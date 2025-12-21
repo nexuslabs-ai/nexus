@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@nexus/react": ["packages/react/src"]
+    }
+  },
+  "references": [
+    { "path": "./packages/react" }
+  ],
+  "include": [],
+  "exclude": ["node_modules"]
+}

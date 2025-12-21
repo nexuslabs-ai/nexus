@@ -1,0 +1,13 @@
+{
+  "name": "@nexus/core",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Internal design tokens and theme definitions (not published)",
+  "scripts": {
+    "build:tokens": "node scripts/generate-css.js",
+    "postbuild:tokens": "node scripts/copy-to-react.js"
+  },
+  "dependencies": {},
+  "license": "MIT"
+}

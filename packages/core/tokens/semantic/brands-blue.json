@@ -1,0 +1,50 @@
+{
+  "primary": {
+    "$value": "{blue.500}",
+    "$type": "color"
+  },
+  "primary-foreground": {
+    "$value": "{blue.50}",
+    "$type": "color"
+  },
+  "primary-hover": {
+    "$value": "{blue.50}",
+    "$type": "color"
+  },
+  "primary-active": {
+    "$value": "{blue.50}",
+    "$type": "color"
+  },
+  "primary-disabled": {
+    "$value": "{blue.50}",
+    "$type": "color"
+  },
+  "secondary": {
+    "$value": "{neutral.100}",
+    "$type": "color"
+  },
+  "secondary-foreground": {
+    "$value": "{neutral.900}",
+    "$type": "color"
+  },
+  "secondary-hover": {
+    "$value": "{neutral.100}",
+    "$type": "color"
+  },
+  "secondary-active": {
+    "$value": "{neutral.100}",
+    "$type": "color"
+  },
+  "secondary-disabled": {
+    "$value": "{neutral.100}",
+    "$type": "color"
+  },
+  "accent": {
+    "$value": "{blue.100}",
+    "$type": "color"
+  },
+  "accent-foreground(delete))": {
+    "$value": "{blue.900}",
+    "$type": "color"
+  }
+}

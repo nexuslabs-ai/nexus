@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "bash": {
+      "enabled": true,
+      "auto_approve": true
+    },
+    "edit": {
+      "enabled": true,
+      "auto_approve": true
+    },
+    "write": {
+      "enabled": true,
+      "auto_approve": true
+    }
+  }
+}
