@@ -1015,7 +1015,7 @@
     "$value": "#ffffff",
     "$type": "color"
   },
-  "balck": {
+  "black": {
     "$value": "#000000",
     "$type": "color"
   }

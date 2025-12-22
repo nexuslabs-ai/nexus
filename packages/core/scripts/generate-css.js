@@ -146,19 +146,30 @@ function getFileCategory(fileName) {
 }
 
 /**
+ * Default theme configuration
+ * Specifies which semantic token files to include
+ */
+const DEFAULT_THEME = {
+  base: 'base-slate.json',
+  brand: 'brands-blue.json',
+};
+
+/**
  * Generate globals.css with Tailwind v4 structure
  */
 function generateGlobalsCSS() {
   const primitivesDir = path.join(TOKENS_DIR, 'primitives');
   const semanticDir = path.join(TOKENS_DIR, 'semantic');
 
-  // Read all files
+  // Read all primitive files
   const primitivesFiles = fs.existsSync(primitivesDir)
     ? fs.readdirSync(primitivesDir).filter(f => f.endsWith('.json'))
     : [];
-  const semanticFiles = fs.existsSync(semanticDir)
-    ? fs.readdirSync(semanticDir).filter(f => f.endsWith('.json'))
-    : [];
+
+  // Only read specified semantic files for the default theme
+  const semanticFiles = [DEFAULT_THEME.base, DEFAULT_THEME.brand].filter(f =>
+    fs.existsSync(path.join(semanticDir, f))
+  );
 
   // Storage for different token types
   const lightColors = [];

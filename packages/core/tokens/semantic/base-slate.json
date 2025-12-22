@@ -15,7 +15,7 @@
     "$value": "{slate.50}",
     "$type": "color"
   },
-  "contianer-foreground": {
+  "container-foreground": {
     "$value": "{slate.900}",
     "$type": "color"
   },
@@ -51,7 +51,7 @@
     "$value": "{slate.950}",
     "$type": "color"
   },
-  "border-warining": {
+  "border-warning": {
     "$value": "{orange.200}",
     "$type": "color"
   },

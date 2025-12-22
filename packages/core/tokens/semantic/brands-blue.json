@@ -43,7 +43,7 @@
     "$value": "{blue.100}",
     "$type": "color"
   },
-  "accent-foreground(delete))": {
+  "accent-foreground": {
     "$value": "{blue.900}",
     "$type": "color"
   }

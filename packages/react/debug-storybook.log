@@ -1,0 +1,13 @@
+[16:35:06.042] [INFO] Initializing Storybook
+[16:35:06.136] [DEBUG] Getting package.json info for /Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/package.json...
+[16:35:06.137] [DEBUG] Getting CLI versions from NPM for storybook...
+[16:35:06.137] [DEBUG] Executing command: yarn info storybook version --json
+[16:35:10.969] [INFO] Adding Storybook version 10.1.10 to your project
+[16:35:10.970] [ERROR] Unable to initialize Storybook in this directory.
+
+Storybook couldn't detect a supported framework or configuration for your project. Make sure you're inside a framework project (e.g., React, Vue, Svelte, Angular, Next.js) and that its dependencies are installed.
+
+Tips:
+- Run init in an empty directory or create a new framework app first.
+- If this directory contains unrelated files, try a new directory for Storybook.
+[16:35:10.972] [INFO] Storybook collects completely anonymous usage telemetry. We use it to shape Storybook's roadmap and prioritize features. You can learn more, including how to opt out, at https://storybook.js.org/telemetry
