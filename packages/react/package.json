@@ -26,19 +26,19 @@
   "devDependencies": {
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/react-vite": "^10.1.10",
-    "@tailwindcss/vite": "^4.0.0",
+    "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^22.10.2",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.4",
     "storybook": "^10.1.10",
-    "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
     "vite": "^6.0.3",
-    "vite-plugin-dts": "^4.3.0"
+    "vite-plugin-dts": "^4.5.4"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.6.0"
