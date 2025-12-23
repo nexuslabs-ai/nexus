@@ -1,0 +1,54 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn:*)",
+      "Bash(yarn install)",
+      "Bash(yarn build)",
+      "Bash(yarn dev)",
+      "Bash(yarn lint:*)",
+      "Bash(yarn test:*)",
+      "Bash(yarn tokens)",
+      "Bash(yarn typecheck)",
+      "Bash(yarn clean)",
+      "Bash(yarn format:*)",
+      "Bash(yarn storybook)",
+      "Bash(yarn build-storybook)",
+      "Bash(npx turbo:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vitest:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)",
+      "Bash(git show:*)",
+      "Bash(git config --get:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(pwd)",
+      "Bash(which:*)",
+      "Bash(mkdir:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -r /)",
+      "Edit(.env*)",
+      "Write(.env*)",
+      "Read(.env.local)",
+      "Bash(git push --force:*)"
+    ]
+  },
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [[ \"$CLAUDE_TOOL_INPUT\" =~ (credentials|secret|password|api_key|apikey|token) ]]; then echo \"Blocked: command contains sensitive keyword\" >&2; exit 1; fi'"
+          }
+        ]
+      }
+    ]
+  }
+}

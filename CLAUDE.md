@@ -10,369 +10,123 @@ When working on tasks:
 2. **Summarize after each step**: Provide a concise summary of what was done after completing each todo/phase
 3. **Wait for confirmation**: Pause after each summary for user review before moving to the next step
 4. **Keep summaries brief**: Use tables or bullet points, not lengthy explanations
-5. **Update context**: After completing a plan/task, ask if CLAUDE.md should be updated to reflect new patterns, components, or architectural decisions
+5. **Keep docs in sync**: After significant changes to a package, proactively check if updates are needed to:
+   - Package `CLAUDE.md` (if behavior/structure changed)
+   - Related `.claude/rules/*.md` (if conventions changed)
+   - Root `CLAUDE.md` (if project-wide patterns changed)
 
 ## Project Structure
 
 ```
 ds/
 ├── packages/
-│   ├── core/           # Design tokens (private, not published)
-│   │   ├── tokens/     # JSON token definitions
-│   │   └── scripts/    # CSS generation scripts
-│   ├── react/          # React component library (@nexus/react)
-│   └── test-utils/     # Test utilities (@nexus/test-utils)
+│   ├── core/           # Design tokens (private) → see packages/core/CLAUDE.md
+│   ├── react/          # React components → see packages/react/CLAUDE.md
+│   └── test-utils/     # Test utilities → see packages/test-utils/CLAUDE.md
 ├── apps/
 │   └── docs/           # Documentation site (planned)
+├── .claude/
+│   ├── commands/       # Slash commands (/pr, /test, /component, /skill, /agent)
+│   ├── rules/          # Convention rules (components, testing, storybook, tokens)
+│   ├── skills/         # Multi-step workflow skills (create-component, etc.)
+│   └── agents/         # Analysis agents (explore-codebase, etc.)
 └── Root configs        # Shared TS, ESLint, Prettier, Turbo
 ```
 
 ## Tech Stack
 
-- **React** 18/19 with TypeScript 5.7
-- **Vite** 6.0 for building (library mode)
-- **Tailwind CSS** 4.0 with @theme directive (CSS-first, no tailwind.config.js)
-- **Turbo** 2.3 for monorepo orchestration
+- **React** 18/19 with TypeScript 5.9
+- **Vite** 7.x for building (library mode)
+- **Tailwind CSS** 4.x with @theme directive (CSS-first)
+- **Turbo** 2.7 for monorepo orchestration
 - **CVA** (class-variance-authority) for component variants
-- **Radix UI** primitives for accessibility (shadcn approach)
-- **Vitest** for testing
+- **Radix UI** primitives for accessibility
+- **Vitest** 4.x for testing (70% coverage thresholds)
 - **Storybook** 10 for component documentation
 
-## Common Commands
+## Commands
 
 ```bash
-# Root commands
-yarn build            # Build all packages
-yarn dev              # Dev mode (watch)
-yarn lint             # Lint all packages
-yarn test             # Run all tests
-yarn test:watch       # Run tests in watch mode
-yarn test:coverage    # Run tests with coverage report
-yarn format           # Format with Prettier
-yarn tokens           # Generate design tokens
-yarn typecheck        # TypeScript check
-yarn clean            # Clean all builds
+# Build & Development
+yarn build              # Build all packages
+yarn dev                # Dev mode (watch)
+yarn tokens             # Generate design tokens
+yarn clean              # Clean all builds
 
-# From packages/react
-yarn build            # vite build
-yarn dev              # vite build --watch
-yarn storybook        # Start Storybook dev server (port 6006)
-yarn build-storybook  # Build static Storybook
+# Quality
+yarn lint               # Lint all packages
+yarn typecheck          # TypeScript check
+yarn format             # Format with Prettier
 
-# From packages/core
-yarn build:tokens     # Generate CSS from tokens
+# Testing
+yarn test               # Run all tests
+yarn test:watch         # Watch mode
+yarn test:coverage      # With coverage report
+
+# Storybook (from packages/react)
+yarn storybook          # Dev server on port 6006
+yarn build-storybook    # Build static site
 ```
 
-## Testing
+## Package Documentation
 
-### Testing Strategy
+| Package | CLAUDE.md | Purpose |
+|---------|-----------|---------|
+| `@nexus/core` | [packages/core/CLAUDE.md](packages/core/CLAUDE.md) | Design tokens (W3C DTCG format) |
+| `@nexus/react` | [packages/react/CLAUDE.md](packages/react/CLAUDE.md) | React component library |
+| `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities |
 
-Three-layer testing approach with clear separation of concerns:
+## Convention Rules
 
-| Layer | Tool | Purpose | What It Covers |
-|-------|------|---------|----------------|
-| **Unit Tests** | Vitest + RTL | Behavior & Logic | Rendering, props, interactions, keyboard nav, a11y violations, edge cases |
-| **Storybook** | Storybook 10 | Visual Docs | All visual states, prop combinations, usage examples, composition patterns |
-| **Visual Regression** | Chromatic | Snapshot Diffs | Cross-browser rendering, responsive layouts, state variations |
+| Rule File | Purpose |
+|-----------|---------|
+| [.claude/rules/components.md](.claude/rules/components.md) | Component structure, props, exports |
+| [.claude/rules/testing.md](.claude/rules/testing.md) | Test structure, patterns, a11y |
+| [.claude/rules/storybook.md](.claude/rules/storybook.md) | Story structure, required stories |
+| [.claude/rules/tokens.md](.claude/rules/tokens.md) | Token format, naming, workflow |
+| [.claude/rules/skills-agents.md](.claude/rules/skills-agents.md) | Skill/agent structure and conventions |
 
-**Key distinctions:**
-- Unit tests → *"Does it work correctly?"*
-- Storybook → *"What does it look like and how do I use it?"*
-- Chromatic → *"Did the visuals change unexpectedly?"*
+## Slash Commands
 
-### Setup
-
-Tests use Vitest + React Testing Library + vitest-axe. Configuration is in `vitest.config.ts`.
-
-```ts
-// Import from @nexus/test-utils (re-exports testing-library + custom render)
-import { axe, render, screen, userEvent } from '@nexus/test-utils';
-import { describe, expect, it, vi } from 'vitest';
-```
-
-### Test File Pattern
-
-Place test files alongside components: `button.tsx` → `button.test.tsx`
-
-### Test Categories
-
-Organize tests into these describe blocks:
-
-```tsx
-describe('Component', () => {
-  describe('Rendering', () => { /* renders, children, element type */ });
-  describe('Props', () => { /* className, native props, data attrs, asChild */ });
-  describe('Variants', () => { /* all variant/size combinations */ });
-  describe('Interactions', () => { /* click, focus, keyboard */ });
-  describe('Accessibility', () => { /* axe audit, aria attrs */ });
-  describe('Edge Cases', () => { /* empty, long content, special chars */ });
-});
-```
-
-### Accessibility Testing
-
-```tsx
-it('has no accessibility violations', async () => {
-  const { container } = render(<Button>Click</Button>);
-  const results = await axe(container);
-  expect(results).toHaveNoViolations();
-});
-```
-
-### Custom Render with Theme
-
-```tsx
-// Light mode (default)
-render(<Button>Click</Button>);
-
-// Dark mode
-render(<Button>Click</Button>, { theme: 'dark' });
-```
-
-## Storybook
-
-### Configuration
-
-Storybook 10 with React Vite. Config in `packages/react/.storybook/`:
-
-- `main.ts` - Framework config, addons, Tailwind CSS plugin
-- `preview.tsx` - Global decorators, theme toggle, backgrounds
-
-### Story File Pattern
-
-Place stories alongside components: `button.tsx` → `Button.stories.tsx`
-
-### Story Structure
-
-```tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
-
-const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
-  component: Button,
-  tags: ['autodocs'],
-  argTypes: {
-    variant: { control: 'select', options: ['primary', 'secondary', 'outline'] },
-    size: { control: 'select', options: ['default', 'sm', 'lg'] },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof Button>;
-
-export const Default: Story = {
-  args: { children: 'Button' },
-};
-
-export const AllVariants: Story = {
-  render: () => (
-    <div className="flex gap-2">
-      <Button variant="primary">Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-    </div>
-  ),
-};
-```
-
-### Required Stories per Component
-
-- Default (primary use case)
-- All variants
-- All sizes
-- Disabled state
-- AllVariants grid (visual comparison)
-
-## Component Patterns
-
-### Standard Component Structure
-
-Components use CVA for variants and `cn()` for class composition:
-
-```tsx
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Slot } from '@radix-ui/react-slot';
-import { cn } from '@/lib/utils';
-
-const componentVariants = cva('base-classes', {
-  variants: {
-    variant: { default: '...', secondary: '...' },
-    size: { default: '...', sm: '...', lg: '...' },
-  },
-  defaultVariants: { variant: 'default', size: 'default' },
-});
-
-function Component({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: React.ComponentProps<'div'> &
-  VariantProps<typeof componentVariants> & {
-    asChild?: boolean;
-  }) {
-  const Comp = asChild ? Slot : 'div';
-  return (
-    <Comp
-      data-slot="component"
-      data-variant={variant}
-      className={cn(componentVariants({ variant, size, className }))}
-      {...props}
-    />
-  );
-}
-
-export { Component, componentVariants };
-```
-
-### Key Conventions
-
-- Use `data-slot` attribute for component identification
-- Use `data-variant` and `data-size` for styling hooks
-- Export both component and variants
-- Support `asChild` prop via Radix Slot for polymorphism
-
-## Design Tokens
-
-### Architecture (W3C DTCG Format)
-
-Tokens follow the W3C Design Tokens Community Group standard:
-
-```
-packages/core/tokens/
-├── primitives/         # Base values (color scales, spacing)
-│   ├── color-light.json
-│   └── color-dark.json
-└── semantic/           # Contextual tokens referencing primitives
-    ├── base-slate.json
-    ├── base-neutral.json
-    ├── brands-blue.json
-    └── brands-amber.json
-```
-
-### Token Format
-
-```json
-{
-  "tokenName": {
-    "$value": "#ffffff",
-    "$type": "color",
-    "$description": "Optional description"
-  },
-  "reference": {
-    "$value": "{slate.50}",
-    "$type": "color"
-  }
-}
-```
-
-### Token Pipeline
-
-1. Edit JSON files in `packages/core/tokens/`
-2. Run `yarn tokens` from root
-3. Generates `packages/react/src/generated/globals.css`
-4. CSS variables available as `--token-name` and via Tailwind
-
-### Semantic Token Categories
-
-Available in `@theme` block (use as Tailwind classes like `bg-primary`):
-
-- **Layout**: `background`, `foreground`, `container`, `popover`, `muted`, `accent`
-- **Brand**: `primary`, `primary-foreground`, `secondary`, `secondary-foreground`
-- **Borders**: `border-default`, `border-primary`, `border-error`, `border-success`
-- **Status**: `error`, `success`, `warning`, `informations` (with `-foreground` variants)
-
-## File Organization
-
-```
-packages/react/src/
-├── components/
-│   └── ui/              # UI components (button.tsx, etc.)
-├── lib/
-│   └── utils.ts         # cn() utility
-├── generated/
-│   └── globals.css      # Auto-generated token CSS
-├── index.css            # Main styles
-└── index.ts             # Package exports
-```
+| Command | Purpose |
+|---------|---------|
+| `/pr` | Pre-PR checklist (typecheck, lint, test, build) |
+| `/test` | Run tests with options |
+| `/component` | Scaffold new component with all files |
+| `/update-docs` | Update documentation after changes |
+| `/skill` | Create or update skills (explore package → define workflow) |
+| `/agent` | Create or update agents (explore scope → define analysis) |
+| `/linkedin` | Generate LinkedIn post from session (creativity 1-5) |
+| `/twitter` | Generate Twitter/X post (single/thread/hot-take) |
 
 ## Code Style
 
 ### Formatting (Prettier)
-
-- Single quotes, semicolons
-- 2-space indentation
-- 80 char line width
-- Trailing commas (es5)
+- Single quotes, semicolons, 2-space indent
+- 80 char line width, trailing commas (es5)
 - Tailwind class sorting enabled
 
 ### Naming
-
-- **Components**: PascalCase (`Button`, `Card`)
-- **Files**: kebab-case (`button.tsx`, `utils.ts`)
-- **Tokens**: camelCase in JSON (`backgroundColor`)
+- **Components**: PascalCase (`Button`)
+- **Files**: kebab-case (`button.tsx`)
+- **Tokens**: camelCase in JSON
 - **CSS vars**: kebab-case (`--color-background`)
-- **Data attrs**: lowercase (`data-slot`, `data-variant`)
 
-### Imports
-
-Sorted by: external → internal → relative
-Use `@/` alias for src-relative imports
-
-## Utilities
-
-### cn() - Class Name Merger
-
-```ts
-import { cn } from '@/lib/utils';
-
-// Combines clsx + tailwind-merge
-cn('px-4 py-2', conditional && 'bg-primary', className);
-```
-
-### CVA - Variant Management
-
-```ts
-import { cva, type VariantProps } from 'class-variance-authority';
-
-const variants = cva('base', {
-  variants: { size: { sm: '...', lg: '...' } },
-  defaultVariants: { size: 'sm' },
-});
-
-// Type-safe variant props
-type Props = VariantProps<typeof variants>;
-```
-
-## Build Output
-
-React package exports:
-- `dist/index.mjs` (ESM)
-- `dist/index.js` (CJS)
-- `dist/index.d.ts` (types)
-- `dist/style.css` (styles)
-
-Import in consuming apps:
-```ts
-import { Button } from '@nexus/react';
-import '@nexus/react/styles.css';
-```
-
-## Theme Support
-
-- Light theme: `:root` CSS variables
-- Dark theme: `.dark` class selector
-- Tokens support both via semantic layer
+### Import Order (ESLint auto-sorts)
+1. React/React-DOM
+2. External packages
+3. Internal aliases (`@/`)
+4. Parent/sibling imports
+5. CSS imports
 
 ## Architecture Philosophy
 
-1. **JSON as Source of Truth**: All design tokens defined in JSON, transformed to CSS
-2. **shadcn/ui Patterns**: Components follow shadcn architecture (copy/customize philosophy)
-3. **Framework Agnostic Tokens**: Core package is private, enables future Vue/Svelte support
+1. **JSON as Source of Truth**: Design tokens in JSON → CSS
+2. **shadcn/ui Patterns**: Components follow shadcn architecture
+3. **Framework Agnostic Tokens**: Core package enables future Vue/Svelte support
 
 ## Notes
 
-- Node >= 18.0.0 required
+- Node >= 20.19.0 required
 - Docs app is placeholder (not implemented)
-- Components reference shadcn's implementation for consistency
+- See package-specific CLAUDE.md files for detailed patterns
