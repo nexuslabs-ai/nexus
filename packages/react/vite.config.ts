@@ -10,6 +10,7 @@ export default defineConfig({
     tailwindcss(),
     dts({
       include: ['src'],
+      exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
       outDir: 'dist',
       rollupTypes: true,
     }),
