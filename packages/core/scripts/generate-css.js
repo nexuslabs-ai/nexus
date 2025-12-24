@@ -12,6 +12,41 @@ if (!fs.existsSync(DIST_DIR)) {
 }
 
 /**
+ * Parse CLI arguments
+ * Usage: node generate-css.js --base=slate --brand=blue
+ */
+function parseArgs() {
+  const args = process.argv.slice(2);
+  const config = {
+    base: 'slate',
+    brand: 'blue',
+  };
+
+  args.forEach((arg) => {
+    const match = arg.match(/^--(\w+)=(.+)$/);
+    if (match) {
+      const [, key, value] = match;
+      if (key === 'base') config.base = value;
+      if (key === 'brand') config.brand = value;
+    }
+  });
+
+  return config;
+}
+
+/**
+ * Get semantic file paths based on base and brand selection
+ */
+function getSemanticFiles(base, brand) {
+  return {
+    baseLight: `base-${base}-light.json`,
+    baseDark: `base-${base}-dark.json`,
+    brandLight: `brands-${brand}-light.json`,
+    brandDark: `brands-${brand}-dark.json`,
+  };
+}
+
+/**
  * Read and parse a DTCG format token file
  */
 function readTokenFile(filePath) {
@@ -48,69 +83,18 @@ function extractTokens(obj, currentPath = [], result = []) {
 }
 
 /**
- * Get namespace prefix based on token path first key
- */
-function getNamespacePrefix(firstKey) {
-  const mapping = {
-    'spacing': 'spacing',
-    'space': 'spacing',
-    'fontSize': 'text',
-    'textSize': 'text',
-    'radius': 'radius',
-    'borderRadius': 'radius',
-    'shadow': 'shadow',
-    'boxShadow': 'shadow',
-    'colors': null, // Strip colors prefix
-    'color': null,
-    'lineHeight': 'leading',
-    'letterSpacing': 'tracking',
-    'fontWeight': 'font-weight',
-  };
-
-  return mapping[firstKey] !== undefined ? mapping[firstKey] : firstKey;
-}
-
-/**
  * Convert token path to CSS variable name
- * @param {string[]} tokenPath - Token path array
- * @param {boolean} isSemanticColor - Whether this is a semantic color token
- * @param {boolean} isPrimitiveColor - Whether this is a primitive color token
- * @returns {string} CSS variable name (without --)
+ * For primitives: ['blue', '500'] → 'blue-500'
+ * For semantic colors: ['primary', 'background'] → 'color-primary-background'
  */
-function pathToCSSVar(tokenPath, isSemanticColor = false, isPrimitiveColor = false) {
-  const firstKey = tokenPath[0];
-  const prefix = getNamespacePrefix(firstKey);
-
-  // For primitive colors (files like color-light.json without nested "colors" group),
-  // just join the path directly
-  if (isPrimitiveColor && prefix !== null && prefix === firstKey) {
-    return tokenPath.join('-');
-  }
-
-  // For tokens with explicit namespace (colors/color prefix that should be stripped)
-  if (prefix === null) {
-    // Strip the first part (colors/color) and join the rest
-    return tokenPath.slice(1).join('-');
-  }
-
-  // If this is a semantic color token, add "color-" prefix
-  if (isSemanticColor) {
-    return `color-${tokenPath.join('-')}`;
-  }
-
-  // Build the CSS variable name with namespace prefix
-  // For namespaced tokens like spacing, fontSize, etc.
-  if (prefix && prefix !== firstKey) {
-    return `${prefix}-${tokenPath.join('-')}`;
-  }
-
-  // Fallback: just join the path
-  return tokenPath.join('-');
+function pathToCSSVar(tokenPath, isSemanticColor = false) {
+  const cssName = tokenPath.join('-');
+  return isSemanticColor ? `color-${cssName}` : cssName;
 }
 
 /**
  * Resolve DTCG reference to CSS var()
- * @param {string} value - Token value (might be a reference like {primary.600})
+ * @param {string} value - Token value (might be a reference like {blue.500})
  * @param {Map} primitiveMap - Map of primitive token paths to CSS names
  * @returns {string} Resolved value
  */
@@ -130,147 +114,124 @@ function resolveReference(value, primitiveMap) {
 }
 
 /**
- * Determine file category based on filename
+ * Process all primitive token files
+ * Returns { tokens: [], primitiveMap: Map }
  */
-function getFileCategory(fileName) {
-  // Check for light/dark color files
-  if (fileName.includes('light') && (fileName.includes('color') || fileName.includes('colour'))) {
-    return 'color-light';
-  }
-  if (fileName.includes('dark') && (fileName.includes('color') || fileName.includes('colour'))) {
-    return 'color-dark';
+function processPrimitives() {
+  const primitivesDir = path.join(TOKENS_DIR, 'primitives');
+  const primitiveTokens = [];
+  const primitiveMap = new Map();
+
+  if (!fs.existsSync(primitivesDir)) {
+    console.warn('⚠ Primitives directory not found');
+    return { tokens: primitiveTokens, primitiveMap };
   }
 
-  // Static tokens (spacing, radius, shadow, typography)
-  return 'static';
+  const files = fs.readdirSync(primitivesDir).filter((f) => f.endsWith('.json'));
+
+  for (const file of files) {
+    const filePath = path.join(primitivesDir, file);
+    const tokenData = readTokenFile(filePath);
+    const tokens = extractTokens(tokenData);
+
+    for (const token of tokens) {
+      const cssName = pathToCSSVar(token.path, false);
+
+      // Add to primitive map for reference resolution
+      primitiveMap.set(token.path.join('.'), cssName);
+
+      primitiveTokens.push({
+        cssName,
+        value: token.value,
+      });
+    }
+  }
+
+  return { tokens: primitiveTokens, primitiveMap };
 }
 
 /**
- * Default theme configuration
- * Specifies which semantic token files to include
+ * Process a semantic token file
+ * Returns array of { cssName, value }
  */
-const DEFAULT_THEME = {
-  base: 'base-slate.json',
-  brand: 'brands-blue.json',
-};
+function processSemanticFile(fileName, primitiveMap) {
+  const semanticDir = path.join(TOKENS_DIR, 'semantic');
+  const filePath = path.join(semanticDir, fileName);
+
+  if (!fs.existsSync(filePath)) {
+    console.warn(`⚠ Semantic file not found: ${fileName}`);
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = extractTokens(tokenData);
+  const result = [];
+
+  for (const token of tokens) {
+    const isColor = token.type === 'color';
+    const cssName = pathToCSSVar(token.path, isColor);
+    const cssValue = resolveReference(token.value, primitiveMap);
+
+    result.push({ cssName, value: cssValue });
+  }
+
+  return result;
+}
 
 /**
  * Generate globals.css with Tailwind v4 structure
  */
-function generateGlobalsCSS() {
-  const primitivesDir = path.join(TOKENS_DIR, 'primitives');
-  const semanticDir = path.join(TOKENS_DIR, 'semantic');
+function generateGlobalsCSS(config) {
+  const { base, brand } = config;
+  const semanticFiles = getSemanticFiles(base, brand);
 
-  // Read all primitive files
-  const primitivesFiles = fs.existsSync(primitivesDir)
-    ? fs.readdirSync(primitivesDir).filter(f => f.endsWith('.json'))
-    : [];
+  console.log(`📦 Theme: base=${base}, brand=${brand}`);
 
-  // Only read specified semantic files for the default theme
-  const semanticFiles = [DEFAULT_THEME.base, DEFAULT_THEME.brand].filter(f =>
-    fs.existsSync(path.join(semanticDir, f))
-  );
-
-  // Storage for different token types
-  const lightColors = [];
-  const darkColors = [];
-  const staticTokens = []; // spacing, fontSize, radius, shadow
-  const semanticTokens = [];
-
-  // Build primitive map for reference resolution
-  const primitiveMap = new Map();
-
-  // Process primitive files
-  for (const file of primitivesFiles) {
-    const filePath = path.join(primitivesDir, file);
-    const tokenData = readTokenFile(filePath);
-    const tokens = extractTokens(tokenData);
-    const fileName = path.basename(file, '.json');
-    const category = getFileCategory(fileName);
-
-    for (const token of tokens) {
-      const isPrimitiveColor = category === 'color-light' || category === 'color-dark';
-      const cssName = pathToCSSVar(token.path, false, isPrimitiveColor);
-
-      // Add to primitive map for reference resolution
-      // Use the original path (without namespace prefix) as key
-      primitiveMap.set(token.path.join('.'), cssName);
-
-      // Categorize by file type
-      if (category === 'color-light') {
-        lightColors.push({ cssName, value: token.value });
-      } else if (category === 'color-dark') {
-        darkColors.push({ cssName, value: token.value });
-      } else {
-        // Static tokens (spacing, radius, shadow, fontSize, etc.)
-        staticTokens.push({ cssName, value: token.value });
-      }
-    }
-  }
+  // Process primitives (theme-agnostic)
+  const { tokens: primitiveTokens, primitiveMap } = processPrimitives();
 
   // Process semantic files
-  for (const file of semanticFiles) {
-    const filePath = path.join(semanticDir, file);
-    const tokenData = readTokenFile(filePath);
-    const tokens = extractTokens(tokenData);
+  const lightBaseTokens = processSemanticFile(semanticFiles.baseLight, primitiveMap);
+  const lightBrandTokens = processSemanticFile(semanticFiles.brandLight, primitiveMap);
+  const darkBaseTokens = processSemanticFile(semanticFiles.baseDark, primitiveMap);
+  const darkBrandTokens = processSemanticFile(semanticFiles.brandDark, primitiveMap);
 
-    for (const token of tokens) {
-      // Strip "semantic" prefix if present
-      const tokenPath = token.path[0] === 'semantic' ? token.path.slice(1) : token.path;
-
-      // Check if this is a color token (add --color- prefix)
-      const isColor = token.type === 'color';
-      const cssName = isColor ? `color-${tokenPath.join('-')}` : pathToCSSVar(tokenPath, false);
-
-      // Resolve reference to var()
-      const cssValue = resolveReference(token.value, primitiveMap);
-
-      semanticTokens.push({ cssName, value: cssValue });
-    }
-  }
+  const lightTokens = [...lightBaseTokens, ...lightBrandTokens];
+  const darkTokens = [...darkBaseTokens, ...darkBrandTokens];
 
   // Generate CSS
   let css = `@import "tailwindcss";\n\n`;
   css += `@custom-variant dark (&:is(.dark *));\n\n`;
 
-  // @theme - Static tokens (spacing, fontSize, radius, shadow, etc.)
-  if (staticTokens.length > 0) {
-    css += `@theme {\n`;
-    for (const token of staticTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-    css += `}\n\n`;
-  }
-
-  // :root - Light colors
-  if (lightColors.length > 0) {
+  // :root - Primitives (all color scales, theme-agnostic)
+  if (primitiveTokens.length > 0) {
     css += `:root {\n`;
-    for (const token of lightColors) {
+    for (const token of primitiveTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
     }
     css += `}\n\n`;
   }
 
-  // .dark - Dark colors
-  if (darkColors.length > 0) {
-    css += `.dark {\n`;
-    for (const token of darkColors) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-    css += `}\n\n`;
-  }
-
-  // @theme inline - Semantic tokens with var() references
-  if (semanticTokens.length > 0) {
+  // @theme inline - Light mode semantic tokens
+  if (lightTokens.length > 0) {
     css += `@theme inline {\n`;
     css += `  --*: initial;\n`;
-    for (const token of semanticTokens) {
+    for (const token of lightTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
     }
     css += `}\n\n`;
   }
 
-  // @layer base - Default styles using CSS variables
+  // .dark - Dark mode semantic overrides
+  if (darkTokens.length > 0) {
+    css += `.dark {\n`;
+    for (const token of darkTokens) {
+      css += `  --${token.cssName}: ${token.value};\n`;
+    }
+    css += `}\n\n`;
+  }
+
+  // @layer base - Default styles
   css += `@layer base {\n`;
   css += `  *,\n`;
   css += `  ::before,\n`;
@@ -288,10 +249,9 @@ function generateGlobalsCSS() {
   console.log('✓ Generated globals.css');
 
   // Log summary
-  console.log(`  - Light colors: ${lightColors.length} tokens`);
-  console.log(`  - Dark colors: ${darkColors.length} tokens`);
-  console.log(`  - Static tokens: ${staticTokens.length} tokens`);
-  console.log(`  - Semantic tokens: ${semanticTokens.length} tokens`);
+  console.log(`  - Primitives: ${primitiveTokens.length} tokens`);
+  console.log(`  - Light semantic: ${lightTokens.length} tokens`);
+  console.log(`  - Dark semantic: ${darkTokens.length} tokens`);
 }
 
 /**
@@ -299,6 +259,7 @@ function generateGlobalsCSS() {
  */
 console.log('🎨 Generating Tailwind v4 CSS from DTCG tokens...\n');
 
-generateGlobalsCSS();
+const config = parseArgs();
+generateGlobalsCSS(config);
 
 console.log('\n✨ Token generation complete!');

@@ -24,7 +24,8 @@ ds/
 │   ├── react/          # React components → see packages/react/CLAUDE.md
 │   └── test-utils/     # Test utilities → see packages/test-utils/CLAUDE.md
 ├── apps/
-│   └── docs/           # Documentation site (planned)
+│   ├── docs/           # Documentation site (planned)
+│   └── playground/     # Theme playground for demos → dynamic theme switching
 ├── .claude/
 │   ├── commands/       # Slash commands (/pr, /test, /component, /skill, /agent)
 │   ├── rules/          # Convention rules (components, testing, storybook, tokens)
@@ -50,8 +51,13 @@ ds/
 # Build & Development
 yarn build              # Build all packages
 yarn dev                # Dev mode (watch)
-yarn tokens             # Generate design tokens
+yarn tokens             # Generate design tokens (production)
+yarn tokens:modular     # Generate modular CSS for playground
 yarn clean              # Clean all builds
+
+# Playground (Theme Demo)
+yarn playground         # Start playground dev server
+yarn playground:copy    # Copy modular themes to playground
 
 # Quality
 yarn lint               # Lint all packages
@@ -75,6 +81,7 @@ yarn build-storybook    # Build static site
 | `@nexus/core` | [packages/core/CLAUDE.md](packages/core/CLAUDE.md) | Design tokens (W3C DTCG format) |
 | `@nexus/react` | [packages/react/CLAUDE.md](packages/react/CLAUDE.md) | React component library |
 | `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities |
+| `@nexus/playground` | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md) | Theme demo app |
 
 ## Convention Rules
 

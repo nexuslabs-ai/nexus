@@ -18,7 +18,10 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens": "cd packages/core && yarn build:tokens"
+    "tokens": "cd packages/core && yarn build:tokens",
+    "tokens:modular": "cd packages/core && yarn build:tokens:modular",
+    "playground": "cd apps/playground && yarn dev",
+    "playground:copy": "cd apps/playground && yarn copy:themes"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

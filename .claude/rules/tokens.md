@@ -21,9 +21,30 @@ Optional properties: `$description`, `$extensions`
 
 | Directory | Pattern | Example |
 |-----------|---------|---------|
-| primitives | `color-{theme}.json` | `color-light.json`, `color-dark.json` |
-| semantic | `base-{palette}.json`, `brands-{name}.json` | `base-slate.json`, `brands-blue.json` |
+| primitives | `color-mode-{n}.json` | `color-mode-1.json` (all colors, theme-agnostic) |
+| semantic | `base-{palette}-{mode}.json` | `base-slate-light.json`, `base-slate-dark.json` |
+| semantic | `brands-{name}-{mode}.json` | `brands-blue-light.json`, `brands-blue-dark.json` |
 | component | `{component}.json` | `button.json` (future) |
+
+## Nested Token Structure
+
+Semantic tokens use nested groups for states:
+
+```json
+{
+  "primary": {
+    "background": { "$value": "{blue.500}", "$type": "color" },
+    "foreground": { "$value": "{blue.50}", "$type": "color" },
+    "hover": { "$value": "{blue.600}", "$type": "color" },
+    "active": { "$value": "{blue.700}", "$type": "color" },
+    "disabled": { "$value": "{blue.300}", "$type": "color" },
+    "text": { "$value": "{blue.500}", "$type": "color" },
+    "surface": { "$value": "{blue.100}", "$type": "color" }
+  }
+}
+```
+
+This generates CSS variables like `--color-primary-background`, `--color-primary-hover`, etc.
 
 ## Reference Syntax
 
@@ -31,8 +52,8 @@ Semantic tokens reference primitives using curly brace syntax:
 
 ```json
 {
-  "primary": {
-    "$value": "{blue.500}",
+  "background": {
+    "$value": "{slate.50}",
     "$type": "color"
   }
 }
@@ -58,22 +79,24 @@ Primitive colors use Tailwind's shade scale (50-950):
 950  - Darkest (text on light bg)
 ```
 
-## Semantic Token Naming
+## Semantic Token Categories
 
-| Pattern | Usage | Example |
-|---------|-------|---------|
-| `{name}` | Main color | `primary`, `background` |
-| `{name}-foreground` | Text on that color | `primary-foreground` |
-| `{name}-hover` | Hover state | `primary-hover` |
-| `{name}-active` | Active/pressed state | `primary-active` |
-| `{name}-disabled` | Disabled state | `primary-disabled` |
-| `border-{context}` | Border colors | `border-default`, `border-error` |
+| Category | Properties | Example |
+|----------|------------|---------|
+| Layout | `background`, `foreground`, `container`, `popover`, `muted`, `accent` | `--color-background` |
+| Brand | `primary.*`, `secondary.*` | `--color-primary-background` |
+| Status | `error.*`, `success.*`, `warning.*`, `information.*` | `--color-error-text` |
+| Borders | `border.default`, `border.primary`, `border.error`, etc. | `--color-border-default` |
+
+Each brand/status group has: `background`, `foreground`, `hover`, `active`, `disabled`, `text`, `surface`
 
 ## Light/Dark Theme Tokens
 
-- Primitive colors go in separate files: `color-light.json` and `color-dark.json`
-- Semantic tokens reference primitives - same semantic file works for both themes
-- The CSS generator outputs `:root` for light and `.dark` for dark primitives
+- **Primitives**: Single file with all color scales (theme-agnostic)
+- **Semantics**: Separate files for light and dark modes
+  - `base-{palette}-light.json` → light mode values
+  - `base-{palette}-dark.json` → dark mode values
+- CSS output: Light in `@theme inline`, dark in `.dark`
 
 ## Validation
 
@@ -93,16 +116,29 @@ Valid `$type` values:
 After editing token files:
 
 ```bash
-yarn tokens           # From root
-# OR
-yarn build:tokens     # From packages/core
+# Production CSS (single theme)
+yarn tokens                    # Uses default: --base=slate --brand=blue
+yarn tokens --base=neutral     # Custom base
+
+# Modular CSS (all themes for playground)
+yarn tokens:modular
 ```
 
-This generates `globals.css` and copies it to the React package.
+## Theme Selection
+
+Configure theme via CLI arguments:
+
+```bash
+node scripts/generate-css.js --base=slate --brand=blue
+```
+
+Available options:
+- **Base**: slate, neutral, zinc, gray, stone
+- **Brand**: blue, gray, neutral, slate
 
 ## Do Not
 
 - Edit files in `dist/` or `packages/react/src/generated/`
-- Use raw hex values in semantic tokens (use references)
-- Mix light/dark values in the same primitive file
+- Use raw hex values in semantic tokens (use `{references}`)
+- Forget to create both light and dark variants for semantic files
 - Add tokens without `$type` property

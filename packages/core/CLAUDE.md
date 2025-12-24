@@ -5,24 +5,33 @@ Private package containing design tokens in W3C DTCG format. Not published to np
 ## Quick Reference
 
 ```bash
-yarn build:tokens    # Generate CSS from tokens
+yarn build:tokens                           # Generate production CSS (default: slate/blue)
+yarn build:tokens:modular                   # Generate modular CSS for playground
+node scripts/generate-css.js --base=neutral --brand=gray  # Custom theme
 ```
 
-Output: `dist/globals.css` → auto-copied to `packages/react/src/generated/globals.css`
+Output:
+- `dist/globals.css` → auto-copied to `packages/react/src/generated/globals.css`
+- `dist/modular/` → individual theme CSS files for playground
 
 ## Token Structure
 
 ```
 tokens/
-├── primitives/           # Raw color scales (light/dark variants)
-│   ├── color-light.json  # Light mode primitives (:root)
-│   └── color-dark.json   # Dark mode primitives (.dark)
-├── semantic/             # Contextual tokens referencing primitives
-│   ├── base-slate.json   # Layout colors (background, foreground, borders)
-│   ├── base-neutral.json # Alternative neutral palette
-│   ├── brands-blue.json  # Brand colors (primary, secondary, accent)
-│   └── brands-amber.json # Alternative brand palette
-└── component/            # Component-specific tokens (future)
+├── primitives/
+│   └── color-mode-1.json      # All color scales (theme-agnostic)
+├── semantic/
+│   ├── base-slate-light.json  # Slate base - light mode
+│   ├── base-slate-dark.json   # Slate base - dark mode
+│   ├── base-neutral-*.json    # Neutral palette variants
+│   ├── base-zinc-*.json       # Zinc palette variants
+│   ├── base-gray-*.json       # Gray palette variants
+│   ├── base-stone-*.json      # Stone palette variants
+│   ├── brands-blue-*.json     # Blue brand variants
+│   ├── brands-gray-*.json     # Gray brand variants
+│   ├── brands-neutral-*.json  # Neutral brand variants
+│   └── brands-slate-*.json    # Slate brand variants
+└── component/                  # Component-specific tokens (future)
 ```
 
 ## Token Format (W3C DTCG)
@@ -31,38 +40,39 @@ tokens/
 ```json
 {
   "blue": {
-    "500": {
-      "$value": "#3b82f6",
-      "$type": "color"
-    }
+    "500": { "$value": "#3b82f6", "$type": "color" }
   }
 }
 ```
 
-**Semantic token** (reference):
+**Semantic token** (nested, with reference):
 ```json
 {
   "primary": {
-    "$value": "{blue.500}",
-    "$type": "color"
+    "background": { "$value": "{blue.500}", "$type": "color" },
+    "foreground": { "$value": "{blue.50}", "$type": "color" },
+    "hover": { "$value": "{blue.600}", "$type": "color" }
   }
 }
 ```
 
-Reference syntax: `{colorName.shade}` resolves to `var(--colorName-shade)`
+Reference syntax: `{colorName.shade}` → `var(--colorName-shade)`
 
-## Theme Configuration
+## Theme Selection
 
-The active theme is defined in `scripts/generate-css.js`:
+Themes are selected via CLI arguments:
 
-```js
-const DEFAULT_THEME = {
-  base: 'base-slate.json',    // Layout tokens
-  brand: 'brands-blue.json',  // Brand tokens
-};
+```bash
+# Default theme
+yarn tokens  # Uses --base=slate --brand=blue
+
+# Custom theme
+node scripts/generate-css.js --base=neutral --brand=gray
 ```
 
-To switch themes, change these file references.
+Available options:
+- **Base**: slate, neutral, zinc, gray, stone
+- **Brand**: blue, gray, neutral, slate
 
 ## Generated CSS Structure
 
@@ -71,39 +81,68 @@ To switch themes, change these file references.
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --blue-500: #3b82f6;        /* Light primitives */
-}
-
-.dark {
-  --blue-500: #60a5fa;        /* Dark primitives */
+  /* Primitives - all color scales (theme-agnostic) */
+  --blue-500: #3b82f6;
+  --slate-50: #f8fafc;
 }
 
 @theme inline {
-  --color-primary: var(--blue-500);  /* Semantic tokens */
+  /* Semantic tokens - light mode */
+  --color-background: var(--slate-50);
+  --color-primary-background: var(--blue-500);
 }
 
-@layer base { ... }           /* Default body styles */
+.dark {
+  /* Semantic tokens - dark mode overrides */
+  --color-background: var(--slate-950);
+}
+
+@layer base { ... }
 ```
 
-## Adding Tokens
+## Modular CSS (for Playground)
 
-1. **Primitive colors**: Add to `tokens/primitives/color-light.json` and `color-dark.json`
-2. **Semantic tokens**: Add to appropriate file in `tokens/semantic/`
-3. Run `yarn tokens` from root
-4. Verify in `packages/react/src/generated/globals.css`
+Generate separate CSS files for dynamic theme switching:
+
+```bash
+yarn build:tokens:modular
+```
+
+Output in `dist/modular/`:
+- `primitives.css` - All color scales
+- `base-{palette}.css` - Base themes (light + dark)
+- `brands-{brand}.css` - Brand themes (light + dark)
 
 ## Semantic Token Categories
 
-| Category | Tokens | Used For |
-|----------|--------|----------|
-| Layout | `background`, `foreground`, `container`, `popover`, `muted`, `accent` | Page structure |
-| Brand | `primary`, `secondary`, `accent` (with `-foreground` variants) | Interactive elements |
-| Borders | `border-default`, `border-primary`, `border-error`, `border-success` | Border colors |
-| Status | `error`, `success`, `warning`, `informations` (with `-foreground`) | Feedback states |
+| Category | Token Pattern | Example |
+|----------|---------------|---------|
+| Layout | `background`, `foreground`, `container`, `popover`, `muted`, `accent` | `--color-background` |
+| Brand | `primary.*`, `secondary.*` | `--color-primary-background` |
+| Status | `error.*`, `success.*`, `warning.*`, `information.*` | `--color-error-text` |
+| Borders | `border.default`, `border.primary`, `border.error` | `--color-border-default` |
+
+Each semantic group has: `background`, `foreground`, `hover`, `active`, `disabled`, `text`, `surface`
+
+## Adding Tokens
+
+1. **Primitives**: Add to `tokens/primitives/color-mode-1.json`
+2. **Base tokens**: Add to both `base-{name}-light.json` and `base-{name}-dark.json`
+3. **Brand tokens**: Add to both `brands-{name}-light.json` and `brands-{name}-dark.json`
+4. Run `yarn tokens` from root
+5. Verify in generated CSS files
+
+## Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `generate-css.js` | Production CSS with selected theme |
+| `generate-modular.js` | Modular CSS for all themes |
+| `copy-to-react.js` | Copy globals.css to React package |
 
 ## Important Notes
 
 - **Never edit** `dist/` or `packages/react/src/generated/` files directly
-- Primitives use direct hex values; semantics use `{references}`
-- Light/dark variants are in separate primitive files, not semantic files
-- The `component/` directory is reserved for future component-specific tokens
+- Primitives are theme-agnostic (same colors for light/dark)
+- Semantic files have separate light/dark variants
+- Dark mode overrides semantic vars, not primitive vars

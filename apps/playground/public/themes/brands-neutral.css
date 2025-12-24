@@ -1,0 +1,35 @@
+/* Brand: neutral */
+
+html {
+  --color-primary-background: var(--neutral-900);
+  --color-primary-foreground: var(--neutral-50);
+  --color-primary-hover: var(--neutral-50);
+  --color-primary-active: var(--neutral-50);
+  --color-primary-disabled: var(--neutral-50);
+  --color-primary-text: var(--neutral-900);
+  --color-primary-surface: var(--neutral-900);
+  --color-secondary-background: var(--neutral-100);
+  --color-secondary-foreground: var(--slate-900);
+  --color-secondary-hover: var(--neutral-100);
+  --color-secondary-active: var(--neutral-100);
+  --color-secondary-disabled: var(--neutral-100);
+  --color-secondary-text: var(--neutral-100);
+  --color-secondary-surface: var(--neutral-100);
+}
+
+html.dark {
+  --color-primary-background: var(--neutral-900);
+  --color-primary-foreground: var(--neutral-50);
+  --color-primary-hover: var(--neutral-50);
+  --color-primary-active: var(--neutral-50);
+  --color-primary-disabled: var(--neutral-50);
+  --color-primary-text: var(--neutral-900);
+  --color-primary-surface: var(--neutral-900);
+  --color-secondary-background: var(--neutral-100);
+  --color-secondary-foreground: var(--slate-900);
+  --color-secondary-hover: var(--neutral-100);
+  --color-secondary-active: var(--neutral-100);
+  --color-secondary-disabled: var(--neutral-100);
+  --color-secondary-text: var(--neutral-100);
+  --color-secondary-surface: var(--neutral-100);
+}

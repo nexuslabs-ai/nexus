@@ -1,0 +1,85 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Theme tokens declaration for Tailwind utility class generation.
+ * Using @theme (not inline) so utilities use var() references that can be overridden.
+ * Actual values are loaded dynamically from /themes/*.css files.
+ */
+@theme {
+  /* Base semantic tokens */
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
+  --color-container: #f8fafc;
+  --color-container-foreground: #0f172a;
+  --color-popover: #f8fafc;
+  --color-popover-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
+  --color-overlay: #1e1e1ecc;
+
+  /* Border tokens */
+  --color-border-default: #e2e8f0;
+  --color-border-primary: #020617;
+  --color-border-warning: #fed7aa;
+  --color-border-success: #bbf7d0;
+  --color-border-error: #fecaca;
+  --color-border-information: #bfdbfe;
+
+  /* Status tokens - Error */
+  --color-error-background: #ef4444;
+  --color-error-foreground: #fafafa;
+  --color-error-hover: #dc2626;
+  --color-error-active: #b91c1c;
+  --color-error-disabled: #fca5a5;
+  --color-error-text: #ef4444;
+  --color-error-surface: #fef2f2;
+
+  /* Status tokens - Success */
+  --color-success-background: #22c55e;
+  --color-success-foreground: #fafafa;
+  --color-success-hover: #16a34a;
+  --color-success-active: #15803d;
+  --color-success-disabled: #86efac;
+  --color-success-text: #22c55e;
+  --color-success-surface: #f0fdf4;
+
+  /* Status tokens - Warning */
+  --color-warning-background: #f97316;
+  --color-warning-foreground: #fafafa;
+  --color-warning-hover: #ea580c;
+  --color-warning-active: #c2410c;
+  --color-warning-disabled: #fdba74;
+  --color-warning-text: #f97316;
+  --color-warning-surface: #fff7ed;
+
+  /* Status tokens - Information */
+  --color-information-background: #3b82f6;
+  --color-information-foreground: #fafafa;
+  --color-information-hover: #2563eb;
+  --color-information-active: #1d4ed8;
+  --color-information-disabled: #93c5fd;
+  --color-information-text: #3b82f6;
+  --color-information-surface: #eff6ff;
+
+  /* Brand tokens - Primary */
+  --color-primary-background: #3b82f6;
+  --color-primary-foreground: #eff6ff;
+  --color-primary-hover: #2563eb;
+  --color-primary-active: #1d4ed8;
+  --color-primary-disabled: #93c5fd;
+  --color-primary-text: #3b82f6;
+  --color-primary-surface: #eff6ff;
+
+  /* Brand tokens - Secondary */
+  --color-secondary-background: #f5f5f5;
+  --color-secondary-foreground: #171717;
+  --color-secondary-hover: #e5e5e5;
+  --color-secondary-active: #d4d4d4;
+  --color-secondary-disabled: #e5e5e5;
+  --color-secondary-text: #525252;
+  --color-secondary-surface: #fafafa;
+}
