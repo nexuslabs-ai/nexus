@@ -1,0 +1,12 @@
+/* radius: blunt */
+
+:root {
+  --base: 16rem;
+  --sm: 14rem;
+  --md: 16rem;
+  --lg: 18rem;
+  --xl: 20rem;
+  --2xl: 24rem;
+  --3xl: 32rem;
+  --full: 9999rem;
+}

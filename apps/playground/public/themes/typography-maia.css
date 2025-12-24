@@ -1,0 +1,48 @@
+/* typography: maia */
+
+:root {
+  --family-font-sans: Inter;
+  --family-font-senrif: Georgia;
+  --family-font-mono: JetBrains Mono;
+  --size-xs: 13rem;
+  --size-sm: 15rem;
+  --size-base: 17rem;
+  --size-lg: 19rem;
+  --size-xl: 21rem;
+  --size-2xl: 25rem;
+  --size-3xl: 31rem;
+  --size-4xl: 37rem;
+  --size-5xl: 49rem;
+  --size-6xl: 61rem;
+  --size-7xl: 73rem;
+  --size-8xl: 97rem;
+  --size-9xl: 129rem;
+  --weight-thin: 100;
+  --weight-extralight: 200;
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --weight-black: 900;
+  --line-height-xs: 18rem;
+  --line-height-sm: 22rem;
+  --line-height-base: 26rem;
+  --line-height-lg: 30rem;
+  --line-height-xl: 30rem;
+  --line-height-2xl: 34rem;
+  --line-height-3xl: 38rem;
+  --line-height-4xl: 42rem;
+  --line-height-5xl: 50rem;
+  --line-height-6xl: 62rem;
+  --line-height-7xl: 74rem;
+  --line-height-8xl: 98rem;
+  --line-height-9xl: 130rem;
+  --letterspacing-tighter: -0.8999999761581421rem;
+  --letterspacing-tight: -0.44999998807907104rem;
+  --letterspacing-normal: 0rem;
+  --letterspacing-wide: 0.44999998807907104rem;
+  --letterspacing-wider: 0.8999999761581421rem;
+  --letterspacing-widest: 1.7999999523162842rem;
+}

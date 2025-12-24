@@ -1,0 +1,14 @@
+/* Shadow Variables */
+
+:root {
+  --shadow-2xs: var(--2xs-layer-1-x) var(--2xs-layer-1-y) 3rem var(--2xs-layer-1-spread) var(--2xs-layer-1-color);
+  --shadow-xs: var(--xs-layer-1-x) var(--xs-layer-1-y) 3rem var(--2xs-layer-1-spread) var(--xs-layer-1-color);
+  --shadow-sm: var(--sm-layer-2-x) var(--sm-layer-2-y) 2rem var(--sm-layer-2-spread) var(--sm-layer-2-color), var(--sm-layer-1-x) var(--sm-layer-1-y) 3rem var(--sm-layer-1-spread) var(--sm-layer-1-color);
+  --shadow-base: var(--base-layer-2-x) var(--base-layer-2-y) 2rem var(--base-layer-2-spread) var(--base-layer-2-color), var(--base-layer-1-x) var(--base-layer-1-y) 3rem var(--base-layer-1-spread) var(--base-layer-1-color);
+  --shadow-lg: var(--lg-layer-2-x) var(--lg-layer-2-y) 6rem var(--lg-layer-2-spread) var(--lg-layer-2-color), var(--lg-layer-1-x) var(--lg-layer-1-y) 3rem var(--lg-layer-1-spread) var(--lg-layer-1-color);
+  --shadow-xl: var(--xl-layer-2-x) var(--xl-layer-2-y) 10rem var(--xl-layer-2-spread) var(--xl-layer-2-color), var(--xl-layer-1-x) var(--xl-layer-1-y) 3rem var(--xl-layer-1-spread) var(--xl-layer-1-color);
+  --shadow-2xl: var(--2xl-layer-1-x) var(--2xl-layer-1-y) 3rem var(--2xl-layer-1-spread) var(--2xl-layer-1-color);
+  --shadow-inner: inset var(--inner-layer-1-x) var(--inner-layer-1-y) 4rem var(--inner-layer-1-spread) var(--inner-layer-1-color);
+  --shadow-focus-default: var(--focus-default-x) var(--focus-default-y) 0rem var(--focus-default-spread) var(--focus-default-color);
+  --shadow-focus-error: var(--focus-error-x) var(--focus-error-y) 0rem var(--focus-error-spread) var(--focus-error-color);
+}

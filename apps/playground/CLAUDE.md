@@ -5,7 +5,7 @@ Theme demonstration app for previewing design token combinations dynamically.
 ## Purpose
 
 - Demo tool for showing clients theme variations
-- Test different base palette + brand combinations
+- Test different color, typography, spacing, and style combinations
 - Preview light/dark mode switching in real-time
 
 ## Tech Stack
@@ -30,9 +30,16 @@ yarn copy:themes      # Copy modular CSS from core package
 apps/playground/
 ├── public/
 │   └── themes/           # Modular CSS files (copied from core)
-│       ├── primitives.css
-│       ├── base-{palette}.css
-│       └── brands-{brand}.css
+│       ├── primitives.css           # All color scales
+│       ├── base-{palette}.css       # Base themes (5)
+│       ├── brands-{brand}.css       # Brand themes (4)
+│       ├── size-{mode}.css          # Size/spacing modes (5)
+│       ├── typography-{mode}.css    # Typography modes (5)
+│       ├── shadow-{mode}.css        # Shadow modes (5)
+│       ├── radius-{mode}.css        # Border radius modes (5)
+│       ├── borderwidth-{mode}.css   # Border width modes (5)
+│       ├── typography-utilities.css # text-* utility classes
+│       └── shadow-variables.css     # --shadow-* CSS variables
 └── src/
     ├── main.tsx          # React entry
     ├── App.tsx           # Main layout
@@ -40,30 +47,45 @@ apps/playground/
     ├── hooks/
     │   └── useTheme.ts   # Theme state + CSS loading
     └── components/
-        ├── ThemeSwitcher.tsx    # Dropdown controls
-        └── ComponentShowcase.tsx # Component preview
+        ├── ThemeSwitcher.tsx    # Dropdown controls (2 rows: Colors + Tokens)
+        └── ComponentShowcase.tsx # Component preview sections
 ```
 
 ## How It Works
 
-1. **Primitives CSS** loads once on mount (all Tailwind colors)
-2. **Base CSS** swaps when palette dropdown changes
-3. **Brand CSS** swaps when brand dropdown changes
+1. **Static files** load once on mount: primitives, typography-utilities, shadow-variables
+2. **Color themes** swap when base/brand dropdown changes
+3. **Token modes** swap when size/typography/shadow/radius/border dropdowns change
 4. **Dark mode** toggles `.dark` class on `<html>`
 
 ```tsx
 // useTheme hook manages dynamic CSS loading
+useEffect(() => loadCSS('/themes/primitives.css', 'primitives'), []);
+useEffect(() => loadCSS('/themes/typography-utilities.css', 'typography-utilities'), []);
 useEffect(() => loadCSS(`/themes/base-${theme.base}.css`, 'base'), [theme.base]);
-useEffect(() => loadCSS(`/themes/brands-${theme.brand}.css`, 'brand'), [theme.brand]);
+useEffect(() => loadCSS(`/themes/size-${theme.size}.css`, 'size'), [theme.size]);
+// ... etc for each dimension
 ```
 
-## Available Themes
+## Available Theme Dimensions
+
+### Color Themes
 
 | Type | Options |
 |------|---------|
 | Base | slate, neutral, zinc, gray, stone |
 | Brand | blue, gray, neutral, slate |
 | Mode | light, dark |
+
+### Design Token Modes
+
+| Dimension | Options | Default |
+|-----------|---------|---------|
+| Size | vega, lyra, maia, mira, nova | vega |
+| Typography | vega, lyra, maia, mira, nova | vega |
+| Shadow | vega, lyra, maia, mira, nova | vega |
+| Radius | blunt, sharp, subtle, smooth, mellow | subtle |
+| Border Width | vega, lyra, maia, mira, nova | vega |
 
 ## Setup
 
@@ -74,17 +96,36 @@ yarn playground:copy    # Copy to playground
 yarn playground         # Start dev server
 ```
 
+## ComponentShowcase Sections
+
+The showcase demonstrates all token categories:
+
+| Section | Tokens Used |
+|---------|-------------|
+| Typography | `text-display-*`, `text-headling-*`, `text-body-*`, `text-label-*`, `text-code-*` |
+| Shadows | `--shadow-2xs` to `--shadow-2xl`, `--shadow-inner`, `--shadow-focus-default` |
+| Border Radius | `--sm`, `--md`, `--lg`, `--xl`, `--2xl`, `--3xl`, `--full` |
+| Spacing | `--size-1` to `--size-16` |
+| Buttons | Semantic colors + `var(--md)` for radius |
+| Colors | `bg-primary-*`, `bg-secondary-*`, `bg-error-*`, etc. |
+| Status | `bg-success-surface`, `text-success-text`, etc. |
+
 ## Adding Components
 
 Edit [ComponentShowcase.tsx](src/components/ComponentShowcase.tsx) to add more component previews using native HTML with semantic token classes:
 
 ```tsx
-// Add to showcase - use semantic color tokens
-<div className="rounded-lg bg-container p-4 border border-border-default">
-  <button className="bg-primary-background text-primary-foreground px-4 py-2 rounded-md">
-    New Button
-  </button>
-</div>
+// Use semantic color tokens
+<button className="bg-primary-background text-primary-foreground px-4 py-2"
+        style={{ borderRadius: 'var(--md)' }}>
+  Button
+</button>
+
+// Use typography utilities
+<p className="text-body-default">Body text</p>
+
+// Use shadow variables
+<div style={{ boxShadow: 'var(--shadow-lg)' }}>Card</div>
 ```
 
 ## Technical Notes

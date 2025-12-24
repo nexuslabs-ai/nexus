@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
 
 export type ThemeConfig = {
+  // Color themes
   base: string;
   brand: string;
   dark: boolean;
+  // Design token modes
+  size: string;
+  typography: string;
+  shadow: string;
+  radius: string;
+  borderWidth: string;
 };
 
 /**
@@ -29,14 +36,23 @@ function loadCSS(href: string, id: string): void {
  */
 export function useTheme() {
   const [theme, setTheme] = useState<ThemeConfig>({
+    // Color themes
     base: 'slate',
     brand: 'blue',
     dark: false,
+    // Design token modes
+    size: 'vega',
+    typography: 'vega',
+    shadow: 'vega',
+    radius: 'subtle',
+    borderWidth: 'vega',
   });
 
-  // Load primitives once on mount
+  // Load static files once on mount (primitives + utilities)
   useEffect(() => {
     loadCSS('/themes/primitives.css', 'primitives');
+    loadCSS('/themes/typography-utilities.css', 'typography-utilities');
+    loadCSS('/themes/shadow-variables.css', 'shadow-variables');
   }, []);
 
   // Load base theme when it changes
@@ -48,6 +64,31 @@ export function useTheme() {
   useEffect(() => {
     loadCSS(`/themes/brands-${theme.brand}.css`, 'brand');
   }, [theme.brand]);
+
+  // Load size mode when it changes
+  useEffect(() => {
+    loadCSS(`/themes/size-${theme.size}.css`, 'size');
+  }, [theme.size]);
+
+  // Load typography mode when it changes
+  useEffect(() => {
+    loadCSS(`/themes/typography-${theme.typography}.css`, 'typography');
+  }, [theme.typography]);
+
+  // Load shadow mode when it changes
+  useEffect(() => {
+    loadCSS(`/themes/shadow-${theme.shadow}.css`, 'shadow');
+  }, [theme.shadow]);
+
+  // Load radius mode when it changes
+  useEffect(() => {
+    loadCSS(`/themes/radius-${theme.radius}.css`, 'radius');
+  }, [theme.radius]);
+
+  // Load border width mode when it changes
+  useEffect(() => {
+    loadCSS(`/themes/borderwidth-${theme.borderWidth}.css`, 'borderwidth');
+  }, [theme.borderWidth]);
 
   // Toggle dark class on html element
   useEffect(() => {

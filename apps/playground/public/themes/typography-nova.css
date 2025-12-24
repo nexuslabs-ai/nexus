@@ -1,0 +1,48 @@
+/* typography: nova */
+
+:root {
+  --family-font-sans: Inter;
+  --family-font-senrif: Georgia;
+  --family-font-mono: JetBrains Mono;
+  --size-xs: 11rem;
+  --size-sm: 13rem;
+  --size-base: 15rem;
+  --size-lg: 17rem;
+  --size-xl: 19rem;
+  --size-2xl: 23rem;
+  --size-3xl: 29rem;
+  --size-4xl: 35rem;
+  --size-5xl: 47rem;
+  --size-6xl: 59rem;
+  --size-7xl: 71rem;
+  --size-8xl: 95rem;
+  --size-9xl: 127rem;
+  --weight-thin: 100;
+  --weight-extralight: 200;
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --weight-black: 900;
+  --line-height-xs: 15rem;
+  --line-height-sm: 19rem;
+  --line-height-base: 23rem;
+  --line-height-lg: 26rem;
+  --line-height-xl: 27rem;
+  --line-height-2xl: 31rem;
+  --line-height-3xl: 35rem;
+  --line-height-4xl: 39rem;
+  --line-height-5xl: 47rem;
+  --line-height-6xl: 59rem;
+  --line-height-7xl: 71rem;
+  --line-height-8xl: 95rem;
+  --line-height-9xl: 127rem;
+  --letterspacing-tighter: -0.699999988079071rem;
+  --letterspacing-tight: -0.3499999940395355rem;
+  --letterspacing-normal: 0rem;
+  --letterspacing-wide: 0.3499999940395355rem;
+  --letterspacing-wider: 0.699999988079071rem;
+  --letterspacing-widest: 1.399999976158142rem;
+}

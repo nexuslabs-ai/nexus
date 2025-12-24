@@ -1,0 +1,12 @@
+/* radius: smooth */
+
+:root {
+  --base: 8rem;
+  --sm: 6rem;
+  --md: 8rem;
+  --lg: 10rem;
+  --xl: 12rem;
+  --2xl: 16rem;
+  --3xl: 24rem;
+  --full: 9999rem;
+}

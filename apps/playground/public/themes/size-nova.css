@@ -1,0 +1,38 @@
+/* size: nova */
+
+:root {
+  --size-0: 0rem;
+  --size-0,5: 2rem;
+  --size-1: 4rem;
+  --size-1,5: 6rem;
+  --size-2: 8rem;
+  --size-2,5: 9rem;
+  --size-3: 10rem;
+  --size-3,5: 12rem;
+  --size-4: 14rem;
+  --size-5: 18rem;
+  --size-6: 22rem;
+  --size-7: 26rem;
+  --size-8: 30rem;
+  --size-9: 34rem;
+  --size-10: 38rem;
+  --size-11: 42rem;
+  --size-12: 46rem;
+  --size-14: 52rem;
+  --size-16: 60rem;
+  --size-20: 76rem;
+  --size-24: 92rem;
+  --size-28: 108rem;
+  --size-32: 124rem;
+  --size-36: 140rem;
+  --size-40: 156rem;
+  --size-44: 172rem;
+  --size-48: 188rem;
+  --size-52: 204rem;
+  --size-56: 220rem;
+  --size-60: 236rem;
+  --size-64: 252rem;
+  --size-72: 284rem;
+  --size-80: 316rem;
+  --size-96: 380rem;
+}

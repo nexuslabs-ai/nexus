@@ -1,0 +1,48 @@
+/* typography: lyra */
+
+:root {
+  --family-font-sans: Inter;
+  --family-font-senrif: Georgia;
+  --family-font-mono: JetBrains Mono;
+  --size-xs: 12rem;
+  --size-sm: 14rem;
+  --size-base: 16rem;
+  --size-lg: 18rem;
+  --size-xl: 20rem;
+  --size-2xl: 24rem;
+  --size-3xl: 30rem;
+  --size-4xl: 36rem;
+  --size-5xl: 48rem;
+  --size-6xl: 60rem;
+  --size-7xl: 72rem;
+  --size-8xl: 96rem;
+  --size-9xl: 128rem;
+  --weight-thin: 100;
+  --weight-extralight: 200;
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --weight-black: 900;
+  --line-height-xs: 18rem;
+  --line-height-sm: 22rem;
+  --line-height-base: 26rem;
+  --line-height-lg: 30rem;
+  --line-height-xl: 32rem;
+  --line-height-2xl: 36rem;
+  --line-height-3xl: 40rem;
+  --line-height-4xl: 44rem;
+  --line-height-5xl: 56rem;
+  --line-height-6xl: 68rem;
+  --line-height-7xl: 80rem;
+  --line-height-8xl: 104rem;
+  --line-height-9xl: 136rem;
+  --letterspacing-tighter: -0.800000011920929rem;
+  --letterspacing-tight: -0.4000000059604645rem;
+  --letterspacing-normal: 0rem;
+  --letterspacing-wide: 0.4000000059604645rem;
+  --letterspacing-wider: 0.800000011920929rem;
+  --letterspacing-widest: 1.600000023841858rem;
+}

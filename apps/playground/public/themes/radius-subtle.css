@@ -1,0 +1,12 @@
+/* radius: subtle */
+
+:root {
+  --base: 4rem;
+  --sm: 2rem;
+  --md: 4rem;
+  --lg: 6rem;
+  --xl: 8rem;
+  --2xl: 12rem;
+  --3xl: 20rem;
+  --full: 9999rem;
+}

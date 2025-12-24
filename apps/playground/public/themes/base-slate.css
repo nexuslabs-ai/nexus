@@ -4,7 +4,7 @@ html {
   --color-background: var(--slate-50);
   --color-foreground: var(--slate-900);
   --color-container: var(--slate-50);
-  --color-contianer-foreground: var(--slate-900);
+  --color-container-foreground: var(--slate-900);
   --color-popover: var(--slate-50);
   --color-popover-foreground: var(--slate-900);
   --color-muted: var(--slate-100);
@@ -14,7 +14,7 @@ html {
   --color-overlay: #1e1e1ecc;
   --color-border-default: var(--slate-200);
   --color-border-primary: var(--slate-950);
-  --color-border-warining: var(--orange-200);
+  --color-border-warning: var(--orange-200);
   --color-border-success: var(--green-200);
   --color-border-error: var(--red-200);
   --color-border-information: var(--blue-200);
@@ -52,7 +52,7 @@ html.dark {
   --color-background: var(--slate-50);
   --color-foreground: var(--slate-900);
   --color-container: var(--slate-50);
-  --color-contianer-foreground: var(--slate-900);
+  --color-container-foreground: var(--slate-900);
   --color-popover: var(--slate-50);
   --color-popover-foreground: var(--slate-900);
   --color-muted: var(--slate-100);
@@ -62,7 +62,7 @@ html.dark {
   --color-overlay: #1e1e1ecc;
   --color-border-default: var(--slate-200);
   --color-border-primary: var(--slate-950);
-  --color-border-warining: var(--orange-200);
+  --color-border-warning: var(--orange-200);
   --color-border-success: var(--green-200);
   --color-border-error: var(--red-200);
   --color-border-information: var(--blue-200);
