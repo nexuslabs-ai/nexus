@@ -176,6 +176,14 @@ export default tseslint.config(
     },
   },
 
+  // CLI scripts - allow console.log for user output
+  {
+    files: ['**/scripts/**/*.js'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
   // Disable rules that conflict with Prettier
   prettierConfig
 );

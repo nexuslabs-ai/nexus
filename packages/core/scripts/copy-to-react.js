@@ -11,7 +11,13 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CORE_DIR = path.join(__dirname, '..');
 const DIST_DIR = path.join(CORE_DIR, 'dist');
-const REACT_GENERATED_DIR = path.join(CORE_DIR, '..', 'react', 'src', 'generated');
+const REACT_GENERATED_DIR = path.join(
+  CORE_DIR,
+  '..',
+  'react',
+  'src',
+  'generated'
+);
 
 // Ensure React generated directory exists
 if (!fs.existsSync(REACT_GENERATED_DIR)) {

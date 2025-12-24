@@ -11,7 +11,7 @@
     "$value": "{white}",
     "$type": "color"
   },
-  "contianer-foreground": {
+  "container-foreground": {
     "$value": "{zinc.950}",
     "$type": "color"
   },
@@ -52,7 +52,7 @@
       "$value": "{zinc.950}",
       "$type": "color"
     },
-    "warining": {
+    "warning": {
       "$value": "{orange.200}",
       "$type": "color"
     },

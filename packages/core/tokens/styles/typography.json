@@ -1,0 +1,187 @@
+{
+  "display": {
+    "large": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.6xl}",
+        "fontWeight": "{weight.light}",
+        "lineHeight": "{line-height.6xl}",
+        "letterSpacing": "{letterspacing.tight}"
+      },
+      "$description": "Hero sections, landing page headlines, marketing headers"
+    },
+    "medium": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.5xl}",
+        "fontWeight": "{weight.normal}",
+        "lineHeight": "{line-height.5xl}",
+        "letterSpacing": "{letterspacing.tight}"
+      },
+      "$description": "Secondary hero text, promotional banners, feature headers"
+    }
+  },
+  "headling": {
+    "xlarge": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.4xl}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "{line-height.4xl}",
+        "letterSpacing": "{letterspacing.tight}"
+      },
+      "$description": "Page titles, dashboard headers, main content titles"
+    },
+    "large": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.3xl}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "{line-height.3xl}",
+        "letterSpacing": "{letterspacing.normal}"
+      },
+      "$description": "Major section heading, dialog titles, card group headers"
+    },
+    "medium": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.2xl}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "{line-height.2xl}",
+        "letterSpacing": "{letterspacing.normal}"
+      },
+      "$description": "Susbsection heading, card titles, modal headers"
+    },
+    "small": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.xl}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "{line-height.xl}",
+        "letterSpacing": "{letterspacing.normal}"
+      },
+      "$description": "Card Titles, list section headers, minor heading"
+    },
+    "xsmall": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.lg}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "{line-height.lg}",
+        "letterSpacing": "{letterspacing.normal}"
+      },
+      "$description": "Table Section headers, accordian titles, minor seciton lables"
+    }
+  },
+  "body": {
+    "large": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.lg}",
+        "fontWeight": "{weight.normal}",
+        "lineHeight": "{line-height.lg}",
+        "letterSpacing": "{letterspacing.normal}"
+      },
+      "$description": "Long-form content, articles, documentation, emphasis paragraph"
+    },
+    "default": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.base}",
+        "fontWeight": "{weight.normal}",
+        "lineHeight": "{line-height.base}",
+        "letterSpacing": "{letterspacing.normal}"
+      },
+      "$description": "Default Paragraph text, description, card content, main body copy"
+    },
+    "small": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.sm}",
+        "fontWeight": "{weight.normal}",
+        "lineHeight": "{line-height.sm}",
+        "letterSpacing": "{letterspacing.normal}"
+      }
+    }
+  },
+  "label": {
+    "large": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.sm}",
+        "fontWeight": "{weight.medium}",
+        "lineHeight": "{line-height.sm}",
+        "letterSpacing": "{letterspacing.normal}"
+      }
+    },
+    "default": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.sm}",
+        "fontWeight": "{weight.medium}",
+        "lineHeight": "{line-height.sm}",
+        "letterSpacing": "{letterspacing.normal}"
+      }
+    },
+    "small": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.xs}",
+        "fontWeight": "{weight.medium}",
+        "lineHeight": "{line-height.xs}",
+        "letterSpacing": "{letterspacing.normal}"
+      }
+    },
+    "caps": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.xs}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "{line-height.xs}",
+        "letterSpacing": "{letterspacing.wider}"
+      }
+    }
+  },
+  "code": {
+    "block": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-mono}",
+        "fontSize": "{size.sm}",
+        "fontWeight": "{weight.normal}",
+        "lineHeight": "{line-height.sm}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "rem"
+        }
+      }
+    },
+    "inline": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-mono}",
+        "fontSize": "{size.sm}",
+        "fontWeight": "{weight.semibold}",
+        "lineHeight": "auto",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "rem"
+        }
+      }
+    }
+  }
+}

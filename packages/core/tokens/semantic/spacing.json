@@ -1,0 +1,138 @@
+{
+  "spacing-0": {
+    "$value": "{size-0}",
+    "$type": "dimension"
+  },
+  "spacing-0,5": {
+    "$value": "{size-0,5}",
+    "$type": "dimension"
+  },
+  "spacing-1": {
+    "$value": "{size-1}",
+    "$type": "dimension"
+  },
+  "spacing-1,5": {
+    "$value": "{size-1,5}",
+    "$type": "dimension"
+  },
+  "spacing-2": {
+    "$value": "{size-2}",
+    "$type": "dimension"
+  },
+  "spacing-2,5": {
+    "$value": "{size-2,5}",
+    "$type": "dimension"
+  },
+  "spacing-3": {
+    "$value": "{size-3}",
+    "$type": "dimension"
+  },
+  "spacing-3,5": {
+    "$value": "{size-3,5}",
+    "$type": "dimension"
+  },
+  "spacing-4": {
+    "$value": "{size-4}",
+    "$type": "dimension"
+  },
+  "spacing-5": {
+    "$value": "{size-5}",
+    "$type": "dimension"
+  },
+  "spacing-6": {
+    "$value": "{size-6}",
+    "$type": "dimension"
+  },
+  "spacing-7": {
+    "$value": "{size-7}",
+    "$type": "dimension"
+  },
+  "spacing-8": {
+    "$value": "{size-8}",
+    "$type": "dimension"
+  },
+  "spacing-9": {
+    "$value": "{size-9}",
+    "$type": "dimension"
+  },
+  "spacing-10": {
+    "$value": "{size-10}",
+    "$type": "dimension"
+  },
+  "spacing-11": {
+    "$value": "{size-11}",
+    "$type": "dimension"
+  },
+  "spacing-12": {
+    "$value": "{size-12}",
+    "$type": "dimension"
+  },
+  "spacing-14": {
+    "$value": "{size-14}",
+    "$type": "dimension"
+  },
+  "spacing-16": {
+    "$value": "{size-16}",
+    "$type": "dimension"
+  },
+  "spacing-20": {
+    "$value": "{size-20}",
+    "$type": "dimension"
+  },
+  "spacing-24": {
+    "$value": "{size-24}",
+    "$type": "dimension"
+  },
+  "spacing-28": {
+    "$value": "{size-28}",
+    "$type": "dimension"
+  },
+  "spacing-32": {
+    "$value": "{size-32}",
+    "$type": "dimension"
+  },
+  "spacing-36": {
+    "$value": "{size-36}",
+    "$type": "dimension"
+  },
+  "spacing-40": {
+    "$value": "{size-40}",
+    "$type": "dimension"
+  },
+  "spacing-44": {
+    "$value": "{size-44}",
+    "$type": "dimension"
+  },
+  "spacing-48": {
+    "$value": "{size-48}",
+    "$type": "dimension"
+  },
+  "spacing-52": {
+    "$value": "{size-52}",
+    "$type": "dimension"
+  },
+  "spacing-56": {
+    "$value": "{size-56}",
+    "$type": "dimension"
+  },
+  "spacing-60": {
+    "$value": "{size-60}",
+    "$type": "dimension"
+  },
+  "spacing-64": {
+    "$value": "{size-64}",
+    "$type": "dimension"
+  },
+  "spacing-72": {
+    "$value": "{size-72}",
+    "$type": "dimension"
+  },
+  "spacing-80": {
+    "$value": "{size-80}",
+    "$type": "dimension"
+  },
+  "spacing-96": {
+    "$value": "{size-96}",
+    "$type": "dimension"
+  }
+}

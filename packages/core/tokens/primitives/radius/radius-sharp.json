@@ -1,0 +1,58 @@
+{
+  "base": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "sm": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "md": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "lg": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "xl": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "2xl": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "3xl": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "full": {
+    "$value": {
+      "value": 9999,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  }
+}

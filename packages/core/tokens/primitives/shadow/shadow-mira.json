@@ -1,0 +1,566 @@
+{
+  "2xs": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000000a",
+        "$type": "color"
+      }
+    }
+  },
+  "xs": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000000a",
+        "$type": "color"
+      }
+    }
+  },
+  "sm": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000000d",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 2,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#00000014",
+        "$type": "color"
+      }
+    }
+  },
+  "base": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#00000014",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 2,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#00000014",
+        "$type": "color"
+      }
+    }
+  },
+  "md": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#00000014",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 2,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 4,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#00000014",
+        "$type": "color"
+      }
+    }
+  },
+  "lg": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 5,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 8,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    }
+  },
+  "xl": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 10,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 14,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    }
+  },
+  "2xl": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 4,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#00000038",
+        "$type": "color"
+      }
+    }
+  },
+  "inner": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 4,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000000a",
+        "$type": "color"
+      }
+    }
+  },
+  "focus": {
+    "default": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 2,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "{neutral.100}",
+        "$type": "color"
+      }
+    },
+    "error": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 0,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 2,
+          "unit": "rem"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "{red.100}",
+        "$type": "color"
+      }
+    }
+  }
+}

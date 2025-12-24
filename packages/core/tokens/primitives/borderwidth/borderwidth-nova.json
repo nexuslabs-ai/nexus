@@ -1,0 +1,16 @@
+{
+  "default": {
+    "$value": {
+      "value": 1.5,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "thick": {
+    "$value": {
+      "value": 3,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  }
+}

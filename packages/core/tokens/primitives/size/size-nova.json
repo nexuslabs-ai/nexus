@@ -1,0 +1,240 @@
+{
+  "size-0": {
+    "$value": {
+      "value": 0,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-0,5": {
+    "$value": {
+      "value": 2,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-1": {
+    "$value": {
+      "value": 4,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-1,5": {
+    "$value": {
+      "value": 6,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-2": {
+    "$value": {
+      "value": 8,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-2,5": {
+    "$value": {
+      "value": 9,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-3": {
+    "$value": {
+      "value": 10,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-3,5": {
+    "$value": {
+      "value": 12,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-4": {
+    "$value": {
+      "value": 14,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-5": {
+    "$value": {
+      "value": 18,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-6": {
+    "$value": {
+      "value": 22,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-7": {
+    "$value": {
+      "value": 26,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-8": {
+    "$value": {
+      "value": 30,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-9": {
+    "$value": {
+      "value": 34,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-10": {
+    "$value": {
+      "value": 38,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-11": {
+    "$value": {
+      "value": 42,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-12": {
+    "$value": {
+      "value": 46,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-14": {
+    "$value": {
+      "value": 52,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-16": {
+    "$value": {
+      "value": 60,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-20": {
+    "$value": {
+      "value": 76,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-24": {
+    "$value": {
+      "value": 92,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-28": {
+    "$value": {
+      "value": 108,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-32": {
+    "$value": {
+      "value": 124,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-36": {
+    "$value": {
+      "value": 140,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-40": {
+    "$value": {
+      "value": 156,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-44": {
+    "$value": {
+      "value": 172,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-48": {
+    "$value": {
+      "value": 188,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-52": {
+    "$value": {
+      "value": 204,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-56": {
+    "$value": {
+      "value": 220,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-60": {
+    "$value": {
+      "value": 236,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-64": {
+    "$value": {
+      "value": 252,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-72": {
+    "$value": {
+      "value": 284,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-80": {
+    "$value": {
+      "value": 316,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  },
+  "size-96": {
+    "$value": {
+      "value": 380,
+      "unit": "rem"
+    },
+    "$type": "dimension"
+  }
+}

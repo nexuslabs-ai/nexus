@@ -19,19 +19,30 @@ Output:
 ```
 tokens/
 ├── primitives/
-│   └── color-mode-1.json      # All color scales (theme-agnostic)
+│   ├── color.json             # All color scales (theme-agnostic)
+│   ├── size/                  # Size/spacing modes
+│   │   ├── size-vega.json     # Default density
+│   │   ├── size-lyra.json     # Compact density
+│   │   ├── size-maia.json     # Comfortable density
+│   │   ├── size-mira.json     # Spacious density
+│   │   └── size-nova.json     # Extra spacious
+│   ├── typography/            # Typography scale modes
+│   │   └── typography-{mode}.json
+│   ├── shadow/                # Shadow intensity modes
+│   │   └── shadow-{mode}.json
+│   ├── radius/                # Border radius modes
+│   │   └── radius-{mode}.json
+│   └── borderwidth/           # Border width modes
+│       └── borderwidth-{mode}.json
 ├── semantic/
 │   ├── base-slate-light.json  # Slate base - light mode
 │   ├── base-slate-dark.json   # Slate base - dark mode
-│   ├── base-neutral-*.json    # Neutral palette variants
-│   ├── base-zinc-*.json       # Zinc palette variants
-│   ├── base-gray-*.json       # Gray palette variants
-│   ├── base-stone-*.json      # Stone palette variants
-│   ├── brands-blue-*.json     # Blue brand variants
-│   ├── brands-gray-*.json     # Gray brand variants
-│   ├── brands-neutral-*.json  # Neutral brand variants
-│   └── brands-slate-*.json    # Slate brand variants
-└── component/                  # Component-specific tokens (future)
+│   ├── base-{palette}-*.json  # Other palette variants (neutral, zinc, gray, stone)
+│   └── brands-{brand}-*.json  # Brand variants (blue, gray, neutral, slate)
+├── styles/
+│   ├── typography.json        # Typography style definitions → @utility classes
+│   └── shadows.json           # Shadow style definitions → --shadow-* variables
+└── component/                 # Component-specific tokens (future)
 ```
 
 ## Token Format (W3C DTCG)
@@ -63,16 +74,24 @@ Reference syntax: `{colorName.shade}` → `var(--colorName-shade)`
 Themes are selected via CLI arguments:
 
 ```bash
-# Default theme
-yarn tokens  # Uses --base=slate --brand=blue
+# Default theme (all options have defaults)
+yarn tokens  # Uses slate/blue/vega defaults
 
 # Custom theme
-node scripts/generate-css.js --base=neutral --brand=gray
+node scripts/generate-css.js --base=neutral --brand=gray --size=lyra --shadow=subtle
 ```
 
 Available options:
-- **Base**: slate, neutral, zinc, gray, stone
-- **Brand**: blue, gray, neutral, slate
+
+| Option | Default | Values |
+|--------|---------|--------|
+| `--base` | slate | slate, neutral, zinc, gray, stone |
+| `--brand` | blue | blue, gray, neutral, slate |
+| `--size` | vega | vega, lyra, maia, mira, nova |
+| `--typography` | vega | vega, lyra, maia, mira, nova |
+| `--shadow` | vega | vega, subtle, dramatic, soft, sharp |
+| `--radius` | subtle | subtle, sharp, rounded, pill |
+| `--borderwidth` | vega | vega, thin, thick |
 
 ## Generated CSS Structure
 
@@ -81,9 +100,17 @@ Available options:
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Primitives - all color scales (theme-agnostic) */
+  /* Primitives - all color scales */
   --blue-500: #3b82f6;
   --slate-50: #f8fafc;
+
+  /* Size/spacing primitives (from selected mode) */
+  --size-0: 0rem;
+  --size-4: 1rem;
+
+  /* Shadow variables */
+  --shadow-xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0px 0px 0px 2px var(--blue-100);
 }
 
 @theme inline {
@@ -95,6 +122,14 @@ Available options:
 .dark {
   /* Semantic tokens - dark mode overrides */
   --color-background: var(--slate-950);
+}
+
+/* Typography utilities (Tailwind v4 @utility) */
+@utility text-display-large {
+  font-family: var(--family-font-sans);
+  font-size: var(--size-6xl);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-6xl);
 }
 
 @layer base { ... }
@@ -109,9 +144,19 @@ yarn build:tokens:modular
 ```
 
 Output in `dist/modular/`:
-- `primitives.css` - All color scales
-- `base-{palette}.css` - Base themes (light + dark)
-- `brands-{brand}.css` - Brand themes (light + dark)
+
+| File Pattern | Content |
+|--------------|---------|
+| `primitives.css` | All color scales |
+| `base-{palette}.css` | Base themes (light + dark) |
+| `brands-{brand}.css` | Brand themes (light + dark) |
+| `size-{mode}.css` | Size/spacing primitives |
+| `typography-{mode}.css` | Typography scale primitives |
+| `shadow-{mode}.css` | Shadow primitives |
+| `radius-{mode}.css` | Border radius primitives |
+| `borderwidth-{mode}.css` | Border width primitives |
+| `typography-utilities.css` | text-* utility classes |
+| `shadow-variables.css` | --shadow-* CSS variables |
 
 ## Semantic Token Categories
 
@@ -126,11 +171,13 @@ Each semantic group has: `background`, `foreground`, `hover`, `active`, `disable
 
 ## Adding Tokens
 
-1. **Primitives**: Add to `tokens/primitives/color-mode-1.json`
-2. **Base tokens**: Add to both `base-{name}-light.json` and `base-{name}-dark.json`
-3. **Brand tokens**: Add to both `brands-{name}-light.json` and `brands-{name}-dark.json`
-4. Run `yarn tokens` from root
-5. Verify in generated CSS files
+1. **Color primitives**: Add to `tokens/primitives/color.json`
+2. **Size/typography/shadow/radius/borderwidth**: Add to respective `tokens/primitives/{category}/{category}-{mode}.json`
+3. **Base tokens**: Add to both `tokens/semantic/base-{name}-light.json` and `base-{name}-dark.json`
+4. **Brand tokens**: Add to both `tokens/semantic/brands-{name}-light.json` and `brands-{name}-dark.json`
+5. **Typography/shadow styles**: Add to `tokens/styles/typography.json` or `shadows.json`
+6. Run `yarn tokens` from root
+7. Verify in generated CSS files
 
 ## Scripts
 
@@ -139,6 +186,9 @@ Each semantic group has: `background`, `foreground`, `hover`, `active`, `disable
 | `generate-css.js` | Production CSS with selected theme |
 | `generate-modular.js` | Modular CSS for all themes |
 | `copy-to-react.js` | Copy globals.css to React package |
+| `utils.js` | Shared utilities (token parsing, CSS var generation) |
+
+Tests: `scripts/__tests__/utils.test.js` (31 unit tests)
 
 ## Important Notes
 
