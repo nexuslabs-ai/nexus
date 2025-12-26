@@ -89,9 +89,9 @@ Available options:
 | `--brand` | blue | blue, gray, neutral, slate |
 | `--size` | vega | vega, lyra, maia, mira, nova |
 | `--typography` | vega | vega, lyra, maia, mira, nova |
-| `--shadow` | vega | vega, subtle, dramatic, soft, sharp |
-| `--radius` | subtle | subtle, sharp, rounded, pill |
-| `--borderwidth` | vega | vega, thin, thick |
+| `--shadow` | vega | vega, lyra, maia, mira, nova |
+| `--radius` | subtle | blunt, sharp, subtle, smooth, mellow |
+| `--borderwidth` | vega | vega, lyra, maia, mira, nova |
 
 ## Generated CSS Structure
 
@@ -157,6 +157,8 @@ Output in `dist/modular/`:
 | `borderwidth-{mode}.css` | Border width primitives |
 | `typography-utilities.css` | text-* utility classes |
 | `shadow-variables.css` | --shadow-* CSS variables |
+| `borderwidth-utilities.css` | border-default, border-thick utilities |
+| `spacing.css` | Spacing semantic mappings |
 
 ## Semantic Token Categories
 
