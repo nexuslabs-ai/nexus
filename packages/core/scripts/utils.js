@@ -199,6 +199,142 @@ export const DEFAULT_CONFIG = {
   borderwidth: 'vega',
 };
 
+// ============================================
+// AUTO-DISCOVERY FUNCTIONS
+// ============================================
+
+/**
+ * Discover all primitive token categories and their modes from file system.
+ * Detects categories from:
+ * - Root level JSON files (single mode, e.g., color.json)
+ * - Subdirectories with {category}-{mode}.json files
+ *
+ * @param {string} primitivesDir - Path to primitives directory
+ * @returns {object} Discovered categories: { category: { modes: string[]|null, files: string[] } }
+ */
+export function discoverPrimitives(primitivesDir) {
+  const result = {};
+
+  if (!fs.existsSync(primitivesDir)) {
+    return result;
+  }
+
+  const items = fs.readdirSync(primitivesDir, { withFileTypes: true });
+
+  for (const item of items) {
+    if (item.name.startsWith('.')) continue; // Skip hidden files
+
+    const fullPath = path.join(primitivesDir, item.name);
+
+    if (item.isDirectory()) {
+      // Subdirectory: discover modes from {category}-{mode}.json pattern
+      const category = item.name;
+      const files = fs.readdirSync(fullPath).filter((f) => f.endsWith('.json'));
+      const modes = files
+        .map((f) => {
+          // Extract mode from {category}-{mode}.json
+          const match = f.match(new RegExp(`^${category}-(.+)\\.json$`));
+          return match ? match[1] : null;
+        })
+        .filter(Boolean)
+        .sort();
+
+      if (modes.length > 0) {
+        result[category] = { modes, files };
+      }
+    } else if (item.name.endsWith('.json')) {
+      // Root level JSON file: single mode category
+      const category = item.name.replace('.json', '');
+      result[category] = { modes: null, files: [item.name] };
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Discover all semantic token themes and standalone files from file system.
+ * Detects:
+ * - Themed files: {type}-{mode}-{light|dark}.json pattern
+ * - Standalone files: {name}.json (no light/dark suffix)
+ *
+ * @param {string} semanticDir - Path to semantic directory
+ * @returns {object} { themed: { type: { mode: { light, dark } } }, standalone: string[] }
+ */
+export function discoverSemantics(semanticDir) {
+  const result = {
+    themed: {},
+    standalone: [],
+  };
+
+  if (!fs.existsSync(semanticDir)) {
+    return result;
+  }
+
+  const files = fs.readdirSync(semanticDir).filter((f) => f.endsWith('.json'));
+
+  // Pattern for themed files: {type}-{mode}-{light|dark}.json
+  const themedPattern = /^(.+)-(.+)-(light|dark)\.json$/;
+
+  for (const file of files) {
+    const match = file.match(themedPattern);
+
+    if (match) {
+      const [, type, mode, variant] = match;
+
+      if (!result.themed[type]) {
+        result.themed[type] = {};
+      }
+      if (!result.themed[type][mode]) {
+        result.themed[type][mode] = {};
+      }
+      result.themed[type][mode][variant] = file;
+    } else {
+      // Standalone file (no light/dark suffix)
+      result.standalone.push(file);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Get all available modes for a discovered primitive category
+ * @param {object} discovered - Result from discoverPrimitives()
+ * @param {string} category - Category name
+ * @returns {string[]|null} Array of modes or null if single-mode
+ */
+export function getModes(discovered, category) {
+  return discovered[category]?.modes || null;
+}
+
+/**
+ * Process a semantic token file and resolve references
+ * @param {string} filePath - Full path to semantic file
+ * @param {Map} primitiveMap - Primitive map for reference resolution
+ * @returns {object[]} Array of { cssName, value, type }
+ */
+export function processSemanticTokens(filePath, primitiveMap) {
+  if (!fs.existsSync(filePath)) {
+    log.warn(`Semantic file not found: ${filePath}`);
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const extracted = extractTokens(tokenData);
+  const tokens = [];
+
+  for (const token of extracted) {
+    // Add 'color' prefix for color tokens, no prefix for dimensions (spacing)
+    const prefix = token.type === 'color' ? 'color' : null;
+    const cssName = pathToCssVar(token.path, prefix);
+    const cssValue = resolveValue(token.value, primitiveMap, token.type);
+    tokens.push({ cssName, value: cssValue, type: token.type });
+  }
+
+  return tokens;
+}
+
 /**
  * Parse CLI arguments
  * @returns {object} Configuration object
@@ -230,3 +366,66 @@ export const log = {
   error: (msg) => console.error(`✗ ${msg}`),
   file: (msg) => console.log(`  ✓ ${msg}`),
 };
+
+// ============================================
+// SHADOW COMPOSITE HELPERS
+// ============================================
+
+/**
+ * Convert a shadow reference path to a CSS var() reference
+ * @param {string} refPath - Reference path like "2xs.layer-1.x"
+ * @returns {string} CSS var() reference like "var(--shadow-2xs-layer-1-x)"
+ */
+export function shadowRefToVar(refPath) {
+  const cssName = refPath.replace(/\./g, '-');
+  return `var(--shadow-${cssName})`;
+}
+
+/**
+ * Format a shadow property value as a var() reference or literal
+ * @param {*} value - Property value (reference or dimension object)
+ * @returns {string} CSS var() reference or literal value
+ */
+export function formatShadowPropertyAsVar(value) {
+  // Handle references like {2xs.layer-1.x} -> var(--shadow-2xs-layer-1-x)
+  if (isReference(value)) {
+    const refPath = extractRefPath(value);
+    return shadowRefToVar(refPath);
+  }
+
+  // Handle dimension objects like { value: 3, unit: "px" }
+  if (typeof value === 'object' && value !== null && 'value' in value) {
+    return formatTokenValue(value, 'dimension');
+  }
+
+  // Return as-is for other values
+  return String(value);
+}
+
+/**
+ * Format a single shadow layer to CSS box-shadow value using var() references
+ * @param {object} layer - Shadow layer definition
+ * @param {boolean} isInset - Whether this is an inset shadow
+ * @returns {string} CSS box-shadow value for this layer
+ */
+export function formatShadowLayer(layer, isInset = false) {
+  const x = formatShadowPropertyAsVar(layer.offsetX);
+  const y = formatShadowPropertyAsVar(layer.offsetY);
+  const blur = formatShadowPropertyAsVar(layer.blur);
+  const spread = formatShadowPropertyAsVar(layer.spread);
+  const color = formatShadowPropertyAsVar(layer.color);
+  const inset = isInset || layer.inset ? 'inset ' : '';
+
+  return `${inset}${x} ${y} ${blur} ${spread} ${color}`;
+}
+
+/**
+ * Format a complete shadow composite (single or multi-layer) to CSS value
+ * @param {object|object[]} value - Shadow value (single layer or array of layers)
+ * @param {boolean} isInset - Whether this is an inset shadow
+ * @returns {string} CSS box-shadow value
+ */
+export function formatShadowComposite(value, isInset = false) {
+  const layers = Array.isArray(value) ? value : [value];
+  return layers.map((layer) => formatShadowLayer(layer, isInset)).join(', ');
+}

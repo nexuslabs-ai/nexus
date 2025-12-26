@@ -6,7 +6,7 @@
     },
     "$type": "dimension"
   },
-  "size-0,5": {
+  "size-0_5": {
     "$value": {
       "value": 2,
       "unit": "px"
@@ -20,7 +20,7 @@
     },
     "$type": "dimension"
   },
-  "size-1,5": {
+  "size-1_5": {
     "$value": {
       "value": 6,
       "unit": "px"
@@ -34,7 +34,7 @@
     },
     "$type": "dimension"
   },
-  "size-2,5": {
+  "size-2_5": {
     "$value": {
       "value": 11,
       "unit": "px"
@@ -48,7 +48,7 @@
     },
     "$type": "dimension"
   },
-  "size-3,5": {
+  "size-3_5": {
     "$value": {
       "value": 16,
       "unit": "px"

@@ -3,32 +3,32 @@
     "$value": "{size-0}",
     "$type": "dimension"
   },
-  "spacing-0,5": {
-    "$value": "{size-0,5}",
+  "spacing-0_5": {
+    "$value": "{size-0_5}",
     "$type": "dimension"
   },
   "spacing-1": {
     "$value": "{size-1}",
     "$type": "dimension"
   },
-  "spacing-1,5": {
-    "$value": "{size-1,5}",
+  "spacing-1_5": {
+    "$value": "{size-1_5}",
     "$type": "dimension"
   },
   "spacing-2": {
     "$value": "{size-2}",
     "$type": "dimension"
   },
-  "spacing-2,5": {
-    "$value": "{size-2,5}",
+  "spacing-2_5": {
+    "$value": "{size-2_5}",
     "$type": "dimension"
   },
   "spacing-3": {
     "$value": "{size-3}",
     "$type": "dimension"
   },
-  "spacing-3,5": {
-    "$value": "{size-3,5}",
+  "spacing-3_5": {
+    "$value": "{size-3_5}",
     "$type": "dimension"
   },
   "spacing-4": {

@@ -1,6 +1,6 @@
 /* borderwidth: maia */
 
 :root {
-  --default: 1rem;
-  --thick: 1rem;
+  --borderwidth-default: 1px;
+  --borderwidth-thick: 1px;
 }

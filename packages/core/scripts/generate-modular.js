@@ -3,12 +3,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import {
+  discoverPrimitives,
+  discoverSemantics,
   ensureDir,
   extractTokens,
+  formatShadowComposite,
   formatTokenValue,
   isReference,
   log,
   pathToCssVar,
+  processSemanticTokens,
   readTokenFile,
   resolveValue,
 } from './utils.js';
@@ -17,87 +21,36 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.join(__dirname, '../tokens');
 const MODULAR_DIR = path.join(__dirname, '../dist/modular');
 
-/**
- * Discover all available modes for each category
- */
-function discoverModes() {
-  const result = {
-    bases: [],
-    brands: [],
-    sizes: [],
-    typographies: [],
-    shadows: [],
-    radii: [],
-    borderwidths: [],
-  };
-
-  // Discover base and brand themes from semantic
-  const semanticDir = path.join(TOKENS_DIR, 'semantic');
-  if (fs.existsSync(semanticDir)) {
-    const files = fs.readdirSync(semanticDir);
-    const bases = new Set();
-    const brands = new Set();
-
-    files.forEach((file) => {
-      const baseMatch = file.match(/^base-(\w+)-(light|dark)\.json$/);
-      if (baseMatch) bases.add(baseMatch[1]);
-
-      const brandMatch = file.match(/^brands-(\w+)-(light|dark)\.json$/);
-      if (brandMatch) brands.add(brandMatch[1]);
-    });
-
-    result.bases = Array.from(bases).sort();
-    result.brands = Array.from(brands).sort();
-  }
-
-  // Discover density/shape modes from primitives subdirectories
-  const primitivesDir = path.join(TOKENS_DIR, 'primitives');
-  const modePatterns = [
-    { dir: 'size', prefix: 'size-', key: 'sizes' },
-    { dir: 'typography', prefix: 'typography-', key: 'typographies' },
-    { dir: 'shadow', prefix: 'shadow-', key: 'shadows' },
-    { dir: 'radius', prefix: 'radius-', key: 'radii' },
-    { dir: 'borderwidth', prefix: 'borderwidth-', key: 'borderwidths' },
-  ];
-
-  for (const { dir, prefix, key } of modePatterns) {
-    const subDir = path.join(primitivesDir, dir);
-    if (fs.existsSync(subDir)) {
-      const files = fs.readdirSync(subDir).filter((f) => f.endsWith('.json'));
-      const modes = files.map((f) =>
-        f.replace(prefix, '').replace('.json', '')
-      );
-      result[key] = modes.sort();
-    }
-  }
-
-  return result;
-}
+const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
+const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 
 /**
- * Process color primitives and build primitive map
+ * Process a single-file primitive category (e.g., color.json)
+ * @param {string} category - Category name (e.g., 'color')
+ * @param {Map} primitiveMap - Map to populate with token references
+ * @returns {object[]} Array of { cssName, value } tokens
  */
-function processColorPrimitives() {
-  const colorFile = path.join(TOKENS_DIR, 'primitives/color.json');
-  const primitiveMap = new Map();
+function processSinglePrimitive(category, primitiveMap) {
+  const filePath = path.join(PRIMITIVES_DIR, `${category}.json`);
   const tokens = [];
 
-  if (!fs.existsSync(colorFile)) {
-    log.warn('Color primitives not found');
-    return { tokens, primitiveMap };
+  if (!fs.existsSync(filePath)) {
+    log.warn(`Single primitive not found: ${category}.json`);
+    return tokens;
   }
 
-  const tokenData = readTokenFile(colorFile);
+  const tokenData = readTokenFile(filePath);
   const extracted = extractTokens(tokenData);
 
   for (const token of extracted) {
-    const cssName = pathToCssVar(token.path);
+    // Add category prefix: --{category}-{token-path}
+    const cssName = `${category}-${pathToCssVar(token.path)}`;
     const cssValue = formatTokenValue(token.value, token.type);
     primitiveMap.set(token.path.join('.'), { cssName, value: cssValue });
     tokens.push({ cssName, value: cssValue });
   }
 
-  return { tokens, primitiveMap };
+  return tokens;
 }
 
 /**
@@ -119,8 +72,9 @@ function processPrimitiveFile(category, mode, primitiveMap) {
   const extracted = extractTokens(tokenData);
 
   for (const token of extracted) {
-    // No prefix needed - category is already part of the token path
-    const cssName = pathToCssVar(token.path);
+    // Add category prefix to CSS variable name: --{category}-{token-path}
+    // e.g., shadow/2xs.layer-1.x → --shadow-2xs-layer-1-x
+    const cssName = `${category}-${pathToCssVar(token.path)}`;
     let cssValue = token.value;
 
     // Resolve references if needed
@@ -139,28 +93,11 @@ function processPrimitiveFile(category, mode, primitiveMap) {
 }
 
 /**
- * Process semantic file (base or brand)
+ * Process semantic file (wrapper for shared function)
  */
 function processSemanticFile(fileName, primitiveMap) {
-  const filePath = path.join(TOKENS_DIR, 'semantic', fileName);
-
-  if (!fs.existsSync(filePath)) {
-    log.warn(`Semantic file not found: ${fileName}`);
-    return [];
-  }
-
-  const tokenData = readTokenFile(filePath);
-  const extracted = extractTokens(tokenData);
-  const tokens = [];
-
-  for (const token of extracted) {
-    const isColor = token.type === 'color';
-    const cssName = pathToCssVar(token.path, isColor ? 'color' : null);
-    const cssValue = resolveValue(token.value, primitiveMap, token.type);
-    tokens.push({ cssName, value: cssValue });
-  }
-
-  return tokens;
+  const filePath = path.join(SEMANTIC_DIR, fileName);
+  return processSemanticTokens(filePath, primitiveMap);
 }
 
 /**
@@ -241,9 +178,9 @@ function processTypographyStyles(primitiveMap) {
 }
 
 /**
- * Process shadow styles
+ * Process shadow styles - generates var() references instead of resolved values
  */
-function processShadowStyles(primitiveMap) {
+function processShadowStyles() {
   const stylesFile = path.join(TOKENS_DIR, 'styles/shadows.json');
 
   if (!fs.existsSync(stylesFile)) {
@@ -258,20 +195,10 @@ function processShadowStyles(primitiveMap) {
     if (token.type !== 'shadow') continue;
 
     const cssName = `shadow-${token.path.join('-')}`;
-    const layers = Array.isArray(token.value) ? token.value : [token.value];
+    const isInset = token.path.includes('inner');
+    const cssValue = formatShadowComposite(token.value, isInset);
 
-    const shadowParts = layers.map((layer) => {
-      const inset = token.path.includes('inner') ? 'inset ' : '';
-      const offsetX = resolveValue(layer.offsetX, primitiveMap, 'dimension');
-      const offsetY = resolveValue(layer.offsetY, primitiveMap, 'dimension');
-      const blur = formatTokenValue(layer.blur, 'dimension');
-      const spread = resolveValue(layer.spread, primitiveMap, 'dimension');
-      const color = resolveValue(layer.color, primitiveMap, 'color');
-
-      return `${inset}${offsetX} ${offsetY} ${blur} ${spread} ${color}`;
-    });
-
-    shadows.push({ cssName, value: shadowParts.join(', ') });
+    shadows.push({ cssName, value: cssValue });
   }
 
   return shadows;
@@ -287,17 +214,19 @@ function writeModularFile(fileName, content) {
 }
 
 /**
- * Generate primitives.css with all color scales
+ * Generate CSS file for a single-file primitive category
+ * @param {object[]} tokens - Array of { cssName, value } tokens
+ * @param {string} category - Category name for file naming
  */
-function generatePrimitivesCSS(colorTokens) {
-  let css = `/* Primitives - All color scales */\n\n:root {\n`;
+function generatePrimitivesCSS(tokens, category) {
+  let css = `/* ${category} primitives */\n\n:root {\n`;
 
-  for (const token of colorTokens) {
+  for (const token of tokens) {
     css += `  --${token.cssName}: ${token.value};\n`;
   }
 
   css += `}\n`;
-  writeModularFile('primitives.css', css);
+  writeModularFile(`${category}.css`, css);
 }
 
 /**
@@ -315,19 +244,22 @@ function generateModeCSS(category, mode, tokens) {
 }
 
 /**
- * Generate base theme CSS
+ * Generate themed CSS file (supports light/dark variants)
+ * @param {string} type - Theme type (e.g., 'base', 'brands')
+ * @param {string} mode - Mode name (e.g., 'slate', 'blue')
+ * @param {Map} primitiveMap - Map of primitive token references
  */
-function generateBaseCSS(baseName, primitiveMap) {
+function generateThemedCSS(type, mode, primitiveMap) {
   const lightTokens = processSemanticFile(
-    `base-${baseName}-light.json`,
+    `${type}-${mode}-light.json`,
     primitiveMap
   );
   const darkTokens = processSemanticFile(
-    `base-${baseName}-dark.json`,
+    `${type}-${mode}-dark.json`,
     primitiveMap
   );
 
-  let css = `/* Base: ${baseName} */\n\nhtml {\n`;
+  let css = `/* ${type}: ${mode} */\n\nhtml {\n`;
 
   for (const token of lightTokens) {
     css += `  --${token.cssName}: ${token.value};\n`;
@@ -339,35 +271,7 @@ function generateBaseCSS(baseName, primitiveMap) {
   }
   css += `}\n`;
 
-  writeModularFile(`base-${baseName}.css`, css);
-}
-
-/**
- * Generate brand theme CSS
- */
-function generateBrandCSS(brandName, primitiveMap) {
-  const lightTokens = processSemanticFile(
-    `brands-${brandName}-light.json`,
-    primitiveMap
-  );
-  const darkTokens = processSemanticFile(
-    `brands-${brandName}-dark.json`,
-    primitiveMap
-  );
-
-  let css = `/* Brand: ${brandName} */\n\nhtml {\n`;
-
-  for (const token of lightTokens) {
-    css += `  --${token.cssName}: ${token.value};\n`;
-  }
-  css += `}\n\nhtml.dark {\n`;
-
-  for (const token of darkTokens) {
-    css += `  --${token.cssName}: ${token.value};\n`;
-  }
-  css += `}\n`;
-
-  writeModularFile(`brands-${brandName}.css`, css);
+  writeModularFile(`${type}-${mode}.css`, css);
 }
 
 /**
@@ -402,6 +306,40 @@ function generateShadowVariablesCSS(shadows) {
 }
 
 /**
+ * Generate border width utilities CSS
+ * @param {object[]} tokens - Array of borderwidth tokens
+ */
+function generateBorderWidthUtilitiesCSS(tokens) {
+  let css = `/* Border Width Utilities */\n\n`;
+
+  for (const token of tokens) {
+    // Extract the name part (e.g., "default" from "borderwidth-default")
+    const name = token.cssName.replace('borderwidth-', '');
+
+    css += `@utility border-${name} {\n`;
+    css += `  border-style: var(--tw-border-style, solid);\n`;
+    css += `  border-width: var(--${token.cssName});\n`;
+    css += `}\n\n`;
+  }
+
+  writeModularFile('borderwidth-utilities.css', css);
+}
+
+/**
+ * Generate standalone semantic CSS (spacing, etc.)
+ */
+function generateStandaloneSemanticCSS(name, tokens) {
+  let css = `/* ${name} */\n\n:root {\n`;
+
+  for (const token of tokens) {
+    css += `  --${token.cssName}: ${token.value};\n`;
+  }
+
+  css += `}\n`;
+  writeModularFile(`${name}.css`, css);
+}
+
+/**
  * Main execution
  */
 function main() {
@@ -409,66 +347,76 @@ function main() {
 
   ensureDir(MODULAR_DIR);
 
-  // Discover all available modes
-  const modes = discoverModes();
+  // Auto-discover all categories and modes
+  const primitives = discoverPrimitives(PRIMITIVES_DIR);
+  const semantics = discoverSemantics(SEMANTIC_DIR);
 
-  console.log(`📦 Discovered modes:`);
-  console.log(`   Bases: ${modes.bases.join(', ')}`);
-  console.log(`   Brands: ${modes.brands.join(', ')}`);
-  console.log(`   Sizes: ${modes.sizes.join(', ')}`);
-  console.log(`   Typography: ${modes.typographies.join(', ')}`);
-  console.log(`   Shadows: ${modes.shadows.join(', ')}`);
-  console.log(`   Radii: ${modes.radii.join(', ')}`);
-  console.log(`   Border widths: ${modes.borderwidths.join(', ')}\n`);
-
-  // Process color primitives first (needed for reference resolution)
-  const { tokens: colorTokens, primitiveMap } = processColorPrimitives();
-
-  // Generate primitives.css
-  console.log('Color primitives:');
-  generatePrimitivesCSS(colorTokens);
-
-  // Generate mode files
-  console.log('\nSize modes:');
-  for (const mode of modes.sizes) {
-    const tokens = processPrimitiveFile('size', mode, primitiveMap);
-    generateModeCSS('size', mode, tokens);
+  // Log discovered structure
+  console.log('📦 Discovered primitives:');
+  for (const [category, info] of Object.entries(primitives)) {
+    if (info.modes) {
+      console.log(`   ${category}: ${info.modes.join(', ')}`);
+    } else {
+      console.log(`   ${category}: (single file)`);
+    }
   }
 
-  console.log('\nTypography modes:');
-  for (const mode of modes.typographies) {
-    const tokens = processPrimitiveFile('typography', mode, primitiveMap);
-    generateModeCSS('typography', mode, tokens);
+  console.log('\n📦 Discovered semantics:');
+  for (const [type, modes] of Object.entries(semantics.themed)) {
+    console.log(`   ${type}: ${Object.keys(modes).join(', ')}`);
+  }
+  if (semantics.standalone.length > 0) {
+    console.log(`   standalone: ${semantics.standalone.join(', ')}`);
   }
 
-  console.log('\nShadow modes:');
-  for (const mode of modes.shadows) {
-    const tokens = processPrimitiveFile('shadow', mode, primitiveMap);
-    generateModeCSS('shadow', mode, tokens);
+  // Build primitive map starting with single-file categories (like color)
+  const primitiveMap = new Map();
+  let totalFiles = 0;
+
+  // Process single-file primitives first (no modes)
+  console.log('\nSingle-file primitives:');
+  for (const [category, info] of Object.entries(primitives)) {
+    if (info.modes === null) {
+      const tokens = processSinglePrimitive(category, primitiveMap);
+      if (tokens.length > 0) {
+        generatePrimitivesCSS(tokens, category);
+        totalFiles++;
+      }
+    }
   }
 
-  console.log('\nRadius modes:');
-  for (const mode of modes.radii) {
-    const tokens = processPrimitiveFile('radius', mode, primitiveMap);
-    generateModeCSS('radius', mode, tokens);
+  // Process multi-mode primitives
+  for (const [category, info] of Object.entries(primitives)) {
+    if (info.modes && info.modes.length > 0) {
+      console.log(`\n${category} modes:`);
+      for (const mode of info.modes) {
+        const tokens = processPrimitiveFile(category, mode, primitiveMap);
+        generateModeCSS(category, mode, tokens);
+        totalFiles++;
+      }
+    }
   }
 
-  console.log('\nBorder width modes:');
-  for (const mode of modes.borderwidths) {
-    const tokens = processPrimitiveFile('borderwidth', mode, primitiveMap);
-    generateModeCSS('borderwidth', mode, tokens);
+  // Generate themed semantic files (base, brands)
+  for (const [type, modes] of Object.entries(semantics.themed)) {
+    console.log(`\n${type} themes:`);
+    for (const mode of Object.keys(modes)) {
+      generateThemedCSS(type, mode, primitiveMap);
+      totalFiles++;
+    }
   }
 
-  // Generate base theme files
-  console.log('\nBase themes:');
-  for (const base of modes.bases) {
-    generateBaseCSS(base, primitiveMap);
-  }
-
-  // Generate brand theme files
-  console.log('\nBrand themes:');
-  for (const brand of modes.brands) {
-    generateBrandCSS(brand, primitiveMap);
+  // Generate standalone semantic files (spacing, etc.)
+  if (semantics.standalone.length > 0) {
+    console.log('\nStandalone semantics:');
+    for (const standaloneFile of semantics.standalone) {
+      const tokens = processSemanticFile(standaloneFile, primitiveMap);
+      if (tokens.length > 0) {
+        const fileName = standaloneFile.replace('.json', '');
+        generateStandaloneSemanticCSS(fileName, tokens);
+        totalFiles++;
+      }
+    }
   }
 
   // Generate typography utilities from styles
@@ -477,27 +425,31 @@ function main() {
   if (typographyUtilities.length > 0) {
     generateTypographyUtilitiesCSS(typographyUtilities);
     console.log(`  ✓ ${typographyUtilities.length} typography utilities`);
+    totalFiles++;
   }
 
   // Generate shadow variables from styles
-  const shadowVariables = processShadowStyles(primitiveMap);
+  const shadowVariables = processShadowStyles();
   if (shadowVariables.length > 0) {
     generateShadowVariablesCSS(shadowVariables);
     console.log(`  ✓ ${shadowVariables.length} shadow variables`);
+    totalFiles++;
   }
 
-  // Count total files
-  const totalFiles =
-    1 + // primitives
-    modes.sizes.length +
-    modes.typographies.length +
-    modes.shadows.length +
-    modes.radii.length +
-    modes.borderwidths.length +
-    modes.bases.length +
-    modes.brands.length +
-    (typographyUtilities.length > 0 ? 1 : 0) +
-    (shadowVariables.length > 0 ? 1 : 0);
+  // Generate border width utilities (use first mode as reference)
+  if (primitives.borderwidth && primitives.borderwidth.modes) {
+    const firstMode = primitives.borderwidth.modes[0];
+    const borderwidthTokens = processPrimitiveFile(
+      'borderwidth',
+      firstMode,
+      primitiveMap
+    );
+    if (borderwidthTokens.length > 0) {
+      generateBorderWidthUtilitiesCSS(borderwidthTokens);
+      console.log(`  ✓ ${borderwidthTokens.length} border width utilities`);
+      totalFiles++;
+    }
+  }
 
   console.log(
     `\n✨ Generated ${totalFiles} modular CSS files in dist/modular/`
