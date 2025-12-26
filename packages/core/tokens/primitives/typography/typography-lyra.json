@@ -17,91 +17,91 @@
     "xs": {
       "$value": {
         "value": 12,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "sm": {
       "$value": {
         "value": 14,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "base": {
       "$value": {
         "value": 16,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "lg": {
       "$value": {
         "value": 18,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "xl": {
       "$value": {
         "value": 20,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "2xl": {
       "$value": {
         "value": 24,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "3xl": {
       "$value": {
         "value": 30,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "4xl": {
       "$value": {
         "value": 36,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "5xl": {
       "$value": {
         "value": 48,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "6xl": {
       "$value": {
         "value": 60,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "7xl": {
       "$value": {
         "value": 72,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "8xl": {
       "$value": {
         "value": 96,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "9xl": {
       "$value": {
         "value": 128,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     }
@@ -148,91 +148,91 @@
     "xs": {
       "$value": {
         "value": 18,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "sm": {
       "$value": {
         "value": 22,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "base": {
       "$value": {
         "value": 26,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "lg": {
       "$value": {
         "value": 30,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "xl": {
       "$value": {
         "value": 32,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "2xl": {
       "$value": {
         "value": 36,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "3xl": {
       "$value": {
         "value": 40,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "4xl": {
       "$value": {
         "value": 44,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "5xl": {
       "$value": {
         "value": 56,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "6xl": {
       "$value": {
         "value": 68,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "7xl": {
       "$value": {
         "value": 80,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "8xl": {
       "$value": {
         "value": 104,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "9xl": {
       "$value": {
         "value": 136,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     }
@@ -241,42 +241,42 @@
     "tighter": {
       "$value": {
         "value": -0.800000011920929,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "tight": {
       "$value": {
         "value": -0.4000000059604645,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "normal": {
       "$value": {
         "value": 0,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "wide": {
       "$value": {
         "value": 0.4000000059604645,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "wider": {
       "$value": {
         "value": 0.800000011920929,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     },
     "widest": {
       "$value": {
         "value": 1.600000023841858,
-        "unit": "rem"
+        "unit": "px"
       },
       "$type": "dimension"
     }

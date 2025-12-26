@@ -5,27 +5,27 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{neutral.50}",
+      "$value": "{white}",
       "$type": "color"
     },
     "hover": {
-      "$value": "{neutral.50}",
+      "$value": "{neutral.100}",
       "$type": "color"
     },
     "active": {
-      "$value": "{neutral.50}",
+      "$value": "{neutral.200}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{neutral.50}",
+      "$value": "{neutral.800}",
       "$type": "color"
     },
     "text": {
-      "$value": "{neutral.900}",
+      "$value": "{neutral.50}",
       "$type": "color"
     },
     "surface": {
-      "$value": "{neutral.900}",
+      "$value": "{neutral.950}",
       "$type": "color"
     }
   },
@@ -35,27 +35,27 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{slate.900}",
+      "$value": "{slate.50}",
       "$type": "color"
     },
     "hover": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.700}",
       "$type": "color"
     },
     "active": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.600}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.900}",
       "$type": "color"
     },
     "text": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.400}",
       "$type": "color"
     },
     "surface": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.800}",
       "$type": "color"
     }
   }

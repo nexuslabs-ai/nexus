@@ -2,238 +2,238 @@
   "size-0": {
     "$value": {
       "value": 0,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-0,5": {
     "$value": {
       "value": 2,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-1": {
     "$value": {
       "value": 4,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-1,5": {
     "$value": {
       "value": 6,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-2": {
     "$value": {
       "value": 8,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-2,5": {
     "$value": {
       "value": 11,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-3": {
     "$value": {
       "value": 14,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-3,5": {
     "$value": {
       "value": 16,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-4": {
     "$value": {
       "value": 18,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-5": {
     "$value": {
       "value": 22,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-6": {
     "$value": {
       "value": 28,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-7": {
     "$value": {
       "value": 32,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-8": {
     "$value": {
       "value": 36,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-9": {
     "$value": {
       "value": 40,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-10": {
     "$value": {
       "value": 44,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-11": {
     "$value": {
       "value": 48,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-12": {
     "$value": {
       "value": 52,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-14": {
     "$value": {
       "value": 60,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-16": {
     "$value": {
       "value": 68,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-20": {
     "$value": {
       "value": 84,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-24": {
     "$value": {
       "value": 100,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-28": {
     "$value": {
       "value": 116,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-32": {
     "$value": {
       "value": 132,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-36": {
     "$value": {
       "value": 148,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-40": {
     "$value": {
       "value": 164,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-44": {
     "$value": {
       "value": 180,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-48": {
     "$value": {
       "value": 196,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-52": {
     "$value": {
       "value": 212,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-56": {
     "$value": {
       "value": 228,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-60": {
     "$value": {
       "value": 244,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-64": {
     "$value": {
       "value": 260,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-72": {
     "$value": {
       "value": 292,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-80": {
     "$value": {
       "value": 324,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "size-96": {
     "$value": {
       "value": 388,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   }

@@ -23,7 +23,7 @@
       "$description": "Secondary hero text, promotional banners, feature headers"
     }
   },
-  "headling": {
+  "heading": {
     "xlarge": {
       "$type": "typography",
       "$value": {
@@ -166,7 +166,7 @@
         "lineHeight": "{line-height.sm}",
         "letterSpacing": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         }
       }
     },
@@ -179,7 +179,7 @@
         "lineHeight": "auto",
         "letterSpacing": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         }
       }
     }

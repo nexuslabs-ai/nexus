@@ -6,7 +6,7 @@
       "offsetY": "{2xs.layer-1.y}",
       "blur": {
         "value": 3,
-        "unit": "rem"
+        "unit": "px"
       },
       "spread": "{2xs.layer-1.spread}",
       "color": "{2xs.layer-1.color}"
@@ -19,7 +19,7 @@
       "offsetY": "{xs.layer-1.y}",
       "blur": {
         "value": 3,
-        "unit": "rem"
+        "unit": "px"
       },
       "spread": "{2xs.layer-1.spread}",
       "color": "{xs.layer-1.color}"
@@ -33,7 +33,7 @@
         "offsetY": "{sm.layer-2.y}",
         "blur": {
           "value": 2,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{sm.layer-2.spread}",
         "color": "{sm.layer-2.color}"
@@ -43,7 +43,7 @@
         "offsetY": "{sm.layer-1.y}",
         "blur": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{sm.layer-1.spread}",
         "color": "{sm.layer-1.color}"
@@ -58,7 +58,7 @@
         "offsetY": "{base.layer-2.y}",
         "blur": {
           "value": 2,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{base.layer-2.spread}",
         "color": "{base.layer-2.color}"
@@ -68,7 +68,7 @@
         "offsetY": "{base.layer-1.y}",
         "blur": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{base.layer-1.spread}",
         "color": "{base.layer-1.color}"
@@ -83,7 +83,7 @@
         "offsetY": "{lg.layer-2.y}",
         "blur": {
           "value": 6,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{lg.layer-2.spread}",
         "color": "{lg.layer-2.color}"
@@ -93,7 +93,7 @@
         "offsetY": "{lg.layer-1.y}",
         "blur": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{lg.layer-1.spread}",
         "color": "{lg.layer-1.color}"
@@ -108,7 +108,7 @@
         "offsetY": "{xl.layer-2.y}",
         "blur": {
           "value": 10,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{xl.layer-2.spread}",
         "color": "{xl.layer-2.color}"
@@ -118,7 +118,7 @@
         "offsetY": "{xl.layer-1.y}",
         "blur": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{xl.layer-1.spread}",
         "color": "{xl.layer-1.color}"
@@ -132,7 +132,7 @@
       "offsetY": "{2xl.layer-1.y}",
       "blur": {
         "value": 3,
-        "unit": "rem"
+        "unit": "px"
       },
       "spread": "{2xl.layer-1.spread}",
       "color": "{2xl.layer-1.color}"
@@ -145,7 +145,7 @@
       "offsetY": "{inner.layer-1.y}",
       "blur": {
         "value": 4,
-        "unit": "rem"
+        "unit": "px"
       },
       "spread": "{inner.layer-1.spread}",
       "color": "{inner.layer-1.color}"
@@ -159,7 +159,7 @@
         "offsetY": "{focus.default.y}",
         "blur": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{focus.default.spread}",
         "color": "{focus.default.color}"
@@ -172,7 +172,7 @@
         "offsetY": "{focus.error.y}",
         "blur": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "spread": "{focus.error.spread}",
         "color": "{focus.error.color}"
