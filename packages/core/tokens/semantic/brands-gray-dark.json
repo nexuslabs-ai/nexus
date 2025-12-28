@@ -5,27 +5,27 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{gray.50}",
+      "$value": "{white}",
       "$type": "color"
     },
     "hover": {
-      "$value": "{gray.50}",
+      "$value": "{gray.100}",
       "$type": "color"
     },
     "active": {
-      "$value": "{gray.50}",
+      "$value": "{gray.200}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{gray.50}",
+      "$value": "{gray.800}",
       "$type": "color"
     },
     "text": {
-      "$value": "{gray.900}",
+      "$value": "{gray.50}",
       "$type": "color"
     },
     "surface": {
-      "$value": "{gray.900}",
+      "$value": "{gray.950}",
       "$type": "color"
     }
   },
@@ -39,19 +39,19 @@
       "$type": "color"
     },
     "hover": {
-      "$value": "{gray.100}",
+      "$value": "{gray.700}",
       "$type": "color"
     },
     "active": {
-      "$value": "{gray.100}",
+      "$value": "{gray.600}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{gray.100}",
+      "$value": "{gray.50}",
       "$type": "color"
     },
     "text": {
-      "$value": "{gray.100}",
+      "$value": "{gray.600}",
       "$type": "color"
     },
     "surface": {

@@ -4,28 +4,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -40,28 +40,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -76,28 +76,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -110,28 +110,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 2,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 4,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": -1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -146,28 +146,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -180,28 +180,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 6,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": -1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -216,28 +216,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -250,28 +250,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 4,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 8,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": -1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -286,28 +286,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -320,28 +320,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 8,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 16,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": -1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -356,28 +356,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -390,28 +390,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 16,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 24,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": -1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -426,28 +426,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 1,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 3,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -462,28 +462,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 2,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 6,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
@@ -498,33 +498,33 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 2,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "color": {
-        "$value": "{neutral.100}",
+        "$value": "{neutral.200}",
         "$type": "color"
       }
     },
@@ -532,28 +532,28 @@
       "x": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "y": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
           "value": 0,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },
       "spread": {
         "$value": {
           "value": 2,
-          "unit": "rem"
+          "unit": "px"
         },
         "$type": "dimension"
       },

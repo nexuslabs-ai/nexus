@@ -3,12 +3,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import {
+  discoverPrimitives,
+  discoverSemantics,
   ensureDir,
   extractTokens,
+  formatShadowComposite,
   formatTokenValue,
   log,
   parseArgs,
   pathToCssVar,
+  processSemanticTokens,
   readTokenFile,
   resolveValue,
 } from './utils.js';
@@ -16,39 +20,73 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.join(__dirname, '../tokens');
 const DIST_DIR = path.join(__dirname, '../dist');
+const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
+const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 
 // Ensure dist directory exists
 ensureDir(DIST_DIR);
 
 /**
- * Get primitive file paths based on config
- * @param {object} config - Configuration object
- * @returns {object} Map of category to file path
+ * Get primitive file paths based on discovered structure and config
+ * @param {object} discovered - Result from discoverPrimitives()
+ * @param {object} config - Configuration object with mode selections
+ * @returns {object} Map of category to { filePath, mode }
  */
-function getPrimitiveFiles(config) {
-  return {
-    color: 'color.json',
-    size: `size/size-${config.size}.json`,
-    typography: `typography/typography-${config.typography}.json`,
-    shadow: `shadow/shadow-${config.shadow}.json`,
-    radius: `radius/radius-${config.radius}.json`,
-    borderwidth: `borderwidth/borderwidth-${config.borderwidth}.json`,
-  };
+function getPrimitiveFiles(discovered, config) {
+  const result = {};
+
+  for (const [category, info] of Object.entries(discovered)) {
+    if (info.modes === null) {
+      // Single-file category (like color)
+      result[category] = {
+        filePath: path.join(PRIMITIVES_DIR, `${category}.json`),
+        mode: null,
+      };
+    } else {
+      // Multi-mode category - use config or first available mode
+      const mode = config[category] || info.modes[0];
+      result[category] = {
+        filePath: path.join(PRIMITIVES_DIR, category, `${category}-${mode}.json`),
+        mode,
+      };
+    }
+  }
+
+  return result;
 }
 
 /**
- * Get semantic file paths based on config
- * @param {object} config - Configuration object
- * @returns {object} Semantic file names
+ * Get semantic file paths based on discovered structure and config
+ * @param {object} discovered - Result from discoverSemantics()
+ * @param {object} config - Configuration object with theme selections
+ * @returns {object} Semantic file info
  */
-function getSemanticFiles(config) {
-  return {
-    baseLight: `base-${config.base}-light.json`,
-    baseDark: `base-${config.base}-dark.json`,
-    brandLight: `brands-${config.brand}-light.json`,
-    brandDark: `brands-${config.brand}-dark.json`,
-    spacing: 'spacing.json',
+function getSemanticFiles(discovered, config) {
+  const result = {
+    themed: [],
+    standalone: [],
   };
+
+  // Handle themed files (base, brands)
+  for (const [type, modes] of Object.entries(discovered.themed)) {
+    // Use config or first available mode
+    const configKey = type === 'brands' ? 'brand' : type;
+    const selectedMode = config[configKey] || Object.keys(modes)[0];
+
+    if (modes[selectedMode]) {
+      result.themed.push({
+        type,
+        mode: selectedMode,
+        light: modes[selectedMode].light,
+        dark: modes[selectedMode].dark,
+      });
+    }
+  }
+
+  // Handle standalone files
+  result.standalone = discovered.standalone;
+
+  return result;
 }
 
 /**
@@ -68,7 +106,8 @@ function loadTokensIntoMap(filePath, primitiveMap, tokenList, category) {
   const tokens = extractTokens(tokenData);
 
   for (const token of tokens) {
-    const cssName = pathToCssVar(token.path);
+    // Add category prefix to CSS variable name: --{category}-{token-path}
+    const cssName = `${category}-${pathToCssVar(token.path)}`;
     const cssValue = formatTokenValue(token.value, token.type);
 
     // Add to map for reference resolution (path.to.token → cssName)
@@ -117,84 +156,36 @@ function resolveCrossPrimitiveReferences(tokenList, primitiveMap) {
 }
 
 /**
- * Process all primitive token files based on config
+ * Process all primitive token files based on discovered structure and config
+ * @param {object} discovered - Result from discoverPrimitives()
  * @param {object} config - Configuration object
- * @returns {{ tokens: object[], primitiveMap: Map }}
+ * @returns {{ tokens: object[], primitiveMap: Map, usedModes: object }}
  */
-function processPrimitives(config) {
-  const primitivesDir = path.join(TOKENS_DIR, 'primitives');
+function processPrimitives(discovered, config) {
   const primitiveTokens = [];
   const primitiveMap = new Map();
+  const usedModes = {};
 
-  const primitiveFiles = getPrimitiveFiles(config);
+  const primitiveFiles = getPrimitiveFiles(discovered, config);
 
   // First pass: load all tokens into map
-  for (const [category, relativePath] of Object.entries(primitiveFiles)) {
-    const filePath = path.join(primitivesDir, relativePath);
-    loadTokensIntoMap(filePath, primitiveMap, primitiveTokens, category);
+  for (const [category, fileInfo] of Object.entries(primitiveFiles)) {
+    loadTokensIntoMap(fileInfo.filePath, primitiveMap, primitiveTokens, category);
+    usedModes[category] = fileInfo.mode;
   }
 
   // Second pass: resolve cross-primitive references (e.g., shadow colors → color primitives)
   resolveCrossPrimitiveReferences(primitiveTokens, primitiveMap);
 
-  return { tokens: primitiveTokens, primitiveMap };
+  return { tokens: primitiveTokens, primitiveMap, usedModes };
 }
 
 /**
- * Process a semantic token file
- * @param {string} fileName - Semantic file name
- * @param {Map} primitiveMap - Primitive map for reference resolution
- * @returns {object[]} Array of { cssName, value }
+ * Process a semantic token file (wrapper for shared function)
  */
 function processSemanticFile(fileName, primitiveMap) {
-  const semanticDir = path.join(TOKENS_DIR, 'semantic');
-  const filePath = path.join(semanticDir, fileName);
-
-  if (!fs.existsSync(filePath)) {
-    log.warn(`Semantic file not found: ${fileName}`);
-    return [];
-  }
-
-  const tokenData = readTokenFile(filePath);
-  const tokens = extractTokens(tokenData);
-  const result = [];
-
-  for (const token of tokens) {
-    // Add 'color' prefix for color tokens, no prefix for dimensions (spacing)
-    const prefix = token.type === 'color' ? 'color' : null;
-    const cssName = pathToCssVar(token.path, prefix);
-    const cssValue = resolveValue(token.value, primitiveMap, token.type);
-
-    result.push({ cssName, value: cssValue, type: token.type });
-  }
-
-  return result;
-}
-
-/**
- * Extract typography composite tokens from styles/typography.json
- * @param {object} obj - Token object
- * @param {string[]} pathParts - Current path parts
- * @param {object[]} result - Accumulated results
- * @returns {object[]} Array of { name, value, description }
- */
-function extractTypographyTokens(obj, pathParts = [], result = []) {
-  for (const [key, value] of Object.entries(obj)) {
-    if (key.startsWith('$')) continue;
-
-    if (value && typeof value === 'object') {
-      if (value.$type === 'typography' && value.$value) {
-        result.push({
-          name: [...pathParts, key].join('-'),
-          value: value.$value,
-          description: value.$description,
-        });
-      } else {
-        extractTypographyTokens(value, [...pathParts, key], result);
-      }
-    }
-  }
-  return result;
+  const filePath = path.join(SEMANTIC_DIR, fileName);
+  return processSemanticTokens(filePath, primitiveMap);
 }
 
 /**
@@ -204,26 +195,16 @@ function extractTypographyTokens(obj, pathParts = [], result = []) {
  * @returns {string} CSS value
  */
 function resolveTypographyProperty(value, primitiveMap) {
-  // Handle "auto" line-height
-  if (value === 'auto') {
-    return 'auto';
-  }
+  if (value === 'auto') return 'auto';
 
-  // Handle references like {family.font-sans}
-  if (
-    typeof value === 'string' &&
-    value.startsWith('{') &&
-    value.endsWith('}')
-  ) {
+  if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
     return resolveValue(value, primitiveMap, 'unknown');
   }
 
-  // Handle dimension objects like { value: 0, unit: "rem" }
   if (typeof value === 'object' && value !== null && 'value' in value) {
     return formatTokenValue(value, 'dimension');
   }
 
-  // Return as-is for other values
   return String(value);
 }
 
@@ -233,8 +214,7 @@ function resolveTypographyProperty(value, primitiveMap) {
  * @returns {string} CSS string with @utility declarations
  */
 function generateTypographyUtilities(primitiveMap) {
-  const stylesDir = path.join(TOKENS_DIR, 'styles');
-  const typographyPath = path.join(stylesDir, 'typography.json');
+  const typographyPath = path.join(TOKENS_DIR, 'styles/typography.json');
 
   if (!fs.existsSync(typographyPath)) {
     log.warn('Typography styles file not found');
@@ -242,16 +222,15 @@ function generateTypographyUtilities(primitiveMap) {
   }
 
   const tokenData = readTokenFile(typographyPath);
-  const typographyTokens = extractTypographyTokens(tokenData);
+  const tokens = extractTokens(tokenData).filter((t) => t.type === 'typography');
 
-  if (typographyTokens.length === 0) {
-    return '';
-  }
+  if (tokens.length === 0) return '';
 
   let css = `/* ===== TYPOGRAPHY UTILITIES ===== */\n`;
 
-  for (const token of typographyTokens) {
-    const { name, value } = token;
+  for (const token of tokens) {
+    const name = token.path.join('-');
+    const value = token.value;
 
     css += `@utility text-${name} {\n`;
 
@@ -274,126 +253,63 @@ function generateTypographyUtilities(primitiveMap) {
     css += `}\n\n`;
   }
 
-  log.success(`Generated ${typographyTokens.length} typography utilities`);
+  log.success(`Generated ${tokens.length} typography utilities`);
   return css;
 }
 
 /**
- * Extract shadow composite tokens from styles/shadows.json
- * @param {object} obj - Token object
- * @param {string[]} pathParts - Current path parts
- * @param {object[]} result - Accumulated results
- * @returns {object[]} Array of { name, value }
+ * Generate border width utility classes for Tailwind v4
+ * @param {object[]} borderwidthTokens - Border width tokens from primitives
+ * @returns {string} CSS string with @utility declarations
  */
-function extractShadowTokens(obj, pathParts = [], result = []) {
-  for (const [key, value] of Object.entries(obj)) {
-    if (key.startsWith('$')) continue;
+function generateBorderWidthUtilities(borderwidthTokens) {
+  if (borderwidthTokens.length === 0) return '';
 
-    if (value && typeof value === 'object') {
-      if (value.$type === 'shadow' && value.$value) {
-        result.push({
-          name: [...pathParts, key].join('-'),
-          value: value.$value,
-        });
-      } else {
-        extractShadowTokens(value, [...pathParts, key], result);
-      }
-    }
+  let css = `/* ===== BORDER WIDTH UTILITIES ===== */\n`;
+
+  for (const token of borderwidthTokens) {
+    // Extract the name part (e.g., "default" from "borderwidth-default")
+    const name = token.cssName.replace('borderwidth-', '');
+
+    css += `@utility border-${name} {\n`;
+    css += `  border-style: var(--tw-border-style, solid);\n`;
+    css += `  border-width: var(--${token.cssName});\n`;
+    css += `}\n\n`;
   }
-  return result;
+
+  log.success(`Generated ${borderwidthTokens.length} border width utilities`);
+  return css;
 }
 
 /**
- * Resolve a shadow property value (reference or dimension object)
- * @param {*} value - Property value
- * @param {Map} primitiveMap - Primitive map for resolution
- * @returns {string} Resolved CSS value
+ * Generate shadow CSS variables for Tailwind v4 @theme inline
+ * @returns {{ css: string, count: number }} CSS variable declarations and count
  */
-function resolveShadowProperty(value, primitiveMap) {
-  // Handle references like {2xs.layer-1.x}
-  if (
-    typeof value === 'string' &&
-    value.startsWith('{') &&
-    value.endsWith('}')
-  ) {
-    const refPath = value.slice(1, -1);
-    const primitive = primitiveMap.get(refPath);
-    if (primitive) {
-      return primitive.value;
-    }
-    console.warn(`⚠ Shadow reference not found: ${value}`);
-    return '0';
-  }
-
-  // Handle dimension objects like { value: 3, unit: "rem" }
-  if (typeof value === 'object' && value !== null && 'value' in value) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  // Return as-is for other values
-  return String(value);
-}
-
-/**
- * Format a single shadow layer to CSS box-shadow value
- * @param {object} layer - Shadow layer definition
- * @param {Map} primitiveMap - Primitive map for resolution
- * @param {boolean} isInset - Whether this is an inset shadow
- * @returns {string} CSS box-shadow value for this layer
- */
-function formatShadowLayer(layer, primitiveMap, isInset = false) {
-  const x = resolveShadowProperty(layer.offsetX, primitiveMap);
-  const y = resolveShadowProperty(layer.offsetY, primitiveMap);
-  const blur = resolveShadowProperty(layer.blur, primitiveMap);
-  const spread = resolveShadowProperty(layer.spread, primitiveMap);
-  const color = resolveShadowProperty(layer.color, primitiveMap);
-  const inset = isInset || layer.inset ? 'inset ' : '';
-
-  return `${inset}${x} ${y} ${blur} ${spread} ${color}`;
-}
-
-/**
- * Generate shadow CSS variables for Tailwind v4
- * @param {Map} primitiveMap - Primitive map for reference resolution
- * @returns {string} CSS string with shadow variables
- */
-function generateShadowVariables(primitiveMap) {
-  const stylesDir = path.join(TOKENS_DIR, 'styles');
-  const shadowsPath = path.join(stylesDir, 'shadows.json');
+function generateShadowVariables() {
+  const shadowsPath = path.join(TOKENS_DIR, 'styles/shadows.json');
 
   if (!fs.existsSync(shadowsPath)) {
     log.warn('Shadows styles file not found');
-    return '';
+    return { css: '', count: 0 };
   }
 
   const tokenData = readTokenFile(shadowsPath);
-  const shadowTokens = extractShadowTokens(tokenData);
+  const tokens = extractTokens(tokenData).filter((t) => t.type === 'shadow');
 
-  if (shadowTokens.length === 0) {
-    return '';
-  }
+  if (tokens.length === 0) return { css: '', count: 0 };
 
-  let css = `/* ===== SHADOW VARIABLES ===== */\n`;
+  let css = '';
 
-  for (const token of shadowTokens) {
-    const { name, value } = token;
-
-    // Check if this is an inset shadow (name contains "inner")
+  for (const token of tokens) {
+    const name = token.path.join('-');
     const isInset = name.toLowerCase().includes('inner');
-
-    // Handle single layer (object) or multiple layers (array)
-    const layers = Array.isArray(value) ? value : [value];
-    const shadowValues = layers.map((layer) =>
-      formatShadowLayer(layer, primitiveMap, isInset)
-    );
-    const cssValue = shadowValues.join(', ');
+    const cssValue = formatShadowComposite(token.value, isInset);
 
     css += `  --shadow-${name}: ${cssValue};\n`;
   }
 
-  css += `\n`;
-  log.success(`Generated ${shadowTokens.length} shadow variables`);
-  return css;
+  log.success(`Generated ${tokens.length} shadow variables`);
+  return { css, count: tokens.length };
 }
 
 /**
@@ -401,50 +317,48 @@ function generateShadowVariables(primitiveMap) {
  * @param {object} config - Configuration object
  */
 function generateGlobalsCSS(config) {
-  const semanticFiles = getSemanticFiles(config);
+  // Auto-discover available structure
+  const discoveredPrimitives = discoverPrimitives(PRIMITIVES_DIR);
+  const discoveredSemantics = discoverSemantics(SEMANTIC_DIR);
 
-  console.log('');
-  console.log(`📦 Theme Configuration:`);
-  console.log(`   Base: ${config.base}`);
-  console.log(`   Brand: ${config.brand}`);
-  console.log(`   Size: ${config.size}`);
-  console.log(`   Typography: ${config.typography}`);
-  console.log(`   Shadow: ${config.shadow}`);
-  console.log(`   Radius: ${config.radius}`);
-  console.log(`   Border Width: ${config.borderwidth}`);
-  console.log('');
+  // Get files based on discovered structure and config
+  const semanticFiles = getSemanticFiles(discoveredSemantics, config);
 
   // Process primitives (based on selected modes)
-  const { tokens: primitiveTokens, primitiveMap } = processPrimitives(config);
-
-  // Process semantic files
-  const lightBaseTokens = processSemanticFile(
-    semanticFiles.baseLight,
-    primitiveMap
-  );
-  const lightBrandTokens = processSemanticFile(
-    semanticFiles.brandLight,
-    primitiveMap
-  );
-  const darkBaseTokens = processSemanticFile(
-    semanticFiles.baseDark,
-    primitiveMap
-  );
-  const darkBrandTokens = processSemanticFile(
-    semanticFiles.brandDark,
-    primitiveMap
-  );
-  const spacingTokens = processSemanticFile(
-    semanticFiles.spacing,
-    primitiveMap
+  const { tokens: primitiveTokens, primitiveMap, usedModes } = processPrimitives(
+    discoveredPrimitives,
+    config
   );
 
-  const lightTokens = [
-    ...lightBaseTokens,
-    ...lightBrandTokens,
-    ...spacingTokens,
-  ];
-  const darkTokens = [...darkBaseTokens, ...darkBrandTokens];
+  // Log configuration (using actual resolved modes)
+  console.log('');
+  console.log(`📦 Theme Configuration:`);
+  for (const [category, mode] of Object.entries(usedModes)) {
+    if (mode) {
+      console.log(`   ${category}: ${mode}`);
+    }
+  }
+  for (const themed of semanticFiles.themed) {
+    console.log(`   ${themed.type}: ${themed.mode}`);
+  }
+  console.log('');
+
+  // Process themed semantic files (base, brands)
+  const lightTokens = [];
+  const darkTokens = [];
+
+  for (const themed of semanticFiles.themed) {
+    const lightThemedTokens = processSemanticFile(themed.light, primitiveMap);
+    const darkThemedTokens = processSemanticFile(themed.dark, primitiveMap);
+    lightTokens.push(...lightThemedTokens);
+    darkTokens.push(...darkThemedTokens);
+  }
+
+  // Process standalone semantic files (spacing, etc.)
+  for (const standaloneFile of semanticFiles.standalone) {
+    const standaloneTokens = processSemanticFile(standaloneFile, primitiveMap);
+    lightTokens.push(...standaloneTokens);
+  }
 
   // Generate CSS
   let css = '';
@@ -458,86 +372,72 @@ function generateGlobalsCSS(config) {
     css += `/* ===== PRIMITIVES ===== */\n`;
     css += `:root {\n`;
 
-    // Group by category (using the category property set during loading)
-    const categories = {
-      color: [],
-      size: [],
-      typography: [],
-      shadow: [],
-      radius: [],
-      borderwidth: [],
-    };
-
+    // Group tokens by category dynamically
+    const categories = {};
     for (const token of primitiveTokens) {
-      if (token.category && categories[token.category]) {
+      if (token.category) {
+        if (!categories[token.category]) {
+          categories[token.category] = [];
+        }
         categories[token.category].push(token);
       }
     }
 
-    // Output colors
-    if (categories.color.length > 0) {
-      css += `  /* Colors */\n`;
-      for (const token of categories.color) {
-        css += `  --${token.cssName}: ${token.value};\n`;
-      }
-      css += `\n`;
-    }
-
-    // Output sizes
-    if (categories.size.length > 0) {
-      css += `  /* Sizes (${config.size}) */\n`;
-      for (const token of categories.size) {
-        css += `  --${token.cssName}: ${token.value};\n`;
-      }
-      css += `\n`;
-    }
-
-    // Output typography primitives
-    if (categories.typography.length > 0) {
-      css += `  /* Typography (${config.typography}) */\n`;
-      for (const token of categories.typography) {
-        css += `  --${token.cssName}: ${token.value};\n`;
-      }
-      css += `\n`;
-    }
-
-    // Output radius
-    if (categories.radius.length > 0) {
-      css += `  /* Radius (${config.radius}) */\n`;
-      for (const token of categories.radius) {
-        css += `  --radius-${token.cssName}: ${token.value};\n`;
-      }
-      css += `\n`;
-    }
-
-    // Output border width
-    if (categories.borderwidth.length > 0) {
-      css += `  /* Border Width (${config.borderwidth}) */\n`;
-      for (const token of categories.borderwidth) {
-        css += `  --borderwidth-${token.cssName}: ${token.value};\n`;
-      }
-      css += `\n`;
-    }
-
-    // Output shadow primitives (layer values)
-    if (categories.shadow.length > 0) {
-      css += `  /* Shadow Primitives (${config.shadow}) */\n`;
-      for (const token of categories.shadow) {
-        css += `  --shadow-${token.cssName}: ${token.value};\n`;
+    // Output each category
+    for (const [category, tokens] of Object.entries(categories)) {
+      if (tokens.length > 0) {
+        const modeInfo = usedModes[category] ? ` (${usedModes[category]})` : '';
+        css += `  /* ${category}${modeInfo} */\n`;
+        for (const token of tokens) {
+          css += `  --${token.cssName}: ${token.value};\n`;
+        }
+        css += `\n`;
       }
     }
 
     css += `}\n\n`;
   }
 
-  // @theme inline - Light mode semantic tokens
-  if (lightTokens.length > 0) {
+  // Generate shadow variables for @theme inline
+  const { css: shadowCSS } = generateShadowVariables();
+
+  // Extract radius and borderwidth primitives for @theme inline
+  // These need to be in @theme for Tailwind to use them (rounded-*, border-*)
+  const radiusTokens = primitiveTokens.filter((t) => t.category === 'radius');
+  const borderwidthTokens = primitiveTokens.filter((t) => t.category === 'borderwidth');
+
+  // @theme inline - Light mode semantic tokens + shadows + radius + borderwidth
+  if (lightTokens.length > 0 || shadowCSS || radiusTokens.length > 0) {
     css += `/* ===== SEMANTIC TOKENS (Light) ===== */\n`;
     css += `@theme inline {\n`;
     css += `  --*: initial;\n\n`;
 
     for (const token of lightTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
+    }
+
+    // Add radius variables inside @theme inline (for rounded-* utilities)
+    if (radiusTokens.length > 0) {
+      css += `\n  /* Radius */\n`;
+      for (const token of radiusTokens) {
+        css += `  --${token.cssName}: ${token.value};\n`;
+      }
+    }
+
+    // Add borderwidth variables inside @theme inline (for border-* utilities)
+    if (borderwidthTokens.length > 0) {
+      css += `\n  /* Border Width */\n`;
+      for (const token of borderwidthTokens) {
+        // Tailwind expects --border-* not --borderwidth-*
+        const twName = token.cssName.replace('borderwidth-', 'border-');
+        css += `  --${twName}: ${token.value};\n`;
+      }
+    }
+
+    // Add shadow variables inside @theme inline
+    if (shadowCSS) {
+      css += `\n  /* Shadows */\n`;
+      css += shadowCSS;
     }
 
     css += `}\n\n`;
@@ -559,10 +459,10 @@ function generateGlobalsCSS(config) {
     css += typographyCSS;
   }
 
-  // Shadow variables (added to @theme inline for Tailwind compatibility)
-  const shadowCSS = generateShadowVariables(primitiveMap);
-  if (shadowCSS) {
-    css += shadowCSS;
+  // Border width utilities
+  const borderWidthCSS = generateBorderWidthUtilities(borderwidthTokens);
+  if (borderWidthCSS) {
+    css += borderWidthCSS;
   }
 
   // @layer base - Default styles

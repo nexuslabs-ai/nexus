@@ -2,14 +2,14 @@
   "default": {
     "$value": {
       "value": 1,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
   "thick": {
     "$value": {
       "value": 1,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   }

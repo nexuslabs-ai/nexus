@@ -1,12 +1,12 @@
 /* radius: mellow */
 
 :root {
-  --base: 12rem;
-  --sm: 10rem;
-  --md: 12rem;
-  --lg: 14rem;
-  --xl: 16rem;
-  --2xl: 20rem;
-  --3xl: 28rem;
-  --full: 9999rem;
+  --radius-base: 12px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
+  --radius-full: 9999px;
 }

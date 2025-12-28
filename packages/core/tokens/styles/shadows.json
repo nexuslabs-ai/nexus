@@ -4,10 +4,7 @@
     "$value": {
       "offsetX": "{2xs.layer-1.x}",
       "offsetY": "{2xs.layer-1.y}",
-      "blur": {
-        "value": 3,
-        "unit": "rem"
-      },
+      "blur": "{2xs.layer-1.blur}",
       "spread": "{2xs.layer-1.spread}",
       "color": "{2xs.layer-1.color}"
     }
@@ -17,10 +14,7 @@
     "$value": {
       "offsetX": "{xs.layer-1.x}",
       "offsetY": "{xs.layer-1.y}",
-      "blur": {
-        "value": 3,
-        "unit": "rem"
-      },
+      "blur": "{xs.layer-1.blur}",
       "spread": "{2xs.layer-1.spread}",
       "color": "{xs.layer-1.color}"
     }
@@ -31,20 +25,14 @@
       {
         "offsetX": "{sm.layer-2.x}",
         "offsetY": "{sm.layer-2.y}",
-        "blur": {
-          "value": 2,
-          "unit": "rem"
-        },
+        "blur": "{sm.layer-2.blur}",
         "spread": "{sm.layer-2.spread}",
         "color": "{sm.layer-2.color}"
       },
       {
         "offsetX": "{sm.layer-1.x}",
         "offsetY": "{sm.layer-1.y}",
-        "blur": {
-          "value": 3,
-          "unit": "rem"
-        },
+        "blur": "{sm.layer-1.blur}",
         "spread": "{sm.layer-1.spread}",
         "color": "{sm.layer-1.color}"
       }
@@ -56,20 +44,14 @@
       {
         "offsetX": "{base.layer-2.x}",
         "offsetY": "{base.layer-2.y}",
-        "blur": {
-          "value": 2,
-          "unit": "rem"
-        },
+        "blur": "{base.layer-2.blur}",
         "spread": "{base.layer-2.spread}",
         "color": "{base.layer-2.color}"
       },
       {
         "offsetX": "{base.layer-1.x}",
         "offsetY": "{base.layer-1.y}",
-        "blur": {
-          "value": 3,
-          "unit": "rem"
-        },
+        "blur": "{base.layer-1.blur}",
         "spread": "{base.layer-1.spread}",
         "color": "{base.layer-1.color}"
       }
@@ -81,20 +63,14 @@
       {
         "offsetX": "{lg.layer-2.x}",
         "offsetY": "{lg.layer-2.y}",
-        "blur": {
-          "value": 6,
-          "unit": "rem"
-        },
+        "blur": "{lg.layer-2.blur}",
         "spread": "{lg.layer-2.spread}",
         "color": "{lg.layer-2.color}"
       },
       {
         "offsetX": "{lg.layer-1.x}",
         "offsetY": "{lg.layer-1.y}",
-        "blur": {
-          "value": 3,
-          "unit": "rem"
-        },
+        "blur": "{lg.layer-1.blur}",
         "spread": "{lg.layer-1.spread}",
         "color": "{lg.layer-1.color}"
       }
@@ -106,20 +82,14 @@
       {
         "offsetX": "{xl.layer-2.x}",
         "offsetY": "{xl.layer-2.y}",
-        "blur": {
-          "value": 10,
-          "unit": "rem"
-        },
+        "blur": "{xl.layer-2.blur}",
         "spread": "{xl.layer-2.spread}",
         "color": "{xl.layer-2.color}"
       },
       {
         "offsetX": "{xl.layer-1.x}",
         "offsetY": "{xl.layer-1.y}",
-        "blur": {
-          "value": 3,
-          "unit": "rem"
-        },
+        "blur": "{xl.layer-1.blur}",
         "spread": "{xl.layer-1.spread}",
         "color": "{xl.layer-1.color}"
       }
@@ -130,10 +100,7 @@
     "$value": {
       "offsetX": "{2xl.layer-1.x}",
       "offsetY": "{2xl.layer-1.y}",
-      "blur": {
-        "value": 3,
-        "unit": "rem"
-      },
+      "blur": "{2xl.layer-1.blur}",
       "spread": "{2xl.layer-1.spread}",
       "color": "{2xl.layer-1.color}"
     }
@@ -143,10 +110,7 @@
     "$value": {
       "offsetX": "{inner.layer-1.x}",
       "offsetY": "{inner.layer-1.y}",
-      "blur": {
-        "value": 4,
-        "unit": "rem"
-      },
+      "blur": "{inner.layer-1.blur}",
       "spread": "{inner.layer-1.spread}",
       "color": "{inner.layer-1.color}"
     }
@@ -157,10 +121,7 @@
       "$value": {
         "offsetX": "{focus.default.x}",
         "offsetY": "{focus.default.y}",
-        "blur": {
-          "value": 0,
-          "unit": "rem"
-        },
+        "blur": "{focus.default.blur}",
         "spread": "{focus.default.spread}",
         "color": "{focus.default.color}"
       }
@@ -170,10 +131,7 @@
       "$value": {
         "offsetX": "{focus.error.x}",
         "offsetY": "{focus.error.y}",
-        "blur": {
-          "value": 0,
-          "unit": "rem"
-        },
+        "blur": "{focus.error.blur}",
         "spread": "{focus.error.spread}",
         "color": "{focus.error.color}"
       }

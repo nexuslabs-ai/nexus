@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react';
-
 export function ComponentShowcase() {
   return (
     <div className="space-y-8 p-8">
@@ -21,17 +19,17 @@ export function ComponentShowcase() {
             <span className="text-muted-foreground text-xs">
               heading-xlarge
             </span>
-            <p className="text-headling-xlarge">Heading XLarge</p>
+            <p className="text-heading-xlarge">Heading XLarge</p>
           </div>
           <div>
             <span className="text-muted-foreground text-xs">heading-large</span>
-            <p className="text-headling-large">Heading Large</p>
+            <p className="text-heading-large">Heading Large</p>
           </div>
           <div>
             <span className="text-muted-foreground text-xs">
               heading-medium
             </span>
-            <p className="text-headling-medium">Heading Medium</p>
+            <p className="text-heading-medium">Heading Medium</p>
           </div>
           <div>
             <span className="text-muted-foreground text-xs">body-large</span>
@@ -88,21 +86,15 @@ export function ComponentShowcase() {
       <section>
         <h2 className="mb-4 text-lg font-semibold">Shadows</h2>
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          <ShadowBox name="2xs" style={{ boxShadow: 'var(--shadow-2xs)' }} />
-          <ShadowBox name="xs" style={{ boxShadow: 'var(--shadow-xs)' }} />
-          <ShadowBox name="sm" style={{ boxShadow: 'var(--shadow-sm)' }} />
-          <ShadowBox name="base" style={{ boxShadow: 'var(--shadow-base)' }} />
-          <ShadowBox name="lg" style={{ boxShadow: 'var(--shadow-lg)' }} />
-          <ShadowBox name="xl" style={{ boxShadow: 'var(--shadow-xl)' }} />
-          <ShadowBox name="2xl" style={{ boxShadow: 'var(--shadow-2xl)' }} />
-          <ShadowBox
-            name="inner"
-            style={{ boxShadow: 'var(--shadow-inner)' }}
-          />
-          <ShadowBox
-            name="focus"
-            style={{ boxShadow: 'var(--shadow-focus-default)' }}
-          />
+          <ShadowBox name="2xs" shadowClass="shadow-2xs" />
+          <ShadowBox name="xs" shadowClass="shadow-xs" />
+          <ShadowBox name="sm" shadowClass="shadow-sm" />
+          <ShadowBox name="base" shadowClass="shadow-base" />
+          <ShadowBox name="lg" shadowClass="shadow-lg" />
+          <ShadowBox name="xl" shadowClass="shadow-xl" />
+          <ShadowBox name="2xl" shadowClass="shadow-2xl" />
+          <ShadowBox name="inner" shadowClass="shadow-inner" />
+          <ShadowBox name="focus" shadowClass="shadow-focus-default" />
         </div>
       </section>
 
@@ -110,13 +102,14 @@ export function ComponentShowcase() {
       <section>
         <h2 className="mb-4 text-lg font-semibold">Border Radius</h2>
         <div className="flex flex-wrap gap-4">
-          <RadiusBox name="sm" style={{ borderRadius: 'var(--sm)' }} />
-          <RadiusBox name="md" style={{ borderRadius: 'var(--md)' }} />
-          <RadiusBox name="lg" style={{ borderRadius: 'var(--lg)' }} />
-          <RadiusBox name="xl" style={{ borderRadius: 'var(--xl)' }} />
-          <RadiusBox name="2xl" style={{ borderRadius: 'var(--2xl)' }} />
-          <RadiusBox name="3xl" style={{ borderRadius: 'var(--3xl)' }} />
-          <RadiusBox name="full" style={{ borderRadius: 'var(--full)' }} />
+          <RadiusBox name="base" className="rounded-base" />
+          <RadiusBox name="sm" className="rounded-sm" />
+          <RadiusBox name="md" className="rounded-md" />
+          <RadiusBox name="lg" className="rounded-lg" />
+          <RadiusBox name="xl" className="rounded-xl" />
+          <RadiusBox name="2xl" className="rounded-2xl" />
+          <RadiusBox name="3xl" className="rounded-3xl" />
+          <RadiusBox name="full" className="rounded-full" />
         </div>
       </section>
 
@@ -124,17 +117,16 @@ export function ComponentShowcase() {
       <section>
         <h2 className="mb-4 text-lg font-semibold">Spacing Scale</h2>
         <div className="space-y-2">
-          {[1, 2, 3, 4, 5, 6, 8, 10, 12, 16].map((n) => (
-            <div key={n} className="flex items-center gap-3">
-              <span className="text-muted-foreground w-12 text-xs">
-                size-{n}
-              </span>
-              <div
-                className="bg-primary-background h-4"
-                style={{ width: `var(--size-${n})` }}
-              />
-            </div>
-          ))}
+          <SpacingBar name="w-1" className="w-1" />
+          <SpacingBar name="w-2" className="w-2" />
+          <SpacingBar name="w-3" className="w-3" />
+          <SpacingBar name="w-4" className="w-4" />
+          <SpacingBar name="w-5" className="w-5" />
+          <SpacingBar name="w-6" className="w-6" />
+          <SpacingBar name="w-8" className="w-8" />
+          <SpacingBar name="w-10" className="w-10" />
+          <SpacingBar name="w-12" className="w-12" />
+          <SpacingBar name="w-16" className="w-16" />
         </div>
       </section>
 
@@ -142,34 +134,19 @@ export function ComponentShowcase() {
       <section>
         <h2 className="mb-4 text-lg font-semibold">Buttons</h2>
         <div className="flex flex-wrap gap-3">
-          <button
-            className="bg-primary-background text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90"
-            style={{ borderRadius: 'var(--md)' }}
-          >
+          <button className="bg-primary-background text-primary-foreground rounded-md px-4 py-2 text-sm font-medium hover:opacity-90">
             Primary
           </button>
-          <button
-            className="bg-secondary-background text-secondary-foreground px-4 py-2 text-sm font-medium hover:opacity-90"
-            style={{ borderRadius: 'var(--md)' }}
-          >
+          <button className="bg-secondary-background text-secondary-foreground rounded-md px-4 py-2 text-sm font-medium hover:opacity-90">
             Secondary
           </button>
-          <button
-            className="border-border-default bg-background hover:bg-accent border px-4 py-2 text-sm font-medium"
-            style={{ borderRadius: 'var(--md)' }}
-          >
+          <button className="border-border-default bg-background hover:bg-accent rounded-md border px-4 py-2 text-sm font-medium">
             Outline
           </button>
-          <button
-            className="hover:bg-accent px-4 py-2 text-sm font-medium"
-            style={{ borderRadius: 'var(--md)' }}
-          >
+          <button className="hover:bg-accent rounded-md px-4 py-2 text-sm font-medium">
             Ghost
           </button>
-          <button
-            className="bg-error-background text-error-foreground px-4 py-2 text-sm font-medium hover:opacity-90"
-            style={{ borderRadius: 'var(--md)' }}
-          >
+          <button className="bg-error-background text-error-foreground rounded-md px-4 py-2 text-sm font-medium hover:opacity-90">
             Destructive
           </button>
         </div>
@@ -226,21 +203,41 @@ export function ComponentShowcase() {
       {/* Borders Section */}
       <section>
         <h2 className="mb-4 text-lg font-semibold">Borders</h2>
-        <div className="flex flex-wrap gap-3">
-          <div className="border-border-default rounded border-2 px-4 py-2">
-            Default
+        <div className="space-y-4">
+          <div>
+            <span className="text-muted-foreground mb-2 block text-xs">
+              Border Width Utilities
+            </span>
+            <div className="flex flex-wrap gap-3">
+              <div className="border-border-default border-default rounded px-4 py-2">
+                border-default
+              </div>
+              <div className="border-border-default border-thick rounded px-4 py-2">
+                border-thick
+              </div>
+            </div>
           </div>
-          <div className="border-border-primary rounded border-2 px-4 py-2">
-            Primary
-          </div>
-          <div className="border-border-success rounded border-2 px-4 py-2">
-            Success
-          </div>
-          <div className="border-border-error rounded border-2 px-4 py-2">
-            Error
-          </div>
-          <div className="border-border-information rounded border-2 px-4 py-2">
-            Info
+          <div>
+            <span className="text-muted-foreground mb-2 block text-xs">
+              Border Colors
+            </span>
+            <div className="flex flex-wrap gap-3">
+              <div className="border-border-default border-thick rounded px-4 py-2">
+                Default
+              </div>
+              <div className="border-border-primary border-thick rounded px-4 py-2">
+                Primary
+              </div>
+              <div className="border-border-success border-thick rounded px-4 py-2">
+                Success
+              </div>
+              <div className="border-border-error border-thick rounded px-4 py-2">
+                Error
+              </div>
+              <div className="border-border-information border-thick rounded px-4 py-2">
+                Info
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -297,24 +294,37 @@ function ColorSwatch({
   );
 }
 
-function ShadowBox({ name, style }: { name: string; style: CSSProperties }) {
+function ShadowBox({
+  name,
+  shadowClass,
+}: {
+  name: string;
+  shadowClass: string;
+}) {
   return (
     <div
-      className="bg-background flex h-20 w-full items-center justify-center rounded-lg"
-      style={style}
+      className={`bg-container flex h-20 w-full items-center justify-center rounded-lg ${shadowClass}`}
     >
       <span className="text-muted-foreground text-xs font-medium">{name}</span>
     </div>
   );
 }
 
-function RadiusBox({ name, style }: { name: string; style: CSSProperties }) {
+function RadiusBox({ name, className }: { name: string; className: string }) {
   return (
     <div
-      className="border-primary-background bg-container flex h-16 w-16 items-center justify-center border-2"
-      style={style}
+      className={`border-primary-background bg-container flex h-16 w-16 items-center justify-center border-2 ${className}`}
     >
       <span className="text-xs font-medium">{name}</span>
+    </div>
+  );
+}
+
+function SpacingBar({ name, className }: { name: string; className: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-muted-foreground w-12 text-xs">{name}</span>
+      <div className={`bg-primary-background h-4 ${className}`} />
     </div>
   );
 }
