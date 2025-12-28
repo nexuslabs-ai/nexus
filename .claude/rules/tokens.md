@@ -21,9 +21,11 @@ Optional properties: `$description`, `$extensions`
 
 | Directory | Pattern | Example |
 |-----------|---------|---------|
-| primitives | `color-mode-{n}.json` | `color-mode-1.json` (all colors, theme-agnostic) |
+| primitives | `color.json` | Single file with all color scales |
+| primitives | `{category}/{category}-{mode}.json` | `size/size-vega.json`, `radius/radius-subtle.json` |
 | semantic | `base-{palette}-{mode}.json` | `base-slate-light.json`, `base-slate-dark.json` |
 | semantic | `brands-{name}-{mode}.json` | `brands-blue-light.json`, `brands-blue-dark.json` |
+| semantic | `spacing.json` | Standalone semantic (no light/dark variant) |
 | component | `{component}.json` | `button.json` (future) |
 
 ## Nested Token Structure
@@ -135,6 +137,11 @@ node scripts/generate-css.js --base=slate --brand=blue
 Available options:
 - **Base**: slate, neutral, zinc, gray, stone
 - **Brand**: blue, gray, neutral, slate
+- **Size**: vega, lyra, maia, mira, nova
+- **Typography**: vega, lyra, maia, mira, nova
+- **Shadow**: vega, lyra, maia, mira, nova
+- **Radius**: blunt, sharp, subtle, smooth, mellow
+- **Border Width**: vega, lyra, maia, mira, nova
 
 ## Do Not
 

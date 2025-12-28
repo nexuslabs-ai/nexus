@@ -1,239 +1,239 @@
 {
-  "size-0": {
+  "0": {
     "$value": {
       "value": 0,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-0,5": {
-    "$value": {
-      "value": 2,
-      "unit": "rem"
-    },
-    "$type": "dimension"
-  },
-  "size-1": {
+  "1": {
     "$value": {
       "value": 4,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-1,5": {
-    "$value": {
-      "value": 6,
-      "unit": "rem"
-    },
-    "$type": "dimension"
-  },
-  "size-2": {
+  "2": {
     "$value": {
       "value": 8,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-2,5": {
-    "$value": {
-      "value": 9,
-      "unit": "rem"
-    },
-    "$type": "dimension"
-  },
-  "size-3": {
+  "3": {
     "$value": {
       "value": 10,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-3,5": {
-    "$value": {
-      "value": 12,
-      "unit": "rem"
-    },
-    "$type": "dimension"
-  },
-  "size-4": {
+  "4": {
     "$value": {
       "value": 14,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-5": {
+  "5": {
     "$value": {
       "value": 18,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-6": {
+  "6": {
     "$value": {
       "value": 22,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-7": {
+  "7": {
     "$value": {
       "value": 26,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-8": {
+  "8": {
     "$value": {
       "value": 30,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-9": {
+  "9": {
     "$value": {
       "value": 34,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-10": {
+  "10": {
     "$value": {
       "value": 38,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-11": {
+  "11": {
     "$value": {
       "value": 42,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-12": {
+  "12": {
     "$value": {
       "value": 46,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-14": {
+  "14": {
     "$value": {
       "value": 52,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-16": {
+  "16": {
     "$value": {
       "value": 60,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-20": {
+  "20": {
     "$value": {
       "value": 76,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-24": {
+  "24": {
     "$value": {
       "value": 92,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-28": {
+  "28": {
     "$value": {
       "value": 108,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-32": {
+  "32": {
     "$value": {
       "value": 124,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-36": {
+  "36": {
     "$value": {
       "value": 140,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-40": {
+  "40": {
     "$value": {
       "value": 156,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-44": {
+  "44": {
     "$value": {
       "value": 172,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-48": {
+  "48": {
     "$value": {
       "value": 188,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-52": {
+  "52": {
     "$value": {
       "value": 204,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-56": {
+  "56": {
     "$value": {
       "value": 220,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-60": {
+  "60": {
     "$value": {
       "value": 236,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-64": {
+  "64": {
     "$value": {
       "value": 252,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-72": {
+  "72": {
     "$value": {
       "value": 284,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-80": {
+  "80": {
     "$value": {
       "value": 316,
-      "unit": "rem"
+      "unit": "px"
     },
     "$type": "dimension"
   },
-  "size-96": {
+  "96": {
     "$value": {
       "value": 380,
-      "unit": "rem"
+      "unit": "px"
+    },
+    "$type": "dimension"
+  },
+  "0_5": {
+    "$value": {
+      "value": 2,
+      "unit": "px"
+    },
+    "$type": "dimension"
+  },
+  "1_5": {
+    "$value": {
+      "value": 6,
+      "unit": "px"
+    },
+    "$type": "dimension"
+  },
+  "2_5": {
+    "$value": {
+      "value": 9,
+      "unit": "px"
+    },
+    "$type": "dimension"
+  },
+  "3_5": {
+    "$value": {
+      "value": 12,
+      "unit": "px"
     },
     "$type": "dimension"
   }

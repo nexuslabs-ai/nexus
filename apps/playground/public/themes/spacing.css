@@ -1,0 +1,38 @@
+/* spacing */
+
+:root {
+  --spacing-0: var(--size-0);
+  --spacing-0_5: var(--size-0_5);
+  --spacing-1: var(--size-1);
+  --spacing-1_5: var(--size-1_5);
+  --spacing-2: var(--size-2);
+  --spacing-2_5: var(--size-2_5);
+  --spacing-3: var(--size-3);
+  --spacing-3_5: var(--size-3_5);
+  --spacing-4: var(--size-4);
+  --spacing-5: var(--size-5);
+  --spacing-6: var(--size-6);
+  --spacing-7: var(--size-7);
+  --spacing-8: var(--size-8);
+  --spacing-9: var(--size-9);
+  --spacing-10: var(--size-10);
+  --spacing-11: var(--size-11);
+  --spacing-12: var(--size-12);
+  --spacing-14: var(--size-14);
+  --spacing-16: var(--size-16);
+  --spacing-20: var(--size-20);
+  --spacing-24: var(--size-24);
+  --spacing-28: var(--size-28);
+  --spacing-32: var(--size-32);
+  --spacing-36: var(--size-36);
+  --spacing-40: var(--size-40);
+  --spacing-44: var(--size-44);
+  --spacing-48: var(--size-48);
+  --spacing-52: var(--size-52);
+  --spacing-56: var(--size-56);
+  --spacing-60: var(--size-60);
+  --spacing-64: var(--size-64);
+  --spacing-72: var(--size-72);
+  --spacing-80: var(--size-80);
+  --spacing-96: var(--size-96);
+}

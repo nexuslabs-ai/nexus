@@ -104,7 +104,7 @@ The showcase demonstrates all token categories:
 |---------|-------------|
 | Typography | `text-display-*`, `text-headling-*`, `text-body-*`, `text-label-*`, `text-code-*` |
 | Shadows | `--shadow-2xs` to `--shadow-2xl`, `--shadow-inner`, `--shadow-focus-default` |
-| Border Radius | `--sm`, `--md`, `--lg`, `--xl`, `--2xl`, `--3xl`, `--full` |
+| Border Radius | `rounded-base`, `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`, `rounded-full` |
 | Spacing | `--size-1` to `--size-16` |
 | Buttons | Semantic colors + `var(--md)` for radius |
 | Colors | `bg-primary-*`, `bg-secondary-*`, `bg-error-*`, etc. |
@@ -115,17 +115,20 @@ The showcase demonstrates all token categories:
 Edit [ComponentShowcase.tsx](src/components/ComponentShowcase.tsx) to add more component previews using native HTML with semantic token classes:
 
 ```tsx
-// Use semantic color tokens
-<button className="bg-primary-background text-primary-foreground px-4 py-2"
-        style={{ borderRadius: 'var(--md)' }}>
+// Use semantic color tokens with Tailwind utilities
+<button className="bg-primary-background text-primary-foreground rounded-md px-4 py-2">
   Button
 </button>
 
 // Use typography utilities
 <p className="text-body-default">Body text</p>
 
-// Use shadow variables
-<div style={{ boxShadow: 'var(--shadow-lg)' }}>Card</div>
+// Use shadow utilities
+<div className="shadow-lg rounded-lg p-4">Card</div>
+
+// Use border width utilities
+<div className="border-default border-border-default rounded">Default border</div>
+<div className="border-thick border-border-primary rounded">Thick border</div>
 ```
 
 ## Technical Notes
