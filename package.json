@@ -18,10 +18,9 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens": "cd packages/core && yarn build:tokens",
-    "tokens:modular": "cd packages/core && yarn build:tokens:modular",
-    "playground": "cd apps/playground && yarn dev",
-    "playground:copy": "cd apps/playground && yarn copy:themes"
+    "tokens:modular": "cd packages/core && yarn build:tokens:modular && cd ../../apps/playground && mkdir -p src/styles public/themes && cp ../../packages/core/dist/modular/* public/themes/ && cp ../../packages/core/dist/modular/globals.css ../../packages/core/dist/modular/color.css ../../packages/core/dist/modular/typography-utilities.css ../../packages/core/dist/modular/borderwidth-utilities.css src/styles/",
+    "tokens:tailwind": "cd packages/core && yarn build:tailwind",
+    "playground": "cd apps/playground && yarn dev"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

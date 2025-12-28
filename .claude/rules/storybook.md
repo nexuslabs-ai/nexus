@@ -1,5 +1,7 @@
 # Storybook Rules
 
+**Note:** All Tailwind utility classes in stories must use `nx:` prefix (e.g., `className="nx:flex nx:gap-2"`).
+
 ## File Naming
 
 Stories file: `{ComponentName}.stories.tsx` (PascalCase)
@@ -132,26 +134,26 @@ export const Disabled: Story = {
 ```tsx
 export const AllVariants: Story = {
   render: () => (
-    <div className="flex flex-col gap-6">
+    <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
-        <h3 className="text-foreground mb-2 text-sm font-medium">Variants</h3>
-        <div className="flex gap-2">
+        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">Variants</h3>
+        <div className="nx:flex nx:gap-2">
           <Component variant="primary">Primary</Component>
           <Component variant="secondary">Secondary</Component>
           <Component variant="outline">Outline</Component>
         </div>
       </div>
       <div>
-        <h3 className="text-foreground mb-2 text-sm font-medium">Sizes</h3>
-        <div className="flex items-center gap-2">
+        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">Sizes</h3>
+        <div className="nx:flex nx:items-center nx:gap-2">
           <Component size="sm">Small</Component>
           <Component size="default">Default</Component>
           <Component size="lg">Large</Component>
         </div>
       </div>
       <div>
-        <h3 className="text-foreground mb-2 text-sm font-medium">Disabled</h3>
-        <div className="flex gap-2">
+        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">Disabled</h3>
+        <div className="nx:flex nx:gap-2">
           <Component variant="primary" disabled>Primary</Component>
           <Component variant="secondary" disabled>Secondary</Component>
           <Component variant="outline" disabled>Outline</Component>

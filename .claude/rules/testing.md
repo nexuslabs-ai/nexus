@@ -1,5 +1,7 @@
 # Testing Rules
 
+**Note:** All Tailwind class assertions must use `nx:` prefix (e.g., `toHaveClass('nx:bg-primary')`).
+
 ## Imports
 
 ```tsx
@@ -132,20 +134,20 @@ describe('Props', () => {
 describe('Variants', () => {
   it('renders primary variant by default', () => {
     render(<Component>Primary</Component>);
-    expect(screen.getByRole('button')).toHaveClass('bg-primary');
+    expect(screen.getByRole('button')).toHaveClass('nx:bg-primary');
   });
 
   it('renders secondary variant', () => {
     render(<Component variant="secondary">Secondary</Component>);
-    expect(screen.getByRole('button')).toHaveClass('bg-secondary');
+    expect(screen.getByRole('button')).toHaveClass('nx:bg-secondary');
   });
 
   // Test each variant...
 
   it('componentVariants function generates correct classes', () => {
     const classes = componentVariants({ variant: 'secondary', size: 'lg' });
-    expect(classes).toContain('bg-secondary');
-    expect(classes).toContain('h-10');
+    expect(classes).toContain('nx:bg-secondary');
+    expect(classes).toContain('nx:h-10');
   });
 });
 ```

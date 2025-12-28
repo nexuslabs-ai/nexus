@@ -120,6 +120,20 @@ export function pathToCssVar(tokenPath, prefix = null) {
 }
 
 /**
+ * Convert token path to CSS variable name with optional nx- prefix
+ * Used for generating prefixed CSS variables for @nexus/tailwind package
+ * @param {string[]} tokenPath - Token path array
+ * @param {string|null} categoryPrefix - Optional category prefix (e.g., 'color', 'size')
+ * @param {boolean} useNxPrefix - Whether to add nx- prefix
+ * @returns {string} CSS variable name (without --)
+ */
+export function pathToCssVarPrefixed(tokenPath, categoryPrefix = null, useNxPrefix = false) {
+  const cssName = tokenPath.join('-');
+  const base = categoryPrefix ? `${categoryPrefix}-${cssName}` : cssName;
+  return useNxPrefix ? `nx-${base}` : base;
+}
+
+/**
  * Check if a value is a DTCG reference (e.g., "{blue.500}")
  * @param {*} value - Value to check
  * @returns {boolean}
@@ -159,6 +173,55 @@ export function resolveReference(value, primitiveMap) {
 
   console.warn(`⚠ Reference not found: ${value}`);
   return value;
+}
+
+/**
+ * Resolve a DTCG reference to CSS var() with nx- prefix
+ * Used for generating @nexus/tailwind package where primitives have --nx-* prefix
+ * @param {*} value - Token value (might be a reference)
+ * @param {Map} primitiveMap - Map of primitive token paths to CSS names (with nx- prefix)
+ * @returns {string} Resolved CSS value with var(--nx-*)
+ */
+export function resolveReferenceWithNxPrefix(value, primitiveMap) {
+  if (!isReference(value)) {
+    return value;
+  }
+
+  const refPath = extractRefPath(value);
+  const primitiveInfo = primitiveMap.get(refPath);
+
+  if (primitiveInfo) {
+    // primitiveInfo.cssName already contains nx- prefix if useNxPrefix was true
+    return `var(--${primitiveInfo.cssName})`;
+  }
+
+  console.warn(`⚠ Reference not found: ${value}`);
+  return value;
+}
+
+/**
+ * Resolve value for @nexus/tailwind package (references use --nx-* variables)
+ * @param {*} value - Token value
+ * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
+ * @param {string} type - Token type
+ * @returns {string} Resolved CSS value
+ */
+export function resolveValueWithNxPrefix(value, primitiveMap, type = 'unknown') {
+  // If it's a reference, resolve it with nx prefix
+  if (isReference(value)) {
+    return resolveReferenceWithNxPrefix(value, primitiveMap);
+  }
+
+  // If it's a dimension object, format it
+  if (
+    type === 'dimension' ||
+    (typeof value === 'object' && value !== null && 'value' in value)
+  ) {
+    return formatTokenValue(value, 'dimension');
+  }
+
+  // Otherwise return as-is (formatted)
+  return formatTokenValue(value, type);
 }
 
 /**
@@ -325,8 +388,9 @@ export function processSemanticTokens(filePath, primitiveMap) {
   const tokens = [];
 
   for (const token of extracted) {
-    // Add 'color' prefix for color tokens, no prefix for dimensions (spacing)
-    const prefix = token.type === 'color' ? 'color' : null;
+    // Add 'nx-color' prefix for color tokens (to match Tailwind prefix(nx) output)
+    // No prefix for dimensions (spacing)
+    const prefix = token.type === 'color' ? 'nx-color' : null;
     const cssName = pathToCssVar(token.path, prefix);
     const cssValue = resolveValue(token.value, primitiveMap, token.type);
     tokens.push({ cssName, value: cssValue, type: token.type });

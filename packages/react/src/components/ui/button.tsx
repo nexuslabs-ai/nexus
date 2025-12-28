@@ -5,25 +5,26 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'ring-offset-background focus-visible:ring-ring inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'nx:ring-offset-background focus-visible:nx:ring-ring nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors focus-visible:nx:ring-2 focus-visible:nx:ring-offset-2 focus-visible:nx:outline-none disabled:nx:pointer-events-none disabled:nx:opacity-50 [&_svg]:nx:pointer-events-none [&_svg]:nx:size-4 [&_svg]:nx:shrink-0',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default:
+          'nx:bg-primary nx:text-primary-foreground hover:nx:bg-primary/90',
         destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+          'nx:bg-destructive nx:text-destructive-foreground hover:nx:bg-destructive/90',
         outline:
-          'border-input bg-background hover:bg-accent hover:text-accent-foreground border',
+          'nx:border-input nx:bg-background hover:nx:bg-accent hover:nx:text-accent-foreground nx:border',
         secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+          'nx:bg-secondary nx:text-secondary-foreground hover:nx:bg-secondary/80',
+        ghost: 'hover:nx:bg-accent hover:nx:text-accent-foreground',
+        link: 'nx:text-primary nx:underline-offset-4 hover:nx:underline',
       },
       size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-        icon: 'h-10 w-10',
+        default: 'nx:h-10 nx:px-4 nx:py-2',
+        sm: 'nx:h-9 nx:rounded-md nx:px-3',
+        lg: 'nx:h-11 nx:rounded-md nx:px-8',
+        icon: 'nx:h-10 nx:w-10',
       },
     },
     defaultVariants: {

@@ -21,6 +21,7 @@ When working on tasks:
 ds/
 ├── packages/
 │   ├── core/           # Design tokens (private) → see packages/core/CLAUDE.md
+│   ├── tailwind/       # Tailwind CSS theme (nx: prefix) → see packages/tailwind/CLAUDE.md
 │   ├── react/          # React components → see packages/react/CLAUDE.md
 │   └── test-utils/     # Test utilities → see packages/test-utils/CLAUDE.md
 ├── apps/
@@ -38,7 +39,7 @@ ds/
 
 - **React** 18/19 with TypeScript 5.9
 - **Vite** 7.x for building (library mode)
-- **Tailwind CSS** 4.x with @theme directive (CSS-first)
+- **Tailwind CSS** 4.x with `nx:` prefix (CSS-first, collision-free)
 - **Turbo** 2.7 for monorepo orchestration
 - **CVA** (class-variance-authority) for component variants
 - **Radix UI** primitives for accessibility
@@ -51,13 +52,12 @@ ds/
 # Build & Development
 yarn build              # Build all packages
 yarn dev                # Dev mode (watch)
-yarn tokens             # Generate design tokens (production)
+yarn tokens:tailwind    # Generate @nexus/tailwind package CSS
 yarn tokens:modular     # Generate modular CSS for playground
 yarn clean              # Clean all builds
 
 # Playground (Theme Demo)
 yarn playground         # Start playground dev server
-yarn playground:copy    # Copy modular themes to playground
 
 # Quality
 yarn lint               # Lint all packages
@@ -79,6 +79,7 @@ yarn build-storybook    # Build static site
 | Package | CLAUDE.md | Purpose |
 |---------|-----------|---------|
 | `@nexus/core` | [packages/core/CLAUDE.md](packages/core/CLAUDE.md) | Design tokens (W3C DTCG format) |
+| `@nexus/tailwind` | [packages/tailwind/CLAUDE.md](packages/tailwind/CLAUDE.md) | Tailwind CSS theme with nx: prefix |
 | `@nexus/react` | [packages/react/CLAUDE.md](packages/react/CLAUDE.md) | React component library |
 | `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities |
 | `@nexus/playground` | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md) | Theme demo app |
@@ -117,7 +118,8 @@ yarn build-storybook    # Build static site
 - **Components**: PascalCase (`Button`)
 - **Files**: kebab-case (`button.tsx`)
 - **Tokens**: camelCase in JSON
-- **CSS vars**: kebab-case (`--color-background`)
+- **CSS vars**: kebab-case (`--color-background`, primitives use `--nx-*`)
+- **Tailwind classes**: `nx:` prefix (`nx:bg-primary`, `nx:text-foreground`)
 
 ### Import Order (ESLint auto-sorts)
 1. React/React-DOM

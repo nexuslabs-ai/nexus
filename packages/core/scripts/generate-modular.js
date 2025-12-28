@@ -14,7 +14,7 @@ import {
   pathToCssVar,
   processSemanticTokens,
   readTokenFile,
-  resolveValue,
+  resolveValueWithNxPrefix,
 } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -43,8 +43,8 @@ function processSinglePrimitive(category, primitiveMap) {
   const extracted = extractTokens(tokenData);
 
   for (const token of extracted) {
-    // Add category prefix: --{category}-{token-path}
-    const cssName = `${category}-${pathToCssVar(token.path)}`;
+    // Add nx- prefix and category: --nx-{category}-{token-path}
+    const cssName = `nx-${category}-${pathToCssVar(token.path)}`;
     const cssValue = formatTokenValue(token.value, token.type);
     primitiveMap.set(token.path.join('.'), { cssName, value: cssValue });
     tokens.push({ cssName, value: cssValue });
@@ -72,14 +72,14 @@ function processPrimitiveFile(category, mode, primitiveMap) {
   const extracted = extractTokens(tokenData);
 
   for (const token of extracted) {
-    // Add category prefix to CSS variable name: --{category}-{token-path}
-    // e.g., shadow/2xs.layer-1.x → --shadow-2xs-layer-1-x
-    const cssName = `${category}-${pathToCssVar(token.path)}`;
+    // Add nx- prefix and category: --nx-{category}-{token-path}
+    // e.g., shadow/2xs.layer-1.x → --nx-shadow-2xs-layer-1-x
+    const cssName = `nx-${category}-${pathToCssVar(token.path)}`;
     let cssValue = token.value;
 
-    // Resolve references if needed
+    // Resolve references if needed (references resolve to var(--nx-*))
     if (isReference(cssValue)) {
-      cssValue = resolveValue(cssValue, primitiveMap, token.type);
+      cssValue = resolveValueWithNxPrefix(cssValue, primitiveMap, token.type);
     } else {
       cssValue = formatTokenValue(cssValue, token.type);
     }
@@ -102,6 +102,7 @@ function processSemanticFile(fileName, primitiveMap) {
 
 /**
  * Process typography styles for utilities
+ * Uses resolveValueWithNxPrefix to resolve references to var(--nx-*)
  */
 function processTypographyStyles(primitiveMap) {
   const stylesFile = path.join(TOKENS_DIR, 'styles/typography.json');
@@ -120,23 +121,23 @@ function processTypographyStyles(primitiveMap) {
     const utilityName = `text-${token.path.join('-')}`;
     const properties = {};
 
-    // Resolve each typography property
+    // Resolve each typography property using nx-prefixed variables
     if (token.value.fontFamily) {
-      properties['font-family'] = resolveValue(
+      properties['font-family'] = resolveValueWithNxPrefix(
         token.value.fontFamily,
         primitiveMap,
         'fontFamily'
       );
     }
     if (token.value.fontSize) {
-      properties['font-size'] = resolveValue(
+      properties['font-size'] = resolveValueWithNxPrefix(
         token.value.fontSize,
         primitiveMap,
         'dimension'
       );
     }
     if (token.value.fontWeight) {
-      properties['font-weight'] = resolveValue(
+      properties['font-weight'] = resolveValueWithNxPrefix(
         token.value.fontWeight,
         primitiveMap,
         'fontWeight'
@@ -146,7 +147,7 @@ function processTypographyStyles(primitiveMap) {
       if (token.value.lineHeight === 'auto') {
         properties['line-height'] = 'auto';
       } else {
-        properties['line-height'] = resolveValue(
+        properties['line-height'] = resolveValueWithNxPrefix(
           token.value.lineHeight,
           primitiveMap,
           'dimension'
@@ -163,7 +164,7 @@ function processTypographyStyles(primitiveMap) {
           'dimension'
         );
       } else {
-        properties['letter-spacing'] = resolveValue(
+        properties['letter-spacing'] = resolveValueWithNxPrefix(
           token.value.letterSpacing,
           primitiveMap,
           'dimension'
@@ -179,6 +180,7 @@ function processTypographyStyles(primitiveMap) {
 
 /**
  * Process shadow styles - generates var() references instead of resolved values
+ * Note: shadow composites reference --nx-shadow-* layer variables
  */
 function processShadowStyles() {
   const stylesFile = path.join(TOKENS_DIR, 'styles/shadows.json');
@@ -194,9 +196,14 @@ function processShadowStyles() {
   for (const token of extracted) {
     if (token.type !== 'shadow') continue;
 
-    const cssName = `shadow-${token.path.join('-')}`;
+    // Shadow composite variables use nx- prefix
+    const cssName = `nx-shadow-${token.path.join('-')}`;
     const isInset = token.path.includes('inner');
-    const cssValue = formatShadowComposite(token.value, isInset);
+    // formatShadowComposite generates var(--shadow-*) references
+    // We need to update those to var(--nx-shadow-*)
+    let cssValue = formatShadowComposite(token.value, isInset);
+    // Replace var(--shadow- with var(--nx-shadow-
+    cssValue = cssValue.replace(/var\(--shadow-/g, 'var(--nx-shadow-');
 
     shadows.push({ cssName, value: cssValue });
   }
@@ -307,14 +314,14 @@ function generateShadowVariablesCSS(shadows) {
 
 /**
  * Generate border width utilities CSS
- * @param {object[]} tokens - Array of borderwidth tokens
+ * @param {object[]} tokens - Array of borderwidth tokens (with nx- prefix)
  */
 function generateBorderWidthUtilitiesCSS(tokens) {
   let css = `/* Border Width Utilities */\n\n`;
 
   for (const token of tokens) {
-    // Extract the name part (e.g., "default" from "borderwidth-default")
-    const name = token.cssName.replace('borderwidth-', '');
+    // Extract the name part (e.g., "default" from "nx-borderwidth-default")
+    const name = token.cssName.replace('nx-borderwidth-', '');
 
     css += `@utility border-${name} {\n`;
     css += `  border-style: var(--tw-border-style, solid);\n`;
@@ -337,6 +344,298 @@ function generateStandaloneSemanticCSS(name, tokens) {
 
   css += `}\n`;
   writeModularFile(`${name}.css`, css);
+}
+
+/**
+ * Collect all semantic color tokens from a file with resolved values
+ * Returns array of { cssName, value } for @theme block
+ * @param {string} fileName - Semantic token file name
+ * @param {Map} primitiveMap - Map of primitive token values for resolution
+ */
+function collectSemanticColorTokens(fileName, primitiveMap) {
+  const filePath = path.join(SEMANTIC_DIR, fileName);
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  // Recursively extract token paths and resolve values
+  function extractPaths(obj, pathParts = []) {
+    for (const [key, value] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+
+      const currentPath = [...pathParts, key];
+
+      if (value.$value !== undefined && value.$type === 'color') {
+        // This is a token - resolve its value
+        const cssName = `color-${currentPath.join('-')}`;
+        let resolvedValue = value.$value;
+
+        // Resolve reference like {slate.50} to actual hex value
+        if (isReference(resolvedValue)) {
+          const refPath = resolvedValue.slice(1, -1); // Remove { }
+          const primitiveInfo = primitiveMap.get(refPath);
+          if (primitiveInfo) {
+            resolvedValue = primitiveInfo.value;
+          }
+        }
+
+        tokens.push({ cssName, value: resolvedValue });
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
+        // Nested group
+        extractPaths(value, currentPath);
+      }
+    }
+  }
+
+  extractPaths(tokenData);
+  return tokens;
+}
+
+/**
+ * Collect spacing token mappings from spacing.json
+ * Returns array of { cssName, varRef } for @theme block
+ */
+function collectSpacingTokens() {
+  const filePath = path.join(SEMANTIC_DIR, 'spacing.json');
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const [key, value] of Object.entries(tokenData)) {
+    if (key.startsWith('$')) continue;
+    if (value.$type !== 'dimension') continue;
+
+    // Extract the size key from the reference {N} -> N
+    const match = value.$value.match(/\{(.+)\}/);
+    if (match) {
+      const sizeKey = match[1];
+      // spacing-0_5 -> --spacing-0_5: var(--nx-size-0_5)
+      const cssName = key.replace('spacing-', 'spacing-');
+      tokens.push({
+        cssName,
+        varRef: `var(--nx-size-${sizeKey})`,
+      });
+    }
+  }
+
+  return tokens;
+}
+
+/**
+ * Collect radius token mappings from a sample mode file
+ * Returns array of { cssName, varRef } for @theme block
+ */
+function collectRadiusTokens(mode) {
+  const filePath = path.join(
+    TOKENS_DIR,
+    `primitives/radius/radius-${mode}.json`
+  );
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const key of Object.keys(tokenData)) {
+    if (key.startsWith('$')) continue;
+    tokens.push({
+      cssName: `radius-${key}`,
+      varRef: `var(--nx-radius-${key})`,
+    });
+  }
+
+  return tokens;
+}
+
+/**
+ * Collect borderwidth token mappings from a sample mode file
+ * Returns array of { cssName, varRef } for @theme block
+ */
+function collectBorderwidthTokens(mode) {
+  const filePath = path.join(
+    TOKENS_DIR,
+    `primitives/borderwidth/borderwidth-${mode}.json`
+  );
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const key of Object.keys(tokenData)) {
+    if (key.startsWith('$')) continue;
+    tokens.push({
+      cssName: `border-${key}`,
+      varRef: `var(--nx-borderwidth-${key})`,
+    });
+  }
+
+  return tokens;
+}
+
+/**
+ * Generate shadow CSS value with var() references to layer variables
+ */
+function generateShadowVarValue(name, shadowValue, isInset = false) {
+  const prefix = isInset ? 'inset ' : '';
+
+  if (Array.isArray(shadowValue)) {
+    // Multi-layer shadow
+    const layers = shadowValue.map((_layer, index) => {
+      const layerNum = shadowValue.length - index; // layer-2, layer-1
+      return `var(--nx-shadow-${name}-layer-${layerNum}-x) var(--nx-shadow-${name}-layer-${layerNum}-y) var(--nx-shadow-${name}-layer-${layerNum}-blur) var(--nx-shadow-${name}-layer-${layerNum}-spread) var(--nx-shadow-${name}-layer-${layerNum}-color)`;
+    });
+    return layers.join(', ');
+  } else {
+    // Single layer or focus shadow
+    if (name.startsWith('focus-')) {
+      // Focus shadows use different naming: focus-default-x instead of focus-default-layer-1-x
+      return `${prefix}var(--nx-shadow-${name}-x) var(--nx-shadow-${name}-y) var(--nx-shadow-${name}-blur) var(--nx-shadow-${name}-spread) var(--nx-shadow-${name}-color)`;
+    }
+    return `${prefix}var(--nx-shadow-${name}-layer-1-x) var(--nx-shadow-${name}-layer-1-y) var(--nx-shadow-${name}-layer-1-blur) var(--nx-shadow-${name}-layer-1-spread) var(--nx-shadow-${name}-layer-1-color)`;
+  }
+}
+
+/**
+ * Collect shadow token CSS values with var() references
+ * Returns array of { cssName, value } for @theme block
+ */
+function collectShadowTokens() {
+  const stylesFile = path.join(TOKENS_DIR, 'styles/shadows.json');
+  if (!fs.existsSync(stylesFile)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(stylesFile);
+  const shadows = [];
+
+  for (const [key, value] of Object.entries(tokenData)) {
+    if (key.startsWith('$')) continue;
+    if (value.$type !== 'shadow') {
+      // Handle nested (like focus.default, focus.error)
+      if (typeof value === 'object') {
+        for (const [subKey, subValue] of Object.entries(value)) {
+          if (subKey.startsWith('$')) continue;
+          if (subValue.$type === 'shadow') {
+            const shadowName = `${key}-${subKey}`;
+            const cssValue = generateShadowVarValue(
+              shadowName,
+              subValue.$value
+            );
+            shadows.push({ cssName: `shadow-${shadowName}`, value: cssValue });
+          }
+        }
+      }
+      continue;
+    }
+
+    const isInset = key === 'inner';
+    const cssValue = generateShadowVarValue(key, value.$value, isInset);
+    shadows.push({ cssName: `shadow-${key}`, value: cssValue });
+  }
+
+  return shadows;
+}
+
+/**
+ * Generate globals.css for playground
+ * Uses @theme (not inline) for dynamic theme switching
+ * @param {object} primitives - Discovered primitives info
+ * @param {Map} primitiveMap - Map of primitive token values for resolution
+ */
+function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
+  let css = `/*
+ * Playground globals.css - Auto-generated by generate-modular.js
+ * DO NOT EDIT MANUALLY - changes will be overwritten
+ *
+ * This file uses @theme (not inline) so utilities use var() references
+ * that can be overridden by dynamically loaded theme CSS files.
+ * Tailwind utilities are generated with nx: prefix (e.g., nx:bg-background).
+ *
+ * Default values are from slate-light base + blue-light brand.
+ * These can be overridden by theme CSS files loaded by useTheme hook.
+ */
+@import 'tailwindcss' prefix(nx);
+@import './color.css';
+@import './typography-utilities.css';
+@import './borderwidth-utilities.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+`;
+
+  // Collect all color tokens from base and brands (with resolved default values)
+  const baseTokens = collectSemanticColorTokens(
+    'base-slate-light.json',
+    primitiveMap
+  );
+  const brandTokens = collectSemanticColorTokens(
+    'brands-blue-light.json',
+    primitiveMap
+  );
+  const allColorTokens = [...baseTokens, ...brandTokens];
+
+  // Group tokens for organized output
+  css += `  /* Semantic color tokens - defaults, overridden by theme CSS */\n`;
+  for (const token of allColorTokens) {
+    css += `  --${token.cssName}: ${token.value};\n`;
+  }
+
+  // Spacing tokens
+  const spacingTokens = collectSpacingTokens();
+  if (spacingTokens.length > 0) {
+    css += `\n  /* Spacing tokens - reference --nx-size-* primitives */\n`;
+    for (const token of spacingTokens) {
+      css += `  --${token.cssName}: ${token.varRef};\n`;
+    }
+  }
+
+  // Radius tokens
+  const firstRadiusMode = primitives.radius?.modes?.[0];
+  if (firstRadiusMode) {
+    const radiusTokens = collectRadiusTokens(firstRadiusMode);
+    if (radiusTokens.length > 0) {
+      css += `\n  /* Radius tokens - reference --nx-radius-* primitives */\n`;
+      for (const token of radiusTokens) {
+        css += `  --${token.cssName}: ${token.varRef};\n`;
+      }
+    }
+  }
+
+  // Border width tokens
+  const firstBorderwidthMode = primitives.borderwidth?.modes?.[0];
+  if (firstBorderwidthMode) {
+    const borderwidthTokens = collectBorderwidthTokens(firstBorderwidthMode);
+    if (borderwidthTokens.length > 0) {
+      css += `\n  /* Border width tokens - reference --nx-borderwidth-* primitives */\n`;
+      for (const token of borderwidthTokens) {
+        css += `  --${token.cssName}: ${token.varRef};\n`;
+      }
+    }
+  }
+
+  // Shadow tokens
+  const shadowTokens = collectShadowTokens();
+  if (shadowTokens.length > 0) {
+    css += `\n  /* Shadow tokens - reference --nx-shadow-* layer variables */\n`;
+    for (const token of shadowTokens) {
+      css += `  --${token.cssName}: ${token.value};\n`;
+    }
+  }
+
+  css += `}\n`;
+
+  writeModularFile('globals.css', css);
+  return allColorTokens.length + spacingTokens.length;
 }
 
 /**
@@ -450,6 +749,12 @@ function main() {
       totalFiles++;
     }
   }
+
+  // Generate playground globals.css
+  console.log('\nPlayground:');
+  const globalsTokenCount = generatePlaygroundGlobalsCSS(primitives, primitiveMap);
+  console.log(`  ✓ globals.css (${globalsTokenCount} tokens)`);
+  totalFiles++;
 
   console.log(
     `\n✨ Generated ${totalFiles} modular CSS files in dist/modular/`

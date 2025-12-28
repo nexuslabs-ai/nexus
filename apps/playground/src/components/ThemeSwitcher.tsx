@@ -30,15 +30,15 @@ function SelectControl({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-2">
-      <label htmlFor={id} className="text-sm font-medium">
+    <div className="nx:flex nx:items-center nx:gap-2">
+      <label htmlFor={id} className="nx:text-sm nx:font-medium">
         {label}:
       </label>
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border-border-default bg-background rounded border px-2 py-1 text-sm"
+        className="nx:border-border-default nx:bg-background nx:rounded nx:border nx:px-2 nx:py-1 nx:text-sm"
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>
@@ -52,10 +52,10 @@ function SelectControl({
 
 export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
   return (
-    <div className="border-border-default bg-muted border-b p-4">
+    <div className="nx:border-border-default nx:bg-muted nx:border-b nx:p-4">
       {/* Color Themes Row */}
-      <div className="mb-3 flex flex-wrap items-center gap-4">
-        <span className="text-muted-foreground text-xs font-semibold uppercase">
+      <div className="nx:mb-3 nx:flex nx:flex-wrap nx:items-center nx:gap-4">
+        <span className="nx:text-muted-foreground nx:text-xs nx:font-semibold nx:uppercase">
           Colors
         </span>
         <SelectControl
@@ -74,15 +74,15 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
         />
         <button
           onClick={() => setTheme((t) => ({ ...t, dark: !t.dark }))}
-          className="border-border-default bg-background hover:bg-accent rounded border px-3 py-1 text-sm"
+          className="nx:border-border-default nx:bg-background hover:nx:bg-accent nx:rounded nx:border nx:px-3 nx:py-1 nx:text-sm"
         >
           {theme.dark ? 'Light' : 'Dark'}
         </button>
       </div>
 
       {/* Design Tokens Row */}
-      <div className="flex flex-wrap items-center gap-4">
-        <span className="text-muted-foreground text-xs font-semibold uppercase">
+      <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-4">
+        <span className="nx:text-muted-foreground nx:text-xs nx:font-semibold nx:uppercase">
           Tokens
         </span>
         <SelectControl

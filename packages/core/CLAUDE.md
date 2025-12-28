@@ -5,14 +5,14 @@ Private package containing design tokens in W3C DTCG format. Not published to np
 ## Quick Reference
 
 ```bash
-yarn build:tokens                           # Generate production CSS (default: slate/blue)
+yarn build:tailwind                         # Generate @nexus/tailwind package CSS
 yarn build:tokens:modular                   # Generate modular CSS for playground
-node scripts/generate-css.js --base=neutral --brand=gray  # Custom theme
 ```
 
 Output:
-- `dist/globals.css` → auto-copied to `packages/react/src/generated/globals.css`
-- `dist/modular/` → individual theme CSS files for playground
+- `../tailwind/nexus.css` → Main Tailwind theme with `nx:` prefix
+- `../tailwind/variables.css` → Primitive CSS variables with `--nx-*` prefix
+- `dist/modular/` → Individual theme CSS files for playground
 
 ## Token Structure
 
@@ -38,7 +38,8 @@ tokens/
 │   ├── base-slate-light.json  # Slate base - light mode
 │   ├── base-slate-dark.json   # Slate base - dark mode
 │   ├── base-{palette}-*.json  # Other palette variants (neutral, zinc, gray, stone)
-│   └── brands-{brand}-*.json  # Brand variants (blue, gray, neutral, slate)
+│   ├── brands-{brand}-*.json  # Brand variants (blue, gray, neutral, slate)
+│   └── spacing.json           # Spacing semantic mappings
 ├── styles/
 │   ├── typography.json        # Typography style definitions → @utility classes
 │   └── shadows.json           # Shadow style definitions → --shadow-* variables
@@ -67,18 +68,18 @@ tokens/
 }
 ```
 
-Reference syntax: `{colorName.shade}` → `var(--colorName-shade)`
+Reference syntax: `{colorName.shade}` → `var(--nx-color-colorName-shade)`
 
 ## Theme Selection
 
-Themes are selected via CLI arguments:
+Themes are selected via CLI arguments for the tailwind generation script:
 
 ```bash
 # Default theme (all options have defaults)
-yarn tokens  # Uses slate/blue/vega defaults
+yarn tokens:tailwind  # Uses slate/blue/vega defaults
 
 # Custom theme
-node scripts/generate-css.js --base=neutral --brand=gray --size=lyra --shadow=subtle
+node scripts/generate-tailwind-package.js --base=neutral --brand=gray --size=lyra
 ```
 
 Available options:
@@ -95,44 +96,47 @@ Available options:
 
 ## Generated CSS Structure
 
+### @nexus/tailwind (nexus.css)
+
 ```css
-@import "tailwindcss";
+@import "tailwindcss" prefix(nx);
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  /* Primitives - all color scales */
-  --blue-500: #3b82f6;
-  --slate-50: #f8fafc;
-
-  /* Size/spacing primitives (from selected mode) */
-  --size-0: 0rem;
-  --size-4: 1rem;
-
-  /* Shadow variables */
-  --shadow-xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
-  --shadow-focus: 0px 0px 0px 2px var(--blue-100);
-}
+@import "./variables.css";
 
 @theme inline {
-  /* Semantic tokens - light mode */
-  --color-background: var(--slate-50);
-  --color-primary-background: var(--blue-500);
+  /* Semantic tokens - light mode (reference --nx-* primitives) */
+  --color-background: var(--nx-color-slate-50);
+  --color-primary-background: var(--nx-color-blue-500);
+  --spacing-4: var(--nx-size-4);
 }
 
 .dark {
   /* Semantic tokens - dark mode overrides */
-  --color-background: var(--slate-950);
+  --color-background: var(--nx-color-slate-950);
 }
 
 /* Typography utilities (Tailwind v4 @utility) */
 @utility text-display-large {
-  font-family: var(--family-font-sans);
-  font-size: var(--size-6xl);
-  font-weight: var(--weight-light);
-  line-height: var(--leading-6xl);
+  font-family: var(--nx-typography-family-font-sans);
+  font-size: var(--nx-typography-size-6xl);
+  font-weight: var(--nx-typography-weight-light);
+  line-height: var(--nx-typography-leading-6xl);
 }
+```
 
-@layer base { ... }
+### @nexus/tailwind (variables.css)
+
+```css
+:root {
+  /* All primitives use --nx-* prefix */
+  --nx-color-blue-500: #3b82f6;
+  --nx-color-slate-50: #f8fafc;
+  --nx-size-0: 0rem;
+  --nx-size-4: 1rem;
+  --nx-shadow-xs-layer-1-x: 0px;
+  /* ... */
+}
 ```
 
 ## Modular CSS (for Playground)
@@ -147,18 +151,18 @@ Output in `dist/modular/`:
 
 | File Pattern | Content |
 |--------------|---------|
-| `primitives.css` | All color scales |
-| `base-{palette}.css` | Base themes (light + dark) |
+| `color.css` | All color primitives (`--nx-color-*`) |
+| `base-{palette}.css` | Base themes (light + dark, references `--nx-color-*`) |
 | `brands-{brand}.css` | Brand themes (light + dark) |
-| `size-{mode}.css` | Size/spacing primitives |
-| `typography-{mode}.css` | Typography scale primitives |
-| `shadow-{mode}.css` | Shadow primitives |
-| `radius-{mode}.css` | Border radius primitives |
-| `borderwidth-{mode}.css` | Border width primitives |
+| `size-{mode}.css` | Size/spacing primitives (`--nx-size-*`) |
+| `typography-{mode}.css` | Typography scale primitives (`--nx-typography-*`) |
+| `shadow-{mode}.css` | Shadow primitives (`--nx-shadow-*`) |
+| `radius-{mode}.css` | Border radius primitives (`--nx-radius-*`) |
+| `borderwidth-{mode}.css` | Border width primitives (`--nx-borderwidth-*`) |
 | `typography-utilities.css` | text-* utility classes |
-| `shadow-variables.css` | --shadow-* CSS variables |
+| `shadow-variables.css` | --nx-shadow-* composite CSS variables |
 | `borderwidth-utilities.css` | border-default, border-thick utilities |
-| `spacing.css` | Spacing semantic mappings |
+| `spacing.css` | Spacing semantic mappings (`--spacing-*` → `var(--nx-size-*)`) |
 
 ## Semantic Token Categories
 
@@ -178,23 +182,31 @@ Each semantic group has: `background`, `foreground`, `hover`, `active`, `disable
 3. **Base tokens**: Add to both `tokens/semantic/base-{name}-light.json` and `base-{name}-dark.json`
 4. **Brand tokens**: Add to both `tokens/semantic/brands-{name}-light.json` and `brands-{name}-dark.json`
 5. **Typography/shadow styles**: Add to `tokens/styles/typography.json` or `shadows.json`
-6. Run `yarn tokens` from root
-7. Verify in generated CSS files
+6. Run `yarn tokens:tailwind` from root
+7. Verify in `packages/tailwind/` CSS files
 
 ## Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `generate-css.js` | Production CSS with selected theme |
-| `generate-modular.js` | Modular CSS for all themes |
-| `copy-to-react.js` | Copy globals.css to React package |
+| `generate-tailwind-package.js` | Generate @nexus/tailwind package CSS |
+| `generate-modular.js` | Modular CSS for all themes (playground) |
 | `utils.js` | Shared utilities (token parsing, CSS var generation) |
 
 Tests: `scripts/__tests__/utils.test.js` (31 unit tests)
 
+## CSS Variable Naming
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Primitive | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-size-4` |
+| Semantic | `--{category}-{path}` | `--color-background`, `--spacing-4` |
+| Tailwind utility | `nx:{utility}` | `nx:bg-primary`, `nx:p-4` |
+
 ## Important Notes
 
-- **Never edit** `dist/` or `packages/react/src/generated/` files directly
+- **Never edit** `dist/` or `packages/tailwind/` CSS files directly
 - Primitives are theme-agnostic (same colors for light/dark)
 - Semantic files have separate light/dark variants
 - Dark mode overrides semantic vars, not primitive vars
+- All primitives use `--nx-*` prefix to avoid collisions
