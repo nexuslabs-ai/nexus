@@ -6,6 +6,19 @@ Stories file: `{ComponentName}.stories.tsx` (PascalCase)
 
 Example: `Button.stories.tsx`, `Card.stories.tsx`
 
+## Adaptation Note
+
+This template assumes components with `variant`, `size`, `disabled`, and `asChild` props. **Adapt based on actual component API:**
+
+| Component Type | Typical Stories |
+|----------------|-----------------|
+| Interactive (Button, Input) | Variants, Sizes, Disabled, States |
+| Container (Card, Dialog) | Default, WithContent, Composition |
+| Display (Badge, Avatar) | Variants, Sizes |
+| Layout (Separator, Spacer) | Default, Orientation |
+
+Skip sections that don't apply. Add component-specific stories as needed.
+
 ## Meta Configuration
 
 ```tsx

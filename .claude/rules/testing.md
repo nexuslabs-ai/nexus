@@ -9,6 +9,26 @@ import { describe, expect, it, vi } from 'vitest';
 import { Component, componentVariants } from './component';
 ```
 
+## Adaptation Note
+
+This template uses `getByRole('button')` as example. **Adapt queries based on component type:**
+
+| Component | Role/Query |
+|-----------|------------|
+| Button | `getByRole('button')` |
+| Input | `getByRole('textbox')` |
+| Checkbox | `getByRole('checkbox')` |
+| Link | `getByRole('link')` |
+| Dialog | `getByRole('dialog')` |
+| Card | `getByTestId('card')` or container query |
+| Badge | `getByText()` or `getByTestId()` |
+
+**Skip sections that don't apply:**
+- No `onClick` → skip click interaction tests
+- No `disabled` prop → skip disabled tests
+- No variants → skip variant tests
+- Static display → minimal interaction tests
+
 ## Test Structure
 
 Organize tests into 6 describe blocks:
