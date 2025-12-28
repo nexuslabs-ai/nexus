@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -427,7 +427,6 @@
   --typography-letterspacing-wide: 0.4000000059604645px;
   --typography-letterspacing-wider: 0.800000011920929px;
   --typography-letterspacing-widest: 1.600000023841858px;
-
 }
 
 /* ===== SEMANTIC TOKENS (Light) ===== */
@@ -543,16 +542,52 @@
   --border-thick: 2px;
 
   /* Shadows */
-  --shadow-2xs: var(--shadow-2xs-layer-1-x) var(--shadow-2xs-layer-1-y) var(--shadow-2xs-layer-1-blur) var(--shadow-2xs-layer-1-spread) var(--shadow-2xs-layer-1-color);
-  --shadow-xs: var(--shadow-xs-layer-1-x) var(--shadow-xs-layer-1-y) var(--shadow-xs-layer-1-blur) var(--shadow-2xs-layer-1-spread) var(--shadow-xs-layer-1-color);
-  --shadow-sm: var(--shadow-sm-layer-2-x) var(--shadow-sm-layer-2-y) var(--shadow-sm-layer-2-blur) var(--shadow-sm-layer-2-spread) var(--shadow-sm-layer-2-color), var(--shadow-sm-layer-1-x) var(--shadow-sm-layer-1-y) var(--shadow-sm-layer-1-blur) var(--shadow-sm-layer-1-spread) var(--shadow-sm-layer-1-color);
-  --shadow-base: var(--shadow-base-layer-2-x) var(--shadow-base-layer-2-y) var(--shadow-base-layer-2-blur) var(--shadow-base-layer-2-spread) var(--shadow-base-layer-2-color), var(--shadow-base-layer-1-x) var(--shadow-base-layer-1-y) var(--shadow-base-layer-1-blur) var(--shadow-base-layer-1-spread) var(--shadow-base-layer-1-color);
-  --shadow-lg: var(--shadow-lg-layer-2-x) var(--shadow-lg-layer-2-y) var(--shadow-lg-layer-2-blur) var(--shadow-lg-layer-2-spread) var(--shadow-lg-layer-2-color), var(--shadow-lg-layer-1-x) var(--shadow-lg-layer-1-y) var(--shadow-lg-layer-1-blur) var(--shadow-lg-layer-1-spread) var(--shadow-lg-layer-1-color);
-  --shadow-xl: var(--shadow-xl-layer-2-x) var(--shadow-xl-layer-2-y) var(--shadow-xl-layer-2-blur) var(--shadow-xl-layer-2-spread) var(--shadow-xl-layer-2-color), var(--shadow-xl-layer-1-x) var(--shadow-xl-layer-1-y) var(--shadow-xl-layer-1-blur) var(--shadow-xl-layer-1-spread) var(--shadow-xl-layer-1-color);
-  --shadow-2xl: var(--shadow-2xl-layer-1-x) var(--shadow-2xl-layer-1-y) var(--shadow-2xl-layer-1-blur) var(--shadow-2xl-layer-1-spread) var(--shadow-2xl-layer-1-color);
-  --shadow-inner: inset var(--shadow-inner-layer-1-x) var(--shadow-inner-layer-1-y) var(--shadow-inner-layer-1-blur) var(--shadow-inner-layer-1-spread) var(--shadow-inner-layer-1-color);
-  --shadow-focus-default: var(--shadow-focus-default-x) var(--shadow-focus-default-y) var(--shadow-focus-default-blur) var(--shadow-focus-default-spread) var(--shadow-focus-default-color);
-  --shadow-focus-error: var(--shadow-focus-error-x) var(--shadow-focus-error-y) var(--shadow-focus-error-blur) var(--shadow-focus-error-spread) var(--shadow-focus-error-color);
+  --shadow-2xs: var(--shadow-2xs-layer-1-x) var(--shadow-2xs-layer-1-y)
+    var(--shadow-2xs-layer-1-blur) var(--shadow-2xs-layer-1-spread)
+    var(--shadow-2xs-layer-1-color);
+  --shadow-xs: var(--shadow-xs-layer-1-x) var(--shadow-xs-layer-1-y)
+    var(--shadow-xs-layer-1-blur) var(--shadow-2xs-layer-1-spread)
+    var(--shadow-xs-layer-1-color);
+  --shadow-sm:
+    var(--shadow-sm-layer-2-x) var(--shadow-sm-layer-2-y)
+      var(--shadow-sm-layer-2-blur) var(--shadow-sm-layer-2-spread)
+      var(--shadow-sm-layer-2-color),
+    var(--shadow-sm-layer-1-x) var(--shadow-sm-layer-1-y)
+      var(--shadow-sm-layer-1-blur) var(--shadow-sm-layer-1-spread)
+      var(--shadow-sm-layer-1-color);
+  --shadow-base:
+    var(--shadow-base-layer-2-x) var(--shadow-base-layer-2-y)
+      var(--shadow-base-layer-2-blur) var(--shadow-base-layer-2-spread)
+      var(--shadow-base-layer-2-color),
+    var(--shadow-base-layer-1-x) var(--shadow-base-layer-1-y)
+      var(--shadow-base-layer-1-blur) var(--shadow-base-layer-1-spread)
+      var(--shadow-base-layer-1-color);
+  --shadow-lg:
+    var(--shadow-lg-layer-2-x) var(--shadow-lg-layer-2-y)
+      var(--shadow-lg-layer-2-blur) var(--shadow-lg-layer-2-spread)
+      var(--shadow-lg-layer-2-color),
+    var(--shadow-lg-layer-1-x) var(--shadow-lg-layer-1-y)
+      var(--shadow-lg-layer-1-blur) var(--shadow-lg-layer-1-spread)
+      var(--shadow-lg-layer-1-color);
+  --shadow-xl:
+    var(--shadow-xl-layer-2-x) var(--shadow-xl-layer-2-y)
+      var(--shadow-xl-layer-2-blur) var(--shadow-xl-layer-2-spread)
+      var(--shadow-xl-layer-2-color),
+    var(--shadow-xl-layer-1-x) var(--shadow-xl-layer-1-y)
+      var(--shadow-xl-layer-1-blur) var(--shadow-xl-layer-1-spread)
+      var(--shadow-xl-layer-1-color);
+  --shadow-2xl: var(--shadow-2xl-layer-1-x) var(--shadow-2xl-layer-1-y)
+    var(--shadow-2xl-layer-1-blur) var(--shadow-2xl-layer-1-spread)
+    var(--shadow-2xl-layer-1-color);
+  --shadow-inner: inset var(--shadow-inner-layer-1-x)
+    var(--shadow-inner-layer-1-y) var(--shadow-inner-layer-1-blur)
+    var(--shadow-inner-layer-1-spread) var(--shadow-inner-layer-1-color);
+  --shadow-focus-default: var(--shadow-focus-default-x)
+    var(--shadow-focus-default-y) var(--shadow-focus-default-blur)
+    var(--shadow-focus-default-spread) var(--shadow-focus-default-color);
+  --shadow-focus-error: var(--shadow-focus-error-x) var(--shadow-focus-error-y)
+    var(--shadow-focus-error-blur) var(--shadow-focus-error-spread)
+    var(--shadow-focus-error-color);
 }
 
 /* ===== DARK MODE ===== */
