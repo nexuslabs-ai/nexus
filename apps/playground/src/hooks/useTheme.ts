@@ -48,13 +48,6 @@ export function useTheme() {
     borderWidth: 'vega',
   });
 
-  // Load static files once on mount (primitives + utilities)
-  useEffect(() => {
-    loadCSS('/themes/primitives.css', 'primitives');
-    loadCSS('/themes/typography-utilities.css', 'typography-utilities');
-    loadCSS('/themes/shadow-variables.css', 'shadow-variables');
-  }, []);
-
   // Load base theme when it changes
   useEffect(() => {
     loadCSS(`/themes/base-${theme.base}.css`, 'base');

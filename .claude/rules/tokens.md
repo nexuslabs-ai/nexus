@@ -118,9 +118,8 @@ Valid `$type` values:
 After editing token files:
 
 ```bash
-# Production CSS (single theme)
-yarn tokens                    # Uses default: --base=slate --brand=blue
-yarn tokens --base=neutral     # Custom base
+# Generate @nexus/tailwind package CSS
+yarn tokens:tailwind           # Uses default: --base=slate --brand=blue
 
 # Modular CSS (all themes for playground)
 yarn tokens:modular
@@ -131,7 +130,7 @@ yarn tokens:modular
 Configure theme via CLI arguments:
 
 ```bash
-node scripts/generate-css.js --base=slate --brand=blue
+node scripts/generate-tailwind-package.js --base=slate --brand=blue
 ```
 
 Available options:
@@ -143,9 +142,17 @@ Available options:
 - **Radius**: blunt, sharp, subtle, smooth, mellow
 - **Border Width**: vega, lyra, maia, mira, nova
 
+## CSS Variable Naming
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Primitive | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-size-4` |
+| Semantic | `--{category}-{path}` | `--color-background`, `--spacing-4` |
+| Tailwind utility | `nx:{utility}` | `nx:bg-primary`, `nx:p-4` |
+
 ## Do Not
 
-- Edit files in `dist/` or `packages/react/src/generated/`
+- Edit files in `dist/` or `packages/tailwind/` directly
 - Use raw hex values in semantic tokens (use `{references}`)
 - Forget to create both light and dark variants for semantic files
 - Add tokens without `$type` property

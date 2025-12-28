@@ -6,10 +6,10 @@ export default function App() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="bg-background text-foreground min-h-screen">
-      <header className="border-border-default border-b p-4">
-        <h1 className="text-2xl font-bold">Nexus Theme Playground</h1>
-        <p className="text-muted-foreground text-sm">
+    <div className="nx:bg-background nx:text-foreground nx:min-h-screen">
+      <header className="nx:border-border-default nx:border-b nx:p-4">
+        <h1 className="nx:text-2xl nx:font-bold">Nexus Theme Playground</h1>
+        <p className="nx:text-muted-foreground nx:text-sm">
           Dynamically switch between theme combinations
         </p>
       </header>

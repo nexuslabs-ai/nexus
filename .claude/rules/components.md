@@ -21,19 +21,19 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const componentVariants = cva(
-  // Base classes (always applied)
-  'inline-flex items-center justify-center',
+  // Base classes (always applied) - ALL classes use nx: prefix
+  'nx:inline-flex nx:items-center nx:justify-center',
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        outline: 'border border-border-default bg-background hover:bg-accent',
+        primary: 'nx:bg-primary nx:text-primary-foreground hover:nx:bg-primary/90',
+        secondary: 'nx:bg-secondary nx:text-secondary-foreground hover:nx:bg-secondary/80',
+        outline: 'nx:border nx:border-border-default nx:bg-background hover:nx:bg-accent',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 px-3 text-xs',
-        lg: 'h-10 px-6',
+        default: 'nx:h-9 nx:px-4 nx:py-2',
+        sm: 'nx:h-8 nx:px-3 nx:text-xs',
+        lg: 'nx:h-10 nx:px-6',
       },
     },
     defaultVariants: {
@@ -113,19 +113,34 @@ import { cn } from '@/lib/utils';
 // 4. Relative imports (if any)
 ```
 
+## Class Naming (nx: prefix)
+
+All Tailwind utility classes MUST use the `nx:` prefix:
+
+```tsx
+// Good - uses nx: prefix
+'nx:bg-primary nx:text-primary-foreground'
+'hover:nx:bg-secondary/80'
+'nx:border nx:border-border-default'
+
+// Bad - missing nx: prefix
+'bg-primary text-primary-foreground'
+'hover:bg-secondary/80'
+```
+
 ## Semantic Token Usage
 
 Use semantic color tokens, not primitive colors:
 
 ```tsx
 // Good
-'bg-primary text-primary-foreground'
-'bg-secondary hover:bg-secondary/80'
-'border-border-default'
+'nx:bg-primary nx:text-primary-foreground'
+'nx:bg-secondary hover:nx:bg-secondary/80'
+'nx:border-border-default'
 
 // Bad
-'bg-blue-500 text-white'
-'bg-neutral-100'
+'nx:bg-blue-500 nx:text-white'
+'nx:bg-neutral-100'
 ```
 
 ## asChild Pattern
@@ -152,6 +167,7 @@ export * from '@/components/ui/new-component';
 
 ## Do Not
 
+- Forget `nx:` prefix on utility classes
 - Use raw Tailwind colors (use semantic tokens)
 - Forget `data-slot` attribute
 - Export without the variants function

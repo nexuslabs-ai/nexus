@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "copy:themes": "cp -r ../../packages/core/dist/modular/* public/themes/"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^19.2.3",

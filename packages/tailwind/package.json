@@ -1,0 +1,23 @@
+{
+  "name": "@nexus/tailwind",
+  "version": "0.0.1",
+  "description": "Nexus Design System Tailwind CSS theme with nx: prefix",
+  "license": "MIT",
+  "type": "module",
+  "main": "./nexus.css",
+  "exports": {
+    ".": "./nexus.css",
+    "./nexus.css": "./nexus.css",
+    "./variables": "./variables.css",
+    "./variables.css": "./variables.css"
+  },
+  "files": [
+    "*.css"
+  ],
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

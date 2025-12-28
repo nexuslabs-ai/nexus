@@ -1,12 +1,12 @@
 /* radius: blunt */
 
 :root {
-  --radius-base: 16px;
-  --radius-sm: 14px;
-  --radius-md: 16px;
-  --radius-lg: 18px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  --radius-3xl: 32px;
-  --radius-full: 9999px;
+  --nx-radius-base: 16px;
+  --nx-radius-sm: 14px;
+  --nx-radius-md: 16px;
+  --nx-radius-lg: 18px;
+  --nx-radius-xl: 20px;
+  --nx-radius-2xl: 24px;
+  --nx-radius-3xl: 32px;
+  --nx-radius-full: 9999px;
 }

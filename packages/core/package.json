@@ -5,9 +5,8 @@
   "type": "module",
   "description": "Internal design tokens and theme definitions (not published)",
   "scripts": {
-    "build:tokens": "node scripts/generate-css.js --base=slate --brand=blue",
     "build:tokens:modular": "node scripts/generate-modular.js",
-    "postbuild:tokens": "node scripts/copy-to-react.js"
+    "build:tailwind": "node scripts/generate-tailwind-package.js --base=slate --brand=blue"
   },
   "dependencies": {},
   "license": "MIT"

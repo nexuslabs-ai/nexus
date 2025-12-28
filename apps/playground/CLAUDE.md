@@ -12,7 +12,7 @@ Theme demonstration app for previewing design token combinations dynamically.
 
 - **Vite** 7.x with React plugin
 - **React** 19 with TypeScript
-- **Tailwind CSS** 4.x
+- **Tailwind CSS** 4.x with `nx:` prefix
 - Native HTML elements (no @nexus/react dependency)
 
 ## Commands
@@ -21,16 +21,17 @@ Theme demonstration app for previewing design token combinations dynamically.
 yarn dev              # Start dev server
 yarn build            # Production build
 yarn preview          # Preview production build
-yarn copy:themes      # Copy modular CSS from core package
 ```
+
+Note: Theme CSS files are automatically copied by `yarn tokens:modular` from the root.
 
 ## Structure
 
 ```
 apps/playground/
 ├── public/
-│   └── themes/           # Modular CSS files (copied from core)
-│       ├── primitives.css           # All color scales
+│   └── themes/           # Runtime CSS files (copied from core)
+│       ├── color.css                # Color primitives (--nx-color-*)
 │       ├── base-{palette}.css       # Base themes (5)
 │       ├── brands-{brand}.css       # Brand themes (4)
 │       ├── size-{mode}.css          # Size/spacing modes (5)
@@ -39,11 +40,17 @@ apps/playground/
 │       ├── radius-{mode}.css        # Border radius modes (5)
 │       ├── borderwidth-{mode}.css   # Border width modes (5)
 │       ├── typography-utilities.css # text-* utility classes
-│       └── shadow-variables.css     # --shadow-* CSS variables
+│       ├── borderwidth-utilities.css # border-default/thick utilities
+│       └── shadow-variables.css     # --nx-shadow-* CSS variables
 └── src/
     ├── main.tsx          # React entry
     ├── App.tsx           # Main layout
-    ├── App.css           # Tailwind import
+    ├── App.css           # Imports styles/globals.css
+    ├── styles/           # Build-time CSS (copied from core)
+    │   ├── globals.css   # Tailwind entry with @theme block
+    │   ├── color.css     # Color primitives
+    │   ├── typography-utilities.css
+    │   └── borderwidth-utilities.css
     ├── hooks/
     │   └── useTheme.ts   # Theme state + CSS loading
     └── components/
@@ -53,16 +60,20 @@ apps/playground/
 
 ## How It Works
 
-1. **Static files** load once on mount: primitives, typography-utilities, shadow-variables
-2. **Color themes** swap when base/brand dropdown changes
-3. **Token modes** swap when size/typography/shadow/radius/border dropdowns change
-4. **Dark mode** toggles `.dark` class on `<html>`
+1. **Build-time CSS** (`src/styles/`) is processed by Tailwind via Vite
+   - `globals.css` imports Tailwind with `prefix(nx)` and `@theme` block
+   - Generates `nx:` prefixed utility classes with `var()` references
+
+2. **Runtime CSS** (`public/themes/`) is loaded dynamically by `useTheme` hook
+   - Color themes swap when base/brand dropdown changes
+   - Token modes swap when size/typography/shadow/radius/border dropdowns change
+
+3. **Dark mode** toggles `.dark` class on `<html>`
 
 ```tsx
 // useTheme hook manages dynamic CSS loading
-useEffect(() => loadCSS('/themes/primitives.css', 'primitives'), []);
-useEffect(() => loadCSS('/themes/typography-utilities.css', 'typography-utilities'), []);
 useEffect(() => loadCSS(`/themes/base-${theme.base}.css`, 'base'), [theme.base]);
+useEffect(() => loadCSS(`/themes/brands-${theme.brand}.css`, 'brand'), [theme.brand]);
 useEffect(() => loadCSS(`/themes/size-${theme.size}.css`, 'size'), [theme.size]);
 // ... etc for each dimension
 ```
@@ -91,8 +102,7 @@ useEffect(() => loadCSS(`/themes/size-${theme.size}.css`, 'size'), [theme.size])
 
 ```bash
 # From root
-yarn tokens:modular     # Generate modular CSS
-yarn playground:copy    # Copy to playground
+yarn tokens:modular     # Generate modular CSS AND copy to playground
 yarn playground         # Start dev server
 ```
 
@@ -112,42 +122,49 @@ The showcase demonstrates all token categories:
 
 ## Adding Components
 
-Edit [ComponentShowcase.tsx](src/components/ComponentShowcase.tsx) to add more component previews using native HTML with semantic token classes:
+Edit [ComponentShowcase.tsx](src/components/ComponentShowcase.tsx) to add more component previews using native HTML with `nx:` prefixed classes:
 
 ```tsx
-// Use semantic color tokens with Tailwind utilities
-<button className="bg-primary-background text-primary-foreground rounded-md px-4 py-2">
+// Use semantic color tokens with nx: prefixed Tailwind utilities
+<button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-4 nx:py-2">
   Button
 </button>
 
 // Use typography utilities
-<p className="text-body-default">Body text</p>
+<p className="nx:text-body-default">Body text</p>
 
 // Use shadow utilities
-<div className="shadow-lg rounded-lg p-4">Card</div>
+<div className="nx:shadow-lg nx:rounded-lg nx:p-4">Card</div>
 
 // Use border width utilities
-<div className="border-default border-border-default rounded">Default border</div>
-<div className="border-thick border-border-primary rounded">Thick border</div>
+<div className="nx:border-default nx:border-border-default nx:rounded">Default border</div>
 ```
 
 ## Technical Notes
 
-**Why `@theme` (not `@theme inline`) in App.css?**
+**Why two CSS locations?**
+
+| Location | Purpose | Processed By |
+|----------|---------|--------------|
+| `src/styles/` | Build-time (Tailwind generates utilities) | Vite + Tailwind |
+| `public/themes/` | Runtime (dynamic theme switching) | Browser (no processing) |
+
+**Why `@theme` (not `@theme inline`) in globals.css?**
 
 | Directive | Generated CSS | Runtime Override |
 |-----------|---------------|------------------|
-| `@theme inline` | `.bg-background { background: #f8fafc; }` | Not possible |
-| `@theme` | `.bg-background { background: var(--color-background); }` | Works |
+| `@theme inline` | `.nx\:bg-background { background: #f8fafc; }` | Not possible |
+| `@theme` | `.nx\:bg-background { background: var(--nx-color-background); }` | Works |
 
 The playground needs `@theme` so Tailwind generates CSS variable references that can be overridden when theme CSS files are loaded dynamically.
 
-**Why `html` selector in modular CSS (not `:root`)?**
+**Why `html` selector in theme CSS (not `:root`)?**
 
-Modular CSS files use `html { }` instead of `:root { }` to ensure they override Tailwind's `@theme`-generated `:root` rules via cascade order (same specificity, but loaded later).
+Theme CSS files use `html { }` instead of `:root { }` to ensure they override Tailwind's `@theme`-generated `:root` rules via cascade order (same specificity, but loaded later).
 
 ## Notes
 
-- Theme files in `public/themes/` are gitignored
-- Run `yarn playground:copy` after `yarn tokens:modular`
+- Theme files in `public/themes/` and `src/styles/` are gitignored
+- Playground has no direct code dependency on core package
+- All CSS is copied via `yarn tokens:modular` from root
 - Uses same semantic tokens as production builds

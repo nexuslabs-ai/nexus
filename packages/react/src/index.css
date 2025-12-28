@@ -1,2 +1,2 @@
-/* Generated tokens, themes, and Tailwind from core */
-@import './generated/globals.css';
+/* Nexus Tailwind theme with nx: prefix */
+@import '@nexus/tailwind';
