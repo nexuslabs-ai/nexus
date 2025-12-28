@@ -524,7 +524,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "{neutral.100}",
+        "$value": "{neutral.200}",
         "$type": "color"
       }
     },

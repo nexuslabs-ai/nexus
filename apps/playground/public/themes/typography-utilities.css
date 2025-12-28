@@ -83,7 +83,7 @@
 @utility text-label-large {
   font-family: var(--typography-family-font-sans);
   font-size: var(--typography-size-sm);
-  font-weight: var(--typography-weight-medium);
+  font-weight: var(--typography-weight-semibold);
   line-height: var(--typography-line-height-sm);
   letter-spacing: var(--typography-letterspacing-normal);
 }

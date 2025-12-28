@@ -75,7 +75,7 @@
   --shadow-focus-default-y: 0px;
   --shadow-focus-default-blur: 0px;
   --shadow-focus-default-spread: 2px;
-  --shadow-focus-default-color: var(--color-neutral-100);
+  --shadow-focus-default-color: var(--color-neutral-200);
   --shadow-focus-error-x: 0px;
   --shadow-focus-error-y: 0px;
   --shadow-focus-error-blur: 0px;

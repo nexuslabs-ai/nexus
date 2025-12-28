@@ -86,40 +86,40 @@
   --color-secondary-surface: #fafafa;
 
   /* Spacing tokens - values come from size-*.css via spacing.css mapping */
-  --spacing-0: var(--size-size-0);
-  --spacing-0_5: var(--size-size-0_5);
-  --spacing-1: var(--size-size-1);
-  --spacing-1_5: var(--size-size-1_5);
-  --spacing-2: var(--size-size-2);
-  --spacing-2_5: var(--size-size-2_5);
-  --spacing-3: var(--size-size-3);
-  --spacing-3_5: var(--size-size-3_5);
-  --spacing-4: var(--size-size-4);
-  --spacing-5: var(--size-size-5);
-  --spacing-6: var(--size-size-6);
-  --spacing-7: var(--size-size-7);
-  --spacing-8: var(--size-size-8);
-  --spacing-9: var(--size-size-9);
-  --spacing-10: var(--size-size-10);
-  --spacing-11: var(--size-size-11);
-  --spacing-12: var(--size-size-12);
-  --spacing-14: var(--size-size-14);
-  --spacing-16: var(--size-size-16);
-  --spacing-20: var(--size-size-20);
-  --spacing-24: var(--size-size-24);
-  --spacing-28: var(--size-size-28);
-  --spacing-32: var(--size-size-32);
-  --spacing-36: var(--size-size-36);
-  --spacing-40: var(--size-size-40);
-  --spacing-44: var(--size-size-44);
-  --spacing-48: var(--size-size-48);
-  --spacing-52: var(--size-size-52);
-  --spacing-56: var(--size-size-56);
-  --spacing-60: var(--size-size-60);
-  --spacing-64: var(--size-size-64);
-  --spacing-72: var(--size-size-72);
-  --spacing-80: var(--size-size-80);
-  --spacing-96: var(--size-size-96);
+  --spacing-0: var(--size-0);
+  --spacing-0_5: var(--size-0_5);
+  --spacing-1: var(--size-1);
+  --spacing-1_5: var(--size-1_5);
+  --spacing-2: var(--size-2);
+  --spacing-2_5: var(--size-2_5);
+  --spacing-3: var(--size-3);
+  --spacing-3_5: var(--size-3_5);
+  --spacing-4: var(--size-4);
+  --spacing-5: var(--size-5);
+  --spacing-6: var(--size-6);
+  --spacing-7: var(--size-7);
+  --spacing-8: var(--size-8);
+  --spacing-9: var(--size-9);
+  --spacing-10: var(--size-10);
+  --spacing-11: var(--size-11);
+  --spacing-12: var(--size-12);
+  --spacing-14: var(--size-14);
+  --spacing-16: var(--size-16);
+  --spacing-20: var(--size-20);
+  --spacing-24: var(--size-24);
+  --spacing-28: var(--size-28);
+  --spacing-32: var(--size-32);
+  --spacing-36: var(--size-36);
+  --spacing-40: var(--size-40);
+  --spacing-44: var(--size-44);
+  --spacing-48: var(--size-48);
+  --spacing-52: var(--size-52);
+  --spacing-56: var(--size-56);
+  --spacing-60: var(--size-60);
+  --spacing-64: var(--size-64);
+  --spacing-72: var(--size-72);
+  --spacing-80: var(--size-80);
+  --spacing-96: var(--size-96);
 
   /* Radius tokens - default values, overridden by radius-*.css */
   --radius-base: 4px;
@@ -136,14 +136,50 @@
   --border-thick: 2px;
 
   /* Shadow tokens - values come from dynamically loaded theme files */
-  --shadow-2xs: var(--shadow-2xs-layer-1-x) var(--shadow-2xs-layer-1-y) var(--shadow-2xs-layer-1-blur) var(--shadow-2xs-layer-1-spread) var(--shadow-2xs-layer-1-color);
-  --shadow-xs: var(--shadow-xs-layer-1-x) var(--shadow-xs-layer-1-y) var(--shadow-xs-layer-1-blur) var(--shadow-2xs-layer-1-spread) var(--shadow-xs-layer-1-color);
-  --shadow-sm: var(--shadow-sm-layer-2-x) var(--shadow-sm-layer-2-y) var(--shadow-sm-layer-2-blur) var(--shadow-sm-layer-2-spread) var(--shadow-sm-layer-2-color), var(--shadow-sm-layer-1-x) var(--shadow-sm-layer-1-y) var(--shadow-sm-layer-1-blur) var(--shadow-sm-layer-1-spread) var(--shadow-sm-layer-1-color);
-  --shadow-base: var(--shadow-base-layer-2-x) var(--shadow-base-layer-2-y) var(--shadow-base-layer-2-blur) var(--shadow-base-layer-2-spread) var(--shadow-base-layer-2-color), var(--shadow-base-layer-1-x) var(--shadow-base-layer-1-y) var(--shadow-base-layer-1-blur) var(--shadow-base-layer-1-spread) var(--shadow-base-layer-1-color);
-  --shadow-lg: var(--shadow-lg-layer-2-x) var(--shadow-lg-layer-2-y) var(--shadow-lg-layer-2-blur) var(--shadow-lg-layer-2-spread) var(--shadow-lg-layer-2-color), var(--shadow-lg-layer-1-x) var(--shadow-lg-layer-1-y) var(--shadow-lg-layer-1-blur) var(--shadow-lg-layer-1-spread) var(--shadow-lg-layer-1-color);
-  --shadow-xl: var(--shadow-xl-layer-2-x) var(--shadow-xl-layer-2-y) var(--shadow-xl-layer-2-blur) var(--shadow-xl-layer-2-spread) var(--shadow-xl-layer-2-color), var(--shadow-xl-layer-1-x) var(--shadow-xl-layer-1-y) var(--shadow-xl-layer-1-blur) var(--shadow-xl-layer-1-spread) var(--shadow-xl-layer-1-color);
-  --shadow-2xl: var(--shadow-2xl-layer-1-x) var(--shadow-2xl-layer-1-y) var(--shadow-2xl-layer-1-blur) var(--shadow-2xl-layer-1-spread) var(--shadow-2xl-layer-1-color);
-  --shadow-inner: inset var(--shadow-inner-layer-1-x) var(--shadow-inner-layer-1-y) var(--shadow-inner-layer-1-blur) var(--shadow-inner-layer-1-spread) var(--shadow-inner-layer-1-color);
-  --shadow-focus-default: var(--shadow-focus-default-x) var(--shadow-focus-default-y) var(--shadow-focus-default-blur) var(--shadow-focus-default-spread) var(--shadow-focus-default-color);
-  --shadow-focus-error: var(--shadow-focus-error-x) var(--shadow-focus-error-y) var(--shadow-focus-error-blur) var(--shadow-focus-error-spread) var(--shadow-focus-error-color);
+  --shadow-2xs: var(--shadow-2xs-layer-1-x) var(--shadow-2xs-layer-1-y)
+    var(--shadow-2xs-layer-1-blur) var(--shadow-2xs-layer-1-spread)
+    var(--shadow-2xs-layer-1-color);
+  --shadow-xs: var(--shadow-xs-layer-1-x) var(--shadow-xs-layer-1-y)
+    var(--shadow-xs-layer-1-blur) var(--shadow-2xs-layer-1-spread)
+    var(--shadow-xs-layer-1-color);
+  --shadow-sm:
+    var(--shadow-sm-layer-2-x) var(--shadow-sm-layer-2-y)
+      var(--shadow-sm-layer-2-blur) var(--shadow-sm-layer-2-spread)
+      var(--shadow-sm-layer-2-color),
+    var(--shadow-sm-layer-1-x) var(--shadow-sm-layer-1-y)
+      var(--shadow-sm-layer-1-blur) var(--shadow-sm-layer-1-spread)
+      var(--shadow-sm-layer-1-color);
+  --shadow-base:
+    var(--shadow-base-layer-2-x) var(--shadow-base-layer-2-y)
+      var(--shadow-base-layer-2-blur) var(--shadow-base-layer-2-spread)
+      var(--shadow-base-layer-2-color),
+    var(--shadow-base-layer-1-x) var(--shadow-base-layer-1-y)
+      var(--shadow-base-layer-1-blur) var(--shadow-base-layer-1-spread)
+      var(--shadow-base-layer-1-color);
+  --shadow-lg:
+    var(--shadow-lg-layer-2-x) var(--shadow-lg-layer-2-y)
+      var(--shadow-lg-layer-2-blur) var(--shadow-lg-layer-2-spread)
+      var(--shadow-lg-layer-2-color),
+    var(--shadow-lg-layer-1-x) var(--shadow-lg-layer-1-y)
+      var(--shadow-lg-layer-1-blur) var(--shadow-lg-layer-1-spread)
+      var(--shadow-lg-layer-1-color);
+  --shadow-xl:
+    var(--shadow-xl-layer-2-x) var(--shadow-xl-layer-2-y)
+      var(--shadow-xl-layer-2-blur) var(--shadow-xl-layer-2-spread)
+      var(--shadow-xl-layer-2-color),
+    var(--shadow-xl-layer-1-x) var(--shadow-xl-layer-1-y)
+      var(--shadow-xl-layer-1-blur) var(--shadow-xl-layer-1-spread)
+      var(--shadow-xl-layer-1-color);
+  --shadow-2xl: var(--shadow-2xl-layer-1-x) var(--shadow-2xl-layer-1-y)
+    var(--shadow-2xl-layer-1-blur) var(--shadow-2xl-layer-1-spread)
+    var(--shadow-2xl-layer-1-color);
+  --shadow-inner: inset var(--shadow-inner-layer-1-x)
+    var(--shadow-inner-layer-1-y) var(--shadow-inner-layer-1-blur)
+    var(--shadow-inner-layer-1-spread) var(--shadow-inner-layer-1-color);
+  --shadow-focus-default: var(--shadow-focus-default-x)
+    var(--shadow-focus-default-y) var(--shadow-focus-default-blur)
+    var(--shadow-focus-default-spread) var(--shadow-focus-default-color);
+  --shadow-focus-error: var(--shadow-focus-error-x) var(--shadow-focus-error-y)
+    var(--shadow-focus-error-blur) var(--shadow-focus-error-spread)
+    var(--shadow-focus-error-color);
 }
