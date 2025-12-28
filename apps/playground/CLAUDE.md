@@ -164,7 +164,6 @@ Theme CSS files use `html { }` instead of `:root { }` to ensure they override Ta
 
 ## Notes
 
-- Theme files in `public/themes/` and `src/styles/` are gitignored
+- All CSS files are committed for standalone deployment
 - Playground has no direct code dependency on core package
-- All CSS is copied via `yarn tokens:modular` from root
-- Uses same semantic tokens as production builds
+- CSS is copied via `yarn tokens:modular` from root (regenerate after token changes)
