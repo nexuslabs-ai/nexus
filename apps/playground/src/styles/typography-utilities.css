@@ -80,6 +80,14 @@
   letter-spacing: var(--nx-typography-letterspacing-normal);
 }
 
+@utility text-body-xsmall {
+  font-family: var(--nx-typography-family-font-sans);
+  font-size: var(--nx-typography-size-xs);
+  font-weight: var(--nx-typography-weight-normal);
+  line-height: var(--nx-typography-line-height-xs);
+  letter-spacing: var(--nx-typography-letterspacing-normal);
+}
+
 @utility text-label-large {
   font-family: var(--nx-typography-family-font-sans);
   font-size: var(--nx-typography-size-sm);

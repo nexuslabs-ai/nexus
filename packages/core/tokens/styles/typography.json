@@ -112,6 +112,16 @@
         "lineHeight": "{line-height.sm}",
         "letterSpacing": "{letterspacing.normal}"
       }
+    },
+    "xsmall": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{family.font-sans}",
+        "fontSize": "{size.xs}",
+        "fontWeight": "{weight.normal}",
+        "lineHeight": "{line-height.xs}",
+        "letterSpacing": "{letterspacing.normal}"
+      }
     }
   },
   "label": {
