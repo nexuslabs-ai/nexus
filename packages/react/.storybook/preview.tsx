@@ -6,6 +6,10 @@ const preview: Preview = {
   // Enable autodocs for all stories globally
   tags: ['autodocs'],
   parameters: {
+    // A11y violations will fail tests automatically
+    a11y: {
+      test: 'error',
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,

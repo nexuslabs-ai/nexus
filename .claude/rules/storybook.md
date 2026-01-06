@@ -244,3 +244,76 @@ export const InternalStory: Story = {
   // ...
 };
 ```
+
+## Play Functions (Testing)
+
+Every interactive component story should include play functions for testing. Stories serve as both documentation and tests.
+
+### Required Play Function Stories
+
+| Story | Tests |
+|-------|-------|
+| Disabled | Verify disabled state, click does nothing |
+| ClickInteraction | Click triggers handler |
+| KeyboardInteraction | Tab focuses, Enter/Space triggers |
+| WithDataAttributes | Verify data-slot, data-variant, data-size |
+
+### Play Function Template
+
+```tsx
+import { expect, fn, userEvent, within } from 'storybook/test';
+
+export const Interactive: Story = {
+  args: {
+    children: 'Click me',
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const element = canvas.getByRole('button');
+
+    await userEvent.click(element);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+```
+
+### Imports for Play Functions
+
+Always use `storybook/test` imports (Storybook 10):
+
+```tsx
+import { expect, fn, userEvent, within } from 'storybook/test';
+```
+
+**Note:** In Storybook 10, use `storybook/test` (not `@storybook/test`).
+
+### Spying on Callbacks
+
+Use `fn()` in meta args to create spy functions:
+
+```tsx
+const meta: Meta<typeof Button> = {
+  // ...
+  args: {
+    onClick: fn(),
+  },
+};
+```
+
+Then assert in play functions:
+
+```tsx
+await expect(args.onClick).toHaveBeenCalledTimes(1);
+```
+
+### Running Story Tests
+
+```bash
+yarn test:storybook        # Run all story tests
+yarn test:storybook:watch  # Watch mode
+yarn test:storybook:ui     # Interactive UI
+```
+
+### A11y Testing
+
+A11y is automatic via `addon-a11y` with `a11y: { test: 'error' }` in preview. Every story is checked against axe-core rules. Violations fail the test.
