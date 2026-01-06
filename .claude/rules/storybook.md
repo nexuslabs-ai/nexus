@@ -34,7 +34,6 @@ const meta: Meta<typeof Component> = {
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',
@@ -232,8 +231,16 @@ Components/
 
 ## Autodocs
 
-The `tags: ['autodocs']` in meta generates automatic documentation including:
+Autodocs is enabled globally in `.storybook/preview.tsx` via `tags: ['autodocs']`. All stories automatically get:
 - Component description
 - Props table
 - Interactive playground
 - All story examples
+
+To exclude a specific story from autodocs:
+```tsx
+export const InternalStory: Story = {
+  tags: ['!autodocs'],  // Exclude from docs
+  // ...
+};
+```

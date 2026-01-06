@@ -1,9 +1,10 @@
 import type { Preview } from '@storybook/react-vite';
-import React from 'react';
 
 import '../src/index.css';
 
 const preview: Preview = {
+  // Enable autodocs for all stories globally
+  tags: ['autodocs'],
   parameters: {
     controls: {
       matchers: {
