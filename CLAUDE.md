@@ -48,8 +48,9 @@ ds/
 - **Turbo** 2.7 for monorepo orchestration
 - **CVA** (class-variance-authority) for component variants
 - **Radix UI** primitives for accessibility
-- **Vitest** 4.x for testing (70% coverage thresholds)
-- **Storybook** 10 for component documentation
+- **Vitest** 4.x with Storybook addon for story-first testing
+- **Storybook** 10 for component documentation and testing
+- **Playwright** for real browser component tests
 
 ## Commands
 
@@ -69,12 +70,15 @@ yarn lint               # Lint all packages
 yarn typecheck          # TypeScript check
 yarn format             # Format with Prettier
 
-# Testing
-yarn test               # Run all tests
-yarn test:watch         # Watch mode
+# Testing (Story-First)
+yarn test               # Run all tests (unit + storybook)
+yarn test:unit          # Run unit tests only (hooks, utilities)
+yarn test:storybook     # Run storybook tests only (components)
+yarn test:storybook:watch # Watch mode for component tests
+yarn test:storybook:ui  # Interactive Vitest UI
 yarn test:coverage      # With coverage report
 
-# Storybook (from packages/react)
+# Storybook
 yarn storybook          # Dev server on port 6006
 yarn build-storybook    # Build static site
 ```

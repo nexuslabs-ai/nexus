@@ -25,12 +25,16 @@ Skip sections that don't apply. Add component-specific stories as needed.
 
 ```tsx
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from 'storybook/test';
 
 import { Component } from './component';
 
 const meta: Meta<typeof Component> = {
   title: 'Components/Component',
   component: Component,
+  args: {
+    onClick: fn(), // Spy for callback testing
+  },
   parameters: {
     layout: 'centered',
   },

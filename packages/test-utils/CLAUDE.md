@@ -10,8 +10,10 @@ Components are tested via Storybook play functions:
 
 ```tsx
 // In *.stories.tsx
-import { expect, fn, userEvent, within } from '@storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 ```
+
+**Note:** In Storybook 10, use `storybook/test` (not `@storybook/test`).
 
 This package is only for hooks and utility functions.
 
@@ -37,8 +39,8 @@ yarn typecheck  # TypeScript check
 | Removed | Reason | Use Instead |
 |---------|--------|-------------|
 | `render` | Components use stories | Storybook play functions |
-| `screen`, `within` | Components use stories | `@storybook/test` |
-| `userEvent` | Components use stories | `@storybook/test` |
+| `screen`, `within` | Components use stories | `storybook/test` |
+| `userEvent` | Components use stories | `storybook/test` |
 | `axe` | A11y is automatic | `addon-a11y` with `test: 'error'` |
 
 ## Usage: Hook Testing
