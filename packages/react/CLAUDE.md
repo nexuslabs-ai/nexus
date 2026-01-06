@@ -18,8 +18,7 @@ yarn typecheck        # TypeScript check
 src/
 ├── components/ui/    # UI components (button.tsx, etc.)
 ├── lib/utils.ts      # cn() utility
-├── generated/        # Auto-generated from @nexus/core (DO NOT EDIT)
-├── index.css         # Main styles (imports generated/globals.css)
+├── index.css         # Main styles (imports @nexus/tailwind)
 └── index.ts          # Package exports
 ```
 
