@@ -101,7 +101,7 @@
   },
   "success": {
     "background": {
-      "$value": "{green.500}",
+      "$value": "{green.600}",
       "$type": "color"
     },
     "foreground": {
