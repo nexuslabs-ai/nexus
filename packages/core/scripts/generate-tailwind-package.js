@@ -339,28 +339,38 @@ function generateVariablesCSS(primitiveTokens, usedModes) {
 
 /**
  * Generate nexus.css with @theme and utilities
+ *
+ * IMPORTANT: Uses @theme (not @theme inline) for semantic tokens.
+ * - @theme inline: resolves var() references at build time → dark mode won't work
+ * - @theme: utilities use var(--color-*) → can be overridden by .dark
  */
 function generateNexusCSS(lightTokens, darkTokens, primitiveTokens, primitiveMap, usedModes) {
   let css = `/* ===== NEXUS DESIGN SYSTEM - TAILWIND THEME ===== */\n`;
   css += `/* Auto-generated - DO NOT EDIT */\n`;
-  css += `/* Uses nx: prefix for all utility classes */\n\n`;
+  css += `/* Uses nx: prefix for all utility classes */\n`;
+  css += `/*\n`;
+  css += ` * Uses @theme (not inline) so utilities reference CSS variables\n`;
+  css += ` * that can be overridden by .dark selector for theme switching.\n`;
+  css += ` */\n\n`;
 
   // Tailwind import with prefix and variables import
   css += `@import "tailwindcss" prefix(nx);\n`;
   css += `@import "./variables.css";\n\n`;
   css += `@custom-variant dark (&:is(.dark *));\n\n`;
 
-  // Generate shadow variables for @theme inline
+  // Generate shadow variables for @theme
   const { css: shadowCSS } = generateShadowVariables();
 
-  // Extract radius and borderwidth primitives for @theme inline
+  // Extract radius and borderwidth primitives for @theme
   const radiusTokens = primitiveTokens.filter((t) => t.category === 'radius');
   const borderwidthTokens = primitiveTokens.filter((t) => t.category === 'borderwidth');
 
-  // @theme inline - Semantic tokens + shadows + radius + borderwidth
+  // @theme (NOT inline) - Semantic tokens + shadows + radius + borderwidth
+  // Using @theme (without inline) ensures utilities use var(--color-*) references
+  // which can be overridden by .dark selector
   if (lightTokens.length > 0 || shadowCSS || radiusTokens.length > 0) {
     css += `/* ===== SEMANTIC TOKENS (Light) ===== */\n`;
-    css += `@theme inline {\n`;
+    css += `@theme {\n`;
     css += `  --*: initial;\n\n`;
 
     for (const token of lightTokens) {
@@ -397,11 +407,14 @@ function generateNexusCSS(lightTokens, darkTokens, primitiveTokens, primitiveMap
   }
 
   // .dark - Dark mode overrides
+  // NOTE: Variables must be prefixed with 'nx-' to match what Tailwind generates
+  // when using prefix(nx). The @theme block creates --nx-color-* variables,
+  // so dark mode overrides need to use the same names.
   if (darkTokens.length > 0) {
     css += `/* ===== DARK MODE ===== */\n`;
     css += `.dark {\n`;
     for (const token of darkTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
+      css += `  --nx-${token.cssName}: ${token.value};\n`;
     }
     css += `}\n\n`;
   }
