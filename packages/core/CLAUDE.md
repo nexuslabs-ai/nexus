@@ -104,7 +104,9 @@ Available options:
 
 @import "./variables.css";
 
-@theme inline {
+@theme {
+  --*: initial;
+
   /* Semantic tokens - light mode (reference --nx-* primitives) */
   --color-background: var(--nx-color-slate-50);
   --color-primary-background: var(--nx-color-blue-500);
@@ -112,8 +114,8 @@ Available options:
 }
 
 .dark {
-  /* Semantic tokens - dark mode overrides */
-  --color-background: var(--nx-color-slate-950);
+  /* Semantic tokens - dark mode (must use nx- prefix to match Tailwind output) */
+  --nx-color-background: var(--nx-color-slate-950);
 }
 
 /* Typography utilities (Tailwind v4 @utility) */
