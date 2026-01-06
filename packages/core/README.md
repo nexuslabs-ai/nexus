@@ -56,17 +56,14 @@ This resolves to CSS:
 
 ### Generate CSS
 ```bash
-yarn build:tokens
+yarn build:tailwind       # Generate @nexus/tailwind package CSS
+yarn build:tokens:modular # Generate modular CSS for playground
 ```
 
-This runs:
-1. `scripts/generate-css.js` - Generates primitives.css and theme.css
-2. `scripts/copy-to-react.js` - Copies to React package
-
 ### Output Files
-- `dist/primitives.css` - Base CSS variables
-- `dist/theme.css` - Tailwind theme with light/dark
-- `packages/react/src/generated/theme.css` - Combined file for React
+- `../tailwind/nexus.css` - Main Tailwind theme with `nx:` prefix
+- `../tailwind/variables.css` - Primitive CSS variables with `--nx-*` prefix
+- `dist/modular/` - Individual theme CSS files for playground
 
 ## Future Platform Support
 

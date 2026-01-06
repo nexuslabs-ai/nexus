@@ -3,13 +3,19 @@ description: Scaffold a new component with all required files
 argument-hint: [component-name]
 ---
 
-Scaffold a new component using shadcn as base, adapted to Nexus token system.
+Scaffold a new component or update an existing one using shadcn as base, adapted to Nexus token system.
 
 ## Required Input
 
 Component name: $ARGUMENTS
 
 If no name provided, ask the user for the component name (e.g., "Card", "Input", "Badge").
+
+## Mode Detection
+
+Check if component exists at `packages/react/src/components/ui/{name}.tsx`:
+- **New component**: Follow full workflow (Phases 1-5)
+- **Existing component**: Skip Phase 1, apply Phase 2 modifications to existing files, update stories/tests as needed
 
 ## Workflow
 
@@ -23,7 +29,9 @@ If command fails or component doesn't exist in shadcn, create from scratch using
 
 ### Phase 2: Adapt to Nexus Token System
 
-**Before modifying, read `packages/react/src/generated/globals.css` to understand current token structure.**
+**Before modifying, read these files to understand current token structure:**
+- `packages/tailwind/nexus.css` - semantic tokens in `@theme inline` block
+- `packages/tailwind/variables.css` - primitive CSS variables with `--nx-*` prefix
 
 **Required Modifications:**
 1. **Add `nx:` prefix** to ALL Tailwind utility classes (critical for coexistence with consumer's Tailwind)
