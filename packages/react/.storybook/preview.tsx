@@ -16,14 +16,12 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-    backgrounds: {
-      default: 'light',
-      values: [
-        { name: 'light', value: '#ffffff' },
-        { name: 'dark', value: '#0a0a0a' },
-      ],
-    },
-    layout: 'centered',
+    // Disable Storybook's built-in background selector
+    // Theme switching is handled by the decorator which applies
+    // nx:bg-background class that uses CSS variables
+    backgrounds: { disable: true },
+    // Use fullscreen layout so our theme wrapper fills the entire canvas
+    layout: 'fullscreen',
   },
   globalTypes: {
     theme: {
@@ -45,7 +43,9 @@ const preview: Preview = {
     (Story, context) => {
       const theme = context.globals.theme;
       return (
-        <div className={theme === 'dark' ? 'dark' : ''}>
+        <div
+          className={`nx:min-h-screen nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${theme === 'dark' ? 'dark' : ''}`}
+        >
           <Story />
         </div>
       );
