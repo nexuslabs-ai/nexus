@@ -1,30 +1,31 @@
 import * as React from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:ring-offset-background focus-visible:nx:ring-ring nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors focus-visible:nx:ring-2 focus-visible:nx:ring-offset-2 focus-visible:nx:outline-none disabled:nx:pointer-events-none disabled:nx:opacity-50 [&_svg]:nx:pointer-events-none [&_svg]:nx:size-4 [&_svg]:nx:shrink-0',
+  'nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:ring-offset-background nx:focus-visible:outline-none nx:focus-visible:ring-2 nx:focus-visible:ring-primary-background/50 nx:focus-visible:ring-offset-2 nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default:
-          'nx:bg-primary nx:text-primary-foreground hover:nx:bg-primary/90',
+          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-hover',
         destructive:
-          'nx:bg-destructive nx:text-destructive-foreground hover:nx:bg-destructive/90',
+          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-hover',
         outline:
-          'nx:border-input nx:bg-background hover:nx:bg-accent hover:nx:text-accent-foreground nx:border',
+          'nx:border nx:border-border-default nx:bg-background nx:hover:bg-accent nx:hover:text-accent-foreground',
         secondary:
-          'nx:bg-secondary nx:text-secondary-foreground hover:nx:bg-secondary/80',
-        ghost: 'hover:nx:bg-accent hover:nx:text-accent-foreground',
-        link: 'nx:text-primary nx:underline-offset-4 hover:nx:underline',
+          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-hover',
+        ghost: 'nx:hover:bg-accent nx:hover:text-accent-foreground',
+        link: 'nx:text-primary-text nx:underline-offset-4 nx:hover:underline',
       },
       size: {
-        default: 'nx:h-10 nx:px-4 nx:py-2',
-        sm: 'nx:h-9 nx:rounded-md nx:px-3',
-        lg: 'nx:h-11 nx:rounded-md nx:px-8',
-        icon: 'nx:h-10 nx:w-10',
+        default: 'nx:px-4 nx:py-2',
+        sm: 'nx:px-3 nx:py-1.5 nx:text-xs',
+        lg: 'nx:px-8 nx:py-3',
+        icon: 'nx:p-2.5',
       },
     },
     defaultVariants: {
@@ -34,25 +35,30 @@ const buttonVariants = cva(
   }
 );
 
-export interface ButtonProps
-  extends
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
+interface ButtonProps
+  extends React.ComponentProps<'button'>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button';
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-Button.displayName = 'Button';
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: ButtonProps) {
+  const Comp = asChild ? Slot : 'button';
 
-export { Button, buttonVariants };
+  return (
+    <Comp
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
+}
+
+export { Button, type ButtonProps, buttonVariants };
