@@ -24,13 +24,14 @@ src/
 
 ## Component File Pattern
 
-Each component has 3 files in `src/components/ui/`:
+Each component has 2 files in `src/components/ui/`:
 
 | File | Pattern | Purpose |
 |------|---------|---------|
 | `{name}.tsx` | `button.tsx` | Component implementation |
-| `{name}.test.tsx` | `button.test.tsx` | Unit tests |
-| `{Name}.stories.tsx` | `Button.stories.tsx` | Storybook stories |
+| `{Name}.stories.tsx` | `Button.stories.tsx` | Stories + Tests (play functions) |
+
+**No separate `*.test.tsx` files for components.** Tests are play functions in stories.
 
 ## Component Structure
 
@@ -86,31 +87,45 @@ export { Component, componentVariants };
 | Export variants function | `export { Button, buttonVariants }` |
 | Use `cn()` for classes | `cn(variants({ variant, size, className }))` |
 
-## Test Structure
+## Testing (Story-First)
 
-Tests use 6 describe blocks:
+Components are tested via Storybook play functions. Import from `storybook/test`:
 
 ```tsx
-describe('Component', () => {
-  describe('Rendering', () => { /* renders, children, element type */ });
-  describe('Props', () => { /* className, native props, data attrs, asChild */ });
-  describe('Variants', () => { /* all variant/size combinations */ });
-  describe('Interactions', () => { /* click, focus, keyboard */ });
-  describe('Accessibility', () => { /* axe audit, aria attrs */ });
-  describe('Edge Cases', () => { /* empty, long content, special chars */ });
-});
+import { expect, fn, userEvent, within } from 'storybook/test';
+
+export const Interactive: Story = {
+  args: { children: 'Click me' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+```
+
+Run tests:
+```bash
+yarn test:storybook        # Run component tests
+yarn test:storybook:watch  # Watch mode
 ```
 
 ## Story Structure
 
 Required stories per component:
 
-- `Default` - Primary use case with args
-- Individual variants (`Primary`, `Secondary`, `Outline`)
-- Individual sizes (`Small`, `Large`)
-- `Disabled` - Disabled state
-- `AllVariants` - Grid showing all combinations
-- Usage examples (`WithIcon`, `AsLink`)
+| Story | Purpose | Play Function? |
+|-------|---------|----------------|
+| `Default` | Primary use case | No |
+| Variants (`Primary`, etc.) | Visual docs | No |
+| Sizes (`Small`, `Large`) | Visual docs | No |
+| `Disabled` | Disabled behavior | Yes |
+| `ClickInteraction` | Click handler | Yes |
+| `KeyboardInteraction` | A11y keyboard | Yes |
+| `AllVariants` | Visual grid | No |
+| `AsLink` (if applicable) | Composition | Yes |
 
 ## Exports
 
@@ -148,7 +163,8 @@ import '@nexus/react/styles.css';
 
 ## Storybook
 
-- Config in `.storybook/` (main.ts, preview.tsx)
+- Config in `.storybook/` (main.ts, preview.tsx, vitest.setup.ts)
 - Theme toggle in toolbar (light/dark)
-- Accessibility addon enabled
+- Accessibility tests automatic via `addon-a11y`
+- Component tests via `@storybook/addon-vitest` (Playwright browser)
 - Uses same Tailwind setup as library
