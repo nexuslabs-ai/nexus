@@ -1,273 +1,251 @@
 # Testing Rules
 
-**Note:** All Tailwind class assertions must use `nx:` prefix (e.g., `toHaveClass('nx:bg-primary')`).
+## Core Principle
 
-## Imports
+**Stories are tests.** Every component story serves as:
+1. Living documentation in Storybook
+2. Interaction tests via play functions
+3. Accessibility tests via addon-a11y
 
-```tsx
-import { axe, render, screen, userEvent } from '@nexus/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+## Testing Split
 
-import { Component, componentVariants } from './component';
+| What | Where | Imports From |
+|------|-------|--------------|
+| Components | `*.stories.tsx` | `storybook/test` |
+| Hooks | `*.test.ts` | `@nexus/test-utils` |
+| Utilities | `*.test.ts` | `@nexus/test-utils` |
+
+## File Structure
+
+### Components (Story-First)
+
+```
+ComponentName/
+├── component-name.tsx        # Implementation
+├── ComponentName.stories.tsx # Stories = Tests
+└── index.ts                  # Exports
 ```
 
-## Adaptation Note
+No separate `*.test.tsx` files for components.
 
-This template uses `getByRole('button')` as example. **Adapt queries based on component type:**
+### Hooks & Utilities (Unit Tests)
 
-| Component | Role/Query |
-|-----------|------------|
-| Button | `getByRole('button')` |
-| Input | `getByRole('textbox')` |
-| Checkbox | `getByRole('checkbox')` |
-| Link | `getByRole('link')` |
-| Dialog | `getByRole('dialog')` |
-| Card | `getByTestId('card')` or container query |
-| Badge | `getByText()` or `getByTestId()` |
+```
+hooks/
+├── use-hook-name.ts
+└── use-hook-name.test.ts    # Unit test
 
-**Skip sections that don't apply:**
-- No `onClick` → skip click interaction tests
-- No `disabled` prop → skip disabled tests
-- No variants → skip variant tests
-- Static display → minimal interaction tests
+lib/
+├── utils.ts
+└── utils.test.ts            # Unit test
+```
 
-## Test Structure
-
-Organize tests into 6 describe blocks:
+## Story Template with Play Functions
 
 ```tsx
-describe('Component', () => {
-  describe('Rendering', () => {
-    // Basic render tests
-  });
+import type { Meta, StoryObj } from '@storybook/react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
-  describe('Props', () => {
-    // Props handling tests
-  });
+import { Component } from './component';
 
-  describe('Variants', () => {
-    // Variant/size combination tests
-  });
+const meta: Meta<typeof Component> = {
+  title: 'Components/Component',
+  component: Component,
+  args: {
+    onClick: fn(), // Spy for callbacks
+  },
+};
 
-  describe('Interactions', () => {
-    // User interaction tests
-  });
+export default meta;
+type Story = StoryObj<typeof Component>;
 
-  describe('Accessibility', () => {
-    // a11y tests
-  });
+// Visual story (no play function needed)
+export const Default: Story = {
+  args: { children: 'Default' },
+};
 
-  describe('Edge Cases', () => {
-    // Edge case handling
+// Interaction test (with play function)
+export const Interactive: Story = {
+  args: { children: 'Click me' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const element = canvas.getByRole('button');
+
+    await userEvent.click(element);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+```
+
+## Required Stories Per Component
+
+| Story Type | Purpose | Play Function? |
+|------------|---------|----------------|
+| Default | Default state | Optional |
+| Each variant | Visual documentation | No |
+| Each size | Visual documentation | No |
+| Disabled | Disabled state behavior | Yes |
+| ClickInteraction | Click handler works | Yes |
+| KeyboardInteraction | A11y keyboard support | Yes |
+| WithDataAttributes | Verify data-* attrs | Yes |
+| asChild (if applicable) | Composition works | Yes |
+| Edge cases | Empty, long content, etc. | Yes |
+| AllVariants | Visual grid reference | No |
+
+## Play Function Patterns
+
+### Click Testing
+
+```tsx
+play: async ({ canvasElement, args }) => {
+  const canvas = within(canvasElement);
+  const button = canvas.getByRole('button');
+
+  await userEvent.click(button);
+  await expect(args.onClick).toHaveBeenCalledTimes(1);
+}
+```
+
+### Keyboard Testing
+
+```tsx
+play: async ({ canvasElement, args }) => {
+  const canvas = within(canvasElement);
+  const element = canvas.getByRole('button');
+
+  await userEvent.tab();
+  await expect(element).toHaveFocus();
+
+  await userEvent.keyboard('{Enter}');
+  await expect(args.onClick).toHaveBeenCalledTimes(1);
+}
+```
+
+### Disabled State Testing
+
+```tsx
+play: async ({ canvasElement, args }) => {
+  const canvas = within(canvasElement);
+  const button = canvas.getByRole('button');
+
+  await expect(button).toBeDisabled();
+  await userEvent.click(button);
+  await expect(args.onClick).not.toHaveBeenCalled();
+}
+```
+
+### Data Attributes Testing
+
+```tsx
+play: async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  const button = canvas.getByRole('button');
+
+  await expect(button).toHaveAttribute('data-slot', 'button');
+  await expect(button).toHaveAttribute('data-variant', 'secondary');
+}
+```
+
+## Hook Tests (Using @nexus/test-utils)
+
+```tsx
+// use-counter.test.ts
+import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
+
+import { useCounter } from './use-counter';
+
+describe('useCounter', () => {
+  it('increments count', () => {
+    const { result } = renderHook(() => useCounter());
+
+    act(() => {
+      result.current.increment();
+    });
+
+    expect(result.current.count).toBe(1);
   });
 });
 ```
 
-## Rendering Tests
+## Utility Tests
 
 ```tsx
-describe('Rendering', () => {
-  it('renders without crashing', () => {
-    render(<Component>Content</Component>);
-    expect(screen.getByRole('button')).toBeInTheDocument();
-  });
+// format-currency.test.ts
+import { describe, expect, it } from '@nexus/test-utils';
 
-  it('renders children correctly', () => {
-    render(<Component>Hello World</Component>);
-    expect(screen.getByRole('button')).toHaveTextContent('Hello World');
-  });
+import { formatCurrency } from './format-currency';
 
-  it('renders as correct element by default', () => {
-    render(<Component>Content</Component>);
-    expect(screen.getByRole('button').tagName).toBe('BUTTON');
+describe('formatCurrency', () => {
+  it('formats USD', () => {
+    expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
   });
 });
-```
-
-## Props Tests
-
-```tsx
-describe('Props', () => {
-  it('applies custom className', () => {
-    render(<Component className="custom-class">Content</Component>);
-    expect(screen.getByRole('button')).toHaveClass('custom-class');
-  });
-
-  it('forwards native props', () => {
-    render(<Component type="submit" disabled>Submit</Component>);
-    const el = screen.getByRole('button');
-    expect(el).toHaveAttribute('type', 'submit');
-    expect(el).toBeDisabled();
-  });
-
-  it('sets data-slot attribute', () => {
-    render(<Component>Content</Component>);
-    expect(screen.getByRole('button')).toHaveAttribute('data-slot', 'component');
-  });
-
-  it('sets data-variant attribute', () => {
-    render(<Component variant="secondary">Content</Component>);
-    expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'secondary');
-  });
-
-  it('sets data-size attribute', () => {
-    render(<Component size="lg">Content</Component>);
-    expect(screen.getByRole('button')).toHaveAttribute('data-size', 'lg');
-  });
-
-  it('supports asChild prop for composition', () => {
-    render(
-      <Component asChild>
-        <a href="/test">Link</a>
-      </Component>
-    );
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', '/test');
-    expect(link).toHaveAttribute('data-slot', 'component');
-  });
-});
-```
-
-## Variants Tests
-
-```tsx
-describe('Variants', () => {
-  it('renders primary variant by default', () => {
-    render(<Component>Primary</Component>);
-    expect(screen.getByRole('button')).toHaveClass('nx:bg-primary');
-  });
-
-  it('renders secondary variant', () => {
-    render(<Component variant="secondary">Secondary</Component>);
-    expect(screen.getByRole('button')).toHaveClass('nx:bg-secondary');
-  });
-
-  // Test each variant...
-
-  it('componentVariants function generates correct classes', () => {
-    const classes = componentVariants({ variant: 'secondary', size: 'lg' });
-    expect(classes).toContain('nx:bg-secondary');
-    expect(classes).toContain('nx:h-10');
-  });
-});
-```
-
-## Interactions Tests
-
-```tsx
-describe('Interactions', () => {
-  it('calls onClick when clicked', async () => {
-    const handleClick = vi.fn();
-    const user = userEvent.setup();
-
-    render(<Component onClick={handleClick}>Click me</Component>);
-    await user.click(screen.getByRole('button'));
-
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not call onClick when disabled', async () => {
-    const handleClick = vi.fn();
-    const user = userEvent.setup();
-
-    render(<Component onClick={handleClick} disabled>Click me</Component>);
-    await user.click(screen.getByRole('button'));
-
-    expect(handleClick).not.toHaveBeenCalled();
-  });
-
-  it('can be focused with keyboard', async () => {
-    const user = userEvent.setup();
-    render(<Component>Focusable</Component>);
-
-    await user.tab();
-    expect(screen.getByRole('button')).toHaveFocus();
-  });
-
-  it('can be triggered with Enter key', async () => {
-    const handleClick = vi.fn();
-    const user = userEvent.setup();
-
-    render(<Component onClick={handleClick}>Press Enter</Component>);
-    await user.tab();
-    await user.keyboard('{Enter}');
-
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-});
-```
-
-## Accessibility Tests
-
-```tsx
-describe('Accessibility', () => {
-  it('has no accessibility violations', async () => {
-    const { container } = render(<Component>Accessible</Component>);
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-
-  it('has no accessibility violations when disabled', async () => {
-    const { container } = render(<Component disabled>Disabled</Component>);
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-
-  it('supports aria-label', () => {
-    render(<Component aria-label="Close">×</Component>);
-    expect(screen.getByRole('button')).toHaveAccessibleName('Close');
-  });
-});
-```
-
-## Edge Cases Tests
-
-```tsx
-describe('Edge Cases', () => {
-  it('handles empty children', () => {
-    render(<Component />);
-    expect(screen.getByRole('button')).toBeInTheDocument();
-  });
-
-  it('handles long content', () => {
-    const longText = 'A'.repeat(100);
-    render(<Component>{longText}</Component>);
-    expect(screen.getByRole('button')).toHaveTextContent(longText);
-  });
-
-  it('handles special characters', () => {
-    render(<Component>{'<script>alert("xss")</script>'}</Component>);
-    expect(screen.getByRole('button')).toHaveTextContent('<script>');
-  });
-
-  it('handles React elements as children', () => {
-    render(
-      <Component>
-        <span data-testid="icon">🎉</span>
-        Text
-      </Component>
-    );
-    expect(screen.getByTestId('icon')).toBeInTheDocument();
-  });
-});
-```
-
-## Dark Mode Testing
-
-```tsx
-// Light mode (default)
-render(<Component>Light</Component>);
-
-// Dark mode
-render(<Component>Dark</Component>, { theme: 'dark' });
 ```
 
 ## Running Tests
 
 ```bash
-yarn test              # Run all tests
-yarn test:watch        # Watch mode
-yarn test:coverage     # With coverage report
+# Run all tests (unit + storybook)
+yarn test
+
+# Run only storybook tests (components)
+yarn test:storybook
+
+# Run only unit tests (hooks, utilities)
+yarn test:unit
+
+# Watch mode for storybook
+yarn test:storybook:watch
+
+# Interactive UI
+yarn test:storybook:ui
 ```
 
-Coverage thresholds: 70% for statements, branches, functions, lines.
+## Accessibility
+
+A11y is automatic. Every story is checked against axe-core rules via `addon-a11y`. Violations fail the test. No separate a11y assertions needed.
+
+To test specific a11y attributes:
+
+```tsx
+play: async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  const button = canvas.getByRole('button');
+
+  await expect(button).toHaveAccessibleName('Close dialog');
+}
+```
+
+## Imports Reference
+
+### For Stories (Component Tests)
+
+```tsx
+import { expect, fn, userEvent, within } from 'storybook/test';
+```
+
+### For Unit Tests (Hooks/Utilities)
+
+```tsx
+import {
+  act,
+  describe,
+  expect,
+  it,
+  renderHook,
+  vi,
+  waitFor,
+} from '@nexus/test-utils';
+```
+
+## Common Mistakes
+
+| Don't | Do |
+|-------|-----|
+| Create `component.test.tsx` | Add play functions to stories |
+| Import from `@testing-library/react` in stories | Use `storybook/test` |
+| Import `render` from `@nexus/test-utils` | Use stories for components |
+| Add manual `axe()` assertions | Let addon-a11y handle it |
+| Skip keyboard interaction tests | Every interactive component needs them |
+| Use `@nexus/test-utils` for components | Use `storybook/test` in stories |
+| Import from `@storybook/test` | Use `storybook/test` (Storybook 10) |

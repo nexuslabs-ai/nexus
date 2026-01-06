@@ -1,11 +1,10 @@
-import { expect } from 'vitest';
-import * as matchers from 'vitest-axe/matchers';
-
+// packages/test-utils/src/setup.ts
 import '@testing-library/jest-dom/vitest';
 
-// Extend Vitest's expect with jest-dom matchers (already done via import)
-// Extend with axe matchers for accessibility testing
-expect.extend(matchers);
+/**
+ * Browser mocks for jsdom environment (hook tests)
+ * These are needed when hooks use browser APIs
+ */
 
 // Mock ResizeObserver for Radix UI components
 class ResizeObserverMock {

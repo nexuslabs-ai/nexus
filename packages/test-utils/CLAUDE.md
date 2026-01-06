@@ -1,6 +1,19 @@
-# Test Utils Package (@nexus/test-utils)
+# @nexus/test-utils
 
-Shared testing utilities for Nexus Design System components. Re-exports testing-library with custom enhancements.
+Testing utilities for hooks and utility functions in Nexus Design System.
+
+## Important: Component Testing Has Moved
+
+**DO NOT use this package for component testing.**
+
+Components are tested via Storybook play functions:
+
+```tsx
+// In *.stories.tsx
+import { expect, fn, userEvent, within } from '@storybook/test';
+```
+
+This package is only for hooks and utility functions.
 
 ## Quick Reference
 
@@ -14,74 +27,72 @@ yarn typecheck  # TypeScript check
 
 | Export | Source | Purpose |
 |--------|--------|---------|
-| `render` | Custom | Theme-aware render with wrapper |
-| `screen`, `within` | @testing-library/react | Query utilities |
-| `userEvent` | @testing-library/user-event | User interaction simulation |
-| `axe` | vitest-axe | Accessibility testing |
-| `waitFor`, `act` | @testing-library/react | Async utilities |
-| Query functions | @testing-library/react | `getByRole`, `findByText`, etc. |
+| `renderHook` | @testing-library/react | Hook testing |
+| `act` | @testing-library/react | State updates in tests |
+| `waitFor` | @testing-library/react | Async assertions |
+| `describe`, `it`, `expect`, `vi` | vitest | Test utilities |
 
-## Usage in Tests
+## What This Package Does NOT Provide
+
+| Removed | Reason | Use Instead |
+|---------|--------|-------------|
+| `render` | Components use stories | Storybook play functions |
+| `screen`, `within` | Components use stories | `@storybook/test` |
+| `userEvent` | Components use stories | `@storybook/test` |
+| `axe` | A11y is automatic | `addon-a11y` with `test: 'error'` |
+
+## Usage: Hook Testing
 
 ```tsx
-import { axe, render, screen, userEvent } from '@nexus/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
 
-import { Button } from './button';
+import { useCounter } from './use-counter';
 
-describe('Button', () => {
-  it('renders', () => {
-    render(<Button>Click</Button>);
-    expect(screen.getByRole('button')).toBeInTheDocument();
-  });
+describe('useCounter', () => {
+  it('increments count', () => {
+    const { result } = renderHook(() => useCounter());
 
-  it('handles click', async () => {
-    const onClick = vi.fn();
-    const user = userEvent.setup();
+    act(() => {
+      result.current.increment();
+    });
 
-    render(<Button onClick={onClick}>Click</Button>);
-    await user.click(screen.getByRole('button'));
-
-    expect(onClick).toHaveBeenCalled();
-  });
-
-  it('is accessible', async () => {
-    const { container } = render(<Button>Click</Button>);
-    expect(await axe(container)).toHaveNoViolations();
+    expect(result.current.count).toBe(1);
   });
 });
 ```
 
-## Theme Testing
+## Usage: Utility Testing
 
 ```tsx
-// Light mode (default)
-render(<Component>Content</Component>);
+import { describe, expect, it } from '@nexus/test-utils';
 
-// Dark mode - wraps component in .dark class
-render(<Component>Content</Component>, { theme: 'dark' });
+import { formatCurrency } from './format-currency';
+
+describe('formatCurrency', () => {
+  it('formats USD', () => {
+    expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
+  });
+});
 ```
+
+## Setup File
+
+The `setup.ts` file is loaded by vitest for unit tests. It provides:
+
+| Setup | Purpose |
+|-------|---------|
+| jest-dom matchers | `toBeInTheDocument()`, `toHaveClass()`, etc. |
+| ResizeObserver mock | For hooks using ResizeObserver |
+| matchMedia mock | For hooks using media queries |
+| IntersectionObserver mock | For hooks using intersection |
 
 ## Directory Structure
 
 ```
 src/
-├── index.ts    # All exports (re-exports + custom)
-├── render.tsx  # Custom render with ThemeWrapper
+├── index.ts    # Exports (renderHook, act, waitFor, vitest utils)
 └── setup.ts    # Test setup (mocks, matchers)
 ```
-
-## Setup File
-
-The `setup.ts` file is loaded by vitest before tests run. It provides:
-
-| Setup | Purpose |
-|-------|---------|
-| jest-dom matchers | `toBeInTheDocument()`, `toHaveClass()`, etc. |
-| vitest-axe matchers | `toHaveNoViolations()` |
-| ResizeObserver mock | For Radix UI components |
-| matchMedia mock | For responsive components |
-| IntersectionObserver mock | For lazy-loading components |
 
 ## Build Output
 
@@ -92,23 +103,14 @@ The `setup.ts` file is loaded by vitest before tests run. It provides:
 | `dist/setup.js` | Setup file (ESM) |
 | `dist/setup.cjs` | Setup file (CJS) |
 
-## Configuration in Root
-
-The vitest.config.ts at root references this package:
-
-```ts
-setupFiles: ['./packages/test-utils/src/setup.ts'],
-```
-
-## Adding New Utilities
-
-1. Create utility in `src/`
-2. Export from `src/index.ts`
-3. Run `yarn build` to rebuild
-4. Available to all packages via `@nexus/test-utils`
-
 ## Do Not
 
-- Import directly from `@testing-library/react` in component tests (use this package)
-- Forget to use `userEvent.setup()` before interactions
-- Skip the `await` on async operations (`user.click()`, `axe()`)
+- Import `render`, `screen`, `userEvent` from this package (removed)
+- Use this package for component testing (use stories)
+- Add axe assertions (addon-a11y handles it)
+
+## Do
+
+- Use for `renderHook` to test custom hooks
+- Use for utility function unit tests
+- Import vitest utilities from here for consistency
