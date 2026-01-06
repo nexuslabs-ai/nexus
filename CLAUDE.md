@@ -8,9 +8,14 @@ When working on tasks:
 
 1. **Plan first**: Create a clear todo list with steps before starting
 2. **Summarize after each step**: Provide a concise summary of what was done after completing each todo/phase
-3. **Wait for confirmation**: Pause after each summary for user review before moving to the next step
-4. **Keep summaries brief**: Use tables or bullet points, not lengthy explanations
-5. **Keep docs in sync**: After significant changes to a package, proactively check if updates are needed to:
+3. **Show key code for review**: In each summary, include a "Key Code to Review" section:
+   - Show the actual code snippets (not just file references) for important implementations
+   - Include file path and line numbers above each snippet: `[file.tsx:42-58](path/to/file.tsx#L42-L58)`
+   - Add brief note explaining what to look for (e.g., "variant logic here", "main state handling")
+   - Focus on: core logic, complex conditions, key patterns, anything non-obvious
+4. **Wait for confirmation**: Pause after each summary for user review before moving to the next step
+5. **Keep summaries brief**: Use tables or bullet points, not lengthy explanations
+6. **Keep docs in sync**: After significant changes to a package, proactively check if updates are needed to:
    - Package `CLAUDE.md` (if behavior/structure changed)
    - Related `.claude/rules/*.md` (if conventions changed)
    - Root `CLAUDE.md` (if project-wide patterns changed)
