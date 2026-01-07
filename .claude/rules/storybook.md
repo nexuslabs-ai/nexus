@@ -1,5 +1,7 @@
 # Storybook Rules
 
+> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
+
 **Note:** All Tailwind utility classes in stories must use `nx:` prefix (e.g., `className="nx:flex nx:gap-2"`).
 
 ## File Naming

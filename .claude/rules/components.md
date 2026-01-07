@@ -1,5 +1,7 @@
 # Component Rules
 
+> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
+
 ## File Structure
 
 Every component in `packages/react/src/components/ui/` needs 2 files:
@@ -84,15 +86,33 @@ export { Component, type ComponentProps, componentVariants };
 
 ## Props Pattern
 
-Define props as a named interface above the function (not inline):
+Define props as a named interface above the function (not inline). Add JSDoc comments for custom props to document behavior, defaults, and usage examples:
 
 ```tsx
 interface ComponentProps
   extends React.ComponentProps<'element'>,  // Native element props
     VariantProps<typeof componentVariants> {  // Variant props from cva
-  asChild?: boolean;  // Polymorphism via Radix Slot
+  /**
+   * When true, renders as child element using Radix Slot.
+   * Useful for composition with links or custom elements.
+   * @default false
+   * @example
+   * ```tsx
+   * <Button asChild>
+   *   <a href="/page">Link as button</a>
+   * </Button>
+   * ```
+   */
+  asChild?: boolean;
 }
 ```
+
+### JSDoc Requirements
+
+All custom props (not inherited from HTML elements or VariantProps) MUST have JSDoc with:
+- Description of what the prop does
+- `@default` value if applicable
+- `@example` for non-obvious usage
 
 ## Export Pattern
 

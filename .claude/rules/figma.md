@@ -1,5 +1,7 @@
 # Figma-to-Code Parity Rules
 
+> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
+
 ## Source of Truth
 
 **Always read actual code files** to understand current token structure:

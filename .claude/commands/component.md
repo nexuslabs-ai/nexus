@@ -1,21 +1,24 @@
 ---
 description: Scaffold a new component with all required files
-argument-hint: [component-name]
+argument-hint: [component-name] [figma-url]
 ---
 
-Scaffold a new component or update an existing one using shadcn as base, adapted to Nexus token system.
+Scaffold a new component or update an existing one using shadcn as base, adapted to Nexus token system and Figma design.
 
 ## Required Input
 
-Component name: $ARGUMENTS
+- **Component name**: $ARGUMENTS (first argument)
+- **Figma URL**: (optional, second argument or ask user)
 
 If no name provided, ask the user for the component name (e.g., "Card", "Input", "Badge").
+
+If Figma URL is available, use it to guide implementation. If not provided, ask user if they have a Figma design for this component.
 
 ## Mode Detection
 
 Check if component exists at `packages/react/src/components/ui/{name}.tsx`:
-- **New component**: Follow full workflow (Phases 1-5)
-- **Existing component**: Skip Phase 1, apply Phase 2 modifications to existing files, update stories/tests as needed
+- **New component**: Follow full workflow (Phases 1-6)
+- **Existing component**: Skip Phase 1, apply modifications to existing files
 
 ## Workflow
 
@@ -27,13 +30,42 @@ npx shadcn@latest add {name} --path=packages/react/src/components/ui --no-overwr
 
 If command fails or component doesn't exist in shadcn, create from scratch using template in `.claude/rules/components.md`.
 
-### Phase 2: Adapt to Nexus Token System
+### Phase 2: Analyze Figma Design (if URL provided)
+
+Skip this phase if no Figma URL is available.
+
+**Fetch Figma data using MCP tools:**
+
+Extract `fileKey` and `nodeId` from URL:
+- Format: `https://www.figma.com/design/:fileKey/:fileName?node-id=:nodeId`
+- Convert node-id: `123-456` → `123:456`
+
+1. **`get_design_context`** - Get component props and structure
+2. **`get_variable_defs`** - Get all tokens used (spacing, colors, radius)
+3. **`get_screenshot`** - Visual reference
+
+**From Figma, extract:**
+- Component props (types, values, defaults)
+- Size mappings to spacing tokens
+- Color tokens used
+- Radius tokens used
+- Variant names and states
+
+**Compare with codebase conventions:**
+- Read `.claude/rules/figma.md` for token mapping rules
+- Verify prop naming follows conventions (abbreviated sizes like `xs`, `sm`, `md`)
+- Verify tokens exist in `packages/tailwind/nexus.css`
+
+**Document findings** for use in Phase 3.
+
+### Phase 3: Adapt to Nexus Token System + Figma Design
 
 **Before modifying, read these files to understand current token structure:**
 - `packages/tailwind/nexus.css` - semantic tokens in `@theme inline` block
 - `packages/tailwind/variables.css` - primitive CSS variables with `--nx-*` prefix
 
 **Required Modifications:**
+
 1. **Add `nx:` prefix** to ALL Tailwind utility classes (critical for coexistence with consumer's Tailwind)
 2. Add `data-slot="{name}"` attribute to root element
 3. Add `data-variant` and `data-size` attributes if component has those props
@@ -41,6 +73,13 @@ If command fails or component doesn't exist in shadcn, create from scratch using
 5. Export variants function alongside component: `export { Component, componentVariants }`
 6. Update imports to use `@/` alias pattern
 7. Replace shadcn tokens with Nexus tokens where different
+
+**If Figma design was analyzed (Phase 2):**
+
+8. **Match Figma props** - Ensure component props match Figma (prop names, types, values)
+9. **Map Figma sizes to tokens** - Use the size-to-spacing mapping from Figma (e.g., `md` → `spacing-10` → 40px)
+10. **Use Figma variant names** - Match variant naming from Figma design
+11. **Verify boolean props** - Use `has*`/`is*` pattern for boolean states per `.claude/rules/figma.md`
 
 **Class Prefix Rule:**
 ALL Tailwind classes must use `nx:` prefix, including modifiers:
@@ -65,19 +104,28 @@ ALL Tailwind classes must use `nx:` prefix, including modifiers:
 
 **Reference:** [button.tsx](packages/react/src/components/ui/button.tsx) for pattern example.
 
-### Phase 3: Create Storybook
+### Phase 4: Create Storybook
 
 Create `packages/react/src/components/ui/{Name}.stories.tsx`
 
 Use template from `.claude/rules/storybook.md`, adapting stories based on actual component props.
 
-### Phase 4: Create Tests
+**If Figma design exists:**
+- Create stories for each variant/size from Figma
+- Use Figma's visual reference to verify stories match design
+- Include AllVariants story showing all Figma variants
 
-Create `packages/react/src/components/ui/{name}.test.tsx`
+### Phase 5: Tests via Play Functions
 
-Use template from `.claude/rules/testing.md`, adapting tests based on actual component behavior.
+Tests are written as play functions in stories (no separate test files for components).
 
-### Phase 5: Finalize
+Use template from `.claude/rules/testing.md`:
+- Add play functions to interactive stories
+- Test click/keyboard interactions
+- Verify data-slot, data-variant, data-size attributes
+- Test disabled states
+
+### Phase 6: Finalize
 
 1. **Add export** to `packages/react/src/index.ts`:
    ```ts
@@ -101,16 +149,22 @@ Use template from `.claude/rules/testing.md`, adapting tests based on actual com
 | Phase | Step | Status |
 |-------|------|--------|
 | 1 | Fetched/created component | |
-| 2 | All classes have `nx:` prefix | |
-| 2 | Adapted to Nexus tokens | |
-| 2 | Added data-slot attribute | |
-| 2 | Added data-variant/size (if applicable) | |
-| 2 | Updated to function component pattern | |
-| 3 | Storybook created | |
-| 4 | Tests created | |
-| 5 | Export added to index.ts | |
-| 5 | Lint passing | |
-| 5 | Tests passing | |
+| 2 | Figma design analyzed (if URL provided) | |
+| 2 | Props extracted from Figma | |
+| 2 | Token mappings documented | |
+| 3 | All classes have `nx:` prefix | |
+| 3 | Adapted to Nexus tokens | |
+| 3 | Added data-slot attribute | |
+| 3 | Added data-variant/size (if applicable) | |
+| 3 | Updated to function component pattern | |
+| 3 | Props match Figma design (if applicable) | |
+| 3 | Sizes use correct spacing tokens | |
+| 4 | Storybook created | |
+| 4 | Stories cover all Figma variants | |
+| 5 | Play function tests added | |
+| 6 | Export added to index.ts | |
+| 6 | Lint passing | |
+| 6 | Tests passing | |
 
 ## Summary After Each Phase
 
