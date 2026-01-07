@@ -104,6 +104,7 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | [.claude/rules/testing.md](.claude/rules/testing.md) | Test structure, patterns, a11y |
 | [.claude/rules/storybook.md](.claude/rules/storybook.md) | Story structure, required stories |
 | [.claude/rules/tokens.md](.claude/rules/tokens.md) | Token format, naming, workflow |
+| [.claude/rules/figma.md](.claude/rules/figma.md) | Figma-to-code parity, token mapping |
 | [.claude/rules/skills-agents.md](.claude/rules/skills-agents.md) | Skill/agent structure and conventions |
 
 ## Slash Commands
@@ -117,8 +118,8 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | `/update-docs` | Update documentation after changes |
 | `/skill` | Create or update skills (explore package → define workflow) |
 | `/agent` | Create or update agents (explore scope → define analysis) |
-| `/linkedin` | Generate LinkedIn post from session (creativity 1-5) |
-| `/twitter` | Generate Twitter/X post (single/thread/hot-take) |
+| `/linkedin` | Generate LinkedIn post from session (AI-native design system focus) |
+| `/figma-analyze` | Analyze Figma component for code parity |
 
 ## Code Style
 
