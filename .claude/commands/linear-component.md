@@ -1,0 +1,232 @@
+# Linear Component Workflow
+
+End-to-end workflow: Linear ticket → Component creation → PR → Review
+
+## Required Input
+
+- **Linear Issue ID**: $ARGUMENTS (e.g., `NEX-123`)
+
+If no issue ID provided, ask the user for it.
+
+## Workflow
+
+### Phase 1: Read Linear Issue
+
+1. **Fetch issue details** using Linear MCP:
+   ```
+   mcp__linear__get_issue(id: "{issue_id}")
+   ```
+
+2. **Extract from description:**
+   - Component name (from `## Component` section)
+   - Figma URLs (from `## Figma` section)
+   - Any requirements (from `## Requirements` section)
+
+3. **Get git branch name** from issue's `branchName` field
+
+4. **Validate** all required fields are present. If missing, ask user.
+
+### Phase 2: Setup
+
+1. **Create git branch:**
+   ```bash
+   git checkout -b {branchName}
+   ```
+
+2. **Update Linear status** to "In Progress":
+   ```
+   mcp__linear__update_issue(id: "{issue_id}", state: "In Progress")
+   ```
+
+3. **Add comment** to Linear issue:
+   ```
+   mcp__linear__create_comment(issueId: "{issue_id}", body: "🤖 Starting component implementation...")
+   ```
+
+### Phase 3: Build Component
+
+Execute the `/component` workflow with extracted details:
+
+1. **Analyze Figma designs** (if URLs provided):
+   - Use `mcp__figma__get_design_context` for each URL
+   - Use `mcp__figma__get_variable_defs` for token mappings
+   - Use `mcp__figma__get_screenshot` for visual reference
+
+2. **Create component** following `.claude/rules/components.md`:
+   - Install Radix primitives if needed
+   - Create `{name}.tsx` with CVA variants
+   - Match Figma props and sizes
+   - Add JSDoc to custom props
+   - Use `nx:` prefix on all classes
+   - Add data-slot, data-variant, data-size attributes
+
+3. **Create stories** following `.claude/rules/storybook.md`:
+   - Create `{Name}.stories.tsx`
+   - Add stories for all variants/sizes from Figma
+   - Add play function tests
+   - Add AllVariants grid story
+
+4. **Add export** to `packages/react/src/index.ts`
+
+5. **Run quality gates:**
+   ```bash
+   yarn lint
+   yarn typecheck
+   yarn test:storybook
+   yarn build
+   ```
+
+6. **Fix any issues** before proceeding
+
+### Phase 4: Create PR
+
+1. **Commit changes:**
+   ```bash
+   git add .
+   git commit -m "feat(react): add {ComponentName} component
+
+   - Implements {ComponentName} with all Figma variants
+   - Adds Storybook stories with play function tests
+   - Follows Nexus design system conventions
+
+   Closes {issue_id}
+
+   🤖 Generated with Claude Code"
+   ```
+
+2. **Push branch:**
+   ```bash
+   git push -u origin {branchName}
+   ```
+
+3. **Create PR** via GitHub MCP:
+   ```
+   mcp__github__create_pull_request(
+     owner: "INNOVATIVEGAMER",
+     repo: "ds",
+     title: "feat(react): add {ComponentName} component",
+     head: "{branchName}",
+     base: "main",
+     body: "## Summary
+     - Adds `{ComponentName}` component to @nexus/react
+     - Implements all variants from Figma design
+     - Includes Storybook stories with interaction tests
+
+     ## Linear Issue
+     Closes {issue_id}
+
+     ## Figma
+     {figma_urls}
+
+     ## Test Plan
+     - [ ] Visual review in Storybook
+     - [ ] Verify Figma parity
+     - [ ] All tests passing
+
+     🤖 Generated with Claude Code"
+   )
+   ```
+
+4. **Update Linear status** to "In Review":
+   ```
+   mcp__linear__update_issue(id: "{issue_id}", state: "In Review")
+   ```
+
+5. **Add PR link** to Linear issue:
+   ```
+   mcp__linear__create_comment(issueId: "{issue_id}", body: "🔗 PR created: {pr_url}")
+   ```
+
+   Or add as link attachment:
+   ```
+   mcp__linear__update_issue(id: "{issue_id}", links: [{url: "{pr_url}", title: "GitHub PR"}])
+   ```
+
+### Phase 5: Self-Review
+
+Review the PR for quality:
+
+1. **Get PR files:**
+   ```
+   mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```
+
+2. **Review checklist:**
+   - [ ] Component follows Nexus conventions
+   - [ ] All Tailwind classes have `nx:` prefix
+   - [ ] Semantic tokens used (no raw colors)
+   - [ ] data-slot, data-variant, data-size present
+   - [ ] JSDoc on custom props
+   - [ ] Stories cover all Figma variants
+   - [ ] Play function tests for interactions
+   - [ ] Quality gates passed
+
+3. **If issues found**, add review comments:
+   ```
+   mcp__github__create_pull_request_review(
+     owner: "INNOVATIVEGAMER",
+     repo: "ds",
+     pull_number: {pr_number},
+     body: "Review comments...",
+     event: "COMMENT"
+   )
+   ```
+
+4. **Compare with Figma** if screenshots available
+
+### Phase 6: Handoff
+
+Provide summary to user:
+
+```markdown
+## ✅ Component Complete
+
+### Links
+- **PR:** {pr_url}
+- **Linear:** {linear_url}
+- **Storybook:** Run `yarn storybook` to preview
+
+### Files Created
+- `packages/react/src/components/ui/{name}.tsx`
+- `packages/react/src/components/ui/{Name}.stories.tsx`
+
+### Quality Gates
+- ✅ Lint passed
+- ✅ TypeScript passed
+- ✅ Tests passed
+- ✅ Build passed
+
+### Next Steps
+1. Review the PR
+2. Check Storybook visuals
+3. Merge when ready
+```
+
+## Error Handling
+
+| Error | Action |
+|-------|--------|
+| Linear issue not found | Ask user to verify issue ID |
+| Missing component name | Ask user to provide it |
+| Missing Figma URL | Continue without Figma (use shadcn base) |
+| Quality gate fails | Fix issues before creating PR |
+| Git conflicts | Alert user, provide guidance |
+
+## Linear Issue Template
+
+For best results, tickets should follow this format:
+
+```markdown
+## Package
+@nexus/react
+
+## Component
+{ComponentName}
+
+## Figma
+- {link1}
+- {link2}
+
+## Requirements (optional)
+- {Any specific requirements}
+```
