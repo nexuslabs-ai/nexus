@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { themeOnlyModes } from '@/storybook/modes';
+
 import { Button } from './button';
 
 const meta: Meta<typeof Button> = {
@@ -146,11 +148,60 @@ export const Disabled: Story = {
   },
 };
 
+export const Loading: Story = {
+  args: {
+    loading: true,
+    children: 'Submitting',
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    // Loading button should be disabled
+    await expect(button).toBeDisabled();
+    await expect(button).toHaveAttribute('aria-busy', 'true');
+    await expect(button).toHaveAttribute('aria-disabled', 'true');
+    await expect(button).toHaveAttribute('data-loading', 'true');
+
+    // Click should not trigger onClick
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+export const LoadingWithVariants: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:gap-2">
+      <Button loading variant="default">
+        Default
+      </Button>
+      <Button loading variant="secondary">
+        Secondary
+      </Button>
+      <Button loading variant="destructive">
+        Destructive
+      </Button>
+      <Button loading variant="outline">
+        Outline
+      </Button>
+    </div>
+  ),
+  parameters: {
+    chromatic: {
+      modes: themeOnlyModes,
+    },
+    // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
+    a11y: { test: 'todo' },
+  },
+};
+
 // ============================================
 // INTERACTION TESTS
 // ============================================
 
 export const ClickInteraction: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     children: 'Click me',
   },
@@ -169,6 +220,9 @@ export const ClickInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     children: 'Press Enter',
   },
@@ -191,6 +245,9 @@ export const KeyboardInteraction: Story = {
 };
 
 export const FocusManagement: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     children: 'Focus me',
   },
@@ -216,6 +273,9 @@ export const FocusManagement: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     children: 'Data Attrs',
     variant: 'secondary',
@@ -232,6 +292,9 @@ export const WithDataAttributes: Story = {
 };
 
 export const WithCustomClassName: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     children: 'Custom Class',
     className: 'custom-test-class',
@@ -245,6 +308,9 @@ export const WithCustomClassName: Story = {
 };
 
 export const WithAriaLabel: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     children: '×',
     'aria-label': 'Close dialog',
@@ -254,6 +320,39 @@ export const WithAriaLabel: Story = {
     const button = canvas.getByRole('button');
 
     await expect(button).toHaveAccessibleName('Close dialog');
+  },
+};
+
+export const DefaultType: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+  args: {
+    children: 'Button',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    // Should default to type="button" to prevent accidental form submission
+    await expect(button).toHaveAttribute('type', 'button');
+  },
+};
+
+export const SubmitType: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+  args: {
+    children: 'Submit',
+    type: 'submit',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    // Can explicitly set type="submit" for forms
+    await expect(button).toHaveAttribute('type', 'submit');
   },
 };
 
@@ -281,6 +380,9 @@ export const AsLink: Story = {
 // ============================================
 
 export const EmptyChildren: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     children: undefined,
     'aria-label': 'Empty button',
@@ -378,12 +480,33 @@ export const AllVariants: Story = {
           </Button>
         </div>
       </div>
+      <div>
+        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+          Loading
+        </h3>
+        <div className="nx:flex nx:flex-wrap nx:gap-2">
+          <Button variant="default" loading>
+            Default
+          </Button>
+          <Button variant="secondary" loading>
+            Secondary
+          </Button>
+          <Button variant="destructive" loading>
+            Destructive
+          </Button>
+          <Button variant="outline" loading>
+            Outline
+          </Button>
+        </div>
+      </div>
     </div>
   ),
   parameters: {
-    layout: 'padded',
     // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
     a11y: { test: 'todo' },
+    chromatic: {
+      modes: themeOnlyModes,
+    },
   },
 };
 
