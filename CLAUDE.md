@@ -1,24 +1,22 @@
 # Nexus Design System
 
+> **CRITICAL WORKFLOW - MUST FOLLOW ON EVERY TASK**
+>
+> | Step | Action | Output |
+> |------|--------|--------|
+> | **1. Plan** | Create todo list BEFORE any code | TodoWrite with all phases |
+> | **2. Execute** | Complete ONE todo item only | Code changes for that phase |
+> | **3. Summarize** | Brief summary + key code snippets | `[file.tsx:42-58](path)` format |
+> | **4. WAIT** | STOP for user confirmation | Do NOT proceed automatically |
+> | **5. Repeat** | Go to step 2 for next phase | Until all todos complete |
+>
+> **Summary format:** Tables/bullets + "Key Code to Review" section with actual snippets, file:line links, and brief notes.
+>
+> **Docs check:** After significant changes, update relevant CLAUDE.md and .claude/rules/*.md files.
+>
+> **NEVER execute multiple phases without stopping for review.**
+
 A multi-framework design system built as a Yarn/Turbo monorepo, starting with React. Components follow shadcn/ui architecture and patterns.
-
-## Workflow Instructions
-
-When working on tasks:
-
-1. **Plan first**: Create a clear todo list with steps before starting
-2. **Summarize after each step**: Provide a concise summary of what was done after completing each todo/phase
-3. **Show key code for review**: In each summary, include a "Key Code to Review" section:
-   - Show the actual code snippets (not just file references) for important implementations
-   - Include file path and line numbers above each snippet: `[file.tsx:42-58](path/to/file.tsx#L42-L58)`
-   - Add brief note explaining what to look for (e.g., "variant logic here", "main state handling")
-   - Focus on: core logic, complex conditions, key patterns, anything non-obvious
-4. **Wait for confirmation**: Pause after each summary for user review before moving to the next step
-5. **Keep summaries brief**: Use tables or bullet points, not lengthy explanations
-6. **Keep docs in sync**: After significant changes to a package, proactively check if updates are needed to:
-   - Package `CLAUDE.md` (if behavior/structure changed)
-   - Related `.claude/rules/*.md` (if conventions changed)
-   - Root `CLAUDE.md` (if project-wide patterns changed)
 
 ## Project Structure
 

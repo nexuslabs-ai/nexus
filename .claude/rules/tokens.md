@@ -1,5 +1,7 @@
 # Design Token Rules
 
+> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
+
 ## Token Format (W3C DTCG)
 
 All tokens MUST follow the W3C Design Tokens Community Group format:
