@@ -5,6 +5,12 @@ argument-hint: [figma-url]
 
 Analyze a Figma component design against Nexus Design System conventions to ensure Figma-to-code parity.
 
+> **EXECUTION MODE: CONTINUOUS**
+>
+> This command runs ALL phases without pausing for confirmation.
+> Do NOT stop between phases. Execute the entire workflow end-to-end.
+> This overrides the default "wait after each phase" behavior from root CLAUDE.md.
+
 ## Required Input
 
 Figma URL: $ARGUMENTS
