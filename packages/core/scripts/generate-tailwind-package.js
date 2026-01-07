@@ -9,6 +9,7 @@ import {
   extractTokens,
   formatShadowComposite,
   formatTokenValue,
+  getGoogleFontsImportFromTokens,
   log,
   parseArgs,
   pathToCssVar,
@@ -352,6 +353,19 @@ function generateNexusCSS(lightTokens, darkTokens, primitiveTokens, primitiveMap
   css += ` * Uses @theme (not inline) so utilities reference CSS variables\n`;
   css += ` * that can be overridden by .dark selector for theme switching.\n`;
   css += ` */\n\n`;
+
+  // Google Fonts import (generated from typography token $extensions)
+  const typographyMode = usedModes.typography || 'vega';
+  const typographyFilePath = path.join(
+    TOKENS_DIR,
+    `primitives/typography/typography-${typographyMode}.json`
+  );
+  const googleFontsImport = getGoogleFontsImportFromTokens(typographyFilePath);
+  if (googleFontsImport) {
+    css += `/* Google Fonts - auto-generated from typography tokens */\n`;
+    css += `${googleFontsImport}\n\n`;
+    log.success(`Generated Google Fonts import for typography mode: ${typographyMode}`);
+  }
 
   // Tailwind import with prefix and variables import
   css += `@import "tailwindcss" prefix(nx);\n`;

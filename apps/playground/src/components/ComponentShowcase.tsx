@@ -15,31 +15,31 @@ export function ComponentShowcase() {
             <span className="nx:text-muted-foreground nx:text-xs">
               display-medium
             </span>
-            <p className="text-display-medium">Display Medium</p>
+            <p className="nx:text-display-medium">Display Medium</p>
           </div>
           <div>
             <span className="nx:text-muted-foreground nx:text-xs">
               heading-xlarge
             </span>
-            <p className="text-heading-xlarge">Heading XLarge</p>
+            <p className="nx:text-heading-xlarge">Heading XLarge</p>
           </div>
           <div>
             <span className="nx:text-muted-foreground nx:text-xs">
               heading-large
             </span>
-            <p className="text-heading-large">Heading Large</p>
+            <p className="nx:text-heading-large">Heading Large</p>
           </div>
           <div>
             <span className="nx:text-muted-foreground nx:text-xs">
               heading-medium
             </span>
-            <p className="text-heading-medium">Heading Medium</p>
+            <p className="nx:text-heading-medium">Heading Medium</p>
           </div>
           <div>
             <span className="nx:text-muted-foreground nx:text-xs">
               body-large
             </span>
-            <p className="text-body-large">
+            <p className="nx:text-body-large">
               Body Large - The quick brown fox jumps over the lazy dog.
             </p>
           </div>
@@ -47,7 +47,7 @@ export function ComponentShowcase() {
             <span className="nx:text-muted-foreground nx:text-xs">
               body-default
             </span>
-            <p className="text-body-default">
+            <p className="nx:text-body-default">
               Body Default - The quick brown fox jumps over the lazy dog.
             </p>
           </div>
@@ -55,7 +55,7 @@ export function ComponentShowcase() {
             <span className="nx:text-muted-foreground nx:text-xs">
               body-small
             </span>
-            <p className="text-body-small">
+            <p className="nx:text-body-small">
               Body Small - The quick brown fox jumps over the lazy dog.
             </p>
           </div>
@@ -64,25 +64,25 @@ export function ComponentShowcase() {
               <span className="nx:text-muted-foreground nx:text-xs">
                 label-large
               </span>
-              <p className="text-label-large">Label Large</p>
+              <p className="nx:text-label-large">Label Large</p>
             </div>
             <div>
               <span className="nx:text-muted-foreground nx:text-xs">
                 label-default
               </span>
-              <p className="text-label-default">Label Default</p>
+              <p className="nx:text-label-default">Label Default</p>
             </div>
             <div>
               <span className="nx:text-muted-foreground nx:text-xs">
                 label-small
               </span>
-              <p className="text-label-small">Label Small</p>
+              <p className="nx:text-label-small">Label Small</p>
             </div>
             <div>
               <span className="nx:text-muted-foreground nx:text-xs">
                 label-caps
               </span>
-              <p className="text-label-caps">Label Caps</p>
+              <p className="nx:text-label-caps">Label Caps</p>
             </div>
           </div>
           <div className="nx:flex nx:gap-6">
@@ -90,13 +90,13 @@ export function ComponentShowcase() {
               <span className="nx:text-muted-foreground nx:text-xs">
                 code-block
               </span>
-              <p className="text-code-block">const x = 42;</p>
+              <p className="nx:text-code-block">const x = 42;</p>
             </div>
             <div>
               <span className="nx:text-muted-foreground nx:text-xs">
                 code-inline
               </span>
-              <p className="text-code-inline">inline code</p>
+              <p className="nx:text-code-inline">inline code</p>
             </div>
           </div>
         </div>
@@ -238,10 +238,10 @@ export function ComponentShowcase() {
               Border Width Utilities
             </span>
             <div className="nx:flex nx:flex-wrap nx:gap-3">
-              <div className="nx:border-border-default border-default nx:rounded nx:px-4 nx:py-2">
+              <div className="nx:border-border-default nx:border-default nx:rounded nx:px-4 nx:py-2">
                 border-default
               </div>
-              <div className="nx:border-border-default border-thick nx:rounded nx:px-4 nx:py-2">
+              <div className="nx:border-border-default nx:border-thick nx:rounded nx:px-4 nx:py-2">
                 border-thick
               </div>
             </div>
@@ -251,19 +251,19 @@ export function ComponentShowcase() {
               Border Colors
             </span>
             <div className="nx:flex nx:flex-wrap nx:gap-3">
-              <div className="nx:border-border-default border-thick nx:rounded nx:px-4 nx:py-2">
+              <div className="nx:border-border-default nx:border-thick nx:rounded nx:px-4 nx:py-2">
                 Default
               </div>
-              <div className="nx:border-border-primary border-thick nx:rounded nx:px-4 nx:py-2">
+              <div className="nx:border-border-primary nx:border-thick nx:rounded nx:px-4 nx:py-2">
                 Primary
               </div>
-              <div className="nx:border-border-success border-thick nx:rounded nx:px-4 nx:py-2">
+              <div className="nx:border-border-success nx:border-thick nx:rounded nx:px-4 nx:py-2">
                 Success
               </div>
-              <div className="nx:border-border-error border-thick nx:rounded nx:px-4 nx:py-2">
+              <div className="nx:border-border-error nx:border-thick nx:rounded nx:px-4 nx:py-2">
                 Error
               </div>
-              <div className="nx:border-border-information border-thick nx:rounded nx:px-4 nx:py-2">
+              <div className="nx:border-border-information nx:border-thick nx:rounded nx:px-4 nx:py-2">
                 Info
               </div>
             </div>

@@ -2,15 +2,55 @@
   "family": {
     "font-sans": {
       "$value": "Inter",
-      "$type": "fontFamily"
+      "$type": "fontFamily",
+      "$extensions": {
+        "nx-font-source": {
+          "type": "google",
+          "family": "Inter",
+          "weights": [
+            100,
+            200,
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900
+          ],
+          "styles": [
+            "normal"
+          ]
+        }
+      }
     },
     "font-senrif": {
       "$value": "Georgia",
-      "$type": "fontFamily"
+      "$type": "fontFamily",
+      "$extensions": {
+        "nx-font-source": {
+          "type": "system"
+        }
+      }
     },
     "font-mono": {
       "$value": "JetBrains Mono",
-      "$type": "fontFamily"
+      "$type": "fontFamily",
+      "$extensions": {
+        "nx-font-source": {
+          "type": "google",
+          "family": "JetBrains+Mono",
+          "weights": [
+            400,
+            500,
+            600,
+            700
+          ],
+          "styles": [
+            "normal"
+          ]
+        }
+      }
     }
   },
   "size": {
