@@ -37,7 +37,9 @@
       "Bash(mkdir:*)",
       "mcp__linear__*",
       "mcp__github__*",
-      "mcp__figma__*"
+      "mcp__figma__*",
+      "Write(packages/react/**)",
+      "Edit(packages/react/**)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
