@@ -142,37 +142,90 @@ Execute the `/component` workflow with extracted details:
    mcp__linear__update_issue(id: "{issue_id}", links: [{url: "{pr_url}", title: "GitHub PR"}])
    ```
 
-### Phase 5: Self-Review
+### Phase 5: Code Review (Unbiased)
 
-Review the PR for quality:
+**IMPORTANT:** Review as if this code was written by someone else. Be critical and thorough.
 
-1. **Get PR files:**
+1. **Get PR files and read actual code:**
    ```
    mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
+   Then **read the full content** of each created file using the Read tool.
 
-2. **Review checklist:**
-   - [ ] Component follows Nexus conventions
-   - [ ] All Tailwind classes have `nx:` prefix
-   - [ ] Semantic tokens used (no raw colors)
-   - [ ] data-slot, data-variant, data-size present
-   - [ ] JSDoc on custom props
-   - [ ] Stories cover all Figma variants
+2. **Architecture Review** (check against `.claude/rules/components.md`):
+   - [ ] Uses CVA for variants (not conditional classes)
+   - [ ] Proper props interface with `VariantProps<typeof variants>`
+   - [ ] Uses Radix primitives where applicable (not custom implementations)
+   - [ ] Follows compound component pattern if needed (e.g., Avatar + AvatarImage + AvatarFallback)
+   - [ ] No unnecessary abstractions or over-engineering
+   - [ ] Matches shadcn/ui architecture patterns
+
+3. **Code Quality Review:**
+   - [ ] All Tailwind classes have `nx:` prefix (scan for any missing)
+   - [ ] Semantic tokens only (no raw colors like `blue-500`, `#fff`)
+   - [ ] `data-slot`, `data-variant`, `data-size` attributes present
+   - [ ] JSDoc on ALL custom props (not just some)
+   - [ ] No hardcoded values that should be tokens
+   - [ ] No unnecessary dependencies imported
+   - [ ] Proper TypeScript types (no `any`, proper generics)
+   - [ ] Export order matches convention (component, props type, variants)
+
+4. **Stories Review** (check against `.claude/rules/storybook.md`):
+   - [ ] All Figma variants covered
    - [ ] Play function tests for interactions
-   - [ ] Quality gates passed
+   - [ ] Chromatic config correct (`themeOnlyModes` for grids, `disableSnapshot` for test-only stories)
+   - [ ] No duplicate or redundant stories
+   - [ ] Proper a11y (alt text, ARIA labels where needed)
 
-3. **If issues found**, add review comments:
+5. **Common Issues to Flag:**
+   - Missing `nx:` prefix on any class
+   - Using `interface Foo {}` instead of `type Foo = ...` for empty interfaces
+   - Missing `asChild` support on interactive components
+   - Fixed heights/widths instead of padding for sizing
+   - Incomplete token paths (e.g., `nx:bg-primary` instead of `nx:bg-primary-background`)
+   - Missing error boundaries or edge case handling
+   - Accessibility issues (color contrast, missing labels)
+
+6. **ALWAYS Add PR Review** (required - never skip):
+
+   **If issues found** - add review with line comments:
    ```
    mcp__github__create_pull_request_review(
      owner: "INNOVATIVEGAMER",
      repo: "ds",
      pull_number: {pr_number},
-     body: "Review comments...",
-     event: "COMMENT"
+     body: "## 🤖 Automated Code Review\n\n{summary table}\n\n### Issues Found\n{list of issues}",
+     event: "COMMENT",  // or "REQUEST_CHANGES" if critical
+     comments: [
+       { path: "file.tsx", line: 42, body: "Issue description..." }
+     ]
    )
    ```
 
-4. **Compare with Figma** if screenshots available
+   **If no issues** - add approval review:
+   ```
+   mcp__github__create_pull_request_review(
+     owner: "INNOVATIVEGAMER",
+     repo: "ds",
+     pull_number: {pr_number},
+     body: "## 🤖 Automated Code Review\n\n{summary table}\n\n### Result\n✅ All checks passed. Code follows Nexus conventions and shadcn/ui architecture patterns.\n\n**Reviewed:**\n- Architecture: CVA, Radix primitives, compound components\n- Code Quality: nx: prefix, semantic tokens, data attributes, JSDoc\n- Stories: Variants coverage, play functions, Chromatic config\n- Accessibility: Color contrast, ARIA labels",
+     event: "APPROVE"
+   )
+   ```
+
+7. **Review Summary Table** (include in PR review body):
+   | Category | Status | Notes |
+   |----------|--------|-------|
+   | Architecture | ✅/⚠️/❌ | {notes} |
+   | Code Quality | ✅/⚠️/❌ | {notes} |
+   | Stories | ✅/⚠️/❌ | {notes} |
+   | A11y | ✅/⚠️/❌ | {notes} |
+
+8. **If critical issues found:**
+   - Do NOT proceed to handoff
+   - Fix the issues first
+   - Re-run quality gates
+   - Amend commit and force push (since not yet reviewed by humans)
 
 ### Phase 6: Handoff
 
