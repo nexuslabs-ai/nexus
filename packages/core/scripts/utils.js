@@ -493,3 +493,91 @@ export function formatShadowComposite(value, isInset = false) {
   const layers = Array.isArray(value) ? value : [value];
   return layers.map((layer) => formatShadowLayer(layer, isInset)).join(', ');
 }
+
+// ============================================
+// GOOGLE FONTS HELPERS
+// ============================================
+
+/**
+ * Extract Google Fonts information from typography token file
+ * Reads font family tokens with $extensions.nx-font-source
+ *
+ * @param {string} typographyFilePath - Path to typography token file (e.g., typography-vega.json)
+ * @returns {object[]} Array of { family, weights, styles } for Google Fonts
+ */
+export function extractGoogleFonts(typographyFilePath) {
+  if (!fs.existsSync(typographyFilePath)) {
+    log.warn(`Typography file not found: ${typographyFilePath}`);
+    return [];
+  }
+
+  const tokenData = readTokenFile(typographyFilePath);
+  const googleFonts = [];
+
+  // Look for family tokens with nx-font-source extension
+  if (tokenData.family) {
+    for (const [_key, value] of Object.entries(tokenData.family)) {
+      if (value.$type !== 'fontFamily') continue;
+
+      const fontSource = value.$extensions?.['nx-font-source'];
+      if (!fontSource || fontSource.type !== 'google') continue;
+
+      googleFonts.push({
+        family: fontSource.family,
+        weights: fontSource.weights || [400],
+        styles: fontSource.styles || ['normal'],
+      });
+    }
+  }
+
+  return googleFonts;
+}
+
+/**
+ * Generate Google Fonts @import URL from font specifications
+ *
+ * @param {object[]} fonts - Array of { family, weights, styles }
+ * @returns {string} CSS @import statement or empty string if no fonts
+ *
+ * @example
+ * // Input: [{ family: 'Inter', weights: [400, 700], styles: ['normal'] }]
+ * // Output: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+ */
+export function generateGoogleFontsImport(fonts) {
+  if (!fonts || fonts.length === 0) {
+    return '';
+  }
+
+  const familyParams = fonts.map((font) => {
+    const { family, weights, styles } = font;
+    const hasItalic = styles.includes('italic');
+
+    if (hasItalic) {
+      // Format: family=Inter:ital,wght@0,400;0,700;1,400;1,700
+      const weightVariants = [];
+      for (const weight of weights) {
+        weightVariants.push(`0,${weight}`); // normal
+        weightVariants.push(`1,${weight}`); // italic
+      }
+      return `family=${family}:ital,wght@${weightVariants.join(';')}`;
+    } else {
+      // Format: family=Inter:wght@400;700
+      return `family=${family}:wght@${weights.join(';')}`;
+    }
+  });
+
+  const url = `https://fonts.googleapis.com/css2?${familyParams.join('&')}&display=swap`;
+  return `@import url('${url}');`;
+}
+
+/**
+ * Extract Google Fonts and generate @import statement from typography token file
+ * Convenience function that combines extractGoogleFonts and generateGoogleFontsImport
+ *
+ * @param {string} typographyFilePath - Path to typography token file
+ * @returns {string} CSS @import statement or empty string if no Google Fonts
+ */
+export function getGoogleFontsImportFromTokens(typographyFilePath) {
+  const fonts = extractGoogleFonts(typographyFilePath);
+  return generateGoogleFontsImport(fonts);
+}
