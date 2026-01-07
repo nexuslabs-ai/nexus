@@ -1,5 +1,7 @@
 import type { Preview } from '@storybook/react-vite';
 
+import { allModes } from '../src/storybook/modes';
+
 import '../src/index.css';
 
 const preview: Preview = {
@@ -22,6 +24,27 @@ const preview: Preview = {
     backgrounds: { disable: true },
     // Use fullscreen layout so our theme wrapper fills the entire canvas
     layout: 'fullscreen',
+    // Viewport configuration for Storybook UI and Chromatic
+    viewport: {
+      options: {
+        mobile: {
+          name: 'Mobile',
+          styles: { width: '375px', height: '667px' },
+        },
+        tablet: {
+          name: 'Tablet',
+          styles: { width: '768px', height: '1024px' },
+        },
+        desktop: {
+          name: 'Desktop',
+          styles: { width: '1280px', height: '800px' },
+        },
+      },
+    },
+    // Chromatic modes - test all theme/viewport combinations
+    chromatic: {
+      modes: allModes,
+    },
   },
   globalTypes: {
     theme: {

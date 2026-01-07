@@ -8,6 +8,7 @@ dist
 build
 .next
 out
+storybook-static
 
 # Turbo
 .turbo
@@ -33,6 +34,7 @@ coverage
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+build-storybook.log
 
 # TypeScript
 *.tsbuildinfo

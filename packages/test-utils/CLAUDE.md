@@ -33,6 +33,7 @@ yarn typecheck  # TypeScript check
 | `act` | @testing-library/react | State updates in tests |
 | `waitFor` | @testing-library/react | Async assertions |
 | `describe`, `it`, `expect`, `vi` | vitest | Test utilities |
+| `beforeAll`, `beforeEach`, `afterAll`, `afterEach` | vitest | Test lifecycle |
 
 ## What This Package Does NOT Provide
 

@@ -37,7 +37,29 @@ const buttonVariants = cva(
 
 interface ButtonProps
   extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
+  /**
+   * When true, the button will render as its child element (using Radix Slot).
+   * Useful for rendering as a link or custom element while keeping button styles.
+   * @default false
+   * @example
+   * ```tsx
+   * <Button asChild>
+   *   <a href="/page">Link styled as button</a>
+   * </Button>
+   * ```
+   */
   asChild?: boolean;
+
+  /**
+   * Shows a loading indicator and disables the button.
+   * When loading, the button is non-interactive and shows aria-busy for accessibility.
+   * @default false
+   * @example
+   * ```tsx
+   * <Button loading>Submitting...</Button>
+   * ```
+   */
+  loading?: boolean;
 }
 
 function Button({
@@ -45,18 +67,38 @@ function Button({
   variant,
   size,
   asChild = false,
+  loading = false,
+  disabled,
+  children,
+  type = 'button',
   ...props
 }: ButtonProps) {
   const Comp = asChild ? Slot : 'button';
+  const isDisabled = disabled || loading;
 
   return (
     <Comp
+      type={type}
       data-slot="button"
       data-variant={variant}
       data-size={size}
+      data-loading={loading || undefined}
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={isDisabled}
+      aria-busy={loading || undefined}
+      aria-disabled={isDisabled || undefined}
       {...props}
-    />
+    >
+      {loading ? (
+        <>
+          {children}
+          {/* TODO: Replace with proper loading icon from design system */}
+          <span aria-hidden="true">...</span>
+        </>
+      ) : (
+        children
+      )}
+    </Comp>
   );
 }
 

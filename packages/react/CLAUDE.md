@@ -17,6 +17,7 @@ yarn typecheck        # TypeScript check
 ```
 src/
 ├── components/ui/    # UI components (button.tsx, etc.)
+├── storybook/        # Storybook utilities (modes.ts)
 ├── lib/utils.ts      # cn() utility
 ├── index.css         # Main styles (imports @nexus/tailwind)
 └── index.ts          # Package exports
@@ -168,3 +169,38 @@ import '@nexus/react/styles.css';
 - Accessibility tests automatic via `addon-a11y`
 - Component tests via `@storybook/addon-vitest` (Playwright browser)
 - Uses same Tailwind setup as library
+
+## Chromatic Visual Testing
+
+Chromatic captures visual snapshots in 4 modes by default (light/dark × desktop/mobile).
+
+### Mode Configuration
+
+Modes are defined in `src/storybook/modes.ts`:
+
+| Mode | Use Case |
+|------|----------|
+| `allModes` | All 4 combinations (default) |
+| `themeOnlyModes` | Light/dark desktop only (AllVariants grids) |
+| `viewportOnlyModes` | Desktop/mobile light only |
+
+### Story Parameters
+
+```tsx
+import { themeOnlyModes } from '@/storybook/modes';
+
+export const MyStory: Story = {
+  parameters: {
+    chromatic: {
+      disableSnapshot: true,  // For interaction-only tests
+      modes: themeOnlyModes,  // For grid stories
+    },
+  },
+};
+```
+
+Run visual tests:
+```bash
+yarn chromatic          # Local (doesn't fail on changes)
+yarn chromatic:ci       # CI (fails if changes need review)
+```

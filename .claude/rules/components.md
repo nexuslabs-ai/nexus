@@ -2,13 +2,14 @@
 
 ## File Structure
 
-Every component in `packages/react/src/components/ui/` needs 3 files:
+Every component in `packages/react/src/components/ui/` needs 2 files:
 
 ```
 {name}.tsx           # Component (kebab-case)
-{name}.test.tsx      # Tests (kebab-case)
-{Name}.stories.tsx   # Stories (PascalCase)
+{Name}.stories.tsx   # Stories + Tests (PascalCase, play functions)
 ```
+
+**No separate `*.test.tsx` files.** Tests are play functions in stories.
 
 ## Component Template
 

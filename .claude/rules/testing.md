@@ -249,3 +249,68 @@ import {
 | Skip keyboard interaction tests | Every interactive component needs them |
 | Use `@nexus/test-utils` for components | Use `storybook/test` in stories |
 | Import from `@storybook/test` | Use `storybook/test` (Storybook 10) |
+
+## Visual Regression Testing (Chromatic)
+
+Every story is automatically snapshotted by Chromatic in 4 modes:
+- light desktop (1280px)
+- dark desktop (1280px)
+- light mobile (375px)
+- dark mobile (375px)
+
+### Running Visual Tests
+
+**In Storybook (recommended for development):**
+1. Open the Visual Tests addon panel
+2. Click "Run tests"
+3. Review and accept/reject changes
+
+**From CLI:**
+```bash
+# Local (doesn't fail on changes)
+yarn chromatic
+
+# CI (fails if changes need review)
+yarn chromatic:ci
+```
+
+### Chromatic Story Parameters
+
+```tsx
+import { themeOnlyModes } from '@/storybook/modes';
+
+export const MyStory: Story = {
+  parameters: {
+    chromatic: {
+      // Skip snapshot for interaction-only tests
+      disableSnapshot: true,
+
+      // Wait for animations
+      delay: 500,
+
+      // Custom modes for this story
+      modes: themeOnlyModes,
+    },
+  },
+};
+```
+
+### When to Disable Snapshots
+
+Add `chromatic: { disableSnapshot: true }` for stories that:
+- Only test interactions (no unique visual output)
+- Test data attributes or ARIA properties
+- Have identical appearance to another story
+
+### When to Use themeOnlyModes
+
+Use `modes: themeOnlyModes` for:
+- Grid/showcase stories like AllVariants
+- Simple components that don't need responsive testing
+
+### Modes Location
+
+Chromatic modes are defined in `packages/react/src/storybook/modes.ts`:
+- `allModes` - All 4 theme/viewport combinations (default)
+- `themeOnlyModes` - Light/dark desktop only
+- `viewportOnlyModes` - Mobile/desktop light only

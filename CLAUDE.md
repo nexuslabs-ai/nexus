@@ -50,6 +50,7 @@ ds/
 - **Radix UI** primitives for accessibility
 - **Vitest** 4.x with Storybook addon for story-first testing
 - **Storybook** 10 for component documentation and testing
+- **Chromatic** for visual regression testing
 - **Playwright** for real browser component tests
 
 ## Commands
@@ -81,6 +82,10 @@ yarn test:coverage      # With coverage report
 # Storybook
 yarn storybook          # Dev server on port 6006
 yarn build-storybook    # Build static site
+
+# Visual Regression (Chromatic)
+yarn chromatic          # Run visual tests (local, doesn't fail on changes)
+yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 ```
 
 ## Package Documentation

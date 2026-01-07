@@ -321,3 +321,44 @@ yarn test:storybook:ui     # Interactive UI
 ### A11y Testing
 
 A11y is automatic via `addon-a11y` with `a11y: { test: 'error' }` in preview. Every story is checked against axe-core rules. Violations fail the test.
+
+## Chromatic Visual Testing
+
+### Story Parameters for Chromatic
+
+```tsx
+import { themeOnlyModes } from '@/storybook/modes';
+
+export const MyStory: Story = {
+  parameters: {
+    chromatic: {
+      disableSnapshot: true,  // Skip visual test
+      delay: 500,             // Wait before capture
+      modes: themeOnlyModes,  // Override default modes
+    },
+  },
+};
+```
+
+### Which Stories Need Visual Tests?
+
+| Story Type | Visual Test? | Chromatic Config |
+|------------|--------------|------------------|
+| Variant stories | Yes | Default (all 4 modes) |
+| Size stories | Yes | Default |
+| Disabled states | Yes | Default |
+| AllVariants grid | Yes | `modes: themeOnlyModes` |
+| Interaction tests | No | `disableSnapshot: true` |
+| Data attribute tests | No | `disableSnapshot: true` |
+| Edge case tests | Maybe | Depends on visual uniqueness |
+
+### Import Modes
+
+```tsx
+import { themeOnlyModes } from '@/storybook/modes';
+```
+
+Available modes from `packages/react/src/storybook/modes.ts`:
+- `allModes` - 4 combinations (light/dark × desktop/mobile)
+- `themeOnlyModes` - 2 combinations (light/dark desktop)
+- `viewportOnlyModes` - 2 combinations (desktop/mobile light)
