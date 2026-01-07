@@ -115,6 +115,36 @@ Valid `$type` values:
 - `shadow` - Box shadow definitions
 - `number` - Unitless numbers
 
+## Font Source Extensions
+
+Typography font family tokens can include `$extensions.nx-font-source` for automatic font loading:
+
+| `type` | Description | Required Fields |
+|--------|-------------|-----------------|
+| `google` | Load from Google Fonts | `family`, `weights`, `styles` |
+| `system` | System font (no import) | None |
+| `custom` | Custom URL (future) | `url` |
+
+Example:
+```json
+{
+  "font-mono": {
+    "$value": "JetBrains Mono",
+    "$type": "fontFamily",
+    "$extensions": {
+      "nx-font-source": {
+        "type": "google",
+        "family": "JetBrains+Mono",
+        "weights": [400, 500, 600, 700],
+        "styles": ["normal"]
+      }
+    }
+  }
+}
+```
+
+The generation scripts (`generate-tailwind-package.js`, `generate-modular.js`) read these extensions and output `@import` statements for Google Fonts at the top of the generated CSS.
+
 ## Generation Workflow
 
 After editing token files:

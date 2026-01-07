@@ -70,6 +70,52 @@ tokens/
 
 Reference syntax: `{colorName.shade}` → `var(--nx-color-colorName-shade)`
 
+## Font Source Extensions
+
+Typography font family tokens support `$extensions.nx-font-source` for automatic Google Fonts import generation:
+
+**Google Font:**
+```json
+{
+  "family": {
+    "font-sans": {
+      "$value": "Inter",
+      "$type": "fontFamily",
+      "$extensions": {
+        "nx-font-source": {
+          "type": "google",
+          "family": "Inter",
+          "weights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+          "styles": ["normal"]
+        }
+      }
+    }
+  }
+}
+```
+
+**System Font (no import needed):**
+```json
+{
+  "font-serif": {
+    "$value": "Georgia",
+    "$type": "fontFamily",
+    "$extensions": {
+      "nx-font-source": { "type": "system" }
+    }
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | `"google" \| "system" \| "custom"` | Yes | Font source type |
+| `family` | `string` | If google | URL-encoded family name for Google Fonts |
+| `weights` | `number[]` | If google | Font weights to load |
+| `styles` | `string[]` | No | `["normal"]` or `["normal", "italic"]` |
+
+The generation scripts read these extensions and automatically output `@import` statements.
+
 ## Theme Selection
 
 Themes are selected via CLI arguments for the tailwind generation script:
@@ -99,10 +145,13 @@ Available options:
 ### @nexus/tailwind (nexus.css)
 
 ```css
-@import "tailwindcss" prefix(nx);
-@custom-variant dark (&:is(.dark *));
+/* Google Fonts - auto-generated from typography tokens */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;...&display=swap');
 
+@import "tailwindcss" prefix(nx);
 @import "./variables.css";
+
+@custom-variant dark (&:is(.dark *));
 
 @theme {
   --*: initial;
