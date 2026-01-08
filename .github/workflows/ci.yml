@@ -41,7 +41,7 @@ jobs:
             BASE_REF="HEAD~1"
           fi
 
-          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR "$BASE_REF"...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.json' '*.md' || true)
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR "$BASE_REF"...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.json' '*.md' '*.css' '*.yml' || true)
 
           if [ -n "$CHANGED_FILES" ]; then
             echo "Checking formatting for changed files:"
