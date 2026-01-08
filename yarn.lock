@@ -817,6 +817,28 @@
     argparse "~1.0.9"
     string-argv "~0.3.1"
 
+"@size-limit/esbuild@12.0.0":
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/@size-limit/esbuild/-/esbuild-12.0.0.tgz#cab251f4edada48e3994556119e5392baab30d65"
+  integrity sha512-r9i+HrtunIu7wAPtqD3t4DqfYin3kxPoMAv8cidkzlCS69IYCe3EG2UbQa10AdvQyaHTEK+MPkr9ifUd3W29og==
+  dependencies:
+    esbuild "^0.27.0"
+    nanoid "^5.1.6"
+
+"@size-limit/file@12.0.0":
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/@size-limit/file/-/file-12.0.0.tgz#4ce4352e8b19ab688e59d4f8bd9a7d6665d6c7c9"
+  integrity sha512-OzKYpDzWJ2jo6cAIzVsaPuvzZTmMLDoVCViEvsctmImxpXzwJZcuBEpPohFKKdgVdZuNTU8WstmvywPq55Njdw==
+
+"@size-limit/preset-small-lib@^12.0.0":
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/@size-limit/preset-small-lib/-/preset-small-lib-12.0.0.tgz#bc05089091c865f28512a0752481f7760a8ba6e3"
+  integrity sha512-HHHVQjZmj+8vg7qsHs1dd3Hmn8ygUsE5O2CfxnbCbHOGyUw7VodZGERh/+5ogVrF2DYza/DIo2PnCJZZETdTRA==
+  dependencies:
+    "@size-limit/esbuild" "12.0.0"
+    "@size-limit/file" "12.0.0"
+    size-limit "12.0.0"
+
 "@standard-schema/spec@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@standard-schema/spec/-/spec-1.1.0.tgz#a79b55dbaf8604812f52d140b2c9ab41bc150bb8"
@@ -1799,6 +1821,11 @@ bundle-require@^5.1.0:
   integrity sha512-3WrrOuZiyaaZPWiEt4G3+IffISVC9HYlWueJEBWED4ZH4aIAC2PnkdnuRrR94M+w6yGWn4AglWtJtBI8YqvgoA==
   dependencies:
     load-tsconfig "^0.2.3"
+
+bytes-iec@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/bytes-iec/-/bytes-iec-3.1.1.tgz#94cd36bf95c2c22a82002c247df8772d1d591083"
+  integrity sha512-fey6+4jDK7TFtFg/klGSvNKJctyU7n2aQdnM+CO0ruLPbqqMOM8Tio0Pc+deqUeVKX1tL5DQep1zQ7+37aTAsA==
 
 cac@^6.7.14:
   version "6.7.14"
@@ -3363,7 +3390,7 @@ lightningcss@1.30.2:
     lightningcss-win32-arm64-msvc "1.30.2"
     lightningcss-win32-x64-msvc "1.30.2"
 
-lilconfig@^3.1.1:
+lilconfig@^3.1.1, lilconfig@^3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/lilconfig/-/lilconfig-3.1.3.tgz#a1bcfd6257f9585bf5ae14ceeebb7b559025e4c4"
   integrity sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==
@@ -3559,6 +3586,18 @@ nanoid@^3.3.11:
   version "3.3.11"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.11.tgz#4f4f112cefbe303202f2199838128936266d185b"
   integrity sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==
+
+nanoid@^5.1.6:
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-5.1.6.tgz#30363f664797e7d40429f6c16946d6bd7a3f26c9"
+  integrity sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg==
+
+nanospinner@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/nanospinner/-/nanospinner-1.2.2.tgz#5a38f4410b5bf7a41585964bee74d32eab3e040b"
+  integrity sha512-Zt/AmG6qRU3e+WnzGGLuMCEAO/dAu45stNbHY223tUxldaDAeE+FxSPsd9Q+j+paejmm0ZbrNVs5Sraqy3dRxA==
+  dependencies:
+    picocolors "^1.1.1"
 
 natural-compare@^1.4.0:
   version "1.4.0"
@@ -4187,6 +4226,17 @@ sirv@^3.0.2:
     "@polka/url" "^1.0.0-next.24"
     mrmime "^2.0.0"
     totalist "^3.0.0"
+
+size-limit@12.0.0, size-limit@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/size-limit/-/size-limit-12.0.0.tgz#9f714026a1bae632d7516d37cb02a5e884fe3c9a"
+  integrity sha512-JBG8dioIs0m2kHOhs9jD6E/tZKD08vmbf2bfqj/rJyNWqJxk/ZcakixjhYtsqdbi+AKVbfPkt3g2RRZiKaizYA==
+  dependencies:
+    bytes-iec "^3.1.1"
+    lilconfig "^3.1.3"
+    nanospinner "^1.2.2"
+    picocolors "^1.1.1"
+    tinyglobby "^0.2.15"
 
 source-map-js@^1.0.1, source-map-js@^1.2.1:
   version "1.2.1"
