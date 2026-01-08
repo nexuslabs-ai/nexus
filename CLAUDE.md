@@ -115,6 +115,7 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | `/linear-component` | Figma component workflow: Linear ticket → Figma analysis → Component → PR |
 | `/pr` | Pre-PR checklist (typecheck, lint, test, build) |
 | `/pr-review` | Unbiased PR code review (reads PR → reviews against conventions → posts feedback) |
+| `/post-merge` | Post-merge cleanup (verify merged → update Linear → switch to main → delete branch) |
 | `/test` | Run tests with options |
 | `/component` | Scaffold new component with all files |
 | `/update-docs` | Update documentation after changes |
