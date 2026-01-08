@@ -16,7 +16,11 @@
 
 /* ===== SEMANTIC TOKENS (Light) ===== */
 @theme {
-  --*: initial;
+  /* Reset default Tailwind namespaces to enforce semantic tokens only */
+  --color-*: initial;
+  --spacing-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
 
   --color-background: var(--nx-color-slate-50);
   --color-foreground: var(--nx-color-slate-900);
