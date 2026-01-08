@@ -2,17 +2,22 @@
 
 End-to-end workflow: Linear ticket → Component creation → PR → Review
 
-> **EXECUTION MODE: CONTINUOUS**
->
-> This command runs ALL phases without pausing for confirmation.
-> Do NOT stop between phases. Execute the entire workflow end-to-end.
-> This overrides the default "wait after each phase" behavior from root CLAUDE.md.
-
 ## Required Input
 
 - **Linear Issue ID**: $ARGUMENTS (e.g., `NEX-123`)
 
 If no issue ID provided, ask the user for it.
+
+## Execution Mode Selection
+
+**FIRST:** Ask the user which execution mode they prefer using AskUserQuestion:
+
+| Mode | Description |
+|------|-------------|
+| **Phased** | Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md` (stop after each phase, summarize, wait for confirmation) |
+| **Continuous** | Execute all phases end-to-end without stopping |
+
+If **Continuous** mode selected, only stop if critical errors occur, user input is required, or quality gates fail.
 
 ## Workflow
 
