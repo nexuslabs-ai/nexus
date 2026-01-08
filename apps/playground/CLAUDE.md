@@ -7,12 +7,15 @@ Theme demonstration app for previewing design token combinations dynamically.
 - Demo tool for showing clients theme variations
 - Test different color, typography, spacing, and style combinations
 - Preview light/dark mode switching in real-time
+- Preview components with different icon libraries (Tabler, Lucide, Phosphor)
 
 ## Tech Stack
 
 - **Vite** 7.x with React plugin
 - **React** 19 with TypeScript
 - **Tailwind CSS** 4.x with `nx:` prefix
+- **Zustand** 5.x for icon library state
+- **Icon Libraries**: @tabler/icons-react, lucide-react, @phosphor-icons/react
 - Native HTML elements (no @nexus/react dependency)
 
 ## Commands
@@ -44,7 +47,7 @@ apps/playground/
 │       └── shadow-variables.css     # --nx-shadow-* CSS variables
 └── src/
     ├── main.tsx          # React entry
-    ├── App.tsx           # Main layout
+    ├── App.tsx           # Main layout (two-column: content + sidebar)
     ├── App.css           # Imports styles/globals.css
     ├── styles/           # Build-time CSS (copied from core)
     │   ├── globals.css   # Tailwind entry with @theme block
@@ -53,9 +56,15 @@ apps/playground/
     │   └── borderwidth-utilities.css
     ├── hooks/
     │   └── useTheme.ts   # Theme state + CSS loading
+    ├── store/
+    │   └── iconStore.ts  # Zustand store for icon library selection
+    ├── lib/
+    │   └── icon-registry.ts # Icon mappings across libraries
     └── components/
-        ├── ThemeSwitcher.tsx    # Dropdown controls (2 rows: Colors + Tokens)
-        └── ComponentShowcase.tsx # Component preview sections
+        ├── ThemeSwitcher.tsx     # Sidebar with theme controls
+        ├── ComponentShowcase.tsx # Component preview sections
+        ├── IconShowcase.tsx      # Icon grid with library info
+        └── PlaygroundIcon.tsx    # Icon component using selected library
 ```
 
 ## How It Works
@@ -98,6 +107,14 @@ useEffect(() => loadCSS(`/themes/size-${theme.size}.css`, 'size'), [theme.size])
 | Radius | blunt, sharp, subtle, smooth, mellow | subtle |
 | Border Width | vega, lyra, maia, mira, nova | vega |
 
+### Icon Libraries
+
+| Library | Package | Icon Count | Default |
+|---------|---------|------------|---------|
+| Tabler | @tabler/icons-react | 5,800+ | ✓ |
+| Lucide | lucide-react | 1,500+ | |
+| Phosphor | @phosphor-icons/react | 9,000+ | |
+
 ## Setup
 
 ```bash
@@ -112,13 +129,73 @@ The showcase demonstrates all token categories:
 
 | Section | Tokens Used |
 |---------|-------------|
-| Typography | `text-display-*`, `text-headling-*`, `text-body-*`, `text-label-*`, `text-code-*` |
-| Shadows | `--shadow-2xs` to `--shadow-2xl`, `--shadow-inner`, `--shadow-focus-default` |
+| Typography | `text-display-*`, `text-heading-*`, `text-body-*`, `text-label-*`, `text-code-*` |
+| Semantic Colors | `bg-primary-*`, `bg-secondary-*`, `bg-error-*`, etc. |
+| Shadows | `shadow-2xs` to `shadow-2xl`, `shadow-inner`, `shadow-focus-default` |
 | Border Radius | `rounded-base`, `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`, `rounded-full` |
-| Spacing | `--size-1` to `--size-16` |
-| Buttons | Semantic colors + `var(--md)` for radius |
-| Colors | `bg-primary-*`, `bg-secondary-*`, `bg-error-*`, etc. |
-| Status | `bg-success-surface`, `text-success-text`, etc. |
+| Spacing | `w-1` to `w-16` |
+| Icons | 14 internal DS icons from selected library |
+| Buttons | Semantic colors + `rounded-md` for radius |
+| Cards & Containers | `bg-container`, `bg-popover`, `bg-muted`, `bg-accent` |
+| Borders | `border-default`, `border-thick`, `border-border-*` colors |
+| Status Messages | `*-surface`, `*-text` for success/error/warning/info |
+
+## Icon Library Switching
+
+The playground allows previewing icons from different libraries to help teams decide which library to use.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  icon-registry.ts                                           │
+│  Maps 14 internal icon names → library-specific components  │
+│  e.g., "check" → IconCheck (Tabler) | Check (Lucide)        │
+├─────────────────────────────────────────────────────────────┤
+│  iconStore.ts (Zustand)                                     │
+│  Manages selected library state with selective subscriptions│
+├─────────────────────────────────────────────────────────────┤
+│  PlaygroundIcon component                                   │
+│  <PlaygroundIcon name="check" size={16} />                  │
+│  Renders icon from currently selected library               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Available Internal Icons
+
+14 icons are mapped across all three libraries:
+
+| Icon Name | Use Case |
+|-----------|----------|
+| loader | Loading states |
+| chevron-down/up/left/right | Dropdowns, navigation |
+| check | Success, selection |
+| x | Close, dismiss |
+| alert-circle | Error states |
+| alert-triangle | Warning states |
+| circle-check | Success confirmation |
+| info-circle | Information |
+| search | Search inputs |
+| eye / eye-off | Password visibility |
+
+### Using PlaygroundIcon
+
+```tsx
+import { PlaygroundIcon } from './components/PlaygroundIcon';
+
+// Basic usage
+<PlaygroundIcon name="check" size={16} />
+
+// With className
+<PlaygroundIcon name="loader" className="nx:animate-spin nx:text-primary-text" />
+```
+
+### Why Zustand?
+
+Zustand was chosen over React Context for:
+- **Selective subscriptions**: Components only re-render when their specific slice changes
+- **No provider wrapping**: Simpler component tree
+- **Future scalability**: Easy to add more playground state (e.g., component props)
 
 ## Adding Components
 
@@ -162,8 +239,22 @@ The playground needs `@theme` so Tailwind generates CSS variable references that
 
 Theme CSS files use `html { }` instead of `:root { }` to ensure they override Tailwind's `@theme`-generated `:root` rules via cascade order (same specificity, but loaded later).
 
+## UI Layout
+
+The playground uses a two-column layout:
+- **Main content** (left): Scrollable component showcase with sticky header
+- **Sidebar** (right): Fixed theme controls panel
+
+ThemeSwitcher sections:
+- **Appearance**: Light/dark toggle switch
+- **Colors**: Base and brand color dropdowns with color indicators
+- **Design Tokens**: Size, typography, shadow, radius, border width
+- **Icons**: Library selector with icon count
+- **Reset button**: Returns to default theme
+
 ## Notes
 
 - All CSS files are committed for standalone deployment
 - Playground has no direct code dependency on core package
 - CSS is copied via `yarn tokens:modular` from root (regenerate after token changes)
+- Icon libraries are playground-only dependencies (not part of @nexus/react)
