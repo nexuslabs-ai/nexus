@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss",
+    "vitest.explorer",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "anthropic.claude-code",
+    "bracketpaircolordlw.bracket-pair-color-dlw"
+  ],
+  "unwantedRecommendations": []
+}
