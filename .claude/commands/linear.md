@@ -19,7 +19,7 @@ If no issue ID provided, ask the user for it.
 
 ## Phase 1: Read & Classify Ticket
 
-1. **Fetch issue details** using Linear MCP:
+1. **Fetch issue details** (see `.claude/rules/linear.md` for MCP conventions):
    ```
    mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
    ```
@@ -101,17 +101,17 @@ Based on ticket type, explore relevant parts of codebase:
 3. **For simple tasks** (single file, clear scope):
    - Proceed directly with todo list
 
-4. **Update Linear status** to "In Progress":
+4. **Update Linear status** to "In Progress" (see `.claude/rules/linear.md` for status flow):
    ```
    mcp__linear__update_issue(id: "{issue_id}", state: "In Progress")
    ```
 
-5. **Create git branch:**
+5. **Create git branch** (use `gitBranchName` from Linear issue per `.claude/rules/linear.md`):
    ```bash
    git checkout -b {gitBranchName}
    ```
 
-6. **Add comment** to Linear issue:
+6. **Add comment** to Linear issue (use emoji conventions from `.claude/rules/linear.md`):
    ```
    mcp__linear__create_comment(issueId: "{issue_id}", body: "🤖 Starting implementation...")
    ```
@@ -161,7 +161,9 @@ yarn test
 
 ## Phase 6: Create PR
 
-1. **Stage and commit:**
+Follow conventions in `.claude/rules/github.md` for PR and commit format.
+
+1. **Stage and commit** using format from rules:
    ```bash
    git add .
    git commit -m "{type}({scope}): {description}
@@ -173,47 +175,15 @@ yarn test
    Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
    ```
 
-   **Commit type mapping:**
-   | Ticket Type | Commit Type |
-   |-------------|-------------|
-   | Feature | `feat` |
-   | Bug | `fix` |
-   | Infrastructure | `chore` or `ci` |
-   | Documentation | `docs` |
-   | Refactor | `refactor` |
-
 2. **Push branch:**
    ```bash
    git push -u origin {gitBranchName}
    ```
 
-3. **Create PR** via GitHub MCP:
-   ```
-   mcp__github__create_pull_request(
-     owner: "INNOVATIVEGAMER",
-     repo: "ds",
-     title: "{type}({scope}): {description}",
-     head: "{gitBranchName}",
-     base: "main",
-     body: "## Summary
-     {bullet points of changes}
-
-     ## Linear Issue
-     Closes {issue_id}
-
-     ## Test Plan
-     - [ ] {verification steps}
-
-     🤖 Generated with Claude Code"
-   )
-   ```
-
-4. **Update Linear:**
-   - Set status to "In Review"
-   - Add PR link to issue
-   ```
-   mcp__linear__update_issue(id: "{issue_id}", state: "In Review", links: [{url: "{pr_url}", title: "GitHub PR"}])
-   ```
+3. **Create PR** using format from `.claude/rules/github.md`:
+   - Title MUST include `[{issue_id}]` for Linear auto-linking
+   - Body MUST include `Closes {issue_id}` for auto-done on merge
+   - Use standard PR body template from rules
 
 ## Phase 7: Handoff
 

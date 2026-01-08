@@ -14,7 +14,7 @@ If no input provided, ask the user for PR number.
    - If numeric only → PR number
    - If contains `NEX-` → Linear issue ID
 
-2. **If Linear issue ID provided:**
+2. **If Linear issue ID provided** (per `.claude/rules/linear.md` for MCP conventions):
    - Fetch issue to find linked PR:
      ```
      mcp__linear__get_issue(id: "{issue_id}")
@@ -22,7 +22,7 @@ If no input provided, ask the user for PR number.
    - Look for PR link in attachments/links
    - If no PR found, ask user for PR number
 
-3. **Fetch PR details:**
+3. **Fetch PR details** (see `.claude/rules/github.md` for MCP usage):
    ```
    mcp__github__get_pull_request(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
@@ -77,6 +77,8 @@ Based on changed files, read relevant rule files:
 | Stories | `.claude/rules/storybook.md`, `.claude/rules/testing.md` |
 | Tokens/CSS | `.claude/rules/tokens.md` |
 | Figma-related | `.claude/rules/figma.md` |
+| PR/Commits | `.claude/rules/github.md` |
+| Linear integration | `.claude/rules/linear.md` |
 | Any code | Root `CLAUDE.md` for general conventions |
 
 ### 3.2 Review Checklist
@@ -165,7 +167,7 @@ If Linear ticket available:
 
 ## Phase 5: Post Review
 
-1. **Create GitHub review:**
+1. **Create GitHub review** (see `.claude/rules/github.md` for review verdicts):
 
    ```
    mcp__github__create_pull_request_review(
@@ -218,11 +220,11 @@ If Linear ticket available:
    *Review performed against: `.claude/rules/components.md`, `.claude/rules/testing.md`, etc.*
    ```
 
-3. **If Linear ticket linked, add comment:**
+3. **If Linear ticket linked, add comment** (use emoji conventions from `.claude/rules/linear.md`):
    ```
    mcp__linear__create_comment(
      issueId: "{issue_id}",
-     body: "🤖 **PR Review Complete**\n\nVerdict: {verdict}\n\nSee PR for details: {pr_url}"
+     body: "📋 **PR Review Complete**\n\nVerdict: {verdict}\n\nSee PR for details: {pr_url}"
    )
    ```
 

@@ -23,9 +23,9 @@ If **Continuous** mode selected, only stop if critical errors occur, user input 
 
 ### Phase 1: Read Linear Issue
 
-1. **Fetch issue details** using Linear MCP:
+1. **Fetch issue details** using Linear MCP (per `.claude/rules/linear.md`):
    ```
-   mcp__linear__get_issue(id: "{issue_id}")
+   mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
    ```
 
 2. **Extract from description:**
@@ -44,12 +44,12 @@ If **Continuous** mode selected, only stop if critical errors occur, user input 
    git checkout -b {branchName}
    ```
 
-2. **Update Linear status** to "In Progress":
+2. **Update Linear status** to "In Progress" (see `.claude/rules/linear.md` for status flow):
    ```
    mcp__linear__update_issue(id: "{issue_id}", state: "In Progress")
    ```
 
-3. **Add comment** to Linear issue:
+3. **Add comment** to Linear issue (use emoji conventions from `.claude/rules/linear.md`):
    ```
    mcp__linear__create_comment(issueId: "{issue_id}", body: "🤖 Starting component implementation...")
    ```
@@ -58,7 +58,7 @@ If **Continuous** mode selected, only stop if critical errors occur, user input 
 
 Execute the `/component` workflow with extracted details:
 
-1. **Analyze Figma designs** (if URLs provided):
+1. **Analyze Figma designs** (if URLs provided, see `.claude/rules/figma.md` for token mapping):
    - Use `mcp__figma__get_design_context` for each URL
    - Use `mcp__figma__get_variable_defs` for token mappings
    - Use `mcp__figma__get_screenshot` for visual reference
@@ -91,6 +91,8 @@ Execute the `/component` workflow with extracted details:
 
 ### Phase 4: Create PR
 
+Follow conventions in `.claude/rules/github.md` for PR and commit format.
+
 1. **Commit changes:**
    ```bash
    git add .
@@ -102,7 +104,7 @@ Execute the `/component` workflow with extracted details:
 
    Closes {issue_id}
 
-   🤖 Generated with Claude Code"
+   Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
    ```
 
 2. **Push branch:**
@@ -110,48 +112,11 @@ Execute the `/component` workflow with extracted details:
    git push -u origin {branchName}
    ```
 
-3. **Create PR** via GitHub MCP:
-   ```
-   mcp__github__create_pull_request(
-     owner: "INNOVATIVEGAMER",
-     repo: "ds",
-     title: "feat(react): add {ComponentName} component",
-     head: "{branchName}",
-     base: "main",
-     body: "## Summary
-     - Adds `{ComponentName}` component to @nexus/react
-     - Implements all variants from Figma design
-     - Includes Storybook stories with interaction tests
-
-     ## Linear Issue
-     Closes {issue_id}
-
-     ## Figma
-     {figma_urls}
-
-     ## Test Plan
-     - [ ] Visual review in Storybook
-     - [ ] Verify Figma parity
-     - [ ] All tests passing
-
-     🤖 Generated with Claude Code"
-   )
-   ```
-
-4. **Update Linear status** to "In Review":
-   ```
-   mcp__linear__update_issue(id: "{issue_id}", state: "In Review")
-   ```
-
-5. **Add PR link** to Linear issue:
-   ```
-   mcp__linear__create_comment(issueId: "{issue_id}", body: "🔗 PR created: {pr_url}")
-   ```
-
-   Or add as link attachment:
-   ```
-   mcp__linear__update_issue(id: "{issue_id}", links: [{url: "{pr_url}", title: "GitHub PR"}])
-   ```
+3. **Create PR** using format from `.claude/rules/github.md`:
+   - Title: `feat(react): add {ComponentName} component [{issue_id}]`
+   - Body: Use component PR template from rules (includes Figma section)
+   - MUST include `[{issue_id}]` in title for Linear auto-linking
+   - MUST include `Closes {issue_id}` in body for auto-done on merge
 
 ### Phase 5: Code Review (Unbiased)
 
