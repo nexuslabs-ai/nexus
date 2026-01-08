@@ -122,6 +122,8 @@ Follow conventions in `.claude/rules/github.md` for PR and commit format.
 
 **IMPORTANT:** Review as if this code was written by someone else. Be critical and thorough.
 
+See `.claude/rules/github.md` for review verdicts and MCP usage.
+
 1. **Get PR files and read actual code:**
    ```
    mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
