@@ -385,7 +385,11 @@ function generateNexusCSS(lightTokens, darkTokens, primitiveTokens, primitiveMap
   if (lightTokens.length > 0 || shadowCSS || radiusTokens.length > 0) {
     css += `/* ===== SEMANTIC TOKENS (Light) ===== */\n`;
     css += `@theme {\n`;
-    css += `  --*: initial;\n\n`;
+    css += `  /* Reset default Tailwind namespaces to enforce semantic tokens only */\n`;
+    css += `  --color-*: initial;\n`;
+    css += `  --spacing-*: initial;\n`;
+    css += `  --radius-*: initial;\n`;
+    css += `  --shadow-*: initial;\n\n`;
 
     for (const token of lightTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;

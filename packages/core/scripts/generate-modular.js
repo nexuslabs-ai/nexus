@@ -590,6 +590,12 @@ function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  /* Reset default Tailwind namespaces to enforce semantic tokens only */
+  --color-*: initial;
+  --spacing-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
 `;
 
   // Collect all color tokens from base and brands (with resolved default values)

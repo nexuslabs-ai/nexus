@@ -20,6 +20,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  /* Reset default Tailwind namespaces to enforce semantic tokens only */
+  --color-*: initial;
+  --spacing-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
   /* Semantic color tokens - defaults, overridden by theme CSS */
   --color-background: #f8fafc;
   --color-foreground: #0f172a;
