@@ -88,6 +88,66 @@ export { Component, componentVariants };
 | Export variants function | `export { Button, buttonVariants }` |
 | Use `cn()` for classes | `cn(variants({ variant, size, className }))` |
 
+## Icons
+
+Uses **Tabler Icons** (`@tabler/icons-react`) as the default icon library.
+
+### Internal vs External Icons
+
+| Type | Description | Source |
+|------|-------------|--------|
+| **Internal** | Icons hardcoded by DS (loader, chevrons, check, close, alerts) | `@/lib/icons` barrel |
+| **External** | User-facing icons passed via props | Consumers import directly |
+
+### Internal Icons Barrel
+
+Components import internal icons from `src/lib/icons.ts`:
+
+```tsx
+import { IconLoader2 } from '@/lib/icons';
+```
+
+Available internal icons:
+
+| Category | Icons |
+|----------|-------|
+| Loading | `IconLoader2` |
+| Navigation | `IconChevronDown`, `IconChevronLeft`, `IconChevronRight`, `IconChevronUp` |
+| Actions | `IconCheck`, `IconX` |
+| Alerts | `IconAlertCircle`, `IconAlertTriangle`, `IconCircleCheck`, `IconInfoCircle` |
+| Common UI | `IconSearch`, `IconEye`, `IconEyeOff` |
+
+### Using Icons in Components
+
+```tsx
+// Internal icon (from barrel)
+import { IconLoader2 } from '@/lib/icons';
+
+<IconLoader2 className="nx:animate-spin" aria-hidden="true" />
+
+// External icon (consumer provides)
+interface ButtonProps {
+  icon?: React.ReactNode;
+}
+```
+
+### Stories with Icons
+
+Import directly from `@tabler/icons-react` in stories:
+
+```tsx
+import { IconRocket, IconStar } from '@tabler/icons-react';
+
+export const WithIcon: Story = {
+  render: () => (
+    <Button>
+      <IconRocket />
+      Launch
+    </Button>
+  ),
+};
+```
+
 ## Testing (Story-First)
 
 Components are tested via Storybook play functions. Import from `storybook/test`:

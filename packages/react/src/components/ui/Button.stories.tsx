@@ -1,3 +1,4 @@
+import { IconRocket, IconStar } from '@tabler/icons-react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
@@ -120,7 +121,7 @@ export const Large: Story = {
 export const IconSize: Story = {
   args: {
     size: 'icon',
-    children: '★',
+    children: <IconStar />,
     'aria-label': 'Star',
   },
 };
@@ -410,7 +411,7 @@ export const LongContent: Story = {
 export const WithIcon: Story = {
   render: (args) => (
     <Button {...args}>
-      <span data-testid="icon">🚀</span>
+      <IconRocket data-testid="icon" />
       Launch
     </Button>
   ),
@@ -451,7 +452,7 @@ export const AllVariants: Story = {
           <Button size="default">Default</Button>
           <Button size="lg">Large</Button>
           <Button size="icon" aria-label="Icon">
-            ★
+            <IconStar />
           </Button>
         </div>
       </div>

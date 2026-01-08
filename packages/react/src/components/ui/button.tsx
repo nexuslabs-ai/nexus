@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { IconLoader2 } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -92,8 +93,7 @@ function Button({
       {loading ? (
         <>
           {children}
-          {/* TODO: Replace with proper loading icon from design system */}
-          <span aria-hidden="true">...</span>
+          <IconLoader2 className="nx:animate-spin" aria-hidden="true" />
         </>
       ) : (
         children
