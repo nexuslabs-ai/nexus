@@ -25,4 +25,4 @@ export { IconCheck, IconX } from '@tabler/icons-react';
 export { IconAlertCircle, IconAlertTriangle, IconCircleCheck, IconInfoCircle } from '@tabler/icons-react';
 
 // Common UI
-export { IconSearch, IconEye, IconEyeOff } from '@tabler/icons-react';
+export { IconEye, IconEyeOff,IconSearch } from '@tabler/icons-react';
