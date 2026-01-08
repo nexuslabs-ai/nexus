@@ -1,5 +1,5 @@
-import { IconRocket, IconStar } from '@tabler/icons-react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { themeOnlyModes } from '@/storybook/modes';
