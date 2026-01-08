@@ -194,6 +194,107 @@ Returns component variant structure. Check:
 - Frame names use `prop=value` format
 - All expected variants are present
 
+## Compound Component Frame Naming
+
+For shadcn/Radix compound components, Figma frame names **must match** the code export names. This ensures seamless Figma-to-code conversion.
+
+### Naming Convention
+
+```
+{ComponentName}{PartName}
+```
+
+- **PascalCase** for all frame names
+- **No spaces or separators** between component and part name
+- Frame name should exactly match the React export
+
+### Common Compound Components
+
+| Component | Figma Frame | Code Export | data-slot |
+|-----------|-------------|-------------|-----------|
+| **Accordion** | | | |
+| | `Accordion` | `Accordion` | `accordion` |
+| | `AccordionItem` | `AccordionItem` | `accordion-item` |
+| | `AccordionTrigger` | `AccordionTrigger` | `accordion-trigger` |
+| | `AccordionContent` | `AccordionContent` | `accordion-content` |
+| **Dialog** | | | |
+| | `Dialog` | `Dialog` | `dialog` |
+| | `DialogTrigger` | `DialogTrigger` | `dialog-trigger` |
+| | `DialogContent` | `DialogContent` | `dialog-content` |
+| | `DialogHeader` | `DialogHeader` | `dialog-header` |
+| | `DialogTitle` | `DialogTitle` | `dialog-title` |
+| | `DialogDescription` | `DialogDescription` | `dialog-description` |
+| | `DialogFooter` | `DialogFooter` | `dialog-footer` |
+| | `DialogClose` | `DialogClose` | `dialog-close` |
+| **Tabs** | | | |
+| | `Tabs` | `Tabs` | `tabs` |
+| | `TabsList` | `TabsList` | `tabs-list` |
+| | `TabsTrigger` | `TabsTrigger` | `tabs-trigger` |
+| | `TabsContent` | `TabsContent` | `tabs-content` |
+| **Select** | | | |
+| | `Select` | `Select` | `select` |
+| | `SelectTrigger` | `SelectTrigger` | `select-trigger` |
+| | `SelectContent` | `SelectContent` | `select-content` |
+| | `SelectItem` | `SelectItem` | `select-item` |
+| | `SelectSeparator` | `SelectSeparator` | `select-separator` |
+| **DropdownMenu** | | | |
+| | `DropdownMenu` | `DropdownMenu` | `dropdown-menu` |
+| | `DropdownMenuTrigger` | `DropdownMenuTrigger` | `dropdown-menu-trigger` |
+| | `DropdownMenuContent` | `DropdownMenuContent` | `dropdown-menu-content` |
+| | `DropdownMenuItem` | `DropdownMenuItem` | `dropdown-menu-item` |
+| | `DropdownMenuSeparator` | `DropdownMenuSeparator` | `dropdown-menu-separator` |
+
+### Frame Naming Anti-Patterns
+
+| ❌ Incorrect | ✅ Correct | Why |
+|--------------|------------|-----|
+| `Trigger` | `AccordionTrigger` | Missing component prefix |
+| `Accordion Trigger` | `AccordionTrigger` | No spaces allowed |
+| `accordion-trigger` | `AccordionTrigger` | Must be PascalCase |
+| `Close Button` | `DialogClose` | Use shadcn part name |
+| `Content Area` | `DialogContent` | Use exact shadcn name |
+| `Item` | `AccordionItem` | Missing component prefix |
+
+### Figma Layer Hierarchy
+
+Figma auto layout hierarchy should mirror React composition:
+
+```
+Accordion (frame)
+├── AccordionItem (frame)
+│   ├── AccordionTrigger (frame)
+│   │   ├── Text
+│   │   └── ChevronIcon
+│   └── AccordionContent (frame)
+│       └── Content text/elements
+```
+
+This maps directly to React:
+
+```tsx
+<Accordion>
+  <AccordionItem>
+    <AccordionTrigger>
+      Text
+      <ChevronIcon />
+    </AccordionTrigger>
+    <AccordionContent>
+      Content text/elements
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+### Icon Instance Naming
+
+Icon instances in Figma should use PascalCase matching code imports:
+
+| ❌ Incorrect | ✅ Correct | Code Import |
+|--------------|------------|-------------|
+| `chevron-down` | `IconChevronDown` | `import { IconChevronDown }` |
+| `close` | `IconX` | `import { IconX }` |
+| `search icon` | `IconSearch` | `import { IconSearch }` |
+
 ## Do Not
 
 - Use verbose size names (`Small` instead of `sm`)
@@ -201,6 +302,8 @@ Returns component variant structure. Check:
 - Use `State=Image/Fallback` pattern (use `hasImage` boolean)
 - Reference primitive tokens directly in Figma (use semantic names)
 - Mix token systems (Figma spacing + hardcoded px values)
+- Use generic frame names without component prefix (`Trigger` instead of `AccordionTrigger`)
+- Use spaces or kebab-case in frame names (use PascalCase)
 
 ## Checklist Before Implementation
 
@@ -210,3 +313,6 @@ Returns component variant structure. Check:
 - [ ] Radius uses named tokens (`md`, `lg`, `2xl`, `full`)
 - [ ] Colors reference semantic tokens
 - [ ] Typography uses named styles (`body/small`, etc.)
+- [ ] Compound component frames use PascalCase with component prefix
+- [ ] Frame hierarchy mirrors React composition structure
+- [ ] Icon instances use PascalCase matching code imports
