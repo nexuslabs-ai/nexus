@@ -111,10 +111,12 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 
 | Command | Purpose |
 |---------|---------|
+| `/linear` | Implement any Linear ticket (read → context → plan → implement → PR) |
+| `/linear-component` | Figma component workflow: Linear ticket → Figma analysis → Component → PR |
 | `/pr` | Pre-PR checklist (typecheck, lint, test, build) |
+| `/pr-review` | Unbiased PR code review (reads PR → reviews against conventions → posts feedback) |
 | `/test` | Run tests with options |
 | `/component` | Scaffold new component with all files |
-| `/linear-component` | Full workflow: Linear ticket → Component → PR (uses Linear + GitHub MCP) |
 | `/update-docs` | Update documentation after changes |
 | `/skill` | Create or update skills (explore package → define workflow) |
 | `/agent` | Create or update agents (explore scope → define analysis) |
