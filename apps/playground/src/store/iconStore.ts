@@ -81,4 +81,4 @@ export const iconNames = getAllIconNames();
 export { iconLibraryMeta };
 
 // Re-export types for convenience
-export type { IconComponent,IconLibrary, IconName };
+export type { IconComponent, IconLibrary, IconName };

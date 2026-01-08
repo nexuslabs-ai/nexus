@@ -13,9 +13,13 @@ function Section({
   return (
     <section className="nx:bg-background nx:rounded-xl nx:border nx:border-border-default nx:overflow-hidden">
       <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-muted/30">
-        <h2 className="nx:text-base nx:font-semibold nx:text-foreground">{title}</h2>
+        <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
+          {title}
+        </h2>
         {description && (
-          <p className="nx:text-sm nx:text-muted-foreground nx:mt-0.5">{description}</p>
+          <p className="nx:text-sm nx:text-muted-foreground nx:mt-0.5">
+            {description}
+          </p>
         )}
       </div>
       <div className="nx:p-5">{children}</div>
@@ -102,12 +106,26 @@ export function ComponentShowcase() {
         </Section>
 
         {/* Colors Section */}
-        <Section title="Semantic Colors" description="Brand and status color palette">
+        <Section
+          title="Semantic Colors"
+          description="Brand and status color palette"
+        >
           <div className="nx:grid nx:grid-cols-2 nx:gap-4 nx:sm:grid-cols-3 nx:md:grid-cols-5">
-            <ColorSwatch name="Background" className="nx:bg-background" border />
-            <ColorSwatch name="Foreground" className="nx:bg-foreground" textDark />
+            <ColorSwatch
+              name="Background"
+              className="nx:bg-background"
+              border
+            />
+            <ColorSwatch
+              name="Foreground"
+              className="nx:bg-foreground"
+              textDark
+            />
             <ColorSwatch name="Primary" className="nx:bg-primary-background" />
-            <ColorSwatch name="Secondary" className="nx:bg-secondary-background" />
+            <ColorSwatch
+              name="Secondary"
+              className="nx:bg-secondary-background"
+            />
             <ColorSwatch name="Muted" className="nx:bg-muted" />
             <ColorSwatch name="Accent" className="nx:bg-accent" />
             <ColorSwatch name="Success" className="nx:bg-success-background" />
@@ -189,7 +207,10 @@ export function ComponentShowcase() {
         </Section>
 
         {/* Cards Section */}
-        <Section title="Cards & Containers" description="Surface styles and containers">
+        <Section
+          title="Cards & Containers"
+          description="Surface styles and containers"
+        >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
             <div className="nx:border nx:border-border-default nx:bg-container nx:rounded-lg nx:p-4">
               <h3 className="nx:font-medium">Container</h3>
@@ -199,7 +220,9 @@ export function ComponentShowcase() {
             </div>
             <div className="nx:border nx:border-border-default nx:bg-popover nx:rounded-lg nx:p-4">
               <h3 className="nx:font-medium">Popover</h3>
-              <p className="nx:text-muted-foreground nx:mt-1 nx:text-sm">Popover background color</p>
+              <p className="nx:text-muted-foreground nx:mt-1 nx:text-sm">
+                Popover background color
+              </p>
             </div>
             <div className="nx:bg-muted nx:rounded-lg nx:p-4">
               <h3 className="nx:text-muted-foreground nx:font-medium">Muted</h3>
@@ -208,7 +231,9 @@ export function ComponentShowcase() {
               </p>
             </div>
             <div className="nx:bg-accent nx:rounded-lg nx:p-4">
-              <h3 className="nx:text-accent-foreground nx:font-medium">Accent</h3>
+              <h3 className="nx:text-accent-foreground nx:font-medium">
+                Accent
+              </h3>
               <p className="nx:text-accent-foreground nx:mt-1 nx:text-sm">
                 Accent background with accent foreground
               </p>
@@ -258,7 +283,10 @@ export function ComponentShowcase() {
         </Section>
 
         {/* Status Colors Section */}
-        <Section title="Status Messages" description="Feedback and alert styles">
+        <Section
+          title="Status Messages"
+          description="Feedback and alert styles"
+        >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
             <div className="nx:bg-success-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-success-background" />
@@ -268,15 +296,21 @@ export function ComponentShowcase() {
             </div>
             <div className="nx:bg-error-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-error-background" />
-              <span className="nx:text-error-text nx:text-sm nx:font-medium">Error message</span>
+              <span className="nx:text-error-text nx:text-sm nx:font-medium">
+                Error message
+              </span>
             </div>
             <div className="nx:bg-warning-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-warning-background" />
-              <span className="nx:text-warning-text nx:text-sm nx:font-medium">Warning message</span>
+              <span className="nx:text-warning-text nx:text-sm nx:font-medium">
+                Warning message
+              </span>
             </div>
             <div className="nx:bg-information-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-information-background" />
-              <span className="nx:text-information-text nx:text-sm nx:font-medium">Info message</span>
+              <span className="nx:text-information-text nx:text-sm nx:font-medium">
+                Info message
+              </span>
             </div>
           </div>
         </Section>
@@ -311,12 +345,20 @@ function ColorSwatch({
   );
 }
 
-function ShadowBox({ name, shadowClass }: { name: string; shadowClass: string }) {
+function ShadowBox({
+  name,
+  shadowClass,
+}: {
+  name: string;
+  shadowClass: string;
+}) {
   return (
     <div
       className={`nx:bg-background nx:flex nx:h-16 nx:w-full nx:items-center nx:justify-center nx:rounded-lg ${shadowClass}`}
     >
-      <span className="nx:text-muted-foreground nx:text-xs nx:font-medium">{name}</span>
+      <span className="nx:text-muted-foreground nx:text-xs nx:font-medium">
+        {name}
+      </span>
     </div>
   );
 }
@@ -337,7 +379,9 @@ function SpacingBar({ name, className }: { name: string; className: string }) {
       <span className="nx:text-muted-foreground nx:w-8 nx:text-xs nx:text-right nx:font-mono">
         {name}
       </span>
-      <div className={`nx:bg-primary-background nx:h-3 nx:rounded-sm ${className}`} />
+      <div
+        className={`nx:bg-primary-background nx:h-3 nx:rounded-sm ${className}`}
+      />
     </div>
   );
 }

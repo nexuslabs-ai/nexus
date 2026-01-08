@@ -91,58 +91,63 @@ export type IconName =
 /**
  * Icon component type (compatible with all three libraries)
  */
-export type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number | string }>;
+export type IconComponent = ComponentType<
+  SVGProps<SVGSVGElement> & { size?: number | string }
+>;
 
 /**
  * Icon registry mapping internal names to library-specific components
  */
-export const iconRegistry: Record<IconLibrary, Record<IconName, IconComponent>> = {
+export const iconRegistry: Record<
+  IconLibrary,
+  Record<IconName, IconComponent>
+> = {
   tabler: {
-    'loader': TablerLoader2,
+    loader: TablerLoader2,
     'chevron-down': TablerChevronDown,
     'chevron-left': TablerChevronLeft,
     'chevron-right': TablerChevronRight,
     'chevron-up': TablerChevronUp,
-    'check': TablerCheck,
-    'x': TablerX,
+    check: TablerCheck,
+    x: TablerX,
     'alert-circle': TablerAlertCircle,
     'alert-triangle': TablerAlertTriangle,
     'circle-check': TablerCircleCheck,
     'info-circle': TablerInfoCircle,
-    'search': TablerSearch,
-    'eye': TablerEye,
+    search: TablerSearch,
+    eye: TablerEye,
     'eye-off': TablerEyeOff,
   },
   lucide: {
-    'loader': LucideLoader2,
+    loader: LucideLoader2,
     'chevron-down': LucideChevronDown,
     'chevron-left': LucideChevronLeft,
     'chevron-right': LucideChevronRight,
     'chevron-up': LucideChevronUp,
-    'check': LucideCheck,
-    'x': LucideX,
+    check: LucideCheck,
+    x: LucideX,
     'alert-circle': LucideAlertCircle,
     'alert-triangle': LucideAlertTriangle,
     'circle-check': LucideCircleCheck,
     'info-circle': LucideInfoCircle,
-    'search': LucideSearch,
-    'eye': LucideEye,
+    search: LucideSearch,
+    eye: LucideEye,
     'eye-off': LucideEyeOff,
   },
   phosphor: {
-    'loader': PhosphorLoader2,
+    loader: PhosphorLoader2,
     'chevron-down': PhosphorChevronDown,
     'chevron-left': PhosphorChevronLeft,
     'chevron-right': PhosphorChevronRight,
     'chevron-up': PhosphorChevronUp,
-    'check': PhosphorCheck,
-    'x': PhosphorX,
+    check: PhosphorCheck,
+    x: PhosphorX,
     'alert-circle': PhosphorAlertCircle,
     'alert-triangle': PhosphorAlertTriangle,
     'circle-check': PhosphorCircleCheck,
     'info-circle': PhosphorInfoCircle,
-    'search': PhosphorSearch,
-    'eye': PhosphorEye,
+    search: PhosphorSearch,
+    eye: PhosphorEye,
     'eye-off': PhosphorEyeOff,
   },
 };
@@ -150,7 +155,10 @@ export const iconRegistry: Record<IconLibrary, Record<IconName, IconComponent>> 
 /**
  * Library metadata for UI display
  */
-export const iconLibraryMeta: Record<IconLibrary, { label: string; iconCount: string; url: string }> = {
+export const iconLibraryMeta: Record<
+  IconLibrary,
+  { label: string; iconCount: string; url: string }
+> = {
   tabler: {
     label: 'Tabler',
     iconCount: '5,700+',

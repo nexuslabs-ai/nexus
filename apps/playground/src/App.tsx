@@ -15,7 +15,9 @@ export default function App() {
             <div className="nx:px-6 nx:py-4">
               <div className="nx:flex nx:items-center nx:gap-3">
                 <div className="nx:w-8 nx:h-8 nx:rounded-lg nx:bg-primary-background nx:flex nx:items-center nx:justify-center">
-                  <span className="nx:text-primary-foreground nx:font-bold nx:text-sm">N</span>
+                  <span className="nx:text-primary-foreground nx:font-bold nx:text-sm">
+                    N
+                  </span>
                 </div>
                 <div>
                   <h1 className="nx:text-lg nx:font-semibold nx:text-foreground">
