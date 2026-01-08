@@ -1,5 +1,9 @@
 import type { ThemeConfig } from '../hooks/useTheme';
-import { type IconLibrary,iconLibraryMeta, useIconStore } from '../store/iconStore';
+import {
+  type IconLibrary,
+  iconLibraryMeta,
+  useIconStore,
+} from '../store/iconStore';
 
 import { PlaygroundIcon } from './PlaygroundIcon';
 
@@ -40,7 +44,13 @@ type ThemeSwitcherProps = {
 };
 
 // Reusable components
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="nx:bg-background nx:rounded-lg nx:border nx:border-border-default nx:p-3">
       <h3 className="nx:text-xs nx:font-semibold nx:uppercase nx:tracking-wide nx:text-muted-foreground nx:mb-3">
@@ -195,7 +205,9 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
     <div className="nx:h-full nx:flex nx:flex-col nx:bg-muted/50">
       {/* Header */}
       <div className="nx:p-4 nx:border-b nx:border-border-default">
-        <h2 className="nx:text-base nx:font-semibold nx:text-foreground">Customize Theme</h2>
+        <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
+          Customize Theme
+        </h2>
         <p className="nx:text-xs nx:text-muted-foreground nx:mt-0.5">
           Adjust colors, tokens, and icons
         </p>
@@ -277,7 +289,10 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
         {/* Icons */}
         <Section title="Icons">
           <div className="nx:flex nx:items-center nx:justify-between">
-            <label htmlFor="icon-library-select" className="nx:text-sm nx:text-foreground">
+            <label
+              htmlFor="icon-library-select"
+              className="nx:text-sm nx:text-foreground"
+            >
               Library
             </label>
             <div className="nx:relative">

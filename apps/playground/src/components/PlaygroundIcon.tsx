@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react';
 
-import { type IconName,useIcon } from '../store/iconStore';
+import { type IconName, useIcon } from '../store/iconStore';
 
 /**
  * PlaygroundIcon props
@@ -24,10 +24,14 @@ interface PlaygroundIconProps extends SVGProps<SVGSVGElement> {
  * <PlaygroundIcon name="loader" className="nx:animate-spin" />
  * ```
  */
-export function PlaygroundIcon({ name, size = 24, ...props }: PlaygroundIconProps) {
+export function PlaygroundIcon({
+  name,
+  size = 24,
+  ...props
+}: PlaygroundIconProps) {
   const Icon = useIcon(name);
 
   return <Icon width={size} height={size} {...props} />;
 }
 
-export type { IconName,PlaygroundIconProps };
+export type { IconName, PlaygroundIconProps };

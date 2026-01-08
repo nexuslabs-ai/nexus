@@ -17,7 +17,9 @@ export function IconShowcase() {
       <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-muted/30">
         <div className="nx:flex nx:items-center nx:justify-between">
           <div>
-            <h2 className="nx:text-base nx:font-semibold nx:text-foreground">Icons</h2>
+            <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
+              Icons
+            </h2>
             <p className="nx:text-sm nx:text-muted-foreground nx:mt-0.5">
               Internal DS icons from{' '}
               <a
@@ -42,7 +44,11 @@ export function IconShowcase() {
               key={name}
               className="nx:bg-muted/50 nx:flex nx:flex-col nx:items-center nx:gap-2 nx:rounded-lg nx:p-3 hover:nx:bg-muted nx:transition-colors nx:cursor-default"
             >
-              <PlaygroundIcon name={name} size={20} className="nx:text-foreground" />
+              <PlaygroundIcon
+                name={name}
+                size={20}
+                className="nx:text-foreground"
+              />
               <span className="nx:text-muted-foreground nx:text-[10px] nx:text-center nx:leading-tight">
                 {name}
               </span>
