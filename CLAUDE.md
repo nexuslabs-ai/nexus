@@ -105,6 +105,8 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | [.claude/rules/storybook.md](.claude/rules/storybook.md) | Story structure, required stories |
 | [.claude/rules/tokens.md](.claude/rules/tokens.md) | Token format, naming, workflow |
 | [.claude/rules/figma.md](.claude/rules/figma.md) | Figma-to-code parity, token mapping |
+| [.claude/rules/linear.md](.claude/rules/linear.md) | Linear integration, issue linking, status flow |
+| [.claude/rules/github.md](.claude/rules/github.md) | PR format, commit conventions, auto-linking |
 | [.claude/rules/skills-agents.md](.claude/rules/skills-agents.md) | Skill/agent structure and conventions |
 
 ## Slash Commands
@@ -113,10 +115,8 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 |---------|---------|
 | `/linear` | Implement any Linear ticket (read → context → plan → implement → PR) |
 | `/linear-component` | Figma component workflow: Linear ticket → Figma analysis → Component → PR |
-| `/pr` | Pre-PR checklist (typecheck, lint, test, build) |
 | `/pr-review` | Unbiased PR code review (reads PR → reviews against conventions → posts feedback) |
 | `/post-merge` | Post-merge cleanup (verify merged → update Linear → switch to main → delete branch) |
-| `/test` | Run tests with options |
 | `/component` | Scaffold new component with all files |
 | `/update-docs` | Update documentation after changes |
 | `/skill` | Create or update skills (explore package → define workflow) |

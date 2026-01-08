@@ -13,7 +13,7 @@ If no PR number provided, ask the user for it.
 
 ### Step 1: Verify PR is Merged
 
-1. **Fetch PR details** using GitHub MCP:
+1. **Fetch PR details** (see `.claude/rules/github.md` for MCP usage):
    ```
    mcp__github__get_pull_request(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
@@ -22,20 +22,21 @@ If no PR number provided, ask the user for it.
    - If `merged_at` is null → PR not merged, inform user and stop
    - If `merged_at` has value → Continue with cleanup
 
-3. **Extract Linear issue ID** from PR body:
-   - Look for patterns: `NEX-###`, `Closes NEX-###`, `Fixes NEX-###`
+3. **Extract Linear issue ID** using patterns from `.claude/rules/linear.md`:
+   - Check PR title and body for issue ID patterns
    - If not found and not provided, ask user
 
 ### Step 2: Update Linear Ticket
 
-1. **Update status to Done:**
+1. **Verify/ensure status is Done** (see `.claude/rules/linear.md` for auto-update behavior):
    ```
    mcp__linear__update_issue(id: "{issue_id}", state: "Done")
    ```
+   > This acts as a fallback - Linear may have auto-updated if PR had proper linking.
 
-2. **Get current issue details** to read existing description:
+2. **Get current issue details** to read existing description (per `.claude/rules/linear.md`):
    ```
-   mcp__linear__get_issue(id: "{issue_id}")
+   mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
    ```
 
 3. **Update description** to mark completed tasks:
@@ -46,7 +47,7 @@ If no PR number provided, ask the user for it.
      - Brief summary of what was implemented
      - Any deviations from original plan
 
-4. **Add completion comment:**
+4. **Add completion comment** (use emoji conventions from `.claude/rules/linear.md`):
    ```
    mcp__linear__create_comment(issueId: "{issue_id}", body: "✅ PR merged and ticket completed...")
    ```
@@ -88,7 +89,7 @@ Provide a summary table:
 | Task | Status |
 |------|--------|
 | PR Merged | ✅ Verified |
-| Linear Status | ✅ Done |
+| Linear Status | ✅ Done (auto/verified) |
 | Linear Description | ✅ Updated |
 | Switched to main | ✅ |
 | Pulled latest | ✅ |
