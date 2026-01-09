@@ -23,8 +23,8 @@ const badgeVariants = cva(
         light: '',
       },
       caps: {
-        true: 'nx:text-label-caps nx:uppercase',
-        false: 'nx:text-label-default',
+        true: 'text-label-caps nx:uppercase',
+        false: 'text-label-default',
       },
     },
     compoundVariants: [
