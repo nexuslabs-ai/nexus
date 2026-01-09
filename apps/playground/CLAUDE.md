@@ -129,7 +129,7 @@ The showcase demonstrates all token categories:
 
 | Section | Tokens Used |
 |---------|-------------|
-| Typography | `text-display-*`, `text-heading-*`, `text-body-*`, `text-label-*`, `text-code-*` |
+| Typography | `typography-display-*`, `typography-heading-*`, `typography-body-*`, `typography-label-*`, `typography-code-*` |
 | Semantic Colors | `bg-primary-*`, `bg-secondary-*`, `bg-error-*`, etc. |
 | Shadows | `shadow-2xs` to `shadow-2xl`, `shadow-inner`, `shadow-focus-default` |
 | Border Radius | `rounded-base`, `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`, `rounded-full` |
@@ -208,7 +208,7 @@ Edit [ComponentShowcase.tsx](src/components/ComponentShowcase.tsx) to add more c
 </button>
 
 // Use typography utilities
-<p className="nx:text-body-default">Body text</p>
+<p className="nx:typography-body-default">Body text</p>
 
 // Use shadow utilities
 <div className="nx:shadow-lg nx:rounded-lg nx:p-4">Card</div>
