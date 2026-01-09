@@ -105,6 +105,7 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | [.claude/rules/storybook.md](.claude/rules/storybook.md) | Story structure, required stories |
 | [.claude/rules/tokens.md](.claude/rules/tokens.md) | Token format, naming, workflow |
 | [.claude/rules/figma.md](.claude/rules/figma.md) | Figma-to-code parity, token mapping |
+| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences |
 | [.claude/rules/linear.md](.claude/rules/linear.md) | Linear integration, issue linking, status flow |
 | [.claude/rules/github.md](.claude/rules/github.md) | PR format, commit conventions, auto-linking |
 | [.claude/rules/skills-agents.md](.claude/rules/skills-agents.md) | Skill/agent structure and conventions |
