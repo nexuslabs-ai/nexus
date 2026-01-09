@@ -100,7 +100,7 @@ Each brand/status group has: `background`, `foreground`, `hover`, `active`, `dis
 - **Semantics**: Separate files for light and dark modes
   - `base-{palette}-light.json` → light mode values
   - `base-{palette}-dark.json` → dark mode values
-- CSS output: Light in `@theme inline`, dark in `.dark`
+- CSS output: Light in `@theme` block, dark in `.dark` selector
 
 ## Validation
 
@@ -181,6 +181,22 @@ Available options:
 | Primitive | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-size-4` |
 | Semantic | `--{category}-{path}` | `--color-background`, `--spacing-4` |
 | Tailwind utility | `nx:{utility}` | `nx:bg-primary`, `nx:p-4` |
+
+## Typography Utilities
+
+Typography composite tokens generate `@utility` classes with `typography-*` prefix:
+
+```css
+@utility typography-body-default {
+  font-family: var(--nx-typography-family-font-sans);
+  font-size: var(--nx-typography-size-base);
+  font-weight: var(--nx-typography-weight-normal);
+  line-height: var(--nx-typography-line-height-base);
+  letter-spacing: var(--nx-typography-letterspacing-normal);
+}
+```
+
+Usage: `nx:typography-body-default`, `nx:typography-heading-large`, etc.
 
 ## Do Not
 
