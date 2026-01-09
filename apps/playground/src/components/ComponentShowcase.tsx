@@ -40,8 +40,8 @@ export function ComponentShowcase() {
                 Display
               </span>
               <div className="nx:space-y-1">
-                <p className="nx:text-display-large">Display Large</p>
-                <p className="nx:text-display-medium">Display Medium</p>
+                <p className="nx:typography-display-large">Display Large</p>
+                <p className="nx:typography-display-medium">Display Medium</p>
               </div>
             </div>
 
@@ -51,9 +51,9 @@ export function ComponentShowcase() {
                 Headings
               </span>
               <div className="nx:space-y-1">
-                <p className="nx:text-heading-xlarge">Heading XLarge</p>
-                <p className="nx:text-heading-large">Heading Large</p>
-                <p className="nx:text-heading-medium">Heading Medium</p>
+                <p className="nx:typography-heading-xlarge">Heading XLarge</p>
+                <p className="nx:typography-heading-large">Heading Large</p>
+                <p className="nx:typography-heading-medium">Heading Medium</p>
               </div>
             </div>
 
@@ -63,13 +63,13 @@ export function ComponentShowcase() {
                 Body
               </span>
               <div className="nx:space-y-2">
-                <p className="nx:text-body-large">
+                <p className="nx:typography-body-large">
                   Body Large - The quick brown fox jumps over the lazy dog.
                 </p>
-                <p className="nx:text-body-default">
+                <p className="nx:typography-body-default">
                   Body Default - The quick brown fox jumps over the lazy dog.
                 </p>
-                <p className="nx:text-body-small">
+                <p className="nx:typography-body-small">
                   Body Small - The quick brown fox jumps over the lazy dog.
                 </p>
               </div>
@@ -82,10 +82,10 @@ export function ComponentShowcase() {
                   Labels
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
-                  <span className="nx:text-label-large">Label Large</span>
-                  <span className="nx:text-label-default">Label Default</span>
-                  <span className="nx:text-label-small">Label Small</span>
-                  <span className="nx:text-label-caps">Label Caps</span>
+                  <span className="nx:typography-label-large">Label Large</span>
+                  <span className="nx:typography-label-default">Label Default</span>
+                  <span className="nx:typography-label-small">Label Small</span>
+                  <span className="nx:typography-label-caps">Label Caps</span>
                 </div>
               </div>
               <div className="nx:space-y-2">
@@ -93,10 +93,10 @@ export function ComponentShowcase() {
                   Code
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
-                  <code className="nx:text-code-block nx:bg-muted nx:px-2 nx:py-1 nx:rounded">
+                  <code className="nx:typography-code-block nx:bg-muted nx:px-2 nx:py-1 nx:rounded">
                     const x = 42;
                   </code>
-                  <code className="nx:text-code-inline nx:bg-muted nx:px-1.5 nx:py-0.5 nx:rounded">
+                  <code className="nx:typography-code-inline nx:bg-muted nx:px-1.5 nx:py-0.5 nx:rounded">
                     inline
                   </code>
                 </div>
