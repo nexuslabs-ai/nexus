@@ -130,13 +130,13 @@ See `.claude/rules/github.md` for review verdicts and MCP usage.
    ```
    Then **read the full content** of each created file using the Read tool.
 
-2. **Architecture Review** (check against `.claude/rules/components.md`):
+2. **Architecture Review** (check against `.claude/rules/components.md` and `.claude/rules/shadcn-divergences.md`):
    - [ ] Uses CVA for variants (not conditional classes)
    - [ ] Proper props interface with `VariantProps<typeof variants>`
    - [ ] Uses Radix primitives where applicable (not custom implementations)
    - [ ] Follows compound component pattern if needed (e.g., Avatar + AvatarImage + AvatarFallback)
    - [ ] No unnecessary abstractions or over-engineering
-   - [ ] Matches shadcn/ui architecture patterns
+   - [ ] Matches shadcn/ui architecture patterns (with Nexus divergences applied)
 
 3. **Code Quality Review:**
    - [ ] All Tailwind classes have `nx:` prefix (scan for any missing)

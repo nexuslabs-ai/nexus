@@ -107,6 +107,7 @@ Read these files to understand current patterns dynamically:
 | `packages/tailwind/variables.css` | Primitive token names (`--nx-*` prefix) |
 | `.claude/rules/figma.md` | Token mapping conventions, compound component naming |
 | `.claude/rules/components.md` | Component patterns and requirements |
+| `.claude/rules/shadcn-divergences.md` | Nexus vs shadcn differences (token naming, prefix, etc.) |
 
 From button.tsx, identify:
 - How variants are structured in CVA

@@ -94,11 +94,14 @@ ALL Tailwind classes must use `nx:` prefix, including modifiers:
 ```
 
 **Common Token Mappings (with nx: prefix):**
+
+See `.claude/rules/shadcn-divergences.md` for complete mapping. Key differences:
+
 | shadcn | Nexus |
 |--------|-------|
-| `bg-primary` | `nx:bg-primary` (or `nx:bg-primary-background` for explicit) |
+| `bg-primary` | `nx:bg-primary-background` |
 | `bg-destructive` | `nx:bg-error-background` |
-| `text-destructive` | `nx:text-error-text` |
+| `text-destructive` | `nx:text-error-foreground` |
 | `border-input` | `nx:border-border-default` |
 | `ring-ring` | `nx:ring-primary-background/50` |
 
