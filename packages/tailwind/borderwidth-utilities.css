@@ -1,0 +1,12 @@
+/* Border Width Utilities */
+
+@utility border-default {
+  border-style: var(--tw-border-style, solid);
+  border-width: var(--nx-borderwidth-default);
+}
+
+@utility border-thick {
+  border-style: var(--tw-border-style, solid);
+  border-width: var(--nx-borderwidth-thick);
+}
+

@@ -9,12 +9,13 @@
 /* Google Fonts - auto-generated from typography tokens */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-@import "tailwindcss" prefix(nx);
-@import "./variables.css";
+@import 'tailwindcss' prefix(nx);
+@import './variables.css';
+@import './typography-utilities.css';
+@import './borderwidth-utilities.css';
 
 @custom-variant dark (&:is(.dark *));
 
-/* ===== SEMANTIC TOKENS (Light) ===== */
 @theme {
   /* Reset default Tailwind namespaces to enforce semantic tokens only */
   --color-*: initial;
@@ -22,6 +23,7 @@
   --radius-*: initial;
   --shadow-*: initial;
 
+  /* Semantic color tokens */
   --color-background: var(--nx-color-slate-50);
   --color-foreground: var(--nx-color-slate-900);
   --color-container: var(--nx-color-white);
@@ -81,6 +83,8 @@
   --color-secondary-disabled: var(--nx-color-neutral-50);
   --color-secondary-text: var(--nx-color-neutral-600);
   --color-secondary-surface: var(--nx-color-neutral-100);
+
+  /* Spacing tokens */
   --spacing-0: var(--nx-size-0);
   --spacing-0_5: var(--nx-size-0_5);
   --spacing-1: var(--nx-size-1);
@@ -116,7 +120,7 @@
   --spacing-80: var(--nx-size-80);
   --spacing-96: var(--nx-size-96);
 
-  /* Radius */
+  /* Radius tokens */
   --radius-base: var(--nx-radius-base);
   --radius-sm: var(--nx-radius-sm);
   --radius-md: var(--nx-radius-md);
@@ -126,21 +130,21 @@
   --radius-3xl: var(--nx-radius-3xl);
   --radius-full: var(--nx-radius-full);
 
-  /* Border Width */
+  /* Border width tokens */
   --border-default: var(--nx-borderwidth-default);
   --border-thick: var(--nx-borderwidth-thick);
 
-  /* Shadows */
-  --shadow-2xs: var(--shadow-2xs-layer-1-x) var(--shadow-2xs-layer-1-y) var(--shadow-2xs-layer-1-blur) var(--shadow-2xs-layer-1-spread) var(--shadow-2xs-layer-1-color);
-  --shadow-xs: var(--shadow-xs-layer-1-x) var(--shadow-xs-layer-1-y) var(--shadow-xs-layer-1-blur) var(--shadow-2xs-layer-1-spread) var(--shadow-xs-layer-1-color);
-  --shadow-sm: var(--shadow-sm-layer-2-x) var(--shadow-sm-layer-2-y) var(--shadow-sm-layer-2-blur) var(--shadow-sm-layer-2-spread) var(--shadow-sm-layer-2-color), var(--shadow-sm-layer-1-x) var(--shadow-sm-layer-1-y) var(--shadow-sm-layer-1-blur) var(--shadow-sm-layer-1-spread) var(--shadow-sm-layer-1-color);
-  --shadow-base: var(--shadow-base-layer-2-x) var(--shadow-base-layer-2-y) var(--shadow-base-layer-2-blur) var(--shadow-base-layer-2-spread) var(--shadow-base-layer-2-color), var(--shadow-base-layer-1-x) var(--shadow-base-layer-1-y) var(--shadow-base-layer-1-blur) var(--shadow-base-layer-1-spread) var(--shadow-base-layer-1-color);
-  --shadow-lg: var(--shadow-lg-layer-2-x) var(--shadow-lg-layer-2-y) var(--shadow-lg-layer-2-blur) var(--shadow-lg-layer-2-spread) var(--shadow-lg-layer-2-color), var(--shadow-lg-layer-1-x) var(--shadow-lg-layer-1-y) var(--shadow-lg-layer-1-blur) var(--shadow-lg-layer-1-spread) var(--shadow-lg-layer-1-color);
-  --shadow-xl: var(--shadow-xl-layer-2-x) var(--shadow-xl-layer-2-y) var(--shadow-xl-layer-2-blur) var(--shadow-xl-layer-2-spread) var(--shadow-xl-layer-2-color), var(--shadow-xl-layer-1-x) var(--shadow-xl-layer-1-y) var(--shadow-xl-layer-1-blur) var(--shadow-xl-layer-1-spread) var(--shadow-xl-layer-1-color);
-  --shadow-2xl: var(--shadow-2xl-layer-1-x) var(--shadow-2xl-layer-1-y) var(--shadow-2xl-layer-1-blur) var(--shadow-2xl-layer-1-spread) var(--shadow-2xl-layer-1-color);
-  --shadow-inner: inset var(--shadow-inner-layer-1-x) var(--shadow-inner-layer-1-y) var(--shadow-inner-layer-1-blur) var(--shadow-inner-layer-1-spread) var(--shadow-inner-layer-1-color);
-  --shadow-focus-default: var(--shadow-focus-default-x) var(--shadow-focus-default-y) var(--shadow-focus-default-blur) var(--shadow-focus-default-spread) var(--shadow-focus-default-color);
-  --shadow-focus-error: var(--shadow-focus-error-x) var(--shadow-focus-error-y) var(--shadow-focus-error-blur) var(--shadow-focus-error-spread) var(--shadow-focus-error-color);
+  /* Shadow tokens */
+  --shadow-2xs: var(--nx-shadow-2xs-layer-1-x) var(--nx-shadow-2xs-layer-1-y) var(--nx-shadow-2xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread) var(--nx-shadow-2xs-layer-1-color);
+  --shadow-xs: var(--nx-shadow-xs-layer-1-x) var(--nx-shadow-xs-layer-1-y) var(--nx-shadow-xs-layer-1-blur) var(--nx-shadow-xs-layer-1-spread) var(--nx-shadow-xs-layer-1-color);
+  --shadow-sm: var(--nx-shadow-sm-layer-2-x) var(--nx-shadow-sm-layer-2-y) var(--nx-shadow-sm-layer-2-blur) var(--nx-shadow-sm-layer-2-spread) var(--nx-shadow-sm-layer-2-color), var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y) var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread) var(--nx-shadow-sm-layer-1-color);
+  --shadow-base: var(--nx-shadow-base-layer-2-x) var(--nx-shadow-base-layer-2-y) var(--nx-shadow-base-layer-2-blur) var(--nx-shadow-base-layer-2-spread) var(--nx-shadow-base-layer-2-color), var(--nx-shadow-base-layer-1-x) var(--nx-shadow-base-layer-1-y) var(--nx-shadow-base-layer-1-blur) var(--nx-shadow-base-layer-1-spread) var(--nx-shadow-base-layer-1-color);
+  --shadow-lg: var(--nx-shadow-lg-layer-2-x) var(--nx-shadow-lg-layer-2-y) var(--nx-shadow-lg-layer-2-blur) var(--nx-shadow-lg-layer-2-spread) var(--nx-shadow-lg-layer-2-color), var(--nx-shadow-lg-layer-1-x) var(--nx-shadow-lg-layer-1-y) var(--nx-shadow-lg-layer-1-blur) var(--nx-shadow-lg-layer-1-spread) var(--nx-shadow-lg-layer-1-color);
+  --shadow-xl: var(--nx-shadow-xl-layer-2-x) var(--nx-shadow-xl-layer-2-y) var(--nx-shadow-xl-layer-2-blur) var(--nx-shadow-xl-layer-2-spread) var(--nx-shadow-xl-layer-2-color), var(--nx-shadow-xl-layer-1-x) var(--nx-shadow-xl-layer-1-y) var(--nx-shadow-xl-layer-1-blur) var(--nx-shadow-xl-layer-1-spread) var(--nx-shadow-xl-layer-1-color);
+  --shadow-2xl: var(--nx-shadow-2xl-layer-1-x) var(--nx-shadow-2xl-layer-1-y) var(--nx-shadow-2xl-layer-1-blur) var(--nx-shadow-2xl-layer-1-spread) var(--nx-shadow-2xl-layer-1-color);
+  --shadow-inner: inset var(--nx-shadow-inner-layer-1-x) var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur) var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
+  --shadow-focus-default: var(--nx-shadow-focus-default-x) var(--nx-shadow-focus-default-y) var(--nx-shadow-focus-default-blur) var(--nx-shadow-focus-default-spread) var(--nx-shadow-focus-default-color);
+  --shadow-focus-error: var(--nx-shadow-focus-error-x) var(--nx-shadow-focus-error-y) var(--nx-shadow-focus-error-blur) var(--nx-shadow-focus-error-spread) var(--nx-shadow-focus-error-color);
 }
 
 /* ===== DARK MODE ===== */
@@ -204,154 +208,6 @@
   --nx-color-secondary-disabled: var(--nx-color-neutral-900);
   --nx-color-secondary-text: var(--nx-color-neutral-400);
   --nx-color-secondary-surface: var(--nx-color-neutral-800);
-}
-
-/* ===== TYPOGRAPHY UTILITIES ===== */
-@utility text-display-large {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-6xl);
-  font-weight: var(--nx-typography-weight-light);
-  line-height: var(--nx-typography-line-height-6xl);
-  letter-spacing: var(--nx-typography-letterspacing-tight);
-}
-
-@utility text-display-medium {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-5xl);
-  font-weight: var(--nx-typography-weight-normal);
-  line-height: var(--nx-typography-line-height-5xl);
-  letter-spacing: var(--nx-typography-letterspacing-tight);
-}
-
-@utility text-heading-xlarge {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-4xl);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-4xl);
-  letter-spacing: var(--nx-typography-letterspacing-tight);
-}
-
-@utility text-heading-large {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-3xl);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-3xl);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-heading-medium {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-2xl);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-2xl);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-heading-small {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-xl);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-xl);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-heading-xsmall {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-lg);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-lg);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-body-large {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-lg);
-  font-weight: var(--nx-typography-weight-normal);
-  line-height: var(--nx-typography-line-height-lg);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-body-default {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-base);
-  font-weight: var(--nx-typography-weight-normal);
-  line-height: var(--nx-typography-line-height-base);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-body-small {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-sm);
-  font-weight: var(--nx-typography-weight-normal);
-  line-height: var(--nx-typography-line-height-sm);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-body-xsmall {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-xs);
-  font-weight: var(--nx-typography-weight-normal);
-  line-height: var(--nx-typography-line-height-xs);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-label-large {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-sm);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-sm);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-label-default {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-sm);
-  font-weight: var(--nx-typography-weight-medium);
-  line-height: var(--nx-typography-line-height-sm);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-label-small {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-xs);
-  font-weight: var(--nx-typography-weight-medium);
-  line-height: var(--nx-typography-line-height-xs);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
-}
-
-@utility text-label-caps {
-  font-family: var(--nx-typography-family-font-sans);
-  font-size: var(--nx-typography-size-xs);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: var(--nx-typography-line-height-xs);
-  letter-spacing: var(--nx-typography-letterspacing-wider);
-}
-
-@utility text-code-block {
-  font-family: var(--nx-typography-family-font-mono);
-  font-size: var(--nx-typography-size-sm);
-  font-weight: var(--nx-typography-weight-normal);
-  line-height: var(--nx-typography-line-height-sm);
-  letter-spacing: 0px;
-}
-
-@utility text-code-inline {
-  font-family: var(--nx-typography-family-font-mono);
-  font-size: var(--nx-typography-size-sm);
-  font-weight: var(--nx-typography-weight-semibold);
-  line-height: auto;
-  letter-spacing: 0px;
-}
-
-/* ===== BORDER WIDTH UTILITIES ===== */
-@utility border-default {
-  border-style: var(--tw-border-style, solid);
-  border-width: var(--nx-borderwidth-default);
-}
-
-@utility border-thick {
-  border-style: var(--tw-border-style, solid);
-  border-width: var(--nx-borderwidth-thick);
 }
 
 /* ===== BASE LAYER ===== */
