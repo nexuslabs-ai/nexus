@@ -27,7 +27,7 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
     "tokens:modular": "cd packages/core && yarn build:tokens:modular && cd ../../apps/playground && mkdir -p src/styles public/themes && cp ../../packages/core/dist/modular/* public/themes/ && cp ../../packages/core/dist/modular/globals.css ../../packages/core/dist/modular/color.css ../../packages/core/dist/modular/typography-utilities.css ../../packages/core/dist/modular/borderwidth-utilities.css src/styles/",
-    "tokens:tailwind": "cd packages/core && yarn build:tailwind",
+    "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "playground": "cd apps/playground && yarn dev",
     "size-limit": "size-limit"
   },
