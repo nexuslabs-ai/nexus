@@ -4,10 +4,10 @@
 
 ## When to Create Skills vs Agents
 
-| Type | Use When | Example |
-|------|----------|---------|
+| Type      | Use When                                            | Example                                               |
+| --------- | --------------------------------------------------- | ----------------------------------------------------- |
 | **Skill** | Multi-step workflow with file creation/modification | Creating components, migrating code, expanding tokens |
-| **Agent** | Autonomous research/analysis task | Auditing codebase, reviewing PRs, exploring patterns |
+| **Agent** | Autonomous research/analysis task                   | Auditing codebase, reviewing PRs, exploring patterns  |
 
 ## Skill Structure
 
@@ -17,25 +17,31 @@ Location: `.claude/skills/{skill-name}/SKILL.md`
 # {Skill Name}
 
 ## Trigger
+
 When user asks: "..." or "..."
 
 ## Context Required
+
 - Package: {which package this skill operates on}
 - Rules: {which rule files to reference}
 
 ## Steps
 
 ### 1. {Step Name}
+
 {Description of what to do}
 
 ### 2. {Step Name}
+
 {Description}
 
 ## Verification
+
 - [ ] {Checklist item}
 - [ ] {Checklist item}
 
 ## Output
+
 {What the skill produces}
 ```
 
@@ -47,36 +53,40 @@ Location: `.claude/agents/{agent-name}.md`
 # {Agent Name}
 
 ## Purpose
+
 {What this agent does}
 
 ## When to Use
+
 - {Trigger condition}
 - {Trigger condition}
 
 ## Exploration Scope
+
 - {What to analyze}
 - {What to look for}
 
 ## Output Format
+
 {How to report findings}
 ```
 
 ## Skill Naming Conventions
 
-| Pattern | Example | Purpose |
-|---------|---------|---------|
-| `create-{thing}` | `create-component` | Scaffold new items |
-| `migrate-{thing}` | `migrate-component` | Adapt external code |
-| `expand-{thing}` | `expand-tokens` | Add to existing systems |
-| `audit-{thing}` | `audit-component` | Check completeness |
+| Pattern           | Example             | Purpose                 |
+| ----------------- | ------------------- | ----------------------- |
+| `create-{thing}`  | `create-component`  | Scaffold new items      |
+| `migrate-{thing}` | `migrate-component` | Adapt external code     |
+| `expand-{thing}`  | `expand-tokens`     | Add to existing systems |
+| `audit-{thing}`   | `audit-component`   | Check completeness      |
 
 ## Agent Naming Conventions
 
-| Pattern | Example | Purpose |
-|---------|---------|---------|
+| Pattern           | Example            | Purpose               |
+| ----------------- | ------------------ | --------------------- |
 | `explore-{scope}` | `explore-codebase` | Research and discover |
-| `review-{thing}` | `review-changes` | Analyze and suggest |
-| `analyze-{thing}` | `analyze-patterns` | Find patterns/issues |
+| `review-{thing}`  | `review-changes`   | Analyze and suggest   |
+| `analyze-{thing}` | `analyze-patterns` | Find patterns/issues  |
 
 ## Discovery Process
 

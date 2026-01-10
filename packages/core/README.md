@@ -5,6 +5,7 @@ Internal package containing design tokens in W3C DTCG format and custom CSS gene
 ## Token Architecture
 
 ### DTCG Format (W3C Standard)
+
 All tokens follow the [Design Tokens Community Group](https://tr.designtokens.org/) specification:
 
 ```json
@@ -20,24 +21,28 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 ### Token Hierarchy
 
 **Primitives** (`tokens/primitives/`)
+
 - Context-independent base values
 - Colors, spacing, typography, borders, shadows
 - Output: CSS variables with category prefixes
 - Example: `--colors-gray-950`, `--spacing-4`
 
 **Semantic** (`tokens/semantic/`)
+
 - Contextual meanings that reference primitives
 - Light and dark theme variants
 - Output: Tailwind v4 `@theme` blocks
 - Example: `--background: var(--colors-white)`
 
 **Component** (future)
+
 - Component-specific tokens
 - References semantic tokens
 
 ## Reference Resolution
 
 Semantic tokens use DTCG reference syntax:
+
 ```json
 {
   "background": {
@@ -48,6 +53,7 @@ Semantic tokens use DTCG reference syntax:
 ```
 
 This resolves to CSS:
+
 ```css
 --background: var(--colors-white);
 ```
@@ -55,12 +61,14 @@ This resolves to CSS:
 ## Build Process
 
 ### Generate CSS
+
 ```bash
 yarn build:tailwind       # Generate @nexus/tailwind package CSS
 yarn build:tokens:modular # Generate modular CSS for playground
 ```
 
 ### Output Files
+
 - `../tailwind/nexus.css` - Main Tailwind theme with `nx:` prefix
 - `../tailwind/variables.css` - Primitive CSS variables with `--nx-*` prefix
 - `dist/modular/` - Individual theme CSS files for playground
@@ -68,6 +76,7 @@ yarn build:tokens:modular # Generate modular CSS for playground
 ## Future Platform Support
 
 Tokens are in DTCG format, making them portable to:
+
 - iOS (Swift)
 - Android (Kotlin/XML)
 - React Native

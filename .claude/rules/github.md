@@ -4,11 +4,11 @@
 
 ## Repository Info
 
-| Field | Value |
-|-------|-------|
-| Owner | `INNOVATIVEGAMER` |
-| Repo | `ds` |
-| Main Branch | `main` |
+| Field       | Value             |
+| ----------- | ----------------- |
+| Owner       | `INNOVATIVEGAMER` |
+| Repo        | `ds`              |
+| Main Branch | `main`            |
 
 ## PR Title Format
 
@@ -19,19 +19,20 @@ PR titles MUST include the Linear issue ID in brackets for auto-linking:
 ```
 
 **Examples:**
+
 - `feat(react): add Button component [NEX-123]`
 - `fix(tailwind): correct spacing token values [NEX-456]`
 - `ci: setup GitHub Actions workflow [NEX-140]`
 
 ### Commit Type Mapping
 
-| Ticket Type | Commit Type |
-|-------------|-------------|
-| Feature | `feat` |
-| Bug | `fix` |
+| Ticket Type    | Commit Type     |
+| -------------- | --------------- |
+| Feature        | `feat`          |
+| Bug            | `fix`           |
 | Infrastructure | `chore` or `ci` |
-| Documentation | `docs` |
-| Refactor | `refactor` |
+| Documentation  | `docs`          |
+| Refactor       | `refactor`      |
 
 ## PR Body Template
 
@@ -39,12 +40,15 @@ Standard PR body structure:
 
 ```markdown
 ## Summary
+
 {bullet points of what changed}
 
 ## Linear Issue
+
 Closes {issue_id}
 
 ## Test Plan
+
 - [ ] {verification step 1}
 - [ ] {verification step 2}
 
@@ -57,17 +61,21 @@ For component PRs, include Figma section:
 
 ```markdown
 ## Summary
+
 - Adds `{ComponentName}` component to @nexus/react
 - Implements all variants from Figma design
 - Includes Storybook stories with interaction tests
 
 ## Linear Issue
+
 Closes {issue_id}
 
 ## Figma
+
 {figma_urls}
 
 ## Test Plan
+
 - [ ] Visual review in Storybook
 - [ ] Verify Figma parity
 - [ ] All tests passing
@@ -79,10 +87,10 @@ Closes {issue_id}
 
 These keywords in PR body trigger Linear automation:
 
-| Keyword | Effect on Merge |
-|---------|-----------------|
-| `Closes NEX-###` | Marks issue as Done |
-| `Fixes NEX-###` | Marks issue as Done |
+| Keyword            | Effect on Merge     |
+| ------------------ | ------------------- |
+| `Closes NEX-###`   | Marks issue as Done |
+| `Fixes NEX-###`    | Marks issue as Done |
 | `Resolves NEX-###` | Marks issue as Done |
 
 **Always use `Closes {issue_id}` in the "Linear Issue" section.**
@@ -91,11 +99,11 @@ These keywords in PR body trigger Linear automation:
 
 When PR title contains `[NEX-###]`:
 
-| Event | Linear Update |
-|-------|---------------|
-| PR opened (draft) | Issue → In Progress |
-| PR ready for review | Issue → In Review |
-| PR merged | Issue → Done (if `Closes` present) |
+| Event               | Linear Update                      |
+| ------------------- | ---------------------------------- |
+| PR opened (draft)   | Issue → In Progress                |
+| PR ready for review | Issue → In Review                  |
+| PR merged           | Issue → Done (if `Closes` present) |
 
 ## MCP Tool Reference
 
@@ -123,6 +131,7 @@ mcp__github__get_pull_request(
 ```
 
 Key fields:
+
 - `title` - PR title (extract issue ID from `[NEX-###]`)
 - `body` - PR description (extract from `Closes NEX-###`)
 - `merged_at` - Merge timestamp (null if not merged)
@@ -155,11 +164,11 @@ mcp__github__create_pull_request_review(
 
 ### Review Verdicts
 
-| Condition | Event |
-|-----------|-------|
-| No issues found | `APPROVE` |
-| Minor issues only | `COMMENT` |
-| Blocking issues | `REQUEST_CHANGES` |
+| Condition         | Event             |
+| ----------------- | ----------------- |
+| No issues found   | `APPROVE`         |
+| Minor issues only | `COMMENT`         |
+| Blocking issues   | `REQUEST_CHANGES` |
 
 ## Commit Message Format
 
@@ -174,6 +183,7 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
 
 **Example:**
+
 ```
 feat(react): add Avatar component
 
@@ -206,11 +216,12 @@ git push origin --delete {branch_name}
 ## 🤖 Automated Code Review
 
 ### Summary
-| Category | Status | Issues |
-|----------|--------|--------|
-| Architecture | {status} | {notes} |
-| Code Quality | {status} | {notes} |
-| Testing | {status} | {notes} |
+
+| Category      | Status   | Issues  |
+| ------------- | -------- | ------- |
+| Architecture  | {status} | {notes} |
+| Code Quality  | {status} | {notes} |
+| Testing       | {status} | {notes} |
 | Accessibility | {status} | {notes} |
 
 ### Verdict: {APPROVED|CHANGES REQUESTED|REVIEWED}
@@ -218,7 +229,8 @@ git push origin --delete {branch_name}
 {issues or approval message}
 
 ---
-*Review performed against: `.claude/rules/components.md`, `.claude/rules/testing.md`, etc.*
+
+_Review performed against: `.claude/rules/components.md`, `.claude/rules/testing.md`, etc._
 ```
 
 ## Do Not

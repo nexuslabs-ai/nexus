@@ -236,7 +236,9 @@ function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
   const googleFontsImport = getGoogleFontsImportFromTokens(typographyFilePath);
 
   if (googleFontsImport) {
-    log.success(`Generated Google Fonts import for typography mode: ${typographyMode}`);
+    log.success(
+      `Generated Google Fonts import for typography mode: ${typographyMode}`
+    );
   }
 
   // Collect color tokens with var() references (consistent with tailwind output)
@@ -279,7 +281,12 @@ function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
   const css = generateThemeCSS({
     header,
     googleFontsImport,
-    imports: ['tailwindcss', './color.css', './typography-utilities.css', './borderwidth-utilities.css'],
+    imports: [
+      'tailwindcss',
+      './color.css',
+      './typography-utilities.css',
+      './borderwidth-utilities.css',
+    ],
     tailwindPrefix: 'nx',
     colorTokens,
     spacingTokens,
@@ -410,7 +417,10 @@ function main() {
 
   // Generate playground globals.css
   console.log('\nPlayground:');
-  const globalsTokenCount = generatePlaygroundGlobalsCSS(primitives, primitiveMap);
+  const globalsTokenCount = generatePlaygroundGlobalsCSS(
+    primitives,
+    primitiveMap
+  );
   console.log(`  ✓ globals.css (${globalsTokenCount} tokens)`);
   totalFiles++;
 

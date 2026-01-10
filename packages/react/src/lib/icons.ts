@@ -16,13 +16,23 @@
 export { IconLoader2 } from '@tabler/icons-react';
 
 // Navigation
-export { IconChevronDown, IconChevronLeft, IconChevronRight, IconChevronUp } from '@tabler/icons-react';
+export {
+  IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronUp,
+} from '@tabler/icons-react';
 
 // Actions
 export { IconCheck, IconX } from '@tabler/icons-react';
 
 // Alerts/Status
-export { IconAlertCircle, IconAlertTriangle, IconCircleCheck, IconInfoCircle } from '@tabler/icons-react';
+export {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconInfoCircle,
+} from '@tabler/icons-react';
 
 // Common UI
-export { IconEye, IconEyeOff,IconSearch } from '@tabler/icons-react';
+export { IconEye, IconEyeOff, IconSearch } from '@tabler/icons-react';

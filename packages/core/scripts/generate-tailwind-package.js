@@ -58,7 +58,11 @@ function getPrimitiveFiles(discovered, config) {
     } else {
       const mode = config[category] || info.modes[0];
       result[category] = {
-        filePath: path.join(PRIMITIVES_DIR, category, `${category}-${mode}.json`),
+        filePath: path.join(
+          PRIMITIVES_DIR,
+          category,
+          `${category}-${mode}.json`
+        ),
         mode,
       };
     }
@@ -138,7 +142,11 @@ function resolveCrossPrimitiveReferences(tokenList, primitiveMap) {
       token.rawValue.startsWith('{') &&
       token.rawValue.endsWith('}')
     ) {
-      const resolved = resolveValueWithNxPrefix(token.rawValue, primitiveMap, token.type);
+      const resolved = resolveValueWithNxPrefix(
+        token.rawValue,
+        primitiveMap,
+        token.type
+      );
       token.value = resolved;
 
       const existing = primitiveMap.get(token.path);
@@ -161,7 +169,12 @@ function processPrimitivesWithNxPrefix(discovered, config) {
 
   // First pass: load all tokens
   for (const [category, fileInfo] of Object.entries(primitiveFiles)) {
-    loadTokensWithNxPrefix(fileInfo.filePath, primitiveMap, primitiveTokens, category);
+    loadTokensWithNxPrefix(
+      fileInfo.filePath,
+      primitiveMap,
+      primitiveTokens,
+      category
+    );
     usedModes[category] = fileInfo.mode;
   }
 
@@ -221,7 +234,9 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
   const googleFontsImport = getGoogleFontsImportFromTokens(typographyFilePath);
 
   if (googleFontsImport) {
-    log.success(`Generated Google Fonts import for typography mode: ${typographyMode}`);
+    log.success(
+      `Generated Google Fonts import for typography mode: ${typographyMode}`
+    );
   }
 
   // Collect light color tokens with var() references
@@ -229,15 +244,27 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
   const darkColorTokens = [];
 
   for (const themed of semanticFiles.themed) {
-    const lightTokens = collectSemanticColorTokensVarRef(SEMANTIC_DIR, themed.light, primitiveMap);
-    const darkTokens = collectSemanticColorTokensVarRef(SEMANTIC_DIR, themed.dark, primitiveMap);
+    const lightTokens = collectSemanticColorTokensVarRef(
+      SEMANTIC_DIR,
+      themed.light,
+      primitiveMap
+    );
+    const darkTokens = collectSemanticColorTokensVarRef(
+      SEMANTIC_DIR,
+      themed.dark,
+      primitiveMap
+    );
     lightColorTokens.push(...lightTokens);
     darkColorTokens.push(...darkTokens);
   }
 
   // Process standalone semantic files (like spacing.json) for light tokens
   for (const standaloneFile of semanticFiles.standalone) {
-    const standaloneTokens = collectSemanticColorTokensVarRef(SEMANTIC_DIR, standaloneFile, primitiveMap);
+    const standaloneTokens = collectSemanticColorTokensVarRef(
+      SEMANTIC_DIR,
+      standaloneFile,
+      primitiveMap
+    );
     lightColorTokens.push(...standaloneTokens);
   }
 
@@ -246,7 +273,10 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
   const radiusMode = usedModes.radius || 'subtle';
   const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
   const borderwidthMode = usedModes.borderwidth || 'vega';
-  const borderwidthTokens = collectBorderwidthTokens(TOKENS_DIR, borderwidthMode);
+  const borderwidthTokens = collectBorderwidthTokens(
+    TOKENS_DIR,
+    borderwidthMode
+  );
   const shadowTokens = collectShadowTokens(TOKENS_DIR);
 
   // Generate header
@@ -264,7 +294,12 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
   let css = generateThemeCSS({
     header,
     googleFontsImport,
-    imports: ['tailwindcss', './variables.css', './typography-utilities.css', './borderwidth-utilities.css'],
+    imports: [
+      'tailwindcss',
+      './variables.css',
+      './typography-utilities.css',
+      './borderwidth-utilities.css',
+    ],
     tailwindPrefix: 'nx',
     colorTokens: lightColorTokens,
     spacingTokens,
@@ -294,10 +329,11 @@ function generateTailwindPackage(config) {
   const semanticFiles = getSemanticFiles(discoveredSemantics, config);
 
   // Process primitives with nx- prefix
-  const { tokens: primitiveTokens, primitiveMap, usedModes } = processPrimitivesWithNxPrefix(
-    discoveredPrimitives,
-    config
-  );
+  const {
+    tokens: primitiveTokens,
+    primitiveMap,
+    usedModes,
+  } = processPrimitivesWithNxPrefix(discoveredPrimitives, config);
 
   // Log configuration
   console.log('');
@@ -324,7 +360,9 @@ function generateTailwindPackage(config) {
   }
 
   // Generate borderwidth-utilities.css (using shared function from utils.js)
-  const borderwidthTokens = primitiveTokens.filter((t) => t.category === 'borderwidth');
+  const borderwidthTokens = primitiveTokens.filter(
+    (t) => t.category === 'borderwidth'
+  );
   const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
   if (borderWidth.css) {
     writeDistFile('borderwidth-utilities.css', borderWidth.css);
@@ -339,7 +377,9 @@ function generateTailwindPackage(config) {
   const themeCount = semanticFiles.themed.length;
   console.log('');
   console.log(`📊 Summary:`);
-  console.log(`   Primitives: ${primitiveTokens.length} tokens (with --nx-* prefix)`);
+  console.log(
+    `   Primitives: ${primitiveTokens.length} tokens (with --nx-* prefix)`
+  );
   console.log(`   Semantic themes: ${themeCount} (light + dark)`);
   console.log(`   Typography utilities: ${typography.count}`);
   console.log(`   Border width utilities: ${borderWidth.count}`);
