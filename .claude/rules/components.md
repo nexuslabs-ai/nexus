@@ -114,6 +114,38 @@ All custom props (not inherited from HTML elements or VariantProps) MUST have JS
 - `@default` value if applicable
 - `@example` for non-obvious usage
 
+### Boolean Props in CVA
+
+**Do NOT use `true`/`false` values in CVA variants.** Handle boolean props with ternary operators in component code instead:
+
+```tsx
+// ❌ Bad - boolean variant in CVA
+const variants = cva('...', {
+  variants: {
+    isCompact: {
+      true: 'nx:p-2',
+      false: 'nx:p-4',
+    },
+  },
+});
+
+// ✅ Good - boolean handled in component with ternary
+function Component({ isCompact = false, ... }) {
+  return (
+    <div className={cn(
+      variants({ variant, size }),
+      isCompact ? 'nx:p-2' : 'nx:p-4',
+    )} />
+  );
+}
+```
+
+**Why:**
+- CVA `true`/`false` variants are less readable
+- Ternary operators make the boolean logic explicit
+- Keeps CVA focused on enum-style variants (variant, size, fill)
+- Boolean props should be defined explicitly in the interface with JSDoc
+
 ## Export Pattern
 
 Always export the component, props type, and variants function (sorted):
@@ -244,3 +276,4 @@ export * from '@/components/ui/new-component';
 - Skip `asChild` support for interactive components
 - Use inline styles
 - Use incomplete token paths (`nx:bg-primary` instead of `nx:bg-primary-background`)
+- Use `true`/`false` values in CVA variants (use ternary in component code)
