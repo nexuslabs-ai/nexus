@@ -1,14 +1,50 @@
 /* Shadow Variables */
 
 :root {
-  --nx-shadow-2xs: var(--nx-shadow-2xs-layer-1-x) var(--nx-shadow-2xs-layer-1-y) var(--nx-shadow-2xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread) var(--nx-shadow-2xs-layer-1-color);
-  --nx-shadow-xs: var(--nx-shadow-xs-layer-1-x) var(--nx-shadow-xs-layer-1-y) var(--nx-shadow-xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread) var(--nx-shadow-xs-layer-1-color);
-  --nx-shadow-sm: var(--nx-shadow-sm-layer-2-x) var(--nx-shadow-sm-layer-2-y) var(--nx-shadow-sm-layer-2-blur) var(--nx-shadow-sm-layer-2-spread) var(--nx-shadow-sm-layer-2-color), var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y) var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread) var(--nx-shadow-sm-layer-1-color);
-  --nx-shadow-base: var(--nx-shadow-base-layer-2-x) var(--nx-shadow-base-layer-2-y) var(--nx-shadow-base-layer-2-blur) var(--nx-shadow-base-layer-2-spread) var(--nx-shadow-base-layer-2-color), var(--nx-shadow-base-layer-1-x) var(--nx-shadow-base-layer-1-y) var(--nx-shadow-base-layer-1-blur) var(--nx-shadow-base-layer-1-spread) var(--nx-shadow-base-layer-1-color);
-  --nx-shadow-lg: var(--nx-shadow-lg-layer-2-x) var(--nx-shadow-lg-layer-2-y) var(--nx-shadow-lg-layer-2-blur) var(--nx-shadow-lg-layer-2-spread) var(--nx-shadow-lg-layer-2-color), var(--nx-shadow-lg-layer-1-x) var(--nx-shadow-lg-layer-1-y) var(--nx-shadow-lg-layer-1-blur) var(--nx-shadow-lg-layer-1-spread) var(--nx-shadow-lg-layer-1-color);
-  --nx-shadow-xl: var(--nx-shadow-xl-layer-2-x) var(--nx-shadow-xl-layer-2-y) var(--nx-shadow-xl-layer-2-blur) var(--nx-shadow-xl-layer-2-spread) var(--nx-shadow-xl-layer-2-color), var(--nx-shadow-xl-layer-1-x) var(--nx-shadow-xl-layer-1-y) var(--nx-shadow-xl-layer-1-blur) var(--nx-shadow-xl-layer-1-spread) var(--nx-shadow-xl-layer-1-color);
-  --nx-shadow-2xl: var(--nx-shadow-2xl-layer-1-x) var(--nx-shadow-2xl-layer-1-y) var(--nx-shadow-2xl-layer-1-blur) var(--nx-shadow-2xl-layer-1-spread) var(--nx-shadow-2xl-layer-1-color);
-  --nx-shadow-inner: inset var(--nx-shadow-inner-layer-1-x) var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur) var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
-  --nx-shadow-focus-default: var(--nx-shadow-focus-default-x) var(--nx-shadow-focus-default-y) var(--nx-shadow-focus-default-blur) var(--nx-shadow-focus-default-spread) var(--nx-shadow-focus-default-color);
-  --nx-shadow-focus-error: var(--nx-shadow-focus-error-x) var(--nx-shadow-focus-error-y) var(--nx-shadow-focus-error-blur) var(--nx-shadow-focus-error-spread) var(--nx-shadow-focus-error-color);
+  --nx-shadow-2xs: var(--nx-shadow-2xs-layer-1-x) var(--nx-shadow-2xs-layer-1-y)
+    var(--nx-shadow-2xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread)
+    var(--nx-shadow-2xs-layer-1-color);
+  --nx-shadow-xs: var(--nx-shadow-xs-layer-1-x) var(--nx-shadow-xs-layer-1-y)
+    var(--nx-shadow-xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread)
+    var(--nx-shadow-xs-layer-1-color);
+  --nx-shadow-sm:
+    var(--nx-shadow-sm-layer-2-x) var(--nx-shadow-sm-layer-2-y)
+      var(--nx-shadow-sm-layer-2-blur) var(--nx-shadow-sm-layer-2-spread)
+      var(--nx-shadow-sm-layer-2-color),
+    var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y)
+      var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread)
+      var(--nx-shadow-sm-layer-1-color);
+  --nx-shadow-base:
+    var(--nx-shadow-base-layer-2-x) var(--nx-shadow-base-layer-2-y)
+      var(--nx-shadow-base-layer-2-blur) var(--nx-shadow-base-layer-2-spread)
+      var(--nx-shadow-base-layer-2-color),
+    var(--nx-shadow-base-layer-1-x) var(--nx-shadow-base-layer-1-y)
+      var(--nx-shadow-base-layer-1-blur) var(--nx-shadow-base-layer-1-spread)
+      var(--nx-shadow-base-layer-1-color);
+  --nx-shadow-lg:
+    var(--nx-shadow-lg-layer-2-x) var(--nx-shadow-lg-layer-2-y)
+      var(--nx-shadow-lg-layer-2-blur) var(--nx-shadow-lg-layer-2-spread)
+      var(--nx-shadow-lg-layer-2-color),
+    var(--nx-shadow-lg-layer-1-x) var(--nx-shadow-lg-layer-1-y)
+      var(--nx-shadow-lg-layer-1-blur) var(--nx-shadow-lg-layer-1-spread)
+      var(--nx-shadow-lg-layer-1-color);
+  --nx-shadow-xl:
+    var(--nx-shadow-xl-layer-2-x) var(--nx-shadow-xl-layer-2-y)
+      var(--nx-shadow-xl-layer-2-blur) var(--nx-shadow-xl-layer-2-spread)
+      var(--nx-shadow-xl-layer-2-color),
+    var(--nx-shadow-xl-layer-1-x) var(--nx-shadow-xl-layer-1-y)
+      var(--nx-shadow-xl-layer-1-blur) var(--nx-shadow-xl-layer-1-spread)
+      var(--nx-shadow-xl-layer-1-color);
+  --nx-shadow-2xl: var(--nx-shadow-2xl-layer-1-x) var(--nx-shadow-2xl-layer-1-y)
+    var(--nx-shadow-2xl-layer-1-blur) var(--nx-shadow-2xl-layer-1-spread)
+    var(--nx-shadow-2xl-layer-1-color);
+  --nx-shadow-inner: inset var(--nx-shadow-inner-layer-1-x)
+    var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur)
+    var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
+  --nx-shadow-focus-default: var(--nx-shadow-focus-default-x)
+    var(--nx-shadow-focus-default-y) var(--nx-shadow-focus-default-blur)
+    var(--nx-shadow-focus-default-spread) var(--nx-shadow-focus-default-color);
+  --nx-shadow-focus-error: var(--nx-shadow-focus-error-x)
+    var(--nx-shadow-focus-error-y) var(--nx-shadow-focus-error-blur)
+    var(--nx-shadow-focus-error-spread) var(--nx-shadow-focus-error-color);
 }
