@@ -28,9 +28,25 @@ const meta: Meta<typeof Badge> = {
       options: ['solid', 'light'],
       description: 'The fill style (solid or light/surface)',
     },
-    caps: {
+    isCaps: {
       control: 'boolean',
       description: 'Use uppercase text with wider letter-spacing',
+    },
+    isNumber: {
+      control: 'boolean',
+      description: 'Render as circular number badge',
+    },
+    value: {
+      control: 'text',
+      description: 'Value to display when isNumber is true',
+    },
+    leftIcon: {
+      control: false,
+      description: 'Icon to display before the label',
+    },
+    rightIcon: {
+      control: false,
+      description: 'Icon to display after the label',
     },
     asChild: {
       control: 'boolean',
@@ -143,14 +159,14 @@ export const LightFill: Story = {
 
 export const Caps: Story = {
   args: {
-    caps: true,
+    isCaps: true,
     children: 'Label',
   },
 };
 
 export const Sentence: Story = {
   args: {
-    caps: false,
+    isCaps: false,
     children: 'Label',
   },
 };
@@ -169,7 +185,7 @@ export const WithDataAttributes: Story = {
     children: 'Status',
     variant: 'success',
     fill: 'light',
-    caps: false,
+    isCaps: false,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -221,16 +237,12 @@ export const AsLink: Story = {
 // WITH ICONS
 // ============================================
 
-export const WithIconLeft: Story = {
-  render: (args) => (
-    <Badge {...args}>
-      <IconCheck className="nx:size-3" />
-      Verified
-    </Badge>
-  ),
+export const WithLeftIcon: Story = {
   args: {
+    children: 'Verified',
     variant: 'success',
-    caps: false,
+    isCaps: false,
+    leftIcon: <IconCheck />,
   },
   // TODO: Fix success-background/success-foreground token contrast
   parameters: {
@@ -238,16 +250,63 @@ export const WithIconLeft: Story = {
   },
 };
 
-export const WithIconRight: Story = {
-  render: (args) => (
-    <Badge {...args}>
-      Dismiss
-      <IconX className="nx:size-3" />
-    </Badge>
-  ),
+export const WithRightIcon: Story = {
   args: {
+    children: 'Dismiss',
     variant: 'secondary',
-    caps: false,
+    isCaps: false,
+    rightIcon: <IconX />,
+  },
+};
+
+export const WithBothIcons: Story = {
+  args: {
+    children: 'Status',
+    variant: 'default',
+    isCaps: false,
+    leftIcon: <IconCheck />,
+    rightIcon: <IconX />,
+  },
+};
+
+// ============================================
+// NUMBER BADGES
+// ============================================
+
+export const NumberBadge: Story = {
+  args: {
+    isNumber: true,
+    value: 8,
+  },
+};
+
+export const NumberBadgeHighValue: Story = {
+  args: {
+    isNumber: true,
+    value: '99+',
+    variant: 'error',
+  },
+  // TODO: Fix error-background/error-foreground token contrast
+  parameters: {
+    a11y: { test: 'todo' },
+  },
+};
+
+export const NumberBadgeIgnoresIcons: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+  args: {
+    isNumber: true,
+    value: 5,
+    leftIcon: <IconCheck />, // Should be ignored
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('5');
+
+    // Should render as number badge without icon
+    await expect(badge).toHaveAttribute('data-number', 'true');
   },
 };
 
@@ -255,16 +314,10 @@ export const WithIconRight: Story = {
 // EDGE CASES
 // ============================================
 
-export const NumberBadge: Story = {
-  args: {
-    children: '8',
-  },
-};
-
 export const LongContent: Story = {
   args: {
     children: 'This is a very long badge text',
-    caps: false,
+    isCaps: false,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -303,25 +356,25 @@ export const AllVariants: Story = {
           Solid Fill (Sentence)
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Badge variant="default" caps={false}>
+          <Badge variant="default" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="secondary" caps={false}>
+          <Badge variant="secondary" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="outline" caps={false}>
+          <Badge variant="outline" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="error" caps={false}>
+          <Badge variant="error" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="warning" caps={false}>
+          <Badge variant="warning" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="success" caps={false}>
+          <Badge variant="success" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="information" caps={false}>
+          <Badge variant="information" isCaps={false}>
             Label
           </Badge>
         </div>
@@ -357,19 +410,19 @@ export const AllVariants: Story = {
           Light Fill (Sentence)
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Badge variant="default" fill="light" caps={false}>
+          <Badge variant="default" fill="light" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="error" fill="light" caps={false}>
+          <Badge variant="error" fill="light" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="warning" fill="light" caps={false}>
+          <Badge variant="warning" fill="light" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="success" fill="light" caps={false}>
+          <Badge variant="success" fill="light" isCaps={false}>
             Label
           </Badge>
-          <Badge variant="information" fill="light" caps={false}>
+          <Badge variant="information" fill="light" isCaps={false}>
             Label
           </Badge>
         </div>
@@ -381,13 +434,13 @@ export const AllVariants: Story = {
           Number Badges
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Badge variant="default">8</Badge>
-          <Badge variant="secondary">8</Badge>
-          <Badge variant="outline">8</Badge>
-          <Badge variant="error">8</Badge>
-          <Badge variant="warning">8</Badge>
-          <Badge variant="success">8</Badge>
-          <Badge variant="information">8</Badge>
+          <Badge variant="default" isNumber value={8} />
+          <Badge variant="secondary" isNumber value={8} />
+          <Badge variant="outline" isNumber value={8} />
+          <Badge variant="error" isNumber value={8} />
+          <Badge variant="warning" isNumber value={8} />
+          <Badge variant="success" isNumber value={8} />
+          <Badge variant="information" isNumber value={8} />
         </div>
       </div>
 
@@ -397,17 +450,14 @@ export const AllVariants: Story = {
           With Icons
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Badge variant="default" caps={false}>
-            <IconCheck className="nx:size-3" />
+          <Badge variant="default" isCaps={false} leftIcon={<IconCheck />}>
             Label
           </Badge>
-          <Badge variant="success" caps={false}>
-            <IconCheck className="nx:size-3" />
+          <Badge variant="success" isCaps={false} leftIcon={<IconCheck />}>
             Label
           </Badge>
-          <Badge variant="error" caps={false}>
+          <Badge variant="error" isCaps={false} rightIcon={<IconX />}>
             Label
-            <IconX className="nx:size-3" />
           </Badge>
         </div>
       </div>

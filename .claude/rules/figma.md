@@ -91,12 +91,12 @@ Figma uses `spacing-{n}` which maps to code's `--spacing-{n}`:
 
 | Figma Style | Code Utility |
 |-------------|--------------|
-| `body/xsmall` | `nx:text-body-xsmall` (12px) |
-| `body/small` | `nx:text-body-small` (14px) |
-| `body/default` | `nx:text-body-default` (16px) |
-| `body/large` | `nx:text-body-large` (18px) |
-| `label/small` | `nx:text-label-small` (12px, medium) |
-| `label/default` | `nx:text-label-default` (14px, medium) |
+| `body/xsmall` | `nx:typography-body-xsmall` (12px) |
+| `body/small` | `nx:typography-body-small` (14px) |
+| `body/default` | `nx:typography-body-default` (16px) |
+| `body/large` | `nx:typography-body-large` (18px) |
+| `label/small` | `nx:typography-label-small` (12px, medium) |
+| `label/default` | `nx:typography-label-default` (14px, medium) |
 
 ## Prop Naming Conventions
 
@@ -145,6 +145,43 @@ hasImage?: boolean  // Instead of State=Image/Fallback
 // Code handles internally
 {hasImage ? <img /> : <Fallback />}
 ```
+
+### Figma Slot Props → React Optional Props
+
+Figma requires **two separate props** to handle optional slots:
+1. A boolean toggle (`hasLeftIcon`)
+2. The slot content (`leftIcon`)
+
+In React, **simplify to a single optional prop**. The prop's presence acts as the boolean:
+
+```typescript
+// ❌ Don't mirror Figma's two-prop pattern
+interface Props {
+  hasLeftIcon?: boolean;
+  leftIcon?: React.ReactNode;
+}
+
+// ✅ Simplify to single optional prop
+interface Props {
+  leftIcon?: React.ReactNode;
+}
+
+// Check presence in component
+{leftIcon && leftIcon}
+```
+
+**Common slot patterns to simplify:**
+
+| Figma Props | React Prop |
+|-------------|------------|
+| `hasLeftIcon` + `leftIcon` | `leftIcon?: ReactNode` |
+| `hasRightIcon` + `rightIcon` | `rightIcon?: ReactNode` |
+| `hasAvatar` + `avatar` | `avatar?: ReactNode` |
+| `hasIcon` + `icon` | `icon?: ReactNode` |
+| `hasPrefix` + `prefix` | `prefix?: ReactNode` |
+| `hasSuffix` + `suffix` | `suffix?: ReactNode` |
+| `hasLeading` + `leading` | `leading?: ReactNode` |
+| `hasTrailing` + `trailing` | `trailing?: ReactNode` |
 
 ### Shape Props
 
@@ -309,6 +346,7 @@ Icon instances in Figma should use PascalCase matching code imports:
 
 - [ ] All size values are abbreviated (`xs`, `sm`, `md`, etc.)
 - [ ] Boolean states use `has*` or `is*` props
+- [ ] Figma slot pairs (`has*` + slot) simplified to single optional prop in code
 - [ ] Spacing uses `spacing-{n}` tokens
 - [ ] Radius uses named tokens (`md`, `lg`, `2xl`, `full`)
 - [ ] Colors reference semantic tokens
