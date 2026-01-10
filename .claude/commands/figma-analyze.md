@@ -50,16 +50,16 @@ From `get_metadata`, extract:
 
 ### Phase 2: Fetch shadcn Reference
 
-Based on the component type identified in Phase 1, fetch the shadcn source code:
+Based on the component type identified in Phase 1, fetch the shadcn documentation:
 
-**Registry URL Pattern:**
+**Documentation URL Pattern:**
 ```
-https://ui.shadcn.com/registry/styles/new-york/{component-name}.json
+https://ui.shadcn.com/docs/components/{component-name}
 ```
 
 Common component names:
-| Component Type | Registry Name |
-|----------------|---------------|
+| Component Type | URL Path |
+|----------------|----------|
 | Accordion | `accordion` |
 | Dialog | `dialog` |
 | Tabs | `tabs` |
@@ -75,26 +75,15 @@ Common component names:
 | Popover | `popover` |
 | Tooltip | `tooltip` |
 
-Use `WebFetch` to get the registry JSON, then extract:
+Use `WebFetch` to get the documentation page, then extract:
 
-**From shadcn source code:**
-- All exported component parts (e.g., `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionContent`)
-- Props for each part
+**From shadcn documentation:**
+- Available variants (e.g., `default`, `secondary`, `destructive`, `outline`)
+- Component props and their types
 - Default prop values
-- Composition structure (which parts are required vs optional)
+- Usage examples and composition patterns
+- For compound components: exported parts and their hierarchy
 - Radix primitive being wrapped (if any)
-
-**Example extraction for Accordion:**
-```typescript
-// Parts found in shadcn source:
-exports: ['Accordion', 'AccordionItem', 'AccordionTrigger', 'AccordionContent']
-
-// Radix primitives used:
-radixImport: '@radix-ui/react-accordion'
-
-// Required composition:
-Accordion > AccordionItem > [AccordionTrigger, AccordionContent]
-```
 
 ### Phase 3: Understand Codebase Conventions
 
