@@ -202,7 +202,9 @@ function Badge({
       className={cn(
         badgeVariants({ variant, fill }),
         // Typography: caps vs sentence case
-        isCaps ? 'nx:typography-label-caps nx:uppercase' : 'nx:typography-label-default',
+        isCaps
+          ? 'nx:typography-label-caps nx:uppercase'
+          : 'nx:typography-label-default',
         isNumber
           ? // Circular number badge: fixed size, no padding, fully rounded
             'nx:size-5 nx:rounded-full nx:p-0 nx:typography-label-caps'

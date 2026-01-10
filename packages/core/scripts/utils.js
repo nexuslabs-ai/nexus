@@ -102,7 +102,11 @@ export function pathToCssVar(tokenPath, prefix = null) {
  * @param {boolean} useNxPrefix - Whether to add nx- prefix
  * @returns {string} CSS variable name (without --)
  */
-export function pathToCssVarPrefixed(tokenPath, categoryPrefix = null, useNxPrefix = false) {
+export function pathToCssVarPrefixed(
+  tokenPath,
+  categoryPrefix = null,
+  useNxPrefix = false
+) {
   const cssName = tokenPath.join('-');
   const base = categoryPrefix ? `${categoryPrefix}-${cssName}` : cssName;
   return useNxPrefix ? `nx-${base}` : base;
@@ -181,7 +185,11 @@ function resolveReferenceWithNxPrefix(value, primitiveMap) {
  * @param {string} type - Token type
  * @returns {string} Resolved CSS value
  */
-export function resolveValueWithNxPrefix(value, primitiveMap, type = 'unknown') {
+export function resolveValueWithNxPrefix(
+  value,
+  primitiveMap,
+  type = 'unknown'
+) {
   // If it's a reference, resolve it with nx prefix
   if (isReference(value)) {
     return resolveReferenceWithNxPrefix(value, primitiveMap);
@@ -481,7 +489,7 @@ function extractGoogleFonts(typographyFilePath) {
 
   // Look for family tokens with nx-font-source extension
   if (tokenData.family) {
-    for (const [_key, value] of Object.entries(tokenData.family)) {
+    for (const value of Object.values(tokenData.family)) {
       if (value.$type !== 'fontFamily') continue;
 
       const fontSource = value.$extensions?.['nx-font-source'];
@@ -564,7 +572,11 @@ function resolveTypographyProperty(value, primitiveMap) {
   if (value === 'auto') return 'auto';
 
   // Handle references like {family.font-sans}
-  if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
+  if (
+    typeof value === 'string' &&
+    value.startsWith('{') &&
+    value.endsWith('}')
+  ) {
     return resolveValueWithNxPrefix(value, primitiveMap, 'unknown');
   }
 
@@ -594,7 +606,9 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
   }
 
   const tokenData = readTokenFile(typographyPath);
-  const tokens = extractTokens(tokenData).filter((t) => t.type === 'typography');
+  const tokens = extractTokens(tokenData).filter(
+    (t) => t.type === 'typography'
+  );
 
   if (tokens.length === 0) {
     return { css: '', count: 0 };
@@ -709,7 +723,10 @@ export function collectSpacingTokens(semanticDir) {
  * @returns {object[]} Array of { cssName, varRef }
  */
 export function collectRadiusTokens(tokensDir, mode) {
-  const filePath = path.join(tokensDir, `primitives/radius/radius-${mode}.json`);
+  const filePath = path.join(
+    tokensDir,
+    `primitives/radius/radius-${mode}.json`
+  );
   if (!fs.existsSync(filePath)) {
     return [];
   }
@@ -737,7 +754,10 @@ export function collectRadiusTokens(tokensDir, mode) {
  * @returns {object[]} Array of { cssName, varRef }
  */
 export function collectBorderwidthTokens(tokensDir, mode) {
-  const filePath = path.join(tokensDir, `primitives/borderwidth/borderwidth-${mode}.json`);
+  const filePath = path.join(
+    tokensDir,
+    `primitives/borderwidth/borderwidth-${mode}.json`
+  );
   if (!fs.existsSync(filePath)) {
     return [];
   }
@@ -807,7 +827,10 @@ export function collectShadowTokens(tokensDir) {
           if (subKey.startsWith('$')) continue;
           if (subValue.$type === 'shadow') {
             const shadowName = `${key}-${subKey}`;
-            const cssValue = generateShadowVarValue(shadowName, subValue.$value);
+            const cssValue = generateShadowVarValue(
+              shadowName,
+              subValue.$value
+            );
             shadows.push({ cssName: `shadow-${shadowName}`, value: cssValue });
           }
         }
@@ -832,7 +855,11 @@ export function collectShadowTokens(tokensDir) {
  * @param {Map} primitiveMap - Map of primitive token values (used for var reference generation)
  * @returns {object[]} Array of { cssName, value }
  */
-export function collectSemanticColorTokensVarRef(semanticDir, fileName, primitiveMap) {
+export function collectSemanticColorTokensVarRef(
+  semanticDir,
+  fileName,
+  primitiveMap
+) {
   const filePath = path.join(semanticDir, fileName);
   if (!fs.existsSync(filePath)) {
     return [];

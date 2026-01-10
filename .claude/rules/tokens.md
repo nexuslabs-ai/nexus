@@ -21,14 +21,14 @@ Optional properties: `$description`, `$extensions`
 
 ## File Naming
 
-| Directory | Pattern | Example |
-|-----------|---------|---------|
-| primitives | `color.json` | Single file with all color scales |
+| Directory  | Pattern                             | Example                                            |
+| ---------- | ----------------------------------- | -------------------------------------------------- |
+| primitives | `color.json`                        | Single file with all color scales                  |
 | primitives | `{category}/{category}-{mode}.json` | `size/size-vega.json`, `radius/radius-subtle.json` |
-| semantic | `base-{palette}-{mode}.json` | `base-slate-light.json`, `base-slate-dark.json` |
-| semantic | `brands-{name}-{mode}.json` | `brands-blue-light.json`, `brands-blue-dark.json` |
-| semantic | `spacing.json` | Standalone semantic (no light/dark variant) |
-| component | `{component}.json` | `button.json` (future) |
+| semantic   | `base-{palette}-{mode}.json`        | `base-slate-light.json`, `base-slate-dark.json`    |
+| semantic   | `brands-{name}-{mode}.json`         | `brands-blue-light.json`, `brands-blue-dark.json`  |
+| semantic   | `spacing.json`                      | Standalone semantic (no light/dark variant)        |
+| component  | `{component}.json`                  | `button.json` (future)                             |
 
 ## Nested Token Structure
 
@@ -85,12 +85,12 @@ Primitive colors use Tailwind's shade scale (50-950):
 
 ## Semantic Token Categories
 
-| Category | Properties | Example |
-|----------|------------|---------|
-| Layout | `background`, `foreground`, `container`, `popover`, `muted`, `accent` | `--color-background` |
-| Brand | `primary.*`, `secondary.*` | `--color-primary-background` |
-| Status | `error.*`, `success.*`, `warning.*`, `information.*` | `--color-error-text` |
-| Borders | `border.default`, `border.primary`, `border.error`, etc. | `--color-border-default` |
+| Category | Properties                                                            | Example                      |
+| -------- | --------------------------------------------------------------------- | ---------------------------- |
+| Layout   | `background`, `foreground`, `container`, `popover`, `muted`, `accent` | `--color-background`         |
+| Brand    | `primary.*`, `secondary.*`                                            | `--color-primary-background` |
+| Status   | `error.*`, `success.*`, `warning.*`, `information.*`                  | `--color-error-text`         |
+| Borders  | `border.default`, `border.primary`, `border.error`, etc.              | `--color-border-default`     |
 
 Each brand/status group has: `background`, `foreground`, `hover`, `active`, `disabled`, `text`, `surface`
 
@@ -107,6 +107,7 @@ Each brand/status group has: `background`, `foreground`, `hover`, `active`, `dis
 Token files are validated against `packages/core/tokens.schema.json`
 
 Valid `$type` values:
+
 - `color` - Color values (#hex, rgb, hsl)
 - `dimension` - Sizes with units (rem, px)
 - `fontFamily` - Font stack
@@ -119,13 +120,14 @@ Valid `$type` values:
 
 Typography font family tokens can include `$extensions.nx-font-source` for automatic font loading:
 
-| `type` | Description | Required Fields |
-|--------|-------------|-----------------|
-| `google` | Load from Google Fonts | `family`, `weights`, `styles` |
-| `system` | System font (no import) | None |
-| `custom` | Custom URL (future) | `url` |
+| `type`   | Description             | Required Fields               |
+| -------- | ----------------------- | ----------------------------- |
+| `google` | Load from Google Fonts  | `family`, `weights`, `styles` |
+| `system` | System font (no import) | None                          |
+| `custom` | Custom URL (future)     | `url`                         |
 
 Example:
+
 ```json
 {
   "font-mono": {
@@ -166,6 +168,7 @@ node scripts/generate-tailwind-package.js --base=slate --brand=blue
 ```
 
 Available options:
+
 - **Base**: slate, neutral, zinc, gray, stone
 - **Brand**: blue, gray, neutral, slate
 - **Size**: vega, lyra, maia, mira, nova
@@ -176,11 +179,11 @@ Available options:
 
 ## CSS Variable Naming
 
-| Type | Pattern | Example |
-|------|---------|---------|
-| Primitive | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-size-4` |
-| Semantic | `--{category}-{path}` | `--color-background`, `--spacing-4` |
-| Tailwind utility | `nx:{utility}` | `nx:bg-primary`, `nx:p-4` |
+| Type             | Pattern                  | Example                              |
+| ---------------- | ------------------------ | ------------------------------------ |
+| Primitive        | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-size-4` |
+| Semantic         | `--{category}-{path}`    | `--color-background`, `--spacing-4`  |
+| Tailwind utility | `nx:{utility}`           | `nx:bg-primary`, `nx:p-4`            |
 
 ## Typography Utilities
 

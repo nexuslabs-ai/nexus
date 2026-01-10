@@ -27,22 +27,22 @@ yarn typecheck  # TypeScript check
 
 ## What This Package Provides
 
-| Export | Source | Purpose |
-|--------|--------|---------|
-| `renderHook` | @testing-library/react | Hook testing |
-| `act` | @testing-library/react | State updates in tests |
-| `waitFor` | @testing-library/react | Async assertions |
-| `describe`, `it`, `expect`, `vi` | vitest | Test utilities |
-| `beforeAll`, `beforeEach`, `afterAll`, `afterEach` | vitest | Test lifecycle |
+| Export                                             | Source                 | Purpose                |
+| -------------------------------------------------- | ---------------------- | ---------------------- |
+| `renderHook`                                       | @testing-library/react | Hook testing           |
+| `act`                                              | @testing-library/react | State updates in tests |
+| `waitFor`                                          | @testing-library/react | Async assertions       |
+| `describe`, `it`, `expect`, `vi`                   | vitest                 | Test utilities         |
+| `beforeAll`, `beforeEach`, `afterAll`, `afterEach` | vitest                 | Test lifecycle         |
 
 ## What This Package Does NOT Provide
 
-| Removed | Reason | Use Instead |
-|---------|--------|-------------|
-| `render` | Components use stories | Storybook play functions |
-| `screen`, `within` | Components use stories | `storybook/test` |
-| `userEvent` | Components use stories | `storybook/test` |
-| `axe` | A11y is automatic | `addon-a11y` with `test: 'error'` |
+| Removed            | Reason                 | Use Instead                       |
+| ------------------ | ---------------------- | --------------------------------- |
+| `render`           | Components use stories | Storybook play functions          |
+| `screen`, `within` | Components use stories | `storybook/test`                  |
+| `userEvent`        | Components use stories | `storybook/test`                  |
+| `axe`              | A11y is automatic      | `addon-a11y` with `test: 'error'` |
 
 ## Usage: Hook Testing
 
@@ -82,12 +82,12 @@ describe('formatCurrency', () => {
 
 The `setup.ts` file is loaded by vitest for unit tests. It provides:
 
-| Setup | Purpose |
-|-------|---------|
-| jest-dom matchers | `toBeInTheDocument()`, `toHaveClass()`, etc. |
-| ResizeObserver mock | For hooks using ResizeObserver |
-| matchMedia mock | For hooks using media queries |
-| IntersectionObserver mock | For hooks using intersection |
+| Setup                     | Purpose                                      |
+| ------------------------- | -------------------------------------------- |
+| jest-dom matchers         | `toBeInTheDocument()`, `toHaveClass()`, etc. |
+| ResizeObserver mock       | For hooks using ResizeObserver               |
+| matchMedia mock           | For hooks using media queries                |
+| IntersectionObserver mock | For hooks using intersection                 |
 
 ## Directory Structure
 
@@ -99,11 +99,11 @@ src/
 
 ## Build Output
 
-| File | Purpose |
-|------|---------|
-| `dist/index.js` | ESM exports |
-| `dist/index.cjs` | CJS exports |
-| `dist/setup.js` | Setup file (ESM) |
+| File             | Purpose          |
+| ---------------- | ---------------- |
+| `dist/index.js`  | ESM exports      |
+| `dist/index.cjs` | CJS exports      |
+| `dist/setup.js`  | Setup file (ESM) |
 | `dist/setup.cjs` | Setup file (CJS) |
 
 ## Do Not

@@ -2,17 +2,17 @@
 
 > **CRITICAL WORKFLOW - MUST FOLLOW ON EVERY TASK**
 >
-> | Step | Action | Output |
-> |------|--------|--------|
-> | **1. Plan** | Create todo list BEFORE any code | TodoWrite with all phases |
-> | **2. Execute** | Complete ONE todo item only | Code changes for that phase |
+> | Step             | Action                            | Output                          |
+> | ---------------- | --------------------------------- | ------------------------------- |
+> | **1. Plan**      | Create todo list BEFORE any code  | TodoWrite with all phases       |
+> | **2. Execute**   | Complete ONE todo item only       | Code changes for that phase     |
 > | **3. Summarize** | Brief summary + key code snippets | `[file.tsx:42-58](path)` format |
-> | **4. WAIT** | STOP for user confirmation | Do NOT proceed automatically |
-> | **5. Repeat** | Go to step 2 for next phase | Until all todos complete |
+> | **4. WAIT**      | STOP for user confirmation        | Do NOT proceed automatically    |
+> | **5. Repeat**    | Go to step 2 for next phase       | Until all todos complete        |
 >
 > **Summary format:** Tables/bullets + "Key Code to Review" section with actual snippets, file:line links, and brief notes.
 >
-> **Docs check:** After significant changes, update relevant CLAUDE.md and .claude/rules/*.md files.
+> **Docs check:** After significant changes, update relevant CLAUDE.md and .claude/rules/\*.md files.
 >
 > **NEVER execute multiple phases without stopping for review.**
 
@@ -88,51 +88,53 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 
 ## Package Documentation
 
-| Package | CLAUDE.md | Purpose |
-|---------|-----------|---------|
-| `@nexus/core` | [packages/core/CLAUDE.md](packages/core/CLAUDE.md) | Design tokens (W3C DTCG format) |
-| `@nexus/tailwind` | [packages/tailwind/CLAUDE.md](packages/tailwind/CLAUDE.md) | Tailwind CSS theme with nx: prefix |
-| `@nexus/react` | [packages/react/CLAUDE.md](packages/react/CLAUDE.md) | React component library |
-| `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities |
-| `@nexus/playground` | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md) | Theme demo app |
+| Package             | CLAUDE.md                                                      | Purpose                            |
+| ------------------- | -------------------------------------------------------------- | ---------------------------------- |
+| `@nexus/core`       | [packages/core/CLAUDE.md](packages/core/CLAUDE.md)             | Design tokens (W3C DTCG format)    |
+| `@nexus/tailwind`   | [packages/tailwind/CLAUDE.md](packages/tailwind/CLAUDE.md)     | Tailwind CSS theme with nx: prefix |
+| `@nexus/react`      | [packages/react/CLAUDE.md](packages/react/CLAUDE.md)           | React component library            |
+| `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities           |
+| `@nexus/playground` | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md)         | Theme demo app                     |
 
 ## Convention Rules
 
-| Rule File | Purpose |
-|-----------|---------|
-| [.claude/rules/components.md](.claude/rules/components.md) | Component structure, props, exports |
-| [.claude/rules/testing.md](.claude/rules/testing.md) | Test structure, patterns, a11y |
-| [.claude/rules/storybook.md](.claude/rules/storybook.md) | Story structure, required stories |
-| [.claude/rules/tokens.md](.claude/rules/tokens.md) | Token format, naming, workflow |
-| [.claude/rules/figma.md](.claude/rules/figma.md) | Figma-to-code parity, token mapping |
-| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences |
-| [.claude/rules/linear.md](.claude/rules/linear.md) | Linear integration, issue linking, status flow |
-| [.claude/rules/github.md](.claude/rules/github.md) | PR format, commit conventions, auto-linking |
-| [.claude/rules/skills-agents.md](.claude/rules/skills-agents.md) | Skill/agent structure and conventions |
+| Rule File                                                                  | Purpose                                        |
+| -------------------------------------------------------------------------- | ---------------------------------------------- |
+| [.claude/rules/components.md](.claude/rules/components.md)                 | Component structure, props, exports            |
+| [.claude/rules/testing.md](.claude/rules/testing.md)                       | Test structure, patterns, a11y                 |
+| [.claude/rules/storybook.md](.claude/rules/storybook.md)                   | Story structure, required stories              |
+| [.claude/rules/tokens.md](.claude/rules/tokens.md)                         | Token format, naming, workflow                 |
+| [.claude/rules/figma.md](.claude/rules/figma.md)                           | Figma-to-code parity, token mapping            |
+| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences                 |
+| [.claude/rules/linear.md](.claude/rules/linear.md)                         | Linear integration, issue linking, status flow |
+| [.claude/rules/github.md](.claude/rules/github.md)                         | PR format, commit conventions, auto-linking    |
+| [.claude/rules/skills-agents.md](.claude/rules/skills-agents.md)           | Skill/agent structure and conventions          |
 
 ## Slash Commands
 
-| Command | Purpose |
-|---------|---------|
-| `/linear` | Implement any Linear ticket (read → context → plan → implement → PR) |
-| `/linear-component` | Figma component workflow: Linear ticket → Figma analysis → Component → PR |
-| `/pr-review` | Unbiased PR code review (reads PR → reviews against conventions → posts feedback) |
-| `/post-merge` | Post-merge cleanup (verify merged → update Linear → switch to main → delete branch) |
-| `/component` | Scaffold new component with all files |
-| `/update-docs` | Update documentation after changes |
-| `/skill` | Create or update skills (explore package → define workflow) |
-| `/agent` | Create or update agents (explore scope → define analysis) |
-| `/linkedin` | Generate LinkedIn post from session (AI-native design system focus) |
-| `/figma-analyze` | Analyze Figma component for code parity |
+| Command             | Purpose                                                                             |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `/linear`           | Implement any Linear ticket (read → context → plan → implement → PR)                |
+| `/linear-component` | Figma component workflow: Linear ticket → Figma analysis → Component → PR           |
+| `/pr-review`        | Unbiased PR code review (reads PR → reviews against conventions → posts feedback)   |
+| `/post-merge`       | Post-merge cleanup (verify merged → update Linear → switch to main → delete branch) |
+| `/component`        | Scaffold new component with all files                                               |
+| `/update-docs`      | Update documentation after changes                                                  |
+| `/skill`            | Create or update skills (explore package → define workflow)                         |
+| `/agent`            | Create or update agents (explore scope → define analysis)                           |
+| `/linkedin`         | Generate LinkedIn post from session (AI-native design system focus)                 |
+| `/figma-analyze`    | Analyze Figma component for code parity                                             |
 
 ## Code Style
 
 ### Formatting (Prettier)
+
 - Single quotes, semicolons, 2-space indent
 - 80 char line width, trailing commas (es5)
 - Tailwind class sorting enabled
 
 ### Naming
+
 - **Components**: PascalCase (`Button`)
 - **Files**: kebab-case (`button.tsx`)
 - **Tokens**: camelCase in JSON
@@ -140,6 +142,7 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 - **Tailwind classes**: `nx:` prefix (`nx:bg-primary`, `nx:text-foreground`)
 
 ### Import Order (ESLint auto-sorts)
+
 1. React/React-DOM
 2. External packages
 3. Internal aliases (`@/`)

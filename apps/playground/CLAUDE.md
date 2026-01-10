@@ -81,9 +81,18 @@ apps/playground/
 
 ```tsx
 // useTheme hook manages dynamic CSS loading
-useEffect(() => loadCSS(`/themes/base-${theme.base}.css`, 'base'), [theme.base]);
-useEffect(() => loadCSS(`/themes/brands-${theme.brand}.css`, 'brand'), [theme.brand]);
-useEffect(() => loadCSS(`/themes/size-${theme.size}.css`, 'size'), [theme.size]);
+useEffect(
+  () => loadCSS(`/themes/base-${theme.base}.css`, 'base'),
+  [theme.base]
+);
+useEffect(
+  () => loadCSS(`/themes/brands-${theme.brand}.css`, 'brand'),
+  [theme.brand]
+);
+useEffect(
+  () => loadCSS(`/themes/size-${theme.size}.css`, 'size'),
+  [theme.size]
+);
 // ... etc for each dimension
 ```
 
@@ -91,29 +100,29 @@ useEffect(() => loadCSS(`/themes/size-${theme.size}.css`, 'size'), [theme.size])
 
 ### Color Themes
 
-| Type | Options |
-|------|---------|
-| Base | slate, neutral, zinc, gray, stone |
-| Brand | blue, gray, neutral, slate |
-| Mode | light, dark |
+| Type  | Options                           |
+| ----- | --------------------------------- |
+| Base  | slate, neutral, zinc, gray, stone |
+| Brand | blue, gray, neutral, slate        |
+| Mode  | light, dark                       |
 
 ### Design Token Modes
 
-| Dimension | Options | Default |
-|-----------|---------|---------|
-| Size | vega, lyra, maia, mira, nova | vega |
-| Typography | vega, lyra, maia, mira, nova | vega |
-| Shadow | vega, lyra, maia, mira, nova | vega |
-| Radius | blunt, sharp, subtle, smooth, mellow | subtle |
-| Border Width | vega, lyra, maia, mira, nova | vega |
+| Dimension    | Options                              | Default |
+| ------------ | ------------------------------------ | ------- |
+| Size         | vega, lyra, maia, mira, nova         | vega    |
+| Typography   | vega, lyra, maia, mira, nova         | vega    |
+| Shadow       | vega, lyra, maia, mira, nova         | vega    |
+| Radius       | blunt, sharp, subtle, smooth, mellow | subtle  |
+| Border Width | vega, lyra, maia, mira, nova         | vega    |
 
 ### Icon Libraries
 
-| Library | Package | Icon Count | Default |
-|---------|---------|------------|---------|
-| Tabler | @tabler/icons-react | 5,800+ | ✓ |
-| Lucide | lucide-react | 1,500+ | |
-| Phosphor | @phosphor-icons/react | 9,000+ | |
+| Library  | Package               | Icon Count | Default |
+| -------- | --------------------- | ---------- | ------- |
+| Tabler   | @tabler/icons-react   | 5,800+     | ✓       |
+| Lucide   | lucide-react          | 1,500+     |         |
+| Phosphor | @phosphor-icons/react | 9,000+     |         |
 
 ## Setup
 
@@ -127,18 +136,18 @@ yarn playground         # Start dev server
 
 The showcase demonstrates all token categories:
 
-| Section | Tokens Used |
-|---------|-------------|
-| Typography | `typography-display-*`, `typography-heading-*`, `typography-body-*`, `typography-label-*`, `typography-code-*` |
-| Semantic Colors | `bg-primary-*`, `bg-secondary-*`, `bg-error-*`, etc. |
-| Shadows | `shadow-2xs` to `shadow-2xl`, `shadow-inner`, `shadow-focus-default` |
-| Border Radius | `rounded-base`, `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`, `rounded-full` |
-| Spacing | `w-1` to `w-16` |
-| Icons | 14 internal DS icons from selected library |
-| Buttons | Semantic colors + `rounded-md` for radius |
-| Cards & Containers | `bg-container`, `bg-popover`, `bg-muted`, `bg-accent` |
-| Borders | `border-default`, `border-thick`, `border-border-*` colors |
-| Status Messages | `*-surface`, `*-text` for success/error/warning/info |
+| Section            | Tokens Used                                                                                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Typography         | `typography-display-*`, `typography-heading-*`, `typography-body-*`, `typography-label-*`, `typography-code-*`       |
+| Semantic Colors    | `bg-primary-*`, `bg-secondary-*`, `bg-error-*`, etc.                                                                 |
+| Shadows            | `shadow-2xs` to `shadow-2xl`, `shadow-inner`, `shadow-focus-default`                                                 |
+| Border Radius      | `rounded-base`, `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`, `rounded-full` |
+| Spacing            | `w-1` to `w-16`                                                                                                      |
+| Icons              | 14 internal DS icons from selected library                                                                           |
+| Buttons            | Semantic colors + `rounded-md` for radius                                                                            |
+| Cards & Containers | `bg-container`, `bg-popover`, `bg-muted`, `bg-accent`                                                                |
+| Borders            | `border-default`, `border-thick`, `border-border-*` colors                                                           |
+| Status Messages    | `*-surface`, `*-text` for success/error/warning/info                                                                 |
 
 ## Icon Library Switching
 
@@ -165,18 +174,18 @@ The playground allows previewing icons from different libraries to help teams de
 
 14 icons are mapped across all three libraries:
 
-| Icon Name | Use Case |
-|-----------|----------|
-| loader | Loading states |
+| Icon Name                  | Use Case              |
+| -------------------------- | --------------------- |
+| loader                     | Loading states        |
 | chevron-down/up/left/right | Dropdowns, navigation |
-| check | Success, selection |
-| x | Close, dismiss |
-| alert-circle | Error states |
-| alert-triangle | Warning states |
-| circle-check | Success confirmation |
-| info-circle | Information |
-| search | Search inputs |
-| eye / eye-off | Password visibility |
+| check                      | Success, selection    |
+| x                          | Close, dismiss        |
+| alert-circle               | Error states          |
+| alert-triangle             | Warning states        |
+| circle-check               | Success confirmation  |
+| info-circle                | Information           |
+| search                     | Search inputs         |
+| eye / eye-off              | Password visibility   |
 
 ### Using PlaygroundIcon
 
@@ -193,6 +202,7 @@ import { PlaygroundIcon } from './components/PlaygroundIcon';
 ### Why Zustand?
 
 Zustand was chosen over React Context for:
+
 - **Selective subscriptions**: Components only re-render when their specific slice changes
 - **No provider wrapping**: Simpler component tree
 - **Future scalability**: Easy to add more playground state (e.g., component props)
@@ -221,17 +231,17 @@ Edit [ComponentShowcase.tsx](src/components/ComponentShowcase.tsx) to add more c
 
 **Why two CSS locations?**
 
-| Location | Purpose | Processed By |
-|----------|---------|--------------|
-| `src/styles/` | Build-time (Tailwind generates utilities) | Vite + Tailwind |
-| `public/themes/` | Runtime (dynamic theme switching) | Browser (no processing) |
+| Location         | Purpose                                   | Processed By            |
+| ---------------- | ----------------------------------------- | ----------------------- |
+| `src/styles/`    | Build-time (Tailwind generates utilities) | Vite + Tailwind         |
+| `public/themes/` | Runtime (dynamic theme switching)         | Browser (no processing) |
 
 **Why `@theme` (not `@theme inline`) in globals.css?**
 
-| Directive | Generated CSS | Runtime Override |
-|-----------|---------------|------------------|
-| `@theme inline` | `.nx\:bg-background { background: #f8fafc; }` | Not possible |
-| `@theme` | `.nx\:bg-background { background: var(--nx-color-background); }` | Works |
+| Directive       | Generated CSS                                                    | Runtime Override |
+| --------------- | ---------------------------------------------------------------- | ---------------- |
+| `@theme inline` | `.nx\:bg-background { background: #f8fafc; }`                    | Not possible     |
+| `@theme`        | `.nx\:bg-background { background: var(--nx-color-background); }` | Works            |
 
 The playground needs `@theme` so Tailwind generates CSS variable references that can be overridden when theme CSS files are loaded dynamically.
 
@@ -242,10 +252,12 @@ Theme CSS files use `html { }` instead of `:root { }` to ensure they override Ta
 ## UI Layout
 
 The playground uses a two-column layout:
+
 - **Main content** (left): Scrollable component showcase with sticky header
 - **Sidebar** (right): Fixed theme controls panel
 
 ThemeSwitcher sections:
+
 - **Appearance**: Light/dark toggle switch
 - **Colors**: Base and brand color dropdowns with color indicators
 - **Design Tokens**: Size, typography, shadow, radius, border width

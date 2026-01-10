@@ -5,17 +5,18 @@
 ## Core Principle
 
 **Stories are tests.** Every component story serves as:
+
 1. Living documentation in Storybook
 2. Interaction tests via play functions
 3. Accessibility tests via addon-a11y
 
 ## Testing Split
 
-| What | Where | Imports From |
-|------|-------|--------------|
-| Components | `*.stories.tsx` | `storybook/test` |
-| Hooks | `*.test.ts` | `@nexus/test-utils` |
-| Utilities | `*.test.ts` | `@nexus/test-utils` |
+| What       | Where           | Imports From        |
+| ---------- | --------------- | ------------------- |
+| Components | `*.stories.tsx` | `storybook/test`    |
+| Hooks      | `*.test.ts`     | `@nexus/test-utils` |
+| Utilities  | `*.test.ts`     | `@nexus/test-utils` |
 
 ## File Structure
 
@@ -81,18 +82,18 @@ export const Interactive: Story = {
 
 ## Required Stories Per Component
 
-| Story Type | Purpose | Play Function? |
-|------------|---------|----------------|
-| Default | Default state | Optional |
-| Each variant | Visual documentation | No |
-| Each size | Visual documentation | No |
-| Disabled | Disabled state behavior | Yes |
-| ClickInteraction | Click handler works | Yes |
-| KeyboardInteraction | A11y keyboard support | Yes |
-| WithDataAttributes | Verify data-* attrs | Yes |
-| asChild (if applicable) | Composition works | Yes |
-| Edge cases | Empty, long content, etc. | Yes |
-| AllVariants | Visual grid reference | No |
+| Story Type              | Purpose                   | Play Function? |
+| ----------------------- | ------------------------- | -------------- |
+| Default                 | Default state             | Optional       |
+| Each variant            | Visual documentation      | No             |
+| Each size               | Visual documentation      | No             |
+| Disabled                | Disabled state behavior   | Yes            |
+| ClickInteraction        | Click handler works       | Yes            |
+| KeyboardInteraction     | A11y keyboard support     | Yes            |
+| WithDataAttributes      | Verify data-\* attrs      | Yes            |
+| asChild (if applicable) | Composition works         | Yes            |
+| Edge cases              | Empty, long content, etc. | Yes            |
+| AllVariants             | Visual grid reference     | No             |
 
 ## Play Function Patterns
 
@@ -105,7 +106,7 @@ play: async ({ canvasElement, args }) => {
 
   await userEvent.click(button);
   await expect(args.onClick).toHaveBeenCalledTimes(1);
-}
+};
 ```
 
 ### Keyboard Testing
@@ -120,7 +121,7 @@ play: async ({ canvasElement, args }) => {
 
   await userEvent.keyboard('{Enter}');
   await expect(args.onClick).toHaveBeenCalledTimes(1);
-}
+};
 ```
 
 ### Disabled State Testing
@@ -133,7 +134,7 @@ play: async ({ canvasElement, args }) => {
   await expect(button).toBeDisabled();
   await userEvent.click(button);
   await expect(args.onClick).not.toHaveBeenCalled();
-}
+};
 ```
 
 ### Data Attributes Testing
@@ -145,7 +146,7 @@ play: async ({ canvasElement }) => {
 
   await expect(button).toHaveAttribute('data-slot', 'button');
   await expect(button).toHaveAttribute('data-variant', 'secondary');
-}
+};
 ```
 
 ## Hook Tests (Using @nexus/test-utils)
@@ -215,7 +216,7 @@ play: async ({ canvasElement }) => {
   const button = canvas.getByRole('button');
 
   await expect(button).toHaveAccessibleName('Close dialog');
-}
+};
 ```
 
 ## Imports Reference
@@ -242,19 +243,20 @@ import {
 
 ## Common Mistakes
 
-| Don't | Do |
-|-------|-----|
-| Create `component.test.tsx` | Add play functions to stories |
-| Import from `@testing-library/react` in stories | Use `storybook/test` |
-| Import `render` from `@nexus/test-utils` | Use stories for components |
-| Add manual `axe()` assertions | Let addon-a11y handle it |
-| Skip keyboard interaction tests | Every interactive component needs them |
-| Use `@nexus/test-utils` for components | Use `storybook/test` in stories |
-| Import from `@storybook/test` | Use `storybook/test` (Storybook 10) |
+| Don't                                           | Do                                     |
+| ----------------------------------------------- | -------------------------------------- |
+| Create `component.test.tsx`                     | Add play functions to stories          |
+| Import from `@testing-library/react` in stories | Use `storybook/test`                   |
+| Import `render` from `@nexus/test-utils`        | Use stories for components             |
+| Add manual `axe()` assertions                   | Let addon-a11y handle it               |
+| Skip keyboard interaction tests                 | Every interactive component needs them |
+| Use `@nexus/test-utils` for components          | Use `storybook/test` in stories        |
+| Import from `@storybook/test`                   | Use `storybook/test` (Storybook 10)    |
 
 ## Visual Regression Testing (Chromatic)
 
 Every story is automatically snapshotted by Chromatic in 4 modes:
+
 - light desktop (1280px)
 - dark desktop (1280px)
 - light mobile (375px)
@@ -263,11 +265,13 @@ Every story is automatically snapshotted by Chromatic in 4 modes:
 ### Running Visual Tests
 
 **In Storybook (recommended for development):**
+
 1. Open the Visual Tests addon panel
 2. Click "Run tests"
 3. Review and accept/reject changes
 
 **From CLI:**
+
 ```bash
 # Local (doesn't fail on changes)
 yarn chromatic
@@ -300,6 +304,7 @@ export const MyStory: Story = {
 ### When to Disable Snapshots
 
 Add `chromatic: { disableSnapshot: true }` for stories that:
+
 - Only test interactions (no unique visual output)
 - Test data attributes or ARIA properties
 - Have identical appearance to another story
@@ -307,12 +312,14 @@ Add `chromatic: { disableSnapshot: true }` for stories that:
 ### When to Use themeOnlyModes
 
 Use `modes: themeOnlyModes` for:
+
 - Grid/showcase stories like AllVariants
 - Simple components that don't need responsive testing
 
 ### Modes Location
 
 Chromatic modes are defined in `packages/react/src/storybook/modes.ts`:
+
 - `allModes` - All 4 theme/viewport combinations (default)
 - `themeOnlyModes` - Light/dark desktop only
 - `viewportOnlyModes` - Mobile/desktop light only

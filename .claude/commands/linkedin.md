@@ -9,18 +9,21 @@ Generate a LinkedIn post about what was built in this session, framed around the
 Nexus is a multi-framework design system being built with AI-native principles:
 
 **Architecture:**
+
 - W3C DTCG tokens → CSS variables → Tailwind utilities (structured for machine consumption)
 - shadcn/ui patterns with Radix UI primitives
 - Multi-framework support (React now, Vue/Svelte planned)
 - Monorepo with Turbo orchestration
 
 **AI-Native Tooling:**
+
 - Claude Code with custom commands and rules
 - MCP integrations (Figma, Linear, GitHub)
 - Automated workflows for component scaffolding, testing, and PR creation
 - Structured conventions that AI can parse and follow
 
 **Philosophy:**
+
 - Design systems should be built for both humans AND AI to understand
 - Structured tokens and conventions make AI tooling possible
 - The future of design systems is AI-native

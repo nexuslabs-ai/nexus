@@ -14,12 +14,12 @@ Example: `Button.stories.tsx`, `Card.stories.tsx`
 
 This template assumes components with `variant`, `size`, `disabled`, and `asChild` props. **Adapt based on actual component API:**
 
-| Component Type | Typical Stories |
-|----------------|-----------------|
+| Component Type              | Typical Stories                   |
+| --------------------------- | --------------------------------- |
 | Interactive (Button, Input) | Variants, Sizes, Disabled, States |
-| Container (Card, Dialog) | Default, WithContent, Composition |
-| Display (Badge, Avatar) | Variants, Sizes |
-| Layout (Separator, Spacer) | Default, Orientation |
+| Container (Card, Dialog)    | Default, WithContent, Composition |
+| Display (Badge, Avatar)     | Variants, Sizes                   |
+| Layout (Separator, Spacer)  | Default, Orientation              |
 
 Skip sections that don't apply. Add component-specific stories as needed.
 
@@ -141,7 +141,9 @@ export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">Variants</h3>
+        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+          Variants
+        </h3>
         <div className="nx:flex nx:gap-2">
           <Component variant="primary">Primary</Component>
           <Component variant="secondary">Secondary</Component>
@@ -149,7 +151,9 @@ export const AllVariants: Story = {
         </div>
       </div>
       <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">Sizes</h3>
+        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+          Sizes
+        </h3>
         <div className="nx:flex nx:items-center nx:gap-2">
           <Component size="sm">Small</Component>
           <Component size="default">Default</Component>
@@ -157,11 +161,19 @@ export const AllVariants: Story = {
         </div>
       </div>
       <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">Disabled</h3>
+        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+          Disabled
+        </h3>
         <div className="nx:flex nx:gap-2">
-          <Component variant="primary" disabled>Primary</Component>
-          <Component variant="secondary" disabled>Secondary</Component>
-          <Component variant="outline" disabled>Outline</Component>
+          <Component variant="primary" disabled>
+            Primary
+          </Component>
+          <Component variant="secondary" disabled>
+            Secondary
+          </Component>
+          <Component variant="outline" disabled>
+            Outline
+          </Component>
         </div>
       </div>
     </div>
@@ -197,15 +209,16 @@ export const AsLink: Story = {
 
 ## Layout Parameters
 
-| Layout | Use Case |
-|--------|----------|
-| `centered` | Single component display (default) |
-| `padded` | Multi-component grids like AllVariants |
-| `fullscreen` | Full-page components |
+| Layout       | Use Case                               |
+| ------------ | -------------------------------------- |
+| `centered`   | Single component display (default)     |
+| `padded`     | Multi-component grids like AllVariants |
+| `fullscreen` | Full-page components                   |
 
 ## Theme Testing
 
 Storybook has a theme toggle in the toolbar. Stories automatically support:
+
 - Light mode (default)
 - Dark mode (via `.dark` class wrapper)
 
@@ -238,15 +251,17 @@ Components/
 ## Autodocs
 
 Autodocs is enabled globally in `.storybook/preview.tsx` via `tags: ['autodocs']`. All stories automatically get:
+
 - Component description
 - Props table
 - Interactive playground
 - All story examples
 
 To exclude a specific story from autodocs:
+
 ```tsx
 export const InternalStory: Story = {
-  tags: ['!autodocs'],  // Exclude from docs
+  tags: ['!autodocs'], // Exclude from docs
   // ...
 };
 ```
@@ -257,12 +272,12 @@ Every interactive component story should include play functions for testing. Sto
 
 ### Required Play Function Stories
 
-| Story | Tests |
-|-------|-------|
-| Disabled | Verify disabled state, click does nothing |
-| ClickInteraction | Click triggers handler |
-| KeyboardInteraction | Tab focuses, Enter/Space triggers |
-| WithDataAttributes | Verify data-slot, data-variant, data-size |
+| Story               | Tests                                     |
+| ------------------- | ----------------------------------------- |
+| Disabled            | Verify disabled state, click does nothing |
+| ClickInteraction    | Click triggers handler                    |
+| KeyboardInteraction | Tab focuses, Enter/Space triggers         |
+| WithDataAttributes  | Verify data-slot, data-variant, data-size |
 
 ### Play Function Template
 
@@ -334,9 +349,9 @@ import { themeOnlyModes } from '@/storybook/modes';
 export const MyStory: Story = {
   parameters: {
     chromatic: {
-      disableSnapshot: true,  // Skip visual test
-      delay: 500,             // Wait before capture
-      modes: themeOnlyModes,  // Override default modes
+      disableSnapshot: true, // Skip visual test
+      delay: 500, // Wait before capture
+      modes: themeOnlyModes, // Override default modes
     },
   },
 };
@@ -344,15 +359,15 @@ export const MyStory: Story = {
 
 ### Which Stories Need Visual Tests?
 
-| Story Type | Visual Test? | Chromatic Config |
-|------------|--------------|------------------|
-| Variant stories | Yes | Default (all 4 modes) |
-| Size stories | Yes | Default |
-| Disabled states | Yes | Default |
-| AllVariants grid | Yes | `modes: themeOnlyModes` |
-| Interaction tests | No | `disableSnapshot: true` |
-| Data attribute tests | No | `disableSnapshot: true` |
-| Edge case tests | Maybe | Depends on visual uniqueness |
+| Story Type           | Visual Test? | Chromatic Config             |
+| -------------------- | ------------ | ---------------------------- |
+| Variant stories      | Yes          | Default (all 4 modes)        |
+| Size stories         | Yes          | Default                      |
+| Disabled states      | Yes          | Default                      |
+| AllVariants grid     | Yes          | `modes: themeOnlyModes`      |
+| Interaction tests    | No           | `disableSnapshot: true`      |
+| Data attribute tests | No           | `disableSnapshot: true`      |
+| Edge case tests      | Maybe        | Depends on visual uniqueness |
 
 ### Import Modes
 
@@ -361,6 +376,7 @@ import { themeOnlyModes } from '@/storybook/modes';
 ```
 
 Available modes from `packages/react/src/storybook/modes.ts`:
+
 - `allModes` - 4 combinations (light/dark × desktop/mobile)
 - `themeOnlyModes` - 2 combinations (light/dark desktop)
 - `viewportOnlyModes` - 2 combinations (desktop/mobile light)

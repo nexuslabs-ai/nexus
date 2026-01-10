@@ -83,7 +83,9 @@ export function ComponentShowcase() {
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
                   <span className="nx:typography-label-large">Label Large</span>
-                  <span className="nx:typography-label-default">Label Default</span>
+                  <span className="nx:typography-label-default">
+                    Label Default
+                  </span>
                   <span className="nx:typography-label-small">Label Small</span>
                   <span className="nx:typography-label-caps">Label Caps</span>
                 </div>
