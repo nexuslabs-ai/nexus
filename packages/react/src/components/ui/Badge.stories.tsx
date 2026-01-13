@@ -34,11 +34,7 @@ const meta: Meta<typeof Badge> = {
     },
     isNumber: {
       control: 'boolean',
-      description: 'Render as circular number badge',
-    },
-    value: {
-      control: 'text',
-      description: 'Value to display when isNumber is true',
+      description: 'Render as circular number badge (pass number as children)',
     },
     leftIcon: {
       control: false,
@@ -219,8 +215,8 @@ export const WithCustomClassName: Story = {
 // ============================================
 
 export const AsLink: Story = {
-  render: (args) => (
-    <Badge {...args} asChild>
+  render: () => (
+    <Badge asChild>
       <a href="https://example.com">New</a>
     </Badge>
   ),
@@ -276,14 +272,14 @@ export const WithBothIcons: Story = {
 export const NumberBadge: Story = {
   args: {
     isNumber: true,
-    value: 8,
+    children: 8,
   },
 };
 
 export const NumberBadgeHighValue: Story = {
   args: {
     isNumber: true,
-    value: '99+',
+    children: '99+',
     variant: 'error',
   },
   // TODO: Fix error-background/error-foreground token contrast
@@ -298,7 +294,7 @@ export const NumberBadgeIgnoresIcons: Story = {
   },
   args: {
     isNumber: true,
-    value: 5,
+    children: 5,
     leftIcon: <IconCheck />, // Should be ignored
   },
   play: async ({ canvasElement }) => {
@@ -434,13 +430,27 @@ export const AllVariants: Story = {
           Number Badges
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
-          <Badge variant="default" isNumber value={8} />
-          <Badge variant="secondary" isNumber value={8} />
-          <Badge variant="outline" isNumber value={8} />
-          <Badge variant="error" isNumber value={8} />
-          <Badge variant="warning" isNumber value={8} />
-          <Badge variant="success" isNumber value={8} />
-          <Badge variant="information" isNumber value={8} />
+          <Badge variant="default" isNumber>
+            8
+          </Badge>
+          <Badge variant="secondary" isNumber>
+            8
+          </Badge>
+          <Badge variant="outline" isNumber>
+            8
+          </Badge>
+          <Badge variant="error" isNumber>
+            8
+          </Badge>
+          <Badge variant="warning" isNumber>
+            8
+          </Badge>
+          <Badge variant="success" isNumber>
+            8
+          </Badge>
+          <Badge variant="information" isNumber>
+            8
+          </Badge>
         </div>
       </div>
 
