@@ -130,25 +130,15 @@ interface BadgeProps
 
   /**
    * When true, renders as a circular number badge.
-   * Use with `value` prop to display a number.
+   * Pass the number as children.
    * @default false
    * @example
    * ```tsx
-   * <Badge isNumber value={8} />
-   * <Badge isNumber value="99+" variant="error" />
+   * <Badge isNumber>8</Badge>
+   * <Badge isNumber variant="error">99+</Badge>
    * ```
    */
   isNumber?: boolean;
-
-  /**
-   * The value to display when `isNumber` is true.
-   * Ignored when `isNumber` is false.
-   * @example
-   * ```tsx
-   * <Badge isNumber value={5} />
-   * ```
-   */
-  value?: string | number;
 
   /**
    * Icon to display before the label.
@@ -180,40 +170,53 @@ function Badge({
   isCaps = true,
   asChild = false,
   isNumber = false,
-  value,
   leftIcon,
   rightIcon,
   children,
   ...props
 }: BadgeProps) {
-  const Comp = asChild ? Slot : 'span';
-
   // Number badges don't support icons
   const showLeftIcon = leftIcon && !isNumber;
   const showRightIcon = rightIcon && !isNumber;
 
+  const classes = cn(
+    badgeVariants({ variant, fill }),
+    isCaps
+      ? 'nx:typography-label-caps nx:uppercase'
+      : 'nx:typography-label-default',
+    isNumber
+      ? 'nx:size-5 nx:rounded-full nx:p-0 nx:typography-label-caps'
+      : isCaps
+        ? 'nx:px-2 nx:py-0.5'
+        : 'nx:px-2.5 nx:py-0.5',
+    className
+  );
+
+  // Slot requires exactly one child element
+  if (asChild) {
+    return (
+      <Slot
+        data-slot="badge"
+        data-variant={variant}
+        data-fill={fill}
+        data-caps={isCaps}
+        data-number={isNumber || undefined}
+        className={classes}
+        {...props}
+      >
+        {children}
+      </Slot>
+    );
+  }
+
   return (
-    <Comp
+    <span
       data-slot="badge"
       data-variant={variant}
       data-fill={fill}
       data-caps={isCaps}
       data-number={isNumber || undefined}
-      className={cn(
-        badgeVariants({ variant, fill }),
-        // Typography: caps vs sentence case
-        isCaps
-          ? 'nx:typography-label-caps nx:uppercase'
-          : 'nx:typography-label-default',
-        isNumber
-          ? // Circular number badge: fixed size, no padding, fully rounded
-            'nx:size-5 nx:rounded-full nx:p-0 nx:typography-label-caps'
-          : // Text badge: padding based on isCaps
-            isCaps
-            ? 'nx:px-2 nx:py-0.5'
-            : 'nx:px-2.5 nx:py-0.5',
-        className
-      )}
+      className={classes}
       {...props}
     >
       {showLeftIcon && (
@@ -221,13 +224,13 @@ function Badge({
           {leftIcon}
         </span>
       )}
-      {isNumber ? value : children}
+      {children}
       {showRightIcon && (
         <span className="nx:flex nx:items-center nx:justify-center nx:size-3.5">
           {rightIcon}
         </span>
       )}
-    </Comp>
+    </span>
   );
 }
 
