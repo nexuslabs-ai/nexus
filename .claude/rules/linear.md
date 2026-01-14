@@ -10,14 +10,15 @@ Linear issues in this workspace use the `NEX-###` format (e.g., `NEX-140`).
 
 When extracting Linear issue IDs from PRs or user input:
 
-| Source | Pattern | Priority |
-|--------|---------|----------|
-| PR Title | `[NEX-###]` | 1st (preferred) |
-| PR Body | `Closes NEX-###`, `Fixes NEX-###` | 2nd |
-| PR Body | `NEX-###` (standalone) | 3rd |
-| User Input | Direct input | Fallback |
+| Source     | Pattern                           | Priority        |
+| ---------- | --------------------------------- | --------------- |
+| PR Title   | `[NEX-###]`                       | 1st (preferred) |
+| PR Body    | `Closes NEX-###`, `Fixes NEX-###` | 2nd             |
+| PR Body    | `NEX-###` (standalone)            | 3rd             |
+| User Input | Direct input                      | Fallback        |
 
 **Extraction Order:**
+
 1. Check PR title for `[NEX-###]` pattern (new format)
 2. Check PR body for magic words: `Closes NEX-###`, `Fixes NEX-###`
 3. Check PR body for standalone `NEX-###`
@@ -37,21 +38,21 @@ Todo → In Progress → In Review → Done
 
 When GitHub integration is properly configured:
 
-| GitHub Event | Linear Status | Condition |
-|--------------|---------------|-----------|
-| PR opened | → In Progress | Issue ID in PR title `[NEX-###]` |
-| PR ready for review | → In Review | Issue ID linked |
-| PR merged | → Done | `Closes NEX-###` in PR body |
+| GitHub Event        | Linear Status | Condition                        |
+| ------------------- | ------------- | -------------------------------- |
+| PR opened           | → In Progress | Issue ID in PR title `[NEX-###]` |
+| PR ready for review | → In Review   | Issue ID linked                  |
+| PR merged           | → Done        | `Closes NEX-###` in PR body      |
 
 ### Manual Updates
 
 Some status updates still require manual API calls:
 
-| Status | When to Update Manually |
-|--------|------------------------|
+| Status      | When to Update Manually                                   |
+| ----------- | --------------------------------------------------------- |
 | In Progress | When starting work (branch creation doesn't auto-trigger) |
-| In Review | Not needed if PR title has `[NEX-###]` |
-| Done | Not needed if PR body has `Closes NEX-###` |
+| In Review   | Not needed if PR title has `[NEX-###]`                    |
+| Done        | Not needed if PR body has `Closes NEX-###`                |
 
 ## MCP Tool Reference
 
@@ -62,6 +63,7 @@ mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
 ```
 
 Key fields to extract:
+
 - `title`, `description` - Issue details
 - `state` - Current status
 - `branchName` / `gitBranchName` - Suggested branch name
@@ -92,12 +94,12 @@ mcp__linear__update_issue(id: "{issue_id}", links: [{url: "{url}", title: "{titl
 
 Use consistent emoji prefixes for Linear comments:
 
-| Action | Prefix | Example |
-|--------|--------|---------|
-| Starting work | `🤖` | `🤖 Starting implementation...` |
-| PR created | `🔗` | `🔗 PR created: {url}` |
-| Review complete | `📋` | `📋 PR Review Complete - Verdict: APPROVED` |
-| Completed | `✅` | `✅ PR merged and ticket completed` |
+| Action          | Prefix | Example                                     |
+| --------------- | ------ | ------------------------------------------- |
+| Starting work   | `🤖`   | `🤖 Starting implementation...`             |
+| PR created      | `🔗`   | `🔗 PR created: {url}`                      |
+| Review complete | `📋`   | `📋 PR Review Complete - Verdict: APPROVED` |
+| Completed       | `✅`   | `✅ PR merged and ticket completed`         |
 
 ## Branch Naming
 

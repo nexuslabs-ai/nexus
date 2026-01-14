@@ -22,14 +22,15 @@
     "build-storybook": "yarn workspace @nexus/react build-storybook",
     "chromatic": "chromatic --exit-zero-on-changes --build-script-name=build-storybook",
     "chromatic:ci": "chromatic --build-script-name=build-storybook",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
     "tokens:modular": "cd packages/core && yarn build:tokens:modular && cd ../../apps/playground && mkdir -p src/styles public/themes && cp ../../packages/core/dist/modular/* public/themes/ && cp ../../packages/core/dist/modular/globals.css ../../packages/core/dist/modular/color.css ../../packages/core/dist/modular/typography-utilities.css ../../packages/core/dist/modular/borderwidth-utilities.css src/styles/",
-    "tokens:tailwind": "cd packages/core && yarn build:tailwind",
+    "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "playground": "cd apps/playground && yarn dev",
-    "size-limit": "size-limit"
+    "size-limit": "size-limit",
+    "prepare": "husky"
   },
   "size-limit": [
     {
@@ -59,7 +60,9 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.3.0",
+    "lint-staged": "^16.2.7",
     "playwright": "^1.57.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
@@ -74,5 +77,14 @@
   "packageManager": "yarn@1.22.22",
   "engines": {
     "node": ">=20.19.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
   }
 }

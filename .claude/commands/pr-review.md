@@ -23,6 +23,7 @@ If no input provided, ask the user for PR number.
    - If no PR found, ask user for PR number
 
 3. **Fetch PR details** (see `.claude/rules/github.md` for MCP usage):
+
    ```
    mcp__github__get_pull_request(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
@@ -34,15 +35,18 @@ If no input provided, ask the user for PR number.
    - PR author
 
 5. **If Linear issue linked, fetch ticket:**
+
    ```
    mcp__linear__get_issue(id: "{issue_id}")
    ```
+
    - Understand what was requested
    - Note acceptance criteria
 
 ## Phase 2: Read Changed Files
 
 1. **Get list of changed files:**
+
    ```
    mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
@@ -54,14 +58,14 @@ If no input provided, ask the user for PR number.
 
 3. **Categorize files:**
 
-   | Category | Files |
-   |----------|-------|
+   | Category   | Files                                    |
+   | ---------- | ---------------------------------------- |
    | Components | `packages/react/src/components/**/*.tsx` |
-   | Stories | `*.stories.tsx` |
-   | Tests | `*.test.ts(x)` |
-   | Config | `*.config.*`, `*.json`, `*.yml` |
-   | Styles | `*.css` |
-   | Docs | `*.md`, `CLAUDE.md` |
+   | Stories    | `*.stories.tsx`                          |
+   | Tests      | `*.test.ts(x)`                           |
+   | Config     | `*.config.*`, `*.json`, `*.yml`          |
+   | Styles     | `*.css`                                  |
+   | Docs       | `*.md`, `CLAUDE.md`                      |
 
 ## Phase 3: Context-Aware Review
 
@@ -71,19 +75,20 @@ If no input provided, ask the user for PR number.
 
 Based on changed files, read relevant rule files:
 
-| If Changed | Read Rules |
-|------------|------------|
-| Components | `.claude/rules/components.md` |
-| Stories | `.claude/rules/storybook.md`, `.claude/rules/testing.md` |
-| Tokens/CSS | `.claude/rules/tokens.md` |
-| Figma-related | `.claude/rules/figma.md` |
-| PR/Commits | `.claude/rules/github.md` |
-| Linear integration | `.claude/rules/linear.md` |
-| Any code | Root `CLAUDE.md` for general conventions |
+| If Changed         | Read Rules                                               |
+| ------------------ | -------------------------------------------------------- |
+| Components         | `.claude/rules/components.md`                            |
+| Stories            | `.claude/rules/storybook.md`, `.claude/rules/testing.md` |
+| Tokens/CSS         | `.claude/rules/tokens.md`                                |
+| Figma-related      | `.claude/rules/figma.md`                                 |
+| PR/Commits         | `.claude/rules/github.md`                                |
+| Linear integration | `.claude/rules/linear.md`                                |
+| Any code           | Root `CLAUDE.md` for general conventions                 |
 
 ### 3.2 Review Checklist
 
 #### Architecture (for components/features)
+
 - [ ] Follows existing patterns in codebase
 - [ ] Uses appropriate abstractions (not over/under-engineered)
 - [ ] Correct file structure and naming
@@ -92,6 +97,7 @@ Based on changed files, read relevant rule files:
 - [ ] CVA for variants (not conditional class logic)
 
 #### Code Quality
+
 - [ ] All Tailwind classes have `nx:` prefix
 - [ ] `nx:` prefix comes BEFORE pseudo-classes (`nx:hover:` not `hover:nx:`)
 - [ ] Semantic tokens only (no raw colors like `blue-500`, `#fff`)
@@ -103,6 +109,7 @@ Based on changed files, read relevant rule files:
 - [ ] Export order: component, props type, variants
 
 #### Testing (for stories/tests)
+
 - [ ] All variants/states covered
 - [ ] Play functions for interactions
 - [ ] Proper imports from `storybook/test` (not `@storybook/test`)
@@ -110,6 +117,7 @@ Based on changed files, read relevant rule files:
 - [ ] Edge cases tested (empty, long content, disabled, etc.)
 
 #### Accessibility
+
 - [ ] Proper ARIA attributes where needed
 - [ ] Keyboard navigation works
 - [ ] Color contrast sufficient
@@ -117,12 +125,14 @@ Based on changed files, read relevant rule files:
 - [ ] Screen reader friendly (alt text, labels)
 
 #### Security
+
 - [ ] No secrets/credentials in code
 - [ ] No hardcoded URLs that should be config
 - [ ] Input validation where needed
 - [ ] No XSS vulnerabilities in dynamic content
 
 #### Performance
+
 - [ ] No unnecessary dependencies added
 - [ ] No large imports that could be tree-shaken
 - [ ] Memoization where appropriate (but not premature)
@@ -131,6 +141,7 @@ Based on changed files, read relevant rule files:
 ### 3.3 Linear Ticket Compliance
 
 If Linear ticket available:
+
 - [ ] All requirements addressed
 - [ ] Acceptance criteria met
 - [ ] Scope matches ticket (no scope creep)
@@ -140,14 +151,14 @@ If Linear ticket available:
 
 1. **Create summary table:**
 
-   | Category | Status | Issues |
-   |----------|--------|--------|
-   | Architecture | ✅/⚠️/❌ | {count} |
-   | Code Quality | ✅/⚠️/❌ | {count} |
-   | Testing | ✅/⚠️/❌ | {count} |
-   | Accessibility | ✅/⚠️/❌ | {count} |
-   | Security | ✅/⚠️/❌ | {count} |
-   | Performance | ✅/⚠️/❌ | {count} |
+   | Category          | Status   | Issues  |
+   | ----------------- | -------- | ------- |
+   | Architecture      | ✅/⚠️/❌ | {count} |
+   | Code Quality      | ✅/⚠️/❌ | {count} |
+   | Testing           | ✅/⚠️/❌ | {count} |
+   | Accessibility     | ✅/⚠️/❌ | {count} |
+   | Security          | ✅/⚠️/❌ | {count} |
+   | Performance       | ✅/⚠️/❌ | {count} |
    | Ticket Compliance | ✅/⚠️/❌ | {count} |
 
    Legend: ✅ Pass | ⚠️ Minor issues | ❌ Blocking issues
@@ -159,10 +170,10 @@ If Linear ticket available:
 
 3. **Determine review verdict:**
 
-   | Condition | Verdict |
-   |-----------|---------|
-   | No issues | `APPROVE` |
-   | Minor issues only (⚠️) | `COMMENT` |
+   | Condition                | Verdict           |
+   | ------------------------ | ----------------- |
+   | No issues                | `APPROVE`         |
+   | Minor issues only (⚠️)   | `COMMENT`         |
    | Any blocking issues (❌) | `REQUEST_CHANGES` |
 
 ## Phase 5: Post Review
@@ -189,35 +200,42 @@ If Linear ticket available:
    ## 🤖 Automated Code Review
 
    ### Summary
-   | Category | Status | Issues |
-   |----------|--------|--------|
-   | Architecture | {status} | {notes} |
-   | Code Quality | {status} | {notes} |
-   | Testing | {status} | {notes} |
-   | Accessibility | {status} | {notes} |
-   | Security | {status} | {notes} |
-   | Performance | {status} | {notes} |
+
+   | Category          | Status   | Issues  |
+   | ----------------- | -------- | ------- |
+   | Architecture      | {status} | {notes} |
+   | Code Quality      | {status} | {notes} |
+   | Testing           | {status} | {notes} |
+   | Accessibility     | {status} | {notes} |
+   | Security          | {status} | {notes} |
+   | Performance       | {status} | {notes} |
    | Ticket Compliance | {status} | {notes} |
 
    ### Verdict: {APPROVED|CHANGES REQUESTED|REVIEWED}
 
    {If issues found:}
+
    ### Issues Found
 
    #### Blocking ❌
+
    - {issue 1}
    - {issue 2}
 
    #### Minor ⚠️
+
    - {issue 1}
    - {issue 2}
 
    {If approved:}
+
    ### Result
+
    ✅ All checks passed. Code follows Nexus conventions.
 
    ---
-   *Review performed against: `.claude/rules/components.md`, `.claude/rules/testing.md`, etc.*
+
+   _Review performed against: `.claude/rules/components.md`, `.claude/rules/testing.md`, etc._
    ```
 
 3. **If Linear ticket linked, add comment** (use emoji conventions from `.claude/rules/linear.md`):
@@ -234,28 +252,34 @@ If Linear ticket available:
 ## 📋 Review Complete
 
 ### PR: #{pr_number} - {title}
+
 **Verdict:** {APPROVED|CHANGES REQUESTED|REVIEWED}
 
 ### Summary
-| Category | Status |
-|----------|--------|
-| Architecture | {emoji} |
-| Code Quality | {emoji} |
-| Testing | {emoji} |
+
+| Category      | Status  |
+| ------------- | ------- |
+| Architecture  | {emoji} |
+| Code Quality  | {emoji} |
+| Testing       | {emoji} |
 | Accessibility | {emoji} |
-| Security | {emoji} |
-| Performance | {emoji} |
+| Security      | {emoji} |
+| Performance   | {emoji} |
 
 ### Issues Found
+
 {count} blocking, {count} minor
 
 {If issues found:}
+
 ### Top Issues to Address
+
 1. {Most critical issue}
 2. {Second issue}
 3. {Third issue}
 
 ### Links
+
 - **PR:** {pr_url}
 - **Linear:** {linear_url}
 ```
@@ -272,6 +296,7 @@ If Linear ticket available:
 ## Common Issues to Watch For
 
 ### Components
+
 - Missing `nx:` prefix on Tailwind classes
 - `hover:nx:` instead of `nx:hover:` (wrong order)
 - Using `bg-primary` instead of `bg-primary-background`
@@ -280,12 +305,14 @@ If Linear ticket available:
 - Missing `asChild` support on interactive elements
 
 ### Stories
+
 - Importing from `@storybook/test` instead of `storybook/test`
 - Missing play functions for interactive stories
 - No `AllVariants` grid story
 - Missing Chromatic config for grid stories
 
 ### General
+
 - Console.log left in code
 - Commented out code
 - TODO comments without ticket reference

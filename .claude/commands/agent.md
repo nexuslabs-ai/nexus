@@ -10,6 +10,7 @@ Create or update agents based on codebase exploration.
 ### 1. Gather Information
 
 Ask the user:
+
 - **Action**: Create new agent or update existing?
 - **Scope**: What should this agent analyze? (package, feature, patterns)
 - **Purpose**: What should the agent discover or report?
@@ -17,6 +18,7 @@ Ask the user:
 ### 2. Explore Relevant Context
 
 Based on scope, read:
+
 - Package `CLAUDE.md` files
 - `.claude/rules/*.md` files
 - Existing patterns in the codebase
@@ -24,6 +26,7 @@ Based on scope, read:
 ### 3. Define Agent Scope
 
 From exploration, identify:
+
 - What files/patterns to analyze
 - What questions the agent should answer
 - What format for output/report
@@ -38,9 +41,9 @@ Follow the structure from `.claude/rules/skills-agents.md`
 
 Provide summary:
 
-| Item | Details |
-|------|---------|
-| Agent | `{agent-name}` |
+| Item     | Details                          |
+| -------- | -------------------------------- |
+| Agent    | `{agent-name}`                   |
 | Location | `.claude/agents/{agent-name}.md` |
-| Scope | {what it analyzes} |
-| Triggers | {when to use} |
+| Scope    | {what it analyzes}               |
+| Triggers | {when to use}                    |

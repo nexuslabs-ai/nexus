@@ -29,9 +29,12 @@ const componentVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-hover',
-        secondary: 'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-hover',
-        outline: 'nx:border nx:border-border-default nx:bg-background nx:hover:bg-accent',
+        primary:
+          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-hover',
+        secondary:
+          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-hover',
+        outline:
+          'nx:border nx:border-border-default nx:bg-background nx:hover:bg-accent',
       },
       size: {
         // Use padding for sizing (flex-friendly), avoid fixed heights
@@ -48,7 +51,8 @@ const componentVariants = cva(
 );
 
 interface ComponentProps
-  extends React.ComponentProps<'element'>,
+  extends
+    React.ComponentProps<'element'>,
     VariantProps<typeof componentVariants> {
   asChild?: boolean;
 }
@@ -78,20 +82,22 @@ export { Component, type ComponentProps, componentVariants };
 
 ## Required Attributes
 
-| Attribute | Purpose | Example |
-|-----------|---------|---------|
-| `data-slot` | Component identification | `data-slot="button"` |
+| Attribute      | Purpose                   | Example                  |
+| -------------- | ------------------------- | ------------------------ |
+| `data-slot`    | Component identification  | `data-slot="button"`     |
 | `data-variant` | Variant for styling hooks | `data-variant={variant}` |
-| `data-size` | Size for styling hooks | `data-size={size}` |
+| `data-size`    | Size for styling hooks    | `data-size={size}`       |
 
 ## Props Pattern
 
 Define props as a named interface above the function (not inline). Add JSDoc comments for custom props to document behavior, defaults, and usage examples:
 
-```tsx
+````tsx
 interface ComponentProps
-  extends React.ComponentProps<'element'>,  // Native element props
-    VariantProps<typeof componentVariants> {  // Variant props from cva
+  extends
+    React.ComponentProps<'element'>, // Native element props
+    VariantProps<typeof componentVariants> {
+  // Variant props from cva
   /**
    * When true, renders as child element using Radix Slot.
    * Useful for composition with links or custom elements.
@@ -105,14 +111,48 @@ interface ComponentProps
    */
   asChild?: boolean;
 }
-```
+````
 
 ### JSDoc Requirements
 
 All custom props (not inherited from HTML elements or VariantProps) MUST have JSDoc with:
+
 - Description of what the prop does
 - `@default` value if applicable
 - `@example` for non-obvious usage
+
+### Boolean Props in CVA
+
+**Do NOT use `true`/`false` values in CVA variants.** Handle boolean props with ternary operators in component code instead:
+
+```tsx
+// ❌ Bad - boolean variant in CVA
+const variants = cva('...', {
+  variants: {
+    isCompact: {
+      true: 'nx:p-2',
+      false: 'nx:p-4',
+    },
+  },
+});
+
+// ✅ Good - boolean handled in component with ternary
+function Component({ isCompact = false, ... }) {
+  return (
+    <div className={cn(
+      variants({ variant, size }),
+      isCompact ? 'nx:p-2' : 'nx:p-4',
+    )} />
+  );
+}
+```
+
+**Why:**
+
+- CVA `true`/`false` variants are less readable
+- Ternary operators make the boolean logic explicit
+- Keeps CVA focused on enum-style variants (variant, size, fill)
+- Boolean props should be defined explicitly in the interface with JSDoc
 
 ## Export Pattern
 
@@ -146,21 +186,21 @@ All Tailwind utility classes MUST use the `nx:` prefix. The prefix comes BEFORE 
 
 ```tsx
 // Good - nx: prefix BEFORE pseudo-classes
-'nx:bg-primary-background nx:text-primary-foreground'
-'nx:hover:bg-secondary-hover'
-'nx:focus-visible:ring-2'
-'nx:disabled:opacity-50'
-'nx:[&_svg]:size-4'
+'nx:bg-primary-background nx:text-primary-foreground';
+'nx:hover:bg-secondary-hover';
+'nx:focus-visible:ring-2';
+'nx:disabled:opacity-50';
+'nx:[&_svg]:size-4';
 
 // Bad - pseudo-class before nx: prefix (won't work correctly)
-'hover:nx:bg-secondary-hover'
-'focus-visible:nx:ring-2'
-'disabled:nx:opacity-50'
-'[&_svg]:nx:size-4'
+'hover:nx:bg-secondary-hover';
+'focus-visible:nx:ring-2';
+'disabled:nx:opacity-50';
+'[&_svg]:nx:size-4';
 
 // Bad - missing nx: prefix entirely
-'bg-primary text-primary-foreground'
-'hover:bg-secondary/80'
+'bg-primary text-primary-foreground';
+'hover:bg-secondary/80';
 ```
 
 ## Semantic Token Usage
@@ -169,18 +209,18 @@ Use semantic color tokens with full path, not primitives:
 
 ```tsx
 // Good - full semantic token path
-'nx:bg-primary-background nx:text-primary-foreground'
-'nx:bg-secondary-background nx:hover:bg-secondary-hover'
-'nx:border-border-default'
-'nx:bg-error-background nx:text-error-foreground'
+'nx:bg-primary-background nx:text-primary-foreground';
+'nx:bg-secondary-background nx:hover:bg-secondary-hover';
+'nx:border-border-default';
+'nx:bg-error-background nx:text-error-foreground';
 
 // Bad - primitive colors
-'nx:bg-blue-500 nx:text-white'
-'nx:bg-neutral-100'
+'nx:bg-blue-500 nx:text-white';
+'nx:bg-neutral-100';
 
 // Bad - incomplete token path
-'nx:bg-primary'  // use nx:bg-primary-background
-'nx:bg-error'    // use nx:bg-error-background
+'nx:bg-primary'; // use nx:bg-primary-background
+'nx:bg-error'; // use nx:bg-error-background
 ```
 
 ## Sizing Convention
@@ -205,6 +245,7 @@ size: {
 ```
 
 **Exceptions** (where fixed dimensions are acceptable):
+
 - Modal/dialog width (`nx:max-w-lg`)
 - Toast max-width
 - Avatar/icon containers that need exact dimensions
@@ -244,3 +285,4 @@ export * from '@/components/ui/new-component';
 - Skip `asChild` support for interactive components
 - Use inline styles
 - Use incomplete token paths (`nx:bg-primary` instead of `nx:bg-primary-background`)
+- Use `true`/`false` values in CVA variants (use ternary in component code)

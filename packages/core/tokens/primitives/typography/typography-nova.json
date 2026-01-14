@@ -7,20 +7,8 @@
         "nx-font-source": {
           "type": "google",
           "family": "Inter",
-          "weights": [
-            100,
-            200,
-            300,
-            400,
-            500,
-            600,
-            700,
-            800,
-            900
-          ],
-          "styles": [
-            "normal"
-          ]
+          "weights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+          "styles": ["normal"]
         }
       }
     },
@@ -40,15 +28,8 @@
         "nx-font-source": {
           "type": "google",
           "family": "JetBrains+Mono",
-          "weights": [
-            400,
-            500,
-            600,
-            700
-          ],
-          "styles": [
-            "normal"
-          ]
+          "weights": [400, 500, 600, 700],
+          "styles": ["normal"]
         }
       }
     }
