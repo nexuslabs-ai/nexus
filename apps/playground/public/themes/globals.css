@@ -6,8 +6,8 @@
  * that can be overridden by dynamically loaded theme CSS files.
  * Tailwind utilities are generated with nx: prefix (e.g., nx:bg-background).
  *
- * Default values are from slate-light base + blue-light brand.
- * These can be overridden by theme CSS files loaded by useTheme hook.
+ * Color tokens reference --nx-* primitives via var().
+ * Theme switching works by loading different primitive CSS files.
  */
 /* Google Fonts - auto-generated from typography tokens */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -26,68 +26,68 @@
   --radius-*: initial;
   --shadow-*: initial;
 
-  /* Semantic color tokens - defaults, overridden by theme CSS */
-  --color-background: #f8fafc;
-  --color-foreground: #0f172a;
-  --color-container: #ffffff;
-  --color-container-foreground: #0f172a;
-  --color-popover: #f8fafc;
-  --color-popover-foreground: #0f172a;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-accent: #f1f5f9;
-  --color-accent-foreground: #0f172a;
+  /* Semantic color tokens */
+  --color-background: var(--nx-color-slate-50);
+  --color-foreground: var(--nx-color-slate-900);
+  --color-container: var(--nx-color-white);
+  --color-container-foreground: var(--nx-color-slate-900);
+  --color-popover: var(--nx-color-slate-50);
+  --color-popover-foreground: var(--nx-color-slate-900);
+  --color-muted: var(--nx-color-slate-100);
+  --color-muted-foreground: var(--nx-color-slate-500);
+  --color-accent: var(--nx-color-slate-100);
+  --color-accent-foreground: var(--nx-color-slate-900);
   --color-overlay: #1e1e1ecc;
-  --color-border-default: #e2e8f0;
-  --color-border-primary: #020617;
-  --color-border-warning: #fed7aa;
-  --color-border-success: #bbf7d0;
-  --color-border-error: #fecaca;
-  --color-border-information: #bfdbfe;
-  --color-error-background: #ef4444;
-  --color-error-foreground: #ffffff;
-  --color-error-hover: #dc2626;
-  --color-error-active: #b91c1c;
-  --color-error-disabled: #fca5a5;
-  --color-error-text: #dc2626;
-  --color-error-surface: #fef2f2;
-  --color-success-background: #16a34a;
-  --color-success-foreground: #ffffff;
-  --color-success-hover: #15803d;
-  --color-success-active: #166534;
-  --color-success-disabled: #86efac;
-  --color-success-text: #16a34a;
-  --color-success-surface: #f0fdf4;
-  --color-information-background: #3b82f6;
-  --color-information-foreground: #ffffff;
-  --color-information-hover: #2563eb;
-  --color-information-active: #1d4ed8;
-  --color-information-disabled: #93c5fd;
-  --color-information-text: #2563eb;
-  --color-information-surface: #eff6ff;
-  --color-warning-background: #f97316;
-  --color-warning-foreground: #ffffff;
-  --color-warning-hover: #ea580c;
-  --color-warning-active: #c2410c;
-  --color-warning-disabled: #fdba74;
-  --color-warning-text: #ea580c;
-  --color-warning-surface: #fff7ed;
-  --color-primary-background: #2563eb;
-  --color-primary-foreground: #ffffff;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-active: #1e40af;
-  --color-primary-disabled: #93c5fd;
-  --color-primary-text: #2563eb;
-  --color-primary-surface: #eff6ff;
-  --color-secondary-background: #f5f5f5;
-  --color-secondary-foreground: #171717;
-  --color-secondary-hover: #e5e5e5;
-  --color-secondary-active: #d4d4d4;
-  --color-secondary-disabled: #fafafa;
-  --color-secondary-text: #525252;
-  --color-secondary-surface: #f5f5f5;
+  --color-border-default: var(--nx-color-slate-200);
+  --color-border-primary: var(--nx-color-slate-950);
+  --color-border-warning: var(--nx-color-orange-200);
+  --color-border-success: var(--nx-color-green-200);
+  --color-border-error: var(--nx-color-red-200);
+  --color-border-information: var(--nx-color-blue-200);
+  --color-error-background: var(--nx-color-red-500);
+  --color-error-foreground: var(--nx-color-white);
+  --color-error-hover: var(--nx-color-red-600);
+  --color-error-active: var(--nx-color-red-700);
+  --color-error-disabled: var(--nx-color-red-300);
+  --color-error-text: var(--nx-color-red-600);
+  --color-error-surface: var(--nx-color-red-50);
+  --color-success-background: var(--nx-color-green-600);
+  --color-success-foreground: var(--nx-color-white);
+  --color-success-hover: var(--nx-color-green-700);
+  --color-success-active: var(--nx-color-green-800);
+  --color-success-disabled: var(--nx-color-green-300);
+  --color-success-text: var(--nx-color-green-600);
+  --color-success-surface: var(--nx-color-green-50);
+  --color-information-background: var(--nx-color-blue-500);
+  --color-information-foreground: var(--nx-color-white);
+  --color-information-hover: var(--nx-color-blue-600);
+  --color-information-active: var(--nx-color-blue-700);
+  --color-information-disabled: var(--nx-color-blue-300);
+  --color-information-text: var(--nx-color-blue-600);
+  --color-information-surface: var(--nx-color-blue-50);
+  --color-warning-background: var(--nx-color-orange-500);
+  --color-warning-foreground: var(--nx-color-white);
+  --color-warning-hover: var(--nx-color-orange-600);
+  --color-warning-active: var(--nx-color-orange-700);
+  --color-warning-disabled: var(--nx-color-orange-300);
+  --color-warning-text: var(--nx-color-orange-600);
+  --color-warning-surface: var(--nx-color-orange-50);
+  --color-primary-background: var(--nx-color-blue-600);
+  --color-primary-foreground: var(--nx-color-white);
+  --color-primary-hover: var(--nx-color-blue-700);
+  --color-primary-active: var(--nx-color-blue-800);
+  --color-primary-disabled: var(--nx-color-blue-300);
+  --color-primary-text: var(--nx-color-blue-600);
+  --color-primary-surface: var(--nx-color-blue-50);
+  --color-secondary-background: var(--nx-color-neutral-100);
+  --color-secondary-foreground: var(--nx-color-neutral-900);
+  --color-secondary-hover: var(--nx-color-neutral-200);
+  --color-secondary-active: var(--nx-color-neutral-300);
+  --color-secondary-disabled: var(--nx-color-neutral-50);
+  --color-secondary-text: var(--nx-color-neutral-600);
+  --color-secondary-surface: var(--nx-color-neutral-100);
 
-  /* Spacing tokens - reference --nx-size-* primitives */
+  /* Spacing tokens */
   --spacing-0: var(--nx-size-0);
   --spacing-0_5: var(--nx-size-0_5);
   --spacing-1: var(--nx-size-1);
@@ -123,7 +123,7 @@
   --spacing-80: var(--nx-size-80);
   --spacing-96: var(--nx-size-96);
 
-  /* Radius tokens - reference --nx-radius-* primitives */
+  /* Radius tokens */
   --radius-base: var(--nx-radius-base);
   --radius-sm: var(--nx-radius-sm);
   --radius-md: var(--nx-radius-md);
@@ -133,19 +133,55 @@
   --radius-3xl: var(--nx-radius-3xl);
   --radius-full: var(--nx-radius-full);
 
-  /* Border width tokens - reference --nx-borderwidth-* primitives */
+  /* Border width tokens */
   --border-default: var(--nx-borderwidth-default);
   --border-thick: var(--nx-borderwidth-thick);
 
-  /* Shadow tokens - reference --nx-shadow-* layer variables */
-  --shadow-2xs: var(--nx-shadow-2xs-layer-1-x) var(--nx-shadow-2xs-layer-1-y) var(--nx-shadow-2xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread) var(--nx-shadow-2xs-layer-1-color);
-  --shadow-xs: var(--nx-shadow-xs-layer-1-x) var(--nx-shadow-xs-layer-1-y) var(--nx-shadow-xs-layer-1-blur) var(--nx-shadow-xs-layer-1-spread) var(--nx-shadow-xs-layer-1-color);
-  --shadow-sm: var(--nx-shadow-sm-layer-2-x) var(--nx-shadow-sm-layer-2-y) var(--nx-shadow-sm-layer-2-blur) var(--nx-shadow-sm-layer-2-spread) var(--nx-shadow-sm-layer-2-color), var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y) var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread) var(--nx-shadow-sm-layer-1-color);
-  --shadow-base: var(--nx-shadow-base-layer-2-x) var(--nx-shadow-base-layer-2-y) var(--nx-shadow-base-layer-2-blur) var(--nx-shadow-base-layer-2-spread) var(--nx-shadow-base-layer-2-color), var(--nx-shadow-base-layer-1-x) var(--nx-shadow-base-layer-1-y) var(--nx-shadow-base-layer-1-blur) var(--nx-shadow-base-layer-1-spread) var(--nx-shadow-base-layer-1-color);
-  --shadow-lg: var(--nx-shadow-lg-layer-2-x) var(--nx-shadow-lg-layer-2-y) var(--nx-shadow-lg-layer-2-blur) var(--nx-shadow-lg-layer-2-spread) var(--nx-shadow-lg-layer-2-color), var(--nx-shadow-lg-layer-1-x) var(--nx-shadow-lg-layer-1-y) var(--nx-shadow-lg-layer-1-blur) var(--nx-shadow-lg-layer-1-spread) var(--nx-shadow-lg-layer-1-color);
-  --shadow-xl: var(--nx-shadow-xl-layer-2-x) var(--nx-shadow-xl-layer-2-y) var(--nx-shadow-xl-layer-2-blur) var(--nx-shadow-xl-layer-2-spread) var(--nx-shadow-xl-layer-2-color), var(--nx-shadow-xl-layer-1-x) var(--nx-shadow-xl-layer-1-y) var(--nx-shadow-xl-layer-1-blur) var(--nx-shadow-xl-layer-1-spread) var(--nx-shadow-xl-layer-1-color);
-  --shadow-2xl: var(--nx-shadow-2xl-layer-1-x) var(--nx-shadow-2xl-layer-1-y) var(--nx-shadow-2xl-layer-1-blur) var(--nx-shadow-2xl-layer-1-spread) var(--nx-shadow-2xl-layer-1-color);
-  --shadow-inner: inset var(--nx-shadow-inner-layer-1-x) var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur) var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
-  --shadow-focus-default: var(--nx-shadow-focus-default-x) var(--nx-shadow-focus-default-y) var(--nx-shadow-focus-default-blur) var(--nx-shadow-focus-default-spread) var(--nx-shadow-focus-default-color);
-  --shadow-focus-error: var(--nx-shadow-focus-error-x) var(--nx-shadow-focus-error-y) var(--nx-shadow-focus-error-blur) var(--nx-shadow-focus-error-spread) var(--nx-shadow-focus-error-color);
+  /* Shadow tokens */
+  --shadow-2xs: var(--nx-shadow-2xs-layer-1-x) var(--nx-shadow-2xs-layer-1-y)
+    var(--nx-shadow-2xs-layer-1-blur) var(--nx-shadow-2xs-layer-1-spread)
+    var(--nx-shadow-2xs-layer-1-color);
+  --shadow-xs: var(--nx-shadow-xs-layer-1-x) var(--nx-shadow-xs-layer-1-y)
+    var(--nx-shadow-xs-layer-1-blur) var(--nx-shadow-xs-layer-1-spread)
+    var(--nx-shadow-xs-layer-1-color);
+  --shadow-sm:
+    var(--nx-shadow-sm-layer-2-x) var(--nx-shadow-sm-layer-2-y)
+      var(--nx-shadow-sm-layer-2-blur) var(--nx-shadow-sm-layer-2-spread)
+      var(--nx-shadow-sm-layer-2-color),
+    var(--nx-shadow-sm-layer-1-x) var(--nx-shadow-sm-layer-1-y)
+      var(--nx-shadow-sm-layer-1-blur) var(--nx-shadow-sm-layer-1-spread)
+      var(--nx-shadow-sm-layer-1-color);
+  --shadow-base:
+    var(--nx-shadow-base-layer-2-x) var(--nx-shadow-base-layer-2-y)
+      var(--nx-shadow-base-layer-2-blur) var(--nx-shadow-base-layer-2-spread)
+      var(--nx-shadow-base-layer-2-color),
+    var(--nx-shadow-base-layer-1-x) var(--nx-shadow-base-layer-1-y)
+      var(--nx-shadow-base-layer-1-blur) var(--nx-shadow-base-layer-1-spread)
+      var(--nx-shadow-base-layer-1-color);
+  --shadow-lg:
+    var(--nx-shadow-lg-layer-2-x) var(--nx-shadow-lg-layer-2-y)
+      var(--nx-shadow-lg-layer-2-blur) var(--nx-shadow-lg-layer-2-spread)
+      var(--nx-shadow-lg-layer-2-color),
+    var(--nx-shadow-lg-layer-1-x) var(--nx-shadow-lg-layer-1-y)
+      var(--nx-shadow-lg-layer-1-blur) var(--nx-shadow-lg-layer-1-spread)
+      var(--nx-shadow-lg-layer-1-color);
+  --shadow-xl:
+    var(--nx-shadow-xl-layer-2-x) var(--nx-shadow-xl-layer-2-y)
+      var(--nx-shadow-xl-layer-2-blur) var(--nx-shadow-xl-layer-2-spread)
+      var(--nx-shadow-xl-layer-2-color),
+    var(--nx-shadow-xl-layer-1-x) var(--nx-shadow-xl-layer-1-y)
+      var(--nx-shadow-xl-layer-1-blur) var(--nx-shadow-xl-layer-1-spread)
+      var(--nx-shadow-xl-layer-1-color);
+  --shadow-2xl: var(--nx-shadow-2xl-layer-1-x) var(--nx-shadow-2xl-layer-1-y)
+    var(--nx-shadow-2xl-layer-1-blur) var(--nx-shadow-2xl-layer-1-spread)
+    var(--nx-shadow-2xl-layer-1-color);
+  --shadow-inner: inset var(--nx-shadow-inner-layer-1-x)
+    var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur)
+    var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
+  --shadow-focus-default: var(--nx-shadow-focus-default-x)
+    var(--nx-shadow-focus-default-y) var(--nx-shadow-focus-default-blur)
+    var(--nx-shadow-focus-default-spread) var(--nx-shadow-focus-default-color);
+  --shadow-focus-error: var(--nx-shadow-focus-error-x)
+    var(--nx-shadow-focus-error-y) var(--nx-shadow-focus-error-blur)
+    var(--nx-shadow-focus-error-spread) var(--nx-shadow-focus-error-color);
 }

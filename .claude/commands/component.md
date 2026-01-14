@@ -17,6 +17,7 @@ If Figma URL is available, use it to guide implementation. If not provided, ask 
 ## Mode Detection
 
 Check if component exists at `packages/react/src/components/ui/{name}.tsx`:
+
 - **New component**: Follow full workflow (Phases 1-6)
 - **Existing component**: Skip Phase 1, apply modifications to existing files
 
@@ -37,6 +38,7 @@ Skip this phase if no Figma URL is available.
 **Fetch Figma data using MCP tools:**
 
 Extract `fileKey` and `nodeId` from URL:
+
 - Format: `https://www.figma.com/design/:fileKey/:fileName?node-id=:nodeId`
 - Convert node-id: `123-456` → `123:456`
 
@@ -45,6 +47,7 @@ Extract `fileKey` and `nodeId` from URL:
 3. **`get_screenshot`** - Visual reference
 
 **From Figma, extract:**
+
 - Component props (types, values, defaults)
 - Size mappings to spacing tokens
 - Color tokens used
@@ -52,6 +55,7 @@ Extract `fileKey` and `nodeId` from URL:
 - Variant names and states
 
 **Compare with codebase conventions:**
+
 - Read `.claude/rules/figma.md` for token mapping rules
 - Verify prop naming follows conventions (abbreviated sizes like `xs`, `sm`, `md`)
 - Verify tokens exist in `packages/tailwind/nexus.css`
@@ -61,6 +65,7 @@ Extract `fileKey` and `nodeId` from URL:
 ### Phase 3: Adapt to Nexus Token System + Figma Design
 
 **Before modifying, read these files to understand current token structure:**
+
 - `packages/tailwind/nexus.css` - semantic tokens in `@theme inline` block
 - `packages/tailwind/variables.css` - primitive CSS variables with `--nx-*` prefix
 
@@ -83,27 +88,28 @@ Extract `fileKey` and `nodeId` from URL:
 
 **Class Prefix Rule:**
 ALL Tailwind classes must use `nx:` prefix, including modifiers:
+
 ```tsx
 // Correct
-'nx:bg-primary nx:text-primary-foreground hover:nx:bg-primary/90'
-'nx:border nx:border-border-default'
-'focus-visible:nx:ring-2 focus-visible:nx:ring-offset-2'
+'nx:bg-primary nx:text-primary-foreground hover:nx:bg-primary/90';
+'nx:border nx:border-border-default';
+'focus-visible:nx:ring-2 focus-visible:nx:ring-offset-2';
 
 // Wrong - missing nx: prefix
-'bg-primary text-primary-foreground hover:bg-primary/90'
+'bg-primary text-primary-foreground hover:bg-primary/90';
 ```
 
 **Common Token Mappings (with nx: prefix):**
 
 See `.claude/rules/shadcn-divergences.md` for complete mapping. Key differences:
 
-| shadcn | Nexus |
-|--------|-------|
-| `bg-primary` | `nx:bg-primary-background` |
-| `bg-destructive` | `nx:bg-error-background` |
-| `text-destructive` | `nx:text-error-foreground` |
-| `border-input` | `nx:border-border-default` |
-| `ring-ring` | `nx:ring-primary-background/50` |
+| shadcn             | Nexus                           |
+| ------------------ | ------------------------------- |
+| `bg-primary`       | `nx:bg-primary-background`      |
+| `bg-destructive`   | `nx:bg-error-background`        |
+| `text-destructive` | `nx:text-error-foreground`      |
+| `border-input`     | `nx:border-border-default`      |
+| `ring-ring`        | `nx:ring-primary-background/50` |
 
 **Reference:** [button.tsx](packages/react/src/components/ui/button.tsx) for pattern example.
 
@@ -114,6 +120,7 @@ Create `packages/react/src/components/ui/{Name}.stories.tsx`
 Use template from `.claude/rules/storybook.md`, adapting stories based on actual component props.
 
 **If Figma design exists:**
+
 - Create stories for each variant/size from Figma
 - Use Figma's visual reference to verify stories match design
 - Include AllVariants story showing all Figma variants
@@ -123,6 +130,7 @@ Use template from `.claude/rules/storybook.md`, adapting stories based on actual
 Tests are written as play functions in stories (no separate test files for components).
 
 Use template from `.claude/rules/testing.md`:
+
 - Add play functions to interactive stories
 - Test click/keyboard interactions
 - Verify data-slot, data-variant, data-size attributes
@@ -131,16 +139,19 @@ Use template from `.claude/rules/testing.md`:
 ### Phase 6: Finalize
 
 1. **Add export** to `packages/react/src/index.ts`:
+
    ```ts
    export * from '@/components/ui/{name}';
    ```
 
 2. **Run lint** to check formatting:
+
    ```bash
    yarn lint
    ```
 
 3. **Run tests** to verify:
+
    ```bash
    yarn test
    ```
@@ -149,29 +160,30 @@ Use template from `.claude/rules/testing.md`:
 
 ## Checklist
 
-| Phase | Step | Status |
-|-------|------|--------|
-| 1 | Fetched/created component | |
-| 2 | Figma design analyzed (if URL provided) | |
-| 2 | Props extracted from Figma | |
-| 2 | Token mappings documented | |
-| 3 | All classes have `nx:` prefix | |
-| 3 | Adapted to Nexus tokens | |
-| 3 | Added data-slot attribute | |
-| 3 | Added data-variant/size (if applicable) | |
-| 3 | Updated to function component pattern | |
-| 3 | Props match Figma design (if applicable) | |
-| 3 | Sizes use correct spacing tokens | |
-| 4 | Storybook created | |
-| 4 | Stories cover all Figma variants | |
-| 5 | Play function tests added | |
-| 6 | Export added to index.ts | |
-| 6 | Lint passing | |
-| 6 | Tests passing | |
+| Phase | Step                                     | Status |
+| ----- | ---------------------------------------- | ------ |
+| 1     | Fetched/created component                |        |
+| 2     | Figma design analyzed (if URL provided)  |        |
+| 2     | Props extracted from Figma               |        |
+| 2     | Token mappings documented                |        |
+| 3     | All classes have `nx:` prefix            |        |
+| 3     | Adapted to Nexus tokens                  |        |
+| 3     | Added data-slot attribute                |        |
+| 3     | Added data-variant/size (if applicable)  |        |
+| 3     | Updated to function component pattern    |        |
+| 3     | Props match Figma design (if applicable) |        |
+| 3     | Sizes use correct spacing tokens         |        |
+| 4     | Storybook created                        |        |
+| 4     | Stories cover all Figma variants         |        |
+| 5     | Play function tests added                |        |
+| 6     | Export added to index.ts                 |        |
+| 6     | Lint passing                             |        |
+| 6     | Tests passing                            |        |
 
 ## Summary After Each Phase
 
 After completing each phase:
+
 1. Provide a brief summary of changes
 2. Wait for user review and feedback
 3. Apply any requested fixes before proceeding to next phase

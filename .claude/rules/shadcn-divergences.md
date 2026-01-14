@@ -5,13 +5,13 @@
 
 ## Quick Reference
 
-| Category | shadcn/ui | Nexus | Notes |
-|----------|-----------|-------|-------|
-| CSS Prefix | none | `nx:` | All utilities require prefix |
-| Destructive tokens | `destructive` | `error-*` | Token names, not variant names |
-| Token structure | CSS vars | 3-layer system | primitive → semantic → utility |
-| Component sizing | Fixed heights | Padding-based | Flex-friendly approach |
-| Data attributes | Optional | Required | `data-slot`, `data-variant`, `data-size` |
+| Category           | shadcn/ui     | Nexus          | Notes                                    |
+| ------------------ | ------------- | -------------- | ---------------------------------------- |
+| CSS Prefix         | none          | `nx:`          | All utilities require prefix             |
+| Destructive tokens | `destructive` | `error-*`      | Token names, not variant names           |
+| Token structure    | CSS vars      | 3-layer system | primitive → semantic → utility           |
+| Component sizing   | Fixed heights | Padding-based  | Flex-friendly approach                   |
+| Data attributes    | Optional      | Required       | `data-slot`, `data-variant`, `data-size` |
 
 ## Token Naming
 
@@ -19,15 +19,15 @@
 
 shadcn uses `destructive` for error states. Nexus uses semantic `error-*` tokens:
 
-| shadcn Token | Nexus Token |
-|--------------|-------------|
-| `--destructive` | `--color-error-background` |
+| shadcn Token               | Nexus Token                |
+| -------------------------- | -------------------------- |
+| `--destructive`            | `--color-error-background` |
 | `--destructive-foreground` | `--color-error-foreground` |
-| N/A | `--color-error-hover` |
-| N/A | `--color-error-active` |
-| N/A | `--color-error-disabled` |
-| N/A | `--color-error-text` |
-| N/A | `--color-error-surface` |
+| N/A                        | `--color-error-hover`      |
+| N/A                        | `--color-error-active`     |
+| N/A                        | `--color-error-disabled`   |
+| N/A                        | `--color-error-text`       |
+| N/A                        | `--color-error-surface`    |
 
 Nexus extends the pattern with additional states (hover, active, disabled, text, surface).
 
@@ -35,11 +35,11 @@ Nexus extends the pattern with additional states (hover, active, disabled, text,
 
 Nexus has consistent token groups for all status types:
 
-| Status | Token Pattern |
-|--------|---------------|
-| Error | `--color-error-{state}` |
-| Success | `--color-success-{state}` |
-| Warning | `--color-warning-{state}` |
+| Status      | Token Pattern                 |
+| ----------- | ----------------------------- |
+| Error       | `--color-error-{state}`       |
+| Success     | `--color-success-{state}`     |
+| Warning     | `--color-warning-{state}`     |
 | Information | `--color-information-{state}` |
 
 Where `{state}` is: `background`, `foreground`, `hover`, `active`, `disabled`, `text`, `surface`
@@ -50,34 +50,35 @@ All Tailwind utilities MUST use `nx:` prefix:
 
 ```tsx
 // shadcn
-className="bg-primary text-primary-foreground hover:bg-primary/90"
+className = 'bg-primary text-primary-foreground hover:bg-primary/90';
 
 // Nexus
-className="nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-hover"
+className =
+  'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-hover';
 ```
 
 **Prefix position:** `nx:` comes BEFORE pseudo-classes:
 
 ```tsx
 // Correct
-"nx:hover:bg-primary-hover"
-"nx:focus-visible:ring-2"
+'nx:hover:bg-primary-hover';
+'nx:focus-visible:ring-2';
 
 // Incorrect
-"hover:nx:bg-primary-hover"
+'hover:nx:bg-primary-hover';
 ```
 
 ## Token Path Differences
 
 Nexus uses full semantic paths:
 
-| shadcn | Nexus |
-|--------|-------|
-| `bg-primary` | `nx:bg-primary-background` |
-| `bg-secondary` | `nx:bg-secondary-background` |
-| `bg-destructive` | `nx:bg-error-background` |
-| `text-primary` | `nx:text-primary-foreground` |
-| `border-input` | `nx:border-border-default` |
+| shadcn           | Nexus                        |
+| ---------------- | ---------------------------- |
+| `bg-primary`     | `nx:bg-primary-background`   |
+| `bg-secondary`   | `nx:bg-secondary-background` |
+| `bg-destructive` | `nx:bg-error-background`     |
+| `text-primary`   | `nx:text-primary-foreground` |
+| `border-input`   | `nx:border-border-default`   |
 
 ## Component Sizing
 
@@ -116,11 +117,11 @@ Nexus requires data attributes on all components:
 >
 ```
 
-| Attribute | Purpose |
-|-----------|---------|
-| `data-slot` | Component identification |
+| Attribute      | Purpose                           |
+| -------------- | --------------------------------- |
+| `data-slot`    | Component identification          |
 | `data-variant` | Current variant for styling hooks |
-| `data-size` | Current size for styling hooks |
+| `data-size`    | Current size for styling hooks    |
 
 ## Variant Names (Components)
 
@@ -128,7 +129,7 @@ Component variant prop values remain the same as shadcn:
 
 ```tsx
 // Both shadcn and Nexus use these variant names
-variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+variant: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
 ```
 
 The `destructive` variant name is kept for API compatibility, but it maps to `error-*` tokens internally.
@@ -147,8 +148,10 @@ The `destructive` variant name is kept for API compatibility, but it maps to `er
 ## When Comparing Figma to Code
 
 If Figma uses `error` in naming:
+
 - Map to `destructive` variant in component API
 - Map to `error-*` tokens in styling
 
 If Figma uses `destructive`:
+
 - Clarify with design team (prefer `error` for consistency)

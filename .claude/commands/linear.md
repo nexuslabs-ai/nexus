@@ -12,14 +12,15 @@ If no issue ID provided, ask the user for it.
 
 **FIRST:** Ask the user which execution mode they prefer using AskUserQuestion:
 
-| Mode | Description |
-|------|-------------|
-| **Phased** | Follow CRITICAL WORKFLOW (stop after each phase, summarize, wait for confirmation) |
-| **Continuous** | Execute all phases without stopping |
+| Mode           | Description                                                                        |
+| -------------- | ---------------------------------------------------------------------------------- |
+| **Phased**     | Follow CRITICAL WORKFLOW (stop after each phase, summarize, wait for confirmation) |
+| **Continuous** | Execute all phases without stopping                                                |
 
 ## Phase 1: Read & Classify Ticket
 
 1. **Fetch issue details** (see `.claude/rules/linear.md` for MCP conventions):
+
    ```
    mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
    ```
@@ -34,14 +35,14 @@ If no issue ID provided, ask the user for it.
 
 3. **Classify ticket type:**
 
-   | Type | Detection Keywords | Action |
-   |------|-------------------|--------|
-   | **Component** | Figma URLs, "component" in title | Redirect to `/linear-component` |
-   | **Feature** | "add", "implement", "create", "setup" | Continue with this workflow |
-   | **Bug** | "fix", "bug", "issue", "error" | Focus on debugging context |
-   | **Infrastructure** | "CI", "workflow", "config", "setup" | Focus on config files |
-   | **Documentation** | "docs", "readme", "update docs" | Focus on doc files |
-   | **Refactor** | "refactor", "cleanup", "improve" | Focus on affected code |
+   | Type               | Detection Keywords                    | Action                          |
+   | ------------------ | ------------------------------------- | ------------------------------- |
+   | **Component**      | Figma URLs, "component" in title      | Redirect to `/linear-component` |
+   | **Feature**        | "add", "implement", "create", "setup" | Continue with this workflow     |
+   | **Bug**            | "fix", "bug", "issue", "error"        | Focus on debugging context      |
+   | **Infrastructure** | "CI", "workflow", "config", "setup"   | Focus on config files           |
+   | **Documentation**  | "docs", "readme", "update docs"       | Focus on doc files              |
+   | **Refactor**       | "refactor", "cleanup", "improve"      | Focus on affected code          |
 
 4. **If Component type detected:**
    - Inform user: "This looks like a component ticket. Redirecting to `/linear-component`..."
@@ -55,6 +56,7 @@ If no issue ID provided, ask the user for it.
 Based on ticket type, explore relevant parts of codebase:
 
 ### For Feature/Infrastructure:
+
 1. **Read project documentation:**
    - Root `CLAUDE.md`
    - Relevant package `CLAUDE.md` files
@@ -71,6 +73,7 @@ Based on ticket type, explore relevant parts of codebase:
    - Any external tools/services involved?
 
 ### For Bug:
+
 1. **Understand the issue:**
    - Search for error messages in codebase
    - Find the affected code paths
@@ -81,6 +84,7 @@ Based on ticket type, explore relevant parts of codebase:
    - What's the expected vs actual behavior?
 
 ### For Refactor:
+
 1. **Map affected code:**
    - Find all usages of code being refactored
    - Identify breaking change potential
@@ -102,11 +106,13 @@ Based on ticket type, explore relevant parts of codebase:
    - Proceed directly with todo list
 
 4. **Update Linear status** to "In Progress" (see `.claude/rules/linear.md` for status flow):
+
    ```
    mcp__linear__update_issue(id: "{issue_id}", state: "In Progress")
    ```
 
 5. **Create git branch** (use `gitBranchName` from Linear issue per `.claude/rules/linear.md`):
+
    ```bash
    git checkout -b {gitBranchName}
    ```
@@ -146,15 +152,16 @@ yarn build
 yarn test
 ```
 
-| Check | Command | Must Pass |
-|-------|---------|-----------|
-| Format | `yarn format:check` | Yes |
-| Lint | `yarn lint` | Yes |
-| TypeScript | `yarn typecheck` | Yes |
-| Build | `yarn build` | Yes |
-| Tests | `yarn test` | Yes |
+| Check      | Command             | Must Pass |
+| ---------- | ------------------- | --------- |
+| Format     | `yarn format:check` | Yes       |
+| Lint       | `yarn lint`         | Yes       |
+| TypeScript | `yarn typecheck`    | Yes       |
+| Build      | `yarn build`        | Yes       |
+| Tests      | `yarn test`         | Yes       |
 
 **If any check fails:**
+
 - Fix the issues
 - Re-run failed checks
 - Do NOT proceed until all pass
@@ -164,6 +171,7 @@ yarn test
 Follow conventions in `.claude/rules/github.md` for PR and commit format.
 
 1. **Stage and commit** using format from rules:
+
    ```bash
    git add .
    git commit -m "{type}({scope}): {description}
@@ -176,6 +184,7 @@ Follow conventions in `.claude/rules/github.md` for PR and commit format.
    ```
 
 2. **Push branch:**
+
    ```bash
    git push -u origin {gitBranchName}
    ```
@@ -193,23 +202,27 @@ Provide summary to user:
 ## ✅ Implementation Complete
 
 ### Links
+
 - **PR:** {pr_url}
 - **Linear:** {linear_url}
 - **Branch:** {gitBranchName}
 
 ### Changes Made
+
 {list of files changed}
 
 ### Quality Gates
-| Check | Status |
-|-------|--------|
-| Format | ✅ |
-| Lint | ✅ |
-| TypeScript | ✅ |
-| Build | ✅ |
-| Tests | ✅ |
+
+| Check      | Status |
+| ---------- | ------ |
+| Format     | ✅     |
+| Lint       | ✅     |
+| TypeScript | ✅     |
+| Build      | ✅     |
+| Tests      | ✅     |
 
 ### Next Steps
+
 1. Run `/pr-review {pr_number}` for unbiased code review
 2. Review the PR manually
 3. Merge when ready
@@ -217,13 +230,13 @@ Provide summary to user:
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Linear issue not found | Ask user to verify issue ID |
-| No git branch name | Generate from title: `{user}/nex-{id}-{slugified-title}` |
-| Quality gate fails | Fix issues, do not create PR until passing |
-| Git conflicts | Alert user, provide resolution guidance |
-| Blocked by other issues | Warn user, ask if should proceed |
+| Error                   | Action                                                   |
+| ----------------------- | -------------------------------------------------------- |
+| Linear issue not found  | Ask user to verify issue ID                              |
+| No git branch name      | Generate from title: `{user}/nex-{id}-{slugified-title}` |
+| Quality gate fails      | Fix issues, do not create PR until passing               |
+| Git conflicts           | Alert user, provide resolution guidance                  |
+| Blocked by other issues | Warn user, ask if should proceed                         |
 
 ## Ticket Template (Recommended)
 
@@ -231,19 +244,24 @@ For best results, Linear tickets should include:
 
 ```markdown
 ## Overview
+
 {What needs to be done and why}
 
 ## Requirements
+
 - {Requirement 1}
 - {Requirement 2}
 
 ## Affected Packages
+
 - @nexus/{package}
 
 ## Technical Notes (optional)
+
 - {Any implementation hints}
 
 ## Acceptance Criteria
+
 - [ ] {Criteria 1}
 - [ ] {Criteria 2}
 ```

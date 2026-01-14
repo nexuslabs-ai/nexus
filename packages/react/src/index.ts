@@ -5,4 +5,5 @@ import './index.css';
 export { cn } from '@/lib/utils';
 
 // Components
+export * from '@/components/ui/badge';
 export * from '@/components/ui/button';

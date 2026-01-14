@@ -14,6 +14,7 @@ If no PR number provided, ask the user for it.
 ### Step 1: Verify PR is Merged
 
 1. **Fetch PR details** (see `.claude/rules/github.md` for MCP usage):
+
    ```
    mcp__github__get_pull_request(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
@@ -29,12 +30,15 @@ If no PR number provided, ask the user for it.
 ### Step 2: Update Linear Ticket
 
 1. **Verify/ensure status is Done** (see `.claude/rules/linear.md` for auto-update behavior):
+
    ```
    mcp__linear__update_issue(id: "{issue_id}", state: "Done")
    ```
+
    > This acts as a fallback - Linear may have auto-updated if PR had proper linking.
 
 2. **Get current issue details** to read existing description (per `.claude/rules/linear.md`):
+
    ```
    mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
    ```
@@ -55,21 +59,25 @@ If no PR number provided, ask the user for it.
 ### Step 3: Git Cleanup
 
 1. **Get current branch name:**
+
    ```bash
    git branch --show-current
    ```
 
 2. **Checkout main:**
+
    ```bash
    git checkout main
    ```
 
 3. **Fetch and pull latest:**
+
    ```bash
    git fetch origin && git pull origin main
    ```
 
 4. **Delete the feature branch locally:**
+
    ```bash
    git branch -d {branch_name}
    ```
@@ -86,15 +94,15 @@ Provide a summary table:
 ```markdown
 ## ✅ Post-Merge Cleanup Complete
 
-| Task | Status |
-|------|--------|
-| PR Merged | ✅ Verified |
-| Linear Status | ✅ Done (auto/verified) |
-| Linear Description | ✅ Updated |
-| Switched to main | ✅ |
-| Pulled latest | ✅ |
-| Local branch deleted | ✅ |
-| Remote branch deleted | ✅/⏭️ Skipped |
+| Task                  | Status                  |
+| --------------------- | ----------------------- |
+| PR Merged             | ✅ Verified             |
+| Linear Status         | ✅ Done (auto/verified) |
+| Linear Description    | ✅ Updated              |
+| Switched to main      | ✅                      |
+| Pulled latest         | ✅                      |
+| Local branch deleted  | ✅                      |
+| Remote branch deleted | ✅/⏭️ Skipped           |
 
 **Cleaned up:** `{branch_name}`
 **Linear:** {linear_url}
@@ -102,13 +110,13 @@ Provide a summary table:
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| PR not found | Ask user to verify PR number |
-| PR not merged | Inform user, stop execution |
-| Linear issue not found | Ask user for correct issue ID |
-| Branch deletion fails | Warn user, continue with other tasks |
-| Not on feature branch | Skip branch deletion, just fetch main |
+| Error                  | Action                                |
+| ---------------------- | ------------------------------------- |
+| PR not found           | Ask user to verify PR number          |
+| PR not merged          | Inform user, stop execution           |
+| Linear issue not found | Ask user for correct issue ID         |
+| Branch deletion fails  | Warn user, continue with other tasks  |
+| Not on feature branch  | Skip branch deletion, just fetch main |
 
 ## Example Usage
 

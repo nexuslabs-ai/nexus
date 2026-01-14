@@ -25,14 +25,14 @@ We use a **three-layer testing approach** where each layer has a distinct purpos
 
 ### What to Test
 
-| Category | Tests | What to Cover |
-|----------|-------|---------------|
-| **Rendering** | 2-3 | Basic render, renders children, renders correct element type |
-| **Props** | 4-6 | className merging, native HTML props, data attributes, asChild polymorphism |
-| **Variants** | All combos | Every variant + size combination applies correct classes |
-| **Interactions** | 3-5 | Click handlers, disabled state, focus management, keyboard (Enter/Space) |
-| **Accessibility** | 3-5 | axe audit, aria-label, aria-describedby, disabled state, role |
-| **Edge Cases** | 3-5 | Empty children, long content, special characters, React elements as children, ref forwarding |
+| Category          | Tests      | What to Cover                                                                                |
+| ----------------- | ---------- | -------------------------------------------------------------------------------------------- |
+| **Rendering**     | 2-3        | Basic render, renders children, renders correct element type                                 |
+| **Props**         | 4-6        | className merging, native HTML props, data attributes, asChild polymorphism                  |
+| **Variants**      | All combos | Every variant + size combination applies correct classes                                     |
+| **Interactions**  | 3-5        | Click handlers, disabled state, focus management, keyboard (Enter/Space)                     |
+| **Accessibility** | 3-5        | axe audit, aria-label, aria-describedby, disabled state, role                                |
+| **Edge Cases**    | 3-5        | Empty children, long content, special characters, React elements as children, ref forwarding |
 
 ### Test File Structure
 
@@ -229,15 +229,15 @@ describe('Button', () => {
 
 ### What to Cover in Stories
 
-| Story Type | Purpose | Example |
-|------------|---------|---------|
-| **Default** | Primary use case | `<Button>Click me</Button>` |
-| **All Variants** | Show each variant option | Primary, Secondary, Outline |
-| **All Sizes** | Show each size option | Small, Default, Large |
-| **States** | Interactive states | Hover, Focus, Active, Disabled |
-| **With Icons** | Icon placement patterns | Left icon, Right icon, Icon only |
-| **Composition** | Common patterns | Button groups, With loading spinner |
-| **Playground** | Interactive controls | All props configurable |
+| Story Type       | Purpose                  | Example                             |
+| ---------------- | ------------------------ | ----------------------------------- |
+| **Default**      | Primary use case         | `<Button>Click me</Button>`         |
+| **All Variants** | Show each variant option | Primary, Secondary, Outline         |
+| **All Sizes**    | Show each size option    | Small, Default, Large               |
+| **States**       | Interactive states       | Hover, Focus, Active, Disabled      |
+| **With Icons**   | Icon placement patterns  | Left icon, Right icon, Icon only    |
+| **Composition**  | Common patterns          | Button groups, With loading spinner |
+| **Playground**   | Interactive controls     | All props configurable              |
 
 ### Story File Structure
 
@@ -335,12 +335,12 @@ export const AllVariants: Story = {
 
 ### What Chromatic Captures
 
-| Test Type | What It Does |
-|-----------|--------------|
-| **Snapshot Baseline** | Captures visual state of each story |
-| **Diff Detection** | Highlights pixel differences from baseline |
-| **Cross-browser** | Tests Chrome, Firefox, Safari |
-| **Responsive** | Tests at multiple viewport widths |
+| Test Type              | What It Does                                |
+| ---------------------- | ------------------------------------------- |
+| **Snapshot Baseline**  | Captures visual state of each story         |
+| **Diff Detection**     | Highlights pixel differences from baseline  |
+| **Cross-browser**      | Tests Chrome, Firefox, Safari               |
+| **Responsive**         | Tests at multiple viewport widths           |
 | **Interaction States** | Captures hover, focus, active if configured |
 
 ### Chromatic Best Practices

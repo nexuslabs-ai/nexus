@@ -2,31 +2,6 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * Recursively get all JSON files from a directory and its subdirectories
- * @param {string} dir - Directory to search
- * @param {string[]} fileList - Accumulated file list (internal)
- * @returns {string[]} Array of absolute file paths
- */
-export function getAllJsonFiles(dir, fileList = []) {
-  if (!fs.existsSync(dir)) {
-    return fileList;
-  }
-
-  const items = fs.readdirSync(dir, { withFileTypes: true });
-
-  for (const item of items) {
-    const fullPath = path.join(dir, item.name);
-    if (item.isDirectory()) {
-      getAllJsonFiles(fullPath, fileList);
-    } else if (item.name.endsWith('.json')) {
-      fileList.push(fullPath);
-    }
-  }
-
-  return fileList;
-}
-
-/**
  * Ensure a directory exists, creating it if necessary
  * @param {string} dir - Directory path
  */
@@ -127,7 +102,11 @@ export function pathToCssVar(tokenPath, prefix = null) {
  * @param {boolean} useNxPrefix - Whether to add nx- prefix
  * @returns {string} CSS variable name (without --)
  */
-export function pathToCssVarPrefixed(tokenPath, categoryPrefix = null, useNxPrefix = false) {
+export function pathToCssVarPrefixed(
+  tokenPath,
+  categoryPrefix = null,
+  useNxPrefix = false
+) {
   const cssName = tokenPath.join('-');
   const base = categoryPrefix ? `${categoryPrefix}-${cssName}` : cssName;
   return useNxPrefix ? `nx-${base}` : base;
@@ -149,7 +128,7 @@ export function isReference(value) {
  * @param {string} ref - Reference string like "{blue.500}"
  * @returns {string} Path like "blue.500"
  */
-export function extractRefPath(ref) {
+function extractRefPath(ref) {
   return ref.slice(1, -1);
 }
 
@@ -159,7 +138,7 @@ export function extractRefPath(ref) {
  * @param {Map} primitiveMap - Map of primitive token paths to CSS names
  * @returns {string} Resolved CSS value
  */
-export function resolveReference(value, primitiveMap) {
+function resolveReference(value, primitiveMap) {
   if (!isReference(value)) {
     return value;
   }
@@ -182,7 +161,7 @@ export function resolveReference(value, primitiveMap) {
  * @param {Map} primitiveMap - Map of primitive token paths to CSS names (with nx- prefix)
  * @returns {string} Resolved CSS value with var(--nx-*)
  */
-export function resolveReferenceWithNxPrefix(value, primitiveMap) {
+function resolveReferenceWithNxPrefix(value, primitiveMap) {
   if (!isReference(value)) {
     return value;
   }
@@ -206,7 +185,11 @@ export function resolveReferenceWithNxPrefix(value, primitiveMap) {
  * @param {string} type - Token type
  * @returns {string} Resolved CSS value
  */
-export function resolveValueWithNxPrefix(value, primitiveMap, type = 'unknown') {
+export function resolveValueWithNxPrefix(
+  value,
+  primitiveMap,
+  type = 'unknown'
+) {
   // If it's a reference, resolve it with nx prefix
   if (isReference(value)) {
     return resolveReferenceWithNxPrefix(value, primitiveMap);
@@ -231,7 +214,7 @@ export function resolveValueWithNxPrefix(value, primitiveMap, type = 'unknown') 
  * @param {string} type - Token type
  * @returns {string} Resolved CSS value
  */
-export function resolveValue(value, primitiveMap, type = 'unknown') {
+function resolveValue(value, primitiveMap, type = 'unknown') {
   // If it's a reference, resolve it
   if (isReference(value)) {
     return resolveReference(value, primitiveMap);
@@ -252,7 +235,7 @@ export function resolveValue(value, primitiveMap, type = 'unknown') {
 /**
  * Default configuration for token generation
  */
-export const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG = {
   base: 'slate',
   brand: 'blue',
   size: 'vega',
@@ -362,16 +345,6 @@ export function discoverSemantics(semanticDir) {
 }
 
 /**
- * Get all available modes for a discovered primitive category
- * @param {object} discovered - Result from discoverPrimitives()
- * @param {string} category - Category name
- * @returns {string[]|null} Array of modes or null if single-mode
- */
-export function getModes(discovered, category) {
-  return discovered[category]?.modes || null;
-}
-
-/**
  * Process a semantic token file and resolve references
  * @param {string} filePath - Full path to semantic file
  * @param {Map} primitiveMap - Primitive map for reference resolution
@@ -440,7 +413,7 @@ export const log = {
  * @param {string} refPath - Reference path like "2xs.layer-1.x"
  * @returns {string} CSS var() reference like "var(--shadow-2xs-layer-1-x)"
  */
-export function shadowRefToVar(refPath) {
+function shadowRefToVar(refPath) {
   const cssName = refPath.replace(/\./g, '-');
   return `var(--shadow-${cssName})`;
 }
@@ -450,7 +423,7 @@ export function shadowRefToVar(refPath) {
  * @param {*} value - Property value (reference or dimension object)
  * @returns {string} CSS var() reference or literal value
  */
-export function formatShadowPropertyAsVar(value) {
+function formatShadowPropertyAsVar(value) {
   // Handle references like {2xs.layer-1.x} -> var(--shadow-2xs-layer-1-x)
   if (isReference(value)) {
     const refPath = extractRefPath(value);
@@ -472,7 +445,7 @@ export function formatShadowPropertyAsVar(value) {
  * @param {boolean} isInset - Whether this is an inset shadow
  * @returns {string} CSS box-shadow value for this layer
  */
-export function formatShadowLayer(layer, isInset = false) {
+function formatShadowLayer(layer, isInset = false) {
   const x = formatShadowPropertyAsVar(layer.offsetX);
   const y = formatShadowPropertyAsVar(layer.offsetY);
   const blur = formatShadowPropertyAsVar(layer.blur);
@@ -505,7 +478,7 @@ export function formatShadowComposite(value, isInset = false) {
  * @param {string} typographyFilePath - Path to typography token file (e.g., typography-vega.json)
  * @returns {object[]} Array of { family, weights, styles } for Google Fonts
  */
-export function extractGoogleFonts(typographyFilePath) {
+function extractGoogleFonts(typographyFilePath) {
   if (!fs.existsSync(typographyFilePath)) {
     log.warn(`Typography file not found: ${typographyFilePath}`);
     return [];
@@ -516,7 +489,7 @@ export function extractGoogleFonts(typographyFilePath) {
 
   // Look for family tokens with nx-font-source extension
   if (tokenData.family) {
-    for (const [_key, value] of Object.entries(tokenData.family)) {
+    for (const value of Object.values(tokenData.family)) {
       if (value.$type !== 'fontFamily') continue;
 
       const fontSource = value.$extensions?.['nx-font-source'];
@@ -543,7 +516,7 @@ export function extractGoogleFonts(typographyFilePath) {
  * // Input: [{ family: 'Inter', weights: [400, 700], styles: ['normal'] }]
  * // Output: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
  */
-export function generateGoogleFontsImport(fonts) {
+function generateGoogleFontsImport(fonts) {
   if (!fonts || fonts.length === 0) {
     return '';
   }
@@ -580,4 +553,491 @@ export function generateGoogleFontsImport(fonts) {
 export function getGoogleFontsImportFromTokens(typographyFilePath) {
   const fonts = extractGoogleFonts(typographyFilePath);
   return generateGoogleFontsImport(fonts);
+}
+
+// ============================================
+// TYPOGRAPHY UTILITIES
+// ============================================
+
+/**
+ * Resolve a typography property value to CSS
+ * Handles 'auto' values, references, dimension objects, and raw values
+ *
+ * @param {*} value - Typography property value
+ * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
+ * @returns {string} Resolved CSS value
+ */
+function resolveTypographyProperty(value, primitiveMap) {
+  // Handle 'auto' for lineHeight
+  if (value === 'auto') return 'auto';
+
+  // Handle references like {family.font-sans}
+  if (
+    typeof value === 'string' &&
+    value.startsWith('{') &&
+    value.endsWith('}')
+  ) {
+    return resolveValueWithNxPrefix(value, primitiveMap, 'unknown');
+  }
+
+  // Handle dimension objects like { value: 0, unit: 'px' }
+  if (typeof value === 'object' && value !== null && 'value' in value) {
+    return formatTokenValue(value, 'dimension');
+  }
+
+  // Return as string for other values
+  return String(value);
+}
+
+/**
+ * Generate typography utility CSS from token file
+ * Creates @utility rules with typography-* prefix for all typography composite tokens
+ *
+ * @param {string} tokensDir - Path to tokens directory (contains styles/typography.json)
+ * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
+ * @returns {{ css: string, count: number }} Generated CSS and token count
+ */
+export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
+  const typographyPath = path.join(tokensDir, 'styles/typography.json');
+
+  if (!fs.existsSync(typographyPath)) {
+    log.warn('Typography styles file not found');
+    return { css: '', count: 0 };
+  }
+
+  const tokenData = readTokenFile(typographyPath);
+  const tokens = extractTokens(tokenData).filter(
+    (t) => t.type === 'typography'
+  );
+
+  if (tokens.length === 0) {
+    return { css: '', count: 0 };
+  }
+
+  let css = `/* Typography Utilities */\n\n`;
+
+  for (const token of tokens) {
+    const name = token.path.join('-');
+    const value = token.value;
+
+    // Use 'typography-' prefix to avoid tailwind-merge conflicts with Tailwind's
+    // text-* utilities (which are used for both color and font-size)
+    css += `@utility typography-${name} {\n`;
+
+    if (value.fontFamily) {
+      css += `  font-family: ${resolveTypographyProperty(value.fontFamily, primitiveMap)};\n`;
+    }
+    if (value.fontSize) {
+      css += `  font-size: ${resolveTypographyProperty(value.fontSize, primitiveMap)};\n`;
+    }
+    if (value.fontWeight) {
+      css += `  font-weight: ${resolveTypographyProperty(value.fontWeight, primitiveMap)};\n`;
+    }
+    if (value.lineHeight) {
+      css += `  line-height: ${resolveTypographyProperty(value.lineHeight, primitiveMap)};\n`;
+    }
+    if (value.letterSpacing) {
+      css += `  letter-spacing: ${resolveTypographyProperty(value.letterSpacing, primitiveMap)};\n`;
+    }
+
+    css += `}\n\n`;
+  }
+
+  return { css, count: tokens.length };
+}
+
+// ============================================
+// BORDER WIDTH UTILITIES
+// ============================================
+
+/**
+ * Generate border width utility CSS from token array
+ * Creates @utility rules with border-{name} pattern for all borderwidth tokens
+ *
+ * @param {object[]} tokens - Array of borderwidth tokens with cssName property (e.g., "nx-borderwidth-default")
+ * @returns {{ css: string, count: number }} Generated CSS and token count
+ */
+export function generateBorderWidthUtilitiesCSS(tokens) {
+  if (!tokens || tokens.length === 0) {
+    return { css: '', count: 0 };
+  }
+
+  let css = `/* Border Width Utilities */\n\n`;
+
+  for (const token of tokens) {
+    // Extract the name part (e.g., "default" from "nx-borderwidth-default")
+    const name = token.cssName.replace('nx-borderwidth-', '');
+
+    css += `@utility border-${name} {\n`;
+    css += `  border-style: var(--tw-border-style, solid);\n`;
+    css += `  border-width: var(--${token.cssName});\n`;
+    css += `}\n\n`;
+  }
+
+  return { css, count: tokens.length };
+}
+
+// ============================================
+// TOKEN COLLECTION FOR @THEME BLOCKS
+// ============================================
+
+/**
+ * Collect spacing token mappings from spacing.json
+ * Returns array of { cssName, varRef } for @theme block
+ *
+ * @param {string} semanticDir - Path to semantic directory
+ * @returns {object[]} Array of { cssName, varRef }
+ */
+export function collectSpacingTokens(semanticDir) {
+  const filePath = path.join(semanticDir, 'spacing.json');
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const [key, value] of Object.entries(tokenData)) {
+    if (key.startsWith('$')) continue;
+    if (value.$type !== 'dimension') continue;
+
+    const match = value.$value.match(/\{(.+)\}/);
+    if (match) {
+      const sizeKey = match[1];
+      tokens.push({
+        cssName: key,
+        varRef: `var(--nx-size-${sizeKey})`,
+      });
+    }
+  }
+
+  return tokens;
+}
+
+/**
+ * Collect radius token mappings from a mode file
+ * Returns array of { cssName, varRef } for @theme block
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @param {string} mode - Radius mode (e.g., 'subtle')
+ * @returns {object[]} Array of { cssName, varRef }
+ */
+export function collectRadiusTokens(tokensDir, mode) {
+  const filePath = path.join(
+    tokensDir,
+    `primitives/radius/radius-${mode}.json`
+  );
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const key of Object.keys(tokenData)) {
+    if (key.startsWith('$')) continue;
+    tokens.push({
+      cssName: `radius-${key}`,
+      varRef: `var(--nx-radius-${key})`,
+    });
+  }
+
+  return tokens;
+}
+
+/**
+ * Collect borderwidth token mappings from a mode file
+ * Returns array of { cssName, varRef } for @theme block
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @param {string} mode - Borderwidth mode (e.g., 'vega')
+ * @returns {object[]} Array of { cssName, varRef }
+ */
+export function collectBorderwidthTokens(tokensDir, mode) {
+  const filePath = path.join(
+    tokensDir,
+    `primitives/borderwidth/borderwidth-${mode}.json`
+  );
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const key of Object.keys(tokenData)) {
+    if (key.startsWith('$')) continue;
+    tokens.push({
+      cssName: `border-${key}`,
+      varRef: `var(--nx-borderwidth-${key})`,
+    });
+  }
+
+  return tokens;
+}
+
+/**
+ * Generate shadow CSS value with var() references to layer variables
+ *
+ * @param {string} name - Shadow name (e.g., '2xs', 'focus-default')
+ * @param {object|object[]} shadowValue - Shadow value (single or multi-layer)
+ * @param {boolean} isInset - Whether this is an inset shadow
+ * @returns {string} CSS shadow value with var() references
+ */
+function generateShadowVarValue(name, shadowValue, isInset = false) {
+  const prefix = isInset ? 'inset ' : '';
+
+  if (Array.isArray(shadowValue)) {
+    const layers = shadowValue.map((_layer, index) => {
+      const layerNum = shadowValue.length - index;
+      return `var(--nx-shadow-${name}-layer-${layerNum}-x) var(--nx-shadow-${name}-layer-${layerNum}-y) var(--nx-shadow-${name}-layer-${layerNum}-blur) var(--nx-shadow-${name}-layer-${layerNum}-spread) var(--nx-shadow-${name}-layer-${layerNum}-color)`;
+    });
+    return layers.join(', ');
+  } else {
+    if (name.startsWith('focus-')) {
+      return `${prefix}var(--nx-shadow-${name}-x) var(--nx-shadow-${name}-y) var(--nx-shadow-${name}-blur) var(--nx-shadow-${name}-spread) var(--nx-shadow-${name}-color)`;
+    }
+    return `${prefix}var(--nx-shadow-${name}-layer-1-x) var(--nx-shadow-${name}-layer-1-y) var(--nx-shadow-${name}-layer-1-blur) var(--nx-shadow-${name}-layer-1-spread) var(--nx-shadow-${name}-layer-1-color)`;
+  }
+}
+
+/**
+ * Collect shadow token CSS values with var() references
+ * Returns array of { cssName, value } for @theme block
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @returns {object[]} Array of { cssName, value }
+ */
+export function collectShadowTokens(tokensDir) {
+  const stylesFile = path.join(tokensDir, 'styles/shadows.json');
+  if (!fs.existsSync(stylesFile)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(stylesFile);
+  const shadows = [];
+
+  for (const [key, value] of Object.entries(tokenData)) {
+    if (key.startsWith('$')) continue;
+
+    if (value.$type !== 'shadow') {
+      // Handle nested (like focus.default, focus.error)
+      if (typeof value === 'object') {
+        for (const [subKey, subValue] of Object.entries(value)) {
+          if (subKey.startsWith('$')) continue;
+          if (subValue.$type === 'shadow') {
+            const shadowName = `${key}-${subKey}`;
+            const cssValue = generateShadowVarValue(
+              shadowName,
+              subValue.$value
+            );
+            shadows.push({ cssName: `shadow-${shadowName}`, value: cssValue });
+          }
+        }
+      }
+      continue;
+    }
+
+    const isInset = key === 'inner';
+    const cssValue = generateShadowVarValue(key, value.$value, isInset);
+    shadows.push({ cssName: `shadow-${key}`, value: cssValue });
+  }
+
+  return shadows;
+}
+
+/**
+ * Collect semantic color tokens from a file with var() references
+ * Used for static theming where colors reference --nx-* primitives
+ *
+ * @param {string} semanticDir - Path to semantic directory
+ * @param {string} fileName - Semantic token file name
+ * @param {Map} primitiveMap - Map of primitive token values (used for var reference generation)
+ * @returns {object[]} Array of { cssName, value }
+ */
+export function collectSemanticColorTokensVarRef(
+  semanticDir,
+  fileName,
+  primitiveMap
+) {
+  const filePath = path.join(semanticDir, fileName);
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  function extractPaths(obj, pathParts = []) {
+    for (const [key, value] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+
+      const currentPath = [...pathParts, key];
+
+      if (value.$value !== undefined && value.$type === 'color') {
+        const cssName = `color-${currentPath.join('-')}`;
+        let resolvedValue = value.$value;
+
+        // Resolve to var(--nx-*) reference
+        if (isReference(resolvedValue)) {
+          const refPath = resolvedValue.slice(1, -1);
+          const primitiveInfo = primitiveMap.get(refPath);
+          if (primitiveInfo) {
+            resolvedValue = `var(--${primitiveInfo.cssName})`;
+          }
+        }
+
+        tokens.push({ cssName, value: resolvedValue });
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
+        extractPaths(value, currentPath);
+      }
+    }
+  }
+
+  extractPaths(tokenData);
+  return tokens;
+}
+
+// ============================================
+// THEME CSS GENERATION
+// ============================================
+
+/**
+ * Generate @theme CSS block for Tailwind
+ * This is the shared function used by both generate-modular.js and generate-tailwind-package.js
+ *
+ * @param {object} config - Configuration object
+ * @param {string} config.header - File header comment
+ * @param {string} [config.googleFontsImport] - Google Fonts @import statement
+ * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
+ * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
+ * @param {object[]} config.colorTokens - Array of { cssName, value } for colors
+ * @param {object[]} config.spacingTokens - Array of { cssName, varRef } for spacing
+ * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
+ * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
+ * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
+ * @param {object[]} [config.darkColorTokens] - Array of { cssName, value } for dark mode colors
+ * @param {string} [config.darkSelector='.dark'] - CSS selector for dark mode
+ * @param {boolean} [config.prefixDarkVars=false] - Whether to add nx- prefix to dark mode vars
+ * @returns {string} Generated CSS content
+ */
+export function generateThemeCSS(config) {
+  const {
+    header,
+    googleFontsImport,
+    imports = [],
+    tailwindPrefix = 'nx',
+    colorTokens = [],
+    spacingTokens = [],
+    radiusTokens = [],
+    borderwidthTokens = [],
+    shadowTokens = [],
+    darkColorTokens = [],
+    darkSelector = '.dark',
+    prefixDarkVars = false,
+  } = config;
+
+  let css = header;
+
+  // Google Fonts import
+  if (googleFontsImport) {
+    css += `/* Google Fonts - auto-generated from typography tokens */\n`;
+    css += `${googleFontsImport}\n\n`;
+  }
+
+  // Imports
+  for (const imp of imports) {
+    if (imp === 'tailwindcss') {
+      css += `@import 'tailwindcss' prefix(${tailwindPrefix});\n`;
+    } else {
+      css += `@import '${imp}';\n`;
+    }
+  }
+  css += `\n@custom-variant dark (&:is(.dark *));\n\n`;
+
+  // @theme block
+  css += `@theme {\n`;
+  css += `  /* Reset default Tailwind namespaces to enforce semantic tokens only */\n`;
+  css += `  --color-*: initial;\n`;
+  css += `  --spacing-*: initial;\n`;
+  css += `  --radius-*: initial;\n`;
+  css += `  --shadow-*: initial;\n\n`;
+
+  // Color tokens
+  if (colorTokens.length > 0) {
+    css += `  /* Semantic color tokens */\n`;
+    for (const token of colorTokens) {
+      css += `  --${token.cssName}: ${token.value};\n`;
+    }
+  }
+
+  // Spacing tokens
+  if (spacingTokens.length > 0) {
+    css += `\n  /* Spacing tokens */\n`;
+    for (const token of spacingTokens) {
+      css += `  --${token.cssName}: ${token.varRef};\n`;
+    }
+  }
+
+  // Radius tokens
+  if (radiusTokens.length > 0) {
+    css += `\n  /* Radius tokens */\n`;
+    for (const token of radiusTokens) {
+      css += `  --${token.cssName}: ${token.varRef};\n`;
+    }
+  }
+
+  // Borderwidth tokens
+  if (borderwidthTokens.length > 0) {
+    css += `\n  /* Border width tokens */\n`;
+    for (const token of borderwidthTokens) {
+      css += `  --${token.cssName}: ${token.varRef};\n`;
+    }
+  }
+
+  // Shadow tokens
+  if (shadowTokens.length > 0) {
+    css += `\n  /* Shadow tokens */\n`;
+    for (const token of shadowTokens) {
+      css += `  --${token.cssName}: ${token.value};\n`;
+    }
+  }
+
+  css += `}\n`;
+
+  // Dark mode block (if provided)
+  if (darkColorTokens.length > 0) {
+    css += `\n/* ===== DARK MODE ===== */\n`;
+    css += `${darkSelector} {\n`;
+    for (const token of darkColorTokens) {
+      const varName = prefixDarkVars ? `nx-${token.cssName}` : token.cssName;
+      css += `  --${varName}: ${token.value};\n`;
+    }
+    css += `}\n`;
+  }
+
+  return css;
+}
+
+/**
+ * Generate base layer CSS for body defaults
+ *
+ * @returns {string} CSS @layer base block
+ */
+export function generateBaseLayerCSS() {
+  return `
+/* ===== BASE LAYER ===== */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border-default);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+`;
 }

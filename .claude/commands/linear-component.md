@@ -12,10 +12,10 @@ If no issue ID provided, ask the user for it.
 
 **FIRST:** Ask the user which execution mode they prefer using AskUserQuestion:
 
-| Mode | Description |
-|------|-------------|
-| **Phased** | Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md` (stop after each phase, summarize, wait for confirmation) |
-| **Continuous** | Execute all phases end-to-end without stopping |
+| Mode           | Description                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Phased**     | Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md` (stop after each phase, summarize, wait for confirmation) |
+| **Continuous** | Execute all phases end-to-end without stopping                                                                     |
 
 If **Continuous** mode selected, only stop if critical errors occur, user input is required, or quality gates fail.
 
@@ -24,6 +24,7 @@ If **Continuous** mode selected, only stop if critical errors occur, user input 
 ### Phase 1: Read Linear Issue
 
 1. **Fetch issue details** using Linear MCP (per `.claude/rules/linear.md`):
+
    ```
    mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
    ```
@@ -40,11 +41,13 @@ If **Continuous** mode selected, only stop if critical errors occur, user input 
 ### Phase 2: Setup
 
 1. **Create git branch:**
+
    ```bash
    git checkout -b {branchName}
    ```
 
 2. **Update Linear status** to "In Progress" (see `.claude/rules/linear.md` for status flow):
+
    ```
    mcp__linear__update_issue(id: "{issue_id}", state: "In Progress")
    ```
@@ -80,6 +83,7 @@ Execute the `/component` workflow with extracted details:
 4. **Add export** to `packages/react/src/index.ts`
 
 5. **Run quality gates:**
+
    ```bash
    yarn lint
    yarn typecheck
@@ -94,6 +98,7 @@ Execute the `/component` workflow with extracted details:
 Follow conventions in `.claude/rules/github.md` for PR and commit format.
 
 1. **Commit changes:**
+
    ```bash
    git add .
    git commit -m "feat(react): add {ComponentName} component
@@ -108,6 +113,7 @@ Follow conventions in `.claude/rules/github.md` for PR and commit format.
    ```
 
 2. **Push branch:**
+
    ```bash
    git push -u origin {branchName}
    ```
@@ -125,9 +131,11 @@ Follow conventions in `.claude/rules/github.md` for PR and commit format.
 See `.claude/rules/github.md` for review verdicts and MCP usage.
 
 1. **Get PR files and read actual code:**
+
    ```
    mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
+
    Then **read the full content** of each created file using the Read tool.
 
 2. **Architecture Review** (check against `.claude/rules/components.md` and `.claude/rules/shadcn-divergences.md`):
@@ -167,6 +175,7 @@ See `.claude/rules/github.md` for review verdicts and MCP usage.
 6. **ALWAYS Add PR Review** (required - never skip):
 
    **If issues found** - add review with line comments:
+
    ```
    mcp__github__create_pull_request_review(
      owner: "INNOVATIVEGAMER",
@@ -181,6 +190,7 @@ See `.claude/rules/github.md` for review verdicts and MCP usage.
    ```
 
    **If no issues** - add approval review:
+
    ```
    mcp__github__create_pull_request_review(
      owner: "INNOVATIVEGAMER",
@@ -213,21 +223,25 @@ Provide summary to user:
 ## ✅ Component Complete
 
 ### Links
+
 - **PR:** {pr_url}
 - **Linear:** {linear_url}
 - **Storybook:** Run `yarn storybook` to preview
 
 ### Files Created
+
 - `packages/react/src/components/ui/{name}.tsx`
 - `packages/react/src/components/ui/{Name}.stories.tsx`
 
 ### Quality Gates
+
 - ✅ Lint passed
 - ✅ TypeScript passed
 - ✅ Tests passed
 - ✅ Build passed
 
 ### Next Steps
+
 1. Review the PR
 2. Check Storybook visuals
 3. Merge when ready
@@ -235,13 +249,13 @@ Provide summary to user:
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Linear issue not found | Ask user to verify issue ID |
-| Missing component name | Ask user to provide it |
-| Missing Figma URL | Continue without Figma (use shadcn base) |
-| Quality gate fails | Fix issues before creating PR |
-| Git conflicts | Alert user, provide guidance |
+| Error                  | Action                                   |
+| ---------------------- | ---------------------------------------- |
+| Linear issue not found | Ask user to verify issue ID              |
+| Missing component name | Ask user to provide it                   |
+| Missing Figma URL      | Continue without Figma (use shadcn base) |
+| Quality gate fails     | Fix issues before creating PR            |
+| Git conflicts          | Alert user, provide guidance             |
 
 ## Linear Issue Template
 
@@ -249,15 +263,19 @@ For best results, tickets should follow this format:
 
 ```markdown
 ## Package
+
 @nexus/react
 
 ## Component
+
 {ComponentName}
 
 ## Figma
+
 - {link1}
 - {link2}
 
 ## Requirements (optional)
+
 - {Any specific requirements}
 ```
