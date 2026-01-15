@@ -62,6 +62,7 @@ If no input provided, ask the user for PR number.
    - PR author
 
 5. **If Linear issue linked, fetch ticket:**
+
    ```
    mcp__linear__get_issue(id: "{issue_id}")
    ```
