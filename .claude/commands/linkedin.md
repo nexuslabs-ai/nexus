@@ -1,66 +1,26 @@
----
-description: Generate LinkedIn post from this session
----
+# LinkedIn Post
 
-Generate a LinkedIn post about what was built in this session, framed around the AI-native design system vision.
+Generate a LinkedIn post about what was accomplished in this session.
 
-## About Nexus Design System
+## Agent Used
 
-Nexus is a multi-framework design system being built with AI-native principles:
+| Agent                                                           | Skill                                                                   | Purpose                        |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------ |
+| [Social Media Manager](../agents/social-media-manager/AGENT.md) | [linkedin-post](../agents/social-media-manager/skills/linkedin-post.md) | Session-aware content creation |
 
-**Architecture:**
+## Execution
 
-- W3C DTCG tokens → CSS variables → Tailwind utilities (structured for machine consumption)
-- shadcn/ui patterns with Radix UI primitives
-- Multi-framework support (React now, Vue/Svelte planned)
-- Monorepo with Turbo orchestration
+> **Mode:** CONTINUOUS — Execute all phases without pausing.
 
-**AI-Native Tooling:**
+1. **Load Social Media Manager agent:**
+   - Read `.claude/agents/social-media-manager/AGENT.md`
+   - Read `.claude/agents/social-media-manager/skills/linkedin-post.md`
 
-- Claude Code with custom commands and rules
-- MCP integrations (Figma, Linear, GitHub)
-- Automated workflows for component scaffolding, testing, and PR creation
-- Structured conventions that AI can parse and follow
+2. **Execute linkedin-post skill:**
+   - Analyze session context (conversation history, git changes)
+   - Identify the story angle
+   - Draft post following agent principles
+   - Self-review against anti-patterns
+   - Present draft with alternatives
 
-**Philosophy:**
-
-- Design systems should be built for both humans AND AI to understand
-- Structured tokens and conventions make AI tooling possible
-- The future of design systems is AI-native
-
-## Your Task
-
-1. **Analyze the session** - What was accomplished? (components, tokens, tooling, automation, etc.)
-2. **Frame it around AI-native design** - How does this work contribute to the vision?
-3. **Generate an engaging post** - Positive, forward-looking, creates "aha moments"
-
-## Tone & Style
-
-- **Positive and forward-looking** - Focus on the future of design systems
-- **Engaging** - Create "aha moments" for readers about AI-native design
-- **Developer voice** - Sound like an engineer sharing learnings, not marketing
-- **Generic representation** - Don't over-specify implementation details
-
-## Post Structure
-
-1. **Hook** - Question or insight that draws readers in
-2. **Context** - Brief problem/opportunity in design systems + AI space
-3. **Pattern/Insight** - The AI-native approach (what makes design systems work with AI)
-4. **What we built** - Brief, generic description of session work
-5. **Tech stack** - One line (Claude Code, MCP, relevant tools)
-6. **Closing** - Positive, future-focused statement (separate paragraph)
-
-## Guidelines
-
-- 150-200 words (LinkedIn engagement sweet spot)
-- Use bullet points for scanability where appropriate
-- End with forward-looking statement about AI-native design systems
-- Include 5-7 relevant hashtags from: #DesignSystems #AI #Figma #ClaudeCode #MCP #DeveloperExperience #FrontendDev #React #TailwindCSS #Monorepo #ComponentLibrary
-- Avoid: buzzwords, "Excited to announce", negative warnings, overly technical implementation details
-
-## Output
-
-- Format in markdown for easy copy-paste
-- Separate sections with `---` for visual clarity
-- Use **bold** for key insights
-- Ask if adjustments needed after presenting
+3. **Iterate** based on user feedback

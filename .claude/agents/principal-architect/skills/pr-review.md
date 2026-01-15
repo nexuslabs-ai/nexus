@@ -13,6 +13,26 @@ Review pull requests from an architectural perspective, focusing on system desig
 - Reviewing data model changes
 - Reviewing API design changes
 
+## Review Modes
+
+### Full Review (Default)
+
+Review all changed files for architectural concerns.
+
+### Follow-up Review
+
+Only triggered when:
+
+- New files were added since last review
+- Significant structural changes detected
+- Previous review had architectural concerns
+
+In follow-up mode:
+
+- Focus on new files and structural changes only
+- Verify previous architectural concerns are addressed
+- Don't re-review unchanged architectural decisions
+
 ## Review Checklist
 
 - [ ] Architecture follows established patterns in codebase
@@ -46,8 +66,10 @@ Review pull requests from an architectural perspective, focusing on system desig
 
 ## Output Format
 
+### Full Review Output
+
 ```markdown
-## 🏛️ Principal Architect Review
+## Principal Architect Review
 
 ### Summary
 
@@ -76,6 +98,40 @@ Review pull requests from an architectural perspective, focusing on system desig
 ---
 
 _Review perspective: Principal Engineer (Google/Meta/Amazon level)_
+```
+
+### Follow-up Review Output
+
+```markdown
+## Principal Architect Follow-up Review
+
+### Scope
+
+Reviewing: {new files / structural changes / previous concerns}
+
+### Previous Concerns Status
+
+| Concern   | Status           | Notes   |
+| --------- | ---------------- | ------- |
+| {concern} | ✅ Addressed     | {how}   |
+| {concern} | ❌ Still Present | {issue} |
+
+### New Architectural Assessment
+
+| Area               | Status   | Notes        |
+| ------------------ | -------- | ------------ |
+| New Files          | ✅/⚠️/❌ | {assessment} |
+| Structural Changes | ✅/⚠️/❌ | {assessment} |
+
+### New Concerns (if any)
+
+{Any new architectural issues in the changes}
+
+### Verdict: {APPROVED|NEEDS DISCUSSION|CHANGES REQUIRED}
+
+---
+
+_Follow-up review - focused on changes since last review_
 ```
 
 ## Verdict Guidelines

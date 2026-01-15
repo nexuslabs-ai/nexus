@@ -13,6 +13,23 @@ Review pull requests from a code quality perspective, focusing on maintainabilit
 - Catching common bugs and anti-patterns
 - Validating error handling and edge cases
 
+## Review Modes
+
+### Full Review (Default)
+
+Review all changed files for code quality issues.
+
+### Follow-up Review
+
+Always runs in follow-up mode (SDE2 reviews every follow-up).
+
+In follow-up mode:
+
+- Verify previous issues are fixed
+- Review ONLY files modified since last review
+- Check for new issues introduced by fixes
+- Don't re-review unchanged code
+
 ## Review Checklist
 
 - [ ] TypeScript strict mode compliance
@@ -51,8 +68,10 @@ Review pull requests from a code quality perspective, focusing on maintainabilit
 
 ## Output Format
 
+### Full Review Output
+
 ```markdown
-## 👨‍💻 SDE2 Code Quality Review
+## SDE2 Code Quality Review
 
 ### Summary
 
@@ -89,6 +108,52 @@ Review pull requests from a code quality perspective, focusing on maintainabilit
 _Review perspective: Senior Software Engineer (SDE2 level)_
 ```
 
+### Follow-up Review Output
+
+```markdown
+## SDE2 Follow-up Review
+
+### Previous Issues Status
+
+| Issue         | File        | Status           | Notes            |
+| ------------- | ----------- | ---------------- | ---------------- |
+| {description} | {file:line} | ✅ Fixed         | {verification}   |
+| {description} | {file:line} | ❌ Still Present | {what's wrong}   |
+| {description} | {file:line} | ⚠️ Partial       | {what's missing} |
+
+### Issue Resolution Summary
+
+- **Fixed:** {count}
+- **Still Present:** {count}
+- **Partially Fixed:** {count}
+
+### New Changes Assessment
+
+Files modified since last review:
+
+| File   | Changes        | Assessment       |
+| ------ | -------------- | ---------------- |
+| {file} | {what changed} | ✅/⚠️/❌ {notes} |
+
+### New Issues Found
+
+#### Blocking ❌
+
+- {new issue with file:line}
+
+#### Minor ⚠️
+
+- {new issue with file:line}
+
+### Verdict: {APPROVED|MINOR CHANGES|CHANGES REQUIRED}
+
+{Summary of overall status}
+
+---
+
+_Follow-up review - focused on changes since last review_
+```
+
 ## Verdict Guidelines
 
 | Condition                                           | Verdict            |
@@ -96,3 +161,11 @@ _Review perspective: Senior Software Engineer (SDE2 level)_
 | No issues found                                     | `APPROVED`         |
 | Only minor style/preference issues                  | `MINOR CHANGES`    |
 | Bugs, missing error handling, or significant issues | `CHANGES REQUIRED` |
+
+### Follow-up Verdict Logic
+
+| Condition                                            | Verdict            |
+| ---------------------------------------------------- | ------------------ |
+| All previous blocking issues fixed, no new issues    | `APPROVED`         |
+| Previous issues fixed, only minor new issues         | `MINOR CHANGES`    |
+| Blocking issues still present OR new blocking issues | `CHANGES REQUIRED` |

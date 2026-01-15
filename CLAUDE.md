@@ -17,10 +17,14 @@ ds/
 │   ├── docs/           # Documentation site (planned)
 │   └── playground/     # Theme playground for demos → dynamic theme switching
 ├── .claude/
-│   ├── commands/       # Slash commands (/pr, /test, /component, /skill, /agent)
-│   ├── rules/          # Convention rules (components, testing, storybook, tokens)
-│   ├── skills/         # Multi-step workflow skills (create-component, etc.)
-│   └── agents/         # Analysis agents (explore-codebase, etc.)
+│   ├── commands/       # Slash commands (/implement, /pr-review, /linkedin, etc.)
+│   ├── rules/          # Convention rules (components, testing, tokens, etc.)
+│   └── agents/         # Persona-based agents with skills
+│       ├── principal-architect/  # Architecture decisions, design planning
+│       ├── sde2/                 # Implementation, code quality
+│       ├── designer/             # Design-to-code parity, Figma analysis
+│       ├── technical-writer/        # Documentation accuracy
+│       └── social-media-manager/    # Developer advocacy content
 └── Root configs        # Shared TS, ESLint, Prettier, Turbo
 ```
 
@@ -93,25 +97,20 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | [.claude/rules/tokens.md](.claude/rules/tokens.md)                         | Token format, naming, workflow                 |
 | [.claude/rules/figma.md](.claude/rules/figma.md)                           | Figma-to-code parity, token mapping            |
 | [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences                 |
+| [.claude/rules/context-engine.md](.claude/rules/context-engine.md)         | Context Engine domain knowledge, AI-first APIs |
 | [.claude/rules/linear.md](.claude/rules/linear.md)                         | Linear integration, issue linking, status flow |
 | [.claude/rules/github.md](.claude/rules/github.md)                         | PR format, commit conventions, auto-linking    |
-| [.claude/rules/skills-agents.md](.claude/rules/skills-agents.md)           | Skill/agent structure and conventions          |
 
 ## Slash Commands
 
-| Command             | Purpose                                                                             |
-| ------------------- | ----------------------------------------------------------------------------------- |
-| `/linear`           | Implement any Linear ticket (read → context → plan → implement → PR)                |
-| `/linear-component` | Figma component workflow: Linear ticket → Figma analysis → Component → PR           |
-| `/pr-review`        | Unbiased PR code review (reads PR → reviews against conventions → posts feedback)   |
-| `/pr-review-ce`     | Context Engine PR review (Principal Architect + SDE2 dual-perspective analysis)     |
-| `/post-merge`       | Post-merge cleanup (verify merged → update Linear → switch to main → delete branch) |
-| `/component`        | Scaffold new component with all files                                               |
-| `/update-docs`      | Update documentation after changes                                                  |
-| `/skill`            | Create or update skills (explore package → define workflow)                         |
-| `/agent`            | Create or update agents (explore scope → define analysis)                           |
-| `/linkedin`         | Generate LinkedIn post from session (AI-native design system focus)                 |
-| `/figma-analyze`    | Analyze Figma component for code parity                                             |
+| Command          | Agent(s) Used                       | Purpose                                               |
+| ---------------- | ----------------------------------- | ----------------------------------------------------- |
+| `/implement`     | SDE2 (+ Principal Architect w/flag) | Implement Linear ticket (optional `--with-architect`) |
+| `/pr-review`     | Principal Architect + SDE2          | Dual-perspective PR code review                       |
+| `/pr-fix`        | SDE2                                | Fix PR review issues (blocking first, then minor)     |
+| `/figma-analyze` | Designer                            | Analyze Figma design for code parity                  |
+| `/update-docs`   | Technical Writer                    | Update documentation after codebase changes           |
+| `/linkedin`      | Social Media Manager                | Generate LinkedIn post from session context           |
 
 ## Code Style
 
