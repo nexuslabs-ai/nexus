@@ -1,7 +1,5 @@
 # Testing Rules
 
-> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
-
 ## Core Principle
 
 **Stories are tests.** Every component story serves as:
