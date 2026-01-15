@@ -5,6 +5,7 @@
   "type": "module",
   "workspaces": [
     "packages/*",
+    "packages/context-engine/*",
     "apps/*"
   ],
   "scripts": {
@@ -30,7 +31,10 @@
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "playground": "cd apps/playground && yarn dev",
     "size-limit": "size-limit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "ce:db:up": "yarn workspace @context-engine/db docker:up",
+    "ce:db:down": "yarn workspace @context-engine/db docker:down",
+    "ce:db:logs": "yarn workspace @context-engine/db docker:logs"
   },
   "size-limit": [
     {

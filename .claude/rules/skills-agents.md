@@ -1,7 +1,5 @@
 # Skills & Agents Rules
 
-> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
-
 ## When to Create Skills vs Agents
 
 | Type      | Use When                                            | Example                                               |

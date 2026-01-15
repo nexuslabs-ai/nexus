@@ -1,20 +1,6 @@
 # Nexus Design System
 
-> **CRITICAL WORKFLOW - MUST FOLLOW ON EVERY TASK**
->
-> | Step             | Action                            | Output                          |
-> | ---------------- | --------------------------------- | ------------------------------- |
-> | **1. Plan**      | Create todo list BEFORE any code  | TodoWrite with all phases       |
-> | **2. Execute**   | Complete ONE todo item only       | Code changes for that phase     |
-> | **3. Summarize** | Brief summary + key code snippets | `[file.tsx:42-58](path)` format |
-> | **4. WAIT**      | STOP for user confirmation        | Do NOT proceed automatically    |
-> | **5. Repeat**    | Go to step 2 for next phase       | Until all todos complete        |
->
-> **Summary format:** Tables/bullets + "Key Code to Review" section with actual snippets, file:line links, and brief notes.
->
-> **Docs check:** After significant changes, update relevant CLAUDE.md and .claude/rules/\*.md files.
->
-> **NEVER execute multiple phases without stopping for review.**
+> **CRITICAL:** Follow [.claude/rules/workflow.md](.claude/rules/workflow.md) for every task.
 
 A multi-framework design system built as a Yarn/Turbo monorepo, starting with React. Components follow shadcn/ui architecture and patterns.
 
@@ -100,6 +86,7 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 
 | Rule File                                                                  | Purpose                                        |
 | -------------------------------------------------------------------------- | ---------------------------------------------- |
+| [.claude/rules/workflow.md](.claude/rules/workflow.md)                     | **Critical workflow (plan→execute→wait)**      |
 | [.claude/rules/components.md](.claude/rules/components.md)                 | Component structure, props, exports            |
 | [.claude/rules/testing.md](.claude/rules/testing.md)                       | Test structure, patterns, a11y                 |
 | [.claude/rules/storybook.md](.claude/rules/storybook.md)                   | Story structure, required stories              |
@@ -117,6 +104,7 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | `/linear`           | Implement any Linear ticket (read → context → plan → implement → PR)                |
 | `/linear-component` | Figma component workflow: Linear ticket → Figma analysis → Component → PR           |
 | `/pr-review`        | Unbiased PR code review (reads PR → reviews against conventions → posts feedback)   |
+| `/pr-review-ce`     | Context Engine PR review (Principal Architect + SDE2 dual-perspective analysis)     |
 | `/post-merge`       | Post-merge cleanup (verify merged → update Linear → switch to main → delete branch) |
 | `/component`        | Scaffold new component with all files                                               |
 | `/update-docs`      | Update documentation after changes                                                  |
