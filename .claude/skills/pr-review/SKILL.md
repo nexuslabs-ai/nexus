@@ -92,6 +92,66 @@ These items apply regardless of review perspective:
 _Review perspective: {Agent persona}_
 ```
 
+## Posting the Review
+
+When posting via `mcp__github__create_pull_request_review`, use **both** the body and inline comments:
+
+### Review Body (`body` parameter)
+
+Use the output format above for the overall review summary.
+
+### Inline Comments (`comments` parameter)
+
+Add inline comments for each blocking and minor issue at its exact location:
+
+```json
+{
+  "comments": [
+    {
+      "path": "src/components/button.tsx",
+      "line": 42,
+      "body": "**Issue:** Missing error handling for null case.\n\n**Suggestion:** Add a null check before accessing properties."
+    },
+    {
+      "path": "src/utils/format.ts",
+      "line": 15,
+      "body": "**Minor:** Consider using `const` instead of `let` here since the value is never reassigned."
+    }
+  ]
+}
+```
+
+### Finding Line Numbers
+
+To get the correct `line` number for inline comments:
+
+1. **From the diff:** Use `mcp__github__get_pull_request_files` to get file patches
+2. **Line numbers:** Use the line number in the **new file** (right side of diff), not the diff position
+3. **Only comment on changed lines:** Inline comments must be on lines that appear in the diff
+
+### Review Event
+
+| Condition         | Event             |
+| ----------------- | ----------------- |
+| No issues found   | `APPROVE`         |
+| Minor issues only | `COMMENT`         |
+| Blocking issues   | `REQUEST_CHANGES` |
+
+### Example API Call
+
+```
+mcp__github__create_pull_request_review(
+  owner: "INNOVATIVEGAMER",
+  repo: "ds",
+  pull_number: 10,
+  body: "{review summary using output format above}",
+  event: "COMMENT",
+  comments: [
+    { path: "file.tsx", line: 42, body: "Issue description..." }
+  ]
+)
+```
+
 ## Verdict Options
 
 | Agent                   | Verdicts                                           | When to Use         |

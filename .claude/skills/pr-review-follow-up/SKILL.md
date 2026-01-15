@@ -150,6 +150,46 @@ Reviewing: {new files / structural changes / previous concerns}
 _Follow-up review - focused on changes since last review_
 ```
 
+## Posting the Review
+
+When posting via `mcp__github__create_pull_request_review`, use **both** the body and inline comments:
+
+### Review Body (`body` parameter)
+
+Use the output format above for the overall follow-up summary.
+
+### Inline Comments (`comments` parameter)
+
+Add inline comments for:
+
+- **Still present issues:** Comment on the same line explaining what's still wrong
+- **New issues found:** Comment on the specific line with the new issue
+
+```json
+{
+  "comments": [
+    {
+      "path": "src/utils/format.ts",
+      "line": 15,
+      "body": "❌ **Still Present:** This issue from the previous review hasn't been addressed. The null check is still missing."
+    },
+    {
+      "path": "src/components/button.tsx",
+      "line": 42,
+      "body": "⚠️ **New Issue:** This was introduced in the fix - consider using optional chaining here."
+    }
+  ]
+}
+```
+
+### Review Event
+
+| Condition                              | Event             |
+| -------------------------------------- | ----------------- |
+| All issues fixed, no new issues        | `APPROVE`         |
+| Issues fixed, only minor new issues    | `COMMENT`         |
+| Blocking issues remain OR new blockers | `REQUEST_CHANGES` |
+
 ## Follow-up Verdict Guidelines
 
 ### SDE2 Verdict Logic
