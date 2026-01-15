@@ -4,9 +4,9 @@ Analyze a Figma component design for code implementation readiness.
 
 ## Agent Used
 
-| Agent                                   | Skill                                                       | Purpose                        |
-| --------------------------------------- | ----------------------------------------------------------- | ------------------------------ |
-| [Designer](../agents/designer/AGENT.md) | [figma-analyze](../agents/designer/skills/figma-analyze.md) | Design-to-code parity analysis |
+| Agent                             | Skill                                             | Purpose                        |
+| --------------------------------- | ------------------------------------------------- | ------------------------------ |
+| [Designer](../agents/designer.md) | [figma-analyze](../skills/figma-analyze/SKILL.md) | Design-to-code parity analysis |
 
 ## Required Input
 
@@ -19,8 +19,8 @@ If no URL provided, ask the user for the Figma component URL.
 > **Mode:** CONTINUOUS — Execute all phases without pausing.
 
 1. **Load Designer agent:**
-   - Read `.claude/agents/designer/AGENT.md`
-   - Read `.claude/agents/designer/skills/figma-analyze.md`
+   - Read `.claude/agents/designer.md`
+   - Read `.claude/skills/figma-analyze/SKILL.md`
 
 2. **Execute figma-analyze skill:**
    - Follow the workflow defined in the skill file

@@ -1,8 +1,28 @@
-# Update Docs Skill
+---
+name: update-docs
+description: Update documentation based on codebase changes. Use when documentation needs updates after code changes, or to ensure docs stay accurate.
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - Edit
+  - Write
+user-invocable: true
+---
+
+# Update Docs
 
 ## Purpose
 
 Update documentation based on codebase changes, ensuring docs stay accurate and complete.
+
+## When to Use
+
+- After code changes that affect documentation
+- When documentation is out of sync with code
+- To ensure docs stay accurate after refactoring
+- When new features need documentation
 
 ## Workflow
 
@@ -44,6 +64,7 @@ Update documentation based on codebase changes, ensuring docs stay accurate and 
    - Commands (`.claude/commands/`)
    - Rules (`.claude/rules/`)
    - Agents (`.claude/agents/`)
+   - Skills (`.claude/skills/`)
    - Project structure
 
 4. **Common discovery patterns:**

@@ -1,52 +1,65 @@
 # Implement
 
-Implement a Linear ticket using the SDE2 agent, with optional architectural guidance from Principal Architect.
+Implement features and tasks using the SDE2 agent, with optional architectural guidance from Principal Architect. Works with any context source.
 
 ## Agents Used
 
-| Agent                                                         | Skill                                                              | When Used                         |
-| ------------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------- |
-| [Principal Architect](../agents/principal-architect/AGENT.md) | [design-plan](../agents/principal-architect/skills/design-plan.md) | Only with `--with-architect` flag |
-| [SDE2](../agents/sde2/AGENT.md)                               | [implement](../agents/sde2/skills/implement.md)                    | Always                            |
+| Agent                                                   | Skill                                         | When Used                         |
+| ------------------------------------------------------- | --------------------------------------------- | --------------------------------- |
+| [Principal Architect](../agents/principal-architect.md) | [design-plan](../skills/design-plan/SKILL.md) | Only with `--with-architect` flag |
+| [SDE2](../agents/sde2.md)                               | [implement](../skills/implement/SKILL.md)     | Always                            |
 
-## Required Input
+## Input (Optional)
 
-- **Linear Issue ID**: $ARGUMENTS (e.g., `NEX-150` or `NEX-150 --with-architect`)
-
-If no issue ID provided, ask the user for it.
-
-## Flag Detection
-
-Parse `$ARGUMENTS` for:
-
-- Issue ID: `NEX-###` pattern
-- Architect flag: `--with-architect` or `-a`
+- **$ARGUMENTS**: Linear ID, file path, or flags
 
 ```
 Examples:
-  /implement NEX-150                    → SDE2 only
-  /implement NEX-150 --with-architect   → Architect + SDE2
-  /implement NEX-150 -a                 → Architect + SDE2
+  /implement                           → Use conversation context
+  /implement NEX-150                   → Fetch from Linear
+  /implement ./specs/feature.md        → Read markdown spec
+  /implement --with-architect          → Architect plans first (conversation context)
+  /implement NEX-150 --with-architect  → Linear + Architect
+  /implement NEX-150 -a                → Short flag for architect
 ```
+
+## Context Detection
+
+Parse `$ARGUMENTS` for:
+
+| Pattern                    | Context Source            |
+| -------------------------- | ------------------------- |
+| `NEX-###`                  | Linear ticket             |
+| `*.md` path                | Markdown spec file        |
+| `--with-architect` or `-a` | Enable architect planning |
+| (none)                     | Use conversation context  |
 
 ## Flow: Default (SDE2 Only)
 
 ```
 ┌─────────────────────────────────────────┐
-│           /implement NEX-150            │
+│              /implement                 │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│           Detect Context                │
+│  • Linear ID? → Fetch ticket            │
+│  • .md file? → Read spec                │
+│  • Otherwise → Use conversation         │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
 │              Load SDE2 Agent            │
-│  • Read AGENT.md (persona, base rules)  │
-│  • Read implement.md skill              │
+│  • Read sde2.md (persona, base rules)   │
+│  • Read implement SKILL.md              │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
 │         Execute implement skill         │
-│  • Understand task                      │
+│  • Gather requirements                  │
 │  • Explore existing code                │
 │  • Create plan (TodoWrite)              │
 │  • Implement phase by phase             │
@@ -58,14 +71,20 @@ Examples:
 
 ```
 ┌─────────────────────────────────────────┐
-│    /implement NEX-150 --with-architect  │
+│      /implement --with-architect        │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│           Detect Context                │
+│  • Same detection as above              │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
 │       Load Principal Architect Agent    │
-│  • Read AGENT.md (persona, base rules)  │
-│  • Read design-plan.md skill            │
+│  • Read principal-architect.md          │
+│  • Read design-plan SKILL.md            │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
@@ -88,7 +107,7 @@ Examples:
 ┌─────────────────────────────────────────┐
 │              Load SDE2 Agent            │
 │  • Receives architect's plan            │
-│  • Read implement.md skill              │
+│  • Read implement SKILL.md              │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
@@ -102,31 +121,33 @@ Examples:
 
 ## Execution
 
-### Phase 1: Load Agent Context
+### Phase 1: Detect Context & Load Agent
 
-1. **Fetch Linear ticket:**
+1. **Parse arguments for context:**
 
    ```
-   mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
+   If NEX-### found → mcp__linear__get_issue(id: "{issue_id}")
+   If .md path found → Read file content
+   Otherwise → Use conversation history as context
    ```
 
 2. **If `--with-architect` flag present:**
-   - Read `.claude/agents/principal-architect/AGENT.md`
-   - Read `.claude/agents/principal-architect/skills/design-plan.md`
+   - Read `.claude/agents/principal-architect.md`
+   - Read `.claude/skills/design-plan/SKILL.md`
    - Execute design-plan skill
    - Present plan to user
    - WAIT for approval
    - Then proceed to step 3
 
 3. **Load SDE2 agent:**
-   - Read `.claude/agents/sde2/AGENT.md`
-   - Read `.claude/agents/sde2/skills/implement.md`
+   - Read `.claude/agents/sde2.md`
+   - Read `.claude/skills/implement/SKILL.md`
 
 ### Phase 2: Execute Implementation
 
 Execute the SDE2 `implement` skill:
 
-- The skill handles all phases (understand → explore → plan → implement → verify)
+- The skill handles all phases (gather → explore → plan → implement → verify)
 - Follow the workflow in the skill file
 - If architect plan was created, SDE2 follows that plan
 
@@ -135,12 +156,15 @@ Execute the SDE2 `implement` skill:
 After implementation is complete, output:
 
 ```markdown
-## ✅ Implementation Complete
+## Implementation Complete
 
-### Linear Ticket
+### Task Reference
 
-- **ID:** {issue_id}
-- **Title:** {title}
+{Include whichever applies:}
+
+- **Linear:** NEX-### - {title}
+- **Spec:** {filename.md}
+- **Request:** {brief summary}
 
 ### Execution Mode
 
@@ -154,9 +178,9 @@ After implementation is complete, output:
 
 ### Verification
 
-- [ ] TypeScript: ✅
-- [ ] Lint: ✅
-- [ ] Tests: ✅
+- [ ] TypeScript: No errors
+- [ ] Lint: No warnings
+- [ ] Tests: All passing
 
 ### Next Steps
 
@@ -177,9 +201,10 @@ After implementation is complete, output:
 
 ## Error Handling
 
-| Error                     | Action                              |
-| ------------------------- | ----------------------------------- |
-| Linear issue not found    | Ask user to verify issue ID         |
-| No requirements in ticket | Ask user for clarification          |
-| Architect plan rejected   | Revise plan or ask for guidance     |
-| Implementation blocked    | Ask user for decision (no patches!) |
+| Error                   | Action                              |
+| ----------------------- | ----------------------------------- |
+| Linear issue not found  | Ask user to verify issue ID         |
+| Spec file not found     | Ask user to verify file path        |
+| Unclear requirements    | Ask user for clarification          |
+| Architect plan rejected | Revise plan or ask for guidance     |
+| Implementation blocked  | Ask user for decision (no patches!) |

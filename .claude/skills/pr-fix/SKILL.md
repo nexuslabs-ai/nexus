@@ -1,6 +1,17 @@
-# PR Fix Skill
+---
+name: pr-fix
+description: Fix issues identified in PR reviews, addressing blocking and minor concerns. Use after receiving PR review feedback or when PR has requested changes.
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - Edit
+  - Write
+user-invocable: true
+---
 
-> Uses: [SDE2 Agent](../AGENT.md)
+# PR Fix
 
 ## Purpose
 
@@ -23,7 +34,7 @@ Based on files changed in the PR, load appropriate rules **before fixing**:
 | `packages/core/`, `packages/tailwind/` | [tokens.md](../../rules/tokens.md)                                                                                         |
 | `packages/context-engine/`             | [context-engine.md](../../rules/context-engine.md)                                                                         |
 
-**Always also load:** Base rules from [AGENT.md](../AGENT.md) (workflow, github, linear)
+**Always also load:** Base rules (workflow, github, linear)
 
 ## Fix Process
 

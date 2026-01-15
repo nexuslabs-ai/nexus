@@ -1,10 +1,21 @@
-# Design Plan Skill
+---
+name: design-plan
+description: Create implementation plans for complex tasks with architectural guidance. Use for complex features, multi-file changes, or when planning is needed before implementation.
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - WebSearch
+  - WebFetch
+user-invocable: true
+---
 
-> Uses: [Principal Architect Agent](../AGENT.md)
+# Design Plan
 
 ## Purpose
 
-Create comprehensive implementation plans for complex tasks, providing architectural guidance that SDE2 can follow for implementation.
+Create comprehensive implementation plans for complex tasks, providing architectural guidance that can be followed for implementation.
 
 ## When to Use
 
@@ -23,7 +34,7 @@ Based on task type, reference these rules when planning:
 | API/Backend  | [context-engine.md](../../rules/context-engine.md)                           |
 | Token System | [tokens.md](../../rules/tokens.md)                                           |
 
-**Always also load:** Base rules from [AGENT.md](../AGENT.md) (workflow, github, linear)
+**Always also load:** Base rules (workflow, github, linear)
 
 ## Planning Process
 
@@ -125,7 +136,7 @@ Based on task type, reference these rules when planning:
 
 ### Phase 6: Present Plan for Approval
 
-Output the plan and **WAIT for user approval** before handing off to SDE2.
+Output the plan and **WAIT for user approval** before implementation.
 
 ## Output Format
 
@@ -203,7 +214,7 @@ Output the plan and **WAIT for user approval** before handing off to SDE2.
 
 ---
 
-**Ready for SDE2 implementation?** Approve to proceed.
+**Ready for implementation?** Approve to proceed.
 ```
 
 ## Principles to Follow
@@ -212,7 +223,7 @@ Output the plan and **WAIT for user approval** before handing off to SDE2.
 2. **Simple over clever** — The best architecture is the simplest one that works
 3. **Think in phases** — Break work into testable increments
 4. **Surface decisions** — Don't hide assumptions, make them explicit
-5. **Plan for handoff** — SDE2 should be able to implement without guessing
+5. **Plan for handoff** — Implementation should be possible without guessing
 
 ## What NOT to Do
 
@@ -220,4 +231,4 @@ Output the plan and **WAIT for user approval** before handing off to SDE2.
 - Don't introduce new patterns when existing ones work
 - Don't skip the trade-off analysis
 - Don't assume — ask user when unclear
-- Don't write code — only plan (SDE2 implements)
+- Don't write code — only plan (implementation is separate)

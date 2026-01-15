@@ -19,12 +19,21 @@ ds/
 ├── .claude/
 │   ├── commands/       # Slash commands (/implement, /pr-review, /linkedin, etc.)
 │   ├── rules/          # Convention rules (components, testing, tokens, etc.)
-│   └── agents/         # Persona-based agents with skills
-│       ├── principal-architect/  # Architecture decisions, design planning
-│       ├── sde2/                 # Implementation, code quality
-│       ├── designer/             # Design-to-code parity, Figma analysis
-│       ├── technical-writer/        # Documentation accuracy
-│       └── social-media-manager/    # Developer advocacy content
+│   ├── skills/         # Auto-discovered capabilities (SKILL.md format)
+│   │   ├── pr-review/           # PR review framework
+│   │   ├── pr-review-follow-up/ # Follow-up review verification
+│   │   ├── implement/           # Linear ticket implementation
+│   │   ├── pr-fix/              # Fix PR review issues
+│   │   ├── design-plan/         # Architecture planning
+│   │   ├── figma-analyze/       # Figma design analysis
+│   │   ├── update-docs/         # Documentation updates
+│   │   └── linkedin-post/       # LinkedIn content generation
+│   └── agents/         # Auto-delegated subagents (single .md files)
+│       ├── principal-architect.md  # Architecture, scalability, design
+│       ├── sde2.md                 # Implementation, code quality
+│       ├── designer.md             # Design-code parity, Figma
+│       ├── technical-writer.md     # Documentation accuracy
+│       └── social-media-manager.md # Developer advocacy content
 └── Root configs        # Shared TS, ESLint, Prettier, Turbo
 ```
 
@@ -100,6 +109,33 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | [.claude/rules/context-engine.md](.claude/rules/context-engine.md)         | Context Engine domain knowledge, AI-first APIs |
 | [.claude/rules/linear.md](.claude/rules/linear.md)                         | Linear integration, issue linking, status flow |
 | [.claude/rules/github.md](.claude/rules/github.md)                         | PR format, commit conventions, auto-linking    |
+
+## Skills (Auto-Discovered)
+
+Skills are auto-discovered capabilities that Claude loads when your request matches the skill description.
+
+| Skill                                                              | Purpose                                |
+| ------------------------------------------------------------------ | -------------------------------------- |
+| [pr-review](.claude/skills/pr-review/SKILL.md)                     | PR review framework (common structure) |
+| [pr-review-follow-up](.claude/skills/pr-review-follow-up/SKILL.md) | Follow-up review verification          |
+| [implement](.claude/skills/implement/SKILL.md)                     | Linear ticket implementation           |
+| [pr-fix](.claude/skills/pr-fix/SKILL.md)                           | Fix PR review issues                   |
+| [design-plan](.claude/skills/design-plan/SKILL.md)                 | Architecture planning                  |
+| [figma-analyze](.claude/skills/figma-analyze/SKILL.md)             | Figma design analysis                  |
+| [update-docs](.claude/skills/update-docs/SKILL.md)                 | Documentation updates                  |
+| [linkedin-post](.claude/skills/linkedin-post/SKILL.md)             | LinkedIn content generation            |
+
+## Agents (Auto-Delegated)
+
+Agents are specialized personas that Claude auto-delegates to based on task type.
+
+| Agent                                                          | Model  | Skills                                            | Focus                        |
+| -------------------------------------------------------------- | ------ | ------------------------------------------------- | ---------------------------- |
+| [principal-architect](.claude/agents/principal-architect.md)   | opus   | pr-review, pr-review-follow-up, design-plan       | Architecture, scalability    |
+| [sde2](.claude/agents/sde2.md)                                 | opus   | pr-review, pr-review-follow-up, implement, pr-fix | Code quality, implementation |
+| [designer](.claude/agents/designer.md)                         | opus   | figma-analyze                                     | Design-code parity           |
+| [technical-writer](.claude/agents/technical-writer.md)         | sonnet | update-docs                                       | Documentation accuracy       |
+| [social-media-manager](.claude/agents/social-media-manager.md) | sonnet | linkedin-post                                     | Developer advocacy           |
 
 ## Slash Commands
 

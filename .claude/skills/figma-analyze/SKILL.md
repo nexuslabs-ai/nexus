@@ -1,15 +1,33 @@
-# Figma Analyze Skill
+---
+name: figma-analyze
+description: Analyze Figma designs for code implementation readiness and design-code parity. Use when working with Figma URLs, analyzing component designs, or checking token consistency.
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - WebFetch
+user-invocable: true
+---
+
+# Figma Analyze
 
 ## Purpose
 
 Analyze a Figma component design against codebase conventions to ensure design-to-code parity and implementation readiness.
 
+## When to Use
+
+- Analyzing Figma designs before implementation
+- Checking design-code alignment
+- Validating token usage in designs
+- Reviewing component structure for compound components
+
 ## Task-Specific Rules
 
-| Context            | Rules to Load                                                                                                |
-| ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Always             | [figma.md](../../../rules/figma.md), [tokens.md](../../../rules/tokens.md)                                   |
-| Component analysis | [components.md](../../../rules/components.md), [shadcn-divergences.md](../../../rules/shadcn-divergences.md) |
+| Context            | Rules to Load                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------ |
+| Always             | [figma.md](../../rules/figma.md), [tokens.md](../../rules/tokens.md)                                   |
+| Component analysis | [components.md](../../rules/components.md), [shadcn-divergences.md](../../rules/shadcn-divergences.md) |
 
 ## Workflow
 
@@ -138,10 +156,10 @@ Output structured analysis using this format:
 - [ ] Ready for implementation
 ```
 
-## Output Format
+## Output Characteristics
 
 The analysis report should be:
 
-- Actionable — clear next steps for both design and code
-- Specific — exact token names, frame names, values
-- Prioritized — blocking issues vs nice-to-haves
+- **Actionable** — Clear next steps for both design and code
+- **Specific** — Exact token names, frame names, values
+- **Prioritized** — Blocking issues vs nice-to-haves
