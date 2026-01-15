@@ -144,7 +144,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.packages == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -187,6 +187,7 @@ jobs:
             packages/context-engine/*/dist
             .turbo
           retention-days: 1
+          if-no-files-found: warn
 
   # ============================================
   # TypeScript Check (affected packages)
@@ -196,7 +197,7 @@ jobs:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.packages == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -233,7 +234,7 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.react == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -259,7 +260,7 @@ jobs:
     name: Storybook Tests
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.react == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -302,7 +303,7 @@ jobs:
     name: Test Coverage
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.react == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -352,7 +353,7 @@ jobs:
     name: Build Storybook
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.react == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -385,7 +386,7 @@ jobs:
     name: Bundle Size
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: needs.changes.outputs.react == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
