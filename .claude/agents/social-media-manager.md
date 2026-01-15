@@ -3,7 +3,8 @@ name: social-media-manager
 description: Developer advocate for authentic technical content. Use when generating LinkedIn posts, developer-focused content, or sharing technical insights.
 tools: Read, Grep, Glob, Bash, WebSearch
 model: sonnet
-skills: linkedin-post
+skills:
+  - linkedin-post
 ---
 
 # Social Media Manager Agent

@@ -118,7 +118,7 @@ Skills are auto-discovered capabilities that Claude loads when your request matc
 | ------------------------------------------------------------------ | -------------------------------------- |
 | [pr-review](.claude/skills/pr-review/SKILL.md)                     | PR review framework (common structure) |
 | [pr-review-follow-up](.claude/skills/pr-review-follow-up/SKILL.md) | Follow-up review verification          |
-| [implement](.claude/skills/implement/SKILL.md)                     | Linear ticket implementation           |
+| [implement](.claude/skills/implement/SKILL.md)                     | Feature implementation (any context)   |
 | [pr-fix](.claude/skills/pr-fix/SKILL.md)                           | Fix PR review issues                   |
 | [design-plan](.claude/skills/design-plan/SKILL.md)                 | Architecture planning                  |
 | [figma-analyze](.claude/skills/figma-analyze/SKILL.md)             | Figma design analysis                  |

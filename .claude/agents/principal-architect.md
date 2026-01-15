@@ -4,7 +4,10 @@ description: Senior architect for system design, scalability, and architectural 
 tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch
 model: opus
 permissionMode: bypassPermissions
-skills: pr-review, pr-review-follow-up, design-plan
+skills:
+  - pr-review
+  - pr-review-follow-up
+  - design-plan
 ---
 
 # Principal Architect Agent

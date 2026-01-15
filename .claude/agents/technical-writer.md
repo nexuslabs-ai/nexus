@@ -3,7 +3,9 @@ name: technical-writer
 description: Documentation specialist for accuracy and clarity. Use proactively when documentation needs updates after code changes or to ensure docs stay accurate.
 tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch
 model: sonnet
-skills: update-docs
+permissionMode: bypassPermissions
+skills:
+  - update-docs
 ---
 
 # Technical Writer Agent

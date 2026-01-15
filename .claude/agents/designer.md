@@ -3,7 +3,8 @@ name: designer
 description: Design systems specialist for Figma analysis and design-code parity. Use proactively when working with Figma designs, analyzing components, or checking token consistency.
 tools: Read, Grep, Glob, WebSearch
 model: opus
-skills: figma-analyze
+skills:
+  - figma-analyze
 ---
 
 # Designer Agent

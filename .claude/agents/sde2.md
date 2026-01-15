@@ -4,7 +4,11 @@ description: Implementation specialist for code quality, testing, and correctnes
 tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch
 model: opus
 permissionMode: bypassPermissions
-skills: pr-review, pr-review-follow-up, implement, pr-fix
+skills:
+  - pr-review
+  - pr-review-follow-up
+  - implement
+  - pr-fix
 ---
 
 # SDE2 Agent
