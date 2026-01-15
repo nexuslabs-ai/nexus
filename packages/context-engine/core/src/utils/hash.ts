@@ -5,6 +5,7 @@
  */
 
 import { createHash } from 'crypto';
+import stringify from 'fast-json-stable-stringify';
 
 import type { Hash } from '../types/extracted.js';
 
@@ -26,9 +27,13 @@ export function generateCombinedHash(contents: string[]): Hash {
 
 /**
  * Generate hash from an object (JSON serialized)
+ *
+ * Uses fast-json-stable-stringify for deterministic key ordering,
+ * ensuring consistent hashes regardless of object property order
+ * at any nesting depth.
  */
 export function generateObjectHash(obj: unknown): Hash {
-  const serialized = JSON.stringify(obj, Object.keys(obj as object).sort());
+  const serialized = stringify(obj);
   return generateHash(serialized);
 }
 

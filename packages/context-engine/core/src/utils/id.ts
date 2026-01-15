@@ -108,7 +108,7 @@ export function parseIdentifier(identifier: string): ParsedIdentifier {
   if (isValidSlug(trimmed)) {
     // Extract parts from slug: name-framework-id8
     const parts = trimmed.split('-');
-    const _idPart = parts.pop()!; // Last 8 chars of UUID (not needed for parsing)
+    parts.pop(); // Discard UUID prefix (last 8 chars)
     const frameworkPart = parts.pop();
 
     // Validate framework
@@ -151,6 +151,10 @@ export function getShortId(id: ComponentId): string {
 /**
  * Check if two IDs refer to the same component
  * (handles full UUID vs short ID comparison)
+ *
+ * @note When comparing a short ID against full UUIDs, this returns
+ * true for any UUID that starts with the short ID. In rare cases,
+ * this could match multiple components. For exact matching, use full UUIDs.
  */
 export function isSameComponent(id1: string, id2: string): boolean {
   const normalized1 = id1.replace(/-/g, '').toLowerCase();
