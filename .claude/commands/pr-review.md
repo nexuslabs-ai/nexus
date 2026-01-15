@@ -4,10 +4,10 @@ Comprehensive code review using dual-agent analysis. Auto-detects context based 
 
 ## Agents Used
 
-| Agent                                                         | Skill                                                          | Perspective                  |
-| ------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------- |
-| [Principal Architect](../agents/principal-architect/AGENT.md) | [pr-review](../agents/principal-architect/skills/pr-review.md) | Architecture & system design |
-| [SDE2](../agents/sde2/AGENT.md)                               | [pr-review](../agents/sde2/skills/pr-review.md)                | Code quality & correctness   |
+| Agent                                                   | Skill                                     | Perspective                  |
+| ------------------------------------------------------- | ----------------------------------------- | ---------------------------- |
+| [Principal Architect](../agents/principal-architect.md) | [pr-review](../skills/pr-review/SKILL.md) | Architecture & system design |
+| [SDE2](../agents/sde2.md)                               | [pr-review](../skills/pr-review/SKILL.md) | Code quality & correctness   |
 
 ## Required Input
 
@@ -88,13 +88,13 @@ If no input provided, ask the user for PR number.
    | `packages/react/src/hooks/**`              | [testing.md](../rules/testing.md)                                                                                                                                                                         |
    | `packages/core/**`, `packages/tailwind/**` | [tokens.md](../rules/tokens.md)                                                                                                                                                                           |
    | `packages/context-engine/**`               | [context-engine.md](../rules/context-engine.md)                                                                                                                                                           |
-   | `.claude/**`                               | Review agent/skill structure                                                                                                                                                                              |
+   | `.claude/**`                               | Check [Claude Code docs](https://code.claude.com/docs/en/) for latest capabilities                                                                                                                        |
    | Any PR                                     | [github.md](../rules/github.md), [linear.md](../rules/linear.md)                                                                                                                                          |
 
 ### Phase 3: Principal Architect Review
 
-> **Load agent:** Read `.claude/agents/principal-architect/AGENT.md`
-> **Load skill:** Read `.claude/agents/principal-architect/skills/pr-review.md`
+> **Load agent:** Read `.claude/agents/principal-architect.md`
+> **Load skill:** Read `.claude/skills/pr-review/SKILL.md`
 
 Execute the Principal Architect's pr-review skill:
 
@@ -104,8 +104,8 @@ Execute the Principal Architect's pr-review skill:
 
 ### Phase 4: SDE2 Review
 
-> **Load agent:** Read `.claude/agents/sde2/AGENT.md`
-> **Load skill:** Read `.claude/agents/sde2/skills/pr-review.md`
+> **Load agent:** Read `.claude/agents/sde2.md`
+> **Load skill:** Read `.claude/skills/pr-review/SKILL.md`
 
 Execute the SDE2's pr-review skill:
 
@@ -135,6 +135,32 @@ Review against checklist in [components.md](../rules/components.md)
 #### If Token files changed:
 
 Review against checklist in [tokens.md](../rules/tokens.md)
+
+#### If `.claude/**` files changed:
+
+**Check Claude Code Documentation for latest capabilities:**
+
+```
+WebFetch(url: "https://code.claude.com/docs/en/", prompt: "What are the current best practices for Claude Code agents, skills, and commands? What capabilities are available?")
+```
+
+Review against:
+
+| Aspect                 | What to Check                                           |
+| ---------------------- | ------------------------------------------------------- |
+| Agent Structure        | Does agent file follow current Claude Code conventions? |
+| Skill Format           | Are skills using correct YAML frontmatter format?       |
+| Command Structure      | Do commands follow current patterns?                    |
+| Available Capabilities | Are we using latest Claude Code features appropriately? |
+| Deprecated Patterns    | Are there any deprecated patterns being used?           |
+
+**Documentation sections to check:**
+
+- Agent configuration and best practices
+- Skill auto-discovery and invocation
+- Command patterns and arguments
+- Tool permissions and security
+- Any new features or deprecations
 
 ### Phase 6: Post Reviews
 
@@ -259,8 +285,8 @@ For each issue from the previous review:
 
 **SDE2 Review (Always):**
 
-> **Load agent:** Read `.claude/agents/sde2/AGENT.md`
-> **Load skill:** Read `.claude/agents/sde2/skills/pr-review.md` (follow-up mode)
+> **Load agent:** Read `.claude/agents/sde2.md`
+> **Load skill:** Read `.claude/skills/pr-review-follow-up/SKILL.md`
 
 - Review ONLY files modified since last review
 - Check if previous issues are fixed
@@ -269,8 +295,8 @@ For each issue from the previous review:
 
 **Architect Review (If Triggered):**
 
-> **Load agent:** Read `.claude/agents/principal-architect/AGENT.md`
-> **Load skill:** Read `.claude/agents/principal-architect/skills/pr-review.md` (follow-up mode)
+> **Load agent:** Read `.claude/agents/principal-architect.md`
+> **Load skill:** Read `.claude/skills/pr-review-follow-up/SKILL.md`
 
 - Review new files for architectural fit
 - Verify previous architectural concerns addressed

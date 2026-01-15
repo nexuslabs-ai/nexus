@@ -4,9 +4,9 @@ Fix issues identified in PR reviews using the SDE2 agent.
 
 ## Agent Used
 
-| Agent                           | Skill                                     | Purpose           |
-| ------------------------------- | ----------------------------------------- | ----------------- |
-| [SDE2](../agents/sde2/AGENT.md) | [pr-fix](../agents/sde2/skills/pr-fix.md) | Fix review issues |
+| Agent                     | Skill                               | Purpose           |
+| ------------------------- | ----------------------------------- | ----------------- |
+| [SDE2](../agents/sde2.md) | [pr-fix](../skills/pr-fix/SKILL.md) | Fix review issues |
 
 ## Required Input
 
@@ -73,8 +73,8 @@ If no PR number provided, ask the user for it.
 ### Phase 2: Load Agent & Execute
 
 1. **Load SDE2 agent:**
-   - Read `.claude/agents/sde2/AGENT.md`
-   - Read `.claude/agents/sde2/skills/pr-fix.md`
+   - Read `.claude/agents/sde2.md`
+   - Read `.claude/skills/pr-fix/SKILL.md`
 
 2. **Execute pr-fix skill:**
    - The skill handles categorization, context loading, and fixing

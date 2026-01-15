@@ -1,12 +1,25 @@
-# LinkedIn Post Skill
+---
+name: linkedin-post
+description: Generate LinkedIn posts about work sessions and technical accomplishments. Use when creating developer-focused content or sharing technical insights.
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+user-invocable: true
+---
+
+# LinkedIn Post
 
 ## Purpose
 
 Generate a LinkedIn post based on the current work session - what was built, changed, or accomplished.
 
-## Trigger
+## When to Use
 
-When user runs `/linkedin` or asks for a LinkedIn post about their session.
+- When user runs `/linkedin` or asks for a LinkedIn post
+- After completing a significant feature or task
+- To share technical learnings or insights
 
 ## Workflow
 
@@ -58,7 +71,7 @@ Based on session analysis, identify:
 
 ### Phase 4: Self-Review
 
-Apply the agent's anti-patterns check:
+Apply anti-patterns check:
 
 - [ ] No "Excited to announce" or marketing clichés
 - [ ] No buzzwords without substance
@@ -106,3 +119,13 @@ The skill derives ALL content from:
 | User's explicit input | Any additional context provided    |
 
 **Never hardcode** project names, tech stack, or domain assumptions - discover them from the session.
+
+## Anti-Patterns to Avoid
+
+- "Excited to announce" and similar marketing clichés
+- Buzzwords without substance (synergy, leverage, cutting-edge)
+- Posts that only describe without creating insight
+- Missing hook in the first line
+- No clear call to engagement
+- Too technical for the platform audience
+- Too vague to be interesting

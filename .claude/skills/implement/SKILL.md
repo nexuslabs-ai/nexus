@@ -1,17 +1,39 @@
-# Implement Skill
+---
+name: implement
+description: Implement features and tasks with production-quality code. Use when implementing features, building components, or any task requiring code implementation from any context source (Linear tickets, markdown specs, or conversation).
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - Edit
+  - Write
+user-invocable: true
+---
 
-> Uses: [SDE2 Agent](../AGENT.md)
+# Implement
 
 ## Purpose
 
-Implement Linear tickets and tasks with production-quality code, following codebase conventions and best practices.
+Implement features and tasks with production-quality code, following codebase conventions and best practices. Works with any context source.
 
 ## When to Use
 
-- Implementing new features from Linear tickets
+- Implementing new features (from any source)
 - Building new components, hooks, or utilities
 - Adding functionality to existing code
 - Any task that requires writing code
+
+## Context Sources
+
+This skill works with multiple input types:
+
+| Source            | Detection                  | How to Extract                             |
+| ----------------- | -------------------------- | ------------------------------------------ |
+| **Linear ticket** | `NEX-###` pattern in input | `mcp__linear__get_issue(id: "{issue_id}")` |
+| **Markdown file** | `.md` file path referenced | Read the file content                      |
+| **Figma design**  | Figma URL in context       | `mcp__figma__get_design_context`           |
+| **Conversation**  | Requirements in chat       | Parse from conversation history            |
 
 ## Task-Specific Rules
 
@@ -25,27 +47,47 @@ Based on what you're implementing, load these rules **before writing any code**:
 | Token          | `packages/core/`, `packages/tailwind/` | [tokens.md](../../rules/tokens.md)                                                                                                                           |
 | Context Engine | `packages/context-engine/`             | [context-engine.md](../../rules/context-engine.md)                                                                                                           |
 
-**Always also load:** Base rules from [AGENT.md](../AGENT.md) (workflow, github, linear)
+**Always also load:** Base rules (workflow, github, linear — if Linear context present)
 
 ## Implementation Process
 
-### Phase 1: Understand the Task
+### Phase 1: Gather Requirements
 
-1. **Read the Linear ticket thoroughly:**
+1. **Detect context source:**
+
+   ```
+   If NEX-### pattern → Fetch Linear ticket
+   If .md file referenced → Read markdown file
+   If Figma URL present → Fetch design context
+   Otherwise → Use conversation context
+   ```
+
+2. **If Linear ticket:**
 
    ```
    mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
    ```
 
-2. **Extract key information:**
-   - What needs to be built?
-   - Acceptance criteria
-   - Any linked Figma designs?
-   - Related issues or blockers?
+   - Extract requirements, acceptance criteria
+   - Check for linked Figma designs
 
-3. **If Figma link present:**
+3. **If Markdown file:**
+   - Read the referenced file
+   - Extract requirements and acceptance criteria
+
+4. **If Figma design:**
    - Use `mcp__figma__get_design_context` to understand the design
    - Note variants, sizes, states required
+
+5. **If conversation context:**
+   - Summarize what the user is asking for
+   - Clarify any ambiguous requirements before proceeding
+
+6. **Extract key information:**
+   - What needs to be built?
+   - Acceptance criteria (explicit or inferred)
+   - Any design references?
+   - Constraints or dependencies?
 
 ### Phase 2: Explore Existing Code
 
@@ -117,12 +159,15 @@ Based on what you're implementing, load these rules **before writing any code**:
 After implementation is complete:
 
 ```markdown
-## ✅ Implementation Complete
+## Implementation Complete
 
-### Linear Ticket
+### Task Reference
 
-- **ID:** {issue_id}
-- **Title:** {title}
+{Include whichever applies:}
+
+- **Linear:** NEX-### - {title}
+- **Spec:** {filename.md}
+- **Request:** {brief summary of what was asked}
 
 ### Changes Made
 
@@ -137,10 +182,10 @@ After implementation is complete:
 
 ### Verification
 
-- [ ] TypeScript: ✅ No errors
-- [ ] Lint: ✅ No warnings
-- [ ] Tests: ✅ All passing
-- [ ] Acceptance criteria: ✅ Met
+- [ ] TypeScript: No errors
+- [ ] Lint: No warnings
+- [ ] Tests: All passing
+- [ ] Requirements: Met
 
 ### Next Steps
 
@@ -154,3 +199,4 @@ After implementation is complete:
 3. **Test as you go** — Don't leave testing for the end
 4. **Ask when unsure** — Better to clarify than assume
 5. **Small iterations** — Complete one todo, summarize, wait for confirmation
+6. **Context-agnostic** — Same quality regardless of input source
