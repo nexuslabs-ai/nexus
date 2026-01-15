@@ -183,8 +183,7 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            packages/*/dist
-            packages/context-engine/*/dist
+            packages/**/dist
             .turbo
           retention-days: 1
           if-no-files-found: warn
@@ -197,7 +196,7 @@ jobs:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.packages == 'true'
+    if: needs.changes.outputs.packages == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -234,7 +233,7 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true'
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -260,7 +259,7 @@ jobs:
     name: Storybook Tests
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true'
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -303,7 +302,7 @@ jobs:
     name: Test Coverage
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true'
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -353,7 +352,7 @@ jobs:
     name: Build Storybook
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true'
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -386,7 +385,7 @@ jobs:
     name: Bundle Size
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true'
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
