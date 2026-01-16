@@ -8,11 +8,11 @@
       "$value": "{white}",
       "$type": "color"
     },
-    "hover": {
+    "background-hover": {
       "$value": "{gray.800}",
       "$type": "color"
     },
-    "active": {
+    "background-active": {
       "$value": "{gray.700}",
       "$type": "color"
     },
@@ -20,12 +20,20 @@
       "$value": "{gray.300}",
       "$type": "color"
     },
-    "text": {
+    "subtle": {
+      "$value": "{gray.50}",
+      "$type": "color"
+    },
+    "subtle-foreground": {
       "$value": "{gray.900}",
       "$type": "color"
     },
-    "surface": {
-      "$value": "{gray.50}",
+    "subtle-hover": {
+      "$value": "{gray.100}",
+      "$type": "color"
+    },
+    "subtle-active": {
+      "$value": "{gray.200}",
       "$type": "color"
     }
   },
@@ -38,11 +46,11 @@
       "$value": "{gray.900}",
       "$type": "color"
     },
-    "hover": {
+    "background-hover": {
       "$value": "{gray.200}",
       "$type": "color"
     },
-    "active": {
+    "background-active": {
       "$value": "{gray.300}",
       "$type": "color"
     },
@@ -50,12 +58,20 @@
       "$value": "{gray.50}",
       "$type": "color"
     },
-    "text": {
+    "subtle": {
+      "$value": "{gray.100}",
+      "$type": "color"
+    },
+    "subtle-foreground": {
       "$value": "{gray.600}",
       "$type": "color"
     },
-    "surface": {
-      "$value": "{gray.100}",
+    "subtle-hover": {
+      "$value": "{gray.200}",
+      "$type": "color"
+    },
+    "subtle-active": {
+      "$value": "{gray.300}",
       "$type": "color"
     }
   }

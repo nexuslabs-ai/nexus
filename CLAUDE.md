@@ -26,6 +26,7 @@ ds/
 │   │   ├── pr-fix/              # Fix PR review issues
 │   │   ├── design-plan/         # Architecture planning
 │   │   ├── figma-analyze/       # Figma design analysis
+│   │   ├── shadcn-to-figma/     # Code → Figma architecture blueprints
 │   │   ├── update-docs/         # Documentation updates
 │   │   └── linkedin-post/       # LinkedIn content generation
 │   └── agents/         # Auto-delegated subagents (single .md files)
@@ -104,7 +105,7 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | [.claude/rules/testing.md](.claude/rules/testing.md)                       | Test structure, patterns, a11y                 |
 | [.claude/rules/storybook.md](.claude/rules/storybook.md)                   | Story structure, required stories              |
 | [.claude/rules/tokens.md](.claude/rules/tokens.md)                         | Token format, naming, workflow                 |
-| [.claude/rules/figma.md](.claude/rules/figma.md)                           | Figma-to-code parity, token mapping            |
+| [.claude/rules/figma.md](.claude/rules/figma.md)                           | Figma-code parity, token mapping, architecture |
 | [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences                 |
 | [.claude/rules/context-engine.md](.claude/rules/context-engine.md)         | Context Engine domain knowledge, AI-first APIs |
 | [.claude/rules/linear.md](.claude/rules/linear.md)                         | Linear integration, issue linking, status flow |
@@ -122,6 +123,7 @@ Skills are auto-discovered capabilities that Claude loads when your request matc
 | [pr-fix](.claude/skills/pr-fix/SKILL.md)                           | Fix PR review issues                   |
 | [design-plan](.claude/skills/design-plan/SKILL.md)                 | Architecture planning                  |
 | [figma-analyze](.claude/skills/figma-analyze/SKILL.md)             | Figma design analysis                  |
+| [shadcn-to-figma](.claude/skills/shadcn-to-figma/SKILL.md)         | Code → Figma architecture blueprints   |
 | [update-docs](.claude/skills/update-docs/SKILL.md)                 | Documentation updates                  |
 | [linkedin-post](.claude/skills/linkedin-post/SKILL.md)             | LinkedIn content generation            |
 
@@ -133,20 +135,21 @@ Agents are specialized personas that Claude auto-delegates to based on task type
 | -------------------------------------------------------------- | ------ | ------------------------------------------------- | ---------------------------- |
 | [principal-architect](.claude/agents/principal-architect.md)   | opus   | pr-review, pr-review-follow-up, design-plan       | Architecture, scalability    |
 | [sde2](.claude/agents/sde2.md)                                 | opus   | pr-review, pr-review-follow-up, implement, pr-fix | Code quality, implementation |
-| [designer](.claude/agents/designer.md)                         | opus   | figma-analyze                                     | Design-code parity           |
+| [designer](.claude/agents/designer.md)                         | opus   | figma-analyze, shadcn-to-figma                    | Design-code parity           |
 | [technical-writer](.claude/agents/technical-writer.md)         | sonnet | update-docs                                       | Documentation accuracy       |
 | [social-media-manager](.claude/agents/social-media-manager.md) | sonnet | linkedin-post                                     | Developer advocacy           |
 
 ## Slash Commands
 
-| Command          | Agent(s) Used                       | Purpose                                               |
-| ---------------- | ----------------------------------- | ----------------------------------------------------- |
-| `/implement`     | SDE2 (+ Principal Architect w/flag) | Implement Linear ticket (optional `--with-architect`) |
-| `/pr-review`     | Principal Architect + SDE2          | Dual-perspective PR code review                       |
-| `/pr-fix`        | SDE2                                | Fix PR review issues (blocking first, then minor)     |
-| `/figma-analyze` | Designer                            | Analyze Figma design for code parity                  |
-| `/update-docs`   | Technical Writer                    | Update documentation after codebase changes           |
-| `/linkedin`      | Social Media Manager                | Generate LinkedIn post from session context           |
+| Command            | Agent(s) Used                       | Purpose                                               |
+| ------------------ | ----------------------------------- | ----------------------------------------------------- |
+| `/implement`       | SDE2 (+ Principal Architect w/flag) | Implement Linear ticket (optional `--with-architect`) |
+| `/pr-review`       | Principal Architect + SDE2          | Dual-perspective PR code review                       |
+| `/pr-fix`          | SDE2                                | Fix PR review issues (blocking first, then minor)     |
+| `/figma-analyze`   | Designer                            | Analyze Figma design for code parity                  |
+| `/shadcn-to-figma` | Designer                            | Generate Figma architecture from shadcn code          |
+| `/update-docs`     | Technical Writer                    | Update documentation after codebase changes           |
+| `/linkedin`        | Social Media Manager                | Generate LinkedIn post from session context           |
 
 ## Code Style
 

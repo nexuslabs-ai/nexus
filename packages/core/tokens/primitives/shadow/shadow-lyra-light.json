@@ -30,7 +30,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000008",
+        "$value": "#0000000d",
         "$type": "color"
       }
     }
@@ -66,7 +66,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000008",
+        "$value": "#0000000d",
         "$type": "color"
       }
     }
@@ -102,7 +102,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000f",
+        "$value": "#0000001a",
         "$type": "color"
       }
     },
@@ -116,14 +116,14 @@
       },
       "y": {
         "$value": {
-          "value": 1,
+          "value": 2,
           "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
-          "value": 2,
+          "value": 3,
           "unit": "px"
         },
         "$type": "dimension"
@@ -136,7 +136,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000d",
+        "$value": "#0000001a",
         "$type": "color"
       }
     }
@@ -172,7 +172,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000f",
+        "$value": "#0000001a",
         "$type": "color"
       }
     },
@@ -186,14 +186,14 @@
       },
       "y": {
         "$value": {
-          "value": 1,
+          "value": 2,
           "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
-          "value": 2,
+          "value": 3,
           "unit": "px"
         },
         "$type": "dimension"
@@ -206,7 +206,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000f",
+        "$value": "#0000001a",
         "$type": "color"
       }
     }
@@ -242,7 +242,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000f",
+        "$value": "#0000001a",
         "$type": "color"
       }
     },
@@ -256,14 +256,14 @@
       },
       "y": {
         "$value": {
-          "value": 2,
+          "value": 3,
           "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
-          "value": 4,
+          "value": 5,
           "unit": "px"
         },
         "$type": "dimension"
@@ -276,7 +276,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000f",
+        "$value": "#0000001a",
         "$type": "color"
       }
     }
@@ -312,7 +312,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000d",
+        "$value": "#0000001f",
         "$type": "color"
       }
     },
@@ -326,14 +326,14 @@
       },
       "y": {
         "$value": {
-          "value": 4,
+          "value": 6,
           "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
-          "value": 6,
+          "value": 9,
           "unit": "px"
         },
         "$type": "dimension"
@@ -346,7 +346,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#0000001f",
         "$type": "color"
       }
     }
@@ -382,7 +382,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#0000001f",
         "$type": "color"
       }
     },
@@ -396,14 +396,14 @@
       },
       "y": {
         "$value": {
-          "value": 8,
+          "value": 12,
           "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
-          "value": 10,
+          "value": 16,
           "unit": "px"
         },
         "$type": "dimension"
@@ -416,7 +416,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#0000001f",
         "$type": "color"
       }
     }
@@ -452,7 +452,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000026",
+        "$value": "#00000040",
         "$type": "color"
       }
     }
@@ -468,14 +468,14 @@
       },
       "y": {
         "$value": {
-          "value": 1,
+          "value": 2,
           "unit": "px"
         },
         "$type": "dimension"
       },
       "blur": {
         "$value": {
-          "value": 3,
+          "value": 5,
           "unit": "px"
         },
         "$type": "dimension"
@@ -488,7 +488,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000a",
+        "$value": "#0000000d",
         "$type": "color"
       }
     }
@@ -524,7 +524,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "{neutral.200}",
+        "$value": "#e5e5e580",
         "$type": "color"
       }
     },
@@ -558,7 +558,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "{red.100}",
+        "$value": "#fecaca80",
         "$type": "color"
       }
     }
