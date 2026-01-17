@@ -21,6 +21,26 @@
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js",
       "require": "./dist/utils/index.cjs"
+    },
+    "./extractor": {
+      "types": "./dist/extractor/index.d.ts",
+      "import": "./dist/extractor/index.js",
+      "require": "./dist/extractor/index.cjs"
+    },
+    "./generator": {
+      "types": "./dist/generator/index.d.ts",
+      "import": "./dist/generator/index.js",
+      "require": "./dist/generator/index.cjs"
+    },
+    "./manifest": {
+      "types": "./dist/manifest/index.d.ts",
+      "import": "./dist/manifest/index.js",
+      "require": "./dist/manifest/index.cjs"
+    },
+    "./processor": {
+      "types": "./dist/processor/index.d.ts",
+      "import": "./dist/processor/index.js",
+      "require": "./dist/processor/index.cjs"
     }
   },
   "scripts": {
@@ -32,8 +52,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
     "fast-json-stable-stringify": "^2.1.0",
+    "react-docgen-typescript": "^2.2.2",
     "semver": "^7.6.0",
+    "ts-morph": "^25.0.1",
     "uuid": "^9.0.0",
     "zod": "^4.0.0"
   },

@@ -93,6 +93,16 @@ When you identify something worth improving:
 **💡 Consider:** {Specific refactor or pattern with example}
 ```
 
+## Coding Style Conventions
+
+| Convention              | Pattern                                     | Why                                    |
+| ----------------------- | ------------------------------------------- | -------------------------------------- |
+| Early returns           | `if (!x) return;` over nested if blocks     | Reduces nesting, improves readability  |
+| Guard clauses first     | Validation at function start                | Clear preconditions, happy path at end |
+| Extract focused methods | Split large functions by concern            | Single responsibility, testable units  |
+| Loop continue           | `if (!valid) continue;` over wrapping in if | Flat loop body, clear skip conditions  |
+| `as const` over enums   | `const Status = { ... } as const`           | Better tree-shaking, type inference    |
+
 ## Anti-Patterns to Flag
 
 - `any` type usage without justification
@@ -105,6 +115,8 @@ When you identify something worth improving:
 - Console.log or debugging code left in
 - Commented-out code without explanation
 - Unused imports or variables
+- Deep nesting (prefer early returns)
+- TypeScript enums (prefer `as const` objects)
 
 ## When Reviewing PRs
 

@@ -146,3 +146,23 @@ export const ParsedIdentifierSchema = z.object({
 });
 
 export type ParsedIdentifier = z.infer<typeof ParsedIdentifierSchema>;
+
+/**
+ * Component identity information for manifest building
+ *
+ * Used by processor and manifest modules to pass identity information
+ * through the extraction -> generation -> manifest build pipeline.
+ */
+export interface ManifestIdentity {
+  /** Component UUID */
+  id: string;
+
+  /** URL-friendly slug */
+  slug: string;
+
+  /** Human-readable name */
+  name: string;
+
+  /** Target framework */
+  framework: Framework;
+}
