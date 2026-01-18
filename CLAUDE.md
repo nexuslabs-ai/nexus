@@ -102,18 +102,20 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 
 ## Convention Rules
 
-| Rule File                                                                  | Purpose                                        |
-| -------------------------------------------------------------------------- | ---------------------------------------------- |
-| [.claude/rules/workflow.md](.claude/rules/workflow.md)                     | **Critical workflow (plan→execute→wait)**      |
-| [.claude/rules/components.md](.claude/rules/components.md)                 | Component structure, props, exports            |
-| [.claude/rules/testing.md](.claude/rules/testing.md)                       | Test structure, patterns, a11y                 |
-| [.claude/rules/storybook.md](.claude/rules/storybook.md)                   | Story structure, required stories              |
-| [.claude/rules/tokens.md](.claude/rules/tokens.md)                         | Token format, naming, workflow                 |
-| [.claude/rules/figma.md](.claude/rules/figma.md)                           | Figma-code parity, token mapping, architecture |
-| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences                 |
-| [.claude/rules/context-engine.md](.claude/rules/context-engine.md)         | Context Engine domain knowledge, AI-first APIs |
-| [.claude/rules/linear.md](.claude/rules/linear.md)                         | Linear integration, issue linking, status flow |
-| [.claude/rules/github.md](.claude/rules/github.md)                         | PR format, commit conventions, auto-linking    |
+| Rule File                                                                          | Purpose                                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------- |
+| [.claude/rules/workflow.md](.claude/rules/workflow.md)                             | **Critical workflow (plan→execute→wait)**      |
+| [.claude/rules/components.md](.claude/rules/components.md)                         | Component structure, props, exports            |
+| [.claude/rules/testing.md](.claude/rules/testing.md)                               | Core testing philosophy (all packages)         |
+| [.claude/rules/testing-react.md](.claude/rules/testing-react.md)                   | React/Storybook testing patterns               |
+| [.claude/rules/testing-context-engine.md](.claude/rules/testing-context-engine.md) | Context Engine testing patterns                |
+| [.claude/rules/storybook.md](.claude/rules/storybook.md)                           | Story structure, required stories              |
+| [.claude/rules/tokens.md](.claude/rules/tokens.md)                                 | Token format, naming, workflow                 |
+| [.claude/rules/figma.md](.claude/rules/figma.md)                                   | Figma-code parity, token mapping, architecture |
+| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md)         | Nexus vs shadcn/ui differences                 |
+| [.claude/rules/context-engine.md](.claude/rules/context-engine.md)                 | Context Engine domain knowledge, AI-first APIs |
+| [.claude/rules/linear.md](.claude/rules/linear.md)                                 | Linear integration, issue linking, status flow |
+| [.claude/rules/github.md](.claude/rules/github.md)                                 | PR format, commit conventions, auto-linking    |
 
 ## Skills (Auto-Discovered)
 

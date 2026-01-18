@@ -51,11 +51,21 @@ Based on what you're testing, different patterns apply:
 
 Load rules based on what you're testing **before writing any tests**:
 
-| Package          | Rules to Load                                                                  |
-| ---------------- | ------------------------------------------------------------------------------ |
-| React Components | [testing.md](../../rules/testing.md), [storybook.md](../../rules/storybook.md) |
-| Context Engine   | [context-engine.md](../../rules/context-engine.md)                             |
-| General          | [testing.md](../../rules/testing.md)                                           |
+| Package          | Rules to Load                                                                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| React Components | [testing.md](../../rules/testing.md), [testing-react.md](../../rules/testing-react.md), [storybook.md](../../rules/storybook.md)                             |
+| React Hooks      | [testing.md](../../rules/testing.md), [testing-react.md](../../rules/testing-react.md)                                                                       |
+| Context Engine   | [testing.md](../../rules/testing.md), [testing-context-engine.md](../../rules/testing-context-engine.md), [context-engine.md](../../rules/context-engine.md) |
+| Core/Tailwind    | [testing.md](../../rules/testing.md)                                                                                                                         |
+| General          | [testing.md](../../rules/testing.md)                                                                                                                         |
+
+**Rule file purpose:**
+
+- `testing.md` — Core philosophy (always load)
+- `testing-react.md` — React/Storybook patterns (for `@nexus/react`)
+- `testing-context-engine.md` — Context Engine patterns (for `@context-engine/*`)
+- `storybook.md` — Story structure (for component stories)
+- `context-engine.md` — Domain knowledge (for Context Engine)
 
 **Always also load:** Base rules (workflow, github, linear — if Linear context present)
 
