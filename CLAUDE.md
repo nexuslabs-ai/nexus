@@ -24,6 +24,7 @@ ds/
 │   │   ├── pr-review/           # PR review framework
 │   │   ├── pr-review-follow-up/ # Follow-up review verification
 │   │   ├── implement/           # Linear ticket implementation
+│   │   ├── implement-test/      # Test implementation
 │   │   ├── pr-fix/              # Fix PR review issues
 │   │   ├── design-plan/         # Architecture planning
 │   │   ├── figma-analyze/       # Figma design analysis
@@ -33,6 +34,7 @@ ds/
 │   └── agents/         # Auto-delegated subagents (single .md files)
 │       ├── principal-architect.md  # Architecture, scalability, design
 │       ├── sde2.md                 # Implementation, code quality
+│       ├── tester.md               # Test strategy, implementation
 │       ├── designer.md             # Design-code parity, Figma
 │       ├── technical-writer.md     # Documentation accuracy
 │       └── social-media-manager.md # Developer advocacy content
@@ -122,6 +124,7 @@ Skills are auto-discovered capabilities that Claude loads when your request matc
 | [pr-review](.claude/skills/pr-review/SKILL.md)                     | PR review framework (common structure) |
 | [pr-review-follow-up](.claude/skills/pr-review-follow-up/SKILL.md) | Follow-up review verification          |
 | [implement](.claude/skills/implement/SKILL.md)                     | Feature implementation (any context)   |
+| [implement-test](.claude/skills/implement-test/SKILL.md)           | Test implementation (any context)      |
 | [pr-fix](.claude/skills/pr-fix/SKILL.md)                           | Fix PR review issues                   |
 | [design-plan](.claude/skills/design-plan/SKILL.md)                 | Architecture planning                  |
 | [figma-analyze](.claude/skills/figma-analyze/SKILL.md)             | Figma design analysis                  |
@@ -137,6 +140,7 @@ Agents are specialized personas that Claude auto-delegates to based on task type
 | -------------------------------------------------------------- | ------ | ------------------------------------------------- | ---------------------------- |
 | [principal-architect](.claude/agents/principal-architect.md)   | opus   | pr-review, pr-review-follow-up, design-plan       | Architecture, scalability    |
 | [sde2](.claude/agents/sde2.md)                                 | opus   | pr-review, pr-review-follow-up, implement, pr-fix | Code quality, implementation |
+| [tester](.claude/agents/tester.md)                             | opus   | implement-test                                    | Test strategy, quality       |
 | [designer](.claude/agents/designer.md)                         | opus   | figma-analyze, shadcn-to-figma                    | Design-code parity           |
 | [technical-writer](.claude/agents/technical-writer.md)         | sonnet | update-docs                                       | Documentation accuracy       |
 | [social-media-manager](.claude/agents/social-media-manager.md) | sonnet | linkedin-post                                     | Developer advocacy           |
@@ -146,6 +150,7 @@ Agents are specialized personas that Claude auto-delegates to based on task type
 | Command            | Agent(s) Used                       | Purpose                                               |
 | ------------------ | ----------------------------------- | ----------------------------------------------------- |
 | `/implement`       | SDE2 (+ Principal Architect w/flag) | Implement Linear ticket (optional `--with-architect`) |
+| `/implement-test`  | Tester                              | Implement tests from plan or context                  |
 | `/pr-review`       | Principal Architect + SDE2          | Dual-perspective PR code review                       |
 | `/pr-fix`          | SDE2                                | Fix PR review issues (blocking first, then minor)     |
 | `/figma-analyze`   | Designer                            | Analyze Figma design for code parity                  |
