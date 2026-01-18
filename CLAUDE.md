@@ -12,7 +12,8 @@ ds/
 │   ├── core/           # Design tokens (private) → see packages/core/CLAUDE.md
 │   ├── tailwind/       # Tailwind CSS theme (nx: prefix) → see packages/tailwind/CLAUDE.md
 │   ├── react/          # React components → see packages/react/CLAUDE.md
-│   └── test-utils/     # Test utilities → see packages/test-utils/CLAUDE.md
+│   ├── test-utils/     # Test utilities → see packages/test-utils/CLAUDE.md
+│   └── context-engine/ # AI-accessible component metadata → see packages/context-engine/CLAUDE.md
 ├── apps/
 │   ├── docs/           # Documentation site (planned)
 │   └── playground/     # Theme playground for demos → dynamic theme switching
@@ -88,13 +89,14 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 
 ## Package Documentation
 
-| Package             | CLAUDE.md                                                      | Purpose                            |
-| ------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| `@nexus/core`       | [packages/core/CLAUDE.md](packages/core/CLAUDE.md)             | Design tokens (W3C DTCG format)    |
-| `@nexus/tailwind`   | [packages/tailwind/CLAUDE.md](packages/tailwind/CLAUDE.md)     | Tailwind CSS theme with nx: prefix |
-| `@nexus/react`      | [packages/react/CLAUDE.md](packages/react/CLAUDE.md)           | React component library            |
-| `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities           |
-| `@nexus/playground` | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md)         | Theme demo app                     |
+| Package                | CLAUDE.md                                                              | Purpose                            |
+| ---------------------- | ---------------------------------------------------------------------- | ---------------------------------- |
+| `@nexus/core`          | [packages/core/CLAUDE.md](packages/core/CLAUDE.md)                     | Design tokens (W3C DTCG format)    |
+| `@nexus/tailwind`      | [packages/tailwind/CLAUDE.md](packages/tailwind/CLAUDE.md)             | Tailwind CSS theme with nx: prefix |
+| `@nexus/react`         | [packages/react/CLAUDE.md](packages/react/CLAUDE.md)                   | React component library            |
+| `@nexus/test-utils`    | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md)         | Shared testing utilities           |
+| `@nexus/playground`    | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md)                 | Theme demo app                     |
+| `@context-engine/core` | [packages/context-engine/CLAUDE.md](packages/context-engine/CLAUDE.md) | AI-accessible component metadata   |
 
 ## Convention Rules
 
