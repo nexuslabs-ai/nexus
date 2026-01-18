@@ -30,11 +30,16 @@ export type {
   ComponentSlug,
   Framework,
   IdentifierType,
+  ManifestIdentity,
   ParsedIdentifier,
   Tier,
   Version,
   Visibility,
 } from './identity.js';
+
+// Output types - shared discriminant for success/failure
+export type { OutputType as OutputTypeValue } from './output.js';
+export { OutputType } from './output.js';
 
 // Embedding types - schemas (values)
 export {

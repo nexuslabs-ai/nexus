@@ -19,14 +19,31 @@ Optional properties: `$description`, `$extensions`
 
 ## File Naming
 
-| Directory  | Pattern                             | Example                                            |
-| ---------- | ----------------------------------- | -------------------------------------------------- |
-| primitives | `color.json`                        | Single file with all color scales                  |
-| primitives | `{category}/{category}-{mode}.json` | `size/size-vega.json`, `radius/radius-subtle.json` |
-| semantic   | `base-{palette}-{mode}.json`        | `base-slate-light.json`, `base-slate-dark.json`    |
-| semantic   | `brands-{name}-{mode}.json`         | `brands-blue-light.json`, `brands-blue-dark.json`  |
-| semantic   | `spacing.json`                      | Standalone semantic (no light/dark variant)        |
-| component  | `{component}.json`                  | `button.json` (future)                             |
+| Directory  | Pattern                             | Example                                                  |
+| ---------- | ----------------------------------- | -------------------------------------------------------- |
+| primitives | `color.json`                        | Single file with all color scales                        |
+| primitives | `{category}/{category}-{mode}.json` | `size/size-vega.json`, `radius/radius-subtle.json`       |
+| primitives | `shadow/shadow-{mode}-{theme}.json` | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json` |
+| primitives | `typography/typography-{mode}.json` | `typography/typography-vega.json`                        |
+| semantic   | `base-{palette}-{theme}.json`       | `base-slate-light.json`, `base-slate-dark.json`          |
+| semantic   | `brands-{name}-{theme}.json`        | `brands-blue-light.json`, `brands-blue-dark.json`        |
+| semantic   | `spacing.json`                      | Standalone semantic (no light/dark variant)              |
+| component  | `{component}.json`                  | `button.json` (future)                                   |
+
+### Shadow Tokens (Theme-Aware)
+
+Shadow tokens have light/dark variants because shadows appear differently on light vs dark backgrounds:
+
+```
+primitives/shadow/
+├── shadow-vega-light.json    # Vega shadows for light theme
+├── shadow-vega-dark.json     # Vega shadows for dark theme
+├── shadow-lyra-light.json
+├── shadow-lyra-dark.json
+└── ...
+```
+
+Available shadow modes: `vega`, `lyra`, `maia`, `mira`, `nova`
 
 ## Nested Token Structure
 

@@ -31,14 +31,15 @@ If no PR number provided, ask the user for it.
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│             Load SDE2 Agent             │
-│  • Read AGENT.md (persona, base rules)  │
-│  • Read pr-fix.md skill                 │
+│          Spawn SDE2 Agent               │
+│  • Use Task tool with subagent_type     │
+│  • Pass PR context in prompt            │
+│  • Agent executes pr-fix skill          │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│          Execute pr-fix skill           │
+│          SDE2 Executes pr-fix           │
 │  • Categorize issues (blocking/minor)   │
 │  • Load context (files, rules)          │
 │  • Fix issues one by one                │
@@ -70,15 +71,49 @@ If no PR number provided, ask the user for it.
    mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
    ```
 
-### Phase 2: Load Agent & Execute
+### Phase 2: Spawn SDE2 Agent
 
-1. **Load SDE2 agent:**
-   - Read `.claude/agents/sde2.md`
-   - Read `.claude/skills/pr-fix/SKILL.md`
+**IMPORTANT: You MUST use the Task tool to spawn the SDE2 agent. Do NOT execute the skill yourself.**
 
-2. **Execute pr-fix skill:**
-   - The skill handles categorization, context loading, and fixing
-   - Follow the workflow defined in the skill file
+```
+Task(
+  subagent_type: "sde2",
+  description: "Fix PR review issues",
+  prompt: """
+  Fix issues identified in PR #{pr_number} review.
+
+  ## PR Details
+  - Title: {pr_title}
+  - Branch: {branch_name}
+  - Linear Issue: {issue_id}
+
+  ## Review Issues to Fix
+
+  ### Blocking Issues (❌)
+  {list of blocking issues with file:line references}
+
+  ### Minor Issues (⚠️)
+  {list of minor issues with file:line references}
+
+  ## Changed Files
+  {list of files changed in PR}
+
+  ## Instructions
+  1. Read the pr-fix skill at `.claude/skills/pr-fix/SKILL.md`
+  2. Load appropriate rules based on changed files
+  3. Fix blocking issues first, then minor issues
+  4. Work through one fix at a time with summaries
+  5. Verify fixes with typecheck and lint
+  """
+)
+```
+
+The SDE2 agent will:
+
+- Load the pr-fix skill and follow its workflow
+- Categorize and prioritize issues
+- Fix issues incrementally with user approval
+- Verify fixes with typecheck/lint
 
 ### Phase 3: Report Completion
 

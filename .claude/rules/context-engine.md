@@ -47,16 +47,116 @@ Customer runs CLI → Server stores manifests → AI assistants connect via WebS
 
 All Context Engine code lives in `packages/context-engine/`
 
+## Core Modules
+
+The `@context-engine/core` package (`packages/context-engine/core/`) provides the extraction-generation pipeline:
+
+| Module        | Purpose                                          | Key Exports                                           |
+| ------------- | ------------------------------------------------ | ----------------------------------------------------- |
+| **extractor** | Hybrid extraction using react-docgen + ts-morph  | `HybridExtractor`, `extractComponent`, `getExtractor` |
+| **generator** | LLM-based metadata generation                    | `MetaGenerator`, `AnthropicProvider`, `buildPrompt`   |
+| **manifest**  | Combines extraction + generation into manifests  | `ManifestBuilder`                                     |
+| **processor** | Orchestrates full extraction-generation pipeline | `ComponentProcessor`, `createComponentProcessor`      |
+
+### Extractor Module
+
+Extracts component metadata (props, variants, dependencies) from source code:
+
+```typescript
+import {
+  extractComponent,
+  HybridExtractor,
+} from '@context-engine/core/extractor';
+
+// Convenience function (auto-selects extractor by framework)
+const result = await extractComponent({
+  filePath: './Button.tsx',
+  componentName: 'Button',
+  framework: 'react',
+});
+
+// Or use extractor directly
+const extractor = new HybridExtractor();
+const result = await extractor.extract(input);
+```
+
+**Extractors:**
+
+- `ReactDocgenExtractor` - Primary extraction via react-docgen-typescript
+- `TsMorphExtractor` - Fallback using ts-morph AST analysis
+- `VariantExtractor` - CVA variant extraction
+- `DependencyExtractor` - Import/dependency analysis
+- `HybridExtractor` - Combines all extractors with fallback logic
+
+### Generator Module
+
+Generates semantic metadata (descriptions, usage patterns) via LLM:
+
+```typescript
+import {
+  createMetaGenerator,
+  createAnthropicProvider,
+} from '@context-engine/core/generator';
+
+const provider = createAnthropicProvider({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+const generator = createMetaGenerator({ provider });
+
+const result = await generator.generate({
+  componentName: 'Button',
+  props: extractedProps,
+  variants: extractedVariants,
+});
+```
+
+### Manifest Module
+
+Builds complete component manifests combining extraction and generation:
+
+```typescript
+import { ManifestBuilder } from '@context-engine/core/manifest';
+
+const builder = new ManifestBuilder();
+const manifest = await builder.build({
+  extraction: extractionResult,
+  generation: generationResult,
+  identity: { orgId, libraryId, componentId },
+});
+```
+
+### Processor Module
+
+Orchestrates the full pipeline:
+
+```typescript
+import { createComponentProcessor } from '@context-engine/core/processor';
+
+const processor = createComponentProcessor({
+  extractor: new HybridExtractor(),
+  generator: createMetaGenerator({ provider }),
+});
+
+// Full pipeline: extract → generate → build manifest
+const result = await processor.process({
+  filePath: './Button.tsx',
+  componentName: 'Button',
+  framework: 'react',
+});
+```
+
 ## File Structure
 
-| Category      | Files                                        |
-| ------------- | -------------------------------------------- |
-| Types/Schemas | `types/*.ts`, `schemas/*.ts`                 |
-| Utilities     | `utils/*.ts`, `lib/*.ts`                     |
-| Database      | `db/**/*.ts`, `migrations/**`                |
-| API/Routes    | `api/**/*.ts`, `routes/**/*.ts`              |
-| Config        | `*.config.*`, `*.json`, `docker-compose.yml` |
-| Tests         | `*.test.ts`, `*.spec.ts`                     |
+| Directory             | Purpose                        | Key Files                                          |
+| --------------------- | ------------------------------ | -------------------------------------------------- |
+| `core/src/extractor/` | Component extraction           | `hybrid-extractor.ts`, `react-docgen-extractor.ts` |
+| `core/src/generator/` | LLM metadata generation        | `meta-generator.ts`, `anthropic-provider.ts`       |
+| `core/src/manifest/`  | Manifest building              | `manifest-builder.ts`                              |
+| `core/src/processor/` | Pipeline orchestration         | `component-processor.ts`                           |
+| `core/src/types/`     | Shared type definitions        | `output.ts`, `identity.ts`                         |
+| `core/src/utils/`     | Utility functions              | `temp-manager.ts`                                  |
+| `core/src/constants/` | Constants and base configs     | `base-libraries.ts`                                |
+| `db/`                 | Database schema and migrations | `schema.ts`, `migrations/**`                       |
 
 ## Code Conventions
 

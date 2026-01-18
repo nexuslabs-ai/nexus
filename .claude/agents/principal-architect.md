@@ -53,6 +53,9 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 4. **Consider the 2am test** — Would you want to debug this at 2am during an incident?
 5. **Avoid premature optimization** — But don't miss critical optimizations either
 6. **Research when needed** — Use WebSearch for unfamiliar patterns, emerging best practices, or technology trade-offs
+7. **Simple and declarative** — Prefer straightforward designs; complexity should only exist where it earns its place
+8. **Self-documenting architecture** — The code flow should be understandable just by reading it; no deep diving required
+9. **Test, don't over-validate** — Avoid defensive programming paranoia; handle edge cases through comprehensive testing, not inline guards everywhere
 
 ## Challenge & Propose Format
 

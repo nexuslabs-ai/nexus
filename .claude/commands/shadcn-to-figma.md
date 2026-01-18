@@ -1,6 +1,6 @@
 # shadcn to Figma
 
-Generate a Figma architecture blueprint from shadcn component code and usage patterns.
+Generate a Figma architecture blueprint from shadcn component code and usage patterns using the Designer agent.
 
 ## Agent Used
 
@@ -10,7 +10,7 @@ Generate a Figma architecture blueprint from shadcn component code and usage pat
 
 ## Required Input
 
-- **Component name**: $ARGUMENTS (e.g., `Button`, `Accordion`, `DropdownMenu`)
+- **$ARGUMENTS**: Component name (e.g., `Button`, `Accordion`, `DropdownMenu`)
 
 Accepts:
 
@@ -20,19 +20,129 @@ Accepts:
 
 If no component provided, ask the user which component to analyze.
 
+## Flow
+
+```
+┌─────────────────────────────────────────┐
+│      /shadcn-to-figma {component}       │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│           Validate Input                │
+│  • Normalize component name             │
+│  • Check if valid shadcn component      │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│        Spawn Designer Agent             │
+│  • Use Task tool with subagent_type     │
+│  • Pass component name in prompt        │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│ Designer Executes shadcn-to-figma skill │
+│  • Fetch shadcn registry                │
+│  • Read Nexus implementation (if any)   │
+│  • Analyze props, variants, composition │
+│  • Generate Figma blueprint             │
+└─────────────────────────────────────────┘
+```
+
 ## Execution
 
-> **Mode:** CONTINUOUS — Execute all phases without pausing.
+### Phase 1: Validate Input
 
-1. **Load Designer agent:**
-   - Read `.claude/agents/designer.md`
-   - Read `.claude/skills/shadcn-to-figma/SKILL.md`
+1. **Parse arguments:**
 
-2. **Execute shadcn-to-figma skill:**
-   - Follow the workflow defined in the skill file
-   - Apply Designer persona and principles throughout
+   ```
+   If component name provided → Normalize to PascalCase
+   If shadcn URL provided → Extract component name
+   If no input → Ask user which component
+   ```
 
-3. **Output Figma blueprint** as defined in the skill
+2. **Normalize component name:**
+   - `button` → `Button`
+   - `dropdown-menu` → `DropdownMenu`
+
+### Phase 2: Spawn Designer Agent
+
+**IMPORTANT: You MUST use the Task tool to spawn the Designer agent. Do NOT execute the skill yourself.**
+
+```
+Task(
+  subagent_type: "designer",
+  description: "Generate Figma blueprint for component",
+  prompt: """
+  Generate a Figma architecture blueprint for the {component_name} component.
+
+  ## Component
+  {component_name}
+
+  ## Instructions
+  1. Read the shadcn-to-figma skill at `.claude/skills/shadcn-to-figma/SKILL.md`
+  2. Read the figma rules at `.claude/rules/figma.md`
+  3. Fetch shadcn source:
+     - Registry: https://ui.shadcn.com/registry/styles/default/{component}.json
+     - Docs: https://ui.shadcn.com/docs/components/{component}
+  4. Check if Nexus has existing implementation:
+     - `packages/react/src/components/ui/{component}.tsx`
+  5. Analyze:
+     - Props and their types
+     - Variants from CVA
+     - Composition patterns (compound components)
+     - Radix primitives used
+  6. Generate Figma blueprint following skill format
+  """
+)
+```
+
+### Phase 3: Output Blueprint
+
+The Designer agent will output:
+
+```markdown
+## Figma Blueprint: {ComponentName}
+
+### Component Structure
+
+{How to organize in Figma}
+
+### Properties
+
+| Property   | Type    | Values       | Figma Implementation |
+| ---------- | ------- | ------------ | -------------------- |
+| `variant`  | Enum    | primary, ... | Variant property     |
+| `size`     | Enum    | sm, md, lg   | Variant property     |
+| `disabled` | Boolean | true/false   | Boolean property     |
+
+### Variants Matrix
+
+{What variants to create}
+
+### Layer Naming
+
+| Layer Purpose | Figma Name | Code Mapping |
+| ------------- | ---------- | ------------ |
+| ...           | ...        | ...          |
+
+### Token Bindings
+
+| Element    | Property | Token              |
+| ---------- | -------- | ------------------ |
+| Background | Fill     | primary/background |
+| Text       | Fill     | primary/foreground |
+
+### Compound Components (if applicable)
+
+{For components like Accordion, Dialog, etc.}
+
+### Notes
+
+{Implementation considerations}
+```
 
 ## Example Usage
 

@@ -54,6 +54,9 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 4. **Single responsibility** — Each function/module does one thing well
 5. **Consider the new hire** — Would they understand this in 6 months?
 6. **Search before guessing** — When unsure about API usage, syntax, or version-specific behavior, use WebSearch to verify. Check `package.json` for versions.
+7. **Simple and declarative** — Code should be straightforward; prefer declarative patterns over imperative complexity
+8. **Self-documenting flow** — Reading through the code should be enough to understand it; no mental gymnastics required
+9. **Test, don't validate** — Avoid aggressive inline validations; handle edge cases through thoughtful and thorough testing instead
 
 ## No Patches Policy
 
@@ -93,6 +96,16 @@ When you identify something worth improving:
 **💡 Consider:** {Specific refactor or pattern with example}
 ```
 
+## Coding Style Conventions
+
+| Convention              | Pattern                                     | Why                                    |
+| ----------------------- | ------------------------------------------- | -------------------------------------- |
+| Early returns           | `if (!x) return;` over nested if blocks     | Reduces nesting, improves readability  |
+| Guard clauses first     | Validation at function start                | Clear preconditions, happy path at end |
+| Extract focused methods | Split large functions by concern            | Single responsibility, testable units  |
+| Loop continue           | `if (!valid) continue;` over wrapping in if | Flat loop body, clear skip conditions  |
+| `as const` over enums   | `const Status = { ... } as const`           | Better tree-shaking, type inference    |
+
 ## Anti-Patterns to Flag
 
 - `any` type usage without justification
@@ -105,6 +118,8 @@ When you identify something worth improving:
 - Console.log or debugging code left in
 - Commented-out code without explanation
 - Unused imports or variables
+- Deep nesting (prefer early returns)
+- TypeScript enums (prefer `as const` objects)
 
 ## When Reviewing PRs
 

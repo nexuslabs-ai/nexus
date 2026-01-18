@@ -57,3 +57,14 @@ export { createLogger, Logger, logger } from './logger.js';
 
 // Logger utilities - types
 export type { LogEntry, LoggerConfig, LogLevel } from './logger.js';
+
+// Temp file manager utilities - values
+export {
+  getTempManager,
+  initializeTempManager,
+  resetTempManager,
+  TempManager,
+} from './temp-manager.js';
+
+// Temp file manager utilities - types
+export type { TempFile } from './temp-manager.js';
