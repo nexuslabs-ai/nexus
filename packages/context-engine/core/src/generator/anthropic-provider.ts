@@ -110,12 +110,14 @@ export class AnthropicProvider implements ILLMProvider {
       model: this.config.model,
       maxTokens,
       promptLength: prompt.length,
+      hasSystemPrompt: !!options.systemPrompt,
     });
 
     try {
       const response = await this.client.messages.create({
         model: this.config.model,
         max_tokens: maxTokens,
+        ...(options.systemPrompt && { system: options.systemPrompt }),
         messages: [
           {
             role: 'user',

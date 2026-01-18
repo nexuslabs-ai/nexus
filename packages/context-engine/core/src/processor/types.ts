@@ -155,6 +155,12 @@ export interface GenerateOnlyInput {
 
   /** Optional hints for generation */
   hints?: string;
+
+  /**
+   * Extraction metadata from prior extractOnly call.
+   * Used to preserve fallback info in the final output.
+   */
+  extraction?: ExtractionMetadata;
 }
 
 // =============================================================================

@@ -202,9 +202,9 @@ export async function initializeTempManager(): Promise<TempManager> {
 /**
  * Reset the singleton instance (for testing)
  */
-export function resetTempManager(): void {
+export async function resetTempManager(): Promise<void> {
   if (tempManagerInstance) {
-    tempManagerInstance.shutdown();
+    await tempManagerInstance.shutdown();
     tempManagerInstance = null;
   }
 }

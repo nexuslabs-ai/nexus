@@ -46,6 +46,13 @@ export interface LLMCompletionOptions {
 
   /** Stop sequences to end generation */
   stopSequences?: string[];
+
+  /**
+   * System prompt for the LLM.
+   * Providers that support native system prompts (like Anthropic) will use
+   * their native parameter. Others may prepend to the user message.
+   */
+  systemPrompt?: string;
 }
 
 /**

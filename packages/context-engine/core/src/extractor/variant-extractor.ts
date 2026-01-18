@@ -13,7 +13,6 @@ import {
   type Node,
   type ObjectLiteralExpression,
   Project,
-  type PropertyAssignment,
   type SourceFile,
   SyntaxKind,
   ts,
@@ -194,37 +193,13 @@ export class VariantExtractor {
   private extractVariantsProperty(
     configObj: ObjectLiteralExpression
   ): Record<string, string[]> {
-    const variantsProp = configObj.getProperty('variants');
-    if (!variantsProp) {
-      return {};
-    }
+    const variantsObj = configObj
+      .getProperty('variants')
+      ?.asKind(SyntaxKind.PropertyAssignment)
+      ?.getInitializer()
+      ?.asKind(SyntaxKind.ObjectLiteralExpression);
 
-    // Guard: Not a property assignment
-    if (variantsProp.getKind() !== SyntaxKind.PropertyAssignment) {
-      return {};
-    }
-
-    const propAssignment = variantsProp.asKind(SyntaxKind.PropertyAssignment);
-    if (!propAssignment) {
-      return {};
-    }
-
-    const initializer = propAssignment.getInitializer();
-    if (!initializer) {
-      return {};
-    }
-
-    // Guard: Not an object literal
-    if (initializer.getKind() !== SyntaxKind.ObjectLiteralExpression) {
-      return {};
-    }
-
-    const variantsObj = initializer.asKind(SyntaxKind.ObjectLiteralExpression);
-    if (!variantsObj) {
-      return {};
-    }
-
-    return this.extractVariantProperties(variantsObj);
+    return variantsObj ? this.extractVariantProperties(variantsObj) : {};
   }
 
   /**
@@ -233,28 +208,18 @@ export class VariantExtractor {
   private extractVariantProperties(
     variantsObj: ObjectLiteralExpression
   ): Record<string, string[]> {
-    const variants: Record<string, string[]> = {};
+    const entries = variantsObj
+      .getProperties()
+      .map((prop) => {
+        const assignment = prop.asKind(SyntaxKind.PropertyAssignment);
+        if (!assignment) return null;
+        const name = assignment.getName();
+        const values = this.extractObjectKeys(assignment.getInitializer());
+        return values.length > 0 ? ([name, values] as const) : null;
+      })
+      .filter((entry): entry is [string, string[]] => entry !== null);
 
-    for (const prop of variantsObj.getProperties()) {
-      // Skip non-property assignments
-      if (prop.getKind() !== SyntaxKind.PropertyAssignment) {
-        continue;
-      }
-
-      const propAssignment = prop.asKind(SyntaxKind.PropertyAssignment);
-      if (!propAssignment) {
-        continue;
-      }
-
-      const variantName = propAssignment.getName();
-      const values = this.extractObjectKeys(propAssignment.getInitializer());
-
-      if (variantName && values.length > 0) {
-        variants[variantName] = values;
-      }
-    }
-
-    return variants;
+    return Object.fromEntries(entries);
   }
 
   /**
@@ -263,37 +228,13 @@ export class VariantExtractor {
   private extractDefaultVariantsProperty(
     configObj: ObjectLiteralExpression
   ): Record<string, string> {
-    const defaultsProp = configObj.getProperty('defaultVariants');
-    if (!defaultsProp) {
-      return {};
-    }
+    const defaultsObj = configObj
+      .getProperty('defaultVariants')
+      ?.asKind(SyntaxKind.PropertyAssignment)
+      ?.getInitializer()
+      ?.asKind(SyntaxKind.ObjectLiteralExpression);
 
-    // Guard: Not a property assignment
-    if (defaultsProp.getKind() !== SyntaxKind.PropertyAssignment) {
-      return {};
-    }
-
-    const propAssignment = defaultsProp.asKind(SyntaxKind.PropertyAssignment);
-    if (!propAssignment) {
-      return {};
-    }
-
-    const initializer = propAssignment.getInitializer();
-    if (!initializer) {
-      return {};
-    }
-
-    // Guard: Not an object literal
-    if (initializer.getKind() !== SyntaxKind.ObjectLiteralExpression) {
-      return {};
-    }
-
-    const defaultsObj = initializer.asKind(SyntaxKind.ObjectLiteralExpression);
-    if (!defaultsObj) {
-      return {};
-    }
-
-    return this.extractDefaultValues(defaultsObj);
+    return defaultsObj ? this.extractDefaultValues(defaultsObj) : {};
   }
 
   /**
@@ -302,73 +243,33 @@ export class VariantExtractor {
   private extractDefaultValues(
     defaultsObj: ObjectLiteralExpression
   ): Record<string, string> {
-    const defaults: Record<string, string> = {};
+    const entries = defaultsObj
+      .getProperties()
+      .map((prop) => {
+        const assignment = prop.asKind(SyntaxKind.PropertyAssignment);
+        const name = assignment?.getName();
+        const value = assignment
+          ?.getInitializer()
+          ?.getText()
+          .replace(/['"]/g, '');
+        return name && value ? ([name, value] as const) : null;
+      })
+      .filter((entry): entry is [string, string] => entry !== null);
 
-    for (const prop of defaultsObj.getProperties()) {
-      // Skip non-property assignments
-      if (prop.getKind() !== SyntaxKind.PropertyAssignment) {
-        continue;
-      }
-
-      const propAssignment = prop.asKind(SyntaxKind.PropertyAssignment) as
-        | PropertyAssignment
-        | undefined;
-      if (!propAssignment) {
-        continue;
-      }
-
-      const name = propAssignment.getName();
-      const initializer = propAssignment.getInitializer();
-
-      if (!name || !initializer) {
-        continue;
-      }
-
-      // Extract string value (handles both 'value' and "value")
-      const value = initializer.getText().replace(/['"]/g, '');
-      if (value) {
-        defaults[name] = value;
-      }
-    }
-
-    return defaults;
+    return Object.fromEntries(entries);
   }
 
   /**
    * Extract keys from an object literal (variant values)
    */
   private extractObjectKeys(node: Node | undefined): string[] {
-    if (!node) {
-      return [];
-    }
+    const objLiteral = node?.asKind(SyntaxKind.ObjectLiteralExpression);
+    if (!objLiteral) return [];
 
-    if (node.getKind() !== SyntaxKind.ObjectLiteralExpression) {
-      return [];
-    }
-
-    const objLiteral = node.asKind(SyntaxKind.ObjectLiteralExpression);
-    if (!objLiteral) {
-      return [];
-    }
-
-    const keys: string[] = [];
-
-    for (const prop of objLiteral.getProperties()) {
-      if (prop.getKind() !== SyntaxKind.PropertyAssignment) {
-        continue;
-      }
-
-      const propAssignment = prop.asKind(SyntaxKind.PropertyAssignment) as
-        | PropertyAssignment
-        | undefined;
-      const name = propAssignment?.getName();
-
-      if (name) {
-        keys.push(name);
-      }
-    }
-
-    return keys;
+    return objLiteral
+      .getProperties()
+      .map((prop) => prop.asKind(SyntaxKind.PropertyAssignment)?.getName())
+      .filter((name): name is string => !!name);
   }
 
   /**

@@ -75,7 +75,7 @@ export class HybridExtractor implements IExtractor {
    * 7. Build and return ExtractedData
    */
   async extract(input: ExtractionInput): Promise<ExtractionOutput> {
-    const startTime = Date.now();
+    const startTime = performance.now();
 
     // Step 1: Compute source hash for change detection
     const sourceHash = generateSourceHash(input.sourceCode);
@@ -159,7 +159,7 @@ export class HybridExtractor implements IExtractor {
       const id = input.existingId ?? generateComponentId();
       const slug = generateSlug(input.name, input.framework, id);
 
-      const extractionTimeMs = Date.now() - startTime;
+      const extractionTimeMs = Math.round(performance.now() - startTime);
 
       logger.debug('Extraction completed', {
         name: input.name,
@@ -195,7 +195,7 @@ export class HybridExtractor implements IExtractor {
         type: ExtractionOutputType.Failure,
         error: error instanceof Error ? error.message : 'Extraction failed',
         sourceHash,
-        extractionTimeMs: Date.now() - startTime,
+        extractionTimeMs: Math.round(performance.now() - startTime),
       };
     }
   }

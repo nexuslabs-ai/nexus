@@ -54,16 +54,7 @@ export class ManifestBuilder {
   build(input: ManifestBuilderInput): ManifestBuilderOutput {
     const { identity, extracted, meta, sourceHash, version = '0.0.1' } = input;
 
-    // Validate required fields
-    const validationError = this.validateInput(input);
-    if (validationError) {
-      return {
-        type: ManifestBuildOutputType.Failure,
-        error: validationError.message,
-        field: validationError.field,
-      };
-    }
-
+    // TypeScript types enforce required fields - no runtime validation needed
     const now = new Date().toISOString();
     const metaHash = generateObjectHash(meta);
 
@@ -133,15 +124,13 @@ export class ManifestBuilder {
     updates: ManifestUpdateInput
   ): ComponentManifest {
     const now = new Date().toISOString();
-    let updated: ComponentManifest = {
+
+    return {
       ...existing,
       updatedAt: now,
-    };
 
-    // Apply extraction updates
-    if (updates.extracted) {
-      updated = {
-        ...updated,
+      // Extraction updates
+      ...(updates.extracted && {
         props: updates.extracted.props,
         variants: updates.extracted.variants,
         defaultVariants: updates.extracted.defaultVariants,
@@ -151,104 +140,26 @@ export class ManifestBuilder {
           internal: updates.extracted.internalDependencies,
         },
         baseLibrary: updates.extracted.baseLibrary,
-      };
-    }
+      }),
 
-    // Apply meta updates
-    if (updates.meta) {
-      updated = {
-        ...updated,
+      // Meta updates
+      ...(updates.meta && {
         description: updates.meta.description,
         tier: updates.meta.tier,
         ai: updates.meta.ai,
         metaHash: generateObjectHash(updates.meta),
-      };
-    }
+      }),
 
-    // Apply source hash update (triggers re-embedding)
-    if (updates.sourceHash) {
-      updated = {
-        ...updated,
+      // Source hash update (triggers re-embedding)
+      ...(updates.sourceHash && {
         sourceHash: updates.sourceHash,
-        // Mark for re-embedding when source changes
-        embeddingStatus: 'pending',
+        embeddingStatus: 'pending' as const,
         embeddingError: undefined,
-      };
-    }
+      }),
 
-    // Apply version update
-    if (updates.version) {
-      updated = {
-        ...updated,
-        version: updates.version,
-      };
-    }
-
-    return updated;
-  }
-
-  /**
-   * Validate builder input
-   *
-   * @param input - Input to validate
-   * @returns Validation error or undefined if valid
-   */
-  private validateInput(
-    input: ManifestBuilderInput
-  ): { message: string; field: string } | undefined {
-    // Validate orgId
-    if (!input.orgId || typeof input.orgId !== 'string') {
-      return { message: 'Organization ID is required', field: 'orgId' };
-    }
-
-    // Validate identity
-    if (!input.identity) {
-      return { message: 'Component identity is required', field: 'identity' };
-    }
-
-    if (!input.identity.id) {
-      return { message: 'Component ID is required', field: 'identity.id' };
-    }
-
-    if (!input.identity.slug) {
-      return { message: 'Component slug is required', field: 'identity.slug' };
-    }
-
-    if (!input.identity.name) {
-      return { message: 'Component name is required', field: 'identity.name' };
-    }
-
-    if (!input.identity.framework) {
-      return { message: 'Framework is required', field: 'identity.framework' };
-    }
-
-    // Validate extracted data
-    if (!input.extracted) {
-      return { message: 'Extracted data is required', field: 'extracted' };
-    }
-
-    // Validate meta
-    if (!input.meta) {
-      return { message: 'Generated meta is required', field: 'meta' };
-    }
-
-    if (!input.meta.description) {
-      return {
-        message: 'Meta description is required',
-        field: 'meta.description',
-      };
-    }
-
-    if (!input.meta.ai) {
-      return { message: 'AI context is required', field: 'meta.ai' };
-    }
-
-    // Validate source hash
-    if (!input.sourceHash) {
-      return { message: 'Source hash is required', field: 'sourceHash' };
-    }
-
-    return undefined;
+      // Version update
+      ...(updates.version && { version: updates.version }),
+    };
   }
 
   /**

@@ -202,7 +202,8 @@ export class DependencyExtractor {
       return false;
     }
 
-    return false;
+    // After filtering out known utilities, assume it's a component
+    return true;
   }
 
   /**

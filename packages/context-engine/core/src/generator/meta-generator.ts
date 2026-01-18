@@ -89,7 +89,7 @@ function parseLLMResponse(text: string): ParsedLLMMetaResponse {
   try {
     const parsed = JSON.parse(jsonStr) as unknown;
 
-    // Basic type validation
+    // Basic object validation only - normalize functions handle bad values with defaults
     if (typeof parsed !== 'object' || parsed === null) {
       throw new Error('Response is not a valid object');
     }
@@ -164,24 +164,17 @@ function buildDefaultSemanticDescription(
   name: string,
   extracted: ExtractedData
 ): string {
-  const parts: string[] = [`A ${name} component for React applications.`];
-
-  if (extracted.acceptsChildren) {
-    parts.push('Accepts children for content composition.');
-  }
-
-  if (extracted.baseLibrary) {
-    parts.push(
-      `Built on ${extracted.baseLibrary.name} primitives for accessibility.`
-    );
-  }
-
   const variantNames = Object.keys(extracted.variants);
-  if (variantNames.length > 0) {
-    parts.push(`Supports ${variantNames.join(', ')} variants.`);
-  }
 
-  return parts.join(' ');
+  return [
+    `A ${name} component for React applications.`,
+    extracted.acceptsChildren && 'Accepts children for content composition.',
+    extracted.baseLibrary &&
+      `Built on ${extracted.baseLibrary.name} primitives for accessibility.`,
+    variantNames.length > 0 && `Supports ${variantNames.join(', ')} variants.`,
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 /**
@@ -347,11 +340,11 @@ export class MetaGenerator implements IMetaGenerator {
         hints,
       });
 
-      // Call LLM provider
-      const response = await this.provider.generateCompletion(
-        this.buildFullPrompt(system, user),
-        { maxTokens: this.maxTokens }
-      );
+      // Call LLM provider with separate system prompt
+      const response = await this.provider.generateCompletion(user, {
+        maxTokens: this.maxTokens,
+        systemPrompt: system,
+      });
 
       // Parse and validate response
       const parsed = parseLLMResponse(response.text);
@@ -401,17 +394,6 @@ export class MetaGenerator implements IMetaGenerator {
 
       return failure;
     }
-  }
-
-  /**
-   * Build the full prompt by combining system and user prompts
-   *
-   * Note: For the Anthropic API, we prepend the system prompt to the user message.
-   * The Anthropic SDK's messages.create() uses a separate 'system' parameter,
-   * but for simplicity and provider-agnostic design, we combine them here.
-   */
-  private buildFullPrompt(system: string, user: string): string {
-    return `${system}\n\n${user}`;
   }
 
   /**

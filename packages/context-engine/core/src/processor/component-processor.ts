@@ -21,6 +21,7 @@ import {
   isExtractionSuccess,
 } from '../extractor/index.js';
 import {
+  type GeneratorFailure,
   type GeneratorInput,
   type GeneratorOutput,
   isGeneratorFailure,
@@ -31,6 +32,7 @@ import {
 import {
   isManifestBuildFailure,
   ManifestBuilder,
+  type ManifestBuilderFailure,
   type ManifestBuilderInput,
   type ManifestBuilderOutput,
 } from '../manifest/index.js';
@@ -404,8 +406,7 @@ export class ComponentProcessor {
         generationTimeMs: genResult.generationTimeMs,
         totalTimeMs,
       },
-      extraction: {
-        // These were computed in extractOnly, not available here
+      extraction: input.extraction ?? {
         fallbackTriggered: false,
         fallbackReason: undefined,
         extractionMethod: 'unknown',
@@ -642,7 +643,7 @@ export class ComponentProcessor {
       };
     }
 
-    // ExtractionFailure
+    // ExtractionFailure - use type guard to narrow
     if (isExtractionFailure(output)) {
       logger.error('Extraction failed', new Error(output.error));
 
@@ -655,13 +656,13 @@ export class ComponentProcessor {
       };
     }
 
-    // Should not reach here
+    // ExtractorResult (success) - should not reach here since caller checks for success
     return {
       type: ProcessorOutputType.Failure,
-      error: 'Unknown extraction error',
+      error: 'Unexpected extraction state',
       code: ProcessorErrorCode.ExtractionFailed,
       metrics: { extractionTimeMs, totalTimeMs },
-      retryable: true,
+      retryable: false,
     };
   }
 
@@ -669,46 +670,30 @@ export class ComponentProcessor {
    * Handle generation failure
    */
   private handleGenerationFailure(
-    genResult: GeneratorOutput,
+    genResult: GeneratorFailure,
     extraction: ExtractorResult,
     extractionTimeMs: number,
     startTime: number
   ): ProcessorFailure {
     const totalTimeMs = Math.round(performance.now() - startTime);
 
-    if (isGeneratorFailure(genResult)) {
-      logger.error('Generation failed', new Error(genResult.error));
+    logger.error('Generation failed', new Error(genResult.error));
 
-      return {
-        type: ProcessorOutputType.Failure,
-        error: genResult.error,
-        code: ProcessorErrorCode.GenerationFailed,
-        metrics: {
-          extractionTimeMs,
-          generationTimeMs: genResult.generationTimeMs,
-          totalTimeMs,
-        },
-        extraction: {
-          fallbackTriggered: extraction.fallbackTriggered,
-          fallbackReason: extraction.fallbackReason,
-          extractionMethod: extraction.extractionMethod,
-        },
-        retryable: genResult.retryable,
-      };
-    }
-
-    // Should not reach here
     return {
       type: ProcessorOutputType.Failure,
-      error: 'Unknown generation error',
+      error: genResult.error,
       code: ProcessorErrorCode.GenerationFailed,
-      metrics: { extractionTimeMs, totalTimeMs },
+      metrics: {
+        extractionTimeMs,
+        generationTimeMs: genResult.generationTimeMs,
+        totalTimeMs,
+      },
       extraction: {
         fallbackTriggered: extraction.fallbackTriggered,
         fallbackReason: extraction.fallbackReason,
         extractionMethod: extraction.extractionMethod,
       },
-      retryable: true,
+      retryable: genResult.retryable,
     };
   }
 
@@ -716,7 +701,7 @@ export class ComponentProcessor {
    * Handle manifest build failure
    */
   private handleBuildFailure(
-    buildResult: ManifestBuilderOutput,
+    buildResult: ManifestBuilderFailure,
     extraction: ExtractorResult,
     extractionTimeMs: number,
     generationResult: GeneratorOutput | null,
@@ -728,35 +713,19 @@ export class ComponentProcessor {
         ? generationResult.generationTimeMs
         : undefined;
 
-    if (isManifestBuildFailure(buildResult)) {
-      logger.error('Manifest build failed', new Error(buildResult.error), {
-        field: buildResult.field,
-      });
+    logger.error('Manifest build failed', new Error(buildResult.error), {
+      field: buildResult.field,
+    });
 
-      return {
-        type: ProcessorOutputType.Failure,
-        error: buildResult.error,
-        code: ProcessorErrorCode.ManifestBuildFailed,
-        metrics: {
-          extractionTimeMs,
-          generationTimeMs: genTimeMs,
-          totalTimeMs,
-        },
-        extraction: {
-          fallbackTriggered: extraction.fallbackTriggered,
-          fallbackReason: extraction.fallbackReason,
-          extractionMethod: extraction.extractionMethod,
-        },
-        retryable: false,
-      };
-    }
-
-    // Should not reach here
     return {
       type: ProcessorOutputType.Failure,
-      error: 'Unknown build error',
+      error: buildResult.error,
       code: ProcessorErrorCode.ManifestBuildFailed,
-      metrics: { extractionTimeMs, totalTimeMs },
+      metrics: {
+        extractionTimeMs,
+        generationTimeMs: genTimeMs,
+        totalTimeMs,
+      },
       extraction: {
         fallbackTriggered: extraction.fallbackTriggered,
         fallbackReason: extraction.fallbackReason,
