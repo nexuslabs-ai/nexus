@@ -51,14 +51,14 @@ Parse `$ARGUMENTS` for:
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│              Load SDE2 Agent            │
-│  • Read sde2.md (persona, base rules)   │
-│  • Read implement SKILL.md              │
+│          Spawn SDE2 Agent               │
+│  • Use Task tool with subagent_type     │
+│  • Pass context in prompt               │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│         Execute implement skill         │
+│      SDE2 Executes implement skill      │
 │  • Gather requirements                  │
 │  • Explore existing code                │
 │  • Create plan (TodoWrite)              │
@@ -82,14 +82,14 @@ Parse `$ARGUMENTS` for:
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│       Load Principal Architect Agent    │
-│  • Read principal-architect.md          │
-│  • Read design-plan SKILL.md            │
+│    Spawn Principal Architect Agent      │
+│  • Use Task tool with subagent_type     │
+│  • Pass context in prompt               │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│        Execute design-plan skill        │
+│    Architect Executes design-plan skill │
 │  • Understand requirements              │
 │  • Research technology context          │
 │  • Explore existing architecture        │
@@ -105,14 +105,14 @@ Parse `$ARGUMENTS` for:
                   │ User approves
                   ▼
 ┌─────────────────────────────────────────┐
-│              Load SDE2 Agent            │
-│  • Receives architect's plan            │
-│  • Read implement SKILL.md              │
+│          Spawn SDE2 Agent               │
+│  • Use Task tool with subagent_type     │
+│  • Pass approved plan in prompt         │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│    Execute implement skill with plan    │
+│    SDE2 Executes implement with plan    │
 │  • Follow architect's phases            │
 │  • Implement according to plan          │
 │  • Verify & test                        │
@@ -121,7 +121,7 @@ Parse `$ARGUMENTS` for:
 
 ## Execution
 
-### Phase 1: Detect Context & Load Agent
+### Phase 1: Detect Context
 
 1. **Parse arguments for context:**
 
@@ -131,25 +131,78 @@ Parse `$ARGUMENTS` for:
    Otherwise → Use conversation history as context
    ```
 
-2. **If `--with-architect` flag present:**
-   - Read `.claude/agents/principal-architect.md`
-   - Read `.claude/skills/design-plan/SKILL.md`
-   - Execute design-plan skill
-   - Present plan to user
-   - WAIT for approval
-   - Then proceed to step 3
+2. **Collect context to pass to agents:**
+   - Task requirements (from Linear/spec/conversation)
+   - Relevant rules based on expected file changes
+   - Any constraints or preferences mentioned
 
-3. **Load SDE2 agent:**
-   - Read `.claude/agents/sde2.md`
-   - Read `.claude/skills/implement/SKILL.md`
+### Phase 2: Spawn Agents
 
-### Phase 2: Execute Implementation
+**If `--with-architect` flag present:**
 
-Execute the SDE2 `implement` skill:
+**IMPORTANT: You MUST use the Task tool to spawn agents. Do NOT execute the skills yourself.**
 
-- The skill handles all phases (gather → explore → plan → implement → verify)
-- Follow the workflow in the skill file
-- If architect plan was created, SDE2 follows that plan
+First, spawn the Principal Architect:
+
+```
+Task(
+  subagent_type: "principal-architect",
+  description: "Design plan for implementation",
+  prompt: """
+  Create an implementation plan for this task.
+
+  ## Task Context
+  - Source: {Linear NEX-### | spec file | conversation}
+  - Requirements: {task requirements}
+
+  ## Instructions
+  1. Read the design-plan skill at `.claude/skills/design-plan/SKILL.md`
+  2. Understand requirements thoroughly
+  3. Research technology context
+  4. Explore existing architecture
+  5. Design solution with phases
+  6. Return the implementation plan
+  """
+)
+```
+
+After architect returns plan:
+
+- Present plan to user
+- WAIT for user approval
+- Then proceed to spawn SDE2
+
+**Spawn SDE2 Agent:**
+
+```
+Task(
+  subagent_type: "sde2",
+  description: "Implement task",
+  prompt: """
+  Implement this task.
+
+  ## Task Context
+  - Source: {Linear NEX-### | spec file | conversation}
+  - Requirements: {task requirements}
+  {If architect plan exists:}
+  - Architect Plan: {the approved plan}
+
+  ## Instructions
+  1. Read the implement skill at `.claude/skills/implement/SKILL.md`
+  2. Follow the workflow (gather → explore → plan → implement → verify)
+  3. If architect plan exists, follow its phases
+  4. Implement phase by phase with summaries
+  5. Verify with typecheck and lint
+  """
+)
+```
+
+The SDE2 agent will:
+
+- Follow the implement skill workflow
+- Create TodoWrite for tracking
+- Implement phase by phase
+- Verify with tests
 
 ### Phase 3: Report Completion
 

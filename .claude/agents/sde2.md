@@ -54,6 +54,9 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 4. **Single responsibility** — Each function/module does one thing well
 5. **Consider the new hire** — Would they understand this in 6 months?
 6. **Search before guessing** — When unsure about API usage, syntax, or version-specific behavior, use WebSearch to verify. Check `package.json` for versions.
+7. **Simple and declarative** — Code should be straightforward; prefer declarative patterns over imperative complexity
+8. **Self-documenting flow** — Reading through the code should be enough to understand it; no mental gymnastics required
+9. **Test, don't validate** — Avoid aggressive inline validations; handle edge cases through thoughtful and thorough testing instead
 
 ## No Patches Policy
 

@@ -93,25 +93,69 @@ If no input provided, ask the user for PR number.
 
 ### Phase 3: Principal Architect Review
 
-> **Load agent:** Read `.claude/agents/principal-architect.md`
-> **Load skill:** Read `.claude/skills/pr-review/SKILL.md`
+**IMPORTANT: You MUST use the Task tool to spawn the Principal Architect agent. Do NOT execute the review yourself.**
 
-Execute the Principal Architect's pr-review skill:
+```
+Task(
+  subagent_type: "principal-architect",
+  description: "Architecture review for PR",
+  prompt: """
+  Review PR #{pr_number} from an architectural perspective.
 
-- Focus on system design, scalability, data model
-- Use Challenge & Propose format for issues
-- Output review in skill's format
+  ## PR Details
+  - Title: {pr_title}
+  - Description: {pr_description}
+  - Linear Issue: {issue_id}
+
+  ## Changed Files
+  {list of changed files with patches}
+
+  ## Context
+  - Loaded rules: {rules loaded based on files changed}
+  - Ticket requirements: {from Linear issue if available}
+
+  ## Instructions
+  1. Read the pr-review skill at `.claude/skills/pr-review/SKILL.md`
+  2. Focus on: system design, scalability, data model, security boundaries
+  3. Use Challenge & Propose format for issues
+  4. Output review following the skill's format
+  5. Return the review body and any inline comments
+  """
+)
+```
 
 ### Phase 4: SDE2 Review
 
-> **Load agent:** Read `.claude/agents/sde2.md`
-> **Load skill:** Read `.claude/skills/pr-review/SKILL.md`
+**IMPORTANT: You MUST use the Task tool to spawn the SDE2 agent. Do NOT execute the review yourself.**
 
-Execute the SDE2's pr-review skill:
+```
+Task(
+  subagent_type: "sde2",
+  description: "Code quality review for PR",
+  prompt: """
+  Review PR #{pr_number} for code quality and correctness.
 
-- Focus on code quality, error handling, testability
-- Use Challenge & Propose format for issues
-- Output review in skill's format
+  ## PR Details
+  - Title: {pr_title}
+  - Description: {pr_description}
+  - Linear Issue: {issue_id}
+
+  ## Changed Files
+  {list of changed files with patches}
+
+  ## Context
+  - Loaded rules: {rules loaded based on files changed}
+  - Ticket requirements: {from Linear issue if available}
+
+  ## Instructions
+  1. Read the pr-review skill at `.claude/skills/pr-review/SKILL.md`
+  2. Focus on: type safety, error handling, code structure, testability
+  3. Use Challenge & Propose format for issues
+  4. Output review following the skill's format
+  5. Return the review body and any inline comments
+  """
+)
+```
 
 ### Phase 5: Context-Specific Checks
 
@@ -285,22 +329,63 @@ For each issue from the previous review:
 
 **SDE2 Review (Always):**
 
-> **Load agent:** Read `.claude/agents/sde2.md`
-> **Load skill:** Read `.claude/skills/pr-review-follow-up/SKILL.md`
+**IMPORTANT: You MUST use the Task tool to spawn the SDE2 agent. Do NOT execute the review yourself.**
 
-- Review ONLY files modified since last review
-- Check if previous issues are fixed
-- Look for new issues in the changes
-- Don't re-review unchanged code
+```
+Task(
+  subagent_type: "sde2",
+  description: "Follow-up review for PR",
+  prompt: """
+  Follow-up review for PR #{pr_number} after changes.
+
+  ## PR Details
+  - Title: {pr_title}
+  - Commits since last review: {commit list}
+
+  ## Previous Issues
+  {list of issues from previous review with file:line}
+
+  ## Files Modified Since Last Review
+  {list of changed files}
+
+  ## Instructions
+  1. Read the pr-review-follow-up skill at `.claude/skills/pr-review-follow-up/SKILL.md`
+  2. Review ONLY files modified since last review
+  3. Check if previous issues are fixed
+  4. Look for new issues in the changes
+  5. Don't re-review unchanged code
+  """
+)
+```
 
 **Architect Review (If Triggered):**
 
-> **Load agent:** Read `.claude/agents/principal-architect.md`
-> **Load skill:** Read `.claude/skills/pr-review-follow-up/SKILL.md`
+Only spawn if: new files added, significant structural changes, or previous Architect review had concerns.
 
-- Review new files for architectural fit
-- Verify previous architectural concerns addressed
-- Check structural changes for system impact
+```
+Task(
+  subagent_type: "principal-architect",
+  description: "Follow-up architecture review",
+  prompt: """
+  Follow-up architecture review for PR #{pr_number}.
+
+  ## Why Architect Review Triggered
+  {reason: new files / structural changes / previous concerns}
+
+  ## Previous Architectural Concerns
+  {list from previous Architect review if any}
+
+  ## New/Changed Files
+  {list of new or structurally changed files}
+
+  ## Instructions
+  1. Read the pr-review-follow-up skill at `.claude/skills/pr-review-follow-up/SKILL.md`
+  2. Review new files for architectural fit
+  3. Verify previous architectural concerns addressed
+  4. Check structural changes for system impact
+  """
+)
+```
 
 ### Phase F5: Post Follow-up Review
 
