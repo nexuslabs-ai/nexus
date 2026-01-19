@@ -1,7 +1,5 @@
 # GitHub Integration Rules
 
-> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
-
 ## Repository Info
 
 | Field       | Value             |

@@ -1,7 +1,5 @@
 # Linear Integration Rules
 
-> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
-
 ## Issue ID Format
 
 Linear issues in this workspace use the `NEX-###` format (e.g., `NEX-140`).

@@ -4,20 +4,59 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    # Run on PRs targeting any branch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   # ============================================
-  # Parallel Jobs (no dependencies)
+  # Change Detection
+  # ============================================
+
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      react: ${{ steps.filter.outputs.react }}
+      context-engine: ${{ steps.filter.outputs.context-engine }}
+      packages: ${{ steps.filter.outputs.packages }}
+      ci: ${{ steps.filter.outputs.ci }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            react:
+              - 'packages/react/**'
+              - 'packages/tailwind/**'
+              - 'packages/core/**'
+              - 'packages/test-utils/**'
+            context-engine:
+              - 'packages/context-engine/**'
+            packages:
+              - 'packages/**'
+            ci:
+              - '.github/workflows/**'
+
+  # ============================================
+  # Always Run (on code changes)
   # ============================================
 
   format-check:
     name: Format Check
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,6 +93,8 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,12 +136,20 @@ jobs:
             echo "No matching files changed, skipping lint"
           fi
 
+  # ============================================
+  # Build (affected packages only)
+  # ============================================
+
   build:
     name: Build
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.packages == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -119,29 +168,40 @@ jobs:
           restore-keys: |
             turbo-${{ runner.os }}-
 
-      - name: Build
-        run: yarn build
+      - name: Build affected packages
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Build only affected packages on PRs
+            yarn turbo build --filter='...[origin/${{ github.base_ref }}]'
+          else
+            # Build all on push to main
+            yarn turbo build
+          fi
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: |
-            packages/*/dist
+            packages/**/dist
             .turbo
           retention-days: 1
+          if-no-files-found: warn
 
   # ============================================
-  # Post-Build Jobs (depend on build)
+  # TypeScript Check (affected packages)
   # ============================================
 
   typecheck:
     name: TypeScript Check
     runs-on: ubuntu-latest
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.packages == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -157,13 +217,23 @@ jobs:
         with:
           name: build-artifacts
 
-      - name: TypeScript check
-        run: yarn typecheck
+      - name: TypeScript check (affected packages)
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            yarn turbo typecheck --filter='...[origin/${{ github.base_ref }}]'
+          else
+            yarn turbo typecheck
+          fi
+
+  # ============================================
+  # React Package Jobs
+  # ============================================
 
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -188,7 +258,8 @@ jobs:
   test-storybook:
     name: Storybook Tests
     runs-on: ubuntu-latest
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -230,7 +301,8 @@ jobs:
   test-coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -279,7 +351,8 @@ jobs:
   build-storybook:
     name: Build Storybook
     runs-on: ubuntu-latest
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -311,7 +384,8 @@ jobs:
   bundle-size:
     name: Bundle Size
     runs-on: ubuntu-latest
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -332,3 +406,32 @@ jobs:
 
       - name: Check bundle size
         run: yarn size-limit
+
+  # ============================================
+  # Context Engine Jobs (placeholder for future)
+  # ============================================
+
+  # Uncomment when context-engine has tests
+  # test-context-engine:
+  #   name: Context Engine Tests
+  #   runs-on: ubuntu-latest
+  #   needs: [changes, build]
+  #   if: needs.changes.outputs.context-engine == 'true' || needs.changes.outputs.ci == 'true'
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'yarn'
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
+  #     - name: Download build artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: build-artifacts
+  #     - name: Run context-engine tests
+  #       run: |
+  #         yarn workspace @context-engine/core test
+  #         yarn workspace @context-engine/db test

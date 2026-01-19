@@ -1,11 +1,11 @@
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-config-prettier';
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   // Global ignores
@@ -179,6 +179,14 @@ export default tseslint.config(
   // CLI scripts - allow console.log for user output
   {
     files: ['**/scripts/**/*.js'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
+  // Context Engine - allow console for logger utility and test debugging
+  {
+    files: ['**/context-engine/**/*.ts'],
     rules: {
       'no-console': 'off',
     },
