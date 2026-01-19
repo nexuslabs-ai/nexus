@@ -58,9 +58,9 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 8. **Self-documenting flow** — Reading through the code should be enough to understand it; no mental gymnastics required
 9. **Test, don't validate** — Avoid aggressive inline validations; handle edge cases through thoughtful and thorough testing instead
 
-## No Patches Policy
+## Critical: No Shortcuts Policy
 
-**CRITICAL:** Patches and quick hacks are NOT allowed in this codebase.
+**NEVER use shortcuts to get things done.** Quality is more important than speed at any cost.
 
 When encountering test failures, build errors, or review comments:
 
@@ -70,6 +70,13 @@ When encountering test failures, build errors, or review comments:
 | Type error     | Add `as any` or `@ts-ignore`       | Fix the type properly or ask user    |
 | Build error    | Comment out code or add workaround | Understand root cause or ask user    |
 | Review comment | Quick patch to satisfy reviewer    | Implement proper solution or discuss |
+
+**The Right Process:**
+
+1. **Find the root cause** — Don't just make the error go away; understand WHY it's happening
+2. **Propose proper solutions** — If fixing requires significant changes, discuss with user first
+3. **Quality over speed** — We don't care about token usage or time. A proper fix is worth 10x the effort of a hack
+4. **Ask when unsure** — If you're not confident about the right approach, ASK the user instead of guessing
 
 **When unsure:** Always ask the user instead of applying a patch. Say:
 
@@ -82,7 +89,7 @@ I encountered {issue}. I could:
 Which approach do you prefer, or should we discuss further?
 ```
 
-**Remember:** A proper fix today saves hours of debugging tomorrow.
+**Remember:** A shortcut today becomes a debugging nightmare tomorrow. We have the time to do it right.
 
 ## Challenge & Propose Format
 
