@@ -87,11 +87,18 @@ export interface LLMConfig {
  * - claude-opus-4-5-20251101 (latest, best quality)
  * - claude-sonnet-4-20250514 (balanced, recommended)
  * - claude-haiku-3-20240307 (fastest, lowest cost)
+ *
+ * Model selection priority:
+ * 1. ANTHROPIC_MODEL (provider-specific)
+ * 2. CONTEXT_ENGINE_MODEL (generic fallback)
+ * 3. Default: claude-sonnet-4-20250514
  */
 export function getLLMConfig(): LLMConfig {
   return {
     apiKey: getEnv('ANTHROPIC_API_KEY'),
-    model: getEnv('CONTEXT_ENGINE_MODEL', 'claude-sonnet-4-20250514')!,
+    model:
+      getEnv('ANTHROPIC_MODEL') ??
+      getEnv('CONTEXT_ENGINE_MODEL', 'claude-sonnet-4-20250514')!,
     maxTokens: getEnvNumber('CONTEXT_ENGINE_MAX_TOKENS', 8192),
     timeoutMs: getEnvNumber('CONTEXT_ENGINE_TIMEOUT_MS', 180000),
     baseUrl: getEnv('ANTHROPIC_BASE_URL'),
@@ -123,11 +130,18 @@ export interface GeminiConfig {
  * - gemini-2.5-flash (latest, recommended - FREE)
  * - gemini-2.0-flash (fast, free tier available)
  * - gemini-1.5-pro (higher quality, paid)
+ *
+ * Model selection priority:
+ * 1. GEMINI_MODEL (provider-specific)
+ * 2. CONTEXT_ENGINE_MODEL (generic fallback)
+ * 3. Default: gemini-2.5-flash
  */
 export function getGeminiConfig(): GeminiConfig {
   return {
     apiKey: getEnv('GOOGLE_API_KEY'),
-    model: getEnv('CONTEXT_ENGINE_MODEL', 'gemini-2.5-flash')!,
+    model:
+      getEnv('GEMINI_MODEL') ??
+      getEnv('CONTEXT_ENGINE_MODEL', 'gemini-2.5-flash')!,
     maxTokens: getEnvNumber('CONTEXT_ENGINE_MAX_TOKENS', 8192),
     timeoutMs: getEnvNumber('CONTEXT_ENGINE_TIMEOUT_MS', 180000),
   };

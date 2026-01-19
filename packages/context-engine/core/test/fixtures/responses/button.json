@@ -1,4 +1,5 @@
 {
+  "$comment": "Manually created fixture for testing. Cache keys are based on component name (lowercased), not inputHash. The inputHash is stored for traceability only.",
   "componentName": "Button",
   "response": {
     "text": "{\"description\":\"An interactive button component for triggering actions and form submissions.\",\"semanticDescription\":\"The Button component provides a flexible and accessible way to trigger actions in user interfaces. It supports multiple visual variants (default, destructive, outline, secondary, ghost, link) and sizes, making it suitable for various use cases from primary calls-to-action to subtle text links. Built with Radix UI Slot for composition, it can render as different elements while maintaining consistent styling.\",\"tier\":\"free\",\"whenToUse\":\"Use Button for clickable actions like form submissions, confirmations, navigation triggers, and any interactive element that performs an action.\",\"whenNotToUse\":\"Avoid Button for navigation links that should use semantic anchor tags, or for non-interactive status indicators where Badge would be more appropriate.\",\"patterns\":[\"async-action\",\"composition\",\"button\"],\"tokens\":[\"color-primary\",\"color-destructive\",\"color-secondary\",\"spacing\",\"border-radius\",\"font-weight\"],\"examples\":[\"<Button variant=\\\"default\\\">Submit</Button>\",\"<Button variant=\\\"destructive\\\">Delete</Button>\",\"<Button variant=\\\"outline\\\" size=\\\"sm\\\">Cancel</Button>\",\"<Button loading>Saving...</Button>\",\"<Button asChild><a href=\\\"/page\\\">Link</a></Button>\"],\"relatedComponents\":[\"IconButton\",\"ButtonGroup\",\"Link\"],\"a11yNotes\":\"Button automatically handles disabled state with aria-disabled and loading state with aria-busy. When using asChild, ensure the wrapped element is keyboard accessible.\"}",
@@ -12,6 +13,6 @@
   "recordedAt": "2025-01-15T10:00:00.000Z",
   "provider": "anthropic",
   "model": "claude-sonnet-4-20250514",
-  "inputHash": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2",
+  "inputHash": "placeholder-manually-created-fixture",
   "promptSummary": "Generate metadata for Button component with CVA variants and asChild pattern"
 }

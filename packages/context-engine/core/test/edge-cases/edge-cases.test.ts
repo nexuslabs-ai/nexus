@@ -32,6 +32,44 @@ import {
 } from '../utils/fixture-loader.js';
 import { TEST_ORG_ID } from '../utils/test-constants.js';
 
+// =============================================================================
+// Fixture existence checks (evaluated once at module load)
+// =============================================================================
+const hasNoPropsFixture = fixtureExists('edge-cases', 'no-props');
+const hasGenericComponentFixture = fixtureExists(
+  'edge-cases',
+  'generic-component'
+);
+const hasForwardRefFixture = fixtureExists('edge-cases', 'forwardref-wrapped');
+
+/**
+ * Expected edge-case fixtures.
+ * Add new fixtures here when they're created.
+ */
+const EXPECTED_EDGE_CASE_FIXTURES = [
+  'no-props',
+  'generic-component',
+  'forwardref-wrapped',
+] as const;
+
+// =============================================================================
+// Fixture Integrity Test
+// =============================================================================
+describe('Fixture Integrity', () => {
+  it('all expected edge-case fixtures exist', () => {
+    const missingFixtures = EXPECTED_EDGE_CASE_FIXTURES.filter(
+      (fixture) => !fixtureExists('edge-cases', fixture)
+    );
+
+    if (missingFixtures.length > 0) {
+      throw new Error(
+        `Missing edge-case fixtures: ${missingFixtures.join(', ')}. ` +
+          `Either create the fixtures or remove them from EXPECTED_EDGE_CASE_FIXTURES.`
+      );
+    }
+  });
+});
+
 describe('Edge Cases', () => {
   let mockProvider: MockLLMProvider;
   let processor: ComponentProcessor;
@@ -46,165 +84,149 @@ describe('Edge Cases', () => {
   });
 
   describe('No Props Component', () => {
-    it('extracts component without explicit props interface', async () => {
-      if (!fixtureExists('edge-cases', 'no-props')) {
-        console.warn('Skipping: no-props fixture not found');
-        return;
+    it.skipIf(!hasNoPropsFixture)(
+      'extracts component without explicit props interface',
+      async () => {
+        const input = loadFixtureAsInput('edge-cases', 'no-props');
+        const result = await extractComponent(input);
+
+        expectExtractionSuccess(result);
+        if (!isExtractionSuccess(result)) return;
+
+        // Component should still be extractable
+        expect(result.data).toBeDefined();
+        // Props array may be empty or contain only HTML element props
+        expect(Array.isArray(result.data.props)).toBe(true);
       }
+    );
 
-      const input = loadFixtureAsInput('edge-cases', 'no-props');
-      const result = await extractComponent(input);
+    it.skipIf(!hasNoPropsFixture)(
+      'produces valid manifest for no-props component',
+      async () => {
+        const fixture = loadFixture('edge-cases', 'no-props');
+        const input: ProcessorInput = {
+          orgId: TEST_ORG_ID,
+          name: 'Separator',
+          sourceCode: fixture.sourceCode,
+          framework: 'react',
+        };
 
-      expectExtractionSuccess(result);
-      if (!isExtractionSuccess(result)) return;
+        const result = await processor.process(input);
 
-      // Component should still be extractable
-      expect(result.data).toBeDefined();
-      // Props array may be empty or contain only HTML element props
-      expect(Array.isArray(result.data.props)).toBe(true);
-    });
-
-    it('produces valid manifest for no-props component', async () => {
-      if (!fixtureExists('edge-cases', 'no-props')) {
-        console.warn('Skipping: no-props fixture not found');
-        return;
+        expect(isProcessorSuccess(result)).toBe(true);
+        if (isProcessorSuccess(result)) {
+          expect(result.manifest.name).toBe('Separator');
+          expect(result.manifest.id).toBeTruthy();
+        }
       }
-
-      const fixture = loadFixture('edge-cases', 'no-props');
-      const input: ProcessorInput = {
-        orgId: TEST_ORG_ID,
-        name: 'Separator',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      };
-
-      const result = await processor.process(input);
-
-      expect(isProcessorSuccess(result)).toBe(true);
-      if (isProcessorSuccess(result)) {
-        expect(result.manifest.name).toBe('Separator');
-        expect(result.manifest.id).toBeTruthy();
-      }
-    });
+    );
   });
 
   describe('Generic Component', () => {
-    it('extracts component with TypeScript generics', async () => {
-      if (!fixtureExists('edge-cases', 'generic-component')) {
-        console.warn('Skipping: generic-component fixture not found');
-        return;
+    it.skipIf(!hasGenericComponentFixture)(
+      'extracts component with TypeScript generics',
+      async () => {
+        const input = loadFixtureAsInput('edge-cases', 'generic-component');
+        const result = await extractComponent(input);
+
+        expectExtractionSuccess(result);
+        if (!isExtractionSuccess(result)) return;
+
+        // Generic props should be extracted
+        expectPropsToInclude(result.data.props, [
+          { name: 'items' },
+          { name: 'renderItem' },
+          { name: 'keyExtractor' },
+          { name: 'loading', required: false },
+        ]);
       }
+    );
 
-      const input = loadFixtureAsInput('edge-cases', 'generic-component');
-      const result = await extractComponent(input);
+    it.skipIf(!hasGenericComponentFixture)(
+      'extracts generic type constraints',
+      async () => {
+        const input = loadFixtureAsInput('edge-cases', 'generic-component');
+        const result = await extractComponent(input);
 
-      expectExtractionSuccess(result);
-      if (!isExtractionSuccess(result)) return;
+        expectExtractionSuccess(result);
+        if (!isExtractionSuccess(result)) return;
 
-      // Generic props should be extracted
-      expectPropsToInclude(result.data.props, [
-        { name: 'items' },
-        { name: 'renderItem' },
-        { name: 'keyExtractor' },
-        { name: 'loading', required: false },
-      ]);
-    });
-
-    it('extracts generic type constraints', async () => {
-      if (!fixtureExists('edge-cases', 'generic-component')) {
-        console.warn('Skipping: generic-component fixture not found');
-        return;
+        // items prop should have array type
+        const itemsProp = result.data.props.find((p) => p.name === 'items');
+        expect(itemsProp).toBeDefined();
+        // The type might be T[] or array<T> or similar
+        expect(itemsProp?.typeCategory).toBe('array');
       }
+    );
 
-      const input = loadFixtureAsInput('edge-cases', 'generic-component');
-      const result = await extractComponent(input);
+    it.skipIf(!hasGenericComponentFixture)(
+      'produces valid manifest for generic component',
+      async () => {
+        const fixture = loadFixture('edge-cases', 'generic-component');
+        const input: ProcessorInput = {
+          orgId: TEST_ORG_ID,
+          name: 'List',
+          sourceCode: fixture.sourceCode,
+          framework: 'react',
+        };
 
-      expectExtractionSuccess(result);
-      if (!isExtractionSuccess(result)) return;
+        const result = await processor.process(input);
 
-      // items prop should have array type
-      const itemsProp = result.data.props.find((p) => p.name === 'items');
-      expect(itemsProp).toBeDefined();
-      // The type might be T[] or array<T> or similar
-      expect(itemsProp?.typeCategory).toBe('array');
-    });
-
-    it('produces valid manifest for generic component', async () => {
-      if (!fixtureExists('edge-cases', 'generic-component')) {
-        console.warn('Skipping: generic-component fixture not found');
-        return;
+        expect(isProcessorSuccess(result)).toBe(true);
+        if (isProcessorSuccess(result)) {
+          expect(result.manifest.name).toBe('List');
+          expect(result.manifest.props.length).toBeGreaterThan(0);
+        }
       }
-
-      const fixture = loadFixture('edge-cases', 'generic-component');
-      const input: ProcessorInput = {
-        orgId: TEST_ORG_ID,
-        name: 'List',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      };
-
-      const result = await processor.process(input);
-
-      expect(isProcessorSuccess(result)).toBe(true);
-      if (isProcessorSuccess(result)) {
-        expect(result.manifest.name).toBe('List');
-        expect(result.manifest.props.length).toBeGreaterThan(0);
-      }
-    });
+    );
   });
 
   describe('ForwardRef Wrapped Component', () => {
-    it('extracts component with forwardRef', async () => {
-      if (!fixtureExists('edge-cases', 'forwardref-wrapped')) {
-        console.warn('Skipping: forwardref-wrapped fixture not found');
-        return;
+    it.skipIf(!hasForwardRefFixture)(
+      'extracts component with forwardRef',
+      async () => {
+        const input = loadFixtureAsInput('edge-cases', 'forwardref-wrapped');
+        const result = await extractComponent(input);
+
+        expectExtractionSuccess(result);
+        if (!isExtractionSuccess(result)) return;
+
+        // Should detect forwardRef usage
+        expect(result.data.usesForwardRef).toBe(true);
       }
+    );
 
-      const input = loadFixtureAsInput('edge-cases', 'forwardref-wrapped');
-      const result = await extractComponent(input);
+    it.skipIf(!hasForwardRefFixture)(
+      'extracts data from forwardRef component',
+      async () => {
+        const input = loadFixtureAsInput('edge-cases', 'forwardref-wrapped');
+        const result = await extractComponent(input);
 
-      expectExtractionSuccess(result);
-      if (!isExtractionSuccess(result)) return;
+        expectExtractionSuccess(result);
+        if (!isExtractionSuccess(result)) return;
 
-      // Should detect forwardRef usage
-      expect(result.data.usesForwardRef).toBe(true);
-    });
-
-    it('extracts data from forwardRef component', async () => {
-      if (!fixtureExists('edge-cases', 'forwardref-wrapped')) {
-        console.warn('Skipping: forwardref-wrapped fixture not found');
-        return;
+        // Extraction should produce props (may vary based on extractor)
+        expect(result.data.props).toBeDefined();
+        // At least some props should be extracted (may not be all due to forwardRef)
+        // Note: Some extractors have difficulty with forwardRef components
+        expect(result.data).toBeDefined();
       }
+    );
 
-      const input = loadFixtureAsInput('edge-cases', 'forwardref-wrapped');
-      const result = await extractComponent(input);
+    it.skipIf(!hasForwardRefFixture)(
+      'includes exportName field (may be derived from filename or displayName)',
+      async () => {
+        const input = loadFixtureAsInput('edge-cases', 'forwardref-wrapped');
+        const result = await extractComponent(input);
 
-      expectExtractionSuccess(result);
-      if (!isExtractionSuccess(result)) return;
+        expectExtractionSuccess(result);
+        if (!isExtractionSuccess(result)) return;
 
-      // Extraction should produce props (may vary based on extractor)
-      expect(result.data.props).toBeDefined();
-      // At least some props should be extracted (may not be all due to forwardRef)
-      // Note: Some extractors have difficulty with forwardRef components
-      expect(result.data).toBeDefined();
-    });
-
-    it('includes exportName field (may be derived from filename or displayName)', async () => {
-      if (!fixtureExists('edge-cases', 'forwardref-wrapped')) {
-        console.warn('Skipping: forwardref-wrapped fixture not found');
-        return;
+        // Export name may be from displayName (TextArea) or derived from filename
+        // Either is acceptable as long as a name is present
+        expect(result.data.exportName).toBeTruthy();
       }
-
-      const input = loadFixtureAsInput('edge-cases', 'forwardref-wrapped');
-      const result = await extractComponent(input);
-
-      expectExtractionSuccess(result);
-      if (!isExtractionSuccess(result)) return;
-
-      // Export name may be from displayName (TextArea) or derived from filename
-      // Either is acceptable as long as a name is present
-      expect(result.data.exportName).toBeTruthy();
-    });
+    );
   });
 
   describe('Source code edge cases', () => {

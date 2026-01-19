@@ -6,7 +6,8 @@
  *
  * Configuration is read from environment variables via the config module:
  * - GOOGLE_API_KEY: API key (required)
- * - CONTEXT_ENGINE_MODEL: Model identifier (defaults to gemini-2.5-flash)
+ * - GEMINI_MODEL: Model identifier (provider-specific, preferred)
+ * - CONTEXT_ENGINE_MODEL: Model identifier (generic fallback)
  * - CONTEXT_ENGINE_MAX_TOKENS: Max tokens for completion
  * - CONTEXT_ENGINE_TIMEOUT_MS: Request timeout
  */
@@ -148,6 +149,12 @@ export class GeminiProvider implements ILLMProvider {
           });
 
       // Generate content with timeout
+      //
+      // NOTE: This Promise.race timeout does NOT abort the underlying API request.
+      // The Google Generative AI SDK does not currently support AbortController/signal.
+      // See: https://github.com/googleapis/nodejs-vertexai/issues/143
+      // This means the request continues in the background after timeout rejection.
+      // Impact is minimal for typical usage - the request will eventually complete.
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(
