@@ -3,10 +3,18 @@
  *
  * LLM provider implementation using the Anthropic Claude API.
  * Handles authentication, request construction, and error handling.
+ *
+ * Configuration is read from environment variables via the config module:
+ * - ANTHROPIC_API_KEY: API key (required)
+ * - CONTEXT_ENGINE_MODEL: Model identifier
+ * - CONTEXT_ENGINE_MAX_TOKENS: Max tokens for completion
+ * - CONTEXT_ENGINE_TIMEOUT_MS: Request timeout
+ * - ANTHROPIC_BASE_URL: Base URL override
  */
 
 import Anthropic from '@anthropic-ai/sdk';
 
+import { getLLMConfig } from '../config/index.js';
 import { createLogger } from '../utils/logger.js';
 
 import type {
@@ -20,19 +28,17 @@ import type {
 const logger = createLogger({ name: 'anthropic-provider' });
 
 /**
- * Default model for Anthropic completions
+ * Get default configuration from environment
  */
-const DEFAULT_MODEL = 'claude-sonnet-4-20250514';
-
-/**
- * Default max tokens for completions
- */
-const DEFAULT_MAX_TOKENS = 2000;
-
-/**
- * Default timeout in milliseconds (2 minutes)
- */
-const DEFAULT_TIMEOUT_MS = 120_000;
+function getDefaults() {
+  const config = getLLMConfig();
+  return {
+    model: config.model,
+    maxTokens: config.maxTokens,
+    timeoutMs: config.timeoutMs,
+    baseUrl: config.baseUrl,
+  };
+}
 
 /**
  * Anthropic Claude provider implementation
@@ -66,6 +72,7 @@ export class AnthropicProvider implements ILLMProvider {
   }
 
   constructor(config: AnthropicProviderConfig = {}) {
+    const defaults = getDefaults();
     const apiKey = config.apiKey ?? process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
@@ -74,16 +81,18 @@ export class AnthropicProvider implements ILLMProvider {
       );
     }
 
+    const timeoutMs = config.timeoutMs ?? defaults.timeoutMs;
+
     this.client = new Anthropic({
       apiKey,
-      baseURL: config.baseUrl,
-      timeout: config.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+      baseURL: config.baseUrl ?? defaults.baseUrl,
+      timeout: timeoutMs,
     });
 
     this.config = {
-      model: config.model ?? process.env.ANTHROPIC_MODEL ?? DEFAULT_MODEL,
-      defaultMaxTokens: config.defaultMaxTokens ?? DEFAULT_MAX_TOKENS,
-      timeoutMs: config.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+      model: config.model ?? defaults.model,
+      defaultMaxTokens: config.defaultMaxTokens ?? defaults.maxTokens,
+      timeoutMs,
     };
 
     logger.debug('Anthropic provider initialized', {

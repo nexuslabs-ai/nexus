@@ -3,12 +3,21 @@
  *
  * Structured logging for Context Engine.
  * Outputs JSON in production, pretty-printed in development.
+ *
+ * Configuration is read from environment variables:
+ * - CONTEXT_ENGINE_LOG_LEVEL: Minimum log level (debug, info, warn, error)
+ * - CONTEXT_ENGINE_LOG_JSON: Output as JSON (true/false)
  */
+
+import {
+  getLoggerConfig,
+  type LogLevel as ConfigLogLevel,
+} from '../config/index.js';
 
 /**
  * Log levels
  */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = ConfigLogLevel;
 
 /**
  * Log level numeric values (for filtering)
@@ -51,19 +60,22 @@ export interface LogEntry {
 }
 
 /**
- * Default configuration
+ * Get default configuration from environment
  */
-const DEFAULT_CONFIG: LoggerConfig = {
-  level: 'info',
-  name: 'context-engine',
-  json: process.env.NODE_ENV === 'production',
-};
+function getDefaultConfig(): LoggerConfig {
+  const envConfig = getLoggerConfig();
+  return {
+    level: envConfig.level,
+    name: 'context-engine',
+    json: envConfig.json,
+  };
+}
 
 /**
  * Create a logger instance
  */
 export function createLogger(config: Partial<LoggerConfig> = {}): Logger {
-  return new Logger({ ...DEFAULT_CONFIG, ...config });
+  return new Logger({ ...getDefaultConfig(), ...config });
 }
 
 /**
@@ -137,7 +149,6 @@ export class Logger {
       ? JSON.stringify(entry)
       : this.formatPretty(entry);
 
-    /* eslint-disable no-console -- Logger utility intentionally uses console methods */
     switch (entry.level) {
       case 'debug':
         console.debug(output);
@@ -152,7 +163,6 @@ export class Logger {
         console.error(output);
         break;
     }
-    /* eslint-enable no-console */
   }
 
   /**

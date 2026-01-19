@@ -8,6 +8,7 @@
 // Types
 export type {
   AnthropicProviderConfig,
+  GeminiProviderConfig,
   GeneratorFailure,
   GeneratorInput,
   GeneratorOutput,
@@ -31,6 +32,7 @@ export {
   AnthropicProvider,
   createAnthropicProvider,
 } from './anthropic-provider.js';
+export { createGeminiProvider, GeminiProvider } from './gemini-provider.js';
 
 // Meta Generator
 export {

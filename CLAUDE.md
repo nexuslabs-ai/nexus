@@ -2,6 +2,55 @@
 
 > **CRITICAL:** Follow [.claude/rules/workflow.md](.claude/rules/workflow.md) for every task.
 
+## Core Operating Principles
+
+These principles are non-negotiable. They apply to ALL work in this codebase.
+
+### Quality Over Speed
+
+**We don't care about token usage or time. Quality is more important than speed at any cost.**
+
+- Never use shortcuts to get things done
+- Find the root cause of problems, don't just patch symptoms
+- Discuss proper solutions with the user when unsure
+- A proper fix is worth 10x the effort of a hack
+
+### Delegate to Agents
+
+**Always delegate specialized work to the appropriate agent.** Do not attempt to do it yourself.
+
+| Task Type              | Delegate To          |
+| ---------------------- | -------------------- |
+| Code implementation    | sde2                 |
+| Test implementation    | tester               |
+| Architecture decisions | principal-architect  |
+| Design-code parity     | designer             |
+| Documentation updates  | technical-writer     |
+| Social media content   | social-media-manager |
+
+Why delegate?
+
+- Agents have specialized knowledge and context
+- Agents enforce domain-specific quality standards
+- Attempting tasks outside your expertise leads to shortcuts
+- Each agent has a "No Shortcuts Policy" that prevents hacks
+
+### No Shortcuts Policy
+
+When encountering errors, test failures, or challenges:
+
+| Shortcut ❌                     | Proper Approach ✅                 |
+| ------------------------------- | ---------------------------------- |
+| Weaken assertions to pass tests | Fix the underlying code or fixture |
+| Add `.skip` to failing tests    | Understand and fix the root cause  |
+| Use `as any` for type errors    | Fix the type properly              |
+| Quick patch to satisfy review   | Implement proper solution          |
+| Guess when unsure               | ASK the user instead               |
+
+**Remember:** A shortcut today becomes a debugging nightmare tomorrow. We have the time to do it right.
+
+---
+
 A multi-framework design system built as a Yarn/Turbo monorepo, starting with React. Components follow shadcn/ui architecture and patterns.
 
 ## Project Structure
