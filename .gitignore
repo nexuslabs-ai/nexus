@@ -42,3 +42,4 @@ build-storybook.log
 .claude/settings.local.json
 CLAUDE.local.md
 **/CLAUDE.local.md
+packages/context-engine/.env.test

@@ -1,74 +1,138 @@
----
-description: Update documentation after codebase changes
----
+# Update Docs
 
-Interactively update Claude Code documentation based on codebase changes.
+Update documentation based on codebase changes using the Technical Writer agent.
+
+## Agent Used
+
+| Agent                                             | Skill                                         | Purpose                         |
+| ------------------------------------------------- | --------------------------------------------- | ------------------------------- |
+| [Technical Writer](../agents/technical-writer.md) | [update-docs](../skills/update-docs/SKILL.md) | Keep docs accurate and complete |
+
+## Input (Optional)
+
+- **$ARGUMENTS**: Scope or specific files to check
+
+```
+Examples:
+  /update-docs                           → Check recent changes (HEAD~5)
+  /update-docs packages/context-engine   → Focus on specific package
+  /update-docs --all                     → Full documentation audit
+```
 
 ## Flow
 
-### 1. Analyze Git Diff
-
-```bash
-git diff --name-only HEAD~5
-git diff --stat
+```
+┌─────────────────────────────────────────┐
+│              /update-docs               │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│           Detect Scope                  │
+│  • Specific path? → Focus on that area  │
+│  • --all flag? → Full audit             │
+│  • Otherwise → Recent changes (HEAD~5)  │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│    Spawn Technical Writer Agent         │
+│  • Use Task tool with subagent_type     │
+│  • Pass scope in prompt                 │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│  Technical Writer Executes Skill        │
+│  • Analyze changes                      │
+│  • Discover affected docs               │
+│  • Compare docs against code            │
+│  • Propose updates                      │
+│  • Apply approved changes               │
+└─────────────────────────────────────────┘
 ```
 
-Use this to prepare suggestions for the questions below.
+## Execution
 
-### 2. Ask Questions
+### Phase 1: Detect Scope
 
-**Question 1: Which area changed?**
+1. **Parse arguments:**
 
-- Options: `core`, `tailwind`, `react`, `test-utils`, `playground`, `claude-config`, `root`, `multiple`
-- Suggested: {based on git diff}
+   ```
+   If specific path → Focus documentation check on that area
+   If --all flag → Full documentation audit across codebase
+   Otherwise → Analyze recent git changes (HEAD~5)
+   ```
 
-**Question 2: What type of change?**
+2. **Build context:**
+   - Determine which areas to check
+   - Note any user-specified focus
 
-- Options: `component`, `testing`, `storybook`, `tokens`, `build`, `commands`, `rules`, `skills`, `agents`, `other`
-- Suggested: {based on file types}
+### Phase 2: Spawn Technical Writer Agent
 
-**Question 3: What specifically changed?**
+**IMPORTANT: You MUST use the Task tool to spawn the agent. Do NOT execute the skill yourself.**
 
-- Free text, suggest based on diff
+```
+Task(
+  subagent_type: "technical-writer",
+  description: "Update documentation",
+  prompt: """
+  Update documentation based on codebase changes.
 
-### 3. Determine Affected Documentation
+  ## Scope
+  {scope description - recent changes / specific path / full audit}
 
-#### Package Documentation
+  ## Instructions
+  1. Read the update-docs skill at `.claude/skills/update-docs/SKILL.md`
+  2. Follow the workflow phases:
+     - Phase 1: Analyze changes (git diff for recent, or specified scope)
+     - Phase 2: Discover affected documentation files
+     - Phase 3: Review and compare docs against code
+     - Phase 4: Propose updates
+     - Phase 5: Confirm and apply (ask user before applying)
+  3. Use dynamic discovery, not hardcoded mappings
+  4. Prioritize: Critical (incorrect) > High (missing APIs) > Medium (missing examples) > Low (wording)
+  """
+)
+```
 
-| Package Changed | Files to Check                                                                  |
-| --------------- | ------------------------------------------------------------------------------- |
-| core            | `packages/core/CLAUDE.md`, `packages/core/README.md`, `.claude/rules/tokens.md` |
-| tailwind        | `packages/tailwind/CLAUDE.md`, `.claude/rules/tokens.md`                        |
-| react           | `packages/react/CLAUDE.md`, `.claude/rules/components.md`                       |
-| test-utils      | `packages/test-utils/CLAUDE.md`, `.claude/rules/testing.md`                     |
-| playground      | `apps/playground/CLAUDE.md`                                                     |
+### Phase 3: Report Completion
 
-#### Change Type Documentation
+After documentation updates are complete, output:
 
-| Change Type | Files to Check                                                                             |
-| ----------- | ------------------------------------------------------------------------------------------ |
-| component   | `packages/react/CLAUDE.md`, `.claude/rules/components.md`, `.claude/commands/component.md` |
-| testing     | `.claude/rules/testing.md`, `packages/test-utils/CLAUDE.md`                                |
-| storybook   | `.claude/rules/storybook.md`                                                               |
-| tokens      | `packages/core/CLAUDE.md`, `packages/tailwind/CLAUDE.md`, `.claude/rules/tokens.md`        |
-| build       | `CLAUDE.md` (root), package.json scripts                                                   |
-| commands    | `.claude/commands/*.md`, `CLAUDE.md` (slash commands table)                                |
-| rules       | `.claude/rules/*.md`, `CLAUDE.md` (convention rules table)                                 |
-| skills      | `.claude/skills/*/SKILL.md`, `.claude/rules/skills-agents.md`                              |
-| agents      | `.claude/agents/*.md`, `.claude/rules/skills-agents.md`                                    |
+```markdown
+## Documentation Updates Complete
 
-#### Cross-Reference Checks
+### Scope
 
-When updating any file, also check for references in:
+{What was checked: recent changes / specific path / full audit}
 
-- `CLAUDE.md` (root) - project structure, package table, command table
-- Other package CLAUDE.md files that may import/reference the changed package
-- `.claude/commands/*.md` - may reference paths or patterns
+### Files Analyzed
 
-### 4. Review and Propose Changes
+- {list of doc files checked}
 
-For each affected file, compare documentation vs actual code and propose updates.
+### Changes Made
 
-### 5. Confirm and Apply
+| File | Change | Status  |
+| ---- | ------ | ------- |
+| ...  | ...    | Applied |
 
-Ask: "Apply these changes? (all / select / none)"
+### Verification
+
+- [ ] All changes applied
+- [ ] Links still work
+- [ ] Examples are accurate
+
+### Next Steps
+
+{Any follow-up items or notes for the user}
+```
+
+## Error Handling
+
+| Error                | Action                                 |
+| -------------------- | -------------------------------------- |
+| No changes detected  | Report "Documentation is up to date"   |
+| Path not found       | Ask user to verify path                |
+| User rejects changes | Skip those changes, continue with rest |
+| Conflicting edits    | Ask user which version to keep         |

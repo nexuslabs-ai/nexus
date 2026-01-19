@@ -12,7 +12,7 @@
         }
       }
     },
-    "font-senrif": {
+    "font-serif": {
       "$value": "Georgia",
       "$type": "fontFamily",
       "$extensions": {

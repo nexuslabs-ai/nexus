@@ -1,0 +1,566 @@
+{
+  "2xs": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000000d",
+        "$type": "color"
+      }
+    }
+  },
+  "xs": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000000d",
+        "$type": "color"
+      }
+    }
+  },
+  "sm": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    }
+  },
+  "base": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    }
+  },
+  "md": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 5,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001a",
+        "$type": "color"
+      }
+    }
+  },
+  "lg": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001f",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 6,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 9,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001f",
+        "$type": "color"
+      }
+    }
+  },
+  "xl": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001f",
+        "$type": "color"
+      }
+    },
+    "layer-2": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": -1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000001f",
+        "$type": "color"
+      }
+    }
+  },
+  "2xl": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 1,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#00000040",
+        "$type": "color"
+      }
+    }
+  },
+  "inner": {
+    "layer-1": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 5,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#0000000d",
+        "$type": "color"
+      }
+    }
+  },
+  "focus": {
+    "default": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#e5e5e580",
+        "$type": "color"
+      }
+    },
+    "error": {
+      "x": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "y": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "blur": {
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "spread": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "color": {
+        "$value": "#fecaca80",
+        "$type": "color"
+      }
+    }
+  }
+}

@@ -1,7 +1,5 @@
 # Component Rules
 
-> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
-
 ## File Structure
 
 Every component in `packages/react/src/components/ui/` needs 2 files:

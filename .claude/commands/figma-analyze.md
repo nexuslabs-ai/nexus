@@ -1,266 +1,157 @@
----
-description: Analyze Figma component design for code parity
-argument-hint: [figma-url]
----
+# Figma Analyze
 
-Analyze a Figma component design against Nexus Design System conventions to ensure Figma-to-code parity.
+Analyze an existing Figma component for convention compliance and code implementation readiness using the Designer agent.
 
-> **EXECUTION MODE: CONTINUOUS**
->
-> This command runs ALL phases without pausing for confirmation.
-> Do NOT stop between phases. Execute the entire workflow end-to-end.
-> This overrides the default "wait after each phase" behavior from root CLAUDE.md.
+## Agent Used
+
+| Agent                             | Skill                                             | Purpose                        |
+| --------------------------------- | ------------------------------------------------- | ------------------------------ |
+| [Designer](../agents/designer.md) | [figma-analyze](../skills/figma-analyze/SKILL.md) | Design-to-code parity analysis |
 
 ## Required Input
 
-Figma URL: $ARGUMENTS
+- **$ARGUMENTS**: Figma URL (e.g., `https://www.figma.com/design/abc123/File?node-id=1-2`)
 
 If no URL provided, ask the user for the Figma component URL.
 
-## Workflow
-
-### Phase 1: Fetch Figma Design
-
-Extract `fileKey` and `nodeId` from the Figma URL:
-
-- Format: `https://www.figma.com/design/:fileKey/:fileName?node-id=:nodeId`
-- Convert node-id: `123-456` → `123:456`
-
-Use MCP tools to gather complete design context:
-
-1. **`get_design_context`** - Component structure, props, and generated code
-2. **`get_variable_defs`** - All tokens/variables used in the component
-3. **`get_screenshot`** - Visual reference for the component
-4. **`get_metadata`** - Frame names and layer hierarchy
-
-From `get_design_context`, extract:
-
-- Component props (types and values)
-- Default values
-- Variant combinations
-
-From `get_variable_defs`, extract:
-
-- Spacing tokens used
-- Color tokens used
-- Radius tokens used
-- Typography tokens used
-
-From `get_metadata`, extract:
-
-- All frame names in the component
-- Layer hierarchy (parent-child relationships)
-- Identify the component type (e.g., Accordion, Dialog, Button)
-
-### Phase 2: Fetch shadcn Reference
-
-Based on the component type identified in Phase 1, fetch the shadcn documentation:
-
-**Documentation URL Pattern:**
+## Flow
 
 ```
-https://ui.shadcn.com/docs/components/{component-name}
+┌─────────────────────────────────────────┐
+│         /figma-analyze {url}            │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│           Validate Input                │
+│  • Extract fileKey and nodeId from URL  │
+│  • Ask for URL if not provided          │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│        Spawn Designer Agent             │
+│  • Use Task tool with subagent_type     │
+│  • Pass Figma URL in prompt             │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│   Designer Executes figma-analyze skill │
+│  • Fetch design context from Figma      │
+│  • Check AI readability                 │
+│  • Validate token usage                 │
+│  • Review state implementation          │
+│  • Check compound structure             │
+│  • Output analysis report               │
+└─────────────────────────────────────────┘
 ```
 
-Common component names:
-| Component Type | URL Path |
-|----------------|----------|
-| Accordion | `accordion` |
-| Dialog | `dialog` |
-| Tabs | `tabs` |
-| Select | `select` |
-| DropdownMenu | `dropdown-menu` |
-| Button | `button` |
-| Input | `input` |
-| Card | `card` |
-| Alert | `alert` |
-| Avatar | `avatar` |
-| Badge | `badge` |
-| Checkbox | `checkbox` |
-| Popover | `popover` |
-| Tooltip | `tooltip` |
+## Execution
 
-Use `WebFetch` to get the documentation page, then extract:
+### Phase 1: Validate Input
 
-**From shadcn documentation:**
+1. **Parse arguments for Figma URL:**
 
-- Available variants (e.g., `default`, `secondary`, `destructive`, `outline`)
-- Component props and their types
-- Default prop values
-- Usage examples and composition patterns
-- For compound components: exported parts and their hierarchy
-- Radix primitive being wrapped (if any)
+   ```
+   If URL provided → Extract fileKey and nodeId
+   If no URL → Ask user for Figma component URL
+   ```
 
-### Phase 3: Understand Codebase Conventions
+2. **URL format:**
+   ```
+   https://www.figma.com/design/{fileKey}/{fileName}?node-id={nodeId}
+   ```
 
-Read these files to understand current patterns dynamically:
+### Phase 2: Spawn Designer Agent
 
-| File                                          | What to Learn                                            |
-| --------------------------------------------- | -------------------------------------------------------- |
-| `packages/react/src/components/ui/button.tsx` | Component structure, prop patterns, CVA usage            |
-| `packages/tailwind/nexus.css`                 | Semantic token names in `@theme` block                   |
-| `packages/tailwind/variables.css`             | Primitive token names (`--nx-*` prefix)                  |
-| `.claude/rules/figma.md`                      | Token mapping conventions, compound component naming     |
-| `.claude/rules/components.md`                 | Component patterns and requirements                      |
-| `.claude/rules/shadcn-divergences.md`         | Nexus vs shadcn differences (token naming, prefix, etc.) |
-
-From button.tsx, identify:
-
-- How variants are structured in CVA
-- Prop naming patterns (lowercase, abbreviated)
-- Data attributes used (`data-slot`, `data-variant`, etc.)
-- Export patterns
-
-From CSS files, build a mental map of:
-
-- Primitive → Semantic → Utility token flow
-- Available semantic tokens for colors, spacing, radius
-- Typography utility classes
-
-### Phase 4: Compare & Analyze
-
-**Token Analysis:**
-For each token found in Figma (`get_variable_defs`), verify:
-
-- Does it exist in the codebase?
-- Is the value correct?
-- Is the naming consistent?
-
-**Prop Analysis:**
-For each prop found in Figma (`get_design_context`), check:
-
-- Are values lowercase and abbreviated where appropriate?
-- Do boolean props use `has*`/`is*` pattern instead of enum states?
-- Are variant names consistent with existing components?
-
-**Structure Analysis:**
-Compare Figma component structure with codebase patterns:
-
-- Does it follow the same variant/size pattern as Button?
-- Are there props that need different handling in code vs Figma?
-
-**shadcn Parity Analysis (NEW):**
-Compare Figma frames against shadcn source from Phase 2:
-
-| Check       | How to Verify                                     |
-| ----------- | ------------------------------------------------- |
-| Part Names  | Do Figma frame names match shadcn exports?        |
-| Part Count  | Are all shadcn parts represented in Figma?        |
-| Composition | Does Figma hierarchy match shadcn composition?    |
-| Props Match | Do Figma props align with shadcn component props? |
-
-For each shadcn export, check:
+**IMPORTANT: You MUST use the Task tool to spawn the Designer agent. Do NOT execute the skill yourself.**
 
 ```
-shadcn export: AccordionTrigger
-├── Figma frame exists? → AccordionTrigger ✅ or Trigger ❌
-├── Frame is PascalCase? → AccordionTrigger ✅ or accordion-trigger ❌
-├── Correct parent? → Inside AccordionItem ✅ or floating ❌
-└── data-slot mapped? → accordion-trigger
+Task(
+  subagent_type: "designer",
+  description: "Analyze Figma component",
+  prompt: """
+  Analyze a Figma component for convention compliance and implementation readiness.
+
+  ## Figma URL
+  {figma_url}
+
+  ## Instructions
+  1. Read the figma-analyze skill at `.claude/skills/figma-analyze/SKILL.md`
+  2. Read the figma rules at `.claude/rules/figma.md`
+  3. Use MCP tools to fetch design context:
+     - `mcp__figma__get_design_context` for component data
+     - `mcp__figma__get_variable_defs` for token usage
+     - `mcp__figma__get_screenshot` if visual reference needed
+  4. Follow the skill workflow to analyze:
+     - AI Readability (property names, layer names, descriptions)
+     - Token Usage (spacing, colors, radius)
+     - State Implementation (hover, focus, disabled)
+     - Compound Structure (frame names, hierarchy)
+  5. Output analysis report with blocking vs nice-to-have recommendations
+  """
+)
 ```
 
-**Icon Analysis:**
-For icons found in Figma:
+### Phase 3: Report Results
 
-- Do instance names match code import pattern? (`IconChevronDown` not `chevron-down`)
-- Are icons from the same icon library used in codebase?
-
-### Phase 5: Generate Report
-
-Provide a structured analysis:
+The Designer agent will output an analysis report with:
 
 ```markdown
-## Figma Analysis: {ComponentName}
+## Figma Component Analysis
 
-### Component Overview
+### Component: {name}
 
-- **Description**: [from Figma]
-- **Type**: Simple | Compound
-- **shadcn Reference**: [link to shadcn docs if applicable]
-- **Radix Primitive**: [e.g., @radix-ui/react-accordion]
+### AI Readability
 
-### Props from Figma
-
-| Prop | Type | Values | Default |
-| ---- | ---- | ------ | ------- |
-| ...  | ...  | ...    | ...     |
-
-### shadcn Parity (Compound Components)
-
-**Expected Parts from shadcn:**
-| shadcn Export | Figma Frame | Status | Notes |
-|---------------|-------------|--------|-------|
-| `Accordion` | `Accordion` | ✅/❌ | ... |
-| `AccordionItem` | `AccordionItem` | ✅/❌ | ... |
-| `AccordionTrigger` | `AccordionTrigger` | ✅/❌ | ... |
-| `AccordionContent` | `AccordionContent` | ✅/❌ | ... |
-
-**Composition Hierarchy:**
-```
-
-Expected (from shadcn): Actual (from Figma):
-Accordion [Figma hierarchy]
-├── AccordionItem ├── ...
-│ ├── AccordionTrigger │ ├── ...
-│ └── AccordionContent │ └── ...
-
-```
-
-### Frame Naming Check
-
-| Figma Frame | Convention | Status | Fix |
-|-------------|------------|--------|-----|
-| `Trigger` | Should be `AccordionTrigger` | ❌ | Add component prefix |
-| `AccordionTrigger` | PascalCase, prefixed | ✅ | - |
-| `accordion-content` | Should be PascalCase | ❌ | Use `AccordionContent` |
+| Check          | Status   | Notes |
+| -------------- | -------- | ----- |
+| Property Names | ✅/⚠️/❌ | ...   |
+| Layer Names    | ✅/⚠️/❌ | ...   |
+| Description    | ✅/⚠️/❌ | ...   |
 
 ### Token Usage
 
-| Category | Figma Tokens | Code Equivalent | Status |
-|----------|--------------|-----------------|--------|
-| Spacing | ... | ... | ✅/⚠️ |
-| Radius | ... | ... | ✅/⚠️ |
-| Colors | ... | ... | ✅/⚠️ |
-| Typography | ... | ... | ✅/⚠️ |
+| Check   | Status   | Notes |
+| ------- | -------- | ----- |
+| Spacing | ✅/⚠️/❌ | ...   |
+| Colors  | ✅/⚠️/❌ | ...   |
+| Radius  | ✅/⚠️/❌ | ...   |
 
-### Convention Check
+### Issues
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| Size values abbreviated | ✅/❌ | ... |
-| Lowercase prop values | ✅/❌ | ... |
-| Boolean vs enum states | ✅/❌ | ... |
-| Token names match code | ✅/❌ | ... |
-| Frame names match shadcn | ✅/❌ | ... |
-| Hierarchy matches shadcn | ✅/❌ | ... |
-| Icons use PascalCase | ✅/❌ | ... |
+#### 🔴 Blocking
 
-### Recommendations
+- {issues that must be fixed}
 
-**Figma Updates Needed** (if any):
-- Frame naming: ...
-- Hierarchy: ...
-- Tokens: ...
-- Props: ...
+#### 🟡 Should Fix
 
-**Code Adaptations Needed** (if any):
-- ...
+- {issues that should be addressed}
 
-### Implementation Readiness
+#### 🟢 Approved
 
-- [ ] Props aligned with code conventions
-- [ ] Tokens exist in codebase
-- [ ] Structure matches component patterns
-- [ ] Frame names match shadcn exports
-- [ ] Composition hierarchy matches shadcn
-- [ ] Icons use correct naming convention
+- {things that follow conventions}
+
+### Implementation Readiness: {READY / NEEDS FIXES}
 ```
 
-## Key Principles
+## What It Checks
 
-1. **Don't assume** - Always read the actual codebase files to understand current patterns
-2. **Compare dynamically** - Token names and patterns may evolve; compare against actual files, not hardcoded expectations
-3. **Reference rules** - Use `.claude/rules/figma.md` as the source of truth for conventions
-4. **Be specific** - Report exactly what matches and what doesn't, with actionable fixes
-5. **shadcn as source of truth** - For compound components, shadcn source defines the expected parts and composition
-6. **Frame names = Code exports** - Figma frame names should exactly match what will be exported in code
+| Category                 | Checks                                                                                    |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
+| **AI Readability**       | Property names match code, child layer names standardized, component descriptions present |
+| **Token Usage**          | Spacing, colors, radius use Figma variables linked to design tokens                       |
+| **State Implementation** | Hover/focus use Interactive Components, disabled/loading use boolean props                |
+| **Compound Structure**   | Frame names PascalCase matching exports, hierarchy mirrors React composition              |
+| **Custom Additions**     | New props/variants/slots follow naming conventions                                        |
+
+## Error Handling
+
+| Error                  | Action                                          |
+| ---------------------- | ----------------------------------------------- |
+| Invalid Figma URL      | Ask user to provide valid URL                   |
+| Figma access denied    | Check MCP connection, ask user to verify        |
+| Component not found    | Ask user to verify node-id                      |
+| Unknown base component | Analyze as fully custom, check conventions only |
+| No Figma variables     | Flag as blocking — must use token variables     |

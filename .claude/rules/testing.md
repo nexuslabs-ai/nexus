@@ -1,325 +1,167 @@
-# Testing Rules
+# Testing Rules - Core Philosophy
 
-> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
+> This file contains testing principles that apply to ALL packages.
+> For package-specific patterns, see:
+>
+> - [testing-react.md](testing-react.md) — React components, Storybook
+> - [testing-context-engine.md](testing-context-engine.md) — Context Engine packages
 
-## Core Principle
-
-**Stories are tests.** Every component story serves as:
-
-1. Living documentation in Storybook
-2. Interaction tests via play functions
-3. Accessibility tests via addon-a11y
-
-## Testing Split
-
-| What       | Where           | Imports From        |
-| ---------- | --------------- | ------------------- |
-| Components | `*.stories.tsx` | `storybook/test`    |
-| Hooks      | `*.test.ts`     | `@nexus/test-utils` |
-| Utilities  | `*.test.ts`     | `@nexus/test-utils` |
-
-## File Structure
-
-### Components (Story-First)
+## Core Philosophy
 
 ```
-ComponentName/
-├── component-name.tsx        # Implementation
-├── ComponentName.stories.tsx # Stories = Tests
-└── index.ts                  # Exports
+┌─────────────────────────────────────────────────────────────────┐
+│  INPUT (real data)  →  SYSTEM UNDER TEST  →  OUTPUT (expected)  │
+│                                                                 │
+│  Tests validate: "Does the output match what we expect?"        │
+│  Tests DO NOT focus on: internal method calls, line coverage    │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-No separate `*.test.tsx` files for components.
+**Given input X, expect output Y.** This applies at every level:
 
-### Hooks & Utilities (Unit Tests)
+- Unit tests: function input → function output
+- Integration tests: component input → component output
+- E2E tests: user action → visible result
 
-```
-hooks/
-├── use-hook-name.ts
-└── use-hook-name.test.ts    # Unit test
+## Principles
 
-lib/
-├── utils.ts
-└── utils.test.ts            # Unit test
-```
+1. **Result validation over code coverage** — 90% coverage with bad assertions is worse than 60% coverage with good assertions
+2. **Real fixtures over synthetic data** — Use actual component code, real API responses, genuine user flows
+3. **Partial matching over exact equality** — Assert on fields you care about, not every byte
+4. **Determinism is non-negotiable** — If a test can fail randomly, it's broken
+5. **Mock boundaries, not internals** — Mock the database, not the repository methods
+6. **Test behavior, not implementation** — Tests shouldn't break when you refactor internals
+7. **One reason to fail** — Each test should fail for exactly one reason
 
-## Story Template with Play Functions
+## Test Type Selection
 
-```tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+| Test Type         | When to Use                               | Mock Strategy              |
+| ----------------- | ----------------------------------------- | -------------------------- |
+| **Unit**          | Pure functions, utilities, isolated logic | None or minimal            |
+| **Integration**   | Component interactions, pipelines         | External services only     |
+| **E2E**           | User flows, critical paths                | Nothing (or test database) |
+| **Fixture-based** | Data transformation pipelines, parsers    | Input files as fixtures    |
 
-import { Component } from './component';
+## Fixture Design
 
-const meta: Meta<typeof Component> = {
-  title: 'Components/Component',
-  component: Component,
-  args: {
-    onClick: fn(), // Spy for callbacks
-  },
-};
+### Good Fixtures
 
-export default meta;
-type Story = StoryObj<typeof Component>;
+| Pattern            | Description                                 |
+| ------------------ | ------------------------------------------- |
+| **Real data**      | Actual component code, real API responses   |
+| **Edge cases**     | Empty arrays, null values, maximum lengths  |
+| **Representative** | Covers common patterns in actual usage      |
+| **Documented**     | Comments explaining what each fixture tests |
 
-// Visual story (no play function needed)
-export const Default: Story = {
-  args: { children: 'Default' },
-};
+### Bad Fixtures
 
-// Interaction test (with play function)
-export const Interactive: Story = {
-  args: { children: 'Click me' },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const element = canvas.getByRole('button');
+| Anti-pattern        | Why It's Bad                                       |
+| ------------------- | -------------------------------------------------- |
+| `foo`, `bar`, `baz` | Meaningless data that doesn't represent real usage |
+| Generated data      | Random data makes tests non-deterministic          |
+| Minimal fixtures    | Misses edge cases that exist in production         |
+| Outdated fixtures   | Fixtures that don't match current system behavior  |
 
-    await userEvent.click(element);
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
-  },
-};
-```
+## Assertion Patterns
 
-## Required Stories Per Component
+### Partial Matching (Preferred)
 
-| Story Type              | Purpose                   | Play Function? |
-| ----------------------- | ------------------------- | -------------- |
-| Default                 | Default state             | Optional       |
-| Each variant            | Visual documentation      | No             |
-| Each size               | Visual documentation      | No             |
-| Disabled                | Disabled state behavior   | Yes            |
-| ClickInteraction        | Click handler works       | Yes            |
-| KeyboardInteraction     | A11y keyboard support     | Yes            |
-| WithDataAttributes      | Verify data-\* attrs      | Yes            |
-| asChild (if applicable) | Composition works         | Yes            |
-| Edge cases              | Empty, long content, etc. | Yes            |
-| AllVariants             | Visual grid reference     | No             |
-
-## Play Function Patterns
-
-### Click Testing
-
-```tsx
-play: async ({ canvasElement, args }) => {
-  const canvas = within(canvasElement);
-  const button = canvas.getByRole('button');
-
-  await userEvent.click(button);
-  await expect(args.onClick).toHaveBeenCalledTimes(1);
-};
-```
-
-### Keyboard Testing
-
-```tsx
-play: async ({ canvasElement, args }) => {
-  const canvas = within(canvasElement);
-  const element = canvas.getByRole('button');
-
-  await userEvent.tab();
-  await expect(element).toHaveFocus();
-
-  await userEvent.keyboard('{Enter}');
-  await expect(args.onClick).toHaveBeenCalledTimes(1);
-};
-```
-
-### Disabled State Testing
-
-```tsx
-play: async ({ canvasElement, args }) => {
-  const canvas = within(canvasElement);
-  const button = canvas.getByRole('button');
-
-  await expect(button).toBeDisabled();
-  await userEvent.click(button);
-  await expect(args.onClick).not.toHaveBeenCalled();
-};
-```
-
-### Data Attributes Testing
-
-```tsx
-play: async ({ canvasElement }) => {
-  const canvas = within(canvasElement);
-  const button = canvas.getByRole('button');
-
-  await expect(button).toHaveAttribute('data-slot', 'button');
-  await expect(button).toHaveAttribute('data-variant', 'secondary');
-};
-```
-
-## Hook Tests (Using @nexus/test-utils)
-
-```tsx
-// use-counter.test.ts
-import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
-
-import { useCounter } from './use-counter';
-
-describe('useCounter', () => {
-  it('increments count', () => {
-    const { result } = renderHook(() => useCounter());
-
-    act(() => {
-      result.current.increment();
-    });
-
-    expect(result.current.count).toBe(1);
-  });
+```typescript
+// Good - assert on what matters
+expect(result).toMatchObject({
+  success: true,
+  data: { name: 'Button' },
 });
+
+// Good - custom helper for domain objects
+expectPropsToInclude(result.props, [{ name: 'variant', type: 'string' }]);
+
+// Bad - exact matching breaks on irrelevant changes
+expect(result).toEqual(fullExpectedObject);
 ```
 
-## Utility Tests
+### Structural Validation
 
-```tsx
-// format-currency.test.ts
-import { describe, expect, it } from '@nexus/test-utils';
+```typescript
+// Good - validates structure without brittle values
+expect(result.success).toBe(true);
+expect(result.data.name).toBeTruthy();
+expect(result.data.items.length).toBeGreaterThan(0);
 
-import { formatCurrency } from './format-currency';
-
-describe('formatCurrency', () => {
-  it('formats USD', () => {
-    expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
-  });
-});
+// Bad - asserts on unstable values
+expect(result.data.timestamp).toBe('2025-01-15T10:00:00Z');
 ```
+
+### Array Assertions
+
+```typescript
+// Good - checks contents without order dependency
+expect(result.items).toContain('expected-item');
+expect(result.items).toHaveLength(3);
+
+// Good - checks structure
+expect(result.items).toEqual(
+  expect.arrayContaining([expect.objectContaining({ id: 'item-1' })])
+);
+```
+
+### Error Assertions
+
+```typescript
+// Good - checks error type and message
+await expect(doThing()).rejects.toThrow('specific error');
+
+// Good - checks error shape for discriminated unions
+const result = await doThing();
+expect(result.success).toBe(false);
+if (!result.success) {
+  expect(result.error.code).toBe('VALIDATION_ERROR');
+}
+```
+
+## Mock Strategy
+
+### When to Mock
+
+| Mock This               | Don't Mock This      |
+| ----------------------- | -------------------- |
+| External APIs           | Internal functions   |
+| Databases               | Business logic       |
+| File system (sometimes) | Data transformations |
+| Time/dates              | Validation logic     |
+| LLM/AI providers        | Internal state       |
+| Network requests        | Utility functions    |
+
+### Mock Design Principles
+
+1. **Implement real interfaces** — Mocks should satisfy the same contract as real implementations
+2. **Track call history** — For verifying interactions when needed
+3. **Configurable responses** — Support happy path, errors, edge cases
+4. **Fail explicitly** — Unconfigured mocks should throw, not return undefined
+
+## Anti-Patterns to Avoid
+
+- Tests that pass but don't actually verify behavior
+- Mocking internal implementation details
+- Exact JSON equality when partial matching would suffice
+- Missing error case coverage
+- Tests that depend on execution order
+- Flaky tests with `retry` or `timeout` workarounds
+- `skip` or `only` committed to codebase
+- Magic numbers in assertions without explanation
 
 ## Running Tests
 
 ```bash
-# Run all tests (unit + storybook)
-yarn test
-
-# Run only storybook tests (components)
-yarn test:storybook
-
-# Run only unit tests (hooks, utilities)
-yarn test:unit
-
-# Watch mode for storybook
-yarn test:storybook:watch
-
-# Interactive UI
-yarn test:storybook:ui
+yarn test               # Run all tests
+yarn test:coverage      # With coverage report (informational)
 ```
 
-## Accessibility
+## Do Not
 
-A11y is automatic. Every story is checked against axe-core rules via `addon-a11y`. Violations fail the test. No separate a11y assertions needed.
-
-To test specific a11y attributes:
-
-```tsx
-play: async ({ canvasElement }) => {
-  const canvas = within(canvasElement);
-  const button = canvas.getByRole('button');
-
-  await expect(button).toHaveAccessibleName('Close dialog');
-};
-```
-
-## Imports Reference
-
-### For Stories (Component Tests)
-
-```tsx
-import { expect, fn, userEvent, within } from 'storybook/test';
-```
-
-### For Unit Tests (Hooks/Utilities)
-
-```tsx
-import {
-  act,
-  describe,
-  expect,
-  it,
-  renderHook,
-  vi,
-  waitFor,
-} from '@nexus/test-utils';
-```
-
-## Common Mistakes
-
-| Don't                                           | Do                                     |
-| ----------------------------------------------- | -------------------------------------- |
-| Create `component.test.tsx`                     | Add play functions to stories          |
-| Import from `@testing-library/react` in stories | Use `storybook/test`                   |
-| Import `render` from `@nexus/test-utils`        | Use stories for components             |
-| Add manual `axe()` assertions                   | Let addon-a11y handle it               |
-| Skip keyboard interaction tests                 | Every interactive component needs them |
-| Use `@nexus/test-utils` for components          | Use `storybook/test` in stories        |
-| Import from `@storybook/test`                   | Use `storybook/test` (Storybook 10)    |
-
-## Visual Regression Testing (Chromatic)
-
-Every story is automatically snapshotted by Chromatic in 4 modes:
-
-- light desktop (1280px)
-- dark desktop (1280px)
-- light mobile (375px)
-- dark mobile (375px)
-
-### Running Visual Tests
-
-**In Storybook (recommended for development):**
-
-1. Open the Visual Tests addon panel
-2. Click "Run tests"
-3. Review and accept/reject changes
-
-**From CLI:**
-
-```bash
-# Local (doesn't fail on changes)
-yarn chromatic
-
-# CI (fails if changes need review)
-yarn chromatic:ci
-```
-
-### Chromatic Story Parameters
-
-```tsx
-import { themeOnlyModes } from '@/storybook/modes';
-
-export const MyStory: Story = {
-  parameters: {
-    chromatic: {
-      // Skip snapshot for interaction-only tests
-      disableSnapshot: true,
-
-      // Wait for animations
-      delay: 500,
-
-      // Custom modes for this story
-      modes: themeOnlyModes,
-    },
-  },
-};
-```
-
-### When to Disable Snapshots
-
-Add `chromatic: { disableSnapshot: true }` for stories that:
-
-- Only test interactions (no unique visual output)
-- Test data attributes or ARIA properties
-- Have identical appearance to another story
-
-### When to Use themeOnlyModes
-
-Use `modes: themeOnlyModes` for:
-
-- Grid/showcase stories like AllVariants
-- Simple components that don't need responsive testing
-
-### Modes Location
-
-Chromatic modes are defined in `packages/react/src/storybook/modes.ts`:
-
-- `allModes` - All 4 theme/viewport combinations (default)
-- `themeOnlyModes` - Light/dark desktop only
-- `viewportOnlyModes` - Mobile/desktop light only
+- Focus on line coverage over result correctness
+- Use synthetic `foo`/`bar` test data
+- Mock internal functions
+- Write flaky tests and add retries
+- Commit `skip` or `only`
+- Assert on unstable values (timestamps, random IDs)

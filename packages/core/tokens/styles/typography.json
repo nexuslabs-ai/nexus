@@ -90,7 +90,7 @@
         "lineHeight": "{line-height.lg}",
         "letterSpacing": "{letterspacing.normal}"
       },
-      "$description": "Long-form content, articles, documentation, emphasis paragraph"
+      "$description": "Long-form content, articles, documentation, emphasis paragraph 18"
     },
     "default": {
       "$type": "typography",
@@ -101,7 +101,7 @@
         "lineHeight": "{line-height.base}",
         "letterSpacing": "{letterspacing.normal}"
       },
-      "$description": "Default Paragraph text, description, card content, main body copy"
+      "$description": "Default Paragraph text, description, card content, main body copy 16"
     },
     "small": {
       "$type": "typography",
@@ -111,7 +111,8 @@
         "fontWeight": "{weight.normal}",
         "lineHeight": "{line-height.sm}",
         "letterSpacing": "{letterspacing.normal}"
-      }
+      },
+      "$description": "14"
     },
     "xsmall": {
       "$type": "typography",
@@ -121,7 +122,8 @@
         "fontWeight": "{weight.normal}",
         "lineHeight": "{line-height.xs}",
         "letterSpacing": "{letterspacing.normal}"
-      }
+      },
+      "$description": "12"
     }
   },
   "label": {
@@ -133,7 +135,8 @@
         "fontWeight": "{weight.semibold}",
         "lineHeight": "{line-height.sm}",
         "letterSpacing": "{letterspacing.normal}"
-      }
+      },
+      "$description": "14"
     },
     "default": {
       "$type": "typography",
@@ -143,7 +146,8 @@
         "fontWeight": "{weight.medium}",
         "lineHeight": "{line-height.sm}",
         "letterSpacing": "{letterspacing.normal}"
-      }
+      },
+      "$description": "14"
     },
     "small": {
       "$type": "typography",
@@ -153,7 +157,8 @@
         "fontWeight": "{weight.medium}",
         "lineHeight": "{line-height.xs}",
         "letterSpacing": "{letterspacing.normal}"
-      }
+      },
+      "$description": "12"
     },
     "caps": {
       "$type": "typography",
@@ -163,7 +168,8 @@
         "fontWeight": "{weight.semibold}",
         "lineHeight": "{line-height.xs}",
         "letterSpacing": "{letterspacing.wider}"
-      }
+      },
+      "$description": "12"
     }
   },
   "code": {

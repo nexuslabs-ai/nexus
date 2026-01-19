@@ -1,7 +1,5 @@
 # Figma-to-Code Parity Rules
 
-> **Workflow:** Follow the CRITICAL WORKFLOW defined in root `CLAUDE.md`.
-
 ## Source of Truth
 
 **Always read actual code files** to understand current token structure:
@@ -198,6 +196,153 @@ shape?: "circle" | "roundedRectangle"
 shape?: "circle" | "rounded"
 ```
 
+## Figma ↔ Code Divergence Patterns
+
+This section documents fundamental differences in how Figma and React handle common patterns. Understanding these is critical for both designers building components and developers implementing them.
+
+### States & Interactivity
+
+| State    | Figma Approach                            | React/Code Approach                    |
+| -------- | ----------------------------------------- | -------------------------------------- |
+| Hover    | Separate variant OR Interactive Component | CSS pseudo-class (`:hover`)            |
+| Focus    | Separate variant with focus ring          | CSS pseudo-class (`:focus-visible`)    |
+| Active   | Separate variant                          | CSS pseudo-class (`:active`)           |
+| Disabled | Boolean property + visual changes         | `disabled` prop + `:disabled` selector |
+| Loading  | Boolean property + spinner slot           | `loading` prop + conditional render    |
+| Error    | Boolean property + error styling          | `error` prop OR validation state       |
+
+**Guidance:** For hover/focus/active, prefer Figma's Interactive Components feature when states only differ in color/shadow. Use explicit variants when states have different layouts or content. In code, use CSS pseudo-classes for styling; the `disabled` prop maps directly to the HTML attribute.
+
+### Slots & Optional Content
+
+| Pattern        | Figma Approach                      | React Approach                    |
+| -------------- | ----------------------------------- | --------------------------------- |
+| Optional icon  | `hasIcon` (boolean) + `icon` (swap) | `icon?: ReactNode`                |
+| Optional slot  | `hasSlot` (boolean) + `slot` (swap) | `slotName?: ReactNode`            |
+| Multiple slots | Multiple boolean + swap pairs       | Multiple optional props           |
+| Empty state    | Variant or boolean toggle           | Conditional render (`{x && <X>}`) |
+
+**Guidance:** Figma requires two props (boolean toggle + instance swap) because it cannot conditionally show/hide layers based on content presence. React simplifies to a single optional prop—presence indicates visibility. See "Figma Slot Props → React Optional Props" above for the full mapping table.
+
+### Polymorphism & Composition
+
+| Pattern      | Figma Approach                         | React Approach                     |
+| ------------ | -------------------------------------- | ---------------------------------- |
+| asChild      | N/A (not representable)                | Radix Slot pattern for composition |
+| Render as    | Separate component or documentation    | `as` prop or polymorphic component |
+| Nested slots | Instance swap with component instances | `children` or named slot props     |
+| Compound     | Multiple linked component sets         | Multiple exports composed together |
+
+**Guidance:** The `asChild` pattern is code-only and allows any element to receive component styles. In Figma, document this capability but don't try to represent it visually. For compound components, mirror the React composition hierarchy in Figma's layer structure (see "Compound Component Frame Naming" below).
+
+### Responsive & Layout
+
+| Pattern        | Figma Approach                 | React Approach                         |
+| -------------- | ------------------------------ | -------------------------------------- |
+| Responsive     | Separate frames per breakpoint | Tailwind responsive prefixes (`md:`)   |
+| Fluid width    | "Fill container" constraint    | `w-full` or flex-grow                  |
+| Fixed vs fluid | Constraints panel              | Explicit width utilities or `flex-1`   |
+| Spacing        | Auto layout gap + padding      | Gap/padding utilities (`nx:gap-4`)     |
+| Stack vs wrap  | Auto layout direction          | `flex-col` vs `flex-row` + `flex-wrap` |
+
+**Guidance:** Figma uses constraints and auto layout; code uses Tailwind utilities. Both should use the same spacing tokens (`spacing-4` → `nx:gap-4`). Document responsive behavior in Figma using separate frames for breakpoints, but code handles it with responsive prefixes on a single component.
+
+## AI Readability
+
+This section ensures Figma components can be reliably parsed by AI tools for code generation.
+
+### Property Names
+
+Figma component property names **must exactly match** code prop names:
+
+| Code Prop     | Figma Property | ❌ Avoid                        |
+| ------------- | -------------- | ------------------------------- |
+| `variant`     | `variant`      | Style, Type, Appearance         |
+| `size`        | `size`         | Scale, Dimension, ComponentSize |
+| `disabled`    | `disabled`     | isDisabled, Inactive            |
+| `orientation` | `orientation`  | Direction, Layout               |
+
+### Child Layer Naming
+
+Standardized names for internal layers enable AI to map Figma structure to code slots:
+
+| Layer Purpose        | Figma Name     | Maps to Code                   |
+| -------------------- | -------------- | ------------------------------ |
+| Primary text content | `Label`        | `children` (text)              |
+| Secondary text       | `Description`  | `description` prop             |
+| Icon before label    | `LeadingIcon`  | `leftIcon` / `leadingIcon`     |
+| Icon after label     | `TrailingIcon` | `rightIcon` / `trailingIcon`   |
+| Standalone icon      | `Icon`         | `icon` prop                    |
+| Loading indicator    | `Spinner`      | Loading state indicator        |
+| Visual indicator     | `Indicator`    | Active/selected dot, checkmark |
+| Avatar/image slot    | `Avatar`       | `avatar` prop                  |
+| Badge/count          | `Badge`        | `badge` prop                   |
+| Chevron/arrow        | `Chevron`      | Expand/collapse indicator      |
+| Close button         | `CloseButton`  | Dismiss action                 |
+| Overlay/backdrop     | `Overlay`      | Modal backdrop                 |
+
+### Component Descriptions
+
+Every Figma component must have a description that helps both designers and AI understand its purpose. Use design language, not code terminology.
+
+**Description Template:**
+
+```
+{What it is} — {Primary use case}. {Key behavior or interaction note}.
+
+Variants: {list main variants}
+States: {list interactive states}
+```
+
+### Description Examples
+
+**Simple Components:**
+
+| Component    | Description                                                                                                                                                                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Button**   | Primary action trigger — Use for form submissions, confirmations, and key user actions. Supports icons for added context. **Variants:** primary, secondary, outline, ghost, destructive, link. **States:** default, hover, focus, active, disabled, loading. |
+| **Badge**    | Status indicator — Highlights counts, labels, or states inline with other content. Use sparingly to draw attention to important information. **Variants:** default, secondary, outline, destructive.                                                         |
+| **Avatar**   | User representation — Displays profile images or initials as a visual identifier. Falls back to initials or placeholder when no image is available. **Sizes:** 2xs through 4xl. **Shapes:** circle, rounded.                                                 |
+| **Input**    | Text entry field — Collects single-line user input. Pair with Label above and HelperText below for context. **States:** default, focus, filled, error, disabled.                                                                                             |
+| **Checkbox** | Binary selection — Allows users to toggle an option on or off. Use in forms or settings where multiple independent choices are available. **States:** unchecked, checked, indeterminate, disabled.                                                           |
+| **Switch**   | Instant toggle — Immediately activates or deactivates a setting. Use for preferences that take effect without requiring a save action. **States:** off, on, disabled.                                                                                        |
+| **Tooltip**  | Contextual hint — Reveals additional information on hover or focus. Keep content brief and helpful. Appears adjacent to trigger element.                                                                                                                     |
+| **Skeleton** | Loading placeholder — Indicates content is being fetched. Mimics the shape of incoming content to reduce layout shift.                                                                                                                                       |
+
+**Compound Component Parts:**
+
+| Part                    | Description                                                                                                                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **DialogContent**       | Modal container — Centers important content and actions that require user attention. Dims the background to focus user on the dialog. Use for confirmations, forms, or critical information. |
+| **DialogHeader**        | Modal title area — Contains the dialog title and optional close button. Establishes context for the dialog content below.                                                                    |
+| **DialogFooter**        | Modal action area — Houses primary and secondary action buttons. Place the primary action on the right, cancel/secondary on the left.                                                        |
+| **AccordionItem**       | Expandable section — Contains a trigger and collapsible content. Use to organize related information that doesn't need to be visible simultaneously.                                         |
+| **AccordionTrigger**    | Section header — Clickable area that expands or collapses the associated content. Shows current state via chevron rotation.                                                                  |
+| **AccordionContent**    | Revealed content — Hidden by default, appears when the trigger is activated. Contains detailed information related to the trigger label.                                                     |
+| **TabsList**            | Navigation bar — Horizontal group of tab triggers. Indicates which section is currently active.                                                                                              |
+| **TabsTrigger**         | Section selector — Individual tab button that switches visible content. Shows active state when its content is displayed.                                                                    |
+| **TabsContent**         | Tab panel — Content area associated with a specific tab. Only one panel is visible at a time.                                                                                                |
+| **SelectTrigger**       | Dropdown button — Displays current selection and opens the options menu when clicked. Shows placeholder when no selection is made.                                                           |
+| **SelectContent**       | Options container — Floating panel containing selectable items. Appears below or above the trigger based on available space.                                                                 |
+| **SelectItem**          | Option entry — Single selectable choice within the dropdown. Shows checkmark when selected.                                                                                                  |
+| **DropdownMenuTrigger** | Menu activator — Button or element that opens the dropdown menu on click. Often an icon button with more options.                                                                            |
+| **DropdownMenuContent** | Menu container — Floating panel with action items. Appears on trigger click and dismisses on selection or outside click.                                                                     |
+| **DropdownMenuItem**    | Action option — Single clickable item in the menu. Can include icons, shortcuts, and destructive styling.                                                                                    |
+| **ToastProvider**       | Notification area — Container region where toast messages appear. Typically positioned at a screen corner.                                                                                   |
+| **Toast**               | Temporary message — Brief notification that appears and auto-dismisses. Use for success confirmations, errors, or updates. **Variants:** default, success, error, warning.                   |
+
+### State Implementation
+
+Choose the right approach for interactive states:
+
+| Approach                   | When to Use                                     | Example                                                 |
+| -------------------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| **Interactive Components** | States differ only in color, shadow, or opacity | Button hover (background color change)                  |
+| **Explicit Variants**      | States have different content or layout         | Loading state (shows spinner), Error state (shows icon) |
+| **Boolean Property**       | State is independently toggleable               | `disabled`, `loading`, `hasError`                       |
+
+**Rule of thumb:** If swapping to a state requires adding/removing elements, use explicit variants or boolean properties. If it's purely visual, use Interactive Components.
+
 ## Component Size Reference
 
 Common component sizes with their spacing token mappings:
@@ -328,6 +473,19 @@ This maps directly to React:
   </AccordionItem>
 </Accordion>
 ```
+
+### Compound Component Organization
+
+Each part of a compound component should be a **separate Figma component** (not just a frame), enabling:
+
+| Part Type | Figma Component Type | Why                                   |
+| --------- | -------------------- | ------------------------------------- |
+| Root      | Component Set        | Contains variants (type, orientation) |
+| Item      | Component Set        | Contains states (expanded, collapsed) |
+| Trigger   | Component            | Reusable, swappable in Item instances |
+| Content   | Component            | Reusable, can contain any content     |
+
+**Key principle:** If a part is exported separately in code, it should be a separate Figma component. This allows designers to compose parts independently, just like developers compose React components.
 
 ### Icon Instance Naming
 
