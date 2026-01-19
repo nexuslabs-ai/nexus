@@ -18,6 +18,9 @@
  * ```
  */
 
+// Re-export config
+export * from './config/index.js';
+
 // Re-export constants
 export * from './constants/index.js';
 

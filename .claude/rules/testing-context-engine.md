@@ -5,27 +5,47 @@
 
 ## Core Principle
 
-**Fixture-based integration testing with MockLLMProvider.** Test the full pipeline with real component fixtures and mock LLM responses for deterministic, cost-free tests.
+**The LLM is the CORE of the generator's value.** Real LLM tests validate actual output quality, mock tests are only for error handling and pipeline mechanics.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  INPUT (component source)  →  SYSTEM  →  OUTPUT (manifest)      │
 │                                                                 │
-│  Tests validate: "Does the output match what we expect?"        │
-│  Tests DO NOT focus on: internal method calls, line coverage    │
+│  Extraction tests: Real code → Real parsed data (VALUABLE)      │
+│  Real LLM tests: Real prompts → Real AI output (VALUABLE)       │
+│  Mock tests: Error handling only (LIMITED USE)                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Testing Philosophy
+
+**Key insight:** If someone breaks the prompt template, will tests catch it?
+
+- With mocks: NO (tests still pass with hardcoded responses)
+- With real LLM: YES (output quality degrades)
+
+**What to test with mocks:**
+
+- Error handling (rate limits, auth failures, malformed JSON)
+- Pipeline mechanics (skipGeneration, two-phase API)
+- Multi-org isolation (where LLM output doesn't matter)
+
+**What to test with real LLM:**
+
+- Output quality (descriptions, patterns, examples)
+- Prompt effectiveness (does the prompt produce useful metadata?)
+- AI usability (can an AI assistant use this manifest to generate code?)
+
 ## Testing Split
 
-| What                | Where                        | Key Pattern                          |
-| ------------------- | ---------------------------- | ------------------------------------ |
-| Extraction          | `test/integration/*.test.ts` | Real fixtures → ExtractedData        |
-| Generation          | `test/integration/*.test.ts` | MockLLMProvider + recorded responses |
-| Full Pipeline       | `test/integration/*.test.ts` | Component → ComponentManifest        |
-| AI Usability        | `test/integration/*.test.ts` | Manifest → AI-ready validation       |
-| Multi-org Isolation | `test/integration/*.test.ts` | orgId scoping                        |
-| Edge Cases          | `test/edge-cases/*.test.ts`  | Unusual patterns                     |
+| What                | Where                           | Provider          | Key Pattern                          |
+| ------------------- | ------------------------------- | ----------------- | ------------------------------------ |
+| Extraction          | `test/integration/extractor.ts` | None (real code)  | Real fixtures → ExtractedData        |
+| LLM Output Quality  | `test/integration/real-llm.ts`  | AnthropicProvider | Real prompts → Real AI output        |
+| Error Handling      | `test/integration/generator.ts` | MockLLMProvider   | Simulated errors → Graceful handling |
+| Pipeline Mechanics  | `test/integration/processor.ts` | MockLLMProvider   | skipGeneration, two-phase API        |
+| Multi-org Isolation | `test/integration/isolation.ts` | MockLLMProvider   | orgId scoping                        |
+| Edge Cases          | `test/edge-cases/*.test.ts`     | MockLLMProvider   | Unusual patterns                     |
 
 ## File Structure
 
@@ -34,92 +54,139 @@ packages/context-engine/core/
 ├── src/                           # Production code
 ├── test/
 │   ├── fixtures/
-│   │   ├── components/
-│   │   │   ├── shadcn/            # Real shadcn-style components
-│   │   │   └── edge-cases/        # Unusual patterns
-│   │   └── responses/             # Recorded LLM responses
+│   │   └── components/
+│   │       ├── shadcn/            # Real shadcn-style components
+│   │       └── edge-cases/        # Unusual patterns
 │   ├── providers/
-│   │   └── mock-llm-provider.ts   # Implements ILLMProvider
+│   │   └── mock-llm-provider.ts   # For error handling tests ONLY
 │   ├── utils/
 │   │   ├── fixture-loader.ts      # Load component files
-│   │   ├── response-recorder.ts   # Record real LLM responses
 │   │   └── assertion-helpers.ts   # Partial matching utilities
 │   ├── integration/
-│   │   ├── extractor.test.ts
-│   │   ├── generator.test.ts
-│   │   ├── processor.test.ts
-│   │   ├── ai-usability.test.ts
-│   │   └── isolation.test.ts
+│   │   ├── extractor.test.ts      # VALUABLE - real extraction
+│   │   ├── real-llm.test.ts       # VALUABLE - real LLM quality
+│   │   ├── generator.test.ts      # Error handling only
+│   │   ├── processor.test.ts      # Mechanics only
+│   │   ├── ai-usability.test.ts   # Extraction structure
+│   │   └── isolation.test.ts      # Multi-org isolation
 │   ├── edge-cases/
 │   │   └── edge-cases.test.ts
 │   └── setup.ts
 └── vitest.config.ts
 ```
 
-## MockLLMProvider
+## Real LLM Tests (MOST VALUABLE)
 
-The mock provider implements `ILLMProvider` interface exactly:
-
-```typescript
-import type {
-  ILLMProvider,
-  LLMCompletionResponse,
-} from '@context-engine/core/generator';
-
-interface MockLLMProviderConfig {
-  modelId?: string;
-  responses?: Map<string | RegExp, LLMCompletionResponse>;
-  defaultResponse?: LLMCompletionResponse;
-  errorAfterCalls?: number;
-  simulateLatencyMs?: number;
-}
-
-class MockLLMProvider implements ILLMProvider {
-  readonly providerType = LLMProviderType.Mock;
-
-  // Test utilities
-  getCallHistory(): Array<{ prompt: string; options?: LLMCompletionOptions }>;
-  getCallCount(): number;
-  reset(): void;
-}
-```
-
-**Key features:**
-
-- Pattern matching for prompt-specific responses
-- Simulated rate limiting (`errorAfterCalls`)
-- Call history tracking for assertions
-- Configurable latency for timing tests
-
-## Fixture Types
-
-### Component Fixtures
-
-| Fixture                            | Pattern        | What It Tests                        |
-| ---------------------------------- | -------------- | ------------------------------------ |
-| `shadcn/button.tsx`                | CVA variants   | Variant extraction, defaults         |
-| `shadcn/dialog.tsx`                | Radix compound | Multi-export, base library detection |
-| `shadcn/input.tsx`                 | forwardRef     | Ref forwarding, HTML props           |
-| `edge-cases/no-props.tsx`          | No interface   | Empty props handling                 |
-| `edge-cases/generic-component.tsx` | `<T>` generics | Generic constraints                  |
-
-### Response Fixtures
-
-Recorded LLM responses in `test/fixtures/responses/`:
-
-```json
-{
-  "text": "{\"description\":\"An interactive button...\"}",
-  "model": "claude-sonnet-4-20250514",
-  "stopReason": "end_turn",
-  "usage": { "inputTokens": 1200, "outputTokens": 450 }
-}
-```
-
-**Recording new responses:**
+Located in `test/integration/real-llm.test.ts`. Requires `ANTHROPIC_API_KEY`.
 
 ```bash
-ANTHROPIC_API_KEY=xxx npx tsx test/utils/response-recorder.ts button
+# Run real LLM tests
+ANTHROPIC_API_KEY=xxx yarn test test/integration/real-llm.test.ts
+```
+
+**When API key is not available, tests are automatically skipped.**
+
+### What Real LLM Tests Validate
+
+```typescript
+// Tests that mock tests CANNOT catch:
+
+it('generates semantically meaningful description', async () => {
+  const result = await processor.process(buttonInput);
+
+  // Description should mention purpose, not just be generic
+  expect(result.manifest.description.toLowerCase()).toContain('button');
+  expect(
+    description.includes('action') ||
+      description.includes('click') ||
+      description.includes('trigger')
+  ).toBe(true);
+});
+
+it('identifies correct patterns for component type', async () => {
+  const result = await processor.process(buttonInput);
+  const patterns = result.manifest.ai?.patterns ?? [];
+
+  // Button should have action-related pattern
+  const hasActionPattern = patterns.some((p) =>
+    ['button', 'async-action', 'action'].includes(p.toLowerCase())
+  );
+  expect(hasActionPattern).toBe(true);
+});
+```
+
+## Mock Provider Usage
+
+**Only use MockLLMProvider for:**
+
+- Error handling tests (rate limits, auth failures)
+- Malformed response handling
+- Pipeline mechanics (skipGeneration)
+- Tests where LLM output quality doesn't matter
+
+```typescript
+// APPROPRIATE: Testing error handling
+describe('error handling', () => {
+  it('returns failure with retryable=true for 429 errors', async () => {
+    const rateLimitedProvider = createRateLimitedProvider(0);
+    generator = createMetaGenerator({ provider: rateLimitedProvider });
+
+    const result = await generator.generate(input);
+
+    expect(result.type).toBe('failure');
+    expect(result.retryable).toBe(true);
+  });
+});
+
+// INAPPROPRIATE: Testing output quality
+describe('output quality', () => {
+  it('generates good descriptions', async () => {
+    // DON'T DO THIS - mock responses make this test useless
+    const mockProvider = createMockLLMProvider({ defaultResponse: MOCK });
+    // The test will always pass with hardcoded responses
+  });
+});
+```
+
+## Extraction Tests (VALUABLE)
+
+Extraction tests use real component fixtures and test real parsing logic:
+
+```typescript
+describe('HybridExtractor', () => {
+  it('extracts CVA variants', async () => {
+    const fixture = loadFixture('shadcn', 'button');
+    const result = await extractComponent({
+      orgId: 'test-org',
+      name: 'Button',
+      sourceCode: fixture.sourceCode,
+      framework: 'react',
+    });
+
+    expect(result.type).toBe('success');
+    if (result.type !== 'success') return;
+
+    // Real extraction from real code
+    expect(result.data.variants?.variant).toContain('default');
+    expect(result.data.variants?.variant).toContain('destructive');
+  });
+});
+```
+
+## Multi-Org Isolation Tests (VALUABLE)
+
+Tests actual isolation behavior, not LLM output:
+
+```typescript
+describe('Multi-Org Isolation', () => {
+  it('same component for different orgs gets different IDs', async () => {
+    const resultA = await processor.process({ ...input, orgId: 'org-a' });
+    const resultB = await processor.process({ ...input, orgId: 'org-b' });
+
+    // IDs should be unique per processing
+    expect(resultA.manifest.id).not.toBe(resultB.manifest.id);
+  });
+});
 ```
 
 ## Assertion Helpers
@@ -127,240 +194,54 @@ ANTHROPIC_API_KEY=xxx npx tsx test/utils/response-recorder.ts button
 ### Partial Matching for Props
 
 ```typescript
-// Assert on key fields we care about, not everything
-expectPropsToInclude(result.data, [
+expectPropsToInclude(result.data.props, [
   { name: 'variant', type: 'string', required: false },
   { name: 'size', type: 'string', required: false },
 ]);
-```
-
-### Variant Assertions
-
-```typescript
-expectVariantsToInclude(result.data, {
-  variant: ['default', 'destructive', 'outline'],
-  size: ['default', 'sm', 'lg'],
-});
-```
-
-### Base Library Detection
-
-```typescript
-expectBaseLibrary(result.data, {
-  name: 'Radix UI',
-  component: 'Dialog',
-});
 ```
 
 ### AI-Ready Validation
 
 ```typescript
 expectManifestAIReady(manifest);
-// Checks: description exists, props documented, types present
-```
-
-## Test Patterns
-
-### Extraction Tests
-
-```typescript
-describe('HybridExtractor', () => {
-  it('extracts props with correct types', async () => {
-    const fixture = await loadFixture('shadcn', 'button');
-    const result = await extractComponent({
-      name: fixture.name,
-      sourceCode: fixture.sourceCode,
-      filePath: fixture.filePath,
-      framework: 'react',
-      orgId: 'test-org',
-      libraryId: 'test-lib',
-    });
-
-    expect(result.success).toBe(true);
-    if (!result.success) return;
-
-    expectPropsToInclude(result.data, [
-      { name: 'variant', type: 'string' },
-      { name: 'disabled', type: 'boolean' },
-    ]);
-  });
-});
-```
-
-### Generation Tests with Mock
-
-```typescript
-describe('MetaGenerator', () => {
-  it('produces metadata with all required fields', async () => {
-    const recordedResponse = await loadRecordedResponse('button');
-    const mockProvider = new MockLLMProvider({
-      defaultResponse: recordedResponse,
-    });
-    const generator = createMetaGenerator({ provider: mockProvider });
-
-    const extraction = await extractComponent({
-      /* ... */
-    });
-    const result = await generator.generate(extraction.data);
-
-    expect(result.success).toBe(true);
-    expect(result.data.description).toBeTruthy();
-    expect(Array.isArray(result.data.useCases)).toBe(true);
-  });
-});
-```
-
-### Full Pipeline Tests
-
-```typescript
-describe('ComponentProcessor', () => {
-  it('produces valid ComponentManifest from source code', async () => {
-    const recordedResponse = await loadRecordedResponse('button');
-    const processor = createComponentProcessor({
-      extractor: new HybridExtractor(),
-      generator: createMetaGenerator({
-        provider: new MockLLMProvider({ defaultResponse: recordedResponse }),
-      }),
-    });
-
-    const fixture = await loadFixture('shadcn', 'button');
-    const result = await processor.process({
-      /* ... */
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.data.name).toBe('Button');
-    expect(result.data.description).toBeTruthy();
-  });
-});
-```
-
-### AI Usability Tests
-
-```typescript
-describe('AI Usability', () => {
-  it('Button manifest enables correct JSX generation', async () => {
-    const result = await processor.process({
-      /* ... */
-    });
-
-    // AI needs these to generate correct code:
-    expect(result.data.name).toBe('Button'); // For import
-    expect(result.data.props.find((p) => p.name === 'variant')).toBeDefined();
-    expect(result.data.defaultVariants).toBeDefined(); // For defaults
-  });
-});
-```
-
-### Multi-Org Isolation Tests
-
-```typescript
-describe('Multi-Org Isolation', () => {
-  it('manifests include orgId in identity', async () => {
-    const result = await processor.process({
-      /* ... */
-      orgId: 'org-123',
-      libraryId: 'lib-456',
-    });
-
-    expect(result.data.identity.orgId).toBe('org-123');
-  });
-
-  it('rejects invalid orgId format', async () => {
-    await expect(
-      processor.process({
-        /* ... */
-        orgId: '', // Invalid
-      })
-    ).rejects.toThrow();
-  });
-});
-```
-
-## Error Testing
-
-### Auth Errors (Non-Retryable)
-
-```typescript
-it('returns failure with retryable=false for auth errors', async () => {
-  vi.spyOn(mockProvider, 'generateCompletion').mockRejectedValue(
-    new Error('401 Unauthorized')
-  );
-
-  const result = await generator.generate(extraction.data);
-
-  expect(result.success).toBe(false);
-  expect(result.error.retryable).toBe(false);
-});
-```
-
-### Rate Limit Errors (Retryable)
-
-```typescript
-it('returns failure with retryable=true for rate limit errors', async () => {
-  vi.spyOn(mockProvider, 'generateCompletion').mockRejectedValue(
-    new Error('429 Rate limit exceeded')
-  );
-
-  const result = await generator.generate(extraction.data);
-
-  expect(result.success).toBe(false);
-  expect(result.error.retryable).toBe(true);
-});
-```
-
-### Malformed JSON Response
-
-```typescript
-it('handles malformed JSON response gracefully', async () => {
-  mockProvider = new MockLLMProvider({
-    defaultResponse: {
-      text: 'This is not valid JSON {{{',
-      model: 'mock',
-      stopReason: 'end_turn',
-      usage: { inputTokens: 100, outputTokens: 50 },
-    },
-  });
-
-  const result = await generator.generate(extraction.data);
-  expect(result.success).toBe(false);
-});
+// Checks: id exists, name exists, props have types, sourceHash valid
 ```
 
 ## Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (mocked LLM tests + extraction)
 yarn test
+
+# Run real LLM tests (requires API key)
+ANTHROPIC_API_KEY=xxx yarn test test/integration/real-llm.test.ts
 
 # Run specific test file
 yarn test test/integration/extractor.test.ts
 
 # Watch mode
 yarn test --watch
-
-# Coverage (informational, not the goal)
-yarn test --coverage
-
-# Record new LLM responses
-ANTHROPIC_API_KEY=xxx npx tsx test/utils/response-recorder.ts button
 ```
 
-## What to Mock
+## When to Mock vs Real LLM
 
-| Mock This        | Don't Mock This     |
-| ---------------- | ------------------- |
-| LLM providers    | Extractor internals |
-| File system I/O  | Parser logic        |
-| Database queries | Business rules      |
-| Network requests | Validation logic    |
+| Scenario                        | Use Mock | Use Real LLM |
+| ------------------------------- | -------- | ------------ |
+| Testing error handling          | Yes      | No           |
+| Testing pipeline mechanics      | Yes      | No           |
+| Testing extraction              | N/A      | N/A          |
+| Testing output quality          | No       | Yes          |
+| Testing prompt effectiveness    | No       | Yes          |
+| Testing AI usability            | No       | Yes          |
+| Testing org isolation           | Yes      | No           |
+| CI pipeline (no API key)        | Yes      | Skip         |
+| Local development (has API key) | Both     | Both         |
 
 ## Do Not
 
+- Use mock tests to validate LLM output quality (they can't)
+- Skip real LLM tests because "they cost money" (they provide real value)
 - Mock internal extraction/generation logic
 - Use synthetic `foo`/`bar` test data
-- Skip org isolation tests
-- Use exact JSON equality for manifests (use partial matching)
-- Make tests depend on real LLM API calls
 - Focus on line coverage over result correctness
 - Commit `.skip` or `.only`

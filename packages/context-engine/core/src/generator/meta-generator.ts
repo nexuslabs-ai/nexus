@@ -3,8 +3,16 @@
  *
  * Orchestrates the generation of component metadata using an LLM provider.
  * Handles prompt construction, response parsing, and validation.
+ *
+ * Configuration is read from environment variables via the config module:
+ * - CONTEXT_ENGINE_GENERATION_MAX_TOKENS: Max tokens for generation
+ * - CONTEXT_ENGINE_MIN_SEMANTIC_DESC_LENGTH: Min semantic description length
+ * - CONTEXT_ENGINE_MAX_SEMANTIC_DESC_LENGTH: Max semantic description length
+ * - CONTEXT_ENGINE_MIN_DESC_LENGTH: Min description length
+ * - CONTEXT_ENGINE_MAX_DESC_LENGTH: Max description length
  */
 
+import { getGenerationConfig } from '../config/index.js';
 import type {
   AIContext,
   ComponentMeta,
@@ -29,23 +37,15 @@ import {
 const logger = createLogger({ name: 'meta-generator' });
 
 // =============================================================================
-// Constants
+// Configuration
 // =============================================================================
 
 /**
- * Default max tokens for meta generation
+ * Get generation configuration from environment
  */
-const DEFAULT_MAX_TOKENS = 2000;
-
-/**
- * Minimum semantic description length
- */
-const MIN_SEMANTIC_DESCRIPTION_LENGTH = 50;
-
-/**
- * Maximum semantic description length
- */
-const MAX_SEMANTIC_DESCRIPTION_LENGTH = 2000;
+function getConfig() {
+  return getGenerationConfig();
+}
 
 // =============================================================================
 // Response Parsing
@@ -185,6 +185,7 @@ function normalizeToAIContext(
   name: string,
   extracted: ExtractedData
 ): AIContext {
+  const config = getConfig();
   const defaultSemanticDescription = buildDefaultSemanticDescription(
     name,
     extracted
@@ -194,12 +195,12 @@ function normalizeToAIContext(
   let semanticDescription = normalizeString(
     parsed.semanticDescription,
     defaultSemanticDescription,
-    MIN_SEMANTIC_DESCRIPTION_LENGTH,
-    MAX_SEMANTIC_DESCRIPTION_LENGTH
+    config.minSemanticDescriptionLength,
+    config.maxSemanticDescriptionLength
   );
 
   // If still too short, use the fallback
-  if (semanticDescription.length < MIN_SEMANTIC_DESCRIPTION_LENGTH) {
+  if (semanticDescription.length < config.minSemanticDescriptionLength) {
     semanticDescription = defaultSemanticDescription;
   }
 
@@ -228,11 +229,12 @@ function normalizeToComponentMeta(
   name: string,
   extracted: ExtractedData
 ): ComponentMeta {
+  const config = getConfig();
   const description = normalizeString(
     parsed.description,
     `A ${name} component`,
-    10,
-    500
+    config.minDescriptionLength,
+    config.maxDescriptionLength
   );
 
   const tier = normalizeTier(parsed.tier);
@@ -301,8 +303,9 @@ export class MetaGenerator implements IMetaGenerator {
    * @param config - Configuration options
    */
   constructor(config: MetaGeneratorConfig = {}) {
+    const envConfig = getConfig();
     this.provider = config.provider ?? new AnthropicProvider();
-    this.maxTokens = config.maxTokens ?? DEFAULT_MAX_TOKENS;
+    this.maxTokens = config.maxTokens ?? envConfig.maxTokens;
 
     logger.debug('MetaGenerator initialized', {
       provider: this.provider.providerType,

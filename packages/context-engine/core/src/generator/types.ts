@@ -17,6 +17,7 @@ import { OutputType } from '../types/output.js';
  */
 export const LLMProviderType = {
   Anthropic: 'anthropic',
+  Gemini: 'gemini',
   OpenAI: 'openai',
   Mock: 'mock',
 } as const;
@@ -228,6 +229,14 @@ export interface LLMProviderConfig {
  */
 export interface AnthropicProviderConfig extends LLMProviderConfig {
   /** Model to use (defaults to claude-sonnet-4-20250514) */
+  model?: string;
+}
+
+/**
+ * Gemini-specific configuration
+ */
+export interface GeminiProviderConfig extends LLMProviderConfig {
+  /** Model to use (defaults to gemini-2.5-flash) */
   model?: string;
 }
 

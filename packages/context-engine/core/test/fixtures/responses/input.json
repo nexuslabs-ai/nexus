@@ -1,0 +1,17 @@
+{
+  "componentName": "Input",
+  "response": {
+    "text": "```json\n{\n  \"description\": \"A flexible text input component with various visual styles and optional icons.\",\n  \"semanticDescription\": \"The Input component provides a foundational element for user data entry in forms. It supports multiple visual variants like default, ghost, and filled, as well as different sizes (sm, default, lg) to match diverse design requirements. Users can also enhance the input with optional leading or trailing icons and indicate an error state for validation purposes, making it highly adaptable for various form contexts.\",\n  \"tier\": \"free\",\n  \"whenToUse\": \"When you need to capture user text input, numbers, or other short data strings. To create interactive form fields for user data entry. When requiring a visual cue for an input's state, such as error or disabled. To provide clear calls to action or information using leading/trailing icons.\",\n  \"whenNotToUse\": \"For large blocks of text, consider a TextArea component instead. When selecting multiple options from a predefined list, use a Select, RadioGroup, or CheckboxGroup. For complex data entry requiring specific formatting or multiple distinct fields (consider a specialized component or a combination of inputs).\",\n  \"patterns\": [\"input\", \"form-control\", \"primitive-based\"],\n  \"tokens\": [\n    \"color-primary\",\n    \"color-text\",\n    \"color-error\",\n    \"spacing-sm\",\n    \"spacing-md\",\n    \"spacing-lg\",\n    \"border-radius-md\",\n    \"typography-body\"\n  ],\n  \"examples\": [\n    \"<Input placeholder=\\\"Enter text here\\\" />\",\n    \"<Input variant=\\\"filled\\\" inputSize=\\\"lg\\\" placeholder=\\\"Search...\\\" />\",\n    \"<Input error startIcon={<Icon name=\\\"search\\\" />} placeholder=\\\"Search...\\\" />\",\n    \"<Input variant=\\\"ghost\\\" startIcon={<Icon name=\\\"user\\\" />} endIcon={<Icon name=\\\"email\\\" />} placeholder=\\\"Email\\\" />\"\n  ],\n  \"relatedComponents\": [\"Label\", \"Button\", \"FormGroup\", \"TextArea\", \"Select\", \"Icon\"],\n  \"a11yNotes\": \"Ensure all inputs have an associated `<label>` element for screen reader users, either visually or via `aria-label`/`aria-labelledby`. Provide clear error messages and use `aria-invalid` to indicate invalid states. Use appropriate `type` attributes (e.g., `type='email'`, `type='password'`, `type='number'`) for improved accessibility and mobile keyboard experiences. Ensure sufficient color contrast for text, borders, and error states.\"\n}\n```",
+    "usage": {
+      "inputTokens": 517,
+      "outputTokens": 556
+    },
+    "model": "gemini-2.5-flash",
+    "stopReason": "STOP"
+  },
+  "recordedAt": "2026-01-19T08:46:34.711Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "98e1996b2cc20127b468a2c7c1d01b9260b8d6ad882775a9e16034988194285e",
+  "promptSummary": "Generate metadata for Input component. Prompt: Generate metadata for this component:\n\n## Component\nName: Input\nFramework: react\n\nProps:\n- variant: 'default' | 'ghost' | 'filled' - Visual variant of the input. [default, ghost, filled]\n- inputSize: ..."
+}
