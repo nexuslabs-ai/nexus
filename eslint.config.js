@@ -192,6 +192,14 @@ export default tseslint.config(
     },
   },
 
+  // CLI package - allow console for user output
+  {
+    files: ['**/packages/cli/**/*.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
   // Disable rules that conflict with Prettier
   prettierConfig
 );
