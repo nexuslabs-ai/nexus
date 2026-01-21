@@ -142,14 +142,22 @@ className={cn(
 
 ### nx: Prefix Rule
 
-All Tailwind utilities must use `nx:` prefix. The prefix comes BEFORE pseudo-classes:
+All Tailwind utilities must use `nx:` prefix. The prefix comes BEFORE all modifiers (pseudo-classes, arbitrary selectors, responsive prefixes):
 
 | Pattern                                | Correct?            |
 | -------------------------------------- | ------------------- |
 | `nx:hover:bg-primary-background-hover` | Yes                 |
 | `hover:nx:bg-primary-background-hover` | No                  |
 | `nx:focus-visible:ring-2`              | Yes                 |
+| `nx:[&>svg]:text-foreground`           | Yes                 |
+| `[&>svg]:nx:text-foreground`           | No                  |
+| `nx:[&_p]:leading-relaxed`             | Yes                 |
+| `[&_p]:nx:leading-relaxed`             | No                  |
+| `nx:md:flex`                           | Yes                 |
+| `md:nx:flex`                           | No                  |
 | `bg-primary-background`                | No (missing prefix) |
+
+**Rule:** `nx:` always comes first, then any modifier (pseudo-class, arbitrary selector, responsive), then the utility.
 
 ### Semantic Token Paths
 
@@ -252,7 +260,7 @@ export * from '@/components/ui/new-component';
 Before submitting a component:
 
 - [ ] `nx:` prefix on all utility classes
-- [ ] Prefix before pseudo-classes (`nx:hover:`, not `hover:nx:`)
+- [ ] Prefix before ALL modifiers (`nx:hover:`, `nx:[&>svg]:`, `nx:md:` — not `hover:nx:`, `[&>svg]:nx:`)
 - [ ] Full semantic token paths (not incomplete like `nx:bg-primary`)
 - [ ] `data-slot` attribute present
 - [ ] Padding-based sizing (no fixed heights unless necessary)

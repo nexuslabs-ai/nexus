@@ -1732,13 +1732,27 @@
     "@vitest/mocker" "4.0.16"
     tinyrainbow "^3.0.3"
 
-"@vitest/browser@4.0.16", "@vitest/browser@^4.0.16":
+"@vitest/browser@4.0.16":
   version "4.0.16"
   resolved "https://registry.yarnpkg.com/@vitest/browser/-/browser-4.0.16.tgz#e243d6a3cda4fbf79fcc7187870746976e6e442d"
   integrity sha512-t4toy8X/YTnjYEPoY0pbDBg3EvDPg1elCDrfc+VupPHwoN/5/FNQ8Z+xBYIaEnOE2vVEyKwqYBzZ9h9rJtZVcg==
   dependencies:
     "@vitest/mocker" "4.0.16"
     "@vitest/utils" "4.0.16"
+    magic-string "^0.30.21"
+    pixelmatch "7.1.0"
+    pngjs "^7.0.0"
+    sirv "^3.0.2"
+    tinyrainbow "^3.0.3"
+    ws "^8.18.3"
+
+"@vitest/browser@4.0.17":
+  version "4.0.17"
+  resolved "https://registry.yarnpkg.com/@vitest/browser/-/browser-4.0.17.tgz#42eedfe6d2844f37dc60aa6481326edd1a2ffadd"
+  integrity sha512-cgf2JZk2fv5or3efmOrRJe1V9Md89BPgz4ntzbf84yAb+z2hW6niaGFinl9aFzPZ1q3TGfWZQWZ9gXTFThs2Qw==
+  dependencies:
+    "@vitest/mocker" "4.0.17"
+    "@vitest/utils" "4.0.17"
     magic-string "^0.30.21"
     pixelmatch "7.1.0"
     pngjs "^7.0.0"
