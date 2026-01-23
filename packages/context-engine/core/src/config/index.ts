@@ -25,17 +25,6 @@ function getEnv(key: string, defaultValue?: string): string | undefined {
 }
 
 /**
- * Get required environment variable
- */
-function getRequiredEnv(key: string): string {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-  return value;
-}
-
-/**
  * Get environment variable as number
  */
 function getEnvNumber(key: string, defaultValue: number): number {
@@ -248,61 +237,3 @@ export function getFeatureFlags(): FeatureFlags {
     debug: getEnvBoolean('CONTEXT_ENGINE_DEBUG', false),
   };
 }
-
-// =============================================================================
-// Combined Configuration
-// =============================================================================
-
-/**
- * Complete Context Engine configuration
- */
-export interface ContextEngineConfig {
-  llm: LLMConfig;
-  generation: GenerationConfig;
-  logger: LoggerEnvConfig;
-  features: FeatureFlags;
-}
-
-/**
- * Get complete configuration from environment
- *
- * @example
- * ```typescript
- * const config = getConfig();
- * console.log(config.llm.model); // 'claude-sonnet-4-20250514'
- * console.log(config.generation.maxTokens); // 2000
- * ```
- */
-export function getConfig(): ContextEngineConfig {
-  return {
-    llm: getLLMConfig(),
-    generation: getGenerationConfig(),
-    logger: getLoggerConfig(),
-    features: getFeatureFlags(),
-  };
-}
-
-// =============================================================================
-// Constants (Non-configurable)
-// =============================================================================
-
-/**
- * Constants that should not be configurable via environment
- * These are implementation details, not configuration
- */
-export const CONSTANTS = {
-  /** Supported frameworks */
-  SUPPORTED_FRAMEWORKS: ['react'] as const,
-
-  /** Default framework when not specified */
-  DEFAULT_FRAMEWORK: 'react' as const,
-
-  /** Manifest schema version */
-  MANIFEST_VERSION: '1.0.0' as const,
-} as const;
-
-// =============================================================================
-// Exports
-// =============================================================================
-
-export { getEnv, getEnvBoolean, getEnvNumber, getRequiredEnv };

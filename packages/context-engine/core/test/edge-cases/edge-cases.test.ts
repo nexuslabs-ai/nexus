@@ -18,10 +18,11 @@ import {
 } from '../../src/processor/index.js';
 import {
   createMockLLMProvider,
-  DEFAULT_MOCK_RESPONSE,
+  DEFAULT_MOCK_TOOL_RESPONSE,
   type MockLLMProvider,
 } from '../providers/mock-llm-provider.js';
 import {
+  countAllProps,
   expectExtractionSuccess,
   expectPropsToInclude,
 } from '../utils/assertion-helpers.js';
@@ -76,7 +77,7 @@ describe('Edge Cases', () => {
 
   beforeEach(() => {
     mockProvider = createMockLLMProvider({
-      defaultResponse: DEFAULT_MOCK_RESPONSE,
+      defaultResponse: DEFAULT_MOCK_TOOL_RESPONSE,
     });
     processor = createComponentProcessor({
       llmProvider: mockProvider,
@@ -175,7 +176,8 @@ describe('Edge Cases', () => {
         expect(isProcessorSuccess(result)).toBe(true);
         if (isProcessorSuccess(result)) {
           expect(result.manifest.name).toBe('List');
-          expect(result.manifest.props.length).toBeGreaterThan(0);
+          // v1.0 schema: props is CategorizedProps, use countAllProps
+          expect(countAllProps(result.manifest.props)).toBeGreaterThan(0);
         }
       }
     );

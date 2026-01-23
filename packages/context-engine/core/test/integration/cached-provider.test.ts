@@ -9,13 +9,17 @@ import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import type { ComponentMetaTool } from '../../src/generator/tool-schema.js';
 import {
   type CachedResponseRecord,
   createCachedProvider,
   createRecordingProvider,
   createValidatingProvider,
 } from '../providers/cached-llm-provider.js';
-import { MockLLMProvider } from '../providers/mock-llm-provider.js';
+import {
+  createMockLLMProvider,
+  DEFAULT_MOCK_TOOL_RESPONSE,
+} from '../providers/mock-llm-provider.js';
 import {
   getResponsesDir,
   getTestingMode,
@@ -44,14 +48,34 @@ describe('CachedLLMProvider', () => {
 
   describe('Playback Mode (default)', () => {
     it('returns cached response when available', async () => {
-      // Create a cached response first
+      // Create a cached response first with ComponentMetaTool format
+      const testResponse: ComponentMetaTool = {
+        description: 'Test component description',
+        semanticDescription: 'Detailed test component description',
+        tier: 'free',
+        minimalExample: '<TestComponent />',
+        examples: {
+          minimal: {
+            title: 'Basic',
+            code: '<TestComponent />',
+            description: 'Basic usage',
+          },
+          common: [],
+          advanced: [],
+        },
+        guidance: {
+          whenToUse: 'Use when testing',
+          whenNotToUse: 'Do not use in production',
+          accessibility: 'Accessible by default',
+          patterns: ['button'],
+          relatedComponents: [],
+        },
+        tokens: ['test-token'],
+      };
+
       const cachedRecord: CachedResponseRecord = {
         componentName: testComponentName,
-        response: {
-          text: '{"description":"Test component"}',
-          model: 'test-model',
-          stopReason: 'end_turn',
-        },
+        response: testResponse,
         recordedAt: new Date().toISOString(),
         provider: 'mock',
         model: 'test-model',
@@ -64,31 +88,36 @@ describe('CachedLLMProvider', () => {
       const provider = createCachedProvider();
       provider.reloadCache();
 
-      // Generate completion
+      // Generate with tool calling
       const prompt = `Generate metadata for ${testComponentName} component`;
-      const response = await provider.generateCompletion(prompt);
+      const result =
+        await provider.generateWithToolCalling<ComponentMetaTool>(prompt);
 
-      expect(response.text).toBe('{"description":"Test component"}');
-      expect(response.model).toBe('test-model');
+      expect(result.type).toBe('success');
+      if (result.type === 'success') {
+        expect(result.data.description).toBe('Test component description');
+        expect(result.model).toBe('test-model');
+      }
     });
 
-    it('throws error when no cached response and no fallback', async () => {
+    it('returns failure when no cached response and no fallback', async () => {
       const provider = createCachedProvider();
 
       const prompt = 'Generate metadata for NonExistentComponent component';
+      const result =
+        await provider.generateWithToolCalling<ComponentMetaTool>(prompt);
 
-      await expect(provider.generateCompletion(prompt)).rejects.toThrow(
-        /No cached response.*no realProvider/
-      );
+      expect(result.type).toBe('failure');
+      if (result.type === 'failure') {
+        expect(result.error).toMatch(
+          /No cached response.*no realProvider|no.*configured/i
+        );
+      }
     });
 
     it('falls back to real provider when available', async () => {
-      const mockProvider = new MockLLMProvider({
-        defaultResponse: {
-          text: '{"description":"Fallback response"}',
-          model: 'mock-model',
-          stopReason: 'end_turn',
-        },
+      const mockProvider = createMockLLMProvider({
+        defaultResponse: DEFAULT_MOCK_TOOL_RESPONSE,
       });
 
       const provider = createCachedProvider({
@@ -96,55 +125,79 @@ describe('CachedLLMProvider', () => {
       });
 
       const prompt = 'Generate metadata for NewComponent component';
-      const response = await provider.generateCompletion(prompt);
+      const result =
+        await provider.generateWithToolCalling<ComponentMetaTool>(prompt);
 
-      expect(response.text).toBe('{"description":"Fallback response"}');
-      expect(mockProvider.getCallCount()).toBe(1);
+      expect(result.type).toBe('success');
+      if (result.type === 'success') {
+        expect(result.data.description).toBeTruthy();
+        expect(mockProvider.getCallCount()).toBe(1);
+      }
     });
   });
 
   describe('Recording Mode', () => {
     it('saves responses to disk when recording', async () => {
-      const mockProvider = new MockLLMProvider({
-        defaultResponse: {
-          text: '{"description":"Recorded component"}',
-          model: 'mock-model',
-          stopReason: 'end_turn',
-        },
+      const mockProvider = createMockLLMProvider({
+        defaultResponse: DEFAULT_MOCK_TOOL_RESPONSE,
       });
 
       const provider = createRecordingProvider(mockProvider, getResponsesDir());
 
-      // Generate completion (should record)
+      // Generate with tool calling (should record)
       const prompt = `Generate metadata for ${testComponentName} component`;
-      const response = await provider.generateCompletion(prompt);
+      const result =
+        await provider.generateWithToolCalling<ComponentMetaTool>(prompt);
 
       // Verify response is correct
-      expect(response.text).toBe('{"description":"Recorded component"}');
+      expect(result.type).toBe('success');
+      if (result.type === 'success') {
+        expect(result.data.description).toBeTruthy();
+      }
 
       // Verify file was saved
       expect(existsSync(testFilePath)).toBe(true);
 
-      // Verify file content
-      const content = JSON.parse(readFileSync(testFilePath, 'utf-8'));
-      expect(content.componentName).toBe(testComponentName);
-      expect(content.response.text).toBe(
-        '{"description":"Recorded component"}'
+      // Verify file content - now uses ComponentMetaTool format directly
+      const content: CachedResponseRecord = JSON.parse(
+        readFileSync(testFilePath, 'utf-8')
       );
+      expect(content.componentName).toBe(testComponentName);
+      expect(content.response.description).toBeTruthy();
       expect(content.provider).toBe('mock');
     });
   });
 
   describe('Validation Mode', () => {
     it('calls validation callback with comparison results', async () => {
-      // Create a cached response first
+      // Create a cached response first with ComponentMetaTool format
+      const cachedResponse: ComponentMetaTool = {
+        description: 'Original test component',
+        semanticDescription: 'Detailed original test component',
+        tier: 'free',
+        minimalExample: '<TestComponent />',
+        examples: {
+          minimal: {
+            title: 'Basic',
+            code: '<TestComponent />',
+            description: 'Basic',
+          },
+          common: [],
+          advanced: [],
+        },
+        guidance: {
+          whenToUse: 'Use for testing',
+          whenNotToUse: 'Do not use in production',
+          accessibility: 'Accessible',
+          patterns: ['button'],
+          relatedComponents: [],
+        },
+        tokens: ['test-token'],
+      };
+
       const cachedRecord: CachedResponseRecord = {
         componentName: testComponentName,
-        response: {
-          text: '{"description":"Original test component","patterns":["test"]}',
-          model: 'test-model',
-          stopReason: 'end_turn',
-        },
+        response: cachedResponse,
         recordedAt: new Date().toISOString(),
         provider: 'mock',
         model: 'test-model',
@@ -154,11 +207,10 @@ describe('CachedLLMProvider', () => {
       writeFileSync(testFilePath, JSON.stringify(cachedRecord, null, 2));
 
       // Create mock provider that returns similar response
-      const mockProvider = new MockLLMProvider({
+      const mockProvider = createMockLLMProvider({
         defaultResponse: {
-          text: '{"description":"New test component response","patterns":["test","new"]}',
-          model: 'mock-model',
-          stopReason: 'end_turn',
+          ...DEFAULT_MOCK_TOOL_RESPONSE,
+          description: 'New test component response',
         },
       });
 
@@ -177,9 +229,9 @@ describe('CachedLLMProvider', () => {
       );
       provider.reloadCache();
 
-      // Generate completion (should validate)
+      // Generate with tool calling (should validate)
       const prompt = `Generate metadata for ${testComponentName} component`;
-      await provider.generateCompletion(prompt);
+      await provider.generateWithToolCalling<ComponentMetaTool>(prompt);
 
       // Verify validation was called
       expect(validationResults.length).toBe(1);
@@ -191,14 +243,34 @@ describe('CachedLLMProvider', () => {
     });
 
     it('detects structural differences', async () => {
-      // Create a cached response with arrays
+      // Create a cached response with many tokens
+      const cachedResponse: ComponentMetaTool = {
+        description: 'Test component',
+        semanticDescription: 'Detailed test',
+        tier: 'free',
+        minimalExample: '<TestComponent />',
+        examples: {
+          minimal: {
+            title: 'Basic',
+            code: '<TestComponent />',
+            description: 'Basic',
+          },
+          common: [],
+          advanced: [],
+        },
+        guidance: {
+          whenToUse: 'Use for testing',
+          whenNotToUse: 'Do not use',
+          accessibility: 'Accessible',
+          patterns: ['button'],
+          relatedComponents: [],
+        },
+        tokens: ['a', 'b', 'c', 'd', 'e'], // 5 tokens
+      };
+
       const cachedRecord: CachedResponseRecord = {
         componentName: testComponentName,
-        response: {
-          text: '{"description":"Test","patterns":["a","b","c","d","e"]}',
-          model: 'test-model',
-          stopReason: 'end_turn',
-        },
+        response: cachedResponse,
         recordedAt: new Date().toISOString(),
         provider: 'mock',
         model: 'test-model',
@@ -207,12 +279,12 @@ describe('CachedLLMProvider', () => {
       };
       writeFileSync(testFilePath, JSON.stringify(cachedRecord, null, 2));
 
-      // Create mock provider that returns very different response
-      const mockProvider = new MockLLMProvider({
+      // Create mock provider that returns response with different token count
+      const mockProvider = createMockLLMProvider({
         defaultResponse: {
-          text: '{"description":"Different","patterns":["x"]}',
-          model: 'mock-model',
-          stopReason: 'end_turn',
+          ...DEFAULT_MOCK_TOOL_RESPONSE,
+          description: 'Different component',
+          tokens: ['x'], // Only 1 token (diff of 4 > 2)
         },
       });
 
@@ -233,27 +305,23 @@ describe('CachedLLMProvider', () => {
       provider.reloadCache();
 
       const prompt = `Generate metadata for ${testComponentName} component`;
-      await provider.generateCompletion(prompt);
+      await provider.generateWithToolCalling<ComponentMetaTool>(prompt);
 
-      // Should detect difference in patterns array length (5 vs 1 = diff of 4 > 2)
+      // Should detect difference in tokens array length (5 vs 1 = diff of 4 > 2)
       expect(validationResult).not.toBeNull();
       expect(validationResult!.differences.length).toBeGreaterThan(0);
     });
   });
 
   describe('Component Name Extraction', () => {
-    it('extracts from "Component: Name" pattern', async () => {
+    it('identifies and lists cached components from response files', () => {
       const provider = createCachedProvider();
 
-      // Check that it can identify Button from the cached response
+      // Should detect Button from cached response
       expect(provider.hasCachedResponse('Button')).toBe(true);
-    });
 
-    it('lists available cached components', () => {
-      const provider = createCachedProvider();
+      // Should list Button in available components
       const components = provider.getCachedComponents();
-
-      // Should include Button from the existing fixture
       expect(components).toContain('Button');
     });
   });
@@ -284,28 +352,24 @@ describe('Response Recorder Utilities', () => {
     expect(['real', 'record', 'cached', 'validate']).toContain(mode);
   });
 
-  it('hasRecordedResponse returns true for Button', () => {
+  it('hasRecordedResponse detects existing and non-existing responses', () => {
+    // Case-insensitive detection for existing component
     expect(hasRecordedResponse('button')).toBe(true);
     expect(hasRecordedResponse('Button')).toBe(true);
-  });
 
-  it('hasRecordedResponse returns false for non-existent', () => {
+    // Non-existent component returns false
     expect(hasRecordedResponse('nonexistent-component')).toBe(false);
   });
 
-  it('loadRecordedResponse returns valid response for Button', () => {
+  it('loadRecordedResponse returns valid ComponentMetaTool for existing and throws for non-existent', () => {
+    // Load existing response - now returns ComponentMetaTool directly
     const response = loadRecordedResponse('button');
-
     expect(response).toBeDefined();
-    expect(response.text).toBeDefined();
-    expect(response.model).toBeDefined();
+    // New format: response is ComponentMetaTool directly
+    expect(response.description).toBeDefined();
+    expect(response.description.toLowerCase()).toContain('button');
 
-    // Should be parseable JSON
-    const parsed = JSON.parse(response.text);
-    expect(parsed.description).toBeDefined();
-  });
-
-  it('loadRecordedResponse throws for non-existent', () => {
+    // Non-existent throws
     expect(() => loadRecordedResponse('nonexistent')).toThrow();
   });
 });
@@ -315,13 +379,16 @@ describe('Integration with Existing Button Fixture', () => {
     const provider = createCachedProvider();
 
     const prompt = 'Generate metadata for Button component';
-    const response = await provider.generateCompletion(prompt);
+    const result =
+      await provider.generateWithToolCalling<ComponentMetaTool>(prompt);
 
     // Should return the cached Button response
-    expect(response.model).toContain('claude');
-
-    const parsed = JSON.parse(response.text);
-    expect(parsed.description.toLowerCase()).toContain('button');
-    expect(parsed.patterns).toContain('button');
+    expect(result.type).toBe('success');
+    if (result.type === 'success') {
+      expect(result.model).toBeTruthy();
+      // New format: data is ComponentMetaTool directly
+      expect(result.data.description.toLowerCase()).toContain('button');
+      expect(result.data.guidance.patterns).toContain('button');
+    }
   });
 });

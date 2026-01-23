@@ -32,7 +32,7 @@ import {
 import {
   createMockLLMProvider,
   createRateLimitedProvider,
-  DEFAULT_MOCK_RESPONSE,
+  DEFAULT_MOCK_TOOL_RESPONSE,
   type MockLLMProvider,
 } from '../providers/mock-llm-provider.js';
 import {
@@ -47,7 +47,7 @@ describe('MetaGenerator - Error Handling', () => {
 
   beforeEach(() => {
     mockProvider = createMockLLMProvider({
-      defaultResponse: DEFAULT_MOCK_RESPONSE,
+      defaultResponse: DEFAULT_MOCK_TOOL_RESPONSE,
     });
     generator = createMetaGenerator({ provider: mockProvider });
   });
@@ -74,9 +74,8 @@ describe('MetaGenerator - Error Handling', () => {
 
   describe('authentication errors (non-retryable)', () => {
     it('returns failure with retryable=false for 401 errors', async () => {
-      const error = new Error('401 Unauthorized');
-      (error as Error & { status: number }).status = 401;
-      mockProvider.setError(error);
+      // With tool calling, errors are returned as ToolCallResult failures
+      mockProvider.setError('401 Unauthorized', false);
 
       const input = await getExtractionForTests();
       const result = await generator.generate(input);
@@ -99,7 +98,8 @@ describe('MetaGenerator - Error Handling', () => {
 
       expectGeneratorFailure(result);
       if (isGeneratorFailure(result)) {
-        expect(result.error).toContain('429');
+        // Rate limit error from mock provider
+        expect(result.error.toLowerCase()).toContain('rate limit');
         expect(result.retryable).toBe(true);
       }
     });
@@ -107,30 +107,28 @@ describe('MetaGenerator - Error Handling', () => {
 
   describe('malformed response handling', () => {
     it('handles completely invalid JSON gracefully', async () => {
+      // With tool calling, we simulate validation failures by providing
+      // an incomplete/invalid tool response
       mockProvider.setDefaultResponse({
-        text: 'This is not valid JSON {{{',
-        model: 'mock',
-        stopReason: 'end_turn',
-        usage: { inputTokens: 100, outputTokens: 50 },
-      });
+        // Missing required fields - will fail schema validation
+        description: 'A button',
+        tier: 'free',
+        // Missing: semanticDescription, minimalExample, examples, guidance, tokens
+      } as never);
 
       const input = await getExtractionForTests();
       const result = await generator.generate(input);
 
       expectGeneratorFailure(result);
       if (isGeneratorFailure(result)) {
-        expect(result.error).toContain('JSON');
-        expect(result.retryable).toBe(false); // JSON parse errors are not retryable
+        expect(result.error.toLowerCase()).toContain('validation');
+        expect(result.retryable).toBe(false); // Validation errors are not retryable
       }
     });
 
     it('handles empty response gracefully', async () => {
-      mockProvider.setDefaultResponse({
-        text: '',
-        model: 'mock',
-        stopReason: 'end_turn',
-        usage: { inputTokens: 100, outputTokens: 0 },
-      });
+      // Simulate empty tool call result by returning failure
+      mockProvider.setError('Empty response', false);
 
       const input = await getExtractionForTests();
       const result = await generator.generate(input);
@@ -139,12 +137,13 @@ describe('MetaGenerator - Error Handling', () => {
     });
 
     it('handles partial JSON response', async () => {
+      // With tool calling, partial responses are handled by the schema validation
       mockProvider.setDefaultResponse({
-        text: '{"description": "A button", "tier": "free"', // Missing closing brace
-        model: 'mock',
-        stopReason: 'end_turn',
-        usage: { inputTokens: 100, outputTokens: 50 },
-      });
+        description: 'A button',
+        tier: 'free',
+        minimalExample: '<Button>Click</Button>',
+        // Missing: semanticDescription, examples, guidance, tokens
+      } as never);
 
       const input = await getExtractionForTests();
       const result = await generator.generate(input);
@@ -153,37 +152,35 @@ describe('MetaGenerator - Error Handling', () => {
     });
 
     it('handles JSON with wrong structure', async () => {
+      // Provide completely wrong structure - should fail validation
       mockProvider.setDefaultResponse({
-        text: JSON.stringify({ foo: 'bar', baz: 123 }), // Valid JSON, wrong structure
-        model: 'mock',
-        stopReason: 'end_turn',
-        usage: { inputTokens: 100, outputTokens: 50 },
-      });
+        foo: 'bar',
+        baz: 123,
+      } as never);
 
       const input = await getExtractionForTests();
       const result = await generator.generate(input);
 
-      // May succeed with defaults or fail validation - either is acceptable
-      // The key is it doesn't crash
-      expect(result.type).toBeDefined();
+      // Should fail validation due to wrong structure
+      expectGeneratorFailure(result);
     });
   });
 
   describe('service errors', () => {
     it('handles generic LLM service error', async () => {
-      mockProvider.setError(new Error('LLM service unavailable'));
+      mockProvider.setError('LLM service unavailable', false);
 
       const input = await getExtractionForTests();
       const result = await generator.generate(input);
 
       expectGeneratorFailure(result);
       if (isGeneratorFailure(result)) {
-        expect(result.error).toContain('LLM');
+        expect(result.error.toLowerCase()).toContain('llm');
       }
     });
 
     it('handles timeout errors', async () => {
-      mockProvider.setError(new Error('Request timed out'));
+      mockProvider.setError('Request timed out', true);
 
       const input = await getExtractionForTests();
       const result = await generator.generate(input);

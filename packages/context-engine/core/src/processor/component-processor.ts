@@ -16,7 +16,6 @@ import {
   type ExtractionOutput,
   type ExtractorResult,
   getExtractor,
-  isExtractionConflict,
   isExtractionFailure,
   isExtractionSuccess,
 } from '../extractor/index.js';
@@ -250,18 +249,6 @@ export class ComponentProcessor {
     });
 
     const extractionResult = await this.runExtraction(input, framework);
-
-    if (isExtractionConflict(extractionResult.output)) {
-      const conflict = extractionResult.output;
-      const failure: ExtractOnlyFailure = {
-        type: ProcessorOutputType.Failure,
-        error: conflict.message,
-        code: ProcessorErrorCode.SourceConflict,
-        sourceHash: conflict.currentHash,
-        retryable: false,
-      };
-      return failure;
-    }
 
     if (isExtractionFailure(extractionResult.output)) {
       const failure: ExtractOnlyFailure = {
@@ -528,7 +515,6 @@ export class ComponentProcessor {
       framework,
       filePath: input.filePath,
       existingId: input.existingId,
-      expectedHash: input.expectedHash,
     };
 
     try {
@@ -627,21 +613,6 @@ export class ComponentProcessor {
     startTime: number
   ): ProcessorFailure {
     const totalTimeMs = Math.round(performance.now() - startTime);
-
-    if (isExtractionConflict(output)) {
-      logger.warn('Extraction conflict detected', {
-        expectedHash: output.expectedHash,
-        currentHash: output.currentHash,
-      });
-
-      return {
-        type: ProcessorOutputType.Failure,
-        error: output.message,
-        code: ProcessorErrorCode.SourceConflict,
-        metrics: { extractionTimeMs, totalTimeMs },
-        retryable: false,
-      };
-    }
 
     // ExtractionFailure - use type guard to narrow
     if (isExtractionFailure(output)) {

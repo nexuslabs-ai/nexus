@@ -1,0 +1,141 @@
+{
+  "componentName": "Badge",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "b558ff5e-95a4-4eba-a645-7b6d2aaa0485",
+    "slug": "badge-react-b558ff5e",
+    "name": "Badge",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A small, visual indicator component used to highlight status, count, or category for UI elements.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Badge } from '@nexus/react'",
+      "typeOnly": "import type { BadgeProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Badge>Content</Badge>",
+    "props": {
+      "variants": [],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, renders as child element using Radix Slot.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ]
+    },
+    "variants": {
+      "variant": {
+        "values": [
+          "default",
+          "secondary",
+          "destructive",
+          "outline",
+          "success",
+          "warning"
+        ],
+        "default": "default"
+      }
+    },
+    "examples": {
+      "minimal": {
+        "title": "Basic",
+        "code": "<Badge>New</Badge>",
+        "isPrimary": true
+      },
+      "common": [
+        {
+          "title": "Secondary variant",
+          "code": "<Badge variant=\"secondary\">Archived</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Destructive variant",
+          "code": "<Badge variant=\"destructive\">Error</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Success variant",
+          "code": "<Badge variant=\"success\">Success</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Composition pattern",
+          "code": "<Button><Badge asChild><span>99+</span></Badge></Button>"
+        },
+        {
+          "title": "Default variant",
+          "code": "<a href=\"#\" class=\"nav-item\">Inbox <Badge variant=\"default\">7</Badge></a>",
+          "propsUsed": ["href", "class", "variant"]
+        },
+        {
+          "title": "Outline variant",
+          "code": "<Badge variant=\"outline\">Category: Design</Badge>",
+          "propsUsed": ["variant", "Design"]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Badge component to draw attention to new items, important statuses, counts, or categories. It's ideal for non-interactive visual indicators that supplement other UI elements.",
+      "whenNotToUse": "Do not use Badge for interactive elements like buttons, links, or tags that require click events or user input. Instead, use components like Button, Link, or a dedicated Tag component if interactivity is needed.",
+      "accessibility": "Badges are primarily visual indicators. Ensure that the information conveyed by a badge is also available through other accessible means for screen reader users, especially if it represents dynamic content (e.g., 'unread count'). Use appropriate ARIA attributes on the parent element if the badge content changes dynamically and is critical for understanding the parent's state (e.g., `aria-live` regions for status updates).",
+      "patterns": ["data-display", "composition"],
+      "relatedComponents": ["Button", "Alert", "Tag"]
+    },
+    "semanticDescription": "The Badge component is a small, inline UI element designed to visually highlight metadata, status, or numerical counts. It is a versatile primitive for drawing attention to specific information without being interactive itself. Key features include multiple `variant` options (default, secondary, destructive, outline, success, warning) to convey different semantic meanings through color and styling, and an `asChild` prop for seamless integration as a child of other components using Radix Slot for maximum flexibility. Common use cases include displaying unread message counts, indicating item status (e.g., 'New', 'Pending', 'Error'), categorizing items (e.g., 'Featured', 'Hot'), or marking promotions. It's often paired with other components like buttons, lists, or avatars.",
+    "tokens": [
+      "color-primary",
+      "color-secondary",
+      "color-destructive",
+      "color-success",
+      "color-warning",
+      "background-color",
+      "text-color",
+      "border-radius",
+      "padding-x",
+      "padding-y",
+      "font-size-sm",
+      "line-height-none"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/context-engine/core/test/fixtures/components/shadcn/badge.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-slot": "*",
+        "class-variance-authority": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Slot"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-23T06:13:33.646Z",
+    "updatedAt": "2026-01-23T06:13:33.646Z",
+    "sourceHash": "88740ce62d569d74f16b8aaa385551d96ab0ff9d9cc1d387fb0bfb7a8b6a9c15",
+    "metaHash": "71c2b1a8712b697bbce82ce73a12071a076239c4e6030e01997e156998866bba"
+  },
+  "recordedAt": "2026-01-23T06:13:33.646Z",
+  "fixtureSource": "shadcn/badge"
+}

@@ -1,17 +1,82 @@
 {
   "componentName": "Badge",
   "response": {
-    "text": "```json\n{\n  \"description\": \"A small, customizable label for displaying short, non-interactive information or status.\",\n  \"semanticDescription\": \"The Badge component is a versatile UI element designed to display concise, non-interactive information or status indicators. It offers multiple predefined visual variants like `default`, `secondary`, `destructive`, `outline`, `success`, and `warning` to convey different semantic meanings effectively. Built on Radix UI's `Slot` primitive via the `asChild` prop, it ensures high composability, allowing it to seamlessly render as a child of another element while inheriting its structure. This makes it ideal for tagging, categorizing, or highlighting specific data points within applications.\",\n  \"tier\": \"free\",\n  \"whenToUse\": \"Use a Badge to indicate a status (e.g., 'Active', 'Pending'), categorize items (e.g., 'New', 'React'), display counts (e.g., '3 New'), or highlight brief, non-interactive information. They are excellent for enhancing visual clarity and providing quick context.\",\n  \"whenNotToUse\": \"Do not use Badges for interactive elements such as buttons, links, or primary calls to action. Avoid using them to display large amounts of text or for complex data visualizations. If the information requires user interaction or is too lengthy, consider using a `Tag`, `Button`, or a dedicated data display component instead.\",\n  \"patterns\": [\n    \"data-display\",\n    \"primitive-based\",\n    \"composition\",\n    \"feedback\"\n  ],\n  \"tokens\": [\n    \"color-background-badge-default\",\n    \"color-text-badge-default\",\n    \"color-background-badge-secondary\",\n    \"color-text-badge-secondary\",\n    \"color-background-badge-destructive\",\n    \"color-text-badge-destructive\",\n    \"color-background-badge-outline\",\n    \"color-text-badge-outline\",\n    \"color-border-badge-outline\",\n    \"color-background-badge-success\",\n    \"color-text-badge-success\",\n    \"color-background-badge-warning\",\n    \"color-text-badge-warning\",\n    \"spacing-xxs\",\n    \"spacing-xs\",\n    \"typography-sm\",\n    \"font-weight-medium\",\n    \"border-radius-full\"\n  ],\n  \"examples\": [\n    \"<Badge>New Feature</Badge>\",\n    \"<Badge variant=\\\"success\\\">Active</Badge>\",\n    \"<Badge variant=\\\"destructive\\\">Error</Badge>\",\n    \"<Badge asChild><p className=\\\"inline-block\\\"><span>Draft</span></p></Badge>\"\n  ],\n  \"relatedComponents\": [\n    \"Button\",\n    \"Tag\",\n    \"Avatar\",\n    \"Alert\",\n    \"Card\"\n  ],\n  \"a11yNotes\": \"Badges are typically non-interactive. Ensure sufficient color contrast for all variants against their background, especially for text within the badge. If a badge conveys critical status, ensure this information is also available through contextual text or ARIA attributes to assistive technologies, particularly if it's dynamic.\"\n}\n```",
-    "usage": {
-      "inputTokens": 482,
-      "outputTokens": 693
+    "semanticDescription": "The Badge component is a small, inline UI element designed to visually highlight metadata, status, or numerical counts. It is a versatile primitive for drawing attention to specific information without being interactive itself. Key features include multiple `variant` options (default, secondary, destructive, outline, success, warning) to convey different semantic meanings through color and styling, and an `asChild` prop for seamless integration as a child of other components using Radix Slot for maximum flexibility. Common use cases include displaying unread message counts, indicating item status (e.g., 'New', 'Pending', 'Error'), categorizing items (e.g., 'Featured', 'Hot'), or marking promotions. It's often paired with other components like buttons, lists, or avatars.",
+    "minimalExample": "<Badge>New</Badge>",
+    "guidance": {
+      "patterns": ["data-display", "composition"],
+      "whenToUse": "Use the Badge component to draw attention to new items, important statuses, counts, or categories. It's ideal for non-interactive visual indicators that supplement other UI elements.",
+      "accessibility": "Badges are primarily visual indicators. Ensure that the information conveyed by a badge is also available through other accessible means for screen reader users, especially if it represents dynamic content (e.g., 'unread count'). Use appropriate ARIA attributes on the parent element if the badge content changes dynamically and is critical for understanding the parent's state (e.g., `aria-live` regions for status updates).",
+      "relatedComponents": ["Button", "Alert", "Tag"],
+      "whenNotToUse": "Do not use Badge for interactive elements like buttons, links, or tags that require click events or user input. Instead, use components like Button, Link, or a dedicated Tag component if interactivity is needed."
     },
-    "model": "gemini-2.5-flash",
-    "stopReason": "STOP"
+    "tokens": [
+      "color-primary",
+      "color-secondary",
+      "color-destructive",
+      "color-success",
+      "color-warning",
+      "background-color",
+      "text-color",
+      "border-radius",
+      "padding-x",
+      "padding-y",
+      "font-size-sm",
+      "line-height-none"
+    ],
+    "examples": {
+      "advanced": [
+        {
+          "code": "<a href=\"#\" class=\"nav-item\">Inbox <Badge variant=\"default\">7</Badge></a>",
+          "description": "Integrating a badge within a navigation link to show unread counts.",
+          "propsUsed": ["variant"],
+          "title": "Badge within a navigation item"
+        },
+        {
+          "description": "Using an outline badge to display a category tag.",
+          "code": "<Badge variant=\"outline\">Category: Design</Badge>",
+          "title": "Outline Badge for category",
+          "propsUsed": ["variant"]
+        }
+      ],
+      "common": [
+        {
+          "code": "<Badge variant=\"secondary\">Archived</Badge>",
+          "propsUsed": ["variant"],
+          "description": "Using the secondary variant for a different visual emphasis.",
+          "title": "Secondary Variant"
+        },
+        {
+          "title": "Destructive Variant",
+          "propsUsed": ["variant"],
+          "code": "<Badge variant=\"destructive\">Error</Badge>",
+          "description": "Using the destructive variant to indicate a negative status."
+        },
+        {
+          "code": "<Badge variant=\"success\">Success</Badge>",
+          "propsUsed": ["variant"],
+          "description": "Using the success variant to indicate a positive status.",
+          "title": "Success Variant"
+        },
+        {
+          "description": "Renders the badge content as a child of another component, using Radix Slot.",
+          "code": "<Button><Badge asChild><span>99+</span></Badge></Button>",
+          "title": "Badge as a child",
+          "propsUsed": ["asChild"]
+        }
+      ],
+      "minimal": {
+        "code": "<Badge>New</Badge>",
+        "description": "The simplest usage of the Badge component.",
+        "title": "Basic Badge"
+      }
+    },
+    "tier": "free",
+    "description": "A small, visual indicator component used to highlight status, count, or category for UI elements."
   },
-  "recordedAt": "2026-01-19T08:45:52.130Z",
+  "recordedAt": "2026-01-23T06:09:20.350Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "ffa20d97ea8036fc768875bffdeaae5d73afec7c8d22502ba8273291d757a431",
-  "promptSummary": "Generate metadata for Badge component. Prompt: Generate metadata for this component:\n\n## Component\nName: Badge\nFramework: react\n\nProps:\n- asChild: boolean - When true, renders as child element using Radix Slot.\n\nVariants (CVA):\n- variant: default,..."
+  "inputHash": "d4ae4850e6a00ddf29126b6448737e1c6d76b6017c005d84f2c2e94919ee1a24",
+  "promptSummary": "Generate metadata for Badge component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Badge\n\nProps:\n- asChild: boolean - When true, renders as child element using Radix Slot.\n\n..."
 }

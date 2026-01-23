@@ -35,7 +35,6 @@ export type ExtractorMethod =
 export const ExtractionOutputType = {
   Success: 'success',
   Failure: 'failure',
-  Conflict: 'conflict',
 } as const;
 
 export type ExtractionOutputType =
@@ -64,9 +63,6 @@ export const ExtractionInputSchema = z.object({
 
   /** Existing component ID (for updates) */
   existingId: z.uuid().optional(),
-
-  /** Expected source hash for optimistic locking */
-  expectedHash: z.string().optional(),
 });
 
 export type ExtractionInput = z.infer<typeof ExtractionInputSchema>;
@@ -123,27 +119,7 @@ export interface ExtractionFailure {
   extractionTimeMs: number;
 }
 
-/**
- * Conflict result for optimistic locking
- */
-export interface ExtractionConflict {
-  /** Discriminant for type narrowing */
-  type: typeof ExtractionOutputType.Conflict;
-
-  /** Expected hash from client */
-  expectedHash: string;
-
-  /** Current hash in database */
-  currentHash: string;
-
-  /** Human-readable conflict message */
-  message: string;
-}
-
-export type ExtractionOutput =
-  | ExtractorResult
-  | ExtractionFailure
-  | ExtractionConflict;
+export type ExtractionOutput = ExtractorResult | ExtractionFailure;
 
 /**
  * Props extraction result (from a single extractor)
@@ -209,15 +185,6 @@ export function isExtractionSuccess(
   output: ExtractionOutput
 ): output is ExtractorResult {
   return output.type === ExtractionOutputType.Success;
-}
-
-/**
- * Check if an extraction output is a conflict
- */
-export function isExtractionConflict(
-  output: ExtractionOutput
-): output is ExtractionConflict {
-  return output.type === ExtractionOutputType.Conflict;
 }
 
 /**

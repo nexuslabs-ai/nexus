@@ -1,17 +1,65 @@
 {
   "componentName": "Card",
   "response": {
-    "text": "```json\n{\n  \"description\": \"A versatile container for grouping related content with customizable visual emphasis.\",\n  \"semanticDescription\": \"The Card component serves as a flexible container to group related content and actions, visually distinguishing them from the surrounding layout. It provides options for various levels of visual emphasis through its `elevation` prop, allowing it to appear `default`, `raised`, or `flat`. This component is fundamental for organizing information into distinct, digestible blocks within an application's user interface, enhancing readability and visual hierarchy.\",\n  \"tier\": \"free\",\n  \"whenToUse\": \"Use Card to group related content or actions, such as user profiles, product listings, or news articles. It's ideal for breaking down complex UIs into digestible sections, making content easier to scan and understand. Employ different `elevation` levels to convey hierarchy or interactivity within your application.\",\n  \"whenNotToUse\": \"Avoid using Card for purely decorative purposes or when a simpler container like a `Box` or `div` would suffice without the need for visual separation or elevation. Do not use Cards as a substitute for semantic HTML elements like `article` or `section` unless it aligns with the component's styling and interaction needs.\",\n  \"patterns\": [\"container\", \"data-display\", \"layout\", \"composition\"],\n  \"tokens\": [\"color-background-surface\", \"spacing-md\", \"border-radius-sm\", \"shadow-sm\"],\n  \"examples\": [\n    \"<Card>This is a default card with some content.</Card>\",\n    \"<Card elevation=\\\"raised\\\">This card has a raised appearance, often used for interactive or primary elements.</Card>\",\n    \"<Card elevation=\\\"flat\\\">This card has a flat appearance, blending more with the background.</Card>\",\n    \"<Card><h3>Product Title</h3><p>Description of the product.</p><Button>View Details</Button></Card>\"\n  ],\n  \"relatedComponents\": [\"Box\", \"Button\", \"Text\", \"Image\"],\n  \"a11yNotes\": \"Ensure the content within the Card maintains a logical reading order. If the Card itself is interactive (e.g., a clickable link or button), ensure it is focusable and has an appropriate ARIA role (e.g., `role=\\\"link\\\"`, `role=\\\"button\\\"`) and an accessible name. For purely visual grouping, no specific ARIA roles are usually required for the Card element itself.\"\n}\n```",
-    "usage": {
-      "inputTokens": 424,
-      "outputTokens": 518
+    "description": "A versatile container component used to group related content and actions, providing visual hierarchy.",
+    "guidance": {
+      "relatedComponents": ["Button", "Image", "Text", "List"],
+      "whenNotToUse": "Avoid using cards for purely decorative purposes or when a simpler container (like a div with styling) would suffice. Do not use cards for content that is not logically grouped or when content needs to span the full width of its parent without visual separation. Alternatives: Box component, div.",
+      "patterns": ["container", "data-display", "composition", "layout"],
+      "whenToUse": "Use cards to group related content and actions into a visually distinct, digestible unit. Ideal for displaying heterogeneous content like product listings, news articles, user profiles, or dashboard widgets, providing clear separation and hierarchy.",
+      "accessibility": "Ensure all interactive elements within a card have appropriate ARIA attributes and keyboard navigation. If the card itself is clickable, ensure it's focusable and has an appropriate role (e.g., role='button', role='link', or role='option'). Provide meaningful alt text for images. Maintain sufficient contrast for text."
     },
-    "model": "gemini-2.5-flash",
-    "stopReason": "STOP"
+    "semanticDescription": "The Card component is a versatile UI container designed to present content and actions in a visually distinct and organized manner. It serves as a flexible surface to group related information, making complex interfaces easier to scan and understand. Key features include configurable visual emphasis via the `elevation` prop, which can be `default`, `raised`, or `flat`, allowing designers to control the perceived depth and importance of the content within. Cards are commonly used for a wide range of applications such as displaying individual items in a list (e.g., product cards, blog post previews), organizing dashboard widgets, showcasing user profiles, or encapsulating form sections. Its primary purpose is to create clear visual boundaries around chunks of information, improving readability and user experience by breaking down large amounts of content into manageable units. It supports composition, allowing various child components like headings, paragraphs, images, buttons, and links to be nested within it.",
+    "examples": {
+      "advanced": [
+        {
+          "propsUsed": ["elevation"],
+          "code": "<Card onClick={() => alert(\"Card clicked!\")} style={{ cursor: 'pointer' }} elevation=\"raised\"><h3>Clickable Widget</h3><p>This card can be interacted with.</p></Card>",
+          "title": "Interactive Card with Click Handler",
+          "description": "A card configured to respond to click events, often used for dashboard widgets or selectable items."
+        }
+      ],
+      "common": [
+        {
+          "title": "Raised Card",
+          "propsUsed": ["elevation"],
+          "description": "A card with a 'raised' elevation to emphasize its content.",
+          "code": "<Card elevation=\"raised\"><h3>Card Title</h3><p>Some important information.</p><button>Action</button></Card>"
+        },
+        {
+          "propsUsed": ["elevation"],
+          "code": "<Card elevation=\"flat\">A less prominent card.</Card>",
+          "description": "A card with a 'flat' elevation for subtle grouping.",
+          "title": "Flat Card"
+        },
+        {
+          "propsUsed": [],
+          "description": "Demonstrates how to compose various elements within a card.",
+          "code": "<Card><img src=\"image.jpg\" alt=\"Description\" /><p>Product details.</p><button>View More</button></Card>",
+          "title": "Card with Image and Text"
+        }
+      ],
+      "minimal": {
+        "title": "Basic Card",
+        "propsUsed": [],
+        "description": "A simple card with default elevation and content.",
+        "code": "<Card>This is a basic card.</Card>"
+      }
+    },
+    "tier": "free",
+    "tokens": [
+      "color-surface",
+      "shadow-default",
+      "shadow-raised",
+      "shadow-flat",
+      "spacing-md",
+      "border-radius-md"
+    ],
+    "minimalExample": "<Card>Content</Card>"
   },
-  "recordedAt": "2026-01-19T08:46:05.912Z",
+  "recordedAt": "2026-01-23T06:09:57.070Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "c0e2851b65532ed469187ae05d4e9fcaddcbf2095b91b600f13d1911fc934ce3",
-  "promptSummary": "Generate metadata for Card component. Prompt: Generate metadata for this component:\n\n## Component\nName: Card\nFramework: react\n\nProps:\n- elevation: enum - Visual emphasis level of the card. [default, raised, flat]\n\n## Output Format\n\nReturn a JSON ..."
+  "inputHash": "77afbee45d28c8d724db312ceba2a36d3cbe6d74be36baa994e81a429d8d9f6e",
+  "promptSummary": "Generate metadata for Card component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Card\n\nProps:\n- elevation: enum - Visual emphasis level of the card. [default, raised, flat..."
 }

@@ -13,10 +13,9 @@ import { basename, join, resolve } from 'node:path';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createAnthropicProvider } from '../src/generator/anthropic-provider.js';
-import { createGeminiProvider } from '../src/generator/gemini-provider.js';
 import type { ILLMProvider } from '../src/generator/types.js';
 import { createComponentProcessor } from '../src/processor/component-processor.js';
+import { createProviderFromEnv } from '../src/utils/env-provider.js';
 import { CachedLLMProvider } from '../test/providers/cached-llm-provider.js';
 
 // Load .env.test from parent directory
@@ -32,21 +31,6 @@ const DELAY_MS = 5000;
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function getProvider(): ILLMProvider {
-  const googleKey = process.env.GOOGLE_API_KEY;
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
-
-  if (googleKey) {
-    console.log('Using Gemini provider');
-    return createGeminiProvider({ apiKey: googleKey });
-  }
-  if (anthropicKey) {
-    console.log('Using Anthropic provider');
-    return createAnthropicProvider({ apiKey: anthropicKey });
-  }
-  throw new Error('No API key found. Set GOOGLE_API_KEY or ANTHROPIC_API_KEY');
 }
 
 function getComponentFixtures(): string[] {
@@ -118,7 +102,8 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const specificComponent = args[0];
 
-  const provider = getProvider();
+  const provider = createProviderFromEnv();
+  console.log(`Using ${provider.providerType} provider`);
 
   let components: string[];
 

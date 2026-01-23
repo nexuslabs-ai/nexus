@@ -12,6 +12,14 @@
  *
  * Philosophy: Processor tests validate the pipeline MECHANICS.
  * Real LLM tests validate the output QUALITY.
+ *
+ * ## Manifest Recording
+ *
+ * To record complete manifests for documentation/examples, use the standalone script:
+ *
+ * ```bash
+ * yarn record:manifests
+ * ```
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -26,10 +34,11 @@ import {
 } from '../../src/processor/index.js';
 import {
   createMockLLMProvider,
-  DEFAULT_MOCK_RESPONSE,
+  DEFAULT_MOCK_TOOL_RESPONSE,
   type MockLLMProvider,
 } from '../providers/mock-llm-provider.js';
 import {
+  countAllProps,
   expectManifestAIReady,
   expectProcessorFailure,
   expectProcessorSuccess,
@@ -44,7 +53,7 @@ describe('ComponentProcessor', () => {
 
   beforeEach(() => {
     mockProvider = createMockLLMProvider({
-      defaultResponse: DEFAULT_MOCK_RESPONSE,
+      defaultResponse: DEFAULT_MOCK_TOOL_RESPONSE,
     });
     processor = createComponentProcessor({
       llmProvider: mockProvider,
@@ -73,7 +82,8 @@ describe('ComponentProcessor', () => {
         expect(result.generationSkipped).toBe(true);
         expect(mockProvider.getCallCount()).toBe(0); // No LLM calls
         expect(result.manifest.name).toBe('Button');
-        expect(result.manifest.props.length).toBeGreaterThan(0);
+        // Props is now CategorizedProps object, not array
+        expect(countAllProps(result.manifest.props)).toBeGreaterThan(0);
       }
     });
 
@@ -96,9 +106,10 @@ describe('ComponentProcessor', () => {
       expect(isProcessorSuccess(result)).toBe(true);
       if (isProcessorSuccess(result)) {
         // Variants come from extraction, not generation
+        // v1.0 schema: variants is CvaVariants with values and default
         expect(result.manifest.variants).toBeDefined();
-        expect(result.manifest.variants?.variant).toContain('default');
-        expect(result.manifest.defaultVariants?.variant).toBe('default');
+        expect(result.manifest.variants?.variant?.values).toContain('default');
+        expect(result.manifest.variants?.variant?.default).toBe('default');
       }
     });
   });
@@ -214,7 +225,7 @@ describe('ComponentProcessor', () => {
     });
 
     it('handles LLM failure gracefully', async () => {
-      mockProvider.setError(new Error('LLM service unavailable'));
+      mockProvider.setError('LLM service unavailable', false);
 
       const fixture = loadFixture('shadcn', 'button');
       const input: ProcessorInput = {
@@ -229,7 +240,7 @@ describe('ComponentProcessor', () => {
       expectProcessorFailure(result);
       if (isProcessorFailure(result)) {
         expect(result.code).toBe(ProcessorErrorCode.GenerationFailed);
-        expect(result.error).toContain('LLM');
+        expect(result.error.toLowerCase()).toContain('llm');
       }
     });
 

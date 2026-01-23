@@ -111,12 +111,6 @@ export interface ProcessorInput {
   existingId?: string;
 
   /**
-   * Expected source hash for optimistic locking.
-   * If provided and doesn't match current source, returns conflict.
-   */
-  expectedHash?: string;
-
-  /**
    * Optional Figma URL for design context.
    * Passed to LLM for richer metadata generation.
    */
@@ -313,9 +307,6 @@ export type ExtractOnlyOutput = ExtractOnlySuccess | ExtractOnlyFailure;
 export const ProcessorErrorCode = {
   /** Extraction failed */
   ExtractionFailed: 'EXTRACTION_FAILED',
-
-  /** Source code conflict (optimistic locking) */
-  SourceConflict: 'SOURCE_CONFLICT',
 
   /** Meta generation failed */
   GenerationFailed: 'GENERATION_FAILED',

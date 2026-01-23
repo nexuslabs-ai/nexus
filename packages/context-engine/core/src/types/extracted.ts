@@ -7,50 +7,20 @@
 
 import { z } from 'zod';
 
+import { BasePropSchema, PropTypeCategorySchema } from './base-prop.js';
 import { BaseLibrarySchema } from './identity.js';
 
-/**
- * Prop type categories
- */
-export const PropTypeCategorySchema = z.enum([
-  'primitive', // string, number, boolean
-  'literal', // 'primary' | 'secondary'
-  'union', // string | number
-  'object', // { label: string }
-  'array', // string[]
-  'function', // () => void
-  'ref', // React.Ref<T>
-  'element', // React.ReactNode
-  'unknown', // Could not determine
-]);
-
-export type PropTypeCategory = z.infer<typeof PropTypeCategorySchema>;
+// Re-export PropTypeCategorySchema for backwards compatibility
+export { PropTypeCategorySchema };
+export type { PropTypeCategory } from './base-prop.js';
 
 /**
  * Extracted prop schema
+ *
+ * Extends BasePropSchema with extraction-specific fields for raw
+ * code analysis results (children detection, className handling, deprecation).
  */
-export const ExtractedPropSchema = z.object({
-  /** Prop name */
-  name: z.string(),
-
-  /** TypeScript type string */
-  type: z.string(),
-
-  /** Simplified type category */
-  typeCategory: PropTypeCategorySchema,
-
-  /** Whether prop is required */
-  required: z.boolean(),
-
-  /** Default value (if any) */
-  defaultValue: z.unknown().optional(),
-
-  /** JSDoc description */
-  description: z.string().optional(),
-
-  /** Possible values for literal/union types */
-  possibleValues: z.array(z.string()).optional(),
-
+export const ExtractedPropSchema = BasePropSchema.extend({
   /** Whether this is a children prop */
   isChildren: z.boolean().default(false),
 

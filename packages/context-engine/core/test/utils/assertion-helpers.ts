@@ -164,18 +164,70 @@ export function expectManifestAIReady(manifest: ComponentManifest): void {
   expect(manifest.description).toBeTruthy();
   expect(manifest.description.length).toBeGreaterThan(10);
 
-  // Props required for code generation
-  expect(Array.isArray(manifest.props)).toBe(true);
+  // Props required for code generation (v1.0 schema: CategorizedProps object)
+  expect(manifest.props).toBeDefined();
+  expect(typeof manifest.props).toBe('object');
 
-  // Each prop should have name and type
-  for (const prop of manifest.props) {
-    expect(prop.name).toBeTruthy();
-    expect(prop.type).toBeTruthy();
+  // CategorizedProps has these categories
+  const propCategories = [
+    'variants',
+    'behaviors',
+    'events',
+    'slots',
+    'passthrough',
+    'other',
+  ] as const;
+
+  // Each category should be an array
+  for (const category of propCategories) {
+    expect(Array.isArray(manifest.props[category])).toBe(true);
+  }
+
+  // Each prop in each category should have name and type
+  for (const category of propCategories) {
+    for (const prop of manifest.props[category]) {
+      expect(prop.name).toBeTruthy();
+      expect(prop.type).toBeTruthy();
+    }
   }
 
   // Source hash for versioning
   expect(manifest.sourceHash).toBeTruthy();
   expect(manifest.sourceHash).toHaveLength(64); // SHA-256
+}
+
+/**
+ * Get all props from a CategorizedProps object as a flat array
+ *
+ * Useful for tests that need to check total prop count
+ * or iterate over all props regardless of category.
+ */
+export function getAllProps(
+  categorizedProps: ComponentManifest['props']
+): Array<{ name: string; type: string }> {
+  const allProps: Array<{ name: string; type: string }> = [];
+
+  for (const category of [
+    'variants',
+    'behaviors',
+    'events',
+    'slots',
+    'passthrough',
+    'other',
+  ] as const) {
+    allProps.push(...categorizedProps[category]);
+  }
+
+  return allProps;
+}
+
+/**
+ * Count total props across all categories
+ */
+export function countAllProps(
+  categorizedProps: ComponentManifest['props']
+): number {
+  return getAllProps(categorizedProps).length;
 }
 
 /**

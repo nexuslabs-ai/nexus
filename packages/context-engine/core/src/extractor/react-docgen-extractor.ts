@@ -20,6 +20,7 @@ import {
 import ts from 'typescript';
 
 import type { ExtractedProp, PropTypeCategory } from '../types/index.js';
+import { pascalCase } from '../utils/case.js';
 import { createLogger } from '../utils/logger.js';
 import { getTempManager } from '../utils/temp-manager.js';
 
@@ -111,7 +112,7 @@ export class ReactDocgenExtractor implements IPropsExtractor {
           }
 
           // Find the component matching our name (case-insensitive)
-          const pascalName = this.toPascalCase(componentName);
+          const pascalName = pascalCase(componentName);
           const component =
             components.find(
               (c) =>
@@ -230,15 +231,5 @@ export class ReactDocgenExtractor implements IPropsExtractor {
     }
 
     return undefined;
-  }
-
-  /**
-   * Convert string to PascalCase
-   */
-  private toPascalCase(str: string): string {
-    return str
-      .split(/[-\s_]/)
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
-      .join('');
   }
 }

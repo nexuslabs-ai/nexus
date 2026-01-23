@@ -24,6 +24,7 @@ import {
 } from 'ts-morph';
 
 import type { ExtractedProp, PropTypeCategory } from '../types/index.js';
+import { pascalCase } from '../utils/case.js';
 import { createLogger } from '../utils/logger.js';
 
 import {
@@ -79,7 +80,7 @@ export class TsMorphExtractor implements IPropsExtractor {
       return {
         props,
         method: ExtractorMethod.TsMorph,
-        componentName: this.toPascalCase(componentName),
+        componentName: pascalCase(componentName),
         description,
       };
     } catch (error) {
@@ -98,7 +99,7 @@ export class TsMorphExtractor implements IPropsExtractor {
     sourceFile: SourceFile,
     componentName: string
   ): ExtractedProp[] {
-    const pascalName = this.toPascalCase(componentName);
+    const pascalName = pascalCase(componentName);
     const propsTypeName = `${pascalName}Props`;
 
     // Strategy 1: Look for named interface (e.g., ButtonProps)
@@ -417,7 +418,7 @@ export class TsMorphExtractor implements IPropsExtractor {
     sourceFile: SourceFile,
     componentName: string
   ): string | undefined {
-    const pascalName = this.toPascalCase(componentName);
+    const pascalName = pascalCase(componentName);
 
     // Try function declaration
     const fn = sourceFile.getFunction(pascalName);
@@ -439,15 +440,5 @@ export class TsMorphExtractor implements IPropsExtractor {
     }
 
     return undefined;
-  }
-
-  /**
-   * Convert string to PascalCase
-   */
-  private toPascalCase(str: string): string {
-    return str
-      .split(/[-\s_]/)
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
-      .join('');
   }
 }

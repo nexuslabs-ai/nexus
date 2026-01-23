@@ -1,17 +1,76 @@
 {
   "componentName": "Button",
   "response": {
-    "text": "```json\n{\n  \"description\": \"A versatile button component for user interaction and actions.\",\n  \"semanticDescription\": \"The Button component provides a flexible and accessible way to trigger actions or navigate within an application. It supports various visual styles through its `variant` prop (default, destructive, outline, secondary, ghost, link) and different `size` options. Key features include a `loading` prop to indicate asynchronous operations and a powerful `asChild` prop, leveraging Radix Slot, to seamlessly render as a different HTML element (e.g., a link or custom component) while preserving button styling and functionality.\",\n  \"tier\": \"free\",\n  \"whenToUse\": \"Use the Button component to initiate actions, submit forms, trigger events, or navigate to different parts of the application. It's ideal for primary calls to action, confirming selections, or indicating an ongoing background process.\",\n  \"whenNotToUse\": \"Avoid using a button for purely decorative purposes, as a simple text display, or for complex interactive elements that require more specific component logic (e.g., a checkbox, radio button, or a full dropdown menu). Do not use for navigation within the same page where a simple anchor tag (`<a>`) without button styling is more appropriate.\",\n  \"patterns\": [\n    \"button\",\n    \"async-action\",\n    \"composition\",\n    \"form-control\"\n  ],\n  \"tokens\": [\n    \"color-primary\",\n    \"color-text\",\n    \"spacing-sm\",\n    \"spacing-md\",\n    \"font-family-sans\",\n    \"font-size-base\",\n    \"border-radius-md\"\n  ],\n  \"examples\": [\n    \"<Button>Click me</Button>\",\n    \"<Button variant=\\\"destructive\\\" size=\\\"lg\\\">Delete Item</Button>\",\n    \"<Button loading>Submitting...</Button>\",\n    \"<Button asChild><a href=\\\"/dashboard\\\">Go to Dashboard</a></Button>\"\n  ],\n  \"relatedComponents\": [\n    \"Input\",\n    \"Form\",\n    \"Dialog\",\n    \"Link\",\n    \"Spinner\"\n  ],\n  \"a11yNotes\": \"Ensure buttons have a clear, descriptive text label. When `loading`, the button should be `disabled` to prevent multiple submissions. Use `aria-label` for icon-only buttons. The `asChild` prop retains accessibility benefits of the underlying element, but ensure the child element is semantically appropriate (e.g., an `<a>` tag for navigation).\"\n}\n```",
-    "usage": {
-      "inputTokens": 533,
-      "outputTokens": 550
+    "tokens": [
+      "color-text",
+      "color-background",
+      "color-border",
+      "spacing-xs",
+      "spacing-sm",
+      "spacing-md",
+      "font-size-sm",
+      "font-size-md",
+      "border-radius-sm",
+      "box-shadow-focus",
+      "transition-ease-in-out"
+    ],
+    "semanticDescription": "The Button component is a highly versatile and customizable UI element designed for initiating various user interactions. It supports different visual `variants` (default, destructive, outline, secondary, ghost, link) and `sizes` (default, sm, lg, icon) to fit diverse contexts within an application. Key features include a `loading` prop to indicate ongoing asynchronous operations, automatically disabling the button, and an `asChild` prop that allows the button's styles and behavior to be applied to a different underlying HTML element (e.g., an `<a>` tag for navigation or a custom component), leveraging Radix UI's Slot primitive for maximum flexibility. This component is essential for user input, form submissions, navigation, and triggering actions like opening modals or confirming decisions, ensuring a consistent and accessible interactive experience.",
+    "minimalExample": "<Button>Click me</Button>",
+    "guidance": {
+      "accessibility": "Handles standard keyboard interactions (Space, Enter) and focus management. When `loading` is true, the button is disabled and `aria-disabled` is set. If `asChild` is used, ensure the child element (e.g., `<a>`) has appropriate ARIA attributes if it performs a role other than its native semantic meaning. Ensure sufficient color contrast for all variants and focus states.",
+      "whenNotToUse": "For purely decorative elements or static text that doesn't trigger an action. Do not use for headings or non-interactive content. Use a `div` or `span` for non-interactive display.",
+      "whenToUse": "To trigger immediate actions, submit forms, navigate between pages, or perform operations that require user interaction. Use for primary and secondary actions across your application.",
+      "patterns": [
+        "button",
+        "form-control",
+        "async-action",
+        "navigation",
+        "icon"
+      ],
+      "relatedComponents": ["Link", "DropdownMenu", "AlertDialog", "Form"]
     },
-    "model": "gemini-2.5-flash",
-    "stopReason": "STOP"
+    "examples": {
+      "minimal": {
+        "title": "Basic Button",
+        "propsUsed": [],
+        "description": "A standard button with default styling.",
+        "code": "<Button>Click me</Button>"
+      },
+      "advanced": [
+        {
+          "code": "<Button asChild size=\"icon\" variant=\"outline\"><Link href=\"/settings\"><SettingsIcon /></Link></Button>",
+          "description": "An icon button wrapped in a framework-specific Link component, maintaining button styles and accessibility for navigation.",
+          "title": "Icon Button as Child",
+          "propsUsed": ["asChild", "size", "variant"]
+        }
+      ],
+      "common": [
+        {
+          "description": "A large button with a destructive visual style, suitable for irreversible actions.",
+          "title": "Destructive Large Button",
+          "propsUsed": ["variant", "size"],
+          "code": "<Button variant=\"destructive\" size=\"lg\">Delete Account</Button>"
+        },
+        {
+          "description": "A button displaying a loading indicator and disabled state during an asynchronous operation.",
+          "propsUsed": ["loading"],
+          "title": "Loading Button",
+          "code": "<Button loading>Submitting...</Button>"
+        },
+        {
+          "description": "Renders the button's styles on an anchor tag, useful for navigation while maintaining button appearance.",
+          "code": "<Button asChild><a href=\"/dashboard\">Dashboard</a></Button>",
+          "propsUsed": ["asChild"],
+          "title": "Button as a Link"
+        }
+      ]
+    },
+    "tier": "free",
+    "description": "A versatile button component for triggering user actions, form submissions, and navigation, with built-in loading states and flexible rendering."
   },
-  "recordedAt": "2026-01-19T12:50:49.457Z",
+  "recordedAt": "2026-01-23T06:09:39.068Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "08dc990515d4d2293da675d13f9d9a9d9f2d25043b89b0be650ce4f2bde82bb3",
-  "promptSummary": "Generate metadata for Button component. Prompt: Generate metadata for this component:\n\n## Component\nName: Button\nFramework: react\n\nProps:\n- asChild: boolean - When true, the button will render as its child element (using Radix Slot).\nUseful for ren..."
+  "inputHash": "b187e64cc532ebc0cbb4e2bc5be05465568280f01e6afc54cdb79fe51704f14f",
+  "promptSummary": "Generate metadata for Button component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Button\n\nProps:\n- asChild: boolean - When true, the button will render as its child element..."
 }

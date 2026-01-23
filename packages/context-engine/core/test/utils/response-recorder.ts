@@ -38,7 +38,7 @@
  * ```json
  * {
  *   "componentName": "Button",
- *   "response": { ... },
+ *   "response": { ... },  // ComponentMetaTool structure
  *   "recordedAt": "2025-01-19T10:00:00.000Z",
  *   "provider": "anthropic",
  *   "model": "claude-sonnet-4-20250514",
@@ -59,7 +59,7 @@ import {
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { LLMCompletionResponse } from '../../src/generator/types.js';
+import type { ComponentMetaTool } from '../../src/generator/tool-schema.js';
 
 // Get directory paths
 const __filename = fileURLToPath(import.meta.url);
@@ -67,16 +67,16 @@ const __dirname = dirname(__filename);
 const RESPONSES_DIR = resolve(__dirname, '../fixtures/responses');
 
 /**
- * Recorded response with metadata (legacy format for backwards compatibility)
+ * Recorded response with metadata
  *
- * @deprecated Use CachedResponseRecord from cached-llm-provider.ts
+ * Uses ComponentMetaTool directly (structured output from tool calling)
  */
 export interface RecordedResponse {
   /** Component name this response is for */
   componentName: string;
 
-  /** The LLM completion response */
-  response: LLMCompletionResponse;
+  /** The structured tool call response */
+  response: ComponentMetaTool;
 
   /** Recording timestamp */
   recordedAt: string;
@@ -149,15 +149,16 @@ export function hashContent(content: string): string {
  * Save a response to the fixtures directory
  *
  * @param componentName - Component name (used as filename)
- * @param response - LLM completion response
+ * @param response - ComponentMetaTool structured response
  * @param options - Additional metadata options
  */
 export function saveRecordedResponse(
   componentName: string,
-  response: LLMCompletionResponse,
+  response: ComponentMetaTool,
   options: {
     promptSummary?: string;
     provider?: string;
+    model?: string;
     inputHash?: string;
   } = {}
 ): string {
@@ -172,12 +173,9 @@ export function saveRecordedResponse(
     recordedAt: new Date().toISOString(),
     promptSummary:
       options.promptSummary ??
-      `Generate metadata for ${componentName} component`,
-    provider:
-      (options.provider ?? response.model.includes('claude'))
-        ? 'anthropic'
-        : 'gemini',
-    model: response.model,
+      `Generate metadata for ${componentName} component.`,
+    provider: options.provider ?? 'anthropic',
+    model: options.model ?? 'claude-sonnet-4-20250514',
     inputHash: options.inputHash ?? '',
   };
 
@@ -191,12 +189,10 @@ export function saveRecordedResponse(
  * Load a recorded response from fixtures
  *
  * @param componentName - Component name to load
- * @returns LLM completion response
+ * @returns ComponentMetaTool structured response
  * @throws Error if response file not found
  */
-export function loadRecordedResponse(
-  componentName: string
-): LLMCompletionResponse {
+export function loadRecordedResponse(componentName: string): ComponentMetaTool {
   const filePath = join(RESPONSES_DIR, `${componentName.toLowerCase()}.json`);
 
   if (!existsSync(filePath)) {
@@ -277,71 +273,30 @@ export interface SemanticComparisonResult {
 }
 
 /**
- * Compare two LLM responses for semantic similarity
+ * Compare two ComponentMetaTool responses for semantic similarity
  *
  * Uses structural comparison rather than exact text matching
  * since LLM outputs are non-deterministic.
  */
 export function compareResponsesSemantically(
-  cached: LLMCompletionResponse,
-  real: LLMCompletionResponse,
+  cached: ComponentMetaTool,
+  real: ComponentMetaTool,
   componentName: string
 ): SemanticComparisonResult {
   const differences: SemanticComparisonResult['differences'] = [];
   let matchCount = 0;
   const totalFields = 6;
 
-  // Parse JSON from both responses
-  let cachedParsed: Record<string, unknown>;
-  let realParsed: Record<string, unknown>;
-
-  try {
-    cachedParsed = JSON.parse(cached.text);
-  } catch {
-    return {
-      similarity: 0,
-      passed: false,
-      differences: [
-        {
-          field: 'cached.text',
-          cached: 'parse error',
-          real: null,
-          severity: 'error',
-        },
-      ],
-    };
-  }
-
-  try {
-    realParsed = JSON.parse(real.text);
-  } catch {
-    return {
-      similarity: 0,
-      passed: false,
-      differences: [
-        {
-          field: 'real.text',
-          cached: null,
-          real: 'parse error',
-          severity: 'error',
-        },
-      ],
-    };
-  }
-
-  // Compare key fields
-  const fieldsToCompare = [
+  // Compare key fields directly (no JSON parsing needed - already structured)
+  const fieldsToCompare: (keyof ComponentMetaTool)[] = [
     'description',
     'tier',
-    'patterns',
     'tokens',
-    'examples',
-    'relatedComponents',
   ];
 
   for (const field of fieldsToCompare) {
-    const cachedValue = cachedParsed[field];
-    const realValue = realParsed[field];
+    const cachedValue = cached[field];
+    const realValue = real[field];
 
     // Both undefined - match
     if (cachedValue === undefined && realValue === undefined) {
@@ -397,8 +352,38 @@ export function compareResponsesSemantically(
     }
   }
 
+  // Compare nested guidance.patterns
+  const cachedPatterns = cached.guidance?.patterns ?? [];
+  const realPatterns = real.guidance?.patterns ?? [];
+  const patternsLengthDiff = Math.abs(
+    cachedPatterns.length - realPatterns.length
+  );
+  if (patternsLengthDiff <= 2) {
+    matchCount++;
+  } else {
+    differences.push({
+      field: 'guidance.patterns.length',
+      cached: cachedPatterns.length,
+      real: realPatterns.length,
+      severity: 'warning',
+    });
+  }
+
+  // Compare examples presence
+  if (cached.examples?.common && real.examples?.common) {
+    matchCount++;
+  }
+
+  // Compare guidance.relatedComponents
+  const cachedRelated = cached.guidance?.relatedComponents ?? [];
+  const realRelated = real.guidance?.relatedComponents ?? [];
+  const relatedLengthDiff = Math.abs(cachedRelated.length - realRelated.length);
+  if (relatedLengthDiff <= 2) {
+    matchCount++;
+  }
+
   // Check description contains component name
-  const realDesc = String(realParsed['description'] ?? '').toLowerCase();
+  const realDesc = String(real.description ?? '').toLowerCase();
   if (!realDesc.includes(componentName.toLowerCase())) {
     differences.push({
       field: 'description.componentName',

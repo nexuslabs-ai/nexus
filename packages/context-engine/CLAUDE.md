@@ -85,10 +85,18 @@ import { generateComponentId, generateHash } from '@context-engine/core/utils';
 | ----------- | ----------------------------------------------- | ------------------------------------------------ |
 | `extractor` | Extract props, variants, dependencies from code | `HybridExtractor`, `extractComponent`            |
 | `generator` | Generate semantic metadata via LLM              | `MetaGenerator`, `AnthropicProvider`             |
-| `manifest`  | Build complete component manifests              | `ManifestBuilder`                                |
+| `manifest`  | Build complete component manifests              | `ManifestBuilder`, `generateImportStatement`     |
 | `processor` | Orchestrate full pipeline                       | `ComponentProcessor`, `createComponentProcessor` |
 | `types`     | Shared type definitions                         | `ComponentManifest`, `ExtractionResult`          |
-| `utils`     | Utility functions                               | `generateComponentId`, `generateHash`            |
+| `utils`     | Utility functions                               | `generateComponentId`, `categorizeProps`         |
+
+### Key Source Files
+
+| File                           | Purpose                              |
+| ------------------------------ | ------------------------------------ |
+| `generator/tool-schema.ts`     | Tool calling schemas for Anthropic   |
+| `manifest/import-generator.ts` | Import statement generation          |
+| `utils/prop-categorization.ts` | Prop categorization by semantic type |
 
 ### Quick Start
 
@@ -119,6 +127,80 @@ const result = await processor.process({
 
 if (result.success) {
   console.log(result.manifest); // Complete component manifest
+}
+```
+
+## Tool Calling Architecture
+
+All LLM providers use tool calling for structured output. There is no text parsing fallback.
+
+### Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Unified Tool Calling Path                       │
+│                                                                  │
+│  MetaGenerator                                                   │
+│       ↓                                                          │
+│  provider.generateWithToolCalling(prompt, COMPONENT_META_TOOL)   │
+│       ↓                                                          │
+│  ToolCallResult<ComponentMetaTool>  (structured JSON)            │
+│       ↓                                                          │
+│  normalizeToolOutputToMeta() → ComponentMeta                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Key Components
+
+| Component                   | Purpose                                   |
+| --------------------------- | ----------------------------------------- |
+| `ComponentMetaToolSchema`   | Zod schema defining tool output structure |
+| `COMPONENT_META_TOOL`       | Tool definition (JSON Schema for LLM)     |
+| `normalizeToolOutputToMeta` | Transforms tool output to ComponentMeta   |
+
+### Supported Providers
+
+| Provider  | SDK                 | Tool Calling |
+| --------- | ------------------- | ------------ |
+| Anthropic | `@anthropic-ai/sdk` | ✅ Native    |
+| Gemini    | `@google/genai`     | ✅ Native    |
+
+## Schema Documentation
+
+### ComponentManifest Structure
+
+The manifest includes these key sections:
+
+| Section           | Source    | Description                                  |
+| ----------------- | --------- | -------------------------------------------- |
+| `props`           | Extractor | Categorized props (variants, behaviors, etc) |
+| `cvaVariants`     | Extractor | CVA variant definitions with defaults        |
+| `dependencies`    | Extractor | npm and internal dependencies                |
+| `description`     | Generator | AI-generated component description           |
+| `examples`        | Generator | Structured examples (minimal, common, adv)   |
+| `guidance`        | Generator | When to use, accessibility, patterns         |
+| `importStatement` | Builder   | Generated import statements                  |
+
+### Categorized Props
+
+Props are grouped by semantic purpose:
+
+| Category      | Description             | Examples                      |
+| ------------- | ----------------------- | ----------------------------- |
+| `variants`    | CVA variant props       | `variant`, `size`, `color`    |
+| `behaviors`   | Boolean state props     | `disabled`, `loading`, `open` |
+| `events`      | Event handlers          | `onClick`, `onChange`         |
+| `slots`       | ReactNode/element props | `children`, `leftIcon`        |
+| `passthrough` | DOM attributes          | `className`, `aria-*`         |
+| `other`       | Uncategorized props     | custom props                  |
+
+### Structured Examples Format
+
+```typescript
+{
+  minimal: { title, code, description?, propsUsed? },
+  common: [{ title, code, description?, propsUsed? }, ...],
+  advanced?: [{ title, code, description?, propsUsed? }, ...]
 }
 ```
 
