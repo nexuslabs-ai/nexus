@@ -27,6 +27,7 @@ These principles are non-negotiable. They apply to ALL work in this codebase.
 | Design-code parity     | designer             |
 | Documentation updates  | technical-writer     |
 | Social media content   | social-media-manager |
+| Dependency analysis    | devops               |
 
 Why delegate?
 
@@ -66,6 +67,8 @@ ds/
 ├── apps/
 │   ├── docs/           # Documentation site (planned)
 │   └── playground/     # Theme playground for demos → dynamic theme switching
+├── reports/
+│   └── deps/           # Generated dependency analysis reports
 ├── .claude/
 │   ├── commands/       # Slash commands (/implement, /pr-review, /linkedin, etc.)
 │   ├── rules/          # Convention rules (components, testing, tokens, etc.)
@@ -79,14 +82,16 @@ ds/
 │   │   ├── figma-analyze/       # Figma design analysis
 │   │   ├── shadcn-to-figma/     # Code → Figma architecture blueprints
 │   │   ├── update-docs/         # Documentation updates
-│   │   └── linkedin-post/       # LinkedIn content generation
+│   │   ├── linkedin-post/       # LinkedIn content generation
+│   │   └── analyze-deps/        # Dependency analysis and reports
 │   └── agents/         # Auto-delegated subagents (single .md files)
 │       ├── principal-architect.md  # Architecture, scalability, design
 │       ├── sde2.md                 # Implementation, code quality
 │       ├── tester.md               # Test strategy, implementation
 │       ├── designer.md             # Design-code parity, Figma
 │       ├── technical-writer.md     # Documentation accuracy
-│       └── social-media-manager.md # Developer advocacy content
+│       ├── social-media-manager.md # Developer advocacy content
+│       └── devops.md               # Infrastructure, CI/CD, dependencies
 └── Root configs        # Shared TS, ESLint, Prettier, Turbo
 ```
 
@@ -182,6 +187,7 @@ Skills are auto-discovered capabilities that Claude loads when your request matc
 | [shadcn-to-figma](.claude/skills/shadcn-to-figma/SKILL.md)         | Code → Figma architecture blueprints   |
 | [update-docs](.claude/skills/update-docs/SKILL.md)                 | Documentation updates                  |
 | [linkedin-post](.claude/skills/linkedin-post/SKILL.md)             | LinkedIn content generation            |
+| [analyze-deps](.claude/skills/analyze-deps/SKILL.md)               | Dependency analysis and migration reports |
 
 ## Agents (Auto-Delegated)
 
@@ -195,6 +201,7 @@ Agents are specialized personas that Claude auto-delegates to based on task type
 | [designer](.claude/agents/designer.md)                         | opus   | figma-analyze, shadcn-to-figma                    | Design-code parity           |
 | [technical-writer](.claude/agents/technical-writer.md)         | sonnet | update-docs                                       | Documentation accuracy       |
 | [social-media-manager](.claude/agents/social-media-manager.md) | sonnet | linkedin-post                                     | Developer advocacy           |
+| [devops](.claude/agents/devops.md)                             | opus   | analyze-deps                                      | Infrastructure, dependencies |
 
 ## Slash Commands
 
@@ -208,6 +215,7 @@ Agents are specialized personas that Claude auto-delegates to based on task type
 | `/shadcn-to-figma` | Designer                            | Generate Figma architecture from shadcn code          |
 | `/update-docs`     | Technical Writer                    | Update documentation after codebase changes           |
 | `/linkedin`        | Social Media Manager                | Generate LinkedIn post from session context           |
+| `/analyze-deps`    | DevOps                              | Analyze dependencies for updates and migration paths  |
 
 ## Code Style
 
