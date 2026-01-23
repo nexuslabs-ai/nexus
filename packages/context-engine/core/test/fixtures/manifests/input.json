@@ -1,0 +1,165 @@
+{
+  "componentName": "Input",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "7699af71-ae91-4fc2-9e0b-f5316faf77ef",
+    "slug": "input-react-7699af71",
+    "name": "Input",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "An input field for collecting user text, numbers, or other data within forms.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Input } from '@nexus/react'",
+      "typeOnly": "import type { InputProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Input />",
+    "props": {
+      "variants": [
+        {
+          "name": "variant",
+          "type": "'default' | 'ghost' | 'filled'",
+          "typeCategory": "literal",
+          "required": false,
+          "defaultValue": "'default'",
+          "possibleValues": ["default", "ghost", "filled"],
+          "description": "Visual variant of the input.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        },
+        {
+          "name": "inputSize",
+          "type": "'sm' | 'default' | 'lg'",
+          "typeCategory": "literal",
+          "required": false,
+          "defaultValue": "'default'",
+          "possibleValues": ["sm", "default", "lg"],
+          "description": "Size of the input.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ],
+      "behaviors": [],
+      "events": [],
+      "slots": [
+        {
+          "name": "startIcon",
+          "type": "React.ReactNode",
+          "typeCategory": "element",
+          "required": false,
+          "description": "Icon to display at the start of the input.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        },
+        {
+          "name": "endIcon",
+          "type": "React.ReactNode",
+          "typeCategory": "element",
+          "required": false,
+          "description": "Icon to display at the end of the input.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ],
+      "passthrough": [],
+      "other": [
+        {
+          "name": "error",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Whether the input is in an error state.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ]
+    },
+    "variants": {},
+    "examples": {
+      "minimal": {
+        "title": "Basic",
+        "code": "<Input />",
+        "isPrimary": true
+      },
+      "common": [
+        {
+          "title": "Filled variant",
+          "code": "<Input variant=\"filled\" placeholder=\"Enter text\" />",
+          "propsUsed": ["variant", "placeholder", "text"]
+        },
+        {
+          "title": "Example 3",
+          "code": "<Input inputSize=\"lg\" error={true} placeholder=\"Invalid data\" />",
+          "propsUsed": ["inputSize", "error", "placeholder", "data"]
+        },
+        {
+          "title": "Ghost variant",
+          "code": "<Input variant=\"ghost\" placeholder=\"Search...\" />",
+          "propsUsed": ["variant", "placeholder"]
+        },
+        {
+          "title": "Example 5",
+          "code": "<Input\\n  startIcon={<SearchIcon />}\\n  endIcon={<ClearIcon />}\\n  placeholder=\"Search...\"\\n/>",
+          "propsUsed": ["startIcon", "endIcon", "placeholder"]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Input component for collecting various types of user data, such as text, numbers, email addresses, or passwords, within forms, search bars, or interactive data entry fields. It is ideal when a user needs to type information directly.",
+      "whenNotToUse": "Avoid using Input for selecting options from a predefined list (use Select or RadioGroup), for triggering actions (use Button), or for displaying large amounts of static text (use Text or Paragraph). Do not use it for complex multi-line text input (use Textarea).",
+      "accessibility": "Ensure every Input component has an associated <label> element for screen reader accessibility. Use the 'for' attribute on the label and the 'id' attribute on the input to link them semantically. For inputs with `error={true}`, consider using `aria-invalid='true'` and `aria-describedby` to link to an error message. If icons are purely decorative, ensure they are hidden from assistive technologies (e.g., `aria-hidden='true'`).",
+      "patterns": ["form-control", "input"],
+      "relatedComponents": ["Label", "Button", "Form", "Textarea", "Select"]
+    },
+    "semanticDescription": "The Input component provides a flexible and customizable text input field for collecting user data. It supports various visual `variant` styles (default, ghost, filled) to integrate seamlessly into different UI contexts. Users can choose from different `inputSize` options (sm, default, lg) to fit layout requirements. The component can display an `error` state to indicate invalid input. Furthermore, it allows for the inclusion of `startIcon` and `endIcon` for adding visual cues or interactive elements within the input field, enhancing usability for tasks like search or password visibility toggles. Key use cases include form building, search interfaces, data filtering, and any scenario requiring direct user text entry.",
+    "tokens": [
+      "color-text-primary",
+      "color-border-default",
+      "color-background-default",
+      "spacing-sm",
+      "spacing-md",
+      "spacing-lg",
+      "font-size-sm",
+      "font-size-md",
+      "font-size-lg",
+      "border-radius-sm",
+      "color-error",
+      "color-background-filled",
+      "color-border-ghost"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/context-engine/core/test/fixtures/components/shadcn/input.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*"
+      },
+      "internal": []
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-23T06:13:54.996Z",
+    "updatedAt": "2026-01-23T06:13:54.996Z",
+    "sourceHash": "4c9d3ff4566a34804f842d2cbb922c7239f14e6cde5663e92ce28c25e723d40c",
+    "metaHash": "2347bf8f18fac13b82c66a2fd05d616c95771a9476af5006085d54ee872e599b"
+  },
+  "recordedAt": "2026-01-23T06:13:54.996Z",
+  "fixtureSource": "shadcn/input"
+}

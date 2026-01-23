@@ -17,10 +17,11 @@
  * Mock tests are valuable ONLY for testing boundaries/error cases.
  */
 
+import type { ComponentMetaTool } from '../../src/generator/tool-schema.js';
 import type {
   ILLMProvider,
-  LLMCompletionOptions,
-  LLMCompletionResponse,
+  ToolCallingOptions,
+  ToolCallResult,
 } from '../../src/generator/types.js';
 import { LLMProviderType } from '../../src/generator/types.js';
 
@@ -32,10 +33,10 @@ export interface MockLLMProviderConfig {
   modelId?: string;
 
   /** Map of prompt patterns to responses (string or RegExp keys) */
-  responses?: Map<string | RegExp, LLMCompletionResponse>;
+  responses?: Map<string | RegExp, ComponentMetaTool>;
 
   /** Default response when no pattern matches */
-  defaultResponse?: LLMCompletionResponse;
+  defaultResponse?: ComponentMetaTool;
 
   /** Error after N calls (simulates rate limiting) */
   errorAfterCalls?: number;
@@ -43,8 +44,11 @@ export interface MockLLMProviderConfig {
   /** Simulated latency in milliseconds */
   simulateLatencyMs?: number;
 
-  /** Error to throw (if set, all calls will throw) */
-  error?: Error;
+  /** Error to return (if set, all calls will return failure) */
+  error?: string;
+
+  /** Whether the error is retryable */
+  errorRetryable?: boolean;
 }
 
 /**
@@ -52,33 +56,42 @@ export interface MockLLMProviderConfig {
  */
 export interface CallRecord {
   prompt: string;
-  options?: LLMCompletionOptions;
+  options?: ToolCallingOptions;
   timestamp: Date;
 }
 
 /**
- * Default mock response that produces valid JSON for meta generation
+ * Default mock response that produces valid tool output for meta generation
  */
-export const DEFAULT_MOCK_RESPONSE: LLMCompletionResponse = {
-  text: JSON.stringify({
-    description: 'A reusable UI component for building interfaces.',
-    semanticDescription:
-      'This component provides a flexible and accessible way to build user interfaces. It supports multiple variants and sizes, making it suitable for various use cases in modern web applications.',
-    tier: 'free',
+export const DEFAULT_MOCK_TOOL_RESPONSE: ComponentMetaTool = {
+  description: 'A reusable UI component for building interfaces.',
+  semanticDescription:
+    'This component provides a flexible and accessible way to build user interfaces. It supports multiple variants and sizes, making it suitable for various use cases in modern web applications.',
+  tier: 'free',
+  minimalExample: '<Component variant="default">Content</Component>',
+  examples: {
+    minimal: {
+      title: 'Basic Usage',
+      code: '<Component>Content</Component>',
+      description: 'Basic usage of the component',
+    },
+    common: [
+      {
+        title: 'With Variant',
+        code: '<Component variant="primary">Content</Component>',
+        description: 'Using a variant',
+      },
+    ],
+    advanced: [],
+  },
+  guidance: {
     whenToUse: 'Use this component when you need a standard UI element.',
     whenNotToUse: 'Avoid using this component for complex custom layouts.',
+    accessibility: 'Ensure proper ARIA labels are provided for accessibility.',
     patterns: ['container', 'composition'],
-    tokens: ['color', 'spacing', 'typography'],
-    examples: ['<Component variant="default">Content</Component>'],
     relatedComponents: ['Button', 'Card'],
-    a11yNotes: 'Ensure proper ARIA labels are provided for accessibility.',
-  }),
-  model: 'mock-model',
-  stopReason: 'end_turn',
-  usage: {
-    inputTokens: 500,
-    outputTokens: 200,
   },
+  tokens: ['color', 'spacing', 'typography'],
 };
 
 /**
@@ -94,13 +107,12 @@ export const DEFAULT_MOCK_RESPONSE: LLMCompletionResponse = {
  * ```typescript
  * const provider = new MockLLMProvider({
  *   defaultResponse: {
- *     text: '{"description": "A button"}',
- *     model: 'mock',
- *     stopReason: 'end_turn',
+ *     description: 'A button',
+ *     // ... other fields
  *   },
  * });
  *
- * const response = await provider.generateCompletion('Generate for Button');
+ * const result = await provider.generateWithToolCalling('Generate for Button');
  * expect(provider.getCallCount()).toBe(1);
  * ```
  */
@@ -117,12 +129,12 @@ export class MockLLMProvider implements ILLMProvider {
   }
 
   /**
-   * Generate a completion from a prompt
+   * Generate structured output using tool calling
    */
-  async generateCompletion(
+  async generateWithToolCalling<T = ComponentMetaTool>(
     prompt: string,
-    options?: LLMCompletionOptions
-  ): Promise<LLMCompletionResponse> {
+    options?: ToolCallingOptions
+  ): Promise<ToolCallResult<T>> {
     // Record the call
     this.callHistory.push({
       prompt,
@@ -132,7 +144,11 @@ export class MockLLMProvider implements ILLMProvider {
 
     // Check for configured error
     if (this.config.error) {
-      throw this.config.error;
+      return {
+        type: 'failure',
+        error: this.config.error,
+        retryable: this.config.errorRetryable ?? false,
+      };
     }
 
     // Check for rate limit simulation
@@ -140,9 +156,11 @@ export class MockLLMProvider implements ILLMProvider {
       this.config.errorAfterCalls !== undefined &&
       this.callHistory.length > this.config.errorAfterCalls
     ) {
-      const error = new Error('429 Rate limit exceeded');
-      (error as Error & { status: number }).status = 429;
-      throw error;
+      return {
+        type: 'failure',
+        error: 'Rate limit exceeded',
+        retryable: true,
+      };
     }
 
     // Simulate latency if configured
@@ -156,16 +174,41 @@ export class MockLLMProvider implements ILLMProvider {
     if (this.config.responses) {
       for (const [pattern, response] of this.config.responses) {
         if (typeof pattern === 'string' && prompt.includes(pattern)) {
-          return { ...response };
+          return {
+            type: 'success',
+            data: { ...response } as T,
+            model: this.modelId,
+            usage: {
+              inputTokens: 500,
+              outputTokens: 200,
+            },
+          };
         }
         if (pattern instanceof RegExp && pattern.test(prompt)) {
-          return { ...response };
+          return {
+            type: 'success',
+            data: { ...response } as T,
+            model: this.modelId,
+            usage: {
+              inputTokens: 500,
+              outputTokens: 200,
+            },
+          };
         }
       }
     }
 
     // Return default response or the global default
-    return { ...(this.config.defaultResponse ?? DEFAULT_MOCK_RESPONSE) };
+    const response = this.config.defaultResponse ?? DEFAULT_MOCK_TOOL_RESPONSE;
+    return {
+      type: 'success',
+      data: { ...response } as T,
+      model: this.modelId,
+      usage: {
+        inputTokens: 500,
+        outputTokens: 200,
+      },
+    };
   }
 
   /**
@@ -215,7 +258,7 @@ export class MockLLMProvider implements ILLMProvider {
   /**
    * Set a specific response for a pattern
    */
-  setResponse(pattern: string | RegExp, response: LLMCompletionResponse): void {
+  setResponse(pattern: string | RegExp, response: ComponentMetaTool): void {
     if (!this.config.responses) {
       this.config.responses = new Map();
     }
@@ -225,15 +268,16 @@ export class MockLLMProvider implements ILLMProvider {
   /**
    * Set the default response
    */
-  setDefaultResponse(response: LLMCompletionResponse): void {
+  setDefaultResponse(response: ComponentMetaTool): void {
     this.config.defaultResponse = response;
   }
 
   /**
-   * Set an error to throw on all calls
+   * Set an error to return on all calls
    */
-  setError(error: Error): void {
+  setError(error: string, retryable = false): void {
     this.config.error = error;
+    this.config.errorRetryable = retryable;
   }
 
   /**
@@ -241,6 +285,7 @@ export class MockLLMProvider implements ILLMProvider {
    */
   clearError(): void {
     this.config.error = undefined;
+    this.config.errorRetryable = undefined;
   }
 }
 
@@ -254,10 +299,13 @@ export function createMockLLMProvider(
 }
 
 /**
- * Create a mock provider that always throws an error
+ * Create a mock provider that always returns an error
  */
-export function createErrorProvider(error: Error): MockLLMProvider {
-  return new MockLLMProvider({ error });
+export function createErrorProvider(
+  error: string,
+  retryable = false
+): MockLLMProvider {
+  return new MockLLMProvider({ error, errorRetryable: retryable });
 }
 
 /**
@@ -266,42 +314,45 @@ export function createErrorProvider(error: Error): MockLLMProvider {
 export function createRateLimitedProvider(afterCalls: number): MockLLMProvider {
   return new MockLLMProvider({
     errorAfterCalls: afterCalls,
-    defaultResponse: DEFAULT_MOCK_RESPONSE,
+    defaultResponse: DEFAULT_MOCK_TOOL_RESPONSE,
   });
 }
 
 /**
- * Create a mock response for a specific component
+ * Create a mock tool response for a specific component
  */
-export function createMockResponse(
+export function createMockToolResponse(
   componentName: string,
-  overrides?: Partial<{
-    description: string;
-    patterns: string[];
-    tier: 'free' | 'pro';
-  }>
-): LLMCompletionResponse {
-  const baseResponse = {
+  overrides?: Partial<ComponentMetaTool>
+): ComponentMetaTool {
+  return {
     description: `A ${componentName} component for building user interfaces.`,
     semanticDescription: `The ${componentName} component provides a flexible and accessible building block for web applications. It follows accessibility best practices and integrates well with other components in the design system.`,
-    tier: 'free' as const,
-    whenToUse: `Use ${componentName} when you need this specific UI pattern.`,
-    whenNotToUse: `Avoid ${componentName} when a simpler alternative exists.`,
-    patterns: ['container'],
-    tokens: ['color', 'spacing'],
-    examples: [`<${componentName}>Content</${componentName}>`],
-    relatedComponents: [],
-    a11yNotes: 'Follow WCAG guidelines for proper accessibility.',
-    ...overrides,
-  };
-
-  return {
-    text: JSON.stringify(baseResponse),
-    model: 'mock-model',
-    stopReason: 'end_turn',
-    usage: {
-      inputTokens: 500,
-      outputTokens: 200,
+    tier: 'free',
+    minimalExample: `<${componentName}>Content</${componentName}>`,
+    examples: {
+      minimal: {
+        title: 'Basic Usage',
+        code: `<${componentName}>Content</${componentName}>`,
+        description: `Basic usage of ${componentName}`,
+      },
+      common: [
+        {
+          title: 'With Variant',
+          code: `<${componentName} variant="primary">Content</${componentName}>`,
+          description: 'Using a variant',
+        },
+      ],
+      advanced: [],
     },
+    guidance: {
+      whenToUse: `Use ${componentName} when you need this specific UI pattern.`,
+      whenNotToUse: `Avoid ${componentName} when a simpler alternative exists.`,
+      accessibility: 'Follow WCAG guidelines for proper accessibility.',
+      patterns: ['container'],
+      relatedComponents: [],
+    },
+    tokens: ['color', 'spacing'],
+    ...overrides,
   };
 }

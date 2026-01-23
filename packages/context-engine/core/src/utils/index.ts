@@ -4,53 +4,23 @@
  * Re-exports all utility functions from @context-engine/core
  */
 
+// Case conversion utilities
+export { kebabCase, pascalCase } from './case.js';
+
 // ID utilities
 export {
   generateComponentId,
   generateSlug,
-  getShortId,
-  isSameComponent,
   isValidSlug,
   isValidUuid,
-  parseIdentifier,
-  toKebabCase,
-  validateComponentId,
-  validateComponentSlug,
 } from './id.js';
 
 // Hash utilities
 export {
-  contentMatchesHash,
-  generateCombinedHash,
   generateHash,
-  generateMetaHash,
   generateObjectHash,
   generateSourceHash,
-  getHashPreview,
-  hashesMatch,
-  isValidHash,
 } from './hash.js';
-
-// Version utilities
-export {
-  compareVersions,
-  formatVersion,
-  getLatestVersion,
-  getVersionParts,
-  incrementVersion,
-  INITIAL_VERSION,
-  isNewerVersion,
-  isOlderVersion,
-  isPrerelease,
-  isValidVersion,
-  nextMajorVersion,
-  nextMinorVersion,
-  nextPatchVersion,
-  parseVersion,
-  satisfiesRange,
-  sortVersionsAsc,
-  sortVersionsDesc,
-} from './version.js';
 
 // Logger utilities - values
 export { createLogger, Logger, logger } from './logger.js';
@@ -68,3 +38,18 @@ export {
 
 // Temp file manager utilities - types
 export type { TempFile } from './temp-manager.js';
+
+// Prop categorization utilities - values
+export {
+  categorizeProps,
+  isBehaviorProp,
+  isEventProp,
+  isPassthroughProp,
+  isSlotProp,
+  isVariantProp,
+  PATTERNS,
+  toDefinition,
+} from './prop-categorization.js';
+
+// Environment-based provider selection
+export { createProviderFromEnv } from './env-provider.js';

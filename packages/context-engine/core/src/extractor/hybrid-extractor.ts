@@ -18,7 +18,8 @@ import {
   isBaseLibraryPackage,
 } from '../constants/index.js';
 import type { ExtractedData } from '../types/index.js';
-import { generateSourceHash, hashesMatch } from '../utils/hash.js';
+import { pascalCase } from '../utils/case.js';
+import { generateSourceHash } from '../utils/hash.js';
 import { generateComponentId, generateSlug } from '../utils/id.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -66,13 +67,11 @@ export class HybridExtractor implements IExtractor {
    * Extract component data from source code
    *
    * Flow:
-   * 1. Validate input
-   * 2. Compute source hash
-   * 3. Check for conflicts (if expectedHash provided)
-   * 4. Extract props (primary, fallback if needed)
-   * 5. Extract variants
-   * 6. Extract dependencies
-   * 7. Build and return ExtractedData
+   * 1. Compute source hash for tracking
+   * 2. Extract props (primary, fallback if needed)
+   * 3. Extract variants
+   * 4. Extract dependencies
+   * 5. Build and return ExtractedData
    */
   async extract(input: ExtractionInput): Promise<ExtractionOutput> {
     const startTime = performance.now();
@@ -80,19 +79,8 @@ export class HybridExtractor implements IExtractor {
     // Step 1: Compute source hash for change detection
     const sourceHash = generateSourceHash(input.sourceCode);
 
-    // Step 2: Handle optimistic locking (conflict detection)
-    if (input.expectedHash) {
-      const conflictResult = this.checkForConflict(
-        input.expectedHash,
-        sourceHash
-      );
-      if (conflictResult) {
-        return conflictResult;
-      }
-    }
-
     try {
-      // Step 3: Extract props using primary extractor
+      // Step 2: Extract props using primary extractor
       let propsResult = await this.reactDocgen.extractProps(
         input.sourceCode,
         input.name,
@@ -103,7 +91,7 @@ export class HybridExtractor implements IExtractor {
       let fallbackTriggered = false;
       let fallbackReason: FallbackReason | undefined;
 
-      // Step 4: Check explicit fallback triggers
+      // Step 3: Check explicit fallback triggers
       const fallbackCheck = shouldFallback(propsResult, input.sourceCode);
 
       if (fallbackCheck.shouldFallback) {
@@ -131,17 +119,17 @@ export class HybridExtractor implements IExtractor {
           : ExtractorMethod.Hybrid;
       }
 
-      // Step 5: Extract variants (always ts-morph, operates independently)
+      // Step 4: Extract variants (always ts-morph, operates independently)
       const { variants, defaultVariants } = this.variantExtractor.extract(
         input.sourceCode,
         input.filePath
       );
 
-      // Step 6: Extract dependencies (always ts-morph, operates independently)
+      // Step 5: Extract dependencies (always ts-morph, operates independently)
       const { npmDependencies, internalDependencies, baseLibrary } =
         this.dependencyExtractor.extract(input.sourceCode, input.filePath);
 
-      // Step 7: Build extracted data
+      // Step 6: Build extracted data
       const data = this.buildExtractedData({
         propsResult,
         variants,
@@ -155,7 +143,7 @@ export class HybridExtractor implements IExtractor {
         extractionMethod,
       });
 
-      // Step 8: Generate identity
+      // Step 7: Generate identity
       const id = input.existingId ?? generateComponentId();
       const slug = generateSlug(input.name, input.framework, id);
 
@@ -201,29 +189,23 @@ export class HybridExtractor implements IExtractor {
   }
 
   /**
-   * Check for optimistic locking conflict
-   *
-   * Returns conflict result if hashes don't match, null otherwise.
-   */
-  private checkForConflict(
-    expectedHash: string,
-    currentHash: string
-  ): ExtractionOutput | null {
-    if (!hashesMatch(expectedHash, currentHash)) {
-      return {
-        type: ExtractionOutputType.Conflict,
-        expectedHash,
-        currentHash,
-        message: 'Source code has changed since last extraction',
-      };
-    }
-    return null;
-  }
-
-  /**
    * Build ExtractedData from all extraction results
+   *
+   * Combines props, variants, dependencies and detected patterns into
+   * the final ExtractedData structure.
    */
-  private buildExtractedData(params: {
+  private buildExtractedData({
+    propsResult,
+    variants,
+    defaultVariants,
+    npmDependencies,
+    internalDependencies,
+    baseLibrary,
+    sourceCode,
+    name,
+    filePath,
+    extractionMethod,
+  }: {
     propsResult: Awaited<
       ReturnType<ReactDocgenExtractor['extractProps']>
     > | null;
@@ -237,19 +219,6 @@ export class HybridExtractor implements IExtractor {
     filePath?: string;
     extractionMethod: ExtractorMethod;
   }): ExtractedData {
-    const {
-      propsResult,
-      variants,
-      defaultVariants,
-      npmDependencies,
-      internalDependencies,
-      baseLibrary,
-      sourceCode,
-      name,
-      filePath,
-      extractionMethod,
-    } = params;
-
     const props = propsResult?.props ?? [];
 
     return {
@@ -261,7 +230,7 @@ export class HybridExtractor implements IExtractor {
       acceptsChildren: props.some((p) => p.isChildren),
       usesForwardRef: this.detectForwardRef(sourceCode),
       exportType: this.detectExportType(sourceCode, name),
-      exportName: this.toPascalCase(name),
+      exportName: pascalCase(name),
       baseLibrary: baseLibrary
         ? {
             name: baseLibrary,
@@ -281,7 +250,7 @@ export class HybridExtractor implements IExtractor {
     sourceCode: string,
     componentName: string
   ): 'default' | 'named' {
-    const pascalName = this.toPascalCase(componentName);
+    const pascalName = pascalCase(componentName);
 
     // Check for default export patterns
     if (
@@ -356,33 +325,11 @@ export class HybridExtractor implements IExtractor {
       if (pattern.test(pkg)) {
         const componentSegment = pkg.replace(pattern, '');
         if (componentSegment) {
-          return this.packageNameToComponentName(componentSegment);
+          return pascalCase(componentSegment);
         }
       }
     }
 
     return undefined;
-  }
-
-  /**
-   * Convert package name segment to PascalCase component name
-   *
-   * Example: "dialog" -> "Dialog", "dropdown-menu" -> "DropdownMenu"
-   */
-  private packageNameToComponentName(segment: string): string {
-    return segment
-      .split('-')
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-      .join('');
-  }
-
-  /**
-   * Convert string to PascalCase
-   */
-  private toPascalCase(str: string): string {
-    return str
-      .split(/[-\s_]/)
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
-      .join('');
   }
 }

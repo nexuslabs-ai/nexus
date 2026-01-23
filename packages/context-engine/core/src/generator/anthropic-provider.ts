@@ -4,6 +4,8 @@
  * LLM provider implementation using the Anthropic Claude API.
  * Handles authentication, request construction, and error handling.
  *
+ * Uses tool calling for structured output generation.
+ *
  * Configuration is read from environment variables via the config module:
  * - ANTHROPIC_API_KEY: API key (required)
  * - CONTEXT_ENGINE_MODEL: Model identifier
@@ -17,12 +19,13 @@ import Anthropic from '@anthropic-ai/sdk';
 import { getLLMConfig } from '../config/index.js';
 import { createLogger } from '../utils/logger.js';
 
+import { COMPONENT_META_TOOL, type ComponentMetaTool } from './tool-schema.js';
 import type {
   AnthropicProviderConfig,
   ILLMProvider,
-  LLMCompletionOptions,
-  LLMCompletionResponse,
   LLMProviderType,
+  ToolCallingOptions,
+  ToolCallResult,
 } from './types.js';
 
 const logger = createLogger({ name: 'anthropic-provider' });
@@ -45,6 +48,7 @@ function getDefaults() {
  *
  * Implements the ILLMProvider interface for the Anthropic Claude API.
  * Supports all Claude models and handles authentication via API key.
+ * Uses tool calling for structured output generation.
  *
  * @example
  * ```typescript
@@ -53,7 +57,7 @@ function getDefaults() {
  *   model: 'claude-sonnet-4-20250514'
  * });
  *
- * const response = await provider.generateCompletion(
+ * const result = await provider.generateWithToolCalling<ComponentMetaTool>(
  *   'Generate metadata for a Button component...',
  *   { maxTokens: 2000 }
  * );
@@ -102,24 +106,26 @@ export class AnthropicProvider implements ILLMProvider {
   }
 
   /**
-   * Generate a text completion using Claude
+   * Generate structured output using tool calling
+   *
+   * Uses Anthropic's tool calling feature to guarantee structured JSON output.
+   * The tool_choice is set to force the model to use the specific tool.
    *
    * @param prompt - The input prompt for generation
    * @param options - Optional generation parameters
-   * @returns Promise resolving to the completion response
-   * @throws Error if the API call fails
+   * @returns Promise resolving to the tool call result
    */
-  async generateCompletion(
+  async generateWithToolCalling<T = ComponentMetaTool>(
     prompt: string,
-    options: LLMCompletionOptions = {}
-  ): Promise<LLMCompletionResponse> {
+    options: ToolCallingOptions = {}
+  ): Promise<ToolCallResult<T>> {
     const maxTokens = options.maxTokens ?? this.config.defaultMaxTokens;
 
-    logger.debug('Starting Anthropic completion', {
+    logger.debug('Starting Anthropic tool calling', {
       model: this.config.model,
       maxTokens,
       promptLength: prompt.length,
-      hasSystemPrompt: !!options.systemPrompt,
+      toolName: COMPONENT_META_TOOL.name,
     });
 
     try {
@@ -127,89 +133,143 @@ export class AnthropicProvider implements ILLMProvider {
         model: this.config.model,
         max_tokens: maxTokens,
         ...(options.systemPrompt && { system: options.systemPrompt }),
+        tools: [COMPONENT_META_TOOL as Anthropic.Tool],
+        tool_choice: {
+          type: 'tool',
+          name: COMPONENT_META_TOOL.name,
+        },
         messages: [
           {
             role: 'user',
             content: prompt,
           },
         ],
-        ...(options.stopSequences && { stop_sequences: options.stopSequences }),
       });
 
-      // Extract text content from response
-      const textContent = response.content.find(
-        (block) => block.type === 'text'
+      // Extract tool use block from response
+      const toolUseBlock = response.content.find(
+        (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use'
       );
 
-      if (!textContent || textContent.type !== 'text') {
-        throw new Error(
-          'Unexpected response format: no text content in response'
-        );
+      if (!toolUseBlock) {
+        logger.error('No tool_use block in response', undefined, {
+          contentTypes: response.content.map((b) => b.type),
+        });
+        return {
+          type: 'failure',
+          error: 'Tool calling failed: no tool_use block in response',
+          retryable: true,
+        };
       }
 
-      const result: LLMCompletionResponse = {
-        text: textContent.text,
+      if (toolUseBlock.name !== COMPONENT_META_TOOL.name) {
+        logger.error('Unexpected tool name', undefined, {
+          expected: COMPONENT_META_TOOL.name,
+          received: toolUseBlock.name,
+        });
+        return {
+          type: 'failure',
+          error: `Tool calling failed: unexpected tool "${toolUseBlock.name}"`,
+          retryable: true,
+        };
+      }
+
+      logger.debug('Anthropic tool calling succeeded', {
+        model: response.model,
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
+        toolName: toolUseBlock.name,
+      });
+
+      return {
+        type: 'success',
+        data: toolUseBlock.input as T,
         usage: {
           inputTokens: response.usage.input_tokens,
           outputTokens: response.usage.output_tokens,
         },
         model: response.model,
-        stopReason: response.stop_reason ?? undefined,
       };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 
-      logger.debug('Anthropic completion succeeded', {
-        model: response.model,
-        inputTokens: response.usage.input_tokens,
-        outputTokens: response.usage.output_tokens,
-        stopReason: response.stop_reason,
+  /**
+   * Handle errors from tool calling, translating to ToolCallResult
+   */
+  private handleError<T>(error: unknown): ToolCallResult<T> {
+    // Handle specific Anthropic errors
+    if (error instanceof Anthropic.APIError) {
+      logger.error('Anthropic API error during tool call', error as Error, {
+        status: error.status,
+        code: error.error?.type,
       });
 
-      return result;
-    } catch (error) {
-      // Handle specific Anthropic errors
-      if (error instanceof Anthropic.APIError) {
-        logger.error('Anthropic API error', error as Error, {
-          status: error.status,
-          code: error.error?.type,
-        });
-
-        // Translate to more specific error messages
-        if (error.status === 401) {
-          throw new Error('Anthropic authentication failed: invalid API key');
-        }
-
-        if (error.status === 429) {
-          throw new Error('Anthropic rate limit exceeded: please retry later');
-        }
-
-        if (error.status === 500 || error.status === 503) {
-          throw new Error('Anthropic service unavailable: please retry later');
-        }
-
-        throw new Error(`Anthropic API error: ${error.message}`);
+      // Rate limit is retryable
+      if (error.status === 429) {
+        return {
+          type: 'failure',
+          error: 'Rate limit exceeded',
+          retryable: true,
+        };
       }
 
-      // Handle timeout errors
-      if (error instanceof Anthropic.APIConnectionTimeoutError) {
-        logger.error('Anthropic timeout error', error as Error);
-        throw new Error(
-          `Anthropic request timed out after ${this.config.timeoutMs}ms`
-        );
+      // Auth errors are not retryable
+      if (error.status === 401) {
+        return {
+          type: 'failure',
+          error: 'Authentication failed: invalid API key',
+          retryable: false,
+        };
       }
 
-      // Handle connection errors
-      if (error instanceof Anthropic.APIConnectionError) {
-        logger.error('Anthropic connection error', error as Error);
-        throw new Error('Failed to connect to Anthropic API');
+      // Service errors are retryable
+      if (error.status === 500 || error.status === 503) {
+        return {
+          type: 'failure',
+          error: 'Service unavailable',
+          retryable: true,
+        };
       }
 
-      // Re-throw unknown errors
+      return {
+        type: 'failure',
+        error: `Anthropic API error: ${error.message}`,
+        retryable: false,
+      };
+    }
+
+    // Handle timeout errors - retryable
+    if (error instanceof Anthropic.APIConnectionTimeoutError) {
+      logger.error('Anthropic timeout during tool call', error as Error);
+      return {
+        type: 'failure',
+        error: `Request timed out after ${this.config.timeoutMs}ms`,
+        retryable: true,
+      };
+    }
+
+    // Handle connection errors - retryable
+    if (error instanceof Anthropic.APIConnectionError) {
       logger.error(
-        'Unexpected error during Anthropic completion',
+        'Anthropic connection error during tool call',
         error as Error
       );
-      throw error;
+      return {
+        type: 'failure',
+        error: 'Failed to connect to Anthropic API',
+        retryable: true,
+      };
     }
+
+    // Unknown errors
+    logger.error('Unexpected error during tool call', error as Error);
+    return {
+      type: 'failure',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      retryable: false,
+    };
   }
 }
 

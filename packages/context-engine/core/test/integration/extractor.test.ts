@@ -10,7 +10,6 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import {
   extractComponent,
   HybridExtractor,
-  isExtractionFailure,
   isExtractionSuccess,
 } from '../../src/extractor/index.js';
 import {
@@ -252,10 +251,10 @@ describe('HybridExtractor', () => {
   });
 
   describe('Input validation', () => {
-    // Note: The current implementation may not strictly validate all inputs
-    // These tests document actual behavior
+    // Note: The extractor is lenient and does not validate orgId format.
+    // These tests document and verify actual behavior.
 
-    it('handles invalid orgId (may succeed or fail)', async () => {
+    it('accepts non-UUID orgId (passes through without validation)', async () => {
       const fixture = loadFixture('shadcn', 'button');
 
       const result = await extractor.extract({
@@ -265,31 +264,35 @@ describe('HybridExtractor', () => {
         framework: 'react',
       });
 
-      // Document actual behavior - Zod validation may throw or extractor may accept
-      // If validation is strict, it should fail; otherwise it may succeed
-      expect(result.type).toBeDefined();
-      if (isExtractionFailure(result)) {
-        expect(result.error).toBeTruthy();
+      // Extractor is lenient - it succeeds and passes through the orgId
+      expect(isExtractionSuccess(result)).toBe(true);
+      if (isExtractionSuccess(result)) {
+        // The orgId is passed through as-is
+        expect(result.orgId).toBe('invalid-uuid');
+        // Extraction still works on the source code
+        expect(result.data.props.length).toBeGreaterThan(0);
       }
     });
 
-    it('handles empty source code (may produce empty extraction)', async () => {
+    it('succeeds with empty source code (returns empty props)', async () => {
       const result = await extractor.extract({
         orgId: TEST_ORG_ID,
-        name: 'Button',
+        name: 'Empty',
         sourceCode: '',
         framework: 'react',
       });
 
-      // Empty source may fail validation or produce empty result
-      expect(result.type).toBeDefined();
+      // Extractor is lenient - succeeds with empty data
+      expect(isExtractionSuccess(result)).toBe(true);
       if (isExtractionSuccess(result)) {
-        // May succeed with empty props
-        expect(result.data.props).toBeDefined();
+        expect(result.data.props).toEqual([]);
+        expect(result.data.variants).toEqual({});
+        // sourceHash is still generated for empty content
+        expect(result.sourceHash).toHaveLength(64);
       }
     });
 
-    it('handles empty component name (may succeed with generated name)', async () => {
+    it('succeeds with empty component name (returns empty name)', async () => {
       const fixture = loadFixture('shadcn', 'button');
 
       const result = await extractor.extract({
@@ -299,8 +302,14 @@ describe('HybridExtractor', () => {
         framework: 'react',
       });
 
-      // May fail validation or succeed with generated/fallback name
-      expect(result.type).toBeDefined();
+      // Extractor is lenient - succeeds with empty name
+      expect(isExtractionSuccess(result)).toBe(true);
+      if (isExtractionSuccess(result)) {
+        // Identity name is whatever was passed (empty string)
+        expect(result.identity.name).toBe('');
+        // But extraction of props from source still works
+        expect(result.data.variants).toBeDefined();
+      }
     });
   });
 

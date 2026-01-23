@@ -11,6 +11,7 @@
 import { Project, type SourceFile, ts } from 'ts-morph';
 
 import { detectBaseLibrary } from '../constants/index.js';
+import { pascalCase } from '../utils/case.js';
 import { createLogger } from '../utils/logger.js';
 
 import type { DependencyExtractionResult } from './types.js';
@@ -167,7 +168,7 @@ export class DependencyExtractor {
     // Convert to PascalCase if it looks like a component path
     // but keep utils/helpers as-is
     if (this.isLikelyComponent(moduleSpecifier, segment)) {
-      return this.toPascalCase(segment);
+      return pascalCase(segment);
     }
 
     return segment;
@@ -233,16 +234,6 @@ export class DependencyExtractor {
     // Handle regular packages (take first segment only)
     const parts = moduleSpecifier.split('/');
     return parts[0];
-  }
-
-  /**
-   * Convert string to PascalCase
-   */
-  private toPascalCase(str: string): string {
-    return str
-      .split(/[-_]/)
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
-      .join('');
   }
 
   /**

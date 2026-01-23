@@ -57,11 +57,12 @@ import {
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import type { ComponentMetaTool } from '../../src/generator/tool-schema.js';
 import type {
   ILLMProvider,
-  LLMCompletionOptions,
-  LLMCompletionResponse,
   LLMProviderType,
+  ToolCallingOptions,
+  ToolCallResult,
 } from '../../src/generator/types.js';
 
 // Directory paths
@@ -78,8 +79,8 @@ export interface CachedResponseRecord {
   /** Component name this response is for */
   componentName: string;
 
-  /** The LLM completion response */
-  response: LLMCompletionResponse;
+  /** The tool call response data */
+  response: ComponentMetaTool;
 
   /** Recording timestamp (ISO string) */
   recordedAt: string;
@@ -108,10 +109,10 @@ export interface ValidationResult {
   differences: ValidationDifference[];
 
   /** Cached response used for comparison */
-  cached: LLMCompletionResponse;
+  cached: ComponentMetaTool;
 
   /** Real response from LLM */
-  real: LLMCompletionResponse;
+  real: ComponentMetaTool;
 }
 
 export interface ValidationDifference {
@@ -215,12 +216,12 @@ export class CachedLLMProvider implements ILLMProvider {
   }
 
   /**
-   * Generate a completion - behavior depends on mode
+   * Generate structured output using tool calling - behavior depends on mode
    */
-  async generateCompletion(
+  async generateWithToolCalling<T = ComponentMetaTool>(
     prompt: string,
-    options?: LLMCompletionOptions
-  ): Promise<LLMCompletionResponse> {
+    options?: ToolCallingOptions
+  ): Promise<ToolCallResult<T>> {
     // Extract component name from prompt
     const componentName = this.extractComponentName(prompt);
     const inputHash = this.hashPrompt(prompt);
@@ -242,24 +243,31 @@ export class CachedLLMProvider implements ILLMProvider {
   /**
    * Record mode: Call real provider and save response
    */
-  private async recordResponse(
+  private async recordResponse<T = ComponentMetaTool>(
     prompt: string,
-    options: LLMCompletionOptions | undefined,
+    options: ToolCallingOptions | undefined,
     componentName: string,
     inputHash: string
-  ): Promise<LLMCompletionResponse> {
+  ): Promise<ToolCallResult<T>> {
     const realProvider = this.config.realProvider!;
 
     // Call real provider
-    const response = await realProvider.generateCompletion(prompt, options);
+    const result = await realProvider.generateWithToolCalling<T>(
+      prompt,
+      options
+    );
+
+    if (result.type === 'failure') {
+      return result;
+    }
 
     // Save to disk
     const record: CachedResponseRecord = {
       componentName,
-      response,
+      response: result.data as ComponentMetaTool,
       recordedAt: new Date().toISOString(),
       provider: realProvider.providerType,
-      model: response.model,
+      model: result.model,
       inputHash,
       promptSummary: this.summarizePrompt(prompt),
     };
@@ -269,23 +277,30 @@ export class CachedLLMProvider implements ILLMProvider {
     // Update in-memory cache
     this.responseCache.set(componentName.toLowerCase(), record);
 
-    return response;
+    return result;
   }
 
   /**
    * Validate mode: Call real provider and compare to cached
    */
-  private async validateResponse(
+  private async validateResponse<T = ComponentMetaTool>(
     prompt: string,
-    options: LLMCompletionOptions | undefined,
+    options: ToolCallingOptions | undefined,
     componentName: string,
     _inputHash: string
-  ): Promise<LLMCompletionResponse> {
+  ): Promise<ToolCallResult<T>> {
     const realProvider = this.config.realProvider!;
     const cacheKey = componentName.toLowerCase();
 
     // Call real provider
-    const realResponse = await realProvider.generateCompletion(prompt, options);
+    const result = await realProvider.generateWithToolCalling<T>(
+      prompt,
+      options
+    );
+
+    if (result.type === 'failure') {
+      return result;
+    }
 
     // Get cached response for comparison
     const cachedRecord = this.responseCache.get(cacheKey);
@@ -294,7 +309,7 @@ export class CachedLLMProvider implements ILLMProvider {
       // Compare responses
       const validationResult = this.compareResponses(
         cachedRecord.response,
-        realResponse,
+        result.data as ComponentMetaTool,
         componentName
       );
 
@@ -312,22 +327,30 @@ export class CachedLLMProvider implements ILLMProvider {
       }
     }
 
-    return realResponse;
+    return result;
   }
 
   /**
    * Playback mode: Return cached response
    */
-  private playbackResponse(
+  private playbackResponse<T = ComponentMetaTool>(
     prompt: string,
-    _options: LLMCompletionOptions | undefined,
+    _options: ToolCallingOptions | undefined,
     componentName: string
-  ): Promise<LLMCompletionResponse> {
+  ): Promise<ToolCallResult<T>> {
     const cacheKey = componentName.toLowerCase();
     const cachedRecord = this.responseCache.get(cacheKey);
 
     if (cachedRecord) {
-      return Promise.resolve({ ...cachedRecord.response });
+      return Promise.resolve({
+        type: 'success',
+        data: { ...cachedRecord.response } as T,
+        model: cachedRecord.model,
+        usage: {
+          inputTokens: 500,
+          outputTokens: 200,
+        },
+      });
     }
 
     // Fallback to real provider if available
@@ -335,13 +358,18 @@ export class CachedLLMProvider implements ILLMProvider {
       console.warn(
         `[CachedLLMProvider] No cached response for "${componentName}", falling back to real provider`
       );
-      return this.config.realProvider.generateCompletion(prompt, _options);
+      return this.config.realProvider.generateWithToolCalling<T>(
+        prompt,
+        _options
+      );
     }
 
     // No cached response and no fallback - return error
-    throw new Error(
-      `CachedLLMProvider: No cached response for "${componentName}" and no realProvider configured for fallback`
-    );
+    return Promise.resolve({
+      type: 'failure',
+      error: `CachedLLMProvider: No cached response for "${componentName}" and no realProvider configured for fallback`,
+      retryable: false,
+    });
   }
 
   /**
@@ -414,62 +442,28 @@ export class CachedLLMProvider implements ILLMProvider {
   }
 
   /**
-   * Compare two LLM responses for semantic similarity
+   * Compare two tool responses for semantic similarity
    *
    * Uses structural comparison since LLM outputs are non-deterministic.
    * Focuses on key fields rather than exact text matching.
    */
   private compareResponses(
-    cached: LLMCompletionResponse,
-    real: LLMCompletionResponse,
+    cached: ComponentMetaTool,
+    real: ComponentMetaTool,
     componentName: string
   ): ValidationResult {
     const differences: ValidationDifference[] = [];
 
-    // Parse JSON from both responses
-    let cachedParsed: Record<string, unknown> = {};
-    let realParsed: Record<string, unknown> = {};
-
-    try {
-      cachedParsed = JSON.parse(cached.text);
-    } catch {
-      differences.push({
-        field: 'cached.text',
-        expected: 'valid JSON',
-        actual: 'parse error',
-        severity: 'error',
-      });
-    }
-
-    try {
-      realParsed = JSON.parse(real.text);
-    } catch {
-      differences.push({
-        field: 'real.text',
-        expected: 'valid JSON',
-        actual: 'parse error',
-        severity: 'error',
-      });
-    }
-
-    // If either failed to parse, return early
-    if (differences.length > 0) {
-      return { passed: false, differences, cached, real };
-    }
-
     // Compare key structural fields
-    const fieldsToCompare = [
+    const fieldsToCompare: (keyof ComponentMetaTool)[] = [
       'description',
       'tier',
-      'patterns',
       'tokens',
-      'examples',
-      'relatedComponents',
     ];
 
     for (const field of fieldsToCompare) {
-      const cachedValue = cachedParsed[field];
-      const realValue = realParsed[field];
+      const cachedValue = cached[field];
+      const realValue = real[field];
 
       // Check field presence
       if (cachedValue === undefined && realValue !== undefined) {
@@ -503,7 +497,7 @@ export class CachedLLMProvider implements ILLMProvider {
     }
 
     // Check description contains component name
-    const realDesc = String(realParsed['description'] ?? '').toLowerCase();
+    const realDesc = String(real.description ?? '').toLowerCase();
     if (!realDesc.includes(componentName.toLowerCase())) {
       differences.push({
         field: 'description',

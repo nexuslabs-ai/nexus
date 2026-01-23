@@ -1,0 +1,153 @@
+{
+  "componentName": "Button",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "bfe08f23-6e68-4d73-9da4-acb1b29efe80",
+    "slug": "button-react-bfe08f23",
+    "name": "Button",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A versatile button component for triggering user actions, form submissions, and navigation, with built-in loading states and flexible rendering.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Button } from '@nexus/react'",
+      "typeOnly": "import type { ButtonProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Button>Content</Button>",
+    "props": {
+      "variants": [],
+      "behaviors": [
+        {
+          "name": "loading",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Shows a loading indicator and disables the button.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, the button will render as its child element (using Radix Slot).\nUseful for rendering as a link or custom element while keeping button styles.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ]
+    },
+    "variants": {
+      "variant": {
+        "values": [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost",
+          "link"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "values": ["default", "sm", "lg", "icon"],
+        "default": "default"
+      }
+    },
+    "examples": {
+      "minimal": {
+        "title": "Basic",
+        "code": "<Button>Click me</Button>",
+        "isPrimary": true
+      },
+      "common": [
+        {
+          "title": "Destructive variant",
+          "code": "<Button variant=\"destructive\" size=\"lg\">Delete Account</Button>",
+          "propsUsed": ["variant", "size", "Account"]
+        },
+        {
+          "title": "Loading state",
+          "code": "<Button loading>Submitting...</Button>"
+        },
+        {
+          "title": "Composition pattern",
+          "code": "<Button asChild><a href=\"/dashboard\">Dashboard</a></Button>",
+          "propsUsed": ["href"]
+        },
+        {
+          "title": "Outline variant",
+          "code": "<Button asChild size=\"icon\" variant=\"outline\"><Link href=\"/settings\"><SettingsIcon /></Link></Button>",
+          "propsUsed": ["asChild", "variant", "href"]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "To trigger immediate actions, submit forms, navigate between pages, or perform operations that require user interaction. Use for primary and secondary actions across your application.",
+      "whenNotToUse": "For purely decorative elements or static text that doesn't trigger an action. Do not use for headings or non-interactive content. Use a `div` or `span` for non-interactive display.",
+      "accessibility": "Handles standard keyboard interactions (Space, Enter) and focus management. When `loading` is true, the button is disabled and `aria-disabled` is set. If `asChild` is used, ensure the child element (e.g., `<a>`) has appropriate ARIA attributes if it performs a role other than its native semantic meaning. Ensure sufficient color contrast for all variants and focus states.",
+      "patterns": [
+        "button",
+        "form-control",
+        "async-action",
+        "navigation",
+        "icon"
+      ],
+      "relatedComponents": ["Link", "DropdownMenu", "AlertDialog", "Form"]
+    },
+    "semanticDescription": "The Button component is a highly versatile and customizable UI element designed for initiating various user interactions. It supports different visual `variants` (default, destructive, outline, secondary, ghost, link) and `sizes` (default, sm, lg, icon) to fit diverse contexts within an application. Key features include a `loading` prop to indicate ongoing asynchronous operations, automatically disabling the button, and an `asChild` prop that allows the button's styles and behavior to be applied to a different underlying HTML element (e.g., an `<a>` tag for navigation or a custom component), leveraging Radix UI's Slot primitive for maximum flexibility. This component is essential for user input, form submissions, navigation, and triggering actions like opening modals or confirming decisions, ensuring a consistent and accessible interactive experience.",
+    "tokens": [
+      "color-text",
+      "color-background",
+      "color-border",
+      "spacing-xs",
+      "spacing-sm",
+      "spacing-md",
+      "font-size-sm",
+      "font-size-md",
+      "border-radius-sm",
+      "box-shadow-focus",
+      "transition-ease-in-out"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/context-engine/core/test/fixtures/components/shadcn/button.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-slot": "*",
+        "class-variance-authority": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Slot"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-23T06:13:39.007Z",
+    "updatedAt": "2026-01-23T06:13:39.007Z",
+    "sourceHash": "ee2c2aa9d5f7192ee02fc79ecf036779ae23667d999088d798e90388150c10e4",
+    "metaHash": "558a1621c1346f91a4e62be77ff94256c9452826baf0adb7bd480d1c3734aeae"
+  },
+  "recordedAt": "2026-01-23T06:13:39.007Z",
+  "fixtureSource": "shadcn/button"
+}

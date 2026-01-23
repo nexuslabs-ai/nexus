@@ -17,6 +17,20 @@ import { OutputType } from '../types/output.js';
 export type { ManifestIdentity } from '../types/index.js';
 
 /**
+ * Configuration for ManifestBuilder
+ */
+export interface ManifestBuilderConfig {
+  /**
+   * Default package name to use when import detection fails.
+   * This is used as a fallback when no design system package
+   * can be derived from the component's dependencies.
+   *
+   * @default '@nexus/react'
+   */
+  defaultPackageName?: string;
+}
+
+/**
  * Build output discriminant
  *
  * Uses shared OutputType for consistency across modules.

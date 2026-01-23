@@ -79,29 +79,36 @@ export interface LLMCompletionResponse {
 /**
  * LLM Provider interface
  *
- * Abstraction for LLM providers to enable swapping between Anthropic, OpenAI, etc.
+ * Abstraction for LLM providers to enable swapping between Anthropic, Gemini, OpenAI, etc.
  * Implementations should handle authentication, retries, and error translation.
+ *
+ * All providers MUST implement tool calling - this is the only supported generation method.
+ * Text-based parsing has been removed in favor of structured output via tool calling.
  *
  * @example
  * ```typescript
  * const provider = new AnthropicProvider({ apiKey: 'sk-...' });
- * const response = await provider.generateCompletion('Generate metadata for...');
- * console.log(response.text);
+ * const result = await provider.generateWithToolCalling<ComponentMetaTool>(
+ *   'Generate metadata for...',
+ *   { maxTokens: 2000 }
+ * );
+ * if (result.type === 'success') {
+ *   console.log(result.data);
+ * }
  * ```
  */
 export interface ILLMProvider {
   /**
-   * Generate a text completion from a prompt
+   * Generate structured output using tool calling
    *
    * @param prompt - The input prompt for generation
    * @param options - Optional generation parameters
-   * @returns Promise resolving to the completion response
-   * @throws Error if the API call fails
+   * @returns Promise resolving to the tool call result
    */
-  generateCompletion(
+  generateWithToolCalling<T>(
     prompt: string,
-    options?: LLMCompletionOptions
-  ): Promise<LLMCompletionResponse>;
+    options?: ToolCallingOptions
+  ): Promise<ToolCallResult<T>>;
 
   /**
    * Provider type for logging and debugging
@@ -258,40 +265,62 @@ export function isGeneratorFailure(
   return output.type === GenerationOutputType.Failure;
 }
 
+// =============================================================================
+// Tool Calling Types
+// =============================================================================
+
 /**
- * Parsed LLM response for component meta
- *
- * This is the raw structure expected from LLM responses before normalization.
- * Fields may be missing or have slightly different names.
+ * Tool calling options for structured output generation
  */
-export interface ParsedLLMMetaResponse {
-  /** Component description (1-2 sentences) */
-  description?: string;
+export interface ToolCallingOptions {
+  /** Maximum tokens to generate */
+  maxTokens?: number;
 
-  /** Rich semantic description for embeddings */
-  semanticDescription?: string;
+  /** System prompt for context */
+  systemPrompt?: string;
+}
 
-  /** Tier classification */
-  tier?: 'free' | 'pro';
+/**
+ * Successful tool calling result
+ */
+export interface ToolCallSuccess<T> {
+  type: 'success';
+  data: T;
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+  };
+  model: string;
+}
 
-  /** When to use guidance */
-  whenToUse?: string;
+/**
+ * Failed tool calling result
+ */
+export interface ToolCallFailure {
+  type: 'failure';
+  error: string;
+  retryable: boolean;
+}
 
-  /** When not to use guidance */
-  whenNotToUse?: string;
+/**
+ * Tool calling result union
+ */
+export type ToolCallResult<T> = ToolCallSuccess<T> | ToolCallFailure;
 
-  /** Component patterns */
-  patterns?: string[];
+/**
+ * Type guard for successful tool call
+ */
+export function isToolCallSuccess<T>(
+  result: ToolCallResult<T>
+): result is ToolCallSuccess<T> {
+  return result.type === 'success';
+}
 
-  /** Design tokens used */
-  tokens?: string[];
-
-  /** Usage examples (JSX strings) */
-  examples?: string[];
-
-  /** Related component names */
-  relatedComponents?: string[];
-
-  /** Accessibility notes */
-  a11yNotes?: string;
+/**
+ * Type guard for failed tool call
+ */
+export function isToolCallFailure<T>(
+  result: ToolCallResult<T>
+): result is ToolCallFailure {
+  return result.type === 'failure';
 }

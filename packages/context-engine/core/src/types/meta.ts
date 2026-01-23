@@ -38,6 +38,10 @@ export const ComponentPatternSchema = z.enum(COMPONENT_PATTERNS);
 
 /**
  * AI-generated component context
+ *
+ * NOTE: This schema is used internally by the generator module during
+ * metadata generation. The final manifest uses GuidanceSchema instead.
+ * This is NOT part of the final ComponentManifest schema.
  */
 export const AIContextSchema = z.object({
   /** Rich semantic description for embeddings (2-5 sentences) */
@@ -94,47 +98,3 @@ export const ComponentMetaSchema = z.object({
 });
 
 export type ComponentMeta = z.infer<typeof ComponentMetaSchema>;
-
-/**
- * Meta generation request
- */
-export const MetaGenerationRequestSchema = z.object({
-  /** Component name */
-  name: z.string(),
-
-  /** Source code content */
-  sourceCode: z.string(),
-
-  /** Extracted props for context */
-  extractedProps: z.array(z.string()),
-
-  /** Extracted variants */
-  variants: z.record(z.string(), z.array(z.string())),
-
-  /** Additional context hints */
-  hints: z.string().optional(),
-});
-
-export type MetaGenerationRequest = z.infer<typeof MetaGenerationRequestSchema>;
-
-/**
- * Meta generation result
- */
-export const MetaGenerationResultSchema = z.object({
-  /** Generated meta */
-  meta: ComponentMetaSchema,
-
-  /** Generation duration in milliseconds */
-  durationMs: z.number().int().min(0),
-
-  /** Model used for generation */
-  model: z.string(),
-
-  /** Token usage */
-  tokenUsage: z.object({
-    input: z.number().int().min(0),
-    output: z.number().int().min(0),
-  }),
-});
-
-export type MetaGenerationResult = z.infer<typeof MetaGenerationResultSchema>;

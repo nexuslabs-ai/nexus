@@ -1,17 +1,72 @@
 {
   "componentName": "Input",
   "response": {
-    "text": "```json\n{\n  \"description\": \"A flexible text input component with various visual styles and optional icons.\",\n  \"semanticDescription\": \"The Input component provides a foundational element for user data entry in forms. It supports multiple visual variants like default, ghost, and filled, as well as different sizes (sm, default, lg) to match diverse design requirements. Users can also enhance the input with optional leading or trailing icons and indicate an error state for validation purposes, making it highly adaptable for various form contexts.\",\n  \"tier\": \"free\",\n  \"whenToUse\": \"When you need to capture user text input, numbers, or other short data strings. To create interactive form fields for user data entry. When requiring a visual cue for an input's state, such as error or disabled. To provide clear calls to action or information using leading/trailing icons.\",\n  \"whenNotToUse\": \"For large blocks of text, consider a TextArea component instead. When selecting multiple options from a predefined list, use a Select, RadioGroup, or CheckboxGroup. For complex data entry requiring specific formatting or multiple distinct fields (consider a specialized component or a combination of inputs).\",\n  \"patterns\": [\"input\", \"form-control\", \"primitive-based\"],\n  \"tokens\": [\n    \"color-primary\",\n    \"color-text\",\n    \"color-error\",\n    \"spacing-sm\",\n    \"spacing-md\",\n    \"spacing-lg\",\n    \"border-radius-md\",\n    \"typography-body\"\n  ],\n  \"examples\": [\n    \"<Input placeholder=\\\"Enter text here\\\" />\",\n    \"<Input variant=\\\"filled\\\" inputSize=\\\"lg\\\" placeholder=\\\"Search...\\\" />\",\n    \"<Input error startIcon={<Icon name=\\\"search\\\" />} placeholder=\\\"Search...\\\" />\",\n    \"<Input variant=\\\"ghost\\\" startIcon={<Icon name=\\\"user\\\" />} endIcon={<Icon name=\\\"email\\\" />} placeholder=\\\"Email\\\" />\"\n  ],\n  \"relatedComponents\": [\"Label\", \"Button\", \"FormGroup\", \"TextArea\", \"Select\", \"Icon\"],\n  \"a11yNotes\": \"Ensure all inputs have an associated `<label>` element for screen reader users, either visually or via `aria-label`/`aria-labelledby`. Provide clear error messages and use `aria-invalid` to indicate invalid states. Use appropriate `type` attributes (e.g., `type='email'`, `type='password'`, `type='number'`) for improved accessibility and mobile keyboard experiences. Ensure sufficient color contrast for text, borders, and error states.\"\n}\n```",
-    "usage": {
-      "inputTokens": 517,
-      "outputTokens": 556
+    "semanticDescription": "The Input component provides a flexible and customizable text input field for collecting user data. It supports various visual `variant` styles (default, ghost, filled) to integrate seamlessly into different UI contexts. Users can choose from different `inputSize` options (sm, default, lg) to fit layout requirements. The component can display an `error` state to indicate invalid input. Furthermore, it allows for the inclusion of `startIcon` and `endIcon` for adding visual cues or interactive elements within the input field, enhancing usability for tasks like search or password visibility toggles. Key use cases include form building, search interfaces, data filtering, and any scenario requiring direct user text entry.",
+    "description": "An input field for collecting user text, numbers, or other data within forms.",
+    "minimalExample": "<Input />",
+    "guidance": {
+      "relatedComponents": ["Label", "Button", "Form", "Textarea", "Select"],
+      "accessibility": "Ensure every Input component has an associated <label> element for screen reader accessibility. Use the 'for' attribute on the label and the 'id' attribute on the input to link them semantically. For inputs with `error={true}`, consider using `aria-invalid='true'` and `aria-describedby` to link to an error message. If icons are purely decorative, ensure they are hidden from assistive technologies (e.g., `aria-hidden='true'`).",
+      "whenToUse": "Use the Input component for collecting various types of user data, such as text, numbers, email addresses, or passwords, within forms, search bars, or interactive data entry fields. It is ideal when a user needs to type information directly.",
+      "whenNotToUse": "Avoid using Input for selecting options from a predefined list (use Select or RadioGroup), for triggering actions (use Button), or for displaying large amounts of static text (use Text or Paragraph). Do not use it for complex multi-line text input (use Textarea).",
+      "patterns": ["form-control", "input"]
     },
-    "model": "gemini-2.5-flash",
-    "stopReason": "STOP"
+    "tier": "free",
+    "tokens": [
+      "color-text-primary",
+      "color-border-default",
+      "color-background-default",
+      "spacing-sm",
+      "spacing-md",
+      "spacing-lg",
+      "font-size-sm",
+      "font-size-md",
+      "font-size-lg",
+      "border-radius-sm",
+      "color-error",
+      "color-background-filled",
+      "color-border-ghost"
+    ],
+    "examples": {
+      "minimal": {
+        "description": "A simple, uncontrolled input field.",
+        "propsUsed": [],
+        "title": "Basic Input",
+        "code": "<Input />"
+      },
+      "advanced": [
+        {
+          "title": "Input with Start and End Icons",
+          "description": "An input field featuring both a leading and trailing icon for enhanced context or action.",
+          "code": "<Input\\n  startIcon={<SearchIcon />}\\n  endIcon={<ClearIcon />}\\n  placeholder=\"Search...\"\\n/>",
+          "propsUsed": ["startIcon", "endIcon", "placeholder"]
+        }
+      ],
+      "common": [
+        {
+          "title": "Filled Input",
+          "code": "<Input variant=\"filled\" placeholder=\"Enter text\" />",
+          "description": "An input with a filled visual style.",
+          "propsUsed": ["variant", "placeholder"]
+        },
+        {
+          "propsUsed": ["inputSize", "error", "placeholder"],
+          "code": "<Input inputSize=\"lg\" error={true} placeholder=\"Invalid data\" />",
+          "description": "A large input field in an error state.",
+          "title": "Large Input with Error"
+        },
+        {
+          "description": "A subtle input with a ghost variant, often used for search.",
+          "code": "<Input variant=\"ghost\" placeholder=\"Search...\" />",
+          "title": "Ghost Input",
+          "propsUsed": ["variant", "placeholder"]
+        }
+      ]
+    }
   },
-  "recordedAt": "2026-01-19T08:46:34.711Z",
+  "recordedAt": "2026-01-23T06:10:37.945Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "98e1996b2cc20127b468a2c7c1d01b9260b8d6ad882775a9e16034988194285e",
-  "promptSummary": "Generate metadata for Input component. Prompt: Generate metadata for this component:\n\n## Component\nName: Input\nFramework: react\n\nProps:\n- variant: 'default' | 'ghost' | 'filled' - Visual variant of the input. [default, ghost, filled]\n- inputSize: ..."
+  "inputHash": "811fe7500514b918ab3b5808856db9168372c1d6ebbe721bb15eee510578107e",
+  "promptSummary": "Generate metadata for Input component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Input\n\nProps:\n- variant: 'default' | 'ghost' | 'filled' - Visual variant of the input. [de..."
 }

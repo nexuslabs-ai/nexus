@@ -2,18 +2,19 @@
  * Component Manifest Types
  *
  * The complete component knowledge, combining identity, extracted data,
- * and AI-generated metadata.
- *
- * IMPORTANT: This schema is versioned. Changes should bump MANIFEST_SCHEMA_VERSION.
+ * and AI-generated metadata. Optimized for AI consumption.
  */
 
 import { z } from 'zod';
 
+import { CvaVariantSchema } from './cva-variant.js';
 import {
   EmbeddingModelInfoSchema,
   EmbeddingStatusSchema,
 } from './embedding.js';
-import { ExtractedPropSchema, HashSchema } from './extracted.js';
+import { StructuredExamplesSchema } from './examples.js';
+import { HashSchema } from './extracted.js';
+import { GuidanceSchema } from './guidance.js';
 import {
   BaseLibrarySchema,
   FrameworkSchema,
@@ -21,18 +22,32 @@ import {
   VersionSchema,
   VisibilitySchema,
 } from './identity.js';
-import { AIContextSchema } from './meta.js';
+import { ImportStatementSchema } from './import-statement.js';
+import { CategorizedPropsSchema } from './props.js';
 
 /**
  * Current manifest schema version
- * Bump this when making breaking changes to ComponentManifestSchema
- *
- * @stable This enables schema migrations without data loss.
  */
 export const MANIFEST_SCHEMA_VERSION = '1.0';
 
 /**
- * Complete component manifest schema
+ * Dependencies schema
+ */
+export const DependenciesSchema = z.object({
+  npm: z.record(z.string(), z.string()),
+  internal: z.array(z.string()),
+});
+
+export type Dependencies = z.infer<typeof DependenciesSchema>;
+
+/**
+ * Complete component manifest schema (v1.0)
+ *
+ * This schema is optimized for AI consumption with:
+ * - Flat structure for AI-critical fields at top level
+ * - Categorized props grouped by semantic purpose
+ * - Structured examples with metadata
+ * - Tool calling support for reliable LLM output
  */
 export const ComponentManifestSchema = z.object({
   // === Schema Version ===
@@ -59,34 +74,66 @@ export const ComponentManifestSchema = z.object({
   /** Component visibility for sharing */
   visibility: VisibilitySchema.default('private'),
 
-  // === From Meta (GENERATED) ===
-  /** One-line description */
-  description: z.string(),
+  // === AI Quick Reference (TOP LEVEL) ===
+  /** One-line description (10-500 chars) */
+  description: z.string().min(10).max(500),
 
-  /** Component tier */
+  /** Component tier for licensing */
   tier: TierSchema,
 
-  /** AI-generated context */
-  ai: AIContextSchema,
+  /**
+   * Import statement variants for AI use
+   */
+  importStatement: ImportStatementSchema,
 
-  // === From Extraction (EXTRACTED) ===
-  /** Component props */
-  props: z.array(ExtractedPropSchema),
+  /**
+   * Simplest working code example
+   */
+  minimalExample: z.string(),
 
-  /** Design variants from cva() */
-  variants: z.record(z.string(), z.array(z.string())),
+  // === Props (Categorized) ===
+  /**
+   * Props categorized by semantic purpose
+   * Grouped for better AI filtering
+   */
+  props: CategorizedPropsSchema,
 
-  /** Default variants */
-  defaultVariants: z.record(z.string(), z.string()),
+  // === CVA Variants ===
+  /**
+   * CVA variant definitions with metadata
+   * @example { variant: { values: ["primary", "secondary"], default: "primary" } }
+   */
+  variants: z.record(z.string(), CvaVariantSchema),
 
+  // === Examples (Structured) ===
+  /**
+   * Structured code examples organized by complexity
+   */
+  examples: StructuredExamplesSchema,
+
+  // === AI Guidance ===
+  /**
+   * Guidance for AI assistants on when/how to use
+   */
+  guidance: GuidanceSchema,
+
+  // === Semantic Search ===
+  /**
+   * Rich description for embedding/search (50-2000 chars)
+   */
+  semanticDescription: z.string().min(50).max(2000),
+
+  /**
+   * Design tokens used by this component
+   */
+  tokens: z.array(z.string()),
+
+  // === From Extraction ===
   /** Component files */
   files: z.array(z.string()),
 
   /** Dependencies */
-  dependencies: z.object({
-    npm: z.record(z.string(), z.string()),
-    internal: z.array(z.string()),
-  }),
+  dependencies: DependenciesSchema,
 
   /** Base UI library (if any) */
   baseLibrary: BaseLibrarySchema.optional(),
@@ -129,6 +176,7 @@ export const ManifestSummarySchema = z.object({
   description: z.string(),
   tier: TierSchema,
   visibility: VisibilitySchema,
+  /** Component patterns from guidance */
   patterns: z.array(z.string()),
   embeddingStatus: EmbeddingStatusSchema,
   updatedAt: z.iso.datetime(),

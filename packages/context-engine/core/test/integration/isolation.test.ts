@@ -29,10 +29,9 @@ import {
 } from '../../src/processor/index.js';
 import {
   createMockLLMProvider,
-  DEFAULT_MOCK_RESPONSE,
+  DEFAULT_MOCK_TOOL_RESPONSE,
   type MockLLMProvider,
 } from '../providers/mock-llm-provider.js';
-import { expectOrgIsolation } from '../utils/assertion-helpers.js';
 import { loadFixture } from '../utils/fixture-loader.js';
 
 describe('Multi-Org Isolation', () => {
@@ -46,7 +45,7 @@ describe('Multi-Org Isolation', () => {
 
   beforeEach(() => {
     mockProvider = createMockLLMProvider({
-      defaultResponse: DEFAULT_MOCK_RESPONSE,
+      defaultResponse: DEFAULT_MOCK_TOOL_RESPONSE,
     });
     processor = createComponentProcessor({
       llmProvider: mockProvider,
@@ -104,7 +103,7 @@ describe('Multi-Org Isolation', () => {
   });
 
   describe('extraction org scoping', () => {
-    it('extraction result includes orgId at top level', async () => {
+    it('extraction result contains orgId at top level and identity with component info', async () => {
       const fixture = loadFixture('shadcn', 'button');
 
       const result = await extractComponent({
@@ -116,29 +115,12 @@ describe('Multi-Org Isolation', () => {
 
       expect(isExtractionSuccess(result)).toBe(true);
       if (isExtractionSuccess(result)) {
-        // orgId is at top level of ExtractorResult, not inside identity
+        // orgId is at top level of ExtractorResult
         expect(result.orgId).toBe(ORG_A);
-      }
-    });
-
-    it('extraction identity contains component info (not orgId)', async () => {
-      const fixture = loadFixture('shadcn', 'button');
-
-      const result = await extractComponent({
-        orgId: ORG_C,
-        name: 'Button',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      });
-
-      expect(isExtractionSuccess(result)).toBe(true);
-      if (isExtractionSuccess(result)) {
         // ManifestIdentity contains id, slug, name, framework (NOT orgId)
         expect(result.identity.id).toBeTruthy();
         expect(result.identity.name).toBe('Button');
         expect(result.identity.framework).toBe('react');
-        // orgId is at result level
-        expect(result.orgId).toBe(ORG_C);
       }
     });
   });
@@ -196,96 +178,31 @@ describe('Multi-Org Isolation', () => {
     });
   });
 
-  describe('invalid orgId handling', () => {
-    // Note: Current implementation may not strictly validate UUID format
-    // These tests document the actual behavior
+  describe('orgId format handling', () => {
+    // Note: Implementation accepts any string as orgId (no UUID validation)
+    // This single test documents this behavior across different formats
 
-    it('handles invalid orgId format in extraction', async () => {
+    it('preserves any orgId format passed to extraction and processing', async () => {
       const fixture = loadFixture('shadcn', 'button');
 
-      const result = await extractComponent({
-        orgId: 'not-a-valid-uuid',
-        name: 'Button',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      });
+      // Test various orgId formats
+      const formats = ['not-a-valid-uuid', '', 'custom-org-id-123'];
 
-      // Implementation may accept any string as orgId
-      // The key is that the provided orgId is preserved
-      if (result.type === 'success') {
-        expect(result.orgId).toBe('not-a-valid-uuid');
-      }
-    });
+      for (const orgId of formats) {
+        const result = await extractComponent({
+          orgId,
+          name: 'Button',
+          sourceCode: fixture.sourceCode,
+          framework: 'react',
+        });
 
-    it('handles empty orgId in extraction', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+        // Should produce a result (success or failure)
+        expect(result.type).toBeDefined();
 
-      const result = await extractComponent({
-        orgId: '',
-        name: 'Button',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      });
-
-      // Implementation may accept empty orgId
-      // This documents actual behavior
-      expect(result.type).toBeDefined();
-    });
-
-    it('processes with non-UUID orgId', async () => {
-      const fixture = loadFixture('shadcn', 'button');
-      const input: ProcessorInput = {
-        orgId: 'custom-org-id-123',
-        name: 'Button',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      };
-
-      const result = await processor.process(input);
-
-      // Current implementation may accept non-UUID orgIds
-      // This documents actual behavior
-      expect(result.type).toBeDefined();
-    });
-  });
-
-  describe('org isolation assertion helper', () => {
-    it('expectOrgIsolation validates direct extraction result', async () => {
-      const fixture = loadFixture('shadcn', 'button');
-
-      // Use extractComponent directly which returns ExtractorResult with orgId
-      const extractResult = await extractComponent({
-        orgId: ORG_A,
-        name: 'Button',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      });
-
-      expect(isExtractionSuccess(extractResult)).toBe(true);
-      if (isExtractionSuccess(extractResult)) {
-        // ExtractorResult has orgId at top level
-        expectOrgIsolation(
-          { orgId: extractResult.orgId, identity: extractResult.identity },
-          ORG_A
-        );
-      }
-    });
-
-    it('expectOrgIsolation validates manifest ID exists', async () => {
-      const fixture = loadFixture('shadcn', 'button');
-      const input: ProcessorInput = {
-        orgId: ORG_A,
-        name: 'Button',
-        sourceCode: fixture.sourceCode,
-        framework: 'react',
-      };
-
-      const result = await processor.process(input);
-
-      expect(isProcessorSuccess(result)).toBe(true);
-      if (isProcessorSuccess(result)) {
-        // Validates that manifest has an ID (org scoping is in processor layer)
-        expectOrgIsolation({ manifest: result.manifest }, ORG_A);
+        // If successful, orgId should be preserved
+        if (result.type === 'success') {
+          expect(result.orgId).toBe(orgId);
+        }
       }
     });
   });

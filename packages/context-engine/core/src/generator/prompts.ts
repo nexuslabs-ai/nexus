@@ -1,7 +1,7 @@
 /**
  * Generation Prompts
  *
- * Prompt templates for LLM-based metadata generation.
+ * Prompt templates for LLM-based metadata generation via tool calling.
  * Designed for efficiency (minimal token usage) while providing rich context.
  */
 
@@ -9,36 +9,8 @@ import type { ExtractedData, Framework } from '../types/index.js';
 import { COMPONENT_PATTERNS } from '../types/meta.js';
 
 // =============================================================================
-// System Prompt
+// Helper Functions for Building Prompt Sections
 // =============================================================================
-
-/**
- * System prompt that explains the task to the LLM
- *
- * Kept concise to minimize token usage while providing clear instructions.
- */
-export const SYSTEM_PROMPT = `You are a design system documentation expert. Generate metadata for React components based on extracted code information.
-
-Output valid JSON only. No markdown, no explanations.`;
-
-// =============================================================================
-// User Prompt Template
-// =============================================================================
-
-/**
- * Template placeholders for user prompt
- */
-export interface PromptPlaceholders {
-  componentName: string;
-  framework: Framework;
-  propsSection: string;
-  variantsSection: string;
-  dependenciesSection: string;
-  baseLibrarySection: string;
-  sourceDescription: string;
-  figmaUrl: string;
-  hints: string;
-}
 
 /**
  * Build the props section for the prompt
@@ -129,65 +101,8 @@ function buildBaseLibrarySection(extracted: ExtractedData): string {
   return parts.join(' ');
 }
 
-/**
- * User prompt template
- *
- * Uses {{PLACEHOLDER}} syntax for template variables.
- */
-export const USER_PROMPT_TEMPLATE = `Generate metadata for this component:
-
-## Component
-Name: {{COMPONENT_NAME}}
-Framework: {{FRAMEWORK}}
-{{SOURCE_DESCRIPTION}}
-
-{{PROPS_SECTION}}
-
-{{VARIANTS_SECTION}}
-
-{{DEPENDENCIES_SECTION}}
-
-{{BASE_LIBRARY_SECTION}}
-
-{{FIGMA_URL}}
-
-{{HINTS}}
-
-## Output Format
-
-Return a JSON object with this structure:
-
-{
-  "description": "One-line description (10-80 chars)",
-  "semanticDescription": "Rich 2-5 sentence description for semantic search. Describe what this component is, its primary purpose, and key characteristics.",
-  "tier": "free",
-  "whenToUse": "Guidance on when to use this component",
-  "whenNotToUse": "Guidance on when NOT to use this component",
-  "patterns": ["pattern1", "pattern2"],
-  "tokens": ["color-primary", "spacing-md"],
-  "examples": ["<Component variant=\\"primary\\" />", "<Component disabled />"],
-  "relatedComponents": ["RelatedOne", "RelatedTwo"],
-  "a11yNotes": "Accessibility considerations"
-}
-
-## Pattern Reference
-
-Standard patterns (use where applicable):
-${COMPONENT_PATTERNS.map((p) => `- ${p}`).join('\n')}
-
-## Guidelines
-
-1. semanticDescription should be optimized for embedding-based search
-2. Include 2-4 realistic JSX examples showing different usages
-3. patterns must be from the standard list above
-4. tokens should reference design tokens (colors, spacing, typography)
-5. relatedComponents should be real component names that pair with this one
-6. Set tier to "pro" only for complex components (data tables, advanced charts)
-
-Return ONLY the JSON object.`;
-
 // =============================================================================
-// Prompt Builder
+// Prompt Builder Input
 // =============================================================================
 
 /**
@@ -210,15 +125,98 @@ export interface PromptBuilderInput {
   hints?: string;
 }
 
+// =============================================================================
+// Response Validation
+// =============================================================================
+
 /**
- * Build the complete user prompt from extracted data
+ * Validate that a pattern is from the standard list
+ */
+function isValidPattern(pattern: string): boolean {
+  return (COMPONENT_PATTERNS as readonly string[]).includes(pattern);
+}
+
+/**
+ * Filter patterns to only include valid ones
+ */
+export function filterValidPatterns(patterns: string[]): string[] {
+  return patterns.filter(isValidPattern);
+}
+
+// =============================================================================
+// Tool Calling Prompts
+// =============================================================================
+
+/**
+ * System prompt for tool calling generation
+ *
+ * Optimized for tool calling - no JSON format instructions needed since the
+ * tool schema defines the output format.
+ */
+export const TOOL_CALLING_SYSTEM_PROMPT = `You are a design system documentation expert. Generate comprehensive metadata for UI components to make them AI-accessible.
+
+Your goal is to help AI coding assistants understand and correctly use this component. Focus on:
+1. Clear, searchable descriptions
+2. Practical code examples
+3. Guidance on when to use (and not use) this component
+4. Accessibility considerations
+
+Use the generate_component_metadata tool to provide your analysis.`;
+
+/**
+ * User prompt template for tool calling
+ *
+ * Simpler than the JSON template since the tool schema defines the output structure.
+ */
+export const TOOL_CALLING_USER_PROMPT_TEMPLATE = `Analyze this {{FRAMEWORK}} component and generate metadata using the generate_component_metadata tool.
+
+## Component: {{COMPONENT_NAME}}
+{{SOURCE_DESCRIPTION}}
+
+{{PROPS_SECTION}}
+
+{{VARIANTS_SECTION}}
+
+{{DEPENDENCIES_SECTION}}
+
+{{BASE_LIBRARY_SECTION}}
+
+{{FIGMA_URL}}
+
+{{HINTS}}
+
+## Pattern Reference
+
+Valid patterns (use where applicable):
+${COMPONENT_PATTERNS.map((p) => `- ${p}`).join('\n')}
+
+## Instructions
+
+Use the generate_component_metadata tool to provide:
+
+1. **description**: A clear, concise one-liner (10-500 chars) that states what this component is AND its primary purpose/action (e.g., 'A button for triggering user actions and form submissions')
+2. **tier**: "free" for basic components, "pro" for advanced/complex ones
+3. **minimalExample**: The simplest working JSX code example (single line if possible)
+4. **examples**: Structured examples showing minimal, common, and advanced usage
+5. **guidance**: When to use, when not to use, accessibility notes, patterns, related components
+6. **semanticDescription**: Detailed description for AI search (50-2000 chars) - include purpose, key features, and use cases
+7. **tokens**: Design tokens this component uses (e.g., "color-primary", "spacing-md")
+
+Focus on making this component discoverable and usable by AI coding assistants.`;
+
+/**
+ * Build the user prompt for tool calling
  *
  * @param input - Prompt builder input
- * @returns Formatted user prompt string
+ * @returns Formatted user prompt string for tool calling
  */
-export function buildUserPrompt(input: PromptBuilderInput): string {
-  const { name, framework, extracted, figmaUrl, hints } = input;
-
+function buildToolCallingUserPrompt({
+  name,
+  framework,
+  extracted,
+  figmaUrl,
+  hints,
+}: PromptBuilderInput): string {
   // Build all sections
   const propsSection = buildPropsSection(extracted);
   const variantsSection = buildVariantsSection(extracted);
@@ -233,7 +231,7 @@ export function buildUserPrompt(input: PromptBuilderInput): string {
   const hintsLine = hints ? `Additional Context: ${hints}` : '';
 
   // Replace placeholders
-  let prompt = USER_PROMPT_TEMPLATE;
+  let prompt = TOOL_CALLING_USER_PROMPT_TEMPLATE;
   prompt = prompt.replace('{{COMPONENT_NAME}}', name);
   prompt = prompt.replace('{{FRAMEWORK}}', framework);
   prompt = prompt.replace('{{SOURCE_DESCRIPTION}}', sourceDescriptionLine);
@@ -244,60 +242,24 @@ export function buildUserPrompt(input: PromptBuilderInput): string {
   prompt = prompt.replace('{{FIGMA_URL}}', figmaLine);
   prompt = prompt.replace('{{HINTS}}', hintsLine);
 
-  // Clean up empty lines (more than 2 consecutive newlines become 2)
+  // Clean up empty lines
   prompt = prompt.replace(/\n{3,}/g, '\n\n');
 
   return prompt.trim();
 }
 
 /**
- * Build the complete prompt for LLM generation
+ * Build the complete prompt for tool calling generation
  *
  * @param input - Prompt builder input
- * @returns Object with system and user prompts
+ * @returns Object with system and user prompts for tool calling
  */
-export function buildPrompt(input: PromptBuilderInput): {
+export function buildToolCallingPrompt(input: PromptBuilderInput): {
   system: string;
   user: string;
 } {
   return {
-    system: SYSTEM_PROMPT,
-    user: buildUserPrompt(input),
+    system: TOOL_CALLING_SYSTEM_PROMPT,
+    user: buildToolCallingUserPrompt(input),
   };
-}
-
-// =============================================================================
-// Response Format
-// =============================================================================
-
-/**
- * Expected JSON structure from LLM response
- *
- * This matches ParsedLLMMetaResponse from types.ts
- */
-export interface ExpectedLLMResponse {
-  description: string;
-  semanticDescription: string;
-  tier?: 'free' | 'pro';
-  whenToUse?: string;
-  whenNotToUse?: string;
-  patterns?: string[];
-  tokens?: string[];
-  examples?: string[];
-  relatedComponents?: string[];
-  a11yNotes?: string;
-}
-
-/**
- * Validate that a pattern is from the standard list
- */
-export function isValidPattern(pattern: string): boolean {
-  return (COMPONENT_PATTERNS as readonly string[]).includes(pattern);
-}
-
-/**
- * Filter patterns to only include valid ones
- */
-export function filterValidPatterns(patterns: string[]): string[] {
-  return patterns.filter(isValidPattern);
 }

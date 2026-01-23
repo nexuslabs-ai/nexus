@@ -71,7 +71,6 @@ export {
   ExtractionMethodSchema,
   ExtractionResultSchema,
   HashSchema,
-  PropTypeCategorySchema,
 } from './extracted.js';
 
 // Extracted data types - types
@@ -81,33 +80,67 @@ export type {
   ExtractionMethod,
   ExtractionResult,
   Hash,
-  PropTypeCategory,
 } from './extracted.js';
 
 // Meta types - schemas (values)
+// NOTE: AIContextSchema is exported for generator module internal use.
+// It is NOT part of the final ComponentManifest schema (use GuidanceSchema instead).
 export {
   AIContextSchema,
   COMPONENT_PATTERNS,
   ComponentMetaSchema,
   ComponentPatternSchema,
-  MetaGenerationRequestSchema,
-  MetaGenerationResultSchema,
 } from './meta.js';
 
 // Meta types - types
+export type { AIContext, ComponentMeta, ComponentPattern } from './meta.js';
+
+// Import statement types - schemas (values)
+export { ImportStatementSchema } from './import-statement.js';
+
+// Import statement types - types
+export type { ImportStatement } from './import-statement.js';
+
+// Base prop types - schemas (values)
+export { BasePropSchema, PropTypeCategorySchema } from './base-prop.js';
+
+// Base prop types - types
+export type { BaseProp, PropTypeCategory } from './base-prop.js';
+
+// Props types - schemas (values)
+export { CategorizedPropsSchema, PropDefinitionSchema } from './props.js';
+
+// Props types - types
 export type {
-  AIContext,
-  ComponentMeta,
-  ComponentPattern,
-  MetaGenerationRequest,
-  MetaGenerationResult,
-} from './meta.js';
+  CategorizedProps,
+  CategorizedPropsCategory,
+  PropDefinition,
+} from './props.js';
+
+// CVA variant types - schemas (values)
+export { CvaVariantSchema, CvaVariantsSchema } from './cva-variant.js';
+
+// CVA variant types - types
+export type { CvaVariant, CvaVariants } from './cva-variant.js';
+
+// Examples types - schemas (values)
+export { CodeExampleSchema, StructuredExamplesSchema } from './examples.js';
+
+// Examples types - types
+export type { CodeExample, StructuredExamples } from './examples.js';
+
+// Guidance types - schemas (values)
+export { GuidanceSchema } from './guidance.js';
+
+// Guidance types - types
+export type { Guidance } from './guidance.js';
 
 // Manifest types - schemas (values)
 export {
   ComponentManifestSchema,
   ComponentWithHistorySchema,
   CreateManifestInputSchema,
+  DependenciesSchema,
   MANIFEST_SCHEMA_VERSION,
   ManifestSummarySchema,
   UpdateManifestInputSchema,
@@ -119,6 +152,7 @@ export type {
   ComponentManifest,
   ComponentWithHistory,
   CreateManifestInput,
+  Dependencies,
   ManifestSummary,
   UpdateManifestInput,
   VersionHistoryEntry,

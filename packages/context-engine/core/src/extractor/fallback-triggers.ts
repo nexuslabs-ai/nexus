@@ -121,22 +121,3 @@ export function getFallbackReasonDescription(reason: FallbackReason): string {
   };
   return descriptions[reason];
 }
-
-/**
- * Check if a specific pattern exists in source code
- */
-export function detectPatterns(sourceCode: string): {
-  hasForwardRef: boolean;
-  hasHOC: boolean;
-  hasStyledComponents: boolean;
-  hasMemo: boolean;
-} {
-  return {
-    hasForwardRef: sourceCode.includes('forwardRef'),
-    hasHOC: HOC_PATTERNS.some((pattern) => pattern.test(sourceCode)),
-    hasStyledComponents: STYLED_PATTERNS.some((pattern) =>
-      pattern.test(sourceCode)
-    ),
-    hasMemo: /\bmemo\s*\(/.test(sourceCode),
-  };
-}
