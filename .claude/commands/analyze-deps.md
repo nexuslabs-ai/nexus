@@ -24,12 +24,11 @@ Examples:
 
 Parse `$ARGUMENTS` for:
 
-| Pattern                          | Scope                              |
-| -------------------------------- | ---------------------------------- |
-| Starts with `@` (e.g., `@radix`) | Single package across all workspaces |
-| No `@`, no `/` (e.g., `react`)   | Single package (npm name)          |
-| Contains `/` (e.g., `packages/react`) | Specific workspace             |
-| `all` or empty                   | All workspaces                     |
+| Pattern                               | Scope                                 |
+| ------------------------------------- | ------------------------------------- |
+| Starts with `@` or no `/`             | Single package across all workspaces  |
+| Contains `/` (e.g., `packages/react`) | Specific workspace                    |
+| `all` or empty                        | All workspaces                        |
 
 ## Flow
 

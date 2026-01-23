@@ -101,21 +101,22 @@ Input (package or workspace)
 | `all`            | Literal string "all"       | Glob all `**/package.json` files          |
 
 **For single package:**
-```bash
-# Find which package.json(s) contain this dependency
-grep -r "package-name" */package.json
+```
+Use Grep tool:
+Grep(pattern: "{package-name}", glob: "**/package.json")
 ```
 
 **For workspace:**
-```bash
-# Read the specific package.json
-cat packages/react/package.json
+```
+Use Read tool:
+Read(file_path: "{workspace}/package.json")
 ```
 
 **For all:**
-```bash
-# Find all package.json files (exclude node_modules)
-find . -name "package.json" -not -path "*/node_modules/*"
+```
+Use Glob tool:
+Glob(pattern: "**/package.json")
+Note: node_modules is excluded by default
 ```
 
 **Extract dependencies:**
@@ -129,6 +130,20 @@ find . -name "package.json" -not -path "*/node_modules/*"
 
 ```bash
 npm view {package-name} --json
+```
+
+**Error handling for npm commands:**
+
+| Error Type | Detection | Action |
+|------------|-----------|--------|
+| Network timeout | Command hangs > 30s | Use `timeout 30` prefix, note as "timed out" |
+| 404 Not Found | Exit code 1, "Not found" in output | Note as "package not found in registry" |
+| 401/403 Auth | "ENEEDAUTH" or "E403" | Note as "private package, auth required" |
+| Rate limited | "ETOOMANYREQS" | Wait and retry, or note as "rate limited" |
+
+**Example with timeout:**
+```bash
+timeout 30 npm view {package-name} --json 2>/dev/null || echo '{"error": "fetch failed"}'
 ```
 
 **Extract:**
@@ -155,6 +170,20 @@ npm view {package-name} --json
 
 **Flag deprecated packages immediately** — these are priority items.
 
+**Security vulnerability check:**
+
+Run npm audit to identify known vulnerabilities:
+```bash
+npm audit --json
+```
+
+**Handling audit results:**
+- Packages with vulnerabilities should be flagged with 🔴 High risk regardless of version bump type
+- Include vulnerability severity (critical, high, moderate, low) in the report
+- Link to advisory details when available
+
+**Note:** Security issues take priority over all other risk factors.
+
 ### Phase 3: Research Breaking Changes
 
 **Only for packages with available updates (prioritize major bumps).**
@@ -175,12 +204,40 @@ npm view {package-name} --json
    - Parse for version headers
    - Extract changes between current and latest
 
+   **Branch fallback order:**
+   1. Try `main` branch first
+   2. Fall back to `master` if 404
+   3. Use repository's default branch from API metadata as final fallback
+
+   ```
+   https://raw.githubusercontent.com/{owner}/{repo}/main/CHANGELOG.md
+   # If 404, try:
+   https://raw.githubusercontent.com/{owner}/{repo}/master/CHANGELOG.md
+   ```
+
 3. **WebSearch for migration guides**
    ```
    "{package-name} v{from} to v{to} migration guide"
    "{package-name} v{to} breaking changes"
    "{package-name} upgrade guide official"
    ```
+
+**Security research triggers:**
+
+Not every package needs security research. Search for security issues when:
+1. Package is flagged by `npm audit` - deep search required
+2. Major version bump - include security in migration research
+3. Package hasn't been updated in 2+ years - search for known issues
+
+**Security search queries (when triggered):**
+```
+"{package-name} CVE"
+"{package-name} security vulnerability"
+"{package-name} v{current-version} security advisory"
+"{package-name} v{latest-version} security advisory"
+```
+
+Check both current AND latest version for vulnerabilities - upgrading isn't always safer.
 
 4. **Official documentation**
    - Check package homepage for upgrade guides
@@ -204,12 +261,12 @@ If no breaking changes were found in Phase 3, skip this phase entirely. There's 
 
 **When breaking changes exist:**
 
-```bash
-# Find import statements
-grep -r "from ['\"]package-name" --include="*.ts" --include="*.tsx"
+```
+Use Grep tool to find import statements:
+Grep(pattern: "from ['\"]package-name", glob: "**/*.{ts,tsx}")
 
-# Find require statements
-grep -r "require(['\"]package-name" --include="*.js" --include="*.ts"
+Use Grep tool to find require statements:
+Grep(pattern: "require\\(['\"]package-name", glob: "**/*.{js,ts}")
 ```
 
 **Map against breaking changes only:**
@@ -285,9 +342,43 @@ Scope: {description of what was analyzed}
 
 ---
 
+## Security
+
+{If no vulnerabilities found:}
+✅ No known vulnerabilities found in current or target versions.
+
+{If vulnerabilities exist:}
+⚠️ {X} packages have security considerations
+
+| Package | Current | Target | Current Vulnerabilities | Target Vulnerabilities | Recommendation |
+|---------|---------|--------|-------------------------|------------------------|----------------|
+| lodash | 4.17.20 | 4.17.21 | 🔴 CVE-2021-23337 (High) | ✅ None | Upgrade to fix |
+| some-pkg | 1.0.0 | 2.0.0 | ✅ None | 🟡 CVE-2024-1234 (Medium) | Stay on 1.0.0 or wait for patch |
+| another | 3.0.0 | 4.0.0 | 🔴 CVE-2023-111 (High) | ✅ Fixed | Upgrade to 3.0.5+ |
+
+**Legend:**
+- 🔴 High/Critical severity - immediate action required
+- 🟡 Medium severity - plan remediation
+- 🟢 Low severity - address when convenient
+- ✅ None - no known vulnerabilities
+
+**Recommendation types:**
+- **Upgrade to fix** - current version has vulnerability, latest is clean
+- **Stay on current** - latest version introduced new vulnerability
+- **Upgrade to specific version** - skip problematic versions, target safe one
+- **Monitor** - low severity, no immediate action needed
+
+---
+
 ## Detailed Analysis
 
 ### package-a: 1.0.0 → 4.0.0 (major) 🔴
+
+**Security:**
+- Current version: 🔴 CVE-2021-23337 - Prototype Pollution (High)
+  - Advisory: https://nvd.nist.gov/vuln/detail/CVE-2021-23337
+  - Fixed in: 4.0.0
+- Target version: ✅ No known vulnerabilities
 
 **Breaking changes:**
 - `OldComponent` removed, use `NewComponent` instead
@@ -344,22 +435,28 @@ yarn upgrade package-c@^1.5.0
 
 ## Recommendations
 
-### 🚨 Immediate Action Required
+### 🚨 Security Vulnerabilities (Address Immediately)
 
-1. **package-b** — Deprecated, migrate to `package-b-v2`
+1. **package-a** — CVE-2021-23337 (High) in current version
+   - Action: Upgrade to 4.0.0
+   - Effort: Medium (has breaking changes, 2 files affected)
+
+### ⚠️ Deprecated Packages
+
+2. **package-b** — Deprecated, migrate to `package-b-v2`
    - Effort: Low (1 file affected)
    - Risk: Package may stop receiving security updates
 
 ### 📋 Plan Migration
 
-2. **package-a** — Major version bump with breaking changes
+3. **package-a** — Major version bump with breaking changes
    - Effort: Medium (2 files affected)
    - Suggest: Create dedicated PR for this migration
 
 ### ✅ Safe to Upgrade
 
-3. **package-c** — Minor version (new features, no breaking changes)
-4. **package-d** — Patch version (bug fixes only)
+4. **package-c** — Minor version (new features, no breaking changes)
+5. **package-d** — Patch version (bug fixes only)
 
 ---
 
