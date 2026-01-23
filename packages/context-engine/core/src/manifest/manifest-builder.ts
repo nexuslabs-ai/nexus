@@ -29,11 +29,15 @@ import { categorizeProps } from '../utils/prop-categorization.js';
 
 import { generateImportStatement } from './import-generator.js';
 import {
+  type ManifestBuilderConfig,
   type ManifestBuilderInput,
   type ManifestBuilderOutput,
   ManifestBuildOutputType,
   type ManifestUpdateInput,
 } from './types.js';
+
+/** Default package name when detection fails */
+const DEFAULT_PACKAGE_NAME = '@nexus/react';
 
 /**
  * ManifestBuilder combines extracted data and generated metadata
@@ -58,6 +62,19 @@ import {
  * ```
  */
 export class ManifestBuilder {
+  private readonly config: Required<ManifestBuilderConfig>;
+
+  /**
+   * Create a new ManifestBuilder
+   *
+   * @param config - Optional configuration
+   */
+  constructor(config: ManifestBuilderConfig = {}) {
+    this.config = {
+      defaultPackageName: config.defaultPackageName ?? DEFAULT_PACKAGE_NAME,
+    };
+  }
+
   /**
    * Build a complete ComponentManifest from extracted data and generated metadata
    *
@@ -203,9 +220,10 @@ export class ManifestBuilder {
     name: string,
     npmDependencies: Record<string, string>
   ): ImportStatement {
-    // Try to derive package name from dependencies
-    let packageName = '@nexus/react'; // Default
+    // Start with configurable default package name
+    let packageName = this.config.defaultPackageName;
 
+    // Try to derive package name from dependencies
     // Look for design system packages in dependencies
     const designSystemPackages = Object.keys(npmDependencies).filter(
       (dep) =>

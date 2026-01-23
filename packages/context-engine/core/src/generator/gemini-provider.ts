@@ -54,6 +54,8 @@ function getDefaults() {
 function convertToGeminiSchema(
   jsonSchema: Record<string, unknown>
 ): Record<string, unknown> {
+  // Note: We use 'any' here because we're bridging between JSON Schema (our source)
+  // and Gemini's proprietary schema format. The types are inherently incompatible.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const definitions = (jsonSchema as any).definitions ?? {};
 
@@ -291,6 +293,8 @@ export class GeminiProvider implements ILLMProvider {
         functionName: functionCall.name,
       });
 
+      // The validation happens in meta-generator.ts after this returns,
+      // so this is safe - but worth noting for future readers.
       return {
         type: 'success',
         data: functionCall.args as T,

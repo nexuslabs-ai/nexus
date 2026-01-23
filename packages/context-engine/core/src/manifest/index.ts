@@ -14,6 +14,7 @@ export { ManifestBuilder } from './manifest-builder.js';
 export {
   isManifestBuildFailure,
   isManifestBuildSuccess,
+  type ManifestBuilderConfig,
   type ManifestBuilderFailure,
   type ManifestBuilderInput,
   type ManifestBuilderOutput,
