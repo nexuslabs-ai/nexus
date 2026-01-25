@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './dialog';
+import { Input } from './input';
 
 const meta: Meta<typeof Dialog> = {
   title: 'Components/Dialog',
@@ -78,10 +79,10 @@ export const WithDescription: Story = {
             >
               Name
             </label>
-            <input
+            <Input
               id="name"
               defaultValue="John Doe"
-              className="nx:col-span-3 nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:px-3 nx:py-2 nx:text-sm"
+              className="nx:col-span-3"
             />
           </div>
           <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
@@ -91,10 +92,10 @@ export const WithDescription: Story = {
             >
               Username
             </label>
-            <input
+            <Input
               id="username"
               defaultValue="@johndoe"
-              className="nx:col-span-3 nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:px-3 nx:py-2 nx:text-sm"
+              className="nx:col-span-3"
             />
           </div>
         </div>
