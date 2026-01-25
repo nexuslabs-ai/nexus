@@ -61,6 +61,7 @@ export const Default: Story = {
 export const WithValue: Story = {
   args: {
     defaultValue: 'Hello World',
+    'aria-label': 'Text input with value',
   },
 };
 
@@ -82,6 +83,7 @@ export const DisabledWithValue: Story = {
   args: {
     defaultValue: 'Cannot edit this',
     disabled: true,
+    'aria-label': 'Disabled input with value',
   },
 };
 
@@ -120,6 +122,7 @@ export const TypeSearch: Story = {
 export const TypeFile: Story = {
   args: {
     type: 'file',
+    'aria-label': 'File upload',
   },
 };
 
@@ -279,7 +282,7 @@ export const AllVariants: Story = {
             <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
               filled
             </span>
-            <Input defaultValue="Filled value" />
+            <Input defaultValue="Filled value" aria-label="Filled input" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
             <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
@@ -323,7 +326,7 @@ export const AllVariants: Story = {
             <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
               file
             </span>
-            <Input type="file" />
+            <Input type="file" aria-label="File upload" />
           </div>
         </div>
       </div>
