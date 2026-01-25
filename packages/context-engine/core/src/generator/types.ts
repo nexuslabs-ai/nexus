@@ -235,7 +235,7 @@ export interface LLMProviderConfig {
  * Anthropic-specific configuration
  */
 export interface AnthropicProviderConfig extends LLMProviderConfig {
-  /** Model to use (defaults to claude-sonnet-4-20250514) */
+  /** Model to use (defaults to DEFAULT_ANTHROPIC_MODEL constant) */
   model?: string;
 }
 
@@ -243,7 +243,7 @@ export interface AnthropicProviderConfig extends LLMProviderConfig {
  * Gemini-specific configuration
  */
 export interface GeminiProviderConfig extends LLMProviderConfig {
-  /** Model to use (defaults to gemini-2.5-flash) */
+  /** Model to use (defaults to DEFAULT_GEMINI_MODEL constant) */
   model?: string;
 }
 

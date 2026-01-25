@@ -54,7 +54,7 @@ function getDefaults() {
  * ```typescript
  * const provider = new AnthropicProvider({
  *   apiKey: process.env.ANTHROPIC_API_KEY,
- *   model: 'claude-sonnet-4-20250514'
+ *   // model defaults to DEFAULT_ANTHROPIC_MODEL constant
  * });
  *
  * const result = await provider.generateWithToolCalling<ComponentMetaTool>(

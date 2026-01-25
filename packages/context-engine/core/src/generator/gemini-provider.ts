@@ -139,7 +139,7 @@ function convertToGeminiSchema(
  * ```typescript
  * const provider = new GeminiProvider({
  *   apiKey: process.env.GOOGLE_API_KEY,
- *   model: 'gemini-2.5-flash'
+ *   // model defaults to DEFAULT_GEMINI_MODEL constant
  * });
  *
  * const result = await provider.generateWithToolCalling<ComponentMetaTool>(
