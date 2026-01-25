@@ -10,6 +10,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @import 'tailwindcss' prefix(nx);
+@import 'tw-animate-css';
 @import './variables.css';
 @import './typography-utilities.css';
 @import './borderwidth-utilities.css';
