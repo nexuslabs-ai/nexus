@@ -41,7 +41,7 @@
  *   "response": { ... },  // ComponentMetaTool structure
  *   "recordedAt": "2025-01-19T10:00:00.000Z",
  *   "provider": "anthropic",
- *   "model": "claude-sonnet-4-20250514",
+ *   "model": "...",  // Model used for recording
  *   "inputHash": "abc123...",
  *   "promptSummary": "Generate metadata for Button component..."
  * }
@@ -59,6 +59,7 @@ import {
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { DEFAULT_ANTHROPIC_MODEL } from '../../src/constants/models.js';
 import type { ComponentMetaTool } from '../../src/generator/tool-schema.js';
 
 // Get directory paths
@@ -175,7 +176,7 @@ export function saveRecordedResponse(
       options.promptSummary ??
       `Generate metadata for ${componentName} component.`,
     provider: options.provider ?? 'anthropic',
-    model: options.model ?? 'claude-sonnet-4-20250514',
+    model: options.model ?? DEFAULT_ANTHROPIC_MODEL,
     inputHash: options.inputHash ?? '',
   };
 

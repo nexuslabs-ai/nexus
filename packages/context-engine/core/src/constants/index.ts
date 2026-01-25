@@ -14,3 +14,6 @@ export {
 
 // Base library types
 export type { BaseLibraryName, BaseLibraryPattern } from './base-libraries.js';
+
+// Default LLM model constants
+export { DEFAULT_ANTHROPIC_MODEL, DEFAULT_GEMINI_MODEL } from './models.js';
