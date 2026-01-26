@@ -8,6 +8,13 @@ const preview: Preview = {
   // Enable autodocs for all stories globally
   tags: ['autodocs'],
   parameters: {
+    // Enable Table of Contents for docs pages
+    docs: {
+      toc: {
+        headingSelector: 'h2, h3',
+        title: 'On this page',
+      },
+    },
     // A11y violations will fail tests automatically
     a11y: {
       test: 'error',
