@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from './card';
+import { Input } from './input';
 
 const meta: Meta<typeof Card> = {
   title: 'Components/Card',
@@ -189,12 +190,7 @@ export const LoginCard: Story = {
             >
               Email
             </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              className="nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:px-3 nx:py-2 nx:text-sm"
-            />
+            <Input id="email" type="email" placeholder="Enter your email" />
           </div>
           <div className="nx:flex nx:flex-col nx:gap-2">
             <label
@@ -203,11 +199,10 @@ export const LoginCard: Story = {
             >
               Password
             </label>
-            <input
+            <Input
               id="password"
               type="password"
               placeholder="Enter your password"
-              className="nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:px-3 nx:py-2 nx:text-sm"
             />
           </div>
         </div>
