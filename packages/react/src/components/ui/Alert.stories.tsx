@@ -34,7 +34,7 @@ type Story = StoryObj<typeof Alert>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert className="nx:max-w-md">
       <AlertTitle>Heads up!</AlertTitle>
       <AlertDescription>
@@ -45,7 +45,7 @@ export const Default: Story = {
 };
 
 export const Destructive: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert variant="destructive" className="nx:max-w-md">
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
@@ -56,7 +56,7 @@ export const Destructive: Story = {
 };
 
 export const Success: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert variant="success" className="nx:max-w-md">
       <AlertTitle>Success</AlertTitle>
       <AlertDescription>
@@ -67,7 +67,7 @@ export const Success: Story = {
 };
 
 export const Warning: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert variant="warning" className="nx:max-w-md">
       <AlertTitle>Warning</AlertTitle>
       <AlertDescription>
@@ -82,7 +82,7 @@ export const Warning: Story = {
 // ============================================
 
 export const WithIcon: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert className="nx:max-w-md">
       <IconInfoCircle className="nx:size-4" />
       <AlertTitle>Information</AlertTitle>
@@ -94,7 +94,7 @@ export const WithIcon: Story = {
 };
 
 export const DestructiveWithIcon: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert variant="destructive" className="nx:max-w-md">
       <IconAlertCircle className="nx:size-4" />
       <AlertTitle>Error</AlertTitle>
@@ -106,7 +106,7 @@ export const DestructiveWithIcon: Story = {
 };
 
 export const SuccessWithIcon: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert variant="success" className="nx:max-w-md">
       <IconCircleCheck className="nx:size-4" />
       <AlertTitle>Success</AlertTitle>
@@ -118,7 +118,7 @@ export const SuccessWithIcon: Story = {
 };
 
 export const WarningWithIcon: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert variant="warning" className="nx:max-w-md">
       <IconAlertTriangle className="nx:size-4" />
       <AlertTitle>Warning</AlertTitle>
@@ -134,7 +134,7 @@ export const WarningWithIcon: Story = {
 // ============================================
 
 export const WithTitle: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert className="nx:max-w-md">
       <AlertTitle>This is just a title</AlertTitle>
     </Alert>
@@ -142,7 +142,7 @@ export const WithTitle: Story = {
 };
 
 export const WithDescription: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert className="nx:max-w-md">
       <AlertDescription>
         This alert has only a description without a title.
@@ -152,7 +152,7 @@ export const WithDescription: Story = {
 };
 
 export const LongContent: Story = {
-  render: () => (
+  render: (_args) => (
     <Alert className="nx:max-w-md">
       <AlertTitle>Important Information</AlertTitle>
       <AlertDescription>
@@ -177,7 +177,7 @@ export const WithDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Alert variant="destructive" className="nx:max-w-md">
       <AlertTitle>Test Alert</AlertTitle>
       <AlertDescription>Testing data attributes.</AlertDescription>
@@ -203,7 +203,7 @@ export const DefaultDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Alert className="nx:max-w-md">
       <AlertTitle>Default Alert</AlertTitle>
       <AlertDescription>Testing default variant.</AlertDescription>
@@ -223,7 +223,7 @@ export const DefaultDataAttributes: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

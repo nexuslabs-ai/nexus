@@ -32,7 +32,7 @@ type Story = StoryObj<typeof Dialog>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Open Dialog</Button>
@@ -59,7 +59,7 @@ export const Default: Story = {
 };
 
 export const WithDescription: Story = {
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button>Edit Profile</Button>
@@ -108,7 +108,7 @@ export const WithDescription: Story = {
 };
 
 export const NoCloseButton: Story = {
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Open Dialog</Button>
@@ -135,7 +135,7 @@ export const NoCloseButton: Story = {
 };
 
 export const CustomCloseButton: Story = {
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Open Dialog</Button>
@@ -161,7 +161,7 @@ export const CustomCloseButton: Story = {
 };
 
 export const ScrollableContent: Story = {
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Terms & Conditions</Button>
@@ -202,7 +202,7 @@ export const OpenCloseInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Open Dialog</Button>
@@ -258,7 +258,7 @@ export const KeyboardInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Open Dialog</Button>
@@ -301,7 +301,7 @@ export const DataAttributesTest: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Open Dialog</Button>
@@ -365,7 +365,7 @@ export const DataAttributesTest: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

@@ -215,7 +215,7 @@ export const WithCustomClassName: Story = {
 // ============================================
 
 export const AsLink: Story = {
-  render: () => (
+  render: (_args) => (
     <Badge asChild>
       <a href="https://example.com">New</a>
     </Badge>
@@ -328,7 +328,7 @@ export const LongContent: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       {/* Solid Fill - Caps */}
       <div>

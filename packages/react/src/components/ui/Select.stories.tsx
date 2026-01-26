@@ -30,7 +30,7 @@ type Story = StoryObj<typeof Select>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
         <SelectValue placeholder="Select a fruit" />
@@ -47,7 +47,7 @@ export const Default: Story = {
 };
 
 export const WithDefaultValue: Story = {
-  render: () => (
+  render: (_args) => (
     <Select defaultValue="banana">
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
         <SelectValue placeholder="Select a fruit" />
@@ -62,7 +62,7 @@ export const WithDefaultValue: Story = {
 };
 
 export const Disabled: Story = {
-  render: () => (
+  render: (_args) => (
     <Select disabled>
       <SelectTrigger className="nx:w-[180px]" aria-label="Disabled select">
         <SelectValue placeholder="Disabled" />
@@ -76,7 +76,7 @@ export const Disabled: Story = {
 };
 
 export const WithDisabledItems: Story = {
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select an option">
         <SelectValue placeholder="Select option" />
@@ -97,7 +97,7 @@ export const WithDisabledItems: Story = {
 // ============================================
 
 export const WithGroups: Story = {
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[200px]" aria-label="Select a food">
         <SelectValue placeholder="Select a food" />
@@ -122,7 +122,7 @@ export const WithGroups: Story = {
 };
 
 export const WithSeparators: Story = {
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[200px]" aria-label="Select a timezone">
         <SelectValue placeholder="Select timezone" />
@@ -146,7 +146,7 @@ export const WithSeparators: Story = {
 // ============================================
 
 export const SmallWidth: Story = {
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[120px]" aria-label="Select size">
         <SelectValue placeholder="Size" />
@@ -163,7 +163,7 @@ export const SmallWidth: Story = {
 };
 
 export const FullWidth: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:w-[300px]">
       <Select>
         <SelectTrigger className="nx:w-full" aria-label="Select a country">
@@ -186,7 +186,7 @@ export const FullWidth: Story = {
 // ============================================
 
 export const Scrollable: Story = {
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[200px]" aria-label="Select a timezone">
         <SelectValue placeholder="Select timezone" />
@@ -230,7 +230,7 @@ export const OpenCloseInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
         <SelectValue placeholder="Select a fruit" />
@@ -275,7 +275,7 @@ export const SelectItemInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
         <SelectValue placeholder="Select a fruit" />
@@ -317,7 +317,7 @@ export const KeyboardNavigationInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
         <SelectValue placeholder="Select a fruit" />
@@ -360,7 +360,7 @@ export const DisabledInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Select disabled>
       <SelectTrigger className="nx:w-[180px]" aria-label="Disabled select">
         <SelectValue placeholder="Disabled" />
@@ -389,7 +389,7 @@ export const DataAttributesTest: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
         <SelectValue placeholder="Select a fruit" />
@@ -440,7 +440,7 @@ export const DataAttributesTest: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

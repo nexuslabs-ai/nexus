@@ -30,7 +30,7 @@ type Story = StoryObj<typeof Card>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Card Title</CardTitle>
@@ -48,7 +48,7 @@ export const Default: Story = {
 };
 
 export const Simple: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Simple Card</CardTitle>
@@ -61,7 +61,7 @@ export const Simple: Story = {
 };
 
 export const WithDescription: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Card with Description</CardTitle>
@@ -78,7 +78,7 @@ export const WithDescription: Story = {
 };
 
 export const WithAction: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:relative nx:w-[350px]">
       <CardHeader>
         <CardTitle>Card with Action</CardTitle>
@@ -97,7 +97,7 @@ export const WithAction: Story = {
 };
 
 export const WithFooter: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Card with Footer</CardTitle>
@@ -119,7 +119,7 @@ export const WithFooter: Story = {
 // ============================================
 
 export const ContentOnly: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardContent className="nx:pt-6">
         <p>A card with only content, no header or footer.</p>
@@ -129,7 +129,7 @@ export const ContentOnly: Story = {
 };
 
 export const HeaderOnly: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Header Only Card</CardTitle>
@@ -142,7 +142,7 @@ export const HeaderOnly: Story = {
 };
 
 export const LongContent: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[400px]">
       <CardHeader>
         <CardTitle>Article Title</CardTitle>
@@ -172,7 +172,7 @@ export const LongContent: Story = {
 // ============================================
 
 export const LoginCard: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Login</CardTitle>
@@ -220,7 +220,7 @@ export const LoginCard: Story = {
 };
 
 export const NotificationCard: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Notifications</CardTitle>
@@ -258,7 +258,7 @@ export const NotificationCard: Story = {
 };
 
 export const StatsCard: Story = {
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[200px]">
       <CardHeader className="nx:pb-2">
         <CardDescription>Total Revenue</CardDescription>
@@ -281,7 +281,7 @@ export const WithDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Data Attributes Test</CardTitle>
@@ -325,7 +325,7 @@ export const ActionDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Card className="nx:relative nx:w-[350px]">
       <CardHeader>
         <CardTitle>Action Test</CardTitle>
@@ -346,7 +346,7 @@ export const ActionDataAttributes: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

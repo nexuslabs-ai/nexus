@@ -54,7 +54,7 @@ export const DisabledChecked: Story = {
 };
 
 export const WithLabel: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:items-center nx:gap-2">
       <Switch id="airplane-mode" />
       <label
@@ -68,7 +68,7 @@ export const WithLabel: Story = {
 };
 
 export const WithLabelAndDescription: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:items-start nx:gap-3">
       <Switch id="notifications" className="nx:mt-0.5" />
       <div className="nx:grid nx:gap-1.5">
@@ -87,7 +87,7 @@ export const WithLabelAndDescription: Story = {
 };
 
 export const LabelOnLeft: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border nx:border-border-default nx:p-4">
       <div className="nx:space-y-0.5">
         <label
@@ -236,7 +236,7 @@ export const DataAttributesTest: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

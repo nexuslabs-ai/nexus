@@ -39,7 +39,7 @@ type Story = StoryObj<typeof DropdownMenu>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Open Menu</Button>
@@ -54,7 +54,7 @@ export const Default: Story = {
 };
 
 export const WithLabelsAndSeparators: Story = {
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">My Account</Button>
@@ -148,7 +148,7 @@ export const WithRadioItems: Story = {
 };
 
 export const WithSubMenu: Story = {
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Open Menu</Button>
@@ -184,7 +184,7 @@ export const WithSubMenu: Story = {
 };
 
 export const WithDestructiveItem: Story = {
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Actions</Button>
@@ -200,7 +200,7 @@ export const WithDestructiveItem: Story = {
 };
 
 export const WithDisabledItems: Story = {
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Edit</Button>
@@ -218,7 +218,7 @@ export const WithDisabledItems: Story = {
 };
 
 export const WithInsetItems: Story = {
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Open Menu</Button>
@@ -242,7 +242,7 @@ export const OpenCloseInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Open Menu</Button>
@@ -287,7 +287,7 @@ export const KeyboardNavigation: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Open Menu</Button>
@@ -331,7 +331,7 @@ export const DataAttributesTest: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">Open Menu</Button>
@@ -393,7 +393,7 @@ export const DataAttributesTest: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

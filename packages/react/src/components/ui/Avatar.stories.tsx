@@ -38,7 +38,7 @@ const AVATAR_URL =
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar>
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -47,7 +47,7 @@ export const Default: Story = {
 };
 
 export const WithFallback: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar>
       <AvatarImage src="/broken-image.jpg" alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -56,7 +56,7 @@ export const WithFallback: Story = {
 };
 
 export const FallbackOnly: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar>
       <AvatarFallback>AB</AvatarFallback>
     </Avatar>
@@ -64,7 +64,7 @@ export const FallbackOnly: Story = {
 };
 
 export const WithIcon: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar>
       <AvatarFallback>
         <IconUser className="nx:size-5" />
@@ -78,7 +78,7 @@ export const WithIcon: Story = {
 // ============================================
 
 export const Size2xs: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="2xs">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -87,7 +87,7 @@ export const Size2xs: Story = {
 };
 
 export const SizeXs: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="xs">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -96,7 +96,7 @@ export const SizeXs: Story = {
 };
 
 export const SizeSm: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="sm">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -105,7 +105,7 @@ export const SizeSm: Story = {
 };
 
 export const SizeMd: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="md">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -114,7 +114,7 @@ export const SizeMd: Story = {
 };
 
 export const SizeLg: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="lg">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -123,7 +123,7 @@ export const SizeLg: Story = {
 };
 
 export const SizeXl: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="xl">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -132,7 +132,7 @@ export const SizeXl: Story = {
 };
 
 export const Size2xl: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="2xl">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -141,7 +141,7 @@ export const Size2xl: Story = {
 };
 
 export const Size3xl: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="3xl">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -150,7 +150,7 @@ export const Size3xl: Story = {
 };
 
 export const Size4xl: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar size="4xl">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -163,7 +163,7 @@ export const Size4xl: Story = {
 // ============================================
 
 export const ShapeCircle: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar shape="circle">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -172,7 +172,7 @@ export const ShapeCircle: Story = {
 };
 
 export const ShapeRounded: Story = {
-  render: () => (
+  render: (_args) => (
     <Avatar shape="rounded">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -188,7 +188,7 @@ export const WithDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Avatar size="lg" shape="rounded">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
       <AvatarFallback>JD</AvatarFallback>
@@ -209,7 +209,7 @@ export const FallbackDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Avatar>
       <AvatarFallback>AB</AvatarFallback>
     </Avatar>
@@ -233,7 +233,7 @@ export const FallbackDataAttributes: Story = {
 // ============================================
 
 export const AllSizes: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

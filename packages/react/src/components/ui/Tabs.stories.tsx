@@ -31,7 +31,7 @@ type Story = StoryObj<typeof Tabs>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList>
         <TabsTrigger value="account">Account</TabsTrigger>
@@ -52,7 +52,7 @@ export const Default: Story = {
 };
 
 export const WithCards: Story = {
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList className="nx:grid nx:w-full nx:grid-cols-2">
         <TabsTrigger value="account">Account</TabsTrigger>
@@ -125,7 +125,7 @@ export const WithCards: Story = {
 };
 
 export const ThreeTabs: Story = {
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="overview" className="nx:w-[500px]">
       <TabsList>
         <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -152,7 +152,7 @@ export const ThreeTabs: Story = {
 };
 
 export const WithDisabledTab: Story = {
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
       <TabsList>
         <TabsTrigger value="account">Account</TabsTrigger>
@@ -175,7 +175,7 @@ export const WithDisabledTab: Story = {
 };
 
 export const FullWidth: Story = {
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-full">
       <TabsList className="nx:w-full nx:justify-start">
         <TabsTrigger value="tab1">First Tab</TabsTrigger>
@@ -209,7 +209,7 @@ export const ClickInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
@@ -252,7 +252,7 @@ export const KeyboardNavigation: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
@@ -298,7 +298,7 @@ export const DisabledTabInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
@@ -344,7 +344,7 @@ export const DataAttributesTest: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
@@ -379,7 +379,7 @@ export const DataAttributesTest: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

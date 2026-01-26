@@ -42,7 +42,7 @@ type Story = StoryObj<typeof Accordion>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
@@ -67,7 +67,7 @@ export const Default: Story = {
 };
 
 export const Multiple: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion type="multiple" className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>First Section</AccordionTrigger>
@@ -93,7 +93,7 @@ export const Multiple: Story = {
 };
 
 export const DefaultOpen: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion
       type="single"
       collapsible
@@ -120,7 +120,7 @@ export const DefaultOpen: Story = {
 };
 
 export const Disabled: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion
       type="single"
       collapsible
@@ -153,7 +153,7 @@ export const Disabled: Story = {
 };
 
 export const DisabledItem: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>Enabled Item</AccordionTrigger>
@@ -190,7 +190,7 @@ export const ExpandInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>Click to expand</AccordionTrigger>
@@ -234,7 +234,7 @@ export const MultipleExpandInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Accordion type="multiple" className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>Section 1</AccordionTrigger>
@@ -272,7 +272,7 @@ export const KeyboardInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>First Item</AccordionTrigger>
@@ -331,7 +331,7 @@ export const WithDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Accordion
       type="single"
       collapsible
@@ -367,7 +367,7 @@ export const WithDataAttributes: Story = {
 // ============================================
 
 export const LongContent: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>
@@ -389,7 +389,7 @@ export const LongContent: Story = {
 };
 
 export const NestedContent: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>Item with nested content</AccordionTrigger>
@@ -412,7 +412,7 @@ export const NestedContent: Story = {
 };
 
 export const SingleItem: Story = {
-  render: () => (
+  render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
         <AccordionTrigger>Single accordion item</AccordionTrigger>
@@ -427,7 +427,7 @@ export const SingleItem: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">

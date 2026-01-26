@@ -36,7 +36,7 @@ type Story = StoryObj<typeof Tooltip>;
 // ============================================
 
 export const Default: Story = {
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Hover me</Button>
@@ -49,7 +49,7 @@ export const Default: Story = {
 };
 
 export const SideTop: Story = {
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Top</Button>
@@ -62,7 +62,7 @@ export const SideTop: Story = {
 };
 
 export const SideRight: Story = {
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Right</Button>
@@ -75,7 +75,7 @@ export const SideRight: Story = {
 };
 
 export const SideBottom: Story = {
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Bottom</Button>
@@ -88,7 +88,7 @@ export const SideBottom: Story = {
 };
 
 export const SideLeft: Story = {
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Left</Button>
@@ -101,7 +101,7 @@ export const SideLeft: Story = {
 };
 
 export const WithLongContent: Story = {
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Hover for details</Button>
@@ -117,7 +117,7 @@ export const WithLongContent: Story = {
 };
 
 export const WithCustomOffset: Story = {
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Custom offset</Button>
@@ -137,7 +137,7 @@ export const HoverInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Hover me</Button>
@@ -178,7 +178,7 @@ export const FocusInteraction: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Focus me</Button>
@@ -217,7 +217,7 @@ export const DataAttributesTest: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
   },
-  render: () => (
+  render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant="outline">Hover me</Button>
@@ -256,7 +256,7 @@ export const DataAttributesTest: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
