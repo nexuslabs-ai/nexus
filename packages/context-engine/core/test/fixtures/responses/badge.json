@@ -1,0 +1,55 @@
+{
+  "componentName": "Badge",
+  "response": {
+    "semanticDescription": "The Badge component is a versatile UI element designed to display small, concise pieces of information such as status indicators, unread counts, or categorical labels. It offers a range of visual variants (default, secondary, outline, error, warning, success, information) and fill styles (solid, light) to effectively communicate different semantic meanings. Key features include the 'isCaps' prop for uppercase text, 'isNumber' for rendering compact circular numeric badges, and 'leftIcon'/'rightIcon' for adding contextual visual cues. The 'asChild' prop, leveraging Radix Slot, provides excellent compositional flexibility, allowing the Badge to render as a child of another element (e.g., a link or custom component) and inherit its behavior. This makes it suitable for enhancing readability and providing quick visual summaries within lists, cards, dashboards, or alongside interactive elements, without being interactive by itself unless explicitly composed with an interactive child.",
+    "guidance": {
+      "whenNotToUse": "Do not use Badge for interactive elements like buttons or standalone links; for such cases, wrap an interactive element with the Badge using the 'asChild' prop. Avoid using Badge to display long text or complex information that requires more space or user interaction. If a more prominent alert or notification is needed, consider an 'Alert' component. For interactive tags that can be dismissed or selected, a 'Tag' component might be more appropriate.",
+      "patterns": ["data-display", "composition", "icon"],
+      "accessibility": "When using the 'asChild' prop, ensure the child element (e.g., <a>) is accessible and handles its own semantic meaning and focus management. For badges displaying numbers ('isNumber'), ensure the number is clearly conveyed to screen readers. Avoid using badges purely for decorative purposes without meaningful content; always provide clear, concise text that adds value.",
+      "relatedComponents": [
+        "Button",
+        "Avatar",
+        "Tooltip",
+        "Card",
+        "Table",
+        "Alert"
+      ],
+      "whenToUse": "Use the Badge component to display short, important information such as status indicators (e.g., 'Active', 'Pending'), unread counts (e.g., '8'), or categorical labels (e.g., 'New', 'Beta'). It is ideal for adding a small, non-interactive visual cue that provides quick context or emphasis to surrounding content."
+    },
+    "examples": {
+      "advanced": [],
+      "minimal": {
+        "title": "Basic Badge",
+        "code": "<Badge>New</Badge>",
+        "description": "A simple badge with default styling."
+      },
+      "common": []
+    },
+    "minimalExample": "<Badge>New</Badge>",
+    "tokens": [
+      "color-default",
+      "color-secondary",
+      "color-outline",
+      "color-error",
+      "color-warning",
+      "color-success",
+      "color-information",
+      "background-solid",
+      "background-light",
+      "spacing-xs",
+      "spacing-sm",
+      "spacing-md",
+      "font-size-sm",
+      "font-weight-medium",
+      "border-radius-sm",
+      "border-radius-full"
+    ],
+    "tier": "free",
+    "description": "A Badge component used to highlight status, counts, or categories with various visual styles."
+  },
+  "recordedAt": "2026-01-26T11:19:41.897Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "c5bc75119958f68af1db2ca8fcfe780e7430fd2922b10fe96c184ccf453be200",
+  "promptSummary": "Generate metadata for Badge component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Badge\n\nProps:\n- isCaps: boolean - When true, uses uppercase text with wider letter-spacing..."
+}

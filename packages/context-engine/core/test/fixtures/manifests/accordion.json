@@ -1,0 +1,162 @@
+{
+  "componentName": "Accordion",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "36fc915b-eeb4-4c70-8010-a8e046b733be",
+    "slug": "accordion-react-36fc915b",
+    "name": "Accordion",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "An accordion component used to display a list of collapsible content sections.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Accordion } from '@nexus/react'",
+      "typeOnly": "import type { AccordionProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Accordion />",
+    "props": {
+      "variants": [],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {},
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Accordion type=\"single\" collapsible className=\"nx:w-full nx:max-w-md\">\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger>Is it accessible?</AccordionTrigger>\n        <AccordionContent>\n          Yes. It adheres to the WAI-ARIA design pattern.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\">\n        <AccordionTrigger>Is it styled?</AccordionTrigger>\n        <AccordionContent>\n          Yes. It comes with default styles that match the Nexus design system.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-3\">\n        <AccordionTrigger>Is it animated?</AccordionTrigger>\n        <AccordionContent>\n          Yes. It has smooth open/close animations built-in.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  )",
+        "isPrimary": true,
+        "propsUsed": [
+          "adheres",
+          "animations",
+          "collapsible",
+          "comes",
+          "default",
+          "design",
+          "has",
+          "it",
+          "match",
+          "open",
+          "smooth",
+          "styles",
+          "that",
+          "the",
+          "to",
+          "type",
+          "value",
+          "with"
+        ]
+      },
+      "common": [],
+      "advanced": [
+        {
+          "title": "Multiple",
+          "code": "(\n    <Accordion type=\"multiple\" className=\"nx:w-full nx:max-w-md\">\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger>First Section</AccordionTrigger>\n        <AccordionContent>\n          This is the content for the first section. Multiple sections can be\n          open at the same time.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\">\n        <AccordionTrigger>Second Section</AccordionTrigger>\n        <AccordionContent>\n          This is the content for the second section. Try opening both!\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-3\">\n        <AccordionTrigger>Third Section</AccordionTrigger>\n        <AccordionContent>\n          This is the content for the third section.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  )",
+          "propsUsed": [
+            "at",
+            "be",
+            "can",
+            "content",
+            "first",
+            "for",
+            "is",
+            "open",
+            "opening",
+            "same",
+            "second",
+            "sections",
+            "the",
+            "third",
+            "type",
+            "value"
+          ]
+        },
+        {
+          "title": "Default Open",
+          "code": "(\n    <Accordion\n      type=\"single\"\n      collapsible\n      defaultValue=\"item-2\"\n      className=\"nx:w-full nx:max-w-md\"\n    >\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger>Closed by default</AccordionTrigger>\n        <AccordionContent>This section starts closed.</AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\">\n        <AccordionTrigger>Open by default</AccordionTrigger>\n        <AccordionContent>\n          This section is open when the page loads because its value matches the\n          defaultValue prop.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-3\">\n        <AccordionTrigger>Also closed by default</AccordionTrigger>\n        <AccordionContent>This section also starts closed.</AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  )",
+          "propsUsed": [
+            "also",
+            "because",
+            "by",
+            "closed",
+            "collapsible",
+            "defaultValue",
+            "is",
+            "its",
+            "loads",
+            "matches",
+            "open",
+            "page",
+            "section",
+            "starts",
+            "the",
+            "type",
+            "value",
+            "when"
+          ]
+        },
+        {
+          "title": "Disabled",
+          "code": "(\n    <Accordion\n      type=\"single\"\n      collapsible\n      disabled\n      className=\"nx:w-full nx:max-w-md\"\n    >\n      <AccordionItem value=\"item-1\">\n        <AccordionTrigger>Disabled Item 1</AccordionTrigger>\n        <AccordionContent>\n          This content cannot be accessed when disabled.\n        </AccordionContent>\n      </AccordionItem>\n      <AccordionItem value=\"item-2\">\n        <AccordionTrigger>Disabled Item 2</AccordionTrigger>\n        <AccordionContent>\n          This content cannot be accessed when disabled.\n        </AccordionContent>\n      </AccordionItem>\n    </Accordion>\n  )",
+          "propsUsed": [
+            "accessed",
+            "be",
+            "cannot",
+            "collapsible",
+            "content",
+            "disabled",
+            "type",
+            "value",
+            "when"
+          ]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Accordion component to present a large amount of information in a constrained space, allowing users to progressively disclose content as needed. Ideal for FAQs, settings panels, or categorized lists where only a few items need to be visible at once.",
+      "whenNotToUse": "Avoid using Accordions for critical information that users must see immediately, or for navigation menus that require direct access to all items. Consider Tabs for related content where only one section is visible at a time, or a simple list/card layout for displaying all content directly.",
+      "accessibility": "The Accordion component is built on Radix UI, providing robust accessibility out-of-the-box. It correctly manages ARIA attributes like `aria-expanded`, `aria-controls`, and keyboard navigation (e.g., Space, Enter to toggle, Arrow keys to navigate items) to ensure compliance with WAI-ARIA authoring practices.",
+      "patterns": ["disclosure", "container", "compound", "layout"],
+      "relatedComponents": ["Tabs", "Dialog", "Collapsible"]
+    },
+    "semanticDescription": "The Accordion component provides a vertically stacked list of collapsible content sections, offering an efficient way to organize and display information. It is designed for progressive disclosure, allowing users to expand and collapse sections to view or hide content as desired. Key features include animated transitions, keyboard navigation, and robust accessibility via its Radix UI foundation. Use cases include frequently asked questions (FAQs), configuration settings, product feature lists, or any scenario where content needs to be grouped and revealed on demand to prevent overwhelming the user or save screen real estate.",
+    "tokens": [
+      "color-text-primary",
+      "color-background-default",
+      "spacing-sm",
+      "spacing-md",
+      "border-radius-md"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/accordion.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-accordion": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Accordion"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:02.505Z",
+    "updatedAt": "2026-01-26T11:57:02.505Z",
+    "sourceHash": "b93bbc5a3720e40a63262fc92d6460a7bcb32b7654931c424959585815c758a9",
+    "metaHash": "24a9b6c3407474c94fdec32404564c913f8c3761c3838bdd0a8e07965475d705"
+  },
+  "recordedAt": "2026-01-26T11:57:02.506Z",
+  "fixtureSource": "nexus/accordion"
+}

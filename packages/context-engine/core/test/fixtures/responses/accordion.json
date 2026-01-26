@@ -1,0 +1,37 @@
+{
+  "componentName": "Accordion",
+  "response": {
+    "tier": "free",
+    "description": "An accordion component used to display a list of collapsible content sections.",
+    "tokens": [
+      "color-text-primary",
+      "color-background-default",
+      "spacing-sm",
+      "spacing-md",
+      "border-radius-md"
+    ],
+    "guidance": {
+      "patterns": ["disclosure", "container", "compound", "layout"],
+      "accessibility": "The Accordion component is built on Radix UI, providing robust accessibility out-of-the-box. It correctly manages ARIA attributes like `aria-expanded`, `aria-controls`, and keyboard navigation (e.g., Space, Enter to toggle, Arrow keys to navigate items) to ensure compliance with WAI-ARIA authoring practices.",
+      "whenNotToUse": "Avoid using Accordions for critical information that users must see immediately, or for navigation menus that require direct access to all items. Consider Tabs for related content where only one section is visible at a time, or a simple list/card layout for displaying all content directly.",
+      "whenToUse": "Use the Accordion component to present a large amount of information in a constrained space, allowing users to progressively disclose content as needed. Ideal for FAQs, settings panels, or categorized lists where only a few items need to be visible at once.",
+      "relatedComponents": ["Tabs", "Dialog", "Collapsible"]
+    },
+    "minimalExample": "<Accordion />",
+    "semanticDescription": "The Accordion component provides a vertically stacked list of collapsible content sections, offering an efficient way to organize and display information. It is designed for progressive disclosure, allowing users to expand and collapse sections to view or hide content as desired. Key features include animated transitions, keyboard navigation, and robust accessibility via its Radix UI foundation. Use cases include frequently asked questions (FAQs), configuration settings, product feature lists, or any scenario where content needs to be grouped and revealed on demand to prevent overwhelming the user or save screen real estate.",
+    "examples": {
+      "minimal": {
+        "propsUsed": ["type", "collapsible", "value"],
+        "description": "A basic accordion with a single collapsible item.",
+        "title": "Basic Accordion",
+        "code": "<Accordion.Root type=\"single\" collapsible><Accordion.Item value=\"item-1\"><Accordion.Header><Accordion.Trigger>Is it accessible?</Accordion.Trigger></Accordion.Header><Accordion.Content>Yes. It adheres to WAI-ARIA guidelines.</Accordion.Content></Accordion.Item></Accordion.Root>"
+      },
+      "common": []
+    }
+  },
+  "recordedAt": "2026-01-26T11:18:56.884Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "342fc45a3d922b7e6fc21e9fb5045ce569a0c0a1bc4b993fca646ff33eedcab4",
+  "promptSummary": "Generate metadata for Accordion component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Accordion\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-accordion, @/lib\n\nBase..."
+}

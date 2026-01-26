@@ -1,0 +1,156 @@
+{
+  "componentName": "Dialog",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "dbe224b8-45ba-4e93-a3f8-42eb7aa727c9",
+    "slug": "dialog-react-dbe224b8",
+    "name": "Dialog",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A modal dialog component for displaying important information or collecting user input, requiring explicit user interaction to dismiss.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Dialog } from '@nexus/react'",
+      "typeOnly": "import type { DialogProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Dialog />",
+    "props": {
+      "variants": [],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {},
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Dialog>\n      <DialogTrigger asChild>\n        <Button variant=\"outline\">Open Dialog</Button>\n      </DialogTrigger>\n      <DialogContent>\n        <DialogHeader>\n          <DialogTitle>Dialog Title</DialogTitle>\n          <DialogDescription>\n            This is a basic dialog with a title and description.\n          </DialogDescription>\n        </DialogHeader>\n        <p className=\"nx:text-sm nx:text-foreground\">\n          Dialog content goes here. You can add any content you need.\n        </p>\n        <DialogFooter>\n          <DialogClose asChild>\n            <Button variant=\"outline\">Cancel</Button>\n          </DialogClose>\n          <Button>Save</Button>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  )",
+        "isPrimary": true,
+        "propsUsed": [
+          "a",
+          "add",
+          "and",
+          "any",
+          "asChild",
+          "basic",
+          "can",
+          "content",
+          "dialog",
+          "goes",
+          "is",
+          "title",
+          "variant",
+          "with",
+          "you"
+        ]
+      },
+      "common": [],
+      "advanced": [
+        {
+          "title": "With Description",
+          "code": "(\n    <Dialog>\n      <DialogTrigger asChild>\n        <Button>Edit Profile</Button>\n      </DialogTrigger>\n      <DialogContent>\n        <DialogHeader>\n          <DialogTitle>Edit Profile</DialogTitle>\n          <DialogDescription>\n            Make changes to your profile here. Click save when you&apos;re done.\n          </DialogDescription>\n        </DialogHeader>\n        <div className=\"nx:grid nx:gap-4 nx:py-4\">\n          <div className=\"nx:grid nx:grid-cols-4 nx:items-center nx:gap-4\">\n            <label\n              htmlFor=\"name\"\n              className=\"nx:text-right nx:text-sm nx:font-medium\"\n            >\n              Name\n            </label>\n            <Input\n              id=\"name\"\n              defaultValue=\"John Doe\"\n              className=\"nx:col-span-3\"\n            />\n          </div>\n          <div className=\"nx:grid nx:grid-cols-4 nx:items-center nx:gap-4\">\n            <label\n              htmlFor=\"username\"\n              className=\"nx:text-right nx:text-sm nx:font-medium\"\n            >\n              Username\n            </label>\n            <Input\n              id=\"username\"\n              defaultValue=\"@johndoe\"\n              className=\"nx:col-span-3\"\n            />\n          </div>\n        </div>\n        <DialogFooter>\n          <Button type=\"submit\">Save changes</Button>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  )",
+          "propsUsed": [
+            "asChild",
+            "changes",
+            "defaultValue",
+            "htmlFor",
+            "id",
+            "profile",
+            "save",
+            "to",
+            "type",
+            "when",
+            "your"
+          ]
+        },
+        {
+          "title": "No Close Button",
+          "code": "(\n    <Dialog>\n      <DialogTrigger asChild>\n        <Button variant=\"outline\">Open Dialog</Button>\n      </DialogTrigger>\n      <DialogContent showCloseButton={false}>\n        <DialogHeader>\n          <DialogTitle>No Close Button</DialogTitle>\n          <DialogDescription>\n            This dialog has no close button in the corner. Use the buttons below\n            to close.\n          </DialogDescription>\n        </DialogHeader>\n        <DialogFooter>\n          <DialogClose asChild>\n            <Button variant=\"outline\">Cancel</Button>\n          </DialogClose>\n          <DialogClose asChild>\n            <Button>Confirm</Button>\n          </DialogClose>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  )",
+          "propsUsed": [
+            "asChild",
+            "below",
+            "button",
+            "buttons",
+            "close",
+            "dialog",
+            "has",
+            "in",
+            "no",
+            "showCloseButton",
+            "the",
+            "to",
+            "variant"
+          ]
+        },
+        {
+          "title": "Custom Close Button",
+          "code": "(\n    <Dialog>\n      <DialogTrigger asChild>\n        <Button variant=\"outline\">Open Dialog</Button>\n      </DialogTrigger>\n      <DialogContent showCloseButton={false}>\n        <DialogHeader>\n          <DialogTitle>Custom Close</DialogTitle>\n          <DialogDescription>\n            This dialog uses a custom close button in the footer.\n          </DialogDescription>\n        </DialogHeader>\n        <p className=\"nx:text-sm nx:text-foreground\">\n          You can customize how users close the dialog.\n        </p>\n        <DialogFooter>\n          <DialogClose asChild>\n            <Button variant=\"ghost\">Dismiss</Button>\n          </DialogClose>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  )",
+          "propsUsed": [
+            "a",
+            "asChild",
+            "button",
+            "can",
+            "close",
+            "custom",
+            "customize",
+            "dialog",
+            "how",
+            "in",
+            "showCloseButton",
+            "the",
+            "users",
+            "uses",
+            "variant"
+          ]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Dialog component to present crucial information, confirm user actions, or collect necessary input in a focused, interruptive manner. Ideal for situations requiring immediate attention and a clear call to action, such as confirmations, form submissions, or detailed views.",
+      "whenNotToUse": "Avoid using Dialogs for non-critical information or as a primary navigation method, as they interrupt user flow. For less critical alerts or non-blocking messages, consider using Toast notifications or inline messages. For complex workflows, consider dedicated pages or multi-step forms.",
+      "accessibility": "Ensure Dialogs are keyboard-accessible, trapping focus within the dialog when open and returning it to the trigger element upon close. Provide clear ARIA attributes like `role=\"dialog\"`, `aria-modal=\"true\"`, and `aria-labelledby` for the dialog title and `aria-describedby` for its description. The close button should be clearly labeled and accessible. Esc key should close the dialog.",
+      "patterns": ["overlay", "disclosure", "container"],
+      "relatedComponents": ["Button", "Toast", "Form"]
+    },
+    "semanticDescription": "The Dialog component provides a robust and accessible modal overlay for presenting content that requires user interaction before proceeding. It's built upon Radix UI's primitives, ensuring high standards for accessibility and behavior. Key features include focus management (trapping focus inside the dialog when open and restoring it upon close), keyboard navigation (e.g., Esc key to close), and proper ARIA attribute application for screen reader compatibility. Use cases include confirming destructive actions, presenting critical alerts, showcasing detailed information that needs to be temporarily isolated, or facilitating focused data entry through forms. It ensures that users are aware of and interact with the presented content before returning to the main application flow.",
+    "tokens": [
+      "color-background",
+      "color-text",
+      "color-border",
+      "spacing-padding",
+      "border-radius",
+      "shadow"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/dialog.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-dialog": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Dialog"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:34.589Z",
+    "updatedAt": "2026-01-26T11:57:34.589Z",
+    "sourceHash": "7484ee0745f89a17bdca74ea846c6895de349005e396ef3414ba9bae27879bfe",
+    "metaHash": "42c701e54a4c9762fb75eeee7aaaba16c2902785c1220548483594873a6e3c7d"
+  },
+  "recordedAt": "2026-01-26T11:57:34.589Z",
+  "fixtureSource": "nexus/dialog"
+}

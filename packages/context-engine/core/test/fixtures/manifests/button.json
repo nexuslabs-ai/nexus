@@ -1,0 +1,213 @@
+{
+  "componentName": "Button",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "adcb250a-8263-496a-83a5-1f19cb24d147",
+    "slug": "button-react-adcb250a",
+    "name": "Button",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A button for triggering user actions, form submissions, and navigation, with support for loading states and custom rendering.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Button } from '@nexus/react'",
+      "typeOnly": "import type { ButtonProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Button>Content</Button>",
+    "props": {
+      "variants": [
+        {
+          "name": "variant",
+          "type": "'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component variant variant",
+          "defaultValue": "default",
+          "possibleValues": [
+            "default",
+            "destructive",
+            "outline",
+            "secondary",
+            "ghost",
+            "link"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "'default' | 'sm' | 'lg' | 'icon'",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component size variant",
+          "defaultValue": "default",
+          "possibleValues": ["default", "sm", "lg", "icon"]
+        }
+      ],
+      "behaviors": [
+        {
+          "name": "loading",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "Shows a loading indicator and disables the button.\nWhen loading, the button is non-interactive and shows aria-busy for accessibility.\n@example ```tsx\n<Button loading>Submitting...</Button>\n```",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, the button will render as its child element (using Radix Slot).\nUseful for rendering as a link or custom element while keeping button styles.\n@example ```tsx\n<Button asChild>\n  <a href=\"/page\">Link styled as button</a>\n</Button>\n```",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ]
+    },
+    "variants": {
+      "variant": {
+        "values": [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost",
+          "link"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "values": ["default", "sm", "lg", "icon"],
+        "default": "default"
+      }
+    },
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "<Button>Button</Button>",
+        "isPrimary": true
+      },
+      "common": [
+        {
+          "title": "Primary",
+          "code": "<Button variant=\"default\">Primary</Button>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Secondary",
+          "code": "<Button variant=\"secondary\">Secondary</Button>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Destructive",
+          "code": "<Button variant=\"destructive\">Delete</Button>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Outline",
+          "code": "<Button variant=\"outline\">Outline</Button>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Ghost",
+          "code": "<Button variant=\"ghost\">Ghost</Button>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Link",
+          "code": "<Button variant=\"link\">Link</Button>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Small",
+          "code": "<Button size=\"sm\">Small</Button>",
+          "propsUsed": ["size"]
+        },
+        {
+          "title": "Large",
+          "code": "<Button size=\"lg\">Large</Button>",
+          "propsUsed": ["size"]
+        }
+      ],
+      "advanced": [
+        {
+          "title": "Loading With Variants",
+          "code": "(\n    <div className=\"nx:flex nx:flex-wrap nx:gap-2\">\n      <Button loading variant=\"default\">\n        Default\n      </Button>\n      <Button loading variant=\"secondary\">\n        Secondary\n      </Button>\n      <Button loading variant=\"destructive\">\n        Destructive\n      </Button>\n      <Button loading variant=\"outline\">\n        Outline\n      </Button>\n    </div>\n  )",
+          "propsUsed": ["loading", "variant"]
+        },
+        {
+          "title": "As Link",
+          "code": "(\n    <Button {...args} asChild>\n      <a href=\"https://example.com\">Visit Website</a>\n    </Button>\n  )",
+          "propsUsed": ["asChild", "href"]
+        },
+        {
+          "title": "With Icon",
+          "code": "(\n    <Button {...args}>\n      <IconRocket data-testid=\"icon\" />\n      Launch\n    </Button>\n  )"
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Button component to allow users to trigger an immediate action, submit a form, or navigate to another page. It is suitable for interactive elements that require a clear visual call to action, especially when providing feedback for asynchronous operations.",
+      "whenNotToUse": "Do not use Button for purely decorative elements or for displaying static information. If the primary purpose is navigation to an internal page without a specific action, consider a Link component. For elements that toggle visibility of content, consider a ToggleButton or AccordionHeader. If the element is part of a larger interactive control (e.g., a tab), use the appropriate component for that pattern.",
+      "accessibility": "The Button component handles accessibility for loading states by setting `aria-busy='true'` and disabling interaction. When using the `asChild` prop, ensure the child element is semantically appropriate (e.g., `<a>` for links) and inherits proper accessibility attributes. Ensure sufficient color contrast for all variants. Provide clear, descriptive text or `aria-label` for icon-only buttons.",
+      "patterns": [
+        "button",
+        "async-action",
+        "form-control",
+        "composition",
+        "navigation"
+      ],
+      "relatedComponents": ["Link", "Input", "Form", "Spinner", "AlertDialog"]
+    },
+    "semanticDescription": "The Button component is a fundamental UI element designed to facilitate user interaction by triggering actions, submitting forms, and enabling navigation. It offers various visual styles through its `variant` prop (default, destructive, outline, secondary, ghost, link) and different sizes (default, sm, lg, icon) to fit diverse design needs. Key features include a `loading` prop that displays an indicator, disables interaction, and sets `aria-busy` for accessibility during asynchronous operations. The `asChild` prop allows the button to render as a child element, preserving button styles while adopting the semantics of the child, such as rendering as a link. This component is built with accessibility in mind, providing mechanisms for clear state communication. It is ideal for interactive elements in forms, navigation menus, and any scenario requiring a distinct call to action.",
+    "tokens": [
+      "color-text",
+      "color-background",
+      "color-border",
+      "spacing-padding",
+      "border-radius",
+      "font-size",
+      "box-shadow"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/button.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-slot": "*",
+        "class-variance-authority": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Slot"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:23.925Z",
+    "updatedAt": "2026-01-26T11:57:23.925Z",
+    "sourceHash": "e98aba18e8c9c3f4037279f15fdbc3da4b4d802f355205fc425247885dbc25be",
+    "metaHash": "4109787b923c0d4467f22c49c23ea1b4a357eef240ac32b52ea1f99388603826"
+  },
+  "recordedAt": "2026-01-26T11:57:23.926Z",
+  "fixtureSource": "nexus/button"
+}

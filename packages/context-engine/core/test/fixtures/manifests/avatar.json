@@ -1,0 +1,138 @@
+{
+  "componentName": "Avatar",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "510cc79b-f42b-4651-ab3b-8ebd72b31f9e",
+    "slug": "avatar-react-510cc79b",
+    "name": "Avatar",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "An Avatar component used to display a user's profile picture, initials, or a fallback icon, providing a visual representation of a user or entity.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Avatar } from '@nexus/react'",
+      "typeOnly": "import type { AvatarProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Avatar>Content</Avatar>",
+    "props": {
+      "variants": [
+        {
+          "name": "size",
+          "type": "''2xs'' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | ''2xl'' | ''3xl'' | ''4xl''",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component size variant",
+          "defaultValue": "md",
+          "possibleValues": [
+            "'2xs'",
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "'2xl'",
+            "'3xl'",
+            "'4xl'"
+          ]
+        },
+        {
+          "name": "shape",
+          "type": "'circle' | 'rounded'",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component shape variant",
+          "defaultValue": "circle",
+          "possibleValues": ["circle", "rounded"]
+        }
+      ],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {
+      "size": {
+        "values": [
+          "'2xs'",
+          "xs",
+          "sm",
+          "md",
+          "lg",
+          "xl",
+          "'2xl'",
+          "'3xl'",
+          "'4xl'"
+        ],
+        "default": "md"
+      },
+      "shape": {
+        "values": ["circle", "rounded"],
+        "default": "circle"
+      }
+    },
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Avatar>\n      <AvatarImage src={AVATAR_URL} alt=\"User avatar\" />\n      <AvatarFallback>JD</AvatarFallback>\n    </Avatar>\n  )",
+        "isPrimary": true,
+        "propsUsed": ["alt", "src"]
+      },
+      "common": [],
+      "advanced": [
+        {
+          "title": "With Fallback",
+          "code": "(\n    <Avatar>\n      <AvatarImage src=\"/broken-image.jpg\" alt=\"User avatar\" />\n      <AvatarFallback>JD</AvatarFallback>\n    </Avatar>\n  )",
+          "propsUsed": ["alt", "src"]
+        },
+        {
+          "title": "Fallback Only",
+          "code": "(\n    <Avatar>\n      <AvatarFallback>AB</AvatarFallback>\n    </Avatar>\n  )"
+        },
+        {
+          "title": "With Icon",
+          "code": "(\n    <Avatar>\n      <AvatarFallback>\n        <IconUser className=\"nx:size-5\" />\n      </AvatarFallback>\n    </Avatar>\n  )"
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Avatar component to visually represent users, accounts, or entities in a concise manner, typically displaying a profile picture, initials, or a generic fallback icon in user lists, comments, or profile headers where a visual identifier is needed.",
+      "whenNotToUse": "Do not use the Avatar component for general image display or purely decorative images. For broader image display needs, use a dedicated `Image` component. Avoid using it when the primary purpose is not to represent a specific user or entity.",
+      "accessibility": "Ensure that if the Avatar displays an image, the `alt` attribute is provided and accurately describes the image for screen readers. For avatars displaying initials, ensure sufficient color contrast between the text and background. The component should gracefully handle missing image sources by displaying fallback content (initials or an icon) and convey this change to assistive technologies appropriately.",
+      "patterns": ["data-display", "primitive-based"],
+      "relatedComponents": ["UserCard", "Comment", "ProfileHeader", "UserMenu"]
+    },
+    "semanticDescription": "The Avatar component is a versatile UI element designed to provide a compact visual representation of a user, account, or any identifiable entity within an application. Its primary purpose is to display a profile picture, but it intelligently falls back to displaying initials derived from a name, or a generic icon, when an image source is unavailable or fails to load. Key features include configurable `size` variants ('2xs' to '4xl') to fit various layout needs, and `shape` variants ('circle', 'rounded') to align with design aesthetics. It's commonly used in scenarios such as user lists, comment sections, chat interfaces, profile headers, and navigation menus where a quick visual cue for identity is crucial. The component ensures graceful degradation and aims for an accessible experience by handling image loading states and providing alternative text considerations.",
+    "tokens": ["spacing", "border-radius", "color-background", "color-text"],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/avatar.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-avatar": "*",
+        "class-variance-authority": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Avatar"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:13.270Z",
+    "updatedAt": "2026-01-26T11:57:13.270Z",
+    "sourceHash": "5f37ce2090e97269e14d8ccdc62b2b6df9bf6df776c94154f188b1c71a7e69a4",
+    "metaHash": "4b1bbf92aa428df61d65ea9ac523c107c3c5f8dd525a1e978ac38466a9cd3b6c"
+  },
+  "recordedAt": "2026-01-26T11:57:13.270Z",
+  "fixtureSource": "nexus/avatar"
+}

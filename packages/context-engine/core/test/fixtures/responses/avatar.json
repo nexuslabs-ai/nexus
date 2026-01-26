@@ -1,0 +1,30 @@
+{
+  "componentName": "Avatar",
+  "response": {
+    "guidance": {
+      "relatedComponents": ["UserCard", "Comment", "ProfileHeader", "UserMenu"],
+      "patterns": ["data-display", "primitive-based"],
+      "accessibility": "Ensure that if the Avatar displays an image, the `alt` attribute is provided and accurately describes the image for screen readers. For avatars displaying initials, ensure sufficient color contrast between the text and background. The component should gracefully handle missing image sources by displaying fallback content (initials or an icon) and convey this change to assistive technologies appropriately.",
+      "whenNotToUse": "Do not use the Avatar component for general image display or purely decorative images. For broader image display needs, use a dedicated `Image` component. Avoid using it when the primary purpose is not to represent a specific user or entity.",
+      "whenToUse": "Use the Avatar component to visually represent users, accounts, or entities in a concise manner, typically displaying a profile picture, initials, or a generic fallback icon in user lists, comments, or profile headers where a visual identifier is needed."
+    },
+    "tokens": ["spacing", "border-radius", "color-background", "color-text"],
+    "minimalExample": "<Avatar />",
+    "examples": {
+      "common": [],
+      "minimal": {
+        "title": "Minimal Avatar",
+        "description": "Basic avatar display with default size and shape.",
+        "code": "<Avatar />"
+      }
+    },
+    "semanticDescription": "The Avatar component is a versatile UI element designed to provide a compact visual representation of a user, account, or any identifiable entity within an application. Its primary purpose is to display a profile picture, but it intelligently falls back to displaying initials derived from a name, or a generic icon, when an image source is unavailable or fails to load. Key features include configurable `size` variants ('2xs' to '4xl') to fit various layout needs, and `shape` variants ('circle', 'rounded') to align with design aesthetics. It's commonly used in scenarios such as user lists, comment sections, chat interfaces, profile headers, and navigation menus where a quick visual cue for identity is crucial. The component ensures graceful degradation and aims for an accessible experience by handling image loading states and providing alternative text considerations.",
+    "tier": "free",
+    "description": "An Avatar component used to display a user's profile picture, initials, or a fallback icon, providing a visual representation of a user or entity."
+  },
+  "recordedAt": "2026-01-26T11:19:25.514Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "4fe4f27d5ac312129203372706413fff687a223b165d123b478837f8566c80e4",
+  "promptSummary": "Generate metadata for Avatar component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Avatar\n\nProps: None extracted\n\nVariants (CVA):\n- size: '2xs', xs, sm, md, lg, xl, '2xl', '..."
+}

@@ -1,0 +1,42 @@
+{
+  "componentName": "Alert",
+  "response": {
+    "description": "An Alert component displays a short, important message to the user in a prominent way.",
+    "semanticDescription": "The Alert component is a crucial UI element designed to display non-interactive, time-sensitive information to users. It comes with different visual variants (default, destructive, success, warning) to communicate the nature of the message effectively. Use cases include notifying users of successful operations, warning them about potential issues, indicating errors, or providing general informational messages. Alerts are typically used for system-level feedback, form validation summaries, or contextual messages within a page. They are meant to be prominent but not disruptive, allowing users to continue their tasks while being informed.",
+    "examples": {
+      "minimal": {
+        "code": "<Alert />",
+        "description": "A simple alert with default variant.",
+        "title": "Basic Alert"
+      },
+      "common": []
+    },
+    "guidance": {
+      "relatedComponents": ["Toast", "Dialog", "Modal", "Spinner"],
+      "patterns": ["feedback", "data-display", "container"],
+      "whenNotToUse": "Do not use Alerts for critical actions that require immediate user input (use a Dialog or Modal instead). Avoid using them for purely decorative purposes; ensure every alert conveys valuable information.",
+      "whenToUse": "Use an Alert to provide contextual feedback, warnings, errors, or success messages to users without interrupting their workflow. Ideal for transient messages that require user attention but not immediate interaction.",
+      "accessibility": "Alerts should have an `aria-live` region set to 'polite' for non-critical updates, or 'assertive' for critical updates (e.g., error messages) to ensure screen readers announce the message. Ensure sufficient color contrast for text and background. Provide a clear visual indication of the alert's variant (e.g., icon, color)."
+    },
+    "tokens": [
+      "color-background-default",
+      "color-text-default",
+      "color-background-destructive",
+      "color-text-destructive",
+      "color-background-success",
+      "color-text-success",
+      "color-background-warning",
+      "color-text-warning",
+      "spacing-md",
+      "border-radius-sm",
+      "font-size-md"
+    ],
+    "minimalExample": "<Alert />",
+    "tier": "free"
+  },
+  "recordedAt": "2026-01-26T11:19:10.664Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "05a960d284af56d7d1e66da146c7e9bf47b5b95774fb00ca0f813292417c640c",
+  "promptSummary": "Generate metadata for Alert component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Alert\n\nProps: None extracted\n\nVariants (CVA):\n- variant: default, destructive, success, wa..."
+}

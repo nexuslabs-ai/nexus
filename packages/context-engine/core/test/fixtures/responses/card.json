@@ -1,0 +1,42 @@
+{
+  "componentName": "Card",
+  "response": {
+    "examples": {
+      "common": [],
+      "minimal": {
+        "title": "Basic Card",
+        "code": "<Card>This is a basic card.</Card>",
+        "description": "A simple card displaying text content."
+      }
+    },
+    "minimalExample": "<Card />",
+    "tier": "free",
+    "semanticDescription": "The Card component serves as a flexible and visually distinct container for organizing and presenting information. Its primary purpose is to encapsulate related content, providing clear visual separation from other elements on the page. Key features include its ability to house various types of content such as text, images, and interactive elements, often featuring subtle styling like borders, shadows, and rounded corners to enhance its visual prominence. Common use cases include displaying product cards in e-commerce, user profiles in social applications, article previews in blogs, or individual data visualizations in dashboards, making complex information digestible and scannable.",
+    "guidance": {
+      "whenToUse": "Use the Card component when you need to group related information visually, present discrete blocks of content, or create layouts that emphasize individual content items. It's ideal for displaying self-contained content units like product listings, user profiles, articles, or dashboard widgets.",
+      "relatedComponents": [
+        "Button",
+        "Image",
+        "Text",
+        "Heading",
+        "Stack",
+        "Grid"
+      ],
+      "whenNotToUse": "Avoid using the Card component for very simple content that doesn't require distinct visual grouping, or when a more specific layout component (e.g., a list, a table, or a simple div) would be more semantically appropriate. Do not overuse cards as it can lead to visual clutter and make the interface feel heavy.",
+      "accessibility": "Ensure that content within the Card is semantically structured using appropriate HTML elements (e.g., headings for titles, paragraphs for text). If the card itself is interactive (e.g., clickable), ensure it has an appropriate ARIA role (e.g., 'button' or 'link' if it acts as one) and is keyboard navigable. Manage focus within interactive cards responsibly.",
+      "patterns": ["container", "layout", "data-display"]
+    },
+    "description": "A versatile container component used to group and display related content, often with a distinct visual boundary.",
+    "tokens": [
+      "background-color-surface",
+      "border-radius-md",
+      "spacing-md",
+      "shadow-elevation-1"
+    ]
+  },
+  "recordedAt": "2026-01-26T11:20:10.366Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "2dbe4d1def65a3f1a695e3638ea619d331eb7c5ea7c3e670c2bf69ec8761122a",
+  "promptSummary": "Generate metadata for Card component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Card\n\nProps: None extracted\n\nNPM Dependencies: @/lib\n\n## Pattern Reference\n\nValid patterns..."
+}

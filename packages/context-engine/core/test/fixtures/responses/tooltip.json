@@ -1,0 +1,37 @@
+{
+  "componentName": "Tooltip",
+  "response": {
+    "examples": {
+      "common": [],
+      "minimal": {
+        "description": "A basic tooltip example.",
+        "code": "<Tooltip />",
+        "title": "Basic Tooltip"
+      }
+    },
+    "minimalExample": "<Tooltip />",
+    "description": "A small, ephemeral pop-up that displays supplementary information when a user hovers over or focuses on an element.",
+    "tier": "free",
+    "tokens": [
+      "color-text-tooltip",
+      "color-bg-tooltip",
+      "font-size-sm",
+      "spacing-xs",
+      "spacing-sm",
+      "border-radius-sm"
+    ],
+    "semanticDescription": "The Tooltip component provides a small, non-interactive visual cue that displays supplementary, contextual information when a user hovers over or focuses on a trigger element. It's designed for displaying short, informative text that enhances understanding without cluttering the primary UI. Key features include delayed appearance, controlled positioning, and automatic dismissal when the user moves away or presses the Escape key. Tooltips are commonly used to explain the function of an icon, provide the full text of an abbreviation or truncated label, or give context to disabled interactive elements. It utilizes the `@radix-ui/react-tooltip` library for robust accessibility and behavior.",
+    "guidance": {
+      "relatedComponents": ["Popover", "Dialog", "Button", "Icon"],
+      "patterns": ["data-display", "overlay", "disclosure"],
+      "whenNotToUse": "Do not use Tooltips for critical information that requires user interaction, persistent display, or contains complex content. For these cases, consider using a Popover, Dialog, or Modal instead. Avoid using Tooltips for information that should always be visible.",
+      "accessibility": "Ensure Tooltips are accessible to keyboard and screen reader users. The underlying Radix UI component handles much of the accessibility, including proper ARIA attributes (`aria-describedby`) and focus management. Tooltips should appear on keyboard focus and disappear on blur, and should be dismissible by pressing the Escape key. Provide a sufficient delay before showing the tooltip and allow enough time for users to read it before it hides.",
+      "whenToUse": "Use a Tooltip to provide concise, non-essential, contextual information or explanations for UI elements upon user interaction (hover or focus). Ideal for explaining icons, abbreviations, truncated text, or disabled elements where immediate visibility isn't required."
+    }
+  },
+  "recordedAt": "2026-01-26T12:07:12.741Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "5fa6350840cfa1a266469fabf2399ee1a1bf61f742e117a697345dfe2832dcb8",
+  "promptSummary": "Generate metadata for Tooltip component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Tooltip\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-tooltip, @/lib\n\nBase Lib..."
+}

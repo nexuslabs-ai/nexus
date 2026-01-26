@@ -1,0 +1,106 @@
+{
+  "componentName": "Select",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "43e75e06-99c7-4bc0-b4ae-e1c18aef0cf5",
+    "slug": "select-react-43e75e06",
+    "name": "Select",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A customizable and accessible form control for selecting a single option from a dropdown list.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Select } from '@nexus/react'",
+      "typeOnly": "import type { SelectProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Select />",
+    "props": {
+      "variants": [],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {},
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Select>\n      <SelectTrigger className=\"nx:w-[180px]\" aria-label=\"Select a fruit\">\n        <SelectValue placeholder=\"Select a fruit\" />\n      </SelectTrigger>\n      <SelectContent>\n        <SelectItem value=\"apple\">Apple</SelectItem>\n        <SelectItem value=\"banana\">Banana</SelectItem>\n        <SelectItem value=\"orange\">Orange</SelectItem>\n        <SelectItem value=\"grape\">Grape</SelectItem>\n        <SelectItem value=\"mango\">Mango</SelectItem>\n      </SelectContent>\n    </Select>\n  )",
+        "isPrimary": true,
+        "propsUsed": ["a", "placeholder", "value"]
+      },
+      "common": [],
+      "advanced": [
+        {
+          "title": "With Default Value",
+          "code": "(\n    <Select defaultValue=\"banana\">\n      <SelectTrigger className=\"nx:w-[180px]\" aria-label=\"Select a fruit\">\n        <SelectValue placeholder=\"Select a fruit\" />\n      </SelectTrigger>\n      <SelectContent>\n        <SelectItem value=\"apple\">Apple</SelectItem>\n        <SelectItem value=\"banana\">Banana</SelectItem>\n        <SelectItem value=\"orange\">Orange</SelectItem>\n      </SelectContent>\n    </Select>\n  )",
+          "propsUsed": ["a", "defaultValue", "placeholder", "value"]
+        },
+        {
+          "title": "Disabled",
+          "code": "(\n    <Select disabled>\n      <SelectTrigger className=\"nx:w-[180px]\" aria-label=\"Disabled select\">\n        <SelectValue placeholder=\"Disabled\" />\n      </SelectTrigger>\n      <SelectContent>\n        <SelectItem value=\"apple\">Apple</SelectItem>\n        <SelectItem value=\"banana\">Banana</SelectItem>\n      </SelectContent>\n    </Select>\n  )",
+          "propsUsed": ["disabled", "placeholder", "value"]
+        },
+        {
+          "title": "With Disabled Items",
+          "code": "(\n    <Select>\n      <SelectTrigger className=\"nx:w-[180px]\" aria-label=\"Select an option\">\n        <SelectValue placeholder=\"Select option\" />\n      </SelectTrigger>\n      <SelectContent>\n        <SelectItem value=\"option1\">Available</SelectItem>\n        <SelectItem value=\"option2\" disabled>\n          Unavailable\n        </SelectItem>\n        <SelectItem value=\"option3\">Available</SelectItem>\n      </SelectContent>\n    </Select>\n  )",
+          "propsUsed": ["an", "disabled", "placeholder", "value"]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Select component when users need to choose a single option from a predefined list. It is ideal for form inputs where space is limited and a dropdown menu is preferred over multiple radio buttons, especially when the list of options is moderately long (e.g., 5-15 items).",
+      "whenNotToUse": "Do not use Select for very few options (2-3 items); prefer RadioGroup. Avoid when users need to select multiple items, instead use a multi-select or checkbox group. For very long lists requiring search or filtering, consider a Combobox or Autocomplete component to improve user experience.",
+      "accessibility": "The Select component built on Radix UI inherently supports robust accessibility. It includes proper ARIA roles and attributes (e.g., \"listbox\", \"aria-haspopup\", \"aria-expanded\", \"aria-controls\") for screen readers. Keyboard navigation (Tab to focus, Space/Enter to open, Up/Down arrows to navigate options, Enter to select, Escape to close) is fully supported. Ensure the component is always associated with a clear <label> element for optimal screen reader context.",
+      "patterns": ["form-control", "selection", "input", "disclosure"],
+      "relatedComponents": [
+        "Input",
+        "RadioGroup",
+        "Checkbox",
+        "Combobox",
+        "Autocomplete"
+      ]
+    },
+    "semanticDescription": "The Select component provides a robust and accessible way for users to choose a single value from a predefined list of options. Built on the highly customizable Radix UI primitives, it offers a solid foundation for creating consistent and branded select inputs within a design system. Key features include a customizable trigger button, a scrollable dropdown menu for options, comprehensive keyboard navigation, and inherent accessibility support ensuring it works well with assistive technologies. This component is ideal for scenarios like selecting a country in a registration form, choosing a sorting preference for a data table, or categorizing an item from a fixed set of categories. It effectively manages lists of varying lengths, providing a clean and intuitive user experience while maintaining compliance with accessibility standards.",
+    "tokens": [
+      "color-text",
+      "color-background",
+      "color-border",
+      "color-primary",
+      "spacing-md",
+      "font-size-md",
+      "border-radius-sm",
+      "shadow-sm"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/select.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-select": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Select"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:50.639Z",
+    "updatedAt": "2026-01-26T11:57:50.639Z",
+    "sourceHash": "5720d8b57490896508cdc571910fdf2e456f111106ba83044e9e8b4c85f50c85",
+    "metaHash": "7dfd9ab261327acec550f61c18b2a8091dd33a7b215434ca0011a39bb09c5543"
+  },
+  "recordedAt": "2026-01-26T11:57:50.639Z",
+  "fixtureSource": "nexus/select"
+}

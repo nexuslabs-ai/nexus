@@ -1,0 +1,135 @@
+{
+  "componentName": "Card",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "5672cf3a-4e5c-40fb-91cd-2ffd6aefbab4",
+    "slug": "card-react-5672cf3a",
+    "name": "Card",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A versatile container component used to group and display related content, often with a distinct visual boundary.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Card } from '@nexus/react'",
+      "typeOnly": "import type { CardProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Card />",
+    "props": {
+      "variants": [],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {},
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card Title</CardTitle>\n        <CardDescription>Card description goes here.</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>Card content goes here.</p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\">Cancel</Button>\n        <Button>Submit</Button>\n      </CardFooter>\n    </Card>\n  )",
+        "isPrimary": true,
+        "propsUsed": ["content", "description", "goes", "variant"]
+      },
+      "common": [],
+      "advanced": [
+        {
+          "title": "With Description",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Description</CardTitle>\n        <CardDescription>\n          This is a longer description that provides more context about the card\n          content.\n        </CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>Main content area of the card.</p>\n      </CardContent>\n    </Card>\n  )",
+          "propsUsed": [
+            "a",
+            "about",
+            "area",
+            "card",
+            "content",
+            "context",
+            "description",
+            "is",
+            "longer",
+            "more",
+            "of",
+            "provides",
+            "that",
+            "the",
+            "with"
+          ]
+        },
+        {
+          "title": "With Action",
+          "code": "(\n    <Card className=\"nx:relative nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Action</CardTitle>\n        <CardDescription>This card has an action button.</CardDescription>\n        <CardAction>\n          <Button size=\"sm\" variant=\"outline\">\n            Edit\n          </Button>\n        </CardAction>\n      </CardHeader>\n      <CardContent>\n        <p>Content with an action button in the header.</p>\n      </CardContent>\n    </Card>\n  )",
+          "propsUsed": [
+            "action",
+            "an",
+            "button",
+            "card",
+            "has",
+            "in",
+            "size",
+            "the",
+            "variant",
+            "with"
+          ]
+        },
+        {
+          "title": "With Footer",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Footer</CardTitle>\n        <CardDescription>This card demonstrates footer usage.</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>The footer is useful for action buttons.</p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\">Cancel</Button>\n        <Button>Save Changes</Button>\n      </CardFooter>\n    </Card>\n  )",
+          "propsUsed": [
+            "action",
+            "card",
+            "demonstrates",
+            "footer",
+            "for",
+            "is",
+            "useful",
+            "variant",
+            "with"
+          ]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Card component when you need to group related information visually, present discrete blocks of content, or create layouts that emphasize individual content items. It's ideal for displaying self-contained content units like product listings, user profiles, articles, or dashboard widgets.",
+      "whenNotToUse": "Avoid using the Card component for very simple content that doesn't require distinct visual grouping, or when a more specific layout component (e.g., a list, a table, or a simple div) would be more semantically appropriate. Do not overuse cards as it can lead to visual clutter and make the interface feel heavy.",
+      "accessibility": "Ensure that content within the Card is semantically structured using appropriate HTML elements (e.g., headings for titles, paragraphs for text). If the card itself is interactive (e.g., clickable), ensure it has an appropriate ARIA role (e.g., 'button' or 'link' if it acts as one) and is keyboard navigable. Manage focus within interactive cards responsibly.",
+      "patterns": ["container", "layout", "data-display"],
+      "relatedComponents": [
+        "Button",
+        "Image",
+        "Text",
+        "Heading",
+        "Stack",
+        "Grid"
+      ]
+    },
+    "semanticDescription": "The Card component serves as a flexible and visually distinct container for organizing and presenting information. Its primary purpose is to encapsulate related content, providing clear visual separation from other elements on the page. Key features include its ability to house various types of content such as text, images, and interactive elements, often featuring subtle styling like borders, shadows, and rounded corners to enhance its visual prominence. Common use cases include displaying product cards in e-commerce, user profiles in social applications, article previews in blogs, or individual data visualizations in dashboards, making complex information digestible and scannable.",
+    "tokens": [
+      "background-color-surface",
+      "border-radius-md",
+      "spacing-md",
+      "shadow-elevation-1"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/card.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:29.264Z",
+    "updatedAt": "2026-01-26T11:57:29.264Z",
+    "sourceHash": "69c9a0f515c3f03477ee3b00998c4832d3b02558fca299d06340d091dc722b10",
+    "metaHash": "0866a0a8dd68df7170a221eb596d464372d776ccb0e3128bc75e5d767b875d7b"
+  },
+  "recordedAt": "2026-01-26T11:57:29.265Z",
+  "fixtureSource": "nexus/card"
+}

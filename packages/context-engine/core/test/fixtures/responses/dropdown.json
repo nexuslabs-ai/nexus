@@ -1,0 +1,40 @@
+{
+  "componentName": "Dropdown",
+  "response": {
+    "minimalExample": "<Dropdown-menu />",
+    "description": "A dropdown menu for displaying a list of options or actions that are revealed upon user interaction.",
+    "semanticDescription": "The Dropdown-menu component provides an accessible and customizable way to present a list of interactive items, such as actions or options, in a compact overlay. It typically appears when a trigger element (e.g., a button) is clicked or hovered. Key features include keyboard navigation, customizable content, and flexible positioning. Use cases include user profile menus, action lists for data tables, filtering options, and contextual navigation.",
+    "tier": "free",
+    "guidance": {
+      "relatedComponents": ["Button", "Menu Item", "Separator", "Popover"],
+      "accessibility": "Ensure proper keyboard navigation (Tab to open/close, Arrow keys to navigate items, Enter/Space to select). Implement appropriate ARIA attributes like `aria-haspopup`, `aria-expanded`, `aria-controls`, and `role='menu'` on the menu and `role='menuitem'` on items.",
+      "whenToUse": "Use a Dropdown-menu to group a list of related actions or options, saving space and presenting them contextually. Ideal for navigation, filtering, or action lists that don't need to be constantly visible.",
+      "whenNotToUse": "Avoid using for only one or two options; use a simple Button or Toggle instead. Do not use for critical, immediate actions that require high visibility, or when all options must be visible simultaneously.",
+      "patterns": ["disclosure", "overlay", "navigation", "selection"]
+    },
+    "tokens": [
+      "color-text-default",
+      "color-background-surface",
+      "spacing-sm",
+      "spacing-md",
+      "border-radius-md",
+      "shadow-md",
+      "font-family-base",
+      "font-size-sm"
+    ],
+    "examples": {
+      "advanced": [],
+      "minimal": {
+        "title": "Minimal Dropdown Menu",
+        "description": "The simplest working dropdown menu.",
+        "code": "<Dropdown-menu />"
+      },
+      "common": []
+    }
+  },
+  "recordedAt": "2026-01-26T11:54:03.419Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "a62b9ee1f375d43af5a2358834669da35006d988b957e52c74500187dd5f7320",
+  "promptSummary": "Generate metadata for Dropdown component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Dropdown-menu\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-dropdown-menu, @/l..."
+}

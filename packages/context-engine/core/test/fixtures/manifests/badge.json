@@ -1,0 +1,251 @@
+{
+  "componentName": "Badge",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "9f9680d4-47c5-4ba9-b201-e04518425ec7",
+    "slug": "badge-react-9f9680d4",
+    "name": "Badge",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A Badge component used to highlight status, counts, or categories with various visual styles.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Badge } from '@nexus/react'",
+      "typeOnly": "import type { BadgeProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Badge>Content</Badge>",
+    "props": {
+      "variants": [
+        {
+          "name": "variant",
+          "type": "'default' | 'secondary' | 'outline' | 'error' | 'warning' | 'success' | 'information'",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component variant variant",
+          "defaultValue": "default",
+          "possibleValues": [
+            "default",
+            "secondary",
+            "outline",
+            "error",
+            "warning",
+            "success",
+            "information"
+          ]
+        },
+        {
+          "name": "fill",
+          "type": "'solid' | 'light'",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component fill variant",
+          "defaultValue": "solid",
+          "possibleValues": ["solid", "light"]
+        }
+      ],
+      "behaviors": [
+        {
+          "name": "isCaps",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "true",
+          "description": "When true, uses uppercase text with wider letter-spacing.",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        },
+        {
+          "name": "isNumber",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, renders as a circular number badge.\nPass the number as children.\n@example ```tsx\n<Badge isNumber>8</Badge>\n<Badge isNumber variant=\"error\">99+</Badge>\n```",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ],
+      "events": [],
+      "slots": [
+        {
+          "name": "leftIcon",
+          "type": "any",
+          "typeCategory": "unknown",
+          "required": false,
+          "description": "Icon to display before the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIgnored when `isNumber` is true.\n@example ```tsx\n<Badge leftIcon={<IconCheck />}>Verified</Badge>\n```",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        },
+        {
+          "name": "rightIcon",
+          "type": "any",
+          "typeCategory": "unknown",
+          "required": false,
+          "description": "Icon to display after the label.\nIcon is automatically sized to 14px (3.5 spacing units).\nIgnored when `isNumber` is true.\n@example ```tsx\n<Badge rightIcon={<IconX />}>Dismiss</Badge>\n```",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ],
+      "passthrough": [],
+      "other": [
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "typeCategory": "primitive",
+          "required": false,
+          "defaultValue": "false",
+          "description": "When true, renders as child element using Radix Slot.\nUseful for composition with links or custom elements.\n@example ```tsx\n<Badge asChild>\n  <a href=\"/status\">Active</a>\n</Badge>\n```",
+          "isControlled": false,
+          "acceptsChildren": false,
+          "isEventHandler": false,
+          "isDeprecated": false
+        }
+      ]
+    },
+    "variants": {
+      "variant": {
+        "values": [
+          "default",
+          "secondary",
+          "outline",
+          "error",
+          "warning",
+          "success",
+          "information"
+        ],
+        "default": "default"
+      },
+      "fill": {
+        "values": ["solid", "light"],
+        "default": "solid"
+      }
+    },
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "<Badge>Badge</Badge>",
+        "isPrimary": true
+      },
+      "common": [
+        {
+          "title": "Primary",
+          "code": "<Badge variant=\"default\">Primary</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Secondary",
+          "code": "<Badge variant=\"secondary\">Secondary</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Outline",
+          "code": "<Badge variant=\"outline\">Outline</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Error",
+          "code": "<Badge variant=\"error\">Error</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Warning",
+          "code": "<Badge variant=\"warning\">Warning</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Success",
+          "code": "<Badge variant=\"success\">Success</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Information",
+          "code": "<Badge variant=\"information\">Info</Badge>",
+          "propsUsed": ["variant"]
+        },
+        {
+          "title": "Solid Fill",
+          "code": "<Badge variant=\"default\" fill=\"solid\">Solid</Badge>",
+          "propsUsed": ["fill", "variant"]
+        }
+      ],
+      "advanced": [
+        {
+          "title": "As Link",
+          "code": "(\n    <Badge asChild>\n      <a href=\"https://example.com\">New</a>\n    </Badge>\n  )",
+          "propsUsed": ["asChild", "href"]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Badge component to display short, important information such as status indicators (e.g., 'Active', 'Pending'), unread counts (e.g., '8'), or categorical labels (e.g., 'New', 'Beta'). It is ideal for adding a small, non-interactive visual cue that provides quick context or emphasis to surrounding content.",
+      "whenNotToUse": "Do not use Badge for interactive elements like buttons or standalone links; for such cases, wrap an interactive element with the Badge using the 'asChild' prop. Avoid using Badge to display long text or complex information that requires more space or user interaction. If a more prominent alert or notification is needed, consider an 'Alert' component. For interactive tags that can be dismissed or selected, a 'Tag' component might be more appropriate.",
+      "accessibility": "When using the 'asChild' prop, ensure the child element (e.g., <a>) is accessible and handles its own semantic meaning and focus management. For badges displaying numbers ('isNumber'), ensure the number is clearly conveyed to screen readers. Avoid using badges purely for decorative purposes without meaningful content; always provide clear, concise text that adds value.",
+      "patterns": ["data-display", "composition", "icon"],
+      "relatedComponents": [
+        "Button",
+        "Avatar",
+        "Tooltip",
+        "Card",
+        "Table",
+        "Alert"
+      ]
+    },
+    "semanticDescription": "The Badge component is a versatile UI element designed to display small, concise pieces of information such as status indicators, unread counts, or categorical labels. It offers a range of visual variants (default, secondary, outline, error, warning, success, information) and fill styles (solid, light) to effectively communicate different semantic meanings. Key features include the 'isCaps' prop for uppercase text, 'isNumber' for rendering compact circular numeric badges, and 'leftIcon'/'rightIcon' for adding contextual visual cues. The 'asChild' prop, leveraging Radix Slot, provides excellent compositional flexibility, allowing the Badge to render as a child of another element (e.g., a link or custom component) and inherit its behavior. This makes it suitable for enhancing readability and providing quick visual summaries within lists, cards, dashboards, or alongside interactive elements, without being interactive by itself unless explicitly composed with an interactive child.",
+    "tokens": [
+      "color-default",
+      "color-secondary",
+      "color-outline",
+      "color-error",
+      "color-warning",
+      "color-success",
+      "color-information",
+      "background-solid",
+      "background-light",
+      "spacing-xs",
+      "spacing-sm",
+      "spacing-md",
+      "font-size-sm",
+      "font-weight-medium",
+      "border-radius-sm",
+      "border-radius-full"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/badge.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-slot": "*",
+        "class-variance-authority": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Slot"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:18.594Z",
+    "updatedAt": "2026-01-26T11:57:18.594Z",
+    "sourceHash": "ab0b4cb16c3ed41050168417210db22d5a9c66f704ceec479d6c81f6e20b0009",
+    "metaHash": "4d4d0e5c369a6d2723e23fdf56928ff6c39a93f116043739668d77f4c8936509"
+  },
+  "recordedAt": "2026-01-26T11:57:18.594Z",
+  "fixtureSource": "nexus/badge"
+}

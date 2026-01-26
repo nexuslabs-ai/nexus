@@ -1,0 +1,133 @@
+{
+  "componentName": "Alert",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "71d9a691-8e71-497e-b021-c0486a36a51b",
+    "slug": "alert-react-71d9a691",
+    "name": "Alert",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "An Alert component displays a short, important message to the user in a prominent way.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Alert } from '@nexus/react'",
+      "typeOnly": "import type { AlertProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Alert>Content</Alert>",
+    "props": {
+      "variants": [
+        {
+          "name": "variant",
+          "type": "'default' | 'destructive' | 'success' | 'warning'",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component variant variant",
+          "defaultValue": "default",
+          "possibleValues": ["default", "destructive", "success", "warning"]
+        }
+      ],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {
+      "variant": {
+        "values": ["default", "destructive", "success", "warning"],
+        "default": "default"
+      }
+    },
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Alert className=\"nx:max-w-md\">\n      <AlertTitle>Heads up!</AlertTitle>\n      <AlertDescription>\n        You can add components and dependencies to your app using the CLI.\n      </AlertDescription>\n    </Alert>\n  )",
+        "isPrimary": true,
+        "propsUsed": [
+          "add",
+          "and",
+          "app",
+          "can",
+          "components",
+          "dependencies",
+          "the",
+          "to",
+          "using",
+          "your"
+        ]
+      },
+      "common": [],
+      "advanced": [
+        {
+          "title": "Destructive",
+          "code": "(\n    <Alert variant=\"destructive\" className=\"nx:max-w-md\">\n      <AlertTitle>Error</AlertTitle>\n      <AlertDescription>\n        Your session has expired. Please log in again.\n      </AlertDescription>\n    </Alert>\n  )",
+          "propsUsed": ["has", "in", "log", "session", "variant"]
+        },
+        {
+          "title": "Success",
+          "code": "(\n    <Alert variant=\"success\" className=\"nx:max-w-md\">\n      <AlertTitle>Success</AlertTitle>\n      <AlertDescription>\n        Your changes have been saved successfully.\n      </AlertDescription>\n    </Alert>\n  )",
+          "propsUsed": ["been", "changes", "have", "saved", "variant"]
+        },
+        {
+          "title": "Warning",
+          "code": "(\n    <Alert variant=\"warning\" className=\"nx:max-w-md\">\n      <AlertTitle>Warning</AlertTitle>\n      <AlertDescription>\n        Your account is about to expire. Please renew your subscription.\n      </AlertDescription>\n    </Alert>\n  )",
+          "propsUsed": [
+            "about",
+            "account",
+            "is",
+            "renew",
+            "to",
+            "variant",
+            "your"
+          ]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use an Alert to provide contextual feedback, warnings, errors, or success messages to users without interrupting their workflow. Ideal for transient messages that require user attention but not immediate interaction.",
+      "whenNotToUse": "Do not use Alerts for critical actions that require immediate user input (use a Dialog or Modal instead). Avoid using them for purely decorative purposes; ensure every alert conveys valuable information.",
+      "accessibility": "Alerts should have an `aria-live` region set to 'polite' for non-critical updates, or 'assertive' for critical updates (e.g., error messages) to ensure screen readers announce the message. Ensure sufficient color contrast for text and background. Provide a clear visual indication of the alert's variant (e.g., icon, color).",
+      "patterns": ["feedback", "data-display", "container"],
+      "relatedComponents": ["Toast", "Dialog", "Modal", "Spinner"]
+    },
+    "semanticDescription": "The Alert component is a crucial UI element designed to display non-interactive, time-sensitive information to users. It comes with different visual variants (default, destructive, success, warning) to communicate the nature of the message effectively. Use cases include notifying users of successful operations, warning them about potential issues, indicating errors, or providing general informational messages. Alerts are typically used for system-level feedback, form validation summaries, or contextual messages within a page. They are meant to be prominent but not disruptive, allowing users to continue their tasks while being informed.",
+    "tokens": [
+      "color-background-default",
+      "color-text-default",
+      "color-background-destructive",
+      "color-text-destructive",
+      "color-background-success",
+      "color-text-success",
+      "color-background-warning",
+      "color-text-warning",
+      "spacing-md",
+      "border-radius-sm",
+      "font-size-md"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/alert.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "class-variance-authority": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:07.908Z",
+    "updatedAt": "2026-01-26T11:57:07.908Z",
+    "sourceHash": "683f2916b687c75b1d58f9d643d66fa72effc4d5b512c78d2f98fd25e55ac1bc",
+    "metaHash": "9c0e50dccfe5e8384e8e44e111e35511a068cc72505e6b02ad6c4edaa129fd06"
+  },
+  "recordedAt": "2026-01-26T11:57:07.908Z",
+  "fixtureSource": "nexus/alert"
+}

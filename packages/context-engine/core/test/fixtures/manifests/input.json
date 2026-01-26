@@ -1,0 +1,134 @@
+{
+  "componentName": "Input",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "b09af309-e542-4d72-a0d3-41c00963e610",
+    "slug": "input-react-b09af309",
+    "name": "Input",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "An input field for collecting user text and data within forms or interactive elements.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Input } from '@nexus/react'",
+      "typeOnly": "import type { InputProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Input>Content</Input>",
+    "props": {
+      "variants": [
+        {
+          "name": "size",
+          "type": "'default' | 'sm' | 'lg'",
+          "typeCategory": "literal",
+          "required": false,
+          "description": "Component size variant",
+          "defaultValue": "default",
+          "possibleValues": ["default", "sm", "lg"]
+        }
+      ],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {
+      "size": {
+        "values": ["default", "sm", "lg"],
+        "default": "default"
+      }
+    },
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "<Input placeholder=\"Enter text...\" />",
+        "isPrimary": true,
+        "propsUsed": ["placeholder"]
+      },
+      "common": [
+        {
+          "title": "With Value",
+          "code": "<Input defaultValue=\"Hello World\" 'aria-label'=\"Text input with value\" />",
+          "propsUsed": ["'aria-label'", "defaultValue"]
+        },
+        {
+          "title": "With Placeholder",
+          "code": "<Input placeholder=\"Enter your email address\" type=\"email\" />",
+          "propsUsed": ["placeholder", "type"]
+        },
+        {
+          "title": "Disabled",
+          "code": "<Input placeholder=\"Disabled input\" disabled />",
+          "propsUsed": ["disabled", "placeholder"]
+        },
+        {
+          "title": "Disabled With Value",
+          "code": "<Input defaultValue=\"Cannot edit this\" disabled 'aria-label'=\"Disabled input with value\" />",
+          "propsUsed": ["'aria-label'", "defaultValue", "disabled"]
+        },
+        {
+          "title": "Type Email",
+          "code": "<Input type=\"email\" placeholder=\"email@example.com\" />",
+          "propsUsed": ["placeholder", "type"]
+        },
+        {
+          "title": "Type Password",
+          "code": "<Input type=\"password\" placeholder=\"Enter password\" />",
+          "propsUsed": ["placeholder", "type"]
+        },
+        {
+          "title": "Type Number",
+          "code": "<Input type=\"number\" placeholder=\"0\" />",
+          "propsUsed": ["placeholder", "type"]
+        },
+        {
+          "title": "Type Search",
+          "code": "<Input type=\"search\" placeholder=\"Search...\" />",
+          "propsUsed": ["placeholder", "type"]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Input component to allow users to enter and edit text, numbers, or other data. Ideal for form fields, search boxes, or any scenario requiring direct user data entry.",
+      "whenNotToUse": "Do not use for selecting predefined options (use Select, RadioGroup, Checkbox instead), for triggering actions (use Button), or for displaying large blocks of static text.",
+      "accessibility": "Ensure inputs have associated <label> elements for screen reader accessibility. Use `aria-describedby` for validation messages or hints, and `aria-invalid` for error states. Provide clear visual focus indicators.",
+      "patterns": ["form-control", "input"],
+      "relatedComponents": ["Label", "Button", "Form", "Textarea", "Select"]
+    },
+    "semanticDescription": "The Input component provides a fundamental user interface element for accepting text-based user input. It is highly versatile and crucial for data collection in forms, search functionalities, and interactive data filtering. Key features include support for different sizes (default, sm, lg) to accommodate various design requirements and contextual uses. It integrates seamlessly into forms, allowing users to type and submit information. It can be used for single-line text, passwords, email addresses, numbers, and more, adapting its behavior based on HTML `type` attributes. Its primary purpose is to enable direct user data entry, making it an essential building block for interactive applications.",
+    "tokens": [
+      "spacing-sm",
+      "spacing-lg",
+      "font-size-sm",
+      "font-size-lg",
+      "color-border",
+      "color-text",
+      "border-radius-md"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/input.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "class-variance-authority": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:45.311Z",
+    "updatedAt": "2026-01-26T11:57:45.311Z",
+    "sourceHash": "fa4d68b02433c4f701c8bbdd0510e4e118bcd7fa757c1521b45c56d1d2739f73",
+    "metaHash": "6e64b3a71c95aec3180561bf02deebe0b14ab438d16858b5139435870744919b"
+  },
+  "recordedAt": "2026-01-26T11:57:45.311Z",
+  "fixtureSource": "nexus/input"
+}

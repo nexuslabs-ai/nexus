@@ -1,0 +1,144 @@
+{
+  "componentName": "Tabs",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "eb7d8a0c-9ef6-4d03-a9cc-38dde7b9f1e5",
+    "slug": "tabs-react-eb7d8a0c",
+    "name": "Tabs",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A component for organizing and navigating between related content sections within a confined space.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Tabs } from '@nexus/react'",
+      "typeOnly": "import type { TabsProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Tabs />",
+    "props": {
+      "variants": [],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {},
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Tabs defaultValue=\"account\" className=\"nx:w-[400px]\">\n      <TabsList>\n        <TabsTrigger value=\"account\">Account</TabsTrigger>\n        <TabsTrigger value=\"password\">Password</TabsTrigger>\n      </TabsList>\n      <TabsContent value=\"account\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">\n          Make changes to your account here. Click save when you&apos;re done.\n        </p>\n      </TabsContent>\n      <TabsContent value=\"password\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">\n          Change your password here. After saving, you&apos;ll be logged out.\n        </p>\n      </TabsContent>\n    </Tabs>\n  )",
+        "isPrimary": true,
+        "propsUsed": [
+          "account",
+          "be",
+          "changes",
+          "defaultValue",
+          "logged",
+          "password",
+          "save",
+          "to",
+          "value",
+          "when",
+          "your"
+        ]
+      },
+      "common": [],
+      "advanced": [
+        {
+          "title": "With Cards",
+          "code": "(\n    <Tabs defaultValue=\"account\" className=\"nx:w-[400px]\">\n      <TabsList className=\"nx:grid nx:w-full nx:grid-cols-2\">\n        <TabsTrigger value=\"account\">Account</TabsTrigger>\n        <TabsTrigger value=\"password\">Password</TabsTrigger>\n      </TabsList>\n      <TabsContent value=\"account\">\n        <Card>\n          <CardHeader>\n            <CardTitle>Account</CardTitle>\n            <CardDescription>\n              Make changes to your account here. Click save when you&apos;re\n              done.\n            </CardDescription>\n          </CardHeader>\n          <CardContent className=\"nx:space-y-2\">\n            <div className=\"nx:space-y-1\">\n              <label\n                htmlFor=\"name\"\n                className=\"nx:text-sm nx:font-medium nx:leading-none\"\n              >\n                Name\n              </label>\n              <Input id=\"name\" defaultValue=\"Pedro Duarte\" />\n            </div>\n            <div className=\"nx:space-y-1\">\n              <label\n                htmlFor=\"username\"\n                className=\"nx:text-sm nx:font-medium nx:leading-none\"\n              >\n                Username\n              </label>\n              <Input id=\"username\" defaultValue=\"@peduarte\" />\n            </div>\n          </CardContent>\n        </Card>\n      </TabsContent>\n      <TabsContent value=\"password\">\n        <Card>\n          <CardHeader>\n            <CardTitle>Password</CardTitle>\n            <CardDescription>\n              Change your password here. After saving, you&apos;ll be logged\n              out.\n            </CardDescription>\n          </CardHeader>\n          <CardContent className=\"nx:space-y-2\">\n            <div className=\"nx:space-y-1\">\n              <label\n                htmlFor=\"current\"\n                className=\"nx:text-sm nx:font-medium nx:leading-none\"\n              >\n                Current password\n              </label>\n              <Input id=\"current\" type=\"password\" />\n            </div>\n            <div className=\"nx:space-y-1\">\n              <label\n                htmlFor=\"new\"\n                className=\"nx:text-sm nx:font-medium nx:leading-none\"\n              >\n                New password\n              </label>\n              <Input id=\"new\" type=\"password\" />\n            </div>\n          </CardContent>\n        </Card>\n      </TabsContent>\n    </Tabs>\n  )",
+          "propsUsed": [
+            "account",
+            "be",
+            "changes",
+            "defaultValue",
+            "htmlFor",
+            "id",
+            "logged",
+            "password",
+            "save",
+            "to",
+            "type",
+            "value",
+            "when",
+            "your"
+          ]
+        },
+        {
+          "title": "Three Tabs",
+          "code": "(\n    <Tabs defaultValue=\"overview\" className=\"nx:w-[500px]\">\n      <TabsList>\n        <TabsTrigger value=\"overview\">Overview</TabsTrigger>\n        <TabsTrigger value=\"analytics\">Analytics</TabsTrigger>\n        <TabsTrigger value=\"reports\">Reports</TabsTrigger>\n      </TabsList>\n      <TabsContent value=\"overview\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">\n          Overview of your dashboard metrics and key performance indicators.\n        </p>\n      </TabsContent>\n      <TabsContent value=\"analytics\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">\n          Detailed analytics showing user engagement and traffic patterns.\n        </p>\n      </TabsContent>\n      <TabsContent value=\"reports\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">\n          Generated reports for stakeholders and team reviews.\n        </p>\n      </TabsContent>\n    </Tabs>\n  )",
+          "propsUsed": [
+            "analytics",
+            "and",
+            "dashboard",
+            "defaultValue",
+            "engagement",
+            "for",
+            "metrics",
+            "of",
+            "performance",
+            "reports",
+            "showing",
+            "stakeholders",
+            "team",
+            "traffic",
+            "user",
+            "value",
+            "your"
+          ]
+        },
+        {
+          "title": "With Disabled Tab",
+          "code": "(\n    <Tabs defaultValue=\"account\" className=\"nx:w-[400px]\">\n      <TabsList>\n        <TabsTrigger value=\"account\">Account</TabsTrigger>\n        <TabsTrigger value=\"password\">Password</TabsTrigger>\n        <TabsTrigger value=\"settings\" disabled>\n          Settings\n        </TabsTrigger>\n      </TabsList>\n      <TabsContent value=\"account\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">Account content</p>\n      </TabsContent>\n      <TabsContent value=\"password\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">Password content</p>\n      </TabsContent>\n      <TabsContent value=\"settings\">\n        <p className=\"nx:text-sm nx:text-muted-foreground\">Settings content</p>\n      </TabsContent>\n    </Tabs>\n  )",
+          "propsUsed": ["defaultValue", "disabled", "value"]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use Tabs to organize a large amount of related content into a smaller, more manageable space, allowing users to switch between different views without navigating to a new page.",
+      "whenNotToUse": "Do not use Tabs for unrelated content or when content needs to be visible simultaneously. Consider Accordion for less critical content or multi-step forms. Avoid using tabs for navigation that leads to entirely different pages; use a NavLink or Menu instead.",
+      "accessibility": "Tabs are inherently accessible when built correctly, leveraging ARIA `role=\"tablist\"`, `role=\"tab\"`, and `role=\"tabpanel\"` attributes. Ensure keyboard navigation (arrow keys for tab selection, Tab key to move into tab panel content) is fully supported. Each tab should have a unique ID and `aria-controls` pointing to its corresponding tab panel.",
+      "patterns": ["navigation", "disclosure", "container"],
+      "relatedComponents": ["TabPanel", "Accordion", "Button"]
+    },
+    "semanticDescription": "The Tabs component provides an effective way to structure and present content in a limited screen area. It allows users to group related information into distinct sections, each accessible via a clickable tab header. This component is ideal for dashboards, profile settings, product details, or any interface where multiple views of information need to be available without full page reloads. Key features include active tab indication, keyboard navigation support, and semantic ARIA attributes for accessibility. It improves user experience by reducing clutter and streamlining content organization.",
+    "tokens": [
+      "color-text",
+      "color-background",
+      "color-primary",
+      "spacing-sm",
+      "spacing-md",
+      "border-radius-sm",
+      "font-weight-medium"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/tabs.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-tabs": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Tabs"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:58:01.441Z",
+    "updatedAt": "2026-01-26T11:58:01.441Z",
+    "sourceHash": "0d1f3263048d57d9dfebd080c657c3ea0b3b7133a78c99b3627f1d3feae38333",
+    "metaHash": "e716ff0a92e2239c37ff2bcfedfdc830ac013200bdc0ae3e358a2e304362b21f"
+  },
+  "recordedAt": "2026-01-26T11:58:01.441Z",
+  "fixtureSource": "nexus/tabs"
+}

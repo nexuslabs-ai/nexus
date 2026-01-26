@@ -1,0 +1,37 @@
+{
+  "componentName": "Dialog",
+  "response": {
+    "tier": "free",
+    "tokens": [
+      "color-background",
+      "color-text",
+      "color-border",
+      "spacing-padding",
+      "border-radius",
+      "shadow"
+    ],
+    "examples": {
+      "common": [],
+      "minimal": {
+        "code": "<Dialog />",
+        "title": "Minimal Dialog Usage",
+        "description": "The simplest way to render a Dialog component."
+      }
+    },
+    "semanticDescription": "The Dialog component provides a robust and accessible modal overlay for presenting content that requires user interaction before proceeding. It's built upon Radix UI's primitives, ensuring high standards for accessibility and behavior. Key features include focus management (trapping focus inside the dialog when open and restoring it upon close), keyboard navigation (e.g., Esc key to close), and proper ARIA attribute application for screen reader compatibility. Use cases include confirming destructive actions, presenting critical alerts, showcasing detailed information that needs to be temporarily isolated, or facilitating focused data entry through forms. It ensures that users are aware of and interact with the presented content before returning to the main application flow.",
+    "description": "A modal dialog component for displaying important information or collecting user input, requiring explicit user interaction to dismiss.",
+    "minimalExample": "<Dialog />",
+    "guidance": {
+      "patterns": ["overlay", "disclosure", "container"],
+      "whenNotToUse": "Avoid using Dialogs for non-critical information or as a primary navigation method, as they interrupt user flow. For less critical alerts or non-blocking messages, consider using Toast notifications or inline messages. For complex workflows, consider dedicated pages or multi-step forms.",
+      "accessibility": "Ensure Dialogs are keyboard-accessible, trapping focus within the dialog when open and returning it to the trigger element upon close. Provide clear ARIA attributes like `role=\"dialog\"`, `aria-modal=\"true\"`, and `aria-labelledby` for the dialog title and `aria-describedby` for its description. The close button should be clearly labeled and accessible. Esc key should close the dialog.",
+      "whenToUse": "Use the Dialog component to present crucial information, confirm user actions, or collect necessary input in a focused, interruptive manner. Ideal for situations requiring immediate attention and a clear call to action, such as confirmations, form submissions, or detailed views.",
+      "relatedComponents": ["Button", "Toast", "Form"]
+    }
+  },
+  "recordedAt": "2026-01-26T11:20:26.134Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "f3ed2a0f3bf2cfc41d8b537498cb7e3fed0701d11c086aae970f2919d413bb36",
+  "promptSummary": "Generate metadata for Dialog component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Dialog\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-dialog, @/lib\n\nBase Libra..."
+}

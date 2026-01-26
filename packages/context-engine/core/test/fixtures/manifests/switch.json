@@ -1,0 +1,129 @@
+{
+  "componentName": "Switch",
+  "manifest": {
+    "schemaVersion": "1.0",
+    "id": "3b34db26-e489-47b5-b7ed-5dc35850fa6f",
+    "slug": "switch-react-3b34db26",
+    "name": "Switch",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "description": "A UI switch control for toggling a setting or state between two distinct options.",
+    "tier": "free",
+    "importStatement": {
+      "primary": "import { Switch } from '@nexus/react'",
+      "typeOnly": "import type { SwitchProps } from '@nexus/react'"
+    },
+    "minimalExample": "<Switch />",
+    "props": {
+      "variants": [],
+      "behaviors": [],
+      "events": [],
+      "slots": [],
+      "passthrough": [],
+      "other": []
+    },
+    "variants": {},
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "<Switch 'aria-label'=\"Toggle switch\" />",
+        "isPrimary": true,
+        "propsUsed": ["'aria-label'"]
+      },
+      "common": [
+        {
+          "title": "Checked",
+          "code": "<Switch 'aria-label'=\"Toggle switch\" defaultChecked />",
+          "propsUsed": ["'aria-label'", "defaultChecked"]
+        },
+        {
+          "title": "Disabled",
+          "code": "<Switch 'aria-label'=\"Toggle switch\" disabled />",
+          "propsUsed": ["'aria-label'", "disabled"]
+        },
+        {
+          "title": "Disabled Checked",
+          "code": "<Switch 'aria-label'=\"Toggle switch\" disabled defaultChecked />",
+          "propsUsed": ["'aria-label'", "defaultChecked", "disabled"]
+        }
+      ],
+      "advanced": [
+        {
+          "title": "With Label",
+          "code": "(\n    <div className=\"nx:flex nx:items-center nx:gap-2\">\n      <Switch id=\"airplane-mode\" />\n      <label\n        htmlFor=\"airplane-mode\"\n        className=\"nx:text-sm nx:font-medium nx:leading-none nx:peer-disabled:cursor-not-allowed nx:peer-disabled:opacity-70\"\n      >\n        Airplane Mode\n      </label>\n    </div>\n  )",
+          "propsUsed": ["htmlFor", "id"]
+        },
+        {
+          "title": "With Label And Description",
+          "code": "(\n    <div className=\"nx:flex nx:items-start nx:gap-3\">\n      <Switch id=\"notifications\" className=\"nx:mt-0.5\" />\n      <div className=\"nx:grid nx:gap-1.5\">\n        <label\n          htmlFor=\"notifications\"\n          className=\"nx:text-sm nx:font-medium nx:leading-none\"\n        >\n          Enable Notifications\n        </label>\n        <p className=\"nx:text-sm nx:text-muted-foreground\">\n          Receive notifications when someone mentions you.\n        </p>\n      </div>\n    </div>\n  )",
+          "propsUsed": [
+            "htmlFor",
+            "id",
+            "mentions",
+            "notifications",
+            "someone",
+            "when"
+          ]
+        },
+        {
+          "title": "Label On Left",
+          "code": "(\n    <div className=\"nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border nx:border-border-default nx:p-4\">\n      <div className=\"nx:space-y-0.5\">\n        <label\n          htmlFor=\"marketing\"\n          className=\"nx:text-sm nx:font-medium nx:leading-none\"\n        >\n          Marketing emails\n        </label>\n        <p className=\"nx:text-sm nx:text-muted-foreground\">\n          Receive emails about new products and features.\n        </p>\n      </div>\n      <Switch id=\"marketing\" />\n    </div>\n  )",
+          "propsUsed": [
+            "about",
+            "and",
+            "emails",
+            "htmlFor",
+            "id",
+            "new",
+            "products"
+          ]
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use a Switch when users need to toggle a single setting or feature on or off. It's ideal for immediate state changes that don't require an explicit save action, such as enabling notifications or dark mode.",
+      "whenNotToUse": "Do not use for actions that trigger irreversible changes or require user confirmation; use a button or confirmation dialog instead. Avoid for selecting multiple items from a list; use checkboxes instead. Do not use for navigating between different views or pages; use links or navigation components.",
+      "accessibility": "Ensure the switch is properly labeled using `aria-label` or by associating it with a `<label>` element for screen readers. Provide clear visual feedback for its checked/unchecked state and focus. The component should be fully keyboard navigable, allowing users to toggle its state using the spacebar or enter key.",
+      "patterns": ["form-control", "input", "selection"],
+      "relatedComponents": ["Checkbox", "Radio Group", "Toggle Button"]
+    },
+    "semanticDescription": "The Switch component provides a user-friendly and accessible way to toggle between two distinct states, typically 'on' and 'off'. It is commonly used for managing settings, preferences, or activating/deactivating features within an application. Built upon Radix UI primitives, it ensures robust accessibility, including keyboard navigability and semantic markup for assistive technologies. Key features include a clear visual indicator of its current state, smooth transitions, and easy integration into forms. It is suitable for scenarios where an immediate state change is desired without requiring additional confirmation steps, offering a straightforward interaction model for users.",
+    "tokens": [
+      "color-primary",
+      "color-text-secondary",
+      "spacing-xs",
+      "spacing-sm",
+      "border-radius-full",
+      "shadow-sm"
+    ],
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/switch.tsx"
+    ],
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-switch": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "Switch"
+    },
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-26T11:57:56.093Z",
+    "updatedAt": "2026-01-26T11:57:56.093Z",
+    "sourceHash": "9c733fa5079da167dacff4377b8ffe5a8870a86ea533598f7674b1e71dd6918b",
+    "metaHash": "be8c440915f6077cd26f0ac72c7d7213df00ae6da732f6ed1d69f2088ec8a204"
+  },
+  "recordedAt": "2026-01-26T11:57:56.093Z",
+  "fixtureSource": "nexus/switch"
+}

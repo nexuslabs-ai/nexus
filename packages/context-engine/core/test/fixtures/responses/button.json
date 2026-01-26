@@ -1,0 +1,46 @@
+{
+  "componentName": "Button",
+  "response": {
+    "tokens": [
+      "color-text",
+      "color-background",
+      "color-border",
+      "spacing-padding",
+      "border-radius",
+      "font-size",
+      "box-shadow"
+    ],
+    "examples": {
+      "advanced": [],
+      "minimal": {
+        "propsUsed": [],
+        "description": "A basic button without any props.",
+        "title": "Minimal Button",
+        "code": "<Button />"
+      },
+      "common": []
+    },
+    "description": "A button for triggering user actions, form submissions, and navigation, with support for loading states and custom rendering.",
+    "semanticDescription": "The Button component is a fundamental UI element designed to facilitate user interaction by triggering actions, submitting forms, and enabling navigation. It offers various visual styles through its `variant` prop (default, destructive, outline, secondary, ghost, link) and different sizes (default, sm, lg, icon) to fit diverse design needs. Key features include a `loading` prop that displays an indicator, disables interaction, and sets `aria-busy` for accessibility during asynchronous operations. The `asChild` prop allows the button to render as a child element, preserving button styles while adopting the semantics of the child, such as rendering as a link. This component is built with accessibility in mind, providing mechanisms for clear state communication. It is ideal for interactive elements in forms, navigation menus, and any scenario requiring a distinct call to action.",
+    "guidance": {
+      "accessibility": "The Button component handles accessibility for loading states by setting `aria-busy='true'` and disabling interaction. When using the `asChild` prop, ensure the child element is semantically appropriate (e.g., `<a>` for links) and inherits proper accessibility attributes. Ensure sufficient color contrast for all variants. Provide clear, descriptive text or `aria-label` for icon-only buttons.",
+      "whenToUse": "Use the Button component to allow users to trigger an immediate action, submit a form, or navigate to another page. It is suitable for interactive elements that require a clear visual call to action, especially when providing feedback for asynchronous operations.",
+      "relatedComponents": ["Link", "Input", "Form", "Spinner", "AlertDialog"],
+      "patterns": [
+        "button",
+        "async-action",
+        "form-control",
+        "composition",
+        "navigation"
+      ],
+      "whenNotToUse": "Do not use Button for purely decorative elements or for displaying static information. If the primary purpose is navigation to an internal page without a specific action, consider a Link component. For elements that toggle visibility of content, consider a ToggleButton or AccordionHeader. If the element is part of a larger interactive control (e.g., a tab), use the appropriate component for that pattern."
+    },
+    "minimalExample": "<Button />",
+    "tier": "free"
+  },
+  "recordedAt": "2026-01-26T11:19:56.336Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "481ba8fe205c9034ffebe6a653bf449263ccda749c393affee7a39c7566bae90",
+  "promptSummary": "Generate metadata for Button component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Button\n\nProps:\n- asChild: boolean - When true, the button will render as its child element..."
+}
