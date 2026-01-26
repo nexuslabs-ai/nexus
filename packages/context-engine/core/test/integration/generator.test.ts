@@ -56,7 +56,7 @@ describe('MetaGenerator - Error Handling', () => {
    * Helper to get a valid extraction result for testing
    */
   async function getExtractionForTests(): Promise<GeneratorInput> {
-    const extractionInput = loadFixtureAsInput('shadcn', 'button');
+    const extractionInput = loadFixtureAsInput('nexus', 'button');
     const extractionResult = await extractComponent(extractionInput);
 
     expect(isExtractionSuccess(extractionResult)).toBe(true);

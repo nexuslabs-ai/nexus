@@ -123,6 +123,12 @@ export interface PromptBuilderInput {
 
   /** Optional hints for generation */
   hints?: string;
+
+  /**
+   * Skip example generation in the prompt.
+   * Set to true when Storybook examples are available from extraction.
+   */
+  skipExamples?: boolean;
 }
 
 // =============================================================================
@@ -205,6 +211,53 @@ Use the generate_component_metadata tool to provide:
 Focus on making this component discoverable and usable by AI coding assistants.`;
 
 /**
+ * User prompt template for tool calling (skip examples)
+ *
+ * Used when Storybook examples are available from extraction.
+ * Tells the LLM to skip example generation since we have real, tested examples.
+ */
+export const TOOL_CALLING_USER_PROMPT_TEMPLATE_SKIP_EXAMPLES = `Analyze this {{FRAMEWORK}} component and generate metadata using the generate_component_metadata tool.
+
+## Component: {{COMPONENT_NAME}}
+{{SOURCE_DESCRIPTION}}
+
+{{PROPS_SECTION}}
+
+{{VARIANTS_SECTION}}
+
+{{DEPENDENCIES_SECTION}}
+
+{{BASE_LIBRARY_SECTION}}
+
+{{FIGMA_URL}}
+
+{{HINTS}}
+
+## Pattern Reference
+
+Valid patterns (use where applicable):
+${COMPONENT_PATTERNS.map((p) => `- ${p}`).join('\n')}
+
+## Instructions
+
+Use the generate_component_metadata tool to provide:
+
+1. **description**: A clear, concise one-liner (10-500 chars) that states what this component is AND its primary purpose/action (e.g., 'A button for triggering user actions and form submissions')
+2. **tier**: "free" for basic components, "pro" for advanced/complex ones
+3. **guidance**: When to use, when not to use, accessibility notes, patterns, related components
+4. **semanticDescription**: Detailed description for AI search (50-2000 chars) - include purpose, key features, and use cases
+5. **tokens**: Design tokens this component uses (e.g., "color-primary", "spacing-md")
+
+**IMPORTANT: Do NOT generate examples.** Real, tested code examples are already available from Storybook.
+For the examples fields, provide minimal placeholders (they will be replaced with Storybook examples):
+- minimalExample: Use a simple placeholder like "<{{COMPONENT_NAME}} />"
+- examples.minimal: Use a simple placeholder
+- examples.common: Leave as empty array []
+- examples.advanced: Omit or leave as empty array []
+
+Focus on making this component discoverable through descriptions, guidance, and patterns.`;
+
+/**
  * Build the user prompt for tool calling
  *
  * @param input - Prompt builder input
@@ -216,6 +269,7 @@ function buildToolCallingUserPrompt({
   extracted,
   figmaUrl,
   hints,
+  skipExamples = false,
 }: PromptBuilderInput): string {
   // Build all sections
   const propsSection = buildPropsSection(extracted);
@@ -230,9 +284,14 @@ function buildToolCallingUserPrompt({
   const figmaLine = figmaUrl ? `Figma: ${figmaUrl}` : '';
   const hintsLine = hints ? `Additional Context: ${hints}` : '';
 
+  // Select template based on whether to skip examples
+  const template = skipExamples
+    ? TOOL_CALLING_USER_PROMPT_TEMPLATE_SKIP_EXAMPLES
+    : TOOL_CALLING_USER_PROMPT_TEMPLATE;
+
   // Replace placeholders
-  let prompt = TOOL_CALLING_USER_PROMPT_TEMPLATE;
-  prompt = prompt.replace('{{COMPONENT_NAME}}', name);
+  let prompt = template;
+  prompt = prompt.replaceAll('{{COMPONENT_NAME}}', name);
   prompt = prompt.replace('{{FRAMEWORK}}', framework);
   prompt = prompt.replace('{{SOURCE_DESCRIPTION}}', sourceDescriptionLine);
   prompt = prompt.replace('{{PROPS_SECTION}}', propsSection);

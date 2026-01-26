@@ -175,18 +175,18 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 
 Skills are auto-discovered capabilities that Claude loads when your request matches the skill description.
 
-| Skill                                                              | Purpose                                |
-| ------------------------------------------------------------------ | -------------------------------------- |
-| [pr-review](.claude/skills/pr-review/SKILL.md)                     | PR review framework (common structure) |
-| [pr-review-follow-up](.claude/skills/pr-review-follow-up/SKILL.md) | Follow-up review verification          |
-| [implement](.claude/skills/implement/SKILL.md)                     | Feature implementation (any context)   |
-| [implement-test](.claude/skills/implement-test/SKILL.md)           | Test implementation (any context)      |
-| [pr-fix](.claude/skills/pr-fix/SKILL.md)                           | Fix PR review issues                   |
-| [design-plan](.claude/skills/design-plan/SKILL.md)                 | Architecture planning                  |
-| [figma-analyze](.claude/skills/figma-analyze/SKILL.md)             | Figma design analysis                  |
-| [shadcn-to-figma](.claude/skills/shadcn-to-figma/SKILL.md)         | Code → Figma architecture blueprints   |
-| [update-docs](.claude/skills/update-docs/SKILL.md)                 | Documentation updates                  |
-| [linkedin-post](.claude/skills/linkedin-post/SKILL.md)             | LinkedIn content generation            |
+| Skill                                                              | Purpose                                   |
+| ------------------------------------------------------------------ | ----------------------------------------- |
+| [pr-review](.claude/skills/pr-review/SKILL.md)                     | PR review framework (common structure)    |
+| [pr-review-follow-up](.claude/skills/pr-review-follow-up/SKILL.md) | Follow-up review verification             |
+| [implement](.claude/skills/implement/SKILL.md)                     | Feature implementation (any context)      |
+| [implement-test](.claude/skills/implement-test/SKILL.md)           | Test implementation (any context)         |
+| [pr-fix](.claude/skills/pr-fix/SKILL.md)                           | Fix PR review issues                      |
+| [design-plan](.claude/skills/design-plan/SKILL.md)                 | Architecture planning                     |
+| [figma-analyze](.claude/skills/figma-analyze/SKILL.md)             | Figma design analysis                     |
+| [shadcn-to-figma](.claude/skills/shadcn-to-figma/SKILL.md)         | Code → Figma architecture blueprints      |
+| [update-docs](.claude/skills/update-docs/SKILL.md)                 | Documentation updates                     |
+| [linkedin-post](.claude/skills/linkedin-post/SKILL.md)             | LinkedIn content generation               |
 | [analyze-deps](.claude/skills/analyze-deps/SKILL.md)               | Dependency analysis and migration reports |
 
 ## Agents (Auto-Delegated)

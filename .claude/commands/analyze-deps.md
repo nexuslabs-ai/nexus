@@ -24,11 +24,11 @@ Examples:
 
 Parse `$ARGUMENTS` for:
 
-| Pattern                               | Scope                                 |
-| ------------------------------------- | ------------------------------------- |
-| Starts with `@` or no `/`             | Single package across all workspaces  |
-| Contains `/` (e.g., `packages/react`) | Specific workspace                    |
-| `all` or empty                        | All workspaces                        |
+| Pattern                               | Scope                                |
+| ------------------------------------- | ------------------------------------ |
+| Starts with `@` or no `/`             | Single package across all workspaces |
+| Contains `/` (e.g., `packages/react`) | Specific workspace                   |
+| `all` or empty                        | All workspaces                       |
 
 ## Flow
 
@@ -164,20 +164,20 @@ After analysis is complete, output:
 
 Reports are saved to `reports/deps/` with naming:
 
-| Scope            | Filename Example                        |
-| ---------------- | --------------------------------------- |
-| Single package   | `radix-ui-react-dialog-2026-01-23.md`   |
-| Workspace        | `packages-react-2026-01-23.md`          |
-| All workspaces   | `all-workspaces-2026-01-23.md`          |
+| Scope          | Filename Example                      |
+| -------------- | ------------------------------------- |
+| Single package | `radix-ui-react-dialog-2026-01-23.md` |
+| Workspace      | `packages-react-2026-01-23.md`        |
+| All workspaces | `all-workspaces-2026-01-23.md`        |
 
 ## Error Handling
 
-| Error                     | Action                                  |
-| ------------------------- | --------------------------------------- |
-| Package not found         | Note as "not found in any workspace"    |
-| Workspace doesn't exist   | Ask user to verify path                 |
-| npm registry unreachable  | Skip package, note as "unable to check" |
-| GitHub API rate limited   | Fall back to WebSearch for changelogs   |
+| Error                    | Action                                  |
+| ------------------------ | --------------------------------------- |
+| Package not found        | Note as "not found in any workspace"    |
+| Workspace doesn't exist  | Ask user to verify path                 |
+| npm registry unreachable | Skip package, note as "unable to check" |
+| GitHub API rate limited  | Fall back to WebSearch for changelogs   |
 
 ## Important Notes
 

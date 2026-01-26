@@ -515,6 +515,8 @@ export class ComponentProcessor {
       framework,
       filePath: input.filePath,
       existingId: input.existingId,
+      storiesCode: input.storiesCode,
+      storiesFilePath: input.storiesFilePath,
     };
 
     try {

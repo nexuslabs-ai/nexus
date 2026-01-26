@@ -41,6 +41,29 @@ export const DependenciesSchema = z.object({
 export type Dependencies = z.infer<typeof DependenciesSchema>;
 
 /**
+ * Sub-component schema for compound components
+ *
+ * Compound components like Dialog, Accordion, Tabs have multiple
+ * related sub-components (DialogTrigger, DialogContent, etc.).
+ * This schema captures metadata for each sub-component.
+ */
+export const SubComponentSchema = z.object({
+  /** Sub-component name (e.g., "DialogTrigger", "AccordionItem") */
+  name: z.string(),
+
+  /** Sub-component description */
+  description: z.string().optional(),
+
+  /** Props specific to this sub-component */
+  props: CategorizedPropsSchema,
+
+  /** Data slot attribute value (e.g., "dialog-trigger") */
+  dataSlot: z.string().optional(),
+});
+
+export type SubComponent = z.infer<typeof SubComponentSchema>;
+
+/**
  * Complete component manifest schema (v1.0)
  *
  * This schema is optimized for AI consumption with:
@@ -137,6 +160,13 @@ export const ComponentManifestSchema = z.object({
 
   /** Base UI library (if any) */
   baseLibrary: BaseLibrarySchema.optional(),
+
+  // === Compound Components ===
+  /**
+   * Sub-components for compound components (Dialog, Accordion, Tabs, etc.)
+   * Contains metadata for each related sub-component
+   */
+  subComponents: z.array(SubComponentSchema).optional(),
 
   // === Embedding Status ===
   /** Current embedding status */

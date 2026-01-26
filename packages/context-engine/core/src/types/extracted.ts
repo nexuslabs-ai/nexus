@@ -7,6 +7,11 @@
 
 import { z } from 'zod';
 
+import {
+  ArgTypeInfoSchema,
+  ExtractedStorySchema,
+} from '../extractor/storybook/types.js';
+
 import { BasePropSchema, PropTypeCategorySchema } from './base-prop.js';
 import { BaseLibrarySchema } from './identity.js';
 
@@ -61,6 +66,25 @@ export const ExtractionMethodSchema = z.enum([
 export type ExtractionMethod = z.infer<typeof ExtractionMethodSchema>;
 
 /**
+ * Compound component detection result schema
+ *
+ * Used to identify compound components (Dialog, Accordion, Tabs, etc.)
+ * that export multiple related sub-components.
+ */
+export const CompoundComponentInfoSchema = z.object({
+  /** Whether this is a compound component */
+  isCompound: z.boolean(),
+
+  /** Root component name (e.g., "Dialog", "Accordion") */
+  rootComponent: z.string(),
+
+  /** Sub-component names (e.g., ["DialogTrigger", "DialogContent"]) */
+  subComponents: z.array(z.string()),
+});
+
+export type CompoundComponentInfo = z.infer<typeof CompoundComponentInfoSchema>;
+
+/**
  * Complete extracted data from source code
  */
 export const ExtractedDataSchema = z.object({
@@ -102,6 +126,15 @@ export const ExtractedDataSchema = z.object({
 
   /** Extraction method used */
   extractionMethod: ExtractionMethodSchema.default('react-docgen-typescript'),
+
+  /** Extracted Storybook stories (if stories file was provided) */
+  stories: z.array(ExtractedStorySchema).optional(),
+
+  /** ArgTypes from Storybook (enhances prop documentation) */
+  storybookArgTypes: z.record(z.string(), ArgTypeInfoSchema).optional(),
+
+  /** Compound component detection result */
+  compoundInfo: CompoundComponentInfoSchema.optional(),
 });
 
 export type ExtractedData = z.infer<typeof ExtractedDataSchema>;

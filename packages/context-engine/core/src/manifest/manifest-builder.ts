@@ -8,15 +8,18 @@
  * produces the complete component knowledge ready for storage.
  */
 
+import type { ExtractedStory } from '../extractor/storybook/types.js';
 import type {
   CategorizedProps,
   CodeExample,
   ComponentManifest,
   CvaVariants,
   EmbeddingStatus,
+  ExtractedData,
   ExtractedProp,
   Guidance,
   ImportStatement,
+  PropDefinition,
   StructuredExamples,
 } from '../types/index.js';
 import {
@@ -95,9 +98,16 @@ export class ManifestBuilder {
     const metaHash = generateObjectHash(meta);
 
     // Categorize props using the dedicated utility
-    const props = this.buildCategorizedProps(
+    let categorizedProps = this.buildCategorizedProps(
       extracted.props,
       extracted.variants
+    );
+
+    // Normalize variants to ensure consistency between manifest.variants and props.variants
+    categorizedProps = this.normalizeVariants(
+      extracted.variants,
+      extracted.defaultVariants,
+      categorizedProps
     );
 
     // Build CVA variants with defaults
@@ -115,8 +125,8 @@ export class ManifestBuilder {
     // Build minimal example
     const minimalExample = this.buildMinimalExample(name, extracted.variants);
 
-    // Build structured examples from meta
-    const examples = this.buildStructuredExamples(name, meta);
+    // Build structured examples from meta (prefer Storybook if available)
+    const examples = this.buildStructuredExamples(name, meta, extracted);
 
     // Build guidance from meta.ai
     const guidance = this.buildGuidance(meta);
@@ -148,7 +158,7 @@ export class ManifestBuilder {
       // New v1.0 fields
       importStatement,
       minimalExample,
-      props,
+      props: categorizedProps,
       variants: cvaVariants,
       examples,
       guidance,
@@ -192,6 +202,72 @@ export class ManifestBuilder {
     variants: Record<string, string[]>
   ): CategorizedProps {
     return categorizeProps(props, variants);
+  }
+
+  /**
+   * Normalize variant storage to ensure consistency.
+   *
+   * Problem: CVA variants may be extracted but not appear in props.variants
+   * because react-docgen-typescript doesn't see them as props (they come from
+   * VariantProps<typeof componentVariants>).
+   *
+   * Solution: For each CVA variant that isn't already in props.variants,
+   * create prop metadata so AI assistants have complete variant information
+   * in both manifest.variants (values) and props.variants (prop metadata).
+   *
+   * @param extractedVariants - CVA variant definitions from extraction
+   * @param defaultVariants - Default variant values from extraction
+   * @param categorizedProps - Props already categorized
+   * @returns Updated categorized props with normalized variants
+   */
+  private normalizeVariants(
+    extractedVariants: ExtractedData['variants'],
+    defaultVariants: ExtractedData['defaultVariants'],
+    categorizedProps: CategorizedProps
+  ): CategorizedProps {
+    // Get CVA variant names
+    const cvaVariantNames = Object.keys(extractedVariants);
+
+    if (cvaVariantNames.length === 0) {
+      return categorizedProps;
+    }
+
+    // Check which variant props are already in props.variants
+    const existingVariantPropNames = new Set(
+      categorizedProps.variants.map((p) => p.name)
+    );
+
+    // Create prop metadata for CVA variants that aren't already in props.variants
+    const missingVariantProps: PropDefinition[] = cvaVariantNames
+      .filter((name) => !existingVariantPropNames.has(name))
+      .map((name) => {
+        const values = extractedVariants[name] ?? [];
+        const defaultValue = defaultVariants[name];
+
+        return {
+          name,
+          type:
+            values.length > 0
+              ? values.map((v) => `'${v}'`).join(' | ')
+              : 'string',
+          typeCategory: 'literal' as const,
+          required: false,
+          description: `Component ${name} variant`,
+          defaultValue,
+          possibleValues: values,
+        };
+      });
+
+    // If no missing variants, return as-is
+    if (missingVariantProps.length === 0) {
+      return categorizedProps;
+    }
+
+    // Add missing variant props to the variants category
+    return {
+      ...categorizedProps,
+      variants: [...categorizedProps.variants, ...missingVariantProps],
+    };
   }
 
   /**
@@ -258,9 +334,89 @@ export class ManifestBuilder {
   }
 
   /**
-   * Build structured examples from meta
+   * Build structured examples from meta, preferring Storybook examples if available
+   *
+   * @param name - Component name
+   * @param meta - Generated metadata from LLM
+   * @param extracted - Extracted data (may contain Storybook stories)
    */
   private buildStructuredExamples(
+    name: string,
+    meta: ManifestBuilderInput['meta'],
+    extracted: ExtractedData
+  ): StructuredExamples {
+    // Prefer Storybook examples if available
+    if (extracted.stories && extracted.stories.length > 0) {
+      return this.buildExamplesFromStorybook(name, extracted.stories);
+    }
+
+    // Fall back to AI-generated examples
+    return this.buildExamplesFromAI(name, meta);
+  }
+
+  /**
+   * Build structured examples from Storybook stories
+   *
+   * Converts extracted Storybook stories into the StructuredExamples format.
+   * Stories are already classified by complexity during extraction.
+   *
+   * @param componentName - Component name for fallback code generation
+   * @param stories - Extracted stories from Storybook file
+   */
+  private buildExamplesFromStorybook(
+    componentName: string,
+    stories: ExtractedStory[]
+  ): StructuredExamples {
+    // Find minimal example (first 'minimal' complexity or first story)
+    const minimalStory =
+      stories.find((s) => s.complexity === 'minimal') ?? stories[0];
+
+    const minimal: CodeExample = {
+      title: minimalStory?.title ?? 'Basic',
+      code:
+        minimalStory?.renderCode ??
+        minimalStory?.code ??
+        `<${componentName} />`,
+      isPrimary: true,
+      propsUsed:
+        minimalStory?.propsUsed && minimalStory.propsUsed.length > 0
+          ? minimalStory.propsUsed
+          : undefined,
+    };
+
+    // Common examples (max 8) - exclude the minimal story
+    const common: CodeExample[] = stories
+      .filter((s) => s.complexity === 'common' && s !== minimalStory)
+      .slice(0, 8)
+      .map((s) => ({
+        title: s.title,
+        code: s.renderCode ?? s.code ?? `<${componentName} />`,
+        propsUsed: s.propsUsed.length > 0 ? s.propsUsed : undefined,
+      }));
+
+    // Advanced examples (max 3)
+    const advancedStories = stories.filter((s) => s.complexity === 'advanced');
+    const advanced: CodeExample[] | undefined =
+      advancedStories.length > 0
+        ? advancedStories.slice(0, 3).map((s) => ({
+            title: s.title,
+            code: s.renderCode ?? s.code ?? `<${componentName} />`,
+            propsUsed: s.propsUsed.length > 0 ? s.propsUsed : undefined,
+          }))
+        : undefined;
+
+    return { minimal, common, advanced };
+  }
+
+  /**
+   * Build structured examples from AI-generated examples
+   *
+   * Fallback when Storybook stories are not available.
+   *
+   * @param name - Component name
+   * @param meta - Generated metadata from LLM
+   */
+  private buildExamplesFromAI(
     name: string,
     meta: ManifestBuilderInput['meta']
   ): StructuredExamples {
@@ -435,10 +591,19 @@ export class ManifestBuilder {
       ? this.buildGuidance(updates.meta)
       : undefined;
 
-    // Build updated examples if meta changed
-    const updatedExamples: StructuredExamples | undefined = updates.meta
-      ? this.buildStructuredExamples(name, updates.meta)
-      : undefined;
+    // Build updated examples based on what's being updated
+    // Priority: Storybook stories (if extraction provided) > AI-generated (if meta provided)
+    let updatedExamples: StructuredExamples | undefined;
+    if (updates.extracted && updates.extracted.stories?.length) {
+      // New extraction with Storybook stories - use them
+      updatedExamples = this.buildExamplesFromStorybook(
+        name,
+        updates.extracted.stories
+      );
+    } else if (updates.meta) {
+      // New meta without Storybook - use AI-generated examples
+      updatedExamples = this.buildExamplesFromAI(name, updates.meta);
+    }
 
     return {
       ...existing,

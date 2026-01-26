@@ -8,11 +8,12 @@
  *
  * Unlike record-responses.ts (which records raw LLM responses), this script
  * records the COMPLETE manifest output from the full processor pipeline.
+ *
+ * Uses @nexus/react components directly from packages/react/src/components/ui/
  */
 
 import { config } from 'dotenv';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,13 +25,17 @@ import {
 import { createProviderFromEnv } from '../src/utils/env-provider.js';
 import { CachedLLMProvider } from '../test/providers/cached-llm-provider.js';
 import { saveRecordedManifest } from '../test/utils/manifest-recorder.js';
+import {
+  listAvailableComponents,
+  loadNexusComponent,
+  type NexusComponentFixture,
+} from '../test/utils/nexus-fixture-loader.js';
 
 // Load .env.test from parent directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 config({ path: resolve(__dirname, '../../.env.test') });
 
-const FIXTURES_DIR = resolve(__dirname, '../test/fixtures/components/shadcn');
 const RESPONSES_DIR = resolve(__dirname, '../test/fixtures/responses');
 const TEST_ORG_ID = 'test-org';
 
@@ -42,23 +47,13 @@ async function sleep(ms: number): Promise<void> {
 }
 
 function getComponentFixtures(): string[] {
-  const files = readdirSync(FIXTURES_DIR).filter((f) => f.endsWith('.tsx'));
-  return files.map((f) => basename(f, '.tsx'));
+  return listAvailableComponents();
 }
 
 async function recordComponentManifest(
-  componentName: string,
+  fixture: NexusComponentFixture,
   provider: ILLMProvider
 ): Promise<boolean> {
-  const fixturePath = join(FIXTURES_DIR, `${componentName}.tsx`);
-
-  if (!existsSync(fixturePath)) {
-    console.error(`Fixture not found: ${fixturePath}`);
-    return false;
-  }
-
-  const sourceCode = readFileSync(fixturePath, 'utf-8');
-
   // Create cached provider that wraps the real provider
   // This will use cached responses if available, otherwise call real LLM
   const cachedProvider = new CachedLLMProvider({
@@ -74,15 +69,17 @@ async function recordComponentManifest(
 
   // Capitalize first letter for component name
   const properName =
-    componentName.charAt(0).toUpperCase() + componentName.slice(1);
+    fixture.name.charAt(0).toUpperCase() + fixture.name.slice(1);
 
   console.log(`\nProcessing ${properName}...`);
 
   try {
     const result = await processor.process({
-      filePath: fixturePath,
+      filePath: fixture.componentPath,
       name: properName,
-      sourceCode,
+      sourceCode: fixture.sourceCode,
+      storiesCode: fixture.storiesCode,
+      storiesFilePath: fixture.storiesPath,
       framework: 'react',
       orgId: TEST_ORG_ID,
     });
@@ -90,7 +87,7 @@ async function recordComponentManifest(
     if (isProcessorSuccess(result)) {
       // Save the manifest using the manifest recorder utility
       saveRecordedManifest(properName, result.manifest, {
-        fixtureSource: `shadcn/${componentName}`,
+        fixtureSource: `nexus/${fixture.name}`,
       });
       console.log(`  ✓ ${properName} manifest recorded`);
       return true;
@@ -111,32 +108,40 @@ async function main(): Promise<void> {
   const provider = createProviderFromEnv();
   console.log(`Using ${provider.providerType} provider`);
 
-  let components: string[];
+  let componentNames: string[];
 
   if (specificComponent) {
-    components = [specificComponent];
+    componentNames = [specificComponent];
   } else {
-    components = getComponentFixtures();
+    componentNames = getComponentFixtures();
   }
 
-  console.log(`\nWill record manifests for ${components.length} component(s):`);
-  console.log(`  ${components.join(', ')}`);
+  console.log(
+    `\nWill record manifests for ${componentNames.length} component(s):`
+  );
+  console.log(`  ${componentNames.join(', ')}`);
   console.log(`\nUsing ${DELAY_MS}ms delay between each to avoid rate limits`);
   console.log('Press Ctrl+C to cancel\n');
 
   let recorded = 0;
   let failed = 0;
 
-  for (const component of components) {
-    const success = await recordComponentManifest(component, provider);
-    if (success) {
-      recorded++;
-    } else {
+  for (const componentName of componentNames) {
+    try {
+      const fixture = loadNexusComponent(componentName);
+      const success = await recordComponentManifest(fixture, provider);
+      if (success) {
+        recorded++;
+      } else {
+        failed++;
+      }
+    } catch (error) {
+      console.error(`  ✗ ${componentName} error loading fixture:`, error);
       failed++;
     }
 
     // Delay before next component (except for last one)
-    if (components.indexOf(component) < components.length - 1) {
+    if (componentNames.indexOf(componentName) < componentNames.length - 1) {
       console.log(`  Waiting ${DELAY_MS}ms before next component...`);
       await sleep(DELAY_MS);
     }

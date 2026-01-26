@@ -54,7 +54,7 @@ describe('Multi-Org Isolation', () => {
 
   describe('manifest org scoping', () => {
     it('generates unique manifest IDs for each request', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: ORG_A,
         name: 'Button',
@@ -73,7 +73,7 @@ describe('Multi-Org Isolation', () => {
     });
 
     it('same component for different orgs gets different component IDs', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
 
       const inputA: ProcessorInput = {
         orgId: ORG_A,
@@ -104,7 +104,7 @@ describe('Multi-Org Isolation', () => {
 
   describe('extraction org scoping', () => {
     it('extraction result contains orgId at top level and identity with component info', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
 
       const result = await extractComponent({
         orgId: ORG_A,
@@ -127,7 +127,7 @@ describe('Multi-Org Isolation', () => {
 
   describe('two-phase API org consistency', () => {
     it('extractOnly returns valid extraction with identity', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: ORG_A,
         name: 'Button',
@@ -149,7 +149,7 @@ describe('Multi-Org Isolation', () => {
     });
 
     it('generateOnly produces valid manifest with passed orgId', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: ORG_B,
         name: 'Button',
@@ -183,7 +183,7 @@ describe('Multi-Org Isolation', () => {
     // This single test documents this behavior across different formats
 
     it('preserves any orgId format passed to extraction and processing', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
 
       // Test various orgId formats
       const formats = ['not-a-valid-uuid', '', 'custom-org-id-123'];
@@ -209,7 +209,7 @@ describe('Multi-Org Isolation', () => {
 
   describe('multiple orgs concurrent processing', () => {
     it('handles concurrent requests from different orgs', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
 
       const inputs: ProcessorInput[] = [
         {

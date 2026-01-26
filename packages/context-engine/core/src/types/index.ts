@@ -66,6 +66,7 @@ export type {
 
 // Extracted data types - schemas (values)
 export {
+  CompoundComponentInfoSchema,
   ExtractedDataSchema,
   ExtractedPropSchema,
   ExtractionMethodSchema,
@@ -75,12 +76,29 @@ export {
 
 // Extracted data types - types
 export type {
+  CompoundComponentInfo,
   ExtractedData,
   ExtractedProp,
   ExtractionMethod,
   ExtractionResult,
   Hash,
 } from './extracted.js';
+
+// Storybook types - schemas (values)
+export {
+  ArgTypeInfoSchema,
+  ExtractedStorySchema,
+  StorybookExtractionResultSchema,
+  StoryComplexitySchema,
+} from '../extractor/storybook/types.js';
+
+// Storybook types - types
+export type {
+  ArgTypeInfo,
+  ExtractedStory,
+  StorybookExtractionResult,
+  StoryComplexity,
+} from '../extractor/storybook/types.js';
 
 // Meta types - schemas (values)
 // NOTE: AIContextSchema is exported for generator module internal use.
@@ -143,6 +161,7 @@ export {
   DependenciesSchema,
   MANIFEST_SCHEMA_VERSION,
   ManifestSummarySchema,
+  SubComponentSchema,
   UpdateManifestInputSchema,
   VersionHistoryEntrySchema,
 } from './manifest.js';
@@ -154,6 +173,7 @@ export type {
   CreateManifestInput,
   Dependencies,
   ManifestSummary,
+  SubComponent,
   UpdateManifestInput,
   VersionHistoryEntry,
 } from './manifest.js';

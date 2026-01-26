@@ -49,7 +49,7 @@ describe('AI Usability - Extraction Structure', () => {
    * Helper to process a fixture with extraction only
    */
   async function getExtractedManifest(
-    category: 'shadcn' | 'edge-cases',
+    category: 'nexus' | 'edge-cases',
     name: string,
     componentName: string
   ): Promise<ComponentManifest | null> {
@@ -67,7 +67,7 @@ describe('AI Usability - Extraction Structure', () => {
 
   describe('Button - essential extraction for AI code generation', () => {
     it('extracts component name for import generation', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'button', 'Button');
+      const manifest = await getExtractedManifest('nexus', 'button', 'Button');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -77,7 +77,7 @@ describe('AI Usability - Extraction Structure', () => {
     });
 
     it('extracts CVA variants for prop completion', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'button', 'Button');
+      const manifest = await getExtractedManifest('nexus', 'button', 'Button');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -93,7 +93,7 @@ describe('AI Usability - Extraction Structure', () => {
     });
 
     it('extracts default variants for omitting unnecessary props', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'button', 'Button');
+      const manifest = await getExtractedManifest('nexus', 'button', 'Button');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -104,7 +104,7 @@ describe('AI Usability - Extraction Structure', () => {
     });
 
     it('extracts props with types for type-safe code generation', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'button', 'Button');
+      const manifest = await getExtractedManifest('nexus', 'button', 'Button');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -119,7 +119,7 @@ describe('AI Usability - Extraction Structure', () => {
     });
 
     it('detects asChild prop for composition guidance', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'button', 'Button');
+      const manifest = await getExtractedManifest('nexus', 'button', 'Button');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -136,7 +136,7 @@ describe('AI Usability - Extraction Structure', () => {
 
   describe('Input - form control extraction', () => {
     it('extracts custom Input props', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'input', 'Input');
+      const manifest = await getExtractedManifest('nexus', 'input', 'Input');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -151,7 +151,7 @@ describe('AI Usability - Extraction Structure', () => {
     });
 
     it('extracts error prop with boolean type', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'input', 'Input');
+      const manifest = await getExtractedManifest('nexus', 'input', 'Input');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -165,7 +165,7 @@ describe('AI Usability - Extraction Structure', () => {
 
   describe('Card - container pattern extraction', () => {
     it('extracts elevation variant', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'card', 'Card');
+      const manifest = await getExtractedManifest('nexus', 'card', 'Card');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -178,7 +178,7 @@ describe('AI Usability - Extraction Structure', () => {
 
   describe('Dialog - compound component extraction', () => {
     it('extracts forwardRef usage indicator', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'dialog', 'Dialog');
+      const manifest = await getExtractedManifest('nexus', 'dialog', 'Dialog');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -188,7 +188,7 @@ describe('AI Usability - Extraction Structure', () => {
     });
 
     it('detects Radix dependency', async () => {
-      const manifest = await getExtractedManifest('shadcn', 'dialog', 'Dialog');
+      const manifest = await getExtractedManifest('nexus', 'dialog', 'Dialog');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
@@ -200,8 +200,8 @@ describe('AI Usability - Extraction Structure', () => {
 
   describe('sourceHash for cache invalidation', () => {
     it('generates consistent hash for same source code', async () => {
-      const manifest1 = await getExtractedManifest('shadcn', 'badge', 'Badge');
-      const manifest2 = await getExtractedManifest('shadcn', 'badge', 'Badge');
+      const manifest1 = await getExtractedManifest('nexus', 'badge', 'Badge');
+      const manifest2 = await getExtractedManifest('nexus', 'badge', 'Badge');
 
       expect(manifest1?.sourceHash).toBeTruthy();
       expect(manifest1?.sourceHash).toBe(manifest2?.sourceHash);
@@ -210,9 +210,9 @@ describe('AI Usability - Extraction Structure', () => {
 
   describe('manifest completeness for AI consumption', () => {
     const fixtures = [
-      { category: 'shadcn' as const, name: 'button', componentName: 'Button' },
-      { category: 'shadcn' as const, name: 'badge', componentName: 'Badge' },
-      { category: 'shadcn' as const, name: 'input', componentName: 'Input' },
+      { category: 'nexus' as const, name: 'button', componentName: 'Button' },
+      { category: 'nexus' as const, name: 'badge', componentName: 'Badge' },
+      { category: 'nexus' as const, name: 'input', componentName: 'Input' },
     ];
 
     fixtures.forEach(({ category, name, componentName }) => {

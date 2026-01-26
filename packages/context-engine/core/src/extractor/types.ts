@@ -63,6 +63,12 @@ export const ExtractionInputSchema = z.object({
 
   /** Existing component ID (for updates) */
   existingId: z.uuid().optional(),
+
+  /** Optional Storybook stories source code */
+  storiesCode: z.string().optional(),
+
+  /** Optional stories file path for context (e.g., "button/Button.stories.tsx") */
+  storiesFilePath: z.string().optional(),
 });
 
 export type ExtractionInput = z.infer<typeof ExtractionInputSchema>;

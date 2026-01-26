@@ -201,7 +201,7 @@ describeWithRealLLM(
 
     describe('Button component - validates real LLM output quality', () => {
       it('generates semantically meaningful description', async () => {
-        const fixture = loadFixture('shadcn', 'button');
+        const fixture = loadFixture('nexus', 'button');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Button',
@@ -228,7 +228,7 @@ describeWithRealLLM(
       }, 60000); // Allow 60s for real API call
 
       it('identifies correct patterns for Button', async () => {
-        const fixture = loadFixture('shadcn', 'button');
+        const fixture = loadFixture('nexus', 'button');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Button',
@@ -258,7 +258,7 @@ describeWithRealLLM(
       }, 60000);
 
       it('provides actionable usage guidance', async () => {
-        const fixture = loadFixture('shadcn', 'button');
+        const fixture = loadFixture('nexus', 'button');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Button',
@@ -292,7 +292,7 @@ describeWithRealLLM(
       }, 60000);
 
       it('generates useful code examples', async () => {
-        const fixture = loadFixture('shadcn', 'button');
+        const fixture = loadFixture('nexus', 'button');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Button',
@@ -330,7 +330,7 @@ describeWithRealLLM(
 
     describe('Input component - form control context', () => {
       it('generates form-appropriate description', async () => {
-        const fixture = loadFixture('shadcn', 'input');
+        const fixture = loadFixture('nexus', 'input');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Input',
@@ -355,7 +355,7 @@ describeWithRealLLM(
       }, 60000);
 
       it('identifies form control patterns', async () => {
-        const fixture = loadFixture('shadcn', 'input');
+        const fixture = loadFixture('nexus', 'input');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Input',
@@ -383,7 +383,7 @@ describeWithRealLLM(
 
     describe('Dialog component - compound component understanding', () => {
       it('recognizes compound component nature', async () => {
-        const fixture = loadFixture('shadcn', 'dialog');
+        const fixture = loadFixture('nexus', 'dialog');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Dialog',
@@ -422,7 +422,7 @@ describeWithRealLLM(
       it.skipIf(!hasCardResponse && isCachedMode())(
         'generates container-appropriate description',
         async () => {
-          const fixture = loadFixture('shadcn', 'card');
+          const fixture = loadFixture('nexus', 'card');
           const input: ProcessorInput = {
             orgId: TEST_ORG_ID,
             name: 'Card',
@@ -451,7 +451,7 @@ describeWithRealLLM(
       it.skipIf(!hasCardResponse && isCachedMode())(
         'identifies container patterns',
         async () => {
-          const fixture = loadFixture('shadcn', 'card');
+          const fixture = loadFixture('nexus', 'card');
           const input: ProcessorInput = {
             orgId: TEST_ORG_ID,
             name: 'Card',
@@ -485,7 +485,7 @@ describeWithRealLLM(
       it.skipIf(!hasAccordionResponse && isCachedMode())(
         'generates disclosure-appropriate description',
         async () => {
-          const fixture = loadFixture('shadcn', 'accordion');
+          const fixture = loadFixture('nexus', 'accordion');
           const input: ProcessorInput = {
             orgId: TEST_ORG_ID,
             name: 'Accordion',
@@ -515,7 +515,7 @@ describeWithRealLLM(
       it.skipIf(!hasAccordionResponse && isCachedMode())(
         'identifies disclosure patterns',
         async () => {
-          const fixture = loadFixture('shadcn', 'accordion');
+          const fixture = loadFixture('nexus', 'accordion');
           const input: ProcessorInput = {
             orgId: TEST_ORG_ID,
             name: 'Accordion',
@@ -548,7 +548,7 @@ describeWithRealLLM(
       it.skipIf(!hasAccordionResponse && isCachedMode())(
         'identifies related accordion parts',
         async () => {
-          const fixture = loadFixture('shadcn', 'accordion');
+          const fixture = loadFixture('nexus', 'accordion');
           const input: ProcessorInput = {
             orgId: TEST_ORG_ID,
             name: 'Accordion',
@@ -574,7 +574,7 @@ describeWithRealLLM(
 
     describe('AI usability - can AI generate correct code from manifest?', () => {
       it('manifest has all info needed for JSX generation', async () => {
-        const fixture = loadFixture('shadcn', 'button');
+        const fixture = loadFixture('nexus', 'button');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Button',
@@ -623,7 +623,7 @@ describeWithRealLLM(
       }, 60000);
 
       it('semantic description enables natural language search', async () => {
-        const fixture = loadFixture('shadcn', 'button');
+        const fixture = loadFixture('nexus', 'button');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Button',
@@ -666,7 +666,7 @@ describeWithRealLLM(
 
     describe('consistency - same input produces consistent output', () => {
       it('multiple runs produce similar descriptions', async () => {
-        const fixture = loadFixture('shadcn', 'badge');
+        const fixture = loadFixture('nexus', 'badge');
         const input: ProcessorInput = {
           orgId: TEST_ORG_ID,
           name: 'Badge',
@@ -713,7 +713,8 @@ describe('Cached Response Infrastructure', () => {
     const available = getAvailableResponses();
 
     // We should have cached responses for at least the core components
-    const coreComponents = ['button', 'badge', 'input', 'dialog'];
+    // Note: Only includes components that exist in @nexus/react
+    const coreComponents = ['button', 'badge'];
 
     if (isCachedMode()) {
       // In cached mode, we expect core components to have cached responses

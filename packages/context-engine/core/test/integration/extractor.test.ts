@@ -31,7 +31,7 @@ describe('HybridExtractor', () => {
 
   describe('Button fixture (CVA + asChild)', () => {
     it('extracts props (CVA variant props may be in variants field)', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -55,7 +55,7 @@ describe('HybridExtractor', () => {
     });
 
     it('extracts CVA variants', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -75,7 +75,7 @@ describe('HybridExtractor', () => {
     });
 
     it('extracts default variants', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -88,7 +88,7 @@ describe('HybridExtractor', () => {
     });
 
     it('detects Radix Slot dependency', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -100,7 +100,7 @@ describe('HybridExtractor', () => {
     });
 
     it('generates consistent source hash', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
 
       const result1 = await extractor.extract(input);
       const result2 = await extractor.extract(input);
@@ -115,7 +115,7 @@ describe('HybridExtractor', () => {
     });
 
     it('includes acceptsChildren field (detection depends on code analysis)', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -129,7 +129,7 @@ describe('HybridExtractor', () => {
 
   describe('Badge fixture (simple CVA)', () => {
     it('extracts variant values', async () => {
-      const input = loadFixtureAsInput('shadcn', 'badge');
+      const input = loadFixtureAsInput('nexus', 'badge');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -150,7 +150,7 @@ describe('HybridExtractor', () => {
 
   describe('Card fixture (composition pattern)', () => {
     it('extracts component with elevation prop', async () => {
-      const input = loadFixtureAsInput('shadcn', 'card');
+      const input = loadFixtureAsInput('nexus', 'card');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -165,7 +165,7 @@ describe('HybridExtractor', () => {
 
   describe('Dialog fixture (Radix compound)', () => {
     it('detects Radix UI base library', async () => {
-      const input = loadFixtureAsInput('shadcn', 'dialog');
+      const input = loadFixtureAsInput('nexus', 'dialog');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -178,7 +178,7 @@ describe('HybridExtractor', () => {
     });
 
     it('detects forwardRef usage', async () => {
-      const input = loadFixtureAsInput('shadcn', 'dialog');
+      const input = loadFixtureAsInput('nexus', 'dialog');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -188,7 +188,7 @@ describe('HybridExtractor', () => {
     });
 
     it('extracts compound component props when found', async () => {
-      const input = loadFixtureAsInput('shadcn', 'dialog');
+      const input = loadFixtureAsInput('nexus', 'dialog');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -210,7 +210,7 @@ describe('HybridExtractor', () => {
 
   describe('Accordion fixture (Radix compound)', () => {
     it('detects Radix Accordion dependency', async () => {
-      const input = loadFixtureAsInput('shadcn', 'accordion');
+      const input = loadFixtureAsInput('nexus', 'accordion');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -224,7 +224,7 @@ describe('HybridExtractor', () => {
 
   describe('Input fixture (forwardRef)', () => {
     it('extracts input props with variants', async () => {
-      const input = loadFixtureAsInput('shadcn', 'input');
+      const input = loadFixtureAsInput('nexus', 'input');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -240,7 +240,7 @@ describe('HybridExtractor', () => {
     });
 
     it('detects forwardRef usage', async () => {
-      const input = loadFixtureAsInput('shadcn', 'input');
+      const input = loadFixtureAsInput('nexus', 'input');
       const result = await extractor.extract(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -255,7 +255,7 @@ describe('HybridExtractor', () => {
     // These tests document and verify actual behavior.
 
     it('accepts non-UUID orgId (passes through without validation)', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
 
       const result = await extractor.extract({
         orgId: 'invalid-uuid',
@@ -293,7 +293,7 @@ describe('HybridExtractor', () => {
     });
 
     it('succeeds with empty component name (returns empty name)', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
 
       const result = await extractor.extract({
         orgId: TEST_ORG_ID,
@@ -315,7 +315,7 @@ describe('HybridExtractor', () => {
 
   describe('extractComponent convenience function', () => {
     it('works with framework-based extractor selection', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
       const result = await extractComponent(input);
 
       expect(isExtractionSuccess(result)).toBe(true);
@@ -325,7 +325,7 @@ describe('HybridExtractor', () => {
     });
 
     it('throws for unsupported framework', async () => {
-      const input = loadFixtureAsInput('shadcn', 'button');
+      const input = loadFixtureAsInput('nexus', 'button');
 
       await expect(
         extractComponent({
@@ -338,12 +338,12 @@ describe('HybridExtractor', () => {
 
   describe('All fixtures produce valid ExtractedData', () => {
     const fixtures = [
-      { category: 'shadcn' as const, name: 'button' },
-      { category: 'shadcn' as const, name: 'badge' },
-      { category: 'shadcn' as const, name: 'card' },
-      { category: 'shadcn' as const, name: 'dialog' },
-      { category: 'shadcn' as const, name: 'accordion' },
-      { category: 'shadcn' as const, name: 'input' },
+      { category: 'nexus' as const, name: 'button' },
+      { category: 'nexus' as const, name: 'badge' },
+      { category: 'nexus' as const, name: 'card' },
+      { category: 'nexus' as const, name: 'dialog' },
+      { category: 'nexus' as const, name: 'accordion' },
+      { category: 'nexus' as const, name: 'input' },
     ];
 
     fixtures.forEach(({ category, name }) => {

@@ -8,6 +8,8 @@
  * 2. TsMorphExtractor (FALLBACK) - When primary fails or returns incomplete data
  * 3. VariantExtractor - For CVA/tailwind-variants (always ts-morph)
  * 4. DependencyExtractor - For import analysis (always ts-morph)
+ * 5. StorybookExtractor - For examples from .stories.tsx files (if provided)
+ * 6. CompoundDetector - For compound component detection (Dialog, Accordion, etc.)
  *
  * Uses explicit fallback triggers from fallback-triggers.ts for predictable behavior.
  */
@@ -17,12 +19,13 @@ import {
   type BaseLibraryName,
   isBaseLibraryPackage,
 } from '../constants/index.js';
-import type { ExtractedData } from '../types/index.js';
+import type { CompoundComponentInfo, ExtractedData } from '../types/index.js';
 import { pascalCase } from '../utils/case.js';
 import { generateSourceHash } from '../utils/hash.js';
 import { generateComponentId, generateSlug } from '../utils/id.js';
 import { createLogger } from '../utils/logger.js';
 
+import { detectCompoundComponent } from './compound-detector.js';
 import { DependencyExtractor } from './dependency-extractor.js';
 import {
   type FallbackReason,
@@ -30,6 +33,8 @@ import {
   shouldFallback,
 } from './fallback-triggers.js';
 import { ReactDocgenExtractor } from './react-docgen-extractor.js';
+import { StorybookExtractor } from './storybook/storybook-extractor.js';
+import type { ArgTypeInfo, ExtractedStory } from './storybook/types.js';
 import { TsMorphExtractor } from './ts-morph-extractor.js';
 import {
   type ExtractionInput,
@@ -55,12 +60,14 @@ export class HybridExtractor implements IExtractor {
   private tsMorph: TsMorphExtractor;
   private variantExtractor: VariantExtractor;
   private dependencyExtractor: DependencyExtractor;
+  private storybookExtractor: StorybookExtractor;
 
   constructor() {
     this.reactDocgen = new ReactDocgenExtractor();
     this.tsMorph = new TsMorphExtractor();
     this.variantExtractor = new VariantExtractor();
     this.dependencyExtractor = new DependencyExtractor();
+    this.storybookExtractor = new StorybookExtractor();
   }
 
   /**
@@ -129,7 +136,39 @@ export class HybridExtractor implements IExtractor {
       const { npmDependencies, internalDependencies, baseLibrary } =
         this.dependencyExtractor.extract(input.sourceCode, input.filePath);
 
-      // Step 6: Build extracted data
+      // Step 6: Extract Storybook stories (if provided)
+      let stories: ExtractedStory[] | undefined;
+      let storybookArgTypes: Record<string, ArgTypeInfo> | undefined;
+
+      if (input.storiesCode) {
+        const storybookResult = this.storybookExtractor.extract(
+          input.storiesCode,
+          input.storiesFilePath
+        );
+
+        // Filter out interaction-only and showcase stories
+        stories = storybookResult.stories.filter(
+          (s) => !s.isInteractionOnly && !s.isShowcase
+        );
+        storybookArgTypes = storybookResult.argTypes;
+
+        logger.debug('Storybook extraction complete', {
+          totalStories: storybookResult.stories.length,
+          includedStories: stories.length,
+        });
+      }
+
+      // Step 7: Detect compound components
+      const compoundInfo = detectCompoundComponent(input.sourceCode);
+
+      if (compoundInfo.isCompound) {
+        logger.debug('Compound component detected', {
+          root: compoundInfo.rootComponent,
+          subComponents: compoundInfo.subComponents,
+        });
+      }
+
+      // Step 8: Build extracted data
       const data = this.buildExtractedData({
         propsResult,
         variants,
@@ -141,9 +180,12 @@ export class HybridExtractor implements IExtractor {
         name: input.name,
         filePath: input.filePath,
         extractionMethod,
+        stories,
+        storybookArgTypes,
+        compoundInfo: compoundInfo.isCompound ? compoundInfo : undefined,
       });
 
-      // Step 7: Generate identity
+      // Step 9: Generate identity
       const id = input.existingId ?? generateComponentId();
       const slug = generateSlug(input.name, input.framework, id);
 
@@ -191,8 +233,8 @@ export class HybridExtractor implements IExtractor {
   /**
    * Build ExtractedData from all extraction results
    *
-   * Combines props, variants, dependencies and detected patterns into
-   * the final ExtractedData structure.
+   * Combines props, variants, dependencies, Storybook stories, compound info,
+   * and detected patterns into the final ExtractedData structure.
    */
   private buildExtractedData({
     propsResult,
@@ -205,6 +247,9 @@ export class HybridExtractor implements IExtractor {
     name,
     filePath,
     extractionMethod,
+    stories,
+    storybookArgTypes,
+    compoundInfo,
   }: {
     propsResult: Awaited<
       ReturnType<ReactDocgenExtractor['extractProps']>
@@ -218,6 +263,9 @@ export class HybridExtractor implements IExtractor {
     name: string;
     filePath?: string;
     extractionMethod: ExtractorMethod;
+    stories?: ExtractedStory[];
+    storybookArgTypes?: Record<string, ArgTypeInfo>;
+    compoundInfo?: CompoundComponentInfo;
   }): ExtractedData {
     const props = propsResult?.props ?? [];
 
@@ -240,6 +288,9 @@ export class HybridExtractor implements IExtractor {
       sourceDescription: propsResult?.description,
       files: [filePath ?? `${name}.tsx`],
       extractionMethod,
+      stories,
+      storybookArgTypes,
+      compoundInfo,
     };
   }
 

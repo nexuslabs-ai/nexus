@@ -7,4 +7,5 @@
 export * from './assertion-helpers.js';
 export * from './fixture-loader.js';
 export * from './manifest-recorder.js';
+export * from './nexus-fixture-loader.js';
 export * from './response-recorder.js';

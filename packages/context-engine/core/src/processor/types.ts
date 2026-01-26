@@ -121,6 +121,18 @@ export interface ProcessorInput {
    * Additional context for the LLM (e.g., design system name).
    */
   hints?: string;
+
+  /**
+   * Optional Storybook stories source code.
+   * Used to extract real examples from stories.
+   */
+  storiesCode?: string;
+
+  /**
+   * Optional path to the stories file.
+   * Used for context in extraction.
+   */
+  storiesFilePath?: string;
 }
 
 /**

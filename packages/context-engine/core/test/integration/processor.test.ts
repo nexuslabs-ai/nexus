@@ -67,7 +67,7 @@ describe('ComponentProcessor', () => {
         skipGeneration: true,
       });
 
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -93,7 +93,7 @@ describe('ComponentProcessor', () => {
         skipGeneration: true,
       });
 
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -116,7 +116,7 @@ describe('ComponentProcessor', () => {
 
   describe('processWithoutGeneration method', () => {
     it('produces manifest without LLM call', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -136,7 +136,7 @@ describe('ComponentProcessor', () => {
 
   describe('two-phase API (valuable for queue-based processing)', () => {
     it('extractOnly returns extraction result without LLM', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -157,7 +157,7 @@ describe('ComponentProcessor', () => {
     });
 
     it('generateOnly produces manifest from extraction result', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -189,7 +189,7 @@ describe('ComponentProcessor', () => {
 
   describe('error handling', () => {
     it('returns failure for unsupported framework', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -227,7 +227,7 @@ describe('ComponentProcessor', () => {
     it('handles LLM failure gracefully', async () => {
       mockProvider.setError('LLM service unavailable', false);
 
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -265,7 +265,7 @@ describe('ComponentProcessor', () => {
 
   describe('metrics and hashing', () => {
     it('produces consistent sourceHash for same input', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -286,7 +286,7 @@ describe('ComponentProcessor', () => {
     });
 
     it('includes processing metrics', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -305,7 +305,7 @@ describe('ComponentProcessor', () => {
     });
 
     it('includes extraction metadata', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -329,7 +329,7 @@ describe('ComponentProcessor', () => {
     // Content quality is tested in real-llm.test.ts
 
     it('produces valid manifest from Button fixture', async () => {
-      const fixture = loadFixture('shadcn', 'button');
+      const fixture = loadFixture('nexus', 'button');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Button',
@@ -346,7 +346,7 @@ describe('ComponentProcessor', () => {
     });
 
     it('produces valid manifest from Input fixture', async () => {
-      const fixture = loadFixture('shadcn', 'input');
+      const fixture = loadFixture('nexus', 'input');
       const input: ProcessorInput = {
         orgId: TEST_ORG_ID,
         name: 'Input',

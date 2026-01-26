@@ -8,10 +8,16 @@
 import { HybridExtractor } from './hybrid-extractor.js';
 import type { ExtractionInput, IExtractor } from './types.js';
 
+export {
+  createCompoundDetector,
+  detectCompoundComponent,
+  inferDataSlot,
+} from './compound-detector.js';
 export { DependencyExtractor } from './dependency-extractor.js';
 export * from './fallback-triggers.js';
 export { HybridExtractor } from './hybrid-extractor.js';
 export { ReactDocgenExtractor } from './react-docgen-extractor.js';
+export * from './storybook/index.js';
 export { TsMorphExtractor } from './ts-morph-extractor.js';
 export * from './types.js';
 export { VariantExtractor } from './variant-extractor.js';

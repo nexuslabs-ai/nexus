@@ -327,6 +327,7 @@ export class MetaGenerator implements IMetaGenerator {
    * Generate metadata for a component
    *
    * Uses tool calling for structured output generation.
+   * When Storybook examples are available, skips example generation in the prompt.
    *
    * @param input - Generation input with extracted data and context
    * @returns Promise resolving to generation output (success or failure)
@@ -341,22 +342,28 @@ export class MetaGenerator implements IMetaGenerator {
   }: GeneratorInput): Promise<GeneratorOutput> {
     const startTime = performance.now();
 
+    // Detect if Storybook examples are available
+    const hasStorybookExamples = (extracted.stories?.length ?? 0) > 0;
+
     logger.info('Starting meta generation', {
       orgId,
       name,
       framework,
       propsCount: extracted.props.length,
       variantsCount: Object.keys(extracted.variants).length,
+      hasStorybookExamples,
     });
 
     try {
       // Build prompt for tool calling
+      // Skip example generation if Storybook examples are available
       const { system, user } = buildToolCallingPrompt({
         name,
         framework,
         extracted,
         figmaUrl,
         hints,
+        skipExamples: hasStorybookExamples,
       });
 
       // Call provider with tool calling
