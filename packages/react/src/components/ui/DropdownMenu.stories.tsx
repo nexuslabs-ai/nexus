@@ -376,8 +376,15 @@ export const DataAttributesTest: Story = {
     );
     await expect(destructiveItem).toBeInTheDocument();
 
-    // Close the menu
+    // Close the menu and wait for complete cleanup
     await userEvent.keyboard('{Escape}');
+
+    // Wait for menu to be fully removed from DOM (including aria-hidden cleanup)
+    await waitFor(() => {
+      expect(document.querySelector('[role="menu"]')).toBeNull();
+      // Ensure no lingering aria-hidden elements from Radix
+      expect(document.querySelector('[data-aria-hidden="true"]')).toBeNull();
+    });
   },
 };
 
