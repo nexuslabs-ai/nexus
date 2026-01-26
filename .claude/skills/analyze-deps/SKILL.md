@@ -94,25 +94,28 @@ Input (package or workspace)
 
 **Parse input to determine scope:**
 
-| Input Type       | Detection                  | Action                                    |
-| ---------------- | -------------------------- | ----------------------------------------- |
-| Single package   | Starts with `@` or no `/`  | Find in all package.json dependencies     |
-| Workspace path   | Contains `/` (e.g., `packages/react`) | Read that workspace's package.json |
-| `all`            | Literal string "all"       | Glob all `**/package.json` files          |
+| Input Type     | Detection                             | Action                                |
+| -------------- | ------------------------------------- | ------------------------------------- |
+| Single package | Starts with `@` or no `/`             | Find in all package.json dependencies |
+| Workspace path | Contains `/` (e.g., `packages/react`) | Read that workspace's package.json    |
+| `all`          | Literal string "all"                  | Glob all `**/package.json` files      |
 
 **For single package:**
+
 ```
 Use Grep tool:
 Grep(pattern: "{package-name}", glob: "**/package.json")
 ```
 
 **For workspace:**
+
 ```
 Use Read tool:
 Read(file_path: "{workspace}/package.json")
 ```
 
 **For all:**
+
 ```
 Use Glob tool:
 Glob(pattern: "**/package.json")
@@ -120,6 +123,7 @@ Note: node_modules is excluded by default
 ```
 
 **Extract dependencies:**
+
 - `dependencies`
 - `devDependencies`
 - `peerDependencies` (note as peer)
@@ -134,14 +138,15 @@ npm view {package-name} --json
 
 **Error handling for npm commands:**
 
-| Error Type | Detection | Action |
-|------------|-----------|--------|
-| Network timeout | Command hangs > 30s | Use `timeout 30` prefix, note as "timed out" |
-| 404 Not Found | Exit code 1, "Not found" in output | Note as "package not found in registry" |
-| 401/403 Auth | "ENEEDAUTH" or "E403" | Note as "private package, auth required" |
-| Rate limited | "ETOOMANYREQS" | Wait and retry, or note as "rate limited" |
+| Error Type      | Detection                          | Action                                       |
+| --------------- | ---------------------------------- | -------------------------------------------- |
+| Network timeout | Command hangs > 30s                | Use `timeout 30` prefix, note as "timed out" |
+| 404 Not Found   | Exit code 1, "Not found" in output | Note as "package not found in registry"      |
+| 401/403 Auth    | "ENEEDAUTH" or "E403"              | Note as "private package, auth required"     |
+| Rate limited    | "ETOOMANYREQS"                     | Wait and retry, or note as "rate limited"    |
 
 **Example with timeout:**
+
 ```bash
 timeout 30 npm view {package-name} --json 2>/dev/null || echo '{"error": "fetch failed"}'
 ```
@@ -156,13 +161,14 @@ timeout 30 npm view {package-name} --json 2>/dev/null || echo '{"error": "fetch 
 
 **Classify version bump:**
 
-| Type  | Criteria | Risk |
-|-------|----------|------|
-| Patch | `1.0.0` → `1.0.1` | Low |
+| Type  | Criteria          | Risk   |
+| ----- | ----------------- | ------ |
+| Patch | `1.0.0` → `1.0.1` | Low    |
 | Minor | `1.0.0` → `1.1.0` | Medium |
-| Major | `1.0.0` → `2.0.0` | High |
+| Major | `1.0.0` → `2.0.0` | High   |
 
 **Emoji usage:** Always use actual Unicode emojis in reports, NOT GitHub shortcodes:
+
 - Use `🔴` not `:red_circle:`
 - Use `🟡` not `:yellow_circle:`
 - Use `🟢` not `:green_circle:`
@@ -173,11 +179,13 @@ timeout 30 npm view {package-name} --json 2>/dev/null || echo '{"error": "fetch 
 **Security vulnerability check:**
 
 Run npm audit to identify known vulnerabilities:
+
 ```bash
 npm audit --json
 ```
 
 **Handling audit results:**
+
 - Packages with vulnerabilities should be flagged with 🔴 High risk regardless of version bump type
 - Include vulnerability severity (critical, high, moderate, low) in the report
 - Link to advisory details when available
@@ -191,16 +199,20 @@ npm audit --json
 **Research sources (in order):**
 
 1. **GitHub Releases API**
+
    ```
    https://api.github.com/repos/{owner}/{repo}/releases
    ```
+
    - Look for release notes between current and latest version
    - Extract breaking changes, migration notes
 
 2. **CHANGELOG.md**
+
    ```
    https://raw.githubusercontent.com/{owner}/{repo}/main/CHANGELOG.md
    ```
+
    - Parse for version headers
    - Extract changes between current and latest
 
@@ -225,11 +237,13 @@ npm audit --json
 **Security research triggers:**
 
 Not every package needs security research. Search for security issues when:
+
 1. Package is flagged by `npm audit` - deep search required
 2. Major version bump - include security in migration research
 3. Package hasn't been updated in 2+ years - search for known issues
 
 **Security search queries (when triggered):**
+
 ```
 "{package-name} CVE"
 "{package-name} security vulnerability"
@@ -244,11 +258,13 @@ Check both current AND latest version for vulnerabilities - upgrading isn't alwa
    - Look for migration documentation
 
 **Search priority:**
+
 - Official documentation > GitHub releases > Release notes > Community guides
 - Avoid outdated blog posts (check dates)
 - Prefer sources from package maintainers
 
 **Document for each package:**
+
 - Breaking changes list
 - Migration steps (if found)
 - Links to official guides
@@ -270,11 +286,13 @@ Grep(pattern: "require\\(['\"]package-name", glob: "**/*.{js,ts}")
 ```
 
 **Map against breaking changes only:**
+
 - For each breaking change found in Phase 3
 - Check if our codebase uses the affected API
 - Only note files that use affected APIs
 
 **Output (only when impact exists):**
+
 ```markdown
 **Impacted files:**
 | File | Line | Impact |
@@ -283,6 +301,7 @@ Grep(pattern: "require\\(['\"]package-name", glob: "**/*.{js,ts}")
 ```
 
 **If no files are impacted by breaking changes:**
+
 ```markdown
 **Impact:** None. Our codebase does not use any affected APIs.
 ```
@@ -294,13 +313,14 @@ Grep(pattern: "require\\(['\"]package-name", glob: "**/*.{js,ts}")
 **Location:** `reports/deps/{target}-{YYYY-MM-DD}.md`
 
 Where `{target}` is:
+
 - Package name (sanitized): `radix-ui-react-dialog`
 - Workspace name: `packages-react`
 - `all-workspaces` for full scan
 
 **Report structure:**
 
-```markdown
+````markdown
 # Dependency Analysis: {target}
 
 Generated: {YYYY-MM-DD HH:mm}
@@ -308,37 +328,37 @@ Scope: {description of what was analyzed}
 
 ## Summary
 
-| Metric | Count |
-|--------|-------|
-| Packages analyzed | X |
-| Up to date | X |
-| Updates available | X |
-| Deprecated | X |
-| Security issues | X |
+| Metric            | Count |
+| ----------------- | ----- |
+| Packages analyzed | X     |
+| Up to date        | X     |
+| Updates available | X     |
+| Deprecated        | X     |
+| Security issues   | X     |
 
 ## Risk Overview
 
-| Risk | Count | Action |
-|------|-------|--------|
-| 🔴 High | X | Requires migration planning |
-| 🟡 Medium | X | Review changelog before upgrade |
-| 🟢 Low | X | Safe to upgrade |
+| Risk      | Count | Action                          |
+| --------- | ----- | ------------------------------- |
+| 🔴 High   | X     | Requires migration planning     |
+| 🟡 Medium | X     | Review changelog before upgrade |
+| 🟢 Low    | X     | Safe to upgrade                 |
 
 ## Updates Available
 
-| Package | Current | Latest | Type | Deprecated | Risk |
-|---------|---------|--------|------|------------|------|
-| package-a | 1.0.0 | 4.0.0 | major | No | 🔴 High |
-| package-b | 2.1.0 | 3.0.0 | major | Yes → use package-b-v2 | 🔴 High |
-| package-c | 1.2.0 | 1.5.0 | minor | No | 🟡 Medium |
-| package-d | 3.0.0 | 3.0.5 | patch | No | 🟢 Low |
+| Package   | Current | Latest | Type  | Deprecated             | Risk      |
+| --------- | ------- | ------ | ----- | ---------------------- | --------- |
+| package-a | 1.0.0   | 4.0.0  | major | No                     | 🔴 High   |
+| package-b | 2.1.0   | 3.0.0  | major | Yes → use package-b-v2 | 🔴 High   |
+| package-c | 1.2.0   | 1.5.0  | minor | No                     | 🟡 Medium |
+| package-d | 3.0.0   | 3.0.5  | patch | No                     | 🟢 Low    |
 
 ## Up to Date
 
-| Package | Version |
-|---------|---------|
-| package-e | 2.0.0 |
-| package-f | 1.5.0 |
+| Package   | Version |
+| --------- | ------- |
+| package-e | 2.0.0   |
+| package-f | 1.5.0   |
 
 ---
 
@@ -350,19 +370,21 @@ Scope: {description of what was analyzed}
 {If vulnerabilities exist:}
 ⚠️ {X} packages have security considerations
 
-| Package | Current | Target | Current Vulnerabilities | Target Vulnerabilities | Recommendation |
-|---------|---------|--------|-------------------------|------------------------|----------------|
-| lodash | 4.17.20 | 4.17.21 | 🔴 CVE-2021-23337 (High) | ✅ None | Upgrade to fix |
-| some-pkg | 1.0.0 | 2.0.0 | ✅ None | 🟡 CVE-2024-1234 (Medium) | Stay on 1.0.0 or wait for patch |
-| another | 3.0.0 | 4.0.0 | 🔴 CVE-2023-111 (High) | ✅ Fixed | Upgrade to 3.0.5+ |
+| Package  | Current | Target  | Current Vulnerabilities  | Target Vulnerabilities    | Recommendation                  |
+| -------- | ------- | ------- | ------------------------ | ------------------------- | ------------------------------- |
+| lodash   | 4.17.20 | 4.17.21 | 🔴 CVE-2021-23337 (High) | ✅ None                   | Upgrade to fix                  |
+| some-pkg | 1.0.0   | 2.0.0   | ✅ None                  | 🟡 CVE-2024-1234 (Medium) | Stay on 1.0.0 or wait for patch |
+| another  | 3.0.0   | 4.0.0   | 🔴 CVE-2023-111 (High)   | ✅ Fixed                  | Upgrade to 3.0.5+               |
 
 **Legend:**
+
 - 🔴 High/Critical severity - immediate action required
 - 🟡 Medium severity - plan remediation
 - 🟢 Low severity - address when convenient
 - ✅ None - no known vulnerabilities
 
 **Recommendation types:**
+
 - **Upgrade to fix** - current version has vulnerability, latest is clean
 - **Stay on current** - latest version introduced new vulnerability
 - **Upgrade to specific version** - skip problematic versions, target safe one
@@ -375,12 +397,14 @@ Scope: {description of what was analyzed}
 ### package-a: 1.0.0 → 4.0.0 (major) 🔴
 
 **Security:**
+
 - Current version: 🔴 CVE-2021-23337 - Prototype Pollution (High)
   - Advisory: https://nvd.nist.gov/vuln/detail/CVE-2021-23337
   - Fixed in: 4.0.0
 - Target version: ✅ No known vulnerabilities
 
 **Breaking changes:**
+
 - `OldComponent` removed, use `NewComponent` instead
 - `legacyProp` renamed to `modernProp`
 - Minimum Node version now 18+
@@ -394,6 +418,7 @@ Scope: {description of what was analyzed}
 | `apps/docs/src/example.tsx` | 42 | Uses `legacyProp` |
 
 **Migration steps:**
+
 1. Replace `OldComponent` with `NewComponent` in `thing.tsx`
 2. Rename `legacyProp` to `modernProp` in `example.tsx`
 3. Verify Node version >= 18 in CI
@@ -414,6 +439,7 @@ Scope: {description of what was analyzed}
 | `packages/core/src/util.ts` | 8 | Must migrate to new package |
 
 **Migration steps:**
+
 1. Install replacement: `yarn add @scope/package-b-v2`
 2. Update imports in `util.ts`
 3. Remove old package: `yarn remove package-b`
@@ -427,9 +453,11 @@ Scope: {description of what was analyzed}
 **Impact:** None. Safe to upgrade.
 
 **Migration steps:**
+
 ```bash
 yarn upgrade package-c@^1.5.0
 ```
+````
 
 ---
 
@@ -468,7 +496,8 @@ yarn upgrade package-c@^1.5.0
 
 ---
 
-*Report generated by analyze-deps skill*
+_Report generated by analyze-deps skill_
+
 ```
 
 ## Error Handling
@@ -488,3 +517,4 @@ yarn upgrade package-c@^1.5.0
 4. **Provide actionable steps** — Every issue should have a clear resolution path
 5. **Use official sources** — Prefer maintainer docs over random blog posts
 6. **Use Unicode emojis** — Always use actual emoji characters (🔴 🟡 🟢 ✅), not shortcodes
+```

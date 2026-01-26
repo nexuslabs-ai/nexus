@@ -170,7 +170,7 @@ export const Loading: Story = {
 };
 
 export const LoadingWithVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-wrap nx:gap-2">
       <Button loading variant="default">
         Default
@@ -428,7 +428,7 @@ export const WithIcon: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: () => (
+  render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
         <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
