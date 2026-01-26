@@ -8,6 +8,13 @@ const preview: Preview = {
   // Enable autodocs for all stories globally
   tags: ['autodocs'],
   parameters: {
+    // Enable Table of Contents for docs pages
+    docs: {
+      toc: {
+        headingSelector: 'h2, h3',
+        title: 'On this page',
+      },
+    },
     // A11y violations will fail tests automatically
     a11y: {
       test: 'error',
@@ -65,9 +72,10 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const theme = context.globals.theme;
+      const isDocs = context.viewMode === 'docs';
       return (
         <div
-          className={`nx:min-h-screen nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${theme === 'dark' ? 'dark' : ''}`}
+          className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${theme === 'dark' ? 'dark' : ''} ${isDocs ? 'nx:py-12' : 'nx:min-h-screen'}`}
         >
           <Story />
         </div>

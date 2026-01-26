@@ -12,15 +12,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-hover',
+          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover',
         destructive:
-          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-hover',
+          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover',
         outline:
-          'nx:border nx:border-border-default nx:bg-background nx:hover:bg-accent nx:hover:text-accent-foreground',
+          'nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:hover:text-foreground',
         secondary:
-          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-hover',
-        ghost: 'nx:hover:bg-accent nx:hover:text-accent-foreground',
-        link: 'nx:text-primary-text nx:underline-offset-4 nx:hover:underline',
+          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover',
+        ghost: 'nx:hover:bg-background-hover nx:hover:text-foreground',
+        link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline',
       },
       size: {
         default: 'nx:px-4 nx:py-2',
