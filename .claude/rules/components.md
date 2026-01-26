@@ -1,5 +1,18 @@
 # Component Rules
 
+> Architectural guidelines for Nexus React components.
+> For token mappings from shadcn/ui, see [shadcn-divergences.md](shadcn-divergences.md).
+
+## Core Principles
+
+| Principle                 | Why                                                              |
+| ------------------------- | ---------------------------------------------------------------- |
+| **Semantic tokens only**  | Enables theming; primitives are implementation details           |
+| **Padding-based sizing**  | Fixed heights break in flex layouts                              |
+| **Data attributes**       | Enable CSS hooks for testing, styling, and state inspection      |
+| **CVA for enum variants** | Clear variant-to-class mapping; boolean logic stays in component |
+| **Named interfaces**      | Self-documenting; enables JSDoc; better IDE experience           |
+
 ## File Structure
 
 Every component in `packages/react/src/components/ui/` needs 2 files:
@@ -13,6 +26,8 @@ Every component in `packages/react/src/components/ui/` needs 2 files:
 
 ## Component Template
 
+This is a minimal template showing required structure. Adapt variants and props to your component's needs.
+
 ```tsx
 import * as React from 'react';
 
@@ -22,27 +37,19 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const componentVariants = cva(
-  // Base classes (always applied) - nx: prefix BEFORE pseudo-classes
-  'nx:inline-flex nx:items-center nx:justify-center nx:transition-colors nx:focus-visible:outline-none nx:focus-visible:ring-2 nx:disabled:pointer-events-none nx:disabled:opacity-50',
+  // Base classes - nx: prefix BEFORE pseudo-classes
+  'nx:inline-flex nx:items-center nx:transition-colors',
   {
     variants: {
       variant: {
-        primary:
-          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-hover',
-        secondary:
-          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-hover',
-        outline:
-          'nx:border nx:border-border-default nx:bg-background nx:hover:bg-accent',
+        /* enum-style variants */
       },
       size: {
-        // Use padding for sizing (flex-friendly), avoid fixed heights
-        default: 'nx:px-4 nx:py-2',
-        sm: 'nx:px-3 nx:py-1.5 nx:text-xs',
-        lg: 'nx:px-8 nx:py-3',
+        /* padding-based sizing */
       },
     },
     defaultVariants: {
-      variant: 'primary',
+      variant: 'default',
       size: 'default',
     },
   }
@@ -66,7 +73,7 @@ function Component({
 
   return (
     <Comp
-      data-slot="component"
+      data-slot="component-name"
       data-variant={variant}
       data-size={size}
       className={cn(componentVariants({ variant, size, className }))}
@@ -78,83 +85,117 @@ function Component({
 export { Component, type ComponentProps, componentVariants };
 ```
 
-## Required Attributes
+**Live examples:** See `button.tsx`, `badge.tsx` for full implementations.
 
-| Attribute      | Purpose                   | Example                  |
-| -------------- | ------------------------- | ------------------------ |
-| `data-slot`    | Component identification  | `data-slot="button"`     |
-| `data-variant` | Variant for styling hooks | `data-variant={variant}` |
-| `data-size`    | Size for styling hooks    | `data-size={size}`       |
+## Data Attributes
+
+| Attribute      | Purpose                  | Required?                   |
+| -------------- | ------------------------ | --------------------------- |
+| `data-slot`    | Component identification | Always                      |
+| `data-variant` | Current variant value    | When component has variants |
+| `data-size`    | Current size value       | When component has sizes    |
+
+Additional `data-*` attributes are acceptable for component-specific state (e.g., `data-loading`, `data-fill`).
 
 ## Props Pattern
 
-Define props as a named interface above the function (not inline). Add JSDoc comments for custom props to document behavior, defaults, and usage examples:
+### Interface Definition
 
-````tsx
-interface ComponentProps
-  extends
-    React.ComponentProps<'element'>, // Native element props
-    VariantProps<typeof componentVariants> {
-  // Variant props from cva
-  /**
-   * When true, renders as child element using Radix Slot.
-   * Useful for composition with links or custom elements.
-   * @default false
-   * @example
-   * ```tsx
-   * <Button asChild>
-   *   <a href="/page">Link as button</a>
-   * </Button>
-   * ```
-   */
-  asChild?: boolean;
-}
-````
+Define props as a named interface above the function. Extend from:
+
+- `React.ComponentProps<'element'>` for native element props
+- `VariantProps<typeof componentVariants>` for CVA-generated variant props
 
 ### JSDoc Requirements
 
-All custom props (not inherited from HTML elements or VariantProps) MUST have JSDoc with:
+All custom props (not inherited) must have JSDoc with:
 
 - Description of what the prop does
 - `@default` value if applicable
 - `@example` for non-obvious usage
 
-### Boolean Props in CVA
-
-**Do NOT use `true`/`false` values in CVA variants.** Handle boolean props with ternary operators in component code instead:
-
 ```tsx
-// ❌ Bad - boolean variant in CVA
-const variants = cva('...', {
-  variants: {
-    isCompact: {
-      true: 'nx:p-2',
-      false: 'nx:p-4',
-    },
-  },
-});
-
-// ✅ Good - boolean handled in component with ternary
-function Component({ isCompact = false, ... }) {
-  return (
-    <div className={cn(
-      variants({ variant, size }),
-      isCompact ? 'nx:p-2' : 'nx:p-4',
-    )} />
-  );
+interface ComponentProps extends React.ComponentProps<'button'> {
+  /**
+   * Brief description of what this does.
+   * @default false
+   */
+  customProp?: boolean;
 }
 ```
 
-**Why:**
+### Boolean Props
 
-- CVA `true`/`false` variants are less readable
-- Ternary operators make the boolean logic explicit
-- Keeps CVA focused on enum-style variants (variant, size, fill)
-- Boolean props should be defined explicitly in the interface with JSDoc
+Handle boolean props with ternary operators in component code, not CVA:
+
+```tsx
+// In component body, not CVA variants
+className={cn(
+  componentVariants({ variant, size }),
+  isCompact ? 'nx:p-2' : 'nx:p-4',
+)}
+```
+
+**Why:** Keeps CVA focused on enum-style variants; makes boolean logic explicit.
+
+## Class Naming
+
+### nx: Prefix Rule
+
+All Tailwind utilities must use `nx:` prefix. The prefix comes BEFORE all modifiers (pseudo-classes, arbitrary selectors, responsive prefixes):
+
+| Pattern                                | Correct?            |
+| -------------------------------------- | ------------------- |
+| `nx:hover:bg-primary-background-hover` | Yes                 |
+| `hover:nx:bg-primary-background-hover` | No                  |
+| `nx:focus-visible:ring-2`              | Yes                 |
+| `nx:[&>svg]:text-foreground`           | Yes                 |
+| `[&>svg]:nx:text-foreground`           | No                  |
+| `nx:[&_p]:leading-relaxed`             | Yes                 |
+| `[&_p]:nx:leading-relaxed`             | No                  |
+| `nx:md:flex`                           | Yes                 |
+| `md:nx:flex`                           | No                  |
+| `bg-primary-background`                | No (missing prefix) |
+
+**Rule:** `nx:` always comes first, then any modifier (pseudo-class, arbitrary selector, responsive), then the utility.
+
+### Semantic Token Paths
+
+Use full semantic token paths, not incomplete or primitive values:
+
+| Pattern                        | Correct? | Notes                           |
+| ------------------------------ | -------- | ------------------------------- |
+| `nx:bg-primary-background`     | Yes      | Full path                       |
+| `nx:bg-primary`                | No       | Incomplete                      |
+| `nx:bg-blue-500`               | No       | Primitive color                 |
+| `nx:hover:bg-background-hover` | Yes      | Hover state token               |
+| `nx:hover:bg-accent`           | No       | `accent` doesn't exist in Nexus |
+
+**Reference:** See `packages/tailwind/nexus.css` for available tokens.
+
+## Sizing Convention
+
+Use padding for sizing, not fixed heights:
+
+```tsx
+// Padding-based (correct)
+size: {
+  default: 'nx:px-4 nx:py-2',
+  sm: 'nx:px-3 nx:py-1.5',
+  lg: 'nx:px-8 nx:py-3',
+}
+
+// Fixed heights (avoid)
+size: {
+  default: 'nx:h-10 nx:px-4',
+}
+```
+
+**Exceptions:** Avatars, progress bars, modals may need fixed dimensions.
 
 ## Export Pattern
 
-Always export the component, props type, and variants function (sorted):
+Always export component, props type, and variants function:
 
 ```tsx
 export { Component, type ComponentProps, componentVariants };
@@ -162,96 +203,29 @@ export { Component, type ComponentProps, componentVariants };
 
 ## Import Order
 
-Follow ESLint auto-sort order:
+ESLint auto-sorts, but the expected order is:
+
+1. React
+2. External packages (Radix, CVA)
+3. Internal aliases (`@/lib/*`)
+4. Relative imports
+
+## Compound Variants
+
+Use `compoundVariants` when styling depends on multiple prop combinations (e.g., `variant` + `fill`):
 
 ```tsx
-// 1. React
-import * as React from 'react';
-
-// 2. External packages
-import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
-
-// 3. Internal aliases
-import { cn } from '@/lib/utils';
-
-// 4. Relative imports (if any)
+compoundVariants: [
+  { variant: 'default', fill: 'solid', className: '...' },
+  { variant: 'default', fill: 'light', className: '...' },
+],
 ```
 
-## Class Naming (nx: prefix)
-
-All Tailwind utility classes MUST use the `nx:` prefix. The prefix comes BEFORE pseudo-classes and modifiers:
-
-```tsx
-// Good - nx: prefix BEFORE pseudo-classes
-'nx:bg-primary-background nx:text-primary-foreground';
-'nx:hover:bg-secondary-hover';
-'nx:focus-visible:ring-2';
-'nx:disabled:opacity-50';
-'nx:[&_svg]:size-4';
-
-// Bad - pseudo-class before nx: prefix (won't work correctly)
-'hover:nx:bg-secondary-hover';
-'focus-visible:nx:ring-2';
-'disabled:nx:opacity-50';
-'[&_svg]:nx:size-4';
-
-// Bad - missing nx: prefix entirely
-'bg-primary text-primary-foreground';
-'hover:bg-secondary/80';
-```
-
-## Semantic Token Usage
-
-Use semantic color tokens with full path, not primitives:
-
-```tsx
-// Good - full semantic token path
-'nx:bg-primary-background nx:text-primary-foreground';
-'nx:bg-secondary-background nx:hover:bg-secondary-hover';
-'nx:border-border-default';
-'nx:bg-error-background nx:text-error-foreground';
-
-// Bad - primitive colors
-'nx:bg-blue-500 nx:text-white';
-'nx:bg-neutral-100';
-
-// Bad - incomplete token path
-'nx:bg-primary'; // use nx:bg-primary-background
-'nx:bg-error'; // use nx:bg-error-background
-```
-
-## Sizing Convention
-
-Use padding for component sizing instead of fixed heights/widths. This ensures components work well in flex layouts:
-
-```tsx
-// Good - padding-based sizing (flex-friendly)
-size: {
-  default: 'nx:px-4 nx:py-2',
-  sm: 'nx:px-3 nx:py-1.5 nx:text-xs',
-  lg: 'nx:px-8 nx:py-3',
-  icon: 'nx:p-2.5',
-}
-
-// Bad - fixed heights (breaks in flex layouts)
-size: {
-  default: 'nx:h-10 nx:px-4 nx:py-2',
-  sm: 'nx:h-9 nx:px-3',
-  lg: 'nx:h-11 nx:px-8',
-}
-```
-
-**Exceptions** (where fixed dimensions are acceptable):
-
-- Modal/dialog width (`nx:max-w-lg`)
-- Toast max-width
-- Avatar/icon containers that need exact dimensions
-- Progress bar heights
+**Live example:** See `badge.tsx` for a full compound variants implementation.
 
 ## asChild Pattern
 
-The `asChild` prop enables component composition via Radix Slot:
+The `asChild` prop enables composition via Radix Slot. Include for interactive components:
 
 ```tsx
 // Renders as button
@@ -263,6 +237,16 @@ The `asChild` prop enables component composition via Radix Slot:
 </Button>
 ```
 
+## State Patterns
+
+Components may implement additional state patterns like loading, disabled, or error states. When doing so:
+
+- Combine states appropriately (e.g., `disabled || loading`)
+- Include accessibility attributes (`aria-busy`, `aria-disabled`)
+- Use `data-*` attributes for styling hooks
+
+**Live example:** See `button.tsx` for loading state implementation.
+
 ## Adding to Exports
 
 After creating a component, add to `src/index.ts`:
@@ -271,16 +255,15 @@ After creating a component, add to `src/index.ts`:
 export * from '@/components/ui/new-component';
 ```
 
-## Do Not
+## Checklist
 
-- Forget `nx:` prefix on utility classes
-- Put pseudo-classes before `nx:` prefix (`hover:nx:` is wrong, use `nx:hover:`)
-- Use raw Tailwind colors (use semantic tokens with full path)
-- Use fixed heights/widths for sizing (use padding instead)
-- Forget `data-slot` attribute
-- Export without the variants function or props type
-- Define props inline in function signature (use named interface)
-- Skip `asChild` support for interactive components
-- Use inline styles
-- Use incomplete token paths (`nx:bg-primary` instead of `nx:bg-primary-background`)
-- Use `true`/`false` values in CVA variants (use ternary in component code)
+Before submitting a component:
+
+- [ ] `nx:` prefix on all utility classes
+- [ ] Prefix before ALL modifiers (`nx:hover:`, `nx:[&>svg]:`, `nx:md:` — not `hover:nx:`, `[&>svg]:nx:`)
+- [ ] Full semantic token paths (not incomplete like `nx:bg-primary`)
+- [ ] `data-slot` attribute present
+- [ ] Padding-based sizing (no fixed heights unless necessary)
+- [ ] Named interface with JSDoc for custom props
+- [ ] Exports include component, props type, and variants function
+- [ ] `asChild` support for interactive components

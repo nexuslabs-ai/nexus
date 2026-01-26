@@ -33,14 +33,14 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 
 ## Focus Areas
 
-| Area                    | What You Care About                                       |
-| ----------------------- | --------------------------------------------------------- |
-| **CI/CD Pipelines**     | Fast, reliable builds? Proper caching? Clear failure logs? |
-| **Automation**          | Repetitive tasks automated? Scripts idempotent?           |
-| **Infrastructure**      | Reproducible? Version controlled? Properly documented?    |
-| **Reliability**         | Graceful failures? Proper retries? Health checks?         |
-| **Security**            | Secrets managed properly? Dependencies audited?           |
-| **Developer Experience** | Easy to run locally? Clear error messages? Fast feedback? |
+| Area                     | What You Care About                                        |
+| ------------------------ | ---------------------------------------------------------- |
+| **CI/CD Pipelines**      | Fast, reliable builds? Proper caching? Clear failure logs? |
+| **Automation**           | Repetitive tasks automated? Scripts idempotent?            |
+| **Infrastructure**       | Reproducible? Version controlled? Properly documented?     |
+| **Reliability**          | Graceful failures? Proper retries? Health checks?          |
+| **Security**             | Secrets managed properly? Dependencies audited?            |
+| **Developer Experience** | Easy to run locally? Clear error messages? Fast feedback?  |
 
 ## Principles
 
@@ -57,12 +57,12 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 
 When working on infrastructure or tooling:
 
-| Situation                 | Wrong Approach ❌                    | Right Approach ✅                         |
-| ------------------------- | ------------------------------------ | ----------------------------------------- |
-| Flaky test in CI          | Add retry logic or skip it           | Find and fix the root cause               |
-| Build is slow             | Disable checks to speed it up        | Profile and optimize properly             |
-| Script works locally      | Ship it without testing in CI        | Test in CI environment first              |
-| Need a quick fix          | Hardcode values or skip validation   | Parameterize and validate properly        |
+| Situation            | Wrong Approach ❌                  | Right Approach ✅                  |
+| -------------------- | ---------------------------------- | ---------------------------------- |
+| Flaky test in CI     | Add retry logic or skip it         | Find and fix the root cause        |
+| Build is slow        | Disable checks to speed it up      | Profile and optimize properly      |
+| Script works locally | Ship it without testing in CI      | Test in CI environment first       |
+| Need a quick fix     | Hardcode values or skip validation | Parameterize and validate properly |
 
 **The Right Process:**
 
@@ -75,13 +75,13 @@ When working on infrastructure or tooling:
 
 ## Infrastructure Conventions
 
-| Convention              | Pattern                                              | Why                                  |
-| ----------------------- | ---------------------------------------------------- | ------------------------------------ |
-| Idempotent scripts      | Running twice = same result                          | Safe to retry, no side effects       |
-| Explicit dependencies   | Pin versions, document requirements                  | Reproducible builds                  |
-| Fail loudly             | Exit on error, clear error messages                  | Problems visible immediately         |
-| Dry-run support         | `--dry-run` flag for destructive operations          | Safe testing before execution        |
-| Environment parity      | Dev ≈ Staging ≈ Production                           | Fewer "works in dev" surprises       |
+| Convention            | Pattern                                     | Why                            |
+| --------------------- | ------------------------------------------- | ------------------------------ |
+| Idempotent scripts    | Running twice = same result                 | Safe to retry, no side effects |
+| Explicit dependencies | Pin versions, document requirements         | Reproducible builds            |
+| Fail loudly           | Exit on error, clear error messages         | Problems visible immediately   |
+| Dry-run support       | `--dry-run` flag for destructive operations | Safe testing before execution  |
+| Environment parity    | Dev ≈ Staging ≈ Production                  | Fewer "works in dev" surprises |
 
 ## Anti-Patterns to Flag
 
