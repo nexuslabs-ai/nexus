@@ -1,7 +1,7 @@
 {
   "componentName": "Avatar",
   "metadata": {
-    "id": "fdd05416-85f1-4d61-a85d-803b6b828b8d",
+    "id": "265e6fe0-3ba2-4b10-8da5-f33dbb0cfaf7",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-27T16:29:28.538Z",
-    "updatedAt": "2026-01-27T16:29:28.538Z",
+    "generatedAt": "2026-01-28T09:25:27.984Z",
+    "updatedAt": "2026-01-28T09:25:27.984Z",
     "sourceHash": "5f37ce2090e97269e14d8ccdc62b2b6df9bf6df776c94154f188b1c71a7e69a4",
     "metaHash": "4b4880b434830f4072efb3054d70ba245b68881663336beeada65d9a063a3744",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Avatar",
-    "slug": "avatar-react-fdd05416",
+    "slug": "avatar-react-265e6fe0",
     "description": "The Avatar component provides a flexible and accessible way to display visual identifiers for users or entities. It supports displaying a profile image, with robust fallback mechanisms to initials generated from a name, or a generic placeholder icon if neither an image nor initials are available. Key features include customizable 'size' (ranging from '2xs' to '4xl') and 'shape' ('circle' or 'rounded'), allowing it to adapt to diverse design contexts. It's built on `@radix-ui/react-avatar` for solid accessibility and behavior, ensuring a consistent user experience across applications. Common use cases include user profile sections, comment threads, team directories, and social media feeds, where a compact visual representation of an individual or organization is needed.",
     "importStatement": {
       "primary": "import { Avatar, AvatarFallback, AvatarImage } from '@nexus/react'",
@@ -154,6 +154,6 @@
       }
     ]
   },
-  "recordedAt": "2026-01-27T16:29:28.539Z",
+  "recordedAt": "2026-01-28T09:25:27.985Z",
   "fixtureSource": "nexus/avatar"
 }

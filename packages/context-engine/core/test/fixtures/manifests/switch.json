@@ -1,7 +1,7 @@
 {
   "componentName": "Switch",
   "metadata": {
-    "id": "228eaa12-6f3b-4222-af55-7b6266bb7dbc",
+    "id": "59bdefb7-2c18-44ea-8c05-ee657688d803",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-27T16:30:11.607Z",
-    "updatedAt": "2026-01-27T16:30:11.607Z",
+    "generatedAt": "2026-01-28T09:26:11.175Z",
+    "updatedAt": "2026-01-28T09:26:11.175Z",
     "sourceHash": "9c733fa5079da167dacff4377b8ffe5a8870a86ea533598f7674b1e71dd6918b",
     "metaHash": "1530e3cb60a3eb9a94dd8e5267acfb2f6580171675cf83c996bb9e208df99e38",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Switch",
-    "slug": "switch-react-228eaa12",
+    "slug": "switch-react-59bdefb7",
     "description": "The Switch component provides an intuitive toggle mechanism for binary states (e.g., on/off, enabled/disabled). It's designed for user settings or preferences that, when changed, apply their effect instantly without requiring an explicit 'save' action. Key features include its clear visual feedback, immediate state changes upon interaction, and adherence to accessibility standards for interactive form controls. Common use cases involve toggling notifications, activating dark mode, enabling feature flags, or any simple binary configuration within an application. It's built on Radix UI, ensuring robust accessibility and behavior.",
     "importStatement": {
       "primary": "import { Switch } from '@nexus/react'",
@@ -96,6 +96,6 @@
       "component": "Switch"
     }
   },
-  "recordedAt": "2026-01-27T16:30:11.607Z",
+  "recordedAt": "2026-01-28T09:26:11.175Z",
   "fixtureSource": "nexus/switch"
 }

@@ -1,7 +1,7 @@
 {
   "componentName": "DropdownMenu",
   "metadata": {
-    "id": "71164775-c3f5-41d3-820d-575268e368d6",
+    "id": "91cb990b-3cf2-4f8f-966c-34617524150f",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,18 +14,18 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-27T16:29:55.492Z",
-    "updatedAt": "2026-01-27T16:29:55.492Z",
+    "generatedAt": "2026-01-28T09:25:54.981Z",
+    "updatedAt": "2026-01-28T09:25:54.981Z",
     "sourceHash": "caff64d02acefc747275cfabb5382fa83b2342d57997d8b5e0105a3323a8d74f",
-    "metaHash": "43ada4b0b29ec5ae88c54db7133725c2b1df5109aba904e1bd5c3ff6c5f98b3f",
+    "metaHash": "e39140436ac8656760822b7dda2ad3aa40b0c3a9d8ca350352a5cb0dff25dfd7",
     "files": [
       "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/dropdown-menu.tsx"
     ]
   },
   "manifest": {
     "name": "DropdownMenu",
-    "slug": "dropdown-menu-react-71164775",
-    "description": "The DropdownMenu component offers an accessible and space-efficient way to present a collection of actions or choices to users. It typically comprises a trigger element that, when activated, reveals an overlay containing a list of interactive menu items. Key functionalities include robust keyboard navigation, precise focus management, and compatibility with various item types like clickable actions, checkboxes, radio groups, and visual separators. It is particularly well-suited for scenarios where screen real estate is at a premium or when actions are specific to a particular context, such as 'Edit', 'Delete', or 'Share' options associated with an item in a list, or for user profile settings. This component leverages `@radix-ui/react-dropdown-menu` to ensure a high standard of accessibility and predictable behavior.",
+    "slug": "dropdown-menu-react-91cb990b",
+    "description": "The DropdownMenu component provides an accessible and highly customizable solution for displaying a list of choices or actions. Built on Radix UI primitives, it offers robust features like keyboard navigation, focus management, and proper ARIA attribute handling out of the box. It's suitable for various use cases such as user account menus, contextual action lists (e.g., 'Edit', 'Delete', 'Share'), 'more' options buttons, or filtering/sorting controls. The component includes a trigger element and a content area that can host `DropdownMenu.Item`, `DropdownMenu.Separator`, and `DropdownMenu.Label` components, allowing for flexible and semantically rich menus. Its composable nature enables developers to create complex menu structures while maintaining accessibility standards.",
     "importStatement": {
       "primary": "import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@nexus/react'",
       "typeOnly": "import type { DropdownMenuProps } from '@nexus/react'"
@@ -68,14 +68,14 @@
       ]
     },
     "guidance": {
-      "whenToUse": "Use when space is limited, to provide context-sensitive actions for an element, or to group related actions under a single trigger.",
-      "whenNotToUse": "Do not use for primary navigation items that need to be always visible. For only 2-3 simple options, consider a Button or a segmented button instead to reduce cognitive load.",
-      "accessibility": "Ensure proper keyboard navigation (arrow keys, Enter/Space) for menu items. Implement ARIA attributes such as role=\"menu\", role=\"menuitem\", aria-haspopup=\"menu\", and aria-expanded. Manage focus effectively upon opening and closing the menu to guide users.",
+      "whenToUse": "Use a DropdownMenu when you need to offer a list of related actions or options that appear in a small overlay, often triggered by a button or an icon. Ideal for saving space and grouping less frequently used actions, such as user profile menus, context-sensitive operations, or 'more' menus.",
+      "whenNotToUse": "Avoid using a DropdownMenu for primary navigation (use a NavBar or Tabs), when there are only one or two actions (use a Button or ButtonGroup), or when options require complex forms or detailed explanations (use a Modal or a dedicated page).",
+      "accessibility": "Ensures full keyboard navigation support, including arrow keys for item selection, Escape key to close, and Enter/Space to activate. Follows ARIA best practices for `menu`, `menuitem`, `button`, and `separator` roles, providing appropriate `aria-haspopup` and `aria-expanded` attributes for screen reader users.",
       "patterns": [
         "disclosure",
         "overlay",
-        "selection",
         "navigation",
+        "selection",
         "compound"
       ],
       "relatedComponents": ["Button", "Select"]
@@ -268,6 +268,6 @@
       "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#root"
     }
   },
-  "recordedAt": "2026-01-27T16:29:55.492Z",
+  "recordedAt": "2026-01-28T09:25:54.981Z",
   "fixtureSource": "nexus/dropdown-menu"
 }

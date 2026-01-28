@@ -1,7 +1,7 @@
 {
   "componentName": "Tabs",
   "metadata": {
-    "id": "7098d695-cbeb-4f83-b3ce-4b8d2b37a122",
+    "id": "3b447de2-01bf-4112-8a3b-590c601af2bb",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-27T16:30:16.976Z",
-    "updatedAt": "2026-01-27T16:30:16.976Z",
+    "generatedAt": "2026-01-28T09:26:16.615Z",
+    "updatedAt": "2026-01-28T09:26:16.615Z",
     "sourceHash": "0d1f3263048d57d9dfebd080c657c3ea0b3b7133a78c99b3627f1d3feae38333",
     "metaHash": "61beb4e7aee0bfb006cd055833be5cc66c93a40165dc06b604f415fad9a8eae1",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Tabs",
-    "slug": "tabs-react-7098d695",
+    "slug": "tabs-react-3b447de2",
     "description": "The Tabs component is a fundamental UI element designed to organize and separate related content into distinct, switchable sections within a single view. It provides a structured way to present large amounts of information without overwhelming the user, improving readability and user experience. Key features include state management for active tabs, logical grouping of content panels, and intuitive navigation between sections. Tabs are commonly used in various application contexts such as user profile settings, product detail pages (e.g., description, reviews, specifications), data dashboards with different analytical views, or multi-step forms where each step is a tab. It acts as a container for `TabList`, `Tab`, and `TabPanel` sub-components, managing their interaction and ensuring only the content of the currently active tab is visible.",
     "importStatement": {
       "primary": "import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus/react'",
@@ -126,6 +126,6 @@
       "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tabs#root"
     }
   },
-  "recordedAt": "2026-01-27T16:30:16.976Z",
+  "recordedAt": "2026-01-28T09:26:16.615Z",
   "fixtureSource": "nexus/tabs"
 }

@@ -1,7 +1,7 @@
 {
   "componentName": "Alert",
   "metadata": {
-    "id": "d92ac321-ca6e-4a12-b1eb-dd2ffdf36eb2",
+    "id": "ea15be9a-f019-46c5-8505-845e4857955c",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-27T16:29:23.132Z",
-    "updatedAt": "2026-01-27T16:29:23.132Z",
+    "generatedAt": "2026-01-28T09:25:22.595Z",
+    "updatedAt": "2026-01-28T09:25:22.595Z",
     "sourceHash": "683f2916b687c75b1d58f9d643d66fa72effc4d5b512c78d2f98fd25e55ac1bc",
     "metaHash": "d7d878fea0801c0f73fb098515bda9e7a34f71f21e43686c87f85d6ab6edb9c3",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Alert",
-    "slug": "alert-react-d92ac321",
+    "slug": "alert-react-ea15be9a",
     "description": "The Alert component is a versatile UI element designed to display prominent, context-sensitive messages to users. It's ideal for conveying critical information such as warnings, errors, success notifications, or general informational updates that require immediate user attention without being blocking. Key features include support for different visual variants (default, destructive, success, warning) to semantically indicate the message type, and optional icon integration to enhance clarity. Use cases include form validation feedback, system status updates, confirmation messages after user actions, or drawing attention to important announcements within an application interface.",
     "importStatement": {
       "primary": "import { Alert, AlertDescription, AlertTitle } from '@nexus/react'",
@@ -118,6 +118,6 @@
       }
     ]
   },
-  "recordedAt": "2026-01-27T16:29:23.132Z",
+  "recordedAt": "2026-01-28T09:25:22.596Z",
   "fixtureSource": "nexus/alert"
 }

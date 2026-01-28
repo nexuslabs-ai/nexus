@@ -8,6 +8,7 @@
  * produces the complete component knowledge ready for storage.
  */
 
+import { inferDataSlot } from '../extractor/compound-detector.js';
 import type { ExtractedStory } from '../extractor/storybook/types.js';
 import type {
   AIManifest,
@@ -50,6 +51,18 @@ import {
 
 /** Default package name when detection fails */
 const DEFAULT_PACKAGE_NAME = '@nexus/react';
+
+/**
+ * Maximum number of common examples to include in the manifest.
+ * Common examples show typical usage patterns for the component.
+ */
+const MAX_COMMON_EXAMPLES = 8;
+
+/**
+ * Maximum number of advanced examples to include in the manifest.
+ * Advanced examples show complex integration or edge case patterns.
+ */
+const MAX_ADVANCED_EXAMPLES = 3;
 
 /**
  * ManifestBuilder combines extracted data and generated metadata
@@ -417,7 +430,7 @@ export class ManifestBuilder {
         name: sub.name,
         description: sub.description,
         props: categorizedProps,
-        dataSlot: this.inferDataSlot(sub.name),
+        dataSlot: inferDataSlot(sub.name),
         requiredInComposition: sub.requiredInComposition,
       };
 
@@ -436,19 +449,6 @@ export class ManifestBuilder {
 
       return subComponent;
     });
-  }
-
-  /**
-   * Infer data-slot value from component name
-   *
-   * Converts PascalCase to kebab-case for data-slot attribute.
-   * Example: "DropdownMenuItem" -> "dropdown-menu-item"
-   *
-   * @param componentName - PascalCase component name
-   * @returns kebab-case data-slot value
-   */
-  private inferDataSlot(componentName: string): string {
-    return componentName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
   }
 
   /**
@@ -518,20 +518,20 @@ export class ManifestBuilder {
       isPrimary: true,
     };
 
-    // Common examples (max 8) - exclude the minimal story
+    // Common examples - exclude the minimal story
     const common: CodeExample[] = stories
       .filter((s) => s.complexity === 'common' && s !== minimalStory)
-      .slice(0, 8)
+      .slice(0, MAX_COMMON_EXAMPLES)
       .map((s) => ({
         title: s.title,
         code: s.renderCode ?? s.code ?? `<${componentName} />`,
       }));
 
-    // Advanced examples (max 3)
+    // Advanced examples
     const advancedStories = stories.filter((s) => s.complexity === 'advanced');
     const advanced: CodeExample[] | undefined =
       advancedStories.length > 0
-        ? advancedStories.slice(0, 3).map((s) => ({
+        ? advancedStories.slice(0, MAX_ADVANCED_EXAMPLES).map((s) => ({
             title: s.title,
             code: s.renderCode ?? s.code ?? `<${componentName} />`,
           }))

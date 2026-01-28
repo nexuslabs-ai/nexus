@@ -91,11 +91,18 @@ export function generateImportStatement(
 /**
  * Derive package name from extracted dependencies
  *
- * Attempts to find the main package that exports this component
- * by analyzing the extracted npm dependencies.
+ * This utility is exported for external CLI consumers who need to detect
+ * the component's source package. ManifestBuilder uses separate internal
+ * logic that respects the defaultPackageName configuration.
  *
- * @param npmDependencies - Record of npm package dependencies
- * @returns The package name or undefined if not found
+ * Priority order:
+ * 1. Design system packages (@scope/react, @scope/components, @scope/ui)
+ * 2. Fallback to first scoped package (excluding @types/*)
+ * 3. Returns undefined if no suitable package found
+ *
+ * @public This is part of the public API for CLI consumers
+ * @param npmDependencies - Record of npm package dependencies from component file
+ * @returns The detected package name or undefined if not found
  */
 export function derivePackageName(
   npmDependencies: Record<string, string>

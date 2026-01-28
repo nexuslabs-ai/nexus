@@ -27,6 +27,7 @@ import {
 import type { ExtractedProp } from '../types/index.js';
 import { pascalCase } from '../utils/case.js';
 import { createLogger } from '../utils/logger.js';
+import { extractEnumValues, simplifyType } from '../utils/type-utils.js';
 
 import {
   ExtractorMethod,
@@ -472,10 +473,10 @@ export class TsMorphExtractor implements IPropsExtractor {
 
     return {
       name,
-      type: this.simplifyType(rawType),
+      type: simplifyType(rawType),
       description,
       defaultValue,
-      values: this.extractEnumValues(rawType),
+      values: extractEnumValues(rawType),
       required: !isOptional,
       isChildren: name === 'children',
       isClassName: name === 'className',
@@ -483,49 +484,6 @@ export class TsMorphExtractor implements IPropsExtractor {
       deprecated,
       deprecationMessage,
     };
-  }
-
-  /**
-   * Simplify a TypeScript type string for AI consumption
-   */
-  private simplifyType(typeString: string): string {
-    // String literal unions → 'string'
-    if (typeString.includes('|') && typeString.includes('"')) {
-      const withoutNullish = typeString
-        .split('|')
-        .map((s) => s.trim())
-        .filter((s) => s !== 'null' && s !== 'undefined')
-        .join(' | ');
-
-      if (/^["'][^"']+["'](\s*\|\s*["'][^"']+["'])*$/.test(withoutNullish)) {
-        return 'string';
-      }
-    }
-
-    // Boolean literals → 'boolean'
-    const normalized = typeString.replace(/\s/g, '');
-    if (normalized === 'true|false' || normalized === 'false|true') {
-      return 'boolean';
-    }
-
-    return typeString;
-  }
-
-  /**
-   * Extract enum/union values from type string
-   */
-  private extractEnumValues(typeString: string): string[] | undefined {
-    if (!typeString.includes('|') || !typeString.includes('"')) {
-      // Also check for single quotes
-      if (!typeString.includes("'")) return undefined;
-    }
-
-    const matches = typeString.match(/["']([^"']+)["']/g);
-    if (!matches || matches.length === 0) {
-      return undefined;
-    }
-
-    return matches.map((m) => m.replace(/["']/g, ''));
   }
 
   /**

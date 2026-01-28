@@ -12,12 +12,12 @@
  */
 
 import {
+  type ExtractionFailure,
   type ExtractionInput,
   type ExtractionOutput,
   type ExtractorResult,
   getExtractor,
   isExtractionFailure,
-  isExtractionSuccess,
 } from '../extractor/index.js';
 import {
   type GeneratorFailure,
@@ -147,7 +147,7 @@ export class ComponentProcessor {
 
     // Step 1: Extract
     const extractionResult = await this.runExtraction(input, framework);
-    if (!isExtractionSuccess(extractionResult.output)) {
+    if (isExtractionFailure(extractionResult.output)) {
       return this.handleExtractionFailure(
         extractionResult.output,
         extractionResult.timeMs,
@@ -432,7 +432,7 @@ export class ComponentProcessor {
 
     // Extract
     const extractionResult = await this.runExtraction(input, framework);
-    if (!isExtractionSuccess(extractionResult.output)) {
+    if (isExtractionFailure(extractionResult.output)) {
       return this.handleExtractionFailure(
         extractionResult.output,
         extractionResult.timeMs,
@@ -616,32 +616,20 @@ export class ComponentProcessor {
    * Handle extraction failure
    */
   private handleExtractionFailure(
-    output: ExtractionOutput,
+    failure: ExtractionFailure,
     extractionTimeMs: number,
     startTime: number
   ): ProcessorFailure {
     const totalTimeMs = Math.round(performance.now() - startTime);
 
-    // ExtractionFailure - use type guard to narrow
-    if (isExtractionFailure(output)) {
-      logger.error('Extraction failed', new Error(output.error));
+    logger.error('Extraction failed', new Error(failure.error));
 
-      return {
-        type: ProcessorOutputType.Failure,
-        error: output.error,
-        code: ProcessorErrorCode.ExtractionFailed,
-        metrics: { extractionTimeMs, totalTimeMs },
-        retryable: true,
-      };
-    }
-
-    // ExtractorResult (success) - should not reach here since caller checks for success
     return {
       type: ProcessorOutputType.Failure,
-      error: 'Unexpected extraction state',
+      error: failure.error,
       code: ProcessorErrorCode.ExtractionFailed,
       metrics: { extractionTimeMs, totalTimeMs },
-      retryable: false,
+      retryable: true,
     };
   }
 

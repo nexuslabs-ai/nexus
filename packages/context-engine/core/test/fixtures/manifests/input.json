@@ -1,7 +1,7 @@
 {
   "componentName": "Input",
   "metadata": {
-    "id": "4e382fea-fac6-4438-93de-a2a1df13c2b9",
+    "id": "6449940c-3d70-4b40-8995-3207dc3f7654",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-27T16:30:00.871Z",
-    "updatedAt": "2026-01-27T16:30:00.871Z",
+    "generatedAt": "2026-01-28T09:26:00.385Z",
+    "updatedAt": "2026-01-28T09:26:00.385Z",
     "sourceHash": "fa4d68b02433c4f701c8bbdd0510e4e118bcd7fa757c1521b45c56d1d2739f73",
     "metaHash": "57a93a38f14b96c89d7b7abc29568757a659babe6dbcc6f00bdad7bc4a89d776",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Input",
-    "slug": "input-react-4e382fea",
+    "slug": "input-react-6449940c",
     "description": "The Input component provides a flexible and accessible text input field for collecting various types of user data within forms or other interactive interfaces. It supports all standard native HTML input attributes (e.g., `type`, `placeholder`, `name`, `value`, `disabled`, `readOnly`, `required`, `pattern`, `maxLength`). Key features include customizable sizing through 'sm', 'default', and 'lg' variants, allowing for consistent visual styling across different contexts. It's ideal for capturing short textual information like usernames, email addresses, passwords, search terms, or general-purpose text entry where a single line is sufficient. The component integrates seamlessly into forms and ensures proper accessibility by supporting associated labels and ARIA attributes to enhance usability for all users.",
     "importStatement": {
       "primary": "import { Input } from '@nexus/react'",
@@ -103,6 +103,6 @@
       "internal": []
     }
   },
-  "recordedAt": "2026-01-27T16:30:00.871Z",
+  "recordedAt": "2026-01-28T09:26:00.385Z",
   "fixtureSource": "nexus/input"
 }

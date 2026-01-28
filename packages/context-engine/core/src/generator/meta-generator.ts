@@ -129,36 +129,37 @@ function buildDefaultSemanticDescription(
  *
  * Collects unique code examples from minimalExample, examples.minimal,
  * examples.common, and examples.advanced fields.
+ *
+ * Uses Set for O(1) deduplication instead of array includes() O(n) checks.
  */
 function extractExamplesFromToolOutput(tool: ComponentMetaTool): string[] {
-  const examples: string[] = [];
+  const exampleSet = new Set<string>();
 
   // Add minimal example first
-  examples.push(tool.minimalExample);
+  exampleSet.add(tool.minimalExample);
 
   // Add examples from structured format
-  if (
-    tool.examples.minimal?.code &&
-    !examples.includes(tool.examples.minimal.code)
-  ) {
-    examples.push(tool.examples.minimal.code);
-  }
-  if (tool.examples.common) {
-    tool.examples.common.forEach((ex) => {
-      if (ex.code && !examples.includes(ex.code)) {
-        examples.push(ex.code);
-      }
-    });
-  }
-  if (tool.examples.advanced) {
-    tool.examples.advanced.forEach((ex) => {
-      if (ex.code && !examples.includes(ex.code)) {
-        examples.push(ex.code);
-      }
-    });
+  if (tool.examples.minimal?.code) {
+    exampleSet.add(tool.examples.minimal.code);
   }
 
-  return examples;
+  if (tool.examples.common) {
+    for (const ex of tool.examples.common) {
+      if (ex.code) {
+        exampleSet.add(ex.code);
+      }
+    }
+  }
+
+  if (tool.examples.advanced) {
+    for (const ex of tool.examples.advanced) {
+      if (ex.code) {
+        exampleSet.add(ex.code);
+      }
+    }
+  }
+
+  return Array.from(exampleSet);
 }
 
 /**
@@ -183,17 +184,13 @@ function normalizeToolOutputToMeta(
   );
 
   // Get semantic description with fallback
-  let semanticDescription = normalizeString(
+  // normalizeString already returns defaultSemanticDescription if input is too short
+  const semanticDescription = normalizeString(
     tool.semanticDescription,
     defaultSemanticDescription,
     config.minSemanticDescriptionLength,
     config.maxSemanticDescriptionLength
   );
-
-  // If still too short, use the fallback
-  if (semanticDescription.length < config.minSemanticDescriptionLength) {
-    semanticDescription = defaultSemanticDescription;
-  }
 
   // Normalize patterns to only include valid ones
   const patterns = filterValidPatterns(tool.guidance.patterns);

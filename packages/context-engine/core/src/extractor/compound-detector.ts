@@ -10,7 +10,13 @@
  * 3. Radix-style re-exports (export { Root as Dialog, Trigger as DialogTrigger })
  */
 
-import { Project, type SourceFile, SyntaxKind } from 'ts-morph';
+import {
+  type CallExpression,
+  type ObjectLiteralExpression,
+  Project,
+  type SourceFile,
+  SyntaxKind,
+} from 'ts-morph';
 
 import type { CompoundComponentInfo } from '../types/index.js';
 import { kebabCase } from '../utils/case.js';
@@ -143,6 +149,75 @@ function extractNamedExports(sourceFile: SourceFile): string[] {
 }
 
 /**
+ * Check if a call expression is an Object.assign call
+ */
+function isObjectAssignCall(call: CallExpression): boolean {
+  const expression = call.getExpression();
+  if (expression.getKind() !== SyntaxKind.PropertyAccessExpression) {
+    return false;
+  }
+  return expression.getText() === 'Object.assign';
+}
+
+/**
+ * Extract the root component name from an Object.assign call
+ *
+ * Returns the variable name if:
+ * - The call is assigned to a variable declaration
+ * - The variable name starts with uppercase (component convention)
+ */
+function extractRootNameFromCall(call: CallExpression): string | null {
+  const parent = call.getParent();
+  if (parent?.getKind() !== SyntaxKind.VariableDeclaration) {
+    return null;
+  }
+
+  const variableDecl = parent.asKind(SyntaxKind.VariableDeclaration);
+  const rootName = variableDecl?.getName();
+
+  if (!rootName || !/^[A-Z]/.test(rootName)) {
+    return null;
+  }
+
+  return rootName;
+}
+
+/**
+ * Extract sub-component names from an object literal argument
+ *
+ * Handles both regular property assignments and shorthand properties:
+ * - { Item: AccordionItem } → "Item"
+ * - { Item } → "Item"
+ */
+function extractSubComponentsFromObject(
+  objLiteral: ObjectLiteralExpression
+): string[] {
+  const subComponents: string[] = [];
+  const properties = objLiteral.getProperties();
+
+  for (const prop of properties) {
+    if (prop.getKind() === SyntaxKind.PropertyAssignment) {
+      const propAssignment = prop.asKind(SyntaxKind.PropertyAssignment);
+      const propName = propAssignment?.getName();
+      if (propName) {
+        subComponents.push(propName);
+      }
+      continue;
+    }
+
+    if (prop.getKind() === SyntaxKind.ShorthandPropertyAssignment) {
+      const shorthand = prop.asKind(SyntaxKind.ShorthandPropertyAssignment);
+      const propName = shorthand?.getName();
+      if (propName) {
+        subComponents.push(propName);
+      }
+    }
+  }
+
+  return subComponents;
+}
+
+/**
  * Detect Object.assign pattern for compound components
  *
  * @example
@@ -160,65 +235,37 @@ function detectObjectAssignPattern(sourceFile: SourceFile): {
   );
 
   for (const call of callExpressions) {
-    const expression = call.getExpression();
-
-    // Check for Object.assign pattern
-    if (expression.getKind() === SyntaxKind.PropertyAccessExpression) {
-      const text = expression.getText();
-      if (text === 'Object.assign') {
-        // Get the variable declaration this is assigned to
-        const parent = call.getParent();
-        if (parent?.getKind() === SyntaxKind.VariableDeclaration) {
-          const variableDecl = parent.asKind(SyntaxKind.VariableDeclaration);
-          const rootName = variableDecl?.getName();
-
-          if (rootName && /^[A-Z]/.test(rootName)) {
-            // Extract sub-component names from the second argument (the object)
-            const args = call.getArguments();
-            if (args.length >= 2) {
-              const objArg = args[1];
-              if (objArg.getKind() === SyntaxKind.ObjectLiteralExpression) {
-                const objLiteral = objArg.asKind(
-                  SyntaxKind.ObjectLiteralExpression
-                );
-                const subComponents: string[] = [];
-
-                if (objLiteral) {
-                  const properties = objLiteral.getProperties();
-                  for (const prop of properties) {
-                    if (prop.getKind() === SyntaxKind.PropertyAssignment) {
-                      const propAssignment = prop.asKind(
-                        SyntaxKind.PropertyAssignment
-                      );
-                      const propName = propAssignment?.getName();
-                      if (propName) {
-                        // Sub-component name is Root.SubName, so we use propName
-                        subComponents.push(propName);
-                      }
-                    }
-                    if (
-                      prop.getKind() === SyntaxKind.ShorthandPropertyAssignment
-                    ) {
-                      const shorthand = prop.asKind(
-                        SyntaxKind.ShorthandPropertyAssignment
-                      );
-                      const propName = shorthand?.getName();
-                      if (propName) {
-                        subComponents.push(propName);
-                      }
-                    }
-                  }
-                }
-
-                if (subComponents.length > 0) {
-                  return { rootComponent: rootName, subComponents };
-                }
-              }
-            }
-          }
-        }
-      }
+    if (!isObjectAssignCall(call)) {
+      continue;
     }
+
+    const rootName = extractRootNameFromCall(call);
+    if (!rootName) {
+      continue;
+    }
+
+    // Extract sub-component names from the second argument (the object)
+    const args = call.getArguments();
+    if (args.length < 2) {
+      continue;
+    }
+
+    const objArg = args[1];
+    if (objArg.getKind() !== SyntaxKind.ObjectLiteralExpression) {
+      continue;
+    }
+
+    const objLiteral = objArg.asKind(SyntaxKind.ObjectLiteralExpression);
+    if (!objLiteral) {
+      continue;
+    }
+
+    const subComponents = extractSubComponentsFromObject(objLiteral);
+    if (subComponents.length === 0) {
+      continue;
+    }
+
+    return { rootComponent: rootName, subComponents };
   }
 
   return null;

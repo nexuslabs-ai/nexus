@@ -11,8 +11,10 @@ import {
   type Expression,
   type FunctionExpression,
   type Node,
+  type ObjectLiteralElementLike,
   type ObjectLiteralExpression,
   Project,
+  type PropertyAssignment,
   type SourceFile,
   SyntaxKind,
   ts,
@@ -659,55 +661,108 @@ export class StorybookExtractor {
     args: Record<string, unknown>
   ): boolean {
     // Check chromatic.disableSnapshot
-    const paramsProp = storyObj
-      .getProperty('parameters')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-
-    if (paramsProp) {
-      const paramsObj = paramsProp
-        .getInitializer()
-        ?.asKind(SyntaxKind.ObjectLiteralExpression);
-
-      if (paramsObj) {
-        const chromaticProp = paramsObj
-          .getProperty('chromatic')
-          ?.asKind(SyntaxKind.PropertyAssignment);
-
-        if (chromaticProp) {
-          const chromaticObj = chromaticProp
-            .getInitializer()
-            ?.asKind(SyntaxKind.ObjectLiteralExpression);
-
-          if (chromaticObj) {
-            const disableSnapshotProp = chromaticObj
-              .getProperty('disableSnapshot')
-              ?.asKind(SyntaxKind.PropertyAssignment);
-
-            if (disableSnapshotProp) {
-              const value = disableSnapshotProp.getInitializer();
-              if (value?.getKind() === SyntaxKind.TrueKeyword) {
-                return true;
-              }
-            }
-          }
-        }
-      }
+    if (this.hasChromaticDisableSnapshot(storyObj)) {
+      return true;
     }
 
     // Story with play but no meaningful args or render is likely interaction-only
-    if (hasPlay && Object.keys(args).length <= 1) {
-      // Only children arg is not meaningful enough
-      const onlyChildren = Object.keys(args).length === 1 && 'children' in args;
-      if (onlyChildren || Object.keys(args).length === 0) {
-        // Check if it has render function
-        const hasRender = storyObj.getProperty('render') !== undefined;
-        if (!hasRender) {
-          return false; // Simple story with play - might still be visual
-        }
-      }
+    if (!hasPlay || Object.keys(args).length > 1) {
+      return false;
+    }
+
+    // Only children arg is not meaningful enough
+    const onlyChildren = Object.keys(args).length === 1 && 'children' in args;
+    if (!onlyChildren && Object.keys(args).length !== 0) {
+      return false;
+    }
+
+    // Check if it has render function
+    const hasRender = storyObj.getProperty('render') !== undefined;
+    if (!hasRender) {
+      return false; // Simple story with play - might still be visual
     }
 
     return false;
+  }
+
+  /**
+   * Get a nested object property from an ObjectLiteralExpression
+   *
+   * @param obj - The root object literal
+   * @param propertyPath - Dot-separated path (e.g., "chromatic.disableSnapshot")
+   * @returns The property assignment at the path, or undefined if not found
+   */
+  private getNestedProperty(
+    obj: ObjectLiteralExpression,
+    propertyPath: string
+  ): ObjectLiteralElementLike | undefined {
+    const parts = propertyPath.split('.');
+    let current: ObjectLiteralExpression | undefined = obj;
+
+    for (let i = 0; i < parts.length; i++) {
+      if (!current) return undefined;
+
+      const propName = parts[i];
+      const prop: ObjectLiteralElementLike | undefined =
+        current.getProperty(propName);
+      if (!prop) return undefined;
+
+      // Last part - return the property itself
+      if (i === parts.length - 1) {
+        return prop;
+      }
+
+      // Not the last part - drill into the object
+      const assignment: PropertyAssignment | undefined = prop.asKind(
+        SyntaxKind.PropertyAssignment
+      );
+      if (!assignment) return undefined;
+
+      current = assignment
+        .getInitializer()
+        ?.asKind(SyntaxKind.ObjectLiteralExpression);
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Check if story has chromatic.disableSnapshot set to true
+   */
+  private hasChromaticDisableSnapshot(
+    storyObj: ObjectLiteralExpression
+  ): boolean {
+    const paramsObj = this.getObjectPropertyValue(storyObj, 'parameters');
+    if (!paramsObj) return false;
+
+    const disableSnapshotProp = this.getNestedProperty(
+      paramsObj,
+      'chromatic.disableSnapshot'
+    );
+    if (!disableSnapshotProp) return false;
+
+    const assignment = disableSnapshotProp.asKind(
+      SyntaxKind.PropertyAssignment
+    );
+    if (!assignment) return false;
+
+    const value = assignment.getInitializer();
+    return value?.getKind() === SyntaxKind.TrueKeyword;
+  }
+
+  /**
+   * Get the ObjectLiteralExpression value of a property
+   */
+  private getObjectPropertyValue(
+    obj: ObjectLiteralExpression,
+    propertyName: string
+  ): ObjectLiteralExpression | undefined {
+    const prop = obj
+      .getProperty(propertyName)
+      ?.asKind(SyntaxKind.PropertyAssignment);
+    if (!prop) return undefined;
+
+    return prop.getInitializer()?.asKind(SyntaxKind.ObjectLiteralExpression);
   }
 
   /**

@@ -53,3 +53,6 @@ export {
 
 // Environment-based provider selection
 export { createProviderFromEnv } from './env-provider.js';
+
+// Type utilities for extraction
+export { extractEnumValues, simplifyType } from './type-utils.js';
