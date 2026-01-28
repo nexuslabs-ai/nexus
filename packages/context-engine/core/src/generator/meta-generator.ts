@@ -209,6 +209,7 @@ function normalizeToolOutputToMeta(
     relatedComponents: normalizeArray(tool.guidance.relatedComponents),
     a11yNotes: tool.guidance.accessibility,
     baseLibrary: extracted.baseLibrary,
+    variantDescriptions: tool.variantDescriptions,
   };
 
   // Build description with validation
@@ -230,12 +231,48 @@ function normalizeToolOutputToMeta(
 }
 
 /**
+ * Pre-process tool output to handle common LLM output issues
+ *
+ * Some LLMs (notably Gemini) return complex nested objects as stringified JSON.
+ * This function detects and parses such cases before validation.
+ */
+function preprocessToolOutput(data: unknown): unknown {
+  if (typeof data !== 'object' || data === null) {
+    return data;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  // Handle variantDescriptions being returned as a stringified JSON
+  if (
+    typeof obj.variantDescriptions === 'string' &&
+    obj.variantDescriptions.trim().startsWith('{')
+  ) {
+    try {
+      obj.variantDescriptions = JSON.parse(obj.variantDescriptions);
+      logger.debug('Parsed stringified variantDescriptions');
+    } catch {
+      // If parsing fails, remove the field to avoid validation errors
+      // The field is optional, so this is safe
+      logger.warn('Failed to parse stringified variantDescriptions, removing');
+      delete obj.variantDescriptions;
+    }
+  }
+
+  return obj;
+}
+
+/**
  * Validate tool calling output against the schema
  *
  * Even with tool calling, we validate the output as a safety layer.
+ * Pre-processes the output to handle common LLM quirks like stringified nested objects.
  */
 function validateToolOutput(data: unknown): ComponentMetaTool | null {
-  const result = ComponentMetaToolSchema.safeParse(data);
+  // Pre-process to handle LLM quirks
+  const preprocessed = preprocessToolOutput(data);
+
+  const result = ComponentMetaToolSchema.safeParse(preprocessed);
   if (result.success) {
     return result.data;
   }

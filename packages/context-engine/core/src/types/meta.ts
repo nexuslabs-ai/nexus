@@ -70,6 +70,16 @@ export const AIContextSchema = z.object({
 
   /** Base UI library used (Radix, Ark, Base UI, Headless UI, React Aria, etc.) */
   baseLibrary: BaseLibrarySchema.optional(),
+
+  /**
+   * LLM-generated descriptions for variant values
+   * Outer key: variant name (e.g., "variant", "size")
+   * Inner key: value (e.g., "destructive", "lg")
+   * Value: description of what this variant value does
+   */
+  variantDescriptions: z
+    .record(z.string(), z.record(z.string(), z.string()))
+    .optional(),
 });
 
 export type AIContext = z.infer<typeof AIContextSchema>;

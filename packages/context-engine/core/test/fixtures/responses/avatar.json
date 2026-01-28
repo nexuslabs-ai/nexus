@@ -1,30 +1,32 @@
 {
   "componentName": "Avatar",
   "response": {
-    "guidance": {
-      "relatedComponents": ["UserCard", "Comment", "ProfileHeader", "UserMenu"],
-      "patterns": ["data-display", "primitive-based"],
-      "accessibility": "Ensure that if the Avatar displays an image, the `alt` attribute is provided and accurately describes the image for screen readers. For avatars displaying initials, ensure sufficient color contrast between the text and background. The component should gracefully handle missing image sources by displaying fallback content (initials or an icon) and convey this change to assistive technologies appropriately.",
-      "whenNotToUse": "Do not use the Avatar component for general image display or purely decorative images. For broader image display needs, use a dedicated `Image` component. Avoid using it when the primary purpose is not to represent a specific user or entity.",
-      "whenToUse": "Use the Avatar component to visually represent users, accounts, or entities in a concise manner, typically displaying a profile picture, initials, or a generic fallback icon in user lists, comments, or profile headers where a visual identifier is needed."
-    },
-    "tokens": ["spacing", "border-radius", "color-background", "color-text"],
+    "tier": "free",
+    "variantDescriptions": "{\"size\": {\"2xs\": \"Extra extra small size, for compact displays.\", \"xs\": \"Extra small size.\", \"sm\": \"Small size.\", \"md\": \"Medium size (default).\", \"lg\": \"Large size.\", \"xl\": \"Extra large size.\", \"2xl\": \"Extra extra large size.\", \"3xl\": \"Triple extra large size.\", \"4xl\": \"Quadruple extra large size, for prominent displays.\"}, \"shape\": {\"circle\": \"A perfectly round avatar (default).\", \"rounded\": \"A square avatar with rounded corners.\"}}",
+    "semanticDescription": "The Avatar component provides a flexible and accessible way to display visual identifiers for users or entities. It supports displaying a profile image, with robust fallback mechanisms to initials generated from a name, or a generic placeholder icon if neither an image nor initials are available. Key features include customizable 'size' (ranging from '2xs' to '4xl') and 'shape' ('circle' or 'rounded'), allowing it to adapt to diverse design contexts. It's built on `@radix-ui/react-avatar` for solid accessibility and behavior, ensuring a consistent user experience across applications. Common use cases include user profile sections, comment threads, team directories, and social media feeds, where a compact visual representation of an individual or organization is needed.",
     "minimalExample": "<Avatar />",
+    "tokens": ["spacing", "border-radius", "font-size", "color"],
+    "guidance": {
+      "relatedComponents": ["Tooltip", "Badge", "UserMenu", "Text"],
+      "whenToUse": "Use to visually represent users or entities with an associated image or initials. Ideal for user profiles, comment sections, team listings, and any context where a compact visual identifier is needed for an individual or organization.",
+      "whenNotToUse": "Do not use as a general icon component or for purely decorative elements that do not represent a specific user or entity. Avoid using when complex interactive states or detailed information needs to be displayed directly on the avatar, as it is primarily a display component.",
+      "accessibility": "Ensure the underlying 'img' element has a descriptive 'alt' attribute for screen readers. When initials are displayed as a fallback, ensure sufficient color contrast. The component should handle cases gracefully where neither an image nor initials are provided, possibly displaying a generic user icon.",
+      "patterns": ["data-display", "primitive-based", "composition"]
+    },
+    "description": "Displays a user's profile image or initials as a visual identifier.",
     "examples": {
       "common": [],
       "minimal": {
+        "description": "The simplest Avatar component.",
         "title": "Minimal Avatar",
-        "description": "Basic avatar display with default size and shape.",
         "code": "<Avatar />"
-      }
-    },
-    "semanticDescription": "The Avatar component is a versatile UI element designed to provide a compact visual representation of a user, account, or any identifiable entity within an application. Its primary purpose is to display a profile picture, but it intelligently falls back to displaying initials derived from a name, or a generic icon, when an image source is unavailable or fails to load. Key features include configurable `size` variants ('2xs' to '4xl') to fit various layout needs, and `shape` variants ('circle', 'rounded') to align with design aesthetics. It's commonly used in scenarios such as user lists, comment sections, chat interfaces, profile headers, and navigation menus where a quick visual cue for identity is crucial. The component ensures graceful degradation and aims for an accessible experience by handling image loading states and providing alternative text considerations.",
-    "tier": "free",
-    "description": "An Avatar component used to display a user's profile picture, initials, or a fallback icon, providing a visual representation of a user or entity."
+      },
+      "advanced": []
+    }
   },
-  "recordedAt": "2026-01-26T11:19:25.514Z",
+  "recordedAt": "2026-01-27T11:54:18.380Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "4fe4f27d5ac312129203372706413fff687a223b165d123b478837f8566c80e4",
-  "promptSummary": "Generate metadata for Avatar component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Avatar\n\nProps: None extracted\n\nVariants (CVA):\n- size: '2xs', xs, sm, md, lg, xl, '2xl', '..."
+  "inputHash": "d39064ea08434ae729f6f5c17e6fbff123c8421494a763f48c1a418367b097ae",
+  "promptSummary": "Generate metadata for Avatar component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Avatar\nDescription: Avatar\n\nDisplays a user's profile image or initials as a visual identi..."
 }

@@ -11,7 +11,6 @@ import { z } from 'zod';
  * Code example schema
  *
  * A single code example with metadata for AI assistants.
- * Includes information about what props are demonstrated.
  *
  * @example
  * ```json
@@ -19,7 +18,6 @@ import { z } from 'zod';
  *   "title": "Destructive action",
  *   "code": "<Button variant=\"destructive\">Delete</Button>",
  *   "description": "Use for dangerous actions like delete",
- *   "propsUsed": ["variant"],
  *   "isPrimary": false
  * }
  * ```
@@ -33,12 +31,6 @@ export const CodeExampleSchema = z.object({
 
   /** Optional description explaining the use case */
   description: z.string().optional(),
-
-  /**
-   * List of prop names demonstrated in this example
-   * Helps AI understand what patterns this example shows
-   */
-  propsUsed: z.array(z.string()).optional(),
 
   /**
    * Whether this is the primary/default example

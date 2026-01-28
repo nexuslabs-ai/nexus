@@ -1,28 +1,32 @@
 {
   "componentName": "Select",
   "response": {
+    "minimalExample": "<Select />",
+    "tier": "free",
+    "description": "A controlled or uncontrolled select input for choosing a single value from a list of options.",
+    "semanticDescription": "The Select component is a fundamental UI element that allows users to pick a single value from a collection of predefined options. It functions as a controlled or uncontrolled input, managing its open/close state and selected value. Built upon Radix UI primitives, it offers robust accessibility, including keyboard navigation and appropriate ARIA attributes. Key features include handling `value`, `defaultValue`, and `onValueChange` props for state management. It's ideal for forms, filters, and settings where a compact dropdown is required to present a list of choices efficiently.",
     "guidance": {
+      "whenNotToUse": "Avoid using Select for lists with very few options (2-3 items) where radio buttons might offer better discoverability, or for lists with a very large number of options (hundreds or thousands) where an autocomplete or searchable dropdown would provide a better user experience. Do not use for multiple selections; use a Multi-Select component instead.",
+      "accessibility": "The Select component is built on Radix UI's Select primitive, ensuring strong accessibility out-of-the-box. It correctly handles keyboard navigation (up/down arrows, enter, escape), focus management, and ARIA attributes (role='combobox', aria-haspopup, aria-expanded, aria-labelledby, aria-controls) to communicate its state and purpose to assistive technologies. Ensure that the label associated with the Select is programmatically linked using 'id' and 'htmlFor' or 'aria-labelledby'.",
+      "whenToUse": "Use the Select component when you need to allow users to choose a single option from a predefined list. It's suitable for forms, filters, or settings where space is limited, and a dropdown is preferred over radio buttons or a large list box.",
       "relatedComponents": [
+        "Button",
+        "Label",
         "Input",
         "RadioGroup",
-        "Checkbox",
-        "Combobox",
-        "Autocomplete"
+        "Checkbox"
       ],
-      "patterns": ["form-control", "selection", "input", "disclosure"],
-      "whenToUse": "Use the Select component when users need to choose a single option from a predefined list. It is ideal for form inputs where space is limited and a dropdown menu is preferred over multiple radio buttons, especially when the list of options is moderately long (e.g., 5-15 items).",
-      "accessibility": "The Select component built on Radix UI inherently supports robust accessibility. It includes proper ARIA roles and attributes (e.g., \"listbox\", \"aria-haspopup\", \"aria-expanded\", \"aria-controls\") for screen readers. Keyboard navigation (Tab to focus, Space/Enter to open, Up/Down arrows to navigate options, Enter to select, Escape to close) is fully supported. Ensure the component is always associated with a clear <label> element for optimal screen reader context.",
-      "whenNotToUse": "Do not use Select for very few options (2-3 items); prefer RadioGroup. Avoid when users need to select multiple items, instead use a multi-select or checkbox group. For very long lists requiring search or filtering, consider a Combobox or Autocomplete component to improve user experience."
+      "patterns": ["form-control", "input", "selection", "disclosure"]
     },
-    "tier": "free",
-    "semanticDescription": "The Select component provides a robust and accessible way for users to choose a single value from a predefined list of options. Built on the highly customizable Radix UI primitives, it offers a solid foundation for creating consistent and branded select inputs within a design system. Key features include a customizable trigger button, a scrollable dropdown menu for options, comprehensive keyboard navigation, and inherent accessibility support ensuring it works well with assistive technologies. This component is ideal for scenarios like selecting a country in a registration form, choosing a sorting preference for a data table, or categorizing an item from a fixed set of categories. It effectively manages lists of varying lengths, providing a clean and intuitive user experience while maintaining compliance with accessibility standards.",
-    "minimalExample": "<Select />",
     "tokens": [
-      "color-text",
-      "color-background",
-      "color-border",
+      "color-text-default",
+      "color-border-default",
+      "color-background-surface",
+      "color-background-hover",
       "color-primary",
+      "spacing-sm",
       "spacing-md",
+      "font-family-sans",
       "font-size-md",
       "border-radius-sm",
       "shadow-sm"
@@ -30,17 +34,15 @@
     "examples": {
       "common": [],
       "minimal": {
-        "description": "A basic select component.",
-        "propsUsed": [],
         "code": "<Select />",
-        "title": "Basic Select"
+        "title": "Basic Select",
+        "description": "A basic select component."
       }
-    },
-    "description": "A customizable and accessible form control for selecting a single option from a dropdown list."
+    }
   },
-  "recordedAt": "2026-01-26T11:21:01.522Z",
+  "recordedAt": "2026-01-27T11:56:04.239Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "2010ee18602cb804faac312f6e9620d25d12e176b2fd084b25d858d224c6a57d",
-  "promptSummary": "Generate metadata for Select component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Select\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-select, @/lib\n\nBase Libra..."
+  "inputHash": "85b478059d6f7f4eae0c8ab84780e23681dc4e223ba7b183d0f49a6d893bd5d0",
+  "promptSummary": "Generate metadata for Select component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Select\nDescription: Select\n\nRoot component for the select. Controls open/close state and v..."
 }

@@ -82,6 +82,120 @@ export class VariantExtractor {
   }
 
   /**
+   * Extract CVA variants for a specific component by name
+   *
+   * This looks for variant function calls that are assigned to a variable
+   * matching the component name pattern. For example:
+   * - "Button" → looks for `buttonVariants = cva(...)`
+   * - "DropdownMenuItem" → looks for `dropdownMenuItemVariants = cva(...)`
+   *
+   * @param sourceCode - Component source code to parse
+   * @param componentName - The component name to find variants for
+   * @param filePath - Optional file path for context
+   * @returns Extracted variants and defaults for the specific component
+   */
+  extractForComponent(
+    sourceCode: string,
+    componentName: string,
+    filePath?: string
+  ): VariantExtractionResult {
+    const fileName = filePath || 'component.tsx';
+
+    // Guard: Empty source code
+    if (!sourceCode.trim()) {
+      return this.emptyResult();
+    }
+
+    const sourceFile = this.project.createSourceFile(fileName, sourceCode, {
+      overwrite: true,
+    });
+
+    try {
+      return this.extractVariantsForComponent(sourceFile, componentName);
+    } catch (error) {
+      logger.debug('Component variant extraction failed', {
+        filePath,
+        componentName,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return this.emptyResult();
+    } finally {
+      // Clean up to prevent memory accumulation
+      this.project.removeSourceFile(sourceFile);
+    }
+  }
+
+  /**
+   * Extract variants for a specific component from a source file
+   */
+  private extractVariantsForComponent(
+    sourceFile: SourceFile,
+    componentName: string
+  ): VariantExtractionResult {
+    const variants: Record<string, string[]> = {};
+    const defaultVariants: Record<string, string> = {};
+
+    // Generate possible variable names for this component's variants
+    // "Button" → ["buttonVariants"]
+    // "DropdownMenuItem" → ["dropdownMenuItemVariants"]
+    const possibleVarNames = this.generateVariantVarNames(componentName);
+
+    // Find variable declarations that match the pattern
+    const variableDeclarations = sourceFile.getDescendantsOfKind(
+      SyntaxKind.VariableDeclaration
+    );
+
+    for (const varDecl of variableDeclarations) {
+      const varName = varDecl.getName();
+
+      // Check if this variable matches our expected pattern
+      if (!possibleVarNames.includes(varName)) {
+        continue;
+      }
+
+      // Check if the initializer is a cva/tv call
+      const initializer = varDecl.getInitializer();
+      if (!initializer) continue;
+
+      const callExpr = initializer.asKind(SyntaxKind.CallExpression);
+      if (!callExpr) continue;
+
+      const fnName = this.getCallExpressionName(callExpr);
+      if (!this.isVariantFunction(fnName)) continue;
+
+      const configResult = this.extractConfigFromCall(callExpr);
+      if (!configResult) continue;
+
+      // Found matching variants
+      Object.assign(variants, configResult.variants);
+      Object.assign(defaultVariants, configResult.defaultVariants);
+
+      logger.debug('Extracted variants for component', {
+        componentName,
+        varName,
+        variantCount: Object.keys(configResult.variants).length,
+      });
+    }
+
+    return { variants, defaultVariants };
+  }
+
+  /**
+   * Generate possible variable names for a component's variants
+   *
+   * Examples:
+   * - "Button" → ["buttonVariants"]
+   * - "DropdownMenuItem" → ["dropdownMenuItemVariants"]
+   * - "DialogContent" → ["dialogContentVariants"]
+   */
+  private generateVariantVarNames(componentName: string): string[] {
+    // Convert PascalCase to camelCase
+    const camelCase =
+      componentName.charAt(0).toLowerCase() + componentName.slice(1);
+    return [`${camelCase}Variants`];
+  }
+
+  /**
    * Extract variants from a source file
    */
   private extractVariants(sourceFile: SourceFile): VariantExtractionResult {

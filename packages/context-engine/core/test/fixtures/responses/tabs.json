@@ -1,38 +1,55 @@
 {
   "componentName": "Tabs",
   "response": {
-    "guidance": {
-      "patterns": ["navigation", "disclosure", "container"],
-      "whenToUse": "Use Tabs to organize a large amount of related content into a smaller, more manageable space, allowing users to switch between different views without navigating to a new page.",
-      "accessibility": "Tabs are inherently accessible when built correctly, leveraging ARIA `role=\"tablist\"`, `role=\"tab\"`, and `role=\"tabpanel\"` attributes. Ensure keyboard navigation (arrow keys for tab selection, Tab key to move into tab panel content) is fully supported. Each tab should have a unique ID and `aria-controls` pointing to its corresponding tab panel.",
-      "relatedComponents": ["TabPanel", "Accordion", "Button"],
-      "whenNotToUse": "Do not use Tabs for unrelated content or when content needs to be visible simultaneously. Consider Accordion for less critical content or multi-step forms. Avoid using tabs for navigation that leads to entirely different pages; use a NavLink or Menu instead."
-    },
     "tier": "free",
-    "description": "A component for organizing and navigating between related content sections within a confined space.",
-    "semanticDescription": "The Tabs component provides an effective way to structure and present content in a limited screen area. It allows users to group related information into distinct sections, each accessible via a clickable tab header. This component is ideal for dashboards, profile settings, product details, or any interface where multiple views of information need to be available without full page reloads. Key features include active tab indication, keyboard navigation support, and semantic ARIA attributes for accessibility. It improves user experience by reducing clutter and streamlining content organization.",
-    "tokens": [
-      "color-text",
-      "color-background",
-      "color-primary",
-      "spacing-sm",
-      "spacing-md",
-      "border-radius-sm",
-      "font-weight-medium"
-    ],
     "examples": {
       "minimal": {
-        "title": "Basic Tabs",
-        "code": "<Tabs />",
-        "description": "A minimal example of the Tabs component."
+        "description": "A basic Tabs component for organizing content into switchable sections.",
+        "propsUsed": [],
+        "title": "Minimal Tabs",
+        "code": "<Tabs />"
       },
+      "advanced": [],
       "common": []
     },
+    "description": "A UI component that organizes and separates content into distinct sections, allowing users to navigate between them.",
+    "tokens": [
+      "color-background-primary",
+      "color-text-primary",
+      "color-border-primary",
+      "color-primary-500",
+      "color-primary-600",
+      "spacing-sm",
+      "spacing-md",
+      "border-radius-md",
+      "font-weight-medium"
+    ],
+    "guidance": {
+      "patterns": [
+        "composition",
+        "container",
+        "disclosure",
+        "navigation",
+        "data-display"
+      ],
+      "whenNotToUse": "Do NOT use Tabs for navigating to entirely different pages or sections of an application. For global navigation, use a `Navbar` or `Sidebar`. Avoid using tabs when the content for each tab is very short and could be displayed together without overwhelming the user, or when users frequently need to compare content across all sections simultaneously. Consider an `Accordion` or `Disclosure` component for less prominent, expandable content.",
+      "whenToUse": "Use Tabs when you need to organize related content into distinct sections within a single view, allowing users to easily switch between different panes of information without navigating away from the current context. Ideal for settings pages, data dashboards with multiple views, or product detail pages with specifications, reviews, etc.",
+      "relatedComponents": [
+        "TabList",
+        "Tab",
+        "TabPanel",
+        "Button",
+        "Accordion",
+        "Card"
+      ],
+      "accessibility": "Tabs should implement WAI-ARIA best practices, including `role=\"tablist\"`, `role=\"tab\"`, and `role=\"tabpanel\"`. Ensure keyboard navigation works correctly with `Tab` for focus management and arrow keys for switching between tabs within the tablist. Active tabs must have `aria-selected=\"true\"`. Associated tab panels should be linked to their respective tabs using `aria-labelledby` and `id` attributes."
+    },
+    "semanticDescription": "The Tabs component is a fundamental UI element designed to organize and separate related content into distinct, switchable sections within a single view. It provides a structured way to present large amounts of information without overwhelming the user, improving readability and user experience. Key features include state management for active tabs, logical grouping of content panels, and intuitive navigation between sections. Tabs are commonly used in various application contexts such as user profile settings, product detail pages (e.g., description, reviews, specifications), data dashboards with different analytical views, or multi-step forms where each step is a tab. It acts as a container for `TabList`, `Tab`, and `TabPanel` sub-components, managing their interaction and ensuring only the content of the currently active tab is visible.",
     "minimalExample": "<Tabs />"
   },
-  "recordedAt": "2026-01-26T11:21:28.392Z",
+  "recordedAt": "2026-01-27T11:56:31.602Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "677a15a1905113126f69cff79c9bdaf05e482bef35186d5302037734493b6900",
-  "promptSummary": "Generate metadata for Tabs component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Tabs\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-tabs, @/lib\n\nBase Library: ..."
+  "inputHash": "e4a098826e954e881d74d4439c45427b69e216ab0749e728498355065d629d94",
+  "promptSummary": "Generate metadata for Tabs component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Tabs\nDescription: Tabs\n\nThe root component that manages tab state. Contains the list and c..."
 }

@@ -1,37 +1,35 @@
 {
   "componentName": "Switch",
   "response": {
-    "description": "A UI switch control for toggling a setting or state between two distinct options.",
+    "description": "A toggle switch for binary on/off states that take effect immediately.",
     "examples": {
       "minimal": {
+        "title": "Basic Switch",
         "code": "<Switch />",
-        "description": "A basic switch control.",
-        "title": "Basic Switch"
+        "description": "A basic switch."
       },
       "common": []
     },
-    "tier": "free",
     "tokens": [
       "color-primary",
-      "color-text-secondary",
-      "spacing-xs",
-      "spacing-sm",
-      "border-radius-full",
-      "shadow-sm"
+      "color-background-elevated",
+      "color-border",
+      "spacing-sm"
     ],
     "minimalExample": "<Switch />",
+    "semanticDescription": "The Switch component provides an intuitive toggle mechanism for binary states (e.g., on/off, enabled/disabled). It's designed for user settings or preferences that, when changed, apply their effect instantly without requiring an explicit 'save' action. Key features include its clear visual feedback, immediate state changes upon interaction, and adherence to accessibility standards for interactive form controls. Common use cases involve toggling notifications, activating dark mode, enabling feature flags, or any simple binary configuration within an application. It's built on Radix UI, ensuring robust accessibility and behavior.",
+    "tier": "free",
     "guidance": {
-      "whenNotToUse": "Do not use for actions that trigger irreversible changes or require user confirmation; use a button or confirmation dialog instead. Avoid for selecting multiple items from a list; use checkboxes instead. Do not use for navigating between different views or pages; use links or navigation components.",
-      "relatedComponents": ["Checkbox", "Radio Group", "Toggle Button"],
-      "patterns": ["form-control", "input", "selection"],
-      "whenToUse": "Use a Switch when users need to toggle a single setting or feature on or off. It's ideal for immediate state changes that don't require an explicit save action, such as enabling notifications or dark mode.",
-      "accessibility": "Ensure the switch is properly labeled using `aria-label` or by associating it with a `<label>` element for screen readers. Provide clear visual feedback for its checked/unchecked state and focus. The component should be fully keyboard navigable, allowing users to toggle its state using the spacebar or enter key."
-    },
-    "semanticDescription": "The Switch component provides a user-friendly and accessible way to toggle between two distinct states, typically 'on' and 'off'. It is commonly used for managing settings, preferences, or activating/deactivating features within an application. Built upon Radix UI primitives, it ensures robust accessibility, including keyboard navigability and semantic markup for assistive technologies. Key features include a clear visual indicator of its current state, smooth transitions, and easy integration into forms. It is suitable for scenarios where an immediate state change is desired without requiring additional confirmation steps, offering a straightforward interaction model for users."
+      "relatedComponents": ["Checkbox", "RadioGroup", "Toggle"],
+      "accessibility": "Ensures proper ARIA attributes for a switch role, indicating its checked or unchecked state to assistive technologies. Supports keyboard interaction (Spacebar to toggle, Tab to focus) and integrates well with screen readers to announce its label and current state.",
+      "patterns": ["form-control", "input"],
+      "whenNotToUse": "Do not use for actions that require a confirmation step, have complex implications, or where multiple selections are possible. For mutually exclusive options, consider RadioGroup; for multiple independent selections, use Checkbox.",
+      "whenToUse": "Use for settings that take effect immediately without requiring a save action, providing a clear binary choice like 'on' or 'off'. Ideal for preferences that need instant application."
+    }
   },
-  "recordedAt": "2026-01-26T11:21:14.893Z",
+  "recordedAt": "2026-01-27T11:56:15.831Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "75ccd6e99852756ffaf4fc4a4581feb394bee29dfbf3d2d56d58a31dffc3e5af",
-  "promptSummary": "Generate metadata for Switch component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Switch\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-switch, @/lib\n\nBase Libra..."
+  "inputHash": "12b0fe2851926064dc67cb267734c36194db1b8541d1a04862186d5f26973797",
+  "promptSummary": "Generate metadata for Switch component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Switch\nDescription: Switch\n\nA toggle switch for binary on/off states. Use for settings tha..."
 }

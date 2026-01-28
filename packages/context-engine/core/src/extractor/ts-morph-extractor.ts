@@ -10,6 +10,7 @@
  * - Complex conditional exports
  * - Non-standard component patterns
  * - forwardRef with complex generic patterns
+ * - Compound components with Radix UI primitives
  */
 
 import {
@@ -23,7 +24,7 @@ import {
   type TypeAliasDeclaration,
 } from 'ts-morph';
 
-import type { ExtractedProp, PropTypeCategory } from '../types/index.js';
+import type { ExtractedProp } from '../types/index.js';
 import { pascalCase } from '../utils/case.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -53,6 +54,87 @@ export class TsMorphExtractor implements IPropsExtractor {
         esModuleInterop: true,
       },
     });
+  }
+
+  /**
+   * Extract props for multiple components from a single source file
+   *
+   * Used for compound components where we need to extract props for each
+   * sub-component (e.g., DropdownMenuItem, DropdownMenuContent).
+   *
+   * Extraction strategy (in order):
+   * 1. Look for explicit interface (e.g., interface DialogContentProps extends ...)
+   * 2. Look for type alias (e.g., type DialogOverlayProps = ...)
+   *
+   * @param sourceCode - Component source code
+   * @param componentNames - List of component names to extract
+   * @param filePath - Optional file path for context
+   * @returns Map of component name to extraction result
+   */
+  async extractMultipleComponents(
+    sourceCode: string,
+    componentNames: string[],
+    filePath?: string
+  ): Promise<Map<string, PropsExtractionResult>> {
+    const results = new Map<string, PropsExtractionResult>();
+    const fileName = filePath || 'compound-component.tsx';
+
+    try {
+      const sourceFile = this.project.createSourceFile(fileName, sourceCode, {
+        overwrite: true,
+      });
+
+      for (const name of componentNames) {
+        const pascalName = pascalCase(name);
+        const propsTypeName = `${pascalName}Props`;
+        let props: ExtractedProp[] = [];
+        let description: string | undefined;
+
+        // Strategy 1: Look for interface (e.g., interface DialogContentProps extends ...)
+        const propsInterface = sourceFile.getInterface(propsTypeName);
+        if (propsInterface) {
+          props = this.extractPropsFromInterface(propsInterface, sourceFile);
+        }
+
+        // Strategy 2: Look for type alias (e.g., type DialogOverlayProps = ...)
+        if (props.length === 0) {
+          const propsType = sourceFile.getTypeAlias(propsTypeName);
+          if (propsType) {
+            props = this.extractPropsFromTypeAlias(propsType);
+          }
+        }
+
+        if (props.length > 0) {
+          // Get description from JSDoc if not already set from well-known props
+          if (!description) {
+            description = this.extractDescription(sourceFile, pascalName);
+          }
+
+          results.set(pascalName, {
+            props,
+            method: ExtractorMethod.TsMorph,
+            componentName: pascalName,
+            description,
+          });
+        }
+      }
+
+      // Clean up
+      this.project.removeSourceFile(sourceFile);
+
+      logger.debug('Multi-component extraction complete', {
+        requested: componentNames.length,
+        found: results.size,
+        componentNames: Array.from(results.keys()),
+      });
+
+      return results;
+    } catch (error) {
+      logger.debug('Multi-component extraction failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return results;
+    }
   }
 
   async extractProps(
@@ -218,19 +300,56 @@ export class TsMorphExtractor implements IPropsExtractor {
 
   /**
    * Extract props from a type alias
+   *
+   * Handles multiple patterns:
+   * - Type literal: `type Props = { prop: string }`
+   * - Intersection: `type Props = BaseProps & { prop: string }`
    */
   private extractPropsFromTypeAlias(
     typeAlias: TypeAliasDeclaration
   ): ExtractedProp[] {
     const typeNode = typeAlias.getTypeNode();
-    if (!typeNode || typeNode.getKind() !== SyntaxKind.TypeLiteral) {
-      return [];
+    if (!typeNode) return [];
+
+    // Handle direct type literal
+    if (typeNode.getKind() === SyntaxKind.TypeLiteral) {
+      const typeLiteral = typeNode.asKind(SyntaxKind.TypeLiteral);
+      if (!typeLiteral) return [];
+      return this.extractPropsFromMembers(typeLiteral.getMembers());
     }
 
-    const typeLiteral = typeNode.asKind(SyntaxKind.TypeLiteral);
-    if (!typeLiteral) return [];
+    // Handle intersection type: BaseType & { customProps }
+    if (typeNode.getKind() === SyntaxKind.IntersectionType) {
+      return this.extractPropsFromIntersection(typeNode);
+    }
 
-    return this.extractPropsFromMembers(typeLiteral.getMembers());
+    return [];
+  }
+
+  /**
+   * Extract props from intersection type, focusing on type literals
+   *
+   * Example: `React.ComponentProps<typeof X> & { inset?: boolean }`
+   * We extract only the props from type literals (the custom props),
+   * not the inherited props from React.ComponentProps.
+   */
+  private extractPropsFromIntersection(typeNode: Node): ExtractedProp[] {
+    const intersectionType = typeNode.asKind(SyntaxKind.IntersectionType);
+    if (!intersectionType) return [];
+
+    const props: ExtractedProp[] = [];
+
+    // Extract from each type in the intersection that is a type literal
+    for (const type of intersectionType.getTypeNodes()) {
+      if (type.getKind() === SyntaxKind.TypeLiteral) {
+        const typeLiteral = type.asKind(SyntaxKind.TypeLiteral);
+        if (typeLiteral) {
+          props.push(...this.extractPropsFromMembers(typeLiteral.getMembers()));
+        }
+      }
+    }
+
+    return props;
   }
 
   /**
@@ -317,12 +436,17 @@ export class TsMorphExtractor implements IPropsExtractor {
 
   /**
    * Extract prop info from a property signature
+   *
+   * Uses simplified structure:
+   * - type: simplified type string ("string", "boolean", not full union)
+   * - values: array of valid options for enum types
+   * - required: whether the prop is required (no ? marker)
    */
   private extractPropInfo(prop: PropertySignature): ExtractedProp {
     const name = prop.getName();
     const typeNode = prop.getTypeNode();
-    const type = typeNode?.getText() || 'unknown';
-    const isOptional = prop.hasQuestionToken() ?? false;
+    const rawType = typeNode?.getText() || 'unknown';
+    const isOptional = prop.hasQuestionToken();
 
     // Extract JSDoc info
     const jsDocs = prop.getJsDocs() || [];
@@ -348,12 +472,11 @@ export class TsMorphExtractor implements IPropsExtractor {
 
     return {
       name,
-      type,
-      typeCategory: this.categorizeType(type),
-      required: !isOptional,
-      defaultValue,
+      type: this.simplifyType(rawType),
       description,
-      possibleValues: this.extractPossibleValues(type),
+      defaultValue,
+      values: this.extractEnumValues(rawType),
+      required: !isOptional,
       isChildren: name === 'children',
       isClassName: name === 'className',
       isStyle: name === 'style',
@@ -363,52 +486,46 @@ export class TsMorphExtractor implements IPropsExtractor {
   }
 
   /**
-   * Categorize TypeScript type string into simplified categories
+   * Simplify a TypeScript type string for AI consumption
    */
-  private categorizeType(typeString: string): PropTypeCategory {
-    const normalized = typeString.toLowerCase();
+  private simplifyType(typeString: string): string {
+    // String literal unions → 'string'
+    if (typeString.includes('|') && typeString.includes('"')) {
+      const withoutNullish = typeString
+        .split('|')
+        .map((s) => s.trim())
+        .filter((s) => s !== 'null' && s !== 'undefined')
+        .join(' | ');
 
-    if (['string', 'number', 'boolean'].includes(normalized)) {
-      return 'primitive';
-    }
-    if (typeString.includes('|') && !typeString.includes('=>')) {
-      if (/^['"][^'"]+['"](\s*\|\s*['"][^'"]+['"])+$/.test(typeString.trim())) {
-        return 'literal';
+      if (/^["'][^"']+["'](\s*\|\s*["'][^"']+["'])*$/.test(withoutNullish)) {
+        return 'string';
       }
-      return 'union';
-    }
-    if (typeString.startsWith('{') || typeString.includes('Record<')) {
-      return 'object';
-    }
-    if (typeString.includes('[]') || typeString.startsWith('Array<')) {
-      return 'array';
-    }
-    if (typeString.includes('=>') || typeString.includes('Function')) {
-      return 'function';
-    }
-    if (typeString.includes('Ref<') || typeString.includes('RefObject')) {
-      return 'ref';
-    }
-    if (
-      typeString.includes('ReactNode') ||
-      typeString.includes('ReactElement')
-    ) {
-      return 'element';
     }
 
-    return 'unknown';
+    // Boolean literals → 'boolean'
+    const normalized = typeString.replace(/\s/g, '');
+    if (normalized === 'true|false' || normalized === 'false|true') {
+      return 'boolean';
+    }
+
+    return typeString;
   }
 
   /**
-   * Extract possible values from literal union types
+   * Extract enum/union values from type string
    */
-  private extractPossibleValues(typeString: string): string[] | undefined {
-    // Extract literal union values: 'a' | 'b' | 'c'
-    const literalMatch = typeString.match(/['"]([^'"]+)['"]/g);
-    if (literalMatch && literalMatch.length > 1) {
-      return literalMatch.map((v) => v.replace(/['"]/g, ''));
+  private extractEnumValues(typeString: string): string[] | undefined {
+    if (!typeString.includes('|') || !typeString.includes('"')) {
+      // Also check for single quotes
+      if (!typeString.includes("'")) return undefined;
     }
-    return undefined;
+
+    const matches = typeString.match(/["']([^"']+)["']/g);
+    if (!matches || matches.length === 0) {
+      return undefined;
+    }
+
+    return matches.map((m) => m.replace(/["']/g, ''));
   }
 
   /**

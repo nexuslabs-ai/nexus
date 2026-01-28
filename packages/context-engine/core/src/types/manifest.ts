@@ -13,7 +13,7 @@ import {
   EmbeddingStatusSchema,
 } from './embedding.js';
 import { StructuredExamplesSchema } from './examples.js';
-import { HashSchema } from './extracted.js';
+import { HashSchema, RadixPrimitiveInfoSchema } from './extracted.js';
 import { GuidanceSchema } from './guidance.js';
 import {
   BaseLibrarySchema,
@@ -59,9 +59,93 @@ export const SubComponentSchema = z.object({
 
   /** Data slot attribute value (e.g., "dialog-trigger") */
   dataSlot: z.string().optional(),
+
+  /** Whether this sub-component is required in composition */
+  requiredInComposition: z.boolean(),
+
+  /** Radix primitive info for direct re-exports */
+  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
+
+  /** CVA variants defined for this sub-component */
+  variants: z.record(z.string(), CvaVariantSchema).optional(),
 });
 
 export type SubComponent = z.infer<typeof SubComponentSchema>;
+
+/**
+ * Children prop information (only present when component accepts children)
+ */
+export const ChildrenInfoSchema = z.object({
+  accepts: z.literal(true),
+  type: z.string().optional(),
+  required: z.boolean().optional(),
+});
+
+export type ChildrenInfo = z.infer<typeof ChildrenInfoSchema>;
+
+/**
+ * System metadata (not for AI consumption)
+ */
+export const ManifestMetadataSchema = z.object({
+  id: z.string().uuid(),
+  schemaVersion: z.string(),
+  version: VersionSchema,
+  framework: FrameworkSchema,
+  visibility: VisibilitySchema,
+  tier: TierSchema,
+  embeddingStatus: EmbeddingStatusSchema,
+  embeddingModel: EmbeddingModelInfoSchema.optional(),
+  embeddingError: z.string().optional(),
+  generatedAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  sourceHash: HashSchema,
+  metaHash: HashSchema,
+  files: z.array(z.string()),
+});
+
+export type ManifestMetadata = z.infer<typeof ManifestMetadataSchema>;
+
+/**
+ * AI-focused manifest (optimized for token efficiency)
+ *
+ * This is what AI agents consume. System metadata is separate.
+ * Uses CategorizedPropsSchema directly - no separate "slim" variant needed
+ * since props are already cleaned at extraction time.
+ *
+ * Note: Top-level `variants` field removed - variant info is now available
+ * in `props.variants` with `values` and `valueDescriptions` for each prop.
+ */
+export const AIManifestSchema = z.object({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  importStatement: ImportStatementSchema,
+  children: ChildrenInfoSchema.optional(),
+  props: CategorizedPropsSchema.optional(),
+  examples: StructuredExamplesSchema.optional(),
+  guidance: GuidanceSchema.optional(),
+  dependencies: DependenciesSchema.optional(),
+  baseLibrary: BaseLibrarySchema.optional(),
+  subComponents: z.array(SubComponentSchema).optional(),
+  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
+});
+
+export type AIManifest = z.infer<typeof AIManifestSchema>;
+
+/**
+ * Complete manifest output (split structure)
+ *
+ * componentName: Component identifier
+ * metadata: System data (embeddings, hashes, timestamps)
+ * manifest: AI data (optimized for consumption)
+ */
+export const ManifestOutputSchema = z.object({
+  componentName: z.string(),
+  metadata: ManifestMetadataSchema,
+  manifest: AIManifestSchema,
+});
+
+export type ManifestOutput = z.infer<typeof ManifestOutputSchema>;
 
 /**
  * Complete component manifest schema (v1.0)
@@ -121,13 +205,6 @@ export const ComponentManifestSchema = z.object({
    */
   props: CategorizedPropsSchema,
 
-  // === CVA Variants ===
-  /**
-   * CVA variant definitions with metadata
-   * @example { variant: { values: ["primary", "secondary"], default: "primary" } }
-   */
-  variants: z.record(z.string(), CvaVariantSchema),
-
   // === Examples (Structured) ===
   /**
    * Structured code examples organized by complexity
@@ -167,6 +244,13 @@ export const ComponentManifestSchema = z.object({
    * Contains metadata for each related sub-component
    */
   subComponents: z.array(SubComponentSchema).optional(),
+
+  // === Radix Primitive ===
+  /**
+   * Radix primitive info when component is a direct re-export
+   * of a Radix UI primitive (e.g., Dialog = DialogPrimitive.Root)
+   */
+  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
 
   // === Embedding Status ===
   /** Current embedding status */

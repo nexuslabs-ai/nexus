@@ -69,9 +69,11 @@ export {
   CompoundComponentInfoSchema,
   ExtractedDataSchema,
   ExtractedPropSchema,
+  ExtractedSubComponentSchema,
   ExtractionMethodSchema,
   ExtractionResultSchema,
   HashSchema,
+  RadixPrimitiveInfoSchema,
 } from './extracted.js';
 
 // Extracted data types - types
@@ -79,9 +81,11 @@ export type {
   CompoundComponentInfo,
   ExtractedData,
   ExtractedProp,
+  ExtractedSubComponent,
   ExtractionMethod,
   ExtractionResult,
   Hash,
+  RadixPrimitiveInfo,
 } from './extracted.js';
 
 // Storybook types - schemas (values)
@@ -120,10 +124,10 @@ export { ImportStatementSchema } from './import-statement.js';
 export type { ImportStatement } from './import-statement.js';
 
 // Base prop types - schemas (values)
-export { BasePropSchema, PropTypeCategorySchema } from './base-prop.js';
+export { BasePropSchema } from './base-prop.js';
 
 // Base prop types - types
-export type { BaseProp, PropTypeCategory } from './base-prop.js';
+export type { BaseProp } from './base-prop.js';
 
 // Props types - schemas (values)
 export { CategorizedPropsSchema, PropDefinitionSchema } from './props.js';
@@ -155,11 +159,15 @@ export type { Guidance } from './guidance.js';
 
 // Manifest types - schemas (values)
 export {
+  AIManifestSchema,
+  ChildrenInfoSchema,
   ComponentManifestSchema,
   ComponentWithHistorySchema,
   CreateManifestInputSchema,
   DependenciesSchema,
   MANIFEST_SCHEMA_VERSION,
+  ManifestMetadataSchema,
+  ManifestOutputSchema,
   ManifestSummarySchema,
   SubComponentSchema,
   UpdateManifestInputSchema,
@@ -168,10 +176,14 @@ export {
 
 // Manifest types - types
 export type {
+  AIManifest,
+  ChildrenInfo,
   ComponentManifest,
   ComponentWithHistory,
   CreateManifestInput,
   Dependencies,
+  ManifestMetadata,
+  ManifestOutput,
   ManifestSummary,
   SubComponent,
   UpdateManifestInput,

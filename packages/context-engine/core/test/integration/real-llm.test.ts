@@ -593,22 +593,24 @@ describeWithRealLLM(
         expect(manifest.name).toBe('Button');
 
         // 2. Variant options (from extraction, not LLM)
-        // v1.0 schema: variants is CvaVariants with values array
-        expect(manifest.variants?.variant).toBeDefined();
-        expect(manifest.variants?.variant?.values?.length).toBeGreaterThan(0);
+        // v1.0 schema: variant info is in props.variants
+        const variantProp = manifest.props.variants?.find(
+          (p) => p.name === 'variant'
+        );
+        expect(variantProp).toBeDefined();
+        expect(variantProp?.values?.length).toBeGreaterThan(0);
 
         // 3. Default values
-        // v1.0 schema: defaults are in variants[key].default
-        expect(manifest.variants?.variant?.default).toBeDefined();
+        // v1.0 schema: defaults are in props.variants[n].defaultValue
+        expect(variantProp?.defaultValue).toBeDefined();
 
-        // 4. Props with types (v1.0: CategorizedProps object)
+        // 4. Props with types (v1.0: CategorizedProps object, all categories optional)
         const allProps = [
-          ...manifest.props.variants,
-          ...manifest.props.behaviors,
-          ...manifest.props.events,
-          ...manifest.props.slots,
-          ...manifest.props.passthrough,
-          ...manifest.props.other,
+          ...(manifest.props.variants ?? []),
+          ...(manifest.props.behaviors ?? []),
+          ...(manifest.props.events ?? []),
+          ...(manifest.props.slots ?? []),
+          ...(manifest.props.other ?? []),
         ];
         expect(allProps.length).toBeGreaterThan(0);
         allProps.forEach((prop) => {

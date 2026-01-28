@@ -16,6 +16,7 @@ export {
 export { DependencyExtractor } from './dependency-extractor.js';
 export * from './fallback-triggers.js';
 export { HybridExtractor } from './hybrid-extractor.js';
+export { detectRadixPrimitive } from './radix-detector.js';
 export { ReactDocgenExtractor } from './react-docgen-extractor.js';
 export * from './storybook/index.js';
 export { TsMorphExtractor } from './ts-morph-extractor.js';

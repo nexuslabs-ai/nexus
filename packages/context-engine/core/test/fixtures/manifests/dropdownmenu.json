@@ -1,0 +1,273 @@
+{
+  "componentName": "DropdownMenu",
+  "metadata": {
+    "id": "71164775-c3f5-41d3-820d-575268e368d6",
+    "schemaVersion": "1.0",
+    "version": "0.0.1",
+    "framework": "react",
+    "visibility": "private",
+    "tier": "free",
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-27T16:29:55.492Z",
+    "updatedAt": "2026-01-27T16:29:55.492Z",
+    "sourceHash": "caff64d02acefc747275cfabb5382fa83b2342d57997d8b5e0105a3323a8d74f",
+    "metaHash": "43ada4b0b29ec5ae88c54db7133725c2b1df5109aba904e1bd5c3ff6c5f98b3f",
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/dropdown-menu.tsx"
+    ]
+  },
+  "manifest": {
+    "name": "DropdownMenu",
+    "slug": "dropdown-menu-react-71164775",
+    "description": "The DropdownMenu component offers an accessible and space-efficient way to present a collection of actions or choices to users. It typically comprises a trigger element that, when activated, reveals an overlay containing a list of interactive menu items. Key functionalities include robust keyboard navigation, precise focus management, and compatibility with various item types like clickable actions, checkboxes, radio groups, and visual separators. It is particularly well-suited for scenarios where screen real estate is at a premium or when actions are specific to a particular context, such as 'Edit', 'Delete', or 'Share' options associated with an item in a list, or for user profile settings. This component leverages `@radix-ui/react-dropdown-menu` to ensure a high standard of accessibility and predictable behavior.",
+    "importStatement": {
+      "primary": "import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@nexus/react'",
+      "typeOnly": "import type { DropdownMenuProps } from '@nexus/react'"
+    },
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"outline\">Open Menu</Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent>\n        <DropdownMenuItem>Profile</DropdownMenuItem>\n        <DropdownMenuItem>Settings</DropdownMenuItem>\n        <DropdownMenuItem>Logout</DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )",
+        "isPrimary": true
+      },
+      "common": [
+        {
+          "title": "With Labels And Separators",
+          "code": "(\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"outline\">My Account</Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"nx:w-56\">\n        <DropdownMenuLabel>My Account</DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuGroup>\n          <DropdownMenuItem>\n            Profile\n            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem>\n            Billing\n            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>\n          </DropdownMenuItem>\n          <DropdownMenuItem>\n            Settings\n            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>\n          </DropdownMenuItem>\n        </DropdownMenuGroup>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem>\n          Logout\n          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>\n        </DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )"
+        },
+        {
+          "title": "With Checkbox Items",
+          "code": "<DropdownMenu>\n        <DropdownMenuTrigger asChild>\n          <Button variant=\"outline\">View Options</Button>\n        </DropdownMenuTrigger>\n        <DropdownMenuContent className=\"nx:w-56\">\n          <DropdownMenuLabel>Appearance</DropdownMenuLabel>\n          <DropdownMenuSeparator />\n          <DropdownMenuCheckboxItem\n            checked={showStatusBar}\n            onCheckedChange={setShowStatusBar}\n          >\n            Status Bar\n          </DropdownMenuCheckboxItem>\n          <DropdownMenuCheckboxItem\n            checked={showActivityBar}\n            onCheckedChange={setShowActivityBar}\n          >\n            Activity Bar\n          </DropdownMenuCheckboxItem>\n          <DropdownMenuCheckboxItem\n            checked={showPanel}\n            onCheckedChange={setShowPanel}\n          >\n            Panel\n          </DropdownMenuCheckboxItem>\n        </DropdownMenuContent>\n      </DropdownMenu>"
+        },
+        {
+          "title": "With Radio Items",
+          "code": "<DropdownMenu>\n        <DropdownMenuTrigger asChild>\n          <Button variant=\"outline\">Panel Position</Button>\n        </DropdownMenuTrigger>\n        <DropdownMenuContent className=\"nx:w-56\">\n          <DropdownMenuLabel>Panel Position</DropdownMenuLabel>\n          <DropdownMenuSeparator />\n          <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>\n            <DropdownMenuRadioItem value=\"top\">Top</DropdownMenuRadioItem>\n            <DropdownMenuRadioItem value=\"bottom\">Bottom</DropdownMenuRadioItem>\n            <DropdownMenuRadioItem value=\"right\">Right</DropdownMenuRadioItem>\n          </DropdownMenuRadioGroup>\n        </DropdownMenuContent>\n      </DropdownMenu>"
+        },
+        {
+          "title": "With Sub Menu",
+          "code": "(\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"outline\">Open Menu</Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"nx:w-56\">\n        <DropdownMenuItem>\n          New Tab\n          <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>\n        </DropdownMenuItem>\n        <DropdownMenuItem>\n          New Window\n          <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>\n        </DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuSub>\n          <DropdownMenuSubTrigger>More Tools</DropdownMenuSubTrigger>\n          <DropdownMenuSubContent>\n            <DropdownMenuItem>Save Page As...</DropdownMenuItem>\n            <DropdownMenuItem>Create Shortcut...</DropdownMenuItem>\n            <DropdownMenuItem>Name Window...</DropdownMenuItem>\n            <DropdownMenuSeparator />\n            <DropdownMenuItem>Developer Tools</DropdownMenuItem>\n          </DropdownMenuSubContent>\n        </DropdownMenuSub>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem>\n          Exit\n          <DropdownMenuShortcut>⌘Q</DropdownMenuShortcut>\n        </DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )"
+        },
+        {
+          "title": "With Destructive Item",
+          "code": "(\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"outline\">Actions</Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent>\n        <DropdownMenuItem>Edit</DropdownMenuItem>\n        <DropdownMenuItem>Duplicate</DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem variant=\"destructive\">Delete</DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )"
+        },
+        {
+          "title": "With Disabled Items",
+          "code": "(\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"outline\">Edit</Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent>\n        <DropdownMenuItem>Undo</DropdownMenuItem>\n        <DropdownMenuItem>Redo</DropdownMenuItem>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem disabled>Cut</DropdownMenuItem>\n        <DropdownMenuItem disabled>Copy</DropdownMenuItem>\n        <DropdownMenuItem>Paste</DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )"
+        },
+        {
+          "title": "With Inset Items",
+          "code": "(\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"outline\">Open Menu</Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent className=\"nx:w-56\">\n        <DropdownMenuLabel>Actions</DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        <DropdownMenuItem inset>Back</DropdownMenuItem>\n        <DropdownMenuItem inset>Forward</DropdownMenuItem>\n        <DropdownMenuItem inset>Reload</DropdownMenuItem>\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )"
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use when space is limited, to provide context-sensitive actions for an element, or to group related actions under a single trigger.",
+      "whenNotToUse": "Do not use for primary navigation items that need to be always visible. For only 2-3 simple options, consider a Button or a segmented button instead to reduce cognitive load.",
+      "accessibility": "Ensure proper keyboard navigation (arrow keys, Enter/Space) for menu items. Implement ARIA attributes such as role=\"menu\", role=\"menuitem\", aria-haspopup=\"menu\", and aria-expanded. Manage focus effectively upon opening and closing the menu to guide users.",
+      "patterns": [
+        "disclosure",
+        "overlay",
+        "selection",
+        "navigation",
+        "compound"
+      ],
+      "relatedComponents": ["Button", "Select"]
+    },
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@radix-ui/react-dropdown-menu": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "baseLibrary": {
+      "name": "radix-ui",
+      "component": "DropdownMenu"
+    },
+    "subComponents": [
+      {
+        "name": "DropdownMenuCheckboxItem",
+        "props": {},
+        "dataSlot": "dropdown-menu-checkbox-item",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "CheckboxItem",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#checkboxitem"
+        }
+      },
+      {
+        "name": "DropdownMenuContent",
+        "props": {},
+        "dataSlot": "dropdown-menu-content",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Portal",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#portal"
+        }
+      },
+      {
+        "name": "DropdownMenuGroup",
+        "props": {},
+        "dataSlot": "dropdown-menu-group",
+        "requiredInComposition": false,
+        "radixPrimitive": {
+          "primitive": "Group",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#group"
+        }
+      },
+      {
+        "name": "DropdownMenuItem",
+        "description": "DropdownMenuItem\n\nAn individual menu item.",
+        "props": {
+          "other": [
+            {
+              "name": "inset",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "variant",
+              "type": "'default' | 'destructive'",
+              "values": ["default", "destructive"],
+              "required": false
+            }
+          ]
+        },
+        "dataSlot": "dropdown-menu-item",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Item",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#item"
+        }
+      },
+      {
+        "name": "DropdownMenuLabel",
+        "description": "DropdownMenuLabel\n\nA label for a group of menu items.",
+        "props": {
+          "other": [
+            {
+              "name": "inset",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        },
+        "dataSlot": "dropdown-menu-label",
+        "requiredInComposition": false,
+        "radixPrimitive": {
+          "primitive": "Label",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#label"
+        }
+      },
+      {
+        "name": "DropdownMenuPortal",
+        "props": {},
+        "dataSlot": "dropdown-menu-portal",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Portal",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#portal"
+        }
+      },
+      {
+        "name": "DropdownMenuRadioGroup",
+        "props": {},
+        "dataSlot": "dropdown-menu-radio-group",
+        "requiredInComposition": false,
+        "radixPrimitive": {
+          "primitive": "RadioGroup",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#radiogroup"
+        }
+      },
+      {
+        "name": "DropdownMenuRadioItem",
+        "props": {},
+        "dataSlot": "dropdown-menu-radio-item",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "RadioItem",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#radioitem"
+        }
+      },
+      {
+        "name": "DropdownMenuSeparator",
+        "props": {},
+        "dataSlot": "dropdown-menu-separator",
+        "requiredInComposition": false,
+        "radixPrimitive": {
+          "primitive": "Separator",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#separator"
+        }
+      },
+      {
+        "name": "DropdownMenuShortcut",
+        "props": {},
+        "dataSlot": "dropdown-menu-shortcut",
+        "requiredInComposition": true
+      },
+      {
+        "name": "DropdownMenuSub",
+        "props": {},
+        "dataSlot": "dropdown-menu-sub",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Sub",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#sub"
+        }
+      },
+      {
+        "name": "DropdownMenuSubContent",
+        "props": {},
+        "dataSlot": "dropdown-menu-sub-content",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "SubContent",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#subcontent"
+        }
+      },
+      {
+        "name": "DropdownMenuSubTrigger",
+        "description": "DropdownMenuSubTrigger\n\nThe trigger for a submenu. Renders a chevron to indicate a submenu.",
+        "props": {
+          "other": [
+            {
+              "name": "inset",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        },
+        "dataSlot": "dropdown-menu-sub-trigger",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "SubTrigger",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#subtrigger"
+        }
+      },
+      {
+        "name": "DropdownMenuTrigger",
+        "props": {},
+        "dataSlot": "dropdown-menu-trigger",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Trigger",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#trigger"
+        }
+      }
+    ],
+    "radixPrimitive": {
+      "primitive": "Root",
+      "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu#root"
+    }
+  },
+  "recordedAt": "2026-01-27T16:29:55.492Z",
+  "fixtureSource": "nexus/dropdown-menu"
+}

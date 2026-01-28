@@ -110,12 +110,15 @@ export class ComponentProcessor {
     };
     this.metaGenerator = new MetaGenerator(generatorConfig);
 
-    // Initialize manifest builder
-    this.manifestBuilder = new ManifestBuilder();
+    // Initialize manifest builder with available components for filtering
+    this.manifestBuilder = new ManifestBuilder({
+      availableComponents: config.availableComponents,
+    });
 
     logger.debug('ComponentProcessor initialized', {
       skipGeneration: config.skipGeneration ?? false,
       hasCustomProvider: !!config.llmProvider,
+      availableComponentsCount: config.availableComponents?.length,
     });
   }
 
@@ -209,6 +212,7 @@ export class ComponentProcessor {
 
     const success: ProcessorSuccess = {
       type: ProcessorOutputType.Success,
+      output: buildResult.output,
       manifest: buildResult.manifest,
       metrics: {
         extractionTimeMs: extractionResult.timeMs,
@@ -388,6 +392,7 @@ export class ComponentProcessor {
 
     const success: ProcessorSuccess = {
       type: ProcessorOutputType.Success,
+      output: buildResult.output,
       manifest: buildResult.manifest,
       metrics: {
         generationTimeMs: genResult.generationTimeMs,
@@ -479,6 +484,7 @@ export class ComponentProcessor {
 
     const success: ProcessorSuccess = {
       type: ProcessorOutputType.Success,
+      output: buildResult.output,
       manifest: buildResult.manifest,
       metrics: {
         extractionTimeMs: extractionResult.timeMs,

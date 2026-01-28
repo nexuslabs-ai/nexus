@@ -42,9 +42,9 @@ export type { TempFile } from './temp-manager.js';
 // Prop categorization utilities - values
 export {
   categorizeProps,
+  detectChildrenInfo,
   isBehaviorProp,
   isEventProp,
-  isPassthroughProp,
   isSlotProp,
   isVariantProp,
   PATTERNS,

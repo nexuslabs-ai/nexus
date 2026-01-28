@@ -1,73 +1,75 @@
 {
   "componentName": "Tooltip",
-  "manifest": {
+  "metadata": {
+    "id": "b481269c-bfc0-4f61-83d6-bfae638ae4f0",
     "schemaVersion": "1.0",
-    "id": "7017257d-b90a-4952-80a1-38e4500461fa",
-    "slug": "tooltip-react-7017257d",
-    "name": "Tooltip",
     "version": "0.0.1",
     "framework": "react",
     "visibility": "private",
-    "description": "A small, non-interactive pop-up that displays informative text when a user hovers over or focuses on an element.",
     "tier": "free",
+    "embeddingStatus": "pending",
+    "embeddingModel": {
+      "provider": "voyage",
+      "model": "voyage-code-3",
+      "version": "2024-01",
+      "dimensions": 1024
+    },
+    "generatedAt": "2026-01-27T16:30:22.342Z",
+    "updatedAt": "2026-01-27T16:30:22.342Z",
+    "sourceHash": "924c1b502df1925dd5a3cc540453a6665b9c082b373dd5fbca0fc68585b20ee5",
+    "metaHash": "a841266b2f5fa9a46f9541818828cc68aee79f2898fcd96fee81538661c9ca7d",
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/tooltip.tsx"
+    ]
+  },
+  "manifest": {
+    "name": "Tooltip",
+    "slug": "tooltip-react-b481269c",
+    "description": "The Tooltip component provides a discreet and non-disruptive way to display additional information or labels when a user interacts with an element. It's ideal for clarifying icons, explaining truncated text, or providing hints for form fields. Key features include its transient nature, appearing on hover or focus and disappearing when the interaction ends, and its ability to prevent UI clutter. Use cases include explaining the function of an icon-only button, providing a full text for truncated labels, or giving quick guidance for complex controls.",
     "importStatement": {
-      "primary": "import { Tooltip } from '@nexus/react'",
+      "primary": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@nexus/react'",
       "typeOnly": "import type { TooltipProps } from '@nexus/react'"
     },
-    "minimalExample": "<Tooltip />",
-    "props": {
-      "variants": [],
-      "behaviors": [],
-      "events": [],
-      "slots": [],
-      "passthrough": [],
-      "other": []
-    },
-    "variants": {},
     "examples": {
       "minimal": {
         "title": "Default",
         "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Hover me</Button>\n      </TooltipTrigger>\n      <TooltipContent>\n        <p>This is a tooltip</p>\n      </TooltipContent>\n    </Tooltip>\n  )",
-        "isPrimary": true,
-        "propsUsed": ["a", "asChild", "is", "variant"]
+        "isPrimary": true
       },
-      "common": [],
-      "advanced": [
+      "common": [
         {
           "title": "Side Top",
-          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Top</Button>\n      </TooltipTrigger>\n      <TooltipContent side=\"top\">\n        <p>Tooltip on top</p>\n      </TooltipContent>\n    </Tooltip>\n  )",
-          "propsUsed": ["asChild", "on", "side", "variant"]
+          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Top</Button>\n      </TooltipTrigger>\n      <TooltipContent side=\"top\">\n        <p>Tooltip on top</p>\n      </TooltipContent>\n    </Tooltip>\n  )"
         },
         {
           "title": "Side Right",
-          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Right</Button>\n      </TooltipTrigger>\n      <TooltipContent side=\"right\">\n        <p>Tooltip on right</p>\n      </TooltipContent>\n    </Tooltip>\n  )",
-          "propsUsed": ["asChild", "on", "side", "variant"]
+          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Right</Button>\n      </TooltipTrigger>\n      <TooltipContent side=\"right\">\n        <p>Tooltip on right</p>\n      </TooltipContent>\n    </Tooltip>\n  )"
         },
         {
           "title": "Side Bottom",
-          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Bottom</Button>\n      </TooltipTrigger>\n      <TooltipContent side=\"bottom\">\n        <p>Tooltip on bottom</p>\n      </TooltipContent>\n    </Tooltip>\n  )",
-          "propsUsed": ["asChild", "on", "side", "variant"]
+          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Bottom</Button>\n      </TooltipTrigger>\n      <TooltipContent side=\"bottom\">\n        <p>Tooltip on bottom</p>\n      </TooltipContent>\n    </Tooltip>\n  )"
+        },
+        {
+          "title": "Side Left",
+          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Left</Button>\n      </TooltipTrigger>\n      <TooltipContent side=\"left\">\n        <p>Tooltip on left</p>\n      </TooltipContent>\n    </Tooltip>\n  )"
+        },
+        {
+          "title": "With Long Content",
+          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Hover for details</Button>\n      </TooltipTrigger>\n      <TooltipContent className=\"nx:max-w-xs\">\n        <p>\n          This tooltip contains longer content that might wrap to multiple lines\n          when it exceeds the maximum width.\n        </p>\n      </TooltipContent>\n    </Tooltip>\n  )"
+        },
+        {
+          "title": "With Custom Offset",
+          "code": "(\n    <Tooltip>\n      <TooltipTrigger asChild>\n        <Button variant=\"outline\">Custom offset</Button>\n      </TooltipTrigger>\n      <TooltipContent sideOffset={12}>\n        <p>12px offset from trigger</p>\n      </TooltipContent>\n    </Tooltip>\n  )"
         }
       ]
     },
     "guidance": {
-      "whenToUse": "Use a Tooltip to display a small amount of non-essential information or context related to an element when a user hovers over it or focuses on it via keyboard. Ideal for explaining icons, abbreviations, or providing quick labels for interactive elements.",
-      "whenNotToUse": "Do NOT use a Tooltip for critical information that requires user interaction or immediate attention. For longer content, interactive elements, or crucial details, consider a Popover or Dialog. Avoid using tooltips for decorative elements or when the content is already clear from context.",
-      "accessibility": "Ensure tooltips are accessible to keyboard and screen reader users. The content should be available via 'aria-describedby' or similar mechanisms. Tooltips should appear on keyboard focus and disappear on blur. Users should be able to dismiss tooltips without needing to interact with the triggering element again. Radix UI's Tooltip component handles many of these accessibility concerns automatically.",
-      "patterns": ["overlay", "disclosure", "data-display"],
-      "relatedComponents": ["Popover", "Dialog", "Toast"]
+      "whenToUse": "Use tooltips to provide supplementary information or context for interactive elements, icons, or truncated text when space is limited and the information is not critical for immediate task completion. They enhance usability by clarifying the purpose of an element without cluttering the UI.",
+      "whenNotToUse": "Avoid using tooltips for essential information that users need to see immediately, for long blocks of text, or for actions that require user interaction within the tooltip itself. Use popovers, modals, or inline text for critical information or interactive content.",
+      "accessibility": "Ensure tooltips are keyboard accessible, appearing on focus and disappearing on blur. Provide clear ARIA attributes (e.g., `aria-describedby` or `aria-label`) to link the tooltip content to its trigger element for screen reader users. The content should be concise and meaningful.",
+      "patterns": ["overlay", "data-display"],
+      "relatedComponents": ["Button"]
     },
-    "semanticDescription": "The Tooltip component provides a brief, non-interactive textual label that appears on hover or focus of its trigger element. It's designed to enhance user understanding by offering supplementary information without obstructing the primary content. Key features include automatic positioning, accessible keyboard interaction, and configurable delay for appearance and disappearance. Use cases include clarifying ambiguous icons, providing full labels for truncated text, explaining input fields, or giving additional context to interactive controls without cluttering the UI.",
-    "tokens": [
-      "color-text",
-      "background-tooltip",
-      "spacing-sm",
-      "border-radius-sm",
-      "font-size-sm"
-    ],
-    "files": [
-      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/tooltip.tsx"
-    ],
     "dependencies": {
       "npm": {
         "react": "*",
@@ -80,18 +82,43 @@
       "name": "radix-ui",
       "component": "Tooltip"
     },
-    "embeddingStatus": "pending",
-    "embeddingModel": {
-      "provider": "voyage",
-      "model": "voyage-code-3",
-      "version": "2024-01",
-      "dimensions": 1024
-    },
-    "generatedAt": "2026-01-26T11:58:06.827Z",
-    "updatedAt": "2026-01-26T11:58:06.827Z",
-    "sourceHash": "924c1b502df1925dd5a3cc540453a6665b9c082b373dd5fbca0fc68585b20ee5",
-    "metaHash": "efeb313eca162cf5cf3fe991a7e407759ba6411b3fae6cb65d707607dfe86ea6"
+    "subComponents": [
+      {
+        "name": "TooltipContent",
+        "props": {},
+        "dataSlot": "tooltip-content",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Portal",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#portal"
+        }
+      },
+      {
+        "name": "TooltipProvider",
+        "props": {},
+        "dataSlot": "tooltip-provider",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Provider",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#provider"
+        }
+      },
+      {
+        "name": "TooltipTrigger",
+        "props": {},
+        "dataSlot": "tooltip-trigger",
+        "requiredInComposition": true,
+        "radixPrimitive": {
+          "primitive": "Trigger",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#trigger"
+        }
+      }
+    ],
+    "radixPrimitive": {
+      "primitive": "Root",
+      "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#root"
+    }
   },
-  "recordedAt": "2026-01-26T11:58:06.827Z",
+  "recordedAt": "2026-01-27T16:30:22.342Z",
   "fixtureSource": "nexus/tooltip"
 }

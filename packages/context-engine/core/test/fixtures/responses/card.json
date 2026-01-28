@@ -1,40 +1,37 @@
 {
   "componentName": "Card",
   "response": {
+    "guidance": {
+      "whenNotToUse": "Avoid using Card for simple inline text or when a more lightweight visual grouping (e.g., a div with padding) is sufficient. Do not use as a primary layout structure when a grid or flexbox layout is more appropriate for overall page arrangement. Alternatives: semantic HTML elements, grid layouts, or simple divs for less complex content grouping.",
+      "patterns": ["container", "data-display", "layout", "composition"],
+      "relatedComponents": ["Button", "Image", "Text", "Heading", "Link"],
+      "accessibility": "Ensure all content within the Card is accessible and follows appropriate ARIA roles if the Card itself acts as a landmark or interactive element. For purely presentational cards, standard HTML semantics are usually sufficient. If the card is clickable or interactive, use appropriate interactive roles like `role='button'` or `role='link'` on the interactive elements within it, rather than on the card container itself. Headings should be used to provide structure within the card content.",
+      "whenToUse": "Use the Card component to visually group related information, present individual pieces of content, or highlight specific sections within a layout. Ideal for displaying heterogeneous content like user profiles, product listings, articles, or settings."
+    },
+    "description": "A versatile container for grouping related content and actions, providing visual separation and organization.",
+    "tier": "free",
+    "semanticDescription": "The Card component serves as a flexible and self-contained container for displaying distinct pieces of information or interactive elements. It's designed to help organize content visually, making complex UIs easier to digest. Key features include its ability to encapsulate various content types like text, images, and actions, providing clear visual boundaries and a sense of hierarchy. Cards are commonly used in dashboards, product listings, news feeds, and profiles to present individual items with a consistent look and feel, promoting readability and user engagement. They are highly adaptable and can be customized in terms of padding, shadow, border, and background to fit diverse design requirements.",
     "examples": {
       "common": [],
       "minimal": {
-        "title": "Basic Card",
-        "code": "<Card>This is a basic card.</Card>",
-        "description": "A simple card displaying text content."
-      }
+        "code": "<Card />",
+        "description": "A simple card with default styling.",
+        "title": "Basic Card"
+      },
+      "advanced": []
     },
-    "minimalExample": "<Card />",
-    "tier": "free",
-    "semanticDescription": "The Card component serves as a flexible and visually distinct container for organizing and presenting information. Its primary purpose is to encapsulate related content, providing clear visual separation from other elements on the page. Key features include its ability to house various types of content such as text, images, and interactive elements, often featuring subtle styling like borders, shadows, and rounded corners to enhance its visual prominence. Common use cases include displaying product cards in e-commerce, user profiles in social applications, article previews in blogs, or individual data visualizations in dashboards, making complex information digestible and scannable.",
-    "guidance": {
-      "whenToUse": "Use the Card component when you need to group related information visually, present discrete blocks of content, or create layouts that emphasize individual content items. It's ideal for displaying self-contained content units like product listings, user profiles, articles, or dashboard widgets.",
-      "relatedComponents": [
-        "Button",
-        "Image",
-        "Text",
-        "Heading",
-        "Stack",
-        "Grid"
-      ],
-      "whenNotToUse": "Avoid using the Card component for very simple content that doesn't require distinct visual grouping, or when a more specific layout component (e.g., a list, a table, or a simple div) would be more semantically appropriate. Do not overuse cards as it can lead to visual clutter and make the interface feel heavy.",
-      "accessibility": "Ensure that content within the Card is semantically structured using appropriate HTML elements (e.g., headings for titles, paragraphs for text). If the card itself is interactive (e.g., clickable), ensure it has an appropriate ARIA role (e.g., 'button' or 'link' if it acts as one) and is keyboard navigable. Manage focus within interactive cards responsibly.",
-      "patterns": ["container", "layout", "data-display"]
-    },
-    "description": "A versatile container component used to group and display related content, often with a distinct visual boundary.",
     "tokens": [
-      "background-color-surface",
-      "border-radius-md",
+      "spacing-sm",
       "spacing-md",
-      "shadow-elevation-1"
-    ]
+      "border-radius-md",
+      "color-background-default",
+      "shadow-sm",
+      "padding-sm",
+      "padding-md"
+    ],
+    "minimalExample": "<Card />"
   },
-  "recordedAt": "2026-01-26T11:20:10.366Z",
+  "recordedAt": "2026-01-27T11:55:05.379Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
   "inputHash": "2dbe4d1def65a3f1a695e3638ea619d331eb7c5ea7c3e670c2bf69ec8761122a",

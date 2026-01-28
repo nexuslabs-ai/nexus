@@ -13,6 +13,7 @@ import type {
   ExtractedData,
   Framework,
   ManifestIdentity,
+  ManifestOutput,
 } from '../types/index.js';
 import { OutputType } from '../types/output.js';
 
@@ -56,6 +57,16 @@ export interface ProcessorConfig {
    * @default 2000
    */
   maxGenerationTokens?: number;
+
+  /**
+   * List of component names that exist in the design system.
+   * Used to filter LLM-generated relatedComponents to prevent
+   * hallucinated component names.
+   *
+   * If not provided, all relatedComponents from the LLM are kept.
+   * Format: PascalCase component names (e.g., ['Button', 'Card', 'Input'])
+   */
+  availableComponents?: string[];
 }
 
 // =============================================================================
@@ -208,7 +219,10 @@ export interface ProcessorSuccess {
   /** Discriminant for type narrowing */
   type: typeof ProcessorOutputType.Success;
 
-  /** Complete component manifest */
+  /** Split manifest output (componentName, metadata, manifest) */
+  output: ManifestOutput;
+
+  /** Complete component manifest (legacy, for internal use) */
   manifest: ComponentManifest;
 
   /** Processing metrics */

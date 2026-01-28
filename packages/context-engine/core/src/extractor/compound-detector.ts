@@ -75,7 +75,7 @@ function findCommonPrefix(names: string[]): string | undefined {
 }
 
 /**
- * Extract named exports from source code
+ * Extract named exports from source code (excluding type-only exports)
  */
 function extractNamedExports(sourceFile: SourceFile): string[] {
   const exports: string[] = [];
@@ -86,8 +86,18 @@ function extractNamedExports(sourceFile: SourceFile): string[] {
   );
 
   for (const decl of exportDeclarations) {
+    // Skip entire type-only export declarations: export type { ... }
+    if (decl.isTypeOnly()) {
+      continue;
+    }
+
     const namedExports = decl.getNamedExports();
     for (const namedExport of namedExports) {
+      // Skip individual type exports: export { type Foo, Bar }
+      if (namedExport.isTypeOnly()) {
+        continue;
+      }
+
       const name = namedExport.getName();
       // Use alias if present (export { Root as Dialog })
       const alias = namedExport.getAliasNode()?.getText();
@@ -332,6 +342,67 @@ export function detectCompoundComponent(
   } finally {
     project.removeSourceFile(sourceFile);
   }
+}
+
+/**
+ * Infer whether a sub-component is required in composition
+ *
+ * Uses naming heuristics to determine if a sub-component is typically
+ * required when composing the compound component.
+ *
+ * @example
+ * inferRequiredInComposition("AccordionItem", "Accordion") // true - items are required
+ * inferRequiredInComposition("DialogClose", "Dialog") // false - close button is optional
+ * inferRequiredInComposition("TabsSeparator", "Tabs") // false - separators are optional
+ */
+export function inferRequiredInComposition(
+  subComponentName: string,
+  rootComponentName: string
+): boolean {
+  // Common optional suffixes across all compound components
+  const optionalSuffixes = ['Separator', 'Label', 'Group'];
+  if (optionalSuffixes.some((suffix) => subComponentName.endsWith(suffix))) {
+    return false;
+  }
+
+  // Dialog-specific optional sub-components
+  if (rootComponentName === 'Dialog') {
+    const dialogOptional = [
+      'Header',
+      'Footer',
+      'Title',
+      'Description',
+      'Close',
+    ];
+    if (dialogOptional.some((suffix) => subComponentName.endsWith(suffix))) {
+      return false;
+    }
+  }
+
+  // Alert-specific optional sub-components
+  if (rootComponentName === 'Alert') {
+    const alertOptional = ['Title', 'Description'];
+    if (alertOptional.some((suffix) => subComponentName.endsWith(suffix))) {
+      return false;
+    }
+  }
+
+  // Card-specific optional sub-components
+  if (rootComponentName === 'Card') {
+    const cardOptional = [
+      'Header',
+      'Footer',
+      'Title',
+      'Description',
+      'Content',
+    ];
+    if (cardOptional.some((suffix) => subComponentName.endsWith(suffix))) {
+      return false;
+    }
+  }
+
+  // Default: sub-component is required
+  return true;
 }
 
 /**

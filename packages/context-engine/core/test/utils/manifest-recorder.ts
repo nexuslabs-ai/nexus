@@ -1,9 +1,8 @@
 /**
  * Manifest Recorder
  *
- * Utilities for recording complete ComponentManifest outputs for testing
- * and documentation purposes. Recorded manifests serve as live examples
- * of what the pipeline produces.
+ * Utilities for recording ManifestOutput for testing and documentation purposes.
+ * Recorded manifests serve as live examples of what the pipeline produces.
  *
  * ## Recording Mode
  *
@@ -13,16 +12,17 @@
  * RECORD_MANIFESTS=true USE_CACHED=true yarn test test/integration/processor.test.ts
  * ```
  *
- * ## File Structure
+ * ## File Structure (NEW SPLIT STRUCTURE)
  *
  * Recorded manifests are stored in `test/fixtures/manifests/{component}.json`:
  *
  * ```json
  * {
  *   "componentName": "Button",
- *   "manifest": { ... },  // Complete ComponentManifest
+ *   "metadata": { ... },     // System metadata (not for AI)
+ *   "manifest": { ... },     // AI-focused manifest (optimized for tokens)
  *   "recordedAt": "2025-01-22T10:00:00.000Z",
- *   "fixtureSource": "shadcn/button"
+ *   "fixtureSource": "nexus/button"
  * }
  * ```
  */
@@ -37,7 +37,11 @@ import {
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { ComponentManifest } from '../../src/types/manifest.js';
+import type {
+  AIManifest,
+  ManifestMetadata,
+  ManifestOutput,
+} from '../../src/types/manifest.js';
 
 // Get directory paths
 const __filename = fileURLToPath(import.meta.url);
@@ -45,19 +49,22 @@ const __dirname = dirname(__filename);
 const MANIFESTS_DIR = resolve(__dirname, '../fixtures/manifests');
 
 /**
- * Recorded manifest with metadata
+ * Recorded manifest with metadata (NEW SPLIT STRUCTURE)
  */
 export interface RecordedManifest {
   /** Component name this manifest is for */
   componentName: string;
 
-  /** The complete component manifest */
-  manifest: ComponentManifest;
+  /** System metadata (not for AI consumption) */
+  metadata: ManifestMetadata;
+
+  /** AI-focused manifest (optimized for token efficiency) */
+  manifest: AIManifest;
 
   /** Recording timestamp (ISO string) */
   recordedAt: string;
 
-  /** Source fixture used (e.g., "shadcn/button") */
+  /** Source fixture used (e.g., "nexus/button") */
   fixtureSource?: string;
 }
 
@@ -77,16 +84,16 @@ export function isManifestRecordingMode(): boolean {
 // =============================================================================
 
 /**
- * Save a manifest to the fixtures directory
+ * Save a manifest output to the fixtures directory
  *
  * @param componentName - Component name (used as filename)
- * @param manifest - Complete ComponentManifest
+ * @param output - ManifestOutput with split structure (componentName, metadata, manifest)
  * @param options - Additional metadata options
  * @returns File path where manifest was saved
  */
 export function saveRecordedManifest(
   componentName: string,
-  manifest: ComponentManifest,
+  output: ManifestOutput,
   options: {
     fixtureSource?: string;
   } = {}
@@ -98,7 +105,8 @@ export function saveRecordedManifest(
 
   const record: RecordedManifest = {
     componentName,
-    manifest,
+    metadata: output.metadata,
+    manifest: output.manifest,
     recordedAt: new Date().toISOString(),
     fixtureSource: options.fixtureSource,
   };
@@ -112,13 +120,13 @@ export function saveRecordedManifest(
 }
 
 /**
- * Load a recorded manifest from fixtures
+ * Load a recorded AI manifest from fixtures
  *
  * @param componentName - Component name to load
- * @returns Complete ComponentManifest
+ * @returns AIManifest (optimized for AI consumption)
  * @throws Error if manifest file not found
  */
-export function loadRecordedManifest(componentName: string): ComponentManifest {
+export function loadRecordedManifest(componentName: string): AIManifest {
   const filePath = join(MANIFESTS_DIR, `${componentName.toLowerCase()}.json`);
 
   if (!existsSync(filePath)) {

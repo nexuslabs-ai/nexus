@@ -10,6 +10,7 @@ import type {
   ComponentMeta,
   ExtractedData,
   ManifestIdentity,
+  ManifestOutput,
 } from '../types/index.js';
 import { OutputType } from '../types/output.js';
 
@@ -28,6 +29,16 @@ export interface ManifestBuilderConfig {
    * @default '@nexus/react'
    */
   defaultPackageName?: string;
+
+  /**
+   * List of component names that exist in the design system.
+   * Used to filter LLM-generated relatedComponents to prevent
+   * hallucinated component names.
+   *
+   * If not provided, all relatedComponents from the LLM are kept.
+   * Format: PascalCase component names (e.g., ['Button', 'Card', 'Input'])
+   */
+  availableComponents?: string[];
 }
 
 /**
@@ -74,7 +85,10 @@ export interface ManifestBuilderSuccess {
   /** Discriminant for type narrowing */
   type: typeof ManifestBuildOutputType.Success;
 
-  /** Complete component manifest */
+  /** Complete manifest output with split structure */
+  output: ManifestOutput;
+
+  /** Legacy: full manifest for internal use */
   manifest: ComponentManifest;
 
   /** Build timestamp */

@@ -106,10 +106,13 @@ describe('ComponentProcessor', () => {
       expect(isProcessorSuccess(result)).toBe(true);
       if (isProcessorSuccess(result)) {
         // Variants come from extraction, not generation
-        // v1.0 schema: variants is CvaVariants with values and default
-        expect(result.manifest.variants).toBeDefined();
-        expect(result.manifest.variants?.variant?.values).toContain('default');
-        expect(result.manifest.variants?.variant?.default).toBe('default');
+        // v1.0 schema: variant info is in props.variants
+        const variantProps = result.manifest.props.variants;
+        expect(variantProps).toBeDefined();
+
+        const variantProp = variantProps?.find((p) => p.name === 'variant');
+        expect(variantProp?.values).toContain('default');
+        expect(variantProp?.defaultValue).toBe('default');
       }
     });
   });

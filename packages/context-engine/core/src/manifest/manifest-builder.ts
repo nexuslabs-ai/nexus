@@ -10,17 +10,23 @@
 
 import type { ExtractedStory } from '../extractor/storybook/types.js';
 import type {
+  AIManifest,
   CategorizedProps,
   CodeExample,
   ComponentManifest,
+  CompoundComponentInfo,
   CvaVariants,
   EmbeddingStatus,
   ExtractedData,
   ExtractedProp,
+  ExtractedSubComponent,
   Guidance,
   ImportStatement,
+  ManifestMetadata,
+  ManifestOutput,
   PropDefinition,
   StructuredExamples,
+  SubComponent,
 } from '../types/index.js';
 import {
   DEFAULT_EMBEDDING_MODEL,
@@ -28,7 +34,10 @@ import {
 } from '../types/index.js';
 import { generateObjectHash } from '../utils/hash.js';
 import { logger } from '../utils/logger.js';
-import { categorizeProps } from '../utils/prop-categorization.js';
+import {
+  categorizeProps,
+  detectChildrenInfo,
+} from '../utils/prop-categorization.js';
 
 import { generateImportStatement } from './import-generator.js';
 import {
@@ -65,7 +74,10 @@ const DEFAULT_PACKAGE_NAME = '@nexus/react';
  * ```
  */
 export class ManifestBuilder {
-  private readonly config: Required<ManifestBuilderConfig>;
+  private readonly config: {
+    defaultPackageName: string;
+    availableComponents?: string[];
+  };
 
   /**
    * Create a new ManifestBuilder
@@ -75,6 +87,7 @@ export class ManifestBuilder {
   constructor(config: ManifestBuilderConfig = {}) {
     this.config = {
       defaultPackageName: config.defaultPackageName ?? DEFAULT_PACKAGE_NAME,
+      availableComponents: config.availableComponents,
     };
   }
 
@@ -110,20 +123,25 @@ export class ManifestBuilder {
       categorizedProps
     );
 
-    // Build CVA variants with defaults
-    const cvaVariants = this.buildCvaVariants(
-      extracted.variants,
-      extracted.defaultVariants
+    // Merge LLM-generated variant descriptions into props.variants
+    categorizedProps = this.mergeValueDescriptions(
+      categorizedProps,
+      meta.ai?.variantDescriptions
     );
 
-    // Generate import statement
+    // Generate import statement (include all exports for compound components)
     const importStatement = this.buildImportStatement(
       name,
-      extracted.npmDependencies
+      extracted.npmDependencies,
+      extracted.compoundInfo
     );
 
     // Build minimal example
-    const minimalExample = this.buildMinimalExample(name, extracted.variants);
+    const minimalExample = this.buildMinimalExample(
+      name,
+      extracted.variants,
+      extracted.acceptsChildren
+    );
 
     // Build structured examples from meta (prefer Storybook if available)
     const examples = this.buildStructuredExamples(name, meta, extracted);
@@ -136,6 +154,9 @@ export class ManifestBuilder {
 
     // Get tokens
     const tokens = meta.ai?.tokens ?? [];
+
+    // Build sub-components for compound components
+    const subComponents = this.buildSubComponents(extracted.subComponents);
 
     const manifest: ComponentManifest = {
       // Schema version for migrations
@@ -159,7 +180,6 @@ export class ManifestBuilder {
       importStatement,
       minimalExample,
       props: categorizedProps,
-      variants: cvaVariants,
       examples,
       guidance,
       semanticDescription,
@@ -175,6 +195,12 @@ export class ManifestBuilder {
       // Base library if detected
       baseLibrary: extracted.baseLibrary,
 
+      // Sub-components for compound components
+      subComponents,
+
+      // Radix primitive info for direct re-exports
+      radixPrimitive: extracted.radixPrimitive,
+
       // Embedding status (pending until processed)
       embeddingStatus: 'pending' as EmbeddingStatus,
       embeddingError: undefined,
@@ -187,9 +213,17 @@ export class ManifestBuilder {
       metaHash,
     };
 
+    // Build the split output structure
+    const output: ManifestOutput = {
+      componentName: identity.name,
+      metadata: this.buildMetadata(manifest),
+      manifest: this.buildAIManifest(extracted, manifest),
+    };
+
     return {
       type: ManifestBuildOutputType.Success,
-      manifest,
+      output,
+      manifest, // Keep for internal use
       builtAt: now,
     };
   }
@@ -211,9 +245,9 @@ export class ManifestBuilder {
    * because react-docgen-typescript doesn't see them as props (they come from
    * VariantProps<typeof componentVariants>).
    *
-   * Solution: For each CVA variant that isn't already in props.variants,
-   * create prop metadata so AI assistants have complete variant information
-   * in both manifest.variants (values) and props.variants (prop metadata).
+   * Solution:
+   * 1. MERGE defaultValue into existing variant props that lack it
+   * 2. ADD missing variant props for CVA variants not in props.variants
    *
    * @param extractedVariants - CVA variant definitions from extraction
    * @param defaultVariants - Default variant values from extraction
@@ -225,48 +259,78 @@ export class ManifestBuilder {
     defaultVariants: ExtractedData['defaultVariants'],
     categorizedProps: CategorizedProps
   ): CategorizedProps {
-    // Get CVA variant names
     const cvaVariantNames = Object.keys(extractedVariants);
 
     if (cvaVariantNames.length === 0) {
       return categorizedProps;
     }
 
-    // Check which variant props are already in props.variants
+    const existingVariants = categorizedProps.variants ?? [];
     const existingVariantPropNames = new Set(
-      categorizedProps.variants.map((p) => p.name)
+      existingVariants.map((p) => p.name)
     );
 
-    // Create prop metadata for CVA variants that aren't already in props.variants
+    // MERGE defaultValue into existing variant props
+    const updatedVariants = existingVariants.map((prop) => {
+      const defaultValue = defaultVariants[prop.name];
+      if (defaultValue !== undefined && prop.defaultValue === undefined) {
+        return { ...prop, defaultValue };
+      }
+      return prop;
+    });
+
+    // ADD missing variant props
     const missingVariantProps: PropDefinition[] = cvaVariantNames
       .filter((name) => !existingVariantPropNames.has(name))
-      .map((name) => {
-        const values = extractedVariants[name] ?? [];
-        const defaultValue = defaultVariants[name];
+      .map((name) => ({
+        name,
+        type: 'string',
+        description: `Component ${name} variant`,
+        defaultValue: defaultVariants[name],
+        values: extractedVariants[name] ?? [],
+        required: false,
+      }));
 
-        return {
-          name,
-          type:
-            values.length > 0
-              ? values.map((v) => `'${v}'`).join(' | ')
-              : 'string',
-          typeCategory: 'literal' as const,
-          required: false,
-          description: `Component ${name} variant`,
-          defaultValue,
-          possibleValues: values,
-        };
-      });
+    return {
+      ...categorizedProps,
+      variants: [...updatedVariants, ...missingVariantProps],
+    };
+  }
 
-    // If no missing variants, return as-is
-    if (missingVariantProps.length === 0) {
+  /**
+   * Merge LLM-generated variant descriptions into props.variants
+   *
+   * The LLM generates descriptions for each variant value (e.g., what "destructive"
+   * means for the variant prop). This method merges those descriptions into the
+   * corresponding props so AI assistants understand what each value does.
+   *
+   * @param categorizedProps - Props already categorized
+   * @param variantDescriptions - LLM-generated descriptions keyed by variant name
+   * @returns Updated categorized props with valueDescriptions
+   */
+  private mergeValueDescriptions(
+    categorizedProps: CategorizedProps,
+    variantDescriptions?: Record<string, Record<string, string>>
+  ): CategorizedProps {
+    if (!variantDescriptions || !categorizedProps.variants) {
       return categorizedProps;
     }
 
-    // Add missing variant props to the variants category
+    const updatedVariants = categorizedProps.variants.map((prop) => {
+      const descriptions = variantDescriptions[prop.name];
+      if (!descriptions) {
+        return prop;
+      }
+
+      return {
+        ...prop,
+        valueDescriptions: descriptions,
+      };
+    });
+
     return {
       ...categorizedProps,
-      variants: [...categorizedProps.variants, ...missingVariantProps],
+      variants: updatedVariants,
     };
   }
 
@@ -291,10 +355,13 @@ export class ManifestBuilder {
 
   /**
    * Build import statement for the component
+   *
+   * For compound components, includes all exported sub-components in the import.
    */
   private buildImportStatement(
     name: string,
-    npmDependencies: Record<string, string>
+    npmDependencies: Record<string, string>,
+    compoundInfo?: CompoundComponentInfo
   ): ImportStatement {
     // Start with configurable default package name
     let packageName = this.config.defaultPackageName;
@@ -311,23 +378,94 @@ export class ManifestBuilder {
       packageName = designSystemPackages[0];
     }
 
+    // Build exports list: root component + sub-components for compound components
+    const exports =
+      compoundInfo?.isCompound && compoundInfo.subComponents.length > 0
+        ? [compoundInfo.rootComponent, ...compoundInfo.subComponents]
+        : undefined;
+
     return generateImportStatement({
       componentName: name,
       packageName,
       hasSubpathExports: false, // Conservative default
+      exports,
     });
   }
 
   /**
+   * Build sub-components for compound components
+   *
+   * Converts extracted sub-component data into manifest SubComponent format
+   * with categorized props, Radix primitive info, and CVA variants.
+   *
+   * @param extractedSubComponents - Sub-components extracted from source
+   * @returns Array of SubComponent or undefined if no sub-components
+   */
+  private buildSubComponents(
+    extractedSubComponents?: ExtractedSubComponent[]
+  ): SubComponent[] | undefined {
+    if (!extractedSubComponents || extractedSubComponents.length === 0) {
+      return undefined;
+    }
+
+    return extractedSubComponents.map((sub) => {
+      // Categorize props with any CVA variants for this subComponent
+      const categorizedProps = categorizeProps(sub.props, sub.variants ?? {});
+
+      // Build base subComponent
+      const subComponent: SubComponent = {
+        name: sub.name,
+        description: sub.description,
+        props: categorizedProps,
+        dataSlot: this.inferDataSlot(sub.name),
+        requiredInComposition: sub.requiredInComposition,
+      };
+
+      // Add Radix primitive info if detected
+      if (sub.radixPrimitive) {
+        subComponent.radixPrimitive = sub.radixPrimitive;
+      }
+
+      // Add CVA variants if any
+      if (sub.variants && Object.keys(sub.variants).length > 0) {
+        subComponent.variants = this.buildCvaVariants(
+          sub.variants,
+          sub.defaultVariants ?? {}
+        );
+      }
+
+      return subComponent;
+    });
+  }
+
+  /**
+   * Infer data-slot value from component name
+   *
+   * Converts PascalCase to kebab-case for data-slot attribute.
+   * Example: "DropdownMenuItem" -> "dropdown-menu-item"
+   *
+   * @param componentName - PascalCase component name
+   * @returns kebab-case data-slot value
+   */
+  private inferDataSlot(componentName: string): string {
+    return componentName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  }
+
+  /**
    * Build minimal example code
+   *
+   * @param name - Component name
+   * @param variants - CVA variants (used to determine if props exist)
+   * @param acceptsChildren - Whether the component accepts children
    */
   private buildMinimalExample(
     name: string,
-    variants: Record<string, string[]>
+    variants: Record<string, string[]>,
+    acceptsChildren: boolean
   ): string {
-    // If component has variants, show a basic variant usage
-    // Otherwise just show the component with no props
-    if (Object.keys(variants).length > 0) {
+    // If component accepts children and has variants, show with content
+    // Otherwise use self-closing tag
+    if (acceptsChildren && Object.keys(variants).length > 0) {
       return `<${name}>Content</${name}>`;
     }
     return `<${name} />`;
@@ -378,10 +516,6 @@ export class ManifestBuilder {
         minimalStory?.code ??
         `<${componentName} />`,
       isPrimary: true,
-      propsUsed:
-        minimalStory?.propsUsed && minimalStory.propsUsed.length > 0
-          ? minimalStory.propsUsed
-          : undefined,
     };
 
     // Common examples (max 8) - exclude the minimal story
@@ -391,7 +525,6 @@ export class ManifestBuilder {
       .map((s) => ({
         title: s.title,
         code: s.renderCode ?? s.code ?? `<${componentName} />`,
-        propsUsed: s.propsUsed.length > 0 ? s.propsUsed : undefined,
       }));
 
     // Advanced examples (max 3)
@@ -401,7 +534,6 @@ export class ManifestBuilder {
         ? advancedStories.slice(0, 3).map((s) => ({
             title: s.title,
             code: s.renderCode ?? s.code ?? `<${componentName} />`,
-            propsUsed: s.propsUsed.length > 0 ? s.propsUsed : undefined,
           }))
         : undefined;
 
@@ -433,12 +565,10 @@ export class ManifestBuilder {
     const common: CodeExample[] = aiExamples.slice(1).map((code, index) => {
       // Try to extract a meaningful title from the code
       const title = this.extractExampleTitle(code, index);
-      const propsUsed = this.extractPropsUsed(code);
 
       return {
         title,
         code,
-        propsUsed: propsUsed.length > 0 ? propsUsed : undefined,
       };
     });
 
@@ -488,40 +618,40 @@ export class ManifestBuilder {
   }
 
   /**
-   * Extract props used from example code
-   */
-  private extractPropsUsed(code: string): string[] {
-    const propsUsed: string[] = [];
-
-    // Match prop=value or prop="value" or prop={value} patterns
-    const propMatches = code.matchAll(/\s([a-zA-Z]+)(?:=["'{]|[^a-zA-Z>])/g);
-    for (const match of propMatches) {
-      const propName = match[1];
-      // Filter out common non-prop patterns
-      if (
-        !['div', 'span', 'a', 'p', 'className', 'style', 'key', 'ref'].includes(
-          propName
-        )
-      ) {
-        propsUsed.push(propName);
-      }
-    }
-
-    return [...new Set(propsUsed)]; // Remove duplicates
-  }
-
-  /**
    * Build guidance from meta.ai
+   *
+   * If availableComponents is configured, filters relatedComponents to only
+   * include components that actually exist in the design system.
    */
   private buildGuidance(meta: ManifestBuilderInput['meta']): Guidance {
     const ai = meta.ai;
+    let relatedComponents = ai?.relatedComponents ?? [];
+
+    // Filter relatedComponents if availableComponents is configured
+    if (this.config.availableComponents && relatedComponents.length > 0) {
+      const available = new Set(this.config.availableComponents);
+      const filtered = relatedComponents.filter((comp) => available.has(comp));
+
+      if (filtered.length !== relatedComponents.length) {
+        const removed = relatedComponents.filter(
+          (comp) => !available.has(comp)
+        );
+        logger.debug('Filtered non-existent relatedComponents', {
+          original: relatedComponents,
+          filtered,
+          removed,
+        });
+      }
+
+      relatedComponents = filtered;
+    }
 
     return {
       whenToUse: ai?.whenToUse ?? `Use ${meta.name} for common use cases.`,
       whenNotToUse: ai?.whenNotToUse ?? 'Consider alternatives when needed.',
       accessibility: ai?.a11yNotes ?? 'Follows WAI-ARIA patterns.',
       patterns: ai?.patterns ?? [],
-      relatedComponents: ai?.relatedComponents ?? [],
+      relatedComponents,
     };
   }
 
@@ -554,6 +684,88 @@ export class ManifestBuilder {
   }
 
   /**
+   * Build system metadata (not for AI consumption)
+   *
+   * Extracts system-level fields from the full manifest that are used
+   * for tracking, embeddings, and version management.
+   *
+   * @param manifest - The full ComponentManifest
+   * @returns ManifestMetadata with system fields
+   */
+  private buildMetadata(manifest: ComponentManifest): ManifestMetadata {
+    return {
+      id: manifest.id,
+      schemaVersion: manifest.schemaVersion,
+      version: manifest.version,
+      framework: manifest.framework,
+      visibility: manifest.visibility,
+      tier: manifest.tier,
+      embeddingStatus: manifest.embeddingStatus,
+      embeddingModel: manifest.embeddingModel,
+      embeddingError: manifest.embeddingError,
+      generatedAt: manifest.generatedAt,
+      updatedAt: manifest.updatedAt,
+      sourceHash: manifest.sourceHash,
+      metaHash: manifest.metaHash,
+      files: manifest.files,
+    };
+  }
+
+  /**
+   * Build AI-focused manifest (optimized for token efficiency)
+   *
+   * Creates a slim manifest with only the fields AI assistants need
+   * to generate correct component code. Props are already clean from
+   * extraction (no passthrough props).
+   *
+   * Note: Top-level variants removed - variant info is in props.variants
+   * with values and valueDescriptions for each prop.
+   *
+   * @param extracted - Extracted data for children detection
+   * @param manifest - The full ComponentManifest
+   * @returns AIManifest optimized for AI consumption
+   */
+  private buildAIManifest(
+    extracted: ExtractedData,
+    manifest: ComponentManifest
+  ): AIManifest {
+    // Detect children info from extracted props
+    const children = detectChildrenInfo(extracted.props);
+
+    // Check if props has any content (any category with items)
+    const hasProps =
+      manifest.props &&
+      Object.values(manifest.props).some(
+        (category) => category && category.length > 0
+      );
+
+    // Use semanticDescription as the single description (it's richer)
+    const description = manifest.semanticDescription || manifest.description;
+
+    // Build dependencies (omit if empty)
+    const hasDependencies =
+      Object.keys(manifest.dependencies.npm).length > 0 ||
+      manifest.dependencies.internal.length > 0;
+
+    return {
+      name: manifest.name,
+      slug: manifest.slug,
+      description,
+      importStatement: manifest.importStatement,
+      ...(children && { children }),
+      ...(hasProps && { props: manifest.props }),
+      ...(manifest.examples && { examples: manifest.examples }),
+      ...(manifest.guidance && { guidance: manifest.guidance }),
+      ...(hasDependencies && { dependencies: manifest.dependencies }),
+      ...(manifest.baseLibrary && { baseLibrary: manifest.baseLibrary }),
+      ...(manifest.subComponents && { subComponents: manifest.subComponents }),
+      ...(manifest.radixPrimitive && {
+        radixPrimitive: manifest.radixPrimitive,
+      }),
+    };
+  }
+
+  /**
    * Update an existing manifest with new extraction or generation data
    *
    * Preserves unchanged fields and updates timestamps appropriately.
@@ -575,14 +787,6 @@ export class ManifestBuilder {
       ? this.buildCategorizedProps(
           updates.extracted.props,
           updates.extracted.variants
-        )
-      : undefined;
-
-    // Build updated variants if extraction changed
-    const updatedVariants: CvaVariants | undefined = updates.extracted
-      ? this.buildCvaVariants(
-          updates.extracted.variants,
-          updates.extracted.defaultVariants
         )
       : undefined;
 
@@ -612,7 +816,6 @@ export class ManifestBuilder {
       // Extraction updates
       ...(updates.extracted && {
         props: updatedProps!,
-        variants: updatedVariants!,
         files: updates.extracted.files,
         dependencies: {
           npm: updates.extracted.npmDependencies,
@@ -691,57 +894,5 @@ export class ManifestBuilder {
       sourceHash,
       version,
     });
-  }
-
-  /**
-   * Validate that propsUsed in examples reference actual props
-   *
-   * Logs warnings for hallucinated prop references.
-   */
-  validatePropsUsed(
-    examples: StructuredExamples,
-    props: CategorizedProps
-  ): void {
-    // Collect all prop names
-    const allPropNames = new Set<string>();
-    for (const category of Object.values(props)) {
-      for (const prop of category) {
-        allPropNames.add(prop.name);
-      }
-    }
-
-    // Check minimal example
-    this.validateExamplePropsUsed(examples.minimal, allPropNames, 'minimal');
-
-    // Check common examples
-    for (const example of examples.common) {
-      this.validateExamplePropsUsed(example, allPropNames, example.title);
-    }
-
-    // Check advanced examples
-    if (examples.advanced) {
-      for (const example of examples.advanced) {
-        this.validateExamplePropsUsed(example, allPropNames, example.title);
-      }
-    }
-  }
-
-  /**
-   * Validate a single example's propsUsed
-   */
-  private validateExamplePropsUsed(
-    example: CodeExample,
-    validProps: Set<string>,
-    exampleName: string
-  ): void {
-    if (!example.propsUsed) return;
-
-    for (const propName of example.propsUsed) {
-      if (!validProps.has(propName)) {
-        logger.warn(
-          `Example "${exampleName}" references unknown prop: ${propName}`
-        );
-      }
-    }
   }
 }

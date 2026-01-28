@@ -15,13 +15,15 @@ import type { ComponentManifest } from '../../src/types/manifest.js';
 
 /**
  * Expected prop shape for partial matching
+ *
+ * Simplified structure after props cleanup:
+ * - name, type, description, defaultValue, values
  */
 export interface ExpectedProp {
   name: string;
   type?: string;
-  required?: boolean;
-  typeCategory?: string;
   defaultValue?: unknown;
+  values?: string[];
 }
 
 /**
@@ -33,7 +35,7 @@ export interface ExpectedProp {
  * ```typescript
  * expectPropsToInclude(result.props, [
  *   { name: 'variant', type: 'string' },
- *   { name: 'size', required: false },
+ *   { name: 'size', values: ['sm', 'md', 'lg'] },
  * ]);
  * ```
  */
@@ -52,16 +54,12 @@ export function expectPropsToInclude(
       expect(found.type).toContain(expected.type);
     }
 
-    if (expected.required !== undefined) {
-      expect(found.required).toBe(expected.required);
-    }
-
-    if (expected.typeCategory !== undefined) {
-      expect(found.typeCategory).toBe(expected.typeCategory);
-    }
-
     if (expected.defaultValue !== undefined) {
       expect(found.defaultValue).toBe(expected.defaultValue);
+    }
+
+    if (expected.values !== undefined) {
+      expect(found.values).toEqual(expected.values);
     }
   }
 }
@@ -153,6 +151,8 @@ export function expectBaseLibrary(
  *
  * Validates that a manifest contains the minimum information
  * needed for AI assistants to generate correct code.
+ *
+ * Note: With props cleanup, categories are optional (undefined if empty).
  */
 export function expectManifestAIReady(manifest: ComponentManifest): void {
   // Identity required
@@ -168,26 +168,25 @@ export function expectManifestAIReady(manifest: ComponentManifest): void {
   expect(manifest.props).toBeDefined();
   expect(typeof manifest.props).toBe('object');
 
-  // CategorizedProps has these categories
+  // CategorizedProps categories (all optional - undefined if empty)
   const propCategories = [
     'variants',
     'behaviors',
     'events',
     'slots',
-    'passthrough',
     'other',
   ] as const;
 
-  // Each category should be an array
+  // Each category should be an array or undefined
   for (const category of propCategories) {
-    expect(Array.isArray(manifest.props[category])).toBe(true);
-  }
-
-  // Each prop in each category should have name and type
-  for (const category of propCategories) {
-    for (const prop of manifest.props[category]) {
-      expect(prop.name).toBeTruthy();
-      expect(prop.type).toBeTruthy();
+    const categoryProps = manifest.props[category];
+    if (categoryProps !== undefined) {
+      expect(Array.isArray(categoryProps)).toBe(true);
+      // Each prop in category should have name and type
+      for (const prop of categoryProps) {
+        expect(prop.name).toBeTruthy();
+        expect(prop.type).toBeTruthy();
+      }
     }
   }
 
@@ -212,10 +211,12 @@ export function getAllProps(
     'behaviors',
     'events',
     'slots',
-    'passthrough',
     'other',
   ] as const) {
-    allProps.push(...categorizedProps[category]);
+    const categoryProps = categorizedProps[category];
+    if (categoryProps) {
+      allProps.push(...categoryProps);
+    }
   }
 
   return allProps;

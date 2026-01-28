@@ -1,123 +1,12 @@
 {
   "componentName": "Card",
-  "manifest": {
+  "metadata": {
+    "id": "8c91dcb5-91c6-47b9-a5ae-0db3abf149c5",
     "schemaVersion": "1.0",
-    "id": "5672cf3a-4e5c-40fb-91cd-2ffd6aefbab4",
-    "slug": "card-react-5672cf3a",
-    "name": "Card",
     "version": "0.0.1",
     "framework": "react",
     "visibility": "private",
-    "description": "A versatile container component used to group and display related content, often with a distinct visual boundary.",
     "tier": "free",
-    "importStatement": {
-      "primary": "import { Card } from '@nexus/react'",
-      "typeOnly": "import type { CardProps } from '@nexus/react'"
-    },
-    "minimalExample": "<Card />",
-    "props": {
-      "variants": [],
-      "behaviors": [],
-      "events": [],
-      "slots": [],
-      "passthrough": [],
-      "other": []
-    },
-    "variants": {},
-    "examples": {
-      "minimal": {
-        "title": "Default",
-        "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card Title</CardTitle>\n        <CardDescription>Card description goes here.</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>Card content goes here.</p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\">Cancel</Button>\n        <Button>Submit</Button>\n      </CardFooter>\n    </Card>\n  )",
-        "isPrimary": true,
-        "propsUsed": ["content", "description", "goes", "variant"]
-      },
-      "common": [],
-      "advanced": [
-        {
-          "title": "With Description",
-          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Description</CardTitle>\n        <CardDescription>\n          This is a longer description that provides more context about the card\n          content.\n        </CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>Main content area of the card.</p>\n      </CardContent>\n    </Card>\n  )",
-          "propsUsed": [
-            "a",
-            "about",
-            "area",
-            "card",
-            "content",
-            "context",
-            "description",
-            "is",
-            "longer",
-            "more",
-            "of",
-            "provides",
-            "that",
-            "the",
-            "with"
-          ]
-        },
-        {
-          "title": "With Action",
-          "code": "(\n    <Card className=\"nx:relative nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Action</CardTitle>\n        <CardDescription>This card has an action button.</CardDescription>\n        <CardAction>\n          <Button size=\"sm\" variant=\"outline\">\n            Edit\n          </Button>\n        </CardAction>\n      </CardHeader>\n      <CardContent>\n        <p>Content with an action button in the header.</p>\n      </CardContent>\n    </Card>\n  )",
-          "propsUsed": [
-            "action",
-            "an",
-            "button",
-            "card",
-            "has",
-            "in",
-            "size",
-            "the",
-            "variant",
-            "with"
-          ]
-        },
-        {
-          "title": "With Footer",
-          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Footer</CardTitle>\n        <CardDescription>This card demonstrates footer usage.</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>The footer is useful for action buttons.</p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\">Cancel</Button>\n        <Button>Save Changes</Button>\n      </CardFooter>\n    </Card>\n  )",
-          "propsUsed": [
-            "action",
-            "card",
-            "demonstrates",
-            "footer",
-            "for",
-            "is",
-            "useful",
-            "variant",
-            "with"
-          ]
-        }
-      ]
-    },
-    "guidance": {
-      "whenToUse": "Use the Card component when you need to group related information visually, present discrete blocks of content, or create layouts that emphasize individual content items. It's ideal for displaying self-contained content units like product listings, user profiles, articles, or dashboard widgets.",
-      "whenNotToUse": "Avoid using the Card component for very simple content that doesn't require distinct visual grouping, or when a more specific layout component (e.g., a list, a table, or a simple div) would be more semantically appropriate. Do not overuse cards as it can lead to visual clutter and make the interface feel heavy.",
-      "accessibility": "Ensure that content within the Card is semantically structured using appropriate HTML elements (e.g., headings for titles, paragraphs for text). If the card itself is interactive (e.g., clickable), ensure it has an appropriate ARIA role (e.g., 'button' or 'link' if it acts as one) and is keyboard navigable. Manage focus within interactive cards responsibly.",
-      "patterns": ["container", "layout", "data-display"],
-      "relatedComponents": [
-        "Button",
-        "Image",
-        "Text",
-        "Heading",
-        "Stack",
-        "Grid"
-      ]
-    },
-    "semanticDescription": "The Card component serves as a flexible and visually distinct container for organizing and presenting information. Its primary purpose is to encapsulate related content, providing clear visual separation from other elements on the page. Key features include its ability to house various types of content such as text, images, and interactive elements, often featuring subtle styling like borders, shadows, and rounded corners to enhance its visual prominence. Common use cases include displaying product cards in e-commerce, user profiles in social applications, article previews in blogs, or individual data visualizations in dashboards, making complex information digestible and scannable.",
-    "tokens": [
-      "background-color-surface",
-      "border-radius-md",
-      "spacing-md",
-      "shadow-elevation-1"
-    ],
-    "files": [
-      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/card.tsx"
-    ],
-    "dependencies": {
-      "npm": {
-        "react": "*",
-        "@/lib": "*"
-      },
-      "internal": []
-    },
     "embeddingStatus": "pending",
     "embeddingModel": {
       "provider": "voyage",
@@ -125,11 +14,116 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-26T11:57:29.264Z",
-    "updatedAt": "2026-01-26T11:57:29.264Z",
+    "generatedAt": "2026-01-27T16:29:44.642Z",
+    "updatedAt": "2026-01-27T16:29:44.642Z",
     "sourceHash": "69c9a0f515c3f03477ee3b00998c4832d3b02558fca299d06340d091dc722b10",
-    "metaHash": "0866a0a8dd68df7170a221eb596d464372d776ccb0e3128bc75e5d767b875d7b"
+    "metaHash": "718066d117ad86da31d58b04561c1d3cbf42a1eea55af0f12a1b46d9d1ef4e9f",
+    "files": [
+      "/Users/prasadpatewar/Desktop/code/Nexus/ds/packages/react/src/components/ui/card.tsx"
+    ]
   },
-  "recordedAt": "2026-01-26T11:57:29.265Z",
+  "manifest": {
+    "name": "Card",
+    "slug": "card-react-8c91dcb5",
+    "description": "The Card component serves as a flexible and self-contained container for displaying distinct pieces of information or interactive elements. It's designed to help organize content visually, making complex UIs easier to digest. Key features include its ability to encapsulate various content types like text, images, and actions, providing clear visual boundaries and a sense of hierarchy. Cards are commonly used in dashboards, product listings, news feeds, and profiles to present individual items with a consistent look and feel, promoting readability and user engagement. They are highly adaptable and can be customized in terms of padding, shadow, border, and background to fit diverse design requirements.",
+    "importStatement": {
+      "primary": "import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@nexus/react'",
+      "typeOnly": "import type { CardProps } from '@nexus/react'"
+    },
+    "examples": {
+      "minimal": {
+        "title": "Default",
+        "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card Title</CardTitle>\n        <CardDescription>Card description goes here.</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>Card content goes here.</p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\">Cancel</Button>\n        <Button>Submit</Button>\n      </CardFooter>\n    </Card>\n  )",
+        "isPrimary": true
+      },
+      "common": [
+        {
+          "title": "With Description",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Description</CardTitle>\n        <CardDescription>\n          This is a longer description that provides more context about the card\n          content.\n        </CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>Main content area of the card.</p>\n      </CardContent>\n    </Card>\n  )"
+        },
+        {
+          "title": "With Action",
+          "code": "(\n    <Card className=\"nx:relative nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Action</CardTitle>\n        <CardDescription>This card has an action button.</CardDescription>\n        <CardAction>\n          <Button size=\"sm\" variant=\"outline\">\n            Edit\n          </Button>\n        </CardAction>\n      </CardHeader>\n      <CardContent>\n        <p>Content with an action button in the header.</p>\n      </CardContent>\n    </Card>\n  )"
+        },
+        {
+          "title": "With Footer",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Card with Footer</CardTitle>\n        <CardDescription>This card demonstrates footer usage.</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p>The footer is useful for action buttons.</p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\">Cancel</Button>\n        <Button>Save Changes</Button>\n      </CardFooter>\n    </Card>\n  )"
+        },
+        {
+          "title": "Content Only",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardContent className=\"nx:pt-6\">\n        <p>A card with only content, no header or footer.</p>\n      </CardContent>\n    </Card>\n  )"
+        },
+        {
+          "title": "Header Only",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Header Only Card</CardTitle>\n        <CardDescription>\n          This card only has a header section with title and description.\n        </CardDescription>\n      </CardHeader>\n    </Card>\n  )"
+        },
+        {
+          "title": "Long Content",
+          "code": "(\n    <Card className=\"nx:w-[400px]\">\n      <CardHeader>\n        <CardTitle>Article Title</CardTitle>\n        <CardDescription>Published on January 23, 2026</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <p className=\"nx:mb-4\">\n          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do\n          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad\n          minim veniam, quis nostrud exercitation ullamco laboris.\n        </p>\n        <p>\n          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n          dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n          proident.\n        </p>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"link\">Read more</Button>\n      </CardFooter>\n    </Card>\n  )"
+        },
+        {
+          "title": "Login Card",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Login</CardTitle>\n        <CardDescription>\n          Enter your credentials to access your account.\n        </CardDescription>\n      </CardHeader>\n      <CardContent>\n        <div className=\"nx:flex nx:flex-col nx:gap-4\">\n          <div className=\"nx:flex nx:flex-col nx:gap-2\">\n            <label\n              htmlFor=\"email\"\n              className=\"nx:text-sm nx:font-medium nx:text-foreground\"\n            >\n              Email\n            </label>\n            <Input id=\"email\" type=\"email\" placeholder=\"Enter your email\" />\n          </div>\n          <div className=\"nx:flex nx:flex-col nx:gap-2\">\n            <label\n              htmlFor=\"password\"\n              className=\"nx:text-sm nx:font-medium nx:text-foreground\"\n            >\n              Password\n            </label>\n            <Input\n              id=\"password\"\n              type=\"password\"\n              placeholder=\"Enter your password\"\n            />\n          </div>\n        </div>\n      </CardContent>\n      <CardFooter>\n        <Button className=\"nx:w-full\">Sign In</Button>\n      </CardFooter>\n    </Card>\n  )"
+        },
+        {
+          "title": "Notification Card",
+          "code": "(\n    <Card className=\"nx:w-[350px]\">\n      <CardHeader>\n        <CardTitle>Notifications</CardTitle>\n        <CardDescription>You have 3 unread messages.</CardDescription>\n      </CardHeader>\n      <CardContent>\n        <div className=\"nx:flex nx:flex-col nx:gap-3\">\n          <div className=\"nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3\">\n            <div className=\"nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background\" />\n            <div>\n              <p className=\"nx:text-sm nx:font-medium\">New message</p>\n              <p className=\"nx:text-sm nx:text-foreground/70\">\n                John sent you a message\n              </p>\n            </div>\n          </div>\n          <div className=\"nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3\">\n            <div className=\"nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background\" />\n            <div>\n              <p className=\"nx:text-sm nx:font-medium\">Update available</p>\n              <p className=\"nx:text-sm nx:text-foreground/70\">\n                Version 2.0 is now available\n              </p>\n            </div>\n          </div>\n        </div>\n      </CardContent>\n      <CardFooter>\n        <Button variant=\"outline\" className=\"nx:w-full\">\n          View all\n        </Button>\n      </CardFooter>\n    </Card>\n  )"
+        }
+      ]
+    },
+    "guidance": {
+      "whenToUse": "Use the Card component to visually group related information, present individual pieces of content, or highlight specific sections within a layout. Ideal for displaying heterogeneous content like user profiles, product listings, articles, or settings.",
+      "whenNotToUse": "Avoid using Card for simple inline text or when a more lightweight visual grouping (e.g., a div with padding) is sufficient. Do not use as a primary layout structure when a grid or flexbox layout is more appropriate for overall page arrangement. Alternatives: semantic HTML elements, grid layouts, or simple divs for less complex content grouping.",
+      "accessibility": "Ensure all content within the Card is accessible and follows appropriate ARIA roles if the Card itself acts as a landmark or interactive element. For purely presentational cards, standard HTML semantics are usually sufficient. If the card is clickable or interactive, use appropriate interactive roles like `role='button'` or `role='link'` on the interactive elements within it, rather than on the card container itself. Headings should be used to provide structure within the card content.",
+      "patterns": ["container", "data-display", "layout", "composition"],
+      "relatedComponents": ["Button"]
+    },
+    "dependencies": {
+      "npm": {
+        "react": "*",
+        "@/lib": "*"
+      },
+      "internal": []
+    },
+    "subComponents": [
+      {
+        "name": "CardAction",
+        "props": {},
+        "dataSlot": "card-action",
+        "requiredInComposition": true
+      },
+      {
+        "name": "CardContent",
+        "props": {},
+        "dataSlot": "card-content",
+        "requiredInComposition": false
+      },
+      {
+        "name": "CardDescription",
+        "props": {},
+        "dataSlot": "card-description",
+        "requiredInComposition": false
+      },
+      {
+        "name": "CardFooter",
+        "props": {},
+        "dataSlot": "card-footer",
+        "requiredInComposition": false
+      },
+      {
+        "name": "CardHeader",
+        "props": {},
+        "dataSlot": "card-header",
+        "requiredInComposition": false
+      },
+      {
+        "name": "CardTitle",
+        "props": {},
+        "dataSlot": "card-title",
+        "requiredInComposition": false
+      }
+    ]
+  },
+  "recordedAt": "2026-01-27T16:29:44.642Z",
   "fixtureSource": "nexus/card"
 }

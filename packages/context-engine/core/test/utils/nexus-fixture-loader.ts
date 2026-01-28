@@ -54,7 +54,7 @@ export interface NexusComponentFixture {
  * @example kebabToPascal('button') => 'Button'
  * @example kebabToPascal('date-picker') => 'DatePicker'
  */
-function kebabToPascal(name: string): string {
+export function kebabToPascal(name: string): string {
   return name
     .split('-')
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))

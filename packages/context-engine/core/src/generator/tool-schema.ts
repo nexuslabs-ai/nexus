@@ -23,10 +23,6 @@ export const ToolCodeExampleSchema = z.object({
     .string()
     .optional()
     .describe('Brief explanation of what this example demonstrates'),
-  propsUsed: z
-    .array(z.string())
-    .optional()
-    .describe('List of prop names used in this example'),
 });
 
 /**
@@ -111,6 +107,14 @@ export const ComponentMetaToolSchema = z.object({
     .array(z.string())
     .describe(
       'Design tokens used by this component (e.g., "color-primary", "spacing-md")'
+    ),
+
+  variantDescriptions: z
+    .record(z.string(), z.record(z.string(), z.string()))
+    .optional()
+    .describe(
+      'Descriptions for each variant value. Outer key is variant name (e.g., "variant"), ' +
+        'inner key is value (e.g., "destructive"), value is description (e.g., "Red color for dangerous actions")'
     ),
 });
 

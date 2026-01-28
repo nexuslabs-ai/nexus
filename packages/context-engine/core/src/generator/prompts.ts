@@ -22,10 +22,9 @@ function buildPropsSection(extracted: ExtractedData): string {
 
   const propsLines = extracted.props.map((p) => {
     const parts = [`- ${p.name}: ${p.type}`];
-    if (p.required) parts.push('(required)');
     if (p.description) parts.push(`- ${p.description}`);
-    if (p.possibleValues?.length) {
-      parts.push(`[${p.possibleValues.join(', ')}]`);
+    if (p.values?.length) {
+      parts.push(`[${p.values.join(', ')}]`);
     }
     return parts.join(' ');
   });

@@ -1,35 +1,36 @@
 {
   "componentName": "Tooltip",
   "response": {
-    "examples": {
-      "common": [],
-      "minimal": {
-        "description": "A basic tooltip example.",
-        "code": "<Tooltip />",
-        "title": "Basic Tooltip"
-      }
-    },
     "minimalExample": "<Tooltip />",
-    "description": "A small, ephemeral pop-up that displays supplementary information when a user hovers over or focuses on an element.",
-    "tier": "free",
+    "guidance": {
+      "accessibility": "Ensure tooltips are keyboard accessible, appearing on focus and disappearing on blur. Provide clear ARIA attributes (e.g., `aria-describedby` or `aria-label`) to link the tooltip content to its trigger element for screen reader users. The content should be concise and meaningful.",
+      "whenNotToUse": "Avoid using tooltips for essential information that users need to see immediately, for long blocks of text, or for actions that require user interaction within the tooltip itself. Use popovers, modals, or inline text for critical information or interactive content.",
+      "whenToUse": "Use tooltips to provide supplementary information or context for interactive elements, icons, or truncated text when space is limited and the information is not critical for immediate task completion. They enhance usability by clarifying the purpose of an element without cluttering the UI.",
+      "patterns": ["overlay", "data-display"],
+      "relatedComponents": ["Button", "IconButton", "Popover", "Menu"]
+    },
+    "semanticDescription": "The Tooltip component provides a discreet and non-disruptive way to display additional information or labels when a user interacts with an element. It's ideal for clarifying icons, explaining truncated text, or providing hints for form fields. Key features include its transient nature, appearing on hover or focus and disappearing when the interaction ends, and its ability to prevent UI clutter. Use cases include explaining the function of an icon-only button, providing a full text for truncated labels, or giving quick guidance for complex controls.",
     "tokens": [
       "color-text-tooltip",
       "color-bg-tooltip",
-      "font-size-sm",
       "spacing-xs",
-      "spacing-sm",
+      "font-size-sm",
       "border-radius-sm"
     ],
-    "semanticDescription": "The Tooltip component provides a small, non-interactive visual cue that displays supplementary, contextual information when a user hovers over or focuses on a trigger element. It's designed for displaying short, informative text that enhances understanding without cluttering the primary UI. Key features include delayed appearance, controlled positioning, and automatic dismissal when the user moves away or presses the Escape key. Tooltips are commonly used to explain the function of an icon, provide the full text of an abbreviation or truncated label, or give context to disabled interactive elements. It utilizes the `@radix-ui/react-tooltip` library for robust accessibility and behavior.",
-    "guidance": {
-      "relatedComponents": ["Popover", "Dialog", "Button", "Icon"],
-      "patterns": ["data-display", "overlay", "disclosure"],
-      "whenNotToUse": "Do not use Tooltips for critical information that requires user interaction, persistent display, or contains complex content. For these cases, consider using a Popover, Dialog, or Modal instead. Avoid using Tooltips for information that should always be visible.",
-      "accessibility": "Ensure Tooltips are accessible to keyboard and screen reader users. The underlying Radix UI component handles much of the accessibility, including proper ARIA attributes (`aria-describedby`) and focus management. Tooltips should appear on keyboard focus and disappear on blur, and should be dismissible by pressing the Escape key. Provide a sufficient delay before showing the tooltip and allow enough time for users to read it before it hides.",
-      "whenToUse": "Use a Tooltip to provide concise, non-essential, contextual information or explanations for UI elements upon user interaction (hover or focus). Ideal for explaining icons, abbreviations, truncated text, or disabled elements where immediate visibility isn't required."
-    }
+    "description": "A small, contextual popup that displays informative text when a user hovers over or focuses on an element.",
+    "examples": {
+      "minimal": {
+        "description": "The simplest usage of the Tooltip component.",
+        "propsUsed": [],
+        "code": "<Tooltip />",
+        "title": "Basic Tooltip"
+      },
+      "advanced": [],
+      "common": []
+    },
+    "tier": "free"
   },
-  "recordedAt": "2026-01-26T12:07:12.741Z",
+  "recordedAt": "2026-01-27T11:56:44.047Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
   "inputHash": "5fa6350840cfa1a266469fabf2399ee1a1bf61f742e117a697345dfe2832dcb8",

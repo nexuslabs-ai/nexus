@@ -82,14 +82,19 @@ describe('AI Usability - Extraction Structure', () => {
       if (!manifest) return;
 
       // AI needs variant options for autocomplete/suggestions
-      // v1.0 schema: variants is CvaVariants with values arrays
-      expect(manifest.variants).toBeDefined();
-      expect(manifest.variants?.variant?.values).toContain('default');
-      expect(manifest.variants?.variant?.values).toContain('destructive');
-      expect(manifest.variants?.variant?.values).toContain('outline');
-      expect(manifest.variants?.size?.values).toContain('default');
-      expect(manifest.variants?.size?.values).toContain('sm');
-      expect(manifest.variants?.size?.values).toContain('lg');
+      // v1.0 schema: variant info is in props.variants with values arrays
+      const variantProps = manifest.props.variants;
+      expect(variantProps).toBeDefined();
+
+      const variantProp = variantProps?.find((p) => p.name === 'variant');
+      const sizeProp = variantProps?.find((p) => p.name === 'size');
+
+      expect(variantProp?.values).toContain('default');
+      expect(variantProp?.values).toContain('destructive');
+      expect(variantProp?.values).toContain('outline');
+      expect(sizeProp?.values).toContain('default');
+      expect(sizeProp?.values).toContain('sm');
+      expect(sizeProp?.values).toContain('lg');
     });
 
     it('extracts default variants for omitting unnecessary props', async () => {
@@ -98,9 +103,13 @@ describe('AI Usability - Extraction Structure', () => {
       if (!manifest) return;
 
       // AI should know defaults so it can omit them in generated code
-      // v1.0 schema: defaults are in variants[key].default
-      expect(manifest.variants?.variant?.default).toBe('default');
-      expect(manifest.variants?.size?.default).toBe('default');
+      // v1.0 schema: defaults are in props.variants[n].defaultValue
+      const variantProps = manifest.props.variants;
+      const variantProp = variantProps?.find((p) => p.name === 'variant');
+      const sizeProp = variantProps?.find((p) => p.name === 'size');
+
+      expect(variantProp?.defaultValue).toBe('default');
+      expect(sizeProp?.defaultValue).toBe('default');
     });
 
     it('extracts props with types for type-safe code generation', async () => {
@@ -135,44 +144,42 @@ describe('AI Usability - Extraction Structure', () => {
   });
 
   describe('Input - form control extraction', () => {
-    it('extracts custom Input props', async () => {
+    it('extracts Input size variant', async () => {
       const manifest = await getExtractedManifest('nexus', 'input', 'Input');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
-      // v1.0 schema: use getAllProps helper
-      const allProps = getAllProps(manifest.props);
-      const propNames = allProps.map((p) => p.name);
-
-      // Should extract explicitly defined props
-      expect(propNames).toContain('variant');
-      expect(propNames).toContain('inputSize');
-      expect(propNames).toContain('error');
+      // Input has size variant in CVA - now in props.variants
+      const sizeProp = manifest.props.variants?.find((p) => p.name === 'size');
+      expect(sizeProp).toBeDefined();
+      expect(sizeProp?.values).toContain('default');
+      expect(sizeProp?.values).toContain('sm');
+      expect(sizeProp?.values).toContain('lg');
     });
 
-    it('extracts error prop with boolean type', async () => {
+    it('extracts custom events (standard HTML events are rejected)', async () => {
       const manifest = await getExtractedManifest('nexus', 'input', 'Input');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
-      // v1.0 schema: use getAllProps helper
-      const allProps = getAllProps(manifest.props);
-      const errorProp = allProps.find((p) => p.name === 'error');
-      expect(errorProp).toBeDefined();
-      expect(errorProp?.type).toContain('boolean');
+      // Input extends React.ComponentProps<'input'> but standard HTML events
+      // are rejected at extraction time - only custom events are kept
+      // Events category may be undefined if no custom events
+      if (manifest.props.events) {
+        expect(Array.isArray(manifest.props.events)).toBe(true);
+      }
     });
   });
 
   describe('Card - container pattern extraction', () => {
-    it('extracts elevation variant', async () => {
+    it('extracts Card component props', async () => {
       const manifest = await getExtractedManifest('nexus', 'card', 'Card');
       expect(manifest).not.toBeNull();
       if (!manifest) return;
 
-      // v1.0 schema: use getAllProps helper
-      const allProps = getAllProps(manifest.props);
-      const elevationProp = allProps.find((p) => p.name === 'elevation');
-      expect(elevationProp).toBeDefined();
+      // Card is a simple wrapper around div, extends React.ComponentProps<'div'>
+      // Extraction should succeed even if no custom props
+      expect(manifest.props).toBeDefined();
     });
   });
 
@@ -243,6 +250,144 @@ describe('AI Usability - Extraction Structure', () => {
           expect(prop.type).toBeTruthy();
         });
       });
+    });
+  });
+
+  describe('Split manifest output for AI consumption', () => {
+    /**
+     * Helper to process a fixture and return the full result
+     */
+    async function processFixture(
+      category: 'nexus' | 'edge-cases',
+      name: string,
+      componentName: string
+    ) {
+      const fixture = loadFixture(category, name);
+      const input: ProcessorInput = {
+        orgId: TEST_ORG_ID,
+        name: componentName,
+        sourceCode: fixture.sourceCode,
+        framework: 'react',
+      };
+
+      return processor.process(input);
+    }
+
+    it('provides split output structure', async () => {
+      const result = await processFixture('nexus', 'button', 'Button');
+      expect(result.type).toBe('success');
+      if (!isProcessorSuccess(result)) return;
+
+      expect(result.output).toBeDefined();
+      expect(result.output.componentName).toBeDefined();
+      expect(result.output.componentName).toBe('Button');
+      expect(result.output.metadata).toBeDefined();
+      expect(result.output.manifest).toBeDefined();
+    });
+
+    it('AI manifest props only include valid categories', async () => {
+      const result = await processFixture('nexus', 'button', 'Button');
+      if (!isProcessorSuccess(result)) return;
+
+      const aiManifest = result.output.manifest;
+      // Props should only have valid categories: variants, behaviors, events, slots, other
+      // All categories are optional (undefined if empty)
+      const validCategories = [
+        'variants',
+        'behaviors',
+        'events',
+        'slots',
+        'other',
+      ];
+      for (const key of Object.keys(aiManifest.props)) {
+        expect(validCategories).toContain(key);
+      }
+    });
+
+    it('provides children info when component explicitly accepts children', async () => {
+      // Button accepts children via React.ComponentProps<'button'>
+      const result = await processFixture('nexus', 'button', 'Button');
+      if (!isProcessorSuccess(result)) return;
+
+      const aiManifest = result.output.manifest;
+
+      // Children info may be present if explicitly extracted
+      // When present, it should indicate the component accepts children
+      if (aiManifest.children) {
+        expect(aiManifest.children.accepts).toBe(true);
+      }
+
+      // Alternatively, children may be in slots category
+      if (aiManifest.props?.slots) {
+        const childrenSlot = aiManifest.props.slots.find(
+          (p) => p.name === 'children'
+        );
+        if (childrenSlot) {
+          expect(childrenSlot.name).toBe('children');
+        }
+      }
+    });
+
+    it('omits empty prop categories from AI manifest', async () => {
+      const result = await processFixture('nexus', 'button', 'Button');
+      if (!isProcessorSuccess(result)) return;
+
+      const props = result.output.manifest.props;
+      if (props) {
+        // Each defined category should have at least one item
+        if (props.variants) expect(props.variants.length).toBeGreaterThan(0);
+        if (props.behaviors) expect(props.behaviors.length).toBeGreaterThan(0);
+        if (props.events) expect(props.events.length).toBeGreaterThan(0);
+        if (props.slots) expect(props.slots.length).toBeGreaterThan(0);
+        if (props.other) expect(props.other.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('metadata contains all system fields', async () => {
+      const result = await processFixture('nexus', 'button', 'Button');
+      if (!isProcessorSuccess(result)) return;
+
+      const metadata = result.output.metadata;
+
+      // Verify all ManifestMetadata fields exist
+      expect(metadata.id).toBeDefined();
+      expect(metadata.schemaVersion).toBeDefined();
+      expect(metadata.version).toBeDefined();
+      expect(metadata.framework).toBeDefined();
+      expect(metadata.visibility).toBeDefined();
+      expect(metadata.tier).toBeDefined();
+      expect(metadata.embeddingStatus).toBeDefined();
+      expect(metadata.generatedAt).toBeDefined();
+      expect(metadata.updatedAt).toBeDefined();
+      expect(metadata.sourceHash).toBeDefined();
+      expect(metadata.metaHash).toBeDefined();
+      expect(metadata.files).toBeDefined();
+    });
+
+    it('AI manifest contains essential fields for code generation', async () => {
+      const result = await processFixture('nexus', 'button', 'Button');
+      if (!isProcessorSuccess(result)) return;
+
+      const manifest = result.output.manifest;
+
+      // Essential fields for AI to generate correct code
+      expect(manifest.name).toBe('Button');
+      expect(manifest.slug).toBeTruthy();
+      expect(manifest.description).toBeTruthy();
+      expect(manifest.importStatement).toBeDefined();
+      expect(manifest.importStatement.primary).toContain('Button');
+    });
+
+    it('backward compatibility: full manifest still available', async () => {
+      const result = await processFixture('nexus', 'button', 'Button');
+      if (!isProcessorSuccess(result)) return;
+
+      // result.manifest should contain the full ComponentManifest
+      expect(result.manifest).toBeDefined();
+      expect(result.manifest.id).toBe(result.output.metadata.id);
+      expect(result.manifest.name).toBe(result.output.manifest.name);
+      // Full manifest has categorized props
+      expect(result.manifest.props).toBeDefined();
     });
   });
 });

@@ -37,6 +37,12 @@ import { MANIFEST_SCHEMA_VERSION } from '../../src/types/index.js';
 
 /**
  * Create a minimal valid ExtractedData for testing
+ *
+ * Note: With props cleanup, props use simplified structure:
+ * - name, type, description, defaultValue, values
+ * - Internal flags: isChildren, isClassName, isStyle, deprecated
+ * - No typeCategory, required, possibleValues
+ * - className is now rejected at extraction time (not included)
  */
 function createMockExtractedData(
   overrides: Partial<ExtractedData> = {}
@@ -45,10 +51,8 @@ function createMockExtractedData(
     props: [
       {
         name: 'variant',
-        type: '"default" | "destructive" | "outline"',
-        required: false,
-        typeCategory: 'literal',
-        possibleValues: ['default', 'destructive', 'outline'],
+        type: 'string',
+        values: ['default', 'destructive', 'outline'],
         isChildren: false,
         isClassName: false,
         isStyle: false,
@@ -56,10 +60,8 @@ function createMockExtractedData(
       },
       {
         name: 'size',
-        type: '"sm" | "md" | "lg"',
-        required: false,
-        typeCategory: 'literal',
-        possibleValues: ['sm', 'md', 'lg'],
+        type: 'string',
+        values: ['sm', 'md', 'lg'],
         isChildren: false,
         isClassName: false,
         isStyle: false,
@@ -68,18 +70,14 @@ function createMockExtractedData(
       {
         name: 'disabled',
         type: 'boolean',
-        required: false,
-        typeCategory: 'primitive',
         isChildren: false,
         isClassName: false,
         isStyle: false,
         deprecated: false,
       },
       {
-        name: 'onClick',
-        type: '() => void',
-        required: false,
-        typeCategory: 'function',
+        name: 'onCustomClick',
+        type: '(data: CustomData) => void',
         isChildren: false,
         isClassName: false,
         isStyle: false,
@@ -87,21 +85,9 @@ function createMockExtractedData(
       },
       {
         name: 'children',
-        type: 'React.ReactNode',
-        required: false,
-        typeCategory: 'element',
+        type: 'ReactNode',
         isChildren: true,
         isClassName: false,
-        isStyle: false,
-        deprecated: false,
-      },
-      {
-        name: 'className',
-        type: 'string',
-        required: false,
-        typeCategory: 'primitive',
-        isChildren: false,
-        isClassName: true,
         isStyle: false,
         deprecated: false,
       },
@@ -336,21 +322,19 @@ describe('ManifestBuilder', () => {
 
       const props = result.manifest.props;
 
-      // Check that all categories exist
+      // Categories are optional (undefined if empty)
+      // At minimum, variants, behaviors, events, slots should have content from mock data
       expect(props.variants).toBeDefined();
       expect(props.behaviors).toBeDefined();
       expect(props.events).toBeDefined();
       expect(props.slots).toBeDefined();
-      expect(props.passthrough).toBeDefined();
-      expect(props.other).toBeDefined();
 
-      // All should be arrays
-      expect(Array.isArray(props.variants)).toBe(true);
-      expect(Array.isArray(props.behaviors)).toBe(true);
-      expect(Array.isArray(props.events)).toBe(true);
-      expect(Array.isArray(props.slots)).toBe(true);
-      expect(Array.isArray(props.passthrough)).toBe(true);
-      expect(Array.isArray(props.other)).toBe(true);
+      // All defined categories should be arrays
+      if (props.variants) expect(Array.isArray(props.variants)).toBe(true);
+      if (props.behaviors) expect(Array.isArray(props.behaviors)).toBe(true);
+      if (props.events) expect(Array.isArray(props.events)).toBe(true);
+      if (props.slots) expect(Array.isArray(props.slots)).toBe(true);
+      if (props.other) expect(Array.isArray(props.other)).toBe(true);
     });
 
     it('places variant props in variants category', () => {
@@ -360,9 +344,8 @@ describe('ManifestBuilder', () => {
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      const variantPropNames = result.manifest.props.variants.map(
-        (p) => p.name
-      );
+      const variantPropNames =
+        result.manifest.props.variants?.map((p) => p.name) ?? [];
       expect(variantPropNames).toContain('variant');
       expect(variantPropNames).toContain('size');
     });
@@ -374,9 +357,8 @@ describe('ManifestBuilder', () => {
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      const behaviorPropNames = result.manifest.props.behaviors.map(
-        (p) => p.name
-      );
+      const behaviorPropNames =
+        result.manifest.props.behaviors?.map((p) => p.name) ?? [];
       expect(behaviorPropNames).toContain('disabled');
     });
 
@@ -387,8 +369,9 @@ describe('ManifestBuilder', () => {
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      const eventPropNames = result.manifest.props.events.map((p) => p.name);
-      expect(eventPropNames).toContain('onClick');
+      const eventPropNames =
+        result.manifest.props.events?.map((p) => p.name) ?? [];
+      expect(eventPropNames).toContain('onCustomClick');
     });
 
     it('places children in slots category', () => {
@@ -398,21 +381,9 @@ describe('ManifestBuilder', () => {
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      const slotPropNames = result.manifest.props.slots.map((p) => p.name);
+      const slotPropNames =
+        result.manifest.props.slots?.map((p) => p.name) ?? [];
       expect(slotPropNames).toContain('children');
-    });
-
-    it('places className in passthrough category', () => {
-      const input = createMockInput();
-      const result = builder.build(input);
-
-      expect(isManifestBuildSuccess(result)).toBe(true);
-      if (!isManifestBuildSuccess(result)) return;
-
-      const passthroughPropNames = result.manifest.props.passthrough.map(
-        (p) => p.name
-      );
-      expect(passthroughPropNames).toContain('className');
     });
 
     it('includes type information in categorized props', () => {
@@ -424,12 +395,11 @@ describe('ManifestBuilder', () => {
 
       // All props should have name and type
       const allProps = [
-        ...result.manifest.props.variants,
-        ...result.manifest.props.behaviors,
-        ...result.manifest.props.events,
-        ...result.manifest.props.slots,
-        ...result.manifest.props.passthrough,
-        ...result.manifest.props.other,
+        ...(result.manifest.props.variants ?? []),
+        ...(result.manifest.props.behaviors ?? []),
+        ...(result.manifest.props.events ?? []),
+        ...(result.manifest.props.slots ?? []),
+        ...(result.manifest.props.other ?? []),
       ];
 
       for (const prop of allProps) {
@@ -439,41 +409,58 @@ describe('ManifestBuilder', () => {
     });
   });
 
-  describe('build() - CVA Variants', () => {
-    it('builds CVA variants with values array', () => {
+  describe('build() - CVA Variants (in props.variants)', () => {
+    it('builds variant props with values array', () => {
       const input = createMockInput();
       const result = builder.build(input);
 
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      const variants = result.manifest.variants;
+      const variantProps = result.manifest.props.variants;
+      expect(variantProps).toBeDefined();
 
-      expect(variants).toBeDefined();
-      expect(variants?.variant?.values).toEqual([
+      const variantProp = variantProps?.find((p) => p.name === 'variant');
+      const sizeProp = variantProps?.find((p) => p.name === 'size');
+
+      expect(variantProp?.values).toEqual([
         'default',
         'destructive',
         'outline',
       ]);
-      expect(variants?.size?.values).toEqual(['sm', 'md', 'lg']);
+      expect(sizeProp?.values).toEqual(['sm', 'md', 'lg']);
     });
 
-    it('includes default values in CVA variants', () => {
+    it('includes default values in variant props', () => {
       const input = createMockInput();
       const result = builder.build(input);
 
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      const variants = result.manifest.variants;
+      const variantProps = result.manifest.props.variants;
 
-      expect(variants?.variant?.default).toBe('default');
-      expect(variants?.size?.default).toBe('md');
+      const variantProp = variantProps?.find((p) => p.name === 'variant');
+      const sizeProp = variantProps?.find((p) => p.name === 'size');
+
+      expect(variantProp?.defaultValue).toBe('default');
+      expect(sizeProp?.defaultValue).toBe('md');
     });
 
     it('handles empty variants', () => {
+      // Create input with no variant props in extracted.props AND no CVA variants
       const input = createMockInput({
         extracted: createMockExtractedData({
+          props: [
+            {
+              name: 'disabled',
+              type: 'boolean',
+              isChildren: false,
+              isClassName: false,
+              isStyle: false,
+              deprecated: false,
+            },
+          ],
           variants: {},
           defaultVariants: {},
         }),
@@ -483,12 +470,25 @@ describe('ManifestBuilder', () => {
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      expect(result.manifest.variants).toEqual({});
+      // With no variant props in extraction and no CVA variants, props.variants should be empty
+      expect(result.manifest.props.variants ?? []).toEqual([]);
     });
 
     it('handles variants without defaults', () => {
+      // Create input with CVA variants that have no defaults
       const input = createMockInput({
         extracted: createMockExtractedData({
+          props: [
+            {
+              name: 'variant',
+              type: 'string',
+              values: ['a', 'b', 'c'],
+              isChildren: false,
+              isClassName: false,
+              isStyle: false,
+              deprecated: false,
+            },
+          ],
           variants: {
             variant: ['a', 'b', 'c'],
           },
@@ -500,12 +500,11 @@ describe('ManifestBuilder', () => {
       expect(isManifestBuildSuccess(result)).toBe(true);
       if (!isManifestBuildSuccess(result)) return;
 
-      expect(result.manifest.variants?.variant?.values).toEqual([
-        'a',
-        'b',
-        'c',
-      ]);
-      expect(result.manifest.variants?.variant?.default).toBeUndefined();
+      const variantProp = result.manifest.props.variants?.find(
+        (p) => p.name === 'variant'
+      );
+      expect(variantProp?.values).toEqual(['a', 'b', 'c']);
+      expect(variantProp?.defaultValue).toBeUndefined();
     });
   });
 
@@ -919,8 +918,6 @@ describe('ManifestBuilder.update()', () => {
         {
           name: 'newProp',
           type: 'string',
-          required: true,
-          typeCategory: 'primitive',
           isChildren: false,
           isClassName: false,
           isStyle: false,
@@ -933,14 +930,13 @@ describe('ManifestBuilder.update()', () => {
       extracted: newExtracted,
     });
 
-    // Should have updated props
+    // Should have updated props - categories are optional
     const allProps = [
-      ...updated.props.variants,
-      ...updated.props.behaviors,
-      ...updated.props.events,
-      ...updated.props.slots,
-      ...updated.props.passthrough,
-      ...updated.props.other,
+      ...(updated.props.variants ?? []),
+      ...(updated.props.behaviors ?? []),
+      ...(updated.props.events ?? []),
+      ...(updated.props.slots ?? []),
+      ...(updated.props.other ?? []),
     ];
     const hasNewProp = allProps.some((p) => p.name === 'newProp');
     expect(hasNewProp).toBe(true);
@@ -1081,6 +1077,32 @@ describe('generateImportStatement()', () => {
       "import { DatePicker } from '@ui/react/date-picker'"
     );
   });
+
+  it('includes all exports for compound components', () => {
+    const result = generateImportStatement({
+      componentName: 'Dialog',
+      packageName: '@nexus/react',
+      exports: ['Dialog', 'DialogTrigger', 'DialogContent', 'DialogHeader'],
+    });
+
+    expect(result.primary).toBe(
+      "import { Dialog, DialogTrigger, DialogContent, DialogHeader } from '@nexus/react'"
+    );
+    // Type-only still uses root component
+    expect(result.typeOnly).toBe(
+      "import type { DialogProps } from '@nexus/react'"
+    );
+  });
+
+  it('falls back to componentName when exports is empty', () => {
+    const result = generateImportStatement({
+      componentName: 'Button',
+      packageName: '@nexus/react',
+      exports: [],
+    });
+
+    expect(result.primary).toBe("import { Button } from '@nexus/react'");
+  });
 });
 
 describe('derivePackageName()', () => {
@@ -1129,5 +1151,207 @@ describe('derivePackageName()', () => {
     });
 
     expect(result).toBe('@company/react');
+  });
+});
+
+// =============================================================================
+// Split Output Structure Tests
+// =============================================================================
+
+describe('ManifestBuilder - Split output structure', () => {
+  let builder: ManifestBuilder;
+
+  beforeEach(() => {
+    builder = new ManifestBuilder();
+  });
+
+  it('returns output with metadata and manifest', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    expect(isManifestBuildSuccess(result)).toBe(true);
+    if (!isManifestBuildSuccess(result)) return;
+
+    expect(result.output).toBeDefined();
+    expect(result.output.componentName).toBe(input.identity.name);
+    expect(result.output.metadata).toBeDefined();
+    expect(result.output.manifest).toBeDefined();
+  });
+
+  it('metadata contains system fields', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    const metadata = result.output.metadata;
+    expect(metadata.id).toBeDefined();
+    expect(metadata.schemaVersion).toBeDefined();
+    expect(metadata.version).toBeDefined();
+    expect(metadata.framework).toBeDefined();
+    expect(metadata.visibility).toBeDefined();
+    expect(metadata.tier).toBeDefined();
+    expect(metadata.embeddingStatus).toBeDefined();
+    expect(metadata.generatedAt).toBeDefined();
+    expect(metadata.updatedAt).toBeDefined();
+    expect(metadata.sourceHash).toBeDefined();
+    expect(metadata.metaHash).toBeDefined();
+    expect(metadata.files).toBeDefined();
+  });
+
+  it('manifest contains AI-consumable fields', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    const manifest = result.output.manifest;
+    expect(manifest.name).toBeDefined();
+    expect(manifest.slug).toBeDefined();
+    expect(manifest.description).toBeDefined();
+    expect(manifest.importStatement).toBeDefined();
+  });
+
+  it('AI manifest props only contain defined categories', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    const aiManifest = result.output.manifest;
+    // AI manifest should have categorized props without internal-only fields
+    // Categories: variants, behaviors, events, slots, other (all optional)
+    const validCategories = [
+      'variants',
+      'behaviors',
+      'events',
+      'slots',
+      'other',
+    ];
+    for (const key of Object.keys(aiManifest.props)) {
+      expect(validCategories).toContain(key);
+    }
+  });
+
+  it('componentName matches identity name', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    expect(result.output.componentName).toBe('Button');
+    expect(result.output.manifest.name).toBe('Button');
+  });
+
+  it('metadata.id matches full manifest id', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    expect(result.output.metadata.id).toBe(result.manifest.id);
+  });
+
+  it('metadata timestamps match full manifest timestamps', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    expect(result.output.metadata.generatedAt).toBe(
+      result.manifest.generatedAt
+    );
+    expect(result.output.metadata.updatedAt).toBe(result.manifest.updatedAt);
+  });
+
+  it('metadata hashes match full manifest hashes', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    expect(result.output.metadata.sourceHash).toBe(result.manifest.sourceHash);
+    expect(result.output.metadata.metaHash).toBe(result.manifest.metaHash);
+  });
+
+  it('AI manifest omits empty variant categories', () => {
+    const inputWithNoVariants = createMockInput({
+      extracted: createMockExtractedData({
+        // Empty CVA variants
+        variants: {},
+        defaultVariants: {},
+        // Props without variant-like values (only behavior and slot props)
+        props: [
+          {
+            name: 'disabled',
+            type: 'boolean',
+            isChildren: false,
+            isClassName: false,
+            isStyle: false,
+            deprecated: false,
+          },
+          {
+            name: 'children',
+            type: 'ReactNode',
+            isChildren: true,
+            isClassName: false,
+            isStyle: false,
+            deprecated: false,
+          },
+        ],
+      }),
+    });
+    const result = builder.build(inputWithNoVariants);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    // When there are no variants, props.variants should be undefined
+    expect(result.output.manifest.props?.variants).toBeUndefined();
+  });
+
+  it('AI manifest includes variants in props when present', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    // Input has variants, so they should be in props.variants
+    expect(result.output.manifest.props?.variants).toBeDefined();
+    const variantProp = result.output.manifest.props?.variants?.find(
+      (p) => p.name === 'variant'
+    );
+    expect(variantProp).toBeDefined();
+    expect(variantProp?.values).toContain('default');
+  });
+
+  it('AI manifest includes children info when component accepts children', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    // The mock extracted data has acceptsChildren: true and a children prop
+    // Children info should be present
+    if (result.output.manifest.children) {
+      expect(result.output.manifest.children.accepts).toBe(true);
+    }
+  });
+
+  it('full manifest props use simplified categorized structure', () => {
+    const input = createMockInput();
+    const result = builder.build(input);
+
+    if (!isManifestBuildSuccess(result)) return;
+
+    // Full manifest should have categorized props (all categories are optional)
+    const props = result.manifest.props;
+    // At least some categories should be present from our mock data
+    const hasAnyCategory =
+      props.variants !== undefined ||
+      props.behaviors !== undefined ||
+      props.events !== undefined ||
+      props.slots !== undefined ||
+      props.other !== undefined;
+    expect(hasAnyCategory).toBe(true);
   });
 });

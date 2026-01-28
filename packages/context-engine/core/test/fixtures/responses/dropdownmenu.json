@@ -1,0 +1,37 @@
+{
+  "componentName": "DropdownMenu",
+  "response": {
+    "description": "A dropdown menu component that displays a list of actions or options when triggered, providing contextual functionality.",
+    "tier": "free",
+    "tokens": [],
+    "semanticDescription": "The DropdownMenu component provides an accessible and highly customizable solution for displaying a list of choices or actions. Built on Radix UI primitives, it offers robust features like keyboard navigation, focus management, and proper ARIA attribute handling out of the box. It's suitable for various use cases such as user account menus, contextual action lists (e.g., 'Edit', 'Delete', 'Share'), 'more' options buttons, or filtering/sorting controls. The component includes a trigger element and a content area that can host `DropdownMenu.Item`, `DropdownMenu.Separator`, and `DropdownMenu.Label` components, allowing for flexible and semantically rich menus. Its composable nature enables developers to create complex menu structures while maintaining accessibility standards.",
+    "guidance": {
+      "patterns": [
+        "disclosure",
+        "overlay",
+        "navigation",
+        "selection",
+        "compound"
+      ],
+      "whenNotToUse": "Avoid using a DropdownMenu for primary navigation (use a NavBar or Tabs), when there are only one or two actions (use a Button or ButtonGroup), or when options require complex forms or detailed explanations (use a Modal or a dedicated page).",
+      "accessibility": "Ensures full keyboard navigation support, including arrow keys for item selection, Escape key to close, and Enter/Space to activate. Follows ARIA best practices for `menu`, `menuitem`, `button`, and `separator` roles, providing appropriate `aria-haspopup` and `aria-expanded` attributes for screen reader users.",
+      "whenToUse": "Use a DropdownMenu when you need to offer a list of related actions or options that appear in a small overlay, often triggered by a button or an icon. Ideal for saving space and grouping less frequently used actions, such as user profile menus, context-sensitive operations, or 'more' menus.",
+      "relatedComponents": ["Button", "Menu", "Select", "Popover"]
+    },
+    "minimalExample": "<DropdownMenu />",
+    "examples": {
+      "advanced": [],
+      "common": [],
+      "minimal": {
+        "description": "A simple dropdown menu with a trigger and content.",
+        "title": "Basic Dropdown Menu",
+        "code": "<DropdownMenu />"
+      }
+    }
+  },
+  "recordedAt": "2026-01-27T16:30:39.615Z",
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "inputHash": "096d2136b40edc518f5a55259899187576cad4c0df2e3fbfc77025b0a50a0912",
+  "promptSummary": "Generate metadata for DropdownMenu component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: DropdownMenu\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-dropdown-menu, @/li..."
+}

@@ -26,6 +26,7 @@ import { createProviderFromEnv } from '../src/utils/env-provider.js';
 import { CachedLLMProvider } from '../test/providers/cached-llm-provider.js';
 import { saveRecordedManifest } from '../test/utils/manifest-recorder.js';
 import {
+  kebabToPascal,
   listAvailableComponents,
   loadNexusComponent,
   type NexusComponentFixture,
@@ -52,7 +53,8 @@ function getComponentFixtures(): string[] {
 
 async function recordComponentManifest(
   fixture: NexusComponentFixture,
-  provider: ILLMProvider
+  provider: ILLMProvider,
+  availableComponents: string[]
 ): Promise<boolean> {
   // Create cached provider that wraps the real provider
   // This will use cached responses if available, otherwise call real LLM
@@ -62,14 +64,15 @@ async function recordComponentManifest(
     responsesDir: RESPONSES_DIR,
   });
 
-  // Create processor with the cached provider
+  // Create processor with the cached provider and available components
+  // for filtering hallucinated relatedComponents
   const processor = createComponentProcessor({
     llmProvider: cachedProvider,
+    availableComponents,
   });
 
-  // Capitalize first letter for component name
-  const properName =
-    fixture.name.charAt(0).toUpperCase() + fixture.name.slice(1);
+  // Convert kebab-case to PascalCase for component name
+  const properName = kebabToPascal(fixture.name);
 
   console.log(`\nProcessing ${properName}...`);
 
@@ -85,8 +88,8 @@ async function recordComponentManifest(
     });
 
     if (isProcessorSuccess(result)) {
-      // Save the manifest using the manifest recorder utility
-      saveRecordedManifest(properName, result.manifest, {
+      // Save the manifest using the new split structure
+      saveRecordedManifest(properName, result.output, {
         fixtureSource: `nexus/${fixture.name}`,
       });
       console.log(`  ✓ ${properName} manifest recorded`);
@@ -108,12 +111,17 @@ async function main(): Promise<void> {
   const provider = createProviderFromEnv();
   console.log(`Using ${provider.providerType} provider`);
 
+  // Get all available component names for filtering relatedComponents
+  const allComponentNames = getComponentFixtures();
+  const availableComponents = allComponentNames.map(kebabToPascal);
+  console.log(`\nAvailable components: ${availableComponents.join(', ')}`);
+
   let componentNames: string[];
 
   if (specificComponent) {
     componentNames = [specificComponent];
   } else {
-    componentNames = getComponentFixtures();
+    componentNames = allComponentNames;
   }
 
   console.log(
@@ -129,7 +137,11 @@ async function main(): Promise<void> {
   for (const componentName of componentNames) {
     try {
       const fixture = loadNexusComponent(componentName);
-      const success = await recordComponentManifest(fixture, provider);
+      const success = await recordComponentManifest(
+        fixture,
+        provider,
+        availableComponents
+      );
       if (success) {
         recorded++;
       } else {

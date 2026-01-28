@@ -20,6 +20,15 @@ export interface ImportGeneratorOptions {
 
   /** Whether the package supports subpath exports */
   hasSubpathExports?: boolean;
+
+  /**
+   * All exported component names from the file.
+   * For compound components like Dialog, this includes all sub-components:
+   * ["Dialog", "DialogTrigger", "DialogContent", "DialogHeader", ...]
+   *
+   * If not provided, only componentName is used in the import.
+   */
+  exports?: string[];
 }
 
 /**
@@ -56,19 +65,24 @@ export function generateImportStatement(
     componentName,
     packageName = DEFAULT_PACKAGE_NAME,
     hasSubpathExports = false,
+    exports,
   } = options;
 
+  // Use all exports if provided, otherwise just the component name
+  const importNames = exports && exports.length > 0 ? exports : [componentName];
+  const importList = importNames.join(', ');
+
   const result: ImportStatement = {
-    primary: `import { ${componentName} } from '${packageName}'`,
+    primary: `import { ${importList} } from '${packageName}'`,
   };
 
-  // Add type-only import for props
+  // Add type-only import for props (only for root component)
   result.typeOnly = `import type { ${componentName}Props } from '${packageName}'`;
 
   // Add subpath import if supported
   if (hasSubpathExports) {
     const kebabName = kebabCase(componentName);
-    result.subpath = `import { ${componentName} } from '${packageName}/${kebabName}'`;
+    result.subpath = `import { ${importList} } from '${packageName}/${kebabName}'`;
   }
 
   return result;

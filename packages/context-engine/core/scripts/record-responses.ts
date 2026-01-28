@@ -20,6 +20,7 @@ import { createComponentProcessor } from '../src/processor/component-processor.j
 import { createProviderFromEnv } from '../src/utils/env-provider.js';
 import { CachedLLMProvider } from '../test/providers/cached-llm-provider.js';
 import {
+  kebabToPascal,
   listAvailableComponents,
   loadNexusComponent,
   type NexusComponentFixture,
@@ -70,9 +71,8 @@ async function recordComponent(
     llmProvider: recordingProvider,
   });
 
-  // Capitalize first letter for component name
-  const properName =
-    fixture.name.charAt(0).toUpperCase() + fixture.name.slice(1);
+  // Convert kebab-case to PascalCase for component name
+  const properName = kebabToPascal(fixture.name);
 
   console.log(`\nRecording ${properName}...`);
 

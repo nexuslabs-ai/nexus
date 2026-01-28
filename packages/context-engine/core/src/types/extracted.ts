@@ -12,12 +12,8 @@ import {
   ExtractedStorySchema,
 } from '../extractor/storybook/types.js';
 
-import { BasePropSchema, PropTypeCategorySchema } from './base-prop.js';
+import { BasePropSchema } from './base-prop.js';
 import { BaseLibrarySchema } from './identity.js';
-
-// Re-export PropTypeCategorySchema for backwards compatibility
-export { PropTypeCategorySchema };
-export type { PropTypeCategory } from './base-prop.js';
 
 /**
  * Extracted prop schema
@@ -85,6 +81,53 @@ export const CompoundComponentInfoSchema = z.object({
 export type CompoundComponentInfo = z.infer<typeof CompoundComponentInfoSchema>;
 
 /**
+ * Radix primitive info for direct re-exports
+ *
+ * When a component is a direct re-export of a Radix primitive
+ * (e.g., `const Dialog = DialogPrimitive.Root`), this captures
+ * the primitive name and generates a documentation URL.
+ *
+ * URL pattern: https://www.radix-ui.com/primitives/docs/components/{component}#{primitive}
+ */
+export const RadixPrimitiveInfoSchema = z.object({
+  /** The primitive component name (e.g., "Root", "Trigger", "Content") */
+  primitive: z.string(),
+
+  /** Documentation URL for the Radix primitive */
+  docsUrl: z.string(),
+});
+
+export type RadixPrimitiveInfo = z.infer<typeof RadixPrimitiveInfoSchema>;
+
+/**
+ * Extracted sub-component data for compound components
+ */
+export const ExtractedSubComponentSchema = z.object({
+  /** Sub-component name (e.g., "DropdownMenuItem") */
+  name: z.string(),
+
+  /** Extracted props for this sub-component */
+  props: z.array(ExtractedPropSchema),
+
+  /** Description from JSDoc */
+  description: z.string().optional(),
+
+  /** Whether this sub-component is required in composition */
+  requiredInComposition: z.boolean(),
+
+  /** Radix primitive info for re-exports (e.g., DialogPrimitive.Trigger) */
+  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
+
+  /** CVA variants defined for this sub-component */
+  variants: z.record(z.string(), z.array(z.string())).optional(),
+
+  /** Default values for CVA variants */
+  defaultVariants: z.record(z.string(), z.string()).optional(),
+});
+
+export type ExtractedSubComponent = z.infer<typeof ExtractedSubComponentSchema>;
+
+/**
  * Complete extracted data from source code
  */
 export const ExtractedDataSchema = z.object({
@@ -135,6 +178,12 @@ export const ExtractedDataSchema = z.object({
 
   /** Compound component detection result */
   compoundInfo: CompoundComponentInfoSchema.optional(),
+
+  /** Extracted sub-component data for compound components */
+  subComponents: z.array(ExtractedSubComponentSchema).optional(),
+
+  /** Radix primitive info for direct re-exports */
+  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
 });
 
 export type ExtractedData = z.infer<typeof ExtractedDataSchema>;

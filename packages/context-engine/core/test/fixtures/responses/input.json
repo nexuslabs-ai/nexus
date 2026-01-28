@@ -1,38 +1,51 @@
 {
   "componentName": "Input",
   "response": {
+    "semanticDescription": "The Input component provides a flexible and accessible text input field for collecting various types of user data within forms or other interactive interfaces. It supports all standard native HTML input attributes (e.g., `type`, `placeholder`, `name`, `value`, `disabled`, `readOnly`, `required`, `pattern`, `maxLength`). Key features include customizable sizing through 'sm', 'default', and 'lg' variants, allowing for consistent visual styling across different contexts. It's ideal for capturing short textual information like usernames, email addresses, passwords, search terms, or general-purpose text entry where a single line is sufficient. The component integrates seamlessly into forms and ensures proper accessibility by supporting associated labels and ARIA attributes to enhance usability for all users.",
     "minimalExample": "<Input />",
     "tokens": [
+      "color-text",
+      "color-border",
       "spacing-sm",
+      "spacing-md",
       "spacing-lg",
       "font-size-sm",
+      "font-size-md",
       "font-size-lg",
-      "color-border",
-      "color-text",
-      "border-radius-md"
+      "border-radius-md",
+      "box-shadow-focus"
     ],
-    "semanticDescription": "The Input component provides a fundamental user interface element for accepting text-based user input. It is highly versatile and crucial for data collection in forms, search functionalities, and interactive data filtering. Key features include support for different sizes (default, sm, lg) to accommodate various design requirements and contextual uses. It integrates seamlessly into forms, allowing users to type and submit information. It can be used for single-line text, passwords, email addresses, numbers, and more, adapting its behavior based on HTML `type` attributes. Its primary purpose is to enable direct user data entry, making it an essential building block for interactive applications.",
     "guidance": {
-      "whenNotToUse": "Do not use for selecting predefined options (use Select, RadioGroup, Checkbox instead), for triggering actions (use Button), or for displaying large blocks of static text.",
+      "accessibility": "Ensure associated labels are always present and correctly linked to the input field using `htmlFor` and `id` attributes to provide context for screen readers. Use appropriate `aria-*` attributes for validation, error states, or specific input types (e.g., `aria-invalid`, `aria-describedby`). Provide clear error messages and visual cues for invalid input states.",
+      "relatedComponents": [
+        "Label",
+        "Button",
+        "Form",
+        "Textarea",
+        "Select",
+        "Checkbox",
+        "RadioGroup"
+      ],
       "patterns": ["form-control", "input"],
-      "accessibility": "Ensure inputs have associated <label> elements for screen reader accessibility. Use `aria-describedby` for validation messages or hints, and `aria-invalid` for error states. Provide clear visual focus indicators.",
-      "whenToUse": "Use the Input component to allow users to enter and edit text, numbers, or other data. Ideal for form fields, search boxes, or any scenario requiring direct user data entry.",
-      "relatedComponents": ["Label", "Button", "Form", "Textarea", "Select"]
+      "whenNotToUse": "Do not use for multi-line text input (use a Textarea instead) or for selecting multiple options (use Checkbox or Radio Group). Avoid using when a specific type of input with dedicated validation or a specialized UI is needed, such as a DatePicker, TimePicker, or a Rich Text Editor.",
+      "whenToUse": "Use the Input component to collect single-line textual user data such as names, emails, passwords, or search queries. It's suitable when you need a standard text field with custom sizing options and native input attribute support within forms or interactive elements."
     },
-    "description": "An input field for collecting user text and data within forms or interactive elements.",
     "examples": {
+      "advanced": [],
       "minimal": {
-        "description": "The simplest rendering of an Input component.",
-        "code": "<Input />",
-        "title": "Minimal Input"
+        "description": "Basic usage of the Input component.",
+        "title": "Minimal Input",
+        "code": "<Input />"
       },
       "common": []
     },
-    "tier": "free"
+    "tier": "free",
+    "variantDescriptions": "{\"size\": {\"default\": \"Standard size for general use input fields, balancing prominence and compactness.\", \"sm\": \"Smaller size for compact forms, dense layouts, or less prominent input needs.\", \"lg\": \"Larger size for prominent input fields, increased readability, or primary data entry areas.\"}}",
+    "description": "A text input field for collecting user data, supporting different sizes and all native input attributes."
   },
-  "recordedAt": "2026-01-26T11:50:29.503Z",
+  "recordedAt": "2026-01-27T11:55:47.546Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "21d044d41144fee751e0735329df3badf779c317ecfe4b218ff846004a0e7a3c",
-  "promptSummary": "Generate metadata for Input component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Input\n\nProps: None extracted\n\nVariants (CVA):\n- size: default, sm, lg\nDefaults:\n  size: de..."
+  "inputHash": "db2a7a9a6170fc12f04ef102913ef348363ce40c2869494a74b965c58990a70a",
+  "promptSummary": "Generate metadata for Input component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Input\nDescription: Input\n\nA text input field for collecting user data.\nSupports different ..."
 }

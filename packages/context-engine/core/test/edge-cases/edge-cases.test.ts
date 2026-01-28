@@ -134,11 +134,12 @@ describe('Edge Cases', () => {
         if (!isExtractionSuccess(result)) return;
 
         // Generic props should be extracted
+        // Note: simplified prop structure - name, type, values, defaultValue
         expectPropsToInclude(result.data.props, [
           { name: 'items' },
           { name: 'renderItem' },
           { name: 'keyExtractor' },
-          { name: 'loading', required: false },
+          { name: 'loading' },
         ]);
       }
     );
@@ -152,11 +153,13 @@ describe('Edge Cases', () => {
         expectExtractionSuccess(result);
         if (!isExtractionSuccess(result)) return;
 
-        // items prop should have array type
+        // items prop should have array type in the simplified type string
         const itemsProp = result.data.props.find((p) => p.name === 'items');
         expect(itemsProp).toBeDefined();
-        // The type might be T[] or array<T> or similar
-        expect(itemsProp?.typeCategory).toBe('array');
+        // The type should indicate array nature (e.g., contains '[]' or 'Array')
+        expect(
+          itemsProp?.type.includes('[]') || itemsProp?.type.includes('Array')
+        ).toBe(true);
       }
     );
 

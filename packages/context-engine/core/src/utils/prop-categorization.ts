@@ -3,9 +3,13 @@
  *
  * Categorizes extracted props by semantic purpose for AI consumption.
  * This is a presentation concern, not extraction - keeps extractor fast and pure.
+ *
+ * Note: With the props cleanup, passthrough props are now rejected at extraction
+ * time, so the passthrough category is no longer used. Props are already clean.
  */
 
 import type { ExtractedProp } from '../types/extracted.js';
+import type { ChildrenInfo } from '../types/manifest.js';
 import type { CategorizedProps, PropDefinition } from '../types/props.js';
 
 // ============================================================================
@@ -44,22 +48,6 @@ const BEHAVIOR_PATTERNS: (string | RegExp)[] = [
   /^has[A-Z]/,
 ];
 
-/**
- * Known passthrough prop names (forwarded to DOM)
- */
-const PASSTHROUGH_NAMES = new Set([
-  'className',
-  'style',
-  'id',
-  'ref',
-  'key',
-  'tabIndex',
-  'role',
-  'title',
-  'lang',
-  'dir',
-]);
-
 // ============================================================================
 // Transformation
 // ============================================================================
@@ -67,34 +55,22 @@ const PASSTHROUGH_NAMES = new Set([
 /**
  * Transform ExtractedProp to PropDefinition format.
  *
- * This maps the raw extraction format to the AI-friendly format with
- * consistent `is*` prefix for boolean flags.
+ * With the props cleanup, this is now a simple mapping since ExtractedProp
+ * and PropDefinition have the same simplified structure:
+ * - name, type, description, defaultValue, values, required
+ *
+ * The internal extraction flags (isChildren, isClassName, isStyle, deprecated)
+ * are stripped out as they're only used for internal categorization logic.
  */
 export function toDefinition(prop: ExtractedProp): PropDefinition {
   return {
     name: prop.name,
     type: prop.type,
-    typeCategory: prop.typeCategory,
-    required: prop.required,
-    defaultValue: prop.defaultValue,
-    possibleValues: prop.possibleValues,
     description: prop.description,
-    isControlled: detectControlled(prop),
-    acceptsChildren: prop.isChildren,
-    isEventHandler:
-      prop.name.startsWith('on') && prop.typeCategory === 'function',
-    isDeprecated: prop.deprecated,
+    defaultValue: prop.defaultValue,
+    values: prop.values,
+    required: prop.required,
   };
-}
-
-/**
- * Detect if a prop is controlled (has corresponding onChange pattern)
- */
-function detectControlled(prop: ExtractedProp): boolean {
-  // Common controlled prop names
-  return (
-    prop.name === 'value' || prop.name === 'checked' || prop.name === 'selected'
-  );
 }
 
 // ============================================================================
@@ -103,10 +79,13 @@ function detectControlled(prop: ExtractedProp): boolean {
 
 /**
  * Check if prop is an event handler
- * Highest precedence - on* functions are always events
+ * Highest precedence - on* functions with complex callback types
+ *
+ * Note: Standard HTML events (onClick, onChange, etc.) are rejected at extraction.
+ * This only sees explicitly defined events like onValueChange, onOpenChange.
  */
 export function isEventProp(p: PropDefinition): boolean {
-  return p.name.startsWith('on') && p.typeCategory === 'function';
+  return p.name.startsWith('on') && p.name.length > 2 && p.type.includes('=>');
 }
 
 /**
@@ -114,13 +93,19 @@ export function isEventProp(p: PropDefinition): boolean {
  * Second highest precedence
  */
 export function isSlotProp(p: PropDefinition): boolean {
-  if (p.acceptsChildren) return true;
-  if (p.typeCategory === 'element') return true;
+  // Check type for React element types
+  if (
+    p.type.includes('ReactNode') ||
+    p.type.includes('ReactElement') ||
+    p.type.includes('JSX.Element')
+  ) {
+    return true;
+  }
   return matchesPattern(p.name, SLOT_PATTERNS);
 }
 
 /**
- * Check if prop is a variant (CVA variant or literal union)
+ * Check if prop is a variant (CVA variant or has values array)
  */
 export function isVariantProp(
   p: PropDefinition,
@@ -129,31 +114,16 @@ export function isVariantProp(
   // Direct CVA variant match
   if (variantNames.has(p.name)) return true;
 
-  // Literal type with multiple possible values
-  return p.typeCategory === 'literal' && (p.possibleValues?.length ?? 0) > 1;
+  // Has values array with multiple options (string enum type)
+  return p.type === 'string' && (p.values?.length ?? 0) > 1;
 }
 
 /**
  * Check if prop is a behavior prop (boolean state control)
  */
 export function isBehaviorProp(p: PropDefinition): boolean {
-  if (p.typeCategory !== 'primitive') return false;
   if (p.type !== 'boolean') return false;
   return matchesPattern(p.name, BEHAVIOR_PATTERNS);
-}
-
-/**
- * Check if prop is a passthrough prop (forwarded to DOM)
- */
-export function isPassthroughProp(p: PropDefinition): boolean {
-  // Check explicit flags from extraction
-  if (p.name === 'className' || p.name === 'style') return true;
-
-  // Known passthrough names
-  if (PASSTHROUGH_NAMES.has(p.name)) return true;
-
-  // aria-* and data-* attributes
-  return p.name.startsWith('aria-') || p.name.startsWith('data-');
 }
 
 // ============================================================================
@@ -166,16 +136,18 @@ export function isPassthroughProp(p: PropDefinition): boolean {
  * Categories follow a strict precedence order to ensure props
  * are placed in exactly one category:
  *
- * 1. events (highest) - on* functions
+ * 1. events (highest) - on* functions (explicitly coded, not standard HTML events)
  * 2. slots - ReactNode/element types
- * 3. variants - CVA variant matches or literal unions
+ * 3. variants - CVA variant matches or props with values array
  * 4. behaviors - Boolean state props
- * 5. passthrough - DOM attributes
- * 6. other (lowest) - Fallback
+ * 5. other (lowest) - Fallback
+ *
+ * Note: Passthrough props (className, style, aria-*, data-*) are now rejected
+ * at extraction time, so the passthrough category is no longer needed.
  *
  * @param props - Array of extracted props from component
  * @param cvaVariants - Record of CVA variant names to their values
- * @returns Props organized into semantic categories
+ * @returns Props organized into semantic categories (empty categories are undefined)
  *
  * @example
  * ```typescript
@@ -187,18 +159,15 @@ export function isPassthroughProp(p: PropDefinition): boolean {
  *
  * // Result:
  * // {
- * //   variants: [{ name: 'variant', ... }, { name: 'size', ... }],
- * //   behaviors: [{ name: 'disabled', ... }],
- * //   events: [{ name: 'onClick', ... }],
- * //   slots: [{ name: 'children', ... }],
- * //   passthrough: [{ name: 'className', ... }],
- * //   other: []
+ * //   variants: [{ name: 'variant', type: 'string', values: [...] }],
+ * //   behaviors: [{ name: 'disabled', type: 'boolean' }],
+ * //   slots: [{ name: 'children', type: 'ReactNode' }],
  * // }
  * ```
  */
 export function categorizeProps(
   props: ExtractedProp[],
-  cvaVariants: Record<string, string[]>
+  cvaVariants: Record<string, string[]> = {}
 ): CategorizedProps {
   const variantNames = new Set(Object.keys(cvaVariants));
 
@@ -212,11 +181,10 @@ export function categorizeProps(
   const slots: PropDefinition[] = [];
   const variants: PropDefinition[] = [];
   const behaviors: PropDefinition[] = [];
-  const passthrough: PropDefinition[] = [];
   const other: PropDefinition[] = [];
 
   for (const prop of definitions) {
-    // Precedence 1: Events
+    // Precedence 1: Events (explicitly coded, not standard HTML events)
     if (isEventProp(prop)) {
       events.push(prop);
       continue;
@@ -240,23 +208,17 @@ export function categorizeProps(
       continue;
     }
 
-    // Precedence 5: Passthrough
-    if (isPassthroughProp(prop)) {
-      passthrough.push(prop);
-      continue;
-    }
-
-    // Precedence 6: Other (fallback)
+    // Precedence 5: Other (fallback)
     other.push(prop);
   }
 
+  // Return only non-empty categories
   return {
-    variants,
-    behaviors,
-    events,
-    slots,
-    passthrough,
-    other,
+    variants: variants.length > 0 ? variants : undefined,
+    behaviors: behaviors.length > 0 ? behaviors : undefined,
+    events: events.length > 0 ? events : undefined,
+    slots: slots.length > 0 ? slots : undefined,
+    other: other.length > 0 ? other : undefined,
   };
 }
 
@@ -274,6 +236,63 @@ function matchesPattern(name: string, patterns: (string | RegExp)[]): boolean {
 }
 
 // ============================================================================
+// Children Detection
+// ============================================================================
+
+/**
+ * Detect children prop information from extracted props.
+ *
+ * Detection patterns:
+ * 1. Props include 'children' with type containing 'ReactNode'
+ * 2. Props with isChildren flag set
+ *
+ * @param props - Array of extracted props from component
+ * @returns ChildrenInfo if component accepts children, undefined otherwise
+ *
+ * @example
+ * ```typescript
+ * const childrenInfo = detectChildrenInfo(extracted.data.props);
+ * // Returns: { accepts: true, type: 'ReactNode', required: false }
+ * // Or: undefined if component doesn't accept children
+ * ```
+ */
+export function detectChildrenInfo(
+  props: ExtractedProp[]
+): ChildrenInfo | undefined {
+  const childrenProp = props.find((p) => p.name === 'children' || p.isChildren);
+
+  if (!childrenProp) {
+    return undefined;
+  }
+
+  return {
+    accepts: true,
+    type: extractChildrenType(childrenProp.type),
+    required: childrenProp.required || undefined,
+  };
+}
+
+/**
+ * Extract the children type from a type string.
+ *
+ * Maps verbose type strings to simplified type names for AI consumption.
+ *
+ * @param type - The type string from prop extraction
+ * @returns Simplified type name or undefined if unknown
+ *
+ * @example
+ * extractChildrenType('ReactNode | undefined') // 'ReactNode'
+ * extractChildrenType('ReactElement<ButtonProps>') // 'ReactElement'
+ */
+function extractChildrenType(type: string): string | undefined {
+  if (type.includes('ReactNode')) return 'ReactNode';
+  if (type.includes('ReactElement')) return 'ReactElement';
+  if (type === 'string') return 'string';
+  if (type === 'number') return 'number';
+  return undefined;
+}
+
+// ============================================================================
 // Exports for Testing
 // ============================================================================
 
@@ -283,5 +302,4 @@ function matchesPattern(name: string, patterns: (string | RegExp)[]): boolean {
 export const PATTERNS = {
   SLOT_PATTERNS,
   BEHAVIOR_PATTERNS,
-  PASSTHROUGH_NAMES,
 } as const;

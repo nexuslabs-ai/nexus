@@ -19,19 +19,31 @@ import {
   type BaseLibraryName,
   isBaseLibraryPackage,
 } from '../constants/index.js';
-import type { CompoundComponentInfo, ExtractedData } from '../types/index.js';
+import type {
+  CompoundComponentInfo,
+  ExtractedData,
+  ExtractedSubComponent,
+  RadixPrimitiveInfo,
+} from '../types/index.js';
 import { pascalCase } from '../utils/case.js';
 import { generateSourceHash } from '../utils/hash.js';
 import { generateComponentId, generateSlug } from '../utils/id.js';
 import { createLogger } from '../utils/logger.js';
 
-import { detectCompoundComponent } from './compound-detector.js';
+import {
+  detectCompoundComponent,
+  inferRequiredInComposition,
+} from './compound-detector.js';
 import { DependencyExtractor } from './dependency-extractor.js';
 import {
   type FallbackReason,
   getFallbackReasonDescription,
   shouldFallback,
 } from './fallback-triggers.js';
+import {
+  detectRadixPrimitive,
+  detectRadixPrimitiveForSubComponent,
+} from './radix-detector.js';
 import { ReactDocgenExtractor } from './react-docgen-extractor.js';
 import { StorybookExtractor } from './storybook/storybook-extractor.js';
 import type { ArgTypeInfo, ExtractedStory } from './storybook/types.js';
@@ -158,17 +170,97 @@ export class HybridExtractor implements IExtractor {
         });
       }
 
-      // Step 7: Detect compound components
-      const compoundInfo = detectCompoundComponent(input.sourceCode);
+      // Step 7: Detect Radix primitive re-exports
+      const radixPrimitive = detectRadixPrimitive(input.name, input.sourceCode);
+      if (radixPrimitive) {
+        logger.debug('Radix primitive detected', {
+          name: input.name,
+          primitive: radixPrimitive.primitive,
+          docsUrl: radixPrimitive.docsUrl,
+        });
+      }
 
-      if (compoundInfo.isCompound) {
+      // Step 8: Detect compound components and extract sub-component data
+      const compoundInfo = detectCompoundComponent(input.sourceCode);
+      let subComponents: ExtractedSubComponent[] | undefined;
+
+      if (compoundInfo.isCompound && compoundInfo.subComponents.length > 0) {
         logger.debug('Compound component detected', {
           root: compoundInfo.rootComponent,
           subComponents: compoundInfo.subComponents,
         });
+
+        // Extract props for each sub-component using ts-morph
+        // (react-docgen fails on files with external package types)
+        const subComponentResults =
+          await this.tsMorph.extractMultipleComponents(
+            input.sourceCode,
+            compoundInfo.subComponents,
+            input.filePath
+          );
+
+        // ALWAYS include ALL subComponents, even if props extraction fails
+        // For each subComponent:
+        // 1. Use extracted props if available (may be empty)
+        // 2. Detect Radix primitive (for doc lookup)
+        // 3. Extract CVA variants if defined
+        // 4. Infer requiredInComposition from naming heuristics
+        subComponents = compoundInfo.subComponents.map((subName) => {
+          // Get props result (may be undefined or have empty props)
+          const propsResult = subComponentResults.get(subName);
+
+          // Detect Radix primitive for this subComponent
+          const subRadixPrimitive = detectRadixPrimitiveForSubComponent(
+            subName,
+            input.sourceCode
+          );
+
+          // Extract variants for this specific subComponent
+          const subVariantResult = this.variantExtractor.extractForComponent(
+            input.sourceCode,
+            subName,
+            input.filePath
+          );
+
+          // Infer if this sub-component is required in composition
+          const requiredInComposition = inferRequiredInComposition(
+            subName,
+            compoundInfo.rootComponent
+          );
+
+          const subComponent: ExtractedSubComponent = {
+            name: subName,
+            props: propsResult?.props ?? [],
+            description: propsResult?.description,
+            requiredInComposition,
+          };
+
+          // Only add radixPrimitive if detected
+          if (subRadixPrimitive) {
+            subComponent.radixPrimitive = subRadixPrimitive;
+          }
+
+          // Only add variants if there are any
+          if (Object.keys(subVariantResult.variants).length > 0) {
+            subComponent.variants = subVariantResult.variants;
+            subComponent.defaultVariants = subVariantResult.defaultVariants;
+          }
+
+          return subComponent;
+        });
+
+        logger.debug('Sub-component data extracted', {
+          count: subComponents.length,
+          names: subComponents.map((s) => s.name),
+          withRadixPrimitive: subComponents.filter((s) => s.radixPrimitive)
+            .length,
+          withVariants: subComponents.filter(
+            (s) => s.variants && Object.keys(s.variants).length > 0
+          ).length,
+        });
       }
 
-      // Step 8: Build extracted data
+      // Step 9: Build extracted data
       const data = this.buildExtractedData({
         propsResult,
         variants,
@@ -183,9 +275,11 @@ export class HybridExtractor implements IExtractor {
         stories,
         storybookArgTypes,
         compoundInfo: compoundInfo.isCompound ? compoundInfo : undefined,
+        subComponents,
+        radixPrimitive,
       });
 
-      // Step 9: Generate identity
+      // Step 10: Generate identity
       const id = input.existingId ?? generateComponentId();
       const slug = generateSlug(input.name, input.framework, id);
 
@@ -250,6 +344,8 @@ export class HybridExtractor implements IExtractor {
     stories,
     storybookArgTypes,
     compoundInfo,
+    subComponents,
+    radixPrimitive,
   }: {
     propsResult: Awaited<
       ReturnType<ReactDocgenExtractor['extractProps']>
@@ -266,6 +362,8 @@ export class HybridExtractor implements IExtractor {
     stories?: ExtractedStory[];
     storybookArgTypes?: Record<string, ArgTypeInfo>;
     compoundInfo?: CompoundComponentInfo;
+    subComponents?: ExtractedSubComponent[];
+    radixPrimitive?: RadixPrimitiveInfo;
   }): ExtractedData {
     const props = propsResult?.props ?? [];
 
@@ -291,6 +389,8 @@ export class HybridExtractor implements IExtractor {
       stories,
       storybookArgTypes,
       compoundInfo,
+      subComponents,
+      radixPrimitive,
     };
   }
 

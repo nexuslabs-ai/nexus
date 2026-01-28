@@ -420,8 +420,13 @@ export class StorybookExtractor {
     // Check if showcase story
     const isShowcase = this.isShowcase(name);
 
-    // Determine complexity
-    const complexity = this.classifyStory(name, hasRender, isInteractionOnly);
+    // Determine complexity (pass renderCode for advanced pattern detection)
+    const complexity = this.classifyStory(
+      name,
+      hasRender,
+      isInteractionOnly,
+      renderCode
+    );
 
     // Extract props used
     const propsUsed = this.extractPropsUsed(args, renderCode);
@@ -713,12 +718,36 @@ export class StorybookExtractor {
   }
 
   /**
+   * Patterns indicating advanced complexity in render code
+   */
+  private static readonly ADVANCED_RENDER_PATTERNS = [
+    /\buseState\b/, // State hooks
+    /\buseReducer\b/, // Reducer hooks
+    /\buseRef\b/, // Refs (often for complex interactions)
+    /\buseEffect\b/, // Side effects
+    /\buseCallback\b/, // Memoized callbacks
+    /\buseMemo\b/, // Memoized values
+    /\bsetTimeout\b/, // Async patterns
+    /\bsetInterval\b/, // Timer patterns
+    /\bPromise\b/, // Async patterns
+    /\bawait\b/, // Async patterns
+  ];
+
+  /**
    * Classify story complexity
+   *
+   * Classification rules:
+   * 1. Interaction-only → 'common' (filtered out later)
+   * 2. Name matches Default/Basic/Simple → 'minimal'
+   * 3. Has render with advanced patterns (hooks, async) → 'advanced'
+   * 4. Has render without advanced patterns → 'common'
+   * 5. No render → 'common'
    */
   private classifyStory(
     name: string,
     hasRender: boolean,
-    isInteractionOnly: boolean
+    isInteractionOnly: boolean,
+    renderCode?: string
   ): StoryComplexity {
     // Interaction-only stories are common (but will be filtered)
     if (isInteractionOnly) return 'common';
@@ -728,14 +757,29 @@ export class StorybookExtractor {
       return 'minimal';
     }
 
-    // Advanced: Has custom render function
-    if (hasRender) {
-      return 'advanced';
+    // If has render, check if it uses advanced patterns
+    if (hasRender && renderCode) {
+      const isAdvanced = StorybookExtractor.ADVANCED_RENDER_PATTERNS.some(
+        (pattern) => pattern.test(renderCode)
+      );
+      return isAdvanced ? 'advanced' : 'common';
     }
 
-    // Common: Everything else (variant, size, state stories)
+    // Common: Everything else (variant, size, state stories, simple renders)
     return 'common';
   }
+
+  /**
+   * Props to skip when extracting propsUsed
+   */
+  private static readonly SKIP_JSX_ATTRIBUTES = new Set([
+    'className',
+    'style',
+    'key',
+    'ref',
+    'data-testid',
+    'id',
+  ]);
 
   /**
    * Extract prop names used in story
@@ -753,22 +797,9 @@ export class StorybookExtractor {
       }
     }
 
-    // Extract props from render code JSX
+    // Extract props from render code JSX using AST parsing
     if (renderCode) {
-      // Match prop patterns: propName="value" or propName={value}
-      const propPattern = /\s([a-z][a-zA-Z0-9]*)(?:=["'{]|(?=\s|>|\/))/g;
-      let match;
-      while ((match = propPattern.exec(renderCode)) !== null) {
-        const propName = match[1];
-        // Filter out common JSX attributes that aren't component props
-        if (
-          !['className', 'style', 'key', 'ref', 'data-testid'].includes(
-            propName
-          )
-        ) {
-          propsUsed.add(propName);
-        }
-      }
+      this.extractPropsFromJsx(renderCode, propsUsed);
 
       // Match spread props: {...args}
       if (
@@ -785,6 +816,51 @@ export class StorybookExtractor {
     }
 
     return Array.from(propsUsed).sort();
+  }
+
+  /**
+   * Extract JSX attribute names from render code using AST parsing
+   * Falls back to conservative regex if parsing fails
+   */
+  private extractPropsFromJsx(
+    renderCode: string,
+    propsUsed: Set<string>
+  ): void {
+    try {
+      // Wrap the render code in a function to make it parseable JSX
+      const wrappedCode = `const __render = () => (${renderCode});`;
+      const tempFileName = `__temp_jsx_${Date.now()}.tsx`;
+      const tempFile = this.project.createSourceFile(tempFileName, wrappedCode);
+
+      try {
+        // Find all JsxAttribute nodes
+        tempFile.forEachDescendant((node) => {
+          const jsxAttr = node.asKind(SyntaxKind.JsxAttribute);
+          if (jsxAttr) {
+            const name = jsxAttr.getNameNode().getText();
+            // Skip common JSX attributes that aren't component props
+            if (!StorybookExtractor.SKIP_JSX_ATTRIBUTES.has(name)) {
+              propsUsed.add(name);
+            }
+          }
+        });
+      } finally {
+        // Clean up temp file
+        this.project.removeSourceFile(tempFile);
+      }
+    } catch {
+      // Fallback to conservative regex that requires = after prop name
+      // This matches: propName="value" or propName={value} or propName='value'
+      // but NOT text content like "This is a tooltip"
+      const propPattern = /\s([a-z][a-zA-Z0-9]*)=/g;
+      let match;
+      while ((match = propPattern.exec(renderCode)) !== null) {
+        const propName = match[1];
+        if (!StorybookExtractor.SKIP_JSX_ATTRIBUTES.has(propName)) {
+          propsUsed.add(propName);
+        }
+      }
+    }
   }
 
   /**
