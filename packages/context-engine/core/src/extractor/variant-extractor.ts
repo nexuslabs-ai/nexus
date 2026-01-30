@@ -170,37 +170,6 @@ export class VariantExtractor {
   }
 
   /**
-   * Get all extracted variant variable names
-   * Useful for debugging or inspection
-   *
-   * @returns Array of variable names (e.g., ["buttonVariants", "badgeVariants"])
-   * @throws Error if extractAll() was not called first
-   */
-  getExtractedVariantNames(): string[] {
-    if (this.allVariants === null) {
-      throw new Error(
-        'extractAll() must be called before getExtractedVariantNames()'
-      );
-    }
-    return Array.from(this.allVariants.keys());
-  }
-
-  /**
-   * Get the component to variants mapping for debugging
-   *
-   * @returns Map of component names to their used variant variable names
-   * @throws Error if extractAll() was not called first
-   */
-  getComponentVariantsMap(): Map<string, string[]> {
-    if (this.componentToVariants === null) {
-      throw new Error(
-        'extractAll() must be called before getComponentVariantsMap()'
-      );
-    }
-    return new Map(this.componentToVariants);
-  }
-
-  /**
    * Extract variants from source file and store in allVariants map
    * Finds variable declarations that contain cva/tv calls
    */

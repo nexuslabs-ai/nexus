@@ -94,25 +94,3 @@ export function extractRadixComponentName(
   // Convert kebab-case to PascalCase
   return pascalCase(componentSegment);
 }
-
-// =============================================================================
-// Backwards Compatibility
-// =============================================================================
-
-/**
- * @deprecated Use RADIX_LIBRARY directly
- */
-export const BASE_LIBRARIES = {
-  RadixUI: RADIX_LIBRARY,
-} as const;
-
-/**
- * @deprecated Use isRadixPackage instead
- */
-export function isBaseLibraryPackage(
-  _library: BaseLibraryName,
-  packageName: string
-): boolean {
-  // Since we only support Radix, just check if it's a Radix package
-  return isRadixPackage(packageName);
-}

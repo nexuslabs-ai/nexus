@@ -118,9 +118,6 @@ export class TsMorphExtractor implements IPropsExtractor {
         }
       }
 
-      // Clear defaults after loop
-      this.currentDefaults.clear();
-
       // Clean up
       this.project.removeSourceFile(sourceFile);
 
@@ -132,11 +129,12 @@ export class TsMorphExtractor implements IPropsExtractor {
 
       return results;
     } catch (error) {
-      this.currentDefaults.clear();
       logger.debug('Multi-component extraction failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
       return results;
+    } finally {
+      this.currentDefaults.clear();
     }
   }
 
@@ -153,9 +151,6 @@ export class TsMorphExtractor implements IPropsExtractor {
 
       const result = this.extractSingleComponent(sourceFile, componentName);
 
-      // Clear defaults after extraction
-      this.currentDefaults.clear();
-
       // Clean up the source file to prevent memory accumulation
       this.project.removeSourceFile(sourceFile);
 
@@ -166,12 +161,13 @@ export class TsMorphExtractor implements IPropsExtractor {
 
       return result;
     } catch (error) {
-      this.currentDefaults.clear();
       logger.debug('ts-morph extraction failed', {
         componentName,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
       return null;
+    } finally {
+      this.currentDefaults.clear();
     }
   }
 

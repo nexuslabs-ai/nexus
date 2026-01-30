@@ -6,11 +6,8 @@
 
 // Radix UI constants and utilities
 export {
-  // Backwards compatibility
-  BASE_LIBRARIES,
   detectBaseLibrary,
   extractRadixComponentName,
-  isBaseLibraryPackage,
   isRadixPackage,
   RADIX_LIBRARY,
 } from './base-libraries.js';
