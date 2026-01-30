@@ -1,8 +1,8 @@
 /**
  * Extractor Module
  *
- * Exports all extractor implementations and types for the
- * hybrid extraction system.
+ * Exports the hybrid extraction system.
+ * implementation details - use HybridExtractor or extractComponent().
  */
 
 import {
@@ -11,23 +11,31 @@ import {
 } from './hybrid-extractor.js';
 import type { ExtractionInput, IExtractor } from './types.js';
 
-export { CompositionExtractor } from './composition-extractor.js';
-export { CompoundExtractor } from './compound-extractor.js';
-export {
-  DependencyExtractor,
-  type DependencyExtractorOptions,
-} from './dependency-extractor.js';
-export * from './fallback-triggers.js';
+// Main public API
 export {
   HybridExtractor,
   type HybridExtractorOptions,
 } from './hybrid-extractor.js';
-export { RadixExtractor } from './radix-extractor.js';
-export { ReactDocgenExtractor } from './react-docgen-extractor.js';
-export * from './storybook/index.js';
-export { TsMorphExtractor } from './ts-morph-extractor.js';
-export * from './types.js';
-export { VariantExtractor } from './variant-extractor.js';
+
+// Storybook extractor
+export type {
+  ExtractedStory,
+  StorybookExtractionResult,
+  StoryComplexity,
+} from './storybook/index.js';
+export { StorybookExtractor } from './storybook/index.js';
+
+// Public types only
+export type {
+  ExtractionFailure,
+  ExtractionInput,
+  ExtractionOutput,
+  ExtractorResult,
+  IExtractor,
+} from './types.js';
+
+// Type guards
+export { isExtractionFailure, isExtractionSuccess } from './types.js';
 
 /**
  * Supported frameworks for extraction

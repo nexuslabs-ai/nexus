@@ -88,14 +88,7 @@ export type {
   RadixPrimitiveInfo,
 } from './extracted.js';
 
-// Storybook types - schemas (values)
-export {
-  ExtractedStorySchema,
-  StorybookExtractionResultSchema,
-  StoryComplexitySchema,
-} from '../extractor/storybook/types.js';
-
-// Storybook types - types
+// Storybook types
 export type {
   ExtractedStory,
   StorybookExtractionResult,

@@ -859,10 +859,3 @@ export class StorybookExtractor {
     return undefined;
   }
 }
-
-/**
- * Factory function for creating StorybookExtractor
- */
-export function createStorybookExtractor(): StorybookExtractor {
-  return new StorybookExtractor();
-}
