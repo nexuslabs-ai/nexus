@@ -1,103 +1,118 @@
 /**
- * Base Libraries Constants
+ * Radix UI Constants
  *
- * Constants and utilities for detecting and working with base UI libraries
- * (headless UI primitive libraries that components may be built upon).
+ * Constants and utilities for detecting Radix UI primitives.
+ * Designed for Radix-based design systems (shadcn/ui pattern).
  */
 
+import { pascalCase } from '../utils/case.js';
+
 // =============================================================================
-// Base UI Libraries
+// Radix UI Library
 // =============================================================================
 
 /**
- * Known base UI library identifiers
+ * Radix UI library identifier
  *
- * These are the headless UI primitive libraries that components may be built upon.
- * The values are used for:
+ * Used for:
  * - Detection during extraction
  * - Filtering/querying in the API
  * - Display in UI
  */
-export const BASE_LIBRARIES = {
-  RadixUI: 'radix-ui',
-  ArkUI: 'ark-ui',
-  BaseUI: 'base-ui',
-  HeadlessUI: 'headless-ui',
-  ReactAria: 'react-aria',
-} as const;
+export const RADIX_LIBRARY = 'radix-ui' as const;
 
 /**
- * Union type of all base library names
+ * Type for base library name (Radix-only)
  */
-export type BaseLibraryName =
-  (typeof BASE_LIBRARIES)[keyof typeof BASE_LIBRARIES];
+export type BaseLibraryName = typeof RADIX_LIBRARY;
 
 /**
- * Pattern configuration for detecting base UI libraries from package names
- */
-export interface BaseLibraryPattern {
-  /** Regex pattern to match against package name */
-  pattern: RegExp;
-  /** Normalized library name to use when matched */
-  name: BaseLibraryName;
-}
-
-/**
- * Mapping of package name patterns to base library names
+ * Pattern to detect Radix UI packages
  *
- * Order matters: first match wins. More specific patterns should come first.
+ * Matches: @radix-ui/react-{component}
  */
-export const BASE_LIBRARY_PATTERNS: ReadonlyArray<BaseLibraryPattern> = [
-  { pattern: /^@radix-ui\/react-/, name: BASE_LIBRARIES.RadixUI },
-  { pattern: /^@ark-ui\/react/, name: BASE_LIBRARIES.ArkUI },
-  { pattern: /^@base-ui-components\/react/, name: BASE_LIBRARIES.BaseUI },
-  { pattern: /^@headlessui\/react/, name: BASE_LIBRARIES.HeadlessUI },
-  { pattern: /^@react-aria\//, name: BASE_LIBRARIES.ReactAria },
-  { pattern: /^react-aria-components/, name: BASE_LIBRARIES.ReactAria },
-];
+const RADIX_PATTERN = /^@radix-ui\/react-/;
 
 /**
- * Detect if a package is a known base UI library
+ * Detect if a package is a Radix UI package
  *
  * @param packageName - The npm package name to check
- * @returns The base library name if detected, null otherwise
+ * @returns 'radix-ui' if detected, null otherwise
  *
  * @example
  * ```typescript
  * detectBaseLibrary('@radix-ui/react-dialog') // 'radix-ui'
- * detectBaseLibrary('@ark-ui/react')          // 'ark-ui'
  * detectBaseLibrary('lodash')                 // null
  * ```
  */
 export function detectBaseLibrary(packageName: string): BaseLibraryName | null {
-  for (const { pattern, name } of BASE_LIBRARY_PATTERNS) {
-    if (pattern.test(packageName)) {
-      return name;
-    }
-  }
-  return null;
+  return RADIX_PATTERN.test(packageName) ? RADIX_LIBRARY : null;
 }
 
 /**
- * Check if a package belongs to a specific base library
+ * Check if a package is a Radix UI package
  *
- * @param library - The base library to check against
  * @param packageName - The npm package name to check
- * @returns True if the package belongs to the specified library
+ * @returns True if the package is a Radix UI package
  *
  * @example
  * ```typescript
- * isBaseLibraryPackage('radix-ui', '@radix-ui/react-dialog') // true
- * isBaseLibraryPackage('radix-ui', '@ark-ui/react')          // false
- * isBaseLibraryPackage('ark-ui', '@ark-ui/react')            // true
+ * isRadixPackage('@radix-ui/react-dialog') // true
+ * isRadixPackage('@radix-ui/react-slot')   // true
+ * isRadixPackage('lodash')                 // false
  * ```
  */
+export function isRadixPackage(packageName: string): boolean {
+  return RADIX_PATTERN.test(packageName);
+}
+
+/**
+ * Extract component name from a Radix UI package
+ *
+ * @param packageName - The Radix UI package name
+ * @returns The component name in PascalCase, or undefined if not a Radix package
+ *
+ * @example
+ * ```typescript
+ * extractRadixComponentName('@radix-ui/react-dialog')   // 'Dialog'
+ * extractRadixComponentName('@radix-ui/react-dropdown-menu') // 'DropdownMenu'
+ * extractRadixComponentName('lodash')                   // undefined
+ * ```
+ */
+export function extractRadixComponentName(
+  packageName: string
+): string | undefined {
+  if (!RADIX_PATTERN.test(packageName)) {
+    return undefined;
+  }
+
+  const componentSegment = packageName.replace(RADIX_PATTERN, '');
+  if (!componentSegment) {
+    return undefined;
+  }
+
+  // Convert kebab-case to PascalCase
+  return pascalCase(componentSegment);
+}
+
+// =============================================================================
+// Backwards Compatibility
+// =============================================================================
+
+/**
+ * @deprecated Use RADIX_LIBRARY directly
+ */
+export const BASE_LIBRARIES = {
+  RadixUI: RADIX_LIBRARY,
+} as const;
+
+/**
+ * @deprecated Use isRadixPackage instead
+ */
 export function isBaseLibraryPackage(
-  library: BaseLibraryName,
+  _library: BaseLibraryName,
   packageName: string
 ): boolean {
-  const libraryPatterns = BASE_LIBRARY_PATTERNS.filter(
-    (p) => p.name === library
-  );
-  return libraryPatterns.some(({ pattern }) => pattern.test(packageName));
+  // Since we only support Radix, just check if it's a Radix package
+  return isRadixPackage(packageName);
 }

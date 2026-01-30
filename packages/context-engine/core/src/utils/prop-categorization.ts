@@ -59,8 +59,8 @@ const BEHAVIOR_PATTERNS: (string | RegExp)[] = [
  * and PropDefinition have the same simplified structure:
  * - name, type, description, defaultValue, values, required
  *
- * The internal extraction flags (isChildren, isClassName, isStyle, deprecated)
- * are stripped out as they're only used for internal categorization logic.
+ * The internal extraction flag (isChildren) is stripped out as it's only
+ * used for internal categorization logic.
  */
 export function toDefinition(prop: ExtractedProp): PropDefinition {
   return {

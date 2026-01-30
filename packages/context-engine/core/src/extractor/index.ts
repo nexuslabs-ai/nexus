@@ -5,18 +5,24 @@
  * hybrid extraction system.
  */
 
-import { HybridExtractor } from './hybrid-extractor.js';
+import {
+  HybridExtractor,
+  type HybridExtractorOptions,
+} from './hybrid-extractor.js';
 import type { ExtractionInput, IExtractor } from './types.js';
 
+export { CompositionExtractor } from './composition-extractor.js';
+export { CompoundExtractor } from './compound-extractor.js';
 export {
-  createCompoundDetector,
-  detectCompoundComponent,
-  inferDataSlot,
-} from './compound-detector.js';
-export { DependencyExtractor } from './dependency-extractor.js';
+  DependencyExtractor,
+  type DependencyExtractorOptions,
+} from './dependency-extractor.js';
 export * from './fallback-triggers.js';
-export { HybridExtractor } from './hybrid-extractor.js';
-export { detectRadixPrimitive } from './radix-detector.js';
+export {
+  HybridExtractor,
+  type HybridExtractorOptions,
+} from './hybrid-extractor.js';
+export { RadixExtractor } from './radix-extractor.js';
 export { ReactDocgenExtractor } from './react-docgen-extractor.js';
 export * from './storybook/index.js';
 export { TsMorphExtractor } from './ts-morph-extractor.js';
@@ -24,29 +30,47 @@ export * from './types.js';
 export { VariantExtractor } from './variant-extractor.js';
 
 /**
- * Singleton extractors per framework
- *
- * Currently only React is supported. Future frameworks (Vue, Svelte, Angular)
- * will have their own extractor implementations.
+ * Supported frameworks for extraction
  */
-const extractors: Record<string, IExtractor> = {
-  react: new HybridExtractor(),
-  // Future: vue, svelte, angular extractors
-};
+const SUPPORTED_FRAMEWORKS = ['react'] as const;
 
 /**
- * Get extractor for a framework
+ * Factory function to create an extractor for a framework
  *
+ * Creates a new extractor instance each time it's called. This is the
+ * recommended way to get an extractor, as it allows passing custom options.
+ *
+ * @param framework - The framework to create an extractor for
+ * @param options - Optional configuration for the extractor
+ * @returns A new extractor instance
  * @throws Error if framework is not supported
+ *
+ * @example
+ * ```typescript
+ * // Basic usage
+ * const extractor = getExtractor('react');
+ *
+ * // With options
+ * const extractor = getExtractor('react', {
+ *   pathAliases: { '@/*': ['./src/*'] },
+ *   dependencies: ['react', '@radix-ui/react-slot'],
+ * });
+ * ```
  */
-export function getExtractor(framework: string): IExtractor {
-  const extractor = extractors[framework];
-  if (!extractor) {
-    throw new Error(
-      `Unsupported framework: ${framework}. Supported: ${Object.keys(extractors).join(', ')}`
-    );
+export function getExtractor(
+  framework: string,
+  options?: HybridExtractorOptions
+): IExtractor {
+  switch (framework) {
+    case 'react':
+      return new HybridExtractor(options);
+    // Future: case 'vue': return new VueExtractor(options);
+    // Future: case 'svelte': return new SvelteExtractor(options);
+    default:
+      throw new Error(
+        `Unsupported framework: ${framework}. Supported: ${SUPPORTED_FRAMEWORKS.join(', ')}`
+      );
   }
-  return extractor;
 }
 
 /**

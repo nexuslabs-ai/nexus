@@ -90,7 +90,6 @@ export type {
 
 // Storybook types - schemas (values)
 export {
-  ArgTypeInfoSchema,
   ExtractedStorySchema,
   StorybookExtractionResultSchema,
   StoryComplexitySchema,
@@ -98,7 +97,6 @@ export {
 
 // Storybook types - types
 export type {
-  ArgTypeInfo,
   ExtractedStory,
   StorybookExtractionResult,
   StoryComplexity,

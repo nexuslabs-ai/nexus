@@ -16,6 +16,7 @@
 import {
   type InterfaceDeclaration,
   type Node,
+  type ParameterDeclaration,
   Project,
   type PropertySignature,
   type SourceFile,
@@ -39,9 +40,31 @@ const logger = createLogger({ name: 'ts-morph-extractor' });
 
 /**
  * Fallback props extractor using ts-morph
+ *
+ * Used when react-docgen-typescript fails (HOCs, forwardRef patterns,
+ * compound components, non-standard exports).
+ *
+ * ## Extraction Flow
+ *
+ * Both public methods (`extractProps` and `extractMultipleComponents`) delegate
+ * to `extractSingleComponent`, which is the unified entry point that applies
+ * all extraction strategies consistently.
+ *
+ * ## Extraction Strategies (in order)
+ *
+ * 1. **Named interface** - Looks for `{ComponentName}Props` interface
+ * 2. **Type alias** - Looks for `type {ComponentName}Props = ...`
+ * 3. **Component props type** - Infers props from function/arrow/forwardRef
+ *
+ * ## Default Value Extraction
+ *
+ * Defaults are extracted from destructuring patterns in the component signature
+ * (e.g., `{ variant = 'default' }`), NOT from JSDoc `@default` tags. This ensures
+ * runtime defaults match what we report.
  */
 export class TsMorphExtractor implements IPropsExtractor {
   private project: Project;
+  private currentDefaults: Map<string, unknown> = new Map();
 
   constructor() {
     // Use in-memory file system to avoid file I/O
@@ -63,9 +86,11 @@ export class TsMorphExtractor implements IPropsExtractor {
    * Used for compound components where we need to extract props for each
    * sub-component (e.g., DropdownMenuItem, DropdownMenuContent).
    *
-   * Extraction strategy (in order):
-   * 1. Look for explicit interface (e.g., interface DialogContentProps extends ...)
-   * 2. Look for type alias (e.g., type DialogOverlayProps = ...)
+   * Uses the same unified extraction logic as `extractProps` via
+   * `extractSingleComponent`, ensuring all 3 strategies are applied:
+   * 1. Named interface (e.g., ButtonProps)
+   * 2. Type alias (e.g., type ButtonProps = {...})
+   * 3. Component props type (function, arrow, or forwardRef)
    *
    * @param sourceCode - Component source code
    * @param componentNames - List of component names to extract
@@ -86,39 +111,15 @@ export class TsMorphExtractor implements IPropsExtractor {
       });
 
       for (const name of componentNames) {
-        const pascalName = pascalCase(name);
-        const propsTypeName = `${pascalName}Props`;
-        let props: ExtractedProp[] = [];
-        let description: string | undefined;
+        const result = this.extractSingleComponent(sourceFile, name);
 
-        // Strategy 1: Look for interface (e.g., interface DialogContentProps extends ...)
-        const propsInterface = sourceFile.getInterface(propsTypeName);
-        if (propsInterface) {
-          props = this.extractPropsFromInterface(propsInterface, sourceFile);
-        }
-
-        // Strategy 2: Look for type alias (e.g., type DialogOverlayProps = ...)
-        if (props.length === 0) {
-          const propsType = sourceFile.getTypeAlias(propsTypeName);
-          if (propsType) {
-            props = this.extractPropsFromTypeAlias(propsType);
-          }
-        }
-
-        if (props.length > 0) {
-          // Get description from JSDoc if not already set from well-known props
-          if (!description) {
-            description = this.extractDescription(sourceFile, pascalName);
-          }
-
-          results.set(pascalName, {
-            props,
-            method: ExtractorMethod.TsMorph,
-            componentName: pascalName,
-            description,
-          });
+        if (result) {
+          results.set(result.componentName ?? pascalCase(name), result);
         }
       }
+
+      // Clear defaults after loop
+      this.currentDefaults.clear();
 
       // Clean up
       this.project.removeSourceFile(sourceFile);
@@ -131,6 +132,7 @@ export class TsMorphExtractor implements IPropsExtractor {
 
       return results;
     } catch (error) {
+      this.currentDefaults.clear();
       logger.debug('Multi-component extraction failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
@@ -149,30 +151,69 @@ export class TsMorphExtractor implements IPropsExtractor {
         overwrite: true,
       });
 
-      const props = this.findAndExtractProps(sourceFile, componentName);
-      const description = this.extractDescription(sourceFile, componentName);
+      const result = this.extractSingleComponent(sourceFile, componentName);
+
+      // Clear defaults after extraction
+      this.currentDefaults.clear();
 
       // Clean up the source file to prevent memory accumulation
       this.project.removeSourceFile(sourceFile);
 
-      if (props.length === 0) {
+      if (!result) {
         logger.debug('No props found by ts-morph', { componentName });
         return null;
       }
 
-      return {
-        props,
-        method: ExtractorMethod.TsMorph,
-        componentName: pascalCase(componentName),
-        description,
-      };
+      return result;
     } catch (error) {
+      this.currentDefaults.clear();
       logger.debug('ts-morph extraction failed', {
         componentName,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
       return null;
     }
+  }
+
+  /**
+   * Extract props for a single component from a source file
+   *
+   * This is the unified extraction logic used by both `extractProps`
+   * and `extractMultipleComponents`. It ensures all 3 extraction strategies
+   * are applied consistently.
+   *
+   * Extraction strategies (in order):
+   * 1. Named interface (e.g., ButtonProps)
+   * 2. Type alias (e.g., type ButtonProps = {...})
+   * 3. Component props type (function, arrow, or forwardRef)
+   *
+   * @param sourceFile - ts-morph SourceFile to extract from
+   * @param componentName - Name of the component to extract
+   * @returns PropsExtractionResult if props found, null otherwise
+   */
+  private extractSingleComponent(
+    sourceFile: SourceFile,
+    componentName: string
+  ): PropsExtractionResult | null {
+    const pascalName = pascalCase(componentName);
+
+    // Extract destructuring defaults upfront (stored in instance variable)
+    this.currentDefaults = this.extractDestructuringDefaults(
+      sourceFile,
+      pascalName
+    );
+
+    const props = this.findAndExtractProps(sourceFile, pascalName);
+    const description = this.extractDescription(sourceFile, pascalName);
+
+    if (props.length === 0) return null;
+
+    return {
+      props,
+      method: ExtractorMethod.TsMorph,
+      componentName: pascalName,
+      description,
+    };
   }
 
   /**
@@ -197,71 +238,92 @@ export class TsMorphExtractor implements IPropsExtractor {
       return this.extractPropsFromTypeAlias(propsType);
     }
 
-    // Strategy 3: Look for function component and infer props type
-    const fnProps = this.extractPropsFromFunctionComponent(
+    // Strategy 3: Look for component (function or arrow) and infer props type
+    const componentProps = this.extractPropsFromComponent(
       sourceFile,
       pascalName
     );
-    if (fnProps) {
-      return fnProps;
-    }
-
-    // Strategy 4: Look for arrow function component
-    const arrowProps = this.extractPropsFromArrowComponent(
-      sourceFile,
-      pascalName
-    );
-    if (arrowProps) {
-      return arrowProps;
+    if (componentProps) {
+      return componentProps;
     }
 
     return [];
   }
 
   /**
-   * Extract props from function component declaration
+   * Get component parameters from function or arrow function declaration
+   *
+   * Tries multiple patterns in order:
+   * 1. Function declaration: function Button(props) {}
+   * 2. forwardRef: const Button = forwardRef<Ref, Props>((props, ref) => ...)
+   * 3. Arrow function: const Button = (props) => ...
+   *
+   * @param sourceFile - ts-morph SourceFile to search
+   * @param componentName - Name of the component to find
+   * @returns Parameters array if found, null otherwise
    */
-  private extractPropsFromFunctionComponent(
+  private getComponentParameters(
     sourceFile: SourceFile,
     componentName: string
-  ): ExtractedProp[] | null {
-    const componentFn = sourceFile.getFunction(componentName);
-    if (!componentFn) return null;
+  ): ParameterDeclaration[] | null {
+    // Try function declaration first
+    const fn = sourceFile.getFunction(componentName);
+    if (fn) {
+      const params = fn.getParameters();
+      if (params.length > 0) return params;
+    }
 
-    const params = componentFn.getParameters();
-    if (params.length === 0) return null;
+    // Try variable declaration (arrow function or forwardRef)
+    const varDecl = sourceFile.getVariableDeclaration(componentName);
+    const initializer = varDecl?.getInitializer();
+    if (!initializer) return null;
 
-    const typeNode = params[0].getTypeNode();
-    if (!typeNode) return null;
-
-    return this.extractPropsFromTypeNode(typeNode, sourceFile);
+    return this.getParametersFromInitializer(initializer);
   }
 
   /**
-   * Extract props from arrow function component
+   * Extract parameters from a variable initializer (arrow function or forwardRef)
+   *
+   * Handles:
+   * - forwardRef: forwardRef<Ref, Props>((props, ref) => ...)
+   * - Arrow function: (props) => ...
+   *
+   * @param initializer - The initializer node from a variable declaration
+   * @returns Parameters array if found, null otherwise
    */
-  private extractPropsFromArrowComponent(
+  private getParametersFromInitializer(
+    initializer: Node
+  ): ParameterDeclaration[] | null {
+    // Handle forwardRef pattern: forwardRef<Ref, Props>((props, ref) => ...)
+    if (initializer.getText().includes('forwardRef')) {
+      const callExpr = initializer.asKind(SyntaxKind.CallExpression);
+      const args = callExpr?.getArguments();
+      const arrowFn = args?.[0]?.asKind(SyntaxKind.ArrowFunction);
+      return arrowFn?.getParameters() ?? null;
+    }
+
+    // Handle arrow function: const Button = (props) => ...
+    const arrowFn = initializer.asKind(SyntaxKind.ArrowFunction);
+    return arrowFn?.getParameters() ?? null;
+  }
+
+  /**
+   * Extract props from component (function or arrow function)
+   *
+   * Unified method that handles both function declarations and arrow functions,
+   * including forwardRef patterns. Uses getComponentParameters to find the
+   * component's parameters, then extracts props from the first parameter's type.
+   *
+   * @param sourceFile - ts-morph SourceFile to extract from
+   * @param componentName - Name of the component to extract
+   * @returns Extracted props if found, null otherwise
+   */
+  private extractPropsFromComponent(
     sourceFile: SourceFile,
     componentName: string
   ): ExtractedProp[] | null {
-    const varDecl = sourceFile.getVariableDeclaration(componentName);
-    if (!varDecl) return null;
-
-    const initializer = varDecl.getInitializer();
-    if (!initializer) return null;
-
-    // Check for forwardRef pattern first
-    const forwardRefProps = this.extractForwardRefProps(initializer);
-    if (forwardRefProps) return forwardRefProps;
-
-    // Check for arrow function
-    if (initializer.getKind() !== SyntaxKind.ArrowFunction) return null;
-
-    const arrowFn = initializer.asKind(SyntaxKind.ArrowFunction);
-    if (!arrowFn) return null;
-
-    const params = arrowFn.getParameters();
-    if (params.length === 0) return null;
+    const params = this.getComponentParameters(sourceFile, componentName);
+    if (!params?.length) return null;
 
     const typeNode = params[0].getTypeNode();
     if (!typeNode) return null;
@@ -276,27 +338,25 @@ export class TsMorphExtractor implements IPropsExtractor {
     iface: InterfaceDeclaration,
     sourceFile: SourceFile
   ): ExtractedProp[] {
-    const props: ExtractedProp[] = [];
-
     // Extract own properties
-    for (const prop of iface.getProperties()) {
-      props.push(this.extractPropInfo(prop));
-    }
+    const ownProps = iface
+      .getProperties()
+      .map((prop) => this.extractPropInfo(prop));
+    const ownPropNames = new Set(ownProps.map((p) => p.name));
 
-    // Check for extended interfaces
-    for (const ext of iface.getExtends()) {
+    // Extract props from extended interfaces (excluding duplicates)
+    const extendedProps = iface.getExtends().flatMap((ext) => {
       const extName = ext.getText().split('<')[0]; // Handle generics
       const extInterface = sourceFile.getInterface(extName);
-      if (extInterface) {
-        for (const prop of extInterface.getProperties()) {
-          if (!props.find((p) => p.name === prop.getName())) {
-            props.push(this.extractPropInfo(prop));
-          }
-        }
-      }
-    }
+      if (!extInterface) return [];
 
-    return props;
+      return extInterface
+        .getProperties()
+        .filter((prop) => !ownPropNames.has(prop.getName()))
+        .map((prop) => this.extractPropInfo(prop));
+    });
+
+    return [...ownProps, ...extendedProps];
   }
 
   /**
@@ -338,19 +398,15 @@ export class TsMorphExtractor implements IPropsExtractor {
     const intersectionType = typeNode.asKind(SyntaxKind.IntersectionType);
     if (!intersectionType) return [];
 
-    const props: ExtractedProp[] = [];
-
-    // Extract from each type in the intersection that is a type literal
-    for (const type of intersectionType.getTypeNodes()) {
-      if (type.getKind() === SyntaxKind.TypeLiteral) {
+    return intersectionType
+      .getTypeNodes()
+      .filter((type) => type.getKind() === SyntaxKind.TypeLiteral)
+      .flatMap((type) => {
         const typeLiteral = type.asKind(SyntaxKind.TypeLiteral);
-        if (typeLiteral) {
-          props.push(...this.extractPropsFromMembers(typeLiteral.getMembers()));
-        }
-      }
-    }
-
-    return props;
+        return typeLiteral
+          ? this.extractPropsFromMembers(typeLiteral.getMembers())
+          : [];
+      });
   }
 
   /**
@@ -416,32 +472,13 @@ export class TsMorphExtractor implements IPropsExtractor {
   }
 
   /**
-   * Extract props from forwardRef pattern
-   */
-  private extractForwardRefProps(initializer: Node): ExtractedProp[] | null {
-    if (!initializer.getText().includes('forwardRef')) return null;
-
-    const callExpr = initializer.asKind(SyntaxKind.CallExpression);
-    if (!callExpr) return null;
-
-    const typeArgs = callExpr.getTypeArguments();
-    // forwardRef<RefType, PropsType> - need at least 2 type args
-    if (typeArgs.length < 2) return null;
-
-    const propsType = typeArgs[1];
-    return this.extractPropsFromTypeNode(
-      propsType,
-      initializer.getSourceFile()
-    );
-  }
-
-  /**
    * Extract prop info from a property signature
    *
    * Uses simplified structure:
    * - type: simplified type string ("string", "boolean", not full union)
    * - values: array of valid options for enum types
    * - required: whether the prop is required (no ? marker)
+   * - defaultValue: looked up from this.currentDefaults (extracted from destructuring)
    */
   private extractPropInfo(prop: PropertySignature): ExtractedProp {
     const name = prop.getName();
@@ -449,40 +486,18 @@ export class TsMorphExtractor implements IPropsExtractor {
     const rawType = typeNode?.getText() || 'unknown';
     const isOptional = prop.hasQuestionToken();
 
-    // Extract JSDoc info
+    // Extract description from JSDoc (but NOT defaultValue - that comes from code)
     const jsDocs = prop.getJsDocs() || [];
-    let description: string | undefined;
-    let defaultValue: unknown;
-    let deprecated = false;
-    let deprecationMessage: string | undefined;
-
-    if (jsDocs.length > 0) {
-      description = jsDocs[0].getDescription()?.trim();
-
-      for (const tag of jsDocs[0].getTags() || []) {
-        const tagName = tag.getTagName();
-        if (tagName === 'default') {
-          defaultValue = tag.getCommentText();
-        }
-        if (tagName === 'deprecated') {
-          deprecated = true;
-          deprecationMessage = tag.getCommentText();
-        }
-      }
-    }
+    const description = jsDocs[0]?.getDescription()?.trim();
 
     return {
       name,
       type: simplifyType(rawType),
       description,
-      defaultValue,
+      defaultValue: this.currentDefaults.get(name),
       values: extractEnumValues(rawType),
       required: !isOptional,
       isChildren: name === 'children',
-      isClassName: name === 'className',
-      isStyle: name === 'style',
-      deprecated,
-      deprecationMessage,
     };
   }
 
@@ -515,5 +530,96 @@ export class TsMorphExtractor implements IPropsExtractor {
     }
 
     return undefined;
+  }
+
+  /**
+   * Extract default values from destructuring in function signature
+   *
+   * Parses patterns like: function Button({ variant = 'default', disabled = false })
+   * This is the source of truth for defaults, not JSDoc @default tags.
+   *
+   * Handles two paths:
+   * - Path 1: Function declaration - function Button({ variant = 'default' }) {}
+   * - Path 2: Variable declaration - arrow function or forwardRef pattern
+   *
+   * Pure function: creates and returns a new Map without mutating external state.
+   */
+  private extractDestructuringDefaults(
+    sourceFile: SourceFile,
+    componentName: string
+  ): Map<string, unknown> {
+    const pascalName = pascalCase(componentName);
+
+    // Path 1: Function declaration
+    const fn = sourceFile.getFunction(pascalName);
+    const fnParams = fn?.getParameters();
+    if (fnParams?.length) {
+      return this.extractDefaultsFromParameter(fnParams[0]);
+    }
+
+    // Path 2: Variable declaration (arrow function or forwardRef)
+    const varDecl = sourceFile.getVariableDeclaration(pascalName);
+    const initializer = varDecl?.getInitializer();
+    if (!initializer) return new Map();
+
+    const params = this.getParametersFromInitializer(initializer);
+    if (params?.length) {
+      return this.extractDefaultsFromParameter(params[0]);
+    }
+
+    return new Map();
+  }
+
+  /**
+   * Extract defaults from a function parameter's destructuring pattern
+   *
+   * Pure function: creates and returns a new Map with extracted defaults.
+   */
+  private extractDefaultsFromParameter(
+    param: ParameterDeclaration
+  ): Map<string, unknown> {
+    const defaults = new Map<string, unknown>();
+
+    const nameNode = param.getNameNode();
+    if (nameNode?.getKind() !== SyntaxKind.ObjectBindingPattern) {
+      return defaults;
+    }
+
+    const bindingPattern = nameNode.asKind(SyntaxKind.ObjectBindingPattern);
+    if (!bindingPattern) return defaults;
+
+    for (const element of bindingPattern.getElements()) {
+      const elementInitializer = element.getInitializer();
+      if (!elementInitializer) continue;
+
+      const propName = element.getNameNode().getText();
+      const value = this.parseDefaultValue(elementInitializer.getText());
+      defaults.set(propName, value);
+    }
+
+    return defaults;
+  }
+
+  /**
+   * Parse a default value string into appropriate type
+   */
+  private parseDefaultValue(text: string): unknown {
+    if (text === 'true') return true;
+    if (text === 'false') return false;
+    if (text === 'null') return null;
+    if (text === 'undefined') return undefined;
+
+    // String literal
+    if (/^['"].*['"]$/.test(text)) {
+      return text.slice(1, -1);
+    }
+
+    // Number
+    if (!isNaN(Number(text))) {
+      return Number(text);
+    }
+
+    // Keep as string for complex expressions (arrays, objects, function calls)
+    return text;
   }
 }

@@ -1,52 +1,53 @@
 /**
  * Hybrid Extractor
  *
+ * Designed for Radix-based design systems (shadcn/ui pattern).
+ *
  * Orchestrates the full extraction pipeline by combining multiple
  * extraction strategies:
  *
+ * **Props Extraction (Primary/Fallback):**
  * 1. ReactDocgenExtractor (PRIMARY) - For standard React components
  * 2. TsMorphExtractor (FALLBACK) - When primary fails or returns incomplete data
- * 3. VariantExtractor - For CVA/tailwind-variants (always ts-morph)
- * 4. DependencyExtractor - For import analysis (always ts-morph)
+ *
+ * **Supplementary Extractors (always run):**
+ * 3. VariantExtractor - For CVA/tailwind-variants (ts-morph based)
+ * 4. DependencyExtractor - For import analysis (npm and internal deps)
  * 5. StorybookExtractor - For examples from .stories.tsx files (if provided)
- * 6. CompoundDetector - For compound component detection (Dialog, Accordion, etc.)
+ *
+ * **Compound Component Extractors:**
+ * 6. CompoundExtractor - Detects compound components (Dialog, Accordion, etc.)
+ * 7. CompositionExtractor - Determines required vs optional sub-components
+ *
+ * **Radix Integration:**
+ * 8. RadixExtractor - Extracts Radix primitive information (AST-based)
  *
  * Uses explicit fallback triggers from fallback-triggers.ts for predictable behavior.
  */
 
 import {
-  BASE_LIBRARIES,
-  type BaseLibraryName,
-  isBaseLibraryPackage,
+  extractRadixComponentName,
+  isRadixPackage,
 } from '../constants/index.js';
-import type {
-  CompoundComponentInfo,
-  ExtractedData,
-  ExtractedSubComponent,
-  RadixPrimitiveInfo,
-} from '../types/index.js';
-import { pascalCase } from '../utils/case.js';
+import type { ExtractedData, ExtractedSubComponent } from '../types/index.js';
 import { generateSourceHash } from '../utils/hash.js';
 import { generateComponentId, generateSlug } from '../utils/id.js';
 import { createLogger } from '../utils/logger.js';
 
+import { CompositionExtractor } from './composition-extractor.js';
+import { CompoundExtractor } from './compound-extractor.js';
 import {
-  detectCompoundComponent,
-  inferRequiredInComposition,
-} from './compound-detector.js';
-import { DependencyExtractor } from './dependency-extractor.js';
+  DependencyExtractor,
+  type DependencyExtractorOptions,
+} from './dependency-extractor.js';
 import {
+  FALLBACK_REASON_DESCRIPTIONS,
   type FallbackReason,
-  getFallbackReasonDescription,
   shouldFallback,
 } from './fallback-triggers.js';
-import {
-  detectRadixPrimitive,
-  detectRadixPrimitiveForSubComponent,
-} from './radix-detector.js';
+import { RadixExtractor } from './radix-extractor.js';
 import { ReactDocgenExtractor } from './react-docgen-extractor.js';
 import { StorybookExtractor } from './storybook/storybook-extractor.js';
-import type { ArgTypeInfo, ExtractedStory } from './storybook/types.js';
 import { TsMorphExtractor } from './ts-morph-extractor.js';
 import {
   type ExtractionInput,
@@ -58,6 +59,33 @@ import {
 import { VariantExtractor } from './variant-extractor.js';
 
 const logger = createLogger({ name: 'hybrid-extractor' });
+
+/**
+ * Options for configuring the HybridExtractor
+ */
+export interface HybridExtractorOptions {
+  /**
+   * Path aliases from tsconfig.json paths configuration.
+   * Used to identify internal imports that use path aliases.
+   *
+   * @example
+   * ```typescript
+   * {
+   *   "@/*": ["./src/*"],
+   *   "@components/*": ["./src/components/*"]
+   * }
+   * ```
+   */
+  pathAliases?: Record<string, string[]>;
+
+  /**
+   * List of dependency names from package.json.
+   * Used to identify external package imports.
+   *
+   * @example ["react", "class-variance-authority", "@radix-ui/react-slot"]
+   */
+  dependencies?: string[];
+}
 
 /**
  * Hybrid extractor that combines multiple extraction strategies
@@ -73,13 +101,26 @@ export class HybridExtractor implements IExtractor {
   private variantExtractor: VariantExtractor;
   private dependencyExtractor: DependencyExtractor;
   private storybookExtractor: StorybookExtractor;
+  private radixExtractor: RadixExtractor;
+  private compoundExtractor: CompoundExtractor;
+  private compositionExtractor: CompositionExtractor;
 
-  constructor() {
+  constructor(options: HybridExtractorOptions = {}) {
     this.reactDocgen = new ReactDocgenExtractor();
     this.tsMorph = new TsMorphExtractor();
     this.variantExtractor = new VariantExtractor();
-    this.dependencyExtractor = new DependencyExtractor();
+
+    // Pass path aliases and dependencies to dependency extractor
+    const dependencyOptions: DependencyExtractorOptions = {
+      pathAliases: options.pathAliases,
+      dependencies: options.dependencies,
+    };
+    this.dependencyExtractor = new DependencyExtractor(dependencyOptions);
+
     this.storybookExtractor = new StorybookExtractor();
+    this.radixExtractor = new RadixExtractor();
+    this.compoundExtractor = new CompoundExtractor();
+    this.compositionExtractor = new CompositionExtractor();
   }
 
   /**
@@ -121,7 +162,7 @@ export class HybridExtractor implements IExtractor {
           name: input.name,
           reason: fallbackReason,
           description: fallbackReason
-            ? getFallbackReasonDescription(fallbackReason)
+            ? FALLBACK_REASON_DESCRIPTIONS[fallbackReason]
             : undefined,
         });
 
@@ -139,53 +180,47 @@ export class HybridExtractor implements IExtractor {
       }
 
       // Step 4: Extract variants (always ts-morph, operates independently)
-      const { variants, defaultVariants } = this.variantExtractor.extract(
-        input.sourceCode,
-        input.filePath
-      );
+      // First, extract ALL variants from the file
+      this.variantExtractor.extractAll(input.sourceCode, input.filePath);
+      // Then, match variants for the main component
+      const { variants, defaultVariants } =
+        this.variantExtractor.matchForComponent(input.name);
 
       // Step 5: Extract dependencies (always ts-morph, operates independently)
       const { npmDependencies, internalDependencies, baseLibrary } =
         this.dependencyExtractor.extract(input.sourceCode, input.filePath);
 
       // Step 6: Extract Storybook stories (if provided)
-      let stories: ExtractedStory[] | undefined;
-      let storybookArgTypes: Record<string, ArgTypeInfo> | undefined;
+      const { stories } = this.storybookExtractor.extract(
+        input.storiesCode,
+        input.storiesFilePath
+      );
 
-      if (input.storiesCode) {
-        const storybookResult = this.storybookExtractor.extract(
-          input.storiesCode,
-          input.storiesFilePath
-        );
-
-        // Filter out interaction-only and showcase stories
-        stories = storybookResult.stories.filter(
-          (s) => !s.isInteractionOnly && !s.isShowcase
-        );
-        storybookArgTypes = storybookResult.argTypes;
-
+      if (stories.length) {
         logger.debug('Storybook extraction complete', {
-          totalStories: storybookResult.stories.length,
-          includedStories: stories.length,
+          storyCount: stories.length,
         });
       }
 
-      // Step 7: Detect Radix primitive re-exports
-      const radixPrimitive = detectRadixPrimitive(input.name, input.sourceCode);
+      // Step 7: Extract Radix primitive information
+      const radixPrimitive = this.radixExtractor.extract(
+        input.name,
+        input.sourceCode
+      );
       if (radixPrimitive) {
-        logger.debug('Radix primitive detected', {
+        logger.debug('Radix primitive extracted', {
           name: input.name,
           primitive: radixPrimitive.primitive,
           docsUrl: radixPrimitive.docsUrl,
         });
       }
 
-      // Step 8: Detect compound components and extract sub-component data
-      const compoundInfo = detectCompoundComponent(input.sourceCode);
+      // Step 8: Extract compound component information and sub-component data
+      const compoundInfo = this.compoundExtractor.extract(input.sourceCode);
       let subComponents: ExtractedSubComponent[] | undefined;
 
       if (compoundInfo.isCompound && compoundInfo.subComponents.length > 0) {
-        logger.debug('Compound component detected', {
+        logger.debug('Compound component extracted', {
           root: compoundInfo.rootComponent,
           subComponents: compoundInfo.subComponents,
         });
@@ -199,55 +234,64 @@ export class HybridExtractor implements IExtractor {
             input.filePath
           );
 
+        // Build sub-component info with Radix primitives for composition analysis
+        const subComponentsWithRadix = compoundInfo.subComponents.map(
+          (subName) => ({
+            name: subName,
+            radixPrimitive: this.radixExtractor.extract(
+              subName,
+              input.sourceCode
+            ),
+          })
+        );
+
+        // Analyze all sub-components for requiredInComposition in a single call
+        const compositionResults = this.compositionExtractor.analyzeAll(
+          input.sourceCode,
+          compoundInfo.rootComponent,
+          subComponentsWithRadix
+        );
+
         // ALWAYS include ALL subComponents, even if props extraction fails
         // For each subComponent:
         // 1. Use extracted props if available (may be empty)
-        // 2. Detect Radix primitive (for doc lookup)
+        // 2. Use pre-extracted Radix primitive (for doc lookup)
         // 3. Extract CVA variants if defined
-        // 4. Infer requiredInComposition from naming heuristics
-        subComponents = compoundInfo.subComponents.map((subName) => {
-          // Get props result (may be undefined or have empty props)
-          const propsResult = subComponentResults.get(subName);
+        // 4. Use pre-computed requiredInComposition from analyzeAll
+        subComponents = subComponentsWithRadix.map(
+          ({ name: subName, radixPrimitive: subRadixPrimitive }) => {
+            // Get props result (may be undefined or have empty props)
+            const propsResult = subComponentResults.get(subName);
 
-          // Detect Radix primitive for this subComponent
-          const subRadixPrimitive = detectRadixPrimitiveForSubComponent(
-            subName,
-            input.sourceCode
-          );
+            // Match variants for this specific subComponent (extractAll already called above)
+            const subVariantResult =
+              this.variantExtractor.matchForComponent(subName);
 
-          // Extract variants for this specific subComponent
-          const subVariantResult = this.variantExtractor.extractForComponent(
-            input.sourceCode,
-            subName,
-            input.filePath
-          );
+            // Get requiredInComposition from pre-computed results
+            const requiredInComposition =
+              compositionResults.get(subName) ?? false;
 
-          // Infer if this sub-component is required in composition
-          const requiredInComposition = inferRequiredInComposition(
-            subName,
-            compoundInfo.rootComponent
-          );
+            const subComponent: ExtractedSubComponent = {
+              name: subName,
+              props: propsResult?.props ?? [],
+              description: propsResult?.description,
+              requiredInComposition,
+            };
 
-          const subComponent: ExtractedSubComponent = {
-            name: subName,
-            props: propsResult?.props ?? [],
-            description: propsResult?.description,
-            requiredInComposition,
-          };
+            // Only add radixPrimitive if detected
+            if (subRadixPrimitive) {
+              subComponent.radixPrimitive = subRadixPrimitive;
+            }
 
-          // Only add radixPrimitive if detected
-          if (subRadixPrimitive) {
-            subComponent.radixPrimitive = subRadixPrimitive;
+            // Only add variants if there are any
+            if (Object.keys(subVariantResult.variants).length > 0) {
+              subComponent.variants = subVariantResult.variants;
+              subComponent.defaultVariants = subVariantResult.defaultVariants;
+            }
+
+            return subComponent;
           }
-
-          // Only add variants if there are any
-          if (Object.keys(subVariantResult.variants).length > 0) {
-            subComponent.variants = subVariantResult.variants;
-            subComponent.defaultVariants = subVariantResult.defaultVariants;
-          }
-
-          return subComponent;
-        });
+        );
 
         logger.debug('Sub-component data extracted', {
           count: subComponents.length,
@@ -261,23 +305,26 @@ export class HybridExtractor implements IExtractor {
       }
 
       // Step 9: Build extracted data
-      const data = this.buildExtractedData({
-        propsResult,
+      const data: ExtractedData = {
+        props: propsResult?.props ?? [],
         variants,
         defaultVariants,
         npmDependencies,
         internalDependencies,
-        baseLibrary,
-        sourceCode: input.sourceCode,
-        name: input.name,
-        filePath: input.filePath,
-        extractionMethod,
+        acceptsChildren: (propsResult?.props ?? []).some((p) => p.isChildren),
+        baseLibrary: baseLibrary
+          ? {
+              name: baseLibrary,
+              component: this.getRadixComponent(npmDependencies),
+            }
+          : undefined,
+        sourceDescription: propsResult?.description,
+        files: [input.filePath ?? `${input.name}.tsx`],
         stories,
-        storybookArgTypes,
         compoundInfo: compoundInfo.isCompound ? compoundInfo : undefined,
         subComponents,
         radixPrimitive,
-      });
+      };
 
       // Step 10: Generate identity
       const id = input.existingId ?? generateComponentId();
@@ -308,7 +355,7 @@ export class HybridExtractor implements IExtractor {
         extractionMethod,
         fallbackTriggered,
         fallbackReason: fallbackReason
-          ? getFallbackReasonDescription(fallbackReason)
+          ? FALLBACK_REASON_DESCRIPTIONS[fallbackReason]
           : undefined,
         extractionTimeMs,
       };
@@ -325,160 +372,20 @@ export class HybridExtractor implements IExtractor {
   }
 
   /**
-   * Build ExtractedData from all extraction results
+   * Get Radix UI component name from npm dependencies
    *
-   * Combines props, variants, dependencies, Storybook stories, compound info,
-   * and detected patterns into the final ExtractedData structure.
-   */
-  private buildExtractedData({
-    propsResult,
-    variants,
-    defaultVariants,
-    npmDependencies,
-    internalDependencies,
-    baseLibrary,
-    sourceCode,
-    name,
-    filePath,
-    extractionMethod,
-    stories,
-    storybookArgTypes,
-    compoundInfo,
-    subComponents,
-    radixPrimitive,
-  }: {
-    propsResult: Awaited<
-      ReturnType<ReactDocgenExtractor['extractProps']>
-    > | null;
-    variants: Record<string, string[]>;
-    defaultVariants: Record<string, string>;
-    npmDependencies: Record<string, string>;
-    internalDependencies: string[];
-    baseLibrary?: string;
-    sourceCode: string;
-    name: string;
-    filePath?: string;
-    extractionMethod: ExtractorMethod;
-    stories?: ExtractedStory[];
-    storybookArgTypes?: Record<string, ArgTypeInfo>;
-    compoundInfo?: CompoundComponentInfo;
-    subComponents?: ExtractedSubComponent[];
-    radixPrimitive?: RadixPrimitiveInfo;
-  }): ExtractedData {
-    const props = propsResult?.props ?? [];
-
-    return {
-      props,
-      variants,
-      defaultVariants,
-      npmDependencies,
-      internalDependencies,
-      acceptsChildren: props.some((p) => p.isChildren),
-      usesForwardRef: this.detectForwardRef(sourceCode),
-      exportType: this.detectExportType(sourceCode, name),
-      exportName: pascalCase(name),
-      baseLibrary: baseLibrary
-        ? {
-            name: baseLibrary,
-            component: this.detectBaseComponent(baseLibrary, npmDependencies),
-          }
-        : undefined,
-      sourceDescription: propsResult?.description,
-      files: [filePath ?? `${name}.tsx`],
-      extractionMethod,
-      stories,
-      storybookArgTypes,
-      compoundInfo,
-      subComponents,
-      radixPrimitive,
-    };
-  }
-
-  /**
-   * Detect export type (default vs named) from source code
-   */
-  private detectExportType(
-    sourceCode: string,
-    componentName: string
-  ): 'default' | 'named' {
-    const pascalName = pascalCase(componentName);
-
-    // Check for default export patterns
-    if (
-      sourceCode.includes(`export default ${pascalName}`) ||
-      sourceCode.includes('export default function') ||
-      sourceCode.includes('export default forwardRef') ||
-      sourceCode.includes('export default memo')
-    ) {
-      return 'default';
-    }
-
-    return 'named';
-  }
-
-  /**
-   * Detect if component uses forwardRef
-   */
-  private detectForwardRef(sourceCode: string): boolean {
-    return sourceCode.includes('forwardRef');
-  }
-
-  /**
-   * Detect base UI library component name from package
-   *
+   * Finds the Radix package and extracts the component name.
    * Example: @radix-ui/react-dialog -> "Dialog"
    */
-  private detectBaseComponent(
-    baseLibrary: string,
+  private getRadixComponent(
     npmDeps: Record<string, string>
   ): string | undefined {
-    // Find packages matching the base library using centralized detection
-    const matchingPackages = Object.keys(npmDeps).filter((pkg) =>
-      isBaseLibraryPackage(baseLibrary as BaseLibraryName, pkg)
-    );
+    // Find Radix packages in dependencies
+    const radixPackages = Object.keys(npmDeps).filter(isRadixPackage);
 
-    // If only one matching package, extract the component name
-    if (matchingPackages.length === 1) {
-      const pkg = matchingPackages[0];
-      return this.extractComponentNameFromPackage(baseLibrary, pkg);
-    }
-
-    return undefined;
-  }
-
-  /**
-   * Extract component name from a base library package
-   *
-   * Each library has different package naming conventions:
-   * - @radix-ui/react-dialog -> Dialog
-   * - @ark-ui/react/dialog -> Dialog
-   * - @react-aria/button -> Button
-   */
-  private extractComponentNameFromPackage(
-    baseLibrary: string,
-    pkg: string
-  ): string | undefined {
-    // Package prefix patterns for component name extraction
-    const prefixPatterns: Record<BaseLibraryName, RegExp[]> = {
-      [BASE_LIBRARIES.RadixUI]: [/^@radix-ui\/react-/],
-      [BASE_LIBRARIES.ArkUI]: [/^@ark-ui\/react\/?/],
-      [BASE_LIBRARIES.BaseUI]: [/^@base-ui-components\/react\/?/],
-      [BASE_LIBRARIES.HeadlessUI]: [/^@headlessui\/react\/?/],
-      [BASE_LIBRARIES.ReactAria]: [/^@react-aria\//],
-    };
-
-    const patterns = prefixPatterns[baseLibrary as BaseLibraryName];
-    if (!patterns) {
-      return undefined;
-    }
-
-    for (const pattern of patterns) {
-      if (pattern.test(pkg)) {
-        const componentSegment = pkg.replace(pattern, '');
-        if (componentSegment) {
-          return pascalCase(componentSegment);
-        }
-      }
+    // If exactly one Radix package, extract the component name
+    if (radixPackages.length === 1) {
+      return extractRadixComponentName(radixPackages[0]);
     }
 
     return undefined;

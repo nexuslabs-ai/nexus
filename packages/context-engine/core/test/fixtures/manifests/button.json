@@ -1,7 +1,7 @@
 {
   "componentName": "Button",
   "metadata": {
-    "id": "4cb09de0-e49e-4459-8c28-3c20885562a3",
+    "id": "33e8ef3a-cf47-4848-88a2-27eb1bcae604",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:25:38.714Z",
-    "updatedAt": "2026-01-28T09:25:38.714Z",
+    "generatedAt": "2026-01-30T10:51:45.285Z",
+    "updatedAt": "2026-01-30T10:51:45.285Z",
     "sourceHash": "e98aba18e8c9c3f4037279f15fdbc3da4b4d802f355205fc425247885dbc25be",
     "metaHash": "0107de0470cc6b649d1421ac9bbc50c8d4b499048d6f6bd2cd5880370660f5ea",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Button",
-    "slug": "button-react-4cb09de0",
+    "slug": "button-react-33e8ef3a",
     "description": "The Button component is a fundamental UI element designed for user interaction, enabling a wide range of actions from submitting forms to navigating between pages. It supports several visual `variants` (default, destructive, outline, secondary, ghost, link) and `sizes` (default, sm, lg, icon) to fit diverse design needs. A key feature is the `loading` prop, which displays a visual indicator and disables the button during asynchronous operations, providing clear user feedback. Furthermore, the `asChild` prop, powered by `@radix-ui/react-slot`, offers exceptional flexibility by allowing the button to render as any child element (e.g., an `<a>` tag for navigation) while retaining all its styles and functionalities. This makes it a highly adaptable component for various interactive scenarios.",
     "importStatement": {
       "primary": "import { Button } from '@nexus/react'",
@@ -146,16 +146,15 @@
       "npm": {
         "react": "*",
         "@radix-ui/react-slot": "*",
-        "class-variance-authority": "*",
-        "@/lib": "*"
+        "class-variance-authority": "*"
       },
-      "internal": []
+      "internal": ["Icons"]
     },
     "baseLibrary": {
       "name": "radix-ui",
       "component": "Slot"
     }
   },
-  "recordedAt": "2026-01-28T09:25:38.714Z",
+  "recordedAt": "2026-01-30T10:51:45.285Z",
   "fixtureSource": "nexus/button"
 }

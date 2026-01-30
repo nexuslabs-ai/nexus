@@ -17,6 +17,7 @@ import {
   type ExtractionOutput,
   type ExtractorResult,
   getExtractor,
+  type IExtractor,
   isExtractionFailure,
 } from '../extractor/index.js';
 import {
@@ -91,6 +92,7 @@ const logger = createLogger({ name: 'component-processor' });
  * ```
  */
 export class ComponentProcessor {
+  private extractor: IExtractor;
   private metaGenerator: MetaGenerator;
   private manifestBuilder: ManifestBuilder;
   private config: ProcessorConfig;
@@ -102,6 +104,10 @@ export class ComponentProcessor {
    */
   constructor(config: ProcessorConfig = {}) {
     this.config = config;
+
+    // Initialize extractor with optional custom options
+    // Default framework is 'react' - the processor uses this for all extractions
+    this.extractor = getExtractor('react', config.extractorOptions);
 
     // Initialize meta generator with optional custom provider
     const generatorConfig: MetaGeneratorConfig = {
@@ -119,6 +125,7 @@ export class ComponentProcessor {
       skipGeneration: config.skipGeneration ?? false,
       hasCustomProvider: !!config.llmProvider,
       availableComponentsCount: config.availableComponents?.length,
+      hasExtractorOptions: !!config.extractorOptions,
     });
   }
 
@@ -507,12 +514,36 @@ export class ComponentProcessor {
 
   /**
    * Run extraction phase
+   *
+   * Uses the stored extractor instance initialized in the constructor.
+   * The extractor is created once with the configured options, ensuring
+   * consistent behavior across all extraction calls.
+   *
+   * Note: Currently only 'react' framework is supported. The framework
+   * parameter is validated at runtime to maintain backward compatibility
+   * with the error behavior.
    */
   private async runExtraction(
     input: ProcessorInput,
     framework: Framework
   ): Promise<{ output: ExtractionOutput; timeMs: number }> {
     const startTime = performance.now();
+
+    // Validate framework - currently only React is supported
+    // This maintains backward compatibility with the previous error behavior
+    const SUPPORTED_FRAMEWORKS = ['react'];
+    if (!SUPPORTED_FRAMEWORKS.includes(framework)) {
+      const timeMs = Math.round(performance.now() - startTime);
+      return {
+        output: {
+          type: 'failure' as const,
+          error: `Unsupported framework: ${framework}. Supported: ${SUPPORTED_FRAMEWORKS.join(', ')}`,
+          sourceHash: '',
+          extractionTimeMs: timeMs,
+        },
+        timeMs,
+      };
+    }
 
     const extractionInput: ExtractionInput = {
       orgId: input.orgId,
@@ -526,19 +557,15 @@ export class ComponentProcessor {
     };
 
     try {
-      const extractor = getExtractor(framework);
-      const output = await extractor.extract(extractionInput);
+      const output = await this.extractor.extract(extractionInput);
       const timeMs = Math.round(performance.now() - startTime);
 
       return { output, timeMs };
     } catch (error) {
       const timeMs = Math.round(performance.now() - startTime);
 
-      // Handle unsupported framework error
-      if (
-        error instanceof Error &&
-        error.message.includes('Unsupported framework')
-      ) {
+      // Handle unexpected extraction errors
+      if (error instanceof Error) {
         return {
           output: {
             type: 'failure' as const,

@@ -160,6 +160,9 @@ export class ReactDocgenExtractor implements IPropsExtractor {
       savePropValueAsString: true,
       shouldExtractLiteralValuesFromEnum: true,
       shouldRemoveUndefinedFromOptional: true,
+      // Sort union type values alphabetically for consistent output
+      // (e.g., "default" | "destructive" | "ghost" instead of random order)
+      shouldSortUnions: true,
       propFilter: (prop) => {
         const propName = prop.name;
 
@@ -284,98 +287,13 @@ export class ReactDocgenExtractor implements IPropsExtractor {
   }
 
   /**
-   * Extract props for multiple components in a single file
-   *
-   * Used for compound components where we need props for each sub-component
-   * (e.g., DropdownMenuItem, DropdownMenuContent).
-   *
-   * @param sourceCode - Component source code
-   * @param componentNames - List of component names to extract
-   * @param filePath - Optional file path for better type resolution
-   * @returns Map of component name to extraction result
-   */
-  async extractMultipleComponents(
-    sourceCode: string,
-    componentNames: string[],
-    filePath?: string
-  ): Promise<Map<string, PropsExtractionResult>> {
-    // If a real file path is provided, use it directly for better type resolution
-    if (filePath && this.fileExists(filePath)) {
-      return this.parseMultipleFromFile(filePath, componentNames);
-    }
-
-    // Fall back to temp file when source code is provided without a valid file path
-    const tempManager = getTempManager();
-    return tempManager.withTempFile(
-      sourceCode,
-      'compound',
-      async (tempFilePath) =>
-        this.parseMultipleFromFile(tempFilePath, componentNames)
-    );
-  }
-
-  /**
-   * Parse multiple components from a file
-   */
-  private parseMultipleFromFile(
-    filePath: string,
-    componentNames: string[]
-  ): Map<string, PropsExtractionResult> {
-    const results = new Map<string, PropsExtractionResult>();
-
-    try {
-      const components = this.parser.parse(filePath);
-
-      if (components.length === 0) {
-        logger.debug('No components found for multi-component extraction');
-        return results;
-      }
-
-      // Create a map of lowercase name to component for lookup
-      const componentMap = new Map(
-        components.map((c) => [c.displayName.toLowerCase(), c])
-      );
-
-      for (const name of componentNames) {
-        const normalizedName = name.toLowerCase();
-        const pascalName = pascalCase(name).toLowerCase();
-
-        // Try to find by exact name or pascal case version
-        const component =
-          componentMap.get(normalizedName) || componentMap.get(pascalName);
-
-        if (component) {
-          const props = this.convertProps(component.props);
-
-          // Only include if we found props (skip re-exports with no custom props)
-          if (props.length > 0) {
-            results.set(component.displayName, {
-              props,
-              method: ExtractorMethod.ReactDocgen,
-              componentName: component.displayName,
-              description: component.description || undefined,
-            });
-          }
-        }
-      }
-
-      logger.debug('Multi-component extraction complete', {
-        requested: componentNames.length,
-        found: results.size,
-        componentNames: Array.from(results.keys()),
-      });
-
-      return results;
-    } catch (error) {
-      logger.debug('Multi-component extraction failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      return results;
-    }
-  }
-
-  /**
    * Convert react-docgen-typescript props to our ExtractedProp format
+   *
+   * Value extraction strategy:
+   * 1. Primary: Use structured type.value from react-docgen when available
+   *    (enabled by shouldExtractLiteralValuesFromEnum option)
+   * 2. Fallback: Parse raw type string for edge cases where structured
+   *    data isn't produced (mixed unions, complex types, ts-morph path)
    *
    * Uses simplified structure:
    * - type: simplified type string ("string", "boolean", not full union)
@@ -385,8 +303,6 @@ export class ReactDocgenExtractor implements IPropsExtractor {
   private convertProps(docgenProps: Record<string, PropItem>): ExtractedProp[] {
     return Object.entries(docgenProps).map(([name, prop]) => {
       const rawType = prop.type?.name || 'unknown';
-      const tags = prop.tags as Record<string, unknown> | undefined;
-      const deprecatedTag = tags?.deprecated;
 
       // Try to extract enum values first (before simplifying type)
       const enumValues =
@@ -400,11 +316,6 @@ export class ReactDocgenExtractor implements IPropsExtractor {
         values: enumValues,
         required: prop.required,
         isChildren: name === 'children',
-        isClassName: name === 'className',
-        isStyle: name === 'style',
-        deprecated: deprecatedTag !== undefined,
-        deprecationMessage:
-          typeof deprecatedTag === 'string' ? deprecatedTag : undefined,
       };
     });
   }

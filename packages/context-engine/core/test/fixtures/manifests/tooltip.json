@@ -1,7 +1,7 @@
 {
   "componentName": "Tooltip",
   "metadata": {
-    "id": "3b0ab7c2-eda0-4885-94b4-7408212265f6",
+    "id": "4e3eadea-297f-4fb2-b0cc-149f8ed1f68d",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:26:22.013Z",
-    "updatedAt": "2026-01-28T09:26:22.013Z",
+    "generatedAt": "2026-01-30T10:52:28.371Z",
+    "updatedAt": "2026-01-30T10:52:28.371Z",
     "sourceHash": "924c1b502df1925dd5a3cc540453a6665b9c082b373dd5fbca0fc68585b20ee5",
     "metaHash": "a841266b2f5fa9a46f9541818828cc68aee79f2898fcd96fee81538661c9ca7d",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Tooltip",
-    "slug": "tooltip-react-3b0ab7c2",
+    "slug": "tooltip-react-4e3eadea",
     "description": "The Tooltip component provides a discreet and non-disruptive way to display additional information or labels when a user interacts with an element. It's ideal for clarifying icons, explaining truncated text, or providing hints for form fields. Key features include its transient nature, appearing on hover or focus and disappearing when the interaction ends, and its ability to prevent UI clutter. Use cases include explaining the function of an icon-only button, providing a full text for truncated labels, or giving quick guidance for complex controls.",
     "importStatement": {
       "primary": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@nexus/react'",
@@ -73,8 +73,7 @@
     "dependencies": {
       "npm": {
         "react": "*",
-        "@radix-ui/react-tooltip": "*",
-        "@/lib": "*"
+        "@radix-ui/react-tooltip": "*"
       },
       "internal": []
     },
@@ -89,15 +88,15 @@
         "dataSlot": "tooltip-content",
         "requiredInComposition": true,
         "radixPrimitive": {
-          "primitive": "Portal",
-          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#portal"
+          "primitive": "Content",
+          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#content"
         }
       },
       {
         "name": "TooltipProvider",
         "props": {},
         "dataSlot": "tooltip-provider",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Provider",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#provider"
@@ -119,6 +118,6 @@
       "docsUrl": "https://www.radix-ui.com/primitives/docs/components/tooltip#root"
     }
   },
-  "recordedAt": "2026-01-28T09:26:22.013Z",
+  "recordedAt": "2026-01-30T10:52:28.371Z",
   "fixtureSource": "nexus/tooltip"
 }

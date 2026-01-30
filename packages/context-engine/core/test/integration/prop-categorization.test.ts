@@ -22,7 +22,7 @@ import { categorizeProps } from '../../src/utils/prop-categorization.js';
  *
  * Simplified structure:
  * - name, type, description, defaultValue, values
- * - Internal flags: isChildren, isClassName, isStyle, deprecated
+ * - Internal flag: isChildren
  */
 function createProp(
   name: string,
@@ -33,9 +33,6 @@ function createProp(
     name,
     type,
     isChildren: false,
-    isClassName: false,
-    isStyle: false,
-    deprecated: false,
     ...overrides,
   };
 }

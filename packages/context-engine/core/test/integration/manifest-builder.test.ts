@@ -40,7 +40,7 @@ import { MANIFEST_SCHEMA_VERSION } from '../../src/types/index.js';
  *
  * Note: With props cleanup, props use simplified structure:
  * - name, type, description, defaultValue, values
- * - Internal flags: isChildren, isClassName, isStyle, deprecated
+ * - Internal flag: isChildren
  * - No typeCategory, required, possibleValues
  * - className is now rejected at extraction time (not included)
  */
@@ -54,42 +54,27 @@ function createMockExtractedData(
         type: 'string',
         values: ['default', 'destructive', 'outline'],
         isChildren: false,
-        isClassName: false,
-        isStyle: false,
-        deprecated: false,
       },
       {
         name: 'size',
         type: 'string',
         values: ['sm', 'md', 'lg'],
         isChildren: false,
-        isClassName: false,
-        isStyle: false,
-        deprecated: false,
       },
       {
         name: 'disabled',
         type: 'boolean',
         isChildren: false,
-        isClassName: false,
-        isStyle: false,
-        deprecated: false,
       },
       {
         name: 'onCustomClick',
         type: '(data: CustomData) => void',
         isChildren: false,
-        isClassName: false,
-        isStyle: false,
-        deprecated: false,
       },
       {
         name: 'children',
         type: 'ReactNode',
         isChildren: true,
-        isClassName: false,
-        isStyle: false,
-        deprecated: false,
       },
     ],
     variants: {
@@ -456,9 +441,6 @@ describe('ManifestBuilder', () => {
               name: 'disabled',
               type: 'boolean',
               isChildren: false,
-              isClassName: false,
-              isStyle: false,
-              deprecated: false,
             },
           ],
           variants: {},
@@ -484,9 +466,6 @@ describe('ManifestBuilder', () => {
               type: 'string',
               values: ['a', 'b', 'c'],
               isChildren: false,
-              isClassName: false,
-              isStyle: false,
-              deprecated: false,
             },
           ],
           variants: {
@@ -919,9 +898,6 @@ describe('ManifestBuilder.update()', () => {
           name: 'newProp',
           type: 'string',
           isChildren: false,
-          isClassName: false,
-          isStyle: false,
-          deprecated: false,
         },
       ],
     });
@@ -1286,17 +1262,11 @@ describe('ManifestBuilder - Split output structure', () => {
             name: 'disabled',
             type: 'boolean',
             isChildren: false,
-            isClassName: false,
-            isStyle: false,
-            deprecated: false,
           },
           {
             name: 'children',
             type: 'ReactNode',
             isChildren: true,
-            isClassName: false,
-            isStyle: false,
-            deprecated: false,
           },
         ],
       }),

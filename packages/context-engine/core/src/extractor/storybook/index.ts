@@ -13,13 +13,11 @@ export {
 
 // Types
 export type {
-  ArgTypeInfo,
   ExtractedStory,
   StorybookExtractionResult,
   StoryComplexity,
 } from './types.js';
 export {
-  ArgTypeInfoSchema,
   ExtractedStorySchema,
   StorybookExtractionResultSchema,
   StoryComplexitySchema,

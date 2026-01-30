@@ -1,7 +1,7 @@
 {
   "componentName": "Avatar",
   "metadata": {
-    "id": "265e6fe0-3ba2-4b10-8da5-f33dbb0cfaf7",
+    "id": "bcbed065-891a-47d6-866c-c6f622ddadf9",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:25:27.984Z",
-    "updatedAt": "2026-01-28T09:25:27.984Z",
+    "generatedAt": "2026-01-30T10:51:34.517Z",
+    "updatedAt": "2026-01-30T10:51:34.517Z",
     "sourceHash": "5f37ce2090e97269e14d8ccdc62b2b6df9bf6df776c94154f188b1c71a7e69a4",
     "metaHash": "4b4880b434830f4072efb3054d70ba245b68881663336beeada65d9a063a3744",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Avatar",
-    "slug": "avatar-react-265e6fe0",
+    "slug": "avatar-react-bcbed065",
     "description": "The Avatar component provides a flexible and accessible way to display visual identifiers for users or entities. It supports displaying a profile image, with robust fallback mechanisms to initials generated from a name, or a generic placeholder icon if neither an image nor initials are available. Key features include customizable 'size' (ranging from '2xs' to '4xl') and 'shape' ('circle' or 'rounded'), allowing it to adapt to diverse design contexts. It's built on `@radix-ui/react-avatar` for solid accessibility and behavior, ensuring a consistent user experience across applications. Common use cases include user profile sections, comment threads, team directories, and social media feeds, where a compact visual representation of an individual or organization is needed.",
     "importStatement": {
       "primary": "import { Avatar, AvatarFallback, AvatarImage } from '@nexus/react'",
@@ -122,8 +122,7 @@
       "npm": {
         "react": "*",
         "@radix-ui/react-avatar": "*",
-        "class-variance-authority": "*",
-        "@/lib": "*"
+        "class-variance-authority": "*"
       },
       "internal": []
     },
@@ -136,7 +135,7 @@
         "name": "AvatarFallback",
         "props": {},
         "dataSlot": "avatar-fallback",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Fallback",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/avatar#fallback"
@@ -146,14 +145,18 @@
         "name": "AvatarImage",
         "props": {},
         "dataSlot": "avatar-image",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Image",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/avatar#image"
         }
       }
-    ]
+    ],
+    "radixPrimitive": {
+      "primitive": "Root",
+      "docsUrl": "https://www.radix-ui.com/primitives/docs/components/avatar#root"
+    }
   },
-  "recordedAt": "2026-01-28T09:25:27.985Z",
+  "recordedAt": "2026-01-30T10:51:34.518Z",
   "fixtureSource": "nexus/avatar"
 }

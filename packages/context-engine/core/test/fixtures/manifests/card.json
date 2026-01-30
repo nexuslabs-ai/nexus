@@ -1,7 +1,7 @@
 {
   "componentName": "Card",
   "metadata": {
-    "id": "48b8c456-1a58-47f6-8cee-f5a52276e90a",
+    "id": "56213889-af79-48ff-bdb0-e4044f3f45f5",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:25:44.064Z",
-    "updatedAt": "2026-01-28T09:25:44.064Z",
+    "generatedAt": "2026-01-30T10:51:50.650Z",
+    "updatedAt": "2026-01-30T10:51:50.650Z",
     "sourceHash": "69c9a0f515c3f03477ee3b00998c4832d3b02558fca299d06340d091dc722b10",
     "metaHash": "718066d117ad86da31d58b04561c1d3cbf42a1eea55af0f12a1b46d9d1ef4e9f",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Card",
-    "slug": "card-react-48b8c456",
+    "slug": "card-react-56213889",
     "description": "The Card component serves as a flexible and self-contained container for displaying distinct pieces of information or interactive elements. It's designed to help organize content visually, making complex UIs easier to digest. Key features include its ability to encapsulate various content types like text, images, and actions, providing clear visual boundaries and a sense of hierarchy. Cards are commonly used in dashboards, product listings, news feeds, and profiles to present individual items with a consistent look and feel, promoting readability and user engagement. They are highly adaptable and can be customized in terms of padding, shadow, border, and background to fit diverse design requirements.",
     "importStatement": {
       "primary": "import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@nexus/react'",
@@ -80,8 +80,7 @@
     },
     "dependencies": {
       "npm": {
-        "react": "*",
-        "@/lib": "*"
+        "react": "*"
       },
       "internal": []
     },
@@ -90,13 +89,13 @@
         "name": "CardAction",
         "props": {},
         "dataSlot": "card-action",
-        "requiredInComposition": true
+        "requiredInComposition": false
       },
       {
         "name": "CardContent",
         "props": {},
         "dataSlot": "card-content",
-        "requiredInComposition": false
+        "requiredInComposition": true
       },
       {
         "name": "CardDescription",
@@ -124,6 +123,6 @@
       }
     ]
   },
-  "recordedAt": "2026-01-28T09:25:44.064Z",
+  "recordedAt": "2026-01-30T10:51:50.650Z",
   "fixtureSource": "nexus/card"
 }

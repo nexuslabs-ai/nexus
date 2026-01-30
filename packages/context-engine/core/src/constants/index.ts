@@ -4,16 +4,19 @@
  * Re-exports all constants from @context-engine/core
  */
 
-// Base library constants and utilities
+// Radix UI constants and utilities
 export {
+  // Backwards compatibility
   BASE_LIBRARIES,
-  BASE_LIBRARY_PATTERNS,
   detectBaseLibrary,
+  extractRadixComponentName,
   isBaseLibraryPackage,
+  isRadixPackage,
+  RADIX_LIBRARY,
 } from './base-libraries.js';
 
 // Base library types
-export type { BaseLibraryName, BaseLibraryPattern } from './base-libraries.js';
+export type { BaseLibraryName } from './base-libraries.js';
 
 // Default LLM model constants
 export { DEFAULT_ANTHROPIC_MODEL, DEFAULT_GEMINI_MODEL } from './models.js';

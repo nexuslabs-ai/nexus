@@ -13,8 +13,8 @@
  */
 
 import { config } from 'dotenv';
-import { resolve } from 'node:path';
-import { dirname } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { ILLMProvider } from '../src/generator/types.js';
@@ -43,6 +43,43 @@ const TEST_ORG_ID = 'test-org';
 // Delay between recordings (ms) to avoid rate limits
 const DELAY_MS = 5000;
 
+// Path to Nexus React package
+// From: packages/context-engine/core/scripts/
+// To:   packages/react/
+const REACT_PACKAGE_DIR = resolve(__dirname, '../../../react');
+
+/**
+ * Read path aliases from tsconfig.json
+ */
+function readPathAliases(): Record<string, string[]> {
+  try {
+    const tsconfigPath = resolve(REACT_PACKAGE_DIR, 'tsconfig.json');
+    const tsconfig = JSON.parse(readFileSync(tsconfigPath, 'utf-8'));
+    return tsconfig.compilerOptions?.paths ?? {};
+  } catch (_error) {
+    console.warn('Could not read tsconfig.json, using empty path aliases');
+    return {};
+  }
+}
+
+/**
+ * Read dependencies from package.json (dependencies + peerDependencies)
+ */
+function readDependencies(): string[] {
+  try {
+    const packageJsonPath = resolve(REACT_PACKAGE_DIR, 'package.json');
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+
+    const deps = Object.keys(packageJson.dependencies ?? {});
+    const peerDeps = Object.keys(packageJson.peerDependencies ?? {});
+
+    return [...new Set([...deps, ...peerDeps])];
+  } catch (_error) {
+    console.warn('Could not read package.json, using empty dependencies');
+    return [];
+  }
+}
+
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -64,11 +101,19 @@ async function recordComponentManifest(
     responsesDir: RESPONSES_DIR,
   });
 
-  // Create processor with the cached provider and available components
-  // for filtering hallucinated relatedComponents
+  // Read project config dynamically from packages/react
+  const pathAliases = readPathAliases();
+  const dependencies = readDependencies();
+
+  // Create processor with the cached provider, available components,
+  // and extractor options for accurate internal/external import detection
   const processor = createComponentProcessor({
     llmProvider: cachedProvider,
     availableComponents,
+    extractorOptions: {
+      pathAliases,
+      dependencies,
+    },
   });
 
   // Convert kebab-case to PascalCase for component name

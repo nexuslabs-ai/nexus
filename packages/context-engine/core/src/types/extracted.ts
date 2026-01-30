@@ -7,10 +7,7 @@
 
 import { z } from 'zod';
 
-import {
-  ArgTypeInfoSchema,
-  ExtractedStorySchema,
-} from '../extractor/storybook/types.js';
+import { ExtractedStorySchema } from '../extractor/storybook/types.js';
 
 import { BasePropSchema } from './base-prop.js';
 import { BaseLibrarySchema } from './identity.js';
@@ -19,23 +16,11 @@ import { BaseLibrarySchema } from './identity.js';
  * Extracted prop schema
  *
  * Extends BasePropSchema with extraction-specific fields for raw
- * code analysis results (children detection, className handling, deprecation).
+ * code analysis results. Only includes fields actively used downstream.
  */
 export const ExtractedPropSchema = BasePropSchema.extend({
   /** Whether this is a children prop */
   isChildren: z.boolean().default(false),
-
-  /** Whether this is a className prop */
-  isClassName: z.boolean().default(false),
-
-  /** Whether this is a style prop */
-  isStyle: z.boolean().default(false),
-
-  /** Whether this prop is deprecated */
-  deprecated: z.boolean().default(false),
-
-  /** Deprecation message */
-  deprecationMessage: z.string().optional(),
 });
 
 export type ExtractedProp = z.infer<typeof ExtractedPropSchema>;
@@ -149,15 +134,6 @@ export const ExtractedDataSchema = z.object({
   /** Whether component accepts children */
   acceptsChildren: z.boolean(),
 
-  /** Whether component uses forwardRef */
-  usesForwardRef: z.boolean(),
-
-  /** Export type (default vs named) */
-  exportType: z.enum(['default', 'named']),
-
-  /** Export name (for named exports) */
-  exportName: z.string().optional(),
-
   /** Base UI library detected (Radix, Ark, Base UI, etc.) */
   baseLibrary: BaseLibrarySchema.optional(),
 
@@ -167,14 +143,8 @@ export const ExtractedDataSchema = z.object({
   /** Files included in extraction */
   files: z.array(z.string()),
 
-  /** Extraction method used */
-  extractionMethod: ExtractionMethodSchema.default('react-docgen-typescript'),
-
   /** Extracted Storybook stories (if stories file was provided) */
   stories: z.array(ExtractedStorySchema).optional(),
-
-  /** ArgTypes from Storybook (enhances prop documentation) */
-  storybookArgTypes: z.record(z.string(), ArgTypeInfoSchema).optional(),
 
   /** Compound component detection result */
   compoundInfo: CompoundComponentInfoSchema.optional(),

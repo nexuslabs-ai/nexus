@@ -1,7 +1,7 @@
 {
   "componentName": "Accordion",
   "metadata": {
-    "id": "cdb1898f-1042-4f58-8610-cddf1f78340d",
+    "id": "a7f5defc-6e1d-4198-89ec-059c4738d16d",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:25:17.175Z",
-    "updatedAt": "2026-01-28T09:25:17.175Z",
+    "generatedAt": "2026-01-30T10:51:23.677Z",
+    "updatedAt": "2026-01-30T10:51:23.677Z",
     "sourceHash": "b93bbc5a3720e40a63262fc92d6460a7bcb32b7654931c424959585815c758a9",
     "metaHash": "fde8107598118ab6941be8e8c5430f5ba3ef5178cad9c248590cffcbcbe3aaad",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Accordion",
-    "slug": "accordion-react-cdb1898f",
+    "slug": "accordion-react-a7f5defc",
     "description": "The Accordion component provides a vertically stacked list of items, each of which can be expanded or collapsed to reveal its associated content. It's built upon Radix UI's robust primitives, ensuring high accessibility and customizability. This component is primarily used to manage and present large quantities of information in a structured and space-efficient manner, preventing information overload by displaying only relevant sections. Key features include animated transitions for expanding/collapsing, support for single or multiple item expansion, and full keyboard navigation. Use cases include frequently asked questions (FAQs), detailed product specifications, settings forms, and documentation sections where content hierarchy is important.",
     "importStatement": {
       "primary": "import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@nexus/react'",
@@ -77,10 +77,9 @@
     "dependencies": {
       "npm": {
         "react": "*",
-        "@radix-ui/react-accordion": "*",
-        "@/lib": "*"
+        "@radix-ui/react-accordion": "*"
       },
-      "internal": []
+      "internal": ["Icons"]
     },
     "baseLibrary": {
       "name": "radix-ui",
@@ -111,14 +110,18 @@
         "name": "AccordionTrigger",
         "props": {},
         "dataSlot": "accordion-trigger",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Header",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/accordion#header"
         }
       }
-    ]
+    ],
+    "radixPrimitive": {
+      "primitive": "Root",
+      "docsUrl": "https://www.radix-ui.com/primitives/docs/components/accordion#root"
+    }
   },
-  "recordedAt": "2026-01-28T09:25:17.175Z",
+  "recordedAt": "2026-01-30T10:51:23.678Z",
   "fixtureSource": "nexus/accordion"
 }

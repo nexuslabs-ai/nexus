@@ -1,7 +1,7 @@
 {
   "componentName": "Select",
   "metadata": {
-    "id": "c213ec27-a262-47a1-b70f-d32bc5f4b636",
+    "id": "5a1a04b7-4229-4807-8c51-23c5bc09a3e5",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:26:05.812Z",
-    "updatedAt": "2026-01-28T09:26:05.812Z",
+    "generatedAt": "2026-01-30T10:52:12.288Z",
+    "updatedAt": "2026-01-30T10:52:12.288Z",
     "sourceHash": "5720d8b57490896508cdc571910fdf2e456f111106ba83044e9e8b4c85f50c85",
     "metaHash": "6c3d17fbaf9a966a91818bc7818804134446ee3664e7e952bff87c37b1590011",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Select",
-    "slug": "select-react-c213ec27",
+    "slug": "select-react-5a1a04b7",
     "description": "The Select component is a fundamental UI element that allows users to pick a single value from a collection of predefined options. It functions as a controlled or uncontrolled input, managing its open/close state and selected value. Built upon Radix UI primitives, it offers robust accessibility, including keyboard navigation and appropriate ARIA attributes. Key features include handling `value`, `defaultValue`, and `onValueChange` props for state management. It's ideal for forms, filters, and settings where a compact dropdown is required to present a list of choices efficiently.",
     "importStatement": {
       "primary": "import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectScrollDownButton, SelectScrollUpButton, SelectSeparator, SelectTrigger, SelectValue } from '@nexus/react'",
@@ -102,10 +102,9 @@
     "dependencies": {
       "npm": {
         "react": "*",
-        "@radix-ui/react-select": "*",
-        "@/lib": "*"
+        "@radix-ui/react-select": "*"
       },
-      "internal": []
+      "internal": ["Icons"]
     },
     "baseLibrary": {
       "name": "radix-ui",
@@ -116,7 +115,7 @@
         "name": "SelectContent",
         "props": {},
         "dataSlot": "select-content",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Portal",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/select#portal"
@@ -156,7 +155,7 @@
         "name": "SelectScrollDownButton",
         "props": {},
         "dataSlot": "select-scroll-down-button",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "ScrollDownButton",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/select#scrolldownbutton"
@@ -166,7 +165,7 @@
         "name": "SelectScrollUpButton",
         "props": {},
         "dataSlot": "select-scroll-up-button",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "ScrollUpButton",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/select#scrollupbutton"
@@ -196,7 +195,7 @@
         "name": "SelectValue",
         "props": {},
         "dataSlot": "select-value",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Value",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/select#value"
@@ -208,6 +207,6 @@
       "docsUrl": "https://www.radix-ui.com/primitives/docs/components/select#root"
     }
   },
-  "recordedAt": "2026-01-28T09:26:05.812Z",
+  "recordedAt": "2026-01-30T10:52:12.288Z",
   "fixtureSource": "nexus/select"
 }

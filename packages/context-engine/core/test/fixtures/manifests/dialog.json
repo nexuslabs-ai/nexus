@@ -1,7 +1,7 @@
 {
   "componentName": "Dialog",
   "metadata": {
-    "id": "93dc0fd3-5564-4f12-b636-c7381a4204cd",
+    "id": "2744cd4e-0ac1-4afb-96b8-0ff5a9c9acb2",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:25:49.465Z",
-    "updatedAt": "2026-01-28T09:25:49.465Z",
+    "generatedAt": "2026-01-30T10:51:56.045Z",
+    "updatedAt": "2026-01-30T10:51:56.045Z",
     "sourceHash": "7484ee0745f89a17bdca74ea846c6895de349005e396ef3414ba9bae27879bfe",
     "metaHash": "428b8bad353fb45f52f95e0a046de7c1e8650bade5f0e568376c39e63c213df0",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Dialog",
-    "slug": "dialog-react-93dc0fd3",
+    "slug": "dialog-react-2744cd4e",
     "description": "The Dialog component provides a highly customizable and accessible modal overlay for presenting focused content or collecting user input. It is built on `@radix-ui/react-dialog` and is designed to temporarily block user interaction with the main application to ensure attention on the dialog's content. Key features include focus trapping, keyboard navigation (e.g., Escape to close), and proper ARIA attribute application for screen reader compatibility. Use cases include confirmation prompts, login forms, detailed views of an item, or any scenario where user focus must be explicitly directed to a specific interaction before proceeding with the rest of the application.",
     "importStatement": {
       "primary": "import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger } from '@nexus/react'",
@@ -65,10 +65,9 @@
     "dependencies": {
       "npm": {
         "react": "*",
-        "@radix-ui/react-dialog": "*",
-        "@/lib": "*"
+        "@radix-ui/react-dialog": "*"
       },
-      "internal": []
+      "internal": ["Icons"]
     },
     "baseLibrary": {
       "name": "radix-ui",
@@ -94,7 +93,7 @@
               "name": "showCloseButton",
               "type": "boolean",
               "description": "Whether to show the close button in the top-right corner.",
-              "defaultValue": "true",
+              "defaultValue": true,
               "required": false
             }
           ]
@@ -120,27 +119,19 @@
         "name": "DialogFooter",
         "props": {},
         "dataSlot": "dialog-footer",
-        "requiredInComposition": false,
-        "radixPrimitive": {
-          "primitive": "Title",
-          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dialog#title"
-        }
+        "requiredInComposition": false
       },
       {
         "name": "DialogHeader",
         "props": {},
         "dataSlot": "dialog-header",
-        "requiredInComposition": false,
-        "radixPrimitive": {
-          "primitive": "Title",
-          "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dialog#title"
-        }
+        "requiredInComposition": false
       },
       {
         "name": "DialogOverlay",
         "props": {},
         "dataSlot": "dialog-overlay",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Overlay",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dialog#overlay"
@@ -150,7 +141,7 @@
         "name": "DialogPortal",
         "props": {},
         "dataSlot": "dialog-portal",
-        "requiredInComposition": true,
+        "requiredInComposition": false,
         "radixPrimitive": {
           "primitive": "Portal",
           "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dialog#portal"
@@ -182,6 +173,6 @@
       "docsUrl": "https://www.radix-ui.com/primitives/docs/components/dialog#root"
     }
   },
-  "recordedAt": "2026-01-28T09:25:49.465Z",
+  "recordedAt": "2026-01-30T10:51:56.046Z",
   "fixtureSource": "nexus/dialog"
 }

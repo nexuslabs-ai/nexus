@@ -23,7 +23,6 @@ import {
 import { createLogger } from '../../utils/logger.js';
 
 import type {
-  ArgTypeInfo,
   ExtractedStory,
   StorybookExtractionResult,
   StoryComplexity,
@@ -33,12 +32,23 @@ const logger = createLogger({ name: 'storybook-extractor' });
 
 /**
  * Internal representation of meta configuration
+ *
+ * Note: defaultArgs is used internally for code generation but not exposed in the result.
  */
 interface MetaConfig {
   title?: string;
-  argTypes: Record<string, ArgTypeInfo>;
   defaultArgs: Record<string, unknown>;
   componentName?: string;
+}
+
+/**
+ * Internal representation of extracted story data before building the final result
+ */
+interface StoryData {
+  args: Record<string, unknown>;
+  hasRender: boolean;
+  renderCode?: string;
+  hasPlay: boolean;
 }
 
 /**
@@ -83,12 +93,15 @@ export class StorybookExtractor {
   /**
    * Extract stories and metadata from Storybook file
    *
-   * @param storiesCode - Source code of the .stories.tsx file
+   * @param storiesCode - Source code of the .stories.tsx file (undefined returns empty result)
    * @param filePath - Optional file path for context
-   * @returns Extraction result with stories, argTypes, and defaultArgs
+   * @returns Extraction result with stories and title
    */
-  extract(storiesCode: string, filePath?: string): StorybookExtractionResult {
-    if (!storiesCode.trim()) {
+  extract(
+    storiesCode: string | undefined,
+    filePath?: string
+  ): StorybookExtractionResult {
+    if (!storiesCode?.trim()) {
       logger.debug('Empty stories code provided', { filePath });
       return this.emptyResult();
     }
@@ -106,14 +119,11 @@ export class StorybookExtractor {
         filePath,
         title: meta.title,
         storyCount: stories.length,
-        argTypeCount: Object.keys(meta.argTypes).length,
       });
 
       return {
         stories,
         title: meta.title,
-        argTypes: meta.argTypes,
-        defaultArgs: meta.defaultArgs,
       };
     } catch (error) {
       logger.debug('Storybook extraction failed', {
@@ -132,8 +142,6 @@ export class StorybookExtractor {
   private emptyResult(): StorybookExtractionResult {
     return {
       stories: [],
-      argTypes: {},
-      defaultArgs: {},
     };
   }
 
@@ -146,38 +154,86 @@ export class StorybookExtractor {
    * - export default { ... } satisfies Meta
    */
   private extractMeta(sourceFile: SourceFile): MetaConfig {
-    const result: MetaConfig = {
-      argTypes: {},
-      defaultArgs: {},
-    };
+    const objLiteral = this.getMetaObjectLiteral(sourceFile);
+    if (!objLiteral) {
+      return { defaultArgs: {} };
+    }
+    return this.extractMetaFromObject(objLiteral);
+  }
 
-    // Try to find meta variable declaration
+  /**
+   * Find the meta object literal from either named variable or default export
+   */
+  private getMetaObjectLiteral(
+    sourceFile: SourceFile
+  ): ObjectLiteralExpression | undefined {
+    // Try named meta variable first
     const metaVar = sourceFile.getVariableDeclaration('meta');
     if (metaVar) {
       const initializer = metaVar.getInitializer();
       if (initializer) {
         const objLiteral = this.resolveToObjectLiteral(initializer);
-        if (objLiteral) {
-          this.extractMetaProperties(objLiteral, result);
-        }
+        if (objLiteral) return objLiteral;
       }
     }
 
-    // Try default export if no meta variable found
-    if (!result.title) {
-      const defaultExport = sourceFile.getDefaultExportSymbol();
-      if (defaultExport) {
-        const declarations = defaultExport.getDeclarations();
-        for (const decl of declarations) {
-          const exportAssign = decl.asKind(SyntaxKind.ExportAssignment);
-          if (exportAssign) {
-            const expr = exportAssign.getExpression();
-            const objLiteral = this.resolveToObjectLiteral(expr);
-            if (objLiteral) {
-              this.extractMetaProperties(objLiteral, result);
-            }
-          }
-        }
+    // Fall back to default export
+    const defaultExport = sourceFile.getDefaultExportSymbol();
+    if (!defaultExport) return undefined;
+
+    for (const decl of defaultExport.getDeclarations()) {
+      const exportAssign = decl.asKind(SyntaxKind.ExportAssignment);
+      if (!exportAssign) continue;
+
+      const objLiteral = this.resolveToObjectLiteral(
+        exportAssign.getExpression()
+      );
+      if (objLiteral) return objLiteral;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Extract all meta properties from object literal and return complete MetaConfig
+   */
+  private extractMetaFromObject(
+    objLiteral: ObjectLiteralExpression
+  ): MetaConfig {
+    const result: MetaConfig = { defaultArgs: {} };
+
+    // Extract title
+    const titleProp = objLiteral
+      .getProperty('title')
+      ?.asKind(SyntaxKind.PropertyAssignment);
+    if (titleProp) {
+      const titleInit = titleProp.getInitializer();
+      if (titleInit) {
+        result.title = this.extractStringValueFromExpression(titleInit);
+      }
+    }
+
+    // Extract component name
+    const componentProp = objLiteral
+      .getProperty('component')
+      ?.asKind(SyntaxKind.PropertyAssignment);
+    if (componentProp) {
+      const componentInit = componentProp.getInitializer();
+      if (componentInit) {
+        result.componentName = componentInit.getText();
+      }
+    }
+
+    // Extract default args
+    const argsProp = objLiteral
+      .getProperty('args')
+      ?.asKind(SyntaxKind.PropertyAssignment);
+    if (argsProp) {
+      const argsObj = argsProp
+        .getInitializer()
+        ?.asKind(SyntaxKind.ObjectLiteralExpression);
+      if (argsObj) {
+        result.defaultArgs = this.extractArgsObject(argsObj);
       }
     }
 
@@ -207,155 +263,6 @@ export class StorybookExtractor {
 
     // Direct object literal
     return node.asKind(SyntaxKind.ObjectLiteralExpression);
-  }
-
-  /**
-   * Extract properties from meta object literal
-   */
-  private extractMetaProperties(
-    objLiteral: ObjectLiteralExpression,
-    result: MetaConfig
-  ): void {
-    // Extract title
-    const titleProp = objLiteral
-      .getProperty('title')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (titleProp) {
-      const titleInit = titleProp.getInitializer();
-      if (titleInit) {
-        result.title = this.extractStringValueFromExpression(titleInit);
-      }
-    }
-
-    // Extract component name from `component` property
-    const componentProp = objLiteral
-      .getProperty('component')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (componentProp) {
-      const componentInit = componentProp.getInitializer();
-      if (componentInit) {
-        result.componentName = componentInit.getText();
-      }
-    }
-
-    // Extract argTypes
-    const argTypesProp = objLiteral
-      .getProperty('argTypes')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (argTypesProp) {
-      const argTypesObj = argTypesProp
-        .getInitializer()
-        ?.asKind(SyntaxKind.ObjectLiteralExpression);
-      if (argTypesObj) {
-        result.argTypes = this.extractArgTypes(argTypesObj);
-      }
-    }
-
-    // Extract default args
-    const argsProp = objLiteral
-      .getProperty('args')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (argsProp) {
-      const argsObj = argsProp
-        .getInitializer()
-        ?.asKind(SyntaxKind.ObjectLiteralExpression);
-      if (argsObj) {
-        result.defaultArgs = this.extractArgsObject(argsObj);
-      }
-    }
-  }
-
-  /**
-   * Extract argTypes metadata from object literal
-   */
-  private extractArgTypes(
-    argTypesObj: ObjectLiteralExpression
-  ): Record<string, ArgTypeInfo> {
-    const result: Record<string, ArgTypeInfo> = {};
-
-    for (const prop of argTypesObj.getProperties()) {
-      const assignment = prop.asKind(SyntaxKind.PropertyAssignment);
-      if (!assignment) continue;
-
-      const propName = assignment.getName();
-      const propObj = assignment
-        .getInitializer()
-        ?.asKind(SyntaxKind.ObjectLiteralExpression);
-
-      if (propObj) {
-        result[propName] = this.extractSingleArgType(propObj);
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Extract a single argType definition
-   */
-  private extractSingleArgType(
-    argTypeObj: ObjectLiteralExpression
-  ): ArgTypeInfo {
-    const result: ArgTypeInfo = {};
-
-    // Extract control
-    const controlProp = argTypeObj
-      .getProperty('control')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (controlProp) {
-      const controlInit = controlProp.getInitializer();
-      if (controlInit) {
-        // Handle both string and object control definitions
-        const controlStr = controlInit.asKind(SyntaxKind.StringLiteral);
-        if (controlStr) {
-          result.control = controlStr.getLiteralValue();
-        } else {
-          result.control = controlInit.getText();
-        }
-      }
-    }
-
-    // Extract options
-    const optionsProp = argTypeObj
-      .getProperty('options')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (optionsProp) {
-      const optionsArr = optionsProp
-        .getInitializer()
-        ?.asKind(SyntaxKind.ArrayLiteralExpression);
-      if (optionsArr) {
-        result.options = optionsArr.getElements().map((el) => {
-          const str = el.asKind(SyntaxKind.StringLiteral);
-          return str
-            ? str.getLiteralValue()
-            : el.getText().replace(/['"]/g, '');
-        });
-      }
-    }
-
-    // Extract description
-    const descProp = argTypeObj
-      .getProperty('description')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (descProp) {
-      const descInit = descProp.getInitializer();
-      if (descInit) {
-        result.description = this.extractStringValueFromExpression(descInit);
-      }
-    }
-
-    // Extract defaultValue
-    const defaultProp = argTypeObj
-      .getProperty('defaultValue')
-      ?.asKind(SyntaxKind.PropertyAssignment);
-    if (defaultProp) {
-      const defaultInit = defaultProp.getInitializer();
-      if (defaultInit) {
-        result.defaultValue = this.parseValueFromNode(defaultInit);
-      }
-    }
-
-    return result;
   }
 
   /**
@@ -401,61 +308,64 @@ export class StorybookExtractor {
 
   /**
    * Parse a single story object
+   *
+   * Returns null for stories that should be filtered out:
+   * - Interaction-only stories (play function with disableSnapshot)
+   * - Showcase/grid stories (AllVariants, Overview, etc.)
+   *
+   * @returns ExtractedStory with only essential fields, or null if filtered
    */
   private parseStory(
     name: string,
     storyObj: ObjectLiteralExpression,
     meta: MetaConfig
   ): ExtractedStory | null {
-    // Extract args
+    if (this.isShowcase(name)) return null;
+
+    const storyData = this.extractStoryData(storyObj);
+
+    if (this.isInteractionOnly(storyObj, storyData)) return null;
+
+    return this.buildStoryResult(name, storyData, meta);
+  }
+
+  /**
+   * Extract raw story data from story object
+   */
+  private extractStoryData(storyObj: ObjectLiteralExpression): StoryData {
     const args = this.extractStoryArgs(storyObj);
-
-    // Extract render function
     const { hasRender, renderCode } = this.extractRenderFunction(storyObj);
-
-    // Check for play function
     const hasPlay = this.hasPlayFunction(storyObj);
 
-    // Check for chromatic.disableSnapshot
-    const isInteractionOnly = this.isInteractionOnly(storyObj, hasPlay, args);
-
-    // Check if showcase story
-    const isShowcase = this.isShowcase(name);
-
-    // Determine complexity (pass renderCode for advanced pattern detection)
-    const complexity = this.classifyStory(
-      name,
-      hasRender,
-      isInteractionOnly,
-      renderCode
-    );
-
-    // Extract props used
-    const propsUsed = this.extractPropsUsed(args, renderCode);
-
-    // Generate code from args if no render function
-    const code = hasRender
-      ? undefined
-      : this.generateCodeFromArgs(
-          meta.componentName ?? 'Component',
-          args,
-          meta.defaultArgs
-        );
-
-    // Generate human-readable title
-    const title = this.generateTitle(name);
-
     return {
-      name,
-      title,
-      args: Object.keys(args).length > 0 ? args : undefined,
+      args,
       hasRender,
       renderCode,
+      hasPlay,
+    };
+  }
+
+  /**
+   * Build the final ExtractedStory result from story data
+   */
+  private buildStoryResult(
+    name: string,
+    storyData: StoryData,
+    meta: MetaConfig
+  ): ExtractedStory {
+    const { args, hasRender, renderCode } = storyData;
+    const componentName = meta.componentName ?? 'Component';
+
+    const complexity = this.classifyStory(storyData, name);
+    const title = this.generateTitle(name);
+    const code = hasRender
+      ? (renderCode ?? `<${componentName} />`)
+      : this.generateCodeFromArgs(componentName, args, meta.defaultArgs);
+
+    return {
+      title,
       code,
-      propsUsed,
       complexity,
-      isInteractionOnly,
-      isShowcase,
     };
   }
 
@@ -657,13 +567,14 @@ export class StorybookExtractor {
    */
   private isInteractionOnly(
     storyObj: ObjectLiteralExpression,
-    hasPlay: boolean,
-    args: Record<string, unknown>
+    storyData: StoryData
   ): boolean {
     // Check chromatic.disableSnapshot
     if (this.hasChromaticDisableSnapshot(storyObj)) {
       return true;
     }
+
+    const { hasPlay, args, hasRender } = storyData;
 
     // Story with play but no meaningful args or render is likely interaction-only
     if (!hasPlay || Object.keys(args).length > 1) {
@@ -676,10 +587,9 @@ export class StorybookExtractor {
       return false;
     }
 
-    // Check if it has render function
-    const hasRender = storyObj.getProperty('render') !== undefined;
+    // Simple story with play - might still be visual
     if (!hasRender) {
-      return false; // Simple story with play - might still be visual
+      return false;
     }
 
     return false;
@@ -792,25 +702,17 @@ export class StorybookExtractor {
    * Classify story complexity
    *
    * Classification rules:
-   * 1. Interaction-only → 'common' (filtered out later)
-   * 2. Name matches Default/Basic/Simple → 'minimal'
-   * 3. Has render with advanced patterns (hooks, async) → 'advanced'
-   * 4. Has render without advanced patterns → 'common'
-   * 5. No render → 'common'
+   * 1. Name matches Default/Basic/Simple → 'minimal'
+   * 2. Has render with advanced patterns (hooks, async) → 'advanced'
+   * 3. Everything else → 'common'
    */
-  private classifyStory(
-    name: string,
-    hasRender: boolean,
-    isInteractionOnly: boolean,
-    renderCode?: string
-  ): StoryComplexity {
-    // Interaction-only stories are common (but will be filtered)
-    if (isInteractionOnly) return 'common';
-
+  private classifyStory(storyData: StoryData, name: string): StoryComplexity {
     // Minimal: Default, Basic, Simple
     if (MINIMAL_STORY_PATTERNS.some((pattern) => pattern.test(name))) {
       return 'minimal';
     }
+
+    const { hasRender, renderCode } = storyData;
 
     // If has render, check if it uses advanced patterns
     if (hasRender && renderCode) {
@@ -822,100 +724,6 @@ export class StorybookExtractor {
 
     // Common: Everything else (variant, size, state stories, simple renders)
     return 'common';
-  }
-
-  /**
-   * Props to skip when extracting propsUsed
-   */
-  private static readonly SKIP_JSX_ATTRIBUTES = new Set([
-    'className',
-    'style',
-    'key',
-    'ref',
-    'data-testid',
-    'id',
-  ]);
-
-  /**
-   * Extract prop names used in story
-   */
-  private extractPropsUsed(
-    args: Record<string, unknown>,
-    renderCode?: string
-  ): string[] {
-    const propsUsed = new Set<string>();
-
-    // Add args keys (except event handlers and children)
-    for (const key of Object.keys(args)) {
-      if (key !== 'children' && !key.startsWith('on')) {
-        propsUsed.add(key);
-      }
-    }
-
-    // Extract props from render code JSX using AST parsing
-    if (renderCode) {
-      this.extractPropsFromJsx(renderCode, propsUsed);
-
-      // Match spread props: {...args}
-      if (
-        renderCode.includes('{...args}') ||
-        renderCode.includes('{...props}')
-      ) {
-        // Add common props that might be spread
-        for (const key of Object.keys(args)) {
-          if (key !== 'children') {
-            propsUsed.add(key);
-          }
-        }
-      }
-    }
-
-    return Array.from(propsUsed).sort();
-  }
-
-  /**
-   * Extract JSX attribute names from render code using AST parsing
-   * Falls back to conservative regex if parsing fails
-   */
-  private extractPropsFromJsx(
-    renderCode: string,
-    propsUsed: Set<string>
-  ): void {
-    try {
-      // Wrap the render code in a function to make it parseable JSX
-      const wrappedCode = `const __render = () => (${renderCode});`;
-      const tempFileName = `__temp_jsx_${Date.now()}.tsx`;
-      const tempFile = this.project.createSourceFile(tempFileName, wrappedCode);
-
-      try {
-        // Find all JsxAttribute nodes
-        tempFile.forEachDescendant((node) => {
-          const jsxAttr = node.asKind(SyntaxKind.JsxAttribute);
-          if (jsxAttr) {
-            const name = jsxAttr.getNameNode().getText();
-            // Skip common JSX attributes that aren't component props
-            if (!StorybookExtractor.SKIP_JSX_ATTRIBUTES.has(name)) {
-              propsUsed.add(name);
-            }
-          }
-        });
-      } finally {
-        // Clean up temp file
-        this.project.removeSourceFile(tempFile);
-      }
-    } catch {
-      // Fallback to conservative regex that requires = after prop name
-      // This matches: propName="value" or propName={value} or propName='value'
-      // but NOT text content like "This is a tooltip"
-      const propPattern = /\s([a-z][a-zA-Z0-9]*)=/g;
-      let match;
-      while ((match = propPattern.exec(renderCode)) !== null) {
-        const propName = match[1];
-        if (!StorybookExtractor.SKIP_JSX_ATTRIBUTES.has(propName)) {
-          propsUsed.add(propName);
-        }
-      }
-    }
   }
 
   /**

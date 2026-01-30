@@ -7,6 +7,7 @@
  * Uses discriminated unions for type-safe success/failure handling.
  */
 
+import type { HybridExtractorOptions } from '../extractor/index.js';
 import type { ILLMProvider } from '../generator/types.js';
 import type {
   ComponentManifest,
@@ -67,6 +68,21 @@ export interface ProcessorConfig {
    * Format: PascalCase component names (e.g., ['Button', 'Card', 'Input'])
    */
   availableComponents?: string[];
+
+  /**
+   * Options for the HybridExtractor.
+   * Used to configure path aliases and dependencies for accurate
+   * internal vs external import detection.
+   *
+   * @example
+   * ```typescript
+   * {
+   *   pathAliases: { "@/*": ["./src/*"] },
+   *   dependencies: ["react", "@radix-ui/react-slot"]
+   * }
+   * ```
+   */
+  extractorOptions?: HybridExtractorOptions;
 }
 
 // =============================================================================

@@ -1,7 +1,7 @@
 {
   "componentName": "Badge",
   "metadata": {
-    "id": "83432fe7-75da-4ac6-9b22-2e0f910bf92b",
+    "id": "836bbed8-ae4b-4958-9aae-5ee03db4d4c1",
     "schemaVersion": "1.0",
     "version": "0.0.1",
     "framework": "react",
@@ -14,8 +14,8 @@
       "version": "2024-01",
       "dimensions": 1024
     },
-    "generatedAt": "2026-01-28T09:25:33.363Z",
-    "updatedAt": "2026-01-28T09:25:33.363Z",
+    "generatedAt": "2026-01-30T10:51:39.918Z",
+    "updatedAt": "2026-01-30T10:51:39.918Z",
     "sourceHash": "ab0b4cb16c3ed41050168417210db22d5a9c66f704ceec479d6c81f6e20b0009",
     "metaHash": "377a95f76309cadf11325cf2384a4856cc85fbddd4f7aef577168a2cc5368d9a",
     "files": [
@@ -24,7 +24,7 @@
   },
   "manifest": {
     "name": "Badge",
-    "slug": "badge-react-83432fe7",
+    "slug": "badge-react-836bbed8",
     "description": "The Badge component is a versatile UI element designed for concisely displaying supplementary information, status, or numerical counts. It supports various visual `variant` styles (default, secondary, outline, error, warning, success, information) and `fill` options (solid, light) to visually differentiate its purpose and urgency. Key features include the `isCaps` prop for uppercase text with wider letter-spacing, `isNumber` for rendering circular numeric badges (passing the number as children), and `leftIcon`/`rightIcon` for adding visual cues (ignored when `isNumber` is true). The `asChild` prop leverages Radix Slot for flexible composition, allowing the badge to inherit styles while rendering as a custom element like a link or button. It's ideal for marking statuses (e.g., 'Active', 'Pending'), categorizing content (e.g., 'New', 'Beta'), or indicating unread counts (e.g., '8', '99+').",
     "importStatement": {
       "primary": "import { Badge } from '@nexus/react'",
@@ -160,8 +160,7 @@
       "npm": {
         "react": "*",
         "@radix-ui/react-slot": "*",
-        "class-variance-authority": "*",
-        "@/lib": "*"
+        "class-variance-authority": "*"
       },
       "internal": []
     },
@@ -170,6 +169,6 @@
       "component": "Slot"
     }
   },
-  "recordedAt": "2026-01-28T09:25:33.363Z",
+  "recordedAt": "2026-01-30T10:51:39.918Z",
   "fixtureSource": "nexus/badge"
 }

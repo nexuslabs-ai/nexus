@@ -8,7 +8,6 @@
  * produces the complete component knowledge ready for storage.
  */
 
-import { inferDataSlot } from '../extractor/compound-detector.js';
 import type { ExtractedStory } from '../extractor/storybook/types.js';
 import type {
   AIManifest,
@@ -33,6 +32,7 @@ import {
   DEFAULT_EMBEDDING_MODEL,
   MANIFEST_SCHEMA_VERSION,
 } from '../types/index.js';
+import { kebabCase } from '../utils/case.js';
 import { generateObjectHash } from '../utils/hash.js';
 import { logger } from '../utils/logger.js';
 import {
@@ -430,7 +430,7 @@ export class ManifestBuilder {
         name: sub.name,
         description: sub.description,
         props: categorizedProps,
-        dataSlot: inferDataSlot(sub.name),
+        dataSlot: kebabCase(sub.name),
         requiredInComposition: sub.requiredInComposition,
       };
 
@@ -511,10 +511,7 @@ export class ManifestBuilder {
 
     const minimal: CodeExample = {
       title: minimalStory?.title ?? 'Basic',
-      code:
-        minimalStory?.renderCode ??
-        minimalStory?.code ??
-        `<${componentName} />`,
+      code: minimalStory?.code ?? `<${componentName} />`,
       isPrimary: true,
     };
 
@@ -524,7 +521,7 @@ export class ManifestBuilder {
       .slice(0, MAX_COMMON_EXAMPLES)
       .map((s) => ({
         title: s.title,
-        code: s.renderCode ?? s.code ?? `<${componentName} />`,
+        code: s.code,
       }));
 
     // Advanced examples
@@ -533,7 +530,7 @@ export class ManifestBuilder {
       advancedStories.length > 0
         ? advancedStories.slice(0, MAX_ADVANCED_EXAMPLES).map((s) => ({
             title: s.title,
-            code: s.renderCode ?? s.code ?? `<${componentName} />`,
+            code: s.code,
           }))
         : undefined;
 
