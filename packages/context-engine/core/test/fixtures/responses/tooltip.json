@@ -1,38 +1,42 @@
 {
   "componentName": "Tooltip",
   "response": {
-    "minimalExample": "<Tooltip />",
     "guidance": {
-      "accessibility": "Ensure tooltips are keyboard accessible, appearing on focus and disappearing on blur. Provide clear ARIA attributes (e.g., `aria-describedby` or `aria-label`) to link the tooltip content to its trigger element for screen reader users. The content should be concise and meaningful.",
-      "whenNotToUse": "Avoid using tooltips for essential information that users need to see immediately, for long blocks of text, or for actions that require user interaction within the tooltip itself. Use popovers, modals, or inline text for critical information or interactive content.",
-      "whenToUse": "Use tooltips to provide supplementary information or context for interactive elements, icons, or truncated text when space is limited and the information is not critical for immediate task completion. They enhance usability by clarifying the purpose of an element without cluttering the UI.",
-      "patterns": ["overlay", "data-display"],
-      "relatedComponents": ["Button", "IconButton", "Popover", "Menu"]
+      "whenToUse": "Use to provide supplementary, non-critical information on hover or focus for interactive elements like buttons, icons, or links. Ideal for clarifying the purpose of UI elements, explaining truncated text, or offering quick definitions without occupying persistent screen space. Improves user comprehension and reduces ambiguity.",
+      "accessibility": "Ensure the tooltip is keyboard accessible and appears on focus. Use `aria-describedby` to associate the tooltip content with its trigger element for screen reader users. Content should be concise and easily understandable. Tooltips should be dismissible, typically by moving focus away from the trigger or pressing the Escape key.",
+      "whenNotToUse": "Do not use for displaying critical information that users must see immediately. Avoid using as a substitute for clear labels or self-explanatory UI. Not suitable for large amounts of text; consider a Popover or Modal instead. Generally not recommended as a primary interaction on mobile devices due to the lack of a hover state.",
+      "patterns": ["overlay", "data-display", "disclosure"],
+      "relatedComponents": ["Button", "Icon", "Popover", "Modal", "Label"]
     },
-    "semanticDescription": "The Tooltip component provides a discreet and non-disruptive way to display additional information or labels when a user interacts with an element. It's ideal for clarifying icons, explaining truncated text, or providing hints for form fields. Key features include its transient nature, appearing on hover or focus and disappearing when the interaction ends, and its ability to prevent UI clutter. Use cases include explaining the function of an icon-only button, providing a full text for truncated labels, or giving quick guidance for complex controls.",
-    "tokens": [
-      "color-text-tooltip",
-      "color-bg-tooltip",
-      "spacing-xs",
-      "font-size-sm",
-      "border-radius-sm"
-    ],
-    "description": "A small, contextual popup that displays informative text when a user hovers over or focuses on an element.",
     "examples": {
       "minimal": {
-        "description": "The simplest usage of the Tooltip component.",
-        "propsUsed": [],
-        "code": "<Tooltip />",
-        "title": "Basic Tooltip"
+        "title": "Basic Tooltip",
+        "code": "import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@radix-ui/react-tooltip';\n\nfunction BasicTooltip() {\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger asChild>\n          <button>Hover me</button>\n        </TooltipTrigger>\n        <TooltipContent>\n          <p>This is a basic tooltip</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n\nexport default BasicTooltip;",
+        "description": "A simple demonstration of a tooltip appearing on hover over a button."
       },
-      "advanced": [],
-      "common": []
+      "common": [
+        {
+          "code": "import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@radix-ui/react-tooltip';\nimport { InfoCircledIcon } from '@radix-ui/react-icons'; // Assuming an icon library\n\nfunction IconTooltip() {\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger asChild>\n          <button aria-label=\"More info\">\n            <InfoCircledIcon />\n          </button>\n        </TooltipTrigger>\n        <TooltipContent>\n          <p>Additional information about this section.</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n\nexport default IconTooltip;",
+          "description": "Applying a tooltip to an icon to provide its meaning or additional context.",
+          "title": "Tooltip on an Icon"
+        },
+        {
+          "title": "Tooltip for Truncated Text",
+          "description": "Revealing the full content of truncated text upon hovering with a tooltip.",
+          "code": "import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@radix-ui/react-tooltip';\n\nfunction TruncatedTextTooltip() {\n  const longText = \"This is a very long piece of text that needs to be truncated to fit into a small space. The tooltip will reveal the full content.\";\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger asChild>\n          <p style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>\n            {longText}\n          </p>\n        </TooltipTrigger>\n        <TooltipContent>\n          <p>{longText}</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n\nexport default TruncatedTextTooltip;"
+        },
+        {
+          "description": "Using a tooltip to provide context for an inline link or other interactive elements within a larger text block.",
+          "code": "import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@radix-ui/react-tooltip';\n\nfunction LinkTooltip() {\n  return (\n    <TooltipProvider>\n      <Tooltip>\n        <TooltipTrigger asChild>\n          <span>Learn more <a href=\"#\" style={{ textDecoration: 'underline' }}>here</a></span>\n        </TooltipTrigger>\n        <TooltipContent>\n          <p>Click the link to visit the documentation page.</p>\n        </TooltipContent>\n      </Tooltip>\n    </TooltipProvider>\n  );\n}\n\nexport default LinkTooltip;",
+          "title": "Tooltip with Interactive Content"
+        }
+      ]
     },
-    "tier": "free"
+    "description": "The Tooltip component provides a brief, informative label that appears when a user hovers over or focuses on an interactive UI element. It is built on top of Radix UI's Tooltip primitive, ensuring high accessibility and customizable behavior. Its primary purpose is to enhance user experience by offering contextual information or explanations for elements such as icons, buttons, or truncated text, without permanently occupying screen space. Tooltips are ideal for situations where a concise explanation is beneficial but not critical to immediate task completion, helping users understand the function or purpose of an element without visual clutter."
   },
-  "recordedAt": "2026-01-27T11:56:44.047Z",
+  "recordedAt": "2026-01-31T20:24:40.549Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "5fa6350840cfa1a266469fabf2399ee1a1bf61f742e117a697345dfe2832dcb8",
+  "inputHash": "0c69f3946b81361ad335cc7a50e0f1a400c215020fecce4b829ec628c2ac5f7e",
   "promptSummary": "Generate metadata for Tooltip component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Tooltip\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-tooltip, @/lib\n\nBase Lib..."
 }

@@ -165,9 +165,6 @@ export class ManifestBuilder {
     // Get semantic description (top-level field)
     const semanticDescription = this.buildSemanticDescription(meta, name);
 
-    // Get tokens
-    const tokens = meta.ai?.tokens ?? [];
-
     // Build sub-components for compound components
     const subComponents = this.buildSubComponents(extracted.subComponents);
 
@@ -187,7 +184,6 @@ export class ManifestBuilder {
 
       // From meta (generated)
       description: meta.description,
-      tier: meta.tier,
 
       // New v1.0 fields
       importStatement,
@@ -196,7 +192,6 @@ export class ManifestBuilder {
       examples,
       guidance,
       semanticDescription,
-      tokens,
 
       // From extraction
       files: extracted.files,
@@ -696,7 +691,6 @@ export class ManifestBuilder {
       version: manifest.version,
       framework: manifest.framework,
       visibility: manifest.visibility,
-      tier: manifest.tier,
       embeddingStatus: manifest.embeddingStatus,
       embeddingModel: manifest.embeddingModel,
       embeddingError: manifest.embeddingError,
@@ -824,12 +818,10 @@ export class ManifestBuilder {
       // Meta updates
       ...(updates.meta && {
         description: updates.meta.description,
-        tier: updates.meta.tier,
         guidance: updatedGuidance!,
         examples: updatedExamples!,
         semanticDescription:
           updates.meta.ai?.semanticDescription ?? updates.meta.description,
-        tokens: updates.meta.ai?.tokens ?? [],
         metaHash: generateObjectHash(updates.meta),
       }),
 
@@ -869,18 +861,14 @@ export class ManifestBuilder {
     const placeholderMeta = {
       name,
       description: extracted.sourceDescription || `${name} component`,
-      tier: 'free' as const,
       ai: {
         semanticDescription:
           extracted.sourceDescription ||
           `A ${name} component for the design system.`,
         patterns: [] as string[],
-        tokens: [] as string[],
         examples: [] as string[],
         relatedComponents: extracted.internalDependencies,
       },
-      variants: extracted.variants,
-      defaults: extracted.defaultVariants,
     };
 
     return this.build({

@@ -1,35 +1,42 @@
 {
   "componentName": "Switch",
   "response": {
-    "description": "A toggle switch for binary on/off states that take effect immediately.",
     "examples": {
+      "common": [
+        {
+          "title": "Controlled Switch",
+          "description": "Demonstrates a controlled Switch component where its state is managed by React's `useState` hook.",
+          "code": "import * as Switch from \"@radix-ui/react-switch\";\nimport { useState } from \"react\";\n\nconst ControlledSwitch = () => {\n  const [checked, setChecked] = useState(false);\n  return (\n    <Switch.Root checked={checked} onCheckedChange={setChecked}>\n      <Switch.Thumb />\n    </Switch.Root>\n  );\n};"
+        },
+        {
+          "title": "Switch with Label",
+          "description": "Shows how to properly associate a `Switch` with a label using `htmlFor` and `id` for accessibility.",
+          "code": "import * => as Switch from \"@radix-ui/react-switch\";\n\nconst SwitchWithLabel = () => (\n  <div style={{ display: 'flex', alignItems: 'center' }}>\n    <label htmlFor=\"airplane-mode\">Airplane mode</label>\n    <Switch.Root id=\"airplane-mode\">\n      <Switch.Thumb />\n    </Switch.Root>\n  </div>\n);"
+        },
+        {
+          "code": "import * as Switch from \"@radix-ui/react-switch\";\n\nconst DisabledSwitch = () => (\n  <Switch.Root disabled>\n    <Switch.Thumb />\n  </Switch.Root>\n);",
+          "title": "Disabled Switch",
+          "description": "An example of a Switch component rendered in a disabled state, preventing user interaction."
+        }
+      ],
       "minimal": {
-        "title": "Basic Switch",
-        "code": "<Switch />",
-        "description": "A basic switch."
-      },
-      "common": []
+        "code": "import * as Switch from \"@radix-ui/react-switch\";\n\nconst MinimalSwitch = () => (\n  <Switch.Root>\n    <Switch.Thumb />\n  </Switch.Root>\n);",
+        "title": "Basic Uncontrolled Switch",
+        "description": "A simple uncontrolled switch without any explicit state management, useful for basic toggles."
+      }
     },
-    "tokens": [
-      "color-primary",
-      "color-background-elevated",
-      "color-border",
-      "spacing-sm"
-    ],
-    "minimalExample": "<Switch />",
-    "semanticDescription": "The Switch component provides an intuitive toggle mechanism for binary states (e.g., on/off, enabled/disabled). It's designed for user settings or preferences that, when changed, apply their effect instantly without requiring an explicit 'save' action. Key features include its clear visual feedback, immediate state changes upon interaction, and adherence to accessibility standards for interactive form controls. Common use cases involve toggling notifications, activating dark mode, enabling feature flags, or any simple binary configuration within an application. It's built on Radix UI, ensuring robust accessibility and behavior.",
-    "tier": "free",
+    "description": "The Switch component is a UI element designed for toggling between two distinct, binary states, typically \"on\" and \"off\". It provides an intuitive way for users to enable or disable features, settings, or preferences that take effect immediately without the need for an explicit save action. Built upon Radix UI primitives, it ensures high accessibility and customizable styling. Common use cases include activating dark mode, enabling notifications, or toggling feature flags within an application. Its immediate feedback mechanism makes it ideal for direct manipulation of state.",
     "guidance": {
-      "relatedComponents": ["Checkbox", "RadioGroup", "Toggle"],
-      "accessibility": "Ensures proper ARIA attributes for a switch role, indicating its checked or unchecked state to assistive technologies. Supports keyboard interaction (Spacebar to toggle, Tab to focus) and integrates well with screen readers to announce its label and current state.",
-      "patterns": ["form-control", "input"],
-      "whenNotToUse": "Do not use for actions that require a confirmation step, have complex implications, or where multiple selections are possible. For mutually exclusive options, consider RadioGroup; for multiple independent selections, use Checkbox.",
-      "whenToUse": "Use for settings that take effect immediately without requiring a save action, providing a clear binary choice like 'on' or 'off'. Ideal for preferences that need instant application."
+      "relatedComponents": ["Checkbox", "Radio Group", "Button"],
+      "accessibility": "Ensure the Switch is always associated with a `<label>` element using `htmlFor` and `id` for screen reader accessibility. The component should be keyboard navigable using `Tab` and activatable using `Space` or `Enter`. Radix UI base ensures correct ARIA roles and attributes (e.g., `role=\"switch\"`, `aria-checked`). Provide clear visual focus indicators.",
+      "whenNotToUse": "Do not use a Switch when a user action requires confirmation or an explicit save, such as submitting a form; prefer a Checkbox with a Button in such cases. Avoid using it for initiating an action that doesn't toggle a state (use a Button instead). Do not use for selections with more than two states (consider Radio Buttons or a Select component).",
+      "patterns": ["form-control", "input", "selection"],
+      "whenToUse": "Use the Switch component for binary settings that trigger an immediate state change without requiring a separate save action. Examples include toggling a dark mode theme, enabling/disabling notifications, activating a feature directly, or showing/hiding UI elements."
     }
   },
-  "recordedAt": "2026-01-27T11:56:15.831Z",
+  "recordedAt": "2026-01-31T20:23:53.276Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "12b0fe2851926064dc67cb267734c36194db1b8541d1a04862186d5f26973797",
+  "inputHash": "e5565fbdbae4fc8b9a48e779a2d07584670963292689521dabe34bfa2caefed4",
   "promptSummary": "Generate metadata for Switch component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Switch\nDescription: Switch\n\nA toggle switch for binary on/off states. Use for settings tha..."
 }

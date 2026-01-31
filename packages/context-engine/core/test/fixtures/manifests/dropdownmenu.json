@@ -6,7 +6,6 @@
     "version": "0.0.1",
     "framework": "react",
     "visibility": "private",
-    "tier": "free",
     "embeddingStatus": "pending",
     "embeddingModel": {
       "provider": "voyage",

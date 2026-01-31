@@ -46,17 +46,6 @@ import {
 const logger = createLogger({ name: 'meta-generator' });
 
 // =============================================================================
-// Configuration
-// =============================================================================
-
-/**
- * Get generation configuration from environment
- */
-function getConfig() {
-  return getGenerationConfig();
-}
-
-// =============================================================================
 // Response Validation & Normalization
 // =============================================================================
 
@@ -127,16 +116,21 @@ function buildDefaultSemanticDescription(
 /**
  * Extract examples from ComponentMetaTool structured format
  *
- * Collects unique code examples from minimalExample, examples.minimal,
+ * Collects unique code examples from examples.minimal,
  * examples.common, and examples.advanced fields.
+ *
+ * Returns empty array if examples are not provided (when Storybook examples
+ * are available, the LLM skips example generation).
  *
  * Uses Set for O(1) deduplication instead of array includes() O(n) checks.
  */
 function extractExamplesFromToolOutput(tool: ComponentMetaTool): string[] {
-  const exampleSet = new Set<string>();
+  // Handle optional examples - return empty array if not provided
+  if (!tool.examples) {
+    return [];
+  }
 
-  // Add minimal example first
-  exampleSet.add(tool.minimalExample);
+  const exampleSet = new Set<string>();
 
   // Add examples from structured format
   if (tool.examples.minimal?.code) {
@@ -177,16 +171,16 @@ function normalizeToolOutputToMeta(
   name: string,
   extracted: ExtractedData
 ): ComponentMeta {
-  const config = getConfig();
+  const config = getGenerationConfig();
   const defaultSemanticDescription = buildDefaultSemanticDescription(
     name,
     extracted
   );
 
-  // Get semantic description with fallback
+  // Get semantic description with fallback (tool.description is now the semantic description)
   // normalizeString already returns defaultSemanticDescription if input is too short
   const semanticDescription = normalizeString(
-    tool.semanticDescription,
+    tool.description,
     defaultSemanticDescription,
     config.minSemanticDescriptionLength,
     config.maxSemanticDescriptionLength
@@ -201,17 +195,16 @@ function normalizeToolOutputToMeta(
     whenToUse: tool.guidance.whenToUse,
     whenNotToUse: tool.guidance.whenNotToUse,
     patterns,
-    tokens: normalizeArray(tool.tokens),
     examples: extractExamplesFromToolOutput(tool),
     relatedComponents: normalizeArray(tool.guidance.relatedComponents),
     a11yNotes: tool.guidance.accessibility,
-    baseLibrary: extracted.baseLibrary,
     variantDescriptions: tool.variantDescriptions,
   };
 
-  // Build description with validation
+  // Build short description from the first sentence of semanticDescription
+  const shortDescription = semanticDescription.split('.')[0] + '.';
   const description = normalizeString(
-    tool.description,
+    shortDescription,
     `A ${name} component`,
     config.minDescriptionLength,
     config.maxDescriptionLength
@@ -220,56 +213,19 @@ function normalizeToolOutputToMeta(
   return {
     name,
     description,
-    tier: tool.tier,
     ai,
-    variants: extracted.variants,
-    defaults: extracted.defaultVariants,
   };
-}
-
-/**
- * Pre-process tool output to handle common LLM output issues
- *
- * Some LLMs (notably Gemini) return complex nested objects as stringified JSON.
- * This function detects and parses such cases before validation.
- */
-function preprocessToolOutput(data: unknown): unknown {
-  if (typeof data !== 'object' || data === null) {
-    return data;
-  }
-
-  const obj = data as Record<string, unknown>;
-
-  // Handle variantDescriptions being returned as a stringified JSON
-  if (
-    typeof obj.variantDescriptions === 'string' &&
-    obj.variantDescriptions.trim().startsWith('{')
-  ) {
-    try {
-      obj.variantDescriptions = JSON.parse(obj.variantDescriptions);
-      logger.debug('Parsed stringified variantDescriptions');
-    } catch {
-      // If parsing fails, remove the field to avoid validation errors
-      // The field is optional, so this is safe
-      logger.warn('Failed to parse stringified variantDescriptions, removing');
-      delete obj.variantDescriptions;
-    }
-  }
-
-  return obj;
 }
 
 /**
  * Validate tool calling output against the schema
  *
  * Even with tool calling, we validate the output as a safety layer.
- * Pre-processes the output to handle common LLM quirks like stringified nested objects.
+ * Provider-specific quirks (like Gemini's stringified nested objects)
+ * are handled by the providers themselves before returning.
  */
 function validateToolOutput(data: unknown): ComponentMetaTool | null {
-  // Pre-process to handle LLM quirks
-  const preprocessed = preprocessToolOutput(data);
-
-  const result = ComponentMetaToolSchema.safeParse(preprocessed);
+  const result = ComponentMetaToolSchema.safeParse(data);
   if (result.success) {
     return result.data;
   }
@@ -346,7 +302,7 @@ export class MetaGenerator implements IMetaGenerator {
    * @param config - Configuration options
    */
   constructor(config: MetaGeneratorConfig = {}) {
-    const envConfig = getConfig();
+    const envConfig = getGenerationConfig();
     this.provider = config.provider ?? createProviderFromEnv();
     this.maxTokens = config.maxTokens ?? envConfig.maxTokens;
 
@@ -371,7 +327,6 @@ export class MetaGenerator implements IMetaGenerator {
     name,
     framework,
     extracted,
-    figmaUrl,
     hints,
   }: GeneratorInput): Promise<GeneratorOutput> {
     const startTime = performance.now();
@@ -395,9 +350,8 @@ export class MetaGenerator implements IMetaGenerator {
         name,
         framework,
         extracted,
-        figmaUrl,
-        hints,
         skipExamples: hasStorybookExamples,
+        hints,
       });
 
       // Call provider with tool calling

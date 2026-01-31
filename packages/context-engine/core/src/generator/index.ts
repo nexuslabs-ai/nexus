@@ -52,7 +52,6 @@ export {
   filterValidPatterns,
   type PromptBuilderInput,
   TOOL_CALLING_SYSTEM_PROMPT,
-  TOOL_CALLING_USER_PROMPT_TEMPLATE,
 } from './prompts.js';
 
 // Tool Schema

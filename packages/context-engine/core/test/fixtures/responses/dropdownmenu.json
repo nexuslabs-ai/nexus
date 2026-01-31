@@ -1,52 +1,51 @@
 {
   "componentName": "DropdownMenu",
   "response": {
-    "semanticDescription": "The DropdownMenu component provides a flexible and accessible way to display a list of actions or options that are revealed upon user interaction. Built on Radix UI primitives, it offers robust keyboard navigation, focus management, and accessibility features out-of-the-box. Key features include customizable trigger elements, grouping of menu items, and support for sub-menus. It is ideal for scenarios where space is at a premium, such as overflow menus for tables or cards, user settings menus, or contextual actions on specific items. It allows users to perform actions without cluttering the main interface, improving the overall user experience.",
-    "tier": "free",
-    "guidance": {
-      "whenNotToUse": "Avoid using a DropdownMenu for primary navigation that requires high visibility or frequent access. For critical actions or options, consider using a Button, AlertDialog, or a persistent navigation element like a Sidebar. Do not use for a single action; a Button is more appropriate.",
-      "accessibility": "Ensure all dropdown menu items are keyboard navigable using arrow keys. Implement proper ARIA attributes such as `role='menu'`, `role='menuitem'`, and `aria-haspopup` on the trigger, and `aria-expanded` to indicate the menu's open state. Provide clear focus management when opening and closing the menu.",
-      "relatedComponents": [
-        "Button",
-        "AlertDialog",
-        "ContextMenu",
-        "Select",
-        "Popover"
-      ],
-      "whenToUse": "Use a DropdownMenu to present a list of related actions or options that are contextually relevant to a UI element, saving space and reducing visual clutter until needed. Ideal for overflow menus, user profile settings, or item-specific actions within a list.",
-      "patterns": [
-        "disclosure",
-        "overlay",
-        "navigation",
-        "selection",
-        "primitive-based",
-        "compound"
+    "description": "A DropdownMenu is a UI component that displays a list of choices or actions in a compact, collapsible menu. It provides an efficient way to present multiple options without cluttering the interface, appearing contextually or on user interaction. The component supports various types of menu items, including selectable options, action triggers, and submenus, and handles keyboard navigation, focus management, and accessibility out-of-the-box. It is ideal for navigation menus, action lists associated with an element, user profile options, or filtering/sorting controls.",
+    "examples": {
+      "minimal": {
+        "description": "A simple dropdown menu with a trigger button and two basic menu items.",
+        "code": "import * as DropdownMenu from \"@radix-ui/react-dropdown-menu\";\n\nexport function BasicDropdownMenu() {\n  return (\n    <DropdownMenu.Root>\n      <DropdownMenu.Trigger asChild>\n        <button aria-label=\"Open menu\">\n          Options\n        </button>\n      </DropdownMenu.Trigger>\n\n      <DropdownMenu.Portal>\n        <DropdownMenu.Content>\n          <DropdownMenu.Item>Edit Profile</DropdownMenu.Item>\n          <DropdownMenu.Item>Settings</DropdownMenu.Item>\n        </DropdownMenu.Content>\n      </DropdownMenu.Portal>\n    </DropdownMenu.Root>\n  );\n}",
+        "title": "Basic Dropdown Menu"
+      },
+      "common": [
+        {
+          "code": "import * as DropdownMenu from \"@radix-ui/react-dropdown-menu\";\nimport { LogOut, Settings, User } from \"lucide-react\";\n\nexport function UserActionsDropdown() {\n  return (\n    <DropdownMenu.Root>\n      <DropdownMenu.Trigger asChild>\n        <button aria-label=\"User actions\">\n          <User className=\"h-4 w-4\" />\n        </button>\n      </DropdownMenu.Trigger>\n\n      <DropdownMenu.Portal>\n        <DropdownMenu.Content>\n          <DropdownMenu.Item onSelect={() => console.log(\"Profile\")}>\n            <User className=\"mr-2 h-4 w-4\" />\n            <span>Profile</span>\n          </DropdownMenu.Item>\n          <DropdownMenu.Item onSelect={() => console.log(\"Settings\")}>\n            <Settings className=\"mr-2 h-4 w-4\" />\n            <span>Settings</span>\n          </DropdownMenu.Item>\n          <DropdownMenu.Separator />\n          <DropdownMenu.Item onSelect={() => console.log(\"Log out\")}>\n            <LogOut className=\"mr-2 h-4 w-4\" />\n            <span>Log out</span>\n          </DropdownMenu.Item>\n        </DropdownMenu.Content>\n      </DropdownMenu.Portal>\n    </DropdownMenu.Root>\n  );\n}",
+          "title": "Dropdown Menu with Actions and Icons",
+          "description": "An example demonstrating a dropdown menu with actions, each accompanied by an icon and a separator for grouping related items."
+        },
+        {
+          "title": "Dropdown Menu with Selectable Theme Options",
+          "description": "A dropdown menu illustrating how to implement selectable options, such as theme settings, using radio group functionality and indicators for the currently selected item.",
+          "code": "import * as DropdownMenu from \"@radix-ui/react-dropdown-menu\";\nimport { Check, Monitor, Moon, Sun } from \"lucide-react\";\nimport React from \"react\";\n\nexport function ThemeSelectorDropdown() {\n  const [theme, setTheme] = React.useState(\"system\");\n\n  return (\n    <DropdownMenu.Root>\n      <DropdownMenu.Trigger asChild>\n        <button aria-label=\"Select theme\">\n          Theme: {theme.charAt(0).toUpperCase() + theme.slice(1)}\n        </button>\n      </DropdownMenu.Trigger>\n\n      <DropdownMenu.Portal>\n        <DropdownMenu.Content>\n          <DropdownMenu.RadioGroup value={theme} onValueChange={setTheme}>\n            <DropdownMenu.RadioItem value=\"light\">\n              <Sun className=\"mr-2 h-4 w-4\" />\n              <span>Light</span>\n              <DropdownMenu.ItemIndicator>\n                <Check className=\"h-4 w-4\" />\n              </DropdownMenu.ItemIndicator>\n            </DropdownMenu.RadioItem>\n            <DropdownMenu.RadioItem value=\"dark\">\n              <Moon className=\"mr-2 h-4 w-4\" />\n              <span>Dark</span>\n              <DropdownMenu.ItemIndicator>\n                <Check className=\"h-4 w-4\" />\n              </DropdownMenu.ItemIndicator>\n            </DropdownMenu.RadioItem>\n            <DropdownMenu.RadioItem value=\"system\">\n              <Monitor className=\"mr-2 h-4 w-4\" />\n              <span>System</span>\n              <DropdownMenu.ItemIndicator>\n                <Check className=\"h-4 w-4\" />\n              </DropdownMenu.ItemIndicator>\n            </DropdownMenu.RadioItem>\n          </DropdownMenu.RadioGroup>\n        </DropdownMenu.Content>\n      </DropdownMenu.Portal>\n    </DropdownMenu.Root>\n  );\n}"
+        }
       ]
     },
-    "tokens": [
-      "color-text-primary",
-      "color-background-surface",
-      "color-border-default",
-      "spacing-sm",
-      "spacing-xs",
-      "border-radius-md",
-      "font-family-base",
-      "font-size-sm"
-    ],
-    "minimalExample": "<DropdownMenu />",
-    "examples": {
-      "common": [],
-      "minimal": {
-        "code": "<DropdownMenu />",
-        "title": "Minimal DropdownMenu",
-        "description": "A basic dropdown menu."
-      }
-    },
-    "description": "A dropdown menu for displaying a list of actions or options in a compact, contextual overlay."
+    "guidance": {
+      "whenToUse": "Use when you need to offer a list of actions or options that don't need to be constantly visible, saving screen space. It's suitable for secondary actions, navigation items, or selection controls within a limited area, especially when space is at a premium or options are numerous.",
+      "whenNotToUse": "Avoid using for primary navigation elements that require constant visibility. If there are only one or two options, consider a Button or ToggleGroup instead. Do not use for critical, immediate actions that need to be clearly visible and accessible without an extra click.",
+      "accessibility": "Ensure proper keyboard navigation with arrow keys to move between items, Enter to select an item, and Escape to close the menu. Implement ARIA roles like `menu`, `menuitem`, `menubutton`, `menuitemradio`, or `menuitemcheckbox` for semantic meaning depending on the item type. Manage focus appropriately upon opening (focusing on the first item) and closing (returning focus to the trigger). Ensure sufficient contrast for text and icons within the menu for users with low vision.",
+      "relatedComponents": [
+        "Button",
+        "Select",
+        "ContextMenu",
+        "CommandMenu",
+        "Popover",
+        "MenuBar"
+      ],
+      "patterns": [
+        "disclosure",
+        "navigation",
+        "selection",
+        "composition",
+        "overlay",
+        "compound"
+      ]
+    }
   },
-  "recordedAt": "2026-01-29T10:31:00.893Z",
+  "recordedAt": "2026-01-31T20:53:15.185Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "096d2136b40edc518f5a55259899187576cad4c0df2e3fbfc77025b0a50a0912",
+  "inputHash": "6f766d9a67f721d9707e622e8bf84fb294b3dd41a9af831a067c90278c314e10",
   "promptSummary": "Generate metadata for DropdownMenu component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: DropdownMenu\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-dropdown-menu, @/li..."
 }

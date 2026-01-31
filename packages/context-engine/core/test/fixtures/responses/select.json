@@ -1,48 +1,54 @@
 {
   "componentName": "Select",
   "response": {
-    "minimalExample": "<Select />",
-    "tier": "free",
-    "description": "A controlled or uncontrolled select input for choosing a single value from a list of options.",
-    "semanticDescription": "The Select component is a fundamental UI element that allows users to pick a single value from a collection of predefined options. It functions as a controlled or uncontrolled input, managing its open/close state and selected value. Built upon Radix UI primitives, it offers robust accessibility, including keyboard navigation and appropriate ARIA attributes. Key features include handling `value`, `defaultValue`, and `onValueChange` props for state management. It's ideal for forms, filters, and settings where a compact dropdown is required to present a list of choices efficiently.",
+    "description": "The `Select` component is a fundamental UI element that allows users to choose a single option from a predefined list. It serves as a controlled or uncontrolled form input, managing its open/close state and the currently selected value. Built upon Radix UI primitives, it offers robust accessibility features and high customizability, making it suitable for various data input and filtering scenarios in forms and interactive UIs. Key features include keyboard navigation, ARIA attribute support, and predictable state management through `value`, `defaultValue`, and `onValueChange` props.",
     "guidance": {
-      "whenNotToUse": "Avoid using Select for lists with very few options (2-3 items) where radio buttons might offer better discoverability, or for lists with a very large number of options (hundreds or thousands) where an autocomplete or searchable dropdown would provide a better user experience. Do not use for multiple selections; use a Multi-Select component instead.",
-      "accessibility": "The Select component is built on Radix UI's Select primitive, ensuring strong accessibility out-of-the-box. It correctly handles keyboard navigation (up/down arrows, enter, escape), focus management, and ARIA attributes (role='combobox', aria-haspopup, aria-expanded, aria-labelledby, aria-controls) to communicate its state and purpose to assistive technologies. Ensure that the label associated with the Select is programmatically linked using 'id' and 'htmlFor' or 'aria-labelledby'.",
-      "whenToUse": "Use the Select component when you need to allow users to choose a single option from a predefined list. It's suitable for forms, filters, or settings where space is limited, and a dropdown is preferred over radio buttons or a large list box.",
-      "relatedComponents": [
-        "Button",
-        "Label",
-        "Input",
-        "RadioGroup",
-        "Checkbox"
+      "patterns": [
+        "form-control",
+        "selection",
+        "disclosure",
+        "input",
+        "compound"
       ],
-      "patterns": ["form-control", "input", "selection", "disclosure"]
+      "relatedComponents": [
+        "Input",
+        "Radio Group",
+        "Checkbox",
+        "MultiSelect",
+        "Dropdown Menu"
+      ],
+      "whenNotToUse": "Do not use `Select` when users need to choose multiple options (consider `MultiSelect` or `Checkbox.Group`). Avoid using it for very short lists (2-3 items) where `Radio.Group` might offer better visibility of all options. Do not use it when users need to enter free-form text or values not present in the list (use `Input.Text`).",
+      "whenToUse": "Use the `Select` component when users need to pick one option from a list, especially when screen space is limited or the list of choices is extensive. It's ideal for form fields where the input must be constrained to a set of predefined values, such as country selectors, sorting options, or category filters.",
+      "accessibility": "The `Select` component, being built on Radix UI, inherently provides strong accessibility. Ensure proper labeling using `<label>` elements associated with the select trigger. It supports keyboard navigation (arrow keys for options, Enter/Space to select, Escape to close). Important ARIA attributes are managed internally, including `role=\"combobox\"`, `aria-haspopup`, `aria-expanded`, `aria-controls`, `aria-labelledby`, and `aria-activedescendant`, which are crucial for screen reader users to understand the component's state and available options."
     },
-    "tokens": [
-      "color-text-default",
-      "color-border-default",
-      "color-background-surface",
-      "color-background-hover",
-      "color-primary",
-      "spacing-sm",
-      "spacing-md",
-      "font-family-sans",
-      "font-size-md",
-      "border-radius-sm",
-      "shadow-sm"
-    ],
     "examples": {
-      "common": [],
+      "common": [
+        {
+          "code": "import React, { useState } from 'react';\nimport { Select } from '@your-design-system/select';\n\nfunction FruitSelector() {\n  const [selectedFruit, setSelectedFruit] = useState('banana');\n\n  return (\n    <div>\n      <label htmlFor=\"fruit-select\">Choose a fruit:</label>\n      <Select\n        id=\"fruit-select\"\n        value={selectedFruit}\n        onValueChange={setSelectedFruit}\n      >\n        <Select.Trigger aria-label=\"Fruit\">\n          <Select.Value />\n        </Select.Trigger>\n        <Select.Content>\n          <Select.Item value=\"apple\">Apple</Select.Item>\n          <Select.Item value=\"banana\">Banana</Select.Item>\n          <Select.Item value=\"orange\">Orange</Select.Item>\n          <Select.Item value=\"grape\">Grape</Select.Item>\n        </Select.Content>\n      </Select>\n      <p>Selected: {selectedFruit}</p>\n    </div>\n  );\n}",
+          "description": "Demonstrates how to use the `Select` component as a controlled input, managing its value via React state.",
+          "title": "Controlled Select with State"
+        },
+        {
+          "title": "Uncontrolled Select with Default Value",
+          "description": "Shows how to use an uncontrolled `Select` with an initial `defaultValue` and a callback for value changes.",
+          "code": "import React from 'react';\nimport { Select } from '@your-design-system/select';\n\nfunction ContinentSelector() {\n  const handleValueChange = (value) => {\n    console.log('Selected continent:', value);\n  };\n\n  return (\n    <div>\n      <label htmlFor=\"continent-select\">Select a continent:</label>\n      <Select\n        id=\"continent-select\"\n        defaultValue=\"europe\"\n        onValueChange={handleValueChange}\n      >\n        <Select.Trigger>\n          <Select.Value />\n        </Select.Trigger>\n        <Select.Content>\n          <Select.Item value=\"asia\">Asia</Select.Item>\n          <Select.Item value=\"africa\">Africa</Select.Item>\n          <Select.Item value=\"europe\">Europe</Select.Item>\n          <Select.Item value=\"north-america\">North America</Select.Item>\n          <Select.Item value=\"south-america\">South America</Select.Item>\n          <Select.Item value=\"australia\">Australia</Select.Item>\n        </Select.Content>\n      </Select>\n    </div>\n  );\n}"
+        },
+        {
+          "code": "import React, { useState } from 'react';\nimport { Select } from '@your-design-system/select';\n\nfunction StatusSelector() {\n  const [status, setStatus] = useState('');\n\n  return (\n    <div>\n      <label htmlFor=\"status-select\">Current Status:</label>\n      <Select\n        id=\"status-select\"\n        value={status}\n        onValueChange={setStatus}\n      >\n        <Select.Trigger>\n          <Select.Value placeholder=\"Set your status\" />\n        </Select.Trigger>\n        <Select.Content>\n          <Select.Item value=\"online\">Online</Select.Item>\n          <Select.Item value=\"away\" disabled>Away (temporarily unavailable)</Select.Item>\n          <Select.Item value=\"offline\">Offline</Select.Item>\n        </Select.Content>\n      </Select>\n      <p>Status: {status || 'Not set'}</p>\n    </div>\n  );\n}",
+          "title": "Select with a Placeholder and Disabled Option",
+          "description": "An example demonstrating a `Select` with a placeholder text and a disabled option within the list."
+        }
+      ],
       "minimal": {
-        "code": "<Select />",
-        "title": "Basic Select",
-        "description": "A basic select component."
+        "title": "Basic Select Usage",
+        "description": "A minimal example showing a controlled `Select` component with three options.",
+        "code": "import React, { useState } from 'react';\nimport { Select } from '@your-design-system/select'; // Assuming this is how it's imported\n\nfunction MyForm() {\n  const [selectedValue, setSelectedValue] = useState('');\n\n  return (\n    <Select\n      value={selectedValue}\n      onValueChange={setSelectedValue}\n    >\n      <Select.Trigger>\n        <Select.Value placeholder=\"Select a fruit\" />\n      </Select.Trigger>\n      <Select.Content>\n        <Select.Item value=\"apple\">Apple</Select.Item>\n        <Select.Item value=\"banana\">Banana</Select.Item>\n        <Select.Item value=\"orange\">Orange</Select.Item>\n      </Select.Content>\n    </Select>\n  );\n}"
       }
     }
   },
-  "recordedAt": "2026-01-27T11:56:04.239Z",
+  "recordedAt": "2026-01-31T20:23:38.138Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "85b478059d6f7f4eae0c8ab84780e23681dc4e223ba7b183d0f49a6d893bd5d0",
+  "inputHash": "9a9268932023e7550b49c7254782bee7b0154992dcec191588b2bdb728a3f3d2",
   "promptSummary": "Generate metadata for Select component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Select\nDescription: Select\n\nRoot component for the select. Controls open/close state and v..."
 }

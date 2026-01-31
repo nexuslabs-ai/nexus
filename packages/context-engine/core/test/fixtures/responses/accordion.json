@@ -1,41 +1,42 @@
 {
   "componentName": "Accordion",
   "response": {
-    "description": "An Accordion component for displaying collapsible content sections, ideal for organizing large amounts of information efficiently.",
-    "semanticDescription": "The Accordion component provides a vertically stacked list of items, each of which can be expanded or collapsed to reveal its associated content. It's built upon Radix UI's robust primitives, ensuring high accessibility and customizability. This component is primarily used to manage and present large quantities of information in a structured and space-efficient manner, preventing information overload by displaying only relevant sections. Key features include animated transitions for expanding/collapsing, support for single or multiple item expansion, and full keyboard navigation. Use cases include frequently asked questions (FAQs), detailed product specifications, settings forms, and documentation sections where content hierarchy is important.",
     "guidance": {
-      "whenNotToUse": "Avoid using Accordions for critical information that needs to be visible at all times. Do not use if content in different sections needs to be compared simultaneously. For comparison, consider using tabs or a multi-column layout. If the content is simple and short, consider using an expandable section directly without the full Accordion structure, or a simple toggle button.",
-      "accessibility": "The Accordion component should adhere to ARIA practices for collapsible content. Ensure proper use of `aria-controls`, `aria-expanded`, and heading levels for each accordion trigger to convey structure and state to assistive technologies. Keyboard navigation (Tab, Space/Enter) should allow users to navigate between and activate accordion items.",
-      "patterns": ["disclosure", "container", "data-display", "layout"],
-      "relatedComponents": ["Tabs", "Dialog", "Tooltip", "Collapsible"],
-      "whenToUse": "Use the Accordion to present multiple sections of related content in a compact manner, allowing users to toggle visibility for each section. It's ideal for FAQs, product details, or settings panels where space is limited and users only need to see one section at a time or specific sections on demand."
+      "whenToUse": "Use the Accordion component to display multiple sections of related content in a confined space, allowing users to expand and collapse sections to reveal or hide information. It's particularly useful for FAQs, detailed product specifications, nested navigation menus, or any scenario where content needs to be organized without overwhelming the user initially.",
+      "whenNotToUse": "Do not use Accordion for critical information that must always be immediately visible. Avoid using it when users need to compare content across different sections simultaneously, as only one or a few sections are typically visible at a time. If there is only a single piece of content to show/hide, a simpler Collapsible component or a Button with a disclosure pattern would be more appropriate.",
+      "patterns": ["disclosure", "container", "data-display", "composition"],
+      "accessibility": "The Accordion component inherits strong accessibility features from Radix UI. It includes proper ARIA roles and attributes (e.g., `role=\"heading\"`, `aria-controls`, `aria-expanded`) for assistive technologies. Keyboard navigation is fully supported, allowing users to navigate between accordion triggers using Tab and expand/collapse sections using Enter or Space keys.",
+      "relatedComponents": ["Collapsible", "Tabs", "Dialog", "Tooltip"]
     },
-    "tier": "free",
-    "minimalExample": "<Accordion />",
-    "tokens": [
-      "color-text-primary",
-      "color-background-default",
-      "spacing-sm",
-      "spacing-md",
-      "border-color-default",
-      "border-width-sm",
-      "border-radius-md",
-      "font-size-md",
-      "line-height-md"
-    ],
     "examples": {
-      "common": [],
+      "common": [
+        {
+          "description": "An accordion with multiple items where only one item can be open at a time. Expanding one item automatically collapses the previously open one.",
+          "code": "<Accordion.Root type=\"single\" collapsible><Accordion.Item value=\"item-1\"><Accordion.Header><Accordion.Trigger>Item 1</Accordion.Trigger></Accordion.Header><Accordion.Content>Content for item 1.</Accordion.Content></Accordion.Item><Accordion.Item value=\"item-2\"><Accordion.Header><Accordion.Trigger>Item 2</Accordion.Trigger></Accordion.Header><Accordion.Content>Content for item 2.</Accordion.Content></Accordion.Item><Accordion.Item value=\"item-3\"><Accordion.Header><Accordion.Trigger>Item 3</Accordion.Trigger></Accordion.Header><Accordion.Content>Content for item 3.</Accordion.Content></Accordion.Item></Accordion.Root>",
+          "title": "Accordion with Multiple Items (Single Open)"
+        },
+        {
+          "description": "An accordion configured to allow multiple items to be open simultaneously. Each item can be expanded and collapsed independently.",
+          "title": "Accordion with Multiple Items (Multiple Open)",
+          "code": "<Accordion.Root type=\"multiple\"><Accordion.Item value=\"item-1\"><Accordion.Header><Accordion.Trigger>Item A</Accordion.Trigger></Accordion.Header><Accordion.Content>Content for item A.</Accordion.Content></Accordion.Item><Accordion.Item value=\"item-2\"><Accordion.Header><Accordion.Trigger>Item B</Accordion.Trigger></Accordion.Header><Accordion.Content>Content for item B.</Accordion.Content></Accordion.Item><Accordion.Item value=\"item-3\"><Accordion.Header><Accordion.Trigger>Item C</Accordion.Trigger></Accordion.Header><Accordion.Content>Content for item C.</Accordion.Content></Accordion.Item></Accordion.Root>"
+        },
+        {
+          "code": "<Accordion.Root type=\"single\" collapsible><Accordion.Item value=\"item-1\"><Accordion.Header><Accordion.Trigger>Enabled Item</Accordion.Trigger></Accordion.Header><Accordion.Content>This item is enabled.</Accordion.Content></Accordion.Item><Accordion.Item value=\"item-2\" disabled><Accordion.Header><Accordion.Trigger>Disabled Item</Accordion.Trigger></Accordion.Header><Accordion.Content>This item is disabled and cannot be opened.</Accordion.Content></Accordion.Item></Accordion.Root>",
+          "title": "Accordion with Disabled Item",
+          "description": "Demonstrates an accordion where one of the items is disabled, preventing it from being expanded or collapsed by user interaction."
+        }
+      ],
       "minimal": {
-        "description": "A basic Accordion component with default settings.",
-        "propsUsed": [],
-        "code": "<Accordion />",
-        "title": "Basic Accordion"
+        "description": "A minimal example showing a single accordion item that can be expanded and collapsed.",
+        "title": "Basic Accordion",
+        "code": "<Accordion.Root type=\"single\" collapsible><Accordion.Item value=\"item-1\"><Accordion.Header><Accordion.Trigger>Is it accessible?</Accordion.Trigger></Accordion.Header><Accordion.Content>Yes. It adheres to WAI-ARIA design patterns.</Accordion.Content></Accordion.Item></Accordion.Root>"
       }
-    }
+    },
+    "description": "The Accordion component is a user interface element designed to display a list of collapsible panels. Each panel can hide or show its content, allowing users to progressively disclose information. It is built on top of Radix UI's Accordion primitive, providing robust accessibility features and flexible customization. This component is ideal for organizing large amounts of content into digestible sections, reducing visual clutter and improving content scannability. It supports both single-item and multiple-item expansion modes, making it versatile for various use cases such as FAQs, detailed product descriptions, or navigation menus."
   },
-  "recordedAt": "2026-01-27T11:53:46.988Z",
+  "recordedAt": "2026-01-31T20:46:09.726Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "342fc45a3d922b7e6fc21e9fb5045ce569a0c0a1bc4b993fca646ff33eedcab4",
+  "inputHash": "e3e6514e946711885843fdb1e406483097f6045d894aabf412076d0abe16a845",
   "promptSummary": "Generate metadata for Accordion component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Accordion\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-accordion, @/lib\n\nBase..."
 }

@@ -137,10 +137,10 @@ export interface GeneratorInput {
   /** Extracted data from code analysis */
   extracted: ExtractedData;
 
-  /** Optional Figma design URL for additional context */
-  figmaUrl?: string;
-
-  /** Optional hints for generation (e.g., design system context) */
+  /**
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
+   */
   hints?: string;
 }
 

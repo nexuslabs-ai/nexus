@@ -323,7 +323,6 @@ export class ComponentProcessor {
       name: input.identity.name,
       framework: input.identity.framework,
       extracted: input.extracted,
-      figmaUrl: input.figmaUrl,
       hints: input.hints,
     };
 
@@ -594,7 +593,6 @@ export class ComponentProcessor {
       name: input.name,
       framework,
       extracted: extraction.data,
-      figmaUrl: input.figmaUrl,
       hints: input.hints,
     };
 

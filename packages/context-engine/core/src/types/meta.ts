@@ -7,13 +7,11 @@
 
 import { z } from 'zod';
 
-import { BaseLibrarySchema, TierSchema } from './identity.js';
-
 /**
  * Pattern definitions
  * These patterns help categorize components for filtering and context
  */
-export const COMPONENT_PATTERNS = [
+export const COMPONENT_PATTERNS: string[] = [
   'form-control', // Has value/onChange props
   'async-action', // Has loading states
   'composition', // Has asChild or similar composition pattern
@@ -30,7 +28,7 @@ export const COMPONENT_PATTERNS = [
   'input', // Text/number inputs
   'button', // Button variants
   'icon', // Icon components
-] as const;
+];
 
 export type ComponentPattern = (typeof COMPONENT_PATTERNS)[number];
 
@@ -56,9 +54,6 @@ export const AIContextSchema = z.object({
   /** Semantic patterns this component represents */
   patterns: z.array(z.string()),
 
-  /** Design tokens used by this component */
-  tokens: z.array(z.string()),
-
   /** Curated usage examples (JSX strings) */
   examples: z.array(z.string()),
 
@@ -67,9 +62,6 @@ export const AIContextSchema = z.object({
 
   /** Accessibility notes */
   a11yNotes: z.string().optional(),
-
-  /** Base UI library used (Radix, Ark, Base UI, Headless UI, React Aria, etc.) */
-  baseLibrary: BaseLibrarySchema.optional(),
 
   /**
    * LLM-generated descriptions for variant values
@@ -94,17 +86,8 @@ export const ComponentMetaSchema = z.object({
   /** Human-readable one-line description */
   description: z.string().min(10).max(500),
 
-  /** Component tier for licensing */
-  tier: TierSchema,
-
   /** AI-generated context */
   ai: AIContextSchema,
-
-  /** Design-level variants (copied from extraction for meta file) */
-  variants: z.record(z.string(), z.array(z.string())),
-
-  /** Default variant values */
-  defaults: z.record(z.string(), z.string()),
 });
 
 export type ComponentMeta = z.infer<typeof ComponentMetaSchema>;

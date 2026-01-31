@@ -138,18 +138,6 @@ export interface ProcessorInput {
   existingId?: string;
 
   /**
-   * Optional Figma URL for design context.
-   * Passed to LLM for richer metadata generation.
-   */
-  figmaUrl?: string;
-
-  /**
-   * Optional hints for generation.
-   * Additional context for the LLM (e.g., design system name).
-   */
-  hints?: string;
-
-  /**
    * Optional Storybook stories source code.
    * Used to extract real examples from stories.
    */
@@ -160,6 +148,12 @@ export interface ProcessorInput {
    * Used for context in extraction.
    */
   storiesFilePath?: string;
+
+  /**
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
+   */
+  hints?: string;
 }
 
 /**
@@ -183,17 +177,17 @@ export interface GenerateOnlyInput {
   /** Component version */
   version?: string;
 
-  /** Optional Figma URL for design context */
-  figmaUrl?: string;
-
-  /** Optional hints for generation */
-  hints?: string;
-
   /**
    * Extraction metadata from prior extractOnly call.
    * Used to preserve fallback info in the final output.
    */
   extraction?: ExtractionMetadata;
+
+  /**
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
+   */
+  hints?: string;
 }
 
 // =============================================================================

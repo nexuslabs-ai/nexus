@@ -1,48 +1,70 @@
 {
   "componentName": "Badge",
   "response": {
-    "minimalExample": "<Badge>New</Badge>",
-    "guidance": {
-      "accessibility": "Ensure sufficient color contrast for readability across all `variant` and `fill` combinations. When using `isNumber`, ensure the number is concise and easily understandable. If `asChild` is used to compose with an interactive element (e.g., a link or button), ensure the child element provides appropriate ARIA attributes and keyboard accessibility for its role.",
-      "whenNotToUse": "Do not use for complex interactive elements like standalone buttons or links unless carefully composed with the `asChild` prop. For displaying large amounts of text or detailed information, consider using a Tag, StatusLabel, or Tooltip component instead.",
-      "whenToUse": "Use the Badge component to highlight important status, categorize items, show counts, or provide quick, at-a-glance information in a compact form. Ideal for notifications, tags, or small labels.",
-      "relatedComponents": ["Tag", "StatusLabel", "Tooltip"],
-      "patterns": ["data-display", "composition", "feedback", "icon"]
-    },
-    "tier": "free",
-    "semanticDescription": "The Badge component is a versatile UI element designed for concisely displaying supplementary information, status, or numerical counts. It supports various visual `variant` styles (default, secondary, outline, error, warning, success, information) and `fill` options (solid, light) to visually differentiate its purpose and urgency. Key features include the `isCaps` prop for uppercase text with wider letter-spacing, `isNumber` for rendering circular numeric badges (passing the number as children), and `leftIcon`/`rightIcon` for adding visual cues (ignored when `isNumber` is true). The `asChild` prop leverages Radix Slot for flexible composition, allowing the badge to inherit styles while rendering as a custom element like a link or button. It's ideal for marking statuses (e.g., 'Active', 'Pending'), categorizing content (e.g., 'New', 'Beta'), or indicating unread counts (e.g., '8', '99+').",
-    "variantDescriptions": "{\"variant\": {\"default\": \"Standard badge style for general informational purposes.\", \"secondary\": \"Subdued badge style, often used for less prominent information.\", \"outline\": \"Badge with a border and transparent background, drawing less attention.\", \"error\": \"Badge indicating a critical issue or error state (red).\", \"warning\": \"Badge indicating a potential issue or warning state (orange/yellow).\", \"success\": \"Badge indicating a successful operation or positive status (green).\", \"information\": \"Badge providing neutral informational context (blue).\"}, \"fill\": {\"solid\": \"Badge with a solid background color, providing strong visual emphasis.\", \"light\": \"Badge with a light background color, often a tinted version of the variant color, offering a softer appearance.\"}}",
-    "tokens": [
-      "color-default",
-      "color-secondary",
-      "color-outline",
-      "color-error",
-      "color-warning",
-      "color-success",
-      "color-information",
-      "spacing-xs",
-      "spacing-sm",
-      "spacing-md",
-      "font-size-sm",
-      "font-weight-medium",
-      "border-radius-full",
-      "border-radius-sm",
-      "letter-spacing-wide"
-    ],
-    "description": "A Badge component for displaying small, discrete pieces of information, status indicators, or counts.",
     "examples": {
-      "advanced": [],
-      "common": [],
       "minimal": {
-        "title": "Minimal Badge",
-        "code": "<Badge>New</Badge>",
-        "description": "A basic badge displaying text."
-      }
+        "code": "<Badge>New Feature</Badge>",
+        "description": "A basic badge displaying simple text with default styling.",
+        "title": "Default Badge"
+      },
+      "advanced": [
+        {
+          "title": "Combined Variant, Fill, and Icon",
+          "code": "<Badge variant=\"information\" fill=\"light\" leftIcon={<IconInfo />}>Information Available</Badge>",
+          "description": "A more complex badge combining a specific variant, light fill, and a left icon for detailed information."
+        },
+        {
+          "description": "An interactive number badge that acts as a button, demonstrating composition of `isNumber`, variant, and `asChild` props.",
+          "code": "<Badge isNumber variant=\"error\" asChild>\n  <button onClick={() => console.log('View urgent alerts')}>3</button>\n</Badge>",
+          "title": "Interactive Number Badge with `asChild`"
+        }
+      ],
+      "common": [
+        {
+          "description": "Examples of badges indicating different statuses using various color variants.",
+          "title": "Status Badges with Variants",
+          "code": "<Badge variant=\"success\">Active</Badge>\n<Badge variant=\"error\">Critical</Badge>\n<Badge variant=\"warning\">Pending Review</Badge>"
+        },
+        {
+          "title": "Number Badge",
+          "description": "Badges specifically designed to display numerical counts, often used for notifications.",
+          "code": "<Badge isNumber>7</Badge>\n<Badge isNumber variant=\"error\">99+</Badge>"
+        },
+        {
+          "code": "<Badge leftIcon={<IconCheck />}>Verified</Badge>\n<Badge rightIcon={<IconX />}>Dismiss</Badge>",
+          "title": "Badge with Icons",
+          "description": "Badges incorporating icons for enhanced visual communication, with icons automatically sized."
+        },
+        {
+          "description": "Using `asChild` to render the badge's content within another element, preserving its native semantics, such as a link or button.",
+          "code": "<Badge asChild>\n  <a href=\"/notifications\">5 New Messages</a>\n</Badge>\n<Badge asChild variant=\"secondary\">\n  <button onClick={() => alert('View details')}>Details</button>\n</Badge>",
+          "title": "Composed Badge (asChild)"
+        },
+        {
+          "title": "Uppercase Badge",
+          "description": "A badge with `isCaps` set to true, rendering text in uppercase with wider letter-spacing.",
+          "code": "<Badge isCaps>featured content</Badge>"
+        }
+      ]
+    },
+    "variantDescriptions": {},
+    "description": "The Badge component is a versatile UI element used to display small, concise pieces of information such as status indicators, counts, labels, or categories. It supports text, numbers, and optional icons, and can be styled with various visual variants and fill styles. It is designed to be highly customizable, including the ability to compose with other elements like links or buttons using the `asChild` prop from Radix UI's Slot primitive, allowing it to adapt to diverse informational display needs in a user interface.",
+    "guidance": {
+      "whenToUse": "Use the Badge component to: 1. Display short, crucial information or metadata. 2. Indicate status (e.g., 'Active', 'Pending', 'Archived', 'Verified'). 3. Show numerical counts (e.g., notification counts, item quantities). 4. Categorize or label items or sections. 5. Add visual emphasis or context to surrounding text.",
+      "whenNotToUse": "Avoid using Badge for: 1. Interactive elements that should respond to user input directly; instead, use `Button`, `Link`, or other interactive components. However, `asChild` can wrap an interactive element if the badge itself is not meant to be the interactive part. 2. Displaying long paragraphs or complex textual content, which is better suited for `Text` or `Paragraph` components. 3. Visualizing complex data that requires charts, graphs, or detailed tables. 4. Primary navigation elements.",
+      "relatedComponents": ["Icon", "Button", "Link", "Text"],
+      "patterns": [
+        "data-display",
+        "composition",
+        "primitive-based",
+        "feedback"
+      ],
+      "accessibility": "1. Ensure sufficient color contrast for all badge variants and fill styles to meet WCAG guidelines. 2. When a badge indicates status, provide additional non-visual context (e.g., via `aria-label` on the parent element or descriptive text nearby) for screen reader users, as color alone is not sufficient. 3. If `isNumber` is used for counts, ensure the surrounding context or an `aria-label` clarifies what the number represents. 4. When using `asChild`, ensure the rendered child element maintains its native semantic meaning and accessibility properties (e.g., an `<a>` tag remains a link). 5. Icons used within badges should be purely decorative or have appropriate `aria-hidden` attributes if their meaning is conveyed by the text."
     }
   },
-  "recordedAt": "2026-01-27T11:54:34.693Z",
+  "recordedAt": "2026-01-31T20:22:07.214Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "49f0f843cb9357d5b8e30d4db96d31f617dd322e769a388c39a34915229fffff",
+  "inputHash": "4831f9bb5fa5ce58bfca5a9c90d1ee5c5ffc94463c411007ecf7c787685ad4e2",
   "promptSummary": "Generate metadata for Badge component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Badge\n\nProps:\n- isCaps: boolean - When true, uses uppercase text with wider letter-spacing..."
 }

@@ -71,43 +71,24 @@ export const ToolGuidanceSchema = z.object({
 export const ComponentMetaToolSchema = z.object({
   description: z
     .string()
-    .min(10)
-    .max(500)
-    .describe('One-line description of the component (10-500 chars)'),
-
-  tier: z
-    .enum(['free', 'pro'])
-    .describe(
-      'Licensing tier: "free" for basic components, "pro" for advanced/complex ones'
-    ),
-
-  minimalExample: z
-    .string()
-    .describe(
-      'The simplest working JSX code example (single line if possible)'
-    ),
-
-  examples: ToolExamplesSchema.describe(
-    'Structured code examples for different use cases'
-  ),
-
-  guidance: ToolGuidanceSchema.describe(
-    'Guidance on when and how to use this component'
-  ),
-
-  semanticDescription: z
-    .string()
     .min(50)
     .max(2000)
     .describe(
-      'Detailed description for embedding/semantic search (50-2000 chars). Describe purpose, key features, and use cases.'
+      'Detailed description for AI search and semantic understanding (50-2000 chars). ' +
+        'Describe the component purpose, key features, supported variants, and common use cases. ' +
+        'Make it comprehensive enough for AI coding assistants to understand when to use this component.'
     ),
 
-  tokens: z
-    .array(z.string())
-    .describe(
-      'Design tokens used by this component (e.g., "color-primary", "spacing-md")'
-    ),
+  guidance: ToolGuidanceSchema.describe(
+    'Usage guidance including when to use, when not to use, accessibility considerations, ' +
+      'applicable patterns from the pattern list, and related components that work well together.'
+  ),
+
+  examples: ToolExamplesSchema.optional().describe(
+    'Practical code examples showing component usage. ' +
+      'Include a minimal example, 2-4 common usage patterns, and optionally advanced examples. ' +
+      'Only provide if Storybook examples are not available.'
+  ),
 
   variantDescriptions: z
     .record(z.string(), z.record(z.string(), z.string()))

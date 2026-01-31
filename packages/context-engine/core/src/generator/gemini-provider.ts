@@ -293,11 +293,12 @@ export class GeminiProvider implements ILLMProvider {
         functionName: functionCall.name,
       });
 
-      // The validation happens in meta-generator.ts after this returns,
-      // so this is safe - but worth noting for future readers.
+      // Normalize the output to handle Gemini-specific quirks before returning
+      const normalizedData = this.normalizeToolOutput(functionCall.args);
+
       return {
         type: 'success',
-        data: functionCall.args as T,
+        data: normalizedData as T,
         usage: usageMetadata
           ? {
               inputTokens: usageMetadata.promptTokenCount ?? 0,
@@ -309,6 +310,44 @@ export class GeminiProvider implements ILLMProvider {
     } catch (error) {
       return this.handleError(error);
     }
+  }
+
+  /**
+   * Normalize tool output to handle Gemini-specific quirks
+   *
+   * Gemini sometimes returns complex nested objects (like variantDescriptions)
+   * as stringified JSON. This method detects and parses such cases.
+   *
+   * @param data - Raw tool output from Gemini
+   * @returns Normalized data with parsed nested objects
+   */
+  private normalizeToolOutput(data: unknown): unknown {
+    if (typeof data !== 'object' || data === null) {
+      return data;
+    }
+
+    // Create a shallow copy to avoid mutating the original
+    const obj = { ...(data as Record<string, unknown>) };
+
+    // Handle variantDescriptions being returned as stringified JSON
+    if (
+      typeof obj.variantDescriptions === 'string' &&
+      obj.variantDescriptions.trim().startsWith('{')
+    ) {
+      try {
+        obj.variantDescriptions = JSON.parse(obj.variantDescriptions);
+        logger.debug('Parsed stringified variantDescriptions from Gemini');
+      } catch {
+        // If parsing fails, remove the field to avoid validation errors
+        // The field is optional, so this is safe
+        logger.warn(
+          'Failed to parse stringified variantDescriptions from Gemini, removing field'
+        );
+        delete obj.variantDescriptions;
+      }
+    }
+
+    return obj;
   }
 
   /**

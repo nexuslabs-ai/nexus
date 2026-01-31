@@ -18,7 +18,6 @@ import { GuidanceSchema } from './guidance.js';
 import {
   BaseLibrarySchema,
   FrameworkSchema,
-  TierSchema,
   VersionSchema,
   VisibilitySchema,
 } from './identity.js';
@@ -92,7 +91,6 @@ export const ManifestMetadataSchema = z.object({
   version: VersionSchema,
   framework: FrameworkSchema,
   visibility: VisibilitySchema,
-  tier: TierSchema,
   embeddingStatus: EmbeddingStatusSchema,
   embeddingModel: EmbeddingModelInfoSchema.optional(),
   embeddingError: z.string().optional(),
@@ -185,9 +183,6 @@ export const ComponentManifestSchema = z.object({
   /** One-line description (10-500 chars) */
   description: z.string().min(10).max(500),
 
-  /** Component tier for licensing */
-  tier: TierSchema,
-
   /**
    * Import statement variants for AI use
    */
@@ -222,11 +217,6 @@ export const ComponentManifestSchema = z.object({
    * Rich description for embedding/search (50-2000 chars)
    */
   semanticDescription: z.string().min(50).max(2000),
-
-  /**
-   * Design tokens used by this component
-   */
-  tokens: z.array(z.string()),
 
   // === From Extraction ===
   /** Component files */
@@ -288,7 +278,6 @@ export const ManifestSummarySchema = z.object({
   version: VersionSchema,
   framework: FrameworkSchema,
   description: z.string(),
-  tier: TierSchema,
   visibility: VisibilitySchema,
   /** Component patterns from guidance */
   patterns: z.array(z.string()),
@@ -340,7 +329,6 @@ export const UpdateManifestInputSchema = z.object({
   version: VersionSchema.optional(),
   sourceCode: z.string().optional(),
   visibility: VisibilitySchema.optional(),
-  tier: TierSchema.optional(),
 });
 
 export type UpdateManifestInput = z.infer<typeof UpdateManifestInputSchema>;

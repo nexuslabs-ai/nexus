@@ -2,35 +2,49 @@
   "componentName": "Dialog",
   "response": {
     "examples": {
+      "common": [
+        {
+          "description": "A common pattern for asking the user to confirm a potentially destructive action.",
+          "code": "import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';\nimport { Button } from '@/components/ui/button';\n\nfunction ConfirmDialog() {\n  const handleDelete = () => {\n    alert(\"Item deleted!\");\n    // Logic to close dialog if needed, or let user close\n  };\n\n  return (\n    <Dialog>\n      <DialogTrigger asChild>\n        <Button variant=\"destructive\">Delete Item</Button>\n      </DialogTrigger>\n      <DialogContent>\n        <DialogTitle>Are you absolutely sure?</DialogTitle>\n        <DialogDescription>\n          This action cannot be undone. This will permanently delete your account and remove your data from our servers.\n        </DialogDescription>\n        <DialogFooter>\n          <Button variant=\"outline\">Cancel</Button>\n          <Button variant=\"destructive\" onClick={handleDelete}>Delete</Button>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  );\n}",
+          "title": "Confirmation Dialog"
+        },
+        {
+          "description": "Demonstrates using a dialog to encapsulate a form for user input, common for editing details or creating new items.",
+          "code": "import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';\nimport { Button } from '@/components/ui/button';\nimport { Input } from '@/components/ui/input';\nimport { Label } from '@/components/ui/label';\n\nfunction FormDialog() {\n  const handleSubmit = (e) => {\n    e.preventDefault();\n    alert(\"Form submitted!\");\n    // Logic to close dialog\n  };\n\n  return (\n    <Dialog>\n      <DialogTrigger asChild>\n        <Button>Edit Profile</Button>\n      </DialogTrigger>\n      <DialogContent className=\"sm:max-w-[425px]\">\n        <DialogTitle>Edit profile</DialogTitle>\n        <DialogDescription>\n          Make changes to your profile here. Click save when you're done.\n        </DialogDescription>\n        <form onSubmit={handleSubmit} className=\"grid gap-4 py-4\">\n          <div className=\"grid grid-cols-4 items-center gap-4\">\n            <Label htmlFor=\"name\" className=\"text-right\">Name</Label>\n            <Input id=\"name\" defaultValue=\"Pedro Duarte\" className=\"col-span-3\" />\n          </div>\n          <div className=\"grid grid-cols-4 items-center gap-4\">\n            <Label htmlFor=\"username\" className=\"text-right\">Username</Label>\n            <Input id=\"username\" defaultValue=\"@peduarte\" className=\"col-span-3\" />\n          </div>\n          <DialogFooter>\n            <Button type=\"submit\">Save changes</Button>\n          </DialogFooter>\n        </form>\n      </DialogContent>\n    </Dialog>\n  );\n}",
+          "title": "Dialog with a Form"
+        }
+      ],
       "minimal": {
-        "code": "<Dialog />",
-        "description": "A minimal dialog invocation.",
+        "description": "The simplest working example of a dialog with a trigger button and basic content.",
+        "code": "import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';\nimport { Button } from '@/components/ui/button';\n\nfunction MyDialog() {\n  return (\n    <Dialog>\n      <DialogTrigger asChild>\n        <Button>Open Dialog</Button>\n      </DialogTrigger>\n      <DialogContent>\n        <DialogTitle>Dialog Title</DialogTitle>\n        <DialogDescription>\n          This is a minimal dialog example.\n        </DialogDescription>\n        <DialogClose asChild>\n          <Button>Close</Button>\n        </DialogClose>\n      </DialogContent>\n    </Dialog>\n  );\n}",
         "title": "Basic Dialog"
-      },
-      "common": []
+      }
     },
-    "tokens": [
-      "color-background-overlay",
-      "spacing-md",
-      "border-radius-lg",
-      "shadow-lg",
-      "z-index-modal"
-    ],
-    "minimalExample": "<Dialog />",
-    "description": "A modal dialog component for displaying important information or collecting user input, requiring explicit user interaction to close.",
     "guidance": {
-      "patterns": ["overlay", "disclosure", "container", "form-control"],
-      "whenToUse": "Use when you need to interrupt the user's workflow to present critical information, ask for a decision, or capture focused input. Ideal for confirmations, forms, or detailed views that require full attention.",
-      "relatedComponents": ["Button", "Form", "Toast", "Alert", "Drawer"],
-      "whenNotToUse": "Avoid using for simple notifications or non-blocking information; use a Toast or Alert for those. Do not use for entire page content; consider a separate page or a Drawer instead if content is complex or scrollable.",
-      "accessibility": "Ensure proper focus management, trapping focus within the dialog when open and returning it to the trigger element when closed. Use appropriate ARIA roles (dialog, alertdialog) and attributes (aria-labelledby, aria-describedby) for screen reader users. The dialog should be dismissible via the Escape key and an explicit close button."
+      "relatedComponents": [
+        "Button",
+        "Form",
+        "Toast",
+        "Alert",
+        "Drawer",
+        "Popover"
+      ],
+      "whenToUse": "Use when you need to display information that requires immediate user attention, prevents interaction with the background content, and often requires a specific user action (e.g., confirmation, form submission, closing). Ideal for critical alerts, user input forms, or displaying complex details.",
+      "accessibility": "Ensures proper focus management, trapping focus within the dialog when open. Uses `role=\"dialog\"` or `role=\"alertdialog\"` as appropriate. Requires `aria-labelledby` to associate a title with the dialog and `aria-describedby` for a description. Supports keyboard interactions for closing (e.g., Escape key) and navigating interactive elements within the dialog.",
+      "patterns": [
+        "overlay",
+        "disclosure",
+        "container",
+        "feedback",
+        "composition"
+      ],
+      "whenNotToUse": "Do not use for simple, non-blocking notifications that don't require immediate action (consider a Toast or Alert). Avoid using for navigation menus or sidebars (consider a Drawer or Popover). If the content can be displayed inline or without disrupting the user flow, a dialog might be overkill."
     },
-    "tier": "free",
-    "semanticDescription": "The Dialog component provides a highly customizable and accessible modal overlay for presenting focused content or collecting user input. It is built on `@radix-ui/react-dialog` and is designed to temporarily block user interaction with the main application to ensure attention on the dialog's content. Key features include focus trapping, keyboard navigation (e.g., Escape to close), and proper ARIA attribute application for screen reader compatibility. Use cases include confirmation prompts, login forms, detailed views of an item, or any scenario where user focus must be explicitly directed to a specific interaction before proceeding with the rest of the application."
+    "description": "A modal dialog component that interrupts the user workflow to display critical information, ask for a decision, or gather input. It creates a temporary, focused space above the main content, preventing interaction with the rest of the page until closed. Built upon Radix UI primitives, ensuring robust accessibility and keyboard interaction. Common uses include confirmations, forms, and displaying detailed information without navigating away."
   },
-  "recordedAt": "2026-01-27T11:55:18.928Z",
+  "recordedAt": "2026-01-31T20:47:40.992Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "f3ed2a0f3bf2cfc41d8b537498cb7e3fed0701d11c086aae970f2919d413bb36",
+  "inputHash": "720597b50d22c8b0302f889fb4d85ea9a7f38e3cc39e5c0fd027c89edd3a0f16",
   "promptSummary": "Generate metadata for Dialog component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Dialog\n\nProps: None extracted\n\nNPM Dependencies: @radix-ui/react-dialog, @/lib\n\nBase Libra..."
 }

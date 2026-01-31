@@ -1,48 +1,62 @@
 {
   "componentName": "Button",
   "response": {
-    "semanticDescription": "The Button component is a fundamental UI element designed for user interaction, enabling a wide range of actions from submitting forms to navigating between pages. It supports several visual `variants` (default, destructive, outline, secondary, ghost, link) and `sizes` (default, sm, lg, icon) to fit diverse design needs. A key feature is the `loading` prop, which displays a visual indicator and disables the button during asynchronous operations, providing clear user feedback. Furthermore, the `asChild` prop, powered by `@radix-ui/react-slot`, offers exceptional flexibility by allowing the button to render as any child element (e.g., an `<a>` tag for navigation) while retaining all its styles and functionalities. This makes it a highly adaptable component for various interactive scenarios.",
+    "description": "The Button component is a versatile UI element used to trigger actions or navigate. It supports various visual styles through its `variant` prop (default, destructive, outline, secondary, ghost, link) and sizes (`default`, `sm`, `lg`, `icon`). Key features include an `asChild` prop, which allows the button to render as its child element (e.g., a link or a custom element) while retaining button styling. It also has a `loading` prop, which displays a loading indicator, disables interaction, and sets `aria-busy` for accessibility. Common use cases involve form submissions, initiating processes, confirming choices, and interactive elements where a clear call to action is needed.",
+    "variantDescriptions": "{\"variant\": {\"default\": \"The primary button style for general actions and calls to action.\", \"destructive\": \"Used for actions that are potentially dangerous, irreversible, or require a strong warning.\", \"outline\": \"A button with a clear border and transparent background, often for secondary actions or when less emphasis is needed.\", \"secondary\": \"A less prominent button style, suitable for supplementary actions or lower-priority functions.\", \"ghost\": \"A minimalist button style with no background or border, often used for subtle actions or within content.\", \"link\": \"A button styled as a text link, suitable for navigation within content or when a button should visually resemble a hyperlink.\"}, \"size\": {\"default\": \"Standard button size for most use cases, balancing prominence and space efficiency.\", \"sm\": \"A smaller button, useful in compact user interfaces or for less prominent actions to save space.\", \"lg\": \"A larger button, designed for primary calls to action or to increase prominence and target area.\", \"icon\": \"A square button designed to exclusively contain an icon, typically for single, unambiguous actions like ",
     "guidance": {
-      "whenToUse": "Use when an interactive element is needed to trigger an action, submit a form, or navigate to a new page. Ideal for primary, secondary, and destructive actions within an application. Leverage the `asChild` prop to style links or other elements as buttons.",
       "patterns": [
         "button",
-        "form-control",
         "async-action",
-        "composition",
+        "form-control",
         "navigation",
+        "composition",
         "primitive-based"
       ],
-      "accessibility": "The button automatically handles `aria-busy` when in a `loading` state, indicating its non-interactive status to assistive technologies. When using the `asChild` prop, ensure the underlying child element (e.g., `<a>`, `<Link>`) provides its own appropriate accessibility attributes (e.g., `href`, `role`, `aria-label`) to maintain semantic correctness. Standard keyboard navigation (Tab, Enter, Space) and click interactions are fully supported.",
-      "whenNotToUse": "Do not use for purely decorative elements or static text. If an element's primary purpose is just display rather than interaction, consider a simple link, paragraph, or div. Avoid overusing many different button variants on a single screen, which can confuse users.",
-      "relatedComponents": ["Link", "Input", "Form"]
+      "relatedComponents": [
+        "Input",
+        "Form",
+        "Dialog",
+        "AlertDialog",
+        "DropdownMenu",
+        "Link"
+      ],
+      "whenNotToUse": "Avoid using buttons for purely decorative purposes or as headings. If an element's primary function is solely to display static information or is purely navigational to an internal page without triggering an action, consider using a standard `Link` component or plain text instead. Do not use buttons for complex nested interactive elements where a `DropdownMenu` or `ContextMenu` might be more appropriate.",
+      "whenToUse": "Use buttons to initiate immediate actions, submit forms, or trigger interactive events. They are ideal for confirming choices, advancing workflows, or toggling UI states. The `asChild` prop makes them suitable for rendering semantic elements like links or custom components while maintaining button aesthetics and interaction patterns. Use different `variant` and `size` props to convey hierarchy and importance of actions.",
+      "accessibility": "When the `loading` prop is true, the button is automatically disabled and sets `aria-busy='true'`, informing assistive technologies of its temporary state. The `asChild` prop is crucial for accessibility when rendering a button semantically as a different element (e.g., an `<a>` tag), ensuring correct native element behavior and keyboard navigation. Ensure sufficient contrast for all button variants to meet WCAG guidelines. All buttons should have an accessible name, either from their text content or an `aria-label` attribute for icon-only buttons."
     },
     "examples": {
-      "common": [],
       "minimal": {
-        "description": "A basic button with default styling.",
-        "code": "<Button>Click Me</Button>",
+        "code": "<Button>Click me</Button>",
+        "description": "A standard button with default variant and size.",
         "title": "Basic Button"
       },
-      "advanced": []
-    },
-    "tier": "free",
-    "tokens": [
-      "color-primary",
-      "color-secondary",
-      "color-destructive",
-      "spacing-sm",
-      "spacing-md",
-      "spacing-lg",
-      "font-size-button",
-      "border-radius-default"
-    ],
-    "minimalExample": "<Button />",
-    "variantDescriptions": "{\"variant\": {\"default\": \"Primary button for general actions and positive confirmations.\", \"destructive\": \"Red-themed button for dangerous or irreversible actions like deletion.\", \"outline\": \"Button with a visible border, suitable for secondary actions or less emphasized interactions.\", \"secondary\": \"Subtle button with a distinct background, for less prominent actions.\", \"ghost\": \"Transparent button with minimal visual impact, often used for tertiary actions or within toolbars.\", \"link\": \"Button styled as a text link, retaining button semantics but appearing as inline text.\"}, \"size\": {\"default\": \"Standard size button for most common use cases.\", \"sm\": \"Small size button, useful for compact interfaces or less critical actions.\", \"lg\": \"Large size button, for primary calls to action or increased prominence.\", \"icon\": \"Square button designed to exclusively contain an icon, often used for toolbar actions or compact controls.\"}}",
-    "description": "A versatile button component for triggering user actions, form submissions, and navigation, offering various visual styles and loading states."
+      "common": [
+        {
+          "code": "<Button loading>Submitting...</Button>",
+          "description": "Demonstrates a button in a loading state, which disables interaction and shows a spinner. It also sets `aria-busy`.",
+          "title": "Button with Loading State"
+        },
+        {
+          "title": "Button as a Link",
+          "code": "<Button asChild>\n  <a href=\"/dashboard\">Go to Dashboard</a>\n</Button>",
+          "description": "Shows how to render the button as an `<a>` element using `asChild` for semantic navigation while retaining button styles."
+        },
+        {
+          "title": "Destructive Button",
+          "description": "An example of a button using the 'destructive' variant for critical or dangerous actions.",
+          "code": "<Button variant=\"destructive\">Delete Account</Button>"
+        },
+        {
+          "title": "Icon Button (Small)",
+          "code": "<Button size=\"icon\">\n  <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg>\n</Button>",
+          "description": "A compact button designed to contain only an icon, typically for single, clear actions like 'next' or 'close'."
+        }
+      ]
+    }
   },
-  "recordedAt": "2026-01-27T11:54:51.772Z",
+  "recordedAt": "2026-01-31T20:52:52.667Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "7d5a416b20f4db37a793b10c1f2122678243ebf17f3ef37840ad253cfd8ff223",
+  "inputHash": "d56470537a8a9877e54b79ca114cbbe753fe10e1dd3341c409a32ed1c17dec2b",
   "promptSummary": "Generate metadata for Button component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Button\n\nProps:\n- asChild: boolean - When true, the button will render as its child element..."
 }

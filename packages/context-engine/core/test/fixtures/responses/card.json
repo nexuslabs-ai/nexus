@@ -2,38 +2,41 @@
   "componentName": "Card",
   "response": {
     "guidance": {
-      "whenNotToUse": "Avoid using Card for simple inline text or when a more lightweight visual grouping (e.g., a div with padding) is sufficient. Do not use as a primary layout structure when a grid or flexbox layout is more appropriate for overall page arrangement. Alternatives: semantic HTML elements, grid layouts, or simple divs for less complex content grouping.",
-      "patterns": ["container", "data-display", "layout", "composition"],
-      "relatedComponents": ["Button", "Image", "Text", "Heading", "Link"],
-      "accessibility": "Ensure all content within the Card is accessible and follows appropriate ARIA roles if the Card itself acts as a landmark or interactive element. For purely presentational cards, standard HTML semantics are usually sufficient. If the card is clickable or interactive, use appropriate interactive roles like `role='button'` or `role='link'` on the interactive elements within it, rather than on the card container itself. Headings should be used to provide structure within the card content.",
-      "whenToUse": "Use the Card component to visually group related information, present individual pieces of content, or highlight specific sections within a layout. Ideal for displaying heterogeneous content like user profiles, product listings, articles, or settings."
+      "patterns": ["container", "data-display", "composition", "layout"],
+      "whenToUse": "Use the Card component when you need to group related content and actions into a distinct visual unit, display individual pieces of information (e.g., product details, news articles), or create a clear separation between different sections of content on a page. It's also suitable for providing a container for interactive elements like forms or action buttons.",
+      "whenNotToUse": "Do not use a Card for very simple, inline content that doesn't require visual separation. A standard `div` or `span` would be more appropriate. Avoid using Cards as primary page layouts or for complex data tables that require specific grid structures. Also, do not use it for navigation menus unless the card itself represents a single navigational item.",
+      "accessibility": "Ensure that content within the Card maintains proper semantic structure (e.g., headings, paragraphs, lists). If the Card itself is interactive (e.g., a clickable card that navigates to a new page), ensure it is focusable via keyboard and has an appropriate ARIA role such as `role=\"link\"` or `role=\"button\"`, with an accessible name. For non-interactive cards that merely group content, no specific ARIA role is typically needed, but ensure content inside is accessible.",
+      "relatedComponents": ["Button", "Image", "Text", "Heading", "Link"]
     },
-    "description": "A versatile container for grouping related content and actions, providing visual separation and organization.",
-    "tier": "free",
-    "semanticDescription": "The Card component serves as a flexible and self-contained container for displaying distinct pieces of information or interactive elements. It's designed to help organize content visually, making complex UIs easier to digest. Key features include its ability to encapsulate various content types like text, images, and actions, providing clear visual boundaries and a sense of hierarchy. Cards are commonly used in dashboards, product listings, news feeds, and profiles to present individual items with a consistent look and feel, promoting readability and user engagement. They are highly adaptable and can be customized in terms of padding, shadow, border, and background to fit diverse design requirements.",
+    "description": "The Card component is a flexible container used to group related content and actions into a visually distinct block. It helps organize information, improve readability, and create a clear visual hierarchy on a page. Cards are ideal for displaying individual pieces of information, such as product listings, user profiles, articles, or any content that benefits from being presented as a self-contained unit.",
     "examples": {
-      "common": [],
       "minimal": {
-        "code": "<Card />",
-        "description": "A simple card with default styling.",
-        "title": "Basic Card"
+        "title": "Basic Card",
+        "description": "A minimal example of a Card displaying plain text content.",
+        "code": "<Card><p>This is a simple card with basic content.</p></Card>"
       },
-      "advanced": []
-    },
-    "tokens": [
-      "spacing-sm",
-      "spacing-md",
-      "border-radius-md",
-      "color-background-default",
-      "shadow-sm",
-      "padding-sm",
-      "padding-md"
-    ],
-    "minimalExample": "<Card />"
+      "common": [
+        {
+          "code": "<Card><h2>Card Title</h2><p>Here is some descriptive content for the card. It explains what this card is about.</p></Card>",
+          "title": "Card with Heading and Paragraph",
+          "description": "A common use case demonstrating a Card with a clear heading and supporting paragraph text."
+        },
+        {
+          "description": "A Card presenting an image, a brief description, and a call-to-action button, often used for promotional content or feature highlights.",
+          "title": "Card with Image and Action Button",
+          "code": "<Card><img src=\"/placeholder-image.jpg\" alt=\"Placeholder Image\" style={{ width: '100%', height: 'auto' }} /><p>Explore this exciting feature!</p><button>Learn More</button></Card>"
+        },
+        {
+          "code": "<Card><h3>Login</h3><form><input type=\"text\" placeholder=\"Username\" /><input type=\"password\" placeholder=\"Password\" /><button type=\"submit\">Login</button></form></Card>",
+          "title": "Card as a Form Container",
+          "description": "Using a Card to visually group and contain form elements, providing a distinct boundary for user input."
+        }
+      ]
+    }
   },
-  "recordedAt": "2026-01-27T11:55:05.379Z",
+  "recordedAt": "2026-01-31T20:22:34.141Z",
   "provider": "gemini",
   "model": "gemini-2.5-flash",
-  "inputHash": "2dbe4d1def65a3f1a695e3638ea619d331eb7c5ea7c3e670c2bf69ec8761122a",
+  "inputHash": "6e2ad8238e13a29976204c6bb5bc220e22e770d7c5619010f306d68c1c101163",
   "promptSummary": "Generate metadata for Card component. Prompt: Analyze this react component and generate metadata using the generate_component_metadata tool.\n\n## Component: Card\n\nProps: None extracted\n\nNPM Dependencies: @/lib\n\n## Pattern Reference\n\nValid patterns..."
 }
