@@ -46,6 +46,11 @@
       "types": "./dist/processor/index.d.ts",
       "import": "./dist/processor/index.js",
       "require": "./dist/processor/index.cjs"
+    },
+    "./pipeline": {
+      "types": "./dist/pipeline/index.d.ts",
+      "import": "./dist/pipeline/index.js",
+      "require": "./dist/pipeline/index.cjs"
     }
   },
   "scripts": {
@@ -53,16 +58,12 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
-    "typecheck:tests": "tsc --noEmit --project tsconfig.test.json",
-    "lint": "eslint src/ test/ --ext .ts",
-    "test": "USE_CACHED=true vitest run",
-    "test:watch": "USE_CACHED=true vitest",
-    "test:ui": "USE_CACHED=true vitest --ui",
-    "test:real": "vitest run test/integration/real-llm.test.ts",
-    "test:validate": "VALIDATE_LLM=true vitest run test/integration/real-llm.test.ts",
-    "record:responses": "tsx scripts/record-responses.ts",
-    "record:manifests": "tsx scripts/record-manifests.ts",
-    "record:all": "tsx scripts/record-responses.ts && tsx scripts/record-manifests.ts"
+    "lint": "eslint src/ --ext .ts",
+    "pipeline": "tsx scripts/run-pipeline.ts",
+    "pipeline:help": "tsx scripts/run-pipeline.ts --help",
+    "extract": "tsx scripts/run-pipeline.ts --phase extract",
+    "generate": "tsx scripts/run-pipeline.ts --phase generate",
+    "manifest": "tsx scripts/run-pipeline.ts --phase build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",

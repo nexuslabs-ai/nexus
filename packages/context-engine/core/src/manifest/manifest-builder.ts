@@ -836,48 +836,4 @@ export class ManifestBuilder {
       ...(updates.version && { version: updates.version }),
     };
   }
-
-  /**
-   * Create a minimal manifest for cases where generation fails
-   *
-   * Uses extracted data with placeholder meta values.
-   * Useful for fallback scenarios where we want to store extraction
-   * results even if LLM generation fails.
-   *
-   * @param input - Partial input with extraction data
-   * @returns Minimal manifest or failure
-   */
-  buildMinimal({
-    orgId,
-    identity,
-    extracted,
-    sourceHash,
-    version = '0.0.1',
-    name,
-  }: Omit<ManifestBuilderInput, 'meta'> & {
-    name: string;
-  }): ManifestBuilderOutput {
-    // Create placeholder meta from extracted data
-    const placeholderMeta = {
-      name,
-      description: extracted.sourceDescription || `${name} component`,
-      ai: {
-        semanticDescription:
-          extracted.sourceDescription ||
-          `A ${name} component for the design system.`,
-        patterns: [] as string[],
-        examples: [] as string[],
-        relatedComponents: extracted.internalDependencies,
-      },
-    };
-
-    return this.build({
-      orgId,
-      identity,
-      extracted,
-      meta: placeholderMeta,
-      sourceHash,
-      version,
-    });
-  }
 }

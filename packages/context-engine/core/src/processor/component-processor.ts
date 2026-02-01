@@ -8,7 +8,7 @@
  *
  * Supports two API patterns:
  * - Combined: process() for single-call extraction + generation
- * - Two-Phase: extractOnly() + generateOnly() for split operations
+ * - Two-Phase: extract() + generate() + build() for split operations
  */
 
 import {
@@ -35,15 +35,20 @@ import {
   type ManifestBuilderFailure,
   type ManifestBuilderInput,
   type ManifestBuilderOutput,
+  ManifestBuildOutputType,
 } from '../manifest/index.js';
 import type { Framework } from '../types/index.js';
 import { createLogger } from '../utils/logger.js';
 
 import {
-  type ExtractOnlyFailure,
-  type ExtractOnlyOutput,
-  type ExtractOnlySuccess,
-  type GenerateOnlyInput,
+  type BuildInput,
+  type ExtractFailure,
+  type ExtractOutput,
+  type ExtractSuccess,
+  type GenerateFailure,
+  type GenerateInput,
+  type GenerateOutput,
+  type GenerateSuccess,
   type ProcessorConfig,
   ProcessorErrorCode,
   type ProcessorFailure,
@@ -67,6 +72,10 @@ const logger = createLogger({ name: 'component-processor' });
  * - MetaGenerator: Generates semantic metadata using LLM
  * - ManifestBuilder: Combines extraction and generation into a complete manifest
  *
+ * API Patterns:
+ * - Combined: process() for single-call extraction + generation
+ * - Two-Phase: extract() + generate() + build() for split operations
+ *
  * @example
  * ```typescript
  * // Full pipeline
@@ -82,12 +91,23 @@ const logger = createLogger({ name: 'component-processor' });
  * }
  *
  * // Two-phase API
- * const extractResult = await processor.extractOnly(input);
+ * const extractResult = await processor.extract(input);
  * if (extractResult.type === 'success') {
- *   const generateResult = await processor.generateOnly({
- *     ...extractResult,
- *     orgId: 'org-uuid',
+ *   const genResult = await processor.generate({
+ *     orgId: input.orgId,
+ *     identity: extractResult.identity,
+ *     extracted: extractResult.extracted,
+ *     sourceHash: extractResult.sourceHash,
  *   });
+ *   if (genResult.type === 'success') {
+ *     const buildResult = processor.build({
+ *       orgId: input.orgId,
+ *       identity: extractResult.identity,
+ *       extracted: extractResult.extracted,
+ *       meta: genResult.meta,
+ *       sourceHash: extractResult.sourceHash,
+ *     });
+ *   }
  * }
  * ```
  */
@@ -122,7 +142,6 @@ export class ComponentProcessor {
     });
 
     logger.debug('ComponentProcessor initialized', {
-      skipGeneration: config.skipGeneration ?? false,
       hasCustomProvider: !!config.llmProvider,
       availableComponentsCount: config.availableComponents?.length,
       hasExtractorOptions: !!config.extractorOptions,
@@ -149,7 +168,6 @@ export class ComponentProcessor {
       orgId: input.orgId,
       name: input.name,
       framework,
-      skipGeneration: this.config.skipGeneration ?? false,
     });
 
     // Step 1: Extract
@@ -164,31 +182,26 @@ export class ComponentProcessor {
 
     const extraction = extractionResult.output;
 
-    // Step 2: Generate (or skip)
-    let generationResult: GeneratorOutput | null = null;
-    let generationSkipped = false;
-
-    if (this.config.skipGeneration) {
-      generationSkipped = true;
-      logger.debug('Skipping meta generation (configured to skip)');
-    } else {
-      generationResult = await this.runGeneration(input, extraction, framework);
-      if (isGeneratorFailure(generationResult)) {
-        return this.handleGenerationFailure(
-          generationResult,
-          extraction,
-          extractionResult.timeMs,
-          startTime
-        );
-      }
+    // Step 2: Generate
+    const generationResult = await this.runGeneration(
+      input,
+      extraction,
+      framework
+    );
+    if (isGeneratorFailure(generationResult)) {
+      return this.handleGenerationFailure(
+        generationResult,
+        extraction,
+        extractionResult.timeMs,
+        startTime
+      );
     }
 
     // Step 3: Build Manifest
     const buildResult = this.runManifestBuild(
       input,
       extraction,
-      generationResult,
-      generationSkipped
+      generationResult
     );
     if (isManifestBuildFailure(buildResult)) {
       return this.handleBuildFailure(
@@ -203,10 +216,9 @@ export class ComponentProcessor {
     // Success
     const totalTimeMs = Math.round(performance.now() - startTime);
 
-    const generationTimeMs =
-      generationResult && isGeneratorSuccess(generationResult)
-        ? generationResult.generationTimeMs
-        : undefined;
+    const generationTimeMs = isGeneratorSuccess(generationResult)
+      ? generationResult.generationTimeMs
+      : undefined;
 
     logger.info('Component processing completed', {
       id: buildResult.manifest.id,
@@ -214,7 +226,6 @@ export class ComponentProcessor {
       totalTimeMs,
       extractionTimeMs: extractionResult.timeMs,
       generationTimeMs,
-      generationSkipped,
     });
 
     const success: ProcessorSuccess = {
@@ -231,7 +242,6 @@ export class ComponentProcessor {
         fallbackReason: extraction.fallbackReason,
         extractionMethod: extraction.extractionMethod,
       },
-      generationSkipped,
     };
 
     return success;
@@ -242,18 +252,34 @@ export class ComponentProcessor {
   // ===========================================================================
 
   /**
-   * Extract only (Phase 1 of two-phase API)
+   * Extract component metadata without LLM generation.
    *
-   * Performs fast code extraction without LLM generation.
-   * Returns extraction result that can be passed to generateOnly().
+   * This is Phase 1 of the two-phase API. Use this when you want to:
+   * - Extract metadata quickly without waiting for LLM
+   * - Store extraction results for later generation
+   * - Batch extractions before running generation
    *
    * @param input - Processing input with source code
-   * @returns ExtractOnlyOutput with success or failure result
+   * @returns ExtractOutput with success or failure result
+   *
+   * @example
+   * ```typescript
+   * const extractResult = await processor.extract(input);
+   * if (extractResult.type === 'success') {
+   *   // Later: run generation
+   *   const genResult = await processor.generate({
+   *     orgId: input.orgId,
+   *     identity: extractResult.identity,
+   *     extracted: extractResult.extracted,
+   *     sourceHash: extractResult.sourceHash,
+   *   });
+   * }
+   * ```
    */
-  async extractOnly(input: ProcessorInput): Promise<ExtractOnlyOutput> {
+  async extract(input: ProcessorInput): Promise<ExtractOutput> {
     const framework = input.framework ?? 'react';
 
-    logger.info('Starting extract-only', {
+    logger.info('Starting extraction', {
       orgId: input.orgId,
       name: input.name,
       framework,
@@ -262,7 +288,7 @@ export class ComponentProcessor {
     const extractionResult = await this.runExtraction(input, framework);
 
     if (isExtractionFailure(extractionResult.output)) {
-      const failure: ExtractOnlyFailure = {
+      const failure: ExtractFailure = {
         type: ProcessorOutputType.Failure,
         error: extractionResult.output.error,
         code: ProcessorErrorCode.ExtractionFailed,
@@ -274,14 +300,14 @@ export class ComponentProcessor {
 
     const extraction = extractionResult.output;
 
-    logger.info('Extract-only completed', {
+    logger.info('Extraction completed', {
       id: extraction.identity.id,
       name: extraction.identity.name,
       extractionTimeMs: extractionResult.timeMs,
       fallbackTriggered: extraction.fallbackTriggered,
     });
 
-    const success: ExtractOnlySuccess = {
+    const success: ExtractSuccess = {
       type: ProcessorOutputType.Success,
       id: extraction.identity.id,
       slug: extraction.identity.slug,
@@ -300,24 +326,44 @@ export class ComponentProcessor {
   }
 
   /**
-   * Generate only (Phase 2 of two-phase API)
+   * Generate LLM metadata from extraction results.
    *
-   * Performs LLM generation and manifest building using prior extraction result.
-   * Requires output from extractOnly().
+   * This is Phase 2 of the two-phase API. Use after extract() to:
+   * - Add semantic descriptions and patterns
+   * - Generate usage examples
+   * - Enrich metadata with AI insights
    *
-   * @param input - Generation input with extracted data
-   * @returns ProcessorOutput with success or failure result
+   * Returns only the generation result (not a manifest). Use build()
+   * to combine extraction and generation into a complete manifest.
+   *
+   * @param input - Generation input with extracted data from extract()
+   * @returns GenerateOutput with success or failure result
+   *
+   * @example
+   * ```typescript
+   * const genResult = await processor.generate(input);
+   * if (genResult.type === 'success') {
+   *   // Build the final manifest
+   *   const buildResult = processor.build({
+   *     orgId: input.orgId,
+   *     identity: extractResult.identity,
+   *     extracted: extractResult.extracted,
+   *     meta: genResult.meta,
+   *     sourceHash: extractResult.sourceHash,
+   *   });
+   * }
+   * ```
    */
-  async generateOnly(input: GenerateOnlyInput): Promise<ProcessorOutput> {
+  async generate(input: GenerateInput): Promise<GenerateOutput> {
     const startTime = performance.now();
 
-    logger.info('Starting generate-only', {
+    logger.info('Starting generation', {
       orgId: input.orgId,
       name: input.identity.name,
       framework: input.identity.framework,
     });
 
-    // Run generation
+    // Build generator input
     const generatorInput: GeneratorInput = {
       orgId: input.orgId,
       name: input.identity.name,
@@ -326,185 +372,97 @@ export class ComponentProcessor {
       hints: input.hints,
     };
 
+    // Run generation
     const genResult = await this.metaGenerator.generate(generatorInput);
+    const generationTimeMs = Math.round(performance.now() - startTime);
 
     if (isGeneratorFailure(genResult)) {
-      const totalTimeMs = Math.round(performance.now() - startTime);
-
-      logger.error('Generate-only failed', new Error(genResult.error), {
+      logger.error('Generation failed', new Error(genResult.error), {
         name: input.identity.name,
       });
 
-      const failure: ProcessorFailure = {
+      const failure: GenerateFailure = {
         type: ProcessorOutputType.Failure,
         error: genResult.error,
-        code: ProcessorErrorCode.GenerationFailed,
-        metrics: {
-          generationTimeMs: genResult.generationTimeMs,
-          totalTimeMs,
-        },
+        generationTimeMs,
         retryable: genResult.retryable,
       };
 
       return failure;
     }
 
-    // Build manifest
-    const builderInput: ManifestBuilderInput = {
-      orgId: input.orgId,
-      identity: input.identity,
-      extracted: input.extracted,
-      meta: genResult.meta,
-      sourceHash: input.sourceHash,
-      version: input.version,
-    };
-
-    const buildResult = this.manifestBuilder.build(builderInput);
-
-    if (isManifestBuildFailure(buildResult)) {
-      const totalTimeMs = Math.round(performance.now() - startTime);
-
-      logger.error(
-        'Generate-only manifest build failed',
-        new Error(buildResult.error),
-        {
-          name: input.identity.name,
-          field: buildResult.field,
-        }
-      );
-
-      const failure: ProcessorFailure = {
-        type: ProcessorOutputType.Failure,
-        error: buildResult.error,
-        code: ProcessorErrorCode.ManifestBuildFailed,
-        metrics: {
-          generationTimeMs: genResult.generationTimeMs,
-          totalTimeMs,
-        },
-        retryable: false,
-      };
-
-      return failure;
-    }
-
-    const totalTimeMs = Math.round(performance.now() - startTime);
-
-    logger.info('Generate-only completed', {
-      id: buildResult.manifest.id,
-      name: buildResult.manifest.name,
-      generationTimeMs: genResult.generationTimeMs,
-      totalTimeMs,
+    logger.info('Generation completed', {
+      name: input.identity.name,
+      generationTimeMs,
+      provider: genResult.provider,
+      model: genResult.model,
     });
 
-    const success: ProcessorSuccess = {
+    const success: GenerateSuccess = {
       type: ProcessorOutputType.Success,
-      output: buildResult.output,
-      manifest: buildResult.manifest,
-      metrics: {
-        generationTimeMs: genResult.generationTimeMs,
-        totalTimeMs,
-      },
-      extraction: input.extraction ?? {
-        fallbackTriggered: false,
-        fallbackReason: undefined,
-        extractionMethod: 'unknown',
-      },
-      generationSkipped: false,
+      meta: genResult.meta,
+      generationTimeMs,
+      provider: genResult.provider,
+      model: genResult.model,
     };
 
     return success;
   }
 
   /**
-   * Process without LLM generation (extraction + minimal manifest)
+   * Build manifest from extraction and generation results.
    *
-   * Convenience method that extracts and builds a minimal manifest
-   * without calling the LLM. Useful for testing or fallback scenarios.
+   * This is the final phase that combines extracted data with
+   * LLM-generated metadata into a complete ComponentManifest.
    *
-   * @param input - Processing input with source code
-   * @returns ProcessorOutput with minimal manifest
+   * @param input - Build input with extraction and generation results
+   * @returns ManifestBuilderOutput with success or failure result
+   *
+   * @example
+   * ```typescript
+   * const buildResult = processor.build({
+   *   orgId: 'org-123',
+   *   identity: extractResult.identity,
+   *   extracted: extractResult.extracted,
+   *   meta: genResult.meta,
+   *   sourceHash: extractResult.sourceHash,
+   * });
+   *
+   * if (buildResult.type === 'success') {
+   *   console.log(buildResult.manifest);
+   * }
+   * ```
    */
-  async processWithoutGeneration(
-    input: ProcessorInput
-  ): Promise<ProcessorOutput> {
-    const startTime = performance.now();
-    const framework = input.framework ?? 'react';
-
-    logger.info('Starting processing without generation', {
+  build(input: BuildInput): ManifestBuilderOutput {
+    logger.info('Building manifest', {
       orgId: input.orgId,
-      name: input.name,
-      framework,
+      name: input.identity.name,
     });
 
-    // Extract
-    const extractionResult = await this.runExtraction(input, framework);
-    if (isExtractionFailure(extractionResult.output)) {
-      return this.handleExtractionFailure(
-        extractionResult.output,
-        extractionResult.timeMs,
-        startTime
-      );
-    }
-
-    const extraction = extractionResult.output;
-
-    // Build minimal manifest (no generation)
-    const buildResult = this.manifestBuilder.buildMinimal({
+    const builderInput: ManifestBuilderInput = {
       orgId: input.orgId,
-      identity: extraction.identity,
-      extracted: extraction.data,
-      sourceHash: extraction.sourceHash,
+      identity: input.identity,
+      extracted: input.extracted,
+      meta: input.meta,
+      sourceHash: input.sourceHash,
       version: input.version,
-      name: input.name,
-    });
-
-    if (isManifestBuildFailure(buildResult)) {
-      const totalTimeMs = Math.round(performance.now() - startTime);
-
-      const failure: ProcessorFailure = {
-        type: ProcessorOutputType.Failure,
-        error: buildResult.error,
-        code: ProcessorErrorCode.ManifestBuildFailed,
-        metrics: {
-          extractionTimeMs: extractionResult.timeMs,
-          totalTimeMs,
-        },
-        extraction: {
-          fallbackTriggered: extraction.fallbackTriggered,
-          fallbackReason: extraction.fallbackReason,
-          extractionMethod: extraction.extractionMethod,
-        },
-        retryable: false,
-      };
-
-      return failure;
-    }
-
-    const totalTimeMs = Math.round(performance.now() - startTime);
-
-    logger.info('Processing without generation completed', {
-      id: buildResult.manifest.id,
-      name: buildResult.manifest.name,
-      totalTimeMs,
-    });
-
-    const success: ProcessorSuccess = {
-      type: ProcessorOutputType.Success,
-      output: buildResult.output,
-      manifest: buildResult.manifest,
-      metrics: {
-        extractionTimeMs: extractionResult.timeMs,
-        totalTimeMs,
-      },
-      extraction: {
-        fallbackTriggered: extraction.fallbackTriggered,
-        fallbackReason: extraction.fallbackReason,
-        extractionMethod: extraction.extractionMethod,
-      },
-      generationSkipped: true,
     };
 
-    return success;
+    const result = this.manifestBuilder.build(builderInput);
+
+    if (isManifestBuildFailure(result)) {
+      logger.error('Manifest build failed', new Error(result.error), {
+        name: input.identity.name,
+        field: result.field,
+      });
+    } else {
+      logger.info('Manifest built successfully', {
+        id: result.manifest.id,
+        name: result.manifest.name,
+      });
+    }
+
+    return result;
   }
 
   // ===========================================================================
@@ -601,27 +559,20 @@ export class ComponentProcessor {
 
   /**
    * Run manifest build phase
+   *
+   * Requires valid generation result - no silent fallbacks.
    */
   private runManifestBuild(
     input: ProcessorInput,
     extraction: ExtractorResult,
-    generationResult: GeneratorOutput | null,
-    generationSkipped: boolean
+    generationResult: GeneratorOutput
   ): ManifestBuilderOutput {
-    // If generation was skipped, build minimal manifest
-    if (
-      generationSkipped ||
-      !generationResult ||
-      isGeneratorFailure(generationResult)
-    ) {
-      return this.manifestBuilder.buildMinimal({
-        orgId: input.orgId,
-        identity: extraction.identity,
-        extracted: extraction.data,
-        sourceHash: extraction.sourceHash,
-        version: input.version,
-        name: input.name,
-      });
+    // Generation must be successful at this point
+    if (isGeneratorFailure(generationResult)) {
+      return {
+        type: ManifestBuildOutputType.Failure,
+        error: `Generation failed: ${generationResult.error}. LLM generation is required for manifest building.`,
+      };
     }
 
     // Build full manifest with generated meta

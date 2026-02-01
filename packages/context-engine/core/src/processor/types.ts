@@ -2,7 +2,7 @@
  * Processor Types
  *
  * Types for the ComponentProcessor that orchestrates the full pipeline:
- * Extract -> Generate (optional) -> Build Manifest
+ * Extract -> Generate -> Build Manifest
  *
  * Uses discriminated unions for type-safe success/failure handling.
  */
@@ -11,6 +11,7 @@ import type { HybridExtractorOptions } from '../extractor/index.js';
 import type { ILLMProvider } from '../generator/types.js';
 import type {
   ComponentManifest,
+  ComponentMeta,
   ExtractedData,
   Framework,
   ManifestIdentity,
@@ -45,13 +46,6 @@ export interface ProcessorConfig {
    * If not provided, defaults to AnthropicProvider.
    */
   llmProvider?: ILLMProvider;
-
-  /**
-   * Skip LLM generation and use minimal/placeholder metadata.
-   * Useful for testing or when LLM is unavailable.
-   * @default false
-   */
-  skipGeneration?: boolean;
 
   /**
    * Maximum tokens for LLM generation.
@@ -156,40 +150,6 @@ export interface ProcessorInput {
   hints?: string;
 }
 
-/**
- * Input for the generate-only phase (Phase 2 of two-phase API)
- *
- * Requires extraction result from a prior extractOnly call.
- */
-export interface GenerateOnlyInput {
-  /** Organization ID */
-  orgId: string;
-
-  /** Component identity from extraction */
-  identity: ManifestIdentity;
-
-  /** Extracted data from extraction phase */
-  extracted: ExtractedData;
-
-  /** Source hash from extraction phase */
-  sourceHash: string;
-
-  /** Component version */
-  version?: string;
-
-  /**
-   * Extraction metadata from prior extractOnly call.
-   * Used to preserve fallback info in the final output.
-   */
-  extraction?: ExtractionMetadata;
-
-  /**
-   * Optional hints to guide LLM generation.
-   * Provides additional context about the component beyond what's extracted from code.
-   */
-  hints?: string;
-}
-
 // =============================================================================
 // Output Types (Discriminated Unions)
 // =============================================================================
@@ -240,9 +200,6 @@ export interface ProcessorSuccess {
 
   /** Extraction metadata */
   extraction: ExtractionMetadata;
-
-  /** Whether generation was skipped (minimal meta used) */
-  generationSkipped: boolean;
 }
 
 /**
@@ -274,64 +231,6 @@ export interface ProcessorFailure {
  * Processor output union
  */
 export type ProcessorOutput = ProcessorSuccess | ProcessorFailure;
-
-// =============================================================================
-// Extract-Only Output Types
-// =============================================================================
-
-/**
- * Successful extract-only output
- */
-export interface ExtractOnlySuccess {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Success;
-
-  /** Component ID (generated or existing) */
-  id: string;
-
-  /** Component slug */
-  slug: string;
-
-  /** Component identity for generate phase */
-  identity: ManifestIdentity;
-
-  /** Extracted data */
-  extracted: ExtractedData;
-
-  /** Source hash for change detection */
-  sourceHash: string;
-
-  /** Extraction metadata */
-  extraction: ExtractionMetadata;
-
-  /** Extraction timing */
-  extractionTimeMs: number;
-}
-
-/**
- * Failed extract-only output
- */
-export interface ExtractOnlyFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /** Error code */
-  code: ProcessorErrorCode;
-
-  /** Source hash (for conflict errors) */
-  sourceHash?: string;
-
-  /** Whether the error is retryable */
-  retryable: boolean;
-}
-
-/**
- * Extract-only output union
- */
-export type ExtractOnlyOutput = ExtractOnlySuccess | ExtractOnlyFailure;
 
 // =============================================================================
 // Error Codes
@@ -382,20 +281,224 @@ export function isProcessorFailure(
   return output.type === ProcessorOutputType.Failure;
 }
 
+// =============================================================================
+// Extraction Phase Types
+// =============================================================================
+
 /**
- * Check if extract-only output is successful
+ * Successful extraction output
  */
-export function isExtractOnlySuccess(
-  output: ExtractOnlyOutput
-): output is ExtractOnlySuccess {
+export interface ExtractSuccess {
+  /** Discriminant for type narrowing */
+  type: typeof ProcessorOutputType.Success;
+
+  /** Component ID (generated or existing) */
+  id: string;
+
+  /** Component slug */
+  slug: string;
+
+  /** Component identity for generate phase */
+  identity: ManifestIdentity;
+
+  /** Extracted data */
+  extracted: ExtractedData;
+
+  /** Source hash for change detection */
+  sourceHash: string;
+
+  /** Extraction metadata */
+  extraction: ExtractionMetadata;
+
+  /** Extraction timing */
+  extractionTimeMs: number;
+}
+
+/**
+ * Failed extraction output
+ */
+export interface ExtractFailure {
+  /** Discriminant for type narrowing */
+  type: typeof ProcessorOutputType.Failure;
+
+  /** Error message */
+  error: string;
+
+  /** Error code */
+  code: ProcessorErrorCode;
+
+  /** Source hash (for conflict errors) */
+  sourceHash?: string;
+
+  /** Whether the error is retryable */
+  retryable: boolean;
+}
+
+/**
+ * Extraction output union
+ */
+export type ExtractOutput = ExtractSuccess | ExtractFailure;
+
+// =============================================================================
+// Generation Phase Types
+// =============================================================================
+
+/**
+ * Input for the generate phase (Phase 2 of two-phase API)
+ *
+ * Requires extraction result from a prior extract call.
+ */
+export interface GenerateInput {
+  /** Organization ID */
+  orgId: string;
+
+  /** Component identity from extraction */
+  identity: ManifestIdentity;
+
+  /** Extracted data from extraction phase */
+  extracted: ExtractedData;
+
+  /** Source hash from extraction phase */
+  sourceHash: string;
+
+  /** Component version */
+  version?: string;
+
+  /**
+   * Extraction metadata from prior extract call.
+   * Used to preserve fallback info in the final output.
+   */
+  extraction?: ExtractionMetadata;
+
+  /**
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
+   */
+  hints?: string;
+}
+
+// =============================================================================
+// Build Phase Types
+// =============================================================================
+
+/**
+ * Input for build phase.
+ *
+ * Combines extraction and generation results with identity
+ * to produce a complete ComponentManifest.
+ */
+export interface BuildInput {
+  /** Organization ID for multi-org isolation */
+  orgId: string;
+
+  /** Component identity */
+  identity: ManifestIdentity;
+
+  /** Extracted data from extraction phase */
+  extracted: ExtractedData;
+
+  /** Generated metadata from generation phase */
+  meta: ComponentMeta;
+
+  /** Source hash for change detection */
+  sourceHash: string;
+
+  /** Component version */
+  version?: string;
+}
+
+/**
+ * Build phase output.
+ *
+ * Result of combining extraction and generation into a manifest.
+ */
+export type { ManifestBuilderOutput as BuildOutput } from '../manifest/index.js';
+
+/**
+ * Generation phase success output.
+ *
+ * Simplified output containing only the LLM-generated metadata,
+ * without manifest building (which happens in the build phase).
+ */
+export interface GenerateSuccess {
+  /** Discriminant for type narrowing */
+  type: typeof ProcessorOutputType.Success;
+
+  /** Generated component metadata */
+  meta: ComponentMeta;
+
+  /** Generation timing in milliseconds */
+  generationTimeMs: number;
+
+  /** Provider used for generation */
+  provider: string;
+
+  /** Model used for generation */
+  model: string;
+}
+
+/**
+ * Generation phase failure output.
+ *
+ * Represents a failed LLM generation attempt.
+ */
+export interface GenerateFailure {
+  /** Discriminant for type narrowing */
+  type: typeof ProcessorOutputType.Failure;
+
+  /** Error message */
+  error: string;
+
+  /** Generation timing in milliseconds */
+  generationTimeMs: number;
+
+  /** Whether the error is retryable */
+  retryable: boolean;
+}
+
+/**
+ * Generation phase output.
+ *
+ * Discriminated union of generation success or failure.
+ */
+export type GenerateOutput = GenerateSuccess | GenerateFailure;
+
+// =============================================================================
+// Type Guards for Extraction and Generation
+// =============================================================================
+
+/**
+ * Check if extraction output is successful
+ */
+export function isExtractSuccess(
+  output: ExtractOutput
+): output is ExtractSuccess {
   return output.type === ProcessorOutputType.Success;
 }
 
 /**
- * Check if extract-only output is a failure
+ * Check if extraction output is a failure
  */
-export function isExtractOnlyFailure(
-  output: ExtractOnlyOutput
-): output is ExtractOnlyFailure {
+export function isExtractFailure(
+  output: ExtractOutput
+): output is ExtractFailure {
   return output.type === ProcessorOutputType.Failure;
+}
+
+/**
+ * Check if generation output is successful
+ */
+export function isGenerateSuccess(
+  result: GenerateOutput
+): result is GenerateSuccess {
+  return result.type === ProcessorOutputType.Success;
+}
+
+/**
+ * Check if generation output is a failure
+ */
+export function isGenerateFailure(
+  result: GenerateOutput
+): result is GenerateFailure {
+  return result.type === ProcessorOutputType.Failure;
 }

@@ -11,13 +11,39 @@ export {
   createComponentProcessor,
 } from './component-processor.js';
 
+// =============================================================================
 // Types
+// =============================================================================
+
+export type {
+  // Build phase
+  BuildInput,
+  BuildOutput,
+  // Extraction phase
+  ExtractFailure,
+  ExtractOutput,
+  ExtractSuccess,
+  // Generation phase
+  GenerateFailure,
+  GenerateInput,
+  GenerateOutput,
+  GenerateSuccess,
+} from './types.js';
+
+// Type guards
+export {
+  isExtractFailure,
+  isExtractSuccess,
+  isGenerateFailure,
+  isGenerateSuccess,
+} from './types.js';
+
+// =============================================================================
+// Common Types (Shared across APIs)
+// =============================================================================
+
 export type {
   ExtractionMetadata,
-  ExtractOnlyFailure,
-  ExtractOnlyOutput,
-  ExtractOnlySuccess,
-  GenerateOnlyInput,
   ProcessorConfig,
   ProcessorFailure,
   ProcessorInput,
@@ -26,10 +52,8 @@ export type {
   ProcessorSuccess,
 } from './types.js';
 
-// Constants and type guards
+// Constants and common type guards
 export {
-  isExtractOnlyFailure,
-  isExtractOnlySuccess,
   isProcessorFailure,
   isProcessorSuccess,
   ProcessorErrorCode,
