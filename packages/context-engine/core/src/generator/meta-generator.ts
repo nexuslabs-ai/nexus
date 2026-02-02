@@ -28,6 +28,7 @@ import type {
   AIContext,
   ComponentMeta,
   ExtractedData,
+  StructuredExamples,
 } from '../types/index.js';
 import { createProviderFromEnv } from '../utils/env-provider.js';
 import { createLogger } from '../utils/logger.js';
@@ -115,46 +116,38 @@ function buildDefaultSemanticDescription(
 // =============================================================================
 
 /**
- * Extract examples from ComponentMetaTool structured format
+ * Convert LLM tool examples to StructuredExamples format
  *
- * Collects unique code examples from examples.minimal,
- * examples.common, and examples.advanced fields.
+ * Preserves the structured format from the LLM (minimal, common, advanced)
+ * instead of flattening to a string array.
  *
- * Returns empty array if examples are not provided (when Storybook examples
+ * Returns undefined if examples are not provided (when Storybook examples
  * are available, the LLM skips example generation).
- *
- * Uses Set for O(1) deduplication instead of array includes() O(n) checks.
  */
-function extractExamplesFromToolOutput(tool: ComponentMetaTool): string[] {
-  // Handle optional examples - return empty array if not provided
+function convertToolExamples(
+  tool: ComponentMetaTool
+): StructuredExamples | undefined {
   if (!tool.examples) {
-    return [];
+    return undefined;
   }
 
-  const exampleSet = new Set<string>();
-
-  // Add examples from structured format
-  if (tool.examples.minimal?.code) {
-    exampleSet.add(tool.examples.minimal.code);
-  }
-
-  if (tool.examples.common) {
-    for (const ex of tool.examples.common) {
-      if (ex.code) {
-        exampleSet.add(ex.code);
-      }
-    }
-  }
-
-  if (tool.examples.advanced) {
-    for (const ex of tool.examples.advanced) {
-      if (ex.code) {
-        exampleSet.add(ex.code);
-      }
-    }
-  }
-
-  return Array.from(exampleSet);
+  return {
+    minimal: {
+      title: tool.examples.minimal.title,
+      code: tool.examples.minimal.code,
+      description: tool.examples.minimal.description,
+    },
+    common: tool.examples.common.map((ex) => ({
+      title: ex.title,
+      code: ex.code,
+      description: ex.description,
+    })),
+    advanced: tool.examples.advanced?.map((ex) => ({
+      title: ex.title,
+      code: ex.code,
+      description: ex.description,
+    })),
+  };
 }
 
 /**
@@ -196,10 +189,11 @@ function normalizeToolOutputToMeta(
     whenToUse: tool.guidance.whenToUse,
     whenNotToUse: tool.guidance.whenNotToUse,
     patterns,
-    examples: extractExamplesFromToolOutput(tool),
+    examples: convertToolExamples(tool),
     relatedComponents: normalizeArray(tool.guidance.relatedComponents),
     a11yNotes: tool.guidance.accessibility,
     variantDescriptions: tool.variantDescriptions,
+    subComponentVariantDescriptions: tool.subComponentVariantDescriptions,
   };
 
   // Build short description from the first sentence of semanticDescription
@@ -381,7 +375,7 @@ export class MetaGenerator implements IMetaGenerator {
       inputTokens: result.usage?.inputTokens,
       outputTokens: result.usage?.outputTokens,
       patternsCount: meta.ai.patterns.length,
-      examplesCount: meta.ai.examples.length,
+      hasExamples: !!meta.ai.examples,
     });
 
     return {

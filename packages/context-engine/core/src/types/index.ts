@@ -97,7 +97,7 @@ export type {
 
 // Meta types - schemas (values)
 // NOTE: AIContextSchema is exported for generator module internal use.
-// It is NOT part of the final ComponentManifest schema (use GuidanceSchema instead).
+// It is NOT part of the final manifest schema (use GuidanceSchema instead).
 export {
   AIContextSchema,
   COMPONENT_PATTERNS,
@@ -152,8 +152,6 @@ export type { Guidance } from './guidance.js';
 export {
   AIManifestSchema,
   ChildrenInfoSchema,
-  ComponentManifestSchema,
-  ComponentWithHistorySchema,
   CreateManifestInputSchema,
   DependenciesSchema,
   MANIFEST_SCHEMA_VERSION,
@@ -169,8 +167,6 @@ export {
 export type {
   AIManifest,
   ChildrenInfo,
-  ComponentManifest,
-  ComponentWithHistory,
   CreateManifestInput,
   Dependencies,
   ManifestMetadata,

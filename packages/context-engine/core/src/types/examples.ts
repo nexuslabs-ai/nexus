@@ -17,8 +17,7 @@ import { z } from 'zod';
  * {
  *   "title": "Destructive action",
  *   "code": "<Button variant=\"destructive\">Delete</Button>",
- *   "description": "Use for dangerous actions like delete",
- *   "isPrimary": false
+ *   "description": "Use for dangerous actions like delete"
  * }
  * ```
  */
@@ -31,12 +30,6 @@ export const CodeExampleSchema = z.object({
 
   /** Optional description explaining the use case */
   description: z.string().optional(),
-
-  /**
-   * Whether this is the primary/default example
-   * AI should show this first when user asks for basic usage
-   */
-  isPrimary: z.boolean().optional(),
 });
 
 export type CodeExample = z.infer<typeof CodeExampleSchema>;

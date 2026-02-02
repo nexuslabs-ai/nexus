@@ -7,7 +7,6 @@
 
 import { z } from 'zod';
 
-import { CvaVariantSchema } from './cva-variant.js';
 import {
   EmbeddingModelInfoSchema,
   EmbeddingStatusSchema,
@@ -53,7 +52,10 @@ export const SubComponentSchema = z.object({
   /** Sub-component description */
   description: z.string().optional(),
 
-  /** Props specific to this sub-component */
+  /**
+   * Props specific to this sub-component (categorized and normalized).
+   * CVA variants are included in props.variants with values and defaultValue.
+   */
   props: CategorizedPropsSchema,
 
   /** Data slot attribute value (e.g., "dialog-trigger") */
@@ -64,9 +66,6 @@ export const SubComponentSchema = z.object({
 
   /** Radix primitive info for direct re-exports */
   radixPrimitive: RadixPrimitiveInfoSchema.optional(),
-
-  /** CVA variants defined for this sub-component */
-  variants: z.record(z.string(), CvaVariantSchema).optional(),
 });
 
 export type SubComponent = z.infer<typeof SubComponentSchema>;
@@ -146,129 +145,6 @@ export const ManifestOutputSchema = z.object({
 export type ManifestOutput = z.infer<typeof ManifestOutputSchema>;
 
 /**
- * Complete component manifest schema (v1.0)
- *
- * This schema is optimized for AI consumption with:
- * - Flat structure for AI-critical fields at top level
- * - Categorized props grouped by semantic purpose
- * - Structured examples with metadata
- * - Tool calling support for reliable LLM output
- */
-export const ComponentManifestSchema = z.object({
-  // === Schema Version ===
-  /** Manifest schema version for migrations */
-  schemaVersion: z.string().default(MANIFEST_SCHEMA_VERSION),
-
-  // === Identity ===
-  /** Primary identifier (UUID v4) */
-  id: z.uuid(),
-
-  /** Derived slug for URLs */
-  slug: z.string(),
-
-  /** Human-readable display name */
-  name: z.string(),
-
-  /** Semantic version */
-  version: VersionSchema,
-
-  /** Target framework */
-  framework: FrameworkSchema,
-
-  // === Visibility ===
-  /** Component visibility for sharing */
-  visibility: VisibilitySchema.default('private'),
-
-  // === AI Quick Reference (TOP LEVEL) ===
-  /** One-line description (10-500 chars) */
-  description: z.string().min(10).max(500),
-
-  /**
-   * Import statement variants for AI use
-   */
-  importStatement: ImportStatementSchema,
-
-  /**
-   * Simplest working code example
-   */
-  minimalExample: z.string(),
-
-  // === Props (Categorized) ===
-  /**
-   * Props categorized by semantic purpose
-   * Grouped for better AI filtering
-   */
-  props: CategorizedPropsSchema,
-
-  // === Examples (Structured) ===
-  /**
-   * Structured code examples organized by complexity
-   */
-  examples: StructuredExamplesSchema,
-
-  // === AI Guidance ===
-  /**
-   * Guidance for AI assistants on when/how to use
-   */
-  guidance: GuidanceSchema,
-
-  // === Semantic Search ===
-  /**
-   * Rich description for embedding/search (50-2000 chars)
-   */
-  semanticDescription: z.string().min(50).max(2000),
-
-  // === From Extraction ===
-  /** Component files */
-  files: z.array(z.string()),
-
-  /** Dependencies */
-  dependencies: DependenciesSchema,
-
-  /** Base UI library (if any) */
-  baseLibrary: BaseLibrarySchema.optional(),
-
-  // === Compound Components ===
-  /**
-   * Sub-components for compound components (Dialog, Accordion, Tabs, etc.)
-   * Contains metadata for each related sub-component
-   */
-  subComponents: z.array(SubComponentSchema).optional(),
-
-  // === Radix Primitive ===
-  /**
-   * Radix primitive info when component is a direct re-export
-   * of a Radix UI primitive (e.g., Dialog = DialogPrimitive.Root)
-   */
-  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
-
-  // === Embedding Status ===
-  /** Current embedding status */
-  embeddingStatus: EmbeddingStatusSchema,
-
-  /** Error message if embedding failed */
-  embeddingError: z.string().optional(),
-
-  /** Embedding model used (for future migrations) */
-  embeddingModel: EmbeddingModelInfoSchema.optional(),
-
-  // === Metadata ===
-  /** When manifest was generated */
-  generatedAt: z.iso.datetime(),
-
-  /** When manifest was last updated */
-  updatedAt: z.iso.datetime(),
-
-  /** Hash of source code (for change detection) */
-  sourceHash: HashSchema,
-
-  /** Hash of meta content (for change detection) */
-  metaHash: HashSchema,
-});
-
-export type ComponentManifest = z.infer<typeof ComponentManifestSchema>;
-
-/**
  * Manifest summary (for list views)
  */
 export const ManifestSummarySchema = z.object({
@@ -298,15 +174,6 @@ export const VersionHistoryEntrySchema = z.object({
 });
 
 export type VersionHistoryEntry = z.infer<typeof VersionHistoryEntrySchema>;
-
-/**
- * Component with version history
- */
-export const ComponentWithHistorySchema = ComponentManifestSchema.extend({
-  versionHistory: z.array(VersionHistoryEntrySchema),
-});
-
-export type ComponentWithHistory = z.infer<typeof ComponentWithHistorySchema>;
 
 /**
  * Manifest creation input (what the API receives)

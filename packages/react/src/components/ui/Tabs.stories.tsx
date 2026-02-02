@@ -51,6 +51,126 @@ export const Default: Story = {
   ),
 };
 
+// ============================================
+// VARIANT STORIES
+// ============================================
+
+export const UnderlineVariant: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="account" className="nx:w-[400px]">
+      <TabsList className="nx:bg-transparent nx:p-0">
+        <TabsTrigger value="account" variant="underline">
+          Account
+        </TabsTrigger>
+        <TabsTrigger value="password" variant="underline">
+          Password
+        </TabsTrigger>
+        <TabsTrigger value="settings" variant="underline">
+          Settings
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Account settings with underline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="password">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Password settings with underline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="settings">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          General settings with underline variant tabs.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
+export const OutlineVariant: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="account" className="nx:w-[400px]">
+      <TabsList className="nx:bg-transparent nx:p-0 nx:gap-2">
+        <TabsTrigger value="account" variant="outline">
+          Account
+        </TabsTrigger>
+        <TabsTrigger value="password" variant="outline">
+          Password
+        </TabsTrigger>
+        <TabsTrigger value="settings" variant="outline">
+          Settings
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Account settings with outline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="password">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Password settings with outline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="settings">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          General settings with outline variant tabs.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
+// ============================================
+// SIZE STORIES
+// ============================================
+
+export const SmallSize: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[400px]">
+      <TabsList>
+        <TabsTrigger value="tab1" size="sm">
+          Small Tab
+        </TabsTrigger>
+        <TabsTrigger value="tab2" size="sm">
+          Another
+        </TabsTrigger>
+        <TabsTrigger value="tab3" size="sm">
+          Third
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Small size tabs content.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
+export const LargeSize: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="tab1" className="nx:w-[500px]">
+      <TabsList className="nx:h-12">
+        <TabsTrigger value="tab1" size="lg">
+          Large Tab
+        </TabsTrigger>
+        <TabsTrigger value="tab2" size="lg">
+          Another
+        </TabsTrigger>
+        <TabsTrigger value="tab3" size="lg">
+          Third
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Large size tabs content.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
 export const WithCards: Story = {
   render: (_args) => (
     <Tabs defaultValue="account" className="nx:w-[400px]">
@@ -348,7 +468,9 @@ export const DataAttributesTest: Story = {
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        <TabsTrigger value="tab2" variant="underline" size="lg">
+          Tab 2
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
         <p>Content 1</p>
@@ -368,6 +490,12 @@ export const DataAttributesTest: Story = {
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
     await expect(tab1).toHaveAttribute('data-slot', 'tabs-trigger');
 
+    // Check data-variant and data-size on tab with explicit values
+    const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+    await expect(tab2).toHaveAttribute('data-slot', 'tabs-trigger');
+    await expect(tab2).toHaveAttribute('data-variant', 'underline');
+    await expect(tab2).toHaveAttribute('data-size', 'lg');
+
     // Check tabpanel has data-slot
     const tabPanel = canvas.getByRole('tabpanel');
     await expect(tabPanel).toHaveAttribute('data-slot', 'tabs-content');
@@ -383,16 +511,17 @@ export const AllVariants: Story = {
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          Two Tabs
+          Default Variant
         </h3>
         <Tabs defaultValue="tab1" className="nx:w-[400px]">
           <TabsList>
             <TabsTrigger value="tab1">Account</TabsTrigger>
             <TabsTrigger value="tab2">Password</TabsTrigger>
+            <TabsTrigger value="tab3">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
             <p className="nx:text-sm nx:text-muted-foreground">
-              Account settings content
+              Default variant (pill style)
             </p>
           </TabsContent>
         </Tabs>
@@ -400,20 +529,94 @@ export const AllVariants: Story = {
 
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          Three Tabs
+          Underline Variant
         </h3>
-        <Tabs defaultValue="tab1" className="nx:w-[500px]">
-          <TabsList>
-            <TabsTrigger value="tab1">Overview</TabsTrigger>
-            <TabsTrigger value="tab2">Analytics</TabsTrigger>
-            <TabsTrigger value="tab3">Reports</TabsTrigger>
+        <Tabs defaultValue="tab1" className="nx:w-[400px]">
+          <TabsList className="nx:bg-transparent nx:p-0">
+            <TabsTrigger value="tab1" variant="underline">
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="tab2" variant="underline">
+              Password
+            </TabsTrigger>
+            <TabsTrigger value="tab3" variant="underline">
+              Settings
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
             <p className="nx:text-sm nx:text-muted-foreground">
-              Overview content
+              Underline variant (border-bottom style)
             </p>
           </TabsContent>
         </Tabs>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          Outline Variant
+        </h3>
+        <Tabs defaultValue="tab1" className="nx:w-[400px]">
+          <TabsList className="nx:bg-transparent nx:p-0 nx:gap-2">
+            <TabsTrigger value="tab1" variant="outline">
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="tab2" variant="outline">
+              Password
+            </TabsTrigger>
+            <TabsTrigger value="tab3" variant="outline">
+              Settings
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">
+            <p className="nx:text-sm nx:text-muted-foreground">
+              Outline variant (bordered style)
+            </p>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          Sizes (Small, Default, Large)
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-4">
+          <Tabs defaultValue="tab1" className="nx:w-[400px]">
+            <TabsList>
+              <TabsTrigger value="tab1" size="sm">
+                Small
+              </TabsTrigger>
+              <TabsTrigger value="tab2" size="sm">
+                Tabs
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1" />
+            <TabsContent value="tab2" />
+          </Tabs>
+          <Tabs defaultValue="tab1" className="nx:w-[400px]">
+            <TabsList>
+              <TabsTrigger value="tab1" size="default">
+                Default
+              </TabsTrigger>
+              <TabsTrigger value="tab2" size="default">
+                Tabs
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1" />
+            <TabsContent value="tab2" />
+          </Tabs>
+          <Tabs defaultValue="tab1" className="nx:w-[400px]">
+            <TabsList className="nx:h-12">
+              <TabsTrigger value="tab1" size="lg">
+                Large
+              </TabsTrigger>
+              <TabsTrigger value="tab2" size="lg">
+                Tabs
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="tab1" />
+            <TabsContent value="tab2" />
+          </Tabs>
+        </div>
       </div>
 
       <div>

@@ -2,17 +2,17 @@
  * Manifest Builder Types
  *
  * Types for combining extracted data and generated metadata
- * into a complete ComponentManifest.
+ * into a complete manifest.
  *
  * The build() method throws ManifestBuildError on failure.
  */
 
 import type {
-  ComponentManifest,
+  AIManifest,
   ComponentMeta,
   ExtractedData,
   ManifestIdentity,
-  ManifestOutput,
+  ManifestMetadata,
 } from '../types/index.js';
 
 // Re-export ManifestIdentity for backwards compatibility
@@ -76,29 +76,15 @@ export interface ManifestBuilderInput {
  * Manifest build result (success only - throws ManifestBuildError on failure)
  */
 export interface ManifestBuilderResult {
-  /** Complete manifest output with split structure */
-  output: ManifestOutput;
+  /** Component name (PascalCase) */
+  componentName: string;
 
-  /** Legacy: full manifest for internal use */
-  manifest: ComponentManifest;
+  /** System metadata (embeddings, hashes, timestamps) */
+  metadata: ManifestMetadata;
+
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
 
   /** Build timestamp */
   builtAt: string;
-}
-
-/**
- * Input for updating an existing manifest
- */
-export interface ManifestUpdateInput {
-  /** Fields to update from new extraction */
-  extracted?: ExtractedData;
-
-  /** Fields to update from new generation */
-  meta?: ComponentMeta;
-
-  /** New source hash */
-  sourceHash?: string;
-
-  /** New version */
-  version?: string;
 }

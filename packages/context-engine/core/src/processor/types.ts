@@ -11,12 +11,12 @@
 import type { HybridExtractorOptions } from '../extractor/index.js';
 import type { ILLMProvider } from '../generator/types.js';
 import type {
-  ComponentManifest,
+  AIManifest,
   ComponentMeta,
   ExtractedData,
   Framework,
   ManifestIdentity,
-  ManifestOutput,
+  ManifestMetadata,
 } from '../types/index.js';
 
 // =============================================================================
@@ -149,11 +149,11 @@ export interface StoredManifest {
   /** Component name (PascalCase) */
   componentName: string;
 
-  /** Complete component manifest */
-  manifest: ComponentManifest;
+  /** System metadata (embeddings, hashes, timestamps) */
+  metadata: ManifestMetadata;
 
-  /** Split manifest output structure */
-  output: ManifestOutput;
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
 
   /** ISO timestamp when manifest was stored */
   storedAt: string;
@@ -272,11 +272,14 @@ export interface ExtractionMetadata {
  * Processor result (success only - throws on error)
  */
 export interface ProcessorResult {
-  /** Split manifest output (componentName, metadata, manifest) */
-  output: ManifestOutput;
+  /** Component name (PascalCase) */
+  componentName: string;
 
-  /** Complete component manifest (legacy, for internal use) */
-  manifest: ComponentManifest;
+  /** System metadata (embeddings, hashes, timestamps) */
+  metadata: ManifestMetadata;
+
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
 
   /** Extraction metadata */
   extraction: ExtractionMetadata;
@@ -369,7 +372,7 @@ export interface GenerateResult {
  * Input for build phase.
  *
  * Combines extraction and generation results with identity
- * to produce a complete ComponentManifest.
+ * to produce a complete manifest.
  */
 export interface BuildInput {
   /** Organization ID for multi-org isolation */
@@ -395,11 +398,14 @@ export interface BuildInput {
  * Build result (success only - throws ManifestBuildError on failure)
  */
 export interface BuildResult {
-  /** Complete manifest output with split structure */
-  output: ManifestOutput;
+  /** Component name (PascalCase) */
+  componentName: string;
 
-  /** Legacy: full manifest for internal use */
-  manifest: ComponentManifest;
+  /** System metadata (embeddings, hashes, timestamps) */
+  metadata: ManifestMetadata;
+
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
 
   /** Build timestamp */
   builtAt: string;

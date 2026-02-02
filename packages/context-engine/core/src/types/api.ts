@@ -18,8 +18,8 @@ import {
   VisibilitySchema,
 } from './identity.js';
 import {
-  ComponentManifestSchema,
   CreateManifestInputSchema,
+  ManifestOutputSchema,
   ManifestSummarySchema,
   UpdateManifestInputSchema,
 } from './manifest.js';
@@ -139,9 +139,8 @@ export const GetComponentQuerySchema = z.object({
 
 export type GetComponentQuery = z.infer<typeof GetComponentQuerySchema>;
 
-export const GetComponentResponseSchema = SuccessResponseSchema(
-  ComponentManifestSchema
-);
+export const GetComponentResponseSchema =
+  SuccessResponseSchema(ManifestOutputSchema);
 
 export type GetComponentResponse = z.infer<typeof GetComponentResponseSchema>;
 
@@ -152,9 +151,8 @@ export const CreateComponentBodySchema = CreateManifestInputSchema;
 
 export type CreateComponentBody = z.infer<typeof CreateComponentBodySchema>;
 
-export const CreateComponentResponseSchema = SuccessResponseSchema(
-  ComponentManifestSchema
-);
+export const CreateComponentResponseSchema =
+  SuccessResponseSchema(ManifestOutputSchema);
 
 export type CreateComponentResponse = z.infer<
   typeof CreateComponentResponseSchema
@@ -173,9 +171,8 @@ export const UpdateComponentBodySchema = UpdateManifestInputSchema;
 
 export type UpdateComponentBody = z.infer<typeof UpdateComponentBodySchema>;
 
-export const UpdateComponentResponseSchema = SuccessResponseSchema(
-  ComponentManifestSchema
-);
+export const UpdateComponentResponseSchema =
+  SuccessResponseSchema(ManifestOutputSchema);
 
 export type UpdateComponentResponse = z.infer<
   typeof UpdateComponentResponseSchema

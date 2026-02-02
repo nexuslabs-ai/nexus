@@ -2,7 +2,7 @@
  * Manifest Builder
  *
  * Combines extracted data from HybridExtractor and generated metadata
- * from MetaGenerator into a complete ComponentManifest.
+ * from MetaGenerator into metadata (system) and manifest (AI) sections.
  *
  * This is the final step in the extraction-generation pipeline that
  * produces the complete component knowledge ready for storage.
@@ -13,17 +13,14 @@ import type {
   AIManifest,
   CategorizedProps,
   CodeExample,
-  ComponentManifest,
   CompoundComponentInfo,
-  CvaVariants,
+  Dependencies,
   EmbeddingStatus,
   ExtractedData,
-  ExtractedProp,
   ExtractedSubComponent,
   Guidance,
   ImportStatement,
   ManifestMetadata,
-  ManifestOutput,
   PropDefinition,
   StructuredExamples,
   SubComponent,
@@ -40,12 +37,10 @@ import {
   detectChildrenInfo,
 } from '../utils/prop-categorization.js';
 
-import { generateImportStatement } from './import-generator.js';
 import type {
   ManifestBuilderConfig,
   ManifestBuilderInput,
   ManifestBuilderResult,
-  ManifestUpdateInput,
 } from './types.js';
 
 /** Default package name when detection fails */
@@ -65,7 +60,7 @@ const MAX_ADVANCED_EXAMPLES = 3;
 
 /**
  * ManifestBuilder combines extracted data and generated metadata
- * into a complete ComponentManifest.
+ * into system metadata and AI-focused manifest sections.
  *
  * @example
  * ```typescript
@@ -80,9 +75,8 @@ const MAX_ADVANCED_EXAMPLES = 3;
  *   version: '1.0.0'
  * });
  *
- * if (result.type === 'success') {
- *   console.log(result.manifest);
- * }
+ * console.log(result.metadata);  // System fields
+ * console.log(result.manifest);  // AI-focused fields
  * ```
  */
 export class ManifestBuilder {
@@ -104,10 +98,10 @@ export class ManifestBuilder {
   }
 
   /**
-   * Build a complete ComponentManifest from extracted data and generated metadata
+   * Build metadata and manifest from extracted data and generated metadata
    *
    * @param input - Builder input containing identity, extracted data, and meta
-   * @returns ManifestBuilderResult with output and manifest
+   * @returns ManifestBuilderResult with componentName, metadata, and manifest
    * @throws ManifestBuildError if building fails
    */
   build({
@@ -118,131 +112,107 @@ export class ManifestBuilder {
     version = '0.0.1',
   }: ManifestBuilderInput): ManifestBuilderResult {
     const { name } = identity;
-
-    // TypeScript types enforce required fields - no runtime validation needed
     const now = new Date().toISOString();
     const metaHash = generateObjectHash(meta);
 
-    // Categorize props using the dedicated utility
-    let categorizedProps = this.buildCategorizedProps(
+    // === Build props (shared between metadata check and manifest) ===
+
+    // Step 1: Categorize props by semantic purpose
+    const categorizedProps = categorizeProps(
       extracted.props,
       extracted.variants
     );
 
-    // Normalize variants to ensure consistency between manifest.variants and props.variants
-    categorizedProps = this.normalizeVariants(
+    // Step 2: Normalize variants (add missing CVA variants, merge defaultValues)
+    const normalizedProps = this.normalizeVariants(
       extracted.variants,
       extracted.defaultVariants,
       categorizedProps
     );
 
-    // Merge LLM-generated variant descriptions into props.variants
-    categorizedProps = this.mergeValueDescriptions(
-      categorizedProps,
+    // Step 3: Enrich with LLM-generated variant value descriptions
+    const enrichedProps = this.mergeValueDescriptions(
+      normalizedProps,
       meta.ai?.variantDescriptions
     );
 
-    // Generate import statement (include all exports for compound components)
+    // === Build shared computed values ===
+
     const importStatement = this.buildImportStatement(
       name,
       extracted.npmDependencies,
       extracted.compoundInfo
     );
 
-    // Build minimal example
-    const minimalExample = this.buildMinimalExample(
-      name,
-      extracted.variants,
-      extracted.acceptsChildren
-    );
-
-    // Build structured examples from meta (prefer Storybook if available)
-    const examples = this.buildStructuredExamples(name, meta, extracted);
-
-    // Build guidance from meta.ai
+    const examples = this.buildStructuredExamples(meta, extracted);
     const guidance = this.buildGuidance(meta);
-
-    // Get semantic description (top-level field)
     const semanticDescription = this.buildSemanticDescription(meta, name);
 
-    // Build sub-components for compound components
-    const subComponents = this.buildSubComponents(extracted.subComponents);
+    const subComponents = this.buildSubComponents(
+      extracted.subComponents,
+      meta.ai?.subComponentVariantDescriptions
+    );
 
-    const manifest: ComponentManifest = {
-      // Schema version for migrations
-      schemaVersion: MANIFEST_SCHEMA_VERSION,
+    const dependencies: Dependencies = {
+      npm: extracted.npmDependencies,
+      internal: extracted.internalDependencies,
+    };
 
-      // Identity
+    // === Build metadata (system fields) ===
+
+    const metadata: ManifestMetadata = {
       id: identity.id,
-      slug: identity.slug,
-      name: identity.name,
+      schemaVersion: MANIFEST_SCHEMA_VERSION,
       version,
       framework: identity.framework,
-
-      // Visibility (default to private)
       visibility: 'private',
-
-      // From meta (generated)
-      description: meta.description,
-
-      // New v1.0 fields
-      importStatement,
-      minimalExample,
-      props: categorizedProps,
-      examples,
-      guidance,
-      semanticDescription,
-
-      // From extraction
-      files: extracted.files,
-      dependencies: {
-        npm: extracted.npmDependencies,
-        internal: extracted.internalDependencies,
-      },
-
-      // Base library if detected
-      baseLibrary: extracted.baseLibrary,
-
-      // Sub-components for compound components
-      subComponents,
-
-      // Radix primitive info for direct re-exports
-      radixPrimitive: extracted.radixPrimitive,
-
-      // Embedding status (pending until processed)
       embeddingStatus: 'pending' as EmbeddingStatus,
-      embeddingError: undefined,
       embeddingModel: DEFAULT_EMBEDDING_MODEL,
-
-      // Timestamps and hashes
+      embeddingError: undefined,
       generatedAt: now,
       updatedAt: now,
       sourceHash,
       metaHash,
+      files: extracted.files,
     };
 
-    // Build the split output structure
-    const output: ManifestOutput = {
-      componentName: identity.name,
-      metadata: this.buildMetadata(manifest),
-      manifest: this.buildAIManifest(extracted, manifest),
+    // === Build AI manifest ===
+
+    const children = detectChildrenInfo(extracted.props);
+
+    const hasProps = Object.values(enrichedProps).some(
+      (category) => Array.isArray(category) && category.length > 0
+    );
+
+    const description = semanticDescription || meta.description;
+
+    const hasDependencies =
+      Object.keys(dependencies.npm).length > 0 ||
+      dependencies.internal.length > 0;
+
+    const manifest: AIManifest = {
+      name: identity.name,
+      slug: identity.slug,
+      description,
+      importStatement,
+      ...(children && { children }),
+      ...(hasProps && { props: enrichedProps }),
+      ...(examples && { examples }),
+      ...(guidance && { guidance }),
+      ...(hasDependencies && { dependencies }),
+      ...(extracted.baseLibrary && { baseLibrary: extracted.baseLibrary }),
+      ...(subComponents && { subComponents }),
+      ...(extracted.radixPrimitive && {
+        radixPrimitive: extracted.radixPrimitive,
+      }),
     };
 
     return {
-      output,
-      manifest, // Keep for internal use
+      componentName: identity.name,
+      metadata,
+      manifest,
       builtAt: now,
     };
-  }
-
-  /**
-   * Build categorized props from extracted props and variants
-   */
-  private buildCategorizedProps(
-    props: ExtractedProp[],
-    variants: Record<string, string[]>
-  ): CategorizedProps {
-    return categorizeProps(props, variants);
   }
 
   /**
@@ -311,19 +281,19 @@ export class ManifestBuilder {
    * means for the variant prop). This method merges those descriptions into the
    * corresponding props so AI assistants understand what each value does.
    *
-   * @param categorizedProps - Props already categorized
+   * @param normalizedProps - Props after normalization (with CVA defaults merged)
    * @param variantDescriptions - LLM-generated descriptions keyed by variant name
-   * @returns Updated categorized props with valueDescriptions
+   * @returns Enriched props with valueDescriptions added
    */
   private mergeValueDescriptions(
-    categorizedProps: CategorizedProps,
+    normalizedProps: CategorizedProps,
     variantDescriptions?: Record<string, Record<string, string>>
   ): CategorizedProps {
-    if (!variantDescriptions || !categorizedProps.variants) {
-      return categorizedProps;
+    if (!variantDescriptions || !normalizedProps.variants) {
+      return normalizedProps;
     }
 
-    const updatedVariants = categorizedProps.variants.map((prop) => {
+    const updatedVariants = normalizedProps.variants.map((prop) => {
       const descriptions = variantDescriptions[prop.name];
       if (!descriptions) {
         return prop;
@@ -336,32 +306,18 @@ export class ManifestBuilder {
     });
 
     return {
-      ...categorizedProps,
+      ...normalizedProps,
       variants: updatedVariants,
     };
   }
 
   /**
-   * Build CVA variants with default values
-   */
-  private buildCvaVariants(
-    variants: Record<string, string[]>,
-    defaultVariants: Record<string, string>
-  ): CvaVariants {
-    const result: CvaVariants = {};
-
-    for (const [variantName, values] of Object.entries(variants)) {
-      result[variantName] = {
-        values,
-        default: defaultVariants[variantName],
-      };
-    }
-
-    return result;
-  }
-
-  /**
    * Build import statement for the component
+   *
+   * Generates import statement variants for AI consumption:
+   * - primary: Named import from package root
+   * - typeOnly: Type-only import for props
+   * - subpath: Import from component subpath (if supported)
    *
    * For compound components, includes all exported sub-components in the import.
    */
@@ -370,60 +326,75 @@ export class ManifestBuilder {
     npmDependencies: Record<string, string>,
     compoundInfo?: CompoundComponentInfo
   ): ImportStatement {
-    // Start with configurable default package name
+    // Derive package name from dependencies or use configured default
     let packageName = this.config.defaultPackageName;
-
-    // Try to derive package name from dependencies
-    // Look for design system packages in dependencies
     const designSystemPackages = Object.keys(npmDependencies).filter(
       (dep) =>
         dep.match(/^@[a-z-]+\/(react|components|ui)$/) ||
         dep.includes('design-system')
     );
-
     if (designSystemPackages.length > 0) {
       packageName = designSystemPackages[0];
     }
 
-    // Build exports list: root component + sub-components for compound components
-    const exports =
+    // Build import list: root component + sub-components for compound components
+    const importNames =
       compoundInfo?.isCompound && compoundInfo.subComponents.length > 0
         ? [compoundInfo.rootComponent, ...compoundInfo.subComponents]
-        : undefined;
+        : [name];
+    const importList = importNames.join(', ');
 
-    return generateImportStatement({
-      componentName: name,
-      packageName,
-      hasSubpathExports: false, // Conservative default
-      exports,
-    });
+    return {
+      primary: `import { ${importList} } from '${packageName}'`,
+      typeOnly: `import type { ${name}Props } from '${packageName}'`,
+      // subpath omitted - not currently supported
+    };
   }
 
   /**
    * Build sub-components for compound components
    *
-   * Converts extracted sub-component data into manifest SubComponent format
-   * with categorized props, Radix primitive info, and CVA variants.
+   * Converts extracted sub-component data into manifest SubComponent format.
+   * Applies the same prop processing pipeline as main component:
+   * categorize → normalize (add CVA defaults) → enrich (add valueDescriptions)
    *
    * @param extractedSubComponents - Sub-components extracted from source
+   * @param subComponentVariantDescriptions - LLM-generated variant descriptions keyed by sub-component name
    * @returns Array of SubComponent or undefined if no sub-components
    */
   private buildSubComponents(
-    extractedSubComponents?: ExtractedSubComponent[]
+    extractedSubComponents?: ExtractedSubComponent[],
+    subComponentVariantDescriptions?: Record<
+      string,
+      Record<string, Record<string, string>>
+    >
   ): SubComponent[] | undefined {
     if (!extractedSubComponents || extractedSubComponents.length === 0) {
       return undefined;
     }
 
     return extractedSubComponents.map((sub) => {
-      // Categorize props with any CVA variants for this subComponent
+      // Step 1: Categorize props by semantic purpose
       const categorizedProps = categorizeProps(sub.props, sub.variants ?? {});
 
-      // Build base subComponent
+      // Step 2: Normalize variants (add missing CVA variants, merge defaultValues)
+      const normalizedProps = this.normalizeVariants(
+        sub.variants ?? {},
+        sub.defaultVariants ?? {},
+        categorizedProps
+      );
+
+      // Step 3: Enrich with LLM-generated variant value descriptions
+      const enrichedProps = this.mergeValueDescriptions(
+        normalizedProps,
+        subComponentVariantDescriptions?.[sub.name]
+      );
+
+      // Build subComponent with enriched props
       const subComponent: SubComponent = {
         name: sub.name,
         description: sub.description,
-        props: categorizedProps,
+        props: enrichedProps,
         dataSlot: kebabCase(sub.name),
         requiredInComposition: sub.requiredInComposition,
       };
@@ -433,57 +404,32 @@ export class ManifestBuilder {
         subComponent.radixPrimitive = sub.radixPrimitive;
       }
 
-      // Add CVA variants if any
-      if (sub.variants && Object.keys(sub.variants).length > 0) {
-        subComponent.variants = this.buildCvaVariants(
-          sub.variants,
-          sub.defaultVariants ?? {}
-        );
-      }
-
       return subComponent;
     });
   }
 
   /**
-   * Build minimal example code
+   * Build structured examples from Storybook or LLM
    *
-   * @param name - Component name
-   * @param variants - CVA variants (used to determine if props exist)
-   * @param acceptsChildren - Whether the component accepts children
-   */
-  private buildMinimalExample(
-    name: string,
-    variants: Record<string, string[]>,
-    acceptsChildren: boolean
-  ): string {
-    // If component accepts children and has variants, show with content
-    // Otherwise use self-closing tag
-    if (acceptsChildren && Object.keys(variants).length > 0) {
-      return `<${name}>Content</${name}>`;
-    }
-    return `<${name} />`;
-  }
-
-  /**
-   * Build structured examples from meta, preferring Storybook examples if available
+   * Priority:
+   * 1. Storybook stories (if available)
+   * 2. LLM-generated examples (if available)
+   * 3. undefined (no examples)
    *
-   * @param name - Component name
    * @param meta - Generated metadata from LLM
    * @param extracted - Extracted data (may contain Storybook stories)
    */
   private buildStructuredExamples(
-    name: string,
     meta: ManifestBuilderInput['meta'],
     extracted: ExtractedData
-  ): StructuredExamples {
+  ): StructuredExamples | undefined {
     // Prefer Storybook examples if available
     if (extracted.stories && extracted.stories.length > 0) {
-      return this.buildExamplesFromStorybook(name, extracted.stories);
+      return this.buildExamplesFromStorybook(extracted.stories);
     }
 
-    // Fall back to AI-generated examples
-    return this.buildExamplesFromAI(name, meta);
+    // Use LLM-generated examples if available
+    return meta.ai?.examples;
   }
 
   /**
@@ -492,11 +438,9 @@ export class ManifestBuilder {
    * Converts extracted Storybook stories into the StructuredExamples format.
    * Stories are already classified by complexity during extraction.
    *
-   * @param componentName - Component name for fallback code generation
    * @param stories - Extracted stories from Storybook file
    */
   private buildExamplesFromStorybook(
-    componentName: string,
     stories: ExtractedStory[]
   ): StructuredExamples {
     // Find minimal example (first 'minimal' complexity or first story)
@@ -504,9 +448,8 @@ export class ManifestBuilder {
       stories.find((s) => s.complexity === 'minimal') ?? stories[0];
 
     const minimal: CodeExample = {
-      title: minimalStory?.title ?? 'Basic',
-      code: minimalStory?.code ?? `<${componentName} />`,
-      isPrimary: true,
+      title: minimalStory.title,
+      code: minimalStory.code,
     };
 
     // Common examples - exclude the minimal story
@@ -529,83 +472,6 @@ export class ManifestBuilder {
         : undefined;
 
     return { minimal, common, advanced };
-  }
-
-  /**
-   * Build structured examples from AI-generated examples
-   *
-   * Fallback when Storybook stories are not available.
-   *
-   * @param name - Component name
-   * @param meta - Generated metadata from LLM
-   */
-  private buildExamplesFromAI(
-    name: string,
-    meta: ManifestBuilderInput['meta']
-  ): StructuredExamples {
-    const aiExamples = meta.ai?.examples ?? [];
-
-    // Build minimal example
-    const minimal: CodeExample = {
-      title: 'Basic',
-      code: aiExamples[0] ?? `<${name} />`,
-      isPrimary: true,
-    };
-
-    // Build common examples from remaining AI examples
-    const common: CodeExample[] = aiExamples.slice(1).map((code, index) => {
-      // Try to extract a meaningful title from the code
-      const title = this.extractExampleTitle(code, index);
-
-      return {
-        title,
-        code,
-      };
-    });
-
-    return {
-      minimal,
-      common,
-      // advanced is optional - could be populated in the future
-    };
-  }
-
-  /**
-   * Extract a title from example code
-   */
-  private extractExampleTitle(code: string, index: number): string {
-    // Try to detect pattern from props used
-    if (code.includes('variant=')) {
-      const match = code.match(/variant="([^"]+)"/);
-      if (match) {
-        return `${this.capitalize(match[1])} variant`;
-      }
-    }
-
-    if (code.includes('size=')) {
-      const match = code.match(/size="([^"]+)"/);
-      if (match) {
-        return `${this.capitalize(match[1])} size`;
-      }
-    }
-
-    if (code.includes('disabled')) {
-      return 'Disabled state';
-    }
-
-    if (code.includes('loading')) {
-      return 'Loading state';
-    }
-
-    if (code.includes('asChild')) {
-      return 'Composition pattern';
-    }
-
-    if (code.includes('onClick')) {
-      return 'With click handler';
-    }
-
-    return `Example ${index + 2}`;
   }
 
   /**
@@ -665,174 +531,5 @@ export class ManifestBuilder {
 
     // Generate a minimal semantic description
     return `The ${name} component provides functionality for building user interfaces. ${meta.description}`;
-  }
-
-  /**
-   * Capitalize first letter
-   */
-  private capitalize(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  /**
-   * Build system metadata (not for AI consumption)
-   *
-   * Extracts system-level fields from the full manifest that are used
-   * for tracking, embeddings, and version management.
-   *
-   * @param manifest - The full ComponentManifest
-   * @returns ManifestMetadata with system fields
-   */
-  private buildMetadata(manifest: ComponentManifest): ManifestMetadata {
-    return {
-      id: manifest.id,
-      schemaVersion: manifest.schemaVersion,
-      version: manifest.version,
-      framework: manifest.framework,
-      visibility: manifest.visibility,
-      embeddingStatus: manifest.embeddingStatus,
-      embeddingModel: manifest.embeddingModel,
-      embeddingError: manifest.embeddingError,
-      generatedAt: manifest.generatedAt,
-      updatedAt: manifest.updatedAt,
-      sourceHash: manifest.sourceHash,
-      metaHash: manifest.metaHash,
-      files: manifest.files,
-    };
-  }
-
-  /**
-   * Build AI-focused manifest (optimized for token efficiency)
-   *
-   * Creates a slim manifest with only the fields AI assistants need
-   * to generate correct component code. Props are already clean from
-   * extraction (no passthrough props).
-   *
-   * Note: Top-level variants removed - variant info is in props.variants
-   * with values and valueDescriptions for each prop.
-   *
-   * @param extracted - Extracted data for children detection
-   * @param manifest - The full ComponentManifest
-   * @returns AIManifest optimized for AI consumption
-   */
-  private buildAIManifest(
-    extracted: ExtractedData,
-    manifest: ComponentManifest
-  ): AIManifest {
-    // Detect children info from extracted props
-    const children = detectChildrenInfo(extracted.props);
-
-    // Check if props has any content (any category with items)
-    const hasProps =
-      manifest.props &&
-      Object.values(manifest.props).some(
-        (category) => category && category.length > 0
-      );
-
-    // Use semanticDescription as the single description (it's richer)
-    const description = manifest.semanticDescription || manifest.description;
-
-    // Build dependencies (omit if empty)
-    const hasDependencies =
-      Object.keys(manifest.dependencies.npm).length > 0 ||
-      manifest.dependencies.internal.length > 0;
-
-    return {
-      name: manifest.name,
-      slug: manifest.slug,
-      description,
-      importStatement: manifest.importStatement,
-      ...(children && { children }),
-      ...(hasProps && { props: manifest.props }),
-      ...(manifest.examples && { examples: manifest.examples }),
-      ...(manifest.guidance && { guidance: manifest.guidance }),
-      ...(hasDependencies && { dependencies: manifest.dependencies }),
-      ...(manifest.baseLibrary && { baseLibrary: manifest.baseLibrary }),
-      ...(manifest.subComponents && { subComponents: manifest.subComponents }),
-      ...(manifest.radixPrimitive && {
-        radixPrimitive: manifest.radixPrimitive,
-      }),
-    };
-  }
-
-  /**
-   * Update an existing manifest with new extraction or generation data
-   *
-   * Preserves unchanged fields and updates timestamps appropriately.
-   * When source code changes, marks embedding status as pending.
-   *
-   * @param existing - The existing manifest to update
-   * @param updates - Partial updates to apply
-   * @returns Updated manifest
-   */
-  update(
-    existing: ComponentManifest,
-    updates: ManifestUpdateInput
-  ): ComponentManifest {
-    const now = new Date().toISOString();
-    const { name } = existing;
-
-    // Build updated props if extraction changed
-    const updatedProps: CategorizedProps | undefined = updates.extracted
-      ? this.buildCategorizedProps(
-          updates.extracted.props,
-          updates.extracted.variants
-        )
-      : undefined;
-
-    // Build updated guidance if meta changed
-    const updatedGuidance: Guidance | undefined = updates.meta
-      ? this.buildGuidance(updates.meta)
-      : undefined;
-
-    // Build updated examples based on what's being updated
-    // Priority: Storybook stories (if extraction provided) > AI-generated (if meta provided)
-    let updatedExamples: StructuredExamples | undefined;
-    if (updates.extracted && updates.extracted.stories?.length) {
-      // New extraction with Storybook stories - use them
-      updatedExamples = this.buildExamplesFromStorybook(
-        name,
-        updates.extracted.stories
-      );
-    } else if (updates.meta) {
-      // New meta without Storybook - use AI-generated examples
-      updatedExamples = this.buildExamplesFromAI(name, updates.meta);
-    }
-
-    return {
-      ...existing,
-      updatedAt: now,
-
-      // Extraction updates
-      ...(updates.extracted && {
-        props: updatedProps!,
-        files: updates.extracted.files,
-        dependencies: {
-          npm: updates.extracted.npmDependencies,
-          internal: updates.extracted.internalDependencies,
-        },
-        baseLibrary: updates.extracted.baseLibrary,
-      }),
-
-      // Meta updates
-      ...(updates.meta && {
-        description: updates.meta.description,
-        guidance: updatedGuidance!,
-        examples: updatedExamples!,
-        semanticDescription:
-          updates.meta.ai?.semanticDescription ?? updates.meta.description,
-        metaHash: generateObjectHash(updates.meta),
-      }),
-
-      // Source hash update (triggers re-embedding)
-      ...(updates.sourceHash && {
-        sourceHash: updates.sourceHash,
-        embeddingStatus: 'pending' as const,
-        embeddingError: undefined,
-      }),
-
-      // Version update
-      ...(updates.version && { version: updates.version }),
-    };
   }
 }

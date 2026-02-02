@@ -7,6 +7,8 @@
 
 import { z } from 'zod';
 
+import { StructuredExamplesSchema } from './examples.js';
+
 /**
  * Pattern definitions
  * These patterns help categorize components for filtering and context
@@ -39,7 +41,7 @@ export const ComponentPatternSchema = z.enum(COMPONENT_PATTERNS);
  *
  * NOTE: This schema is used internally by the generator module during
  * metadata generation. The final manifest uses GuidanceSchema instead.
- * This is NOT part of the final ComponentManifest schema.
+ * This is NOT part of the final manifest schema (use AIManifest instead).
  */
 export const AIContextSchema = z.object({
   /** Rich semantic description for embeddings (2-5 sentences) */
@@ -54,8 +56,8 @@ export const AIContextSchema = z.object({
   /** Semantic patterns this component represents */
   patterns: z.array(z.string()),
 
-  /** Curated usage examples (JSX strings) */
-  examples: z.array(z.string()),
+  /** Structured usage examples (from LLM when Storybook not available) */
+  examples: StructuredExamplesSchema.optional(),
 
   /** Related component names for context bundling */
   relatedComponents: z.array(z.string()),
@@ -71,6 +73,15 @@ export const AIContextSchema = z.object({
    */
   variantDescriptions: z
     .record(z.string(), z.record(z.string(), z.string()))
+    .optional(),
+
+  /**
+   * LLM-generated descriptions for sub-component variant values
+   * Used for compound components (Dialog, Accordion, etc.)
+   * Structure: { subComponentName: { variantName: { value: description } } }
+   */
+  subComponentVariantDescriptions: z
+    .record(z.string(), z.record(z.string(), z.record(z.string(), z.string())))
     .optional(),
 });
 

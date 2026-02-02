@@ -6,10 +6,10 @@
  * @example
  * ```typescript
  * // Import types
- * import { ComponentManifest, Framework } from '@context-engine/core';
+ * import { AIManifest, ManifestMetadata, Framework } from '@context-engine/core';
  *
  * // Import from subpaths
- * import { ComponentManifestSchema } from '@context-engine/core/types';
+ * import { AIManifestSchema, ManifestMetadataSchema } from '@context-engine/core/types';
  * import { generateComponentId, generateHash } from '@context-engine/core/utils';
  * import { HybridExtractor, extractComponent } from '@context-engine/core/extractor';
  * import { MetaGenerator, createMetaGenerator } from '@context-engine/core/generator';

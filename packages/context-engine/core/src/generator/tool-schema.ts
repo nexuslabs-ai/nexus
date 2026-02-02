@@ -97,6 +97,15 @@ export const ComponentMetaToolSchema = z.object({
       'Descriptions for each variant value. Outer key is variant name (e.g., "variant"), ' +
         'inner key is value (e.g., "destructive"), value is description (e.g., "Red color for dangerous actions")'
     ),
+
+  subComponentVariantDescriptions: z
+    .record(z.string(), z.record(z.string(), z.record(z.string(), z.string())))
+    .optional()
+    .describe(
+      'Variant descriptions for sub-components of compound components. ' +
+        'Structure: { subComponentName: { variantName: { value: description } } }. ' +
+        'Example: { "DialogTrigger": { "variant": { "outline": "Border-only style for less emphasis" } } }'
+    ),
 });
 
 export type ComponentMetaTool = z.infer<typeof ComponentMetaToolSchema>;

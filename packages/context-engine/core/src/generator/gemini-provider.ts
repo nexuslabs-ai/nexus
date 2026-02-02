@@ -409,6 +409,28 @@ export class GeminiProvider implements ILLMProvider {
       }
     }
 
+    // Handle subComponentVariantDescriptions being returned as stringified JSON
+    if (
+      typeof obj.subComponentVariantDescriptions === 'string' &&
+      obj.subComponentVariantDescriptions.trim().startsWith('{')
+    ) {
+      try {
+        obj.subComponentVariantDescriptions = JSON.parse(
+          obj.subComponentVariantDescriptions
+        );
+        logger.debug(
+          'Parsed stringified subComponentVariantDescriptions from Gemini'
+        );
+      } catch {
+        // If parsing fails, remove the field to avoid validation errors
+        // The field is optional, so this is safe
+        logger.warn(
+          'Failed to parse stringified subComponentVariantDescriptions from Gemini, removing field'
+        );
+        delete obj.subComponentVariantDescriptions;
+      }
+    }
+
     return obj;
   }
 }

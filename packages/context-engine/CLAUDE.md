@@ -63,7 +63,7 @@ yarn workspace @context-engine/core build
 
 ```typescript
 // Main exports
-import { ComponentManifest, Framework } from '@context-engine/core';
+import { AIManifest, ManifestMetadata, Framework } from '@context-engine/core';
 
 // Subpath imports
 import {
@@ -85,9 +85,9 @@ import { generateComponentId, generateHash } from '@context-engine/core/utils';
 | ----------- | ----------------------------------------------- | ------------------------------------------------ |
 | `extractor` | Extract props, variants, dependencies from code | `HybridExtractor`, `extractComponent`            |
 | `generator` | Generate semantic metadata via LLM              | `MetaGenerator`, `AnthropicProvider`             |
-| `manifest`  | Build complete component manifests              | `ManifestBuilder`, `generateImportStatement`     |
+| `manifest`  | Build component manifests (metadata + AI)       | `ManifestBuilder`                                |
 | `processor` | Orchestrate full pipeline                       | `ComponentProcessor`, `createComponentProcessor` |
-| `types`     | Shared type definitions                         | `ComponentManifest`, `ExtractionResult`          |
+| `types`     | Shared type definitions                         | `AIManifest`, `ManifestMetadata`                 |
 | `utils`     | Utility functions                               | `generateComponentId`, `categorizeProps`         |
 
 ### Key Source Files
@@ -95,7 +95,6 @@ import { generateComponentId, generateHash } from '@context-engine/core/utils';
 | File                           | Purpose                              |
 | ------------------------------ | ------------------------------------ |
 | `generator/tool-schema.ts`     | Tool calling schemas for Anthropic   |
-| `manifest/import-generator.ts` | Import statement generation          |
 | `utils/prop-categorization.ts` | Prop categorization by semantic type |
 
 ### Quick Start
@@ -167,19 +166,38 @@ All LLM providers use tool calling for structured output. There is no text parsi
 
 ## Schema Documentation
 
-### ComponentManifest Structure
+### Manifest Structure (Split Format)
 
-The manifest includes these key sections:
+The build result contains two sections:
 
-| Section           | Source    | Description                                  |
+**ManifestMetadata** (system fields):
+
+| Field             | Source    | Description                 |
+| ----------------- | --------- | --------------------------- |
+| `id`              | Extractor | Component UUID              |
+| `schemaVersion`   | Builder   | Manifest schema version     |
+| `version`         | Input     | Component semantic version  |
+| `framework`       | Input     | Target framework (react)    |
+| `visibility`      | Builder   | Private/public visibility   |
+| `embeddingStatus` | Builder   | Embedding processing status |
+| `generatedAt`     | Builder   | Creation timestamp          |
+| `sourceHash`      | Extractor | Hash of source code         |
+| `metaHash`        | Builder   | Hash of generated metadata  |
+| `files`           | Extractor | Component file paths        |
+
+**AIManifest** (for AI consumption):
+
+| Field             | Source    | Description                                  |
 | ----------------- | --------- | -------------------------------------------- |
+| `name`            | Extractor | Component name                               |
+| `slug`            | Extractor | URL-friendly identifier                      |
+| `description`     | Generator | Semantic description for AI                  |
+| `importStatement` | Builder   | Generated import statements                  |
 | `props`           | Extractor | Categorized props (variants, behaviors, etc) |
-| `cvaVariants`     | Extractor | CVA variant definitions with defaults        |
-| `dependencies`    | Extractor | npm and internal dependencies                |
-| `description`     | Generator | AI-generated component description           |
 | `examples`        | Generator | Structured examples (minimal, common, adv)   |
 | `guidance`        | Generator | When to use, accessibility, patterns         |
-| `importStatement` | Builder   | Generated import statements                  |
+| `dependencies`    | Extractor | npm and internal dependencies                |
+| `subComponents`   | Extractor | Sub-components for compound components       |
 
 ### Categorized Props
 

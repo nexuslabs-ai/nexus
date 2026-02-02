@@ -100,6 +100,46 @@ function buildBaseLibrarySection(extracted: ExtractedData): string {
   return parts.join(' ');
 }
 
+/**
+ * Build the sub-component variants section for the prompt
+ *
+ * For compound components (Dialog, Accordion, etc.), includes variant information
+ * for each sub-component so the LLM can generate variant descriptions for them.
+ */
+function buildSubComponentVariantsSection(extracted: ExtractedData): string {
+  if (!extracted.subComponents || extracted.subComponents.length === 0) {
+    return '';
+  }
+
+  // Filter to only sub-components that have variants
+  const subComponentsWithVariants = extracted.subComponents.filter(
+    (sub) => sub.variants && Object.keys(sub.variants).length > 0
+  );
+
+  if (subComponentsWithVariants.length === 0) {
+    return '';
+  }
+
+  const sections = subComponentsWithVariants.map((sub) => {
+    const variantLines = Object.entries(sub.variants!).map(
+      ([name, values]) => `  - ${name}: ${values.join(', ')}`
+    );
+
+    // Include defaults if available
+    let subSection = `${sub.name}:\n${variantLines.join('\n')}`;
+    if (sub.defaultVariants && Object.keys(sub.defaultVariants).length > 0) {
+      const defaultLines = Object.entries(sub.defaultVariants).map(
+        ([name, value]) => `    ${name}: ${value}`
+      );
+      subSection += `\n  Defaults:\n${defaultLines.join('\n')}`;
+    }
+
+    return subSection;
+  });
+
+  return `Sub-Component Variants:\n${sections.join('\n\n')}`;
+}
+
 // =============================================================================
 // Prompt Builder Input
 // =============================================================================
@@ -188,6 +228,8 @@ function buildToolCallingUserPrompt({
 }: PromptBuilderInput): string {
   const propsSection = buildPropsSection(extracted);
   const variantsSection = buildVariantsSection(extracted);
+  const subComponentVariantsSection =
+    buildSubComponentVariantsSection(extracted);
   const dependenciesSection = buildDependenciesSection(extracted);
   const baseLibrarySection = buildBaseLibrarySection(extracted);
 
@@ -204,6 +246,8 @@ ${sourceDescription}
 ${propsSection}
 
 ${variantsSection}
+
+${subComponentVariantsSection}
 
 ${dependenciesSection}
 

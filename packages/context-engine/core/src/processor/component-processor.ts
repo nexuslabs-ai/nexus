@@ -193,11 +193,12 @@ export class ComponentProcessor {
     logger.info('Full pipeline processing completed', {
       orgId: input.orgId,
       name: input.name,
-      id: buildResult.manifest.id,
+      id: buildResult.metadata.id,
     });
 
     return {
-      output: buildResult.output,
+      componentName: buildResult.componentName,
+      metadata: buildResult.metadata,
       manifest: buildResult.manifest,
       extraction: extractResult.metadata,
     };
@@ -344,7 +345,7 @@ export class ComponentProcessor {
    * Build manifest from extraction and generation results.
    *
    * This is the final phase that combines extracted data with
-   * LLM-generated metadata into a complete ComponentManifest.
+   * LLM-generated metadata into a complete manifest.
    *
    * @param input - Build input with extraction and generation results
    * @returns BuildResult with output and manifest
@@ -383,7 +384,7 @@ export class ComponentProcessor {
       this.manifestBuilder.build(builderInput);
 
     logger.info('Manifest built successfully', {
-      id: result.manifest.id,
+      id: result.metadata.id,
       name: result.manifest.name,
     });
 
@@ -510,8 +511,8 @@ export class ComponentProcessor {
 
     const storedManifest: StoredManifest = {
       componentName,
+      metadata: result.metadata,
       manifest: result.manifest,
-      output: result.output,
       storedAt: new Date().toISOString(),
     };
 
@@ -549,7 +550,8 @@ export class ComponentProcessor {
     });
 
     return {
-      output: buildResult.output,
+      componentName: buildResult.componentName,
+      metadata: buildResult.metadata,
       manifest: buildResult.manifest,
       extraction: extractResult.metadata,
     };
