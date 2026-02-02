@@ -3,6 +3,8 @@
  *
  * Exports ComponentProcessor and related types for orchestrating
  * the full extraction-generation-build pipeline.
+ *
+ * All methods throw on error - no discriminated unions.
  */
 
 // Main processor
@@ -11,6 +13,9 @@ export {
   createComponentProcessor,
 } from './component-processor.js';
 
+// Re-export FileStateStore for consumers who want to use persistent storage
+export { FileStateStore } from './file-state-store.js';
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -18,24 +23,12 @@ export {
 export type {
   // Build phase
   BuildInput,
-  BuildOutput,
+  BuildResult,
   // Extraction phase
-  ExtractFailure,
-  ExtractOutput,
-  ExtractSuccess,
+  ExtractResult,
   // Generation phase
-  GenerateFailure,
   GenerateInput,
-  GenerateOutput,
-  GenerateSuccess,
-} from './types.js';
-
-// Type guards
-export {
-  isExtractFailure,
-  isExtractSuccess,
-  isGenerateFailure,
-  isGenerateSuccess,
+  GenerateResult,
 } from './types.js';
 
 // =============================================================================
@@ -45,17 +38,23 @@ export {
 export type {
   ExtractionMetadata,
   ProcessorConfig,
-  ProcessorFailure,
   ProcessorInput,
-  ProcessorMetrics,
-  ProcessorOutput,
-  ProcessorSuccess,
+  ProcessorResult,
 } from './types.js';
 
-// Constants and common type guards
-export {
-  isProcessorFailure,
-  isProcessorSuccess,
-  ProcessorErrorCode,
-  ProcessorOutputType,
+// =============================================================================
+// State Store Types (for persistent storage)
+// =============================================================================
+
+export type {
+  StoredComponentState,
+  StoredExtraction,
+  StoredGeneration,
+  StoredManifest,
 } from './types.js';
+
+// =============================================================================
+// Manifest Builder Types (for build() return type)
+// =============================================================================
+
+export type { ManifestBuilderResult } from '../manifest/index.js';

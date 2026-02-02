@@ -6,6 +6,9 @@
  *
  * Uses tool calling (function calling) for structured output generation.
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * Configuration is read from environment variables via the config module:
  * - GOOGLE_API_KEY: API key (required)
  * - GEMINI_MODEL: Model identifier (provider-specific, preferred)
@@ -17,6 +20,7 @@
 import { FunctionCallingConfigMode, GoogleGenAI, Type } from '@google/genai';
 
 import { getGeminiConfig } from '../config/index.js';
+import { MetaGenerationError } from '../types/errors.js';
 import { createLogger } from '../utils/logger.js';
 
 import {
@@ -135,6 +139,9 @@ function convertToGeminiSchema(
  * Supports Gemini models and handles authentication via API key.
  * Uses tool calling (function calling) for structured output.
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * @example
  * ```typescript
  * const provider = new GeminiProvider({
@@ -142,10 +149,12 @@ function convertToGeminiSchema(
  *   // model defaults to DEFAULT_GEMINI_MODEL constant
  * });
  *
+ * // Throws MetaGenerationError on failure
  * const result = await provider.generateWithToolCalling<ComponentMetaTool>(
  *   'Generate metadata for a Button component...',
  *   { maxTokens: 2000 }
  * );
+ * console.log(result.data);
  * ```
  */
 export class GeminiProvider implements ILLMProvider {
@@ -193,6 +202,7 @@ export class GeminiProvider implements ILLMProvider {
    * @param prompt - The input prompt for generation
    * @param options - Optional generation parameters
    * @returns Promise resolving to the tool call result
+   * @throws MetaGenerationError on failure
    */
   async generateWithToolCalling<T>(
     prompt: string,
@@ -229,8 +239,9 @@ export class GeminiProvider implements ILLMProvider {
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(
-            new Error(
-              `Gemini request timed out after ${this.config.timeoutMs}ms`
+            new MetaGenerationError(
+              `Gemini request timed out after ${this.config.timeoutMs}ms`,
+              { provider: 'gemini', timeoutMs: this.config.timeoutMs }
             )
           );
         }, this.config.timeoutMs);
@@ -263,11 +274,10 @@ export class GeminiProvider implements ILLMProvider {
           finishReason: candidate?.finishReason,
         });
 
-        return {
-          type: 'failure',
-          error: 'Tool calling failed: no function call in response',
-          retryable: true,
-        };
+        throw new MetaGenerationError(
+          'Tool calling failed: no function call in response',
+          { provider: 'gemini', model: this.config.model }
+        );
       }
 
       if (functionCall.name !== COMPONENT_META_TOOL.name) {
@@ -276,11 +286,10 @@ export class GeminiProvider implements ILLMProvider {
           received: functionCall.name,
         });
 
-        return {
-          type: 'failure',
-          error: `Tool calling failed: unexpected function "${functionCall.name}"`,
-          retryable: true,
-        };
+        throw new MetaGenerationError(
+          `Tool calling failed: unexpected function "${functionCall.name}"`,
+          { provider: 'gemini', model: this.config.model }
+        );
       }
 
       // Extract usage metadata
@@ -297,7 +306,6 @@ export class GeminiProvider implements ILLMProvider {
       const normalizedData = this.normalizeToolOutput(functionCall.args);
 
       return {
-        type: 'success',
         data: normalizedData as T,
         usage: usageMetadata
           ? {
@@ -308,7 +316,61 @@ export class GeminiProvider implements ILLMProvider {
         model: this.config.model,
       };
     } catch (error) {
-      return this.handleError(error);
+      // Re-throw MetaGenerationError as-is
+      if (error instanceof MetaGenerationError) {
+        throw error;
+      }
+
+      // Handle API errors
+      if (error instanceof Error) {
+        const message = error.message.toLowerCase();
+
+        logger.error('Gemini API error', error);
+
+        // Auth errors
+        if (
+          message.includes('401') ||
+          message.includes('403') ||
+          message.includes('api key')
+        ) {
+          throw new MetaGenerationError(
+            'Gemini authentication failed: invalid API key',
+            { provider: 'gemini' }
+          );
+        }
+
+        // Rate limit
+        if (
+          message.includes('429') ||
+          message.includes('rate limit') ||
+          message.includes('quota')
+        ) {
+          throw new MetaGenerationError(
+            'Gemini rate limit exceeded: please retry later',
+            { provider: 'gemini' }
+          );
+        }
+
+        // Service errors
+        if (
+          message.includes('500') ||
+          message.includes('503') ||
+          message.includes('unavailable')
+        ) {
+          throw new MetaGenerationError(
+            'Gemini service unavailable: please retry later',
+            { provider: 'gemini' }
+          );
+        }
+
+        throw new MetaGenerationError(`Gemini API error: ${error.message}`, {
+          provider: 'gemini',
+        });
+      }
+
+      // Unknown errors
+      logger.error('Unexpected error during Gemini call', error as Error);
+      throw new MetaGenerationError('Unknown error', { provider: 'gemini' });
     }
   }
 
@@ -348,81 +410,6 @@ export class GeminiProvider implements ILLMProvider {
     }
 
     return obj;
-  }
-
-  /**
-   * Handle errors from Gemini API calls
-   */
-  private handleError<T>(error: unknown): ToolCallResult<T> {
-    // Handle timeout errors (from our Promise.race)
-    if (error instanceof Error && error.message.includes('timed out')) {
-      logger.error('Gemini timeout error', error);
-      return {
-        type: 'failure',
-        error: error.message,
-        retryable: true,
-      };
-    }
-
-    // Handle API errors
-    if (error instanceof Error) {
-      const message = error.message.toLowerCase();
-
-      logger.error('Gemini API error', error);
-
-      // Auth errors are not retryable
-      if (
-        message.includes('401') ||
-        message.includes('403') ||
-        message.includes('api key')
-      ) {
-        return {
-          type: 'failure',
-          error: 'Gemini authentication failed: invalid API key',
-          retryable: false,
-        };
-      }
-
-      // Rate limit is retryable
-      if (
-        message.includes('429') ||
-        message.includes('rate limit') ||
-        message.includes('quota')
-      ) {
-        return {
-          type: 'failure',
-          error: 'Gemini rate limit exceeded: please retry later',
-          retryable: true,
-        };
-      }
-
-      // Service errors are retryable
-      if (
-        message.includes('500') ||
-        message.includes('503') ||
-        message.includes('unavailable')
-      ) {
-        return {
-          type: 'failure',
-          error: 'Gemini service unavailable: please retry later',
-          retryable: true,
-        };
-      }
-
-      return {
-        type: 'failure',
-        error: `Gemini API error: ${error.message}`,
-        retryable: false,
-      };
-    }
-
-    // Unknown errors
-    logger.error('Unexpected error during Gemini call', error as Error);
-    return {
-      type: 'failure',
-      error: 'Unknown error',
-      retryable: false,
-    };
   }
 }
 

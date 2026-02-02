@@ -253,7 +253,6 @@ export const SearchResponseSchema = z.object({
   meta: z.object({
     query: z.string(),
     totalResults: z.number().int().min(0),
-    searchTimeMs: z.number().min(0),
   }),
 });
 

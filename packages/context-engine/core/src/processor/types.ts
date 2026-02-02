@@ -4,7 +4,8 @@
  * Types for the ComponentProcessor that orchestrates the full pipeline:
  * Extract -> Generate -> Build Manifest
  *
- * Uses discriminated unions for type-safe success/failure handling.
+ * All methods throw on error - no discriminated unions.
+ * Includes stored state types for optional persistent state storage.
  */
 
 import type { HybridExtractorOptions } from '../extractor/index.js';
@@ -17,21 +18,6 @@ import type {
   ManifestIdentity,
   ManifestOutput,
 } from '../types/index.js';
-import { OutputType } from '../types/output.js';
-
-// =============================================================================
-// Discriminant Constants
-// =============================================================================
-
-/**
- * Processor output type discriminant
- *
- * Uses shared OutputType for consistency across modules.
- */
-export const ProcessorOutputType = OutputType;
-
-export type ProcessorOutputType =
-  (typeof ProcessorOutputType)[keyof typeof ProcessorOutputType];
 
 // =============================================================================
 // Configuration
@@ -77,6 +63,120 @@ export interface ProcessorConfig {
    * ```
    */
   extractorOptions?: HybridExtractorOptions;
+
+  /**
+   * Optional directory path for persistent state storage.
+   * When provided, enables checkpoint-based processing where state
+   * can be saved after each phase (extraction, generation, build).
+   *
+   * The processor will create a FileStateStore internally using this directory.
+   * Use with `extractAndStore`, `generateAndStore`, and `buildAndStore` methods.
+   *
+   * @example
+   * ```typescript
+   * const processor = new ComponentProcessor({ storeDir: './state' });
+   *
+   * // Extract and save checkpoint
+   * await processor.extractAndStore(input);
+   *
+   * // Later: resume from checkpoint
+   * await processor.generateAndStore('Button');
+   * ```
+   */
+  storeDir?: string;
+}
+
+// =============================================================================
+// Stored State Types
+// =============================================================================
+
+/**
+ * Stored extraction state
+ *
+ * Persisted result from the extraction phase, containing all data
+ * needed to resume with generation or rebuild manifests.
+ */
+export interface StoredExtraction {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Organization ID for multi-org isolation */
+  orgId: string;
+
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
+
+  /** Extracted data from source code analysis */
+  extracted: ExtractedData;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** ISO timestamp when extraction was stored */
+  storedAt: string;
+}
+
+/**
+ * Stored generation state
+ *
+ * Persisted result from the generation phase, containing LLM-generated
+ * metadata that can be combined with extraction to build manifests.
+ */
+export interface StoredGeneration {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Generated component metadata */
+  meta: ComponentMeta;
+
+  /** LLM provider type used */
+  provider: string;
+
+  /** Model identifier used for generation */
+  model: string;
+
+  /** ISO timestamp when generation was stored */
+  storedAt: string;
+}
+
+/**
+ * Stored manifest
+ *
+ * Persisted complete manifest, representing the final output
+ * of the extraction-generation-build pipeline.
+ */
+export interface StoredManifest {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Complete component manifest */
+  manifest: ComponentManifest;
+
+  /** Split manifest output structure */
+  output: ManifestOutput;
+
+  /** ISO timestamp when manifest was stored */
+  storedAt: string;
+}
+
+/**
+ * Stored component state
+ *
+ * Combined state for a component, including extraction, generation,
+ * and manifest data. Used for querying complete component state.
+ */
+export interface StoredComponentState {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Stored extraction (if available) */
+  extraction?: StoredExtraction;
+
+  /** Stored generation (if available) */
+  generation?: StoredGeneration;
+
+  /** Stored manifest (if available) */
+  manifest?: StoredManifest;
 }
 
 // =============================================================================
@@ -151,22 +251,8 @@ export interface ProcessorInput {
 }
 
 // =============================================================================
-// Output Types (Discriminated Unions)
+// Output Types (Success only - methods throw on error)
 // =============================================================================
-
-/**
- * Timing metrics for the processing pipeline
- */
-export interface ProcessorMetrics {
-  /** Time spent on extraction (ms) */
-  extractionTimeMs?: number;
-
-  /** Time spent on generation (ms) */
-  generationTimeMs?: number;
-
-  /** Total processing time (ms) */
-  totalTimeMs: number;
-}
 
 /**
  * Extraction metadata from the pipeline
@@ -183,102 +269,17 @@ export interface ExtractionMetadata {
 }
 
 /**
- * Successful processor output
+ * Processor result (success only - throws on error)
  */
-export interface ProcessorSuccess {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Success;
-
+export interface ProcessorResult {
   /** Split manifest output (componentName, metadata, manifest) */
   output: ManifestOutput;
 
   /** Complete component manifest (legacy, for internal use) */
   manifest: ComponentManifest;
 
-  /** Processing metrics */
-  metrics: ProcessorMetrics;
-
   /** Extraction metadata */
   extraction: ExtractionMetadata;
-}
-
-/**
- * Failed processor output
- */
-export interface ProcessorFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /**
-   * Error code for programmatic handling
-   */
-  code: ProcessorErrorCode;
-
-  /** Processing metrics (may be partial) */
-  metrics: Partial<ProcessorMetrics>;
-
-  /** Extraction metadata (if extraction completed) */
-  extraction?: ExtractionMetadata;
-
-  /** Whether the error is retryable */
-  retryable: boolean;
-}
-
-/**
- * Processor output union
- */
-export type ProcessorOutput = ProcessorSuccess | ProcessorFailure;
-
-// =============================================================================
-// Error Codes
-// =============================================================================
-
-/**
- * Processor error codes for programmatic handling
- */
-export const ProcessorErrorCode = {
-  /** Extraction failed */
-  ExtractionFailed: 'EXTRACTION_FAILED',
-
-  /** Meta generation failed */
-  GenerationFailed: 'GENERATION_FAILED',
-
-  /** Manifest building failed */
-  ManifestBuildFailed: 'MANIFEST_BUILD_FAILED',
-
-  /** Unsupported framework */
-  UnsupportedFramework: 'UNSUPPORTED_FRAMEWORK',
-
-  /** Invalid input */
-  InvalidInput: 'INVALID_INPUT',
-} as const;
-
-export type ProcessorErrorCode =
-  (typeof ProcessorErrorCode)[keyof typeof ProcessorErrorCode];
-
-// =============================================================================
-// Type Guards
-// =============================================================================
-
-/**
- * Check if processor output is successful
- */
-export function isProcessorSuccess(
-  output: ProcessorOutput
-): output is ProcessorSuccess {
-  return output.type === ProcessorOutputType.Success;
-}
-
-/**
- * Check if processor output is a failure
- */
-export function isProcessorFailure(
-  output: ProcessorOutput
-): output is ProcessorFailure {
-  return output.type === ProcessorOutputType.Failure;
 }
 
 // =============================================================================
@@ -286,12 +287,9 @@ export function isProcessorFailure(
 // =============================================================================
 
 /**
- * Successful extraction output
+ * Extraction result (success only - extractor throws on error)
  */
-export interface ExtractSuccess {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Success;
-
+export interface ExtractResult {
   /** Component ID (generated or existing) */
   id: string;
 
@@ -308,36 +306,8 @@ export interface ExtractSuccess {
   sourceHash: string;
 
   /** Extraction metadata */
-  extraction: ExtractionMetadata;
-
-  /** Extraction timing */
-  extractionTimeMs: number;
+  metadata: ExtractionMetadata;
 }
-
-/**
- * Failed extraction output
- */
-export interface ExtractFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /** Error code */
-  code: ProcessorErrorCode;
-
-  /** Source hash (for conflict errors) */
-  sourceHash?: string;
-
-  /** Whether the error is retryable */
-  retryable: boolean;
-}
-
-/**
- * Extraction output union
- */
-export type ExtractOutput = ExtractSuccess | ExtractFailure;
 
 // =============================================================================
 // Generation Phase Types
@@ -377,6 +347,20 @@ export interface GenerateInput {
   hints?: string;
 }
 
+/**
+ * Generation result (success only - generator throws on error)
+ */
+export interface GenerateResult {
+  /** Generated component metadata */
+  meta: ComponentMeta;
+
+  /** Provider used for generation */
+  provider: string;
+
+  /** Model used for generation */
+  model: string;
+}
+
 // =============================================================================
 // Build Phase Types
 // =============================================================================
@@ -408,97 +392,15 @@ export interface BuildInput {
 }
 
 /**
- * Build phase output.
- *
- * Result of combining extraction and generation into a manifest.
+ * Build result (success only - throws ManifestBuildError on failure)
  */
-export type { ManifestBuilderOutput as BuildOutput } from '../manifest/index.js';
+export interface BuildResult {
+  /** Complete manifest output with split structure */
+  output: ManifestOutput;
 
-/**
- * Generation phase success output.
- *
- * Simplified output containing only the LLM-generated metadata,
- * without manifest building (which happens in the build phase).
- */
-export interface GenerateSuccess {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Success;
+  /** Legacy: full manifest for internal use */
+  manifest: ComponentManifest;
 
-  /** Generated component metadata */
-  meta: ComponentMeta;
-
-  /** Generation timing in milliseconds */
-  generationTimeMs: number;
-
-  /** Provider used for generation */
-  provider: string;
-
-  /** Model used for generation */
-  model: string;
-}
-
-/**
- * Generation phase failure output.
- *
- * Represents a failed LLM generation attempt.
- */
-export interface GenerateFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /** Generation timing in milliseconds */
-  generationTimeMs: number;
-
-  /** Whether the error is retryable */
-  retryable: boolean;
-}
-
-/**
- * Generation phase output.
- *
- * Discriminated union of generation success or failure.
- */
-export type GenerateOutput = GenerateSuccess | GenerateFailure;
-
-// =============================================================================
-// Type Guards for Extraction and Generation
-// =============================================================================
-
-/**
- * Check if extraction output is successful
- */
-export function isExtractSuccess(
-  output: ExtractOutput
-): output is ExtractSuccess {
-  return output.type === ProcessorOutputType.Success;
-}
-
-/**
- * Check if extraction output is a failure
- */
-export function isExtractFailure(
-  output: ExtractOutput
-): output is ExtractFailure {
-  return output.type === ProcessorOutputType.Failure;
-}
-
-/**
- * Check if generation output is successful
- */
-export function isGenerateSuccess(
-  result: GenerateOutput
-): result is GenerateSuccess {
-  return result.type === ProcessorOutputType.Success;
-}
-
-/**
- * Check if generation output is a failure
- */
-export function isGenerateFailure(
-  result: GenerateOutput
-): result is GenerateFailure {
-  return result.type === ProcessorOutputType.Failure;
+  /** Build timestamp */
+  builtAt: string;
 }

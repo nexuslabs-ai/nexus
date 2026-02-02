@@ -29,6 +29,7 @@ import {
   extractRadixComponentName,
   isRadixPackage,
 } from '../constants/index.js';
+import { ExtractionError } from '../types/errors.js';
 import type { ExtractedData, ExtractedSubComponent } from '../types/index.js';
 import { generateSourceHash } from '../utils/hash.js';
 import { generateComponentId, generateSlug } from '../utils/id.js';
@@ -51,9 +52,8 @@ import { StorybookExtractor } from './storybook/storybook-extractor.js';
 import { TsMorphExtractor } from './ts-morph-extractor.js';
 import {
   type ExtractionInput,
-  type ExtractionOutput,
-  ExtractionOutputType,
   ExtractorMethod,
+  type ExtractorResult,
   type IExtractor,
 } from './types.js';
 import { VariantExtractor } from './variant-extractor.js';
@@ -132,10 +132,10 @@ export class HybridExtractor implements IExtractor {
    * 3. Extract variants
    * 4. Extract dependencies
    * 5. Build and return ExtractedData
+   *
+   * @throws ExtractionError if extraction fails
    */
-  async extract(input: ExtractionInput): Promise<ExtractionOutput> {
-    const startTime = performance.now();
-
+  async extract(input: ExtractionInput): Promise<ExtractorResult> {
     // Step 1: Compute source hash for change detection
     const sourceHash = generateSourceHash(input.sourceCode);
 
@@ -330,19 +330,15 @@ export class HybridExtractor implements IExtractor {
       const id = input.existingId ?? generateComponentId();
       const slug = generateSlug(input.name, input.framework, id);
 
-      const extractionTimeMs = Math.round(performance.now() - startTime);
-
       logger.debug('Extraction completed', {
         name: input.name,
         extractionMethod,
         fallbackTriggered,
         propsCount: data.props.length,
         variantsCount: Object.keys(variants).length,
-        durationMs: extractionTimeMs,
       });
 
       return {
-        type: ExtractionOutputType.Success,
         orgId: input.orgId,
         identity: {
           id,
@@ -357,17 +353,17 @@ export class HybridExtractor implements IExtractor {
         fallbackReason: fallbackReason
           ? FALLBACK_REASON_DESCRIPTIONS[fallbackReason]
           : undefined,
-        extractionTimeMs,
       };
     } catch (error) {
       logger.error('Extraction failed', error as Error, { name: input.name });
 
-      return {
-        type: ExtractionOutputType.Failure,
-        error: error instanceof Error ? error.message : 'Extraction failed',
-        sourceHash,
-        extractionTimeMs: Math.round(performance.now() - startTime),
-      };
+      throw new ExtractionError(
+        error instanceof Error ? error.message : 'Extraction failed',
+        {
+          componentName: input.name,
+          sourceHash,
+        }
+      );
     }
   }
 

@@ -26,16 +26,7 @@ export type {
 export { StorybookExtractor } from './storybook/index.js';
 
 // Public types only
-export type {
-  ExtractionFailure,
-  ExtractionInput,
-  ExtractionOutput,
-  ExtractorResult,
-  IExtractor,
-} from './types.js';
-
-// Type guards
-export { isExtractionFailure, isExtractionSuccess } from './types.js';
+export type { ExtractionInput, ExtractorResult, IExtractor } from './types.js';
 
 /**
  * Supported frameworks for extraction

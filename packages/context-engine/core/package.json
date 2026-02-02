@@ -46,11 +46,6 @@
       "types": "./dist/processor/index.d.ts",
       "import": "./dist/processor/index.js",
       "require": "./dist/processor/index.cjs"
-    },
-    "./pipeline": {
-      "types": "./dist/pipeline/index.d.ts",
-      "import": "./dist/pipeline/index.js",
-      "require": "./dist/pipeline/index.cjs"
     }
   },
   "scripts": {

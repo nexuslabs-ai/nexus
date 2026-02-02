@@ -3,6 +3,11 @@
  *
  * Types for LLM-based metadata generation. This module provides abstractions
  * for LLM providers and meta generation to enable future multi-provider support.
+ *
+ * Error Handling:
+ * All generator methods throw MetaGenerationError on failure instead of returning
+ * failure result objects. This simplifies consumer code and follows the pattern
+ * established in the extractor module.
  */
 
 import type {
@@ -10,7 +15,6 @@ import type {
   ExtractedData,
   Framework,
 } from '../types/index.js';
-import { OutputType } from '../types/output.js';
 
 /**
  * LLM provider discriminant for type narrowing
@@ -24,16 +28,6 @@ export const LLMProviderType = {
 
 export type LLMProviderType =
   (typeof LLMProviderType)[keyof typeof LLMProviderType];
-
-/**
- * Generation output type discriminant
- *
- * Uses shared OutputType for consistency across modules.
- */
-export const GenerationOutputType = OutputType;
-
-export type GenerationOutputType =
-  (typeof GenerationOutputType)[keyof typeof GenerationOutputType];
 
 /**
  * LLM completion options
@@ -85,6 +79,9 @@ export interface LLMCompletionResponse {
  * All providers MUST implement tool calling - this is the only supported generation method.
  * Text-based parsing has been removed in favor of structured output via tool calling.
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * @example
  * ```typescript
  * const provider = new AnthropicProvider({ apiKey: 'sk-...' });
@@ -92,9 +89,7 @@ export interface LLMCompletionResponse {
  *   'Generate metadata for...',
  *   { maxTokens: 2000 }
  * );
- * if (result.type === 'success') {
- *   console.log(result.data);
- * }
+ * console.log(result.data); // Throws on error
  * ```
  */
 export interface ILLMProvider {
@@ -104,6 +99,7 @@ export interface ILLMProvider {
    * @param prompt - The input prompt for generation
    * @param options - Optional generation parameters
    * @returns Promise resolving to the tool call result
+   * @throws MetaGenerationError on failure
    */
   generateWithToolCalling<T>(
     prompt: string,
@@ -145,17 +141,11 @@ export interface GeneratorInput {
 }
 
 /**
- * Successful generation output
+ * Generation output (success only - throws on failure)
  */
-export interface GeneratorSuccess {
-  /** Discriminant for type narrowing */
-  type: typeof GenerationOutputType.Success;
-
+export interface GeneratorOutput {
   /** Generated component metadata */
   meta: ComponentMeta;
-
-  /** Generation timing in milliseconds */
-  generationTimeMs: number;
 
   /** Provider used for generation */
   provider: LLMProviderType;
@@ -171,39 +161,21 @@ export interface GeneratorSuccess {
 }
 
 /**
- * Failed generation output
- */
-export interface GeneratorFailure {
-  /** Discriminant for type narrowing */
-  type: typeof GenerationOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /** Generation timing in milliseconds */
-  generationTimeMs: number;
-
-  /** Whether the error is retryable */
-  retryable: boolean;
-}
-
-/**
- * Generator output union
- */
-export type GeneratorOutput = GeneratorSuccess | GeneratorFailure;
-
-/**
  * Meta generator interface
  *
  * Orchestrates the generation of component metadata using an LLM provider.
  * Handles prompt construction, response parsing, and validation.
+ *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
  */
 export interface IMetaGenerator {
   /**
    * Generate metadata for a component
    *
    * @param input - Generation input with extracted data and context
-   * @returns Promise resolving to generation output (success or failure)
+   * @returns Promise resolving to generation output
+   * @throws MetaGenerationError on failure
    */
   generate(input: GeneratorInput): Promise<GeneratorOutput>;
 }
@@ -247,24 +219,6 @@ export interface GeminiProviderConfig extends LLMProviderConfig {
   model?: string;
 }
 
-/**
- * Type guard for successful generation output
- */
-export function isGeneratorSuccess(
-  output: GeneratorOutput
-): output is GeneratorSuccess {
-  return output.type === GenerationOutputType.Success;
-}
-
-/**
- * Type guard for failed generation output
- */
-export function isGeneratorFailure(
-  output: GeneratorOutput
-): output is GeneratorFailure {
-  return output.type === GenerationOutputType.Failure;
-}
-
 // =============================================================================
 // Tool Calling Types
 // =============================================================================
@@ -281,46 +235,18 @@ export interface ToolCallingOptions {
 }
 
 /**
- * Successful tool calling result
+ * Tool calling result (success only - throws on failure)
  */
-export interface ToolCallSuccess<T> {
-  type: 'success';
+export interface ToolCallResult<T> {
+  /** Tool output data */
   data: T;
+
+  /** Token usage statistics */
   usage?: {
     inputTokens: number;
     outputTokens: number;
   };
+
+  /** Model used for generation */
   model: string;
-}
-
-/**
- * Failed tool calling result
- */
-export interface ToolCallFailure {
-  type: 'failure';
-  error: string;
-  retryable: boolean;
-}
-
-/**
- * Tool calling result union
- */
-export type ToolCallResult<T> = ToolCallSuccess<T> | ToolCallFailure;
-
-/**
- * Type guard for successful tool call
- */
-export function isToolCallSuccess<T>(
-  result: ToolCallResult<T>
-): result is ToolCallSuccess<T> {
-  return result.type === 'success';
-}
-
-/**
- * Type guard for failed tool call
- */
-export function isToolCallFailure<T>(
-  result: ToolCallResult<T>
-): result is ToolCallFailure {
-  return result.type === 'failure';
 }

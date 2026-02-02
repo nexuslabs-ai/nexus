@@ -30,17 +30,6 @@ export type ExtractorMethod =
   (typeof ExtractorMethod)[keyof typeof ExtractorMethod];
 
 /**
- * Extraction output type discriminant
- */
-export const ExtractionOutputType = {
-  Success: 'success',
-  Failure: 'failure',
-} as const;
-
-export type ExtractionOutputType =
-  (typeof ExtractionOutputType)[keyof typeof ExtractionOutputType];
-
-/**
  * Input for code extraction
  */
 export const ExtractionInputSchema = z.object({
@@ -78,11 +67,12 @@ export type ExtractionInput = z.infer<typeof ExtractionInputSchema>;
  *
  * Note: Named ExtractorResult to avoid collision with
  * ExtractionResult schema in types/extracted.ts
+ *
+ * On failure, the extractor throws ExtractionError instead of returning
+ * a failure result. This simplifies consumer code and follows the
+ * "throw on error" pattern used elsewhere in the codebase.
  */
 export interface ExtractorResult {
-  /** Discriminant for type narrowing */
-  type: typeof ExtractionOutputType.Success;
-
   /** Organization ID */
   orgId: string;
 
@@ -103,29 +93,7 @@ export interface ExtractorResult {
 
   /** Reason for fallback (if triggered) */
   fallbackReason?: string;
-
-  /** Extraction timing (ms) */
-  extractionTimeMs: number;
 }
-
-/**
- * Failed extraction result
- */
-export interface ExtractionFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ExtractionOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /** Hash of source code */
-  sourceHash: string;
-
-  /** Extraction timing (ms) */
-  extractionTimeMs: number;
-}
-
-export type ExtractionOutput = ExtractorResult | ExtractionFailure;
 
 /**
  * Props extraction result (from a single extractor)
@@ -154,9 +122,11 @@ export interface IPropsExtractor {
 
 /**
  * Full extractor interface (props + variants + dependencies)
+ *
+ * Throws ExtractionError on failure instead of returning a failure result.
  */
 export interface IExtractor {
-  extract(input: ExtractionInput): Promise<ExtractionOutput>;
+  extract(input: ExtractionInput): Promise<ExtractorResult>;
 }
 
 /**
@@ -182,22 +152,4 @@ export interface DependencyExtractionResult {
 
   /** Base UI library detected (Radix, Ark, etc.) */
   baseLibrary?: string;
-}
-
-/**
- * Check if an extraction output is successful
- */
-export function isExtractionSuccess(
-  output: ExtractionOutput
-): output is ExtractorResult {
-  return output.type === ExtractionOutputType.Success;
-}
-
-/**
- * Check if an extraction output is a failure
- */
-export function isExtractionFailure(
-  output: ExtractionOutput
-): output is ExtractionFailure {
-  return output.type === ExtractionOutputType.Failure;
 }

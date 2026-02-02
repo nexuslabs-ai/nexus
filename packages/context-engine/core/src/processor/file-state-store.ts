@@ -1,8 +1,8 @@
 /**
  * File-based Pipeline State Store
  *
- * Implements IPipelineStateStore using the local filesystem.
- * Files are stored as JSON with naming convention:
+ * Stores pipeline state as JSON files in a configurable directory.
+ * Files are stored with naming convention:
  * {component-name-in-kebab-case}.{type}.json
  */
 
@@ -16,7 +16,8 @@ import {
 } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { IPipelineStateStore } from './state-store.js';
+import { kebabCase } from '../utils/case.js';
+
 import type {
   StoredExtraction,
   StoredGeneration,
@@ -33,56 +34,34 @@ const DEFAULT_STATE_DIR = '.ce-state';
 /** Environment variable for custom state directory */
 const STATE_DIR_ENV = 'CE_STATE_DIR';
 
+/** State phase constants */
+const PHASE_EXTRACTION = 'extraction' as const;
+const PHASE_GENERATION = 'generation' as const;
+const PHASE_MANIFEST = 'manifest' as const;
+
+/** All state phases in pipeline order */
+const STATE_PHASES = [
+  PHASE_EXTRACTION,
+  PHASE_GENERATION,
+  PHASE_MANIFEST,
+] as const;
+
+/** Type representing valid state phases */
+type StatePhase = (typeof STATE_PHASES)[number];
+
 /** File suffixes for different state types */
-const FILE_SUFFIX = {
-  extraction: '.extraction.json',
-  generation: '.generation.json',
-  manifest: '.manifest.json',
-} as const;
-
-// =============================================================================
-// Helper Functions
-// =============================================================================
-
-/**
- * Convert a string to kebab-case
- *
- * Handles PascalCase, camelCase, and mixed inputs.
- *
- * @param str - Input string
- * @returns kebab-case version
- *
- * @example
- * toKebabCase('ButtonGroup') // 'button-group'
- * toKebabCase('DatePicker') // 'date-picker'
- * toKebabCase('XMLParser') // 'xml-parser'
- */
-function toKebabCase(str: string): string {
-  return (
-    str
-      // Insert hyphen before uppercase letters that follow lowercase letters
-      .replace(/([a-z])([A-Z])/g, '$1-$2')
-      // Insert hyphen before uppercase letters that are followed by lowercase letters (for XMLParser -> xml-parser)
-      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
-      // Replace spaces and underscores with hyphens
-      .replace(/[\s_]+/g, '-')
-      // Convert to lowercase
-      .toLowerCase()
-      // Remove any non-alphanumeric characters except hyphens
-      .replace(/[^a-z0-9-]/g, '')
-      // Remove consecutive hyphens
-      .replace(/-+/g, '-')
-      // Remove leading/trailing hyphens
-      .replace(/^-|-$/g, '')
-  );
-}
+const FILE_SUFFIX: Record<StatePhase, string> = {
+  [PHASE_EXTRACTION]: '.extraction.json',
+  [PHASE_GENERATION]: '.generation.json',
+  [PHASE_MANIFEST]: '.manifest.json',
+};
 
 // =============================================================================
 // FileStateStore Implementation
 // =============================================================================
 
 /**
- * File-based implementation of IPipelineStateStore
+ * File-based state store for pipeline persistence
  *
  * Stores pipeline state as JSON files in a configurable directory.
  * Supports atomic writes via temp file + rename pattern.
@@ -100,7 +79,7 @@ function toKebabCase(str: string): string {
  * const data = await store.getExtraction('Button');
  * ```
  */
-export class FileStateStore implements IPipelineStateStore {
+export class FileStateStore {
   private readonly stateDir: string;
   private initialized = false;
 
@@ -133,11 +112,8 @@ export class FileStateStore implements IPipelineStateStore {
   /**
    * Get full file path for a component and state type
    */
-  private getFilePath(
-    componentName: string,
-    type: 'extraction' | 'generation' | 'manifest'
-  ): string {
-    const kebabName = toKebabCase(componentName);
+  private getFilePath(componentName: string, type: StatePhase): string {
+    const kebabName = kebabCase(componentName);
     return join(this.stateDir, `${kebabName}${FILE_SUFFIX[type]}`);
   }
 
@@ -200,12 +176,12 @@ export class FileStateStore implements IPipelineStateStore {
     componentName: string,
     data: StoredExtraction
   ): Promise<void> {
-    const filePath = this.getFilePath(componentName, 'extraction');
+    const filePath = this.getFilePath(componentName, PHASE_EXTRACTION);
     await this.writeJsonFile(filePath, data);
   }
 
   async getExtraction(componentName: string): Promise<StoredExtraction | null> {
-    const filePath = this.getFilePath(componentName, 'extraction');
+    const filePath = this.getFilePath(componentName, PHASE_EXTRACTION);
     return this.readJsonFile<StoredExtraction>(filePath);
   }
 
@@ -217,12 +193,12 @@ export class FileStateStore implements IPipelineStateStore {
     componentName: string,
     data: StoredGeneration
   ): Promise<void> {
-    const filePath = this.getFilePath(componentName, 'generation');
+    const filePath = this.getFilePath(componentName, PHASE_GENERATION);
     await this.writeJsonFile(filePath, data);
   }
 
   async getGeneration(componentName: string): Promise<StoredGeneration | null> {
-    const filePath = this.getFilePath(componentName, 'generation');
+    const filePath = this.getFilePath(componentName, PHASE_GENERATION);
     return this.readJsonFile<StoredGeneration>(filePath);
   }
 
@@ -234,12 +210,12 @@ export class FileStateStore implements IPipelineStateStore {
     componentName: string,
     data: StoredManifest
   ): Promise<void> {
-    const filePath = this.getFilePath(componentName, 'manifest');
+    const filePath = this.getFilePath(componentName, PHASE_MANIFEST);
     await this.writeJsonFile(filePath, data);
   }
 
   async getManifest(componentName: string): Promise<StoredManifest | null> {
-    const filePath = this.getFilePath(componentName, 'manifest');
+    const filePath = this.getFilePath(componentName, PHASE_MANIFEST);
     return this.readJsonFile<StoredManifest>(filePath);
   }
 
@@ -248,11 +224,9 @@ export class FileStateStore implements IPipelineStateStore {
   // ===========================================================================
 
   async delete(componentName: string): Promise<void> {
-    const types = ['extraction', 'generation', 'manifest'] as const;
-
     await Promise.all(
-      types.map((type) => {
-        const filePath = this.getFilePath(componentName, type);
+      STATE_PHASES.map((phase) => {
+        const filePath = this.getFilePath(componentName, phase);
         return this.deleteIfExists(filePath);
       })
     );
@@ -322,15 +296,13 @@ export class FileStateStore implements IPipelineStateStore {
   }
 
   async exists(componentName: string): Promise<boolean> {
-    const types = ['extraction', 'generation', 'manifest'] as const;
-
-    for (const type of types) {
-      const filePath = this.getFilePath(componentName, type);
+    for (const phase of STATE_PHASES) {
+      const filePath = this.getFilePath(componentName, phase);
       try {
         await readFile(filePath);
         return true;
       } catch {
-        // Continue to check other types
+        // Continue to check other phases
       }
     }
 

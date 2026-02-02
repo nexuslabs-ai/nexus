@@ -14,8 +14,7 @@
  * import { HybridExtractor, extractComponent } from '@context-engine/core/extractor';
  * import { MetaGenerator, createMetaGenerator } from '@context-engine/core/generator';
  * import { ManifestBuilder } from '@context-engine/core/manifest';
- * import { ComponentProcessor } from '@context-engine/core/processor';
- * import { Pipeline, FileStateStore } from '@context-engine/core/pipeline';
+ * import { ComponentProcessor, FileStateStore } from '@context-engine/core/processor';
  * ```
  */
 
@@ -40,8 +39,5 @@ export * from './generator/index.js';
 // Re-export manifest module
 export * from './manifest/index.js';
 
-// Re-export processor module
+// Re-export processor module (includes FileStateStore and state store types)
 export * from './processor/index.js';
-
-// Re-export pipeline module
-export * from './pipeline/index.js';

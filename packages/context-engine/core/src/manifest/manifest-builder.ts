@@ -41,12 +41,11 @@ import {
 } from '../utils/prop-categorization.js';
 
 import { generateImportStatement } from './import-generator.js';
-import {
-  type ManifestBuilderConfig,
-  type ManifestBuilderInput,
-  type ManifestBuilderOutput,
-  ManifestBuildOutputType,
-  type ManifestUpdateInput,
+import type {
+  ManifestBuilderConfig,
+  ManifestBuilderInput,
+  ManifestBuilderResult,
+  ManifestUpdateInput,
 } from './types.js';
 
 /** Default package name when detection fails */
@@ -108,7 +107,8 @@ export class ManifestBuilder {
    * Build a complete ComponentManifest from extracted data and generated metadata
    *
    * @param input - Builder input containing identity, extracted data, and meta
-   * @returns ManifestBuilderOutput with success or failure result
+   * @returns ManifestBuilderResult with output and manifest
+   * @throws ManifestBuildError if building fails
    */
   build({
     identity,
@@ -116,7 +116,7 @@ export class ManifestBuilder {
     meta,
     sourceHash,
     version = '0.0.1',
-  }: ManifestBuilderInput): ManifestBuilderOutput {
+  }: ManifestBuilderInput): ManifestBuilderResult {
     const { name } = identity;
 
     // TypeScript types enforce required fields - no runtime validation needed
@@ -229,7 +229,6 @@ export class ManifestBuilder {
     };
 
     return {
-      type: ManifestBuildOutputType.Success,
       output,
       manifest, // Keep for internal use
       builtAt: now,

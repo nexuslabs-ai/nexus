@@ -3,34 +3,27 @@
  *
  * Exports for LLM-based metadata generation including provider abstractions,
  * the Anthropic and Gemini implementations, MetaGenerator, and prompts.
+ *
+ * Error Handling:
+ * All generator methods throw MetaGenerationError on failure instead of returning
+ * failure result objects. Import MetaGenerationError from '../types/errors.js'.
  */
 
 // Types
 export type {
   AnthropicProviderConfig,
   GeminiProviderConfig,
-  GeneratorFailure,
   GeneratorInput,
   GeneratorOutput,
-  GeneratorSuccess,
   ILLMProvider,
   IMetaGenerator,
   LLMCompletionOptions,
   LLMCompletionResponse,
   LLMProviderConfig,
-  ToolCallFailure,
   ToolCallingOptions,
   ToolCallResult,
-  ToolCallSuccess,
 } from './types.js';
-export {
-  GenerationOutputType,
-  isGeneratorFailure,
-  isGeneratorSuccess,
-  isToolCallFailure,
-  isToolCallSuccess,
-  LLMProviderType,
-} from './types.js';
+export { LLMProviderType } from './types.js';
 
 // Providers
 export {

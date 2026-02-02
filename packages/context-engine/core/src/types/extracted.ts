@@ -168,9 +168,6 @@ export const ExtractionResultSchema = z.object({
   /** Source hash for change detection */
   sourceHash: HashSchema,
 
-  /** Extraction duration in milliseconds */
-  durationMs: z.number().int().min(0),
-
   /** Any warnings during extraction */
   warnings: z.array(z.string()).default([]),
 });
