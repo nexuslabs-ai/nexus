@@ -1,24 +1,24 @@
 #!/usr/bin/env node
 /**
- * Pipeline Runner Script
+ * Processor Runner Script
  *
  * CLI script that processes Nexus components through the extraction-generation
- * pipeline and saves outputs to a local directory.
+ * processor and saves outputs to a local directory.
  *
  * Usage:
- *   tsx scripts/run-pipeline.ts [options]
+ *   tsx scripts/run-processor.ts --phase <phase> [options]
  *
  * Options:
- *   --phase <phase>      Run specific phase: extract, generate, build, full (default: full)
+ *   --phase <phase>      Required. Phase to run: extract, generate, build, full
  *   --component <name>   Process single component by name
  *   --output <dir>       Output directory (default: .ce-output)
  *   --help               Show help
  *
  * Examples:
- *   tsx scripts/run-pipeline.ts                           # Full pipeline, all components
- *   tsx scripts/run-pipeline.ts --phase extract           # Extract only, all components
- *   tsx scripts/run-pipeline.ts --component Button        # Full pipeline, Button only
- *   tsx scripts/run-pipeline.ts --component Button --phase extract
+ *   tsx scripts/run-processor.ts --phase full              # Full processing, all components
+ *   tsx scripts/run-processor.ts --phase extract           # Extract only, all components
+ *   tsx scripts/run-processor.ts --phase full --component Button  # Full processing, Button only
+ *   tsx scripts/run-processor.ts --phase extract --component Button
  */
 
 import { config } from 'dotenv';
@@ -26,7 +26,6 @@ import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { ILLMProvider, ToolCallResult } from '../src/generator/index.js';
 import { ComponentProcessor } from '../src/processor/index.js';
 import { createProviderFromEnv } from '../src/utils/env-provider.js';
 import { createLogger } from '../src/utils/logger.js';
@@ -38,29 +37,7 @@ import {
   getComponentNames,
 } from './components.js';
 
-const logger = createLogger({ name: 'run-pipeline' });
-
-// =============================================================================
-// Noop LLM Provider (for extraction-only mode)
-// =============================================================================
-
-/**
- * A noop LLM provider that throws when used.
- *
- * This allows the Pipeline/ComponentProcessor to be instantiated without
- * requiring an API key, while ensuring generation operations fail clearly
- * if attempted.
- */
-class NoopLLMProvider implements ILLMProvider {
-  readonly providerType = 'noop' as const;
-  readonly modelId = 'noop';
-
-  async generateWithToolCalling<T>(): Promise<ToolCallResult<T>> {
-    throw new Error(
-      'NoopLLMProvider: Generation not available. Set ANTHROPIC_API_KEY or GOOGLE_API_KEY.'
-    );
-  }
-}
+const logger = createLogger({ name: 'run-processor' });
 
 // =============================================================================
 // Constants
@@ -82,7 +59,7 @@ type Phase = 'extract' | 'generate' | 'build' | 'full';
 // =============================================================================
 
 interface CliArgs {
-  phase: Phase;
+  phase?: Phase;
   component?: string;
   output: string;
   help: boolean;
@@ -90,7 +67,6 @@ interface CliArgs {
 
 function parseArgs(args: string[]): CliArgs {
   const result: CliArgs = {
-    phase: 'full',
     output: DEFAULT_OUTPUT_DIR,
     help: false,
   };
@@ -131,13 +107,13 @@ function parseArgs(args: string[]): CliArgs {
 
 function showHelp(): void {
   logger.info(`
-Context Engine Pipeline Runner
+Context Engine Processor Runner
 
 Usage:
-  tsx scripts/run-pipeline.ts [options]
+  tsx scripts/run-processor.ts --phase <phase> [options]
 
 Options:
-  --phase <phase>      Run specific phase: extract, generate, build, full (default: full)
+  --phase <phase>      Required. Phase to run: extract, generate, build, full
   --component <name>   Process single component by name
   --output <dir>       Output directory (default: .ce-output)
   --help, -h           Show this help message
@@ -146,23 +122,23 @@ Phases:
   extract   Extract props, variants, dependencies from source code
   generate  Generate semantic metadata via LLM (requires prior extraction)
   build     Build manifest from stored extraction and generation
-  full      Run all phases in sequence (default)
+  full      Full pipeline via processAndStore (extract → generate → build)
 
 Examples:
-  # Process all components through full pipeline
-  tsx scripts/run-pipeline.ts
+  # Process all components through full processor
+  tsx scripts/run-processor.ts
 
   # Extract only (fast, no LLM)
-  tsx scripts/run-pipeline.ts --phase extract
+  tsx scripts/run-processor.ts --phase extract
 
   # Process single component
-  tsx scripts/run-pipeline.ts --component Button
+  tsx scripts/run-processor.ts --component Button
 
   # Extract single component
-  tsx scripts/run-pipeline.ts --component Button --phase extract
+  tsx scripts/run-processor.ts --component Button --phase extract
 
   # Custom output directory
-  tsx scripts/run-pipeline.ts --output ./my-output
+  tsx scripts/run-processor.ts --output ./my-output
 
 Available Components:
   ${getComponentNames().join(', ')}
@@ -186,7 +162,7 @@ function printHeader(
   componentCount: number
 ): void {
   logger.info('\n' + '='.repeat(65));
-  logger.info('  Context Engine Pipeline Runner');
+  logger.info('  Context Engine Processor Runner');
   logger.info('='.repeat(65));
   logger.info('');
   logger.info(`Phase: ${phase}`);
@@ -258,7 +234,7 @@ async function readComponentFile(component: ComponentDefinition): Promise<{
 }
 
 // =============================================================================
-// Pipeline Processing
+// Component Processing
 // =============================================================================
 
 async function processComponent(
@@ -307,19 +283,10 @@ async function processComponent(
       return { success: true, timings };
     }
 
-    // Full pipeline - all methods throw on error
-    const extractStart = performance.now();
-    await processor.extractAndStore(input);
-    timings.extraction = Math.round(performance.now() - extractStart);
-
-    const genStart = performance.now();
-    await processor.generateAndStore(component.name);
-    timings.generation = Math.round(performance.now() - genStart);
-
-    const buildStart = performance.now();
-    await processor.buildAndStore(component.name);
-    timings.build = Math.round(performance.now() - buildStart);
-
+    // Full processing via processAndStore
+    const start = performance.now();
+    await processor.processAndStore(input);
+    timings.total = Math.round(performance.now() - start);
     return { success: true, timings };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -343,38 +310,15 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // Validate API key for phases that need it
-  const needsLLM = args.phase === 'generate' || args.phase === 'full';
-  if (needsLLM) {
-    const provider =
-      process.env.CONTEXT_ENGINE_PROVIDER?.toLowerCase() ?? 'anthropic';
-    const hasAnthropicKey = !!process.env.ANTHROPIC_API_KEY;
-    const hasGeminiKey = !!process.env.GOOGLE_API_KEY;
-
-    if (provider === 'gemini' && !hasGeminiKey) {
-      logger.error(
-        'Error: GOOGLE_API_KEY environment variable is required for Gemini provider.'
-      );
-      logger.error('');
-      logger.error(
-        'Set CONTEXT_ENGINE_PROVIDER=gemini and GOOGLE_API_KEY in .env.test'
-      );
-      process.exit(1);
-    } else if (provider !== 'gemini' && !hasAnthropicKey) {
-      logger.error(
-        'Error: ANTHROPIC_API_KEY environment variable is required for Anthropic provider.'
-      );
-      logger.error('');
-      logger.error('Set it in your environment or use Gemini:');
-      logger.error('  CONTEXT_ENGINE_PROVIDER=gemini');
-      logger.error('  GOOGLE_API_KEY=your-key-here');
-      logger.error('');
-      logger.error('Or run extraction only (no LLM required):');
-      logger.error('  tsx scripts/run-pipeline.ts --phase extract');
-      process.exit(1);
-    }
-
-    logger.info(`Using provider: ${provider}`);
+  // Validate that --phase is provided
+  if (!args.phase) {
+    logger.error('Error: --phase is required.');
+    logger.error('');
+    logger.error('Usage: tsx scripts/run-processor.ts --phase <phase>');
+    logger.error('Phases: extract, generate, build, full');
+    logger.error('');
+    logger.error('Run with --help for more information.');
+    process.exit(1);
   }
 
   // Resolve components to process
@@ -394,15 +338,10 @@ async function main(): Promise<void> {
   // Resolve output directory
   const outputDir = resolve(process.cwd(), args.output);
 
-  // Use env-based provider for phases that need LLM, noop provider for extract-only
-  const llmProvider = needsLLM
-    ? createProviderFromEnv()
-    : new NoopLLMProvider();
-
   // Create processor with storeDir for persistent storage
   const processor = new ComponentProcessor({
     storeDir: outputDir,
-    llmProvider,
+    llmProvider: createProviderFromEnv(),
     availableComponents: getComponentNames(),
   });
 
@@ -437,6 +376,9 @@ async function main(): Promise<void> {
       }
       if (result.timings.build !== undefined && result.timings.build > 0) {
         logger.info(`  [ok] Build (${formatMs(result.timings.build)})`);
+      }
+      if (result.timings.total !== undefined) {
+        logger.info(`  [ok] Full pipeline (${formatMs(result.timings.total)})`);
       }
 
       // Show saved location

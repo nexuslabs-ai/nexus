@@ -1,12 +1,12 @@
 /**
- * Component Definitions for Pipeline Processing
+ * Component Definitions for Processor
  *
  * Defines the list of Nexus design system components to process
- * through the extraction-generation pipeline.
+ * through the extraction-generation processor.
  */
 
 /**
- * Component definition for pipeline processing
+ * Component definition for processor
  */
 export interface ComponentDefinition {
   /** Component name (PascalCase) */

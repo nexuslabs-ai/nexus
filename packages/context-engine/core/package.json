@@ -54,11 +54,11 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ --ext .ts",
-    "pipeline": "tsx scripts/run-pipeline.ts",
-    "pipeline:help": "tsx scripts/run-pipeline.ts --help",
-    "extract": "tsx scripts/run-pipeline.ts --phase extract",
-    "generate": "tsx scripts/run-pipeline.ts --phase generate",
-    "manifest": "tsx scripts/run-pipeline.ts --phase build"
+    "process:help": "tsx scripts/run-processor.ts --help",
+    "extract": "tsx scripts/run-processor.ts --phase extract",
+    "generate": "tsx scripts/run-processor.ts --phase generate",
+    "manifest": "tsx scripts/run-processor.ts --phase build",
+    "process": "tsx scripts/run-processor.ts --phase full"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",

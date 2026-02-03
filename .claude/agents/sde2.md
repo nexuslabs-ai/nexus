@@ -5,10 +5,10 @@ tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch
 model: opus
 permissionMode: bypassPermissions
 skills:
-  - pr-review
-  - pr-review-follow-up
   - implement
   - pr-fix
+  - pr-review
+  - pr-review-follow-up
 ---
 
 # SDE2 Agent
