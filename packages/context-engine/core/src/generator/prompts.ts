@@ -22,10 +22,9 @@ function buildPropsSection(extracted: ExtractedData): string {
 
   const propsLines = extracted.props.map((p) => {
     const parts = [`- ${p.name}: ${p.type}`];
-    if (p.required) parts.push('(required)');
     if (p.description) parts.push(`- ${p.description}`);
-    if (p.possibleValues?.length) {
-      parts.push(`[${p.possibleValues.join(', ')}]`);
+    if (p.values?.length) {
+      parts.push(`[${p.values.join(', ')}]`);
     }
     return parts.join(' ');
   });
@@ -101,6 +100,46 @@ function buildBaseLibrarySection(extracted: ExtractedData): string {
   return parts.join(' ');
 }
 
+/**
+ * Build the sub-component variants section for the prompt
+ *
+ * For compound components (Dialog, Accordion, etc.), includes variant information
+ * for each sub-component so the LLM can generate variant descriptions for them.
+ */
+function buildSubComponentVariantsSection(extracted: ExtractedData): string {
+  if (!extracted.subComponents || extracted.subComponents.length === 0) {
+    return '';
+  }
+
+  // Filter to only sub-components that have variants
+  const subComponentsWithVariants = extracted.subComponents.filter(
+    (sub) => sub.variants && Object.keys(sub.variants).length > 0
+  );
+
+  if (subComponentsWithVariants.length === 0) {
+    return '';
+  }
+
+  const sections = subComponentsWithVariants.map((sub) => {
+    const variantLines = Object.entries(sub.variants!).map(
+      ([name, values]) => `  - ${name}: ${values.join(', ')}`
+    );
+
+    // Include defaults if available
+    let subSection = `${sub.name}:\n${variantLines.join('\n')}`;
+    if (sub.defaultVariants && Object.keys(sub.defaultVariants).length > 0) {
+      const defaultLines = Object.entries(sub.defaultVariants).map(
+        ([name, value]) => `    ${name}: ${value}`
+      );
+      subSection += `\n  Defaults:\n${defaultLines.join('\n')}`;
+    }
+
+    return subSection;
+  });
+
+  return `Sub-Component Variants:\n${sections.join('\n\n')}`;
+}
+
 // =============================================================================
 // Prompt Builder Input
 // =============================================================================
@@ -118,10 +157,16 @@ export interface PromptBuilderInput {
   /** Extracted data from code analysis */
   extracted: ExtractedData;
 
-  /** Optional Figma design URL */
-  figmaUrl?: string;
+  /**
+   * Skip example generation in the prompt.
+   * Set to true when Storybook examples are available from extraction.
+   */
+  skipExamples?: boolean;
 
-  /** Optional hints for generation */
+  /**
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
+   */
   hints?: string;
 }
 
@@ -130,21 +175,14 @@ export interface PromptBuilderInput {
 // =============================================================================
 
 /**
- * Validate that a pattern is from the standard list
- */
-function isValidPattern(pattern: string): boolean {
-  return (COMPONENT_PATTERNS as readonly string[]).includes(pattern);
-}
-
-/**
  * Filter patterns to only include valid ones
  */
 export function filterValidPatterns(patterns: string[]): string[] {
-  return patterns.filter(isValidPattern);
+  return patterns.filter((pattern) => COMPONENT_PATTERNS.includes(pattern));
 }
 
 // =============================================================================
-// Tool Calling Prompts
+// Prompt Constants
 // =============================================================================
 
 /**
@@ -164,48 +202,19 @@ Your goal is to help AI coding assistants understand and correctly use this comp
 Use the generate_component_metadata tool to provide your analysis.`;
 
 /**
- * User prompt template for tool calling
- *
- * Simpler than the JSON template since the tool schema defines the output structure.
+ * Pattern reference section (shared between both prompt paths)
  */
-export const TOOL_CALLING_USER_PROMPT_TEMPLATE = `Analyze this {{FRAMEWORK}} component and generate metadata using the generate_component_metadata tool.
-
-## Component: {{COMPONENT_NAME}}
-{{SOURCE_DESCRIPTION}}
-
-{{PROPS_SECTION}}
-
-{{VARIANTS_SECTION}}
-
-{{DEPENDENCIES_SECTION}}
-
-{{BASE_LIBRARY_SECTION}}
-
-{{FIGMA_URL}}
-
-{{HINTS}}
-
-## Pattern Reference
+const PATTERN_REFERENCE = `## Pattern Reference
 
 Valid patterns (use where applicable):
-${COMPONENT_PATTERNS.map((p) => `- ${p}`).join('\n')}
+${COMPONENT_PATTERNS.map((p) => `- ${p}`).join('\n')}`;
 
-## Instructions
-
-Use the generate_component_metadata tool to provide:
-
-1. **description**: A clear, concise one-liner (10-500 chars) that states what this component is AND its primary purpose/action (e.g., 'A button for triggering user actions and form submissions')
-2. **tier**: "free" for basic components, "pro" for advanced/complex ones
-3. **minimalExample**: The simplest working JSX code example (single line if possible)
-4. **examples**: Structured examples showing minimal, common, and advanced usage
-5. **guidance**: When to use, when not to use, accessibility notes, patterns, related components
-6. **semanticDescription**: Detailed description for AI search (50-2000 chars) - include purpose, key features, and use cases
-7. **tokens**: Design tokens this component uses (e.g., "color-primary", "spacing-md")
-
-Focus on making this component discoverable and usable by AI coding assistants.`;
+// =============================================================================
+// Prompt Builder
+// =============================================================================
 
 /**
- * Build the user prompt for tool calling
+ * Build the user prompt for tool calling using template literals
  *
  * @param input - Prompt builder input
  * @returns Formatted user prompt string for tool calling
@@ -214,38 +223,44 @@ function buildToolCallingUserPrompt({
   name,
   framework,
   extracted,
-  figmaUrl,
+  skipExamples = false,
   hints,
 }: PromptBuilderInput): string {
-  // Build all sections
   const propsSection = buildPropsSection(extracted);
   const variantsSection = buildVariantsSection(extracted);
+  const subComponentVariantsSection =
+    buildSubComponentVariantsSection(extracted);
   const dependenciesSection = buildDependenciesSection(extracted);
   const baseLibrarySection = buildBaseLibrarySection(extracted);
 
-  // Build optional sections
-  const sourceDescriptionLine = extracted.sourceDescription
+  const sourceDescription = extracted.sourceDescription
     ? `Description: ${extracted.sourceDescription}`
     : '';
-  const figmaLine = figmaUrl ? `Figma: ${figmaUrl}` : '';
-  const hintsLine = hints ? `Additional Context: ${hints}` : '';
+  const hintsSection = hints ? `Additional Context: ${hints}` : '';
 
-  // Replace placeholders
-  let prompt = TOOL_CALLING_USER_PROMPT_TEMPLATE;
-  prompt = prompt.replace('{{COMPONENT_NAME}}', name);
-  prompt = prompt.replace('{{FRAMEWORK}}', framework);
-  prompt = prompt.replace('{{SOURCE_DESCRIPTION}}', sourceDescriptionLine);
-  prompt = prompt.replace('{{PROPS_SECTION}}', propsSection);
-  prompt = prompt.replace('{{VARIANTS_SECTION}}', variantsSection);
-  prompt = prompt.replace('{{DEPENDENCIES_SECTION}}', dependenciesSection);
-  prompt = prompt.replace('{{BASE_LIBRARY_SECTION}}', baseLibrarySection);
-  prompt = prompt.replace('{{FIGMA_URL}}', figmaLine);
-  prompt = prompt.replace('{{HINTS}}', hintsLine);
+  const prompt = `Analyze this ${framework} component and generate metadata using the generate_component_metadata tool.
 
-  // Clean up empty lines
-  prompt = prompt.replace(/\n{3,}/g, '\n\n');
+## Component: ${name}
+${sourceDescription}
 
-  return prompt.trim();
+${propsSection}
+
+${variantsSection}
+
+${subComponentVariantsSection}
+
+${dependenciesSection}
+
+${baseLibrarySection}
+
+${hintsSection}
+
+${PATTERN_REFERENCE}
+
+Generate comprehensive metadata to make this component AI-accessible.${!skipExamples ? ' Include practical code examples.' : ''}`;
+
+  // Clean up empty lines (3+ newlines -> 2)
+  return prompt.replace(/\n{3,}/g, '\n\n').trim();
 }
 
 /**

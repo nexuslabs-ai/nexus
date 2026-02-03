@@ -6,6 +6,9 @@
  *
  * Uses tool calling for structured output generation.
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * Configuration is read from environment variables via the config module:
  * - ANTHROPIC_API_KEY: API key (required)
  * - CONTEXT_ENGINE_MODEL: Model identifier
@@ -17,6 +20,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 import { getLLMConfig } from '../config/index.js';
+import { MetaGenerationError } from '../types/errors.js';
 import { createLogger } from '../utils/logger.js';
 
 import { COMPONENT_META_TOOL, type ComponentMetaTool } from './tool-schema.js';
@@ -50,6 +54,9 @@ function getDefaults() {
  * Supports all Claude models and handles authentication via API key.
  * Uses tool calling for structured output generation.
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * @example
  * ```typescript
  * const provider = new AnthropicProvider({
@@ -57,10 +64,12 @@ function getDefaults() {
  *   // model defaults to DEFAULT_ANTHROPIC_MODEL constant
  * });
  *
+ * // Throws MetaGenerationError on failure
  * const result = await provider.generateWithToolCalling<ComponentMetaTool>(
  *   'Generate metadata for a Button component...',
  *   { maxTokens: 2000 }
  * );
+ * console.log(result.data);
  * ```
  */
 export class AnthropicProvider implements ILLMProvider {
@@ -114,6 +123,7 @@ export class AnthropicProvider implements ILLMProvider {
    * @param prompt - The input prompt for generation
    * @param options - Optional generation parameters
    * @returns Promise resolving to the tool call result
+   * @throws MetaGenerationError on failure
    */
   async generateWithToolCalling<T = ComponentMetaTool>(
     prompt: string,
@@ -155,11 +165,10 @@ export class AnthropicProvider implements ILLMProvider {
         logger.error('No tool_use block in response', undefined, {
           contentTypes: response.content.map((b) => b.type),
         });
-        return {
-          type: 'failure',
-          error: 'Tool calling failed: no tool_use block in response',
-          retryable: true,
-        };
+        throw new MetaGenerationError(
+          'Tool calling failed: no tool_use block in response',
+          { provider: 'anthropic', model: this.config.model }
+        );
       }
 
       if (toolUseBlock.name !== COMPONENT_META_TOOL.name) {
@@ -167,11 +176,10 @@ export class AnthropicProvider implements ILLMProvider {
           expected: COMPONENT_META_TOOL.name,
           received: toolUseBlock.name,
         });
-        return {
-          type: 'failure',
-          error: `Tool calling failed: unexpected tool "${toolUseBlock.name}"`,
-          retryable: true,
-        };
+        throw new MetaGenerationError(
+          `Tool calling failed: unexpected tool "${toolUseBlock.name}"`,
+          { provider: 'anthropic', model: this.config.model }
+        );
       }
 
       logger.debug('Anthropic tool calling succeeded', {
@@ -182,7 +190,6 @@ export class AnthropicProvider implements ILLMProvider {
       });
 
       return {
-        type: 'success',
         data: toolUseBlock.input as T,
         usage: {
           inputTokens: response.usage.input_tokens,
@@ -191,85 +198,72 @@ export class AnthropicProvider implements ILLMProvider {
         model: response.model,
       };
     } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  /**
-   * Handle errors from tool calling, translating to ToolCallResult
-   */
-  private handleError<T>(error: unknown): ToolCallResult<T> {
-    // Handle specific Anthropic errors
-    if (error instanceof Anthropic.APIError) {
-      logger.error('Anthropic API error during tool call', error as Error, {
-        status: error.status,
-        code: error.error?.type,
-      });
-
-      // Rate limit is retryable
-      if (error.status === 429) {
-        return {
-          type: 'failure',
-          error: 'Rate limit exceeded',
-          retryable: true,
-        };
+      // Re-throw MetaGenerationError as-is
+      if (error instanceof MetaGenerationError) {
+        throw error;
       }
 
-      // Auth errors are not retryable
-      if (error.status === 401) {
-        return {
-          type: 'failure',
-          error: 'Authentication failed: invalid API key',
-          retryable: false,
-        };
+      // Handle specific Anthropic errors
+      if (error instanceof Anthropic.APIError) {
+        logger.error('Anthropic API error during tool call', error as Error, {
+          status: error.status,
+          code: error.error?.type,
+        });
+
+        if (error.status === 429) {
+          throw new MetaGenerationError('Rate limit exceeded', {
+            provider: 'anthropic',
+            status: error.status,
+          });
+        }
+
+        if (error.status === 401) {
+          throw new MetaGenerationError(
+            'Authentication failed: invalid API key',
+            { provider: 'anthropic', status: error.status }
+          );
+        }
+
+        if (error.status === 500 || error.status === 503) {
+          throw new MetaGenerationError('Service unavailable', {
+            provider: 'anthropic',
+            status: error.status,
+          });
+        }
+
+        throw new MetaGenerationError(`Anthropic API error: ${error.message}`, {
+          provider: 'anthropic',
+          status: error.status,
+        });
       }
 
-      // Service errors are retryable
-      if (error.status === 500 || error.status === 503) {
-        return {
-          type: 'failure',
-          error: 'Service unavailable',
-          retryable: true,
-        };
+      // Handle timeout errors
+      if (error instanceof Anthropic.APIConnectionTimeoutError) {
+        logger.error('Anthropic timeout during tool call', error as Error);
+        throw new MetaGenerationError(
+          `Request timed out after ${this.config.timeoutMs}ms`,
+          { provider: 'anthropic', timeoutMs: this.config.timeoutMs }
+        );
       }
 
-      return {
-        type: 'failure',
-        error: `Anthropic API error: ${error.message}`,
-        retryable: false,
-      };
-    }
+      // Handle connection errors
+      if (error instanceof Anthropic.APIConnectionError) {
+        logger.error(
+          'Anthropic connection error during tool call',
+          error as Error
+        );
+        throw new MetaGenerationError('Failed to connect to Anthropic API', {
+          provider: 'anthropic',
+        });
+      }
 
-    // Handle timeout errors - retryable
-    if (error instanceof Anthropic.APIConnectionTimeoutError) {
-      logger.error('Anthropic timeout during tool call', error as Error);
-      return {
-        type: 'failure',
-        error: `Request timed out after ${this.config.timeoutMs}ms`,
-        retryable: true,
-      };
-    }
-
-    // Handle connection errors - retryable
-    if (error instanceof Anthropic.APIConnectionError) {
-      logger.error(
-        'Anthropic connection error during tool call',
-        error as Error
+      // Unknown errors
+      logger.error('Unexpected error during tool call', error as Error);
+      throw new MetaGenerationError(
+        error instanceof Error ? error.message : 'Unknown error',
+        { provider: 'anthropic' }
       );
-      return {
-        type: 'failure',
-        error: 'Failed to connect to Anthropic API',
-        retryable: true,
-      };
     }
-
-    // Unknown errors
-    logger.error('Unexpected error during tool call', error as Error);
-    return {
-      type: 'failure',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      retryable: false,
-    };
   }
 }
 

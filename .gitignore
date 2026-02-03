@@ -43,3 +43,7 @@ build-storybook.log
 CLAUDE.local.md
 **/CLAUDE.local.md
 packages/context-engine/.env.test
+
+# Context Engine pipeline output
+.ce-output
+.ce-state

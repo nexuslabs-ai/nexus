@@ -1,12 +1,15 @@
 # Context Engine
 
-> Make design system components AI-accessible through semantic search and intelligent code assistance.
+## Purpose
 
-## Overview
+Makes design system components AI-accessible through automated extraction and semantic enrichment. The problem: AI coding assistants don't understand custom component libraries — they hallucinate props, miss variants, and can't recommend the right component for a task. The solution: extract component metadata from code (automated for accuracy) and enrich with semantic meaning via LLM (for natural language understanding).
 
-Context Engine solves the problem of AI coding assistants (Claude, Cursor, Copilot) not understanding custom design system components — they hallucinate props, miss variants, and can't recommend the right component for a task.
+## What It Produces
 
-**Core principle:** Code is the source of truth. Automated extraction for accuracy, AI generation for semantic richness.
+**Two key outputs:**
+
+1. **MCP Gateway** — AI assistants query components in real-time via WebSocket
+2. **A2UI Catalog** — Runtime generative UI for GenUI Platform
 
 ## Architecture
 
@@ -15,6 +18,8 @@ Context Engine solves the problem of AI coding assistants (Claude, Cursor, Copil
 │                     Context Engine Pipeline                      │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
+│  Customer Component Code                                         │
+│       ↓                                                          │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
 │  │  Extractor   │ → │  Generator   │ → │   Manifest   │       │
 │  │              │    │              │    │   Builder    │       │
@@ -28,21 +33,36 @@ Context Engine solves the problem of AI coding assistants (Claude, Cursor, Copil
 │                    │  (Orchestrates)  │                          │
 │                    └──────────────────┘                          │
 │                                                                  │
+│  Result: Component Knowledge Structure                           │
+│       ↓                                                          │
+│  MCP Server → AI Assistants (Claude, Cursor, etc)               │
+│                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+## Core Modules
+
+The Context Engine pipeline consists of four modules, each with a single clear responsibility:
+
+| Module        | Purpose                                         | Documentation                                                  |
+| ------------- | ----------------------------------------------- | -------------------------------------------------------------- |
+| **Extractor** | Extract props, variants, dependencies from code | [core/src/extractor/CLAUDE.md](./core/src/extractor/CLAUDE.md) |
+| **Generator** | Generate semantic metadata via LLM              | [core/src/generator/CLAUDE.md](./core/src/generator/CLAUDE.md) |
+| **Manifest**  | Combine extraction + generation into manifest   | [core/src/manifest/CLAUDE.md](./core/src/manifest/CLAUDE.md)   |
+| **Processor** | Orchestrate full pipeline                       | [core/src/processor/CLAUDE.md](./core/src/processor/CLAUDE.md) |
 
 ## Package Structure
 
 ```
 packages/context-engine/
-├── core/                    # @context-engine/core - Extraction & generation pipeline
+├── core/                    # @context-engine/core - Main extraction/generation package
 │   ├── src/
-│   │   ├── extractor/       # Component metadata extraction
-│   │   ├── generator/       # LLM-based metadata generation
-│   │   ├── manifest/        # Manifest building
-│   │   ├── processor/       # Pipeline orchestration
-│   │   ├── types/           # Shared types
-│   │   ├── utils/           # Utilities
+│   │   ├── extractor/       # Module 1: Extraction strategies
+│   │   ├── generator/       # Module 2: LLM-based generation
+│   │   ├── manifest/        # Module 3: Manifest building
+│   │   ├── processor/       # Module 4: Pipeline orchestration
+│   │   ├── types/           # Shared type definitions
+│   │   ├── utils/           # Utility functions
 │   │   └── constants/       # Constants and configs
 │   └── package.json
 ├── db/                      # Database package (Drizzle + PostgreSQL)
@@ -50,159 +70,43 @@ packages/context-engine/
 └── env.example              # Environment template
 ```
 
-## Core Package (`@context-engine/core`)
+## Design Decisions
 
-### Installation
+| Decision                           | Rationale                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Code as source of truth**        | Automated extraction from actual code guarantees accuracy — no manual maintenance           |
+| **LLM for semantic enrichment**    | Humans understand "primary action button" better than `variant="primary"` — LLM bridges gap |
+| **Tool calling only**              | Structured output guaranteed, no regex brittleness — LLM returns valid JSON                 |
+| **Hybrid extraction**              | react-docgen for props, ts-morph for patterns it misses — combine strengths                 |
+| **Storybook examples prioritized** | Real code > LLM-generated synthetic examples — prefer actual usage                          |
+| **Server-owns-data SaaS**          | Multi-org isolation with centralized knowledge store — not client-side libraries            |
 
-```bash
-# From monorepo
-yarn workspace @context-engine/core build
-```
+## How AI Assistants Use It
 
-### Subpath Exports
+**Flow:**
 
-```typescript
-// Main exports
-import { ComponentManifest, Framework } from '@context-engine/core';
+1. Developer asks AI: "Add a button with loading state"
+2. AI queries MCP server: "components matching 'button loading'"
+3. Context Engine returns: Button manifest with props, variants, examples
+4. AI generates correct code using actual component API
 
-// Subpath imports
-import {
-  HybridExtractor,
-  extractComponent,
-} from '@context-engine/core/extractor';
-import {
-  MetaGenerator,
-  createMetaGenerator,
-} from '@context-engine/core/generator';
-import { ManifestBuilder } from '@context-engine/core/manifest';
-import { ComponentProcessor } from '@context-engine/core/processor';
-import { generateComponentId, generateHash } from '@context-engine/core/utils';
-```
+**Without Context Engine:** AI hallucinates props, generates invalid code
+**With Context Engine:** AI has accurate component knowledge, generates working code
 
-### Modules
+## Tech Stack
 
-| Module      | Purpose                                         | Key Exports                                      |
-| ----------- | ----------------------------------------------- | ------------------------------------------------ |
-| `extractor` | Extract props, variants, dependencies from code | `HybridExtractor`, `extractComponent`            |
-| `generator` | Generate semantic metadata via LLM              | `MetaGenerator`, `AnthropicProvider`             |
-| `manifest`  | Build complete component manifests              | `ManifestBuilder`, `generateImportStatement`     |
-| `processor` | Orchestrate full pipeline                       | `ComponentProcessor`, `createComponentProcessor` |
-| `types`     | Shared type definitions                         | `ComponentManifest`, `ExtractionResult`          |
-| `utils`     | Utility functions                               | `generateComponentId`, `categorizeProps`         |
-
-### Key Source Files
-
-| File                           | Purpose                              |
-| ------------------------------ | ------------------------------------ |
-| `generator/tool-schema.ts`     | Tool calling schemas for Anthropic   |
-| `manifest/import-generator.ts` | Import statement generation          |
-| `utils/prop-categorization.ts` | Prop categorization by semantic type |
-
-### Quick Start
-
-```typescript
-import { createComponentProcessor } from '@context-engine/core/processor';
-import { HybridExtractor } from '@context-engine/core/extractor';
-import {
-  createMetaGenerator,
-  createAnthropicProvider,
-} from '@context-engine/core/generator';
-
-// Create processor with extractor and generator
-const processor = createComponentProcessor({
-  extractor: new HybridExtractor(),
-  generator: createMetaGenerator({
-    provider: createAnthropicProvider({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    }),
-  }),
-});
-
-// Process a component
-const result = await processor.process({
-  filePath: './Button.tsx',
-  componentName: 'Button',
-  framework: 'react',
-});
-
-if (result.success) {
-  console.log(result.manifest); // Complete component manifest
-}
-```
-
-## Tool Calling Architecture
-
-All LLM providers use tool calling for structured output. There is no text parsing fallback.
-
-### Flow
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                  Unified Tool Calling Path                       │
-│                                                                  │
-│  MetaGenerator                                                   │
-│       ↓                                                          │
-│  provider.generateWithToolCalling(prompt, COMPONENT_META_TOOL)   │
-│       ↓                                                          │
-│  ToolCallResult<ComponentMetaTool>  (structured JSON)            │
-│       ↓                                                          │
-│  normalizeToolOutputToMeta() → ComponentMeta                     │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Key Components
-
-| Component                   | Purpose                                   |
-| --------------------------- | ----------------------------------------- |
-| `ComponentMetaToolSchema`   | Zod schema defining tool output structure |
-| `COMPONENT_META_TOOL`       | Tool definition (JSON Schema for LLM)     |
-| `normalizeToolOutputToMeta` | Transforms tool output to ComponentMeta   |
-
-### Supported Providers
-
-| Provider  | SDK                 | Tool Calling |
-| --------- | ------------------- | ------------ |
-| Anthropic | `@anthropic-ai/sdk` | ✅ Native    |
-| Gemini    | `@google/genai`     | ✅ Native    |
-
-## Schema Documentation
-
-### ComponentManifest Structure
-
-The manifest includes these key sections:
-
-| Section           | Source    | Description                                  |
-| ----------------- | --------- | -------------------------------------------- |
-| `props`           | Extractor | Categorized props (variants, behaviors, etc) |
-| `cvaVariants`     | Extractor | CVA variant definitions with defaults        |
-| `dependencies`    | Extractor | npm and internal dependencies                |
-| `description`     | Generator | AI-generated component description           |
-| `examples`        | Generator | Structured examples (minimal, common, adv)   |
-| `guidance`        | Generator | When to use, accessibility, patterns         |
-| `importStatement` | Builder   | Generated import statements                  |
-
-### Categorized Props
-
-Props are grouped by semantic purpose:
-
-| Category      | Description             | Examples                      |
-| ------------- | ----------------------- | ----------------------------- |
-| `variants`    | CVA variant props       | `variant`, `size`, `color`    |
-| `behaviors`   | Boolean state props     | `disabled`, `loading`, `open` |
-| `events`      | Event handlers          | `onClick`, `onChange`         |
-| `slots`       | ReactNode/element props | `children`, `leftIcon`        |
-| `passthrough` | DOM attributes          | `className`, `aria-*`         |
-| `other`       | Uncategorized props     | custom props                  |
-
-### Structured Examples Format
-
-```typescript
-{
-  minimal: { title, code, description?, propsUsed? },
-  common: [{ title, code, description?, propsUsed? }, ...],
-  advanced?: [{ title, code, description?, propsUsed? }, ...]
-}
-```
+| Technology              | Purpose                     |
+| ----------------------- | --------------------------- |
+| TypeScript              | Type safety                 |
+| tsup                    | Build tool                  |
+| react-docgen-typescript | Primary prop extraction     |
+| ts-morph                | Fallback AST analysis       |
+| @anthropic-ai/sdk       | LLM provider for generation |
+| zod                     | Schema validation           |
+| vitest                  | Testing                     |
+| PostgreSQL + pgvector   | Storage and semantic search |
+| Drizzle ORM             | Database queries            |
+| Hono                    | HTTP routing for MCP server |
 
 ## Commands
 
@@ -224,68 +128,57 @@ yarn workspace @context-engine/core test:watch
 yarn workspace @context-engine/core clean
 ```
 
-## Tech Stack
+## Key Conventions
 
-| Technology              | Purpose                     |
-| ----------------------- | --------------------------- |
-| TypeScript              | Type safety                 |
-| tsup                    | Build tool                  |
-| react-docgen-typescript | Primary prop extraction     |
-| ts-morph                | Fallback AST analysis       |
-| @anthropic-ai/sdk       | LLM provider for generation |
-| zod                     | Schema validation           |
-| vitest                  | Testing                     |
+**Result Types:**
 
-## Conventions
+- All async operations return discriminated unions or throw
+- Pattern: `{ success: true, data }` or `{ success: false, error }`
 
-### Result Types
+**Error Codes:**
 
-All async operations return discriminated union result types:
+- Specific error codes for programmatic handling
+- Example: `EXTRACTION_FAILED`, `GENERATION_FAILED`
 
-```typescript
-// Success/failure pattern
-type ProcessorOutput = ProcessorSuccess | ProcessorFailure;
+**Factory Functions:**
 
-// Type guards
-if (isProcessorSuccess(result)) {
-  // result.manifest is available
-}
-```
+- Prefer factory functions over direct instantiation
+- Example: `createComponentProcessor({ extractor, generator })`
 
-### Error Codes
+**Multi-Tenancy:**
 
-Use specific error codes for programmatic handling:
+- All queries scoped to organization
+- Never leak data between orgs
+
+## Subpath Exports
 
 ```typescript
-enum ProcessorErrorCode {
-  EXTRACTION_FAILED = 'EXTRACTION_FAILED',
-  GENERATION_FAILED = 'GENERATION_FAILED',
-  MANIFEST_BUILD_FAILED = 'MANIFEST_BUILD_FAILED',
-}
+// Main exports (types, constants)
+import { AIManifest, ManifestMetadata, Framework } from '@context-engine/core';
+
+// Module-specific imports
+import {
+  HybridExtractor,
+  extractComponent,
+} from '@context-engine/core/extractor';
+import {
+  MetaGenerator,
+  createMetaGenerator,
+} from '@context-engine/core/generator';
+import { ManifestBuilder } from '@context-engine/core/manifest';
+import {
+  ComponentProcessor,
+  createComponentProcessor,
+} from '@context-engine/core/processor';
+import {
+  generateComponentId,
+  categorizeProps,
+} from '@context-engine/core/utils';
 ```
-
-### Factory Functions
-
-Prefer factory functions for complex object creation:
-
-```typescript
-// Good - factory function
-const provider = createAnthropicProvider({ apiKey });
-const generator = createMetaGenerator({ provider });
-const processor = createComponentProcessor({ extractor, generator });
-
-// Avoid - direct instantiation with complex setup
-const processor = new ComponentProcessor(/* many params */);
-```
-
-## Related Documentation
-
-- [Context Engine Rules](../../.claude/rules/context-engine.md) - Coding conventions and review guidelines
-- [Root CLAUDE.md](../../CLAUDE.md) - Project overview
 
 ## Environment Variables
 
-See `env.example` for required variables:
+See `env.example` for configuration:
 
 ```bash
 # LLM Provider
@@ -294,3 +187,8 @@ ANTHROPIC_API_KEY=           # Required for generation
 # Database (for db package)
 DATABASE_URL=                # PostgreSQL connection string
 ```
+
+## Related Documentation
+
+- [Context Engine Rules](../../.claude/rules/context-engine.md) - Coding conventions and review guidelines
+- [Root CLAUDE.md](../../CLAUDE.md) - Project overview

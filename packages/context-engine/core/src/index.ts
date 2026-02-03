@@ -6,15 +6,15 @@
  * @example
  * ```typescript
  * // Import types
- * import { ComponentManifest, Framework } from '@context-engine/core';
+ * import { AIManifest, ManifestMetadata, Framework } from '@context-engine/core';
  *
  * // Import from subpaths
- * import { ComponentManifestSchema } from '@context-engine/core/types';
+ * import { AIManifestSchema, ManifestMetadataSchema } from '@context-engine/core/types';
  * import { generateComponentId, generateHash } from '@context-engine/core/utils';
  * import { HybridExtractor, extractComponent } from '@context-engine/core/extractor';
  * import { MetaGenerator, createMetaGenerator } from '@context-engine/core/generator';
  * import { ManifestBuilder } from '@context-engine/core/manifest';
- * import { ComponentProcessor } from '@context-engine/core/processor';
+ * import { ComponentProcessor, FileStateStore } from '@context-engine/core/processor';
  * ```
  */
 
@@ -39,5 +39,5 @@ export * from './generator/index.js';
 // Re-export manifest module
 export * from './manifest/index.js';
 
-// Re-export processor module
+// Re-export processor module (includes FileStateStore and state store types)
 export * from './processor/index.js';

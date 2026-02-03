@@ -6,6 +6,10 @@
  *
  * Always uses ts-morph since this is pure AST-based extraction
  * that requires no type resolution.
+ *
+ * Usage Pattern:
+ * 1. Call extractAll() first to parse all variants from the file
+ * 2. Call matchForComponent() to get variants for a specific component
  */
 
 import {
@@ -18,6 +22,7 @@ import {
   ts,
 } from 'ts-morph';
 
+import { camelCase } from '../utils/case.js';
 import { createLogger } from '../utils/logger.js';
 
 import type { VariantExtractionResult } from './types.js';
@@ -37,6 +42,18 @@ type VariantFunction = (typeof VARIANT_FUNCTIONS)[number];
 export class VariantExtractor {
   private project: Project;
 
+  /**
+   * Stores all extracted variants keyed by variable name (e.g., "buttonVariants")
+   * Must call extractAll() before accessing
+   */
+  private allVariants: Map<string, VariantExtractionResult> | null = null;
+
+  /**
+   * Maps component names to the variant variable names they use
+   * A component can use multiple variants (e.g., Button uses buttonVariants + iconVariants)
+   */
+  private componentToVariants: Map<string, string[]> | null = null;
+
   constructor() {
     this.project = new Project({
       useInMemoryFileSystem: true,
@@ -49,18 +66,24 @@ export class VariantExtractor {
   }
 
   /**
-   * Extract variants from source code
+   * Extract ALL cva/tv calls from source code and store them keyed by variable name
+   *
+   * Must be called before matchForComponent(). Extracts and stores all variant
+   * definitions found in the file, keyed by their variable names (e.g., "buttonVariants").
    *
    * @param sourceCode - Component source code to parse
    * @param filePath - Optional file path for context
-   * @returns Extracted variants and defaults
    */
-  extract(sourceCode: string, filePath?: string): VariantExtractionResult {
+  extractAll(sourceCode: string, filePath?: string): void {
     const fileName = filePath || 'component.tsx';
+
+    // Reset state
+    this.allVariants = new Map();
+    this.componentToVariants = new Map();
 
     // Guard: Empty source code
     if (!sourceCode.trim()) {
-      return this.emptyResult();
+      return;
     }
 
     const sourceFile = this.project.createSourceFile(fileName, sourceCode, {
@@ -68,13 +91,14 @@ export class VariantExtractor {
     });
 
     try {
-      return this.extractVariants(sourceFile);
+      this.extractVariantsToMap(sourceFile);
+      this.buildComponentToVariantsMap(sourceFile);
     } catch (error) {
       logger.debug('Variant extraction failed', {
         filePath,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      return this.emptyResult();
+      // Keep empty map on error
     } finally {
       // Clean up to prevent memory accumulation
       this.project.removeSourceFile(sourceFile);
@@ -82,40 +106,172 @@ export class VariantExtractor {
   }
 
   /**
-   * Extract variants from a source file
+   * Match a component name to its variants from the previously extracted data
+   *
+   * Must call extractAll() first. First tries to find variants by actual usage
+   * in the component's body, then falls back to camelCase naming convention
+   * (e.g., "Button" -> look for "buttonVariants").
+   *
+   * @param componentName - The component name to find variants for (e.g., "Button", "DialogContent")
+   * @returns Extracted variants and defaults for the component, or empty result if no match
+   * @throws Error if extractAll() was not called first
    */
-  private extractVariants(sourceFile: SourceFile): VariantExtractionResult {
-    const variants: Record<string, string[]> = {};
-    const defaultVariants: Record<string, string> = {};
+  matchForComponent(componentName: string): VariantExtractionResult {
+    if (this.allVariants === null || this.componentToVariants === null) {
+      throw new Error('extractAll() must be called before matchForComponent()');
+    }
 
-    const callExpressions = sourceFile.getDescendantsOfKind(
-      SyntaxKind.CallExpression
+    // First, try to find by actual usage
+    const usedVariantNames = this.componentToVariants.get(componentName);
+
+    if (usedVariantNames && usedVariantNames.length > 0) {
+      // Merge all variants this component uses
+      const mergedVariants: Record<string, string[]> = {};
+      const mergedDefaults: Record<string, string> = {};
+
+      for (const varName of usedVariantNames) {
+        const result = this.allVariants.get(varName);
+        if (result) {
+          Object.assign(mergedVariants, result.variants);
+          Object.assign(mergedDefaults, result.defaultVariants);
+        }
+      }
+
+      logger.debug('Matched variants for component by usage', {
+        componentName,
+        usedVariantNames,
+        variantCount: Object.keys(mergedVariants).length,
+      });
+
+      return { variants: mergedVariants, defaultVariants: mergedDefaults };
+    }
+
+    // Fallback: try name-based matching (for edge cases)
+    const expectedVarName = `${camelCase(componentName)}Variants`;
+    const result = this.allVariants.get(expectedVarName);
+
+    if (result) {
+      logger.debug(
+        'Matched variants for component by naming convention (fallback)',
+        {
+          componentName,
+          varName: expectedVarName,
+        }
+      );
+      return result;
+    }
+
+    logger.debug('No variants found for component', {
+      componentName,
+      availableVarNames: Array.from(this.allVariants.keys()),
+    });
+
+    return this.emptyResult();
+  }
+
+  /**
+   * Extract variants from source file and store in allVariants map
+   * Finds variable declarations that contain cva/tv calls
+   */
+  private extractVariantsToMap(sourceFile: SourceFile): void {
+    const variableDeclarations = sourceFile.getDescendantsOfKind(
+      SyntaxKind.VariableDeclaration
     );
 
-    for (const call of callExpressions) {
-      const fnName = this.getCallExpressionName(call);
+    for (const varDecl of variableDeclarations) {
+      const varName = varDecl.getName();
+      const initializer = varDecl.getInitializer();
 
-      // Skip non-variant functions
-      if (!this.isVariantFunction(fnName)) {
-        continue;
-      }
+      if (!initializer) continue;
 
-      const configResult = this.extractConfigFromCall(call);
-      if (!configResult) {
-        continue;
-      }
+      // Check if initializer is a cva/tv call
+      const callExpr = initializer.asKind(SyntaxKind.CallExpression);
+      if (!callExpr) continue;
 
-      // Merge results (in case of multiple cva/tv calls)
-      Object.assign(variants, configResult.variants);
-      Object.assign(defaultVariants, configResult.defaultVariants);
+      const fnName = this.getCallExpressionName(callExpr);
+      if (!this.isVariantFunction(fnName)) continue;
 
-      logger.debug('Extracted variants from call', {
+      const configResult = this.extractConfigFromCall(callExpr);
+      if (!configResult) continue;
+
+      // Store keyed by variable name
+      this.allVariants!.set(varName, configResult);
+
+      logger.debug('Extracted variant definition', {
+        varName,
         function: fnName,
         variantCount: Object.keys(configResult.variants).length,
       });
     }
+  }
 
-    return { variants, defaultVariants };
+  /**
+   * Find which components use which variant functions
+   * Searches inside each component's body for calls to extracted variant variables
+   */
+  private buildComponentToVariantsMap(sourceFile: SourceFile): void {
+    const variantNames = new Set(this.allVariants!.keys());
+    if (variantNames.size === 0) return;
+
+    // Find all function declarations
+    for (const fn of sourceFile.getFunctions()) {
+      const componentName = fn.getName();
+      if (!componentName) continue;
+
+      const usedVariants = this.findVariantUsagesInNode(fn, variantNames);
+      if (usedVariants.length > 0) {
+        this.componentToVariants!.set(componentName, usedVariants);
+      }
+    }
+
+    // Find all variable declarations (arrow functions, forwardRef)
+    for (const varDecl of sourceFile.getVariableDeclarations()) {
+      const componentName = varDecl.getName();
+      const initializer = varDecl.getInitializer();
+      if (!initializer) continue;
+
+      // Check if it's a component (arrow function or forwardRef call)
+      const isArrowFn = initializer.getKind() === SyntaxKind.ArrowFunction;
+      const isForwardRef = initializer.getText().includes('forwardRef');
+
+      if (!isArrowFn && !isForwardRef) continue;
+
+      const usedVariants = this.findVariantUsagesInNode(
+        initializer,
+        variantNames
+      );
+      if (usedVariants.length > 0) {
+        this.componentToVariants!.set(componentName, usedVariants);
+      }
+    }
+
+    logger.debug('Built component to variants map', {
+      mappings: Object.fromEntries(this.componentToVariants!),
+    });
+  }
+
+  /**
+   * Find all variant function calls within a node
+   */
+  private findVariantUsagesInNode(
+    node: Node,
+    variantNames: Set<string>
+  ): string[] {
+    const usedVariants: string[] = [];
+
+    // Find all call expressions in this node
+    const callExprs = node.getDescendantsOfKind(SyntaxKind.CallExpression);
+
+    for (const call of callExprs) {
+      const calledName = call.getExpression().getText();
+
+      // Check if this call is to one of our extracted variants
+      if (variantNames.has(calledName) && !usedVariants.includes(calledName)) {
+        usedVariants.push(calledName);
+      }
+    }
+
+    return usedVariants;
   }
 
   /**
@@ -199,27 +355,23 @@ export class VariantExtractor {
       ?.getInitializer()
       ?.asKind(SyntaxKind.ObjectLiteralExpression);
 
-    return variantsObj ? this.extractVariantProperties(variantsObj) : {};
-  }
+    if (!variantsObj) return {};
 
-  /**
-   * Extract variant name -> values mapping from variants object
-   */
-  private extractVariantProperties(
-    variantsObj: ObjectLiteralExpression
-  ): Record<string, string[]> {
-    const entries = variantsObj
-      .getProperties()
-      .map((prop) => {
-        const assignment = prop.asKind(SyntaxKind.PropertyAssignment);
-        if (!assignment) return null;
-        const name = assignment.getName();
-        const values = this.extractObjectKeys(assignment.getInitializer());
-        return values.length > 0 ? ([name, values] as const) : null;
-      })
-      .filter((entry): entry is [string, string[]] => entry !== null);
+    const result: Record<string, string[]> = {};
 
-    return Object.fromEntries(entries);
+    for (const prop of variantsObj.getProperties()) {
+      const assignment = prop.asKind(SyntaxKind.PropertyAssignment);
+      if (!assignment) continue;
+
+      const name = assignment.getName();
+      const values = this.extractObjectKeys(assignment.getInitializer());
+
+      if (values.length > 0) {
+        result[name] = values;
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -234,29 +386,23 @@ export class VariantExtractor {
       ?.getInitializer()
       ?.asKind(SyntaxKind.ObjectLiteralExpression);
 
-    return defaultsObj ? this.extractDefaultValues(defaultsObj) : {};
-  }
+    if (!defaultsObj) return {};
 
-  /**
-   * Extract default variant values from defaultVariants object
-   */
-  private extractDefaultValues(
-    defaultsObj: ObjectLiteralExpression
-  ): Record<string, string> {
-    const entries = defaultsObj
-      .getProperties()
-      .map((prop) => {
-        const assignment = prop.asKind(SyntaxKind.PropertyAssignment);
-        const name = assignment?.getName();
-        const value = assignment
-          ?.getInitializer()
-          ?.getText()
-          .replace(/['"]/g, '');
-        return name && value ? ([name, value] as const) : null;
-      })
-      .filter((entry): entry is [string, string] => entry !== null);
+    const result: Record<string, string> = {};
 
-    return Object.fromEntries(entries);
+    for (const prop of defaultsObj.getProperties()) {
+      const assignment = prop.asKind(SyntaxKind.PropertyAssignment);
+      if (!assignment) continue;
+
+      const name = assignment.getName();
+      const value = assignment.getInitializer()?.getText().replace(/['"]/g, '');
+
+      if (name && value) {
+        result[name] = value;
+      }
+    }
+
+    return result;
   }
 
   /**

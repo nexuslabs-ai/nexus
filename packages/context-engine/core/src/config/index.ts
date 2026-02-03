@@ -217,8 +217,6 @@ export function getLoggerConfig(): LoggerEnvConfig {
  * Feature flags configuration
  */
 export interface FeatureFlags {
-  /** Skip LLM generation (extraction only) */
-  skipGeneration: boolean;
   /** Enable debug mode */
   debug: boolean;
 }
@@ -228,7 +226,6 @@ export interface FeatureFlags {
  */
 export function getFeatureFlags(): FeatureFlags {
   return {
-    skipGeneration: getEnvBoolean('CONTEXT_ENGINE_SKIP_GENERATION', false),
     debug: getEnvBoolean('CONTEXT_ENGINE_DEBUG', false),
   };
 }

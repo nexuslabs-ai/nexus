@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
@@ -58,11 +59,77 @@ function TabsList({ className, ...props }: TabsListProps) {
 }
 
 /**
+ * TabsTrigger variants
+ *
+ * CVA configuration for TabsTrigger styling.
+ */
+const tabsTriggerVariants = cva(
+  // Base classes
+  [
+    'nx:inline-flex nx:items-center nx:justify-center',
+    'nx:whitespace-nowrap',
+    'nx:font-medium nx:text-foreground/70',
+    'nx:ring-offset-background',
+    'nx:transition-all',
+    'nx:focus-visible:outline-none nx:focus-visible:ring-2',
+    'nx:focus-visible:ring-primary-background/50 nx:focus-visible:ring-offset-2',
+    'nx:disabled:pointer-events-none nx:disabled:opacity-50',
+  ],
+  {
+    variants: {
+      /**
+       * Visual style variant
+       * @default "default"
+       */
+      variant: {
+        default: [
+          'nx:rounded-sm',
+          'nx:data-[state=active]:bg-background',
+          'nx:data-[state=active]:text-foreground',
+          'nx:data-[state=active]:shadow-sm',
+        ],
+        underline: [
+          'nx:rounded-none nx:border-b-2 nx:border-transparent',
+          'nx:bg-transparent',
+          'nx:data-[state=active]:border-primary-background',
+          'nx:data-[state=active]:text-foreground',
+          'nx:data-[state=active]:shadow-none',
+        ],
+        outline: [
+          'nx:rounded-sm nx:border nx:border-transparent',
+          'nx:bg-transparent',
+          'nx:hover:bg-muted',
+          'nx:data-[state=active]:border-border-default',
+          'nx:data-[state=active]:bg-background',
+          'nx:data-[state=active]:text-foreground',
+        ],
+      },
+      /**
+       * Size variant
+       * @default "default"
+       */
+      size: {
+        sm: 'nx:px-2 nx:py-1 nx:text-xs',
+        default: 'nx:px-3 nx:py-1.5 nx:text-sm',
+        lg: 'nx:px-4 nx:py-2 nx:text-base',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
+
+/**
  * TabsTriggerProps
  *
  * Props for the TabsTrigger component.
  */
-type TabsTriggerProps = React.ComponentProps<typeof TabsPrimitive.Trigger>;
+interface TabsTriggerProps
+  extends
+    React.ComponentProps<typeof TabsPrimitive.Trigger>,
+    VariantProps<typeof tabsTriggerVariants> {}
 
 /**
  * TabsTrigger
@@ -73,24 +140,19 @@ type TabsTriggerProps = React.ComponentProps<typeof TabsPrimitive.Trigger>;
  * ```tsx
  * <TabsTrigger value="account">Account</TabsTrigger>
  * ```
+ *
+ * @example
+ * ```tsx
+ * <TabsTrigger value="account" variant="underline" size="lg">Account</TabsTrigger>
+ * ```
  */
-function TabsTrigger({ className, ...props }: TabsTriggerProps) {
+function TabsTrigger({ className, variant, size, ...props }: TabsTriggerProps) {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
-      className={cn(
-        'nx:inline-flex nx:items-center nx:justify-center',
-        'nx:whitespace-nowrap nx:rounded-sm nx:px-3 nx:py-1.5',
-        'nx:text-sm nx:font-medium nx:text-foreground',
-        'nx:ring-offset-background',
-        'nx:transition-all',
-        'nx:focus-visible:outline-none nx:focus-visible:ring-2',
-        'nx:focus-visible:ring-primary-background/50 nx:focus-visible:ring-offset-2',
-        'nx:disabled:pointer-events-none nx:disabled:opacity-50',
-        'nx:data-[state=active]:bg-background nx:data-[state=active]:text-foreground',
-        'nx:data-[state=active]:shadow-sm',
-        className
-      )}
+      data-variant={variant}
+      data-size={size}
+      className={cn(tabsTriggerVariants({ variant, size, className }))}
       {...props}
     />
   );
@@ -140,4 +202,5 @@ export {
   type TabsListProps,
   TabsTrigger,
   type TabsTriggerProps,
+  tabsTriggerVariants,
 };

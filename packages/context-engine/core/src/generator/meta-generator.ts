@@ -11,6 +11,9 @@
  *
  * Flow: ComponentMetaTool Schema -> LLM Tool Calling -> normalizeToolOutputToMeta() -> ComponentMeta
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * Configuration is read from environment variables via the config module:
  * - CONTEXT_ENGINE_GENERATION_MAX_TOKENS: Max tokens for generation
  * - CONTEXT_ENGINE_MIN_SEMANTIC_DESC_LENGTH: Min semantic description length
@@ -20,10 +23,12 @@
  */
 
 import { getGenerationConfig } from '../config/index.js';
+import { MetaGenerationError } from '../types/errors.js';
 import type {
   AIContext,
   ComponentMeta,
   ExtractedData,
+  StructuredExamples,
 } from '../types/index.js';
 import { createProviderFromEnv } from '../utils/env-provider.js';
 import { createLogger } from '../utils/logger.js';
@@ -33,28 +38,14 @@ import {
   type ComponentMetaTool,
   ComponentMetaToolSchema,
 } from './tool-schema.js';
-import {
-  GenerationOutputType,
-  type GeneratorFailure,
-  type GeneratorInput,
-  type GeneratorOutput,
-  type GeneratorSuccess,
-  type ILLMProvider,
-  type IMetaGenerator,
+import type {
+  GeneratorInput,
+  GeneratorOutput,
+  ILLMProvider,
+  IMetaGenerator,
 } from './types.js';
 
 const logger = createLogger({ name: 'meta-generator' });
-
-// =============================================================================
-// Configuration
-// =============================================================================
-
-/**
- * Get generation configuration from environment
- */
-function getConfig() {
-  return getGenerationConfig();
-}
 
 // =============================================================================
 // Response Validation & Normalization
@@ -125,40 +116,38 @@ function buildDefaultSemanticDescription(
 // =============================================================================
 
 /**
- * Extract examples from ComponentMetaTool structured format
+ * Convert LLM tool examples to StructuredExamples format
  *
- * Collects unique code examples from minimalExample, examples.minimal,
- * examples.common, and examples.advanced fields.
+ * Preserves the structured format from the LLM (minimal, common, advanced)
+ * instead of flattening to a string array.
+ *
+ * Returns undefined if examples are not provided (when Storybook examples
+ * are available, the LLM skips example generation).
  */
-function extractExamplesFromToolOutput(tool: ComponentMetaTool): string[] {
-  const examples: string[] = [];
-
-  // Add minimal example first
-  examples.push(tool.minimalExample);
-
-  // Add examples from structured format
-  if (
-    tool.examples.minimal?.code &&
-    !examples.includes(tool.examples.minimal.code)
-  ) {
-    examples.push(tool.examples.minimal.code);
-  }
-  if (tool.examples.common) {
-    tool.examples.common.forEach((ex) => {
-      if (ex.code && !examples.includes(ex.code)) {
-        examples.push(ex.code);
-      }
-    });
-  }
-  if (tool.examples.advanced) {
-    tool.examples.advanced.forEach((ex) => {
-      if (ex.code && !examples.includes(ex.code)) {
-        examples.push(ex.code);
-      }
-    });
+function convertToolExamples(
+  tool: ComponentMetaTool
+): StructuredExamples | undefined {
+  if (!tool.examples) {
+    return undefined;
   }
 
-  return examples;
+  return {
+    minimal: {
+      title: tool.examples.minimal.title,
+      code: tool.examples.minimal.code,
+      description: tool.examples.minimal.description,
+    },
+    common: tool.examples.common.map((ex) => ({
+      title: ex.title,
+      code: ex.code,
+      description: ex.description,
+    })),
+    advanced: tool.examples.advanced?.map((ex) => ({
+      title: ex.title,
+      code: ex.code,
+      description: ex.description,
+    })),
+  };
 }
 
 /**
@@ -176,24 +165,20 @@ function normalizeToolOutputToMeta(
   name: string,
   extracted: ExtractedData
 ): ComponentMeta {
-  const config = getConfig();
+  const config = getGenerationConfig();
   const defaultSemanticDescription = buildDefaultSemanticDescription(
     name,
     extracted
   );
 
-  // Get semantic description with fallback
-  let semanticDescription = normalizeString(
-    tool.semanticDescription,
+  // Get semantic description with fallback (tool.description is now the semantic description)
+  // normalizeString already returns defaultSemanticDescription if input is too short
+  const semanticDescription = normalizeString(
+    tool.description,
     defaultSemanticDescription,
     config.minSemanticDescriptionLength,
     config.maxSemanticDescriptionLength
   );
-
-  // If still too short, use the fallback
-  if (semanticDescription.length < config.minSemanticDescriptionLength) {
-    semanticDescription = defaultSemanticDescription;
-  }
 
   // Normalize patterns to only include valid ones
   const patterns = filterValidPatterns(tool.guidance.patterns);
@@ -204,16 +189,17 @@ function normalizeToolOutputToMeta(
     whenToUse: tool.guidance.whenToUse,
     whenNotToUse: tool.guidance.whenNotToUse,
     patterns,
-    tokens: normalizeArray(tool.tokens),
-    examples: extractExamplesFromToolOutput(tool),
+    examples: convertToolExamples(tool),
     relatedComponents: normalizeArray(tool.guidance.relatedComponents),
     a11yNotes: tool.guidance.accessibility,
-    baseLibrary: extracted.baseLibrary,
+    variantDescriptions: tool.variantDescriptions,
+    subComponentVariantDescriptions: tool.subComponentVariantDescriptions,
   };
 
-  // Build description with validation
+  // Build short description from the first sentence of semanticDescription
+  const shortDescription = semanticDescription.split('.')[0] + '.';
   const description = normalizeString(
-    tool.description,
+    shortDescription,
     `A ${name} component`,
     config.minDescriptionLength,
     config.maxDescriptionLength
@@ -222,10 +208,7 @@ function normalizeToolOutputToMeta(
   return {
     name,
     description,
-    tier: tool.tier,
     ai,
-    variants: extracted.variants,
-    defaults: extracted.defaultVariants,
   };
 }
 
@@ -233,8 +216,12 @@ function normalizeToolOutputToMeta(
  * Validate tool calling output against the schema
  *
  * Even with tool calling, we validate the output as a safety layer.
+ * Provider-specific quirks (like Gemini's stringified nested objects)
+ * are handled by the providers themselves before returning.
+ *
+ * @throws MetaGenerationError if validation fails
  */
-function validateToolOutput(data: unknown): ComponentMetaTool | null {
+function validateToolOutput(data: unknown): ComponentMetaTool {
   const result = ComponentMetaToolSchema.safeParse(data);
   if (result.success) {
     return result.data;
@@ -249,14 +236,16 @@ function validateToolOutput(data: unknown): ComponentMetaTool | null {
         }>)
       : [];
 
-  logger.warn('Tool output validation failed', {
-    errors: issues.map((e) => ({
-      path: e.path.join('.'),
-      message: e.message,
-    })),
-  });
+  const errorDetails = issues.map((e) => ({
+    path: e.path.join('.'),
+    message: e.message,
+  }));
 
-  return null;
+  logger.warn('Tool output validation failed', { errors: errorDetails });
+
+  throw new MetaGenerationError('Tool output validation failed', {
+    validationErrors: errorDetails,
+  });
 }
 
 // =============================================================================
@@ -280,6 +269,9 @@ export interface MetaGeneratorConfig {
  * Implements the IMetaGenerator interface. Uses dependency injection for the
  * LLM provider, enabling easy testing and provider swapping.
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * @example
  * ```typescript
  * // With default Anthropic provider
@@ -289,16 +281,19 @@ export interface MetaGeneratorConfig {
  * const mockProvider = createMockProvider();
  * const generator = new MetaGenerator({ provider: mockProvider });
  *
- * // Generate metadata
- * const output = await generator.generate({
- *   orgId: 'org-123',
- *   name: 'Button',
- *   framework: 'react',
- *   extracted: extractedData,
- * });
- *
- * if (output.type === 'success') {
+ * // Generate metadata (throws on error)
+ * try {
+ *   const output = await generator.generate({
+ *     orgId: 'org-123',
+ *     name: 'Button',
+ *     framework: 'react',
+ *     extracted: extractedData,
+ *   });
  *   console.log(output.meta);
+ * } catch (error) {
+ *   if (error instanceof MetaGenerationError) {
+ *     console.error('Generation failed:', error.message);
+ *   }
  * }
  * ```
  */
@@ -312,7 +307,7 @@ export class MetaGenerator implements IMetaGenerator {
    * @param config - Configuration options
    */
   constructor(config: MetaGeneratorConfig = {}) {
-    const envConfig = getConfig();
+    const envConfig = getGenerationConfig();
     this.provider = config.provider ?? createProviderFromEnv();
     this.maxTokens = config.maxTokens ?? envConfig.maxTokens;
 
@@ -327,19 +322,21 @@ export class MetaGenerator implements IMetaGenerator {
    * Generate metadata for a component
    *
    * Uses tool calling for structured output generation.
+   * When Storybook examples are available, skips example generation in the prompt.
    *
    * @param input - Generation input with extracted data and context
-   * @returns Promise resolving to generation output (success or failure)
+   * @returns Promise resolving to generation output
+   * @throws MetaGenerationError on failure
    */
   async generate({
     orgId,
     name,
     framework,
     extracted,
-    figmaUrl,
     hints,
   }: GeneratorInput): Promise<GeneratorOutput> {
-    const startTime = performance.now();
+    // Detect if Storybook examples are available
+    const hasStorybookExamples = (extracted.stories?.length ?? 0) > 0;
 
     logger.info('Starting meta generation', {
       orgId,
@@ -347,148 +344,46 @@ export class MetaGenerator implements IMetaGenerator {
       framework,
       propsCount: extracted.props.length,
       variantsCount: Object.keys(extracted.variants).length,
+      hasStorybookExamples,
     });
 
-    try {
-      // Build prompt for tool calling
-      const { system, user } = buildToolCallingPrompt({
-        name,
-        framework,
-        extracted,
-        figmaUrl,
-        hints,
+    // Build prompt for tool calling
+    // Skip example generation if Storybook examples are available
+    const { system, user } = buildToolCallingPrompt({
+      name,
+      framework,
+      extracted,
+      skipExamples: hasStorybookExamples,
+      hints,
+    });
+
+    // Call provider with tool calling (throws on error)
+    const result =
+      await this.provider.generateWithToolCalling<ComponentMetaTool>(user, {
+        maxTokens: this.maxTokens,
+        systemPrompt: system,
       });
 
-      // Call provider with tool calling
-      const result =
-        await this.provider.generateWithToolCalling<ComponentMetaTool>(user, {
-          maxTokens: this.maxTokens,
-          systemPrompt: system,
-        });
+    // Validate the tool output (throws on validation failure)
+    const validatedTool = validateToolOutput(result.data);
 
-      if (result.type === 'failure') {
-        const generationTimeMs = Math.round(performance.now() - startTime);
+    // Normalize tool output directly to ComponentMeta
+    const meta = normalizeToolOutputToMeta(validatedTool, name, extracted);
 
-        logger.error('Tool calling failed', undefined, {
-          name,
-          error: result.error,
-          retryable: result.retryable,
-          generationTimeMs,
-        });
+    logger.info('Meta generation completed', {
+      name,
+      inputTokens: result.usage?.inputTokens,
+      outputTokens: result.usage?.outputTokens,
+      patternsCount: meta.ai.patterns.length,
+      hasExamples: !!meta.ai.examples,
+    });
 
-        const failure: GeneratorFailure = {
-          type: GenerationOutputType.Failure,
-          error: result.error,
-          generationTimeMs,
-          retryable: result.retryable,
-        };
-
-        return failure;
-      }
-
-      // Validate the tool output (safety layer)
-      const validatedTool = validateToolOutput(result.data);
-      if (!validatedTool) {
-        const generationTimeMs = Math.round(performance.now() - startTime);
-
-        logger.error('Tool output validation failed', undefined, {
-          name,
-          generationTimeMs,
-        });
-
-        const failure: GeneratorFailure = {
-          type: GenerationOutputType.Failure,
-          error: 'Tool output validation failed',
-          generationTimeMs,
-          retryable: false,
-        };
-
-        return failure;
-      }
-
-      // Normalize tool output directly to ComponentMeta
-      const meta = normalizeToolOutputToMeta(validatedTool, name, extracted);
-
-      const generationTimeMs = Math.round(performance.now() - startTime);
-
-      logger.info('Meta generation completed', {
-        name,
-        generationTimeMs,
-        inputTokens: result.usage?.inputTokens,
-        outputTokens: result.usage?.outputTokens,
-        patternsCount: meta.ai.patterns.length,
-        examplesCount: meta.ai.examples.length,
-      });
-
-      const success: GeneratorSuccess = {
-        type: GenerationOutputType.Success,
-        meta,
-        generationTimeMs,
-        provider: this.provider.providerType,
-        model: this.provider.modelId,
-        usage: result.usage,
-      };
-
-      return success;
-    } catch (error) {
-      const generationTimeMs = Math.round(performance.now() - startTime);
-
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-
-      logger.error('Meta generation failed', error as Error, {
-        name,
-        generationTimeMs,
-      });
-
-      // Determine if error is retryable
-      const retryable = this.isRetryableError(error);
-
-      const failure: GeneratorFailure = {
-        type: GenerationOutputType.Failure,
-        error: errorMessage,
-        generationTimeMs,
-        retryable,
-      };
-
-      return failure;
-    }
-  }
-
-  /**
-   * Determine if an error is retryable
-   */
-  private isRetryableError(error: unknown): boolean {
-    if (!(error instanceof Error)) {
-      return false;
-    }
-
-    const message = error.message.toLowerCase();
-
-    // Rate limit errors are retryable
-    if (message.includes('rate limit')) {
-      return true;
-    }
-
-    // Service unavailable is retryable
-    if (
-      message.includes('service unavailable') ||
-      message.includes('timeout')
-    ) {
-      return true;
-    }
-
-    // Connection errors are retryable
-    if (message.includes('connection') || message.includes('network')) {
-      return true;
-    }
-
-    // JSON parsing errors are not retryable
-    if (message.includes('json')) {
-      return false;
-    }
-
-    return false;
+    return {
+      meta,
+      provider: this.provider.providerType,
+      model: this.provider.modelId,
+      usage: result.usage,
+    };
   }
 }
 

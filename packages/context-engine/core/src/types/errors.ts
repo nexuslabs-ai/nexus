@@ -44,7 +44,11 @@ export const ErrorCodeSchema = z.enum([
   // Processing errors (422)
   'EXTRACTION_FAILED',
   'META_GENERATION_FAILED',
+  'MANIFEST_BUILD_FAILED',
   'EMBEDDING_FAILED',
+
+  // State store errors (500)
+  'STATE_STORE_ERROR',
 
   // Server errors (500)
   'INTERNAL_ERROR',
@@ -90,9 +94,11 @@ export const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
   // 422 Unprocessable Entity
   EXTRACTION_FAILED: 422,
   META_GENERATION_FAILED: 422,
+  MANIFEST_BUILD_FAILED: 422,
   EMBEDDING_FAILED: 422,
 
   // 500 Internal Server Error
+  STATE_STORE_ERROR: 500,
   INTERNAL_ERROR: 500,
   DATABASE_ERROR: 500,
   EXTERNAL_SERVICE_ERROR: 500,
@@ -309,6 +315,28 @@ export class EmbeddingError extends ContextEngineError {
   ) {
     super('EMBEDDING_FAILED', message, { details, requestId });
     this.name = 'EmbeddingError';
+  }
+}
+
+export class ManifestBuildError extends ContextEngineError {
+  constructor(
+    message: string,
+    details?: Record<string, unknown>,
+    requestId?: string
+  ) {
+    super('MANIFEST_BUILD_FAILED', message, { details, requestId });
+    this.name = 'ManifestBuildError';
+  }
+}
+
+export class StateStoreError extends ContextEngineError {
+  constructor(
+    message: string,
+    details?: { operation?: string; componentName?: string },
+    requestId?: string
+  ) {
+    super('STATE_STORE_ERROR', message, { details, requestId });
+    this.name = 'StateStoreError';
   }
 }
 
