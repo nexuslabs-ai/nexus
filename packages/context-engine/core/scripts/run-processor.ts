@@ -46,8 +46,8 @@ const logger = createLogger({ name: 'run-processor' });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load .env.test from packages/context-engine/ (parent of core/)
-config({ path: resolve(__dirname, '../../.env.test') });
+// Load .env.test from packages/context-engine/core/
+config({ path: resolve(__dirname, '../.env.test') });
 
 const DEFAULT_OUTPUT_DIR = '.ce-output';
 const LLM_DELAY_MS = 2000; // Delay between LLM calls to avoid rate limiting
@@ -148,7 +148,7 @@ Environment Variables:
   ANTHROPIC_API_KEY         Required for Anthropic provider
   GOOGLE_API_KEY            Required for Gemini provider
 
-  Config is loaded from packages/context-engine/.env.test
+  Config is loaded from packages/context-engine/core/.env.test
 `);
 }
 
