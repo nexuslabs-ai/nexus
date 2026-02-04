@@ -104,8 +104,11 @@ export class EmbeddingService {
    * @returns The embedding vector optimized for similarity search
    */
   async embedQuery(text: string): Promise<number[]> {
-    const [embedding] = await this.embedBatch([text], 'query');
-    return embedding;
+    const result = await this.embedBatch([text], 'query');
+    if (result.length === 0) {
+      throw new Error('Embedding service returned empty result for query');
+    }
+    return result[0];
   }
 
   /**
