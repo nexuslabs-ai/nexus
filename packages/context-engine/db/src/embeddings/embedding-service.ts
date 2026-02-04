@@ -13,7 +13,7 @@ import type { EmbeddingModelInfo } from '../types.js';
 
 const MODEL = 'voyage-code-3';
 const DIMENSIONS = 1024;
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 100;
 const MAX_RETRIES = 3;
 const VOYAGE_API_URL = 'https://api.voyageai.com/v1/embeddings';
 
@@ -159,10 +159,21 @@ export class EmbeddingService {
             model: MODEL,
             input: texts,
             input_type: inputType,
+            output_dimension: DIMENSIONS,
           }),
         });
 
         if (!response.ok) {
+          // Handle rate limiting with Retry-After header
+          if (response.status === 429) {
+            const retryAfter = response.headers.get('Retry-After');
+            const waitTime = retryAfter
+              ? parseInt(retryAfter, 10) * 1000
+              : 5000;
+            await this.delay(waitTime);
+            continue; // Retry immediately after waiting
+          }
+
           const errorText = await response.text();
           throw new Error(
             `Voyage API error (${response.status}): ${errorText}`
@@ -176,8 +187,10 @@ export class EmbeddingService {
         lastError = error instanceof Error ? error : new Error(String(error));
 
         if (attempt < MAX_RETRIES - 1) {
-          // Exponential backoff: 1s, 2s, 4s, ...
-          await this.delay(Math.pow(2, attempt) * 1000);
+          // Exponential backoff with jitter to prevent thundering herd
+          const baseDelay = Math.pow(2, attempt) * 1000;
+          const jitter = Math.random() * 500;
+          await this.delay(baseDelay + jitter);
         }
       }
     }

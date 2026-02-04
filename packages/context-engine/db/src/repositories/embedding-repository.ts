@@ -162,6 +162,12 @@ export class EmbeddingRepository {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
 
+      // Log error for observability
+      console.error(
+        `[EmbeddingRepository] Failed to index component ${componentId}:`,
+        errorMessage
+      );
+
       // Update status to failed on error
       await this.db
         .update(components)
