@@ -69,6 +69,8 @@ export class OrganizationRepository {
 
   /**
    * Delete an organization
+   *
+   * @throws Error if organization has associated components (FK constraint)
    */
   async delete(id: string): Promise<boolean> {
     const result = await this.db

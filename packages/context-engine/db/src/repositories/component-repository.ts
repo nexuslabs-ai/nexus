@@ -5,7 +5,7 @@
  * All methods are scoped to an organization for multi-tenancy.
  */
 
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, count, desc, eq } from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { type Component, components, type NewComponent } from '../schema.js';
@@ -62,6 +62,10 @@ export class ComponentRepository {
       .insert(components)
       .values({ ...data, orgId })
       .returning();
+
+    if (!result) {
+      throw new Error('Failed to create component: no row returned');
+    }
 
     return result;
   }
@@ -186,6 +190,10 @@ export class ComponentRepository {
       })
       .returning();
 
+    if (!result) {
+      throw new Error('Failed to upsert component: no row returned');
+    }
+
     return result;
   }
 
@@ -205,11 +213,11 @@ export class ComponentRepository {
    * Count components for an organization
    */
   async count(orgId: string): Promise<number> {
-    const results = await this.db
-      .select({ id: components.id })
+    const [result] = await this.db
+      .select({ count: count() })
       .from(components)
       .where(eq(components.orgId, orgId));
 
-    return results.length;
+    return result?.count ?? 0;
   }
 }
