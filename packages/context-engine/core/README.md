@@ -273,7 +273,6 @@ yarn workspace @context-engine/core clean
   generatedAt: "2025-02-03T10:00:00Z",
   updatedAt: "2025-02-03T10:00:00Z",
   sourceHash: "abc123",
-  metaHash: "def456",
   files: ["button/button.tsx"]
 }
 ```

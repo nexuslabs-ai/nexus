@@ -13,6 +13,7 @@ export {
   ComponentSlugSchema,
   FrameworkSchema,
   IdentifierTypeSchema,
+  ManifestIdentitySchema,
   ParsedIdentifierSchema,
   SLUG_PATTERN,
   TierSchema,
@@ -40,29 +41,6 @@ export type {
 // Output types - shared discriminant for success/failure
 export type { OutputType as OutputTypeValue } from './output.js';
 export { OutputType } from './output.js';
-
-// Embedding types - schemas (values)
-export {
-  DEFAULT_EMBEDDING_MODEL,
-  EmbeddingChunkTypeSchema,
-  EmbeddingModelInfoSchema,
-  EmbeddingProviderSchema,
-  EmbeddingQueueEntrySchema,
-  EmbeddingStatusInfoSchema,
-  EmbeddingStatusSchema,
-  EmbeddingStatusSummarySchema,
-} from './embedding.js';
-
-// Embedding types - types
-export type {
-  EmbeddingChunkType,
-  EmbeddingModelInfo,
-  EmbeddingProvider,
-  EmbeddingQueueEntry,
-  EmbeddingStatus,
-  EmbeddingStatusInfo,
-  EmbeddingStatusSummary,
-} from './embedding.js';
 
 // Extracted data types - schemas (values)
 export {
@@ -154,10 +132,7 @@ export {
   ChildrenInfoSchema,
   CreateManifestInputSchema,
   DependenciesSchema,
-  MANIFEST_SCHEMA_VERSION,
-  ManifestMetadataSchema,
   ManifestOutputSchema,
-  ManifestSummarySchema,
   SubComponentSchema,
   UpdateManifestInputSchema,
   VersionHistoryEntrySchema,
@@ -169,71 +144,11 @@ export type {
   ChildrenInfo,
   CreateManifestInput,
   Dependencies,
-  ManifestMetadata,
   ManifestOutput,
-  ManifestSummary,
   SubComponent,
   UpdateManifestInput,
   VersionHistoryEntry,
 } from './manifest.js';
-
-// Database types - schemas (values)
-export {
-  ComponentEmbeddingRecordSchema,
-  ComponentRecordSchema,
-  EmbeddingQueueRecordSchema,
-  OrganizationRecordSchema,
-  TABLE_NAMES,
-  VersionHistoryRecordSchema,
-} from './database.js';
-
-// Database types - types
-export type {
-  ComponentEmbeddingRecord,
-  ComponentRecord,
-  EmbeddingQueueRecord,
-  InsertComponent,
-  InsertComponentEmbedding,
-  InsertEmbeddingQueue,
-  InsertOrganization,
-  InsertVersionHistory,
-  OrganizationRecord,
-  TableName,
-  UpdateComponent,
-  UpdateEmbeddingQueue,
-  UpdateOrganization,
-  VersionHistoryRecord,
-} from './database.js';
-
-// Auth types - schemas (values)
-export {
-  API_KEY_PATTERN,
-  API_KEY_PREFIX,
-  ApiKeyEnvironmentSchema,
-  ApiKeyRecordSchema,
-  ApiKeySchema,
-  ApiKeySummarySchema,
-  AuthContextSchema,
-  CreateApiKeyInputSchema,
-  CreateApiKeyResultSchema,
-  PermissionLevelSchema,
-  RateLimitInfoSchema,
-  RateLimitStatusSchema,
-} from './auth.js';
-
-// Auth types - types
-export type {
-  ApiKey,
-  ApiKeyEnvironment,
-  ApiKeyRecord,
-  ApiKeySummary,
-  AuthContext,
-  CreateApiKeyInput,
-  CreateApiKeyResult,
-  PermissionLevel,
-  RateLimitInfo,
-  RateLimitStatus,
-} from './auth.js';
 
 // Error types - schemas and classes (values)
 export {
@@ -259,57 +174,3 @@ export {
 
 // Error types - types
 export type { ApiError, ErrorCode, ValidationErrorDetail } from './errors.js';
-
-// API types - schemas (values)
-export {
-  CreateComponentBodySchema,
-  CreateComponentResponseSchema,
-  DeleteComponentParamsSchema,
-  DeleteComponentResponseSchema,
-  GetComponentParamsSchema,
-  GetComponentQuerySchema,
-  GetComponentResponseSchema,
-  GetContextBodySchema,
-  GetContextResponseSchema,
-  GetStatsResponseSchema,
-  ListComponentsQuerySchema,
-  ListComponentsResponseSchema,
-  PaginatedResponseSchema,
-  PaginationMetaSchema,
-  PaginationParamsSchema,
-  SearchBodySchema,
-  SearchResponseSchema,
-  SearchResultItemSchema,
-  SuccessResponseSchema,
-  UpdateComponentBodySchema,
-  UpdateComponentParamsSchema,
-  UpdateComponentResponseSchema,
-  WebhookEventTypeSchema,
-  WebhookPayloadSchema,
-} from './api.js';
-
-// API types - types
-export type {
-  CreateComponentBody,
-  CreateComponentResponse,
-  DeleteComponentParams,
-  DeleteComponentResponse,
-  GetComponentParams,
-  GetComponentQuery,
-  GetComponentResponse,
-  GetContextBody,
-  GetContextResponse,
-  GetStatsResponse,
-  ListComponentsQuery,
-  ListComponentsResponse,
-  PaginationMeta,
-  PaginationParams,
-  SearchBody,
-  SearchResponse,
-  SearchResultItem,
-  UpdateComponentBody,
-  UpdateComponentParams,
-  UpdateComponentResponse,
-  WebhookEventType,
-  WebhookPayload,
-} from './api.js';
