@@ -15,6 +15,7 @@ import type {
   ComponentMeta,
   ExtractedData,
 } from '@context-engine/core';
+import { sql } from 'drizzle-orm';
 import {
   customType,
   index,
@@ -27,6 +28,7 @@ import {
   uniqueIndex,
   uuid,
   varchar,
+  vector,
 } from 'drizzle-orm/pg-core';
 
 import type {
@@ -42,7 +44,7 @@ import type {
 /**
  * PostgreSQL tsvector type for full-text search.
  * Drizzle doesn't have built-in support for tsvector.
- * The actual tsvector value is auto-populated via database trigger (see setup.sql).
+ * Used with generatedAlwaysAs() for automatic computation on INSERT/UPDATE.
  */
 const tsvector = customType<{ data: string }>({
   dataType() {
@@ -153,10 +155,18 @@ export const components = pgTable(
     /** Embedding model info (provider, model name, dimensions) */
     embeddingModel: jsonb('embedding_model').$type<EmbeddingModelInfo>(),
 
-    /** Full-text search vector (auto-populated via database trigger, see setup.sql) */
-    searchVector: tsvector('search_vector'),
-
-    // Note: embedding vector column (pgvector) will be added via setup.sql
+    /**
+     * Full-text search vector (generated column).
+     * Auto-computed on INSERT/UPDATE from name and manifest description.
+     * Weight A = component name (highest priority)
+     * Weight B = manifest description
+     */
+    searchVector: tsvector('search_vector').generatedAlwaysAs(
+      sql`
+        setweight(to_tsvector('english', coalesce(name, '')), 'A') ||
+        setweight(to_tsvector('english', coalesce(manifest->>'description', '')), 'B')
+      `
+    ),
 
     // =========================================================================
     // Change Detection
@@ -190,6 +200,9 @@ export const components = pgTable(
       table.orgId,
       table.embeddingStatus
     ),
+
+    // GIN index for full-text search on search_vector
+    index('components_search_vector_idx').using('gin', table.searchVector),
   ]
 );
 
@@ -201,7 +214,7 @@ export const components = pgTable(
  * Embedding chunks table
  *
  * Components are split into semantic chunks for better retrieval.
- * Each chunk gets its own embedding vector (added via setup.sql).
+ * Each chunk gets its own embedding vector for semantic search.
  *
  * Multi-tenant: orgId required for all queries to prevent data leakage.
  */
@@ -232,6 +245,9 @@ export const embeddingChunks = pgTable(
     /** Chunk sequence within type (for ordering multiple chunks of same type) */
     chunkIndex: integer('chunk_index').notNull().default(0),
 
+    /** Vector embedding for semantic search (1024 dimensions for Voyage AI) */
+    embedding: vector('embedding', { dimensions: 1024 }),
+
     /** Creation timestamp */
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
@@ -247,6 +263,12 @@ export const embeddingChunks = pgTable(
       table.orgId,
       table.componentId
     ),
+
+    // HNSW index for fast approximate nearest neighbor search
+    // Using cosine distance ops for semantic similarity
+    index('embedding_chunks_embedding_hnsw_idx')
+      .using('hnsw', table.embedding.op('vector_cosine_ops'))
+      .with({ m: 16, ef_construction: 64 }),
   ]
 );
 

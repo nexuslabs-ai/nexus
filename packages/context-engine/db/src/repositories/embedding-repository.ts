@@ -10,7 +10,7 @@
  */
 
 import type { AIManifest } from '@context-engine/core';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, cosineDistance, eq, sql } from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { generateChunks } from '../embeddings/chunk-generator.js';
@@ -18,7 +18,7 @@ import {
   createEmbeddingServiceFromEnv,
   type EmbeddingService,
 } from '../embeddings/embedding-service.js';
-import { embeddingChunks } from '../schema.js';
+import { components, embeddingChunks } from '../schema.js';
 import type { IndexResult, SearchOptions, SearchResult } from '../types.js';
 
 // =============================================================================
@@ -96,25 +96,18 @@ export class EmbeddingRepository {
         chunks.map((c) => c.content)
       );
 
-      // Insert chunks with embeddings using raw SQL for vector type
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        const embedding = embeddings[i];
+      // Prepare chunk records with embeddings
+      const chunkRecords = chunks.map((chunk, i) => ({
+        orgId,
+        componentId,
+        chunkType: chunk.type,
+        content: chunk.content,
+        chunkIndex: chunk.index,
+        embedding: embeddings[i],
+      }));
 
-        // Use raw SQL because Drizzle doesn't support pgvector natively
-        await this.db.execute(sql`
-          INSERT INTO embedding_chunks (org_id, component_id, chunk_type, content, chunk_index, embedding, created_at)
-          VALUES (
-            ${orgId}::uuid,
-            ${componentId}::uuid,
-            ${chunk.type},
-            ${chunk.content},
-            ${chunk.index},
-            ${sql.raw(`'[${embedding.join(',')}]'::vector`)},
-            NOW()
-          )
-        `);
-      }
+      // Batch insert chunks with embeddings using native Drizzle pgvector support
+      await this.db.insert(embeddingChunks).values(chunkRecords);
 
       return {
         success: true,
@@ -160,14 +153,12 @@ export class EmbeddingRepository {
    *
    * Process:
    * 1. Generate query embedding (optimized for search queries)
-   * 2. Find similar chunks using cosine distance (<=> operator)
+   * 2. Find similar chunks using cosine distance
    * 3. Aggregate scores by component (take max score per component)
    * 4. Return components ordered by relevance
    *
-   * Uses a CTE query for efficiency:
-   * - ranked_chunks: Find top matching chunks by vector similarity
-   * - component_scores: Aggregate to component level with max score
-   * - Final join: Get component details
+   * Uses Drizzle's native cosineDistance function for type-safe queries.
+   * Orders by cosineDistance directly to ensure HNSW index usage.
    *
    * @param orgId - Organization ID (for multi-tenant isolation)
    * @param query - Natural language search query
@@ -183,57 +174,79 @@ export class EmbeddingRepository {
 
     // Generate query embedding (query-optimized)
     const queryEmbedding = await this.embeddingService.embedQuery(query);
-    const vectorLiteral = `'[${queryEmbedding.join(',')}]'::vector`;
 
-    // Build framework filter (conditional SQL fragment)
-    const frameworkFilter = framework
-      ? sql`AND c.framework = ${framework}`
-      : sql``;
+    // Calculate similarity as 1 - cosineDistance (cosine similarity)
+    const similarity = sql<number>`1 - ${cosineDistance(embeddingChunks.embedding, queryEmbedding)}`;
 
-    // Vector similarity search with CTE for aggregation
-    const results = await this.db.execute(sql`
-      WITH ranked_chunks AS (
-        SELECT
-          ec.component_id,
-          1 - (ec.embedding <=> ${sql.raw(vectorLiteral)}) AS similarity
-        FROM embedding_chunks ec
-        WHERE ec.org_id = ${orgId}::uuid
-        ORDER BY ec.embedding <=> ${sql.raw(vectorLiteral)}
-        LIMIT ${limit * 3}
-      ),
-      component_scores AS (
-        SELECT
-          component_id,
-          MAX(similarity) AS score
-        FROM ranked_chunks
-        GROUP BY component_id
-        HAVING MAX(similarity) >= ${minScore}
-        ORDER BY score DESC
-        LIMIT ${limit}
-      )
-      SELECT
-        c.id AS component_id,
-        c.slug,
-        c.name,
-        c.manifest->>'description' AS description,
-        cs.score
-      FROM component_scores cs
-      JOIN components c ON c.id = cs.component_id
-      WHERE c.org_id = ${orgId}::uuid
-        ${frameworkFilter}
-      ORDER BY cs.score DESC
-    `);
+    // Build framework filter conditions
+    const frameworkCondition = framework
+      ? eq(components.framework, framework)
+      : undefined;
 
-    // Map raw results to SearchResult type
-    // postgres-js returns results as an array-like object, not { rows: [] }
-    const rows = results as unknown as RawSearchRow[];
-    return rows.map((row) => ({
-      componentId: row.component_id,
-      slug: row.slug,
-      name: row.name,
-      description: row.description,
-      score: parseFloat(String(row.score)),
-    }));
+    // Query chunks with similarity scores, ordered by distance (for index usage)
+    // Then aggregate by component in-memory for simplicity and type safety
+    const rankedChunks = await this.db
+      .select({
+        componentId: embeddingChunks.componentId,
+        similarity,
+      })
+      .from(embeddingChunks)
+      .where(eq(embeddingChunks.orgId, orgId))
+      .orderBy(cosineDistance(embeddingChunks.embedding, queryEmbedding))
+      .limit(limit * 3);
+
+    // Aggregate: take max similarity per component
+    const componentScores = new Map<string, number>();
+    for (const chunk of rankedChunks) {
+      const current = componentScores.get(chunk.componentId) ?? 0;
+      if (chunk.similarity > current) {
+        componentScores.set(chunk.componentId, chunk.similarity);
+      }
+    }
+
+    // Filter by minScore and get top components
+    const topComponentIds = Array.from(componentScores.entries())
+      .filter(([, score]) => score >= minScore)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limit)
+      .map(([id]) => id);
+
+    if (topComponentIds.length === 0) {
+      return [];
+    }
+
+    // Fetch component details for top results
+    const componentDetails = await this.db
+      .select({
+        id: components.id,
+        slug: components.slug,
+        name: components.name,
+        description: sql<string | null>`${components.manifest}->>'description'`,
+      })
+      .from(components)
+      .where(
+        and(
+          eq(components.orgId, orgId),
+          sql`${components.id} = ANY(${topComponentIds})`,
+          frameworkCondition
+        )
+      );
+
+    // Build result with scores, maintaining score order
+    const componentMap = new Map(componentDetails.map((c) => [c.id, c]));
+    return topComponentIds
+      .map((id) => {
+        const component = componentMap.get(id);
+        if (!component) return null;
+        return {
+          componentId: component.id,
+          slug: component.slug,
+          name: component.name,
+          description: component.description,
+          score: componentScores.get(id) ?? 0,
+        };
+      })
+      .filter((r): r is SearchResult => r !== null);
   }
 
   // ===========================================================================
@@ -249,19 +262,4 @@ export class EmbeddingRepository {
   get modelInfo() {
     return this.embeddingService.modelInfo;
   }
-}
-
-// =============================================================================
-// Internal Types
-// =============================================================================
-
-/**
- * Raw row shape from search query results
- */
-interface RawSearchRow {
-  component_id: string;
-  slug: string;
-  name: string;
-  description: string | null;
-  score: string | number;
 }

@@ -23,8 +23,7 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:setup": "tsx src/scripts/run-setup.ts",
-    "db:init": "yarn db:push && yarn db:setup",
+    "db:init": "yarn db:push",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
