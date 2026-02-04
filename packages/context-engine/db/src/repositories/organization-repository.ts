@@ -28,6 +28,10 @@ export class OrganizationRepository {
       .values(data)
       .returning();
 
+    if (!result) {
+      throw new Error('Failed to create organization: no row returned');
+    }
+
     return result;
   }
 
