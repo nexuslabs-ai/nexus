@@ -9,6 +9,7 @@ import { and, asc, desc, eq } from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { type Component, components, type NewComponent } from '../schema.js';
+import type { EmbeddingStatus } from '../types.js';
 
 // =============================================================================
 // Types
@@ -22,7 +23,7 @@ export interface FindManyOptions {
   where?: {
     framework?: string;
     visibility?: string;
-    embeddingStatus?: string;
+    embeddingStatus?: EmbeddingStatus;
   };
 
   /** Maximum number of results */
@@ -178,6 +179,7 @@ export class ComponentRepository {
           manifest: data.manifest,
           embeddingStatus: data.embeddingStatus,
           embeddingError: data.embeddingError,
+          embeddingModel: data.embeddingModel,
           sourceHash: data.sourceHash,
           updatedAt: new Date(),
         },

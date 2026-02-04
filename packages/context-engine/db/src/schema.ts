@@ -26,6 +26,8 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+import type { EmbeddingModelInfo, EmbeddingStatus } from './types.js';
+
 // =============================================================================
 // Organizations
 // =============================================================================
@@ -119,11 +121,15 @@ export const components = pgTable(
 
     /** Embedding status: pending/processing/indexed/failed */
     embeddingStatus: varchar('embedding_status', { length: 20 })
+      .$type<EmbeddingStatus>()
       .notNull()
       .default('pending'),
 
     /** Error message if embedding failed */
     embeddingError: text('embedding_error'),
+
+    /** Embedding model info (provider, model name, dimensions) */
+    embeddingModel: jsonb('embedding_model').$type<EmbeddingModelInfo>(),
 
     // Note: embedding vector column (pgvector) will be added in future phase
 
