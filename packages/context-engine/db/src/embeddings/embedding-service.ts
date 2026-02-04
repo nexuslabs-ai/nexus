@@ -59,8 +59,11 @@ export class EmbeddingService {
    * @returns The embedding vector
    */
   async embed(text: string): Promise<number[]> {
-    const [embedding] = await this.embedBatch([text], 'document');
-    return embedding;
+    const result = await this.embedBatch([text], 'document');
+    if (result.length === 0) {
+      throw new Error('Embedding service returned empty result');
+    }
+    return result[0];
   }
 
   /**

@@ -254,7 +254,7 @@ function buildCompositionChunk(manifest: AIManifest): string | null {
     }
 
     // Add props if the sub-component has any
-    const propsLine = formatSubComponentProps(sub.props);
+    const propsLine = sub.props ? formatSubComponentProps(sub.props) : null;
     if (propsLine) {
       parts.push(`  ${propsLine}`);
     }

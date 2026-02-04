@@ -54,10 +54,12 @@ export class EmbeddingRepository {
    * Index a component (generate chunks and embeddings).
    *
    * Process:
-   * 1. Delete any existing chunks for this component
-   * 2. Generate semantic chunks from the manifest
-   * 3. Generate embeddings for each chunk via Voyage AI
-   * 4. Store chunks with embeddings in the database
+   * 1. Set embedding status to 'processing'
+   * 2. Delete any existing chunks for this component
+   * 3. Generate semantic chunks from the manifest
+   * 4. Generate embeddings for each chunk via Voyage AI
+   * 5. Store chunks with embeddings in the database
+   * 6. Update embedding status to 'indexed' on success or 'failed' on error
    *
    * @param orgId - Organization ID (for multi-tenant isolation)
    * @param componentId - Component to index
@@ -70,6 +72,17 @@ export class EmbeddingRepository {
     manifest: AIManifest
   ): Promise<IndexResult> {
     try {
+      // Set status to processing
+      await this.db
+        .update(components)
+        .set({
+          embeddingStatus: 'processing',
+          embeddingError: null,
+        })
+        .where(
+          and(eq(components.id, componentId), eq(components.orgId, orgId))
+        );
+
       // Delete existing chunks for this component
       await this.db
         .delete(embeddingChunks)
@@ -84,6 +97,18 @@ export class EmbeddingRepository {
       const chunks = generateChunks(manifest);
 
       if (chunks.length === 0) {
+        // Update status to indexed even with no chunks
+        await this.db
+          .update(components)
+          .set({
+            embeddingStatus: 'indexed',
+            embeddingModel: this.embeddingService.modelInfo,
+            embeddingError: null,
+          })
+          .where(
+            and(eq(components.id, componentId), eq(components.orgId, orgId))
+          );
+
         return {
           success: true,
           componentId,
@@ -95,6 +120,13 @@ export class EmbeddingRepository {
       const embeddings = await this.embeddingService.embedBatch(
         chunks.map((c) => c.content)
       );
+
+      // Verify we got the expected number of embeddings
+      if (embeddings.length !== chunks.length) {
+        throw new Error(
+          `Embedding count mismatch: expected ${chunks.length}, got ${embeddings.length}`
+        );
+      }
 
       // Prepare chunk records with embeddings
       const chunkRecords = chunks.map((chunk, i) => ({
@@ -109,17 +141,43 @@ export class EmbeddingRepository {
       // Batch insert chunks with embeddings using native Drizzle pgvector support
       await this.db.insert(embeddingChunks).values(chunkRecords);
 
+      // Update status to indexed on success
+      await this.db
+        .update(components)
+        .set({
+          embeddingStatus: 'indexed',
+          embeddingModel: this.embeddingService.modelInfo,
+          embeddingError: null,
+        })
+        .where(
+          and(eq(components.id, componentId), eq(components.orgId, orgId))
+        );
+
       return {
         success: true,
         componentId,
         chunksCreated: chunks.length,
       };
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+
+      // Update status to failed on error
+      await this.db
+        .update(components)
+        .set({
+          embeddingStatus: 'failed',
+          embeddingError: errorMessage,
+        })
+        .where(
+          and(eq(components.id, componentId), eq(components.orgId, orgId))
+        );
+
       return {
         success: false,
         componentId,
         chunksCreated: 0,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       };
     }
   }
@@ -199,8 +257,8 @@ export class EmbeddingRepository {
     const componentScores = new Map<string, number>();
     for (const chunk of rankedChunks) {
       const current = componentScores.get(chunk.componentId) ?? 0;
-      if (chunk.similarity > current) {
-        componentScores.set(chunk.componentId, chunk.similarity);
+      if ((chunk.similarity ?? 0) > current) {
+        componentScores.set(chunk.componentId, chunk.similarity ?? 0);
       }
     }
 
