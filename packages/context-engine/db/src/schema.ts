@@ -16,9 +16,12 @@ import type {
   ExtractedData,
 } from '@context-engine/core';
 import {
+  customType,
   index,
+  integer,
   jsonb,
   pgTable,
+  serial,
   text,
   timestamp,
   uniqueIndex,
@@ -26,7 +29,26 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import type { EmbeddingModelInfo, EmbeddingStatus } from './types.js';
+import type {
+  ChunkType,
+  EmbeddingModelInfo,
+  EmbeddingStatus,
+} from './types.js';
+
+// =============================================================================
+// Custom Types
+// =============================================================================
+
+/**
+ * PostgreSQL tsvector type for full-text search.
+ * Drizzle doesn't have built-in support for tsvector.
+ * The actual tsvector value is auto-populated via database trigger (see setup.sql).
+ */
+const tsvector = customType<{ data: string }>({
+  dataType() {
+    return 'tsvector';
+  },
+});
 
 // =============================================================================
 // Organizations
@@ -131,7 +153,10 @@ export const components = pgTable(
     /** Embedding model info (provider, model name, dimensions) */
     embeddingModel: jsonb('embedding_model').$type<EmbeddingModelInfo>(),
 
-    // Note: embedding vector column (pgvector) will be added in future phase
+    /** Full-text search vector (auto-populated via database trigger, see setup.sql) */
+    searchVector: tsvector('search_vector'),
+
+    // Note: embedding vector column (pgvector) will be added via setup.sql
 
     // =========================================================================
     // Change Detection
@@ -169,6 +194,63 @@ export const components = pgTable(
 );
 
 // =============================================================================
+// Embedding Chunks
+// =============================================================================
+
+/**
+ * Embedding chunks table
+ *
+ * Components are split into semantic chunks for better retrieval.
+ * Each chunk gets its own embedding vector (added via setup.sql).
+ *
+ * Multi-tenant: orgId required for all queries to prevent data leakage.
+ */
+export const embeddingChunks = pgTable(
+  'embedding_chunks',
+  {
+    /** Auto-increment ID */
+    id: serial('id').primaryKey(),
+
+    /** Organization ID (for multi-tenant isolation) */
+    orgId: uuid('org_id')
+      .notNull()
+      .references(() => organizations.id),
+
+    /** Reference to component (cascade delete when component is removed) */
+    componentId: uuid('component_id')
+      .notNull()
+      .references(() => components.id, { onDelete: 'cascade' }),
+
+    /** Chunk type: description | props | examples | patterns | guidance */
+    chunkType: varchar('chunk_type', { length: 50 })
+      .$type<ChunkType>()
+      .notNull(),
+
+    /** Chunk text content */
+    content: text('content').notNull(),
+
+    /** Chunk sequence within type (for ordering multiple chunks of same type) */
+    chunkIndex: integer('chunk_index').notNull().default(0),
+
+    /** Creation timestamp */
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    // Index for filtering by organization (all queries use this)
+    index('embedding_chunks_org_id_idx').on(table.orgId),
+
+    // Index for filtering by component
+    index('embedding_chunks_component_id_idx').on(table.componentId),
+
+    // Composite index for org+component queries (most common pattern)
+    index('embedding_chunks_org_component_idx').on(
+      table.orgId,
+      table.componentId
+    ),
+  ]
+);
+
+// =============================================================================
 // Type Exports (inferred from schema)
 // =============================================================================
 
@@ -183,3 +265,9 @@ export type Component = typeof components.$inferSelect;
 
 /** Component insert type */
 export type NewComponent = typeof components.$inferInsert;
+
+/** Embedding chunk select type */
+export type EmbeddingChunk = typeof embeddingChunks.$inferSelect;
+
+/** Embedding chunk insert type */
+export type NewEmbeddingChunk = typeof embeddingChunks.$inferInsert;

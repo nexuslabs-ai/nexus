@@ -38,7 +38,14 @@ export {
   ComponentRepository,
   type FindManyOptions,
 } from './repositories/component-repository.js';
+export { EmbeddingRepository } from './repositories/embedding-repository.js';
 export { OrganizationRepository } from './repositories/organization-repository.js';
+
+// =============================================================================
+// Embeddings
+// =============================================================================
+
+export * from './embeddings/index.js';
 
 // =============================================================================
 // Factory Functions
@@ -46,6 +53,7 @@ export { OrganizationRepository } from './repositories/organization-repository.j
 
 import { getDatabase } from './client.js';
 import { ComponentRepository } from './repositories/component-repository.js';
+import { EmbeddingRepository } from './repositories/embedding-repository.js';
 import { OrganizationRepository } from './repositories/organization-repository.js';
 
 /**
@@ -60,6 +68,15 @@ export function createOrganizationRepository(): OrganizationRepository {
  */
 export function createComponentRepository(): ComponentRepository {
   return new ComponentRepository(getDatabase());
+}
+
+/**
+ * Create an EmbeddingRepository instance.
+ *
+ * Uses VOYAGE_API_KEY from environment variables for the embedding service.
+ */
+export function createEmbeddingRepository(): EmbeddingRepository {
+  return new EmbeddingRepository(getDatabase());
 }
 
 // =============================================================================
