@@ -1,7 +1,7 @@
 {
   "name": "@context-engine/db",
   "version": "0.1.0",
-  "description": "Database client and migrations for Context Engine",
+  "description": "Database layer for Context Engine",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -19,7 +19,9 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@context-engine/core": "*",

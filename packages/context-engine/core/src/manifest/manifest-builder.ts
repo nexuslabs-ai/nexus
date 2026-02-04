@@ -15,22 +15,15 @@ import type {
   CodeExample,
   CompoundComponentInfo,
   Dependencies,
-  EmbeddingStatus,
   ExtractedData,
   ExtractedSubComponent,
   Guidance,
   ImportStatement,
-  ManifestMetadata,
   PropDefinition,
   StructuredExamples,
   SubComponent,
 } from '../types/index.js';
-import {
-  DEFAULT_EMBEDDING_MODEL,
-  MANIFEST_SCHEMA_VERSION,
-} from '../types/index.js';
 import { kebabCase } from '../utils/case.js';
-import { generateObjectHash } from '../utils/hash.js';
 import { logger } from '../utils/logger.js';
 import {
   categorizeProps,
@@ -98,10 +91,10 @@ export class ManifestBuilder {
   }
 
   /**
-   * Build metadata and manifest from extracted data and generated metadata
+   * Build manifest from extracted data and generated metadata
    *
    * @param input - Builder input containing identity, extracted data, and meta
-   * @returns ManifestBuilderResult with componentName, metadata, and manifest
+   * @returns ManifestBuilderResult with flat structure matching ManifestOutput
    * @throws ManifestBuildError if building fails
    */
   build({
@@ -109,11 +102,9 @@ export class ManifestBuilder {
     extracted,
     meta,
     sourceHash,
-    version = '0.0.1',
   }: ManifestBuilderInput): ManifestBuilderResult {
     const { name } = identity;
     const now = new Date().toISOString();
-    const metaHash = generateObjectHash(meta);
 
     // === Build props (shared between metadata check and manifest) ===
 
@@ -158,24 +149,6 @@ export class ManifestBuilder {
       internal: extracted.internalDependencies,
     };
 
-    // === Build metadata (system fields) ===
-
-    const metadata: ManifestMetadata = {
-      id: identity.id,
-      schemaVersion: MANIFEST_SCHEMA_VERSION,
-      version,
-      framework: identity.framework,
-      visibility: 'private',
-      embeddingStatus: 'pending' as EmbeddingStatus,
-      embeddingModel: DEFAULT_EMBEDDING_MODEL,
-      embeddingError: undefined,
-      generatedAt: now,
-      updatedAt: now,
-      sourceHash,
-      metaHash,
-      files: extracted.files,
-    };
-
     // === Build AI manifest ===
 
     const children = detectChildrenInfo(extracted.props);
@@ -209,8 +182,10 @@ export class ManifestBuilder {
 
     return {
       componentName: identity.name,
-      metadata,
+      identity,
       manifest,
+      sourceHash,
+      files: extracted.files,
       builtAt: now,
     };
   }

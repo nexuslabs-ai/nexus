@@ -187,19 +187,20 @@ export class ComponentProcessor {
       extracted: extractResult.extracted,
       meta: genResult.meta,
       sourceHash: extractResult.sourceHash,
-      version: input.version,
     });
 
     logger.info('Full pipeline processing completed', {
       orgId: input.orgId,
       name: input.name,
-      id: buildResult.metadata.id,
+      id: buildResult.identity.id,
     });
 
     return {
       componentName: buildResult.componentName,
-      metadata: buildResult.metadata,
+      identity: buildResult.identity,
       manifest: buildResult.manifest,
+      sourceHash: buildResult.sourceHash,
+      files: buildResult.files,
       extraction: extractResult.metadata,
     };
   }
@@ -376,7 +377,6 @@ export class ComponentProcessor {
       extracted: input.extracted,
       meta: input.meta,
       sourceHash: input.sourceHash,
-      version: input.version,
     };
 
     // Manifest builder now returns success directly (throws on error)
@@ -384,7 +384,7 @@ export class ComponentProcessor {
       this.manifestBuilder.build(builderInput);
 
     logger.info('Manifest built successfully', {
-      id: result.metadata.id,
+      id: result.identity.id,
       name: result.manifest.name,
     });
 
@@ -482,7 +482,7 @@ export class ComponentProcessor {
    */
   async buildAndStore(
     componentName: string,
-    options?: { orgId?: string; version?: string }
+    options?: { orgId?: string }
   ): Promise<BuildResult> {
     const store = this.requireStore('buildAndStore');
 
@@ -506,13 +506,14 @@ export class ComponentProcessor {
       extracted: storedExtraction.extracted,
       meta: storedGeneration.meta,
       sourceHash: storedExtraction.sourceHash,
-      version: options?.version,
     });
 
     const storedManifest: StoredManifest = {
       componentName,
-      metadata: result.metadata,
+      identity: result.identity,
       manifest: result.manifest,
+      sourceHash: result.sourceHash,
+      files: result.files,
       storedAt: new Date().toISOString(),
     };
 
@@ -546,13 +547,14 @@ export class ComponentProcessor {
     // Phase 3: Build and store (throws on error)
     const buildResult = await this.buildAndStore(input.name, {
       orgId: input.orgId,
-      version: input.version,
     });
 
     return {
       componentName: buildResult.componentName,
-      metadata: buildResult.metadata,
+      identity: buildResult.identity,
       manifest: buildResult.manifest,
+      sourceHash: buildResult.sourceHash,
+      files: buildResult.files,
       extraction: extractResult.metadata,
     };
   }

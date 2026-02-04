@@ -12,7 +12,6 @@ import type {
   ComponentMeta,
   ExtractedData,
   ManifestIdentity,
-  ManifestMetadata,
 } from '../types/index.js';
 
 // Re-export ManifestIdentity for backwards compatibility
@@ -50,7 +49,7 @@ export interface ManifestBuilderConfig {
  * - Component identity (id, slug, name, framework)
  * - Extracted data from HybridExtractor
  * - Generated metadata from MetaGenerator
- * - Source tracking (sourceHash, version)
+ * - Source tracking (sourceHash)
  */
 export interface ManifestBuilderInput {
   /** Organization ID for multi-org isolation */
@@ -67,23 +66,29 @@ export interface ManifestBuilderInput {
 
   /** Hash of source code for change detection */
   sourceHash: string;
-
-  /** Semantic version (defaults to "0.0.1") */
-  version?: string;
 }
 
 /**
  * Manifest build result (success only - throws ManifestBuildError on failure)
+ *
+ * Flat structure matching ManifestOutput. DB layer adds its own fields
+ * (timestamps, versioning, embedding status) separately.
  */
 export interface ManifestBuilderResult {
   /** Component name (PascalCase) */
   componentName: string;
 
-  /** System metadata (embeddings, hashes, timestamps) */
-  metadata: ManifestMetadata;
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
 
   /** AI-focused manifest (optimized for consumption) */
   manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
 
   /** Build timestamp */
   builtAt: string;

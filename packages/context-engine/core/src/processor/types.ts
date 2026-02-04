@@ -16,7 +16,6 @@ import type {
   ExtractedData,
   Framework,
   ManifestIdentity,
-  ManifestMetadata,
 } from '../types/index.js';
 
 // =============================================================================
@@ -143,17 +142,24 @@ export interface StoredGeneration {
  * Stored manifest
  *
  * Persisted complete manifest, representing the final output
- * of the extraction-generation-build pipeline.
+ * of the extraction-generation-build pipeline. Flat structure
+ * matching ManifestOutput.
  */
 export interface StoredManifest {
   /** Component name (PascalCase) */
   componentName: string;
 
-  /** System metadata (embeddings, hashes, timestamps) */
-  metadata: ManifestMetadata;
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
 
   /** AI-focused manifest (optimized for consumption) */
   manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
 
   /** ISO timestamp when manifest was stored */
   storedAt: string;
@@ -270,16 +276,24 @@ export interface ExtractionMetadata {
 
 /**
  * Processor result (success only - throws on error)
+ *
+ * Flat structure matching ManifestOutput with additional extraction metadata.
  */
 export interface ProcessorResult {
   /** Component name (PascalCase) */
   componentName: string;
 
-  /** System metadata (embeddings, hashes, timestamps) */
-  metadata: ManifestMetadata;
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
 
   /** AI-focused manifest (optimized for consumption) */
   manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
 
   /** Extraction metadata */
   extraction: ExtractionMetadata;
@@ -389,23 +403,28 @@ export interface BuildInput {
 
   /** Source hash for change detection */
   sourceHash: string;
-
-  /** Component version */
-  version?: string;
 }
 
 /**
  * Build result (success only - throws ManifestBuildError on failure)
+ *
+ * Flat structure matching ManifestOutput with build timestamp.
  */
 export interface BuildResult {
   /** Component name (PascalCase) */
   componentName: string;
 
-  /** System metadata (embeddings, hashes, timestamps) */
-  metadata: ManifestMetadata;
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
 
   /** AI-focused manifest (optimized for consumption) */
   manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
 
   /** Build timestamp */
   builtAt: string;

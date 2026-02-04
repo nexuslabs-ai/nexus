@@ -7,26 +7,18 @@
 
 import { z } from 'zod';
 
-import {
-  EmbeddingModelInfoSchema,
-  EmbeddingStatusSchema,
-} from './embedding.js';
 import { StructuredExamplesSchema } from './examples.js';
 import { HashSchema, RadixPrimitiveInfoSchema } from './extracted.js';
 import { GuidanceSchema } from './guidance.js';
 import {
   BaseLibrarySchema,
   FrameworkSchema,
+  ManifestIdentitySchema,
   VersionSchema,
   VisibilitySchema,
 } from './identity.js';
 import { ImportStatementSchema } from './import-statement.js';
 import { CategorizedPropsSchema } from './props.js';
-
-/**
- * Current manifest schema version
- */
-export const MANIFEST_SCHEMA_VERSION = '1.0';
 
 /**
  * Dependencies schema
@@ -82,27 +74,6 @@ export const ChildrenInfoSchema = z.object({
 export type ChildrenInfo = z.infer<typeof ChildrenInfoSchema>;
 
 /**
- * System metadata (not for AI consumption)
- */
-export const ManifestMetadataSchema = z.object({
-  id: z.string().uuid(),
-  schemaVersion: z.string(),
-  version: VersionSchema,
-  framework: FrameworkSchema,
-  visibility: VisibilitySchema,
-  embeddingStatus: EmbeddingStatusSchema,
-  embeddingModel: EmbeddingModelInfoSchema.optional(),
-  embeddingError: z.string().optional(),
-  generatedAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  sourceHash: HashSchema,
-  metaHash: HashSchema,
-  files: z.array(z.string()),
-});
-
-export type ManifestMetadata = z.infer<typeof ManifestMetadataSchema>;
-
-/**
  * AI-focused manifest (optimized for token efficiency)
  *
  * This is what AI agents consume. System metadata is separate.
@@ -130,38 +101,20 @@ export const AIManifestSchema = z.object({
 export type AIManifest = z.infer<typeof AIManifestSchema>;
 
 /**
- * Complete manifest output (split structure)
+ * Complete manifest output (flat structure)
  *
- * componentName: Component identifier
- * metadata: System data (embeddings, hashes, timestamps)
- * manifest: AI data (optimized for consumption)
+ * Core produces this output directly. DB layer adds its own fields
+ * (timestamps, versioning, embedding status) separately.
  */
 export const ManifestOutputSchema = z.object({
   componentName: z.string(),
-  metadata: ManifestMetadataSchema,
+  identity: ManifestIdentitySchema,
   manifest: AIManifestSchema,
+  sourceHash: HashSchema,
+  files: z.array(z.string()),
 });
 
 export type ManifestOutput = z.infer<typeof ManifestOutputSchema>;
-
-/**
- * Manifest summary (for list views)
- */
-export const ManifestSummarySchema = z.object({
-  id: z.uuid(),
-  slug: z.string(),
-  name: z.string(),
-  version: VersionSchema,
-  framework: FrameworkSchema,
-  description: z.string(),
-  visibility: VisibilitySchema,
-  /** Component patterns from guidance */
-  patterns: z.array(z.string()),
-  embeddingStatus: EmbeddingStatusSchema,
-  updatedAt: z.iso.datetime(),
-});
-
-export type ManifestSummary = z.infer<typeof ManifestSummarySchema>;
 
 /**
  * Version history entry
@@ -170,7 +123,6 @@ export const VersionHistoryEntrySchema = z.object({
   version: VersionSchema,
   generatedAt: z.iso.datetime(),
   sourceHash: HashSchema,
-  metaHash: HashSchema,
 });
 
 export type VersionHistoryEntry = z.infer<typeof VersionHistoryEntrySchema>;
