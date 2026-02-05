@@ -90,5 +90,8 @@
     "*.{json,md,css}": [
       "prettier --write"
     ]
+  },
+  "resolutions": {
+    "minimatch": "^10.1.2"
   }
 }
