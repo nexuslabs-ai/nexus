@@ -43,8 +43,12 @@ export type EmbeddingStatus = z.infer<typeof EmbeddingStatusEnum>;
 /**
  * Create component request body.
  *
- * All pipeline outputs (extraction, generation, manifest) are required
- * because the server stores pre-processed data from the CLI.
+ * Only slug and name are required. All other fields are optional to support
+ * incremental creation:
+ * 1. POST with minimal data (slug, name)
+ * 2. PATCH with extraction
+ * 3. PATCH with generation + provider + model
+ * 4. PATCH with manifest
  */
 export const CreateComponentSchema = z
   .object({
@@ -82,45 +86,52 @@ export const CreateComponentSchema = z
     }),
     sourceHash: z
       .string()
-      .min(1, 'Source hash is required')
       .max(64, 'Source hash must be 64 characters or less')
+      .optional()
       .openapi({
         example: 'abc123def456789',
         description: 'Hash of source code for change detection',
       }),
-    extraction: z.record(z.any()).openapi({
-      example: {
-        props: [{ name: 'variant', type: 'string', required: false }],
-        variants: [],
-      },
-      description: 'Extracted component data (props, variants, dependencies)',
-    }),
-    generation: z.record(z.any()).openapi({
-      example: {
-        description: 'A clickable button component for user interactions',
-        patterns: ['form-submit', 'navigation'],
-      },
-      description: 'LLM-generated metadata (descriptions, patterns, guidance)',
-    }),
-    generationProvider: z
-      .string()
-      .min(1, 'Generation provider is required')
+    extraction: z
+      .record(z.any())
+      .optional()
       .openapi({
-        example: 'anthropic',
-        description: 'LLM provider used for generation',
+        example: {
+          props: [{ name: 'variant', type: 'string', required: false }],
+          variants: [],
+        },
+        description: 'Extracted component data (props, variants, dependencies)',
       }),
-    generationModel: z.string().min(1, 'Generation model is required').openapi({
+    generation: z
+      .record(z.any())
+      .optional()
+      .openapi({
+        example: {
+          description: 'A clickable button component for user interactions',
+          patterns: ['form-submit', 'navigation'],
+        },
+        description:
+          'LLM-generated metadata (descriptions, patterns, guidance)',
+      }),
+    generationProvider: z.string().optional().openapi({
+      example: 'anthropic',
+      description: 'LLM provider used for generation',
+    }),
+    generationModel: z.string().optional().openapi({
       example: 'claude-sonnet-4-20250514',
       description: 'LLM model used for generation',
     }),
-    manifest: z.record(z.any()).openapi({
-      example: {
-        name: 'Button',
-        description: 'A clickable button component',
-        props: [],
-      },
-      description: 'Complete AI manifest for consumption',
-    }),
+    manifest: z
+      .record(z.any())
+      .optional()
+      .openapi({
+        example: {
+          name: 'Button',
+          description: 'A clickable button component',
+          props: [],
+        },
+        description: 'Complete AI manifest for consumption',
+      }),
   })
   .openapi('CreateComponent');
 
@@ -245,9 +256,9 @@ export const ComponentSchema = z
       example: 'org',
       description: 'Visibility level',
     }),
-    sourceHash: z.string().openapi({
+    sourceHash: z.string().nullable().openapi({
       example: 'abc123def456789',
-      description: 'Source code hash',
+      description: 'Source code hash (null if not yet computed)',
     }),
     embeddingStatus: z.string().openapi({
       example: 'indexed',
@@ -257,22 +268,22 @@ export const ComponentSchema = z
       example: null,
       description: 'Error message if embedding failed',
     }),
-    extraction: z.record(z.any()).openapi({
-      description: 'Extracted component data',
+    extraction: z.record(z.any()).nullable().openapi({
+      description: 'Extracted component data (null if not yet extracted)',
     }),
-    generation: z.record(z.any()).openapi({
-      description: 'LLM-generated metadata',
+    generation: z.record(z.any()).nullable().openapi({
+      description: 'LLM-generated metadata (null if not yet generated)',
     }),
-    generationProvider: z.string().openapi({
+    generationProvider: z.string().nullable().openapi({
       example: 'anthropic',
-      description: 'LLM provider',
+      description: 'LLM provider (null if not yet generated)',
     }),
-    generationModel: z.string().openapi({
+    generationModel: z.string().nullable().openapi({
       example: 'claude-sonnet-4-20250514',
-      description: 'LLM model',
+      description: 'LLM model (null if not yet generated)',
     }),
-    manifest: z.record(z.any()).openapi({
-      description: 'Complete AI manifest',
+    manifest: z.record(z.any()).nullable().openapi({
+      description: 'Complete AI manifest (null if not yet built)',
     }),
     createdAt: z.string().datetime().openapi({
       example: '2025-01-15T10:00:00.000Z',
@@ -381,6 +392,30 @@ export const DeleteComponentResponseSchema = z
   })
   .openapi('DeleteComponentResponse');
 
+/**
+ * Index component response.
+ * Returned after triggering embedding generation for a component.
+ */
+export const IndexComponentResponseSchema = z
+  .object({
+    success: z.literal(true).openapi({ example: true }),
+    data: z.object({
+      componentId: z.string().uuid().openapi({
+        example: '123e4567-e89b-12d3-a456-426614174000',
+        description: 'Component UUID that was indexed',
+      }),
+      chunksCreated: z.number().int().openapi({
+        example: 5,
+        description: 'Number of embedding chunks created',
+      }),
+      embeddingStatus: z.string().openapi({
+        example: 'indexed',
+        description: 'Current embedding status after indexing',
+      }),
+    }),
+  })
+  .openapi('IndexComponentResponse');
+
 // =============================================================================
 // Parameter Schemas
 // =============================================================================
@@ -426,3 +461,6 @@ export type Component = z.infer<typeof ComponentSchema>;
 export type ComponentSummary = z.infer<typeof ComponentSummarySchema>;
 export type ComponentList = z.infer<typeof ComponentListSchema>;
 export type ComponentResponse = z.infer<typeof ComponentResponseSchema>;
+export type IndexComponentResponse = z.infer<
+  typeof IndexComponentResponseSchema
+>;

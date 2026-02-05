@@ -8,7 +8,7 @@
 import type { Component, NewComponent } from '@context-engine/db';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
-import { NotFound } from '../errors.js';
+import { NotFound, ServiceUnavailable, ValidationError } from '../errors.js';
 import { ErrorSchema } from '../schemas/common.js';
 import {
   ComponentIdParamSchema,
@@ -17,6 +17,7 @@ import {
   ComponentSlugParamSchema,
   CreateComponentSchema,
   DeleteComponentResponseSchema,
+  IndexComponentResponseSchema,
   ListComponentsQuerySchema,
   UpdateComponentSchema,
 } from '../schemas/components.js';
@@ -355,6 +356,56 @@ const deleteComponentRoute = createRoute({
   },
 });
 
+/**
+ * POST /:id/index - Index component for search
+ */
+const indexComponentRoute = createRoute({
+  method: 'post',
+  path: '/{id}/index',
+  tags: ['Components'],
+  summary: 'Index component for search',
+  description:
+    'Generate embeddings for a component to enable semantic search. Requires VOYAGE_API_KEY to be configured.',
+  request: {
+    params: ComponentIdParamSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: IndexComponentResponseSchema,
+        },
+      },
+      description: 'Component indexed successfully',
+    },
+    400: {
+      content: {
+        'application/json': {
+          schema: ErrorSchema,
+        },
+      },
+      description: 'Component has no manifest to index',
+    },
+    404: {
+      content: {
+        'application/json': {
+          schema: ErrorSchema,
+        },
+      },
+      description: 'Component not found',
+    },
+    503: {
+      content: {
+        'application/json': {
+          schema: ErrorSchema,
+        },
+      },
+      description:
+        'Embedding service unavailable (VOYAGE_API_KEY not configured)',
+    },
+  },
+});
+
 // =============================================================================
 // Router
 // =============================================================================
@@ -495,4 +546,52 @@ componentsRouter.openapi(deleteComponentRoute, async (c) => {
   }
 
   return c.json(successResponse({ deleted: true }), 200);
+});
+
+// -----------------------------------------------------------------------------
+// POST /:id/index - Index component for search
+// -----------------------------------------------------------------------------
+
+componentsRouter.openapi(indexComponentRoute, async (c) => {
+  const { orgId, id } = c.req.valid('param');
+  const componentRepo = c.var.componentRepo;
+  const embeddingRepo = c.var.embeddingRepo;
+
+  // Check if embedding service is available
+  if (!embeddingRepo) {
+    throw ServiceUnavailable(
+      'Embedding service unavailable',
+      'VOYAGE_API_KEY not configured'
+    );
+  }
+
+  // Get component
+  const component = await componentRepo.findById(orgId, id);
+  if (!component) {
+    throw NotFound('Component', id);
+  }
+
+  // Check if component has manifest
+  if (!component.manifest) {
+    throw ValidationError(
+      'Component has no manifest',
+      'Generate manifest before indexing'
+    );
+  }
+
+  // Index the component
+  const result = await embeddingRepo.index(orgId, id, component.manifest);
+
+  if (!result.success) {
+    throw ServiceUnavailable('Embedding generation failed', result.error);
+  }
+
+  return c.json(
+    successResponse({
+      componentId: id,
+      chunksCreated: result.chunksCreated,
+      embeddingStatus: 'indexed',
+    }),
+    200
+  );
 });

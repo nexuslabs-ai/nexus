@@ -54,6 +54,8 @@ export {
   EmbeddingStatusEnum,
   type Framework,
   FrameworkEnum,
+  type IndexComponentResponse,
+  IndexComponentResponseSchema,
   type ListComponentsQuery,
   ListComponentsQuerySchema,
   type UpdateComponent,

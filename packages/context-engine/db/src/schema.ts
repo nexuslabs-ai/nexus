@@ -123,21 +123,21 @@ export const components = pgTable(
     // =========================================================================
 
     /** Extraction result (JSONB) - props, variants, dependencies, stories */
-    extraction: jsonb('extraction').$type<ExtractedData>().notNull(),
+    extraction: jsonb('extraction').$type<ExtractedData | null>(),
 
     /** Generation result (JSONB) - LLM-generated descriptions, patterns, guidance */
-    generation: jsonb('generation').$type<ComponentMeta>().notNull(),
+    generation: jsonb('generation').$type<ComponentMeta | null>(),
 
     /** LLM provider used for generation (e.g., 'anthropic') */
     generationProvider: varchar('generation_provider', {
       length: 50,
-    }).notNull(),
+    }),
 
     /** LLM model used for generation (e.g., 'claude-sonnet-4-20250514') */
-    generationModel: varchar('generation_model', { length: 100 }).notNull(),
+    generationModel: varchar('generation_model', { length: 100 }),
 
     /** Final manifest (JSONB) - combined output for AI consumption */
-    manifest: jsonb('manifest').$type<AIManifest>().notNull(),
+    manifest: jsonb('manifest').$type<AIManifest | null>(),
 
     // =========================================================================
     // Embedding (for semantic search)
@@ -173,7 +173,7 @@ export const components = pgTable(
     // =========================================================================
 
     /** Hash of source code for change detection */
-    sourceHash: varchar('source_hash', { length: 64 }).notNull(),
+    sourceHash: varchar('source_hash', { length: 64 }),
 
     // =========================================================================
     // Timestamps
