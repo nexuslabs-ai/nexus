@@ -5,11 +5,6 @@
  * Powers AI assistants to discover relevant components from the component library.
  */
 
-import {
-  ComponentRepository,
-  createEmbeddingRepository,
-  getDatabase,
-} from '@context-engine/db';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { ServiceUnavailable } from '../errors.js';
@@ -20,8 +15,18 @@ import {
   SearchResponseSchema,
   type SearchResult,
 } from '../schemas/index.js';
+import type { AppEnv } from '../types.js';
+import { successResponse } from '../utils/index.js';
 
-export const searchRouter = new OpenAPIHono();
+/**
+ * Search router.
+ *
+ * Requires repositories middleware to be applied at app level.
+ * Access embedding repository via `c.var.embeddingRepo`.
+ *
+ * Note: embeddingRepo is undefined if VOYAGE_API_KEY is not configured.
+ */
+export const searchRouter = new OpenAPIHono<AppEnv>();
 
 // =============================================================================
 // POST / - Semantic Search
@@ -60,16 +65,14 @@ searchRouter.openapi(searchRoute, async (c) => {
   const { orgId } = c.req.valid('param');
   const body = c.req.valid('json');
 
-  // Perform semantic search using embedding repository
-  // Note: createEmbeddingRepository() will throw if VOYAGE_API_KEY is not set
-  let embeddingRepo;
-  try {
-    embeddingRepo = createEmbeddingRepository();
-  } catch (error) {
-    // VOYAGE_API_KEY not configured
+  // Get embedding repository from context
+  // Note: embeddingRepo is undefined if VOYAGE_API_KEY is not configured
+  const embeddingRepo = c.var.embeddingRepo;
+
+  if (!embeddingRepo) {
     throw ServiceUnavailable(
       'Search service unavailable',
-      error instanceof Error ? error.message : undefined
+      'VOYAGE_API_KEY environment variable is not configured'
     );
   }
 
@@ -79,54 +82,22 @@ searchRouter.openapi(searchRoute, async (c) => {
     framework: body.framework,
   });
 
-  // Build response with framework information
-  // Note: The db SearchResult type doesn't include framework, but the schema requires it.
-  // When a framework filter is provided, all results have that framework.
-  // Otherwise, we fetch each component's framework (bounded by search limit).
-  let resultsWithFramework: SearchResult[];
-
-  if (body.framework) {
-    // If filtered by framework, all results have that framework
-    const framework = body.framework; // Capture to avoid type narrowing issues
-    resultsWithFramework = results.map((r) => ({
-      componentId: r.componentId,
-      slug: r.slug,
-      name: r.name,
-      description: r.description,
-      framework,
-      score: r.score,
-    }));
-  } else if (results.length > 0) {
-    // Fetch component frameworks individually
-    // This is bounded by the search limit (max 50), so acceptable for now.
-    // TODO: Optimize by updating db SearchResult to include framework.
-    const componentRepo = new ComponentRepository(getDatabase());
-    resultsWithFramework = await Promise.all(
-      results.map(async (r) => {
-        const component = await componentRepo.findById(orgId, r.componentId);
-        return {
-          componentId: r.componentId,
-          slug: r.slug,
-          name: r.name,
-          description: r.description,
-          framework: component?.framework ?? 'react',
-          score: r.score,
-        };
-      })
-    );
-  } else {
-    resultsWithFramework = [];
-  }
+  // Map results to response format
+  const resultsWithFramework: SearchResult[] = results.map((r) => ({
+    componentId: r.componentId,
+    slug: r.slug,
+    name: r.name,
+    description: r.description,
+    framework: r.framework,
+    score: r.score,
+  }));
 
   return c.json(
-    {
-      success: true as const,
-      data: {
-        results: resultsWithFramework,
-        total: resultsWithFramework.length,
-        query: body.query,
-      },
-    },
+    successResponse({
+      results: resultsWithFramework,
+      total: resultsWithFramework.length,
+      query: body.query,
+    }),
     200 as const
   );
 });

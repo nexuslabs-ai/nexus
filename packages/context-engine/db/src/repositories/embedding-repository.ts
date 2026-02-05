@@ -279,13 +279,14 @@ export class EmbeddingRepository {
       return [];
     }
 
-    // Fetch component details for top results
+    // Fetch component details for top results (including framework)
     const componentDetails = await this.db
       .select({
         id: components.id,
         slug: components.slug,
         name: components.name,
         description: sql<string | null>`${components.manifest}->>'description'`,
+        framework: components.framework,
       })
       .from(components)
       .where(
@@ -307,6 +308,7 @@ export class EmbeddingRepository {
           slug: component.slug,
           name: component.name,
           description: component.description,
+          framework: component.framework,
           score: componentScores.get(id) ?? 0,
         };
       })

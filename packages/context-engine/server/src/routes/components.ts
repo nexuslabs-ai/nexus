@@ -5,7 +5,7 @@
  * All routes are nested under `/api/v1/organizations/:orgId/components`.
  */
 
-import type { Component } from '@context-engine/db';
+import type { Component, NewComponent } from '@context-engine/db';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { NotFound } from '../errors.js';
@@ -21,52 +21,25 @@ import {
   UpdateComponentSchema,
 } from '../schemas/components.js';
 import { OrgIdPathParamSchema } from '../schemas/organizations.js';
+import type { AppEnv } from '../types.js';
+import { successResponse } from '../utils/index.js';
 
 // =============================================================================
-// Types
+// Type Helpers
 // =============================================================================
 
 /**
- * Context type expected by the router.
- * Parent router must provide database and repositories.
+ * Create component data type (excludes orgId which is added by repository).
+ *
+ * The Zod schema uses z.record(z.any()) for flexibility, but the repository
+ * expects typed data. This type assertion bridges the API schema and DB types.
  */
-interface ComponentsRouterContext {
-  Variables: {
-    db: unknown;
-    componentRepository: {
-      findById: (orgId: string, id: string) => Promise<Component | null>;
-      findBySlug: (orgId: string, slug: string) => Promise<Component | null>;
-      findMany: (
-        orgId: string,
-        options: {
-          where?: {
-            framework?: string;
-            visibility?: string;
-            embeddingStatus?: string;
-          };
-          limit?: number;
-          offset?: number;
-          orderBy?: 'name' | 'createdAt' | 'updatedAt';
-          orderDir?: 'asc' | 'desc';
-        }
-      ) => Promise<{ components: Component[]; total: number }>;
-      create: (
-        orgId: string,
-        data: Record<string, unknown>
-      ) => Promise<Component>;
-      upsert: (
-        orgId: string,
-        data: Record<string, unknown>
-      ) => Promise<Component>;
-      update: (
-        orgId: string,
-        id: string,
-        data: Record<string, unknown>
-      ) => Promise<Component | null>;
-      delete: (orgId: string, id: string) => Promise<Component | null>;
-    };
-  };
-}
+type CreateComponentData = Omit<NewComponent, 'orgId'>;
+
+/**
+ * Update component data type.
+ */
+type UpdateComponentData = Partial<Omit<NewComponent, 'id' | 'orgId'>>;
 
 // =============================================================================
 // Helper Functions
@@ -389,8 +362,11 @@ const deleteComponentRoute = createRoute({
 /**
  * Components router.
  * Mount at `/api/v1/organizations/:orgId/components`.
+ *
+ * Requires repositories middleware to be applied at app level.
+ * Access component repository via `c.var.componentRepo`.
  */
-export const componentsRouter = new OpenAPIHono<ComponentsRouterContext>();
+export const componentsRouter = new OpenAPIHono<AppEnv>();
 
 // -----------------------------------------------------------------------------
 // GET / - List components
@@ -399,7 +375,7 @@ export const componentsRouter = new OpenAPIHono<ComponentsRouterContext>();
 componentsRouter.openapi(listComponentsRoute, async (c) => {
   const { orgId } = c.req.valid('param');
   const query = c.req.valid('query');
-  const repository = c.var.componentRepository;
+  const repository = c.var.componentRepo;
 
   const result = await repository.findMany(orgId, {
     where: {
@@ -414,15 +390,12 @@ componentsRouter.openapi(listComponentsRoute, async (c) => {
   });
 
   return c.json(
-    {
-      success: true as const,
-      data: {
-        components: result.components.map(formatComponentSummary),
-        total: result.total,
-        limit: query.limit,
-        offset: query.offset,
-      },
-    },
+    successResponse({
+      components: result.components.map(formatComponentSummary),
+      total: result.total,
+      limit: query.limit,
+      offset: query.offset,
+    }),
     200
   );
 });
@@ -433,20 +406,14 @@ componentsRouter.openapi(listComponentsRoute, async (c) => {
 
 componentsRouter.openapi(getComponentByIdRoute, async (c) => {
   const { orgId, id } = c.req.valid('param');
-  const repository = c.var.componentRepository;
+  const repository = c.var.componentRepo;
   const component = await repository.findById(orgId, id);
 
   if (!component) {
     throw NotFound('Component', id);
   }
 
-  return c.json(
-    {
-      success: true as const,
-      data: formatComponent(component),
-    },
-    200
-  );
+  return c.json(successResponse(formatComponent(component)), 200);
 });
 
 // -----------------------------------------------------------------------------
@@ -455,20 +422,14 @@ componentsRouter.openapi(getComponentByIdRoute, async (c) => {
 
 componentsRouter.openapi(getComponentBySlugRoute, async (c) => {
   const { orgId, slug } = c.req.valid('param');
-  const repository = c.var.componentRepository;
+  const repository = c.var.componentRepo;
   const component = await repository.findBySlug(orgId, slug);
 
   if (!component) {
     throw NotFound('Component', slug);
   }
 
-  return c.json(
-    {
-      success: true as const,
-      data: formatComponent(component),
-    },
-    200
-  );
+  return c.json(successResponse(formatComponent(component)), 200);
 });
 
 // -----------------------------------------------------------------------------
@@ -478,25 +439,23 @@ componentsRouter.openapi(getComponentBySlugRoute, async (c) => {
 componentsRouter.openapi(createComponentRoute, async (c) => {
   const { orgId } = c.req.valid('param');
   const body = c.req.valid('json');
-  const repository = c.var.componentRepository;
+  const repository = c.var.componentRepo;
 
   // Check if component already exists by slug
   const existing = await repository.findBySlug(orgId, body.slug);
   const isCreate = !existing;
 
   // Upsert the component
-  const component = await repository.upsert(orgId, body);
+  // Cast body to match repository expected type - Zod schema validates structure
+  const component = await repository.upsert(
+    orgId,
+    body as unknown as CreateComponentData
+  );
 
   // Return 201 if created, 200 if updated
   const status = isCreate ? 201 : 200;
 
-  return c.json(
-    {
-      success: true as const,
-      data: formatComponent(component),
-    },
-    status
-  );
+  return c.json(successResponse(formatComponent(component)), status);
 });
 
 // -----------------------------------------------------------------------------
@@ -506,20 +465,20 @@ componentsRouter.openapi(createComponentRoute, async (c) => {
 componentsRouter.openapi(updateComponentRoute, async (c) => {
   const { orgId, id } = c.req.valid('param');
   const body = c.req.valid('json');
-  const repository = c.var.componentRepository;
-  const component = await repository.update(orgId, id, body);
+  const repository = c.var.componentRepo;
+
+  // Cast body to match repository expected type - Zod schema validates structure
+  const component = await repository.update(
+    orgId,
+    id,
+    body as unknown as UpdateComponentData
+  );
 
   if (!component) {
     throw NotFound('Component', id);
   }
 
-  return c.json(
-    {
-      success: true as const,
-      data: formatComponent(component),
-    },
-    200
-  );
+  return c.json(successResponse(formatComponent(component)), 200);
 });
 
 // -----------------------------------------------------------------------------
@@ -528,20 +487,12 @@ componentsRouter.openapi(updateComponentRoute, async (c) => {
 
 componentsRouter.openapi(deleteComponentRoute, async (c) => {
   const { orgId, id } = c.req.valid('param');
-  const repository = c.var.componentRepository;
+  const repository = c.var.componentRepo;
   const deleted = await repository.delete(orgId, id);
 
   if (!deleted) {
     throw NotFound('Component', id);
   }
 
-  return c.json(
-    {
-      success: true as const,
-      data: {
-        deleted: true,
-      },
-    },
-    200
-  );
+  return c.json(successResponse({ deleted: true }), 200);
 });

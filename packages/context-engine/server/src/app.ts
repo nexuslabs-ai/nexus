@@ -11,12 +11,14 @@ import { logger } from 'hono/logger';
 
 import { getConfig } from './config.js';
 import { ApiError } from './errors.js';
+import { repositoriesMiddleware } from './middleware/index.js';
 import {
   componentsRouter,
   healthRouter,
   organizationsRouter,
   searchRouter,
 } from './routes/index.js';
+import type { AppEnv } from './types.js';
 
 /**
  * Create and configure the HTTP server application.
@@ -29,12 +31,17 @@ import {
  * - Error handlers for 404 and 500
  */
 export function createApp() {
-  const app = new OpenAPIHono();
+  const app = new OpenAPIHono<AppEnv>();
 
   // === Global Middleware ===
   // CORS must be registered before routes per Hono best practices
   app.use('*', cors());
   app.use('*', logger());
+
+  // === Repository DI Middleware ===
+  // Injects repositories into context for all API v1 routes
+  // Access via c.var.organizationRepo, c.var.componentRepo, c.var.embeddingRepo
+  app.use('/api/v1/*', repositoriesMiddleware);
 
   // === Health Routes (at root) ===
   // /health - liveness check

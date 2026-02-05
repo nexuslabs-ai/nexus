@@ -1,9 +1,22 @@
 /**
  * Server Configuration
  *
- * Loads configuration from environment variables.
+ * Loads configuration from environment variables with Zod validation.
  * Required variables must be set; optional ones have sensible defaults.
  */
+
+import { z } from 'zod';
+
+/**
+ * Environment variable schema with validation and coercion
+ */
+const envSchema = z.object({
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
+});
 
 /**
  * Runtime environment types
@@ -29,41 +42,25 @@ export interface ServerConfig {
 }
 
 /**
- * Validate that a string is a valid environment
- */
-function isValidEnvironment(value: string): value is Environment {
-  return Object.values(Environment).includes(value as Environment);
-}
-
-/**
  * Load configuration from environment variables.
  *
- * @throws Error if required variables are missing
+ * @throws Error if required variables are missing or invalid
  * @returns ServerConfig object
  */
 export function loadConfig(): ServerConfig {
-  const databaseUrl = process.env.DATABASE_URL;
+  const result = envSchema.safeParse(process.env);
 
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL environment variable is required');
-  }
-
-  const envValue = process.env.NODE_ENV || 'development';
-  const environment = isValidEnvironment(envValue)
-    ? envValue
-    : Environment.Development;
-
-  const portString = process.env.PORT || '3000';
-  const port = parseInt(portString, 10);
-
-  if (isNaN(port) || port < 1 || port > 65535) {
-    throw new Error(`Invalid PORT value: ${portString}. Must be 1-65535`);
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+      .join(', ');
+    throw new Error(`Configuration error: ${errors}`);
   }
 
   return {
-    port,
-    environment,
-    databaseUrl,
+    port: result.data.PORT,
+    environment: result.data.NODE_ENV,
+    databaseUrl: result.data.DATABASE_URL,
   };
 }
 

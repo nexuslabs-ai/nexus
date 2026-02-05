@@ -5,8 +5,6 @@
  * Organizations are the top-level multi-tenant entity in Context Engine.
  */
 
-import type { Organization as DbOrganization } from '@context-engine/db';
-import { createOrganizationRepository } from '@context-engine/db';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { NotFound } from '../errors.js';
@@ -19,29 +17,20 @@ import {
   OrgIdParamSchema,
   UpdateOrganizationSchema,
 } from '../schemas/index.js';
+import type { AppEnv } from '../types.js';
+import { formatDates, successResponse } from '../utils/index.js';
 
 // =============================================================================
 // Router Setup
 // =============================================================================
 
-export const organizationsRouter = new OpenAPIHono();
-
-// =============================================================================
-// Helpers
-// =============================================================================
-
 /**
- * Format organization for API response.
- * Converts Date objects to ISO strings.
+ * Organizations router.
+ *
+ * Requires repositories middleware to be applied at app level.
+ * Access organization repository via `c.var.organizationRepo`.
  */
-function formatOrganization(org: DbOrganization) {
-  return {
-    id: org.id,
-    name: org.name,
-    createdAt: org.createdAt.toISOString(),
-    updatedAt: org.updatedAt.toISOString(),
-  };
-}
+export const organizationsRouter = new OpenAPIHono<AppEnv>();
 
 // =============================================================================
 // Route Definitions
@@ -194,57 +183,42 @@ const deleteOrganizationRoute = createRoute({
 // =============================================================================
 
 organizationsRouter.openapi(listOrganizationsRoute, async (c) => {
-  const repo = createOrganizationRepository();
+  const repo = c.var.organizationRepo;
   const organizations = await repo.findAll();
 
   return c.json(
-    {
-      success: true as const,
-      data: {
-        organizations: organizations.map(formatOrganization),
-        total: organizations.length,
-      },
-    },
+    successResponse({
+      organizations: organizations.map(formatDates),
+      total: organizations.length,
+    }),
     200
   );
 });
 
 organizationsRouter.openapi(getOrganizationRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const repo = createOrganizationRepository();
+  const repo = c.var.organizationRepo;
   const org = await repo.findById(id);
 
   if (!org) {
     throw NotFound('Organization', id);
   }
 
-  return c.json(
-    {
-      success: true as const,
-      data: formatOrganization(org),
-    },
-    200
-  );
+  return c.json(successResponse(formatDates(org)), 200);
 });
 
 organizationsRouter.openapi(createOrganizationRoute, async (c) => {
   const body = c.req.valid('json');
-  const repo = createOrganizationRepository();
+  const repo = c.var.organizationRepo;
   const org = await repo.create({ name: body.name });
 
-  return c.json(
-    {
-      success: true as const,
-      data: formatOrganization(org),
-    },
-    201
-  );
+  return c.json(successResponse(formatDates(org)), 201);
 });
 
 organizationsRouter.openapi(updateOrganizationRoute, async (c) => {
   const { id } = c.req.valid('param');
   const body = c.req.valid('json');
-  const repo = createOrganizationRepository();
+  const repo = c.var.organizationRepo;
 
   const org = await repo.update(id, body);
 
@@ -252,18 +226,12 @@ organizationsRouter.openapi(updateOrganizationRoute, async (c) => {
     throw NotFound('Organization', id);
   }
 
-  return c.json(
-    {
-      success: true as const,
-      data: formatOrganization(org),
-    },
-    200
-  );
+  return c.json(successResponse(formatDates(org)), 200);
 });
 
 organizationsRouter.openapi(deleteOrganizationRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const repo = createOrganizationRepository();
+  const repo = c.var.organizationRepo;
 
   const deleted = await repo.delete(id);
 
@@ -271,13 +239,5 @@ organizationsRouter.openapi(deleteOrganizationRoute, async (c) => {
     throw NotFound('Organization', id);
   }
 
-  return c.json(
-    {
-      success: true as const,
-      data: {
-        deleted: true,
-      },
-    },
-    200
-  );
+  return c.json(successResponse({ deleted: true }), 200);
 });
