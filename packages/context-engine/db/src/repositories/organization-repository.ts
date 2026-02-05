@@ -74,14 +74,15 @@ export class OrganizationRepository {
   /**
    * Delete an organization
    *
+   * @returns The deleted organization, or null if not found
    * @throws Error if organization has associated components (FK constraint)
    */
-  async delete(id: string): Promise<boolean> {
-    const result = await this.db
+  async delete(id: string): Promise<Organization | null> {
+    const [result] = await this.db
       .delete(organizations)
       .where(eq(organizations.id, id))
-      .returning({ id: organizations.id });
+      .returning();
 
-    return result.length > 0;
+    return result ?? null;
   }
 }
