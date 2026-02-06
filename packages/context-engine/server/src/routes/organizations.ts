@@ -197,15 +197,16 @@ const deleteOrganizationRoute = createRoute({
 organizationsRouter.openapi(listOrganizationsRoute, async (c) => {
   const repo = c.var.organizationRepo;
   const query = c.req.valid('query');
-  const all = await repo.findAll();
 
-  // Apply pagination in-memory (repo returns all)
-  const paginated = all.slice(query.offset, query.offset + query.limit);
+  const result = await repo.findMany({
+    limit: query.limit,
+    offset: query.offset,
+  });
 
   return c.json(
     successResponse({
-      organizations: paginated.map(formatDates),
-      total: all.length,
+      organizations: result.organizations.map(formatDates),
+      total: result.total,
       limit: query.limit,
       offset: query.offset,
     }),

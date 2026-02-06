@@ -39,7 +39,10 @@ export {
   type FindManyOptions,
 } from './repositories/component-repository.js';
 export { EmbeddingRepository } from './repositories/embedding-repository.js';
-export { OrganizationRepository } from './repositories/organization-repository.js';
+export {
+  type FindManyOrganizationsOptions,
+  OrganizationRepository,
+} from './repositories/organization-repository.js';
 
 // =============================================================================
 // Embeddings
