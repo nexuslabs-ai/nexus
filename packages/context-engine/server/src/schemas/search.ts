@@ -42,34 +42,6 @@ export const SearchRequestSchema = z
   })
   .openapi('SearchRequest');
 
-/**
- * Search query parameters (for GET requests).
- * Alternative to POST body for simple searches.
- */
-export const SearchQuerySchema = z
-  .object({
-    q: z
-      .string()
-      .min(1, 'Search query is required')
-      .max(500, 'Search query must be 500 characters or less')
-      .openapi({
-        example: 'modal dialog',
-        description: 'Natural language search query',
-      }),
-    limit: z.coerce.number().int().min(1).max(50).default(10).openapi({
-      example: 10,
-      description: 'Maximum number of results',
-    }),
-    minScore: z.coerce.number().min(0).max(1).optional().openapi({
-      example: 0.7,
-      description: 'Minimum similarity score',
-    }),
-    framework: FrameworkEnum.optional().openapi({
-      description: 'Filter by framework',
-    }),
-  })
-  .openapi('SearchQuery');
-
 // =============================================================================
 // Response Schemas
 // =============================================================================
@@ -144,6 +116,5 @@ export const SearchParamsSchema = OrgIdPathParamSchema;
 // =============================================================================
 
 export type SearchRequest = z.infer<typeof SearchRequestSchema>;
-export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 export type SearchResult = z.infer<typeof SearchResultSchema>;
 export type SearchResponse = z.infer<typeof SearchResponseSchema>;

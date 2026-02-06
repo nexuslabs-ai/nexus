@@ -9,7 +9,6 @@
 
 // Common schemas (errors, health, pagination)
 export {
-  createSuccessResponse,
   ErrorSchema,
   HealthSchema,
   PaginationMetaSchema,
@@ -67,8 +66,6 @@ export {
 // Search schemas
 export {
   SearchParamsSchema,
-  type SearchQuery,
-  SearchQuerySchema,
   type SearchRequest,
   SearchRequestSchema,
   type SearchResponse,

@@ -86,8 +86,10 @@ function toUpdateData(
 /**
  * Format a component summary for list responses.
  * Excludes large JSONB fields for performance.
+ * Uses formatDates for date conversion to avoid duplicating .toISOString() logic.
  */
 function formatComponentSummary(component: Component) {
+  const { createdAt, updatedAt } = formatDates(component);
   return {
     id: component.id,
     slug: component.slug,
@@ -96,8 +98,8 @@ function formatComponentSummary(component: Component) {
     version: component.version,
     visibility: component.visibility,
     embeddingStatus: component.embeddingStatus,
-    createdAt: component.createdAt.toISOString(),
-    updatedAt: component.updatedAt.toISOString(),
+    createdAt,
+    updatedAt,
   };
 }
 

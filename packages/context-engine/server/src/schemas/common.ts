@@ -132,26 +132,3 @@ export const PaginationMetaSchema = z.object({
     description: 'Current offset',
   }),
 });
-
-// =============================================================================
-// Success Response Wrapper
-// =============================================================================
-
-/**
- * Creates a success response schema wrapping the provided data schema.
- * Enforces the `{ success: true, data: T }` pattern.
- */
-export function createSuccessResponse<T extends z.ZodTypeAny>(
-  dataSchema: T,
-  name: string
-) {
-  return z
-    .object({
-      success: z.literal(true).openapi({
-        example: true,
-        description: 'Always true for successful responses',
-      }),
-      data: dataSchema,
-    })
-    .openapi(name);
-}
