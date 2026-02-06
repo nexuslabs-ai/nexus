@@ -7,7 +7,7 @@
 
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
-import { NotFound } from '../errors.js';
+import { ApiError, conflict, notFound } from '../errors.js';
 import {
   CreateOrganizationSchema,
   DeleteOrganizationResponseSchema,
@@ -15,6 +15,7 @@ import {
   OrganizationListSchema,
   OrganizationResponseSchema,
   OrgIdParamSchema,
+  PaginationQuerySchema,
   UpdateOrganizationSchema,
 } from '../schemas/index.js';
 import type { AppEnv } from '../types.js';
@@ -41,7 +42,10 @@ const listOrganizationsRoute = createRoute({
   path: '/',
   tags: ['Organizations'],
   summary: 'List all organizations',
-  description: 'Retrieve a list of all organizations.',
+  description: 'Retrieve a paginated list of all organizations.',
+  request: {
+    query: PaginationQuerySchema,
+  },
   responses: {
     200: {
       content: {
@@ -175,6 +179,14 @@ const deleteOrganizationRoute = createRoute({
       },
       description: 'Organization not found',
     },
+    409: {
+      content: {
+        'application/json': {
+          schema: ErrorSchema,
+        },
+      },
+      description: 'Cannot delete organization with existing components',
+    },
   },
 });
 
@@ -184,12 +196,18 @@ const deleteOrganizationRoute = createRoute({
 
 organizationsRouter.openapi(listOrganizationsRoute, async (c) => {
   const repo = c.var.organizationRepo;
-  const organizations = await repo.findAll();
+  const query = c.req.valid('query');
+  const all = await repo.findAll();
+
+  // Apply pagination in-memory (repo returns all)
+  const paginated = all.slice(query.offset, query.offset + query.limit);
 
   return c.json(
     successResponse({
-      organizations: organizations.map(formatDates),
-      total: organizations.length,
+      organizations: paginated.map(formatDates),
+      total: all.length,
+      limit: query.limit,
+      offset: query.offset,
     }),
     200
   );
@@ -201,7 +219,7 @@ organizationsRouter.openapi(getOrganizationRoute, async (c) => {
   const org = await repo.findById(id);
 
   if (!org) {
-    throw NotFound('Organization', id);
+    throw notFound('Organization', id);
   }
 
   return c.json(successResponse(formatDates(org)), 200);
@@ -223,7 +241,7 @@ organizationsRouter.openapi(updateOrganizationRoute, async (c) => {
   const org = await repo.update(id, body);
 
   if (!org) {
-    throw NotFound('Organization', id);
+    throw notFound('Organization', id);
   }
 
   return c.json(successResponse(formatDates(org)), 200);
@@ -233,11 +251,26 @@ organizationsRouter.openapi(deleteOrganizationRoute, async (c) => {
   const { id } = c.req.valid('param');
   const repo = c.var.organizationRepo;
 
-  const deleted = await repo.delete(id);
+  try {
+    const deleted = await repo.delete(id);
 
-  if (!deleted) {
-    throw NotFound('Organization', id);
+    if (!deleted) {
+      throw notFound('Organization', id);
+    }
+
+    return c.json(successResponse({ deleted: true }), 200);
+  } catch (err) {
+    // Re-throw our own API errors
+    if (err instanceof ApiError) throw err;
+
+    // Handle FK constraint violation (PostgreSQL error code 23503)
+    const pgError = err as { code?: string };
+    if (pgError.code === '23503') {
+      throw conflict(
+        'Cannot delete organization with existing components. Delete all components first.'
+      );
+    }
+
+    throw err;
   }
-
-  return c.json(successResponse({ deleted: true }), 200);
 });

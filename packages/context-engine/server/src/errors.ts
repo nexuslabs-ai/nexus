@@ -11,6 +11,7 @@ import type { ContentfulStatusCode } from 'hono/utils/http-status';
 type ErrorCode =
   | 'NOT_FOUND'
   | 'VALIDATION_ERROR'
+  | 'CONFLICT'
   | 'SERVICE_UNAVAILABLE'
   | 'INTERNAL_ERROR';
 
@@ -39,7 +40,7 @@ export class ApiError extends HTTPException {
  * @param resource - The type of resource (e.g., "Organization", "Component")
  * @param id - Optional identifier that was not found
  */
-export const NotFound = (resource: string, id?: string) =>
+export const notFound = (resource: string, id?: string) =>
   new ApiError(
     404,
     'NOT_FOUND',
@@ -47,12 +48,21 @@ export const NotFound = (resource: string, id?: string) =>
   );
 
 /**
+ * Conflict error.
+ * Use when an operation conflicts with existing state (e.g., FK constraint).
+ * @param message - Description of the conflict
+ * @param details - Optional additional context
+ */
+export const conflict = (message: string, details?: unknown) =>
+  new ApiError(409, 'CONFLICT', message, details);
+
+/**
  * Service unavailable error.
  * Use when external dependencies (database, APIs) are unavailable.
  * @param message - Description of what's unavailable
  * @param details - Optional additional context
  */
-export const ServiceUnavailable = (message: string, details?: unknown) =>
+export const serviceUnavailable = (message: string, details?: unknown) =>
   new ApiError(503, 'SERVICE_UNAVAILABLE', message, details);
 
 /**
@@ -61,5 +71,5 @@ export const ServiceUnavailable = (message: string, details?: unknown) =>
  * @param message - Description of what's invalid
  * @param details - Optional field-level details
  */
-export const ValidationError = (message: string, details?: unknown) =>
+export const validationError = (message: string, details?: unknown) =>
   new ApiError(400, 'VALIDATION_ERROR', message, details);

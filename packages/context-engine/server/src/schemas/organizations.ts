@@ -88,6 +88,14 @@ export const OrganizationListSchema = z
         example: 10,
         description: 'Total number of organizations',
       }),
+      limit: z.number().int().openapi({
+        example: 50,
+        description: 'Number of items per page',
+      }),
+      offset: z.number().int().openapi({
+        example: 0,
+        description: 'Current offset',
+      }),
     }),
   })
   .openapi('OrganizationList');

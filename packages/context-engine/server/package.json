@@ -15,8 +15,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsx watch --env-file=.env src/index.ts",
-    "start": "node --env-file=.env dist/index.js",
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "start": "node --env-file=.env dist/server.js",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -27,8 +27,7 @@
     "@hono/node-server": "^1.14.1",
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.19.3",
-    "hono": "^4.7.4",
-    "zod": "^3.24.2"
+    "hono": "^4.7.4"
   },
   "devDependencies": {
     "@types/node": "^25.2.0",

@@ -5,7 +5,7 @@
  * Required variables must be set; optional ones have sensible defaults.
  */
 
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 
 /**
  * Environment variable schema with validation and coercion

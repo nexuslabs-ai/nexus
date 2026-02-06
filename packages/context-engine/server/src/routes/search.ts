@@ -7,7 +7,7 @@
 
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
-import { ServiceUnavailable } from '../errors.js';
+import { serviceUnavailable } from '../errors.js';
 import {
   ErrorSchema,
   SearchParamsSchema,
@@ -47,6 +47,7 @@ const searchRoute = createRoute({
           schema: SearchRequestSchema,
         },
       },
+      required: true,
     },
   },
   responses: {
@@ -70,7 +71,7 @@ searchRouter.openapi(searchRoute, async (c) => {
   const embeddingRepo = c.var.embeddingRepo;
 
   if (!embeddingRepo) {
-    throw ServiceUnavailable(
+    throw serviceUnavailable(
       'Search service unavailable',
       'VOYAGE_API_KEY environment variable is not configured'
     );
@@ -98,6 +99,6 @@ searchRouter.openapi(searchRoute, async (c) => {
       total: resultsWithFramework.length,
       query: body.query,
     }),
-    200 as const
+    200
   );
 });

@@ -6,9 +6,10 @@
  */
 
 import type { Component, NewComponent } from '@context-engine/db';
+import type { z } from '@hono/zod-openapi';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
-import { NotFound, ServiceUnavailable, ValidationError } from '../errors.js';
+import { notFound, serviceUnavailable, validationError } from '../errors.js';
 import { ErrorSchema } from '../schemas/common.js';
 import {
   ComponentIdParamSchema,
@@ -23,40 +24,64 @@ import {
 } from '../schemas/components.js';
 import { OrgIdPathParamSchema } from '../schemas/organizations.js';
 import type { AppEnv } from '../types.js';
-import { successResponse } from '../utils/index.js';
+import { formatDates, successResponse } from '../utils/index.js';
 
 // =============================================================================
-// Type Helpers
+// Body → Repository Mappers
 // =============================================================================
 
 /**
- * Create component data type (excludes orgId which is added by repository).
+ * Map validated create body to repository input.
  *
- * The Zod schema uses z.record(z.any()) for flexibility, but the repository
- * expects typed data. This type assertion bridges the API schema and DB types.
+ * Explicit field mapping ensures compile-time safety: if the Zod schema
+ * or DB types diverge, TypeScript will error on the specific field.
+ * JSONB fields use `as` casts because the API intentionally accepts
+ * arbitrary JSON that the pipeline will later validate.
  */
-type CreateComponentData = Omit<NewComponent, 'orgId'>;
+function toCreateData(
+  body: z.infer<typeof CreateComponentSchema>
+): Omit<NewComponent, 'orgId'> {
+  return {
+    slug: body.slug,
+    name: body.name,
+    framework: body.framework,
+    version: body.version,
+    visibility: body.visibility,
+    sourceHash: body.sourceHash,
+    extraction: body.extraction as NewComponent['extraction'],
+    generation: body.generation as NewComponent['generation'],
+    generationProvider: body.generationProvider,
+    generationModel: body.generationModel,
+    manifest: body.manifest as NewComponent['manifest'],
+  };
+}
 
 /**
- * Update component data type.
+ * Map validated update body to repository input.
+ *
+ * Drizzle ignores `undefined` values in `.set()`, so we can map all
+ * fields directly — only fields present in the request body will be
+ * included in the SQL UPDATE.
  */
-type UpdateComponentData = Partial<Omit<NewComponent, 'id' | 'orgId'>>;
+function toUpdateData(
+  body: z.infer<typeof UpdateComponentSchema>
+): Partial<Omit<NewComponent, 'id' | 'orgId'>> {
+  return {
+    name: body.name,
+    version: body.version,
+    visibility: body.visibility,
+    sourceHash: body.sourceHash,
+    extraction: body.extraction as NewComponent['extraction'],
+    generation: body.generation as NewComponent['generation'],
+    generationProvider: body.generationProvider,
+    generationModel: body.generationModel,
+    manifest: body.manifest as NewComponent['manifest'],
+  };
+}
 
 // =============================================================================
 // Helper Functions
 // =============================================================================
-
-/**
- * Format a component for API response.
- * Converts Date objects to ISO strings.
- */
-function formatComponent(component: Component) {
-  return {
-    ...component,
-    createdAt: component.createdAt.toISOString(),
-    updatedAt: component.updatedAt.toISOString(),
-  };
-}
 
 /**
  * Format a component summary for list responses.
@@ -461,10 +486,10 @@ componentsRouter.openapi(getComponentByIdRoute, async (c) => {
   const component = await repository.findById(orgId, id);
 
   if (!component) {
-    throw NotFound('Component', id);
+    throw notFound('Component', id);
   }
 
-  return c.json(successResponse(formatComponent(component)), 200);
+  return c.json(successResponse(formatDates(component)), 200);
 });
 
 // -----------------------------------------------------------------------------
@@ -477,10 +502,10 @@ componentsRouter.openapi(getComponentBySlugRoute, async (c) => {
   const component = await repository.findBySlug(orgId, slug);
 
   if (!component) {
-    throw NotFound('Component', slug);
+    throw notFound('Component', slug);
   }
 
-  return c.json(successResponse(formatComponent(component)), 200);
+  return c.json(successResponse(formatDates(component)), 200);
 });
 
 // -----------------------------------------------------------------------------
@@ -497,16 +522,12 @@ componentsRouter.openapi(createComponentRoute, async (c) => {
   const isCreate = !existing;
 
   // Upsert the component
-  // Cast body to match repository expected type - Zod schema validates structure
-  const component = await repository.upsert(
-    orgId,
-    body as unknown as CreateComponentData
-  );
+  const component = await repository.upsert(orgId, toCreateData(body));
 
   // Return 201 if created, 200 if updated
   const status = isCreate ? 201 : 200;
 
-  return c.json(successResponse(formatComponent(component)), status);
+  return c.json(successResponse(formatDates(component)), status);
 });
 
 // -----------------------------------------------------------------------------
@@ -518,18 +539,13 @@ componentsRouter.openapi(updateComponentRoute, async (c) => {
   const body = c.req.valid('json');
   const repository = c.var.componentRepo;
 
-  // Cast body to match repository expected type - Zod schema validates structure
-  const component = await repository.update(
-    orgId,
-    id,
-    body as unknown as UpdateComponentData
-  );
+  const component = await repository.update(orgId, id, toUpdateData(body));
 
   if (!component) {
-    throw NotFound('Component', id);
+    throw notFound('Component', id);
   }
 
-  return c.json(successResponse(formatComponent(component)), 200);
+  return c.json(successResponse(formatDates(component)), 200);
 });
 
 // -----------------------------------------------------------------------------
@@ -542,7 +558,7 @@ componentsRouter.openapi(deleteComponentRoute, async (c) => {
   const deleted = await repository.delete(orgId, id);
 
   if (!deleted) {
-    throw NotFound('Component', id);
+    throw notFound('Component', id);
   }
 
   return c.json(successResponse({ deleted: true }), 200);
@@ -559,7 +575,7 @@ componentsRouter.openapi(indexComponentRoute, async (c) => {
 
   // Check if embedding service is available
   if (!embeddingRepo) {
-    throw ServiceUnavailable(
+    throw serviceUnavailable(
       'Embedding service unavailable',
       'VOYAGE_API_KEY not configured'
     );
@@ -568,12 +584,12 @@ componentsRouter.openapi(indexComponentRoute, async (c) => {
   // Get component
   const component = await componentRepo.findById(orgId, id);
   if (!component) {
-    throw NotFound('Component', id);
+    throw notFound('Component', id);
   }
 
   // Check if component has manifest
   if (!component.manifest) {
-    throw ValidationError(
+    throw validationError(
       'Component has no manifest',
       'Generate manifest before indexing'
     );
@@ -583,7 +599,7 @@ componentsRouter.openapi(indexComponentRoute, async (c) => {
   const result = await embeddingRepo.index(orgId, id, component.manifest);
 
   if (!result.success) {
-    throw ServiceUnavailable('Embedding generation failed', result.error);
+    throw serviceUnavailable('Embedding generation failed', result.error);
   }
 
   return c.json(

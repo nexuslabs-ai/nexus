@@ -10,7 +10,7 @@ import { checkHealth } from '@context-engine/db';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { getConfig } from '../config.js';
-import { SERVER_VERSION } from '../index.js';
+import { SERVER_VERSION } from '../constants.js';
 import { HealthSchema, ReadySchema } from '../schemas/index.js';
 
 export const healthRouter = new OpenAPIHono();
@@ -56,16 +56,24 @@ const readyRoute = createRoute({
   responses: {
     200: {
       content: { 'application/json': { schema: ReadySchema } },
-      description: 'Readiness status',
+      description: 'Server is ready',
+    },
+    503: {
+      content: { 'application/json': { schema: ReadySchema } },
+      description: 'Server is not ready (database unavailable)',
     },
   },
 });
 
 healthRouter.openapi(readyRoute, async (c) => {
   const dbHealthy = await checkHealth();
+  const status = dbHealthy ? 200 : 503;
 
-  return c.json({
-    ready: dbHealthy,
-    database: dbHealthy ? ('ok' as const) : ('error' as const),
-  });
+  return c.json(
+    {
+      ready: dbHealthy,
+      database: dbHealthy ? 'ok' : 'error',
+    },
+    status
+  );
 });
