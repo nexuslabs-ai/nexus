@@ -10,7 +10,7 @@
  */
 
 import type { AIManifest } from '@context-engine/core';
-import { and, cosineDistance, eq, sql } from 'drizzle-orm';
+import { and, cosineDistance, eq, inArray, sql } from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { generateChunks } from '../embeddings/chunk-generator.js';
@@ -234,37 +234,40 @@ export class EmbeddingRepository {
     query: string,
     options: SearchOptions = {}
   ): Promise<SearchResult[]> {
-    const { limit = 10, minScore = 0.0, framework } = options;
+    const { limit = 10, minScore = 0.5, framework } = options;
 
     // Generate query embedding (query-optimized)
     const queryEmbedding = await this.embeddingService.embedQuery(query);
-
-    // Calculate similarity as 1 - cosineDistance (cosine similarity)
-    const similarity = sql<number>`1 - ${cosineDistance(embeddingChunks.embedding, queryEmbedding)}`;
 
     // Build framework filter conditions
     const frameworkCondition = framework
       ? eq(components.framework, framework)
       : undefined;
 
-    // Query chunks with similarity scores, ordered by distance (for index usage)
-    // Then aggregate by component in-memory for simplicity and type safety
+    // Use cosineDistance directly in select and orderBy (ensures HNSW index usage)
+    // Similarity is computed in JS as 1 - distance to avoid SQL type mismatch
+    const distance = cosineDistance(
+      embeddingChunks.embedding,
+      queryEmbedding
+    ).mapWith(Number);
+
     const rankedChunks = await this.db
       .select({
         componentId: embeddingChunks.componentId,
-        similarity,
+        distance,
       })
       .from(embeddingChunks)
       .where(eq(embeddingChunks.orgId, orgId))
-      .orderBy(cosineDistance(embeddingChunks.embedding, queryEmbedding))
+      .orderBy(distance)
       .limit(limit * 3);
 
-    // Aggregate: take max similarity per component
+    // Aggregate: take max similarity (1 - distance) per component
     const componentScores = new Map<string, number>();
     for (const chunk of rankedChunks) {
+      const similarity = 1 - (chunk.distance ?? 1);
       const current = componentScores.get(chunk.componentId) ?? 0;
-      if ((chunk.similarity ?? 0) > current) {
-        componentScores.set(chunk.componentId, chunk.similarity ?? 0);
+      if (similarity > current) {
+        componentScores.set(chunk.componentId, similarity);
       }
     }
 
@@ -292,7 +295,7 @@ export class EmbeddingRepository {
       .where(
         and(
           eq(components.orgId, orgId),
-          sql`${components.id} = ANY(${topComponentIds})`,
+          inArray(components.id, topComponentIds),
           frameworkCondition
         )
       );
