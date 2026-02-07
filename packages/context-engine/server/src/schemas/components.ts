@@ -93,7 +93,7 @@ export const CreateComponentSchema = z
         description: 'Hash of source code for change detection',
       }),
     extraction: z
-      .record(z.any())
+      .record(z.string(), z.any())
       .optional()
       .openapi({
         example: {
@@ -103,7 +103,7 @@ export const CreateComponentSchema = z
         description: 'Extracted component data (props, variants, dependencies)',
       }),
     generation: z
-      .record(z.any())
+      .record(z.string(), z.any())
       .optional()
       .openapi({
         example: {
@@ -122,7 +122,7 @@ export const CreateComponentSchema = z
       description: 'LLM model used for generation',
     }),
     manifest: z
-      .record(z.any())
+      .record(z.string(), z.any())
       .optional()
       .openapi({
         example: {
@@ -162,10 +162,10 @@ export const UpdateComponentSchema = z
       example: 'def456abc789012',
       description: 'Hash of source code for change detection',
     }),
-    extraction: z.record(z.any()).optional().openapi({
+    extraction: z.record(z.string(), z.any()).optional().openapi({
       description: 'Extracted component data (props, variants, dependencies)',
     }),
-    generation: z.record(z.any()).optional().openapi({
+    generation: z.record(z.string(), z.any()).optional().openapi({
       description: 'LLM-generated metadata',
     }),
     generationProvider: z.string().min(1).optional().openapi({
@@ -176,7 +176,7 @@ export const UpdateComponentSchema = z
       example: 'claude-sonnet-4-20250514',
       description: 'LLM model used for generation',
     }),
-    manifest: z.record(z.any()).optional().openapi({
+    manifest: z.record(z.string(), z.any()).optional().openapi({
       description: 'Complete AI manifest for consumption',
     }),
   })
@@ -268,10 +268,10 @@ export const ComponentSchema = z
       example: null,
       description: 'Error message if embedding failed',
     }),
-    extraction: z.record(z.any()).nullable().openapi({
+    extraction: z.record(z.string(), z.any()).nullable().openapi({
       description: 'Extracted component data (null if not yet extracted)',
     }),
-    generation: z.record(z.any()).nullable().openapi({
+    generation: z.record(z.string(), z.any()).nullable().openapi({
       description: 'LLM-generated metadata (null if not yet generated)',
     }),
     generationProvider: z.string().nullable().openapi({
@@ -282,7 +282,7 @@ export const ComponentSchema = z
       example: 'claude-sonnet-4-20250514',
       description: 'LLM model (null if not yet generated)',
     }),
-    manifest: z.record(z.any()).nullable().openapi({
+    manifest: z.record(z.string(), z.any()).nullable().openapi({
       description: 'Complete AI manifest (null if not yet built)',
     }),
     createdAt: z.string().datetime().openapi({
