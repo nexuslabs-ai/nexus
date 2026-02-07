@@ -6,7 +6,6 @@
  */
 
 import type { Component, NewComponent } from '@context-engine/db';
-import type { z } from '@hono/zod-openapi';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { notFound, serviceUnavailable, validationError } from '../errors.js';
@@ -25,59 +24,6 @@ import {
 import { OrgIdPathParamSchema } from '../schemas/organizations.js';
 import type { AppEnv } from '../types.js';
 import { formatDates, successResponse } from '../utils/index.js';
-
-// =============================================================================
-// Body → Repository Mappers
-// =============================================================================
-
-/**
- * Map validated create body to repository input.
- *
- * Explicit field mapping ensures compile-time safety: if the Zod schema
- * or DB types diverge, TypeScript will error on the specific field.
- * JSONB fields use `as` casts because the API intentionally accepts
- * arbitrary JSON that the pipeline will later validate.
- */
-function toCreateData(
-  body: z.infer<typeof CreateComponentSchema>
-): Omit<NewComponent, 'orgId'> {
-  return {
-    slug: body.slug,
-    name: body.name,
-    framework: body.framework,
-    version: body.version,
-    visibility: body.visibility,
-    sourceHash: body.sourceHash,
-    extraction: body.extraction as NewComponent['extraction'],
-    generation: body.generation as NewComponent['generation'],
-    generationProvider: body.generationProvider,
-    generationModel: body.generationModel,
-    manifest: body.manifest as NewComponent['manifest'],
-  };
-}
-
-/**
- * Map validated update body to repository input.
- *
- * Drizzle ignores `undefined` values in `.set()`, so we can map all
- * fields directly — only fields present in the request body will be
- * included in the SQL UPDATE.
- */
-function toUpdateData(
-  body: z.infer<typeof UpdateComponentSchema>
-): Partial<Omit<NewComponent, 'id' | 'orgId'>> {
-  return {
-    name: body.name,
-    version: body.version,
-    visibility: body.visibility,
-    sourceHash: body.sourceHash,
-    extraction: body.extraction as NewComponent['extraction'],
-    generation: body.generation as NewComponent['generation'],
-    generationProvider: body.generationProvider,
-    generationModel: body.generationModel,
-    manifest: body.manifest as NewComponent['manifest'],
-  };
-}
 
 // =============================================================================
 // Helper Functions
@@ -524,7 +470,13 @@ componentsRouter.openapi(createComponentRoute, async (c) => {
   const isCreate = !existing;
 
   // Upsert the component
-  const component = await repository.upsert(orgId, toCreateData(body));
+  const createData: Omit<NewComponent, 'orgId'> = {
+    ...body,
+    extraction: body.extraction as NewComponent['extraction'],
+    generation: body.generation as NewComponent['generation'],
+    manifest: body.manifest as NewComponent['manifest'],
+  };
+  const component = await repository.upsert(orgId, createData);
 
   // Return 201 if created, 200 if updated
   const status = isCreate ? 201 : 200;
@@ -541,7 +493,13 @@ componentsRouter.openapi(updateComponentRoute, async (c) => {
   const body = c.req.valid('json');
   const repository = c.var.componentRepo;
 
-  const component = await repository.update(orgId, id, toUpdateData(body));
+  const updateData: Partial<Omit<NewComponent, 'id' | 'orgId'>> = {
+    ...body,
+    extraction: body.extraction as NewComponent['extraction'],
+    generation: body.generation as NewComponent['generation'],
+    manifest: body.manifest as NewComponent['manifest'],
+  };
+  const component = await repository.update(orgId, id, updateData);
 
   if (!component) {
     throw notFound('Component', id);

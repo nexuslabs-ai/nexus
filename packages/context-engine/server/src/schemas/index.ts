@@ -14,7 +14,6 @@ export {
   PaginationMetaSchema,
   PaginationQuerySchema,
   ReadySchema,
-  ValidationErrorDetailSchema,
 } from './common.js';
 
 // Organization schemas

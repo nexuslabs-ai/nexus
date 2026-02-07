@@ -37,23 +37,6 @@ export const ErrorSchema = z
   })
   .openapi('Error');
 
-/**
- * Validation error detail schema.
- * Used when request validation fails to provide field-level feedback.
- */
-export const ValidationErrorDetailSchema = z
-  .object({
-    field: z.string().openapi({
-      example: 'name',
-      description: 'The field that failed validation',
-    }),
-    message: z.string().openapi({
-      example: 'Required field is missing',
-      description: 'What went wrong with this field',
-    }),
-  })
-  .openapi('ValidationErrorDetail');
-
 // =============================================================================
 // Health Check Schemas
 // =============================================================================
