@@ -4,7 +4,7 @@
  * Simple CRUD operations for organizations.
  */
 
-import { eq } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import {
@@ -12,6 +12,21 @@ import {
   type Organization,
   organizations,
 } from '../schema.js';
+
+// =============================================================================
+// Types
+// =============================================================================
+
+/**
+ * Options for finding multiple organizations
+ */
+export interface FindManyOrganizationsOptions {
+  /** Maximum number of results */
+  limit?: number;
+
+  /** Number of results to skip */
+  offset?: number;
+}
 
 /**
  * Repository for organization CRUD operations
@@ -49,10 +64,31 @@ export class OrganizationRepository {
   }
 
   /**
-   * Find all organizations
+   * Find organizations with pagination
+   *
+   * @returns Object containing the paginated organizations and total count
    */
-  async findAll(): Promise<Organization[]> {
-    return this.db.select().from(organizations);
+  async findMany(
+    options: FindManyOrganizationsOptions = {}
+  ): Promise<{ organizations: Organization[]; total: number }> {
+    const { limit = 50, offset = 0 } = options;
+
+    // Count total records
+    const [countResult] = await this.db
+      .select({ count: count() })
+      .from(organizations);
+
+    const total = countResult?.count ?? 0;
+
+    // Fetch paginated results
+    const results = await this.db
+      .select()
+      .from(organizations)
+      .orderBy(desc(organizations.updatedAt))
+      .limit(limit)
+      .offset(offset);
+
+    return { organizations: results, total };
   }
 
   /**
@@ -74,14 +110,15 @@ export class OrganizationRepository {
   /**
    * Delete an organization
    *
+   * @returns The deleted organization, or null if not found
    * @throws Error if organization has associated components (FK constraint)
    */
-  async delete(id: string): Promise<boolean> {
-    const result = await this.db
+  async delete(id: string): Promise<Organization | null> {
+    const [result] = await this.db
       .delete(organizations)
       .where(eq(organizations.id, id))
-      .returning({ id: organizations.id });
+      .returning();
 
-    return result.length > 0;
+    return result ?? null;
   }
 }

@@ -409,10 +409,8 @@ async function main(): Promise<void> {
   const totalTimeMs = performance.now() - startTime;
   printSummary(succeeded, failed, totalTimeMs);
 
-  // Exit with error if any failed
-  if (failed.length > 0) {
-    process.exit(1);
-  }
+  // Exit with appropriate code
+  process.exit(failed.length > 0 ? 1 : 0);
 }
 
 main().catch((error) => {

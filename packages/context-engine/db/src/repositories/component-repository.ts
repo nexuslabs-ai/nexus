@@ -98,11 +98,13 @@ export class ComponentRepository {
 
   /**
    * Find multiple components with optional filters
+   *
+   * @returns Object containing the paginated components and total count
    */
   async findMany(
     orgId: string,
     options: FindManyOptions = {}
-  ): Promise<Component[]> {
+  ): Promise<{ components: Component[]; total: number }> {
     const {
       where = {},
       limit = 50,
@@ -124,6 +126,14 @@ export class ComponentRepository {
       conditions.push(eq(components.embeddingStatus, where.embeddingStatus));
     }
 
+    // Count total matching records (without pagination)
+    const [countResult] = await this.db
+      .select({ count: count() })
+      .from(components)
+      .where(and(...conditions));
+
+    const total = countResult?.count ?? 0;
+
     // Order column
     const orderColumn = {
       name: components.name,
@@ -133,13 +143,16 @@ export class ComponentRepository {
 
     const orderFn = orderDir === 'desc' ? desc : asc;
 
-    return this.db
+    // Fetch paginated results
+    const componentsList = await this.db
       .select()
       .from(components)
       .where(and(...conditions))
       .orderBy(orderFn(orderColumn))
       .limit(limit)
       .offset(offset);
+
+    return { components: componentsList, total };
   }
 
   /**
@@ -199,14 +212,16 @@ export class ComponentRepository {
 
   /**
    * Delete a component
+   *
+   * @returns The deleted component, or null if not found
    */
-  async delete(orgId: string, id: string): Promise<boolean> {
-    const result = await this.db
+  async delete(orgId: string, id: string): Promise<Component | null> {
+    const [result] = await this.db
       .delete(components)
       .where(and(eq(components.orgId, orgId), eq(components.id, id)))
-      .returning({ id: components.id });
+      .returning();
 
-    return result.length > 0;
+    return result ?? null;
   }
 
   /**

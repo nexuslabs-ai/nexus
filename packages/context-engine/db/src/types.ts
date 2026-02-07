@@ -89,6 +89,8 @@ export interface SearchResult {
   name: string;
   /** Component description (may be null) */
   description: string | null;
+  /** Target framework (e.g., 'react', 'vue') */
+  framework: string;
   /** Similarity score (0-1, higher is more relevant) */
   score: number;
 }

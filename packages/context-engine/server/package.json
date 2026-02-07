@@ -1,7 +1,7 @@
 {
-  "name": "@context-engine/db",
+  "name": "@context-engine/server",
   "version": "0.1.0",
-  "description": "Database layer for Context Engine",
+  "description": "HTTP API server for Context Engine",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -15,26 +15,23 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "start": "node --env-file=.env dist/server.js",
     "clean": "rm -rf dist",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "db:push": "drizzle-kit push",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:init": "yarn db:push",
-    "db:studio": "drizzle-kit studio"
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "@context-engine/core": "*",
-    "drizzle-orm": "^0.45.1",
-    "postgres": "^3.4.8"
+    "@context-engine/db": "*",
+    "@hono/node-server": "^1.14.1",
+    "@hono/swagger-ui": "^0.5.1",
+    "@hono/zod-openapi": "^0.19.3",
+    "hono": "^4.7.4"
   },
   "devDependencies": {
     "@types/node": "^25.2.0",
-    "drizzle-kit": "^0.31.8",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",

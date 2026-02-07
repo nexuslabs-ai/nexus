@@ -53,7 +53,7 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/ --ext .ts",
+    "lint": "eslint src/",
     "process:help": "tsx scripts/run-processor.ts --help",
     "extract": "tsx scripts/run-processor.ts --phase extract",
     "generate": "tsx scripts/run-processor.ts --phase generate",
