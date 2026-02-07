@@ -5,14 +5,12 @@
  * Separated to avoid circular imports between routes and index.
  */
 
-import { createRequire } from 'node:module';
-
 // =============================================================================
 // Version
 // =============================================================================
 
-const require = createRequire(import.meta.url);
-const packageJson = require('../package.json') as { version: string };
-
-/** Current server version, read from package.json as single source of truth. */
-export const SERVER_VERSION: string = packageJson.version;
+/**
+ * Current server version, injected at build time from package.json by tsup.
+ * Falls back to '0.0.0' in development mode (ts-node/tsx).
+ */
+export const SERVER_VERSION: string = process.env.PACKAGE_VERSION ?? '0.0.0';
