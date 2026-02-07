@@ -52,13 +52,17 @@ async function startServer() {
   const shutdown = async (signal: string) => {
     console.log(`\n${signal} received, shutting down gracefully...`);
 
-    // Close the HTTP server
-    server.close((err) => {
-      if (err) {
-        console.error('Error closing HTTP server:', err);
-      } else {
-        console.log('HTTP server closed');
-      }
+    // Close the HTTP server (wait for connections to drain)
+    await new Promise<void>((resolve, reject) => {
+      server.close((err) => {
+        if (err) {
+          console.error('Error closing HTTP server:', err);
+          reject(err);
+        } else {
+          console.log('HTTP server closed');
+          resolve();
+        }
+      });
     });
 
     // Close database connection

@@ -64,13 +64,6 @@ export class OrganizationRepository {
   }
 
   /**
-   * Find all organizations
-   */
-  async findAll(): Promise<Organization[]> {
-    return this.db.select().from(organizations);
-  }
-
-  /**
    * Find organizations with pagination
    *
    * @returns Object containing the paginated organizations and total count
