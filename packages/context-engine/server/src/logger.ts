@@ -11,9 +11,30 @@
  * (startup, shutdown, fatal errors).
  */
 
+import { createRequire } from 'node:module';
 import pino from 'pino';
 
 import { Environment, type ServerConfig } from './config.js';
+
+const REDACT_PATHS = [
+  'req.headers.authorization',
+  'req.headers.cookie',
+  '*.password',
+  '*.secret',
+  '*.apiKey',
+  '*.keyHash',
+  '*.apiKeyHashSecret',
+];
+
+function isPinoPrettyAvailable(): boolean {
+  try {
+    const require = createRequire(import.meta.url);
+    require.resolve('pino-pretty');
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Create a pino logger instance from server config.
@@ -24,9 +45,10 @@ import { Environment, type ServerConfig } from './config.js';
 export function createServerLogger(config: ServerConfig): pino.Logger {
   const isDev = config.environment !== Environment.Production;
 
-  if (isDev) {
+  if (isDev && isPinoPrettyAvailable()) {
     return pino({
       level: config.logLevel,
+      redact: REDACT_PATHS,
       transport: {
         target: 'pino-pretty',
         options: {
@@ -38,5 +60,5 @@ export function createServerLogger(config: ServerConfig): pino.Logger {
     });
   }
 
-  return pino({ level: config.logLevel });
+  return pino({ level: config.logLevel, redact: REDACT_PATHS });
 }
