@@ -201,11 +201,10 @@ apiKeysRouter.openapi(createApiKeyRoute, async (c) => {
     throw notFound('Organization', orgId);
   }
 
-  // Guard: API key creation requires the hash secret
-  if (!config.apiKeyHashSecret) {
+  if (!config.authEnabled) {
     throw serviceUnavailable(
       'API key creation unavailable',
-      'API_KEY_HASH_SECRET not configured'
+      'Authentication is not enabled'
     );
   }
 

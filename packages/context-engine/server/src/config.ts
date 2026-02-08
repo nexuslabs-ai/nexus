@@ -27,6 +27,17 @@ const envSchema = z
         message: 'API_KEY_HASH_SECRET is required when AUTH_ENABLED is true',
         path: ['API_KEY_HASH_SECRET'],
       });
+    } else if (
+      data.AUTH_ENABLED === 'true' &&
+      data.API_KEY_HASH_SECRET &&
+      data.API_KEY_HASH_SECRET.length < 32
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'API_KEY_HASH_SECRET must be at least 32 characters (NIST SP 800-224)',
+        path: ['API_KEY_HASH_SECRET'],
+      });
     }
 
     if (
@@ -53,20 +64,40 @@ export const Environment = {
 export type Environment = (typeof Environment)[keyof typeof Environment];
 
 /**
- * Server configuration interface
+ * Base server configuration shared across all auth modes
  */
-export interface ServerConfig {
+interface BaseConfig {
   /** Server port */
   port: number;
   /** Runtime environment */
   environment: Environment;
   /** PostgreSQL connection string */
   databaseUrl: string;
-  /** Whether authentication is enabled */
-  authEnabled: boolean;
-  /** Secret used to HMAC-hash API keys (required when authEnabled is true) */
-  apiKeyHashSecret: string | undefined;
 }
+
+/**
+ * Configuration when authentication is disabled (dev mode)
+ */
+interface AuthDisabledConfig extends BaseConfig {
+  authEnabled: false;
+}
+
+/**
+ * Configuration when authentication is enabled (production)
+ */
+interface AuthEnabledConfig extends BaseConfig {
+  authEnabled: true;
+  /** Secret used to HMAC-hash API keys (>= 32 chars, per NIST SP 800-224) */
+  apiKeyHashSecret: string;
+}
+
+/**
+ * Server configuration — discriminated union keyed on `authEnabled`.
+ *
+ * When `authEnabled` is `true`, `apiKeyHashSecret` is guaranteed to be a string.
+ * When `authEnabled` is `false`, `apiKeyHashSecret` does not exist on the type.
+ */
+export type ServerConfig = AuthDisabledConfig | AuthEnabledConfig;
 
 /**
  * Load configuration from environment variables.
@@ -84,13 +115,21 @@ export function loadConfig(): ServerConfig {
     throw new Error(`Configuration error: ${errors}`);
   }
 
-  return {
+  const base: BaseConfig = {
     port: result.data.PORT,
     environment: result.data.NODE_ENV,
     databaseUrl: result.data.DATABASE_URL,
-    authEnabled: result.data.AUTH_ENABLED === 'true',
-    apiKeyHashSecret: result.data.API_KEY_HASH_SECRET,
   };
+
+  if (result.data.AUTH_ENABLED === 'true') {
+    return {
+      ...base,
+      authEnabled: true,
+      apiKeyHashSecret: result.data.API_KEY_HASH_SECRET!,
+    };
+  }
+
+  return { ...base, authEnabled: false };
 }
 
 /**

@@ -67,7 +67,7 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
 
   const result = await validateApiKey(
     token,
-    config.apiKeyHashSecret!,
+    config.apiKeyHashSecret,
     apiKeyRepo
   );
 

@@ -91,6 +91,7 @@ export function createApp() {
   // API Key management (requires admin scope)
   // GET/POST /api/v1/organizations/:orgId/api-keys
   // DELETE /api/v1/organizations/:orgId/api-keys/:keyId
+  app.use('/api/v1/organizations/:orgId/api-keys', requireScope('admin'));
   app.use('/api/v1/organizations/:orgId/api-keys/*', requireScope('admin'));
   app.route('/api/v1/organizations/:orgId/api-keys', apiKeysRouter);
 
