@@ -8,7 +8,28 @@
  * Both HTTP API and MCP Streamable HTTP consume these utilities.
  */
 
-import type { AuthContext, AuthScope } from './auth-types.js';
+import {
+  type AuthContext,
+  type AuthScope,
+  DEV_API_KEY_ID,
+} from './auth-types.js';
+
+// =============================================================================
+// Dev Mode Check
+// =============================================================================
+
+/**
+ * Check if the current auth context is in dev mode (AUTH_ENABLED=false).
+ *
+ * Dev mode uses the sentinel API key ID instead of a real database-backed key.
+ * Useful for bypassing org-scoping checks during local development.
+ *
+ * @param context - The authenticated context from API key validation
+ * @returns `true` if the context represents a dev mode session
+ */
+export function isDevMode(context: AuthContext): boolean {
+  return context.apiKeyId === DEV_API_KEY_ID;
+}
 
 // =============================================================================
 // Scope Checks

@@ -31,3 +31,9 @@ export * from './schemas/index.js';
 
 // Re-export routes
 export * from './routes/index.js';
+
+// Re-export auth module
+export * from './auth/index.js';
+
+// Re-export middleware
+export { authMiddleware, requireScope } from './middleware/index.js';

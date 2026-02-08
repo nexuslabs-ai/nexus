@@ -101,6 +101,10 @@ function printBanner(config: ServerConfig) {
     ? 'Configured'
     : 'Not configured';
 
+  const auth = config.authEnabled
+    ? 'Enabled'
+    : 'Disabled (set AUTH_ENABLED=true for production)';
+
   console.log(`
 +=====================================================================+
 |                     Context Engine Server                           |
@@ -109,6 +113,7 @@ function printBanner(config: ServerConfig) {
 |  Environment: ${config.environment.padEnd(54)}|
 |  Port:        ${String(config.port).padEnd(54)}|
 |  Database:    ${dbHost.padEnd(54)}|
+|  Auth:        ${auth.padEnd(54)}|
 |  Embeddings:  ${embeddings.padEnd(54)}|
 +=====================================================================+
 `);

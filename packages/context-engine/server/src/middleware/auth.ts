@@ -13,7 +13,9 @@ import { createMiddleware } from 'hono/factory';
 import {
   AUTH_SCOPES,
   type AuthScope,
+  DEV_API_KEY_ID,
   hasScope,
+  isDevMode,
   validateApiKey,
 } from '../auth/index.js';
 import { getConfig } from '../config.js';
@@ -45,7 +47,7 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
 
     c.set('auth', {
       orgId,
-      apiKeyId: 'dev',
+      apiKeyId: DEV_API_KEY_ID,
       scopes: [...AUTH_SCOPES],
     });
 
@@ -75,6 +77,29 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   }
 
   c.set('auth', result.context);
+  await next();
+});
+
+// =============================================================================
+// Org Access Middleware
+// =============================================================================
+
+/**
+ * Middleware that validates the URL's `:orgId` matches the authenticated org.
+ *
+ * Registered at the app level for all org-scoped routes.
+ * Dev mode bypasses the check (all orgs accessible for local development).
+ *
+ * Must be mounted AFTER `authMiddleware` (requires `c.var.auth`).
+ */
+export const requireOrgAccess = createMiddleware<AppEnv>(async (c, next) => {
+  const auth = c.get('auth');
+  const orgId = c.req.param('orgId');
+
+  if (orgId && !isDevMode(auth) && orgId !== auth.orgId) {
+    throw forbidden('Access denied: cannot access another organization');
+  }
+
   await next();
 });
 

@@ -11,8 +11,14 @@ import { logger } from 'hono/logger';
 
 import { Environment, getConfig } from './config.js';
 import { ApiError } from './errors.js';
-import { repositoriesMiddleware } from './middleware/index.js';
 import {
+  authMiddleware,
+  repositoriesMiddleware,
+  requireOrgAccess,
+  requireScope,
+} from './middleware/index.js';
+import {
+  apiKeysRouter,
   componentsRouter,
   healthRouter,
   organizationsRouter,
@@ -33,6 +39,13 @@ import type { AppEnv } from './types.js';
 export function createApp() {
   const app = new OpenAPIHono<AppEnv>();
 
+  // === OpenAPI Security Scheme ===
+  app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
+    type: 'http',
+    scheme: 'bearer',
+    description: 'API key authentication. Format: Bearer ce_{key}',
+  });
+
   // === Global Middleware ===
   // CORS must be registered before routes per Hono best practices
   app.use('*', cors());
@@ -43,6 +56,18 @@ export function createApp() {
   // Access via c.var.organizationRepo, c.var.componentRepo, c.var.embeddingRepo
   app.use('/api/v1/*', repositoriesMiddleware);
 
+  // === Auth Middleware ===
+  // Validates API key from Authorization header and sets c.var.auth
+  // Dev mode (AUTH_ENABLED=false): bypasses auth, grants all scopes
+  // Production (AUTH_ENABLED=true): requires valid Bearer token
+  app.use('/api/v1/*', authMiddleware);
+
+  // === Org Access Middleware ===
+  // Validates URL :orgId matches authenticated org for all org-scoped routes.
+  // Dev mode bypasses (all orgs accessible for local development).
+  app.use('/api/v1/organizations/:orgId', requireOrgAccess);
+  app.use('/api/v1/organizations/:orgId/*', requireOrgAccess);
+
   // === Health Routes (at root) ===
   // /health - liveness check
   // /ready - readiness check with database connectivity
@@ -52,7 +77,7 @@ export function createApp() {
 
   // Organizations CRUD
   // GET/POST /api/v1/organizations
-  // GET/PATCH/DELETE /api/v1/organizations/:id
+  // GET/PATCH/DELETE /api/v1/organizations/:orgId
   app.route('/api/v1/organizations', organizationsRouter);
 
   // Components CRUD (nested under organization)
@@ -62,6 +87,12 @@ export function createApp() {
   // Semantic search (nested under organization)
   // POST /api/v1/organizations/:orgId/search
   app.route('/api/v1/organizations/:orgId/search', searchRouter);
+
+  // API Key management (requires admin scope)
+  // GET/POST /api/v1/organizations/:orgId/api-keys
+  // DELETE /api/v1/organizations/:orgId/api-keys/:keyId
+  app.use('/api/v1/organizations/:orgId/api-keys/*', requireScope('admin'));
+  app.route('/api/v1/organizations/:orgId/api-keys', apiKeysRouter);
 
   // === OpenAPI Documentation ===
   app.doc('/doc', {
@@ -77,6 +108,7 @@ export function createApp() {
       { name: 'Organizations', description: 'Organization management' },
       { name: 'Components', description: 'Component CRUD operations' },
       { name: 'Search', description: 'Semantic component search' },
+      { name: 'API Keys', description: 'API key management' },
     ],
   });
 

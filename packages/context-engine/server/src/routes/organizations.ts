@@ -7,6 +7,7 @@
 
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
+import { isDevMode } from '../auth/index.js';
 import { ApiError, conflict, notFound } from '../errors.js';
 import {
   CreateOrganizationSchema,
@@ -60,7 +61,7 @@ const listOrganizationsRoute = createRoute({
 
 const getOrganizationRoute = createRoute({
   method: 'get',
-  path: '/{id}',
+  path: '/{orgId}',
   tags: ['Organizations'],
   summary: 'Get organization by ID',
   description: 'Retrieve a single organization by its UUID.',
@@ -117,7 +118,7 @@ const createOrganizationRoute = createRoute({
 
 const updateOrganizationRoute = createRoute({
   method: 'patch',
-  path: '/{id}',
+  path: '/{orgId}',
   tags: ['Organizations'],
   summary: 'Update organization',
   description: 'Update an existing organization. All fields are optional.',
@@ -154,7 +155,7 @@ const updateOrganizationRoute = createRoute({
 
 const deleteOrganizationRoute = createRoute({
   method: 'delete',
-  path: '/{id}',
+  path: '/{orgId}',
   tags: ['Organizations'],
   summary: 'Delete organization',
   description:
@@ -197,7 +198,24 @@ const deleteOrganizationRoute = createRoute({
 organizationsRouter.openapi(listOrganizationsRoute, async (c) => {
   const repo = c.var.organizationRepo;
   const query = c.req.valid('query');
+  const auth = c.var.auth;
 
+  // When authenticated with a real API key, only return the key's org
+  if (!isDevMode(auth)) {
+    const org = await repo.findById(auth.orgId);
+    const organizations = org ? [formatDates(org)] : [];
+    return c.json(
+      successResponse({
+        organizations,
+        total: organizations.length,
+        limit: query.limit,
+        offset: query.offset,
+      }),
+      200
+    );
+  }
+
+  // Dev mode: return all orgs
   const result = await repo.findMany({
     limit: query.limit,
     offset: query.offset,
@@ -215,12 +233,13 @@ organizationsRouter.openapi(listOrganizationsRoute, async (c) => {
 });
 
 organizationsRouter.openapi(getOrganizationRoute, async (c) => {
-  const { id } = c.req.valid('param');
+  const { orgId } = c.req.valid('param');
   const repo = c.var.organizationRepo;
-  const org = await repo.findById(id);
+
+  const org = await repo.findById(orgId);
 
   if (!org) {
-    throw notFound('Organization', id);
+    throw notFound('Organization', orgId);
   }
 
   return c.json(successResponse(formatDates(org)), 200);
@@ -235,28 +254,28 @@ organizationsRouter.openapi(createOrganizationRoute, async (c) => {
 });
 
 organizationsRouter.openapi(updateOrganizationRoute, async (c) => {
-  const { id } = c.req.valid('param');
+  const { orgId } = c.req.valid('param');
   const body = c.req.valid('json');
   const repo = c.var.organizationRepo;
 
-  const org = await repo.update(id, body);
+  const org = await repo.update(orgId, body);
 
   if (!org) {
-    throw notFound('Organization', id);
+    throw notFound('Organization', orgId);
   }
 
   return c.json(successResponse(formatDates(org)), 200);
 });
 
 organizationsRouter.openapi(deleteOrganizationRoute, async (c) => {
-  const { id } = c.req.valid('param');
+  const { orgId } = c.req.valid('param');
   const repo = c.var.organizationRepo;
 
   try {
-    const deleted = await repo.delete(id);
+    const deleted = await repo.delete(orgId);
 
     if (!deleted) {
-      throw notFound('Organization', id);
+      throw notFound('Organization', orgId);
     }
 
     return c.json(successResponse({ deleted: true }), 200);
