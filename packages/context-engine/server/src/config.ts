@@ -18,6 +18,9 @@ const envSchema = z
       .enum(['development', 'production', 'test'])
       .default('development'),
     AUTH_ENABLED: z.enum(['true', 'false']).default('false'),
+    SERVER_LOG_LEVEL: z
+      .enum(['debug', 'info', 'warn', 'error', 'silent'])
+      .default('info'),
     API_KEY_HASH_SECRET: z.string().optional(),
   })
   .superRefine((data, ctx) => {
@@ -73,6 +76,8 @@ interface BaseConfig {
   environment: Environment;
   /** PostgreSQL connection string */
   databaseUrl: string;
+  /** Server log level */
+  logLevel: 'debug' | 'info' | 'warn' | 'error' | 'silent';
 }
 
 /**
@@ -119,6 +124,7 @@ export function loadConfig(): ServerConfig {
     port: result.data.PORT,
     environment: result.data.NODE_ENV,
     databaseUrl: result.data.DATABASE_URL,
+    logLevel: result.data.SERVER_LOG_LEVEL,
   };
 
   if (result.data.AUTH_ENABLED === 'true') {

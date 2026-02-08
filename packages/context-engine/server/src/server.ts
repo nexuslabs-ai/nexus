@@ -15,6 +15,7 @@ import { serve } from '@hono/node-server';
 import { createApp } from './app.js';
 import { loadConfig, type ServerConfig } from './config.js';
 import { SERVER_VERSION } from './constants.js';
+import { createServerLogger } from './logger.js';
 
 // =============================================================================
 // Server Startup
@@ -26,6 +27,7 @@ import { SERVER_VERSION } from './constants.js';
 async function startServer() {
   // Load config first (will throw if DATABASE_URL missing)
   const config = loadConfig();
+  const rootLogger = createServerLogger(config);
 
   // Initialize database connection
   initializeDatabase({
@@ -44,22 +46,23 @@ async function startServer() {
     port: config.port,
   });
 
-  console.log(`Server running at http://localhost:${config.port}`);
-  console.log(`API docs: http://localhost:${config.port}/ui`);
-  console.log(`OpenAPI spec: http://localhost:${config.port}/doc`);
+  rootLogger.info(
+    { port: config.port, docs: `/ui`, spec: `/doc` },
+    `Server running at http://localhost:${config.port}`
+  );
 
   // Setup graceful shutdown
   const shutdown = async (signal: string) => {
-    console.log(`\n${signal} received, shutting down gracefully...`);
+    rootLogger.info({ signal }, 'Shutting down gracefully');
 
     // Close the HTTP server (wait for connections to drain)
     await new Promise<void>((resolve, reject) => {
       server.close((err) => {
         if (err) {
-          console.error('Error closing HTTP server:', err);
+          rootLogger.error({ err }, 'Error closing HTTP server');
           reject(err);
         } else {
-          console.log('HTTP server closed');
+          rootLogger.info('HTTP server closed');
           resolve();
         }
       });
@@ -67,7 +70,7 @@ async function startServer() {
 
     // Close database connection
     await closeDatabase();
-    console.log('Database connection closed');
+    rootLogger.info('Database connection closed');
 
     process.exit(0);
   };

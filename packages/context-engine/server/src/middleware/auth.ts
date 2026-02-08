@@ -72,11 +72,22 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   );
 
   if (!result.success) {
-    console.warn(`[auth] Authentication failed: ${result.error}`);
+    c.var.logger.warn({ reason: result.error }, 'Authentication failed');
     throw unauthorized(result.error);
   }
 
   c.set('auth', result.context);
+
+  // Fire-and-forget: track key usage (operational concern, not validation)
+  apiKeyRepo
+    .touchLastUsed(result.context.apiKeyId)
+    .catch((err: unknown) =>
+      c.var.logger.warn(
+        { err: err instanceof Error ? err.message : String(err) },
+        'Failed to update lastUsedAt'
+      )
+    );
+
   await next();
 });
 

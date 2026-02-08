@@ -7,10 +7,11 @@
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
+import { pinoLogger } from 'hono-pino';
 
 import { Environment, getConfig } from './config.js';
 import { ApiError } from './errors.js';
+import { createServerLogger } from './logger.js';
 import {
   authMiddleware,
   repositoriesMiddleware,
@@ -49,7 +50,37 @@ export function createApp() {
   // === Global Middleware ===
   // CORS must be registered before routes per Hono best practices
   app.use('*', cors());
-  app.use('*', logger());
+
+  // === Structured Logging ===
+  // Request-scoped logger with method, path, status, duration.
+  // Access via c.var.logger in handlers and middleware.
+  const config = getConfig();
+  const rootLogger = createServerLogger(config);
+
+  app.use(
+    pinoLogger({
+      pino: rootLogger,
+      http: {
+        onResLevel: (c) => {
+          if (c.res.status >= 500) return 'error';
+          if (c.res.status >= 400) return 'warn';
+          return 'info';
+        },
+        onReqBindings: (c) => ({
+          req: {
+            method: c.req.method,
+            url: c.req.path,
+          },
+        }),
+        onResBindings: (c) => ({
+          res: {
+            status: c.res.status,
+          },
+        }),
+        responseTime: true,
+      },
+    })
+  );
 
   // === Repository DI Middleware ===
   // Injects repositories into context for all API v1 routes
@@ -150,7 +181,15 @@ export function createApp() {
     }
 
     // Handle unknown errors
-    console.error('[Server Error]', err);
+    c.var.logger.error(
+      {
+        err:
+          err instanceof Error
+            ? { message: err.message, stack: err.stack }
+            : err,
+      },
+      'Unhandled server error'
+    );
     const config = getConfig();
     const isDevelopment = config.environment === Environment.Development;
 

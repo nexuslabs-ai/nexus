@@ -11,6 +11,7 @@ import type {
   EmbeddingRepository,
   OrganizationRepository,
 } from '@context-engine/db';
+import type { PinoLogger } from 'hono-pino';
 
 import type { AuthContext } from './auth/index.js';
 
@@ -69,6 +70,21 @@ export interface AuthVariables {
 }
 
 // =============================================================================
+// Logger Variable Types
+// =============================================================================
+
+/**
+ * Logger variables injected via hono-pino middleware.
+ */
+export interface LoggerVariables {
+  /**
+   * Request-scoped structured logger.
+   * Available on all routes after the pinoLogger middleware.
+   */
+  logger: PinoLogger;
+}
+
+// =============================================================================
 // App Environment Types
 // =============================================================================
 
@@ -80,5 +96,5 @@ export interface AuthVariables {
  * and authenticated context.
  */
 export interface AppEnv {
-  Variables: RepositoryVariables & AuthVariables;
+  Variables: RepositoryVariables & AuthVariables & LoggerVariables;
 }

@@ -79,8 +79,7 @@ export function hashApiKey(rawKey: string, secret: string): string {
  * 1. Check key format (must start with `ce_`)
  * 2. Hash the key and look up in database
  * 3. Timing-safe comparison of stored vs computed hash
- * 4. Fire-and-forget lastUsedAt update
- * 5. Filter scopes to known valid values
+ * 4. Filter scopes to known valid values
  *
  * @param token - The raw API key from the request
  * @param secret - Server-side HMAC secret for hashing
@@ -118,17 +117,7 @@ export async function validateApiKey(
     return { success: false, error: 'Invalid or missing API key' };
   }
 
-  // Step 4: Fire-and-forget lastUsedAt update
-  apiKeyRepo
-    .touchLastUsed(apiKey.id)
-    .catch((err: unknown) =>
-      console.warn(
-        '[auth] Failed to update lastUsedAt:',
-        err instanceof Error ? err.message : String(err)
-      )
-    );
-
-  // Step 5: Filter scopes to known valid values
+  // Step 4: Filter scopes to known valid values
   const validScopes = (apiKey.scopes as string[]).filter((s): s is AuthScope =>
     (AUTH_SCOPES as readonly string[]).includes(s)
   );
