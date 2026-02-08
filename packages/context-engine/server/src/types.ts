@@ -6,10 +6,13 @@
  */
 
 import type {
+  ApiKeyRepository,
   ComponentRepository,
   EmbeddingRepository,
   OrganizationRepository,
 } from '@context-engine/db';
+
+import type { AuthContext } from './auth/index.js';
 
 // =============================================================================
 // Context Variable Types
@@ -40,6 +43,29 @@ export interface RepositoryVariables {
    * Check availability with `c.var.embeddingRepo !== undefined`.
    */
   embeddingRepo: EmbeddingRepository | undefined;
+
+  /**
+   * Repository for API key CRUD and lookup operations.
+   * Always available for `/api/v1/*` routes.
+   */
+  apiKeyRepo: ApiKeyRepository;
+}
+
+// =============================================================================
+// Auth Variable Types
+// =============================================================================
+
+/**
+ * Auth variables injected via auth middleware.
+ *
+ * Available on `c.var` in route handlers after the auth middleware has run.
+ */
+export interface AuthVariables {
+  /**
+   * Authenticated context for the current request.
+   * Contains the org ID, API key ID, and validated scopes.
+   */
+  auth: AuthContext;
 }
 
 // =============================================================================
@@ -50,8 +76,9 @@ export interface RepositoryVariables {
  * Environment type for the app.
  *
  * Extends Hono's Env type to include our custom context variables.
- * Use this when creating middleware or handlers that need access to repositories.
+ * Use this when creating middleware or handlers that need access to repositories
+ * and authenticated context.
  */
 export interface AppEnv {
-  Variables: RepositoryVariables;
+  Variables: RepositoryVariables & AuthVariables;
 }

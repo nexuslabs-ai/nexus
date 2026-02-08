@@ -12,6 +12,8 @@ type ErrorCode =
   | 'NOT_FOUND'
   | 'VALIDATION_ERROR'
   | 'CONFLICT'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
   | 'SERVICE_UNAVAILABLE'
   | 'INTERNAL_ERROR';
 
@@ -73,3 +75,19 @@ export const serviceUnavailable = (message: string, details?: unknown) =>
  */
 export const validationError = (message: string, details?: unknown) =>
   new ApiError(400, 'VALIDATION_ERROR', message, details);
+
+/**
+ * 401 Unauthorized — missing or invalid authentication.
+ * Use when a request lacks valid credentials.
+ * @param message - Description of the auth failure
+ */
+export const unauthorized = (message = 'Authentication required') =>
+  new ApiError(401, 'UNAUTHORIZED', message);
+
+/**
+ * 403 Forbidden — valid auth but insufficient permissions.
+ * Use when the caller is authenticated but lacks the required scope.
+ * @param message - Description of what permission is missing
+ */
+export const forbidden = (message = 'Insufficient permissions') =>
+  new ApiError(403, 'FORBIDDEN', message);

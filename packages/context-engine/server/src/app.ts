@@ -9,7 +9,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 
-import { getConfig } from './config.js';
+import { Environment, getConfig } from './config.js';
 import { ApiError } from './errors.js';
 import { repositoriesMiddleware } from './middleware/index.js';
 import {
@@ -119,7 +119,7 @@ export function createApp() {
     // Handle unknown errors
     console.error('[Server Error]', err);
     const config = getConfig();
-    const isDevelopment = config.environment === 'development';
+    const isDevelopment = config.environment === Environment.Development;
 
     return c.json(
       {

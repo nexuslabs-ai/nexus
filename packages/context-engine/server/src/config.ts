@@ -10,13 +10,36 @@ import { z } from '@hono/zod-openapi';
 /**
  * Environment variable schema with validation and coercion
  */
-const envSchema = z.object({
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
-  NODE_ENV: z
-    .enum(['development', 'production', 'test'])
-    .default('development'),
-});
+const envSchema = z
+  .object({
+    DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+    PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+    NODE_ENV: z
+      .enum(['development', 'production', 'test'])
+      .default('development'),
+    AUTH_ENABLED: z.enum(['true', 'false']).default('false'),
+    API_KEY_HASH_SECRET: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.AUTH_ENABLED === 'true' && !data.API_KEY_HASH_SECRET) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'API_KEY_HASH_SECRET is required when AUTH_ENABLED is true',
+        path: ['API_KEY_HASH_SECRET'],
+      });
+    }
+
+    if (
+      data.NODE_ENV === Environment.Production &&
+      data.AUTH_ENABLED !== 'true'
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'AUTH_ENABLED must be true in production',
+        path: ['AUTH_ENABLED'],
+      });
+    }
+  });
 
 /**
  * Runtime environment types
@@ -39,6 +62,10 @@ export interface ServerConfig {
   environment: Environment;
   /** PostgreSQL connection string */
   databaseUrl: string;
+  /** Whether authentication is enabled */
+  authEnabled: boolean;
+  /** Secret used to HMAC-hash API keys (required when authEnabled is true) */
+  apiKeyHashSecret: string | undefined;
 }
 
 /**
@@ -61,6 +88,8 @@ export function loadConfig(): ServerConfig {
     port: result.data.PORT,
     environment: result.data.NODE_ENV,
     databaseUrl: result.data.DATABASE_URL,
+    authEnabled: result.data.AUTH_ENABLED === 'true',
+    apiKeyHashSecret: result.data.API_KEY_HASH_SECRET,
   };
 }
 
