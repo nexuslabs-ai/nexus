@@ -44,6 +44,7 @@ const listOrganizationsRoute = createRoute({
   tags: ['Organizations'],
   summary: 'List all organizations',
   description: 'Retrieve a paginated list of all organizations.',
+  security: [{ Bearer: [] }],
   request: {
     query: PaginationQuerySchema,
   },
@@ -65,6 +66,7 @@ const getOrganizationRoute = createRoute({
   tags: ['Organizations'],
   summary: 'Get organization by ID',
   description: 'Retrieve a single organization by its UUID.',
+  security: [{ Bearer: [] }],
   request: {
     params: OrgIdParamSchema,
   },
@@ -94,6 +96,7 @@ const createOrganizationRoute = createRoute({
   tags: ['Organizations'],
   summary: 'Create organization',
   description: 'Create a new organization.',
+  security: [{ Bearer: [] }],
   request: {
     body: {
       content: {
@@ -122,6 +125,7 @@ const updateOrganizationRoute = createRoute({
   tags: ['Organizations'],
   summary: 'Update organization',
   description: 'Update an existing organization. All fields are optional.',
+  security: [{ Bearer: [] }],
   request: {
     params: OrgIdParamSchema,
     body: {
@@ -160,6 +164,7 @@ const deleteOrganizationRoute = createRoute({
   summary: 'Delete organization',
   description:
     'Delete an organization by ID. Will fail if organization has associated components.',
+  security: [{ Bearer: [] }],
   request: {
     params: OrgIdParamSchema,
   },

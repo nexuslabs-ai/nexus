@@ -116,6 +116,7 @@ const listComponentsRoute = createRoute({
   summary: 'List components',
   description:
     'List components for an organization with optional filtering, pagination, and sorting.',
+  security: [{ Bearer: [] }],
   request: {
     params: OrgIdPathParamSchema,
     query: ListComponentsQuerySchema,
@@ -157,6 +158,7 @@ const getComponentByIdRoute = createRoute({
   tags: ['Components'],
   summary: 'Get component by ID',
   description: 'Retrieve a single component by its UUID.',
+  security: [{ Bearer: [] }],
   request: {
     params: ComponentIdParamSchema,
   },
@@ -197,6 +199,7 @@ const getComponentBySlugRoute = createRoute({
   tags: ['Components'],
   summary: 'Get component by slug',
   description: 'Retrieve a single component by its URL-friendly slug.',
+  security: [{ Bearer: [] }],
   request: {
     params: ComponentSlugParamSchema,
   },
@@ -238,6 +241,7 @@ const createComponentRoute = createRoute({
   summary: 'Create or update component',
   description:
     'Create a new component or update an existing one by slug. Returns 201 if created, 200 if updated.',
+  security: [{ Bearer: [] }],
   request: {
     params: OrgIdPathParamSchema,
     body: {
@@ -294,6 +298,7 @@ const updateComponentRoute = createRoute({
   tags: ['Components'],
   summary: 'Update component',
   description: 'Partially update an existing component by ID.',
+  security: [{ Bearer: [] }],
   request: {
     params: ComponentIdParamSchema,
     body: {
@@ -351,6 +356,7 @@ const deleteComponentRoute = createRoute({
   summary: 'Delete component',
   description:
     'Delete a component by ID. This also deletes associated embedding chunks.',
+  security: [{ Bearer: [] }],
   request: {
     params: ComponentIdParamSchema,
   },
@@ -392,6 +398,7 @@ const indexComponentRoute = createRoute({
   summary: 'Index component for search',
   description:
     'Generate embeddings for a component to enable semantic search. Requires VOYAGE_API_KEY to be configured.',
+  security: [{ Bearer: [] }],
   request: {
     params: ComponentIdParamSchema,
   },

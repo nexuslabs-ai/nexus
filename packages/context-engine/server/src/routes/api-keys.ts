@@ -58,6 +58,7 @@ const createApiKeyRoute = createRoute({
   summary: 'Create API key',
   description:
     'Create a new API key for the organization. The raw key is returned ONLY in this response — store it securely.',
+  security: [{ Bearer: [] }],
   request: {
     params: OrgIdPathParamSchema,
     body: {
@@ -107,6 +108,7 @@ const listApiKeysRoute = createRoute({
   summary: 'List API keys',
   description:
     'List all API keys for the organization. The raw key is never returned in list responses.',
+  security: [{ Bearer: [] }],
   request: {
     params: OrgIdPathParamSchema,
   },
@@ -140,6 +142,7 @@ const revokeApiKeyRoute = createRoute({
   summary: 'Revoke API key',
   description:
     'Revoke an API key by setting it to inactive. Revoked keys can no longer authenticate.',
+  security: [{ Bearer: [] }],
   request: {
     params: ApiKeyIdParamSchema,
   },

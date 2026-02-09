@@ -39,6 +39,7 @@ const searchRoute = createRoute({
   summary: 'Search components',
   description:
     'Semantic search for components using natural language queries. Requires VOYAGE_API_KEY to be configured for embedding generation.',
+  security: [{ Bearer: [] }],
   request: {
     params: SearchParamsSchema,
     body: {
