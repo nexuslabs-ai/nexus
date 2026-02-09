@@ -24,6 +24,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@context-engine/core": "*",
     "@context-engine/db": "*",
     "@hono/node-server": "^1.14.1",
     "@hono/swagger-ui": "^0.5.1",
