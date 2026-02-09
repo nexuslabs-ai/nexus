@@ -16,7 +16,7 @@ import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import type { AuthScope } from '../auth/auth-types.js';
 import { generateApiKey, hashApiKey } from '../auth/auth-validator.js';
 import { getConfig } from '../config.js';
-import { notFound, serviceUnavailable } from '../errors.js';
+import { notFound } from '../errors.js';
 import {
   ApiKeyIdParamSchema,
   ApiKeyListSchema,
@@ -199,13 +199,6 @@ apiKeysRouter.openapi(createApiKeyRoute, async (c) => {
   const org = await organizationRepo.findById(orgId);
   if (!org) {
     throw notFound('Organization', orgId);
-  }
-
-  if (!config.authEnabled) {
-    throw serviceUnavailable(
-      'API key creation unavailable',
-      'Authentication is not enabled'
-    );
   }
 
   // Generate key and hash

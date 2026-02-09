@@ -7,8 +7,8 @@
 
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
-import { isDevMode } from '../auth/index.js';
-import { ApiError, conflict, notFound } from '../errors.js';
+import { isPlatform, isTenant } from '../auth/index.js';
+import { ApiError, conflict, forbidden, notFound } from '../errors.js';
 import {
   CreateOrganizationSchema,
   DeleteOrganizationResponseSchema,
@@ -200,8 +200,8 @@ organizationsRouter.openapi(listOrganizationsRoute, async (c) => {
   const query = c.req.valid('query');
   const auth = c.var.auth;
 
-  // When authenticated with a real API key, only return the key's org
-  if (!isDevMode(auth)) {
+  // Tenant context: only return the key's own org
+  if (isTenant(auth)) {
     const org = await repo.findById(auth.orgId);
     const organizations = org ? [formatDates(org)] : [];
     return c.json(
@@ -215,7 +215,7 @@ organizationsRouter.openapi(listOrganizationsRoute, async (c) => {
     );
   }
 
-  // Dev mode: return all orgs
+  // Platform context: return all orgs
   const result = await repo.findMany({
     limit: query.limit,
     offset: query.offset,
@@ -246,6 +246,12 @@ organizationsRouter.openapi(getOrganizationRoute, async (c) => {
 });
 
 organizationsRouter.openapi(createOrganizationRoute, async (c) => {
+  const auth = c.var.auth;
+
+  if (!isPlatform(auth)) {
+    throw forbidden('Organization creation requires platform admin');
+  }
+
   const body = c.req.valid('json');
   const repo = c.var.organizationRepo;
   const org = await repo.create({ name: body.name });
