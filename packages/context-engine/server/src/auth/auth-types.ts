@@ -23,6 +23,15 @@ export const AuthKind = {
 
 export type AuthKind = (typeof AuthKind)[keyof typeof AuthKind];
 
+/** Token kind discriminator values for prefix-based detection */
+export const TokenKind = {
+  TenantApiKey: 'tenant-api-key',
+  PlatformToken: 'platform-token',
+  Unknown: 'unknown',
+} as const;
+
+export type TokenKind = (typeof TokenKind)[keyof typeof TokenKind];
+
 // =============================================================================
 // Scopes
 // =============================================================================

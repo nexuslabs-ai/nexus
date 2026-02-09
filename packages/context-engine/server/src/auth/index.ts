@@ -5,9 +5,11 @@
  * Zero Hono dependency — consumed by both HTTP API and MCP Streamable HTTP.
  *
  * Exports:
- * - Types: AuthScope, PlatformScope, AuthContext, TenantAuthContext, PlatformAuthContext, AuthResult
- * - Constants: AUTH_SCOPES, DEV_API_KEY_ID
+ * - Types: AuthScope, PlatformScope, TokenKind, AuthContext, TenantAuthContext, PlatformAuthContext, AuthResult
+ * - Constants: AUTH_SCOPES, DEV_API_KEY_ID, AuthKind
+ * - Token detection: detectTokenKind
  * - Key management: generateApiKey, hashApiKey, validateApiKey
+ * - Platform validation: validatePlatformToken
  * - Authorization: hasScope, hasAllScopes
  */
 
