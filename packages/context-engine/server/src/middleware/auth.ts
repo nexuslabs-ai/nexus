@@ -2,8 +2,13 @@
  * Auth Middleware
  *
  * Bridges the transport-agnostic auth core to Hono's HTTP layer.
- * Extracts credentials from the Authorization header, validates via the
- * auth module, and sets the authenticated context on `c.var.auth`.
+ * Extracts credentials from the Authorization header, detects the token kind,
+ * validates via the appropriate strategy, and sets `c.var.auth`.
+ *
+ * Token routing:
+ * - `ce_`  prefix  -> Tenant API key (HMAC-SHA256 validated against database)
+ * - `cep_` prefix  -> Platform admin token (constant-time comparison)
+ * - Other          -> Rejected as unknown format
  *
  * Must be mounted AFTER the repositories middleware (requires `c.var.apiKeyRepo`).
  */
@@ -11,12 +16,15 @@
 import { createMiddleware } from 'hono/factory';
 
 import {
-  AUTH_SCOPES,
   type AuthScope,
-  DEV_API_KEY_ID,
+  detectTokenKind,
+  getOrgId,
   hasScope,
-  isDevMode,
+  isPlatform,
+  isTenant,
+  TokenKind,
   validateApiKey,
+  validatePlatformToken,
 } from '../auth/index.js';
 import { getConfig } from '../config.js';
 import { forbidden, unauthorized } from '../errors.js';
@@ -29,33 +37,21 @@ import type { AppEnv } from '../types.js';
 /**
  * Main authentication middleware.
  *
- * **Dev mode** (AUTH_ENABLED=false):
- * - Extracts `orgId` from the URL path param if available
- * - Grants all scopes for local development
+ * Expects `Authorization: Bearer <token>` on every request.
+ * Detects the token kind by prefix and delegates to the appropriate validator:
  *
- * **Production** (AUTH_ENABLED=true):
- * - Expects `Authorization: Bearer <api_key>` header
- * - Validates the key against the database via HMAC-SHA256
- * - Sets `c.var.auth` with the authenticated context
+ * - **Tenant API key** (`ce_`): validated via HMAC-SHA256 against the database.
+ *   Sets a tenant auth context with `orgId`, `apiKeyId`, and scopes.
+ *   Fires a non-blocking `touchLastUsed` for usage tracking.
+ *
+ * - **Platform token** (`cep_`): validated via constant-time comparison against
+ *   the server-configured expected token. Sets a platform auth context.
+ *
+ * - **Unknown**: rejects with 401 for unrecognized token formats.
  */
 export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   const config = getConfig();
 
-  // Dev mode: bypass authentication, grant full access
-  if (!config.authEnabled) {
-    const orgId = c.req.param('orgId') ?? 'dev';
-
-    c.set('auth', {
-      orgId,
-      apiKeyId: DEV_API_KEY_ID,
-      scopes: [...AUTH_SCOPES],
-    });
-
-    await next();
-    return;
-  }
-
-  // Production mode: validate Bearer token
   const authHeader = c.req.header('Authorization');
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -63,30 +59,55 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   }
 
   const token = authHeader.slice('Bearer '.length);
-  const apiKeyRepo = c.var.apiKeyRepo;
+  const kind = detectTokenKind(token);
 
-  const result = await validateApiKey(
-    token,
-    config.apiKeyHashSecret,
-    apiKeyRepo
-  );
+  switch (kind) {
+    case TokenKind.TenantApiKey: {
+      const apiKeyRepo = c.var.apiKeyRepo;
+      const result = await validateApiKey(
+        token,
+        config.apiKeyHashSecret,
+        apiKeyRepo
+      );
 
-  if (!result.success) {
-    c.var.logger.warn({ reason: result.error }, 'Authentication failed');
-    throw unauthorized(result.error);
+      if (!result.success) {
+        c.var.logger.warn({ reason: result.error }, 'Authentication failed');
+        throw unauthorized(result.error);
+      }
+
+      c.set('auth', result.context);
+
+      // Fire-and-forget: track key usage (operational concern, not validation)
+      if (isTenant(result.context)) {
+        apiKeyRepo
+          .touchLastUsed(result.context.apiKeyId)
+          .catch((err: unknown) =>
+            c.var.logger.warn(
+              { err: err instanceof Error ? err.message : String(err) },
+              'Failed to update lastUsedAt'
+            )
+          );
+      }
+
+      break;
+    }
+
+    case TokenKind.PlatformToken: {
+      const result = validatePlatformToken(token, config.platformToken);
+
+      if (!result.success) {
+        c.var.logger.warn({ reason: result.error }, 'Authentication failed');
+        throw unauthorized(result.error);
+      }
+
+      c.set('auth', result.context);
+      break;
+    }
+
+    case TokenKind.Unknown: {
+      throw unauthorized('Invalid token format');
+    }
   }
-
-  c.set('auth', result.context);
-
-  // Fire-and-forget: track key usage (operational concern, not validation)
-  apiKeyRepo
-    .touchLastUsed(result.context.apiKeyId)
-    .catch((err: unknown) =>
-      c.var.logger.warn(
-        { err: err instanceof Error ? err.message : String(err) },
-        'Failed to update lastUsedAt'
-      )
-    );
 
   await next();
 });
@@ -99,15 +120,25 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
  * Middleware that validates the URL's `:orgId` matches the authenticated org.
  *
  * Registered at the app level for all org-scoped routes.
- * Dev mode bypasses the check (all orgs accessible for local development).
+ *
+ * - **Platform context**: bypassed — platform tokens can access any organization.
+ * - **Tenant context**: the URL's `orgId` must match the authenticated org's `orgId`.
  *
  * Must be mounted AFTER `authMiddleware` (requires `c.var.auth`).
  */
 export const requireOrgAccess = createMiddleware<AppEnv>(async (c, next) => {
   const auth = c.get('auth');
-  const orgId = c.req.param('orgId');
 
-  if (orgId && !isDevMode(auth) && orgId !== auth.orgId) {
+  // Platform context can access any organization
+  if (isPlatform(auth)) {
+    await next();
+    return;
+  }
+
+  const orgId = c.req.param('orgId');
+  const authOrgId = getOrgId(auth);
+
+  if (orgId && orgId !== authOrgId) {
     throw forbidden('Access denied: cannot access another organization');
   }
 
@@ -119,11 +150,15 @@ export const requireOrgAccess = createMiddleware<AppEnv>(async (c, next) => {
 // =============================================================================
 
 /**
- * Middleware factory that requires a specific scope on the authenticated context.
+ * Middleware factory that requires a specific tenant scope on the authenticated context.
+ *
+ * - **Platform context**: bypassed — platform operates at a higher permission level
+ *   and is not subject to tenant scope checks.
+ * - **Tenant context**: checks that the API key has the required scope (or `admin`).
  *
  * Must be mounted AFTER `authMiddleware` (requires `c.var.auth`).
  *
- * @param scope - The scope the request must have
+ * @param scope - The tenant scope the request must have
  * @returns Hono middleware that throws 403 if the scope is missing
  *
  * @example
@@ -137,6 +172,12 @@ export const requireOrgAccess = createMiddleware<AppEnv>(async (c, next) => {
 export function requireScope(scope: AuthScope) {
   return createMiddleware<AppEnv>(async (c, next) => {
     const auth = c.get('auth');
+
+    // Platform context bypasses tenant scope checks
+    if (isPlatform(auth)) {
+      await next();
+      return;
+    }
 
     if (!hasScope(auth, scope)) {
       throw forbidden(`Requires '${scope}' scope`);
