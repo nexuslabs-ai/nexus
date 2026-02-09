@@ -308,17 +308,7 @@ export const apiKeys = pgTable(
     keyPrefix: varchar('key_prefix', { length: 8 }).notNull(),
 
     /** Array of permission scopes granted to this key */
-    scopes: jsonb('scopes')
-      .$type<
-        (
-          | 'component:read'
-          | 'component:write'
-          | 'component:delete'
-          | 'embedding:manage'
-          | 'admin'
-        )[]
-      >()
-      .notNull(),
+    scopes: jsonb('scopes').$type<string[]>().notNull(),
 
     /** Hash algorithm version for future migration support */
     hashVersion: integer('hash_version').notNull().default(1),

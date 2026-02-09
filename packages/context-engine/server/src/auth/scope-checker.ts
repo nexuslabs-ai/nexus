@@ -132,6 +132,13 @@ export function hasScope(context: AuthContext, scope: AuthScope): boolean {
  * Platform contexts always return `false` — platform authorization
  * is a separate permission domain handled at the middleware level.
  *
+ * **Note on empty scopes:** When `scopes` is an empty array, this returns
+ * `true` for any tenant context. This is intentional — an empty list means
+ * "no required scopes", i.e. no restriction beyond being a valid tenant.
+ * This follows from `Array.every()` returning `true` on empty arrays
+ * (vacuous truth) and matches the semantic: "the context satisfies all
+ * zero requirements."
+ *
  * @param context - The authenticated context from API key validation
  * @param scopes - Array of tenant scopes that are all required
  * @returns `true` if the context has all required scopes

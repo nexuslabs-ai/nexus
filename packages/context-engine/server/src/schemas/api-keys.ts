@@ -157,14 +157,6 @@ export const ApiKeyListSchema = z
         example: 3,
         description: 'Total number of API keys',
       }),
-      limit: z.number().int().openapi({
-        example: 3,
-        description: 'Number of results returned',
-      }),
-      offset: z.number().int().openapi({
-        example: 0,
-        description: 'Offset from start of results',
-      }),
     }),
   })
   .openapi('ApiKeyList');

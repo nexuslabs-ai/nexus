@@ -242,8 +242,6 @@ apiKeysRouter.openapi(listApiKeysRoute, async (c) => {
     successResponse({
       apiKeys: keys.map(formatApiKey),
       total: keys.length,
-      limit: keys.length,
-      offset: 0,
     }),
     200
   );

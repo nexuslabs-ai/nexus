@@ -135,6 +135,7 @@ export const requireOrgAccess = createMiddleware<AppEnv>(async (c, next) => {
     return;
   }
 
+  // Assumes route has an :orgId param. If absent, orgId is undefined and the check is a no-op by design.
   const orgId = c.req.param('orgId');
   const authOrgId = getOrgId(auth);
 
