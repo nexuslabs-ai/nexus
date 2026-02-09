@@ -21,28 +21,39 @@ const envSchema = z
     SERVER_LOG_LEVEL: z
       .enum(['debug', 'info', 'warn', 'error', 'silent'])
       .default('info'),
-    API_KEY_HASH_SECRET: z.string().optional(),
+    API_KEY_HASH_SECRET: z
+      .string()
+      .min(
+        32,
+        'API_KEY_HASH_SECRET must be at least 32 characters (NIST SP 800-224)'
+      )
+      .optional(),
+    CE_PLATFORM_TOKEN: z
+      .string()
+      .min(32, 'CE_PLATFORM_TOKEN must be at least 32 characters')
+      .startsWith('cep_', 'CE_PLATFORM_TOKEN must start with "cep_" prefix')
+      .optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.AUTH_ENABLED === 'true' && !data.API_KEY_HASH_SECRET) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'API_KEY_HASH_SECRET is required when AUTH_ENABLED is true',
-        path: ['API_KEY_HASH_SECRET'],
-      });
-    } else if (
-      data.AUTH_ENABLED === 'true' &&
-      data.API_KEY_HASH_SECRET &&
-      data.API_KEY_HASH_SECRET.length < 32
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          'API_KEY_HASH_SECRET must be at least 32 characters (NIST SP 800-224)',
-        path: ['API_KEY_HASH_SECRET'],
-      });
+    // Cross-field: auth-enabled requires secrets
+    if (data.AUTH_ENABLED === 'true') {
+      if (!data.API_KEY_HASH_SECRET) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'API_KEY_HASH_SECRET is required when AUTH_ENABLED is true',
+          path: ['API_KEY_HASH_SECRET'],
+        });
+      }
+      if (!data.CE_PLATFORM_TOKEN) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'CE_PLATFORM_TOKEN is required when AUTH_ENABLED is true',
+          path: ['CE_PLATFORM_TOKEN'],
+        });
+      }
     }
 
+    // Cross-field: production requires auth
     if (
       data.NODE_ENV === Environment.Production &&
       data.AUTH_ENABLED !== 'true'
@@ -67,9 +78,15 @@ export const Environment = {
 export type Environment = (typeof Environment)[keyof typeof Environment];
 
 /**
- * Base server configuration shared across all auth modes
+ * Server configuration.
+ *
+ * `authEnabled` controls whether the auth middleware enforces token
+ * validation (production) or bypasses it (dev mode). The secrets
+ * `apiKeyHashSecret` and `platformToken` can be provided independently —
+ * they are required when auth is enabled, but can also be set in dev mode
+ * to enable features like API key creation during local development.
  */
-interface BaseConfig {
+export interface ServerConfig {
   /** Server port */
   port: number;
   /** Runtime environment */
@@ -78,31 +95,13 @@ interface BaseConfig {
   databaseUrl: string;
   /** Server log level */
   logLevel: 'debug' | 'info' | 'warn' | 'error' | 'silent';
-}
-
-/**
- * Configuration when authentication is disabled (dev mode)
- */
-interface AuthDisabledConfig extends BaseConfig {
-  authEnabled: false;
-}
-
-/**
- * Configuration when authentication is enabled (production)
- */
-interface AuthEnabledConfig extends BaseConfig {
-  authEnabled: true;
+  /** Whether authentication is enabled */
+  authEnabled: boolean;
   /** Secret used to HMAC-hash API keys (>= 32 chars, per NIST SP 800-224) */
-  apiKeyHashSecret: string;
+  apiKeyHashSecret?: string;
+  /** Platform token for internal service authentication (must start with "cep_") */
+  platformToken?: string;
 }
-
-/**
- * Server configuration — discriminated union keyed on `authEnabled`.
- *
- * When `authEnabled` is `true`, `apiKeyHashSecret` is guaranteed to be a string.
- * When `authEnabled` is `false`, `apiKeyHashSecret` does not exist on the type.
- */
-export type ServerConfig = AuthDisabledConfig | AuthEnabledConfig;
 
 /**
  * Load configuration from environment variables.
@@ -120,22 +119,15 @@ export function loadConfig(): ServerConfig {
     throw new Error(`Configuration error: ${errors}`);
   }
 
-  const base: BaseConfig = {
+  return {
     port: result.data.PORT,
     environment: result.data.NODE_ENV,
     databaseUrl: result.data.DATABASE_URL,
     logLevel: result.data.SERVER_LOG_LEVEL,
+    authEnabled: result.data.AUTH_ENABLED === 'true',
+    apiKeyHashSecret: result.data.API_KEY_HASH_SECRET,
+    platformToken: result.data.CE_PLATFORM_TOKEN,
   };
-
-  if (result.data.AUTH_ENABLED === 'true') {
-    return {
-      ...base,
-      authEnabled: true,
-      apiKeyHashSecret: result.data.API_KEY_HASH_SECRET!,
-    };
-  }
-
-  return { ...base, authEnabled: false };
 }
 
 /**

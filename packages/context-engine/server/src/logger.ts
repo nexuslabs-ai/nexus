@@ -24,6 +24,7 @@ const REDACT_PATHS = [
   '*.apiKey',
   '*.keyHash',
   '*.apiKeyHashSecret',
+  '*.platformToken',
 ];
 
 function isPinoPrettyAvailable(): boolean {
