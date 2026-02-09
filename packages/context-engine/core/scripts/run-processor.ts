@@ -145,8 +145,7 @@ Available Components:
 
 Environment Variables:
   CONTEXT_ENGINE_PROVIDER   Provider to use: 'anthropic' (default) or 'gemini'
-  ANTHROPIC_API_KEY         Required for Anthropic provider
-  GOOGLE_API_KEY            Required for Gemini provider
+  LLM_API_KEY               API key for the selected provider
 
   Config is loaded from packages/context-engine/core/.env.test
 `);

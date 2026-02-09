@@ -10,7 +10,7 @@
  * Throws MetaGenerationError on failure instead of returning failure objects.
  *
  * Configuration is read from environment variables via the config module:
- * - GOOGLE_API_KEY: API key (required)
+ * - LLM_API_KEY: API key (required, provider-agnostic)
  * - GEMINI_MODEL: Model identifier (provider-specific, preferred)
  * - CONTEXT_ENGINE_MODEL: Model identifier (generic fallback)
  * - CONTEXT_ENGINE_MAX_TOKENS: Max tokens for completion
@@ -145,7 +145,7 @@ function convertToGeminiSchema(
  * @example
  * ```typescript
  * const provider = new GeminiProvider({
- *   apiKey: process.env.GOOGLE_API_KEY,
+ *   apiKey: process.env.LLM_API_KEY,
  *   // model defaults to DEFAULT_GEMINI_MODEL constant
  * });
  *
@@ -171,11 +171,11 @@ export class GeminiProvider implements ILLMProvider {
 
   constructor(config: GeminiProviderConfig = {}) {
     const defaults = getDefaults();
-    const apiKey = config.apiKey ?? process.env.GOOGLE_API_KEY;
+    const apiKey = config.apiKey ?? process.env.LLM_API_KEY;
 
     if (!apiKey) {
       throw new Error(
-        'Google API key is required. Provide via config.apiKey or GOOGLE_API_KEY environment variable.'
+        'Gemini API key is required. Provide via config.apiKey or LLM_API_KEY environment variable.'
       );
     }
 

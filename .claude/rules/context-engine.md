@@ -99,7 +99,7 @@ import {
 } from '@context-engine/core/generator';
 
 const provider = createAnthropicProvider({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.LLM_API_KEY,
 });
 const generator = createMetaGenerator({ provider });
 
