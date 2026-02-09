@@ -64,7 +64,10 @@ export interface RepositoryVariables {
 export interface AuthVariables {
   /**
    * Authenticated context for the current request.
-   * Contains the org ID, API key ID, and validated scopes.
+   *
+   * Discriminated union — narrow on `auth.kind`:
+   * - `'tenant'`   — contains `orgId`, `apiKeyId`, and tenant scopes
+   * - `'platform'` — contains platform-level scopes, no `orgId`
    */
   auth: AuthContext;
 }
