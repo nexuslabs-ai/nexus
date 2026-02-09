@@ -88,14 +88,15 @@ export function createApp() {
   app.use('/api/v1/*', repositoriesMiddleware);
 
   // === Auth Middleware ===
-  // Validates API key from Authorization header and sets c.var.auth
-  // Dev mode (AUTH_ENABLED=false): bypasses auth, grants all scopes
-  // Production (AUTH_ENABLED=true): requires valid Bearer token
+  // Validates API key from Authorization header and sets c.var.auth.
+  // Supports two token types:
+  //   - Tenant API keys (ce_ prefix): org-scoped, looked up in database
+  //   - Platform token (cep_ prefix): cross-org admin, compared against config
   app.use('/api/v1/*', authMiddleware);
 
   // === Org Access Middleware ===
   // Validates URL :orgId matches authenticated org for all org-scoped routes.
-  // Dev mode bypasses (all orgs accessible for local development).
+  // Platform tokens (cep_) are exempt — they operate across organizations.
   app.use('/api/v1/organizations/:orgId', requireOrgAccess);
   app.use('/api/v1/organizations/:orgId/*', requireOrgAccess);
 

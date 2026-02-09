@@ -104,20 +104,19 @@ function printBanner(config: ServerConfig) {
     ? 'Configured'
     : 'Not configured';
 
-  const auth = config.authEnabled
-    ? 'Enabled'
-    : 'Disabled (set AUTH_ENABLED=true for production)';
+  const platformToken = config.platformToken ? 'Configured' : 'Missing';
 
   console.log(`
 +=====================================================================+
 |                     Context Engine Server                           |
 +=====================================================================+
-|  Version:     ${SERVER_VERSION.padEnd(54)}|
-|  Environment: ${config.environment.padEnd(54)}|
-|  Port:        ${String(config.port).padEnd(54)}|
-|  Database:    ${dbHost.padEnd(54)}|
-|  Auth:        ${auth.padEnd(54)}|
-|  Embeddings:  ${embeddings.padEnd(54)}|
+|  Version:        ${SERVER_VERSION.padEnd(51)}|
+|  Environment:    ${config.environment.padEnd(51)}|
+|  Port:           ${String(config.port).padEnd(51)}|
+|  Database:       ${dbHost.padEnd(51)}|
+|  Auth:           ${'Enabled'.padEnd(51)}|
+|  Platform token: ${platformToken.padEnd(51)}|
+|  Embeddings:     ${embeddings.padEnd(51)}|
 +=====================================================================+
 `);
 }
