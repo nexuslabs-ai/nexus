@@ -16,7 +16,6 @@ import {
   authMiddleware,
   repositoriesMiddleware,
   requireOrgAccess,
-  requireScope,
 } from './middleware/index.js';
 import {
   apiKeysRouter,
@@ -120,11 +119,9 @@ export function createApp() {
   // POST /api/v1/organizations/:orgId/search
   app.route('/api/v1/organizations/:orgId/search', searchRouter);
 
-  // API Key management (requires admin scope)
+  // API Key management
   // GET/POST /api/v1/organizations/:orgId/api-keys
   // DELETE /api/v1/organizations/:orgId/api-keys/:keyId
-  app.use('/api/v1/organizations/:orgId/api-keys', requireScope('admin'));
-  app.use('/api/v1/organizations/:orgId/api-keys/*', requireScope('admin'));
   app.route('/api/v1/organizations/:orgId/api-keys', apiKeysRouter);
 
   // === OpenAPI Documentation ===

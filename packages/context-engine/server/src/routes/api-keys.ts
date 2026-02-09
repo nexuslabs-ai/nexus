@@ -5,7 +5,7 @@
  * All routes are nested under `/api/v1/organizations/:orgId/api-keys`.
  *
  * Security:
- * - All routes require `admin` scope (applied at app level).
+ * - All routes require `admin` scope (applied at route level).
  * - The raw key is returned ONLY on creation — it cannot be retrieved again.
  * - The keyHash is NEVER included in any response.
  */
@@ -17,6 +17,7 @@ import type { AuthScope } from '../auth/auth-types.js';
 import { generateApiKey, hashApiKey } from '../auth/auth-validator.js';
 import { getConfig } from '../config.js';
 import { notFound } from '../errors.js';
+import { requireScope } from '../middleware/auth.js';
 import {
   ApiKeyIdParamSchema,
   ApiKeyListSchema,
@@ -59,6 +60,7 @@ const createApiKeyRoute = createRoute({
   description:
     'Create a new API key for the organization. The raw key is returned ONLY in this response — store it securely.',
   security: [{ Bearer: [] }],
+  middleware: [requireScope('admin')],
   request: {
     params: OrgIdPathParamSchema,
     body: {
@@ -109,6 +111,7 @@ const listApiKeysRoute = createRoute({
   description:
     'List all API keys for the organization. The raw key is never returned in list responses.',
   security: [{ Bearer: [] }],
+  middleware: [requireScope('admin')],
   request: {
     params: OrgIdPathParamSchema,
   },
@@ -143,6 +146,7 @@ const revokeApiKeyRoute = createRoute({
   description:
     'Revoke an API key by setting it to inactive. Revoked keys can no longer authenticate.',
   security: [{ Bearer: [] }],
+  middleware: [requireScope('admin')],
   request: {
     params: ApiKeyIdParamSchema,
   },
@@ -183,7 +187,7 @@ const revokeApiKeyRoute = createRoute({
  * Mount at `/api/v1/organizations/:orgId/api-keys`.
  *
  * Requires repositories middleware to be applied at app level.
- * All routes require `admin` scope (applied at app level, not here).
+ * All routes require `admin` scope (applied in route definitions).
  */
 export const apiKeysRouter = new OpenAPIHono<AppEnv>();
 

@@ -9,6 +9,7 @@ import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { isPlatform, isTenant } from '../auth/index.js';
 import { ApiError, conflict, forbidden, notFound } from '../errors.js';
+import { requireScope } from '../middleware/auth.js';
 import {
   CreateOrganizationSchema,
   DeleteOrganizationResponseSchema,
@@ -126,6 +127,7 @@ const updateOrganizationRoute = createRoute({
   summary: 'Update organization',
   description: 'Update an existing organization. All fields are optional.',
   security: [{ Bearer: [] }],
+  middleware: [requireScope('admin')],
   request: {
     params: OrgIdParamSchema,
     body: {
@@ -165,6 +167,7 @@ const deleteOrganizationRoute = createRoute({
   description:
     'Delete an organization by ID. Will fail if organization has associated components.',
   security: [{ Bearer: [] }],
+  middleware: [requireScope('admin')],
   request: {
     params: OrgIdParamSchema,
   },
