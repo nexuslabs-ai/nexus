@@ -7,6 +7,7 @@
  */
 
 import {
+  createApiKeyRepository,
   createComponentRepository,
   createEmbeddingRepository,
   createOrganizationRepository,
@@ -25,6 +26,7 @@ import type { AppEnv } from '../types.js';
  * Provides:
  * - `c.var.organizationRepo` - Always available
  * - `c.var.componentRepo` - Always available
+ * - `c.var.apiKeyRepo` - Always available
  * - `c.var.embeddingRepo` - Only if VOYAGE_API_KEY is configured
  *
  * The embedding repository is optional because it requires the VOYAGE_API_KEY
@@ -43,9 +45,10 @@ import type { AppEnv } from '../types.js';
  */
 export const repositoriesMiddleware = createMiddleware<AppEnv>(
   async (c, next) => {
-    // Always inject organization and component repositories
+    // Always inject organization, component, and API key repositories
     c.set('organizationRepo', createOrganizationRepository());
     c.set('componentRepo', createComponentRepository());
+    c.set('apiKeyRepo', createApiKeyRepository());
 
     // Conditionally inject embedding repository if VOYAGE_API_KEY is available
     // The factory function throws if the key is not set, so we catch and leave undefined

@@ -9,6 +9,7 @@ import type { Component, NewComponent } from '@context-engine/db';
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { notFound, serviceUnavailable, validationError } from '../errors.js';
+import { requireScope } from '../middleware/auth.js';
 import { ErrorSchema } from '../schemas/common.js';
 import {
   ComponentIdParamSchema,
@@ -116,6 +117,8 @@ const listComponentsRoute = createRoute({
   summary: 'List components',
   description:
     'List components for an organization with optional filtering, pagination, and sorting.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('component:read')],
   request: {
     params: OrgIdPathParamSchema,
     query: ListComponentsQuerySchema,
@@ -157,6 +160,8 @@ const getComponentByIdRoute = createRoute({
   tags: ['Components'],
   summary: 'Get component by ID',
   description: 'Retrieve a single component by its UUID.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('component:read')],
   request: {
     params: ComponentIdParamSchema,
   },
@@ -197,6 +202,8 @@ const getComponentBySlugRoute = createRoute({
   tags: ['Components'],
   summary: 'Get component by slug',
   description: 'Retrieve a single component by its URL-friendly slug.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('component:read')],
   request: {
     params: ComponentSlugParamSchema,
   },
@@ -238,6 +245,8 @@ const createComponentRoute = createRoute({
   summary: 'Create or update component',
   description:
     'Create a new component or update an existing one by slug. Returns 201 if created, 200 if updated.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('component:write')],
   request: {
     params: OrgIdPathParamSchema,
     body: {
@@ -294,6 +303,8 @@ const updateComponentRoute = createRoute({
   tags: ['Components'],
   summary: 'Update component',
   description: 'Partially update an existing component by ID.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('component:write')],
   request: {
     params: ComponentIdParamSchema,
     body: {
@@ -351,6 +362,8 @@ const deleteComponentRoute = createRoute({
   summary: 'Delete component',
   description:
     'Delete a component by ID. This also deletes associated embedding chunks.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('component:delete')],
   request: {
     params: ComponentIdParamSchema,
   },
@@ -392,6 +405,8 @@ const indexComponentRoute = createRoute({
   summary: 'Index component for search',
   description:
     'Generate embeddings for a component to enable semantic search. Requires VOYAGE_API_KEY to be configured.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('embedding:manage')],
   request: {
     params: ComponentIdParamSchema,
   },

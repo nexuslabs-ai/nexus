@@ -131,14 +131,14 @@ export const DeleteOrganizationResponseSchema = z
 
 /**
  * Organization ID path parameter.
- * Used in routes like `/organizations/{id}`.
+ * Used in routes like `/organizations/{orgId}`.
  */
 export const OrgIdParamSchema = z.object({
-  id: z
+  orgId: z
     .string()
     .uuid('Invalid organization ID format')
     .openapi({
-      param: { name: 'id', in: 'path' },
+      param: { name: 'orgId', in: 'path' },
       example: '123e4567-e89b-12d3-a456-426614174000',
       description: 'Organization UUID',
     }),

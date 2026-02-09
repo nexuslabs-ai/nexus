@@ -8,6 +8,7 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { serviceUnavailable } from '../errors.js';
+import { requireScope } from '../middleware/auth.js';
 import {
   ErrorSchema,
   SearchParamsSchema,
@@ -39,6 +40,8 @@ const searchRoute = createRoute({
   summary: 'Search components',
   description:
     'Semantic search for components using natural language queries. Requires VOYAGE_API_KEY to be configured for embedding generation.',
+  security: [{ Bearer: [] }],
+  middleware: [requireScope('component:read')],
   request: {
     params: SearchParamsSchema,
     body: {

@@ -34,6 +34,7 @@ export * from './schema.js';
 // Repositories
 // =============================================================================
 
+export { ApiKeyRepository } from './repositories/api-key-repository.js';
 export {
   ComponentRepository,
   type FindManyOptions,
@@ -55,9 +56,17 @@ export * from './embeddings/index.js';
 // =============================================================================
 
 import { getDatabase } from './client.js';
+import { ApiKeyRepository } from './repositories/api-key-repository.js';
 import { ComponentRepository } from './repositories/component-repository.js';
 import { EmbeddingRepository } from './repositories/embedding-repository.js';
 import { OrganizationRepository } from './repositories/organization-repository.js';
+
+/**
+ * Create an ApiKeyRepository instance
+ */
+export function createApiKeyRepository(): ApiKeyRepository {
+  return new ApiKeyRepository(getDatabase());
+}
 
 /**
  * Create an OrganizationRepository instance

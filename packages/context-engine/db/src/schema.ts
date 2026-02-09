@@ -17,6 +17,7 @@ import type {
 } from '@context-engine/core';
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
   customType,
   index,
   integer,
@@ -273,6 +274,70 @@ export const embeddingChunks = pgTable(
 );
 
 // =============================================================================
+// API Keys
+// =============================================================================
+
+/**
+ * API keys table - authentication for Context Engine API
+ *
+ * Stores hashed API keys for authenticating requests.
+ * Raw keys are never stored; only the HMAC-SHA256 hash is persisted.
+ * The keyPrefix (first 8 chars after 'ce_') enables key identification
+ * without exposing the full key.
+ *
+ * Multi-tenant: orgId scopes keys to an organization.
+ */
+export const apiKeys = pgTable(
+  'api_keys',
+  {
+    /** API key ID (UUID) */
+    id: uuid('id').defaultRandom().primaryKey(),
+
+    /** Organization ID (FK) - cascade delete when org is removed */
+    orgId: uuid('org_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'cascade' }),
+
+    /** Human-readable label for identifying the key */
+    name: varchar('name', { length: 255 }).notNull(),
+
+    /** HMAC-SHA256 hash of the raw API key */
+    keyHash: varchar('key_hash', { length: 128 }).notNull(),
+
+    /** First 8 characters after 'ce_' prefix for key identification */
+    keyPrefix: varchar('key_prefix', { length: 8 }).notNull(),
+
+    /** Array of permission scopes granted to this key */
+    scopes: jsonb('scopes').$type<string[]>().notNull(),
+
+    /** Hash algorithm version for future migration support */
+    hashVersion: integer('hash_version').notNull().default(1),
+
+    /** Whether this key is currently active */
+    isActive: boolean('is_active').notNull().default(true),
+
+    /** Timestamp of last API call using this key */
+    lastUsedAt: timestamp('last_used_at'),
+
+    /** Expiration timestamp (null = never expires) */
+    expiresAt: timestamp('expires_at'),
+
+    /** Creation timestamp */
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+
+    /** Last update timestamp */
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    // Unique index on keyHash for fast lookup and uniqueness enforcement
+    uniqueIndex('api_keys_key_hash_unique_idx').on(table.keyHash),
+
+    // Index for filtering by organization (all queries use this)
+    index('api_keys_org_id_idx').on(table.orgId),
+  ]
+);
+
+// =============================================================================
 // Type Exports (inferred from schema)
 // =============================================================================
 
@@ -293,3 +358,9 @@ export type EmbeddingChunk = typeof embeddingChunks.$inferSelect;
 
 /** Embedding chunk insert type */
 export type NewEmbeddingChunk = typeof embeddingChunks.$inferInsert;
+
+/** API key select type */
+export type ApiKey = typeof apiKeys.$inferSelect;
+
+/** API key insert type */
+export type NewApiKey = typeof apiKeys.$inferInsert;

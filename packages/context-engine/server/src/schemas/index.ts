@@ -72,3 +72,19 @@ export {
   type SearchResult,
   SearchResultSchema,
 } from './search.js';
+
+// API key schemas
+export {
+  ApiKeyIdParamSchema,
+  type ApiKeyList,
+  ApiKeyListSchema,
+  type ApiKeyResponse,
+  ApiKeySchema,
+  AuthScopeEnum,
+  type CreateApiKey,
+  type CreateApiKeyResponse,
+  CreateApiKeyResponseSchema,
+  CreateApiKeySchema,
+  type RevokeApiKeyResponse,
+  RevokeApiKeyResponseSchema,
+} from './api-keys.js';

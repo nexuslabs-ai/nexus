@@ -2,7 +2,8 @@
  * Server Configuration
  *
  * Loads configuration from environment variables with Zod validation.
- * Required variables must be set; optional ones have sensible defaults.
+ * Auth is always enabled — both API_KEY_HASH_SECRET and CE_PLATFORM_TOKEN
+ * are required in all environments.
  */
 
 import { z } from '@hono/zod-openapi';
@@ -16,6 +17,19 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
+  SERVER_LOG_LEVEL: z
+    .enum(['debug', 'info', 'warn', 'error', 'silent'])
+    .default('info'),
+  API_KEY_HASH_SECRET: z
+    .string()
+    .min(
+      32,
+      'API_KEY_HASH_SECRET must be at least 32 characters (NIST SP 800-224)'
+    ),
+  CE_PLATFORM_TOKEN: z
+    .string()
+    .min(32, 'CE_PLATFORM_TOKEN must be at least 32 characters')
+    .startsWith('cep_', 'CE_PLATFORM_TOKEN must start with "cep_" prefix'),
 });
 
 /**
@@ -30,7 +44,11 @@ export const Environment = {
 export type Environment = (typeof Environment)[keyof typeof Environment];
 
 /**
- * Server configuration interface
+ * Server configuration.
+ *
+ * Auth is always enabled. The platform token (`CE_PLATFORM_TOKEN`) handles
+ * admin operations, and tenant API keys (`ce_`) handle tenant operations.
+ * Both `apiKeyHashSecret` and `platformToken` are required in all environments.
  */
 export interface ServerConfig {
   /** Server port */
@@ -39,6 +57,12 @@ export interface ServerConfig {
   environment: Environment;
   /** PostgreSQL connection string */
   databaseUrl: string;
+  /** Server log level */
+  logLevel: 'debug' | 'info' | 'warn' | 'error' | 'silent';
+  /** Secret used to HMAC-hash API keys (>= 32 chars, per NIST SP 800-224) */
+  apiKeyHashSecret: string;
+  /** Platform token for internal service authentication (must start with "cep_") */
+  platformToken: string;
 }
 
 /**
@@ -61,6 +85,9 @@ export function loadConfig(): ServerConfig {
     port: result.data.PORT,
     environment: result.data.NODE_ENV,
     databaseUrl: result.data.DATABASE_URL,
+    logLevel: result.data.SERVER_LOG_LEVEL,
+    apiKeyHashSecret: result.data.API_KEY_HASH_SECRET,
+    platformToken: result.data.CE_PLATFORM_TOKEN,
   };
 }
 
