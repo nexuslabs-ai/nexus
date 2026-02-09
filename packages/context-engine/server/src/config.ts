@@ -2,7 +2,8 @@
  * Server Configuration
  *
  * Loads configuration from environment variables with Zod validation.
- * Required variables must be set; optional ones have sensible defaults.
+ * Auth is always enabled — both API_KEY_HASH_SECRET and CE_PLATFORM_TOKEN
+ * are required in all environments.
  */
 
 import { z } from '@hono/zod-openapi';
@@ -10,61 +11,26 @@ import { z } from '@hono/zod-openapi';
 /**
  * Environment variable schema with validation and coercion
  */
-const envSchema = z
-  .object({
-    DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
-    PORT: z.coerce.number().int().min(1).max(65535).default(3000),
-    NODE_ENV: z
-      .enum(['development', 'production', 'test'])
-      .default('development'),
-    AUTH_ENABLED: z.enum(['true', 'false']).default('false'),
-    SERVER_LOG_LEVEL: z
-      .enum(['debug', 'info', 'warn', 'error', 'silent'])
-      .default('info'),
-    API_KEY_HASH_SECRET: z
-      .string()
-      .min(
-        32,
-        'API_KEY_HASH_SECRET must be at least 32 characters (NIST SP 800-224)'
-      )
-      .optional(),
-    CE_PLATFORM_TOKEN: z
-      .string()
-      .min(32, 'CE_PLATFORM_TOKEN must be at least 32 characters')
-      .startsWith('cep_', 'CE_PLATFORM_TOKEN must start with "cep_" prefix')
-      .optional(),
-  })
-  .superRefine((data, ctx) => {
-    // Cross-field: auth-enabled requires secrets
-    if (data.AUTH_ENABLED === 'true') {
-      if (!data.API_KEY_HASH_SECRET) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'API_KEY_HASH_SECRET is required when AUTH_ENABLED is true',
-          path: ['API_KEY_HASH_SECRET'],
-        });
-      }
-      if (!data.CE_PLATFORM_TOKEN) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'CE_PLATFORM_TOKEN is required when AUTH_ENABLED is true',
-          path: ['CE_PLATFORM_TOKEN'],
-        });
-      }
-    }
-
-    // Cross-field: production requires auth
-    if (
-      data.NODE_ENV === Environment.Production &&
-      data.AUTH_ENABLED !== 'true'
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'AUTH_ENABLED must be true in production',
-        path: ['AUTH_ENABLED'],
-      });
-    }
-  });
+const envSchema = z.object({
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
+  SERVER_LOG_LEVEL: z
+    .enum(['debug', 'info', 'warn', 'error', 'silent'])
+    .default('info'),
+  API_KEY_HASH_SECRET: z
+    .string()
+    .min(
+      32,
+      'API_KEY_HASH_SECRET must be at least 32 characters (NIST SP 800-224)'
+    ),
+  CE_PLATFORM_TOKEN: z
+    .string()
+    .min(32, 'CE_PLATFORM_TOKEN must be at least 32 characters')
+    .startsWith('cep_', 'CE_PLATFORM_TOKEN must start with "cep_" prefix'),
+});
 
 /**
  * Runtime environment types
@@ -80,11 +46,9 @@ export type Environment = (typeof Environment)[keyof typeof Environment];
 /**
  * Server configuration.
  *
- * `authEnabled` controls whether the auth middleware enforces token
- * validation (production) or bypasses it (dev mode). The secrets
- * `apiKeyHashSecret` and `platformToken` can be provided independently —
- * they are required when auth is enabled, but can also be set in dev mode
- * to enable features like API key creation during local development.
+ * Auth is always enabled. The platform token (`CE_PLATFORM_TOKEN`) handles
+ * admin operations, and tenant API keys (`ce_`) handle tenant operations.
+ * Both `apiKeyHashSecret` and `platformToken` are required in all environments.
  */
 export interface ServerConfig {
   /** Server port */
@@ -95,12 +59,10 @@ export interface ServerConfig {
   databaseUrl: string;
   /** Server log level */
   logLevel: 'debug' | 'info' | 'warn' | 'error' | 'silent';
-  /** Whether authentication is enabled */
-  authEnabled: boolean;
   /** Secret used to HMAC-hash API keys (>= 32 chars, per NIST SP 800-224) */
-  apiKeyHashSecret?: string;
+  apiKeyHashSecret: string;
   /** Platform token for internal service authentication (must start with "cep_") */
-  platformToken?: string;
+  platformToken: string;
 }
 
 /**
@@ -124,7 +86,6 @@ export function loadConfig(): ServerConfig {
     environment: result.data.NODE_ENV,
     databaseUrl: result.data.DATABASE_URL,
     logLevel: result.data.SERVER_LOG_LEVEL,
-    authEnabled: result.data.AUTH_ENABLED === 'true',
     apiKeyHashSecret: result.data.API_KEY_HASH_SECRET,
     platformToken: result.data.CE_PLATFORM_TOKEN,
   };
