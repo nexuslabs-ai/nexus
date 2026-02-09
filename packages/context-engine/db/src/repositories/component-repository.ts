@@ -5,7 +5,7 @@
  * All methods are scoped to an organization for multi-tenancy.
  */
 
-import { and, asc, count, desc, eq } from 'drizzle-orm';
+import { and, asc, count, desc, eq, sql } from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { type Component, components, type NewComponent } from '../schema.js';
@@ -78,6 +78,24 @@ export class ComponentRepository {
       .select()
       .from(components)
       .where(and(eq(components.orgId, orgId), eq(components.id, id)))
+      .limit(1);
+
+    return result ?? null;
+  }
+
+  /**
+   * Find component by name (case-insensitive)
+   */
+  async findByName(orgId: string, name: string): Promise<Component | null> {
+    const [result] = await this.db
+      .select()
+      .from(components)
+      .where(
+        and(
+          eq(components.orgId, orgId),
+          sql`lower(${components.name}) = lower(${name})`
+        )
+      )
       .limit(1);
 
     return result ?? null;
@@ -234,5 +252,40 @@ export class ComponentRepository {
       .where(eq(components.orgId, orgId));
 
     return result?.count ?? 0;
+  }
+
+  /**
+   * Count components grouped by embedding status.
+   *
+   * Returns a record with all possible statuses, defaulting to 0
+   * for any status that has no matching components.
+   */
+  async countByEmbeddingStatus(
+    orgId: string
+  ): Promise<Record<EmbeddingStatus, number>> {
+    const results = await this.db
+      .select({
+        status: components.embeddingStatus,
+        count: count(),
+      })
+      .from(components)
+      .where(eq(components.orgId, orgId))
+      .groupBy(components.embeddingStatus);
+
+    // Initialize all statuses to 0
+    const counts: Record<EmbeddingStatus, number> = {
+      pending: 0,
+      processing: 0,
+      indexed: 0,
+      failed: 0,
+    };
+
+    for (const row of results) {
+      if (row.status) {
+        counts[row.status] = Number(row.count);
+      }
+    }
+
+    return counts;
   }
 }
