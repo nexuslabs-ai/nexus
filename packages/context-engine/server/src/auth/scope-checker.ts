@@ -2,7 +2,14 @@
  * Scope Checker
  *
  * Utilities for checking authorization scopes on an authenticated context.
- * The `admin` scope acts as a superuser — it satisfies any scope check.
+ * The `admin` scope acts as a superuser — it satisfies any tenant scope check.
+ *
+ * Handles the `AuthContext` discriminated union:
+ * - `TenantAuthContext` — org-scoped, has `orgId`, `apiKeyId`, and `AuthScope[]`
+ * - `PlatformAuthContext` — cross-org admin, has `PlatformScope[]` only
+ *
+ * Tenant scope checks (`hasScope`, `hasAllScopes`) return `false` for platform
+ * contexts. Platform authorization is handled at the middleware level, not here.
  *
  * This module is transport-agnostic: no Hono dependency.
  * Both HTTP API and MCP Streamable HTTP consume these utilities.
@@ -10,25 +17,76 @@
 
 import {
   type AuthContext,
+  AuthKind,
   type AuthScope,
-  DEV_API_KEY_ID,
+  type PlatformAuthContext,
+  type TenantAuthContext,
 } from './auth-types.js';
 
 // =============================================================================
-// Dev Mode Check
+// Type Guards
 // =============================================================================
 
 /**
- * Check if the current auth context is in dev mode (AUTH_ENABLED=false).
+ * Narrow an `AuthContext` to `TenantAuthContext`.
  *
- * Dev mode uses the sentinel API key ID instead of a real database-backed key.
- * Useful for bypassing org-scoping checks during local development.
+ * @param context - The authenticated context to check
+ * @returns `true` if the context is a tenant (org-scoped) context
  *
- * @param context - The authenticated context from API key validation
- * @returns `true` if the context represents a dev mode session
+ * @example
+ * ```ts
+ * if (isTenant(auth)) {
+ *   // auth.orgId and auth.apiKeyId are available here
+ *   console.log(auth.orgId);
+ * }
+ * ```
  */
-export function isDevMode(context: AuthContext): boolean {
-  return context.apiKeyId === DEV_API_KEY_ID;
+export function isTenant(context: AuthContext): context is TenantAuthContext {
+  return context.kind === AuthKind.Tenant;
+}
+
+/**
+ * Narrow an `AuthContext` to `PlatformAuthContext`.
+ *
+ * @param context - The authenticated context to check
+ * @returns `true` if the context is a platform (cross-org admin) context
+ *
+ * @example
+ * ```ts
+ * if (isPlatform(auth)) {
+ *   // auth has PlatformScope[], no orgId
+ * }
+ * ```
+ */
+export function isPlatform(
+  context: AuthContext
+): context is PlatformAuthContext {
+  return context.kind === AuthKind.Platform;
+}
+
+// =============================================================================
+// Context Accessors
+// =============================================================================
+
+/**
+ * Safely extract the `orgId` from an auth context.
+ *
+ * Returns the org ID for tenant contexts, or `null` for platform contexts
+ * (which are not tied to any specific organization).
+ *
+ * @param context - The authenticated context
+ * @returns The org ID string, or `null` if the context is platform-level
+ *
+ * @example
+ * ```ts
+ * const orgId = getOrgId(auth);
+ * if (orgId === null) {
+ *   // Platform context — handle cross-org logic
+ * }
+ * ```
+ */
+export function getOrgId(context: AuthContext): string | null {
+  return context.kind === AuthKind.Tenant ? context.orgId : null;
 }
 
 // =============================================================================
@@ -36,14 +94,17 @@ export function isDevMode(context: AuthContext): boolean {
 // =============================================================================
 
 /**
- * Check if the authenticated context has a specific scope.
+ * Check if the authenticated context has a specific tenant scope.
  *
- * Returns `true` if the context has:
+ * Returns `true` if the context is a tenant context AND has:
  * - The `admin` scope (superuser, satisfies any check), OR
  * - The specific scope requested
  *
+ * Platform contexts always return `false` — platform authorization
+ * is a separate permission domain handled at the middleware level.
+ *
  * @param context - The authenticated context from API key validation
- * @param scope - The scope to check for
+ * @param scope - The tenant scope to check for
  * @returns `true` if the context has the required scope
  *
  * @example
@@ -54,18 +115,25 @@ export function isDevMode(context: AuthContext): boolean {
  * ```
  */
 export function hasScope(context: AuthContext, scope: AuthScope): boolean {
+  if (context.kind !== AuthKind.Tenant) {
+    return false;
+  }
+
   return context.scopes.includes('admin') || context.scopes.includes(scope);
 }
 
 /**
- * Check if the authenticated context has ALL specified scopes.
+ * Check if the authenticated context has ALL specified tenant scopes.
  *
- * Returns `true` if the context has:
+ * Returns `true` if the context is a tenant context AND has:
  * - The `admin` scope (superuser, satisfies any check), OR
  * - Every scope in the provided list
  *
+ * Platform contexts always return `false` — platform authorization
+ * is a separate permission domain handled at the middleware level.
+ *
  * @param context - The authenticated context from API key validation
- * @param scopes - Array of scopes that are all required
+ * @param scopes - Array of tenant scopes that are all required
  * @returns `true` if the context has all required scopes
  *
  * @example
@@ -79,6 +147,10 @@ export function hasAllScopes(
   context: AuthContext,
   scopes: AuthScope[]
 ): boolean {
+  if (context.kind !== AuthKind.Tenant) {
+    return false;
+  }
+
   if (context.scopes.includes('admin')) {
     return true;
   }

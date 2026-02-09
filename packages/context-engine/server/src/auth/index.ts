@@ -6,10 +6,12 @@
  *
  * Exports:
  * - Types: AuthScope, PlatformScope, TokenKind, AuthContext, TenantAuthContext, PlatformAuthContext, AuthResult
- * - Constants: AUTH_SCOPES, DEV_API_KEY_ID, AuthKind
+ * - Constants: AUTH_SCOPES, AuthKind
  * - Token detection: detectTokenKind
  * - Key management: generateApiKey, hashApiKey, validateApiKey
  * - Platform validation: validatePlatformToken
+ * - Type guards: isTenant, isPlatform
+ * - Context accessors: getOrgId
  * - Authorization: hasScope, hasAllScopes
  */
 

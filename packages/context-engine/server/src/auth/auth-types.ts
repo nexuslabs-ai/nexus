@@ -12,9 +12,6 @@
 // Constants
 // =============================================================================
 
-/** Sentinel API key ID used in dev mode (AUTH_ENABLED=false) */
-export const DEV_API_KEY_ID = 'dev';
-
 /** Auth context kind discriminator values */
 export const AuthKind = {
   Tenant: 'tenant',
