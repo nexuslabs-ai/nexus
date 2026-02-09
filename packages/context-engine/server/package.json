@@ -27,8 +27,9 @@
     "@context-engine/db": "*",
     "@hono/node-server": "^1.14.1",
     "@hono/swagger-ui": "^0.5.1",
-    "@hono/zod-openapi": "^0.19.3",
+    "@hono/zod-openapi": "^1.2.1",
     "hono": "^4.7.4",
+    "zod": "^4.0.0",
     "hono-pino": "^0.10.3",
     "pino": "^10.3.0"
   },
