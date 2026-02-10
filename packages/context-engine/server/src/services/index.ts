@@ -10,3 +10,9 @@ export {
   processingService,
   type ProcessingServiceConfig,
 } from './processing-service.js';
+export {
+  type FusedSearchResult,
+  type HybridSearchResult,
+  type SearchOptions,
+  SearchService,
+} from './search-service.js';
