@@ -2,7 +2,7 @@
  * Processing Service
  *
  * Orchestrates component processing using @context-engine/core.
- * Provides both full pipeline and atomic operations for server routes.
+ * Provides atomic operations (extract, generate, build) for server routes.
  *
  * Uses ComponentProcessor from core, which internally coordinates:
  * - HybridExtractor for props, variants, and dependency extraction
@@ -22,7 +22,6 @@ import {
   type GenerateResult,
   type ProcessorConfig,
   type ProcessorInput,
-  type ProcessorResult,
 } from '@context-engine/core/processor';
 import { createProviderFromEnv } from '@context-engine/core/utils';
 
@@ -54,9 +53,9 @@ export interface ProcessingServiceConfig {
  * Service for processing components through the extraction-generation pipeline.
  *
  * Wraps @context-engine/core's ComponentProcessor with atomic methods
- * for server routes. Provides both full pipeline and step-by-step operations:
+ * for server routes. Provides step-by-step operations that ensure each
+ * phase result is available for database persistence:
  *
- * - **process()** — Full pipeline: extract -> generate -> build
  * - **extract()** — Extract props, variants, dependencies from source code
  * - **generate()** — Generate semantic metadata using LLM
  * - **build()** — Combine extraction and generation into a manifest
@@ -66,10 +65,6 @@ export interface ProcessingServiceConfig {
  *
  * @example
  * ```typescript
- * // Full pipeline
- * const result = await processingService.process(input);
- *
- * // Step-by-step for more control
  * const extractResult = await processingService.extract(input);
  * const genResult = await processingService.generate({
  *   orgId: input.orgId,
@@ -97,25 +92,6 @@ export class ProcessingService {
   // ===========================================================================
   // Public API
   // ===========================================================================
-
-  /**
-   * Process a component through the full pipeline.
-   *
-   * Runs extraction (props, variants, dependencies), LLM generation
-   * (semantic descriptions, usage patterns), and manifest building
-   * in sequence.
-   *
-   * @param input - Processing input with source code and context
-   * @returns ProcessorResult with manifest, identity, and extraction metadata
-   * @throws Error if LLM_API_KEY is not configured
-   * @throws ExtractionError if extraction fails
-   * @throws MetaGenerationError if LLM generation fails
-   * @throws ManifestBuildError if manifest building fails
-   */
-  async process(input: ProcessorInput): Promise<ProcessorResult> {
-    const processor = this.getProcessor();
-    return processor.process(input);
-  }
 
   /**
    * Extract component metadata without LLM generation.
@@ -199,11 +175,9 @@ export class ProcessingService {
  * ```typescript
  * import { processingService } from './services/index.js';
  *
- * // Full pipeline
- * const result = await processingService.process(input);
- *
- * // Or atomic operations
  * const extractResult = await processingService.extract(input);
+ * const genResult = await processingService.generate(genInput);
+ * const buildResult = processingService.build(buildInput);
  * ```
  */
 export const processingService = new ProcessingService();
