@@ -101,6 +101,9 @@ searchRouter.openapi(searchRoute, async (c) => {
       results: resultsWithFramework,
       total: resultsWithFramework.length,
       query: body.query,
+      meta: {
+        searchMode: body.mode,
+      },
     }),
     200
   );

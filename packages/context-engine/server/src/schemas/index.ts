@@ -64,6 +64,8 @@ export {
 
 // Search schemas
 export {
+  type SearchMode,
+  SearchModeEnum,
   SearchParamsSchema,
   type SearchRequest,
   SearchRequestSchema,
