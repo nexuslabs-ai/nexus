@@ -5,3 +5,8 @@
  */
 
 export { ComponentResolver } from './component-resolver.js';
+export {
+  ProcessingService,
+  processingService,
+  type ProcessingServiceConfig,
+} from './processing-service.js';
