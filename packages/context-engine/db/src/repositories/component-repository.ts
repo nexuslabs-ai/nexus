@@ -16,6 +16,28 @@ import type { EmbeddingStatus } from '../types.js';
 // =============================================================================
 
 /**
+ * Result of a keyword (full-text) search against the components table.
+ *
+ * Uses PostgreSQL's tsvector/tsquery for ranking by term relevance.
+ * Score is computed by ts_rank and reflects how well the component's
+ * searchVector matches the query (higher is more relevant).
+ */
+export interface KeywordSearchResult {
+  /** Component UUID */
+  componentId: string;
+  /** URL-friendly identifier */
+  slug: string;
+  /** Human-readable component name */
+  name: string;
+  /** Component description extracted from manifest (may be null) */
+  description: string | null;
+  /** Target framework (e.g., 'react', 'vue') */
+  framework: string;
+  /** Full-text search rank score (higher is more relevant) */
+  score: number;
+}
+
+/**
  * Options for finding multiple components
  */
 export interface FindManyOptions {
@@ -287,5 +309,66 @@ export class ComponentRepository {
     }
 
     return counts;
+  }
+
+  // ===========================================================================
+  // Search
+  // ===========================================================================
+
+  /**
+   * Full-text keyword search using the pre-computed searchVector (tsvector) column.
+   *
+   * Uses PostgreSQL's websearch_to_tsquery for user-friendly query parsing
+   * (supports natural syntax like "button loading", "dialog OR modal").
+   * Results are ranked by ts_rank, which scores based on term frequency
+   * and weight (component name = weight A, description = weight B).
+   *
+   * Only returns components with embeddingStatus = 'indexed' (fully searchable).
+   *
+   * @param orgId - Organization ID (for multi-tenant isolation)
+   * @param query - User search query (parsed by websearch_to_tsquery)
+   * @param options - Optional filters: limit, minScore, framework
+   * @returns Components matching the query, ordered by relevance score descending
+   */
+  async searchKeyword(
+    orgId: string,
+    query: string,
+    options: { limit?: number; minScore?: number; framework?: string } = {}
+  ): Promise<KeywordSearchResult[]> {
+    const { limit = 10, minScore = 0, framework } = options;
+
+    // FTS query — must use sql (no Drizzle built-in for websearch_to_tsquery)
+    const tsquery = sql`websearch_to_tsquery('english', ${query})`;
+
+    // Build WHERE conditions: Drizzle built-ins for equality, sql for FTS match
+    const conditions = [
+      eq(components.orgId, orgId),
+      eq(components.embeddingStatus, 'indexed'),
+      sql`${components.searchVector} @@ ${tsquery}`,
+    ];
+
+    if (framework) {
+      conditions.push(eq(components.framework, framework));
+    }
+
+    // Query with ts_rank scoring
+    const results = await this.db
+      .select({
+        componentId: components.id,
+        slug: components.slug,
+        name: components.name,
+        description: sql<string | null>`${components.manifest}->>'description'`,
+        framework: components.framework,
+        score: sql<number>`ts_rank(${components.searchVector}, ${tsquery})`,
+      })
+      .from(components)
+      .where(and(...conditions))
+      .orderBy(sql`ts_rank(${components.searchVector}, ${tsquery}) DESC`)
+      .limit(limit);
+
+    // Normalize score to number and apply minimum score threshold
+    return results
+      .map((r) => ({ ...r, score: Number(r.score) }))
+      .filter((r) => r.score >= minScore);
   }
 }

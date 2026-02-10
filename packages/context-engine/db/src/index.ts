@@ -38,6 +38,7 @@ export { ApiKeyRepository } from './repositories/api-key-repository.js';
 export {
   ComponentRepository,
   type FindManyOptions,
+  type KeywordSearchResult,
 } from './repositories/component-repository.js';
 export { EmbeddingRepository } from './repositories/embedding-repository.js';
 export {
