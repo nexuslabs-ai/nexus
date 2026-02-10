@@ -5,7 +5,17 @@
  * All methods are scoped to an organization for multi-tenancy.
  */
 
-import { and, asc, count, desc, eq, sql } from 'drizzle-orm';
+import type { AIManifest } from '@context-engine/core';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  sql,
+} from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { type Component, components, type NewComponent } from '../schema.js';
@@ -35,6 +45,36 @@ export interface KeywordSearchResult {
   framework: string;
   /** Full-text search rank score (higher is more relevant) */
   score: number;
+}
+
+/**
+ * Options for finding components with manifests
+ */
+export interface FindAllManifestsOptions {
+  /** Filter to specific slugs */
+  slugs?: string[];
+  /** Filter by framework */
+  framework?: string;
+  /** Maximum number of results (default: 100) */
+  limit?: number;
+}
+
+/**
+ * Result from findAllManifests containing component with manifest
+ */
+export interface ManifestResult {
+  /** Component ID */
+  id: string;
+  /** URL-friendly identifier */
+  slug: string;
+  /** Component display name */
+  name: string;
+  /** Target framework */
+  framework: string;
+  /** Semantic version */
+  version: string;
+  /** AI manifest (always present due to isNotNull filter) */
+  manifest: AIManifest | null;
 }
 
 /**
@@ -193,6 +233,49 @@ export class ComponentRepository {
       .offset(offset);
 
     return { components: componentsList, total };
+  }
+
+  /**
+   * Find all components that have manifests for an organization.
+   * Used for bundle resolution and bulk manifest retrieval.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @param options - Optional filters and pagination
+   * @returns Components with their manifests
+   */
+  async findAllManifests(
+    orgId: string,
+    options: FindAllManifestsOptions = {}
+  ): Promise<ManifestResult[]> {
+    const { slugs, framework, limit = 100 } = options;
+
+    // Build conditions
+    const conditions = [
+      eq(components.orgId, orgId),
+      isNotNull(components.manifest),
+    ];
+
+    if (slugs && slugs.length > 0) {
+      conditions.push(inArray(components.slug, slugs));
+    }
+
+    if (framework) {
+      conditions.push(eq(components.framework, framework));
+    }
+
+    return this.db
+      .select({
+        id: components.id,
+        slug: components.slug,
+        name: components.name,
+        framework: components.framework,
+        version: components.version,
+        manifest: components.manifest,
+      })
+      .from(components)
+      .where(and(...conditions))
+      .orderBy(asc(components.name))
+      .limit(limit);
   }
 
   /**
