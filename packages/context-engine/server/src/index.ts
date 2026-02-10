@@ -36,4 +36,19 @@ export * from './routes/index.js';
 export * from './auth/index.js';
 
 // Re-export middleware
-export { authMiddleware, requireScope } from './middleware/index.js';
+export {
+  authMiddleware,
+  rateLimitMiddleware,
+  requireScope,
+} from './middleware/index.js';
+
+// Re-export services
+export {
+  ComponentResolver,
+  type FusedSearchResult,
+  type HybridSearchResult,
+  ProcessingService,
+  type ProcessingServiceConfig,
+  type SearchOptions,
+  SearchService,
+} from './services/index.js';

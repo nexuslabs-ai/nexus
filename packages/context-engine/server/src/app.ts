@@ -14,6 +14,7 @@ import { ApiError } from './errors.js';
 import { createServerLogger } from './logger.js';
 import {
   authMiddleware,
+  rateLimitMiddleware,
   repositoriesMiddleware,
   requireOrgAccess,
 } from './middleware/index.js';
@@ -93,6 +94,12 @@ export function createApp() {
   //   - Tenant API keys (ce_ prefix): org-scoped, looked up in database
   //   - Platform token (cep_ prefix): cross-org admin, compared against config
   app.use('/api/v1/*', authMiddleware);
+
+  // === Rate Limit Middleware ===
+  // Fixed-window counter per client IP. Returns X-RateLimit-* headers on every
+  // response and 429 with Retry-After when the limit is exceeded.
+  // Placed after auth so unauthenticated requests are rejected before counting.
+  app.use('/api/v1/*', rateLimitMiddleware);
 
   // === Org Access Middleware ===
   // Validates URL :orgId matches authenticated org for all org-scoped routes.

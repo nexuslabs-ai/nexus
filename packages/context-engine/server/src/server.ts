@@ -106,6 +106,8 @@ function printBanner(config: ServerConfig) {
 
   const platformToken = config.platformToken ? 'Configured' : 'Missing';
 
+  const llmKey = process.env.LLM_API_KEY ? 'Configured' : 'Not configured';
+
   console.log(`
 +=====================================================================+
 |                     Context Engine Server                           |
@@ -116,7 +118,12 @@ function printBanner(config: ServerConfig) {
 |  Database:       ${dbHost.padEnd(51)}|
 |  Auth:           ${'Enabled'.padEnd(51)}|
 |  Platform token: ${platformToken.padEnd(51)}|
++---------------------------------------------------------------------+
+|  Features                                                           |
++---------------------------------------------------------------------+
+|  Processing:     ${llmKey.padEnd(51)}|
 |  Embeddings:     ${embeddings.padEnd(51)}|
+|  Search:         ${'Hybrid (semantic + keyword, RRF)'.padEnd(51)}|
 +=====================================================================+
 `);
 }
