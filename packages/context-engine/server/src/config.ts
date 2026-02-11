@@ -31,9 +31,13 @@ const envSchema = z.object({
     .min(32, 'CE_PLATFORM_TOKEN must be at least 32 characters')
     .startsWith('cep_', 'CE_PLATFORM_TOKEN must start with "cep_" prefix'),
 
-  // Rate limiting
+  // Post-auth rate limiting (identity-based, per API key)
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
+
+  // Pre-auth rate limiting (IP-based, DDoS protection)
+  PRE_AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
+  PRE_AUTH_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(1000),
 });
 
 /**
@@ -67,10 +71,14 @@ export interface ServerConfig {
   apiKeyHashSecret: string;
   /** Platform token for internal service authentication (must start with "cep_") */
   platformToken: string;
-  /** Rate limit window duration in milliseconds @default 60000 */
+  /** Post-auth rate limit window duration in milliseconds @default 60000 */
   rateLimitWindowMs: number;
-  /** Maximum requests allowed per rate limit window @default 100 */
+  /** Maximum requests allowed per post-auth rate limit window @default 100 */
   rateLimitMaxRequests: number;
+  /** Pre-auth (IP-based) rate limit window duration in milliseconds @default 60000 */
+  preAuthRateLimitWindowMs: number;
+  /** Maximum requests allowed per pre-auth rate limit window @default 1000 */
+  preAuthRateLimitMaxRequests: number;
 }
 
 /**
@@ -98,6 +106,8 @@ export function loadConfig(): ServerConfig {
     platformToken: result.data.CE_PLATFORM_TOKEN,
     rateLimitWindowMs: result.data.RATE_LIMIT_WINDOW_MS,
     rateLimitMaxRequests: result.data.RATE_LIMIT_MAX_REQUESTS,
+    preAuthRateLimitWindowMs: result.data.PRE_AUTH_RATE_LIMIT_WINDOW_MS,
+    preAuthRateLimitMaxRequests: result.data.PRE_AUTH_RATE_LIMIT_MAX_REQUESTS,
   };
 }
 

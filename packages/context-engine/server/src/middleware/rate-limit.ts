@@ -1,16 +1,16 @@
 /**
  * Rate Limit Middleware
  *
- * Simple in-memory rate limiter using a fixed-window counter.
- * Limits requests per IP address within a configurable time window.
- *
- * Reads `rateLimitWindowMs` and `rateLimitMaxRequests` from server config.
- * Returns standard rate limit headers on every response and a `Retry-After`
- * header when the limit is exceeded.
+ * Two-layer rate limiting:
+ * 1. **Pre-auth (IP-based):** Coarse protection before authentication (default 1000 req/min).
+ * 2. **Post-auth (identity-based):** Per-tenant limits keyed on authenticated identity.
  */
 
+import { getConnInfo } from '@hono/node-server/conninfo';
+import type { Context } from 'hono';
 import { createMiddleware } from 'hono/factory';
 
+import { type AuthContext, AuthKind } from '../auth/index.js';
 import { getConfig } from '../config.js';
 import { rateLimited } from '../errors.js';
 import type { AppEnv } from '../types.js';
@@ -27,98 +27,164 @@ interface RateLimitEntry {
 }
 
 // =============================================================================
-// In-memory store
+// In-memory stores
 // =============================================================================
 
-/**
- * Maps client identifier (IP) to their current rate limit entry.
- *
- * Note: This store is process-local. In a multi-instance deployment,
- * each instance tracks limits independently. For shared state,
- * replace with Redis or similar.
- */
-const store = new Map<string, RateLimitEntry>();
+/** Maps authenticated identity to their current rate limit entry. */
+const identityStore = new Map<string, RateLimitEntry>();
 
-/** Interval handle for periodic cleanup (exported for test teardown) */
-export const cleanupInterval = setInterval(
+/** Maps IP address to their current rate limit entry. */
+const ipStore = new Map<string, RateLimitEntry>();
+
+/**
+ * Periodic cleanup for the identity-based store.
+ * Removes expired entries every 5 minutes.
+ */
+export const identityCleanupInterval = setInterval(
   () => {
     const now = Date.now();
-    for (const [key, entry] of store) {
+    for (const [key, entry] of identityStore) {
       if (entry.resetAt < now) {
-        store.delete(key);
+        identityStore.delete(key);
       }
     }
   },
   5 * 60 * 1000
 );
 
-// Allow the process to exit even if the interval is still active
-cleanupInterval.unref();
+identityCleanupInterval.unref();
+
+/**
+ * Periodic cleanup for the IP-based store.
+ * Removes expired entries every 5 minutes.
+ */
+export const ipCleanupInterval = setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, entry] of ipStore) {
+      if (entry.resetAt < now) {
+        ipStore.delete(key);
+      }
+    }
+  },
+  5 * 60 * 1000
+);
+
+ipCleanupInterval.unref();
 
 // =============================================================================
 // Helpers
 // =============================================================================
 
 /**
- * Derive a client identifier for rate limiting.
+ * Derive a rate limit key from the authenticated context.
  *
- * Checks `X-Forwarded-For` first (for proxied environments), then
- * `X-Real-IP`, and falls back to `"unknown"` when neither is present.
+ * - Tenant: `tenant:{orgId}:{apiKeyId}`
+ * - Platform: `platform`
  */
-function getClientId(req: {
-  header: (name: string) => string | undefined;
-}): string {
-  const forwarded = req.header('x-forwarded-for');
-  if (forwarded) {
-    // First IP in the chain is the original client
-    return forwarded.split(',')[0].trim();
+function getRateLimitKey(auth: AuthContext): string {
+  if (auth.kind === AuthKind.Tenant) {
+    return `tenant:${auth.orgId}:${auth.apiKeyId}`;
   }
 
-  const realIp = req.header('x-real-ip');
-  if (realIp) {
-    return realIp.trim();
+  if (auth.kind === AuthKind.Platform) {
+    return 'platform';
   }
 
-  return 'unknown';
+  // Exhaustive check — should never reach here if AuthContext union is complete
+  const _exhaustive: never = auth;
+  return `unknown:${String(_exhaustive)}`;
 }
 
-// =============================================================================
-// Middleware
-// =============================================================================
+/** Get the client IP from the TCP socket. Falls back to "unknown" if unavailable. */
+function getSocketAddress(c: Context<AppEnv>): string {
+  try {
+    const info = getConnInfo(c);
+    return info.remote.address ?? 'unknown';
+  } catch {
+    // Socket access may be unavailable in test environments
+    return 'unknown';
+  }
+}
 
-/**
- * Rate limit middleware.
- *
- * Applies a fixed-window counter per client IP. On every request:
- *
- * 1. Identifies the client by IP (via proxy headers or fallback).
- * 2. Increments the request count for the current window.
- * 3. If the limit is exceeded, throws a `rateLimited` error with `Retry-After`.
- * 4. Sets standard `X-RateLimit-*` headers on the response.
- *
- * Configuration is read from `getConfig()` on first invocation and cached
- * for the lifetime of the middleware.
- */
-export const rateLimitMiddleware = createMiddleware<AppEnv>(async (c, next) => {
-  const { rateLimitWindowMs, rateLimitMaxRequests } = getConfig();
-  const clientId = getClientId(c.req);
-  const now = Date.now();
-
-  let entry = store.get(clientId);
+/** Check and increment the rate limit counter for a given key. */
+function checkRateLimit(
+  store: Map<string, RateLimitEntry>,
+  key: string,
+  windowMs: number,
+  maxRequests: number,
+  now: number
+): { entry: RateLimitEntry; exceeded: boolean } {
+  let entry = store.get(key);
 
   // Create new entry or reset if window has expired
   if (!entry || entry.resetAt <= now) {
     entry = {
       count: 0,
-      resetAt: now + rateLimitWindowMs,
+      resetAt: now + windowMs,
     };
-    store.set(clientId, entry);
+    store.set(key, entry);
   }
 
   entry.count++;
 
+  return {
+    entry,
+    exceeded: entry.count > maxRequests,
+  };
+}
+
+// =============================================================================
+// Pre-Auth Rate Limit Middleware (IP-based)
+// =============================================================================
+
+/** IP-based rate limiter that runs before authentication. */
+export const preAuthRateLimitMiddleware = createMiddleware<AppEnv>(
+  async (c, next) => {
+    const { preAuthRateLimitWindowMs, preAuthRateLimitMaxRequests } =
+      getConfig();
+    const ip = getSocketAddress(c);
+    const now = Date.now();
+
+    const { entry, exceeded } = checkRateLimit(
+      ipStore,
+      ip,
+      preAuthRateLimitWindowMs,
+      preAuthRateLimitMaxRequests,
+      now
+    );
+
+    if (exceeded) {
+      const retryAfterSeconds = Math.ceil((entry.resetAt - now) / 1000);
+      c.header('Retry-After', String(retryAfterSeconds));
+      throw rateLimited(retryAfterSeconds);
+    }
+
+    await next();
+  }
+);
+
+// =============================================================================
+// Post-Auth Rate Limit Middleware (identity-based)
+// =============================================================================
+
+/** Identity-based rate limiter that runs after authentication. Sets X-RateLimit-* response headers. */
+export const rateLimitMiddleware = createMiddleware<AppEnv>(async (c, next) => {
+  const { rateLimitWindowMs, rateLimitMaxRequests } = getConfig();
+  const auth = c.var.auth;
+  const key = getRateLimitKey(auth);
+  const now = Date.now();
+
+  const { entry, exceeded } = checkRateLimit(
+    identityStore,
+    key,
+    rateLimitWindowMs,
+    rateLimitMaxRequests,
+    now
+  );
+
   // Reject if over limit
-  if (entry.count > rateLimitMaxRequests) {
+  if (exceeded) {
     const retryAfterSeconds = Math.ceil((entry.resetAt - now) / 1000);
     c.header('Retry-After', String(retryAfterSeconds));
     c.header('X-RateLimit-Limit', String(rateLimitMaxRequests));

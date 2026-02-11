@@ -14,6 +14,7 @@ import { ApiError } from './errors.js';
 import { createServerLogger } from './logger.js';
 import {
   authMiddleware,
+  preAuthRateLimitMiddleware,
   rateLimitMiddleware,
   repositoriesMiddleware,
   requireOrgAccess,
@@ -88,6 +89,10 @@ export function createApp() {
   // Access via c.var.organizationRepo, c.var.componentRepo, c.var.embeddingRepo
   app.use('/api/v1/*', repositoriesMiddleware);
 
+  // === Pre-Auth Rate Limit ===
+  // IP-based rate limiter (default 1000 req/min)
+  app.use('/api/v1/*', preAuthRateLimitMiddleware);
+
   // === Auth Middleware ===
   // Validates API key from Authorization header and sets c.var.auth.
   // Supports two token types:
@@ -95,10 +100,8 @@ export function createApp() {
   //   - Platform token (cep_ prefix): cross-org admin, compared against config
   app.use('/api/v1/*', authMiddleware);
 
-  // === Rate Limit Middleware ===
-  // Fixed-window counter per client IP. Returns X-RateLimit-* headers on every
-  // response and 429 with Retry-After when the limit is exceeded.
-  // Placed after auth so unauthenticated requests are rejected before counting.
+  // === Post-Auth Rate Limit ===
+  // Per-tenant rate limiter keyed on authenticated identity
   app.use('/api/v1/*', rateLimitMiddleware);
 
   // === Org Access Middleware ===
