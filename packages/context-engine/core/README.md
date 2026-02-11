@@ -84,8 +84,6 @@ const processor = createComponentProcessor({
     },
     dependencies: ['react', '@radix-ui/react-slot'],
   },
-  // Optional: Filter LLM-generated related components
-  availableComponents: ['Button', 'Input', 'Card'],
 });
 
 const result = await processor.process({
@@ -99,6 +97,8 @@ const result = await processor.process({
   hints: 'Primary action button with loading states',
   // Optional: Semantic version
   version: '1.0.0',
+  // Optional: Filter LLM-generated related components
+  availableComponents: ['Button', 'Input', 'Card'],
 });
 
 // Access results

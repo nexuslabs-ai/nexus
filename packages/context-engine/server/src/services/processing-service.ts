@@ -158,7 +158,6 @@ export class ProcessingService {
 
       const config: ProcessorConfig = {
         llmProvider: provider,
-        availableComponents: this.config.availableComponents,
       };
 
       this.processor = new ComponentProcessor(config);

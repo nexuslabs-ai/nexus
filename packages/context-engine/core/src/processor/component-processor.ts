@@ -115,10 +115,8 @@ export class ComponentProcessor {
     };
     this.metaGenerator = new MetaGenerator(generatorConfig);
 
-    // Initialize manifest builder with available components for filtering
-    this.manifestBuilder = new ManifestBuilder({
-      availableComponents: config.availableComponents,
-    });
+    // Initialize manifest builder
+    this.manifestBuilder = new ManifestBuilder();
 
     // Initialize optional state store for persistent storage
     if (config.storeDir) {
@@ -127,7 +125,6 @@ export class ComponentProcessor {
 
     logger.debug('ComponentProcessor initialized', {
       hasCustomProvider: !!config.llmProvider,
-      availableComponentsCount: config.availableComponents?.length,
       hasExtractorOptions: !!config.extractorOptions,
       hasStore: !!config.storeDir,
     });
@@ -187,6 +184,7 @@ export class ComponentProcessor {
       extracted: extractResult.extracted,
       meta: genResult.meta,
       sourceHash: extractResult.sourceHash,
+      availableComponents: input.availableComponents,
     });
 
     logger.info('Full pipeline processing completed', {
@@ -377,6 +375,7 @@ export class ComponentProcessor {
       extracted: input.extracted,
       meta: input.meta,
       sourceHash: input.sourceHash,
+      availableComponents: input.availableComponents,
     };
 
     // Manifest builder now returns success directly (throws on error)

@@ -29,16 +29,6 @@ export interface ManifestBuilderConfig {
    * @default '@nexus/react'
    */
   defaultPackageName?: string;
-
-  /**
-   * List of component names that exist in the design system.
-   * Used to filter LLM-generated relatedComponents to prevent
-   * hallucinated component names.
-   *
-   * If not provided, all relatedComponents from the LLM are kept.
-   * Format: PascalCase component names (e.g., ['Button', 'Card', 'Input'])
-   */
-  availableComponents?: string[];
 }
 
 /**
@@ -66,6 +56,9 @@ export interface ManifestBuilderInput {
 
   /** Hash of source code for change detection */
   sourceHash: string;
+
+  /** Component names in the design system for filtering relatedComponents */
+  availableComponents?: string[];
 }
 
 /**

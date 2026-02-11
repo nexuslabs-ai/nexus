@@ -281,6 +281,25 @@ export class ComponentRepository {
   }
 
   /**
+   * Find all component names for an organization.
+   *
+   * Returns a flat array of PascalCase component names, ordered alphabetically.
+   * Useful for building available-component lists at request time.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @returns Array of component names (e.g., ['Button', 'Card', 'Input'])
+   */
+  async findAllNames(orgId: string): Promise<string[]> {
+    const rows = await this.db
+      .select({ name: components.name })
+      .from(components)
+      .where(eq(components.orgId, orgId))
+      .orderBy(asc(components.name));
+
+    return rows.map((row) => row.name);
+  }
+
+  /**
    * Update a component
    */
   async update(

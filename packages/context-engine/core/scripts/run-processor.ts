@@ -259,6 +259,7 @@ async function processComponent(
       filePath,
       storiesFilePath,
       framework: 'react' as const,
+      availableComponents: getComponentNames(),
     };
 
     if (phase === 'extract') {
@@ -341,7 +342,6 @@ async function main(): Promise<void> {
   const processor = new ComponentProcessor({
     storeDir: outputDir,
     llmProvider: createProviderFromEnv(),
-    availableComponents: getComponentNames(),
   });
 
   // Print header
