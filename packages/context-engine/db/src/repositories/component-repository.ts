@@ -412,7 +412,8 @@ export class ComponentRepository {
    *
    * @param orgId - Organization ID (for multi-tenant isolation)
    * @param query - User search query (parsed by websearch_to_tsquery)
-   * @param options - Optional filters: limit, minScore, framework
+   * @param options - Optional filters: limit (maximum, fewer may be returned if
+   *   scores fall below minScore), minScore, framework
    * @returns Components matching the query, ordered by relevance score descending
    */
   async searchKeyword(
@@ -444,11 +445,11 @@ export class ComponentRepository {
         name: components.name,
         description: sql<string | null>`${components.manifest}->>'description'`,
         framework: components.framework,
-        score: sql<number>`ts_rank(${components.searchVector}, ${tsquery})`,
+        score: sql<number>`ts_rank(${components.searchVector}, ${tsquery}, 32)`,
       })
       .from(components)
       .where(and(...conditions))
-      .orderBy(sql`ts_rank(${components.searchVector}, ${tsquery}) DESC`)
+      .orderBy(sql`ts_rank(${components.searchVector}, ${tsquery}, 32) DESC`)
       .limit(limit);
 
     // Normalize score to number and apply minimum score threshold

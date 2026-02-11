@@ -224,6 +224,7 @@ export class SearchService {
     query: string,
     options: SearchOptions = {}
   ): Promise<HybridSearchResult> {
+    // minScore is intentionally excluded — RRF fusion works on rank positions, not raw scores.
     const { limit = 10, framework } = options;
     const searchOptions = { limit, framework };
 
