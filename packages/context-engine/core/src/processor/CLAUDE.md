@@ -111,7 +111,7 @@ The processor is the top-level orchestrator of the Context Engine pipeline. It c
 - **Store requires write permissions** — storeDir must be writable
 - **Component name collision** — Same name overwrites in store; use unique names or separate store directories
 - **hints are optional but valuable** — Providing hints significantly improves LLM output quality
-- **availableComponents prevents hallucinations** — Without it, LLM may generate non-existent related components
+- **availableComponents prevents hallucinations** — Passed per-request in process() or build() input, not at construction time; enables dynamic filtering based on the org's actual components at request time. Without it, LLM may generate non-existent related components
 
 ## When to Use
 

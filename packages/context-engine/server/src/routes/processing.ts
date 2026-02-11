@@ -428,6 +428,9 @@ processingRouter.openapi(buildRoute, async (c) => {
   // Build identity from stored component data
   const identity = buildIdentity(component);
 
+  // Query available component names for related-component filtering
+  const availableComponents = await repository.findAllNames(orgId);
+
   // Run build via processing service
   let buildResult;
   try {
@@ -437,6 +440,7 @@ processingRouter.openapi(buildRoute, async (c) => {
       extracted: component.extraction,
       meta: component.generation,
       sourceHash: component.sourceHash ?? '',
+      availableComponents,
     });
   } catch (err: unknown) {
     throw processingError(

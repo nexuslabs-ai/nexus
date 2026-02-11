@@ -57,7 +57,7 @@ Combines extracted component data (from HybridExtractor) and generated semantic 
 | **Normalize CVA variants**         | react-docgen misses CVA variants from VariantProps<typeof> — must add them explicitly with defaults            |
 | **Storybook examples prioritized** | Real Storybook examples > LLM-generated synthetic examples — always prefer actual code                         |
 | **Variant descriptions optional**  | Only included if LLM generated them — not all components have variants                                         |
-| **Related component filtering**    | LLMs hallucinate non-existent components — filter against availableComponents if configured                    |
+| **Related component filtering**    | LLMs hallucinate non-existent components — filter against availableComponents passed per build request         |
 | **Package detection heuristic**    | Look for @\*/(react                                                                                            | components | ui) or "design-system" in dependencies — fallback to configured default |
 
 ## Prop Processing Pipeline
@@ -95,7 +95,7 @@ The manifest builder is the final phase of the Context Engine pipeline. It produ
 - **Variant normalization is critical** — Without it, CVA variants that don't appear as explicit props would be missing
 - **Prop pipeline order matters** — Must run categorize → normalize → enrich; reordering breaks
 - **Sub-components use same pipeline** — Same quirks affect sub-component props
-- **Related components filtering is optional** — Without availableComponents config, hallucinated components are included
+- **Related components filtering is optional** — availableComponents is a per-request field on ManifestBuilderInput; without it, hallucinated components pass through unfiltered
 - **Example limits are hardcoded** — 1 minimal, 8 common, 3 advanced; change requires code modification
 - **Package detection is heuristic** — Non-standard design system naming may not be detected correctly
 - **Children detection by name** — Component must have prop named "children" for detection
