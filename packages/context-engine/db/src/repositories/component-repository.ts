@@ -22,6 +22,21 @@ import { type Component, components, type NewComponent } from '../schema.js';
 import type { EmbeddingStatus } from '../types.js';
 
 // =============================================================================
+// Constants
+// =============================================================================
+
+/**
+ * PostgreSQL ts_rank normalization flags
+ *
+ * The normalization flag controls how ts_rank computes relevance scores.
+ * Flag 32: Divides rank by (1 + document length), producing 0-1 bounded scores.
+ * This prevents longer documents from artificially inflating their scores.
+ *
+ * @see https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING
+ */
+const TS_RANK_NORMALIZE_BY_LENGTH = 32;
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -464,11 +479,13 @@ export class ComponentRepository {
         name: components.name,
         description: sql<string | null>`${components.manifest}->>'description'`,
         framework: components.framework,
-        score: sql<number>`ts_rank(${components.searchVector}, ${tsquery}, 32)`,
+        score: sql<number>`ts_rank(${components.searchVector}, ${tsquery}, ${TS_RANK_NORMALIZE_BY_LENGTH})`,
       })
       .from(components)
       .where(and(...conditions))
-      .orderBy(sql`ts_rank(${components.searchVector}, ${tsquery}, 32) DESC`)
+      .orderBy(
+        sql`ts_rank(${components.searchVector}, ${tsquery}, ${TS_RANK_NORMALIZE_BY_LENGTH}) DESC`
+      )
       .limit(limit);
 
     // Normalize score to number and apply minimum score threshold
