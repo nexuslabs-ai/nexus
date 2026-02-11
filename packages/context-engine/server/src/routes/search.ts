@@ -1,8 +1,9 @@
 /**
  * Search Routes
  *
- * Semantic search endpoint for finding components using natural language queries.
- * Powers AI assistants to discover relevant components from the component library.
+ * Component search endpoint supporting semantic (vector), keyword (full-text),
+ * and hybrid (RRF fusion) modes. Powers AI assistants to discover relevant
+ * components from the component library.
  */
 
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
@@ -14,8 +15,8 @@ import {
   SearchParamsSchema,
   SearchRequestSchema,
   SearchResponseSchema,
-  type SearchResult,
 } from '../schemas/index.js';
+import { SearchService } from '../services/index.js';
 import type { AppEnv } from '../types.js';
 import { successResponse } from '../utils/index.js';
 
@@ -23,14 +24,12 @@ import { successResponse } from '../utils/index.js';
  * Search router.
  *
  * Requires repositories middleware to be applied at app level.
- * Access embedding repository via `c.var.embeddingRepo`.
- *
- * Note: embeddingRepo is undefined if VOYAGE_API_KEY is not configured.
+ * Delegates all search modes to SearchService for transport-agnostic execution.
  */
 export const searchRouter = new OpenAPIHono<AppEnv>();
 
 // =============================================================================
-// POST / - Semantic Search
+// POST / - Search Components
 // =============================================================================
 
 const searchRoute = createRoute({
@@ -39,7 +38,7 @@ const searchRoute = createRoute({
   tags: ['Search'],
   summary: 'Search components',
   description:
-    'Semantic search for components using natural language queries. Requires VOYAGE_API_KEY to be configured for embedding generation.',
+    'Search for components using natural language queries. Supports semantic (vector), keyword (full-text), and hybrid (RRF fusion) modes.',
   security: [{ Bearer: [] }],
   middleware: [requireScope('component:read')],
   request: {
@@ -60,7 +59,8 @@ const searchRoute = createRoute({
     },
     503: {
       content: { 'application/json': { schema: ErrorSchema } },
-      description: 'Search service unavailable (VOYAGE_API_KEY not configured)',
+      description:
+        'Embedding service not configured (required for semantic/hybrid modes)',
     },
   },
 });
@@ -69,39 +69,108 @@ searchRouter.openapi(searchRoute, async (c) => {
   const { orgId } = c.req.valid('param');
   const body = c.req.valid('json');
 
-  // Get embedding repository from context
-  // Note: embeddingRepo is undefined if VOYAGE_API_KEY is not configured
-  const embeddingRepo = c.var.embeddingRepo;
+  const componentRepo = c.var.componentRepo;
 
-  if (!embeddingRepo) {
+  // Embedding repo is only required for semantic and hybrid search modes.
+  // Keyword search uses PostgreSQL full-text search and does not need embeddings.
+  if (
+    !c.var.embeddingRepo &&
+    (body.mode === 'semantic' || body.mode === 'hybrid')
+  ) {
     throw serviceUnavailable(
-      'Search service unavailable',
-      'VOYAGE_API_KEY environment variable is not configured'
+      'Embedding service not configured',
+      'VOYAGE_API_KEY is required for semantic and hybrid search. Use mode=keyword as fallback.'
     );
   }
 
-  const results = await embeddingRepo.search(orgId, body.query, {
+  const embeddingRepo = c.var.embeddingRepo!;
+  const searchService = new SearchService(componentRepo, embeddingRepo);
+
+  const searchOptions = {
     limit: body.limit,
     minScore: body.minScore,
     framework: body.framework,
-  });
+  };
 
-  // Map results to response format
-  const resultsWithFramework: SearchResult[] = results.map((r) => ({
-    componentId: r.componentId,
-    slug: r.slug,
-    name: r.name,
-    description: r.description,
-    framework: r.framework,
-    score: r.score,
-  }));
+  switch (body.mode) {
+    case 'keyword': {
+      const results = await searchService.searchKeyword(
+        orgId,
+        body.query,
+        searchOptions
+      );
 
-  return c.json(
-    successResponse({
-      results: resultsWithFramework,
-      total: resultsWithFramework.length,
-      query: body.query,
-    }),
-    200
-  );
+      return c.json(
+        successResponse({
+          results: results.map((r) => ({
+            componentId: r.componentId,
+            slug: r.slug,
+            name: r.name,
+            description: r.description,
+            framework: r.framework,
+            score: r.score,
+          })),
+          total: results.length,
+          query: body.query,
+          meta: { searchMode: body.mode },
+        }),
+        200
+      );
+    }
+
+    case 'semantic': {
+      const results = await searchService.searchSemantic(
+        orgId,
+        body.query,
+        searchOptions
+      );
+
+      return c.json(
+        successResponse({
+          results: results.map((r) => ({
+            componentId: r.componentId,
+            slug: r.slug,
+            name: r.name,
+            description: r.description,
+            framework: r.framework,
+            score: r.score,
+          })),
+          total: results.length,
+          query: body.query,
+          meta: { searchMode: body.mode },
+        }),
+        200
+      );
+    }
+
+    case 'hybrid':
+    default: {
+      const hybridResult = await searchService.searchHybrid(
+        orgId,
+        body.query,
+        searchOptions
+      );
+
+      return c.json(
+        successResponse({
+          results: hybridResult.results.map((r) => ({
+            componentId: r.componentId,
+            slug: r.slug,
+            name: r.name,
+            description: r.description,
+            framework: r.framework,
+            score: r.rrfScore,
+          })),
+          total: hybridResult.results.length,
+          query: body.query,
+          meta: {
+            searchMode: hybridResult.meta.searchMode,
+            semanticCount: hybridResult.meta.semanticCount,
+            keywordCount: hybridResult.meta.keywordCount,
+          },
+        }),
+        200
+      );
+    }
+  }
 });

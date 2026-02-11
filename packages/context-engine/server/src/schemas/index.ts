@@ -64,6 +64,8 @@ export {
 
 // Search schemas
 export {
+  type SearchMode,
+  SearchModeEnum,
   SearchParamsSchema,
   type SearchRequest,
   SearchRequestSchema,
@@ -72,6 +74,25 @@ export {
   type SearchResult,
   SearchResultSchema,
 } from './search.js';
+
+// Processing schemas
+export {
+  type BuildRequest,
+  BuildRequestSchema,
+  type BuildResponse,
+  BuildResponseSchema,
+  type ExtractionMetadata,
+  ExtractionMetadataSchema,
+  type ExtractRequest,
+  ExtractRequestSchema,
+  type ExtractResponse,
+  ExtractResponseSchema,
+  type GenerateRequest,
+  GenerateRequestSchema,
+  type GenerateResponse,
+  GenerateResponseSchema,
+  ProcessingParamsSchema,
+} from './processing.js';
 
 // API key schemas
 export {

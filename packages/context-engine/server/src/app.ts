@@ -14,6 +14,8 @@ import { ApiError } from './errors.js';
 import { createServerLogger } from './logger.js';
 import {
   authMiddleware,
+  preAuthRateLimitMiddleware,
+  rateLimitMiddleware,
   repositoriesMiddleware,
   requireOrgAccess,
 } from './middleware/index.js';
@@ -22,6 +24,7 @@ import {
   componentsRouter,
   healthRouter,
   organizationsRouter,
+  processingRouter,
   searchRouter,
 } from './routes/index.js';
 import type { AppEnv } from './types.js';
@@ -86,12 +89,20 @@ export function createApp() {
   // Access via c.var.organizationRepo, c.var.componentRepo, c.var.embeddingRepo
   app.use('/api/v1/*', repositoriesMiddleware);
 
+  // === Pre-Auth Rate Limit ===
+  // IP-based rate limiter (default 1000 req/min)
+  app.use('/api/v1/*', preAuthRateLimitMiddleware);
+
   // === Auth Middleware ===
   // Validates API key from Authorization header and sets c.var.auth.
   // Supports two token types:
   //   - Tenant API keys (ce_ prefix): org-scoped, looked up in database
   //   - Platform token (cep_ prefix): cross-org admin, compared against config
   app.use('/api/v1/*', authMiddleware);
+
+  // === Post-Auth Rate Limit ===
+  // Per-tenant rate limiter keyed on authenticated identity
+  app.use('/api/v1/*', rateLimitMiddleware);
 
   // === Org Access Middleware ===
   // Validates URL :orgId matches authenticated org for all org-scoped routes.
@@ -115,6 +126,12 @@ export function createApp() {
   // Expects orgId in path: /api/v1/organizations/:orgId/components
   app.route('/api/v1/organizations/:orgId/components', componentsRouter);
 
+  // Processing pipeline (nested under organization)
+  // POST /api/v1/organizations/:orgId/processing/extract
+  // POST /api/v1/organizations/:orgId/processing/generate
+  // POST /api/v1/organizations/:orgId/processing/build
+  app.route('/api/v1/organizations/:orgId/processing', processingRouter);
+
   // Semantic search (nested under organization)
   // POST /api/v1/organizations/:orgId/search
   app.route('/api/v1/organizations/:orgId/search', searchRouter);
@@ -137,6 +154,10 @@ export function createApp() {
       { name: 'Health', description: 'Health check endpoints' },
       { name: 'Organizations', description: 'Organization management' },
       { name: 'Components', description: 'Component CRUD operations' },
+      {
+        name: 'Processing',
+        description: 'Component processing pipeline (extract, generate, build)',
+      },
       { name: 'Search', description: 'Semantic component search' },
       { name: 'API Keys', description: 'API key management' },
     ],

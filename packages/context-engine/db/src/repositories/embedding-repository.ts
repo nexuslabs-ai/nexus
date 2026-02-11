@@ -10,7 +10,7 @@
  */
 
 import type { AIManifest } from '@context-engine/core';
-import { and, cosineDistance, eq, inArray, sql } from 'drizzle-orm';
+import { and, cosineDistance, count, eq, inArray, sql } from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { generateChunks } from '../embeddings/chunk-generator.js';
@@ -19,7 +19,12 @@ import {
   type EmbeddingService,
 } from '../embeddings/embedding-service.js';
 import { components, embeddingChunks } from '../schema.js';
-import type { IndexResult, SearchOptions, SearchResult } from '../types.js';
+import type {
+  ChunkType,
+  IndexResult,
+  SearchOptions,
+  SearchResult,
+} from '../types.js';
 
 // =============================================================================
 // Repository
@@ -316,6 +321,62 @@ export class EmbeddingRepository {
         };
       })
       .filter((r): r is SearchResult => r !== null);
+  }
+
+  // ===========================================================================
+  // Analytics
+  // ===========================================================================
+
+  /**
+   * Count total embedding chunks for an organization.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @returns Total number of chunks
+   */
+  async countChunks(orgId: string): Promise<number> {
+    const [result] = await this.db
+      .select({ count: count() })
+      .from(embeddingChunks)
+      .where(eq(embeddingChunks.orgId, orgId));
+
+    return Number(result.count);
+  }
+
+  /**
+   * Count embedding chunks grouped by chunk type.
+   *
+   * Returns a record with counts for each chunk type.
+   * Missing types default to 0.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @returns Record mapping chunk types to counts
+   */
+  async countChunksByType(orgId: string): Promise<Record<ChunkType, number>> {
+    const results = await this.db
+      .select({
+        chunkType: embeddingChunks.chunkType,
+        count: count(),
+      })
+      .from(embeddingChunks)
+      .where(eq(embeddingChunks.orgId, orgId))
+      .groupBy(embeddingChunks.chunkType);
+
+    // Initialize all chunk types to 0
+    const counts: Record<ChunkType, number> = {
+      description: 0,
+      import: 0,
+      props: 0,
+      composition: 0,
+      examples: 0,
+      patterns: 0,
+      guidance: 0,
+    };
+
+    for (const row of results) {
+      counts[row.chunkType] = Number(row.count);
+    }
+
+    return counts;
   }
 
   // ===========================================================================

@@ -21,9 +21,11 @@
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:extract": "tsx --env-file=.env scripts/test-extract.ts"
   },
   "dependencies": {
+    "@context-engine/core": "*",
     "@context-engine/db": "*",
     "@hono/node-server": "^1.14.1",
     "@hono/swagger-ui": "^0.5.1",

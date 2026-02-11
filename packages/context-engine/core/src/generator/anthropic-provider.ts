@@ -10,7 +10,7 @@
  * Throws MetaGenerationError on failure instead of returning failure objects.
  *
  * Configuration is read from environment variables via the config module:
- * - ANTHROPIC_API_KEY: API key (required)
+ * - LLM_API_KEY: API key (required, provider-agnostic)
  * - CONTEXT_ENGINE_MODEL: Model identifier
  * - CONTEXT_ENGINE_MAX_TOKENS: Max tokens for completion
  * - CONTEXT_ENGINE_TIMEOUT_MS: Request timeout
@@ -19,7 +19,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 
-import { getLLMConfig } from '../config/index.js';
+import { getAnthropicConfig } from '../config/index.js';
 import { MetaGenerationError } from '../types/errors.js';
 import { createLogger } from '../utils/logger.js';
 
@@ -38,7 +38,7 @@ const logger = createLogger({ name: 'anthropic-provider' });
  * Get default configuration from environment
  */
 function getDefaults() {
-  const config = getLLMConfig();
+  const config = getAnthropicConfig();
   return {
     model: config.model,
     maxTokens: config.maxTokens,
@@ -60,7 +60,7 @@ function getDefaults() {
  * @example
  * ```typescript
  * const provider = new AnthropicProvider({
- *   apiKey: process.env.ANTHROPIC_API_KEY,
+ *   apiKey: process.env.LLM_API_KEY,
  *   // model defaults to DEFAULT_ANTHROPIC_MODEL constant
  * });
  *
@@ -86,11 +86,11 @@ export class AnthropicProvider implements ILLMProvider {
 
   constructor(config: AnthropicProviderConfig = {}) {
     const defaults = getDefaults();
-    const apiKey = config.apiKey ?? process.env.ANTHROPIC_API_KEY;
+    const apiKey = config.apiKey ?? process.env.LLM_API_KEY;
 
     if (!apiKey) {
       throw new Error(
-        'Anthropic API key is required. Provide via config.apiKey or ANTHROPIC_API_KEY environment variable.'
+        'Anthropic API key is required. Provide via config.apiKey or LLM_API_KEY environment variable.'
       );
     }
 

@@ -5,15 +5,92 @@
  * All methods are scoped to an organization for multi-tenancy.
  */
 
-import { and, asc, count, desc, eq } from 'drizzle-orm';
+import type { AIManifest } from '@context-engine/core';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  sql,
+} from 'drizzle-orm';
 
 import type { Database } from '../client.js';
 import { type Component, components, type NewComponent } from '../schema.js';
 import type { EmbeddingStatus } from '../types.js';
 
 // =============================================================================
+// Constants
+// =============================================================================
+
+/**
+ * PostgreSQL ts_rank normalization flags
+ *
+ * The normalization flag controls how ts_rank computes relevance scores.
+ * Flag 32: Divides rank by (1 + document length), producing 0-1 bounded scores.
+ * This prevents longer documents from artificially inflating their scores.
+ *
+ * @see https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING
+ */
+const TS_RANK_NORMALIZE_BY_LENGTH = 32;
+
+// =============================================================================
 // Types
 // =============================================================================
+
+/**
+ * Result of a keyword (full-text) search against the components table.
+ *
+ * Uses PostgreSQL's tsvector/tsquery for ranking by term relevance.
+ * Score is computed by ts_rank and reflects how well the component's
+ * searchVector matches the query (higher is more relevant).
+ */
+export interface KeywordSearchResult {
+  /** Component UUID */
+  componentId: string;
+  /** URL-friendly identifier */
+  slug: string;
+  /** Human-readable component name */
+  name: string;
+  /** Component description extracted from manifest (may be null) */
+  description: string | null;
+  /** Target framework (e.g., 'react', 'vue') */
+  framework: string;
+  /** Full-text search rank score (higher is more relevant) */
+  score: number;
+}
+
+/**
+ * Options for finding components with manifests
+ */
+export interface FindAllManifestsOptions {
+  /** Filter to specific slugs */
+  slugs?: string[];
+  /** Filter by framework */
+  framework?: string;
+  /** Maximum number of results (default: 100) */
+  limit?: number;
+}
+
+/**
+ * Result from findAllManifests containing component with manifest
+ */
+export interface ManifestResult {
+  /** Component ID */
+  id: string;
+  /** URL-friendly identifier */
+  slug: string;
+  /** Component display name */
+  name: string;
+  /** Target framework */
+  framework: string;
+  /** Semantic version */
+  version: string;
+  /** AI manifest (always present due to isNotNull filter) */
+  manifest: AIManifest;
+}
 
 /**
  * Options for finding multiple components
@@ -78,6 +155,24 @@ export class ComponentRepository {
       .select()
       .from(components)
       .where(and(eq(components.orgId, orgId), eq(components.id, id)))
+      .limit(1);
+
+    return result ?? null;
+  }
+
+  /**
+   * Find component by name (case-insensitive)
+   */
+  async findByName(orgId: string, name: string): Promise<Component | null> {
+    const [result] = await this.db
+      .select()
+      .from(components)
+      .where(
+        and(
+          eq(components.orgId, orgId),
+          sql`lower(${components.name}) = lower(${name})`
+        )
+      )
       .limit(1);
 
     return result ?? null;
@@ -153,6 +248,70 @@ export class ComponentRepository {
       .offset(offset);
 
     return { components: componentsList, total };
+  }
+
+  /**
+   * Find all components that have manifests for an organization.
+   * Used for bundle resolution and bulk manifest retrieval.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @param options - Optional filters and pagination
+   * @returns Components with their manifests
+   */
+  async findAllManifests(
+    orgId: string,
+    options: FindAllManifestsOptions = {}
+  ): Promise<ManifestResult[]> {
+    const { slugs, framework, limit = 100 } = options;
+
+    // Build conditions
+    const conditions = [
+      eq(components.orgId, orgId),
+      isNotNull(components.manifest),
+    ];
+
+    if (slugs && slugs.length > 0) {
+      conditions.push(inArray(components.slug, slugs));
+    }
+
+    if (framework) {
+      conditions.push(eq(components.framework, framework));
+    }
+
+    const rows = await this.db
+      .select({
+        id: components.id,
+        slug: components.slug,
+        name: components.name,
+        framework: components.framework,
+        version: components.version,
+        manifest: components.manifest,
+      })
+      .from(components)
+      .where(and(...conditions))
+      .orderBy(asc(components.name))
+      .limit(limit);
+
+    return rows as ManifestResult[];
+  }
+
+  /**
+   * Find all component names for an organization.
+   *
+   * Returns a flat array of PascalCase component names, ordered alphabetically.
+   * Useful for building available-component lists at request time.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @returns Array of component names (e.g., ['Button', 'Card', 'Input'])
+   */
+  async findAllNames(orgId: string): Promise<string[]> {
+    const rows = await this.db
+      .select({ name: components.name })
+      .from(components)
+      .where(eq(components.orgId, orgId))
+      .orderBy(asc(components.name));
+
+    return rows.map((row) => row.name);
   }
 
   /**
@@ -234,5 +393,104 @@ export class ComponentRepository {
       .where(eq(components.orgId, orgId));
 
     return result?.count ?? 0;
+  }
+
+  /**
+   * Count components grouped by embedding status.
+   *
+   * Returns a record with all possible statuses, defaulting to 0
+   * for any status that has no matching components.
+   */
+  async countByEmbeddingStatus(
+    orgId: string
+  ): Promise<Record<EmbeddingStatus, number>> {
+    const results = await this.db
+      .select({
+        status: components.embeddingStatus,
+        count: count(),
+      })
+      .from(components)
+      .where(eq(components.orgId, orgId))
+      .groupBy(components.embeddingStatus);
+
+    // Initialize all statuses to 0
+    const counts: Record<EmbeddingStatus, number> = {
+      pending: 0,
+      processing: 0,
+      indexed: 0,
+      failed: 0,
+    };
+
+    for (const row of results) {
+      if (row.status) {
+        counts[row.status] = Number(row.count);
+      }
+    }
+
+    return counts;
+  }
+
+  // ===========================================================================
+  // Search
+  // ===========================================================================
+
+  /**
+   * Full-text keyword search using the pre-computed searchVector (tsvector) column.
+   *
+   * Uses PostgreSQL's websearch_to_tsquery for user-friendly query parsing
+   * (supports natural syntax like "button loading", "dialog OR modal").
+   * Results are ranked by ts_rank, which scores based on term frequency
+   * and weight (component name = weight A, description = weight B).
+   *
+   * Only returns components with embeddingStatus = 'indexed' (fully searchable).
+   *
+   * @param orgId - Organization ID (for multi-tenant isolation)
+   * @param query - User search query (parsed by websearch_to_tsquery)
+   * @param options - Optional filters: limit (maximum, fewer may be returned if
+   *   scores fall below minScore), minScore, framework
+   * @returns Components matching the query, ordered by relevance score descending
+   */
+  async searchKeyword(
+    orgId: string,
+    query: string,
+    options: { limit?: number; minScore?: number; framework?: string } = {}
+  ): Promise<KeywordSearchResult[]> {
+    const { limit = 10, minScore = 0, framework } = options;
+
+    // FTS query — must use sql (no Drizzle built-in for websearch_to_tsquery)
+    const tsquery = sql`websearch_to_tsquery('english', ${query})`;
+
+    // Build WHERE conditions: Drizzle built-ins for equality, sql for FTS match
+    const conditions = [
+      eq(components.orgId, orgId),
+      eq(components.embeddingStatus, 'indexed'),
+      sql`${components.searchVector} @@ ${tsquery}`,
+    ];
+
+    if (framework) {
+      conditions.push(eq(components.framework, framework));
+    }
+
+    // Query with ts_rank scoring
+    const results = await this.db
+      .select({
+        componentId: components.id,
+        slug: components.slug,
+        name: components.name,
+        description: sql<string | null>`${components.manifest}->>'description'`,
+        framework: components.framework,
+        score: sql<number>`ts_rank(${components.searchVector}, ${tsquery}, ${TS_RANK_NORMALIZE_BY_LENGTH})`,
+      })
+      .from(components)
+      .where(and(...conditions))
+      .orderBy(
+        sql`ts_rank(${components.searchVector}, ${tsquery}, ${TS_RANK_NORMALIZE_BY_LENGTH}) DESC`
+      )
+      .limit(limit);
+
+    // Normalize score to number and apply minimum score threshold
+    return results
+      .map((r) => ({ ...r, score: Number(r.score) }))
+      .filter((r) => r.score >= minScore);
   }
 }

@@ -182,7 +182,7 @@ See `env.example` for configuration:
 
 ```bash
 # LLM Provider
-ANTHROPIC_API_KEY=           # Required for generation
+LLM_API_KEY=                 # Required for generation (provider-agnostic)
 
 # Database (for db package)
 DATABASE_URL=                # PostgreSQL connection string

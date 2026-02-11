@@ -1,8 +1,9 @@
 /**
  * Search Schemas
  *
- * Request and response schemas for semantic component search.
+ * Request and response schemas for component search.
  * These power the natural language search capabilities for AI assistants.
+ * Supports semantic (vector), keyword (full-text), and hybrid (both with RRF fusion) modes.
  */
 
 import { z } from '@hono/zod-openapi';
@@ -11,11 +12,30 @@ import { FrameworkEnum } from './components.js';
 import { OrgIdPathParamSchema } from './organizations.js';
 
 // =============================================================================
+// Enums / Constants
+// =============================================================================
+
+/**
+ * Search mode selection.
+ * Controls how the search query is processed:
+ * - semantic: Vector similarity search using embeddings
+ * - keyword: Full-text search using PostgreSQL tsvector
+ * - hybrid: Combines both with Reciprocal Rank Fusion (RRF)
+ */
+export const SearchModeEnum = z
+  .enum(['semantic', 'keyword', 'hybrid'])
+  .openapi({
+    example: 'hybrid',
+    description:
+      'Search mode: semantic (vector), keyword (full-text), or hybrid (both with RRF fusion)',
+  });
+
+// =============================================================================
 // Request Schemas
 // =============================================================================
 
 /**
- * Semantic search request body.
+ * Search request body.
  * Used by AI assistants to find relevant components.
  */
 export const SearchRequestSchema = z
@@ -38,6 +58,9 @@ export const SearchRequestSchema = z
     }),
     framework: FrameworkEnum.optional().openapi({
       description: 'Filter results by framework',
+    }),
+    mode: SearchModeEnum.default('hybrid').openapi({
+      description: 'Search mode selection (default: hybrid)',
     }),
   })
   .openapi('SearchRequest');
@@ -81,6 +104,8 @@ export const SearchResultSchema = z
 
 /**
  * Search response with results and metadata.
+ * Includes search execution metadata for AI consumers to understand
+ * how results were retrieved.
  */
 export const SearchResponseSchema = z
   .object({
@@ -97,6 +122,21 @@ export const SearchResponseSchema = z
         example: 'button with loading state',
         description: 'The query that was searched',
       }),
+      meta: z
+        .object({
+          searchMode: SearchModeEnum.openapi({
+            description: 'The search mode that was used',
+          }),
+          semanticCount: z.number().int().optional().openapi({
+            description: 'Number of semantic results (hybrid mode only)',
+          }),
+          keywordCount: z.number().int().optional().openapi({
+            description: 'Number of keyword results (hybrid mode only)',
+          }),
+        })
+        .openapi({
+          description: 'Search execution metadata',
+        }),
     }),
   })
   .openapi('SearchResponse');
@@ -115,6 +155,7 @@ export const SearchParamsSchema = OrgIdPathParamSchema;
 // Type Exports
 // =============================================================================
 
+export type SearchMode = z.infer<typeof SearchModeEnum>;
 export type SearchRequest = z.infer<typeof SearchRequestSchema>;
 export type SearchResult = z.infer<typeof SearchResultSchema>;
 export type SearchResponse = z.infer<typeof SearchResponseSchema>;

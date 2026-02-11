@@ -39,16 +39,6 @@ export interface ProcessorConfig {
   maxGenerationTokens?: number;
 
   /**
-   * List of component names that exist in the design system.
-   * Used to filter LLM-generated relatedComponents to prevent
-   * hallucinated component names.
-   *
-   * If not provided, all relatedComponents from the LLM are kept.
-   * Format: PascalCase component names (e.g., ['Button', 'Card', 'Input'])
-   */
-  availableComponents?: string[];
-
-  /**
    * Options for the HybridExtractor.
    * Used to configure path aliases and dependencies for accurate
    * internal vs external import detection.
@@ -254,6 +244,9 @@ export interface ProcessorInput {
    * Provides additional context about the component beyond what's extracted from code.
    */
   hints?: string;
+
+  /** Component names in the design system for filtering relatedComponents */
+  availableComponents?: string[];
 }
 
 // =============================================================================
@@ -403,6 +396,9 @@ export interface BuildInput {
 
   /** Source hash for change detection */
   sourceHash: string;
+
+  /** Component names in the design system for filtering relatedComponents */
+  availableComponents?: string[];
 }
 
 /**

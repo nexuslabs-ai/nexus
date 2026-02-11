@@ -15,7 +15,9 @@ type ErrorCode =
   | 'UNAUTHORIZED'
   | 'FORBIDDEN'
   | 'SERVICE_UNAVAILABLE'
-  | 'INTERNAL_ERROR';
+  | 'INTERNAL_ERROR'
+  | 'RATE_LIMITED'
+  | 'PROCESSING_ERROR';
 
 /**
  * Base API error class.
@@ -91,3 +93,25 @@ export const unauthorized = (message = 'Authentication required') =>
  */
 export const forbidden = (message = 'Insufficient permissions') =>
   new ApiError(403, 'FORBIDDEN', message);
+
+/**
+ * Rate limit exceeded.
+ * Use when a client has exceeded their allowed request rate.
+ * @param retryAfter - Optional seconds until the client can retry
+ */
+export const rateLimited = (retryAfter?: number) =>
+  new ApiError(
+    429,
+    'RATE_LIMITED',
+    'Rate limit exceeded. Please try again later.',
+    retryAfter ? { retryAfter } : undefined
+  );
+
+/**
+ * Component processing error.
+ * Use when component extraction or generation fails.
+ * @param message - Description of what failed during processing
+ * @param details - Optional additional context about the failure
+ */
+export const processingError = (message: string, details?: unknown) =>
+  new ApiError(500, 'PROCESSING_ERROR', message, details);

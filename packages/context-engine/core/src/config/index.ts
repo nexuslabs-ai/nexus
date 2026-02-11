@@ -55,14 +55,14 @@ function getEnvBoolean(key: string, defaultValue: boolean): boolean {
 }
 
 // =============================================================================
-// LLM Configuration
+// Anthropic Configuration
 // =============================================================================
 
 /**
- * LLM provider configuration
+ * Anthropic provider configuration
  */
-export interface LLMConfig {
-  /** Anthropic API key */
+export interface AnthropicConfig {
+  /** LLM API key (provider-agnostic, set via LLM_API_KEY) */
   apiKey: string | undefined;
   /** Model identifier */
   model: string;
@@ -75,16 +75,16 @@ export interface LLMConfig {
 }
 
 /**
- * Get LLM configuration from environment (Anthropic)
+ * Get Anthropic provider configuration from environment
  *
  * Model selection priority:
  * 1. ANTHROPIC_MODEL (provider-specific)
  * 2. CONTEXT_ENGINE_MODEL (generic fallback)
  * 3. Default: DEFAULT_ANTHROPIC_MODEL constant
  */
-export function getLLMConfig(): LLMConfig {
+export function getAnthropicConfig(): AnthropicConfig {
   return {
-    apiKey: getEnv('ANTHROPIC_API_KEY'),
+    apiKey: getEnv('LLM_API_KEY'),
     model:
       getEnv('ANTHROPIC_MODEL') ??
       getEnv('CONTEXT_ENGINE_MODEL', DEFAULT_ANTHROPIC_MODEL)!,
@@ -102,7 +102,7 @@ export function getLLMConfig(): LLMConfig {
  * Gemini provider configuration
  */
 export interface GeminiConfig {
-  /** Google API key */
+  /** LLM API key (provider-agnostic, set via LLM_API_KEY) */
   apiKey: string | undefined;
   /** Model identifier */
   model: string;
@@ -122,7 +122,7 @@ export interface GeminiConfig {
  */
 export function getGeminiConfig(): GeminiConfig {
   return {
-    apiKey: getEnv('GOOGLE_API_KEY'),
+    apiKey: getEnv('LLM_API_KEY'),
     model:
       getEnv('GEMINI_MODEL') ??
       getEnv('CONTEXT_ENGINE_MODEL', DEFAULT_GEMINI_MODEL)!,

@@ -75,7 +75,6 @@ const MAX_ADVANCED_EXAMPLES = 3;
 export class ManifestBuilder {
   private readonly config: {
     defaultPackageName: string;
-    availableComponents?: string[];
   };
 
   /**
@@ -86,7 +85,6 @@ export class ManifestBuilder {
   constructor(config: ManifestBuilderConfig = {}) {
     this.config = {
       defaultPackageName: config.defaultPackageName ?? DEFAULT_PACKAGE_NAME,
-      availableComponents: config.availableComponents,
     };
   }
 
@@ -102,6 +100,7 @@ export class ManifestBuilder {
     extracted,
     meta,
     sourceHash,
+    availableComponents,
   }: ManifestBuilderInput): ManifestBuilderResult {
     const { name } = identity;
     const now = new Date().toISOString();
@@ -136,7 +135,7 @@ export class ManifestBuilder {
     );
 
     const examples = this.buildStructuredExamples(meta, extracted);
-    const guidance = this.buildGuidance(meta);
+    const guidance = this.buildGuidance(meta, availableComponents);
     const semanticDescription = this.buildSemanticDescription(meta, name);
 
     const subComponents = this.buildSubComponents(
@@ -452,16 +451,22 @@ export class ManifestBuilder {
   /**
    * Build guidance from meta.ai
    *
-   * If availableComponents is configured, filters relatedComponents to only
+   * If availableComponents is provided, filters relatedComponents to only
    * include components that actually exist in the design system.
+   *
+   * @param meta - Generated metadata from LLM
+   * @param availableComponents - Optional list of component names to filter against
    */
-  private buildGuidance(meta: ManifestBuilderInput['meta']): Guidance {
+  private buildGuidance(
+    meta: ManifestBuilderInput['meta'],
+    availableComponents?: string[]
+  ): Guidance {
     const ai = meta.ai;
     let relatedComponents = ai?.relatedComponents ?? [];
 
-    // Filter relatedComponents if availableComponents is configured
-    if (this.config.availableComponents && relatedComponents.length > 0) {
-      const available = new Set(this.config.availableComponents);
+    // Filter relatedComponents if availableComponents is provided
+    if (availableComponents && relatedComponents.length > 0) {
+      const available = new Set(availableComponents);
       const filtered = relatedComponents.filter((comp) => available.has(comp));
 
       if (filtered.length !== relatedComponents.length) {

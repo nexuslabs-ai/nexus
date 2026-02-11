@@ -8,4 +8,5 @@ export { apiKeysRouter } from './api-keys.js';
 export { componentsRouter } from './components.js';
 export { healthRouter } from './health.js';
 export { organizationsRouter } from './organizations.js';
+export { processingRouter } from './processing.js';
 export { searchRouter } from './search.js';

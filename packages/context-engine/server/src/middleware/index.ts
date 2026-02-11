@@ -5,4 +5,8 @@
  */
 
 export { authMiddleware, requireOrgAccess, requireScope } from './auth.js';
+export {
+  preAuthRateLimitMiddleware,
+  rateLimitMiddleware,
+} from './rate-limit.js';
 export { repositoriesMiddleware } from './repositories.js';

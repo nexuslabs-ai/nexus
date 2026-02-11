@@ -17,7 +17,7 @@ Context Engine Core provides a complete pipeline for extracting component metada
 yarn add @context-engine/core
 
 # Set environment variable
-export ANTHROPIC_API_KEY=your-api-key
+export LLM_API_KEY=your-api-key
 ```
 
 ```typescript
@@ -45,8 +45,8 @@ console.log('Guidance:', result.manifest.guidance);
 ### Environment Variables
 
 ```bash
-# Required for generation
-ANTHROPIC_API_KEY=sk-ant-...
+# Required for generation (provider-agnostic)
+LLM_API_KEY=sk-ant-...
 
 # Optional: Generation config
 CONTEXT_ENGINE_GENERATION_MAX_TOKENS=3000
@@ -84,8 +84,6 @@ const processor = createComponentProcessor({
     },
     dependencies: ['react', '@radix-ui/react-slot'],
   },
-  // Optional: Filter LLM-generated related components
-  availableComponents: ['Button', 'Input', 'Card'],
 });
 
 const result = await processor.process({
@@ -99,6 +97,8 @@ const result = await processor.process({
   hints: 'Primary action button with loading states',
   // Optional: Semantic version
   version: '1.0.0',
+  // Optional: Filter LLM-generated related components
+  availableComponents: ['Button', 'Input', 'Card'],
 });
 
 // Access results
@@ -163,7 +163,7 @@ const extractResult = await extractor.extract({
 
 // 2. Generate
 const provider = createAnthropicProvider({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.LLM_API_KEY,
 });
 const generator = createMetaGenerator({ provider });
 const genResult = await generator.generate({

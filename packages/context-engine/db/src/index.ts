@@ -37,7 +37,10 @@ export * from './schema.js';
 export { ApiKeyRepository } from './repositories/api-key-repository.js';
 export {
   ComponentRepository,
+  type FindAllManifestsOptions,
   type FindManyOptions,
+  type KeywordSearchResult,
+  type ManifestResult,
 } from './repositories/component-repository.js';
 export { EmbeddingRepository } from './repositories/embedding-repository.js';
 export {
