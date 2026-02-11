@@ -8,8 +8,10 @@
 
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
+import { serviceUnavailable } from '../errors.js';
 import { requireScope } from '../middleware/auth.js';
 import {
+  ErrorSchema,
   SearchParamsSchema,
   SearchRequestSchema,
   SearchResponseSchema,
@@ -55,6 +57,11 @@ const searchRoute = createRoute({
       content: { 'application/json': { schema: SearchResponseSchema } },
       description: 'Search results ordered by relevance',
     },
+    503: {
+      content: { 'application/json': { schema: ErrorSchema } },
+      description:
+        'Embedding service not configured (required for semantic/hybrid modes)',
+    },
   },
 });
 
@@ -63,6 +70,19 @@ searchRouter.openapi(searchRoute, async (c) => {
   const body = c.req.valid('json');
 
   const componentRepo = c.var.componentRepo;
+
+  // Embedding repo is only required for semantic and hybrid search modes.
+  // Keyword search uses PostgreSQL full-text search and does not need embeddings.
+  if (
+    !c.var.embeddingRepo &&
+    (body.mode === 'semantic' || body.mode === 'hybrid')
+  ) {
+    throw serviceUnavailable(
+      'Embedding service not configured',
+      'VOYAGE_API_KEY is required for semantic and hybrid search. Use mode=keyword as fallback.'
+    );
+  }
+
   const embeddingRepo = c.var.embeddingRepo!;
   const searchService = new SearchService(componentRepo, embeddingRepo);
 

@@ -74,7 +74,7 @@ export interface ManifestResult {
   /** Semantic version */
   version: string;
   /** AI manifest (always present due to isNotNull filter) */
-  manifest: AIManifest | null;
+  manifest: AIManifest;
 }
 
 /**
@@ -263,7 +263,7 @@ export class ComponentRepository {
       conditions.push(eq(components.framework, framework));
     }
 
-    return this.db
+    const rows = await this.db
       .select({
         id: components.id,
         slug: components.slug,
@@ -276,6 +276,8 @@ export class ComponentRepository {
       .where(and(...conditions))
       .orderBy(asc(components.name))
       .limit(limit);
+
+    return rows as ManifestResult[];
   }
 
   /**
