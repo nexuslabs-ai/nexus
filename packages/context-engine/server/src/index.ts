@@ -62,5 +62,7 @@ export {
   type McpContext,
   mcpRouter,
   type ResourceHandler,
+  type SessionEntry,
+  SessionStore,
   type ToolHandler,
 } from './mcp/index.js';

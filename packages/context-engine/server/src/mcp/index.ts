@@ -17,5 +17,8 @@ export { createMcpServer } from './server.js';
 // Auth bridge
 export { extractMcpAuth } from './auth.js';
 
+// Session store
+export { type SessionEntry, SessionStore } from './sessions.js';
+
 // Types
 export type { McpContext, ResourceHandler, ToolHandler } from './types.js';
