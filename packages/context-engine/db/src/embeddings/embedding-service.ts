@@ -76,15 +76,17 @@ export class EmbeddingService {
    *
    * @param texts - Array of texts to embed
    * @returns Array of embedding vectors in same order as input
+   * @throws Error if embedding generation fails for any text
    */
   async embedBatch(texts: string[]): Promise<number[][]> {
     if (texts.length === 0) return [];
 
-    // Check cache for each text
-    const results: number[][] = [];
+    // Initialize results array with proper length to catch gaps early
+    const results: Array<number[] | undefined> = new Array(texts.length);
     const uncachedTexts: string[] = [];
     const uncachedIndices: number[] = [];
 
+    // Check cache for each text
     for (let i = 0; i < texts.length; i++) {
       const text = texts[i];
       const cacheKey = this.getCacheKey(text);
@@ -120,7 +122,15 @@ export class EmbeddingService {
       }
     }
 
-    return results;
+    // Validate no holes remain - catches incomplete embedding generation
+    if (results.some((r) => r === undefined)) {
+      throw new Error(
+        'Failed to generate embeddings for all texts: some results are undefined'
+      );
+    }
+
+    // Safe to cast after validation - all elements guaranteed to be number[]
+    return results as number[][];
   }
 
   /**
@@ -223,12 +233,11 @@ export class EmbeddingService {
   private setCached(text: string, embedding: number[]): void {
     const cacheKey = this.getCacheKey(text);
 
-    // Evict oldest entry if cache is full
+    // Evict oldest entry if cache is full (LRU via Map insertion order)
     if (this.cache.size >= CACHE_MAX_SIZE) {
       const firstKey = this.cache.keys().next().value;
-      if (firstKey !== undefined) {
-        this.cache.delete(firstKey);
-      }
+      // Safe assertion: if size >= CACHE_MAX_SIZE, there's always a first key
+      this.cache.delete(firstKey!);
     }
 
     this.cache.set(cacheKey, embedding);

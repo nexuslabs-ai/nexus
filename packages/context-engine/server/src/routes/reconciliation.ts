@@ -305,27 +305,19 @@ reconciliationRouter.openapi(processPendingRoute, async (c) => {
   // Find pending components for this org
   const pending = await componentRepo.findPending(orgId, batchSize);
 
-  let succeeded = 0;
-  let failed = 0;
+  // Filter out components without manifests before processing
+  const componentsToProcess = pending.filter((c) => c.manifest);
 
-  // Process each component
-  for (const component of pending) {
-    if (!component.manifest) {
-      // Skip components without manifests
-      continue;
-    }
+  // Process components in parallel using Promise.allSettled
+  // This reduces latency for manual reconciliation operations
+  const results = await Promise.allSettled(
+    componentsToProcess.map((component) =>
+      embeddingRepo.index(component.orgId, component.id, component.manifest!)
+    )
+  );
 
-    try {
-      await embeddingRepo.index(
-        component.orgId,
-        component.id,
-        component.manifest
-      );
-      succeeded++;
-    } catch (_error) {
-      failed++;
-    }
-  }
+  const succeeded = results.filter((r) => r.status === 'fulfilled').length;
+  const failed = results.filter((r) => r.status === 'rejected').length;
 
   return c.json(
     successResponse({

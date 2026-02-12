@@ -530,17 +530,20 @@ export class ComponentRepository {
 
     // Continue until we reach limit or exhaust all components
     while (result.length < limit && componentsByOrg.size > 0) {
+      let addedThisRound = 0;
+
       for (const [_orgId, orgComponents] of componentsByOrg.entries()) {
         if (index < orgComponents.length) {
           result.push(orgComponents[index]);
+          addedThisRound++;
           if (result.length >= limit) break;
         }
       }
 
-      index++;
+      // Exit if no components added this round (all orgs exhausted)
+      if (addedThisRound === 0) break;
 
-      // Remove orgs that have exhausted their components
-      if (index >= maxPerOrg) break;
+      index++;
     }
 
     return result;
