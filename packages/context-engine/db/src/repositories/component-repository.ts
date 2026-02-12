@@ -574,6 +574,42 @@ export class ComponentRepository {
     return result.length;
   }
 
+  /**
+   * Find components with outdated embedding models.
+   *
+   * Queries components where the embedding model doesn't match the current
+   * model version. Used for migration when upgrading embedding models
+   * (e.g., voyage-code-3 → voyage-code-4).
+   *
+   * Only returns indexed components (successfully embedded with old model).
+   * Pending/failed components will be indexed with new model automatically.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @param currentModel - Current model identifier (e.g., 'voyage-code-3')
+   * @param limit - Maximum number of components to return
+   * @returns Components that need re-embedding with new model
+   */
+  async findByOutdatedModel(
+    orgId: string,
+    currentModel: string,
+    limit: number
+  ): Promise<Component[]> {
+    const result = await this.db
+      .select()
+      .from(components)
+      .where(
+        and(
+          eq(components.orgId, orgId),
+          eq(components.embeddingStatus, 'indexed'),
+          sql`${components.embeddingModel}->>'model' != ${currentModel}`
+        )
+      )
+      .orderBy(asc(components.updatedAt))
+      .limit(limit);
+
+    return result;
+  }
+
   // ===========================================================================
   // Search
   // ===========================================================================
