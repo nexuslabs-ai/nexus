@@ -38,6 +38,14 @@ const envSchema = z.object({
   // Pre-auth rate limiting (IP-based, DDoS protection)
   PRE_AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
   PRE_AUTH_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(1000),
+
+  // Background embedding processor
+  EMBEDDING_PROCESSOR_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((val) => val === 'true'),
+  EMBEDDING_PROCESSOR_INTERVAL: z.coerce.number().min(1000).default(5000),
+  EMBEDDING_PROCESSOR_BATCH_SIZE: z.coerce.number().min(1).max(100).default(5),
 });
 
 /**
@@ -79,6 +87,12 @@ export interface ServerConfig {
   preAuthRateLimitWindowMs: number;
   /** Maximum requests allowed per pre-auth rate limit window @default 1000 */
   preAuthRateLimitMaxRequests: number;
+  /** Enable background embedding processor @default false */
+  embeddingProcessorEnabled: boolean;
+  /** Embedding processor polling interval in milliseconds @default 5000 */
+  embeddingProcessorInterval: number;
+  /** Embedding processor batch size (components per cycle) @default 5 */
+  embeddingProcessorBatchSize: number;
 }
 
 /**
@@ -108,6 +122,9 @@ export function loadConfig(): ServerConfig {
     rateLimitMaxRequests: result.data.RATE_LIMIT_MAX_REQUESTS,
     preAuthRateLimitWindowMs: result.data.PRE_AUTH_RATE_LIMIT_WINDOW_MS,
     preAuthRateLimitMaxRequests: result.data.PRE_AUTH_RATE_LIMIT_MAX_REQUESTS,
+    embeddingProcessorEnabled: result.data.EMBEDDING_PROCESSOR_ENABLED,
+    embeddingProcessorInterval: result.data.EMBEDDING_PROCESSOR_INTERVAL,
+    embeddingProcessorBatchSize: result.data.EMBEDDING_PROCESSOR_BATCH_SIZE,
   };
 }
 
