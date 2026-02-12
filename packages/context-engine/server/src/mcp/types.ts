@@ -22,6 +22,8 @@ import type {
   ReadResourceResult,
 } from '@modelcontextprotocol/sdk/types.js';
 
+import type { AuthScope } from '../auth/auth-types.js';
+
 // =============================================================================
 // MCP Context
 // =============================================================================
@@ -59,6 +61,13 @@ export interface McpContext {
    * Used by auth bridge, not typically needed by handlers.
    */
   apiKeyRepo: ApiKeyRepository;
+
+  /**
+   * Validated permission scopes from API key.
+   * Used for read-scope verification in MCP tools.
+   * MCP is read-only: all tools require component:read at minimum.
+   */
+  scopes: AuthScope[];
 }
 
 // =============================================================================

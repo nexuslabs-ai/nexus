@@ -101,6 +101,7 @@ mcpRouter.post('/', async (c) => {
     componentRepo: c.var.componentRepo,
     embeddingRepo: c.var.embeddingRepo,
     apiKeyRepo: c.var.apiKeyRepo,
+    scopes: authResult.context.scopes,
   };
 
   // 4. Create per-request MCP server + stateless transport

@@ -91,6 +91,18 @@ const envSchema = z.object({
     .describe(
       'MCP CORS policy: DISABLED=no browser access (server-to-server only), RESTRICTED=use CORS_ALLOWED_ORIGINS, PERMISSIVE=allow all (dev only)'
     ),
+
+  // MCP stateful session configuration (always-on)
+  MCP_SESSION_TTL: z.coerce
+    .number()
+    .min(60_000)
+    .default(3_600_000)
+    .describe('Session TTL in milliseconds (default: 1 hour)'),
+  MCP_MAX_SESSIONS_PER_ORG: z.coerce
+    .number()
+    .min(1)
+    .default(10)
+    .describe('Maximum concurrent sessions per organization'),
 });
 
 /**
@@ -131,6 +143,10 @@ export interface ServerConfig {
   embeddingProcessorInterval: number;
   /** Embedding processor batch size (components per cycle) @default 5 */
   embeddingProcessorBatchSize: number;
+  /** MCP session TTL in milliseconds @default 3600000 (1 hour) */
+  mcpSessionTtl: number;
+  /** Maximum concurrent sessions per organization @default 10 */
+  mcpMaxSessionsPerOrg: number;
 }
 
 /**
@@ -165,6 +181,8 @@ export function loadConfig(): ServerConfig {
     embeddingProcessorEnabled: result.data.EMBEDDING_PROCESSOR_ENABLED,
     embeddingProcessorInterval: result.data.EMBEDDING_PROCESSOR_INTERVAL,
     embeddingProcessorBatchSize: result.data.EMBEDDING_PROCESSOR_BATCH_SIZE,
+    mcpSessionTtl: result.data.MCP_SESSION_TTL,
+    mcpMaxSessionsPerOrg: result.data.MCP_MAX_SESSIONS_PER_ORG,
   };
 }
 
