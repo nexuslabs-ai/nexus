@@ -66,6 +66,14 @@ const envSchema = z.object({
   PRE_AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
   PRE_AUTH_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(1000),
 
+  // Background embedding processor
+  EMBEDDING_PROCESSOR_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((val) => val === 'true'),
+  EMBEDDING_PROCESSOR_INTERVAL: z.coerce.number().min(1000).default(5000),
+  EMBEDDING_PROCESSOR_BATCH_SIZE: z.coerce.number().min(1).max(100).default(5),
+
   // CORS configuration
   CORS_ALLOWED_ORIGINS: z
     .string()
@@ -117,6 +125,12 @@ export interface ServerConfig {
   corsAllowedOrigins: string[];
   /** MCP-specific CORS mode */
   mcpCorsMode: McpCorsMode;
+  /** Enable background embedding processor @default false */
+  embeddingProcessorEnabled: boolean;
+  /** Embedding processor polling interval in milliseconds @default 5000 */
+  embeddingProcessorInterval: number;
+  /** Embedding processor batch size (components per cycle) @default 5 */
+  embeddingProcessorBatchSize: number;
 }
 
 /**
@@ -148,6 +162,9 @@ export function loadConfig(): ServerConfig {
     preAuthRateLimitMaxRequests: result.data.PRE_AUTH_RATE_LIMIT_MAX_REQUESTS,
     corsAllowedOrigins: parseAllowedOrigins(result.data.CORS_ALLOWED_ORIGINS),
     mcpCorsMode: result.data.MCP_CORS_MODE,
+    embeddingProcessorEnabled: result.data.EMBEDDING_PROCESSOR_ENABLED,
+    embeddingProcessorInterval: result.data.EMBEDDING_PROCESSOR_INTERVAL,
+    embeddingProcessorBatchSize: result.data.EMBEDDING_PROCESSOR_BATCH_SIZE,
   };
 }
 
