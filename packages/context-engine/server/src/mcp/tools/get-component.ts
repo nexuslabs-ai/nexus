@@ -12,6 +12,7 @@
  * The manifest fields are flattened into the response for easier AI parsing.
  */
 
+import type { ShapeOutput } from '@modelcontextprotocol/sdk/server/zod-compat.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 
@@ -25,6 +26,7 @@ import type { McpContext } from '../types.js';
 
 /**
  * Input schema for get_component tool.
+ * Plain object with Zod validators (v1.x SDK pattern).
  */
 export const getComponentSchema = {
   identifier: z
@@ -37,8 +39,9 @@ export const getComponentSchema = {
 
 /**
  * Validated input type for get_component.
+ * Uses SDK's ShapeOutput helper for correct type inference with v1.x.
  */
-export type GetComponentInput = z.infer<z.ZodObject<typeof getComponentSchema>>;
+export type GetComponentInput = ShapeOutput<typeof getComponentSchema>;
 
 // =============================================================================
 // Handler

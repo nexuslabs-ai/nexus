@@ -13,6 +13,7 @@
  * - Optional framework filter
  */
 
+import type { ShapeOutput } from '@modelcontextprotocol/sdk/server/zod-compat.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 
@@ -24,6 +25,7 @@ import type { McpContext } from '../types.js';
 
 /**
  * Input schema for search_components tool.
+ * Plain object with Zod validators (v1.x SDK pattern).
  */
 export const searchComponentsSchema = {
   query: z
@@ -47,10 +49,9 @@ export const searchComponentsSchema = {
 
 /**
  * Validated input type for search_components.
+ * Uses SDK's ShapeOutput helper for correct type inference with v1.x.
  */
-export type SearchComponentsInput = z.infer<
-  z.ZodObject<typeof searchComponentsSchema>
->;
+export type SearchComponentsInput = ShapeOutput<typeof searchComponentsSchema>;
 
 // =============================================================================
 // Handler

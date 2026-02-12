@@ -9,6 +9,7 @@
  * No input arguments required.
  */
 
+import type { ShapeOutput } from '@modelcontextprotocol/sdk/server/zod-compat.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 import type { McpContext } from '../types.js';
@@ -20,13 +21,15 @@ import type { McpContext } from '../types.js';
 /**
  * Input schema for get_index_stats tool.
  * No arguments required - stats are scoped to the authenticated org.
+ * Plain object (empty) with Zod validators (v1.x SDK pattern).
  */
 export const getIndexStatsSchema = {};
 
 /**
  * Validated input type for get_index_stats (empty object).
+ * Uses SDK's ShapeOutput helper for correct type inference with v1.x.
  */
-export type GetIndexStatsInput = Record<string, never>;
+export type GetIndexStatsInput = ShapeOutput<typeof getIndexStatsSchema>;
 
 // =============================================================================
 // Handler
