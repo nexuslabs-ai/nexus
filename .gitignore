@@ -48,3 +48,4 @@ packages/context-engine/core/.env.test
 # Context Engine pipeline output
 .ce-output
 .ce-state
+packages/context-engine/db/drizzle/
