@@ -401,6 +401,9 @@ reconciliationRouter.openapi(forceReindexRoute, async (c) => {
  * POST /migrate-embeddings handler
  */
 reconciliationRouter.openapi(migrateEmbeddingsRoute, async (c) => {
+  const { orgId } = c.req.valid('param');
+  const { batchSize } = c.req.valid('json');
+  const componentRepo = c.var.componentRepo;
   const embeddingRepo = c.var.embeddingRepo;
 
   // Check if embedding service is available
@@ -413,13 +416,26 @@ reconciliationRouter.openapi(migrateEmbeddingsRoute, async (c) => {
   // Get current model info
   const currentModel = embeddingRepo.modelInfo.model;
 
-  // TODO: Implement findByOutdatedModel in Section 2 (Optimizations)
-  // For now, return placeholder response
+  // Find components with outdated embedding models
+  const outdatedComponents = await componentRepo.findByOutdatedModel(
+    orgId,
+    currentModel,
+    batchSize
+  );
+
+  // Queue outdated components for re-indexing (set to pending)
+  for (const component of outdatedComponents) {
+    await componentRepo.update(orgId, component.id, {
+      embeddingStatus: 'pending',
+      embeddingError: null,
+    });
+  }
+
   return c.json(
     successResponse({
-      queued: 0,
+      queued: outdatedComponents.length,
       currentModel,
-      outdatedComponents: 0,
+      outdatedComponents: outdatedComponents.length,
     }),
     200
   );
