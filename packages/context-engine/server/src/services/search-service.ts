@@ -20,17 +20,7 @@ import type {
   SearchResult,
 } from '@context-engine/db';
 
-// =============================================================================
-// Constants
-// =============================================================================
-
-/**
- * RRF smoothing constant.
- *
- * Controls how much rank position affects the fused score.
- * Higher values dampen rank differences (standard value from the RRF paper).
- */
-const RRF_K = 60;
+import { fuseWithRRF, type RrfFusedResult } from '../utils/rrf.js';
 
 // =============================================================================
 // Types
@@ -53,29 +43,12 @@ export interface SearchOptions {
 /**
  * A single result from hybrid search with an RRF-fused score.
  *
+ * Re-exported from utils/rrf for backward compatibility.
  * The rrfScore combines rankings from both semantic and keyword search,
  * where higher values indicate the component appeared highly ranked
  * in one or both retrieval methods.
  */
-export interface FusedSearchResult {
-  /** Component UUID */
-  componentId: string;
-
-  /** URL-friendly identifier */
-  slug: string;
-
-  /** Human-readable component name */
-  name: string;
-
-  /** Component description (may be null) */
-  description: string | null;
-
-  /** Target framework (e.g., 'react', 'vue') */
-  framework: string;
-
-  /** Reciprocal Rank Fusion score (higher is more relevant) */
-  rrfScore: number;
-}
+export type FusedSearchResult = RrfFusedResult;
 
 /**
  * Result of a hybrid search including metadata about the search execution.
@@ -98,77 +71,6 @@ export interface HybridSearchResult {
     /** Number of results from keyword search */
     keywordCount: number;
   };
-}
-
-// =============================================================================
-// RRF Fusion
-// =============================================================================
-
-/**
- * Fuse semantic and keyword search results using Reciprocal Rank Fusion.
- *
- * RRF combines ranked lists by assigning each result a score of 1/(k + rank)
- * from each retrieval method, then summing across methods. This approach:
- * - Requires no score normalization between methods
- * - Rewards results that appear in both lists
- * - Handles different score scales naturally
- *
- * @param semanticResults - Results from vector similarity search (ordered by relevance)
- * @param keywordResults - Results from full-text search (ordered by relevance)
- * @param limit - Maximum number of fused results to return
- * @returns Fused results sorted by combined RRF score descending
- */
-function fuseWithRRF(
-  semanticResults: SearchResult[],
-  keywordResults: KeywordSearchResult[],
-  limit: number
-): FusedSearchResult[] {
-  const scores = new Map<
-    string,
-    {
-      rrfScore: number;
-      name: string;
-      slug: string;
-      description: string | null;
-      framework: string;
-      componentId: string;
-    }
-  >();
-
-  // Assign RRF scores from semantic results (rank-based, 0-indexed)
-  for (let rank = 0; rank < semanticResults.length; rank++) {
-    const result = semanticResults[rank];
-    const entry = scores.get(result.componentId) ?? {
-      rrfScore: 0,
-      name: result.name,
-      slug: result.slug,
-      description: result.description,
-      framework: result.framework,
-      componentId: result.componentId,
-    };
-    entry.rrfScore += 1 / (RRF_K + rank + 1);
-    scores.set(result.componentId, entry);
-  }
-
-  // Assign RRF scores from keyword results (rank-based, 0-indexed)
-  for (let rank = 0; rank < keywordResults.length; rank++) {
-    const result = keywordResults[rank];
-    const entry = scores.get(result.componentId) ?? {
-      rrfScore: 0,
-      name: result.name,
-      slug: result.slug,
-      description: result.description,
-      framework: result.framework,
-      componentId: result.componentId,
-    };
-    entry.rrfScore += 1 / (RRF_K + rank + 1);
-    scores.set(result.componentId, entry);
-  }
-
-  // Sort by fused RRF score descending, take top N
-  return Array.from(scores.values())
-    .sort((a, b) => b.rrfScore - a.rrfScore)
-    .slice(0, limit);
 }
 
 // =============================================================================
