@@ -9,13 +9,19 @@
  *   Production:  node --env-file=.env dist/server.js
  */
 
-import { closeDatabase, initializeDatabase } from '@context-engine/db';
+import {
+  closeDatabase,
+  createComponentRepository,
+  createEmbeddingRepository,
+  initializeDatabase,
+} from '@context-engine/db';
 import { serve } from '@hono/node-server';
 
 import { createApp } from './app.js';
 import { loadConfig, type ServerConfig } from './config.js';
 import { SERVER_VERSION } from './constants.js';
 import { createServerLogger } from './logger.js';
+import { EmbeddingProcessor } from './services/embedding-processor.js';
 
 // =============================================================================
 // Server Startup
@@ -37,6 +43,18 @@ async function startServer() {
   // Create the app
   const app = createApp();
 
+  // Initialize background embedding processor (if enabled)
+  let embeddingProcessor: EmbeddingProcessor | null = null;
+  if (config.embeddingProcessorEnabled) {
+    embeddingProcessor = new EmbeddingProcessor({
+      intervalMs: config.embeddingProcessorInterval,
+      batchSize: config.embeddingProcessorBatchSize,
+      createComponentRepo: createComponentRepository,
+      createEmbeddingRepo: createEmbeddingRepository,
+    });
+    embeddingProcessor.start();
+  }
+
   // Print startup banner
   printBanner(config);
 
@@ -54,6 +72,12 @@ async function startServer() {
   // Setup graceful shutdown
   const shutdown = async (signal: string) => {
     rootLogger.info({ signal }, 'Shutting down gracefully');
+
+    // Stop background processor
+    if (embeddingProcessor) {
+      embeddingProcessor.stop();
+      rootLogger.info('Embedding processor stopped');
+    }
 
     // Close the HTTP server (wait for connections to drain)
     await new Promise<void>((resolve, reject) => {
@@ -108,6 +132,11 @@ function printBanner(config: ServerConfig) {
 
   const llmKey = process.env.LLM_API_KEY ? 'Configured' : 'Not configured';
 
+  // Embedding processor status
+  const processorStatus = config.embeddingProcessorEnabled
+    ? `Enabled (${config.embeddingProcessorInterval}ms, batch ${config.embeddingProcessorBatchSize})`
+    : 'Disabled';
+
   console.log(`
 +=====================================================================+
 |                     Context Engine Server                           |
@@ -124,6 +153,7 @@ function printBanner(config: ServerConfig) {
 |  Processing:     ${llmKey.padEnd(51)}|
 |  Embeddings:     ${embeddings.padEnd(51)}|
 |  Search:         ${'Hybrid (semantic + keyword, RRF)'.padEnd(51)}|
+|  BG Processor:   ${processorStatus.padEnd(51)}|
 +=====================================================================+
 `);
 }

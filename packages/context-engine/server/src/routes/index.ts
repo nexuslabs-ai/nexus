@@ -9,4 +9,5 @@ export { componentsRouter } from './components.js';
 export { healthRouter } from './health.js';
 export { organizationsRouter } from './organizations.js';
 export { processingRouter } from './processing.js';
+export { reconciliationRouter } from './reconciliation.js';
 export { searchRouter } from './search.js';

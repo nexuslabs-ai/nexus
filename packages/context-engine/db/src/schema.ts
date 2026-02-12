@@ -196,10 +196,16 @@ export const components = pgTable(
     // Index for filtering by organization and framework
     index('components_org_framework_idx').on(table.orgId, table.framework),
 
-    // Index for finding components needing embedding
+    // Index for finding components needing embedding (org-scoped)
     index('components_org_embedding_status_idx').on(
       table.orgId,
       table.embeddingStatus
+    ),
+
+    // Index for background processor global pending queries
+    index('components_embedding_status_updated_idx').on(
+      table.embeddingStatus,
+      table.updatedAt
     ),
 
     // GIN index for full-text search on search_vector

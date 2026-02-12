@@ -3,7 +3,11 @@
  *
  * Handles embedding generation via Voyage AI for semantic search.
  * Uses voyage-code-3 model optimized for code understanding.
+ *
+ * Includes LRU cache for document embeddings to reduce API costs and latency.
  */
+
+import { createHash } from 'node:crypto';
 
 import type { EmbeddingModelInfo } from '../types.js';
 
@@ -16,6 +20,7 @@ const DIMENSIONS = 1024;
 const BATCH_SIZE = 100;
 const MAX_RETRIES = 3;
 const VOYAGE_API_URL = 'https://api.voyageai.com/v1/embeddings';
+const CACHE_MAX_SIZE = 1000;
 
 // =============================================================================
 // Types
@@ -37,15 +42,23 @@ interface VoyageAPIResponse {
  *
  * Supports single document embedding, batch embedding with automatic pagination,
  * and query-optimized embedding for search queries.
+ *
+ * Includes LRU cache for document embeddings:
+ * - Cache key: SHA-256 hash of input text
+ * - Max size: 1000 entries
+ * - Eviction: Least recently used (Map insertion order)
+ * - Scope: Document embeddings only (queries use different optimization)
  */
 export class EmbeddingService {
   private apiKey: string;
+  private cache: Map<string, number[]>;
 
   constructor(apiKey: string) {
     if (!apiKey) {
       throw new Error('Voyage API key is required');
     }
     this.apiKey = apiKey;
+    this.cache = new Map();
   }
 
   // ===========================================================================
@@ -53,35 +66,84 @@ export class EmbeddingService {
   // ===========================================================================
 
   /**
-   * Embed a single text (document).
-   *
-   * @param text - The text to embed
-   * @returns The embedding vector
-   */
-  async embed(text: string): Promise<number[]> {
-    const result = await this.embedBatch([text], 'document');
-    if (result.length === 0) {
-      throw new Error('Embedding service returned empty result');
-    }
-    return result[0];
-  }
-
-  /**
-   * Embed multiple texts in batch.
+   * Embed multiple texts in batch (documents only).
    *
    * Automatically handles pagination for large batches by splitting into
    * chunks of BATCH_SIZE and processing sequentially.
    *
+   * Uses LRU cache to reduce API costs and latency. For query embeddings,
+   * use embedQuery() instead (different optimization strategy).
+   *
    * @param texts - Array of texts to embed
-   * @param inputType - Type of input ('document' for indexing, 'query' for search)
    * @returns Array of embedding vectors in same order as input
+   * @throws Error if embedding generation fails for any text
    */
-  async embedBatch(
-    texts: string[],
-    inputType: 'document' | 'query' = 'document'
-  ): Promise<number[][]> {
+  async embedBatch(texts: string[]): Promise<number[][]> {
     if (texts.length === 0) return [];
 
+    // Initialize results array with proper length to catch gaps early
+    const results: Array<number[] | undefined> = new Array(texts.length);
+    const uncachedTexts: string[] = [];
+    const uncachedIndices: number[] = [];
+
+    // Check cache for each text
+    for (let i = 0; i < texts.length; i++) {
+      const text = texts[i];
+      const cacheKey = this.getCacheKey(text);
+      const cached = this.cache.get(cacheKey);
+
+      if (cached) {
+        // Cache hit - use cached embedding and refresh LRU position
+        this.cache.delete(cacheKey);
+        this.cache.set(cacheKey, cached);
+        results[i] = cached;
+      } else {
+        // Cache miss - need to fetch
+        uncachedTexts.push(text);
+        uncachedIndices.push(i);
+      }
+    }
+
+    // Fetch uncached embeddings
+    if (uncachedTexts.length > 0) {
+      const embeddings = await this.embedBatchUncached(
+        uncachedTexts,
+        'document'
+      );
+
+      // Store in cache and results
+      for (let i = 0; i < embeddings.length; i++) {
+        const text = uncachedTexts[i];
+        const embedding = embeddings[i];
+        const resultIndex = uncachedIndices[i];
+
+        this.setCached(text, embedding);
+        results[resultIndex] = embedding;
+      }
+    }
+
+    // Validate no holes remain - catches incomplete embedding generation
+    if (results.some((r) => r === undefined)) {
+      throw new Error(
+        'Failed to generate embeddings for all texts: some results are undefined'
+      );
+    }
+
+    // Safe to cast after validation - all elements guaranteed to be number[]
+    return results as number[][];
+  }
+
+  /**
+   * Embed batch without cache (internal).
+   *
+   * @param texts - Texts to embed
+   * @param inputType - Document or query
+   * @returns Embeddings
+   */
+  private async embedBatchUncached(
+    texts: string[],
+    inputType: 'document' | 'query'
+  ): Promise<number[][]> {
     const results: number[][] = [];
 
     // Process in batches
@@ -100,11 +162,13 @@ export class EmbeddingService {
    * Voyage AI optimizes embeddings differently for queries vs documents.
    * Use this for search queries to get better retrieval results.
    *
+   * Query embeddings bypass cache (low hit rate, different optimization).
+   *
    * @param text - The query text to embed
    * @returns The embedding vector optimized for similarity search
    */
   async embedQuery(text: string): Promise<number[]> {
-    const result = await this.embedBatch([text], 'query');
+    const result = await this.embedBatchUncached([text], 'query');
     if (result.length === 0) {
       throw new Error('Embedding service returned empty result for query');
     }
@@ -134,9 +198,50 @@ export class EmbeddingService {
     return DIMENSIONS;
   }
 
+  /**
+   * Get cache statistics.
+   *
+   * @returns Cache size and hit rate info
+   */
+  get cacheStats() {
+    return {
+      size: this.cache.size,
+      maxSize: CACHE_MAX_SIZE,
+    };
+  }
+
   // ===========================================================================
   // Private Methods
   // ===========================================================================
+
+  /**
+   * Generate cache key from text using SHA-256.
+   *
+   * @param text - Input text
+   * @returns Cache key (hex string)
+   */
+  private getCacheKey(text: string): string {
+    return createHash('sha256').update(text).digest('hex');
+  }
+
+  /**
+   * Set cached embedding with LRU eviction.
+   *
+   * @param text - Input text
+   * @param embedding - Embedding vector
+   */
+  private setCached(text: string, embedding: number[]): void {
+    const cacheKey = this.getCacheKey(text);
+
+    // Evict oldest entry if cache is full (LRU via Map insertion order)
+    if (this.cache.size >= CACHE_MAX_SIZE) {
+      const firstKey = this.cache.keys().next().value;
+      // Safe assertion: if size >= CACHE_MAX_SIZE, there's always a first key
+      this.cache.delete(firstKey!);
+    }
+
+    this.cache.set(cacheKey, embedding);
+  }
 
   /**
    * Call Voyage AI API with retry logic and exponential backoff.

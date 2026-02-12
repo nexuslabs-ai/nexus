@@ -45,10 +45,12 @@ export {
 // Re-export services
 export {
   ComponentResolver,
+  EmbeddingProcessor,
   type FusedSearchResult,
   type HybridSearchResult,
   ProcessingService,
   type ProcessingServiceConfig,
+  type ProcessorConfig,
   type SearchOptions,
   SearchService,
 } from './services/index.js';

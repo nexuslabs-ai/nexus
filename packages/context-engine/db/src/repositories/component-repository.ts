@@ -431,6 +431,189 @@ export class ComponentRepository {
   }
 
   // ===========================================================================
+  // Embedding Status Management
+  // ===========================================================================
+
+  /**
+   * Find pending components for an organization.
+   *
+   * Org-scoped shorthand for findMany with embeddingStatus: 'pending'.
+   * Used for manual reconciliation operations.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @param limit - Maximum number of components to return
+   * @returns Components with pending embedding status
+   */
+  async findPending(orgId: string, limit: number): Promise<Component[]> {
+    const result = await this.findMany(orgId, {
+      where: { embeddingStatus: 'pending' },
+      limit,
+      orderBy: 'updatedAt',
+      orderDir: 'asc',
+    });
+
+    return result.components;
+  }
+
+  /**
+   * Find pending components with fair distribution across organizations.
+   *
+   * Uses round-robin selection to prevent any single org from monopolizing
+   * the background processor. Selects at most `maxPerOrg` components from
+   * each org and distributes them evenly across organizations.
+   *
+   * Only returns components with manifests (ready for embedding).
+   *
+   * @param limit - Maximum total components to return
+   * @param options.maxPerOrg - Maximum components per org (defaults to limit/10)
+   * @returns Components distributed fairly across organizations
+   */
+  async findAllPendingFair(
+    limit: number,
+    options?: { maxPerOrg?: number }
+  ): Promise<
+    Pick<Component, 'id' | 'orgId' | 'manifest' | 'embeddingStatus'>[]
+  > {
+    const maxPerOrg = options?.maxPerOrg ?? Math.ceil(limit / 10);
+
+    // Step 1: Find distinct orgIds with pending components that have manifests
+    const orgsWithPending = await this.db
+      .selectDistinct({ orgId: components.orgId })
+      .from(components)
+      .where(
+        and(
+          eq(components.embeddingStatus, 'pending'),
+          isNotNull(components.manifest)
+        )
+      );
+
+    if (orgsWithPending.length === 0) {
+      return [];
+    }
+
+    // Step 2: For each org, fetch up to maxPerOrg pending components
+    const componentsByOrg: Map<
+      string,
+      Pick<Component, 'id' | 'orgId' | 'manifest' | 'embeddingStatus'>[]
+    > = new Map();
+
+    for (const { orgId } of orgsWithPending) {
+      const orgComponents = await this.db
+        .select({
+          id: components.id,
+          orgId: components.orgId,
+          manifest: components.manifest,
+          embeddingStatus: components.embeddingStatus,
+        })
+        .from(components)
+        .where(
+          and(
+            eq(components.orgId, orgId),
+            eq(components.embeddingStatus, 'pending'),
+            isNotNull(components.manifest)
+          )
+        )
+        .orderBy(asc(components.updatedAt))
+        .limit(maxPerOrg);
+
+      if (orgComponents.length > 0) {
+        componentsByOrg.set(orgId, orgComponents);
+      }
+    }
+
+    // Step 3: Interleave components in round-robin fashion
+    const result: Pick<
+      Component,
+      'id' | 'orgId' | 'manifest' | 'embeddingStatus'
+    >[] = [];
+    let index = 0;
+
+    // Continue until we reach limit or exhaust all components
+    while (result.length < limit && componentsByOrg.size > 0) {
+      let addedThisRound = 0;
+
+      for (const [_orgId, orgComponents] of componentsByOrg.entries()) {
+        if (index < orgComponents.length) {
+          result.push(orgComponents[index]);
+          addedThisRound++;
+          if (result.length >= limit) break;
+        }
+      }
+
+      // Exit if no components added this round (all orgs exhausted)
+      if (addedThisRound === 0) break;
+
+      index++;
+    }
+
+    return result;
+  }
+
+  /**
+   * Reset failed components to pending status.
+   *
+   * Batch update that sets all failed components back to pending for retry.
+   * Clears the error message and updates the timestamp.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @returns Number of components reset
+   */
+  async resetFailedToPending(orgId: string): Promise<number> {
+    const result = await this.db
+      .update(components)
+      .set({
+        embeddingStatus: 'pending',
+        embeddingError: null,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(components.orgId, orgId),
+          eq(components.embeddingStatus, 'failed')
+        )
+      )
+      .returning({ id: components.id });
+
+    return result.length;
+  }
+
+  /**
+   * Find components with outdated embedding models.
+   *
+   * Queries components where the embedding model doesn't match the current
+   * model version. Used for migration when upgrading embedding models
+   * (e.g., voyage-code-3 → voyage-code-4).
+   *
+   * Only returns indexed components (successfully embedded with old model).
+   * Pending/failed components will be indexed with new model automatically.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @param currentModel - Current model identifier (e.g., 'voyage-code-3')
+   * @param limit - Maximum number of components to return
+   * @returns Components that need re-embedding with new model
+   */
+  async findByOutdatedModel(
+    orgId: string,
+    currentModel: string,
+    limit: number
+  ): Promise<Component[]> {
+    const result = await this.db
+      .select()
+      .from(components)
+      .where(
+        and(
+          eq(components.orgId, orgId),
+          eq(components.embeddingStatus, 'indexed'),
+          sql`${components.embeddingModel}->>'model' != ${currentModel}`
+        )
+      )
+      .orderBy(asc(components.updatedAt))
+      .limit(limit);
+
+    return result;
+  }
+
+  // ===========================================================================
   // Search
   // ===========================================================================
 

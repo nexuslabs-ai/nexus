@@ -25,6 +25,7 @@ import {
   healthRouter,
   organizationsRouter,
   processingRouter,
+  reconciliationRouter,
   searchRouter,
 } from './routes/index.js';
 import type { AppEnv } from './types.js';
@@ -141,6 +142,17 @@ export function createApp() {
   // DELETE /api/v1/organizations/:orgId/api-keys/:keyId
   app.route('/api/v1/organizations/:orgId/api-keys', apiKeysRouter);
 
+  // Embedding reconciliation (nested under organization)
+  // GET /api/v1/organizations/:orgId/reconciliation/status
+  // POST /api/v1/organizations/:orgId/reconciliation/process-pending
+  // POST /api/v1/organizations/:orgId/reconciliation/retry-failed
+  // POST /api/v1/organizations/:orgId/reconciliation/force-reindex/:componentId
+  // POST /api/v1/organizations/:orgId/reconciliation/migrate-embeddings
+  app.route(
+    '/api/v1/organizations/:orgId/reconciliation',
+    reconciliationRouter
+  );
+
   // === OpenAPI Documentation ===
   app.doc('/doc', {
     openapi: '3.1.0',
@@ -160,6 +172,10 @@ export function createApp() {
       },
       { name: 'Search', description: 'Semantic component search' },
       { name: 'API Keys', description: 'API key management' },
+      {
+        name: 'Reconciliation',
+        description: 'Embedding reconciliation and manual control',
+      },
     ],
   });
 

@@ -109,3 +109,15 @@ export {
   type RevokeApiKeyResponse,
   RevokeApiKeyResponseSchema,
 } from './api-keys.js';
+
+// Reconciliation schemas
+export {
+  ForceReindexParamsSchema,
+  ForceReindexResponseSchema,
+  MigrateEmbeddingsRequestSchema,
+  MigrateEmbeddingsResponseSchema,
+  ProcessPendingRequestSchema,
+  ProcessPendingResponseSchema,
+  ReconciliationStatusSchema,
+  RetryFailedResponseSchema,
+} from './reconciliation.js';
