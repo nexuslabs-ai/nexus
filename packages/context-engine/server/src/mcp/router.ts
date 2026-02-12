@@ -12,10 +12,35 @@
 
 import { Hono } from 'hono';
 
-import { getConfig } from '../config.js';
+import { getConfig, type ServerConfig } from '../config.js';
+import {
+  buildAllowedHeaders,
+  type CorsConfig,
+  isOriginAllowedForMcp,
+} from '../cors/index.js';
 import type { AppEnv } from '../types.js';
 
+/**
+ * Convert ServerConfig to CorsConfig for CORS validation.
+ * Used in POST handler to manually set CORS headers on Node.js response.
+ */
+function toCorsConfig(config: ServerConfig): CorsConfig {
+  return {
+    allowedOrigins: config.corsAllowedOrigins,
+    mcpMode: config.mcpCorsMode,
+    environment: config.environment,
+  };
+}
+
 export const mcpRouter = new Hono<AppEnv>();
+
+/**
+ * NOTE: OPTIONS /mcp is handled by global CORS middleware
+ *
+ * The middleware at src/middleware/cors.ts handles all OPTIONS requests,
+ * including MCP-specific validation via isOriginAllowedForMcp().
+ * No need for a separate OPTIONS handler here.
+ */
 
 /**
  * POST /mcp — Handle MCP JSON-RPC requests (stateless mode)
@@ -89,6 +114,26 @@ mcpRouter.post('/', async (c) => {
   // 5. Bridge to Node.js transport
   const nodeReq = c.env.incoming;
   const nodeRes = c.env.outgoing;
+
+  // CRITICAL: Manually set CORS headers on Node.js response
+  // The transport writes directly to nodeRes, bypassing Hono's CORS middleware
+  const origin = c.req.header('origin');
+  const corsConfig = toCorsConfig(config);
+
+  // Only add CORS headers if origin is allowed by configuration
+  if (origin && isOriginAllowedForMcp(origin, corsConfig)) {
+    nodeRes.setHeader('Access-Control-Allow-Origin', origin);
+    // CRITICAL: NO Access-Control-Allow-Credentials with dynamic origin reflection
+    nodeRes.setHeader(
+      'Access-Control-Allow-Headers',
+      buildAllowedHeaders(config.environment)
+    );
+    nodeRes.setHeader(
+      'Access-Control-Expose-Headers',
+      'mcp-session-id, mcp-protocol-version'
+    );
+  }
+
   // Body passed explicitly because Hono consumes the request stream
   await transport.handleRequest(nodeReq, nodeRes, await c.req.json());
 

@@ -6,7 +6,6 @@
 
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { cors } from 'hono/cors';
 import { pinoLogger } from 'hono-pino';
 
 import { Environment, getConfig } from './config.js';
@@ -15,6 +14,7 @@ import { createServerLogger } from './logger.js';
 import { mcpRouter } from './mcp/index.js';
 import {
   authMiddleware,
+  createCorsMiddleware,
   preAuthRateLimitMiddleware,
   rateLimitMiddleware,
   repositoriesMiddleware,
@@ -52,26 +52,22 @@ export function createApp() {
 
   // === Global Middleware ===
   // CORS must be registered before routes per Hono best practices
-  // MCP headers included for forward compatibility (stateful sessions in future phases)
+  const config = getConfig();
+
+  // CORS middleware (validates origins, sets headers)
+  // Configured from environment variables via cors/ module
   app.use(
     '*',
-    cors({
-      origin: '*', // Permissive for now; production hardening out of scope
-      allowHeaders: [
-        'Content-Type',
-        'Authorization',
-        'mcp-session-id',
-        'Last-Event-ID',
-        'mcp-protocol-version',
-      ],
-      exposeHeaders: ['mcp-session-id', 'mcp-protocol-version'],
+    createCorsMiddleware({
+      allowedOrigins: config.corsAllowedOrigins,
+      mcpMode: config.mcpCorsMode,
+      environment: config.environment,
     })
   );
 
   // === Structured Logging ===
   // Request-scoped logger with method, path, status, duration.
   // Access via c.var.logger in handlers and middleware.
-  const config = getConfig();
   const rootLogger = createServerLogger(config);
 
   app.use(

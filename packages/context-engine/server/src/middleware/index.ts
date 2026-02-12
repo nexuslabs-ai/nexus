@@ -5,6 +5,7 @@
  */
 
 export { authMiddleware, requireOrgAccess, requireScope } from './auth.js';
+export { createCorsMiddleware } from './cors.js';
 export {
   preAuthRateLimitMiddleware,
   rateLimitMiddleware,
