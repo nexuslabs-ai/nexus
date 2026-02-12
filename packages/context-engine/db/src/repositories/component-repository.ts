@@ -462,6 +462,8 @@ export class ComponentRepository {
    * the background processor. Selects at most `maxPerOrg` components from
    * each org and distributes them evenly across organizations.
    *
+   * Only returns components with manifests (ready for embedding).
+   *
    * @param limit - Maximum total components to return
    * @param options.maxPerOrg - Maximum components per org (defaults to limit/10)
    * @returns Components distributed fairly across organizations
@@ -474,11 +476,16 @@ export class ComponentRepository {
   > {
     const maxPerOrg = options?.maxPerOrg ?? Math.ceil(limit / 10);
 
-    // Step 1: Find distinct orgIds with pending components
+    // Step 1: Find distinct orgIds with pending components that have manifests
     const orgsWithPending = await this.db
       .selectDistinct({ orgId: components.orgId })
       .from(components)
-      .where(eq(components.embeddingStatus, 'pending'));
+      .where(
+        and(
+          eq(components.embeddingStatus, 'pending'),
+          isNotNull(components.manifest)
+        )
+      );
 
     if (orgsWithPending.length === 0) {
       return [];
@@ -502,7 +509,8 @@ export class ComponentRepository {
         .where(
           and(
             eq(components.orgId, orgId),
-            eq(components.embeddingStatus, 'pending')
+            eq(components.embeddingStatus, 'pending'),
+            isNotNull(components.manifest)
           )
         )
         .orderBy(asc(components.updatedAt))

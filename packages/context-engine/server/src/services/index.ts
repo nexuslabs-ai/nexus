@@ -6,6 +6,10 @@
 
 export { ComponentResolver } from './component-resolver.js';
 export {
+  EmbeddingProcessor,
+  type ProcessorConfig,
+} from './embedding-processor.js';
+export {
   ProcessingService,
   processingService,
   type ProcessingServiceConfig,
