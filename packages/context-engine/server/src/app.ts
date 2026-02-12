@@ -12,6 +12,7 @@ import { pinoLogger } from 'hono-pino';
 import { Environment, getConfig } from './config.js';
 import { ApiError } from './errors.js';
 import { createServerLogger } from './logger.js';
+import { mcpRouter } from './mcp/index.js';
 import {
   authMiddleware,
   preAuthRateLimitMiddleware,
@@ -51,7 +52,21 @@ export function createApp() {
 
   // === Global Middleware ===
   // CORS must be registered before routes per Hono best practices
-  app.use('*', cors());
+  // MCP headers included for forward compatibility (stateful sessions in future phases)
+  app.use(
+    '*',
+    cors({
+      origin: '*', // Permissive for now; production hardening out of scope
+      allowHeaders: [
+        'Content-Type',
+        'Authorization',
+        'mcp-session-id',
+        'Last-Event-ID',
+        'mcp-protocol-version',
+      ],
+      exposeHeaders: ['mcp-session-id', 'mcp-protocol-version'],
+    })
+  );
 
   // === Structured Logging ===
   // Request-scoped logger with method, path, status, duration.
@@ -140,6 +155,12 @@ export function createApp() {
   // GET/POST /api/v1/organizations/:orgId/api-keys
   // DELETE /api/v1/organizations/:orgId/api-keys/:keyId
   app.route('/api/v1/organizations/:orgId/api-keys', apiKeysRouter);
+
+  // === MCP Gateway ===
+  // Model Context Protocol endpoint for AI assistants.
+  // Repository middleware + MCP router (handles auth, server creation, transport)
+  app.use('/mcp', repositoriesMiddleware);
+  app.route('/mcp', mcpRouter);
 
   // === OpenAPI Documentation ===
   app.doc('/doc', {

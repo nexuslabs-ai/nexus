@@ -11,6 +11,7 @@ import type {
   EmbeddingRepository,
   OrganizationRepository,
 } from '@context-engine/db';
+import type { HttpBindings } from '@hono/node-server';
 import type { PinoLogger } from 'hono-pino';
 
 import type { AuthContext } from './auth/index.js';
@@ -97,7 +98,12 @@ export interface LoggerVariables {
  * Extends Hono's Env type to include our custom context variables.
  * Use this when creating middleware or handlers that need access to repositories
  * and authenticated context.
+ *
+ * HttpBindings from @hono/node-server provides access to Node.js IncomingMessage
+ * and ServerResponse objects via `c.env.incoming` and `c.env.outgoing`.
+ * This is required for MCP integration (v1.x SDK uses Node.js types).
  */
 export interface AppEnv {
   Variables: RepositoryVariables & AuthVariables & LoggerVariables;
+  Bindings: HttpBindings;
 }

@@ -31,12 +31,6 @@ const envSchema = z.object({
     .min(32, 'CE_PLATFORM_TOKEN must be at least 32 characters')
     .startsWith('cep_', 'CE_PLATFORM_TOKEN must start with "cep_" prefix'),
 
-  // MCP Gateway
-  MCP_ENABLED: z
-    .enum(['true', 'false'])
-    .default('false')
-    .transform((val) => val === 'true'),
-
   // Post-auth rate limiting (identity-based, per API key)
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
@@ -77,8 +71,6 @@ export interface ServerConfig {
   apiKeyHashSecret: string;
   /** Platform token for internal service authentication (must start with "cep_") */
   platformToken: string;
-  /** Enable MCP gateway endpoint at POST /mcp @default false */
-  mcpEnabled: boolean;
   /** Post-auth rate limit window duration in milliseconds @default 60000 */
   rateLimitWindowMs: number;
   /** Maximum requests allowed per post-auth rate limit window @default 100 */
@@ -112,7 +104,6 @@ export function loadConfig(): ServerConfig {
     logLevel: result.data.SERVER_LOG_LEVEL,
     apiKeyHashSecret: result.data.API_KEY_HASH_SECRET,
     platformToken: result.data.CE_PLATFORM_TOKEN,
-    mcpEnabled: result.data.MCP_ENABLED,
     rateLimitWindowMs: result.data.RATE_LIMIT_WINDOW_MS,
     rateLimitMaxRequests: result.data.RATE_LIMIT_MAX_REQUESTS,
     preAuthRateLimitWindowMs: result.data.PRE_AUTH_RATE_LIMIT_WINDOW_MS,
