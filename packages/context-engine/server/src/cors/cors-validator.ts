@@ -10,6 +10,7 @@
 import { Environment, McpCorsMode } from '../config.js';
 
 import type { CorsConfig } from './cors-types.js';
+import { CORS_HEADERS } from './cors-types.js';
 
 /**
  * Check if an origin matches a subdomain wildcard pattern.
@@ -137,24 +138,19 @@ export function isOriginAllowedForMcp(
 }
 
 /**
- * Build the allowed headers list based on environment.
+ * Build allowed headers list based on environment.
+ *
+ * Uses CORS_HEADERS constant for single source of truth.
  *
  * @param environment - Current environment
  * @returns Comma-separated header string for Access-Control-Allow-Headers
  */
 export function buildAllowedHeaders(environment: Environment): string {
-  const headers = [
-    'Content-Type',
-    'Authorization',
-    'Accept',
-    'mcp-session-id',
-    'Last-Event-ID',
-    'mcp-protocol-version',
-  ];
+  const headers: string[] = [...CORS_HEADERS.STANDARD, ...CORS_HEADERS.MCP];
 
   // Dev-only headers (MCP Inspector)
   if (environment !== Environment.Production) {
-    headers.push('x-custom-auth-headers');
+    headers.push(...CORS_HEADERS.DEV_ONLY);
   }
 
   return headers.join(', ');

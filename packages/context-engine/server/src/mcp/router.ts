@@ -134,8 +134,27 @@ mcpRouter.post('/', async (c) => {
     );
   }
 
+  // Parse request body with error handling for invalid JSON
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    // Return JSON-RPC parse error (RFC 2.0 spec)
+    return c.json(
+      {
+        jsonrpc: '2.0',
+        error: {
+          code: -32700,
+          message: 'Parse error: Invalid JSON',
+        },
+        id: null,
+      },
+      400
+    );
+  }
+
   // Body passed explicitly because Hono consumes the request stream
-  await transport.handleRequest(nodeReq, nodeRes, await c.req.json());
+  await transport.handleRequest(nodeReq, nodeRes, body);
 
   // 6. Transport already wrote the response to nodeRes
   return RESPONSE_ALREADY_SENT;
