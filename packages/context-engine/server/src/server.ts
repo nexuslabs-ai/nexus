@@ -124,6 +124,7 @@ function printBanner(config: ServerConfig) {
 |  Processing:     ${llmKey.padEnd(51)}|
 |  Embeddings:     ${embeddings.padEnd(51)}|
 |  Search:         ${'Hybrid (semantic + keyword, RRF)'.padEnd(51)}|
+|  MCP:            ${'Enabled (POST /mcp)'.padEnd(51)}|
 +=====================================================================+
 `);
 }

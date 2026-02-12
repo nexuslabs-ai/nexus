@@ -6,14 +6,15 @@
 
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { cors } from 'hono/cors';
 import { pinoLogger } from 'hono-pino';
 
 import { Environment, getConfig } from './config.js';
 import { ApiError } from './errors.js';
 import { createServerLogger } from './logger.js';
+import { mcpRouter } from './mcp/index.js';
 import {
   authMiddleware,
+  createCorsMiddleware,
   preAuthRateLimitMiddleware,
   rateLimitMiddleware,
   repositoriesMiddleware,
@@ -51,12 +52,22 @@ export function createApp() {
 
   // === Global Middleware ===
   // CORS must be registered before routes per Hono best practices
-  app.use('*', cors());
+  const config = getConfig();
+
+  // CORS middleware (validates origins, sets headers)
+  // Configured from environment variables via cors/ module
+  app.use(
+    '*',
+    createCorsMiddleware({
+      allowedOrigins: config.corsAllowedOrigins,
+      mcpMode: config.mcpCorsMode,
+      environment: config.environment,
+    })
+  );
 
   // === Structured Logging ===
   // Request-scoped logger with method, path, status, duration.
   // Access via c.var.logger in handlers and middleware.
-  const config = getConfig();
   const rootLogger = createServerLogger(config);
 
   app.use(
@@ -140,6 +151,12 @@ export function createApp() {
   // GET/POST /api/v1/organizations/:orgId/api-keys
   // DELETE /api/v1/organizations/:orgId/api-keys/:keyId
   app.route('/api/v1/organizations/:orgId/api-keys', apiKeysRouter);
+
+  // === MCP Gateway ===
+  // Model Context Protocol endpoint for AI assistants.
+  // Repository middleware + MCP router (handles auth, server creation, transport)
+  app.use('/mcp', repositoriesMiddleware);
+  app.route('/mcp', mcpRouter);
 
   // === OpenAPI Documentation ===
   app.doc('/doc', {

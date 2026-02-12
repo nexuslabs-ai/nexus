@@ -52,3 +52,13 @@ export {
   type SearchOptions,
   SearchService,
 } from './services/index.js';
+
+// Re-export MCP module
+export {
+  createMcpServer,
+  extractMcpAuth,
+  type McpContext,
+  mcpRouter,
+  type ResourceHandler,
+  type ToolHandler,
+} from './mcp/index.js';
