@@ -21,6 +21,7 @@ import { createApp } from './app.js';
 import { loadConfig, type ServerConfig } from './config.js';
 import { SERVER_VERSION } from './constants.js';
 import { createServerLogger } from './logger.js';
+import { sessionStore } from './middleware/repositories.js';
 import { EmbeddingProcessor } from './services/embedding-processor.js';
 
 // =============================================================================
@@ -78,6 +79,11 @@ async function startServer() {
       embeddingProcessor.stop();
       rootLogger.info('Embedding processor stopped');
     }
+
+    // Close all MCP sessions
+    await sessionStore.closeAll();
+    sessionStore.destroy();
+    rootLogger.info('MCP sessions closed');
 
     // Close the HTTP server (wait for connections to drain)
     await new Promise<void>((resolve, reject) => {
@@ -137,6 +143,9 @@ function printBanner(config: ServerConfig) {
     ? `Enabled (${config.embeddingProcessorInterval}ms, batch ${config.embeddingProcessorBatchSize})`
     : 'Disabled';
 
+  // MCP session configuration
+  const sessionConfig = `TTL: ${config.mcpSessionTtl}ms, Max/org: ${config.mcpMaxSessionsPerOrg}`;
+
   console.log(`
 +=====================================================================+
 |                     Context Engine Server                           |
@@ -154,6 +163,7 @@ function printBanner(config: ServerConfig) {
 |  Embeddings:     ${embeddings.padEnd(51)}|
 |  Search:         ${'Hybrid (semantic + keyword, RRF)'.padEnd(51)}|
 |  MCP:            ${'Enabled (POST /mcp)'.padEnd(51)}|
+|  MCP Sessions:   ${sessionConfig.padEnd(51)}|
 |  BG Processor:   ${processorStatus.padEnd(51)}|
 +=====================================================================+
 `);

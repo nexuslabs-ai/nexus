@@ -35,6 +35,9 @@ import type { AppEnv } from '../types.js';
  */
 const sessionStore = new SessionStore();
 
+// Export for server shutdown handler
+export { sessionStore };
+
 // =============================================================================
 // Middleware
 // =============================================================================
