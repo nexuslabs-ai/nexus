@@ -13,7 +13,11 @@
  * The server is created fresh for each request and garbage-collected after response.
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import {
+  McpServer,
+  ResourceTemplate,
+} from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { Variables } from '@modelcontextprotocol/sdk/shared/uriTemplate.js';
 
 import { SERVER_VERSION } from '../constants.js';
 
@@ -21,7 +25,23 @@ import {
   COMPONENT_CATALOG_DESCRIPTION,
   COMPONENT_CATALOG_NAME,
   COMPONENT_CATALOG_URI,
+  COMPONENT_DETAIL_DESCRIPTION,
+  COMPONENT_DETAIL_NAME,
+  COMPONENT_DETAIL_URI_PATTERN,
+  COMPONENT_EXAMPLES_DESCRIPTION,
+  COMPONENT_EXAMPLES_NAME,
+  COMPONENT_EXAMPLES_URI_PATTERN,
+  COMPONENT_GUIDANCE_DESCRIPTION,
+  COMPONENT_GUIDANCE_NAME,
+  COMPONENT_GUIDANCE_URI_PATTERN,
+  COMPONENT_PROPS_DESCRIPTION,
+  COMPONENT_PROPS_NAME,
+  COMPONENT_PROPS_URI_PATTERN,
   handleComponentCatalog,
+  handleComponentDetail,
+  handleComponentExamples,
+  handleComponentGuidance,
+  handleComponentProps,
   handleIndexStats,
   INDEX_STATS_DESCRIPTION,
   INDEX_STATS_NAME,
@@ -157,6 +177,78 @@ export function createMcpServer(ctx: McpContext): McpServer {
       mimeType: 'application/json',
     },
     async () => handleIndexStats(ctx)
+  );
+
+  // =========================================================================
+  // Register Parameterized Resources (Component Resources)
+  // =========================================================================
+
+  /**
+   * Resource: component-detail
+   *
+   * URI: component://detail/{slug}
+   * Returns full component manifest with all sections.
+   */
+  server.registerResource(
+    COMPONENT_DETAIL_NAME,
+    new ResourceTemplate(COMPONENT_DETAIL_URI_PATTERN, { list: undefined }),
+    {
+      description: COMPONENT_DETAIL_DESCRIPTION,
+      mimeType: 'application/json',
+    },
+    async (_uri: URL, variables: Variables) =>
+      handleComponentDetail(variables.slug as string, ctx)
+  );
+
+  /**
+   * Resource: component-props
+   *
+   * URI: component://props/{slug}
+   * Returns component props reference only.
+   */
+  server.registerResource(
+    COMPONENT_PROPS_NAME,
+    new ResourceTemplate(COMPONENT_PROPS_URI_PATTERN, { list: undefined }),
+    {
+      description: COMPONENT_PROPS_DESCRIPTION,
+      mimeType: 'application/json',
+    },
+    async (_uri: URL, variables: Variables) =>
+      handleComponentProps(variables.slug as string, ctx)
+  );
+
+  /**
+   * Resource: component-examples
+   *
+   * URI: component://examples/{slug}
+   * Returns component usage examples only.
+   */
+  server.registerResource(
+    COMPONENT_EXAMPLES_NAME,
+    new ResourceTemplate(COMPONENT_EXAMPLES_URI_PATTERN, { list: undefined }),
+    {
+      description: COMPONENT_EXAMPLES_DESCRIPTION,
+      mimeType: 'application/json',
+    },
+    async (_uri: URL, variables: Variables) =>
+      handleComponentExamples(variables.slug as string, ctx)
+  );
+
+  /**
+   * Resource: component-guidance
+   *
+   * URI: component://guidance/{slug}
+   * Returns component best practices and usage guidance only.
+   */
+  server.registerResource(
+    COMPONENT_GUIDANCE_NAME,
+    new ResourceTemplate(COMPONENT_GUIDANCE_URI_PATTERN, { list: undefined }),
+    {
+      description: COMPONENT_GUIDANCE_DESCRIPTION,
+      mimeType: 'application/json',
+    },
+    async (_uri: URL, variables: Variables) =>
+      handleComponentGuidance(variables.slug as string, ctx)
   );
 
   return server;
