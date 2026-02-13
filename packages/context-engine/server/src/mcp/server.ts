@@ -48,8 +48,10 @@ import {
   INDEX_STATS_URI,
 } from './resources/index.js';
 import {
+  findSimilarSchema,
   getComponentSchema,
   getIndexStatsSchema,
+  handleFindSimilar,
   handleGetComponent,
   handleGetIndexStats,
   handleSearchComponents,
@@ -100,17 +102,33 @@ export function createMcpServer(ctx: McpContext): McpServer {
   /**
    * Tool: search_components
    *
-   * Semantic search for components using natural language queries.
-   * Requires embedding repository (VOYAGE_API_KEY configured).
+   * Search for components using natural language queries.
+   * Supports three modes: hybrid (default, RRF fusion), semantic (vector), keyword (full-text).
    */
   server.registerTool(
     'search_components',
     {
       description:
-        'Search for components by natural language query. Use when an AI needs to find relevant components for a task.',
+        'Search for components by natural language query. Supports semantic (vector similarity), keyword (full-text), and hybrid (RRF fusion) modes. Default is hybrid for best results.',
       inputSchema: searchComponentsSchema,
     },
     async (args) => handleSearchComponents(args, ctx)
+  );
+
+  /**
+   * Tool: find_similar_components
+   *
+   * Find components similar to a given component using semantic similarity.
+   * Requires embedding repository (VOYAGE_API_KEY configured).
+   */
+  server.registerTool(
+    'find_similar_components',
+    {
+      description:
+        'Find components similar to a given component using semantic vector similarity. Useful for discovering alternatives, related components, or variations. Requires a base component identifier (slug, name, or ID).',
+      inputSchema: findSimilarSchema,
+    },
+    async (args) => handleFindSimilar(args, ctx)
   );
 
   /**
