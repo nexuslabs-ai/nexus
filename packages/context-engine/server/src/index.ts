@@ -57,12 +57,18 @@ export {
 
 // Re-export MCP module
 export {
+  type AuthResult,
   createMcpServer,
-  extractMcpAuth,
+  detectTokenKind,
+  hasScope,
   type McpContext,
   mcpRouter,
+  type PlatformAuthContext,
   type ResourceHandler,
   type SessionEntry,
   SessionStore,
+  type TenantAuthContext,
+  TokenKind,
   type ToolHandler,
+  validateApiKey,
 } from './mcp/index.js';

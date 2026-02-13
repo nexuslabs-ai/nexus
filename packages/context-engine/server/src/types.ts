@@ -14,7 +14,8 @@ import type {
 import type { HttpBindings } from '@hono/node-server';
 import type { PinoLogger } from 'hono-pino';
 
-import type { AuthContext } from './auth/index.js';
+import type { AuthContext, TenantAuthContext } from './auth/index.js';
+import type { SessionEntry, SessionStore } from './mcp/sessions.js';
 
 // =============================================================================
 // Context Variable Types
@@ -51,6 +52,13 @@ export interface RepositoryVariables {
    * Always available for `/api/v1/*` routes.
    */
   apiKeyRepo: ApiKeyRepository;
+
+  /**
+   * MCP session store for stateful session management.
+   * Always available (always-on architecture).
+   * Manages session lifecycle, TTL cleanup, and per-org limits.
+   */
+  sessionStore: SessionStore;
 }
 
 // =============================================================================
@@ -89,6 +97,35 @@ export interface LoggerVariables {
 }
 
 // =============================================================================
+// MCP Variable Types
+// =============================================================================
+
+/**
+ * MCP-specific variables injected via MCP middleware.
+ *
+ * Available on `c.var` in MCP route handlers after the MCP middleware has run.
+ */
+export interface McpVariables {
+  /**
+   * Authenticated MCP context (tenant only).
+   * Set by mcpAuthMiddleware after validating tenant API key.
+   */
+  mcpAuth?: {
+    success: true;
+    context: TenantAuthContext;
+  };
+
+  /**
+   * Retrieved MCP session with validated ownership.
+   * Set by mcpSessionMiddleware after validating session ID and ownership.
+   */
+  mcpSession?: {
+    session: SessionEntry;
+    sessionId: string;
+  };
+}
+
+// =============================================================================
 // App Environment Types
 // =============================================================================
 
@@ -104,6 +141,9 @@ export interface LoggerVariables {
  * This is required for MCP integration (v1.x SDK uses Node.js types).
  */
 export interface AppEnv {
-  Variables: RepositoryVariables & AuthVariables & LoggerVariables;
+  Variables: RepositoryVariables &
+    AuthVariables &
+    LoggerVariables &
+    McpVariables;
   Bindings: HttpBindings;
 }
