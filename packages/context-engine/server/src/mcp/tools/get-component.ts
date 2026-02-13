@@ -19,6 +19,7 @@ import { z } from 'zod';
 import { ComponentResolver } from '../../services/component-resolver.js';
 import { formatComponent } from '../../utils/formatters.js';
 import type { McpContext } from '../types.js';
+import { mcpError } from '../utils/error.js';
 
 // =============================================================================
 // Schema
@@ -67,20 +68,11 @@ export async function handleGetComponent(
 
   // Handle not found
   if (!component) {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify({
-            error: 'Component not found',
-            identifier: args.identifier,
-            suggestion:
-              'Use search_components to find available components, or check the component identifier',
-          }),
-        },
-      ],
-      isError: true,
-    };
+    return mcpError('Component not found', {
+      identifier: args.identifier,
+      suggestion:
+        'Use search_components to find available components, or check the component identifier',
+    });
   }
 
   // Format component for response (converts dates to ISO strings)

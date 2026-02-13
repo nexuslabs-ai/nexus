@@ -18,6 +18,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 
 import type { McpContext } from '../types.js';
+import { mcpError } from '../utils/error.js';
 
 // =============================================================================
 // Schema
@@ -73,20 +74,10 @@ export async function handleSearchComponents(
 ): Promise<CallToolResult> {
   // Check if embedding repository is available
   if (!ctx.embeddingRepo) {
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify({
-            error: 'Semantic search not available',
-            reason:
-              'Embedding repository not configured (VOYAGE_API_KEY missing)',
-            suggestion: 'Configure VOYAGE_API_KEY to enable semantic search',
-          }),
-        },
-      ],
-      isError: true,
-    };
+    return mcpError('Semantic search not available', {
+      reason: 'Embedding repository not configured (VOYAGE_API_KEY missing)',
+      suggestion: 'Configure VOYAGE_API_KEY to enable semantic search',
+    });
   }
 
   // Clamp limit with default
