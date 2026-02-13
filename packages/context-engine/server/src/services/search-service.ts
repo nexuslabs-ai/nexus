@@ -41,6 +41,31 @@ export interface SearchOptions {
 }
 
 /**
+ * Unified search result format for all search modes.
+ *
+ * Normalizes results from keyword, semantic, and hybrid searches
+ * into a consistent structure for transport-agnostic consumption.
+ */
+export interface UnifiedSearchResult {
+  /** Search results with normalized score field */
+  results: Array<{
+    componentId: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    framework: string;
+    score: number; // Normalized: keyword score, semantic score, or RRF score
+  }>;
+
+  /** Metadata about the search execution */
+  meta: {
+    searchMode: 'semantic' | 'keyword' | 'hybrid';
+    semanticCount?: number; // Only present for hybrid mode
+    keywordCount?: number; // Only present for hybrid mode
+  };
+}
+
+/**
  * A single result from hybrid search with an RRF-fused score.
  *
  * Re-exported from utils/rrf for backward compatibility.
@@ -80,23 +105,23 @@ export interface HybridSearchResult {
 /**
  * Transport-agnostic search service combining semantic and keyword search.
  *
- * Provides three search modes:
- * - `searchHybrid` — Best results via RRF fusion of both methods
- * - `searchSemantic` — Vector similarity only
- * - `searchKeyword` — PostgreSQL full-text search only
+ * Provides unified search with three modes:
+ * - `hybrid` — Best results via RRF fusion of both methods (default)
+ * - `semantic` — Vector similarity only
+ * - `keyword` — PostgreSQL full-text search only
  *
  * @example
  * ```typescript
  * const searchService = new SearchService(componentRepo, embeddingRepo);
  *
  * // Hybrid search (recommended for best results)
- * const { results, meta } = await searchService.searchHybrid(
- *   orgId, 'button with loading state', { limit: 5 }
+ * const { results, meta } = await searchService.search(
+ *   orgId, 'button with loading state', { mode: 'hybrid', limit: 5 }
  * );
  *
  * // Keyword-only
- * const keywords = await searchService.searchKeyword(
- *   orgId, 'dialog modal', { framework: 'react' }
+ * const { results } = await searchService.search(
+ *   orgId, 'dialog modal', { mode: 'keyword', framework: 'react' }
  * );
  * ```
  */
@@ -107,8 +132,99 @@ export class SearchService {
   ) {}
 
   // ===========================================================================
-  // Public API
+  // Public API - Unified Search
   // ===========================================================================
+
+  /**
+   * Unified search method with mode parameter.
+   *
+   * Provides a single entry point for all search modes (keyword, semantic, hybrid).
+   * Delegates to the appropriate search method and normalizes the result format.
+   *
+   * This method eliminates the need for mode-switching logic in consumers
+   * (HTTP routes, MCP tools) by handling it in the service layer.
+   *
+   * @param orgId - Organization ID for multi-tenant isolation
+   * @param query - Natural language search query
+   * @param options - Search options including mode
+   * @returns Unified search result with normalized format
+   *
+   * @example
+   * ```typescript
+   * const searchService = new SearchService(componentRepo, embeddingRepo);
+   *
+   * // Hybrid search (default)
+   * const result = await searchService.search(orgId, query, { mode: 'hybrid' });
+   *
+   * // Keyword only
+   * const result = await searchService.search(orgId, query, { mode: 'keyword' });
+   * ```
+   */
+  async search(
+    orgId: string,
+    query: string,
+    options: SearchOptions & { mode?: 'semantic' | 'keyword' | 'hybrid' } = {}
+  ): Promise<UnifiedSearchResult> {
+    const mode = options.mode ?? 'hybrid';
+
+    switch (mode) {
+      case 'keyword': {
+        const results = await this.searchKeyword(orgId, query, options);
+        return {
+          results: results.map((r) => this.formatResult(r, r.score)),
+          meta: { searchMode: 'keyword' },
+        };
+      }
+
+      case 'semantic': {
+        const results = await this.searchSemantic(orgId, query, options);
+        return {
+          results: results.map((r) => this.formatResult(r, r.score)),
+          meta: { searchMode: 'semantic' },
+        };
+      }
+
+      case 'hybrid':
+      default: {
+        const hybridResult = await this.searchHybrid(orgId, query, options);
+        return {
+          results: hybridResult.results.map((r) =>
+            this.formatResult(r, r.rrfScore)
+          ),
+          meta: {
+            searchMode: 'hybrid',
+            semanticCount: hybridResult.meta.semanticCount,
+            keywordCount: hybridResult.meta.keywordCount,
+          },
+        };
+      }
+    }
+  }
+
+  // ===========================================================================
+  // Private Implementation Methods
+  // ===========================================================================
+
+  /**
+   * Format a search result into the unified result structure.
+   *
+   * @param result - Raw result from repository (keyword or semantic)
+   * @param score - The score to use (could be keyword score, semantic score, or RRF score)
+   * @returns Formatted result with normalized fields
+   */
+  private formatResult(
+    result: SearchResult | KeywordSearchResult | FusedSearchResult,
+    score: number
+  ): UnifiedSearchResult['results'][number] {
+    return {
+      componentId: result.componentId,
+      name: result.name,
+      slug: result.slug,
+      description: result.description,
+      framework: result.framework,
+      score,
+    };
+  }
 
   /**
    * Hybrid search combining semantic and keyword results via RRF fusion.
@@ -121,7 +237,7 @@ export class SearchService {
    * @param options - Search options (limit, minScore, framework)
    * @returns Fused results with metadata about the search execution
    */
-  async searchHybrid(
+  private async searchHybrid(
     orgId: string,
     query: string,
     options: SearchOptions = {}
@@ -159,7 +275,7 @@ export class SearchService {
    * @param options - Search options (limit, minScore, framework)
    * @returns Array of matching components with similarity scores
    */
-  async searchSemantic(
+  private async searchSemantic(
     orgId: string,
     query: string,
     options: SearchOptions = {}
@@ -177,7 +293,7 @@ export class SearchService {
    * @param options - Search options (limit, minScore, framework)
    * @returns Array of matching components with full-text relevance scores
    */
-  async searchKeyword(
+  private async searchKeyword(
     orgId: string,
     query: string,
     options: SearchOptions = {}
