@@ -8,11 +8,25 @@
       "type": "http",
       "url": "https://mcp.figma.com/mcp"
     },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "chrome-devtools-mcp@latest",
+        "--executable-path=/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+      ]
+    },
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "***REDACTED***"
+      }
+    },
+    "nexus-context-engine": {
+      "type": "http",
+      "url": "http://localhost:3000/mcp",
+      "headers": {
+        "Authorization": "Bearer ***REDACTED***"
       }
     }
   }

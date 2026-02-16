@@ -229,48 +229,6 @@ export class Logger {
       this.log('error', message, { ...error, ...context });
     }
   }
-
-  /**
-   * Log operation timing
-   */
-  time<T>(operation: string, fn: () => T): T {
-    const start = performance.now();
-    try {
-      const result = fn();
-      const duration = performance.now() - start;
-      this.debug(`${operation} completed`, {
-        durationMs: Math.round(duration),
-      });
-      return result;
-    } catch (error) {
-      const duration = performance.now() - start;
-      this.error(`${operation} failed`, error as Error, {
-        durationMs: Math.round(duration),
-      });
-      throw error;
-    }
-  }
-
-  /**
-   * Log async operation timing
-   */
-  async timeAsync<T>(operation: string, fn: () => Promise<T>): Promise<T> {
-    const start = performance.now();
-    try {
-      const result = await fn();
-      const duration = performance.now() - start;
-      this.debug(`${operation} completed`, {
-        durationMs: Math.round(duration),
-      });
-      return result;
-    } catch (error) {
-      const duration = performance.now() - start;
-      this.error(`${operation} failed`, error as Error, {
-        durationMs: Math.round(duration),
-      });
-      throw error;
-    }
-  }
 }
 
 /**

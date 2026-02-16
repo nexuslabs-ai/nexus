@@ -53,35 +53,34 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/ test/ --ext .ts",
-    "test": "USE_CACHED=true vitest run",
-    "test:watch": "USE_CACHED=true vitest",
-    "test:ui": "USE_CACHED=true vitest --ui",
-    "test:real": "vitest run test/integration/real-llm.test.ts",
-    "test:record": "RECORD_RESPONSES=true vitest run test/integration/real-llm.test.ts",
-    "test:validate": "VALIDATE_LLM=true vitest run test/integration/real-llm.test.ts",
-    "test:record-all": "tsx scripts/record-responses.ts"
+    "lint": "eslint src/",
+    "process:help": "tsx scripts/run-processor.ts --help",
+    "extract": "tsx scripts/run-processor.ts --phase extract",
+    "generate": "tsx scripts/run-processor.ts --phase generate",
+    "manifest": "tsx scripts/run-processor.ts --phase build",
+    "process": "tsx scripts/run-processor.ts --phase full"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.52.0",
-    "@google/generative-ai": "^0.24.1",
+    "@anthropic-ai/sdk": "^0.72.1",
+    "@google/genai": "^1.39.0",
+    "@types/lodash": "^4.17.23",
     "fast-json-stable-stringify": "^2.1.0",
-    "react-docgen-typescript": "^2.2.2",
-    "semver": "^7.6.0",
-    "ts-morph": "^25.0.1",
-    "uuid": "^9.0.0",
-    "zod": "^4.0.0"
+    "lodash": "^4.17.23",
+    "react-docgen-typescript": "^2.4.0",
+    "semver": "^7.7.3",
+    "ts-morph": "^27.0.2",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/semver": "^7.5.0",
-    "@types/uuid": "^9.0.0",
-    "@vitest/ui": "4.0.17",
+    "@types/node": "^25.2.0",
+    "@types/semver": "^7.7.1",
+    "@vitest/ui": "^4.0.18",
     "dotenv": "^17.2.3",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "4.0.17"
+    "vitest": "^4.0.18"
   },
   "files": [
     "dist"

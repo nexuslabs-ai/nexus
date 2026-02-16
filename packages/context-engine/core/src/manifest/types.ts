@@ -2,26 +2,34 @@
  * Manifest Builder Types
  *
  * Types for combining extracted data and generated metadata
- * into a complete ComponentManifest.
+ * into a complete manifest.
+ *
+ * The build() method throws ManifestBuildError on failure.
  */
 
 import type {
-  ComponentManifest,
+  AIManifest,
   ComponentMeta,
   ExtractedData,
   ManifestIdentity,
 } from '../types/index.js';
-import { OutputType } from '../types/output.js';
 
 // Re-export ManifestIdentity for backwards compatibility
 export type { ManifestIdentity } from '../types/index.js';
 
 /**
- * Build output discriminant
- *
- * Uses shared OutputType for consistency across modules.
+ * Configuration for ManifestBuilder
  */
-export const ManifestBuildOutputType = OutputType;
+export interface ManifestBuilderConfig {
+  /**
+   * Default package name to use when import detection fails.
+   * This is used as a fallback when no design system package
+   * can be derived from the component's dependencies.
+   *
+   * @default '@nexus/react'
+   */
+  defaultPackageName?: string;
+}
 
 /**
  * Input for building a manifest
@@ -31,7 +39,7 @@ export const ManifestBuildOutputType = OutputType;
  * - Component identity (id, slug, name, framework)
  * - Extracted data from HybridExtractor
  * - Generated metadata from MetaGenerator
- * - Source tracking (sourceHash, version)
+ * - Source tracking (sourceHash)
  */
 export interface ManifestBuilderInput {
   /** Organization ID for multi-org isolation */
@@ -49,76 +57,32 @@ export interface ManifestBuilderInput {
   /** Hash of source code for change detection */
   sourceHash: string;
 
-  /** Semantic version (defaults to "0.0.1") */
-  version?: string;
+  /** Component names in the design system for filtering relatedComponents */
+  availableComponents?: string[];
 }
 
 /**
- * Successful manifest build output
+ * Manifest build result (success only - throws ManifestBuildError on failure)
+ *
+ * Flat structure matching ManifestOutput. DB layer adds its own fields
+ * (timestamps, versioning, embedding status) separately.
  */
-export interface ManifestBuilderSuccess {
-  /** Discriminant for type narrowing */
-  type: typeof ManifestBuildOutputType.Success;
+export interface ManifestBuilderResult {
+  /** Component name (PascalCase) */
+  componentName: string;
 
-  /** Complete component manifest */
-  manifest: ComponentManifest;
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
+
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
 
   /** Build timestamp */
   builtAt: string;
-}
-
-/**
- * Failed manifest build output
- */
-export interface ManifestBuilderFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ManifestBuildOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /** Field that caused the failure (if applicable) */
-  field?: string;
-}
-
-/**
- * Manifest build output union
- */
-export type ManifestBuilderOutput =
-  | ManifestBuilderSuccess
-  | ManifestBuilderFailure;
-
-/**
- * Input for updating an existing manifest
- */
-export interface ManifestUpdateInput {
-  /** Fields to update from new extraction */
-  extracted?: ExtractedData;
-
-  /** Fields to update from new generation */
-  meta?: ComponentMeta;
-
-  /** New source hash */
-  sourceHash?: string;
-
-  /** New version */
-  version?: string;
-}
-
-/**
- * Type guard for successful manifest build
- */
-export function isManifestBuildSuccess(
-  output: ManifestBuilderOutput
-): output is ManifestBuilderSuccess {
-  return output.type === ManifestBuildOutputType.Success;
-}
-
-/**
- * Type guard for failed manifest build
- */
-export function isManifestBuildFailure(
-  output: ManifestBuilderOutput
-): output is ManifestBuilderFailure {
-  return output.type === ManifestBuildOutputType.Failure;
 }

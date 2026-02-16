@@ -17,4 +17,13 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   target: 'node20',
+  // Externalize dependencies that use dynamic requires (breaks ESM bundles)
+  // ts-morph and typescript use require('fs'), require('path'), etc.
+  external: [
+    'ts-morph',
+    'typescript',
+    'react-docgen-typescript',
+    '@anthropic-ai/sdk',
+    '@google/genai',
+  ],
 });

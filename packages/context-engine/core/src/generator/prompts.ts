@@ -1,7 +1,7 @@
 /**
  * Generation Prompts
  *
- * Prompt templates for LLM-based metadata generation.
+ * Prompt templates for LLM-based metadata generation via tool calling.
  * Designed for efficiency (minimal token usage) while providing rich context.
  */
 
@@ -9,36 +9,8 @@ import type { ExtractedData, Framework } from '../types/index.js';
 import { COMPONENT_PATTERNS } from '../types/meta.js';
 
 // =============================================================================
-// System Prompt
+// Helper Functions for Building Prompt Sections
 // =============================================================================
-
-/**
- * System prompt that explains the task to the LLM
- *
- * Kept concise to minimize token usage while providing clear instructions.
- */
-export const SYSTEM_PROMPT = `You are a design system documentation expert. Generate metadata for React components based on extracted code information.
-
-Output valid JSON only. No markdown, no explanations.`;
-
-// =============================================================================
-// User Prompt Template
-// =============================================================================
-
-/**
- * Template placeholders for user prompt
- */
-export interface PromptPlaceholders {
-  componentName: string;
-  framework: Framework;
-  propsSection: string;
-  variantsSection: string;
-  dependenciesSection: string;
-  baseLibrarySection: string;
-  sourceDescription: string;
-  figmaUrl: string;
-  hints: string;
-}
 
 /**
  * Build the props section for the prompt
@@ -50,10 +22,9 @@ function buildPropsSection(extracted: ExtractedData): string {
 
   const propsLines = extracted.props.map((p) => {
     const parts = [`- ${p.name}: ${p.type}`];
-    if (p.required) parts.push('(required)');
     if (p.description) parts.push(`- ${p.description}`);
-    if (p.possibleValues?.length) {
-      parts.push(`[${p.possibleValues.join(', ')}]`);
+    if (p.values?.length) {
+      parts.push(`[${p.values.join(', ')}]`);
     }
     return parts.join(' ');
   });
@@ -130,64 +101,47 @@ function buildBaseLibrarySection(extracted: ExtractedData): string {
 }
 
 /**
- * User prompt template
+ * Build the sub-component variants section for the prompt
  *
- * Uses {{PLACEHOLDER}} syntax for template variables.
+ * For compound components (Dialog, Accordion, etc.), includes variant information
+ * for each sub-component so the LLM can generate variant descriptions for them.
  */
-export const USER_PROMPT_TEMPLATE = `Generate metadata for this component:
+function buildSubComponentVariantsSection(extracted: ExtractedData): string {
+  if (!extracted.subComponents || extracted.subComponents.length === 0) {
+    return '';
+  }
 
-## Component
-Name: {{COMPONENT_NAME}}
-Framework: {{FRAMEWORK}}
-{{SOURCE_DESCRIPTION}}
+  // Filter to only sub-components that have variants
+  const subComponentsWithVariants = extracted.subComponents.filter(
+    (sub) => sub.variants && Object.keys(sub.variants).length > 0
+  );
 
-{{PROPS_SECTION}}
+  if (subComponentsWithVariants.length === 0) {
+    return '';
+  }
 
-{{VARIANTS_SECTION}}
+  const sections = subComponentsWithVariants.map((sub) => {
+    const variantLines = Object.entries(sub.variants!).map(
+      ([name, values]) => `  - ${name}: ${values.join(', ')}`
+    );
 
-{{DEPENDENCIES_SECTION}}
+    // Include defaults if available
+    let subSection = `${sub.name}:\n${variantLines.join('\n')}`;
+    if (sub.defaultVariants && Object.keys(sub.defaultVariants).length > 0) {
+      const defaultLines = Object.entries(sub.defaultVariants).map(
+        ([name, value]) => `    ${name}: ${value}`
+      );
+      subSection += `\n  Defaults:\n${defaultLines.join('\n')}`;
+    }
 
-{{BASE_LIBRARY_SECTION}}
+    return subSection;
+  });
 
-{{FIGMA_URL}}
-
-{{HINTS}}
-
-## Output Format
-
-Return a JSON object with this structure:
-
-{
-  "description": "One-line description (10-80 chars)",
-  "semanticDescription": "Rich 2-5 sentence description for semantic search. Describe what this component is, its primary purpose, and key characteristics.",
-  "tier": "free",
-  "whenToUse": "Guidance on when to use this component",
-  "whenNotToUse": "Guidance on when NOT to use this component",
-  "patterns": ["pattern1", "pattern2"],
-  "tokens": ["color-primary", "spacing-md"],
-  "examples": ["<Component variant=\\"primary\\" />", "<Component disabled />"],
-  "relatedComponents": ["RelatedOne", "RelatedTwo"],
-  "a11yNotes": "Accessibility considerations"
+  return `Sub-Component Variants:\n${sections.join('\n\n')}`;
 }
 
-## Pattern Reference
-
-Standard patterns (use where applicable):
-${COMPONENT_PATTERNS.map((p) => `- ${p}`).join('\n')}
-
-## Guidelines
-
-1. semanticDescription should be optimized for embedding-based search
-2. Include 2-4 realistic JSX examples showing different usages
-3. patterns must be from the standard list above
-4. tokens should reference design tokens (colors, spacing, typography)
-5. relatedComponents should be real component names that pair with this one
-6. Set tier to "pro" only for complex components (data tables, advanced charts)
-
-Return ONLY the JSON object.`;
-
 // =============================================================================
-// Prompt Builder
+// Prompt Builder Input
 // =============================================================================
 
 /**
@@ -203,101 +157,124 @@ export interface PromptBuilderInput {
   /** Extracted data from code analysis */
   extracted: ExtractedData;
 
-  /** Optional Figma design URL */
-  figmaUrl?: string;
+  /**
+   * Skip example generation in the prompt.
+   * Set to true when Storybook examples are available from extraction.
+   */
+  skipExamples?: boolean;
 
-  /** Optional hints for generation */
+  /**
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
+   */
   hints?: string;
 }
 
-/**
- * Build the complete user prompt from extracted data
- *
- * @param input - Prompt builder input
- * @returns Formatted user prompt string
- */
-export function buildUserPrompt(input: PromptBuilderInput): string {
-  const { name, framework, extracted, figmaUrl, hints } = input;
-
-  // Build all sections
-  const propsSection = buildPropsSection(extracted);
-  const variantsSection = buildVariantsSection(extracted);
-  const dependenciesSection = buildDependenciesSection(extracted);
-  const baseLibrarySection = buildBaseLibrarySection(extracted);
-
-  // Build optional sections
-  const sourceDescriptionLine = extracted.sourceDescription
-    ? `Description: ${extracted.sourceDescription}`
-    : '';
-  const figmaLine = figmaUrl ? `Figma: ${figmaUrl}` : '';
-  const hintsLine = hints ? `Additional Context: ${hints}` : '';
-
-  // Replace placeholders
-  let prompt = USER_PROMPT_TEMPLATE;
-  prompt = prompt.replace('{{COMPONENT_NAME}}', name);
-  prompt = prompt.replace('{{FRAMEWORK}}', framework);
-  prompt = prompt.replace('{{SOURCE_DESCRIPTION}}', sourceDescriptionLine);
-  prompt = prompt.replace('{{PROPS_SECTION}}', propsSection);
-  prompt = prompt.replace('{{VARIANTS_SECTION}}', variantsSection);
-  prompt = prompt.replace('{{DEPENDENCIES_SECTION}}', dependenciesSection);
-  prompt = prompt.replace('{{BASE_LIBRARY_SECTION}}', baseLibrarySection);
-  prompt = prompt.replace('{{FIGMA_URL}}', figmaLine);
-  prompt = prompt.replace('{{HINTS}}', hintsLine);
-
-  // Clean up empty lines (more than 2 consecutive newlines become 2)
-  prompt = prompt.replace(/\n{3,}/g, '\n\n');
-
-  return prompt.trim();
-}
-
-/**
- * Build the complete prompt for LLM generation
- *
- * @param input - Prompt builder input
- * @returns Object with system and user prompts
- */
-export function buildPrompt(input: PromptBuilderInput): {
-  system: string;
-  user: string;
-} {
-  return {
-    system: SYSTEM_PROMPT,
-    user: buildUserPrompt(input),
-  };
-}
-
 // =============================================================================
-// Response Format
+// Response Validation
 // =============================================================================
-
-/**
- * Expected JSON structure from LLM response
- *
- * This matches ParsedLLMMetaResponse from types.ts
- */
-export interface ExpectedLLMResponse {
-  description: string;
-  semanticDescription: string;
-  tier?: 'free' | 'pro';
-  whenToUse?: string;
-  whenNotToUse?: string;
-  patterns?: string[];
-  tokens?: string[];
-  examples?: string[];
-  relatedComponents?: string[];
-  a11yNotes?: string;
-}
-
-/**
- * Validate that a pattern is from the standard list
- */
-export function isValidPattern(pattern: string): boolean {
-  return (COMPONENT_PATTERNS as readonly string[]).includes(pattern);
-}
 
 /**
  * Filter patterns to only include valid ones
  */
 export function filterValidPatterns(patterns: string[]): string[] {
-  return patterns.filter(isValidPattern);
+  return patterns.filter((pattern) => COMPONENT_PATTERNS.includes(pattern));
+}
+
+// =============================================================================
+// Prompt Constants
+// =============================================================================
+
+/**
+ * System prompt for tool calling generation
+ *
+ * Optimized for tool calling - no JSON format instructions needed since the
+ * tool schema defines the output format.
+ */
+export const TOOL_CALLING_SYSTEM_PROMPT = `You are a design system documentation expert. Generate comprehensive metadata for UI components to make them AI-accessible.
+
+Your goal is to help AI coding assistants understand and correctly use this component. Focus on:
+1. Clear, searchable descriptions
+2. Practical code examples
+3. Guidance on when to use (and not use) this component
+4. Accessibility considerations
+
+Use the generate_component_metadata tool to provide your analysis.`;
+
+/**
+ * Pattern reference section (shared between both prompt paths)
+ */
+const PATTERN_REFERENCE = `## Pattern Reference
+
+Valid patterns (use where applicable):
+${COMPONENT_PATTERNS.map((p) => `- ${p}`).join('\n')}`;
+
+// =============================================================================
+// Prompt Builder
+// =============================================================================
+
+/**
+ * Build the user prompt for tool calling using template literals
+ *
+ * @param input - Prompt builder input
+ * @returns Formatted user prompt string for tool calling
+ */
+function buildToolCallingUserPrompt({
+  name,
+  framework,
+  extracted,
+  skipExamples = false,
+  hints,
+}: PromptBuilderInput): string {
+  const propsSection = buildPropsSection(extracted);
+  const variantsSection = buildVariantsSection(extracted);
+  const subComponentVariantsSection =
+    buildSubComponentVariantsSection(extracted);
+  const dependenciesSection = buildDependenciesSection(extracted);
+  const baseLibrarySection = buildBaseLibrarySection(extracted);
+
+  const sourceDescription = extracted.sourceDescription
+    ? `Description: ${extracted.sourceDescription}`
+    : '';
+  const hintsSection = hints ? `Additional Context: ${hints}` : '';
+
+  const prompt = `Analyze this ${framework} component and generate metadata using the generate_component_metadata tool.
+
+## Component: ${name}
+${sourceDescription}
+
+${propsSection}
+
+${variantsSection}
+
+${subComponentVariantsSection}
+
+${dependenciesSection}
+
+${baseLibrarySection}
+
+${hintsSection}
+
+${PATTERN_REFERENCE}
+
+Generate comprehensive metadata to make this component AI-accessible.${!skipExamples ? ' Include practical code examples.' : ''}`;
+
+  // Clean up empty lines (3+ newlines -> 2)
+  return prompt.replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/**
+ * Build the complete prompt for tool calling generation
+ *
+ * @param input - Prompt builder input
+ * @returns Object with system and user prompts for tool calling
+ */
+export function buildToolCallingPrompt(input: PromptBuilderInput): {
+  system: string;
+  user: string;
+} {
+  return {
+    system: TOOL_CALLING_SYSTEM_PROMPT,
+    user: buildToolCallingUserPrompt(input),
+  };
 }

@@ -4,6 +4,16 @@
  * Orchestrates the generation of component metadata using an LLM provider.
  * Handles prompt construction, response parsing, and validation.
  *
+ * ## Architecture
+ *
+ * This module uses tool calling exclusively for structured output generation.
+ * All providers must implement `generateWithToolCalling()`.
+ *
+ * Flow: ComponentMetaTool Schema -> LLM Tool Calling -> normalizeToolOutputToMeta() -> ComponentMeta
+ *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * Configuration is read from environment variables via the config module:
  * - CONTEXT_ENGINE_GENERATION_MAX_TOKENS: Max tokens for generation
  * - CONTEXT_ENGINE_MIN_SEMANTIC_DESC_LENGTH: Min semantic description length
@@ -13,95 +23,29 @@
  */
 
 import { getGenerationConfig } from '../config/index.js';
+import { MetaGenerationError } from '../types/errors.js';
 import type {
   AIContext,
   ComponentMeta,
   ExtractedData,
-  Tier,
+  StructuredExamples,
 } from '../types/index.js';
+import { createProviderFromEnv } from '../utils/env-provider.js';
 import { createLogger } from '../utils/logger.js';
 
-import { AnthropicProvider } from './anthropic-provider.js';
-import { buildPrompt, filterValidPatterns } from './prompts.js';
+import { buildToolCallingPrompt, filterValidPatterns } from './prompts.js';
 import {
-  GenerationOutputType,
-  type GeneratorFailure,
-  type GeneratorInput,
-  type GeneratorOutput,
-  type GeneratorSuccess,
-  type ILLMProvider,
-  type IMetaGenerator,
-  type ParsedLLMMetaResponse,
+  type ComponentMetaTool,
+  ComponentMetaToolSchema,
+} from './tool-schema.js';
+import type {
+  GeneratorInput,
+  GeneratorOutput,
+  ILLMProvider,
+  IMetaGenerator,
 } from './types.js';
 
 const logger = createLogger({ name: 'meta-generator' });
-
-// =============================================================================
-// Configuration
-// =============================================================================
-
-/**
- * Get generation configuration from environment
- */
-function getConfig() {
-  return getGenerationConfig();
-}
-
-// =============================================================================
-// Response Parsing
-// =============================================================================
-
-/**
- * Extract JSON from LLM response text
- *
- * Handles responses that may be wrapped in markdown code blocks.
- *
- * @param text - Raw LLM response text
- * @returns Extracted JSON string
- * @throws Error if no JSON found
- */
-function extractJsonFromResponse(text: string): string {
-  // Try to extract from markdown code block first
-  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  if (codeBlockMatch?.[1]) {
-    return codeBlockMatch[1].trim();
-  }
-
-  // Try to find raw JSON object
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (jsonMatch?.[0]) {
-    return jsonMatch[0].trim();
-  }
-
-  throw new Error('Could not extract JSON from LLM response');
-}
-
-/**
- * Parse LLM response into structured data
- *
- * @param text - Raw LLM response text
- * @returns Parsed response object
- * @throws Error if parsing fails
- */
-function parseLLMResponse(text: string): ParsedLLMMetaResponse {
-  const jsonStr = extractJsonFromResponse(text);
-
-  try {
-    const parsed = JSON.parse(jsonStr) as unknown;
-
-    // Basic object validation only - normalize functions handle bad values with defaults
-    if (typeof parsed !== 'object' || parsed === null) {
-      throw new Error('Response is not a valid object');
-    }
-
-    return parsed as ParsedLLMMetaResponse;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error(`Invalid JSON in LLM response: ${error.message}`);
-    }
-    throw error;
-  }
-}
 
 // =============================================================================
 // Response Validation & Normalization
@@ -148,16 +92,6 @@ function normalizeArray(value: unknown, defaultValue: string[] = []): string[] {
 }
 
 /**
- * Validate and normalize tier field
- */
-function normalizeTier(value: unknown): Tier {
-  if (value === 'pro') {
-    return 'pro';
-  }
-  return 'free';
-}
-
-/**
  * Build default semantic description from component name and extracted data
  */
 function buildDefaultSemanticDescription(
@@ -177,77 +111,141 @@ function buildDefaultSemanticDescription(
     .join(' ');
 }
 
+// =============================================================================
+// Tool Calling Response Conversion
+// =============================================================================
+
 /**
- * Normalize parsed LLM response into AIContext
+ * Convert LLM tool examples to StructuredExamples format
+ *
+ * Preserves the structured format from the LLM (minimal, common, advanced)
+ * instead of flattening to a string array.
+ *
+ * Returns undefined if examples are not provided (when Storybook examples
+ * are available, the LLM skips example generation).
  */
-function normalizeToAIContext(
-  parsed: ParsedLLMMetaResponse,
+function convertToolExamples(
+  tool: ComponentMetaTool
+): StructuredExamples | undefined {
+  if (!tool.examples) {
+    return undefined;
+  }
+
+  return {
+    minimal: {
+      title: tool.examples.minimal.title,
+      code: tool.examples.minimal.code,
+      description: tool.examples.minimal.description,
+    },
+    common: tool.examples.common.map((ex) => ({
+      title: ex.title,
+      code: ex.code,
+      description: ex.description,
+    })),
+    advanced: tool.examples.advanced?.map((ex) => ({
+      title: ex.title,
+      code: ex.code,
+      description: ex.description,
+    })),
+  };
+}
+
+/**
+ * Normalize tool calling output directly to ComponentMeta
+ *
+ * Transforms structured tool output to ComponentMeta.
+ *
+ * @param tool - Validated tool calling output
+ * @param name - Component name
+ * @param extracted - Extracted component data
+ * @returns Normalized ComponentMeta
+ */
+function normalizeToolOutputToMeta(
+  tool: ComponentMetaTool,
   name: string,
   extracted: ExtractedData
-): AIContext {
-  const config = getConfig();
+): ComponentMeta {
+  const config = getGenerationConfig();
   const defaultSemanticDescription = buildDefaultSemanticDescription(
     name,
     extracted
   );
 
-  // Get semantic description with fallback
-  let semanticDescription = normalizeString(
-    parsed.semanticDescription,
+  // Get semantic description with fallback (tool.description is now the semantic description)
+  // normalizeString already returns defaultSemanticDescription if input is too short
+  const semanticDescription = normalizeString(
+    tool.description,
     defaultSemanticDescription,
     config.minSemanticDescriptionLength,
     config.maxSemanticDescriptionLength
   );
 
-  // If still too short, use the fallback
-  if (semanticDescription.length < config.minSemanticDescriptionLength) {
-    semanticDescription = defaultSemanticDescription;
-  }
-
   // Normalize patterns to only include valid ones
-  const rawPatterns = normalizeArray(parsed.patterns);
-  const patterns = filterValidPatterns(rawPatterns);
+  const patterns = filterValidPatterns(tool.guidance.patterns);
 
-  return {
+  // Build AIContext directly from tool output
+  const ai: AIContext = {
     semanticDescription,
-    whenToUse: parsed.whenToUse,
-    whenNotToUse: parsed.whenNotToUse,
+    whenToUse: tool.guidance.whenToUse,
+    whenNotToUse: tool.guidance.whenNotToUse,
     patterns,
-    tokens: normalizeArray(parsed.tokens),
-    examples: normalizeArray(parsed.examples),
-    relatedComponents: normalizeArray(parsed.relatedComponents),
-    a11yNotes: parsed.a11yNotes,
-    baseLibrary: extracted.baseLibrary,
+    examples: convertToolExamples(tool),
+    relatedComponents: normalizeArray(tool.guidance.relatedComponents),
+    a11yNotes: tool.guidance.accessibility,
+    variantDescriptions: tool.variantDescriptions,
+    subComponentVariantDescriptions: tool.subComponentVariantDescriptions,
   };
-}
 
-/**
- * Normalize parsed LLM response into ComponentMeta
- */
-function normalizeToComponentMeta(
-  parsed: ParsedLLMMetaResponse,
-  name: string,
-  extracted: ExtractedData
-): ComponentMeta {
-  const config = getConfig();
+  // Build short description from the first sentence of semanticDescription
+  const shortDescription = semanticDescription.split('.')[0] + '.';
   const description = normalizeString(
-    parsed.description,
+    shortDescription,
     `A ${name} component`,
     config.minDescriptionLength,
     config.maxDescriptionLength
   );
 
-  const tier = normalizeTier(parsed.tier);
-  const ai = normalizeToAIContext(parsed, name, extracted);
-
   return {
     name,
     description,
-    tier,
     ai,
-    variants: extracted.variants,
-    defaults: extracted.defaultVariants,
   };
+}
+
+/**
+ * Validate tool calling output against the schema
+ *
+ * Even with tool calling, we validate the output as a safety layer.
+ * Provider-specific quirks (like Gemini's stringified nested objects)
+ * are handled by the providers themselves before returning.
+ *
+ * @throws MetaGenerationError if validation fails
+ */
+function validateToolOutput(data: unknown): ComponentMetaTool {
+  const result = ComponentMetaToolSchema.safeParse(data);
+  if (result.success) {
+    return result.data;
+  }
+
+  // Zod 4 uses 'issues' instead of 'errors'
+  const issues =
+    'issues' in result.error
+      ? (result.error.issues as Array<{
+          path: (string | number)[];
+          message: string;
+        }>)
+      : [];
+
+  const errorDetails = issues.map((e) => ({
+    path: e.path.join('.'),
+    message: e.message,
+  }));
+
+  logger.warn('Tool output validation failed', { errors: errorDetails });
+
+  throw new MetaGenerationError('Tool output validation failed', {
+    validationErrors: errorDetails,
+  });
 }
 
 // =============================================================================
@@ -271,6 +269,9 @@ export interface MetaGeneratorConfig {
  * Implements the IMetaGenerator interface. Uses dependency injection for the
  * LLM provider, enabling easy testing and provider swapping.
  *
+ * Error Handling:
+ * Throws MetaGenerationError on failure instead of returning failure objects.
+ *
  * @example
  * ```typescript
  * // With default Anthropic provider
@@ -280,16 +281,19 @@ export interface MetaGeneratorConfig {
  * const mockProvider = createMockProvider();
  * const generator = new MetaGenerator({ provider: mockProvider });
  *
- * // Generate metadata
- * const output = await generator.generate({
- *   orgId: 'org-123',
- *   name: 'Button',
- *   framework: 'react',
- *   extracted: extractedData,
- * });
- *
- * if (output.type === 'success') {
+ * // Generate metadata (throws on error)
+ * try {
+ *   const output = await generator.generate({
+ *     orgId: 'org-123',
+ *     name: 'Button',
+ *     framework: 'react',
+ *     extracted: extractedData,
+ *   });
  *   console.log(output.meta);
+ * } catch (error) {
+ *   if (error instanceof MetaGenerationError) {
+ *     console.error('Generation failed:', error.message);
+ *   }
  * }
  * ```
  */
@@ -303,8 +307,8 @@ export class MetaGenerator implements IMetaGenerator {
    * @param config - Configuration options
    */
   constructor(config: MetaGeneratorConfig = {}) {
-    const envConfig = getConfig();
-    this.provider = config.provider ?? new AnthropicProvider();
+    const envConfig = getGenerationConfig();
+    this.provider = config.provider ?? createProviderFromEnv();
     this.maxTokens = config.maxTokens ?? envConfig.maxTokens;
 
     logger.debug('MetaGenerator initialized', {
@@ -317,13 +321,22 @@ export class MetaGenerator implements IMetaGenerator {
   /**
    * Generate metadata for a component
    *
+   * Uses tool calling for structured output generation.
+   * When Storybook examples are available, skips example generation in the prompt.
+   *
    * @param input - Generation input with extracted data and context
-   * @returns Promise resolving to generation output (success or failure)
+   * @returns Promise resolving to generation output
+   * @throws MetaGenerationError on failure
    */
-  async generate(input: GeneratorInput): Promise<GeneratorOutput> {
-    const startTime = performance.now();
-
-    const { orgId, name, framework, extracted, figmaUrl, hints } = input;
+  async generate({
+    orgId,
+    name,
+    framework,
+    extracted,
+    hints,
+  }: GeneratorInput): Promise<GeneratorOutput> {
+    // Detect if Storybook examples are available
+    const hasStorybookExamples = (extracted.stories?.length ?? 0) > 0;
 
     logger.info('Starting meta generation', {
       orgId,
@@ -331,108 +344,46 @@ export class MetaGenerator implements IMetaGenerator {
       framework,
       propsCount: extracted.props.length,
       variantsCount: Object.keys(extracted.variants).length,
+      hasStorybookExamples,
     });
 
-    try {
-      // Build prompt
-      const { system, user } = buildPrompt({
-        name,
-        framework,
-        extracted,
-        figmaUrl,
-        hints,
-      });
+    // Build prompt for tool calling
+    // Skip example generation if Storybook examples are available
+    const { system, user } = buildToolCallingPrompt({
+      name,
+      framework,
+      extracted,
+      skipExamples: hasStorybookExamples,
+      hints,
+    });
 
-      // Call LLM provider with separate system prompt
-      const response = await this.provider.generateCompletion(user, {
+    // Call provider with tool calling (throws on error)
+    const result =
+      await this.provider.generateWithToolCalling<ComponentMetaTool>(user, {
         maxTokens: this.maxTokens,
         systemPrompt: system,
       });
 
-      // Parse and validate response
-      const parsed = parseLLMResponse(response.text);
-      const meta = normalizeToComponentMeta(parsed, name, extracted);
+    // Validate the tool output (throws on validation failure)
+    const validatedTool = validateToolOutput(result.data);
 
-      const generationTimeMs = Math.round(performance.now() - startTime);
+    // Normalize tool output directly to ComponentMeta
+    const meta = normalizeToolOutputToMeta(validatedTool, name, extracted);
 
-      logger.info('Meta generation completed', {
-        name,
-        generationTimeMs,
-        inputTokens: response.usage?.inputTokens,
-        outputTokens: response.usage?.outputTokens,
-        patternsCount: meta.ai.patterns.length,
-        examplesCount: meta.ai.examples.length,
-      });
+    logger.info('Meta generation completed', {
+      name,
+      inputTokens: result.usage?.inputTokens,
+      outputTokens: result.usage?.outputTokens,
+      patternsCount: meta.ai.patterns.length,
+      hasExamples: !!meta.ai.examples,
+    });
 
-      const success: GeneratorSuccess = {
-        type: GenerationOutputType.Success,
-        meta,
-        generationTimeMs,
-        provider: this.provider.providerType,
-        model: this.provider.modelId,
-        usage: response.usage,
-      };
-
-      return success;
-    } catch (error) {
-      const generationTimeMs = Math.round(performance.now() - startTime);
-
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-
-      logger.error('Meta generation failed', error as Error, {
-        name,
-        generationTimeMs,
-      });
-
-      // Determine if error is retryable
-      const retryable = this.isRetryableError(error);
-
-      const failure: GeneratorFailure = {
-        type: GenerationOutputType.Failure,
-        error: errorMessage,
-        generationTimeMs,
-        retryable,
-      };
-
-      return failure;
-    }
-  }
-
-  /**
-   * Determine if an error is retryable
-   */
-  private isRetryableError(error: unknown): boolean {
-    if (!(error instanceof Error)) {
-      return false;
-    }
-
-    const message = error.message.toLowerCase();
-
-    // Rate limit errors are retryable
-    if (message.includes('rate limit')) {
-      return true;
-    }
-
-    // Service unavailable is retryable
-    if (
-      message.includes('service unavailable') ||
-      message.includes('timeout')
-    ) {
-      return true;
-    }
-
-    // Connection errors are retryable
-    if (message.includes('connection') || message.includes('network')) {
-      return true;
-    }
-
-    // JSON parsing errors are not retryable
-    if (message.includes('json')) {
-      return false;
-    }
-
-    return false;
+    return {
+      meta,
+      provider: this.provider.providerType,
+      model: this.provider.modelId,
+      usage: result.usage,
+    };
   }
 }
 

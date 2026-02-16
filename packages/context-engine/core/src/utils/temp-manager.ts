@@ -188,23 +188,3 @@ export function getTempManager(): TempManager {
   }
   return tempManagerInstance;
 }
-
-/**
- * Initialize temp manager on server startup
- * Cleans up orphaned files from previous runs
- */
-export async function initializeTempManager(): Promise<TempManager> {
-  const manager = getTempManager();
-  await manager.initialize();
-  return manager;
-}
-
-/**
- * Reset the singleton instance (for testing)
- */
-export async function resetTempManager(): Promise<void> {
-  if (tempManagerInstance) {
-    await tempManagerInstance.shutdown();
-    tempManagerInstance = null;
-  }
-}

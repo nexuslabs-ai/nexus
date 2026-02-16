@@ -1,16 +1,23 @@
 /**
  * Dependency Extractor
  *
+ * Designed for Radix-based design systems (shadcn/ui pattern).
+ *
  * Extracts dependencies from import statements in component source code.
  * Identifies:
  * - NPM package dependencies (external packages)
- * - Internal dependencies (relative imports like ../utils)
- * - Base UI library detection (Radix, Ark, etc.)
+ * - Internal dependencies (relative imports or path alias imports like @/utils)
+ * - Radix UI primitive detection (@radix-ui/react-*)
+ *
+ * Supports project configuration for accurate internal vs external detection:
+ * - Path aliases from tsconfig.json (e.g., @/* -> ./src/*)
+ * - Dependencies list from package.json for external package detection
  */
 
 import { Project, type SourceFile, ts } from 'ts-morph';
 
 import { detectBaseLibrary } from '../constants/index.js';
+import { pascalCase } from '../utils/case.js';
 import { createLogger } from '../utils/logger.js';
 
 import type { DependencyExtractionResult } from './types.js';
@@ -27,18 +34,76 @@ const INTERNAL_COMPONENT_PATTERNS: ReadonlyArray<RegExp> = [
 ];
 
 /**
+ * Options for configuring the dependency extractor
+ */
+export interface DependencyExtractorOptions {
+  /**
+   * Path aliases from tsconfig.json paths configuration.
+   * Used to identify internal imports that use path aliases.
+   *
+   * @example
+   * ```typescript
+   * {
+   *   "@/*": ["./src/*"],
+   *   "@components/*": ["./src/components/*"]
+   * }
+   * ```
+   */
+  pathAliases?: Record<string, string[]>;
+
+  /**
+   * List of dependency names from package.json.
+   * Used to identify external package imports.
+   *
+   * @example ["react", "class-variance-authority", "@radix-ui/react-slot"]
+   */
+  dependencies?: string[];
+}
+
+/**
  * Extracts dependencies from import statements
  */
 export class DependencyExtractor {
   private project: Project;
+  private pathAliases: Record<string, string[]>;
+  private dependencies: Set<string>;
+  private pathAliasPatterns: RegExp[];
 
-  constructor() {
+  constructor(options: DependencyExtractorOptions = {}) {
     this.project = new Project({
       useInMemoryFileSystem: true,
       compilerOptions: {
         target: ts.ScriptTarget.ESNext,
         module: ts.ModuleKind.ESNext,
       },
+    });
+
+    this.pathAliases = options.pathAliases ?? {};
+    this.dependencies = new Set(options.dependencies ?? []);
+
+    // Pre-compile path alias patterns for efficient matching
+    this.pathAliasPatterns = this.compilePathAliasPatterns(this.pathAliases);
+  }
+
+  /**
+   * Compile path alias keys into regex patterns for matching
+   *
+   * Converts tsconfig path patterns like "@/*" into regex patterns
+   * that can match import specifiers like "@/utils/cn"
+   */
+  private compilePathAliasPatterns(
+    pathAliases: Record<string, string[]>
+  ): RegExp[] {
+    return Object.keys(pathAliases).map((alias) => {
+      // Convert path alias pattern to regex
+      // "@/*" -> "^@/" (matches @/anything)
+      // "@components/*" -> "^@components/" (matches @components/anything)
+      // "~/*" -> "^~/" (matches ~/anything)
+      const escapedAlias = alias
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape regex special chars
+        .replace(/\\\*/g, '.*'); // Convert * to .* for matching
+
+      return new RegExp(`^${escapedAlias.replace(/\/\.\*$/, '(/|$)')}`);
     });
   }
 
@@ -89,8 +154,8 @@ export class DependencyExtractor {
       const moduleSpecifier = imp.getModuleSpecifierValue();
       const isTypeOnly = imp.isTypeOnly();
 
-      // Process relative imports (internal dependencies)
-      if (this.isRelativeImport(moduleSpecifier)) {
+      // Process internal imports (relative imports or path alias imports)
+      if (this.isInternalImport(moduleSpecifier)) {
         const componentName = this.extractComponentName(moduleSpecifier);
         if (
           componentName &&
@@ -137,10 +202,72 @@ export class DependencyExtractor {
   }
 
   /**
-   * Check if an import is a relative import
+   * Check if an import is internal (relative import or path alias)
+   *
+   * An import is internal if:
+   * 1. It starts with './' or '../' (relative import)
+   * 2. It starts with '/' (absolute path from project root)
+   * 3. It matches a path alias pattern (e.g., '@/', '@components/')
+   *
+   * An import is external if:
+   * 1. It's in the dependencies list
+   * 2. It doesn't match any internal patterns
    */
-  private isRelativeImport(moduleSpecifier: string): boolean {
-    return moduleSpecifier.startsWith('.') || moduleSpecifier.startsWith('/');
+  private isInternalImport(moduleSpecifier: string): boolean {
+    // Check for relative imports
+    if (moduleSpecifier.startsWith('.') || moduleSpecifier.startsWith('/')) {
+      return true;
+    }
+
+    // If we have a dependencies list, check if the package is in it
+    // This takes priority over path alias matching to avoid false positives
+    // (e.g., @radix-ui/react-slot shouldn't match @/* alias)
+    if (this.dependencies.size > 0) {
+      const packageName = this.getPackageNameFromSpecifier(moduleSpecifier);
+      if (packageName && this.dependencies.has(packageName)) {
+        return false; // It's a known external dependency
+      }
+    }
+
+    // Check if it matches any path alias pattern
+    if (this.matchesPathAlias(moduleSpecifier)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Extract the package name from a module specifier for dependency lookup
+   *
+   * Examples:
+   * - 'react' -> 'react'
+   * - 'react/jsx-runtime' -> 'react'
+   * - '@radix-ui/react-slot' -> '@radix-ui/react-slot'
+   * - '@radix-ui/react-slot/internal' -> '@radix-ui/react-slot'
+   */
+  private getPackageNameFromSpecifier(moduleSpecifier: string): string | null {
+    if (moduleSpecifier.startsWith('@')) {
+      // Scoped package: @scope/package or @scope/package/subpath
+      const parts = moduleSpecifier.split('/');
+      if (parts.length >= 2) {
+        return `${parts[0]}/${parts[1]}`;
+      }
+      return null;
+    }
+
+    // Regular package: package or package/subpath
+    const parts = moduleSpecifier.split('/');
+    return parts[0] || null;
+  }
+
+  /**
+   * Check if a module specifier matches any configured path alias
+   */
+  private matchesPathAlias(moduleSpecifier: string): boolean {
+    return this.pathAliasPatterns.some((pattern) =>
+      pattern.test(moduleSpecifier)
+    );
   }
 
   /**
@@ -167,7 +294,7 @@ export class DependencyExtractor {
     // Convert to PascalCase if it looks like a component path
     // but keep utils/helpers as-is
     if (this.isLikelyComponent(moduleSpecifier, segment)) {
-      return this.toPascalCase(segment);
+      return pascalCase(segment);
     }
 
     return segment;
@@ -215,8 +342,8 @@ export class DependencyExtractor {
    * - Deep imports: lodash/debounce -> lodash
    */
   private extractPackageName(moduleSpecifier: string): string | null {
-    // Guard: Don't process relative imports
-    if (this.isRelativeImport(moduleSpecifier)) {
+    // Guard: Don't process internal imports (relative or path alias)
+    if (this.isInternalImport(moduleSpecifier)) {
       return null;
     }
 
@@ -233,16 +360,6 @@ export class DependencyExtractor {
     // Handle regular packages (take first segment only)
     const parts = moduleSpecifier.split('/');
     return parts[0];
-  }
-
-  /**
-   * Convert string to PascalCase
-   */
-  private toPascalCase(str: string): string {
-    return str
-      .split(/[-_]/)
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
-      .join('');
   }
 
   /**

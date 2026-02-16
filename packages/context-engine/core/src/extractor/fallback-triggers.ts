@@ -75,28 +75,23 @@ export function shouldFallback(
   }
 
   // Trigger 4: HOC patterns detected (react-docgen often fails with these)
-  for (const pattern of HOC_PATTERNS) {
-    if (pattern.test(sourceCode)) {
-      // Only fallback if props seem incomplete
-      if (result.props.length < 3) {
-        return {
-          shouldFallback: true,
-          reason: FallbackReason.HocPatternDetected,
-        };
-      }
-    }
+  // Only fallback if props seem incomplete
+  const hasHocPattern = HOC_PATTERNS.some((pattern) =>
+    pattern.test(sourceCode)
+  );
+  if (hasHocPattern && result.props.length < 3) {
+    return { shouldFallback: true, reason: FallbackReason.HocPatternDetected };
   }
 
   // Trigger 5: Styled-components pattern (check if props might be incomplete)
-  for (const pattern of STYLED_PATTERNS) {
-    if (pattern.test(sourceCode)) {
-      if (result.props.length < 2) {
-        return {
-          shouldFallback: true,
-          reason: FallbackReason.StyledComponentPattern,
-        };
-      }
-    }
+  const hasStyledPattern = STYLED_PATTERNS.some((pattern) =>
+    pattern.test(sourceCode)
+  );
+  if (hasStyledPattern && result.props.length < 2) {
+    return {
+      shouldFallback: true,
+      reason: FallbackReason.StyledComponentPattern,
+    };
   }
 
   // No fallback needed
@@ -104,39 +99,17 @@ export function shouldFallback(
 }
 
 /**
- * Get human-readable description of fallback reason
+ * Human-readable descriptions of fallback reasons
  */
-export function getFallbackReasonDescription(reason: FallbackReason): string {
-  const descriptions: Record<FallbackReason, string> = {
-    [FallbackReason.PrimaryReturnedNull]:
-      'Primary extractor (react-docgen-typescript) failed to parse the component',
-    [FallbackReason.EmptyPropsArray]:
-      'No props were extracted by the primary extractor',
-    [FallbackReason.ForwardRefNoProps]:
-      'forwardRef pattern detected but props interface could not be resolved',
-    [FallbackReason.HocPatternDetected]:
-      'Higher-order component wrapper detected, which may confuse the primary extractor',
-    [FallbackReason.StyledComponentPattern]:
-      'Styled-components pattern detected with potentially incomplete props',
-  };
-  return descriptions[reason];
-}
-
-/**
- * Check if a specific pattern exists in source code
- */
-export function detectPatterns(sourceCode: string): {
-  hasForwardRef: boolean;
-  hasHOC: boolean;
-  hasStyledComponents: boolean;
-  hasMemo: boolean;
-} {
-  return {
-    hasForwardRef: sourceCode.includes('forwardRef'),
-    hasHOC: HOC_PATTERNS.some((pattern) => pattern.test(sourceCode)),
-    hasStyledComponents: STYLED_PATTERNS.some((pattern) =>
-      pattern.test(sourceCode)
-    ),
-    hasMemo: /\bmemo\s*\(/.test(sourceCode),
-  };
-}
+export const FALLBACK_REASON_DESCRIPTIONS: Record<FallbackReason, string> = {
+  [FallbackReason.PrimaryReturnedNull]:
+    'Primary extractor (react-docgen-typescript) failed to parse the component',
+  [FallbackReason.EmptyPropsArray]:
+    'No props were extracted by the primary extractor',
+  [FallbackReason.ForwardRefNoProps]:
+    'forwardRef pattern detected but props interface could not be resolved',
+  [FallbackReason.HocPatternDetected]:
+    'Higher-order component wrapper detected, which may confuse the primary extractor',
+  [FallbackReason.StyledComponentPattern]:
+    'Styled-components pattern detected with potentially incomplete props',
+};

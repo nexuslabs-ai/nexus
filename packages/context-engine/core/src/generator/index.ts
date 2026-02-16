@@ -2,30 +2,28 @@
  * Generator Module
  *
  * Exports for LLM-based metadata generation including provider abstractions,
- * the Anthropic implementation, MetaGenerator, and prompts.
+ * the Anthropic and Gemini implementations, MetaGenerator, and prompts.
+ *
+ * Error Handling:
+ * All generator methods throw MetaGenerationError on failure instead of returning
+ * failure result objects. Import MetaGenerationError from '../types/errors.js'.
  */
 
 // Types
 export type {
   AnthropicProviderConfig,
   GeminiProviderConfig,
-  GeneratorFailure,
   GeneratorInput,
   GeneratorOutput,
-  GeneratorSuccess,
   ILLMProvider,
   IMetaGenerator,
   LLMCompletionOptions,
   LLMCompletionResponse,
   LLMProviderConfig,
-  ParsedLLMMetaResponse,
+  ToolCallingOptions,
+  ToolCallResult,
 } from './types.js';
-export {
-  GenerationOutputType,
-  isGeneratorFailure,
-  isGeneratorSuccess,
-  LLMProviderType,
-} from './types.js';
+export { LLMProviderType } from './types.js';
 
 // Providers
 export {
@@ -43,13 +41,20 @@ export {
 
 // Prompts
 export {
-  buildPrompt,
-  buildUserPrompt,
-  type ExpectedLLMResponse,
+  buildToolCallingPrompt,
   filterValidPatterns,
-  isValidPattern,
   type PromptBuilderInput,
-  type PromptPlaceholders,
-  SYSTEM_PROMPT,
-  USER_PROMPT_TEMPLATE,
+  TOOL_CALLING_SYSTEM_PROMPT,
 } from './prompts.js';
+
+// Tool Schema
+export {
+  COMPONENT_META_TOOL,
+  COMPONENT_META_TOOL_JSON_SCHEMA,
+  type ComponentMetaTool,
+  type ComponentMetaToolDefinition,
+  ComponentMetaToolSchema,
+  ToolCodeExampleSchema,
+  ToolExamplesSchema,
+  ToolGuidanceSchema,
+} from './tool-schema.js';

@@ -153,16 +153,18 @@ export type ParsedIdentifier = z.infer<typeof ParsedIdentifierSchema>;
  * Used by processor and manifest modules to pass identity information
  * through the extraction -> generation -> manifest build pipeline.
  */
-export interface ManifestIdentity {
+export const ManifestIdentitySchema = z.object({
   /** Component UUID */
-  id: string;
+  id: z.string(),
 
   /** URL-friendly slug */
-  slug: string;
+  slug: z.string(),
 
   /** Human-readable name */
-  name: string;
+  name: z.string(),
 
   /** Target framework */
-  framework: Framework;
-}
+  framework: FrameworkSchema,
+});
+
+export type ManifestIdentity = z.infer<typeof ManifestIdentitySchema>;

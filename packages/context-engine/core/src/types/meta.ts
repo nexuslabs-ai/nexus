@@ -7,13 +7,13 @@
 
 import { z } from 'zod';
 
-import { BaseLibrarySchema, TierSchema } from './identity.js';
+import { StructuredExamplesSchema } from './examples.js';
 
 /**
  * Pattern definitions
  * These patterns help categorize components for filtering and context
  */
-export const COMPONENT_PATTERNS = [
+export const COMPONENT_PATTERNS: string[] = [
   'form-control', // Has value/onChange props
   'async-action', // Has loading states
   'composition', // Has asChild or similar composition pattern
@@ -30,7 +30,7 @@ export const COMPONENT_PATTERNS = [
   'input', // Text/number inputs
   'button', // Button variants
   'icon', // Icon components
-] as const;
+];
 
 export type ComponentPattern = (typeof COMPONENT_PATTERNS)[number];
 
@@ -38,6 +38,10 @@ export const ComponentPatternSchema = z.enum(COMPONENT_PATTERNS);
 
 /**
  * AI-generated component context
+ *
+ * NOTE: This schema is used internally by the generator module during
+ * metadata generation. The final manifest uses GuidanceSchema instead.
+ * This is NOT part of the final manifest schema (use AIManifest instead).
  */
 export const AIContextSchema = z.object({
   /** Rich semantic description for embeddings (2-5 sentences) */
@@ -52,11 +56,8 @@ export const AIContextSchema = z.object({
   /** Semantic patterns this component represents */
   patterns: z.array(z.string()),
 
-  /** Design tokens used by this component */
-  tokens: z.array(z.string()),
-
-  /** Curated usage examples (JSX strings) */
-  examples: z.array(z.string()),
+  /** Structured usage examples (from LLM when Storybook not available) */
+  examples: StructuredExamplesSchema.optional(),
 
   /** Related component names for context bundling */
   relatedComponents: z.array(z.string()),
@@ -64,8 +65,24 @@ export const AIContextSchema = z.object({
   /** Accessibility notes */
   a11yNotes: z.string().optional(),
 
-  /** Base UI library used (Radix, Ark, Base UI, Headless UI, React Aria, etc.) */
-  baseLibrary: BaseLibrarySchema.optional(),
+  /**
+   * LLM-generated descriptions for variant values
+   * Outer key: variant name (e.g., "variant", "size")
+   * Inner key: value (e.g., "destructive", "lg")
+   * Value: description of what this variant value does
+   */
+  variantDescriptions: z
+    .record(z.string(), z.record(z.string(), z.string()))
+    .optional(),
+
+  /**
+   * LLM-generated descriptions for sub-component variant values
+   * Used for compound components (Dialog, Accordion, etc.)
+   * Structure: { subComponentName: { variantName: { value: description } } }
+   */
+  subComponentVariantDescriptions: z
+    .record(z.string(), z.record(z.string(), z.record(z.string(), z.string())))
+    .optional(),
 });
 
 export type AIContext = z.infer<typeof AIContextSchema>;
@@ -80,61 +97,8 @@ export const ComponentMetaSchema = z.object({
   /** Human-readable one-line description */
   description: z.string().min(10).max(500),
 
-  /** Component tier for licensing */
-  tier: TierSchema,
-
   /** AI-generated context */
   ai: AIContextSchema,
-
-  /** Design-level variants (copied from extraction for meta file) */
-  variants: z.record(z.string(), z.array(z.string())),
-
-  /** Default variant values */
-  defaults: z.record(z.string(), z.string()),
 });
 
 export type ComponentMeta = z.infer<typeof ComponentMetaSchema>;
-
-/**
- * Meta generation request
- */
-export const MetaGenerationRequestSchema = z.object({
-  /** Component name */
-  name: z.string(),
-
-  /** Source code content */
-  sourceCode: z.string(),
-
-  /** Extracted props for context */
-  extractedProps: z.array(z.string()),
-
-  /** Extracted variants */
-  variants: z.record(z.string(), z.array(z.string())),
-
-  /** Additional context hints */
-  hints: z.string().optional(),
-});
-
-export type MetaGenerationRequest = z.infer<typeof MetaGenerationRequestSchema>;
-
-/**
- * Meta generation result
- */
-export const MetaGenerationResultSchema = z.object({
-  /** Generated meta */
-  meta: ComponentMetaSchema,
-
-  /** Generation duration in milliseconds */
-  durationMs: z.number().int().min(0),
-
-  /** Model used for generation */
-  model: z.string(),
-
-  /** Token usage */
-  tokenUsage: z.object({
-    input: z.number().int().min(0),
-    output: z.number().int().min(0),
-  }),
-});
-
-export type MetaGenerationResult = z.infer<typeof MetaGenerationResultSchema>;

@@ -7,64 +7,20 @@
 
 import { z } from 'zod';
 
+import { ExtractedStorySchema } from '../extractor/storybook/types.js';
+
+import { BasePropSchema } from './base-prop.js';
 import { BaseLibrarySchema } from './identity.js';
 
 /**
- * Prop type categories
- */
-export const PropTypeCategorySchema = z.enum([
-  'primitive', // string, number, boolean
-  'literal', // 'primary' | 'secondary'
-  'union', // string | number
-  'object', // { label: string }
-  'array', // string[]
-  'function', // () => void
-  'ref', // React.Ref<T>
-  'element', // React.ReactNode
-  'unknown', // Could not determine
-]);
-
-export type PropTypeCategory = z.infer<typeof PropTypeCategorySchema>;
-
-/**
  * Extracted prop schema
+ *
+ * Extends BasePropSchema with extraction-specific fields for raw
+ * code analysis results. Only includes fields actively used downstream.
  */
-export const ExtractedPropSchema = z.object({
-  /** Prop name */
-  name: z.string(),
-
-  /** TypeScript type string */
-  type: z.string(),
-
-  /** Simplified type category */
-  typeCategory: PropTypeCategorySchema,
-
-  /** Whether prop is required */
-  required: z.boolean(),
-
-  /** Default value (if any) */
-  defaultValue: z.unknown().optional(),
-
-  /** JSDoc description */
-  description: z.string().optional(),
-
-  /** Possible values for literal/union types */
-  possibleValues: z.array(z.string()).optional(),
-
+export const ExtractedPropSchema = BasePropSchema.extend({
   /** Whether this is a children prop */
   isChildren: z.boolean().default(false),
-
-  /** Whether this is a className prop */
-  isClassName: z.boolean().default(false),
-
-  /** Whether this is a style prop */
-  isStyle: z.boolean().default(false),
-
-  /** Whether this prop is deprecated */
-  deprecated: z.boolean().default(false),
-
-  /** Deprecation message */
-  deprecationMessage: z.string().optional(),
 });
 
 export type ExtractedProp = z.infer<typeof ExtractedPropSchema>;
@@ -91,6 +47,72 @@ export const ExtractionMethodSchema = z.enum([
 export type ExtractionMethod = z.infer<typeof ExtractionMethodSchema>;
 
 /**
+ * Compound component detection result schema
+ *
+ * Used to identify compound components (Dialog, Accordion, Tabs, etc.)
+ * that export multiple related sub-components.
+ */
+export const CompoundComponentInfoSchema = z.object({
+  /** Whether this is a compound component */
+  isCompound: z.boolean(),
+
+  /** Root component name (e.g., "Dialog", "Accordion") */
+  rootComponent: z.string(),
+
+  /** Sub-component names (e.g., ["DialogTrigger", "DialogContent"]) */
+  subComponents: z.array(z.string()),
+});
+
+export type CompoundComponentInfo = z.infer<typeof CompoundComponentInfoSchema>;
+
+/**
+ * Radix primitive info for direct re-exports
+ *
+ * When a component is a direct re-export of a Radix primitive
+ * (e.g., `const Dialog = DialogPrimitive.Root`), this captures
+ * the primitive name and generates a documentation URL.
+ *
+ * URL pattern: https://www.radix-ui.com/primitives/docs/components/{component}#{primitive}
+ */
+export const RadixPrimitiveInfoSchema = z.object({
+  /** The primitive component name (e.g., "Root", "Trigger", "Content") */
+  primitive: z.string(),
+
+  /** Documentation URL for the Radix primitive */
+  docsUrl: z.string(),
+});
+
+export type RadixPrimitiveInfo = z.infer<typeof RadixPrimitiveInfoSchema>;
+
+/**
+ * Extracted sub-component data for compound components
+ */
+export const ExtractedSubComponentSchema = z.object({
+  /** Sub-component name (e.g., "DropdownMenuItem") */
+  name: z.string(),
+
+  /** Extracted props for this sub-component */
+  props: z.array(ExtractedPropSchema),
+
+  /** Description from JSDoc */
+  description: z.string().optional(),
+
+  /** Whether this sub-component is required in composition */
+  requiredInComposition: z.boolean(),
+
+  /** Radix primitive info for re-exports (e.g., DialogPrimitive.Trigger) */
+  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
+
+  /** CVA variants defined for this sub-component */
+  variants: z.record(z.string(), z.array(z.string())).optional(),
+
+  /** Default values for CVA variants */
+  defaultVariants: z.record(z.string(), z.string()).optional(),
+});
+
+export type ExtractedSubComponent = z.infer<typeof ExtractedSubComponentSchema>;
+
+/**
  * Complete extracted data from source code
  */
 export const ExtractedDataSchema = z.object({
@@ -112,15 +134,6 @@ export const ExtractedDataSchema = z.object({
   /** Whether component accepts children */
   acceptsChildren: z.boolean(),
 
-  /** Whether component uses forwardRef */
-  usesForwardRef: z.boolean(),
-
-  /** Export type (default vs named) */
-  exportType: z.enum(['default', 'named']),
-
-  /** Export name (for named exports) */
-  exportName: z.string().optional(),
-
   /** Base UI library detected (Radix, Ark, Base UI, etc.) */
   baseLibrary: BaseLibrarySchema.optional(),
 
@@ -130,8 +143,17 @@ export const ExtractedDataSchema = z.object({
   /** Files included in extraction */
   files: z.array(z.string()),
 
-  /** Extraction method used */
-  extractionMethod: ExtractionMethodSchema.default('react-docgen-typescript'),
+  /** Extracted Storybook stories (if stories file was provided) */
+  stories: z.array(ExtractedStorySchema).optional(),
+
+  /** Compound component detection result */
+  compoundInfo: CompoundComponentInfoSchema.optional(),
+
+  /** Extracted sub-component data for compound components */
+  subComponents: z.array(ExtractedSubComponentSchema).optional(),
+
+  /** Radix primitive info for direct re-exports */
+  radixPrimitive: RadixPrimitiveInfoSchema.optional(),
 });
 
 export type ExtractedData = z.infer<typeof ExtractedDataSchema>;
@@ -145,9 +167,6 @@ export const ExtractionResultSchema = z.object({
 
   /** Source hash for change detection */
   sourceHash: HashSchema,
-
-  /** Extraction duration in milliseconds */
-  durationMs: z.number().int().min(0),
 
   /** Any warnings during extraction */
   warnings: z.array(z.string()).default([]),

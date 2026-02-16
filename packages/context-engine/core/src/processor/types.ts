@@ -2,33 +2,21 @@
  * Processor Types
  *
  * Types for the ComponentProcessor that orchestrates the full pipeline:
- * Extract -> Generate (optional) -> Build Manifest
+ * Extract -> Generate -> Build Manifest
  *
- * Uses discriminated unions for type-safe success/failure handling.
+ * All methods throw on error - no discriminated unions.
+ * Includes stored state types for optional persistent state storage.
  */
 
+import type { HybridExtractorOptions } from '../extractor/index.js';
 import type { ILLMProvider } from '../generator/types.js';
 import type {
-  ComponentManifest,
+  AIManifest,
+  ComponentMeta,
   ExtractedData,
   Framework,
   ManifestIdentity,
 } from '../types/index.js';
-import { OutputType } from '../types/output.js';
-
-// =============================================================================
-// Discriminant Constants
-// =============================================================================
-
-/**
- * Processor output type discriminant
- *
- * Uses shared OutputType for consistency across modules.
- */
-export const ProcessorOutputType = OutputType;
-
-export type ProcessorOutputType =
-  (typeof ProcessorOutputType)[keyof typeof ProcessorOutputType];
 
 // =============================================================================
 // Configuration
@@ -45,17 +33,146 @@ export interface ProcessorConfig {
   llmProvider?: ILLMProvider;
 
   /**
-   * Skip LLM generation and use minimal/placeholder metadata.
-   * Useful for testing or when LLM is unavailable.
-   * @default false
-   */
-  skipGeneration?: boolean;
-
-  /**
    * Maximum tokens for LLM generation.
    * @default 2000
    */
   maxGenerationTokens?: number;
+
+  /**
+   * Options for the HybridExtractor.
+   * Used to configure path aliases and dependencies for accurate
+   * internal vs external import detection.
+   *
+   * @example
+   * ```typescript
+   * {
+   *   pathAliases: { "@/*": ["./src/*"] },
+   *   dependencies: ["react", "@radix-ui/react-slot"]
+   * }
+   * ```
+   */
+  extractorOptions?: HybridExtractorOptions;
+
+  /**
+   * Optional directory path for persistent state storage.
+   * When provided, enables checkpoint-based processing where state
+   * can be saved after each phase (extraction, generation, build).
+   *
+   * The processor will create a FileStateStore internally using this directory.
+   * Use with `extractAndStore`, `generateAndStore`, and `buildAndStore` methods.
+   *
+   * @example
+   * ```typescript
+   * const processor = new ComponentProcessor({ storeDir: './state' });
+   *
+   * // Extract and save checkpoint
+   * await processor.extractAndStore(input);
+   *
+   * // Later: resume from checkpoint
+   * await processor.generateAndStore('Button');
+   * ```
+   */
+  storeDir?: string;
+}
+
+// =============================================================================
+// Stored State Types
+// =============================================================================
+
+/**
+ * Stored extraction state
+ *
+ * Persisted result from the extraction phase, containing all data
+ * needed to resume with generation or rebuild manifests.
+ */
+export interface StoredExtraction {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Organization ID for multi-org isolation */
+  orgId: string;
+
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
+
+  /** Extracted data from source code analysis */
+  extracted: ExtractedData;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** ISO timestamp when extraction was stored */
+  storedAt: string;
+}
+
+/**
+ * Stored generation state
+ *
+ * Persisted result from the generation phase, containing LLM-generated
+ * metadata that can be combined with extraction to build manifests.
+ */
+export interface StoredGeneration {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Generated component metadata */
+  meta: ComponentMeta;
+
+  /** LLM provider type used */
+  provider: string;
+
+  /** Model identifier used for generation */
+  model: string;
+
+  /** ISO timestamp when generation was stored */
+  storedAt: string;
+}
+
+/**
+ * Stored manifest
+ *
+ * Persisted complete manifest, representing the final output
+ * of the extraction-generation-build pipeline. Flat structure
+ * matching ManifestOutput.
+ */
+export interface StoredManifest {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
+
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
+
+  /** ISO timestamp when manifest was stored */
+  storedAt: string;
+}
+
+/**
+ * Stored component state
+ *
+ * Combined state for a component, including extraction, generation,
+ * and manifest data. Used for querying complete component state.
+ */
+export interface StoredComponentState {
+  /** Component name (PascalCase) */
+  componentName: string;
+
+  /** Stored extraction (if available) */
+  extraction?: StoredExtraction;
+
+  /** Stored generation (if available) */
+  generation?: StoredGeneration;
+
+  /** Stored manifest (if available) */
+  manifest?: StoredManifest;
 }
 
 // =============================================================================
@@ -111,75 +228,30 @@ export interface ProcessorInput {
   existingId?: string;
 
   /**
-   * Expected source hash for optimistic locking.
-   * If provided and doesn't match current source, returns conflict.
+   * Optional Storybook stories source code.
+   * Used to extract real examples from stories.
    */
-  expectedHash?: string;
+  storiesCode?: string;
 
   /**
-   * Optional Figma URL for design context.
-   * Passed to LLM for richer metadata generation.
+   * Optional path to the stories file.
+   * Used for context in extraction.
    */
-  figmaUrl?: string;
+  storiesFilePath?: string;
 
   /**
-   * Optional hints for generation.
-   * Additional context for the LLM (e.g., design system name).
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
    */
   hints?: string;
-}
 
-/**
- * Input for the generate-only phase (Phase 2 of two-phase API)
- *
- * Requires extraction result from a prior extractOnly call.
- */
-export interface GenerateOnlyInput {
-  /** Organization ID */
-  orgId: string;
-
-  /** Component identity from extraction */
-  identity: ManifestIdentity;
-
-  /** Extracted data from extraction phase */
-  extracted: ExtractedData;
-
-  /** Source hash from extraction phase */
-  sourceHash: string;
-
-  /** Component version */
-  version?: string;
-
-  /** Optional Figma URL for design context */
-  figmaUrl?: string;
-
-  /** Optional hints for generation */
-  hints?: string;
-
-  /**
-   * Extraction metadata from prior extractOnly call.
-   * Used to preserve fallback info in the final output.
-   */
-  extraction?: ExtractionMetadata;
+  /** Component names in the design system for filtering relatedComponents */
+  availableComponents?: string[];
 }
 
 // =============================================================================
-// Output Types (Discriminated Unions)
+// Output Types (Success only - methods throw on error)
 // =============================================================================
-
-/**
- * Timing metrics for the processing pipeline
- */
-export interface ProcessorMetrics {
-  /** Time spent on extraction (ms) */
-  extractionTimeMs?: number;
-
-  /** Time spent on generation (ms) */
-  generationTimeMs?: number;
-
-  /** Total processing time (ms) */
-  totalTimeMs: number;
-}
 
 /**
  * Extraction metadata from the pipeline
@@ -196,66 +268,38 @@ export interface ExtractionMetadata {
 }
 
 /**
- * Successful processor output
+ * Processor result (success only - throws on error)
+ *
+ * Flat structure matching ManifestOutput with additional extraction metadata.
  */
-export interface ProcessorSuccess {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Success;
+export interface ProcessorResult {
+  /** Component name (PascalCase) */
+  componentName: string;
 
-  /** Complete component manifest */
-  manifest: ComponentManifest;
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
 
-  /** Processing metrics */
-  metrics: ProcessorMetrics;
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
 
   /** Extraction metadata */
   extraction: ExtractionMetadata;
-
-  /** Whether generation was skipped (minimal meta used) */
-  generationSkipped: boolean;
 }
-
-/**
- * Failed processor output
- */
-export interface ProcessorFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /**
-   * Error code for programmatic handling
-   */
-  code: ProcessorErrorCode;
-
-  /** Processing metrics (may be partial) */
-  metrics: Partial<ProcessorMetrics>;
-
-  /** Extraction metadata (if extraction completed) */
-  extraction?: ExtractionMetadata;
-
-  /** Whether the error is retryable */
-  retryable: boolean;
-}
-
-/**
- * Processor output union
- */
-export type ProcessorOutput = ProcessorSuccess | ProcessorFailure;
 
 // =============================================================================
-// Extract-Only Output Types
+// Extraction Phase Types
 // =============================================================================
 
 /**
- * Successful extract-only output
+ * Extraction result (success only - extractor throws on error)
  */
-export interface ExtractOnlySuccess {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Success;
-
+export interface ExtractResult {
   /** Component ID (generated or existing) */
   id: string;
 
@@ -272,103 +316,112 @@ export interface ExtractOnlySuccess {
   sourceHash: string;
 
   /** Extraction metadata */
-  extraction: ExtractionMetadata;
-
-  /** Extraction timing */
-  extractionTimeMs: number;
+  metadata: ExtractionMetadata;
 }
-
-/**
- * Failed extract-only output
- */
-export interface ExtractOnlyFailure {
-  /** Discriminant for type narrowing */
-  type: typeof ProcessorOutputType.Failure;
-
-  /** Error message */
-  error: string;
-
-  /** Error code */
-  code: ProcessorErrorCode;
-
-  /** Source hash (for conflict errors) */
-  sourceHash?: string;
-
-  /** Whether the error is retryable */
-  retryable: boolean;
-}
-
-/**
- * Extract-only output union
- */
-export type ExtractOnlyOutput = ExtractOnlySuccess | ExtractOnlyFailure;
 
 // =============================================================================
-// Error Codes
+// Generation Phase Types
 // =============================================================================
 
 /**
- * Processor error codes for programmatic handling
+ * Input for the generate phase (Phase 2 of two-phase API)
+ *
+ * Requires extraction result from a prior extract call.
  */
-export const ProcessorErrorCode = {
-  /** Extraction failed */
-  ExtractionFailed: 'EXTRACTION_FAILED',
+export interface GenerateInput {
+  /** Organization ID */
+  orgId: string;
 
-  /** Source code conflict (optimistic locking) */
-  SourceConflict: 'SOURCE_CONFLICT',
+  /** Component identity from extraction */
+  identity: ManifestIdentity;
 
-  /** Meta generation failed */
-  GenerationFailed: 'GENERATION_FAILED',
+  /** Extracted data from extraction phase */
+  extracted: ExtractedData;
 
-  /** Manifest building failed */
-  ManifestBuildFailed: 'MANIFEST_BUILD_FAILED',
+  /** Source hash from extraction phase */
+  sourceHash: string;
 
-  /** Unsupported framework */
-  UnsupportedFramework: 'UNSUPPORTED_FRAMEWORK',
+  /** Component version */
+  version?: string;
 
-  /** Invalid input */
-  InvalidInput: 'INVALID_INPUT',
-} as const;
+  /**
+   * Extraction metadata from prior extract call.
+   * Used to preserve fallback info in the final output.
+   */
+  extraction?: ExtractionMetadata;
 
-export type ProcessorErrorCode =
-  (typeof ProcessorErrorCode)[keyof typeof ProcessorErrorCode];
+  /**
+   * Optional hints to guide LLM generation.
+   * Provides additional context about the component beyond what's extracted from code.
+   */
+  hints?: string;
+}
+
+/**
+ * Generation result (success only - generator throws on error)
+ */
+export interface GenerateResult {
+  /** Generated component metadata */
+  meta: ComponentMeta;
+
+  /** Provider used for generation */
+  provider: string;
+
+  /** Model used for generation */
+  model: string;
+}
 
 // =============================================================================
-// Type Guards
+// Build Phase Types
 // =============================================================================
 
 /**
- * Check if processor output is successful
+ * Input for build phase.
+ *
+ * Combines extraction and generation results with identity
+ * to produce a complete manifest.
  */
-export function isProcessorSuccess(
-  output: ProcessorOutput
-): output is ProcessorSuccess {
-  return output.type === ProcessorOutputType.Success;
+export interface BuildInput {
+  /** Organization ID for multi-org isolation */
+  orgId: string;
+
+  /** Component identity */
+  identity: ManifestIdentity;
+
+  /** Extracted data from extraction phase */
+  extracted: ExtractedData;
+
+  /** Generated metadata from generation phase */
+  meta: ComponentMeta;
+
+  /** Source hash for change detection */
+  sourceHash: string;
+
+  /** Component names in the design system for filtering relatedComponents */
+  availableComponents?: string[];
 }
 
 /**
- * Check if processor output is a failure
+ * Build result (success only - throws ManifestBuildError on failure)
+ *
+ * Flat structure matching ManifestOutput with build timestamp.
  */
-export function isProcessorFailure(
-  output: ProcessorOutput
-): output is ProcessorFailure {
-  return output.type === ProcessorOutputType.Failure;
-}
+export interface BuildResult {
+  /** Component name (PascalCase) */
+  componentName: string;
 
-/**
- * Check if extract-only output is successful
- */
-export function isExtractOnlySuccess(
-  output: ExtractOnlyOutput
-): output is ExtractOnlySuccess {
-  return output.type === ProcessorOutputType.Success;
-}
+  /** Component identity (id, slug, name, framework) */
+  identity: ManifestIdentity;
 
-/**
- * Check if extract-only output is a failure
- */
-export function isExtractOnlyFailure(
-  output: ExtractOnlyOutput
-): output is ExtractOnlyFailure {
-  return output.type === ProcessorOutputType.Failure;
+  /** AI-focused manifest (optimized for consumption) */
+  manifest: AIManifest;
+
+  /** Hash of source code for change detection */
+  sourceHash: string;
+
+  /** Source files used for extraction */
+  files: string[];
+
+  /** Build timestamp */
+  builtAt: string;
 }

@@ -8,6 +8,8 @@ allowed-tools:
   - Bash
   - Edit
   - Write
+  - WebSearch
+  - WebFetch
 user-invocable: true
 ---
 
@@ -152,7 +154,33 @@ After completion, provide:
    - Where should new files go?
    - What's the naming convention?
 
-### Phase 3: Create Implementation Plan
+### Phase 3: Research Dependencies (MANDATORY)
+
+**Before writing any code, research any third-party dependencies you'll be using.**
+
+1. **Identify what you'll use:**
+   - What libraries/frameworks does this feature require?
+   - Any new dependencies being introduced?
+   - Any existing dependencies you're unfamiliar with?
+
+2. **Research each one:**
+
+   ```
+   "{library} best practices {current year}"
+   "{library} {version} documentation"
+   "{library} common mistakes"
+   ```
+
+3. **Verify correct usage:**
+   - How should this library be used?
+   - Are there configuration options to consider?
+   - What are common pitfalls to avoid?
+
+4. **Document findings:**
+   - Note any important discoveries
+   - Include in implementation plan if relevant
+
+### Phase 4: Create Implementation Plan
 
 1. **Use TodoWrite to create task list:**
    - Break down into small, testable chunks
@@ -170,7 +198,7 @@ After completion, provide:
 
 3. **WAIT for user confirmation before proceeding**
 
-### Phase 4: Implement
+### Phase 5: Implement
 
 1. **Work through todos one at a time:**
    - Mark todo as `in_progress` before starting
@@ -187,7 +215,7 @@ After completion, provide:
    - Include file:line references
    - WAIT for user confirmation
 
-### Phase 5: Verify & Test
+### Phase 6: Verify & Test
 
 1. **Run relevant checks:**
 
@@ -244,8 +272,8 @@ After implementation is complete:
 ## Principles to Follow
 
 1. **Read before write** — Understand existing patterns first
-2. **Follow loaded rules** — Rules files are the source of truth for conventions
-3. **Test as you go** — Don't leave testing for the end
+2. **Research before coding** — Don't guess how libraries work; look them up
+3. **Follow loaded rules** — Rules files are the source of truth for conventions
 4. **Ask when unsure** — Better to clarify than assume
 5. **Small iterations** — Complete one todo, summarize, wait for confirmation
 6. **Context-agnostic** — Same quality regardless of input source

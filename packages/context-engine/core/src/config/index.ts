@@ -13,6 +13,11 @@
  * to ensure deterministic behavior.
  */
 
+import {
+  DEFAULT_ANTHROPIC_MODEL,
+  DEFAULT_GEMINI_MODEL,
+} from '../constants/models.js';
+
 // =============================================================================
 // Utility Functions
 // =============================================================================
@@ -22,17 +27,6 @@
  */
 function getEnv(key: string, defaultValue?: string): string | undefined {
   return process.env[key] ?? defaultValue;
-}
-
-/**
- * Get required environment variable
- */
-function getRequiredEnv(key: string): string {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-  return value;
 }
 
 /**
@@ -61,14 +55,14 @@ function getEnvBoolean(key: string, defaultValue: boolean): boolean {
 }
 
 // =============================================================================
-// LLM Configuration
+// Anthropic Configuration
 // =============================================================================
 
 /**
- * LLM provider configuration
+ * Anthropic provider configuration
  */
-export interface LLMConfig {
-  /** Anthropic API key */
+export interface AnthropicConfig {
+  /** LLM API key (provider-agnostic, set via LLM_API_KEY) */
   apiKey: string | undefined;
   /** Model identifier */
   model: string;
@@ -81,24 +75,19 @@ export interface LLMConfig {
 }
 
 /**
- * Get LLM configuration from environment (Anthropic)
- *
- * Available models:
- * - claude-opus-4-5-20251101 (latest, best quality)
- * - claude-sonnet-4-20250514 (balanced, recommended)
- * - claude-haiku-3-20240307 (fastest, lowest cost)
+ * Get Anthropic provider configuration from environment
  *
  * Model selection priority:
  * 1. ANTHROPIC_MODEL (provider-specific)
  * 2. CONTEXT_ENGINE_MODEL (generic fallback)
- * 3. Default: claude-sonnet-4-20250514
+ * 3. Default: DEFAULT_ANTHROPIC_MODEL constant
  */
-export function getLLMConfig(): LLMConfig {
+export function getAnthropicConfig(): AnthropicConfig {
   return {
-    apiKey: getEnv('ANTHROPIC_API_KEY'),
+    apiKey: getEnv('LLM_API_KEY'),
     model:
       getEnv('ANTHROPIC_MODEL') ??
-      getEnv('CONTEXT_ENGINE_MODEL', 'claude-sonnet-4-20250514')!,
+      getEnv('CONTEXT_ENGINE_MODEL', DEFAULT_ANTHROPIC_MODEL)!,
     maxTokens: getEnvNumber('CONTEXT_ENGINE_MAX_TOKENS', 8192),
     timeoutMs: getEnvNumber('CONTEXT_ENGINE_TIMEOUT_MS', 180000),
     baseUrl: getEnv('ANTHROPIC_BASE_URL'),
@@ -113,7 +102,7 @@ export function getLLMConfig(): LLMConfig {
  * Gemini provider configuration
  */
 export interface GeminiConfig {
-  /** Google API key */
+  /** LLM API key (provider-agnostic, set via LLM_API_KEY) */
   apiKey: string | undefined;
   /** Model identifier */
   model: string;
@@ -126,22 +115,17 @@ export interface GeminiConfig {
 /**
  * Get Gemini configuration from environment
  *
- * Available models:
- * - gemini-2.5-flash (latest, recommended - FREE)
- * - gemini-2.0-flash (fast, free tier available)
- * - gemini-1.5-pro (higher quality, paid)
- *
  * Model selection priority:
  * 1. GEMINI_MODEL (provider-specific)
  * 2. CONTEXT_ENGINE_MODEL (generic fallback)
- * 3. Default: gemini-2.5-flash
+ * 3. Default: DEFAULT_GEMINI_MODEL constant
  */
 export function getGeminiConfig(): GeminiConfig {
   return {
-    apiKey: getEnv('GOOGLE_API_KEY'),
+    apiKey: getEnv('LLM_API_KEY'),
     model:
       getEnv('GEMINI_MODEL') ??
-      getEnv('CONTEXT_ENGINE_MODEL', 'gemini-2.5-flash')!,
+      getEnv('CONTEXT_ENGINE_MODEL', DEFAULT_GEMINI_MODEL)!,
     maxTokens: getEnvNumber('CONTEXT_ENGINE_MAX_TOKENS', 8192),
     timeoutMs: getEnvNumber('CONTEXT_ENGINE_TIMEOUT_MS', 180000),
   };
@@ -233,8 +217,6 @@ export function getLoggerConfig(): LoggerEnvConfig {
  * Feature flags configuration
  */
 export interface FeatureFlags {
-  /** Skip LLM generation (extraction only) */
-  skipGeneration: boolean;
   /** Enable debug mode */
   debug: boolean;
 }
@@ -244,65 +226,6 @@ export interface FeatureFlags {
  */
 export function getFeatureFlags(): FeatureFlags {
   return {
-    skipGeneration: getEnvBoolean('CONTEXT_ENGINE_SKIP_GENERATION', false),
     debug: getEnvBoolean('CONTEXT_ENGINE_DEBUG', false),
   };
 }
-
-// =============================================================================
-// Combined Configuration
-// =============================================================================
-
-/**
- * Complete Context Engine configuration
- */
-export interface ContextEngineConfig {
-  llm: LLMConfig;
-  generation: GenerationConfig;
-  logger: LoggerEnvConfig;
-  features: FeatureFlags;
-}
-
-/**
- * Get complete configuration from environment
- *
- * @example
- * ```typescript
- * const config = getConfig();
- * console.log(config.llm.model); // 'claude-sonnet-4-20250514'
- * console.log(config.generation.maxTokens); // 2000
- * ```
- */
-export function getConfig(): ContextEngineConfig {
-  return {
-    llm: getLLMConfig(),
-    generation: getGenerationConfig(),
-    logger: getLoggerConfig(),
-    features: getFeatureFlags(),
-  };
-}
-
-// =============================================================================
-// Constants (Non-configurable)
-// =============================================================================
-
-/**
- * Constants that should not be configurable via environment
- * These are implementation details, not configuration
- */
-export const CONSTANTS = {
-  /** Supported frameworks */
-  SUPPORTED_FRAMEWORKS: ['react'] as const,
-
-  /** Default framework when not specified */
-  DEFAULT_FRAMEWORK: 'react' as const,
-
-  /** Manifest schema version */
-  MANIFEST_VERSION: '1.0.0' as const,
-} as const;
-
-// =============================================================================
-// Exports
-// =============================================================================
-
-export { getEnv, getEnvBoolean, getEnvNumber, getRequiredEnv };

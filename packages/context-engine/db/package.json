@@ -1,7 +1,7 @@
 {
   "name": "@context-engine/db",
   "version": "0.1.0",
-  "description": "Database client and migrations for Context Engine",
+  "description": "Database layer for Context Engine",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -17,21 +17,28 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
+    "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:init": "yarn db:push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@context-engine/core": "*",
-    "drizzle-orm": "^0.44.0",
-    "postgres": "^3.4.0"
+    "drizzle-orm": "^0.45.1",
+    "postgres": "^3.4.8"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "drizzle-kit": "^0.30.0",
+    "@types/node": "^25.2.0",
+    "drizzle-kit": "^0.31.8",
     "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "4.0.17"
+    "vitest": "4.0.18"
   },
   "files": [
     "dist"
