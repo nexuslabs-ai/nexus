@@ -110,10 +110,7 @@ export interface McpVariables {
    * Authenticated MCP context (tenant only).
    * Set by mcpAuthMiddleware after validating tenant API key.
    */
-  mcpAuth?: {
-    success: true;
-    context: TenantAuthContext;
-  };
+  mcpAuth?: TenantAuthContext;
 
   /**
    * Retrieved MCP session with validated ownership.

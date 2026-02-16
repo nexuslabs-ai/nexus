@@ -23,6 +23,36 @@ import type { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/se
 import { getConfig } from '../config.js';
 
 // =============================================================================
+// Helpers
+// =============================================================================
+
+/**
+ * Safely close a transport, logging any errors.
+ *
+ * Transport cleanup is non-fatal: the session is removed from
+ * the store regardless of whether close() succeeds. Errors are
+ * logged for observability but don't propagate because:
+ *
+ * 1. Cleanup errors are infrastructure concerns, not business logic
+ * 2. They happen outside Hono's request lifecycle (can't use app.onError)
+ * 3. Propagating would crash background timers (cleanup interval)
+ * 4. The operation succeeded - session IS removed
+ *
+ * @param transport - The transport to close
+ * @param context - Human-readable context for error logging
+ */
+function safeCloseTransport(
+  transport: StreamableHTTPServerTransport,
+  context: string
+): void {
+  try {
+    transport.close();
+  } catch (error) {
+    console.error(`Transport cleanup failed (${context}):`, error);
+  }
+}
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -150,7 +180,10 @@ export class SessionStore {
       if (oldestSessionId) {
         const oldestSession = this.sessions.get(oldestSessionId);
         if (oldestSession) {
-          oldestSession.transport.close();
+          safeCloseTransport(
+            oldestSession.transport,
+            `LRU eviction ${oldestSessionId}`
+          );
           this.sessions.delete(oldestSessionId);
         }
       }
@@ -182,7 +215,7 @@ export class SessionStore {
 
     if (age > config.mcpSessionTtl) {
       // Expired - clean up and return undefined
-      entry.transport.close();
+      safeCloseTransport(entry.transport, `TTL expiry ${sessionId}`);
       this.sessions.delete(sessionId);
       return undefined;
     }
@@ -208,7 +241,7 @@ export class SessionStore {
       return false;
     }
 
-    entry.transport.close();
+    safeCloseTransport(entry.transport, `explicit delete ${sessionId}`);
     this.sessions.delete(sessionId);
     return true;
   }
@@ -256,7 +289,7 @@ export class SessionStore {
     for (const sessionId of expiredSessions) {
       const entry = this.sessions.get(sessionId);
       if (entry) {
-        entry.transport.close();
+        safeCloseTransport(entry.transport, `background cleanup ${sessionId}`);
         this.sessions.delete(sessionId);
       }
     }
@@ -269,8 +302,8 @@ export class SessionStore {
    * Use this during server shutdown.
    */
   async closeAll(): Promise<void> {
-    for (const entry of this.sessions.values()) {
-      entry.transport.close();
+    for (const [sessionId, entry] of this.sessions.entries()) {
+      safeCloseTransport(entry.transport, `graceful shutdown ${sessionId}`);
     }
 
     this.sessions.clear();

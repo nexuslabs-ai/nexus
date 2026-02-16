@@ -7,11 +7,14 @@
  * Use when AI needs complete component information.
  */
 
-import type { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
+import {
+  ErrorCode,
+  McpError,
+  type ReadResourceResult,
+} from '@modelcontextprotocol/sdk/types.js';
 
 import { ComponentResolver } from '../../services/component-resolver.js';
 import type { McpContext } from '../types.js';
-import { mcpError } from '../utils/error.js';
 
 /**
  * Resource URI pattern for component detail.
@@ -48,12 +51,12 @@ export async function handleComponentDetail(
   const component = await resolver.resolve(ctx.orgId, slug);
 
   if (!component) {
-    throw mcpError('NOT_FOUND', `Component not found: ${slug}`);
+    throw new McpError(ErrorCode.InvalidParams, `Component not found: ${slug}`);
   }
 
   if (!component.manifest) {
-    throw mcpError(
-      'INVALID_STATE',
+    throw new McpError(
+      ErrorCode.InternalError,
       `Component ${slug} has no manifest (processing may have failed)`
     );
   }

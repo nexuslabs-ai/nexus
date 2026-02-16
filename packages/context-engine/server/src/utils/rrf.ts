@@ -141,6 +141,9 @@ export function fuseWithRRF(
   }
 
   // Sort by fused RRF score descending, take top N
+  // Note: If both input arrays are empty, scores.values() will be empty,
+  // resulting in an empty array. This is the expected behavior — no results
+  // from either retrieval method means no fused results to return.
   return Array.from(scores.values())
     .sort((a, b) => b.rrfScore - a.rrfScore)
     .slice(0, limit);

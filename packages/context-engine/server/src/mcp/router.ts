@@ -30,6 +30,7 @@ import {
   mcpCorsMiddleware,
   mcpSessionMiddleware,
 } from './middleware.js';
+import { jsonRpcError } from './utils.js';
 
 export const mcpRouter = new Hono<AppEnv>();
 
@@ -82,15 +83,23 @@ mcpRouter.post('/', async (c) => {
   const { createMcpServer } = await import('./server.js');
 
   // Get auth context from middleware
-  const auth = c.var.mcpAuth!; // mcpAuthMiddleware ensures this exists
+  const auth = c.var.mcpAuth;
+
+  // Defensive check: mcpAuthMiddleware should guarantee this exists
+  if (!auth) {
+    return c.json(
+      jsonRpcError(-32001, 'Internal error: Missing auth context'),
+      500
+    );
+  }
 
   // Build MCP context from auth + repositories
   const ctx = {
-    orgId: auth.context.orgId,
+    orgId: auth.orgId,
     componentRepo: c.var.componentRepo,
     embeddingRepo: c.var.embeddingRepo,
     apiKeyRepo: c.var.apiKeyRepo,
-    scopes: auth.context.scopes,
+    scopes: auth.scopes,
   };
 
   // Check for existing session (via mcp-session-id header)
@@ -112,7 +121,7 @@ mcpRouter.post('/', async (c) => {
     server = createMcpServer(ctx);
     transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(), // Enable stateful sessions
-      enableJsonResponse: false, // Enable SSE streaming
+      enableJsonResponse: false, // Use SSE streaming instead of JSON response mode
     });
     await server.connect(transport);
     isNewSession = true;
@@ -128,17 +137,7 @@ mcpRouter.post('/', async (c) => {
     body = await c.req.json();
   } catch {
     // Return JSON-RPC parse error (RFC 2.0 spec)
-    return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32700,
-          message: 'Parse error: Invalid JSON',
-        },
-        id: null,
-      },
-      400
-    );
+    return c.json(jsonRpcError(-32700, 'Parse error: Invalid JSON'), 400);
   }
 
   // Body passed explicitly because Hono consumes the request stream
@@ -149,7 +148,7 @@ mcpRouter.post('/', async (c) => {
     sessionStore.set(transport.sessionId, {
       transport,
       server,
-      orgId: auth.context.orgId,
+      orgId: auth.orgId,
       createdAt: Date.now(),
       lastAccessedAt: Date.now(),
     });

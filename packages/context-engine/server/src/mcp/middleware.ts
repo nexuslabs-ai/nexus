@@ -16,8 +16,7 @@ import type { MiddlewareHandler } from 'hono';
 
 import { TokenKind } from '../auth/auth-types.js';
 import { detectTokenKind, validateApiKey } from '../auth/auth-validator.js';
-import type { TenantAuthContext } from '../auth/index.js';
-import { hasScope } from '../auth/scope-checker.js';
+import { hasScope, isTenant } from '../auth/scope-checker.js';
 import { getConfig, type ServerConfig } from '../config.js';
 import {
   buildAllowedHeaders,
@@ -25,6 +24,8 @@ import {
   isOriginAllowedForMcp,
 } from '../cors/index.js';
 import type { AppEnv } from '../types.js';
+
+import { jsonRpcError } from './utils.js';
 
 /**
  * Convert ServerConfig to CorsConfig for CORS validation.
@@ -118,14 +119,7 @@ export const mcpAuthMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   const authHeader = c.req.header('authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32001,
-          message: 'Missing or invalid Authorization header',
-        },
-        id: null,
-      },
+      jsonRpcError(-32001, 'Missing or invalid Authorization header'),
       401
     );
   }
@@ -139,28 +133,14 @@ export const mcpAuthMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   // Step 4: Reject platform tokens (MCP requires tenant API keys)
   if (tokenKind === TokenKind.PlatformToken) {
     return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32001,
-          message: 'MCP requires tenant API key (ce_ prefix)',
-        },
-        id: null,
-      },
+      jsonRpcError(-32001, 'MCP requires tenant API key (ce_ prefix)'),
       401
     );
   }
 
   // Step 5: Validate as tenant API key
   if (tokenKind !== TokenKind.TenantApiKey) {
-    return c.json(
-      {
-        jsonrpc: '2.0',
-        error: { code: -32001, message: 'Invalid token format' },
-        id: null,
-      },
-      401
-    );
+    return c.json(jsonRpcError(-32001, 'Invalid token format'), 401);
   }
 
   const validationResult = await validateApiKey(
@@ -170,37 +150,27 @@ export const mcpAuthMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   );
 
   if (!validationResult.success) {
+    return c.json(jsonRpcError(-32001, validationResult.error), 401);
+  }
+
+  // Step 6: Type guard - ensure we have tenant context (should always be true at this point)
+  if (!isTenant(validationResult.context)) {
     return c.json(
-      {
-        jsonrpc: '2.0',
-        error: { code: -32001, message: validationResult.error },
-        id: null,
-      },
+      jsonRpcError(-32001, 'Invalid auth context: expected tenant'),
       401
     );
   }
 
-  // Step 6: Check for component:read scope (required for all MCP tools)
+  // Step 7: Check for component:read scope (required for all MCP tools)
   if (!hasScope(validationResult.context, 'component:read')) {
     return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32001,
-          message: "Missing required scope: 'component:read'",
-        },
-        id: null,
-      },
+      jsonRpcError(-32001, "Missing required scope: 'component:read'"),
       403
     );
   }
 
-  // Step 7: Store tenant auth context
-  // Type assertion is safe: we validated tenant API key and checked scope above
-  c.set(
-    'mcpAuth',
-    validationResult as { success: true; context: TenantAuthContext }
-  );
+  // Step 8: Store tenant auth context
+  c.set('mcpAuth', validationResult.context);
 
   await next();
 };
@@ -231,17 +201,7 @@ export const mcpSessionMiddleware: MiddlewareHandler<AppEnv> = async (
   const sessionId = c.req.header('mcp-session-id');
 
   if (!sessionId) {
-    return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32000,
-          message: 'Missing mcp-session-id header',
-        },
-        id: null,
-      },
-      400
-    );
+    return c.json(jsonRpcError(-32000, 'Missing mcp-session-id header'), 400);
   }
 
   // Retrieve session from store
@@ -249,31 +209,17 @@ export const mcpSessionMiddleware: MiddlewareHandler<AppEnv> = async (
   const session = sessionStore.get(sessionId);
 
   if (!session) {
-    return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32000,
-          message: 'Session not found or expired',
-        },
-        id: null,
-      },
-      404
-    );
+    return c.json(jsonRpcError(-32000, 'Session not found or expired'), 404);
   }
 
   // Validate session ownership (requires mcpAuthMiddleware to run first)
   const auth = c.var.mcpAuth;
-  if (!auth || session.orgId !== auth.context.orgId) {
+  if (!auth || session.orgId !== auth.orgId) {
     return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32001,
-          message: 'Unauthorized: Session belongs to different organization',
-        },
-        id: null,
-      },
+      jsonRpcError(
+        -32001,
+        'Unauthorized: Session belongs to different organization'
+      ),
       403
     );
   }
