@@ -69,8 +69,6 @@ searchRouter.openapi(searchRoute, async (c) => {
   const { orgId } = c.req.valid('param');
   const body = c.req.valid('json');
 
-  const componentRepo = c.var.componentRepo;
-
   // Embedding repo is only required for semantic and hybrid search modes.
   // Keyword search uses PostgreSQL full-text search and does not need embeddings.
   if (
@@ -83,94 +81,27 @@ searchRouter.openapi(searchRoute, async (c) => {
     );
   }
 
-  const embeddingRepo = c.var.embeddingRepo!;
-  const searchService = new SearchService(componentRepo, embeddingRepo);
+  // Create search service and delegate to unified search method
+  const searchService = new SearchService(
+    c.var.componentRepo,
+    c.var.embeddingRepo!
+  );
 
-  const searchOptions = {
+  const result = await searchService.search(orgId, body.query, {
+    mode: body.mode,
     limit: body.limit,
     minScore: body.minScore,
     framework: body.framework,
-  };
+  });
 
-  switch (body.mode) {
-    case 'keyword': {
-      const results = await searchService.searchKeyword(
-        orgId,
-        body.query,
-        searchOptions
-      );
-
-      return c.json(
-        successResponse({
-          results: results.map((r) => ({
-            componentId: r.componentId,
-            slug: r.slug,
-            name: r.name,
-            description: r.description,
-            framework: r.framework,
-            score: r.score,
-          })),
-          total: results.length,
-          query: body.query,
-          meta: { searchMode: body.mode },
-        }),
-        200
-      );
-    }
-
-    case 'semantic': {
-      const results = await searchService.searchSemantic(
-        orgId,
-        body.query,
-        searchOptions
-      );
-
-      return c.json(
-        successResponse({
-          results: results.map((r) => ({
-            componentId: r.componentId,
-            slug: r.slug,
-            name: r.name,
-            description: r.description,
-            framework: r.framework,
-            score: r.score,
-          })),
-          total: results.length,
-          query: body.query,
-          meta: { searchMode: body.mode },
-        }),
-        200
-      );
-    }
-
-    case 'hybrid':
-    default: {
-      const hybridResult = await searchService.searchHybrid(
-        orgId,
-        body.query,
-        searchOptions
-      );
-
-      return c.json(
-        successResponse({
-          results: hybridResult.results.map((r) => ({
-            componentId: r.componentId,
-            slug: r.slug,
-            name: r.name,
-            description: r.description,
-            framework: r.framework,
-            score: r.rrfScore,
-          })),
-          total: hybridResult.results.length,
-          query: body.query,
-          meta: {
-            searchMode: hybridResult.meta.searchMode,
-            semanticCount: hybridResult.meta.semanticCount,
-            keywordCount: hybridResult.meta.keywordCount,
-          },
-        }),
-        200
-      );
-    }
-  }
+  // Format for HTTP response
+  return c.json(
+    successResponse({
+      results: result.results,
+      total: result.results.length,
+      query: body.query,
+      meta: result.meta,
+    }),
+    200
+  );
 });

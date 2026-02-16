@@ -8,6 +8,33 @@
 
 import { z } from '@hono/zod-openapi';
 
+import { parseAllowedOrigins } from './cors/cors-config.js';
+
+/**
+ * Runtime environment types
+ */
+export const Environment = {
+  Development: 'development',
+  Production: 'production',
+  Test: 'test',
+} as const;
+
+export type Environment = (typeof Environment)[keyof typeof Environment];
+
+/**
+ * MCP-specific CORS modes
+ */
+export const McpCorsMode = {
+  /** No browser access (server-to-server only) */
+  Disabled: 'DISABLED',
+  /** Use CORS_ALLOWED_ORIGINS allowlist */
+  Restricted: 'RESTRICTED',
+  /** Allow all origins (development only) */
+  Permissive: 'PERMISSIVE',
+} as const;
+
+export type McpCorsMode = (typeof McpCorsMode)[keyof typeof McpCorsMode];
+
 /**
  * Environment variable schema with validation and coercion
  */
@@ -15,8 +42,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   NODE_ENV: z
-    .enum(['development', 'production', 'test'])
-    .default('development'),
+    .enum([Environment.Development, Environment.Production, Environment.Test])
+    .default(Environment.Development),
   SERVER_LOG_LEVEL: z
     .enum(['debug', 'info', 'warn', 'error', 'silent'])
     .default('info'),
@@ -46,18 +73,37 @@ const envSchema = z.object({
     .transform((val) => val === 'true'),
   EMBEDDING_PROCESSOR_INTERVAL: z.coerce.number().min(1000).default(5000),
   EMBEDDING_PROCESSOR_BATCH_SIZE: z.coerce.number().min(1).max(100).default(5),
+
+  // CORS configuration
+  CORS_ALLOWED_ORIGINS: z
+    .string()
+    .default('*')
+    .describe(
+      'Comma-separated list of allowed origins. Use "*" for dev only, "NONE" to disable browser CORS, or specific domains for production.'
+    ),
+  MCP_CORS_MODE: z
+    .enum([
+      McpCorsMode.Disabled,
+      McpCorsMode.Restricted,
+      McpCorsMode.Permissive,
+    ])
+    .default(McpCorsMode.Permissive)
+    .describe(
+      'MCP CORS policy: DISABLED=no browser access (server-to-server only), RESTRICTED=use CORS_ALLOWED_ORIGINS, PERMISSIVE=allow all (dev only)'
+    ),
+
+  // MCP stateful session configuration (always-on)
+  MCP_SESSION_TTL: z.coerce
+    .number()
+    .min(60_000)
+    .default(3_600_000)
+    .describe('Session TTL in milliseconds (default: 1 hour)'),
+  MCP_MAX_SESSIONS_PER_ORG: z.coerce
+    .number()
+    .min(1)
+    .default(10)
+    .describe('Maximum concurrent sessions per organization'),
 });
-
-/**
- * Runtime environment types
- */
-export const Environment = {
-  Development: 'development',
-  Production: 'production',
-  Test: 'test',
-} as const;
-
-export type Environment = (typeof Environment)[keyof typeof Environment];
 
 /**
  * Server configuration.
@@ -87,12 +133,20 @@ export interface ServerConfig {
   preAuthRateLimitWindowMs: number;
   /** Maximum requests allowed per pre-auth rate limit window @default 1000 */
   preAuthRateLimitMaxRequests: number;
+  /** Allowed CORS origins (parsed from comma-separated string) */
+  corsAllowedOrigins: string[];
+  /** MCP-specific CORS mode */
+  mcpCorsMode: McpCorsMode;
   /** Enable background embedding processor @default false */
   embeddingProcessorEnabled: boolean;
   /** Embedding processor polling interval in milliseconds @default 5000 */
   embeddingProcessorInterval: number;
   /** Embedding processor batch size (components per cycle) @default 5 */
   embeddingProcessorBatchSize: number;
+  /** MCP session TTL in milliseconds @default 3600000 (1 hour) */
+  mcpSessionTtl: number;
+  /** Maximum concurrent sessions per organization @default 10 */
+  mcpMaxSessionsPerOrg: number;
 }
 
 /**
@@ -122,9 +176,13 @@ export function loadConfig(): ServerConfig {
     rateLimitMaxRequests: result.data.RATE_LIMIT_MAX_REQUESTS,
     preAuthRateLimitWindowMs: result.data.PRE_AUTH_RATE_LIMIT_WINDOW_MS,
     preAuthRateLimitMaxRequests: result.data.PRE_AUTH_RATE_LIMIT_MAX_REQUESTS,
+    corsAllowedOrigins: parseAllowedOrigins(result.data.CORS_ALLOWED_ORIGINS),
+    mcpCorsMode: result.data.MCP_CORS_MODE,
     embeddingProcessorEnabled: result.data.EMBEDDING_PROCESSOR_ENABLED,
     embeddingProcessorInterval: result.data.EMBEDDING_PROCESSOR_INTERVAL,
     embeddingProcessorBatchSize: result.data.EMBEDDING_PROCESSOR_BATCH_SIZE,
+    mcpSessionTtl: result.data.MCP_SESSION_TTL,
+    mcpMaxSessionsPerOrg: result.data.MCP_MAX_SESSIONS_PER_ORG,
   };
 }
 

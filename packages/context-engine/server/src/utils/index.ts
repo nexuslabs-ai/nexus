@@ -13,3 +13,4 @@ export {
   formatSearchResults,
 } from './formatters.js';
 export { successResponse } from './response.js';
+export { fuseWithRRF, RRF_K, type RrfFusedResult } from './rrf.js';

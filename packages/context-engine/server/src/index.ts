@@ -54,3 +54,21 @@ export {
   type SearchOptions,
   SearchService,
 } from './services/index.js';
+
+// Re-export MCP module
+export {
+  type AuthResult,
+  createMcpServer,
+  detectTokenKind,
+  hasScope,
+  type McpContext,
+  mcpRouter,
+  type PlatformAuthContext,
+  type ResourceHandler,
+  type SessionEntry,
+  SessionStore,
+  type TenantAuthContext,
+  TokenKind,
+  type ToolHandler,
+  validateApiKey,
+} from './mcp/index.js';

@@ -21,6 +21,13 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
       }
+    },
+    "nexus-context-engine": {
+      "type": "http",
+      "url": "http://localhost:3000/mcp",
+      "headers": {
+        "Authorization": "Bearer ce_1ca3a3e5495489203fbd6782040a584eaa5c8a6db11076ad76576c34fc7dc471"
+      }
     }
   }
 }
