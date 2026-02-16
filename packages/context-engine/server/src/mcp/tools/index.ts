@@ -6,6 +6,11 @@
  */
 
 export {
+  type FindSimilarInput,
+  findSimilarSchema,
+  handleFindSimilar,
+} from './find-similar.js';
+export {
   type GetComponentInput,
   getComponentSchema,
   handleGetComponent,

@@ -2,35 +2,35 @@
  * MCP Router
  *
  * HTTP routing layer for the MCP gateway.
- * Handles JSON-RPC requests over Streamable HTTP (stateless mode).
+ * Handles JSON-RPC requests over Streamable HTTP with stateful session support.
  *
  * This router is mounted at `/mcp` in the main app and provides:
- * - POST /mcp — Handle MCP JSON-RPC requests
- * - GET /mcp — Method not allowed (405)
- * - DELETE /mcp — Method not allowed (405)
+ * - POST /mcp — Handle MCP JSON-RPC requests (stateful sessions via SSE)
+ * - GET /mcp — Open SSE stream for server-to-client notifications
+ * - DELETE /mcp — Terminate session and clean up
+ *
+ * Middleware Order (CRITICAL):
+ * 1. mcpCorsMiddleware - Sets CORS headers on nodeRes (transport bypasses Hono)
+ * 2. mcpAuthMiddleware - Validates tenant API key
+ * 3. mcpSessionMiddleware - Retrieves and validates session (GET/DELETE only)
+ *
+ * Session Architecture (Always-On):
+ * - POST handler creates/reuses sessions with optional session ID
+ * - GET handler opens SSE stream for existing session
+ * - DELETE handler terminates session and cleans up resources
  */
 
 import { Hono } from 'hono';
+import { randomUUID } from 'node:crypto';
 
-import { getConfig, type ServerConfig } from '../config.js';
-import {
-  buildAllowedHeaders,
-  type CorsConfig,
-  isOriginAllowedForMcp,
-} from '../cors/index.js';
 import type { AppEnv } from '../types.js';
 
-/**
- * Convert ServerConfig to CorsConfig for CORS validation.
- * Used in POST handler to manually set CORS headers on Node.js response.
- */
-function toCorsConfig(config: ServerConfig): CorsConfig {
-  return {
-    allowedOrigins: config.corsAllowedOrigins,
-    mcpMode: config.mcpCorsMode,
-    environment: config.environment,
-  };
-}
+import {
+  mcpAuthMiddleware,
+  mcpCorsMiddleware,
+  mcpSessionMiddleware,
+} from './middleware.js';
+import { jsonRpcError } from './utils.js';
 
 export const mcpRouter = new Hono<AppEnv>();
 
@@ -42,16 +42,37 @@ export const mcpRouter = new Hono<AppEnv>();
  * No need for a separate OPTIONS handler here.
  */
 
+// =============================================================================
+// Apply Middleware (CRITICAL ORDER)
+// =============================================================================
+
 /**
- * POST /mcp — Handle MCP JSON-RPC requests (stateless mode)
+ * CRITICAL MIDDLEWARE ORDER:
+ *
+ * 1. mcpCorsMiddleware - MUST run first to set CORS headers on nodeRes
+ *    before transport writes response
+ *
+ * 2. mcpAuthMiddleware - Validates tenant API key and stores mcpAuth in context
+ *    Required for all MCP routes
+ */
+mcpRouter.use('*', mcpCorsMiddleware);
+mcpRouter.use('*', mcpAuthMiddleware);
+
+// =============================================================================
+// Route Handlers
+// =============================================================================
+
+/**
+ * POST /mcp — Handle MCP JSON-RPC requests (stateful sessions via SSE)
  *
  * Flow:
- * 1. Validate auth (tenant API key only)
- * 2. Build MCP context (orgId + repositories)
- * 3. Create per-request MCP server
- * 4. Create stateless transport
- * 5. Bridge to Node.js request/response
- * 6. Return RESPONSE_ALREADY_SENT
+ * 1. Check for existing session (via mcp-session-id header)
+ * 2. Reuse existing or create new session
+ * 3. Bridge to Node.js transport
+ * 4. Store new session AFTER handleRequest (transport generates ID)
+ * 5. Return RESPONSE_ALREADY_SENT
+ *
+ * Middleware applied: CORS, Auth
  */
 mcpRouter.post('/', async (c) => {
   // Dynamic imports for code-splitting when MCP not used
@@ -60,79 +81,55 @@ mcpRouter.post('/', async (c) => {
   const { RESPONSE_ALREADY_SENT } =
     await import('@hono/node-server/utils/response');
   const { createMcpServer } = await import('./server.js');
-  const { extractMcpAuth } = await import('./auth.js');
 
-  const config = getConfig();
+  // Get auth context from middleware
+  const auth = c.var.mcpAuth;
 
-  // 1. Auth -- validate before MCP processing
-  const apiKeyRepo = c.var.apiKeyRepo;
-  const authResult = await extractMcpAuth(c.req.raw, config, apiKeyRepo);
-
-  if (!authResult.success) {
+  // Defensive check: mcpAuthMiddleware should guarantee this exists
+  if (!auth) {
     return c.json(
-      {
-        jsonrpc: '2.0',
-        error: { code: -32001, message: authResult.error },
-        id: null,
-      },
-      401
+      jsonRpcError(-32001, 'Internal error: Missing auth context'),
+      500
     );
   }
 
-  // 2. Ensure tenant context (platform tokens rejected)
-  // extractMcpAuth already rejects platform tokens, but double-check for type safety
-  if (authResult.context.kind !== 'tenant') {
-    return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32001,
-          message: 'MCP requires tenant API key',
-        },
-        id: null,
-      },
-      401
-    );
-  }
-
-  // 3. Build MCP context from auth + repositories
+  // Build MCP context from auth + repositories
   const ctx = {
-    orgId: authResult.context.orgId,
+    orgId: auth.orgId,
     componentRepo: c.var.componentRepo,
     embeddingRepo: c.var.embeddingRepo,
     apiKeyRepo: c.var.apiKeyRepo,
+    scopes: auth.scopes,
   };
 
-  // 4. Create per-request MCP server + stateless transport
-  const server = createMcpServer(ctx);
-  const transport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: undefined, // stateless mode
-    enableJsonResponse: true,
-  });
-  await server.connect(transport);
+  // Check for existing session (via mcp-session-id header)
+  const sessionStore = c.var.sessionStore;
+  const sessionId = c.req.header('mcp-session-id');
+  const session = sessionId ? sessionStore.get(sessionId) : undefined;
 
-  // 5. Bridge to Node.js transport
+  // Create server + transport (reuse existing or create new)
+  let server;
+  let transport;
+  let isNewSession = false;
+
+  if (session) {
+    // Reuse existing session
+    server = session.server;
+    transport = session.transport;
+  } else {
+    // Create new session
+    server = createMcpServer(ctx);
+    transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(), // Enable stateful sessions
+      enableJsonResponse: false, // Use SSE streaming instead of JSON response mode
+    });
+    await server.connect(transport);
+    isNewSession = true;
+  }
+
+  // Bridge to Node.js transport
   const nodeReq = c.env.incoming;
   const nodeRes = c.env.outgoing;
-
-  // CRITICAL: Manually set CORS headers on Node.js response
-  // The transport writes directly to nodeRes, bypassing Hono's CORS middleware
-  const origin = c.req.header('origin');
-  const corsConfig = toCorsConfig(config);
-
-  // Only add CORS headers if origin is allowed by configuration
-  if (origin && isOriginAllowedForMcp(origin, corsConfig)) {
-    nodeRes.setHeader('Access-Control-Allow-Origin', origin);
-    // CRITICAL: NO Access-Control-Allow-Credentials with dynamic origin reflection
-    nodeRes.setHeader(
-      'Access-Control-Allow-Headers',
-      buildAllowedHeaders(config.environment)
-    );
-    nodeRes.setHeader(
-      'Access-Control-Expose-Headers',
-      'mcp-session-id, mcp-protocol-version'
-    );
-  }
 
   // Parse request body with error handling for invalid JSON
   let body: unknown;
@@ -140,63 +137,77 @@ mcpRouter.post('/', async (c) => {
     body = await c.req.json();
   } catch {
     // Return JSON-RPC parse error (RFC 2.0 spec)
-    return c.json(
-      {
-        jsonrpc: '2.0',
-        error: {
-          code: -32700,
-          message: 'Parse error: Invalid JSON',
-        },
-        id: null,
-      },
-      400
-    );
+    return c.json(jsonRpcError(-32700, 'Parse error: Invalid JSON'), 400);
   }
 
   // Body passed explicitly because Hono consumes the request stream
   await transport.handleRequest(nodeReq, nodeRes, body);
 
-  // 6. Transport already wrote the response to nodeRes
+  // Store new session AFTER handleRequest (transport has generated session ID)
+  if (isNewSession && transport.sessionId) {
+    sessionStore.set(transport.sessionId, {
+      transport,
+      server,
+      orgId: auth.orgId,
+      createdAt: Date.now(),
+      lastAccessedAt: Date.now(),
+    });
+  }
+
+  // Transport already wrote the response to nodeRes
   return RESPONSE_ALREADY_SENT;
 });
 
 /**
- * GET /mcp — Method not allowed
+ * GET /mcp — Open SSE stream for server-to-client notifications
  *
- * Returns 405 with JSON-RPC error.
- * Use POST for stateless MCP requests.
+ * Flow:
+ * 1. Get session from middleware (mcpSessionMiddleware)
+ * 2. Open SSE stream via transport
+ * 3. Return RESPONSE_ALREADY_SENT
+ *
+ * Middleware applied: CORS, Auth, Session
  */
-mcpRouter.get('/', (c) => {
-  return c.json(
-    {
-      jsonrpc: '2.0',
-      error: {
-        code: -32000,
-        message: 'Method not allowed. Use POST for stateless MCP.',
-      },
-      id: null,
-    },
-    405
-  );
+mcpRouter.get('/', mcpSessionMiddleware, async (c) => {
+  const { RESPONSE_ALREADY_SENT } =
+    await import('@hono/node-server/utils/response');
+
+  // Get session from middleware (validated ownership)
+  const { session } = c.var.mcpSession!;
+
+  // Open SSE stream
+  const nodeReq = c.env.incoming;
+  const nodeRes = c.env.outgoing;
+
+  await session.transport.handleRequest(nodeReq, nodeRes, undefined);
+
+  return RESPONSE_ALREADY_SENT;
 });
 
 /**
- * DELETE /mcp — Method not allowed
+ * DELETE /mcp — Terminate session and clean up
  *
- * Returns 405 with JSON-RPC error.
- * Sessions not supported in stateless mode.
+ * Flow:
+ * 1. Get session from middleware (mcpSessionMiddleware)
+ * 2. Delete session from SessionStore (calls transport.close())
+ * 3. Return success response
+ *
+ * Middleware applied: CORS, Auth, Session
  */
-mcpRouter.delete('/', (c) => {
+mcpRouter.delete('/', mcpSessionMiddleware, async (c) => {
+  // Get session from middleware
+  const { sessionId } = c.var.mcpSession!;
+
+  // Delete session (calls transport.close())
+  const sessionStore = c.var.sessionStore;
+  sessionStore.delete(sessionId);
+
   return c.json(
     {
       jsonrpc: '2.0',
-      error: {
-        code: -32000,
-        message:
-          'Method not allowed. Sessions not supported in stateless mode.',
-      },
+      result: { deleted: true },
       id: null,
     },
-    405
+    200
   );
 });

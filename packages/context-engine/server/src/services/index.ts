@@ -19,4 +19,5 @@ export {
   type HybridSearchResult,
   type SearchOptions,
   SearchService,
+  type UnifiedSearchResult,
 } from './search-service.js';
