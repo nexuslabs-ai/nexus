@@ -21,13 +21,6 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "***REDACTED***"
       }
-    },
-    "nexus-context-engine": {
-      "type": "http",
-      "url": "http://localhost:3000/mcp",
-      "headers": {
-        "Authorization": "Bearer ***REDACTED***"
-      }
     }
   }
 }

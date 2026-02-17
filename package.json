@@ -5,7 +5,6 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "packages/context-engine/*",
     "apps/*"
   ],
   "scripts": {
@@ -31,18 +30,7 @@
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "playground": "cd apps/playground && yarn dev",
     "size-limit": "size-limit",
-    "prepare": "husky",
-    "ce:docker:up": "docker compose -f packages/context-engine/docker-compose.yml up -d",
-    "ce:docker:down": "docker compose -f packages/context-engine/docker-compose.yml down",
-    "ce:docker:logs": "docker compose -f packages/context-engine/docker-compose.yml logs -f",
-    "ce:db:push": "yarn workspace @context-engine/db db:push",
-    "ce:db:generate": "yarn workspace @context-engine/db db:generate",
-    "ce:db:migrate": "yarn workspace @context-engine/db db:migrate",
-    "ce:db:studio": "yarn workspace @context-engine/db db:studio",
-    "ce:server:dev": "yarn workspace @context-engine/server dev",
-    "ce:server:start": "yarn workspace @context-engine/server start",
-    "ce:core:build": "yarn workspace @context-engine/core build",
-    "ce:core:dev": "yarn workspace @context-engine/core dev"
+    "prepare": "husky"
   },
   "size-limit": [
     {

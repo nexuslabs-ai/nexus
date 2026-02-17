@@ -87,7 +87,6 @@ If no input provided, ask the user for PR number.
    | `packages/react/src/components/**`         | [components.md](../rules/components.md), [testing.md](../rules/testing.md), [storybook.md](../rules/storybook.md), [figma.md](../rules/figma.md), [shadcn-divergences.md](../rules/shadcn-divergences.md) |
    | `packages/react/src/hooks/**`              | [testing.md](../rules/testing.md)                                                                                                                                                                         |
    | `packages/core/**`, `packages/tailwind/**` | [tokens.md](../rules/tokens.md)                                                                                                                                                                           |
-   | `packages/context-engine/**`               | [context-engine.md](../rules/context-engine.md)                                                                                                                                                           |
    | `.claude/**`                               | Check [Claude Code docs](https://code.claude.com/docs/en/) for latest capabilities                                                                                                                        |
    | Any PR                                     | [github.md](../rules/github.md), [linear.md](../rules/linear.md)                                                                                                                                          |
 
@@ -160,17 +159,6 @@ Task(
 ### Phase 5: Context-Specific Checks
 
 Based on detected context, perform additional checks:
-
-#### If Context Engine files changed:
-
-**AI Consumer Assessment** (from [context-engine.md](../rules/context-engine.md)):
-
-| Aspect                | What to Check                       |
-| --------------------- | ----------------------------------- |
-| Response Parseability | Is data easy for AI to parse?       |
-| Context Completeness  | Enough info for code generation?    |
-| Error Guidance        | Do errors help AI recover?          |
-| Search Quality        | Will queries find right components? |
 
 #### If Component files changed:
 

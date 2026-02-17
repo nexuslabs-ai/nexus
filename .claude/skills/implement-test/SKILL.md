@@ -43,7 +43,6 @@ Based on what you're testing, different patterns apply:
 | ------------------ | -------------------------------------- | --------------------------------------- |
 | React Components   | `packages/react/src/components/`       | Story-first testing with play functions |
 | React Hooks        | `packages/react/src/hooks/`            | Unit tests with `@nexus/test-utils`     |
-| Context Engine     | `packages/context-engine/`             | Fixture-based integration tests         |
 | Core/Tailwind      | `packages/core/`, `packages/tailwind/` | Unit tests, output validation           |
 | General TypeScript | Any `.ts` or `.tsx`                    | Vitest unit/integration tests           |
 
@@ -51,21 +50,18 @@ Based on what you're testing, different patterns apply:
 
 Load rules based on what you're testing **before writing any tests**:
 
-| Package          | Rules to Load                                                                                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| React Components | [testing.md](../../rules/testing.md), [testing-react.md](../../rules/testing-react.md), [storybook.md](../../rules/storybook.md)                             |
-| React Hooks      | [testing.md](../../rules/testing.md), [testing-react.md](../../rules/testing-react.md)                                                                       |
-| Context Engine   | [testing.md](../../rules/testing.md), [testing-context-engine.md](../../rules/testing-context-engine.md), [context-engine.md](../../rules/context-engine.md) |
-| Core/Tailwind    | [testing.md](../../rules/testing.md)                                                                                                                         |
-| General          | [testing.md](../../rules/testing.md)                                                                                                                         |
+| Package          | Rules to Load                                                                                                                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| React Components | [testing.md](../../rules/testing.md), [testing-react.md](../../rules/testing-react.md), [storybook.md](../../rules/storybook.md) |
+| React Hooks      | [testing.md](../../rules/testing.md), [testing-react.md](../../rules/testing-react.md)                                           |
+| Core/Tailwind    | [testing.md](../../rules/testing.md)                                                                                             |
+| General          | [testing.md](../../rules/testing.md)                                                                                             |
 
 **Rule file purpose:**
 
 - `testing.md` — Core philosophy (always load)
 - `testing-react.md` — React/Storybook patterns (for `@nexus/react`)
-- `testing-context-engine.md` — Context Engine patterns (for `@context-engine/*`)
 - `storybook.md` — Story structure (for component stories)
-- `context-engine.md` — Domain knowledge (for Context Engine)
 
 **Always also load:** Base rules (workflow, github, linear — if Linear context present)
 

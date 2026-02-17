@@ -68,7 +68,6 @@
       "packages/react/**": "allow",
       "packages/core/**": "allow",
       "packages/tailwind/**": "allow",
-      "packages/context-engine/**": "allow",
       "packages/test-utils/**": "allow",
       "apps/**": "allow",
       ".opencode/**": "allow",
@@ -78,7 +77,6 @@
       "packages/react/**": "allow",
       "packages/core/**": "allow",
       "packages/tailwind/**": "allow",
-      "packages/context-engine/**": "allow",
       "packages/test-utils/**": "allow",
       "apps/**": "allow",
       ".opencode/**": "allow",
@@ -114,13 +112,6 @@
       "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
       "environment": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "***REDACTED***"
-      }
-    },
-    "nexus-context-engine": {
-      "type": "remote",
-      "url": "http://localhost:3000/mcp",
-      "headers": {
-        "Authorization": "Bearer ***REDACTED***"
       }
     }
   },

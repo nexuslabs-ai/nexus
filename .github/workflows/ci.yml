@@ -24,7 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       react: ${{ steps.filter.outputs.react }}
-      context-engine: ${{ steps.filter.outputs.context-engine }}
       packages: ${{ steps.filter.outputs.packages }}
       ci: ${{ steps.filter.outputs.ci }}
     steps:
@@ -41,8 +40,6 @@ jobs:
               - 'packages/tailwind/**'
               - 'packages/core/**'
               - 'packages/test-utils/**'
-            context-engine:
-              - 'packages/context-engine/**'
             packages:
               - 'packages/**'
             ci:
@@ -406,32 +403,3 @@ jobs:
 
       - name: Check bundle size
         run: yarn size-limit
-
-  # ============================================
-  # Context Engine Jobs (placeholder for future)
-  # ============================================
-
-  # Uncomment when context-engine has tests
-  # test-context-engine:
-  #   name: Context Engine Tests
-  #   runs-on: ubuntu-latest
-  #   needs: [changes, build]
-  #   if: needs.changes.outputs.context-engine == 'true' || needs.changes.outputs.ci == 'true'
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
-  #         cache: 'yarn'
-  #     - name: Install dependencies
-  #       run: yarn install --frozen-lockfile
-  #     - name: Download build artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: build-artifacts
-  #     - name: Run context-engine tests
-  #       run: |
-  #         yarn workspace @context-engine/core test
-  #         yarn workspace @context-engine/db test

@@ -31,7 +31,7 @@ Comprehensive code review using dual-agent analysis. Auto-detects context based 
 
 1. Get PR context (title, description, linked Linear issue)
 2. Read all changed files
-3. Load rules based on detected context (components, tokens, context-engine, etc.)
+3. Load rules based on detected context (components, tokens, etc.)
 4. Principal Architect reviews: system design, scalability, data model, security
 5. SDE2 reviews: type safety, error handling, code structure, testability
 6. Post reviews with inline comments at specific lines

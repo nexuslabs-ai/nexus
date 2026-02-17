@@ -41,13 +41,12 @@ This skill works with multiple input types:
 
 Based on what you're implementing, load these rules **before writing any code**:
 
-| Task Type      | Detect By                              | Rules to Load                                                                                                                                                |
-| -------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Component      | `packages/react/src/components/`       | [components.md](../../rules/components.md), [testing.md](../../rules/testing.md), [storybook.md](../../rules/storybook.md), [figma.md](../../rules/figma.md) |
-| Hook           | `packages/react/src/hooks/`            | [testing.md](../../rules/testing.md)                                                                                                                         |
-| Utility        | `packages/react/src/lib/`              | [testing.md](../../rules/testing.md)                                                                                                                         |
-| Token          | `packages/core/`, `packages/tailwind/` | [tokens.md](../../rules/tokens.md)                                                                                                                           |
-| Context Engine | `packages/context-engine/`             | [context-engine.md](../../rules/context-engine.md)                                                                                                           |
+| Task Type | Detect By                              | Rules to Load                                                                                                                                                |
+| --------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Component | `packages/react/src/components/`       | [components.md](../../rules/components.md), [testing.md](../../rules/testing.md), [storybook.md](../../rules/storybook.md), [figma.md](../../rules/figma.md) |
+| Hook      | `packages/react/src/hooks/`            | [testing.md](../../rules/testing.md)                                                                                                                         |
+| Utility   | `packages/react/src/lib/`              | [testing.md](../../rules/testing.md)                                                                                                                         |
+| Token     | `packages/core/`, `packages/tailwind/` | [tokens.md](../../rules/tokens.md)                                                                                                                           |
 
 **Always also load:** Base rules (workflow, github, linear — if Linear context present)
 

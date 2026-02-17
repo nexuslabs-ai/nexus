@@ -32,7 +32,6 @@ Based on files changed in the PR, load appropriate rules **before fixing**:
 | `packages/react/src/components/`       | [components.md](../../rules/components.md), [testing.md](../../rules/testing.md), [storybook.md](../../rules/storybook.md) |
 | `packages/react/src/hooks/`            | [testing.md](../../rules/testing.md)                                                                                       |
 | `packages/core/`, `packages/tailwind/` | [tokens.md](../../rules/tokens.md)                                                                                         |
-| `packages/context-engine/`             | [context-engine.md](../../rules/context-engine.md)                                                                         |
 
 **Always also load:** Base rules (workflow, github, linear)
 

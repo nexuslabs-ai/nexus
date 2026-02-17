@@ -4,7 +4,6 @@
 > For package-specific patterns, see:
 >
 > - [testing-react.md](testing-react.md) — React components, Storybook
-> - [testing-context-engine.md](testing-context-engine.md) — Context Engine packages
 
 ## Core Philosophy
 

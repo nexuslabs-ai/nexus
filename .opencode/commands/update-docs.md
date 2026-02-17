@@ -12,7 +12,6 @@ Update documentation based on codebase changes using the Technical Writer agent.
 Examples:
 
 - `/update-docs` → Check recent changes (HEAD~5)
-- `/update-docs packages/context-engine` → Focus on specific package
 - `/update-docs --all` → Full documentation audit
 
 ## Instructions

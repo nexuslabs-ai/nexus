@@ -42,10 +42,3 @@ build-storybook.log
 .claude/settings.local.json
 CLAUDE.local.md
 **/CLAUDE.local.md
-packages/context-engine/.env.test
-packages/context-engine/core/.env.test
-
-# Context Engine pipeline output
-.ce-output
-.ce-state
-packages/context-engine/db/drizzle/

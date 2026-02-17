@@ -62,8 +62,7 @@ ds/
 │   ├── core/           # Design tokens (private) → see packages/core/CLAUDE.md
 │   ├── tailwind/       # Tailwind CSS theme (nx: prefix) → see packages/tailwind/CLAUDE.md
 │   ├── react/          # React components → see packages/react/CLAUDE.md
-│   ├── test-utils/     # Test utilities → see packages/test-utils/CLAUDE.md
-│   └── context-engine/ # AI-accessible component metadata → see packages/context-engine/CLAUDE.md
+│   └── test-utils/     # Test utilities → see packages/test-utils/CLAUDE.md
 ├── apps/
 │   ├── docs/           # Documentation site (planned)
 │   └── playground/     # Theme playground for demos → dynamic theme switching
@@ -145,34 +144,28 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 
 ## Package Documentation
 
-| Package                | CLAUDE.md                                                              | Purpose                            |
-| ---------------------- | ---------------------------------------------------------------------- | ---------------------------------- |
-| `@nexus/core`          | [packages/core/CLAUDE.md](packages/core/CLAUDE.md)                     | Design tokens (W3C DTCG format)    |
-| `@nexus/tailwind`      | [packages/tailwind/CLAUDE.md](packages/tailwind/CLAUDE.md)             | Tailwind CSS theme with nx: prefix |
-| `@nexus/react`         | [packages/react/CLAUDE.md](packages/react/CLAUDE.md)                   | React component library            |
-| `@nexus/test-utils`    | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md)         | Shared testing utilities           |
-| `@nexus/playground`    | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md)                 | Theme demo app                     |
-| `@context-engine/core` | [packages/context-engine/CLAUDE.md](packages/context-engine/CLAUDE.md) | AI-accessible component metadata   |
+| Package             | CLAUDE.md                                                      | Purpose                            |
+| ------------------- | -------------------------------------------------------------- | ---------------------------------- |
+| `@nexus/core`       | [packages/core/CLAUDE.md](packages/core/CLAUDE.md)             | Design tokens (W3C DTCG format)    |
+| `@nexus/tailwind`   | [packages/tailwind/CLAUDE.md](packages/tailwind/CLAUDE.md)     | Tailwind CSS theme with nx: prefix |
+| `@nexus/react`      | [packages/react/CLAUDE.md](packages/react/CLAUDE.md)           | React component library            |
+| `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities           |
+| `@nexus/playground` | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md)         | Theme demo app                     |
 
 ## Convention Rules
 
-| Rule File                                                                                | Purpose                                        |
-| ---------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [.claude/rules/workflow.md](.claude/rules/workflow.md)                                   | **Critical workflow (plan→execute→wait)**      |
-| [.claude/rules/components.md](.claude/rules/components.md)                               | Component structure, props, exports            |
-| [.claude/rules/testing.md](.claude/rules/testing.md)                                     | Core testing philosophy (all packages)         |
-| [.claude/rules/testing-react.md](.claude/rules/testing-react.md)                         | React/Storybook testing patterns               |
-| [.claude/rules/testing-context-engine.md](.claude/rules/testing-context-engine.md)       | Context Engine testing patterns                |
-| [.claude/rules/storybook.md](.claude/rules/storybook.md)                                 | Story structure, required stories              |
-| [.claude/rules/tokens.md](.claude/rules/tokens.md)                                       | Token format, naming, workflow                 |
-| [.claude/rules/figma.md](.claude/rules/figma.md)                                         | Figma-code parity, token mapping, architecture |
-| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md)               | Nexus vs shadcn/ui differences                 |
-| [.claude/rules/context-engine.md](.claude/rules/context-engine.md)                       | Context Engine domain knowledge, AI-first APIs |
-| [.claude/rules/context-engine-database.md](.claude/rules/context-engine-database.md)     | Database patterns (Drizzle, pgvector)          |
-| [.claude/rules/context-engine-api.md](.claude/rules/context-engine-api.md)               | API patterns (Hono, MCP, endpoints)            |
-| [.claude/rules/context-engine-embeddings.md](.claude/rules/context-engine-embeddings.md) | Embedding patterns (chunking, vector search)   |
-| [.claude/rules/linear.md](.claude/rules/linear.md)                                       | Linear integration, issue linking, status flow |
-| [.claude/rules/github.md](.claude/rules/github.md)                                       | PR format, commit conventions, auto-linking    |
+| Rule File                                                                  | Purpose                                        |
+| -------------------------------------------------------------------------- | ---------------------------------------------- |
+| [.claude/rules/workflow.md](.claude/rules/workflow.md)                     | **Critical workflow (plan→execute→wait)**      |
+| [.claude/rules/components.md](.claude/rules/components.md)                 | Component structure, props, exports            |
+| [.claude/rules/testing.md](.claude/rules/testing.md)                       | Core testing philosophy (all packages)         |
+| [.claude/rules/testing-react.md](.claude/rules/testing-react.md)           | React/Storybook testing patterns               |
+| [.claude/rules/storybook.md](.claude/rules/storybook.md)                   | Story structure, required stories              |
+| [.claude/rules/tokens.md](.claude/rules/tokens.md)                         | Token format, naming, workflow                 |
+| [.claude/rules/figma.md](.claude/rules/figma.md)                           | Figma-code parity, token mapping, architecture |
+| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences                 |
+| [.claude/rules/linear.md](.claude/rules/linear.md)                         | Linear integration, issue linking, status flow |
+| [.claude/rules/github.md](.claude/rules/github.md)                         | PR format, commit conventions, auto-linking    |
 
 ## Skills (Auto-Discovered)
 
