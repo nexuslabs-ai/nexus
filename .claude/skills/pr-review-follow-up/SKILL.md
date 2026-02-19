@@ -181,7 +181,7 @@ _Follow-up review - focused on changes since last review_
 
 ## Posting the Review
 
-When posting via `mcp__github__create_pull_request_review`, use **both** the body and inline comments:
+When posting via `gh api`, use **both** the body and inline comments:
 
 ### Review Body (`body` parameter)
 

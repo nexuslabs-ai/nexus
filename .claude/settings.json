@@ -38,8 +38,8 @@
       "Bash(which:*)",
       "Bash(mkdir:*)",
       "mcp__linear__*",
-      "mcp__github__*",
       "mcp__figma__*",
+      "Bash(gh:*)",
       "Write(packages/react/**)",
       "Edit(packages/react/**)",
       "WebFetch(domain:*)"

@@ -6,8 +6,7 @@ allowed-tools:
   - Grep
   - Glob
   - WebFetch
-  - mcp__github__get_file_contents
-  - mcp__github__search_code
+  - Bash
 user-invocable: true
 ---
 
@@ -63,14 +62,11 @@ Priority examples to fetch:
 - `{component}-with-icon.tsx` — Icon composition
 - `{component}-loading.tsx` — Loading states
 
-Use GitHub MCP:
+Use `gh` CLI:
 
-```
-mcp__github__get_file_contents(
-  owner: "shadcn-ui",
-  repo: "ui",
-  path: "apps/v4/registry/new-york-v4/examples/{component}-{pattern}.tsx"
-)
+```bash
+gh api repos/shadcn-ui/ui/contents/apps/v4/registry/new-york-v4/examples/{component}-{pattern}.tsx \
+  --jq '.content' | base64 --decode
 ```
 
 ## Workflow

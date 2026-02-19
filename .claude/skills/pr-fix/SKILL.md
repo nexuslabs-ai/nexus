@@ -41,20 +41,20 @@ Based on files changed in the PR, load appropriate rules **before fixing**:
 
 1. **Fetch PR details:**
 
-   ```
-   mcp__github__get_pull_request(owner: "{owner}", repo: "{repo}", pull_number: {pr_number})
+   ```bash
+   gh pr view {pr_number} --json number,title,body,headRefName,baseRefName,author,url
    ```
 
 2. **Get review comments:**
 
-   ```
-   mcp__github__get_pull_request_reviews(owner: "{owner}", repo: "{repo}", pull_number: {pr_number})
-   mcp__github__get_pull_request_comments(owner: "{owner}", repo: "{repo}", pull_number: {pr_number})
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
+   gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
    ```
 
 3. **Get changed files:**
-   ```
-   mcp__github__get_pull_request_files(owner: "{owner}", repo: "{repo}", pull_number: {pr_number})
+   ```bash
+   gh pr diff {pr_number}
    ```
 
 ### Phase 2: Categorize Issues

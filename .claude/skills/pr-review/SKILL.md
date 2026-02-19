@@ -151,7 +151,7 @@ _Review perspective: {Agent persona}_
 
 ## Posting the Review
 
-When posting via `mcp__github__create_pull_request_review`, use **both** the body and inline comments:
+When posting via `gh api`, use **both** the body and inline comments:
 
 ### Review Body (`body` parameter)
 
@@ -182,7 +182,7 @@ Add inline comments for each blocking and minor issue at its exact location:
 
 To get the correct `line` number for inline comments:
 
-1. **From the diff:** Use `mcp__github__get_pull_request_files` to get file patches
+1. **From the diff:** Use `gh pr diff {pr_number}` to get file patches
 2. **Line numbers:** Use the line number in the **new file** (right side of diff), not the diff position
 3. **Only comment on changed lines:** Inline comments must be on lines that appear in the diff
 
@@ -196,17 +196,12 @@ To get the correct `line` number for inline comments:
 
 ### Example API Call
 
-```
-mcp__github__create_pull_request_review(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  pull_number: 10,
-  body: "{review summary using output format above}",
-  event: "COMMENT",
-  comments: [
-    { path: "file.tsx", line: 42, body: "Issue description..." }
-  ]
-)
+```bash
+gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
+  --method POST \
+  -f body="{review summary using output format above}" \
+  -f event="COMMENT" \
+  -F comments='[{"path":"file.tsx","line":42,"body":"Issue description..."}]'
 ```
 
 ## Verdict Options

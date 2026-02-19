@@ -1,7 +1,7 @@
 ---
 name: designer
 description: Design systems specialist for Figma analysis and design-code parity. Use proactively when working with Figma designs, analyzing components, or checking token consistency.
-tools: Read, Grep, Glob, WebSearch, WebFetch, mcp__figma__get_design_context, mcp__figma__get_variable_defs, mcp__figma__get_screenshot, mcp__figma__get_metadata, mcp__figma__get_code_connect_map, mcp__github__get_file_contents, mcp__github__search_code
+tools: Read, Grep, Glob, Bash, WebSearch, WebFetch, mcp__figma__get_design_context, mcp__figma__get_variable_defs, mcp__figma__get_screenshot, mcp__figma__get_metadata, mcp__figma__get_code_connect_map
 model: opus
 skills:
   - figma-analyze

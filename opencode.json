@@ -106,13 +106,6 @@
         "chrome-devtools-mcp@latest",
         "--executable-path=/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
       ]
-    },
-    "github": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
-      "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "***REDACTED***"
-      }
     }
   },
   "agent": {

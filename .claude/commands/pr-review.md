@@ -51,8 +51,8 @@ If no input provided, ask the user for PR number.
 
 3. **Fetch PR details:**
 
-   ```
-   mcp__github__get_pull_request(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr view {pr_number} --json number,title,body,headRefName,baseRefName,author,url,mergedAt
    ```
 
 4. **Extract:**
@@ -74,8 +74,8 @@ If no input provided, ask the user for PR number.
 
 1. **Get list of changed files:**
 
-   ```
-   mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr diff {pr_number}
    ```
 
 2. **For each changed file, read full content** using Read tool
@@ -198,28 +198,22 @@ Review against:
 
 1. **Post Principal Architect review:**
 
-   ```
-   mcp__github__create_pull_request_review(
-     owner: "INNOVATIVEGAMER",
-     repo: "ds",
-     pull_number: {pr_number},
-     body: "{Principal Architect review from skill}",
-     event: "COMMENT",
-     comments: [{inline comments}]
-   )
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+     --method POST \
+     -f body="{Principal Architect review from skill}" \
+     -f event="COMMENT" \
+     -F comments='[{inline comments}]'
    ```
 
 2. **Post SDE2 review:**
 
-   ```
-   mcp__github__create_pull_request_review(
-     owner: "INNOVATIVEGAMER",
-     repo: "ds",
-     pull_number: {pr_number},
-     body: "{SDE2 review from skill}",
-     event: "{APPROVE|COMMENT|REQUEST_CHANGES}",
-     comments: [{inline comments}]
-   )
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+     --method POST \
+     -f body="{SDE2 review from skill}" \
+     -f event="{APPROVE|COMMENT|REQUEST_CHANGES}" \
+     -F comments='[{inline comments}]'
    ```
 
    **Verdict logic:**
@@ -258,14 +252,14 @@ When developer pushes changes after initial review, use follow-up mode to focus 
 
 2. **Fetch previous reviews:**
 
-   ```
-   mcp__github__get_pull_request_reviews(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews
    ```
 
 3. **Fetch review comments:**
 
-   ```
-   mcp__github__get_pull_request_comments(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/comments
    ```
 
 4. **Parse previous review data:**
@@ -278,16 +272,16 @@ When developer pushes changes after initial review, use follow-up mode to focus 
 
 1. **Get commits since last review:**
 
-   ```
-   mcp__github__list_commits(owner: "INNOVATIVEGAMER", repo: "ds", sha: "{pr_head_sha}")
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/commits
    ```
 
    - Filter to commits after last review timestamp
 
 2. **Get current changed files:**
 
-   ```
-   mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr diff {pr_number}
    ```
 
 3. **Determine if Architect review needed:**
@@ -377,15 +371,12 @@ Task(
 
 ### Phase F5: Post Follow-up Review
 
-```
-mcp__github__create_pull_request_review(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  pull_number: {pr_number},
-  body: "{Follow-up review}",
-  event: "{APPROVE|COMMENT|REQUEST_CHANGES}",
-  comments: [{inline comments on new issues only}]
-)
+```bash
+gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+  --method POST \
+  -f body="{Follow-up review}" \
+  -f event="{APPROVE|COMMENT|REQUEST_CHANGES}" \
+  -F comments='[{inline comments on new issues only}]'
 ```
 
 **Verdict logic for follow-up:**

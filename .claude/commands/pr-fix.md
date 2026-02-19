@@ -53,22 +53,22 @@ If no PR number provided, ask the user for it.
 
 1. **Fetch PR details:**
 
-   ```
-   mcp__github__get_pull_request(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr view {pr_number} --json number,title,body,headRefName,baseRefName,author,url
    ```
 
 2. **Extract Linear issue** from PR title `[NEX-###]` or body `Closes NEX-###`
 
 3. **Get all review feedback:**
 
-   ```
-   mcp__github__get_pull_request_reviews(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
-   mcp__github__get_pull_request_comments(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/comments
    ```
 
 4. **Get changed files:**
-   ```
-   mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr diff {pr_number}
    ```
 
 ### Phase 2: Spawn SDE2 Agent
