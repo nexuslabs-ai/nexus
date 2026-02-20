@@ -82,7 +82,6 @@ Parse `$ARGUMENTS` for:
 
 2. **Identify what package this relates to:**
    - `packages/react/` → Component/hook testing patterns
-   - `packages/context-engine/` → Integration testing patterns
    - Other → General Vitest patterns
 
 3. **Collect context to pass to agent:**

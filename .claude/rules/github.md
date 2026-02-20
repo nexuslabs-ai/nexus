@@ -103,61 +103,64 @@ When PR title contains `[NEX-###]`:
 | PR ready for review | Issue → In Review                  |
 | PR merged           | Issue → Done (if `Closes` present) |
 
-## MCP Tool Reference
+## `gh` CLI Reference
 
 ### Creating PRs
 
-```
-mcp__github__create_pull_request(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  title: "{title with [issue_id]}",
-  head: "{branch_name}",
-  base: "main",
-  body: "{PR body}"
-)
+```bash
+gh pr create \
+  --title "{title with [issue_id]}" \
+  --head "{branch_name}" \
+  --base "main" \
+  --body "{PR body}"
 ```
 
 ### Fetching PR Details
 
-```
-mcp__github__get_pull_request(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  pull_number: {pr_number}
-)
+```bash
+gh pr view {pr_number} --json number,title,body,headRefName,baseRefName,author,url,mergedAt
 ```
 
 Key fields:
 
 - `title` - PR title (extract issue ID from `[NEX-###]`)
 - `body` - PR description (extract from `Closes NEX-###`)
-- `merged_at` - Merge timestamp (null if not merged)
-- `head.ref` - Branch name
+- `mergedAt` - Merge timestamp (null if not merged)
+- `headRefName` - Branch name
 
-### Fetching PR Files
+### Fetching PR Files / Diff
 
-```
-mcp__github__get_pull_request_files(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  pull_number: {pr_number}
-)
+```bash
+gh pr diff {pr_number}
 ```
 
 ### Creating PR Reviews
 
-```
-mcp__github__create_pull_request_review(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  pull_number: {pr_number},
-  body: "{review summary}",
-  event: "{APPROVE|COMMENT|REQUEST_CHANGES}",
-  comments: [
-    { path: "file.tsx", line: 42, body: "Issue..." }
+```bash
+gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+  --method POST \
+  --input - <<'EOF'
+{
+  "body": "{review summary}",
+  "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
+  "comments": [
+    {"path": "file.tsx", "line": 42, "body": "Issue..."}
   ]
-)
+}
+EOF
+```
+
+### Fetching Reviews & Comments
+
+```bash
+# Reviews (verdict + body)
+gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews
+
+# Inline comments
+gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/comments
+
+# Commits on a PR
+gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/commits
 ```
 
 ### Review Verdicts

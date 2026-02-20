@@ -51,8 +51,8 @@ If no input provided, ask the user for PR number.
 
 3. **Fetch PR details:**
 
-   ```
-   mcp__github__get_pull_request(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr view {pr_number} --json number,title,body,headRefName,baseRefName,author,url,mergedAt
    ```
 
 4. **Extract:**
@@ -74,8 +74,8 @@ If no input provided, ask the user for PR number.
 
 1. **Get list of changed files:**
 
-   ```
-   mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr diff {pr_number}
    ```
 
 2. **For each changed file, read full content** using Read tool
@@ -87,7 +87,6 @@ If no input provided, ask the user for PR number.
    | `packages/react/src/components/**`         | [components.md](../rules/components.md), [testing.md](../rules/testing.md), [storybook.md](../rules/storybook.md), [figma.md](../rules/figma.md), [shadcn-divergences.md](../rules/shadcn-divergences.md) |
    | `packages/react/src/hooks/**`              | [testing.md](../rules/testing.md)                                                                                                                                                                         |
    | `packages/core/**`, `packages/tailwind/**` | [tokens.md](../rules/tokens.md)                                                                                                                                                                           |
-   | `packages/context-engine/**`               | [context-engine.md](../rules/context-engine.md)                                                                                                                                                           |
    | `.claude/**`                               | Check [Claude Code docs](https://code.claude.com/docs/en/) for latest capabilities                                                                                                                        |
    | Any PR                                     | [github.md](../rules/github.md), [linear.md](../rules/linear.md)                                                                                                                                          |
 
@@ -161,17 +160,6 @@ Task(
 
 Based on detected context, perform additional checks:
 
-#### If Context Engine files changed:
-
-**AI Consumer Assessment** (from [context-engine.md](../rules/context-engine.md)):
-
-| Aspect                | What to Check                       |
-| --------------------- | ----------------------------------- |
-| Response Parseability | Is data easy for AI to parse?       |
-| Context Completeness  | Enough info for code generation?    |
-| Error Guidance        | Do errors help AI recover?          |
-| Search Quality        | Will queries find right components? |
-
 #### If Component files changed:
 
 Review against checklist in [components.md](../rules/components.md)
@@ -210,28 +198,30 @@ Review against:
 
 1. **Post Principal Architect review:**
 
-   ```
-   mcp__github__create_pull_request_review(
-     owner: "INNOVATIVEGAMER",
-     repo: "ds",
-     pull_number: {pr_number},
-     body: "{Principal Architect review from skill}",
-     event: "COMMENT",
-     comments: [{inline comments}]
-   )
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+     --method POST \
+     --input - <<'EOF'
+   {
+     "body": "{Principal Architect review from skill}",
+     "event": "COMMENT",
+     "comments": [{inline comments}]
+   }
+   EOF
    ```
 
 2. **Post SDE2 review:**
 
-   ```
-   mcp__github__create_pull_request_review(
-     owner: "INNOVATIVEGAMER",
-     repo: "ds",
-     pull_number: {pr_number},
-     body: "{SDE2 review from skill}",
-     event: "{APPROVE|COMMENT|REQUEST_CHANGES}",
-     comments: [{inline comments}]
-   )
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+     --method POST \
+     --input - <<'EOF'
+   {
+     "body": "{SDE2 review from skill}",
+     "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
+     "comments": [{inline comments}]
+   }
+   EOF
    ```
 
    **Verdict logic:**
@@ -270,14 +260,14 @@ When developer pushes changes after initial review, use follow-up mode to focus 
 
 2. **Fetch previous reviews:**
 
-   ```
-   mcp__github__get_pull_request_reviews(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews
    ```
 
 3. **Fetch review comments:**
 
-   ```
-   mcp__github__get_pull_request_comments(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/comments
    ```
 
 4. **Parse previous review data:**
@@ -290,16 +280,16 @@ When developer pushes changes after initial review, use follow-up mode to focus 
 
 1. **Get commits since last review:**
 
-   ```
-   mcp__github__list_commits(owner: "INNOVATIVEGAMER", repo: "ds", sha: "{pr_head_sha}")
+   ```bash
+   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/commits
    ```
 
    - Filter to commits after last review timestamp
 
 2. **Get current changed files:**
 
-   ```
-   mcp__github__get_pull_request_files(owner: "INNOVATIVEGAMER", repo: "ds", pull_number: {pr_number})
+   ```bash
+   gh pr diff {pr_number}
    ```
 
 3. **Determine if Architect review needed:**
@@ -389,15 +379,16 @@ Task(
 
 ### Phase F5: Post Follow-up Review
 
-```
-mcp__github__create_pull_request_review(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  pull_number: {pr_number},
-  body: "{Follow-up review}",
-  event: "{APPROVE|COMMENT|REQUEST_CHANGES}",
-  comments: [{inline comments on new issues only}]
-)
+```bash
+gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+  --method POST \
+  --input - <<'EOF'
+{
+  "body": "{Follow-up review}",
+  "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
+  "comments": [{inline comments on new issues only}]
+}
+EOF
 ```
 
 **Verdict logic for follow-up:**

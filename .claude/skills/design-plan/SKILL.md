@@ -31,7 +31,6 @@ Based on task type, reference these rules when planning:
 | Task Type    | Rules to Reference                                                           |
 | ------------ | ---------------------------------------------------------------------------- |
 | Component    | [components.md](../../rules/components.md), [figma.md](../../rules/figma.md) |
-| API/Backend  | [context-engine.md](../../rules/context-engine.md)                           |
 | Token System | [tokens.md](../../rules/tokens.md)                                           |
 
 **Always also load:** Base rules (workflow, github, linear)

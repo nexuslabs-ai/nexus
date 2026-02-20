@@ -5,7 +5,6 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "packages/context-engine/*",
     "apps/*"
   ],
   "scripts": {
@@ -31,10 +30,7 @@
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "playground": "cd apps/playground && yarn dev",
     "size-limit": "size-limit",
-    "prepare": "husky",
-    "ce:db:up": "yarn workspace @context-engine/db docker:up",
-    "ce:db:down": "yarn workspace @context-engine/db docker:down",
-    "ce:db:logs": "yarn workspace @context-engine/db docker:logs"
+    "prepare": "husky"
   },
   "size-limit": [
     {
@@ -53,9 +49,9 @@
     "@eslint/js": "^9.39.2",
     "@size-limit/preset-small-lib": "^12.0.0",
     "@storybook/addon-vitest": "^10.1.11",
-    "@vitest/browser": "4.0.17",
-    "@vitest/browser-playwright": "4.0.17",
-    "@vitest/coverage-istanbul": "4.0.17",
+    "@vitest/browser": "4.0.18",
+    "@vitest/browser-playwright": "4.0.18",
+    "@vitest/coverage-istanbul": "4.0.18",
     "chromatic": "^13.3.5",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
@@ -76,7 +72,7 @@
     "turbo": "^2.7.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0",
-    "vitest": "4.0.17"
+    "vitest": "4.0.18"
   },
   "packageManager": "yarn@1.22.22",
   "engines": {
@@ -90,5 +86,8 @@
     "*.{json,md,css}": [
       "prettier --write"
     ]
+  },
+  "resolutions": {
+    "minimatch": "^10.1.2"
   }
 }

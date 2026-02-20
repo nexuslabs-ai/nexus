@@ -8,12 +8,12 @@
       "type": "http",
       "url": "https://mcp.figma.com/mcp"
     },
-    "github": {
+    "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "***REDACTED***"
-      }
+      "args": [
+        "chrome-devtools-mcp@latest",
+        "--executable-path=/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+      ]
     }
   }
 }

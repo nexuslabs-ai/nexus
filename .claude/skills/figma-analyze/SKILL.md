@@ -11,7 +11,6 @@ allowed-tools:
   - mcp__figma__get_screenshot
   - mcp__figma__get_metadata
   - mcp__figma__get_code_connect_map
-  - mcp__github__get_file_contents
 user-invocable: true
 ---
 

@@ -6,6 +6,8 @@ allowed-tools:
   - Grep
   - Glob
   - Bash(git:*, gh:*)
+  - WebSearch
+  - WebFetch
 user-invocable: true
 ---
 
@@ -36,16 +38,23 @@ Re-review a pull request after the author has pushed changes in response to init
    - Get commits since last review
    - List files modified since last review
 
-3. **Verify previous issues**
+3. **Research dependencies (if applicable)**
+   - If fixes involve third-party libraries, verify against latest documentation
+   - Use WebSearch to confirm fixes align with correct usage patterns
+   - Check for any new recommendations since initial review
+   - This is especially important if initial review raised concerns about library usage
+
+4. **Verify previous issues**
    - For each previous issue, check if it's addressed
    - Mark status using indicators below
+   - For API-related fixes, verify against researched best practices
 
-4. **Review new changes only**
+5. **Review new changes only**
    - Don't re-review unchanged code
    - Focus on files modified since last review
    - Check for new issues introduced by fixes
 
-5. **Apply verdict logic**
+6. **Apply verdict logic**
    - Use follow-up verdict guidelines below
 
 ## Status Indicators
@@ -56,6 +65,26 @@ Re-review a pull request after the author has pushed changes in response to init
 | ❌ Still Present   | Issue remains unchanged           | No change or wrong change      |
 | ⚠️ Partially Fixed | Attempted but incomplete          | Some aspects fixed, others not |
 | 🔄 Changed         | Code changed, needs re-evaluation | Different approach taken       |
+
+## Dependency Research in Follow-ups
+
+Research is required in follow-up reviews when:
+
+| Condition                                      | Research Action                     |
+| ---------------------------------------------- | ----------------------------------- |
+| Initial review flagged incorrect library usage | Verify fix against latest docs      |
+| Fix changed how a dependency is used           | Confirm usage is correct per docs   |
+| New dependency added in the fix                | Full research on new dependency     |
+| Fix involves library configuration             | Verify configuration is appropriate |
+
+### Verification Checklist
+
+When fixes involve third-party dependencies:
+
+- [ ] Fix aligns with current official documentation
+- [ ] Library is being used as intended
+- [ ] No common mistakes introduced in the fix
+- [ ] Any new usage patterns are correct
 
 ## Smart Agent Selection
 
@@ -152,7 +181,7 @@ _Follow-up review - focused on changes since last review_
 
 ## Posting the Review
 
-When posting via `mcp__github__create_pull_request_review`, use **both** the body and inline comments:
+When posting via `gh api`, use **both** the body and inline comments:
 
 ### Review Body (`body` parameter)
 

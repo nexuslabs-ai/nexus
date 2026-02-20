@@ -6,6 +6,8 @@ allowed-tools:
   - Grep
   - Glob
   - Bash(git:*, gh:*)
+  - WebSearch
+  - WebFetch
 user-invocable: true
 ---
 
@@ -28,20 +30,73 @@ Review pull requests to ensure code quality, architectural soundness, and adhere
    - Understand what problem is being solved
    - Check the scope of changes
 
-2. **Analyze the changes**
+2. **Research third-party dependencies (MANDATORY)**
+   - Identify ALL third-party libraries and dependencies in the changed code
+   - Use WebSearch to find latest documentation, best practices, and common mistakes
+   - Verify the code uses these dependencies correctly and as intended
+   - Check for version-specific behavior or configuration options
+   - See "External Technology Research" section below for details
+
+3. **Analyze the changes**
    - Review each changed file thoroughly
    - Don't just skim the diff—understand what each function/module does
    - Consider how changes fit into the existing system
+   - Compare implementation against researched best practices
 
-3. **Apply your lens**
+4. **Apply your lens**
    - Use your agent's focus areas (architecture vs implementation)
    - Check against your agent's checklist items
    - Apply the Challenge & Propose format for issues
 
-4. **Document findings**
+5. **Document findings**
    - Use the output format below
    - Be specific with file:line references
    - Distinguish blocking vs minor issues
+   - Include findings from external research
+
+## External Technology Research
+
+**This phase is MANDATORY for any PR that uses third-party dependencies or external technologies.**
+
+### When to Research
+
+Any code using something you didn't write:
+
+- Third-party libraries and frameworks
+- Platform or browser APIs
+- External services and integrations
+- Build tools and configuration
+- Any dependency where correct usage matters
+
+### What to Search For
+
+1. **Correct usage** — Is the API being used as intended?
+2. **Configuration options** — Are there settings that should be customized?
+3. **Common mistakes** — What do people typically get wrong?
+4. **Version-specific behavior** — Check `package.json` versions against docs
+5. **Performance considerations** — Any known gotchas?
+
+### How to Research
+
+```
+"{library/technology} best practices {current year}"
+"{library/technology} {version} documentation"
+"{library/technology} common mistakes"
+"{library/technology} correct usage"
+"{library/technology} vs {alternative}"
+```
+
+### Research Output
+
+Include a research summary in your review:
+
+```markdown
+### 🔍 External Technology Research
+
+| Technology | Findings                | Impact on PR     |
+| ---------- | ----------------------- | ---------------- |
+| {name}     | {key finding from docs} | {recommendation} |
+```
 
 ## Common Checklist
 
@@ -53,6 +108,8 @@ These items apply regardless of review perspective:
 - [ ] Imports organized and minimal
 - [ ] Follows existing patterns in codebase
 - [ ] Changes are within scope of PR description
+- [ ] Third-party dependencies used correctly (verified via research)
+- [ ] No common mistakes for libraries/technologies used
 
 ## Output Format
 
@@ -94,7 +151,7 @@ _Review perspective: {Agent persona}_
 
 ## Posting the Review
 
-When posting via `mcp__github__create_pull_request_review`, use **both** the body and inline comments:
+When posting via `gh api`, use **both** the body and inline comments:
 
 ### Review Body (`body` parameter)
 
@@ -125,7 +182,7 @@ Add inline comments for each blocking and minor issue at its exact location:
 
 To get the correct `line` number for inline comments:
 
-1. **From the diff:** Use `mcp__github__get_pull_request_files` to get file patches
+1. **From the diff:** Use `gh pr diff {pr_number}` to get file patches
 2. **Line numbers:** Use the line number in the **new file** (right side of diff), not the diff position
 3. **Only comment on changed lines:** Inline comments must be on lines that appear in the diff
 
@@ -139,17 +196,18 @@ To get the correct `line` number for inline comments:
 
 ### Example API Call
 
-```
-mcp__github__create_pull_request_review(
-  owner: "INNOVATIVEGAMER",
-  repo: "ds",
-  pull_number: 10,
-  body: "{review summary using output format above}",
-  event: "COMMENT",
-  comments: [
-    { path: "file.tsx", line: 42, body: "Issue description..." }
+```bash
+gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
+  --method POST \
+  --input - <<'EOF'
+{
+  "body": "{review summary using output format above}",
+  "event": "COMMENT",
+  "comments": [
+    {"path": "file.tsx", "line": 42, "body": "Issue description..."}
   ]
-)
+}
+EOF
 ```
 
 ## Verdict Options

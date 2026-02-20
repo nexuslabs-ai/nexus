@@ -42,4 +42,7 @@ build-storybook.log
 .claude/settings.local.json
 CLAUDE.local.md
 **/CLAUDE.local.md
-packages/context-engine/.env.test
+
+# MCP / AI tool configs (may contain credentials)
+.mcp.json
+opencode.json

@@ -184,14 +184,6 @@ export default tseslint.config(
     },
   },
 
-  // Context Engine - allow console for logger utility and test debugging
-  {
-    files: ['**/context-engine/**/*.ts'],
-    rules: {
-      'no-console': 'off',
-    },
-  },
-
   // Disable rules that conflict with Prettier
   prettierConfig
 );
