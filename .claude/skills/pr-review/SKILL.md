@@ -199,9 +199,15 @@ To get the correct `line` number for inline comments:
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --method POST \
-  -f body="{review summary using output format above}" \
-  -f event="COMMENT" \
-  -F comments='[{"path":"file.tsx","line":42,"body":"Issue description..."}]'
+  --input - <<'EOF'
+{
+  "body": "{review summary using output format above}",
+  "event": "COMMENT",
+  "comments": [
+    {"path": "file.tsx", "line": 42, "body": "Issue description..."}
+  ]
+}
+EOF
 ```
 
 ## Verdict Options

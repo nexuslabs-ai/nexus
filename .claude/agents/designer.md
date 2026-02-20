@@ -62,6 +62,15 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | **Design-Code Alignment** | Can designers and developers speak the same language?         |
 | **Accessibility**         | Are contrast ratios, touch targets, and focus states correct? |
 
+## Bash Tool Usage
+
+The `Bash` tool is available to this agent for **read-only `gh api` operations on external repositories only**. Allowed uses:
+
+- `gh api repos/shadcn-ui/ui/contents/{path}` — Fetch shadcn component source files
+- `gh api repos/{owner}/{repo}/contents/{path}` — Read external reference implementations
+
+**Not allowed:** Writing files, running builds, posting reviews, or any mutation operations via Bash. Use dedicated tools (Read, Grep, Glob, WebFetch) for all local and web reads.
+
 ## Principles
 
 1. **Consistency over perfection** — A consistent 8px grid beats perfect spacing

@@ -201,9 +201,13 @@ Review against:
    ```bash
    gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
      --method POST \
-     -f body="{Principal Architect review from skill}" \
-     -f event="COMMENT" \
-     -F comments='[{inline comments}]'
+     --input - <<'EOF'
+   {
+     "body": "{Principal Architect review from skill}",
+     "event": "COMMENT",
+     "comments": [{inline comments}]
+   }
+   EOF
    ```
 
 2. **Post SDE2 review:**
@@ -211,9 +215,13 @@ Review against:
    ```bash
    gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
      --method POST \
-     -f body="{SDE2 review from skill}" \
-     -f event="{APPROVE|COMMENT|REQUEST_CHANGES}" \
-     -F comments='[{inline comments}]'
+     --input - <<'EOF'
+   {
+     "body": "{SDE2 review from skill}",
+     "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
+     "comments": [{inline comments}]
+   }
+   EOF
    ```
 
    **Verdict logic:**
@@ -374,9 +382,13 @@ Task(
 ```bash
 gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
   --method POST \
-  -f body="{Follow-up review}" \
-  -f event="{APPROVE|COMMENT|REQUEST_CHANGES}" \
-  -F comments='[{inline comments on new issues only}]'
+  --input - <<'EOF'
+{
+  "body": "{Follow-up review}",
+  "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
+  "comments": [{inline comments on new issues only}]
+}
+EOF
 ```
 
 **Verdict logic for follow-up:**

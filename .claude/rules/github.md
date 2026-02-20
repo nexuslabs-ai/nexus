@@ -139,9 +139,15 @@ gh pr diff {pr_number}
 ```bash
 gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
   --method POST \
-  -f body="{review summary}" \
-  -f event="{APPROVE|COMMENT|REQUEST_CHANGES}" \
-  -F comments='[{"path":"file.tsx","line":42,"body":"Issue..."}]'
+  --input - <<'EOF'
+{
+  "body": "{review summary}",
+  "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
+  "comments": [
+    {"path": "file.tsx", "line": 42, "body": "Issue..."}
+  ]
+}
+EOF
 ```
 
 ### Fetching Reviews & Comments

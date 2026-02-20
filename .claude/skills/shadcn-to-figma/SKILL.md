@@ -66,7 +66,8 @@ Use `gh` CLI:
 
 ```bash
 gh api repos/shadcn-ui/ui/contents/apps/v4/registry/new-york-v4/examples/{component}-{pattern}.tsx \
-  --jq '.content' | base64 --decode
+  --jq 'if .download_url then .download_url else error("file not found or is a directory") end' \
+  | xargs curl -sL
 ```
 
 ## Workflow
