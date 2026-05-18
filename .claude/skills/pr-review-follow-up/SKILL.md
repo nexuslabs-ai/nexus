@@ -8,7 +8,7 @@ allowed-tools:
   - Bash(git:*, gh:*)
   - WebSearch
   - WebFetch
-user-invocable: true
+user-invocable: false
 ---
 
 # PR Review Follow-up
@@ -22,6 +22,25 @@ Re-review a pull request after the author has pushed changes in response to init
 - After initial PR review when changes have been pushed
 - When verifying review feedback has been addressed
 - When re-evaluating a PR after modifications
+
+## Base Rules
+
+Always load and check the new diff against:
+
+| Rule                                                                             | Purpose                                                                            |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files     |
+| [ripple-effect.md](../../rules/ripple-effect.md)                                 | Flag callers, callees, or adjacent code left inconsistent after the change         |
+| [parse-dont-narrow.md](../../rules/parse-dont-narrow.md)                         | Flag hand-rolled `typeof` guards or `as` casts at boundaries — require zod         |
+| [dont-duplicate-validation.md](../../rules/dont-duplicate-validation.md)         | Flag internal re-validation that duplicates zod / FK / caller-contract guarantees  |
+| [guard-clauses.md](../../rules/guard-clauses.md)                                 | Flag deeply nested conditionals; require happy path at column 0                    |
+| [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Flag `renderItem` / `mode` discriminators; require `children` or per-mode split    |
+| [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Flag effects that orchestrate React state instead of syncing with external systems |
+| [logging-proportionality.md](../../rules/logging-proportionality.md)             | Flag noisy incremental logs; require one dense canonical log line                  |
+| [code-comments.md](../../rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code           |
+| [no-follow-up-deferral.md](../../rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                            |
+| [project-stage.md](../../rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                |
+| [docs-mcp.md](../../rules/docs-mcp.md)                                           | Verify third-party API usage via examlly-docs-mcp before approving                 |
 
 ## Prerequisites
 
@@ -86,138 +105,79 @@ When fixes involve third-party dependencies:
 - [ ] No common mistakes introduced in the fix
 - [ ] Any new usage patterns are correct
 
-## Smart Agent Selection
+## Agent Selection
 
-For follow-up reviews, not all agents need to re-review:
+Both agents always run in follow-up reviews. Each covers the same focus lane as the full review — Architect owns structure and architecture, SDE2 owns code quality and correctness.
 
-| Condition                                  | Agents Used                |
-| ------------------------------------------ | -------------------------- |
-| Only code fixes (same files modified)      | SDE2 only                  |
-| New files added                            | SDE2 + Principal Architect |
-| Significant structural changes             | SDE2 + Principal Architect |
-| Previous review had architectural concerns | SDE2 + Principal Architect |
+## Scope of Findings
+
+Any new issue you flag is fixable in this PR. Do not recommend deferring to a follow-up PR unless you can cite an existing tracked issue or milestone that owns the work. Avoid deferral framing ("not blocking, monitor post-launch", "flag for later rollout") unless a tracked issue is cited. See `.claude/rules/no-follow-up-deferral.md`.
 
 ## Output Format
 
-### SDE2 Follow-up Output
+The template below **is the entire review body**. No preamble, no trailing summary, no "Findings" / "Observations" / "Notes" sections, no numbered concern lists in the body.
 
 ```markdown
-## SDE2 Follow-up Review
+## {Agent Name} Follow-up — Verdict: {VERDICT}
 
-### Previous Issues Status
+### Unresolved Issues
 
-| Issue         | File        | Status           | Notes            |
-| ------------- | ----------- | ---------------- | ---------------- |
-| {description} | {file:line} | ✅ Fixed         | {verification}   |
-| {description} | {file:line} | ❌ Still Present | {what's wrong}   |
-| {description} | {file:line} | ⚠️ Partial       | {what's missing} |
+| #   | Original Issue | File         | Status           | Notes                |
+| --- | -------------- | ------------ | ---------------- | -------------------- |
+| 1   | {description}  | `file.ts:42` | ❌ Still Present | {what's still wrong} |
+| 2   | {description}  | `file.ts:15` | ⚠️ Partial       | {what's missing}     |
 
-### Issue Resolution Summary
+### New Issues
 
-- **Fixed:** {count}
-- **Still Present:** {count}
-- **Partially Fixed:** {count}
-
-### New Changes Assessment
-
-Files modified since last review:
-
-| File   | Changes        | Assessment       |
-| ------ | -------------- | ---------------- |
-| {file} | {what changed} | ✅/⚠️/❌ {notes} |
-
-### New Issues Found
-
-#### Blocking ❌
-
-- {new issue with file:line}
-
-#### Minor ⚠️
-
-- {new issue with file:line}
-
-### Verdict: {VERDICT}
-
-{Summary of overall status}
-
----
-
-_Follow-up review - focused on changes since last review_
+| #   | Severity    | File         | Issue         | Suggestion                   |
+| --- | ----------- | ------------ | ------------- | ---------------------------- |
+| 1   | ❌ Blocking | `file.ts:10` | {description} | {only if fix is non-obvious} |
 ```
 
-### Principal Architect Follow-up Output
+**Rules:**
 
-```markdown
-## Principal Architect Follow-up Review
+- `Unresolved Issues`: only include rows for issues that are ❌ Still Present or ⚠️ Partial. No ✅ Fixed rows.
+- If all previous issues are resolved, replace the table with: _All previous issues resolved._
+- `New Issues`: omit section entirely if no new issues found
+- **No preamble or trailing paragraph.** The verdict line is the only body prose above the Unresolved Issues table
+- **No "Findings", "Observations", "Notes", "What's done well" sections** — banned regardless of heading
+- **No praise.** Verdict signals quality; prose doesn't
+- **No numbered concern lists in the body.** Concerns go in table rows, not `1. … 2. … 3. …` narrative
+- No Issue Resolution Summary counters
+- No New Changes Assessment table (only surface problems, not a file-by-file audit)
 
-### Scope
+## Review Writing Style
 
-Reviewing: {new files / structural changes / previous concerns}
+Same caps as `pr-review-guide` — apply to every output: review body, `Unresolved Issues` notes, `New Issues` table, inline comments.
 
-### Previous Concerns Status
+- **Inline comment body:** ≤50 words. **Count them.** One sentence on the problem, one on the fix. If it needs file-path references + rationale, split or surface in `Unresolved Issues` notes
+- **Unresolved Issues "Notes" column:** ≤15 words
+- **New Issues "Issue" column:** ≤15 words
+- **Plain language.** No downstream-ripple narration, prior-incident history, or code blocks unless the fix is one line
+- **Shape for inline comments:** `**{✅ Fixed|❌ Still Present|⚠️ Partial|⚠️ New}:** {what's wrong}. {what to do}.`
 
-| Concern   | Status           | Notes   |
-| --------- | ---------------- | ------- |
-| {concern} | ✅ Addressed     | {how}   |
-| {concern} | ❌ Still Present | {issue} |
+If a finding doesn't fit these caps, split it into two findings.
 
-### New Architectural Assessment
+**Self-check before returning:** re-read your own review body. If any paragraph is longer than two sentences, or any inline comment is longer than three lines, cut or split it.
 
-| Area               | Status   | Notes        |
-| ------------------ | -------- | ------------ |
-| New Files          | ✅/⚠️/❌ | {assessment} |
-| Structural Changes | ✅/⚠️/❌ | {assessment} |
+## Returning Findings
 
-### New Concerns (if any)
+**Do NOT post the review yourself.** The calling command is responsible for posting.
 
-{Any new architectural issues in the changes}
+Return your findings in this structured format so the caller can post:
 
-### Verdict: {VERDICT}
-
----
-
-_Follow-up review - focused on changes since last review_
 ```
+REVIEW_BODY:
+{your follow-up review body using the output format above}
 
-## Posting the Review
+INLINE_COMMENTS:
+[
+  {"path": "src/utils/format.ts", "line": 15, "body": "❌ **Still Present:** The null check is still missing."},
+  {"path": "src/components/button.tsx", "line": 42, "body": "⚠️ **New Issue:** Consider using optional chaining here."}
+]
 
-When posting via `gh api`, use **both** the body and inline comments:
-
-### Review Body (`body` parameter)
-
-Use the output format above for the overall follow-up summary.
-
-### Inline Comments (`comments` parameter)
-
-Add inline comments for:
-
-- **Still present issues:** Comment on the same line explaining what's still wrong
-- **New issues found:** Comment on the specific line with the new issue
-
-```json
-{
-  "comments": [
-    {
-      "path": "src/utils/format.ts",
-      "line": 15,
-      "body": "❌ **Still Present:** This issue from the previous review hasn't been addressed. The null check is still missing."
-    },
-    {
-      "path": "src/components/button.tsx",
-      "line": 42,
-      "body": "⚠️ **New Issue:** This was introduced in the fix - consider using optional chaining here."
-    }
-  ]
-}
+VERDICT: APPROVE | COMMENT | REQUEST_CHANGES
 ```
-
-### Review Event
-
-| Condition                              | Event             |
-| -------------------------------------- | ----------------- |
-| All issues fixed, no new issues        | `APPROVE`         |
-| Issues fixed, only minor new issues    | `COMMENT`         |
-| Blocking issues remain OR new blockers | `REQUEST_CHANGES` |
 
 ## Follow-up Verdict Guidelines
 
@@ -236,13 +196,3 @@ Add inline comments for:
 | Previous architectural concerns addressed | `APPROVED`         |
 | Minor questions remain, non-blocking      | `NEEDS DISCUSSION` |
 | Significant architectural issues remain   | `CHANGES REQUIRED` |
-
-## When Principal Architect Skips Follow-up
-
-Principal Architect only needs to re-review when:
-
-- New files were added since last review
-- Significant structural changes detected
-- Previous review had architectural concerns
-
-If none of these apply, SDE2 handles the follow-up alone.

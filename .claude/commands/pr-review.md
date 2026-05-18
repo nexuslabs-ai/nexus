@@ -4,24 +4,24 @@ Comprehensive code review using dual-agent analysis. Auto-detects context based 
 
 ## Agents Used
 
-| Agent                                                   | Skill                                     | Perspective                  |
-| ------------------------------------------------------- | ----------------------------------------- | ---------------------------- |
-| [Principal Architect](../agents/principal-architect.md) | [pr-review](../skills/pr-review/SKILL.md) | Architecture & system design |
-| [SDE2](../agents/sde2.md)                               | [pr-review](../skills/pr-review/SKILL.md) | Code quality & correctness   |
+| Agent                                                   | Skill                                                 | Perspective                  |
+| ------------------------------------------------------- | ----------------------------------------------------- | ---------------------------- |
+| [Principal Architect](../agents/principal-architect.md) | [pr-review-guide](../skills/pr-review-guide/SKILL.md) | Architecture & system design |
+| [SDE2](../agents/sde2.md)                               | [pr-review-guide](../skills/pr-review-guide/SKILL.md) | Code quality & correctness   |
 
 ## Required Input
 
-- **PR Number or Linear Issue ID**: $ARGUMENTS (e.g., `5` or `NEX-140`)
+- **PR Number**: $ARGUMENTS (e.g., `5`)
 - **Optional flag**: `--follow-up` or `-f` for re-review after changes
 
 ```
 Examples:
-  /pr-review 5                → Full review (first time)
+  /pr-review 5                → Full review by PR number
   /pr-review 5 --follow-up    → Follow-up review (after changes pushed)
-  /pr-review NEX-140 -f       → Follow-up using Linear issue
+  /pr-review 5 -f             → Follow-up (short flag)
 ```
 
-If no input provided, ask the user for PR number.
+If no input provided, ask the user for the PR number.
 
 ## Mode Detection
 
@@ -30,41 +30,32 @@ If no input provided, ask the user for PR number.
 | (none)               | Full Review      | Both agents review all changed files  |
 | `--follow-up` / `-f` | Follow-up Review | SDE2 always, Architect only if needed |
 
+## Non-negotiable: agents do the review, not you
+
+Every `/pr-review` run MUST spawn both agents via the Agent tool — full or follow-up, big diff or small. If you catch yourself thinking "I can verify this directly," that's the trigger to spawn, not a reason to skip. Reaching the end without an Agent call = spec violation; re-run from Phase 3 / F4.
+
 ---
 
 ## Full Review Mode (Default)
 
 ### Phase 1: Get PR Context
 
-1. **Determine input type:**
-   - If numeric only → PR number
-   - If contains `NEX-` → Linear issue ID
-
-2. **If Linear issue ID provided:**
-
-   ```
-   mcp__linear__get_issue(id: "{issue_id}")
-   ```
-
-   - Look for PR link in attachments/links
-   - If no PR found, ask user for PR number
-
-3. **Fetch PR details:**
+1. **Fetch PR details:**
 
    ```bash
    gh pr view {pr_number} --json number,title,body,headRefName,baseRefName,author,url,mergedAt
    ```
 
-4. **Extract:**
+2. **Extract:**
    - PR title and description
    - Base and head branches
-   - Linked Linear issue (from title `[NEX-###]` or body)
+   - Linked GitHub issue (from body `Closes #123`)
    - PR author
 
-5. **If Linear issue linked, fetch ticket:**
+3. **If GitHub issue linked, fetch it:**
 
-   ```
-   mcp__linear__get_issue(id: "{issue_id}")
+   ```bash
+   gh issue view {issue_number} --json number,title,body,labels,state,url
    ```
 
    - Understand what was requested
@@ -82,20 +73,18 @@ If no input provided, ask the user for PR number.
 
 3. **Auto-detect context and load rules:**
 
-   | Files Changed                              | Rules to Load                                                                                                                                                                                             |
-   | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | `packages/react/src/components/**`         | [components.md](../rules/components.md), [testing.md](../rules/testing.md), [storybook.md](../rules/storybook.md), [figma.md](../rules/figma.md), [shadcn-divergences.md](../rules/shadcn-divergences.md) |
-   | `packages/react/src/hooks/**`              | [testing.md](../rules/testing.md)                                                                                                                                                                         |
-   | `packages/core/**`, `packages/tailwind/**` | [tokens.md](../rules/tokens.md)                                                                                                                                                                           |
-   | `.claude/**`                               | Check [Claude Code docs](https://code.claude.com/docs/en/) for latest capabilities                                                                                                                        |
-   | Any PR                                     | [github.md](../rules/github.md), [linear.md](../rules/linear.md)                                                                                                                                          |
+   Check `.claude/rules/` for any rule files relevant to the changed files. Load and follow all applicable rules. Always load [github.md](../rules/github.md).
 
-### Phase 3: Principal Architect Review
+### Phase 3: Spawn Both Review Agents in Parallel
 
-**IMPORTANT: You MUST use the Task tool to spawn the Principal Architect agent. Do NOT execute the review yourself.**
+**IMPORTANT: Spawn both agents simultaneously using the Agent tool. Do NOT execute the reviews yourself and do NOT wait for one to finish before spawning the other.**
+
+Each agent has a distinct focus lane — keep to it to avoid duplicate inline comments.
 
 ```
-Task(
+// Spawn both at the same time:
+
+Agent(
   subagent_type: "principal-architect",
   description: "Architecture review for PR",
   prompt: """
@@ -104,31 +93,44 @@ Task(
   ## PR Details
   - Title: {pr_title}
   - Description: {pr_description}
-  - Linear Issue: {issue_id}
+  - GitHub Issue: #{issue_number}
 
   ## Changed Files
   {list of changed files with patches}
 
   ## Context
   - Loaded rules: {rules loaded based on files changed}
-  - Ticket requirements: {from Linear issue if available}
+  - Issue requirements: {from GitHub issue if available}
+
+  ## Your Focus (ONLY these areas — do not overlap with SDE2)
+  - Module boundaries and folder structure
+  - Data model design and type system decisions
+  - Security boundaries (auth patterns, server-only access)
+  - Scalability concerns (N+1 queries, computed fields, caching)
+  - API contract design (route structure, response shapes)
+  - Stub/placeholder routes and their production readiness
+
+  ## Out of Scope for You
+  Do NOT flag: deprecated library APIs, code style, naming, redundant code patterns.
+  Those are SDE2's lane.
+
+  ## Output Caps (strict — enforced; see pr-review-guide skill for full rules)
+  - **Review body = verdict line + template sections ONLY.** No preamble paragraph, no trailing summary.
+  - **No "Findings", "Observations", "Notes", "What's done well" sections** (banned regardless of heading).
+  - **No praise.** "Cleanly mirrors X", "sound type plumbing", "neatly avoids Y" — cut all of it.
+  - **No numbered concern lists in the body.** Three concerns = three table rows or three Architectural Concerns entries, not `1. … 2. … 3. …` prose.
+  - **Inline comment ≤50 words.** Count them. If it needs file refs + rationale, surface in Architectural Concerns instead.
+  - **Architectural Concerns entry ≤2 sentences.** No alternative-path discussion; pick one direction.
 
   ## Instructions
-  1. Read the pr-review skill at `.claude/skills/pr-review/SKILL.md`
-  2. Focus on: system design, scalability, data model, security boundaries
-  3. Use Challenge & Propose format for issues
-  4. Output review following the skill's format
-  5. Return the review body and any inline comments
+  1. Focus exclusively on your lane above
+  2. Output review following the skill's format AND the output caps above
+  3. Self-check: re-read your review body. Any paragraph >2 sentences or inline comment >3 lines → cut or split.
+  4. Return the review body and any inline comments — DO NOT post to GitHub yourself
   """
 )
-```
 
-### Phase 4: SDE2 Review
-
-**IMPORTANT: You MUST use the Task tool to spawn the SDE2 agent. Do NOT execute the review yourself.**
-
-```
-Task(
+Agent(
   subagent_type: "sde2",
   description: "Code quality review for PR",
   prompt: """
@@ -137,36 +139,75 @@ Task(
   ## PR Details
   - Title: {pr_title}
   - Description: {pr_description}
-  - Linear Issue: {issue_id}
+  - GitHub Issue: #{issue_number}
 
   ## Changed Files
   {list of changed files with patches}
 
   ## Context
   - Loaded rules: {rules loaded based on files changed}
-  - Ticket requirements: {from Linear issue if available}
+  - Issue requirements: {from GitHub issue if available}
+
+  ## Your Focus (ONLY these areas — do not overlap with Architect)
+  - Type safety and TypeScript correctness
+  - Deprecated or incorrect library API usage (Zod, Next.js, etc.)
+  - Error handling completeness
+  - Redundant or overly complex code patterns
+  - Naming and readability for the target audience (design students)
+  - Edge cases and potential runtime bugs
+
+  ## Out of Scope for You
+  Do NOT flag: folder structure, data model design, scalability, auth patterns.
+  Those are the Architect's lane.
+
+  ## Output Caps (strict — enforced; see pr-review-guide skill for full rules)
+  - **Review body = verdict line + template sections ONLY.** No preamble paragraph, no trailing summary.
+  - **No "Findings", "Observations", "Notes", "What's done well" sections** (banned regardless of heading).
+  - **No praise.** "Cleanly mirrors X", "sound type plumbing", "neatly avoids Y" — cut all of it.
+  - **No numbered concern lists in the body.** Three concerns = three table rows, not `1. … 2. … 3. …` prose.
+  - **Inline comment ≤50 words.** Count them. If it needs file refs + rationale, surface in Architectural Concerns instead.
+  - **Architectural Concerns entry ≤2 sentences.** No alternative-path discussion; pick one direction.
 
   ## Instructions
-  1. Read the pr-review skill at `.claude/skills/pr-review/SKILL.md`
-  2. Focus on: type safety, error handling, code structure, testability
-  3. Use Challenge & Propose format for issues
-  4. Output review following the skill's format
-  5. Return the review body and any inline comments
+  1. Focus exclusively on your lane above
+  2. Output review following the skill's format AND the output caps above
+  3. Self-check: re-read your review body. Any paragraph >2 sentences or inline comment >3 lines → cut or split.
+  4. Return the review body and any inline comments — DO NOT post to GitHub yourself
   """
 )
 ```
 
+Wait for both to return, then proceed to Phase 4.
+
+### Phase 4: Consolidate Inline Comments
+
+Before posting, deduplicate inline comments across both agent results to prevent the same file:line from getting two comments.
+
+**Steps:**
+
+1. Collect all inline comments from both agents into a flat list, tagged by source:
+
+   ```
+   architect_comments = [{path, line, body}, ...]
+   sde2_comments      = [{path, line, body}, ...]
+   ```
+
+2. Find overlapping comments — where both agents commented on the same `path:line`.
+
+3. For each overlap, **keep only one**:
+   - If the comments cover different aspects, merge them into a single comment body (e.g. "**Architecture:** ... \n\n**Code quality:** ...")
+   - If one is more specific/actionable, keep that one and discard the other
+   - Assign the merged/kept comment to whichever agent's review body it fits best
+
+4. The result is two non-overlapping comment sets:
+   - `architect_final_comments` — Architect inline comments with no duplicates
+   - `sde2_final_comments` — SDE2 inline comments with no duplicates
+
+5. Proceed to Phase 5 with these deduplicated sets.
+
 ### Phase 5: Context-Specific Checks
 
 Based on detected context, perform additional checks:
-
-#### If Component files changed:
-
-Review against checklist in [components.md](../rules/components.md)
-
-#### If Token files changed:
-
-Review against checklist in [tokens.md](../rules/tokens.md)
 
 #### If `.claude/**` files changed:
 
@@ -196,16 +237,21 @@ Review against:
 
 ### Phase 6: Post Reviews
 
+Use `architect_final_comments` and `sde2_final_comments` from Phase 4 — never the raw agent output directly.
+
+**Reviews are posted from the `examlly-tech` bot account.** Prefix every `gh api .../reviews --method POST` call with `GH_TOKEN=$(gh auth token --user examlly-tech)`. This keeps review comments attributed to the bot and avoids GitHub's self-authored-PR rejection of `APPROVE` / `REQUEST_CHANGES` (since the bot is never the PR author).
+
 1. **Post Principal Architect review:**
 
    ```bash
-   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+   GH_TOKEN=$(gh auth token --user examlly-tech) \
+     gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
      --method POST \
      --input - <<'EOF'
    {
-     "body": "{Principal Architect review from skill}",
-     "event": "COMMENT",
-     "comments": [{inline comments}]
+   "body": "{Principal Architect review from skill}",
+   "event": "COMMENT",
+   "comments": {architect_final_comments}
    }
    EOF
    ```
@@ -213,31 +259,24 @@ Review against:
 2. **Post SDE2 review:**
 
    ```bash
-   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+   GH_TOKEN=$(gh auth token --user examlly-tech) \
+     gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
      --method POST \
      --input - <<'EOF'
    {
-     "body": "{SDE2 review from skill}",
-     "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
-     "comments": [{inline comments}]
+   "body": "{SDE2 review from skill}",
+   "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
+   "comments": {sde2_final_comments}
    }
    EOF
    ```
 
-   **Verdict logic:**
+   **Verdict logic** (based on combined findings from both agents):
    | Condition | Event |
    |-----------|-------|
    | No blocking issues in either review | `APPROVE` |
    | Only minor issues (⚠️) | `COMMENT` |
    | Any blocking issues (❌) | `REQUEST_CHANGES` |
-
-3. **If Linear ticket linked:**
-   ```
-   mcp__linear__create_comment(
-     issueId: "{issue_id}",
-     body: "📋 **PR Review Complete**\n\n🏛️ Architect: {verdict}\n👨‍💻 SDE2: {verdict}\n\nSee PR for details: {pr_url}"
-   )
-   ```
 
 ---
 
@@ -245,14 +284,7 @@ Review against:
 
 When developer pushes changes after initial review, use follow-up mode to focus on what changed.
 
-### Agent Selection (Smart)
-
-| Condition                                  | Agents Used      |
-| ------------------------------------------ | ---------------- |
-| Only code fixes (same files modified)      | SDE2 only        |
-| New files added                            | SDE2 + Architect |
-| Significant structural changes             | SDE2 + Architect |
-| Previous review had architectural concerns | SDE2 + Architect |
+Both agents always run. Each agent covers the same focus lane as in the full review — Architect owns structure and architecture, SDE2 owns code quality and correctness.
 
 ### Phase F1: Get PR & Previous Reviews
 
@@ -261,27 +293,26 @@ When developer pushes changes after initial review, use follow-up mode to focus 
 2. **Fetch previous reviews:**
 
    ```bash
-   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews
+   gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
    ```
 
 3. **Fetch review comments:**
 
    ```bash
-   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/comments
+   gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
    ```
 
 4. **Parse previous review data:**
-   - Extract issues raised (blocking ❌ and minor ⚠️)
+   - Extract issues raised (blocking ❌ and minor ⚠️), separated by agent (Architect vs SDE2)
    - Note which files had comments
    - Get timestamp of last review
-   - Check if Architect raised architectural concerns
 
 ### Phase F2: Identify Changes Since Last Review
 
 1. **Get commits since last review:**
 
    ```bash
-   gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/commits
+   gh api repos/{owner}/{repo}/pulls/{pr_number}/commits
    ```
 
    - Filter to commits after last review timestamp
@@ -292,12 +323,7 @@ When developer pushes changes after initial review, use follow-up mode to focus 
    gh pr diff {pr_number}
    ```
 
-3. **Determine if Architect review needed:**
-   - Check for new files (not in previous review)
-   - Check for significant structural changes (new exports, renamed files)
-   - Check if previous Architect review had concerns
-
-4. **Read files that were:**
+3. **Read files that were:**
    - Mentioned in previous review comments
    - Modified in commits since last review
 
@@ -315,78 +341,122 @@ For each issue from the previous review:
    | ⚠️ Partially Fixed | Attempted but incomplete          |
    | 🔄 Changed         | Code changed, needs re-evaluation |
 
-### Phase F4: Review New Changes
+### Phase F4: Spawn Both Agents in Parallel
 
-**SDE2 Review (Always):**
+**IMPORTANT: Spawn both agents simultaneously. Do NOT execute the reviews yourself and do NOT wait for one before spawning the other.**
 
-**IMPORTANT: You MUST use the Task tool to spawn the SDE2 agent. Do NOT execute the review yourself.**
+Each agent covers the same focus lane as the full review.
 
 ```
-Task(
-  subagent_type: "sde2",
-  description: "Follow-up review for PR",
+Agent(
+  subagent_type: "principal-architect",
+  description: "Follow-up architecture review for PR",
   prompt: """
-  Follow-up review for PR #{pr_number} after changes.
+  Follow-up architecture review for PR #{pr_number} after changes.
 
   ## PR Details
   - Title: {pr_title}
   - Commits since last review: {commit list}
 
-  ## Previous Issues
-  {list of issues from previous review with file:line}
+  ## Previous Architectural Issues
+  {list of Architect issues from previous review with file:line}
 
   ## Files Modified Since Last Review
   {list of changed files}
 
+  ## Your Focus (same as full review — ONLY these areas)
+  - Module boundaries and folder structure
+  - Data model design and type system decisions
+  - Security boundaries (auth patterns, server-only access)
+  - Scalability concerns (N+1 queries, computed fields, caching)
+  - API contract design (route structure, response shapes)
+  - Stub/placeholder routes and their production readiness
+
+  ## Output Caps (strict — enforced; see pr-review-follow-up skill for full rules)
+  - **Review body = verdict line + template sections ONLY.** No preamble, no trailing summary.
+  - **No "Findings", "Observations", "Notes", "What's done well" sections.**
+  - **No praise.** Verdict signals quality; prose doesn't.
+  - **No numbered concern lists in the body** — use table rows.
+  - **Inline comment ≤50 words.** Count them.
+  - **Unresolved Issues "Notes" column ≤15 words.**
+
   ## Instructions
-  1. Read the pr-review-follow-up skill at `.claude/skills/pr-review-follow-up/SKILL.md`
-  2. Review ONLY files modified since last review
-  3. Check if previous issues are fixed
-  4. Look for new issues in the changes
-  5. Don't re-review unchanged code
+  1. Review ONLY files modified since last review
+  2. Check if previous architectural issues are fixed
+  3. Look for new architectural issues in the changes
+  4. Don't re-review unchanged code
+  5. Self-check: re-read your review. Any paragraph >2 sentences or inline comment >3 lines → cut or split.
+  6. Return findings — DO NOT post to GitHub yourself
   """
 )
-```
 
-**Architect Review (If Triggered):**
-
-Only spawn if: new files added, significant structural changes, or previous Architect review had concerns.
-
-```
-Task(
-  subagent_type: "principal-architect",
-  description: "Follow-up architecture review",
+Agent(
+  subagent_type: "sde2",
+  description: "Follow-up code quality review for PR",
   prompt: """
-  Follow-up architecture review for PR #{pr_number}.
+  Follow-up code quality review for PR #{pr_number} after changes.
 
-  ## Why Architect Review Triggered
-  {reason: new files / structural changes / previous concerns}
+  ## PR Details
+  - Title: {pr_title}
+  - Commits since last review: {commit list}
 
-  ## Previous Architectural Concerns
-  {list from previous Architect review if any}
+  ## Previous SDE2 Issues
+  {list of SDE2 issues from previous review with file:line}
 
-  ## New/Changed Files
-  {list of new or structurally changed files}
+  ## Files Modified Since Last Review
+  {list of changed files}
+
+  ## Your Focus (same as full review — ONLY these areas)
+  - Type safety and TypeScript correctness
+  - Deprecated or incorrect library API usage (Zod, Next.js, etc.)
+  - Error handling completeness
+  - Redundant or overly complex code patterns
+  - Naming and readability for the target audience (design students)
+  - Edge cases and potential runtime bugs
+
+  ## Output Caps (strict — enforced; see pr-review-follow-up skill for full rules)
+  - **Review body = verdict line + template sections ONLY.** No preamble, no trailing summary.
+  - **No "Findings", "Observations", "Notes", "What's done well" sections.**
+  - **No praise.** Verdict signals quality; prose doesn't.
+  - **No numbered concern lists in the body** — use table rows.
+  - **Inline comment ≤50 words.** Count them.
+  - **Unresolved Issues "Notes" column ≤15 words.**
 
   ## Instructions
-  1. Read the pr-review-follow-up skill at `.claude/skills/pr-review-follow-up/SKILL.md`
-  2. Review new files for architectural fit
-  3. Verify previous architectural concerns addressed
-  4. Check structural changes for system impact
+  1. Review ONLY files modified since last review
+  2. Check if previous SDE2 issues are fixed
+  3. Look for new code quality issues in the changes
+  4. Don't re-review unchanged code
+  5. Self-check: re-read your review. Any paragraph >2 sentences or inline comment >3 lines → cut or split.
+  6. Return findings — DO NOT post to GitHub yourself
   """
 )
 ```
 
-### Phase F5: Post Follow-up Review
+Wait for both to return, then proceed to Phase F5.
+
+### Phase F5: Consolidate & Post Follow-up Reviews
+
+Deduplicate inline comments across both agents (same as Phase 4 in full review mode), then post two separate reviews:
+
+1. **Post Principal Architect follow-up review**
+2. **Post SDE2 follow-up review**
+
+### Phase F6: Post Follow-up Review
+
+Post from the `examlly-tech` bot account (same pattern as Phase 6):
 
 ```bash
-gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+GH_TOKEN=$(gh auth token --user examlly-tech) \
+  gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --method POST \
   --input - <<'EOF'
 {
   "body": "{Follow-up review}",
   "event": "{APPROVE|COMMENT|REQUEST_CHANGES}",
-  "comments": [{inline comments on new issues only}]
+  "comments": [
+    {"path": "path/to/file", "line": 42, "body": "New issue or still present"}
+  ]
 }
 EOF
 ```
@@ -406,105 +476,55 @@ EOF
 ### Full Review Output
 
 ```markdown
-## PR Review Complete
+## PR Review — #{pr_number} {title}
 
-### PR: #{pr_number} - {title}
+**Principal Architect:** {APPROVED|NEEDS DISCUSSION|CHANGES REQUIRED}
+**SDE2:** {APPROVED|MINOR CHANGES|CHANGES REQUIRED}
 
-### Context Detected
+### Issues
 
-{packages/areas affected}
+| #   | Agent     | Severity    | File         | Issue         |
+| --- | --------- | ----------- | ------------ | ------------- |
+| 1   | Architect | ❌ Blocking | `file.ts:42` | {description} |
+| 2   | SDE2      | ⚠️ Minor    | `file.ts:15` | {description} |
 
-### Rules Loaded
-
-{list of rule files used}
-
-### Principal Architect Review
-
-**Verdict:** {APPROVED|NEEDS DISCUSSION|CHANGES REQUIRED}
-
-| Area          | Status  |
-| ------------- | ------- |
-| System Design | {emoji} |
-| Scalability   | {emoji} |
-| Data Model    | {emoji} |
-| Security      | {emoji} |
-
-**Challenges Raised:** {count}
-
-### SDE2 Review
-
-**Verdict:** {APPROVED|MINOR CHANGES|CHANGES REQUIRED}
-
-| Area           | Status  |
-| -------------- | ------- |
-| Type Safety    | {emoji} |
-| Error Handling | {emoji} |
-| Code Structure | {emoji} |
-
-**Issues:** {blocking} blocking, {minor} minor
-
-### Top Items to Address
-
-1. {Most critical from either review}
-2. {Second priority}
-3. {Third priority}
+{Omit Issues table entirely if no issues found.}
 
 ### Links
 
 - **PR:** {pr_url}
-- **Linear:** {linear_url}
+- **GitHub Issue:** #{issue_number}
 ```
 
 ### Follow-up Review Output
 
 ```markdown
-## Follow-up PR Review
+## Follow-up Review — #{pr_number} {title}
 
-### PR: #{pr_number} - {title}
+**SDE2:** {APPROVED|MINOR CHANGES|CHANGES REQUIRED}
+**Architect:** {APPROVED|NEEDS DISCUSSION|CHANGES REQUIRED|⏭️ Skipped}
 
-### Review Scope
+### Unresolved Issues
 
-- **SDE2:** ✅ Reviewing changes
-- **Architect:** {✅ Reviewing | ⏭️ Skipped (no structural changes)}
+| #   | Original Issue | File         | Status           | Notes                |
+| --- | -------------- | ------------ | ---------------- | -------------------- |
+| 1   | {description}  | `file.ts:42` | ❌ Still Present | {what's still wrong} |
+| 2   | {description}  | `file.ts:15` | ⚠️ Partial       | {what's missing}     |
 
-### Previous Issues Status
+{If all resolved: "All previous issues resolved."}
 
-| Issue         | File        | Status           | Notes           |
-| ------------- | ----------- | ---------------- | --------------- |
-| {description} | {file:line} | ✅ Fixed         | {how fixed}     |
-| {description} | {file:line} | ❌ Still Present | {what's wrong}  |
-| {description} | {file:line} | ⚠️ Partial       | {what's needed} |
+### New Issues
 
-### Summary
+| #   | Agent | Severity    | File         | Issue         |
+| --- | ----- | ----------- | ------------ | ------------- |
+| 1   | SDE2  | ❌ Blocking | `file.ts:10` | {description} |
 
-- **Fixed:** {count} issues
-- **Still Present:** {count} issues
-- **New Issues:** {count} issues
-
-### New Changes Review
-
-| File   | Change         | Assessment       |
-| ------ | -------------- | ---------------- |
-| {file} | {what changed} | ✅/⚠️/❌ {notes} |
-
-### New Issues Found (if any)
-
-#### Blocking ❌
-
-- {new issue with file:line}
-
-#### Minor ⚠️
-
-- {new issue with file:line}
-
-### Verdict: {APPROVED|CHANGES REQUESTED}
-
-{Summary message}
+{Omit New Issues table entirely if none.}
 
 ### Links
 
 - **PR:** {pr_url}
-- **Linear:** {linear_url}
+- **GitHub Issue:** #{issue_number}
 ```
 
 ---
@@ -516,5 +536,6 @@ EOF
 3. **Be constructive** - Explain why, not just what
 4. **Prioritize** - Blocking issues vs nice-to-haves
 5. **Follow loaded rules** - Rules files are source of truth
-6. **Consider context** - Understand the ticket's goals
+6. **Consider context** - Understand the issue's goals
 7. **In follow-up mode** - Focus on changes, don't repeat old feedback
+8. **No deferral framing** - Anything worth flagging is fixable in this PR. Do not recommend deferring to a follow-up PR unless you cite an existing tracked issue or milestone. See `.claude/rules/no-follow-up-deferral.md`.

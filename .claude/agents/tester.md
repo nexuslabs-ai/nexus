@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch
 model: opus
 permissionMode: bypassPermissions
 skills:
-  - implement-test
+  - implement-test-guide
 ---
 
 # Tester Agent
@@ -44,11 +44,16 @@ Think like a **Senior QA Engineer / SDET** who believes that tests are the first
 
 These rules apply to ALL skills this agent executes. Read and internalize before starting any task.
 
-| Rule                                | Purpose                                       |
-| ----------------------------------- | --------------------------------------------- |
-| [workflow.md](../rules/workflow.md) | Phase-based execution (plan → execute → wait) |
-| [github.md](../rules/github.md)     | PR conventions, commit format, branch naming  |
-| [linear.md](../rules/linear.md)     | Ticket linking, status updates, comments      |
+| Rule                                                              | Purpose                                                                             |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [code-quality.md](../rules/code-quality.md)                       | Governing principle: favor simplicity over cleverness; index to per-rule files      |
+| [ripple-effect.md](../rules/ripple-effect.md)                     | Test changes must leave helpers, fixtures, and adjacent tests consistently updated  |
+| [parse-dont-narrow.md](../rules/parse-dont-narrow.md)             | zod at fixture boundaries; never hand-roll runtime guards in tests                  |
+| [guard-clauses.md](../rules/guard-clauses.md)                     | Keep the assertion path at column 0; exit early on setup failures                   |
+| [logging-proportionality.md](../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                             |
+| [code-comments.md](../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues   |
+| [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no migration files; edit the three baseline files    |
+| [docs-mcp.md](../rules/docs-mcp.md)                               | MANDATORY: query examlly-docs-mcp for any third-party API; do not guess from memory |
 
 ## Focus Areas
 

@@ -8,7 +8,7 @@ allowed-tools:
   - Bash
   - WebSearch
   - WebFetch
-user-invocable: true
+user-invocable: false
 ---
 
 # Design Plan
@@ -22,27 +22,33 @@ Create comprehensive implementation plans for complex tasks, providing architect
 - Complex features with architectural decisions
 - Tasks spanning multiple files/modules
 - New patterns or abstractions needed
-- When user requests `--with-architect` flag
+- When the implement command coordinator spawns you for planning
 
-## Task-Specific Rules
+## Base Rules
 
-Based on task type, reference these rules when planning:
+Always load and follow:
 
-| Task Type    | Rules to Reference                                                           |
-| ------------ | ---------------------------------------------------------------------------- |
-| Component    | [components.md](../../rules/components.md), [figma.md](../../rules/figma.md) |
-| Token System | [tokens.md](../../rules/tokens.md)                                           |
-
-**Always also load:** Base rules (workflow, github, linear)
+| Rule                                                                             | Purpose                                                                             |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files      |
+| [ripple-effect.md](../../rules/ripple-effect.md)                                 | Plan must account for callers, callees, and adjacent code consistency               |
+| [parse-dont-narrow.md](../../rules/parse-dont-narrow.md)                         | Identify boundary points for zod parsing in the plan                                |
+| [dont-duplicate-validation.md](../../rules/dont-duplicate-validation.md)         | Plan single-layer validation; don't duplicate across layers                         |
+| [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Component shape decisions: `children` or per-mode split, never render callbacks     |
+| [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Design data flow so effects sync with external systems, not React state             |
+| [project-stage.md](../../rules/project-stage.md)                                 | Pre-production: no backcompat, no migration files; edit the three baseline files    |
+| [docs-mcp.md](../../rules/docs-mcp.md)                                           | MANDATORY: query examlly-docs-mcp for any third-party API; do not guess from memory |
+| [github.md](../../rules/github.md)                                               | PR title/body templates, branch naming, commit format, `Closes #N`                  |
+| [design.md](../../rules/design.md)                                               | Mobile-first, three required states (loading/empty/error), accessibility floors     |
 
 ## Planning Process
 
 ### Phase 1: Understand Requirements
 
-1. **Read the Linear ticket thoroughly:**
+1. **Fetch the GitHub issue if one is referenced:**
 
-   ```
-   mcp__linear__get_issue(id: "{issue_id}", includeRelations: true)
+   ```bash
+   gh issue view {number} --json number,title,body,labels,state,url
    ```
 
 2. **Extract key information:**
@@ -50,10 +56,6 @@ Based on task type, reference these rules when planning:
    - What are the acceptance criteria?
    - Any constraints or requirements?
    - Linked designs or references?
-
-3. **If Figma link present:**
-   - Use `mcp__figma__get_design_context` to understand the design
-   - Note complexity and variants
 
 ### Phase 2: Research Technology Context
 
@@ -133,9 +135,9 @@ Based on task type, reference these rules when planning:
    - What could go wrong?
    - What assumptions are being made?
 
-### Phase 6: Present Plan for Approval
+### Phase 6: Return the Plan
 
-Output the plan and **WAIT for user approval** before implementation.
+Output the plan in the format below and return it. The coordinator will present it to the user and handle approval.
 
 ## Output Format
 
@@ -144,7 +146,7 @@ Output the plan and **WAIT for user approval** before implementation.
 
 ### Task
 
-- **Linear:** {issue_id} - {title}
+- **GitHub Issue:** #{issue_number} - {title}
 - **Complexity:** {Low|Medium|High}
 - **Estimated Phases:** {count}
 

@@ -2,29 +2,35 @@
 
 ## Repository Info
 
-| Field       | Value             |
-| ----------- | ----------------- |
-| Owner       | `INNOVATIVEGAMER` |
-| Repo        | `ds`              |
-| Main Branch | `main`            |
+| Field       | Value                                        |
+| ----------- | -------------------------------------------- |
+| Owner       | Inferred from `git remote` — do not hardcode |
+| Repo        | Inferred from `git remote` — do not hardcode |
+| Main Branch | `main`                                       |
+
+**Resolve `{owner}` and `{repo}` at runtime:**
+
+```bash
+gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"'
+```
 
 ## PR Title Format
 
-PR titles MUST include the Linear issue ID in brackets for auto-linking:
+PR titles use conventional commit format:
 
 ```
-{type}({scope}): {description} [{issue_id}]
+{type}({scope}): {description}
 ```
 
 **Examples:**
 
-- `feat(react): add Button component [NEX-123]`
-- `fix(tailwind): correct spacing token values [NEX-456]`
-- `ci: setup GitHub Actions workflow [NEX-140]`
+- `feat(api): add question generation endpoint`
+- `fix(auth): correct token refresh logic`
+- `ci: setup GitHub Actions workflow`
 
 ### Commit Type Mapping
 
-| Ticket Type    | Commit Type     |
+| Change Type    | Commit Type     |
 | -------------- | --------------- |
 | Feature        | `feat`          |
 | Bug            | `fix`           |
@@ -41,78 +47,121 @@ Standard PR body structure:
 
 {bullet points of what changed}
 
-## Linear Issue
+## GitHub Issue
 
-Closes {issue_id}
+Closes #123
 
 ## Test Plan
 
 - [ ] {verification step 1}
 - [ ] {verification step 2}
-
-🤖 Generated with Claude Code
 ```
 
-### Component PR Body
+## Closing Issues via PR
 
-For component PRs, include Figma section:
+Use `Closes #123` in the PR body — GitHub automatically closes the issue when the PR merges.
 
-```markdown
-## Summary
+| Keyword         | Effect on Merge  |
+| --------------- | ---------------- |
+| `Closes #123`   | Closes the issue |
+| `Fixes #123`    | Closes the issue |
+| `Resolves #123` | Closes the issue |
 
-- Adds `{ComponentName}` component to @nexus/react
-- Implements all variants from Figma design
-- Includes Storybook stories with interaction tests
+**Always use `Closes #123` in the "GitHub Issue" section.** Prefer `Closes` for consistency.
 
-## Linear Issue
+## Branch Naming
 
-Closes {issue_id}
+Derive branch name from the GitHub issue:
 
-## Figma
-
-{figma_urls}
-
-## Test Plan
-
-- [ ] Visual review in Storybook
-- [ ] Verify Figma parity
-- [ ] All tests passing
-
-🤖 Generated with Claude Code
+```
+{username}/issue-{number}-{slugified-title}
 ```
 
-## Magic Words for Linear Linking
+**Example:** `prasad/issue-42-add-question-generation`
 
-These keywords in PR body trigger Linear automation:
+Or use the GitHub CLI to generate the branch automatically:
 
-| Keyword            | Effect on Merge     |
-| ------------------ | ------------------- |
-| `Closes NEX-###`   | Marks issue as Done |
-| `Fixes NEX-###`    | Marks issue as Done |
-| `Resolves NEX-###` | Marks issue as Done |
+```bash
+gh issue develop 42
+```
 
-**Always use `Closes {issue_id}` in the "Linear Issue" section.**
+## Issue Labels
 
-## Auto-Linking Behavior
+| Label              | Usage                            |
+| ------------------ | -------------------------------- |
+| `bug`              | Something is broken or incorrect |
+| `enhancement`      | New feature or improvement       |
+| `good first issue` | Suitable for new contributors    |
+| `question`         | Further information needed       |
+| `documentation`    | Documentation-only changes       |
+| `help wanted`      | Extra attention needed           |
 
-When PR title contains `[NEX-###]`:
+## Issue Extraction
 
-| Event               | Linear Update                      |
-| ------------------- | ---------------------------------- |
-| PR opened (draft)   | Issue → In Progress                |
-| PR ready for review | Issue → In Review                  |
-| PR merged           | Issue → Done (if `Closes` present) |
+When extracting a GitHub issue number from a PR or user input:
+
+| Source     | Pattern                     | Priority        |
+| ---------- | --------------------------- | --------------- |
+| PR Body    | `Closes #123`, `Fixes #123` | 1st (preferred) |
+| PR Body    | `#123` (standalone)         | 2nd             |
+| User Input | Direct input                | Fallback        |
+
+**Extraction order:**
+
+1. Check PR body for `Closes #123` or `Fixes #123`
+2. Check PR body for standalone `#123`
+3. If not found, ask user
 
 ## `gh` CLI Reference
+
+All GitHub interactions use the `gh` CLI. Authenticate with `gh auth login`.
+
+### Accounts
+
+Each developer's `gh` CLI is logged in to two accounts:
+
+| Account                    | Role          | Used For                                                           |
+| -------------------------- | ------------- | ------------------------------------------------------------------ |
+| Your personal GitHub login | Main (active) | Everything except posting reviews — PRs, issues, commits, fetching |
+| `examlly-tech`             | Shared bot    | **Posting** PR reviews only (`POST /pulls/{n}/reviews`)            |
+
+**First-time setup:** run `gh auth login` to add the `examlly-tech` bot (ask a teammate for credentials), then `gh auth switch --user <your-personal-account>` so your own account stays active.
+
+When posting a PR review, prefix the command with `GH_TOKEN=$(gh auth token --user examlly-tech)` to post from the bot. This keeps review comments attributed to the bot and avoids GitHub's self-authored-PR rejection of `APPROVE` / `REQUEST_CHANGES`, since the bot is never the PR author.
+
+Every other `gh` command — fetching reviews, reading comments, creating PRs, etc. — uses your personal account as-is, no prefix.
+
+### Fetching Issues
+
+```bash
+gh issue view 123 --json number,title,body,labels,state,url
+```
+
+Key fields: `title`, `body`, `labels`, `state`, `url`
+
+### Adding Comments to Issues
+
+```bash
+gh issue comment 123 --body "Comment text..."
+```
 
 ### Creating PRs
 
 ```bash
 gh pr create \
-  --title "{title with [issue_id]}" \
-  --head "{branch_name}" \
-  --base "main" \
-  --body "{PR body}"
+  --title "feat(api): add search endpoint" \
+  --body "$(cat <<'EOF'
+## Summary
+- ...
+
+## GitHub Issue
+Closes #123
+
+## Test Plan
+- [ ] ...
+EOF
+)" \
+  --base main
 ```
 
 ### Fetching PR Details
@@ -121,23 +170,27 @@ gh pr create \
 gh pr view {pr_number} --json number,title,body,headRefName,baseRefName,author,url,mergedAt
 ```
 
-Key fields:
+Key fields: `title`, `body` (extract issue number from `Closes #123`), `mergedAt`, `headRefName`
 
-- `title` - PR title (extract issue ID from `[NEX-###]`)
-- `body` - PR description (extract from `Closes NEX-###`)
-- `mergedAt` - Merge timestamp (null if not merged)
-- `headRefName` - Branch name
-
-### Fetching PR Files / Diff
+### Fetching PR Diff
 
 ```bash
 gh pr diff {pr_number}
 ```
 
-### Creating PR Reviews
+For a structured file list:
 
 ```bash
-gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews \
+gh pr view {pr_number} --json files
+```
+
+### Creating PR Reviews
+
+Posted from the `examlly-tech` bot account (see [Accounts](#accounts)):
+
+```bash
+GH_TOKEN=$(gh auth token --user examlly-tech) \
+  gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --method POST \
   --input - <<'EOF'
 {
@@ -154,13 +207,13 @@ EOF
 
 ```bash
 # Reviews (verdict + body)
-gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/reviews
+gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
 
 # Inline comments
-gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/comments
+gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
 
 # Commits on a PR
-gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/commits
+gh api repos/{owner}/{repo}/pulls/{pr_number}/commits
 ```
 
 ### Review Verdicts
@@ -178,23 +231,19 @@ gh api repos/INNOVATIVEGAMER/ds/pulls/{pr_number}/commits
 
 {body - what was done}
 
-Closes {issue_id}
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+Closes #{issue_number}
 ```
 
 **Example:**
 
 ```
-feat(react): add Avatar component
+feat(api): add question generation endpoint
 
-- Implements Avatar with all Figma variants
-- Adds Storybook stories with play function tests
-- Follows Nexus design system conventions
+- Implements question generation with AI pipeline
+- Adds input validation and error handling
+- Includes unit tests for edge cases
 
-Closes NEX-150
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+Closes #42
 ```
 
 ## Branch Operations
@@ -218,12 +267,11 @@ git push origin --delete {branch_name}
 
 ### Summary
 
-| Category      | Status   | Issues  |
-| ------------- | -------- | ------- |
-| Architecture  | {status} | {notes} |
-| Code Quality  | {status} | {notes} |
-| Testing       | {status} | {notes} |
-| Accessibility | {status} | {notes} |
+| Category     | Status   | Issues  |
+| ------------ | -------- | ------- |
+| Architecture | {status} | {notes} |
+| Code Quality | {status} | {notes} |
+| Testing      | {status} | {notes} |
 
 ### Verdict: {APPROVED|CHANGES REQUESTED|REVIEWED}
 
@@ -231,13 +279,12 @@ git push origin --delete {branch_name}
 
 ---
 
-_Review performed against: `.claude/rules/components.md`, `.claude/rules/testing.md`, etc._
+_Review performed against: `.claude/rules/` guidelines_
 ```
 
 ## Do Not
 
-- Create PRs without `[{issue_id}]` in title (breaks auto-linking)
-- Forget `Closes {issue_id}` in PR body (breaks auto-done)
+- Forget `Closes #123` in PR body (breaks auto-close on merge)
 - Use `Fixes` inconsistently (prefer `Closes` for consistency)
 - Skip the Test Plan section
-- Forget `Co-Authored-By` in commits
+- Post PR reviews without the `GH_TOKEN=$(gh auth token --user examlly-tech)` prefix (reviews must come from the bot)

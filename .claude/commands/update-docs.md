@@ -4,9 +4,9 @@ Update documentation based on codebase changes using the Technical Writer agent.
 
 ## Agent Used
 
-| Agent                                             | Skill                                         | Purpose                         |
-| ------------------------------------------------- | --------------------------------------------- | ------------------------------- |
-| [Technical Writer](../agents/technical-writer.md) | [update-docs](../skills/update-docs/SKILL.md) | Keep docs accurate and complete |
+| Agent                                             | Skill                                                     | Purpose                         |
+| ------------------------------------------------- | --------------------------------------------------------- | ------------------------------- |
+| [Technical Writer](../agents/technical-writer.md) | [update-docs-guide](../skills/update-docs-guide/SKILL.md) | Keep docs accurate and complete |
 
 ## Input (Optional)
 
@@ -36,7 +36,7 @@ Examples:
                   ▼
 ┌─────────────────────────────────────────┐
 │    Spawn Technical Writer Agent         │
-│  • Use Task tool with subagent_type     │
+│  • Use Agent tool with subagent_type     │
 │  • Pass scope in prompt                 │
 └─────────────────┬───────────────────────┘
                   │
@@ -69,10 +69,10 @@ Examples:
 
 ### Phase 2: Spawn Technical Writer Agent
 
-**IMPORTANT: You MUST use the Task tool to spawn the agent. Do NOT execute the skill yourself.**
+**IMPORTANT: You MUST use the Agent tool to spawn the agent. Do NOT execute the skill yourself.**
 
 ```
-Task(
+Agent(
   subagent_type: "technical-writer",
   description: "Update documentation",
   prompt: """
@@ -82,15 +82,13 @@ Task(
   {scope description - recent changes / specific path / full audit}
 
   ## Instructions
-  1. Read the update-docs skill at `.claude/skills/update-docs/SKILL.md`
-  2. Follow the workflow phases:
+  1. Follow the workflow phases:
      - Phase 1: Analyze changes (git diff for recent, or specified scope)
      - Phase 2: Discover affected documentation files
      - Phase 3: Review and compare docs against code
-     - Phase 4: Propose updates
-     - Phase 5: Confirm and apply (ask user before applying)
-  3. Use dynamic discovery, not hardcoded mappings
-  4. Prioritize: Critical (incorrect) > High (missing APIs) > Medium (missing examples) > Low (wording)
+     - Phase 4: Propose and apply updates
+  2. Use dynamic discovery, not hardcoded mappings
+  3. Prioritize: Critical (incorrect) > High (missing APIs) > Medium (missing examples) > Low (wording)
   """
 )
 ```
