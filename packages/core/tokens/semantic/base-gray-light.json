@@ -263,7 +263,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{orange.900}",
+      "$value": "{orange.300}",
       "$type": "color"
     },
     "subtle": {
