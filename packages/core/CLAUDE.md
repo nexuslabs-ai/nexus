@@ -39,7 +39,7 @@ tokens/
 │   ├── base-slate-light.json  # Slate base - light mode
 │   ├── base-slate-dark.json   # Slate base - dark mode
 │   ├── base-{palette}-*.json  # Other palette variants (neutral, zinc, gray, stone)
-│   ├── brands-{brand}-*.json  # Brand variants (blue, gray, neutral, slate)
+│   ├── brands-{brand}-*.json  # Brand variants (blue, gray, neutral, slate, stone)
 │   └── spacing.json           # Spacing semantic mappings
 ├── styles/
 │   ├── typography.json        # Typography style definitions → @utility classes
@@ -126,8 +126,8 @@ The generation scripts read these extensions and automatically output `@import` 
 Themes are selected via CLI arguments for the tailwind generation script:
 
 ```bash
-# Default theme (all options have defaults)
-yarn tokens:tailwind  # Uses slate/blue/vega defaults
+# Bundled theme (current package.json defaults)
+yarn tokens:tailwind  # Uses stone/neutral/sharp defaults
 
 # Custom theme
 node scripts/generate-tailwind-package.js --base=neutral --brand=gray --size=lyra
@@ -137,12 +137,12 @@ Available options:
 
 | Option          | Default | Values                               |
 | --------------- | ------- | ------------------------------------ |
-| `--base`        | slate   | slate, neutral, zinc, gray, stone    |
-| `--brand`       | blue    | blue, gray, neutral, slate           |
+| `--base`        | stone   | slate, neutral, zinc, gray, stone    |
+| `--brand`       | neutral | blue, gray, neutral, slate, stone    |
 | `--size`        | vega    | vega, lyra, maia, mira, nova         |
 | `--typography`  | vega    | vega, lyra, maia, mira, nova         |
 | `--shadow`      | vega    | vega, lyra, maia, mira, nova         |
-| `--radius`      | subtle  | blunt, sharp, subtle, smooth, mellow |
+| `--radius`      | sharp   | blunt, sharp, subtle, smooth, mellow |
 | `--borderwidth` | vega    | vega, lyra, maia, mira, nova         |
 
 ## Generated CSS Structure

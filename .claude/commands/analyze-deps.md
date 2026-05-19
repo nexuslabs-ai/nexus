@@ -4,9 +4,9 @@ Analyze dependencies for updates, breaking changes, deprecations, and migration 
 
 ## Agent Used
 
-| Agent                         | Skill                                           | Purpose                    |
-| ----------------------------- | ----------------------------------------------- | -------------------------- |
-| [DevOps](../agents/devops.md) | [analyze-deps](../skills/analyze-deps/SKILL.md) | Dependency analysis report |
+| Agent                         | Skill                                                       | Purpose                    |
+| ----------------------------- | ----------------------------------------------------------- | -------------------------- |
+| [DevOps](../agents/devops.md) | [analyze-deps-guide](../skills/analyze-deps-guide/SKILL.md) | Dependency analysis report |
 
 ## Input
 
@@ -47,7 +47,7 @@ Parse `$ARGUMENTS` for:
                   ▼
 ┌─────────────────────────────────────────┐
 │         Spawn DevOps Agent              │
-│  • Use Task tool with subagent_type     │
+│  • Use Agent tool with subagent_type     │
 │  • Pass scope in prompt                 │
 └─────────────────┬───────────────────────┘
                   │
@@ -87,10 +87,10 @@ Parse `$ARGUMENTS` for:
 
 ### Phase 2: Spawn DevOps Agent
 
-**IMPORTANT: You MUST use the Task tool to spawn the DevOps agent. Do NOT execute the skill yourself.**
+**IMPORTANT: You MUST use the Agent tool to spawn the DevOps agent. Do NOT execute the skill yourself.**
 
 ```
-Task(
+Agent(
   subagent_type: "devops",
   description: "Analyze dependencies",
   prompt: """
@@ -101,15 +101,14 @@ Task(
   - Mode: {single-package | workspace | all-workspaces}
 
   ## Instructions
-  1. Read the analyze-deps skill at `.claude/skills/analyze-deps/SKILL.md`
-  2. Follow the 5-phase workflow:
+  1. Follow the 5-phase workflow:
      - Resolve package.json(s)
      - Query npm registry
      - Research breaking changes (for updates)
      - Scan codebase impact
      - Generate report
-  3. Save report to `reports/deps/{target}-{YYYY-MM-DD}.md`
-  4. Return summary of findings
+  2. Save report to `reports/deps/{target}-{YYYY-MM-DD}.md`
+  3. Return summary of findings
   """
 )
 ```

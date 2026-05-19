@@ -1,263 +1,219 @@
 # Implement
 
-Implement features and tasks using the SDE2 agent, with optional architectural guidance from Principal Architect. Works with any context source.
+Implements features directly without agent delegation. You handle both planning and execution yourself, following the implement skill.
 
-## Agents Used
+## Skill Used
 
-| Agent                                                   | Skill                                         | When Used                         |
-| ------------------------------------------------------- | --------------------------------------------- | --------------------------------- |
-| [Principal Architect](../agents/principal-architect.md) | [design-plan](../skills/design-plan/SKILL.md) | Only with `--with-architect` flag |
-| [SDE2](../agents/sde2.md)                               | [implement](../skills/implement/SKILL.md)     | Always                            |
+| Skill                                                 | Purpose                         |
+| ----------------------------------------------------- | ------------------------------- |
+| [implement-guide](../skills/implement-guide/SKILL.md) | Planning + implementation guide |
 
-## Input (Optional)
+## Input
 
-- **$ARGUMENTS**: Linear ID, file path, or flags
+- **$ARGUMENTS**: GitHub issue number, file path, or description
 
 ```
 Examples:
-  /implement                           → Use conversation context
-  /implement NEX-150                   → Fetch from Linear
-  /implement ./specs/feature.md        → Read markdown spec
-  /implement --with-architect          → Architect plans first (conversation context)
-  /implement NEX-150 --with-architect  → Linear + Architect
-  /implement NEX-150 -a                → Short flag for architect
+  /implement                     -> Conversation context
+  /implement #42                 -> GitHub issue
+  /implement ./specs/feature.md  -> Markdown spec
 ```
 
-## Context Detection
-
-Parse `$ARGUMENTS` for:
-
-| Pattern                    | Context Source            |
-| -------------------------- | ------------------------- |
-| `NEX-###`                  | Linear ticket             |
-| `*.md` path                | Markdown spec file        |
-| `--with-architect` or `-a` | Enable architect planning |
-| (none)                     | Use conversation context  |
-
-## Flow: Default (SDE2 Only)
+## Flow
 
 ```
-┌─────────────────────────────────────────┐
-│              /implement                 │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│           Detect Context                │
-│  • Linear ID? → Fetch ticket            │
-│  • .md file? → Read spec                │
-│  • Otherwise → Use conversation         │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│          Spawn SDE2 Agent               │
-│  • Use Task tool with subagent_type     │
-│  • Pass context in prompt               │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│      SDE2 Executes implement skill      │
-│  • Gather requirements                  │
-│  • Explore existing code                │
-│  • Create plan (TodoWrite)              │
-│  • Implement phase by phase             │
-│  • Verify & test                        │
-└─────────────────────────────────────────┘
+Detect Context
+     |
+     v
+Branch Setup
+     |
+     v
+Read skill -> Plan (yourself)
+     |
+     v
+Show plan to user -> WAIT for approval -> create TodoWrite
+     |
+     v
++--- For each phase ----------------------------------------+
+|                                                            |
+|   Mark in_progress                                         |
+|   Implement phase (yourself, following skill)              |
+|   ** COMMIT changes (MANDATORY before moving on) **        |
+|   Mark completed -> next phase                             |
++------------------------------------------------------------+
+     |
+     v
+Report summary
 ```
 
-## Flow: With Architect
-
-```
-┌─────────────────────────────────────────┐
-│      /implement --with-architect        │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│           Detect Context                │
-│  • Same detection as above              │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│    Spawn Principal Architect Agent      │
-│  • Use Task tool with subagent_type     │
-│  • Pass context in prompt               │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│    Architect Executes design-plan skill │
-│  • Understand requirements              │
-│  • Research technology context          │
-│  • Explore existing architecture        │
-│  • Design solution                      │
-│  • Create implementation plan           │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│         WAIT for user approval          │
-│  "Does this plan look good?"            │
-└─────────────────┬───────────────────────┘
-                  │ User approves
-                  ▼
-┌─────────────────────────────────────────┐
-│          Spawn SDE2 Agent               │
-│  • Use Task tool with subagent_type     │
-│  • Pass approved plan in prompt         │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│    SDE2 Executes implement with plan    │
-│  • Follow architect's phases            │
-│  • Implement according to plan          │
-│  • Verify & test                        │
-└─────────────────────────────────────────┘
-```
+---
 
 ## Execution
 
 ### Phase 1: Detect Context
 
-1. **Parse arguments for context:**
+Parse `$ARGUMENTS`:
+
+```
+If #123 found   -> gh issue view 123 --json number,title,body,labels,state,url
+If .md path     -> Read file content
+Otherwise       -> Use conversation context
+```
+
+Collect:
+
+- Full requirements text
+- Acceptance criteria (explicit or inferred)
+- Any design references or constraints
+
+### Phase 2: Branch Setup
+
+1. Check current branch:
+
+   ```bash
+   git branch --show-current
+   ```
+
+2. Derive branch name:
+
+   | Context      | Branch name pattern                           |
+   | ------------ | --------------------------------------------- |
+   | GitHub issue | `{username}/issue-{number}-{slugified-title}` |
+   | Spec file    | `{username}/{slugified-filename}`             |
+   | Conversation | Ask user                                      |
+
+3. Check if branch exists:
+
+   ```bash
+   git branch --list "{branch_name}"
+   git ls-remote --heads origin "{branch_name}"
+   ```
+
+   - Exists locally -> ask user: checkout existing or create new?
+   - Exists on remote only -> fetch and checkout
+
+4. Ask user for base branch (default: `main`)
+
+5. Create and checkout:
+
+   ```bash
+   git checkout -b {branch_name} {base_branch}
+   ```
+
+6. Confirm to user:
 
    ```
-   If NEX-### found → mcp__linear__get_issue(id: "{issue_id}")
-   If .md path found → Read file content
-   Otherwise → Use conversation history as context
+   On branch: {branch_name} (based on {base_branch})
    ```
 
-2. **Collect context to pass to agents:**
-   - Task requirements (from Linear/spec/conversation)
-   - Relevant rules based on expected file changes
-   - Any constraints or preferences mentioned
+### Phase 3: Planning
 
-### Phase 2: Spawn Agents
+**Do this yourself. Do NOT spawn any agents.**
 
-**If `--with-architect` flag present:**
+1. Read the implement skill at `.claude/skills/implement-guide/SKILL.md`
+2. Follow Part 1 (Planning) of the skill exactly:
+   - Understand requirements
+   - Research technology context
+   - Explore existing architecture
+   - Design the solution
+   - Create the implementation plan
 
-**IMPORTANT: You MUST use the Task tool to spawn agents. Do NOT execute the skills yourself.**
+3. Present the plan in the skill's planning output format.
 
-First, spawn the Principal Architect:
+### Phase 4: Plan Approval
 
-```
-Task(
-  subagent_type: "principal-architect",
-  description: "Design plan for implementation",
-  prompt: """
-  Create an implementation plan for this task.
+After creating the plan:
 
-  ## Task Context
-  - Source: {Linear NEX-### | spec file | conversation}
-  - Requirements: {task requirements}
+1. Create TodoWrite from the phase list
+2. Present to user:
 
-  ## Instructions
-  1. Read the design-plan skill at `.claude/skills/design-plan/SKILL.md`
-  2. Understand requirements thoroughly
-  3. Research technology context
-  4. Explore existing architecture
-  5. Design solution with phases
-  6. Return the implementation plan
-  """
-)
-```
+   ```markdown
+   ## Implementation Plan
 
-After architect returns plan:
+   {plan content from Phase 3}
 
-- Present plan to user
-- WAIT for user approval
-- Then proceed to spawn SDE2
+   Does this plan look good? Let me know if you'd like any changes before we start.
+   ```
 
-**Spawn SDE2 Agent:**
+3. **WAIT for user approval**
 
-```
-Task(
-  subagent_type: "sde2",
-  description: "Implement task",
-  prompt: """
-  Implement this task.
+4. If user requests changes -> adjust the plan, update TodoWrite, present again
 
-  ## Task Context
-  - Source: {Linear NEX-### | spec file | conversation}
-  - Requirements: {task requirements}
-  {If architect plan exists:}
-  - Architect Plan: {the approved plan}
+### Phase 5: Implementation Loop
 
-  ## Instructions
-  1. Read the implement skill at `.claude/skills/implement/SKILL.md`
-  2. Follow the workflow (gather → explore → plan → implement → verify)
-  3. If architect plan exists, follow its phases
-  4. Implement phase by phase with summaries
-  5. Verify with typecheck and lint
-  """
-)
+For each phase in the approved plan:
+
+#### Step A -- Mark in_progress
+
+Update the todo item to `in_progress`.
+
+#### Step B -- Implement
+
+**Do this yourself. Do NOT spawn any agents.**
+
+Follow Part 2 (Implementation) of the skill:
+
+1. Explore existing code relevant to this phase
+2. Research any third-party dependencies
+3. Implement only this phase
+4. Verify with typecheck and lint
+
+#### Step B.1 -- Commit (MANDATORY)
+
+**You MUST commit after every phase, before moving to the next phase.**
+
+```bash
+git add -A && git commit -m "phase {n}: {phase name}"
 ```
 
-The SDE2 agent will:
+Do NOT batch commits. Do NOT defer commits to the end. Each phase gets its own commit immediately after implementation.
 
-- Follow the implement skill workflow
-- Create TodoWrite for tracking
-- Implement phase by phase
-- Verify with tests
+#### Step C -- Mark completed
 
-### Phase 3: Report Completion
+Mark todo item as `completed` and proceed immediately to the next phase. Do NOT wait for user confirmation between phases.
 
-After implementation is complete, output:
+### Phase 6: Report
+
+After all phases are done:
 
 ```markdown
 ## Implementation Complete
 
 ### Task Reference
 
-{Include whichever applies:}
+{GitHub Issue #123 -- title | Spec: filename.md | Request: summary}
 
-- **Linear:** NEX-### - {title}
-- **Spec:** {filename.md}
-- **Request:** {brief summary}
+### Completed Phases
 
-### Execution Mode
+| #   | Phase        | Status |
+| --- | ------------ | ------ |
+| 1   | {phase name} | Done   |
+| 2   | {phase name} | Done   |
 
-{SDE2 Only | With Architect Guidance}
+### Files Modified
 
-### Changes Made
-
-| File           | Change        |
-| -------------- | ------------- |
-| `path/to/file` | {description} |
+| File               | Change        |
+| ------------------ | ------------- |
+| `path/to/file.tsx` | {description} |
 
 ### Verification
 
-- [ ] TypeScript: No errors
-- [ ] Lint: No warnings
-- [ ] Tests: All passing
+- TypeScript: No errors
+- Lint: No warnings
 
 ### Next Steps
 
-{User can now review changes, create PR, etc.}
+- Review changes: `git diff main`
+- Create PR: `gh pr create` or `/pr-review`
 ```
 
-## When to Use `--with-architect`
+---
 
-| Task Complexity                | Recommendation     |
-| ------------------------------ | ------------------ |
-| Simple bug fix                 | SDE2 only          |
-| Single file change             | SDE2 only          |
-| New component (well-defined)   | SDE2 only          |
-| Multi-file feature             | Consider architect |
-| Architectural decisions needed | Use architect      |
-| New patterns/abstractions      | Use architect      |
-| Unclear requirements           | Use architect      |
+## When to Ask User
 
-## Error Handling
-
-| Error                   | Action                              |
-| ----------------------- | ----------------------------------- |
-| Linear issue not found  | Ask user to verify issue ID         |
-| Spec file not found     | Ask user to verify file path        |
-| Unclear requirements    | Ask user for clarification          |
-| Architect plan rejected | Revise plan or ask for guidance     |
-| Implementation blocked  | Ask user for decision (no patches!) |
+| Situation                          | Action                                  |
+| ---------------------------------- | --------------------------------------- |
+| After creating the plan            | Always show plan and WAIT for approval  |
+| Branch already exists              | Ask: checkout existing or create new?   |
+| Branch name unknown (conversation) | Ask user for branch name                |
+| Blocked on ambiguous requirements  | Ask for clarification before continuing |

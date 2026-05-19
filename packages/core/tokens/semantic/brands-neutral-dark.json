@@ -1,18 +1,18 @@
 {
   "primary": {
     "background": {
-      "$value": "{neutral.900}",
-      "$type": "color"
-    },
-    "foreground": {
-      "$value": "{white}",
-      "$type": "color"
-    },
-    "background-hover": {
       "$value": "{neutral.100}",
       "$type": "color"
     },
     "background-active": {
+      "$value": "{neutral.300}",
+      "$type": "color"
+    },
+    "foreground": {
+      "$value": "{neutral.900}",
+      "$type": "color"
+    },
+    "background-hover": {
       "$value": "{neutral.200}",
       "$type": "color"
     },
@@ -39,11 +39,11 @@
   },
   "secondary": {
     "background": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.900}",
       "$type": "color"
     },
     "foreground": {
-      "$value": "{slate.50}",
+      "$value": "{neutral.100}",
       "$type": "color"
     },
     "background-hover": {
@@ -55,7 +55,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{neutral.900}",
+      "$value": "{neutral.950}",
       "$type": "color"
     },
     "subtle": {

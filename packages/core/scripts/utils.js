@@ -236,12 +236,12 @@ function resolveValue(value, primitiveMap, type = 'unknown') {
  * Default configuration for token generation
  */
 const DEFAULT_CONFIG = {
-  base: 'slate',
-  brand: 'blue',
+  base: 'stone',
+  brand: 'neutral',
   size: 'vega',
   typography: 'vega',
   shadow: 'vega',
-  radius: 'subtle',
+  radius: 'sharp',
   borderwidth: 'vega',
 };
 

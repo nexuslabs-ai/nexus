@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch
 model: sonnet
 permissionMode: bypassPermissions
 skills:
-  - update-docs
+  - update-docs-guide
 ---
 
 # Technical Writer Agent
@@ -45,9 +45,9 @@ When encountering documentation challenges or unclear code:
 
 These rules apply to ALL skills this agent executes. Read and internalize before starting any task.
 
-| Rule                                | Purpose                                       |
-| ----------------------------------- | --------------------------------------------- |
-| [workflow.md](../rules/workflow.md) | Phase-based execution (plan → execute → wait) |
+| Rule                                          | Purpose                                                                          |
+| --------------------------------------------- | -------------------------------------------------------------------------------- |
+| [project-stage.md](../rules/project-stage.md) | Pre-production: no backcompat, no shims, no feature flags — change code in place |
 
 ## Focus Areas
 

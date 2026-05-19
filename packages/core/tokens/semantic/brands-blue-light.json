@@ -4,16 +4,16 @@
       "$value": "{blue.600}",
       "$type": "color"
     },
+    "background-active": {
+      "$value": "{blue.800}",
+      "$type": "color"
+    },
     "foreground": {
       "$value": "{white}",
       "$type": "color"
     },
     "background-hover": {
       "$value": "{blue.700}",
-      "$type": "color"
-    },
-    "background-active": {
-      "$value": "{blue.800}",
       "$type": "color"
     },
     "disabled": {
@@ -39,7 +39,7 @@
   },
   "secondary": {
     "background": {
-      "$value": "{neutral.50}",
+      "$value": "{neutral.100}",
       "$type": "color"
     },
     "foreground": {
@@ -47,11 +47,11 @@
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.200}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{neutral.200}",
+      "$value": "{neutral.300}",
       "$type": "color"
     },
     "disabled": {

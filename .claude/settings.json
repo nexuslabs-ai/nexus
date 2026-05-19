@@ -37,7 +37,6 @@
       "Bash(pwd)",
       "Bash(which:*)",
       "Bash(mkdir:*)",
-      "mcp__linear__*",
       "mcp__figma__*",
       "Bash(gh:*)",
       "Write(packages/react/**)",
@@ -45,12 +44,12 @@
       "WebFetch(domain:*)"
     ],
     "deny": [
+      "Bash(git push --force:*)",
       "Bash(rm -rf:*)",
       "Bash(rm -r /)",
-      "Edit(.env*)",
-      "Write(.env*)",
       "Read(.env.local)",
-      "Bash(git push --force:*)"
+      "Edit(.env*)",
+      "Write(.env*)"
     ]
   },
   "hooks": {

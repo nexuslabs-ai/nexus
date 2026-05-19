@@ -2,34 +2,42 @@
 
 html {
   --nx-color-primary-background: var(--nx-color-gray-900);
+  --nx-color-primary-background-active: var(--nx-color-gray-950);
   --nx-color-primary-foreground: var(--nx-color-white);
-  --nx-color-primary-hover: var(--nx-color-gray-800);
-  --nx-color-primary-active: var(--nx-color-gray-700);
+  --nx-color-primary-background-hover: var(--nx-color-gray-800);
   --nx-color-primary-disabled: var(--nx-color-gray-300);
-  --nx-color-primary-text: var(--nx-color-gray-900);
-  --nx-color-primary-surface: var(--nx-color-gray-50);
+  --nx-color-primary-subtle: var(--nx-color-gray-50);
+  --nx-color-primary-subtle-foreground: var(--nx-color-gray-900);
+  --nx-color-primary-subtle-hover: var(--nx-color-gray-100);
+  --nx-color-primary-subtle-active: var(--nx-color-gray-200);
   --nx-color-secondary-background: var(--nx-color-gray-100);
   --nx-color-secondary-foreground: var(--nx-color-gray-900);
-  --nx-color-secondary-hover: var(--nx-color-gray-200);
-  --nx-color-secondary-active: var(--nx-color-gray-300);
+  --nx-color-secondary-background-hover: var(--nx-color-gray-200);
+  --nx-color-secondary-background-active: var(--nx-color-gray-300);
   --nx-color-secondary-disabled: var(--nx-color-gray-50);
-  --nx-color-secondary-text: var(--nx-color-gray-600);
-  --nx-color-secondary-surface: var(--nx-color-gray-100);
+  --nx-color-secondary-subtle: var(--nx-color-gray-100);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-gray-600);
+  --nx-color-secondary-subtle-hover: var(--nx-color-gray-200);
+  --nx-color-secondary-subtle-active: var(--nx-color-gray-300);
 }
 
 html.dark {
-  --nx-color-primary-background: var(--nx-color-gray-900);
-  --nx-color-primary-foreground: var(--nx-color-white);
-  --nx-color-primary-hover: var(--nx-color-gray-100);
-  --nx-color-primary-active: var(--nx-color-gray-200);
+  --nx-color-primary-background: var(--nx-color-gray-100);
+  --nx-color-primary-background-active: var(--nx-color-gray-300);
+  --nx-color-primary-foreground: var(--nx-color-gray-900);
+  --nx-color-primary-background-hover: var(--nx-color-gray-200);
   --nx-color-primary-disabled: var(--nx-color-gray-800);
-  --nx-color-primary-text: var(--nx-color-gray-50);
-  --nx-color-primary-surface: var(--nx-color-gray-950);
-  --nx-color-secondary-background: var(--nx-color-gray-100);
-  --nx-color-secondary-foreground: var(--nx-color-gray-900);
-  --nx-color-secondary-hover: var(--nx-color-gray-700);
-  --nx-color-secondary-active: var(--nx-color-gray-600);
-  --nx-color-secondary-disabled: var(--nx-color-gray-50);
-  --nx-color-secondary-text: var(--nx-color-gray-600);
-  --nx-color-secondary-surface: var(--nx-color-gray-100);
+  --nx-color-primary-subtle: var(--nx-color-gray-950);
+  --nx-color-primary-subtle-foreground: var(--nx-color-gray-50);
+  --nx-color-primary-subtle-hover: var(--nx-color-gray-900);
+  --nx-color-primary-subtle-active: var(--nx-color-gray-800);
+  --nx-color-secondary-background: var(--nx-color-gray-900);
+  --nx-color-secondary-foreground: var(--nx-color-gray-100);
+  --nx-color-secondary-background-hover: var(--nx-color-gray-700);
+  --nx-color-secondary-background-active: var(--nx-color-gray-600);
+  --nx-color-secondary-disabled: var(--nx-color-gray-950);
+  --nx-color-secondary-subtle: var(--nx-color-gray-800);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-gray-400);
+  --nx-color-secondary-subtle-hover: var(--nx-color-gray-700);
+  --nx-color-secondary-subtle-active: var(--nx-color-gray-600);
 }

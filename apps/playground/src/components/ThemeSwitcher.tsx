@@ -21,6 +21,7 @@ const BRANDS = [
   { value: 'gray', label: 'Gray', color: '#6b7280' },
   { value: 'neutral', label: 'Neutral', color: '#737373' },
   { value: 'slate', label: 'Slate', color: '#64748b' },
+  { value: 'stone', label: 'Stone', color: '#78716c' },
 ] as const;
 
 const TOKEN_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova'] as const;

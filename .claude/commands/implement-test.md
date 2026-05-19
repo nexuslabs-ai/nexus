@@ -4,21 +4,21 @@ Implement tests using the Tester agent, focusing on result validation over code 
 
 ## Agents Used
 
-| Agent                         | Skill                                               | When Used |
-| ----------------------------- | --------------------------------------------------- | --------- |
-| [Tester](../agents/tester.md) | [implement-test](../skills/implement-test/SKILL.md) | Always    |
+| Agent                         | Skill                                                           | When Used |
+| ----------------------------- | --------------------------------------------------------------- | --------- |
+| [Tester](../agents/tester.md) | [implement-test-guide](../skills/implement-test-guide/SKILL.md) | Always    |
 
 ## Input (Optional)
 
-- **$ARGUMENTS**: Testing plan file, Linear ID, source file path, or description
+- **$ARGUMENTS**: Testing plan file, GitHub issue number, source file path, or description
 
 ```
 Examples:
   /implement-test                              → Use conversation context
   /implement-test ./docs/TESTING_PLAN.md       → Follow testing plan
-  /implement-test NEX-141                      → Fetch from Linear
+  /implement-test #42                          → Fetch from GitHub issue
   /implement-test src/module.ts                → Write tests for module
-  /implement-test "tests for Button component" → Description
+  /implement-test "tests for search pipeline"  → Description
 ```
 
 ## Context Detection
@@ -28,7 +28,7 @@ Parse `$ARGUMENTS` for:
 | Pattern            | Context Source            |
 | ------------------ | ------------------------- |
 | `*.md` path        | Testing plan or spec file |
-| `NEX-###`          | Linear ticket             |
+| `#123`             | GitHub issue              |
 | `*.ts` or `*.tsx`  | Source file to test       |
 | String description | Use as requirements       |
 | (none)             | Use conversation context  |
@@ -44,7 +44,7 @@ Parse `$ARGUMENTS` for:
 ┌─────────────────────────────────────────┐
 │           Detect Context                │
 │  • Testing plan? → Read plan            │
-│  • Linear ID? → Fetch ticket            │
+│  • GitHub issue? → Fetch issue          │
 │  • Source file? → Read file             │
 │  • Otherwise → Use conversation         │
 └─────────────────┬───────────────────────┘
@@ -52,7 +52,7 @@ Parse `$ARGUMENTS` for:
                   ▼
 ┌─────────────────────────────────────────┐
 │          Spawn Tester Agent             │
-│  • Use Task tool with subagent_type     │
+│  • Use Agent tool with subagent_type     │
 │  • Pass context in prompt               │
 └─────────────────┬───────────────────────┘
                   │
@@ -75,14 +75,14 @@ Parse `$ARGUMENTS` for:
 
    ```
    If .md file → Read testing plan
-   If NEX-### → mcp__linear__get_issue(id: "{issue_id}")
+   If #123 → gh issue view 123 --json number,title,body,labels,state,url
    If .ts/.tsx file → Read source file to understand what to test
    Otherwise → Use conversation history as context
    ```
 
-2. **Identify what package this relates to:**
-   - `packages/react/` → Component/hook testing patterns
-   - Other → General Vitest patterns
+2. **Identify what area this relates to:**
+   - Check `.claude/rules/` for any testing or domain-specific rules
+   - Use existing test patterns found in the codebase
 
 3. **Collect context to pass to agent:**
    - What needs tests (code, module, feature)
@@ -91,27 +91,25 @@ Parse `$ARGUMENTS` for:
 
 ### Phase 2: Spawn Tester Agent
 
-**IMPORTANT: You MUST use the Task tool to spawn the agent. Do NOT execute the skill yourself.**
+**IMPORTANT: You MUST use the Agent tool to spawn the agent. Do NOT execute the skill yourself.**
 
 ```
-Task(
+Agent(
   subagent_type: "tester",
   description: "Implement tests for {target}",
   prompt: """
   Implement tests for this target.
 
   ## Context
-  - Source: {testing plan / ticket / source file / conversation}
+  - Source: {testing plan / GitHub issue / source file / conversation}
   - Package: {detected package type}
   - Target: {what needs tests}
 
   ## Instructions
-  1. Read the implement-test skill at `.claude/skills/implement-test/SKILL.md`
-  2. Understand the code to be tested
-  3. Design test strategy (fixtures, mocks, assertions)
-  4. Create test plan (TodoWrite)
-  5. Implement tests phase by phase
-  6. Verify all tests passing
+  1. Understand the code to be tested
+  2. Design test strategy (fixtures, mocks, assertions)
+  3. Implement tests
+  4. Verify all tests passing
 
   ## Testing Philosophy
   - Result validation over code coverage
@@ -142,7 +140,7 @@ After tests are implemented, output:
 
 ### Context
 
-- **Source:** {Testing plan / Linear ticket / Source file / Conversation}
+- **Source:** {Testing plan / GitHub issue / Source file / Conversation}
 
 ### Test Files Created/Modified
 
@@ -190,7 +188,7 @@ All tests passing: ✅
 | ------------------------ | -------------------------------------- |
 | Testing plan not found   | Ask user to verify file path           |
 | Source file not found    | Ask user to verify file path           |
-| Linear issue not found   | Ask user to verify issue ID            |
+| GitHub issue not found   | Ask user to verify issue number        |
 | Unclear what to test     | Ask user for clarification             |
 | Tests failing            | Debug and fix (no skipping tests!)     |
 | Flaky tests              | Fix the flakiness, don't add retries   |

@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch, WebFetch
 model: opus
 permissionMode: bypassPermissions
 skills:
-  - analyze-deps
+  - analyze-deps-guide
 ---
 
 # DevOps Agent
@@ -25,11 +25,14 @@ Think like a **Staff DevOps Engineer** focused on infrastructure reliability, au
 
 These rules apply to ALL skills this agent executes. Read and internalize before starting any task.
 
-| Rule                                | Purpose                                       |
-| ----------------------------------- | --------------------------------------------- |
-| [workflow.md](../rules/workflow.md) | Phase-based execution (plan → execute → wait) |
-| [github.md](../rules/github.md)     | PR conventions, commit format, branch naming  |
-| [linear.md](../rules/linear.md)     | Ticket linking, status updates, comments      |
+| Rule                                                              | Purpose                                                                           |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| [code-quality.md](../rules/code-quality.md)                       | Governing principle: favor simplicity over cleverness; index to per-rule files    |
+| [ripple-effect.md](../rules/ripple-effect.md)                     | Config/infra changes must leave callers and adjacent setup consistently updated   |
+| [logging-proportionality.md](../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                           |
+| [code-comments.md](../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues |
+| [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place  |
+| [github.md](../rules/github.md)                                   | PR title/body templates, branch naming, commit format, `Closes #N`                |
 
 ## Focus Areas
 

@@ -4,20 +4,20 @@
       "$value": "{blue.600}",
       "$type": "color"
     },
+    "background-active": {
+      "$value": "{blue.800}",
+      "$type": "color"
+    },
     "foreground": {
       "$value": "{white}",
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{blue.400}",
-      "$type": "color"
-    },
-    "background-active": {
-      "$value": "{blue.300}",
+      "$value": "{blue.700}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{blue.800}",
+      "$value": "{blue.950}",
       "$type": "color"
     },
     "subtle": {
@@ -39,11 +39,11 @@
   },
   "secondary": {
     "background": {
-      "$value": "{neutral.800}",
+      "$value": "{neutral.900}",
       "$type": "color"
     },
     "foreground": {
-      "$value": "{neutral.50}",
+      "$value": "{neutral.100}",
       "$type": "color"
     },
     "background-hover": {
@@ -55,7 +55,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{neutral.900}",
+      "$value": "{neutral.950}",
       "$type": "color"
     },
     "subtle": {
@@ -71,7 +71,7 @@
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{neutral.700}",
+      "$value": "{neutral.600}",
       "$type": "color"
     }
   }
