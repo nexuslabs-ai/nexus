@@ -8,11 +8,11 @@
     "$type": "color"
   },
   "background-hover": {
-    "$value": "{slate.700}",
+    "$value": "{slate.800}",
     "$type": "color"
   },
   "background-active": {
-    "$value": "{slate.900}",
+    "$value": "{slate.950}",
     "$type": "color"
   },
   "muted": {
@@ -263,7 +263,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{orange.500}",
+      "$value": "{orange.900}",
       "$type": "color"
     },
     "subtle": {

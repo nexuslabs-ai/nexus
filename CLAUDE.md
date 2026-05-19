@@ -67,7 +67,7 @@ ds/
 ├── .claude/
 │   ├── commands/       # Slash commands (/implement, /pr-review, /pr-fix, /ui-audit, etc.)
 │   ├── rules/          # Convention rules (components, testing, tokens, etc.)
-│   ├── skills/         # Auto-discovered capabilities (SKILL.md format; skills paired with a slash command use the `-guide` suffix)
+│   ├── skills/         # Auto-discovered capabilities (SKILL.md format; the primary skill of a slash command uses the `-guide` suffix — mode/specialization skills like `pr-review-follow-up` do not)
 │   │   ├── pr-review-guide/      # PR review framework
 │   │   ├── pr-review-follow-up/  # Follow-up review verification
 │   │   ├── pr-fix-guide/         # Fix PR review issues

@@ -34,7 +34,7 @@
     "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
   },
   "disabled": {
-    "$value": "{neutral.50}",
+    "$value": "{neutral.100}",
     "$type": "color"
   },
   "disabled-foreground": {

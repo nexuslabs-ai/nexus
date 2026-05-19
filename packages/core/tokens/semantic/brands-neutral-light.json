@@ -13,7 +13,7 @@
       "$type": "color"
     },
     "background-active": {
-      "$value": "{neutral.700}",
+      "$value": "{neutral.950}",
       "$type": "color"
     },
     "disabled": {

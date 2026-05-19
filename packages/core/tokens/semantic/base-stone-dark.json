@@ -8,11 +8,11 @@
     "$type": "color"
   },
   "background-hover": {
-    "$value": "{stone.700}",
+    "$value": "{stone.800}",
     "$type": "color"
   },
   "background-active": {
-    "$value": "{stone.900}",
+    "$value": "{stone.950}",
     "$type": "color"
   },
   "muted": {
@@ -203,7 +203,7 @@
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{green.950}",
+      "$value": "{green.800}",
       "$type": "color"
     }
   },

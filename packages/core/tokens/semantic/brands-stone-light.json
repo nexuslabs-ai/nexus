@@ -1,7 +1,7 @@
 {
   "primary": {
     "background": {
-      "$value": "{blue.600}",
+      "$value": "{stone.900}",
       "$type": "color"
     },
     "foreground": {
@@ -9,69 +9,69 @@
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{blue.700}",
+      "$value": "{stone.800}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{blue.900}",
+      "$value": "{stone.950}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{blue.300}",
+      "$value": "{stone.300}",
       "$type": "color"
     },
     "subtle": {
-      "$value": "{blue.50}",
+      "$value": "{stone.50}",
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{blue.600}",
+      "$value": "{stone.900}",
       "$type": "color"
     },
     "subtle-hover": {
-      "$value": "{blue.100}",
+      "$value": "{stone.100}",
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{blue.200}",
+      "$value": "{stone.200}",
       "$type": "color"
     }
   },
   "secondary": {
     "background": {
-      "$value": "{neutral.100}",
+      "$value": "{stone.100}",
       "$type": "color"
     },
     "foreground": {
-      "$value": "{neutral.900}",
+      "$value": "{stone.900}",
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{neutral.200}",
+      "$value": "{stone.200}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{neutral.300}",
+      "$value": "{stone.300}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{neutral.50}",
+      "$value": "{stone.50}",
       "$type": "color"
     },
     "subtle": {
-      "$value": "{neutral.100}",
+      "$value": "{stone.100}",
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{neutral.600}",
+      "$value": "{stone.600}",
       "$type": "color"
     },
     "subtle-hover": {
-      "$value": "{neutral.200}",
+      "$value": "{stone.200}",
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{neutral.300}",
+      "$value": "{stone.300}",
       "$type": "color"
     }
   }
