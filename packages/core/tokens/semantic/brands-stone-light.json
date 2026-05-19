@@ -4,16 +4,16 @@
       "$value": "{stone.900}",
       "$type": "color"
     },
+    "background-active": {
+      "$value": "{stone.950}",
+      "$type": "color"
+    },
     "foreground": {
       "$value": "{white}",
       "$type": "color"
     },
     "background-hover": {
       "$value": "{stone.800}",
-      "$type": "color"
-    },
-    "background-active": {
-      "$value": "{stone.950}",
       "$type": "color"
     },
     "disabled": {

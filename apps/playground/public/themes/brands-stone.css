@@ -1,0 +1,43 @@
+/* brands: stone */
+
+html {
+  --nx-color-primary-background: var(--nx-color-stone-900);
+  --nx-color-primary-background-active: var(--nx-color-stone-950);
+  --nx-color-primary-foreground: var(--nx-color-white);
+  --nx-color-primary-background-hover: var(--nx-color-stone-800);
+  --nx-color-primary-disabled: var(--nx-color-stone-300);
+  --nx-color-primary-subtle: var(--nx-color-stone-50);
+  --nx-color-primary-subtle-foreground: var(--nx-color-stone-900);
+  --nx-color-primary-subtle-hover: var(--nx-color-stone-100);
+  --nx-color-primary-subtle-active: var(--nx-color-stone-200);
+  --nx-color-secondary-background: var(--nx-color-stone-100);
+  --nx-color-secondary-foreground: var(--nx-color-stone-900);
+  --nx-color-secondary-background-hover: var(--nx-color-stone-200);
+  --nx-color-secondary-background-active: var(--nx-color-stone-300);
+  --nx-color-secondary-disabled: var(--nx-color-stone-50);
+  --nx-color-secondary-subtle: var(--nx-color-stone-100);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-stone-600);
+  --nx-color-secondary-subtle-hover: var(--nx-color-stone-200);
+  --nx-color-secondary-subtle-active: var(--nx-color-stone-300);
+}
+
+html.dark {
+  --nx-color-primary-background: var(--nx-color-stone-100);
+  --nx-color-primary-background-active: var(--nx-color-stone-300);
+  --nx-color-primary-foreground: var(--nx-color-stone-900);
+  --nx-color-primary-background-hover: var(--nx-color-stone-200);
+  --nx-color-primary-disabled: var(--nx-color-stone-800);
+  --nx-color-primary-subtle: var(--nx-color-stone-950);
+  --nx-color-primary-subtle-foreground: var(--nx-color-stone-50);
+  --nx-color-primary-subtle-hover: var(--nx-color-stone-900);
+  --nx-color-primary-subtle-active: var(--nx-color-stone-800);
+  --nx-color-secondary-background: var(--nx-color-stone-900);
+  --nx-color-secondary-foreground: var(--nx-color-stone-100);
+  --nx-color-secondary-background-hover: var(--nx-color-stone-700);
+  --nx-color-secondary-background-active: var(--nx-color-stone-600);
+  --nx-color-secondary-disabled: var(--nx-color-stone-950);
+  --nx-color-secondary-subtle: var(--nx-color-stone-800);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-stone-400);
+  --nx-color-secondary-subtle-hover: var(--nx-color-stone-700);
+  --nx-color-secondary-subtle-active: var(--nx-color-stone-600);
+}

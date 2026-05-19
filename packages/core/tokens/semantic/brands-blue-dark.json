@@ -4,6 +4,10 @@
       "$value": "{blue.600}",
       "$type": "color"
     },
+    "background-active": {
+      "$value": "{blue.800}",
+      "$type": "color"
+    },
     "foreground": {
       "$value": "{white}",
       "$type": "color"
@@ -12,12 +16,8 @@
       "$value": "{blue.700}",
       "$type": "color"
     },
-    "background-active": {
-      "$value": "{blue.800}",
-      "$type": "color"
-    },
     "disabled": {
-      "$value": "{blue.800}",
+      "$value": "{blue.950}",
       "$type": "color"
     },
     "subtle": {

@@ -4,16 +4,16 @@
       "$value": "{neutral.900}",
       "$type": "color"
     },
+    "background-active": {
+      "$value": "{neutral.950}",
+      "$type": "color"
+    },
     "foreground": {
       "$value": "{white}",
       "$type": "color"
     },
     "background-hover": {
       "$value": "{neutral.800}",
-      "$type": "color"
-    },
-    "background-active": {
-      "$value": "{neutral.950}",
       "$type": "color"
     },
     "disabled": {

@@ -36,7 +36,7 @@ apps/playground/
 │   └── themes/           # Runtime CSS files (copied from core)
 │       ├── color.css                # Color primitives (--nx-color-*)
 │       ├── base-{palette}.css       # Base themes (5)
-│       ├── brands-{brand}.css       # Brand themes (4)
+│       ├── brands-{brand}.css       # Brand themes (5)
 │       ├── size-{mode}.css          # Size/spacing modes (5)
 │       ├── typography-{mode}.css    # Typography modes (5)
 │       ├── shadow-{mode}.css        # Shadow modes (5)

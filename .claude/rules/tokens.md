@@ -168,7 +168,7 @@ After editing token files:
 
 ```bash
 # Generate @nexus/tailwind package CSS
-yarn tokens:tailwind           # Uses default: --base=slate --brand=blue
+yarn tokens:tailwind           # Bundled defaults: --base=stone --brand=neutral --radius=sharp
 
 # Modular CSS (all themes for playground)
 yarn tokens:modular
@@ -179,13 +179,13 @@ yarn tokens:modular
 Configure theme via CLI arguments:
 
 ```bash
-node scripts/generate-tailwind-package.js --base=slate --brand=blue
+node scripts/generate-tailwind-package.js --base=stone --brand=neutral
 ```
 
 Available options:
 
 - **Base**: slate, neutral, zinc, gray, stone
-- **Brand**: blue, gray, neutral, slate
+- **Brand**: blue, gray, neutral, slate, stone
 - **Size**: vega, lyra, maia, mira, nova
 - **Typography**: vega, lyra, maia, mira, nova
 - **Shadow**: vega, lyra, maia, mira, nova

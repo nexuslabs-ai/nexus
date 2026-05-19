@@ -93,9 +93,9 @@
   --color-warning-subtle-hover: var(--nx-color-orange-100);
   --color-warning-subtle-active: var(--nx-color-orange-200);
   --color-primary-background: var(--nx-color-neutral-900);
+  --color-primary-background-active: var(--nx-color-neutral-950);
   --color-primary-foreground: var(--nx-color-white);
   --color-primary-background-hover: var(--nx-color-neutral-800);
-  --color-primary-background-active: var(--nx-color-neutral-950);
   --color-primary-disabled: var(--nx-color-neutral-300);
   --color-primary-subtle: var(--nx-color-neutral-50);
   --color-primary-subtle-foreground: var(--nx-color-neutral-900);
@@ -281,9 +281,9 @@
   --nx-color-warning-subtle-hover: var(--nx-color-orange-900);
   --nx-color-warning-subtle-active: var(--nx-color-orange-800);
   --nx-color-primary-background: var(--nx-color-neutral-100);
+  --nx-color-primary-background-active: var(--nx-color-neutral-300);
   --nx-color-primary-foreground: var(--nx-color-neutral-900);
   --nx-color-primary-background-hover: var(--nx-color-neutral-200);
-  --nx-color-primary-background-active: var(--nx-color-neutral-300);
   --nx-color-primary-disabled: var(--nx-color-neutral-800);
   --nx-color-primary-subtle: var(--nx-color-neutral-950);
   --nx-color-primary-subtle-foreground: var(--nx-color-neutral-50);
