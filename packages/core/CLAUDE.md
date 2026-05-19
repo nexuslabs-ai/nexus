@@ -39,7 +39,7 @@ tokens/
 │   ├── base-slate-light.json  # Slate base - light mode
 │   ├── base-slate-dark.json   # Slate base - dark mode
 │   ├── base-{palette}-*.json  # Other palette variants (neutral, zinc, gray, stone)
-│   ├── brands-{brand}-*.json  # Brand variants (blue, gray, neutral, slate)
+│   ├── brands-{brand}-*.json  # Brand variants (blue, gray, neutral, slate, stone)
 │   └── spacing.json           # Spacing semantic mappings
 ├── styles/
 │   ├── typography.json        # Typography style definitions → @utility classes

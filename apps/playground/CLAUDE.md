@@ -103,7 +103,7 @@ useEffect(
 | Type  | Options                           |
 | ----- | --------------------------------- |
 | Base  | slate, neutral, zinc, gray, stone |
-| Brand | blue, gray, neutral, slate        |
+| Brand | blue, gray, neutral, slate, stone |
 | Mode  | light, dark                       |
 
 ### Design Token Modes
