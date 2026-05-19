@@ -1,7 +1,5 @@
 # Nexus Design System
 
-> **CRITICAL:** Follow [.claude/rules/workflow.md](.claude/rules/workflow.md) for every task.
-
 ## Core Operating Principles
 
 These principles are non-negotiable. They apply to ALL work in this codebase.
@@ -19,15 +17,13 @@ These principles are non-negotiable. They apply to ALL work in this codebase.
 
 **Always delegate specialized work to the appropriate agent.** Do not attempt to do it yourself.
 
-| Task Type              | Delegate To          |
-| ---------------------- | -------------------- |
-| Code implementation    | sde2                 |
-| Test implementation    | tester               |
-| Architecture decisions | principal-architect  |
-| Design-code parity     | designer             |
-| Documentation updates  | technical-writer     |
-| Social media content   | social-media-manager |
-| Dependency analysis    | devops               |
+| Task Type              | Delegate To         |
+| ---------------------- | ------------------- |
+| Code implementation    | sde2                |
+| Test implementation    | tester              |
+| Architecture decisions | principal-architect |
+| Documentation updates  | technical-writer    |
+| Dependency analysis    | devops              |
 
 Why delegate?
 
@@ -151,67 +147,6 @@ yarn chromatic:ci       # Run visual tests (CI, fails if changes need review)
 | `@nexus/react`      | [packages/react/CLAUDE.md](packages/react/CLAUDE.md)           | React component library            |
 | `@nexus/test-utils` | [packages/test-utils/CLAUDE.md](packages/test-utils/CLAUDE.md) | Shared testing utilities           |
 | `@nexus/playground` | [apps/playground/CLAUDE.md](apps/playground/CLAUDE.md)         | Theme demo app                     |
-
-## Convention Rules
-
-| Rule File                                                                  | Purpose                                        |
-| -------------------------------------------------------------------------- | ---------------------------------------------- |
-| [.claude/rules/workflow.md](.claude/rules/workflow.md)                     | **Critical workflow (plan→execute→wait)**      |
-| [.claude/rules/components.md](.claude/rules/components.md)                 | Component structure, props, exports            |
-| [.claude/rules/testing.md](.claude/rules/testing.md)                       | Core testing philosophy (all packages)         |
-| [.claude/rules/testing-react.md](.claude/rules/testing-react.md)           | React/Storybook testing patterns               |
-| [.claude/rules/storybook.md](.claude/rules/storybook.md)                   | Story structure, required stories              |
-| [.claude/rules/tokens.md](.claude/rules/tokens.md)                         | Token format, naming, workflow                 |
-| [.claude/rules/figma.md](.claude/rules/figma.md)                           | Figma-code parity, token mapping, architecture |
-| [.claude/rules/shadcn-divergences.md](.claude/rules/shadcn-divergences.md) | Nexus vs shadcn/ui differences                 |
-| [.claude/rules/linear.md](.claude/rules/linear.md)                         | Linear integration, issue linking, status flow |
-| [.claude/rules/github.md](.claude/rules/github.md)                         | PR format, commit conventions, auto-linking    |
-
-## Skills (Auto-Discovered)
-
-Skills are auto-discovered capabilities that Claude loads when your request matches the skill description.
-
-| Skill                                                              | Purpose                                   |
-| ------------------------------------------------------------------ | ----------------------------------------- |
-| [pr-review](.claude/skills/pr-review/SKILL.md)                     | PR review framework (common structure)    |
-| [pr-review-follow-up](.claude/skills/pr-review-follow-up/SKILL.md) | Follow-up review verification             |
-| [implement](.claude/skills/implement/SKILL.md)                     | Feature implementation (any context)      |
-| [implement-test](.claude/skills/implement-test/SKILL.md)           | Test implementation (any context)         |
-| [pr-fix](.claude/skills/pr-fix/SKILL.md)                           | Fix PR review issues                      |
-| [design-plan](.claude/skills/design-plan/SKILL.md)                 | Architecture planning                     |
-| [figma-analyze](.claude/skills/figma-analyze/SKILL.md)             | Figma design analysis                     |
-| [shadcn-to-figma](.claude/skills/shadcn-to-figma/SKILL.md)         | Code → Figma architecture blueprints      |
-| [update-docs](.claude/skills/update-docs/SKILL.md)                 | Documentation updates                     |
-| [linkedin-post](.claude/skills/linkedin-post/SKILL.md)             | LinkedIn content generation               |
-| [analyze-deps](.claude/skills/analyze-deps/SKILL.md)               | Dependency analysis and migration reports |
-
-## Agents (Auto-Delegated)
-
-Agents are specialized personas that Claude auto-delegates to based on task type.
-
-| Agent                                                          | Model  | Skills                                            | Focus                        |
-| -------------------------------------------------------------- | ------ | ------------------------------------------------- | ---------------------------- |
-| [principal-architect](.claude/agents/principal-architect.md)   | opus   | pr-review, pr-review-follow-up, design-plan       | Architecture, scalability    |
-| [sde2](.claude/agents/sde2.md)                                 | opus   | pr-review, pr-review-follow-up, implement, pr-fix | Code quality, implementation |
-| [tester](.claude/agents/tester.md)                             | opus   | implement-test                                    | Test strategy, quality       |
-| [designer](.claude/agents/designer.md)                         | opus   | figma-analyze, shadcn-to-figma                    | Design-code parity           |
-| [technical-writer](.claude/agents/technical-writer.md)         | sonnet | update-docs                                       | Documentation accuracy       |
-| [social-media-manager](.claude/agents/social-media-manager.md) | sonnet | linkedin-post                                     | Developer advocacy           |
-| [devops](.claude/agents/devops.md)                             | opus   | analyze-deps                                      | Infrastructure, dependencies |
-
-## Slash Commands
-
-| Command            | Agent(s) Used                       | Purpose                                               |
-| ------------------ | ----------------------------------- | ----------------------------------------------------- |
-| `/implement`       | SDE2 (+ Principal Architect w/flag) | Implement Linear ticket (optional `--with-architect`) |
-| `/implement-test`  | Tester                              | Implement tests from plan or context                  |
-| `/pr-review`       | Principal Architect + SDE2          | Dual-perspective PR code review                       |
-| `/pr-fix`          | SDE2                                | Fix PR review issues (blocking first, then minor)     |
-| `/figma-analyze`   | Designer                            | Analyze Figma design for code parity                  |
-| `/shadcn-to-figma` | Designer                            | Generate Figma architecture from shadcn code          |
-| `/update-docs`     | Technical Writer                    | Update documentation after codebase changes           |
-| `/linkedin`        | Social Media Manager                | Generate LinkedIn post from session context           |
-| `/analyze-deps`    | DevOps                              | Analyze dependencies for updates and migration paths  |
 
 ## Code Style
 
