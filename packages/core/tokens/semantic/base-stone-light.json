@@ -50,11 +50,11 @@
     "$type": "color"
   },
   "container-hover": {
-    "$value": "{stone.50}",
+    "$value": "{stone.100}",
     "$type": "color"
   },
   "container-active": {
-    "$value": "{stone.100}",
+    "$value": "{stone.200}",
     "$type": "color"
   },
   "popover": {
@@ -95,15 +95,23 @@
       "$type": "color"
     },
     "primary-active": {
-      "$value": "{blue.200}",
+      "$value": "{blue.400}",
       "$type": "color"
     },
     "warning": {
       "$value": "{orange.200}",
       "$type": "color"
     },
+    "warning-active": {
+      "$value": "{orange.400}",
+      "$type": "color"
+    },
     "success": {
       "$value": "{green.200}",
+      "$type": "color"
+    },
+    "success-active": {
+      "$value": "{green.400}",
       "$type": "color"
     },
     "error": {
@@ -111,11 +119,15 @@
       "$type": "color"
     },
     "error-active": {
-      "$value": "{red.200}",
+      "$value": "{red.400}",
       "$type": "color"
     },
     "information": {
       "$value": "{blue.200}",
+      "$type": "color"
+    },
+    "information-active": {
+      "$value": "{blue.400}",
       "$type": "color"
     }
   },

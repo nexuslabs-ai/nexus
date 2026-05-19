@@ -39,7 +39,7 @@
   },
   "secondary": {
     "background": {
-      "$value": "{neutral.50}",
+      "$value": "{neutral.100}",
       "$type": "color"
     },
     "foreground": {

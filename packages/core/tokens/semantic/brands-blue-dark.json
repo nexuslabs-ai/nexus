@@ -43,7 +43,7 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{neutral.50}",
+      "$value": "{neutral.900}",
       "$type": "color"
     },
     "background-hover": {
