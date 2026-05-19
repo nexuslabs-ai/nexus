@@ -20,8 +20,6 @@ Always load and follow:
 | [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Effects sync with external systems, not React state                                  |
 | [guard-clauses.md](../../rules/guard-clauses.md)                                 | Keep the happy path at column 0; exit early                                          |
 | [code-comments.md](../../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
-| [design.md](../../rules/design.md)                                               | Mobile-first, three required states (loading/empty/error), accessibility floors      |
-| [docs-mcp.md](../../rules/docs-mcp.md)                                           | MANDATORY: query examlly-docs-mcp for any third-party UI lib API; do not guess       |
 
 ## Design Thinking
 

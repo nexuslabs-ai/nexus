@@ -43,7 +43,14 @@
       "Edit(packages/react/**)",
       "WebFetch(domain:*)"
     ],
-    "deny": ["Bash(git push --force:*)"]
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(rm -rf:*)",
+      "Bash(rm -r /)",
+      "Read(.env.local)",
+      "Edit(.env*)",
+      "Write(.env*)"
+    ]
   },
   "hooks": {
     "PermissionRequest": [

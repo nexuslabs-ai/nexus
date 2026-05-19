@@ -28,19 +28,16 @@ Think like a **Senior Software Engineer (SDE2)** focused on code quality, mainta
 
 These rules apply to ALL skills this agent executes. Read and internalize before starting any task.
 
-| Rule                                                                          | Purpose                                                                                    |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [code-quality.md](../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files             |
-| [ripple-effect.md](../rules/ripple-effect.md)                                 | A change isn't done until callers, callees, and adjacent code are consistently clean       |
-| [parse-dont-narrow.md](../rules/parse-dont-narrow.md)                         | zod at every boundary; never hand-roll `typeof` guards or `as` casts for runtime narrowing |
-| [dont-duplicate-validation.md](../rules/dont-duplicate-validation.md)         | Once parsed, FK-protected, or caller-gated — stop re-validating                            |
-| [guard-clauses.md](../rules/guard-clauses.md)                                 | Keep the happy path at column 0; exit early                                                |
-| [composition-over-render-props.md](../rules/composition-over-render-props.md) | `children` or per-mode components; never `renderItem` / `mode` discriminators              |
-| [useeffect-escape-hatch.md](../rules/useeffect-escape-hatch.md)               | Effects sync with external systems, not React state                                        |
-| [logging-proportionality.md](../rules/logging-proportionality.md)             | One dense canonical log line beats ten incremental ones                                    |
-| [code-comments.md](../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues          |
-| [project-stage.md](../rules/project-stage.md)                                 | Pre-production: no backcompat, no migration files; edit the three baseline files           |
-| [docs-mcp.md](../rules/docs-mcp.md)                                           | MANDATORY: query examlly-docs-mcp for any third-party API; do not guess from memory        |
+| Rule                                                                          | Purpose                                                                              |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [code-quality.md](../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files       |
+| [ripple-effect.md](../rules/ripple-effect.md)                                 | A change isn't done until callers, callees, and adjacent code are consistently clean |
+| [guard-clauses.md](../rules/guard-clauses.md)                                 | Keep the happy path at column 0; exit early                                          |
+| [composition-over-render-props.md](../rules/composition-over-render-props.md) | `children` or per-mode components; never `renderItem` / `mode` discriminators        |
+| [useeffect-escape-hatch.md](../rules/useeffect-escape-hatch.md)               | Effects sync with external systems, not React state                                  |
+| [logging-proportionality.md](../rules/logging-proportionality.md)             | One dense canonical log line beats ten incremental ones                              |
+| [code-comments.md](../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
+| [project-stage.md](../rules/project-stage.md)                                 | Pre-production: no backcompat, no migration files; edit the three baseline files     |
 
 ## Focus Areas
 

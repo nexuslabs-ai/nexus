@@ -28,18 +28,14 @@ Create comprehensive implementation plans for complex tasks, providing architect
 
 Always load and follow:
 
-| Rule                                                                             | Purpose                                                                             |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files      |
-| [ripple-effect.md](../../rules/ripple-effect.md)                                 | Plan must account for callers, callees, and adjacent code consistency               |
-| [parse-dont-narrow.md](../../rules/parse-dont-narrow.md)                         | Identify boundary points for zod parsing in the plan                                |
-| [dont-duplicate-validation.md](../../rules/dont-duplicate-validation.md)         | Plan single-layer validation; don't duplicate across layers                         |
-| [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Component shape decisions: `children` or per-mode split, never render callbacks     |
-| [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Design data flow so effects sync with external systems, not React state             |
-| [project-stage.md](../../rules/project-stage.md)                                 | Pre-production: no backcompat, no migration files; edit the three baseline files    |
-| [docs-mcp.md](../../rules/docs-mcp.md)                                           | MANDATORY: query examlly-docs-mcp for any third-party API; do not guess from memory |
-| [github.md](../../rules/github.md)                                               | PR title/body templates, branch naming, commit format, `Closes #N`                  |
-| [design.md](../../rules/design.md)                                               | Mobile-first, three required states (loading/empty/error), accessibility floors     |
+| Rule                                                                             | Purpose                                                                          |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files   |
+| [ripple-effect.md](../../rules/ripple-effect.md)                                 | Plan must account for callers, callees, and adjacent code consistency            |
+| [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Component shape decisions: `children` or per-mode split, never render callbacks  |
+| [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Design data flow so effects sync with external systems, not React state          |
+| [project-stage.md](../../rules/project-stage.md)                                 | Pre-production: no backcompat, no migration files; edit the three baseline files |
+| [github.md](../../rules/github.md)                                               | PR title/body templates, branch naming, commit format, `Closes #N`               |
 
 ## Planning Process
 

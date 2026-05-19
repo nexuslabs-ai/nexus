@@ -65,27 +65,25 @@ ds/
 ├── reports/
 │   └── deps/           # Generated dependency analysis reports
 ├── .claude/
-│   ├── commands/       # Slash commands (/implement, /pr-review, /linkedin, etc.)
+│   ├── commands/       # Slash commands (/implement, /pr-review, /pr-fix, /ui-audit, etc.)
 │   ├── rules/          # Convention rules (components, testing, tokens, etc.)
 │   ├── skills/         # Auto-discovered capabilities (SKILL.md format)
-│   │   ├── pr-review/           # PR review framework
-│   │   ├── pr-review-follow-up/ # Follow-up review verification
-│   │   ├── implement/           # Linear ticket implementation
-│   │   ├── implement-test/      # Test implementation
-│   │   ├── pr-fix/              # Fix PR review issues
-│   │   ├── design-plan/         # Architecture planning
-│   │   ├── figma-analyze/       # Figma design analysis
-│   │   ├── shadcn-to-figma/     # Code → Figma architecture blueprints
-│   │   ├── update-docs/         # Documentation updates
-│   │   ├── linkedin-post/       # LinkedIn content generation
-│   │   └── analyze-deps/        # Dependency analysis and reports
+│   │   ├── pr-review-guide/      # PR review framework
+│   │   ├── pr-review-follow-up/  # Follow-up review verification
+│   │   ├── pr-fix-guide/         # Fix PR review issues
+│   │   ├── implement-guide/      # Feature implementation
+│   │   ├── implement-test-guide/ # Test implementation
+│   │   ├── design-plan/          # Architecture planning
+│   │   ├── frontend-design/      # Distinctive frontend interfaces
+│   │   ├── ui-audit-guide/       # UI/UX audit via Playwright
+│   │   ├── shadcn/               # shadcn component workflows
+│   │   ├── update-docs-guide/    # Documentation updates
+│   │   └── analyze-deps-guide/   # Dependency analysis and reports
 │   └── agents/         # Auto-delegated subagents (single .md files)
 │       ├── principal-architect.md  # Architecture, scalability, design
 │       ├── sde2.md                 # Implementation, code quality
 │       ├── tester.md               # Test strategy, implementation
-│       ├── designer.md             # Design-code parity, Figma
 │       ├── technical-writer.md     # Documentation accuracy
-│       ├── social-media-manager.md # Developer advocacy content
 │       └── devops.md               # Infrastructure, CI/CD, dependencies
 └── Root configs        # Shared TS, ESLint, Prettier, Turbo
 ```

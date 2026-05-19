@@ -25,7 +25,7 @@ The full ruleset lives in `.claude/rules/*.md` — those files are the spec. Don
 
 The **Reflex Check** in Part 2 → Step 3 names the actions that should evoke a rule mid-write and points at the relevant file. Read the Reflex Check at the start of every phase; open a full rule file only when a reflex actually fires while you're writing.
 
-Operational rules (`docs-mcp.md`, `github.md`, `project-stage.md`) are referenced inline by the step they govern.
+Operational rules (`github.md`, `project-stage.md`) are referenced inline by the step they govern.
 
 ## Part 1: Planning
 
@@ -211,9 +211,6 @@ _Reshaping existing code_
 
 _Data flow and types_
 
-- _Untyped data crossing a boundary (network body, `process.env`, form input, IPC, file read), **or** about to narrow it with `typeof x ===`, `'foo' in x`, or an `as` cast?_
-  -> Define a zod schema at the boundary; use `safeParse` if the failure path becomes a domain error. **Once parsed, FK-protected, or caller-gated — stop re-checking.** Don't write defensive existence checks, invariant throws, or SELECT-before-INSERT for what the schema / FK / contract already guarantees. (`parse-dont-narrow.md`, `dont-duplicate-validation.md`)
-
 _Control flow_
 
 - _Wrapping real work inside an `if (ok) { ... }` chain, writing `else` after a `return`, or assembling a multi-field result with branching ternaries?_
@@ -225,7 +222,7 @@ _React and JSX_
   -> Only for syncing with an external system (browser API, subscription, third-party widget, manual DOM measurement). Anything that orchestrates React state — derive during render, move into the event handler that caused it, use a `key` prop to reset, or use `useSyncExternalStore`. Never suppress `exhaustive-deps`. (`useeffect-escape-hatch.md`)
 
 - _Defining a component prop interface?_
-  -> Two checks. **(a)** Reject render-callback props (`(...) => ReactNode`), component-as-prop props (`ComponentType<...>`), and `mode`/`variant` discriminators that gate two different render branches — use `children` (or named `ReactNode` slots), or split into per-mode components. **(b)** If a child would take 4+ props all derived from one parent's `data` + state (`isPending`, `isError`, `refetch`, `visibleRows`, etc.), push the state down — let the child call its own query hook. Props describe parent **decisions**, not parent-derived state. (`composition-over-render-props.md`, `push-state-down.md`)
+  -> Reject render-callback props (`(...) => ReactNode`), component-as-prop props (`ComponentType<...>`), and `mode`/`variant` discriminators that gate two different render branches — use `children` (or named `ReactNode` slots), or split into per-mode components. (`composition-over-render-props.md`)
 
 - _Writing an inline arrow in a JSX prop (`onClick={() => { ... }}`, `onSubmit={...}`, `onChange={...}`)?_
   -> If the body is 3+ lines, branches, or nests a callback, extract a named function (`handleX`) above `return` and pass it by reference. One- and two-line handlers stay inline. Don't wrap a bare reference in an arrow — `onClick={() => doThing()}` is just `onClick={doThing}`. (`extract-inline-handlers.md`)
@@ -238,17 +235,10 @@ _Diagnostic noise_
 - _Writing a comment, or typing "for now" / "follow-up" / "later" / "TODO" anywhere — in code, in commit bodies, in PR descriptions?_
   -> Default: no comment. Comment only non-obvious **logic** — not rationale, not tradeoffs, not "why we chose X" (that goes in the PR body). TODO is allowed only as `// TODO(#295):` pointing at a tracked issue. Deferral framing ("not blocking, monitor post-launch", "flag for later rollout") without a cited issue number is rejected — fix it in this PR. (`code-comments.md`, `no-follow-up-deferral.md`)
 
-_UI surfaces_
-
-- _Touching a UI surface — new page, component, dialog, route, restyle?_
-  -> Check the **register** first (Monument / Workshop / Bond Paper) before reaching for type or color. No Clash Display on Workshop surfaces. No Archivo Black or Source Serif 4 off Bond Paper. No arbitrary spacing (`p-[18px]`, `gap-[7px]`) — use the Tailwind scale or the codified `--spacing-4_5`. No rounded corners over 2px. No gradients, drop shadows, glassmorphism. Mobile-first base layout. All three states (loading / empty / error) designed; never a blank screen or raw `error.message`. (`design.md`)
-  - **Forms, dialogs, destructive actions:** labels above inputs (never floating, never beside), single top-of-form legend for required (`* required`), one primary action per surface, Cancel **left** / primary **right**. Dialogs are for confirms or ≤4-field edits only — long forms go to a page. Destructive confirms name the entity (`Delete paper "X"?`, never "Are you sure?") and the action button (`Delete paper`, never `Yes` / `OK`); use the `destructive` variant. (`forms-and-actions.md`)
-  - **Tables, data rows, status indicators:** `line-clamp` + `title` for long content (numbers don't truncate — widen the column), shared date formatter (`formatRelativeOrAbsolute`) — never inline `.toLocaleString()`, `tabular-nums` + right-align for numeric columns, `—` for empty cells (never blank), icon-only buttons need **both** `aria-label` **and** a Tooltip, no decorative icons. Status renders as `● label` (`Status` component), not a tinted pill — max one tinted pill per row, and only for role identity (Admin, Lead, External), never for state. (`data-display.md`, `state-color-density.md`)
-
 _Pre-production hygiene_
 
-- _About to create a new migration file, feature flag, backcompat shim, deprecation comment, `_unused` rename, or `// removed in X` marker?_
-  -> Don't. Edit the three baseline migration files (`0000_baseline.sql`, `0001_custom-sql.sql`, `0002_seed-reference-data.sql`) in place — never create a fourth. Delete instead of deprecate; rename in place instead of shim; remove unused exports entirely. There is no live deployment to protect. (`project-stage.md`)
+- _About to create a feature flag, backcompat shim, deprecation comment, `_unused` rename, or `// removed in X` marker?_
+  -> Don't. Delete instead of deprecate; rename in place instead of shim; remove unused exports entirely. There is no live deployment to protect. (`project-stage.md`)
 
 When a reflex fires and you're not certain of the spec, open the linked rule file. The reflex list above is the trigger; the rule file is the answer.
 

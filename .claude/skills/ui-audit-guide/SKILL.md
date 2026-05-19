@@ -21,16 +21,14 @@ Audit a running web application for UI/UX issues by navigating through user flow
 
 Always load and audit against:
 
-| Rule                                                                 | Purpose                                                                         |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| [design.md](../../rules/design.md)                                   | Mobile-first, three required states (loading/empty/error), accessibility floors |
-| [logging-proportionality.md](../../rules/logging-proportionality.md) | Report findings tersely — one dense line per issue, no incremental narration    |
+| Rule                                                                 | Purpose                                                                      |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [logging-proportionality.md](../../rules/logging-proportionality.md) | Report findings tersely — one dense line per issue, no incremental narration |
 
 ## Prerequisites
 
 - Playwright MCP server must be configured in `.mcp.json` (runs headless by default)
 - The application must be running at a known URL
-- Design guidelines must exist at `.claude/rules/design.md` or `docs/DESIGN.md`
 
 ## Process
 
@@ -51,12 +49,7 @@ If flows are not specified, explore the page to identify them:
 
 ### Step 2: Load Design Context
 
-Before testing, read the design guidelines:
-
-```
-Read .claude/rules/design.md
-Read docs/DESIGN.md (if exists)
-```
+Before testing, read any project design references that exist (`docs/DESIGN.md`, package-level `CLAUDE.md` files in `packages/`, or design tokens at `packages/core/tokens/`). Skip if none apply.
 
 Extract and hold onto:
 

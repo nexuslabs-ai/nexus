@@ -14,11 +14,8 @@ Every rule below is a concrete application of this principle. When they conflict
 ## Rules in this directory
 
 - `ripple-effect.md` — a change isn't done until callers, callees, and adjacent code are as clean as a fresh write
-- `parse-dont-narrow.md` — zod at every boundary; no hand-rolled `typeof` guards
-- `dont-duplicate-validation.md` — once parsed / FK-protected / caller-gated, stop re-validating
 - `guard-clauses.md` — keep the happy path at column 0; exit early
 - `composition-over-render-props.md` — `children` or per-mode components; never `renderItem` / `mode` discriminators
-- `push-state-down.md` — children own their data; props describe parent decisions, not parent-derived state
 - `extract-inline-handlers.md` — multi-line / branching JSX handlers get a named function above `return`; one-liners stay inline
 - `useeffect-escape-hatch.md` — effects sync with external systems, not React state
 - `logging-proportionality.md` — one dense canonical log line beats ten incremental ones

@@ -29,7 +29,6 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | [code-quality.md](../rules/code-quality.md)                       | Governing principle: favor simplicity over cleverness; index to per-rule files    |
 | [ripple-effect.md](../rules/ripple-effect.md)                     | Config/infra changes must leave callers and adjacent setup consistently updated   |
-| [parse-dont-narrow.md](../rules/parse-dont-narrow.md)             | zod at boundaries — CI env parsing, secrets shape, third-party webhooks           |
 | [logging-proportionality.md](../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                           |
 | [code-comments.md](../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues |
 | [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no migration files; edit the three baseline files  |

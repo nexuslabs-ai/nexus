@@ -48,7 +48,6 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | Rule                                          | Purpose                                                                          |
 | --------------------------------------------- | -------------------------------------------------------------------------------- |
 | [project-stage.md](../rules/project-stage.md) | Pre-production: no backcompat, no migration files; edit the three baseline files |
-| [docs-mcp.md](../rules/docs-mcp.md)           | MANDATORY: query examlly-docs-mcp when documenting any third-party API           |
 
 ## Focus Areas
 

@@ -32,7 +32,6 @@ Always load and follow:
 | Rule                                             | Purpose                                                                       |
 | ------------------------------------------------ | ----------------------------------------------------------------------------- |
 | [project-stage.md](../../rules/project-stage.md) | Pre-production: don't document migration paths or backcompat that don't exist |
-| [docs-mcp.md](../../rules/docs-mcp.md)           | When documenting third-party APIs, verify against examlly-docs-mcp            |
 
 ## Workflow
 

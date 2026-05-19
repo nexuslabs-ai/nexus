@@ -31,8 +31,6 @@ Always load and check the diff against:
 | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files     |
 | [ripple-effect.md](../../rules/ripple-effect.md)                                 | Flag callers, callees, or adjacent code left inconsistent after the change         |
-| [parse-dont-narrow.md](../../rules/parse-dont-narrow.md)                         | Flag hand-rolled `typeof` guards or `as` casts at boundaries — require zod         |
-| [dont-duplicate-validation.md](../../rules/dont-duplicate-validation.md)         | Flag internal re-validation that duplicates zod / FK / caller-contract guarantees  |
 | [guard-clauses.md](../../rules/guard-clauses.md)                                 | Flag deeply nested conditionals; require happy path at column 0                    |
 | [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Flag `renderItem` / `mode` discriminators; require `children` or per-mode split    |
 | [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Flag effects that orchestrate React state instead of syncing with external systems |
@@ -40,7 +38,6 @@ Always load and check the diff against:
 | [code-comments.md](../../rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code           |
 | [no-follow-up-deferral.md](../../rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                            |
 | [project-stage.md](../../rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                |
-| [docs-mcp.md](../../rules/docs-mcp.md)                                           | Verify third-party API usage via examlly-docs-mcp before approving                 |
 
 ## Review Process
 

@@ -71,7 +71,7 @@ Parse viewport flag:
 
 **Do this yourself — do NOT spawn an agent.**
 
-1. Read `.claude/rules/design.md` for design guidelines
+1. Read available design references (`docs/DESIGN.md`, package-level `CLAUDE.md`s, design tokens) if present
 2. Use `mcp__playwright__browser_resize` to set the viewport
 3. Use `mcp__playwright__browser_navigate` to go to the URL
 4. Use `mcp__playwright__browser_take_screenshot` to capture the initial state
@@ -137,7 +137,7 @@ After all flows are audited, run the visual direction pass **before** compiling 
 
 Follow Step 5 in `.claude/skills/ui-audit-guide/SKILL.md`:
 
-1. State the design intent explicitly (product, user, north star) — read from `.claude/rules/design.md`
+1. State the design intent explicitly (product, user, north star) — infer from available design references (`docs/DESIGN.md`, package-level `CLAUDE.md`s, design tokens)
 2. Select 2–4 key "resting state" screenshots from what you captured during Phase 4
 3. For each screenshot, answer the five decomposed questions (squint test, type scale, spacing rhythm, primary action clarity, intentionality)
 4. Score each dimension 1–5 with a one-sentence observation

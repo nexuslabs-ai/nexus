@@ -29,10 +29,9 @@ On-demand dependency analysis that checks for available updates, breaking change
 
 Always load and follow:
 
-| Rule                                             | Purpose                                                                            |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| [docs-mcp.md](../../rules/docs-mcp.md)           | MANDATORY: query examlly-docs-mcp for current API surface before flagging breakage |
-| [project-stage.md](../../rules/project-stage.md) | Pre-production: prefer clean upgrades over migration shims; no backcompat layers   |
+| Rule                                             | Purpose                                                                          |
+| ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| [project-stage.md](../../rules/project-stage.md) | Pre-production: prefer clean upgrades over migration shims; no backcompat layers |
 
 ## Input Options
 
