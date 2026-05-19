@@ -51,7 +51,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | [guard-clauses.md](../rules/guard-clauses.md)                     | Keep the assertion path at column 0; exit early on setup failures                  |
 | [logging-proportionality.md](../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                            |
 | [code-comments.md](../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues  |
-| [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no migration files; edit the three baseline files   |
+| [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place   |
 
 ## Focus Areas
 

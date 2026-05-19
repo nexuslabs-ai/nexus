@@ -31,7 +31,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | [ripple-effect.md](../rules/ripple-effect.md)                     | Config/infra changes must leave callers and adjacent setup consistently updated   |
 | [logging-proportionality.md](../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                           |
 | [code-comments.md](../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues |
-| [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no migration files; edit the three baseline files  |
+| [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place  |
 | [github.md](../rules/github.md)                                   | PR title/body templates, branch naming, commit format, `Closes #N`                |
 
 ## Focus Areas

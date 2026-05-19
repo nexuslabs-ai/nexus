@@ -39,12 +39,13 @@ This skill works with multiple input types:
 
 Based on what you're testing, different patterns apply:
 
-| Package            | Detect By          | Testing Approach                  |
-| ------------------ | ------------------ | --------------------------------- |
-| Core               | `packages/core/`   | Unit + integration tests (Vitest) |
-| Database           | `packages/db/`     | Integration tests with test DB    |
-| Server             | `packages/server/` | Integration tests (Hono + mock)   |
-| General TypeScript | Any `.ts`          | Vitest unit/integration tests     |
+| Package            | Detect By              | Testing Approach                                   |
+| ------------------ | ---------------------- | -------------------------------------------------- |
+| Core               | `packages/core/`       | Unit tests for token generation scripts (Vitest)   |
+| React              | `packages/react/`      | Story-first: play functions in `*.stories.tsx`     |
+| Test utils         | `packages/test-utils/` | Unit tests for shared helpers                      |
+| Tailwind           | `packages/tailwind/`   | Generated CSS — verify via consuming-package tests |
+| General TypeScript | Any `.ts`              | Vitest unit/integration tests                      |
 
 ## Base Rules
 
@@ -57,7 +58,7 @@ Always load and follow:
 | [guard-clauses.md](../../rules/guard-clauses.md)                     | Keep the assertion path at column 0; exit early on setup failures                    |
 | [logging-proportionality.md](../../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                              |
 | [code-comments.md](../../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
-| [project-stage.md](../../rules/project-stage.md)                     | Pre-production: no backcompat, no migration files; edit the three baseline files     |
+| [project-stage.md](../../rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place     |
 | [github.md](../../rules/github.md)                                   | PR title/body templates, branch naming, commit format, `Closes #N`                   |
 
 ## Implementation Process
@@ -203,7 +204,6 @@ After test implementation is complete:
 ```bash
 yarn test path/to/tests
 ```
-````
 
 - [ ] All tests passing
 - [ ] Tests are deterministic
@@ -212,7 +212,6 @@ yarn test path/to/tests
 ### Next Steps
 
 {Any follow-up items or notes}
-
 ````
 
 ## Assertion Patterns Reference
@@ -227,10 +226,8 @@ expect(result).toMatchObject({
 });
 
 // Good - custom helper for domain objects
-expectPropsToInclude(result.props, [
-  { name: 'variant', type: 'string' },
-]);
-````
+expectPropsToInclude(result.props, [{ name: 'variant', type: 'string' }]);
+```
 
 ### Array Assertions
 

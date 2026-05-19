@@ -47,11 +47,11 @@
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{neutral.100}",
+      "$value": "{neutral.200}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{neutral.200}",
+      "$value": "{neutral.300}",
       "$type": "color"
     },
     "disabled": {

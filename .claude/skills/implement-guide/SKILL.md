@@ -209,8 +209,6 @@ _Reshaping existing code_
 - _Adding a new helper, formatter, hook, dialog, route handler, or component from scratch?_
   -> Grep first. If something near-equivalent exists, extend it. A second copy that "differs only in `h` vs `hr`", "differs only by one default arg", or is "near-byte-identical" is the drift smell that keeps getting flagged in review. (`code-quality.md`)
 
-_Data flow and types_
-
 _Control flow_
 
 - _Wrapping real work inside an `if (ok) { ... }` chain, writing `else` after a `return`, or assembling a multi-field result with branching ternaries?_

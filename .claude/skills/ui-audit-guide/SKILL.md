@@ -49,13 +49,13 @@ If flows are not specified, explore the page to identify them:
 
 ### Step 2: Load Design Context
 
-Before testing, read any project design references that exist (`docs/DESIGN.md`, package-level `CLAUDE.md` files in `packages/`, or design tokens at `packages/core/tokens/`). Skip if none apply.
+Before testing, read available design references: the root `CLAUDE.md`, package-level `CLAUDE.md` files (`packages/core/CLAUDE.md`, `packages/react/CLAUDE.md`, etc.), and design tokens in `packages/core/tokens/`. Skip any that don't apply.
 
 Extract and hold onto:
 
 - Who the user is (non-technical? expert? mobile-first?)
 - What the product is for
-- The aesthetic north star ("effortless for a first-time teacher", etc.)
+- The aesthetic north star (one-sentence summary of what "good" feels like for this product)
 - Anti-patterns to watch for
 
 This design intent will anchor the visual direction evaluation in Step 5.

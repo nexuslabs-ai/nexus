@@ -47,7 +47,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 
 | Rule                                          | Purpose                                                                          |
 | --------------------------------------------- | -------------------------------------------------------------------------------- |
-| [project-stage.md](../rules/project-stage.md) | Pre-production: no backcompat, no migration files; edit the three baseline files |
+| [project-stage.md](../rules/project-stage.md) | Pre-production: no backcompat, no shims, no feature flags — change code in place |
 
 ## Focus Areas
 

@@ -34,7 +34,7 @@ Always load and follow:
 | [ripple-effect.md](../../rules/ripple-effect.md)                                 | Plan must account for callers, callees, and adjacent code consistency            |
 | [composition-over-render-props.md](../../rules/composition-over-render-props.md) | Component shape decisions: `children` or per-mode split, never render callbacks  |
 | [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Design data flow so effects sync with external systems, not React state          |
-| [project-stage.md](../../rules/project-stage.md)                                 | Pre-production: no backcompat, no migration files; edit the three baseline files |
+| [project-stage.md](../../rules/project-stage.md)                                 | Pre-production: no backcompat, no shims, no feature flags — change code in place |
 | [github.md](../../rules/github.md)                                               | PR title/body templates, branch naming, commit format, `Closes #N`               |
 
 ## Planning Process

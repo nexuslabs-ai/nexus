@@ -11,7 +11,7 @@ The goal is code that is easy to read, easy to change, and easy to delete. Prefe
 
 Every rule below is a concrete application of this principle. When they conflict with each other in a specific case, pick whichever keeps the simpler reading.
 
-## Rules in this directory
+## Rules in this set
 
 - `ripple-effect.md` — a change isn't done until callers, callees, and adjacent code are as clean as a fresh write
 - `guard-clauses.md` — keep the happy path at column 0; exit early
@@ -20,3 +20,5 @@ Every rule below is a concrete application of this principle. When they conflict
 - `useeffect-escape-hatch.md` — effects sync with external systems, not React state
 - `logging-proportionality.md` — one dense canonical log line beats ten incremental ones
 - `code-comments.md` — comment non-obvious logic only; TODOs must cite a tracked issue
+- `no-follow-up-deferral.md` — every issue flagged by a PR review is fixed in the same PR
+- `project-stage.md` — pre-production: no backcompat, no shims, no feature flags — change code in place
