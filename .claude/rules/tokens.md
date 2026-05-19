@@ -17,6 +17,42 @@ All tokens MUST follow the W3C Design Tokens Community Group format:
 Required properties: `$value`, `$type`
 Optional properties: `$description`, `$extensions`
 
+## Color Token Pipeline
+
+**On-disk format: hex strings.** `tokens/primitives/color.json` and the ten semantic overlay tokens (e.g., `#000000cc`) store hex. Tokens Studio and Figma Variables hex-normalise color values on export and cannot round-trip OKLCH, so hex is the only viable on-disk format for a Figma-driven workflow.
+
+**Runtime format: OKLCH.** The build pipeline converts hex to `oklch(...)` at emit time. The conversion happens in `packages/core/scripts/utils.js` (lines 30–53, `formatTokenValue`), which routes every `$type: "color"` hex value through `packages/core/scripts/lib/perceptual-grid.js`.
+
+### Routing modes
+
+**Grid-pinned** — applies to primitive palette shades, where the token path matches `{palette}.{shade}` and `shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`. Lightness (L) is overwritten by a fixed perceptual grid defined in `perceptual-grid.js:PERCEPTUAL_L_GRID`. Chroma comes from culori's parse of the hex and is then clamped via `culori.toGamut('rgb')` to stay in sRGB. Hue is preserved from the hex.
+
+**Mechanical** — applies to everything else: white, black, semantic overlay hex with alpha (e.g., `#000000cc`), and any one-off value that isn't a palette shade key. Straight hex→oklch via culori; alpha is preserved from 8-digit hex.
+
+### Warning for designers
+
+When you pick a hex in Figma for a palette shade, only the **hue and chroma** of that hex flow through to the generated CSS. The **L is overwritten by the grid**. A vivid `#ff0000` and a dark `#400000` at the same shade key produce identical lightness — only the hue and chroma differ. To change the lightness of a shade, edit `perceptual-grid.js:PERCEPTUAL_L_GRID` — the JSON hex is not the right lever.
+
+### DTCG deviation
+
+We keep `$value` as a hex string on disk rather than the DTCG-2025.10 structured-object form (`{ "colorSpace": "oklch", "components": [...] }`). Reason: design tools write hex strings on export, not DTCG objects, so the structured form would be lost on the next round-trip. The string form passes through the existing resolver unchanged. Revisit if a downstream consumer ever needs spec-compliant import.
+
+### Browser floor
+
+OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex fallback is emitted. Consumers needing older browsers must pin to the last pre-migration tag.
+
+### APCA contrast gate
+
+`yarn workspace @nexus/core audit:contrast` (implemented in `packages/core/scripts/audit-contrast.js`) runs APCA Lc on every base and brand foreground↔background pair, with thresholds chosen per APCA's intended-use tiers:
+
+| Pair                                                                             | Threshold | Rationale |
+| -------------------------------------------------------------------------------- | --------- | --------- | ----- | ------------------------------- |
+| `foreground ↔ background`                                                        | `         | Lc        | ≥ 75` | Body text, fluent reading       |
+| `{primary,secondary,error,success,warning,information}-foreground ↔ -background` | `         | Lc        | ≥ 60` | UI labels (buttons, badges)     |
+| `muted-foreground ↔ muted`                                                       | `         | Lc        | ≥ 45` | Incidental / de-emphasised text |
+
+Failures must be fixed by adjusting the semantic token reference (which shade a given role points to) or the L grid values — not by lowering the thresholds. The tiers themselves come from APCA's published guidance and are not negotiable per-finding.
+
 ## File Naming
 
 | Directory  | Pattern                             | Example                                                  |
@@ -78,7 +114,7 @@ Semantic tokens reference primitives using curly brace syntax:
 }
 ```
 
-The reference path matches the JSON structure: `{colorName.shade}`
+The reference path matches the JSON structure: `{colorName.shade}`. At build time the resolver walks this reference to the primitive hex value, then the OKLCH converter emits `var(--nx-color-slate-50)` as an `oklch(...)` value. The hex string stays in JSON; the CSS variable contains OKLCH. See [§ Color Token Pipeline](#color-token-pipeline) for routing details.
 
 ## Color Scale Convention
 

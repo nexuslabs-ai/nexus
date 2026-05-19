@@ -1,6 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 
+import {
+  hexToOklchMechanical,
+  hexToOklchPinned,
+  isPaletteShadeKey,
+} from './lib/perceptual-grid.js';
+
 /**
  * Ensure a directory exists, creating it if necessary
  * @param {string} dir - Directory path
@@ -22,13 +28,16 @@ export function readTokenFile(filePath) {
 }
 
 /**
- * Format a dimension value object to CSS string
+ * Format a token value to a CSS string. For `$type: "color"` hex values,
+ * routes through the OKLCH converters: palette shade tokens (path like
+ * `['blue', '500']`) get pinned to the perceptual L grid; everything else
+ * (white/black/semantic hex literals with alpha) is converted mechanically.
  * @param {object|string|number} value - Token value
  * @param {string} type - Token type
+ * @param {string[]} [tokenPath] - Token path (used to route shade conversions)
  * @returns {string} Formatted CSS value
  */
-export function formatTokenValue(value, type) {
-  // Handle dimension objects: { value: 16, unit: "rem" } → "16rem"
+export function formatTokenValue(value, type, tokenPath) {
   if (
     type === 'dimension' &&
     typeof value === 'object' &&
@@ -38,17 +47,25 @@ export function formatTokenValue(value, type) {
     return `${value.value}${value.unit || 'px'}`;
   }
 
-  // Handle string values (colors, font families, etc.)
+  if (type === 'color' && typeof value === 'string' && value.startsWith('#')) {
+    if (
+      tokenPath &&
+      tokenPath.length === 2 &&
+      isPaletteShadeKey(tokenPath[1])
+    ) {
+      return hexToOklchPinned(value, tokenPath[1]);
+    }
+    return hexToOklchMechanical(value);
+  }
+
   if (typeof value === 'string') {
     return value;
   }
 
-  // Handle numbers (font weights, opacity, etc.)
   if (typeof value === 'number') {
     return String(value);
   }
 
-  // Fallback for complex objects (shouldn't happen for primitives)
   return JSON.stringify(value);
 }
 
@@ -128,7 +145,7 @@ export function isReference(value) {
  * @param {string} ref - Reference string like "{blue.500}"
  * @returns {string} Path like "blue.500"
  */
-function extractRefPath(ref) {
+export function extractRefPath(ref) {
   return ref.slice(1, -1);
 }
 
@@ -138,7 +155,7 @@ function extractRefPath(ref) {
  * @param {Map} primitiveMap - Map of primitive token paths to CSS names
  * @returns {string} Resolved CSS value
  */
-function resolveReference(value, primitiveMap) {
+export function resolveReference(value, primitiveMap) {
   if (!isReference(value)) {
     return value;
   }
@@ -183,19 +200,19 @@ function resolveReferenceWithNxPrefix(value, primitiveMap) {
  * @param {*} value - Token value
  * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
  * @param {string} type - Token type
+ * @param {string[]} [tokenPath] - Token path for color routing
  * @returns {string} Resolved CSS value
  */
 export function resolveValueWithNxPrefix(
   value,
   primitiveMap,
-  type = 'unknown'
+  type = 'unknown',
+  tokenPath
 ) {
-  // If it's a reference, resolve it with nx prefix
   if (isReference(value)) {
     return resolveReferenceWithNxPrefix(value, primitiveMap);
   }
 
-  // If it's a dimension object, format it
   if (
     type === 'dimension' ||
     (typeof value === 'object' && value !== null && 'value' in value)
@@ -203,8 +220,7 @@ export function resolveValueWithNxPrefix(
     return formatTokenValue(value, 'dimension');
   }
 
-  // Otherwise return as-is (formatted)
-  return formatTokenValue(value, type);
+  return formatTokenValue(value, type, tokenPath);
 }
 
 /**
@@ -212,15 +228,14 @@ export function resolveValueWithNxPrefix(
  * @param {*} value - Token value
  * @param {Map} primitiveMap - Map of primitives
  * @param {string} type - Token type
+ * @param {string[]} [tokenPath] - Token path for color routing
  * @returns {string} Resolved CSS value
  */
-function resolveValue(value, primitiveMap, type = 'unknown') {
-  // If it's a reference, resolve it
+export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
   if (isReference(value)) {
     return resolveReference(value, primitiveMap);
   }
 
-  // If it's a dimension object, format it
   if (
     type === 'dimension' ||
     (typeof value === 'object' && value !== null && 'value' in value)
@@ -228,14 +243,13 @@ function resolveValue(value, primitiveMap, type = 'unknown') {
     return formatTokenValue(value, 'dimension');
   }
 
-  // Otherwise return as-is (formatted)
-  return formatTokenValue(value, type);
+  return formatTokenValue(value, type, tokenPath);
 }
 
 /**
  * Default configuration for token generation
  */
-const DEFAULT_CONFIG = {
+export const DEFAULT_CONFIG = {
   base: 'stone',
   brand: 'neutral',
   size: 'vega',
@@ -365,7 +379,12 @@ export function processSemanticTokens(filePath, primitiveMap) {
     // No prefix for dimensions (spacing)
     const prefix = token.type === 'color' ? 'nx-color' : null;
     const cssName = pathToCssVar(token.path, prefix);
-    const cssValue = resolveValue(token.value, primitiveMap, token.type);
+    const cssValue = resolveValue(
+      token.value,
+      primitiveMap,
+      token.type,
+      token.path
+    );
     tokens.push({ cssName, value: cssValue, type: token.type });
   }
 
@@ -878,13 +897,14 @@ export function collectSemanticColorTokensVarRef(
         const cssName = `color-${currentPath.join('-')}`;
         let resolvedValue = value.$value;
 
-        // Resolve to var(--nx-*) reference
         if (isReference(resolvedValue)) {
           const refPath = resolvedValue.slice(1, -1);
           const primitiveInfo = primitiveMap.get(refPath);
           if (primitiveInfo) {
             resolvedValue = `var(--${primitiveInfo.cssName})`;
           }
+        } else {
+          resolvedValue = formatTokenValue(resolvedValue, 'color', currentPath);
         }
 
         tokens.push({ cssName, value: resolvedValue });

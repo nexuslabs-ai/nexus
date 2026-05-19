@@ -28,8 +28,23 @@ describe('utils', () => {
       expect(formatTokenValue(value, 'dimension')).toBe('0rem');
     });
 
-    it('returns string values as-is', () => {
-      expect(formatTokenValue('#3b82f6', 'color')).toBe('#3b82f6');
+    it('converts hex colors to oklch (mechanical when no shade path)', () => {
+      expect(formatTokenValue('#3b82f6', 'color')).toBe(
+        'oklch(0.6231 0.188 259.815)'
+      );
+    });
+
+    it('preserves alpha when converting 8-digit hex colors', () => {
+      expect(formatTokenValue('#000000cc', 'color')).toBe('oklch(0 0 0 / 0.8)');
+    });
+
+    it('pins lightness for palette shade tokens', () => {
+      expect(formatTokenValue('#3b82f6', 'color', ['blue', '500'])).toBe(
+        'oklch(0.553 0.188 259.815)'
+      );
+    });
+
+    it('returns non-color string values as-is', () => {
       expect(formatTokenValue('Inter, sans-serif', 'fontFamily')).toBe(
         'Inter, sans-serif'
       );
@@ -163,8 +178,10 @@ describe('utils', () => {
       expect(resolveValue(dimension, primitiveMap, 'unknown')).toBe('8px');
     });
 
-    it('passes through string values', () => {
-      expect(resolveValue('#ff0000', primitiveMap, 'color')).toBe('#ff0000');
+    it('converts non-reference hex strings through the oklch formatter', () => {
+      expect(resolveValue('#ff0000', primitiveMap, 'color')).toBe(
+        'oklch(0.628 0.2577 29.234)'
+      );
     });
   });
 

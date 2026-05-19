@@ -42,7 +42,7 @@
   --color-popover-foreground: var(--nx-color-stone-950);
   --color-popover-hover: var(--nx-color-stone-50);
   --color-popover-active: var(--nx-color-stone-100);
-  --color-overlay: #1e1e1ecc;
+  --color-overlay: oklch(0.235 0 0 / 0.8);
   --color-border-default: var(--nx-color-stone-200);
   --color-border-active: var(--nx-color-stone-400);
   --color-border-disabled: var(--nx-color-stone-100);
@@ -217,7 +217,7 @@
   --nx-color-background-hover: var(--nx-color-stone-800);
   --nx-color-background-active: var(--nx-color-stone-950);
   --nx-color-muted: var(--nx-color-stone-800);
-  --nx-color-muted-foreground: var(--nx-color-stone-400);
+  --nx-color-muted-foreground: var(--nx-color-stone-300);
   --nx-color-muted-light: var(--nx-color-stone-800);
   --nx-color-muted-light-foreground: var(--nx-color-stone-500);
   --nx-color-disabled: var(--nx-color-stone-950);
@@ -230,7 +230,7 @@
   --nx-color-popover-foreground: var(--nx-color-white);
   --nx-color-popover-hover: var(--nx-color-stone-700);
   --nx-color-popover-active: var(--nx-color-stone-900);
-  --nx-color-overlay: #000000cc;
+  --nx-color-overlay: oklch(0 0 0 / 0.8);
   --nx-color-border-default: var(--nx-color-stone-700);
   --nx-color-border-active: var(--nx-color-stone-400);
   --nx-color-border-disabled: var(--nx-color-stone-950);

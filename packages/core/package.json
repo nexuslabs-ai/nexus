@@ -6,8 +6,13 @@
   "description": "Internal design tokens and theme definitions (not published)",
   "scripts": {
     "build:tokens:modular": "node scripts/generate-modular.js",
-    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=neutral --borderwidth=vega --radius=sharp --shadow=vega --size=vega --typography=vega"
+    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=neutral --borderwidth=vega --radius=sharp --shadow=vega --size=vega --typography=vega",
+    "audit:contrast": "node scripts/audit-contrast.js"
   },
   "dependencies": {},
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "apca-w3": "^0.1.9",
+    "culori": "^4.0.2"
+  }
 }

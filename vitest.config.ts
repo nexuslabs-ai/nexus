@@ -30,6 +30,7 @@ export default defineConfig({
           globals: true,
           include: [
             'packages/**/src/**/*.test.{ts,tsx}',
+            'packages/**/scripts/**/*.test.{js,ts}',
             // Exclude component tests - they're now in stories
             '!packages/react/src/components/**/*.test.{ts,tsx}',
           ],

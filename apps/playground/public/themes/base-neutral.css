@@ -19,7 +19,7 @@ html {
   --nx-color-popover-foreground: var(--nx-color-neutral-950);
   --nx-color-popover-hover: var(--nx-color-neutral-50);
   --nx-color-popover-active: var(--nx-color-neutral-100);
-  --nx-color-overlay: #1e1e1ecc;
+  --nx-color-overlay: oklch(0.235 0 0 / 0.8);
   --nx-color-border-default: var(--nx-color-neutral-200);
   --nx-color-border-active: var(--nx-color-neutral-400);
   --nx-color-border-disabled: var(--nx-color-neutral-100);
@@ -77,7 +77,7 @@ html.dark {
   --nx-color-background-hover: var(--nx-color-neutral-800);
   --nx-color-background-active: var(--nx-color-neutral-950);
   --nx-color-muted: var(--nx-color-neutral-800);
-  --nx-color-muted-foreground: var(--nx-color-neutral-400);
+  --nx-color-muted-foreground: var(--nx-color-neutral-300);
   --nx-color-muted-light: var(--nx-color-neutral-800);
   --nx-color-muted-light-foreground: var(--nx-color-neutral-500);
   --nx-color-disabled: var(--nx-color-neutral-950);
@@ -90,7 +90,7 @@ html.dark {
   --nx-color-popover-foreground: var(--nx-color-white);
   --nx-color-popover-hover: var(--nx-color-neutral-700);
   --nx-color-popover-active: var(--nx-color-neutral-900);
-  --nx-color-overlay: #000000cc;
+  --nx-color-overlay: oklch(0 0 0 / 0.8);
   --nx-color-border-default: var(--nx-color-neutral-700);
   --nx-color-border-active: var(--nx-color-neutral-400);
   --nx-color-border-disabled: var(--nx-color-neutral-950);

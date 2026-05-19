@@ -45,7 +45,7 @@
   --color-popover-foreground: var(--nx-color-slate-900);
   --color-popover-hover: var(--nx-color-slate-50);
   --color-popover-active: var(--nx-color-slate-100);
-  --color-overlay: #1e1e1ecc;
+  --color-overlay: oklch(0.235 0 0 / 0.8);
   --color-border-default: var(--nx-color-slate-200);
   --color-border-active: var(--nx-color-slate-400);
   --color-border-disabled: var(--nx-color-slate-100);
