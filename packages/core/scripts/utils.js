@@ -641,8 +641,10 @@ export function getGoogleFontsImportFromTokens(typographyFilePath) {
  * @returns {string} Resolved CSS value
  */
 function resolveTypographyProperty(value, primitiveMap) {
-  // Handle 'auto' for lineHeight
-  if (value === 'auto') return 'auto';
+  // Figma exports `lineHeight: "auto"` for the code-inline typography token,
+  // but `line-height: auto` is invalid CSS — browsers ignore it. Map to
+  // `normal` (CSS spec default, ~1.2) so the emitted utility is well-formed.
+  if (value === 'auto') return 'normal';
 
   // Handle references like {family.font-sans}
   if (
