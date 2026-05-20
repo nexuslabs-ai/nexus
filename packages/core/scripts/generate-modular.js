@@ -195,6 +195,72 @@ function generateThemedCSS(type, mode, primitiveMap) {
 }
 
 /**
+ * Generate themed primitive CSS file (light/dark pair → one file with html / html.dark blocks).
+ * Mirrors generateThemedCSS so themed primitives load the same way as base/brands semantics.
+ */
+function generateThemedPrimitiveCSS(category, mode, primitiveMap) {
+  const lightTokens = processPrimitiveFile(
+    category,
+    `${mode}-light`,
+    primitiveMap
+  );
+  const darkTokens = processPrimitiveFile(
+    category,
+    `${mode}-dark`,
+    primitiveMap
+  );
+
+  let css = `/* ${category}: ${mode} */\n\nhtml {\n`;
+
+  for (const token of lightTokens) {
+    css += `  --${token.cssName}: ${token.value};\n`;
+  }
+  css += `}\n\nhtml.dark {\n`;
+
+  for (const token of darkTokens) {
+    css += `  --${token.cssName}: ${token.value};\n`;
+  }
+  css += `}\n`;
+
+  writeModularFile(`${category}-${mode}.css`, css);
+}
+
+/**
+ * Group {base}-light / {base}-dark mode names into pairs; pass others through unchanged.
+ * Returns { themed: { base: { light, dark } }, plain: [mode, ...] }.
+ */
+function partitionThemedModes(modes) {
+  const themed = {};
+  const plain = [];
+  const seen = new Set();
+
+  for (const mode of modes) {
+    if (seen.has(mode)) continue;
+    const match = mode.match(/^(.+)-(light|dark)$/);
+    if (!match) {
+      plain.push(mode);
+      seen.add(mode);
+      continue;
+    }
+    const [, base, variant] = match;
+    const other = variant === 'light' ? `${base}-dark` : `${base}-light`;
+    if (modes.includes(other)) {
+      themed[base] = {
+        light: `${base}-light`,
+        dark: `${base}-dark`,
+      };
+      seen.add(`${base}-light`);
+      seen.add(`${base}-dark`);
+    } else {
+      plain.push(mode);
+      seen.add(mode);
+    }
+  }
+
+  return { themed, plain };
+}
+
+/**
  * Generate shadow variables CSS
  */
 function generateShadowVariablesCSS(shadows) {
@@ -306,6 +372,8 @@ function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
 function main() {
   console.log('🎨 Generating modular CSS files...\n');
 
+  // Wipe and recreate dist so renamed/removed outputs do not leave orphans.
+  fs.rmSync(MODULAR_DIR, { recursive: true, force: true });
   ensureDir(MODULAR_DIR);
 
   // Auto-discover all categories and modes
@@ -350,9 +418,16 @@ function main() {
   for (const [category, info] of Object.entries(primitives)) {
     if (info.modes && info.modes.length > 0) {
       console.log(`\n${category} modes:`);
-      for (const mode of info.modes) {
+      const { themed, plain } = partitionThemedModes(info.modes);
+
+      for (const mode of plain) {
         const tokens = processPrimitiveFile(category, mode, primitiveMap);
         generateModeCSS(category, mode, tokens);
+        totalFiles++;
+      }
+
+      for (const mode of Object.keys(themed)) {
+        generateThemedPrimitiveCSS(category, mode, primitiveMap);
         totalFiles++;
       }
     }
