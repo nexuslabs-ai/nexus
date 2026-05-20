@@ -290,25 +290,25 @@ export function ComponentShowcase() {
           description="Feedback and alert styles"
         >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
-            <div className="nx:bg-success-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-success-subtle nx:border nx:border-border-success nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-success-background" />
               <span className="nx:text-success-subtle-foreground nx:text-sm nx:font-medium">
                 Success message
               </span>
             </div>
-            <div className="nx:bg-error-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-error-subtle nx:border nx:border-border-error nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-error-background" />
               <span className="nx:text-error-subtle-foreground nx:text-sm nx:font-medium">
                 Error message
               </span>
             </div>
-            <div className="nx:bg-warning-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-warning-subtle nx:border nx:border-border-warning nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-warning-background" />
               <span className="nx:text-warning-subtle-foreground nx:text-sm nx:font-medium">
                 Warning message
               </span>
             </div>
-            <div className="nx:bg-information-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-information-subtle nx:border nx:border-border-information nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-information-background" />
               <span className="nx:text-information-subtle-foreground nx:text-sm nx:font-medium">
                 Info message
