@@ -1,10 +1,14 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import * as prettier from 'prettier';
+import { fileURLToPath } from 'url';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { generateTailwindPackage } from '../generate-tailwind-package.js';
 import { DEFAULT_CONFIG } from '../utils.js';
+
+const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 const tmpDirs = [];
 
@@ -28,7 +32,7 @@ function extractBlock(css, openSelector) {
   return match[1];
 }
 
-afterEach(() => {
+afterAll(() => {
   while (tmpDirs.length > 0) {
     const dir = tmpDirs.pop();
     fs.rmSync(dir, { recursive: true, force: true });
@@ -41,14 +45,14 @@ describe('generateTailwindPackage', () => {
   let nexusCSS;
   let warnings;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     warnings = [];
     const originalWarn = console.warn;
     console.warn = (...args) => warnings.push(args.map(String).join(' '));
 
     try {
       distDir = makeTmpDir();
-      generateTailwindPackage(DEFAULT_CONFIG, { distDir });
+      await generateTailwindPackage(DEFAULT_CONFIG, { distDir });
     } finally {
       console.warn = originalWarn;
     }
@@ -108,5 +112,28 @@ describe('generateTailwindPackage', () => {
   it('emits zero `File not found` warnings for the default config', () => {
     const fileNotFound = warnings.filter((w) => /File not found/.test(w));
     expect(fileNotFound).toEqual([]);
+  });
+
+  // Regenerating tokens used to produce a noisy whitespace diff against the
+  // committed CSS because the generator emitted raw output but the committed
+  // files were prettier-formatted. The generator now formats every emitted
+  // file, so prettier --check must agree it has nothing to change.
+  it('emits prettier-formatted CSS (idempotent under prettier)', async () => {
+    const config = await prettier.resolveConfig(TEST_DIR);
+    const files = fs
+      .readdirSync(distDir)
+      .filter((name) => name.endsWith('.css'));
+
+    expect(files.length).toBeGreaterThan(0);
+
+    for (const name of files) {
+      const filePath = path.join(distDir, name);
+      const content = fs.readFileSync(filePath, 'utf8');
+      const reformatted = await prettier.format(content, {
+        ...config,
+        filepath: filePath,
+      });
+      expect(reformatted, `${name} is not prettier-formatted`).toBe(content);
+    }
   });
 });
