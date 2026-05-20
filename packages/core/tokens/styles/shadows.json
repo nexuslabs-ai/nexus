@@ -15,7 +15,7 @@
       "offsetX": "{xs.layer-1.x}",
       "offsetY": "{xs.layer-1.y}",
       "blur": "{xs.layer-1.blur}",
-      "spread": "{2xs.layer-1.spread}",
+      "spread": "{xs.layer-1.spread}",
       "color": "{xs.layer-1.color}"
     }
   },
