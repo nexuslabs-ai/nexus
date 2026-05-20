@@ -13,6 +13,7 @@
   "license": "MIT",
   "devDependencies": {
     "apca-w3": "^0.1.9",
-    "culori": "^4.0.2"
+    "culori": "^4.0.2",
+    "prettier": "^3.7.4"
   }
 }

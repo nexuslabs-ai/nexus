@@ -12,7 +12,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
-  formatDistDirectory,
+  formatDistCssFiles,
   formatTokenValue,
   generateBaseLayerCSS,
   generateBorderWidthUtilitiesCSS,
@@ -526,7 +526,7 @@ export async function generateTailwindPackage(
   const nexusCSS = generateNexusCSS(semanticFiles, primitiveMap, usedModes);
   writeDistFile('nexus.css', nexusCSS);
 
-  await formatDistDirectory(distDir);
+  await formatDistCssFiles(distDir);
 
   const themeCount = semanticFiles.themed.length;
   console.log('');

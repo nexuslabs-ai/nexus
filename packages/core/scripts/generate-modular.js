@@ -12,7 +12,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
-  formatDistDirectory,
+  formatDistCssFiles,
   formatShadowComposite,
   formatTokenValue,
   generateBorderWidthUtilitiesCSS,
@@ -30,7 +30,7 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.join(__dirname, '../tokens');
-const MODULAR_DIR = path.join(__dirname, '../dist/modular');
+const DEFAULT_MODULAR_DIR = path.join(__dirname, '../dist/modular');
 
 const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
 const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
@@ -136,8 +136,8 @@ function processShadowStyles() {
 /**
  * Write CSS file
  */
-function writeModularFile(fileName, content) {
-  const filePath = path.join(MODULAR_DIR, fileName);
+function writeModularFile(distDir, fileName, content) {
+  const filePath = path.join(distDir, fileName);
   fs.writeFileSync(filePath, content);
   log.file(fileName);
 }
@@ -145,7 +145,7 @@ function writeModularFile(fileName, content) {
 /**
  * Generate CSS file for a single-file primitive category
  */
-function generatePrimitivesCSS(tokens, category) {
+function generatePrimitivesCSS(distDir, tokens, category) {
   let css = `/* ${category} primitives */\n\n:root {\n`;
 
   for (const token of tokens) {
@@ -153,13 +153,13 @@ function generatePrimitivesCSS(tokens, category) {
   }
 
   css += `}\n`;
-  writeModularFile(`${category}.css`, css);
+  writeModularFile(distDir, `${category}.css`, css);
 }
 
 /**
  * Generate mode file (size, typography, shadow, radius, borderwidth)
  */
-function generateModeCSS(category, mode, tokens) {
+function generateModeCSS(distDir, category, mode, tokens) {
   let css = `/* ${category}: ${mode} */\n\n:root {\n`;
 
   for (const token of tokens) {
@@ -167,13 +167,13 @@ function generateModeCSS(category, mode, tokens) {
   }
 
   css += `}\n`;
-  writeModularFile(`${category}-${mode}.css`, css);
+  writeModularFile(distDir, `${category}-${mode}.css`, css);
 }
 
 /**
  * Generate themed CSS file (supports light/dark variants)
  */
-function generateThemedCSS(type, mode, primitiveMap) {
+function generateThemedCSS(distDir, type, mode, primitiveMap) {
   const lightTokens = processSemanticFile(
     `${type}-${mode}-light.json`,
     primitiveMap
@@ -195,14 +195,14 @@ function generateThemedCSS(type, mode, primitiveMap) {
   }
   css += `}\n`;
 
-  writeModularFile(`${type}-${mode}.css`, css);
+  writeModularFile(distDir, `${type}-${mode}.css`, css);
 }
 
 /**
  * Generate themed primitive CSS file (light/dark pair → one file with html / html.dark blocks).
  * Mirrors generateThemedCSS so themed primitives load the same way as base/brands semantics.
  */
-function generateThemedPrimitiveCSS(category, mode, primitiveMap) {
+function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
   const lightTokens = processPrimitiveFile(
     category,
     `${mode}-light`,
@@ -226,13 +226,13 @@ function generateThemedPrimitiveCSS(category, mode, primitiveMap) {
   }
   css += `}\n`;
 
-  writeModularFile(`${category}-${mode}.css`, css);
+  writeModularFile(distDir, `${category}-${mode}.css`, css);
 }
 
 /**
  * Generate shadow variables CSS
  */
-function generateShadowVariablesCSS(shadows) {
+function generateShadowVariablesCSS(distDir, shadows) {
   let css = `/* Shadow Variables */\n\n:root {\n`;
 
   for (const shadow of shadows) {
@@ -240,13 +240,13 @@ function generateShadowVariablesCSS(shadows) {
   }
 
   css += `}\n`;
-  writeModularFile('shadow-variables.css', css);
+  writeModularFile(distDir, 'shadow-variables.css', css);
 }
 
 /**
  * Generate standalone semantic CSS (spacing, etc.)
  */
-function generateStandaloneSemanticCSS(name, tokens) {
+function generateStandaloneSemanticCSS(distDir, name, tokens) {
   let css = `/* ${name} */\n\n:root {\n`;
 
   for (const token of tokens) {
@@ -254,13 +254,13 @@ function generateStandaloneSemanticCSS(name, tokens) {
   }
 
   css += `}\n`;
-  writeModularFile(`${name}.css`, css);
+  writeModularFile(distDir, `${name}.css`, css);
 }
 
 /**
  * Generate globals.css for playground using shared generateThemeCSS function
  */
-function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
+function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
   // Get first available typography mode for Google Fonts
   const typographyModes = primitives.typography?.modes || ['vega'];
   const typographyMode = typographyModes[0];
@@ -331,19 +331,19 @@ function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
     // No dark mode block - playground uses dynamic theme switching
   });
 
-  writeModularFile('globals.css', css);
+  writeModularFile(distDir, 'globals.css', css);
   return colorTokens.length + spacingTokens.length;
 }
 
 /**
  * Main execution
  */
-async function main() {
+export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
   console.log('🎨 Generating modular CSS files...\n');
 
   // Wipe and recreate dist so renamed/removed outputs do not leave orphans.
-  fs.rmSync(MODULAR_DIR, { recursive: true, force: true });
-  ensureDir(MODULAR_DIR);
+  fs.rmSync(distDir, { recursive: true, force: true });
+  ensureDir(distDir);
 
   // Auto-discover all categories and modes
   const primitives = discoverPrimitives(PRIMITIVES_DIR);
@@ -376,7 +376,7 @@ async function main() {
   for (const [category, info] of Object.entries(primitives)) {
     if (info.modes === null) {
       const tokens = processSinglePrimitive(category, primitiveMap);
-      generatePrimitivesCSS(tokens, category);
+      generatePrimitivesCSS(distDir, tokens, category);
       totalFiles++;
     }
   }
@@ -389,12 +389,12 @@ async function main() {
 
       for (const mode of plain) {
         const tokens = processPrimitiveFile(category, mode, primitiveMap);
-        generateModeCSS(category, mode, tokens);
+        generateModeCSS(distDir, category, mode, tokens);
         totalFiles++;
       }
 
       for (const mode of Object.keys(themed)) {
-        generateThemedPrimitiveCSS(category, mode, primitiveMap);
+        generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap);
         totalFiles++;
       }
     }
@@ -404,7 +404,7 @@ async function main() {
   for (const [type, modes] of Object.entries(semantics.themed)) {
     console.log(`\n${type} themes:`);
     for (const mode of Object.keys(modes)) {
-      generateThemedCSS(type, mode, primitiveMap);
+      generateThemedCSS(distDir, type, mode, primitiveMap);
       totalFiles++;
     }
   }
@@ -415,7 +415,7 @@ async function main() {
     for (const standaloneFile of semantics.standalone) {
       const tokens = processSemanticFile(standaloneFile, primitiveMap);
       const fileName = standaloneFile.replace('.json', '');
-      generateStandaloneSemanticCSS(fileName, tokens);
+      generateStandaloneSemanticCSS(distDir, fileName, tokens);
       totalFiles++;
     }
   }
@@ -424,14 +424,14 @@ async function main() {
   console.log('\nStyles:');
   const typography = generateTypographyUtilitiesCSS(TOKENS_DIR, primitiveMap);
   if (typography.css) {
-    writeModularFile('typography-utilities.css', typography.css);
+    writeModularFile(distDir, 'typography-utilities.css', typography.css);
     console.log(`  ✓ ${typography.count} typography utilities`);
     totalFiles++;
   }
 
   // Generate shadow variables from styles
   const shadowVariables = processShadowStyles();
-  generateShadowVariablesCSS(shadowVariables);
+  generateShadowVariablesCSS(distDir, shadowVariables);
   console.log(`  ✓ ${shadowVariables.length} shadow variables`);
   totalFiles++;
 
@@ -444,7 +444,7 @@ async function main() {
       primitiveMap
     );
     const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
-    writeModularFile('borderwidth-utilities.css', borderWidth.css);
+    writeModularFile(distDir, 'borderwidth-utilities.css', borderWidth.css);
     console.log(`  ✓ ${borderWidth.count} border width utilities`);
     totalFiles++;
   }
@@ -452,17 +452,20 @@ async function main() {
   // Generate playground globals.css
   console.log('\nPlayground:');
   const globalsTokenCount = generatePlaygroundGlobalsCSS(
+    distDir,
     primitives,
     primitiveMap
   );
   console.log(`  ✓ globals.css (${globalsTokenCount} tokens)`);
   totalFiles++;
 
-  await formatDistDirectory(MODULAR_DIR);
+  await formatDistCssFiles(distDir);
 
   console.log(
     `\n✨ Generated ${totalFiles} modular CSS files in dist/modular/`
   );
 }
 
-await main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  await generateModular();
+}
