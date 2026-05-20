@@ -168,10 +168,9 @@ jobs:
       - name: Build affected packages
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # Build only affected packages on PRs
-            yarn turbo build --filter='...[origin/${{ github.base_ref }}]'
+            # Force @nexus/react: bundle-size needs its dist even when only core/scripts changes (core isn't a workspace dep of react).
+            yarn turbo build --filter='...[origin/${{ github.base_ref }}]' --filter='@nexus/react'
           else
-            # Build all on push to main
             yarn turbo build
           fi
 
