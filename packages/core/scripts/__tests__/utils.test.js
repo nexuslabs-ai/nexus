@@ -28,8 +28,39 @@ describe('utils', () => {
       expect(formatTokenValue(value, 'dimension')).toBe('0rem');
     });
 
-    it('returns string values as-is', () => {
-      expect(formatTokenValue('#3b82f6', 'color')).toBe('#3b82f6');
+    it('converts hex colors to oklch (mechanical when no shade path)', () => {
+      expect(formatTokenValue('#3b82f6', 'color')).toBe(
+        'oklch(0.6231 0.188 259.815)'
+      );
+    });
+
+    it('preserves alpha when converting 8-digit hex colors', () => {
+      expect(formatTokenValue('#000000cc', 'color')).toBe('oklch(0 0 0 / 0.8)');
+    });
+
+    it('pins lightness for palette shade tokens', () => {
+      expect(formatTokenValue('#3b82f6', 'color', ['blue', '500'])).toBe(
+        'oklch(0.553 0.188 259.815)'
+      );
+    });
+
+    it('routes single-element paths to mechanical (white/black at root)', () => {
+      // `['white']` is length 1 — last segment isn't a shade key, falls through
+      // to mechanical conversion.
+      expect(formatTokenValue('#ffffff', 'color', ['white'])).toBe(
+        'oklch(1 0 0)'
+      );
+    });
+
+    it('pins deeper nested shade-key paths (length 3+)', () => {
+      // Future-proofs against nested palettes like `chart.series.500` —
+      // routing keys on path-suffix semantics, not length.
+      expect(
+        formatTokenValue('#3b82f6', 'color', ['some', 'group', '500'])
+      ).toBe('oklch(0.553 0.188 259.815)');
+    });
+
+    it('returns non-color string values as-is', () => {
       expect(formatTokenValue('Inter, sans-serif', 'fontFamily')).toBe(
         'Inter, sans-serif'
       );
@@ -44,9 +75,10 @@ describe('utils', () => {
       expect(formatTokenValue(null, 'unknown')).toBe('null');
     });
 
-    it('returns undefined as-is (edge case)', () => {
-      // undefined passes through - edge case that shouldn't occur in practice
-      expect(formatTokenValue(undefined, 'unknown')).toBeUndefined();
+    it('throws on undefined input', () => {
+      expect(() => formatTokenValue(undefined, 'unknown')).toThrow(
+        /value is undefined/
+      );
     });
   });
 
@@ -163,8 +195,10 @@ describe('utils', () => {
       expect(resolveValue(dimension, primitiveMap, 'unknown')).toBe('8px');
     });
 
-    it('passes through string values', () => {
-      expect(resolveValue('#ff0000', primitiveMap, 'color')).toBe('#ff0000');
+    it('converts non-reference hex strings through the oklch formatter', () => {
+      expect(resolveValue('#ff0000', primitiveMap, 'color')).toBe(
+        'oklch(0.628 0.2577 29.234)'
+      );
     });
   });
 

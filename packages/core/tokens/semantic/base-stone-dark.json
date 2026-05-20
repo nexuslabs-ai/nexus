@@ -20,7 +20,7 @@
     "$type": "color"
   },
   "muted-foreground": {
-    "$value": "{stone.400}",
+    "$value": "{stone.300}",
     "$type": "color",
     "$description": "It’s a gray that softens contrast so primary content stands forward."
   },

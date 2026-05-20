@@ -73,6 +73,8 @@ tokens/
 
 Reference syntax: `{colorName.shade}` → `var(--nx-color-colorName-shade)`
 
+Token files store hex strings in `$value`. The build pipeline converts those hex strings to OKLCH in the generated CSS — `#3b82f6` becomes `oklch(...)` in `variables.css`. The on-disk hex format is required because Figma Variables and Tokens Studio normalise color values to hex on export. See `.claude/rules/tokens.md` § "Color Token Pipeline" for the full routing logic (grid-pinned vs. mechanical), the designer warning about L-grid enforcement, and the APCA contrast gate.
+
 ## Font Source Extensions
 
 Typography font family tokens support `$extensions.nx-font-source` for automatic Google Fonts import generation:
@@ -256,11 +258,12 @@ Each semantic group has: `background`, `foreground`, `hover`, `active`, `disable
 
 ## Scripts
 
-| Script                         | Purpose                                                            |
-| ------------------------------ | ------------------------------------------------------------------ |
-| `generate-tailwind-package.js` | Generate @nexus/tailwind package CSS (outputs to `dist/tailwind/`) |
-| `generate-modular.js`          | Modular CSS for all themes (outputs to `dist/modular/`)            |
-| `utils.js`                     | Shared utilities (token parsing, CSS generation)                   |
+| Script                         | Purpose                                                                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | --- | ----- |
+| `generate-tailwind-package.js` | Generate @nexus/tailwind package CSS (outputs to `dist/tailwind/`)                                                         |
+| `generate-modular.js`          | Modular CSS for all themes (outputs to `dist/modular/`)                                                                    |
+| `utils.js`                     | Shared utilities (token parsing, CSS generation); routes color values through OKLCH converter via `lib/perceptual-grid.js` |
+| `audit-contrast.js`            | APCA Lc contrast audit over every base/brand foreground↔background pair; threshold `                                       | Lc  | ≥ 60` |
 
 ### Shared Architecture (utils.js)
 

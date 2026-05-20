@@ -50,7 +50,7 @@ function processSinglePrimitive(category, primitiveMap) {
 
   for (const token of extracted) {
     const cssName = `nx-${category}-${pathToCssVar(token.path)}`;
-    const cssValue = formatTokenValue(token.value, token.type);
+    const cssValue = formatTokenValue(token.value, token.type, token.path);
     primitiveMap.set(token.path.join('.'), { cssName, value: cssValue });
     tokens.push({ cssName, value: cssValue });
   }
@@ -83,7 +83,7 @@ function processPrimitiveFile(category, mode, primitiveMap) {
     if (isReference(cssValue)) {
       cssValue = resolveValueWithNxPrefix(cssValue, primitiveMap, token.type);
     } else {
-      cssValue = formatTokenValue(cssValue, token.type);
+      cssValue = formatTokenValue(cssValue, token.type, token.path);
     }
 
     primitiveMap.set(token.path.join('.'), { cssName, value: cssValue });

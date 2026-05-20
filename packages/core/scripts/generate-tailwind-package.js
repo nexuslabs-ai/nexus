@@ -112,7 +112,7 @@ function loadTokensWithNxPrefix(filePath, primitiveMap, tokenList, category) {
 
   for (const token of tokens) {
     const cssName = pathToCssVarPrefixed(token.path, category, true);
-    const cssValue = formatTokenValue(token.value, token.type);
+    const cssValue = formatTokenValue(token.value, token.type, token.path);
 
     primitiveMap.set(token.path.join('.'), {
       cssName,
