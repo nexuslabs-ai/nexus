@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Design System — Audit Report (2026-05-20)</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --surface-2: #f4f4f3;
+      --border: #e5e5e4;
+      --border-strong: #d4d4d3;
+      --text: #1f1f1d;
+      --text-muted: #6b6b67;
+      --text-subtle: #8a8a84;
+      --accent: #3d5aac;
+      --accent-bg: #eef1fb;
+      --critical: #b91c1c;
+      --critical-bg: #fef2f2;
+      --critical-border: #fecaca;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --info: #1e6cb3;
+      --info-bg: #eff6fc;
+      --info-border: #bfdcf3;
+      --ok: #15803d;
+      --ok-bg: #f0fdf4;
+      --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ── Hero ─────────────────────────────── */
+    .hero {
+      background: linear-gradient(180deg, #1f1f1d 0%, #2a2a27 100%);
+      color: #f5f5f4;
+      padding: 56px 0 48px;
+      margin-bottom: 48px;
+      border-bottom: 1px solid #000;
+    }
+    .hero .container { display: grid; gap: 32px; }
+    .hero .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #a8a89e;
+      margin: 0;
+    }
+    .hero h1 {
+      font-size: 48px;
+      line-height: 1.05;
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .hero .lede {
+      font-size: 17px;
+      color: #d6d6cf;
+      max-width: 800px;
+      margin: 0;
+    }
+    .hero .meta {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #a8a89e;
+      margin: 0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .stat {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+    .stat .n { font-size: 32px; font-weight: 600; line-height: 1; }
+    .stat .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #a8a89e;
+      margin-top: 6px;
+    }
+    .stat.critical .n { color: #fca5a5; }
+    .stat.warning .n { color: #fcd34d; }
+    .stat.info .n { color: #93c5fd; }
+
+    /* ── Layout ───────────────────────────── */
+    main { padding-bottom: 96px; }
+
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 48px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 24px;
+    }
+    nav.toc a {
+      color: var(--text);
+      text-decoration: none;
+      padding: 6px 0;
+      font-size: 14px;
+      border-bottom: 1px dashed transparent;
+    }
+    nav.toc a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+    nav.toc .toc-num {
+      font-family: var(--mono);
+      color: var(--text-subtle);
+      margin-right: 8px;
+    }
+
+    section {
+      margin-bottom: 64px;
+      scroll-margin-top: 24px;
+    }
+    section h2 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin: 0 0 8px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--text);
+    }
+    section h2 .num {
+      font-family: var(--mono);
+      color: var(--text-subtle);
+      font-weight: 500;
+      font-size: 22px;
+      margin-right: 12px;
+    }
+    section .section-lede {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin: 16px 0 32px;
+      max-width: 800px;
+    }
+    section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 32px 0 12px;
+    }
+    section h3 .h3-num {
+      font-family: var(--mono);
+      color: var(--text-subtle);
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    /* ── Diagrams ─────────────────────────── */
+    .diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 16px 0 24px;
+      overflow-x: auto;
+    }
+    .diagram .caption {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    .mermaid { display: flex; justify-content: center; }
+
+    /* ── Findings ─────────────────────────── */
+    .finding {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 8px 0;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .finding.critical { border-left-color: var(--critical); background: var(--critical-bg); }
+    .finding.warning { border-left-color: var(--warning); background: var(--warning-bg); }
+    .finding.info { border-left-color: var(--info); background: var(--info-bg); }
+
+    .finding .badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      align-self: start;
+    }
+    .badge.critical {
+      background: var(--critical);
+      color: #fff;
+    }
+    .badge.warning {
+      background: var(--warning);
+      color: #fff;
+    }
+    .badge.info {
+      background: var(--info);
+      color: #fff;
+    }
+    .badge.ok {
+      background: var(--ok);
+      color: #fff;
+    }
+
+    .finding .body { min-width: 0; }
+    .finding .title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 14.5px;
+    }
+    .finding .id {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-subtle);
+      margin-right: 8px;
+    }
+    .finding .loc {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.04);
+      padding: 2px 6px;
+      border-radius: 3px;
+      word-break: break-all;
+    }
+    .finding .why {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(0, 0, 0, 0.08);
+    }
+    .finding .why::before {
+      content: "Technical detail · ";
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-subtle);
+      font-weight: 600;
+    }
+
+    .finding .eli5 {
+      margin-top: 10px;
+      font-size: 14.5px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .finding .eli5::before {
+      content: "In plain English · ";
+      display: block;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .finding.critical .eli5::before { color: var(--critical); }
+    .finding.warning .eli5::before { color: var(--warning); }
+    .finding.info .eli5::before { color: var(--info); }
+
+    code, .inline-code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 1px 5px;
+      border-radius: 3px;
+      word-break: break-word;
+    }
+
+    /* ── Tables ───────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      background: var(--surface-2);
+      font-weight: 600;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(0, 0, 0, 0.015); }
+
+    td.center, th.center { text-align: center; }
+
+    /* ── Heatmap ──────────────────────────── */
+    .heatmap {
+      display: grid;
+      grid-template-columns: 180px repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .heatmap .cell {
+      background: var(--surface);
+      padding: 10px 14px;
+      font-size: 13.5px;
+    }
+    .heatmap .cell.head {
+      background: var(--surface-2);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+    .heatmap .cell.head.center { text-align: center; }
+    .heatmap .cell.center { text-align: center; }
+    .heatmap .cell.c1 { background: var(--critical-bg); color: var(--critical); font-weight: 600; }
+    .heatmap .cell.c2 { background: #fde68a; color: #92400e; font-weight: 700; }
+    .heatmap .cell.c3 { background: #fca5a5; color: #7f1d1d; font-weight: 700; }
+    .heatmap .cell.w1 { background: var(--warning-bg); color: var(--warning); font-weight: 600; }
+    .heatmap .cell.w2 { background: #fde68a; color: var(--warning); font-weight: 600; }
+    .heatmap .cell.i1 { background: var(--info-bg); color: var(--info); font-weight: 600; }
+    .heatmap .cell.zero { color: var(--text-subtle); }
+    .heatmap .cell.name { font-family: var(--mono); font-size: 13px; }
+
+    /* ── PR cards ─────────────────────────── */
+    .pr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .pr-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      border-top: 4px solid var(--accent);
+    }
+    .pr-card.urgent { border-top-color: var(--critical); }
+    .pr-card.standard { border-top-color: var(--warning); }
+    .pr-card .pr-name {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0 0 6px;
+    }
+    .pr-card .pr-tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0 0 14px;
+    }
+    .pr-card .pr-ids {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .pr-card .pr-ids .id-chip {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text);
+    }
+    .pr-card ul { margin: 8px 0 0; padding-left: 18px; }
+    .pr-card li { margin: 4px 0; font-size: 13.5px; }
+
+    /* ── Severity bar ─────────────────────── */
+    .sev-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0 32px;
+    }
+    .sev-bar .col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .sev-bar .col.critical { border-top: 4px solid var(--critical); }
+    .sev-bar .col.warning { border-top: 4px solid var(--warning); }
+    .sev-bar .col.info { border-top: 4px solid var(--info); }
+    .sev-bar .col .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .sev-bar .col .n {
+      font-size: 36px;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      line-height: 1;
+    }
+    .sev-bar .col.critical .n { color: var(--critical); }
+    .sev-bar .col.warning .n { color: var(--warning); }
+    .sev-bar .col.info .n { color: var(--info); }
+    .sev-bar .col .sub { font-size: 13px; color: var(--text-muted); }
+
+    /* ── Glossary ─────────────────────────── */
+    .glossary dt {
+      font-family: var(--mono);
+      font-weight: 600;
+      margin-top: 12px;
+      color: var(--text);
+    }
+    .glossary dd {
+      margin: 4px 0 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* ── Footer ───────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ── Utility ──────────────────────────── */
+    .callout {
+      background: var(--accent-bg);
+      border-left: 3px solid var(--accent);
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .callout .label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .pill {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+    .pill.crit { background: var(--critical-bg); color: var(--critical); border-color: var(--critical-border); }
+    .pill.warn { background: var(--warning-bg); color: var(--warning); border-color: var(--warning-border); }
+    .pill.info { background: var(--info-bg); color: var(--info); border-color: var(--info-border); }
+    .pill.ok { background: var(--ok-bg); color: var(--ok); border-color: #bbf7d0; }
+
+    @media (max-width: 720px) {
+      .container { padding: 0 20px; }
+      .hero h1 { font-size: 36px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      nav.toc { grid-template-columns: 1fr; }
+      .sev-bar { grid-template-columns: 1fr; }
+      .heatmap { grid-template-columns: 140px repeat(3, 1fr); font-size: 12px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="container">
+      <p class="eyebrow">Nexus Design System</p>
+      <h1>Repository Audit Report</h1>
+      <p class="lede">
+        Full-stack audit of token JSON, generated CSS, React components, Storybook stories, the playground app,
+        documentation, and CI configuration. Findings are categorized by severity and grouped into recommended
+        PR sequences.
+      </p>
+      <p class="meta">
+        Generated 2026-05-20 · main @ 29e4d9a · 13 components · 23 primitive token files · 21 semantic token files
+      </p>
+
+      <div class="stats">
+        <div class="stat"><div class="n">138</div><div class="label">Total findings</div></div>
+        <div class="stat critical"><div class="n">19</div><div class="label">Critical</div></div>
+        <div class="stat warning"><div class="n">58</div><div class="label">Warning</div></div>
+        <div class="stat info"><div class="n">61</div><div class="label">Info</div></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <nav class="toc">
+      <a href="#summary"><span class="toc-num">00</span>Executive Summary</a>
+      <a href="#pipeline"><span class="toc-num">01</span>Token Pipeline & Generated CSS</a>
+      <a href="#components"><span class="toc-num">02</span>React Components</a>
+      <a href="#stories"><span class="toc-num">03</span>Stories & Storybook</a>
+      <a href="#apps"><span class="toc-num">04</span>Apps & Playground</a>
+      <a href="#docs"><span class="toc-num">05</span>Documentation & Rules</a>
+      <a href="#config"><span class="toc-num">06</span>Config & CI</a>
+      <a href="#prs"><span class="toc-num">07</span>Recommended PR Plan</a>
+      <a href="#glossary"><span class="toc-num">08</span>Glossary</a>
+    </nav>
+
+    <main>
+
+    <!-- ═══════════════ EXECUTIVE SUMMARY ═══════════════ -->
+    <section id="summary">
+      <h2><span class="num">00</span>Executive Summary</h2>
+      <p class="section-lede">
+        The token JSON and OKLCH pipeline are largely sound — primitive&nbsp;↔&nbsp;semantic references all
+        resolve, the perceptual L-grid routing matches the documented spec, and theme parity passes across all
+        ten light/dark palette pairs. The cracks appear at the seams: where the build pipeline emits the
+        <em>bundled</em> tailwind package, where components reference tokens that don't exist, and where docs
+        teach patterns the code no longer uses.
+      </p>
+
+      <div class="sev-bar">
+        <div class="col critical">
+          <div class="label">Critical</div>
+          <div class="n">19</div>
+          <div class="sub">Code or build that produces broken output, missing styles, broken exports, or contradicts the rules in a way users will hit.</div>
+        </div>
+        <div class="col warning">
+          <div class="label">Warning</div>
+          <div class="n">58</div>
+          <div class="sub">Drift, duplication, inconsistency, missing gates, fragile config. Won't break today but compounds over time.</div>
+        </div>
+        <div class="col info">
+          <div class="label">Info</div>
+          <div class="n">61</div>
+          <div class="sub">Observations, polish, cosmetic, dead code, documentation gaps without immediate impact.</div>
+        </div>
+      </div>
+
+      <h3>The five highest-impact findings</h3>
+      <ol>
+        <li>
+          <strong>The bundled <code>@nexus/tailwind</code> shadow utilities are structurally broken.</strong>
+          <code>nexus.css</code> emits 42 <code>var(--nx-shadow-*)</code> references; <code>variables.css</code>
+          declares zero. The modular pipeline (playground) works; only the bundled generator drops shadows
+          because it never adapted to themed shadow files. <span class="pill crit">C-01</span>
+        </li>
+        <li>
+          <strong>Badge light-fill variants render unstyled.</strong> Seven references to <code>*-text</code>
+          and <code>*-surface</code> tokens that don't exist in <code>nexus.css</code>. The Playground's
+          <code>IconShowcase</code> repeats the same bug pattern. <span class="pill crit">C-04</span> <span class="pill crit">C-05</span>
+        </li>
+        <li>
+          <strong><code>@nexus/react</code> ships a broken CSS export.</strong>
+          <code>package.json</code> maps <code>./styles.css</code> → <code>./dist/style.css</code>; the actual
+          built file is <code>dist/react.css</code>. Any consumer of <code>import '@nexus/react/styles.css'</code>
+          gets a module-resolution error. <span class="pill crit">C-09</span>
+        </li>
+        <li>
+          <strong>CONTRIBUTING.md is structurally obsolete.</strong> Teaches imports
+          (<code>axe, render, screen, userEvent</code> from <code>@nexus/test-utils</code>) that don't exist,
+          assertions against class names that have no <code>nx:</code> prefix, and a three-layer testing model
+          that was replaced by story-first play functions. <span class="pill crit">C-12</span>
+        </li>
+        <li>
+          <strong>Focus-ring style diverges three ways across the library.</strong> Components mix
+          <code>focus:</code> vs <code>focus-visible:</code>, three different ring colors, and inconsistent
+          opacity tokens. Tabbing through a form changes the indicator color per control.
+          <span class="pill crit">C-13</span> <span class="pill crit">C-14</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <div class="label">How to read this report</div>
+        Each finding has two parts:
+        <strong>"In plain English"</strong> — what's wrong, in everyday words, useful for skimming or sharing.
+        <strong>"Technical detail"</strong> — the file, line, and exact reason, useful when you're fixing the bug.
+        Every finding has a stable ID (e.g.&nbsp;<code>C-01</code>, <code>W-12</code>) so the PR plan in §07 can
+        point back at it. Critical = red, Warning = amber, Info = blue.
+      </div>
+    </section>
+
+
+    <!-- ═══════════════ 01. PIPELINE & CSS ═══════════════ -->
+    <section id="pipeline">
+      <h2><span class="num">01</span>Token Pipeline & Generated CSS</h2>
+      <p class="section-lede">
+        How JSON tokens become CSS variables, where the conversion happens, and where it currently breaks.
+        The diagram below traces the same source through two parallel emitters — the modular path (used by
+        the playground) succeeds; the bundled path (shipped to consumers) silently drops shadow primitives.
+      </p>
+
+      <div class="diagram">
+        <p class="caption">Figure 1.1 — Token pipeline. Solid green = working path. Dashed red = broken path. <strong>What this shows:</strong> the same JSON tokens flow through two different generators. The "modular" one (top, for the playground) works fine. The "bundled" one (bottom, for npm consumers) silently drops shadow definitions, so the shipped CSS uses 42 shadow variables that don't exist.</p>
+        <div class="mermaid">
+flowchart LR
+  classDef ok fill:#f0fdf4,stroke:#15803d,color:#15803d
+  classDef bad fill:#fef2f2,stroke:#b91c1c,color:#b91c1c
+  classDef src fill:#fffbeb,stroke:#b45309,color:#b45309
+  classDef out fill:#eff6fc,stroke:#1e6cb3,color:#1e6cb3
+
+  JSON["packages/core/tokens/primitives/<br/>shadow/shadow-{mode}-{theme}.json<br/>(10 files)"]:::src
+  UTILS["packages/core/scripts/utils.js<br/>formatTokenValue + OKLCH router"]:::src
+
+  GEN_MOD["generate-modular.js<br/>partitionThemedModes ✓"]:::ok
+  GEN_BUN["generate-tailwind-package.js<br/>no themed shadow handling ✗"]:::bad
+
+  MOD["apps/playground/public/themes/<br/>shadow-vega.css ... shadow-nova.css<br/>160 declarations each"]:::out
+  BUN_VAR["packages/tailwind/variables.css<br/>0 shadow declarations"]:::bad
+  BUN_NEX["packages/tailwind/nexus.css<br/>42 var(--nx-shadow-*) refs"]:::bad
+
+  PG["apps/playground<br/>shadows render"]:::ok
+  PKG["@nexus/tailwind consumer<br/>shadows resolve to empty"]:::bad
+
+  JSON --> UTILS
+  UTILS --> GEN_MOD
+  UTILS --> GEN_BUN
+  GEN_MOD --> MOD
+  GEN_BUN -.-> BUN_VAR
+  BUN_VAR -.-> BUN_NEX
+  MOD --> PG
+  BUN_NEX --> PKG
+        </div>
+      </div>
+
+      <h3><span class="h3-num">1.1</span>Critical — bundled pipeline</h3>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-01</span>Shadow primitives missing from bundled CSS</div>
+          <span class="loc">packages/tailwind/variables.css ↔ nexus.css</span>
+          <p class="eli5">The shipped CSS file uses 42 shadow variables that aren't defined anywhere. Every <code>shadow-sm</code>, <code>shadow-lg</code>, etc. utility silently renders nothing in any app that installs <code>@nexus/tailwind</code>.</p>
+          <p class="why">
+            <code>nexus.css</code> has 42 <code>var(--nx-shadow-*-layer-N-{x,y,blur,spread,color})</code>
+            references; <code>variables.css</code> has zero declarations. Confirmed by grep
+            (<code>grep -c '^[[:space:]]*--nx-shadow-'</code> returns 0). Every consumer using
+            <code>nx:shadow-2xs</code>&nbsp;…&nbsp;<code>nx:shadow-2xl</code> gets an unstyled element.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-02</span><code>generate-tailwind-package.js</code> doesn't handle themed primitive files</div>
+          <span class="loc">packages/core/scripts/generate-tailwind-package.js:49,163</span>
+          <p class="eli5">The CSS generator was never taught that shadow files now come in light + dark versions. It looks for the old filename, doesn't find it, logs a quiet warning, and ships a broken CSS with no error. This is the root cause of C-01.</p>
+          <p class="why">
+            <code>generate-modular.js:232</code> calls <code>partitionThemedModes</code> to handle the
+            <code>shadow-{mode}-{theme}.json</code> shape introduced in PR #34. The bundled generator was
+            never updated. <code>loadTokensWithNxPrefix</code> emits a buried <code>log.warn</code>, the
+            script exits 0, and the broken CSS ships. The shadow regression would be caught by an end-to-end
+            snapshot test, but there is no such test.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-03</span>CI doesn't enforce the gates the rules promise</div>
+          <span class="loc">.github/workflows/ci.yml</span>
+          <p class="eli5">The rules say CI must block PRs on contrast checks and visual-regression tests. CI never runs those checks. So the "gates" are just suggestions — broken styles can merge undetected.</p>
+          <p class="why">
+            <code>.claude/rules/tokens.md</code> documents APCA contrast as "enforced"; CI never runs
+            <code>audit:contrast</code>. <code>.claude/rules/testing-react.md</code> documents Chromatic as the
+            visual-regression gate; CI never runs <code>chromatic:ci</code>. CI also doesn't verify that
+            regenerating tokens produces a diff-clean working tree — the shadow break above could have been
+            caught by a regenerate-and-diff job.
+          </p>
+        </div>
+      </div>
+
+      <h3><span class="h3-num">1.2</span>Critical — token JSON</h3>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-15</span><code>xs</code> shadow spread references the wrong layer</div>
+          <span class="loc">packages/core/tokens/styles/shadows.json:18</span>
+          <p class="eli5">An <code>xs</code>-shadow recipe accidentally borrows a value from the <code>2xs</code> recipe (copy-paste mistake). Today both values happen to be zero, so nobody notices. The moment someone tunes one but not the other, the <code>xs</code> shadow gets the wrong spread silently.</p>
+          <p class="why">
+            The <code>xs</code> shadow's spread reads <code>{2xs.layer-1.spread}</code> (copy-paste from the
+            <code>2xs</code> block at line 8). The other 5 properties on the same composite correctly point at
+            <code>{xs.layer-1.*}</code>. Values happen to match today (both are <code>0px</code>), so the bug
+            is silent — it surfaces the moment any mode diverges.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-16</span><code>tokens.schema.json</code> regex rejects every shipped key</div>
+          <span class="loc">packages/core/tokens.schema.json:7,60</span>
+          <p class="eli5">The "validator" that's meant to catch malformed tokens rejects every key that starts with a digit (<code>50</code>, <code>100</code>, <code>2xs</code>, etc.) — which is most token keys. So in practice it validates nothing. A safety net with a hole.</p>
+          <p class="why">
+            The key regex <code>^\$?[a-zA-Z_][a-zA-Z0-9_-]*$</code> doesn't allow leading digits
+            (<code>50</code>–<code>950</code>, <code>0_5</code>, <code>2xs</code>, <code>2xl</code>,
+            <code>3xl</code>). <code>tokens.md</code> documents this file as the validation gate. In practice
+            it validates nothing the codebase actually ships.
+          </p>
+        </div>
+      </div>
+
+      <h3><span class="h3-num">1.3</span>Warnings</h3>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-01</span>APCA gate is missing two documented foreground pairs</div>
+          <span class="loc">packages/core/scripts/audit-contrast.js:20-27</span>
+          <p class="eli5">The contrast checker is missing two text-on-background pairs that the rule says to check. Those pairs may be failing accessibility quietly with nobody alerted.</p>
+          <p class="why">
+            <code>tokens.md:48-52</code> defines the 45-Lc incidental tier and explicitly includes
+            <code>muted-foreground ↔ muted</code>. <code>BASE_PAIRS</code> covers that one but skips
+            <code>muted-light-foreground ↔ muted-light</code> and <code>disabled-foreground ↔ disabled</code>.
+            The <code>stone-light</code> palette resolves those to <code>stone-400/stone-50</code> and
+            <code>stone-300/stone-100</code> — likely below the 45-Lc floor, but never asserted.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-02</span>Typography letter-spacing tokens carry Figma float-32 junk</div>
+          <span class="loc">packages/core/tokens/primitives/typography/typography-{vega,lyra}.json + variables.css:341-346</span>
+          <p class="eli5">Five letter-spacing values are ugly numbers like <code>-0.800000011920929px</code> instead of <code>-0.8px</code> — leftover precision artifacts from a Figma export. Works correctly, but looks broken when anyone inspects the CSS.</p>
+          <p class="why">
+            Values like <code>-0.800000011920929px</code>, <code>0.4000000059604645px</code>,
+            <code>1.600000023841858px</code> survive the Figma export and propagate verbatim into emitted CSS.
+            The other three modes (maia/mira/nova) use clean values. Rounding belongs in the generator
+            (<code>utils.js</code>), not on a per-token basis.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-03</span>Two byte-equivalent reference resolvers</div>
+          <span class="loc">packages/core/scripts/utils.js:171-209</span>
+          <p class="eli5">Two functions are byte-for-byte identical except for one comment line. Delete one.</p>
+          <p class="why">
+            <code>resolveReference</code> and <code>resolveReferenceWithNxPrefix</code> are identical except
+            for a single comment line. Two functions, one implementation. Violates the "fewer moving parts"
+            principle in <code>code-quality.md</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-04</span>Multi-layer inset shadows silently drop the <code>inset</code> prefix</div>
+          <span class="loc">packages/core/scripts/utils.js:822-833</span>
+          <p class="eli5">If a shadow ever has both multiple layers AND the "inset" property, the generator silently drops "inset". No such shadow exists today; the next one will break silently.</p>
+          <p class="why">
+            <code>generateShadowVarValue</code> only applies the <code>inset</code> prefix to single-layer
+            shadows. For multi-layer arrays the <code>isInset</code> flag is ignored. Today no shadow uses
+            multi-layer&nbsp;+&nbsp;inset, but the next one will silently fail.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-05</span><code>line-height: auto</code> emitted to CSS</div>
+          <span class="loc">packages/core/scripts/utils.js:604 → typography-utilities.css:135</span>
+          <p class="eli5">The generator emits <code>line-height: auto</code>, which browsers don't accept (the CSS spec only allows <code>normal</code>, a number, or a length). Browsers silently ignore it — the setting has no effect.</p>
+          <p class="why">
+            Source <code>typography.json:195</code> sets <code>"lineHeight": "auto"</code> for
+            <code>typography-code-inline</code>; the generator passes it through; browsers reject
+            <code>line-height: auto</code> as invalid. Either map <code>auto</code> →&nbsp;<code>normal</code>
+            in <code>resolveTypographyProperty</code>, or fix the source token.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-06</span>137 unused color primitives shipped in the bundled CSS</div>
+          <span class="loc">packages/tailwind/variables.css</span>
+          <p class="eli5">The CSS file ships 244 color variables but the default theme uses only ~107 of them. The other ~137 (cyan, emerald, fuchsia, etc.) are dead weight that every consumer downloads but never uses.</p>
+          <p class="why">
+            <code>variables.css</code> emits all 244 color primitives. <code>nexus.css</code> (default
+            <code>stone</code>+<code>neutral</code> theme) references ~107. The remaining ~137
+            (<code>cyan</code>, <code>emerald</code>, <code>fuchsia</code>, <code>indigo</code>,
+            <code>orange</code>, <code>pink</code>, <code>purple</code>, <code>rose</code>, <code>sky</code>,
+            <code>teal</code>, <code>violet</code>, <code>yellow</code>, <code>zinc</code>, and several
+            partial palettes) are dead in the default bundle. Either tree-shake or accept and document.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-07</span>Generation scripts have ~15% test coverage</div>
+          <span class="loc">packages/core/scripts/__tests__/</span>
+          <p class="eli5">The scripts that build all the CSS are barely tested. The big shadow bug above (C-01) would have been caught by even a basic snapshot test that compared the new output to a known-good baseline.</p>
+          <p class="why">
+            <code>audit-contrast.js</code>, <code>generate-tailwind-package.js</code>,
+            <code>generate-modular.js</code>, <code>sync-playground-themes.js</code> have zero tests. Only 9
+            of 28 <code>utils.js</code> exports are tested. <code>perceptual-grid.js</code> is well-covered
+            (~80%). The shadow regression in C-01 would have been caught by an end-to-end snapshot test.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-08</span><code>utils.js</code> at 1,076 lines / 28 exports has become a library</div>
+          <span class="loc">packages/core/scripts/utils.js</span>
+          <p class="eli5">One file ("utils.js") is over a thousand lines and exports 28 different things. It's grown past "utility helpers" into "library that needs structure." Split it into focused modules.</p>
+          <p class="why">
+            Past the threshold where "utils" is the right name. Should split into
+            <code>tokens.js</code>, <code>css-emitters.js</code>, <code>typography.js</code>,
+            <code>shadows.js</code>, <code>google-fonts.js</code>. Four near-duplicate
+            <code>collect*Tokens</code> functions (spacing/radius/borderwidth) would consolidate to one.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-09</span>Stale testing plan with references to deleted scripts</div>
+          <span class="loc">packages/core/scripts/TESTING_ACTION_PLAN.md</span>
+          <p class="eli5">A "here's what we'll do" planning doc references script files that were renamed or deleted long ago. Either start executing it or delete it.</p>
+          <p class="why">
+            "Phase 2/3 pending" since the plan's creation. References <code>generate-css.js</code> and
+            <code>copy-to-react.js</code> — both renamed or deleted. Per <code>project-stage.md</code>,
+            either commit or delete.
+          </p>
+        </div>
+      </div>
+
+      <h3><span class="h3-num">1.4</span>Info</h3>
+      <div class="finding info">
+        <span class="badge info">Info</span>
+        <div class="body">
+          <div class="title"><span class="id">I-01</span><code>blue</code> &amp; <code>red</code> primitives diverge from Tailwind scale</div>
+          <span class="loc">packages/core/tokens/primitives/color.json:646-690, 876-920</span>
+          <p class="eli5">The brand <code>blue</code> and <code>red</code> have been custom-tuned away from Tailwind's defaults — but a doc says they all match Tailwind. Just outdated documentation.</p>
+          <p class="why">
+            <code>blue-500: #3d7bc8</code> (Tailwind <code>#3b82f6</code>) and
+            <code>red-500: #d95c50</code> (Tailwind <code>#ef4444</code>) — other palettes match.
+            <code>tokens.md:121</code> says all use Tailwind's scale. Either re-tune or document the brand
+            divergence.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding info">
+        <span class="badge info">Info</span>
+        <div class="body">
+          <div class="title"><span class="id">I-02</span><code>radius=sharp</code> emits 8 identical zero tokens</div>
+          <span class="loc">packages/tailwind/variables.css:257-264</span>
+          <p class="eli5">In the default "sharp" radius theme, eight different border-radius tokens (<code>sm</code>, <code>md</code>, <code>lg</code>, etc.) all equal <code>0px</code>. Working as designed — sharp means no rounding — but worth noting.</p>
+          <p class="why">
+            <code>--nx-radius-base</code>&nbsp;…&nbsp;<code>--nx-radius-3xl</code> are all <code>0px</code> in
+            sharp mode; only <code>--nx-radius-full: 9999px</code> carries a non-zero value. By design but
+            worth noting.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ═══════════════ 02. COMPONENTS ═══════════════ -->
+    <section id="components">
+      <h2><span class="num">02</span>React Components</h2>
+      <p class="section-lede">
+        Audit of all 13 components in <code>packages/react/src/components/ui/</code> against the rules in
+        <code>.claude/rules/components.md</code> and <code>shadcn-divergences.md</code>. The heatmap below shows
+        finding density per component; the focus-ring diagram visualizes the three-way style split.
+      </p>
+
+      <div class="diagram">
+        <p class="caption">Figure 2.1 — Severity heatmap by component. Numbers = findings of that severity. <strong>What this shows:</strong> at a glance, which components carry the most risk. Badge, DropdownMenu, and Select stand out with multiple critical findings each; Avatar is the cleanest.</p>
+        <div class="heatmap">
+          <div class="cell head">Component</div>
+          <div class="cell head center">Critical</div>
+          <div class="cell head center">Warning</div>
+          <div class="cell head center">Info</div>
+
+          <div class="cell name">accordion.tsx</div>
+          <div class="cell center c1">2</div>
+          <div class="cell center w1">2</div>
+          <div class="cell center i1">1</div>
+
+          <div class="cell name">alert.tsx</div>
+          <div class="cell center c1">1</div>
+          <div class="cell center w1">2</div>
+          <div class="cell center i1">1</div>
+
+          <div class="cell name">avatar.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center i1">2</div>
+
+          <div class="cell name">badge.tsx</div>
+          <div class="cell center c3">3</div>
+          <div class="cell center w1">2</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">button.tsx</div>
+          <div class="cell center c1">1</div>
+          <div class="cell center w1">2</div>
+          <div class="cell center i1">1</div>
+
+          <div class="cell name">card.tsx</div>
+          <div class="cell center c2">2</div>
+          <div class="cell center w1">1</div>
+          <div class="cell center i1">1</div>
+
+          <div class="cell name">dialog.tsx</div>
+          <div class="cell center c2">2</div>
+          <div class="cell center w1">3</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">dropdown-menu.tsx</div>
+          <div class="cell center c3">4</div>
+          <div class="cell center w1">3</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">input.tsx</div>
+          <div class="cell center c2">2</div>
+          <div class="cell center w1">2</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">select.tsx</div>
+          <div class="cell center c2">3</div>
+          <div class="cell center w1">3</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">switch.tsx</div>
+          <div class="cell center c1">2</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">tabs.tsx</div>
+          <div class="cell center c1">1</div>
+          <div class="cell center w1">2</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">tooltip.tsx</div>
+          <div class="cell center c1">1</div>
+          <div class="cell center w1">1</div>
+          <div class="cell center i1">1</div>
+        </div>
+      </div>
+
+      <div class="diagram">
+        <p class="caption">Figure 2.2 — Focus-ring style divergence across the library. <strong>What this shows:</strong> there should be one focus indicator across the whole library — same color, shown in the same situations. Today there are three different ring colors AND two different triggers (mouse vs keyboard). Tab through a form and the indicator changes per control.</p>
+        <div class="mermaid">
+flowchart TD
+  classDef ok fill:#f0fdf4,stroke:#15803d,color:#15803d
+  classDef bad fill:#fef2f2,stroke:#b91c1c,color:#b91c1c
+  classDef warn fill:#fffbeb,stroke:#b45309,color:#b45309
+
+  ROOT["Focus-ring style"]
+  TRIG["Focus trigger"]
+  COLOR["Ring color"]
+
+  ROOT --> TRIG
+  ROOT --> COLOR
+
+  TRIG --> FV["focus-visible:<br/>(keyboard only)<br/>Button, Accordion, Tabs,<br/>Switch, Input"]:::ok
+  TRIG --> F["focus:<br/>(any focus, mouse + kb)<br/>Dialog, Select"]:::bad
+
+  COLOR --> C1["ring-primary-background/50<br/>Button, Accordion, Dialog, Tabs"]:::warn
+  COLOR --> C2["ring-primary-background-active<br/>Input, Select"]:::warn
+  COLOR --> C3["ring-primary-background<br/>Switch (no /50, no -active)"]:::warn
+        </div>
+      </div>
+
+      <h3><span class="h3-num">2.1</span>Critical findings</h3>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-04</span>Badge light-fill variants reference 7 non-existent tokens</div>
+          <span class="loc">packages/react/src/components/ui/badge.tsx:36,69,74,85,90,95,100</span>
+          <p class="eli5">Seven Badge color styles look up paint colors that aren't in the paint catalog. Those badges render with no background or text color — they're invisible until you put them on a non-white surface.</p>
+          <p class="why">
+            References <code>primary-text</code>, <code>primary-surface</code>, <code>secondary-text</code>,
+            <code>secondary-surface</code>, <code>error-text</code>, <code>error-surface</code>,
+            <code>warning-*</code>, <code>success-*</code>, <code>information-*</code> in the
+            <code>-text</code> / <code>-surface</code> family. None exist in <code>nexus.css</code>. The
+            actual family is <code>*-subtle</code> / <code>*-subtle-foreground</code>. Visually broken.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-13</span><code>focus</code> vs <code>focus-visible</code> mixing</div>
+          <span class="loc">dialog.tsx:146, select.tsx:72</span>
+          <p class="eli5">Two components (Dialog, Select) show a focus glow whenever you click them with the mouse — usually unwanted noise. The other nine components only show it when you tab with the keyboard, which is the modern norm. Inconsistent feel across the same form.</p>
+          <p class="why">
+            Dialog and Select use <code>nx:focus:ring-*</code>, which lights up on mouse click. Every other
+            component uses <code>nx:focus-visible:</code>, which only shows on keyboard navigation. Users see
+            the indicator inconsistently across the same form.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-14</span>Three different focus-ring colors</div>
+          <span class="loc">button.tsx:10, input.tsx:13, switch.tsx:41, dialog.tsx:146, etc.</span>
+          <p class="eli5">The focus-ring color is different in three groups of components. Tab through a form and the indicator color shifts as you move between fields. Looks accidental.</p>
+          <p class="why">
+            <code>ring-primary-background/50</code> (Button, Accordion, Dialog, Tabs);
+            <code>ring-primary-background-active</code> (Input, Select);
+            <code>ring-primary-background</code> (Switch, no opacity, no <code>-active</code>). Three sources
+            of truth; pick one. See Figure 2.2.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-17</span>Input / Select / Tabs use fixed heights</div>
+          <span class="loc">input.tsx:19-22, select.tsx:66, tabs.tsx:52</span>
+          <p class="eli5">Three components hard-code their height in pixels (<code>h-10</code>, <code>h-12</code>). The design rule says size with padding instead — fixed heights break in flex/grid layouts and don't scale with font size.</p>
+          <p class="why">
+            <code>components.md</code> mandates padding-based sizing — fixed heights break in flex layouts.
+            Switch is a legitimate exception (toggle widget). Input/Select/TabsList still ship
+            <code>nx:h-10</code>/<code>h-8</code>/<code>h-12</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-18</span><code>dropdown-menu</code> uses wrong prefix order</div>
+          <span class="loc">dropdown-menu.tsx:92,235</span>
+          <p class="eli5">Tailwind classes in one file have the prefix in the wrong position (<code>[&amp;_svg]:nx:</code> instead of <code>nx:[&amp;_svg]:</code>). Tailwind v4 will refuse to compile these classes, so they silently produce no styling.</p>
+          <p class="why">
+            <code>[&amp;_svg]:nx:pointer-events-none [&amp;_svg]:nx:size-4</code> — <code>nx:</code> placed
+            <em>after</em> the arbitrary selector. Rule is <em>"prefix always comes first"</em>. Tailwind v4
+            will silently fail to compile these.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-19</span><code>DropdownMenu</code> destructive variant invisible</div>
+          <span class="loc">dropdown-menu.tsx:237-238</span>
+          <p class="eli5">The "Delete" option in dropdown menus renders as white text on a white menu background — completely invisible until you hover over it. Should be red text on the default background.</p>
+          <p class="why">
+            Destructive item uses <code>nx:text-error-foreground</code> (white) with
+            <code>focus:bg-error-background</code> — applies white text without the colored background by
+            default, so the menu item is invisible on a white menu until hovered. Should be
+            <code>text-error-subtle-foreground</code> + <code>focus:bg-error-subtle</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-20</span><code>accordion.tsx</code> uses <code>forwardRef</code>; 12 others use <code>function</code></div>
+          <span class="loc">packages/react/src/components/ui/accordion.tsx</span>
+          <p class="eli5">Twelve components are written as plain functions. The thirteenth (accordion) uses an older React pattern (<code>forwardRef</code>). When a developer copies an existing component as a template, they hit a coin-flip — which is the right pattern?</p>
+          <p class="why">
+            Confirmed sole user of <code>React.forwardRef + displayName</code> in the library. The template
+            in <code>components.md</code> mandates plain function components. Per <code>ripple-effect.md</code>,
+            change once and bring the rest of the library into one pattern.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-21</span><code>CardAction</code> positioning requires consumer guesswork</div>
+          <span class="loc">card.tsx:162-173, used by Card.stories.tsx:83,324,384</span>
+          <p class="eli5">The Card has an "Action" slot positioned to the top-right. But Card itself isn't set up as a positioning container — so every consumer has to remember to add <code>nx:relative</code> to Card themselves. Easy to forget.</p>
+          <p class="why">
+            <code>CardAction</code> applies <code>nx:absolute nx:right-6 nx:top-6</code> but <code>Card</code>
+            has no <code>nx:relative</code>. Every consumer must remember to add it themselves; the stories
+            do it three times. Either add <code>nx:relative</code> to <code>Card</code> base, or make
+            <code>CardHeader</code> the positioning context.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-22</span><code>Dialog</code> close-button focus ring uses <code>focus:</code> not <code>focus-visible:</code></div>
+          <span class="loc">dialog.tsx:146</span>
+          <p class="eli5">Dialog's close button flashes a focus ring on mouse click (same bug as C-13). Also missing a label that screen readers can announce.</p>
+          <p class="why">
+            Same family as C-13; called out here because Dialog also lacks a <code>data-slot</code> on the
+            close icon and the close button itself lacks <code>aria-label</code> (the inner
+            <code>.sr-only</code> span provides the accessible name, but the conventional pattern is on the
+            button).
+          </p>
+        </div>
+      </div>
+
+      <h3><span class="h3-num">2.2</span>Warnings</h3>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-10</span><code>type =</code> vs <code>interface extends</code> split</div>
+          <span class="loc">8 files use type, 5 use interface</span>
+          <p class="eli5">Some component files declare their props with TypeScript's <code>type</code>, others with <code>interface</code>. The rule says <code>interface</code>. Mixed style — pick one.</p>
+          <p class="why">
+            <code>type</code>: accordion, card, dialog, dropdown-menu, select, switch, tabs, tooltip.
+            <code>interface</code>: alert, avatar, badge, button, input. <code>components.md</code> mandates
+            named interfaces.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-11</span><code>data-variant</code>/<code>data-size</code> coverage is patchy</div>
+          <span class="loc">multiple components</span>
+          <p class="eli5">Most components add little tags (<code>data-variant="primary"</code>, <code>data-size="lg"</code>) so CSS can target specific states. Some components include them, some don't, with no clear rule. Inconsistent surface for theming and testing.</p>
+          <p class="why">
+            Input has <code>data-size</code> but no variant (no enum variants exist, OK). Alert has variant
+            but no size. Select / Switch / Tooltip have neither. No documented rule for when to omit.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-12</span><code>asChild</code> support is patchy</div>
+          <span class="loc">multiple components</span>
+          <p class="eli5">The <code>asChild</code> prop lets a consumer swap the wrapping element — so <code>&lt;Button asChild&gt;&lt;a href=...&gt;Link&lt;/a&gt;&lt;/Button&gt;</code> works. Only 2 of 13 components support it; the rest force a fixed element type, limiting composition.</p>
+          <p class="why">
+            Only Button and Badge implement <code>asChild</code>. Alert, Input, Card sub-components, Dialog
+            content, Tooltip content, Switch don't — yet are likely composition targets. CardTitle
+            specifically hardcodes <code>h3</code>, breaking heading hierarchy in nested layouts.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-13</span><code>destructive</code> vs <code>error</code> variant naming</div>
+          <span class="loc">badge.tsx vs button.tsx, alert.tsx, dropdown-menu.tsx</span>
+          <p class="eli5">Most components expose a "delete-style" variant as <code>variant="destructive"</code>. Badge calls the same thing <code>variant="error"</code>. Inconsistent public API — consumers can't predict the prop value.</p>
+          <p class="why">
+            <code>shadcn-divergences.md</code> mandates public variant prop name stays <code>destructive</code>
+            for shadcn API compat. Button, Alert, DropdownMenu comply; Badge exposes <code>error</code>.
+            Public API drift.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-14</span><code>badge.tsx</code> duplicates render branches</div>
+          <span class="loc">badge.tsx:182-193, 196-234</span>
+          <p class="eli5">Badge's render code has a nested if/else for choosing padding, then duplicates almost the entire return statement for the two element types. Refactor to a single shared body with a swapped tag.</p>
+          <p class="why">
+            Nested ternary <code>isNumber ? 'p-x' : isCaps ? 'p-y' : 'p-z'</code> for class composition;
+            two near-identical return branches for <code>Slot</code> vs <code>span</code>. Refactor to the
+            <code>Comp = asChild ? Slot : 'span'</code> shared body in the <code>components.md</code> template.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-15</span>Long single-string classNames hurt scanability</div>
+          <span class="loc">button.tsx:10, accordion.tsx:75</span>
+          <p class="eli5">Some components have 200-character single-line class strings — unreadable. <code>tabs.tsx</code> already uses a cleaner array format. Bring the others into line.</p>
+          <p class="why">
+            12+ utilities concatenated on one line. <code>tabs.tsx</code> already uses the cleaner array form
+            (<code>['classes', 'more', 'classes']</code>) — bring the others into line.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-16</span>Button shows spinner <em>after</em> children</div>
+          <span class="loc">button.tsx:93-101</span>
+          <p class="eli5">Loading buttons render "Submitting… ⟳" with the spinner trailing the text. Most patterns lead with the spinner: "⟳ Submitting…". Designer call, but worth flagging.</p>
+          <p class="why">
+            Loading state renders children then spinner; reads as "Submitting… ⟳". Most patterns lead with
+            the spinner. Flag for designer review.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-17</span><code>DropdownMenuItem</code> hybrid variant pattern</div>
+          <span class="loc">dropdown-menu.tsx:200-205, 237-238</span>
+          <p class="eli5">One item's "destructive" style is half-implemented with the standard variant library and half with manual if-checks. Pick one approach end-to-end; the current shape is the worst of both.</p>
+          <p class="why">
+            Introduces <code>variant: 'default' | 'destructive'</code> as a literal union, not CVA. Then a
+            compound conditional in the class string applies destructive styles. Worst of both worlds: not
+            CVA, not data-attribute styling.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-18</span>Alert and Button "destructive" use different visual intensity</div>
+          <span class="loc">alert.tsx:13, button.tsx (destructive variant)</span>
+          <p class="eli5">A "destructive" Alert is soft pink with subtle text. A "destructive" Button is loud solid red. Same prop name, very different visual weight. Confusing for designers building UIs from the library.</p>
+          <p class="why">
+            Alert destructive uses <code>border-border-error</code> + <code>bg-error-subtle</code> + subtle
+            text. Button destructive uses <code>bg-error-background</code> + solid foreground. One is soft,
+            the other is loud. Same variant prop name, different visual weight — designers / consumers will
+            be confused.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ═══════════════ 03. STORIES ═══════════════ -->
+    <section id="stories">
+      <h2><span class="num">03</span>Stories & Storybook</h2>
+      <p class="section-lede">
+        Story-first testing depends on play functions, <code>fn()</code> spies, and dark-mode wrapper hygiene.
+        Coverage of those primitives across the 13 story files is uneven.
+      </p>
+
+      <div class="diagram">
+        <p class="caption">Figure 3.1 — Radix portals escape the Storybook dark-mode wrapper. <strong>What this shows:</strong> Storybook puts a <code>.dark</code> class on a wrapper <code>div</code> around each story. But Dialog/Tooltip/DropdownMenu content is rendered (by React) into a portal attached to the page body — outside the wrapper. So those components always show light mode in Storybook, even when the toggle says dark.</p>
+        <div class="mermaid">
+flowchart TD
+  classDef ok fill:#f0fdf4,stroke:#15803d,color:#15803d
+  classDef bad fill:#fef2f2,stroke:#b91c1c,color:#b91c1c
+  classDef neutral fill:#ffffff,stroke:#8a8a84,color:#1f1f1d
+
+  HTML["html"]:::neutral
+  BODY["body"]:::neutral
+  WRAP["div.dark<br/>(story wrapper)"]:::ok
+  STORY["Story content<br/>(in-tree components)"]:::ok
+  PORTAL["body > div<br/>(Radix portal target)"]:::bad
+  DIALOG["DialogContent / DropdownContent /<br/>TooltipContent (escapes .dark)"]:::bad
+
+  HTML --> BODY
+  BODY --> WRAP
+  WRAP --> STORY
+  BODY --> PORTAL
+  PORTAL --> DIALOG
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-19</span>Storybook dark wrapper doesn't reach Radix portals</div>
+          <span class="loc">packages/react/.storybook/preview.tsx:73-83</span>
+          <p class="eli5">Storybook's "dark mode" toggle wraps each story in a <code>dark</code>-class container. But Dialog, DropdownMenu, Tooltip, and Select content render outside that container (in a portal at the page root). So those components always appear in light mode in Storybook, regardless of the toggle.</p>
+          <p class="why">
+            Decorator wraps each story in <code>&lt;div className="dark"&gt;</code>; Radix renders Dialog /
+            DropdownMenu / Tooltip / Select content into <code>document.body</code> portals. The class is on
+            a sibling, not an ancestor — portal content renders in light mode regardless of the dark toggle.
+            Move the class to <code>document.documentElement</code> via an effect.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-20</span>Missing <code>fn()</code> spies in 8 of 13 story files</div>
+          <span class="loc">Accordion / Alert / Avatar / Card / Dialog / DropdownMenu / Select / Tooltip</span>
+          <p class="eli5">Most interactive components don't have a "spy" function set up to verify "when I click, the handler runs." So the test sees the button get clicked, but never checks that the actual callback fired. Real coverage gap on Dialog, Select, DropdownMenu.</p>
+          <p class="why">
+            Per <code>testing-react.md</code>, interactive components need <code>fn()</code> spies in meta to
+            assert callback invocation. For Dialog/Select/DropdownMenu this is a real coverage gap — there's
+            no test that <code>onOpenChange</code> actually fires.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-21</span><code>a11y: { test: 'todo' }</code> silently disables a11y assertions</div>
+          <span class="loc">Badge.stories.tsx, Button.stories.tsx, Alert.stories.tsx (multiple)</span>
+          <p class="eli5">Several stories silently disable accessibility tests with a bare "TODO: fix contrast" comment and no tracking ticket. So real a11y violations pass silently while waiting for someone to remember.</p>
+          <p class="why">
+            Paired with bare <code>// TODO: Fix … contrast</code> comments that have no issue number.
+            <code>code-comments.md</code> requires TODOs to cite a tracked issue;
+            <code>no-follow-up-deferral.md</code> requires every flagged finding to be fixed in the same PR.
+            Currently both are violated and a11y violations pass silently.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-22</span>Token showcase stories cross-package import primitive JSON</div>
+          <span class="loc">packages/react/src/stories/{Shadow,Radius,Spacing,Typography}.stories.tsx</span>
+          <p class="eli5">Token-showcase stories reach across package boundaries with brittle <code>../../../core/...</code> paths to import JSON. If anything moves, all four stories break. Should go through a proper package export.</p>
+          <p class="why">
+            All four use <code>../../../core/tokens/primitives/...</code> to read JSON directly. Fragile
+            workspace-relative traversal; expose tokens through <code>@nexus/core</code>'s public
+            <code>exports</code> instead.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding info">
+        <span class="badge info">Info</span>
+        <div class="body">
+          <div class="title"><span class="id">I-03</span>Stories use <code>nx:space-y-*</code> instead of <code>flex-col gap-*</code></div>
+          <span class="loc">Switch / Accordion / Dialog / Tabs stories — 13+ sites</span>
+          <p class="eli5">Some stories use the older "stack with margins" spacing utility (<code>space-y-*</code>) instead of the modern "flex with gap" approach. Both work; the demo code should model the preferred one.</p>
+          <p class="why">
+            Modern Tailwind / shadcn conventions prefer <code>flex flex-col gap-*</code> for stack spacing
+            over the legacy <code>space-y-*</code> margin-injection pattern. Demo code should model correct
+            patterns.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ═══════════════ 04. APPS ═══════════════ -->
+    <section id="apps">
+      <h2><span class="num">04</span>Apps & Playground</h2>
+      <p class="section-lede">
+        The playground demos the design system to designers and stakeholders — so its own token usage and
+        a11y choices set the example. Several violations there are worse-by-association than the same bug
+        elsewhere.
+      </p>
+
+      <div class="diagram">
+        <p class="caption">Figure 4.1 — Playground theme loader. <strong>What this shows:</strong> the theme switcher fires seven nearly-identical "load this CSS file" effects (one per theme dimension). One effect over a config map would do the job in ~10 lines instead of 35. Also: if any of those CSS fetches fails (404, network blip), the playground silently strips the old theme and shows broken styles — there's no error path.</p>
+        <div class="mermaid">
+flowchart LR
+  classDef ok fill:#f0fdf4,stroke:#15803d,color:#15803d
+  classDef warn fill:#fffbeb,stroke:#b45309,color:#b45309
+  classDef bad fill:#fef2f2,stroke:#b91c1c,color:#b91c1c
+
+  STATE["7 state slices<br/>(base, brand, size, type,<br/>shadow, radius, borderwidth)"]:::ok
+  E1["useEffect → loadCSS(base)"]:::warn
+  E2["useEffect → loadCSS(brand)"]:::warn
+  E3["useEffect → loadCSS(size)"]:::warn
+  E4["useEffect → loadCSS(type)"]:::warn
+  E5["useEffect → loadCSS(shadow)"]:::warn
+  E6["useEffect → loadCSS(radius)"]:::warn
+  E7["useEffect → loadCSS(borderwidth)"]:::warn
+  FETCH["fetch /themes/*.css"]
+  OK["link.href set ✓"]:::ok
+  FAIL["404 / network err →<br/>previous link removed,<br/>no fallback"]:::bad
+
+  STATE --> E1 & E2 & E3 & E4 & E5 & E6 & E7
+  E1 & E2 & E3 & E4 & E5 & E6 & E7 --> FETCH
+  FETCH --> OK
+  FETCH --> FAIL
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-05</span>Playground uses non-existent <code>accent</code> token with wrong prefix order</div>
+          <span class="loc">apps/playground/src/components/ThemeSwitcher.tsx:90,137,304,329</span>
+          <p class="eli5">The playground (the demo that designers look at to learn the design system) uses a class with TWO bugs at once: the prefix is in the wrong order, AND the color name (<code>accent</code>) isn't a real token. So the class does nothing — and the playground models the exact anti-pattern designers should avoid.</p>
+          <p class="why">
+            <code>hover:nx:bg-accent</code> — two bugs at once. Prefix must be <code>nx:hover:</code> (rule
+            in <code>components.md</code>); <code>accent</code> doesn't exist as a Nexus token
+            (<code>shadcn-divergences.md</code> explicitly removes it). Resolves to nothing. The playground
+            models the exact anti-pattern designers should avoid.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-06</span><code>IconShowcase</code> uses non-existent <code>primary-text</code> token</div>
+          <span class="loc">apps/playground/src/components/IconShowcase.tsx:29,45</span>
+          <p class="eli5">Same bug family as Badge (C-04). IconShowcase asks for a color called <code>primary-text</code> which doesn't exist. The component renders unstyled. Looks copy-pasted from Badge.</p>
+          <p class="why">
+            <code>nx:text-primary-text</code> doesn't exist; correct token is
+            <code>nx:text-primary-subtle-foreground</code>. Same bug class as C-04 in Badge — same fix
+            pattern.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-07</span><code>ComponentShowcase</code> demos buttons using <code>opacity-90</code> hover</div>
+          <span class="loc">apps/playground/src/components/ComponentShowcase.tsx:192-206</span>
+          <p class="eli5">The playground's button demos hover-dim themselves with a generic opacity trick — the exact anti-pattern the rules say to avoid. The design system has proper hover-color tokens for this; the playground should be teaching them.</p>
+          <p class="why">
+            All five button-variant demos use <code>nx:hover:opacity-90 nx:transition-opacity</code> —
+            literally the shadcn anti-pattern <code>shadcn-divergences.md</code> warns against. The design
+            system explicitly provides <code>-hover</code> tokens for this. The playground exists to demo
+            correct usage.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-08</span><code>vitest.d.ts</code> references a missing package</div>
+          <span class="loc">vitest.d.ts:5</span>
+          <p class="eli5">A TypeScript type file imports types from a package (<code>vitest-axe</code>) that isn't installed anywhere in the workspace. Dead reference — just delete the file.</p>
+          <p class="why">
+            <code>import type { AxeMatchers } from 'vitest-axe/matchers';</code> — package is not in any
+            <code>package.json</code>, not in <code>node_modules</code>. Per <code>testing-react.md</code>,
+            a11y is automatic via <code>addon-a11y</code>; <code>vitest-axe</code> is irrelevant. Delete the
+            file.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-23</span>Seven near-identical <code>useEffect</code> blocks load CSS</div>
+          <span class="loc">apps/playground/src/hooks/useTheme.ts:52-89</span>
+          <p class="eli5">The theme switcher has 7 nearly-identical effects, one per theme dimension (base, brand, size, etc.). One effect over a config map would do the same job in ~10 lines instead of 35, and adding a new dimension wouldn't require touching two places.</p>
+          <p class="why">
+            One <code>useEffect</code> iterating <code>Object.entries(theme)</code> with a <code>LOADERS</code>
+            map collapses 35 lines to ~10 and removes the maintenance trap (adding a new theme dimension
+            currently requires touching two places). See Figure 4.1.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-24</span><code>loadCSS</code> has no error handling</div>
+          <span class="loc">apps/playground/src/hooks/useTheme.ts:19-32</span>
+          <p class="eli5">If a theme CSS file fails to load (404, network blip), the playground silently strips the previous theme and shows broken styles. No error message, no fallback.</p>
+          <p class="why">
+            If <code>/themes/base-foo.css</code> 404s, the link stays attached and the previous theme is
+            silently stripped. No <code>onerror</code> handler, no fallback. Combined with the orphan
+            <code>public/themes/</code> files (W-26), an invalid theme combination breaks the playground
+            silently.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-25</span>Custom switch button lacks accessible name</div>
+          <span class="loc">apps/playground/src/components/ThemeSwitcher.tsx:173-186</span>
+          <p class="eli5">A custom switch in the playground has no label that screen readers can announce — they say only "switch, checked" with no context. Also: buttons without <code>type="button"</code> will accidentally submit forms if dropped inside one.</p>
+          <p class="why">
+            <code>role="switch"</code> + <code>aria-checked</code> but no <code>aria-label</code> or
+            <code>aria-labelledby</code> connecting the flanking span labels. Screen readers announce only
+            "switch, checked" without context. Also: all <code>&lt;button&gt;</code> elements in the
+            playground lack <code>type="button"</code> — defaults to <code>submit</code> inside any form.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-26</span>Six orphan CSS files in <code>public/themes/</code></div>
+          <span class="loc">apps/playground/public/themes/{globals,color,typography-utilities,borderwidth-utilities,shadow-variables,spacing}.css</span>
+          <p class="eli5">Six CSS files sit in the playground's themes folder but the playground never loads them. Probably the sync script copies them in blindly. Bundle bloat and confusion about which files are actually live.</p>
+          <p class="why">
+            None are loaded by <code>useTheme</code>'s patterns; likely a side effect of
+            <code>sync-playground-themes.js</code> copying the whole modular output blindly. Inflates the
+            playground bundle and creates confusion about which files are live.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-27</span><code>debug-storybook.log</code> committed to git</div>
+          <span class="loc">packages/react/debug-storybook.log</span>
+          <p class="eli5">A debug log file with someone's absolute home directory path and a stale error got committed by accident. Just delete it and add the pattern to .gitignore.</p>
+          <p class="why">
+            Contains an absolute path with a hardcoded username and a stale "Unable to initialize Storybook"
+            error. Delete and add to <code>.gitignore</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-28</span><code>apps/docs</code> ships an echo-only placeholder</div>
+          <span class="loc">apps/docs/package.json</span>
+          <p class="eli5">The docs site is a placeholder that prints "Docs site not yet implemented" when you run dev. Per the pre-production rule "no shims, just change code in place", delete it until docs work is actually scheduled.</p>
+          <p class="why">
+            <code>"dev": "echo 'Docs site not yet implemented'"</code> with no source files. Per
+            <code>project-stage.md</code> ("no shims, change code in place"), delete until docs work is
+            scheduled. Currently appears in every <code>yarn dev</code> / <code>yarn build</code> for zero
+            value.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ═══════════════ 05. DOCS & RULES ═══════════════ -->
+    <section id="docs">
+      <h2><span class="num">05</span>Documentation & Rules</h2>
+      <p class="section-lede">
+        The <code>.claude/rules/</code> directory is the source of truth for AI-assisted contributions.
+        Whenever a rule lists a token name, prop, or command, it must match the code. The drift map below
+        shows where rules / docs diverge from the actual codebase.
+      </p>
+
+      <div class="diagram">
+        <p class="caption">Figure 5.1 — Documentation ↔ code drift. Red = doc claims something the code doesn't have. Amber = doc claims something the code has a different name for. <strong>What this shows:</strong> the rules and CLAUDE.md docs lead readers (humans and AI coding assistants) toward token names, file paths, and APIs that no longer exist or never existed. Every row here is a place where doc and code disagree.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Doc / rule file</th>
+              <th>Claims</th>
+              <th>Actual</th>
+              <th class="center">Severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>figma.md:83</code></td>
+              <td><code>--color-primary-hover</code></td>
+              <td><code>--color-primary-background-hover</code></td>
+              <td class="center"><span class="badge critical">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>tokens.md:141-147</code><br/><code>core/CLAUDE.md:242</code></td>
+              <td>Semantic groups have <code>text</code> and <code>surface</code> sub-tokens</td>
+              <td>Actual shape is <code>subtle</code>/<code>subtle-foreground</code></td>
+              <td class="center"><span class="badge critical">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>tokens.md:141</code></td>
+              <td>Layout category includes <code>accent</code></td>
+              <td><code>--color-accent</code> doesn't exist</td>
+              <td class="center"><span class="badge critical">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>playground/CLAUDE.md:148,199</code></td>
+              <td><code>error-surface</code>, <code>primary-text</code>, <code>bg-accent</code></td>
+              <td>None of these exist</td>
+              <td class="center"><span class="badge critical">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>tailwind/CLAUDE.md:76-80</code></td>
+              <td><code>nx:bg-primary</code></td>
+              <td>Incomplete; correct is <code>nx:bg-primary-background</code></td>
+              <td class="center"><span class="badge warning">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>react/CLAUDE.md:57-78</code></td>
+              <td>Component template uses inline type union</td>
+              <td><code>components.md</code> mandates named interface</td>
+              <td class="center"><span class="badge warning">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>react/CLAUDE.md:220</code><br/><code>react/package.json exports</code></td>
+              <td><code>dist/style.css</code></td>
+              <td>Actual file is <code>dist/react.css</code></td>
+              <td class="center"><span class="badge critical">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>core/CLAUDE.md:33</code></td>
+              <td><code>shadow-{mode}.json</code></td>
+              <td><code>shadow-{mode}-{light,dark}.json</code> (10 files)</td>
+              <td class="center"><span class="badge warning">Drift</span></td>
+            </tr>
+            <tr>
+              <td><code>playground/CLAUDE.md:121-125</code></td>
+              <td>5,800+ / 1,500+ / 9,000+ icons</td>
+              <td>5,700+ / 1,500+ / 7,400+ (per <code>icon-registry.ts</code>)</td>
+              <td class="center"><span class="badge warning">Stale</span></td>
+            </tr>
+            <tr>
+              <td><code>CONTRIBUTING.md</code> (entire testing section)</td>
+              <td>Three-layer testing; imports from <code>@nexus/test-utils</code></td>
+              <td>Story-first only; those imports don't exist</td>
+              <td class="center"><span class="badge critical">Obsolete</span></td>
+            </tr>
+            <tr>
+              <td><code>ui-audit.md</code> + <code>ui-audit-guide/SKILL.md</code></td>
+              <td>Requires Playwright MCP in <code>.mcp.json</code></td>
+              <td><code>.mcp.json</code> has no Playwright server</td>
+              <td class="center"><span class="badge critical">Non-functional</span></td>
+            </tr>
+            <tr>
+              <td><code>README.md:1</code></td>
+              <td><code># ds 2</code></td>
+              <td>Project is "Nexus Design System" everywhere else</td>
+              <td class="center"><span class="badge warning">Stale</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="h3-num">5.1</span>Critical</h3>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-09</span><code>@nexus/react</code> CSS export points at the wrong file</div>
+          <span class="loc">packages/react/package.json exports</span>
+          <p class="eli5">The package promises its styles live at <code>styles.css</code>. The actual built file is named <code>react.css</code>. Anyone trying <code>import '@nexus/react/styles.css'</code> gets a "module not found" error.</p>
+          <p class="why">
+            <code>"./styles.css": "./dist/style.css"</code>. <code>dist/</code> contains
+            <code>react.css</code>, not <code>style.css</code> (confirmed by <code>ls dist/</code> and by
+            <code>size-limit</code> config which targets <code>react.css</code>). Any consumer doing
+            <code>import '@nexus/react/styles.css'</code> gets a module-resolution error.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-10</span><code>test-utils</code> doesn't export what CONTRIBUTING claims</div>
+          <span class="loc">packages/test-utils/src/index.ts vs CONTRIBUTING.md:41,446</span>
+          <p class="eli5">CONTRIBUTING.md tells you to import four things (<code>axe</code>, <code>render</code>, <code>screen</code>, <code>userEvent</code>) from <code>@nexus/test-utils</code>. None of those four exist in the package. The first time a contributor copy-pastes that example, it fails to compile.</p>
+          <p class="why">
+            CONTRIBUTING.md says <code>import { axe, render, screen, userEvent } from '@nexus/test-utils'</code>.
+            Actual exports: only <code>act</code>, <code>renderHook</code>, <code>waitFor</code> from RTL +
+            vitest re-exports. Examples in the doc would fail to compile.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-11</span><code>/ui-audit</code> command is non-functional</div>
+          <span class="loc">.claude/commands/ui-audit.md:75-124 + ui-audit-guide/SKILL.md:30</span>
+          <p class="eli5">The <code>/ui-audit</code> slash command requires a Playwright MCP server to be configured. The repo doesn't have one — only Linear, Figma, and Chrome DevTools. The command is broken from day one.</p>
+          <p class="why">
+            Both reference <code>mcp__playwright__*</code> tools and state the Playwright MCP server must be
+            configured. <code>.mcp.json</code> has <code>linear</code>, <code>figma</code>,
+            <code>chrome-devtools</code> — no Playwright. The command runs and immediately fails.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding critical">
+        <span class="badge critical">Critical</span>
+        <div class="body">
+          <div class="title"><span class="id">C-12</span>CONTRIBUTING.md is structurally obsolete</div>
+          <span class="loc">CONTRIBUTING.md (entire testing section)</span>
+          <p class="eli5">The entire testing section of CONTRIBUTING.md teaches the OLD way: separate test files, raw class names (no <code>nx:</code> prefix), fixed heights — everything the current rules forbid. New contributors who read it learn anti-patterns. Needs a rewrite, not patches.</p>
+          <p class="why">
+            Describes three-layer testing (unit + Storybook + Chromatic) — replaced by story-first play
+            functions; teaches assertions against raw class names (<code>bg-primary</code>,
+            <code>h-9</code>) without the <code>nx:</code> prefix and against fixed heights that the rules
+            forbid; lists <code>tags: ['autodocs']</code> as a per-story setting that's actually global.
+            Rewrite needed, not patches.
+          </p>
+        </div>
+      </div>
+
+      <h3><span class="h3-num">5.2</span>Warnings</h3>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-29</span>Per-package CLAUDE.md files use package-local scripts without context</div>
+          <span class="loc">packages/core/CLAUDE.md:8-9</span>
+          <p class="eli5">Per-package docs show commands that only work if you've <code>cd</code>'d into that package first — but the doc doesn't say so. A newcomer typing the command at the repo root gets "command not found".</p>
+          <p class="why">
+            Shows <code>yarn build:tailwind</code> and <code>yarn build:tokens:modular</code> — both
+            package-local. From the repo root the equivalents are <code>yarn tokens:tailwind</code> /
+            <code>yarn tokens:modular</code>. New contributors get "command not found".
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-30</span><code>docs/plans/oklch-migration.md</code> has no completion marker</div>
+          <span class="loc">docs/plans/oklch-migration.md</span>
+          <p class="eli5">A planning doc describes a migration that already shipped (PR #33) — but there's no "completed" marker at the top. Anyone reading it will think the work is still ahead.</p>
+          <p class="why">
+            The plan is fully landed (PR #33, commit <code>99f3fb5</code>). Future readers will treat it as
+            forward-looking. Either mark it <code>Status: completed</code> at the top or move it to a
+            <code>completed/</code> subdir.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-31</span>Root <code>CLAUDE.md</code> structure tree omits root-level <code>docs/</code></div>
+          <span class="loc">CLAUDE.md:57-88</span>
+          <p class="eli5">The project tree in the root CLAUDE.md shows <code>apps/docs/</code> but skips the root-level <code>docs/</code> folder (which has actual content). Two similarly-named directories; the doc only mentions one.</p>
+          <p class="why">
+            The tree shows <code>apps/docs/</code> but skips the root-level <code>docs/</code> directory
+            (which contains <code>plans/oklch-migration.md</code>). Two different directories with the same
+            name — at least mention the root one.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-32</span>README is 14 lines, no project description</div>
+          <span class="loc">README.md</span>
+          <p class="eli5">The README is titled <code># ds 2</code> (a leftover name) and has 14 lines total. No description, no setup, no links to CLAUDE.md or CONTRIBUTING. Someone landing on the GitHub page learns nothing.</p>
+          <p class="why">
+            Title is <code># ds 2</code>. No setup, no links to CLAUDE.md / CONTRIBUTING.md. Anyone landing
+            on the repo's GitHub front page learns nothing.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-33</span><code>CLAUDE.md (root)</code> components count drift risk</div>
+          <span class="loc">CLAUDE.md</span>
+          <p class="eli5">The slash-commands list in root CLAUDE.md ends with "etc.", quietly omitting <code>/update-docs</code> and <code>/analyze-deps</code>. Either enumerate them all or remove the partial list.</p>
+          <p class="why">
+            Slash commands list ends with <code>etc.</code>, omitting <code>/update-docs</code> and
+            <code>/analyze-deps</code>. Either enumerate fully or remove the partial list.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ═══════════════ 06. CONFIG & CI ═══════════════ -->
+    <section id="config">
+      <h2><span class="num">06</span>Config & CI</h2>
+      <p class="section-lede">
+        The CI configuration silently diverges from local-dev paths, Node version pinning, and what the rules
+        promise. The matrix below maps each rule-promised gate to its actual CI status.
+      </p>
+
+      <div class="diagram">
+        <p class="caption">Figure 6.1 — CI gate matrix. <strong>What this shows:</strong> for each quality check the rules promise (lint, typecheck, contrast, visual regression, etc.), this table shows whether there's a local <code>yarn</code> script for it and whether CI actually enforces it. Two big gaps: contrast and visual regression have scripts but CI never runs them, so they're suggestions, not gates.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Gate</th>
+              <th>Promised by</th>
+              <th class="center">Local script</th>
+              <th class="center">CI status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lint</td>
+              <td><code>code-quality.md</code></td>
+              <td class="center"><span class="badge ok">yarn lint</span></td>
+              <td class="center"><span class="badge warning">Partial — diff-only, diverges from local</span></td>
+            </tr>
+            <tr>
+              <td>Typecheck</td>
+              <td><code>react/CLAUDE.md</code></td>
+              <td class="center"><span class="badge ok">yarn typecheck</span></td>
+              <td class="center"><span class="badge warning">Partial — only packages with the script</span></td>
+            </tr>
+            <tr>
+              <td>Unit tests</td>
+              <td><code>testing.md</code></td>
+              <td class="center"><span class="badge ok">yarn test:unit</span></td>
+              <td class="center"><span class="badge ok">Present</span></td>
+            </tr>
+            <tr>
+              <td>Story tests</td>
+              <td><code>testing-react.md</code></td>
+              <td class="center"><span class="badge ok">yarn test:storybook</span></td>
+              <td class="center"><span class="badge ok">Present</span></td>
+            </tr>
+            <tr>
+              <td>APCA contrast</td>
+              <td><code>tokens.md</code></td>
+              <td class="center"><span class="badge ok">audit:contrast</span></td>
+              <td class="center"><span class="badge critical">Missing</span></td>
+            </tr>
+            <tr>
+              <td>Visual regression</td>
+              <td><code>storybook.md</code>, <code>testing-react.md</code></td>
+              <td class="center"><span class="badge ok">yarn chromatic:ci</span></td>
+              <td class="center"><span class="badge critical">Missing</span></td>
+            </tr>
+            <tr>
+              <td>Format</td>
+              <td>Prettier config</td>
+              <td class="center"><span class="badge ok">yarn format</span></td>
+              <td class="center"><span class="badge warning">Partial — diff-only</span></td>
+            </tr>
+            <tr>
+              <td>Regenerate-diff check</td>
+              <td>—</td>
+              <td class="center">—</td>
+              <td class="center"><span class="badge critical">Missing</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="h3-num">6.1</span>Findings</h3>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-34</span>Node version pinning drifts across three sources</div>
+          <span class="loc">.nvmrc, package.json engines, .github/workflows/ci.yml</span>
+          <p class="eli5">Three different config files specify the Node version slightly differently (<code>20</code>, <code>&gt;=20.19.0</code>, <code>'20'</code>). They should agree on one canonical pin so local and CI environments match.</p>
+          <p class="why">
+            <code>.nvmrc: 20</code> vs <code>engines: ">=20.19.0"</code> vs CI <code>'20'</code>. Three pins,
+            none precisely agreeing. Pick one canonical pin (probably <code>20.19.0</code>) and reference it
+            from the others.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-35</span><code>vitest</code> pinned at different versions in workspace</div>
+          <span class="loc">root: 4.0.18, packages/test-utils: 4.0.17</span>
+          <p class="eli5">The root package uses vitest 4.0.18; the test-utils package uses 4.0.17. Two patch versions of the same tool in one workspace — should match.</p>
+          <p class="why">
+            Patch-level drift in a monorepo. Pin both to one.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-36</span><code>tsconfig.base.json</code> missing two strict flags</div>
+          <span class="loc">tsconfig.base.json</span>
+          <p class="eli5">TypeScript is set to <code>strict: true</code>, but two extra-strict flags are off. For a library shipping to consumers, those flags catch subtle bugs (like accessing an array index without checking it exists). Worth enabling.</p>
+          <p class="why">
+            Has <code>strict: true</code> but lacks <code>noUncheckedIndexedAccess</code> and
+            <code>exactOptionalPropertyTypes</code>. For a public library shipping to consumers,
+            indexed-access narrowing matters (avoids <code>arr[0]!</code> patterns leaking into public APIs).
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-37</span>Root <code>tsconfig.json</code> only references <code>packages/react</code></div>
+          <span class="loc">tsconfig.json</span>
+          <p class="eli5">The root TypeScript config only knows about one of the four packages. Running <code>tsc --build</code> from the root only typechecks <code>@nexus/react</code> — the others are invisible.</p>
+          <p class="why">
+            <code>packages/core</code> (JS+JSDoc), <code>packages/tailwind</code>,
+            <code>packages/test-utils</code> aren't in the project graph; <code>tsc --build</code> from root
+            only typechecks one package.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-38</span><code>turbo.json</code> has dead config and missing tasks</div>
+          <span class="loc">turbo.json:6</span>
+          <p class="eli5">Turbo's config still has leftover settings for Next.js (which the repo doesn't use). And most actual scripts (token generation, contrast audit, playground, format, test:*) aren't declared in turbo at all — so they bypass its cache and parallelization.</p>
+          <p class="why">
+            <code>build</code> outputs include <code>.next/**</code> + <code>!.next/cache/**</code> — no
+            Next.js anywhere in the repo. <code>audit:contrast</code>, <code>tokens:tailwind</code>,
+            <code>tokens:modular</code>, <code>playground</code>, <code>chromatic</code>, <code>format</code>,
+            <code>test:*</code> not declared — most root scripts bypass turbo orchestration.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-39</span><code>.husky/pre-commit</code> hardcodes nvm path</div>
+          <span class="loc">.husky/pre-commit</span>
+          <p class="eli5">The git pre-commit hook assumes everyone uses <code>nvm</code> to manage Node — it sources <code>~/.nvm/nvm.sh</code>. Breaks for anyone using Volta, fnm, asdf, or system Node.</p>
+          <p class="why">
+            <code>. "$HOME/.nvm/nvm.sh"</code> breaks for Volta / fnm / asdf / system Node users. Drop it or
+            detect the manager.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-40</span><code>.prettierignore</code> doesn't exclude generated CSS</div>
+          <span class="loc">.prettierignore</span>
+          <p class="eli5">Several CSS files are auto-generated and carry "DO NOT EDIT" headers — but they're not listed in prettierignore. Every <code>prettier --write</code> reformats them and produces spurious diffs.</p>
+          <p class="why">
+            <code>apps/playground/public/themes/*.css</code>,
+            <code>apps/playground/src/styles/*.css</code>, and <code>packages/tailwind/*.css</code> all carry
+            "DO NOT EDIT" headers and yet aren't ignored. <code>prettier --write</code> reformats them on every
+            run, creating spurious diffs.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-41</span><code>test-storybook</code> and <code>test-coverage</code> CI jobs duplicate setup</div>
+          <span class="loc">.github/workflows/ci.yml:255-296, 298-346</span>
+          <p class="eli5">CI has two jobs that do nearly the same thing (one with coverage, one without), each installing Playwright separately. Merging them with a coverage toggle would halve the CI minutes.</p>
+          <p class="why">
+            Both install Playwright and run the same Storybook tests, differing only by
+            <code>--coverage</code>. One job with conditional coverage output would halve CI minutes.
+          </p>
+        </div>
+      </div>
+
+      <div class="finding warning">
+        <span class="badge warning">Warning</span>
+        <div class="body">
+          <div class="title"><span class="id">W-42</span>CI lint path diverges from <code>yarn lint</code></div>
+          <span class="loc">.github/workflows/ci.yml:90-134</span>
+          <p class="eli5">CI runs <code>eslint</code> directly on the changed files. Local <code>yarn lint</code> runs turbo, which only lints one of four packages. Two different lint paths — CI catches more than local, but local catches less than it should.</p>
+          <p class="why">
+            CI runs <code>npx eslint</code> directly on changed files; <code>yarn lint</code> is
+            <code>turbo run lint</code> which only lints the <code>react</code> package (only one with a
+            <code>lint</code> script). Two diverging lint paths — CI catches more, local catches less.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ═══════════════ 07. PR PLAN ═══════════════ -->
+    <section id="prs">
+      <h2><span class="num">07</span>Recommended PR Plan</h2>
+      <p class="section-lede">
+        Findings grouped into six PRs ordered by impact. Each PR is self-contained, scoped tightly, and cites
+        finding IDs so reviewers can map back to this report.
+      </p>
+
+      <div class="diagram">
+        <p class="caption">Figure 7.1 — Fan-out from findings to PR plan. <strong>What this shows:</strong> each critical/warning finding maps to one of six PRs. Each PR has a narrow theme so reviewers can scope what they're seeing. PRs A and B carry the highest-impact fixes (shipped CSS broken + invisible UI states); PRs E and F are larger consistency sweeps.</p>
+        <div class="mermaid">
+flowchart LR
+  classDef pr fill:#1f1f1d,stroke:#1f1f1d,color:#ffffff
+  classDef critical fill:#fef2f2,stroke:#b91c1c,color:#b91c1c
+  classDef warning fill:#fffbeb,stroke:#b45309,color:#b45309
+
+  C01[C-01 shadow refs]:::critical
+  C02[C-02 shadow gen]:::critical
+  W07[W-07 script tests]:::warning
+  C04[C-04 badge tokens]:::critical
+  C05[C-05 playground accent]:::critical
+  C06[C-06 IconShowcase]:::critical
+  C19[C-19 dropdown destruct]:::critical
+  W18[W-18 alert vs button]:::warning
+  C09[C-09 react export]:::critical
+  C10[C-10 test-utils]:::critical
+  C08[C-08 vitest-axe]:::critical
+  C12[C-12 CONTRIBUTING]:::critical
+  C03[C-03 CI gates]:::critical
+  W41[W-41 CI dupe]:::warning
+  W42[W-42 CI lint]:::warning
+  C13[C-13 focus mix]:::critical
+  C14[C-14 ring color]:::critical
+  C17[C-17 fixed heights]:::critical
+  C20[C-20 forwardRef]:::critical
+  W10[W-10 type vs interface]:::warning
+
+  PRA[PR A · Shadow pipeline]:::pr
+  PRB[PR B · Broken tokens + doc drift]:::pr
+  PRC[PR C · Consumer-facing exports]:::pr
+  PRD[PR D · CONTRIBUTING rewrite]:::pr
+  PRE[PR E · CI hardening]:::pr
+  PRF[PR F · Component consistency]:::pr
+
+  C01 --> PRA
+  C02 --> PRA
+  W07 --> PRA
+
+  C04 --> PRB
+  C05 --> PRB
+  C06 --> PRB
+  C19 --> PRB
+  W18 --> PRB
+
+  C09 --> PRC
+  C10 --> PRC
+  C08 --> PRC
+
+  C12 --> PRD
+
+  C03 --> PRE
+  W41 --> PRE
+  W42 --> PRE
+
+  C13 --> PRF
+  C14 --> PRF
+  C17 --> PRF
+  C20 --> PRF
+  W10 --> PRF
+        </div>
+      </div>
+
+      <div class="pr-grid">
+        <div class="pr-card urgent">
+          <p class="pr-name">PR A · Fix bundled shadow pipeline</p>
+          <p class="pr-tagline">Restore <code>@nexus/tailwind</code> shadow utilities — they don't render today.</p>
+          <ul>
+            <li>Port <code>partitionThemedModes</code> from <code>generate-modular.js</code> into <code>generate-tailwind-package.js</code></li>
+            <li>Regenerate <code>variables.css</code>; verify 160+ <code>--nx-shadow-*</code> declarations land</li>
+            <li>Add an end-to-end snapshot test in <code>__tests__/</code> that diffs the regenerated output</li>
+            <li>Fix <code>shadows.json:18</code> spread reference (<code>{2xs.layer-1.spread}</code> → <code>{xs.layer-1.spread}</code>)</li>
+          </ul>
+          <div class="pr-ids">
+            <span class="id-chip">C-01</span><span class="id-chip">C-02</span><span class="id-chip">C-15</span><span class="id-chip">W-04</span><span class="id-chip">W-07</span>
+          </div>
+        </div>
+
+        <div class="pr-card urgent">
+          <p class="pr-name">PR B · Broken tokens + doc drift</p>
+          <p class="pr-tagline">Single sweep covering every place that names a non-existent token.</p>
+          <ul>
+            <li>Badge: replace <code>*-text</code> / <code>*-surface</code> with <code>*-subtle</code> family</li>
+            <li>IconShowcase: <code>primary-text</code> → <code>primary-subtle-foreground</code></li>
+            <li>ThemeSwitcher: drop <code>hover:nx:bg-accent</code> (two bugs in one), use <code>nx:hover:bg-background-hover</code></li>
+            <li>DropdownMenu destructive: rebase on <code>error-subtle</code> family</li>
+            <li>Update <code>figma.md:83</code>, <code>tokens.md:141-147</code>, <code>core/CLAUDE.md:242</code>, <code>playground/CLAUDE.md:148,199</code></li>
+            <li>Resolve Alert-vs-Button destructive intensity divergence (pick one)</li>
+          </ul>
+          <div class="pr-ids">
+            <span class="id-chip">C-04</span><span class="id-chip">C-05</span><span class="id-chip">C-06</span><span class="id-chip">C-19</span><span class="id-chip">W-13</span><span class="id-chip">W-18</span>
+          </div>
+        </div>
+
+        <div class="pr-card urgent">
+          <p class="pr-name">PR C · Consumer-facing exports</p>
+          <p class="pr-tagline">Three small fixes that unbreak the public API surface.</p>
+          <ul>
+            <li>Fix <code>@nexus/react</code> <code>exports['./styles.css']</code> → <code>./dist/react.css</code></li>
+            <li>Align <code>test-utils</code> re-exports with what consumers and CONTRIBUTING expect, OR rewrite the docs</li>
+            <li>Delete <code>vitest.d.ts</code> (or install <code>vitest-axe</code> if it's actually needed)</li>
+          </ul>
+          <div class="pr-ids">
+            <span class="id-chip">C-08</span><span class="id-chip">C-09</span><span class="id-chip">C-10</span>
+          </div>
+        </div>
+
+        <div class="pr-card standard">
+          <p class="pr-name">PR D · CONTRIBUTING.md rewrite</p>
+          <p class="pr-tagline">Full rewrite (not patches) to align with current story-first testing + nx: prefix rules. Pair with README expansion.</p>
+          <ul>
+            <li>Drop the three-layer testing narrative</li>
+            <li>Replace test examples with current story-first patterns from <code>testing-react.md</code></li>
+            <li>Fix all class names to use <code>nx:</code> prefix and semantic tokens</li>
+            <li>Add real description + setup instructions to README; rename from "ds 2"</li>
+          </ul>
+          <div class="pr-ids">
+            <span class="id-chip">C-12</span><span class="id-chip">W-32</span><span class="id-chip">W-33</span>
+          </div>
+        </div>
+
+        <div class="pr-card standard">
+          <p class="pr-name">PR E · CI gate hardening</p>
+          <p class="pr-tagline">Make CI enforce what the rules promise.</p>
+          <ul>
+            <li>Wire <code>yarn audit:contrast</code> into CI; fix the two missing pairs (W-01) in the same change</li>
+            <li>Wire <code>yarn chromatic:ci</code> into CI on PRs (informational on main)</li>
+            <li>Add regenerate-and-diff step for <code>packages/tailwind/*.css</code></li>
+            <li>Merge <code>test-storybook</code> + <code>test-coverage</code> jobs</li>
+            <li>Unify CI lint path with <code>yarn lint</code></li>
+            <li>Decide on Playwright MCP for <code>/ui-audit</code> — either wire it in <code>.mcp.json</code> or delete the command</li>
+          </ul>
+          <div class="pr-ids">
+            <span class="id-chip">C-03</span><span class="id-chip">C-11</span><span class="id-chip">W-01</span><span class="id-chip">W-41</span><span class="id-chip">W-42</span>
+          </div>
+        </div>
+
+        <div class="pr-card standard">
+          <p class="pr-name">PR F · Component consistency sweep</p>
+          <p class="pr-tagline">Mechanical fixes that compound visibly across the library.</p>
+          <ul>
+            <li>Standardize on <code>focus-visible:</code> + one ring color (e.g., <code>ring-primary-background/50</code>)</li>
+            <li>Remove fixed heights from Input / Select / TabsList</li>
+            <li>Convert <code>accordion.tsx</code> from <code>forwardRef</code> to <code>function</code></li>
+            <li>Convert all <code>type Props =</code> to <code>interface Props extends</code></li>
+            <li>Fix <code>dropdown-menu</code> prefix-after-selector bug</li>
+            <li>Add <code>nx:relative</code> to <code>Card</code> base</li>
+            <li>Standardize <code>data-variant</code>/<code>data-size</code> emission per the new policy you pick</li>
+          </ul>
+          <div class="pr-ids">
+            <span class="id-chip">C-13</span><span class="id-chip">C-14</span><span class="id-chip">C-17</span><span class="id-chip">C-18</span><span class="id-chip">C-20</span><span class="id-chip">C-21</span><span class="id-chip">C-22</span><span class="id-chip">W-10</span><span class="id-chip">W-11</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Optional follow-ups</h3>
+      <ul>
+        <li><strong>PR G — config drift</strong>: Node version pins (W-34), vitest version (W-35), tsconfig project graph (W-37), turbo task coverage (W-38), husky nvm path (W-39), prettierignore for generated files (W-40), tsconfig strict flags (W-36)</li>
+        <li><strong>PR H — playground polish</strong>: collapse 7 effects into 1 (W-23), add <code>loadCSS</code> error handler (W-24), accessible name on switch (W-25), prune orphan theme files (W-26), delete <code>debug-storybook.log</code> (W-27)</li>
+        <li><strong>PR I — token coverage hygiene</strong>: tree-shake unused color primitives (W-06), fix <code>line-height: auto</code> (W-05), round letter-spacing values (W-02), de-duplicate reference resolvers (W-03), split <code>utils.js</code> (W-08), schema regex (C-16)</li>
+        <li><strong>PR J — docs hygiene</strong>: complete README, mark <code>oklch-migration.md</code> as landed (W-30), align package CLAUDE.md commands with root scripts (W-29), root CLAUDE.md slash commands list (W-33)</li>
+      </ul>
+    </section>
+
+
+    <!-- ═══════════════ 08. GLOSSARY ═══════════════ -->
+    <section id="glossary">
+      <h2><span class="num">08</span>Glossary</h2>
+      <p class="section-lede">Quick reference for terms used throughout this report.</p>
+
+      <dl class="glossary">
+        <dt>OKLCH</dt>
+        <dd>Perceptually uniform color space (Oklab, with L=lightness, C=chroma, H=hue). Nexus emits colors as <code>oklch(...)</code> at build time; hex stays in JSON because Figma can't round-trip OKLCH on export.</dd>
+
+        <dt>DTCG</dt>
+        <dd>W3C Design Tokens Community Group format. Every token has <code>$value</code> + <code>$type</code>; cross-token references use <code>{path.to.token}</code>.</dd>
+
+        <dt>CVA</dt>
+        <dd><code>class-variance-authority</code>. Maps component variants to class strings; used by all enum-style variants in <code>packages/react/src/components/ui/</code>.</dd>
+
+        <dt>nx: prefix</dt>
+        <dd>Tailwind v4 variant-style prefix. Every Nexus utility class starts with <code>nx:</code> (e.g., <code>nx:bg-primary-background</code>). The prefix always comes first, before any pseudo-class or arbitrary selector.</dd>
+
+        <dt>Semantic vs primitive tokens</dt>
+        <dd>Primitives are raw values (<code>--nx-color-blue-500</code>). Semantics reference primitives by role (<code>--color-primary-background</code> → <code>--nx-color-blue-500</code>). Components consume semantics only.</dd>
+
+        <dt>asChild / Radix Slot</dt>
+        <dd>Composition pattern from Radix UI. When <code>asChild</code> is true, the component renders its child instead of its default element, forwarding props and refs. Lets <code>&lt;Button asChild&gt;&lt;a&gt;...&lt;/a&gt;&lt;/Button&gt;</code> work.</dd>
+
+        <dt>Radix portal</dt>
+        <dd>Many Radix overlay primitives (Dialog, DropdownMenu, Tooltip, Select content) render into <code>document.body</code> via <code>createPortal</code> to escape z-index/clipping problems. This means they're not descendants of the trigger's DOM ancestors — so wrapping a <code>div.dark</code> around stories doesn't reach them.</dd>
+
+        <dt>APCA</dt>
+        <dd>Accessible Perceptual Contrast Algorithm. Lc (lightness contrast) score replaces WCAG's contrast ratio for OKLCH-based palettes. Nexus uses thresholds 75 / 60 / 45 by usage tier.</dd>
+
+        <dt>shadcn/ui</dt>
+        <dd>Component recipe library Nexus is forked from. Nexus diverges in token names (<code>destructive</code> → <code>error</code> in CSS, retained as <code>destructive</code> in props), prefix (<code>nx:</code> required), and sizing convention (padding-based, no fixed heights).</dd>
+
+        <dt>Story-first testing</dt>
+        <dd>Component tests live as play functions inside <code>*.stories.tsx</code> — no separate <code>*.test.tsx</code> files. Imports from <code>storybook/test</code>. Hooks and pure utilities still use Vitest unit tests.</dd>
+      </dl>
+    </section>
+
+    </main>
+
+    <footer>
+      <p>
+        Generated by Claude Code · <code>/Users/temp/code/nexus</code> · 2026-05-20<br/>
+        138 findings across 6 categories · pipeline ↔ components ↔ apps ↔ docs ↔ config ↔ CI
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#ffffff',
+        primaryTextColor: '#1f1f1d',
+        primaryBorderColor: '#8a8a84',
+        lineColor: '#6b6b67',
+        secondaryColor: '#f4f4f3',
+        tertiaryColor: '#fafaf9',
+        fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        fontSize: '14px',
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: 'basis',
+        padding: 16,
+      },
+    });
+  </script>
+</body>
+</html>
