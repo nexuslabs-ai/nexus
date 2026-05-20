@@ -68,10 +68,11 @@ export function useTheme() {
     loadCSS(`/themes/typography-${theme.typography}.css`, 'typography');
   }, [theme.typography]);
 
-  // Load shadow mode when it changes
+  // Load shadow mode when it (or dark mode) changes — light/dark variants are separate files
   useEffect(() => {
-    loadCSS(`/themes/shadow-${theme.shadow}.css`, 'shadow');
-  }, [theme.shadow]);
+    const variant = theme.dark ? 'dark' : 'light';
+    loadCSS(`/themes/shadow-${theme.shadow}-${variant}.css`, 'shadow');
+  }, [theme.shadow, theme.dark]);
 
   // Load radius mode when it changes
   useEffect(() => {
