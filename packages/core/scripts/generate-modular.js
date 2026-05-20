@@ -20,6 +20,7 @@ import {
   getGoogleFontsImportFromTokens,
   isReference,
   log,
+  partitionThemedModes,
   pathToCssVar,
   processSemanticTokens,
   readTokenFile,
@@ -34,19 +35,20 @@ const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
 const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 
 /**
- * Process a single-file primitive category (e.g., color.json)
+ * Process a single-file primitive category (e.g., color.json). Throws if the
+ * file does not exist.
  */
 function processSinglePrimitive(category, primitiveMap) {
   const filePath = path.join(PRIMITIVES_DIR, `${category}.json`);
-  const tokens = [];
-
   if (!fs.existsSync(filePath)) {
-    log.warn(`Single primitive not found: ${category}.json`);
-    return tokens;
+    throw new Error(
+      `Primitive file missing: ${filePath} (single-file category "${category}")`
+    );
   }
 
   const tokenData = readTokenFile(filePath);
   const extracted = extractTokens(tokenData);
+  const tokens = [];
 
   for (const token of extracted) {
     const cssName = `nx-${category}-${pathToCssVar(token.path)}`;
@@ -59,22 +61,23 @@ function processSinglePrimitive(category, primitiveMap) {
 }
 
 /**
- * Process a primitive category file (size, typography, shadow, radius, borderwidth)
+ * Process a primitive category file (size, typography, shadow, radius,
+ * borderwidth). Throws if the file does not exist.
  */
 function processPrimitiveFile(category, mode, primitiveMap) {
   const filePath = path.join(
     TOKENS_DIR,
     `primitives/${category}/${category}-${mode}.json`
   );
-  const tokens = [];
-
   if (!fs.existsSync(filePath)) {
-    log.warn(`File not found: ${category}-${mode}.json`);
-    return tokens;
+    throw new Error(
+      `Primitive file missing: ${filePath} (category "${category}", mode "${mode}")`
+    );
   }
 
   const tokenData = readTokenFile(filePath);
   const extracted = extractTokens(tokenData);
+  const tokens = [];
 
   for (const token of extracted) {
     const cssName = `nx-${category}-${pathToCssVar(token.path)}`;
@@ -102,13 +105,13 @@ function processSemanticFile(fileName, primitiveMap) {
 }
 
 /**
- * Process shadow styles - generates var() references instead of resolved values
+ * Process shadow styles - generates var() references instead of resolved
+ * values. Throws if the file does not exist.
  */
 function processShadowStyles() {
   const stylesFile = path.join(TOKENS_DIR, 'styles/shadows.json');
-
   if (!fs.existsSync(stylesFile)) {
-    return [];
+    throw new Error(`Shadow styles file missing: ${stylesFile}`);
   }
 
   const tokenData = readTokenFile(stylesFile);
@@ -223,41 +226,6 @@ function generateThemedPrimitiveCSS(category, mode, primitiveMap) {
   css += `}\n`;
 
   writeModularFile(`${category}-${mode}.css`, css);
-}
-
-/**
- * Group {base}-light / {base}-dark mode names into pairs; pass others through unchanged.
- * Returns { themed: { base: { light, dark } }, plain: [mode, ...] }.
- */
-function partitionThemedModes(modes) {
-  const themed = {};
-  const plain = [];
-  const seen = new Set();
-
-  for (const mode of modes) {
-    if (seen.has(mode)) continue;
-    const match = mode.match(/^(.+)-(light|dark)$/);
-    if (!match) {
-      plain.push(mode);
-      seen.add(mode);
-      continue;
-    }
-    const [, base, variant] = match;
-    const other = variant === 'light' ? `${base}-dark` : `${base}-light`;
-    if (modes.includes(other)) {
-      themed[base] = {
-        light: `${base}-light`,
-        dark: `${base}-dark`,
-      };
-      seen.add(`${base}-light`);
-      seen.add(`${base}-dark`);
-    } else {
-      plain.push(mode);
-      seen.add(mode);
-    }
-  }
-
-  return { themed, plain };
 }
 
 /**
@@ -407,10 +375,8 @@ function main() {
   for (const [category, info] of Object.entries(primitives)) {
     if (info.modes === null) {
       const tokens = processSinglePrimitive(category, primitiveMap);
-      if (tokens.length > 0) {
-        generatePrimitivesCSS(tokens, category);
-        totalFiles++;
-      }
+      generatePrimitivesCSS(tokens, category);
+      totalFiles++;
     }
   }
 
@@ -447,11 +413,9 @@ function main() {
     console.log('\nStandalone semantics:');
     for (const standaloneFile of semantics.standalone) {
       const tokens = processSemanticFile(standaloneFile, primitiveMap);
-      if (tokens.length > 0) {
-        const fileName = standaloneFile.replace('.json', '');
-        generateStandaloneSemanticCSS(fileName, tokens);
-        totalFiles++;
-      }
+      const fileName = standaloneFile.replace('.json', '');
+      generateStandaloneSemanticCSS(fileName, tokens);
+      totalFiles++;
     }
   }
 
@@ -466,11 +430,9 @@ function main() {
 
   // Generate shadow variables from styles
   const shadowVariables = processShadowStyles();
-  if (shadowVariables.length > 0) {
-    generateShadowVariablesCSS(shadowVariables);
-    console.log(`  ✓ ${shadowVariables.length} shadow variables`);
-    totalFiles++;
-  }
+  generateShadowVariablesCSS(shadowVariables);
+  console.log(`  ✓ ${shadowVariables.length} shadow variables`);
+  totalFiles++;
 
   // Generate border width utilities (use first mode as reference)
   if (primitives.borderwidth && primitives.borderwidth.modes) {
@@ -480,14 +442,10 @@ function main() {
       firstMode,
       primitiveMap
     );
-    if (borderwidthTokens.length > 0) {
-      const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
-      if (borderWidth.css) {
-        writeModularFile('borderwidth-utilities.css', borderWidth.css);
-        console.log(`  ✓ ${borderWidth.count} border width utilities`);
-        totalFiles++;
-      }
-    }
+    const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
+    writeModularFile('borderwidth-utilities.css', borderWidth.css);
+    console.log(`  ✓ ${borderWidth.count} border width utilities`);
+    totalFiles++;
   }
 
   // Generate playground globals.css

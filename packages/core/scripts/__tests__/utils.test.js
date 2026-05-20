@@ -6,6 +6,7 @@ import {
   extractTokens,
   formatTokenValue,
   isReference,
+  partitionThemedModes,
   pathToCssVar,
   resolveReference,
   resolveValue,
@@ -305,6 +306,70 @@ describe('utils', () => {
 
     it('returns empty array for empty input', () => {
       expect(extractTokens({})).toEqual([]);
+    });
+  });
+
+  describe('partitionThemedModes', () => {
+    it('pairs {base}-light / {base}-dark into a themed base', () => {
+      const result = partitionThemedModes(['vega-light', 'vega-dark']);
+      expect(result).toEqual({
+        themed: { vega: { light: 'vega-light', dark: 'vega-dark' } },
+        plain: [],
+      });
+    });
+
+    it('leaves un-paired modes in plain', () => {
+      const result = partitionThemedModes(['lyra', 'maia', 'nova']);
+      expect(result).toEqual({
+        themed: {},
+        plain: ['lyra', 'maia', 'nova'],
+      });
+    });
+
+    it('handles mixed themed and plain modes', () => {
+      const result = partitionThemedModes([
+        'vega-light',
+        'vega-dark',
+        'standalone',
+      ]);
+      expect(result).toEqual({
+        themed: { vega: { light: 'vega-light', dark: 'vega-dark' } },
+        plain: ['standalone'],
+      });
+    });
+
+    it('treats asymmetric singletons (only -light) as plain', () => {
+      const result = partitionThemedModes(['vega-light']);
+      expect(result).toEqual({
+        themed: {},
+        plain: ['vega-light'],
+      });
+    });
+
+    it('treats asymmetric singletons (only -dark) as plain', () => {
+      const result = partitionThemedModes(['vega-dark']);
+      expect(result).toEqual({
+        themed: {},
+        plain: ['vega-dark'],
+      });
+    });
+
+    it('pairs multiple themed bases simultaneously', () => {
+      const result = partitionThemedModes([
+        'vega-light',
+        'vega-dark',
+        'lyra-light',
+        'lyra-dark',
+      ]);
+      expect(result.themed).toEqual({
+        vega: { light: 'vega-light', dark: 'vega-dark' },
+        lyra: { light: 'lyra-light', dark: 'lyra-dark' },
+      });
+      expect(result.plain).toEqual([]);
+    });
+
+    it('returns empty shape for empty input', () => {
+      expect(partitionThemedModes([])).toEqual({ themed: {}, plain: [] });
     });
   });
 

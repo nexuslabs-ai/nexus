@@ -372,6 +372,46 @@ export function discoverSemantics(semanticDir) {
 }
 
 /**
+ * Group {base}-light / {base}-dark mode names into pairs; pass others through unchanged.
+ * Used by both bundled and modular generators to recognize themed primitive categories.
+ *
+ * @param {string[]} modes - List of mode names (e.g., ['vega-light', 'vega-dark', 'lyra'])
+ * @returns {{ themed: Record<string, { light: string, dark: string }>, plain: string[] }}
+ *   themed: base names that have both -light and -dark partners
+ *   plain: modes with no themed partner (asymmetric singletons fall here too)
+ */
+export function partitionThemedModes(modes) {
+  const themed = {};
+  const plain = [];
+  const seen = new Set();
+
+  for (const mode of modes) {
+    if (seen.has(mode)) continue;
+    const match = mode.match(/^(.+)-(light|dark)$/);
+    if (!match) {
+      plain.push(mode);
+      seen.add(mode);
+      continue;
+    }
+    const [, base, variant] = match;
+    const other = variant === 'light' ? `${base}-dark` : `${base}-light`;
+    if (modes.includes(other)) {
+      themed[base] = {
+        light: `${base}-light`,
+        dark: `${base}-dark`,
+      };
+      seen.add(`${base}-light`);
+      seen.add(`${base}-dark`);
+    } else {
+      plain.push(mode);
+      seen.add(mode);
+    }
+  }
+
+  return { themed, plain };
+}
+
+/**
  * Process a semantic token file and resolve references
  * @param {string} filePath - Full path to semantic file
  * @param {Map} primitiveMap - Primitive map for reference resolution
@@ -379,8 +419,7 @@ export function discoverSemantics(semanticDir) {
  */
 export function processSemanticTokens(filePath, primitiveMap) {
   if (!fs.existsSync(filePath)) {
-    log.warn(`Semantic file not found: ${filePath}`);
-    return [];
+    throw new Error(`Semantic file missing: ${filePath}`);
   }
 
   const tokenData = readTokenFile(filePath);
@@ -512,8 +551,7 @@ export function formatShadowComposite(value, isInset = false) {
  */
 function extractGoogleFonts(typographyFilePath) {
   if (!fs.existsSync(typographyFilePath)) {
-    log.warn(`Typography file not found: ${typographyFilePath}`);
-    return [];
+    throw new Error(`Typography file missing: ${typographyFilePath}`);
   }
 
   const tokenData = readTokenFile(typographyFilePath);
@@ -633,8 +671,7 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
   const typographyPath = path.join(tokensDir, 'styles/typography.json');
 
   if (!fs.existsSync(typographyPath)) {
-    log.warn('Typography styles file not found');
-    return { css: '', count: 0 };
+    throw new Error(`Typography styles file missing: ${typographyPath}`);
   }
 
   const tokenData = readTokenFile(typographyPath);
@@ -723,7 +760,7 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
 export function collectSpacingTokens(semanticDir) {
   const filePath = path.join(semanticDir, 'spacing.json');
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(`Spacing semantic file missing: ${filePath}`);
   }
 
   const tokenData = readTokenFile(filePath);
@@ -760,7 +797,9 @@ export function collectRadiusTokens(tokensDir, mode) {
     `primitives/radius/radius-${mode}.json`
   );
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(
+      `Radius primitive file missing: ${filePath} (mode "${mode}")`
+    );
   }
 
   const tokenData = readTokenFile(filePath);
@@ -791,7 +830,9 @@ export function collectBorderwidthTokens(tokensDir, mode) {
     `primitives/borderwidth/borderwidth-${mode}.json`
   );
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(
+      `Borderwidth primitive file missing: ${filePath} (mode "${mode}")`
+    );
   }
 
   const tokenData = readTokenFile(filePath);
@@ -843,7 +884,7 @@ function generateShadowVarValue(name, shadowValue, isInset = false) {
 export function collectShadowTokens(tokensDir) {
   const stylesFile = path.join(tokensDir, 'styles/shadows.json');
   if (!fs.existsSync(stylesFile)) {
-    return [];
+    throw new Error(`Shadow styles file missing: ${stylesFile}`);
   }
 
   const tokenData = readTokenFile(stylesFile);
@@ -894,7 +935,7 @@ export function collectSemanticColorTokensVarRef(
 ) {
   const filePath = path.join(semanticDir, fileName);
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(`Semantic color file missing: ${filePath}`);
   }
 
   const tokenData = readTokenFile(filePath);
