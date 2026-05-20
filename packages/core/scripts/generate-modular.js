@@ -12,6 +12,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  formatDistDirectory,
   formatShadowComposite,
   formatTokenValue,
   generateBorderWidthUtilitiesCSS,
@@ -337,7 +338,7 @@ function generatePlaygroundGlobalsCSS(primitives, primitiveMap) {
 /**
  * Main execution
  */
-function main() {
+async function main() {
   console.log('🎨 Generating modular CSS files...\n');
 
   // Wipe and recreate dist so renamed/removed outputs do not leave orphans.
@@ -457,9 +458,11 @@ function main() {
   console.log(`  ✓ globals.css (${globalsTokenCount} tokens)`);
   totalFiles++;
 
+  await formatDistDirectory(MODULAR_DIR);
+
   console.log(
     `\n✨ Generated ${totalFiles} modular CSS files in dist/modular/`
   );
 }
 
-main();
+await main();

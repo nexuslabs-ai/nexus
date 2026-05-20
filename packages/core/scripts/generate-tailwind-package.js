@@ -12,6 +12,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  formatDistDirectory,
   formatTokenValue,
   generateBaseLayerCSS,
   generateBorderWidthUtilitiesCSS,
@@ -460,7 +461,7 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
  * Main generation function. Exported so tests can run it against a temp
  * `distDir` without overwriting the committed bundle in `dist/tailwind`.
  */
-export function generateTailwindPackage(
+export async function generateTailwindPackage(
   config,
   { distDir = DEFAULT_DIST_DIR } = {}
 ) {
@@ -525,6 +526,8 @@ export function generateTailwindPackage(
   const nexusCSS = generateNexusCSS(semanticFiles, primitiveMap, usedModes);
   writeDistFile('nexus.css', nexusCSS);
 
+  await formatDistDirectory(distDir);
+
   const themeCount = semanticFiles.themed.length;
   console.log('');
   console.log(`📊 Summary:`);
@@ -543,7 +546,7 @@ export function generateTailwindPackage(
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('🎨 Generating @nexus/tailwind package from DTCG tokens...');
   const cliConfig = parseArgs();
-  generateTailwindPackage(cliConfig);
+  await generateTailwindPackage(cliConfig);
   console.log('');
   console.log('✨ @nexus/tailwind package generation complete!');
 }

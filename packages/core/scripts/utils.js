@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import * as prettier from 'prettier';
+import { fileURLToPath } from 'url';
 
 import {
   hexToOklchMechanical,
@@ -1114,4 +1116,27 @@ export function generateBaseLayerCSS() {
   }
 }
 `;
+}
+
+const SCRIPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Format every `.css` file in `distDir` in place with prettier, using the
+ * repo's `.prettierrc`. Resolves the config from the script's own location so
+ * callers can write to a temporary dist (e.g. tests) without losing config
+ * resolution.
+ */
+export async function formatDistDirectory(distDir) {
+  const config = await prettier.resolveConfig(SCRIPTS_DIR);
+  const files = fs.readdirSync(distDir).filter((name) => name.endsWith('.css'));
+
+  for (const name of files) {
+    const filePath = path.join(distDir, name);
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const formatted = await prettier.format(raw, {
+      ...config,
+      filepath: filePath,
+    });
+    fs.writeFileSync(filePath, formatted);
+  }
 }
