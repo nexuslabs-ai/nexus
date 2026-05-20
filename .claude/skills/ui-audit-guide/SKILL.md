@@ -49,7 +49,7 @@ If flows are not specified, explore the page to identify them:
 
 ### Step 2: Load Design Context
 
-Before testing, read available design references: the root `CLAUDE.md`, package-level `CLAUDE.md` files (`packages/core/CLAUDE.md`, `packages/react/CLAUDE.md`, etc.), and design tokens in `packages/core/tokens/`. Skip any that don't apply.
+Before testing, read available design references: the `.claude/rules/` directory (especially `components.md`, `tokens.md`, `figma.md`, `shadcn-divergences.md`), and design tokens in `packages/core/tokens/`. Skip any that don't apply.
 
 Extract and hold onto:
 
