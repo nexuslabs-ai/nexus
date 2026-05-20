@@ -235,7 +235,7 @@ function DropdownMenuItem({
         '[&_svg]:nx:pointer-events-none [&_svg]:nx:size-4 [&_svg]:nx:shrink-0',
         inset && 'nx:pl-8',
         variant === 'destructive' &&
-          'nx:text-error-foreground nx:focus:bg-error-background nx:focus:text-error-foreground',
+          'nx:text-error-subtle-foreground nx:focus:bg-error-background nx:focus:text-error-foreground',
         className
       )}
       {...props}
