@@ -20,6 +20,8 @@ const THEMES = ['light', 'dark'];
 const BASE_PAIRS = [
   ['foreground', 'background', 75],
   ['muted-foreground', 'muted', 45],
+  ['muted-light-foreground', 'muted-light', 45],
+  ['disabled-foreground', 'disabled', 45],
   ['error.foreground', 'error.background', 60],
   ['success.foreground', 'success.background', 60],
   ['warning.foreground', 'warning.background', 60],

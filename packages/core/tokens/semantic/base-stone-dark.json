@@ -29,7 +29,7 @@
     "$type": "color"
   },
   "muted-light-foreground": {
-    "$value": "{stone.500}",
+    "$value": "{stone.300}",
     "$type": "color",
     "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
   },
@@ -38,7 +38,7 @@
     "$type": "color"
   },
   "disabled-foreground": {
-    "$value": "{stone.400}",
+    "$value": "{stone.300}",
     "$type": "color"
   },
   "container": {

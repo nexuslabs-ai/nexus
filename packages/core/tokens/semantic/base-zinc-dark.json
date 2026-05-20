@@ -29,7 +29,7 @@
     "$type": "color"
   },
   "muted-light-foreground": {
-    "$value": "{zinc.500}",
+    "$value": "{zinc.300}",
     "$type": "color",
     "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
   },
@@ -38,7 +38,7 @@
     "$type": "color"
   },
   "disabled-foreground": {
-    "$value": "{zinc.400}",
+    "$value": "{zinc.300}",
     "$type": "color"
   },
   "container": {

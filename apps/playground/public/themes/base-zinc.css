@@ -10,7 +10,7 @@ html {
   --nx-color-muted-light: var(--nx-color-zinc-50);
   --nx-color-muted-light-foreground: var(--nx-color-zinc-400);
   --nx-color-disabled: var(--nx-color-zinc-100);
-  --nx-color-disabled-foreground: var(--nx-color-zinc-300);
+  --nx-color-disabled-foreground: var(--nx-color-zinc-400);
   --nx-color-container: var(--nx-color-white);
   --nx-color-container-foreground: var(--nx-color-zinc-950);
   --nx-color-container-hover: var(--nx-color-zinc-100);
@@ -79,9 +79,9 @@ html.dark {
   --nx-color-muted: var(--nx-color-zinc-800);
   --nx-color-muted-foreground: var(--nx-color-zinc-300);
   --nx-color-muted-light: var(--nx-color-zinc-800);
-  --nx-color-muted-light-foreground: var(--nx-color-zinc-500);
+  --nx-color-muted-light-foreground: var(--nx-color-zinc-300);
   --nx-color-disabled: var(--nx-color-zinc-950);
-  --nx-color-disabled-foreground: var(--nx-color-zinc-400);
+  --nx-color-disabled-foreground: var(--nx-color-zinc-300);
   --nx-color-container: var(--nx-color-black);
   --nx-color-container-foreground: var(--nx-color-white);
   --nx-color-container-hover: var(--nx-color-zinc-950);

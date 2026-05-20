@@ -36,7 +36,7 @@
   --color-muted-light: var(--nx-color-slate-50);
   --color-muted-light-foreground: var(--nx-color-slate-400);
   --color-disabled: var(--nx-color-slate-100);
-  --color-disabled-foreground: var(--nx-color-slate-300);
+  --color-disabled-foreground: var(--nx-color-slate-400);
   --color-container: var(--nx-color-white);
   --color-container-foreground: var(--nx-color-slate-900);
   --color-container-hover: var(--nx-color-slate-100);

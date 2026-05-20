@@ -33,7 +33,7 @@
   --color-muted-light: var(--nx-color-stone-50);
   --color-muted-light-foreground: var(--nx-color-stone-400);
   --color-disabled: var(--nx-color-stone-100);
-  --color-disabled-foreground: var(--nx-color-stone-300);
+  --color-disabled-foreground: var(--nx-color-stone-400);
   --color-container: var(--nx-color-white);
   --color-container-foreground: var(--nx-color-stone-950);
   --color-container-hover: var(--nx-color-stone-100);
@@ -219,9 +219,9 @@
   --nx-color-muted: var(--nx-color-stone-800);
   --nx-color-muted-foreground: var(--nx-color-stone-300);
   --nx-color-muted-light: var(--nx-color-stone-800);
-  --nx-color-muted-light-foreground: var(--nx-color-stone-500);
+  --nx-color-muted-light-foreground: var(--nx-color-stone-300);
   --nx-color-disabled: var(--nx-color-stone-950);
-  --nx-color-disabled-foreground: var(--nx-color-stone-400);
+  --nx-color-disabled-foreground: var(--nx-color-stone-300);
   --nx-color-container: var(--nx-color-black);
   --nx-color-container-foreground: var(--nx-color-white);
   --nx-color-container-hover: var(--nx-color-stone-950);
