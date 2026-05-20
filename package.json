@@ -26,7 +26,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens:modular": "cd packages/core && yarn build:tokens:modular && cd ../../apps/playground && mkdir -p src/styles public/themes && rm -rf public/themes/* src/styles/* && cp ../../packages/core/dist/modular/* public/themes/ && cp ../../packages/core/dist/modular/globals.css ../../packages/core/dist/modular/color.css ../../packages/core/dist/modular/typography-utilities.css ../../packages/core/dist/modular/borderwidth-utilities.css src/styles/",
+    "tokens:modular": "yarn workspace @nexus/core build:tokens:modular && node scripts/sync-playground-themes.js",
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:contrast": "yarn workspace @nexus/core audit:contrast",
     "playground": "cd apps/playground && yarn dev",
