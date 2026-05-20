@@ -39,10 +39,10 @@
   --nx-typography-line-height-7xl: 72px;
   --nx-typography-line-height-8xl: 96px;
   --nx-typography-line-height-9xl: 128px;
-  --nx-typography-letterspacing-tighter: -0.800000011920929px;
-  --nx-typography-letterspacing-tight: -0.4000000059604645px;
+  --nx-typography-letterspacing-tighter: -0.8px;
+  --nx-typography-letterspacing-tight: -0.4px;
   --nx-typography-letterspacing-normal: 0px;
-  --nx-typography-letterspacing-wide: 0.4000000059604645px;
-  --nx-typography-letterspacing-wider: 0.800000011920929px;
-  --nx-typography-letterspacing-widest: 1.600000023841858px;
+  --nx-typography-letterspacing-wide: 0.4px;
+  --nx-typography-letterspacing-wider: 0.8px;
+  --nx-typography-letterspacing-widest: 1.6px;
 }
