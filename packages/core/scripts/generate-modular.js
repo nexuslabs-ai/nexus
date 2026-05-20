@@ -375,10 +375,8 @@ function main() {
   for (const [category, info] of Object.entries(primitives)) {
     if (info.modes === null) {
       const tokens = processSinglePrimitive(category, primitiveMap);
-      if (tokens.length > 0) {
-        generatePrimitivesCSS(tokens, category);
-        totalFiles++;
-      }
+      generatePrimitivesCSS(tokens, category);
+      totalFiles++;
     }
   }
 
@@ -415,11 +413,9 @@ function main() {
     console.log('\nStandalone semantics:');
     for (const standaloneFile of semantics.standalone) {
       const tokens = processSemanticFile(standaloneFile, primitiveMap);
-      if (tokens.length > 0) {
-        const fileName = standaloneFile.replace('.json', '');
-        generateStandaloneSemanticCSS(fileName, tokens);
-        totalFiles++;
-      }
+      const fileName = standaloneFile.replace('.json', '');
+      generateStandaloneSemanticCSS(fileName, tokens);
+      totalFiles++;
     }
   }
 
@@ -434,11 +430,9 @@ function main() {
 
   // Generate shadow variables from styles
   const shadowVariables = processShadowStyles();
-  if (shadowVariables.length > 0) {
-    generateShadowVariablesCSS(shadowVariables);
-    console.log(`  ✓ ${shadowVariables.length} shadow variables`);
-    totalFiles++;
-  }
+  generateShadowVariablesCSS(shadowVariables);
+  console.log(`  ✓ ${shadowVariables.length} shadow variables`);
+  totalFiles++;
 
   // Generate border width utilities (use first mode as reference)
   if (primitives.borderwidth && primitives.borderwidth.modes) {
@@ -448,14 +442,10 @@ function main() {
       firstMode,
       primitiveMap
     );
-    if (borderwidthTokens.length > 0) {
-      const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
-      if (borderWidth.css) {
-        writeModularFile('borderwidth-utilities.css', borderWidth.css);
-        console.log(`  ✓ ${borderWidth.count} border width utilities`);
-        totalFiles++;
-      }
-    }
+    const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
+    writeModularFile('borderwidth-utilities.css', borderWidth.css);
+    console.log(`  ✓ ${borderWidth.count} border width utilities`);
+    totalFiles++;
   }
 
   // Generate playground globals.css

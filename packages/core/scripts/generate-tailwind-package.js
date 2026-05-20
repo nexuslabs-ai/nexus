@@ -320,10 +320,9 @@ function filterDivergentDark(primitiveTokens, darkTokens) {
  * Generate variables.css with --nx-* prefixed primitives.
  * Themed dark variants emit into a `.dark` block that overrides `:root` when
  * an ancestor carries the `.dark` class (matching the @custom-variant selector
- * used in nexus.css). Dark = primitive overrides land in variables.css; dark
- * semantic-color overrides land in the `.dark` block inside nexus.css.
+ * used in nexus.css).
  */
-function generateVariablesCSS(primitiveTokens, darkTokens, usedModes) {
+function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
   let css = `/* ===== NEXUS DESIGN SYSTEM - PRIMITIVE VARIABLES ===== */\n`;
   css += `/* Auto-generated - DO NOT EDIT */\n`;
   css += `/* All primitives use --nx-* prefix for namespace isolation */\n\n`;
@@ -340,8 +339,6 @@ function generateVariablesCSS(primitiveTokens, darkTokens, usedModes) {
     css += `\n`;
   }
   css += `}\n`;
-
-  const divergentDark = filterDivergentDark(primitiveTokens, darkTokens);
 
   if (divergentDark.length > 0) {
     css += `\n.dark {\n`;
@@ -498,9 +495,14 @@ export function generateTailwindPackage(
   }
   console.log('');
 
+  const divergentDark = filterDivergentDark(
+    primitiveTokens,
+    darkPrimitiveTokens
+  );
+
   const variablesCSS = generateVariablesCSS(
     primitiveTokens,
-    darkPrimitiveTokens,
+    divergentDark,
     usedModes
   );
   writeDistFile('variables.css', variablesCSS);
@@ -529,12 +531,8 @@ export function generateTailwindPackage(
   console.log(
     `   Primitives: ${primitiveTokens.length} tokens (with --nx-* prefix)`
   );
-  const divergentDarkCount = filterDivergentDark(
-    primitiveTokens,
-    darkPrimitiveTokens
-  ).length;
-  if (divergentDarkCount > 0) {
-    console.log(`   Dark overrides: ${divergentDarkCount} tokens`);
+  if (divergentDark.length > 0) {
+    console.log(`   Dark overrides: ${divergentDark.length} tokens`);
   }
   console.log(`   Semantic themes: ${themeCount} (light + dark)`);
   console.log(`   Typography utilities: ${typography.count}`);

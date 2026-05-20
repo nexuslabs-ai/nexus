@@ -760,7 +760,7 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
 export function collectSpacingTokens(semanticDir) {
   const filePath = path.join(semanticDir, 'spacing.json');
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(`Spacing semantic file missing: ${filePath}`);
   }
 
   const tokenData = readTokenFile(filePath);
@@ -797,7 +797,9 @@ export function collectRadiusTokens(tokensDir, mode) {
     `primitives/radius/radius-${mode}.json`
   );
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(
+      `Radius primitive file missing: ${filePath} (mode "${mode}")`
+    );
   }
 
   const tokenData = readTokenFile(filePath);
@@ -828,7 +830,9 @@ export function collectBorderwidthTokens(tokensDir, mode) {
     `primitives/borderwidth/borderwidth-${mode}.json`
   );
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(
+      `Borderwidth primitive file missing: ${filePath} (mode "${mode}")`
+    );
   }
 
   const tokenData = readTokenFile(filePath);
@@ -880,7 +884,7 @@ function generateShadowVarValue(name, shadowValue, isInset = false) {
 export function collectShadowTokens(tokensDir) {
   const stylesFile = path.join(tokensDir, 'styles/shadows.json');
   if (!fs.existsSync(stylesFile)) {
-    return [];
+    throw new Error(`Shadow styles file missing: ${stylesFile}`);
   }
 
   const tokenData = readTokenFile(stylesFile);
@@ -931,7 +935,7 @@ export function collectSemanticColorTokensVarRef(
 ) {
   const filePath = path.join(semanticDir, fileName);
   if (!fs.existsSync(filePath)) {
-    return [];
+    throw new Error(`Semantic color file missing: ${filePath}`);
   }
 
   const tokenData = readTokenFile(filePath);
