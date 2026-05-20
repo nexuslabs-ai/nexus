@@ -4,7 +4,7 @@
   "description": "JSON Schema for W3C Design Tokens Community Group format (v2025.10)",
   "type": "object",
   "patternProperties": {
-    "^\\$?[a-zA-Z_][a-zA-Z0-9_-]*$": {
+    "^\\$?[a-zA-Z0-9_][a-zA-Z0-9_-]*$": {
       "oneOf": [
         {
           "$ref": "#/definitions/token"
@@ -57,7 +57,7 @@
       "type": "object",
       "description": "A group of tokens or nested groups",
       "patternProperties": {
-        "^\\$?[a-zA-Z_][a-zA-Z0-9_-]*$": {
+        "^\\$?[a-zA-Z0-9_][a-zA-Z0-9_-]*$": {
           "oneOf": [
             {
               "$ref": "#/definitions/token"
