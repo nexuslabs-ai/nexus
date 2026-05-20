@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   hexToOklchMechanical,
   hexToOklchPinned,
+  hexToSrgbInts,
   isPaletteShadeKey,
   PERCEPTUAL_L_GRID,
 } from '../lib/perceptual-grid.js';
@@ -104,6 +105,24 @@ describe('hexToOklchMechanical', () => {
   it('emits achromatic hue as 0 (not the culori `none` keyword)', () => {
     expect(hexToOklchMechanical('#ffffff')).toBe('oklch(1 0 0)');
     expect(hexToOklchMechanical('#000000')).toBe('oklch(0 0 0)');
+  });
+});
+
+describe('hexToSrgbInts', () => {
+  it('returns a 3-tuple for opaque colors (apca-w3 sRGBtoY contract)', () => {
+    const ints = hexToSrgbInts('#3b82f6');
+    expect(ints).toHaveLength(3);
+    expect(ints.every((v) => Number.isInteger(v) && v >= 0 && v <= 255)).toBe(
+      true
+    );
+  });
+
+  it('throws on alpha-bearing input (must pre-blend before contrast)', () => {
+    // 8-digit hex with alpha < 1 — overlay tokens (e.g. `#000000cc`) hit
+    // this path. apca-w3 ignores indices past [r,g,b], so silently dropping
+    // alpha would produce wrong Lc scores; throw forces the caller to
+    // pre-blend against the actual background first.
+    expect(() => hexToSrgbInts('#000000cc')).toThrow(/alpha-bearing/);
   });
 });
 
