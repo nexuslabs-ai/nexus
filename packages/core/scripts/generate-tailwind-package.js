@@ -87,9 +87,7 @@ function getPrimitiveFiles(discovered, config) {
 }
 
 /**
- * Assert every entry in primitiveFiles points to an existing file. Catches the
- * silent-skip failure mode that broke shadow emission before this fix landed —
- * e.g. requesting `--shadow=vega` when only `shadow-vega-light.json` exists.
+ * Throws if any primitive file does not exist.
  */
 function assertPrimitiveFilesExist(primitiveFiles) {
   for (const [category, info] of Object.entries(primitiveFiles)) {
@@ -172,26 +170,19 @@ function loadTokensWithNxPrefix(filePath, primitiveMap, tokenList, category) {
 /**
  * Load dark themed primitive tokens into a separate list. The light-side
  * primitiveMap is the canonical resolution map, so dark tokens do not write
- * to it; they only contribute the `.dark` override declarations.
- *
- * Refs in dark values are rejected: resolving them would silently bind to the
- * light primitive (wrong) or emit an unresolved `{ref}` string (broken).
- * Today's themed primitives use concrete values so this path is a guardrail.
+ * to it; they only contribute the `.dark` override declarations. References
+ * are stored raw and resolved against the fully-populated primitiveMap by
+ * `resolveDarkReferences` after all primitive categories have loaded.
  */
 function loadDarkThemedTokens(filePath, tokenList, category) {
   const tokenData = readTokenFile(filePath);
   const tokens = extractTokens(tokenData);
 
   for (const token of tokens) {
-    if (isReference(token.value)) {
-      throw new Error(
-        `Dark themed primitive has reference value: ${category}.${token.path.join('.')} = ${token.value}. ` +
-          `Cross-primitive refs in dark variants are not supported.`
-      );
-    }
-
     const cssName = pathToCssVarPrefixed(token.path, category, true);
-    const cssValue = formatTokenValue(token.value, token.type, token.path);
+    const cssValue = isReference(token.value)
+      ? token.value
+      : formatTokenValue(token.value, token.type, token.path);
 
     tokenList.push({
       cssName,
@@ -201,6 +192,30 @@ function loadDarkThemedTokens(filePath, tokenList, category) {
       rawValue: token.value,
       path: token.path.join('.'),
     });
+  }
+}
+
+/**
+ * Resolve `{ref}` values in dark tokens against the light primitiveMap.
+ * Unlike `resolveCrossPrimitiveReferences`, this does not write back into the
+ * primitiveMap — dark resolutions must not bleed into the light-canonical map.
+ * Throws on any reference that does not resolve.
+ */
+function resolveDarkReferences(darkTokens, primitiveMap) {
+  for (const token of darkTokens) {
+    if (!isReference(token.rawValue)) continue;
+
+    const resolved = resolveValueWithNxPrefix(
+      token.rawValue,
+      primitiveMap,
+      token.type
+    );
+    if (isReference(resolved)) {
+      throw new Error(
+        `Dark themed primitive reference not found: ${token.category}.${token.path} = ${token.rawValue}`
+      );
+    }
+    token.value = resolved;
   }
 }
 
@@ -268,6 +283,7 @@ function processPrimitivesWithNxPrefix(discovered, config) {
   }
 
   resolveCrossPrimitiveReferences(primitiveTokens, primitiveMap);
+  resolveDarkReferences(darkPrimitiveTokens, primitiveMap);
 
   return {
     tokens: primitiveTokens,
@@ -291,10 +307,21 @@ function groupByCategory(tokens) {
 }
 
 /**
+ * Return dark tokens whose value differs from the light token sharing the same
+ * cssName. Dark tokens with identical values would emit redundant `.dark`
+ * overrides.
+ */
+function filterDivergentDark(primitiveTokens, darkTokens) {
+  const lightByName = new Map(primitiveTokens.map((t) => [t.cssName, t.value]));
+  return darkTokens.filter((t) => lightByName.get(t.cssName) !== t.value);
+}
+
+/**
  * Generate variables.css with --nx-* prefixed primitives.
- * Themed dark variants are emitted in a `.dark` override block that overrides
- * the `:root` declarations when an ancestor element carries the `.dark` class
- * (the same selector @custom-variant uses in nexus.css).
+ * Themed dark variants emit into a `.dark` block that overrides `:root` when
+ * an ancestor carries the `.dark` class (matching the @custom-variant selector
+ * used in nexus.css). Dark = primitive overrides land in variables.css; dark
+ * semantic-color overrides land in the `.dark` block inside nexus.css.
  */
 function generateVariablesCSS(primitiveTokens, darkTokens, usedModes) {
   let css = `/* ===== NEXUS DESIGN SYSTEM - PRIMITIVE VARIABLES ===== */\n`;
@@ -314,9 +341,11 @@ function generateVariablesCSS(primitiveTokens, darkTokens, usedModes) {
   }
   css += `}\n`;
 
-  if (darkTokens.length > 0) {
+  const divergentDark = filterDivergentDark(primitiveTokens, darkTokens);
+
+  if (divergentDark.length > 0) {
     css += `\n.dark {\n`;
-    const darkCategories = groupByCategory(darkTokens);
+    const darkCategories = groupByCategory(divergentDark);
     for (const [category, tokens] of Object.entries(darkCategories)) {
       if (tokens.length === 0) continue;
       const modeInfo = usedModes[category]
@@ -500,8 +529,12 @@ export function generateTailwindPackage(
   console.log(
     `   Primitives: ${primitiveTokens.length} tokens (with --nx-* prefix)`
   );
-  if (darkPrimitiveTokens.length > 0) {
-    console.log(`   Dark overrides: ${darkPrimitiveTokens.length} tokens`);
+  const divergentDarkCount = filterDivergentDark(
+    primitiveTokens,
+    darkPrimitiveTokens
+  ).length;
+  if (divergentDarkCount > 0) {
+    console.log(`   Dark overrides: ${divergentDarkCount} tokens`);
   }
   console.log(`   Semantic themes: ${themeCount} (light + dark)`);
   console.log(`   Typography utilities: ${typography.count}`);

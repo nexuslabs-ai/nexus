@@ -18,6 +18,16 @@ function read(distDir, fileName) {
   return fs.readFileSync(path.join(distDir, fileName), 'utf8');
 }
 
+function extractBlock(css, openSelector) {
+  const escaped = openSelector.replace(/\./g, '\\.');
+  const pattern = new RegExp(`^${escaped} \\{\\n([\\s\\S]*?)^\\}`, 'm');
+  const match = css.match(pattern);
+  if (!match) {
+    throw new Error(`Block "${openSelector}" not found in CSS`);
+  }
+  return match[1];
+}
+
 afterEach(() => {
   while (tmpDirs.length > 0) {
     const dir = tmpDirs.pop();
@@ -29,43 +39,38 @@ describe('generateTailwindPackage', () => {
   let distDir;
   let variablesCSS;
   let nexusCSS;
+  let warnings;
 
   beforeAll(() => {
-    distDir = makeTmpDir();
-    generateTailwindPackage(DEFAULT_CONFIG, { distDir });
+    warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (...args) => warnings.push(args.map(String).join(' '));
+
+    try {
+      distDir = makeTmpDir();
+      generateTailwindPackage(DEFAULT_CONFIG, { distDir });
+    } finally {
+      console.warn = originalWarn;
+    }
+
     variablesCSS = read(distDir, 'variables.css');
     nexusCSS = read(distDir, 'nexus.css');
   });
 
-  it('emits a :root block and a .dark block in variables.css', () => {
+  it('emits a :root block in variables.css', () => {
     expect(variablesCSS).toMatch(/^:root \{/m);
-    expect(variablesCSS).toMatch(/^\.dark \{/m);
   });
 
   it('emits shadow primitives in :root (light values)', () => {
-    const rootBlock = variablesCSS.slice(
-      variablesCSS.indexOf(':root {'),
-      variablesCSS.indexOf('.dark {')
-    );
+    const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
     expect(rootBlock).toMatch(/--nx-shadow-focus-default-color:/);
   });
 
-  it('emits dark shadow overrides in .dark', () => {
-    const darkBlock = variablesCSS.slice(variablesCSS.indexOf('.dark {'));
-    expect(darkBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
-    expect(darkBlock).toMatch(/--nx-shadow-focus-default-color:/);
-  });
-
-  // The contract that broke before this fix: every var(--nx-shadow-*) reference
-  // in the emitted nexus.css must resolve to a --nx-shadow-*: declaration in
-  // variables.css. If any decl is missing, the corresponding nx:shadow-*
-  // utility silently renders flat.
-  it('symmetric: every var(--nx-shadow-*) ref in nexus.css has a matching decl in :root', () => {
-    const rootBlock = variablesCSS.slice(
-      variablesCSS.indexOf(':root {'),
-      variablesCSS.indexOf('.dark {')
-    );
+  // Every var(--nx-shadow-*) ref in nexus.css must have a matching decl in
+  // :root of variables.css; missing decls render the utility flat.
+  it('every var(--nx-shadow-*) ref in nexus.css has a matching decl in :root', () => {
+    const rootBlock = extractBlock(variablesCSS, ':root');
 
     const refPattern = /var\(--(nx-shadow-[a-z0-9-]+)\)/g;
     const refs = new Set();
@@ -78,8 +83,7 @@ describe('generateTailwindPackage', () => {
 
     const missing = [];
     for (const varName of refs) {
-      const declPattern = new RegExp(`--${varName}:`);
-      if (!declPattern.test(rootBlock)) {
+      if (!new RegExp(`--${varName}:`).test(rootBlock)) {
         missing.push(varName);
       }
     }
@@ -87,48 +91,21 @@ describe('generateTailwindPackage', () => {
     expect(missing).toEqual([]);
   });
 
-  it('dark block contains overrides for the same shadow layer vars declared in :root', () => {
-    const rootBlock = variablesCSS.slice(
-      variablesCSS.indexOf(':root {'),
-      variablesCSS.indexOf('.dark {')
-    );
-    const darkBlock = variablesCSS.slice(variablesCSS.indexOf('.dark {'));
+  // The .dark block must contain only dark tokens whose value diverges from
+  // their `:root` counterpart by cssName. Today's vega shadow has 2 divergent
+  // focus colors; the rest of the 80 dark shadow tokens are byte-identical to
+  // light and must be suppressed.
+  it('.dark block contains only tokens that diverge from :root by value', () => {
+    const darkBlock = extractBlock(variablesCSS, '.dark');
 
-    const rootLayerVars = new Set();
-    const layerPattern = /--nx-shadow-([a-z0-9-]+-layer-\d+-[a-z]+):/g;
-    let match;
-    while ((match = layerPattern.exec(rootBlock)) !== null) {
-      rootLayerVars.add(match[1]);
-    }
+    expect(darkBlock).toMatch(/--nx-shadow-focus-default-color:/);
+    expect(darkBlock).toMatch(/--nx-shadow-focus-error-color:/);
 
-    expect(rootLayerVars.size).toBeGreaterThan(0);
-
-    const missing = [];
-    for (const layerVar of rootLayerVars) {
-      const declPattern = new RegExp(`--nx-shadow-${layerVar}:`);
-      if (!declPattern.test(darkBlock)) {
-        missing.push(layerVar);
-      }
-    }
-
-    expect(missing).toEqual([]);
+    expect(darkBlock).not.toMatch(/--nx-shadow-2xs-layer-1-x:/);
+    expect(darkBlock).not.toMatch(/--nx-shadow-2xs-layer-1-y:/);
   });
 
   it('emits zero `File not found` warnings for the default config', () => {
-    // Re-run while capturing console.warn; the silent-skip failure mode emitted
-    // `⚠ File not found: ...`. With the file-existence invariant, missing files
-    // throw instead — so no warn lines should fire on a clean run.
-    const warnings = [];
-    const originalWarn = console.warn;
-    console.warn = (msg) => warnings.push(String(msg));
-
-    try {
-      const fresh = makeTmpDir();
-      generateTailwindPackage(DEFAULT_CONFIG, { distDir: fresh });
-    } finally {
-      console.warn = originalWarn;
-    }
-
     const fileNotFound = warnings.filter((w) => /File not found/.test(w));
     expect(fileNotFound).toEqual([]);
   });

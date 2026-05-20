@@ -419,8 +419,7 @@ export function partitionThemedModes(modes) {
  */
 export function processSemanticTokens(filePath, primitiveMap) {
   if (!fs.existsSync(filePath)) {
-    log.warn(`Semantic file not found: ${filePath}`);
-    return [];
+    throw new Error(`Semantic file missing: ${filePath}`);
   }
 
   const tokenData = readTokenFile(filePath);
@@ -552,8 +551,7 @@ export function formatShadowComposite(value, isInset = false) {
  */
 function extractGoogleFonts(typographyFilePath) {
   if (!fs.existsSync(typographyFilePath)) {
-    log.warn(`Typography file not found: ${typographyFilePath}`);
-    return [];
+    throw new Error(`Typography file missing: ${typographyFilePath}`);
   }
 
   const tokenData = readTokenFile(typographyFilePath);
@@ -673,8 +671,7 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
   const typographyPath = path.join(tokensDir, 'styles/typography.json');
 
   if (!fs.existsSync(typographyPath)) {
-    log.warn('Typography styles file not found');
-    return { css: '', count: 0 };
+    throw new Error(`Typography styles file missing: ${typographyPath}`);
   }
 
   const tokenData = readTokenFile(typographyPath);
