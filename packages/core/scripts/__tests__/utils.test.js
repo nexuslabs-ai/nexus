@@ -130,8 +130,8 @@ describe('utils', () => {
 
     it('adds prefix when provided', () => {
       expect(pathToCssVar(['background'], 'color')).toBe('color-background');
-      expect(pathToCssVar(['primary', 'hover'], 'color')).toBe(
-        'color-primary-hover'
+      expect(pathToCssVar(['primary', 'background-hover'], 'color')).toBe(
+        'color-primary-background-hover'
       );
     });
 
