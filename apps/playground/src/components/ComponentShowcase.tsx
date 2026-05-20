@@ -129,7 +129,7 @@ export function ComponentShowcase() {
               className="nx:bg-secondary-background"
             />
             <ColorSwatch name="Muted" className="nx:bg-muted" />
-            <ColorSwatch name="Accent" className="nx:bg-accent" />
+            <ColorSwatch name="Muted Light" className="nx:bg-muted-light" />
             <ColorSwatch name="Success" className="nx:bg-success-background" />
             <ColorSwatch name="Error" className="nx:bg-error-background" />
             <ColorSwatch name="Warning" className="nx:bg-warning-background" />
@@ -189,19 +189,19 @@ export function ComponentShowcase() {
         <Section title="Buttons" description="Interactive button variants">
           <div className="nx:space-y-4">
             <div className="nx:flex nx:flex-wrap nx:gap-3">
-              <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium hover:nx:opacity-90 nx:transition-opacity">
+              <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:opacity-90 nx:transition-opacity">
                 Primary
               </button>
-              <button className="nx:bg-secondary-background nx:text-secondary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium hover:nx:opacity-90 nx:transition-opacity">
+              <button className="nx:bg-secondary-background nx:text-secondary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:opacity-90 nx:transition-opacity">
                 Secondary
               </button>
-              <button className="nx:border nx:border-border-default nx:bg-background hover:nx:bg-accent nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:transition-colors">
+              <button className="nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:transition-colors">
                 Outline
               </button>
-              <button className="hover:nx:bg-accent nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:transition-colors">
+              <button className="nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:transition-colors">
                 Ghost
               </button>
-              <button className="nx:bg-error-background nx:text-error-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium hover:nx:opacity-90 nx:transition-opacity">
+              <button className="nx:bg-error-background nx:text-error-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:opacity-90 nx:transition-opacity">
                 Destructive
               </button>
             </div>
@@ -232,12 +232,12 @@ export function ComponentShowcase() {
                 Muted background with muted foreground
               </p>
             </div>
-            <div className="nx:bg-accent nx:rounded-lg nx:p-4">
-              <h3 className="nx:text-accent-foreground nx:font-medium">
-                Accent
+            <div className="nx:bg-background-hover nx:rounded-lg nx:p-4">
+              <h3 className="nx:text-foreground nx:font-medium">
+                Background Hover
               </h3>
-              <p className="nx:text-accent-foreground nx:mt-1 nx:text-sm">
-                Accent background with accent foreground
+              <p className="nx:text-muted-foreground nx:mt-1 nx:text-sm">
+                Hover-state background color
               </p>
             </div>
           </div>
@@ -290,27 +290,27 @@ export function ComponentShowcase() {
           description="Feedback and alert styles"
         >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
-            <div className="nx:bg-success-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-success-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-success-background" />
-              <span className="nx:text-success-text nx:text-sm nx:font-medium">
+              <span className="nx:text-success-subtle-foreground nx:text-sm nx:font-medium">
                 Success message
               </span>
             </div>
-            <div className="nx:bg-error-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-error-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-error-background" />
-              <span className="nx:text-error-text nx:text-sm nx:font-medium">
+              <span className="nx:text-error-subtle-foreground nx:text-sm nx:font-medium">
                 Error message
               </span>
             </div>
-            <div className="nx:bg-warning-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-warning-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-warning-background" />
-              <span className="nx:text-warning-text nx:text-sm nx:font-medium">
+              <span className="nx:text-warning-subtle-foreground nx:text-sm nx:font-medium">
                 Warning message
               </span>
             </div>
-            <div className="nx:bg-information-surface nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-information-subtle nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-information-background" />
-              <span className="nx:text-information-text nx:text-sm nx:font-medium">
+              <span className="nx:text-information-subtle-foreground nx:text-sm nx:font-medium">
                 Info message
               </span>
             </div>
