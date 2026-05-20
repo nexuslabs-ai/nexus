@@ -372,6 +372,46 @@ export function discoverSemantics(semanticDir) {
 }
 
 /**
+ * Group {base}-light / {base}-dark mode names into pairs; pass others through unchanged.
+ * Used by both bundled and modular generators to recognize themed primitive categories.
+ *
+ * @param {string[]} modes - List of mode names (e.g., ['vega-light', 'vega-dark', 'lyra'])
+ * @returns {{ themed: Record<string, { light: string, dark: string }>, plain: string[] }}
+ *   themed: base names that have both -light and -dark partners
+ *   plain: modes with no themed partner (asymmetric singletons fall here too)
+ */
+export function partitionThemedModes(modes) {
+  const themed = {};
+  const plain = [];
+  const seen = new Set();
+
+  for (const mode of modes) {
+    if (seen.has(mode)) continue;
+    const match = mode.match(/^(.+)-(light|dark)$/);
+    if (!match) {
+      plain.push(mode);
+      seen.add(mode);
+      continue;
+    }
+    const [, base, variant] = match;
+    const other = variant === 'light' ? `${base}-dark` : `${base}-light`;
+    if (modes.includes(other)) {
+      themed[base] = {
+        light: `${base}-light`,
+        dark: `${base}-dark`,
+      };
+      seen.add(`${base}-light`);
+      seen.add(`${base}-dark`);
+    } else {
+      plain.push(mode);
+      seen.add(mode);
+    }
+  }
+
+  return { themed, plain };
+}
+
+/**
  * Process a semantic token file and resolve references
  * @param {string} filePath - Full path to semantic file
  * @param {Map} primitiveMap - Primitive map for reference resolution

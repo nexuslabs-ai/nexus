@@ -20,6 +20,7 @@ import {
   getGoogleFontsImportFromTokens,
   isReference,
   log,
+  partitionThemedModes,
   pathToCssVar,
   processSemanticTokens,
   readTokenFile,
@@ -223,41 +224,6 @@ function generateThemedPrimitiveCSS(category, mode, primitiveMap) {
   css += `}\n`;
 
   writeModularFile(`${category}-${mode}.css`, css);
-}
-
-/**
- * Group {base}-light / {base}-dark mode names into pairs; pass others through unchanged.
- * Returns { themed: { base: { light, dark } }, plain: [mode, ...] }.
- */
-function partitionThemedModes(modes) {
-  const themed = {};
-  const plain = [];
-  const seen = new Set();
-
-  for (const mode of modes) {
-    if (seen.has(mode)) continue;
-    const match = mode.match(/^(.+)-(light|dark)$/);
-    if (!match) {
-      plain.push(mode);
-      seen.add(mode);
-      continue;
-    }
-    const [, base, variant] = match;
-    const other = variant === 'light' ? `${base}-dark` : `${base}-light`;
-    if (modes.includes(other)) {
-      themed[base] = {
-        light: `${base}-light`,
-        dark: `${base}-dark`,
-      };
-      seen.add(`${base}-light`);
-      seen.add(`${base}-dark`);
-    } else {
-      plain.push(mode);
-      seen.add(mode);
-    }
-  }
-
-  return { themed, plain };
 }
 
 /**
