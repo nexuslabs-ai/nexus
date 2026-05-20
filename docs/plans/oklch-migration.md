@@ -29,7 +29,7 @@ DTCG-2025.10 (Color Module) prefers a structured `$value`: `{ "colorSpace": "okl
 The original plan to re-author `color.json` directly to oklch is rejected on new evidence: Tokens Studio explicitly converts non-hex colors back to hex on export (issue #2459, closed "not planned"), and Figma Variables stores hex natively. Any "edit in Figma → re-export JSON" cycle would silently clobber oklch values. The fix is to move the value-space change one layer down:
 
 - `color.json` keeps hex. Designers edit hue freely in Figma; only hue and chroma flow through.
-- A new module `scripts/lib/perceptual-grid.js` defines the L grid: `L = 0.985 / 0.945 / 0.870 / 0.765 / 0.660 / 0.553 / 0.460 / 0.385 / 0.297 / 0.207 / 0.118` for shades `50 / 100 / 200 / 300 / 400 / 500 / 600 / 700 / 800 / 900 / 950`.
+- A new module `scripts/lib/perceptual-grid.js` defines the converters; the L grid itself lives in `scripts/lib/perceptual-grid.json` (`L = 0.985 / 0.945 / 0.870 / 0.765 / 0.660 / 0.553 / 0.460 / 0.385 / 0.297 / 0.207 / 0.118` for shades `50 / 100 / 200 / 300 / 400 / 500 / 600 / 700 / 800 / 900 / 950`) so designers can re-tune without a script-code PR.
 - `utils.js:formatTokenValue` is extended: when `type === 'color'` and the value is a hex string, route it through one of two converters:
   - **Grid-pinned** for primitive palette shades (key matches `^(50|100|200|300|400|500|600|700|800|900|950)$` under a palette group in `color.json`). Hue/chroma come from culori, L overwritten by the grid, chroma clamped via `culori.toGamut('rgb')`.
   - **Mechanical** for everything else (semantic overlay hex with alpha, white, black, any one-off). Straight hex→oklch via culori, alpha preserved.
@@ -79,7 +79,7 @@ Ordered steps:
 7. Update `.claude/rules/tokens.md` (hex-in / oklch-out contract; APCA gate; L enforcement note for designers), `packages/core/CLAUDE.md`, `README.md` browser-support floor.
 8. Merge.
 
-**Rollback signal**: if designer rejects the L grid on > 2 palettes, do not revert the architecture — re-tune the grid constants in `perceptual-grid.js`, regenerate, re-review. The architecture's value is independent of the specific L values chosen.
+**Rollback signal**: if designer rejects the L grid on > 2 palettes, do not revert the architecture — re-tune the grid constants in `scripts/lib/perceptual-grid.json`, regenerate, re-review. The architecture's value is independent of the specific L values chosen.
 
 ## 8. Traps
 

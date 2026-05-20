@@ -20,15 +20,15 @@ const THEMES = ['light', 'dark'];
 const BASE_PAIRS = [
   ['foreground', 'background', 75],
   ['muted-foreground', 'muted', 45],
+  ['error.foreground', 'error.background', 60],
+  ['success.foreground', 'success.background', 60],
+  ['warning.foreground', 'warning.background', 60],
+  ['information.foreground', 'information.background', 60],
 ];
 
 const BRAND_PAIRS = [
   ['primary.foreground', 'primary.background', 60],
   ['secondary.foreground', 'secondary.background', 60],
-  ['error.foreground', 'error.background', 60],
-  ['success.foreground', 'success.background', 60],
-  ['warning.foreground', 'warning.background', 60],
-  ['information.foreground', 'information.background', 60],
 ];
 
 const REF_RE = /^\{([^}]+)\}$/;
@@ -47,7 +47,11 @@ function buildPrimitiveHexMap() {
 }
 
 function resolveToSrgbInts(value, primitiveMap) {
-  if (typeof value !== 'string') return null;
+  if (typeof value !== 'string') {
+    throw new Error(
+      `audit-contrast: expected string color value, got ${typeof value}`
+    );
+  }
 
   const refMatch = value.match(REF_RE);
   if (refMatch) {
@@ -106,7 +110,17 @@ function auditFile(filePath, pairs, primitiveMap) {
   for (const [textKey, bgKey, minLc] of pairs) {
     const textValue = findTokenValue(fileData, textKey);
     const bgValue = findTokenValue(fileData, bgKey);
-    if (textValue === undefined || bgValue === undefined) continue;
+    if (textValue === undefined || bgValue === undefined) {
+      const missing = [
+        textValue === undefined ? textKey : null,
+        bgValue === undefined ? bgKey : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+      throw new Error(
+        `audit-contrast: ${fileName} is missing declared pair token(s): ${missing}`
+      );
+    }
 
     const textInts = resolveToSrgbInts(textValue, primitiveMap);
     const bgInts = resolveToSrgbInts(bgValue, primitiveMap);

@@ -1,20 +1,18 @@
 import { clampChroma, converter, oklch, parse } from 'culori';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const toRgb = converter('rgb');
 
-export const PERCEPTUAL_L_GRID = Object.freeze({
-  50: 0.985,
-  100: 0.945,
-  200: 0.87,
-  300: 0.765,
-  400: 0.66,
-  500: 0.553,
-  600: 0.46,
-  700: 0.385,
-  800: 0.297,
-  900: 0.207,
-  950: 0.118,
-});
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const GRID_FILE = path.join(__dirname, 'perceptual-grid.json');
+
+// The L grid lives in JSON so designers can re-tune perceptual lightness
+// without a script-code PR (see docs/plans/oklch-migration.md §6).
+export const PERCEPTUAL_L_GRID = Object.freeze(
+  JSON.parse(fs.readFileSync(GRID_FILE, 'utf8'))
+);
 
 const SHADE_KEY_RE = /^(50|100|200|300|400|500|600|700|800|900|950)$/;
 
@@ -28,11 +26,12 @@ function round(value, decimals) {
 }
 
 function formatOklch({ l, c, h, alpha }) {
-  const lRounded = round(l ?? 0, 4);
-  const cRounded = round(c ?? 0, 4);
+  const finite = (v) => (Number.isFinite(v) ? v : 0);
+  const lRounded = round(finite(l), 4);
+  const cRounded = round(finite(c), 4);
   // Hue is undefined when chroma is 0 (achromatic). Emit 0 rather than `none`
   // so consuming CSS stays compatible with the project's spot-check format.
-  const hRounded = c && h !== undefined ? round(h, 3) : 0;
+  const hRounded = c && h !== undefined ? round(finite(h), 3) : 0;
   const base = `oklch(${lRounded} ${cRounded} ${hRounded}`;
   if (alpha !== undefined && alpha < 1) {
     return `${base} / ${round(alpha, 4)})`;
@@ -86,8 +85,15 @@ export function hexToOklchMechanical(hex) {
 
 function oklchToSrgbInts(oklchColor) {
   const rgb = toRgb(oklchColor);
+  if ((rgb.alpha ?? 1) < 1) {
+    // apca-w3 `sRGBtoY` reads only [r,g,b]; an alpha-bearing color must be
+    // pre-blended against its actual background before contrast computation.
+    throw new Error(
+      'perceptual-grid: oklchToSrgbInts received alpha-bearing color; pre-blend before contrast computation'
+    );
+  }
   const channel = (v) => Math.max(0, Math.min(255, Math.round(v * 255)));
-  return [channel(rgb.r), channel(rgb.g), channel(rgb.b), rgb.alpha ?? 1];
+  return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
 }
 
 // Routes through the same converters the build uses so APCA scores match

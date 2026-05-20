@@ -29,15 +29,20 @@ export function readTokenFile(filePath) {
 
 /**
  * Format a token value to a CSS string. For `$type: "color"` hex values,
- * routes through the OKLCH converters: palette shade tokens (path like
- * `['blue', '500']`) get pinned to the perceptual L grid; everything else
+ * routes through the OKLCH converters: palette shade tokens (path ending in a
+ * shade key like `'500'`) get pinned to the perceptual L grid; everything else
  * (white/black/semantic hex literals with alpha) is converted mechanically.
  * @param {object|string|number} value - Token value
  * @param {string} type - Token type
  * @param {string[]} [tokenPath] - Token path (used to route shade conversions)
  * @returns {string} Formatted CSS value
+ * @throws {Error} If value is undefined
  */
 export function formatTokenValue(value, type, tokenPath) {
+  if (value === undefined) {
+    throw new Error(`formatTokenValue: value is undefined (type="${type}")`);
+  }
+
   if (
     type === 'dimension' &&
     typeof value === 'object' &&
@@ -48,13 +53,21 @@ export function formatTokenValue(value, type, tokenPath) {
   }
 
   if (type === 'color' && typeof value === 'string' && value.startsWith('#')) {
-    if (
-      tokenPath &&
-      tokenPath.length === 2 &&
-      isPaletteShadeKey(tokenPath[1])
-    ) {
-      return hexToOklchPinned(value, tokenPath[1]);
+    const lastSegment =
+      tokenPath && tokenPath.length > 0
+        ? tokenPath[tokenPath.length - 1]
+        : undefined;
+
+    if (tokenPath && tokenPath.length >= 2 && isPaletteShadeKey(lastSegment)) {
+      return hexToOklchPinned(value, lastSegment);
     }
+
+    if (isPaletteShadeKey(lastSegment)) {
+      console.warn(
+        `formatTokenValue: shade-key color "${tokenPath.join('.')}" lacks palette root — falling through to mechanical`
+      );
+    }
+
     return hexToOklchMechanical(value);
   }
 

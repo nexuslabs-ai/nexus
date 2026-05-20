@@ -44,6 +44,22 @@ describe('utils', () => {
       );
     });
 
+    it('routes single-element paths to mechanical (white/black at root)', () => {
+      // `['white']` is length 1 — last segment isn't a shade key, falls through
+      // to mechanical conversion.
+      expect(formatTokenValue('#ffffff', 'color', ['white'])).toBe(
+        'oklch(1 0 0)'
+      );
+    });
+
+    it('pins deeper nested shade-key paths (length 3+)', () => {
+      // Future-proofs against nested palettes like `chart.series.500` —
+      // routing keys on path-suffix semantics, not length.
+      expect(
+        formatTokenValue('#3b82f6', 'color', ['some', 'group', '500'])
+      ).toBe('oklch(0.553 0.188 259.815)');
+    });
+
     it('returns non-color string values as-is', () => {
       expect(formatTokenValue('Inter, sans-serif', 'fontFamily')).toBe(
         'Inter, sans-serif'
@@ -59,9 +75,10 @@ describe('utils', () => {
       expect(formatTokenValue(null, 'unknown')).toBe('null');
     });
 
-    it('returns undefined as-is (edge case)', () => {
-      // undefined passes through - edge case that shouldn't occur in practice
-      expect(formatTokenValue(undefined, 'unknown')).toBeUndefined();
+    it('throws on undefined input', () => {
+      expect(() => formatTokenValue(undefined, 'unknown')).toThrow(
+        /value is undefined/
+      );
     });
   });
 
