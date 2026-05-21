@@ -3,8 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Button } from './button';
 import {
   DropdownMenu,
@@ -239,9 +237,6 @@ export const WithInsetItems: Story = {
 // ============================================
 
 export const OpenCloseInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -284,9 +279,6 @@ export const OpenCloseInteraction: Story = {
 };
 
 export const KeyboardNavigation: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -328,9 +320,6 @@ export const KeyboardNavigation: Story = {
 };
 
 export const DataAttributesTest: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -478,9 +467,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 

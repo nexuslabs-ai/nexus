@@ -17,6 +17,9 @@ export default tseslint.config(
       '**/.turbo/**',
       '**/coverage/**',
       '**/generated/**',
+      '**/storybook-static/**',
+      '**/build/**',
+      '**/out/**',
     ],
   },
 

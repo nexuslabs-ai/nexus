@@ -2,6 +2,11 @@
   "name": "@nexus/react",
   "version": "0.0.1",
   "description": "React components built with Radix UI and Tailwind CSS",
+  "//": [
+    "@nexus/core in devDependencies is a turbo-affected-graph hint, not a code import — nothing in packages/react/src imports from it.",
+    "Without this edge, a core/scripts change that doesn't regenerate packages/tailwind/*.css skips @nexus/react#build, and bundle-size loses its dist input.",
+    "Tracked for restructure: https://github.com/nexuslabs-ai/nexus/issues/66 (move to @nexus/tailwind dependsOn @nexus/core#build:tailwind in turbo)."
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -19,11 +24,11 @@
     "build": "vite build",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@nexus/core": "*",
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/addon-docs": "^10.1.10",
     "@storybook/react-vite": "^10.1.10",

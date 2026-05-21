@@ -38,6 +38,9 @@ build-storybook.log
 # TypeScript
 *.tsbuildinfo
 
+# ESLint cache
+.eslintcache
+
 # Claude Code (local settings not committed)
 .claude/settings.local.json
 CLAUDE.local.md

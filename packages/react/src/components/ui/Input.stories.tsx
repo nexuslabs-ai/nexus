@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
@@ -156,9 +154,6 @@ export const SizeLarge: Story = {
 // ============================================
 
 export const TypeInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     placeholder: 'Type here...',
   },
@@ -178,9 +173,6 @@ export const TypeInteraction: Story = {
 };
 
 export const FocusBlurInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     placeholder: 'Focus me...',
   },
@@ -201,9 +193,6 @@ export const FocusBlurInteraction: Story = {
 };
 
 export const DisabledInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     placeholder: 'Cannot type here',
     disabled: true,
@@ -218,9 +207,6 @@ export const DisabledInteraction: Story = {
 };
 
 export const DataAttributesTest: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     size: 'lg',
     placeholder: 'Test input',
@@ -334,9 +320,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 

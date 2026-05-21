@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Button } from './button';
 import {
   Card,
@@ -273,9 +271,6 @@ export const StatsCard: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
@@ -317,9 +312,6 @@ export const WithDataAttributes: Story = {
 };
 
 export const ActionDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <CardHeader>
@@ -426,9 +418,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 

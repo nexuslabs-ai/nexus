@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 const PALETTE_GROUPS: { label: string; palettes: string[] }[] = [
   {
     label: 'Neutrals',
@@ -80,7 +78,6 @@ const meta: Meta = {
   title: 'Tokens/Colors',
   parameters: {
     layout: 'fullscreen',
-    chromatic: { modes: themeOnlyModes },
     docs: {
       description: {
         component:

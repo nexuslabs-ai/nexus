@@ -3,8 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Switch } from './switch';
 
 const meta: Meta<typeof Switch> = {
@@ -138,9 +136,6 @@ export const Controlled: Story = {
 // ============================================
 
 export const ClickInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     'aria-label': 'Toggle switch',
   },
@@ -164,9 +159,6 @@ export const ClickInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     'aria-label': 'Toggle switch',
   },
@@ -191,9 +183,6 @@ export const KeyboardInteraction: Story = {
 };
 
 export const DisabledInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     disabled: true,
     'aria-label': 'Disabled switch',
@@ -212,9 +201,6 @@ export const DisabledInteraction: Story = {
 };
 
 export const DataAttributesTest: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     'aria-label': 'Toggle switch',
   },
@@ -320,9 +306,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 

@@ -14,6 +14,11 @@ permissions:
   contents: read
   pull-requests: read
 
+# Branch protection on `main` requires only the `CI Status` aggregator
+# job (defined at the bottom of this file). Individual jobs are gated by
+# path filters, so a docs-only PR may skip most of them — the aggregator
+# treats skipped as success.
+
 jobs:
   # ============================================
   # Change Detection
@@ -24,7 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       react: ${{ steps.filter.outputs.react }}
-      packages: ${{ steps.filter.outputs.packages }}
+      # `packages` is true if `packages/**` changed OR if `apps/**` changed
+      # outside `apps/docs/**`. See the two paths-filter steps below.
+      packages: ${{ steps.filter.outputs.packages == 'true' || steps.filter-apps.outputs.apps == 'true' }}
       ci: ${{ steps.filter.outputs.ci }}
     steps:
       - name: Checkout
@@ -35,6 +42,10 @@ jobs:
         id: filter
         with:
           filters: |
+            # `react` intentionally excludes `apps/**` — no app currently
+            # consumes @nexus/react at runtime, so apps/ changes can't break
+            # the react test/build/bundle-size jobs. Revisit if an app starts
+            # importing from @nexus/react.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
@@ -45,9 +56,24 @@ jobs:
             ci:
               - '.github/workflows/**'
 
-  # ============================================
-  # Always Run (on code changes)
-  # ============================================
+      # Second paths-filter call so the `apps` filter can use
+      # `predicate-quantifier: every` — required for `!apps/docs/**` to
+      # actually negate (under the default `some`, the `apps/**` inclusion
+      # wins and the negation is silently a no-op). Combined with `packages`
+      # via the job-level output expression below. Drop `!apps/docs/**` when
+      # @nexus/docs becomes a real package.
+      - name: Detect non-docs app changes
+        uses: dorny/paths-filter@v3
+        id: filter-apps
+        with:
+          predicate-quantifier: 'every'
+          filters: |
+            apps:
+              - 'apps/**'
+              - '!apps/docs/**'
+
+  # format-check and lint run full-tree to mirror local `yarn lint` /
+  # `yarn format:check`.
 
   format-check:
     name: Format Check
@@ -57,8 +83,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -69,23 +93,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Check formatting (changed files only)
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE_REF="origin/${{ github.base_ref }}"
-          else
-            BASE_REF="HEAD~1"
-          fi
-
-          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR "$BASE_REF"...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.json' '*.md' '*.css' '*.yml' || true)
-
-          if [ -n "$CHANGED_FILES" ]; then
-            echo "Checking formatting for changed files:"
-            echo "$CHANGED_FILES"
-            echo "$CHANGED_FILES" | xargs npx prettier --check
-          else
-            echo "No matching files changed, skipping format check"
-          fi
+      - name: Check formatting
+        run: yarn format:check
 
   lint:
     name: Lint
@@ -95,8 +104,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -107,31 +114,17 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Restore Turbo cache
+      - name: Restore ESLint cache
         uses: actions/cache@v4
         with:
-          path: .turbo
-          key: turbo-${{ runner.os }}-${{ github.sha }}
+          path: .eslintcache
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-${{ github.sha }}
           restore-keys: |
-            turbo-${{ runner.os }}-
+            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-
+            eslint-${{ runner.os }}-
 
-      - name: Lint (changed files only)
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE_REF="origin/${{ github.base_ref }}"
-          else
-            BASE_REF="HEAD~1"
-          fi
-
-          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR "$BASE_REF"...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' || true)
-
-          if [ -n "$CHANGED_FILES" ]; then
-            echo "Linting changed files:"
-            echo "$CHANGED_FILES"
-            echo "$CHANGED_FILES" | xargs npx eslint --max-warnings 0
-          else
-            echo "No matching files changed, skipping lint"
-          fi
+      - name: Lint
+        run: yarn lint --cache --cache-location .eslintcache --cache-strategy content
 
   # ============================================
   # Build (affected packages only)
@@ -141,7 +134,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -166,10 +159,11 @@ jobs:
             turbo-${{ runner.os }}-
 
       - name: Build affected packages
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # Force @nexus/react: bundle-size needs its dist even when only core/scripts changes (core isn't a workspace dep of react).
-            yarn turbo build --filter='...[origin/${{ github.base_ref }}]' --filter='@nexus/react'
+            yarn turbo build --filter="...[origin/$BASE_REF]"
           else
             yarn turbo build
           fi
@@ -178,9 +172,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: |
-            packages/**/dist
-            .turbo
+          path: packages/**/dist
           retention-days: 1
           if-no-files-found: warn
 
@@ -192,7 +184,7 @@ jobs:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.packages == 'true' && needs.build.result == 'success'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -213,10 +205,20 @@ jobs:
         with:
           name: build-artifacts
 
+      - name: Restore Turbo cache (read-only)
+        uses: actions/cache/restore@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
       - name: TypeScript check (affected packages)
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            yarn turbo typecheck --filter='...[origin/${{ github.base_ref }}]'
+            yarn turbo typecheck --filter="...[origin/$BASE_REF]"
           else
             yarn turbo typecheck
           fi
@@ -225,11 +227,12 @@ jobs:
   # React Package Jobs
   # ============================================
 
+  # Fast-fail unit subset; coverage runs separately in test-coverage.
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest
-    needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    needs: changes
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -243,19 +246,16 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-
       - name: Run unit tests
         run: yarn test:unit
 
   audit-tokens:
     name: Audit Tokens
     runs-on: ubuntu-latest
-    needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    needs: changes
+    # Gate on `packages` (not `react`): the freshness check covers
+    # apps/playground/** and audit:class-refs scans apps/** sources.
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -271,71 +271,46 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Regenerate @nexus/tailwind and check freshness
+      - name: Regenerate token outputs (tailwind + modular)
+        id: regen
         run: |
-          yarn workspace @nexus/core build:tailwind
-          if ! git diff --exit-code -- packages/tailwind; then
-            echo "::error::packages/tailwind/ is stale — run 'yarn workspace @nexus/core build:tailwind' and commit the result."
+          set -euo pipefail
+          yarn tokens:tailwind
+          yarn tokens:modular
+
+      - name: Check token output freshness
+        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
+        # `git status --porcelain` (not `git diff`) so untracked new files also fail.
+        run: |
+          set -euo pipefail
+          DIRTY=$(git status --porcelain -- \
+            packages/tailwind \
+            apps/playground/public/themes \
+            apps/playground/src/styles)
+          if [ -n "$DIRTY" ]; then
+            echo "::error::Token output is stale. Affected paths:"
+            echo "$DIRTY"
+            echo "::error::Run 'yarn tokens:tailwind && yarn tokens:modular' and commit the result."
             exit 1
           fi
 
       - name: APCA contrast audit
+        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:contrast
 
       - name: Tailwind class-ref audit
+        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:class-refs
 
       - name: Figma parity audit (color)
+        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:figma-parity --category color
-
-  test-storybook:
-    name: Storybook Tests
-    runs-on: ubuntu-latest
-    needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium --with-deps
-
-      - name: Install Playwright system deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-
-      - name: Run Storybook tests
-        run: yarn test:storybook
 
   test-coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
-    needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    needs: changes
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -349,27 +324,20 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
+
+      - name: Install Playwright system deps
+        # apt-installed deps aren't part of the browser cache; always install.
+        run: npx playwright install-deps chromium
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium --with-deps
-
-      - name: Install Playwright system deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright install chromium
 
       - name: Run tests with coverage
         run: yarn test:coverage
@@ -384,8 +352,8 @@ jobs:
   build-storybook:
     name: Build Storybook
     runs-on: ubuntu-latest
-    needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    needs: changes
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -398,11 +366,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
 
       - name: Build Storybook
         run: yarn build-storybook
@@ -418,7 +381,7 @@ jobs:
     name: Bundle Size
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -439,3 +402,37 @@ jobs:
 
       - name: Check bundle size
         run: yarn size-limit
+
+  # ============================================
+  # Aggregator — the single required status check
+  # ============================================
+  # Runs unconditionally so docs-only / .claude/** / repo-root PRs still
+  # report a status that satisfies branch protection. Skipped upstream jobs
+  # (filtered out by `if:`) are treated as success; only `failure` and
+  # `cancelled` propagate.
+  #
+  # Contract: every required job must appear in `needs:` below — otherwise
+  # its failure won't propagate through the aggregator. `changes` is
+  # included so a Detect Changes failure (which would empty every
+  # downstream `if:` and silently skip everything) still fails the gate.
+  ci-status:
+    name: CI Status
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - changes
+      - format-check
+      - lint
+      - build
+      - typecheck
+      - test-unit
+      - audit-tokens
+      - test-coverage
+      - build-storybook
+      - bundle-size
+    steps:
+      - name: Fail on any required-job failure or cancellation
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::One or more required jobs failed or were cancelled."
+          exit 1

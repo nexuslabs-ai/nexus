@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import {
   Accordion,
   AccordionContent,
@@ -187,9 +185,6 @@ export const DisabledItem: Story = {
 // ============================================
 
 export const ExpandInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
@@ -232,9 +227,6 @@ export const ExpandInteraction: Story = {
 };
 
 export const MultipleExpandInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Accordion type="multiple" className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
@@ -271,9 +263,6 @@ export const MultipleExpandInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
       <AccordionItem value="item-1">
@@ -330,9 +319,6 @@ export const KeyboardInteraction: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Accordion
       type="single"
@@ -506,11 +492,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-  parameters: {
-    chromatic: {
-      modes: themeOnlyModes,
-    },
-  },
 };
 
 // ============================================

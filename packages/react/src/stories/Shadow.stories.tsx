@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import shadowLyraDark from '../../../core/tokens/primitives/shadow/shadow-lyra-dark.json';
 import shadowLyraLight from '../../../core/tokens/primitives/shadow/shadow-lyra-light.json';
 import shadowMaiaDark from '../../../core/tokens/primitives/shadow/shadow-maia-dark.json';
@@ -150,9 +148,6 @@ type Story = StoryObj;
 
 export const Light: Story = {
   globals: { theme: 'light' },
-  parameters: {
-    chromatic: { modes: { 'light desktop': themeOnlyModes.light } },
-  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-w-fit">
       <div className="nx:flex nx:flex-col nx:gap-2">
@@ -179,9 +174,6 @@ export const Light: Story = {
 
 export const Dark: Story = {
   globals: { theme: 'dark' },
-  parameters: {
-    chromatic: { modes: { 'dark desktop': themeOnlyModes.dark } },
-  },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-w-fit">
       <div className="nx:flex nx:flex-col nx:gap-2">

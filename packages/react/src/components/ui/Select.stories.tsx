@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import {
   Select,
   SelectContent,
@@ -227,9 +225,6 @@ export const Scrollable: Story = {
 // ============================================
 
 export const OpenCloseInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -272,9 +267,6 @@ export const OpenCloseInteraction: Story = {
 };
 
 export const SelectItemInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -314,9 +306,6 @@ export const SelectItemInteraction: Story = {
 };
 
 export const KeyboardNavigationInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -357,9 +346,6 @@ export const KeyboardNavigationInteraction: Story = {
 };
 
 export const DisabledInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Select disabled>
       <SelectTrigger className="nx:w-[180px]" aria-label="Disabled select">
@@ -386,9 +372,6 @@ export const DisabledInteraction: Story = {
 };
 
 export const DataAttributesTest: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -591,9 +574,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 
