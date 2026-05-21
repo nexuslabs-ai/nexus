@@ -229,9 +229,9 @@ jobs:
 
       - name: Regenerate @nexus/tailwind and check freshness
         run: |
-          yarn workspace @nexus/core build:tailwind
+          yarn tokens:tailwind
           if ! git diff --exit-code -- packages/tailwind; then
-            echo "::error::packages/tailwind/ is stale — run 'yarn workspace @nexus/core build:tailwind' and commit the result."
+            echo "::error::packages/tailwind/ is stale — run 'yarn tokens:tailwind' and commit the result."
             exit 1
           fi
 
