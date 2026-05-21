@@ -29,6 +29,7 @@
     "tokens:modular": "yarn workspace @nexus/core build:tokens:modular && node scripts/sync-playground-themes.js",
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:contrast": "yarn workspace @nexus/core audit:contrast",
+    "audit:figma-parity": "yarn workspace @nexus/core audit:figma-parity",
     "playground": "cd apps/playground && yarn dev",
     "size-limit": "size-limit",
     "prepare": "husky"
