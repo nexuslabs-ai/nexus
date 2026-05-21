@@ -75,12 +75,12 @@ html {
   --nx-shadow-focus-default-y: 0px;
   --nx-shadow-focus-default-blur: 0px;
   --nx-shadow-focus-default-spread: 2px;
-  --nx-shadow-focus-default-color: oklch(0.9219 0 0 / 0.502);
+  --nx-shadow-focus-default-color: oklch(0.5555 0 0);
   --nx-shadow-focus-error-x: 0px;
   --nx-shadow-focus-error-y: 0px;
   --nx-shadow-focus-error-blur: 0px;
   --nx-shadow-focus-error-spread: 2px;
-  --nx-shadow-focus-error-color: oklch(0.8845 0.0593 18.334 / 0.502);
+  --nx-shadow-focus-error-color: oklch(0.5771 0.2152 27.325);
 }
 
 html.dark {
@@ -158,10 +158,10 @@ html.dark {
   --nx-shadow-focus-default-y: 0px;
   --nx-shadow-focus-default-blur: 0px;
   --nx-shadow-focus-default-spread: 2px;
-  --nx-shadow-focus-default-color: oklch(0.9219 0 0 / 0.2);
+  --nx-shadow-focus-default-color: oklch(0.7572 0 0);
   --nx-shadow-focus-error-x: 0px;
   --nx-shadow-focus-error-y: 0px;
   --nx-shadow-focus-error-blur: 0px;
   --nx-shadow-focus-error-spread: 2px;
-  --nx-shadow-focus-error-color: oklch(0.4437 0.1613 26.899 / 0.502);
+  --nx-shadow-focus-error-color: oklch(0.7106 0.1661 22.216);
 }
