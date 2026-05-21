@@ -1,3 +1,3 @@
-. "$HOME/.nvm/nvm.sh"
+[ -f ~/.config/husky/init.sh ] && . ~/.config/husky/init.sh
 
 npx lint-staged
