@@ -30,13 +30,40 @@ yarn audit:figma-parity --category color
 
 Exit codes:
 
-| Code | Meaning                                                          |
-| ---- | ---------------------------------------------------------------- |
-| 0    | No drift                                                         |
-| 1    | Drift findings reported                                          |
-| 2    | Configuration error (snapshot missing, unknown/pending category) |
+| Code | Meaning                                                                                                                                      |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | No drift                                                                                                                                     |
+| 1    | Drift findings reported                                                                                                                      |
+| 2    | Configuration error — read stderr for the specific reason (missing/stale snapshot, unknown category, unsupported value type, malformed JSON) |
 
-Categories supported today: `color`. Pending categories — each one is its own `--category` invocation, wired up alongside the linked issue: `size` (#61), `radius` (#61), `borderwidth` (#61), `typography` (#62), `shadow` (#63). #61 lands three separate categories together because they share an Engineering primitive shape (`{value, unit}` dimension tokens), but the audit still runs as three commands.
+The audit guards against a stale snapshot by comparing the code file's last git-commit timestamp against the snapshot file's. If the code file was committed more recently, the audit fails — the designer must refresh the snapshot before drift can be assessed.
+
+### Categories
+
+| Category      | Status    | Wired by | Notes                                                   |
+| ------------- | --------- | -------- | ------------------------------------------------------- |
+| `color`       | Supported | #65      | Single-mode (one `color.json`).                         |
+| `size`        | Pending   | #61      | Multi-mode (`size-{vega,lyra,maia,mira,nova}.json`).    |
+| `radius`      | Pending   | #61      | Multi-mode (`radius-{blunt,sharp,subtle,...}.json`).    |
+| `borderwidth` | Pending   | #61      | Multi-mode (`borderwidth-{vega,lyra,...}.json`).        |
+| `typography`  | Pending   | #62      | Multi-mode composite tokens.                            |
+| `shadow`      | Pending   | #63      | Multi-mode × theme (`shadow-{mode}-{light,dark}.json`). |
+
+This table is the single source of truth for the audit's category coverage. The script no longer carries a parallel `PENDING_CATEGORIES` map — running `--category size` today fails with an unknown-category error pointing readers back here.
+
+### Snapshot shape
+
+The snapshot JSON mirrors the code's primitive file structure, so the same diff core walks both sides without translation:
+
+| Category type | Code layout                                    | Snapshot key shape                      |
+| ------------- | ---------------------------------------------- | --------------------------------------- |
+| Single-mode   | `primitives/color.json`                        | `snapshot.color.<palette>.<shade>`      |
+| Multi-mode    | `primitives/{cat}/{cat}-{mode}.json`           | `snapshot.<cat>.<mode>.<keys>`          |
+| Mode × theme  | `primitives/shadow/shadow-{mode}-{theme}.json` | `snapshot.shadow.<mode>.<theme>.<keys>` |
+
+Each category subtree carries a `$meta` block — at minimum `capturedAt` (ISO date) and `figmaFileName`. The `$`-prefix is DTCG metadata and is skipped by the token walker, so it never appears as a drift finding.
+
+Multi-mode CLI invocation (likely a `--mode <name>` flag) is locked in by #61 alongside its category wiring; single-mode color today only needs `--category color`.
 
 ### Refreshing the snapshot
 

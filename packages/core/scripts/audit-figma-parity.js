@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +8,7 @@ import { extractTokens, readTokenFile } from './utils.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.resolve(__dirname, '..', 'tokens');
 const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
+const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const DEFAULT_SNAPSHOT = path.join(TOKENS_DIR, 'figma-snapshot.json');
 
 const CATEGORIES = {
@@ -15,17 +17,11 @@ const CATEGORIES = {
   },
 };
 
-const PENDING_CATEGORIES = {
-  size: '#61',
-  radius: '#61',
-  borderwidth: '#61',
-  typography: '#62',
-  shadow: '#63',
-};
-
 const EXIT_OK = 0;
 const EXIT_DRIFT = 1;
 const EXIT_CONFIG = 2;
+
+const DOCS_HINT = 'see .claude/rules/figma.md → Code-vs-Figma Parity Audit';
 
 export function parseArgs(argv) {
   const args = { category: null, snapshot: DEFAULT_SNAPSHOT };
@@ -58,6 +54,12 @@ function normalizeValue(value, type) {
   ) {
     const rounded = Math.round(value.value * 10000) / 10000;
     return `${rounded}${value.unit || 'px'}`;
+  }
+  if (typeof value === 'object' && value !== null) {
+    throw new Error(
+      `normalizeValue: object value for $type "${type}" is not supported. ` +
+        `Wire normalization for this type when its category lands.`
+    );
   }
   return value;
 }
@@ -119,8 +121,6 @@ function formatFinding(finding) {
       return `  ✗ ${label} missing in Figma (code value: ${finding.code.value}) → add to Figma`;
     case 'missing-in-code':
       return `  ✗ ${label} extra in Figma (figma value: ${finding.figma.value}) → remove from Figma`;
-    default:
-      return `  ✗ ${label} unknown finding kind: ${finding.kind}`;
   }
 }
 
@@ -129,37 +129,64 @@ function fail(message) {
   process.exit(EXIT_CONFIG);
 }
 
+function readSnapshotOrFail(filePath) {
+  try {
+    return readTokenFile(filePath);
+  } catch (err) {
+    fail(`failed to parse snapshot ${filePath}: ${err.message}`);
+  }
+}
+
+function readCodeFileOrFail(filePath) {
+  try {
+    return readTokenFile(filePath);
+  } catch (err) {
+    fail(`failed to parse code file ${filePath}: ${err.message}`);
+  }
+}
+
+function gitLastCommitTs(filePath) {
+  try {
+    const rel = path.relative(REPO_ROOT, filePath);
+    const output = execSync(
+      `git log -1 --format=%ct -- ${JSON.stringify(rel)}`,
+      {
+        encoding: 'utf8',
+        cwd: REPO_ROOT,
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }
+    ).trim();
+    const ts = parseInt(output, 10);
+    return Number.isFinite(ts) ? ts : null;
+  } catch {
+    return null;
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
 
   if (!args.category) {
     const supported = Object.keys(CATEGORIES).join(', ');
-    const pending = Object.entries(PENDING_CATEGORIES)
-      .map(([cat, issue]) => `${cat} (${issue})`)
-      .join(', ');
     fail(
-      `--category <name> is required\n  supported: ${supported}\n  pending:   ${pending}`
-    );
-  }
-
-  if (args.category in PENDING_CATEGORIES) {
-    fail(
-      `--category ${args.category} is not yet supported. Tracked in ${PENDING_CATEGORIES[args.category]}.`
+      `--category <name> is required\n  supported: ${supported}\n  pending categories — ${DOCS_HINT}`
     );
   }
 
   const config = CATEGORIES[args.category];
   if (!config) {
-    fail(`unknown category "${args.category}"`);
+    fail(
+      `unknown category "${args.category}"\n  supported: ${Object.keys(CATEGORIES).join(', ')}\n  pending categories — ${DOCS_HINT}`
+    );
   }
 
   if (!fs.existsSync(args.snapshot)) {
     fail(
-      `snapshot file not found: ${args.snapshot}\n  Refresh the snapshot via the figma MCP — see .claude/rules/figma.md.`
+      `snapshot file not found: ${args.snapshot}\n  Refresh via the figma MCP — ${DOCS_HINT}.`
     );
   }
 
-  const snapshot = readTokenFile(args.snapshot);
+  const snapshot = readSnapshotOrFail(args.snapshot);
   const snapshotSubtree = snapshot[args.category];
   if (!snapshotSubtree) {
     fail(
@@ -167,7 +194,17 @@ function main() {
     );
   }
 
-  const codeData = readTokenFile(config.file);
+  const codeTs = gitLastCommitTs(config.file);
+  const snapshotTs = gitLastCommitTs(args.snapshot);
+  if (codeTs !== null && snapshotTs !== null && codeTs > snapshotTs) {
+    const codeDate = new Date(codeTs * 1000).toISOString().slice(0, 10);
+    const snapDate = new Date(snapshotTs * 1000).toISOString().slice(0, 10);
+    fail(
+      `snapshot is stale: ${path.basename(config.file)} was last committed ${codeDate}, after snapshot's ${snapDate}. Refresh per .claude/rules/figma.md.`
+    );
+  }
+
+  const codeData = readCodeFileOrFail(config.file);
   const findings = diffTokenTrees(codeData, snapshotSubtree);
 
   const meta = snapshotSubtree.$meta;

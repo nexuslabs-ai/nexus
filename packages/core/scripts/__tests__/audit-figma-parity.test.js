@@ -160,6 +160,42 @@ describe('diffTokenTrees', () => {
     };
     expect(diffTokenTrees(code, figma)).toEqual([]);
   });
+
+  it('reports independent findings of all four kinds simultaneously, sorted by path', () => {
+    const code = {
+      blue: { 500: colorToken('#3b82f6'), 600: colorToken('#2563eb') },
+      red: { 500: dimToken(8) },
+      green: { 500: colorToken('#22c55e') },
+    };
+    const figma = {
+      blue: { 500: colorToken('#1d4ed8'), 600: colorToken('#2563eb') },
+      red: { 500: colorToken('#dc2626') },
+      yellow: { 500: colorToken('#eab308') },
+    };
+    const findings = diffTokenTrees(code, figma);
+    expect(findings.map((f) => f.path)).toEqual([
+      'blue.500',
+      'green.500',
+      'red.500',
+      'yellow.500',
+    ]);
+    expect(findings.map((f) => f.kind)).toEqual([
+      'value-mismatch',
+      'missing-in-figma',
+      'type-mismatch',
+      'missing-in-code',
+    ]);
+  });
+
+  it('throws when an object value reaches an unsupported $type (locks contract before composite categories land)', () => {
+    const code = {
+      body: {
+        $value: { fontFamily: 'Inter', fontSize: '16px' },
+        $type: 'typography',
+      },
+    };
+    expect(() => diffTokenTrees(code, {})).toThrow(/normalizeValue/);
+  });
 });
 
 describe('parseArgs', () => {
