@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus DS Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+<style>
+:root {
+  --nx-white: #ffffff;
+  --nx-black: #0a0a0a;
+  --nx-gray-50:  #f9f9f9;
+  --nx-gray-100: #f2f2f2;
+  --nx-gray-150: #e8e8e8;
+  --nx-gray-200: #d9d9d9;
+  --nx-gray-300: #b8b8b8;
+  --nx-gray-400: #8f8f8f;
+  --nx-gray-500: #6b6b6b;
+  --nx-gray-600: #4d4d4d;
+  --nx-gray-700: #333333;
+  --nx-gray-800: #1f1f1f;
+  --nx-gray-850: #161616;
+  --nx-gray-900: #111111;
+  --nx-gray-950: #0a0a0a;
+  --nx-lead-bg: #e6f4ea; --nx-lead-fg: #1b5e20; --nx-lead-border: #a5d6a7;
+  --nx-parity-bg: #fff8e1; --nx-parity-fg: #4e3b00; --nx-parity-border: #ffe082;
+  --nx-behind-bg: #fce4ec; --nx-behind-fg: #7f0000; --nx-behind-border: #ef9a9a;
+  --nx-inferred-bg: #fff3e0; --nx-inferred-fg: #5d3a00; --nx-inferred-border: #ffcc80;
+  --nx-adopt-bg: #e6f4ea; --nx-adopt-fg: #1b5e20; --nx-adopt-border: #a5d6a7;
+  --nx-adapt-bg: #fff8e1; --nx-adapt-fg: #4e3b00; --nx-adapt-border: #ffe082;
+  --nx-skip-bg: #f5f5f5; --nx-skip-fg: #5a5a5a; --nx-skip-border: #cccccc;
+  --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:20px;--s-6:24px;--s-8:32px;--s-10:40px;--s-12:48px;--s-16:64px;
+  --r-sm:3px;--r-md:5px;--r-lg:8px;--r-xl:12px;
+  --font-sans:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono','Cascadia Code',ui-monospace,monospace;
+  --text-xs:11px;--text-sm:13px;--text-base:15px;--text-lg:18px;--text-xl:22px;--text-2xl:28px;
+  --sidebar-w:224px;--topbar-h:52px;--rightpanel-w:220px;
+}
+:root,.light {
+  --bg:var(--nx-white);--bg-muted:var(--nx-gray-50);--bg-muted2:var(--nx-gray-100);
+  --bg-hover:var(--nx-gray-100);--bg-active:var(--nx-gray-150);
+  --surface:var(--nx-white);--surface-raised:var(--nx-gray-50);
+  --border:var(--nx-gray-200);--border-subtle:var(--nx-gray-150);
+  --fg:var(--nx-gray-950);--fg-muted:var(--nx-gray-600);--fg-subtle:var(--nx-gray-400);
+  --fg-inverted:var(--nx-white);--accent:var(--nx-gray-900);--accent-hover:var(--nx-gray-700);
+  --focus-ring:rgba(0,0,0,0.3);
+  --lead-bg:var(--nx-lead-bg);--lead-fg:var(--nx-lead-fg);--lead-border:var(--nx-lead-border);
+  --parity-bg:var(--nx-parity-bg);--parity-fg:var(--nx-parity-fg);--parity-border:var(--nx-parity-border);
+  --behind-bg:var(--nx-behind-bg);--behind-fg:var(--nx-behind-fg);--behind-border:var(--nx-behind-border);
+  --inferred-bg:var(--nx-inferred-bg);--inferred-fg:var(--nx-inferred-fg);--inferred-border:var(--nx-inferred-border);
+  --adopt-bg:var(--nx-adopt-bg);--adopt-fg:var(--nx-adopt-fg);--adopt-border:var(--nx-adopt-border);
+  --adapt-bg:var(--nx-adapt-bg);--adapt-fg:var(--nx-adapt-fg);--adapt-border:var(--nx-adapt-border);
+  --skip-bg:var(--nx-skip-bg);--skip-fg:var(--nx-skip-fg);--skip-border:var(--nx-skip-border);
+}
+.dark {
+  --bg:var(--nx-gray-950);--bg-muted:var(--nx-gray-900);--bg-muted2:var(--nx-gray-850);
+  --bg-hover:var(--nx-gray-800);--bg-active:var(--nx-gray-700);
+  --surface:var(--nx-gray-900);--surface-raised:var(--nx-gray-800);
+  --border:var(--nx-gray-800);--border-subtle:#1d1d1d;
+  --fg:var(--nx-gray-50);--fg-muted:var(--nx-gray-300);--fg-subtle:var(--nx-gray-500);
+  --fg-inverted:var(--nx-gray-950);--accent:var(--nx-gray-100);--accent-hover:var(--nx-gray-300);
+  --focus-ring:rgba(255,255,255,0.3);
+  --lead-bg:#0a2e12;--lead-fg:#86efac;--lead-border:#166534;
+  --parity-bg:#2a1f00;--parity-fg:#fde68a;--parity-border:#92400e;
+  --behind-bg:#2d0a0a;--behind-fg:#fca5a5;--behind-border:#7f1d1d;
+  --inferred-bg:#2a1e00;--inferred-fg:#fed7aa;--inferred-border:#92400e;
+  --adopt-bg:#0a2e12;--adopt-fg:#86efac;--adopt-border:#166534;
+  --adapt-bg:#2a1f00;--adapt-fg:#fde68a;--adapt-border:#92400e;
+  --skip-bg:#1a1a1a;--skip-fg:#a0a0a0;--skip-border:#333333;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;}
+body{font-family:var(--font-sans);font-size:var(--text-base);line-height:1.6;color:var(--fg);background:var(--bg);-webkit-font-smoothing:antialiased;}
+a{color:var(--fg);text-decoration:underline;text-underline-offset:2px;}
+a:hover{color:var(--fg-muted);}
+code,pre{font-family:var(--font-mono);font-size:var(--text-xs);}
+pre{background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--s-3) var(--s-4);overflow-x:auto;line-height:1.5;}
+code{background:var(--bg-muted2);border-radius:var(--r-sm);padding:1px 4px;}
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;grid-template-rows:var(--topbar-h) 1fr;min-height:100vh;}
+.topbar{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:var(--s-4);padding:0 var(--s-6);background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.topbar-logo{font-size:var(--text-sm);font-weight:600;letter-spacing:-0.01em;color:var(--fg);white-space:nowrap;flex-shrink:0;}
+.topbar-logo span{color:var(--fg-muted);font-weight:400;}
+.search-wrap{flex:1;max-width:400px;}
+.search-input{width:100%;background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-md);padding:6px var(--s-3);font-family:var(--font-sans);font-size:var(--text-sm);color:var(--fg);outline:none;transition:border-color 0.15s;}
+.search-input::placeholder{color:var(--fg-subtle);}
+.search-input:focus{border-color:var(--fg-subtle);box-shadow:0 0 0 2px var(--focus-ring);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:var(--s-3);}
+.theme-toggle{background:var(--bg-muted2);border:1px solid var(--border);border-radius:var(--r-md);padding:5px var(--s-3);font-size:var(--text-xs);font-family:var(--font-sans);color:var(--fg-muted);cursor:pointer;transition:background 0.15s,color 0.15s;}
+.theme-toggle:hover{background:var(--bg-hover);color:var(--fg);}
+.sidebar{grid-column:1;grid-row:2;position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;border-right:1px solid var(--border);background:var(--surface);padding:var(--s-4) 0 var(--s-8);}
+.sidebar-section-label{font-size:var(--text-xs);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--fg-subtle);padding:var(--s-4) var(--s-4) var(--s-2);}
+.sidebar-tier-label{font-size:10px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);padding:var(--s-3) var(--s-4) var(--s-1);border-top:1px solid var(--border-subtle);margin-top:var(--s-2);}
+.sidebar-progress{font-size:10px;color:var(--fg-subtle);padding:0 var(--s-4) var(--s-3);}
+.sidebar-progress-bar{height:2px;background:var(--border);border-radius:1px;margin-top:var(--s-1);}
+.sidebar-progress-fill{height:100%;background:var(--fg-muted);border-radius:1px;transition:width 0.3s;}
+.nav-item{display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);padding:6px var(--s-4);font-size:var(--text-sm);color:var(--fg-muted);cursor:pointer;border-radius:0;transition:background 0.1s,color 0.1s;text-decoration:none;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:var(--bg-hover);color:var(--fg);}
+.nav-item.active{color:var(--fg);background:var(--bg-active);font-weight:500;}
+.nav-item .nav-badge{font-size:10px;padding:1px 5px;border-radius:10px;font-weight:500;flex-shrink:0;}
+.nav-item .badge-done{background:var(--lead-bg);color:var(--lead-fg);}
+.nav-item .badge-stub{background:var(--bg-muted2);color:var(--fg-subtle);}
+.main{grid-column:2;grid-row:2;min-width:0;display:flex;gap:0;}
+.main-content{flex:1;min-width:0;padding:var(--s-8) var(--s-8);max-width:900px;}
+.right-panel{width:var(--rightpanel-w);flex-shrink:0;position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;padding:var(--s-6) var(--s-5);border-left:1px solid var(--border);}
+.section{display:none;}.section.active{display:block;}
+.section-header{margin-bottom:var(--s-6);padding-bottom:var(--s-6);border-bottom:1px solid var(--border);}
+.section-tag{font-size:var(--text-xs);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-2);}
+.section-title{font-size:var(--text-2xl);font-weight:700;letter-spacing:-0.02em;color:var(--fg);margin-bottom:var(--s-3);}
+.exec-line{font-size:var(--text-base);color:var(--fg-muted);line-height:1.6;padding:var(--s-4);background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-lg);border-left:3px solid var(--fg-muted);}
+.stub-banner{margin:var(--s-8) 0;padding:var(--s-6);background:var(--bg-muted);border:1px dashed var(--border);border-radius:var(--r-xl);}
+.stub-banner h3{font-size:var(--text-lg);font-weight:600;margin-bottom:var(--s-2);}
+.stub-banner p{font-size:var(--text-sm);color:var(--fg-muted);}
+
+/* ===== MATRIX (div-based grid, fixes Alpine3 nested-template bug) ===== */
+.matrix-section{margin:var(--s-8) 0;}
+.matrix-title{font-size:var(--text-base);font-weight:600;margin-bottom:var(--s-4);color:var(--fg);}
+.matrix-head{display:grid;grid-template-columns:180px 1fr 1fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
+.matrix-head-cell{font-size:var(--text-xs);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--fg-subtle);padding:var(--s-2) var(--s-3);cursor:pointer;user-select:none;}
+.matrix-head-cell:hover{color:var(--fg-muted);}
+.matrix-row-wrap{border-bottom:1px solid var(--border-subtle);}
+.matrix-row-wrap:last-child{border-bottom:none;}
+.matrix-row{display:grid;grid-template-columns:180px 1fr 1fr 1fr 1fr 1fr;gap:0;cursor:pointer;transition:background 0.1s;}
+.matrix-row:hover{background:var(--bg-hover);}
+.matrix-cell{padding:var(--s-3);vertical-align:top;display:flex;align-items:center;}
+.matrix-cell:first-child{display:block;}
+.matrix-drawer{display:none;padding:var(--s-4) var(--s-3);background:var(--bg-muted);border-top:1px solid var(--border-subtle);}
+.matrix-drawer.open{display:block;}
+.drawer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s-4);}
+.drawer-block h5{font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-2);}
+.drawer-block p,.drawer-block li{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;}
+.drawer-block ul{padding-left:var(--s-4);}
+.source-link{font-size:var(--text-xs);color:var(--fg-muted);text-decoration:underline;text-underline-offset:2px;word-break:break-all;}
+.verdict{display:inline-flex;align-items:center;gap:5px;font-size:var(--text-xs);font-weight:600;padding:2px var(--s-2);border-radius:var(--r-sm);white-space:nowrap;}
+.verdict-lead{background:var(--lead-bg);color:var(--lead-fg);border:1px solid var(--lead-border);}
+.verdict-parity{background:var(--parity-bg);color:var(--parity-fg);border:1px solid var(--parity-border);}
+.verdict-behind{background:var(--behind-bg);color:var(--behind-fg);border:1px solid var(--behind-border);}
+.verdict-inferred{background:var(--inferred-bg);color:var(--inferred-fg);border:1px solid var(--inferred-border);}
+.system-name{font-weight:500;color:var(--fg);font-size:var(--text-sm);}
+.system-version{font-size:var(--text-xs);color:var(--fg-subtle);display:block;margin-top:2px;}
+.tier-badge{font-size:10px;font-weight:600;padding:1px 5px;border-radius:10px;background:var(--bg-muted2);color:var(--fg-subtle);display:inline-block;margin-top:3px;}
+.tier-a-badge{background:var(--parity-bg);color:var(--parity-fg);}
+
+/* ===== DEEP DIVES ===== */
+.deep-dives{margin:var(--s-8) 0;}
+.deep-dives-title{font-size:var(--text-base);font-weight:600;margin-bottom:var(--s-4);color:var(--fg);}
+.deep-dive-item{border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:var(--s-3);overflow:hidden;}
+.deep-dive-header{display:flex;align-items:center;justify-content:space-between;padding:var(--s-4);cursor:pointer;background:var(--surface);user-select:none;}
+.deep-dive-header:hover{background:var(--bg-hover);}
+.deep-dive-title{font-weight:500;font-size:var(--text-sm);color:var(--fg);}
+.deep-dive-meta{font-size:var(--text-xs);color:var(--fg-subtle);}
+.deep-dive-chevron{color:var(--fg-subtle);font-size:var(--text-xs);}
+.deep-dive-body{padding:var(--s-4) var(--s-5);border-top:1px solid var(--border);background:var(--bg-muted);}
+.deep-dive-body p{font-size:var(--text-sm);color:var(--fg-muted);margin-bottom:var(--s-3);line-height:1.6;}
+.deep-dive-body h5{font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);margin:var(--s-4) 0 var(--s-2);}
+.deep-dive-body h5:first-child{margin-top:0;}
+.deep-dive-body ul{padding-left:var(--s-5);}
+.deep-dive-body li{font-size:var(--text-sm);color:var(--fg-muted);margin-bottom:4px;}
+.nx-rec-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--r-md);font-size:var(--text-xs);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:var(--s-3);}
+.chip-adopt{background:var(--adopt-bg);color:var(--adopt-fg);border:1px solid var(--adopt-border);}
+.chip-adapt{background:var(--adapt-bg);color:var(--adapt-fg);border:1px solid var(--adapt-border);}
+.chip-skip{background:var(--skip-bg);color:var(--skip-fg);border:1px solid var(--skip-border);}
+
+/* ===== RECOMMENDATIONS ===== */
+.recs{margin:var(--s-8) 0;}
+.recs-title{font-size:var(--text-base);font-weight:600;margin-bottom:var(--s-4);color:var(--fg);}
+.rec-item{border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:var(--s-4);overflow:hidden;}
+.rec-pinned{border-color:var(--fg-muted);}
+.rec-header{display:flex;align-items:flex-start;gap:var(--s-3);padding:var(--s-4);background:var(--surface);}
+.rec-rank{width:24px;height:24px;border-radius:50%;background:var(--bg-muted2);color:var(--fg-muted);font-size:var(--text-xs);font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rec-pinned .rec-rank{background:var(--fg);color:var(--fg-inverted);}
+.rec-body{flex:1;}
+.rec-title{font-weight:600;font-size:var(--text-sm);color:var(--fg);margin-bottom:var(--s-2);}
+.rec-sub-label{font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);margin:var(--s-3) 0 var(--s-1);}
+.rec-sub-body{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;margin-bottom:var(--s-2);}
+.rec-steps{padding-left:var(--s-5);margin-bottom:var(--s-2);}
+.rec-steps li{font-size:var(--text-sm);color:var(--fg-muted);margin-bottom:4px;line-height:1.5;}
+.rec-bullets{list-style:disc;padding-left:var(--s-5);margin-bottom:var(--s-2);}
+.rec-bullets li{font-size:var(--text-sm);color:var(--fg-muted);margin-bottom:4px;}
+.rec-tags{display:flex;gap:var(--s-2);margin-top:var(--s-3);flex-wrap:wrap;}
+.rec-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:var(--r-sm);background:var(--bg-muted2);color:var(--fg-subtle);text-transform:uppercase;letter-spacing:0.04em;}
+.rec-impact-high{background:var(--lead-bg);color:var(--lead-fg);}
+.rec-effort-low{background:var(--parity-bg);color:var(--parity-fg);}
+.rec-effort-med{background:var(--bg-muted2);color:var(--fg-subtle);}
+.rec-diff{background:var(--bg-muted);border-top:1px solid var(--border);padding:var(--s-3) var(--s-4);}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel-title{font-size:var(--text-xs);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-3);}
+.toc-list{list-style:none;}
+.toc-item{margin-bottom:var(--s-1);}
+.toc-link{font-size:var(--text-xs);color:var(--fg-subtle);text-decoration:none;display:block;padding:3px 0;border-left:2px solid transparent;padding-left:var(--s-3);transition:color 0.1s,border-color 0.1s;}
+.toc-link:hover{color:var(--fg-muted);border-left-color:var(--fg-subtle);}
+.honest-take{margin-top:var(--s-6);padding:var(--s-4);background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-lg);}
+.honest-take-title{font-size:var(--text-xs);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-3);}
+.honest-take-row{display:flex;justify-content:space-between;align-items:center;padding:var(--s-1) 0;font-size:var(--text-xs);}
+.honest-take-label{color:var(--fg-muted);}
+.honest-take-count{font-weight:600;font-size:var(--text-sm);}
+.count-lead{color:var(--lead-fg);}.count-parity{color:var(--parity-fg);}.count-behind{color:var(--behind-fg);}.count-inferred{color:var(--inferred-fg);}
+
+/* ===== DASHBOARD ===== */
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-5);margin:var(--s-6) 0;}
+.dashboard-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:var(--s-5);}
+.dashboard-card-title{font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-4);}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3);}
+.stat-item{text-align:center;padding:var(--s-3);background:var(--bg-muted);border-radius:var(--r-md);}
+.stat-num{font-size:var(--text-xl);font-weight:700;display:block;}
+.stat-label{font-size:var(--text-xs);color:var(--fg-subtle);}
+.scorecard-placeholder{height:200px;display:flex;align-items:center;justify-content:center;background:var(--bg-muted);border:1px dashed var(--border);border-radius:var(--r-lg);color:var(--fg-subtle);font-size:var(--text-sm);}
+
+/* ===== RUBRIC TOOLTIP ===== */
+.rubric-info{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--bg-muted2);color:var(--fg-subtle);font-size:10px;font-weight:700;text-align:center;line-height:14px;cursor:help;margin-left:4px;position:relative;}
+.rubric-info:hover .rubric-tooltip{display:block;}
+.rubric-tooltip{display:none;position:absolute;left:20px;top:-4px;width:280px;background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s-3);z-index:200;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+.rubric-tooltip h6{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--fg-subtle);margin-bottom:var(--s-2);}
+.rubric-tooltip p{font-size:var(--text-xs);color:var(--fg-muted);line-height:1.5;margin-bottom:var(--s-2);}
+
+/* ===== MISC ===== */
+h2{font-size:var(--text-xl);font-weight:600;margin:var(--s-8) 0 var(--s-4);color:var(--fg);letter-spacing:-0.01em;}
+h3{font-size:var(--text-base);font-weight:600;margin:var(--s-6) 0 var(--s-3);color:var(--fg);}
+p{color:var(--fg-muted);}
+.divider{height:1px;background:var(--border);margin:var(--s-6) 0;}
+.tag{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:1px 6px;border-radius:var(--r-sm);background:var(--bg-muted2);color:var(--fg-subtle);}
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;grid-template-rows:var(--topbar-h) auto;}
+  .sidebar{display:none;}.main{grid-column:1;}.right-panel{display:none;}
+  .main-content{padding:var(--s-4);}.dashboard-grid{grid-template-columns:1fr;}.drawer-grid{grid-template-columns:1fr;}
+  .matrix-head,.matrix-row{grid-template-columns:140px repeat(5,1fr);}
+}
+</style>
+</head>
+
+<body x-data="app()" :class="theme">
+<div class="app">
+<header class="topbar">
+  <div class="topbar-logo">Nexus DS <span>Intelligence</span></div>
+  <div class="search-wrap">
+    <input class="search-input" type="search" placeholder="Search sections..."
+      x-model="searchQuery" @input="filterSections()">
+  </div>
+  <div class="topbar-right">
+    <button class="theme-toggle" @click="toggleTheme()" x-text="theme === 'dark' ? 'Light mode' : 'Dark mode'"></button>
+  </div>
+</header>
+
+<nav class="sidebar">
+  <div class="sidebar-section-label">Nexus DS</div>
+  <div class="sidebar-progress">
+    1 of 18 sections populated
+    <div class="sidebar-progress-bar"><div class="sidebar-progress-fill" style="width:5.5%"></div></div>
+  </div>
+  <template x-for="section in visibleSections" :key="section.id">
+    <button class="nav-item"
+      :class="{ active: activeSection === section.id }"
+      @click="setSection(section.id)">
+      <span x-text="section.label"></span>
+      <span class="nav-badge" :class="section.done ? 'badge-done' : 'badge-stub'"
+        x-text="section.done ? 'Done' : 'Phase 2+'"></span>
+    </button>
+  </template>
+</nav>
+
+<main class="main">
+<div class="main-content">
+
+<!-- ===== DASHBOARD ===== -->
+<div id="sec-dashboard" class="section" :class="{ active: activeSection === 'dashboard' }">
+  <div class="section-header">
+    <div class="section-tag">Global view</div>
+    <div class="section-title">Dashboard</div>
+    <div class="exec-line">
+      Cross-cutting overview of Nexus's position across 18 design-system surfaces. Tokens &gt; Color is fully populated against 6 Tier-A product systems (Linear, Vercel/Geist, Stripe, Notion, Raycast, Figma) and 4 Tier-B open-source kits (shadcn/ui, Radix Themes, Adobe Spectrum, Material 3). 17 sections are stubs awaiting Phase 2+ research.
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="dashboard-card">
+      <div class="dashboard-card-title">Section Status</div>
+      <div class="stat-grid">
+        <div class="stat-item"><span class="stat-num" style="color:var(--lead-fg)">1</span><span class="stat-label">Populated</span></div>
+        <div class="stat-item"><span class="stat-num" style="color:var(--fg-muted)">17</span><span class="stat-label">Stubs</span></div>
+        <div class="stat-item"><span class="stat-num">18</span><span class="stat-label">Total</span></div>
+      </div>
+    </div>
+    <div class="dashboard-card">
+      <div class="dashboard-card-title">Tokens &gt; Color — 11-system Matrix</div>
+      <div class="stat-grid">
+        <div class="stat-item"><span class="stat-num count-lead">12</span><span class="stat-label">Lead</span></div>
+        <div class="stat-item"><span class="stat-num count-parity">16</span><span class="stat-label">Parity</span></div>
+        <div class="stat-item"><span class="stat-num count-behind">7</span><span class="stat-label">Behind</span></div>
+      </div>
+      <div style="margin-top:var(--s-2);font-size:10px;color:var(--fg-subtle)">+ 6 cells inferred (Tier-A partial public surface)</div>
+    </div>
+  </div>
+
+  <div class="dashboard-card" style="margin-bottom:var(--s-5)">
+    <div class="dashboard-card-title">Tiering Model (Phase 1)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-5);margin-top:var(--s-3);">
+      <div>
+        <div style="font-size:var(--text-xs);font-weight:600;color:var(--parity-fg);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--s-2);">Tier A — Aspirational benchmarks</div>
+        <div style="font-size:var(--text-sm);color:var(--fg-muted);line-height:1.6;">Product design systems with real public design surface: <strong style="color:var(--fg)">Linear, Vercel/Geist, Stripe, Notion, Raycast, Figma</strong>. These are the systems Nexus aspires to match in design quality and polish. Some verdicts are marked <em>inferred</em> where authoritative token docs are not public.</div>
+      </div>
+      <div>
+        <div style="font-size:var(--text-xs);font-weight:600;color:var(--fg-subtle);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--s-2);">Tier B — Technical reference</div>
+        <div style="font-size:var(--text-sm);color:var(--fg-muted);line-height:1.6;">Open-source kits examined for token mechanics: <strong style="color:var(--fg)">shadcn/ui, Radix Themes, Adobe Spectrum, Material 3</strong>. Not design quality benchmarks — implementation patterns to learn from or adopt.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="dashboard-card-title">Top Recommendations (Tokens &gt; Color)</div>
+    <div style="padding:var(--s-3) 0;font-size:var(--text-sm);color:var(--fg-muted);">
+      <strong style="color:var(--fg)">1.</strong> Add alpha-variant token scale — Radix Colors solves on-colored-surface blending; Nexus has no alpha scale at all.<br><br>
+      <strong style="color:var(--fg)">2.</strong> Publish <code>@nexus/colors</code> as a standalone package — primitives locked in <code>@nexus/tailwind</code> blocks non-Tailwind consumers.<br><br>
+      <strong style="color:var(--fg)">3.</strong> Define a semantic density/surface story — Linear and Geist both use tightly constrained neutral surfaces; Nexus's container/popover split is underdocumented for complex app layouts.<br><br>
+      <strong style="color:var(--fg)">4.</strong> Add chart/data-viz tokens — every Tier-A product uses charts; Nexus ships nothing and consumers will reach for off-system colors.
+    </div>
+  </div>
+
+  <div class="dashboard-card" style="margin-top:var(--s-5)">
+    <div class="dashboard-card-title">Radar Scorecard — Nexus vs Tier-A (Tokens &gt; Color)</div>
+    <div class="scorecard-placeholder">Radar chart populates as all 18 sections are completed (Phase 2+)</div>
+  </div>
+</div>
+
+<!-- ===== TOKENS > COLOR ===== -->
+<div id="sec-tokens-color" class="section" :class="{ active: activeSection === 'tokens-color' }">
+  <div class="section-header">
+    <div class="section-tag">1. Tokens</div>
+    <div class="section-title">Color</div>
+    <div class="exec-line">
+      Nexus's perceptual-OKLCH pipeline and APCA-gated semantic layer are genuinely differentiated against Tier-B technical references. Against Tier-A product systems (Linear, Geist, Stripe, Notion, Raycast, Figma) the gaps become concrete: no alpha-variant scale, no standalone color package, no chart/data-viz palette, and a surface hierarchy that is underdocumented for complex app layouts.
+    </div>
+  </div>
+
+  <!-- MATRIX -->
+  <div class="matrix-section" id="color-matrix">
+    <div class="matrix-title">
+      Comparison Matrix — 11 systems
+      <span class="rubric-info">?
+        <div class="rubric-tooltip">
+          <h6>Verdict Scale</h6>
+          <p><strong>Lead</strong> — Nexus ships a structural capability this system lacks or handles worse (perceptual color math, APCA gating, multi-base-palette support).</p>
+          <p><strong>Parity</strong> — Both systems reach the same outcome through different means, or Nexus's approach is equivalent within acceptable tradeoffs.</p>
+          <p><strong>Behind</strong> — The other system ships a meaningful capability Nexus does not (alpha scales, P3 tokens, standalone color package).</p>
+          <p><strong>Inferred</strong> — Verdict based on observed product UI and engineering blog posts, not authoritative token docs. Used for Tier-A systems with partial public surface.</p>
+        </div>
+      </span>
+    </div>
+
+    <div x-data="matrix()">
+      <!-- Header row -->
+      <div class="matrix-head">
+        <div class="matrix-head-cell" @click="sortBy('system')">System <span x-text="sortCol==='system'?(sortAsc?'↑':'↓'):''"></span></div>
+        <div class="matrix-head-cell" @click="sortBy('palette')">Palette scale <span x-text="sortCol==='palette'?(sortAsc?'↑':'↓'):''"></span></div>
+        <div class="matrix-head-cell" @click="sortBy('semantic')">Semantic layer <span x-text="sortCol==='semantic'?(sortAsc?'↑':'↓'):''"></span></div>
+        <div class="matrix-head-cell" @click="sortBy('darkmode')">Dark mode <span x-text="sortCol==='darkmode'?(sortAsc?'↑':'↓'):''"></span></div>
+        <div class="matrix-head-cell" @click="sortBy('colorspace')">Color space <span x-text="sortCol==='colorspace'?(sortAsc?'↑':'↓'):''"></span></div>
+        <div class="matrix-head-cell" @click="sortBy('distribution')">Distribution <span x-text="sortCol==='distribution'?(sortAsc?'↑':'↓'):''"></span></div>
+      </div>
+
+      <!-- Data rows — each row-wrap holds the row + its drawer as siblings (not nested templates) -->
+      <template x-for="(row, idx) in sortedRows" :key="row.system">
+        <div class="matrix-row-wrap">
+          <div class="matrix-row" @click="toggleDrawer(idx)" :aria-expanded="openDrawer === idx">
+            <div class="matrix-cell">
+              <span class="system-name" x-text="row.system"></span>
+              <span class="system-version" x-text="row.version"></span>
+              <span class="tier-badge" :class="row.tier === 'A' ? 'tier-a-badge' : ''" x-text="'Tier ' + row.tier"></span>
+            </div>
+            <div class="matrix-cell"><span class="verdict" :class="'verdict-'+row.palette" x-text="capitalize(row.palette)"></span></div>
+            <div class="matrix-cell"><span class="verdict" :class="'verdict-'+row.semantic" x-text="capitalize(row.semantic)"></span></div>
+            <div class="matrix-cell"><span class="verdict" :class="'verdict-'+row.darkmode" x-text="capitalize(row.darkmode)"></span></div>
+            <div class="matrix-cell"><span class="verdict" :class="'verdict-'+row.colorspace" x-text="capitalize(row.colorspace)"></span></div>
+            <div class="matrix-cell"><span class="verdict" :class="'verdict-'+row.distribution" x-text="capitalize(row.distribution)"></span></div>
+          </div>
+          <div class="matrix-drawer" :class="{ open: openDrawer === idx }">
+            <div class="drawer-grid">
+              <div class="drawer-block">
+                <h5>Rubric &amp; Evidence</h5>
+                <p x-html="row.evidence"></p>
+              </div>
+              <div class="drawer-block">
+                <h5>What they uniquely teach</h5>
+                <p x-text="row.teach"></p>
+              </div>
+              <div class="drawer-block">
+                <h5>Source</h5>
+                <a class="source-link" :href="row.source" target="_blank" rel="noopener" x-text="row.source"></a>
+                <p style="margin-top:8px;font-size:11px;color:var(--fg-subtle)" x-text="row.reviewed"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- DEEP DIVES -->
+  <div class="deep-dives" id="color-deepdives">
+    <div class="deep-dives-title">Per-System Deep Dives</div>
+
+    <!-- ===== TIER A: LINEAR ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Linear — Color System</div>
+          <div class="deep-dive-meta">Tier A · Reviewed May 2026 — observed app UI + engineering blog (no authoritative public token docs) · <a href="https://linear.app/blog" target="_blank" rel="noopener" style="color:var(--fg-subtle)">linear.app/blog</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Linear does not publish a public design system or token documentation. Verdicts are inferred from the Linear app UI (observed May 2026), the March 2026 blog post "A calmer, more consistent interface," and the Linear changelog. Linear's color approach is characterized by extreme chromatic restraint: the UI uses a near-monochromatic base with a single high-chroma accent (violet/purple) applied very sparingly. The March 2026 refresh explicitly cited reducing visual noise as its primary goal.</p>
+        <h5>Token categories (inferred from app UI)</h5>
+        <ul>
+          <li><strong>Background surfaces</strong> — deeply neutral, near-black in dark mode with subtle stepped elevation (sidebar darker than canvas)</li>
+          <li><strong>Text hierarchy</strong> — three visible levels: primary, secondary (de-emphasized labels), tertiary (metadata/timestamps)</li>
+          <li><strong>Accent</strong> — single violet/indigo used for active states, links, selection indicators; no multi-brand switching observed</li>
+          <li><strong>Status</strong> — functional status colors (red for overdue, amber for at-risk, green for completed) used in issue status badges</li>
+          <li><strong>No alpha-variant or wide-gamut documentation visible</strong></li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>Linear demonstrates that extreme chromatic discipline — one accent, near-monochromatic base — is itself a design-system decision that can be more powerful than a broad semantic palette. The March 2026 "calmer interface" refresh showed that reducing the number of visible colors (not adding more) is often the lever for perceived quality improvement. Nexus has the tokens to be this disciplined but no guidance to enforce it.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>Linear's approach is opinionated for a task-management product. Nexus must support multiple brand colors and product contexts, so the single-accent approach is not directly adoptable. The density story — Linear's compact sidebar and list items at very tight row heights — requires Nexus to also have a density token mode, which it does not yet ship.</p>
+        <h5>What Nexus is behind on</h5>
+        <p>Linear's color story is inseparable from its density/spacing story. Nexus has no documented "compact density" mode for tight list UIs. The surface elevation model (sidebar vs. canvas vs. modal, each at a distinct gray) is implicit in Linear and underdocumented in Nexus.</p>
+        <div class="nx-rec-chip chip-adapt">Adapt</div>
+        <p><strong>Nexus recommendation:</strong> Adopt Linear's surface-elevation discipline by documenting a 3-level neutral surface stack (canvas, sidebar/secondary, overlay/modal) using Nexus's existing container/muted/popover tokens. Write the rule: canvas = <code>nx:bg-background</code>, secondary surface = <code>nx:bg-muted</code>, raised surface = <code>nx:bg-container</code>. Currently these tokens exist but the application rule is unwritten, so every team member makes their own choice. <strong>Reason:</strong> the surface naming already exists in Nexus — what's missing is a one-page usage contract comparable to what Linear enforces implicitly through their UI.</p>
+        <h5>Source</h5>
+        <p><a href="https://linear.app/blog" target="_blank" rel="noopener" class="source-link">https://linear.app/blog</a> — "A calmer, more consistent interface" (Mar 12 2026)</p>
+      </div>
+    </div>
+
+    <!-- ===== TIER A: VERCEL/GEIST ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Vercel / Geist — Color System</div>
+          <div class="deep-dive-meta">Tier A · Reviewed May 2026 — vercel.com/geist/colors (official docs) · <a href="https://vercel.com/geist/colors" target="_blank" rel="noopener" style="color:var(--fg-subtle)">vercel.com/geist/colors</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Geist's color system ships via <code>vercel.com/geist/colors</code> (official Vercel design documentation). It defines 10 color scales: Gray, Gray-Alpha, Blue, Red, Amber, Green, Teal, Purple, Pink — each with 10 steps. Steps are semantically defined: steps 1–3 = component backgrounds (default/hover/active), steps 4–6 = borders (default/hover/active), steps 7–8 = high-contrast backgrounds, steps 9–10 = text/icons (secondary/primary). Two additional background tokens — Background 1 (default) and Background 2 (secondary) — sit outside the scale. P3 wide-gamut colors are served to supporting browsers; the documentation confirms P3 support explicitly.</p>
+        <h5>Token categories</h5>
+        <ul>
+          <li><strong>Gray / Gray-Alpha</strong> — 10-step neutral scale + alpha variants for blending</li>
+          <li><strong>Chromatic scales</strong> — Blue, Red, Amber, Green, Teal, Purple, Pink (10 steps each)</li>
+          <li><strong>Background tokens</strong> — Background 1 (page default), Background 2 (secondary surface)</li>
+          <li><strong>P3 wide-gamut</strong> — confirmed support on capable displays</li>
+          <li><strong>Alpha variants</strong> — Gray-Alpha explicitly ships; alpha behavior implied for chromatic scales</li>
+          <li><strong>Step semantics</strong> — publicly documented: backgrounds → borders → fills → text</li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>Geist's step-semantic mapping (backgrounds 1–3, borders 4–6, fills 7–8, text 9–10) is a clean, publicized contract that designers and developers can internalize without consulting docs. The 10-step structure is simpler than Radix's 12-step (fewer edge cases) while retaining full coverage. P3 wide-gamut as a default — not a roadmap item — shows Vercel's commitment to display quality. The Gray-Alpha scale for blending is a pattern Nexus entirely lacks.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>Geist's palette is tuned for Vercel's monochromatic product aesthetic. The 10-step scale is less granular than Nexus's 11-shade DTCG primitive scale; Nexus's perceptual-grid lightness pinning produces more visually consistent steps than Geist's approach (which doesn't document its lightness math). Nexus's APCA gating has no equivalent in Geist's published documentation.</p>
+        <h5>What Nexus is behind on</h5>
+        <p>P3 wide-gamut tokens are documented and shipped by Geist; Nexus's OKLCH pipeline can emit P3 but has no P3 semantic layer. Gray-Alpha for blending is a solved problem in Geist; Nexus has no alpha scale. Step-semantic documentation (which steps to use for backgrounds vs borders vs text) is published by Geist; Nexus's 11-shade scale has no comparable public use-case guide.</p>
+        <div class="nx-rec-chip chip-adopt">Adopt</div>
+        <p><strong>Nexus recommendation:</strong> Publish a "shade use-case guide" for Nexus's primitive scale, mapping each shade step (50 through 950) to its canonical use case (50–100: backgrounds, 200–300: borders, 400–500: secondary text, 600–700: primary text on light, 800–950: fills on dark). Then add a Gray-Alpha scale to the primitive layer. <strong>Reason:</strong> Geist proves that publishing this mapping as a one-page doc — not just having the tokens — is what makes designers reach for the right shade instead of guessing. The primitives already exist in Nexus; the documented contract is what's missing.</p>
+        <h5>Source</h5>
+        <p><a href="https://vercel.com/geist/colors" target="_blank" rel="noopener" class="source-link">https://vercel.com/geist/colors</a></p>
+      </div>
+    </div>
+
+    <!-- ===== TIER A: STRIPE ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Stripe — Color System</div>
+          <div class="deep-dive-meta">Tier A · Reviewed May 2026 — blog post "Designing accessible color systems" (Oct 2019) + observed app UI · <a href="https://stripe.com/blog/accessible-color-systems" target="_blank" rel="noopener" style="color:var(--fg-subtle)">stripe.com/blog/accessible-color-systems</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Stripe's color system is not publicly documented as a design system package. The most authoritative public source is their 2019 engineering blog post "Designing accessible color systems" (Daryl Koopersmith and Wilson Miner). That post describes their approach: colors are generated in CIELAB (a perceptually uniform color space) to ensure uniform contrast across hues at the same nominal lightness level. The key innovation is designing colors with "uniform contrast across all hues" — meaning any color at a given lightness step produces equivalent text legibility. Dark mode support is confirmed from observed app UI but not documented as a token architecture. No token package is published.</p>
+        <h5>Token categories (inferred from blog + app UI)</h5>
+        <ul>
+          <li><strong>Brand blue</strong> — Stripe's primary interaction color; observed in buttons, links, CTAs</li>
+          <li><strong>Status colors</strong> — green (success), red (error), amber (warning) visible in Dashboard UI</li>
+          <li><strong>Neutral grays</strong> — multi-step scale for text, borders, surfaces; density tuned for financial data tables</li>
+          <li><strong>CIELAB perceptual uniformity</strong> — documented: each hue at a given L-level produces equivalent contrast against white/black</li>
+          <li><strong>WCAG 2.0 gates</strong> — cited explicitly: 4.5:1 for small text, 3:1 for large text</li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>Stripe's CIELAB approach pre-dates OKLCH but solves the same problem: perceptual uniformity across hues. Their innovation was designing a palette where "yellow text on white" and "blue text on white" at the same nominal lightness both pass contrast — something RGB/HSL palettes fail at. This is essentially what Nexus's perceptual-grid does, but Stripe published the methodology with user-research evidence for why it matters. Stripe also validated their palette against color-blind users — no other system reviewed documents this.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>Stripe's system is opaque — no token names, no package, no extension points. The 2019 post is the only published artifact. Nexus's approach is more documented and more extensible. Stripe's WCAG 2.0 gating is also weaker than Nexus's APCA approach (WCAG 2.0 is known to produce incorrect results for certain color combinations at medium luminance).</p>
+        <h5>What Nexus is behind on</h5>
+        <p>Stripe documented their color decisions with color-blind user research and published the methodology openly — a credibility move Nexus has not made. Nexus's perceptual-grid is technically equivalent or better but has no published rationale document.</p>
+        <div class="nx-rec-chip chip-adapt">Adapt</div>
+        <p><strong>Nexus recommendation:</strong> Write and publish a "Color math" page for Nexus analogous to Stripe's 2019 blog post — explaining why perceptual-grid.json pins lightness per shade, why OKLCH was chosen over CIELAB, and what the APCA thresholds mean in practice. This costs nothing in code, converts the existing engineering work into a trust signal, and makes Nexus's color system legible to designers who don't read source code. <strong>Reason:</strong> Stripe demonstrates that explaining the methodology is as valuable as implementing it.</p>
+        <h5>Source</h5>
+        <p><a href="https://stripe.com/blog/accessible-color-systems" target="_blank" rel="noopener" class="source-link">https://stripe.com/blog/accessible-color-systems</a> — Oct 15 2019</p>
+      </div>
+    </div>
+
+    <!-- ===== TIER A: NOTION ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Notion — Color System</div>
+          <div class="deep-dive-meta">Tier A · Reviewed May 2026 — observed app UI + "Updating the design of Notion pages" blog post · <a href="https://www.notion.com/blog" target="_blank" rel="noopener" style="color:var(--fg-subtle)">notion.com/blog</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Notion does not publish token documentation or a design system package. Color verdicts are inferred from the Notion app (observed May 2026) and Paul Velleux's blog post "Updating the design of Notion pages." Notion's color language is highly distinctive: it uses a set of named highlight colors (default, gray, brown, orange, yellow, green, blue, purple, pink, red) as first-class content-coloring tools — users apply these to text, backgrounds, and callout blocks. The Notion UI itself (chrome, sidebar, toolbar) is near-monochromatic with a white or very light gray base. Dark mode matches the light semantic — same color names, different underlying values.</p>
+        <h5>Token categories (inferred)</h5>
+        <ul>
+          <li><strong>Content highlight colors</strong> — 10 named colors (gray, brown, orange, yellow, green, blue, purple, pink, red) + default; applied to text foreground and block background</li>
+          <li><strong>UI chrome tokens</strong> — near-monochromatic; sidebar, toolbar, modal surfaces each at subtle stepped grays</li>
+          <li><strong>Spacing/rhythm focus</strong> — the "Updating page design" post focused entirely on standardized spacing intervals and context-aware padding, not on color changes</li>
+          <li><strong>No public alpha variant or P3 documentation</strong></li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>Notion's 10 named content-highlight colors are a user-facing color API — not just a developer token system. This is a distinct pattern: colors as a user-controlled primitive (I can make this block orange) rather than a purely system-controlled semantic. No other reviewed system models color as a user-controllable dimension. For Nexus this is a reminder that "color tokens" might eventually need a user-facing layer, not just a developer layer.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>Notion's highlight system is product-specific. The 10 named colors are part of Notion's content model, not a general-purpose design token strategy. Notion's UI chrome is largely underdocumented and the contrast decisions are not published. There is no APCA audit equivalent visible in public Notion material.</p>
+        <h5>What Nexus is behind on</h5>
+        <p>Notion demonstrates that a design system can expose color as a user-facing primitive. Nexus has no concept of "user-selectable color" in its token model — all colors are developer/designer decisions. For any product that wants to offer color customization to end users, Nexus has no patterns.</p>
+        <div class="nx-rec-chip chip-skip">Skip</div>
+        <p><strong>Nexus recommendation:</strong> Skip the user-facing color API pattern at this stage — it requires product integration that is out of scope for a pre-production component library. However, note the 10-color highlight category as a future candidate for Nexus's data-viz or tag/label token layer. <strong>Reason:</strong> Notion's highlight colors work because they're tied to a document editing paradigm; Nexus doesn't ship document editing primitives. The lesson to internalize is that color can serve user customization — a future recommendation for theming work.</p>
+        <h5>Source</h5>
+        <p><a href="https://www.notion.com/blog/updating-the-design-of-notion-pages" target="_blank" rel="noopener" class="source-link">https://www.notion.com/blog/updating-the-design-of-notion-pages</a></p>
+      </div>
+    </div>
+
+    <!-- ===== TIER A: RAYCAST ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Raycast — Color System</div>
+          <div class="deep-dive-meta">Tier A · Reviewed May 2026 — developers.raycast.com (official API docs) · <a href="https://developers.raycast.com/api-reference/user-interface/colors" target="_blank" rel="noopener" style="color:var(--fg-subtle)">developers.raycast.com/api-reference/user-interface/colors</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Raycast publishes a developer-facing color API at <code>developers.raycast.com/api-reference/user-interface/colors</code>. The API defines 9 named color constants: Blue, Green, Magenta, Orange, Purple, Red, Yellow, PrimaryText, SecondaryText. These are adaptive — they "automatically adapt to the Raycast theme (light or dark)" without developer intervention. The API also exposes a <code>Color.Dynamic</code> type with explicit <code>dark</code> and <code>light</code> properties (plus optional <code>adjustContrast</code>), and <code>Color.Raw</code> for arbitrary CSS values (hex, RGB, HSL). This is a developer ergonomics-first design: the abstraction makes dark/light handling invisible for the common case.</p>
+        <h5>Token categories</h5>
+        <ul>
+          <li><strong>Semantic color constants</strong> — 9 named: Blue, Green, Magenta, Orange, Purple, Red, Yellow (chromatic) + PrimaryText, SecondaryText</li>
+          <li><strong>Color.Dynamic</strong> — explicit dark/light pair for custom colors; <code>adjustContrast</code> flag for automatic WCAG correction</li>
+          <li><strong>Color.Raw</strong> — escape hatch accepting any CSS color string</li>
+          <li><strong>Adaptive by default</strong> — all standard constants auto-switch with system theme; developer never writes conditional color logic</li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>Raycast's <code>adjustContrast</code> boolean on <code>Color.Dynamic</code> is the most developer-ergonomic contrast handling in any reviewed system: the developer says "I want this color to be legible" and the system adjusts — no APCA math required. The adaptive-by-default model (colors that automatically follow theme) is a DX pattern Nexus has not considered. Nexus currently requires developers to use <code>dark:</code> variants explicitly; Raycast inverts this default.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>Raycast's 9-color system is intentionally minimal — it matches the constraint of a macOS command-palette app. No alpha variants, no multi-step scales, no semantic state tokens (no hover/active/disabled). The API is runtime-adaptive but not token-file-driven in the DTCG sense. For a general-purpose component library like Nexus, this vocabulary is too narrow.</p>
+        <h5>What Nexus is behind on</h5>
+        <p>The <code>adjustContrast</code> pattern — automatic contrast correction for user-supplied colors — has no equivalent in Nexus. For any Nexus consumer that wants to support user-defined brand colors (custom accent colors at runtime), there is no contrast safety net. Raycast solves this in three lines of API; Nexus has nothing.</p>
+        <div class="nx-rec-chip chip-adopt">Adopt</div>
+        <p><strong>Nexus recommendation:</strong> Adopt the adaptive-by-default pattern for Nexus's semantic tokens in documentation: document the rule that semantic tokens (<code>nx:bg-primary-background</code>, <code>nx:text-foreground</code>) are always theme-adaptive — developers should never write a dark-mode conditional for a color that already has a semantic name. Make this an explicit rule in the Nexus component authoring guide. The <code>adjustContrast</code> idea is worth a Phase 3 implementation: a JavaScript utility that takes a user-provided hex and snaps it to the nearest APCA-safe Nexus shade. <strong>Reason:</strong> Raycast's ergonomic insight — "colors should be adaptive by default, not opt-in" — maps directly to Nexus's existing semantic layer; it just needs to be stated as a rule.</p>
+        <h5>Source</h5>
+        <p><a href="https://developers.raycast.com/api-reference/user-interface/colors" target="_blank" rel="noopener" class="source-link">https://developers.raycast.com/api-reference/user-interface/colors</a></p>
+      </div>
+    </div>
+
+    <!-- ===== TIER A: FIGMA ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Figma — Color System</div>
+          <div class="deep-dive-meta">Tier A · Reviewed May 2026 — observed Figma app UI + Figma blog design posts · <a href="https://www.figma.com/blog/" target="_blank" rel="noopener" style="color:var(--fg-subtle)">figma.com/blog</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Figma does not publish a public design system or token package. Verdicts are inferred entirely from observing the Figma app UI (May 2026) and design-adjacent blog posts. Figma's color language is structurally interesting: as a tool for designing color systems, Figma uses its own product to demonstrate best practices. The UI employs a very tight neutral palette (dark sidebar, lighter canvas, white modal surfaces) with a single strong accent (blue for active/selected states). Icon colors in the toolbar are all-monochromatic. The Figma brand purple appears only in marketing contexts, not in the product UI itself.</p>
+        <h5>Token categories (inferred)</h5>
+        <ul>
+          <li><strong>Surface hierarchy</strong> — sidebar (dark), canvas (medium), panels (lighter), modals (lightest); 4 visible surface levels</li>
+          <li><strong>Accent</strong> — single blue for selection, active state, links, primary actions</li>
+          <li><strong>Status</strong> — red for errors/destructive, amber for warnings in inspector panels</li>
+          <li><strong>Text hierarchy</strong> — 3+ visible text levels: primary, secondary (labels), tertiary (metadata)</li>
+          <li><strong>No published token documentation, no package</strong></li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>Figma's 4-level surface hierarchy (sidebar / canvas / panel / modal) is the most visible in any reviewed product. The UI makes surface elevation legible at a glance: you always know where you are in the layer stack. This is achieved through neutral-only color steps — no color to communicate elevation, only luminance. For Nexus, this demonstrates that a complete surface story requires more than 2 named surfaces (container + popover) — complex app UIs need at least 3–4 distinct surface levels.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>Figma's surface palette is tuned for a tool UI (many simultaneous panels). A component library serving diverse product types should not prescribe a tool-centric surface hierarchy. The single-blue-accent discipline works for Figma's known brand context; Nexus must support multiple brand colors.</p>
+        <h5>What Nexus is behind on</h5>
+        <p>Figma uses 4 legible surface levels; Nexus's documented surface vocabulary is 2 (container, popover) with muted as an underdocumented third. For any app that approaches Figma's UI complexity — sidebars, inspector panels, floating menus, modals — Nexus's surface tokens run out before the design does.</p>
+        <div class="nx-rec-chip chip-adapt">Adapt</div>
+        <p><strong>Nexus recommendation:</strong> Extend Nexus's surface vocabulary to document 4 canonical levels: <code>background</code> (page canvas), <code>muted</code> (secondary panel/sidebar background), <code>container</code> (cards, raised surfaces), <code>popover</code> (floating overlays and modals). Write this as a one-page surface guide with a diagram. The tokens already exist — they are <code>--color-background</code>, <code>--color-muted</code>, <code>--color-container</code>, <code>--color-popover</code>. The guide makes the system legible. <strong>Reason:</strong> Figma demonstrates that 4 surfaces is the minimum for complex product UIs; Nexus has the tokens but not the contract.</p>
+        <h5>Source</h5>
+        <p><a href="https://www.figma.com/blog/" target="_blank" rel="noopener" class="source-link">https://www.figma.com/blog/</a> — observed UI, May 2026</p>
+      </div>
+    </div>
+
+    <!-- ===== TIER B: SHADCN/UI ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">shadcn/ui — Color System</div>
+          <div class="deep-dive-meta">Tier B · Tailwind v4 compatible · Reviewed May 2026 · <a href="https://ui.shadcn.com/docs/theming" target="_blank" rel="noopener" style="color:var(--fg-subtle)">ui.shadcn.com/docs/theming</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>shadcn/ui's color system is a thin semantic layer of ~22 CSS custom properties defined under <code>:root</code> and <code>.dark</code>. Current version uses OKLCH (e.g. <code>--background: oklch(1 0 0)</code>). There is no primitive scale — semantic tokens reference raw color values directly. The system ships chart-1 through chart-5 and an 8-variant sidebar-* namespace.</p>
+        <h5>Token categories</h5>
+        <ul>
+          <li><strong>background / foreground</strong> — page surface and default text</li>
+          <li><strong>primary / primary-foreground</strong> — high-emphasis brand elements</li>
+          <li><strong>secondary / muted / accent</strong> — supporting surfaces and states</li>
+          <li><strong>destructive</strong> — error actions only; no success/warning/info tokens</li>
+          <li><strong>card / popover / border / input / ring</strong> — structural tokens</li>
+          <li><strong>chart-1 through chart-5</strong> — data-viz palette (Nexus has none)</li>
+          <li><strong>sidebar-* (8 variants)</strong> — per-region semantic theming</li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>The sidebar-* token namespace (sidebar-background, sidebar-foreground, sidebar-accent, etc.) is an explicit acknowledgment that navigation regions often need independent theming. The chart-1–5 palette proves that even a minimal semantic system must address data visualization. The radius-derivation approach (one <code>--radius</code> var scaling to sm/md/lg/xl) is simpler than Nexus's independent radius tokens.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>No primitive scale means design decisions are invisible. No APCA audit path, no multi-brand support, no success/warning/info states. Intentionally minimal — powerful for copy-paste, fragile for programmatic theming at scale.</p>
+        <div class="nx-rec-chip chip-adapt">Adapt</div>
+        <p><strong>Nexus recommendation:</strong> Adopt shadcn's sidebar-* token namespace pattern for Nexus's complex-layout story. Add a semantic namespace for navigation surfaces (<code>--color-nav-background</code>, <code>--color-nav-foreground</code>, <code>--color-nav-item-hover</code>) so sidebars and navigation rails can be independently themed without fighting the page-level tokens. <strong>Reason:</strong> Nexus currently has no navigation-specific tokens; every consumer who builds a sidebar reaches for raw container/muted tokens and makes inconsistent choices. Compared to Tier-A systems like Linear and Figma (which both show clearly distinct sidebar surfaces), this is a semantic gap.</p>
+        <h5>Source</h5>
+        <p><a href="https://ui.shadcn.com/docs/theming" target="_blank" rel="noopener" class="source-link">https://ui.shadcn.com/docs/theming</a></p>
+      </div>
+    </div>
+
+    <!-- ===== TIER B: RADIX THEMES ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Radix Themes — Color System</div>
+          <div class="deep-dive-meta">Tier B · Radix Colors 3.x · Reviewed May 2026 · <a href="https://www.radix-ui.com/colors" target="_blank" rel="noopener" style="color:var(--fg-subtle)">radix-ui.com/colors</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Radix Colors is a standalone <code>@radix-ui/colors</code> package — 32 color families, each with a 12-step scale in solid, alpha, and P3 variants. Step semantics are rigorously documented: steps 1–2 backgrounds, 3–5 interactive components, 6–8 borders, 9–10 solid fills, 11–12 text. Data-attribute driven accent selection (<code>data-accent-color</code>) enables multi-brand without class changes.</p>
+        <h5>Token categories</h5>
+        <ul>
+          <li><strong>--colorname-1 through --colorname-12</strong> — 12 semantic steps per family</li>
+          <li><strong>--colorname-a1 through --colorname-a12</strong> — alpha variants for every step</li>
+          <li><strong>P3 wide-gamut</strong> — confirmed support; "accounts for blending differences in wide gamut color spaces"</li>
+          <li><strong>--accent-surface, --accent-contrast, --accent-indicator, --accent-track</strong> — functional tokens</li>
+          <li>32 color families (including 6 neutral variants: Gray, Mauve, Slate, Sage, Olive, Sand)</li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>The 12-step semantic contract with defined use cases per step is the clearest color contract in any reviewed system. Alpha variants that "appear visually the same when placed over the page background" solve on-colored-surface blending — a concrete problem Nexus has not addressed. P3 delivery for vivid yellows and reds on capable displays.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>32-color family catalog is overwhelming for a focused system. Numbered naming (blue-9 vs primary-background) loses semantic intent. No APCA gating built in — consumers verify contrast independently.</p>
+        <div class="nx-rec-chip chip-adapt">Adapt</div>
+        <p><strong>Nexus recommendation:</strong> Adopt Radix Colors' 12-step semantic contract for Nexus's gray and brand palettes, but keep Nexus's <code>primary-background</code> naming rather than step numbers. Map steps 1–2 → muted/container backgrounds, steps 6–8 → border tokens, steps 9–10 → solid fills, steps 11–12 → foreground. Then add an alpha scale for Nexus's gray primitive. <strong>Reason:</strong> the documented per-step use-case mapping resolves the "which shade do I use" question in every design handoff. Numbered naming is opaque without the docs — the hybrid gives Nexus the clarity contract with discoverable names. Compared to Tier-A benchmarks (Geist, Linear), a well-documented step contract is the shared pattern that makes color systems trustworthy at scale.</p>
+        <h5>Source</h5>
+        <p><a href="https://www.radix-ui.com/colors" target="_blank" rel="noopener" class="source-link">https://www.radix-ui.com/colors</a></p>
+        <p><a href="https://www.radix-ui.com/themes/docs/theme/color" target="_blank" rel="noopener" class="source-link">https://www.radix-ui.com/themes/docs/theme/color</a></p>
+      </div>
+    </div>
+
+    <!-- ===== TIER B: ADOBE SPECTRUM ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Adobe Spectrum — Color System</div>
+          <div class="deep-dive-meta">Tier B · Spectrum 2 · Reviewed May 2026 · <a href="https://spectrum.adobe.com/page/design-tokens/" target="_blank" rel="noopener" style="color:var(--fg-subtle)">spectrum.adobe.com/page/design-tokens</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>Spectrum implements a strict three-tier token hierarchy: global tokens (raw values — color-blue-700), alias tokens (semantic meaning — accent-color-default), and component tokens (component-scoped — button-background-color-default). Light, dark, wireframe, and high-contrast themes ship as first-class modes. Colors use Spectrum's own perceptual-lightness algorithm designed for Adobe's product suite.</p>
+        <h5>Token categories</h5>
+        <ul>
+          <li><strong>Global</strong> — named color scale, typography, spacing primitives</li>
+          <li><strong>Alias</strong> — semantic roles: accent, neutral, negative, notice, positive, informative</li>
+          <li><strong>Component</strong> — per-component overrides, highly granular</li>
+          <li><strong>High-contrast theme</strong> — first-class mode, not an afterthought</li>
+          <li>Status: negative (error), notice (warning), positive (success), informative (info)</li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>Spectrum's three-tier hierarchy (global→alias→component) is the most complete conceptual model. High-contrast as a first-class theme is a genuine accessibility commitment. Component-level token overrides let enterprise consumers retheme individual components without touching the semantic layer.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>Spectrum's component token depth adds massive maintenance overhead — hundreds of per-component variables. The three-tier indirection is powerful but verbose. Nexus's two-tier model (primitives + semantic) is genuinely simpler and sufficient for non-enterprise scope.</p>
+        <div class="nx-rec-chip chip-skip">Skip</div>
+        <p><strong>Nexus recommendation:</strong> Skip the three-tier hierarchy and component-level token layer at this stage. Nexus's two-tier model (primitives + semantic) serves the current scope. However, note the high-contrast theme pattern for Phase 3 accessibility work — Spectrum proves that high-contrast as a first-class mode (not an afterthought) requires planning the semantic layer to support it from the start. Revisit when Nexus has enterprise consumers requiring WCAG AAA / high-contrast compliance. <strong>Reason:</strong> The maintenance cost of per-component tokens is only justified at enterprise scale; Nexus is pre-production with no live consumers. Against Tier-A benchmarks, high-contrast support is not yet a differentiator.</p>
+        <h5>Source</h5>
+        <p><a href="https://github.com/adobe/spectrum-css" target="_blank" rel="noopener" class="source-link">https://github.com/adobe/spectrum-css</a></p>
+        <p><a href="https://spectrum.adobe.com/page/design-tokens/" target="_blank" rel="noopener" class="source-link">https://spectrum.adobe.com/page/design-tokens/</a></p>
+      </div>
+    </div>
+
+    <!-- ===== TIER B: MATERIAL 3 ===== -->
+    <div class="deep-dive-item" x-data="{ open: false }">
+      <div class="deep-dive-header" @click="open = !open">
+        <div>
+          <div class="deep-dive-title">Material Design 3 — Color System</div>
+          <div class="deep-dive-meta">Tier B · Material Web 1.x / MD3 · Reviewed May 2026 · <a href="https://m3.material.io/styles/color/system/overview" target="_blank" rel="noopener" style="color:var(--fg-subtle)">m3.material.io/styles/color</a></div>
+        </div>
+        <div class="deep-dive-chevron" x-text="open ? '▲' : '▼'"></div>
+      </div>
+      <div class="deep-dive-body" x-show="open" x-cloak>
+        <h5>Architecture</h5>
+        <p>MD3's color system builds on tonal palettes derived from a single source color using HCT (Hue-Chroma-Tone) color space. Each tonal palette generates 13 tones (0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100). The system assigns color roles — semantic names that always maintain WCAG-specified contrast. Both light and dark themes use the same role names but draw from different tones.</p>
+        <h5>Token categories</h5>
+        <ul>
+          <li><strong>Primary group</strong> — primary, on-primary, primary-container, on-primary-container, primary-fixed, primary-fixed-dim</li>
+          <li><strong>Secondary &amp; Tertiary</strong> — same structure; tertiary is MD3's complementary accent</li>
+          <li><strong>Surface group</strong> — 8 surface variants (surface, surface-variant, bright, dim, container-lowest/low/high/highest)</li>
+          <li><strong>Error group</strong> — error, on-error, error-container, on-error-container</li>
+          <li><strong>Outline group</strong> — outline, outline-variant</li>
+        </ul>
+        <h5>What we uniquely learn</h5>
+        <p>The on-* naming convention (on-primary, on-surface) makes the foreground/background relationship explicit. The 8-surface-variant hierarchy (surface, surface-variant, bright, dim, container-lowest/low/high/highest) enables complex layered UIs without ad-hoc background values. Tonal palette from a single seed color enables true dynamic theming where every shade is mathematically consistent.</p>
+        <h5>What we'd lose by copying</h5>
+        <p>HCT requires Material Theme Builder tooling to produce. The 5-level surface container hierarchy is more granular than most UIs need. Deeply entangled with Material's visual language — significant adaptation required for non-Material products.</p>
+        <div class="nx-rec-chip chip-adapt">Adapt</div>
+        <p><strong>Nexus recommendation:</strong> Adopt MD3's on-* naming convention as an optional alias pattern for Nexus's foreground tokens. Currently Nexus uses <code>primary-foreground</code> (text on primary background); MD3's <code>on-primary</code> is equivalent but shorter. More importantly, adapt MD3's 8-surface-variant pattern to define 4 Nexus surface levels (background, muted, container, popover) and explicitly document the equivalent of MD3's "container-lowest through container-highest" as Nexus's surface stack. <strong>Reason:</strong> MD3 and Figma independently arrive at the same conclusion — 4+ surface levels are needed for complex UIs. Nexus has the tokens; the missing piece is the documented hierarchy rule. Against Tier-A benchmarks (Figma, Linear), this surface story is a consistent gap.</p>
+        <h5>Source</h5>
+        <p><a href="https://github.com/material-components/material-web/blob/main/tokens/_md-sys-color.scss" target="_blank" rel="noopener" class="source-link">https://github.com/material-components/material-web/blob/main/tokens/_md-sys-color.scss</a></p>
+        <p><a href="https://m3.material.io/styles/color/system/overview" target="_blank" rel="noopener" class="source-link">https://m3.material.io/styles/color/system/overview</a></p>
+      </div>
+    </div>
+  </div><!-- end deep-dives -->
+
+  <!-- RECOMMENDATIONS -->
+  <div class="recs" id="color-recs">
+    <div class="recs-title">Nexus Recommendations</div>
+
+    <!-- #1 -->
+    <div class="rec-item rec-pinned">
+      <div class="rec-header">
+        <div class="rec-rank">1</div>
+        <div class="rec-body">
+          <div class="rec-title">Add alpha-variant token scale</div>
+          <div class="rec-sub-label">What to do</div>
+          <ol class="rec-steps">
+            <li>Extend <code>perceptual-grid.js</code> to emit alpha variants for each shade: <code>--nx-color-gray-a200: oklch(0.72 0 0 / 0.18)</code></li>
+            <li>Add alpha semantic tokens to base semantic files: <code>border.default-alpha</code>, <code>muted-alpha</code></li>
+            <li>Emit Tailwind utilities: <code>nx:bg-muted/50</code> via CSS <code>color-mix()</code> or explicit alpha vars</li>
+            <li>Update <code>audit:contrast</code> to validate alpha tokens against their expected blending surfaces</li>
+          </ol>
+          <div class="rec-sub-label">Before</div>
+          <p class="rec-sub-body">Nexus has no alpha (transparency) tokens. Any component placed on a colored surface — a toast on a tinted sidebar, a tooltip on a card — must use hardcoded <code>rgba()</code> values rather than semantic tokens. This breaks theming: the hardcoded alpha value is tuned for one background and looks wrong on any other. Every Tier-A product system (Geist's Gray-Alpha, Radix's --colorname-a1 through a12) and every Tier-B system with alpha support (Radix) treats alpha variants as table stakes.</p>
+          <div class="rec-sub-label">After</div>
+          <p class="rec-sub-body">Components can express transparent surfaces (<code>nx:bg-muted-alpha</code>, <code>nx:border-default-alpha</code>) that visually match their semantic non-alpha counterparts when placed over the page background. Overlays, glassmorphism-adjacent patterns, and components blended onto colored panels become consistent and themeable. No <code>rgba()</code> values in component source code.</p>
+          <div class="rec-sub-label">Impact on Nexus</div>
+          <ul class="rec-bullets">
+            <li>Unblocks any component that needs to render over a non-white surface (toast, dropdown, popover on tinted container)</li>
+            <li>Closes the largest visible gap versus Radix Colors and Geist's alpha scale</li>
+            <li>Enables consistent dark-mode overlays without per-component rgba gymnastics</li>
+            <li>Makes Nexus's OKLCH pipeline payoff visible: alpha+OKLCH means correct perceptual blending, not RGB approximation</li>
+          </ul>
+          <div class="rec-tags">
+            <span class="rec-tag rec-impact-high">Impact: High</span>
+            <span class="rec-tag rec-effort-med">Effort: Medium</span>
+            <span class="rec-tag">Phase 2</span>
+          </div>
+        </div>
+      </div>
+      <div class="rec-diff">
+        <pre>// tokens/primitives/color.json — proposed alpha extension
+"gray": {
+  "a200": { "$value": "#00000018", "$type": "color" },  // hex-encoded alpha
+  "a300": { "$value": "#00000030", "$type": "color" }
+}
+
+// variables.css — generated OKLCH output
+--nx-color-gray-a200: oklch(0.72 0 0 / 0.094);
+--nx-color-gray-a300: oklch(0.60 0 0 / 0.188);
+
+// tokens/semantic/base-slate-light.json — semantic alpha
+"border": {
+  "default":       { "$value": "{slate.200}", "$type": "color" },
+  "default-alpha": { "$value": "{gray.a200}", "$type": "color" }
+}</pre>
+      </div>
+    </div>
+
+    <!-- #2 -->
+    <div class="rec-item rec-pinned">
+      <div class="rec-header">
+        <div class="rec-rank">2</div>
+        <div class="rec-body">
+          <div class="rec-title">Publish <code>@nexus/colors</code> as a standalone package</div>
+          <div class="rec-sub-label">What to do</div>
+          <ol class="rec-steps">
+            <li>Create <code>packages/colors/</code> with its own <code>package.json</code> exporting <code>dist/primitives.css</code> and <code>dist/semantic-{palette}-{theme}.css</code></li>
+            <li>Point it at the existing generated output from <code>@nexus/core</code> — no new generation logic needed</li>
+            <li>Add <code>@nexus/colors</code> to the monorepo workspace and publish alongside <code>@nexus/tailwind</code></li>
+            <li>Document usage for non-Tailwind consumers (Svelte, React Native CSS, vanilla CSS)</li>
+          </ol>
+          <div class="rec-sub-label">Before</div>
+          <p class="rec-sub-body">Nexus color primitives are locked inside <code>@nexus/tailwind</code>. A consumer using Svelte, React Native StyleSheet, or vanilla CSS cannot use Nexus's perceptual-OKLCH palette without installing the full Tailwind theme. This blocks adoption in non-React stacks. Every benchmarked system with strong primitives ships a separate color package: <code>@radix-ui/colors</code>, <code>geist</code> (font package separate from design system), shadcn's standalone CSS variables.</p>
+          <div class="rec-sub-label">After</div>
+          <p class="rec-sub-body">Any consumer can do <code>npm install @nexus/colors</code> and get the full Nexus primitive and semantic color layer as CSS custom properties, without Tailwind. The OKLCH-at-runtime, APCA-validated palette becomes available to native, server-rendered, and framework-agnostic stacks. The same token files are the source of truth for both packages — no duplication.</p>
+          <div class="rec-sub-label">Impact on Nexus</div>
+          <ul class="rec-bullets">
+            <li>Makes the color pipeline independently useful — Nexus becomes "Nexus colors" + "Nexus components" rather than one inseparable bundle</li>
+            <li>Closes the distribution gap vs Radix Colors (<code>@radix-ui/colors</code>) which is a primary reason Radix Colors has wide adoption beyond Radix components</li>
+            <li>Near-zero implementation cost: the CSS output already exists, only packaging is new</li>
+            <li>Establishes Nexus as a color-system authority, not just a React component library</li>
+          </ul>
+          <div class="rec-tags">
+            <span class="rec-tag rec-impact-high">Impact: High</span>
+            <span class="rec-tag rec-effort-low">Effort: Low</span>
+            <span class="rec-tag">Phase 2</span>
+          </div>
+        </div>
+      </div>
+      <div class="rec-diff">
+        <pre>// packages/colors/package.json (new package)
+{
+  "name": "@nexus/colors",
+  "version": "0.1.0",
+  "exports": {
+    ".":             "./dist/colors.css",
+    "./primitives":  "./dist/primitives.css",
+    "./slate-light": "./dist/base-slate-light.css",
+    "./slate-dark":  "./dist/base-slate-dark.css"
+  }
+}
+
+// Consumer usage (no Tailwind required)
+@import '@nexus/colors/slate-light';
+/* now has --nx-color-slate-500, --color-primary-background, etc. */</pre>
+      </div>
+    </div>
+
+    <!-- #3 -->
+    <div class="rec-item rec-pinned">
+      <div class="rec-header">
+        <div class="rec-rank">3</div>
+        <div class="rec-body">
+          <div class="rec-title">Document the 4-level surface hierarchy and shade use-case guide</div>
+          <div class="rec-sub-label">What to do</div>
+          <ol class="rec-steps">
+            <li>Write a "Surfaces" guide: <code>background</code> (canvas) → <code>muted</code> (sidebar/secondary panel) → <code>container</code> (cards, raised) → <code>popover</code> (floating/modal)</li>
+            <li>Write a "Shade use-case guide" mapping each primitive shade step to its canonical role (50–100: backgrounds, 150–200: borders, 300–400: secondary text, 500–600: primary text on dark, 700–950: fills)</li>
+            <li>Add an eslint-plugin-nexus rule (Phase 3) that flags raw primitive usage where a semantic token exists</li>
+            <li>Link both guides from <code>CLAUDE.md</code> and component templates</li>
+          </ol>
+          <div class="rec-sub-label">Before</div>
+          <p class="rec-sub-body">Nexus has the tokens for 4 surface levels — <code>background</code>, <code>muted</code>, <code>container</code>, <code>popover</code> — but no documented contract for when to use each. The shade primitive scale (50 through 950) has 11 steps with no published guide for which shade to use for borders vs text vs fills. Every designer and developer makes these choices independently, producing inconsistent outputs. Geist documents step semantics; Radix Colors documents 12-step roles; Figma and Linear demonstrate 4-surface UIs — all without Nexus having documented its own equivalent contract.</p>
+          <div class="rec-sub-label">After</div>
+          <p class="rec-sub-body">A designer opening a Nexus Figma file or a developer writing a component knows exactly which surface token to use for a sidebar (muted), a card (container), or a modal (popover). Shade steps have documented use cases — no more "should this border be 200 or 300?" The perceptual-grid.json lightness pinning is explained publicly so consumers understand why the shades look good.</p>
+          <div class="rec-sub-label">Impact on Nexus</div>
+          <ul class="rec-bullets">
+            <li>Resolves the most common design-handoff friction point: "which background color do I use here?"</li>
+            <li>Matches the documentation pattern of every Tier-A benchmark (Geist, Radix, MD3) that drives their adoption</li>
+            <li>Zero code cost — existing tokens, new words only</li>
+            <li>Positions Nexus's perceptual-grid innovation as a explained, trustworthy system rather than an internal implementation detail</li>
+          </ul>
+          <div class="rec-tags">
+            <span class="rec-tag">Impact: High</span>
+            <span class="rec-tag rec-effort-low">Effort: Low</span>
+            <span class="rec-tag">Phase 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- #4 -->
+    <div class="rec-item">
+      <div class="rec-header">
+        <div class="rec-rank">4</div>
+        <div class="rec-body">
+          <div class="rec-title">Add chart/data-viz color tokens</div>
+          <div class="rec-sub-label">What to do</div>
+          <ol class="rec-steps">
+            <li>Add <code>tokens/semantic/data-viz.json</code> with 5 categorical colors and 2 sequential scales</li>
+            <li>Validate each categorical color against white and page-background with APCA (update <code>audit:contrast</code>)</li>
+            <li>Emit <code>--color-chart-1</code> through <code>--color-chart-5</code> CSS variables from the semantic layer</li>
+            <li>Add Tailwind utilities: <code>nx:bg-chart-1</code> through <code>nx:bg-chart-5</code>, plus <code>nx:text-chart-*</code></li>
+          </ol>
+          <div class="rec-sub-label">Before</div>
+          <p class="rec-sub-body">Nexus ships no data-visualization color tokens. Any consumer building a dashboard, analytics view, or report will reach for off-system colors — typically from the charting library's own defaults (Recharts' blues, Chart.js' primaries). These off-system colors will clash with Nexus's perceptual palette and won't be APCA-validated. shadcn ships chart-1 through chart-5; Spectrum ships a full data-viz categorical palette. Nexus ships nothing.</p>
+          <div class="rec-sub-label">After</div>
+          <p class="rec-sub-body">Consumers building charts and dashboards with Recharts, Nivo, or D3 can use <code>--color-chart-1</code> through <code>--color-chart-5</code> as their categorical palette and trust that the colors are perceptually distinct, APCA-validated against the page background, and harmonious with Nexus's brand colors.</p>
+          <div class="rec-sub-label">Impact on Nexus</div>
+          <ul class="rec-bullets">
+            <li>Closes the gap vs every Tier-A product system (all ship data-viz in their products)</li>
+            <li>Prevents the most common off-system color bleed — charting is the #1 place designers reach for raw hex values</li>
+            <li>Low lift: 5 JSON entries + audit script update; re-uses existing OKLCH pipeline</li>
+            <li>Makes Nexus viable as the complete color system for any analytics or dashboard product</li>
+          </ul>
+          <div class="rec-tags">
+            <span class="rec-tag rec-impact-high">Impact: High</span>
+            <span class="rec-tag rec-effort-med">Effort: Medium</span>
+            <span class="rec-tag">Phase 2</span>
+          </div>
+        </div>
+      </div>
+      <div class="rec-diff">
+        <pre>// tokens/semantic/data-viz.json (new file)
+{
+  "chart": {
+    "1": { "$value": "{blue.500}",   "$type": "color" },
+    "2": { "$value": "{green.500}",  "$type": "color" },
+    "3": { "$value": "{amber.500}",  "$type": "color" },
+    "4": { "$value": "{red.500}",    "$type": "color" },
+    "5": { "$value": "{violet.500}", "$type": "color" }
+  }
+}</pre>
+      </div>
+    </div>
+
+    <!-- #5 -->
+    <div class="rec-item">
+      <div class="rec-header">
+        <div class="rec-rank">5</div>
+        <div class="rec-body">
+          <div class="rec-title">Surface role vocabulary is shallower than complex-app benchmarks require</div>
+          <div class="rec-sub-label">What to do</div>
+          <ol class="rec-steps">
+            <li>Audit existing surface token names vs MD3's 8-surface hierarchy and Figma's observed 4-level approach</li>
+            <li>Add <code>--color-nav-background</code> and <code>--color-nav-foreground</code> to semantic layer (shadcn's sidebar-* lesson)</li>
+            <li>Document the canonical surface stack: canvas → secondary panel → card/raised → overlay</li>
+            <li>Review and align Storybook examples to use the documented surface stack consistently</li>
+          </ol>
+          <div class="rec-sub-label">Before</div>
+          <p class="rec-sub-body">Nexus has <code>container</code> and <code>popover</code> as named surface layers plus <code>muted</code> as an implicit third. For complex app surfaces — sidebar vs main canvas vs modal vs toast — consumers use ad-hoc background values rather than consistent semantic tokens. MD3 ships 8 surface variants; Figma's UI demonstrates 4 visible levels; Linear's redesign explicitly cited surface elevation as a key design decision. Nexus's surface token vocabulary does not support these patterns.</p>
+          <div class="rec-sub-label">After</div>
+          <p class="rec-sub-body">Nexus components and consumers share a 4-level surface contract that maps to every benchmarked product system. Sidebar components reliably use <code>muted</code>; cards use <code>container</code>; modals and dropdowns use <code>popover</code>; nav panels use <code>nav-background</code>. No more inconsistent background choices across teams.</p>
+          <div class="rec-sub-label">Impact on Nexus</div>
+          <ul class="rec-bullets">
+            <li>Closes the surface story gap vs MD3, Figma, and Linear — three systems that independently arrived at 4+ surface levels</li>
+            <li>Unblocks sidebar and navigation components that currently lack a correct background token</li>
+            <li>Makes Nexus's component library feel "product-ready" for complex dashboard and tool UIs</li>
+            <li>Requires only token additions and documentation — no breaking changes to existing semantic tokens</li>
+          </ul>
+          <div class="rec-tags">
+            <span class="rec-tag">Impact: Medium</span>
+            <span class="rec-tag rec-effort-med">Effort: Medium</span>
+            <span class="rec-tag">Phase 3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end recs -->
+</div><!-- end tokens-color -->
+
+<!-- ===== STUB SECTIONS ===== -->
+<template x-for="stub in stubSections" :key="stub.id">
+  <div :id="'sec-'+stub.id" class="section" :class="{ active: activeSection === stub.id }">
+    <div class="section-header">
+      <div class="section-tag" x-text="stub.tag"></div>
+      <div class="section-title" x-text="stub.title"></div>
+      <div class="exec-line" x-text="stub.exec"></div>
+    </div>
+    <div style="margin:var(--s-6) 0;padding:var(--s-4);background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-lg);">
+      <div style="font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-3);">Rubric</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);">
+        <div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--lead-fg);margin-bottom:4px;">Lead means:</div>
+          <div style="font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;" x-text="stub.rubricLead"></div>
+        </div>
+        <div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--behind-fg);margin-bottom:4px;">Behind means:</div>
+          <div style="font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;" x-text="stub.rubricBehind"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stub-banner">
+      <h3>Coming in Phase 2+</h3>
+      <p>This section's matrix, deep dives, and recommendations will be populated in a future phase. When populated, the matrix will cover Nexus + 6 Tier-A benchmarks (Linear, Vercel/Geist, Stripe, Notion, Raycast, Figma) + 4 Tier-B references (shadcn/ui, Radix Themes, Adobe Spectrum, Material 3).</p>
+    </div>
+    <div style="margin:var(--s-4) 0;">
+      <div style="font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-3);">Tier A — Aspirational benchmarks</div>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--s-2);margin-bottom:var(--s-3);">
+        <span class="tag" style="background:var(--parity-bg);color:var(--parity-fg);">Linear</span>
+        <span class="tag" style="background:var(--parity-bg);color:var(--parity-fg);">Vercel / Geist</span>
+        <span class="tag" style="background:var(--parity-bg);color:var(--parity-fg);">Stripe</span>
+        <span class="tag" style="background:var(--parity-bg);color:var(--parity-fg);">Notion</span>
+        <span class="tag" style="background:var(--parity-bg);color:var(--parity-fg);">Raycast</span>
+        <span class="tag" style="background:var(--parity-bg);color:var(--parity-fg);">Figma</span>
+      </div>
+      <div style="font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-3);">Tier B — Technical reference</div>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--s-2);">
+        <span class="tag">shadcn/ui</span>
+        <span class="tag">Radix Themes</span>
+        <span class="tag">Adobe Spectrum</span>
+        <span class="tag">Material 3</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+</div><!-- end main-content -->
+
+<!-- RIGHT PANEL -->
+<aside class="right-panel">
+  <div x-show="activeSection === 'dashboard'">
+    <div class="right-panel-title">On this page</div>
+    <ul class="toc-list">
+      <li class="toc-item"><a class="toc-link" href="#sec-dashboard">Dashboard</a></li>
+    </ul>
+    <div class="honest-take">
+      <div class="honest-take-title">Phase 1 verdicts</div>
+      <div class="honest-take-row"><span class="honest-take-label">Lead</span><span class="honest-take-count count-lead">12</span></div>
+      <div class="honest-take-row"><span class="honest-take-label">Parity</span><span class="honest-take-count count-parity">16</span></div>
+      <div class="honest-take-row"><span class="honest-take-label">Behind</span><span class="honest-take-count count-behind">7</span></div>
+      <div class="honest-take-row"><span class="honest-take-label">Inferred</span><span class="honest-take-count count-inferred">6</span></div>
+      <div style="margin-top:var(--s-3);font-size:10px;color:var(--fg-subtle);">Tokens &gt; Color only (11 systems × 5 dimensions). 17 sections are stubs.</div>
+    </div>
+  </div>
+
+  <div x-show="activeSection === 'tokens-color'">
+    <div class="right-panel-title">On this page</div>
+    <ul class="toc-list">
+      <li class="toc-item"><a class="toc-link" href="#color-matrix">Matrix (11 rows)</a></li>
+      <li class="toc-item"><a class="toc-link" href="#color-deepdives">Deep dives (10)</a></li>
+      <li class="toc-item"><a class="toc-link" href="#color-recs">Recommendations (5)</a></li>
+    </ul>
+    <div class="honest-take">
+      <div class="honest-take-title">Honest Take</div>
+      <div class="honest-take-row"><span class="honest-take-label">Lead</span><span class="honest-take-count count-lead">12</span></div>
+      <div class="honest-take-row"><span class="honest-take-label">Parity</span><span class="honest-take-count count-parity">16</span></div>
+      <div class="honest-take-row"><span class="honest-take-label">Behind</span><span class="honest-take-count count-behind">7</span></div>
+      <div class="honest-take-row"><span class="honest-take-label">Inferred</span><span class="honest-take-count count-inferred">6</span></div>
+      <div style="margin-top:var(--s-3);font-size:10px;color:var(--fg-subtle)">11 systems &times; 5 dimensions. Tier-A verdicts marked inferred where authoritative docs unavailable.</div>
+    </div>
+  </div>
+
+  <template x-for="stub in stubSections" :key="stub.id">
+    <div x-show="activeSection === stub.id">
+      <div class="right-panel-title">On this page</div>
+      <ul class="toc-list">
+        <li class="toc-item"><a class="toc-link">Rubric</a></li>
+        <li class="toc-item"><a class="toc-link">Coming Phase 2+</a></li>
+        <li class="toc-item"><a class="toc-link">Systems in scope</a></li>
+      </ul>
+      <div class="honest-take" style="margin-top:var(--s-5);">
+        <div class="honest-take-title">Status</div>
+        <div style="font-size:var(--text-xs);color:var(--fg-subtle);line-height:1.5;">Stub — rubric defined. Will cover 6 Tier-A + 4 Tier-B systems when populated.</div>
+      </div>
+    </div>
+  </template>
+</aside>
+
+</main>
+</div><!-- end app -->
+
+<script>
+function app() {
+  return {
+    theme: localStorage.getItem('nxi-theme') || 'dark',
+    activeSection: 'dashboard',
+    searchQuery: '',
+
+    sections: [
+      { id: 'dashboard',           label: 'Dashboard',                done: false, visible: true },
+      { id: 'tokens-color',        label: '1.1 Tokens — Color',       done: true,  visible: true },
+      { id: 'tokens-spacing',      label: '1.2 Tokens — Spacing',     done: false, visible: true },
+      { id: 'tokens-radius',       label: '1.3 Tokens — Radius',      done: false, visible: true },
+      { id: 'tokens-typography',   label: '1.4 Tokens — Typography',  done: false, visible: true },
+      { id: 'tokens-shadow',       label: '1.5 Tokens — Shadow',      done: false, visible: true },
+      { id: 'tokens-motion',       label: '1.6 Tokens — Motion',      done: false, visible: true },
+      { id: 'tokens-focus',        label: '1.7 Tokens — Focus Ring',  done: false, visible: true },
+      { id: 'tokens-border',       label: '1.8 Tokens — Border Width',done: false, visible: true },
+      { id: 'tokens-zindex',       label: '1.9 Tokens — Z-Index',     done: false, visible: true },
+      { id: 'tokens-breakpoints',  label: '1.10 Tokens — Breakpoints',done: false, visible: true },
+      { id: 'comp-architecture',   label: '2. Component Architecture', done: false, visible: true },
+      { id: 'comp-coverage',       label: '3. Component Coverage',    done: false, visible: true },
+      { id: 'layout-primitives',   label: '4. Layout Primitives',     done: false, visible: true },
+      { id: 'patterns',            label: '5. Patterns',              done: false, visible: true },
+      { id: 'iconography',         label: '6. Iconography',           done: false, visible: true },
+      { id: 'motion',              label: '7. Motion',                done: false, visible: true },
+      { id: 'accessibility',       label: '8. Accessibility',         done: false, visible: true },
+      { id: 'theming',             label: '9. Theming',               done: false, visible: true },
+      { id: 'rtl-i18n',            label: '10. RTL & i18n',           done: false, visible: true },
+      { id: 'tooling',             label: '11. Tooling',              done: false, visible: true },
+      { id: 'distribution',        label: '12. Distribution',         done: false, visible: true },
+      { id: 'design-integration',  label: '13. Design Integration',   done: false, visible: true },
+      { id: 'documentation',       label: '14. Documentation',        done: false, visible: true },
+      { id: 'governance',          label: '15. Governance',           done: false, visible: true },
+      { id: 'testing',             label: '16. Testing',              done: false, visible: true },
+      { id: 'performance',         label: '17. Performance',          done: false, visible: true },
+      { id: 'data-viz',            label: '18. Data Viz',             done: false, visible: true },
+    ],
+
+    get visibleSections() {
+      if (!this.searchQuery) return this.sections;
+      const q = this.searchQuery.toLowerCase();
+      return this.sections.filter(s => s.label.toLowerCase().includes(q));
+    },
+
+    stubSections: [
+      { id:'tokens-spacing', tag:'1. Tokens', title:'Spacing',
+        exec:'Nexus ships a 27-step spacing scale mapped to CSS custom properties via Tailwind v4 @theme. Against Tier-A benchmarks: Linear uses very compact row heights (density story); Geist documents spacing in its Figma Core system but not publicly as tokens.',
+        rubricLead:'Nexus\'s spacing tokens are more comprehensive or more rhythmically consistent than the compared system\'s scale.',
+        rubricBehind:'The compared system ships density modes, rem-based scaling, or a documented spatial system that Nexus lacks.' },
+      { id:'tokens-radius', tag:'1. Tokens', title:'Radius',
+        exec:'Nexus ships 7 named radius tokens (sm through full) across 5 modes (blunt, sharp, subtle, smooth, mellow). Tier-A: Geist documents radius as a token; Linear uses border-radius in its compact UI; Raycast has fixed platform-native radius.',
+        rubricLead:'Nexus\'s radius token system supports more modes or a clearer semantic contract than the compared system.',
+        rubricBehind:'The compared system derives radius from a single base token (simpler, more predictable) or provides device-native radius semantics.' },
+      { id:'tokens-typography', tag:'1. Tokens', title:'Typography',
+        exec:'Nexus emits composite @utility typography classes with automatic Google Fonts loading. Tier-A: Geist ships Geist Sans and Geist Mono as its own typefaces (geist npm package v1.7.1); Linear uses custom Inter variant; Stripe uses Stripe Sans internally.',
+        rubricLead:'Nexus\'s typography utilities are richer, more consistently applied, or more automatically loaded than the compared system.',
+        rubricBehind:'The compared system ships a custom typeface, variable-font support, or documented type pairing guidelines that Nexus lacks.' },
+      { id:'tokens-shadow', tag:'1. Tokens', title:'Shadow / Elevation',
+        exec:'Nexus ships theme-aware shadow tokens in 5 shadow modes. Tier-A: Figma uses subtle elevation shadows to distinguish panel layers; Linear uses minimal shadow (elevation through color step, not shadow); Geist documents shadow in its Figma system.',
+        rubricLead:'Nexus\'s shadow tokens are theme-aware and mode-switchable in a way the compared system does not support.',
+        rubricBehind:'The compared system ships an elevation semantic layer with automatic dark-mode color-mixing that Nexus must manually maintain per-theme.' },
+      { id:'tokens-motion', tag:'1. Tokens', title:'Motion',
+        exec:'Nexus ships no motion/animation tokens. Tier-A: Linear is known for fluid, performant animations (issue transitions, drag interactions); Raycast has distinctive spring-physics animations; Figma uses careful micro-animations in inspector panels.',
+        rubricLead:'Nexus ships motion tokens with reduced-motion defaults baked in at the token level.',
+        rubricBehind:'The compared system ships motion tokens, documented easing curves, and reduced-motion guidance that Nexus does not have at all.' },
+      { id:'tokens-focus', tag:'1. Tokens', title:'Focus Ring',
+        exec:'Nexus uses shadow-focus-default and shadow-focus-error tokens (box-shadow based). Tier-A: Raycast is keyboard-first; Linear has consistent focus indicators; Figma has distinctive blue focus rings matching its interaction model.',
+        rubricLead:'Nexus\'s focus-ring tokens cover more states or are more accessible by default than the compared system.',
+        rubricBehind:'The compared system documents a more complete focus indicator contract (multi-surface, high-contrast aware) than Nexus provides.' },
+      { id:'tokens-border', tag:'1. Tokens', title:'Border Width',
+        exec:'Nexus ships border-width tokens in 5 modes (vega through nova). No Tier-A system exposes multi-mode border width tokens publicly. Geist uses subtle 1px borders throughout; Linear uses hairline borders in compact list views.',
+        rubricLead:'Nexus\'s border-width token system supports more density/style variation than the compared system.',
+        rubricBehind:'The compared system has more granular semantic border tokens (inner, outer, focus, separator) than Nexus provides.' },
+      { id:'tokens-zindex', tag:'1. Tokens', title:'Z-Index',
+        exec:'Nexus ships no z-index tokens. Tier-A: Figma has complex panel layering (inspector, canvas, modal, tooltip all coexist); Linear has overlapping sidebar/modal/command-menu layers; no Tier-A system publishes z-index tokens explicitly.',
+        rubricLead:'Nexus ships a semantic z-index scale preventing overlay layer collisions across components.',
+        rubricBehind:'The compared system ships a documented z-index token contract; Nexus has none, creating overlay conflicts in complex UIs.' },
+      { id:'tokens-breakpoints', tag:'1. Tokens', title:'Breakpoints',
+        exec:'Nexus uses Tailwind v4 default breakpoints with nx: prefix. Tier-A: Geist documents breakpoints in its Figma Core system; Notion pages adapt to mobile via responsive layout; Raycast is desktop-only (no responsive breakpoints needed).',
+        rubricLead:'Nexus\'s breakpoint tokens are semantically named and documented for component-level responsive behavior.',
+        rubricBehind:'The compared system ships a semantic responsive model (window classes, fluid type) that is more adaptive-display-aware than Nexus\'s pixel-breakpoint approach.' },
+      { id:'comp-architecture', tag:'2. Component Architecture', title:'Architecture',
+        exec:'Nexus uses CVA for variant APIs, Radix Slot for asChild composition, data-slot/data-variant/data-size attrs. Tier-A: Raycast\'s UI API is SwiftUI-like (native macOS primitives); Figma components are web-only; Linear\'s component API is not public.',
+        rubricLead:'Nexus\'s component architecture has a clearer, more consistent, or more extensible structural contract than the compared system.',
+        rubricBehind:'The compared system ships a polymorphism model, compound variant system, or composition primitive that Nexus is missing or has implemented less cleanly.' },
+      { id:'comp-coverage', tag:'3. Component Coverage', title:'Coverage',
+        exec:'Nexus ships 13 UI components. Tier-A: Raycast ships List, Grid, Detail, Form, ActionPanel as its primary component surface; Geist ships 60+ components; Figma has no public component library for external use.',
+        rubricLead:'Nexus ships equivalent component fidelity (accessibility, API, documentation) at higher coverage relative to the compared system.',
+        rubricBehind:'The compared system covers interaction patterns, form elements, or layout primitives that Nexus does not ship yet.' },
+      { id:'layout-primitives', tag:'4. Layout Primitives', title:'Layout Primitives',
+        exec:'Nexus ships no layout primitives. Tier-A: Geist ships Grid and other layout components; Notion\'s page layout is a product-specific primitive; Linear\'s list/sidebar layout is component-level, not token-level.',
+        rubricLead:'Nexus ships composable layout primitives handling common layout patterns without requiring direct Tailwind class knowledge.',
+        rubricBehind:'The compared system ships layout components (Grid, Stack, Flex, Container) that Nexus does not have.' },
+      { id:'patterns', tag:'5. Patterns', title:'Patterns',
+        exec:'Nexus ships no pattern-level compositions. Tier-A: Raycast\'s List pattern (isLoading, filtering, section headers) is a complete interaction pattern; Linear\'s issue list is a sophisticated multi-column pattern; Notion\'s page is a pattern.',
+        rubricLead:'Nexus ships documented, accessible patterns handling real interaction flows beyond component primitives.',
+        rubricBehind:'The compared system ships packaged patterns (DataTable, FormField groups, Navigation patterns) that Nexus has not codified.' },
+      { id:'iconography', tag:'6. Iconography', title:'Iconography',
+        exec:'Nexus uses Tabler Icons via @tabler/icons-react; not packaged as part of the DS. Tier-A: Geist ships a custom "Icon set tailored for developer tools"; Raycast ships system SF Symbols; Linear uses custom icons consistent with its visual language.',
+        rubricLead:'Nexus ships a curated, packaged icon set with documented size scale, semantic names, and accessible usage guidelines.',
+        rubricBehind:'The compared system ships a first-class, custom icon library with SVG optimization and grid sizing that Nexus relies on a third-party package to provide.' },
+      { id:'motion', tag:'7. Motion', title:'Motion',
+        exec:'Nexus ships no motion tokens. Tier-A: Raycast is known for spring-physics animations; Linear\'s 2026 interface refresh emphasized "calmer" motion; Figma uses micro-animations for panel transitions and tool selection.',
+        rubricLead:'Nexus ships duration/easing tokens, enter/exit animation defaults, and reduced-motion handling as a first-class token category.',
+        rubricBehind:'The compared system ships a documented motion system with explicit reduced-motion variants; Nexus has no equivalent.' },
+      { id:'accessibility', tag:'8. Accessibility', title:'Accessibility',
+        exec:'Nexus uses Radix Primitives for a11y + APCA contrast via yarn audit:contrast. Tier-A: Raycast is keyboard-first by design; Figma documents accessibility features of the app itself; Stripe documented color-blind user research for their accessible color system.',
+        rubricLead:'Nexus\'s accessibility posture (APCA thresholds, focus patterns, ARIA contracts) exceeds what the compared system ships as defaults.',
+        rubricBehind:'The compared system ships stricter built-in accessibility contracts, screen-reader annotations, or documented ARIA authoring guidelines than Nexus provides.' },
+      { id:'theming', tag:'9. Theming', title:'Theming',
+        exec:'Nexus supports 5 base palettes × 5 brands × 5 size/radius/shadow/typography modes. Tier-A: Geist supports light/dark/system; Raycast supports light/dark + Dynamic Color type for custom colors; Notion supports light/dark + sepia; Linear supports light/dark.',
+        rubricLead:'Nexus supports more theme dimensions, easier runtime theme switching, or more documented theme extension points than the compared system.',
+        rubricBehind:'The compared system ships a runtime theme builder, CSS-variable override API, or user-selectable theme without a build step that Nexus requires.' },
+      { id:'rtl-i18n', tag:'10. RTL & i18n', title:'RTL & i18n',
+        exec:'Nexus has no documented RTL or i18n support. Tier-A: Notion supports right-to-left content in its page editor; Figma has RTL UI support; Linear\'s internationalization status is not publicly documented.',
+        rubricLead:'Nexus ships logical CSS properties throughout, documented RTL testing, and text-expansion handling in layout components.',
+        rubricBehind:'The compared system ships RTL variants, uses logical CSS by default, and documents i18n behavior; Nexus has none of these.' },
+      { id:'tooling', tag:'11. Tooling', title:'Tooling',
+        exec:'Nexus ships token generator CLI (yarn tokens:tailwind, yarn tokens:modular) and contrast auditing. Tier-A: Raycast ships an Extension API with CLI tooling; Geist has Figma Core as its source of truth. No Tier-A system ships a public design-token CLI.',
+        rubricLead:'Nexus ships CLI tooling for scaffolding, auditing, and automating design-token updates that other systems lack.',
+        rubricBehind:'The compared system ships a CLI with component scaffolding, codemods for breaking changes, or ESLint rules enforcing design-system usage; Nexus has none.' },
+      { id:'distribution', tag:'12. Distribution', title:'Distribution',
+        exec:'Nexus ships @nexus/tailwind, @nexus/react, @nexus/core as separate npm packages. Tier-A: Geist ships its typeface as the geist npm package (v1.7.1); Raycast ships its API as @raycast/api; no Tier-A system ships a full design token npm package.',
+        rubricLead:'Nexus\'s package boundaries, CSS layer strategy, and tree-shaking behavior are clearly documented and well-optimized.',
+        rubricBehind:'The compared system documents its CSS layer cascade, bundle impact per component, and tree-shaking contract more completely than Nexus does.' },
+      { id:'design-integration', tag:'13. Design Integration', title:'Design Integration',
+        exec:'Nexus has Figma variable mapping, Code Connect guidelines, and MCP integration. Tier-A: Figma itself is the design integration benchmark — variables, component instances, auto layout; Geist is built in Figma Core; Linear designs in Figma.',
+        rubricLead:'Nexus\'s Figma-to-code round-trip (variables, Code Connect, MCP) is more complete and automated than the compared system\'s design integration.',
+        rubricBehind:'The compared system has a tighter, officially maintained Figma library with versioned variable sets that Nexus\'s integration does not match.' },
+      { id:'documentation', tag:'14. Documentation', title:'Documentation',
+        exec:'Nexus has Storybook with Autodocs but no separate doc site. Tier-A: Geist has vercel.com/geist as a full doc site; Raycast has developers.raycast.com with complete API reference; Stripe has detailed engineering blog documentation.',
+        rubricLead:'Nexus\'s documentation is more complete, more searchable, or ships better usage guidance than the compared system.',
+        rubricBehind:'The compared system ships a dedicated public doc site with component examples, design rationale, and contribution guides that Nexus\'s Storybook does not replace.' },
+      { id:'governance', tag:'15. Governance', title:'Governance',
+        exec:'Nexus is pre-production with no live consumers; governance is intentionally deferred per project-stage.md. Tier-A: Geist is governed by Vercel\'s design team; Raycast extension API is versioned and breaking changes are announced.',
+        rubricLead:'Nexus ships a governance model making contribution, versioning, and deprecation decisions predictable for consumers.',
+        rubricBehind:'The compared system has a documented RFC process, SemVer policy, and deprecation timeline that Nexus does not yet have.' },
+      { id:'testing', tag:'16. Testing', title:'Testing',
+        exec:'Nexus uses Storybook play functions, addon-a11y, and Chromatic. Tier-A: Raycast tests extensions via its own sandbox; Figma has internal testing for its component library; no Tier-A system publishes its testing strategy publicly.',
+        rubricLead:'Nexus\'s testing strategy (visual regression, a11y automation, interaction testing) is more complete or better integrated than the compared system.',
+        rubricBehind:'The compared system ships contract testing, cross-browser visual regression at scale, or performance benchmarks that Nexus does not have.' },
+      { id:'performance', tag:'17. Performance', title:'Performance',
+        exec:'Nexus bundles Tailwind v4 CSS with nx: prefix scoping; exact CSS payload per component is not benchmarked. Tier-A: Raycast is native macOS (no CSS); Figma\'s web app performance is separately studied; Geist is optimized for Next.js SSR.',
+        rubricLead:'Nexus\'s CSS payload per component, bundle size, and hydration cost are demonstrably lower or better optimized than the compared system.',
+        rubricBehind:'The compared system publishes per-component bundle size data, ships CSS Modules scoping, or documents hydration cost; Nexus has no published performance benchmarks.' },
+      { id:'data-viz', tag:'18. Data Viz', title:'Data Visualization',
+        exec:'Nexus ships no chart primitives or data-viz color scales. Tier-A: Linear ships charts for analytics; Stripe\'s Dashboard is chart-heavy; Notion ships charts; Figma\'s inspect panel shows data. All Tier-A products use data visualization heavily.',
+        rubricLead:'Nexus ships APCA-validated categorical and sequential data-viz palettes ready for charting library integration.',
+        rubricBehind:'The compared system ships a data-viz color scale, chart component primitives, or documented data-viz accessibility guidance that Nexus does not have.' },
+    ],
+
+    toggleTheme() {
+      this.theme = this.theme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('nxi-theme', this.theme);
+    },
+
+    setSection(id) {
+      this.activeSection = id;
+      window.scrollTo(0, 0);
+    },
+
+    filterSections() {
+      if (this.searchQuery) {
+        const q = this.searchQuery.toLowerCase();
+        const match = this.sections.find(s => s.label.toLowerCase().includes(q));
+        if (match) this.activeSection = match.id;
+      }
+    },
+  };
+}
+
+function matrix() {
+  return {
+    openDrawer: null,
+    sortCol: null,
+    sortAsc: true,
+
+    rows: [
+      // ===== NEXUS (self-reference) =====
+      {
+        system: 'Nexus DS', version: 'Current — May 2026', tier: 'Self',
+        palette: 'lead', semantic: 'lead', darkmode: 'parity', colorspace: 'lead', distribution: 'behind',
+        evidence: `10+ color families × 11 shades (50–950), W3C DTCG hex on disk → OKLCH at build via culori. Perceptual lightness pinned per shade in <code>perceptual-grid.json</code> — L overrides input hex. 100+ named semantic tokens across 6 status categories × 9 state variants. APCA gating via <code>yarn audit:contrast</code> with per-tier thresholds (Lc 75/60/45). No alpha scale; no standalone color package; no data-viz tokens.`,
+        teach: 'Perceptual-grid lightness pinning is unique among all reviewed systems. APCA gating with per-tier thresholds (body text / UI labels / incidental text) is more nuanced than WCAG 2.0 binary pass/fail.',
+        source: 'packages/core/tokens/primitives/color.json + packages/tailwind/nexus.css (local repo)',
+        reviewed: 'Reviewed: May 2026 — repo commit bda66dd',
+      },
+
+      // ===== TIER A: LINEAR =====
+      {
+        system: 'Linear', version: 'App UI — Mar 2026 refresh', tier: 'A',
+        palette: 'inferred', semantic: 'inferred', darkmode: 'inferred', colorspace: 'inferred', distribution: 'behind',
+        evidence: `No public token docs. Inferred from app UI (May 2026) and blog post "A calmer, more consistent interface" (Mar 12 2026). Near-monochromatic base, single violet accent. Surface elevation visible (sidebar darker than canvas). Dark mode confirmed. No published palette scale, alpha variants, or token package.`,
+        teach: 'Extreme chromatic restraint — one accent, monochromatic base — is a design system decision that can improve perceived quality more than adding more tokens. The 2026 redesign used *fewer* colors to achieve *more* visual calm.',
+        source: 'https://linear.app/blog',
+        reviewed: 'Reviewed: May 2026 — observed app UI + blog. No authoritative token docs.',
+      },
+
+      // ===== TIER A: VERCEL/GEIST =====
+      {
+        system: 'Vercel / Geist', version: 'Geist DS — May 2026', tier: 'A',
+        palette: 'parity', semantic: 'parity', darkmode: 'parity', colorspace: 'lead', distribution: 'behind',
+        evidence: `10-step color scales (Gray, Gray-Alpha, Blue, Red, Amber, Green, Teal, Purple, Pink). Step semantics documented: 1–3 backgrounds, 4–6 borders, 7–8 high-contrast backgrounds, 9–10 text. P3 wide-gamut confirmed. Gray-Alpha scale for blending. Background 1 + Background 2 page tokens. No standalone color npm package; token values not machine-readable from docs page (right-click copy only).`,
+        teach: 'Published step-semantic mapping (which steps = backgrounds, borders, fills, text) is the design contract that makes a palette usable across a team. P3 as a default (not a roadmap item) shows Vercel\'s display-quality commitment.',
+        source: 'https://vercel.com/geist/colors',
+        reviewed: 'Reviewed: May 2026 — official Geist documentation site',
+      },
+
+      // ===== TIER A: STRIPE =====
+      {
+        system: 'Stripe', version: 'Blog post — Oct 2019', tier: 'A',
+        palette: 'inferred', semantic: 'inferred', darkmode: 'inferred', colorspace: 'parity', distribution: 'behind',
+        evidence: `Blog post "Designing accessible color systems" (Koopersmith & Miner, Oct 2019) documents CIELAB-based palette generation ensuring uniform contrast across hues. WCAG 2.0 gates: 4.5:1 small text, 3:1 large text. Color-blind user testing documented. No public token package; no token names; no distribution path. Dark mode visible in Stripe Dashboard UI but not documented as token architecture.`,
+        teach: 'Stripe validated their palette with color-blind user research and published the methodology — the credibility signal, not just the implementation. Their CIELAB perceptual uniformity approach predates OKLCH but solves the same problem: hue-independent contrast at a given lightness.',
+        source: 'https://stripe.com/blog/accessible-color-systems',
+        reviewed: 'Reviewed: May 2026 — Oct 2019 blog post + observed Dashboard UI',
+      },
+
+      // ===== TIER A: NOTION =====
+      {
+        system: 'Notion', version: 'App UI — May 2026', tier: 'A',
+        palette: 'inferred', semantic: 'inferred', darkmode: 'inferred', colorspace: 'inferred', distribution: 'behind',
+        evidence: `No public token docs. 10 named content-highlight colors (default, gray, brown, orange, yellow, green, blue, purple, pink, red) as user-facing primitives. UI chrome near-monochromatic. Dark mode confirmed. Blog post "Updating the design of Notion pages" focuses on spacing/rhythm rather than color. No palette scale, alpha variants, or token package published.`,
+        teach: 'Color as a user-facing primitive — not just a developer token — is a distinct pattern. Notion\'s 10 named highlight colors are a user API: end users control content color. No other reviewed system models color as a user-controllable dimension.',
+        source: 'https://www.notion.com/blog/updating-the-design-of-notion-pages',
+        reviewed: 'Reviewed: May 2026 — blog post + observed app UI. No authoritative token docs.',
+      },
+
+      // ===== TIER A: RAYCAST =====
+      {
+        system: 'Raycast', version: 'API docs — May 2026', tier: 'A',
+        palette: 'behind', semantic: 'parity', darkmode: 'lead', distribution: 'behind',
+        colorspace: 'parity',
+        evidence: `Official API at developers.raycast.com. 9 semantic constants: Blue, Green, Magenta, Orange, Purple, Red, Yellow, PrimaryText, SecondaryText. Adaptive-by-default: all constants auto-switch with system theme. Color.Dynamic type with dark/light pair + adjustContrast flag for automatic WCAG correction. Color.Raw accepts any CSS color. No alpha scale, no palette steps, no DTCG tokens.`,
+        teach: 'adjustContrast flag on Color.Dynamic — automatic contrast correction for user-supplied colors — is the most developer-ergonomic accessibility feature in any reviewed system. Adaptive-by-default (colors follow theme without conditional logic) inverts Nexus\'s current opt-in approach.',
+        source: 'https://developers.raycast.com/api-reference/user-interface/colors',
+        reviewed: 'Reviewed: May 2026 — official Raycast developer documentation',
+      },
+
+      // ===== TIER A: FIGMA =====
+      {
+        system: 'Figma', version: 'App UI — May 2026', tier: 'A',
+        palette: 'inferred', semantic: 'inferred', darkmode: 'inferred', colorspace: 'inferred', distribution: 'behind',
+        evidence: `No public design system or token package. Inferred from app UI (May 2026) and Figma blog. 4 visible surface levels: sidebar (dark) / canvas (medium) / panels (lighter) / modals (lightest). Single blue accent for selection and primary actions. 3-level text hierarchy (primary, secondary, tertiary). No published token names, no npm package.`,
+        teach: 'Four legible surface levels (sidebar/canvas/panel/modal) achieved through neutral luminance steps only — no color used for elevation, only gray value. The most visible surface hierarchy of any reviewed product.',
+        source: 'https://www.figma.com/blog/',
+        reviewed: 'Reviewed: May 2026 — observed app UI. No authoritative design system documentation.',
+      },
+
+      // ===== TIER B: SHADCN/UI =====
+      {
+        system: 'shadcn/ui', version: 'Tailwind v4 (2026)', tier: 'B',
+        palette: 'behind', semantic: 'parity', darkmode: 'parity', colorspace: 'parity', distribution: 'lead',
+        evidence: `22 semantic CSS custom properties; OKLCH values. No primitive scale. chart-1–5 tokens for data-viz. 8-variant sidebar-* namespace. Light/dark via .dark class. Distribution lead: copy-paste model; no install required; standalone colors not needed because there is no primitive layer to distribute. No alpha scale, no P3 tokens, no APCA gating.`,
+        teach: 'Chart-1–5 semantic tokens prove even a minimal color system must address data visualization. Sidebar-* token namespace acknowledges that navigation regions need independent theming — a pattern Nexus lacks.',
+        source: 'https://ui.shadcn.com/docs/theming',
+        reviewed: 'Reviewed: May 2026 — ui.shadcn.com docs',
+      },
+
+      // ===== TIER B: RADIX THEMES =====
+      {
+        system: 'Radix Themes', version: '3.x (2026)', tier: 'B',
+        palette: 'parity', semantic: 'parity', darkmode: 'parity', colorspace: 'lead', distribution: 'lead',
+        evidence: `32 color families × 12 steps each + alpha variants (--colorname-a1 through a12) + P3 wide-gamut. Step semantics documented: 1–2 backgrounds, 3–5 components, 6–8 borders, 9–10 solid fills, 11–12 text. Data-attribute accent switching (data-accent-color). @radix-ui/colors ships as standalone package. No APCA gate.`,
+        teach: 'Rigorously documented 12-step semantic contract is the clearest color contract in any reviewed system. Alpha variants for on-colored-surface blending are a concrete solved problem. P3 wide-gamut delivery on capable displays.',
+        source: 'https://www.radix-ui.com/colors',
+        reviewed: 'Reviewed: May 2026 — radix-ui.com/colors + github.com/radix-ui/themes',
+      },
+
+      // ===== TIER B: ADOBE SPECTRUM =====
+      {
+        system: 'Adobe Spectrum', version: 'Spectrum 2 (2026)', tier: 'B',
+        palette: 'lead', semantic: 'lead', darkmode: 'lead', colorspace: 'parity', distribution: 'parity',
+        evidence: `3-tier hierarchy: global (raw values) → alias (semantic roles) → component (per-component overrides). Status: negative, notice, positive, informative — more expressive than Nexus's error/warning/success/information. High-contrast theme as first-class mode. Light, dark, wireframe, high-contrast all bundled. Spectrum's own perceptual-lightness algorithm (not OKLCH). Component-token depth adds heavy maintenance overhead.`,
+        teach: 'Component-level token overrides let enterprise consumers retheme individual components without touching semantic tokens. High-contrast as a first-class theme (not afterthought) requires planning from the semantic layer upward.',
+        source: 'https://spectrum.adobe.com/page/design-tokens/',
+        reviewed: 'Reviewed: May 2026 — spectrum.adobe.com + github.com/adobe/spectrum-css',
+      },
+
+      // ===== TIER B: MATERIAL 3 =====
+      {
+        system: 'Material 3', version: 'Material Web 1.x (2026)', tier: 'B',
+        palette: 'lead', semantic: 'lead', darkmode: 'lead', colorspace: 'lead', distribution: 'parity',
+        evidence: `HCT color space (Hue-Chroma-Tone) — seed → 13 tones per palette. 50+ named color roles: primary/on-primary/primary-container groups, secondary, tertiary, 8 surface variants (surface, surface-variant, bright, dim, container-lowest/low/high/highest), error group, outline group. on-* naming makes fg/bg relationship explicit. Light + dark use same role names, different tones. Requires Theme Builder tooling.`,
+        teach: 'On-* naming (on-primary, on-surface) is more terse than -foreground suffix equivalents. 8-surface-variant hierarchy enables complex layered UIs. Tonal palette from a single seed enables mathematically coherent dynamic theming.',
+        source: 'https://m3.material.io/styles/color/system/overview',
+        reviewed: 'Reviewed: May 2026 — m3.material.io + material-web GitHub repo',
+      },
+    ],
+
+    get sortedRows() {
+      if (!this.sortCol) return this.rows;
+      return [...this.rows].sort((a, b) => {
+        const va = a[this.sortCol] || '';
+        const vb = b[this.sortCol] || '';
+        const order = { lead: 0, parity: 1, inferred: 2, behind: 3 };
+        const na = order[va] !== undefined ? order[va] : va;
+        const nb = order[vb] !== undefined ? order[vb] : vb;
+        if (na < nb) return this.sortAsc ? -1 : 1;
+        if (na > nb) return this.sortAsc ? 1 : -1;
+        return 0;
+      });
+    },
+
+    sortBy(col) {
+      if (this.sortCol === col) {
+        this.sortAsc = !this.sortAsc;
+      } else {
+        this.sortCol = col;
+        this.sortAsc = true;
+      }
+      this.openDrawer = null;
+    },
+
+    toggleDrawer(idx) {
+      this.openDrawer = this.openDrawer === idx ? null : idx;
+    },
+
+    capitalize(s) {
+      return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+    },
+  };
+}
+</script>
+</body>
+</html>
