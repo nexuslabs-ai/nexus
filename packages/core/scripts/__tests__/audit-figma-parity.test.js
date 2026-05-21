@@ -217,4 +217,27 @@ describe('parseArgs', () => {
     const args = parseArgs(['--category']);
     expect(args.category).toBe(null);
   });
+
+  it('skips bare `--` without consuming the next argv slot', () => {
+    const args = parseArgs(['--', '--category', 'color']);
+    expect(args.category).toBe('color');
+  });
+
+  it('skips `--=value` (empty key) without writing args[""]', () => {
+    const args = parseArgs(['--=value', '--category', 'color']);
+    expect(args.category).toBe('color');
+    expect(args['']).toBeUndefined();
+  });
+
+  it('skips `---foo` (triple-dash junk flag) without writing args["-foo"]', () => {
+    const args = parseArgs(['---foo', 'bar', '--category', 'color']);
+    expect(args.category).toBe('color');
+    expect(args['-foo']).toBeUndefined();
+  });
+
+  it('skips `--snapshot=` (empty value) so the default snapshot survives', () => {
+    const args = parseArgs(['--snapshot=', '--category', 'color']);
+    expect(args.snapshot).not.toBe('');
+    expect(args.category).toBe('color');
+  });
 });

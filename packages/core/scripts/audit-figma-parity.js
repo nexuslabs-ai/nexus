@@ -12,16 +12,16 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const DEFAULT_SNAPSHOT = path.join(TOKENS_DIR, 'figma-snapshot.json');
 
 /**
- * Each registry entry is one of:
- *  - Single-mode: { file: '<path>' }
- *      diff `snapshot[category]` against the one code file.
- *  - Multi-mode:  { dir: '<path>', filePattern: '{cat}-{mode}.json' }
- *      with `--mode <name>`, diff `snapshot[category][mode]` against `<dir>/<cat>-<mode>.json`.
- *  - Mode × theme: { dir: '<path>', filePattern: '{cat}-{mode}-{theme}.json' }
- *      with `--mode <name> --theme <variant>`, diff `snapshot[cat][mode][theme]` against the matching file.
+ * Today only the single-mode shape is wired:
+ *   { file: '<path>' } — diff `snapshot[category]` against the one code file.
  *
- * #61/#62/#63 add their categories by filling paths into this map. Snapshot/CLI shape is
- * locked in .claude/rules/figma.md — Code-vs-Figma Parity Audit.
+ * The intended shapes for multi-mode and mode × theme (wired alongside #61/#62/#63):
+ *   { dir: '<path>', filePattern: '{cat}-{mode}.json' }
+ *   { dir: '<path>', filePattern: '{cat}-{mode}-{theme}.json' }
+ *
+ * Those branches add `--mode`/`--theme` parsing, a path resolver, and a deeper
+ * snapshot subtree read (`snapshot[cat][mode]` / `snapshot[cat][mode][theme]`).
+ * See .claude/rules/figma.md — Code-vs-Figma Parity Audit → Snapshot shape.
  */
 const CATEGORIES = {
   color: {
@@ -43,10 +43,13 @@ export function parseArgs(argv) {
     const arg = argv[i];
     if (!arg.startsWith('--')) continue;
     if (arg === '--') continue;
+    if (arg[2] === '-') continue;
     const eq = arg.indexOf('=');
     if (eq === 2) continue;
     if (eq !== -1) {
-      args[arg.slice(2, eq)] = arg.slice(eq + 1);
+      const val = arg.slice(eq + 1);
+      if (val.length === 0) continue;
+      args[arg.slice(2, eq)] = val;
       continue;
     }
     const next = argv[i + 1];
@@ -69,7 +72,7 @@ function normalizeValue(value, type) {
     'value' in value
   ) {
     const rounded = Math.round(value.value * 10000) / 10000;
-    return `${rounded}${value.unit ?? 'px'}`;
+    return `${rounded}${value.unit || 'px'}`;
   }
   if (typeof value === 'object' && value !== null) {
     throw new Error(
@@ -206,6 +209,11 @@ function main() {
   const codeTs = gitLastCommitTs(config.file);
   const snapshotTs = gitLastCommitTs(args.snapshot);
   const staleGuardSkipped = codeTs === null || snapshotTs === null;
+  if (staleGuardSkipped && process.env.CI) {
+    fail(
+      `stale-snapshot guard could not run under CI (git timestamps unavailable for ${path.basename(config.file)} or the snapshot). CI must be able to verify snapshot freshness — fix git availability or stop running this audit in CI.`
+    );
+  }
   if (!staleGuardSkipped && codeTs > snapshotTs) {
     const codeDate = new Date(codeTs * 1000).toISOString().slice(0, 10);
     const snapDate = new Date(snapshotTs * 1000).toISOString().slice(0, 10);
