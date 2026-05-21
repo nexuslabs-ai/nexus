@@ -17,14 +17,24 @@ permissions:
 # ============================================
 # Required status checks (branch protection on `main`)
 # ============================================
-# The following job names are listed as required checks in branch protection
-# rules. Renaming or removing any of them requires a coordinated protection-rule
-# update in the same change — otherwise every subsequent PR blocks on a check
-# that no longer exists.
+# Every job below is listed as a required status check in branch protection
+# rules on `main`. Renaming or removing any of them requires a coordinated
+# protection-rule update in the same change — otherwise every subsequent PR
+# blocks on a check that no longer exists.
 #
-#   - test-coverage   (renamed from test-storybook when consolidated)
+#   - format-check
+#   - lint
+#   - build
+#   - typecheck      (job name: "TypeScript Check")
+#   - test-unit      (job name: "Unit Tests")
+#   - audit-tokens   (job name: "Audit Tokens")
+#   - test-coverage  (job name: "Test Coverage"; renamed from test-storybook
+#                     when consolidated; see also #67)
+#   - build-storybook
+#   - bundle-size
 #
-# If you add a new required check here, also update the protection rule.
+# If you add or rename a required check, update both this list AND the
+# protection rule.
 
 jobs:
   # ============================================
@@ -54,21 +64,22 @@ jobs:
               - 'packages/test-utils/**'
             packages:
               - 'packages/**'
+              - 'apps/**'
             ci:
               - '.github/workflows/**'
 
   # ============================================
-  # Always Run (on code changes)
+  # format-check + lint (always run, full-tree)
   # ============================================
   #
-  # format-check and lint run full-tree (no `--filter='...[origin/base]'`)
-  # while build, typecheck, and test run affected-only. The asymmetry is
-  # intentional: local `yarn lint` / `yarn format:check` run full-tree, so CI
-  # mirrors that exactly. A divergence here would let a stale rule miss a file
-  # locally that CI then flags (or vice versa). Affected-only lint is also
-  # error-prone — a config change in eslint.config.js must invalidate the
-  # whole tree, which `--filter` won't catch. Keep these jobs full-tree until
-  # wall-clock pain forces the move.
+  # These two jobs run full-tree (no `--filter='...[origin/base]'`) while
+  # build, typecheck, and test run affected-only. The asymmetry is intentional:
+  # local `yarn lint` / `yarn format:check` run full-tree, so CI mirrors that
+  # exactly. A divergence here would let a stale rule miss a file locally that
+  # CI then flags (or vice versa). Affected-only lint is also error-prone — a
+  # config change in eslint.config.js must invalidate the whole tree, which
+  # `--filter` won't catch. Keep these jobs full-tree until wall-clock pain
+  # forces the move.
 
   format-check:
     name: Format Check
@@ -200,8 +211,8 @@ jobs:
         with:
           name: build-artifacts
 
-      - name: Restore Turbo cache
-        uses: actions/cache@v4
+      - name: Restore Turbo cache (read-only)
+        uses: actions/cache/restore@v4
         with:
           path: .turbo
           key: turbo-${{ runner.os }}-${{ github.sha }}
@@ -223,9 +234,10 @@ jobs:
   # ============================================
 
   # Runs the `unit` vitest project under jsdom — a deliberate fast-fail signal
-  # before the slower `test-coverage` job (which runs both projects, including
-  # `unit`, under Playwright with coverage instrumentation). The unit project
-  # therefore runs twice in CI; the duplication is the point.
+  # before the slower `test-coverage` job (which runs both vitest projects:
+  # `unit` in jsdom and `storybook` under Playwright, plus coverage). The unit
+  # project therefore runs twice in CI; the duplication is the point — this
+  # job fails fast without the Playwright + coverage overhead.
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest

@@ -5,11 +5,6 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "build:tailwind": {
-      "dependsOn": [],
-      "outputs": ["../tailwind/*.css"],
-      "cache": false
-    },
     "dev": {
       "cache": false,
       "persistent": true
