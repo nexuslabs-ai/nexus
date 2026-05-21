@@ -14,6 +14,18 @@ permissions:
   contents: read
   pull-requests: read
 
+# ============================================
+# Required status checks (branch protection on `main`)
+# ============================================
+# The following job names are listed as required checks in branch protection
+# rules. Renaming or removing any of them requires a coordinated protection-rule
+# update in the same change — otherwise every subsequent PR blocks on a check
+# that no longer exists.
+#
+#   - test-coverage   (renamed from test-storybook when consolidated)
+#
+# If you add a new required check here, also update the protection rule.
+
 jobs:
   # ============================================
   # Change Detection
@@ -117,7 +129,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -142,9 +154,11 @@ jobs:
             turbo-${{ runner.os }}-
 
       - name: Build affected packages
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            yarn turbo build --filter='...[origin/${{ github.base_ref }}]'
+            yarn turbo build --filter="...[origin/$BASE_REF]"
           else
             yarn turbo build
           fi
@@ -153,9 +167,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: |
-            packages/**/dist
-            .turbo
+          path: packages/**/dist
           retention-days: 1
           if-no-files-found: warn
 
@@ -167,7 +179,7 @@ jobs:
     name: TypeScript Check
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.packages == 'true' && needs.build.result == 'success'
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -188,10 +200,20 @@ jobs:
         with:
           name: build-artifacts
 
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
       - name: TypeScript check (affected packages)
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            yarn turbo typecheck --filter='...[origin/${{ github.base_ref }}]'
+            yarn turbo typecheck --filter="...[origin/$BASE_REF]"
           else
             yarn turbo typecheck
           fi
@@ -200,11 +222,15 @@ jobs:
   # React Package Jobs
   # ============================================
 
+  # Runs the `unit` vitest project under jsdom — a deliberate fast-fail signal
+  # before the slower `test-coverage` job (which runs both projects, including
+  # `unit`, under Playwright with coverage instrumentation). The unit project
+  # therefore runs twice in CI; the duplication is the point.
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -230,7 +256,7 @@ jobs:
     name: Audit Tokens
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.react == 'true'
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -264,15 +290,13 @@ jobs:
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:class-refs
 
-  # NOTE: branch protection on `main` lists this job as a required status check
-  # (renamed from `test-storybook` when that job was consolidated into this one).
-  # If you rename or remove `test-coverage`, update the protection rule in the
-  # same change — otherwise every subsequent PR blocks on a vanished check.
+  # Required status check — see "Required status checks" block at top of file
+  # before renaming or removing.
   test-coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -322,7 +346,7 @@ jobs:
     name: Build Storybook
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -355,7 +379,7 @@ jobs:
     name: Bundle Size
     runs-on: ubuntu-latest
     needs: [changes, build]
-    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
