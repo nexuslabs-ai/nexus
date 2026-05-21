@@ -67,10 +67,11 @@ describe('generateTailwindPackage', () => {
     expect(variablesCSS).toMatch(/^:root \{/m);
   });
 
-  it('emits shadow primitives in :root (light values)', () => {
+  it('emits shadow and focus primitives in :root (light values)', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
-    expect(rootBlock).toMatch(/--nx-shadow-focus-default-color:/);
+    expect(rootBlock).toMatch(/--nx-focus-color-default:/);
+    expect(rootBlock).toMatch(/--nx-focus-geometry-spread: 2px;/);
   });
 
   // Every var(--nx-shadow-*) ref in nexus.css must have a matching decl in
