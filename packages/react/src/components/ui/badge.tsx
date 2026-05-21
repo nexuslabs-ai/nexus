@@ -33,7 +33,7 @@ const badgeVariants = cva(
       {
         variant: 'secondary',
         fill: 'solid',
-        className: 'nx:bg-secondary-background nx:text-secondary-text',
+        className: 'nx:bg-secondary-background nx:text-secondary-foreground',
       },
       {
         variant: 'outline',
@@ -66,12 +66,12 @@ const badgeVariants = cva(
       {
         variant: 'default',
         fill: 'light',
-        className: 'nx:bg-primary-surface nx:text-primary-text',
+        className: 'nx:bg-primary-subtle nx:text-primary-subtle-foreground',
       },
       {
         variant: 'secondary',
         fill: 'light',
-        className: 'nx:bg-secondary-surface nx:text-secondary-text',
+        className: 'nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
       },
       {
         variant: 'outline',
@@ -82,22 +82,23 @@ const badgeVariants = cva(
       {
         variant: 'error',
         fill: 'light',
-        className: 'nx:bg-error-surface nx:text-error-text',
+        className: 'nx:bg-error-subtle nx:text-error-subtle-foreground',
       },
       {
         variant: 'warning',
         fill: 'light',
-        className: 'nx:bg-warning-surface nx:text-warning-text',
+        className: 'nx:bg-warning-subtle nx:text-warning-subtle-foreground',
       },
       {
         variant: 'success',
         fill: 'light',
-        className: 'nx:bg-success-surface nx:text-success-text',
+        className: 'nx:bg-success-subtle nx:text-success-subtle-foreground',
       },
       {
         variant: 'information',
         fill: 'light',
-        className: 'nx:bg-information-surface nx:text-information-text',
+        className:
+          'nx:bg-information-subtle nx:text-information-subtle-foreground',
       },
     ],
     defaultVariants: {

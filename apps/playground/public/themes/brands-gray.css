@@ -37,7 +37,7 @@ html.dark {
   --nx-color-secondary-background-active: var(--nx-color-gray-600);
   --nx-color-secondary-disabled: var(--nx-color-gray-950);
   --nx-color-secondary-subtle: var(--nx-color-gray-800);
-  --nx-color-secondary-subtle-foreground: var(--nx-color-gray-400);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-gray-200);
   --nx-color-secondary-subtle-hover: var(--nx-color-gray-700);
   --nx-color-secondary-subtle-active: var(--nx-color-gray-600);
 }

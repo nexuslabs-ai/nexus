@@ -35,8 +35,20 @@ const BASE_PAIRS = [
   },
   { text: 'error.foreground', bg: 'error.background', minLc: 60, tier: 'ui' },
   {
+    text: 'error.subtle-foreground',
+    bg: 'error.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
     text: 'success.foreground',
     bg: 'success.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'success.subtle-foreground',
+    bg: 'success.subtle',
     minLc: 60,
     tier: 'ui',
   },
@@ -47,8 +59,20 @@ const BASE_PAIRS = [
     tier: 'ui',
   },
   {
+    text: 'warning.subtle-foreground',
+    bg: 'warning.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
     text: 'information.foreground',
     bg: 'information.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'information.subtle-foreground',
+    bg: 'information.subtle',
     minLc: 60,
     tier: 'ui',
   },
@@ -62,8 +86,20 @@ const BRAND_PAIRS = [
     tier: 'ui',
   },
   {
+    text: 'primary.subtle-foreground',
+    bg: 'primary.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
     text: 'secondary.foreground',
     bg: 'secondary.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'secondary.subtle-foreground',
+    bg: 'secondary.subtle',
     minLc: 60,
     tier: 'ui',
   },

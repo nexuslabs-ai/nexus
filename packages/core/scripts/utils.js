@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import * as prettier from 'prettier';
+import { fileURLToPath } from 'url';
 
 import {
   hexToOklchMechanical,
@@ -1051,4 +1053,44 @@ export function generateBaseLayerCSS() {
   }
 }
 `;
+}
+
+const SCRIPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Format every `.css` file directly inside `distDir` in place with prettier,
+ * using the repo's `.prettierrc`. Resolves the config from the script's own
+ * location so callers can write to a temporary dist (e.g. tests) without
+ * losing config resolution.
+ *
+ * Only walks the top level — both dist layouts (`dist/tailwind`,
+ * `dist/modular`) are flat today. Throws if a subdirectory appears so a
+ * future nested layout cannot silently skip files.
+ */
+export async function formatDistCssFiles(distDir) {
+  const config = await prettier.resolveConfig(SCRIPTS_DIR);
+  const entries = fs.readdirSync(distDir, { withFileTypes: true });
+  const cssFiles = [];
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      throw new Error(
+        `formatDistCssFiles: unexpected subdirectory '${entry.name}' in ${distDir}. ` +
+          `Helper assumes a flat layout; update it to walk recursively if nesting is intentional.`
+      );
+    }
+    if (entry.isFile() && entry.name.endsWith('.css')) {
+      cssFiles.push(entry.name);
+    }
+  }
+
+  for (const name of cssFiles) {
+    const filePath = path.join(distDir, name);
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const formatted = await prettier.format(raw, {
+      ...config,
+      filepath: filePath,
+    });
+    fs.writeFileSync(filePath, formatted);
+  }
 }

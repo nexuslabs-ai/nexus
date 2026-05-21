@@ -87,7 +87,7 @@ function ColorSelect({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-7 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer hover:nx:bg-accent nx:transition-colors"
+          className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-7 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -134,7 +134,7 @@ function TokenSelect({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer hover:nx:bg-accent nx:transition-colors nx:capitalize"
+          className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors nx:capitalize"
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>
@@ -301,7 +301,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
                 id="icon-library-select"
                 value={iconLibrary}
                 onChange={(e) => setIconLibrary(e.target.value as IconLibrary)}
-                className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer hover:nx:bg-accent nx:transition-colors"
+                className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
               >
                 {ICON_LIBRARIES.map((lib) => (
                   <option key={lib} value={lib}>
@@ -326,7 +326,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
       <div className="nx:p-4 nx:border-t nx:border-border-default">
         <button
           onClick={handleReset}
-          className="nx:w-full nx:flex nx:items-center nx:justify-center nx:gap-2 nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium hover:nx:bg-accent nx:transition-colors"
+          className="nx:w-full nx:flex nx:items-center nx:justify-center nx:gap-2 nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:bg-background-hover nx:transition-colors"
         >
           <PlaygroundIcon name="x" size={14} />
           Reset to Default

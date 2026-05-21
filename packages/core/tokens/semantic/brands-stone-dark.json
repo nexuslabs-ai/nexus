@@ -63,7 +63,7 @@
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{stone.400}",
+      "$value": "{stone.200}",
       "$type": "color"
     },
     "subtle-hover": {

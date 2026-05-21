@@ -110,7 +110,7 @@ html.dark {
   --nx-color-error-background-active: var(--nx-color-red-800);
   --nx-color-error-disabled: var(--nx-color-red-900);
   --nx-color-error-subtle: var(--nx-color-red-950);
-  --nx-color-error-subtle-foreground: var(--nx-color-red-300);
+  --nx-color-error-subtle-foreground: var(--nx-color-red-200);
   --nx-color-error-subtle-hover: var(--nx-color-red-900);
   --nx-color-error-subtle-active: var(--nx-color-red-800);
   --nx-color-success-background: var(--nx-color-green-600);

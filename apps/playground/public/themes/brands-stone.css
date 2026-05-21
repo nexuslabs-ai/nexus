@@ -37,7 +37,7 @@ html.dark {
   --nx-color-secondary-background-active: var(--nx-color-stone-600);
   --nx-color-secondary-disabled: var(--nx-color-stone-950);
   --nx-color-secondary-subtle: var(--nx-color-stone-800);
-  --nx-color-secondary-subtle-foreground: var(--nx-color-stone-400);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-stone-200);
   --nx-color-secondary-subtle-hover: var(--nx-color-stone-700);
   --nx-color-secondary-subtle-active: var(--nx-color-stone-600);
 }
