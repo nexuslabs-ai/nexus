@@ -14,28 +14,10 @@ permissions:
   contents: read
   pull-requests: read
 
-# ============================================
-# Required status checks (branch protection on `main`)
-# ============================================
-# The job `name:` values below are listed as required status checks in
-# branch protection rules on `main`. Renaming any of them (the `name:`
-# field, not the YAML id) requires a coordinated protection-rule update
-# in the same change — otherwise every subsequent PR blocks on a check
-# that no longer exists.
-#
-#   - Format Check
-#   - Lint
-#   - Build
-#   - TypeScript Check
-#   - Unit Tests
-#   - Audit Tokens
-#   - Test Coverage     (renamed from "Storybook Tests" when consolidated;
-#                        see also #67 for the coverage-instrumentation gap)
-#   - Build Storybook
-#   - Bundle Size
-#
-# If you add or rename a required check, update both this list AND the
-# protection rule.
+# Branch protection on `main` requires only the `CI Status` aggregator
+# job (defined at the bottom of this file). Individual jobs are gated by
+# path filters, so a docs-only PR may skip most of them — the aggregator
+# treats skipped as success.
 
 jobs:
   # ============================================
@@ -77,18 +59,8 @@ jobs:
             ci:
               - '.github/workflows/**'
 
-  # ============================================
-  # format-check + lint (always run, full-tree)
-  # ============================================
-  #
-  # These two jobs run full-tree (no `--filter='...[origin/base]'`) while
-  # build, typecheck, and test run affected-only. The asymmetry is intentional:
-  # local `yarn lint` / `yarn format:check` run full-tree, so CI mirrors that
-  # exactly. A divergence here would let a stale rule miss a file locally that
-  # CI then flags (or vice versa). Affected-only lint is also error-prone — a
-  # config change in eslint.config.js must invalidate the whole tree, which
-  # `--filter` won't catch. Keep these jobs full-tree until wall-clock pain
-  # forces the move.
+  # format-check and lint run full-tree to mirror local `yarn lint` /
+  # `yarn format:check`.
 
   format-check:
     name: Format Check
@@ -242,11 +214,7 @@ jobs:
   # React Package Jobs
   # ============================================
 
-  # Runs the `unit` vitest project under jsdom — a deliberate fast-fail signal
-  # before the slower `test-coverage` job (which runs both vitest projects:
-  # `unit` in jsdom and `storybook` under Playwright, plus coverage). The unit
-  # project therefore runs twice in CI; the duplication is the point — this
-  # job fails fast without the Playwright + coverage overhead.
+  # Fast-fail unit subset; coverage runs separately in test-coverage.
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -272,7 +240,9 @@ jobs:
     name: Audit Tokens
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    # Gate on `packages` (not `react`): the freshness check covers
+    # apps/playground/** and audit:class-refs scans apps/** sources.
+    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -289,17 +259,19 @@ jobs:
       - name: Regenerate token outputs (tailwind + modular)
         id: regen
         run: |
+          set -euo pipefail
           yarn tokens:tailwind
           yarn tokens:modular
 
       - name: Check token output freshness
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
+        # `git status --porcelain` (not `git diff`) so untracked new files also fail.
         run: |
-          DIRS="packages/tailwind apps/playground/public/themes apps/playground/src/styles"
-          # Use git status --porcelain instead of git diff so new untracked
-          # files (e.g. a new CSS filename from a future token category) also
-          # trigger the failure.
-          DIRTY=$(git status --porcelain -- $DIRS)
+          set -euo pipefail
+          DIRTY=$(git status --porcelain -- \
+            packages/tailwind \
+            apps/playground/public/themes \
+            apps/playground/src/styles)
           if [ -n "$DIRTY" ]; then
             echo "::error::Token output is stale. Affected paths:"
             echo "$DIRTY"
@@ -315,8 +287,6 @@ jobs:
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:class-refs
 
-  # Required status check — see "Required status checks" block at top of file
-  # before renaming or removing.
   test-coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
@@ -413,3 +383,36 @@ jobs:
 
       - name: Check bundle size
         run: yarn size-limit
+
+  # ============================================
+  # Aggregator — the single required status check
+  # ============================================
+  # Runs unconditionally so docs-only / .claude/** / repo-root PRs still
+  # report a status that satisfies branch protection. Skipped upstream jobs
+  # (filtered out by `if:`) are treated as success; only `failure` and
+  # `cancelled` propagate.
+  ci-status:
+    name: CI Status
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - format-check
+      - lint
+      - build
+      - typecheck
+      - test-unit
+      - audit-tokens
+      - test-coverage
+      - build-storybook
+      - bundle-size
+    steps:
+      - name: Aggregate required-check results
+        run: |
+          set -euo pipefail
+          results='${{ toJSON(needs) }}'
+          echo "$results"
+          if echo "$results" | grep -qE '"result"[[:space:]]*:[[:space:]]*"(failure|cancelled)"'; then
+            echo "::error::One or more required jobs failed or were cancelled."
+            exit 1
+          fi
+          echo "All required jobs succeeded or were skipped."
