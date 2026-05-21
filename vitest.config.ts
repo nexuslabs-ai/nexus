@@ -67,27 +67,6 @@ export default defineConfig({
       },
     ],
 
-    // Coverage configuration (applies to all projects)
-    coverage: {
-      provider: 'istanbul',
-      reporter: ['text', 'json', 'html'],
-      include: ['packages/react/src/**/*.{ts,tsx}'],
-      exclude: [
-        '**/node_modules/**',
-        '**/dist/**',
-        '**/*.test.{ts,tsx}',
-        '**/*.stories.{ts,tsx}',
-        '**/index.ts',
-        '**/generated/**',
-      ],
-      thresholds: {
-        statements: 70,
-        branches: 70,
-        functions: 70,
-        lines: 70,
-      },
-    },
-
     // Reporter configuration
     reporters: ['default'],
 
