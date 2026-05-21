@@ -4,8 +4,6 @@
   "private": true,
   "description": "Documentation site for the Nexus Design System",
   "scripts": {
-    "dev": "echo 'Docs site not yet implemented'",
-    "build": "echo 'Docs site not yet implemented'",
     "clean": "rm -rf .next out"
   }
 }

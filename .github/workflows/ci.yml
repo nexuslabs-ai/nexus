@@ -70,6 +70,10 @@ jobs:
             packages:
               - 'packages/**'
               - 'apps/**'
+              # apps/docs is a stub placeholder with no build/dev scripts;
+              # changes there shouldn't trigger Build / TypeScript Check.
+              # Drop the exclusion when @nexus/docs becomes a real package.
+              - '!apps/docs/**'
             ci:
               - '.github/workflows/**'
 
@@ -246,7 +250,7 @@ jobs:
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest
-    needs: [changes, build]
+    needs: changes
     if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -260,11 +264,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
 
       - name: Run unit tests
         run: yarn test:unit
@@ -287,15 +286,24 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Regenerate @nexus/tailwind
+      - name: Regenerate token outputs (tailwind + modular)
         id: regen
-        run: yarn tokens:tailwind
+        run: |
+          yarn tokens:tailwind
+          yarn tokens:modular
 
-      - name: Check token CSS freshness
+      - name: Check token output freshness
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: |
-          if ! git diff --exit-code -- packages/tailwind; then
-            echo "::error::packages/tailwind/ is stale — run 'yarn tokens:tailwind' and commit the result."
+          DIRS="packages/tailwind apps/playground/public/themes apps/playground/src/styles"
+          # Use git status --porcelain instead of git diff so new untracked
+          # files (e.g. a new CSS filename from a future token category) also
+          # trigger the failure.
+          DIRTY=$(git status --porcelain -- $DIRS)
+          if [ -n "$DIRTY" ]; then
+            echo "::error::Token output is stale. Affected paths:"
+            echo "$DIRTY"
+            echo "::error::Run 'yarn tokens:tailwind && yarn tokens:modular' and commit the result."
             exit 1
           fi
 
@@ -312,7 +320,7 @@ jobs:
   test-coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
-    needs: [changes, build]
+    needs: changes
     if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -327,19 +335,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
 
       - name: Install Playwright system deps
         # apt-installed deps aren't part of the browser cache; always install.
@@ -362,7 +363,7 @@ jobs:
   build-storybook:
     name: Build Storybook
     runs-on: ubuntu-latest
-    needs: [changes, build]
+    needs: changes
     if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -376,11 +377,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
 
       - name: Build Storybook
         run: yarn build-storybook
