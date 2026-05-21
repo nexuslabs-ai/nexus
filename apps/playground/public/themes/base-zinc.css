@@ -78,7 +78,7 @@ html.dark {
   --nx-color-background-active: var(--nx-color-zinc-950);
   --nx-color-muted: var(--nx-color-zinc-800);
   --nx-color-muted-foreground: var(--nx-color-zinc-300);
-  --nx-color-muted-light: var(--nx-color-zinc-800);
+  --nx-color-muted-light: var(--nx-color-zinc-900);
   --nx-color-muted-light-foreground: var(--nx-color-zinc-300);
   --nx-color-disabled: var(--nx-color-zinc-950);
   --nx-color-disabled-foreground: var(--nx-color-zinc-300);

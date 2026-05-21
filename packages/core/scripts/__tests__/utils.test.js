@@ -29,6 +29,18 @@ describe('utils', () => {
       expect(formatTokenValue(value, 'dimension')).toBe('0rem');
     });
 
+    it('strips Figma float-32 export artifacts from dimension values', () => {
+      expect(
+        formatTokenValue({ value: -0.800000011920929, unit: 'px' }, 'dimension')
+      ).toBe('-0.8px');
+      expect(
+        formatTokenValue(
+          { value: 0.30000001192092896, unit: 'rem' },
+          'dimension'
+        )
+      ).toBe('0.3rem');
+    });
+
     it('converts hex colors to oklch (mechanical when no shade path)', () => {
       expect(formatTokenValue('#3b82f6', 'color')).toBe(
         'oklch(0.6231 0.188 259.815)'

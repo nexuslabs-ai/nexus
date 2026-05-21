@@ -157,8 +157,6 @@ Each brand/status group has: `background`, `foreground`, `hover`, `active`, `dis
 
 ## Validation
 
-Token files are validated against `packages/core/tokens.schema.json`
-
 Valid `$type` values:
 
 - `color` - Color values (#hex, rgb, hsl)

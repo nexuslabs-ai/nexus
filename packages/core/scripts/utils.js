@@ -50,7 +50,7 @@ export function formatTokenValue(value, type, tokenPath) {
     'value' in value
   ) {
     // Round to 4 decimals to strip Figma's float-32 export artifacts
-    // (e.g. -0.800000011920929 → -0.8). Trailing zeros drop in number-to-string.
+    // (e.g. -0.800000011920929 → -0.8).
     const rounded = Math.round(value.value * 10000) / 10000;
     return `${rounded}${value.unit || 'px'}`;
   }

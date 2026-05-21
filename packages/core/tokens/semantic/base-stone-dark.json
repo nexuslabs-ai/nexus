@@ -25,7 +25,7 @@
     "$description": "It’s a gray that softens contrast so primary content stands forward."
   },
   "muted-light": {
-    "$value": "{stone.800}",
+    "$value": "{stone.900}",
     "$type": "color"
   },
   "muted-light-foreground": {

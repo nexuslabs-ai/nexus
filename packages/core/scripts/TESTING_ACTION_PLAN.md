@@ -143,38 +143,6 @@ fixtures/
 
 ---
 
-## Phase 3: Schema Validation (Optional)
-
-**When to implement**: When adding new token types or validating external token imports
-
-### Approach
-
-Use `packages/core/tokens.schema.json` to validate:
-
-- Token files have required `$value` and `$type`
-- Types match allowed values (color, dimension, typography, shadow, etc.)
-- References use valid `{path.to.token}` syntax
-
-### Test File: `scripts/__tests__/validation.test.js`
-
-```javascript
-describe('Token Validation', () => {
-  it('validates all primitive token files', () => {
-    // Load each file and validate against schema
-  });
-
-  it('validates all semantic token files', () => {
-    // Load each file and validate against schema
-  });
-
-  it('rejects invalid token format', () => {
-    // Missing $type, missing $value, etc.
-  });
-});
-```
-
----
-
 ## Implementation Notes
 
 ### Running Tests
