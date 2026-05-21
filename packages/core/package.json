@@ -8,7 +8,8 @@
     "build:tokens:modular": "node scripts/generate-modular.js",
     "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=neutral --borderwidth=vega --radius=sharp --shadow=vega --size=vega --typography=vega",
     "audit:contrast": "node scripts/audit-contrast.js",
-    "audit:class-refs": "node scripts/audit-class-refs.js"
+    "audit:class-refs": "node scripts/audit-class-refs.js",
+    "audit:figma-parity": "node scripts/audit-figma-parity.js"
   },
   "dependencies": {},
   "license": "MIT",

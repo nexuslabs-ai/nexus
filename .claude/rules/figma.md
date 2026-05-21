@@ -12,6 +12,55 @@
 
 The tables below are reference examples. If they conflict with actual code, **code wins**.
 
+## Code-vs-Figma Parity Audit
+
+The `audit:figma-parity` script diffs the JSON primitives in `packages/core/tokens/primitives/` against a checked-in snapshot of Figma's variables at `packages/core/tokens/figma-snapshot.json`. Use it to detect drift between what designers see and what the build emits.
+
+### Canonical rule: code wins
+
+When code and Figma disagree on a primitive token value, the JSON file is canonical. Reason: code changes go through PR review (e.g., PR #55 retuned focus colors to clear APCA Lc ≥ 45), so any value committed represents an intentional, reviewed engineering decision. Figma mirrors code; resolution always pushes code values into Figma, never the other way.
+
+A designer who wants to change a token value opens a PR against the JSON file. Editing Figma directly is fine for exploration but is not authoritative — the next snapshot refresh will surface it as drift.
+
+### Running the audit
+
+```bash
+yarn audit:figma-parity --category color
+```
+
+Exit codes:
+
+| Code | Meaning                                                          |
+| ---- | ---------------------------------------------------------------- |
+| 0    | No drift                                                         |
+| 1    | Drift findings reported                                          |
+| 2    | Configuration error (snapshot missing, unknown/pending category) |
+
+Categories supported today: `color`. Categories pending — wire up alongside the linked issue: `size`/`radius`/`borderwidth` (#61), `typography` (#62), `shadow` (#63).
+
+### Refreshing the snapshot
+
+The snapshot is not auto-refreshed. To update it:
+
+1. Open the design-system Figma file in the desktop app.
+2. In Claude, invoke `figma:figma-use` (the skill is a mandatory prerequisite for `use_figma`).
+3. Use `use_figma` to enumerate the relevant variable collection and read each variable's hex value.
+4. Write the result into `packages/core/tokens/figma-snapshot.json` matching the DTCG shape of the corresponding code file (e.g., `snapshot.color` mirrors `primitives/color.json`).
+5. Re-run `yarn audit:figma-parity --category color` to see the new diff.
+
+### Resolving drift
+
+For each finding, take action by kind:
+
+| Finding kind       | Action                                                          |
+| ------------------ | --------------------------------------------------------------- |
+| `value-mismatch`   | Designer updates Figma variable to match the code value.        |
+| `type-mismatch`    | Treat as a structural bug — investigate which side broke shape. |
+| `missing-in-figma` | Designer adds the missing variable to Figma.                    |
+| `missing-in-code`  | Designer removes the extra variable from Figma.                 |
+
+After the designer syncs, refresh the snapshot and re-run the audit. Zero drift is the merge bar for the issue that prompted the audit.
+
 ## Token Architecture
 
 The design system uses a three-layer token architecture:
