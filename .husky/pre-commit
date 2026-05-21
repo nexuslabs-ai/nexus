@@ -1,3 +1,1 @@
-[ -f ~/.config/husky/init.sh ] && . ~/.config/husky/init.sh
-
 npx lint-staged
