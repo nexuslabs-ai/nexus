@@ -1,406 +1,333 @@
 # Contributing to Nexus Design System
 
+Project overview lives in [`README.md`](README.md); this document is the testing on-ramp.
+
 ## Testing Philosophy
 
-We use a **two-layer testing approach** where each layer has a distinct purpose. This prevents duplication and ensures comprehensive coverage.
+A single `*.stories.tsx` file does four jobs at once:
+
+1. **Visual documentation** — autodocs is enabled globally in `packages/react/.storybook/preview.tsx`, so every story renders an autodoc page.
+2. **Interactive playground** — Storybook's `argTypes` controls let designers and developers exercise every prop combination.
+3. **Behavior tests** — `play` functions run as real assertions under Vitest's storybook project (real Chromium via Playwright).
+4. **Accessibility assertions** — addon-a11y runs axe-core against every story with `test: 'error'`, so any violation fails the test.
+
+You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — `vitest.config.ts` explicitly excludes `packages/react/src/components/**/*.test.{ts,tsx}` from the `unit` project.
+
+Hooks and utilities use `*.test.ts` files with `@nexus/test-utils`. Scripts under `packages/core/scripts/__tests__/` use `.test.js` and import from `vitest` directly. Both run under Vitest's `unit` project (jsdom).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        STORYBOOK                                │
-│         Visual docs • Playground • Usage examples               │
-├─────────────────────────────────────────────────────────────────┤
-│                      UNIT TESTS (Vitest)                        │
-│         Behavior • Interactions • Accessibility • Edge cases    │
+│  Components  →  *.stories.tsx (storybook project, real browser) │
+│  Hooks/utils →  *.test.ts     (unit project, jsdom)             │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+The full spec lives in `.claude/rules/testing-react.md`, `.claude/rules/storybook.md`, and `.claude/rules/components.md`. This document is the on-ramp.
+
 ---
 
-## Layer 1: Unit Tests (Vitest + React Testing Library)
+## Components: Stories as Tests
 
-**Purpose:** Verify component behavior and logic works correctly.
+### Imports
 
-### What to Test
-
-| Category          | Tests      | What to Cover                                                                                |
-| ----------------- | ---------- | -------------------------------------------------------------------------------------------- |
-| **Rendering**     | 2-3        | Basic render, renders children, renders correct element type                                 |
-| **Props**         | 4-6        | className merging, native HTML props, data attributes, asChild polymorphism                  |
-| **Variants**      | All combos | Every variant + size combination applies correct classes                                     |
-| **Interactions**  | 3-5        | Click handlers, disabled state, focus management, keyboard (Enter/Space)                     |
-| **Accessibility** | 3-5        | axe audit, aria-label, aria-describedby, disabled state, role                                |
-| **Edge Cases**    | 3-5        | Empty children, long content, special characters, React elements as children, ref forwarding |
-
-### Test File Structure
+Two distinct sources:
 
 ```tsx
-// button.test.tsx
-import { axe, render, screen, userEvent } from '@nexus/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+// Types
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { Button, buttonVariants } from './button';
-
-describe('Button', () => {
-  describe('Rendering', () => {
-    it('renders without crashing', () => {
-      render(<Button>Click me</Button>);
-      expect(screen.getByRole('button')).toBeInTheDocument();
-    });
-
-    it('renders children correctly', () => {
-      render(<Button>Hello World</Button>);
-      expect(screen.getByText('Hello World')).toBeInTheDocument();
-    });
-
-    it('renders as button element by default', () => {
-      render(<Button>Click</Button>);
-      expect(screen.getByRole('button').tagName).toBe('BUTTON');
-    });
-  });
-
-  describe('Props', () => {
-    it('merges custom className with default classes', () => {
-      render(<Button className="custom-class">Click</Button>);
-      expect(screen.getByRole('button')).toHaveClass('custom-class');
-    });
-
-    it('passes native button props', () => {
-      render(<Button type="submit" name="test-btn">Submit</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('type', 'submit');
-      expect(button).toHaveAttribute('name', 'test-btn');
-    });
-
-    it('applies data-slot attribute', () => {
-      render(<Button>Click</Button>);
-      expect(screen.getByRole('button')).toHaveAttribute('data-slot', 'button');
-    });
-
-    it('supports asChild prop for polymorphism', () => {
-      render(
-        <Button asChild>
-          <a href="/test">Link Button</a>
-        </Button>
-      );
-      expect(screen.getByRole('link')).toHaveAttribute('href', '/test');
-    });
-  });
-
-  describe('Variants', () => {
-    it.each([
-      ['primary', 'bg-primary'],
-      ['secondary', 'bg-secondary'],
-      ['outline', 'border'],
-    ])('applies %s variant classes', (variant, expectedClass) => {
-      render(<Button variant={variant as any}>Click</Button>);
-      expect(screen.getByRole('button').className).toContain(expectedClass);
-    });
-
-    it.each([
-      ['default', 'h-9'],
-      ['sm', 'h-8'],
-      ['lg', 'h-10'],
-    ])('applies %s size classes', (size, expectedClass) => {
-      render(<Button size={size as any}>Click</Button>);
-      expect(screen.getByRole('button')).toHaveClass(expectedClass);
-    });
-  });
-
-  describe('Interactions', () => {
-    it('calls onClick when clicked', async () => {
-      const handleClick = vi.fn();
-      render(<Button onClick={handleClick}>Click</Button>);
-      await userEvent.click(screen.getByRole('button'));
-      expect(handleClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('does not call onClick when disabled', async () => {
-      const handleClick = vi.fn();
-      render(<Button disabled onClick={handleClick}>Click</Button>);
-      await userEvent.click(screen.getByRole('button'));
-      expect(handleClick).not.toHaveBeenCalled();
-    });
-
-    it('can be focused', async () => {
-      render(<Button>Focus me</Button>);
-      const button = screen.getByRole('button');
-      await userEvent.tab();
-      expect(button).toHaveFocus();
-    });
-
-    it('triggers click on Enter key', async () => {
-      const handleClick = vi.fn();
-      render(<Button onClick={handleClick}>Click</Button>);
-      screen.getByRole('button').focus();
-      await userEvent.keyboard('{Enter}');
-      expect(handleClick).toHaveBeenCalled();
-    });
-
-    it('triggers click on Space key', async () => {
-      const handleClick = vi.fn();
-      render(<Button onClick={handleClick}>Click</Button>);
-      screen.getByRole('button').focus();
-      await userEvent.keyboard(' ');
-      expect(handleClick).toHaveBeenCalled();
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('has no accessibility violations', async () => {
-      const { container } = render(<Button>Accessible Button</Button>);
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('supports aria-label', () => {
-      render(<Button aria-label="Close dialog">X</Button>);
-      expect(screen.getByLabelText('Close dialog')).toBeInTheDocument();
-    });
-
-    it('supports aria-describedby', () => {
-      render(
-        <>
-          <Button aria-describedby="desc">Click</Button>
-          <span id="desc">This button submits the form</span>
-        </>
-      );
-      expect(screen.getByRole('button')).toHaveAttribute('aria-describedby', 'desc');
-    });
-
-    it('has correct disabled state for assistive technology', () => {
-      render(<Button disabled>Disabled</Button>);
-      expect(screen.getByRole('button')).toBeDisabled();
-    });
-  });
-
-  describe('Edge Cases', () => {
-    it('handles empty children', () => {
-      render(<Button></Button>);
-      expect(screen.getByRole('button')).toBeInTheDocument();
-    });
-
-    it('handles very long text content', () => {
-      const longText = 'A'.repeat(100);
-      render(<Button>{longText}</Button>);
-      expect(screen.getByText(longText)).toBeInTheDocument();
-    });
-
-    it('handles special characters', () => {
-      render(<Button>Click & Save <Test></Button>);
-      expect(screen.getByRole('button')).toHaveTextContent('Click & Save <Test>');
-    });
-
-    it('handles React elements as children', () => {
-      render(
-        <Button>
-          <span data-testid="icon">🚀</span>
-          Launch
-        </Button>
-      );
-      expect(screen.getByTestId('icon')).toBeInTheDocument();
-      expect(screen.getByText('Launch')).toBeInTheDocument();
-    });
-
-    it('forwards ref correctly', () => {
-      const ref = { current: null };
-      render(<Button ref={ref}>Click</Button>);
-      expect(ref.current).toBeInstanceOf(HTMLButtonElement);
-    });
-  });
-});
+// Test utilities (Storybook 10 — note: `storybook/test`, NOT `@storybook/test`)
+import { expect, fn, userEvent, within } from 'storybook/test';
 ```
 
-### What NOT to Test in Unit Tests
+### Story file structure
 
-- Visual appearance (use Storybook)
-- CSS values or computed styles
-- Hover/focus visual states
-- Responsive behavior
-- Animation timing
-
----
-
-## Layer 2: Storybook
-
-**Purpose:** Visual documentation and interactive playground for designers and developers.
-
-### What to Cover in Stories
-
-| Story Type       | Purpose                  | Example                             |
-| ---------------- | ------------------------ | ----------------------------------- |
-| **Default**      | Primary use case         | `<Button>Click me</Button>`         |
-| **All Variants** | Show each variant option | Primary, Secondary, Outline         |
-| **All Sizes**    | Show each size option    | Small, Default, Large               |
-| **States**       | Interactive states       | Hover, Focus, Active, Disabled      |
-| **With Icons**   | Icon placement patterns  | Left icon, Right icon, Icon only    |
-| **Composition**  | Common patterns          | Button groups, With loading spinner |
-| **Playground**   | Interactive controls     | All props configurable              |
-
-### Story File Structure
+A real example from `Button.stories.tsx`:
 
 ```tsx
-// Button.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, fn, userEvent, within } from 'storybook/test';
+
 import { Button } from './button';
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
   component: Button,
-  parameters: {
-    layout: 'centered',
+  args: {
+    onClick: fn(), // spy function for testing
   },
-  tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'outline'],
+      options: [
+        'default',
+        'destructive',
+        'outline',
+        'secondary',
+        'ghost',
+        'link',
+      ],
     },
-    size: {
-      control: 'select',
-      options: ['default', 'sm', 'lg'],
-    },
+    size: { control: 'select', options: ['default', 'sm', 'lg', 'icon'] },
+    disabled: { control: 'boolean' },
+    asChild: { control: 'boolean' },
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof Button>;
+```
 
-// Default story
+Do **not** add `tags: ['autodocs']` to your meta. Autodocs is global; setting it per-story is redundant.
+
+### Visual stories (no play function)
+
+```tsx
 export const Default: Story = {
-  args: {
-    children: 'Button',
-  },
-};
-
-// Variants
-export const Primary: Story = {
-  args: { children: 'Primary', variant: 'primary' },
+  args: { children: 'Button' },
 };
 
 export const Secondary: Story = {
-  args: { children: 'Secondary', variant: 'secondary' },
+  args: { variant: 'secondary', children: 'Secondary' },
+};
+```
+
+### Interaction tests (with play functions)
+
+Use data attributes (`data-slot`, `data-variant`, `data-size`) as the stable test surface — not class names. Tailwind classes are subject to the `nx:` prefix and may change as variants are restyled; data attributes are part of the component contract.
+
+```tsx
+export const ClickInteraction: Story = {
+  args: { children: 'Click me' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
 };
 
-export const Outline: Story = {
-  args: { children: 'Outline', variant: 'outline' },
+export const KeyboardInteraction: Story = {
+  args: { children: 'Press Enter' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
 };
 
-// Sizes
-export const Small: Story = {
-  args: { children: 'Small', size: 'sm' },
+export const WithDataAttributes: Story = {
+  args: { children: 'Data Attrs', variant: 'secondary', size: 'lg' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    await expect(button).toHaveAttribute('data-slot', 'button');
+    await expect(button).toHaveAttribute('data-variant', 'secondary');
+    await expect(button).toHaveAttribute('data-size', 'lg');
+  },
 };
 
-export const Large: Story = {
-  args: { children: 'Large', size: 'lg' },
-};
-
-// States
 export const Disabled: Story = {
-  args: { children: 'Disabled', disabled: true },
-};
+  args: { disabled: true, children: 'Disabled' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
 
-// All variants grid (for visual comparison)
+    await expect(button).toBeDisabled();
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+```
+
+### Composition via `asChild`
+
+```tsx
+export const AsLink: Story = {
+  render: (args) => (
+    <Button {...args} asChild>
+      <a href="https://example.com">Visit Website</a>
+    </Button>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link');
+
+    await expect(link).toHaveAttribute('href', 'https://example.com');
+    await expect(link).toHaveAttribute('data-slot', 'button');
+  },
+};
+```
+
+### AllVariants grid
+
+Stories that compose multiple instances for visual comparison. Tailwind utilities here must carry the `nx:` prefix, and colors must use semantic tokens (e.g., `nx:bg-error-background`, not `nx:bg-destructive` — `destructive` is the variant name, not a token):
+
+```tsx
 export const AllVariants: Story = {
   render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Button variant="primary">Primary</Button>
+    <div className="nx:flex nx:flex-col nx:gap-6">
+      <div className="nx:flex nx:flex-wrap nx:gap-2">
+        <Button variant="default">Default</Button>
         <Button variant="secondary">Secondary</Button>
+        <Button variant="destructive">Destructive</Button>
         <Button variant="outline">Outline</Button>
-      </div>
-      <div className="flex gap-2">
-        <Button size="sm">Small</Button>
-        <Button size="default">Default</Button>
-        <Button size="lg">Large</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="link">Link</Button>
       </div>
     </div>
   ),
 };
 ```
 
-### What NOT to Include in Storybook
+### A11y escape hatch
 
-- Implementation details or internal logic
-- Test assertions
-- Edge case scenarios (unless visually relevant)
+Some stories trigger known-broken a11y rules (e.g., a contrast pair that's tracked for token retuning). The escape hatch:
+
+```tsx
+export const Destructive: Story = {
+  args: { variant: 'destructive', children: 'Delete' },
+  parameters: {
+    a11y: { test: 'todo' }, // tracked separately; don't fail the suite
+  },
+};
+```
+
+Use sparingly. The default (and what every other story inherits) is `test: 'error'` — a violation fails CI. See `.claude/rules/storybook.md` for the full pattern.
+
+---
+
+## Hooks and Utilities: `*.test.ts`
+
+Hooks and utility functions use plain Vitest with `@nexus/test-utils`.
+
+### Imports
+
+```tsx
+import {
+  act,
+  describe,
+  expect,
+  it,
+  renderHook,
+  vi,
+  waitFor,
+} from '@nexus/test-utils';
+```
+
+`@nexus/test-utils` re-exports `act`, `renderHook`, and `waitFor` from `@testing-library/react`, plus the standard Vitest globals. It does **not** export `render`, `screen`, `userEvent`, or `axe` — those would only be useful for component tests, which live in stories.
+
+### Hook test example
+
+Pattern from `.claude/rules/testing-react.md`:
+
+```tsx
+// use-counter.test.ts
+import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
+
+import { useCounter } from './use-counter';
+
+describe('useCounter', () => {
+  it('increments count', () => {
+    const { result } = renderHook(() => useCounter());
+
+    act(() => {
+      result.current.increment();
+    });
+
+    expect(result.current.count).toBe(1);
+  });
+});
+```
+
+### Utility test example
+
+```tsx
+// format-currency.test.ts
+import { describe, expect, it } from '@nexus/test-utils';
+
+import { formatCurrency } from './format-currency';
+
+describe('formatCurrency', () => {
+  it('formats USD', () => {
+    expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
+  });
+});
+```
+
+There are no hook tests in the repo today (the single `.test.ts` file, `packages/react/src/exports.test.ts`, is a package-exports smoke test). When a hook lands, the pattern above is ready.
+
+---
+
+## What's Out of Scope
+
+**Don't write play functions for:**
+
+- Visual appearance — the rendered story is the visual. Visual regression isn't currently in scope.
+- Computed CSS values or pixel measurements — read the token, not the resolved style.
+- Hover/focus visual styling — `:hover` snapshots aren't behavior assertions.
+- Animation timing.
+
+**Don't write `*.test.tsx` for components** — `vitest.config.ts` excludes them. Move the assertion into a story's `play` function.
+
+**Don't assert on Tailwind class names** — they change as variants are restyled. Use `data-slot`, `data-variant`, `data-size`, ARIA attributes, or accessible queries (`getByRole`, `getByLabelText`).
 
 ---
 
 ## Component Checklist
 
-Use this checklist when creating or updating a component:
+A new (or updated) component should ship the following stories. The fuller table lives at `.claude/rules/testing-react.md`.
 
-### Unit Tests
+| Story                                | Play function? | Purpose                                                     |
+| ------------------------------------ | -------------- | ----------------------------------------------------------- |
+| `Default`                            | Optional       | Default args                                                |
+| One story per variant                | No             | Visual documentation                                        |
+| One story per size                   | No             | Visual documentation                                        |
+| `Disabled`                           | Yes            | Verify disabled state; `onClick` not called                 |
+| `ClickInteraction`                   | Yes            | Verify click handler fires                                  |
+| `KeyboardInteraction`                | Yes            | Verify Tab focuses; Enter/Space triggers                    |
+| `WithDataAttributes`                 | Yes            | Verify `data-slot`, `data-variant`, `data-size`             |
+| `AsLink` / `asChild` (if applicable) | Yes            | Verify composition keeps `data-slot`                        |
+| Edge cases                           | Yes            | Empty children, long content, special characters, with icon |
+| `AllVariants`                        | No             | Visual grid for review                                      |
 
-- [ ] Rendering (2-3 tests)
-  - [ ] Renders without crashing
-  - [ ] Renders children correctly
-  - [ ] Renders correct element type
-- [ ] Props (4-6 tests)
-  - [ ] className merging works
-  - [ ] Native HTML props pass through
-  - [ ] data-slot attribute present
-  - [ ] asChild polymorphism works (if applicable)
-  - [ ] Custom data attributes work
-- [ ] Variants (all combinations)
-  - [ ] Each variant applies correct classes
-  - [ ] Each size applies correct classes
-  - [ ] Default variants work
-- [ ] Interactions (3-5 tests)
-  - [ ] Click handler fires
-  - [ ] Disabled state prevents interaction
-  - [ ] Focus management works
-  - [ ] Keyboard navigation (Enter/Space)
-- [ ] Accessibility (3-5 tests)
-  - [ ] No axe violations
-  - [ ] aria-label support
-  - [ ] aria-describedby support
-  - [ ] Correct disabled state for AT
-- [ ] Edge Cases (3-5 tests)
-  - [ ] Empty children
-  - [ ] Long content
-  - [ ] Special characters
-  - [ ] React elements as children
-  - [ ] Ref forwarding
-
-### Storybook
-
-- [ ] Default story
-- [ ] All variants
-- [ ] All sizes
-- [ ] Disabled state
-- [ ] With icons (if applicable)
-- [ ] AllVariants grid story
-- [ ] Autodocs enabled
+A11y is automatic — every story is axe-checked. No separate a11y story needed.
 
 ---
 
-## Quick Reference
+## Running Tests
 
-### Test Imports
+| Command                     | What it does                                                                                                          |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `yarn test`                 | Run both vitest projects: `unit` (jsdom) and `storybook` (real Chromium via Playwright)                               |
+| `yarn test:unit`            | `unit` project only — fastest feedback loop for hooks/utilities                                                       |
+| `yarn test:storybook`       | `storybook` project only — runs every story's play function in a browser                                              |
+| `yarn test:storybook:watch` | Watch mode for stories                                                                                                |
+| `yarn test:storybook:ui`    | **Debugging entry point** when a play function fails — opens Vitest's interactive UI mounted on the storybook project |
+| `yarn storybook`            | Start the Storybook dev server (the UI you're documenting against)                                                    |
 
-```tsx
-// Unit tests
-import { axe, render, screen, userEvent } from '@nexus/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+The first run of `yarn test` (or any storybook-project run) launches Storybook in the background — the first cold start takes a few extra seconds.
 
-// Stories
-import type { Meta, StoryObj } from '@storybook/react';
-```
+---
 
-### Running Tests
+## Authoritative Specs
 
-```bash
-yarn test              # Run all unit tests
-yarn test:watch        # Watch mode
-yarn storybook         # Start Storybook dev server
-yarn build-storybook   # Build static Storybook
-```
+This file is the on-ramp. The specs are:
 
-### Test File Naming
+- [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
+- [`.claude/rules/storybook.md`](.claude/rules/storybook.md) — story structure, required stories, play function patterns
+- [`.claude/rules/components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes, variants
 
-```
-button.tsx           # Component
-button.test.tsx      # Unit tests (same directory)
-Button.stories.tsx   # Storybook stories (same directory)
-```
+When this doc and a rule file disagree, the rule file wins.
