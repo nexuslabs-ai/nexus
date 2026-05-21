@@ -48,6 +48,15 @@ jobs:
   # ============================================
   # Always Run (on code changes)
   # ============================================
+  #
+  # format-check and lint run full-tree (no `--filter='...[origin/base]'`)
+  # while build, typecheck, and test run affected-only. The asymmetry is
+  # intentional: local `yarn lint` / `yarn format:check` run full-tree, so CI
+  # mirrors that exactly. A divergence here would let a stale rule miss a file
+  # locally that CI then flags (or vice versa). Affected-only lint is also
+  # error-prone — a config change in eslint.config.js must invalidate the
+  # whole tree, which `--filter` won't catch. Keep these jobs full-tree until
+  # wall-clock pain forces the move.
 
   format-check:
     name: Format Check
@@ -88,8 +97,17 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Restore ESLint cache
+        uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-${{ github.sha }}
+          restore-keys: |
+            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-
+            eslint-${{ runner.os }}-
+
       - name: Lint
-        run: yarn lint
+        run: yarn lint --cache --cache-location .eslintcache
 
   # ============================================
   # Build (affected packages only)
@@ -236,9 +254,11 @@ jobs:
           fi
 
       - name: APCA contrast audit
+        if: ${{ !cancelled() }}
         run: yarn workspace @nexus/core audit:contrast
 
       - name: Tailwind class-ref audit
+        if: ${{ !cancelled() }}
         run: yarn workspace @nexus/core audit:class-refs
 
   test-coverage:

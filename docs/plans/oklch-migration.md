@@ -1,5 +1,12 @@
 # OKLCH Color Token Migration — Plan
 
+> **Status note:** The visual-regression layer described below (Chromatic +
+> `@chromatic-com/storybook` + `packages/react/src/storybook/modes.ts`) was
+> wired in alongside this migration, then removed in PR #64 as out of scope
+> for the CI quality-gates work. References to Chromatic and the `modes.ts`
+> path in the original draft have been struck below. APCA contrast (§6) and
+> the L-grid eyeball pass remain the validation layers in use today.
+
 Target value space at consumption time: OKLCH, with lightness pinned to a fixed perceptual grid. Hex sRGB stays as the on-disk source format because design tools (Tokens Studio, Figma Variables) hex-normalise on export and cannot round-trip OKLCH. The migration moves into the build pipeline.
 
 ## 1. Files affected
@@ -48,7 +55,6 @@ OKLCH is Baseline 2023 — Chrome 111 (Mar 2023), Safari 15.4 (Mar 2022), Firefo
 | --------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `apps/playground`                             | generated CSS vars in `public/themes/*.css`                   | transparent — `var(--nx-color-*)` resolves at the browser                                                                 | regenerate via `yarn tokens:modular`                                                                           |
 | `packages/react` components                   | semantic Tailwind utilities (`nx:bg-primary-background` etc.) | transparent — Tailwind v4's own palette already ships oklch (`node_modules/tailwindcss/theme.css`); current dep `^4.1.18` | none                                                                                                           |
-| Chromatic baselines                           | rendered PNGs                                                 | full reset expected (intended visual change)                                                                              | designer accepts new baseline on the feature branch                                                            |
 | Tokens Studio / Figma Variables → JSON export | `color.json`                                                  | transparent now — hex stays hex on disk; the build script does the conversion                                             | document in `tokens.md`: "L is enforced by build; the L of any hex you pick is ignored, only H/C flow through" |
 | Code Connect / `.figma.ts` bindings           | —                                                             | n/a — none found in `git ls-files`                                                                                        | n/a                                                                                                            |
 | Design tool exports (Sketch / Affinity)       | flat colors from generated CSS                                | partial — Sketch/Affinity have no OKLCH import path. Not a blocker (no exports exist in-repo)                             | document the gap                                                                                               |
@@ -56,13 +62,11 @@ OKLCH is Baseline 2023 — Chrome 111 (Mar 2023), Safari 15.4 (Mar 2022), Firefo
 
 ## 6. Testing
 
-**Decision: three layers, one existing tool, one new dep.**
+**Decision: two layers, one new dep.** (Originally three layers; the visual-regression layer was dropped — see status note at top.)
 
-1. **Visual regression — Chromatic.** Already wired (root `package.json` scripts; `@chromatic-com/storybook` addon registered in `packages/react/.storybook/main.ts:9`; 4 modes per story via `packages/react/src/storybook/modes.ts`). Expected diff: ≥ 80% of color-bearing stories. The diff is the deliverable, not a regression — designer accepts it as the new baseline.
+1. **Contrast — APCA, not WCAG 2.** WCAG 2's sRGB-luminance formula treats hues equally; human perception doesn't (blue under-contributes to perceived luminance). APCA fixes that. APCA isn't officially tied to OKLCH, but for an OKLCH-authored palette it's the right tool; WCAG-2 audits would be silently misleading. Add `apca-w3` as a `packages/core` dev dep (~6 kB, zero transitive deps). Write `scripts/audit-contrast.js` to walk every `base-*-{light,dark}.json` and assert `|Lc| ≥ 60` for `foreground ↔ background`, `muted-foreground ↔ muted`, `primary-foreground ↔ primary-background`, plus the equivalents in every brand file. Wire into `yarn build` and CI.
 
-2. **Contrast — APCA, not WCAG 2.** WCAG 2's sRGB-luminance formula treats hues equally; human perception doesn't (blue under-contributes to perceived luminance). APCA fixes that. APCA isn't officially tied to OKLCH, but for an OKLCH-authored palette it's the right tool; WCAG-2 audits would be silently misleading. Add `apca-w3` as a `packages/core` dev dep (~6 kB, zero transitive deps). Write `scripts/audit-contrast.js` to walk every `base-*-{light,dark}.json` and assert `|Lc| ≥ 60` for `foreground ↔ background`, `muted-foreground ↔ muted`, `primary-foreground ↔ primary-background`, plus the equivalents in every brand file. Wire into `yarn build` and CI.
-
-3. **Perceived-lightness eyeball pass.** Render each of the 22 palettes as an 11-shade vertical strip in both themes. The grid is wrong if any palette's progression looks accelerated or stalled. Mandatory before designer sign-off; no tooling.
+2. **Perceived-lightness eyeball pass.** Render each of the 22 palettes as an 11-shade vertical strip in both themes. The grid is wrong if any palette's progression looks accelerated or stalled. Mandatory before designer sign-off; no tooling.
 
 ## 7. Rollout
 
@@ -75,7 +79,7 @@ Ordered steps:
 3. Write `scripts/lib/perceptual-grid.js` (L grid + two converter functions). Extend `formatTokenValue` in `utils.js` to route `$type: "color"` hex values through the converter. Pattern-match palette shade keys for grid-pinned routing; mechanical for everything else.
 4. Run `yarn tokens:tailwind` + `yarn tokens:modular`. Confirm JSON files unchanged on disk; generated CSS now contains `oklch(...)`.
 5. Write `scripts/audit-contrast.js`. Run it. Fix any APCA failure by adjusting chroma at the offending palette/shade (in the source hex, since H/C come from there) — never by abandoning the L grid.
-6. Run Chromatic on the branch. Designer reviews. Eyeball the 22 palette strips.
+6. Eyeball the 22 palette strips. Designer reviews.
 7. Update `.claude/rules/tokens.md` (hex-in / oklch-out contract; APCA gate; L enforcement note for designers), `packages/core/CLAUDE.md`, `README.md` browser-support floor.
 8. Merge.
 

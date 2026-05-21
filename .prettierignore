@@ -3,6 +3,9 @@ dist
 .next
 .turbo
 coverage
+storybook-static
+build
+out
 *.min.js
 pnpm-lock.yaml
 yarn.lock
