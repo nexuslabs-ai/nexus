@@ -107,23 +107,14 @@ const BRAND_PAIRS = [
 ];
 
 // Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),
-// which APCA encodes as the incidental tier (Lc 45). Pair against each
-// base palette's `background` per theme; the focus color is theme-aware
-// and loaded from primitives/focus/.
-const FOCUS_PAIRS = [
-  {
-    focus: 'focus-color.default',
-    bg: 'background',
-    minLc: 45,
-    tier: 'incidental',
-  },
-  {
-    focus: 'focus-color.error',
-    bg: 'background',
-    minLc: 45,
-    tier: 'incidental',
-  },
-];
+// which APCA encodes as the incidental tier (Lc 45). Pair against every
+// base palette surface focusable controls actually render on per theme;
+// the focus color is theme-aware and loaded from primitives/focus/.
+const FOCUS_SURFACES = ['background', 'container', 'popover'];
+const FOCUS_COLORS = ['default', 'error'];
+const FOCUS_PAIRS = FOCUS_COLORS.flatMap((focus) =>
+  FOCUS_SURFACES.map((bg) => ({ focus, bg, minLc: 45, tier: 'incidental' }))
+);
 
 const REF_RE = /^\{([^}]+)\}$/;
 
@@ -197,18 +188,18 @@ function formatLine(passed, label, lc, minLc, tier) {
   return `  ${mark} ${label.padEnd(48)} Lc ${lcStr}${tail}`;
 }
 
-function auditFile(filePath, pairs, primitiveMap) {
-  const fileData = readTokenFile(filePath);
-  const fileName = path.basename(filePath);
+function auditPairs(fgData, bgData, fileName, pairs, primitiveMap, fgKey) {
   const lines = [];
   const results = [];
 
-  for (const { text, bg, minLc, tier } of pairs) {
-    const textValue = findTokenValue(fileData, text);
-    const bgValue = findTokenValue(fileData, bg);
-    if (textValue === undefined || bgValue === undefined) {
+  for (const pair of pairs) {
+    const fg = pair[fgKey];
+    const { bg, minLc, tier } = pair;
+    const fgValue = findTokenValue(fgData, fg);
+    const bgValue = findTokenValue(bgData, bg);
+    if (fgValue === undefined || bgValue === undefined) {
       const missing = [
-        textValue === undefined ? text : null,
+        fgValue === undefined ? fg : null,
         bgValue === undefined ? bg : null,
       ]
         .filter(Boolean)
@@ -218,52 +209,13 @@ function auditFile(filePath, pairs, primitiveMap) {
       );
     }
 
-    const textInts = resolveToSrgbInts(textValue, primitiveMap);
+    const fgInts = resolveToSrgbInts(fgValue, primitiveMap);
     const bgInts = resolveToSrgbInts(bgValue, primitiveMap);
-    const lc = computeLc(textInts, bgInts);
+    const lc = computeLc(fgInts, bgInts);
     const passed = Math.abs(lc) >= minLc;
 
     results.push({ passed });
-    lines.push(formatLine(passed, `${text} ↔ ${bg}`, lc, minLc, tier));
-  }
-
-  return { fileName, lines, results };
-}
-
-function auditFocusAgainstBase(
-  baseFilePath,
-  focusData,
-  primitiveMap,
-  palette,
-  theme
-) {
-  const baseFileData = readTokenFile(baseFilePath);
-  const fileName = `base-${palette}-${theme}.json ↔ focus-default-${theme}.json`;
-  const lines = [];
-  const results = [];
-
-  for (const { focus, bg, minLc, tier } of FOCUS_PAIRS) {
-    const focusValue = findTokenValue(focusData, focus);
-    const bgValue = findTokenValue(baseFileData, bg);
-    if (focusValue === undefined || bgValue === undefined) {
-      const missing = [
-        focusValue === undefined ? focus : null,
-        bgValue === undefined ? bg : null,
-      ]
-        .filter(Boolean)
-        .join(', ');
-      throw new Error(
-        `audit-contrast: ${fileName} is missing declared pair token(s): ${missing}`
-      );
-    }
-
-    const focusInts = resolveToSrgbInts(focusValue, primitiveMap);
-    const bgInts = resolveToSrgbInts(bgValue, primitiveMap);
-    const lc = computeLc(focusInts, bgInts);
-    const passed = Math.abs(lc) >= minLc;
-
-    results.push({ passed });
-    lines.push(formatLine(passed, `${focus} ↔ ${bg}`, lc, minLc, tier));
+    lines.push(formatLine(passed, `${fg} ↔ ${bg}`, lc, minLc, tier));
   }
 
   return { fileName, lines, results };
@@ -272,21 +224,22 @@ function auditFocusAgainstBase(
 function main() {
   const primitiveMap = buildPrimitiveHexMap();
   const sections = [];
-  let totalPairs = 0;
-  let passCount = 0;
-  let failCount = 0;
 
   for (const palette of BASE_PALETTES) {
     for (const theme of THEMES) {
       const filePath = path.join(SEMANTIC_DIR, `base-${palette}-${theme}.json`);
       if (!fs.existsSync(filePath)) continue;
-      const section = auditFile(filePath, BASE_PAIRS, primitiveMap);
-      sections.push(section);
-      for (const result of section.results) {
-        totalPairs += 1;
-        if (result.passed) passCount += 1;
-        else failCount += 1;
-      }
+      const fileData = readTokenFile(filePath);
+      sections.push(
+        auditPairs(
+          fileData,
+          fileData,
+          path.basename(filePath),
+          BASE_PAIRS,
+          primitiveMap,
+          'text'
+        )
+      );
     }
   }
 
@@ -294,13 +247,17 @@ function main() {
     for (const theme of THEMES) {
       const filePath = path.join(SEMANTIC_DIR, `brands-${brand}-${theme}.json`);
       if (!fs.existsSync(filePath)) continue;
-      const section = auditFile(filePath, BRAND_PAIRS, primitiveMap);
-      sections.push(section);
-      for (const result of section.results) {
-        totalPairs += 1;
-        if (result.passed) passCount += 1;
-        else failCount += 1;
-      }
+      const fileData = readTokenFile(filePath);
+      sections.push(
+        auditPairs(
+          fileData,
+          fileData,
+          path.basename(filePath),
+          BRAND_PAIRS,
+          primitiveMap,
+          'text'
+        )
+      );
     }
   }
 
@@ -317,27 +274,33 @@ function main() {
         `base-${palette}-${theme}.json`
       );
       if (!fs.existsSync(baseFilePath)) continue;
-      const section = auditFocusAgainstBase(
-        baseFilePath,
-        focusData,
-        primitiveMap,
-        palette,
-        theme
+      const baseData = readTokenFile(baseFilePath);
+      sections.push(
+        auditPairs(
+          focusData,
+          baseData,
+          `base-${palette}-${theme}.json ↔ focus-default-${theme}.json`,
+          FOCUS_PAIRS,
+          primitiveMap,
+          'focus'
+        )
       );
-      sections.push(section);
-      for (const result of section.results) {
-        totalPairs += 1;
-        if (result.passed) passCount += 1;
-        else failCount += 1;
-      }
     }
   }
 
+  let totalPairs = 0;
+  let passCount = 0;
+  let failCount = 0;
   const output = [];
   for (const section of sections) {
     output.push(`─── ${section.fileName} ───`);
     output.push(...section.lines);
     output.push('');
+    for (const result of section.results) {
+      totalPairs += 1;
+      if (result.passed) passCount += 1;
+      else failCount += 1;
+    }
   }
   output.push(
     `Checked ${totalPairs} pairs — ${passCount} passed, ${failCount} failed.`

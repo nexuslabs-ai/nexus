@@ -53,6 +53,7 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 | `muted-foreground ↔ muted`                                                          | `         | Lc        | ≥ 45` | Incidental / de-emphasised text        |
 | `muted-light-foreground ↔ muted-light`                                              | `         | Lc        | ≥ 45` | Dividers, helper text, subtle surfaces |
 | `disabled-foreground ↔ disabled`                                                    | `         | Lc        | ≥ 45` | Disabled-state text, still readable    |
+| `focus.{default,error} ↔ {background,container,popover}`                            | `         | Lc        | ≥ 45` | Focus rings on every surface they hit  |
 
 Failures must be fixed by adjusting the semantic token reference (which shade a given role points to) or the L grid values — not by lowering the thresholds. The tiers themselves come from APCA's published guidance and are not negotiable per-finding.
 

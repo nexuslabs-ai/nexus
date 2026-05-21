@@ -524,7 +524,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "{focus-color.default}",
+        "$value": "{default}",
         "$type": "color"
       }
     },
@@ -558,7 +558,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "{focus-color.error}",
+        "$value": "{error}",
         "$type": "color"
       }
     }

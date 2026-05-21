@@ -254,8 +254,8 @@
   --nx-color-black: oklch(0.1448 0 0);
 
   /* focus (default) */
-  --nx-focus-focus-color-default: oklch(0.5555 0 0);
-  --nx-focus-focus-color-error: oklch(0.5771 0.2152 27.325);
+  --nx-focus-default: oklch(0.5555 0 0);
+  --nx-focus-error: oklch(0.5771 0.2152 27.325);
 
   /* radius (sharp) */
   --nx-radius-base: 0px;
@@ -342,12 +342,12 @@
   --nx-shadow-focus-default-y: 0px;
   --nx-shadow-focus-default-blur: 0px;
   --nx-shadow-focus-default-spread: 2px;
-  --nx-shadow-focus-default-color: var(--nx-focus-focus-color-default);
+  --nx-shadow-focus-default-color: var(--nx-focus-default);
   --nx-shadow-focus-error-x: 0px;
   --nx-shadow-focus-error-y: 0px;
   --nx-shadow-focus-error-blur: 0px;
   --nx-shadow-focus-error-spread: 2px;
-  --nx-shadow-focus-error-color: var(--nx-focus-focus-color-error);
+  --nx-shadow-focus-error-color: var(--nx-focus-error);
 
   /* size (vega) */
   --nx-size-0: 0px;
@@ -434,6 +434,6 @@
 
 .dark {
   /* focus (default dark) */
-  --nx-focus-focus-color-default: oklch(0.7572 0 0);
-  --nx-focus-focus-color-error: oklch(0.7106 0.1661 22.216);
+  --nx-focus-default: oklch(0.7572 0 0);
+  --nx-focus-error: oklch(0.8077 0.1035 19.571);
 }
