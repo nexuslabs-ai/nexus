@@ -26,7 +26,6 @@ type ShadowLayer = {
   color: ColorToken;
 };
 type ShadowToken = Record<string, ShadowLayer>;
-type ShadowSet = Record<string, ShadowToken>;
 
 const SHADOW_KEYS = [
   '2xs',
@@ -38,6 +37,8 @@ const SHADOW_KEYS = [
   'xl',
   '2xl',
 ] as const;
+type ShadowKey = (typeof SHADOW_KEYS)[number];
+type ShadowSet = Record<ShadowKey, ShadowToken>;
 
 const SHADOW_MODES_LIGHT: { name: string; tokens: ShadowSet }[] = [
   { name: 'vega', tokens: shadowVegaLight as ShadowSet },

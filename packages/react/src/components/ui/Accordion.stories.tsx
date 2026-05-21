@@ -206,9 +206,10 @@ export const ExpandInteraction: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const triggers = canvas.getAllByRole('button');
-    const firstTrigger = triggers[0];
-    const secondTrigger = triggers[1];
+    const [firstTrigger, secondTrigger] = canvas.getAllByRole('button');
+    if (!firstTrigger || !secondTrigger) {
+      throw new Error('Expected 2 accordion triggers');
+    }
 
     // Initially both should be closed
     await expect(firstTrigger).toHaveAttribute('data-state', 'closed');
@@ -248,9 +249,10 @@ export const MultipleExpandInteraction: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const triggers = canvas.getAllByRole('button');
-    const firstTrigger = triggers[0];
-    const secondTrigger = triggers[1];
+    const [firstTrigger, secondTrigger] = canvas.getAllByRole('button');
+    if (!firstTrigger || !secondTrigger) {
+      throw new Error('Expected 2 accordion triggers');
+    }
 
     // Click first trigger
     await userEvent.click(firstTrigger);
