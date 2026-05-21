@@ -29,7 +29,7 @@ const CATEGORIES = {
   },
 };
 
-const KNOWN_FLAGS = new Set(['category', 'snapshot', 'mode', 'theme']);
+const KNOWN_FLAGS = new Set(['category', 'snapshot']);
 
 const EXIT_OK = 0;
 const EXIT_DRIFT = 1;
@@ -40,6 +40,10 @@ const DOCS_HINT = 'see .claude/rules/figma.md → Code-vs-Figma Parity Audit';
 class ConfigError extends Error {}
 
 const FLAG_PATTERN = /^--([a-zA-Z][a-zA-Z0-9-]*)(?:=(.+))?$/;
+
+export function findUnknownFlags(args) {
+  return Object.keys(args).filter((k) => !KNOWN_FLAGS.has(k));
+}
 
 export function parseArgs(argv) {
   const args = { category: null, snapshot: DEFAULT_SNAPSHOT };
@@ -195,7 +199,7 @@ function isCI() {
 function main() {
   const args = parseArgs(process.argv.slice(2));
 
-  const unknownFlags = Object.keys(args).filter((k) => !KNOWN_FLAGS.has(k));
+  const unknownFlags = findUnknownFlags(args);
   if (unknownFlags.length > 0) {
     fail(
       `unknown flag(s): ${unknownFlags.map((k) => `--${k}`).join(', ')}\n  known: ${[...KNOWN_FLAGS].map((k) => `--${k}`).join(', ')}\n  ${DOCS_HINT}`

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_SNAPSHOT,
   diffTokenTrees,
+  findUnknownFlags,
   parseArgs,
 } from '../audit-figma-parity.js';
 
@@ -243,5 +244,28 @@ describe('parseArgs', () => {
     const args = parseArgs(['--snapshot=', '--category', 'color']);
     expect(args.snapshot).toBe(DEFAULT_SNAPSHOT);
     expect(args.category).toBe('color');
+  });
+});
+
+describe('findUnknownFlags', () => {
+  it('returns an empty list when every key is in the whitelist', () => {
+    expect(findUnknownFlags({ category: 'color', snapshot: '/x' })).toEqual([]);
+  });
+
+  it('surfaces typo flags like `--catagory`', () => {
+    expect(findUnknownFlags({ catagory: 'color' })).toEqual(['catagory']);
+  });
+
+  it('rejects `--mode` today (multi-mode is wired by #61)', () => {
+    expect(findUnknownFlags({ category: 'color', mode: 'vega' })).toEqual([
+      'mode',
+    ]);
+  });
+
+  it('reports multiple unknown flags in input order', () => {
+    expect(findUnknownFlags({ foo: 1, category: 'color', bar: 2 })).toEqual([
+      'foo',
+      'bar',
+    ]);
   });
 });

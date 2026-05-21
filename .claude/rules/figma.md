@@ -31,11 +31,11 @@ yarn audit:figma-parity --category color --snapshot path/to/alt-snapshot.json
 
 Flags:
 
-| Flag                | Required?                                                                                                                          | Default                                    |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| `--category <name>` | Always                                                                                                                             | —                                          |
-| `--snapshot <path>` | Optional — testing/alternate snapshots                                                                                             | `packages/core/tokens/figma-snapshot.json` |
-| `--mode <name>`     | Pending — wired by #61 alongside multi-mode categories. Today the flag parses but `main()` doesn't read it (color is single-mode). | —                                          |
+| Flag                | Required?                                                                        | Default                                    |
+| ------------------- | -------------------------------------------------------------------------------- | ------------------------------------------ |
+| `--category <name>` | Always                                                                           | —                                          |
+| `--snapshot <path>` | Optional — testing/alternate snapshots                                           | `packages/core/tokens/figma-snapshot.json` |
+| `--mode <name>`     | Rejected today as an unknown flag; wired by #61 alongside multi-mode categories. | —                                          |
 
 Exit codes:
 
