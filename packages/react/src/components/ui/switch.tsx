@@ -37,8 +37,8 @@ function Switch({ className, ...props }: SwitchProps) {
       className={cn(
         'nx:peer nx:inline-flex nx:h-5 nx:w-9 nx:shrink-0 nx:cursor-pointer nx:items-center',
         'nx:rounded-full nx:border-2 nx:border-transparent',
-        'nx:shadow-sm nx:transition-colors',
-        'nx:focus-visible:outline-none nx:focus-visible:ring-2 nx:focus-visible:ring-primary-background nx:focus-visible:ring-offset-2 nx:focus-visible:ring-offset-background',
+        'nx:transition-colors',
+        'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
         'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
         'nx:data-[state=checked]:bg-primary-background nx:data-[state=unchecked]:bg-muted',
         className

@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils';
 const inputVariants = cva(
   [
     'nx:flex nx:w-full nx:rounded-md nx:border nx:border-border-default',
-    'nx:bg-background nx:text-foreground nx:shadow-sm nx:transition-colors',
+    'nx:bg-background nx:text-foreground nx:transition-colors',
     'nx:file:border-0 nx:file:bg-transparent nx:file:text-sm nx:file:font-medium nx:file:text-foreground',
     'nx:placeholder:text-muted-foreground',
-    'nx:focus-visible:ring-2 nx:focus-visible:ring-primary-background-active nx:focus-visible:ring-offset-2',
+    'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
     'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
   ],
   {

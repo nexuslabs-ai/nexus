@@ -141,9 +141,9 @@ function DialogContent({
             data-slot="dialog-close-button"
             className={cn(
               'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:opacity-70',
-              'nx:ring-offset-background nx:transition-opacity',
+              'nx:transition-opacity',
               'nx:hover:opacity-100',
-              'nx:focus:outline-none nx:focus:ring-2 nx:focus:ring-primary-background/50 nx:focus:ring-offset-2',
+              'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
               'nx:disabled:pointer-events-none',
               'nx:data-[state=open]:bg-muted nx:data-[state=open]:text-muted-foreground'
             )}

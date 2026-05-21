@@ -69,10 +69,8 @@ const tabsTriggerVariants = cva(
     'nx:inline-flex nx:items-center nx:justify-center',
     'nx:whitespace-nowrap',
     'nx:font-medium nx:text-foreground/70',
-    'nx:ring-offset-background',
     'nx:transition-all',
-    'nx:focus-visible:outline-none nx:focus-visible:ring-2',
-    'nx:focus-visible:ring-primary-background/50 nx:focus-visible:ring-offset-2',
+    'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
     'nx:disabled:pointer-events-none nx:disabled:opacity-50',
   ],
   {
@@ -184,9 +182,7 @@ function TabsContent({ className, ...props }: TabsContentProps) {
       data-slot="tabs-content"
       className={cn(
         'nx:mt-2',
-        'nx:ring-offset-background',
-        'nx:focus-visible:outline-none nx:focus-visible:ring-2',
-        'nx:focus-visible:ring-primary-background/50 nx:focus-visible:ring-offset-2',
+        'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
         className
       )}
       {...props}
