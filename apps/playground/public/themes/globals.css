@@ -14,6 +14,7 @@
 
 @import 'tailwindcss' prefix(nx);
 @import './color.css';
+@import './focus-default.css';
 @import './typography-utilities.css';
 @import './borderwidth-utilities.css';
 

@@ -144,10 +144,6 @@ export default tseslint.config(
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
       '@typescript-eslint/no-import-type-side-effects': 'error',
-      '@typescript-eslint/no-empty-object-type': [
-        'error',
-        { allowInterfaces: 'with-single-extends' },
-      ],
 
       // General best practices
       'no-console': ['warn', { allow: ['warn', 'error'] }],
@@ -185,6 +181,17 @@ export default tseslint.config(
     files: ['**/scripts/**/*.js'],
     rules: {
       'no-console': 'off',
+    },
+  },
+
+  // UI components: allow empty interface extends per .claude/rules/components.md
+  {
+    files: ['packages/react/src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-empty-object-type': [
+        'error',
+        { allowInterfaces: 'with-single-extends' },
+      ],
     },
   },
 

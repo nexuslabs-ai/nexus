@@ -319,6 +319,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     imports: [
       'tailwindcss',
       './color.css',
+      './focus-default.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
     ],

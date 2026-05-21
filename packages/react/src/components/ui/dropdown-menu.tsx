@@ -416,7 +416,7 @@ function DropdownMenuSeparator({
  *
  * Props for the DropdownMenuShortcut component.
  */
-interface DropdownMenuShortcutProps extends React.HTMLAttributes<HTMLSpanElement> {}
+interface DropdownMenuShortcutProps extends React.ComponentProps<'span'> {}
 
 /**
  * DropdownMenuShortcut

@@ -10,6 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.resolve(__dirname, '..', 'tokens');
 const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 const PRIMITIVES_FILE = path.join(TOKENS_DIR, 'primitives', 'color.json');
+const FOCUS_PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives', 'focus');
 
 const BASE_PALETTES = ['slate', 'neutral', 'zinc', 'gray', 'stone'];
 const BRANDS = ['blue', 'gray', 'neutral', 'slate', 'stone'];
@@ -102,6 +103,25 @@ const BRAND_PAIRS = [
     bg: 'secondary.subtle',
     minLc: 60,
     tier: 'ui',
+  },
+];
+
+// Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),
+// which APCA encodes as the incidental tier (Lc 45). Pair against each
+// base palette's `background` per theme; the focus color is theme-aware
+// and loaded from primitives/focus/.
+const FOCUS_PAIRS = [
+  {
+    focus: 'focus-color.default',
+    bg: 'background',
+    minLc: 45,
+    tier: 'incidental',
+  },
+  {
+    focus: 'focus-color.error',
+    bg: 'background',
+    minLc: 45,
+    tier: 'incidental',
   },
 ];
 
@@ -210,6 +230,45 @@ function auditFile(filePath, pairs, primitiveMap) {
   return { fileName, lines, results };
 }
 
+function auditFocusAgainstBase(
+  baseFilePath,
+  focusData,
+  primitiveMap,
+  palette,
+  theme
+) {
+  const baseFileData = readTokenFile(baseFilePath);
+  const fileName = `base-${palette}-${theme}.json ↔ focus-default-${theme}.json`;
+  const lines = [];
+  const results = [];
+
+  for (const { focus, bg, minLc, tier } of FOCUS_PAIRS) {
+    const focusValue = findTokenValue(focusData, focus);
+    const bgValue = findTokenValue(baseFileData, bg);
+    if (focusValue === undefined || bgValue === undefined) {
+      const missing = [
+        focusValue === undefined ? focus : null,
+        bgValue === undefined ? bg : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+      throw new Error(
+        `audit-contrast: ${fileName} is missing declared pair token(s): ${missing}`
+      );
+    }
+
+    const focusInts = resolveToSrgbInts(focusValue, primitiveMap);
+    const bgInts = resolveToSrgbInts(bgValue, primitiveMap);
+    const lc = computeLc(focusInts, bgInts);
+    const passed = Math.abs(lc) >= minLc;
+
+    results.push({ passed });
+    lines.push(formatLine(passed, `${focus} ↔ ${bg}`, lc, minLc, tier));
+  }
+
+  return { fileName, lines, results };
+}
+
 function main() {
   const primitiveMap = buildPrimitiveHexMap();
   const sections = [];
@@ -236,6 +295,35 @@ function main() {
       const filePath = path.join(SEMANTIC_DIR, `brands-${brand}-${theme}.json`);
       if (!fs.existsSync(filePath)) continue;
       const section = auditFile(filePath, BRAND_PAIRS, primitiveMap);
+      sections.push(section);
+      for (const result of section.results) {
+        totalPairs += 1;
+        if (result.passed) passCount += 1;
+        else failCount += 1;
+      }
+    }
+  }
+
+  for (const theme of THEMES) {
+    const focusFilePath = path.join(
+      FOCUS_PRIMITIVES_DIR,
+      `focus-default-${theme}.json`
+    );
+    if (!fs.existsSync(focusFilePath)) continue;
+    const focusData = readTokenFile(focusFilePath);
+    for (const palette of BASE_PALETTES) {
+      const baseFilePath = path.join(
+        SEMANTIC_DIR,
+        `base-${palette}-${theme}.json`
+      );
+      if (!fs.existsSync(baseFilePath)) continue;
+      const section = auditFocusAgainstBase(
+        baseFilePath,
+        focusData,
+        primitiveMap,
+        palette,
+        theme
+      );
       sections.push(section);
       for (const result of section.results) {
         totalPairs += 1;

@@ -151,7 +151,7 @@ export const SmallSize: Story = {
 export const LargeSize: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[500px]">
-      <TabsList className="nx:h-12">
+      <TabsList>
         <TabsTrigger value="tab1" size="lg">
           Large Tab
         </TabsTrigger>
@@ -605,7 +605,7 @@ export const AllVariants: Story = {
             <TabsContent value="tab2" />
           </Tabs>
           <Tabs defaultValue="tab1" className="nx:w-[400px]">
-            <TabsList className="nx:h-12">
+            <TabsList>
               <TabsTrigger value="tab1" size="lg">
                 Large
               </TabsTrigger>
