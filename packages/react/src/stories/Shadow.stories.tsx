@@ -36,8 +36,7 @@ type ShadowKey =
   | 'lg'
   | 'xl'
   | '2xl'
-  | 'inner'
-  | 'focus';
+  | 'inner';
 type ShadowSet = Record<ShadowKey, ShadowToken>;
 
 const DISPLAY_SHADOW_KEYS = [
@@ -140,7 +139,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Shadow primitives — composite tokens whose per-layer x/y/blur/spread/color values compose into a CSS `box-shadow` string. Each mode has light and dark variants because shadow colors and opacities differ by background tone. Shown: 8 elevation shadows (2xs → 2xl). Inner and focus tokens exist in JSON but use different visual treatments and are not part of this elevation showcase.',
+          'Shadow primitives — composite tokens whose per-layer x/y/blur/spread/color values compose into a CSS `box-shadow` string. Each mode has light and dark variants because shadow colors and opacities differ by background tone. Shown: 8 elevation shadows (2xs → 2xl). The inner shadow exists in JSON but uses a different visual treatment and is not part of this elevation showcase. Focus shadows live in the focus primitive (separate from elevation since focus is a theme-aware, mode-agnostic a11y role).',
       },
     },
   },
