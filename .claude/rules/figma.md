@@ -36,7 +36,7 @@ Exit codes:
 | 1    | Drift findings reported                                          |
 | 2    | Configuration error (snapshot missing, unknown/pending category) |
 
-Categories supported today: `color`. Categories pending — wire up alongside the linked issue: `size`/`radius`/`borderwidth` (#61), `typography` (#62), `shadow` (#63).
+Categories supported today: `color`. Pending categories — each one is its own `--category` invocation, wired up alongside the linked issue: `size` (#61), `radius` (#61), `borderwidth` (#61), `typography` (#62), `shadow` (#63). #61 lands three separate categories together because they share an Engineering primitive shape (`{value, unit}` dimension tokens), but the audit still runs as three commands.
 
 ### Refreshing the snapshot
 
@@ -45,7 +45,7 @@ The snapshot is not auto-refreshed. To update it:
 1. Open the design-system Figma file in the desktop app.
 2. In Claude, invoke `figma:figma-use` (the skill is a mandatory prerequisite for `use_figma`).
 3. Use `use_figma` to enumerate the relevant variable collection and read each variable's hex value.
-4. Write the result into `packages/core/tokens/figma-snapshot.json` matching the DTCG shape of the corresponding code file (e.g., `snapshot.color` mirrors `primitives/color.json`).
+4. Write the result into `packages/core/tokens/figma-snapshot.json` matching the DTCG shape of the corresponding code file (e.g., `snapshot.color` mirrors `primitives/color.json`). Add a per-category `$meta` block — at minimum `capturedAt` (ISO date) and `figmaFileName` — alongside the token tree (`snapshot.color.$meta`). The audit reads it to print the snapshot's capture date so readers can spot stale snapshots.
 5. Re-run `yarn audit:figma-parity --category color` to see the new diff.
 
 ### Resolving drift

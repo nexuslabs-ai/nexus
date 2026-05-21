@@ -1,12 +1,12 @@
 {
-  "_meta": {
-    "capturedAt": "2026-05-21",
-    "figmaFile": "9T3zwjS0oLunWaPC3rcDVJ",
-    "figmaFileName": "Foundation-Master",
-    "variableCollection": "color",
-    "notes": "Captured via figma MCP (use_figma). Refresh per .claude/rules/figma.md → Code-vs-Figma Parity Audit → Refreshing the snapshot."
-  },
   "color": {
+    "$meta": {
+      "capturedAt": "2026-05-21",
+      "figmaFile": "9T3zwjS0oLunWaPC3rcDVJ",
+      "figmaFileName": "Foundation-Master",
+      "variableCollection": "color",
+      "notes": "Captured via figma MCP (use_figma). Refresh per .claude/rules/figma.md → Code-vs-Figma Parity Audit → Refreshing the snapshot."
+    },
     "green": {
       "50": { "$value": "#f0f7f0", "$type": "color" },
       "100": { "$value": "#e5f3e4", "$type": "color" },

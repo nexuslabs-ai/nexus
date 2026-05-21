@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { diffTokenTrees } from '../audit-figma-parity.js';
+import { diffTokenTrees, parseArgs } from '../audit-figma-parity.js';
 
 const colorToken = (value) => ({ $value: value, $type: 'color' });
 const dimToken = (value) => ({
@@ -129,5 +129,56 @@ describe('diffTokenTrees', () => {
       code: { value: '#000000cc' },
       figma: { value: '#00000099' },
     });
+  });
+
+  it('reports no drift when dimension values match', () => {
+    const code = { size: { 4: dimToken(16) } };
+    const figma = { size: { 4: dimToken(16) } };
+    expect(diffTokenTrees(code, figma)).toEqual([]);
+  });
+
+  it('reports value-mismatch for differing dimensions, with canonical string values', () => {
+    const code = { size: { 4: dimToken(16) } };
+    const figma = { size: { 4: dimToken(20) } };
+    const findings = diffTokenTrees(code, figma);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({
+      path: 'size.4',
+      kind: 'value-mismatch',
+      code: { value: '16px' },
+      figma: { value: '20px' },
+    });
+  });
+
+  it('skips DTCG metadata keys ($-prefixed) on either side', () => {
+    const code = {
+      blue: { 500: colorToken('#3b82f6') },
+    };
+    const figma = {
+      $meta: { capturedAt: '2026-05-21' },
+      blue: { 500: colorToken('#3b82f6') },
+    };
+    expect(diffTokenTrees(code, figma)).toEqual([]);
+  });
+});
+
+describe('parseArgs', () => {
+  it('parses --key value form', () => {
+    expect(parseArgs(['--category', 'color']).category).toBe('color');
+  });
+
+  it('parses --key=value form', () => {
+    expect(parseArgs(['--category=color']).category).toBe('color');
+  });
+
+  it("does not consume a following --flag as the prior flag's value", () => {
+    const args = parseArgs(['--category', '--snapshot', 'foo.json']);
+    expect(args.category).toBe(null);
+    expect(args.snapshot).toBe('foo.json');
+  });
+
+  it('handles a trailing bare --flag without crashing', () => {
+    const args = parseArgs(['--category']);
+    expect(args.category).toBe(null);
   });
 });

@@ -11,7 +11,6 @@ const DEFAULT_SNAPSHOT = path.join(TOKENS_DIR, 'figma-snapshot.json');
 
 const CATEGORIES = {
   color: {
-    kind: 'single',
     file: path.join(PRIMITIVES_DIR, 'color.json'),
   },
 };
@@ -28,7 +27,7 @@ const EXIT_OK = 0;
 const EXIT_DRIFT = 1;
 const EXIT_CONFIG = 2;
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const args = { category: null, snapshot: DEFAULT_SNAPSHOT };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -36,8 +35,12 @@ function parseArgs(argv) {
     const eq = arg.indexOf('=');
     if (eq !== -1) {
       args[arg.slice(2, eq)] = arg.slice(eq + 1);
-    } else {
-      args[arg.slice(2)] = argv[++i];
+      continue;
+    }
+    const next = argv[i + 1];
+    if (next && !next.startsWith('--')) {
+      args[arg.slice(2)] = next;
+      i++;
     }
   }
   return args;
@@ -46,6 +49,15 @@ function parseArgs(argv) {
 function normalizeValue(value, type) {
   if (type === 'color' && typeof value === 'string') {
     return value.toLowerCase();
+  }
+  if (
+    type === 'dimension' &&
+    typeof value === 'object' &&
+    value !== null &&
+    'value' in value
+  ) {
+    const rounded = Math.round(value.value * 10000) / 10000;
+    return `${rounded}${value.unit || 'px'}`;
   }
   return value;
 }
@@ -63,10 +75,6 @@ function buildTokenMap(subtree) {
 }
 
 /**
- * Pure diff function: takes two parsed DTCG token subtrees and returns a sorted
- * list of drift findings. Symmetric inputs in, symmetric findings out — no fs,
- * no env, no globals. Unit-testable.
- *
  * @param {object} codeSubtree - Parsed JSON for the code side (e.g., color.json contents)
  * @param {object} snapshotSubtree - Parsed JSON for the Figma snapshot side (same shape)
  * @returns {{ path: string, kind: string, code?: object, figma?: object }[]}
@@ -162,8 +170,13 @@ function main() {
   const codeData = readTokenFile(config.file);
   const findings = diffTokenTrees(codeData, snapshotSubtree);
 
+  const meta = snapshotSubtree.$meta;
   const lines = [];
   lines.push(`─── audit-figma-parity --category ${args.category} ───`);
+  if (meta?.capturedAt) {
+    const source = meta.figmaFileName ? ` (${meta.figmaFileName})` : '';
+    lines.push(`  Snapshot: ${meta.capturedAt}${source}`);
+  }
   if (findings.length === 0) {
     lines.push('  ✓ no drift');
     lines.push('');
