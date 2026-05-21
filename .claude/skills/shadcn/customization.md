@@ -150,7 +150,7 @@ Prefer these approaches in order:
 ### 2. Tailwind classes via `className`
 
 ```tsx
-<Card className="max-w-md mx-auto">...</Card>
+<Card className="mx-auto max-w-md">...</Card>
 ```
 
 ### 3. Add a new variant
