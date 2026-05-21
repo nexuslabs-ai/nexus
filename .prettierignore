@@ -7,3 +7,8 @@ coverage
 pnpm-lock.yaml
 yarn.lock
 package-lock.json
+
+# Auto-generated CSS — produced by @nexus/core token pipeline; do not reformat
+packages/tailwind/*.css
+apps/playground/public/themes/*.css
+apps/playground/src/styles/*.css
