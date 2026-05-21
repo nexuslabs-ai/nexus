@@ -106,10 +106,10 @@ function processSemanticFile(fileName, primitiveMap) {
 }
 
 /**
- * Process shadow styles - generates var() references instead of resolved
- * values. Throws if the file does not exist.
+ * Process shadow styles for shadow-variables.css. Each shadow property
+ * reference resolves through primitiveMap to the actual primitive cssName.
  */
-function processShadowStyles() {
+function processShadowStyles(primitiveMap) {
   const stylesFile = path.join(TOKENS_DIR, 'styles/shadows.json');
   if (!fs.existsSync(stylesFile)) {
     throw new Error(`Shadow styles file missing: ${stylesFile}`);
@@ -124,8 +124,7 @@ function processShadowStyles() {
 
     const cssName = `nx-shadow-${token.path.join('-')}`;
     const isInset = token.path.includes('inner');
-    let cssValue = formatShadowComposite(token.value, isInset);
-    cssValue = cssValue.replace(/var\(--shadow-/g, 'var(--nx-shadow-');
+    const cssValue = formatShadowComposite(token.value, primitiveMap, isInset);
 
     shadows.push({ cssName, value: cssValue });
   }
@@ -297,7 +296,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
   const borderwidthTokens = primitives.borderwidth?.modes?.[0]
     ? collectBorderwidthTokens(TOKENS_DIR, primitives.borderwidth.modes[0])
     : [];
-  const shadowTokens = collectShadowTokens(TOKENS_DIR);
+  const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
 
   // Generate using shared function
   const header = `/*
@@ -431,7 +430,7 @@ export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
   }
 
   // Generate shadow variables from styles
-  const shadowVariables = processShadowStyles();
+  const shadowVariables = processShadowStyles(primitiveMap);
   generateShadowVariablesCSS(distDir, shadowVariables);
   console.log(`  ✓ ${shadowVariables.length} shadow variables`);
   totalFiles++;

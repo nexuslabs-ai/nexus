@@ -409,7 +409,7 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     TOKENS_DIR,
     borderwidthMode
   );
-  const shadowTokens = collectShadowTokens(TOKENS_DIR);
+  const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
 
   // Generate header
   const header = `/* ===== NEXUS DESIGN SYSTEM - TAILWIND THEME ===== */

@@ -434,62 +434,45 @@ export const log = {
 // ============================================
 
 /**
- * Convert a shadow reference path to a CSS var() reference
- * @param {string} refPath - Reference path like "2xs.layer-1.x"
- * @returns {string} CSS var() reference like "var(--shadow-2xs-layer-1-x)"
+ * Format a shadow property value as a var() reference or literal.
+ * References are resolved through the primitive map so the var name matches
+ * the actual primitive cssName (e.g. `{color.default}` → `var(--nx-focus-color-default)`
+ * when the focus primitive provides it). This means shadow property references
+ * can point to any primitive category, not just `--nx-shadow-*`.
  */
-function shadowRefToVar(refPath) {
-  const cssName = refPath.replace(/\./g, '-');
-  return `var(--shadow-${cssName})`;
-}
-
-/**
- * Format a shadow property value as a var() reference or literal
- * @param {*} value - Property value (reference or dimension object)
- * @returns {string} CSS var() reference or literal value
- */
-function formatShadowPropertyAsVar(value) {
-  // Handle references like {2xs.layer-1.x} -> var(--shadow-2xs-layer-1-x)
+function formatShadowPropertyAsVar(value, primitiveMap) {
   if (isReference(value)) {
-    const refPath = extractRefPath(value);
-    return shadowRefToVar(refPath);
+    return resolveValue(value, primitiveMap);
   }
 
-  // Handle dimension objects like { value: 3, unit: "px" }
   if (typeof value === 'object' && value !== null && 'value' in value) {
     return formatTokenValue(value, 'dimension');
   }
 
-  // Return as-is for other values
   return String(value);
 }
 
-/**
- * Format a single shadow layer to CSS box-shadow value using var() references
- * @param {object} layer - Shadow layer definition
- * @param {boolean} isInset - Whether this is an inset shadow
- * @returns {string} CSS box-shadow value for this layer
- */
-function formatShadowLayer(layer, isInset = false) {
-  const x = formatShadowPropertyAsVar(layer.offsetX);
-  const y = formatShadowPropertyAsVar(layer.offsetY);
-  const blur = formatShadowPropertyAsVar(layer.blur);
-  const spread = formatShadowPropertyAsVar(layer.spread);
-  const color = formatShadowPropertyAsVar(layer.color);
+function formatShadowLayer(layer, primitiveMap, isInset = false) {
+  const x = formatShadowPropertyAsVar(layer.offsetX, primitiveMap);
+  const y = formatShadowPropertyAsVar(layer.offsetY, primitiveMap);
+  const blur = formatShadowPropertyAsVar(layer.blur, primitiveMap);
+  const spread = formatShadowPropertyAsVar(layer.spread, primitiveMap);
+  const color = formatShadowPropertyAsVar(layer.color, primitiveMap);
   const inset = isInset || layer.inset ? 'inset ' : '';
 
   return `${inset}${x} ${y} ${blur} ${spread} ${color}`;
 }
 
 /**
- * Format a complete shadow composite (single or multi-layer) to CSS value
- * @param {object|object[]} value - Shadow value (single layer or array of layers)
- * @param {boolean} isInset - Whether this is an inset shadow
- * @returns {string} CSS box-shadow value
+ * Format a complete shadow composite (single or multi-layer) to CSS value.
+ * `primitiveMap` is required so the resolver can map reference paths to their
+ * actual primitive cssNames.
  */
-export function formatShadowComposite(value, isInset = false) {
+export function formatShadowComposite(value, primitiveMap, isInset = false) {
   const layers = Array.isArray(value) ? value : [value];
-  return layers.map((layer) => formatShadowLayer(layer, isInset)).join(', ');
+  return layers
+    .map((layer) => formatShadowLayer(layer, primitiveMap, isInset))
+    .join(', ');
 }
 
 // ============================================
@@ -790,38 +773,10 @@ export function collectBorderwidthTokens(tokensDir, mode) {
 }
 
 /**
- * Generate shadow CSS value with var() references to layer variables
- *
- * @param {string} name - Shadow name (e.g., '2xs', 'focus-default')
- * @param {object|object[]} shadowValue - Shadow value (single or multi-layer)
- * @param {boolean} isInset - Whether this is an inset shadow
- * @returns {string} CSS shadow value with var() references
- */
-function generateShadowVarValue(name, shadowValue, isInset = false) {
-  const prefix = isInset ? 'inset ' : '';
-
-  if (Array.isArray(shadowValue)) {
-    const layers = shadowValue.map((_layer, index) => {
-      const layerNum = shadowValue.length - index;
-      return `var(--nx-shadow-${name}-layer-${layerNum}-x) var(--nx-shadow-${name}-layer-${layerNum}-y) var(--nx-shadow-${name}-layer-${layerNum}-blur) var(--nx-shadow-${name}-layer-${layerNum}-spread) var(--nx-shadow-${name}-layer-${layerNum}-color)`;
-    });
-    return layers.join(', ');
-  } else {
-    if (name.startsWith('focus-')) {
-      return `${prefix}var(--nx-shadow-${name}-x) var(--nx-shadow-${name}-y) var(--nx-shadow-${name}-blur) var(--nx-shadow-${name}-spread) var(--nx-shadow-${name}-color)`;
-    }
-    return `${prefix}var(--nx-shadow-${name}-layer-1-x) var(--nx-shadow-${name}-layer-1-y) var(--nx-shadow-${name}-layer-1-blur) var(--nx-shadow-${name}-layer-1-spread) var(--nx-shadow-${name}-layer-1-color)`;
-  }
-}
-
-/**
  * Collect shadow token CSS values with var() references
  * Returns array of { cssName, value } for @theme block
- *
- * @param {string} tokensDir - Path to tokens directory
- * @returns {object[]} Array of { cssName, value }
  */
-export function collectShadowTokens(tokensDir) {
+export function collectShadowTokens(tokensDir, primitiveMap) {
   const stylesFile = path.join(tokensDir, 'styles/shadows.json');
   if (!fs.existsSync(stylesFile)) {
     throw new Error(`Shadow styles file missing: ${stylesFile}`);
@@ -840,9 +795,9 @@ export function collectShadowTokens(tokensDir) {
           if (subKey.startsWith('$')) continue;
           if (subValue.$type === 'shadow') {
             const shadowName = `${key}-${subKey}`;
-            const cssValue = generateShadowVarValue(
-              shadowName,
-              subValue.$value
+            const cssValue = formatShadowComposite(
+              subValue.$value,
+              primitiveMap
             );
             shadows.push({ cssName: `shadow-${shadowName}`, value: cssValue });
           }
@@ -852,7 +807,7 @@ export function collectShadowTokens(tokensDir) {
     }
 
     const isInset = key === 'inner';
-    const cssValue = generateShadowVarValue(key, value.$value, isInset);
+    const cssValue = formatShadowComposite(value.$value, primitiveMap, isInset);
     shadows.push({ cssName: `shadow-${key}`, value: cssValue });
   }
 
