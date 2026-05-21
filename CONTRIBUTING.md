@@ -393,7 +393,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 ```bash
 yarn test              # Run all unit tests
 yarn test:watch        # Watch mode
-yarn test:coverage     # With coverage report
 yarn storybook         # Start Storybook dev server
 yarn build-storybook   # Build static Storybook
 ```

@@ -153,7 +153,6 @@ if (!result.success) {
 
 ```bash
 yarn test               # Run all tests
-yarn test:coverage      # With coverage report (informational)
 ```
 
 ## Do Not
