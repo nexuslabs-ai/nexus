@@ -132,10 +132,12 @@ function computeLc(textInts, bgInts) {
   return typeof lc === 'number' ? lc : Number(lc);
 }
 
-function formatLine(passed, label, lc, minLc) {
+function formatLine(passed, label, lc, minLc, tier) {
   const mark = passed ? '✓' : '✗';
   const lcStr = lc.toFixed(1).padStart(6);
-  const tail = passed ? `   (≥ ${minLc})` : `   FAIL (< ${minLc})`;
+  const tail = passed
+    ? `   (≥ ${minLc}, ${tier})`
+    : `   FAIL (< ${minLc}, ${tier})`;
   return `  ${mark} ${label.padEnd(48)} Lc ${lcStr}${tail}`;
 }
 
@@ -145,7 +147,7 @@ function auditFile(filePath, pairs, primitiveMap) {
   const lines = [];
   const results = [];
 
-  for (const { text, bg, minLc } of pairs) {
+  for (const { text, bg, minLc, tier } of pairs) {
     const textValue = findTokenValue(fileData, text);
     const bgValue = findTokenValue(fileData, bg);
     if (textValue === undefined || bgValue === undefined) {
@@ -166,7 +168,7 @@ function auditFile(filePath, pairs, primitiveMap) {
     const passed = Math.abs(lc) >= minLc;
 
     results.push({ passed });
-    lines.push(formatLine(passed, `${text} ↔ ${bg}`, lc, minLc));
+    lines.push(formatLine(passed, `${text} ↔ ${bg}`, lc, minLc, tier));
   }
 
   return { fileName, lines, results };
