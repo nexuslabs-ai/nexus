@@ -17,21 +17,22 @@ permissions:
 # ============================================
 # Required status checks (branch protection on `main`)
 # ============================================
-# Every job below is listed as a required status check in branch protection
-# rules on `main`. Renaming or removing any of them requires a coordinated
-# protection-rule update in the same change — otherwise every subsequent PR
-# blocks on a check that no longer exists.
+# The job `name:` values below are listed as required status checks in
+# branch protection rules on `main`. Renaming any of them (the `name:`
+# field, not the YAML id) requires a coordinated protection-rule update
+# in the same change — otherwise every subsequent PR blocks on a check
+# that no longer exists.
 #
-#   - format-check
-#   - lint
-#   - build
-#   - typecheck      (job name: "TypeScript Check")
-#   - test-unit      (job name: "Unit Tests")
-#   - audit-tokens   (job name: "Audit Tokens")
-#   - test-coverage  (job name: "Test Coverage"; renamed from test-storybook
-#                     when consolidated; see also #67)
-#   - build-storybook
-#   - bundle-size
+#   - Format Check
+#   - Lint
+#   - Build
+#   - TypeScript Check
+#   - Unit Tests
+#   - Audit Tokens
+#   - Test Coverage     (renamed from "Storybook Tests" when consolidated;
+#                        see also #67 for the coverage-instrumentation gap)
+#   - Build Storybook
+#   - Bundle Size
 #
 # If you add or rename a required check, update both this list AND the
 # protection rule.
@@ -57,6 +58,10 @@ jobs:
         id: filter
         with:
           filters: |
+            # `react` intentionally excludes `apps/**` — no app currently
+            # consumes @nexus/react at runtime, so apps/ changes can't break
+            # the react test/build/bundle-size jobs. Revisit if an app starts
+            # importing from @nexus/react.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
@@ -336,13 +341,13 @@ jobs:
           restore-keys: |
             playwright-${{ runner.os }}-
 
+      - name: Install Playwright system deps
+        # apt-installed deps aren't part of the browser cache; always install.
+        run: npx playwright install-deps chromium
+
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium --with-deps
-
-      - name: Install Playwright system deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright install chromium
 
       - name: Run tests with coverage
         run: yarn test:coverage
