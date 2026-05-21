@@ -23,6 +23,7 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@nexus/core": "*",
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/addon-docs": "^10.1.10",
     "@storybook/react-vite": "^10.1.10",
