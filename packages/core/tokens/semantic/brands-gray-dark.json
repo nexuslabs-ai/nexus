@@ -63,7 +63,7 @@
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{gray.400}",
+      "$value": "{gray.200}",
       "$type": "color"
     },
     "subtle-hover": {

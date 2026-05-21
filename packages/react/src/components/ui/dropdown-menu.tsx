@@ -89,7 +89,7 @@ function DropdownMenuSubTrigger({
         'nx:rounded-sm nx:px-2 nx:py-1.5 nx:text-sm nx:outline-none',
         'nx:focus:bg-background-hover',
         'nx:data-[state=open]:bg-background-hover',
-        '[&_svg]:nx:pointer-events-none [&_svg]:nx:size-4 [&_svg]:nx:shrink-0',
+        'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         inset && 'nx:pl-8',
         className
       )}
@@ -232,7 +232,7 @@ function DropdownMenuItem({
         'nx:transition-colors',
         'nx:focus:bg-background-hover nx:focus:text-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
-        '[&_svg]:nx:pointer-events-none [&_svg]:nx:size-4 [&_svg]:nx:shrink-0',
+        'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         inset && 'nx:pl-8',
         variant === 'destructive' &&
           'nx:text-error-subtle-foreground nx:focus:bg-error-background nx:focus:text-error-foreground',
