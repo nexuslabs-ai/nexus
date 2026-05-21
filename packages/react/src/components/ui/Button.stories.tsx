@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Button } from './button';
 
 const meta: Meta<typeof Button> = {
@@ -187,9 +185,6 @@ export const LoadingWithVariants: Story = {
     </div>
   ),
   parameters: {
-    chromatic: {
-      modes: themeOnlyModes,
-    },
     // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
     a11y: { test: 'todo' },
   },
@@ -200,9 +195,6 @@ export const LoadingWithVariants: Story = {
 // ============================================
 
 export const ClickInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Click me',
   },
@@ -221,9 +213,6 @@ export const ClickInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Press Enter',
   },
@@ -246,9 +235,6 @@ export const KeyboardInteraction: Story = {
 };
 
 export const FocusManagement: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Focus me',
   },
@@ -274,9 +260,6 @@ export const FocusManagement: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Data Attrs',
     variant: 'secondary',
@@ -293,9 +276,6 @@ export const WithDataAttributes: Story = {
 };
 
 export const WithCustomClassName: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Custom Class',
     className: 'custom-test-class',
@@ -309,9 +289,6 @@ export const WithCustomClassName: Story = {
 };
 
 export const WithAriaLabel: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: '×',
     'aria-label': 'Close dialog',
@@ -325,9 +302,6 @@ export const WithAriaLabel: Story = {
 };
 
 export const DefaultType: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Button',
   },
@@ -341,9 +315,6 @@ export const DefaultType: Story = {
 };
 
 export const SubmitType: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Submit',
     type: 'submit',
@@ -381,9 +352,6 @@ export const AsLink: Story = {
 // ============================================
 
 export const EmptyChildren: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: undefined,
     'aria-label': 'Empty button',
@@ -505,9 +473,6 @@ export const AllVariants: Story = {
   parameters: {
     // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
     a11y: { test: 'todo' },
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 

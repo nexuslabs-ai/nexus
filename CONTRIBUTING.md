@@ -2,13 +2,10 @@
 
 ## Testing Philosophy
 
-We use a **three-layer testing approach** where each layer has a distinct purpose. This prevents duplication and ensures comprehensive coverage.
+We use a **two-layer testing approach** where each layer has a distinct purpose. This prevents duplication and ensures comprehensive coverage.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        CHROMATIC                                │
-│         Visual regression • Cross-browser • Responsive          │
-├─────────────────────────────────────────────────────────────────┤
 │                        STORYBOOK                                │
 │         Visual docs • Playground • Usage examples               │
 ├─────────────────────────────────────────────────────────────────┤
@@ -215,7 +212,7 @@ describe('Button', () => {
 
 ### What NOT to Test in Unit Tests
 
-- Visual appearance (use Storybook/Chromatic)
+- Visual appearance (use Storybook)
 - CSS values or computed styles
 - Hover/focus visual states
 - Responsive behavior
@@ -329,59 +326,6 @@ export const AllVariants: Story = {
 
 ---
 
-## Layer 3: Chromatic (Visual Regression)
-
-**Purpose:** Catch unintended visual changes across browsers and viewports.
-
-### What Chromatic Captures
-
-| Test Type              | What It Does                                |
-| ---------------------- | ------------------------------------------- |
-| **Snapshot Baseline**  | Captures visual state of each story         |
-| **Diff Detection**     | Highlights pixel differences from baseline  |
-| **Cross-browser**      | Tests Chrome, Firefox, Safari               |
-| **Responsive**         | Tests at multiple viewport widths           |
-| **Interaction States** | Captures hover, focus, active if configured |
-
-### Chromatic Best Practices
-
-1. **One visual state per story** - Makes diffs easy to identify
-2. **Use consistent viewport** - Set in Storybook parameters
-3. **Avoid animations** - Disable or mock for consistent snapshots
-4. **Review all changes** - Don't auto-accept without checking
-
-### Configuring Stories for Chromatic
-
-```tsx
-// Disable animations for consistent snapshots
-export const Animated: Story = {
-  parameters: {
-    chromatic: {
-      disableSnapshot: false,
-      delay: 300, // Wait for animations
-    },
-  },
-};
-
-// Test at specific viewports
-export const Responsive: Story = {
-  parameters: {
-    chromatic: {
-      viewports: [320, 768, 1200],
-    },
-  },
-};
-
-// Skip specific stories from Chromatic
-export const Development: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
-};
-```
-
----
-
 ## Component Checklist
 
 Use this checklist when creating or updating a component:
@@ -428,12 +372,6 @@ Use this checklist when creating or updating a component:
 - [ ] With icons (if applicable)
 - [ ] AllVariants grid story
 - [ ] Autodocs enabled
-
-### Chromatic
-
-- [ ] Stories appear in Chromatic builds
-- [ ] Baseline approved
-- [ ] Viewport tests configured (if responsive)
 
 ---
 

@@ -3,8 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import {
   Card,
   CardContent,
@@ -326,9 +324,6 @@ export const FullWidth: Story = {
 // ============================================
 
 export const ClickInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
@@ -369,9 +364,6 @@ export const ClickInteraction: Story = {
 };
 
 export const KeyboardNavigation: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
@@ -415,9 +407,6 @@ export const KeyboardNavigation: Story = {
 };
 
 export const DisabledTabInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
@@ -461,9 +450,6 @@ export const DisabledTabInteraction: Story = {
 };
 
 export const DataAttributesTest: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
@@ -657,11 +643,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-  parameters: {
-    chromatic: {
-      modes: themeOnlyModes,
-    },
-  },
 };
 
 // ============================================

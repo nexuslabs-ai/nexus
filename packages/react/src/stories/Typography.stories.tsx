@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import typographyLyra from '../../../core/tokens/primitives/typography/typography-lyra.json';
 import typographyMaia from '../../../core/tokens/primitives/typography/typography-maia.json';
 import typographyMira from '../../../core/tokens/primitives/typography/typography-mira.json';
@@ -152,7 +150,6 @@ const meta: Meta = {
   parameters: {
     layout: 'fullscreen',
     a11y: { test: 'off' },
-    chromatic: { modes: themeOnlyModes, delay: 300 },
     docs: {
       description: {
         component:

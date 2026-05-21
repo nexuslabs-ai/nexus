@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import sizeLyra from '../../../core/tokens/primitives/size/size-lyra.json';
 import sizeMaia from '../../../core/tokens/primitives/size/size-maia.json';
 import sizeMira from '../../../core/tokens/primitives/size/size-mira.json';
@@ -94,7 +92,6 @@ const meta: Meta = {
   parameters: {
     layout: 'fullscreen',
     a11y: { test: 'off' },
-    chromatic: { modes: themeOnlyModes },
     docs: {
       description: {
         component:

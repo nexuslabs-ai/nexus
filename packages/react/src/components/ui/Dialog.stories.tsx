@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Button } from './button';
 import {
   Dialog,
@@ -199,9 +197,6 @@ export const ScrollableContent: Story = {
 // ============================================
 
 export const OpenCloseInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
@@ -255,9 +250,6 @@ export const OpenCloseInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
@@ -298,9 +290,6 @@ export const KeyboardInteraction: Story = {
 };
 
 export const DataAttributesTest: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
@@ -459,9 +448,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 

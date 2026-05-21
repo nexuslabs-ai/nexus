@@ -7,8 +7,6 @@ import {
 } from '@tabler/icons-react';
 import { expect } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Alert, AlertDescription, AlertTitle } from './alert';
 
 const meta: Meta<typeof Alert> = {
@@ -174,9 +172,6 @@ export const LongContent: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Alert variant="destructive" className="nx:max-w-md">
       <AlertTitle>Test Alert</AlertTitle>
@@ -200,9 +195,6 @@ export const WithDataAttributes: Story = {
 };
 
 export const DefaultDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Alert className="nx:max-w-md">
       <AlertTitle>Default Alert</AlertTitle>
@@ -276,9 +268,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
     // TODO: Fix status token contrast ratios across error, warning, success
     a11y: { test: 'todo' },
   },

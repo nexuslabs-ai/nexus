@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Badge } from './badge';
 
 const meta: Meta<typeof Badge> = {
@@ -172,9 +170,6 @@ export const Sentence: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Status',
     variant: 'success',
@@ -193,9 +188,6 @@ export const WithDataAttributes: Story = {
 };
 
 export const WithCustomClassName: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     children: 'Custom',
     className: 'custom-test-class',
@@ -287,9 +279,6 @@ export const NumberBadgeHighValue: Story = {
 };
 
 export const NumberBadgeIgnoresIcons: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     isNumber: true,
     children: 5,
@@ -473,9 +462,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
     // TODO: Fix status token contrast ratios across error, warning, success, information
     a11y: { test: 'todo' },
   },

@@ -3,8 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Button } from './button';
 import {
   Tooltip,
@@ -134,9 +132,6 @@ export const WithCustomOffset: Story = {
 // ============================================
 
 export const HoverInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -175,9 +170,6 @@ export const HoverInteraction: Story = {
 };
 
 export const FocusInteraction: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -214,9 +206,6 @@ export const FocusInteraction: Story = {
 };
 
 export const DataAttributesTest: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -336,9 +325,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 

@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import borderwidthLyra from '../../../core/tokens/primitives/borderwidth/borderwidth-lyra.json';
 import borderwidthMaia from '../../../core/tokens/primitives/borderwidth/borderwidth-maia.json';
 import borderwidthMira from '../../../core/tokens/primitives/borderwidth/borderwidth-mira.json';
@@ -130,7 +128,6 @@ const meta: Meta = {
   parameters: {
     layout: 'fullscreen',
     a11y: { test: 'off' },
-    chromatic: { modes: themeOnlyModes },
     docs: {
       description: {
         component:

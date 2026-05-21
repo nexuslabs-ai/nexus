@@ -11,7 +11,6 @@
 1. Living documentation in Storybook
 2. Interaction tests via play functions
 3. Accessibility tests via addon-a11y
-4. Visual regression tests via Chromatic
 
 ## Testing Split
 
@@ -226,69 +225,6 @@ import {
 ## Accessibility Testing
 
 A11y is automatic. Every story is checked against axe-core rules via `addon-a11y`. Violations fail the test. No separate a11y assertions needed.
-
-## Visual Regression Testing (Chromatic)
-
-Every story is automatically snapshotted by Chromatic in 4 modes:
-
-- light desktop (1280px)
-- dark desktop (1280px)
-- light mobile (375px)
-- dark mobile (375px)
-
-### Running Visual Tests
-
-**In Storybook (recommended for development):**
-
-1. Open the Visual Tests addon panel
-2. Click "Run tests"
-3. Review and accept/reject changes
-
-**From CLI:**
-
-```bash
-yarn chromatic        # Local (doesn't fail on changes)
-yarn chromatic:ci     # CI (fails if changes need review)
-```
-
-### Chromatic Story Parameters
-
-```tsx
-import { themeOnlyModes } from '@/storybook/modes';
-
-export const MyStory: Story = {
-  parameters: {
-    chromatic: {
-      disableSnapshot: true, // Skip visual test
-      delay: 500, // Wait for animations
-      modes: themeOnlyModes, // Override default modes
-    },
-  },
-};
-```
-
-### When to Disable Snapshots
-
-Add `chromatic: { disableSnapshot: true }` for stories that:
-
-- Only test interactions (no unique visual output)
-- Test data attributes or ARIA properties
-- Have identical appearance to another story
-
-### When to Use themeOnlyModes
-
-Use `modes: themeOnlyModes` for:
-
-- Grid/showcase stories like AllVariants
-- Simple components that don't need responsive testing
-
-### Modes Location
-
-From `packages/react/src/storybook/modes.ts`:
-
-- `allModes` - All 4 theme/viewport combinations (default)
-- `themeOnlyModes` - Light/dark desktop only
-- `viewportOnlyModes` - Mobile/desktop light only
 
 ## Running Tests
 

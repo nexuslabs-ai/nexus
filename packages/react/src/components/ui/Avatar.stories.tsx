@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconUser } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { themeOnlyModes } from '@/storybook/modes';
-
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 
 const meta: Meta<typeof Avatar> = {
@@ -185,9 +183,6 @@ export const ShapeRounded: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Avatar size="lg" shape="rounded">
       <AvatarImage src={AVATAR_URL} alt="User avatar" />
@@ -206,9 +201,6 @@ export const WithDataAttributes: Story = {
 };
 
 export const FallbackDataAttributes: Story = {
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   render: (_args) => (
     <Avatar>
       <AvatarFallback>AB</AvatarFallback>
@@ -355,9 +347,6 @@ export const AllSizes: Story = {
   ),
   parameters: {
     layout: 'padded',
-    chromatic: {
-      modes: themeOnlyModes,
-    },
   },
 };
 
