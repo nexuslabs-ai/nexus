@@ -366,6 +366,16 @@ export function partitionThemedModes(modes) {
 }
 
 /**
+ * Return dark tokens whose value diverges from the light token sharing the same
+ * cssName. Dark tokens identical to their light counterpart would emit redundant
+ * `.dark` (or `html.dark`) overrides; filtering keeps the override block honest.
+ */
+export function filterDivergentDark(lightTokens, darkTokens) {
+  const lightByName = new Map(lightTokens.map((t) => [t.cssName, t.value]));
+  return darkTokens.filter((t) => lightByName.get(t.cssName) !== t.value);
+}
+
+/**
  * Process a semantic token file and resolve references
  * @param {string} filePath - Full path to semantic file
  * @param {Map} primitiveMap - Primitive map for reference resolution

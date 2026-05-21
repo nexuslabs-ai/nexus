@@ -8,5 +8,35 @@
       "$value": "#fca5a5",
       "$type": "color"
     }
+  },
+  "geometry": {
+    "x": {
+      "$value": {
+        "value": 0,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "y": {
+      "$value": {
+        "value": 0,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "blur": {
+      "$value": {
+        "value": 0,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "spread": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    }
   }
 }

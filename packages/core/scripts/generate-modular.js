@@ -12,8 +12,8 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  filterDivergentDark,
   formatDistCssFiles,
-  formatShadowComposite,
   formatTokenValue,
   generateBorderWidthUtilitiesCSS,
   generateThemeCSS,
@@ -54,7 +54,10 @@ function processSinglePrimitive(category, primitiveMap) {
   for (const token of extracted) {
     const cssName = `nx-${category}-${pathToCssVar(token.path)}`;
     const cssValue = formatTokenValue(token.value, token.type, token.path);
-    primitiveMap.set(token.path.join('.'), { cssName, value: cssValue });
+    const entry = { cssName, value: cssValue };
+    const refPath = token.path.join('.');
+    primitiveMap.set(refPath, entry);
+    primitiveMap.set(`${category}.${refPath}`, entry);
     tokens.push({ cssName, value: cssValue });
   }
 
@@ -90,7 +93,10 @@ function processPrimitiveFile(category, mode, primitiveMap) {
       cssValue = formatTokenValue(cssValue, token.type, token.path);
     }
 
-    primitiveMap.set(token.path.join('.'), { cssName, value: cssValue });
+    const entry = { cssName, value: cssValue };
+    const refPath = token.path.join('.');
+    primitiveMap.set(refPath, entry);
+    primitiveMap.set(`${category}.${refPath}`, entry);
     tokens.push({ cssName, value: cssValue, type: token.type });
   }
 
@@ -103,33 +109,6 @@ function processPrimitiveFile(category, mode, primitiveMap) {
 function processSemanticFile(fileName, primitiveMap) {
   const filePath = path.join(SEMANTIC_DIR, fileName);
   return processSemanticTokens(filePath, primitiveMap);
-}
-
-/**
- * Process shadow styles for shadow-variables.css. Each shadow property
- * reference resolves through primitiveMap to the actual primitive cssName.
- */
-function processShadowStyles(primitiveMap) {
-  const stylesFile = path.join(TOKENS_DIR, 'styles/shadows.json');
-  if (!fs.existsSync(stylesFile)) {
-    throw new Error(`Shadow styles file missing: ${stylesFile}`);
-  }
-
-  const tokenData = readTokenFile(stylesFile);
-  const extracted = extractTokens(tokenData);
-  const shadows = [];
-
-  for (const token of extracted) {
-    if (token.type !== 'shadow') continue;
-
-    const cssName = `nx-shadow-${token.path.join('-')}`;
-    const isInset = token.path.includes('inner');
-    const cssValue = formatShadowComposite(token.value, primitiveMap, isInset);
-
-    shadows.push({ cssName, value: cssValue });
-  }
-
-  return shadows;
 }
 
 /**
@@ -200,6 +179,9 @@ function generateThemedCSS(distDir, type, mode, primitiveMap) {
 /**
  * Generate themed primitive CSS file (light/dark pair → one file with html / html.dark blocks).
  * Mirrors generateThemedCSS so themed primitives load the same way as base/brands semantics.
+ * Dark tokens identical to their light counterpart are filtered out so the
+ * `html.dark` block contains only genuine divergences (matches the bundled
+ * variables.css behaviour).
  */
 function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
   const lightTokens = processPrimitiveFile(
@@ -212,6 +194,7 @@ function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
     `${mode}-dark`,
     primitiveMap
   );
+  const divergentDark = filterDivergentDark(lightTokens, darkTokens);
 
   let css = `/* ${category}: ${mode} */\n\nhtml {\n`;
 
@@ -220,26 +203,12 @@ function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
   }
   css += `}\n\nhtml.dark {\n`;
 
-  for (const token of darkTokens) {
+  for (const token of divergentDark) {
     css += `  --${token.cssName}: ${token.value};\n`;
   }
   css += `}\n`;
 
   writeModularFile(distDir, `${category}-${mode}.css`, css);
-}
-
-/**
- * Generate shadow variables CSS
- */
-function generateShadowVariablesCSS(distDir, shadows) {
-  let css = `/* Shadow Variables */\n\n:root {\n`;
-
-  for (const shadow of shadows) {
-    css += `  --${shadow.cssName}: ${shadow.value};\n`;
-  }
-
-  css += `}\n`;
-  writeModularFile(distDir, 'shadow-variables.css', css);
 }
 
 /**
@@ -428,12 +397,6 @@ export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
     console.log(`  ✓ ${typography.count} typography utilities`);
     totalFiles++;
   }
-
-  // Generate shadow variables from styles
-  const shadowVariables = processShadowStyles(primitiveMap);
-  generateShadowVariablesCSS(distDir, shadowVariables);
-  console.log(`  ✓ ${shadowVariables.length} shadow variables`);
-  totalFiles++;
 
   // Generate border width utilities (use first mode as reference)
   if (primitives.borderwidth && primitives.borderwidth.modes) {

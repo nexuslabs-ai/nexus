@@ -119,21 +119,21 @@
     "default": {
       "$type": "shadow",
       "$value": {
-        "offsetX": "{geometry.x}",
-        "offsetY": "{geometry.y}",
-        "blur": "{geometry.blur}",
-        "spread": "{geometry.spread}",
-        "color": "{color.default}"
+        "offsetX": "{focus.geometry.x}",
+        "offsetY": "{focus.geometry.y}",
+        "blur": "{focus.geometry.blur}",
+        "spread": "{focus.geometry.spread}",
+        "color": "{focus.color.default}"
       }
     },
     "error": {
       "$type": "shadow",
       "$value": {
-        "offsetX": "{geometry.x}",
-        "offsetY": "{geometry.y}",
-        "blur": "{geometry.blur}",
-        "spread": "{geometry.spread}",
-        "color": "{color.error}"
+        "offsetX": "{focus.geometry.x}",
+        "offsetY": "{focus.geometry.y}",
+        "blur": "{focus.geometry.blur}",
+        "spread": "{focus.geometry.spread}",
+        "color": "{focus.color.error}"
       }
     }
   }

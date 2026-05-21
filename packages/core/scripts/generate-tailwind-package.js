@@ -12,6 +12,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
   generateBaseLayerCSS,
@@ -149,13 +150,16 @@ function loadTokensWithNxPrefix(filePath, primitiveMap, tokenList, category) {
   for (const token of tokens) {
     const cssName = pathToCssVarPrefixed(token.path, category, true);
     const cssValue = formatTokenValue(token.value, token.type, token.path);
-
-    primitiveMap.set(token.path.join('.'), {
+    const entry = {
       cssName,
       value: cssValue,
       type: token.type,
       rawValue: token.value,
-    });
+    };
+    const refPath = token.path.join('.');
+
+    primitiveMap.set(refPath, entry);
+    primitiveMap.set(`${category}.${refPath}`, entry);
 
     tokenList.push({
       cssName,
@@ -163,7 +167,7 @@ function loadTokensWithNxPrefix(filePath, primitiveMap, tokenList, category) {
       type: token.type,
       category,
       rawValue: token.value,
-      path: token.path.join('.'),
+      path: refPath,
     });
   }
 }
@@ -297,16 +301,6 @@ function groupByCategory(tokens) {
     groups[token.category].push(token);
   }
   return groups;
-}
-
-/**
- * Return dark tokens whose value differs from the light token sharing the same
- * cssName. Dark tokens with identical values would emit redundant `.dark`
- * overrides.
- */
-function filterDivergentDark(primitiveTokens, darkTokens) {
-  const lightByName = new Map(primitiveTokens.map((t) => [t.cssName, t.value]));
-  return darkTokens.filter((t) => lightByName.get(t.cssName) !== t.value);
 }
 
 /**
