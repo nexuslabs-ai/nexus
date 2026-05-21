@@ -11,6 +11,18 @@ const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const DEFAULT_SNAPSHOT = path.join(TOKENS_DIR, 'figma-snapshot.json');
 
+/**
+ * Each registry entry is one of:
+ *  - Single-mode: { file: '<path>' }
+ *      diff `snapshot[category]` against the one code file.
+ *  - Multi-mode:  { dir: '<path>', filePattern: '{cat}-{mode}.json' }
+ *      with `--mode <name>`, diff `snapshot[category][mode]` against `<dir>/<cat>-<mode>.json`.
+ *  - Mode × theme: { dir: '<path>', filePattern: '{cat}-{mode}-{theme}.json' }
+ *      with `--mode <name> --theme <variant>`, diff `snapshot[cat][mode][theme]` against the matching file.
+ *
+ * #61/#62/#63 add their categories by filling paths into this map. Snapshot/CLI shape is
+ * locked in .claude/rules/figma.md — Code-vs-Figma Parity Audit.
+ */
 const CATEGORIES = {
   color: {
     file: path.join(PRIMITIVES_DIR, 'color.json'),
@@ -23,12 +35,16 @@ const EXIT_CONFIG = 2;
 
 const DOCS_HINT = 'see .claude/rules/figma.md → Code-vs-Figma Parity Audit';
 
+class ConfigError extends Error {}
+
 export function parseArgs(argv) {
   const args = { category: null, snapshot: DEFAULT_SNAPSHOT };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (!arg.startsWith('--')) continue;
+    if (arg === '--') continue;
     const eq = arg.indexOf('=');
+    if (eq === 2) continue;
     if (eq !== -1) {
       args[arg.slice(2, eq)] = arg.slice(eq + 1);
       continue;
@@ -53,7 +69,7 @@ function normalizeValue(value, type) {
     'value' in value
   ) {
     const rounded = Math.round(value.value * 10000) / 10000;
-    return `${rounded}${value.unit || 'px'}`;
+    return `${rounded}${value.unit ?? 'px'}`;
   }
   if (typeof value === 'object' && value !== null) {
     throw new Error(
@@ -121,27 +137,20 @@ function formatFinding(finding) {
       return `  ✗ ${label} missing in Figma (code value: ${finding.code.value}) → add to Figma`;
     case 'missing-in-code':
       return `  ✗ ${label} extra in Figma (figma value: ${finding.figma.value}) → remove from Figma`;
+    default:
+      throw new Error(`formatFinding: unknown kind "${finding.kind}"`);
   }
 }
 
 function fail(message) {
-  process.stderr.write(`audit-figma-parity: ${message}\n`);
-  process.exit(EXIT_CONFIG);
+  throw new ConfigError(message);
 }
 
-function readSnapshotOrFail(filePath) {
+function readJsonOrFail(filePath, label) {
   try {
     return readTokenFile(filePath);
   } catch (err) {
-    fail(`failed to parse snapshot ${filePath}: ${err.message}`);
-  }
-}
-
-function readCodeFileOrFail(filePath) {
-  try {
-    return readTokenFile(filePath);
-  } catch (err) {
-    fail(`failed to parse code file ${filePath}: ${err.message}`);
+    fail(`failed to parse ${label} ${filePath}: ${err.message}`);
   }
 }
 
@@ -186,7 +195,7 @@ function main() {
     );
   }
 
-  const snapshot = readSnapshotOrFail(args.snapshot);
+  const snapshot = readJsonOrFail(args.snapshot, 'snapshot');
   const snapshotSubtree = snapshot[args.category];
   if (!snapshotSubtree) {
     fail(
@@ -196,7 +205,8 @@ function main() {
 
   const codeTs = gitLastCommitTs(config.file);
   const snapshotTs = gitLastCommitTs(args.snapshot);
-  if (codeTs !== null && snapshotTs !== null && codeTs > snapshotTs) {
+  const staleGuardSkipped = codeTs === null || snapshotTs === null;
+  if (!staleGuardSkipped && codeTs > snapshotTs) {
     const codeDate = new Date(codeTs * 1000).toISOString().slice(0, 10);
     const snapDate = new Date(snapshotTs * 1000).toISOString().slice(0, 10);
     fail(
@@ -204,7 +214,7 @@ function main() {
     );
   }
 
-  const codeData = readCodeFileOrFail(config.file);
+  const codeData = readJsonOrFail(config.file, 'code file');
   const findings = diffTokenTrees(codeData, snapshotSubtree);
 
   const meta = snapshotSubtree.$meta;
@@ -213,6 +223,9 @@ function main() {
   if (meta?.capturedAt) {
     const source = meta.figmaFileName ? ` (${meta.figmaFileName})` : '';
     lines.push(`  Snapshot: ${meta.capturedAt}${source}`);
+  }
+  if (staleGuardSkipped) {
+    lines.push('  ⚠ stale-snapshot guard skipped (git timestamps unavailable)');
   }
   if (findings.length === 0) {
     lines.push('  ✓ no drift');
@@ -234,5 +247,13 @@ function main() {
 
 const isMain = process.argv[1] === fileURLToPath(import.meta.url);
 if (isMain) {
-  main();
+  try {
+    main();
+  } catch (err) {
+    if (err instanceof ConfigError) {
+      process.stderr.write(`audit-figma-parity: ${err.message}\n`);
+      process.exit(EXIT_CONFIG);
+    }
+    throw err;
+  }
 }

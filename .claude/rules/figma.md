@@ -26,7 +26,16 @@ A designer who wants to change a token value opens a PR against the JSON file. E
 
 ```bash
 yarn audit:figma-parity --category color
+yarn audit:figma-parity --category color --snapshot path/to/alt-snapshot.json
 ```
+
+Flags:
+
+| Flag                | Required?                              | Default                                    |
+| ------------------- | -------------------------------------- | ------------------------------------------ |
+| `--category <name>` | Always                                 | —                                          |
+| `--snapshot <path>` | Optional — testing/alternate snapshots | `packages/core/tokens/figma-snapshot.json` |
+| `--mode <name>`     | Required for multi-mode categories     | — (color is single-mode, ignores this)     |
 
 Exit codes:
 
@@ -53,17 +62,17 @@ This table is the single source of truth for the audit's category coverage. The 
 
 ### Snapshot shape
 
-The snapshot JSON mirrors the code's primitive file structure, so the same diff core walks both sides without translation:
+The snapshot JSON nests by mode so a single capture covers every mode the designer cares about. Each `--category … --mode <name>` invocation slices into one subtree on the snapshot side and reads one file on the code side:
 
-| Category type | Code layout                                    | Snapshot key shape                      |
-| ------------- | ---------------------------------------------- | --------------------------------------- |
-| Single-mode   | `primitives/color.json`                        | `snapshot.color.<palette>.<shade>`      |
-| Multi-mode    | `primitives/{cat}/{cat}-{mode}.json`           | `snapshot.<cat>.<mode>.<keys>`          |
-| Mode × theme  | `primitives/shadow/shadow-{mode}-{theme}.json` | `snapshot.shadow.<mode>.<theme>.<keys>` |
+| Category type | CLI invocation                                | Code file read                             | Snapshot subtree read        |
+| ------------- | --------------------------------------------- | ------------------------------------------ | ---------------------------- |
+| Single-mode   | `--category color`                            | `primitives/color.json`                    | `snapshot.color`             |
+| Multi-mode    | `--category size --mode vega`                 | `primitives/size/size-vega.json`           | `snapshot.size.vega`         |
+| Mode × theme  | `--category shadow --mode vega --theme light` | `primitives/shadow/shadow-vega-light.json` | `snapshot.shadow.vega.light` |
 
-Each category subtree carries a `$meta` block — at minimum `capturedAt` (ISO date) and `figmaFileName`. The `$`-prefix is DTCG metadata and is skipped by the token walker, so it never appears as a drift finding.
+Each category subtree carries a `$meta` block — at minimum `capturedAt` (ISO date) and `figmaFileName`. The `$`-prefix is DTCG metadata and is skipped by the token walker, so it never appears as a drift finding. For multi-mode categories the `$meta` lives under the mode (e.g., `snapshot.size.vega.$meta`) so each capture timestamps independently.
 
-Multi-mode CLI invocation (likely a `--mode <name>` flag) is locked in by #61 alongside its category wiring; single-mode color today only needs `--category color`.
+This is the locked contract for #61/#62/#63 — sub-issue PRs only fill in the code-file path and add their categories to the registry, not redesign the snapshot or CLI shape.
 
 ### Refreshing the snapshot
 

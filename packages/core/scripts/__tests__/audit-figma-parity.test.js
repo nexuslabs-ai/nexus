@@ -194,7 +194,7 @@ describe('diffTokenTrees', () => {
         $type: 'typography',
       },
     };
-    expect(() => diffTokenTrees(code, {})).toThrow(/normalizeValue/);
+    expect(() => diffTokenTrees(code, {})).toThrow(/object value for \$type/);
   });
 });
 
