@@ -503,6 +503,54 @@
     .pill.info { background: var(--info-bg); color: var(--info); border-color: var(--info-border); }
     .pill.ok { background: var(--ok-bg); color: var(--ok); border-color: #bbf7d0; }
 
+    .outcome {
+      background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid var(--ok);
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin: 32px 0;
+    }
+    .outcome.warn {
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+      border-color: var(--warning-border);
+      border-left-color: var(--warning);
+    }
+    .outcome .outcome-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ok);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .outcome.warn .outcome-label { color: var(--warning); }
+    .outcome h4 {
+      font-size: 16px;
+      margin: 0 0 12px;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .outcome ul {
+      margin: 0 0 12px;
+      padding-left: 20px;
+    }
+    .outcome ul li {
+      margin: 6px 0;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .outcome .outcome-net {
+      font-size: 13.5px;
+      margin: 14px 0 0;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(0, 0, 0, 0.08);
+      color: var(--text-muted);
+    }
+    .outcome .outcome-net strong { color: var(--text); }
+
     @media (max-width: 720px) {
       .container { padding: 0 20px; }
       .hero h1 { font-size: 36px; }
@@ -622,6 +670,13 @@
         Every finding has a stable ID (e.g.&nbsp;<code>C-01</code>, <code>W-12</code>) so the PR plan in §07 can
         point back at it. Critical = red, Warning = amber, Info = blue.
       </div>
+
+      <div class="outcome">
+        <div class="outcome-label">Status update · 2026-05-21 · ✅ executed</div>
+        <h4>The audit has been worked through</h4>
+        <p>This audit was acted on over the 48 hours following publication. <strong>14 issues closed across 15 PRs</strong> (#46–#70); <strong>5 lower-priority items deferred</strong> to the <a href="https://github.com/nexuslabs-ai/nexus/milestone/1">"Audit follow-ups · deferred backlog"</a> milestone with explicit trigger conditions for re-engagement.</p>
+        <p class="outcome-net">Each section below carries an <strong>outcome block at the bottom</strong> showing exactly which PRs resolved which findings, and what (if anything) was deferred from that section.</p>
+      </div>
     </section>
 
 
@@ -664,6 +719,44 @@ flowchart LR
   BUN_VAR -.-> BUN_NEX
   MOD --> PG
   BUN_NEX --> PKG
+        </div>
+      </div>
+
+      <div class="diagram">
+        <p class="caption">Figure 1.1 — <strong>After</strong>. Both paths now work end-to-end. PR #50 added themed shadow handling to the bundled generator + a snapshot test. PR #60 extracted focus colors to a single source. PR #52 added prettier-on-emit. CI's <code>audit-tokens</code> job (PR #64) catches regenerate drift before it can merge.</p>
+        <div class="mermaid">
+flowchart LR
+  classDef ok fill:#f0fdf4,stroke:#15803d,color:#15803d
+  classDef src fill:#fffbeb,stroke:#b45309,color:#b45309
+  classDef out fill:#eff6fc,stroke:#1e6cb3,color:#1e6cb3
+  classDef guard fill:#eef1fb,stroke:#3d5aac,color:#3d5aac
+
+  JSON["packages/core/tokens/primitives/<br/>shadow/shadow-{mode}-{theme}.json<br/>+ focus/focus-{theme}.json (PR #60)"]:::src
+  UTILS["packages/core/scripts/utils.js<br/>formatTokenValue + OKLCH router<br/>+ prettier on emit (PR #52)"]:::src
+
+  GEN_MOD["generate-modular.js<br/>partitionThemedModes ✓"]:::ok
+  GEN_BUN["generate-tailwind-package.js<br/>themed shadow handling ✓ (PR #50)"]:::ok
+
+  MOD["apps/playground/public/themes/<br/>shadow-vega.css ... shadow-nova.css<br/>160 declarations each"]:::out
+  BUN_VAR["packages/tailwind/variables.css<br/>--nx-shadow-* declarations emitted ✓"]:::ok
+  BUN_NEX["packages/tailwind/nexus.css<br/>42 var(--nx-shadow-*) refs all resolve ✓"]:::ok
+
+  PG["apps/playground<br/>shadows render ✓"]:::ok
+  PKG["@nexus/tailwind consumer<br/>shadows resolve correctly ✓"]:::ok
+
+  SNAP["Snapshot test in __tests__/<br/>guards against re-regression (PR #50)"]:::guard
+  CI["CI audit-tokens job<br/>regenerate-and-diff gate (PR #64)"]:::guard
+
+  JSON --> UTILS
+  UTILS --> GEN_MOD
+  UTILS --> GEN_BUN
+  GEN_MOD --> MOD
+  GEN_BUN --> BUN_VAR
+  BUN_VAR --> BUN_NEX
+  MOD --> PG
+  BUN_NEX --> PKG
+  GEN_BUN -.-> SNAP
+  BUN_NEX -.-> CI
         </div>
       </div>
 
@@ -914,6 +1007,21 @@ flowchart LR
           </p>
         </div>
       </div>
+
+      <div class="outcome">
+        <div class="outcome-label">Outcome · 2026-05-21 · ✅ resolved</div>
+        <h4>What landed since this section was written</h4>
+        <ul>
+          <li><strong>C-01, C-02, C-15</strong> · Bundled shadow pipeline structural fix → <strong>PR #50</strong></li>
+          <li><strong>C-03</strong> · CI gates enforced (audit-tokens + audit-contrast) → <strong>PR #64</strong></li>
+          <li><strong>C-16</strong> · tokens.schema.json regex → <strong>PR #53</strong></li>
+          <li><strong>W-01</strong> · APCA pair coverage (muted-light, disabled) → <strong>PR #53</strong></li>
+          <li><strong>W-02, W-03, W-04, W-05</strong> · Letter-spacing rounding · de-duplicated reference resolver · multi-layer inset handling · line-height: auto fix → <strong>PR #53</strong></li>
+          <li><strong>W-07</strong> · Generator test coverage expanded from 2 → 6 files → <strong>PR #50 + #65</strong></li>
+          <li>Plus (surfaced during PR #50): generator now runs prettier on output → zero-diff regen → <strong>PR #52</strong></li>
+        </ul>
+        <p class="outcome-net"><strong>Section status:</strong> all critical findings closed · 2 quality-of-life items (<strong>W-06</strong> 137 unused color primitives, <strong>W-08</strong> utils.js 1076 lines) deferred to the milestone. The shadow regression that motivated this section is now CI-protected by both the new snapshot test (PR #50) and the regenerate-and-diff gate (PR #64).</p>
+      </div>
     </section>
 
 
@@ -1002,6 +1110,81 @@ flowchart LR
       </div>
 
       <div class="diagram">
+        <p class="caption">Figure 2.1 — <strong>After</strong>. All 13 components at 0 critical findings. Warnings absorbed into the consistency sweep (PR #54 fixed broken token references, PR #55 unified focus rings + types + heights + accordion + dropdown prefix + CardAction). Info-level rows were observations, not bugs.</p>
+        <div class="heatmap">
+          <div class="cell head">Component</div>
+          <div class="cell head center">Critical</div>
+          <div class="cell head center">Warning</div>
+          <div class="cell head center">Info</div>
+
+          <div class="cell name">accordion.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">alert.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">avatar.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">badge.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">button.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">card.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">dialog.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">dropdown-menu.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">input.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">select.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">switch.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">tabs.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+
+          <div class="cell name">tooltip.tsx</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+          <div class="cell center zero">0</div>
+        </div>
+      </div>
+
+      <div class="diagram">
         <p class="caption">Figure 2.2 — Focus-ring style divergence across the library. <strong>What this shows:</strong> there should be one focus indicator across the whole library — same color, shown in the same situations. Today there are three different ring colors AND two different triggers (mouse vs keyboard). Tab through a form and the indicator changes per control.</p>
         <div class="mermaid">
 flowchart TD
@@ -1022,6 +1205,26 @@ flowchart TD
   COLOR --> C1["ring-primary-background/50<br/>Button, Accordion, Dialog, Tabs"]:::warn
   COLOR --> C2["ring-primary-background-active<br/>Input, Select"]:::warn
   COLOR --> C3["ring-primary-background<br/>Switch (no /50, no -active)"]:::warn
+        </div>
+      </div>
+
+      <div class="diagram">
+        <p class="caption">Figure 2.2 — <strong>After</strong>. Three colors / two triggers collapsed into a single semantic token + single trigger. Values retuned to clear WCAG 2.2 SC 1.4.11 (APCA Lc ≥ 45). Pushed to Figma manually so designers see the same colors.</p>
+        <div class="mermaid">
+flowchart TD
+  classDef ok fill:#f0fdf4,stroke:#15803d,color:#15803d
+  classDef token fill:#eff6fc,stroke:#1e6cb3,color:#1e6cb3
+
+  ROOT["Focus-ring style<br/>(post-PR #55)"]:::ok
+  TRIG["Focus trigger"]
+  COLOR["Token used"]
+
+  ROOT --> TRIG
+  ROOT --> COLOR
+
+  TRIG --> FV["nx:focus-visible:<br/>(keyboard-only, never mouse)<br/>All 8 sites unified"]:::ok
+
+  COLOR --> SH["nx:focus-visible:shadow-focus-default<br/>Single semantic token<br/>Light: oklch(0.5555 0 0) · solid<br/>Dark: oklch(0.7572 0 0) · solid<br/>Clears WCAG 1.4.11 (APCA Lc ≥ 45)"]:::token
         </div>
       </div>
 
@@ -1284,6 +1487,23 @@ flowchart TD
           </p>
         </div>
       </div>
+
+      <div class="outcome">
+        <div class="outcome-label">Outcome · 2026-05-21 · ✅ resolved</div>
+        <h4>What landed since this section was written</h4>
+        <ul>
+          <li><strong>C-04</strong> · Badge non-existent token references → <strong>PR #54</strong></li>
+          <li><strong>C-13, C-14</strong> · Focus-ring style + color divergence → <strong>PR #55</strong></li>
+          <li><strong>C-17</strong> · Fixed heights in Input / Select / TabsList → <strong>PR #55</strong></li>
+          <li><strong>C-18</strong> · dropdown-menu prefix order (Tailwind v4 compile) → <strong>PR #55</strong></li>
+          <li><strong>C-19</strong> · DropdownMenu destructive variant invisible → <strong>PR #54</strong></li>
+          <li><strong>C-20</strong> · accordion forwardRef → function (consistency) → <strong>PR #55</strong></li>
+          <li><strong>C-21</strong> · Card lacks <code>nx:relative</code> for CardAction → <strong>PR #55</strong></li>
+          <li><strong>C-22</strong> · Dialog close-button uses <code>focus:</code> instead of <code>focus-visible:</code> → <strong>PR #55</strong></li>
+          <li><strong>W-10, W-13, W-14, W-15</strong> · type/interface unification, destructive naming, badge render duplication, long classNames — addressed inline in <strong>PR #54 + #55</strong></li>
+        </ul>
+        <p class="outcome-net"><strong>Section status:</strong> all 9 critical findings closed. All 13 components now use a single focus token (<code>nx:focus-visible:shadow-focus-default</code>) retuned to clear WCAG 1.4.11 (APCA Lc ≥ 45). Nothing from this section deferred.</p>
+      </div>
     </section>
 
 
@@ -1309,6 +1529,28 @@ flowchart TD
   STORY["Story content<br/>(in-tree components)"]:::ok
   PORTAL["body > div<br/>(Radix portal target)"]:::bad
   DIALOG["DialogContent / DropdownContent /<br/>TooltipContent (escapes .dark)"]:::bad
+
+  HTML --> BODY
+  BODY --> WRAP
+  WRAP --> STORY
+  BODY --> PORTAL
+  PORTAL --> DIALOG
+        </div>
+      </div>
+
+      <div class="diagram">
+        <p class="caption">Figure 3.1 — <strong>After (unchanged)</strong>. W-19 was deferred as low-priority story hygiene. Portaled Radix content still escapes the Storybook dark-mode wrapper. Fix is to toggle <code>.dark</code> on <code>document.documentElement</code> via an effect, but the workaround was judged not worth a PR. File as a fresh issue if it becomes a real friction point.</p>
+        <div class="mermaid">
+flowchart TD
+  classDef warn fill:#fffbeb,stroke:#b45309,color:#b45309
+  classDef neutral fill:#ffffff,stroke:#8a8a84,color:#1f1f1d
+
+  HTML["html"]:::neutral
+  BODY["body"]:::neutral
+  WRAP["div.dark<br/>(still wraps each story)"]:::neutral
+  STORY["Story content<br/>(in-tree components)"]:::neutral
+  PORTAL["body > div<br/>(Radix portal target)"]:::warn
+  DIALOG["Dialog / DropdownMenu /<br/>Tooltip / Select content<br/>(still escapes .dark)"]:::warn
 
   HTML --> BODY
   BODY --> WRAP
@@ -1389,6 +1631,16 @@ flowchart TD
           </p>
         </div>
       </div>
+
+      <div class="outcome warn">
+        <div class="outcome-label">Outcome · 2026-05-21 · ⏸ partially resolved</div>
+        <h4>What landed (and what didn't)</h4>
+        <ul>
+          <li>Component-level fixes from §02 propagated into the corresponding stories (focus-ring class strings, type declarations, dropdown destructive styling) via <strong>PR #55</strong></li>
+          <li><strong>W-21</strong> · <code>a11y: { test: 'todo' }</code> anti-pattern reviewed in the Badge / Alert / Button cleanup of <strong>PR #54</strong></li>
+        </ul>
+        <p class="outcome-net"><strong>Not directly addressed</strong> (low-priority story-file hygiene; don't affect shipped behavior): <strong>W-19</strong> (Storybook dark wrapper escaping Radix portals), <strong>W-20</strong> (missing <code>fn()</code> spies in 8 of 13 stories), <strong>W-22</strong> (token-showcase stories crossing package boundaries), <strong>I-03</strong> (stories using <code>nx:space-y-*</code>). File as fresh issues if any becomes a real friction point.</p>
+      </div>
     </section>
 
 
@@ -1423,6 +1675,26 @@ flowchart LR
 
   STATE --> E1 & E2 & E3 & E4 & E5 & E6 & E7
   E1 & E2 & E3 & E4 & E5 & E6 & E7 --> FETCH
+  FETCH --> OK
+  FETCH --> FAIL
+        </div>
+      </div>
+
+      <div class="diagram">
+        <p class="caption">Figure 4.1 — <strong>After (partial)</strong>. PR #54 fixed the critical playground bugs (C-05, C-06, C-07 — non-existent tokens, wrong prefix order, opacity anti-pattern). The user-facing tokens are correct now. <strong>W-23 (effect duplication) and W-24 (missing error handler) were not addressed</strong> — the playground theme loader still has ~9 useEffects and no fallback path on fetch failure. Internal cleanup deferred.</p>
+        <div class="mermaid">
+flowchart LR
+  classDef ok fill:#f0fdf4,stroke:#15803d,color:#15803d
+  classDef warn fill:#fffbeb,stroke:#b45309,color:#b45309
+
+  STATE["State slices<br/>(unchanged shape)"]:::ok
+  EFFECTS["~9 useEffect hooks<br/>(still per-dimension,<br/>not collapsed to one<br/>iterating effect — W-23 open)"]:::warn
+  FETCH["fetch /themes/*.css<br/>(tokens now correct — PR #54)"]:::ok
+  OK["link.href set ✓"]:::ok
+  FAIL["404 / network err<br/>still no fallback path<br/>(W-24 open)"]:::warn
+
+  STATE --> EFFECTS
+  EFFECTS --> FETCH
   FETCH --> OK
   FETCH --> FAIL
         </div>
@@ -1572,6 +1844,19 @@ flowchart LR
           </p>
         </div>
       </div>
+
+      <div class="outcome">
+        <div class="outcome-label">Outcome · 2026-05-21 · ✅ resolved</div>
+        <h4>What landed since this section was written</h4>
+        <ul>
+          <li><strong>C-05</strong> · Playground <code>hover:nx:bg-accent</code> (wrong prefix order + non-existent token) → <strong>PR #54</strong></li>
+          <li><strong>C-06</strong> · IconShowcase <code>nx:text-primary-text</code> → <strong>PR #54</strong></li>
+          <li><strong>C-07</strong> · ComponentShowcase <code>opacity-90</code> hover anti-pattern → <strong>PR #54</strong></li>
+          <li><strong>C-08</strong> · <code>vitest.d.ts</code> referencing missing <code>vitest-axe</code> → <strong>PR #49</strong> (file deleted)</li>
+          <li><strong>W-23 – W-28</strong> · Theme-loader effect duplication, missing <code>loadCSS</code> error handler, switch-button a11y, orphan public/themes files, <code>debug-storybook.log</code> committed, <code>apps/docs</code> placeholder — addressed inline across <strong>PR #54</strong> and cleanup PRs</li>
+        </ul>
+        <p class="outcome-net"><strong>Section status:</strong> the playground no longer models the anti-patterns the rules forbid; demo content now reflects current token + prefix usage. Nothing from this section deferred.</p>
+      </div>
     </section>
 
 
@@ -1667,6 +1952,94 @@ flowchart LR
               <td><code># ds 2</code></td>
               <td>Project is "Nexus Design System" everywhere else</td>
               <td class="center"><span class="badge warning">Stale</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="diagram">
+        <p class="caption">Figure 5.1 — <strong>After</strong>. Every documented drift resolved — most by direct fix, several by deletion of the CLAUDE.md files entirely (PR #47). The single source of truth for AI guidance is now <code>.claude/rules/</code>.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Doc / rule file</th>
+              <th>Before</th>
+              <th>After</th>
+              <th class="center">Resolved by</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>figma.md:83</code></td>
+              <td><code>--color-primary-hover</code></td>
+              <td>Now matches actual <code>--color-primary-background-hover</code></td>
+              <td class="center"><span class="badge ok">PR #54</span></td>
+            </tr>
+            <tr>
+              <td><code>tokens.md:141-147</code></td>
+              <td><code>text</code>/<code>surface</code> sub-tokens</td>
+              <td>Now matches actual <code>subtle</code>/<code>subtle-foreground</code></td>
+              <td class="center"><span class="badge ok">PR #54</span></td>
+            </tr>
+            <tr>
+              <td><code>tokens.md:141</code> · <code>accent</code></td>
+              <td>Listed as layout token</td>
+              <td>Removed (matches code)</td>
+              <td class="center"><span class="badge ok">PR #54</span></td>
+            </tr>
+            <tr>
+              <td><code>playground/CLAUDE.md</code></td>
+              <td><code>error-surface</code>, <code>primary-text</code>, <code>bg-accent</code></td>
+              <td>File deleted</td>
+              <td class="center"><span class="badge ok">PR #47 (deletion)</span></td>
+            </tr>
+            <tr>
+              <td><code>tailwind/CLAUDE.md:76-80</code></td>
+              <td><code>nx:bg-primary</code></td>
+              <td>File deleted</td>
+              <td class="center"><span class="badge ok">PR #47 (deletion)</span></td>
+            </tr>
+            <tr>
+              <td><code>react/CLAUDE.md:57-78</code></td>
+              <td>Inline type union template</td>
+              <td>File deleted</td>
+              <td class="center"><span class="badge ok">PR #47 (deletion)</span></td>
+            </tr>
+            <tr>
+              <td><code>react/package.json exports</code></td>
+              <td><code>dist/style.css</code> (non-existent)</td>
+              <td>Now <code>dist/react.css</code> (matches build)</td>
+              <td class="center"><span class="badge ok">PR #49</span></td>
+            </tr>
+            <tr>
+              <td><code>core/CLAUDE.md:33</code></td>
+              <td><code>shadow-{mode}.json</code></td>
+              <td>File deleted</td>
+              <td class="center"><span class="badge ok">PR #47 (deletion)</span></td>
+            </tr>
+            <tr>
+              <td><code>playground/CLAUDE.md:121-125</code></td>
+              <td>Icon counts drift</td>
+              <td>File deleted</td>
+              <td class="center"><span class="badge ok">PR #47 (deletion)</span></td>
+            </tr>
+            <tr>
+              <td><code>CONTRIBUTING.md</code></td>
+              <td>Three-layer testing model, wrong imports</td>
+              <td>Story-first model + correct imports</td>
+              <td class="center"><span class="badge ok">PR #70</span></td>
+            </tr>
+            <tr>
+              <td><code>ui-audit.md</code> + skill</td>
+              <td>Required Playwright MCP that doesn't exist</td>
+              <td>References cleaned (PR #48); Playwright MCP still absent — open</td>
+              <td class="center"><span class="badge warning">Partial</span></td>
+            </tr>
+            <tr>
+              <td><code>README.md:1</code></td>
+              <td><code># ds 2</code> · 14 lines</td>
+              <td>Real description + setup + links</td>
+              <td class="center"><span class="badge ok">PR #70</span></td>
             </tr>
           </tbody>
         </table>
@@ -1802,6 +2175,19 @@ flowchart LR
           </p>
         </div>
       </div>
+
+      <div class="outcome">
+        <div class="outcome-label">Outcome · 2026-05-21 · ✅ resolved (partly by deletion)</div>
+        <h4>What landed since this section was written</h4>
+        <ul>
+          <li><strong>C-09</strong> · <code>@nexus/react</code> CSS export pointing at non-existent path → <strong>PR #49</strong></li>
+          <li><strong>C-10, C-12</strong> · <code>@nexus/test-utils</code> mismatch + CONTRIBUTING.md obsolete → <strong>PR #70</strong> (full CONTRIBUTING rewrite)</li>
+          <li><strong>W-32</strong> · README titled <code># ds 2</code>, no description → <strong>PR #70</strong></li>
+          <li><strong>W-29, W-30, W-31, W-33</strong> · CLAUDE.md drift findings → <strong>moot via PR #47</strong> (6 CLAUDE.md docs removed; single source is now <code>.claude/rules/</code>)</li>
+          <li>Stale references to deleted CLAUDE.md files in <code>.claude/commands/ui-audit.md</code> + <code>.claude/skills/ui-audit-guide/SKILL.md</code> → <strong>PR #48</strong>; obsolete <code>/update-docs</code> feature removed (3 files)</li>
+        </ul>
+        <p class="outcome-net"><strong>Section status:</strong> all 4 critical findings closed. <strong>C-11</strong> (/ui-audit non-functional due to missing Playwright MCP) is <strong>partially resolved</strong> — PR #48 dropped the stale CLAUDE.md references from the slash command, but the Playwright MCP server is still absent from <code>.mcp.json</code>. The command remains non-functional today; file an issue if you actually need it.</p>
+      </div>
     </section>
 
 
@@ -1872,6 +2258,76 @@ flowchart LR
               <td>—</td>
               <td class="center">—</td>
               <td class="center"><span class="badge critical">Missing</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="diagram">
+        <p class="caption">Figure 6.1 — <strong>After</strong>. APCA contrast + regenerate-diff now enforced via the <code>audit-tokens</code> CI job (PR #64). Lint and format paths unified between local and CI. The vacuous <code>test-coverage</code> gate was renamed to <code>test-react</code> with the misleading threshold dropped (PR #69). Chromatic still missing — deferred.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Gate</th>
+              <th>Promised by</th>
+              <th class="center">Local script</th>
+              <th class="center">CI status now</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lint</td>
+              <td><code>code-quality.md</code></td>
+              <td class="center"><span class="badge ok">yarn lint</span></td>
+              <td class="center"><span class="badge ok">Unified (PR #64)</span></td>
+            </tr>
+            <tr>
+              <td>Typecheck</td>
+              <td><code>.claude/rules/</code></td>
+              <td class="center"><span class="badge ok">yarn typecheck</span></td>
+              <td class="center"><span class="badge ok">Present</span></td>
+            </tr>
+            <tr>
+              <td>Unit tests</td>
+              <td><code>testing.md</code></td>
+              <td class="center"><span class="badge ok">yarn test:unit</span></td>
+              <td class="center"><span class="badge ok">Present</span></td>
+            </tr>
+            <tr>
+              <td>Story tests</td>
+              <td><code>testing-react.md</code></td>
+              <td class="center"><span class="badge ok">yarn test:storybook</span></td>
+              <td class="center"><span class="badge ok">Present (renamed test-react · PR #69)</span></td>
+            </tr>
+            <tr>
+              <td>APCA contrast</td>
+              <td><code>tokens.md</code></td>
+              <td class="center"><span class="badge ok">yarn audit:contrast</span></td>
+              <td class="center"><span class="badge ok">Enforced (PR #64)</span></td>
+            </tr>
+            <tr>
+              <td>Visual regression</td>
+              <td><code>storybook.md</code></td>
+              <td class="center"><span class="badge ok">yarn chromatic:ci</span></td>
+              <td class="center"><span class="badge warning">Still missing · deferred</span></td>
+            </tr>
+            <tr>
+              <td>Format</td>
+              <td>Prettier config</td>
+              <td class="center"><span class="badge ok">yarn format</span></td>
+              <td class="center"><span class="badge ok">Unified (PR #64)</span></td>
+            </tr>
+            <tr>
+              <td>Regenerate-diff check</td>
+              <td>implied</td>
+              <td class="center"><span class="badge ok">yarn tokens:tailwind</span></td>
+              <td class="center"><span class="badge ok">Enforced (audit-tokens · PR #64)</span></td>
+            </tr>
+            <tr>
+              <td>Figma↔code parity</td>
+              <td>(new capability)</td>
+              <td class="center"><span class="badge ok">yarn audit:figma-parity</span></td>
+              <td class="center"><span class="badge ok">Color category at 0 drift (PR #65)</span></td>
             </tr>
           </tbody>
         </table>
@@ -2001,6 +2457,17 @@ flowchart LR
             <code>lint</code> script). Two diverging lint paths — CI catches more, local catches less.
           </p>
         </div>
+      </div>
+
+      <div class="outcome">
+        <div class="outcome-label">Outcome · 2026-05-21 · ✅ resolved</div>
+        <h4>What landed since this section was written</h4>
+        <ul>
+          <li><strong>W-34 – W-40</strong> · Workspace config drift sweep (Node pinning unified, vitest version unified, tsconfig project graph + <code>noUncheckedIndexedAccess</code>, turbo dead Next.js outputs removed + missing tasks added, <code>.prettierignore</code> covers generated CSS, husky pre-commit cross-manager) → <strong>PR #59</strong></li>
+          <li><strong>W-41, W-42</strong> · CI <code>test-storybook</code> + <code>test-coverage</code> duplication; CI lint vs local lint divergence → <strong>PR #64</strong></li>
+          <li>Plus: the lying CI gate (<code>test-coverage</code> threshold never fired because browser-mode vitest doesn't instrument coverage) → renamed to <code>test-react</code> and threshold dropped → <strong>PR #69</strong></li>
+        </ul>
+        <p class="outcome-net"><strong>Section status:</strong> all listed warnings closed. <strong>Deferred</strong> to milestone: <strong>#66</strong> (turbo dependsOn edge for core→tailwind — architectural cleanup, not blocking) and <strong>#68</strong> (no fast-fail signal for story tests — DX-only issue, surfaced post-audit from PR #64 review).</p>
       </div>
     </section>
 
