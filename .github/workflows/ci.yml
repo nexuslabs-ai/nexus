@@ -204,6 +204,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+          path: packages
 
       - name: Restore Turbo cache (read-only)
         uses: actions/cache/restore@v4
@@ -227,7 +228,7 @@ jobs:
   # React Package Jobs
   # ============================================
 
-  # Fast-fail unit subset; coverage runs separately in test-coverage.
+  # Fast-fail unit project; storybook project runs separately in test-react.
   test-unit:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -306,8 +307,8 @@ jobs:
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:figma-parity --category color
 
-  test-coverage:
-    name: Test Coverage
+  test-react:
+    name: Test (React)
     runs-on: ubuntu-latest
     needs: changes
     if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
@@ -339,15 +340,8 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
-      - name: Run tests with coverage
-        run: yarn test:coverage
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage
-          retention-days: 7
+      - name: Run story tests
+        run: yarn test:storybook
 
   build-storybook:
     name: Build Storybook
@@ -399,6 +393,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+          path: packages
 
       - name: Check bundle size
         run: yarn size-limit
@@ -427,7 +422,7 @@ jobs:
       - typecheck
       - test-unit
       - audit-tokens
-      - test-coverage
+      - test-react
       - build-storybook
       - bundle-size
     steps:
