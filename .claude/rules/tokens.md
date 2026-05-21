@@ -45,11 +45,12 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 
 `yarn workspace @nexus/core audit:contrast` (implemented in `packages/core/scripts/audit-contrast.js`) runs APCA Lc on every base and brand foreground↔background pair, with thresholds chosen per APCA's intended-use tiers:
 
-| Pair                                                                             | Threshold | Rationale |
-| -------------------------------------------------------------------------------- | --------- | --------- | ----- | ------------------------------- |
-| `foreground ↔ background`                                                        | `         | Lc        | ≥ 75` | Body text, fluent reading       |
-| `{primary,secondary,error,success,warning,information}-foreground ↔ -background` | `         | Lc        | ≥ 60` | UI labels (buttons, badges)     |
-| `muted-foreground ↔ muted`                                                       | `         | Lc        | ≥ 45` | Incidental / de-emphasised text |
+| Pair                                                                                | Threshold | Rationale |
+| ----------------------------------------------------------------------------------- | --------- | --------- | ----- | ------------------------------- |
+| `foreground ↔ background`                                                           | `         | Lc        | ≥ 75` | Body text, fluent reading       |
+| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`    | `         | Lc        | ≥ 60` | UI labels (buttons, badges)     |
+| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle` | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills |
+| `muted-foreground ↔ muted`                                                          | `         | Lc        | ≥ 45` | Incidental / de-emphasised text |
 
 Failures must be fixed by adjusting the semantic token reference (which shade a given role points to) or the L grid values — not by lowering the thresholds. The tiers themselves come from APCA's published guidance and are not negotiable per-finding.
 
@@ -88,18 +89,20 @@ Semantic tokens use nested groups for states:
 ```json
 {
   "primary": {
-    "background": { "$value": "{blue.500}", "$type": "color" },
-    "foreground": { "$value": "{blue.50}", "$type": "color" },
-    "hover": { "$value": "{blue.600}", "$type": "color" },
-    "active": { "$value": "{blue.700}", "$type": "color" },
+    "background": { "$value": "{blue.600}", "$type": "color" },
+    "background-hover": { "$value": "{blue.700}", "$type": "color" },
+    "background-active": { "$value": "{blue.800}", "$type": "color" },
+    "foreground": { "$value": "{white}", "$type": "color" },
     "disabled": { "$value": "{blue.300}", "$type": "color" },
-    "text": { "$value": "{blue.500}", "$type": "color" },
-    "surface": { "$value": "{blue.100}", "$type": "color" }
+    "subtle": { "$value": "{blue.50}", "$type": "color" },
+    "subtle-foreground": { "$value": "{blue.600}", "$type": "color" },
+    "subtle-hover": { "$value": "{blue.100}", "$type": "color" },
+    "subtle-active": { "$value": "{blue.200}", "$type": "color" }
   }
 }
 ```
 
-This generates CSS variables like `--color-primary-background`, `--color-primary-hover`, etc.
+This generates CSS variables like `--color-primary-background`, `--color-primary-background-hover`, etc.
 
 ## Reference Syntax
 
@@ -136,14 +139,14 @@ Primitive colors use Tailwind's shade scale (50-950):
 
 ## Semantic Token Categories
 
-| Category | Properties                                                            | Example                      |
-| -------- | --------------------------------------------------------------------- | ---------------------------- |
-| Layout   | `background`, `foreground`, `container`, `popover`, `muted`, `accent` | `--color-background`         |
-| Brand    | `primary.*`, `secondary.*`                                            | `--color-primary-background` |
-| Status   | `error.*`, `success.*`, `warning.*`, `information.*`                  | `--color-error-text`         |
-| Borders  | `border.default`, `border.primary`, `border.error`, etc.              | `--color-border-default`     |
+| Category | Properties                                                  | Example                           |
+| -------- | ----------------------------------------------------------- | --------------------------------- |
+| Layout   | `background`, `foreground`, `container`, `popover`, `muted` | `--color-background`              |
+| Brand    | `primary.*`, `secondary.*`                                  | `--color-primary-background`      |
+| Status   | `error.*`, `success.*`, `warning.*`, `information.*`        | `--color-error-subtle-foreground` |
+| Borders  | `border.default`, `border.primary`, `border.error`, etc.    | `--color-border-default`          |
 
-Each brand/status group has: `background`, `foreground`, `hover`, `active`, `disabled`, `text`, `surface`
+Each brand/status group has: `background`, `background-hover`, `background-active`, `foreground`, `disabled`, `subtle`, `subtle-foreground`, `subtle-hover`, `subtle-active`
 
 ## Light/Dark Theme Tokens
 

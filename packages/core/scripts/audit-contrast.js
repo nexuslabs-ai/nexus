@@ -21,14 +21,20 @@ const BASE_PAIRS = [
   ['foreground', 'background', 75],
   ['muted-foreground', 'muted', 45],
   ['error.foreground', 'error.background', 60],
+  ['error.subtle-foreground', 'error.subtle', 60],
   ['success.foreground', 'success.background', 60],
+  ['success.subtle-foreground', 'success.subtle', 60],
   ['warning.foreground', 'warning.background', 60],
+  ['warning.subtle-foreground', 'warning.subtle', 60],
   ['information.foreground', 'information.background', 60],
+  ['information.subtle-foreground', 'information.subtle', 60],
 ];
 
 const BRAND_PAIRS = [
   ['primary.foreground', 'primary.background', 60],
+  ['primary.subtle-foreground', 'primary.subtle', 60],
   ['secondary.foreground', 'secondary.background', 60],
+  ['secondary.subtle-foreground', 'secondary.subtle', 60],
 ];
 
 const REF_RE = /^\{([^}]+)\}$/;

@@ -174,8 +174,6 @@ export const Sentence: Story = {
 export const WithDataAttributes: Story = {
   parameters: {
     chromatic: { disableSnapshot: true },
-    // TODO: Fix success-surface/success-text token contrast
-    a11y: { test: 'todo' },
   },
   args: {
     children: 'Status',

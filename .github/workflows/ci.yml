@@ -251,6 +251,38 @@ jobs:
       - name: Run unit tests
         run: yarn test:unit
 
+  audit-tokens:
+    name: Audit Tokens
+    runs-on: ubuntu-latest
+    needs: [changes, build]
+    if: needs.changes.outputs.react == 'true' && needs.build.result == 'success'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Regenerate @nexus/tailwind and check freshness
+        run: |
+          yarn workspace @nexus/core build:tailwind
+          if ! git diff --exit-code -- packages/tailwind; then
+            echo "::error::packages/tailwind/ is stale — run 'yarn workspace @nexus/core build:tailwind' and commit the result."
+            exit 1
+          fi
+
+      - name: APCA contrast audit
+        run: yarn workspace @nexus/core audit:contrast
+
+      - name: Tailwind class-ref audit
+        run: yarn workspace @nexus/core audit:class-refs
+
   test-storybook:
     name: Storybook Tests
     runs-on: ubuntu-latest

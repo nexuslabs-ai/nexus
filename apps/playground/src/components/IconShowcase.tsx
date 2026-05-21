@@ -26,7 +26,7 @@ export function IconShowcase() {
                 href={meta.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="nx:text-primary-text nx:underline hover:nx:no-underline"
+                className="nx:text-primary-subtle-foreground nx:underline nx:hover:no-underline"
               >
                 {meta.label}
               </a>
@@ -42,7 +42,7 @@ export function IconShowcase() {
           {iconNames.map((name) => (
             <div
               key={name}
-              className="nx:bg-muted/50 nx:flex nx:flex-col nx:items-center nx:gap-2 nx:rounded-lg nx:p-3 hover:nx:bg-muted nx:transition-colors nx:cursor-default"
+              className="nx:bg-muted/50 nx:flex nx:flex-col nx:items-center nx:gap-2 nx:rounded-lg nx:p-3 nx:hover:bg-muted nx:transition-colors nx:cursor-default"
             >
               <PlaygroundIcon
                 name={name}

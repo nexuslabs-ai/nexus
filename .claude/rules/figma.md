@@ -72,18 +72,18 @@ Figma uses `spacing-{n}` which maps to code's `--spacing-{n}`:
 
 ### Color Tokens
 
-| Figma Token            | Code Token                     | Usage               |
-| ---------------------- | ------------------------------ | ------------------- |
-| `background`           | `--color-background`           | Page background     |
-| `foreground`           | `--color-foreground`           | Primary text        |
-| `muted`                | `--color-muted`                | Muted backgrounds   |
-| `muted-foreground`     | `--color-muted-foreground`     | Secondary text      |
-| `primary-background`   | `--color-primary-background`   | Primary buttons     |
-| `primary-foreground`   | `--color-primary-foreground`   | Text on primary     |
-| `primary-hover`        | `--color-primary-hover`        | Primary hover state |
-| `secondary-background` | `--color-secondary-background` | Secondary buttons   |
-| `error-background`     | `--color-error-background`     | Error/destructive   |
-| `border-default`       | `--color-border-default`       | Default borders     |
+| Figma Token                | Code Token                         | Usage               |
+| -------------------------- | ---------------------------------- | ------------------- |
+| `background`               | `--color-background`               | Page background     |
+| `foreground`               | `--color-foreground`               | Primary text        |
+| `muted`                    | `--color-muted`                    | Muted backgrounds   |
+| `muted-foreground`         | `--color-muted-foreground`         | Secondary text      |
+| `primary-background`       | `--color-primary-background`       | Primary buttons     |
+| `primary-foreground`       | `--color-primary-foreground`       | Text on primary     |
+| `primary-background-hover` | `--color-primary-background-hover` | Primary hover state |
+| `secondary-background`     | `--color-secondary-background`     | Secondary buttons   |
+| `error-background`         | `--color-error-background`         | Error/destructive   |
+| `border-default`           | `--color-border-default`           | Default borders     |
 
 ### Typography Tokens
 
