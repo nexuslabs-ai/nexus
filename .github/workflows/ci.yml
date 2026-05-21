@@ -29,7 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       react: ${{ steps.filter.outputs.react }}
-      packages: ${{ steps.filter.outputs.packages }}
+      # `packages` is true if `packages/**` changed OR if `apps/**` changed
+      # outside `apps/docs/**`. See the two paths-filter steps below.
+      packages: ${{ steps.filter.outputs.packages == 'true' || steps.filter-apps.outputs.apps == 'true' }}
       ci: ${{ steps.filter.outputs.ci }}
     steps:
       - name: Checkout
@@ -51,13 +53,24 @@ jobs:
               - 'packages/test-utils/**'
             packages:
               - 'packages/**'
-              - 'apps/**'
-              # apps/docs is a stub placeholder with no build/dev scripts;
-              # changes there shouldn't trigger Build / TypeScript Check.
-              # Drop the exclusion when @nexus/docs becomes a real package.
-              - '!apps/docs/**'
             ci:
               - '.github/workflows/**'
+
+      # Second paths-filter call so the `apps` filter can use
+      # `predicate-quantifier: every` — required for `!apps/docs/**` to
+      # actually negate (under the default `some`, the `apps/**` inclusion
+      # wins and the negation is silently a no-op). Combined with `packages`
+      # via the job-level output expression below. Drop `!apps/docs/**` when
+      # @nexus/docs becomes a real package.
+      - name: Detect non-docs app changes
+        uses: dorny/paths-filter@v3
+        id: filter-apps
+        with:
+          predicate-quantifier: 'every'
+          filters: |
+            apps:
+              - 'apps/**'
+              - '!apps/docs/**'
 
   # format-check and lint run full-tree to mirror local `yarn lint` /
   # `yarn format:check`.
@@ -391,11 +404,17 @@ jobs:
   # report a status that satisfies branch protection. Skipped upstream jobs
   # (filtered out by `if:`) are treated as success; only `failure` and
   # `cancelled` propagate.
+  #
+  # Contract: every required job must appear in `needs:` below — otherwise
+  # its failure won't propagate through the aggregator. `changes` is
+  # included so a Detect Changes failure (which would empty every
+  # downstream `if:` and silently skip everything) still fails the gate.
   ci-status:
     name: CI Status
     runs-on: ubuntu-latest
     if: always()
     needs:
+      - changes
       - format-check
       - lint
       - build
@@ -406,13 +425,8 @@ jobs:
       - build-storybook
       - bundle-size
     steps:
-      - name: Aggregate required-check results
+      - name: Fail on any required-job failure or cancellation
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
         run: |
-          set -euo pipefail
-          results='${{ toJSON(needs) }}'
-          echo "$results"
-          if echo "$results" | grep -qE '"result"[[:space:]]*:[[:space:]]*"(failure|cancelled)"'; then
-            echo "::error::One or more required jobs failed or were cancelled."
-            exit 1
-          fi
-          echo "All required jobs succeeded or were skipped."
+          echo "::error::One or more required jobs failed or were cancelled."
+          exit 1
