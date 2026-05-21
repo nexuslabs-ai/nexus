@@ -63,7 +63,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        'nx:flex nx:h-10 nx:w-full nx:items-center nx:justify-between nx:gap-2',
+        'nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-2',
         'nx:rounded-md nx:border nx:border-border-default nx:bg-background',
         'nx:px-3 nx:py-2 nx:text-sm',
         'nx:whitespace-nowrap',
