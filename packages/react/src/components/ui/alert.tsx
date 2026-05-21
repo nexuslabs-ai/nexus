@@ -77,7 +77,7 @@ function Alert({ className, variant, ...props }: AlertProps) {
  *
  * Props for the AlertTitle component.
  */
-type AlertTitleProps = React.ComponentProps<'h5'>;
+interface AlertTitleProps extends React.ComponentProps<'h5'> {}
 
 /**
  * AlertTitle
@@ -109,7 +109,7 @@ function AlertTitle({ className, children, ...props }: AlertTitleProps) {
  *
  * Props for the AlertDescription component.
  */
-type AlertDescriptionProps = React.ComponentProps<'div'>;
+interface AlertDescriptionProps extends React.ComponentProps<'div'> {}
 
 /**
  * AlertDescription

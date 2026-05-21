@@ -98,15 +98,18 @@ describe('generateTailwindPackage', () => {
   });
 
   // The .dark block must contain only dark tokens whose value diverges from
-  // their `:root` counterpart by cssName. Today's vega shadow has 2 divergent
-  // focus colors; the rest of the 80 dark shadow tokens are byte-identical to
-  // light and must be suppressed.
+  // their `:root` counterpart by cssName. Focus colors live in their own
+  // primitive category (primitives/focus/) and supply the dark divergence;
+  // shadow tokens reference focus colors and stay byte-identical across
+  // themes, so none of the 80 dark shadow tokens reach the .dark block.
   it('.dark block contains only tokens that diverge from :root by value', () => {
     const darkBlock = extractBlock(variablesCSS, '.dark');
 
-    expect(darkBlock).toMatch(/--nx-shadow-focus-default-color:/);
-    expect(darkBlock).toMatch(/--nx-shadow-focus-error-color:/);
+    expect(darkBlock).toMatch(/--nx-focus-color-default:/);
+    expect(darkBlock).toMatch(/--nx-focus-color-error:/);
 
+    expect(darkBlock).not.toMatch(/--nx-shadow-focus-default-color:/);
+    expect(darkBlock).not.toMatch(/--nx-shadow-focus-error-color:/);
     expect(darkBlock).not.toMatch(/--nx-shadow-2xs-layer-1-x:/);
     expect(darkBlock).not.toMatch(/--nx-shadow-2xs-layer-1-y:/);
   });

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
  *
  * Props for the Card component.
  */
-type CardProps = React.ComponentProps<'div'>;
+interface CardProps extends React.ComponentProps<'div'> {}
 
 /**
  * Card
@@ -36,7 +36,7 @@ function Card({ className, ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        'nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
+        'nx:relative nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
         className
       )}
       {...props}
@@ -49,7 +49,7 @@ function Card({ className, ...props }: CardProps) {
  *
  * Props for the CardHeader component.
  */
-type CardHeaderProps = React.ComponentProps<'div'>;
+interface CardHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
  * CardHeader
@@ -82,7 +82,7 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
  *
  * Props for the CardTitle component.
  */
-type CardTitleProps = React.ComponentProps<'h3'>;
+interface CardTitleProps extends React.ComponentProps<'h3'> {}
 
 /**
  * CardTitle
@@ -114,7 +114,7 @@ function CardTitle({ className, children, ...props }: CardTitleProps) {
  *
  * Props for the CardDescription component.
  */
-type CardDescriptionProps = React.ComponentProps<'p'>;
+interface CardDescriptionProps extends React.ComponentProps<'p'> {}
 
 /**
  * CardDescription
@@ -141,7 +141,7 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
  *
  * Props for the CardAction component.
  */
-type CardActionProps = React.ComponentProps<'div'>;
+interface CardActionProps extends React.ComponentProps<'div'> {}
 
 /**
  * CardAction
@@ -177,7 +177,7 @@ function CardAction({ className, ...props }: CardActionProps) {
  *
  * Props for the CardContent component.
  */
-type CardContentProps = React.ComponentProps<'div'>;
+interface CardContentProps extends React.ComponentProps<'div'> {}
 
 /**
  * CardContent
@@ -206,7 +206,7 @@ function CardContent({ className, ...props }: CardContentProps) {
  *
  * Props for the CardFooter component.
  */
-type CardFooterProps = React.ComponentProps<'div'>;
+interface CardFooterProps extends React.ComponentProps<'div'> {}
 
 /**
  * CardFooter

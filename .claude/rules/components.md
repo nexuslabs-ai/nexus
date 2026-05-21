@@ -247,6 +247,25 @@ Components may implement additional state patterns like loading, disabled, or er
 
 **Live example:** See `button.tsx` for loading state implementation.
 
+## Focus States
+
+Use the design-system focus token, not Tailwind `ring-*` utilities:
+
+```
+nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default
+```
+
+For error focus on invalid fields, use `shadow-focus-error`.
+
+### Shadow Stacking
+
+`shadow-focus-default` is a box-shadow utility, so it **replaces** any existing elevation shadow during focus. The system avoids this conflict by structurally separating elevation from focusable controls:
+
+- **Non-focusable elevated surfaces** — Card (`shadow-sm`), Dialog (`shadow-lg`) — keep their elevation. Their focus rings appear on focusable children (DialogClose, controls inside Card), not on the surface itself.
+- **Focusable controls** — Input, Switch — do not use shadow elevation. They rely on border/background for visual depth. This avoids the elevation/focus conflict by design.
+
+Do not add `nx:shadow-*` utilities to focusable elements.
+
 ## Adding to Exports
 
 After creating a component, add to `src/index.ts`:
@@ -267,3 +286,4 @@ Before submitting a component:
 - [ ] Named interface with JSDoc for custom props
 - [ ] Exports include component, props type, and variants function
 - [ ] `asChild` support for interactive components
+- [ ] Focus uses `nx:focus-visible:shadow-focus-default` (not `nx:ring-*`)

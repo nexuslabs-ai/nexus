@@ -10,6 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.resolve(__dirname, '..', 'tokens');
 const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 const PRIMITIVES_FILE = path.join(TOKENS_DIR, 'primitives', 'color.json');
+const FOCUS_PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives', 'focus');
 
 const BASE_PALETTES = ['slate', 'neutral', 'zinc', 'gray', 'stone'];
 const BRANDS = ['blue', 'gray', 'neutral', 'slate', 'stone'];
@@ -19,59 +20,59 @@ const THEMES = ['light', 'dark'];
 // incidental 45 (muted text, dividers, disabled state).
 // See https://git.apcacontrast.com/documentation/APCAeasyIntro.html
 const BASE_PAIRS = [
-  { text: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
-  { text: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
+  { fg: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
+  { fg: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
   {
-    text: 'muted-light-foreground',
+    fg: 'muted-light-foreground',
     bg: 'muted-light',
     minLc: 45,
     tier: 'incidental',
   },
   {
-    text: 'disabled-foreground',
+    fg: 'disabled-foreground',
     bg: 'disabled',
     minLc: 45,
     tier: 'incidental',
   },
-  { text: 'error.foreground', bg: 'error.background', minLc: 60, tier: 'ui' },
+  { fg: 'error.foreground', bg: 'error.background', minLc: 60, tier: 'ui' },
   {
-    text: 'error.subtle-foreground',
+    fg: 'error.subtle-foreground',
     bg: 'error.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'success.foreground',
+    fg: 'success.foreground',
     bg: 'success.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'success.subtle-foreground',
+    fg: 'success.subtle-foreground',
     bg: 'success.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'warning.foreground',
+    fg: 'warning.foreground',
     bg: 'warning.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'warning.subtle-foreground',
+    fg: 'warning.subtle-foreground',
     bg: 'warning.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'information.foreground',
+    fg: 'information.foreground',
     bg: 'information.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'information.subtle-foreground',
+    fg: 'information.subtle-foreground',
     bg: 'information.subtle',
     minLc: 60,
     tier: 'ui',
@@ -80,30 +81,42 @@ const BASE_PAIRS = [
 
 const BRAND_PAIRS = [
   {
-    text: 'primary.foreground',
+    fg: 'primary.foreground',
     bg: 'primary.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'primary.subtle-foreground',
+    fg: 'primary.subtle-foreground',
     bg: 'primary.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'secondary.foreground',
+    fg: 'secondary.foreground',
     bg: 'secondary.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'secondary.subtle-foreground',
+    fg: 'secondary.subtle-foreground',
     bg: 'secondary.subtle',
     minLc: 60,
     tier: 'ui',
   },
 ];
+
+// Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),
+// which APCA encodes as the incidental tier (Lc 45). Pair against every
+// base palette surface focusable controls actually render on per theme;
+// the focus color is theme-aware and loaded from primitives/focus/.
+// `muted` and `disabled` are intentionally excluded — they are non-focusable
+// fills (de-emphasised text backgrounds and disabled-state backdrops).
+const FOCUS_SURFACES = ['background', 'container', 'popover'];
+const FOCUS_COLORS = ['color.default', 'color.error'];
+const FOCUS_PAIRS = FOCUS_COLORS.flatMap((fg) =>
+  FOCUS_SURFACES.map((bg) => ({ fg, bg, minLc: 45, tier: 'incidental' }))
+);
 
 const REF_RE = /^\{([^}]+)\}$/;
 
@@ -177,18 +190,17 @@ function formatLine(passed, label, lc, minLc, tier) {
   return `  ${mark} ${label.padEnd(48)} Lc ${lcStr}${tail}`;
 }
 
-function auditFile(filePath, pairs, primitiveMap) {
-  const fileData = readTokenFile(filePath);
-  const fileName = path.basename(filePath);
+function auditPairs(fgData, bgData, fileName, pairs, primitiveMap) {
   const lines = [];
   const results = [];
 
-  for (const { text, bg, minLc, tier } of pairs) {
-    const textValue = findTokenValue(fileData, text);
-    const bgValue = findTokenValue(fileData, bg);
-    if (textValue === undefined || bgValue === undefined) {
+  for (const pair of pairs) {
+    const { fg, bg, minLc, tier } = pair;
+    const fgValue = findTokenValue(fgData, fg);
+    const bgValue = findTokenValue(bgData, bg);
+    if (fgValue === undefined || bgValue === undefined) {
       const missing = [
-        textValue === undefined ? text : null,
+        fgValue === undefined ? fg : null,
         bgValue === undefined ? bg : null,
       ]
         .filter(Boolean)
@@ -198,13 +210,13 @@ function auditFile(filePath, pairs, primitiveMap) {
       );
     }
 
-    const textInts = resolveToSrgbInts(textValue, primitiveMap);
+    const fgInts = resolveToSrgbInts(fgValue, primitiveMap);
     const bgInts = resolveToSrgbInts(bgValue, primitiveMap);
-    const lc = computeLc(textInts, bgInts);
+    const lc = computeLc(fgInts, bgInts);
     const passed = Math.abs(lc) >= minLc;
 
     results.push({ passed });
-    lines.push(formatLine(passed, `${text} ↔ ${bg}`, lc, minLc, tier));
+    lines.push(formatLine(passed, `${fg} ↔ ${bg}`, lc, minLc, tier));
   }
 
   return { fileName, lines, results };
@@ -213,21 +225,21 @@ function auditFile(filePath, pairs, primitiveMap) {
 function main() {
   const primitiveMap = buildPrimitiveHexMap();
   const sections = [];
-  let totalPairs = 0;
-  let passCount = 0;
-  let failCount = 0;
 
   for (const palette of BASE_PALETTES) {
     for (const theme of THEMES) {
       const filePath = path.join(SEMANTIC_DIR, `base-${palette}-${theme}.json`);
       if (!fs.existsSync(filePath)) continue;
-      const section = auditFile(filePath, BASE_PAIRS, primitiveMap);
-      sections.push(section);
-      for (const result of section.results) {
-        totalPairs += 1;
-        if (result.passed) passCount += 1;
-        else failCount += 1;
-      }
+      const fileData = readTokenFile(filePath);
+      sections.push(
+        auditPairs(
+          fileData,
+          fileData,
+          path.basename(filePath),
+          BASE_PAIRS,
+          primitiveMap
+        )
+      );
     }
   }
 
@@ -235,21 +247,58 @@ function main() {
     for (const theme of THEMES) {
       const filePath = path.join(SEMANTIC_DIR, `brands-${brand}-${theme}.json`);
       if (!fs.existsSync(filePath)) continue;
-      const section = auditFile(filePath, BRAND_PAIRS, primitiveMap);
-      sections.push(section);
-      for (const result of section.results) {
-        totalPairs += 1;
-        if (result.passed) passCount += 1;
-        else failCount += 1;
-      }
+      const fileData = readTokenFile(filePath);
+      sections.push(
+        auditPairs(
+          fileData,
+          fileData,
+          path.basename(filePath),
+          BRAND_PAIRS,
+          primitiveMap
+        )
+      );
     }
   }
 
+  for (const theme of THEMES) {
+    const focusFilePath = path.join(
+      FOCUS_PRIMITIVES_DIR,
+      `focus-default-${theme}.json`
+    );
+    if (!fs.existsSync(focusFilePath)) continue;
+    const focusData = readTokenFile(focusFilePath);
+    for (const palette of BASE_PALETTES) {
+      const baseFilePath = path.join(
+        SEMANTIC_DIR,
+        `base-${palette}-${theme}.json`
+      );
+      if (!fs.existsSync(baseFilePath)) continue;
+      const baseData = readTokenFile(baseFilePath);
+      sections.push(
+        auditPairs(
+          focusData,
+          baseData,
+          `base-${palette}-${theme}.json ↔ focus-default-${theme}.json`,
+          FOCUS_PAIRS,
+          primitiveMap
+        )
+      );
+    }
+  }
+
+  let totalPairs = 0;
+  let passCount = 0;
+  let failCount = 0;
   const output = [];
   for (const section of sections) {
     output.push(`─── ${section.fileName} ───`);
     output.push(...section.lines);
     output.push('');
+    for (const result of section.results) {
+      totalPairs += 1;
+      if (result.passed) passCount += 1;
+      else failCount += 1;
+    }
   }
   output.push(
     `Checked ${totalPairs} pairs — ${passCount} passed, ${failCount} failed.`

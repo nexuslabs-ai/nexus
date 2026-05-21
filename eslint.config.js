@@ -184,6 +184,17 @@ export default tseslint.config(
     },
   },
 
+  // UI components: allow empty interface extends per .claude/rules/components.md
+  {
+    files: ['packages/react/src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-empty-object-type': [
+        'error',
+        { allowInterfaces: 'with-single-extends' },
+      ],
+    },
+  },
+
   // Disable rules that conflict with Prettier
   prettierConfig
 );

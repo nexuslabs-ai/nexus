@@ -223,6 +223,7 @@ export const DEFAULT_CONFIG = {
   shadow: 'vega',
   radius: 'sharp',
   borderwidth: 'vega',
+  focus: 'default',
 };
 
 // ============================================

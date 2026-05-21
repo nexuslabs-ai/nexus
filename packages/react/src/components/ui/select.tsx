@@ -44,7 +44,9 @@ const SelectValue = SelectPrimitive.Value;
  *
  * Props for the SelectTrigger component.
  */
-type SelectTriggerProps = React.ComponentProps<typeof SelectPrimitive.Trigger>;
+interface SelectTriggerProps extends React.ComponentProps<
+  typeof SelectPrimitive.Trigger
+> {}
 
 /**
  * SelectTrigger
@@ -63,13 +65,12 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        'nx:flex nx:h-10 nx:w-full nx:items-center nx:justify-between nx:gap-2',
+        'nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-2',
         'nx:rounded-md nx:border nx:border-border-default nx:bg-background',
         'nx:px-3 nx:py-2 nx:text-sm',
         'nx:whitespace-nowrap',
-        'nx:ring-offset-background',
         'nx:placeholder:text-muted-foreground',
-        'nx:focus:outline-none nx:focus:ring-2 nx:focus:ring-primary-background-active nx:focus:ring-offset-2',
+        'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
         'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
         'nx:[&>span]:line-clamp-1',
         className
@@ -135,7 +136,9 @@ function SelectScrollDownButton({
  *
  * Props for the SelectContent component.
  */
-type SelectContentProps = React.ComponentProps<typeof SelectPrimitive.Content>;
+interface SelectContentProps extends React.ComponentProps<
+  typeof SelectPrimitive.Content
+> {}
 
 /**
  * SelectContent
@@ -196,7 +199,9 @@ function SelectContent({
  *
  * Props for the SelectLabel component.
  */
-type SelectLabelProps = React.ComponentProps<typeof SelectPrimitive.Label>;
+interface SelectLabelProps extends React.ComponentProps<
+  typeof SelectPrimitive.Label
+> {}
 
 /**
  * SelectLabel
@@ -226,7 +231,9 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
  *
  * Props for the SelectItem component.
  */
-type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
+interface SelectItemProps extends React.ComponentProps<
+  typeof SelectPrimitive.Item
+> {}
 
 /**
  * SelectItem
@@ -266,9 +273,9 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
  *
  * Props for the SelectSeparator component.
  */
-type SelectSeparatorProps = React.ComponentProps<
+interface SelectSeparatorProps extends React.ComponentProps<
   typeof SelectPrimitive.Separator
->;
+> {}
 
 /**
  * SelectSeparator

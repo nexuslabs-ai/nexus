@@ -14,6 +14,7 @@ const STYLES_DIR = path.join(PLAYGROUND_DIR, 'src/styles');
 const STYLES_FILES = [
   'globals.css',
   'color.css',
+  'focus-default.css',
   'typography-utilities.css',
   'borderwidth-utilities.css',
 ];

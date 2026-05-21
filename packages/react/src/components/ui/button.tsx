@@ -7,7 +7,7 @@ import { IconLoader2 } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:ring-offset-background nx:focus-visible:outline-none nx:focus-visible:ring-2 nx:focus-visible:ring-primary-background/50 nx:focus-visible:ring-offset-2 nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {

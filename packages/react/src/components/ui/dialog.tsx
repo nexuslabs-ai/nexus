@@ -57,7 +57,9 @@ const DialogClose = DialogPrimitive.Close;
  *
  * Props for the DialogOverlay component.
  */
-type DialogOverlayProps = React.ComponentProps<typeof DialogPrimitive.Overlay>;
+interface DialogOverlayProps extends React.ComponentProps<
+  typeof DialogPrimitive.Overlay
+> {}
 
 /**
  * DialogOverlay
@@ -141,9 +143,9 @@ function DialogContent({
             data-slot="dialog-close-button"
             className={cn(
               'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:opacity-70',
-              'nx:ring-offset-background nx:transition-opacity',
+              'nx:transition-opacity',
               'nx:hover:opacity-100',
-              'nx:focus:outline-none nx:focus:ring-2 nx:focus:ring-primary-background/50 nx:focus:ring-offset-2',
+              'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
               'nx:disabled:pointer-events-none',
               'nx:data-[state=open]:bg-muted nx:data-[state=open]:text-muted-foreground'
             )}
@@ -162,7 +164,7 @@ function DialogContent({
  *
  * Props for the DialogHeader component.
  */
-type DialogHeaderProps = React.ComponentProps<'div'>;
+interface DialogHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
  * DialogHeader
@@ -195,7 +197,7 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
  *
  * Props for the DialogFooter component.
  */
-type DialogFooterProps = React.ComponentProps<'div'>;
+interface DialogFooterProps extends React.ComponentProps<'div'> {}
 
 /**
  * DialogFooter
@@ -228,7 +230,9 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
  *
  * Props for the DialogTitle component.
  */
-type DialogTitleProps = React.ComponentProps<typeof DialogPrimitive.Title>;
+interface DialogTitleProps extends React.ComponentProps<
+  typeof DialogPrimitive.Title
+> {}
 
 /**
  * DialogTitle
@@ -258,9 +262,9 @@ function DialogTitle({ className, ...props }: DialogTitleProps) {
  *
  * Props for the DialogDescription component.
  */
-type DialogDescriptionProps = React.ComponentProps<
+interface DialogDescriptionProps extends React.ComponentProps<
   typeof DialogPrimitive.Description
->;
+> {}
 
 /**
  * DialogDescription

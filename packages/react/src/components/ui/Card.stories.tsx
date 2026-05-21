@@ -80,7 +80,7 @@ export const WithDescription: Story = {
 
 export const WithAction: Story = {
   render: (_args) => (
-    <Card className="nx:relative nx:w-[350px]">
+    <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Card with Action</CardTitle>
         <CardDescription>This card has an action button.</CardDescription>
@@ -321,7 +321,7 @@ export const ActionDataAttributes: Story = {
     chromatic: { disableSnapshot: true },
   },
   render: (_args) => (
-    <Card className="nx:relative nx:w-[350px]">
+    <Card className="nx:w-[350px]">
       <CardHeader>
         <CardTitle>Action Test</CardTitle>
         <CardAction>
@@ -381,7 +381,7 @@ export const AllVariants: Story = {
         <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
           Card with Action
         </h3>
-        <Card className="nx:relative nx:w-[350px]">
+        <Card className="nx:w-[350px]">
           <CardHeader>
             <CardTitle>Card with Action</CardTitle>
             <CardDescription>Has an action in the header.</CardDescription>
