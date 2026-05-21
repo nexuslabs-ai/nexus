@@ -67,18 +67,21 @@ describe('generateTailwindPackage', () => {
     expect(variablesCSS).toMatch(/^:root \{/m);
   });
 
-  it('emits shadow primitives in :root (light values)', () => {
+  it('emits shadow and focus primitives in :root (light values)', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
-    expect(rootBlock).toMatch(/--nx-shadow-focus-default-color:/);
+    expect(rootBlock).toMatch(/--nx-focus-color-default:/);
+    expect(rootBlock).toMatch(/--nx-focus-geometry-spread: 2px;/);
   });
 
-  // Every var(--nx-shadow-*) ref in nexus.css must have a matching decl in
-  // :root of variables.css; missing decls render the utility flat.
-  it('every var(--nx-shadow-*) ref in nexus.css has a matching decl in :root', () => {
+  // Every var(--nx-shadow-*) or var(--nx-focus-*) ref in nexus.css must have a
+  // matching decl in :root of variables.css; missing decls render the utility
+  // flat. Focus refs are covered because shadow composites built from
+  // styles/shadows.json now point at --nx-focus-* primitives directly.
+  it('every var(--nx-(shadow|focus)-*) ref in nexus.css has a matching decl in :root', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
 
-    const refPattern = /var\(--(nx-shadow-[a-z0-9-]+)\)/g;
+    const refPattern = /var\(--(nx-(?:shadow|focus)-[a-z0-9-]+)\)/g;
     const refs = new Set();
     let match;
     while ((match = refPattern.exec(nexusCSS)) !== null) {

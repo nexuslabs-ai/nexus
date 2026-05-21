@@ -12,6 +12,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
   generateBaseLayerCSS,
@@ -149,13 +150,16 @@ function loadTokensWithNxPrefix(filePath, primitiveMap, tokenList, category) {
   for (const token of tokens) {
     const cssName = pathToCssVarPrefixed(token.path, category, true);
     const cssValue = formatTokenValue(token.value, token.type, token.path);
-
-    primitiveMap.set(token.path.join('.'), {
+    const entry = {
       cssName,
       value: cssValue,
       type: token.type,
       rawValue: token.value,
-    });
+    };
+    const refPath = token.path.join('.');
+
+    primitiveMap.set(refPath, entry);
+    primitiveMap.set(`${category}.${refPath}`, entry);
 
     tokenList.push({
       cssName,
@@ -163,7 +167,7 @@ function loadTokensWithNxPrefix(filePath, primitiveMap, tokenList, category) {
       type: token.type,
       category,
       rawValue: token.value,
-      path: token.path.join('.'),
+      path: refPath,
     });
   }
 }
@@ -300,16 +304,6 @@ function groupByCategory(tokens) {
 }
 
 /**
- * Return dark tokens whose value differs from the light token sharing the same
- * cssName. Dark tokens with identical values would emit redundant `.dark`
- * overrides.
- */
-function filterDivergentDark(primitiveTokens, darkTokens) {
-  const lightByName = new Map(primitiveTokens.map((t) => [t.cssName, t.value]));
-  return darkTokens.filter((t) => lightByName.get(t.cssName) !== t.value);
-}
-
-/**
  * Generate variables.css with --nx-* prefixed primitives.
  * Themed dark variants emit into a `.dark` block that overrides `:root` when
  * an ancestor carries the `.dark` class (matching the @custom-variant selector
@@ -409,7 +403,7 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     TOKENS_DIR,
     borderwidthMode
   );
-  const shadowTokens = collectShadowTokens(TOKENS_DIR);
+  const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
 
   // Generate header
   const header = `/* ===== NEXUS DESIGN SYSTEM - TAILWIND THEME ===== */

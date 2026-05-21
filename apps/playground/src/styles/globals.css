@@ -206,10 +206,10 @@
   --shadow-inner: inset var(--nx-shadow-inner-layer-1-x)
     var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur)
     var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
-  --shadow-focus-default: var(--nx-shadow-focus-default-x)
-    var(--nx-shadow-focus-default-y) var(--nx-shadow-focus-default-blur)
-    var(--nx-shadow-focus-default-spread) var(--nx-shadow-focus-default-color);
-  --shadow-focus-error: var(--nx-shadow-focus-error-x)
-    var(--nx-shadow-focus-error-y) var(--nx-shadow-focus-error-blur)
-    var(--nx-shadow-focus-error-spread) var(--nx-shadow-focus-error-color);
+  --shadow-focus-default: var(--nx-focus-geometry-x) var(--nx-focus-geometry-y)
+    var(--nx-focus-geometry-blur) var(--nx-focus-geometry-spread)
+    var(--nx-focus-color-default);
+  --shadow-focus-error: var(--nx-focus-geometry-x) var(--nx-focus-geometry-y)
+    var(--nx-focus-geometry-blur) var(--nx-focus-geometry-spread)
+    var(--nx-focus-color-error);
 }
