@@ -105,8 +105,8 @@ describe('generateTailwindPackage', () => {
   it('.dark block contains only tokens that diverge from :root by value', () => {
     const darkBlock = extractBlock(variablesCSS, '.dark');
 
-    expect(darkBlock).toMatch(/--nx-focus-default:/);
-    expect(darkBlock).toMatch(/--nx-focus-error:/);
+    expect(darkBlock).toMatch(/--nx-focus-color-default:/);
+    expect(darkBlock).toMatch(/--nx-focus-color-error:/);
 
     expect(darkBlock).not.toMatch(/--nx-shadow-focus-default-color:/);
     expect(darkBlock).not.toMatch(/--nx-shadow-focus-error-color:/);

@@ -20,59 +20,59 @@ const THEMES = ['light', 'dark'];
 // incidental 45 (muted text, dividers, disabled state).
 // See https://git.apcacontrast.com/documentation/APCAeasyIntro.html
 const BASE_PAIRS = [
-  { text: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
-  { text: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
+  { fg: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
+  { fg: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
   {
-    text: 'muted-light-foreground',
+    fg: 'muted-light-foreground',
     bg: 'muted-light',
     minLc: 45,
     tier: 'incidental',
   },
   {
-    text: 'disabled-foreground',
+    fg: 'disabled-foreground',
     bg: 'disabled',
     minLc: 45,
     tier: 'incidental',
   },
-  { text: 'error.foreground', bg: 'error.background', minLc: 60, tier: 'ui' },
+  { fg: 'error.foreground', bg: 'error.background', minLc: 60, tier: 'ui' },
   {
-    text: 'error.subtle-foreground',
+    fg: 'error.subtle-foreground',
     bg: 'error.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'success.foreground',
+    fg: 'success.foreground',
     bg: 'success.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'success.subtle-foreground',
+    fg: 'success.subtle-foreground',
     bg: 'success.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'warning.foreground',
+    fg: 'warning.foreground',
     bg: 'warning.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'warning.subtle-foreground',
+    fg: 'warning.subtle-foreground',
     bg: 'warning.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'information.foreground',
+    fg: 'information.foreground',
     bg: 'information.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'information.subtle-foreground',
+    fg: 'information.subtle-foreground',
     bg: 'information.subtle',
     minLc: 60,
     tier: 'ui',
@@ -81,25 +81,25 @@ const BASE_PAIRS = [
 
 const BRAND_PAIRS = [
   {
-    text: 'primary.foreground',
+    fg: 'primary.foreground',
     bg: 'primary.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'primary.subtle-foreground',
+    fg: 'primary.subtle-foreground',
     bg: 'primary.subtle',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'secondary.foreground',
+    fg: 'secondary.foreground',
     bg: 'secondary.background',
     minLc: 60,
     tier: 'ui',
   },
   {
-    text: 'secondary.subtle-foreground',
+    fg: 'secondary.subtle-foreground',
     bg: 'secondary.subtle',
     minLc: 60,
     tier: 'ui',
@@ -110,10 +110,12 @@ const BRAND_PAIRS = [
 // which APCA encodes as the incidental tier (Lc 45). Pair against every
 // base palette surface focusable controls actually render on per theme;
 // the focus color is theme-aware and loaded from primitives/focus/.
+// `muted` and `disabled` are intentionally excluded — they are non-focusable
+// fills (de-emphasised text backgrounds and disabled-state backdrops).
 const FOCUS_SURFACES = ['background', 'container', 'popover'];
-const FOCUS_COLORS = ['default', 'error'];
-const FOCUS_PAIRS = FOCUS_COLORS.flatMap((focus) =>
-  FOCUS_SURFACES.map((bg) => ({ focus, bg, minLc: 45, tier: 'incidental' }))
+const FOCUS_COLORS = ['color.default', 'color.error'];
+const FOCUS_PAIRS = FOCUS_COLORS.flatMap((fg) =>
+  FOCUS_SURFACES.map((bg) => ({ fg, bg, minLc: 45, tier: 'incidental' }))
 );
 
 const REF_RE = /^\{([^}]+)\}$/;
@@ -188,13 +190,12 @@ function formatLine(passed, label, lc, minLc, tier) {
   return `  ${mark} ${label.padEnd(48)} Lc ${lcStr}${tail}`;
 }
 
-function auditPairs(fgData, bgData, fileName, pairs, primitiveMap, fgKey) {
+function auditPairs(fgData, bgData, fileName, pairs, primitiveMap) {
   const lines = [];
   const results = [];
 
   for (const pair of pairs) {
-    const fg = pair[fgKey];
-    const { bg, minLc, tier } = pair;
+    const { fg, bg, minLc, tier } = pair;
     const fgValue = findTokenValue(fgData, fg);
     const bgValue = findTokenValue(bgData, bg);
     if (fgValue === undefined || bgValue === undefined) {
@@ -236,8 +237,7 @@ function main() {
           fileData,
           path.basename(filePath),
           BASE_PAIRS,
-          primitiveMap,
-          'text'
+          primitiveMap
         )
       );
     }
@@ -254,8 +254,7 @@ function main() {
           fileData,
           path.basename(filePath),
           BRAND_PAIRS,
-          primitiveMap,
-          'text'
+          primitiveMap
         )
       );
     }
@@ -281,8 +280,7 @@ function main() {
           baseData,
           `base-${palette}-${theme}.json ↔ focus-default-${theme}.json`,
           FOCUS_PAIRS,
-          primitiveMap,
-          'focus'
+          primitiveMap
         )
       );
     }

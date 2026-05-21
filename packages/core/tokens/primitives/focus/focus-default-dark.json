@@ -1,10 +1,12 @@
 {
-  "default": {
-    "$value": "#b0b0b0",
-    "$type": "color"
-  },
-  "error": {
-    "$value": "#fca5a5",
-    "$type": "color"
+  "color": {
+    "default": {
+      "$value": "#b0b0b0",
+      "$type": "color"
+    },
+    "error": {
+      "$value": "#fca5a5",
+      "$type": "color"
+    }
   }
 }

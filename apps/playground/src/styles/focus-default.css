@@ -1,11 +1,11 @@
 /* focus: default */
 
 html {
-  --nx-focus-default: oklch(0.5555 0 0);
-  --nx-focus-error: oklch(0.5771 0.2152 27.325);
+  --nx-focus-color-default: oklch(0.5555 0 0);
+  --nx-focus-color-error: oklch(0.5771 0.2152 27.325);
 }
 
 html.dark {
-  --nx-focus-default: oklch(0.7572 0 0);
-  --nx-focus-error: oklch(0.8077 0.1035 19.571);
+  --nx-focus-color-default: oklch(0.7572 0 0);
+  --nx-focus-color-error: oklch(0.8077 0.1035 19.571);
 }
