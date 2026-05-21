@@ -15,24 +15,6 @@ type DimensionToken = { $value: Dimension; $type: string };
 type FontFamilyToken = { $value: string; $type: string };
 type FontWeightToken = { $value: number; $type: string };
 
-type TypographyTokenSet = {
-  family: Record<string, FontFamilyToken>;
-  size: Record<string, DimensionToken>;
-  weight: Record<string, FontWeightToken>;
-  'line-height': Record<string, DimensionToken>;
-  letterspacing: Record<string, DimensionToken>;
-};
-
-const VEGA = typographyVega as TypographyTokenSet;
-
-const TYPOGRAPHY_MODES: { name: string; tokens: TypographyTokenSet }[] = [
-  { name: 'vega', tokens: VEGA },
-  { name: 'lyra', tokens: typographyLyra as TypographyTokenSet },
-  { name: 'maia', tokens: typographyMaia as TypographyTokenSet },
-  { name: 'mira', tokens: typographyMira as TypographyTokenSet },
-  { name: 'nova', tokens: typographyNova as TypographyTokenSet },
-];
-
 const SIZE_KEYS = [
   'xs',
   'sm',
@@ -68,6 +50,35 @@ const LINE_HEIGHT_DISPLAY_KEYS = [
   'xl',
   '2xl',
 ] as const;
+
+type SizeKey = (typeof SIZE_KEYS)[number];
+type WeightKey = (typeof WEIGHT_KEYS)[number];
+type FamilyKey = (typeof FAMILY_KEYS)[number];
+type LetterspacingKey =
+  | 'tighter'
+  | 'tight'
+  | 'normal'
+  | 'wide'
+  | 'wider'
+  | 'widest';
+
+type TypographyTokenSet = {
+  family: Record<FamilyKey, FontFamilyToken>;
+  size: Record<SizeKey, DimensionToken>;
+  weight: Record<WeightKey, FontWeightToken>;
+  'line-height': Record<SizeKey, DimensionToken>;
+  letterspacing: Record<LetterspacingKey, DimensionToken>;
+};
+
+const VEGA = typographyVega satisfies TypographyTokenSet;
+
+const TYPOGRAPHY_MODES: { name: string; tokens: TypographyTokenSet }[] = [
+  { name: 'vega', tokens: VEGA },
+  { name: 'lyra', tokens: typographyLyra satisfies TypographyTokenSet },
+  { name: 'maia', tokens: typographyMaia satisfies TypographyTokenSet },
+  { name: 'mira', tokens: typographyMira satisfies TypographyTokenSet },
+  { name: 'nova', tokens: typographyNova satisfies TypographyTokenSet },
+];
 
 const SCALE_SAMPLE = 'Aa Bb 12';
 const WEIGHT_SAMPLE = 'The quick brown fox';

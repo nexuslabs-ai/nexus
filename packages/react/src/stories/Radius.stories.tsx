@@ -18,7 +18,6 @@ const BUNDLED_BORDERWIDTH_MODE = 'vega';
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
-type DimensionMap = Record<string, DimensionToken>;
 
 const RADIUS_KEYS = [
   'base',
@@ -32,20 +31,25 @@ const RADIUS_KEYS = [
 ] as const;
 const BORDERWIDTH_KEYS = ['default', 'thick'] as const;
 
-const RADIUS_MODES: { name: string; tokens: DimensionMap }[] = [
-  { name: 'blunt', tokens: radiusBlunt as DimensionMap },
-  { name: 'mellow', tokens: radiusMellow as DimensionMap },
-  { name: 'sharp', tokens: radiusSharp as DimensionMap },
-  { name: 'smooth', tokens: radiusSmooth as DimensionMap },
-  { name: 'subtle', tokens: radiusSubtle as DimensionMap },
+type RadiusKey = (typeof RADIUS_KEYS)[number];
+type BorderWidthKey = (typeof BORDERWIDTH_KEYS)[number];
+type RadiusMap = Record<RadiusKey, DimensionToken>;
+type BorderWidthMap = Record<BorderWidthKey, DimensionToken>;
+
+const RADIUS_MODES: { name: string; tokens: RadiusMap }[] = [
+  { name: 'blunt', tokens: radiusBlunt as RadiusMap },
+  { name: 'mellow', tokens: radiusMellow as RadiusMap },
+  { name: 'sharp', tokens: radiusSharp as RadiusMap },
+  { name: 'smooth', tokens: radiusSmooth as RadiusMap },
+  { name: 'subtle', tokens: radiusSubtle as RadiusMap },
 ];
 
-const BORDERWIDTH_MODES: { name: string; tokens: DimensionMap }[] = [
-  { name: 'vega', tokens: borderwidthVega as DimensionMap },
-  { name: 'lyra', tokens: borderwidthLyra as DimensionMap },
-  { name: 'maia', tokens: borderwidthMaia as DimensionMap },
-  { name: 'mira', tokens: borderwidthMira as DimensionMap },
-  { name: 'nova', tokens: borderwidthNova as DimensionMap },
+const BORDERWIDTH_MODES: { name: string; tokens: BorderWidthMap }[] = [
+  { name: 'vega', tokens: borderwidthVega as BorderWidthMap },
+  { name: 'lyra', tokens: borderwidthLyra as BorderWidthMap },
+  { name: 'maia', tokens: borderwidthMaia as BorderWidthMap },
+  { name: 'mira', tokens: borderwidthMira as BorderWidthMap },
+  { name: 'nova', tokens: borderwidthNova as BorderWidthMap },
 ];
 
 function formatDimension(d: Dimension) {

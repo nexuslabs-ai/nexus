@@ -26,9 +26,21 @@ type ShadowLayer = {
   color: ColorToken;
 };
 type ShadowToken = Record<string, ShadowLayer>;
-type ShadowSet = Record<string, ShadowToken>;
 
-const SHADOW_KEYS = [
+type ShadowKey =
+  | '2xs'
+  | 'xs'
+  | 'sm'
+  | 'base'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | '2xl'
+  | 'inner'
+  | 'focus';
+type ShadowSet = Record<ShadowKey, ShadowToken>;
+
+const DISPLAY_SHADOW_KEYS = [
   '2xs',
   'xs',
   'sm',
@@ -37,7 +49,7 @@ const SHADOW_KEYS = [
   'lg',
   'xl',
   '2xl',
-] as const;
+] as const satisfies readonly ShadowKey[];
 
 const SHADOW_MODES_LIGHT: { name: string; tokens: ShadowSet }[] = [
   { name: 'vega', tokens: shadowVegaLight as ShadowSet },
@@ -112,7 +124,7 @@ function ModeSection({
         )}
       </h3>
       <div className="nx:flex nx:flex-wrap nx:items-end nx:gap-8 nx:px-2 nx:py-6">
-        {SHADOW_KEYS.map((sk) => (
+        {DISPLAY_SHADOW_KEYS.map((sk) => (
           <ShadowCard key={sk} name={sk} token={tokens[sk]} />
         ))}
       </div>
