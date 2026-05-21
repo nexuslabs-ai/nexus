@@ -25,7 +25,7 @@ import {
   partitionThemedModes,
   pathToCssVarPrefixed,
   readTokenFile,
-  resolveValueWithNxPrefix,
+  resolveValue,
 } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -206,11 +206,7 @@ function resolveDarkReferences(darkTokens, primitiveMap) {
   for (const token of darkTokens) {
     if (!isReference(token.rawValue)) continue;
 
-    const resolved = resolveValueWithNxPrefix(
-      token.rawValue,
-      primitiveMap,
-      token.type
-    );
+    const resolved = resolveValue(token.rawValue, primitiveMap, token.type);
     if (isReference(resolved)) {
       throw new Error(
         `Dark themed primitive reference not found: ${token.category}.${token.path} = ${token.rawValue}`
@@ -230,11 +226,7 @@ function resolveCrossPrimitiveReferences(tokenList, primitiveMap) {
       token.rawValue.startsWith('{') &&
       token.rawValue.endsWith('}')
     ) {
-      const resolved = resolveValueWithNxPrefix(
-        token.rawValue,
-        primitiveMap,
-        token.type
-      );
+      const resolved = resolveValue(token.rawValue, primitiveMap, token.type);
       token.value = resolved;
 
       const existing = primitiveMap.get(token.path);

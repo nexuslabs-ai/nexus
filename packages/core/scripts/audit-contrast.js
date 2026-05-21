@@ -15,26 +15,94 @@ const BASE_PALETTES = ['slate', 'neutral', 'zinc', 'gray', 'stone'];
 const BRANDS = ['blue', 'gray', 'neutral', 'slate', 'stone'];
 const THEMES = ['light', 'dark'];
 
-// APCA tiers: 75 body text, 60 UI labels, 45 muted/incidental.
+// APCA tiers: body 75 (fluent reading), ui 60 (button/badge labels),
+// incidental 45 (muted text, dividers, disabled state).
 // See https://git.apcacontrast.com/documentation/APCAeasyIntro.html
 const BASE_PAIRS = [
-  ['foreground', 'background', 75],
-  ['muted-foreground', 'muted', 45],
-  ['error.foreground', 'error.background', 60],
-  ['error.subtle-foreground', 'error.subtle', 60],
-  ['success.foreground', 'success.background', 60],
-  ['success.subtle-foreground', 'success.subtle', 60],
-  ['warning.foreground', 'warning.background', 60],
-  ['warning.subtle-foreground', 'warning.subtle', 60],
-  ['information.foreground', 'information.background', 60],
-  ['information.subtle-foreground', 'information.subtle', 60],
+  { text: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
+  { text: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
+  {
+    text: 'muted-light-foreground',
+    bg: 'muted-light',
+    minLc: 45,
+    tier: 'incidental',
+  },
+  {
+    text: 'disabled-foreground',
+    bg: 'disabled',
+    minLc: 45,
+    tier: 'incidental',
+  },
+  { text: 'error.foreground', bg: 'error.background', minLc: 60, tier: 'ui' },
+  {
+    text: 'error.subtle-foreground',
+    bg: 'error.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'success.foreground',
+    bg: 'success.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'success.subtle-foreground',
+    bg: 'success.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'warning.foreground',
+    bg: 'warning.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'warning.subtle-foreground',
+    bg: 'warning.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'information.foreground',
+    bg: 'information.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'information.subtle-foreground',
+    bg: 'information.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
 ];
 
 const BRAND_PAIRS = [
-  ['primary.foreground', 'primary.background', 60],
-  ['primary.subtle-foreground', 'primary.subtle', 60],
-  ['secondary.foreground', 'secondary.background', 60],
-  ['secondary.subtle-foreground', 'secondary.subtle', 60],
+  {
+    text: 'primary.foreground',
+    bg: 'primary.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'primary.subtle-foreground',
+    bg: 'primary.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'secondary.foreground',
+    bg: 'secondary.background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    text: 'secondary.subtle-foreground',
+    bg: 'secondary.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
 ];
 
 const REF_RE = /^\{([^}]+)\}$/;
@@ -100,10 +168,12 @@ function computeLc(textInts, bgInts) {
   return typeof lc === 'number' ? lc : Number(lc);
 }
 
-function formatLine(passed, label, lc, minLc) {
+function formatLine(passed, label, lc, minLc, tier) {
   const mark = passed ? '✓' : '✗';
   const lcStr = lc.toFixed(1).padStart(6);
-  const tail = passed ? `   (≥ ${minLc})` : `   FAIL (< ${minLc})`;
+  const tail = passed
+    ? `   (≥ ${minLc}, ${tier})`
+    : `   FAIL (< ${minLc}, ${tier})`;
   return `  ${mark} ${label.padEnd(48)} Lc ${lcStr}${tail}`;
 }
 
@@ -113,13 +183,13 @@ function auditFile(filePath, pairs, primitiveMap) {
   const lines = [];
   const results = [];
 
-  for (const [textKey, bgKey, minLc] of pairs) {
-    const textValue = findTokenValue(fileData, textKey);
-    const bgValue = findTokenValue(fileData, bgKey);
+  for (const { text, bg, minLc, tier } of pairs) {
+    const textValue = findTokenValue(fileData, text);
+    const bgValue = findTokenValue(fileData, bg);
     if (textValue === undefined || bgValue === undefined) {
       const missing = [
-        textValue === undefined ? textKey : null,
-        bgValue === undefined ? bgKey : null,
+        textValue === undefined ? text : null,
+        bgValue === undefined ? bg : null,
       ]
         .filter(Boolean)
         .join(', ');
@@ -134,7 +204,7 @@ function auditFile(filePath, pairs, primitiveMap) {
     const passed = Math.abs(lc) >= minLc;
 
     results.push({ passed });
-    lines.push(formatLine(passed, `${textKey} ↔ ${bgKey}`, lc, minLc));
+    lines.push(formatLine(passed, `${text} ↔ ${bg}`, lc, minLc, tier));
   }
 
   return { fileName, lines, results };

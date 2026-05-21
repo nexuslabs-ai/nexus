@@ -25,7 +25,7 @@ import {
   pathToCssVar,
   processSemanticTokens,
   readTokenFile,
-  resolveValueWithNxPrefix,
+  resolveValue,
 } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -85,7 +85,7 @@ function processPrimitiveFile(category, mode, primitiveMap) {
     let cssValue = token.value;
 
     if (isReference(cssValue)) {
-      cssValue = resolveValueWithNxPrefix(cssValue, primitiveMap, token.type);
+      cssValue = resolveValue(cssValue, primitiveMap, token.type);
     } else {
       cssValue = formatTokenValue(cssValue, token.type, token.path);
     }

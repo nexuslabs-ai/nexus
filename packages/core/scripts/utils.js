@@ -51,7 +51,10 @@ export function formatTokenValue(value, type, tokenPath) {
     value !== null &&
     'value' in value
   ) {
-    return `${value.value}${value.unit || 'px'}`;
+    // Round to 4 decimals to strip Figma's float-32 export artifacts
+    // (e.g. -0.800000011920929 → -0.8).
+    const rounded = Math.round(value.value * 10000) / 10000;
+    return `${rounded}${value.unit || 'px'}`;
   }
 
   if (type === 'color' && typeof value === 'string' && value.startsWith('#')) {
@@ -184,58 +187,6 @@ export function resolveReference(value, primitiveMap) {
 
   console.warn(`⚠ Reference not found: ${value}`);
   return value;
-}
-
-/**
- * Resolve a DTCG reference to CSS var() with nx- prefix
- * Used for generating @nexus/tailwind package where primitives have --nx-* prefix
- * @param {*} value - Token value (might be a reference)
- * @param {Map} primitiveMap - Map of primitive token paths to CSS names (with nx- prefix)
- * @returns {string} Resolved CSS value with var(--nx-*)
- */
-function resolveReferenceWithNxPrefix(value, primitiveMap) {
-  if (!isReference(value)) {
-    return value;
-  }
-
-  const refPath = extractRefPath(value);
-  const primitiveInfo = primitiveMap.get(refPath);
-
-  if (primitiveInfo) {
-    // primitiveInfo.cssName already contains nx- prefix if useNxPrefix was true
-    return `var(--${primitiveInfo.cssName})`;
-  }
-
-  console.warn(`⚠ Reference not found: ${value}`);
-  return value;
-}
-
-/**
- * Resolve value for @nexus/tailwind package (references use --nx-* variables)
- * @param {*} value - Token value
- * @param {Map} primitiveMap - Map of primitives with nx- prefixed cssName
- * @param {string} type - Token type
- * @param {string[]} [tokenPath] - Token path for color routing
- * @returns {string} Resolved CSS value
- */
-export function resolveValueWithNxPrefix(
-  value,
-  primitiveMap,
-  type = 'unknown',
-  tokenPath
-) {
-  if (isReference(value)) {
-    return resolveReferenceWithNxPrefix(value, primitiveMap);
-  }
-
-  if (
-    type === 'dimension' ||
-    (typeof value === 'object' && value !== null && 'value' in value)
-  ) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  return formatTokenValue(value, type, tokenPath);
 }
 
 /**
@@ -640,25 +591,11 @@ export function getGoogleFontsImportFromTokens(typographyFilePath) {
  * @returns {string} Resolved CSS value
  */
 function resolveTypographyProperty(value, primitiveMap) {
-  // Handle 'auto' for lineHeight
-  if (value === 'auto') return 'auto';
-
-  // Handle references like {family.font-sans}
-  if (
-    typeof value === 'string' &&
-    value.startsWith('{') &&
-    value.endsWith('}')
-  ) {
-    return resolveValueWithNxPrefix(value, primitiveMap, 'unknown');
-  }
-
-  // Handle dimension objects like { value: 0, unit: 'px' }
-  if (typeof value === 'object' && value !== null && 'value' in value) {
-    return formatTokenValue(value, 'dimension');
-  }
-
-  // Return as string for other values
-  return String(value);
+  // Figma exports `lineHeight: "auto"` for the code-inline typography token,
+  // but `line-height: auto` is invalid CSS — browsers ignore it. Map to
+  // `normal` (CSS spec default, ~1.2) so the emitted utility is well-formed.
+  if (value === 'auto') return 'normal';
+  return resolveValue(value, primitiveMap, 'unknown');
 }
 
 /**

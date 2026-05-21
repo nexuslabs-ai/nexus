@@ -10,7 +10,7 @@ html {
   --nx-color-muted-light: var(--nx-color-stone-50);
   --nx-color-muted-light-foreground: var(--nx-color-stone-400);
   --nx-color-disabled: var(--nx-color-stone-100);
-  --nx-color-disabled-foreground: var(--nx-color-stone-300);
+  --nx-color-disabled-foreground: var(--nx-color-stone-400);
   --nx-color-container: var(--nx-color-white);
   --nx-color-container-foreground: var(--nx-color-stone-950);
   --nx-color-container-hover: var(--nx-color-stone-100);
@@ -78,10 +78,10 @@ html.dark {
   --nx-color-background-active: var(--nx-color-stone-950);
   --nx-color-muted: var(--nx-color-stone-800);
   --nx-color-muted-foreground: var(--nx-color-stone-300);
-  --nx-color-muted-light: var(--nx-color-stone-800);
-  --nx-color-muted-light-foreground: var(--nx-color-stone-500);
+  --nx-color-muted-light: var(--nx-color-stone-900);
+  --nx-color-muted-light-foreground: var(--nx-color-stone-300);
   --nx-color-disabled: var(--nx-color-stone-950);
-  --nx-color-disabled-foreground: var(--nx-color-stone-400);
+  --nx-color-disabled-foreground: var(--nx-color-stone-300);
   --nx-color-container: var(--nx-color-black);
   --nx-color-container-foreground: var(--nx-color-white);
   --nx-color-container-hover: var(--nx-color-stone-950);
@@ -110,7 +110,7 @@ html.dark {
   --nx-color-error-background-active: var(--nx-color-red-800);
   --nx-color-error-disabled: var(--nx-color-red-900);
   --nx-color-error-subtle: var(--nx-color-red-950);
-  --nx-color-error-subtle-foreground: var(--nx-color-red-300);
+  --nx-color-error-subtle-foreground: var(--nx-color-red-200);
   --nx-color-error-subtle-hover: var(--nx-color-red-900);
   --nx-color-error-subtle-active: var(--nx-color-red-800);
   --nx-color-success-background: var(--nx-color-green-600);

@@ -43,6 +43,7 @@ describe('generateTailwindPackage', () => {
   let distDir;
   let variablesCSS;
   let nexusCSS;
+  let typographyCSS;
   let warnings;
 
   beforeAll(async () => {
@@ -59,6 +60,7 @@ describe('generateTailwindPackage', () => {
 
     variablesCSS = read(distDir, 'variables.css');
     nexusCSS = read(distDir, 'nexus.css');
+    typographyCSS = read(distDir, 'typography-utilities.css');
   });
 
   it('emits a :root block in variables.css', () => {
@@ -112,6 +114,17 @@ describe('generateTailwindPackage', () => {
   it('emits zero `File not found` warnings for the default config', () => {
     const fileNotFound = warnings.filter((w) => /File not found/.test(w));
     expect(fileNotFound).toEqual([]);
+  });
+
+  // Source token has `lineHeight: "auto"` which is invalid CSS — the generator
+  // maps it to `normal` inside resolveTypographyProperty.
+  it('maps lineHeight "auto" to line-height: normal in typography-code-inline', () => {
+    const block = extractBlock(
+      typographyCSS,
+      '@utility typography-code-inline'
+    );
+    expect(block).toMatch(/line-height: normal;/);
+    expect(typographyCSS).not.toMatch(/line-height: auto/);
   });
 
   // Regenerating tokens used to produce a noisy whitespace diff against the

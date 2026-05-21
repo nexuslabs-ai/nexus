@@ -33,7 +33,7 @@
   --color-muted-light: var(--nx-color-stone-50);
   --color-muted-light-foreground: var(--nx-color-stone-400);
   --color-disabled: var(--nx-color-stone-100);
-  --color-disabled-foreground: var(--nx-color-stone-300);
+  --color-disabled-foreground: var(--nx-color-stone-400);
   --color-container: var(--nx-color-white);
   --color-container-foreground: var(--nx-color-stone-950);
   --color-container-hover: var(--nx-color-stone-100);
@@ -218,10 +218,10 @@
   --nx-color-background-active: var(--nx-color-stone-950);
   --nx-color-muted: var(--nx-color-stone-800);
   --nx-color-muted-foreground: var(--nx-color-stone-300);
-  --nx-color-muted-light: var(--nx-color-stone-800);
-  --nx-color-muted-light-foreground: var(--nx-color-stone-500);
+  --nx-color-muted-light: var(--nx-color-stone-900);
+  --nx-color-muted-light-foreground: var(--nx-color-stone-300);
   --nx-color-disabled: var(--nx-color-stone-950);
-  --nx-color-disabled-foreground: var(--nx-color-stone-400);
+  --nx-color-disabled-foreground: var(--nx-color-stone-300);
   --nx-color-container: var(--nx-color-black);
   --nx-color-container-foreground: var(--nx-color-white);
   --nx-color-container-hover: var(--nx-color-stone-950);
@@ -250,7 +250,7 @@
   --nx-color-error-background-active: var(--nx-color-red-800);
   --nx-color-error-disabled: var(--nx-color-red-900);
   --nx-color-error-subtle: var(--nx-color-red-950);
-  --nx-color-error-subtle-foreground: var(--nx-color-red-300);
+  --nx-color-error-subtle-foreground: var(--nx-color-red-200);
   --nx-color-error-subtle-hover: var(--nx-color-red-900);
   --nx-color-error-subtle-active: var(--nx-color-red-800);
   --nx-color-success-background: var(--nx-color-green-600);
@@ -295,7 +295,7 @@
   --nx-color-secondary-background-active: var(--nx-color-neutral-600);
   --nx-color-secondary-disabled: var(--nx-color-neutral-950);
   --nx-color-secondary-subtle: var(--nx-color-neutral-800);
-  --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-400);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-200);
   --nx-color-secondary-subtle-hover: var(--nx-color-neutral-700);
   --nx-color-secondary-subtle-active: var(--nx-color-neutral-600);
 }

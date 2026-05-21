@@ -25,11 +25,11 @@
     "$description": "It’s a gray that softens contrast so primary content stands forward."
   },
   "muted-light": {
-    "$value": "{gray.800}",
+    "$value": "{gray.900}",
     "$type": "color"
   },
   "muted-light-foreground": {
-    "$value": "{gray.500}",
+    "$value": "{gray.300}",
     "$type": "color",
     "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
   },
@@ -38,7 +38,7 @@
     "$type": "color"
   },
   "disabled-foreground": {
-    "$value": "{gray.400}",
+    "$value": "{gray.300}",
     "$type": "color"
   },
   "container": {

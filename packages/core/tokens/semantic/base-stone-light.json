@@ -38,7 +38,7 @@
     "$type": "color"
   },
   "disabled-foreground": {
-    "$value": "{stone.300}",
+    "$value": "{stone.400}",
     "$type": "color"
   },
   "container": {

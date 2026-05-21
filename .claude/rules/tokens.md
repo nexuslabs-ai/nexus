@@ -46,11 +46,13 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 `yarn workspace @nexus/core audit:contrast` (implemented in `packages/core/scripts/audit-contrast.js`) runs APCA Lc on every base and brand foreground↔background pair, with thresholds chosen per APCA's intended-use tiers:
 
 | Pair                                                                                | Threshold | Rationale |
-| ----------------------------------------------------------------------------------- | --------- | --------- | ----- | ------------------------------- |
-| `foreground ↔ background`                                                           | `         | Lc        | ≥ 75` | Body text, fluent reading       |
-| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`    | `         | Lc        | ≥ 60` | UI labels (buttons, badges)     |
-| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle` | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills |
-| `muted-foreground ↔ muted`                                                          | `         | Lc        | ≥ 45` | Incidental / de-emphasised text |
+| ----------------------------------------------------------------------------------- | --------- | --------- | ----- | -------------------------------------- |
+| `foreground ↔ background`                                                           | `         | Lc        | ≥ 75` | Body text, fluent reading              |
+| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`    | `         | Lc        | ≥ 60` | UI labels (buttons, badges)            |
+| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle` | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills        |
+| `muted-foreground ↔ muted`                                                          | `         | Lc        | ≥ 45` | Incidental / de-emphasised text        |
+| `muted-light-foreground ↔ muted-light`                                              | `         | Lc        | ≥ 45` | Dividers, helper text, subtle surfaces |
+| `disabled-foreground ↔ disabled`                                                    | `         | Lc        | ≥ 45` | Disabled-state text, still readable    |
 
 Failures must be fixed by adjusting the semantic token reference (which shade a given role points to) or the L grid values — not by lowering the thresholds. The tiers themselves come from APCA's published guidance and are not negotiable per-finding.
 
@@ -157,8 +159,6 @@ Each brand/status group has: `background`, `background-hover`, `background-activ
 - CSS output: Light in `@theme` block, dark in `.dark` selector
 
 ## Validation
-
-Token files are validated against `packages/core/tokens.schema.json`
 
 Valid `$type` values:
 
