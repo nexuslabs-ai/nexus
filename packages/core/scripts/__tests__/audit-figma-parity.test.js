@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { diffTokenTrees, parseArgs } from '../audit-figma-parity.js';
+import {
+  DEFAULT_SNAPSHOT,
+  diffTokenTrees,
+  parseArgs,
+} from '../audit-figma-parity.js';
 
 const colorToken = (value) => ({ $value: value, $type: 'color' });
 const dimToken = (value) => ({
@@ -237,7 +241,7 @@ describe('parseArgs', () => {
 
   it('skips `--snapshot=` (empty value) so the default snapshot survives', () => {
     const args = parseArgs(['--snapshot=', '--category', 'color']);
-    expect(args.snapshot).not.toBe('');
+    expect(args.snapshot).toBe(DEFAULT_SNAPSHOT);
     expect(args.category).toBe('color');
   });
 });

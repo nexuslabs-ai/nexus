@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.resolve(__dirname, '..', 'tokens');
 const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const DEFAULT_SNAPSHOT = path.join(TOKENS_DIR, 'figma-snapshot.json');
+export const DEFAULT_SNAPSHOT = path.join(TOKENS_DIR, 'figma-snapshot.json');
 
 /**
  * Today only the single-mode shape is wired:
@@ -29,6 +29,8 @@ const CATEGORIES = {
   },
 };
 
+const KNOWN_FLAGS = new Set(['category', 'snapshot', 'mode', 'theme']);
+
 const EXIT_OK = 0;
 const EXIT_DRIFT = 1;
 const EXIT_CONFIG = 2;
@@ -37,24 +39,21 @@ const DOCS_HINT = 'see .claude/rules/figma.md → Code-vs-Figma Parity Audit';
 
 class ConfigError extends Error {}
 
+const FLAG_PATTERN = /^--([a-zA-Z][a-zA-Z0-9-]*)(?:=(.+))?$/;
+
 export function parseArgs(argv) {
   const args = { category: null, snapshot: DEFAULT_SNAPSHOT };
   for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-    if (!arg.startsWith('--')) continue;
-    if (arg === '--') continue;
-    if (arg[2] === '-') continue;
-    const eq = arg.indexOf('=');
-    if (eq === 2) continue;
-    if (eq !== -1) {
-      const val = arg.slice(eq + 1);
-      if (val.length === 0) continue;
-      args[arg.slice(2, eq)] = val;
+    const match = argv[i].match(FLAG_PATTERN);
+    if (!match) continue;
+    const [, key, inlineVal] = match;
+    if (inlineVal !== undefined) {
+      args[key] = inlineVal;
       continue;
     }
     const next = argv[i + 1];
     if (next && !next.startsWith('--')) {
-      args[arg.slice(2)] = next;
+      args[key] = next;
       i++;
     }
   }
@@ -175,8 +174,33 @@ function gitLastCommitTs(filePath) {
   }
 }
 
+function isShallowClone() {
+  try {
+    const output = execSync('git rev-parse --is-shallow-repository', {
+      encoding: 'utf8',
+      cwd: REPO_ROOT,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    return output === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function isCI() {
+  const v = process.env.CI?.toLowerCase();
+  return v === 'true' || v === '1';
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
+
+  const unknownFlags = Object.keys(args).filter((k) => !KNOWN_FLAGS.has(k));
+  if (unknownFlags.length > 0) {
+    fail(
+      `unknown flag(s): ${unknownFlags.map((k) => `--${k}`).join(', ')}\n  known: ${[...KNOWN_FLAGS].map((k) => `--${k}`).join(', ')}\n  ${DOCS_HINT}`
+    );
+  }
 
   if (!args.category) {
     const supported = Object.keys(CATEGORIES).join(', ');
@@ -209,7 +233,14 @@ function main() {
   const codeTs = gitLastCommitTs(config.file);
   const snapshotTs = gitLastCommitTs(args.snapshot);
   const staleGuardSkipped = codeTs === null || snapshotTs === null;
-  if (staleGuardSkipped && process.env.CI) {
+  if (staleGuardSkipped && isCI()) {
+    const shallow = isShallowClone();
+    if (shallow) {
+      fail(
+        `stale-snapshot guard requires full git history but the working tree is a shallow clone. ` +
+          `Configure the CI checkout with fetch-depth: 0 (e.g. actions/checkout@v4 with fetch-depth: 0). ${DOCS_HINT}.`
+      );
+    }
     fail(
       `stale-snapshot guard could not run under CI (git timestamps unavailable for ${path.basename(config.file)} or the snapshot). CI must be able to verify snapshot freshness — fix git availability or stop running this audit in CI.`
     );

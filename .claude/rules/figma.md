@@ -31,11 +31,11 @@ yarn audit:figma-parity --category color --snapshot path/to/alt-snapshot.json
 
 Flags:
 
-| Flag                | Required?                              | Default                                    |
-| ------------------- | -------------------------------------- | ------------------------------------------ |
-| `--category <name>` | Always                                 | —                                          |
-| `--snapshot <path>` | Optional — testing/alternate snapshots | `packages/core/tokens/figma-snapshot.json` |
-| `--mode <name>`     | Required for multi-mode categories     | — (color is single-mode, ignores this)     |
+| Flag                | Required?                                                                                                                          | Default                                    |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `--category <name>` | Always                                                                                                                             | —                                          |
+| `--snapshot <path>` | Optional — testing/alternate snapshots                                                                                             | `packages/core/tokens/figma-snapshot.json` |
+| `--mode <name>`     | Pending — wired by #61 alongside multi-mode categories. Today the flag parses but `main()` doesn't read it (color is single-mode). | —                                          |
 
 Exit codes:
 
@@ -45,7 +45,9 @@ Exit codes:
 | 1    | Drift findings reported                                                                                                                      |
 | 2    | Configuration error — read stderr for the specific reason (missing/stale snapshot, unknown category, unsupported value type, malformed JSON) |
 
-The audit guards against a stale snapshot by comparing the code file's last git-commit timestamp against the snapshot file's. If the code file was committed more recently, the audit fails — the designer must refresh the snapshot before drift can be assessed.
+The audit guards against a stale snapshot by comparing the code file's last git-commit timestamp against the snapshot file's. If the code file was committed more recently, the audit fails — the designer must refresh the snapshot before drift can be assessed. The guard reads committed state via `git log`, so uncommitted local edits to either file are not considered — the guard is a CI/PR bar, not a pre-commit check.
+
+Under CI (`CI=true` or `CI=1`), the guard hard-fails if git timestamps are unavailable. The most common cause is a shallow clone — the audit detects this and points at `actions/checkout` with `fetch-depth: 0` in the error message. Outside CI the same situation just prints a `⚠ skipped` line.
 
 ### Categories
 
