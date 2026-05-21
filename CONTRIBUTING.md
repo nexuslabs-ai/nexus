@@ -1,5 +1,7 @@
 # Contributing to Nexus Design System
 
+Project overview lives in [`README.md`](README.md); this document is the testing on-ramp.
+
 ## Testing Philosophy
 
 A single `*.stories.tsx` file does four jobs at once:
@@ -11,7 +13,7 @@ A single `*.stories.tsx` file does four jobs at once:
 
 You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — `vitest.config.ts` explicitly excludes `packages/react/src/components/**/*.test.{ts,tsx}` from the `unit` project.
 
-Hooks, utilities, and scripts use plain `*.test.ts` files with `@nexus/test-utils`. They run under Vitest's `unit` project (jsdom).
+Hooks and utilities use `*.test.ts` files with `@nexus/test-utils`. Scripts under `packages/core/scripts/__tests__/` use `.test.js` and import from `vitest` directly. Both run under Vitest's `unit` project (jsdom).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

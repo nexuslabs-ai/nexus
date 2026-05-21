@@ -34,12 +34,12 @@ Each command runs from the repo root.
 | `packages/react`      | React components built with Radix UI and Tailwind CSS        |
 | `packages/test-utils` | Test utilities for hooks and utilities                       |
 | `apps/playground`     | Theme/token exploration UI                                   |
-| `apps/docs`           | Documentation site                                           |
+| `apps/docs`           | Documentation site (scaffold — no implementation yet)        |
 
 ## Where to learn more
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — testing model, story patterns, component checklist
-- [`.claude/rules/`](.claude/rules/) — project conventions (canonical). High-traffic files:
+- [`.claude/rules/`](.claude/rules/) — project conventions (canonical). There is no root `CLAUDE.md`; the rules directory is the authoritative AI-guidance source. High-traffic files:
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
   - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
   - [`tokens.md`](.claude/rules/tokens.md) — token format, OKLCH pipeline, APCA contrast gate
