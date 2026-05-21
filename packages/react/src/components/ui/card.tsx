@@ -36,7 +36,7 @@ function Card({ className, ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        'nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
+        'nx:relative nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
         className
       )}
       {...props}
