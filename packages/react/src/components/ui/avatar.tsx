@@ -82,7 +82,9 @@ function Avatar({ className, size, shape, ...props }: AvatarProps) {
  *
  * Props for the AvatarImage component.
  */
-type AvatarImageProps = React.ComponentProps<typeof AvatarPrimitive.Image>;
+interface AvatarImageProps extends React.ComponentProps<
+  typeof AvatarPrimitive.Image
+> {}
 
 /**
  * AvatarImage
@@ -109,9 +111,9 @@ function AvatarImage({ className, ...props }: AvatarImageProps) {
  *
  * Props for the AvatarFallback component.
  */
-type AvatarFallbackProps = React.ComponentProps<
+interface AvatarFallbackProps extends React.ComponentProps<
   typeof AvatarPrimitive.Fallback
->;
+> {}
 
 /**
  * AvatarFallback

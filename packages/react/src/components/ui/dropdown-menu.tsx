@@ -63,11 +63,11 @@ const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
  *
  * Props for the DropdownMenuSubTrigger component.
  */
-type DropdownMenuSubTriggerProps = React.ComponentProps<
+interface DropdownMenuSubTriggerProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.SubTrigger
-> & {
+> {
   inset?: boolean;
-};
+}
 
 /**
  * DropdownMenuSubTrigger
@@ -106,9 +106,9 @@ function DropdownMenuSubTrigger({
  *
  * Props for the DropdownMenuSubContent component.
  */
-type DropdownMenuSubContentProps = React.ComponentProps<
+interface DropdownMenuSubContentProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.SubContent
->;
+> {}
 
 /**
  * DropdownMenuSubContent
@@ -145,9 +145,9 @@ function DropdownMenuSubContent({
  *
  * Props for the DropdownMenuContent component.
  */
-type DropdownMenuContentProps = React.ComponentProps<
+interface DropdownMenuContentProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Content
->;
+> {}
 
 /**
  * DropdownMenuContent
@@ -197,12 +197,12 @@ function DropdownMenuContent({
  *
  * Props for the DropdownMenuItem component.
  */
-type DropdownMenuItemProps = React.ComponentProps<
+interface DropdownMenuItemProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Item
-> & {
+> {
   inset?: boolean;
   variant?: 'default' | 'destructive';
-};
+}
 
 /**
  * DropdownMenuItem
@@ -248,9 +248,9 @@ function DropdownMenuItem({
  *
  * Props for the DropdownMenuCheckboxItem component.
  */
-type DropdownMenuCheckboxItemProps = React.ComponentProps<
+interface DropdownMenuCheckboxItemProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.CheckboxItem
->;
+> {}
 
 /**
  * DropdownMenuCheckboxItem
@@ -299,9 +299,9 @@ function DropdownMenuCheckboxItem({
  *
  * Props for the DropdownMenuRadioItem component.
  */
-type DropdownMenuRadioItemProps = React.ComponentProps<
+interface DropdownMenuRadioItemProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.RadioItem
->;
+> {}
 
 /**
  * DropdownMenuRadioItem
@@ -349,11 +349,11 @@ function DropdownMenuRadioItem({
  *
  * Props for the DropdownMenuLabel component.
  */
-type DropdownMenuLabelProps = React.ComponentProps<
+interface DropdownMenuLabelProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Label
-> & {
+> {
   inset?: boolean;
-};
+}
 
 /**
  * DropdownMenuLabel
@@ -389,9 +389,9 @@ function DropdownMenuLabel({
  *
  * Props for the DropdownMenuSeparator component.
  */
-type DropdownMenuSeparatorProps = React.ComponentProps<
+interface DropdownMenuSeparatorProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Separator
->;
+> {}
 
 /**
  * DropdownMenuSeparator
@@ -416,7 +416,7 @@ function DropdownMenuSeparator({
  *
  * Props for the DropdownMenuShortcut component.
  */
-type DropdownMenuShortcutProps = React.HTMLAttributes<HTMLSpanElement>;
+interface DropdownMenuShortcutProps extends React.HTMLAttributes<HTMLSpanElement> {}
 
 /**
  * DropdownMenuShortcut

@@ -57,7 +57,9 @@ const DialogClose = DialogPrimitive.Close;
  *
  * Props for the DialogOverlay component.
  */
-type DialogOverlayProps = React.ComponentProps<typeof DialogPrimitive.Overlay>;
+interface DialogOverlayProps extends React.ComponentProps<
+  typeof DialogPrimitive.Overlay
+> {}
 
 /**
  * DialogOverlay
@@ -162,7 +164,7 @@ function DialogContent({
  *
  * Props for the DialogHeader component.
  */
-type DialogHeaderProps = React.ComponentProps<'div'>;
+interface DialogHeaderProps extends React.ComponentProps<'div'> {}
 
 /**
  * DialogHeader
@@ -195,7 +197,7 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
  *
  * Props for the DialogFooter component.
  */
-type DialogFooterProps = React.ComponentProps<'div'>;
+interface DialogFooterProps extends React.ComponentProps<'div'> {}
 
 /**
  * DialogFooter
@@ -228,7 +230,9 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
  *
  * Props for the DialogTitle component.
  */
-type DialogTitleProps = React.ComponentProps<typeof DialogPrimitive.Title>;
+interface DialogTitleProps extends React.ComponentProps<
+  typeof DialogPrimitive.Title
+> {}
 
 /**
  * DialogTitle
@@ -258,9 +262,9 @@ function DialogTitle({ className, ...props }: DialogTitleProps) {
  *
  * Props for the DialogDescription component.
  */
-type DialogDescriptionProps = React.ComponentProps<
+interface DialogDescriptionProps extends React.ComponentProps<
   typeof DialogPrimitive.Description
->;
+> {}
 
 /**
  * DialogDescription

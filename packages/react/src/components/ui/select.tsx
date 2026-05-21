@@ -44,7 +44,9 @@ const SelectValue = SelectPrimitive.Value;
  *
  * Props for the SelectTrigger component.
  */
-type SelectTriggerProps = React.ComponentProps<typeof SelectPrimitive.Trigger>;
+interface SelectTriggerProps extends React.ComponentProps<
+  typeof SelectPrimitive.Trigger
+> {}
 
 /**
  * SelectTrigger
@@ -134,7 +136,9 @@ function SelectScrollDownButton({
  *
  * Props for the SelectContent component.
  */
-type SelectContentProps = React.ComponentProps<typeof SelectPrimitive.Content>;
+interface SelectContentProps extends React.ComponentProps<
+  typeof SelectPrimitive.Content
+> {}
 
 /**
  * SelectContent
@@ -195,7 +199,9 @@ function SelectContent({
  *
  * Props for the SelectLabel component.
  */
-type SelectLabelProps = React.ComponentProps<typeof SelectPrimitive.Label>;
+interface SelectLabelProps extends React.ComponentProps<
+  typeof SelectPrimitive.Label
+> {}
 
 /**
  * SelectLabel
@@ -225,7 +231,9 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
  *
  * Props for the SelectItem component.
  */
-type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
+interface SelectItemProps extends React.ComponentProps<
+  typeof SelectPrimitive.Item
+> {}
 
 /**
  * SelectItem
@@ -265,9 +273,9 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
  *
  * Props for the SelectSeparator component.
  */
-type SelectSeparatorProps = React.ComponentProps<
+interface SelectSeparatorProps extends React.ComponentProps<
   typeof SelectPrimitive.Separator
->;
+> {}
 
 /**
  * SelectSeparator

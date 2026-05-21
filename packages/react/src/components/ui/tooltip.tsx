@@ -46,9 +46,9 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
  *
  * Props for the TooltipContent component.
  */
-type TooltipContentProps = React.ComponentProps<
+interface TooltipContentProps extends React.ComponentProps<
   typeof TooltipPrimitive.Content
->;
+> {}
 
 /**
  * TooltipContent

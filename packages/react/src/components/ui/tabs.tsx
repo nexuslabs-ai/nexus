@@ -29,7 +29,9 @@ const Tabs = TabsPrimitive.Root;
  *
  * Props for the TabsList component.
  */
-type TabsListProps = React.ComponentProps<typeof TabsPrimitive.List>;
+interface TabsListProps extends React.ComponentProps<
+  typeof TabsPrimitive.List
+> {}
 
 /**
  * TabsList
@@ -161,7 +163,9 @@ function TabsTrigger({ className, variant, size, ...props }: TabsTriggerProps) {
  *
  * Props for the TabsContent component.
  */
-type TabsContentProps = React.ComponentProps<typeof TabsPrimitive.Content>;
+interface TabsContentProps extends React.ComponentProps<
+  typeof TabsPrimitive.Content
+> {}
 
 /**
  * TabsContent

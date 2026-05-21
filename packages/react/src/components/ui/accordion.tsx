@@ -38,7 +38,9 @@ Accordion.displayName = 'Accordion';
  *
  * Individual accordion section containing a trigger and content.
  */
-type AccordionItemProps = React.ComponentProps<typeof AccordionPrimitive.Item>;
+interface AccordionItemProps extends React.ComponentProps<
+  typeof AccordionPrimitive.Item
+> {}
 
 const AccordionItem = React.forwardRef<
   React.ComponentRef<typeof AccordionPrimitive.Item>,
@@ -59,9 +61,9 @@ AccordionItem.displayName = 'AccordionItem';
  * Button that toggles the expanded state of an accordion item.
  * Includes a chevron icon that rotates when expanded.
  */
-type AccordionTriggerProps = React.ComponentProps<
+interface AccordionTriggerProps extends React.ComponentProps<
   typeof AccordionPrimitive.Trigger
->;
+> {}
 
 const AccordionTrigger = React.forwardRef<
   React.ComponentRef<typeof AccordionPrimitive.Trigger>,
@@ -93,9 +95,9 @@ AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
  * Collapsible content area for an accordion item.
  * Animates open/close with height transition.
  */
-type AccordionContentProps = React.ComponentProps<
+interface AccordionContentProps extends React.ComponentProps<
   typeof AccordionPrimitive.Content
->;
+> {}
 
 const AccordionContent = React.forwardRef<
   React.ComponentRef<typeof AccordionPrimitive.Content>,

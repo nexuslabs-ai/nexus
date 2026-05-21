@@ -9,7 +9,9 @@ import { cn } from '@/lib/utils';
  *
  * Props for the Switch component.
  */
-type SwitchProps = React.ComponentProps<typeof SwitchPrimitive.Root>;
+interface SwitchProps extends React.ComponentProps<
+  typeof SwitchPrimitive.Root
+> {}
 
 /**
  * Switch
