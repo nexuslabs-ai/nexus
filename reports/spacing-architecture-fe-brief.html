@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spacing Architecture — FE Brief</title>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+<style>
+:root {
+  --nx-white:#fff;
+  --nx-gray-50:#f9f9f9;--nx-gray-100:#f2f2f2;--nx-gray-150:#e8e8e8;
+  --nx-gray-200:#d9d9d9;--nx-gray-300:#b8b8b8;--nx-gray-400:#8f8f8f;
+  --nx-gray-500:#6b6b6b;--nx-gray-600:#4d4d4d;--nx-gray-700:#333;
+  --nx-gray-800:#1f1f1f;--nx-gray-850:#161616;--nx-gray-900:#111;--nx-gray-950:#0a0a0a;
+  --nx-lead:#86efac;--nx-lead-bg:#0a2e12;--nx-lead-border:#166534;
+  --nx-warn:#fde68a;--nx-warn-bg:#2a1f00;--nx-warn-border:#92400e;
+  --nx-bad:#fca5a5;--nx-bad-bg:#2d0a0a;--nx-bad-border:#7f1d1d;
+  --nx-accent:#7dd3fc;--nx-accent-bg:#0c2942;--nx-accent-border:#075985;
+  --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:20px;--s-6:24px;--s-8:32px;--s-10:40px;--s-12:48px;--s-16:64px;--s-20:80px;
+  --r-sm:3px;--r-md:6px;--r-lg:10px;--r-xl:14px;--r-2xl:20px;
+  --font-sans:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono','Cascadia Code',ui-monospace,monospace;
+  --text-xs:11px;--text-sm:13px;--text-base:15px;--text-lg:18px;--text-xl:22px;--text-2xl:28px;--text-3xl:38px;--text-hero:56px;
+}
+.dark{
+  --bg:var(--nx-gray-950);--bg-muted:var(--nx-gray-900);--bg-muted2:var(--nx-gray-850);
+  --surface:var(--nx-gray-900);--surface-raised:var(--nx-gray-800);
+  --border:var(--nx-gray-800);--border-subtle:#1d1d1d;
+  --fg:var(--nx-gray-50);--fg-muted:var(--nx-gray-300);--fg-subtle:var(--nx-gray-500);
+  --fg-inverted:var(--nx-gray-950);
+  --lead:var(--nx-lead);--lead-bg:var(--nx-lead-bg);--lead-border:var(--nx-lead-border);
+  --warn:var(--nx-warn);--warn-bg:var(--nx-warn-bg);--warn-border:var(--nx-warn-border);
+  --bad:var(--nx-bad);--bad-bg:var(--nx-bad-bg);--bad-border:var(--nx-bad-border);
+  --accent:var(--nx-accent);--accent-bg:var(--nx-accent-bg);--accent-border:var(--nx-accent-border);
+}
+.light{
+  --bg:var(--nx-white);--bg-muted:var(--nx-gray-50);--bg-muted2:var(--nx-gray-100);
+  --surface:var(--nx-white);--surface-raised:var(--nx-gray-50);
+  --border:var(--nx-gray-200);--border-subtle:var(--nx-gray-150);
+  --fg:var(--nx-gray-950);--fg-muted:var(--nx-gray-600);--fg-subtle:var(--nx-gray-400);
+  --fg-inverted:var(--nx-white);
+  --lead:#1b5e20;--lead-bg:#e6f4ea;--lead-border:#a5d6a7;
+  --warn:#4e3b00;--warn-bg:#fff8e1;--warn-border:#ffe082;
+  --bad:#7f0000;--bad-bg:#fce4ec;--bad-border:#ef9a9a;
+  --accent:#075985;--accent-bg:#dbeafe;--accent-border:#7dd3fc;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;}
+body{font-family:var(--font-sans);font-size:var(--text-base);line-height:1.6;color:var(--fg);background:var(--bg);-webkit-font-smoothing:antialiased;}
+code{font-family:var(--font-mono);font-size:0.9em;background:var(--bg-muted2);padding:1px 6px;border-radius:var(--r-sm);}
+pre{font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--s-3) var(--s-4);overflow-x:auto;line-height:1.55;}
+
+/* ===== TOP BAR ===== */
+.topbar{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border);padding:var(--s-3) var(--s-6);display:flex;align-items:center;gap:var(--s-4);}
+.topbar-logo{font-size:var(--text-sm);font-weight:600;}
+.topbar-logo span{color:var(--fg-muted);font-weight:400;}
+.topbar-nav{display:flex;gap:var(--s-3);margin-left:auto;}
+.topbar-nav a{font-size:var(--text-xs);color:var(--fg-subtle);text-decoration:none;padding:4px var(--s-2);border-radius:var(--r-sm);}
+.topbar-nav a:hover{color:var(--fg);background:var(--bg-muted);}
+.topbar-meta{font-size:var(--text-xs);color:var(--fg-subtle);}
+.theme-toggle{background:var(--bg-muted2);border:1px solid var(--border);border-radius:var(--r-md);padding:4px var(--s-3);font-size:var(--text-xs);color:var(--fg-muted);cursor:pointer;font-family:inherit;}
+.theme-toggle:hover{color:var(--fg);}
+
+.page{max-width:1080px;margin:0 auto;padding:var(--s-12) var(--s-6);}
+
+/* ===== HERO ===== */
+.hero{padding:var(--s-12) 0 var(--s-16);border-bottom:1px solid var(--border);margin-bottom:var(--s-16);}
+.hero-tag{display:inline-block;font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);padding:4px 10px;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:var(--r-md);margin-bottom:var(--s-5);}
+.hero-headline{font-size:var(--text-hero);font-weight:700;letter-spacing:-0.035em;line-height:1.05;margin-bottom:var(--s-5);max-width:780px;}
+.hero-headline em{font-style:normal;color:var(--lead);}
+.hero-sub{font-size:var(--text-lg);color:var(--fg-muted);max-width:680px;line-height:1.5;margin-bottom:var(--s-8);}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-4);max-width:760px;}
+.hero-stat{padding:var(--s-5) var(--s-5);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);}
+.hero-stat-num{font-size:var(--text-3xl);font-weight:700;letter-spacing:-0.03em;color:var(--fg);line-height:1;}
+.hero-stat-label{font-size:var(--text-xs);color:var(--fg-subtle);text-transform:uppercase;letter-spacing:0.05em;margin-top:var(--s-2);line-height:1.4;}
+
+/* ===== SECTION ===== */
+section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
+.block:last-child{border-bottom:none;}
+.block-num{font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:var(--s-3);}
+.block-title{font-size:var(--text-2xl);font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin-bottom:var(--s-3);max-width:780px;}
+.block-lede{font-size:var(--text-base);color:var(--fg-muted);max-width:680px;margin-bottom:var(--s-8);line-height:1.6;}
+
+/* ===== LIVE DEMO ===== */
+.demo-frame{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;}
+.demo-modepicker{display:flex;flex-wrap:wrap;gap:6px;padding:var(--s-4) var(--s-5);background:var(--bg-muted);border-bottom:1px solid var(--border);}
+.mode-pill{font-family:inherit;font-size:var(--text-xs);font-weight:600;letter-spacing:0.03em;padding:6px 14px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border);color:var(--fg-muted);cursor:pointer;transition:all 0.15s;}
+.mode-pill:hover{color:var(--fg);background:var(--surface-raised);}
+.mode-pill.active{background:var(--fg);color:var(--fg-inverted);border-color:var(--fg);}
+.mode-pill .mode-meta{display:block;font-size:9px;opacity:0.6;font-weight:400;letter-spacing:0;margin-top:2px;}
+
+.demo-stage{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.demo-render{padding:var(--s-12) var(--s-8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-5);background:var(--surface);position:relative;}
+.demo-render::before{content:"LIVE";position:absolute;top:var(--s-3);left:var(--s-4);font-size:9px;font-weight:700;letter-spacing:0.1em;color:var(--lead);}
+.demo-button{font-family:inherit;font-weight:500;background:var(--fg);color:var(--fg-inverted);border:none;border-radius:var(--r-md);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.25s ease;}
+.demo-button:hover{opacity:0.9;}
+.demo-button-shadow{font-size:var(--text-xs);color:var(--fg-subtle);font-family:var(--font-mono);}
+
+.demo-vars{padding:var(--s-5);background:var(--bg-muted);border-left:1px solid var(--border);font-family:var(--font-mono);font-size:var(--text-xs);}
+.demo-vars-label{font-size:9px;font-weight:700;letter-spacing:0.1em;color:var(--fg-subtle);text-transform:uppercase;margin-bottom:var(--s-3);font-family:var(--font-sans);}
+.demo-var-row{padding:var(--s-2) 0;border-bottom:1px dashed var(--border-subtle);color:var(--fg-muted);line-height:1.5;}
+.demo-var-row:last-child{border-bottom:none;}
+.demo-var-name{color:var(--accent);}
+.demo-var-val{color:var(--lead);float:right;}
+.demo-var-arrow{color:var(--fg-subtle);margin:0 6px;}
+
+.demo-toggle{display:flex;border-top:1px solid var(--border);background:var(--bg-muted);}
+.demo-toggle-btn{flex:1;font-family:inherit;font-size:var(--text-xs);font-weight:600;padding:var(--s-3);background:none;border:none;color:var(--fg-subtle);cursor:pointer;border-right:1px solid var(--border);}
+.demo-toggle-btn:last-child{border-right:none;}
+.demo-toggle-btn.active{color:var(--fg);background:var(--surface);}
+.demo-toggle-btn:hover:not(.active){color:var(--fg-muted);}
+
+/* ===== ARCHITECTURE COMPARISON ===== */
+.arch-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:var(--s-5);align-items:start;}
+.arch-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;}
+.arch-col.now{border-color:var(--bad-border);}
+.arch-col.future{border-color:var(--lead-border);}
+.arch-col-header{padding:var(--s-4) var(--s-5);border-bottom:1px solid var(--border);}
+.arch-col-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:var(--r-sm);margin-bottom:6px;}
+.arch-col.now .arch-col-tag{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-border);}
+.arch-col.future .arch-col-tag{background:var(--lead-bg);color:var(--lead);border:1px solid var(--lead-border);}
+.arch-col-title{font-size:var(--text-lg);font-weight:600;}
+.arch-col-sub{font-size:var(--text-xs);color:var(--fg-subtle);margin-top:4px;}
+.arch-layer{padding:var(--s-3) var(--s-5);border-bottom:1px solid var(--border-subtle);}
+.arch-layer:last-child{border-bottom:none;}
+.arch-layer-label{font-size:9px;font-weight:700;color:var(--fg-subtle);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.arch-layer-code{font-family:var(--font-mono);font-size:var(--text-xs);color:var(--fg-muted);line-height:1.7;}
+.arch-layer-code .hl{color:var(--accent);}
+.arch-layer-code .hl-good{color:var(--lead);}
+.arch-divider{display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:var(--s-12);font-size:var(--text-2xl);color:var(--fg-subtle);}
+
+/* ===== CODE DIFF ===== */
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);}
+.diff-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.diff-block.before{border-left:3px solid var(--bad);}
+.diff-block.after{border-left:3px solid var(--lead);}
+.diff-header{padding:var(--s-3) var(--s-4);background:var(--bg-muted);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.diff-header-label{font-size:var(--text-xs);font-weight:600;}
+.diff-header-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-sm);}
+.diff-block.before .diff-header-tag{background:var(--bad-bg);color:var(--bad);}
+.diff-block.after .diff-header-tag{background:var(--lead-bg);color:var(--lead);}
+.diff-block pre{margin:0;border:none;border-radius:0;background:var(--surface);font-size:11px;}
+.diff-footer{padding:var(--s-3) var(--s-4);background:var(--bg-muted2);border-top:1px solid var(--border);font-size:var(--text-xs);color:var(--fg-muted);}
+.diff-footer strong{color:var(--fg);}
+
+/* ===== SLOP FLOOR ===== */
+.slop-prompt{background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s-4);margin-bottom:var(--s-5);font-family:var(--font-mono);font-size:var(--text-xs);color:var(--fg-muted);}
+.slop-prompt::before{content:"PROMPT  ";color:var(--accent);font-weight:700;letter-spacing:0.1em;}
+.slop-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);}
+.slop-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--s-4);}
+.slop-card.good{border-left:3px solid var(--lead);}
+.slop-card.bad{border-left:3px solid var(--bad);}
+.slop-arch{font-size:var(--text-xs);font-weight:600;margin-bottom:var(--s-2);color:var(--fg);}
+.slop-output{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);background:var(--bg-muted);padding:var(--s-2) var(--s-3);border-radius:var(--r-sm);margin:var(--s-2) 0;line-height:1.55;}
+.slop-output .strike{text-decoration:line-through;color:var(--bad);opacity:0.8;}
+.slop-output .ok{color:var(--lead);}
+.slop-verdict{font-size:var(--text-xs);color:var(--fg-muted);margin-top:var(--s-2);}
+.slop-verdict.bad{color:var(--bad);}
+.slop-verdict.good{color:var(--lead);}
+
+/* ===== FOUR OPTIONS ===== */
+.opts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s-4);}
+.opt{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s-5);position:relative;}
+.opt.recommended{border-color:var(--lead-border);background:linear-gradient(135deg,var(--lead-bg) 0%,var(--surface) 25%);}
+.opt-rank{position:absolute;top:var(--s-4);right:var(--s-4);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:var(--r-sm);}
+.opt-rank.pick{background:var(--lead-bg);color:var(--lead);border:1px solid var(--lead-border);}
+.opt-rank.alt{background:var(--bg-muted2);color:var(--fg-subtle);border:1px solid var(--border);}
+.opt-rank.skip{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-border);}
+.opt-name{font-size:var(--text-lg);font-weight:600;margin-bottom:6px;}
+.opt-sub{font-size:var(--text-xs);color:var(--fg-subtle);margin-bottom:var(--s-3);font-family:var(--font-mono);}
+.opt-pros, .opt-cons{margin-top:var(--s-3);}
+.opt-list-label{font-size:9px;font-weight:700;letter-spacing:0.08em;color:var(--fg-subtle);text-transform:uppercase;margin-bottom:6px;}
+.opt-list{list-style:none;padding:0;}
+.opt-list li{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.5;padding-left:18px;position:relative;margin-bottom:4px;}
+.opt-pros li::before{content:"✓";color:var(--lead);font-weight:700;position:absolute;left:0;}
+.opt-cons li::before{content:"–";color:var(--bad);font-weight:700;position:absolute;left:0;}
+
+/* ===== SCORING BARS ===== */
+.score-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.score-row{display:grid;grid-template-columns:200px 1fr 1fr 1fr 1fr;gap:var(--s-3);padding:var(--s-3) var(--s-5);align-items:center;border-bottom:1px solid var(--border-subtle);}
+.score-row:last-child{border-bottom:none;}
+.score-row.header{background:var(--bg-muted);font-weight:600;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--fg-subtle);padding:var(--s-3) var(--s-5);}
+.score-dim{font-size:var(--text-sm);font-weight:500;color:var(--fg);}
+.score-pill{font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);text-align:center;letter-spacing:0.02em;}
+.score-pill.s-strong{background:var(--lead-bg);color:var(--lead);border:1px solid var(--lead-border);}
+.score-pill.s-ok{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border);}
+.score-pill.s-weak{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-border);}
+
+/* ===== MIGRATION TIMELINE ===== */
+.timeline{position:relative;padding:var(--s-6) 0;}
+.timeline::before{content:"";position:absolute;left:24px;top:0;bottom:0;width:2px;background:var(--border);}
+.tl-step{position:relative;padding-left:60px;margin-bottom:var(--s-5);}
+.tl-step:last-child{margin-bottom:0;}
+.tl-dot{position:absolute;left:16px;top:0;width:20px;height:20px;border-radius:50%;background:var(--fg);color:var(--fg-inverted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:3px solid var(--bg);}
+.tl-week{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:4px;}
+.tl-title{font-size:var(--text-base);font-weight:600;margin-bottom:6px;}
+.tl-body{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;}
+.tl-effort{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;background:var(--bg-muted2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--fg-muted);margin-top:6px;}
+
+/* ===== DECISION CARDS ===== */
+.dec-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);}
+.dec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s-5);position:relative;}
+.dec-card.primary{border-color:var(--accent-border);background:linear-gradient(135deg,var(--accent-bg) 0%,var(--surface) 30%);}
+.dec-num{font-size:9px;font-weight:700;letter-spacing:0.1em;color:var(--fg-subtle);text-transform:uppercase;}
+.dec-q{font-size:var(--text-base);font-weight:600;margin:6px 0 var(--s-3);line-height:1.4;}
+.dec-arrow{font-size:var(--text-xs);color:var(--fg-subtle);margin:var(--s-2) 0 4px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;}
+.dec-answer{font-size:var(--text-sm);font-weight:600;color:var(--lead);margin-bottom:var(--s-3);}
+.dec-flip-label{font-size:9px;font-weight:700;letter-spacing:0.08em;color:var(--fg-subtle);text-transform:uppercase;margin-top:var(--s-3);margin-bottom:4px;}
+.dec-flip{font-size:var(--text-xs);color:var(--fg-muted);line-height:1.5;font-style:italic;}
+
+/* ===== APPLES-TO-APPLES COMPARISON ===== */
+.apples-trade{display:grid;grid-template-columns:1fr auto 1fr;gap:var(--s-5);align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:var(--s-6) var(--s-8);margin-bottom:var(--s-6);}
+.apples-trade-side{text-align:center;}
+.apples-trade-code{font-family:var(--font-mono);font-size:var(--text-xl);font-weight:600;padding:var(--s-3) var(--s-4);background:var(--bg-muted);border:1px solid var(--border);border-radius:var(--r-md);display:inline-block;margin-bottom:8px;}
+.apples-trade-code.before{color:var(--bad);border-color:var(--bad-border);background:var(--bad-bg);}
+.apples-trade-code.after{color:var(--lead);border-color:var(--lead-border);background:var(--lead-bg);}
+.apples-trade-chars{font-size:var(--text-xs);color:var(--fg-subtle);font-family:var(--font-mono);}
+.apples-trade-vs{font-size:var(--text-2xl);font-weight:700;color:var(--fg-subtle);letter-spacing:-0.04em;}
+.apples-trade-receipt{padding:var(--s-5) var(--s-6);background:var(--bg-muted);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-xl) var(--r-xl);margin-top:calc(var(--s-6) * -1);margin-bottom:var(--s-6);}
+.apples-trade-receipt-label{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--s-3);}
+.apples-trade-receipt ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3);}
+.apples-trade-receipt li{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.5;padding-left:18px;position:relative;}
+.apples-trade-receipt li::before{content:"+";color:var(--lead);font-weight:700;position:absolute;left:0;}
+
+.vocab-compare{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);margin:var(--s-6) 0;}
+.vocab-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s-5);}
+.vocab-col.today{border-left:3px solid var(--bad);}
+.vocab-col.future{border-left:3px solid var(--lead);}
+.vocab-col-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--s-3);padding-bottom:var(--s-3);border-bottom:1px solid var(--border-subtle);}
+.vocab-col-h h4{font-size:var(--text-base);font-weight:600;}
+.vocab-col-count{font-size:var(--text-2xl);font-weight:700;letter-spacing:-0.03em;}
+.vocab-col.today .vocab-col-count{color:var(--bad);}
+.vocab-col.future .vocab-col-count{color:var(--lead);}
+.vocab-col-sub{font-size:var(--text-xs);color:var(--fg-subtle);}
+.vocab-col ul{list-style:none;padding:0;margin-top:var(--s-3);}
+.vocab-col li{font-size:var(--text-sm);color:var(--fg-muted);padding:6px 0 6px 22px;border-bottom:1px dashed var(--border-subtle);position:relative;line-height:1.4;}
+.vocab-col li:last-child{border-bottom:none;}
+.vocab-col li::before{position:absolute;left:0;top:6px;font-size:14px;line-height:1.2;}
+.vocab-col.today li::before{content:"?";color:var(--bad);font-weight:700;}
+.vocab-col.future li::before{content:"✓";color:var(--lead);font-weight:700;}
+
+.decision-tree{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);margin:var(--s-6) 0;}
+.dt-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.dt-col.today{border-top:3px solid var(--bad);}
+.dt-col.future{border-top:3px solid var(--lead);}
+.dt-col-header{padding:var(--s-4);background:var(--bg-muted);border-bottom:1px solid var(--border);}
+.dt-col-header h4{font-size:var(--text-base);font-weight:600;margin-bottom:4px;}
+.dt-col-header .dt-counter{font-size:var(--text-xs);color:var(--fg-subtle);}
+.dt-col.today .dt-counter strong{color:var(--bad);}
+.dt-col.future .dt-counter strong{color:var(--lead);}
+.dt-step{display:grid;grid-template-columns:28px 1fr;gap:var(--s-3);padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border-subtle);}
+.dt-step:last-child{border-bottom:none;}
+.dt-num{font-size:var(--text-xs);font-weight:700;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.dt-col.today .dt-num{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-border);}
+.dt-col.future .dt-num{background:var(--lead-bg);color:var(--lead);border:1px solid var(--lead-border);}
+.dt-step-body{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.5;}
+.dt-step-body code{font-size:11px;}
+.dt-done{padding:var(--s-3) var(--s-4);background:var(--bg-muted2);font-size:var(--text-xs);color:var(--fg-subtle);text-align:center;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;}
+.dt-col.future .dt-done{color:var(--lead);background:var(--lead-bg);}
+
+.read-test{margin:var(--s-6) 0;}
+.read-test-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s-5);margin-bottom:var(--s-3);}
+.read-test-card.today{border-left:3px solid var(--bad);}
+.read-test-card.future{border-left:3px solid var(--lead);}
+.read-test-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border-radius:var(--r-sm);margin-bottom:var(--s-3);}
+.read-test-card.today .read-test-tag{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-border);}
+.read-test-card.future .read-test-tag{background:var(--lead-bg);color:var(--lead);border:1px solid var(--lead-border);}
+.read-test-card pre{margin-bottom:var(--s-3);}
+.read-test-q{font-size:var(--text-sm);color:var(--fg);font-weight:600;margin-bottom:var(--s-2);}
+.read-test-a{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;}
+.read-test-a code{font-size:11px;}
+.read-test-mental{margin-top:var(--s-3);padding:var(--s-3);background:var(--bg-muted);border-radius:var(--r-md);font-size:var(--text-xs);color:var(--fg-muted);font-family:var(--font-mono);line-height:1.6;}
+.read-test-mental .lookup{color:var(--bad);}
+.read-test-mental .clear{color:var(--lead);}
+
+.maint-scenario{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin:var(--s-6) 0;}
+.maint-header{padding:var(--s-5);background:var(--bg-muted);border-bottom:1px solid var(--border);}
+.maint-task{font-size:var(--text-xs);font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
+.maint-task-detail{font-size:var(--text-lg);font-weight:600;color:var(--fg);}
+.maint-grid{display:grid;grid-template-columns:1fr 1fr;}
+.maint-side{padding:var(--s-5);}
+.maint-side.today{border-right:1px solid var(--border);background:var(--bad-bg);background:linear-gradient(135deg,var(--bad-bg) 0%,var(--surface) 30%);}
+.maint-side.future{background:linear-gradient(135deg,var(--lead-bg) 0%,var(--surface) 30%);}
+.maint-side-label{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-3);}
+.maint-side.today .maint-side-label{color:var(--bad);}
+.maint-side.future .maint-side-label{color:var(--lead);}
+.maint-side ol{padding-left:18px;}
+.maint-side li{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;margin-bottom:var(--s-2);}
+.maint-side li code{font-size:11px;}
+.maint-side .maint-conclusion{margin-top:var(--s-3);padding-top:var(--s-3);border-top:1px dashed var(--border-subtle);font-size:var(--text-xs);font-weight:600;}
+.maint-side.today .maint-conclusion{color:var(--bad);}
+.maint-side.future .maint-conclusion{color:var(--lead);}
+
+/* ===== CALLOUT ===== */
+.callout{background:var(--surface);border-left:3px solid var(--accent);padding:var(--s-4) var(--s-5);border-radius:0 var(--r-md) var(--r-md) 0;margin:var(--s-5) 0;}
+.callout-label{font-size:9px;font-weight:700;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
+.callout-body{font-size:var(--text-sm);color:var(--fg-muted);line-height:1.55;}
+
+/* ===== FOOTER ===== */
+.footer{padding:var(--s-12) 0;text-align:center;font-size:var(--text-sm);color:var(--fg-subtle);}
+.footer a{color:var(--fg-muted);}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:900px){
+  .demo-stage,.arch-grid,.diff-grid,.opts-grid,.slop-grid,.dec-grid,.vocab-compare,.decision-tree,.maint-grid{grid-template-columns:1fr;}
+  .arch-divider{padding:var(--s-4) 0;}
+  .score-row{grid-template-columns:1fr;gap:var(--s-2);}
+  .score-row.header{display:none;}
+  .hero-headline{font-size:var(--text-2xl);}
+  .hero-stats{grid-template-columns:1fr;}
+  .page{padding:var(--s-6) var(--s-4);}
+  .apples-trade{grid-template-columns:1fr;}
+  .apples-trade-vs{transform:rotate(90deg);}
+  .apples-trade-receipt ul{grid-template-columns:1fr;}
+  .maint-side.today{border-right:none;border-bottom:1px solid var(--border);}
+}
+
+[x-cloak]{display:none !important;}
+</style>
+</head>
+<body x-data="brief()" :class="theme">
+
+<!-- ===== TOP BAR ===== -->
+<header class="topbar">
+  <div class="topbar-logo">Nexus DS <span>· FE Brief</span></div>
+  <div class="topbar-nav">
+    <a href="#demo">Demo</a>
+    <a href="#shift">Shift</a>
+    <a href="#compare">Compare</a>
+    <a href="#options">Options</a>
+    <a href="#score">Score</a>
+    <a href="#plan">Plan</a>
+    <a href="#decisions">Decisions</a>
+  </div>
+  <span class="topbar-meta">4-min read</span>
+  <button class="theme-toggle" @click="toggleTheme()" x-text="theme === 'dark' ? '☀' : '☾'"></button>
+</header>
+
+<div class="page">
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-tag">Spacing Token Architecture · Pre-decision FE Brief</div>
+  <h1 class="hero-headline">Stop reaching for <code style="font-size:0.85em;background:var(--bad-bg);color:var(--bad);padding:2px 12px;border-radius:var(--r-md);">nx:px-2.5</code>. Start reaching for <em><code style="font-size:0.85em;background:var(--lead-bg);color:var(--lead);padding:2px 12px;border-radius:var(--r-md);">nx:px-control</code></em>.</h1>
+  <p class="hero-sub">One shared 4px primitive scale. Twelve role-named alias tokens. Seven modes that swap which primitive each role points to. Same Button component renders correctly under all 7 modes — no per-mode variants, no rebuild.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">~20%</div>
+      <div class="hero-stat-label">LLM miss rate today<br>between <code>nx:px-2.5</code> and <code>nx:px-3</code></div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">~5%</div>
+      <div class="hero-stat-label">LLM miss rate after<br>role-named utilities</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">1 / 10</div>
+      <div class="hero-stat-label">Surveyed design systems<br>that took this approach</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION: LIVE DEMO ===== -->
+<section class="block" id="demo">
+  <div class="block-num">01 · See it work</div>
+  <h2 class="block-title">Live mode switch — same Button, no rebuild.</h2>
+  <p class="block-lede">Click a mode pill. The button below resizes. The CSS variables update on the right. The component code does not change — only which primitive each role points to.</p>
+
+  <div class="demo-frame">
+    <div class="demo-modepicker">
+      <template x-for="(spec, name) in modes" :key="name">
+        <button class="mode-pill" :class="{ active: mode === name }" @click="mode = name">
+          <span x-text="name.charAt(0).toUpperCase()+name.slice(1)"></span>
+          <span class="mode-meta" x-text="spec.label"></span>
+        </button>
+      </template>
+    </div>
+
+    <div class="demo-stage">
+      <div class="demo-render">
+        <button class="demo-button"
+          :style="`height: ${current['control-h-md']}px; padding-inline: ${current['control-px']}px; gap: ${current['control-gap']}px; font-size: ${current['text-control']}px;`">
+          <span x-text="current['icon']"></span>
+          Save changes
+        </button>
+        <div class="demo-button-shadow" x-text="`${current['control-h-md']}px tall · ${current['control-px']}px padding · ${current['text-control']}px text`"></div>
+      </div>
+
+      <div class="demo-vars">
+        <div class="demo-vars-label">Resolved CSS variables · mode <span x-text="`= ${mode}`" style="font-family:var(--font-mono);color:var(--accent);"></span></div>
+        <div class="demo-var-row">
+          <span class="demo-var-name">--space-control-h-md</span>
+          <span class="demo-var-val" x-text="`${current['control-h-md']}px`"></span>
+        </div>
+        <div class="demo-var-row">
+          <span class="demo-var-name">--space-control-px</span>
+          <span class="demo-var-val" x-text="`${current['control-px']}px`"></span>
+        </div>
+        <div class="demo-var-row">
+          <span class="demo-var-name">--space-control-gap</span>
+          <span class="demo-var-val" x-text="`${current['control-gap']}px`"></span>
+        </div>
+        <div class="demo-var-row">
+          <span class="demo-var-name">--text-control</span>
+          <span class="demo-var-val" x-text="`${current['text-control']}px`"></span>
+        </div>
+        <div class="demo-var-row">
+          <span class="demo-var-name">--radius-control</span>
+          <span class="demo-var-val" x-text="`${current['radius']}px`"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">What just happened</div>
+    <div class="callout-body">You changed one attribute on the root (<code>data-style="mira"</code>). The CSS variable cascade resolved each role to a different primitive step. The Button's <code>className</code> never changed. No component refactor, no rebuild, no 7-variant authoring burden.</div>
+  </div>
+</section>
+
+<!-- ===== SECTION: THE SHIFT ===== -->
+<section class="block" id="shift">
+  <div class="block-num">02 · The shift</div>
+  <h2 class="block-title">Two layers today. Three layers tomorrow.</h2>
+  <p class="block-lede">Today's tokens are numeric pass-throughs — components reach directly for primitive steps. Proposed: insert a semantic alias layer that names roles, not numbers. Modes swap primitive references behind stable role names.</p>
+
+  <div class="arch-grid">
+    <div class="arch-col now">
+      <div class="arch-col-header">
+        <span class="arch-col-tag">Today</span>
+        <div class="arch-col-title">Numeric pass-through</div>
+        <div class="arch-col-sub">2 layers · 5 size-mode files · LLM guesses steps</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Component code</div>
+        <div class="arch-layer-code"><span class="hl">nx:h-9</span> <span class="hl">nx:px-2.5</span> <span class="hl">nx:gap-2</span></div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Semantic layer · numeric aliases</div>
+        <div class="arch-layer-code">--spacing-9: var(--nx-size-9);<br>--spacing-2_5: var(--nx-size-2_5);</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Primitive scale · 5 mode files</div>
+        <div class="arch-layer-code">size-vega.json &nbsp; size-lyra.json<br>size-maia.json &nbsp; size-mira.json<br>size-nova.json</div>
+      </div>
+    </div>
+
+    <div class="arch-divider">→</div>
+
+    <div class="arch-col future">
+      <div class="arch-col-header">
+        <span class="arch-col-tag">Tomorrow</span>
+        <div class="arch-col-title">Role-named aliases</div>
+        <div class="arch-col-sub">3 layers · 1 shared scale · 7 alias mode files</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Component code</div>
+        <div class="arch-layer-code"><span class="hl-good">nx:h-control-md</span> <span class="hl-good">nx:px-control</span> <span class="hl-good">nx:gap-control</span></div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Semantic alias · per-mode mapping</div>
+        <div class="arch-layer-code">--space-control-h-md: var(--nx-size-9);<br>--space-control-px: var(--nx-size-2_5);<br><span style="color:var(--fg-subtle);">/* swap when mode changes */</span></div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-label">Primitive scale · 1 shared file</div>
+        <div class="arch-layer-code">size.json <span style="color:var(--fg-subtle);">/* identical across all modes */</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: CODE DIFF ===== -->
+<section class="block" id="code">
+  <div class="block-num">03 · What this means for your component code</div>
+  <h2 class="block-title">Button.tsx — before and after.</h2>
+  <p class="block-lede">Same component shape, different utilities. Reading the new utilities tells you <em>what the spacing is for</em>. Reading the old ones makes you guess <em>which step is closest to what you meant</em>.</p>
+
+  <div class="diff-grid">
+    <div class="diff-block before">
+      <div class="diff-header">
+        <span class="diff-header-label">button.tsx (today)</span>
+        <span class="diff-header-tag">Numeric utilities</span>
+      </div>
+<pre>&lt;Comp
+  className={cn(
+    "nx:inline-flex nx:items-center",
+    "nx:h-9 nx:px-2.5 nx:gap-2",
+    "nx:text-sm nx:rounded-md",
+    "nx:transition-colors"
+  )}
+  {...props}
+/&gt;</pre>
+      <div class="diff-footer">
+        <strong>4 numeric decisions.</strong> Same Button looks broken in 6 of 7 modes. Author must remember which step matches which role.
+      </div>
+    </div>
+
+    <div class="diff-block after">
+      <div class="diff-header">
+        <span class="diff-header-label">button.tsx (proposed)</span>
+        <span class="diff-header-tag">Role-named utilities</span>
+      </div>
+<pre>&lt;Comp
+  className={cn(
+    "nx:inline-flex nx:items-center",
+    "nx:h-control-md nx:px-control nx:gap-control",
+    "nx:text-control nx:rounded-control",
+    "nx:transition-colors"
+  )}
+  {...props}
+/&gt;</pre>
+      <div class="diff-footer">
+        <strong>4 role-named decisions.</strong> Same Button renders correctly across all 7 modes. Names communicate role; mode is a separate dimension.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: APPLES-TO-APPLES ===== -->
+<section class="block" id="compare">
+  <div class="block-num">04 · Apples-to-apples · Current vs Proposed</div>
+  <h2 class="block-title">"Role names are more typing." Yes — 4 keystrokes more. Here's what those 4 keystrokes buy you.</h2>
+  <p class="block-lede">The honest count of what changes with role-named utilities: ~4 characters added per utility. ~3 decisions eliminated per component. ~12 things-to-remember dropped from your head. <strong>The new vocabulary is smaller than the old one</strong>, not larger.</p>
+
+  <!-- VISUAL A: The keystroke math -->
+  <h3 style="font-size:var(--text-base);font-weight:600;margin-top:var(--s-8);margin-bottom:var(--s-4);">The keystroke trade</h3>
+  <div class="apples-trade">
+    <div class="apples-trade-side">
+      <div class="apples-trade-code before">nx:px-2.5</div>
+      <div class="apples-trade-chars">9 characters · today</div>
+    </div>
+    <div class="apples-trade-vs">→</div>
+    <div class="apples-trade-side">
+      <div class="apples-trade-code after">nx:px-control</div>
+      <div class="apples-trade-chars">13 characters · proposed</div>
+    </div>
+  </div>
+  <div class="apples-trade-receipt">
+    <div class="apples-trade-receipt-label">What those 4 keystrokes get you</div>
+    <ul>
+      <li>Zero step-picking decisions ("is it 2.5 or 3?")</li>
+      <li>Self-documenting at code review (intent visible)</li>
+      <li>Mode-resilient (same code works in 7 modes)</li>
+      <li>Discoverable via autocomplete (role names cluster)</li>
+      <li>Refactor-safe (rename role, all uses update)</li>
+      <li>LLM-resolvable (intent → role, no guessing)</li>
+    </ul>
+  </div>
+
+  <!-- VISUAL B: Vocabulary you have to remember -->
+  <h3 style="font-size:var(--text-base);font-weight:600;margin-top:var(--s-10);margin-bottom:var(--s-4);">Vocabulary you have to remember</h3>
+  <div class="vocab-compare">
+    <div class="vocab-col today">
+      <div class="vocab-col-h">
+        <div>
+          <h4>Today (numeric)</h4>
+          <div class="vocab-col-sub">~34 steps × N coupling rules</div>
+        </div>
+        <div class="vocab-col-count">46+</div>
+      </div>
+      <ul>
+        <li>34 numeric steps in the scale (0, 0.5, 1, 1.5, … 96)</li>
+        <li>Which step is Button padding? <code>px-2.5</code>? <code>px-3</code>?</li>
+        <li>Which step is Input padding? Same as Button or different?</li>
+        <li>Which step is Card padding? <code>p-6</code>? <code>p-8</code>?</li>
+        <li>Whether your numbers match Figma spec exactly</li>
+        <li>Whether other Buttons in the codebase use the same step</li>
+        <li>Whether half-steps are allowed (<code>p-2.5</code>) or forbidden</li>
+        <li>What changes when mode swaps (nothing — it breaks)</li>
+        <li>Which utilities are layout-scale vs component-scale</li>
+        <li>Coupling rules across 13 components</li>
+      </ul>
+    </div>
+    <div class="vocab-col future">
+      <div class="vocab-col-h">
+        <div>
+          <h4>Tomorrow (role-named)</h4>
+          <div class="vocab-col-sub">~18–22 named roles</div>
+        </div>
+        <div class="vocab-col-count">20</div>
+      </div>
+      <ul>
+        <li><code>control-*</code> roles for buttons / inputs / selects / chips</li>
+        <li><code>container-*</code> roles for cards / panels / surfaces</li>
+        <li><code>section-*</code> / <code>stack-*</code> roles for layout</li>
+        <li>Which role this component plays — <em>that's it</em></li>
+        <li>Numeric scale only for layout escape hatches</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-label">The counter-intuitive finding</div>
+    <div class="callout-body">Role-named tokens look like <em>more</em> vocabulary because the names are longer. They're actually <em>less</em>: the new system has ~20 names you can keep in your head; the old system has 34 numeric steps + the implicit coupling rules ("Button uses 2.5, Input uses 3, why?") that nobody documents and everyone has to discover by reading other components.</div>
+  </div>
+
+  <!-- VISUAL C: Decision tree -->
+  <h3 style="font-size:var(--text-base);font-weight:600;margin-top:var(--s-10);margin-bottom:var(--s-4);">What goes through your head when authoring Button</h3>
+  <p style="font-size:var(--text-sm);color:var(--fg-muted);margin-bottom:var(--s-4);">Mental decision tree for a single utility class. Multiply by 4 utilities per component, then by 13 components.</p>
+  <div class="decision-tree">
+    <div class="dt-col today">
+      <div class="dt-col-header">
+        <h4>Today — picking padding for a Button</h4>
+        <div class="dt-counter"><strong>4 steps</strong>, requires lookup or recall</div>
+      </div>
+      <div class="dt-step">
+        <div class="dt-num">1</div>
+        <div class="dt-step-body">Decide: "this is a button's horizontal padding"</div>
+      </div>
+      <div class="dt-step">
+        <div class="dt-num">2</div>
+        <div class="dt-step-body">Remember which numeric step matches Button padding. Was it <code>px-2.5</code>? <code>px-3</code>?</div>
+      </div>
+      <div class="dt-step">
+        <div class="dt-num">3</div>
+        <div class="dt-step-body">Open <code>button.tsx</code> elsewhere in the repo to confirm. Or check Figma. Or guess.</div>
+      </div>
+      <div class="dt-step">
+        <div class="dt-num">4</div>
+        <div class="dt-step-body">Write <code>nx:px-2.5</code> — hope it's consistent with the existing component</div>
+      </div>
+      <div class="dt-done">~30 seconds per utility</div>
+    </div>
+    <div class="dt-col future">
+      <div class="dt-col-header">
+        <h4>Tomorrow — picking padding for a Button</h4>
+        <div class="dt-counter"><strong>1 step</strong>, role IS the answer</div>
+      </div>
+      <div class="dt-step">
+        <div class="dt-num">1</div>
+        <div class="dt-step-body">It's a control. Write <code>nx:px-control</code>.</div>
+      </div>
+      <div class="dt-done">~2 seconds per utility</div>
+    </div>
+  </div>
+
+  <!-- VISUAL D: The 6-months-later read test -->
+  <h3 style="font-size:var(--text-base);font-weight:600;margin-top:var(--s-10);margin-bottom:var(--s-4);">The 6-months-later code-review test</h3>
+  <p style="font-size:var(--text-sm);color:var(--fg-muted);margin-bottom:var(--s-4);">Someone (or you, in 6 months) opens this file. Read the className. What is this component doing?</p>
+  <div class="read-test">
+    <div class="read-test-card today">
+      <span class="read-test-tag">Today · numeric</span>
+<pre>&lt;button className="nx:h-9 nx:px-2.5 nx:gap-2 nx:text-sm nx:rounded-md"&gt;
+  Save
+&lt;/button&gt;</pre>
+      <div class="read-test-q">What is this component?</div>
+      <div class="read-test-a">A 36px-tall element with 10px horizontal padding, 8px gap, 14px text, and 6px radius. <strong>You can't tell from reading this whether it's a button, an input, a chip, or a tag.</strong> You have to check the JSX tag (<code>&lt;button&gt;</code>) — and even then you don't know if these step numbers are <em>intentional</em> for a button or copy-pasted from somewhere else.</div>
+      <div class="read-test-mental">
+mental cost: <span class="lookup">[lookup h-9 = ?px]</span> <span class="lookup">[lookup px-2.5 = ?px]</span> <span class="lookup">[lookup gap-2 = ?px]</span> <span class="lookup">[verify these are the canonical Button steps]</span>
+      </div>
+    </div>
+    <div class="read-test-card future">
+      <span class="read-test-tag">Tomorrow · role-named</span>
+<pre>&lt;button className="nx:h-control-md nx:px-control nx:gap-control nx:text-control nx:rounded-control"&gt;
+  Save
+&lt;/button&gt;</pre>
+      <div class="read-test-q">What is this component?</div>
+      <div class="read-test-a">A control surface at default size. <strong>Self-evident at a glance.</strong> The actual pixel values live in the spacing mode file; the component declares <em>what it is</em>, not <em>which numbers it picked</em>. Reviewing this in a PR takes seconds; you check whether the role assignments match the component's actual purpose, not whether the numbers are right.</div>
+      <div class="read-test-mental">
+mental cost: <span class="clear">[parse "control surface, default size"]</span> — done.
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL E: Real maintenance scenario -->
+  <h3 style="font-size:var(--text-base);font-weight:600;margin-top:var(--s-10);margin-bottom:var(--s-4);">Real maintenance scenario</h3>
+  <p style="font-size:var(--text-sm);color:var(--fg-muted);margin-bottom:var(--s-4);">A common request from design: "Make all buttons 2px taller in the default mode." Here's what happens.</p>
+  <div class="maint-scenario">
+    <div class="maint-header">
+      <div class="maint-task">Task</div>
+      <div class="maint-task-detail">Designer: "Bump default button height from 36px to 38px"</div>
+    </div>
+    <div class="maint-grid">
+      <div class="maint-side today">
+        <div class="maint-side-label">Today (numeric utilities)</div>
+        <ol>
+          <li>Grep for <code>nx:h-9</code> across the codebase</li>
+          <li>For each match, decide: is this a Button? An Input? A Select? Something else?</li>
+          <li>Filter to only the Button-like usages (manual judgement)</li>
+          <li>Change them to <code>nx:h-[38px]</code> (no step exists for 38px) <em>or</em> add a new <code>--nx-size-9_5</code> primitive</li>
+          <li>Test in all 7 modes — except numeric utilities don't shift with mode, so half the work is mode-by-mode</li>
+          <li>Hope you didn't miss any Button-like usages</li>
+        </ol>
+        <div class="maint-conclusion">~2–4 hours · drift risk · likely follow-up PR</div>
+      </div>
+      <div class="maint-side future">
+        <div class="maint-side-label">Tomorrow (role-named)</div>
+        <ol>
+          <li>Open <code>spacing-vega.json</code></li>
+          <li>Change one line: <code>control-h-md: size.9</code> → <code>size.9_5</code> (or new step)</li>
+          <li>Every control surface in every component updates</li>
+        </ol>
+        <div class="maint-conclusion">~10 minutes · zero drift · single source of truth</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM-LINE -->
+  <div class="callout" style="margin-top:var(--s-8);border-left-color:var(--lead);">
+    <div class="callout-label" style="color:var(--lead);">The receipt</div>
+    <div class="callout-body">
+      <strong style="color:var(--fg);">Today's system feels familiar because you've internalized the lookups.</strong> You memorize which numeric steps belong to which components, and the burden is invisible to you because it's already paid. To a new author, a designer, or an LLM, the lookups are pure tax. Role names eliminate the tax — same scale, fewer decisions, better self-documentation. The "more typing" cost is 4 characters; the "more thinking" cost goes <em>down</em>, not up.
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: SLOP FLOOR ===== -->
+<section class="block" id="slop">
+  <div class="block-num">05 · The agent-legibility test</div>
+  <h2 class="block-title">What does an LLM generate for "make this button 36px tall in compact mode"?</h2>
+  <p class="block-lede">Nexus's thesis is human + agent. Every architecture choice gets graded on what an LLM produces with imperfect docs. Failures should be <em>loud</em> (devtools shows undefined CSS) not <em>silent</em> (renders something plausible-looking but wrong).</p>
+
+  <div class="slop-prompt">"Render a 36px-tall Button labelled 'Save' in compact mode."</div>
+
+  <div class="slop-grid">
+    <div class="slop-card good">
+      <div class="slop-arch">Spectrum-style (proposed)</div>
+      <div class="slop-output"><span class="ok">&lt;Button className="nx:h-control-md"<br>&nbsp;&nbsp;data-style="mira" /&gt;</span></div>
+      <div class="slop-verdict good">✓ Correct. Role name resolves to 28px under <code>data-style="mira"</code>. Switching modes does the right thing.</div>
+    </div>
+    <div class="slop-card good">
+      <div class="slop-arch">Primer-style</div>
+      <div class="slop-output"><span class="ok">&lt;Button<br>&nbsp;&nbsp;className="nx:h-control-condensed" /&gt;</span></div>
+      <div class="slop-verdict good">✓ Correct. Density modifier in the name itself. Most self-documenting.</div>
+    </div>
+    <div class="slop-card bad">
+      <div class="slop-arch">shadcn-style (today)</div>
+      <div class="slop-output">&lt;Button className=<span class="strike">"nx:h-9"</span> /&gt;</div>
+      <div class="slop-verdict bad">✗ Wrong. 36px is the right answer in Vega but ignores "compact mode." LLM doesn't know to scope inside <code>style-mira</code> class. Silent failure.</div>
+    </div>
+    <div class="slop-card bad">
+      <div class="slop-arch">Radix-style</div>
+      <div class="slop-output">&lt;Theme scaling="80%"&gt;<br>&nbsp;&nbsp;&lt;Button className=<span class="strike">"nx:h-9"</span> /&gt;<br>&lt;/Theme&gt;</div>
+      <div class="slop-verdict bad">✗ Wrong. LLM guesses a multiplier; 0.8 × 36 = 28.8px ≠ 28px. Silent rendering off-grid.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: FOUR OPTIONS ===== -->
+<section class="block" id="options">
+  <div class="block-num">06 · The four architectural options</div>
+  <h2 class="block-title">Where mode variation lives.</h2>
+  <p class="block-lede">Surveyed 10 design systems. Three viable patterns plus shadcn's component-layer (what we copy today). Spectrum-style wins on the criterion that matters most for an AI-native system.</p>
+
+  <div class="opts-grid">
+    <div class="opt recommended">
+      <span class="opt-rank pick">Recommended</span>
+      <div class="opt-name">Spectrum-style</div>
+      <div class="opt-sub">Stable alias names · swappable primitive refs</div>
+      <div class="opt-pros">
+        <div class="opt-list-label">Wins</div>
+        <ul class="opt-list">
+          <li>Role names are agent-legible</li>
+          <li>Invented names fail loudly (undefined var)</li>
+          <li>Adds new mode in ~50 lines of JSON</li>
+          <li>Matches the pattern Nexus color tokens already use</li>
+        </ul>
+      </div>
+      <div class="opt-cons">
+        <div class="opt-list-label">Costs</div>
+        <ul class="opt-list">
+          <li>New role vocabulary to maintain (~18–22 roles)</li>
+          <li>Migration touches every component</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="opt">
+      <span class="opt-rank alt">Alternative</span>
+      <div class="opt-name">Primer-style</div>
+      <div class="opt-sub">Per-mode alias maps · density in names</div>
+      <div class="opt-pros">
+        <div class="opt-list-label">Wins</div>
+        <ul class="opt-list">
+          <li>Most self-documenting names</li>
+          <li>Density modifier baked into token</li>
+        </ul>
+      </div>
+      <div class="opt-cons">
+        <div class="opt-list-label">Costs</div>
+        <ul class="opt-list">
+          <li>Vocabulary doubles (roles × modifiers)</li>
+          <li>Only one precedent (Primer itself)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="opt">
+      <span class="opt-rank skip">Status quo</span>
+      <div class="opt-name">shadcn-style</div>
+      <div class="opt-sub">Component layer · style-XXX body class</div>
+      <div class="opt-pros">
+        <div class="opt-list-label">Wins</div>
+        <ul class="opt-list">
+          <li>Most flexible per-mode aesthetics</li>
+          <li>Matches what we're doing today</li>
+        </ul>
+      </div>
+      <div class="opt-cons">
+        <div class="opt-list-label">Costs</div>
+        <ul class="opt-list">
+          <li>7 variants per component × 13 components = 91 pairings</li>
+          <li>Silent LLM failures (numeric guess resolves but is wrong)</li>
+          <li>Adding 8th mode = refactor everything</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="opt">
+      <span class="opt-rank skip">Mismatched</span>
+      <div class="opt-name">Radix-style</div>
+      <div class="opt-sub">Single calc multiplier · uniform scale</div>
+      <div class="opt-pros">
+        <div class="opt-list-label">Wins</div>
+        <ul class="opt-list">
+          <li>One variable explains everything</li>
+          <li>Trivial runtime override</li>
+        </ul>
+      </div>
+      <div class="opt-cons">
+        <div class="opt-list-label">Costs</div>
+        <ul class="opt-list">
+          <li>Can't express non-proportional modes (flat radius in Lyra)</li>
+          <li>Numeric names — same LLM-legibility problem as today</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: SCORING ===== -->
+<section class="block" id="score">
+  <div class="block-num">07 · Side-by-side scoring</div>
+  <h2 class="block-title">Where each option wins and loses.</h2>
+  <p class="block-lede">13 dimensions across two rubrics: long-horizon scalability and agent / LLM legibility. Cells colored by verdict. Spectrum-style wins or ties on the dimensions that matter for Nexus.</p>
+
+  <div class="score-table">
+    <div class="score-row header">
+      <div>Dimension</div>
+      <div>Spectrum-style</div>
+      <div>Primer-style</div>
+      <div>shadcn-style</div>
+      <div>Radix-style</div>
+    </div>
+
+    <!-- Scalability -->
+    <div class="score-row">
+      <div class="score-dim">Add mode</div>
+      <div class="score-pill s-ok">Medium</div>
+      <div class="score-pill s-ok">Low-med</div>
+      <div class="score-pill s-weak">High</div>
+      <div class="score-pill s-strong">Trivial</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Add component</div>
+      <div class="score-pill s-strong">Low</div>
+      <div class="score-pill s-ok">Low-med</div>
+      <div class="score-pill s-ok">Medium</div>
+      <div class="score-pill s-strong">Trivial</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Add axis (radius, font…)</div>
+      <div class="score-pill s-strong">Low</div>
+      <div class="score-pill s-strong">Low</div>
+      <div class="score-pill s-weak">Med-high</div>
+      <div class="score-pill s-weak">Limited</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Team scale (10+ authors)</div>
+      <div class="score-pill s-ok">Medium</div>
+      <div class="score-pill s-weak">Med-high</div>
+      <div class="score-pill s-weak">High drift</div>
+      <div class="score-pill s-strong">Low</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Consumer override</div>
+      <div class="score-pill s-ok">Medium</div>
+      <div class="score-pill s-weak">High</div>
+      <div class="score-pill s-weak">Hard</div>
+      <div class="score-pill s-strong">Trivial</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Name predictability (LLM)</div>
+      <div class="score-pill s-strong">High</div>
+      <div class="score-pill s-strong">Highest</div>
+      <div class="score-pill s-weak">Low</div>
+      <div class="score-pill s-weak">Low</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Hallucination resistance</div>
+      <div class="score-pill s-strong">Loud fail</div>
+      <div class="score-pill s-strong">Loud fail</div>
+      <div class="score-pill s-ok">Silent</div>
+      <div class="score-pill s-weak">Silent</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Figma → code mapping</div>
+      <div class="score-pill s-strong">High</div>
+      <div class="score-pill s-strong">Highest</div>
+      <div class="score-pill s-weak">Low</div>
+      <div class="score-pill s-weak">Low</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Self-documentation</div>
+      <div class="score-pill s-strong">High</div>
+      <div class="score-pill s-strong">Highest</div>
+      <div class="score-pill s-weak">Low</div>
+      <div class="score-pill s-weak">Low</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Mode-switch reasoning</div>
+      <div class="score-pill s-strong">Easy</div>
+      <div class="score-pill s-strong">Easy</div>
+      <div class="score-pill s-weak">Hard</div>
+      <div class="score-pill s-strong">Easy</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Slop floor</div>
+      <div class="score-pill s-strong">Loud</div>
+      <div class="score-pill s-strong">Loud</div>
+      <div class="score-pill s-weak">Silent</div>
+      <div class="score-pill s-weak">Silent</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Prompt economy (docs cost)</div>
+      <div class="score-pill s-ok">~800tok</div>
+      <div class="score-pill s-ok">~1200tok</div>
+      <div class="score-pill s-weak">Highest</div>
+      <div class="score-pill s-strong">Lowest</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Build complexity</div>
+      <div class="score-pill s-ok">Medium</div>
+      <div class="score-pill s-ok">Medium</div>
+      <div class="score-pill s-ok">Mixed</div>
+      <div class="score-pill s-strong">Low</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: PLAN ===== -->
+<section class="block" id="plan">
+  <div class="block-num">08 · Migration plan</div>
+  <h2 class="block-title">Four weeks. Eight steps. Button first.</h2>
+  <p class="block-lede">Step 1 (collapse primitives) is unblocking regardless of which architecture wins — do it first. Then audit, build the alias layer, refactor one component as proof, then roll out.</p>
+
+  <div class="timeline">
+    <div class="tl-step">
+      <div class="tl-dot">1</div>
+      <div class="tl-week">Week 1 · Foundations</div>
+      <div class="tl-title">Collapse primitives → one shared scale</div>
+      <div class="tl-body">Delete <code>size-{lyra,maia,mira,nova}.json</code>. Keep <code>size.json</code> as canonical. No other system in the survey ships multi-file primitives for spacing.</div>
+      <div class="tl-effort">~30 min · 1 PR</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">2</div>
+      <div class="tl-week">Week 1 · Foundations</div>
+      <div class="tl-title">Audit existing components for spacing roles</div>
+      <div class="tl-body">Enumerate every spacing decision in <code>button</code>, <code>input</code>, <code>card</code>, <code>dialog</code>, <code>badge</code>, <code>avatar</code>, <code>select</code>. Cluster into roles. Real count: 18–22, not the 12 the deep-dive originally proposed.</div>
+      <div class="tl-effort">~2 hours</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">3</div>
+      <div class="tl-week">Week 2 · Tokens</div>
+      <div class="tl-title">Author 7 semantic-spacing mode files</div>
+      <div class="tl-body">Same role keys, different primitive references per mode. Each ~50 lines of JSON. The 7 mode names: Vega (default), Nova, Maia, Lyra, Mira, Luma, Sera.</div>
+      <div class="tl-effort">~3 hours</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">4</div>
+      <div class="tl-week">Week 2 · Tokens</div>
+      <div class="tl-title">Register roles in nexus.css <code>@theme</code></div>
+      <div class="tl-body">Wire the 18–22 alias tokens through Tailwind so utilities like <code>nx:h-control-md</code> become legal. Emit per-mode <code>[data-style="X"]</code> scopes in one bundle.</div>
+      <div class="tl-effort">~2 hours</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">5</div>
+      <div class="tl-week">Week 3 · Proof point</div>
+      <div class="tl-title">Refactor Button to use role names</div>
+      <div class="tl-body">One component, one PR. Verify identical render in Vega; add a Storybook story that switches to Sera and visibly shifts. This is the architecture demo.</div>
+      <div class="tl-effort">~4 hours · 1 PR</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">6</div>
+      <div class="tl-week">Week 3 · Rollout</div>
+      <div class="tl-title">Roll out remaining components</div>
+      <div class="tl-body">Order: Input → Card → Dialog → Select → rest. Each one PR. Follow Button's pattern. Cumulative: ~13 component PRs.</div>
+      <div class="tl-effort">~1–2 days</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">7</div>
+      <div class="tl-week">Week 4 · Documentation</div>
+      <div class="tl-title">Publish role-to-component coupling table</div>
+      <div class="tl-body">Single source of truth in <code>CLAUDE.md</code> and <code>figma.md</code>. Without this, agents have to guess which role applies to which component.</div>
+      <div class="tl-effort">~2 hours</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">8</div>
+      <div class="tl-week">Week 4 · Guardrails</div>
+      <div class="tl-title">Add ESLint rule against primitive utilities in components</div>
+      <div class="tl-body">Flag <code>nx:p-N</code>, <code>nx:h-N</code>, etc. in component files. Allow-list with justification comment. Prevents drift back to numeric utilities.</div>
+      <div class="tl-effort">~3 hours</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: DECISIONS ===== -->
+<section class="block" id="decisions">
+  <div class="block-num">09 · Decisions to make</div>
+  <h2 class="block-title">Six choices. One is dominant — resolve it first.</h2>
+  <p class="block-lede">The reviewer's position on each, with the flip condition that would change the answer. Brainstorm starts with Q1; everything else cascades from it.</p>
+
+  <div class="dec-grid">
+    <div class="dec-card primary">
+      <div class="dec-num">Decision 1 · Dominant</div>
+      <div class="dec-q">Multi-axis modes (spacing + radius + typography + shadow) — or spacing-only?</div>
+      <div class="dec-arrow">Recommended</div>
+      <div class="dec-answer">→ Multi-axis from day 1</div>
+      <div class="dec-flip-label">Flips if</div>
+      <div class="dec-flip">…the 7 modes turn out to be pure density nudges and we never want radius/font to vary per mode. shadcn's evidence says we already do.</div>
+    </div>
+
+    <div class="dec-card">
+      <div class="dec-num">Decision 2</div>
+      <div class="dec-q">Spectrum-style stable aliases — or Primer-style per-mode aliases?</div>
+      <div class="dec-arrow">Recommended</div>
+      <div class="dec-answer">→ Spectrum-style</div>
+      <div class="dec-flip-label">Flips if</div>
+      <div class="dec-flip">…we explicitly want density to appear in the token name itself (e.g., <code>--space-stack-gap-condensed</code>). Primer is more self-documenting; Spectrum is simpler.</div>
+    </div>
+
+    <div class="dec-card">
+      <div class="dec-num">Decision 3</div>
+      <div class="dec-q">Density vocabulary — borrow <code>condensed / normal / spacious</code> or invent?</div>
+      <div class="dec-arrow">Recommended</div>
+      <div class="dec-answer">→ Borrow</div>
+      <div class="dec-flip-label">Flips if</div>
+      <div class="dec-flip">…we'd rather lean entirely on the star names (Mira = compact, Sera = spacious) for vocabulary. Then no English modifier ever appears in a token name.</div>
+    </div>
+
+    <div class="dec-card">
+      <div class="dec-num">Decision 4</div>
+      <div class="dec-q">Runtime activation — <code>data-style</code> attribute or <code>class="style-X"</code>?</div>
+      <div class="dec-arrow">Recommended</div>
+      <div class="dec-answer">→ <code>data-style</code></div>
+      <div class="dec-flip-label">Flips if</div>
+      <div class="dec-flip">…we'd rather match shadcn's exact mechanism for migration ergonomics. Class wins on familiarity; attribute wins on per-subtree composition.</div>
+    </div>
+
+    <div class="dec-card">
+      <div class="dec-num">Decision 5</div>
+      <div class="dec-q">Canonical default — Vega?</div>
+      <div class="dec-arrow">Recommended</div>
+      <div class="dec-answer">→ Yes, Vega</div>
+      <div class="dec-flip-label">Flips if</div>
+      <div class="dec-flip">…most product surfaces ship in Maia or Nova in practice. Default should match dominant use, not first listing.</div>
+    </div>
+
+    <div class="dec-card">
+      <div class="dec-num">Decision 6</div>
+      <div class="dec-q">Role-layer scope — 12 roles or 18–22?</div>
+      <div class="dec-arrow">Recommended</div>
+      <div class="dec-answer">→ Audit first; expect 18–22</div>
+      <div class="dec-flip-label">Flips if</div>
+      <div class="dec-flip">…the audit returns fewer distinct roles than expected. Set the floor by data, not estimation.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <p>Deep-dive research available at <a href="./spacing-token-architecture.html">spacing-token-architecture.html</a> — full survey of 10 systems, deep dives, and risk register.</p>
+  <p style="margin-top:8px;">Prompt template for adversarial review: <code>reports/_prompts/staff-ds-architecture-review.md</code></p>
+</div>
+
+</div><!-- /.page -->
+
+<script>
+function brief() {
+  return {
+    theme: 'dark',
+    mode: 'vega',
+    modes: {
+      mira: { 'control-h-md': 28, 'control-px': 8,  'control-gap': 4, 'text-control': 12, 'radius': 8,  'icon': '✓', label: 'compact'  },
+      lyra: { 'control-h-md': 32, 'control-px': 10, 'control-gap': 4, 'text-control': 12, 'radius': 0,  'icon': '✓', label: 'sharp'    },
+      nova: { 'control-h-md': 32, 'control-px': 10, 'control-gap': 4, 'text-control': 14, 'radius': 10, 'icon': '✓', label: 'crisp'    },
+      vega: { 'control-h-md': 36, 'control-px': 10, 'control-gap': 4, 'text-control': 14, 'radius': 8,  'icon': '✓', label: 'default'  },
+      maia: { 'control-h-md': 36, 'control-px': 12, 'control-gap': 6, 'text-control': 14, 'radius': 26, 'icon': '✓', label: 'pill'     },
+      luma: { 'control-h-md': 36, 'control-px': 12, 'control-gap': 6, 'text-control': 14, 'radius': 26, 'icon': '✓', label: 'soft'     },
+      sera: { 'control-h-md': 40, 'control-px': 24, 'control-gap': 8, 'text-control': 12, 'radius': 0,  'icon': '✓', label: 'spacious' },
+    },
+    get current() { return this.modes[this.mode]; },
+    toggleTheme() {
+      this.theme = this.theme === 'dark' ? 'light' : 'dark';
+    },
+  };
+}
+</script>
+</body>
+</html>
