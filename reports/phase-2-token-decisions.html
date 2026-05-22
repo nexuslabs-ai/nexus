@@ -1878,34 +1878,75 @@ nx:focus-visible:outline-offset-2</pre>
 
   <!-- DECISION D -->
   <div class="sub-decision">
-    <h4>D · Dialog's <code>nx:sm:</code> resolution <span class="verdict verdict-pick">migrate to @container</span></h4>
+    <h4>D · Dialog's <code>nx:sm:</code> resolution <span class="verdict verdict-pick">keep + document as viewport-driven exception</span></h4>
     <p class="sub-q">Three sites in <code>dialog.tsx</code> use <code>nx:sm:</code> mobile-first defaults. Keep, strip, or migrate?</p>
 
+    <div class="callout callout-warn">
+      <strong>Spike finding — May 2026</strong>
+      The naïve <code>nx:sm:</code> → <code>nx:@sm:</code> migration originally proposed in D3
+      <strong>does not work as written</strong>. Tailwind v4's container-query namespace
+      (<code>--container-*</code>) is separate from the viewport namespace
+      (<code>--breakpoint-*</code>), and the two scales have different default values.
+      <code>nx:@sm:</code> fires at container ≥ 24rem (384px), NOT at viewport ≥ 40rem (640px).
+      Walking through Dialog's actual widths:
+      <table style="margin-top: 8px; font-size: 12px;">
+        <thead><tr><th>Viewport</th><th>Dialog width</th><th>Original <code>nx:sm:</code></th><th>Naïve <code>nx:@sm:</code></th><th>Wanted</th></tr></thead>
+        <tbody>
+          <tr><td>320px</td><td>20rem (full-bleed)</td><td>no rounded ✓</td><td>no rounded (20&lt;24) ✓</td><td>no rounded</td></tr>
+          <tr><td>480px</td><td>30rem (full-bleed)</td><td>no rounded ✓</td><td><strong>rounded (30≥24) ✗</strong></td><td>no rounded</td></tr>
+          <tr><td>640px+</td><td>32rem (max-w-lg)</td><td>rounded ✓</td><td>rounded ✓</td><td>rounded</td></tr>
+        </tbody>
+      </table>
+      At viewports 384–640px the swap flips Dialog's rounded corners on prematurely. The two
+      scales are not interchangeable. <strong>Revised pick: D1 (keep + document as exception).</strong>
+    </div>
+
     <div class="decision-grid">
-      <div class="decision-col">
-        <h5>D1 · Keep + document exception <span class="verdict verdict-skip">skip</span></h5>
-        <p class="desc">Leave the three <code>nx:sm:</code> sites; note Dialog as a deliberate mobile-first exception.</p>
+      <div class="decision-col picked">
+        <h5>D1 · Keep + document as viewport-driven exception <span class="verdict verdict-pick">pick (post-spike)</span></h5>
+        <p class="desc">Leave the three <code>nx:sm:</code> sites in <code>dialog.tsx</code> intact. Document Dialog in <code>responsive.md</code> as a deliberate exception to Decision C's <code>@container</code>-first stance.</p>
+        <h6>Pros</h6>
+        <ul class="pros">
+          <li>Honest about Dialog's actual UX trigger: positioning relative to the viewport, not Dialog's own width</li>
+          <li>Preserves the mobile-bottom-sheet behaviour at narrow viewports</li>
+          <li>Zero code change — the existing behaviour is already correct</li>
+          <li>Becomes a teaching moment for future components: "container queries are the default, but viewport-driven UX (Dialog, Sheet, FullScreenOverlay) is the documented exception"</li>
+        </ul>
         <h6>Cons</h6>
-        <ul class="cons"><li>Contradicts the Standard-primary stance documented in Decision B</li><li>Codifies an exception future authors will replicate</li></ul>
+        <ul class="cons">
+          <li>Adds a carve-out to Decision C — slight cognitive load on contributors</li>
+          <li>Mitigated by explicit documentation in <code>responsive.md</code></li>
+        </ul>
       </div>
 
       <div class="decision-col">
-        <h5>D2 · Strip (consumer DIY) <span class="verdict verdict-watch">acceptable</span></h5>
+        <h5>D2 · Strip (consumer DIY) <span class="verdict verdict-skip">skip</span></h5>
         <p class="desc">Remove the three <code>nx:sm:</code> sites; let consumers add responsive behaviour.</p>
-        <h6>Pros</h6>
-        <ul class="pros"><li>Pure desktop-primary stance</li><li>Maximum flexibility for consumers</li></ul>
         <h6>Cons</h6>
         <ul class="cons"><li>Dialog at &lt;640px viewport becomes ungainly without consumer fix</li><li>Loses the mobile-bottom-sheet behaviour users expect</li></ul>
       </div>
 
-      <div class="decision-col picked">
-        <h5>D3 · Migrate to <code>@container</code> <span class="verdict verdict-pick">pick</span></h5>
-        <p class="desc">Replace <code>nx:sm:</code> (viewport) with <code>@sm:</code> (container). Dialog adapts to its rendered container, not the global viewport.</p>
-        <h6>Pros</h6>
-        <ul class="pros"><li>Aligns with 2026 component-internal-responsive consensus</li><li>Dialog rendered in a half-screen split still adapts correctly</li><li>Establishes the canonical pattern for future components</li><li>Same UX outcome at &lt;640px viewports</li></ul>
-        <h6>Cons</h6>
-        <ul class="cons"><li>Requires <code>container-type: inline-size</code> on DialogContent</li><li>Slightly heavier CSS rule</li></ul>
+      <div class="decision-col">
+        <h5>D3 · Migrate to <code>@container</code> <span class="verdict verdict-skip">rejected after spike</span></h5>
+        <p class="desc">Originally proposed: replace <code>nx:sm:</code> (viewport) with <code>nx:@sm:</code> (container).</p>
+        <h6>Why rejected</h6>
+        <ul class="cons">
+          <li><strong>Tailwind's <code>@sm:</code> fires at container ≥ 24rem (384px), not viewport ≥ 40rem (640px)</strong> — different scales</li>
+          <li>At viewport 480px, Dialog's container width is ~30rem (full-bleed) — naïve swap triggers rounded corners during the full-bleed phase</li>
+          <li>Dialog's responsive behaviour is genuinely about <em>positioning relative to the viewport</em>, not Dialog's own width — viewport queries are the correct mechanism</li>
+          <li>Workarounds (arbitrary values, custom container sizes) add token surface without addressing the underlying mismatch</li>
+        </ul>
       </div>
+    </div>
+
+    <div class="callout callout-note">
+      <strong>Why this is a principled exception, not a workaround</strong>
+      §5 Decision C says "component-internal responsive uses <code>@container</code>." Dialog
+      tests that principle. The honest answer: Dialog isn't responding to its own container
+      — it's responding to whether it occupies the full viewport or a centred slot.
+      That trigger is the viewport, not the container. The exception holds for any full-viewport
+      overlay (Dialog, Sheet, FullScreenOverlay). Component-internal layouts inside non-overlay
+      components still default to <code>@container</code>.
     </div>
   </div>
 
@@ -2026,32 +2067,26 @@ nx:focus-visible:outline-offset-2</pre>
     preferences — same pattern Atlassian, Polaris, and Mantine use.
   </p>
 
-  <h4>Step 2 — Migrate Dialog's three <code>nx:sm:</code> sites to <code>@container</code></h4>
-  <table class="migration-table">
-    <thead><tr><th>File · Line</th><th>Before</th><th>After</th></tr></thead>
-    <tbody>
-      <tr>
-        <td class="file-ref">dialog.tsx:126</td>
-        <td>DialogContent root — no container-type</td>
-        <td>Add <code>nx:@container</code> to enable container queries on DialogContent</td>
-      </tr>
-      <tr>
-        <td class="file-ref">dialog.tsx:135</td>
-        <td><code>nx:sm:rounded-lg</code></td>
-        <td><code>nx:@sm:rounded-lg</code></td>
-      </tr>
-      <tr>
-        <td class="file-ref">dialog.tsx:187</td>
-        <td><code>nx:flex nx:flex-col nx:gap-1.5 nx:text-center nx:sm:text-left</code></td>
-        <td><code>nx:flex nx:flex-col nx:gap-1.5 nx:text-center nx:@sm:text-left</code></td>
-      </tr>
-      <tr>
-        <td class="file-ref">dialog.tsx:220</td>
-        <td><code>nx:flex nx:flex-col-reverse nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2</code></td>
-        <td><code>nx:flex nx:flex-col-reverse nx:@sm:flex-row nx:@sm:justify-end nx:@sm:gap-2</code></td>
-      </tr>
-    </tbody>
-  </table>
+  <h4>Step 2 — Document Dialog as a viewport-driven exception (no code change)</h4>
+  <p>
+    Per Decision D (post-spike): <strong>do not migrate Dialog's <code>nx:sm:</code> sites to
+    <code>@container</code></strong>. The spike found Tailwind's <code>@sm:</code> fires at
+    container ≥ 24rem (384px) — different from viewport ≥ 40rem (640px) — which breaks
+    Dialog's full-bleed-vs-centred behaviour at 384–640px viewports.
+  </p>
+  <p>
+    Instead, in <code>responsive.md</code> (Step 3 below), add a "Viewport-driven exceptions"
+    subsection documenting that:
+  </p>
+  <ul>
+    <li>Most Nexus components use <code>@container</code> for internal responsive behaviour (Decision C)</li>
+    <li>Full-viewport overlay components (Dialog, future Sheet, future FullScreenOverlay) are exceptions: their responsive trigger is positioning relative to the viewport, not their own container width</li>
+    <li>For exceptions, use viewport breakpoints (<code>nx:sm:</code>, <code>nx:md:</code>, etc.) as usual</li>
+  </ul>
+  <p>
+    Zero code change to <code>dialog.tsx</code>. The existing behaviour is correct as-is; only
+    the documentation gets updated to explain why.
+  </p>
 
   <h4>Step 3 — Write <code>.claude/rules/responsive.md</code></h4>
   <p>
@@ -2116,14 +2151,15 @@ nx:focus-visible:outline-offset-2</pre>
 
   <h3 id="bp-decision">Recommendation — Option D + E (Token + Docs + Container default + <code>&lt;Show&gt;</code>/<code>&lt;Hide&gt;</code>)</h3>
   <div class="callout callout-pick">
-    <strong>Ship A2 (rem) + B + C + D3 + E together</strong>
+    <strong>Ship A2 (rem) + B + C + D1 + E together</strong>
     Add 5 rem-based <code>--breakpoint-*</code> CSS variables (A2). Document Narrow / Standard /
     Wide display classes with ≥1024px primary target (B). Adopt <code>@container</code> as the
-    canonical pattern for component-internal responsive behaviour (C). Migrate Dialog's three
-    <code>nx:sm:</code> sites to <code>@container</code> queries (D3). Ship two new tiny
-    primitives — <code>&lt;Show&gt;</code> and <code>&lt;Hide&gt;</code> — with both viewport and
-    container axes, mirroring Atlassian but extending beyond it (E).
-    Total scope: 1 token file edit + 4 edits in <code>dialog.tsx</code> + 1 new rule file +
+    canonical pattern for component-internal responsive behaviour (C). Keep Dialog's three
+    <code>nx:sm:</code> sites and document Dialog as a viewport-driven exception in
+    <code>responsive.md</code> (D1, post-spike). Ship two new tiny primitives —
+    <code>&lt;Show&gt;</code> and <code>&lt;Hide&gt;</code> — with both viewport and container
+    axes, mirroring Atlassian but extending beyond it (E).
+    Total scope: 1 token file edit + zero edits in <code>dialog.tsx</code> + 1 new rule file +
     3 cross-link edits + 5 new component files (Show/Hide + stories + export).
   </div>
 
@@ -2209,10 +2245,10 @@ nx:focus-visible:outline-offset-2</pre>
       <li>
         <span class="num">07</span>
         <div>
-          <div class="title">Migrate Dialog's three <code>nx:sm:</code> sites to <code>@container</code> queries</div>
-          <div class="meta">dialog.tsx:126 (add nx:@container), :135, :187, :220 (swap nx:sm: → nx:@sm:) · establishes canonical pattern for component-internal responsive</div>
+          <div class="title">Document Dialog as a viewport-driven exception in <code>responsive.md</code></div>
+          <div class="meta">Post-spike correction: do NOT migrate dialog.tsx to <code>@container</code> (Tailwind's <code>@sm:</code> ≠ <code>sm:</code> values — would break Dialog at viewports 384–640px). Keep <code>nx:sm:</code> as the canonical exception for full-viewport overlays.</div>
         </div>
-        <span class="verdict verdict-pick">P0 · ship with #06</span>
+        <span class="verdict verdict-pick">P1 · docs only</span>
       </li>
       <li>
         <span class="num">08</span>
@@ -2338,9 +2374,9 @@ nx:focus-visible:outline-offset-2</pre>
         <td>Polaris and Mantine ship overridable CSS variables; Nexus didn't. Tailwind v4's <code>--breakpoint-*</code> auto-discovery makes this a one-block edit. Unblocks CSS-only consumers (React Native, vanilla CSS).</td>
       </tr>
       <tr>
-        <td>(new) — Migrate Dialog <code>nx:sm:</code> usage to <code>@container</code></td>
-        <td><span class="verdict verdict-pick">add</span></td>
-        <td>The single existing responsive-utility usage in shipped Nexus components. Migrate rather than strip — preserves Dialog's mobile-bottom-sheet UX while making the pattern correct for the canonical <code>@container</code> stance.</td>
+        <td>(new) — Dialog <code>nx:sm:</code> handling</td>
+        <td><span class="verdict verdict-watch">revised post-spike</span></td>
+        <td>Originally proposed migration to <code>@container</code>. Pre-implementation spike found Tailwind's <code>@sm:</code> (container ≥ 24rem) ≠ <code>sm:</code> (viewport ≥ 40rem) — naïve swap breaks Dialog at viewports 384–640px. Revised plan: keep <code>nx:sm:</code> as a documented viewport-driven exception. Dialog's "full-bleed vs centred card" trigger is viewport positioning, not container width — viewport queries are correct here.</td>
       </tr>
       <tr>
         <td>(new) — Ship <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> primitives</td>
