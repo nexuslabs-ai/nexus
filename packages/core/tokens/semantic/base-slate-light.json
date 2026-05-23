@@ -11,6 +11,10 @@
     "$value": "{slate.50}",
     "$type": "color"
   },
+  "background-hover-alpha": {
+    "$value": "{slate.a100}",
+    "$type": "color"
+  },
   "background-active": {
     "$value": "{slate.100}",
     "$type": "color"
@@ -69,6 +73,14 @@
     "$value": "{slate.50}",
     "$type": "color"
   },
+  "popover-background-alpha": {
+    "$value": "{white-a900}",
+    "$type": "color"
+  },
+  "popover-backdrop": {
+    "$value": "{slate.a900}",
+    "$type": "color"
+  },
   "nav-background": {
     "$value": "{slate.100}",
     "$type": "color"
@@ -94,12 +106,16 @@
     "$type": "color"
   },
   "overlay": {
-    "$value": "#1e1e1ecc",
+    "$value": "{slate.a700}",
     "$type": "color"
   },
   "border": {
     "default": {
       "$value": "{slate.200}",
+      "$type": "color"
+    },
+    "default-alpha": {
+      "$value": "{slate.a200}",
       "$type": "color"
     },
     "active": {
