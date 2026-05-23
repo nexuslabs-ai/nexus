@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PR #133 — Model 2 surface contract</title>
+    <style>
+      :root[data-theme='light'] {
+        --background: #ffffff;
+        --foreground: #020617;
+        --container: #ffffff;
+        --container-foreground: #0f172a;
+        --popover: #ffffff;
+        --muted: #f8fafc;
+        --muted-foreground: #64748b;
+        --muted-foreground-subtle: #94a3b8;
+        --border-default: #e2e8f0;
+        --border-active: #94a3b8;
+        --nav-background: #f1f5f9;
+        --nav-foreground: #0f172a;
+        --nav-item-active: #cbd5e1;
+        --primary-bg: #2563eb;
+        --primary-fg: #ffffff;
+        --success-fg: #15803d;
+        --warn-fg: #b45309;
+        --error-fg: #b91c1c;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+        --shadow-lg: 0 10px 20px -3px rgb(0 0 0 / 0.1), 0 4px 8px -4px rgb(0 0 0 / 0.08);
+        --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.08);
+        --canvas: #f1f5f9;
+      }
+      :root[data-theme='dark'] {
+        --background: #0f172a;
+        --foreground: #ffffff;
+        --container: #1e293b;
+        --container-foreground: #ffffff;
+        --popover: #334155;
+        --muted: #1e293b;
+        --muted-foreground: #cbd5e1;
+        --muted-foreground-subtle: #cbd5e1;
+        --border-default: #334155;
+        --border-active: #94a3b8;
+        --nav-background: #020617;
+        --nav-foreground: #f8fafc;
+        --nav-item-active: #1e293b;
+        --primary-bg: #3b82f6;
+        --primary-fg: #ffffff;
+        --success-fg: #4ade80;
+        --warn-fg: #fbbf24;
+        --error-fg: #f87171;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+        --shadow-md: 0 4px 8px -1px rgb(0 0 0 / 0.45);
+        --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.55);
+        --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.4);
+        --canvas: #020617;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--canvas);
+        color: var(--foreground);
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui,
+          sans-serif;
+        font-size: 15px;
+        line-height: 1.55;
+        font-feature-settings: 'cv05', 'cv11', 'ss01';
+        transition:
+          background 0.25s ease,
+          color 0.25s ease;
+        min-height: 100vh;
+      }
+      code,
+      pre,
+      .mono {
+        font-family:
+          ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 0.875em;
+      }
+      code {
+        background: var(--muted);
+        color: var(--foreground);
+        padding: 0.1em 0.4em;
+        border-radius: 4px;
+        border: 1px solid var(--border-default);
+      }
+
+      .layout {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 40px 28px 80px;
+      }
+
+      header.page-header {
+        background: var(--container);
+        color: var(--container-foreground);
+        border: 1px solid var(--border-default);
+        border-radius: 12px;
+        padding: 32px 32px 28px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 24px;
+      }
+      .eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+        margin: 0 0 8px;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin: 0 0 16px;
+      }
+      .header-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        align-items: center;
+        font-size: 13px;
+        color: var(--muted-foreground);
+        margin-bottom: 4px;
+      }
+      .header-meta .dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--muted-foreground);
+        flex: none;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border-default);
+        background: var(--muted);
+        color: var(--foreground);
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .pill.merged {
+        background: color-mix(in srgb, var(--success-fg) 18%, transparent);
+        border-color: color-mix(in srgb, var(--success-fg) 35%, transparent);
+        color: var(--success-fg);
+      }
+
+      .toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10;
+        background: var(--container);
+        color: var(--container-foreground);
+        border: 1px solid var(--border-default);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition:
+          background 0.2s,
+          border-color 0.2s,
+          color 0.2s;
+      }
+      .toggle:hover {
+        border-color: var(--border-active);
+      }
+
+      section.panel {
+        background: var(--container);
+        color: var(--container-foreground);
+        border: 1px solid var(--border-default);
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 20px;
+      }
+      section.panel h2 {
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin: 0 0 6px;
+      }
+      section.panel p.lede {
+        color: var(--muted-foreground);
+        margin: 0 0 22px;
+        font-size: 14px;
+      }
+      section.panel h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 24px 0 8px;
+      }
+
+      /* Timeline */
+      .timeline {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+        margin-top: 8px;
+      }
+      .timeline-step {
+        background: var(--muted);
+        border: 1px solid var(--border-default);
+        border-radius: 8px;
+        padding: 10px 8px;
+        text-align: center;
+        font-size: 11px;
+      }
+      .timeline-step .step-label {
+        font-weight: 600;
+        font-size: 11px;
+        margin-bottom: 2px;
+        color: var(--foreground);
+      }
+      .timeline-step .step-meta {
+        color: var(--muted-foreground);
+        font-size: 10px;
+      }
+      .timeline-step.merge {
+        background: color-mix(in srgb, var(--success-fg) 12%, var(--muted));
+        border-color: color-mix(in srgb, var(--success-fg) 30%, transparent);
+      }
+
+      /* Model 2 surface demo */
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 12px;
+      }
+      .demo-stage {
+        border-radius: 10px;
+        border: 1px solid var(--border-default);
+        overflow: hidden;
+        font-size: 12px;
+      }
+      .demo-stage .stage-label {
+        padding: 8px 12px;
+        background: var(--muted);
+        color: var(--muted-foreground);
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-default);
+      }
+      .demo-stage .stage-body {
+        padding: 28px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .demo-card {
+        padding: 14px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-default);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .demo-card .card-mono {
+        display: block;
+        color: var(--muted-foreground);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .stage-old-light .stage-body {
+        background: #ffffff;
+      }
+      .stage-old-light .demo-card {
+        background: #f1f5f9;
+        color: #0f172a;
+        border-color: #e2e8f0;
+      }
+      .stage-new-light .stage-body {
+        background: #f1f5f9;
+      }
+      .stage-new-light .demo-card {
+        background: #ffffff;
+        color: #0f172a;
+        border-color: #e2e8f0;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.06);
+      }
+      .stage-old-dark .stage-body {
+        background: #0f172a;
+      }
+      .stage-old-dark .demo-card {
+        background: #000000;
+        color: #ffffff;
+        border-color: #1e293b;
+      }
+      .stage-old-dark .demo-card .card-mono {
+        color: #94a3b8;
+      }
+      .stage-new-dark .stage-body {
+        background: #0f172a;
+      }
+      .stage-new-dark .demo-card {
+        background: #1e293b;
+        color: #ffffff;
+        border-color: #334155;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+      }
+      .stage-new-dark .demo-card .card-mono {
+        color: #94a3b8;
+      }
+      .verdict {
+        font-size: 11px;
+        font-weight: 500;
+        margin-top: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .verdict.bad {
+        color: var(--error-fg);
+      }
+      .verdict.good {
+        color: var(--success-fg);
+      }
+      .verdict::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        flex: none;
+      }
+
+      /* Surface stack diagram */
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .stack-row {
+        display: grid;
+        grid-template-columns: 120px 1fr 1fr 1fr;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border-default);
+        background: var(--muted);
+        font-size: 13px;
+      }
+      .stack-row .stack-name {
+        font-family:
+          ui-monospace, 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .stack-row .stack-light,
+      .stack-row .stack-dark {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--muted-foreground);
+      }
+      .swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+        flex: none;
+      }
+      .stack-role {
+        font-size: 12px;
+        color: var(--muted-foreground);
+      }
+      .stack-head {
+        background: transparent;
+        border: none;
+        padding: 4px 14px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+      }
+
+      /* Tables */
+      table.simple {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 13px;
+      }
+      table.simple th,
+      table.simple td {
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-default);
+        vertical-align: top;
+      }
+      table.simple th {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted-foreground);
+        background: var(--muted);
+      }
+      table.simple tbody tr:last-child td {
+        border-bottom: none;
+      }
+      table.simple code {
+        font-size: 11px;
+      }
+
+      /* Stat row */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .stat {
+        background: var(--muted);
+        border-radius: 10px;
+        border: 1px solid var(--border-default);
+        padding: 14px 16px;
+      }
+      .stat-value {
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+      .stat-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-top: 2px;
+      }
+
+      /* APCA bar */
+      .bar-chart {
+        display: grid;
+        grid-template-columns: 80px 1fr 60px;
+        gap: 8px 16px;
+        align-items: center;
+        margin-top: 12px;
+      }
+      .bar-chart .bar-label {
+        font-size: 12px;
+        color: var(--muted-foreground);
+      }
+      .bar-chart .bar-track {
+        height: 18px;
+        background: var(--muted);
+        border-radius: 6px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid var(--border-default);
+      }
+      .bar-chart .bar-fill {
+        height: 100%;
+        background: var(--primary-bg);
+        transition: width 0.4s ease;
+      }
+      .bar-chart .bar-num {
+        font-family:
+          ui-monospace, monospace;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: right;
+      }
+
+      /* Press demo */
+      .press-demo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 10px;
+      }
+      .press-card {
+        padding: 18px 20px;
+        background: var(--container);
+        border: 1px solid var(--border-default);
+        border-radius: 10px;
+        cursor: pointer;
+        user-select: none;
+        font-size: 13px;
+        transition: all 0.1s ease;
+      }
+      .press-card .press-label {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+      .press-card .press-sub {
+        font-size: 11px;
+        color: var(--muted-foreground);
+      }
+      .press-card.shadow-press:active {
+        box-shadow: var(--shadow-inner);
+      }
+      .press-card.border-press:active {
+        border-color: var(--border-active);
+      }
+
+      /* Known overlaps */
+      .overlap-grid {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .overlap {
+        padding: 10px 14px;
+        background: var(--muted);
+        border: 1px solid var(--border-default);
+        border-left: 3px solid var(--warn-fg);
+        border-radius: 6px;
+        font-size: 13px;
+      }
+      .overlap .ovr-name {
+        font-family:
+          ui-monospace, monospace;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .overlap .ovr-why {
+        color: var(--muted-foreground);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      /* Nav demo */
+      .nav-demo {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        border: 1px solid var(--border-default);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 10px;
+        min-height: 200px;
+      }
+      .nav-demo .sidebar {
+        background: var(--nav-background);
+        color: var(--nav-foreground);
+        padding: 16px 14px;
+      }
+      .nav-demo .sidebar .nav-title {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.7;
+        margin-bottom: 12px;
+      }
+      .nav-demo .sidebar .nav-item {
+        padding: 7px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        margin-bottom: 2px;
+      }
+      .nav-demo .sidebar .nav-item.active {
+        background: var(--nav-item-active);
+      }
+      .nav-demo .sidebar .nav-meta {
+        font-size: 11px;
+        opacity: 0.6;
+        margin-top: 18px;
+        padding-left: 10px;
+      }
+      .nav-demo .content {
+        background: var(--background);
+        padding: 22px 24px;
+        font-size: 13px;
+      }
+      .nav-demo .content .cta {
+        background: var(--primary-bg);
+        color: var(--primary-fg);
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 12px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted-foreground);
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-default);
+      }
+
+      .kbd {
+        background: var(--muted);
+        border: 1px solid var(--border-default);
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        font-family:
+          ui-monospace, monospace;
+        font-size: 11px;
+        padding: 1px 5px;
+      }
+
+      .callout {
+        background: color-mix(in srgb, var(--primary-bg) 8%, var(--muted));
+        border-left: 3px solid var(--primary-bg);
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        margin: 12px 0;
+      }
+      .callout strong {
+        font-weight: 600;
+      }
+
+      @media (max-width: 720px) {
+        .demo-grid,
+        .press-demo {
+          grid-template-columns: 1fr;
+        }
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stack-row {
+          grid-template-columns: 100px 1fr 1fr;
+        }
+        .stack-row .stack-role {
+          display: none;
+        }
+        .nav-demo {
+          grid-template-columns: 1fr;
+        }
+        .timeline {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="toggle" id="themeToggle" aria-label="Toggle theme">
+      <span id="themeIcon">●</span>
+      <span id="themeLabel">Dark</span>
+    </button>
+
+    <main class="layout">
+      <header class="page-header">
+        <p class="eyebrow">PR #133 · Closed issue #80</p>
+        <h1>[2/5] Adopt Model 2 surface contract + nav-* tokens + dark container fix</h1>
+        <div class="header-meta">
+          <span class="pill merged">Squash-merged 2026-05-23</span>
+          <span class="dot"></span>
+          <span class="mono">06686d3</span>
+          <span class="dot"></span>
+          <span>4 review rounds</span>
+          <span class="dot"></span>
+          <span>360 / 360 APCA pass</span>
+        </div>
+      </header>
+
+      <section class="panel">
+        <h2>The big idea, in one breath</h2>
+        <p class="lede">
+          An app's UI is a stack of "surfaces" — page, card, popover. PR #133
+          fixed how those surfaces communicate "raised" in both light and dark
+          modes, gave the navigation chrome its own paint set, and codified the
+          rules so future contributors don't have to guess.
+        </p>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Surface levels</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">6</div>
+            <div class="stat-label">New nav-* tokens</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">+110</div>
+            <div class="stat-label">APCA pairs gained</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">2</div>
+            <div class="stat-label">New rule files</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Session timeline</h2>
+        <p class="lede">
+          From the first fix on a branch with one open architect / sde2 review
+          through to local cleanup after the squash-merge.
+        </p>
+        <div class="timeline">
+          <div class="timeline-step">
+            <div class="step-label">pr-fix R1</div>
+            <div class="step-meta">840a7a3</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-label">pr-fix R2</div>
+            <div class="step-meta">b339189</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-label">pr-fix R3</div>
+            <div class="step-meta">54a6795</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-label">Merge main</div>
+            <div class="step-meta">b79defc</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-label">CI fix</div>
+            <div class="step-meta">5b8c858</div>
+          </div>
+          <div class="timeline-step merge">
+            <div class="step-label">Squash merge</div>
+            <div class="step-meta">06686d3</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-label">Cleanup</div>
+            <div class="step-meta">local</div>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>Try it:</strong> toggle the page from light to dark using the
+          button in the top-right. The demos below use the same OKLCH-grid
+          values that ship in <code>nexus.css</code>.
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Change #1 — Light mode adopts Model 2 (white canvas, shadow lifts)</h2>
+        <p class="lede">
+          shadcn's default makes cards slightly grayer than the page. Linear /
+          Notion / Vercel make them all white and let shadow do the lifting.
+          PR #133 switches to the second pattern.
+        </p>
+
+        <div class="demo-grid">
+          <div class="demo-stage stage-old-light">
+            <div class="stage-label">Before — shadcn pattern</div>
+            <div class="stage-body">
+              <div class="demo-card">
+                Card looks slightly gray on white
+                <span class="card-mono">background: slate.50 on white canvas</span>
+              </div>
+              <span class="verdict bad">Card edges read flat; no shadow</span>
+            </div>
+          </div>
+          <div class="demo-stage stage-new-light">
+            <div class="stage-label">After — Model 2</div>
+            <div class="stage-body">
+              <div class="demo-card">
+                Card is white, shadow lifts it
+                <span class="card-mono">container: white &nbsp;·&nbsp; canvas: slate.50</span>
+              </div>
+              <span class="verdict good">Card floats above muted canvas</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Change #2 — Dark mode container fix (the real bug)</h2>
+        <p class="lede">
+          The pre-PR dark mode had <code>container = #000000</code> on top of a
+          <code>#0f172a</code> page. Pure black is darker than dark gray, so
+          cards visually <em>sank into</em> the page instead of floating
+          above it. Cards now sit at <code>slate.800</code> — one step lighter
+          than the canvas — and read as raised.
+        </p>
+
+        <div class="demo-grid">
+          <div class="demo-stage stage-old-dark">
+            <div class="stage-label">Before — sinking</div>
+            <div class="stage-body">
+              <div class="demo-card">
+                Card below page
+                <span class="card-mono">container: black · background: slate.900</span>
+              </div>
+              <span class="verdict bad">Card sinks into the canvas</span>
+            </div>
+          </div>
+          <div class="demo-stage stage-new-dark">
+            <div class="stage-label">After — rising</div>
+            <div class="stage-body">
+              <div class="demo-card">
+                Card above page
+                <span class="card-mono">container: slate.800 · background: slate.900</span>
+              </div>
+              <span class="verdict good">Card sits above the canvas</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Change #3 — The 5-level surface stack, codified</h2>
+        <p class="lede">
+          Every surface in the system now picks one of five levels, defined by
+          luminance step only (never by hue). Light values move toward
+          <code>{white}</code>; dark values move away from
+          <code>{slate.900}</code>.
+        </p>
+
+        <div class="stack">
+          <div class="stack-row stack-head">
+            <span>Token</span>
+            <span>Light</span>
+            <span>Dark</span>
+            <span>Role</span>
+          </div>
+          <div class="stack-row">
+            <span class="stack-name">popover</span>
+            <span class="stack-light"><span class="swatch" style="background:#ffffff"></span>{white}</span>
+            <span class="stack-dark"><span class="swatch" style="background:#334155"></span>{slate.700}</span>
+            <span class="stack-role">Floating overlays</span>
+          </div>
+          <div class="stack-row">
+            <span class="stack-name">container</span>
+            <span class="stack-light"><span class="swatch" style="background:#ffffff"></span>{white}</span>
+            <span class="stack-dark"><span class="swatch" style="background:#1e293b"></span>{slate.800}</span>
+            <span class="stack-role">Cards, dialog bodies</span>
+          </div>
+          <div class="stack-row">
+            <span class="stack-name">background</span>
+            <span class="stack-light"><span class="swatch" style="background:#ffffff"></span>{white}</span>
+            <span class="stack-dark"><span class="swatch" style="background:#0f172a"></span>{slate.900}</span>
+            <span class="stack-role">Page canvas</span>
+          </div>
+          <div class="stack-row">
+            <span class="stack-name">muted</span>
+            <span class="stack-light"><span class="swatch" style="background:#f8fafc"></span>{slate.50}</span>
+            <span class="stack-dark"><span class="swatch" style="background:#1e293b"></span>{slate.800}</span>
+            <span class="stack-role">Recessed regions</span>
+          </div>
+          <div class="stack-row">
+            <span class="stack-name">nav-background</span>
+            <span class="stack-light"><span class="swatch" style="background:#f1f5f9"></span>{slate.100}</span>
+            <span class="stack-dark"><span class="swatch" style="background:#020617"></span>{slate.950}</span>
+            <span class="stack-role">Fixed chrome (sidebar)</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Change #4 — Nav-* gets its own paint set</h2>
+        <p class="lede">
+          Six tokens — <code>nav-background</code>, <code>nav-foreground</code>,
+          <code>nav-muted-foreground</code>, <code>nav-item-hover</code>,
+          <code>nav-item-active</code>, <code>nav-border</code> — so the chrome
+          can be styled (or brand-tinted) independently. The namespace
+          deliberately stops at chrome: <strong>CTAs inside nav reuse base
+          <code>primary-*</code>; focus rings reuse <code>focus-*</code>.</strong>
+        </p>
+
+        <div class="nav-demo">
+          <aside class="sidebar">
+            <div class="nav-title">Workspace</div>
+            <div class="nav-item">Inbox</div>
+            <div class="nav-item">Projects</div>
+            <div class="nav-item active">Design system</div>
+            <div class="nav-item">Reports</div>
+            <div class="nav-meta">v0.2.5 · Maintained by you</div>
+          </aside>
+          <div class="content">
+            <p style="margin: 0 0 6px"><strong>Design system</strong></p>
+            <p style="margin: 0; color: var(--muted-foreground); font-size: 12px">
+              Primary buttons placed inside nav still use the base
+              <code>primary-*</code> tokens — nav doesn't ship its own
+              <code>nav-primary-*</code>.
+            </p>
+            <button class="cta">Publish release</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Change #5 — Rule 6: press cue moves off the fill</h2>
+        <p class="lede">
+          In dark mode, <code>container-active</code> and
+          <code>popover-active</code> can't step to a distinct shade without
+          colliding with neighbouring surfaces. So when you press a card, the
+          token still resolves (as a stable hook for component code) but the
+          visual affordance comes from <code>nx:active:shadow-inner</code> or
+          <code>nx:active:border-border-active</code> — applied at the
+          <code>:active</code> / <code>[data-state="active"]</code> selector.
+        </p>
+
+        <div class="press-demo">
+          <div class="press-card shadow-press" tabindex="0">
+            <div class="press-label">Click & hold me</div>
+            <div class="press-sub">Press cue: <code>nx:active:shadow-inner</code></div>
+          </div>
+          <div class="press-card border-press" tabindex="0">
+            <div class="press-label">Click & hold me</div>
+            <div class="press-sub">Press cue: <code>nx:active:border-border-active</code></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Known overlaps (6 collisions, all intentional)</h2>
+        <p class="lede">
+          Some tokens land on the same shade — these fall out of the luminance
+          grammar, not bugs. <code>surfaces.md</code> § Known overlaps now
+          enumerates each one.
+        </p>
+
+        <div class="overlap-grid">
+          <div class="overlap">
+            <div class="ovr-name">dark · container = muted = background-hover = {slate.800}</div>
+            <div class="ovr-why">Context resolves the ambiguity — a row that highlights on hover does not become a card.</div>
+          </div>
+          <div class="overlap">
+            <div class="ovr-name">dark · container-active = container = {slate.800}</div>
+            <div class="ovr-why">Press cue moves off the fill per Rule 6.</div>
+          </div>
+          <div class="overlap">
+            <div class="ovr-name">dark · popover-active = popover = {slate.700}</div>
+            <div class="ovr-why">Same shape as container-active; popover surfaces are rarely pressed directly.</div>
+          </div>
+          <div class="overlap">
+            <div class="ovr-name">light · popover-hover = popover-active = {slate.50}</div>
+            <div class="ovr-why">Near-white compression — no half-step between slate.50 and slate.100.</div>
+          </div>
+          <div class="overlap">
+            <div class="ovr-name">dark · muted-foreground-subtle = muted-foreground = {slate.300}</div>
+            <div class="ovr-why">No palette step exists between slate.300 (passes APCA) and slate.400 (too dim, Lc -39).</div>
+          </div>
+          <div class="overlap">
+            <div class="ovr-name">dark · nav-border = nav-item-active = {slate.800}</div>
+            <div class="ovr-why">The selected item reads as "pressed into" the chrome, not raised above it.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>APCA pair growth across the session</h2>
+        <p class="lede">
+          The contrast audit gained 110 pairs across the session — each row
+          below shows the state after a specific commit landed.
+        </p>
+
+        <div class="bar-chart">
+          <div class="bar-label">Pre-PR</div>
+          <div class="bar-track"><div class="bar-fill" style="width: 69%"></div></div>
+          <div class="bar-num">250</div>
+
+          <div class="bar-label">pr-fix R1</div>
+          <div class="bar-track"><div class="bar-fill" style="width: 72%"></div></div>
+          <div class="bar-num">260</div>
+
+          <div class="bar-label">+ merge main</div>
+          <div class="bar-track"><div class="bar-fill" style="width: 100%"></div></div>
+          <div class="bar-num">360</div>
+        </div>
+        <p class="lede" style="margin-top: 14px; margin-bottom: 0">
+          <strong style="color: var(--foreground)">+10</strong> from adding
+          <code>nav-foreground ↔ nav-item-hover</code> as an explicit audit
+          pair. <strong style="color: var(--foreground)">+100</strong> from
+          merging main, which absorbed PR #132's chart × surface audit
+          (5 series × 2 surfaces × 5 palettes × 2 themes).
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Cross-PR collision — the unexpected story</h2>
+        <p class="lede">
+          PR #132 (charts) merged just before us. Their dark-mode chart series 1
+          and 2 were tuned against the <em>old</em>
+          <code>container = #000000</code>. Our Model 2 fix lifted
+          <code>container</code> to <code>slate.800</code>, dropping APCA Lc to
+          <code>-59.6</code> / <code>-58.9</code> (UI tier needs ≥ 60). Fix:
+          re-anchor the two chart shades one step lighter.
+        </p>
+
+        <table class="simple">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Before merge</th>
+              <th>After re-anchor</th>
+              <th>APCA Lc</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>chart.categorical.1</code> (dark)</td>
+              <td><code>{teal.300}</code></td>
+              <td><code>{teal.200}</code></td>
+              <td>-59.6 → -83.2</td>
+            </tr>
+            <tr>
+              <td><code>chart.categorical.2</code> (dark)</td>
+              <td><code>{lime.300}</code></td>
+              <td><code>{lime.200}</code></td>
+              <td>-58.9 → -91.8</td>
+            </tr>
+            <tr>
+              <td><code>chart.categorical.{3,4,5}</code> (dark)</td>
+              <td colspan="2"><code>{*.200}</code> already</td>
+              <td>passes ≥ -84.8</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <strong>Lesson saved to memory:</strong> after merging main into any
+          token branch, always re-run <code>yarn audit:contrast</code> before
+          committing — a clean <code>git merge</code> with auto-merged files
+          does not imply APCA still passes.
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What landed where</h2>
+        <table class="simple">
+          <thead>
+            <tr><th>File</th><th>Change</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>packages/core/tokens/semantic/base-*-{light,dark}.json</code> (10 files)</td>
+              <td>Model 2 cascade · dark container fix · nav-* namespace · muted-light → muted-foreground-subtle</td>
+            </tr>
+            <tr>
+              <td><code>packages/core/scripts/audit-contrast.js</code></td>
+              <td>+3 nav pairs, regenerated CSS</td>
+            </tr>
+            <tr>
+              <td><code>packages/tailwind/nexus.css</code></td>
+              <td>Regenerated (--color-nav-*, --color-muted-foreground-subtle, ...)</td>
+            </tr>
+            <tr>
+              <td><code>.claude/rules/surfaces.md</code></td>
+              <td>New · 5-level stack, 6 rules, 6 known overlaps, nav namespace contract</td>
+            </tr>
+            <tr>
+              <td><code>.claude/rules/color-shades.md</code></td>
+              <td>New · 11-step reverse-index (shade → tokens that use it, per mode)</td>
+            </tr>
+            <tr>
+              <td><code>.claude/rules/components.md</code></td>
+              <td>+ Active / press states subsection naming nx:active:shadow-inner</td>
+            </tr>
+            <tr>
+              <td><code>.claude/rules/tokens.md</code></td>
+              <td>Synced APCA gate · semantic categories · cross-links</td>
+            </tr>
+            <tr>
+              <td><code>.claude/rules/shadcn-divergences.md</code></td>
+              <td>+ Navigation (Nexus-only) section · muted-foreground-subtle row</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Deferred (intentionally not in this PR)</h2>
+        <table class="simple">
+          <thead>
+            <tr><th>Item</th><th>Why deferred</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Card default shadow under white canvas</td>
+              <td>Visual review item — Storybook needs eyeball check before deciding shadow-sm vs shadow-md</td>
+            </tr>
+            <tr>
+              <td>Dark <code>muted-foreground-subtle</code> tier collapse</td>
+              <td>Restoring the tier needs a palette extension (new shade) — out of scope for this surface PR</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <footer class="footer">
+        Generated 2026-05-23 · self-contained · open in any browser ·
+        toggle theme with the chip in the top-right
+      </footer>
+    </main>
+
+    <script>
+      const root = document.documentElement;
+      const toggle = document.getElementById('themeToggle');
+      const icon = document.getElementById('themeIcon');
+      const label = document.getElementById('themeLabel');
+
+      function applyTheme(theme) {
+        root.dataset.theme = theme;
+        icon.textContent = theme === 'dark' ? '○' : '●';
+        label.textContent = theme === 'dark' ? 'Light' : 'Dark';
+      }
+
+      toggle.addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      });
+
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme('dark');
+      }
+    </script>
+  </body>
+</html>
