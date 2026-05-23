@@ -14,13 +14,37 @@ import {
 } from 'recharts';
 
 const CHART_SERIES = ['1', '2', '3', '4', '5'] as const;
+type ChartIndex = (typeof CHART_SERIES)[number];
 
-const CHART_NAMES: Record<(typeof CHART_SERIES)[number], string> = {
+const CHART_NAMES: Record<ChartIndex, string> = {
   '1': 'teal',
   '2': 'lime',
   '3': 'orange',
   '4': 'rose',
   '5': 'indigo',
+};
+
+// Literal class strings so Tailwind's content scanner emits the utilities.
+const CHART_BG_CLASS: Record<ChartIndex, string> = {
+  '1': 'nx:bg-chart-1',
+  '2': 'nx:bg-chart-2',
+  '3': 'nx:bg-chart-3',
+  '4': 'nx:bg-chart-4',
+  '5': 'nx:bg-chart-5',
+};
+const CHART_TEXT_CLASS: Record<ChartIndex, string> = {
+  '1': 'nx:text-chart-1',
+  '2': 'nx:text-chart-2',
+  '3': 'nx:text-chart-3',
+  '4': 'nx:text-chart-4',
+  '5': 'nx:text-chart-5',
+};
+const CHART_BORDER_CLASS: Record<ChartIndex, string> = {
+  '1': 'nx:border-chart-1',
+  '2': 'nx:border-chart-2',
+  '3': 'nx:border-chart-3',
+  '4': 'nx:border-chart-4',
+  '5': 'nx:border-chart-5',
 };
 
 const BAR_DATA = [
@@ -36,16 +60,11 @@ const PIE_DATA = CHART_SERIES.map((n) => ({
   fill: `var(--color-chart-${n})`,
 }));
 
-function Swatch({ index }: { index: (typeof CHART_SERIES)[number] }) {
+function Swatch({ index }: { index: ChartIndex }) {
   return (
     <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
       <div
-        className="nx:rounded-md nx:border nx:border-border-default"
-        style={{
-          backgroundColor: `var(--color-chart-${index})`,
-          width: 96,
-          height: 96,
-        }}
+        className={`nx:rounded-md nx:border nx:border-border-default nx:size-24 ${CHART_BG_CLASS[index]}`}
       />
       <div className="nx:flex nx:flex-col nx:items-center">
         <span className="nx:text-foreground nx:typography-label-default nx:font-mono">
@@ -96,6 +115,55 @@ export const Swatches: Story = {
           <Swatch key={n} index={n} />
         ))}
       </div>
+    </div>
+  ),
+};
+
+export const UtilityClasses: Story = {
+  name: 'Tailwind Utilities',
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen">
+      <div className="nx:flex nx:flex-col nx:gap-2">
+        <h2 className="nx:text-foreground nx:typography-heading-medium">
+          Tailwind utilities
+        </h2>
+        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+          Chart tokens emit standard color utilities under the <code>nx:</code>{' '}
+          prefix. Background, text, and border variants are demonstrated per
+          series.
+        </p>
+      </div>
+
+      <table className="nx:typography-body-small">
+        <thead>
+          <tr className="nx:text-left nx:text-muted-foreground">
+            <th className="nx:p-2">Series</th>
+            <th className="nx:p-2">nx:bg-chart-N</th>
+            <th className="nx:p-2">nx:text-chart-N</th>
+            <th className="nx:p-2">nx:border-chart-N</th>
+          </tr>
+        </thead>
+        <tbody>
+          {CHART_SERIES.map((n) => (
+            <tr key={n} className="nx:text-foreground">
+              <td className="nx:p-2 nx:font-mono">chart.{n}</td>
+              <td className="nx:p-2">
+                <span
+                  className={`nx:inline-block nx:size-8 nx:rounded-sm ${CHART_BG_CLASS[n]}`}
+                />
+              </td>
+              <td className={`nx:p-2 nx:font-mono ${CHART_TEXT_CLASS[n]}`}>
+                Aa {CHART_NAMES[n]}
+              </td>
+              <td className="nx:p-2">
+                <span
+                  className={`nx:inline-block nx:size-8 nx:rounded-sm nx:border-2 ${CHART_BORDER_CLASS[n]}`}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   ),
 };
