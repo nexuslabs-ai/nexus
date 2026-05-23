@@ -128,7 +128,7 @@ describe('generateTailwindPackage', () => {
 
     const darkBlock = extractBlock(nexusCSS, '.dark');
     expect(darkBlock).toMatch(
-      /--nx-color-chart-categorical-1: var\(--nx-color-teal-300\);/
+      /--nx-color-chart-categorical-1: var\(--nx-color-teal-200\);/
     );
     expect(darkBlock).toMatch(
       /--nx-color-chart-categorical-5: var\(--nx-color-indigo-200\);/
