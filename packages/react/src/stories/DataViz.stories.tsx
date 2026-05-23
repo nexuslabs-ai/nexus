@@ -57,7 +57,7 @@ const BAR_DATA = [
 const PIE_DATA = CHART_SERIES.map((n) => ({
   name: CHART_NAMES[n],
   value: 20,
-  fill: `var(--color-chart-${n})`,
+  fill: `var(--nx-color-chart-${n})`,
 }));
 
 function Swatch({ index }: { index: ChartIndex }) {
@@ -96,7 +96,7 @@ type Story = StoryObj;
 
 export const Swatches: Story = {
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen">
+    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Chart Palette
@@ -122,7 +122,7 @@ export const Swatches: Story = {
 export const UtilityClasses: Story = {
   name: 'Tailwind Utilities',
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen">
+    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Tailwind utilities
@@ -171,33 +171,33 @@ export const UtilityClasses: Story = {
 export const BarChartExample: Story = {
   name: 'Bar Chart',
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-screen">
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
       <h2 className="nx:text-foreground nx:typography-heading-medium">
         Grouped Bar Chart
       </h2>
-      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border nx:border-border-default">
+      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border nx:border-border-default nx:w-full">
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={BAR_DATA}>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="var(--color-border-default)"
+              stroke="var(--nx-color-border-default)"
             />
-            <XAxis dataKey="period" stroke="var(--color-muted-foreground)" />
-            <YAxis stroke="var(--color-muted-foreground)" />
+            <XAxis dataKey="period" stroke="var(--nx-color-muted-foreground)" />
+            <YAxis stroke="var(--nx-color-muted-foreground)" />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'var(--color-popover)',
-                border: '1px solid var(--color-border-default)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--color-popover-foreground)',
+                backgroundColor: 'var(--nx-color-popover)',
+                border: '1px solid var(--nx-color-border-default)',
+                borderRadius: 'var(--nx-radius-md)',
+                color: 'var(--nx-color-popover-foreground)',
               }}
             />
             <Legend />
-            <Bar dataKey="s1" name="teal" fill="var(--color-chart-1)" />
-            <Bar dataKey="s2" name="lime" fill="var(--color-chart-2)" />
-            <Bar dataKey="s3" name="orange" fill="var(--color-chart-3)" />
-            <Bar dataKey="s4" name="rose" fill="var(--color-chart-4)" />
-            <Bar dataKey="s5" name="indigo" fill="var(--color-chart-5)" />
+            <Bar dataKey="s1" name="teal" fill="var(--nx-color-chart-1)" />
+            <Bar dataKey="s2" name="lime" fill="var(--nx-color-chart-2)" />
+            <Bar dataKey="s3" name="orange" fill="var(--nx-color-chart-3)" />
+            <Bar dataKey="s4" name="rose" fill="var(--nx-color-chart-4)" />
+            <Bar dataKey="s5" name="indigo" fill="var(--nx-color-chart-5)" />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -208,11 +208,11 @@ export const BarChartExample: Story = {
 export const PieChartExample: Story = {
   name: 'Pie Chart',
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-screen">
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
       <h2 className="nx:text-foreground nx:typography-heading-medium">
         Pie Chart
       </h2>
-      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border nx:border-border-default">
+      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border nx:border-border-default nx:w-full">
         <ResponsiveContainer width="100%" height={400}>
           <PieChart>
             <Pie
@@ -228,10 +228,10 @@ export const PieChartExample: Story = {
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: 'var(--color-popover)',
-                border: '1px solid var(--color-border-default)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--color-popover-foreground)',
+                backgroundColor: 'var(--nx-color-popover)',
+                border: '1px solid var(--nx-color-border-default)',
+                borderRadius: 'var(--nx-radius-md)',
+                color: 'var(--nx-color-popover-foreground)',
               }}
             />
             <Legend />
