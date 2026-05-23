@@ -1,0 +1,2472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Phase 2 Token Decisions — Focus · Z-Index · Tabs · Menu :focus</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    color-scheme: light;
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-raised: #ffffff;
+    --container: #ffffff;
+    --fg: #09090b;
+    --fg-muted: #3f3f46;
+    --fg-subtle: #71717a;
+    --border: #e4e4e7;
+    --border-strong: #a1a1aa;
+    --muted: #f4f4f5;
+    --muted-fg: #71717a;
+
+    --primary-bg: oklch(0.21 0 0);
+    --primary-fg: #ffffff;
+    --error-bg: oklch(0.5771 0.2152 27.325);
+    --error-fg: #ffffff;
+    --success-bg: oklch(0.55 0.16 142);
+    --success-fg: #ffffff;
+    --info-bg: oklch(0.55 0.18 264);
+    --info-fg: #ffffff;
+
+    /* Focus tokens (mirror Nexus light mode) */
+    --focus-default: oklch(0.5555 0 0);
+    --focus-error: oklch(0.5771 0.2152 27.325);
+
+    /* Proposed z scale (Nexus) */
+    --z-overlay: 10;
+    --z-popover: 20;
+    --z-sticky: 30;
+    --z-modal: 50;
+    --z-toast: 100;
+    --z-max: 9999;
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px;
+    --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+    --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-xl: 12px;
+
+    --lead-bg: oklch(0.95 0.04 142);
+    --lead-fg: oklch(0.3 0.12 142);
+    --warn-bg: oklch(0.96 0.04 80);
+    --warn-fg: oklch(0.4 0.16 80);
+    --err-bg: oklch(0.95 0.03 30);
+    --err-fg: oklch(0.45 0.15 30);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-raised: #1f1f23;
+      --container: #18181b;
+      --fg: #fafafa;
+      --fg-muted: #d4d4d8;
+      --fg-subtle: #a1a1aa;
+      --border: #27272a;
+      --border-strong: #3f3f46;
+      --muted: #27272a;
+      --muted-fg: #a1a1aa;
+      --primary-bg: oklch(0.92 0 0);
+      --primary-fg: oklch(0.15 0 0);
+      --focus-default: oklch(0.7572 0 0);
+      --focus-error: oklch(0.8077 0.1035 19.571);
+      --lead-bg: oklch(0.25 0.05 142);
+      --lead-fg: oklch(0.85 0.1 142);
+      --warn-bg: oklch(0.25 0.05 80);
+      --warn-fg: oklch(0.85 0.1 80);
+      --err-bg: oklch(0.25 0.05 30);
+      --err-fg: oklch(0.85 0.1 30);
+    }
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.55;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .layout {
+    max-width: 1180px; margin: 0 auto;
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: var(--s-10); padding: 0 var(--s-6);
+  }
+  @media (max-width: 920px) {
+    .layout { grid-template-columns: 1fr; gap: var(--s-6); }
+    nav.toc { position: static !important; }
+  }
+
+  header.hero {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: var(--s-8) 0;
+    margin-bottom: var(--s-8);
+  }
+  .hero-inner { max-width: 1180px; margin: 0 auto; padding: 0 var(--s-6); }
+  .hero h1 { font-size: 28px; margin: 0 0 var(--s-2); letter-spacing: -0.012em; }
+  .hero p.subtitle { color: var(--fg-muted); margin: 0; max-width: 760px; font-size: 15px; }
+  .hero .meta { display: flex; gap: var(--s-2); margin-top: var(--s-5); flex-wrap: wrap; }
+  .chip {
+    padding: 3px 8px; border-radius: 999px; font-size: 11px;
+    background: var(--muted); color: var(--fg-muted);
+    font-family: var(--font-mono);
+  }
+
+  nav.toc {
+    position: sticky; top: var(--s-6);
+    align-self: start;
+    border-left: 2px solid var(--border);
+    padding-left: var(--s-4);
+    max-height: calc(100vh - var(--s-12));
+    overflow-y: auto;
+  }
+  .toc-section {
+    font-size: 10px; color: var(--fg-subtle);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin: var(--s-4) 0 var(--s-2);
+    font-weight: 600;
+  }
+  .toc-section:first-child { margin-top: 0; }
+  .toc ol { list-style: none; margin: 0; padding: 0; }
+  .toc li { margin-bottom: 3px; }
+  .toc a {
+    color: var(--fg-muted); text-decoration: none; font-size: 12.5px;
+    display: block; padding: 3px 0; line-height: 1.3;
+  }
+  .toc a:hover { color: var(--fg); }
+
+  section { margin-bottom: var(--s-12); scroll-margin-top: var(--s-6); }
+  section > h2 {
+    font-size: 22px; margin: 0 0 var(--s-2);
+    border-top: 2px solid var(--fg); padding-top: var(--s-4);
+    letter-spacing: -0.012em;
+  }
+  section > p.lede { color: var(--fg-muted); margin: 0 0 var(--s-6); font-size: 15px; max-width: 720px; }
+  h3 { font-size: 16px; margin: var(--s-6) 0 var(--s-3); letter-spacing: -0.005em; }
+  h4 { font-size: 12px; margin: var(--s-5) 0 var(--s-2); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  p { margin: 0 0 var(--s-3); }
+  ul, ol { margin: 0 0 var(--s-3); padding-left: var(--s-5); }
+  li { margin-bottom: 4px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    margin-bottom: var(--s-4);
+  }
+
+  pre, code { font-family: var(--font-mono); font-size: 12px; }
+  pre {
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    overflow-x: auto;
+    line-height: 1.5;
+    margin: var(--s-3) 0;
+  }
+  code:not(pre code) {
+    background: var(--muted);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: var(--s-3) 0; font-size: 13px; }
+  th, td { text-align: left; padding: var(--s-2) var(--s-3); border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--fg-subtle); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.06em; }
+
+  .verdict {
+    display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px;
+    font-weight: 500; white-space: nowrap;
+  }
+  .verdict-pick { background: var(--lead-bg); color: var(--lead-fg); }
+  .verdict-skip { background: var(--err-bg); color: var(--err-fg); }
+  .verdict-watch { background: var(--warn-bg); color: var(--warn-fg); }
+  .verdict-note { background: var(--muted); color: var(--fg-muted); }
+
+  /* ─── Controls ────────────────────────────── */
+  .controls {
+    display: flex; gap: var(--s-3); align-items: center; flex-wrap: wrap;
+    padding: var(--s-3) var(--s-4);
+    background: var(--muted);
+    border-radius: var(--r-md);
+    margin-bottom: var(--s-4);
+    font-size: 13px;
+  }
+  .tabs-control { display: inline-flex; gap: 2px; background: var(--surface); padding: 3px; border-radius: var(--r-md); border: 1px solid var(--border); }
+  .tabs-control button {
+    background: transparent; border: 0; padding: 6px 12px; border-radius: var(--r-sm);
+    font-size: 13px; cursor: pointer; color: var(--fg-muted);
+    font-family: inherit; transition: background 120ms;
+  }
+  .tabs-control button[aria-selected="true"] {
+    background: var(--muted); color: var(--fg); font-weight: 500;
+  }
+  .toggle {
+    display: inline-flex; align-items: center; gap: var(--s-2); cursor: pointer;
+    color: var(--fg-muted); user-select: none;
+  }
+  .toggle input { margin: 0; cursor: pointer; }
+  .controls-spacer { flex: 1; }
+
+  /* ─── Focus surface grid ──────────────────── */
+  .surface-grid {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .surface-row { display: contents; }
+  .surface-label {
+    padding: var(--s-4); border-bottom: 1px solid var(--border);
+    background: var(--muted); font-size: 11px; color: var(--fg-muted);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 4px; justify-content: center;
+  }
+  .surface-label-name { font-weight: 600; color: var(--fg); font-size: 12px; }
+  .surface-row:last-child .surface-label { border-bottom: 0; }
+  .surface-cell {
+    padding: var(--s-5); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; gap: var(--s-3);
+    min-height: 96px;
+  }
+  .surface-row:last-child .surface-cell { border-bottom: 0; }
+  .cell-bg-page { background: var(--bg); }
+  .cell-bg-card { background: var(--surface); }
+  .cell-bg-muted { background: var(--muted); }
+  .cell-bg-primary { background: var(--primary-bg); }
+  .cell-bg-error { background: var(--error-bg); }
+
+  /* ─── Buttons ─────────────────────────────── */
+  .btn {
+    padding: 8px 16px; border-radius: var(--r-md);
+    border: 1px solid transparent;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: inherit; transition: background 120ms;
+    line-height: 1;
+  }
+  .btn-primary { background: var(--primary-bg); color: var(--primary-fg); }
+  .btn-error { background: var(--error-bg); color: var(--error-fg); }
+  .btn-outline { background: transparent; border-color: var(--border-strong); color: var(--fg); }
+  .btn-muted { background: var(--muted); color: var(--fg); }
+  .btn-white { background: var(--surface); color: var(--fg); border-color: var(--border); }
+  .btn-on-color { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.3); backdrop-filter: blur(2px); }
+
+  /* ─── Focus techniques ────────────────────── */
+  /* A: Single shadow ring (Nexus current state) */
+  .focus-a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--focus-default);
+  }
+
+  /* B: Outline + offset */
+  .focus-b:focus-visible {
+    outline: 2px solid var(--focus-default);
+    outline-offset: 2px;
+  }
+
+  /* C: Background-colour spacer (shadcn-style) */
+  .focus-c:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--focus-default);
+  }
+
+  /* D: Double-ring lightness inverse (Piccalilli-style for neutrals) */
+  .focus-d:focus-visible {
+    outline: none;
+    --inner-ring: var(--focus-default);
+    box-shadow:
+      0 0 0 2px var(--inner-ring),
+      0 0 0 4px oklch(from var(--inner-ring) calc(1 - l) 0 h);
+  }
+
+  /* E: Hybrid — box-shadow ring + transparent outline (WHCM-safe) */
+  .focus-e:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--focus-default);
+  }
+
+  /* "show all focused" toggle (state forced) */
+  body.show-focused .focus-a {
+    box-shadow: 0 0 0 2px var(--focus-default) !important;
+  }
+  body.show-focused .focus-b {
+    outline: 2px solid var(--focus-default) !important;
+    outline-offset: 2px !important;
+  }
+  body.show-focused .focus-c {
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--focus-default) !important;
+  }
+  body.show-focused .focus-d {
+    --inner-ring: var(--focus-default);
+    box-shadow:
+      0 0 0 2px var(--inner-ring),
+      0 0 0 4px oklch(from var(--inner-ring) calc(1 - l) 0 h) !important;
+  }
+  body.show-focused .focus-e {
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px var(--focus-default) !important;
+  }
+
+  /* WHCM simulation — strips all box-shadow, forces high-contrast colours */
+  body.simulate-whcm,
+  body.simulate-whcm * {
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+  body.simulate-whcm { background: #000 !important; }
+  body.simulate-whcm * { color: #fff !important; }
+  body.simulate-whcm .surface-grid,
+  body.simulate-whcm .card { background: #000 !important; border-color: #fff !important; }
+  body.simulate-whcm .cell-bg-page,
+  body.simulate-whcm .cell-bg-card,
+  body.simulate-whcm .cell-bg-muted,
+  body.simulate-whcm .cell-bg-primary,
+  body.simulate-whcm .cell-bg-error,
+  body.simulate-whcm .btn { background: #000 !important; border: 1px solid #fff !important; }
+  body.simulate-whcm .btn { color: #fff !important; }
+  /* Outline survives in WHCM */
+  body.simulate-whcm.show-focused .focus-b,
+  body.simulate-whcm .focus-b:focus-visible {
+    outline: 2px solid #ff0 !important;
+  }
+  body.simulate-whcm.show-focused .focus-e,
+  body.simulate-whcm .focus-e:focus-visible {
+    outline: 2px solid #ff0 !important;
+  }
+  body.simulate-whcm .surface-label { background: #000 !important; border-color: #fff !important; color: #fff !important; }
+  body.simulate-whcm .surface-label-name { color: #fff !important; }
+
+  /* ─── Decision matrix ─────────────────────── */
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--s-3);
+    margin: var(--s-4) 0;
+  }
+  .decision-col {
+    padding: var(--s-4); border: 1px solid var(--border);
+    border-radius: var(--r-lg); background: var(--surface);
+    display: flex; flex-direction: column;
+  }
+  .decision-col.picked {
+    border: 2px solid var(--success-bg);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--success-bg) 5%, var(--surface)) 0%, var(--surface) 100%);
+  }
+  .decision-col h5 {
+    margin: 0 0 var(--s-2); font-size: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--s-2);
+  }
+  .decision-col .verdict { font-size: 10px; }
+  .decision-col .desc { font-size: 12px; color: var(--fg-muted); margin-bottom: var(--s-3); }
+  .decision-col h6 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; margin: var(--s-3) 0 4px; color: var(--fg-subtle); }
+  .decision-col ul { margin: 0; padding-left: 16px; font-size: 12px; }
+  .decision-col li { margin-bottom: 3px; }
+  .pros li::marker { color: var(--success-bg); }
+  .cons li::marker { color: var(--error-bg); }
+
+  /* ─── Z-stack visualization ──────────────── */
+  .z-viz {
+    position: relative;
+    height: 380px;
+    background: var(--muted);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--r-lg);
+    perspective: 1100px;
+    perspective-origin: 60% 35%;
+    overflow: hidden;
+  }
+  .z-layer {
+    position: absolute;
+    left: 50%;
+    width: 70%;
+    height: 50px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-strong);
+    padding: 0 var(--s-4);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    color: var(--fg);
+  }
+  .z-layer .z-name { font-weight: 600; }
+  .z-layer .z-value { font-size: 11px; opacity: 0.7; }
+  .z-layer .z-desc { font-size: 11px; color: var(--fg-muted); margin-left: var(--s-3); font-family: var(--font-sans); }
+  .z-base   { top: 280px; transform: translateX(-50%) rotateX(45deg); background: oklch(0.97 0 0); }
+  .z-overlay{ top: 240px; transform: translateX(-50%) rotateX(45deg); background: oklch(0.96 0.02 220); }
+  .z-popover{ top: 200px; transform: translateX(-50%) rotateX(45deg); background: oklch(0.95 0.04 220); }
+  .z-sticky { top: 160px; transform: translateX(-50%) rotateX(45deg); background: oklch(0.95 0.04 80);  border-style: dashed; }
+  .z-modal  { top: 120px; transform: translateX(-50%) rotateX(45deg); background: oklch(0.93 0.06 264); }
+  .z-toast  { top: 80px;  transform: translateX(-50%) rotateX(45deg); background: oklch(0.93 0.06 142); }
+  .z-max    { top: 40px;  transform: translateX(-50%) rotateX(45deg); background: oklch(0.93 0.06 30); }
+
+  /* Mini app demo for --z-sticky case */
+  .mini-app-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4);
+  }
+  @media (max-width: 720px) { .mini-app-wrap { grid-template-columns: 1fr; } }
+  .mini-app {
+    position: relative; height: 320px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .mini-app-header { padding: var(--s-2) var(--s-3); background: var(--muted); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono); }
+  .mini-app-frame { position: relative; height: calc(100% - 30px); overflow-y: auto; }
+  .mini-app-nav {
+    position: sticky; top: 0;
+    height: 44px; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 var(--s-3);
+    font-weight: 600; font-size: 12px;
+    z-index: var(--demo-z-sticky, 50);
+  }
+  .mini-app-nav .z-tag { font-family: var(--font-mono); font-weight: 400; font-size: 10px; background: var(--muted); padding: 2px 6px; border-radius: 3px; }
+  .mini-app-content { padding: var(--s-3); }
+  .mini-app-content p { font-size: 11px; color: var(--fg-muted); }
+  .mini-modal-overlay {
+    position: absolute; inset: 30px 0 0 0;
+    background: rgba(0,0,0,0.4);
+    z-index: var(--demo-z-modal, 50);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mini-modal {
+    background: var(--surface); padding: var(--s-4);
+    border-radius: var(--r-md); width: 70%;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    font-size: 11px;
+  }
+  .mini-modal .z-tag { font-family: var(--font-mono); font-weight: 400; font-size: 10px; background: var(--muted); padding: 2px 6px; border-radius: 3px; }
+  .mini-app-label { font-size: 11px; color: var(--fg-muted); margin-top: var(--s-2); text-align: center; font-family: var(--font-mono); }
+
+  /* ─── Tabs demo ───────────────────────────── */
+  .tabs-demo {
+    display: inline-flex; gap: 2px; background: var(--muted);
+    padding: 3px; border-radius: var(--r-md);
+  }
+  .tabs-demo-trigger {
+    background: transparent; border: 0; padding: 8px 16px; border-radius: var(--r-sm);
+    font-size: 13px; cursor: pointer; color: var(--fg-muted);
+    font-family: inherit;
+    transition: background 120ms;
+  }
+  .tabs-demo-trigger[data-state="active"] {
+    background: var(--surface); color: var(--fg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .tabs-demo-trigger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--focus-default);
+  }
+  .tabs-demo-trigger[data-state="active"]:focus-visible {
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.06),
+      0 0 0 2px var(--focus-default);
+  }
+  body.show-focused .tabs-demo-trigger.demo-focused {
+    box-shadow: 0 0 0 2px var(--focus-default);
+  }
+  body.show-focused .tabs-demo-trigger[data-state="active"].demo-focused {
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.06),
+      0 0 0 2px var(--focus-default);
+  }
+  .tab-state-row {
+    display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-6);
+    align-items: flex-end; margin-top: var(--s-3);
+  }
+  .tab-state-item { display: flex; flex-direction: column; gap: var(--s-2); align-items: flex-start; }
+  .tab-state-label { font-size: 10px; color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--font-mono); }
+
+  /* ─── Dropdown menu demo ─────────────────── */
+  .menu-host {
+    position: relative; display: inline-block;
+  }
+  .menu-demo {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-md); padding: 4px; width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .menu-demo-item {
+    padding: 7px 10px; border-radius: var(--r-sm);
+    font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: var(--s-2);
+    outline: none;
+  }
+  .menu-demo-item:focus {
+    background: var(--muted);
+  }
+  .menu-demo-item .kbd {
+    margin-left: auto; font-family: var(--font-mono); font-size: 10px;
+    color: var(--fg-subtle); background: var(--muted); padding: 1px 5px; border-radius: 3px;
+  }
+  .menu-demo-item:focus .kbd { background: rgba(0,0,0,0.06); }
+
+  /* ─── Callouts ────────────────────────────── */
+  .callout {
+    border-left: 3px solid; padding: var(--s-3) var(--s-4);
+    border-radius: 0 var(--r-md) var(--r-md) 0;
+    margin: var(--s-3) 0; font-size: 13px;
+  }
+  .callout-pick { border-color: var(--success-bg); background: color-mix(in oklch, var(--success-bg) 6%, var(--surface)); }
+  .callout-warn { border-color: var(--warn-fg); background: color-mix(in oklch, var(--warn-fg) 6%, var(--surface)); }
+  .callout-note { border-color: var(--border-strong); background: var(--muted); }
+  .callout strong { display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .callout-pick strong { color: var(--lead-fg); }
+  .callout-warn strong { color: var(--warn-fg); }
+
+  /* ─── Migration table ────────────────────── */
+  .file-ref { font-family: var(--font-mono); font-size: 11px; }
+  .arrow { color: var(--fg-subtle); }
+
+  /* ─── Summary checklist ──────────────────── */
+  .summary-list { list-style: none; padding: 0; }
+  .summary-list li {
+    display: grid; grid-template-columns: 28px 1fr auto; gap: var(--s-3);
+    padding: var(--s-3); border-bottom: 1px solid var(--border); align-items: center;
+  }
+  .summary-list li:last-child { border-bottom: 0; }
+  .summary-list .num { font-family: var(--font-mono); font-size: 14px; color: var(--fg-subtle); }
+  .summary-list .title { font-weight: 500; font-size: 13px; }
+  .summary-list .meta { font-size: 11px; color: var(--fg-subtle); margin-top: 2px; }
+
+  /* ─── Misc ────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
+  .note-inline { font-size: 11px; color: var(--fg-subtle); font-style: italic; margin-left: var(--s-2); }
+  .tag-row { display: flex; gap: var(--s-2); flex-wrap: wrap; margin: var(--s-3) 0; }
+
+  /* ─── Container query demo ──────────────── */
+  .cq-demo-wrap { display: grid; gap: var(--s-4); margin: var(--s-3) 0 var(--s-4); }
+  .cq-resize {
+    resize: horizontal; overflow: auto;
+    min-width: 240px; max-width: 100%; width: 100%;
+    padding: var(--s-3);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--r-md);
+    background: var(--muted);
+  }
+  .cq-resize-label { font-size: 11px; color: var(--fg-subtle); font-family: var(--font-mono); margin-bottom: var(--s-2); display: flex; justify-content: space-between; }
+  .cq-card {
+    container-type: inline-size;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-md); padding: var(--s-3);
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .cq-card-thumb {
+    width: 100%; aspect-ratio: 16/9;
+    background: linear-gradient(135deg, oklch(0.85 0.06 264), oklch(0.75 0.1 200));
+    border-radius: var(--r-sm);
+    flex-shrink: 0;
+  }
+  .cq-card-body { display: flex; flex-direction: column; gap: 4px; }
+  .cq-card-title { font-size: 13px; font-weight: 600; margin: 0; }
+  .cq-card-desc { font-size: 12px; color: var(--fg-muted); margin: 0; }
+  .cq-card-actions { display: flex; gap: var(--s-2); }
+  /* The breakpoint at the container level, not the viewport */
+  @container (min-width: 400px) {
+    .cq-card { flex-direction: row; align-items: flex-start; }
+    .cq-card-thumb { width: 100px; aspect-ratio: 1; flex-shrink: 0; }
+    .cq-card-body { flex: 1; }
+  }
+  @container (min-width: 600px) {
+    .cq-card-thumb { width: 160px; }
+    .cq-card-title { font-size: 15px; }
+  }
+
+  /* Breakpoint scale viz */
+  .bp-scale {
+    display: grid; grid-template-columns: 120px 1fr 80px 120px;
+    gap: 0; align-items: center;
+    border: 1px solid var(--border); border-radius: var(--r-md);
+    overflow: hidden; margin: var(--s-3) 0;
+  }
+  .bp-scale-head { display: contents; }
+  .bp-scale-head > div { padding: var(--s-2) var(--s-3); background: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-subtle); font-weight: 600; border-bottom: 1px solid var(--border); }
+  .bp-row { display: contents; }
+  .bp-row > div { padding: var(--s-3); border-bottom: 1px solid var(--border); font-size: 12px; }
+  .bp-row:last-child > div { border-bottom: 0; }
+  .bp-name { font-family: var(--font-mono); font-weight: 600; }
+  .bp-bar-cell { padding: var(--s-2) var(--s-3) !important; }
+  .bp-bar { height: 16px; background: linear-gradient(90deg, oklch(0.85 0.04 264), oklch(0.6 0.12 264)); border-radius: 2px; position: relative; }
+  .bp-px { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); }
+  .bp-class-badge {
+    display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px;
+    background: var(--lead-bg); color: var(--lead-fg); font-family: var(--font-mono);
+  }
+  .bp-class-badge.standard { background: oklch(0.92 0.05 264); color: oklch(0.3 0.15 264); }
+  .bp-class-badge.wide { background: oklch(0.92 0.05 30); color: oklch(0.4 0.15 30); }
+
+  /* Matrix table for benchmark comparison */
+  .bp-matrix {
+    width: 100%; font-size: 12px; margin: var(--s-3) 0;
+    border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden;
+  }
+  .bp-matrix th, .bp-matrix td { padding: var(--s-2) var(--s-3); border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  .bp-matrix th { background: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-subtle); font-weight: 600; white-space: nowrap; }
+  .bp-matrix tr:last-child td { border-bottom: 0; }
+  .bp-matrix code { font-size: 11px; }
+  .bp-matrix .nexus-row { background: oklch(0.98 0.02 264); }
+  @media (prefers-color-scheme: dark) {
+    .bp-matrix .nexus-row { background: oklch(0.2 0.05 264); }
+  }
+
+  /* Sub-decision section divider */
+  .sub-decision {
+    margin: var(--s-6) 0;
+    padding: var(--s-5); background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--r-lg);
+  }
+  .sub-decision h4 {
+    font-size: 13px; margin: 0 0 var(--s-3); color: var(--fg);
+    text-transform: none; letter-spacing: 0; font-weight: 600;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sub-decision .sub-q { font-size: 12px; color: var(--fg-muted); margin-bottom: var(--s-3); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <h1>Phase 2 Token Decisions</h1>
+    <p class="subtitle">
+      Deep-dive companion to the Phase 1 intelligence report. Covers the focus-ring technique
+      choice, the z-index token shape (with the <code>--z-sticky</code> question), the Tabs
+      shadow-stacking issue, the menu-item <code>:focus</code> pattern, and the breakpoint /
+      responsive strategy (grounded in 12 design systems + 2026 industry consensus on container
+      queries, dynamic viewport units, and fluid scaling). Live demos so each decision is
+      visible, not just described.
+    </p>
+    <div class="meta">
+      <span class="chip">Reviewed May 2026</span>
+      <span class="chip">Nexus DS · Phase 2</span>
+      <span class="chip">Focus · Z-Index · Tabs · Menu · Breakpoints</span>
+      <span class="chip">Author: aishvarya</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-section">1 — Focus Ring</div>
+    <ol>
+      <li><a href="#focus-problem">Problem</a></li>
+      <li><a href="#focus-techniques">5 techniques</a></li>
+      <li><a href="#focus-demo">Live demo</a></li>
+      <li><a href="#focus-whcm">WHCM behaviour</a></li>
+      <li><a href="#focus-decision">Recommendation</a></li>
+    </ol>
+    <div class="toc-section">2 — Z-Index</div>
+    <ol>
+      <li><a href="#z-problem">Problem</a></li>
+      <li><a href="#z-scale">5 vs 6 tokens</a></li>
+      <li><a href="#z-sticky">--z-sticky demo</a></li>
+      <li><a href="#z-migration">Migration plan</a></li>
+      <li><a href="#z-decision">Recommendation</a></li>
+    </ol>
+    <div class="toc-section">3 — Tabs Stack</div>
+    <ol>
+      <li><a href="#tabs-problem">Problem</a></li>
+      <li><a href="#tabs-demo">Live demo</a></li>
+      <li><a href="#tabs-options">3 fixes</a></li>
+      <li><a href="#tabs-decision">Recommendation</a></li>
+    </ol>
+    <div class="toc-section">4 — Menu :focus</div>
+    <ol>
+      <li><a href="#menu-problem">Problem</a></li>
+      <li><a href="#menu-demo">Live demo</a></li>
+      <li><a href="#menu-map">Exception map</a></li>
+      <li><a href="#menu-decision">Recommendation</a></li>
+    </ol>
+    <div class="toc-section">5 — Breakpoints</div>
+    <ol>
+      <li><a href="#bp-problem">Codebase audit</a></li>
+      <li><a href="#bp-benchmarks">10-system survey</a></li>
+      <li><a href="#bp-headlines">2026 consensus</a></li>
+      <li><a href="#bp-decisions">4 sub-decisions</a></li>
+      <li><a href="#bp-demo">Live demo (@container)</a></li>
+      <li><a href="#bp-migration">Migration plan</a></li>
+      <li><a href="#bp-future">Forward direction</a></li>
+      <li><a href="#bp-decision">Recommendation</a></li>
+    </ol>
+    <div class="toc-section">Summary</div>
+    <ol>
+      <li><a href="#summary">Action checklist</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+<!-- ────────────────────────────────────────────── -->
+<!-- SECTION 1: FOCUS RING                          -->
+<!-- ────────────────────────────────────────────── -->
+<section id="focus-ring">
+  <h2>1 — Focus Ring Technique</h2>
+  <p class="lede">
+    Nexus currently uses a single-shadow neutral-grey ring (option A below). The Phase 1 report's
+    Rec #1 proposes adding a background-colour spacer (option C). Two problems with that proposal
+    were identified in the cross-check: the spacer doesn't work on coloured surfaces (the case it
+    was supposed to fix), and box-shadow-based focus rings are <strong>invisible in Windows High
+    Contrast Mode</strong>. Five techniques are compared side-by-side below.
+    <strong>Recommendation: Option B (outline + offset)</strong> — the same pattern Linear,
+    Stripe, Figma, and Spectrum ship. One CSS declaration pair delivers surface-invariance, a
+    visible floating gap in normal mode, and native WHCM survival, while making issue #3 (Tabs
+    shadow stacking) dissolve as a side effect.
+  </p>
+
+  <h3 id="focus-problem">The problem</h3>
+  <p>
+    A focus ring has to satisfy three properties at once:
+  </p>
+  <ol>
+    <li><strong>Visible on every surface</strong> — page background, card, muted, primary (dark), error (red), etc. A neutral grey APCA-gated to Lc ≥ 45 covers this in Nexus today.</li>
+    <li><strong>Visually separated from the element</strong> — a ring that sits flush with the element edge is harder to read than one with a 2px gap. This is the "ring offset" property.</li>
+    <li><strong>Survives Windows High Contrast Mode</strong> — WHCM (a.k.a. <code>forced-colors: active</code>) strips <code>box-shadow</code> entirely. A pure-shadow ring becomes invisible for users who depend on the high-contrast theme.</li>
+  </ol>
+  <p>
+    Nexus's current implementation handles (1) — Issue #44 verified APCA Lc ≥ 45 on all
+    semantic surfaces. It does not yet handle (2) or (3).
+  </p>
+
+  <h3 id="focus-techniques">The five candidate techniques</h3>
+  <p>Each labelled A–E. A is the current state; B–E are candidates.</p>
+
+  <div class="decision-grid">
+    <div class="decision-col">
+      <h5>A · Current state <span class="verdict verdict-note">baseline</span></h5>
+      <p class="desc">Single box-shadow at 2px spread, flush with element edge.</p>
+      <pre>outline: none;
+box-shadow: 0 0 0 2px
+  var(--focus-default);</pre>
+      <h6>Pros</h6>
+      <ul class="pros">
+        <li>Already shipped</li>
+        <li>APCA-verified on all surfaces</li>
+      </ul>
+      <h6>Cons</h6>
+      <ul class="cons">
+        <li>Invisible in WHCM</li>
+        <li>No visual separation from element edge</li>
+        <li>Stacks with elevation shadows</li>
+      </ul>
+    </div>
+
+    <div class="decision-col picked">
+      <h5>B · Outline + offset <span class="verdict verdict-pick">pick</span></h5>
+      <p class="desc">Native CSS outline with a 2px offset. The pre-box-shadow web standard — and what every Tier-A benchmark actually ships.</p>
+      <pre>outline: 2px solid
+  var(--focus-default);
+outline-offset: 2px;</pre>
+      <h6>Pros</h6>
+      <ul class="pros">
+        <li>Visible 2px gap to all users in normal mode (not just WHCM)</li>
+        <li>Survives WHCM natively (outline preserved)</li>
+        <li>Doesn't stack with box-shadow elevation — fixes Tabs §3 automatically</li>
+        <li>One CSS declaration pair; single-token mental model</li>
+        <li>Matches Linear, Stripe, Figma, Spectrum (all use outline)</li>
+      </ul>
+      <h6>Cons</h6>
+      <ul class="cons">
+        <li>Drops the unused <code>--nx-focus-geometry-*</code> primitives</li>
+        <li>Refactor across ~8 component files (one-time cost)</li>
+        <li>Outline not composable into asymmetric shapes (theoretical for Nexus)</li>
+      </ul>
+    </div>
+
+    <div class="decision-col">
+      <h5>C · BG spacer (report's Rec #1) <span class="verdict verdict-skip">skip</span></h5>
+      <p class="desc">Two-layer shadow: inner = page bg colour, outer = ring colour.</p>
+      <pre>outline: none;
+box-shadow:
+  0 0 0 2px var(--bg),
+  0 0 0 4px var(--focus-default);</pre>
+      <h6>Pros</h6>
+      <ul class="pros">
+        <li>Minimal token-level change</li>
+        <li>Matches shadcn's ring-offset idiom</li>
+      </ul>
+      <h6>Cons</h6>
+      <ul class="cons">
+        <li>Spacer is wrong colour on primary / error / coloured buttons — see demo</li>
+        <li>Still invisible in WHCM</li>
+        <li>Still stacks with elevation shadows</li>
+      </ul>
+    </div>
+
+    <div class="decision-col">
+      <h5>D · Double-ring lightness-inverse <span class="verdict verdict-watch">candidate</span></h5>
+      <p class="desc">Two rings; outer = inverse lightness of inner. Guarantees one ring has contrast on any background.</p>
+      <pre>box-shadow:
+  0 0 0 2px var(--ring),
+  0 0 0 4px oklch(from
+    var(--ring) calc(1-l) 0 h);</pre>
+      <h6>Pros</h6>
+      <ul class="pros">
+        <li>Truly surface-invariant by construction</li>
+        <li>Uses modern OKLCH relative colour syntax</li>
+      </ul>
+      <h6>Cons</h6>
+      <ul class="cons">
+        <li>Two visible rings = visually heavier</li>
+        <li>Still invisible in WHCM</li>
+        <li>Requires Baseline 2024 browsers</li>
+      </ul>
+    </div>
+
+    <div class="decision-col">
+      <h5>E · Hybrid <span class="verdict verdict-watch">fallback</span></h5>
+      <p class="desc">Box-shadow for normal mode + transparent outline as WHCM fallback. The conservative incremental move.</p>
+      <pre>outline: 2px solid transparent;
+outline-offset: 2px;
+box-shadow: 0 0 0 2px
+  var(--focus-default);</pre>
+      <h6>Pros</h6>
+      <ul class="pros">
+        <li>Preserves issue #44's box-shadow infrastructure</li>
+        <li>Transparent outline becomes visible system colour in WHCM</li>
+        <li>Smallest delta from current state</li>
+      </ul>
+      <h6>Cons</h6>
+      <ul class="cons">
+        <li>Visible gap only in WHCM mode, not normal mode — sighted users still see ring flush with element edge</li>
+        <li>Three CSS declarations vs B's two</li>
+        <li>Still stacks with elevation shadows (Tabs §3 not auto-fixed)</li>
+        <li>Outline / shadow geometry differs between WHCM and normal modes</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 id="focus-demo">Live demo</h3>
+  <p>
+    Tab through the buttons below or toggle <em>Show all focused</em> to compare. Each technique is
+    rendered on five surfaces. The interesting cells are the coloured ones (<em>primary</em> and
+    <em>error</em>) — that's where the spacer's flaw shows up most clearly.
+  </p>
+
+  <div class="controls">
+    <div class="tabs-control" role="tablist" aria-label="Focus technique">
+      <button role="tab" aria-selected="true" data-technique="a">A · Current</button>
+      <button role="tab" aria-selected="false" data-technique="b">B · Outline+offset</button>
+      <button role="tab" aria-selected="false" data-technique="c">C · BG spacer</button>
+      <button role="tab" aria-selected="false" data-technique="d">D · Double-ring</button>
+      <button role="tab" aria-selected="false" data-technique="e">E · Hybrid</button>
+    </div>
+    <div class="controls-spacer"></div>
+    <label class="toggle">
+      <input type="checkbox" id="toggle-focused" />
+      Show all focused
+    </label>
+    <label class="toggle">
+      <input type="checkbox" id="toggle-whcm" />
+      Simulate WHCM
+    </label>
+  </div>
+
+  <div class="surface-grid" id="focus-grid">
+    <div class="surface-row">
+      <div class="surface-label">
+        <span class="surface-label-name">Page background</span>
+        <span>--color-background</span>
+      </div>
+      <div class="surface-cell cell-bg-page">
+        <button class="btn btn-white focus-demo">Default</button>
+        <button class="btn btn-primary focus-demo">Primary action</button>
+        <button class="btn btn-outline focus-demo">Outline</button>
+      </div>
+    </div>
+    <div class="surface-row">
+      <div class="surface-label">
+        <span class="surface-label-name">Container / card</span>
+        <span>--color-container</span>
+      </div>
+      <div class="surface-cell cell-bg-card">
+        <button class="btn btn-white focus-demo">Default</button>
+        <button class="btn btn-muted focus-demo">Muted</button>
+        <button class="btn btn-outline focus-demo">Outline</button>
+      </div>
+    </div>
+    <div class="surface-row">
+      <div class="surface-label">
+        <span class="surface-label-name">Muted surface</span>
+        <span>--color-muted</span>
+      </div>
+      <div class="surface-cell cell-bg-muted">
+        <button class="btn btn-white focus-demo">Default</button>
+        <button class="btn btn-primary focus-demo">Primary action</button>
+      </div>
+    </div>
+    <div class="surface-row">
+      <div class="surface-label">
+        <span class="surface-label-name">Primary (dark)</span>
+        <span>--primary-background</span>
+      </div>
+      <div class="surface-cell cell-bg-primary">
+        <button class="btn btn-on-color focus-demo">Action on primary</button>
+        <button class="btn btn-on-color focus-demo">Secondary</button>
+      </div>
+    </div>
+    <div class="surface-row">
+      <div class="surface-label">
+        <span class="surface-label-name">Error (red)</span>
+        <span>--error-background</span>
+      </div>
+      <div class="surface-cell cell-bg-error">
+        <button class="btn btn-on-color focus-demo">Confirm</button>
+        <button class="btn btn-on-color focus-demo">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-note">
+    <strong>What to look for</strong>
+    Start with <strong>A · Current</strong> and toggle <em>Show all focused</em> — note the ring
+    sits flush with each button. Switch to <strong>B · Outline + offset</strong> (the pick) — every
+    button now has a 2px floating gap before the ring, on every surface, including primary and
+    error. Now toggle <em>Simulate WHCM</em> — A's ring disappears entirely; B's outline is forced
+    to a system colour and stays visible. Switch to <strong>C · BG spacer</strong> with WHCM off
+    and look at the primary / error rows: the spacer is a white-ish stripe on coloured backgrounds
+    that doesn't belong there. <strong>D · Double-ring</strong> keeps contrast on every surface but
+    at the cost of visual weight. <strong>E · Hybrid</strong> matches A in normal mode (ring flush
+    with edge) but survives WHCM like B.
+  </div>
+
+  <h3 id="focus-whcm">Windows High Contrast Mode behaviour</h3>
+  <p>
+    Turn on <em>Simulate WHCM</em> in the controls above. The simulation strips all box-shadows
+    and forces foreground/background to high-contrast values — close to what users experience with
+    Windows Forced Colors enabled. Behaviour summary:
+  </p>
+  <table>
+    <thead>
+      <tr><th>Technique</th><th>Visible in normal mode</th><th>Visible in WHCM</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A · Current state</td><td>Yes</td><td><span class="verdict verdict-skip">No</span></td><td>Box-shadow is stripped</td></tr>
+      <tr><td><strong>B · Outline + offset</strong> <span class="verdict verdict-pick">picked</span></td><td>Yes — with floating 2px gap</td><td><span class="verdict verdict-pick">Yes</span></td><td>Native CSS outline is preserved; same geometry in both modes</td></tr>
+      <tr><td>C · BG spacer</td><td>Yes (degraded on coloured surfaces)</td><td><span class="verdict verdict-skip">No</span></td><td>Both shadows stripped</td></tr>
+      <tr><td>D · Double-ring</td><td>Yes</td><td><span class="verdict verdict-skip">No</span></td><td>Both shadows stripped</td></tr>
+      <tr><td>E · Hybrid (transparent outline)</td><td>Yes — ring flush with edge in normal mode</td><td><span class="verdict verdict-pick">Yes</span></td><td>Transparent outline → forced system colour (geometry differs between modes)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="focus-decision">Recommendation</h3>
+  <div class="callout callout-pick">
+    <strong>Pick B · Outline + offset</strong>
+    Change the canonical focus pattern in <code>components.md</code> from
+    <code>nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default</code> to:
+    <pre>nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default
+nx:focus-visible:outline-offset-2</pre>
+    One declaration pair, surface-invariant, native WHCM survival, no shadow-stack interaction
+    with elevation. The 2px floating gap is visible to <em>all</em> users in normal mode — not
+    just WHCM users — which delivers what the Phase 1 BG-spacer was trying to achieve, without
+    its coloured-surface failure.
+  </div>
+
+  <div class="callout callout-note">
+    <strong>What this drops</strong>
+    The <code>--nx-focus-geometry-x/y/blur/spread</code> primitives in <code>variables.css</code>
+    (lines 259–262) and the <code>--shadow-focus-default</code> / <code>--shadow-focus-error</code>
+    composed tokens in <code>nexus.css</code> (lines 205–210). Per
+    <code>.claude/rules/project-stage.md</code>, pre-production code refactors freely — no
+    backward-compatibility shim. Keep <code>--nx-focus-color-default</code> and
+    <code>--nx-focus-color-error</code> (lines 257–258, 431–432); they get promoted to the
+    semantic colour namespace as <code>--color-focus-default</code> and
+    <code>--color-focus-error</code> so Tailwind generates <code>outline-focus-default</code> and
+    <code>outline-focus-error</code> utilities automatically.
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>Why not E (the conservative move)</strong>
+    E preserves issue #44's box-shadow infrastructure but only delivers the visible gap to WHCM
+    users — sighted users still see the ring flush with the element edge. Issue #44's locked
+    rationale was about <em>colour</em> (APCA-gated neutral grey) and avoiding shadow-stacking;
+    the box-shadow-vs-outline axis was tangential. Every Tier-A benchmark that actually documents
+    focus (Linear, Stripe, Figma, Spectrum) uses outline. Reversing #44's tangential mechanism
+    isn't fighting the decision — it's completing the intent.
+  </div>
+
+  <h4>Files that change</h4>
+  <table class="migration-table">
+    <thead><tr><th>File</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td class="file-ref">packages/tailwind/variables.css</td><td>Lines 259–262 — delete <code>--nx-focus-geometry-x/y/blur/spread</code> primitives</td></tr>
+      <tr><td class="file-ref">packages/tailwind/nexus.css</td><td>Lines 205–210 — delete <code>--shadow-focus-default</code> / <code>--shadow-focus-error</code>. Add <code>--color-focus-default: var(--nx-focus-color-default)</code> and <code>--color-focus-error: var(--nx-focus-color-error)</code> in the <code>@theme</code> block so Tailwind generates <code>outline-focus-*</code> utilities</td></tr>
+      <tr><td class="file-ref">.claude/rules/components.md</td><td>Replace "Focus States" canonical pattern; add APCA Lc ≥ 45 rationale; add surface exception map (see §4)</td></tr>
+      <tr><td class="file-ref">packages/react/src/components/ui/button.tsx</td><td>Line 10 — swap <code>focus-visible:outline-none focus-visible:shadow-focus-default</code> → <code>focus-visible:outline-2 focus-visible:outline-focus-default focus-visible:outline-offset-2</code></td></tr>
+      <tr><td class="file-ref">packages/react/src/components/ui/input.tsx</td><td>Line 13 — same swap (also covers error state via <code>aria-invalid:outline-focus-error</code>)</td></tr>
+      <tr><td class="file-ref">packages/react/src/components/ui/switch.tsx</td><td>Line 43 — same swap</td></tr>
+      <tr><td class="file-ref">packages/react/src/components/ui/tabs.tsx</td><td>Lines 75, 189 — same swap; also see §3 for the <code>shadow-sm</code> active-state fix</td></tr>
+      <tr><td class="file-ref">packages/react/src/components/ui/accordion.tsx</td><td>Line 75 — same swap</td></tr>
+      <tr><td class="file-ref">packages/react/src/components/ui/dialog.tsx</td><td>Line 148 — same swap (DialogClose)</td></tr>
+      <tr><td class="file-ref">packages/react/src/components/ui/select.tsx</td><td>Line 73 — same swap (SelectTrigger)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-note">
+    <strong>Side-effect: Tabs shadow-stack issue §3 dissolves</strong>
+    Because outline doesn't compose with box-shadow, the active-tab <code>shadow-sm</code> and the
+    focus indicator no longer interact at all — outline sits in its own paint layer 2px outside
+    the element. The §3 fix (bottom-border indicator) is still worth doing for visual reasons, but
+    it's no longer a correctness fix; the stacking violation is gone the moment B lands.
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────── -->
+<!-- SECTION 2: Z-INDEX                             -->
+<!-- ────────────────────────────────────────────── -->
+<section id="z-index">
+  <h2>2 — Z-Index Tokens (5 vs 6 with <code>--z-sticky</code>)</h2>
+  <p class="lede">
+    Nexus ships zero z-index tokens today. Six components hardcode <code>nx:z-50</code> — the
+    same magic-number anti-pattern the Phase 1 report criticised shadcn for. This section shows
+    the proposed scale, demonstrates why <code>--z-sticky</code> is worth adding, and lists the
+    exact files that change.
+  </p>
+
+  <h3 id="z-problem">The problem</h3>
+  <p>
+    Verified call sites of <code>nx:z-50</code> in the current codebase:
+  </p>
+  <table class="migration-table">
+    <thead><tr><th>File</th><th>Line</th><th>Component</th><th>Should map to</th></tr></thead>
+    <tbody>
+      <tr><td class="file-ref">tooltip.tsx</td><td>77</td><td>TooltipContent</td><td><code>--z-popover</code></td></tr>
+      <tr><td class="file-ref">dialog.tsx</td><td>74</td><td>DialogOverlay</td><td><code>--z-modal</code></td></tr>
+      <tr><td class="file-ref">dialog.tsx</td><td>126</td><td>DialogContent</td><td><code>--z-modal</code></td></tr>
+      <tr><td class="file-ref">dropdown-menu.tsx</td><td>126</td><td>DropdownMenuSubContent</td><td><code>--z-popover</code></td></tr>
+      <tr><td class="file-ref">dropdown-menu.tsx</td><td>176</td><td>DropdownMenuContent</td><td><code>--z-popover</code></td></tr>
+      <tr><td class="file-ref">select.tsx</td><td>167</td><td>SelectContent</td><td><code>--z-popover</code></td></tr>
+    </tbody>
+  </table>
+  <p>
+    All six currently live at <code>z-50</code>, so their relative ordering today depends on
+    portal append order — not declared intent. A Toast added later (which the Phase 1 report
+    anticipates) would land at the same level unless tokens are introduced.
+  </p>
+
+  <h3 id="z-scale">The proposed scale — 5 tokens vs 6 with <code>--z-sticky</code></h3>
+  <p>
+    Phase 1 proposed 5 tokens (overlay/popover/modal/toast/max). The Salt Design System (JP
+    Morgan) uses 8 tiers and explicitly carves out a layer for "appHeader" between the page
+    base and the modal layer. The empirical case for adding the sixth (<code>--z-sticky</code>)
+    is the fixed-navbar consumer — the #1 reported shadcn pain point. Demo below.
+  </p>
+
+  <div class="card">
+    <h4>Proposed Nexus scale (6 tokens)</h4>
+    <div class="z-viz" aria-hidden="true">
+      <div class="z-layer z-base">     <span class="z-name">base</span>     <span class="z-value">0</span>     </div>
+      <div class="z-layer z-overlay">  <span class="z-name">--z-overlay</span>  <span class="z-value">10</span>  </div>
+      <div class="z-layer z-popover">  <span class="z-name">--z-popover</span>  <span class="z-value">20</span>  </div>
+      <div class="z-layer z-sticky">   <span class="z-name">--z-sticky</span>   <span class="z-value">30  · proposed</span></div>
+      <div class="z-layer z-modal">    <span class="z-name">--z-modal</span>    <span class="z-value">50</span>    </div>
+      <div class="z-layer z-toast">    <span class="z-name">--z-toast</span>    <span class="z-value">100</span>   </div>
+      <div class="z-layer z-max">      <span class="z-name">--z-max</span>      <span class="z-value">9999</span>  </div>
+    </div>
+    <h4>Layer semantics</h4>
+    <table>
+      <thead><tr><th>Token</th><th>Value</th><th>Used for</th><th>Component</th></tr></thead>
+      <tbody>
+        <tr><td><code>--z-overlay</code></td><td>10</td><td>Backdrop layers below popovers — e.g., scrim under a side panel</td><td>(reserved)</td></tr>
+        <tr><td><code>--z-popover</code></td><td>20</td><td>Floating menus, tooltips, dropdowns</td><td>DropdownMenu, Select, Tooltip</td></tr>
+        <tr><td><code>--z-sticky</code></td><td>30</td><td>Consumer-owned fixed/sticky headers and table headers</td><td>None in Nexus — consumer use</td></tr>
+        <tr><td><code>--z-modal</code></td><td>50</td><td>Modal dialogs (overlay + content)</td><td>Dialog</td></tr>
+        <tr><td><code>--z-toast</code></td><td>100</td><td>Toast / Sonner notifications</td><td>(not yet shipped)</td></tr>
+        <tr><td><code>--z-max</code></td><td>9999</td><td>Reserved: AI agent overlays, accessibility tools, debug</td><td>Consumer-only; no Nexus component uses it by default</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="z-sticky">Why <code>--z-sticky</code> matters — live demo</h3>
+  <p>
+    Consumer scenario: a SaaS app with a fixed top-nav opens a Nexus Dialog. Both want to be
+    "above" something — the nav above the page content, the dialog above everything else. Without
+    a sticky token, the consumer has no documented layer to put the nav at. They guess
+    <code>z-50</code> (matches Tailwind's default), and now their nav fights the Dialog.
+  </p>
+  <p>
+    The mini-apps below render the same UI twice — left without <code>--z-sticky</code> (nav at
+    50, modal at 50, ordering is random); right with the proposed scale (nav at 30, modal at 50,
+    correct).
+  </p>
+
+  <div class="mini-app-wrap">
+    <div>
+      <div class="mini-app" style="--demo-z-sticky: 50; --demo-z-modal: 50;">
+        <div class="mini-app-header">Without --z-sticky · nav and modal both at z=50</div>
+        <div class="mini-app-frame">
+          <div class="mini-app-nav">
+            <span>Consumer App · Sticky Nav</span>
+            <span class="z-tag">z:50</span>
+          </div>
+          <div class="mini-app-content">
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+          </div>
+          <div class="mini-modal-overlay">
+            <div class="mini-modal">
+              <strong>Dialog content</strong> <span class="z-tag">z:50</span>
+              <p style="margin-top:8px;">The sticky nav is poking through the modal overlay — ordering depends on which appended last.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-app-label">⚠ Collision: nav can appear above the modal scrim</div>
+    </div>
+
+    <div>
+      <div class="mini-app" style="--demo-z-sticky: 30; --demo-z-modal: 50;">
+        <div class="mini-app-header">With --z-sticky (=30) · nav < modal (=50)</div>
+        <div class="mini-app-frame">
+          <div class="mini-app-nav">
+            <span>Consumer App · Sticky Nav</span>
+            <span class="z-tag">z:30</span>
+          </div>
+          <div class="mini-app-content">
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+            <p>Scroll content here.</p>
+          </div>
+          <div class="mini-modal-overlay">
+            <div class="mini-modal">
+              <strong>Dialog content</strong> <span class="z-tag">z:50</span>
+              <p style="margin-top:8px;">Modal covers everything including the sticky nav — correct.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-app-label">✓ Correct: nav at z=30, modal at z=50</div>
+    </div>
+  </div>
+
+  <div class="callout callout-pick">
+    <strong>Recommendation — Ship 6 tokens (5 + <code>--z-sticky</code>)</strong>
+    The cost is one extra CSS variable; the benefit is a documented layer that consumers can
+    target without colliding with Nexus's modal. Salt's design system arrived at the same
+    conclusion empirically (their "appHeader" layer sits between page base and modal).
+  </div>
+
+  <h3 id="z-migration">Migration plan</h3>
+  <h4>Step 1 — add tokens to <code>nexus.css</code></h4>
+  <pre>/* In the @theme block, alongside --shadow-* and --radius-* */
+--z-overlay: 10;
+--z-popover: 20;
+--z-sticky:  30;
+--z-modal:   50;
+--z-toast:  100;
+--z-max:   9999;</pre>
+
+  <h4>Step 2 — extend Tailwind's z scale to expose the tokens</h4>
+  <p>
+    Tailwind v4's <code>@theme</code> block automatically generates <code>z-{name}</code>
+    utilities, so the tokens above produce <code>nx:z-overlay</code>, <code>nx:z-popover</code>,
+    etc. No additional config needed.
+  </p>
+
+  <h4>Step 3 — replace hardcoded <code>nx:z-50</code> in 6 places</h4>
+  <table class="migration-table">
+    <thead><tr><th>File · Line</th><th>Before</th><th>After</th></tr></thead>
+    <tbody>
+      <tr><td class="file-ref">tooltip.tsx:77</td><td><code>nx:z-50</code></td><td><code>nx:z-popover</code></td></tr>
+      <tr><td class="file-ref">dialog.tsx:74</td><td><code>nx:z-50</code></td><td><code>nx:z-modal</code></td></tr>
+      <tr><td class="file-ref">dialog.tsx:126</td><td><code>nx:z-50</code></td><td><code>nx:z-modal</code></td></tr>
+      <tr><td class="file-ref">dropdown-menu.tsx:126</td><td><code>nx:z-50</code></td><td><code>nx:z-popover</code></td></tr>
+      <tr><td class="file-ref">dropdown-menu.tsx:176</td><td><code>nx:z-50</code></td><td><code>nx:z-popover</code></td></tr>
+      <tr><td class="file-ref">select.tsx:167</td><td><code>nx:z-50</code></td><td><code>nx:z-popover</code></td></tr>
+    </tbody>
+  </table>
+
+  <h4>Step 4 — document the layering model in <code>components.md</code></h4>
+  <p>
+    Add a "Layering model" subsection that (a) lists the six layers and their use, (b) notes that
+    Radix Portal handles single-overlay ordering automatically, (c) shows the override snippet for
+    consumers with a fixed nav.
+  </p>
+
+  <h3 id="z-decision">Recommendation summary</h3>
+  <div class="decision-grid">
+    <div class="decision-col">
+      <h5>5 tokens (Phase 1 proposal) <span class="verdict verdict-watch">acceptable</span></h5>
+      <p class="desc">overlay/popover/modal/toast/max. No sticky layer.</p>
+      <h6>Pros</h6>
+      <ul class="pros"><li>Minimal scale</li><li>Easier to teach</li></ul>
+      <h6>Cons</h6>
+      <ul class="cons"><li>Consumer fixed-nav has no documented layer</li><li>Forces consumers to pick z between popover and modal themselves</li></ul>
+    </div>
+
+    <div class="decision-col picked">
+      <h5>6 tokens (with --z-sticky) <span class="verdict verdict-pick">pick</span></h5>
+      <p class="desc">overlay/popover/sticky/modal/toast/max. Sticky reserved for consumer use.</p>
+      <h6>Pros</h6>
+      <ul class="pros"><li>Closes the #1 shadcn pain point</li><li>Matches Salt's empirically-derived scale</li><li>Costs one variable</li></ul>
+      <h6>Cons</h6>
+      <ul class="cons"><li>Slightly larger scale to teach</li></ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────── -->
+<!-- SECTION 3: TABS SHADOW STACK                   -->
+<!-- ────────────────────────────────────────────── -->
+<section id="tabs-stack">
+  <h2>3 — Tabs Shadow-Stack Issue</h2>
+  <p class="lede">
+    <code>TabsTrigger</code> applies <code>nx:data-[state=active]:shadow-sm</code> for elevation
+    and <code>nx:focus-visible:shadow-focus-default</code> for keyboard focus. When a tab is both
+    active <em>and</em> focused, both shadows stack. This violates the components.md rule
+    "Focusable controls do not use shadow elevation" — a pre-existing inconsistency, not one
+    introduced by the Phase 2 work. <strong>Adopting Option B in §1 dissolves the correctness
+    side of this issue automatically</strong> (outline doesn't compose with box-shadow). The
+    bottom-border recommendation below is now P1 aesthetic polish, not a P0 correctness fix.
+  </p>
+
+  <h3 id="tabs-problem">The problem visualised</h3>
+  <p>
+    Each tab below is rendered in a specific state. <em>Focus all</em> shows what the user sees
+    when keyboard-focused.
+  </p>
+
+  <div class="controls">
+    <label class="toggle">
+      <input type="checkbox" id="toggle-tabs-focused" />
+      Force focused state
+    </label>
+  </div>
+
+  <div class="tab-state-row">
+    <div class="tab-state-item">
+      <span class="tab-state-label">Inactive</span>
+      <div class="tabs-demo">
+        <button class="tabs-demo-trigger" data-state="inactive">Account</button>
+        <button class="tabs-demo-trigger" data-state="inactive">Billing</button>
+      </div>
+    </div>
+
+    <div class="tab-state-item">
+      <span class="tab-state-label">Active (shadow-sm)</span>
+      <div class="tabs-demo">
+        <button class="tabs-demo-trigger" data-state="active">Account</button>
+        <button class="tabs-demo-trigger" data-state="inactive">Billing</button>
+      </div>
+    </div>
+
+    <div class="tab-state-item">
+      <span class="tab-state-label">Inactive + focused (ring only)</span>
+      <div class="tabs-demo">
+        <button class="tabs-demo-trigger demo-focused" data-state="inactive">Account</button>
+        <button class="tabs-demo-trigger" data-state="inactive">Billing</button>
+      </div>
+    </div>
+
+    <div class="tab-state-item">
+      <span class="tab-state-label">Active + focused (sm + ring stacked)</span>
+      <div class="tabs-demo">
+        <button class="tabs-demo-trigger demo-focused" data-state="active">Account</button>
+        <button class="tabs-demo-trigger" data-state="inactive">Billing</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>What's stacked in the rightmost case</strong>
+    Two box-shadows fire simultaneously: <code>shadow-sm</code> (1px y-offset drop shadow) and
+    <code>shadow-focus-default</code> (2px spread ring). The visual result is a faint drop shadow
+    bleeding out from under the focus ring. It works, but it violates the explicit components.md
+    rule and looks slightly off-spec.
+  </div>
+
+  <h3 id="tabs-options">Three resolution options</h3>
+
+  <div class="decision-grid">
+    <div class="decision-col">
+      <h5>1 · Strip <code>shadow-sm</code> from active state <span class="verdict verdict-watch">candidate</span></h5>
+      <p class="desc">Active tab uses border / background change only, no elevation.</p>
+      <h6>Pros</h6>
+      <ul class="pros"><li>Aligns with the components.md rule literally</li><li>No shadow stacking ever</li></ul>
+      <h6>Cons</h6>
+      <ul class="cons"><li>Loses the "lifted active tab" affordance shadcn ships with</li><li>Active state becomes less distinct visually</li></ul>
+    </div>
+
+    <div class="decision-col picked">
+      <h5>2 · Replace shadow-sm with a bottom-border indicator <span class="verdict verdict-pick">pick</span></h5>
+      <p class="desc">Active tab gets a 2px bottom border in primary colour; no shadow.</p>
+      <h6>Pros</h6>
+      <ul class="pros"><li>Strong active affordance without shadow stack</li><li>Matches Linear, Stripe, Notion tab patterns</li><li>Survives WHCM (border is preserved)</li></ul>
+      <h6>Cons</h6>
+      <ul class="cons"><li>Slightly changes Nexus's tab aesthetic</li><li>Bottom border interacts with the pill background — needs visual tuning</li></ul>
+    </div>
+
+    <div class="decision-col">
+      <h5>3 · Accept the stack, update the rule <span class="verdict verdict-skip">skip</span></h5>
+      <p class="desc">Document Tabs as a deliberate exception to the elevation rule.</p>
+      <h6>Pros</h6>
+      <ul class="pros"><li>Zero code change</li></ul>
+      <h6>Cons</h6>
+      <ul class="cons"><li>Codifies the inconsistency into the rule</li><li>Future controls will adopt the exception pattern</li><li>Doesn't resolve the visual issue</li></ul>
+    </div>
+  </div>
+
+  <h3 id="tabs-decision">Recommendation</h3>
+  <div class="callout callout-pick">
+    <strong>Pick option 2 — bottom-border active indicator (now P1, not P0)</strong>
+    Strip <code>nx:data-[state=active]:shadow-sm</code> from <code>tabs.tsx:89</code>. Replace
+    with <code>nx:data-[state=active]:border-b-2 nx:data-[state=active]:border-primary-background</code>
+    or equivalent. Makes Tabs follow the "no elevation on focusable controls" rule honestly.
+  </div>
+
+  <div class="callout callout-note">
+    <strong>Important: this dropped from P0 to P1 once B (outline) is selected for §1</strong>
+    The shadow-stacking <em>correctness</em> issue dissolves the moment outline-based focus
+    lands — outline doesn't compose with box-shadow, so active-tab elevation and focus indicator
+    no longer interact. The remaining motivation is purely aesthetic (the rule still says "no
+    elevation on focusable controls"). Worth doing, but doesn't need to ship in the same PR as §1
+    anymore. Can land as a separate small PR after §1 stabilises.
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────── -->
+<!-- SECTION 4: MENU :FOCUS EXCEPTION              -->
+<!-- ────────────────────────────────────────────── -->
+<section id="menu-focus">
+  <h2>4 — Menu Item <code>:focus</code> Pattern</h2>
+  <p class="lede">
+    <code>DropdownMenu</code> and <code>Select</code> items use <code>nx:focus:bg-background-hover</code>
+    — not <code>focus-visible:</code> and not <code>shadow-focus-default</code>. This isn't a bug;
+    it's the correct pattern for Radix's roving-focus menu items. It just isn't documented as such.
+    A new Nexus component author looking at Button and Dropdown side-by-side will see two
+    different focus patterns and not know which to follow.
+  </p>
+
+  <h3 id="menu-problem">Why menus use <code>:focus</code>, not <code>:focus-visible</code></h3>
+  <p>
+    Radix's menu primitives implement <strong>roving focus</strong>: only one item in the menu
+    has DOM focus at any time, and arrow keys move focus between items. When the user opens a
+    dropdown with a mouse hover, Radix moves DOM focus to the hovered item — by design, because
+    the next keypress (arrow keys) should pick up from where the mouse left off.
+  </p>
+  <p>
+    This means <code>:focus</code> fires on the item the user is mousing over, not just on
+    keyboard-targeted items. A <code>focus-visible</code>-only ring would be wrong: mouse users
+    would see no indicator while moving through the menu. A background-tint <code>:focus</code>
+    treatment shows the "current item" regardless of input modality — which is exactly the menu
+    UX users expect.
+  </p>
+
+  <h3 id="menu-demo">Live demo</h3>
+  <p>
+    Click a menu item or use Tab + Arrow keys to navigate. Notice that the active item is
+    indicated by a <em>background tint</em>, not by a focus ring. This is the correct menu pattern.
+  </p>
+
+  <div class="card" style="background: var(--muted); display: flex; gap: var(--s-6); align-items: center;">
+    <div class="menu-host">
+      <div class="menu-demo">
+        <div class="menu-demo-item" tabindex="0">
+          ↗
+          <span>New issue</span>
+          <span class="kbd">C</span>
+        </div>
+        <div class="menu-demo-item" tabindex="0">
+          ✎
+          <span>Edit</span>
+          <span class="kbd">E</span>
+        </div>
+        <div class="menu-demo-item" tabindex="0">
+          ⌖
+          <span>Move to project</span>
+          <span class="kbd">M</span>
+        </div>
+        <div class="menu-demo-item" tabindex="0">
+          ↶
+          <span>Duplicate</span>
+          <span class="kbd">D</span>
+        </div>
+        <div class="menu-demo-item" tabindex="0" style="color: var(--error-bg);">
+          ✕
+          <span>Delete</span>
+          <span class="kbd">⌫</span>
+        </div>
+      </div>
+    </div>
+    <div style="font-size: 12px; color: var(--fg-muted); max-width: 260px;">
+      Tab into the menu, then use ↑/↓ to navigate. The item under the cursor or under keyboard
+      focus gets <code>--color-background-hover</code> as its background. No ring. No box-shadow.
+      <em>This is intentional and correct.</em>
+    </div>
+  </div>
+
+  <h3 id="menu-map">Surface exception map (proposed addition to components.md)</h3>
+  <p>
+    Phase 1 Rec #3 proposed a surface exception table. Add the menu pattern as a documented row:
+  </p>
+
+  <table>
+    <thead><tr><th>Surface type</th><th>Focus pattern</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Interactive controls<br><span class="note-inline">Button, Input, Select trigger, Switch, Checkbox, Tabs trigger</span></td>
+        <td><code>nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2</code></td>
+        <td>Keyboard-only ring; native outline survives WHCM</td>
+      </tr>
+      <tr>
+        <td>Error-state inputs</td>
+        <td>Same as above but <code>outline-focus-error</code></td>
+        <td>Red outline signals invalid input</td>
+      </tr>
+      <tr>
+        <td><strong>Menu items</strong><br><span class="note-inline">DropdownMenuItem, SelectItem, ContextMenuItem, navigation list items</span></td>
+        <td><code>nx:focus:bg-background-hover</code> (no ring)</td>
+        <td>Radix roving focus fires <code>:focus</code> on mouse-hover too; ring would be wrong UX</td>
+      </tr>
+      <tr>
+        <td>Destructive menu items</td>
+        <td><code>nx:focus:bg-error-background nx:focus:text-error-foreground</code></td>
+        <td>Same roving-focus pattern, red tint signals destructive action</td>
+      </tr>
+      <tr>
+        <td>Non-focusable elevated surfaces<br><span class="note-inline">Card, Dialog body, Popover wrapper</span></td>
+        <td>No focus treatment</td>
+        <td>Focus rings appear on focusable children (DialogClose, controls inside Card)</td>
+      </tr>
+      <tr>
+        <td>Canvas / editor surfaces</td>
+        <td>Custom cursor / selection model, no ring</td>
+        <td>Direct-manipulation model; ring would be redundant</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="menu-decision">Recommendation</h3>
+  <div class="callout callout-pick">
+    <strong>No code change — documentation only</strong>
+    The current menu pattern is correct. The fix is to document it as a deliberate exception in
+    the surface exception map (above), with the rationale (Radix roving focus). This prevents a
+    future author from "fixing" the inconsistency by adding a ring to menu items.
+  </div>
+
+  <p>
+    File touched: <code class="file-ref">.claude/rules/components.md</code> — add the surface
+    exception map under "Focus States."
+  </p>
+</section>
+
+
+<!-- ────────────────────────────────────────────── -->
+<!-- SECTION 5: BREAKPOINTS & RESPONSIVE STRATEGY  -->
+<!-- ────────────────────────────────────────────── -->
+<section id="breakpoints">
+  <h2>5 — Breakpoints &amp; Responsive Strategy</h2>
+  <p class="lede">
+    Nexus inherits Tailwind v4's 5 default breakpoints with zero customisation and zero
+    documented opinion. The cross-check found Dialog already uses <code>nx:sm:</code> in
+    3 places, contradicting any "desktop-primary" stance. Meanwhile 2026 industry consensus
+    has shifted decisively: container queries are now Baseline (Chrome 105+, Safari 16+,
+    Firefox 110+ → ~95% coverage) and have largely replaced viewport media queries for
+    component-internal responsive behaviour.
+    <strong>Recommendation: Option D — Token + Documentation + Container Queries default.</strong>
+    Promote 5 breakpoint CSS variables to the semantic namespace, document Narrow/Standard/Wide
+    display classes with ≥1024px as the primary target, adopt <code>@container</code> as the
+    canonical pattern for component-internal responsive behaviour, and migrate Dialog's three
+    <code>nx:sm:</code> sites to container queries.
+  </p>
+
+  <h3 id="bp-problem">The problem — codebase audit</h3>
+  <p>
+    Verified state (May 2026, this branch):
+  </p>
+  <ul>
+    <li>Zero breakpoint tokens — <code>variables.css</code> and <code>nexus.css</code> contain no <code>--breakpoint-*</code> or <code>screens:</code> overrides</li>
+    <li>Zero <code>@container</code> usage anywhere in <code>packages/react/src/</code></li>
+    <li>Zero <code>dvh / svh / lvh</code> dynamic viewport units</li>
+    <li>Zero <code>clamp()</code> fluid scaling</li>
+    <li>Three <code>nx:sm:</code> sites in <code>dialog.tsx</code> (lines 135, 187, 220) — shadcn-inherited mobile-first defaults</li>
+    <li>No <code>.claude/rules/responsive.md</code> exists; <code>figma.md:329</code> documents responsive only as "Tailwind responsive prefixes" with no Nexus opinion</li>
+  </ul>
+  <p>
+    The implication: a new contributor (human or LLM) has no Nexus opinion to follow. They
+    default to Tailwind defaults, default to viewport media queries, and default to mobile-first
+    — none of which match how a desktop-tool design system actually performs. The gap is almost
+    entirely documentation, with one piece of contradictory code (Dialog).
+  </p>
+
+  <h3 id="bp-benchmarks">Benchmark survey — 10 systems</h3>
+  <p>
+    Lined up by what they actually ship (verified May 2026):
+  </p>
+  <table class="bp-matrix">
+    <thead>
+      <tr>
+        <th>System</th>
+        <th>Tier</th>
+        <th>BP tokens?</th>
+        <th>Naming</th>
+        <th>Container queries?</th>
+        <th>Primary target / posture</th>
+        <th>Unique teach</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Linear</strong></td>
+        <td>A</td>
+        <td>Inferred only (~768, ~480)</td>
+        <td>—</td>
+        <td>Custom ResizeObserver "ResponsiveSlot" (not native @container)</td>
+        <td>Desktop-primary; mobile = graceful degradation</td>
+        <td>Resize-observer-based "container-like" pattern predates @container</td>
+      </tr>
+      <tr>
+        <td><strong>Vercel / Geist</strong></td>
+        <td>A</td>
+        <td>Not published</td>
+        <td>xs / sm / md / lg</td>
+        <td>Not documented</td>
+        <td>Mobile-capable (Dashboard runs on mobile)</td>
+        <td>Documents responsive via a Grid component, not standalone tokens</td>
+      </tr>
+      <tr>
+        <td><strong>Stripe</strong></td>
+        <td>A</td>
+        <td>Not published</td>
+        <td>—</td>
+        <td>Stripe Elements is container-agnostic (precursor to @container)</td>
+        <td>Mobile-capable; Elements is width-flexible</td>
+        <td>"Container-agnostic component" pattern dating to pre-@container era</td>
+      </tr>
+      <tr>
+        <td><strong>Notion</strong></td>
+        <td>A</td>
+        <td>Not published</td>
+        <td>—</td>
+        <td>Not used</td>
+        <td>Web = graceful degradation; serious mobile = native app</td>
+        <td>Page-level responsive only; component-level is consumer's problem</td>
+      </tr>
+      <tr>
+        <td><strong>Raycast</strong></td>
+        <td>A</td>
+        <td>N/A (macOS native)</td>
+        <td>—</td>
+        <td>N/A (SwiftUI ZStack)</td>
+        <td>Desktop-only by definition</td>
+        <td>Fixed-width palette = container-constrained design</td>
+      </tr>
+      <tr>
+        <td><strong>Figma</strong></td>
+        <td>A</td>
+        <td>Not published</td>
+        <td>—</td>
+        <td>Not used</td>
+        <td>Desktop-only; mobile redirects to native app</td>
+        <td>Explicit "desktop-only" stance is itself a contract</td>
+      </tr>
+      <tr>
+        <td><strong>shadcn/ui</strong></td>
+        <td>B</td>
+        <td>No (Tailwind defaults)</td>
+        <td>sm/md/lg/xl/2xl</td>
+        <td>Available via Tailwind v4 <code>--breakpoint-*</code></td>
+        <td>Silent (consumer DIY)</td>
+        <td>Tailwind v4 <code>--breakpoint-*</code> theme vars are the right primitive</td>
+      </tr>
+      <tr>
+        <td><strong>Radix Themes</strong></td>
+        <td>B</td>
+        <td>Yes (6 BP)</td>
+        <td>Device-based (initial/xs/sm/md/lg/xl)</td>
+        <td>Not documented</td>
+        <td>Mobile-first via Responsive prop API</td>
+        <td>Responsive prop syntax: <code>size={{ initial: "3", md: "5", xl: "7" }}</code></td>
+      </tr>
+      <tr>
+        <td><strong>Adobe Spectrum 2</strong></td>
+        <td>B</td>
+        <td>Yes (S/M/L/XL)</td>
+        <td>T-shirt</td>
+        <td>Not documented (uses viewport)</td>
+        <td>Mobile-first; L = 1024px+</td>
+        <td>iPad as first-class target (Adobe Creative tools)</td>
+      </tr>
+      <tr>
+        <td><strong>Material 3 (Oct 2025+)</strong></td>
+        <td>B</td>
+        <td>Yes (5 size classes)</td>
+        <td>Semantic device-class (Compact / Medium / Expanded / Large / Extra-Large)</td>
+        <td>Yes — at component level, separate from window size classes</td>
+        <td>Cross-platform (Android, iOS, web)</td>
+        <td>Window size class = semantic contract; <strong>Large 1200-1600dp / XL ≥1600dp added in Oct 2025</strong> for desktop & ultrawide</td>
+      </tr>
+      <tr>
+        <td><strong>IBM Carbon</strong></td>
+        <td>B</td>
+        <td>Yes (sm/md/lg/xlg/max)</td>
+        <td>T-shirt + "max"</td>
+        <td>Not documented</td>
+        <td>Enterprise web; 16-column grid</td>
+        <td>"max" tier explicitly for ≥1584px (ultrawide)</td>
+      </tr>
+      <tr>
+        <td><strong>Shopify Polaris</strong></td>
+        <td>B</td>
+        <td>Yes (CSS vars: <code>--p-breakpoints-{xs/sm/md/lg/xl}</code>)</td>
+        <td>T-shirt</td>
+        <td>Not documented</td>
+        <td>Mobile-first (Shopify admin on phones)</td>
+        <td>Sass directional helpers: <code>-up</code> / <code>-down</code> / <code>-only</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mantine</strong></td>
+        <td>B</td>
+        <td>Yes (em units)</td>
+        <td>T-shirt (xs/sm/md/lg/xl)</td>
+        <td><strong>Yes — first-class</strong></td>
+        <td>Mobile-first via Responsive prop API + hooks</td>
+        <td>Multiple responsive APIs (style props, hiddenFrom/visibleFrom, useMediaQuery, useMatches)</td>
+      </tr>
+      <tr>
+        <td><strong>Atlassian DS</strong><br><span class="note-inline">responsive primitive only</span></td>
+        <td>B</td>
+        <td>Yes — <code>UNSAFE_</code> prefixed</td>
+        <td>T-shirt (xxs/xs/sm/md/lg/xl)</td>
+        <td>Not shipped in the primitive</td>
+        <td>Not stated (primitive is neutral)</td>
+        <td><strong>rem units (scales with user font-size)</strong>; <code>media.above/only/below</code> API surface; ships <code>&lt;Show&gt;</code>/<code>&lt;Hide&gt;</code> declarative primitives + <code>useMediaQuery</code> hook; <code>md</code> boundary lands at 64rem (1024px) — same Standard inflection Nexus arrived at independently</td>
+      </tr>
+      <tr class="nexus-row">
+        <td><strong>Nexus DS (current)</strong></td>
+        <td>—</td>
+        <td><strong>No</strong></td>
+        <td>Tailwind defaults inherited (sm/md/lg/xl/2xl)</td>
+        <td><strong>Zero usage</strong></td>
+        <td>None documented (silent)</td>
+        <td>(audit row — gaps to address below)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-pick">
+    <strong>Three things worth borrowing from Atlassian's responsive primitive</strong>
+    Atlassian's grid system is in beta and being pivoted away from, but their
+    <em>breakpoint primitive</em> (the <code>@atlaskit/primitives</code> responsive layer) is
+    independently strong and stable in shape. Three lessons informed updates below:
+    <ol style="margin: 6px 0 0 16px; padding: 0; font-size: 13px;">
+      <li><strong>rem-based breakpoints, not px</strong> — when a user bumps their browser
+        font-size from 16px → 20px, rem-based breakpoints scale proportionally; px-based
+        breakpoints don't. This is the single largest accessibility win in the breakpoint
+        layer, and Polaris (em) + Mantine (em) both ship it. Tailwind defaults to px. Nexus
+        should follow Atlassian's lead — see Decision A update below.</li>
+      <li><strong><code>above</code> / <code>only</code> / <code>below</code> on one media object</strong>
+        — Atlassian exposes all three media-query intents through a single <code>media</code>
+        object (<code>media.above.md</code>, <code>media.only.sm</code>, <code>media.below.lg</code>).
+        Cleanest API surface for media queries observed. Worth mirroring if Nexus ever ships
+        a JS-side breakpoint helper.</li>
+      <li><strong>Declarative <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> primitives</strong>
+        — instead of CSS-in-JS or className gymnastics, Atlassian wraps responsive visibility
+        in two small React components. Tiny (each ~30 lines), composable, and remove the most
+        common breakpoint friction in JSX. New sub-decision E below proposes Nexus ship the
+        same pair.</li>
+    </ol>
+  </div>
+
+  <h3 id="bp-headlines">Industry consensus, May 2026</h3>
+  <p>
+    Six load-bearing shifts since the Phase 1 audit was written:
+  </p>
+  <ul>
+    <li><strong>Container queries are now Baseline</strong> — ~95% browser coverage. The 2026 default for component-internal responsive is <code>@container</code>, not viewport media queries.</li>
+    <li><strong>Viewport breakpoints are demoted to page-skeleton level only</strong> — nav, side panels, top-level shell. Components inside should adapt to their container.</li>
+    <li><strong>Dynamic viewport units (<code>svh / lvh / dvh</code>)</strong> have replaced raw <code>vh</code> for mobile-edge cases. Default: <code>svh</code> for sticky elements, <code>lvh</code> for modals, <code>dvh</code> only for full-screen hero containers (jitter risk on internal elements).</li>
+    <li><strong>Fluid scaling via <code>clamp()</code></strong> is the modern alternative to breakpoint ladders for typography and spacing — one declaration replaces 3+ media queries.</li>
+    <li><strong>Material 3 expanded window size classes (Oct 2025)</strong> — Large (1200–1600dp) and Extra-Large (≥1600dp) added to better target desktop and ultrawide. Total: 5 semantic device classes.</li>
+    <li><strong>Content breakpoints &gt; device breakpoints</strong> — 45–75 character reading width (≈600–700px) is the load-bearing constraint, not "what's iPhone width."</li>
+  </ul>
+  <p>
+    For Nexus, this means: viewport breakpoint tokens are still needed (consumers reach for
+    <code>nx:lg:</code> for top-level shell), but the answer to "how do my Nexus components
+    adapt to width" should be <code>@container</code>, not <code>nx:sm:</code>.
+  </p>
+
+  <h3 id="bp-decisions">The four decisions</h3>
+  <p>
+    Breakpoint strategy isn't one decision — it's four interleaved. Each addressed below
+    with its own recommendation. The end of the section ties them into a single migration plan.
+  </p>
+
+  <!-- DECISION A -->
+  <div class="sub-decision">
+    <h4>A · Breakpoint token shape <span class="verdict verdict-pick">CSS variables in @theme</span></h4>
+    <p class="sub-q">Should Nexus ship breakpoint tokens, or rely on Tailwind defaults?</p>
+
+    <div class="decision-grid">
+      <div class="decision-col">
+        <h5>A1 · Status quo <span class="verdict verdict-skip">skip</span></h5>
+        <p class="desc">Inherit Tailwind's <code>sm/md/lg/xl/2xl</code> defaults. No Nexus override.</p>
+        <h6>Pros</h6>
+        <ul class="pros"><li>Zero work</li><li>Tailwind v4 idiomatic</li></ul>
+        <h6>Cons</h6>
+        <ul class="cons"><li>Consumers can't override without Tailwind config</li><li>No CSS-only consumers (RN, Svelte, vanilla) can adapt</li><li>Misses 2026 trend toward CSS-variable tokens</li></ul>
+      </div>
+
+      <div class="decision-col picked">
+        <h5>A2 · CSS variables in <code>@theme</code> · <strong>rem-based</strong> <span class="verdict verdict-pick">pick</span></h5>
+        <p class="desc">Add <code>--breakpoint-sm/md/lg/xl/2xl</code> to <code>nexus.css</code> <code>@theme</code> in <strong>rem</strong> units. Tailwind v4 auto-discovers them and generates responsive variants. Values scale with user's browser font-size.</p>
+        <h6>Pros</h6>
+        <ul class="pros">
+          <li>Aligns with Tailwind v4's native pattern (auto-discovers <code>--breakpoint-*</code> in <code>@theme</code>)</li>
+          <li>rem-based values scale with user font-size (matches Atlassian, Polaris, Mantine — all em/rem-based)</li>
+          <li>Tailwind's defaults are px; overriding to rem is the accessibility upgrade</li>
+          <li><strong>Build-time</strong> consumer override via the consumer's own <code>@theme</code> block — no Tailwind config file needed</li>
+          <li>Values exposed as CSS variables for non-Tailwind contexts (custom <code>@media</code>, React Native, vanilla CSS)</li>
+          <li>One-block change to <code>nexus.css</code></li>
+        </ul>
+        <h6>Cons</h6>
+        <ul class="cons">
+          <li>rem-based breakpoints fire at different px widths for users with non-default browser font-size — usually a feature, occasionally surprising for designers</li>
+        </ul>
+        <h6>⚠ What this is NOT</h6>
+        <p style="font-size: 12px; color: var(--fg-muted); margin: 4px 0 0;">
+          A consumer setting <code>:root { --breakpoint-lg: 70rem }</code> at runtime does <strong>not</strong> retune Tailwind's generated <code>nx:lg:</code> media queries. <code>@media</code> doesn't accept <code>var()</code> in any current browser — Tailwind bakes the resolved value at build time. The override path is the consumer's <code>@theme</code> block (build-time), not runtime CSS variables. Same constraint applies to container queries (<code>--container-*</code>).
+        </p>
+      </div>
+
+      <div class="decision-col">
+        <h5>A3 · Numeric (Radix-style) <span class="verdict verdict-skip">skip</span></h5>
+        <p class="desc">Replace t-shirt names with numeric (1/2/3/4/5).</p>
+        <h6>Pros</h6>
+        <ul class="pros"><li>No device-class implication baked in</li></ul>
+        <h6>Cons</h6>
+        <ul class="cons"><li>Breaks Tailwind familiarity</li><li>Less actionable for consumers</li><li>Numeric names lose semantic meaning</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECISION B -->
+  <div class="sub-decision">
+    <h4>B · Semantic display classes + primary target <span class="verdict verdict-pick">Narrow / Standard / Wide</span></h4>
+    <p class="sub-q">Should Nexus document semantic intent on top of the breakpoint scale, and state a primary target?</p>
+
+    <p>The five Tailwind breakpoints are dimensions without meaning. Material 3 (Compact/Medium/Expanded/Large/XL), Spectrum (S/M/L/XL with iPad target), Linear/Figma/Raycast (all desktop-primary) all attach semantic meaning to their breakpoint range. Nexus should do the same — adapted for its desktop-tool positioning.</p>
+
+    <div class="bp-scale">
+      <div class="bp-scale-head">
+        <div>Tailwind class</div>
+        <div>Range</div>
+        <div>px</div>
+        <div>Nexus display class</div>
+      </div>
+      <div class="bp-row">
+        <div class="bp-name">nx:sm:</div>
+        <div class="bp-bar-cell"><div class="bp-bar" style="width:30%;"></div></div>
+        <div class="bp-px">≥ 640</div>
+        <div><span class="bp-class-badge">Narrow</span> compact mobile (graceful)</div>
+      </div>
+      <div class="bp-row">
+        <div class="bp-name">nx:md:</div>
+        <div class="bp-bar-cell"><div class="bp-bar" style="width:40%;"></div></div>
+        <div class="bp-px">≥ 768</div>
+        <div><span class="bp-class-badge">Narrow</span> tablet portrait (graceful)</div>
+      </div>
+      <div class="bp-row">
+        <div class="bp-name">nx:lg:</div>
+        <div class="bp-bar-cell"><div class="bp-bar" style="width:60%;"></div></div>
+        <div class="bp-px">≥ 1024</div>
+        <div><span class="bp-class-badge standard">Standard ★</span> desktop minimum · primary floor</div>
+      </div>
+      <div class="bp-row">
+        <div class="bp-name">nx:xl:</div>
+        <div class="bp-bar-cell"><div class="bp-bar" style="width:80%;"></div></div>
+        <div class="bp-px">≥ 1280</div>
+        <div><span class="bp-class-badge standard">Standard ★</span> desktop reference · design target</div>
+      </div>
+      <div class="bp-row">
+        <div class="bp-name">nx:2xl:</div>
+        <div class="bp-bar-cell"><div class="bp-bar" style="width:100%;"></div></div>
+        <div class="bp-px">≥ 1536</div>
+        <div><span class="bp-class-badge wide">Wide</span> wide desktop / ultrawide</div>
+      </div>
+    </div>
+
+    <p>
+      <strong>Primary target stance — for the Nexus reference brand</strong>: Nexus components
+      are designed for <strong>Standard (≥1024px)</strong>. Narrow is graceful degradation; Wide
+      gets extra breathing room when available. Use <code>nx:lg:</code> as the primary responsive
+      prefix in consumer code.
+    </p>
+
+    <p>
+      <strong>For consumer brands</strong>: this is a default, not a mandate. A consumer brand
+      building a mobile-first product can override by setting their own <code>@theme</code>
+      breakpoint values and treating a different tier (e.g., <code>nx:md:</code>) as their
+      primary target. The display-class labels (Narrow/Standard/Wide) are documentation, not
+      hard-coded behaviour — they describe Nexus's reference defaults, which consumer brands can
+      remap. No Nexus utility is named <code>nx:standard:</code> or similar; only the standard
+      Tailwind class names (<code>nx:sm:</code>, <code>nx:md:</code>, etc.) exist as code.
+    </p>
+
+    <p>
+      <strong>Why Narrow / Standard / Wide and not Material's Compact / Medium / Expanded</strong>:
+      MD3's labels assume mobile-first (Compact = phone portrait, 0–600dp). Nexus's reference
+      brand is desktop-tool primary — the same semantic spectrum but rotated 180°. Narrow /
+      Standard / Wide makes the desktop-first <em>default</em> load-bearing in the names without
+      forcing it on consumer brands.
+    </p>
+
+    <div class="callout callout-note">
+      <strong>Designer note — zoom and rem interaction</strong>
+      Because breakpoints are rem-based (Decision A2), they fire at the user's <em>zoom-adjusted</em>
+      threshold, not pixel-adjusted. A low-vision user at 200% browser zoom on a 1280px viewport
+      sees layouts triggering as if the viewport were ~640px (Narrow). This is the intended
+      accessibility behaviour — content stays at readable proportions when zoomed — but it can
+      surprise designers who test at 1280px expecting Standard. <strong>Test at multiple zoom
+      levels and font-size settings, not just default 100% at 16px root.</strong>
+    </div>
+  </div>
+
+  <!-- DECISION C -->
+  <div class="sub-decision">
+    <h4>C · Container queries — when to use, when to skip <span class="verdict verdict-pick">default for component-internal</span></h4>
+    <p class="sub-q">Should Nexus components use <code>@container</code> for internal responsive behaviour, or rely on viewport media queries?</p>
+
+    <p>
+      2026 default: <code>@container</code> for component-internal width adaptation; viewport
+      <code>nx:sm:</code>/<code>nx:md:</code> only at the page-skeleton level (top-level shell,
+      navigation, side panels). Mantine has it as a first-class concept; Tailwind v4 supports
+      it natively via the <code>@container</code> utility and <code>@sm:</code> / <code>@md:</code>
+      variant prefixes.
+    </p>
+
+    <table>
+      <thead><tr><th>Pattern</th><th>Use case</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Container query</strong> (<code>@container</code>)</td>
+          <td>Component renders differently based on its parent width — works at any viewport</td>
+          <td>A Card that's full-width in a hero, narrow in a sidebar — uses the same JSX</td>
+        </tr>
+        <tr>
+          <td><strong>Viewport media query</strong> (<code>nx:lg:</code>)</td>
+          <td>Page-shell decisions — navigation collapse, side panel hide, top-level grid</td>
+          <td>Hide the secondary sidebar below <code>nx:lg:</code></td>
+        </tr>
+        <tr>
+          <td><strong>Fluid scaling</strong> (<code>clamp()</code>)</td>
+          <td>Continuous adaptation of size — typography, padding</td>
+          <td><code>font-size: clamp(1rem, 0.9rem + 0.5vw, 1.5rem)</code></td>
+        </tr>
+        <tr>
+          <td><strong>Dynamic viewport units</strong> (<code>svh/lvh/dvh</code>)</td>
+          <td>Mobile browser-chrome accommodation</td>
+          <td>Full-screen modal: <code>min-height: 100dvh</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <strong>Key rule for Nexus contributors and LLM agents</strong>: if a component's responsive
+      behaviour depends on the <em>component's own width</em>, use <code>@container</code>. If it
+      depends on the <em>viewport's width</em> (shell-level decisions), use <code>nx:lg:</code>.
+      Most Nexus component-internal adaptation falls into the first bucket.
+    </p>
+  </div>
+
+  <!-- DECISION D -->
+  <div class="sub-decision">
+    <h4>D · Dialog's <code>nx:sm:</code> resolution <span class="verdict verdict-pick">keep + document as viewport-driven exception</span></h4>
+    <p class="sub-q">Three sites in <code>dialog.tsx</code> use <code>nx:sm:</code> mobile-first defaults. Keep, strip, or migrate?</p>
+
+    <div class="callout callout-warn">
+      <strong>Spike finding — May 2026</strong>
+      The naïve <code>nx:sm:</code> → <code>nx:@sm:</code> migration originally proposed in D3
+      <strong>does not work as written</strong>. Tailwind v4's container-query namespace
+      (<code>--container-*</code>) is separate from the viewport namespace
+      (<code>--breakpoint-*</code>), and the two scales have different default values.
+      <code>nx:@sm:</code> fires at container ≥ 24rem (384px), NOT at viewport ≥ 40rem (640px).
+      Walking through Dialog's actual widths:
+      <table style="margin-top: 8px; font-size: 12px;">
+        <thead><tr><th>Viewport</th><th>Dialog width</th><th>Original <code>nx:sm:</code></th><th>Naïve <code>nx:@sm:</code></th><th>Wanted</th></tr></thead>
+        <tbody>
+          <tr><td>320px</td><td>20rem (full-bleed)</td><td>no rounded ✓</td><td>no rounded (20&lt;24) ✓</td><td>no rounded</td></tr>
+          <tr><td>480px</td><td>30rem (full-bleed)</td><td>no rounded ✓</td><td><strong>rounded (30≥24) ✗</strong></td><td>no rounded</td></tr>
+          <tr><td>640px+</td><td>32rem (max-w-lg)</td><td>rounded ✓</td><td>rounded ✓</td><td>rounded</td></tr>
+        </tbody>
+      </table>
+      At viewports 384–640px the swap flips Dialog's rounded corners on prematurely. The two
+      scales are not interchangeable. <strong>Revised pick: D1 (keep + document as exception).</strong>
+    </div>
+
+    <div class="decision-grid">
+      <div class="decision-col picked">
+        <h5>D1 · Keep + document as viewport-driven exception <span class="verdict verdict-pick">pick (post-spike)</span></h5>
+        <p class="desc">Leave the three <code>nx:sm:</code> sites in <code>dialog.tsx</code> intact. Document Dialog in <code>responsive.md</code> as a deliberate exception to Decision C's <code>@container</code>-first stance.</p>
+        <h6>Pros</h6>
+        <ul class="pros">
+          <li>Honest about Dialog's actual UX trigger: positioning relative to the viewport, not Dialog's own width</li>
+          <li>Preserves the mobile-bottom-sheet behaviour at narrow viewports</li>
+          <li>Zero code change — the existing behaviour is already correct</li>
+          <li>Becomes a teaching moment for future components: "container queries are the default, but viewport-driven UX (Dialog, Sheet, FullScreenOverlay) is the documented exception"</li>
+        </ul>
+        <h6>Cons</h6>
+        <ul class="cons">
+          <li>Adds a carve-out to Decision C — slight cognitive load on contributors</li>
+          <li>Mitigated by explicit documentation in <code>responsive.md</code></li>
+        </ul>
+      </div>
+
+      <div class="decision-col">
+        <h5>D2 · Strip (consumer DIY) <span class="verdict verdict-skip">skip</span></h5>
+        <p class="desc">Remove the three <code>nx:sm:</code> sites; let consumers add responsive behaviour.</p>
+        <h6>Cons</h6>
+        <ul class="cons"><li>Dialog at &lt;640px viewport becomes ungainly without consumer fix</li><li>Loses the mobile-bottom-sheet behaviour users expect</li></ul>
+      </div>
+
+      <div class="decision-col">
+        <h5>D3 · Migrate to <code>@container</code> <span class="verdict verdict-skip">rejected after spike</span></h5>
+        <p class="desc">Originally proposed: replace <code>nx:sm:</code> (viewport) with <code>nx:@sm:</code> (container).</p>
+        <h6>Why rejected</h6>
+        <ul class="cons">
+          <li><strong>Tailwind's <code>@sm:</code> fires at container ≥ 24rem (384px), not viewport ≥ 40rem (640px)</strong> — different scales</li>
+          <li>At viewport 480px, Dialog's container width is ~30rem (full-bleed) — naïve swap triggers rounded corners during the full-bleed phase</li>
+          <li>Dialog's responsive behaviour is genuinely about <em>positioning relative to the viewport</em>, not Dialog's own width — viewport queries are the correct mechanism</li>
+          <li>Workarounds (arbitrary values, custom container sizes) add token surface without addressing the underlying mismatch</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-note">
+      <strong>Why this is a principled exception, not a workaround</strong>
+      §5 Decision C says "component-internal responsive uses <code>@container</code>." Dialog
+      tests that principle. The honest answer: Dialog isn't responding to its own container
+      — it's responding to whether it occupies the full viewport or a centred slot.
+      That trigger is the viewport, not the container. The exception holds for any full-viewport
+      overlay (Dialog, Sheet, FullScreenOverlay). Component-internal layouts inside non-overlay
+      components still default to <code>@container</code>.
+    </div>
+  </div>
+
+  <!-- DECISION E -->
+  <div class="sub-decision">
+    <h4>E · Ship <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> primitives (Atlassian-inspired) <span class="verdict verdict-pick">propose</span></h4>
+    <p class="sub-q">Two small components that wrap responsive visibility. Removes the most common breakpoint friction in JSX.</p>
+
+    <p>
+      Today, hiding a sidebar below <code>lg</code> in Nexus consumer code looks like:
+    </p>
+    <pre>&lt;aside className="nx:hidden nx:lg:block"&gt;Secondary nav&lt;/aside&gt;</pre>
+    <p>
+      It works, but the two-class invert is a small footgun (forgetting <code>nx:hidden</code>
+      leaves it visible at all sizes). Atlassian's <code>&lt;Show above="lg"&gt;</code> and
+      <code>&lt;Hide below="lg"&gt;</code> primitives are declarative wrappers around the same
+      CSS — clearer intent, less footgun:
+    </p>
+    <pre>&lt;Show above="lg"&gt;
+  &lt;aside&gt;Secondary nav&lt;/aside&gt;
+&lt;/Show&gt;
+
+&lt;Hide below="md"&gt;
+  &lt;span&gt;Extra context only on tablet+&lt;/span&gt;
+&lt;/Hide&gt;</pre>
+
+    <p>
+      <strong>Nexus extension</strong>: ship a third prop for <em>container</em> queries, not
+      just viewport. This is something Atlassian doesn't have — and it's a natural fit for the
+      <code>@container</code>-default stance from Decision C:
+    </p>
+    <pre>&lt;Show containerAbove="md"&gt;
+  &lt;span&gt;Visible when the parent container ≥ md, regardless of viewport&lt;/span&gt;
+&lt;/Show&gt;</pre>
+
+    <p>
+      Implementation is small — each component is ~30 lines of CSS-driven JSX (just toggles
+      <code>display</code>). Children always render (no unmount); only visibility changes.
+      Both components live in <code>packages/react/src/components/primitives/</code>.
+    </p>
+
+    <h6>API surface (proposed)</h6>
+    <table>
+      <thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>above</code></td><td><code>"sm" | "md" | "lg" | "xl" | "2xl"</code></td><td>Viewport min-width — show/hide above this breakpoint</td></tr>
+        <tr><td><code>below</code></td><td><code>"sm" | "md" | "lg" | "xl" | "2xl"</code></td><td>Viewport max-width — show/hide below this breakpoint</td></tr>
+        <tr><td><code>containerAbove</code></td><td><code>"sm" | "md" | "lg" | "xl" | "2xl"</code></td><td><strong>Nexus extension</strong> — container min-width via <code>@container</code></td></tr>
+        <tr><td><code>containerBelow</code></td><td><code>"sm" | "md" | "lg" | "xl" | "2xl"</code></td><td><strong>Nexus extension</strong> — container max-width via <code>@container</code></td></tr>
+        <tr><td><code>as</code></td><td><code>keyof JSX.IntrinsicElements</code></td><td>HTML element to render (default <code>span</code>)</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Exactly one of <code>above</code>, <code>below</code>, <code>containerAbove</code>,
+      <code>containerBelow</code> must be specified.
+    </p>
+
+    <div class="callout callout-note">
+      <strong>Why this is a Nexus genuine differentiation, not just a copy</strong>
+      Atlassian's <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> only do viewport. Nexus's add
+      <code>containerAbove</code> / <code>containerBelow</code> for container queries. This makes
+      the primitives the FIRST place where a Nexus consumer sees the
+      "container-over-viewport" choice — the same stance Decision C documents in prose, here
+      surfaced in the API. Humans and LLM agents both encounter it at the moment of use.
+    </div>
+  </div>
+
+  <h3 id="bp-demo">Live demo — container queries in action</h3>
+  <p>
+    The card below uses <code>@container</code> rather than viewport breakpoints to decide its
+    layout. <strong>Drag the bottom-right corner of the dashed box</strong> to resize the
+    container. The card flips from stacked → horizontal at 400px <em>of container width</em>,
+    independent of your browser viewport.
+  </p>
+
+  <div class="cq-demo-wrap">
+    <div class="cq-resize" style="width: 280px;">
+      <div class="cq-resize-label">
+        <span>↘ drag to resize container</span>
+        <span>container width</span>
+      </div>
+      <div class="cq-card">
+        <div class="cq-card-thumb"></div>
+        <div class="cq-card-body">
+          <h5 class="cq-card-title">Component card</h5>
+          <p class="cq-card-desc">This card adapts to its container width — not the viewport. Resize the dashed box around it.</p>
+          <div class="cq-card-actions">
+            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 12px;">Primary</button>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;">Secondary</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-note">
+    <strong>What to look for</strong>
+    At narrow container width, the thumbnail sits on top and content stacks below. Past 400px
+    container width, the thumbnail moves to the side. Past 600px, the thumbnail enlarges and
+    the title gets bigger. <em>The viewport never changed</em> — only the container did. This
+    is the pattern Nexus components should follow for internal responsive behaviour.
+  </div>
+
+  <h3 id="bp-migration">Migration plan</h3>
+
+  <h4>Step 1 — Add 5 breakpoint CSS variables to <code>nexus.css</code> (rem-based)</h4>
+  <pre>/* In @theme block, alongside --shadow-*, --radius-*, --z-* */
+--breakpoint-sm:  40rem;   /* 640px @ 16px root  · narrow */
+--breakpoint-md:  48rem;   /* 768px @ 16px root  · narrow */
+--breakpoint-lg:  64rem;   /* 1024px @ 16px root · Standard floor ★ */
+--breakpoint-xl:  80rem;   /* 1280px @ 16px root · Standard reference ★ */
+--breakpoint-2xl: 96rem;   /* 1536px @ 16px root · wide */</pre>
+  <p>
+    Tailwind v4 picks these up automatically (it scans <code>@theme</code> for
+    <code>--breakpoint-*</code>). Values map exactly to Tailwind defaults at 16px root font-size,
+    but expressed in <code>rem</code> so they scale with the user's browser zoom and font
+    preferences — same pattern Atlassian, Polaris, and Mantine use.
+  </p>
+
+  <h4>Step 2 — Document Dialog as a viewport-driven exception (no code change)</h4>
+  <p>
+    Per Decision D (post-spike): <strong>do not migrate Dialog's <code>nx:sm:</code> sites to
+    <code>@container</code></strong>. The spike found Tailwind's <code>@sm:</code> fires at
+    container ≥ 24rem (384px) — different from viewport ≥ 40rem (640px) — which breaks
+    Dialog's full-bleed-vs-centred behaviour at 384–640px viewports.
+  </p>
+  <p>
+    Instead, in <code>responsive.md</code> (Step 3 below), add a "Viewport-driven exceptions"
+    subsection documenting that:
+  </p>
+  <ul>
+    <li>Most Nexus components use <code>@container</code> for internal responsive behaviour (Decision C)</li>
+    <li>Full-viewport overlay components (Dialog, future Sheet, future FullScreenOverlay) are exceptions: their responsive trigger is positioning relative to the viewport, not their own container width</li>
+    <li>For exceptions, use viewport breakpoints (<code>nx:sm:</code>, <code>nx:md:</code>, etc.) as usual</li>
+  </ul>
+  <p>
+    Zero code change to <code>dialog.tsx</code>. The existing behaviour is correct as-is; only
+    the documentation gets updated to explain why.
+  </p>
+
+  <h4>Step 3 — Write <code>.claude/rules/responsive.md</code></h4>
+  <p>
+    New rule file. Sections:
+  </p>
+  <ol>
+    <li><strong>Primary target</strong>: Nexus is designed for Standard (≥1024px). Narrow = graceful degradation, Wide = breathing room.</li>
+    <li><strong>Display class table</strong> (the Narrow/Standard/Wide table from Decision B above).</li>
+    <li><strong>Decision tree</strong>: when to use <code>@container</code> vs <code>nx:lg:</code> vs <code>clamp()</code> vs <code>dvh/svh/lvh</code>.</li>
+    <li><strong>Anti-patterns</strong>: don't use <code>nx:sm:</code> inside component internals; don't use viewport units for things that should respond to their container.</li>
+    <li><strong>Forward direction</strong>: fluid scaling and dynamic viewport units are forthcoming. Components that need them today should use <code>clamp()</code> and <code>svh</code> directly.</li>
+  </ol>
+
+  <h4>Step 4 — Cross-link in existing rules</h4>
+  <ul>
+    <li><code>.claude/rules/components.md</code> — add a "Responsive behaviour" subsection linking to <code>responsive.md</code></li>
+    <li><code>.claude/rules/figma.md</code> — update line 329 (responsive row in the Figma↔Code Divergence Patterns table) to reflect <code>@container</code>-first stance</li>
+    <li><code>.claude/rules/code-quality.md</code> — add a one-liner: "Component-internal responsive behaviour: prefer <code>@container</code> over viewport media queries"</li>
+  </ul>
+
+  <h4>Step 5 — Ship <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> primitives (Decision E)</h4>
+  <p>
+    Add two small components to <code>packages/react/src/components/primitives/</code> (new
+    folder — primitives sits alongside <code>ui/</code>):
+  </p>
+  <table class="migration-table">
+    <thead><tr><th>File</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td class="file-ref">primitives/show.tsx</td><td>~30 lines — declarative wrapper using <code>display: none</code> / <code>display: revert</code>. Supports <code>above</code> / <code>below</code> (viewport) and <code>containerAbove</code> / <code>containerBelow</code> (container).</td></tr>
+      <tr><td class="file-ref">primitives/hide.tsx</td><td>Inverse of show.tsx (same shape, hides when condition matches).</td></tr>
+      <tr><td class="file-ref">primitives/Show.stories.tsx</td><td>Storybook stories covering each prop axis (above/below/containerAbove/containerBelow).</td></tr>
+      <tr><td class="file-ref">primitives/Hide.stories.tsx</td><td>Same coverage as Show.</td></tr>
+      <tr><td class="file-ref">src/index.ts</td><td>Add exports for <code>Show</code>, <code>Hide</code>, and their types.</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Document usage in <code>responsive.md</code> as the canonical way to express responsive
+    visibility in JSX. Discourage <code>nx:hidden nx:lg:block</code> in consumer code; prefer
+    <code>&lt;Show above="lg"&gt;</code>.
+  </p>
+
+  <h3 id="bp-future">Forward direction (deferred)</h3>
+  <p>
+    Two items intentionally deferred — both are real 2026 best practices, but neither blocks
+    the current decision. They become more relevant once Nexus ships its first layout-primitive
+    component or its first full-screen overlay surface.
+  </p>
+
+  <table>
+    <thead><tr><th>Item</th><th>When to revisit</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Fluid scaling via <code>clamp()</code></strong> for type sizes and spacing tokens</td>
+        <td>When typography Phase ships, or when a consumer reports awkward scaling on ultrawide. Replaces ladder of breakpoint-specific overrides with single declarations.</td>
+      </tr>
+      <tr>
+        <td><strong>Dynamic viewport units</strong> (<code>svh/lvh/dvh</code>) for full-screen surfaces</td>
+        <td>When Nexus ships Sheet, full-screen Dialog, or any mobile-first component that hits the iOS browser-chrome jitter case.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="bp-decision">Recommendation — Option D + E (Token + Docs + Container default + <code>&lt;Show&gt;</code>/<code>&lt;Hide&gt;</code>)</h3>
+  <div class="callout callout-pick">
+    <strong>Ship A2 (rem) + B + C + D1 + E together</strong>
+    Add 5 rem-based <code>--breakpoint-*</code> CSS variables (A2). Document Narrow / Standard /
+    Wide display classes with ≥1024px primary target (B). Adopt <code>@container</code> as the
+    canonical pattern for component-internal responsive behaviour (C). Keep Dialog's three
+    <code>nx:sm:</code> sites and document Dialog as a viewport-driven exception in
+    <code>responsive.md</code> (D1, post-spike). Ship two new tiny primitives —
+    <code>&lt;Show&gt;</code> and <code>&lt;Hide&gt;</code> — with both viewport and container
+    axes, mirroring Atlassian but extending beyond it (E).
+    Total scope: 1 token file edit + zero edits in <code>dialog.tsx</code> + 1 new rule file +
+    3 cross-link edits + 5 new component files (Show/Hide + stories + export).
+  </div>
+
+  <div class="callout callout-note">
+    <strong>What this defers</strong>
+    Fluid scaling (<code>clamp()</code>) and dynamic viewport units (<code>svh/lvh/dvh</code>) — both
+    are correct directions, neither is blocking. Add when the relevant Phase or consumer use
+    case lands.
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>Anti-slop notes for LLM agents implementing this</strong>
+    <ul style="margin: 6px 0 0 16px; padding: 0; font-size: 12px;">
+      <li>Tailwind v4 container-query syntax is <code>@container</code> (parent) + <code>@sm:</code> / <code>@md:</code> (children) — note the <code>@</code> prefix differs from viewport <code>sm:</code> / <code>md:</code>.</li>
+      <li>With the <code>nx:</code> prefix order rule (components.md §145), the correct form is <code>nx:@sm:flex-row</code>, NOT <code>@nx:sm:flex-row</code>. The <code>nx:</code> always comes first.</li>
+      <li>Do NOT add <code>container-type: inline-size</code> by default on every component — only where a child needs to query the container. Carries minor formatting-context cost.</li>
+      <li>Do NOT replace ALL <code>nx:sm:</code> / <code>nx:md:</code> globally — viewport breakpoints are still correct for shell-level page decisions. Only component-internal adaptation moves to <code>@container</code>.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────── -->
+<!-- SUMMARY                                        -->
+<!-- ────────────────────────────────────────────── -->
+<section id="summary">
+  <h2>Summary — Action Checklist</h2>
+  <p class="lede">
+    Five items, ordered by risk-adjusted priority. Items 1 and 2 should ship together (both touch
+    Tabs); items 3, 4, 5 can ship independently.
+  </p>
+
+  <div class="card">
+    <ol class="summary-list">
+      <li>
+        <span class="num">01</span>
+        <div>
+          <div class="title">Ship 6 z-index tokens; migrate 6 component call sites off <code>nx:z-50</code></div>
+          <div class="meta">overlay 10 · popover 20 · sticky 30 · modal 50 · toast 100 · max 9999 — touches nexus.css + 4 component files</div>
+        </div>
+        <span class="verdict verdict-pick">P0 · ship first</span>
+      </li>
+      <li>
+        <span class="num">02</span>
+        <div>
+          <div class="title">Adopt focus pattern B (Outline + offset)</div>
+          <div class="meta">Swap canonical pattern to <code>outline-2 outline-focus-default outline-offset-2</code> · promote focus colours to <code>--color-focus-*</code> · delete <code>--nx-focus-geometry-*</code> and <code>--shadow-focus-*</code> tokens · touches 7 component files + variables.css + nexus.css + components.md</div>
+        </div>
+        <span class="verdict verdict-pick">P0</span>
+      </li>
+      <li>
+        <span class="num">03</span>
+        <div>
+          <div class="title">Replace tabs.tsx <code>shadow-sm</code> active state with bottom-border indicator</div>
+          <div class="meta">Cosmetic improvement only after #02 lands (correctness side of the issue dissolves with outline). Worth doing for the visual cue but no longer blocking</div>
+        </div>
+        <span class="verdict verdict-watch">P1</span>
+      </li>
+      <li>
+        <span class="num">04</span>
+        <div>
+          <div class="title">Document surface exception map in components.md (menu items, canvas, elevated surfaces)</div>
+          <div class="meta">Includes the Radix roving-focus rationale for menu items · doc-only, zero code change</div>
+        </div>
+        <span class="verdict verdict-pick">P1 · standalone PR</span>
+      </li>
+      <li>
+        <span class="num">05</span>
+        <div>
+          <div class="title">Document Radix Portal layering behaviour + consumer override pattern</div>
+          <div class="meta">Goes alongside #01 in components.md "Layering model" section</div>
+        </div>
+        <span class="verdict verdict-pick">P1 · with #01</span>
+      </li>
+      <li>
+        <span class="num">06</span>
+        <div>
+          <div class="title">Add 5 <code>--breakpoint-*</code> CSS variables to <code>nexus.css</code> @theme</div>
+          <div class="meta">Tailwind v4 auto-discovers them · enables CSS-only consumer override · matches Polaris/Mantine pattern</div>
+        </div>
+        <span class="verdict verdict-pick">P0</span>
+      </li>
+      <li>
+        <span class="num">07</span>
+        <div>
+          <div class="title">Document Dialog as a viewport-driven exception in <code>responsive.md</code></div>
+          <div class="meta">Post-spike correction: do NOT migrate dialog.tsx to <code>@container</code> (Tailwind's <code>@sm:</code> ≠ <code>sm:</code> values — would break Dialog at viewports 384–640px). Keep <code>nx:sm:</code> as the canonical exception for full-viewport overlays.</div>
+        </div>
+        <span class="verdict verdict-pick">P1 · docs only</span>
+      </li>
+      <li>
+        <span class="num">08</span>
+        <div>
+          <div class="title">Create <code>.claude/rules/responsive.md</code> with primary target + display classes + decision tree</div>
+          <div class="meta">Narrow / Standard / Wide semantics · ≥1024px primary target · when @container vs nx:lg: vs clamp() vs dvh · anti-patterns</div>
+        </div>
+        <span class="verdict verdict-pick">P0 · with #06/#07</span>
+      </li>
+      <li>
+        <span class="num">09</span>
+        <div>
+          <div class="title">Cross-link new rule in components.md / figma.md / code-quality.md</div>
+          <div class="meta">Three small edits adding "Responsive behaviour" pointers · updates figma.md:329 to reflect @container-first stance</div>
+        </div>
+        <span class="verdict verdict-pick">P1 · with #08</span>
+      </li>
+      <li>
+        <span class="num">10</span>
+        <div>
+          <div class="title">Ship <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> primitives (Atlassian-inspired, container-extended)</div>
+          <div class="meta">Two ~30-line components in packages/react/src/components/primitives/ · viewport axes (above/below) + container axes (containerAbove/containerBelow) · documented in responsive.md as the canonical way to express responsive visibility</div>
+        </div>
+        <span class="verdict verdict-pick">P1 · after #06–#08</span>
+      </li>
+    </ol>
+  </div>
+
+  <h3>Deferred (Phase 7+ polish)</h3>
+  <table>
+    <thead><tr><th>Item</th><th>Why deferred</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Double-ring lightness-inverse focus (Option D)</td>
+        <td>Aesthetic improvement on coloured surfaces. Lower priority than the outline-based focus pattern (Option B) chosen for §1. Revisit when polish review surfaces this as a concrete user complaint.</td>
+      </tr>
+      <tr>
+        <td>Toast / Sonner integration</td>
+        <td>Token <code>--z-toast</code> is preemptively reserved; component itself is out of scope.</td>
+      </tr>
+      <tr>
+        <td>Reserved <code>--z-max</code> for AI-agent UI</td>
+        <td>Documented as reserved; no Nexus component uses it. Re-evaluate when AI-native integration concrete.</td>
+      </tr>
+      <tr>
+        <td>Fluid scaling via <code>clamp()</code> for typography and spacing tokens</td>
+        <td>2026 best practice for continuous adaptation. Revisit when typography Phase ships or when a consumer reports awkward scaling on ultrawide displays. Replaces ladder of breakpoint overrides with single declarations.</td>
+      </tr>
+      <tr>
+        <td>Dynamic viewport units (<code>svh / lvh / dvh</code>)</td>
+        <td>Modern replacement for raw <code>vh</code> in mobile-edge cases. Revisit when Nexus ships Sheet, full-screen Dialog, or any component that hits the iOS browser-chrome jitter case.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>What this artefact replaces in Phase 1's recommendations</h3>
+  <table>
+    <thead><tr><th>Phase 1 Rec</th><th>Status</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Focus Rec #1 — Add <code>--nx-focus-geometry-offset</code> gap primitive</td>
+        <td><span class="verdict verdict-skip">superseded</span></td>
+        <td>BG spacer fails on coloured surfaces. Option B (outline + offset) achieves the visible 2px gap natively, for all users in all modes, without spacer logic.</td>
+      </tr>
+      <tr>
+        <td>Focus Rec #2 — Cite APCA Lc ≥ 45 in components.md</td>
+        <td><span class="verdict verdict-pick">keep</span></td>
+        <td>Still correct and trivial. Roll into the components.md edit for Option B.</td>
+      </tr>
+      <tr>
+        <td>Focus Rec #3 — Surface exception map</td>
+        <td><span class="verdict verdict-pick">keep + extend</span></td>
+        <td>Now extended to include the menu-item <code>:focus</code> pattern (§4).</td>
+      </tr>
+      <tr>
+        <td>Focus Rec #4 — WHCM acknowledgement</td>
+        <td><span class="verdict verdict-pick">resolved</span></td>
+        <td>Resolved natively by Option B (outline survives WHCM). No workaround or transparent-outline trick needed.</td>
+      </tr>
+      <tr>
+        <td>(new) — Delete <code>--nx-focus-geometry-*</code> and <code>--shadow-focus-*</code> tokens</td>
+        <td><span class="verdict verdict-pick">add</span></td>
+        <td>Side effect of adopting Option B: the geometry primitives and composed shadow tokens stop being used. Per project-stage.md (pre-production, no backcompat), delete in the same PR rather than deprecate.</td>
+      </tr>
+      <tr>
+        <td>Z-Index Rec #1 — Ship 5 tokens</td>
+        <td><span class="verdict verdict-watch">extended to 6</span></td>
+        <td><code>--z-sticky</code> added based on Salt's empirical scale and consumer fixed-nav use case.</td>
+      </tr>
+      <tr>
+        <td>Z-Index Rec #2 — Document Radix Portal behaviour</td>
+        <td><span class="verdict verdict-pick">keep</span></td>
+        <td>Goes alongside the token rollout.</td>
+      </tr>
+      <tr>
+        <td>Z-Index Rec #3 — Reserve <code>--z-max</code></td>
+        <td><span class="verdict verdict-pick">keep</span></td>
+        <td>Documented as reserved; no code impact.</td>
+      </tr>
+      <tr>
+        <td>Breakpoint Rec #1 — Document Narrow / Standard / Wide display classes</td>
+        <td><span class="verdict verdict-pick">keep + extend</span></td>
+        <td>Kept; extended with explicit ≥1024px primary target and the Tailwind-class → display-class mapping table (§5 Decision B).</td>
+      </tr>
+      <tr>
+        <td>Breakpoint Rec #2 — Device-class mapping table for 5 Tailwind breakpoints</td>
+        <td><span class="verdict verdict-pick">keep</span></td>
+        <td>Now lives in §5 Decision B (Tailwind class · range · display class · semantic intent).</td>
+      </tr>
+      <tr>
+        <td>Breakpoint Rec #3 — "Components should not embed viewport breakpoints"</td>
+        <td><span class="verdict verdict-watch">revised</span></td>
+        <td>Original framing ("components are already breakpoint-agnostic") was factually wrong — Dialog uses <code>nx:sm:</code> at 3 sites. Revised: "Components should use <code>@container</code> for internal responsive behaviour; viewport breakpoints only at the page-skeleton level." This is the 2026 consensus and a stronger principle than "no responsive at all."</td>
+      </tr>
+      <tr>
+        <td>(new) — Adopt <code>@container</code> as canonical pattern for component-internal responsive</td>
+        <td><span class="verdict verdict-pick">add</span></td>
+        <td>Baseline browser support (~95% as of 2026). Mantine has it as first-class. Tailwind v4 supports it natively. Replaces the broken "components must not embed responsive utilities" rule with one that actually serves desktop-tool + multi-screen products.</td>
+      </tr>
+      <tr>
+        <td>(new) — Add <code>--breakpoint-*</code> CSS variables to <code>@theme</code></td>
+        <td><span class="verdict verdict-pick">add</span></td>
+        <td>Polaris and Mantine ship overridable CSS variables; Nexus didn't. Tailwind v4's <code>--breakpoint-*</code> auto-discovery makes this a one-block edit. Unblocks CSS-only consumers (React Native, vanilla CSS).</td>
+      </tr>
+      <tr>
+        <td>(new) — Dialog <code>nx:sm:</code> handling</td>
+        <td><span class="verdict verdict-watch">revised post-spike</span></td>
+        <td>Originally proposed migration to <code>@container</code>. Pre-implementation spike found Tailwind's <code>@sm:</code> (container ≥ 24rem) ≠ <code>sm:</code> (viewport ≥ 40rem) — naïve swap breaks Dialog at viewports 384–640px. Revised plan: keep <code>nx:sm:</code> as a documented viewport-driven exception. Dialog's "full-bleed vs centred card" trigger is viewport positioning, not container width — viewport queries are correct here.</td>
+      </tr>
+      <tr>
+        <td>(new) — Ship <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> primitives</td>
+        <td><span class="verdict verdict-pick">add</span></td>
+        <td>Atlassian-inspired declarative responsive visibility wrappers. Nexus extension: adds container-query axes (<code>containerAbove</code>, <code>containerBelow</code>) on top of viewport axes (<code>above</code>, <code>below</code>) — surfacing the container-over-viewport stance at the API level, not just in docs.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+  </main>
+</div>
+
+<script>
+  // Focus technique tab switching
+  const techniqueButtons = document.querySelectorAll('.tabs-control [data-technique]');
+  const focusGrid = document.getElementById('focus-grid');
+  const focusButtons = focusGrid.querySelectorAll('.focus-demo');
+
+  function applyTechnique(t) {
+    focusButtons.forEach(btn => {
+      btn.classList.remove('focus-a', 'focus-b', 'focus-c', 'focus-d', 'focus-e');
+      btn.classList.add('focus-' + t);
+    });
+    techniqueButtons.forEach(b => {
+      b.setAttribute('aria-selected', b.dataset.technique === t ? 'true' : 'false');
+    });
+  }
+
+  techniqueButtons.forEach(b => {
+    b.addEventListener('click', () => applyTechnique(b.dataset.technique));
+  });
+  applyTechnique('a');
+
+  // Show all focused toggle
+  document.getElementById('toggle-focused').addEventListener('change', (e) => {
+    document.body.classList.toggle('show-focused', e.target.checked);
+  });
+
+  // WHCM simulation toggle
+  document.getElementById('toggle-whcm').addEventListener('change', (e) => {
+    document.body.classList.toggle('simulate-whcm', e.target.checked);
+  });
+
+  // Tabs focused toggle (independent demo)
+  document.getElementById('toggle-tabs-focused').addEventListener('change', (e) => {
+    // Reuses show-focused via the same class — tabs demo respects it
+    document.body.classList.toggle('show-focused', e.target.checked);
+    // Sync the focus-section toggle to avoid confusion
+    document.getElementById('toggle-focused').checked = e.target.checked;
+  });
+  // Reverse-sync the focus toggle
+  document.getElementById('toggle-focused').addEventListener('change', (e) => {
+    document.getElementById('toggle-tabs-focused').checked = e.target.checked;
+  });
+</script>
+
+</body>
+</html>
