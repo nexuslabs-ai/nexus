@@ -1,6 +1,6 @@
 {
   "background": {
-    "$value": "{slate.50}",
+    "$value": "{white}",
     "$type": "color"
   },
   "foreground": {
@@ -8,15 +8,15 @@
     "$type": "color"
   },
   "background-hover": {
-    "$value": "{slate.100}",
+    "$value": "{slate.50}",
     "$type": "color"
   },
   "background-active": {
-    "$value": "{slate.200}",
+    "$value": "{slate.100}",
     "$type": "color"
   },
   "muted": {
-    "$value": "{slate.100}",
+    "$value": "{slate.50}",
     "$type": "color"
   },
   "muted-foreground": {
@@ -34,7 +34,7 @@
     "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
   },
   "disabled": {
-    "$value": "{slate.100}",
+    "$value": "{slate.50}",
     "$type": "color"
   },
   "disabled-foreground": {
@@ -50,11 +50,11 @@
     "$type": "color"
   },
   "container-hover": {
-    "$value": "{slate.100}",
+    "$value": "{slate.50}",
     "$type": "color"
   },
   "container-active": {
-    "$value": "{slate.200}",
+    "$value": "{slate.100}",
     "$type": "color"
   },
   "popover": {
@@ -70,7 +70,7 @@
     "$type": "color"
   },
   "popover-active": {
-    "$value": "{slate.100}",
+    "$value": "{slate.50}",
     "$type": "color"
   },
   "overlay": {
@@ -87,7 +87,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{slate.100}",
+      "$value": "{slate.50}",
       "$type": "color"
     },
     "primary": {
