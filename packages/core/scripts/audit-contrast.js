@@ -77,6 +77,28 @@ const BASE_PAIRS = [
     minLc: 60,
     tier: 'ui',
   },
+  // Nav chrome — UI tier (60) for label text, incidental (45) for the
+  // muted helper text. Audits rest state plus the most pressed surface
+  // (item-active); hover sits between, so passing both implies passing
+  // hover.
+  {
+    fg: 'nav-foreground',
+    bg: 'nav-background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    fg: 'nav-muted-foreground',
+    bg: 'nav-background',
+    minLc: 45,
+    tier: 'incidental',
+  },
+  {
+    fg: 'nav-foreground',
+    bg: 'nav-item-active',
+    minLc: 60,
+    tier: 'ui',
+  },
 ];
 
 const BRAND_PAIRS = [
