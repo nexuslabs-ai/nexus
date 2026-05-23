@@ -224,6 +224,7 @@ export const DEFAULT_CONFIG = {
   radius: 'sharp',
   borderwidth: 'vega',
   focus: 'default',
+  'chart-categorical': 'default',
 };
 
 // ============================================
@@ -416,7 +417,7 @@ export function parseArgs() {
   const config = { ...DEFAULT_CONFIG };
 
   args.forEach((arg) => {
-    const match = arg.match(/^--(\w+)=(.+)$/);
+    const match = arg.match(/^--([\w-]+)=(.+)$/);
     if (match) {
       const [, key, value] = match;
       if (key in config) {

@@ -117,6 +117,24 @@ describe('generateTailwindPackage', () => {
     expect(darkBlock).not.toMatch(/--nx-shadow-2xs-layer-1-y:/);
   });
 
+  it('emits chart.categorical tokens in @theme (light) and .dark (dark override)', () => {
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(
+      /--color-chart-categorical-1: var\(--nx-color-teal-600\);/
+    );
+    expect(themeBlock).toMatch(
+      /--color-chart-categorical-5: var\(--nx-color-indigo-600\);/
+    );
+
+    const darkBlock = extractBlock(nexusCSS, '.dark');
+    expect(darkBlock).toMatch(
+      /--nx-color-chart-categorical-1: var\(--nx-color-teal-300\);/
+    );
+    expect(darkBlock).toMatch(
+      /--nx-color-chart-categorical-5: var\(--nx-color-indigo-200\);/
+    );
+  });
+
   it('emits zero `File not found` warnings for the default config', () => {
     const fileNotFound = warnings.filter((w) => /File not found/.test(w));
     expect(fileNotFound).toEqual([]);
