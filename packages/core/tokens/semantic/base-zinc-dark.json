@@ -11,6 +11,10 @@
     "$value": "{zinc.800}",
     "$type": "color"
   },
+  "background-hover-alpha": {
+    "$value": "{zinc.a100}",
+    "$type": "color"
+  },
   "background-active": {
     "$value": "{zinc.950}",
     "$type": "color"
@@ -69,6 +73,14 @@
     "$value": "{zinc.700}",
     "$type": "color"
   },
+  "popover-alpha": {
+    "$value": "{zinc.a800}",
+    "$type": "color"
+  },
+  "popover-backdrop": {
+    "$value": "{zinc.a900}",
+    "$type": "color"
+  },
   "nav-background": {
     "$value": "{zinc.950}",
     "$type": "color"
@@ -94,12 +106,16 @@
     "$type": "color"
   },
   "overlay": {
-    "$value": "#000000cc",
+    "$value": "{zinc.a800}",
     "$type": "color"
   },
   "border": {
     "default": {
       "$value": "{zinc.700}",
+      "$type": "color"
+    },
+    "default-alpha": {
+      "$value": "{zinc.a300}",
       "$type": "color"
     },
     "active": {
