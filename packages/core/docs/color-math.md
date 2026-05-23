@@ -32,7 +32,7 @@ Why OKLCH and not the alternatives:
 
 **On-disk format is hex, not OKLCH.** Token source files (`tokens/primitives/color.json` and the semi-transparent semantic overlay tokens) store plain hex strings. The reason is the Figma round-trip: Tokens Studio and Figma Variables hex-normalize color on export and cannot preserve an `oklch()` string. Hex is the only format that survives a designer editing a value in Figma and exporting it back. The OKLCH conversion happens at build time, in [`scripts/utils.js`](../scripts/utils.js) (`formatTokenValue`), routing through [`scripts/lib/perceptual-grid.js`](../scripts/lib/perceptual-grid.js).
 
-**Browser floor: Baseline 2023.** OKLCH requires Chrome 111+, Safari 15.4+, and Firefox 113+. The build emits no hex fallback — a consumer targeting older browsers must pin to the last pre-OKLCH release tag. This is deliberate: a hex fallback would double every color declaration and reintroduce the per-hue lightness drift the pipeline exists to remove.
+**Browser floor: Baseline 2023.** OKLCH requires Chrome 111+, Safari 15.4+, and Firefox 113+. The build emits no hex fallback — a consumer targeting older browsers must pin to the last pre-OKLCH release tag (the reasoning is in [Trade-offs](#trade-offs)).
 
 ## Perceptual lightness pinning
 

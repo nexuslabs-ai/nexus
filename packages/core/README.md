@@ -39,6 +39,10 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 - Component-specific tokens
 - References semantic tokens
 
+### Color generation
+
+Color tokens don't ship the values stored on disk. Source files hold hex; the build converts to OKLCH, pins each shade to a perceptual lightness grid (so the same step is equally light across every palette), and gates every text/surface pair with APCA contrast in CI. See [Color math](docs/color-math.md) for the full pipeline and its trade-offs.
+
 ## Reference Resolution
 
 Semantic tokens use DTCG reference syntax:
