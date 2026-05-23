@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Why alpha-variant tokens? — Issue #81 rationale</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #0a0a0a;
+    --muted: #f5f5f5;
+    --border: #e5e5e5;
+    --slate-950: #020617;
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --slate-700: #334155;
+    --slate-500: #64748b;
+    --slate-400: #94a3b8;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+    --red: #dc2626;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --amber: #d97706;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif; padding: 64px 24px 96px; }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+
+  h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 14px; }
+  h2 { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; margin: 64px 0 18px; padding-top: 24px; border-top: 1px solid var(--slate-100); }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  h3 { font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--slate-500); margin-bottom: 10px; }
+  .lede { font-size: 18px; line-height: 1.55; color: var(--slate-700); max-width: 760px; }
+  .meta { color: var(--slate-500); font-size: 13px; margin-top: 16px; }
+  .meta code { font-family: ui-monospace, monospace; font-size: 12px; background: var(--slate-100); padding: 1px 6px; border-radius: 3px; color: var(--slate-700); }
+
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 16px 0; }
+
+  .card { border: 1px solid var(--border); border-radius: 10px; padding: 18px; background: var(--bg); }
+  .card.bad { border-color: rgba(220, 38, 38, 0.25); background: rgba(220, 38, 38, 0.015); }
+  .card.good { border-color: rgba(22, 163, 74, 0.25); background: rgba(22, 163, 74, 0.015); }
+  .card-tag { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; }
+  .tag-bad { background: rgba(220, 38, 38, 0.10); color: var(--red); }
+  .tag-good { background: rgba(22, 163, 74, 0.10); color: var(--green); }
+  .card p { font-size: 13px; color: var(--slate-700); margin-top: 12px; line-height: 1.5; }
+
+  /* Demo containers */
+  .demo { border-radius: 8px; min-height: 160px; position: relative; overflow: hidden; padding: 16px; font-size: 13px; }
+  .demo-label { position: absolute; bottom: 8px; right: 12px; font-size: 10.5px; font-family: ui-monospace, monospace; padding: 2px 8px; border-radius: 3px; background: rgba(255,255,255,0.85); color: var(--slate-700); }
+  .demo-label.dark { background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.85); }
+
+  /* Background simulations */
+  .bg-photo { background: linear-gradient(135deg, #d97706 0%, #b91c1c 30%, #7c3aed 60%, #0891b2 100%); color: white; }
+  .bg-tinted { background: linear-gradient(180deg, #fef3c7, #fde68a); }
+  .bg-dark { background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%); color: white; }
+  .bg-mesh {
+    background:
+      radial-gradient(at 0% 0%, #fef3c7, transparent 50%),
+      radial-gradient(at 100% 0%, #fce7f3, transparent 50%),
+      radial-gradient(at 100% 100%, #dbeafe, transparent 50%),
+      radial-gradient(at 0% 100%, #dcfce7, transparent 50%),
+      #f9fafb;
+  }
+  .bg-slate-tint { background: linear-gradient(180deg, #f1f5f9, #cbd5e1); }
+
+  /* Popover */
+  .pop-solid {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #0f172a;
+    display: inline-block;
+    min-width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .pop-alpha {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #0f172a;
+    display: inline-block;
+    min-width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .pop-alpha-dark {
+    background: rgba(15, 23, 42, 0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: white;
+    display: inline-block;
+    min-width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  /* Code */
+  pre { background: var(--slate-50); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 12.5px; overflow-x: auto; line-height: 1.65; }
+  .tok-key { color: #0369a1; }
+  .tok-str { color: #16a34a; }
+  .tok-com { color: #94a3b8; font-style: italic; }
+  .tok-fn { color: #7c3aed; }
+
+  /* Tables */
+  table.matrix { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+  table.matrix th { text-align: left; padding: 12px 14px; background: var(--slate-50); border-bottom: 2px solid var(--border); font-weight: 600; color: var(--slate-700); font-size: 13px; }
+  table.matrix td { padding: 12px 14px; border-bottom: 1px solid var(--slate-100); vertical-align: top; line-height: 1.55; }
+  table.matrix tr:last-child td { border-bottom: none; }
+
+  code.inl { font-family: ui-monospace, monospace; font-size: 12.5px; background: var(--slate-100); padding: 1px 6px; border-radius: 3px; color: var(--slate-800); }
+
+  /* Hover row demo */
+  .list { border-radius: 6px; overflow: hidden; }
+  .list-row { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+  .list-row + .list-row { border-top: 1px solid rgba(0,0,0,0.04); }
+  .list-row.hov-solid { background: #f1f5f9; }
+  .list-row.hov-alpha { background: rgba(0, 0, 0, 0.07); }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; background: var(--slate-100); color: var(--slate-700); font-size: 11px; font-weight: 500; }
+
+  /* Scrim */
+  .scrim-demo { position: relative; min-height: 180px; }
+  .scrim-solid { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.92); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+  .scrim-alpha { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.62); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+
+  /* Border swatch */
+  .border-card {
+    padding: 14px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.7);
+  }
+  .border-card.bad { border: 1px solid #e2e8f0; }
+  .border-card.good { border: 1px solid rgba(15, 23, 42, 0.12); }
+
+  /* List */
+  ul.bullets { list-style: none; padding-left: 0; margin-top: 8px; }
+  ul.bullets li { padding: 8px 0; border-bottom: 1px solid var(--slate-100); font-size: 14px; line-height: 1.5; }
+  ul.bullets li:last-child { border-bottom: none; }
+  ul.bullets li::before { content: "→ "; color: var(--green); font-weight: 600; margin-right: 4px; }
+
+  .summary-bar { display: flex; gap: 20px; padding: 18px 22px; border: 1px solid var(--border); border-radius: 10px; background: var(--slate-50); margin: 20px 0 28px; }
+  .summary-bar > div { flex: 1; }
+  .summary-bar strong { display: block; font-size: 22px; font-weight: 700; color: var(--slate-900); }
+  .summary-bar small { color: var(--slate-500); font-size: 12px; }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Why alpha-variant tokens?</h1>
+  <p class="lede">Issue #81 adds <code class="inl">a50</code>–<code class="inl">a950</code> to every primitive palette in <code class="inl">color.json</code>. The short version: <strong>solid colors don't blend</strong>. Without alpha tokens, every translucent surface in Nexus is a hand-tuned <code class="inl">rgba(...)</code> that looks correct on exactly one background — and wrong on every other.</p>
+  <p class="meta">Visual rationale · GitHub <code>#81</code> · phase 3 of 5, Color foundation milestone</p>
+
+  <div class="summary-bar">
+    <div><strong>264</strong><small>new primitive alpha tokens</small></div>
+    <div><strong>50</strong><small>new semantic alpha tokens</small></div>
+    <div><strong>0</strong><small>existing tokens renamed</small></div>
+    <div><strong>0</strong><small>component renders changed</small></div>
+  </div>
+
+  <h2>The problem, on one surface</h2>
+  <p class="lede" style="font-size: 15px; margin-bottom: 16px;">A popover, three contexts. Top row uses a solid white background (today's default). Bottom row uses an alpha-token background.</p>
+
+  <div class="grid-3">
+    <div class="card bad">
+      <span class="card-tag tag-bad">Solid · today</span>
+      <div class="demo bg-photo" style="min-height: 180px;">
+        <div style="margin-top: 28px;">
+          <div class="pop-solid">
+            <strong>Command palette</strong><br>
+            <span style="font-size: 12px; color: #64748b;">Press ⌘K to open</span>
+          </div>
+        </div>
+        <div class="demo-label dark">photo background</div>
+      </div>
+      <p>Pasted rectangle. Reads as a cutout, not a layer.</p>
+    </div>
+    <div class="card bad">
+      <span class="card-tag tag-bad">Solid · today</span>
+      <div class="demo bg-tinted" style="min-height: 180px;">
+        <div style="margin-top: 28px;">
+          <div class="pop-solid">
+            <strong>Command palette</strong><br>
+            <span style="font-size: 12px; color: #64748b;">Press ⌘K to open</span>
+          </div>
+        </div>
+        <div class="demo-label">tinted (amber) background</div>
+      </div>
+      <p>Looks OK because the surface is light. But it's the same rectangle — luck, not design.</p>
+    </div>
+    <div class="card bad">
+      <span class="card-tag tag-bad">Solid · today</span>
+      <div class="demo bg-dark" style="min-height: 180px;">
+        <div style="margin-top: 28px;">
+          <div class="pop-solid">
+            <strong>Command palette</strong><br>
+            <span style="font-size: 12px; color: #64748b;">Press ⌘K to open</span>
+          </div>
+        </div>
+        <div class="demo-label dark">dark theme surface</div>
+      </div>
+      <p>White slab on a dark surface. Glaring. Designer's instinct is to lower opacity — but Nexus has no token for it.</p>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card good">
+      <span class="card-tag tag-good">Alpha · this PR</span>
+      <div class="demo bg-photo" style="min-height: 180px;">
+        <div style="margin-top: 28px;">
+          <div class="pop-alpha">
+            <strong>Command palette</strong><br>
+            <span style="font-size: 12px; color: rgba(15, 23, 42, 0.7);">Press ⌘K to open</span>
+          </div>
+        </div>
+        <div class="demo-label dark">photo background</div>
+      </div>
+      <p>Background = <code class="inl">{white-a900}</code>. Inherits the warmth of the photo. Layered, not pasted.</p>
+    </div>
+    <div class="card good">
+      <span class="card-tag tag-good">Alpha · this PR</span>
+      <div class="demo bg-tinted" style="min-height: 180px;">
+        <div style="margin-top: 28px;">
+          <div class="pop-alpha">
+            <strong>Command palette</strong><br>
+            <span style="font-size: 12px; color: rgba(15, 23, 42, 0.7);">Press ⌘K to open</span>
+          </div>
+        </div>
+        <div class="demo-label">tinted (amber) background</div>
+      </div>
+      <p>Same token. Picks up the tint subtly. Identical CSS, different ambient feel.</p>
+    </div>
+    <div class="card good">
+      <span class="card-tag tag-good">Alpha · this PR</span>
+      <div class="demo bg-dark" style="min-height: 180px;">
+        <div style="margin-top: 28px;">
+          <div class="pop-alpha-dark">
+            <strong>Command palette</strong><br>
+            <span style="font-size: 12px; color: rgba(255,255,255,0.7);">Press ⌘K to open</span>
+          </div>
+        </div>
+        <div class="demo-label dark">dark theme surface</div>
+      </div>
+      <p>Dark theme swaps the token to <code class="inl">{slate.a800}</code> — translucent enough to absorb surface tone.</p>
+    </div>
+  </div>
+
+  <h2>If we don't do this</h2>
+  <table class="matrix">
+    <thead><tr><th style="width: 22%;">Symptom</th><th style="width: 48%;">What goes wrong</th><th style="width: 30%;">Who pays the cost</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Hardcoded <code class="inl">rgba()</code> in components</strong></td>
+        <td>Designer hand-picks <code class="inl">rgba(15, 23, 42, 0.12)</code> for a border. Looks correct on the slate base. Now there are 5 base palettes — wrong on the other 4.</td>
+        <td>Designers re-tune per brand. Engineers fork components. Quality drifts.</td>
+      </tr>
+      <tr>
+        <td><strong>Theming impossible</strong></td>
+        <td>Alpha values bake into source code. Switching from slate to stone base means re-grepping every <code class="inl">rgba(...)</code>. The multi-brand thesis collapses at the translucent layer.</td>
+        <td>Brand work becomes one-offs. Defeats the "AI-native multi-brand" thesis.</td>
+      </tr>
+      <tr>
+        <td><strong>No glass / vibrancy effects</strong></td>
+        <td>Apple HIG materials, Linear's Cmd-K, Raycast palettes, Notion mentions, Stripe row hover, Vercel/Geist <code class="inl">gray-alpha-N</code> — every Tier-A system uses translucency. Nexus is the only Tier-A-aspiring system without it.</td>
+        <td>Components feel flat next to category benchmarks. Surface credibility erodes.</td>
+      </tr>
+      <tr>
+        <td><strong>Designers can't see alpha in Figma</strong></td>
+        <td>Translucent surfaces don't appear in Tokens Studio / Figma Variables. Designers fake them with low-opacity layers or use brand colors that pretend to be alpha.</td>
+        <td>Code-vs-design parity erodes. The Figma audit can't compare what isn't there.</td>
+      </tr>
+      <tr>
+        <td><strong>Modal scrims look wrong on tinted pages</strong></td>
+        <td>Today's scrim is <code class="inl">#1e1e1ecc</code> — a fixed dark with fixed alpha. On slate it looks correct; on stone or zinc it reads as a foreign object.</td>
+        <td>Per-palette tweaks accumulate in component CSS. Compounding drift.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>If we do this — concrete use cases</h2>
+  <div class="grid-2">
+    <div class="card good">
+      <span class="card-tag tag-good">Use case · borders on tinted cards</span>
+      <h3>Today vs. with alpha</h3>
+      <div class="grid-2" style="gap: 10px; margin-top: 8px;">
+        <div class="demo bg-tinted" style="padding: 14px; min-height: 100px;">
+          <div class="border-card bad">
+            <strong>Pro plan</strong><br>
+            <span style="font-size: 11px; color: var(--slate-700);">$29/mo</span>
+          </div>
+        </div>
+        <div class="demo bg-tinted" style="padding: 14px; min-height: 100px;">
+          <div class="border-card good">
+            <strong>Pro plan</strong><br>
+            <span style="font-size: 11px; color: var(--slate-700);">$29/mo</span>
+          </div>
+        </div>
+      </div>
+      <p>Solid <code class="inl">{slate.200}</code> border (left) sits on top of the surface. Alpha <code class="inl">{slate.a200}</code> (right) picks up the card's tint.</p>
+    </div>
+
+    <div class="card good">
+      <span class="card-tag tag-good">Use case · hover rows in tinted lists</span>
+      <h3>Today vs. with alpha</h3>
+      <div class="grid-2" style="gap: 10px; margin-top: 8px;">
+        <div class="demo bg-tinted" style="padding: 8px; min-height: 130px;">
+          <div class="list">
+            <div class="list-row">Aishvarya <span class="pill">Admin</span></div>
+            <div class="list-row hov-solid">Sam <span class="pill">Editor</span></div>
+            <div class="list-row">Priya <span class="pill">Viewer</span></div>
+          </div>
+        </div>
+        <div class="demo bg-tinted" style="padding: 8px; min-height: 130px;">
+          <div class="list">
+            <div class="list-row">Aishvarya <span class="pill">Admin</span></div>
+            <div class="list-row hov-alpha">Sam <span class="pill">Editor</span></div>
+            <div class="list-row">Priya <span class="pill">Viewer</span></div>
+          </div>
+        </div>
+      </div>
+      <p>Solid <code class="inl">{slate.100}</code> hover (left) wipes out the surface tint. Alpha <code class="inl">{slate.a100}</code> (right) subtly darkens it.</p>
+    </div>
+
+    <div class="card good">
+      <span class="card-tag tag-good">Use case · modal scrims</span>
+      <h3>Today vs. with alpha</h3>
+      <div class="grid-2" style="gap: 10px; margin-top: 8px;">
+        <div class="demo bg-mesh scrim-demo" style="min-height: 130px;">
+          <div style="padding: 12px; color: var(--slate-800); font-size: 12px;">Page content beneath…</div>
+          <div class="scrim-solid">⌘ + K dialog</div>
+        </div>
+        <div class="demo bg-mesh scrim-demo" style="min-height: 130px;">
+          <div style="padding: 12px; color: var(--slate-800); font-size: 12px;">Page content beneath…</div>
+          <div class="scrim-alpha">⌘ + K dialog</div>
+        </div>
+      </div>
+      <p>Today's scrim (left) hides surface entirely. Alpha <code class="inl">{slate.a700}</code> (right) preserves page presence while focusing the dialog.</p>
+    </div>
+
+    <div class="card good">
+      <span class="card-tag tag-good">Use case · Cmd-K palette over content</span>
+      <h3>The Linear / Raycast look</h3>
+      <div class="demo bg-mesh" style="min-height: 170px; padding: 18px;">
+        <div style="margin-top: 8px;">
+          <div class="pop-alpha" style="min-width: 280px;">
+            <div style="font-size: 10.5px; color: var(--slate-500); letter-spacing: 0.05em; margin-bottom: 6px;">SEARCH</div>
+            <strong style="color: var(--slate-900);">Find anything…</strong>
+            <div style="font-size: 11.5px; color: var(--slate-700); margin-top: 8px;">⌘+P  ·  ⌘+K  ·  ⌘+/</div>
+          </div>
+        </div>
+      </div>
+      <p>Background <code class="inl">{white-a900}</code> + <code class="inl">backdrop-filter: blur</code>. Unreachable from Nexus utilities today; native after this PR.</p>
+    </div>
+  </div>
+
+  <h2>What changes in code</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Before</h3>
+      <pre><span class="tok-com">// component/popover.tsx — today</span>
+&lt;<span class="tok-key">div</span> <span class="tok-key">style</span>={{
+  background: <span class="tok-str">'rgba(255, 255, 255, 0.85)'</span>,
+  border: <span class="tok-str">'1px solid rgba(15, 23, 42, 0.12)'</span>,
+}}&gt;
+
+<span class="tok-com">// Dark theme? Designer must:</span>
+<span class="tok-com">// 1. know slate.900's exact hex</span>
+<span class="tok-com">// 2. hand-mix it with 0.85 alpha</span>
+<span class="tok-com">// 3. duplicate it in every consumer</span>
+<span class="tok-com">// 4. rebuild when base palette swaps</span></pre>
+    </div>
+    <div>
+      <h3>After</h3>
+      <pre><span class="tok-com">// component/popover.tsx — with #81</span>
+&lt;<span class="tok-key">div</span> <span class="tok-key">className</span>=<span class="tok-str">"nx:bg-popover-background-alpha</span>
+            <span class="tok-str">nx:border-border-default-alpha"</span>&gt;
+
+<span class="tok-com">// Light theme: white@90% on surface</span>
+<span class="tok-com">// Dark theme: slate-950@85% on surface</span>
+<span class="tok-com">// Different base palette? Same token.</span>
+<span class="tok-com">// Tokens visible in Figma. Figma audit covers it.</span></pre>
+    </div>
+  </div>
+
+  <h2>What ships with this PR</h2>
+  <ul class="bullets">
+    <li><strong>264 primitive alpha tokens.</strong> 22 chromatic palettes × 11 alpha shades, plus <code class="inl">white-a*</code> and <code class="inl">black-a*</code> leaves. Mechanical OKLCH conversion preserves alpha — no script changes needed.</li>
+    <li><strong>50 semantic alpha tokens.</strong> 5 alpha keys per base file × 10 base files (5 palettes × light/dark). Covers borders, hover, popover, scrim, backdrop.</li>
+    <li><strong>Generated CSS &amp; utilities.</strong> <code class="inl">--nx-color-slate-a200</code>, <code class="inl">--color-border-default-alpha</code>, etc. Tailwind utilities like <code class="inl">nx:bg-popover-background-alpha</code> become available.</li>
+    <li><strong>Tokens Studio / Figma Variables visibility.</strong> Designers can pick alpha tokens directly. Code-vs-Figma audit can compare them once the snapshot is refreshed.</li>
+    <li><strong>Documentation.</strong> <code class="inl">.claude/rules/tokens.md</code> gets an Alpha Token Scale section explaining the curve and the mechanical routing.</li>
+    <li><strong>Pure addition, zero breakage.</strong> No existing token values change; no CSS variables renamed; no Storybook regressions expected. <code class="inl">audit:contrast</code> stays green (alpha intentionally out of APCA scope per the issue).</li>
+  </ul>
+
+  <h2>Why now, not later</h2>
+  <p class="lede" style="font-size: 15px;">Three reasons this is the right phase:</p>
+  <ul class="bullets">
+    <li><strong>Theming gate.</strong> The 10 base palettes ship in Phase 1. Alpha tokens must exist before components can be themed without hardcoded <code class="inl">rgba()</code> — otherwise every later component PR carries the migration cost.</li>
+    <li><strong>OKLCH pipeline is ready.</strong> The mechanical routing path already handles 8-digit alpha hex correctly. Adding alpha later would still cost the same — but later means more <code class="inl">rgba()</code> drift to clean up.</li>
+    <li><strong>Tier-A parity.</strong> Linear, Geist, Radix, Apple HIG, Stripe, Notion all ship alpha. Nexus's "AI-native multi-brand design system for humans and agents" thesis (per memory) requires showing parity with the systems agents will be benchmarked against.</li>
+  </ul>
+
+  <p style="margin-top: 48px; color: var(--slate-500); font-size: 12.5px; padding-top: 18px; border-top: 1px solid var(--slate-100);">
+    Source: <code class="inl">github.com/nexuslabs-ai/nexus/issues/81</code> · milestone <em>Color foundation · Phase 1</em> · part 3 of 5 · prior: <code class="inl">reports/phase-1-preview.html § Alpha-variant tokens</code> (full visual preview)
+  </p>
+</div>
+</body>
+</html>
