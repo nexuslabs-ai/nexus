@@ -46,7 +46,7 @@
   --color-popover-foreground: var(--nx-color-slate-900);
   --color-popover-hover: var(--nx-color-slate-50);
   --color-popover-active: var(--nx-color-slate-50);
-  --color-popover-background-alpha: var(--nx-color-white-a900);
+  --color-popover-alpha: var(--nx-color-white-a900);
   --color-popover-backdrop: var(--nx-color-slate-a900);
   --color-nav-background: var(--nx-color-slate-100);
   --color-nav-foreground: var(--nx-color-slate-900);

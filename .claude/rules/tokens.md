@@ -48,7 +48,7 @@ E.g. `slate` (950 = `#020617`) yields `slate.a50` = `#0206170a` and `slate.a500`
 
 **Routing.** Alpha shades route **mechanically** (not grid-pinned): the shade-key regex matches only `50`–`950`, so an `a*` segment falls through to a straight hex→OKLCH conversion. L/C/H come from the 950 base hex and the alpha channel is preserved — `slate.a200` → `oklch(0.1288 0.0406 264.695 / 0.0941)`. To retune the curve, edit the alpha bytes in `color.json`; the perceptual grid does **not** apply to alpha shades.
 
-**Semantic alpha tokens.** Each base file exposes `background-hover-alpha`, `popover-background-alpha`, `popover-backdrop`, `border.default-alpha`, and `overlay` (migrated from a hardcoded `#…cc` to `{palette.a700}` light / `{palette.a800}` dark).
+**Semantic alpha tokens.** Each base file exposes `background-hover-alpha`, `popover-alpha`, `popover-backdrop`, `border.default-alpha`, and `overlay` (migrated from a hardcoded `#…cc` to `{palette.a700}` light / `{palette.a800}` dark).
 
 **Not APCA-gated.** Alpha tokens blend with their backdrop, so their contrast is context-dependent — they are intentionally excluded from the `audit:contrast` pairs. `oklchToSrgbInts()` throws on an alpha-bearing color, so any future pair that needs one must pre-blend against its surface first.
 

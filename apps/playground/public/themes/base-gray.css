@@ -19,7 +19,7 @@ html {
   --nx-color-popover-foreground: var(--nx-color-gray-950);
   --nx-color-popover-hover: var(--nx-color-gray-50);
   --nx-color-popover-active: var(--nx-color-gray-50);
-  --nx-color-popover-background-alpha: var(--nx-color-white-a900);
+  --nx-color-popover-alpha: var(--nx-color-white-a900);
   --nx-color-popover-backdrop: var(--nx-color-gray-a900);
   --nx-color-nav-background: var(--nx-color-gray-100);
   --nx-color-nav-foreground: var(--nx-color-gray-900);
@@ -99,7 +99,7 @@ html.dark {
   --nx-color-popover-foreground: var(--nx-color-white);
   --nx-color-popover-hover: var(--nx-color-gray-600);
   --nx-color-popover-active: var(--nx-color-gray-700);
-  --nx-color-popover-background-alpha: var(--nx-color-gray-a800);
+  --nx-color-popover-alpha: var(--nx-color-gray-a800);
   --nx-color-popover-backdrop: var(--nx-color-gray-a900);
   --nx-color-nav-background: var(--nx-color-gray-950);
   --nx-color-nav-foreground: var(--nx-color-gray-50);

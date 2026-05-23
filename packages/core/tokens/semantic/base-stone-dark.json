@@ -73,7 +73,7 @@
     "$value": "{stone.700}",
     "$type": "color"
   },
-  "popover-background-alpha": {
+  "popover-alpha": {
     "$value": "{stone.a800}",
     "$type": "color"
   },

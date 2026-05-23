@@ -73,7 +73,7 @@
     "$value": "{zinc.700}",
     "$type": "color"
   },
-  "popover-background-alpha": {
+  "popover-alpha": {
     "$value": "{zinc.a800}",
     "$type": "color"
   },
