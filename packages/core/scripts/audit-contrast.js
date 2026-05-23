@@ -106,6 +106,12 @@ const BRAND_PAIRS = [
   },
 ];
 
+// Categorical chart series must be readable as filled marks on every surface
+// they render on — both the page canvas (`background`) and raised containers
+// (`container`, since charts often live inside cards). UI tier (Lc 60) treats
+// chart marks like labels rather than fluent reading text.
+const CHART_SURFACES = ['background', 'container'];
+
 // Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),
 // which APCA encodes as the incidental tier (Lc 45). Pair against every
 // base palette surface focusable controls actually render on per theme;
@@ -222,6 +228,41 @@ function auditPairs(fgData, bgData, fileName, pairs, primitiveMap) {
   return { fileName, lines, results };
 }
 
+function auditCrossFileLoop({
+  themes,
+  palettes,
+  pairs,
+  fgFile,
+  fgLabel,
+  primitiveMap,
+}) {
+  const sections = [];
+  for (const theme of themes) {
+    const fgFilePath = fgFile(theme);
+    if (!fs.existsSync(fgFilePath)) continue;
+    const fgData = readTokenFile(fgFilePath);
+    const fgDisplayLabel = fgLabel(theme);
+    for (const palette of palettes) {
+      const bgFilePath = path.join(
+        SEMANTIC_DIR,
+        `base-${palette}-${theme}.json`
+      );
+      if (!fs.existsSync(bgFilePath)) continue;
+      const bgData = readTokenFile(bgFilePath);
+      sections.push(
+        auditPairs(
+          fgData,
+          bgData,
+          `base-${palette}-${theme}.json ↔ ${fgDisplayLabel}`,
+          pairs,
+          primitiveMap
+        )
+      );
+    }
+  }
+  return sections;
+}
+
 function main() {
   const primitiveMap = buildPrimitiveHexMap();
   const sections = [];
@@ -260,30 +301,43 @@ function main() {
     }
   }
 
-  for (const theme of THEMES) {
-    const focusFilePath = path.join(
-      FOCUS_PRIMITIVES_DIR,
-      `focus-default-${theme}.json`
+  sections.push(
+    ...auditCrossFileLoop({
+      themes: THEMES,
+      palettes: BASE_PALETTES,
+      pairs: FOCUS_PAIRS,
+      fgFile: (theme) =>
+        path.join(FOCUS_PRIMITIVES_DIR, `focus-default-${theme}.json`),
+      fgLabel: (theme) => `focus-default-${theme}.json`,
+      primitiveMap,
+    })
+  );
+
+  const chartLightFile = path.join(
+    SEMANTIC_DIR,
+    'chart-categorical-default-light.json'
+  );
+  if (fs.existsSync(chartLightFile)) {
+    const categoricalKeys = Object.keys(
+      readTokenFile(chartLightFile).chart.categorical
     );
-    if (!fs.existsSync(focusFilePath)) continue;
-    const focusData = readTokenFile(focusFilePath);
-    for (const palette of BASE_PALETTES) {
-      const baseFilePath = path.join(
-        SEMANTIC_DIR,
-        `base-${palette}-${theme}.json`
+    const chartPairs = categoricalKeys
+      .map((key) => `chart.categorical.${key}`)
+      .flatMap((fg) =>
+        CHART_SURFACES.map((bg) => ({ fg, bg, minLc: 60, tier: 'ui' }))
       );
-      if (!fs.existsSync(baseFilePath)) continue;
-      const baseData = readTokenFile(baseFilePath);
-      sections.push(
-        auditPairs(
-          focusData,
-          baseData,
-          `base-${palette}-${theme}.json ↔ focus-default-${theme}.json`,
-          FOCUS_PAIRS,
-          primitiveMap
-        )
-      );
-    }
+
+    sections.push(
+      ...auditCrossFileLoop({
+        themes: THEMES,
+        palettes: BASE_PALETTES,
+        pairs: chartPairs,
+        fgFile: (theme) =>
+          path.join(SEMANTIC_DIR, `chart-categorical-default-${theme}.json`),
+        fgLabel: (theme) => `chart-categorical-default-${theme}.json`,
+        primitiveMap,
+      })
+    );
   }
 
   let totalPairs = 0;

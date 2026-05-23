@@ -2,6 +2,10 @@
 import './index.css';
 
 // Utilities
+export {
+  CHART_CATEGORICAL_SERIES,
+  type ChartCategoricalIndex,
+} from '@/lib/chart';
 export { cn } from '@/lib/utils';
 
 // Components

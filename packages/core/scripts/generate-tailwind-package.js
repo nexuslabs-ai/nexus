@@ -123,7 +123,17 @@ function getSemanticFiles(discovered, config) {
 
   for (const [type, modes] of Object.entries(discovered.themed)) {
     const configKey = type === 'brands' ? 'brand' : type;
-    const selectedMode = config[configKey] || Object.keys(modes)[0];
+    let selectedMode = config[configKey];
+
+    if (!selectedMode) {
+      const modeKeys = Object.keys(modes);
+      if (modeKeys.length > 1) {
+        throw new Error(
+          `getSemanticFiles: themed type "${type}" has ${modeKeys.length} modes [${modeKeys.join(', ')}] but no config["${configKey}"] selector. Add '${configKey}': '<mode>' to DEFAULT_CONFIG.`
+        );
+      }
+      selectedMode = modeKeys[0];
+    }
 
     if (modes[selectedMode]) {
       result.themed.push({

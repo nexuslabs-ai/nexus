@@ -110,6 +110,11 @@
   --color-secondary-subtle-foreground: var(--nx-color-neutral-600);
   --color-secondary-subtle-hover: var(--nx-color-neutral-200);
   --color-secondary-subtle-active: var(--nx-color-neutral-300);
+  --color-chart-categorical-1: var(--nx-color-teal-600);
+  --color-chart-categorical-2: var(--nx-color-lime-700);
+  --color-chart-categorical-3: var(--nx-color-orange-600);
+  --color-chart-categorical-4: var(--nx-color-rose-600);
+  --color-chart-categorical-5: var(--nx-color-indigo-600);
 
   /* Spacing tokens */
   --spacing-0: var(--nx-size-0);
@@ -298,6 +303,11 @@
   --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-200);
   --nx-color-secondary-subtle-hover: var(--nx-color-neutral-700);
   --nx-color-secondary-subtle-active: var(--nx-color-neutral-600);
+  --nx-color-chart-categorical-1: var(--nx-color-teal-300);
+  --nx-color-chart-categorical-2: var(--nx-color-lime-300);
+  --nx-color-chart-categorical-3: var(--nx-color-orange-200);
+  --nx-color-chart-categorical-4: var(--nx-color-rose-200);
+  --nx-color-chart-categorical-5: var(--nx-color-indigo-200);
 }
 
 /* ===== BASE LAYER ===== */
