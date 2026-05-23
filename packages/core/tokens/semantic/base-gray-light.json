@@ -24,14 +24,10 @@
     "$type": "color",
     "$description": "It’s a gray that softens contrast so primary content stands forward."
   },
-  "muted-light": {
-    "$value": "{gray.50}",
-    "$type": "color"
-  },
-  "muted-light-foreground": {
+  "muted-foreground-subtle": {
     "$value": "{gray.400}",
     "$type": "color",
-    "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
+    "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
     "$value": "{gray.50}",

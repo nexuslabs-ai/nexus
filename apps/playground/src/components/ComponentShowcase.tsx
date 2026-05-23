@@ -129,11 +129,54 @@ export function ComponentShowcase() {
               className="nx:bg-secondary-background"
             />
             <ColorSwatch name="Muted" className="nx:bg-muted" />
-            <ColorSwatch name="Muted Light" className="nx:bg-muted-light" />
+            <ColorSwatch
+              name="Muted Foreground Subtle"
+              className="nx:bg-muted-foreground-subtle"
+            />
             <ColorSwatch name="Success" className="nx:bg-success-background" />
             <ColorSwatch name="Error" className="nx:bg-error-background" />
             <ColorSwatch name="Warning" className="nx:bg-warning-background" />
             <ColorSwatch name="Info" className="nx:bg-information-background" />
+          </div>
+        </Section>
+
+        {/* Navigation Section */}
+        <Section
+          title="Navigation"
+          description="Sidebar/topbar chrome surface tokens"
+        >
+          <div className="nx:grid nx:grid-cols-2 nx:gap-4 nx:sm:grid-cols-3 nx:md:grid-cols-6">
+            <ColorSwatch
+              name="Nav Background"
+              className="nx:bg-nav-background"
+              border
+            />
+            <ColorSwatch
+              name="Nav Foreground"
+              className="nx:bg-nav-foreground"
+              textDark
+            />
+            <ColorSwatch
+              name="Nav Muted Fg"
+              className="nx:bg-nav-muted-foreground"
+            />
+            <ColorSwatch
+              name="Nav Item Hover"
+              className="nx:bg-nav-item-hover"
+            />
+            <ColorSwatch
+              name="Nav Item Active"
+              className="nx:bg-nav-item-active"
+            />
+            <ColorSwatch name="Nav Border" className="nx:bg-nav-border" />
+          </div>
+          <div className="nx:mt-4 nx:bg-nav-background nx:border nx:border-nav-border nx:rounded-md nx:p-4">
+            <p className="nx:text-nav-foreground nx:text-sm nx:font-medium">
+              Nav item label
+            </p>
+            <p className="nx:text-nav-muted-foreground nx:text-xs nx:mt-1">
+              Nav muted helper text
+            </p>
           </div>
         </Section>
 

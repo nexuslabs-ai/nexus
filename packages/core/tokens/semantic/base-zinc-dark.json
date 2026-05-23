@@ -24,14 +24,10 @@
     "$type": "color",
     "$description": "It’s a gray that softens contrast so primary content stands forward."
   },
-  "muted-light": {
-    "$value": "{zinc.900}",
-    "$type": "color"
-  },
-  "muted-light-foreground": {
-    "$value": "{zinc.300}",
+  "muted-foreground-subtle": {
+    "$value": "{zinc.400}",
     "$type": "color",
-    "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
+    "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
     "$value": "{zinc.950}",

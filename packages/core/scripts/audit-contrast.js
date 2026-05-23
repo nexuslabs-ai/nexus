@@ -23,8 +23,8 @@ const BASE_PAIRS = [
   { fg: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
   { fg: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
   {
-    fg: 'muted-light-foreground',
-    bg: 'muted-light',
+    fg: 'muted-foreground-subtle',
+    bg: 'muted',
     minLc: 45,
     tier: 'incidental',
   },
