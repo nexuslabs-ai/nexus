@@ -380,7 +380,7 @@
     <div>
       <h3>After</h3>
       <pre><span class="tok-com">// component/popover.tsx — with #81</span>
-&lt;<span class="tok-key">div</span> <span class="tok-key">className</span>=<span class="tok-str">"nx:bg-popover-background-alpha</span>
+&lt;<span class="tok-key">div</span> <span class="tok-key">className</span>=<span class="tok-str">"nx:bg-popover-alpha</span>
             <span class="tok-str">nx:border-border-default-alpha"</span>&gt;
 
 <span class="tok-com">// Light theme: white@90% on surface</span>
@@ -394,7 +394,7 @@
   <ul class="bullets">
     <li><strong>264 primitive alpha tokens.</strong> 22 chromatic palettes × 11 alpha shades, plus <code class="inl">white-a*</code> and <code class="inl">black-a*</code> leaves. Mechanical OKLCH conversion preserves alpha — no script changes needed.</li>
     <li><strong>50 semantic alpha tokens.</strong> 5 alpha keys per base file × 10 base files (5 palettes × light/dark). Covers borders, hover, popover, scrim, backdrop.</li>
-    <li><strong>Generated CSS &amp; utilities.</strong> <code class="inl">--nx-color-slate-a200</code>, <code class="inl">--color-border-default-alpha</code>, etc. Tailwind utilities like <code class="inl">nx:bg-popover-background-alpha</code> become available.</li>
+    <li><strong>Generated CSS &amp; utilities.</strong> <code class="inl">--nx-color-slate-a200</code>, <code class="inl">--color-border-default-alpha</code>, etc. Tailwind utilities like <code class="inl">nx:bg-popover-alpha</code> become available.</li>
     <li><strong>Tokens Studio / Figma Variables visibility.</strong> Designers can pick alpha tokens directly. Code-vs-Figma audit can compare them once the snapshot is refreshed.</li>
     <li><strong>Documentation.</strong> <code class="inl">.claude/rules/tokens.md</code> gets an Alpha Token Scale section explaining the curve and the mechanical routing.</li>
     <li><strong>Pure addition, zero breakage.</strong> No existing token values change; no CSS variables renamed; no Storybook regressions expected. <code class="inl">audit:contrast</code> stays green (alpha intentionally out of APCA scope per the issue).</li>
