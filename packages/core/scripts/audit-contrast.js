@@ -106,6 +106,16 @@ const BRAND_PAIRS = [
   },
 ];
 
+// Categorical chart series must be readable as filled marks on every surface
+// they render on — both the page canvas (`background`) and raised containers
+// (`container`, since charts often live inside cards). UI tier (Lc 60) treats
+// chart marks like labels rather than fluent reading text.
+const CHART_SURFACES = ['background', 'container'];
+const CHART_SERIES = ['chart.1', 'chart.2', 'chart.3', 'chart.4', 'chart.5'];
+const CHART_PAIRS = CHART_SERIES.flatMap((fg) =>
+  CHART_SURFACES.map((bg) => ({ fg, bg, minLc: 60, tier: 'ui' }))
+);
+
 // Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),
 // which APCA encodes as the incidental tier (Lc 45). Pair against every
 // base palette surface focusable controls actually render on per theme;
@@ -280,6 +290,32 @@ function main() {
           baseData,
           `base-${palette}-${theme}.json ↔ focus-default-${theme}.json`,
           FOCUS_PAIRS,
+          primitiveMap
+        )
+      );
+    }
+  }
+
+  for (const theme of THEMES) {
+    const chartFilePath = path.join(
+      SEMANTIC_DIR,
+      `chart-default-${theme}.json`
+    );
+    if (!fs.existsSync(chartFilePath)) continue;
+    const chartData = readTokenFile(chartFilePath);
+    for (const palette of BASE_PALETTES) {
+      const baseFilePath = path.join(
+        SEMANTIC_DIR,
+        `base-${palette}-${theme}.json`
+      );
+      if (!fs.existsSync(baseFilePath)) continue;
+      const baseData = readTokenFile(baseFilePath);
+      sections.push(
+        auditPairs(
+          chartData,
+          baseData,
+          `base-${palette}-${theme}.json ↔ chart-default-${theme}.json`,
+          CHART_PAIRS,
           primitiveMap
         )
       );
