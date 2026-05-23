@@ -88,8 +88,9 @@ The build emits one CSS block per mode, all in a single bundle:
   --spacing-1: 4px;
   --spacing-2: 8px;
   /* ... */
-  --space-control-h-md: 36px;
-  --space-control-px: 10px;
+  --control-h-md: 36px;
+  --control-padding-x-md: 12px;
+  --control-padding-y-md: 8px;
   /* ... */
 }
 
@@ -97,8 +98,9 @@ The build emits one CSS block per mode, all in a single bundle:
   --spacing-1: 3px;
   --spacing-2: 6px;
   /* ... */
-  --space-control-h-md: 28px;
-  --space-control-px: 8px;
+  --control-h-md: 28px;
+  --control-padding-x-md: 8px;
+  --control-padding-y-md: 6px;
   /* ... */
 }
 ```
@@ -161,20 +163,23 @@ Two ESLint/Stylelint rules guard the architecture:
 
 Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
 
-| Component        | Role used for                     | Token                                                                                 |
-| ---------------- | --------------------------------- | ------------------------------------------------------------------------------------- |
-| Button (default) | height, px, gap, font             | `--space-control-h-md`, `--space-control-px`, `--space-control-gap`, `--text-control` |
-| Input            | height, px, font                  | `--space-control-h-md`, `--space-control-px`, `--text-control`                        |
-| Select           | trigger height/px/gap             | `--space-control-h-md`, `--space-control-px`, `--space-control-gap`                   |
-| Card             | interior padding                  | `--space-container-p`                                                                 |
-| Card header      | header strip py, px               | `--space-container-header-py`, `--space-container-p`                                  |
-| Dialog           | interior padding                  | `--space-container-p`                                                                 |
-| Badge / Chip     | height (sm), px                   | `--space-control-h-sm`, `--space-control-px`                                          |
-| Avatar           | (uses sizing tokens, not spacing) | N/A                                                                                   |
-| Page layout      | left/right gutter                 | `--space-page-gutter`                                                                 |
-| Section          | top/bottom margin                 | `--space-section-gap`                                                                 |
-| Stack utility    | gap                               | `--space-stack-gap`                                                                   |
-| Inline group     | gap                               | `--space-inline-gap`                                                                  |
+| Component                                | Role used for                     | Tokens                                                                                |
+| ---------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------- |
+| Button (default)                         | height, padding-x, padding-y, gap | `--control-h-md`, `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap` |
+| Button (sm)                              | height, padding-x, padding-y      | `--control-h-sm`, `--control-padding-x-sm`, `--control-padding-y-sm`                  |
+| Button (lg)                              | height, padding-x, padding-y      | `--control-h-lg`, `--control-padding-x-lg`, `--control-padding-y-lg`                  |
+| Input (default)                          | height, padding-x, padding-y      | `--control-h-md`, `--control-padding-x-md`, `--control-padding-y-md`                  |
+| Select trigger                           | height, padding-x, gap            | `--control-h-md`, `--control-padding-x-md`, `--control-gap`                           |
+| Tabs trigger                             | height (sm/md), padding-x         | `--control-h-{sm,md}`, `--control-padding-x-{sm,md}`                                  |
+| Tooltip                                  | padding-x, padding-y              | `--control-padding-x-sm`, `--control-padding-y-sm`                                    |
+| Badge / Chip                             | height (sm), padding-x            | `--control-h-sm`, `--control-padding-x-sm`                                            |
+| Card                                     | interior padding, gap             | `--container-p`, `--container-gap`                                                    |
+| Card header                              | container padding                 | `--container-p` (sub-element offsets use numeric `spacing-N`)                         |
+| Dialog                                   | interior padding, gap             | `--container-p`, `--container-gap`                                                    |
+| Avatar                                   | (uses sizing tokens, not spacing) | N/A — see `nx:size-*` numeric utilities                                               |
+| Section between blocks                   | vertical gap                      | `--layout-section-gap`                                                                |
+| Stack utility                            | gap between siblings              | `--layout-stack-gap`                                                                  |
+| Page gutter, inline groups, layout-level | (no named role yet)               | Use numeric `spacing-N` from canonical step set                                       |
 
 When a new component is authored, the author adds a row to this table.
 

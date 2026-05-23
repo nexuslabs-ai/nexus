@@ -388,15 +388,15 @@ section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
       <div class="demo-vars">
         <div class="demo-vars-label">Resolved CSS variables · mode <span x-text="`= ${mode}`" style="font-family:var(--font-mono);color:var(--accent);"></span></div>
         <div class="demo-var-row">
-          <span class="demo-var-name">--space-control-h-md</span>
+          <span class="demo-var-name">--control-h-md</span>
           <span class="demo-var-val" x-text="`${current['control-h-md']}px`"></span>
         </div>
         <div class="demo-var-row">
-          <span class="demo-var-name">--space-control-px</span>
+          <span class="demo-var-name">--control-padding-x-md</span>
           <span class="demo-var-val" x-text="`${current['control-px']}px`"></span>
         </div>
         <div class="demo-var-row">
-          <span class="demo-var-name">--space-control-gap</span>
+          <span class="demo-var-name">--control-gap</span>
           <span class="demo-var-val" x-text="`${current['control-gap']}px`"></span>
         </div>
         <div class="demo-var-row">
@@ -421,7 +421,7 @@ section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
 <section class="block" id="shift">
   <div class="block-num">02 · The shift</div>
   <h2 class="block-title">Drop the primitive layer. Direct values per mode.</h2>
-  <p class="block-lede">Today, primitives are mode-variant (5 size files, all numeric utilities shift implicitly). Proposed: delete the primitive layer entirely. Each mode is one self-contained file with direct px values for both numeric tokens (<code>--spacing-N</code>) and role-named tokens (<code>--space-control-px</code>). No cross-file indirection. No primitive scale to maintain. No "which step does this role point to" gate.</p>
+  <p class="block-lede">Today, primitives are mode-variant (5 size files, all numeric utilities shift implicitly). Proposed: delete the primitive layer entirely. Each mode is one self-contained file with direct px values for both numeric tokens (<code>--spacing-N</code>) and role-named tokens (<code>--control-padding-x-md</code>). No cross-file indirection. No primitive scale to maintain. No "which step does this role point to" gate.</p>
 
   <div class="arch-grid">
     <div class="arch-col now">
@@ -458,7 +458,7 @@ section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
       </div>
       <div class="arch-layer">
         <div class="arch-layer-label">Per-mode semantic · direct values</div>
-        <div class="arch-layer-code">/* spacing-vega.json → emitted as: */<br>--spacing-2: 8px;<br>--spacing-9: 36px;<br>--space-control-h-md: 36px;<br>--space-control-px: 10px;</div>
+        <div class="arch-layer-code">/* spacing-vega.json → emitted as: */<br>--spacing-2: 8px;<br>--spacing-9: 36px;<br>--control-h-md: 36px;<br>--control-padding-x-md: 12px;<br>--control-padding-y-md: 8px;</div>
       </div>
       <div class="arch-layer">
         <div class="arch-layer-label" style="color:var(--lead);">No primitive layer</div>
@@ -976,7 +976,7 @@ mental cost: <span class="clear">[parse "control surface, default size"]</span> 
       <div class="tl-dot">4</div>
       <div class="tl-week">Week 2 · Tokens</div>
       <div class="tl-title">Author 7 mode files with direct values</div>
-      <div class="tl-body">Each <code>spacing-{mode}.json</code> contains every numeric step (<code>spacing-0</code> through <code>spacing-96</code>) AND every role (<code>space-control-*</code>, <code>space-container-*</code>, …) with direct px values. Self-contained per mode. Each ~80 lines.</div>
+      <div class="tl-body">Each <code>spacing-{mode}.json</code> contains every numeric step (<code>spacing-0</code> through <code>spacing-96</code>) AND every role (<code>control-*</code>, <code>container-*</code>, …) with direct px values. Self-contained per mode. Each ~80 lines.</div>
       <div class="tl-effort">~4 hours</div>
     </div>
 
