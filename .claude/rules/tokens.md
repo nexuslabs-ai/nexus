@@ -54,23 +54,23 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 | `muted-light-foreground ↔ muted-light`                                              | `         | Lc        | ≥ 45` | Dividers, helper text, subtle surfaces   |
 | `disabled-foreground ↔ disabled`                                                    | `         | Lc        | ≥ 45` | Disabled-state text, still readable      |
 | `focus.color.{default,error} ↔ {background,container,popover}`                      | `         | Lc        | ≥ 45` | Focus rings on every surface they hit    |
-| `chart.{1..5} ↔ {background,container}`                                             | `         | Lc        | ≥ 60` | Categorical chart marks on every surface |
+| `chart.categorical.{1..5} ↔ {background,container}`                                 | `         | Lc        | ≥ 60` | Categorical chart marks on every surface |
 
 Failures must be fixed by adjusting the semantic token reference (which shade a given role points to) or the L grid values — not by lowering the thresholds. The tiers themselves come from APCA's published guidance and are not negotiable per-finding.
 
 ## File Naming
 
-| Directory  | Pattern                             | Example                                                  |
-| ---------- | ----------------------------------- | -------------------------------------------------------- |
-| primitives | `color.json`                        | Single file with all color scales                        |
-| primitives | `{category}/{category}-{mode}.json` | `size/size-vega.json`, `radius/radius-subtle.json`       |
-| primitives | `shadow/shadow-{mode}-{theme}.json` | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json` |
-| primitives | `typography/typography-{mode}.json` | `typography/typography-vega.json`                        |
-| semantic   | `base-{palette}-{theme}.json`       | `base-slate-light.json`, `base-slate-dark.json`          |
-| semantic   | `brands-{name}-{theme}.json`        | `brands-blue-light.json`, `brands-blue-dark.json`        |
-| semantic   | `chart-{mode}-{theme}.json`         | `chart-default-light.json`, `chart-default-dark.json`    |
-| semantic   | `spacing.json`                      | Standalone semantic (no light/dark variant)              |
-| component  | `{component}.json`                  | `button.json` (future)                                   |
+| Directory  | Pattern                             | Example                                                                       |
+| ---------- | ----------------------------------- | ----------------------------------------------------------------------------- |
+| primitives | `color.json`                        | Single file with all color scales                                             |
+| primitives | `{category}/{category}-{mode}.json` | `size/size-vega.json`, `radius/radius-subtle.json`                            |
+| primitives | `shadow/shadow-{mode}-{theme}.json` | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json`                      |
+| primitives | `typography/typography-{mode}.json` | `typography/typography-vega.json`                                             |
+| semantic   | `base-{palette}-{theme}.json`       | `base-slate-light.json`, `base-slate-dark.json`                               |
+| semantic   | `brands-{name}-{theme}.json`        | `brands-blue-light.json`, `brands-blue-dark.json`                             |
+| semantic   | `chart-{scale}-{mode}-{theme}.json` | `chart-categorical-default-light.json`, `chart-categorical-default-dark.json` |
+| semantic   | `spacing.json`                      | Standalone semantic (no light/dark variant)                                   |
+| component  | `{component}.json`                  | `button.json` (future)                                                        |
 
 ### Shadow Tokens (Theme-Aware)
 
@@ -150,7 +150,7 @@ Primitive colors use Tailwind's shade scale (50-950):
 | Brand    | `primary.*`, `secondary.*`                                  | `--color-primary-background`      |
 | Status   | `error.*`, `success.*`, `warning.*`, `information.*`        | `--color-error-subtle-foreground` |
 | Borders  | `border.default`, `border.primary`, `border.error`, etc.    | `--color-border-default`          |
-| Data viz | `chart.1`, `chart.2`, `chart.3`, `chart.4`, `chart.5`       | `--color-chart-1`                 |
+| Data viz | `chart.categorical.{1..5}`                                  | `--color-chart-categorical-1`     |
 
 Each brand/status group has: `background`, `background-hover`, `background-active`, `foreground`, `disabled`, `subtle`, `subtle-foreground`, `subtle-hover`, `subtle-active`
 
@@ -158,12 +158,12 @@ Each brand/status group has: `background`, `background-hover`, `background-activ
 
 Categorical chart palette for data visualization. Hues rotate (teal → lime → orange → rose → indigo) for visual rhythm in stacked/grouped marks and deliberately avoid status-semantic hues (green/amber/red) so a red bar doesn't read as an error series.
 
-Theme-aware — lives in `chart-{mode}-light.json` and `chart-{mode}-dark.json` (a themed pair). Light mode uses shade 600–700 primitives (dark colors on a near-white canvas); dark mode uses shade 200–300 (light colors on a near-black canvas). Each chart × surface pair (`chart.{1..5}` ↔ `background`, `chart.{1..5}` ↔ `container`) is APCA-validated at Lc ≥ 60 (UI tier) across every base palette by `yarn audit:contrast`.
+Theme-aware — lives in `chart-categorical-{mode}-light.json` and `chart-categorical-{mode}-dark.json` (a themed pair). The `categorical` infix locks scale-type in both the filename and the token path (`chart.categorical.{1..5}` → `--color-chart-categorical-{1..5}`), so future scale shapes (sequential, diverging) land as `chart-sequential-default-*.json` with `chart.sequential.N` paths and never collide on the same CSS variable. Light mode uses shade 600–700 primitives (dark colors on a near-white canvas); dark mode uses shade 200–300 (light colors on a near-black canvas). Each chart × surface pair (`chart.categorical.{1..5}` ↔ `background`, `chart.categorical.{1..5}` ↔ `container`) is APCA-validated at Lc ≥ 60 (UI tier) across every base palette by `yarn audit:contrast`.
 
 ## Light/Dark Theme Tokens
 
 - **Primitives**: Single file with all color scales (theme-agnostic)
-- **Semantics**: Themed pairs follow `{type}-{mode}-light.json` + `{type}-{mode}-dark.json`. Concrete instances: `base-slate-{light,dark}.json`, `brands-blue-{light,dark}.json`, `chart-default-{light,dark}.json`.
+- **Semantics**: Themed pairs follow `{type}-{mode}-light.json` + `{type}-{mode}-dark.json`. Concrete instances: `base-slate-{light,dark}.json`, `brands-blue-{light,dark}.json`, `chart-categorical-default-{light,dark}.json`.
 - CSS output: Light in `@theme` block, dark in `.dark` selector
 
 ## Validation

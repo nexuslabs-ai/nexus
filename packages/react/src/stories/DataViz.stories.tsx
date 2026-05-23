@@ -3,7 +3,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
   Pie,
   PieChart,
@@ -13,10 +12,12 @@ import {
   YAxis,
 } from 'recharts';
 
-const CHART_SERIES = ['1', '2', '3', '4', '5'] as const;
-type ChartIndex = (typeof CHART_SERIES)[number];
+import {
+  CHART_CATEGORICAL_SERIES,
+  type ChartCategoricalIndex,
+} from '@/lib/chart';
 
-const CHART_NAMES: Record<ChartIndex, string> = {
+const CHART_NAMES: Record<ChartCategoricalIndex, string> = {
   '1': 'teal',
   '2': 'lime',
   '3': 'orange',
@@ -25,26 +26,35 @@ const CHART_NAMES: Record<ChartIndex, string> = {
 };
 
 // Literal class strings so Tailwind's content scanner emits the utilities.
-const CHART_BG_CLASS: Record<ChartIndex, string> = {
-  '1': 'nx:bg-chart-1',
-  '2': 'nx:bg-chart-2',
-  '3': 'nx:bg-chart-3',
-  '4': 'nx:bg-chart-4',
-  '5': 'nx:bg-chart-5',
-};
-const CHART_TEXT_CLASS: Record<ChartIndex, string> = {
-  '1': 'nx:text-chart-1',
-  '2': 'nx:text-chart-2',
-  '3': 'nx:text-chart-3',
-  '4': 'nx:text-chart-4',
-  '5': 'nx:text-chart-5',
-};
-const CHART_BORDER_CLASS: Record<ChartIndex, string> = {
-  '1': 'nx:border-chart-1',
-  '2': 'nx:border-chart-2',
-  '3': 'nx:border-chart-3',
-  '4': 'nx:border-chart-4',
-  '5': 'nx:border-chart-5',
+const CHART_CLASSES: Record<
+  ChartCategoricalIndex,
+  { bg: string; text: string; border: string }
+> = {
+  '1': {
+    bg: 'nx:bg-chart-categorical-1',
+    text: 'nx:text-chart-categorical-1',
+    border: 'nx:border-chart-categorical-1',
+  },
+  '2': {
+    bg: 'nx:bg-chart-categorical-2',
+    text: 'nx:text-chart-categorical-2',
+    border: 'nx:border-chart-categorical-2',
+  },
+  '3': {
+    bg: 'nx:bg-chart-categorical-3',
+    text: 'nx:text-chart-categorical-3',
+    border: 'nx:border-chart-categorical-3',
+  },
+  '4': {
+    bg: 'nx:bg-chart-categorical-4',
+    text: 'nx:text-chart-categorical-4',
+    border: 'nx:border-chart-categorical-4',
+  },
+  '5': {
+    bg: 'nx:bg-chart-categorical-5',
+    text: 'nx:text-chart-categorical-5',
+    border: 'nx:border-chart-categorical-5',
+  },
 };
 
 const BAR_DATA = [
@@ -54,21 +64,21 @@ const BAR_DATA = [
   { period: 'Q4', s1: 56, s2: 44, s3: 31, s4: 46, s5: 39 },
 ];
 
-const PIE_DATA = CHART_SERIES.map((n) => ({
+const PIE_DATA = CHART_CATEGORICAL_SERIES.map((n) => ({
   name: CHART_NAMES[n],
   value: 20,
-  fill: `var(--nx-color-chart-${n})`,
+  fill: `var(--nx-color-chart-categorical-${n})`,
 }));
 
-function Swatch({ index }: { index: ChartIndex }) {
+function Swatch({ index }: { index: ChartCategoricalIndex }) {
   return (
     <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
       <div
-        className={`nx:rounded-md nx:border nx:border-border-default nx:size-24 ${CHART_BG_CLASS[index]}`}
+        className={`nx:rounded-md nx:border nx:border-border-default nx:size-24 ${CHART_CLASSES[index].bg}`}
       />
       <div className="nx:flex nx:flex-col nx:items-center">
         <span className="nx:text-foreground nx:typography-label-default nx:font-mono">
-          chart.{index}
+          chart.categorical.{index}
         </span>
         <span className="nx:text-muted-foreground nx:typography-label-small">
           {CHART_NAMES[index]}
@@ -85,7 +95,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Five-color categorical chart palette for data visualization. Tokens are theme-aware — light mode uses shade 600–700 primitives (dark colors on a near-white canvas), dark mode uses shade 200–300 primitives (light colors on a near-black canvas). Each chart × surface pair is APCA-validated at Lc ≥ 60 (UI tier) across all five base palettes. Source: packages/core/tokens/semantic/chart-default-{light,dark}.json.',
+          'Five-color categorical chart palette for data visualization. Tokens are theme-aware — light mode uses shade 600–700 primitives (dark colors on a near-white canvas), dark mode uses shade 200–300 primitives (light colors on a near-black canvas). Each chart × surface pair is APCA-validated at Lc ≥ 60 (UI tier) across all five base palettes. Source: packages/core/tokens/semantic/chart-categorical-default-{light,dark}.json.',
       },
     },
   },
@@ -111,7 +121,7 @@ export const Swatches: Story = {
       </div>
 
       <div className="nx:flex nx:flex-wrap nx:gap-6">
-        {CHART_SERIES.map((n) => (
+        {CHART_CATEGORICAL_SERIES.map((n) => (
           <Swatch key={n} index={n} />
         ))}
       </div>
@@ -138,26 +148,26 @@ export const UtilityClasses: Story = {
         <thead>
           <tr className="nx:text-left nx:text-muted-foreground">
             <th className="nx:p-2">Series</th>
-            <th className="nx:p-2">nx:bg-chart-N</th>
-            <th className="nx:p-2">nx:text-chart-N</th>
-            <th className="nx:p-2">nx:border-chart-N</th>
+            <th className="nx:p-2">nx:bg-chart-categorical-N</th>
+            <th className="nx:p-2">nx:text-chart-categorical-N</th>
+            <th className="nx:p-2">nx:border-chart-categorical-N</th>
           </tr>
         </thead>
         <tbody>
-          {CHART_SERIES.map((n) => (
+          {CHART_CATEGORICAL_SERIES.map((n) => (
             <tr key={n} className="nx:text-foreground">
-              <td className="nx:p-2 nx:font-mono">chart.{n}</td>
+              <td className="nx:p-2 nx:font-mono">chart.categorical.{n}</td>
               <td className="nx:p-2">
                 <span
-                  className={`nx:inline-block nx:size-8 nx:rounded-sm ${CHART_BG_CLASS[n]}`}
+                  className={`nx:inline-block nx:size-8 nx:rounded-sm ${CHART_CLASSES[n].bg}`}
                 />
               </td>
-              <td className={`nx:p-2 nx:font-mono ${CHART_TEXT_CLASS[n]}`}>
+              <td className={`nx:p-2 nx:font-mono ${CHART_CLASSES[n].text}`}>
                 Aa {CHART_NAMES[n]}
               </td>
               <td className="nx:p-2">
                 <span
-                  className={`nx:inline-block nx:size-8 nx:rounded-sm nx:border-2 ${CHART_BORDER_CLASS[n]}`}
+                  className={`nx:inline-block nx:size-8 nx:rounded-sm nx:border-2 ${CHART_CLASSES[n].border}`}
                 />
               </td>
             </tr>
@@ -193,11 +203,31 @@ export const BarChartExample: Story = {
               }}
             />
             <Legend />
-            <Bar dataKey="s1" name="teal" fill="var(--nx-color-chart-1)" />
-            <Bar dataKey="s2" name="lime" fill="var(--nx-color-chart-2)" />
-            <Bar dataKey="s3" name="orange" fill="var(--nx-color-chart-3)" />
-            <Bar dataKey="s4" name="rose" fill="var(--nx-color-chart-4)" />
-            <Bar dataKey="s5" name="indigo" fill="var(--nx-color-chart-5)" />
+            <Bar
+              dataKey="s1"
+              name="teal"
+              fill="var(--nx-color-chart-categorical-1)"
+            />
+            <Bar
+              dataKey="s2"
+              name="lime"
+              fill="var(--nx-color-chart-categorical-2)"
+            />
+            <Bar
+              dataKey="s3"
+              name="orange"
+              fill="var(--nx-color-chart-categorical-3)"
+            />
+            <Bar
+              dataKey="s4"
+              name="rose"
+              fill="var(--nx-color-chart-categorical-4)"
+            />
+            <Bar
+              dataKey="s5"
+              name="indigo"
+              fill="var(--nx-color-chart-categorical-5)"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -221,11 +251,7 @@ export const PieChartExample: Story = {
               nameKey="name"
               outerRadius={140}
               label
-            >
-              {PIE_DATA.map((entry) => (
-                <Cell key={entry.name} fill={entry.fill} />
-              ))}
-            </Pie>
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'var(--nx-color-popover)',
