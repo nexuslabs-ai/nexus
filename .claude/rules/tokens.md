@@ -21,7 +21,7 @@ Optional properties: `$description`, `$extensions`
 
 > Public-facing companion: [`packages/core/docs/color-math.md`](../../packages/core/docs/color-math.md) narrates this pipeline for designers and external readers.
 
-**On-disk format: hex strings.** `tokens/primitives/color.json` and the ten semantic overlay tokens (e.g., `#000000cc`) store hex. Tokens Studio and Figma Variables hex-normalise color values on export and cannot round-trip OKLCH, so hex is the only viable on-disk format for a Figma-driven workflow.
+**On-disk format: hex strings.** `tokens/primitives/color.json` stores hex — 6-digit for solid shades (`#020617`) and 8-digit for alpha shades (`#0206170a`, see [§ Alpha Token Scale](#alpha-token-scale)). Tokens Studio and Figma Variables hex-normalise color values on export and cannot round-trip OKLCH, so hex is the only viable on-disk format for a Figma-driven workflow.
 
 **Runtime format: OKLCH.** The build pipeline converts hex to `oklch(...)` at emit time. The conversion happens in `packages/core/scripts/utils.js` (`formatTokenValue`), which routes every `$type: "color"` hex value through `packages/core/scripts/lib/perceptual-grid.js`.
 
@@ -29,7 +29,30 @@ Optional properties: `$description`, `$extensions`
 
 **Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/scripts/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `clampChroma(color, 'oklch', 'rgb')` to stay in sRGB. Hue is preserved from the hex.
 
-**Mechanical** — applies to everything else: white, black, semantic overlay hex with alpha (e.g., `#000000cc`), and any one-off value that isn't a palette shade key. Straight hex→oklch via culori; alpha is preserved from 8-digit hex.
+**Mechanical** — applies to everything else: white, black, the alpha shades (`a50`–`a950`, 8-digit hex), and any one-off value whose last path segment isn't a palette shade key. Straight hex→oklch via culori; alpha is preserved from 8-digit hex.
+
+### Alpha Token Scale
+
+Every palette ships **alpha (transparent) shades** `a50`–`a950` alongside the solid `50`–`950` scale. Translucent surfaces — popover / command-palette backgrounds, modal scrims, hover rows on tinted lists, borders on colored cards — reference these instead of hand-written `rgba()`, so they blend with whatever surface they sit on and theme correctly across every base palette.
+
+**Structure.** Chromatic palettes nest the alpha shades under the palette (`slate.a200` → `{slate.a200}`). `white` and `black` are standalone leaf tokens, so their alpha shades are **top-level leaves** referenced with a hyphen (`{white-a900}`, `{black-a50}`) — nesting them would break the existing `{white}` / `{black}` references.
+
+**Value derivation.** Each alpha shade is the palette's **950 hex** plus an alpha byte from this curve:
+
+| Shade     | `a50` | `a100` | `a200` | `a300` | `a400` | `a500` | `a600` | `a700` | `a800` | `a900` | `a950` |
+| --------- | ----- | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| Alpha     | `0a`  | `10`   | `18`   | `30`   | `50`   | `80`   | `a0`   | `c0`   | `d8`   | `e8`   | `f4`   |
+| ≈ opacity | 4%    | 6%     | 9%     | 19%    | 31%    | 50%    | 63%    | 75%    | 85%    | 91%    | 96%    |
+
+E.g. `slate` (950 = `#020617`) yields `slate.a50` = `#0206170a` and `slate.a500` = `#02061780`.
+
+**Routing.** Alpha shades route **mechanically** (not grid-pinned): the shade-key regex matches only `50`–`950`, so an `a*` segment falls through to a straight hex→OKLCH conversion. L/C/H come from the 950 base hex and the alpha channel is preserved — `slate.a200` → `oklch(0.1288 0.0406 264.695 / 0.0941)`. To retune the curve, edit the alpha bytes in `color.json`; the perceptual grid does **not** apply to alpha shades.
+
+**Semantic alpha tokens.** Each base file exposes `background-hover-alpha`, `popover-background-alpha`, `popover-backdrop`, `border.default-alpha`, and `overlay` (migrated from a hardcoded `#…cc` to `{palette.a700}` light / `{palette.a800}` dark).
+
+**Not APCA-gated.** Alpha tokens blend with their backdrop, so their contrast is context-dependent — they are intentionally excluded from the `audit:contrast` pairs. `oklchToSrgbInts()` throws on an alpha-bearing color, so any future pair that needs one must pre-blend against its surface first.
+
+**Figma parity.** The alpha primitives are mirrored into `figma-snapshot.json` so `audit:figma-parity --category color` sees no drift. Figma is the side that catches up — designers add the matching alpha variables there (code is canonical, per `.claude/rules/figma.md`).
 
 ### Warning for designers
 
