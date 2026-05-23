@@ -313,9 +313,6 @@ function main() {
     })
   );
 
-  // Derive chart pairs from the JSON so adding chart.categorical.6 in [4/5]
-  // only edits the JSON. The path is nested under the scale type so [2/5]
-  // sequential can land alongside without colliding on `--color-chart-N`.
   const chartLightFile = path.join(
     SEMANTIC_DIR,
     'chart-categorical-default-light.json'
