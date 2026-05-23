@@ -46,14 +46,16 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 `yarn workspace @nexus/core audit:contrast` (implemented in `packages/core/scripts/audit-contrast.js`) runs APCA Lc on every base and brand foreground↔background pair, with thresholds chosen per APCA's intended-use tiers:
 
 | Pair                                                                                | Threshold | Rationale |
-| ----------------------------------------------------------------------------------- | --------- | --------- | ----- | -------------------------------------- |
-| `foreground ↔ background`                                                           | `         | Lc        | ≥ 75` | Body text, fluent reading              |
-| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`    | `         | Lc        | ≥ 60` | UI labels (buttons, badges)            |
-| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle` | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills        |
-| `muted-foreground ↔ muted`                                                          | `         | Lc        | ≥ 45` | Incidental / de-emphasised text        |
-| `muted-light-foreground ↔ muted-light`                                              | `         | Lc        | ≥ 45` | Dividers, helper text, subtle surfaces |
-| `disabled-foreground ↔ disabled`                                                    | `         | Lc        | ≥ 45` | Disabled-state text, still readable    |
-| `focus.color.{default,error} ↔ {background,container,popover}`                      | `         | Lc        | ≥ 45` | Focus rings on every surface they hit  |
+| ----------------------------------------------------------------------------------- | --------- | --------- | ----- | ----------------------------------------------------- |
+| `foreground ↔ background`                                                           | `         | Lc        | ≥ 75` | Body text, fluent reading                             |
+| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`    | `         | Lc        | ≥ 60` | UI labels (buttons, badges)                           |
+| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle` | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills                       |
+| `muted-foreground ↔ muted`                                                          | `         | Lc        | ≥ 45` | Incidental / de-emphasised text                       |
+| `muted-foreground-subtle ↔ muted`                                                   | `         | Lc        | ≥ 45` | Tertiary text — helper text, captions, divider labels |
+| `disabled-foreground ↔ disabled`                                                    | `         | Lc        | ≥ 45` | Disabled-state text, still readable                   |
+| `nav-foreground ↔ nav-{background,item-active}`                                     | `         | Lc        | ≥ 60` | Nav label text on chrome surfaces                     |
+| `nav-muted-foreground ↔ nav-background`                                             | `         | Lc        | ≥ 45` | Nav helper / metadata text                            |
+| `focus.color.{default,error} ↔ {background,container,popover}`                      | `         | Lc        | ≥ 45` | Focus rings on every surface they hit                 |
 
 Failures must be fixed by adjusting the semantic token reference (which shade a given role points to) or the L grid values — not by lowering the thresholds. The tiers themselves come from APCA's published guidance and are not negotiable per-finding.
 
@@ -142,14 +144,20 @@ Primitive colors use Tailwind's shade scale (50-950):
 
 ## Semantic Token Categories
 
-| Category | Properties                                                  | Example                           |
-| -------- | ----------------------------------------------------------- | --------------------------------- |
-| Layout   | `background`, `foreground`, `container`, `popover`, `muted` | `--color-background`              |
-| Brand    | `primary.*`, `secondary.*`                                  | `--color-primary-background`      |
-| Status   | `error.*`, `success.*`, `warning.*`, `information.*`        | `--color-error-subtle-foreground` |
-| Borders  | `border.default`, `border.primary`, `border.error`, etc.    | `--color-border-default`          |
+| Category   | Properties                                                                                                    | Example                           |
+| ---------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| Layout     | `background`, `foreground`, `container`, `popover`, `muted`, `muted-foreground-subtle`                        | `--color-background`              |
+| Brand      | `primary.*`, `secondary.*`                                                                                    | `--color-primary-background`      |
+| Status     | `error.*`, `success.*`, `warning.*`, `information.*`                                                          | `--color-error-subtle-foreground` |
+| Borders    | `border.default`, `border.primary`, `border.error`, etc.                                                      | `--color-border-default`          |
+| Navigation | `nav-background`, `nav-foreground`, `nav-muted-foreground`, `nav-item-hover`, `nav-item-active`, `nav-border` | `--color-nav-background`          |
 
 Each brand/status group has: `background`, `background-hover`, `background-active`, `foreground`, `disabled`, `subtle`, `subtle-foreground`, `subtle-hover`, `subtle-active`
+
+**See also:**
+
+- [surfaces.md](surfaces.md) — the 5-level surface contract these tokens compose (canvas / muted / container / popover / nav), elevation grammar, and known overlaps.
+- [color-shades.md](color-shades.md) — what each 50 → 950 shade is for, per mode.
 
 ## Light/Dark Theme Tokens
 

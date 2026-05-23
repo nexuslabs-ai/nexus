@@ -106,12 +106,11 @@ shadcn uses `destructive`, Nexus uses `error`:
 
 ### Muted Colors
 
-| shadcn                  | Nexus                            | Notes              |
-| ----------------------- | -------------------------------- | ------------------ |
-| `bg-muted`              | `nx:bg-muted`                    | Same               |
-| `text-muted-foreground` | `nx:text-muted-foreground`       | Same               |
-| —                       | `nx:bg-muted-light`              | Nexus adds lighter |
-| —                       | `nx:text-muted-light-foreground` | Nexus adds lighter |
+| shadcn                  | Nexus                             | Notes                                                                                                                                                                                                                             |
+| ----------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bg-muted`              | `nx:bg-muted`                     | Same                                                                                                                                                                                                                              |
+| `text-muted-foreground` | `nx:text-muted-foreground`        | Same                                                                                                                                                                                                                              |
+| —                       | `nx:text-muted-foreground-subtle` | Nexus tertiary text tier (below `muted-foreground`). Paired with `muted` surface. Light mode adds a real third tier; dark mode collapses to the same shade as `muted-foreground` (see [surfaces.md](surfaces.md#known-overlaps)). |
 
 ### Layout Colors
 
@@ -225,6 +224,19 @@ Nexus provides status colors beyond shadcn's destructive:
 | `nx:text-information-foreground`           | `--color-information-foreground`       |
 | `nx:hover:bg-information-background-hover` | `--color-information-background-hover` |
 | `nx:bg-information-subtle`                 | `--color-information-subtle`           |
+
+### Navigation (Nexus-Only)
+
+shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalent fixed chrome (sidebar, topbar). Nav is treated as one namespace — `nav-border` is flat (not nested under `border.*`) so the tokens travel as a unit. See [surfaces.md](surfaces.md#nav-as-a-namespace) for the elevation contract.
+
+| Token                          | CSS Variable                   |
+| ------------------------------ | ------------------------------ |
+| `nx:bg-nav-background`         | `--color-nav-background`       |
+| `nx:text-nav-foreground`       | `--color-nav-foreground`       |
+| `nx:text-nav-muted-foreground` | `--color-nav-muted-foreground` |
+| `nx:hover:bg-nav-item-hover`   | `--color-nav-item-hover`       |
+| `nx:active:bg-nav-item-active` | `--color-nav-item-active`      |
+| `nx:border-nav-border`         | `--color-nav-border`           |
 
 ---
 
