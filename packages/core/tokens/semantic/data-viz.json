@@ -1,0 +1,29 @@
+{
+  "chart": {
+    "1": {
+      "$value": "{teal.600}",
+      "$type": "color",
+      "$description": "Categorical chart series 1 — teal"
+    },
+    "2": {
+      "$value": "{lime.700}",
+      "$type": "color",
+      "$description": "Categorical chart series 2 — lime"
+    },
+    "3": {
+      "$value": "{orange.600}",
+      "$type": "color",
+      "$description": "Categorical chart series 3 — orange"
+    },
+    "4": {
+      "$value": "{rose.600}",
+      "$type": "color",
+      "$description": "Categorical chart series 4 — rose"
+    },
+    "5": {
+      "$value": "{indigo.600}",
+      "$type": "color",
+      "$description": "Categorical chart series 5 — indigo"
+    }
+  }
+}
