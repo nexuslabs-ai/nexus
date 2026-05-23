@@ -21,10 +21,13 @@
 3. **Dark mode: container/popover step lighter than canvas.** Shadow is additive but not load-bearing; the luminance step is what reads as raised.
 4. **Direction is consistent across modes.** Raised sits closer to white in light mode, lighter than canvas in dark mode. Recessed sits darker in light mode; in dark mode "more recessed than canvas" is impossible — `muted` stays at `{p.800}` (one lighter than canvas at `{p.900}`) and relies on border/inset framing for the recessed read.
 5. **Components don't pick surfaces, contexts do.** A card inside a sidebar uses `container`; the sidebar uses `nav-background`. A dialog body uses `container`; the dropdown inside the dialog uses `popover`.
+6. **When `-active` cannot step to a distinct shade, the press cue moves off the fill.** The token still resolves (to the same value as rest) so component code has a stable hook, but the visual affordance comes from `border-active` or an inset shadow applied at the component layer — not from a fill change. This is forced by dark-mode shade scarcity (`container = {p.800}` has no distinct darker step that doesn't collide with canvas; `popover = {p.700}` has no distinct darker step that doesn't collide with container) and by light-mode near-white compression (`popover-hover` and `popover-active` both sit at `{p.50}`). See § Known overlaps for the specific pairs.
 
 ## Nav as a namespace
 
 The `nav-*` block is one namespace, not a relabel of `muted`. It bundles its own background, foreground, muted-foreground, hover/active item states, and border because navigation chrome needs independent theming (often distinctly darker than canvas, sometimes brand-tinted later). `nav-border` is flat (a top-level key, not nested under `border.*`) because it travels with the rest of the nav tokens as one unit — splitting it into `border.nav` would scatter the namespace.
+
+The namespace deliberately stops at surface chrome. **Primary buttons and other CTAs placed inside nav use the base `primary-*` / status `-*` tokens; focus rings use `focus-*`.** Nav does not ship its own `nav-primary-*` or `nav-ring` — a sidebar button is a primary button that happens to live in a sidebar, not a separately-tokenised thing. (This is where Nexus diverges from shadcn's `sidebar-primary*` / `sidebar-ring`; the bet is that one set of brand and focus tokens is easier to keep coherent than two.)
 
 | Token                  | Light value | Dark value | Role                                |
 | ---------------------- | ----------- | ---------- | ----------------------------------- |
@@ -37,9 +40,12 @@ The `nav-*` block is one namespace, not a relabel of `muted`. It bundles its own
 
 ## Known overlaps
 
-These collisions are intentional — they fall out of the luminance grammar:
+These collisions are intentional — they fall out of the luminance grammar. The list below covers the surface-stack and nav tokens; for the comprehensive shade-by-shade view (which catalogues every token that lands on a given shade, including disabled / border / foreground tiers), see [color-shades.md](color-shades.md) § The 11-step grid.
 
 - **Dark mode `container = muted = background-hover = {p.800}`.** All three render at the same shade in dark mode. Cards (`container`) are bordered + static; muted regions are de-emphasised content blocks; `background-hover` is a transient interaction state on items _inside_ containers. Context resolves the ambiguity — a row that highlights on hover does not visually become a card.
+- **Dark mode `container-active = container = {p.800}`.** No darker shade is available without colliding with canvas (`{p.900}`), and stepping lighter would collide with `container-hover = {p.700}`. The press cue moves off the fill per Rule 6 — `border-active` or an inset shadow at the component layer carries the active affordance.
+- **Dark mode `popover-active = popover = {p.700}`.** Same shape as container-active: stepping darker collides with `container`, stepping lighter collides with `popover-hover = {p.600}`. Press cue moves off the fill per Rule 6. (In practice, popover surfaces themselves are rarely pressed — selected items inside a popover use their own item-level styling, not `popover-active`.)
+- **Light mode `popover-hover = popover-active = {p.50}`.** Near-white compression: rest sits at `{white}`, hover steps to `{p.50}`, and there's no half-step between `{p.50}` and `{p.100}` (which is owned by `container-active` / `background-active`). Stepping `popover-active` to `{p.100}` would muddy the popover/container distinction. Press cue moves off the fill per Rule 6.
 - **Dark mode `muted-foreground-subtle = muted-foreground = {p.300}`.** The tertiary text tier collapses in dark mode because no palette step exists between `{p.300}` (passes APCA on `muted = {p.800}` at Lc ≥ 45) and `{p.400}` (too dim, Lc -39). Light mode preserves the tier (`muted-foreground = {p.500}`, `muted-foreground-subtle = {p.400}`). To restore the dark-mode tier, either nudge `muted` itself or extend the palette with an intermediate step — both are out of scope of the surface contract.
 - **Dark mode `nav-border = nav-item-active = {p.800}`.** Same shade because the border between nav items and the selected item's fill sit at the same depth — the active item reads as "pressed into" the chrome, not "raised above" it.
 

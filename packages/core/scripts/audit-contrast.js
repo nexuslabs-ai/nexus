@@ -78,9 +78,9 @@ const BASE_PAIRS = [
     tier: 'ui',
   },
   // Nav chrome — UI tier (60) for label text, incidental (45) for the
-  // muted helper text. Audits rest state plus the most pressed surface
-  // (item-active); hover sits between, so passing both implies passing
-  // hover.
+  // muted helper text. Audits every surface that nav-foreground actually
+  // renders on (rest, hover, active) rather than trusting interpolation
+  // between rest and the deepest pressed shade.
   {
     fg: 'nav-foreground',
     bg: 'nav-background',
@@ -92,6 +92,12 @@ const BASE_PAIRS = [
     bg: 'nav-background',
     minLc: 45,
     tier: 'incidental',
+  },
+  {
+    fg: 'nav-foreground',
+    bg: 'nav-item-hover',
+    minLc: 60,
+    tier: 'ui',
   },
   {
     fg: 'nav-foreground',

@@ -27,7 +27,7 @@
   "muted-foreground-subtle": {
     "$value": "{gray.300}",
     "$type": "color",
-    "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels. Dark mode: collapses to the same shade as muted-foreground because no palette step exists between {p.300} (APCA-passing on muted = p.800) and {p.400} (too dim)."
+    "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
     "$value": "{gray.950}",
