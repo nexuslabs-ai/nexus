@@ -41,11 +41,19 @@ build-storybook.log
 # ESLint cache
 .eslintcache
 
-# Claude Code (local settings not committed)
+# Claude Code (local settings + runtime state, not committed)
 .claude/settings.local.json
+.claude/scheduled_tasks.json
+.claude/scheduled_tasks.lock
 CLAUDE.local.md
 **/CLAUDE.local.md
 
 # MCP / AI tool configs (may contain credentials)
 .mcp.json
 opencode.json
+
+# Playwright MCP (local browser session logs/snapshots)
+.playwright-mcp/
+
+# Local scratch artifacts (throwaway screenshots, etc.)
+/dataviz-*.png
