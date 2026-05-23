@@ -2,12 +2,12 @@
   "chart": {
     "categorical": {
       "1": {
-        "$value": "{teal.300}",
+        "$value": "{teal.200}",
         "$type": "color",
         "$description": "Categorical chart series 1 — teal (dark theme)"
       },
       "2": {
-        "$value": "{lime.300}",
+        "$value": "{lime.200}",
         "$type": "color",
         "$description": "Categorical chart series 2 — lime (dark theme)"
       },

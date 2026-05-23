@@ -247,6 +247,15 @@ Components may implement additional state patterns like loading, disabled, or er
 
 **Live example:** See `button.tsx` for loading state implementation.
 
+### Active / press states on container & popover
+
+When a component renders on `container` or `popover` and needs a visible press cue, do **not** rely on `*-active` fill changes — those tokens collapse to the rest shade in dark mode (and in light mode for popover) by design. The press cue lives at the component layer, applied to the `:active` / `[data-state="active"]` selector:
+
+- `nx:active:shadow-inner` — `inset` shadow primitive, additive on top of the existing fill.
+- `nx:active:border-border-active` — emphasised border, useful when the component already has a border.
+
+See [`surfaces.md` Rule 6](surfaces.md#rules) and [`surfaces.md` § Known overlaps](surfaces.md#known-overlaps) for why these surfaces don't get a distinct active fill.
+
 ## Focus States
 
 Use the design-system focus token, not Tailwind `ring-*` utilities:

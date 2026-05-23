@@ -9,8 +9,8 @@ html {
 }
 
 html.dark {
-  --nx-color-chart-categorical-1: var(--nx-color-teal-300);
-  --nx-color-chart-categorical-2: var(--nx-color-lime-300);
+  --nx-color-chart-categorical-1: var(--nx-color-teal-200);
+  --nx-color-chart-categorical-2: var(--nx-color-lime-200);
   --nx-color-chart-categorical-3: var(--nx-color-orange-200);
   --nx-color-chart-categorical-4: var(--nx-color-rose-200);
   --nx-color-chart-categorical-5: var(--nx-color-indigo-200);

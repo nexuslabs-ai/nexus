@@ -23,8 +23,8 @@ const BASE_PAIRS = [
   { fg: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
   { fg: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
   {
-    fg: 'muted-light-foreground',
-    bg: 'muted-light',
+    fg: 'muted-foreground-subtle',
+    bg: 'muted',
     minLc: 45,
     tier: 'incidental',
   },
@@ -74,6 +74,34 @@ const BASE_PAIRS = [
   {
     fg: 'information.subtle-foreground',
     bg: 'information.subtle',
+    minLc: 60,
+    tier: 'ui',
+  },
+  // Nav chrome — UI tier (60) for label text, incidental (45) for the
+  // muted helper text. Audits every surface that nav-foreground actually
+  // renders on (rest, hover, active) rather than trusting interpolation
+  // between rest and the deepest pressed shade.
+  {
+    fg: 'nav-foreground',
+    bg: 'nav-background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    fg: 'nav-muted-foreground',
+    bg: 'nav-background',
+    minLc: 45,
+    tier: 'incidental',
+  },
+  {
+    fg: 'nav-foreground',
+    bg: 'nav-item-hover',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    fg: 'nav-foreground',
+    bg: 'nav-item-active',
     minLc: 60,
     tier: 'ui',
   },

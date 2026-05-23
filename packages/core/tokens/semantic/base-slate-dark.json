@@ -24,14 +24,10 @@
     "$type": "color",
     "$description": "It’s a gray that softens contrast so primary content stands forward."
   },
-  "muted-light": {
-    "$value": "{slate.900}",
-    "$type": "color"
-  },
-  "muted-light-foreground": {
+  "muted-foreground-subtle": {
     "$value": "{slate.300}",
     "$type": "color",
-    "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
+    "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
     "$value": "{slate.950}",
@@ -42,7 +38,7 @@
     "$type": "color"
   },
   "container": {
-    "$value": "{black}",
+    "$value": "{slate.800}",
     "$type": "color"
   },
   "container-foreground": {
@@ -50,15 +46,15 @@
     "$type": "color"
   },
   "container-hover": {
-    "$value": "{slate.950}",
+    "$value": "{slate.700}",
     "$type": "color"
   },
   "container-active": {
-    "$value": "{slate.900}",
+    "$value": "{slate.800}",
     "$type": "color"
   },
   "popover": {
-    "$value": "{slate.800}",
+    "$value": "{slate.700}",
     "$type": "color"
   },
   "popover-foreground": {
@@ -66,11 +62,35 @@
     "$type": "color"
   },
   "popover-hover": {
-    "$value": "{slate.700}",
+    "$value": "{slate.600}",
     "$type": "color"
   },
   "popover-active": {
+    "$value": "{slate.700}",
+    "$type": "color"
+  },
+  "nav-background": {
+    "$value": "{slate.950}",
+    "$type": "color"
+  },
+  "nav-foreground": {
+    "$value": "{slate.50}",
+    "$type": "color"
+  },
+  "nav-muted-foreground": {
+    "$value": "{slate.300}",
+    "$type": "color"
+  },
+  "nav-item-hover": {
     "$value": "{slate.900}",
+    "$type": "color"
+  },
+  "nav-item-active": {
+    "$value": "{slate.800}",
+    "$type": "color"
+  },
+  "nav-border": {
+    "$value": "{slate.800}",
     "$type": "color"
   },
   "overlay": {

@@ -1,6 +1,6 @@
 {
   "background": {
-    "$value": "{gray.50}",
+    "$value": "{white}",
     "$type": "color"
   },
   "foreground": {
@@ -8,15 +8,15 @@
     "$type": "color"
   },
   "background-hover": {
-    "$value": "{gray.100}",
+    "$value": "{gray.50}",
     "$type": "color"
   },
   "background-active": {
-    "$value": "{gray.200}",
+    "$value": "{gray.100}",
     "$type": "color"
   },
   "muted": {
-    "$value": "{gray.100}",
+    "$value": "{gray.50}",
     "$type": "color"
   },
   "muted-foreground": {
@@ -24,17 +24,13 @@
     "$type": "color",
     "$description": "It’s a gray that softens contrast so primary content stands forward."
   },
-  "muted-light": {
-    "$value": "{gray.50}",
-    "$type": "color"
-  },
-  "muted-light-foreground": {
+  "muted-foreground-subtle": {
     "$value": "{gray.400}",
     "$type": "color",
-    "$description": "Ideal for dividers, secondary surfaces, subtle outlines, or helper text."
+    "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
-    "$value": "{gray.100}",
+    "$value": "{gray.50}",
     "$type": "color"
   },
   "disabled-foreground": {
@@ -50,11 +46,11 @@
     "$type": "color"
   },
   "container-hover": {
-    "$value": "{gray.100}",
+    "$value": "{gray.50}",
     "$type": "color"
   },
   "container-active": {
-    "$value": "{gray.200}",
+    "$value": "{gray.100}",
     "$type": "color"
   },
   "popover": {
@@ -70,7 +66,31 @@
     "$type": "color"
   },
   "popover-active": {
+    "$value": "{gray.50}",
+    "$type": "color"
+  },
+  "nav-background": {
     "$value": "{gray.100}",
+    "$type": "color"
+  },
+  "nav-foreground": {
+    "$value": "{gray.900}",
+    "$type": "color"
+  },
+  "nav-muted-foreground": {
+    "$value": "{gray.600}",
+    "$type": "color"
+  },
+  "nav-item-hover": {
+    "$value": "{gray.200}",
+    "$type": "color"
+  },
+  "nav-item-active": {
+    "$value": "{gray.300}",
+    "$type": "color"
+  },
+  "nav-border": {
+    "$value": "{gray.200}",
     "$type": "color"
   },
   "overlay": {
@@ -87,7 +107,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{gray.100}",
+      "$value": "{gray.50}",
       "$type": "color"
     },
     "primary": {
