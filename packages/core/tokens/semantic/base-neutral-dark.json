@@ -73,6 +73,30 @@
     "$value": "{neutral.700}",
     "$type": "color"
   },
+  "nav-background": {
+    "$value": "{neutral.950}",
+    "$type": "color"
+  },
+  "nav-foreground": {
+    "$value": "{neutral.50}",
+    "$type": "color"
+  },
+  "nav-muted-foreground": {
+    "$value": "{neutral.400}",
+    "$type": "color"
+  },
+  "nav-item-hover": {
+    "$value": "{neutral.900}",
+    "$type": "color"
+  },
+  "nav-item-active": {
+    "$value": "{neutral.800}",
+    "$type": "color"
+  },
+  "nav-border": {
+    "$value": "{neutral.800}",
+    "$type": "color"
+  },
   "overlay": {
     "$value": "#000000cc",
     "$type": "color"

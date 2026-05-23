@@ -73,6 +73,30 @@
     "$value": "{zinc.700}",
     "$type": "color"
   },
+  "nav-background": {
+    "$value": "{zinc.950}",
+    "$type": "color"
+  },
+  "nav-foreground": {
+    "$value": "{zinc.50}",
+    "$type": "color"
+  },
+  "nav-muted-foreground": {
+    "$value": "{zinc.400}",
+    "$type": "color"
+  },
+  "nav-item-hover": {
+    "$value": "{zinc.900}",
+    "$type": "color"
+  },
+  "nav-item-active": {
+    "$value": "{zinc.800}",
+    "$type": "color"
+  },
+  "nav-border": {
+    "$value": "{zinc.800}",
+    "$type": "color"
+  },
   "overlay": {
     "$value": "#000000cc",
     "$type": "color"
