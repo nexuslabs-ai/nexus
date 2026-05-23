@@ -342,7 +342,7 @@ section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
 <div class="hero">
   <div class="hero-tag">Spacing Token Architecture · Pre-decision FE Brief</div>
   <h1 class="hero-headline">Stop reaching for <code style="font-size:0.85em;background:var(--bad-bg);color:var(--bad);padding:2px 12px;border-radius:var(--r-md);">nx:px-2.5</code>. Start reaching for <em><code style="font-size:0.85em;background:var(--lead-bg);color:var(--lead);padding:2px 12px;border-radius:var(--r-md);">nx:px-control</code></em>.</h1>
-  <p class="hero-sub">One shared 4px primitive scale. Twelve role-named alias tokens. Seven modes that swap which primitive each role points to. Same Button component renders correctly under all 7 modes — no per-mode variants, no rebuild.</p>
+  <p class="hero-sub">Two-tier model: no primitive size scale, just per-mode files with direct values. Numeric utilities (<code>nx:p-2</code>) and role-named utilities (<code>nx:px-control</code>) coexist — both shift when mode swaps. Same Button renders correctly under all 7 modes via a single <code>data-style</code> attribute.</p>
   <div class="hero-stats">
     <div class="hero-stat">
       <div class="hero-stat-num">~20%</div>
@@ -353,8 +353,8 @@ section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
       <div class="hero-stat-label">LLM miss rate after<br>role-named utilities</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-num">1 / 10</div>
-      <div class="hero-stat-label">Surveyed design systems<br>that took this approach</div>
+      <div class="hero-stat-num">7×</div>
+      <div class="hero-stat-label">Self-contained mode files<br>no cross-file primitive coupling</div>
     </div>
   </div>
 </div>
@@ -420,27 +420,27 @@ section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
 <!-- ===== SECTION: THE SHIFT ===== -->
 <section class="block" id="shift">
   <div class="block-num">02 · The shift</div>
-  <h2 class="block-title">Two layers today. Three layers tomorrow.</h2>
-  <p class="block-lede">Today's tokens are numeric pass-throughs — components reach directly for primitive steps. Proposed: insert a semantic alias layer that names roles, not numbers. Modes swap primitive references behind stable role names.</p>
+  <h2 class="block-title">Drop the primitive layer. Direct values per mode.</h2>
+  <p class="block-lede">Today, primitives are mode-variant (5 size files, all numeric utilities shift implicitly). Proposed: delete the primitive layer entirely. Each mode is one self-contained file with direct px values for both numeric tokens (<code>--spacing-N</code>) and role-named tokens (<code>--space-control-px</code>). No cross-file indirection. No primitive scale to maintain. No "which step does this role point to" gate.</p>
 
   <div class="arch-grid">
     <div class="arch-col now">
       <div class="arch-col-header">
         <span class="arch-col-tag">Today</span>
-        <div class="arch-col-title">Numeric pass-through</div>
-        <div class="arch-col-sub">2 layers · 5 size-mode files · LLM guesses steps</div>
+        <div class="arch-col-title">Numeric utilities + mode-variant primitives</div>
+        <div class="arch-col-sub">2 tiers · 5 size-mode files · only numeric vocabulary</div>
       </div>
       <div class="arch-layer">
         <div class="arch-layer-label">Component code</div>
         <div class="arch-layer-code"><span class="hl">nx:h-9</span> <span class="hl">nx:px-2.5</span> <span class="hl">nx:gap-2</span></div>
       </div>
       <div class="arch-layer">
-        <div class="arch-layer-label">Semantic layer · numeric aliases</div>
-        <div class="arch-layer-code">--spacing-9: var(--nx-size-9);<br>--spacing-2_5: var(--nx-size-2_5);</div>
+        <div class="arch-layer-label">Tailwind passthrough</div>
+        <div class="arch-layer-code">--spacing-9: var(--nx-size-9);<br>--spacing-2_5: var(--nx-size-2_5);<br><span style="color:var(--fg-subtle);">/* 1:1, no real semantic layer */</span></div>
       </div>
       <div class="arch-layer">
         <div class="arch-layer-label">Primitive scale · 5 mode files</div>
-        <div class="arch-layer-code">size-vega.json &nbsp; size-lyra.json<br>size-maia.json &nbsp; size-mira.json<br>size-nova.json</div>
+        <div class="arch-layer-code">size-vega.json &nbsp; size-lyra.json<br>size-maia.json &nbsp; size-mira.json<br>size-nova.json<br><span style="color:var(--fg-subtle);">/* whole scale shifts per mode */</span></div>
       </div>
     </div>
 
@@ -449,22 +449,27 @@ section.block{padding:var(--s-12) 0;border-bottom:1px solid var(--border);}
     <div class="arch-col future">
       <div class="arch-col-header">
         <span class="arch-col-tag">Tomorrow</span>
-        <div class="arch-col-title">Role-named aliases</div>
-        <div class="arch-col-sub">3 layers · 1 shared scale · 7 alias mode files</div>
+        <div class="arch-col-title">Per-mode semantic, direct values</div>
+        <div class="arch-col-sub">2 tiers · 7 self-contained mode files · numeric + role vocab</div>
       </div>
       <div class="arch-layer">
         <div class="arch-layer-label">Component code</div>
-        <div class="arch-layer-code"><span class="hl-good">nx:h-control-md</span> <span class="hl-good">nx:px-control</span> <span class="hl-good">nx:gap-control</span></div>
+        <div class="arch-layer-code"><span class="hl-good">nx:h-control-md</span> <span class="hl-good">nx:px-control</span> <span class="hl">nx:gap-2</span><br><span style="color:var(--fg-subtle);">/* choose: role or numeric — both shift with mode */</span></div>
       </div>
       <div class="arch-layer">
-        <div class="arch-layer-label">Semantic alias · per-mode mapping</div>
-        <div class="arch-layer-code">--space-control-h-md: var(--nx-size-9);<br>--space-control-px: var(--nx-size-2_5);<br><span style="color:var(--fg-subtle);">/* swap when mode changes */</span></div>
+        <div class="arch-layer-label">Per-mode semantic · direct values</div>
+        <div class="arch-layer-code">/* spacing-vega.json → emitted as: */<br>--spacing-2: 8px;<br>--spacing-9: 36px;<br>--space-control-h-md: 36px;<br>--space-control-px: 10px;</div>
       </div>
       <div class="arch-layer">
-        <div class="arch-layer-label">Primitive scale · 1 shared file</div>
-        <div class="arch-layer-code">size.json <span style="color:var(--fg-subtle);">/* identical across all modes */</span></div>
+        <div class="arch-layer-label" style="color:var(--lead);">No primitive layer</div>
+        <div class="arch-layer-code" style="color:var(--fg-subtle);">Deleted. Mode files own their values directly.<br>Canonical step set documented in CLAUDE.md, enforced by lint.</div>
       </div>
     </div>
+  </div>
+
+  <div class="callout" style="margin-top:var(--s-6);">
+    <div class="callout-label">Why no primitives</div>
+    <div class="callout-body">A primitive layer enforces a shared scale but creates cross-mode coupling — editing <code>--nx-size-9</code> for one mode breaks every other mode that references it. Workarounds (additive primitives, per-mode remapping) add cognitive load without earning their place. Each mode being self-contained with direct values eliminates the coupling and keeps the mental model flat. The scale discipline moves from "the primitive list exists" to "the canonical step set is documented and lint-enforced."</div>
   </div>
 </section>
 
@@ -939,16 +944,16 @@ mental cost: <span class="clear">[parse "control surface, default size"]</span> 
 <!-- ===== SECTION: PLAN ===== -->
 <section class="block" id="plan">
   <div class="block-num">08 · Migration plan</div>
-  <h2 class="block-title">Four weeks. Eight steps. Button first.</h2>
-  <p class="block-lede">Step 1 (collapse primitives) is unblocking regardless of which architecture wins — do it first. Then audit, build the alias layer, refactor one component as proof, then roll out.</p>
+  <h2 class="block-title">Four weeks. Eleven steps. Button first.</h2>
+  <p class="block-lede">Step 1 (delete primitives) is unblocking. Then audit, document the canonical scale, author mode files with direct values, refactor one component as proof, roll out, then add the discipline tooling that replaces what primitives used to enforce.</p>
 
   <div class="timeline">
     <div class="tl-step">
       <div class="tl-dot">1</div>
       <div class="tl-week">Week 1 · Foundations</div>
-      <div class="tl-title">Collapse primitives → one shared scale</div>
-      <div class="tl-body">Delete <code>size-{lyra,maia,mira,nova}.json</code>. Keep <code>size.json</code> as canonical. No other system in the survey ships multi-file primitives for spacing.</div>
-      <div class="tl-effort">~30 min · 1 PR</div>
+      <div class="tl-title">Delete the primitive size layer entirely</div>
+      <div class="tl-body">Remove <code>packages/core/tokens/primitives/size/</code> (all 5 mode files). Remove <code>--nx-size-*</code> emission from the build. The scale moves to documentation + lint, not a CSS variable layer.</div>
+      <div class="tl-effort">~1 hour · 1 PR</div>
     </div>
 
     <div class="tl-step">
@@ -961,22 +966,30 @@ mental cost: <span class="clear">[parse "control surface, default size"]</span> 
 
     <div class="tl-step">
       <div class="tl-dot">3</div>
-      <div class="tl-week">Week 2 · Tokens</div>
-      <div class="tl-title">Author 7 semantic-spacing mode files</div>
-      <div class="tl-body">Same role keys, different primitive references per mode. Each ~50 lines of JSON. The 7 mode names: Vega (default), Nova, Maia, Lyra, Mira, Luma, Sera.</div>
-      <div class="tl-effort">~3 hours</div>
+      <div class="tl-week">Week 1 · Discipline</div>
+      <div class="tl-title">Document the canonical step set in CLAUDE.md</div>
+      <div class="tl-body">Without primitives, the "allowed values" rule must live as a project rule. Publish the canonical step set (<code>0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 36, 40, 48, 56, 64, 80, 96, 128, …</code>) as the scale that lint, code review, and LLM context all reference.</div>
+      <div class="tl-effort">~1 hour</div>
     </div>
 
     <div class="tl-step">
       <div class="tl-dot">4</div>
       <div class="tl-week">Week 2 · Tokens</div>
-      <div class="tl-title">Register roles in nexus.css <code>@theme</code></div>
-      <div class="tl-body">Wire the 18–22 alias tokens through Tailwind so utilities like <code>nx:h-control-md</code> become legal. Emit per-mode <code>[data-style="X"]</code> scopes in one bundle.</div>
-      <div class="tl-effort">~2 hours</div>
+      <div class="tl-title">Author 7 mode files with direct values</div>
+      <div class="tl-body">Each <code>spacing-{mode}.json</code> contains every numeric step (<code>spacing-0</code> through <code>spacing-96</code>) AND every role (<code>space-control-*</code>, <code>space-container-*</code>, …) with direct px values. Self-contained per mode. Each ~80 lines.</div>
+      <div class="tl-effort">~4 hours</div>
     </div>
 
     <div class="tl-step">
       <div class="tl-dot">5</div>
+      <div class="tl-week">Week 2 · Tokens</div>
+      <div class="tl-title">Register tokens in nexus.css <code>@theme</code></div>
+      <div class="tl-body">Wire both numeric tokens (<code>--spacing-N</code>) and role tokens so utilities like <code>nx:p-2</code> AND <code>nx:px-control</code> are legal. Emit per-mode <code>[data-style="X"]</code> scopes in one bundle. No primitive layer to pass through.</div>
+      <div class="tl-effort">~2 hours</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">6</div>
       <div class="tl-week">Week 3 · Proof point</div>
       <div class="tl-title">Refactor Button to use role names</div>
       <div class="tl-body">One component, one PR. Verify identical render in Vega; add a Storybook story that switches to Sera and visibly shifts. This is the architecture demo.</div>
@@ -984,36 +997,60 @@ mental cost: <span class="clear">[parse "control surface, default size"]</span> 
     </div>
 
     <div class="tl-step">
-      <div class="tl-dot">6</div>
+      <div class="tl-dot">7</div>
       <div class="tl-week">Week 3 · Rollout</div>
       <div class="tl-title">Roll out remaining components</div>
-      <div class="tl-body">Order: Input → Card → Dialog → Select → rest. Each one PR. Follow Button's pattern. Cumulative: ~13 component PRs.</div>
+      <div class="tl-body">Order: Input → Card → Dialog → Select → rest. Each one PR. Components mix role names (for control internals) with numeric utilities (for layout) freely. Both shift with mode.</div>
       <div class="tl-effort">~1–2 days</div>
     </div>
 
     <div class="tl-step">
-      <div class="tl-dot">7</div>
+      <div class="tl-dot">8</div>
       <div class="tl-week">Week 4 · Documentation</div>
       <div class="tl-title">Publish role-to-component coupling table</div>
-      <div class="tl-body">Single source of truth in <code>CLAUDE.md</code> and <code>figma.md</code>. Without this, agents have to guess which role applies to which component.</div>
+      <div class="tl-body">Single source of truth in <code>CLAUDE.md</code> and <code>figma.md</code>. Documents which role each component uses for each spacing decision. LLMs and humans share this lookup.</div>
       <div class="tl-effort">~2 hours</div>
     </div>
 
     <div class="tl-step">
-      <div class="tl-dot">8</div>
+      <div class="tl-dot">9</div>
       <div class="tl-week">Week 4 · Guardrails</div>
-      <div class="tl-title">Add ESLint rule against primitive utilities in components</div>
-      <div class="tl-body">Flag <code>nx:p-N</code>, <code>nx:h-N</code>, etc. in component files. Allow-list with justification comment. Prevents drift back to numeric utilities.</div>
+      <div class="tl-title">Lint rule for canonical step set</div>
+      <div class="tl-body">ESLint/Stylelint flags spacing values in mode files that fall outside the canonical step set, AND flags raw numeric utilities (<code>nx:p-N</code>) inside component files when a role would apply. Prevents drift both ways.</div>
       <div class="tl-effort">~3 hours</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">10</div>
+      <div class="tl-week">Week 4 · Tooling</div>
+      <div class="tl-title">Refactor <code>audit:figma-parity</code> for mode-level comparison</div>
+      <div class="tl-body">Existing script audits primitives. Without primitives, the audit shifts to comparing each mode's semantic values against the corresponding Figma collection mode. Same intent, mode-scoped diff.</div>
+      <div class="tl-effort">~3 hours</div>
+    </div>
+
+    <div class="tl-step">
+      <div class="tl-dot">11</div>
+      <div class="tl-week">Week 4 · Schema</div>
+      <div class="tl-title">JSON schema validation for mode files</div>
+      <div class="tl-body">All 7 <code>spacing-{mode}.json</code> files must have identical key sets. Catches forgotten keys, typos, and key drift across modes at build time. Ensures every mode covers every numeric step and every role.</div>
+      <div class="tl-effort">~2 hours</div>
     </div>
   </div>
 </section>
 
 <!-- ===== SECTION: DECISIONS ===== -->
 <section class="block" id="decisions">
-  <div class="block-num">09 · Decisions to make</div>
-  <h2 class="block-title">Six choices. One is dominant — resolve it first.</h2>
-  <p class="block-lede">The reviewer's position on each, with the flip condition that would change the answer. Brainstorm starts with Q1; everything else cascades from it.</p>
+  <div class="block-num">09 · Decisions</div>
+  <h2 class="block-title">Five open · two now resolved.</h2>
+  <p class="block-lede">Two decisions have landed since the original draft: <strong>no primitive size layer</strong> (each mode is self-contained with direct values) and <strong>both numeric + role-named utilities coexist</strong> (component authors pick by intent). Remaining decisions still need brainstorm. Recommended position + flip condition listed for each.</p>
+
+  <div class="callout" style="margin-top:0;margin-bottom:var(--s-6);border-left-color:var(--lead);">
+    <div class="callout-label" style="color:var(--lead);">Resolved this round</div>
+    <div class="callout-body">
+      <strong style="color:var(--fg);">✓ No primitive size layer.</strong> Mode files own values directly. Discipline moves to lint + CLAUDE.md canonical step set.<br>
+      <strong style="color:var(--fg);">✓ Numeric + role utilities coexist.</strong> <code>nx:p-2</code> for layout-level spacing; <code>nx:px-control</code> for component-internal contracts. Both shift per mode.
+    </div>
+  </div>
 
   <div class="dec-grid">
     <div class="dec-card primary">
@@ -1027,11 +1064,11 @@ mental cost: <span class="clear">[parse "control surface, default size"]</span> 
 
     <div class="dec-card">
       <div class="dec-num">Decision 2</div>
-      <div class="dec-q">Spectrum-style stable aliases — or Primer-style per-mode aliases?</div>
+      <div class="dec-q">How to keep mode files' values from drifting away from the canonical step set?</div>
       <div class="dec-arrow">Recommended</div>
-      <div class="dec-answer">→ Spectrum-style</div>
+      <div class="dec-answer">→ Lint + JSON schema + CLAUDE.md</div>
       <div class="dec-flip-label">Flips if</div>
-      <div class="dec-flip">…we explicitly want density to appear in the token name itself (e.g., <code>--space-stack-gap-condensed</code>). Primer is more self-documenting; Spectrum is simpler.</div>
+      <div class="dec-flip">…the team explicitly wants more freedom to use arbitrary values per mode. Then drop the canonical step set; accept that scale becomes implicit.</div>
     </div>
 
     <div class="dec-card">

@@ -1750,11 +1750,24 @@ nx:focus-visible:outline-offset-2</pre>
 
       <div class="decision-col picked">
         <h5>A2 · CSS variables in <code>@theme</code> · <strong>rem-based</strong> <span class="verdict verdict-pick">pick</span></h5>
-        <p class="desc">Add <code>--breakpoint-sm/md/lg/xl/2xl</code> to <code>nexus.css</code> <code>@theme</code> in <strong>rem</strong> units. Tailwind v4 reads them; consumers override them. Values scale with user's browser font-size.</p>
+        <p class="desc">Add <code>--breakpoint-sm/md/lg/xl/2xl</code> to <code>nexus.css</code> <code>@theme</code> in <strong>rem</strong> units. Tailwind v4 auto-discovers them and generates responsive variants. Values scale with user's browser font-size.</p>
         <h6>Pros</h6>
-        <ul class="pros"><li>Aligns with Tailwind v4's native pattern</li><li>Consumer-overridable from CSS only</li><li>rem-based values scale with user font-size (matches Atlassian, Polaris, Mantine — all em/rem-based)</li><li>Tailwind's defaults are px; overriding to rem is the accessibility upgrade</li><li>One-block change to <code>nexus.css</code></li></ul>
+        <ul class="pros">
+          <li>Aligns with Tailwind v4's native pattern (auto-discovers <code>--breakpoint-*</code> in <code>@theme</code>)</li>
+          <li>rem-based values scale with user font-size (matches Atlassian, Polaris, Mantine — all em/rem-based)</li>
+          <li>Tailwind's defaults are px; overriding to rem is the accessibility upgrade</li>
+          <li><strong>Build-time</strong> consumer override via the consumer's own <code>@theme</code> block — no Tailwind config file needed</li>
+          <li>Values exposed as CSS variables for non-Tailwind contexts (custom <code>@media</code>, React Native, vanilla CSS)</li>
+          <li>One-block change to <code>nexus.css</code></li>
+        </ul>
         <h6>Cons</h6>
-        <ul class="cons"><li>Requires verifying Tailwind v4 picks them up correctly</li><li>rem-based breakpoints fire at different px widths for users with non-default browser font-size — usually a feature, occasionally surprising for designers</li></ul>
+        <ul class="cons">
+          <li>rem-based breakpoints fire at different px widths for users with non-default browser font-size — usually a feature, occasionally surprising for designers</li>
+        </ul>
+        <h6>⚠ What this is NOT</h6>
+        <p style="font-size: 12px; color: var(--fg-muted); margin: 4px 0 0;">
+          A consumer setting <code>:root { --breakpoint-lg: 70rem }</code> at runtime does <strong>not</strong> retune Tailwind's generated <code>nx:lg:</code> media queries. <code>@media</code> doesn't accept <code>var()</code> in any current browser — Tailwind bakes the resolved value at build time. The override path is the consumer's <code>@theme</code> block (build-time), not runtime CSS variables. Same constraint applies to container queries (<code>--container-*</code>).
+        </p>
       </div>
 
       <div class="decision-col">
@@ -1815,18 +1828,39 @@ nx:focus-visible:outline-offset-2</pre>
     </div>
 
     <p>
-      <strong>Primary target stance</strong>: Nexus components are designed for
-      <strong>Standard (≥1024px)</strong>. Narrow is graceful degradation; Wide gets extra
-      breathing room when available. Use <code>nx:lg:</code> as the primary responsive prefix
-      in consumer code.
+      <strong>Primary target stance — for the Nexus reference brand</strong>: Nexus components
+      are designed for <strong>Standard (≥1024px)</strong>. Narrow is graceful degradation; Wide
+      gets extra breathing room when available. Use <code>nx:lg:</code> as the primary responsive
+      prefix in consumer code.
+    </p>
+
+    <p>
+      <strong>For consumer brands</strong>: this is a default, not a mandate. A consumer brand
+      building a mobile-first product can override by setting their own <code>@theme</code>
+      breakpoint values and treating a different tier (e.g., <code>nx:md:</code>) as their
+      primary target. The display-class labels (Narrow/Standard/Wide) are documentation, not
+      hard-coded behaviour — they describe Nexus's reference defaults, which consumer brands can
+      remap. No Nexus utility is named <code>nx:standard:</code> or similar; only the standard
+      Tailwind class names (<code>nx:sm:</code>, <code>nx:md:</code>, etc.) exist as code.
     </p>
 
     <p>
       <strong>Why Narrow / Standard / Wide and not Material's Compact / Medium / Expanded</strong>:
-      MD3's labels assume mobile-first (Compact = phone portrait, 0–600dp). Nexus is desktop-tool
-      primary — the same semantic spectrum but rotated 180°. Narrow / Standard / Wide makes the
-      desktop-first stance load-bearing in the names themselves.
+      MD3's labels assume mobile-first (Compact = phone portrait, 0–600dp). Nexus's reference
+      brand is desktop-tool primary — the same semantic spectrum but rotated 180°. Narrow /
+      Standard / Wide makes the desktop-first <em>default</em> load-bearing in the names without
+      forcing it on consumer brands.
     </p>
+
+    <div class="callout callout-note">
+      <strong>Designer note — zoom and rem interaction</strong>
+      Because breakpoints are rem-based (Decision A2), they fire at the user's <em>zoom-adjusted</em>
+      threshold, not pixel-adjusted. A low-vision user at 200% browser zoom on a 1280px viewport
+      sees layouts triggering as if the viewport were ~640px (Narrow). This is the intended
+      accessibility behaviour — content stays at readable proportions when zoomed — but it can
+      surprise designers who test at 1280px expecting Standard. <strong>Test at multiple zoom
+      levels and font-size settings, not just default 100% at 16px root.</strong>
+    </div>
   </div>
 
   <!-- DECISION C -->
