@@ -19,13 +19,15 @@ Optional properties: `$description`, `$extensions`
 
 ## Color Token Pipeline
 
+> Public-facing companion: [`packages/core/docs/color-math.md`](../../packages/core/docs/color-math.md) narrates this pipeline for designers and external readers.
+
 **On-disk format: hex strings.** `tokens/primitives/color.json` and the ten semantic overlay tokens (e.g., `#000000cc`) store hex. Tokens Studio and Figma Variables hex-normalise color values on export and cannot round-trip OKLCH, so hex is the only viable on-disk format for a Figma-driven workflow.
 
 **Runtime format: OKLCH.** The build pipeline converts hex to `oklch(...)` at emit time. The conversion happens in `packages/core/scripts/utils.js` (`formatTokenValue`), which routes every `$type: "color"` hex value through `packages/core/scripts/lib/perceptual-grid.js`.
 
 ### Routing modes
 
-**Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/scripts/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `culori.toGamut('rgb')` to stay in sRGB. Hue is preserved from the hex.
+**Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/scripts/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `clampChroma(color, 'oklch', 'rgb')` to stay in sRGB. Hue is preserved from the hex.
 
 **Mechanical** — applies to everything else: white, black, semantic overlay hex with alpha (e.g., `#000000cc`), and any one-off value that isn't a palette shade key. Straight hex→oklch via culori; alpha is preserved from 8-digit hex.
 
