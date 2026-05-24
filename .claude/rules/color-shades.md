@@ -40,7 +40,7 @@ When introducing a new semantic token:
 - **Don't use `{p.500}` as a "default" tint.** It's the secondary-text anchor; using it as a fill produces muddy mid-luminance surfaces that fight every text layer above.
 - **Don't use `{p.50}` for borders in light mode.** It's nearly white; you'll get an invisible divider. Use `{p.200}` (`border.default`).
 - **Don't use `{p.950}` for body text in light mode.** `{p.900}` is the primary text anchor; `{p.950}` is reserved for dark-mode disabled and the deepest chrome.
-- **Don't pair `{p.400}` text on `{p.800}` surface in dark mode.** Fails APCA Lc ≥ 45 (verified empirically — this is exactly why `muted-foreground-subtle` collapses to `{p.300}` in dark mode; see [surfaces.md § Known overlaps](surfaces.md#known-overlaps)).
+- **Don't pair `{p.400}` text on `{p.800}` surface in dark mode.** Fails the [APCA gate](tokens.md#apca-contrast-gate) (verified empirically — this is exactly why `muted-foreground-subtle` collapses to `{p.300}` in dark mode; see [surfaces.md § Known overlaps](surfaces.md#known-overlaps)).
 - **Don't introduce a new shade between two existing steps.** The 11-step grid is the contract. If a design needs a luminance not on the grid, the right move is to evaluate whether the role can use an adjacent shade — not to add a `{p.350}`.
 
 ## See also
