@@ -53,9 +53,9 @@ describe('renderSvg', () => {
   });
 });
 
-describe('committed-grid pipeline determinism', () => {
+describe('committed-grid pipeline', () => {
   // Distinct hex per shade so pinning + simulation + float→int rounding all
-  // produce non-trivial values — the rounding the CI freshness gate relies on.
+  // produce non-trivial values — the output the CI freshness gate diffs against.
   const FAKE_RAMP = [
     '#f8fafc',
     '#f1f5f9',
@@ -80,10 +80,18 @@ describe('committed-grid pipeline determinism', () => {
     return out;
   }
 
-  it('renderSvg(buildSimulatedByVision(...)) is byte-stable across runs', () => {
-    const primitives = fakePrimitives();
-    const first = renderSvg(buildSimulatedByVision(primitives));
-    const second = renderSvg(buildSimulatedByVision(primitives));
-    expect(first).toBe(second);
+  // Golden cells pin the parse→pin→simulate→round output the freshness gate
+  // diffs against — a grid/simulation/rounding regression fails here first.
+  it('pins the simulated float→int cells and renders them as SVG hex', () => {
+    const tree = buildSimulatedByVision(fakePrimitives());
+    expect(tree.normal.slate['500']).toEqual([100, 116, 139]);
+    expect(tree.deuteranopia.slate['500']).toEqual([111, 111, 139]);
+    expect(tree.protanopia.slate['500']).toEqual([113, 113, 139]);
+    expect(tree.tritanopia.slate['500']).toEqual([97, 119, 119]);
+    expect(tree.tritanopia.slate['950']).toEqual([0, 6, 6]);
+
+    const svg = renderSvg(tree);
+    expect(svg).toContain('fill="#6f6f8b"'); // deuteranopia slate.500
+    expect(svg).toContain('fill="#000606"'); // tritanopia slate.950
   });
 });
