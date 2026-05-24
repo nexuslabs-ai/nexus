@@ -3,6 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// emit ships P3 chroma; audit scores in sRGB (legacy-display equivalent)
+const EMIT_GAMUT = 'p3';
+const AUDIT_GAMUT = 'rgb';
+
 const toRgb = converter('rgb');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,7 +66,7 @@ function computePinnedOklch(hex, shade) {
     ...(source.alpha !== undefined ? { alpha: source.alpha } : {}),
   };
 
-  const clamped = clampChroma(target, 'oklch', 'p3');
+  const clamped = clampChroma(target, 'oklch', EMIT_GAMUT);
   const originalC = target.c;
   const clampedC = clamped.c ?? 0;
 
@@ -84,7 +88,7 @@ export function hexToOklchMechanical(hex) {
 }
 
 function oklchToSrgbInts(oklchColor) {
-  const rgb = toRgb(clampChroma(oklchColor, 'oklch', 'rgb'));
+  const rgb = toRgb(clampChroma(oklchColor, 'oklch', AUDIT_GAMUT));
   if ((rgb.alpha ?? 1) < 1) {
     // apca-w3 `sRGBtoY` reads only [r,g,b]; an alpha-bearing color must be
     // pre-blended against its actual background before contrast computation.

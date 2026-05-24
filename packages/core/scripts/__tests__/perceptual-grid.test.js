@@ -90,9 +90,12 @@ describe('hexToOklchPinned', () => {
   });
 
   it('delivers P3 chroma for shades inside P3 but outside sRGB (teal.600 #0d9488)', () => {
-    // sRGB clamp would emit c≈0.081; P3 clamp emits c≈0.104. 0.09 sits between.
+    // sRGB clamp would emit c≈0.081; P3 clamp emits c≈0.104. Pin to the P3
+    // band (0.09 < c < 0.11) so a future widening to rec2020 trips the test
+    // too, not just a revert to sRGB.
     const parsed = parseOklch(hexToOklchPinned('#0d9488', '600'));
     expect(parsed.c).toBeGreaterThan(0.09);
+    expect(parsed.c).toBeLessThan(0.11);
   });
 });
 
