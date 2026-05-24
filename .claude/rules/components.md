@@ -173,18 +173,19 @@ Use full semantic token paths, not incomplete or primitive values:
 
 **Reference:** See `packages/tailwind/nexus.css` for available tokens.
 
-### Adaptive-by-default semantic tokens
+### Adaptive-by-Default Semantic Tokens
 
 Semantic color tokens adapt to theme automatically. Do not write `dark:` modifiers on tokens that already have a semantic name — the underlying CSS variable is already overridden under the `.dark` selector at emit time, so the modifier is a no-op.
 
-| Pattern                              | Correct? | Notes                                                                                                                                                                  |
-| ------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nx:bg-primary-background`           | Yes      | Semantic token — adapts across light/dark automatically                                                                                                                |
-| `nx:text-foreground`                 | Yes      | Same — `foreground` already carries its dark-mode value                                                                                                                |
-| `nx:dark:bg-primary-background`      | No       | `dark:` is a no-op; the token already adapts                                                                                                                           |
-| `nx:bg-blue-500 nx:dark:bg-blue-900` | Edge     | Raw primitives are non-adaptive, so `dark:` is the only mechanism. But primitives in component code are themselves an anti-pattern — see § Semantic Token Paths above. |
+| Pattern                         | Correct? | Notes                                                   |
+| ------------------------------- | -------- | ------------------------------------------------------- |
+| `nx:bg-primary-background`      | Yes      | Semantic token — adapts across light/dark automatically |
+| `nx:text-foreground`            | Yes      | Same — `foreground` already carries its dark-mode value |
+| `nx:dark:bg-primary-background` | No       | `dark:` is a no-op; the token already adapts            |
 
-**Rule of thumb:** if the class name carries a semantic role (`-background`, `-foreground`, `muted`, `container`, `popover`, `nav-*`, etc.), it adapts — don't add `dark:`. The `dark:` modifier is reserved for raw primitives, which should be rare in component code.
+**Rule of thumb:** any class referencing a token from [`tokens.md` § Semantic Token Categories](tokens.md#semantic-token-categories) (Layout, Brand, Status, Borders, Navigation, Data viz) adapts — don't add `dark:`. The `dark:` modifier is reserved for raw primitives, which should be rare in component code.
+
+**Primitive edge case.** Raw primitive utilities (`nx:bg-blue-500 nx:dark:bg-blue-900`) _are_ non-adaptive, so `dark:` is the only mechanism for varying them by theme. But primitives in component code are themselves an anti-pattern (see § Semantic Token Paths above), so this case should almost never come up — if you find yourself reaching for one, prefer adding the missing semantic token instead.
 
 See [`tokens.md` § Light/Dark Theme Tokens](tokens.md#lightdark-theme-tokens) for how the `.dark` selector emit makes this work.
 
