@@ -173,6 +173,21 @@ Use full semantic token paths, not incomplete or primitive values:
 
 **Reference:** See `packages/tailwind/nexus.css` for available tokens.
 
+### Adaptive-by-default semantic tokens
+
+Semantic color tokens adapt to theme automatically. Do not write `dark:` modifiers on tokens that already have a semantic name — the underlying CSS variable is already overridden under the `.dark` selector at emit time, so the modifier is a no-op.
+
+| Pattern                              | Correct? | Notes                                                                                                                                                                  |
+| ------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nx:bg-primary-background`           | Yes      | Semantic token — adapts across light/dark automatically                                                                                                                |
+| `nx:text-foreground`                 | Yes      | Same — `foreground` already carries its dark-mode value                                                                                                                |
+| `nx:dark:bg-primary-background`      | No       | `dark:` is a no-op; the token already adapts                                                                                                                           |
+| `nx:bg-blue-500 nx:dark:bg-blue-900` | Edge     | Raw primitives are non-adaptive, so `dark:` is the only mechanism. But primitives in component code are themselves an anti-pattern — see § Semantic Token Paths above. |
+
+**Rule of thumb:** if the class name carries a semantic role (`-background`, `-foreground`, `muted`, `container`, `popover`, `nav-*`, etc.), it adapts — don't add `dark:`. The `dark:` modifier is reserved for raw primitives, which should be rare in component code.
+
+See [`tokens.md` § Light/Dark Theme Tokens](tokens.md#lightdark-theme-tokens) for how the `.dark` selector emit makes this work.
+
 ## Sizing Convention
 
 Use padding for sizing, not fixed heights:
@@ -290,6 +305,7 @@ Before submitting a component:
 - [ ] `nx:` prefix on all utility classes
 - [ ] Prefix before ALL modifiers (`nx:hover:`, `nx:[&>svg]:`, `nx:md:` — not `hover:nx:`, `[&>svg]:nx:`)
 - [ ] Full semantic token paths (not incomplete like `nx:bg-primary`)
+- [ ] No `dark:` modifiers on semantic tokens (they adapt automatically)
 - [ ] `data-slot` attribute present
 - [ ] Padding-based sizing (no fixed heights unless necessary)
 - [ ] Named interface with JSDoc for custom props

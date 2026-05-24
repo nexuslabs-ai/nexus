@@ -202,6 +202,7 @@ Theme-aware — lives in `chart-categorical-{mode}-light.json` and `chart-catego
 - **Primitives**: Single file with all color scales (theme-agnostic)
 - **Semantics**: Themed pairs follow `{type}-{mode}-light.json` + `{type}-{mode}-dark.json`. Concrete instances: `base-slate-{light,dark}.json`, `brands-blue-{light,dark}.json`, `chart-categorical-default-{light,dark}.json`.
 - CSS output: Light in `@theme` block, dark in `.dark` selector
+- **Authoring rule**: Because the `.dark` selector already overrides semantic token values, never write `dark:` modifiers on semantic-named utilities in component code — see [`components.md` § Adaptive-by-default semantic tokens](components.md#adaptive-by-default-semantic-tokens).
 
 ## Validation
 
