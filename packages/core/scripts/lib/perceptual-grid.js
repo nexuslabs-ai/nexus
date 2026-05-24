@@ -62,13 +62,13 @@ function computePinnedOklch(hex, shade) {
     ...(source.alpha !== undefined ? { alpha: source.alpha } : {}),
   };
 
-  const clamped = clampChroma(target, 'oklch', 'rgb');
+  const clamped = clampChroma(target, 'oklch', 'p3');
   const originalC = target.c;
   const clampedC = clamped.c ?? 0;
 
   if (originalC > 0 && (originalC - clampedC) / originalC > 0.2) {
     console.warn(
-      `perceptual-grid: gamut clip on ${hex} at shade ${shade} — C ${originalC.toFixed(4)} → ${clampedC.toFixed(4)}`
+      `perceptual-grid: P3 gamut clip on ${hex} at shade ${shade} — C ${originalC.toFixed(4)} → ${clampedC.toFixed(4)}`
     );
   }
 
@@ -84,7 +84,7 @@ export function hexToOklchMechanical(hex) {
 }
 
 function oklchToSrgbInts(oklchColor) {
-  const rgb = toRgb(oklchColor);
+  const rgb = toRgb(clampChroma(oklchColor, 'oklch', 'rgb'));
   if ((rgb.alpha ?? 1) < 1) {
     // apca-w3 `sRGBtoY` reads only [r,g,b]; an alpha-bearing color must be
     // pre-blended against its actual background before contrast computation.
