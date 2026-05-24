@@ -283,12 +283,16 @@ function assertShowcaseExists(component) {
       `Showcase export "${component.showcase}" not found in ${component.name}.stories.tsx`
     );
   }
-  // Require a `render:` within the export's block (up to the next top-level
-  // export) so an args-only story fails here rather than rendering empty cells.
+  // Require a `render:` object key within the export's block (up to the next
+  // top-level export) so an args-only story fails here rather than rendering
+  // empty cells. Match `render:` either at a line start (the indented-key case,
+  // robust to intervening comments/keys) or right after a `{`/`,` (same-line
+  // case) — so a `render:` inside a string value (mid-line, after a quote)
+  // can't satisfy the guard.
   const rest = src.slice(exportMatch.index);
   const nextExport = rest.slice(exportMatch[0].length).search(/^export /m);
   const block = nextExport === -1 ? rest : rest.slice(0, exportMatch[0].length + nextExport);
-  if (!/\brender\s*:/.test(block)) {
+  if (!/(?:^|[{,])\s*render\s*:/m.test(block)) {
     throw new Error(
       `Showcase "${component.showcase}" in ${component.name}.stories.tsx is args-only; ` +
         `base-variant generation needs a render-based story`
