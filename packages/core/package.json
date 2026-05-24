@@ -9,11 +9,13 @@
     "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=neutral --borderwidth=vega --radius=sharp --shadow=vega --size=vega --typography=vega",
     "audit:contrast": "node scripts/audit-contrast.js",
     "audit:class-refs": "node scripts/audit-class-refs.js",
+    "audit:colorblind": "node scripts/audit-colorblind.js",
     "audit:figma-parity": "node scripts/audit-figma-parity.js"
   },
   "dependencies": {},
   "license": "MIT",
   "devDependencies": {
+    "@bjornlu/colorblind": "^1.0.3",
     "apca-w3": "^0.1.9",
     "culori": "^4.0.2",
     "prettier": "^3.7.4"
