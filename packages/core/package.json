@@ -3,19 +3,36 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Internal design tokens and theme definitions (not published)",
+  "description": "Internal design tokens, theme definitions, and runtime color utilities (not published)",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/runtime/index.d.ts",
+        "default": "./dist/runtime/index.js"
+      },
+      "require": {
+        "types": "./dist/runtime/index.d.cts",
+        "default": "./dist/runtime/index.cjs"
+      }
+    }
+  },
   "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
     "build:tokens:modular": "node scripts/generate-modular.js",
     "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=neutral --borderwidth=vega --radius=sharp --shadow=vega --size=vega --typography=vega",
     "audit:contrast": "node scripts/audit-contrast.js",
     "audit:class-refs": "node scripts/audit-class-refs.js",
     "audit:figma-parity": "node scripts/audit-figma-parity.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "apca-w3": "^0.1.9",
+    "culori": "^4.0.2"
+  },
   "license": "MIT",
   "devDependencies": {
-    "apca-w3": "^0.1.9",
-    "culori": "^4.0.2",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   }
 }
