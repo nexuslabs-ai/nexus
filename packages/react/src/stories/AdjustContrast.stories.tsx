@@ -113,6 +113,10 @@ const meta: Meta<DemoArgs> = {
   title: 'Utilities/Adjust Contrast',
   parameters: {
     layout: 'fullscreen',
+    // This demo snaps colors to APCA tiers (the Nexus contrast gate); the ui
+    // and incidental tiers intentionally render below axe's WCAG-2 4.5:1 ratio,
+    // so the WCAG-2 color-contrast check is the wrong gate here.
+    a11y: { test: 'off' },
     docs: {
       description: {
         component:
