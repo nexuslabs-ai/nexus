@@ -325,6 +325,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # The AdjustContrast story imports @nexus/core, which is consumed via
+      # its built dist/runtime entry (package.json exports). Build it so
+      # Storybook/Vite can resolve the package during the story tests.
+      - name: Build @nexus/core
+        run: yarn workspace @nexus/core build
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
@@ -360,6 +366,12 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      # The AdjustContrast story imports @nexus/core, which is consumed via
+      # its built dist/runtime entry (package.json exports). Build it so the
+      # Storybook production build can resolve the package.
+      - name: Build @nexus/core
+        run: yarn workspace @nexus/core build
 
       - name: Build Storybook
         run: yarn build-storybook
