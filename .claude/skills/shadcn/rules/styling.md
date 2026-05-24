@@ -134,7 +134,7 @@ Use `gap-*` instead. `space-y-4` → `flex flex-col gap-4`. `space-x-2` → `fle
 
 ## No manual dark: color overrides
 
-Use semantic tokens — they handle light/dark via CSS variables. `bg-background text-foreground` not `bg-white dark:bg-gray-950`.
+Semantic tokens already switch under the `.dark` selector via CSS variables, so `dark:` modifiers on them are no-ops. Use `bg-background text-foreground`, not `bg-white dark:bg-gray-950`. The `dark:` modifier is only meaningful on raw primitives (`bg-blue-500 dark:bg-blue-900`), which are themselves an anti-pattern in component code.
 
 ---
 
