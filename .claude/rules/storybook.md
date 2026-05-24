@@ -375,6 +375,7 @@ Each cell emits the **full** semantic set (base + the `neutral` brand) for its t
 ### Conventions specific to generated stories
 
 - **Inline styles, not `nx:` utilities, for the grid scaffolding.** The wrapper (grid, cell chrome) uses `style={{ … 'var(--nx-color-…)' }}`. This is the one place the `nx:`-prefix rule is intentionally relaxed: generated files are gitignored, and Tailwind's content scanner ignores gitignored paths — so an `nx:` class used _only_ here would never be emitted. The actual component content comes from the reused showcase, whose classes are emitted from the (scanned) canonical story file.
+- **Component decorators are applied; the global one is not.** The reused showcase is wrapped in its own meta + story decorators (e.g. Tooltip's `TooltipProvider`, Input's width wrapper) so it renders faithfully — but the global preview decorator (dark / centering wrapper) is skipped so each cell controls its own theme via `data-nexus-base` + `.dark`.
 - **`a11y: { test: 'off' }`** — a11y and contrast are covered by the canonical stories and `yarn workspace @nexus/core audit:contrast`; these grids are visual-comparison duplicates and would only add noise (duplicated controls / ids across 10 renders).
 - **`tags: ['!autodocs']`** — no docs page per generated story.
 

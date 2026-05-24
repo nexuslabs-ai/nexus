@@ -113,10 +113,29 @@ const BASES: string[] = ${bases};
 const THEMES: string[] = ${themes};
 
 type AnyRender = (args: unknown, context: unknown) => ReactNode;
+type AnyDecorator = (story: () => ReactNode, context: unknown) => ReactNode;
+
+function toDecorators(d: unknown): AnyDecorator[] {
+  if (!d) return [];
+  return (Array.isArray(d) ? d : [d]) as AnyDecorator[];
+}
 
 function renderShowcase(): ReactNode {
   const render = showcase.render as unknown as AnyRender | undefined;
-  return render?.({ ...componentMeta.args, ...showcase.args }, {});
+  if (!render) return null;
+  const args = { ...componentMeta.args, ...showcase.args };
+  const context = { args } as unknown;
+  // Apply the component's own decorators (meta then story), outermost first —
+  // e.g. Tooltip's TooltipProvider. The global preview decorator (dark /
+  // centering wrapper) is intentionally skipped so cells stay self-contained.
+  const decorators = [
+    ...toDecorators(componentMeta.decorators),
+    ...toDecorators(showcase.decorators),
+  ];
+  return decorators.reduceRight<() => ReactNode>(
+    (inner, decorator) => () => decorator(inner, context),
+    () => render(args, context)
+  )();
 }
 
 function BaseCell({ base, theme }: { base: string; theme: string }) {
