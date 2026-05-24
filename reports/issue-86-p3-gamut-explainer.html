@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Issue #86 — P3 wide-gamut delivery (ELI5)</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: oklch(0.985 0.002 247);
+        --panel: oklch(1 0 0);
+        --ink: oklch(0.21 0.034 264);
+        --ink-2: oklch(0.45 0.02 264);
+        --ink-3: oklch(0.62 0.015 264);
+        --line: oklch(0.92 0.005 247);
+        --line-2: oklch(0.86 0.008 247);
+        --accent: oklch(0.46 0.1038 184.7); /* teal.600 — a shade that GAINS chroma */
+        --warn: oklch(0.553 0.1341 74.87); /* amber.500 — also gains */
+        --good: oklch(0.46 0.1195 144.96); /* green.600 — unchanged */
+        --err: oklch(0.46 0.1699 27.93); /* red.600 — unchanged */
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.55 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
+          Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 56px 28px 96px;
+      }
+      h1,
+      h2,
+      h3 {
+        letter-spacing: -0.01em;
+        color: var(--ink);
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.15;
+        margin: 0 0 10px;
+        font-weight: 650;
+      }
+      h2 {
+        font-size: 20px;
+        margin: 48px 0 14px;
+        font-weight: 620;
+      }
+      h2 .num {
+        display: inline-block;
+        width: 26px;
+        height: 26px;
+        background: var(--ink);
+        color: var(--panel);
+        border-radius: 6px;
+        text-align: center;
+        line-height: 26px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-right: 10px;
+        vertical-align: 1px;
+      }
+      h3 {
+        font-size: 14px;
+        margin: 22px 0 8px;
+        font-weight: 600;
+        color: var(--ink-2);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      p {
+        margin: 0 0 12px;
+        color: var(--ink);
+      }
+      p.muted {
+        color: var(--ink-2);
+      }
+      code {
+        font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        background: oklch(0.96 0.005 247);
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+      a {
+        color: var(--accent);
+      }
+      .tag {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 99px;
+        background: oklch(0.95 0.04 184.7);
+        color: var(--accent);
+        letter-spacing: 0.02em;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 20px 22px;
+      }
+      .panel + .panel {
+        margin-top: 12px;
+      }
+      .tldr {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin-top: 22px;
+      }
+      .tldr ul {
+        margin: 8px 0 0;
+        padding: 0 0 0 18px;
+      }
+      .tldr li {
+        margin: 4px 0;
+      }
+      .tldr b {
+        font-weight: 600;
+      }
+
+      /* gamut badge: live demo of color-gamut media query */
+      .gamut-detect {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 99px;
+        font-size: 13px;
+        margin-top: 14px;
+      }
+      .gamut-detect .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: oklch(0.62 0.015 264);
+      }
+      .gamut-detect::after {
+        content: 'sRGB display detected';
+        color: var(--ink-2);
+      }
+      @media (color-gamut: p3) {
+        .gamut-detect .dot {
+          background: var(--accent);
+        }
+        .gamut-detect::after {
+          content: 'P3 display detected — you can see the wins below';
+          color: var(--accent);
+          font-weight: 600;
+        }
+      }
+
+      /* chroma ruler diagram */
+      .ruler {
+        position: relative;
+        margin: 20px 0 10px;
+        height: 84px;
+      }
+      .ruler-track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: linear-gradient(
+          to right,
+          oklch(0.7 0 0),
+          oklch(0.6 0.12 184.7),
+          oklch(0.55 0.22 184.7)
+        );
+      }
+      .ruler-band {
+        position: absolute;
+        top: 28px;
+        height: 28px;
+        background: repeating-linear-gradient(
+          135deg,
+          oklch(1 0 0 / 0.35),
+          oklch(1 0 0 / 0.35) 4px,
+          transparent 4px,
+          transparent 8px
+        );
+        border-left: 1px dashed oklch(1 0 0 / 0.75);
+        border-right: 1px dashed oklch(1 0 0 / 0.75);
+      }
+      .ruler-tick {
+        position: absolute;
+        top: 22px;
+        height: 40px;
+        width: 2px;
+        background: var(--ink);
+      }
+      .ruler-tick.p3 {
+        background: var(--accent);
+      }
+      .ruler-label {
+        position: absolute;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+        color: var(--ink);
+      }
+      .ruler-label.top {
+        top: 0;
+      }
+      .ruler-label.bot {
+        bottom: 0;
+      }
+      .ruler-label.p3 {
+        color: var(--accent);
+      }
+      .ruler-arrow {
+        position: absolute;
+        top: 65px;
+        font-size: 11px;
+        color: var(--ink-2);
+      }
+
+      /* before/after pipeline */
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0;
+        align-items: center;
+        margin: 14px 0;
+      }
+      .flow .step {
+        background: oklch(0.97 0.005 247);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 8px;
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.35;
+      }
+      .flow .step.bad {
+        background: oklch(0.95 0.04 27.93);
+        border-color: oklch(0.85 0.08 27.93);
+      }
+      .flow .step.good {
+        background: oklch(0.95 0.04 184.7);
+        border-color: oklch(0.85 0.08 184.7);
+      }
+      .flow .step code {
+        background: oklch(1 0 0 / 0.6);
+        padding: 0 4px;
+        font-size: 11px;
+      }
+      .flow .arrow {
+        text-align: center;
+        color: var(--ink-3);
+      }
+      .flow-after {
+        grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      }
+      .fork-note {
+        font-size: 11px;
+        color: var(--ink-2);
+        text-align: center;
+        margin-top: 8px;
+      }
+
+      /* swatches */
+      .swatch-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .swatch-row {
+        display: grid;
+        grid-template-columns: 110px 1fr 1fr 60px;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 12px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+      .swatch-row .label {
+        font-size: 13px;
+      }
+      .swatch-row .label small {
+        display: block;
+        color: var(--ink-3);
+        font-size: 11px;
+        font-weight: 400;
+        margin-top: 2px;
+      }
+      .chip {
+        height: 38px;
+        border-radius: 6px;
+        border: 1px solid oklch(0 0 0 / 0.08);
+      }
+      .delta {
+        font-size: 12px;
+        font-weight: 600;
+        text-align: right;
+        color: var(--ink-2);
+      }
+      .delta.gain {
+        color: var(--accent);
+      }
+      .delta.zero {
+        color: var(--ink-3);
+      }
+      .swatch-hdr {
+        display: grid;
+        grid-template-columns: 110px 1fr 1fr 60px;
+        gap: 10px;
+        padding: 0 12px 6px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-3);
+        font-weight: 600;
+      }
+      .swatch-hdr span:nth-child(3) {
+        color: var(--accent);
+      }
+
+      /* impact bar */
+      .impact-bar {
+        display: flex;
+        height: 32px;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        margin: 10px 0 8px;
+      }
+      .impact-bar .seg {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: oklch(1 0 0);
+      }
+      .impact-bar .seg.unchanged {
+        background: oklch(0.55 0.02 264);
+      }
+      .impact-bar .seg.gain {
+        background: var(--accent);
+      }
+      .impact-legend {
+        display: flex;
+        gap: 18px;
+        font-size: 12px;
+        color: var(--ink-2);
+        margin-bottom: 4px;
+      }
+      .impact-legend .sq {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+      .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .stat {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 14px;
+      }
+      .stat .v {
+        font: 600 22px/1.1 -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+      }
+      .stat .v.accent {
+        color: var(--accent);
+      }
+      .stat .v.ok {
+        color: var(--good);
+      }
+      .stat .k {
+        font-size: 11px;
+        color: var(--ink-3);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-top: 4px;
+      }
+
+      /* gaps & issues callouts */
+      .gap {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 14px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left-width: 3px;
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-top: 10px;
+      }
+      .gap.found {
+        border-left-color: var(--warn);
+      }
+      .gap.fixed {
+        border-left-color: var(--good);
+      }
+      .gap.info {
+        border-left-color: var(--accent);
+      }
+      .gap.manual {
+        border-left-color: oklch(0.62 0.015 264);
+      }
+      .gap .ico {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: oklch(1 0 0);
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 1px;
+      }
+      .gap.found .ico {
+        background: var(--warn);
+      }
+      .gap.fixed .ico {
+        background: var(--good);
+      }
+      .gap.info .ico {
+        background: var(--accent);
+      }
+      .gap.manual .ico {
+        background: oklch(0.62 0.015 264);
+      }
+      .gap h4 {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 620;
+      }
+      .gap p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+      .gap p + p {
+        margin-top: 6px;
+      }
+
+      .footer {
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+      .footer code {
+        font-size: 11px;
+      }
+
+      table.phases {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+      table.phases th,
+      table.phases td {
+        text-align: left;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      table.phases th {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-3);
+        font-weight: 600;
+      }
+      table.phases td:first-child {
+        width: 70px;
+        font-weight: 600;
+        color: var(--ink-2);
+      }
+
+      .crayons {
+        display: flex;
+        gap: 4px;
+        margin: 10px 0 14px;
+        flex-wrap: wrap;
+      }
+      .crayon {
+        width: 14px;
+        height: 36px;
+        border-radius: 2px 2px 0 0;
+      }
+      .crayons.box-srgb .crayon:nth-child(n + 25) {
+        opacity: 0.18;
+      }
+
+      details {
+        margin-top: 8px;
+        font-size: 13px;
+      }
+      summary {
+        cursor: pointer;
+        color: var(--ink-2);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="tag">Issue #86 · explainer</span>
+      <h1>Deliver P3 wide-gamut OKLCH on capable displays</h1>
+      <p class="muted" style="font-size: 16px; max-width: 70ch">
+        We're letting Nexus colors use the full range modern screens can show —
+        instead of dimming every vivid hue down to the limits of a
+        20-year-old monitor. One clamp swap in the build pipeline; everything
+        else stays put.
+      </p>
+      <div class="gamut-detect">
+        <span class="dot"></span>
+      </div>
+
+      <div class="tldr">
+        <h3 style="margin: 0 0 6px; color: var(--ink); letter-spacing: 0">
+          ELI5 in three lines
+        </h3>
+        <ul>
+          <li>
+            <b>What</b> — Stop forcing every Nexus shade into the small "sRGB"
+            box of colors. Use the bigger "P3" box that modern phones,
+            laptops, and tablets can actually show.
+          </li>
+          <li>
+            <b>How</b> — Change one line in the color build:
+            <code>clampChroma(…, 'rgb')</code> → <code>'p3'</code>. Browsers
+            handle the rest automatically — no media queries, no fallbacks.
+          </li>
+          <li>
+            <b>Cost</b> — Tiny and provably safe. Neutrals don't change.
+            Contrast (APCA) is byte-identical. Only some vivid hues — mostly
+            teals, ambers, skies, and chart colors — get richer on P3
+            displays.
+          </li>
+        </ul>
+      </div>
+
+      <h2><span class="num">1</span>The big idea</h2>
+      <p>
+        Every screen can only show a fixed range of colors — its
+        <b>gamut</b>. Think of it as a box of crayons:
+      </p>
+
+      <h3>sRGB — the old 24-crayon box (1996)</h3>
+      <div class="crayons box-srgb" aria-hidden="true">
+        <!-- 48 crayons, last 24 dimmed -->
+        <span class="crayon" style="background: oklch(0.55 0.18 27)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 50)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 75)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 100)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 125)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 150)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 175)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 200)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 225)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 250)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 275)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 300)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 325)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.18 350)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.15 100)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.15 150)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.15 200)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.15 250)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.15 300)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.18 30)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.18 130)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.18 230)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.18 280)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.18 350)"></span>
+      </div>
+      <h3>P3 — the 48-crayon box (most screens since ~2017)</h3>
+      <div class="crayons" aria-hidden="true">
+        <span class="crayon" style="background: oklch(0.55 0.25 27)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 50)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 75)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 100)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 125)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 150)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 175)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 200)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 225)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 250)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 275)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 300)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 325)"></span
+        ><span class="crayon" style="background: oklch(0.55 0.25 350)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.21 100)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.21 150)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.21 200)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.21 250)"></span
+        ><span class="crayon" style="background: oklch(0.7 0.21 300)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.25 30)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.25 130)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.25 230)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.25 280)"></span
+        ><span class="crayon" style="background: oklch(0.4 0.25 350)"></span>
+      </div>
+      <p class="muted">
+        Every crayon in the 24-box also exists in the 48-box. P3 just adds
+        more saturated versions — extra vividness for greens, teals, reds,
+        oranges. Today the Nexus build was reaching for a P3 crayon, then
+        manually rubbing it on a tissue to dim it to sRGB before handing it
+        over. That stops.
+      </p>
+
+      <h3 style="margin-top: 28px">How the clamp works on one color</h3>
+      <p class="muted" style="font-size: 13px">
+        Each shade has a "wanted" chroma (saturation) coming from its source
+        hex. The build clamps it back into a gamut. The diagram below shows
+        what changes:
+      </p>
+      <div class="ruler">
+        <div class="ruler-track"></div>
+        <div class="ruler-band" style="left: 50%; right: 22%"></div>
+        <div class="ruler-tick" style="left: 50%"></div>
+        <div
+          class="ruler-label top"
+          style="left: calc(50% - 26px); width: 80px; text-align: left"
+        >
+          sRGB limit
+        </div>
+        <div
+          class="ruler-label bot"
+          style="left: calc(50% - 26px); width: 80px; text-align: left"
+        >
+          today's clamp
+        </div>
+        <div class="ruler-tick p3" style="left: 78%"></div>
+        <div
+          class="ruler-label top p3"
+          style="left: calc(78% - 22px); width: 80px; text-align: left"
+        >
+          P3 limit
+        </div>
+        <div
+          class="ruler-label bot p3"
+          style="left: calc(78% - 22px); width: 100px; text-align: left"
+        >
+          new clamp
+        </div>
+        <div
+          class="ruler-arrow"
+          style="left: calc(50% + 4px); width: 28%; text-align: center"
+        >
+          ← saturation we used to throw away →
+        </div>
+      </div>
+
+      <h2><span class="num">2</span>Before &amp; after — the one pipeline step</h2>
+
+      <h3>Today</h3>
+      <div class="flow">
+        <div class="step">hex<br /><code>#10b981</code></div>
+        <div class="arrow">→</div>
+        <div class="step">
+          OKLCH<br />pin L to grid<br /><code>L=0.553</code>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step bad">
+          <b>clamp to sRGB</b><br />reduces chroma<br /><code
+            >'rgb' clamp</code
+          >
+        </div>
+      </div>
+      <p class="muted" style="font-size: 13px">
+        Output: <code>oklch(0.553 0.1204 162.5)</code> — a paler emerald,
+        because we forced it into the small box.
+      </p>
+
+      <h3>After this PR</h3>
+      <div class="flow flow-after">
+        <div class="step">hex<br /><code>#10b981</code></div>
+        <div class="arrow">→</div>
+        <div class="step">
+          OKLCH<br />pin L to grid<br /><code>L=0.553</code>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step good">
+          <b>clamp to P3</b><br />keeps more chroma<br /><code
+            >'p3' clamp</code
+          >
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          emit<br /><code>oklch(0.553 <b>0.1491</b> 162.5)</code>
+        </div>
+      </div>
+      <p class="muted" style="font-size: 13px">
+        Same hex in. Same lightness pinned. Same hue. The
+        <b>only</b> thing that moved: chroma is no longer capped at sRGB's
+        wall. <code>0.1204 → 0.1491</code> for that emerald — about
+        <b>+24%</b>.
+      </p>
+
+      <h3>For contrast math (APCA): a separate sRGB clamp</h3>
+      <p class="muted" style="font-size: 13px">
+        APCA checks if text is readable on a surface. It assumes sRGB. So in
+        the audit path, we add a quiet sRGB clamp <i>just for scoring</i> —
+        so contrast values stay <b>byte-identical</b> to today. Verified: 0
+        mismatches across all 242 shades. Display gets P3; math gets sRGB; no
+        contrast guarantee is weakened.
+      </p>
+
+      <h2><span class="num">3</span>See it on your screen</h2>
+      <p class="muted">
+        Each row below renders <b>both</b> values as real
+        <code>oklch()</code> CSS. On a P3 display, the right-hand chip looks
+        visibly richer where chroma gained. On an sRGB-only display, your
+        browser maps the P3 chip down to sRGB — so they look the same. That's
+        the whole point: it's safe everywhere, better where possible.
+      </p>
+
+      <h3 style="margin-top: 22px">Unchanged anchors (already inside sRGB)</h3>
+      <div class="swatch-hdr">
+        <span>token</span><span>today (sRGB)</span><span>after (P3)</span
+        ><span>Δ</span>
+      </div>
+      <div class="swatch-row">
+        <div class="label">slate.500<small>text anchor</small></div>
+        <div class="chip" style="background: oklch(0.553 0.0407 257.42)"></div>
+        <div class="chip" style="background: oklch(0.553 0.0407 257.42)"></div>
+        <div class="delta zero">0%</div>
+      </div>
+      <div class="swatch-row">
+        <div class="label">blue.600<small>brand / primary</small></div>
+        <div class="chip" style="background: oklch(0.46 0.1301 255.28)"></div>
+        <div class="chip" style="background: oklch(0.46 0.1301 255.28)"></div>
+        <div class="delta zero">0%</div>
+      </div>
+      <div class="swatch-row">
+        <div class="label">red.600<small>error</small></div>
+        <div class="chip" style="background: oklch(0.46 0.1699 27.93)"></div>
+        <div class="chip" style="background: oklch(0.46 0.1699 27.93)"></div>
+        <div class="delta zero">0%</div>
+      </div>
+      <div class="swatch-row">
+        <div class="label">green.600<small>success</small></div>
+        <div class="chip" style="background: oklch(0.46 0.1195 144.96)"></div>
+        <div class="chip" style="background: oklch(0.46 0.1195 144.96)"></div>
+        <div class="delta zero">0%</div>
+      </div>
+
+      <h3 style="margin-top: 22px">Hues that gain richness on P3</h3>
+      <div class="swatch-hdr">
+        <span>token</span><span>today (sRGB)</span><span>after (P3)</span
+        ><span>Δ</span>
+      </div>
+      <div class="swatch-row">
+        <div class="label">teal.600<small>chart series · shipped</small></div>
+        <div class="chip" style="background: oklch(0.46 0.0812 184.7)"></div>
+        <div class="chip" style="background: oklch(0.46 0.1038 184.7)"></div>
+        <div class="delta gain">+28%</div>
+      </div>
+      <div class="swatch-row">
+        <div class="label">emerald.500<small>vivid inventory</small></div>
+        <div class="chip" style="background: oklch(0.553 0.1204 162.48)"></div>
+        <div class="chip" style="background: oklch(0.553 0.1491 162.48)"></div>
+        <div class="delta gain">+24%</div>
+      </div>
+      <div class="swatch-row">
+        <div class="label">sky.500<small>vivid blue</small></div>
+        <div class="chip" style="background: oklch(0.553 0.1213 237.32)"></div>
+        <div class="chip" style="background: oklch(0.553 0.1479 237.32)"></div>
+        <div class="delta gain">+22%</div>
+      </div>
+      <div class="swatch-row">
+        <div class="label">amber.500<small>warning · shipped</small></div>
+        <div class="chip" style="background: oklch(0.553 0.1167 74.87)"></div>
+        <div class="chip" style="background: oklch(0.553 0.1341 74.87)"></div>
+        <div class="delta gain">+15%</div>
+      </div>
+
+      <p class="muted" style="font-size: 13px; margin-top: 12px">
+        <b>Honest framing:</b> the brand and status <i>anchor</i> shades
+        (blue.600, red.600, green.600) were already inside sRGB, so they
+        don't change. The visible wins are in cooler vivid hues and the chart
+        palette. This isn't "everything pops more" — it's "the colors that
+        were being held back, aren't anymore."
+      </p>
+
+      <h2><span class="num">4</span>What's impacted, by the numbers</h2>
+
+      <div class="impact-legend">
+        <span
+          ><span class="sq" style="background: oklch(0.55 0.02 264)"></span
+          >unchanged emit</span
+        >
+        <span
+          ><span class="sq" style="background: var(--accent)"></span>richer
+          chroma on P3</span
+        >
+      </div>
+      <div
+        class="impact-bar"
+        role="img"
+        aria-label="139 of 242 shades unchanged, 103 gain chroma"
+      >
+        <div
+          class="seg unchanged"
+          style="flex: 139"
+          title="139 shades unchanged"
+        >
+          139 unchanged
+        </div>
+        <div class="seg gain" style="flex: 103" title="103 shades gain chroma">
+          103 gain
+        </div>
+      </div>
+      <p class="muted" style="font-size: 12px">
+        Of <b>242</b> pinned shades in <code>color.json</code>.
+      </p>
+
+      <div class="impact-grid">
+        <div class="stat">
+          <div class="v ok">0</div>
+          <div class="k">base-palette shades changed</div>
+        </div>
+        <div class="stat">
+          <div class="v ok">0</div>
+          <div class="k">APCA mismatches / 242</div>
+        </div>
+        <div class="stat">
+          <div class="v accent">103</div>
+          <div class="k">shades richer on P3</div>
+        </div>
+        <div class="stat">
+          <div class="v">14</div>
+          <div class="k">shipped shades that clip to P3 boundary</div>
+        </div>
+      </div>
+      <p class="muted" style="font-size: 13px; margin-top: 14px">
+        Because <b>0 base-palette shades change</b>
+        (slate/neutral/gray/stone/zinc), every surface, text tier, border,
+        and nav token is byte-identical. Every accessibility contrast pair is
+        byte-identical (proven, not assumed). The diff is large but
+        surgically limited to chromatic hues.
+      </p>
+
+      <h2><span class="num">5</span>Gaps and issues I found</h2>
+      <p class="muted">
+        Color-coded: <b style="color: var(--warn)">amber</b> = a real gap
+        found, <b style="color: var(--good)">green</b> = closed/proven,
+        <b style="color: var(--accent)">teal</b> = a decision worth flagging,
+        <b style="color: var(--ink-3)">gray</b> = manual step I can't do here.
+      </p>
+
+      <div class="gap found">
+        <div class="ico">!</div>
+        <div>
+          <h4>The issue's "throw if any shade is outside P3" is infeasible</h4>
+          <p>
+            I checked every shade against P3 at its pinned lightness.
+            <b>14 shipped shades</b> are technically outside P3 — including
+            <code>amber.500–950</code> (warning), <code>red.50/900/950</code>
+            (error), <code>blue.50/950</code> (info), and chart colors. These
+            aren't bugs; they're intentional vivid hues that can't hold both
+            their pinned lightness and full chroma inside any gamut. A hard
+            throw would break the build on real palette colors.
+          </p>
+          <p>
+            <b>Resolution:</b> graceful P3 clamp + a warning when chroma
+            still has to drop &gt;20%. This is also what the original
+            <code>oklch-migration.md</code> plan (line 91) explicitly
+            specified: <i>"warn (not fail)"</i>. The issue contradicts the
+            project's own established design intent here.
+          </p>
+        </div>
+      </div>
+
+      <div class="gap found">
+        <div class="ico">!</div>
+        <div>
+          <h4>The issue describes code that doesn't exist</h4>
+          <p>
+            The issue says the current clamp is
+            <code>culori.toGamut('rgb')(adjusted)</code>. The shipped code
+            uses <code>clampChroma(target, 'oklch', 'rgb')</code>. The
+            distinction matters: <code>clampChroma</code> preserves L
+            exactly; <code>toGamut</code> doesn't. If we'd followed the
+            issue literally, we'd have broken the perceptual-grid pinning.
+          </p>
+          <p>
+            <b>Resolution:</b> change the gamut argument from
+            <code>'rgb'</code> to <code>'p3'</code> on <code>clampChroma</code>
+            — verified empirically that L drift = 0 across all 242 shades.
+          </p>
+        </div>
+      </div>
+
+      <div class="gap found">
+        <div class="ico">!</div>
+        <div>
+          <h4>A unit test was about to break silently</h4>
+          <p>
+            <code>perceptual-grid.test.js</code> asserts that
+            <code>#facc15</code> at shade 400 fires the "&gt;20% chroma drop"
+            warning. Under sRGB it drops 22.0% (fires). Under P3 it drops
+            only 9.9% (won't fire) — the test would have failed.
+          </p>
+          <p>
+            <b>Resolution:</b> swap the fixture to a real shipped color:
+            <code>amber.950 (#392402)</code>, which clips
+            <b>49.6%</b> under P3 — robust margin, real palette data
+            (testing.md prefers real fixtures over synthetic).
+          </p>
+        </div>
+      </div>
+
+      <div class="gap info">
+        <div class="ico">⚙</div>
+        <div>
+          <h4>CI has a freshness guard on three paths, not two</h4>
+          <p>
+            <code>.github/workflows/ci.yml</code> fails if generated CSS is
+            stale across <code>packages/tailwind</code>,
+            <code>apps/playground/public/themes</code>, <b>and</b>
+            <code>apps/playground/src/styles</code>. I'd only listed the
+            first two.
+          </p>
+          <p>
+            <b>Verified:</b> <code>yarn tokens:tailwind &amp;&amp; yarn
+            tokens:modular</code> regenerates all three (the
+            <code>sync-playground-themes.js</code> step copies into both
+            playground dirs). Phase 2 covers it.
+          </p>
+        </div>
+      </div>
+
+      <div class="gap found">
+        <div class="ico">!</div>
+        <div>
+          <h4>A third stale doc I'd missed</h4>
+          <p>
+            Beyond <code>tokens.md</code> and <code>color-math.md</code>,
+            <code>docs/plans/oklch-migration.md</code> also describes the
+            sRGB clamp (lines 41, 91). It's a historical plan but is
+            referenced from code.
+          </p>
+          <p>
+            <b>Resolution:</b> add a minimal forward-pointer
+            (<i>"superseded by #86 — gamut step now targets P3"</i>) rather
+            than rewriting the historical decision text. Two living docs
+            stay authoritative.
+          </p>
+        </div>
+      </div>
+
+      <div class="gap fixed">
+        <div class="ico">✓</div>
+        <div>
+          <h4>APCA contrast stability — proven, not assumed</h4>
+          <p>
+            The plan rests on "APCA scores don't change." I verified across
+            all <b>242 pinned shades</b> that the new path produces sRGB
+            ints byte-identical to today's: <b>0 mismatches</b>. This
+            directly answers the issue's open question #2.
+          </p>
+        </div>
+      </div>
+
+      <div class="gap fixed">
+        <div class="ico">✓</div>
+        <div>
+          <h4>Lightness preservation — proven, not assumed</h4>
+          <p>
+            <code>clampChroma('p3')</code> never moves L. Verified: max L
+            drift = 0 across all 242 shades. The perceptual-grid pinning the
+            whole system rests on is safe.
+          </p>
+        </div>
+      </div>
+
+      <div class="gap manual">
+        <div class="ico">?</div>
+        <div>
+          <h4>Two checks I genuinely can't do from here</h4>
+          <p>
+            <b>Chromatic visual diff</b> (issue acceptance) — I don't have
+            access to your Chromatic. <b>Safari/Firefox visual check</b>
+            (issue open Q#1) — automated screenshots flatten to sRGB in the
+            capture pipeline, so they can't reliably show P3 chroma
+            differences. Both are flagged for your visual review at PR time.
+          </p>
+        </div>
+      </div>
+
+      <h2><span class="num">6</span>The one decision for you</h2>
+      <div class="panel" style="border-left: 3px solid var(--accent)">
+        <p style="margin: 0">
+          <b>Throw vs warn on shades that exceed P3?</b> The issue asks for a
+          throw. My data says throw is infeasible (14 shipped shades). My
+          recommendation is to clamp gracefully to P3 and keep the existing
+          ">20% drop" warning, retargeted from sRGB to P3 — which is also
+          what <code>oklch-migration.md</code> originally specified. The PR
+          body will document why the issue's wording was tightened.
+        </p>
+        <details>
+          <summary>Why not just retune the 14 hexes?</summary>
+          <p style="margin-top: 8px">
+            Could be done, but it changes what the colors <i>look like</i> —
+            that's a separate scope from "delivery mechanism." It'd reduce
+            chroma on amber/red/blue/orange at deep + edge shades, possibly
+            shift APCA, and require designer review of every retuned
+            primitive. Worth doing if it ever comes up, but not inside a PR
+            whose goal is "deliver P3."
+          </p>
+        </details>
+      </div>
+
+      <h2><span class="num">7</span>Plan, after all this</h2>
+      <table class="phases">
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>What</th>
+            <th>Verified by</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>
+              <code>perceptual-grid.js</code>: emit clamp
+              <code>'rgb'</code>→<code>'p3'</code>; APCA path adds sRGB
+              clamp; warning text updated. Plus test fixture
+              <code>#facc15</code>→<code>amber.950</code>.
+            </td>
+            <td>
+              <code>yarn lint</code>, <code>yarn test:unit</code>,
+              <code>audit:contrast</code> == baseline
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>
+              Regenerate CSS:
+              <code>yarn tokens:tailwind &amp;&amp; yarn tokens:modular</code>
+              → all 3 CI-guarded paths.
+            </td>
+            <td>
+              <code>git status</code> clean +
+              <code>audit:contrast</code> + <code>audit:class-refs</code> +
+              <code>audit:figma-parity --category color</code>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>
+              Docs: <code>tokens.md</code>, <code>color-math.md</code> (both
+              authoritative); minimal forward-pointer in
+              <code>oklch-migration.md</code>.
+            </td>
+            <td>prose matches shipped code</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footer">
+        Self-contained artifact. Color swatches use real
+        <code>oklch()</code> values computed from
+        <code>packages/core/tokens/primitives/color.json</code> with the
+        perceptual-grid L applied. The "P3 display detected" badge at the
+        top uses the
+        <code>@media (color-gamut: p3)</code> query — the exact mechanism
+        this PR relies on. Issue
+        <a href="https://github.com/nexuslabs-ai/nexus/issues/86">#86</a> ·
+        branch <code>aishvarya/issue-86-p3-wide-gamut-oklch</code>.
+      </div>
+    </main>
+  </body>
+</html>

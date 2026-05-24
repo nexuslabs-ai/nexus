@@ -32,7 +32,7 @@ Why OKLCH and not the alternatives:
 
 **On-disk format is hex, not OKLCH.** Token source files (`tokens/primitives/color.json` and the semi-transparent semantic overlay tokens) store plain hex strings. The reason is the Figma round-trip: Tokens Studio and Figma Variables hex-normalize color on export and cannot preserve an `oklch()` string. Hex is the only format that survives a designer editing a value in Figma and exporting it back. The OKLCH conversion happens at build time, in [`scripts/utils.js`](../scripts/utils.js) (`formatTokenValue`), routing through [`scripts/lib/perceptual-grid.js`](../scripts/lib/perceptual-grid.js).
 
-**Browser floor: Baseline 2023.** OKLCH requires Chrome 111+, Safari 15.4+, and Firefox 113+. The build emits no hex fallback — a consumer targeting older browsers must pin to the last pre-OKLCH release tag (the reasoning is in [Trade-offs](#trade-offs)).
+**Browser floor: Baseline 2023.** OKLCH requires Chrome 111+, Safari 15.4+, and Firefox 113+. The build emits no hex fallback — a consumer targeting older browsers must pin to the last pre-OKLCH release tag (the reasoning is in [Trade-offs](#trade-offs)). Emitted values ship at Display P3 chroma; capable displays render full P3, legacy displays get the browser's automatic gamut map to sRGB. No `@media (color-gamut: p3)` query is needed.
 
 ## Perceptual lightness pinning
 
@@ -52,7 +52,7 @@ The grid lives in [`scripts/lib/perceptual-grid.json`](../scripts/lib/perceptual
 Conversion does three things to a shade hex:
 
 1. **Lightness** — discarded from the hex, replaced by `grid[shade]`.
-2. **Chroma** — taken from the hex, then clamped into the sRGB gamut so the pinned color is actually displayable.
+2. **Chroma** — taken from the hex, then clamped into the Display P3 gamut so the pinned color ships at full chroma on capable displays; only the over-P3 excess clips.
 3. **Hue** — taken from the hex, preserved unchanged.
 
 Because the grid is shared, `slate.500` and `stone.500` come out with identical L (`0.553`) and differ only in H and C. The perceptual-uniformity guarantee is made true by construction, not by hand-tuning each palette to match.
@@ -94,7 +94,7 @@ The audited pairs:
 
 Each pair is checked across every applicable base palette and brand, in **both** light and dark themes — a matrix of dozens of checks per run, not a single spot-check.
 
-**The audit scores the color you ship, not the source hex.** This is the part that closes the loop. The audit does not read the JSON hex and score that; it runs each token through the _same_ OKLCH-pinning converter the build uses (`hexToSrgbInts` in [`scripts/lib/perceptual-grid.js`](../scripts/lib/perceptual-grid.js)), then scores the resulting sRGB. The number APCA checks is the number a user sees in the browser — pinning, chroma-clamping, and all. A pin that quietly broke contrast cannot pass.
+**The audit scores the sRGB-equivalent of what you ship.** This is the part that closes the loop. The audit runs each token through the OKLCH-pinning converter the build uses (`hexToSrgbInts` in [`scripts/lib/perceptual-grid.js`](../scripts/lib/perceptual-grid.js)), which re-clamps the (P3-emit) value into sRGB and scores the resulting `[r, g, b]`. APCA reads only RGB ints, and contrast must hold on the lowest-common-denominator display — a legacy sRGB screen — so the gate measures the sRGB projection of the shipped color. A pin that quietly broke contrast cannot pass. A pin that quietly broke contrast cannot pass.
 
 A failing pair is not a threshold to lower. The thresholds come from APCA's published intended-use tiers and are fixed; a failure means the semantic token points at the wrong shade, or the grid L for that shade is wrong. Fix the reference or the grid — [`color-shades.md`](../../../.claude/rules/color-shades.md) maps which shade each role should use.
 
@@ -104,7 +104,7 @@ Every choice here gave something up. Naming the costs is the honest part:
 
 - **No pre-2023 browsers.** OKLCH-only output means no support below Chrome 111 / Safari 15.4 / Firefox 113, and no hex fallback. A consumer who needs older browsers must pin to the last pre-OKLCH release tag. Emitting a hex fallback beside every OKLCH value was rejected: it doubles every declaration and silently reintroduces the per-hue lightness drift the pipeline removes.
 - **Off-spec DTCG color values.** Token files keep `$value` as a hex string, not the DTCG 2025.10 structured-object form (`{ "colorSpace": "oklch", "components": [...] }`). The structured form is more correct on paper, but design tools write hex on export and would discard it on the next round-trip. Hex is the format that survives the Figma loop. Revisit if a downstream consumer ever needs spec-compliant import.
-- **Chroma can clip.** Pinning L can push a vivid hue past what sRGB can represent at that lightness. The converter clamps chroma back into gamut, so an intensely saturated source can come out softer at extreme shades. The build warns when chroma is reduced by more than 20%, surfacing the cases worth a designer's eye. This is the unavoidable cost of holding L fixed: you cannot always keep both the requested lightness and the requested saturation in-gamut.
+- **Chroma can clip.** Pinning L can push a vivid hue past what Display P3 can represent at that lightness. The converter clamps chroma to the P3 boundary, so an intensely saturated source can come out softer at extreme shades — though far less often than under the old sRGB clamp, since P3 is the strict superset. The build warns when chroma is reduced by more than 20%, surfacing the cases worth a designer's eye. This is the unavoidable cost of holding L fixed: you cannot always keep both the requested lightness and the requested saturation in-gamut.
 
 ## Verify locally
 

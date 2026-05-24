@@ -88,6 +88,15 @@ describe('hexToOklchPinned', () => {
   it('throws on unparseable hex', () => {
     expect(() => hexToOklchPinned('not-a-color', '500')).toThrow();
   });
+
+  it('delivers P3 chroma for shades inside P3 but outside sRGB (teal.600 #0d9488)', () => {
+    // sRGB clamp would emit c≈0.081; P3 clamp emits c≈0.104. Pin to the P3
+    // band (0.09 < c < 0.11) so a future widening to rec2020 trips the test
+    // too, not just a revert to sRGB.
+    const parsed = parseOklch(hexToOklchPinned('#0d9488', '600'));
+    expect(parsed.c).toBeGreaterThan(0.09);
+    expect(parsed.c).toBeLessThan(0.11);
+  });
 });
 
 describe('hexToOklchMechanical', () => {
@@ -126,7 +135,7 @@ describe('hexToSrgbInts', () => {
   });
 });
 
-describe('gamut clip warning', () => {
+describe('P3 gamut clip warning', () => {
   let warnSpy;
 
   beforeEach(() => {
@@ -137,15 +146,15 @@ describe('gamut clip warning', () => {
     warnSpy.mockRestore();
   });
 
-  it('warns when chroma drops more than 20% on a vivid shade like yellow.400 (#facc15)', () => {
-    hexToOklchPinned('#facc15', '400');
+  it('warns when chroma drops more than 20% on a shade outside P3 at its pinned L (amber.950 #392402)', () => {
+    hexToOklchPinned('#392402', '950');
     expect(warnSpy).toHaveBeenCalledTimes(1);
     const message = warnSpy.mock.calls[0][0];
-    expect(message).toContain('#facc15');
-    expect(message).toContain('shade 400');
+    expect(message).toContain('#392402');
+    expect(message).toContain('shade 950');
   });
 
-  it('does not warn on shades within sRGB gamut at their pinned L', () => {
+  it('does not warn on shades within P3 at their pinned L', () => {
     hexToOklchPinned('#3b82f6', '500');
     expect(warnSpy).not.toHaveBeenCalled();
   });

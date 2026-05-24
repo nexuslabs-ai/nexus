@@ -1,11 +1,21 @@
 # OKLCH Color Token Migration — Plan
 
-> **Status note:** The visual-regression layer described below (Chromatic +
-> `@chromatic-com/storybook` + `packages/react/src/storybook/modes.ts`) was
-> wired in alongside this migration, then removed in PR #64 as out of scope
-> for the CI quality-gates work. References to Chromatic and the `modes.ts`
-> path in the original draft have been struck below. APCA contrast (§6) and
-> the L-grid eyeball pass remain the validation layers in use today.
+> **Historical plan — superseded.** This is the original migration design;
+> it records the intent and rationale behind the move to OKLCH, but it is
+> no longer the authoritative source for current behavior. The live spec
+> lives in [`.claude/rules/tokens.md`](../../.claude/rules/tokens.md)
+> (Color Token Pipeline §) and
+> [`packages/core/docs/color-math.md`](../../packages/core/docs/color-math.md)
+> (designer-facing narrative). When this plan and those docs disagree, the
+> live spec wins — don't update this doc to chase post-merge changes.
+>
+> One specific subsequent change worth flagging here because it would
+> otherwise be invisible to a reader of this plan: the visual-regression
+> layer described below (Chromatic + `@chromatic-com/storybook` +
+> `packages/react/src/storybook/modes.ts`) was wired in alongside this
+> migration, then removed in PR #64 as out of scope for the CI quality-gates
+> work. APCA contrast (§6) and the L-grid eyeball pass remain the
+> validation layers in use today.
 
 Target value space at consumption time: OKLCH, with lightness pinned to a fixed perceptual grid. Hex sRGB stays as the on-disk source format because design tools (Tokens Studio, Figma Variables) hex-normalise on export and cannot round-trip OKLCH. The migration moves into the build pipeline.
 

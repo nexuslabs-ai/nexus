@@ -27,7 +27,7 @@ Optional properties: `$description`, `$extensions`
 
 ### Routing modes
 
-**Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/scripts/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `clampChroma(color, 'oklch', 'rgb')` to stay in sRGB. Hue is preserved from the hex.
+**Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/scripts/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `clampChroma(color, 'oklch', 'p3')` so shades ship at their full chroma up to the Display P3 boundary; only the over-P3 excess clips. The build warns when post-clamp chroma drops by more than 20% (rare under P3 — flags the cases worth a designer's eye). Hue is preserved from the hex.
 
 **Mechanical** — applies to everything else: white, black, the alpha shades (`a50`–`a950`, 8-digit hex), and any one-off value whose last path segment isn't a palette shade key. Straight hex→oklch via culori; alpha is preserved from 8-digit hex.
 
@@ -66,6 +66,8 @@ We keep `$value` as a hex string on disk rather than the DTCG-2025.10 structured
 
 OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex fallback is emitted. Consumers needing older browsers must pin to the last pre-migration tag.
 
+**Display P3 delivery is automatic.** Emitted `oklch(...)` values carry P3 chroma; browsers map them to the display's native gamut at render time — full Display P3 on capable hardware (most laptops/tablets/phones since ~2017), gamut-mapped to sRGB on legacy displays. No `@media (color-gamut: p3)` query or hex fallback is needed; the CSS is the same everywhere, capable hardware just shows more of the chroma the source hex carried.
+
 ### APCA contrast gate
 
 `yarn workspace @nexus/core audit:contrast` (implemented in `packages/core/scripts/audit-contrast.js`) runs APCA Lc on every base and brand foreground↔background pair, with thresholds chosen per APCA's intended-use tiers:
@@ -82,6 +84,8 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 | `nav-muted-foreground ↔ nav-background`                                             | `         | Lc        | ≥ 45` | Nav helper / metadata text                            |
 | `focus.color.{default,error} ↔ {background,container,popover}`                      | `         | Lc        | ≥ 45` | Focus rings on every surface they hit                 |
 | `chart.categorical.{1..5} ↔ {background,container}`                                 | `         | Lc        | ≥ 60` | Categorical chart marks on every surface              |
+
+**Scoring is sRGB-equivalent.** APCA reads only `[r, g, b]` ints, so `hexToSrgbInts` re-clamps the (P3-emit) color into sRGB before sampling channels. The audit measures what a legacy sRGB display renders — the lowest-common-denominator surface — so contrast guarantees hold everywhere, P3 hardware or not. APCA scores are byte-stable across the sRGB→P3 emit retarget (issue #86).
 
 Failures must be fixed by adjusting the semantic token reference (which shade a given role points to) or the L grid values — not by lowering the thresholds. The tiers themselves come from APCA's published guidance and are not negotiable per-finding.
 

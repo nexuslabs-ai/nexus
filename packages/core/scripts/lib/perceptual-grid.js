@@ -3,6 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// emit ships P3 chroma; audit scores in sRGB (legacy-display equivalent)
+const EMIT_GAMUT = 'p3';
+const AUDIT_GAMUT = 'rgb';
+
 const toRgb = converter('rgb');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,13 +66,13 @@ function computePinnedOklch(hex, shade) {
     ...(source.alpha !== undefined ? { alpha: source.alpha } : {}),
   };
 
-  const clamped = clampChroma(target, 'oklch', 'rgb');
+  const clamped = clampChroma(target, 'oklch', EMIT_GAMUT);
   const originalC = target.c;
   const clampedC = clamped.c ?? 0;
 
   if (originalC > 0 && (originalC - clampedC) / originalC > 0.2) {
     console.warn(
-      `perceptual-grid: gamut clip on ${hex} at shade ${shade} — C ${originalC.toFixed(4)} → ${clampedC.toFixed(4)}`
+      `perceptual-grid: P3 gamut clip on ${hex} at shade ${shade} — C ${originalC.toFixed(4)} → ${clampedC.toFixed(4)}`
     );
   }
 
@@ -84,7 +88,7 @@ export function hexToOklchMechanical(hex) {
 }
 
 function oklchToSrgbInts(oklchColor) {
-  const rgb = toRgb(oklchColor);
+  const rgb = toRgb(clampChroma(oklchColor, 'oklch', AUDIT_GAMUT));
   if ((rgb.alpha ?? 1) < 1) {
     // apca-w3 `sRGBtoY` reads only [r,g,b]; an alpha-bearing color must be
     // pre-blended against its actual background before contrast computation.
