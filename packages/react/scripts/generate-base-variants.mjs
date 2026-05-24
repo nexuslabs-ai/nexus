@@ -287,8 +287,9 @@ function assertShowcaseExists(component) {
   // top-level export) so an args-only story fails here rather than rendering
   // empty cells. Match `render:` either at a line start (the indented-key case,
   // robust to intervening comments/keys) or right after a `{`/`,` (same-line
-  // case) — so a `render:` inside a string value (mid-line, after a quote)
-  // can't satisfy the guard.
+  // case). This rejects a `render:` inside a string value in every realistic
+  // shape; the lone residual — one at column 0 inside a multiline template
+  // literal — is contrived and would surface in the render/smoke test.
   const rest = src.slice(exportMatch.index);
   const nextExport = rest.slice(exportMatch[0].length).search(/^export /m);
   const block = nextExport === -1 ? rest : rest.slice(0, exportMatch[0].length + nextExport);
