@@ -107,10 +107,11 @@ This is the discipline Stripe documented alongside their LCH palette in 2019 —
 
 **Methodology.** [`scripts/audit-colorblind.js`](../scripts/audit-colorblind.js) pulls every shade of every base, status, and chart palette (14 palettes × 11 shades), pins each through the same `hexToSrgbInts` converter the build uses, then simulates each under deuteranopia, protanopia, and tritanopia via [`@bjornlu/colorblind`](https://github.com/bluwy/colorblind) (the single-matrix dichromacy model of Viénot, Brettel & Mollon 1999 — one 3×3 LMS transform per deficiency). For each (palette, vision-type) pair the audit measures OKLab ΔE between every adjacent shade (50↔100, 100↔200, …) and between every cross-status pair at shade 600 (`red.600 ↔ green.600`, etc. — the brand `-background` tier referenced by `error`, `success`, `warning`, and `information` in both themes). The threshold is **ΔE < 0.02** — OKLab's just-noticeable-difference floor; below it, two surfaces are effectively indistinguishable to a user with that deficiency.
 
-Two caveats worth naming:
+Three caveats worth naming:
 
 - **OKLab ΔE, not APCA Lc.** APCA's dark-pair contrast floors at 0 by design — text on a dark surface is unreadable regardless of luminance ratio, and APCA encodes that. But the question here isn't text legibility, it's whether two fills are distinguishable. APCA flagged 339 false positives on the same data (every dark-end adjacent pair, where the visual difference is real but APCA reports 0). OKLab ΔE answers the discrimination question uniformly across the luminance range, so it is the metric here.
 - **Dichromacy is the worst case, not the common case.** The simulation models complete absence of one cone class (≤ 2% of the population combined across all three types). The much more common anomalous trichromacy (~6%) sees the same colors with reduced separation, not collapse. Passing dichromacy is the strict bound — anomalous trichromats clear the same audit by a margin.
+- **The simulation runs in gamma-encoded sRGB.** `@bjornlu/colorblind` divides 8-bit channels by 255 but skips the sRGB→linear-light decode the Viénot model assumes, so its LMS transform operates on gamma-encoded values. The per-deficiency matrix is right, so the simulated hue shifts are correct — but the absolute ΔE _magnitudes_ are directional, not exact. This is worth naming because the single finding below sits only ~17% under the 0.02 floor: read `ΔE 0.0165` as "confusable, near the line," not a precise measurement.
 
 **Current state.** The audit produces one finding on today's palette:
 
@@ -165,8 +166,8 @@ To read the engineering directly:
 - [`scripts/lib/perceptual-grid.js`](../scripts/lib/perceptual-grid.js) — hex→OKLCH conversion, the L override, chroma clamping, and the `hexToSrgbInts` helper the audit shares with the build.
 - [`scripts/lib/perceptual-grid.json`](../scripts/lib/perceptual-grid.json) — the eleven L values. Editing one retunes that shade across every palette.
 - [`scripts/audit-contrast.js`](../scripts/audit-contrast.js) — the pair list, the tier thresholds, and the matrix loop.
-- [`scripts/audit-colorblind.js`](../scripts/audit-colorblind.js) — the CB simulation pipeline, the OKLab ΔE threshold, and `renderSvg`.
-- [`scripts/generate-colorblind-svg.js`](../scripts/generate-colorblind-svg.js) — writes the committed grid SVG; the freshness-gated generator that keeps the audit itself a pure stdout+exit-code gate.
+- [`scripts/audit-colorblind.js`](../scripts/audit-colorblind.js) — the CB simulation pipeline and the OKLab ΔE threshold; a pure stdout+exit-code gate that owns no output file.
+- [`scripts/generate-colorblind-svg.js`](../scripts/generate-colorblind-svg.js) — renders (`renderSvg`) and writes the committed grid SVG; the freshness-gated generator that keeps the audit itself a pure gate.
 
 To add a new audited pair, add a `{ fg, bg, minLc, tier }` entry to the relevant pair list in `audit-contrast.js`. The audit throws if either token is missing from the file it checks, so a typo or a renamed token fails loudly rather than skipping silently.
 

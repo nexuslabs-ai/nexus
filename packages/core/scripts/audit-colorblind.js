@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { hexToSrgbInts } from './lib/perceptual-grid.js';
-import { readTokenFile } from './utils.js';
+import { readTokenFile, titleCase } from './utils.js';
 
 // Distance metric is OKLab Euclidean ΔE — not APCA Lc (which #88 originally
 // specified). APCA floors contrast at 0 for dark-dark pairs by design (text
@@ -16,13 +16,11 @@ const oklabDelta = differenceEuclidean('oklab');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.resolve(__dirname, '..', 'tokens');
-const DOCS_DIR = path.resolve(__dirname, '..', 'docs');
 export const PRIMITIVES_FILE = path.join(
   TOKENS_DIR,
   'primitives',
   'color.json'
 );
-export const SVG_OUT = path.join(DOCS_DIR, 'color-math-colorblind.svg');
 
 export const SHADES = [
   '50',
@@ -182,96 +180,6 @@ export function findStatusPairConfusable(
     }
   }
   return findings;
-}
-
-function rgbToHex(rgbInts) {
-  const hex = (n) => n.toString(16).padStart(2, '0');
-  return `#${hex(rgbInts[0])}${hex(rgbInts[1])}${hex(rgbInts[2])}`;
-}
-
-const CELL = 22;
-const GAP = 2;
-const LABEL_WIDTH = 70;
-const HEADER_HEIGHT = 22;
-const SECTION_GAP = 24;
-const SECTION_TITLE_HEIGHT = 26;
-const PADDING = 16;
-
-function svgEscape(value) {
-  return String(value).replace(
-    /[<>&"]/g,
-    (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c]
-  );
-}
-
-function titleCase(s) {
-  return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
-}
-
-export function renderSvg(simulatedByVision) {
-  const colsWidth = SHADES.length * CELL + (SHADES.length - 1) * GAP;
-  const rowsHeight =
-    ALL_PALETTES.length * CELL + (ALL_PALETTES.length - 1) * GAP;
-  const sectionWidth = PADDING + LABEL_WIDTH + colsWidth + PADDING;
-  const sectionHeight = SECTION_TITLE_HEIGHT + HEADER_HEIGHT + rowsHeight;
-  const totalHeight =
-    PADDING +
-    VISION_TYPES.length * sectionHeight +
-    (VISION_TYPES.length - 1) * SECTION_GAP +
-    PADDING;
-
-  const parts = [];
-  parts.push('<?xml version="1.0" encoding="UTF-8"?>');
-  parts.push(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${sectionWidth} ${totalHeight}" width="${sectionWidth}" height="${totalHeight}" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">`
-  );
-  parts.push(
-    '<style>text{font-size:11px;fill:#0f172a}.section-title{font-size:13px;font-weight:600}.shade-label{font-size:10px;fill:#475569}.palette-label{font-size:11px;text-anchor:end}</style>'
-  );
-  parts.push(
-    `<rect width="${sectionWidth}" height="${totalHeight}" fill="#ffffff"/>`
-  );
-
-  let yCursor = PADDING;
-  for (const visionType of VISION_TYPES) {
-    const sectionLabel =
-      visionType === 'normal' ? 'Normal vision' : titleCase(visionType);
-    parts.push(
-      `<text class="section-title" x="${PADDING}" y="${yCursor + 16}">${svgEscape(sectionLabel)}</text>`
-    );
-
-    const headerY = yCursor + SECTION_TITLE_HEIGHT;
-    const gridX = PADDING + LABEL_WIDTH;
-
-    for (let i = 0; i < SHADES.length; i += 1) {
-      const x = gridX + i * (CELL + GAP) + CELL / 2;
-      parts.push(
-        `<text class="shade-label" x="${x}" y="${headerY + 14}" text-anchor="middle">${SHADES[i]}</text>`
-      );
-    }
-
-    for (let r = 0; r < ALL_PALETTES.length; r += 1) {
-      const palette = ALL_PALETTES[r];
-      const rowY = headerY + HEADER_HEIGHT + r * (CELL + GAP);
-      parts.push(
-        `<text class="palette-label" x="${PADDING + LABEL_WIDTH - 6}" y="${rowY + CELL / 2 + 4}">${svgEscape(palette)}</text>`
-      );
-      const palShades = simulatedByVision[visionType][palette];
-      for (let i = 0; i < SHADES.length; i += 1) {
-        const x = gridX + i * (CELL + GAP);
-        const hex = rgbToHex(palShades[SHADES[i]]);
-        parts.push(
-          `<rect x="${x}" y="${rowY}" width="${CELL}" height="${CELL}" fill="${hex}" stroke="#e2e8f0" stroke-width="0.5"><title>${palette}.${SHADES[i]} — ${hex}</title></rect>`
-        );
-      }
-    }
-
-    yCursor += sectionHeight + SECTION_GAP;
-  }
-
-  parts.push('</svg>');
-  parts.push('');
-  return parts.join('\n');
 }
 
 function formatFindingLine(finding) {

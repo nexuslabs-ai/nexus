@@ -30,6 +30,15 @@ export function readTokenFile(filePath) {
 }
 
 /**
+ * Capitalize the first character of a string, leaving the rest unchanged.
+ * @param {string} s - Input string
+ * @returns {string} String with its first character upper-cased
+ */
+export function titleCase(s) {
+  return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
+}
+
+/**
  * Format a token value to a CSS string. For `$type: "color"` hex values,
  * routes through the OKLCH converters: palette shade tokens (path ending in a
  * shade key like `'500'`) get pinned to the perceptual L grid; everything else

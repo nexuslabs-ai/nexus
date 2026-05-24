@@ -10,7 +10,6 @@ import {
   computeDeltaE,
   findConfusableAdjacent,
   findStatusPairConfusable,
-  renderSvg,
   SHADES,
   simulatePalette,
   simulateRgb,
@@ -303,48 +302,5 @@ describe('findStatusPairConfusable', () => {
       'normal'
     );
     expect(findings).toEqual([]);
-  });
-});
-
-describe('renderSvg', () => {
-  function tinyData() {
-    const oneShade = [128, 128, 128];
-    const shades = {};
-    for (const s of SHADES) shades[s] = oneShade;
-    const byVision = {};
-    for (const v of VISION_TYPES) {
-      byVision[v] = {};
-      for (const p of ALL_PALETTES) byVision[v][p] = shades;
-    }
-    return byVision;
-  }
-
-  it('emits a well-formed standalone SVG document', () => {
-    const svg = renderSvg(tinyData());
-    expect(svg.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
-    expect(svg).toContain('<svg xmlns="http://www.w3.org/2000/svg"');
-    expect(svg.trimEnd().endsWith('</svg>')).toBe(true);
-  });
-
-  it('renders one swatch <rect> per (vision × palette × shade) plus a background rect', () => {
-    const svg = renderSvg(tinyData());
-    const rectCount = (svg.match(/<rect /g) ?? []).length;
-    const expected =
-      VISION_TYPES.length * ALL_PALETTES.length * SHADES.length + 1;
-    expect(rectCount).toBe(expected);
-  });
-
-  it('labels every section, shade, and palette', () => {
-    const svg = renderSvg(tinyData());
-    expect(svg).toContain('Normal vision');
-    expect(svg).toContain('Deuteranopia');
-    expect(svg).toContain('Protanopia');
-    expect(svg).toContain('Tritanopia');
-    for (const palette of ALL_PALETTES) expect(svg).toContain(`>${palette}<`);
-    for (const shade of SHADES) expect(svg).toContain(`>${shade}<`);
-  });
-
-  it('is deterministic — identical input produces identical output', () => {
-    expect(renderSvg(tinyData())).toBe(renderSvg(tinyData()));
   });
 });
