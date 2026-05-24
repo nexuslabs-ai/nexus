@@ -1,7 +1,8 @@
 import { oklch, parse } from 'culori';
 
-import perceptualGrid from '../../scripts/lib/perceptual-grid.json';
 import primitiveColors from '../../tokens/primitives/color.json';
+
+import perceptualGrid from './perceptual-grid.json';
 
 export const SHADES = [
   '50',

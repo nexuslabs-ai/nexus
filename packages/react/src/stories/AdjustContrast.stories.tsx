@@ -3,17 +3,13 @@ import {
   type AdjustContrastOptions,
   type AdjustContrastPalette,
   type AdjustContrastTier,
+  PALETTE_KEYS,
+  TIER_THRESHOLDS,
 } from '@nexus/core';
 import type { Meta, StoryObj } from '@storybook/react';
 
-const TIERS: AdjustContrastTier[] = ['body', 'ui', 'incidental'];
-const PALETTES: AdjustContrastPalette[] = [
-  'slate',
-  'neutral',
-  'gray',
-  'stone',
-  'zinc',
-];
+const TIERS = Object.keys(TIER_THRESHOLDS) as AdjustContrastTier[];
+const PALETTES: AdjustContrastPalette[] = [...PALETTE_KEYS];
 
 const SHOWCASE_INPUTS: { hex: string; label: string }[] = [
   { hex: '#ff6b6b', label: 'Brand red' },

@@ -1,12 +1,5 @@
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
-import {
-  clampChroma,
-  converter,
-  type Oklch,
-  oklch,
-  parse,
-  type Rgb,
-} from 'culori';
+import { clampChroma, converter, type Oklch, oklch, parse } from 'culori';
 
 import {
   getPaletteReference,
@@ -74,7 +67,7 @@ function parseToOklch(input: string, label: string): Oklch {
 
 function oklchToSrgbInts(color: Oklch): [number, number, number] {
   const clamped = clampChroma(color, 'oklch', 'rgb');
-  const rgb = toRgb(clamped) as Rgb;
+  const rgb = toRgb(clamped);
   const channel = (v: number) =>
     Math.max(0, Math.min(255, Math.round(v * 255)));
   return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];

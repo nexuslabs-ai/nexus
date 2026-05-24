@@ -3,14 +3,21 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "tokens/primitives/color.json",
+        "tsup.config.ts",
+        "tsconfig.json",
+        "package.json"
+      ],
       "outputs": ["dist/runtime/**"]
     },
     "build:tokens:modular": {
-      "inputs": ["scripts/**", "tokens/**"],
+      "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
       "outputs": ["dist/modular/**"]
     },
     "build:tailwind": {
-      "inputs": ["scripts/**", "tokens/**"],
+      "inputs": ["scripts/**", "tokens/**", "src/lib/perceptual-grid.json"],
       "outputs": ["dist/tailwind/**"]
     },
     "storybook": {

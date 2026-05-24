@@ -10,7 +10,9 @@ const AUDIT_GAMUT = 'rgb';
 const toRgb = converter('rgb');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const GRID_FILE = path.join(__dirname, 'perceptual-grid.json');
+// Grid is runtime-owned (src/lib/) and imported by adjust-contrast; scripts
+// read from there so the dependency direction stays one-way (scripts → src).
+const GRID_FILE = path.join(__dirname, '../../src/lib/perceptual-grid.json');
 
 // The L grid lives in JSON so designers can re-tune perceptual lightness
 // without a script-code PR (see docs/plans/oklch-migration.md §6).
