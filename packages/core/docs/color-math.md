@@ -7,7 +7,7 @@ Every color in Nexus is engineered, not picked. The system stores hex on disk, c
 - **Every shade at the same step has the same perceptual lightness, regardless of palette.** `slate.500`, `stone.500`, and `neutral.500` are all exactly as light as each other — only their hue and chroma differ.
 - **OKLCH plus a perceptual lightness grid make this true.** Source hex contributes hue and chroma; the lightness channel is overwritten from a hand-tuned grid shared by every palette.
 - **APCA verifies it.** Every foreground/background pairing is checked against perceptual-contrast thresholds in CI, and a failing pair blocks the build.
-- **Color-blind simulation re-runs the discrimination test for the ~8% of users with a color-vision deficiency.** Every shade and every status pair is checked against Brettel-simulated dichromacy — one finding, [tracked in #141](https://github.com/nexuslabs-ai/nexus/issues/141).
+- **Color-blind simulation re-runs the discrimination test for the ~8% of users with a color-vision deficiency.** Every shade and every status pair is checked against Viénot-simulated dichromacy — one finding, [tracked in #141](https://github.com/nexuslabs-ai/nexus/issues/141).
 
 ## Why this matters
 
@@ -105,12 +105,12 @@ Around 8% of men and 0.5% of women have a color-vision deficiency. APCA gates le
 
 This is the discipline Stripe documented alongside their LCH palette in 2019 — they shipped color-blind simulations of every shade as part of the case for accessibility. The same property is checked here, mechanically, on every primitive palette.
 
-**Methodology.** [`scripts/audit-colorblind.js`](../scripts/audit-colorblind.js) pulls every shade of every base, status, and chart palette (14 palettes × 11 shades), pins each through the same `hexToSrgbInts` converter the build uses, then simulates each under deuteranopia, protanopia, and tritanopia via [`@bjornlu/colorblind`](https://github.com/bluwy/colorblind) (a Brettel/Vienot/Mollon-based dichromacy model). For each (palette, vision-type) pair the audit measures OKLab ΔE between every adjacent shade (50↔100, 100↔200, …) and between every cross-status pair at shade 600 (`red.600 ↔ green.600`, etc. — the brand `-background` tier referenced by `error`, `success`, `warning`, and `information` in both themes). The threshold is **ΔE < 0.02** — OKLab's just-noticeable-difference floor; below it, two surfaces are effectively indistinguishable to a user with that deficiency.
+**Methodology.** [`scripts/audit-colorblind.js`](../scripts/audit-colorblind.js) pulls every shade of every base, status, and chart palette (14 palettes × 11 shades), pins each through the same `hexToSrgbInts` converter the build uses, then simulates each under deuteranopia, protanopia, and tritanopia via [`@bjornlu/colorblind`](https://github.com/bluwy/colorblind) (the single-matrix dichromacy model of Viénot, Brettel & Mollon 1999 — one 3×3 LMS transform per deficiency). For each (palette, vision-type) pair the audit measures OKLab ΔE between every adjacent shade (50↔100, 100↔200, …) and between every cross-status pair at shade 600 (`red.600 ↔ green.600`, etc. — the brand `-background` tier referenced by `error`, `success`, `warning`, and `information` in both themes). The threshold is **ΔE < 0.02** — OKLab's just-noticeable-difference floor; below it, two surfaces are effectively indistinguishable to a user with that deficiency.
 
 Two caveats worth naming:
 
 - **OKLab ΔE, not APCA Lc.** APCA's dark-pair contrast floors at 0 by design — text on a dark surface is unreadable regardless of luminance ratio, and APCA encodes that. But the question here isn't text legibility, it's whether two fills are distinguishable. APCA flagged 339 false positives on the same data (every dark-end adjacent pair, where the visual difference is real but APCA reports 0). OKLab ΔE answers the discrimination question uniformly across the luminance range, so it is the metric here.
-- **Dichromacy is the worst case, not the common case.** Brettel models complete absence of one cone class (≤ 2% of the population combined across all three types). The much more common anomalous trichromacy (~6%) sees the same colors with reduced separation, not collapse. Passing dichromacy is the strict bound — anomalous trichromats clear the same audit by a margin.
+- **Dichromacy is the worst case, not the common case.** The simulation models complete absence of one cone class (≤ 2% of the population combined across all three types). The much more common anomalous trichromacy (~6%) sees the same colors with reduced separation, not collapse. Passing dichromacy is the strict bound — anomalous trichromats clear the same audit by a margin.
 
 **Current state.** The audit produces one finding on today's palette:
 
@@ -120,7 +120,7 @@ Two caveats worth naming:
 
 Both shades back the brand `-background` tier in both themes — `success.background` and `information.background` — so a tritanope (~0.01% prevalence) reads them as the same fill. The 420 within-palette adjacent-shade checks all pass, which is itself a credibility signal: the perceptual-grid pinning preserves L distinction even after dichromat projection. The single cross-status failure is the contract the system has bought; #141 owns the resolution.
 
-The simulated grid (re-generated by the audit, deterministic across runs):
+The simulated grid (re-generated by `generate:colorblind-svg`, deterministic across runs):
 
 ![Every Nexus palette under Normal vision, Deuteranopia, Protanopia, and Tritanopia — a 14×11 swatch grid per vision type.](./color-math-colorblind.svg)
 
@@ -144,20 +144,29 @@ yarn workspace @nexus/core audit:contrast
 
 It prints one line per pair — `✓`/`✗`, the Lc score, the threshold, and the tier — then a summary count. It exits `0` when every pair passes and `1` on any failure, which is what gates CI.
 
-Run the color-blind validation alongside it (re-generates [`color-math-colorblind.svg`](./color-math-colorblind.svg) deterministically):
+Run the color-blind validation alongside it:
 
 ```bash
 yarn workspace @nexus/core audit:colorblind
 ```
 
-It prints one section per CB type per audit kind (adjacent-shade collapse, cross-status pair confusability) and exits `0` when clean, `1` on any finding. Not yet wired to CI — findings are documented inline above and tracked as separate issues.
+It prints one section per CB type per audit kind (adjacent-shade collapse, cross-status pair confusability) and exits `0` when clean, `1` on any finding. The exit-code gate is **not** wired into CI yet — every run exits `1` while [#141](https://github.com/nexuslabs-ai/nexus/issues/141) is open, so wiring it in now would turn the build red. That wiring is sequenced behind the fix and tracked as an acceptance criterion on [#141](https://github.com/nexuslabs-ai/nexus/issues/141); until then the finding is documented inline above.
+
+Regenerate the simulated grid (deterministic integer sRGB — identical bytes every run):
+
+```bash
+yarn workspace @nexus/core generate:colorblind-svg
+```
+
+This is the only piece wired into CI today: the `audit-tokens` job regenerates [`color-math-colorblind.svg`](./color-math-colorblind.svg) and fails on a `git status --porcelain` diff, the same freshness gate the token CSS outputs use, so the committed grid can't drift from `color.json`.
 
 To read the engineering directly:
 
 - [`scripts/lib/perceptual-grid.js`](../scripts/lib/perceptual-grid.js) — hex→OKLCH conversion, the L override, chroma clamping, and the `hexToSrgbInts` helper the audit shares with the build.
 - [`scripts/lib/perceptual-grid.json`](../scripts/lib/perceptual-grid.json) — the eleven L values. Editing one retunes that shade across every palette.
 - [`scripts/audit-contrast.js`](../scripts/audit-contrast.js) — the pair list, the tier thresholds, and the matrix loop.
-- [`scripts/audit-colorblind.js`](../scripts/audit-colorblind.js) — the CB simulation pipeline, the OKLab ΔE threshold, and the SVG emitter.
+- [`scripts/audit-colorblind.js`](../scripts/audit-colorblind.js) — the CB simulation pipeline, the OKLab ΔE threshold, and `renderSvg`.
+- [`scripts/generate-colorblind-svg.js`](../scripts/generate-colorblind-svg.js) — writes the committed grid SVG; the freshness-gated generator that keeps the audit itself a pure stdout+exit-code gate.
 
 To add a new audited pair, add a `{ fg, bg, minLc, tier }` entry to the relevant pair list in `audit-contrast.js`. The audit throws if either token is missing from the file it checks, so a typo or a renamed token fails loudly rather than skipping silently.
 
@@ -170,7 +179,7 @@ External:
 - Stripe (2019) — [Designing accessible color systems](https://stripe.com/blog/accessible-color-systems) — inspiration for both the LCH-style lightness pinning and the published color-blind validation
 - [APCA — easy intro](https://git.apcacontrast.com/documentation/APCAeasyIntro.html), source of the contrast tiers
 - Björn Ottosson (2020) — [A perceptual color space (OKLab / OKLCH)](https://bottosson.github.io/posts/oklab/)
-- Brettel, Viénot & Mollon (1997) — _Computerized simulation of color appearance for dichromats_ ([J. Opt. Soc. Am. A, vol. 14, no. 10](https://doi.org/10.1364/JOSAA.14.002647)), the algorithm `@bjornlu/colorblind` implements
+- Viénot, Brettel & Mollon (1999) — _Digital video colourmaps for checking the legibility of displays by dichromats_ ([Color Res. Appl., vol. 24, no. 4](https://doi.org/10.1002/%28SICI%291520-6378%28199908%2924:4%3C243::AID-COL5%3E3.0.CO%3B2-3)), the single-matrix model `@bjornlu/colorblind` implements (a simplification of the same authors' earlier two-plane algorithm in JOSA A 14, 1997)
 - [Vercel Geist colors](https://vercel.com/geist/colors) and [Radix Colors](https://www.radix-ui.com/colors) — published per-step color semantics
 
 Internal (deeper, agent-facing):

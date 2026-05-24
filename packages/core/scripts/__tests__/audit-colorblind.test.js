@@ -5,6 +5,7 @@ import {
   ALL_PALETTES,
   BASE_PALETTES,
   buildPalettesSrgb,
+  buildSimulatedByVision,
   CHART_PALETTES,
   computeDeltaE,
   findConfusableAdjacent,
@@ -13,6 +14,7 @@ import {
   SHADES,
   simulatePalette,
   simulateRgb,
+  STATUS_PAIRS_600,
   STATUS_PALETTES,
   VISION_TYPES,
 } from '../audit-colorblind.js';
@@ -81,6 +83,20 @@ describe('constants', () => {
 
   it('ADJACENT_CONFUSABLE_DELTA_E is the OKLab JND floor (0.02)', () => {
     expect(ADJACENT_CONFUSABLE_DELTA_E).toBe(0.02);
+  });
+
+  it('STATUS_PAIRS_600 is the 4-choose-2 of STATUS_PALETTES (derived, no hand-maintenance)', () => {
+    const n = STATUS_PALETTES.length;
+    expect(STATUS_PAIRS_600).toHaveLength((n * (n - 1)) / 2);
+    // every pair is two distinct status palettes
+    for (const [a, b] of STATUS_PAIRS_600) {
+      expect(STATUS_PALETTES).toContain(a);
+      expect(STATUS_PALETTES).toContain(b);
+      expect(a).not.toBe(b);
+    }
+    // no unordered pair repeats
+    const keys = STATUS_PAIRS_600.map(([a, b]) => [a, b].sort().join('|'));
+    expect(new Set(keys).size).toBe(STATUS_PAIRS_600.length);
   });
 });
 
@@ -176,6 +192,34 @@ describe('simulatePalette', () => {
   });
 });
 
+describe('buildSimulatedByVision', () => {
+  function fakePrimitives() {
+    const palette = {};
+    for (const shade of SHADES) palette[shade] = colorToken('#808080');
+    const out = {};
+    for (const name of ALL_PALETTES) out[name] = palette;
+    return out;
+  }
+
+  it('returns a vision → palette → shade tree of sRGB tuples', () => {
+    const tree = buildSimulatedByVision(fakePrimitives());
+    expect(Object.keys(tree)).toEqual(VISION_TYPES);
+    for (const vision of VISION_TYPES) {
+      expect(Object.keys(tree[vision])).toEqual(ALL_PALETTES);
+      for (const palette of ALL_PALETTES) {
+        expect(Object.keys(tree[vision][palette])).toEqual(SHADES);
+        expect(tree[vision][palette]['500']).toHaveLength(3);
+      }
+    }
+  });
+
+  it('leaves the normal-vision section equal to the raw (unsimulated) sRGB', () => {
+    const primitives = fakePrimitives();
+    const tree = buildSimulatedByVision(primitives);
+    expect(tree.normal.slate).toEqual(buildPalettesSrgb(primitives).slate);
+  });
+});
+
 describe('findConfusableAdjacent', () => {
   it('returns no findings when every adjacent pair has high contrast', () => {
     const findings = findConfusableAdjacent(ALTERNATING_RAMP, 'fake', 'normal');
@@ -207,6 +251,7 @@ describe('findConfusableAdjacent', () => {
       visionType: 'deuteranopia',
       shadeA: '50',
       shadeB: '100',
+      label: 'fake.50 ↔ fake.100',
     });
     expect(findings[0].deltaE).toBeLessThan(ADJACENT_CONFUSABLE_DELTA_E);
   });
@@ -243,6 +288,7 @@ describe('findStatusPairConfusable', () => {
       expect(f.shade).toBe('600');
       expect(f.visionType).toBe('deuteranopia');
       expect(f.deltaE).toBeLessThan(ADJACENT_CONFUSABLE_DELTA_E);
+      expect(f.label).toBe(`${f.paletteA}.600 ↔ ${f.paletteB}.600`);
     }
   });
 

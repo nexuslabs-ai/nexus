@@ -1,6 +1,5 @@
 import { simulate } from '@bjornlu/colorblind';
 import { differenceEuclidean } from 'culori';
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,7 +17,11 @@ const oklabDelta = differenceEuclidean('oklab');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS_DIR = path.resolve(__dirname, '..', 'tokens');
 const DOCS_DIR = path.resolve(__dirname, '..', 'docs');
-const PRIMITIVES_FILE = path.join(TOKENS_DIR, 'primitives', 'color.json');
+export const PRIMITIVES_FILE = path.join(
+  TOKENS_DIR,
+  'primitives',
+  'color.json'
+);
 export const SVG_OUT = path.join(DOCS_DIR, 'color-math-colorblind.svg');
 
 export const SHADES = [
@@ -60,16 +63,21 @@ export const VISION_TYPES = [
 // space are effectively indistinguishable.
 export const ADJACENT_CONFUSABLE_DELTA_E = 0.02;
 
+function unorderedPairs(items) {
+  const pairs = [];
+  for (let i = 0; i < items.length - 1; i += 1) {
+    for (let j = i + 1; j < items.length; j += 1) {
+      pairs.push([items[i], items[j]]);
+    }
+  }
+  return pairs;
+}
+
 // Cross-status pair test fires at shade 600 — the brand `-background` tier
-// referenced by error/success/warning/information in both themes.
-const STATUS_PAIRS_600 = [
-  ['red', 'green'],
-  ['red', 'amber'],
-  ['green', 'amber'],
-  ['red', 'blue'],
-  ['green', 'blue'],
-  ['amber', 'blue'],
-];
+// referenced by error/success/warning/information in both themes. Derived as
+// the 4-choose-2 of STATUS_PALETTES so adding a status palette can't silently
+// miss a pair.
+export const STATUS_PAIRS_600 = unorderedPairs(STATUS_PALETTES);
 const STATUS_PAIR_SHADE = '600';
 
 export function buildPalettesSrgb(primitives) {
@@ -138,7 +146,14 @@ export function findConfusableAdjacent(
     const b = SHADES[i + 1];
     const deltaE = computeDeltaE(simulatedShades[a], simulatedShades[b]);
     if (deltaE < threshold) {
-      findings.push({ palette, visionType, shadeA: a, shadeB: b, deltaE });
+      findings.push({
+        palette,
+        visionType,
+        shadeA: a,
+        shadeB: b,
+        deltaE,
+        label: `${palette}.${a} ↔ ${palette}.${b}`,
+      });
     }
   }
   return findings;
@@ -162,6 +177,7 @@ export function findStatusPairConfusable(
         paletteB: b,
         shade: STATUS_PAIR_SHADE,
         deltaE,
+        label: `${a}.${STATUS_PAIR_SHADE} ↔ ${b}.${STATUS_PAIR_SHADE}`,
       });
     }
   }
@@ -258,14 +274,8 @@ export function renderSvg(simulatedByVision) {
   return parts.join('\n');
 }
 
-function formatAdjacentLine(finding) {
-  const label = `${finding.palette}.${finding.shadeA} ↔ ${finding.palette}.${finding.shadeB}`;
-  return `  ✗ ${label.padEnd(38)} ΔE ${finding.deltaE.toFixed(4)}   (< ${ADJACENT_CONFUSABLE_DELTA_E})`;
-}
-
-function formatStatusLine(finding) {
-  const label = `${finding.paletteA}.${finding.shade} ↔ ${finding.paletteB}.${finding.shade}`;
-  return `  ✗ ${label.padEnd(38)} ΔE ${finding.deltaE.toFixed(4)}   (< ${ADJACENT_CONFUSABLE_DELTA_E})`;
+function formatFindingLine(finding) {
+  return `  ✗ ${finding.label.padEnd(38)} ΔE ${finding.deltaE.toFixed(4)}   (< ${ADJACENT_CONFUSABLE_DELTA_E})`;
 }
 
 function buildSummary(adjacentFindings, statusFindings) {
@@ -291,7 +301,7 @@ function buildSummary(adjacentFindings, statusFindings) {
     if (adj.length === 0) {
       lines.push('  ✓ no adjacent-shade collapse');
     } else {
-      for (const f of adj) lines.push(formatAdjacentLine(f));
+      for (const f of adj) lines.push(formatFindingLine(f));
     }
     lines.push('');
     lines.push(
@@ -301,7 +311,7 @@ function buildSummary(adjacentFindings, statusFindings) {
     if (sts.length === 0) {
       lines.push('  ✓ no status-pair confusability');
     } else {
-      for (const f of sts) lines.push(formatStatusLine(f));
+      for (const f of sts) lines.push(formatFindingLine(f));
     }
     lines.push('');
   }
@@ -313,10 +323,8 @@ function buildSummary(adjacentFindings, statusFindings) {
   return lines.join('\n') + '\n';
 }
 
-function main() {
-  const primitives = readTokenFile(PRIMITIVES_FILE);
+export function buildSimulatedByVision(primitives) {
   const palettesSrgb = buildPalettesSrgb(primitives);
-
   const simulatedByVision = {};
   for (const visionType of VISION_TYPES) {
     simulatedByVision[visionType] = {};
@@ -327,6 +335,13 @@ function main() {
       );
     }
   }
+  return simulatedByVision;
+}
+
+function main() {
+  const simulatedByVision = buildSimulatedByVision(
+    readTokenFile(PRIMITIVES_FILE)
+  );
 
   const adjacentFindings = [];
   for (const visionType of VISION_TYPES) {
@@ -349,8 +364,6 @@ function main() {
       ...findStatusPairConfusable(simulatedByVision[visionType], visionType)
     );
   }
-
-  fs.writeFileSync(SVG_OUT, renderSvg(simulatedByVision));
 
   process.stdout.write(buildSummary(adjacentFindings, statusFindings));
   process.exit(adjacentFindings.length + statusFindings.length === 0 ? 0 : 1);
