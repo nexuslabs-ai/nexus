@@ -1,0 +1,72 @@
+{
+  "bases": ["slate", "neutral", "gray", "stone", "zinc"],
+  "brand": "neutral",
+  "themes": ["light", "dark"],
+  "components": [
+    {
+      "name": "Accordion",
+      "storiesFile": "Accordion.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Alert",
+      "storiesFile": "Alert.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Avatar",
+      "storiesFile": "Avatar.stories",
+      "showcase": "AllSizes"
+    },
+    {
+      "name": "Badge",
+      "storiesFile": "Badge.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Button",
+      "storiesFile": "Button.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Card",
+      "storiesFile": "Card.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Dialog",
+      "storiesFile": "Dialog.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "DropdownMenu",
+      "storiesFile": "DropdownMenu.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Input",
+      "storiesFile": "Input.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Select",
+      "storiesFile": "Select.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Switch",
+      "storiesFile": "Switch.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Tabs",
+      "storiesFile": "Tabs.stories",
+      "showcase": "AllVariants"
+    },
+    {
+      "name": "Tooltip",
+      "storiesFile": "Tooltip.stories",
+      "showcase": "AllVariants"
+    }
+  ]
+}
