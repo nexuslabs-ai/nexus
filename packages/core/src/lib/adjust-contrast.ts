@@ -41,6 +41,9 @@ export interface AdjustContrastOptions {
   palette?: AdjustContrastPalette;
 }
 
+// TODO(#84): parseToOklch / oklchToSrgbInts / formatOklch / clampForEmit
+// duplicate scripts/lib/perceptual-grid.js (~20 lines). Extract to a shared
+// browser-safe module once @nexus/colors lands.
 function stripAlpha(color: OklchColor): OklchColor {
   if (color.alpha === undefined || color.alpha === 1) return color;
   return { mode: 'oklch', l: color.l, c: color.c, h: color.h };
@@ -53,7 +56,13 @@ function parseToOklch(input: string, label: string): OklchColor {
       `adjustContrast: cannot parse ${label} '${input}' — expected a CSS color string (hex, rgb, oklch, hsl)`
     );
   }
-  return stripAlpha(oklch(parsed));
+  const converted = oklch(parsed);
+  if (!converted) {
+    throw new Error(
+      `adjustContrast: cannot convert ${label} '${input}' to OKLCH`
+    );
+  }
+  return stripAlpha(converted);
 }
 
 function oklchToSrgbInts(color: OklchColor): [number, number, number] {
@@ -80,14 +89,6 @@ function formatOklch(color: OklchColor): string {
   const c = round(finite(color.c), 4);
   const h = c && color.h !== undefined ? round(finite(color.h), 3) : 0;
   return `oklch(${l} ${c} ${h})`;
-}
-
-function computeLc(
-  fg: [number, number, number],
-  bg: [number, number, number]
-): number {
-  const lc = APCAcontrast(sRGBtoY(fg), sRGBtoY(bg));
-  return typeof lc === 'number' ? lc : Number(lc);
 }
 
 /**
@@ -126,9 +127,10 @@ export function adjustContrast(
 
   const inputOklch = parseToOklch(input, 'input');
 
-  const isAchromatic = (inputOklch.c ?? 0) < ACHROMATIC_THRESHOLD;
+  const inputChroma = inputOklch.c ?? 0;
+  const isAchromatic = inputChroma < ACHROMATIC_THRESHOLD;
   const reference = PALETTE_REFERENCE_OKLCH[palette];
-  const chroma = isAchromatic ? reference.c : inputOklch.c;
+  const chroma = isAchromatic ? reference.c : inputChroma;
   const hue = isAchromatic ? reference.h : (inputOklch.h ?? reference.h);
 
   const attempts: { shade: Shade; lc: number }[] = [];
@@ -137,7 +139,7 @@ export function adjustContrast(
     const l = PERCEPTUAL_L_GRID[shade];
     const candidate: OklchColor = { mode: 'oklch', l, c: chroma, h: hue };
     const fgInts = oklchToSrgbInts(candidate);
-    const lc = computeLc(fgInts, bgInts);
+    const lc = APCAcontrast(sRGBtoY(fgInts), sRGBtoY(bgInts));
     attempts.push({ shade, lc });
     if (Math.abs(lc) >= minLc) {
       return formatOklch(clampForEmit(candidate));

@@ -28,11 +28,16 @@ interface DemoArgs extends Required<AdjustContrastOptions> {
   input: string;
 }
 
-function safeAdjust(input: string, options: AdjustContrastOptions): string {
+type AdjustResult = { ok: true; value: string } | { ok: false; error: string };
+
+function safeAdjust(
+  input: string,
+  options: AdjustContrastOptions
+): AdjustResult {
   try {
-    return adjustContrast(input, options);
+    return { ok: true, value: adjustContrast(input, options) };
   } catch (error) {
-    return (error as Error).message;
+    return { ok: false, error: (error as Error).message };
   }
 }
 
@@ -76,7 +81,7 @@ function ResultRow({
   palette: AdjustContrastPalette;
 }) {
   const result = safeAdjust(input, { background: surface, tier, palette });
-  const failed = result.startsWith('adjustContrast:');
+  const textColor = result.ok ? result.value : '#888';
   return (
     <div
       className="nx:flex nx:items-center nx:gap-4 nx:rounded-md nx:border nx:border-border-default nx:p-4"
@@ -85,15 +90,15 @@ function ResultRow({
       <div className="nx:min-w-32">
         <p
           className="nx:typography-body-small nx:font-semibold"
-          style={{ color: failed ? '#888' : result }}
+          style={{ color: textColor }}
         >
-          {failed ? '⚠ no shade passes' : 'Sample label'}
+          {result.ok ? 'Sample label' : '⚠ no shade passes'}
         </p>
         <p
           className="nx:typography-label-small nx:font-mono"
-          style={{ color: failed ? '#888' : result }}
+          style={{ color: textColor }}
         >
-          {failed ? tier : result}
+          {result.ok ? result.value : tier}
         </p>
       </div>
       <div className="nx:ml-auto nx:flex nx:flex-col nx:items-end nx:gap-0">
@@ -153,7 +158,7 @@ type Story = StoryObj<DemoArgs>;
 export const Playground: Story = {
   render: ({ input, tier, palette, background }) => {
     const result = safeAdjust(input, { tier, palette, background });
-    const failed = result.startsWith('adjustContrast:');
+    const textColor = result.ok ? result.value : '#888';
 
     return (
       <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen">
@@ -173,17 +178,17 @@ export const Playground: Story = {
           <div className="nx:text-muted-foreground nx:typography-heading-large nx:pb-6">
             →
           </div>
-          {failed ? (
+          {result.ok ? (
+            <Swatch label={`output: ${result.value}`} color={result.value} />
+          ) : (
             <div className="nx:flex nx:flex-col nx:gap-1 nx:max-w-md">
               <span className="nx:text-error-foreground nx:typography-label-default nx:font-semibold">
                 Throws
               </span>
               <code className="nx:text-error-foreground nx:typography-label-small nx:font-mono nx:break-all">
-                {result}
+                {result.error}
               </code>
             </div>
-          ) : (
-            <Swatch label={`output: ${result}`} color={result} />
           )}
         </div>
 
@@ -193,13 +198,13 @@ export const Playground: Story = {
         >
           <p
             className="nx:typography-heading-small"
-            style={{ color: failed ? '#888' : result }}
+            style={{ color: textColor }}
           >
             Sample heading on the target surface
           </p>
           <p
             className="nx:typography-body-default"
-            style={{ color: failed ? '#888' : result }}
+            style={{ color: textColor }}
           >
             And a paragraph of body text. {tier} tier; palette={palette}.
           </p>

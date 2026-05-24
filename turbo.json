@@ -3,7 +3,13 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/runtime/**"]
+    },
+    "build:tokens:modular": {
+      "outputs": ["dist/modular/**"]
+    },
+    "build:tailwind": {
+      "outputs": ["dist/tailwind/**"]
     },
     "dev": {
       "cache": false,

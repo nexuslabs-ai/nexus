@@ -67,6 +67,9 @@ function deriveReference(palette: PaletteKey): PaletteReference {
     throw new Error(`palette: cannot parse '${palette}.500' hex '${hex}'`);
   }
   const o = oklch(parsed);
+  if (!o) {
+    throw new Error(`palette: cannot convert '${palette}.500' to OKLCH`);
+  }
   return { c: o.c ?? 0, h: o.h ?? 0 };
 }
 

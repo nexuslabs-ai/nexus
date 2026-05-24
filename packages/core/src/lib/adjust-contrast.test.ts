@@ -3,30 +3,30 @@ import { clampChroma, converter, oklch, parse } from 'culori';
 import { describe, expect, it } from 'vitest';
 
 import { adjustContrast } from './adjust-contrast';
-import { PALETTE_KEYS, TIER_THRESHOLDS } from './palette';
+import { PALETTE_KEYS, PERCEPTUAL_L_GRID, TIER_THRESHOLDS } from './palette';
 
 const toRgb = converter('rgb');
+const GRID_L_VALUES = Object.values(PERCEPTUAL_L_GRID);
 
 function oklchStringToSrgbInts(value: string): [number, number, number] {
   const parsed = parse(value);
   if (!parsed) throw new Error(`unparseable oklch string: ${value}`);
-  const clamped = clampChroma(oklch(parsed), 'oklch', 'rgb');
+  const converted = oklch(parsed);
+  if (!converted) throw new Error(`cannot convert to oklch: ${value}`);
+  const clamped = clampChroma(converted, 'oklch', 'rgb');
   const rgb = toRgb(clamped);
   const channel = (v: number) =>
     Math.max(0, Math.min(255, Math.round(v * 255)));
   return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
 }
 
-function hexToSrgbInts(hex: string): [number, number, number] {
-  return oklchStringToSrgbInts(hex);
-}
-
 function lcOf(fg: string, bg: string): number {
-  const lc = APCAcontrast(
-    sRGBtoY(oklchStringToSrgbInts(fg)),
-    sRGBtoY(hexToSrgbInts(bg))
+  return Math.abs(
+    APCAcontrast(
+      sRGBtoY(oklchStringToSrgbInts(fg)),
+      sRGBtoY(oklchStringToSrgbInts(bg))
+    )
   );
-  return Math.abs(typeof lc === 'number' ? lc : Number(lc));
 }
 
 describe('adjustContrast', () => {
@@ -83,15 +83,15 @@ describe('adjustContrast', () => {
     it('returns a light shade for any input against a black background', () => {
       const result = adjustContrast('#ff0000', { background: '#000000' });
       const l = Number(result.match(/oklch\(([^ ]+)/)![1]);
-      // Light text on black means high L
-      expect(l).toBeGreaterThan(0.5);
+      expect(GRID_L_VALUES).toContain(l);
+      expect(l).toBeGreaterThanOrEqual(PERCEPTUAL_L_GRID['500']);
     });
 
     it('returns a dark shade for any input against a white background', () => {
       const result = adjustContrast('#ffff00', { background: '#ffffff' });
       const l = Number(result.match(/oklch\(([^ ]+)/)![1]);
-      // Dark text on white means low L
-      expect(l).toBeLessThan(0.6);
+      expect(GRID_L_VALUES).toContain(l);
+      expect(l).toBeLessThanOrEqual(PERCEPTUAL_L_GRID['500']);
     });
   });
 

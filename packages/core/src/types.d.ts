@@ -2,7 +2,7 @@ declare module 'culori' {
   export interface OklchColor {
     mode: 'oklch';
     l: number;
-    c: number;
+    c?: number;
     h?: number;
     alpha?: number;
   }
@@ -17,7 +17,7 @@ declare module 'culori' {
   export type Gamut = 'rgb' | 'p3' | 'rec2020';
 
   export function parse(input: string): Color | undefined;
-  export function oklch(input: Color | string): OklchColor;
+  export function oklch(input: Color | string): OklchColor | undefined;
   export function converter(mode: 'rgb'): (color: Color) => RgbColor;
   export function converter(mode: 'oklch'): (color: Color) => OklchColor;
   export function clampChroma<T extends Color>(
@@ -28,6 +28,6 @@ declare module 'culori' {
 }
 
 declare module 'apca-w3' {
-  export function APCAcontrast(textY: number, bgY: number): number | string;
+  export function APCAcontrast(textY: number, bgY: number): number;
   export function sRGBtoY(rgb: [number, number, number]): number;
 }
