@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "description": "React components built with Radix UI and Tailwind CSS",
   "//": [
-    "@nexus/core in devDependencies is a turbo-affected-graph hint, not a code import — nothing in packages/react/src imports from it.",
-    "Without this edge, a core/scripts change that doesn't regenerate packages/tailwind/*.css skips @nexus/react#build, and bundle-size loses its dist input.",
+    "@nexus/core in devDependencies covers two needs: (1) a turbo-affected-graph hint so a core/scripts change that doesn't regenerate packages/tailwind/*.css still rebuilds @nexus/react (and bundle-size keeps its dist input); (2) dev-time resolution for Storybook stories that import runtime utilities from @nexus/core (e.g. adjustContrast). Story imports never reach the published @nexus/react bundle.",
     "Tracked for restructure: https://github.com/nexuslabs-ai/nexus/issues/66 (move to @nexus/tailwind dependsOn @nexus/core#build:tailwind in turbo)."
   ],
   "type": "module",
