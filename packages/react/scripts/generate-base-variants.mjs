@@ -7,6 +7,13 @@
  * `[data-nexus-base]` subtree. Output lands in src/components/__generated__/
  * (gitignored) and is regenerated on each storybook / test run.
  *
+ * The color resolver/flattener below re-implements the color subset of
+ * packages/core/scripts/utils.js (refToVar ≈ resolveReference,
+ * flattenColorTokens ≈ extractTokens + processSemanticTokens). It is a copy,
+ * not an import: core/scripts is not in @nexus/core's exports/dist, and reading
+ * the committed semantic JSON directly keeps this generator free of a token
+ * build-order dependency (output is verified byte-identical to dist/modular).
+ *
  * See .claude/rules/storybook.md § Per-base variant generation.
  */
 import fs from 'fs';
@@ -58,8 +65,7 @@ const PRIMITIVE_NAMES = collectPrimitiveNames(readJson(PRIMITIVES_PATH));
  */
 function refToVar(value) {
   if (typeof value !== 'string' || !value.startsWith('{') || !value.endsWith('}')) {
-    console.warn(`  ⚠ non-reference semantic value passed through verbatim: ${value}`);
-    return value;
+    throw new Error(`Expected a {…} token reference, got: ${JSON.stringify(value)}`);
   }
   const ref = value.slice(1, -1).replace(/\./g, '-');
   if (!PRIMITIVE_NAMES.has(ref)) {
@@ -80,11 +86,16 @@ function flattenColorTokens(node, prefix = []) {
     if (key.startsWith('$') || val === null || typeof val !== 'object') {
       continue;
     }
-    if (val.$value !== undefined) {
-      out.push({
-        cssVar: `--nx-color-${[...prefix, key].join('-')}`,
-        value: refToVar(val.$value),
-      });
+    // A leaf needs both $value and $type (mirrors core's extractTokens). Only
+    // color tokens take the --nx-color- prefix; gating on $type keeps a future
+    // non-color semantic alias from being mis-prefixed and emitted here.
+    if (val.$value !== undefined && val.$type !== undefined) {
+      if (val.$type === 'color') {
+        out.push({
+          cssVar: `--nx-color-${[...prefix, key].join('-')}`,
+          value: refToVar(val.$value),
+        });
+      }
       continue;
     }
     out.push(...flattenColorTokens(val, [...prefix, key]));
@@ -245,19 +256,42 @@ export const AllBases: Story = {};
 `;
 }
 
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
- * Fail fast (before templating) if the canonical stories file or its named
- * showcase export is missing — a typo otherwise yields a valid `.tsx` that
- * only breaks at the Storybook/vitest build.
+ * Fail fast (before templating) if the canonical stories file is missing, its
+ * named showcase export is absent, or that export is args-only — each otherwise
+ * yields a valid `.tsx` that breaks (or renders empty cells) only at the
+ * Storybook/vitest build. The generator reuses `showcase.render()` directly, so
+ * a render-based export is a hard precondition.
  */
 function assertShowcaseExists(component) {
   const file = path.join(UI_DIR, `${component.name}.stories.tsx`);
   if (!fs.existsSync(file)) {
     throw new Error(`Stories file missing for "${component.name}": ${file}`);
   }
-  if (!new RegExp(`export const ${component.showcase}\\b`).test(fs.readFileSync(file, 'utf8'))) {
+  const src = fs.readFileSync(file, 'utf8');
+  // Anchor to the start of a line (multiline flag) so a commented or stringified
+  // mention can't satisfy the guard; escape the config value before interpolating.
+  const exportMatch = new RegExp(`^export const ${escapeRegExp(component.showcase)}\\b`, 'm').exec(
+    src
+  );
+  if (!exportMatch) {
     throw new Error(
       `Showcase export "${component.showcase}" not found in ${component.name}.stories.tsx`
+    );
+  }
+  // Require a `render:` within the export's block (up to the next top-level
+  // export) so an args-only story fails here rather than rendering empty cells.
+  const rest = src.slice(exportMatch.index);
+  const nextExport = rest.slice(exportMatch[0].length).search(/^export /m);
+  const block = nextExport === -1 ? rest : rest.slice(0, exportMatch[0].length + nextExport);
+  if (!/\brender\s*:/.test(block)) {
+    throw new Error(
+      `Showcase "${component.showcase}" in ${component.name}.stories.tsx is args-only; ` +
+        `base-variant generation needs a render-based story`
     );
   }
 }

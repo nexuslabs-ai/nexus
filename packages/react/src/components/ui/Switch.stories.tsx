@@ -222,88 +222,108 @@ export const DataAttributesTest: Story = {
 // ============================================
 
 export const AllVariants: Story = {
-  render: (_args) => (
-    <div className="nx:flex nx:flex-col nx:gap-8">
-      <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          States
-        </h3>
-        <div className="nx:flex nx:items-center nx:gap-6">
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Switch aria-label="Unchecked" />
-            <span className="nx:text-xs nx:text-muted-foreground">
-              Unchecked
-            </span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Switch defaultChecked aria-label="Checked" />
-            <span className="nx:text-xs nx:text-muted-foreground">Checked</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Switch disabled aria-label="Disabled unchecked" />
-            <span className="nx:text-xs nx:text-muted-foreground">
-              Disabled
-            </span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Switch disabled defaultChecked aria-label="Disabled checked" />
-            <span className="nx:text-xs nx:text-muted-foreground">
-              Disabled Checked
-            </span>
+  // Named function + useId so the id/htmlFor pairs are unique. This showcase is
+  // reused by base-variant generation (rendered once per cell, 10×); static ids
+  // would collide across cells. See storybook.md § Caveats.
+  render: function AllVariantsShowcase() {
+    const uid = React.useId();
+    return (
+      <div className="nx:flex nx:flex-col nx:gap-8">
+        <div>
+          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+            States
+          </h3>
+          <div className="nx:flex nx:items-center nx:gap-6">
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch aria-label="Unchecked" />
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Unchecked
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch defaultChecked aria-label="Checked" />
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Checked
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch disabled aria-label="Disabled unchecked" />
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Disabled
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch disabled defaultChecked aria-label="Disabled checked" />
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Disabled Checked
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          With Labels
-        </h3>
-        <div className="nx:flex nx:flex-col nx:gap-4">
-          <div className="nx:flex nx:items-center nx:gap-2">
-            <Switch id="label-right" />
-            <label htmlFor="label-right" className="nx:text-sm nx:font-medium">
-              Label on right
-            </label>
-          </div>
-          <div className="nx:flex nx:items-center nx:gap-2">
-            <label htmlFor="label-left" className="nx:text-sm nx:font-medium">
-              Label on left
-            </label>
-            <Switch id="label-left" />
+        <div>
+          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+            With Labels
+          </h3>
+          <div className="nx:flex nx:flex-col nx:gap-4">
+            <div className="nx:flex nx:items-center nx:gap-2">
+              <Switch id={`${uid}-label-right`} />
+              <label
+                htmlFor={`${uid}-label-right`}
+                className="nx:text-sm nx:font-medium"
+              >
+                Label on right
+              </label>
+            </div>
+            <div className="nx:flex nx:items-center nx:gap-2">
+              <label
+                htmlFor={`${uid}-label-left`}
+                className="nx:text-sm nx:font-medium"
+              >
+                Label on left
+              </label>
+              <Switch id={`${uid}-label-left`} />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          Settings Pattern
-        </h3>
-        <div className="nx:w-80 nx:space-y-4">
-          <div className="nx:flex nx:items-center nx:justify-between">
-            <label htmlFor="setting1" className="nx:text-sm nx:font-medium">
-              Enable feature
-            </label>
-            <Switch id="setting1" defaultChecked />
-          </div>
-          <div className="nx:flex nx:items-center nx:justify-between">
-            <label htmlFor="setting2" className="nx:text-sm nx:font-medium">
-              Show previews
-            </label>
-            <Switch id="setting2" />
-          </div>
-          <div className="nx:flex nx:items-center nx:justify-between">
-            <label
-              htmlFor="setting3"
-              className="nx:text-sm nx:font-medium nx:text-muted-foreground"
-            >
-              Beta features (disabled)
-            </label>
-            <Switch id="setting3" disabled />
+        <div>
+          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+            Settings Pattern
+          </h3>
+          <div className="nx:w-80 nx:space-y-4">
+            <div className="nx:flex nx:items-center nx:justify-between">
+              <label
+                htmlFor={`${uid}-setting1`}
+                className="nx:text-sm nx:font-medium"
+              >
+                Enable feature
+              </label>
+              <Switch id={`${uid}-setting1`} defaultChecked />
+            </div>
+            <div className="nx:flex nx:items-center nx:justify-between">
+              <label
+                htmlFor={`${uid}-setting2`}
+                className="nx:text-sm nx:font-medium"
+              >
+                Show previews
+              </label>
+              <Switch id={`${uid}-setting2`} />
+            </div>
+            <div className="nx:flex nx:items-center nx:justify-between">
+              <label
+                htmlFor={`${uid}-setting3`}
+                className="nx:text-sm nx:font-medium nx:text-muted-foreground"
+              >
+                Beta features (disabled)
+              </label>
+              <Switch id={`${uid}-setting3`} disabled />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  ),
+    );
+  },
   parameters: {
     layout: 'padded',
   },

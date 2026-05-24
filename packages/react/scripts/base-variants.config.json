@@ -1,4 +1,5 @@
 {
+  "//": "chart-categorical-{1..5} tokens are NOT per-cell-scoped (separate token file); opting in a charted component would render its marks under the default base, not the cell's. Add them to the merge in generate-base-variants.mjs first. See storybook.md § Caveats.",
   "bases": ["slate", "neutral", "gray", "stone", "zinc"],
   "brand": "neutral",
   "themes": ["light", "dark"],

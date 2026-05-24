@@ -350,7 +350,7 @@ Nexus's headline claim is perceptual consistency across its 5 bases (slate / neu
 | `base-variants.css`                | Each base's semantic tokens scoped to `[data-nexus-base="…"]` (light) / `[data-nexus-base="…"].dark` (dark)  |
 | `{Name}.base-variants.stories.tsx` | One per component — a 2×5 grid (light/dark rows × 5 base columns), under the `Base Variants/*` sidebar group |
 
-The stories run as smoke/render tests under `@storybook/addon-vitest` — that is the visual-regression capture mechanism (no Chromatic).
+The stories run as render/smoke tests under `@storybook/addon-vitest` — they assert each base × theme renders without throwing, not pixel output. Pixel-level visual-regression diffing is a deliberate non-goal of this generator (no Chromatic); these grids exist for side-by-side human comparison.
 
 ### Opting a component in
 
@@ -361,7 +361,7 @@ Add an entry to `packages/react/scripts/base-variants.config.json`:
 ```
 
 - `name` — the component. Used as the sidebar title, the output filename prefix, and to locate the canonical stories module (`../ui/{name}.stories`).
-- `showcase` — a **render-based** export from that module (e.g. `AllVariants`; Avatar uses `AllSizes`). The generator reuses this story's `render()` directly, so it must not be args-only. Generation fails fast if the stories file or this export is missing.
+- `showcase` — a **render-based** export from that module (e.g. `AllVariants`; Avatar uses `AllSizes`). The generator reuses this story's `render()` directly, so it must not be args-only. Generation fails fast if the stories file is missing, the export is absent, or the export has no `render:` (args-only).
 
 Then re-run `yarn workspace @nexus/react generate:base-variants` (or just `yarn storybook` — see Lifecycle below).
 
@@ -382,7 +382,7 @@ Each cell emits the **full** semantic set (base + the `neutral` brand) for its t
 
 - **Overlay components** (Dialog, DropdownMenu, Select, Tooltip): only the closed trigger renders in-place and scopes correctly. Open/portal content renders outside the `[data-nexus-base]` subtree (React portals attach to `document.body`) and falls back to the default base. The static showcases render closed, so this is rarely visible.
 - **`chart-categorical-{1..5}`** are the only ~5 of ~100 semantic colors not per-cell-scoped (they live in a separate token file and no covered component renders charts). Add them to the merge in the generator if a charted component is ever opted in.
-- **Static ids in a showcase collide across cells.** The generator reuses a showcase's `render()` once per cell (10×), so any hardcoded `id` in it (e.g. Switch's `id="setting1"`) emits as a duplicate DOM id, breaking that cell's `htmlFor`↔control pairing. This is masked here by `a11y: { test: 'off' }` and smoke-only assertions, and the generator can't scope ids it doesn't own. **Showcase-authoring constraint:** a story opted into base-variant generation should not embed static ids (use `aria-label`, or `React.useId`).
+- **Static ids in a showcase collide across cells.** The generator reuses a showcase's `render()` once per cell (10×), so any hardcoded `id` in it would emit as a duplicate DOM id across the cells, breaking that cell's `htmlFor`↔control pairing — and the generator can't scope ids it doesn't own. **Showcase-authoring constraint:** a story opted into base-variant generation must not embed static ids — use `aria-label`, or namespace each id with `React.useId` (as Switch's `AllVariants` does). Duplicate-id breakage would otherwise be masked here by `a11y: { test: 'off' }` and smoke-only assertions.
 
 ### Lifecycle
 
