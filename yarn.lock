@@ -202,6 +202,11 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.28.5"
 
+"@bjornlu/colorblind@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@bjornlu/colorblind/-/colorblind-1.0.3.tgz#556289e01c3aa5c065bad98af6cfcfac17305c5f"
+  integrity sha512-RG9W0BuFib5xN19R4U1dFK7s26+UPiJqHdwqawpvH7sywXJ6zc37onPpRpnFP0aNuKLhhmuitqPAXxLxOA+HgQ==
+
 "@csstools/color-helpers@^5.1.0":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@csstools/color-helpers/-/color-helpers-5.1.0.tgz#106c54c808cabfd1ab4c602d8505ee584c2996ef"
