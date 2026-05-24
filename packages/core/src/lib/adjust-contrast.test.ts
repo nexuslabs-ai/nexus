@@ -25,7 +25,7 @@ function lcOf(fg: string, bg: string): number {
     APCAcontrast(
       sRGBtoY(oklchStringToSrgbInts(fg)),
       sRGBtoY(oklchStringToSrgbInts(bg))
-    )
+    ) as number
   );
 }
 
@@ -75,7 +75,6 @@ describe('adjustContrast', () => {
       ['#000000', 'pure black'],
       ['#ffffff', 'pure white'],
     ])('handles %s (%s) without throwing', (input) => {
-      expect(() => adjustContrast(input)).not.toThrow();
       const result = adjustContrast(input);
       expect(result).toMatch(/^oklch\(/);
     });

@@ -73,11 +73,12 @@ function deriveReference(palette: PaletteKey): PaletteReference {
   return { c: o.c ?? 0, h: o.h ?? 0 };
 }
 
-export const PALETTE_REFERENCE_OKLCH: Record<PaletteKey, PaletteReference> =
-  Object.freeze({
-    slate: deriveReference('slate'),
-    neutral: deriveReference('neutral'),
-    gray: deriveReference('gray'),
-    stone: deriveReference('stone'),
-    zinc: deriveReference('zinc'),
-  });
+const paletteReferenceCache = new Map<PaletteKey, PaletteReference>();
+
+export function getPaletteReference(palette: PaletteKey): PaletteReference {
+  const cached = paletteReferenceCache.get(palette);
+  if (cached) return cached;
+  const reference = deriveReference(palette);
+  paletteReferenceCache.set(palette, reference);
+  return reference;
+}

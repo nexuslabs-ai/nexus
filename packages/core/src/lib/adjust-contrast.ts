@@ -1,8 +1,15 @@
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
-import { clampChroma, converter, oklch, type OklchColor, parse } from 'culori';
+import {
+  clampChroma,
+  converter,
+  type Oklch,
+  oklch,
+  parse,
+  type Rgb,
+} from 'culori';
 
 import {
-  PALETTE_REFERENCE_OKLCH,
+  getPaletteReference,
   type PaletteKey,
   PERCEPTUAL_L_GRID,
   type Shade,
@@ -44,12 +51,12 @@ export interface AdjustContrastOptions {
 // TODO(#84): parseToOklch / oklchToSrgbInts / formatOklch / clampForEmit
 // duplicate scripts/lib/perceptual-grid.js (~20 lines). Extract to a shared
 // browser-safe module once @nexus/colors lands.
-function stripAlpha(color: OklchColor): OklchColor {
+function stripAlpha(color: Oklch): Oklch {
   if (color.alpha === undefined || color.alpha === 1) return color;
   return { mode: 'oklch', l: color.l, c: color.c, h: color.h };
 }
 
-function parseToOklch(input: string, label: string): OklchColor {
+function parseToOklch(input: string, label: string): Oklch {
   const parsed = parse(input);
   if (!parsed) {
     throw new Error(
@@ -65,15 +72,15 @@ function parseToOklch(input: string, label: string): OklchColor {
   return stripAlpha(converted);
 }
 
-function oklchToSrgbInts(color: OklchColor): [number, number, number] {
+function oklchToSrgbInts(color: Oklch): [number, number, number] {
   const clamped = clampChroma(color, 'oklch', 'rgb');
-  const rgb = toRgb(clamped);
+  const rgb = toRgb(clamped) as Rgb;
   const channel = (v: number) =>
     Math.max(0, Math.min(255, Math.round(v * 255)));
   return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
 }
 
-function clampForEmit(color: OklchColor): OklchColor {
+function clampForEmit(color: Oklch): Oklch {
   return clampChroma(color, 'oklch', 'p3');
 }
 
@@ -82,7 +89,7 @@ function round(value: number, decimals: number): number {
   return Math.round(value * factor) / factor;
 }
 
-function formatOklch(color: OklchColor): string {
+function formatOklch(color: Oklch): string {
   const finite = (v: number | undefined) =>
     typeof v === 'number' && Number.isFinite(v) ? v : 0;
   const l = round(finite(color.l), 4);
@@ -129,7 +136,7 @@ export function adjustContrast(
 
   const inputChroma = inputOklch.c ?? 0;
   const isAchromatic = inputChroma < ACHROMATIC_THRESHOLD;
-  const reference = PALETTE_REFERENCE_OKLCH[palette];
+  const reference = getPaletteReference(palette);
   const chroma = isAchromatic ? reference.c : inputChroma;
   const hue = isAchromatic ? reference.h : (inputOklch.h ?? reference.h);
 
@@ -137,9 +144,9 @@ export function adjustContrast(
 
   for (const shade of SHADES) {
     const l = PERCEPTUAL_L_GRID[shade];
-    const candidate: OklchColor = { mode: 'oklch', l, c: chroma, h: hue };
+    const candidate: Oklch = { mode: 'oklch', l, c: chroma, h: hue };
     const fgInts = oklchToSrgbInts(candidate);
-    const lc = APCAcontrast(sRGBtoY(fgInts), sRGBtoY(bgInts));
+    const lc = APCAcontrast(sRGBtoY(fgInts), sRGBtoY(bgInts)) as number;
     attempts.push({ shade, lc });
     if (Math.abs(lc) >= minLc) {
       return formatOklch(clampForEmit(candidate));

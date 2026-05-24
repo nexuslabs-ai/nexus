@@ -6,10 +6,17 @@
       "outputs": ["dist/runtime/**"]
     },
     "build:tokens:modular": {
+      "inputs": ["scripts/**", "tokens/**"],
       "outputs": ["dist/modular/**"]
     },
     "build:tailwind": {
+      "inputs": ["scripts/**", "tokens/**"],
       "outputs": ["dist/tailwind/**"]
+    },
+    "storybook": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
     },
     "dev": {
       "cache": false,
