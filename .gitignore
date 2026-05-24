@@ -37,6 +37,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 build-storybook.log
+debug-storybook.log
 
 # TypeScript
 *.tsbuildinfo
@@ -60,3 +61,4 @@ opencode.json
 
 # Local scratch artifacts (throwaway screenshots, etc.)
 /dataviz-*.png
+/scrim-*.png
