@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { BASE_PALETTES } from './lib/palettes.js';
 import { hexToSrgbInts, isPaletteShadeKey } from './lib/perceptual-grid.js';
 import { extractTokens, readTokenFile } from './utils.js';
 
@@ -12,7 +13,6 @@ const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 const PRIMITIVES_FILE = path.join(TOKENS_DIR, 'primitives', 'color.json');
 const FOCUS_PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives', 'focus');
 
-const BASE_PALETTES = ['slate', 'neutral', 'zinc', 'gray', 'stone'];
 const BRANDS = ['blue', 'gray', 'neutral', 'slate', 'stone'];
 const THEMES = ['light', 'dark'];
 
