@@ -17,6 +17,7 @@ export default tseslint.config(
       '**/.turbo/**',
       '**/coverage/**',
       '**/generated/**',
+      '**/__generated__/**',
       '**/storybook-static/**',
       '**/build/**',
       '**/out/**',
@@ -181,7 +182,7 @@ export default tseslint.config(
 
   // CLI scripts - allow console.log for user output
   {
-    files: ['**/scripts/**/*.js'],
+    files: ['**/scripts/**/*.{js,mjs}'],
     rules: {
       'no-console': 'off',
     },
