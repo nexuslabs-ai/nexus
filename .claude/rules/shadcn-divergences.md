@@ -272,7 +272,7 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
 // Nexus
-'nx:focus-visible:outline-none nx:focus-visible:ring-2 nx:focus-visible:ring-primary-background/50 nx:focus-visible:ring-offset-2';
+'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default';
 ```
 
 ---

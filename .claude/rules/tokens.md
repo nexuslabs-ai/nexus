@@ -91,17 +91,20 @@ Failures must be fixed by adjusting the semantic token reference (which shade a 
 
 ## File Naming
 
-| Directory  | Pattern                             | Example                                                                       |
-| ---------- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| primitives | `color.json`                        | Single file with all color scales                                             |
-| primitives | `{category}/{category}-{mode}.json` | `size/size-vega.json`, `radius/radius-subtle.json`                            |
-| primitives | `shadow/shadow-{mode}-{theme}.json` | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json`                      |
-| primitives | `typography/typography-{mode}.json` | `typography/typography-vega.json`                                             |
-| semantic   | `base-{palette}-{theme}.json`       | `base-slate-light.json`, `base-slate-dark.json`                               |
-| semantic   | `brands-{name}-{theme}.json`        | `brands-blue-light.json`, `brands-blue-dark.json`                             |
-| semantic   | `chart-{scale}-{mode}-{theme}.json` | `chart-categorical-default-light.json`, `chart-categorical-default-dark.json` |
-| semantic   | `spacing.json`                      | Standalone semantic (no light/dark variant)                                   |
-| component  | `{component}.json`                  | `button.json` (future)                                                        |
+| Directory  | Pattern                               | Example                                                                       |
+| ---------- | ------------------------------------- | ----------------------------------------------------------------------------- |
+| primitives | `color.json`                          | Single file with all color scales                                             |
+| primitives | `{category}/{category}-{mode}.json`   | `size/size-vega.json`, `radius/radius-subtle.json`                            |
+| primitives | `shadow/shadow-{mode}-{theme}.json`   | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json`                      |
+| primitives | `typography/typography-{mode}.json`   | `typography/typography-vega.json`                                             |
+| primitives | `borderwidth/borderwidth-{mode}.json` | `borderwidth/borderwidth-vega.json`                                           |
+| primitives | `focus/focus-{name}-{theme}.json`     | `focus/focus-default-light.json`, `focus-default-dark.json`                   |
+| semantic   | `base-{palette}-{theme}.json`         | `base-slate-light.json`, `base-slate-dark.json`                               |
+| semantic   | `brands-{name}-{theme}.json`          | `brands-blue-light.json`, `brands-blue-dark.json`                             |
+| semantic   | `chart-{scale}-{mode}-{theme}.json`   | `chart-categorical-default-light.json`, `chart-categorical-default-dark.json` |
+| semantic   | `spacing.json`                        | Standalone semantic (no light/dark variant)                                   |
+| component  | `{component}.json`                    | `button.json` (future)                                                        |
+| styles     | `{name}.json`                         | `styles/shadows.json`, `styles/typography.json`                               |
 
 ### Shadow Tokens (Theme-Aware)
 

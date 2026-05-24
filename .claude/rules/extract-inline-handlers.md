@@ -80,7 +80,7 @@ One or two lines, one statement, no branching. The closure is a thin adapter, no
 
 - **Three or more lines, or any branching/nested callback, in a JSX handler → extract.** Name it `handleX` (or a verb phrase that says what it does) and declare it above the `return`.
 - **One- or two-line handlers stay inline.** A single `mutation.mutate()`, `setX(value)`, `router.push(...)`, or one-liner adapter does not need a name.
-- **Don't wrap a bare reference in an arrow.** `onClick={() => doThing()}` when `doThing` takes no args is just `onClick={doThing}`. (See also `feedback_no_thin_wrapper_hooks.md` — no pass-through `useCallback`.)
+- **Don't wrap a bare reference in an arrow.** `onClick={() => doThing()}` when `doThing` takes no args is just `onClick={doThing}`. (Same for hooks — no pass-through `useCallback`.)
 - **Don't extract for memoization alone.** Re-creating a closure on render is not a perf problem. Extract for readability; reach for `useCallback` only when a memoized child actually depends on referential stability.
 - The rule applies to all JSX handler-shaped props (`onClick`, `onChange`, `onSubmit`, `onKeyDown`, `onValueChange`, …), not just `onClick`.
 
