@@ -173,24 +173,7 @@ export const AsLink: Story = {
 
 ### AllVariants grid
 
-Stories that compose multiple instances for visual comparison. Tailwind utilities here must carry the `nx:` prefix, and colors must use semantic tokens (e.g., `nx:bg-error-background`, not `nx:bg-destructive` — `destructive` is the variant name, not a token):
-
-```tsx
-export const AllVariants: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-6">
-      <div className="nx:flex nx:flex-wrap nx:gap-2">
-        <Button variant="default">Default</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="link">Link</Button>
-      </div>
-    </div>
-  ),
-};
-```
+Stories that compose multiple instances for visual comparison. Tailwind utilities here must carry the `nx:` prefix, and colors must use semantic tokens (e.g., `nx:bg-error-background`, not `nx:bg-destructive` — `destructive` is the variant name, not a token). See [`.claude/rules/storybook.md`](.claude/rules/storybook.md) § AllVariants grid for the canonical template.
 
 ### A11y escape hatch
 
