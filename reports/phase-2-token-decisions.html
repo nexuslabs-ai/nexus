@@ -1501,7 +1501,7 @@ nx:focus-visible:outline-offset-2</pre>
     Nexus inherits Tailwind v4's 5 default breakpoints with zero customisation and zero
     documented opinion. The cross-check found Dialog already uses <code>nx:sm:</code> in
     3 places, which initially read as at odds with the "desktop-primary" stance (a spike later
-    confirmed it's a legitimate viewport-driven exception — see Decision D). Meanwhile 2026 industry consensus
+    confirmed it's a legitimate viewport-driven exception). Meanwhile 2026 industry consensus
     has shifted decisively: container queries are now Baseline (Chrome 105+, Safari 16+,
     Firefox 110+ → ~95% coverage) and have largely replaced viewport media queries for
     component-internal responsive behaviour.
@@ -1530,7 +1530,8 @@ nx:focus-visible:outline-offset-2</pre>
     The implication: a new contributor (human or LLM) has no Nexus opinion to follow. They
     default to Tailwind defaults, default to viewport media queries, and default to mobile-first
     — none of which match how a desktop-tool design system actually performs. The gap is almost
-    entirely documentation, with one piece of contradictory code (Dialog).
+    entirely documentation, with one piece of seemingly contradictory code — Dialog, which
+    the spike confirmed is a legitimate viewport-driven exception.
   </p>
 
   <h3 id="bp-benchmarks">Benchmark survey — 10 systems</h3>
