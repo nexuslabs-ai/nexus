@@ -1,0 +1,43 @@
+{
+  "$description": "Responsive breakpoints (rem). Values match Tailwind v4's own defaults exactly — Nexus declares them explicitly so they fall under the same reset-and-own discipline as every other namespace (color/spacing/radius/shadow) instead of being inherited implicitly. Tailwind v4 auto-discovers --breakpoint-* from @theme and uses them to generate the nx:sm:…nx:2xl: responsive variants. Override at BUILD TIME by re-declaring a value in a consumer @theme block — NOT at runtime: @media cannot read var(), so Tailwind bakes the resolved value into the generated media queries at build time.",
+  "breakpoint-sm": {
+    "$value": {
+      "value": 40,
+      "unit": "rem"
+    },
+    "$type": "dimension",
+    "$description": "640px @ 16px root — narrow."
+  },
+  "breakpoint-md": {
+    "$value": {
+      "value": 48,
+      "unit": "rem"
+    },
+    "$type": "dimension",
+    "$description": "768px @ 16px root — compact."
+  },
+  "breakpoint-lg": {
+    "$value": {
+      "value": 64,
+      "unit": "rem"
+    },
+    "$type": "dimension",
+    "$description": "1024px @ 16px root — standard floor."
+  },
+  "breakpoint-xl": {
+    "$value": {
+      "value": 80,
+      "unit": "rem"
+    },
+    "$type": "dimension",
+    "$description": "1280px @ 16px root — standard reference."
+  },
+  "breakpoint-2xl": {
+    "$value": {
+      "value": 96,
+      "unit": "rem"
+    },
+    "$type": "dimension",
+    "$description": "1536px @ 16px root — wide."
+  }
+}

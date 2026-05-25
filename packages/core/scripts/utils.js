@@ -763,6 +763,50 @@ export function collectZIndexTokens(semanticDir) {
 }
 
 /**
+ * Collect breakpoint token mappings from breakpoints.json.
+ * Returns array of { cssName, value } for the @theme block. Like z-index,
+ * breakpoints are standalone semantics with direct values (no primitive layer,
+ * no modes, no light/dark) — but they carry rem dimensions, so the value is
+ * formatted from a structured { value, unit } and the unit is required to be
+ * rem (a px breakpoint would silently defeat font-size scaling).
+ *
+ * @param {string} semanticDir - Path to semantic directory
+ * @returns {object[]} Array of { cssName, value }
+ */
+export function collectBreakpointsTokens(semanticDir) {
+  const filePath = path.join(semanticDir, 'breakpoints.json');
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Breakpoints semantic file missing: ${filePath}`);
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const [key, value] of Object.entries(tokenData)) {
+    if (key.startsWith('$')) continue;
+    if (value.$type !== 'dimension') {
+      throw new Error(
+        `Breakpoint token "${key}" has $type "${value.$type}" but must be "dimension" (${filePath})`
+      );
+    }
+    const dim = value.$value;
+    if (
+      typeof dim !== 'object' ||
+      dim === null ||
+      typeof dim.value !== 'number' ||
+      dim.unit !== 'rem'
+    ) {
+      throw new Error(
+        `Breakpoint token "${key}" must be a rem dimension { value: number, unit: "rem" } (${filePath})`
+      );
+    }
+    tokens.push({ cssName: key, value: formatTokenValue(dim, 'dimension') });
+  }
+
+  return tokens;
+}
+
+/**
  * Collect radius token mappings from a mode file
  * Returns array of { cssName, varRef } for @theme block
  *
@@ -958,6 +1002,7 @@ export function generateThemeCSS(config) {
     borderwidthTokens = [],
     shadowTokens = [],
     zIndexTokens = [],
+    breakpointTokens = [],
     darkColorTokens = [],
     darkSelector = '.dark',
     prefixDarkVars = false,
@@ -987,7 +1032,8 @@ export function generateThemeCSS(config) {
   css += `  --color-*: initial;\n`;
   css += `  --spacing-*: initial;\n`;
   css += `  --radius-*: initial;\n`;
-  css += `  --shadow-*: initial;\n\n`;
+  css += `  --shadow-*: initial;\n`;
+  css += `  --breakpoint-*: initial;\n\n`;
 
   // Color tokens
   if (colorTokens.length > 0) {
@@ -1033,6 +1079,14 @@ export function generateThemeCSS(config) {
   if (zIndexTokens.length > 0) {
     css += `\n  /* Z-index tokens */\n`;
     for (const token of zIndexTokens) {
+      css += `  --${token.cssName}: ${token.value};\n`;
+    }
+  }
+
+  // Breakpoint tokens
+  if (breakpointTokens.length > 0) {
+    css += `\n  /* Breakpoint tokens */\n`;
+    for (const token of breakpointTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
     }
   }
