@@ -3,6 +3,7 @@ import { differenceEuclidean } from 'culori';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { BASE_PALETTES } from './lib/palettes.js';
 import { hexToSrgbInts } from './lib/perceptual-grid.js';
 import { readTokenFile, titleCase } from './utils.js';
 
@@ -38,7 +39,7 @@ export const SHADES = [
 
 // Grouped because the SVG sections them visually and the cross-status pair
 // confusability test only fires for STATUS_PALETTES.
-export const BASE_PALETTES = ['slate', 'neutral', 'zinc', 'gray', 'stone'];
+export { BASE_PALETTES };
 export const STATUS_PALETTES = ['red', 'green', 'amber', 'blue'];
 export const CHART_PALETTES = ['teal', 'lime', 'orange', 'rose', 'indigo'];
 export const ALL_PALETTES = [

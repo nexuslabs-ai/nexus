@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronRight, IconCircleFilled } from '@/lib/icons';
 import { cn } from '@/lib/utils';
@@ -66,6 +67,10 @@ const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 interface DropdownMenuSubTriggerProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.SubTrigger
 > {
+  /**
+   * Indents the trigger to align with items that have a leading icon or checkbox.
+   * @default false
+   */
   inset?: boolean;
 }
 
@@ -192,16 +197,36 @@ function DropdownMenuContent({
   );
 }
 
+const dropdownMenuItemVariants = cva(
+  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:text-sm nx:outline-none nx:transition-colors nx:focus:bg-background-hover nx:focus:text-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  {
+    variants: {
+      variant: {
+        default: '',
+        destructive:
+          'nx:text-error-subtle-foreground nx:focus:bg-error-background nx:focus:text-error-foreground',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
 /**
  * DropdownMenuItemProps
  *
  * Props for the DropdownMenuItem component.
  */
-interface DropdownMenuItemProps extends React.ComponentProps<
-  typeof DropdownMenuPrimitive.Item
-> {
+interface DropdownMenuItemProps
+  extends
+    React.ComponentProps<typeof DropdownMenuPrimitive.Item>,
+    VariantProps<typeof dropdownMenuItemVariants> {
+  /**
+   * Indents the item to align with items that have a leading icon or checkbox.
+   * @default false
+   */
   inset?: boolean;
-  variant?: 'default' | 'destructive';
 }
 
 /**
@@ -227,15 +252,8 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2',
-        'nx:rounded-sm nx:px-2 nx:py-1.5 nx:text-sm nx:outline-none',
-        'nx:transition-colors',
-        'nx:focus:bg-background-hover nx:focus:text-foreground',
-        'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
-        'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        dropdownMenuItemVariants({ variant }),
         inset && 'nx:pl-8',
-        variant === 'destructive' &&
-          'nx:text-error-subtle-foreground nx:focus:bg-error-background nx:focus:text-error-foreground',
         className
       )}
       {...props}
@@ -352,6 +370,10 @@ function DropdownMenuRadioItem({
 interface DropdownMenuLabelProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Label
 > {
+  /**
+   * Indents the label to align with items that have a leading icon or checkbox.
+   * @default false
+   */
   inset?: boolean;
 }
 
@@ -455,6 +477,7 @@ export {
   DropdownMenuGroup,
   DropdownMenuItem,
   type DropdownMenuItemProps,
+  dropdownMenuItemVariants,
   DropdownMenuLabel,
   type DropdownMenuLabelProps,
   DropdownMenuPortal,

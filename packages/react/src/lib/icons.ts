@@ -18,7 +18,6 @@ export { IconLoader2 } from '@tabler/icons-react';
 // Navigation
 export {
   IconChevronDown,
-  IconChevronLeft,
   IconChevronRight,
   IconChevronUp,
 } from '@tabler/icons-react';
@@ -33,6 +32,3 @@ export {
   IconCircleCheck,
   IconInfoCircle,
 } from '@tabler/icons-react';
-
-// Common UI
-export { IconEye, IconEyeOff, IconSearch } from '@tabler/icons-react';

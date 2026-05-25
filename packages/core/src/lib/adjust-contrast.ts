@@ -41,9 +41,6 @@ export interface AdjustContrastOptions {
   palette?: AdjustContrastPalette;
 }
 
-// TODO(#84): parseToOklch / oklchToSrgbInts / formatOklch / clampForEmit
-// duplicate scripts/lib/perceptual-grid.js (~20 lines). Extract to a shared
-// browser-safe module once @nexus/colors lands.
 function stripAlpha(color: Oklch): Oklch {
   if (color.alpha === undefined || color.alpha === 1) return color;
   return { mode: 'oklch', l: color.l, c: color.c, h: color.h };
