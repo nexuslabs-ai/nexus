@@ -18,6 +18,7 @@ Every rule below is a concrete application of this principle. When they conflict
 - `composition-over-render-props.md` — `children` or per-mode components; never `renderItem` / `mode` discriminators
 - `extract-inline-handlers.md` — multi-line / branching JSX handlers get a named function above `return`; one-liners stay inline
 - `useeffect-escape-hatch.md` — effects sync with external systems, not React state
+- `responsive.md` — `@container` for component-internal, viewport prefixes for page-shell; decision tree for which mechanism
 - `logging-proportionality.md` — one dense canonical log line beats ten incremental ones
 - `code-comments.md` — comment non-obvious logic only; TODOs must cite a tracked issue
 - `no-follow-up-deferral.md` — every issue flagged by a PR review is fixed in the same PR
