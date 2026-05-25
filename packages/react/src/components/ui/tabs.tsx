@@ -84,6 +84,7 @@ const tabsTriggerVariants = cva(
       variant: {
         default: [
           'nx:rounded-sm nx:border nx:border-transparent',
+          'nx:data-[state=inactive]:hover:bg-background/60',
           'nx:data-[state=active]:border-border-default',
           'nx:data-[state=active]:bg-background',
           'nx:data-[state=active]:text-foreground',
@@ -92,14 +93,6 @@ const tabsTriggerVariants = cva(
           'nx:rounded-none nx:border-b-2 nx:border-transparent',
           'nx:bg-transparent',
           'nx:data-[state=active]:border-primary-background',
-          'nx:data-[state=active]:text-foreground',
-        ],
-        outline: [
-          'nx:rounded-sm nx:border nx:border-transparent',
-          'nx:bg-transparent',
-          'nx:hover:bg-muted',
-          'nx:data-[state=active]:border-border-default',
-          'nx:data-[state=active]:bg-background',
           'nx:data-[state=active]:text-foreground',
         ],
       },
