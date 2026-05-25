@@ -213,20 +213,6 @@ function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
 }
 
 /**
- * Generate standalone semantic CSS (spacing, etc.)
- */
-function generateStandaloneSemanticCSS(distDir, name, tokens) {
-  let css = `/* ${name} */\n\n:root {\n`;
-
-  for (const token of tokens) {
-    css += `  --${token.cssName}: ${token.value};\n`;
-  }
-
-  css += `}\n`;
-  writeModularFile(distDir, `${name}.css`, css);
-}
-
-/**
  * Generate globals.css for playground using shared generateThemeCSS function
  */
 function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
@@ -377,17 +363,6 @@ export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
     console.log(`\n${type} themes:`);
     for (const mode of Object.keys(modes)) {
       generateThemedCSS(distDir, type, mode, primitiveMap);
-      totalFiles++;
-    }
-  }
-
-  // Generate standalone semantic files (spacing, etc.)
-  if (semantics.standalone.length > 0) {
-    console.log('\nStandalone semantics:');
-    for (const standaloneFile of semantics.standalone) {
-      const tokens = processSemanticFile(standaloneFile, primitiveMap);
-      const fileName = standaloneFile.replace('.json', '');
-      generateStandaloneSemanticCSS(distDir, fileName, tokens);
       totalFiles++;
     }
   }
