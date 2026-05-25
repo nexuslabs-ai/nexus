@@ -67,11 +67,27 @@ describe('generateTailwindPackage', () => {
     expect(variablesCSS).toMatch(/^:root \{/m);
   });
 
-  it('emits shadow and focus primitives in :root (light values)', () => {
+  it('emits focus colour primitives but no geometry in :root (light values)', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
     expect(rootBlock).toMatch(/--nx-focus-color-default:/);
-    expect(rootBlock).toMatch(/--nx-focus-geometry-spread: 2px;/);
+    expect(rootBlock).toMatch(/--nx-focus-color-error:/);
+    // Focus is an outline ring; the geometry primitives were dropped.
+    expect(rootBlock).not.toMatch(/--nx-focus-geometry-/);
+  });
+
+  // Focus colours are promoted to the --color-* namespace so Tailwind emits
+  // outline-focus-* utilities. The ring is outline-only — no focus box-shadow
+  // tokens of any kind (the geometry-composed --shadow-focus-* are gone).
+  it('promotes focus colours to --color-* and emits no focus box-shadow', () => {
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(
+      /--color-focus-default: var\(--nx-focus-color-default\);/
+    );
+    expect(themeBlock).toMatch(
+      /--color-focus-error: var\(--nx-focus-color-error\);/
+    );
+    expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 
   // Every var(--nx-shadow-*) or var(--nx-focus-*) ref in nexus.css must have a
