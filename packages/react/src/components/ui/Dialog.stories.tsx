@@ -12,6 +12,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './dropdown-menu';
 import { Input } from './input';
 
 const meta: Meta<typeof Dialog> = {
@@ -346,6 +352,77 @@ export const DataAttributesTest: Story = {
 
     // Close the dialog
     await userEvent.keyboard('{Escape}');
+  },
+};
+
+// ============================================
+// NESTED OVERLAY STACKING (z-index layering)
+// ============================================
+
+/**
+ * Verifies the z-index layering contract: a DropdownMenu opened inside a Dialog
+ * must render *above* the dialog (popover z=70 > modal z=50) so the menu stays
+ * usable when nested. See issue #91.
+ */
+export const NestedOverlayStacking: Story = {
+  render: (_args) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open stacking dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nested overlay stacking</DialogTitle>
+          <DialogDescription>
+            The dropdown below must appear above this dialog.
+          </DialogDescription>
+        </DialogHeader>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Open menu</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+
+    // Open the dialog (modal layer).
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open stacking dialog' })
+    );
+    const dialog = await body.findByRole('dialog');
+    await expect(dialog).toHaveClass('nx:z-modal');
+
+    // Open the dropdown nested inside the dialog (popover layer).
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: 'Open menu' })
+    );
+    const menu = await body.findByRole('menu');
+    await expect(menu).toHaveClass('nx:z-popover');
+    await expect(
+      within(menu).getByRole('menuitem', { name: 'Profile' })
+    ).toBeInTheDocument();
+
+    // The popover layer must stack above the modal layer.
+    const zIndexOf = (el: Element) => Number(getComputedStyle(el).zIndex);
+    await expect(zIndexOf(menu)).toBeGreaterThan(zIndexOf(dialog));
+
+    // Cleanup: close the menu, then the dialog.
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="menu"]')).toBeNull();
+    });
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
   },
 };
 

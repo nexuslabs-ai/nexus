@@ -8,6 +8,7 @@ import {
   collectSemanticColorTokensVarRef,
   collectShadowTokens,
   collectSpacingTokens,
+  collectZIndexTokens,
   discoverPrimitives,
   discoverSemantics,
   ensureDir,
@@ -414,6 +415,7 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     borderwidthMode
   );
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
+  const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
 
   // Generate header
   const header = `/* ===== NEXUS DESIGN SYSTEM - TAILWIND THEME ===== */
@@ -442,6 +444,7 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     radiusTokens,
     borderwidthTokens,
     shadowTokens,
+    zIndexTokens,
     darkColorTokens,
     darkSelector: '.dark',
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides

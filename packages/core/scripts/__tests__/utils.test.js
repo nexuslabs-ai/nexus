@@ -1,6 +1,10 @@
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { describe, expect, it } from 'vitest';
 
 import {
+  collectZIndexTokens,
   DEFAULT_CONFIG,
   extractRefPath,
   extractTokens,
@@ -404,6 +408,50 @@ describe('utils', () => {
       expect(DEFAULT_CONFIG.shadow).toBe('vega');
       expect(DEFAULT_CONFIG.radius).toBe('sharp');
       expect(DEFAULT_CONFIG.borderwidth).toBe('vega');
+    });
+  });
+
+  describe('collectZIndexTokens', () => {
+    function withZIndexFixture(tokenData, fn) {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-zindex-test-'));
+      try {
+        fs.writeFileSync(
+          path.join(dir, 'z-index.json'),
+          JSON.stringify(tokenData)
+        );
+        return fn(dir);
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    }
+
+    it('collects unitless number tokens as direct values, skipping metadata', () => {
+      withZIndexFixture(
+        {
+          $description: 'ignored metadata',
+          'z-index-modal': { $value: 50, $type: 'number' },
+        },
+        (dir) => {
+          expect(collectZIndexTokens(dir)).toEqual([
+            { cssName: 'z-index-modal', value: '50' },
+          ]);
+        }
+      );
+    });
+
+    it('throws (naming the token) when a token $type is not number', () => {
+      withZIndexFixture(
+        { 'z-index-modal': { $value: '50px', $type: 'dimension' } },
+        (dir) => {
+          expect(() => collectZIndexTokens(dir)).toThrow(/z-index-modal/);
+        }
+      );
+    });
+
+    it('throws (naming the token) when a number token is missing its $value', () => {
+      withZIndexFixture({ 'z-index-modal': { $type: 'number' } }, (dir) => {
+        expect(() => collectZIndexTokens(dir)).toThrow(/z-index-modal/);
+      });
     });
   });
 });

@@ -60,4 +60,10 @@ describe('generateModular', () => {
       expect(reformatted, `${name} is not prettier-formatted`).toBe(content);
     }
   });
+
+  it('emits z-index tokens in playground globals.css', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(/--z-index-popover: 70;/);
+    expect(globals).toMatch(/--z-index-modal: 50;/);
+  });
 });

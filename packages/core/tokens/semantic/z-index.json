@@ -1,0 +1,32 @@
+{
+  "z-index-overlay": {
+    "$value": 10,
+    "$type": "number",
+    "$description": "Base overlay layer — backdrops and low-level stacking."
+  },
+  "z-index-sticky": {
+    "$value": 30,
+    "$type": "number",
+    "$description": "Sticky chrome (headers, toolbars) — above content, below dialogs."
+  },
+  "z-index-modal": {
+    "$value": 50,
+    "$type": "number",
+    "$description": "Modal dialogs and their overlay."
+  },
+  "z-index-popover": {
+    "$value": 70,
+    "$type": "number",
+    "$description": "Tooltips, dropdowns, selects, popovers — above modals so they stay usable when nested in a dialog."
+  },
+  "z-index-toast": {
+    "$value": 100,
+    "$type": "number",
+    "$description": "Toasts and notifications — above popovers."
+  },
+  "z-index-max": {
+    "$value": 9999,
+    "$type": "number",
+    "$description": "Reserved for host-application system UI (e.g. AI agent overlays)."
+  }
+}

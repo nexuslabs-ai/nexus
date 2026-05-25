@@ -222,6 +222,14 @@
   --shadow-focus-error: var(--nx-focus-geometry-x) var(--nx-focus-geometry-y)
     var(--nx-focus-geometry-blur) var(--nx-focus-geometry-spread)
     var(--nx-focus-color-error);
+
+  /* Z-index tokens */
+  --z-index-overlay: 10;
+  --z-index-sticky: 30;
+  --z-index-modal: 50;
+  --z-index-popover: 70;
+  --z-index-toast: 100;
+  --z-index-max: 9999;
 }
 
 /* ===== DARK MODE ===== */
