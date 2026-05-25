@@ -727,6 +727,33 @@ export function collectSpacingTokens(semanticDir) {
 }
 
 /**
+ * Collect z-index token mappings from z-index.json.
+ * Returns array of { cssName, value } for the @theme block. Unlike
+ * spacing/radius/borderwidth, z-index tokens carry direct unitless values (no
+ * primitive layer) — they have no modes and no light/dark variance.
+ *
+ * @param {string} semanticDir - Path to semantic directory
+ * @returns {object[]} Array of { cssName, value }
+ */
+export function collectZIndexTokens(semanticDir) {
+  const filePath = path.join(semanticDir, 'z-index.json');
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Z-index semantic file missing: ${filePath}`);
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const [key, value] of Object.entries(tokenData)) {
+    if (key.startsWith('$')) continue;
+    if (value.$type !== 'number') continue;
+    tokens.push({ cssName: key, value: String(value.$value) });
+  }
+
+  return tokens;
+}
+
+/**
  * Collect radius token mappings from a mode file
  * Returns array of { cssName, varRef } for @theme block
  *
@@ -921,6 +948,7 @@ export function generateThemeCSS(config) {
     radiusTokens = [],
     borderwidthTokens = [],
     shadowTokens = [],
+    zIndexTokens = [],
     darkColorTokens = [],
     darkSelector = '.dark',
     prefixDarkVars = false,
@@ -988,6 +1016,14 @@ export function generateThemeCSS(config) {
   if (shadowTokens.length > 0) {
     css += `\n  /* Shadow tokens */\n`;
     for (const token of shadowTokens) {
+      css += `  --${token.cssName}: ${token.value};\n`;
+    }
+  }
+
+  // Z-index tokens
+  if (zIndexTokens.length > 0) {
+    css += `\n  /* Z-index tokens */\n`;
+    for (const token of zIndexTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
     }
   }

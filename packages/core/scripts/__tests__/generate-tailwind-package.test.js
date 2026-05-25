@@ -135,6 +135,16 @@ describe('generateTailwindPackage', () => {
     );
   });
 
+  it('emits z-index tokens in @theme', () => {
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(/--z-index-overlay: 10;/);
+    expect(themeBlock).toMatch(/--z-index-sticky: 30;/);
+    expect(themeBlock).toMatch(/--z-index-modal: 50;/);
+    expect(themeBlock).toMatch(/--z-index-popover: 70;/);
+    expect(themeBlock).toMatch(/--z-index-toast: 100;/);
+    expect(themeBlock).toMatch(/--z-index-max: 9999;/);
+  });
+
   it('emits zero `File not found` warnings for the default config', () => {
     const fileNotFound = warnings.filter((w) => /File not found/.test(w));
     expect(fileNotFound).toEqual([]);

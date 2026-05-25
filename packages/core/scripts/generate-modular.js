@@ -8,6 +8,7 @@ import {
   collectSemanticColorTokensVarRef,
   collectShadowTokens,
   collectSpacingTokens,
+  collectZIndexTokens,
   discoverPrimitives,
   discoverSemantics,
   ensureDir,
@@ -266,6 +267,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     ? collectBorderwidthTokens(TOKENS_DIR, primitives.borderwidth.modes[0])
     : [];
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
+  const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
 
   // Generate using shared function
   const header = `/*
@@ -297,6 +299,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     radiusTokens,
     borderwidthTokens,
     shadowTokens,
+    zIndexTokens,
     // No dark mode block - playground uses dynamic theme switching
   });
 

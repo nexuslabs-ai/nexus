@@ -1,0 +1,10 @@
+/* z-index */
+
+:root {
+  --z-index-overlay: 10;
+  --z-index-sticky: 30;
+  --z-index-modal: 50;
+  --z-index-popover: 70;
+  --z-index-toast: 100;
+  --z-index-max: 9999;
+}
