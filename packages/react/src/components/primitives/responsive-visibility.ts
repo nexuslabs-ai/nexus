@@ -18,7 +18,7 @@
  * therefore resolve the same breakpoint name to different rem values.
  */
 
-import type { ElementType, HTMLAttributes, ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 export type Breakpoint = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
@@ -54,12 +54,13 @@ export type VisibilityAxis =
 
 export type ResponsiveVisibilityProps = HTMLAttributes<HTMLElement> & {
   /**
-   * Element rendered as the display-managed wrapper. Keep it non-semantic:
-   * `display: contents` can drop a semantic element's box from the accessibility
-   * tree, so put semantics on a child *inside* `<Show>` / `<Hide>` instead.
+   * Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.
+   * Tag-only by design and intentionally non-semantic: `display: contents` can
+   * drop a semantic element's box from the accessibility tree, so put semantics
+   * on a child *inside* `<Show>` / `<Hide>` instead.
    * @default 'span'
    */
-  as?: ElementType;
+  as?: 'span' | 'div';
   children: ReactNode;
 } & VisibilityAxis;
 

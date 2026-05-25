@@ -90,14 +90,17 @@ export const ViewportAxis: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const above = canvas.getByTestId('above');
-    const below = canvas.getByTestId('below');
-    // Self-consistent against the runner's own viewport — no hard-coded width.
-    const lg = window.innerWidth >= 1024;
-    await waitFor(() => {
-      expect(getComputedStyle(above).display).toBe(lg ? 'contents' : 'none');
-      expect(getComputedStyle(below).display).toBe(lg ? 'none' : 'contents');
-    });
+    // Deterministic at any viewport: assert the exact classes each axis resolves
+    // to, covering both. The contents↔none toggle is exercised across a real
+    // width boundary in ContainerAxis.
+    expect(canvas.getByTestId('above')).toHaveClass(
+      'nx:hidden',
+      'nx:lg:contents'
+    );
+    expect(canvas.getByTestId('below')).toHaveClass(
+      'nx:contents',
+      'nx:lg:hidden'
+    );
   },
 };
 

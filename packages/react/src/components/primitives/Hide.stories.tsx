@@ -95,14 +95,16 @@ export const ViewportAxis: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const above = canvas.getByTestId('above');
-    const below = canvas.getByTestId('below');
-    const lg = window.innerWidth >= 1024;
-    // Inverse of <Show>: Hide above="lg" is hidden at ≥ lg.
-    await waitFor(() => {
-      expect(getComputedStyle(above).display).toBe(lg ? 'none' : 'contents');
-      expect(getComputedStyle(below).display).toBe(lg ? 'contents' : 'none');
-    });
+    // <Hide> inverts <Show> (hide-above === show-below); assert the resolved
+    // classes, deterministic at any viewport. Toggle is covered in ContainerAxis.
+    expect(canvas.getByTestId('above')).toHaveClass(
+      'nx:contents',
+      'nx:lg:hidden'
+    );
+    expect(canvas.getByTestId('below')).toHaveClass(
+      'nx:hidden',
+      'nx:lg:contents'
+    );
   },
 };
 
