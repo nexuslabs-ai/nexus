@@ -7,6 +7,14 @@
     "error": {
       "$value": "{focus.color.error}",
       "$type": "color"
+    },
+    "brand": {
+      "$value": "{focus.color.brand}",
+      "$type": "color"
+    },
+    "glow": {
+      "$value": "{focus.color.glow}",
+      "$type": "color"
     }
   }
 }

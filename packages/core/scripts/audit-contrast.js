@@ -147,7 +147,7 @@ const CHART_SURFACES = ['background', 'container'];
 // `muted` and `disabled` are intentionally excluded — they are non-focusable
 // fills (de-emphasised text backgrounds and disabled-state backdrops).
 const FOCUS_SURFACES = ['background', 'container', 'popover'];
-const FOCUS_COLORS = ['color.default', 'color.error'];
+const FOCUS_COLORS = ['color.default', 'color.error', 'color.brand'];
 const FOCUS_PAIRS = FOCUS_COLORS.flatMap((fg) =>
   FOCUS_SURFACES.map((bg) => ({ fg, bg, minLc: 45, tier: 'incidental' }))
 );

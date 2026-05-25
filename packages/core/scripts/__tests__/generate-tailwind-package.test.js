@@ -75,10 +75,11 @@ describe('generateTailwindPackage', () => {
     expect(rootBlock).not.toMatch(/--nx-focus-geometry-/);
   });
 
-  // #92: focus ring moved from box-shadow to outline. The geometry-composed
-  // --shadow-focus-* tokens are gone; focus colours are promoted to the
-  // --color-* namespace so Tailwind emits outline-focus-* utilities.
-  it('promotes focus colours to --color-* and drops --shadow-focus-*', () => {
+  // The focus ring is outline-based; a translucent brand glow shadow sits on
+  // top. Focus colours (incl. the brand ring) are promoted to the --color-*
+  // namespace; the box-shadow *ring* tokens (default/error) stay gone — the
+  // additive glow is the only focus shadow.
+  it('emits brand + glow focus tokens and no box-shadow ring tokens', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(
       /--color-focus-default: var\(--nx-focus-color-default\);/
@@ -86,7 +87,11 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(
       /--color-focus-error: var\(--nx-focus-color-error\);/
     );
-    expect(nexusCSS).not.toMatch(/--shadow-focus-/);
+    expect(themeBlock).toMatch(
+      /--color-focus-brand: var\(--nx-focus-color-brand\);/
+    );
+    expect(themeBlock).toMatch(/--shadow-focus-glow:/);
+    expect(nexusCSS).not.toMatch(/--shadow-focus-default|--shadow-focus-error/);
   });
 
   // Every var(--nx-shadow-*) or var(--nx-focus-*) ref in nexus.css must have a

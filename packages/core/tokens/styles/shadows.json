@@ -114,5 +114,15 @@
       "spread": "{inner.layer-1.spread}",
       "color": "{inner.layer-1.color}"
     }
+  },
+  "focus-glow": {
+    "$type": "shadow",
+    "$value": {
+      "offsetX": { "value": 0, "unit": "px" },
+      "offsetY": { "value": 0, "unit": "px" },
+      "blur": { "value": 8, "unit": "px" },
+      "spread": { "value": 2, "unit": "px" },
+      "color": "{focus.color.glow}"
+    }
   }
 }

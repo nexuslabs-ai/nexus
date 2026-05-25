@@ -7,6 +7,14 @@
     "error": {
       "$value": "#fca5a5",
       "$type": "color"
+    },
+    "brand": {
+      "$value": "#9dc1ee",
+      "$type": "color"
+    },
+    "glow": {
+      "$value": "#9dc1ee66",
+      "$type": "color"
     }
   }
 }

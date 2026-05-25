@@ -126,6 +126,8 @@
   --color-chart-categorical-5: var(--nx-color-indigo-600);
   --color-focus-default: var(--nx-focus-color-default);
   --color-focus-error: var(--nx-focus-color-error);
+  --color-focus-brand: var(--nx-focus-color-brand);
+  --color-focus-glow: var(--nx-focus-color-glow);
 
   /* Spacing tokens */
   --spacing-0: var(--nx-size-0);
@@ -218,6 +220,7 @@
   --shadow-inner: inset var(--nx-shadow-inner-layer-1-x)
     var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur)
     var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
+  --shadow-focus-glow: 0px 0px 8px 2px var(--nx-focus-color-glow);
 }
 
 /* ===== DARK MODE ===== */
