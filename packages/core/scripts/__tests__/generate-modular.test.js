@@ -66,4 +66,10 @@ describe('generateModular', () => {
     expect(globals).toMatch(/--z-index-popover: 70;/);
     expect(globals).toMatch(/--z-index-modal: 50;/);
   });
+
+  it('emits breakpoint tokens in playground globals.css', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(/--breakpoint-sm: 40rem;/);
+    expect(globals).toMatch(/--breakpoint-2xl: 96rem;/);
+  });
 });

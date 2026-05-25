@@ -4,6 +4,7 @@ import path from 'path';
 import { describe, expect, it } from 'vitest';
 
 import {
+  collectBreakpointsTokens,
   collectZIndexTokens,
   DEFAULT_CONFIG,
   extractRefPath,
@@ -452,6 +453,63 @@ describe('utils', () => {
       withZIndexFixture({ 'z-index-modal': { $type: 'number' } }, (dir) => {
         expect(() => collectZIndexTokens(dir)).toThrow(/z-index-modal/);
       });
+    });
+  });
+
+  describe('collectBreakpointsTokens', () => {
+    function withBreakpointsFixture(tokenData, fn) {
+      const dir = fs.mkdtempSync(
+        path.join(os.tmpdir(), 'nexus-breakpoint-test-')
+      );
+      try {
+        fs.writeFileSync(
+          path.join(dir, 'breakpoints.json'),
+          JSON.stringify(tokenData)
+        );
+        return fn(dir);
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    }
+
+    it('collects rem dimensions as direct values, skipping metadata', () => {
+      withBreakpointsFixture(
+        {
+          $description: 'ignored metadata',
+          'breakpoint-lg': {
+            $value: { value: 64, unit: 'rem' },
+            $type: 'dimension',
+          },
+        },
+        (dir) => {
+          expect(collectBreakpointsTokens(dir)).toEqual([
+            { cssName: 'breakpoint-lg', value: '64rem' },
+          ]);
+        }
+      );
+    });
+
+    it('throws (naming the token) when a token $type is not dimension', () => {
+      withBreakpointsFixture(
+        { 'breakpoint-lg': { $value: 64, $type: 'number' } },
+        (dir) => {
+          expect(() => collectBreakpointsTokens(dir)).toThrow(/breakpoint-lg/);
+        }
+      );
+    });
+
+    it('throws (naming the token) when the unit is not rem', () => {
+      withBreakpointsFixture(
+        {
+          'breakpoint-lg': {
+            $value: { value: 1024, unit: 'px' },
+            $type: 'dimension',
+          },
+        },
+        (dir) => {
+          expect(() => collectBreakpointsTokens(dir)).toThrow(/breakpoint-lg/);
+        }
+      );
     });
   });
 });

@@ -145,6 +145,16 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(/--z-index-max: 9999;/);
   });
 
+  it('emits breakpoint tokens (with reset) in @theme', () => {
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(/--breakpoint-\*: initial;/);
+    expect(themeBlock).toMatch(/--breakpoint-sm: 40rem;/);
+    expect(themeBlock).toMatch(/--breakpoint-md: 48rem;/);
+    expect(themeBlock).toMatch(/--breakpoint-lg: 64rem;/);
+    expect(themeBlock).toMatch(/--breakpoint-xl: 80rem;/);
+    expect(themeBlock).toMatch(/--breakpoint-2xl: 96rem;/);
+  });
+
   it('emits zero `File not found` warnings for the default config', () => {
     const fileNotFound = warnings.filter((w) => /File not found/.test(w));
     expect(fileNotFound).toEqual([]);
