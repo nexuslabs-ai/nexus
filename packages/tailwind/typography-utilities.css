@@ -6,7 +6,6 @@
   font-weight: var(--nx-typography-weight-light);
   line-height: var(--nx-typography-line-height-6xl);
   letter-spacing: var(--nx-typography-letterspacing-tight);
-  font-optical-sizing: auto;
 }
 
 @utility typography-display-medium {
@@ -15,7 +14,6 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-5xl);
   letter-spacing: var(--nx-typography-letterspacing-tight);
-  font-optical-sizing: auto;
 }
 
 @utility typography-heading-xlarge {
@@ -24,7 +22,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-4xl);
   letter-spacing: var(--nx-typography-letterspacing-tight);
-  font-optical-sizing: auto;
 }
 
 @utility typography-heading-large {
@@ -33,7 +30,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-3xl);
   letter-spacing: var(--nx-typography-letterspacing-tight);
-  font-optical-sizing: auto;
 }
 
 @utility typography-heading-medium {
@@ -42,7 +38,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-2xl);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
 }
 
 @utility typography-heading-small {
@@ -51,7 +46,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-xl);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
 }
 
 @utility typography-heading-xsmall {
@@ -60,7 +54,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-lg);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
 }
 
 @utility typography-body-large {
@@ -69,7 +62,6 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-lg);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
   text-wrap: pretty;
 }
 
@@ -79,7 +71,6 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-base);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
   text-wrap: pretty;
 }
 
@@ -89,7 +80,6 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
   text-wrap: pretty;
 }
 
@@ -99,7 +89,6 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-xs);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
   text-wrap: pretty;
 }
 
@@ -109,7 +98,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
 }
 
 @utility typography-label-default {
@@ -118,7 +106,6 @@
   font-weight: var(--nx-typography-weight-medium);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
 }
 
 @utility typography-label-small {
@@ -127,7 +114,6 @@
   font-weight: var(--nx-typography-weight-medium);
   line-height: var(--nx-typography-line-height-xs);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
 }
 
 @utility typography-label-caps {
@@ -136,7 +122,6 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-xs);
   letter-spacing: var(--nx-typography-letterspacing-wider);
-  font-optical-sizing: auto;
 }
 
 @utility typography-code-block {
@@ -145,7 +130,6 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: 0px;
-  font-optical-sizing: auto;
 }
 
 @utility typography-code-inline {
@@ -154,5 +138,4 @@
   font-weight: var(--nx-typography-weight-semibold);
   line-height: normal;
   letter-spacing: 0px;
-  font-optical-sizing: auto;
 }

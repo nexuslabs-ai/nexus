@@ -25,6 +25,9 @@ const BRANDS = [
 ] as const;
 
 const TOKEN_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova'] as const;
+// Typography dropped its byte-duplicate lyra/mira modes (PR #157); their theme
+// CSS no longer exists, so the Typography select offers only the 3 real modes.
+const TYPOGRAPHY_MODES = ['nova', 'vega', 'maia'] as const;
 const RADIUS_MODES = ['blunt', 'sharp', 'subtle', 'smooth', 'mellow'] as const;
 const ICON_LIBRARIES = ['tabler', 'lucide', 'phosphor'] as const;
 
@@ -260,7 +263,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
               id="typography-select"
               label="Typography"
               value={theme.typography}
-              options={TOKEN_MODES}
+              options={TYPOGRAPHY_MODES}
               onChange={(v) => setTheme((t) => ({ ...t, typography: v }))}
             />
             <TokenSelect

@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect } from 'storybook/test';
 
 import typographyMaia from '../../../core/tokens/primitives/typography/typography-maia.json';
 import typographyNova from '../../../core/tokens/primitives/typography/typography-nova.json';
 import typographyVega from '../../../core/tokens/primitives/typography/typography-vega.json';
+import typographyStyles from '../../../core/tokens/styles/typography.json';
 
 const BUNDLED_TYPOGRAPHY_MODE = 'vega';
 
@@ -132,7 +134,7 @@ const COMPOSITE_UTILITIES: {
       { cls: 'nx:typography-label-large', sample: 'Label Large' },
       { cls: 'nx:typography-label-default', sample: 'Label Default' },
       { cls: 'nx:typography-label-small', sample: 'Label Small' },
-      { cls: 'nx:typography-label-caps', sample: 'Label Caps' },
+      { cls: 'nx:typography-label-caps', sample: 'LABEL CAPS' },
     ],
   },
   {
@@ -146,6 +148,23 @@ const COMPOSITE_UTILITIES: {
     ],
   },
 ];
+
+// The literal class strings above can't be derived (Tailwind's content scanner
+// only emits @utility classes referenced as static literals — v4 tree-shakes the
+// rest), so they're a hand-maintained parallel to the typography.json source of
+// truth. Derive the expected set from that source and assert parity in the
+// CompositeUtilities play function below, so a token add/rename can't silently
+// desync the specimen.
+const EXPECTED_UTILITY_CLASSES = Object.entries(
+  typographyStyles as Record<string, Record<string, unknown>>
+)
+  .filter(([tier]) => !tier.startsWith('$'))
+  .flatMap(([tier, group]) =>
+    Object.keys(group)
+      .filter((name) => !name.startsWith('$'))
+      .map((name) => `nx:typography-${tier}-${name}`)
+  )
+  .sort();
 
 const SCALE_SAMPLE = 'Aa Bb 12';
 const WEIGHT_SAMPLE = 'The quick brown fox';
@@ -424,10 +443,10 @@ export const CompositeUtilities: Story = {
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
           The 17 ready-to-use `nx:typography-*` classes — each bundles
-          font-family, size, weight, line-height, letter-spacing, and
-          `font-optical-sizing: auto` (body tiers also get `text-wrap: pretty`).
-          Prefer these over composing raw size/weight utilities so a mode switch
-          propagates everywhere. Rendered in the bundled mode (vega).
+          font-family, size, weight, line-height, and letter-spacing (body tiers
+          also get `text-wrap: pretty`). Prefer these over composing raw
+          size/weight utilities so a mode switch propagates everywhere. Rendered
+          in the bundled mode (vega).
         </p>
       </div>
       {COMPOSITE_UTILITIES.map(({ group, items }) => (
@@ -452,4 +471,11 @@ export const CompositeUtilities: Story = {
       ))}
     </div>
   ),
+  // Lock the hand-maintained literal list to the typography.json source of truth.
+  play: async () => {
+    const rendered = COMPOSITE_UTILITIES.flatMap((g) =>
+      g.items.map((i) => i.cls)
+    ).sort();
+    await expect(rendered).toEqual(EXPECTED_UTILITY_CLASSES);
+  },
 };

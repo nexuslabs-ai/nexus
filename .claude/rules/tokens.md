@@ -253,7 +253,7 @@ The generation scripts (`generate-tailwind-package.js`, `generate-modular.js`) r
 
 ### Variable-font axes
 
-The `weights` array drives variable-font loading. Listing the full ramp (`[100, 200, …, 900]`, as the typography modes do for Inter) requests Inter's variable `wght` axis from Google Fonts as a single payload, not nine static cuts. The `opsz` (optical-size) axis is activated separately at the utility layer — every `typography-*` `@utility` emits `font-optical-sizing: auto` (see [Typography Utilities](#typography-utilities)), so any loaded variable font with an `opsz` axis (Inter has one) adapts its letterforms to the rendered size. No `variableAxes` field is needed in the token JSON: axis support follows from the `weights` array plus the emitted `font-optical-sizing` — adding an unconsumed field would be dead data.
+The `weights` array drives variable-font loading. Listing the full ramp (`[100, 200, …, 900]`, as the typography modes do for Inter) requests Inter's variable `wght` axis from Google Fonts as a single payload, not nine static cuts. **Only `wght` is requested.** Inter also ships an `opsz` (optical-size) axis, but Google Fonts serves only the axes named in the request URL (`Inter:wght@…`), so `opsz` is never delivered and optical sizing stays inactive. The utilities therefore do **not** emit `font-optical-sizing: auto` — with no `opsz` axis loaded it is a no-op, and `auto` is the CSS initial value besides. Activating optical sizing would mean requesting the axis in the import (`Inter:opsz,wght@…`); there is no `variableAxes` / `opsz` field in the token JSON because nothing consumes one today.
 
 ## Generation Workflow
 
@@ -285,6 +285,8 @@ Available options:
 - **Radius**: blunt, sharp, subtle, smooth, mellow
 - **Border Width**: vega, lyra, maia, mira, nova
 
+> **Mode distinctness varies by axis.** A mode listed above means the CLI flag is accepted — not that it resolves to unique values. `shadow` is genuinely distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `size` and `borderwidth` still expose five flags, but several are byte-identical copies of `vega` (`size-mira` = `size-vega`; `borderwidth-lyra` = `borderwidth-mira` = `borderwidth-vega`) — the flag resolves, it just yields the same tokens. Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
+
 ## CSS Variable Naming
 
 | Type             | Pattern                  | Example                              |
@@ -295,7 +297,7 @@ Available options:
 
 ## Typography Utilities
 
-Typography composite tokens (defined in `tokens/styles/typography.json`) generate `@utility` classes with the `typography-*` prefix. The generator emits `font-optical-sizing: auto` on **every** utility — activating the variable-font `opsz` axis where the font has one (Inter does; JetBrains Mono doesn't, where it is a harmless no-op) — plus `text-wrap: pretty` on the **body tier only** (orphan/widow protection for multi-line copy):
+Typography composite tokens (defined in `tokens/styles/typography.json`) generate `@utility` classes with the `typography-*` prefix. The generator emits `text-wrap: pretty` on the **body tier only** (orphan/widow protection for multi-line copy):
 
 ```css
 @utility typography-body-default {
@@ -304,7 +306,6 @@ Typography composite tokens (defined in `tokens/styles/typography.json`) generat
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-base);
   letter-spacing: var(--nx-typography-letterspacing-normal);
-  font-optical-sizing: auto;
   text-wrap: pretty;
 }
 ```
