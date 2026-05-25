@@ -21,6 +21,8 @@ export default tseslint.config(
       '**/storybook-static/**',
       '**/build/**',
       '**/out/**',
+      // Untracked git worktree copies (full-repo clones) under .claude — never lint them.
+      '**/.claude/worktrees/**',
     ],
   },
 

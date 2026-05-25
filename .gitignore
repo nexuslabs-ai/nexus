@@ -49,6 +49,7 @@ debug-storybook.log
 .claude/settings.local.json
 .claude/scheduled_tasks.json
 .claude/scheduled_tasks.lock
+.claude/worktrees/
 CLAUDE.local.md
 **/CLAUDE.local.md
 
