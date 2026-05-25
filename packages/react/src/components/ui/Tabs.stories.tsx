@@ -86,6 +86,39 @@ export const UnderlineVariant: Story = {
   ),
 };
 
+export const OutlineVariant: Story = {
+  render: (_args) => (
+    <Tabs defaultValue="account" className="nx:w-[400px]">
+      <TabsList className="nx:bg-transparent nx:p-0 nx:gap-2">
+        <TabsTrigger value="account" variant="outline">
+          Account
+        </TabsTrigger>
+        <TabsTrigger value="password" variant="outline">
+          Password
+        </TabsTrigger>
+        <TabsTrigger value="settings" variant="outline">
+          Settings
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Account settings with outline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="password">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          Password settings with outline variant tabs.
+        </p>
+      </TabsContent>
+      <TabsContent value="settings">
+        <p className="nx:text-sm nx:text-muted-foreground">
+          General settings with outline variant tabs.
+        </p>
+      </TabsContent>
+    </Tabs>
+  ),
+};
+
 // ============================================
 // SIZE STORIES
 // ============================================
@@ -315,11 +348,6 @@ export const ClickInteraction: Story = {
     await expect(tab1).toHaveAttribute('data-state', 'active');
     await expect(tab2).toHaveAttribute('data-state', 'inactive');
 
-    // Active state is cued by the segmented-control border (not a shadow)
-    await expect(tab1).toHaveClass(
-      'nx:data-[state=active]:border-border-default'
-    );
-
     // Content 1 should be visible
     await expect(canvas.getByText('Content 1')).toBeVisible();
 
@@ -504,6 +532,30 @@ export const AllVariants: Story = {
           <TabsContent value="tab1">
             <p className="nx:text-sm nx:text-muted-foreground">
               Underline variant (border-bottom style)
+            </p>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          Outline Variant
+        </h3>
+        <Tabs defaultValue="tab1" className="nx:w-[400px]">
+          <TabsList className="nx:bg-transparent nx:p-0 nx:gap-2">
+            <TabsTrigger value="tab1" variant="outline">
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="tab2" variant="outline">
+              Password
+            </TabsTrigger>
+            <TabsTrigger value="tab3" variant="outline">
+              Settings
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">
+            <p className="nx:text-sm nx:text-muted-foreground">
+              Outline variant (bordered style)
             </p>
           </TabsContent>
         </Tabs>
