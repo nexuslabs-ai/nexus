@@ -27,7 +27,7 @@ Optional properties: `$description`, `$extensions`
 
 ### Routing modes
 
-**Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/scripts/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `clampChroma(color, 'oklch', 'p3')` so shades ship at their full chroma up to the Display P3 boundary; only the over-P3 excess clips. The build warns when post-clamp chroma drops by more than 20% (rare under P3 — flags the cases worth a designer's eye). Hue is preserved from the hex.
+**Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/src/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `clampChroma(color, 'oklch', 'p3')` so shades ship at their full chroma up to the Display P3 boundary; only the over-P3 excess clips. The build warns when post-clamp chroma drops by more than 20% (rare under P3 — flags the cases worth a designer's eye). Hue is preserved from the hex.
 
 **Mechanical** — applies to everything else: white, black, the alpha shades (`a50`–`a950`, 8-digit hex), and any one-off value whose last path segment isn't a palette shade key. Straight hex→oklch via culori; alpha is preserved from 8-digit hex.
 
@@ -56,7 +56,7 @@ E.g. `slate` (950 = `#020617`) yields `slate.a50` = `#0206170a` and `slate.a500`
 
 ### Warning for designers
 
-When you pick a hex in Figma for a palette shade, only the **hue and chroma** of that hex flow through to the generated CSS. The **L is overwritten by the grid**. A vivid `#ff0000` and a dark `#400000` at the same shade key produce identical lightness — only the hue and chroma differ. To change the lightness of a shade, edit `packages/core/scripts/lib/perceptual-grid.json` — the JSON hex is not the right lever.
+When you pick a hex in Figma for a palette shade, only the **hue and chroma** of that hex flow through to the generated CSS. The **L is overwritten by the grid**. A vivid `#ff0000` and a dark `#400000` at the same shade key produce identical lightness — only the hue and chroma differ. To change the lightness of a shade, edit `packages/core/src/lib/perceptual-grid.json` — the JSON hex is not the right lever.
 
 ### DTCG deviation
 
