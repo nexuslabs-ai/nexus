@@ -193,6 +193,7 @@ Each brand/status group has: `background`, `background-hover`, `background-activ
 
 - [surfaces.md](surfaces.md) — the 5-level surface contract these tokens compose (canvas / muted / container / popover / nav), elevation grammar, and known overlaps.
 - [color-shades.md](color-shades.md) — what each 50 → 950 shade is for, per mode.
+- [components.md § Layering model](components.md#layering-model) — the z-index token scale (`--z-index-*`) and stacking contract.
 
 ### Data viz tokens
 

@@ -54,3 +54,4 @@ These collisions are intentional — they fall out of the luminance grammar. The
 - [color-shades.md](color-shades.md) — what each 50→950 shade is for
 - [tokens.md](tokens.md) — pipeline, OKLCH conversion, APCA gate
 - [shadcn-divergences.md](shadcn-divergences.md) — shadcn → Nexus token mapping
+- [components.md § Layering model](components.md#layering-model) — z-index / stacking order, the structural axis paired with this file's elevation/shadow contract
