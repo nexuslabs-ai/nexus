@@ -70,7 +70,7 @@ When working on infrastructure or tooling:
 **The Right Process:**
 
 1. **Understand the system** — Read existing configs, understand the flow
-2. **Test changes safely** — Use feature flags, staged rollouts, dry-run modes
+2. **Test changes safely** — Use dry-run modes and reversible, incremental changes
 3. **Document decisions** — Future you will thank present you
 4. **Ask when unsure** — Infrastructure mistakes are expensive to fix
 

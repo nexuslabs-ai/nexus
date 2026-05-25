@@ -305,7 +305,7 @@ Grep(pattern: "require\\(['\"]package-name", glob: "**/*.{js,ts}")
 **Impacted files:**
 | File | Line | Impact |
 |------|------|--------|
-| `packages/react/src/components/modal.tsx` | 12 | Uses deprecated `open` prop |
+| `packages/react/src/components/ui/dialog.tsx` | 12 | Uses deprecated `open` prop |
 ```
 
 **If no files are impacted by breaking changes:**
