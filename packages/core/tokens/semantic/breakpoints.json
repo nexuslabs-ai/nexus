@@ -14,7 +14,7 @@
       "unit": "rem"
     },
     "$type": "dimension",
-    "$description": "768px @ 16px root — narrow."
+    "$description": "768px @ 16px root — compact."
   },
   "breakpoint-lg": {
     "$value": {

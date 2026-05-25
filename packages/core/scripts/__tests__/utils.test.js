@@ -511,5 +511,14 @@ describe('utils', () => {
         }
       );
     });
+
+    it('throws (naming the token) when a dimension token is missing its $value', () => {
+      withBreakpointsFixture(
+        { 'breakpoint-lg': { $type: 'dimension' } },
+        (dir) => {
+          expect(() => collectBreakpointsTokens(dir)).toThrow(/breakpoint-lg/);
+        }
+      );
+    });
   });
 });
