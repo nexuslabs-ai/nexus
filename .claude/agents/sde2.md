@@ -7,7 +7,6 @@ permissionMode: bypassPermissions
 skills:
   - pr-review-guide
   - pr-review-follow-up
-  - frontend-design
 ---
 
 # SDE2 Agent
