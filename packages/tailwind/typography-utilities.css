@@ -29,7 +29,7 @@
   font-size: var(--nx-typography-size-3xl);
   font-weight: var(--nx-typography-weight-semibold);
   line-height: var(--nx-typography-line-height-3xl);
-  letter-spacing: var(--nx-typography-letterspacing-normal);
+  letter-spacing: var(--nx-typography-letterspacing-tight);
 }
 
 @utility typography-heading-medium {
@@ -62,6 +62,7 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-lg);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  text-wrap: pretty;
 }
 
 @utility typography-body-default {
@@ -70,6 +71,7 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-base);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  text-wrap: pretty;
 }
 
 @utility typography-body-small {
@@ -78,6 +80,7 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-sm);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  text-wrap: pretty;
 }
 
 @utility typography-body-xsmall {
@@ -86,6 +89,7 @@
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-xs);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  text-wrap: pretty;
 }
 
 @utility typography-label-large {

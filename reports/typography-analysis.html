@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Typography — Analysis &amp; Next Steps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-muted: #f8fafc;
+      --bg-sunk: #f1f5f9;
+      --fg: #0f172a;
+      --fg-muted: #475569;
+      --fg-subtle: #94a3b8;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --accent: #0f172a;
+      --good: #047857;
+      --good-bg: #ecfdf5;
+      --warn: #b45309;
+      --warn-bg: #fffbeb;
+      --bad: #b91c1c;
+      --bad-bg: #fef2f2;
+      --info: #1e40af;
+      --info-bg: #eff6ff;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      letter-spacing: -0.005em;
+      font-optical-sizing: auto;
+      text-wrap: pretty;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 64px 32px 96px;
+    }
+
+    /* ----- header ----- */
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 44px;
+      line-height: 1.1;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      margin: 0 0 16px;
+    }
+    .lede {
+      font-size: 18px;
+      line-height: 1.55;
+      color: var(--fg-muted);
+      max-width: 720px;
+      margin: 0 0 8px;
+    }
+    .source-line {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--fg-subtle);
+      margin-top: 24px;
+    }
+
+    /* ----- sections ----- */
+    section { margin-top: 72px; }
+    h2 {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: var(--mono);
+      color: var(--fg-subtle);
+      margin: 0 0 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 {
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin: 0 0 12px;
+    }
+    .section-intro {
+      font-size: 16px;
+      color: var(--fg-muted);
+      max-width: 720px;
+      margin: 0 0 32px;
+    }
+
+    /* ----- compare cards (claim vs reality) ----- */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      background: var(--bg);
+    }
+    .card-claim { background: var(--bad-bg); border-color: rgba(185, 28, 28, 0.18); }
+    .card-reality { background: var(--good-bg); border-color: rgba(4, 120, 87, 0.18); }
+
+    .card-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .card-claim .card-label { color: var(--bad); }
+    .card-reality .card-label { color: var(--good); }
+    .card h4 {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      letter-spacing: -0.01em;
+    }
+    .card p {
+      font-size: 14px;
+      color: var(--fg-muted);
+      margin: 0 0 12px;
+    }
+    .card-evidence {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: rgba(15, 23, 42, 0.04);
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin-top: 12px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+    .strike { text-decoration: line-through; color: var(--fg-subtle); }
+
+    /* ----- 5-mode visual ----- */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+    @media (max-width: 720px) { .mode-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .mode-file {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      background: var(--bg);
+      position: relative;
+    }
+    .mode-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--fg-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .mode-size {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .mode-size-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--fg-subtle);
+      margin-top: 4px;
+    }
+    .mode-file.canonical {
+      border-color: var(--border-strong);
+      background: var(--bg-muted);
+    }
+    .mode-file .copy-mark {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--bad);
+      background: var(--bad-bg);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .mode-file .canon-mark {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--fg-muted);
+      background: var(--bg-sunk);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .diff-result {
+      margin-top: 16px;
+      padding: 16px 20px;
+      background: var(--bg-sunk);
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .diff-result .row { display: flex; justify-content: space-between; gap: 24px; }
+    .diff-result .check { color: var(--bad); font-weight: 600; }
+
+    /* ----- 17 utilities specimen ----- */
+    .specimen-table {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .specimen-row {
+      display: grid;
+      grid-template-columns: 220px 1fr 80px;
+      gap: 24px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      align-items: baseline;
+    }
+    .specimen-row:last-child { border-bottom: none; }
+    .specimen-row:nth-child(even) { background: var(--bg-muted); }
+    .specimen-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg-muted);
+    }
+    .specimen-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--fg-subtle);
+      text-align: right;
+    }
+
+    /* the live typography utilities (vega values) */
+    .t-display-large {
+      font-family: 'Inter', sans-serif; font-size: 60px; font-weight: 300;
+      line-height: 60px; letter-spacing: -0.4px;
+    }
+    .t-display-medium {
+      font-family: 'Inter', sans-serif; font-size: 48px; font-weight: 400;
+      line-height: 48px; letter-spacing: -0.4px;
+    }
+    .t-heading-xlarge {
+      font-family: 'Inter', sans-serif; font-size: 36px; font-weight: 600;
+      line-height: 48px; letter-spacing: -0.4px;
+    }
+    .t-heading-large {
+      font-family: 'Inter', sans-serif; font-size: 30px; font-weight: 600;
+      line-height: 36px; letter-spacing: 0;
+    }
+    .t-heading-medium {
+      font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600;
+      line-height: 32px; letter-spacing: 0;
+    }
+    .t-heading-small {
+      font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600;
+      line-height: 28px; letter-spacing: 0;
+    }
+    .t-heading-xsmall {
+      font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600;
+      line-height: 28px; letter-spacing: 0;
+    }
+    .t-body-large {
+      font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 400;
+      line-height: 28px; letter-spacing: 0;
+    }
+    .t-body-default {
+      font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 400;
+      line-height: 24px; letter-spacing: 0;
+    }
+    .t-body-small {
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400;
+      line-height: 20px; letter-spacing: 0;
+    }
+    .t-body-xsmall {
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400;
+      line-height: 16px; letter-spacing: 0;
+    }
+    .t-label-large {
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+      line-height: 20px; letter-spacing: 0;
+    }
+    .t-label-default {
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
+      line-height: 20px; letter-spacing: 0;
+    }
+    .t-label-small {
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+      line-height: 16px; letter-spacing: 0;
+    }
+    .t-label-caps {
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+      line-height: 16px; letter-spacing: 0.8px; text-transform: uppercase;
+    }
+    .t-code-block {
+      font-family: var(--mono); font-size: 14px; font-weight: 400;
+      line-height: 20px; letter-spacing: 0;
+    }
+    .t-code-inline {
+      font-family: var(--mono); font-size: 14px; font-weight: 600;
+      line-height: normal; letter-spacing: 0;
+    }
+
+    /* tier markers next to each row */
+    .tier-display { color: var(--info); }
+    .tier-heading { color: var(--fg-muted); }
+    .tier-body { color: var(--fg-muted); }
+    .tier-label { color: var(--fg-muted); }
+    .tier-code { color: var(--good); }
+
+    /* spacing gauge in the specimen meta */
+    .ls-tight { background: var(--warn-bg); color: var(--warn); padding: 1px 5px; border-radius: 3px; }
+    .ls-normal { background: var(--bg-sunk); color: var(--fg-muted); padding: 1px 5px; border-radius: 3px; }
+    .ls-wider { background: var(--info-bg); color: var(--info); padding: 1px 5px; border-radius: 3px; }
+
+    /* ----- gap matrix ----- */
+    .gap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .gap-table thead th {
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .gap-table tbody td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .gap-table tbody tr:last-child td { border-bottom: none; }
+    .gap-table .gap-num {
+      font-family: var(--mono);
+      color: var(--fg-subtle);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .gap-table .gap-title {
+      font-weight: 600;
+      letter-spacing: -0.005em;
+    }
+    .gap-table .gap-desc {
+      color: var(--fg-muted);
+      margin-top: 4px;
+      font-size: 13px;
+    }
+    .gap-table code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg-sunk);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .pill {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .pill-missing { background: var(--bad-bg); color: var(--bad); }
+    .pill-partial { background: var(--warn-bg); color: var(--warn); }
+    .pill-cosmetic { background: var(--info-bg); color: var(--info); }
+    .pill-strategic { background: var(--bg-sunk); color: var(--fg-muted); }
+
+    /* ----- steps ----- */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .step {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 80px 1fr 180px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 720px) { .step { grid-template-columns: 1fr; } }
+    .step-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--fg-subtle);
+      text-transform: uppercase;
+    }
+    .step-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .step-body {
+      font-size: 14px;
+      color: var(--fg-muted);
+      line-height: 1.55;
+    }
+    .step-body code {
+      font-family: var(--mono); font-size: 12px;
+      background: var(--bg-sunk); padding: 1px 5px; border-radius: 3px;
+    }
+    .step-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    @media (max-width: 720px) { .step-meta { align-items: flex-start; } }
+    .meta-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+    .meta-label { color: var(--fg-subtle); }
+
+    .step-flagged { border-color: rgba(180, 83, 9, 0.3); background: rgba(255, 251, 235, 0.4); }
+
+    /* ----- closing judgment ----- */
+    .judgment {
+      margin-top: 72px;
+      padding: 32px;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .judgment h3 { margin-bottom: 16px; }
+    .judgment p {
+      font-size: 16px;
+      color: var(--fg-muted);
+      line-height: 1.6;
+      margin: 0 0 12px;
+      max-width: 760px;
+    }
+    .judgment .key {
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--fg-subtle);
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ HERO ============ -->
+  <div class="eyebrow">03.1 · Tokens · Typography</div>
+  <h1>Three real modes, two duplicates pretending.<br/>Seventeen utilities, none with <code style="font-family:var(--mono); font-size:0.85em; background:var(--bg-sunk); padding:2px 8px; border-radius:4px;">font-optical-sizing</code>.</h1>
+  <p class="lede">The intelligence report's typography section is mostly right about the modes — the actual gap is narrower and the polish work survives. The strategic question now: what should <code style="font-family:var(--mono); font-size:0.85em; background:var(--bg-sunk); padding:2px 8px; border-radius:4px;">lyra</code> and <code style="font-family:var(--mono); font-size:0.85em; background:var(--bg-sunk); padding:2px 8px; border-radius:4px;">mira</code> become?</p>
+  <div class="source-line">Verified against <span style="color:var(--fg-muted)">packages/core/tokens/primitives/typography/</span> &amp; <span style="color:var(--fg-muted)">packages/tailwind/typography-utilities.css</span> · 2026-05-25</div>
+
+
+  <!-- ============ SECTION 1: ONE CORRECTION, ONE CONFIRMATION ============ -->
+  <section>
+    <h2>1 · What the report got right and wrong</h2>
+    <h3>Modes: report correct. Headings: report wrong.</h3>
+    <p class="section-intro">The intelligence report had two structural claims. Verifying both against the actual code: one holds up exactly, one doesn't.</p>
+
+    <div class="compare-grid">
+
+      <!-- claim 1 — report was right -->
+      <div class="card card-reality">
+        <div class="card-label">Report claim · #1 · holds up</div>
+        <h4>"5 modes resolve to 3 effective variants"</h4>
+        <p>nova/vega/maia differ by exactly ±1px on every step of the 13-step size scale. lyra and mira are byte-copies of vega.</p>
+        <div class="card-evidence">$ md5 typography-*.json<br/>nova   de0b292…  ← distinct<br/>vega   1324d13…  ← canonical<br/>lyra   dcc01af…  = vega values<br/>mira   174201…   = vega values<br/>maia   5732e7…   ← distinct</div>
+      </div>
+
+      <div class="card card-reality">
+        <div class="card-label">Reality · #1 · confirmed</div>
+        <h4>nova / vega / maia form a clean ±1px scaffold</h4>
+        <p>Across all 13 steps: nova = vega − 1px, maia = vega + 1px. Not approximate noise — a deliberate density triplet that maps cleanly to tool / product / editorial archetypes.</p>
+        <div class="card-evidence">step   nova  vega  maia<br/>xs     11    12    13<br/>base   15    16    17<br/>2xl    23    24    25<br/>5xl    47    48    49<br/>9xl    127   128   129</div>
+      </div>
+
+      <!-- claim 2 — report was wrong -->
+      <div class="card card-claim">
+        <div class="card-label">Report claim · #2 · wrong</div>
+        <h4>"No heading composite utilities exist"</h4>
+        <p>"Every heading requires composing raw Tailwind size + weight + line-height + letter-spacing manually — losing the coordinated behavior baked into the utility."</p>
+        <div class="card-evidence">// claim — missing<br/>typography-heading-sm<br/>typography-heading-md<br/>typography-heading-lg ...</div>
+      </div>
+
+      <div class="card card-reality">
+        <div class="card-label">Reality · #2</div>
+        <h4>17 composite utilities ship, including 7 heading/display tiers</h4>
+        <p>display-large, display-medium, heading-xlarge, heading-large, heading-medium, heading-small, heading-xsmall — all present in <code style="font-family:var(--mono); font-size:12px; background:rgba(15,23,42,0.05); padding:1px 5px; border-radius:3px;">typography-utilities.css</code>.</p>
+        <div class="card-evidence">$ grep "@utility typography" \<br/>&nbsp;&nbsp;&nbsp;&nbsp;typography-utilities.css | wc -l<br/><span style="color:var(--good); font-weight:600">17</span></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ SECTION 2: THE MODE LANDSCAPE ============ -->
+  <section>
+    <h2>2 · The mode landscape</h2>
+    <h3>3 real archetypes + 2 empty slots</h3>
+    <p class="section-intro">The triplet nova / vega / maia is a legitimate density scaffold — pick the one that matches your product type. lyra and mira are byte-copies of vega with no defined identity.</p>
+
+    <div class="mode-grid">
+      <div class="mode-file" style="border-color:var(--border-strong); background:var(--bg);">
+        <span class="canon-mark" style="color:var(--info); background:var(--info-bg);">tool</span>
+        <div class="mode-name">nova</div>
+        <div class="mode-size">15px</div>
+        <div class="mode-size-label">base · −1px scale</div>
+      </div>
+      <div class="mode-file canonical">
+        <span class="canon-mark">product ★</span>
+        <div class="mode-name">vega</div>
+        <div class="mode-size">16px</div>
+        <div class="mode-size-label">base · canonical</div>
+      </div>
+      <div class="mode-file" style="border-color:var(--border-strong); background:var(--bg);">
+        <span class="canon-mark" style="color:var(--info); background:var(--info-bg);">editorial</span>
+        <div class="mode-name">maia</div>
+        <div class="mode-size">17px</div>
+        <div class="mode-size-label">base · +1px scale</div>
+      </div>
+      <div class="mode-file">
+        <span class="copy-mark">copy of vega</span>
+        <div class="mode-name">lyra</div>
+        <div class="mode-size">16px</div>
+        <div class="mode-size-label">no defined identity</div>
+      </div>
+      <div class="mode-file">
+        <span class="copy-mark">copy of vega</span>
+        <div class="mode-name">mira</div>
+        <div class="mode-size">16px</div>
+        <div class="mode-size-label">no defined identity</div>
+      </div>
+    </div>
+
+    <div class="diff-result">
+      <div class="row"><span style="color:var(--good); font-weight:600">nova / vega / maia ±1px across all 13 size steps</span><span style="color:var(--good); font-weight:600">distinct</span></div>
+      <div class="row"><span>md5 vega ↔ lyra</span><span class="check">identical bytes</span></div>
+      <div class="row"><span>md5 vega ↔ mira</span><span class="check">identical bytes</span></div>
+    </div>
+
+    <p style="margin-top:20px; color:var(--fg-muted); font-size:14px;">
+      A consumer who picks <code>--typography=lyra</code> or <code>--typography=mira</code> today gets exactly vega. Those two flags are no-ops; the other three are real.
+    </p>
+  </section>
+
+
+  <!-- ============ SECTION 3: SPECIMEN ============ -->
+  <section>
+    <h2>3 · What's actually shipped today</h2>
+    <h3>17 composite utilities, rendered live</h3>
+    <p class="section-intro">These render with vega's values — which is to say, with every mode's values. Note the inconsistent letter-spacing across the heading tiers (flagged in the right column).</p>
+
+    <div class="specimen-table">
+      <!-- Display tier -->
+      <div class="specimen-row">
+        <div class="specimen-name tier-display">typography-display-large</div>
+        <div class="t-display-large">Display L</div>
+        <div class="specimen-meta">60/light<br/><span class="ls-tight">tight</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-display">typography-display-medium</div>
+        <div class="t-display-medium">Display M</div>
+        <div class="specimen-meta">48/normal<br/><span class="ls-tight">tight</span></div>
+      </div>
+
+      <!-- Heading tier -->
+      <div class="specimen-row">
+        <div class="specimen-name tier-heading">typography-heading-xlarge</div>
+        <div class="t-heading-xlarge">Heading XL</div>
+        <div class="specimen-meta">36/semibold<br/><span class="ls-tight">tight</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-heading">typography-heading-large</div>
+        <div class="t-heading-large">Heading L</div>
+        <div class="specimen-meta">30/semibold<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-heading">typography-heading-medium</div>
+        <div class="t-heading-medium">Heading M</div>
+        <div class="specimen-meta">24/semibold<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-heading">typography-heading-small</div>
+        <div class="t-heading-small">Heading S</div>
+        <div class="specimen-meta">20/semibold<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-heading">typography-heading-xsmall</div>
+        <div class="t-heading-xsmall">Heading XS</div>
+        <div class="specimen-meta">18/semibold<br/><span class="ls-normal">normal</span></div>
+      </div>
+
+      <!-- Body tier -->
+      <div class="specimen-row">
+        <div class="specimen-name tier-body">typography-body-large</div>
+        <div class="t-body-large">The quick brown fox jumps over the lazy dog.</div>
+        <div class="specimen-meta">18/normal<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-body">typography-body-default</div>
+        <div class="t-body-default">The quick brown fox jumps over the lazy dog.</div>
+        <div class="specimen-meta">16/normal<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-body">typography-body-small</div>
+        <div class="t-body-small">The quick brown fox jumps over the lazy dog.</div>
+        <div class="specimen-meta">14/normal<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-body">typography-body-xsmall</div>
+        <div class="t-body-xsmall">The quick brown fox jumps over the lazy dog.</div>
+        <div class="specimen-meta">12/normal<br/><span class="ls-normal">normal</span></div>
+      </div>
+
+      <!-- Label tier -->
+      <div class="specimen-row">
+        <div class="specimen-name tier-label">typography-label-large</div>
+        <div class="t-label-large">Label Large</div>
+        <div class="specimen-meta">14/semibold<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-label">typography-label-default</div>
+        <div class="t-label-default">Label Default</div>
+        <div class="specimen-meta">14/medium<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-label">typography-label-small</div>
+        <div class="t-label-small">Label Small</div>
+        <div class="specimen-meta">12/medium<br/><span class="ls-normal">normal</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-label">typography-label-caps</div>
+        <div class="t-label-caps">Label Caps</div>
+        <div class="specimen-meta">12/semibold<br/><span class="ls-wider">wider</span></div>
+      </div>
+
+      <!-- Code tier -->
+      <div class="specimen-row">
+        <div class="specimen-name tier-code">typography-code-block</div>
+        <div class="t-code-block">const x = 42;</div>
+        <div class="specimen-meta">14/normal<br/><span class="ls-normal">0px</span></div>
+      </div>
+      <div class="specimen-row">
+        <div class="specimen-name tier-code">typography-code-inline</div>
+        <div class="t-code-inline">useState&lt;T&gt;()</div>
+        <div class="specimen-meta">14/semibold<br/><span class="ls-normal">0px</span></div>
+      </div>
+    </div>
+
+    <p style="margin-top:16px; color:var(--fg-muted); font-size:13px; font-family:var(--mono);">
+      <span style="color:var(--warn)">↗</span> Letter-spacing is <code style="font-family:var(--mono); font-size:12px;">tight</code> at the top (display + heading-xlarge) but drops to <code style="font-family:var(--mono); font-size:12px;">normal</code> for heading-large through heading-xsmall. The Radix-style "proportional letter-spacing per step" pattern is half-applied.
+    </p>
+  </section>
+
+
+  <!-- ============ SECTION 4: GAPS ============ -->
+  <section>
+    <h2>4 · Real gaps, restated</h2>
+    <h3>Once the report's wrong claims are stripped</h3>
+    <p class="section-intro">Seven concrete findings against the actual code. Sorted by severity.</p>
+
+    <table class="gap-table">
+      <thead>
+        <tr>
+          <th style="width:48px;"></th>
+          <th style="width:auto;">Gap</th>
+          <th style="width:120px;">Kind</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="gap-num">01</td>
+          <td>
+            <div class="gap-title">lyra and mira are vega in costume</div>
+            <div class="gap-desc">Two of the five mode files are byte-copies of <code>vega</code>, with no defined identity. <code>--typography=lyra</code> and <code>--typography=mira</code> are no-op CLI flags. nova / vega / maia themselves are fine — distinct ±1px scaffold across all 13 steps.</div>
+          </td>
+          <td><span class="pill pill-strategic">Strategic</span></td>
+        </tr>
+        <tr>
+          <td class="gap-num">02</td>
+          <td>
+            <div class="gap-title">Letter-spacing pattern is half-applied</div>
+            <div class="gap-desc">Display + heading-xlarge use <code>tight</code>. Heading-large through heading-xsmall use <code>normal</code>. Either commit to proportional spacing throughout the heading tiers, or revert display tier to <code>normal</code>. Don't leave it inconsistent.</div>
+          </td>
+          <td><span class="pill pill-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="gap-num">03</td>
+          <td>
+            <div class="gap-title">No <code>font-optical-sizing: auto</code> anywhere</div>
+            <div class="gap-desc">All 17 utilities. Inter v4 supports the opsz axis on Google Fonts. Single CSS property; zero bundle cost; activates sharper letterforms at small sizes and more open ones at display sizes.</div>
+          </td>
+          <td><span class="pill pill-missing">Missing</span></td>
+        </tr>
+        <tr>
+          <td class="gap-num">04</td>
+          <td>
+            <div class="gap-title">No <code>text-wrap: pretty</code> on body utilities</div>
+            <div class="gap-desc">Prevents typographic orphans on body-large / body-default. Modern-browser only but graceful. Zero bundle cost.</div>
+          </td>
+          <td><span class="pill pill-missing">Missing</span></td>
+        </tr>
+        <tr>
+          <td class="gap-num">05</td>
+          <td>
+            <div class="gap-title">Float-precision artifacts in letter-spacing JSON</div>
+            <div class="gap-desc">Values like <code>-0.800000011920929</code> and <code>0.4000000059604645</code> suggest a lossy round-trip through 32-bit floats. Should be clean (<code>-0.8</code>, <code>0.4</code>).</div>
+          </td>
+          <td><span class="pill pill-cosmetic">Cosmetic</span></td>
+        </tr>
+        <tr>
+          <td class="gap-num">06</td>
+          <td>
+            <div class="gap-title">No variable-font axis documentation</div>
+            <div class="gap-desc">Inter is requested with all 9 weights (which triggers a variable-font fetch from Google Fonts), but <code>nx-font-source</code> doesn't document <code>wght</code> or <code>opsz</code> support. This one the report got right.</div>
+          </td>
+          <td><span class="pill pill-missing">Missing</span></td>
+        </tr>
+        <tr>
+          <td class="gap-num">07</td>
+          <td>
+            <div class="gap-title">No mode → archetype mapping documented</div>
+            <div class="gap-desc">nova / vega / maia ARE real and map cleanly to tool / product / editorial — but the docs don't say so. A consumer who reads the JSON cannot derive the intent. Quick write-up; pure documentation work.</div>
+          </td>
+          <td><span class="pill pill-missing">Missing</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ============ SECTION 5: PLAN ============ -->
+  <section>
+    <h2>5 · Recommended sequence</h2>
+    <h3>One strategic call, then polish</h3>
+    <p class="section-intro">The only mode-shaped decision is what to do with lyra and mira. Everything else is bounded polish on already-shipped utilities.</p>
+
+    <div class="steps">
+
+      <!-- step 1 -->
+      <div class="step step-flagged">
+        <div class="step-num">Step 1</div>
+        <div>
+          <div class="step-title">Decide what lyra and mira become</div>
+          <div class="step-body">
+            <strong style="color:var(--fg)">(a) Give them a real differentiator.</strong> Different typeface (Geist Sans instead of Inter), different weight palette, different letter-spacing curve, or a different scale ratio (e.g., minor third vs perfect fourth between steps). Something that makes them not just "vega in costume."<br/><br/>
+            <strong style="color:var(--fg)">(b) Delete them.</strong> Free under <code>.claude/rules/project-stage.md</code> — pre-prod, no backcompat. Ship nova / vega / maia as the canonical three-archetype set with documentation. Reintroduce when there's a real brand decision behind them.<br/><br/>
+            <span style="color:var(--fg)">Lean (b).</span> Three real modes beat five fake ones; (a) is a multi-day exercise that needs design input. (b) is a single commit and unblocks Step 3 documentation.
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="meta-row"><span class="meta-label">Effort</span> (b) ≤ 30 min</div>
+          <div class="meta-row"><span class="meta-label">Effort</span> (a) Multi-day</div>
+        </div>
+      </div>
+
+      <!-- step 2 -->
+      <div class="step">
+        <div class="step-num">Step 2</div>
+        <div>
+          <div class="step-title">Polish pass on the already-shipped utilities</div>
+          <div class="step-body">
+            Add <code>font-optical-sizing: auto</code> to all 17 utilities.<br/>
+            Add <code>text-wrap: pretty</code> to body-* utilities.<br/>
+            Resolve letter-spacing inconsistency: commit to proportional <em>or</em> revert the display tier to <code>normal</code>.<br/>
+            Clean float-precision letter-spacing JSON (<code>-0.800000011920929</code> → <code>-0.8</code>).
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="meta-row"><span class="meta-label">Effort</span> ≤ 1 hour</div>
+          <div class="meta-row"><span class="meta-label">Risk</span> Very low</div>
+        </div>
+      </div>
+
+      <!-- step 3 -->
+      <div class="step">
+        <div class="step-num">Step 3</div>
+        <div>
+          <div class="step-title">Documentation</div>
+          <div class="step-body">
+            Mode → archetype guide: <code>nova</code> = dense tool (Figma/Linear-style), <code>vega</code> = standard product, <code>maia</code> = editorial/document (Notion-style).<br/>
+            Variable-font axis docs (<code>wght</code>, <code>opsz</code>) in <code>nx-font-source</code>.<br/>
+            Storybook specimen story showing all 17 utilities at vega, with mode-switch side-by-side comparison across nova / vega / maia.
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="meta-row"><span class="meta-label">Effort</span> 1 session</div>
+          <div class="meta-row"><span class="meta-label">Blocked by</span> Step 1</div>
+        </div>
+      </div>
+
+      <!-- defer -->
+      <div class="step" style="background:var(--bg-sunk); border-color:var(--border);">
+        <div class="step-num">Defer / Skip</div>
+        <div>
+          <div class="step-title">What the report says to do that doesn't survive</div>
+          <div class="step-body">
+            <strong style="color:var(--fg)">Rec #1 as written</strong> — "ship heading utilities" — they're already shipped. Only the polish bits (Step 2) survive.<br/><br/>
+            <strong style="color:var(--fg)">Role-based MD3/Spectrum aliases</strong> — existing utility names <em>are</em> already role-based (<code>label-default</code>, <code>body-default</code>, <code>heading-medium</code>). Aliases are duplication.
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="meta-row"><span class="meta-label">Action</span> None</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============ HEADLINE JUDGMENT ============ -->
+  <div class="judgment">
+    <h3>Headline judgment</h3>
+    <p>The report was <span class="key">right about the modes</span>: nova / vega / maia are three real density archetypes with a clean ±1px scaffold across every size step. Keep them. The honest scope of the "5 modes" critique is much narrower than I first wrote — it's about <span class="key">lyra and mira specifically</span>, both byte-copies of vega with no defined identity.</p>
+    <p>The report was <span class="key">wrong about heading utilities</span>. They're already shipped, all 7 tiers from display-large down to heading-xsmall. Rec #1 as written (add heading utilities) is solving a problem that doesn't exist; only the polish bits — <code>font-optical-sizing</code>, <code>text-wrap: pretty</code>, letter-spacing consistency — are net-new.</p>
+    <p>The single decision worth running first is <span class="key">Step 1</span>: either differentiate lyra/mira or delete them. Delete is a 30-minute commit; differentiate is a multi-day design exercise. Either is defensible — but leaving them as silent vega-copies is the worst of both worlds.</p>
+  </div>
+
+  <footer>
+    Verified against the repo on 2026-05-25 · packages/core/tokens/primitives/typography/ · packages/tailwind/typography-utilities.css
+  </footer>
+
+</div>
+</body>
+</html>

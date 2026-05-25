@@ -253,6 +253,10 @@ Example:
 
 The generation scripts (`generate-tailwind-package.js`, `generate-modular.js`) read these extensions and output `@import` statements for Google Fonts at the top of the generated CSS.
 
+### Variable-font axes
+
+The `weights` array drives variable-font loading. Listing the full ramp (`[100, 200, …, 900]`, as the typography modes do for Inter) requests Inter's variable `wght` axis from Google Fonts as a single payload, not nine static cuts. **Only `wght` is requested.** Inter also ships an `opsz` (optical-size) axis, but Google Fonts serves only the axes named in the request URL (`Inter:wght@…`), so `opsz` is never delivered and optical sizing stays inactive. The utilities therefore do **not** emit `font-optical-sizing: auto` — with no `opsz` axis loaded it is a no-op, and `auto` is the CSS initial value besides. Activating optical sizing would mean requesting the axis in the import (`Inter:opsz,wght@…`); there is no `variableAxes` / `opsz` field in the token JSON because nothing consumes one today.
+
 ## Generation Workflow
 
 After editing token files:
@@ -278,10 +282,12 @@ Available options:
 - **Base**: slate, neutral, zinc, gray, stone
 - **Brand**: blue, gray, neutral, slate, stone
 - **Size**: vega, lyra, maia, mira, nova
-- **Typography**: vega, lyra, maia, mira, nova
+- **Typography**: nova, vega, maia
 - **Shadow**: vega, lyra, maia, mira, nova
 - **Radius**: blunt, sharp, subtle, smooth, mellow
 - **Border Width**: vega, lyra, maia, mira, nova
+
+> **Mode distinctness varies by axis.** A mode listed above means the CLI flag is accepted — not that it resolves to unique values. `shadow` is genuinely distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `size` and `borderwidth` still expose five flags, but several are byte-identical copies of `vega` (`size-mira` = `size-vega`; `borderwidth-lyra` = `borderwidth-mira` = `borderwidth-vega`) — the flag resolves, it just yields the same tokens. Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
 
 ## CSS Variable Naming
 
@@ -293,7 +299,7 @@ Available options:
 
 ## Typography Utilities
 
-Typography composite tokens generate `@utility` classes with `typography-*` prefix:
+Typography composite tokens (defined in `tokens/styles/typography.json`) generate `@utility` classes with the `typography-*` prefix. The generator emits `text-wrap: pretty` on the **body tier only** (orphan/widow protection for multi-line copy):
 
 ```css
 @utility typography-body-default {
@@ -302,10 +308,36 @@ Typography composite tokens generate `@utility` classes with `typography-*` pref
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-base);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  text-wrap: pretty;
 }
 ```
 
 Usage: `nx:typography-body-default`, `nx:typography-heading-large`, etc.
+
+### The 17 composite utilities
+
+| Tier    | Utilities                                                                             | Weight            | Letter-spacing |
+| ------- | ------------------------------------------------------------------------------------- | ----------------- | -------------- |
+| Display | `display-large` (60px), `display-medium` (48px)                                       | light / normal    | tight          |
+| Heading | `heading-xlarge` (36px), `heading-large` (30px)                                       | semibold          | tight          |
+| Heading | `heading-medium` (24px), `heading-small` (20px), `heading-xsmall` (18px)              | semibold          | normal         |
+| Body    | `body-large` (18px), `body-default` (16px), `body-small` (14px), `body-xsmall` (12px) | normal            | normal         |
+| Label   | `label-large` / `label-default` / `label-small` (14/14/12px), `label-caps` (12px)     | semibold/medium   | normal / wider |
+| Code    | `code-block`, `code-inline` (14px, mono)                                              | normal / semibold | 0              |
+
+Letter-spacing is **proportional**: `tight` (−0.4px) on display + headings ≥ 30px, `normal` (0) at 24px and below — bigger type tightens, body-scale stays neutral. The token jumps straight from `tight` to `normal` (no intermediate step), so 30px is the threshold.
+
+### Typography modes → product archetypes
+
+Three typography modes ship, differing by a uniform **±1px on every step** of the 13-step size scale:
+
+| Mode     | Base | Archetype            | Use for                                                              |
+| -------- | ---- | -------------------- | -------------------------------------------------------------------- |
+| `nova`   | 15px | Tool / dense         | Developer tools, dashboards, data-heavy UIs (Figma / Linear density) |
+| `vega` ★ | 16px | Standard product     | SaaS, consumer apps — the recommended default and bundled mode       |
+| `maia`   | 17px | Editorial / document | Reading-focused UIs, document editors (Notion density)               |
+
+Select via the `--typography` CLI flag (see [Theme Selection](#theme-selection)). All three currently share the Inter / Georgia / JetBrains Mono families — they differ by scale only. Two former modes (`lyra`, `mira`) were byte-duplicates of `vega` and were removed; reintroduce them only with a real typeface or scale-ratio decision behind them.
 
 ## Do Not
 
