@@ -153,7 +153,7 @@ Agent(
   - Deprecated or incorrect library API usage (Zod, Next.js, etc.)
   - Error handling completeness
   - Redundant or overly complex code patterns
-  - Naming and readability for the target audience (design students)
+  - Naming and readability for the target audience (design-system maintainers)
   - Edge cases and potential runtime bugs
 
   ## Out of Scope for You
@@ -411,7 +411,7 @@ Agent(
   - Deprecated or incorrect library API usage (Zod, Next.js, etc.)
   - Error handling completeness
   - Redundant or overly complex code patterns
-  - Naming and readability for the target audience (design students)
+  - Naming and readability for the target audience (design-system maintainers)
   - Edge cases and potential runtime bugs
 
   ## Output Caps (strict — enforced; see pr-review-follow-up skill for full rules)

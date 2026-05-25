@@ -253,8 +253,8 @@ When a reflex fires and you're not certain of the spec, open the linked rule fil
 Run after completing:
 
 ```bash
-npm run typecheck
-npm run lint
+yarn typecheck
+yarn lint
 ```
 
 Fix all errors before presenting your summary.

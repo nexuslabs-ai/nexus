@@ -99,7 +99,7 @@ Do **not** wait for explicit approval. The plan is a preview so the user can int
 
 ## Part 2: Fixing
 
-After user approves the analysis, fix all issues.
+After emitting the plan, fix all issues.
 
 ### Fix Process
 
@@ -130,8 +130,8 @@ Two reflexes specific to fixing:
 1. **Run checks:**
 
    ```bash
-   npm run typecheck
-   npm run lint
+   yarn typecheck
+   yarn lint
    ```
 
 2. **Review against original comments:**
