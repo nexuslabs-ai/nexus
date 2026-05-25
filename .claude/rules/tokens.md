@@ -251,6 +251,10 @@ Example:
 
 The generation scripts (`generate-tailwind-package.js`, `generate-modular.js`) read these extensions and output `@import` statements for Google Fonts at the top of the generated CSS.
 
+### Variable-font axes
+
+The `weights` array drives variable-font loading. Listing the full ramp (`[100, 200, …, 900]`, as the typography modes do for Inter) requests Inter's variable `wght` axis from Google Fonts as a single payload, not nine static cuts. The `opsz` (optical-size) axis is activated separately at the utility layer — every `typography-*` `@utility` emits `font-optical-sizing: auto` (see [Typography Utilities](#typography-utilities)), so any loaded variable font with an `opsz` axis (Inter has one) adapts its letterforms to the rendered size. No `variableAxes` field is needed in the token JSON: axis support follows from the `weights` array plus the emitted `font-optical-sizing` — adding an unconsumed field would be dead data.
+
 ## Generation Workflow
 
 After editing token files:
@@ -276,7 +280,7 @@ Available options:
 - **Base**: slate, neutral, zinc, gray, stone
 - **Brand**: blue, gray, neutral, slate, stone
 - **Size**: vega, lyra, maia, mira, nova
-- **Typography**: vega, lyra, maia, mira, nova
+- **Typography**: nova, vega, maia
 - **Shadow**: vega, lyra, maia, mira, nova
 - **Radius**: blunt, sharp, subtle, smooth, mellow
 - **Border Width**: vega, lyra, maia, mira, nova
@@ -291,7 +295,7 @@ Available options:
 
 ## Typography Utilities
 
-Typography composite tokens generate `@utility` classes with `typography-*` prefix:
+Typography composite tokens (defined in `tokens/styles/typography.json`) generate `@utility` classes with the `typography-*` prefix. The generator emits `font-optical-sizing: auto` on **every** utility — activating the variable-font `opsz` axis where the font has one (Inter does; JetBrains Mono doesn't, where it is a harmless no-op) — plus `text-wrap: pretty` on the **body tier only** (orphan/widow protection for multi-line copy):
 
 ```css
 @utility typography-body-default {
@@ -300,10 +304,37 @@ Typography composite tokens generate `@utility` classes with `typography-*` pref
   font-weight: var(--nx-typography-weight-normal);
   line-height: var(--nx-typography-line-height-base);
   letter-spacing: var(--nx-typography-letterspacing-normal);
+  font-optical-sizing: auto;
+  text-wrap: pretty;
 }
 ```
 
 Usage: `nx:typography-body-default`, `nx:typography-heading-large`, etc.
+
+### The 17 composite utilities
+
+| Tier    | Utilities                                                                             | Weight            | Letter-spacing |
+| ------- | ------------------------------------------------------------------------------------- | ----------------- | -------------- |
+| Display | `display-large` (60px), `display-medium` (48px)                                       | light / normal    | tight          |
+| Heading | `heading-xlarge` (36px), `heading-large` (30px)                                       | semibold          | tight          |
+| Heading | `heading-medium` (24px), `heading-small` (20px), `heading-xsmall` (18px)              | semibold          | normal         |
+| Body    | `body-large` (18px), `body-default` (16px), `body-small` (14px), `body-xsmall` (12px) | normal            | normal         |
+| Label   | `label-large` / `label-default` / `label-small` (14/14/12px), `label-caps` (12px)     | semibold/medium   | normal / wider |
+| Code    | `code-block`, `code-inline` (14px, mono)                                              | normal / semibold | 0              |
+
+Letter-spacing is **proportional**: `tight` (−0.4px) on display + headings ≥ 30px, `normal` (0) at 24px and below — bigger type tightens, body-scale stays neutral. The token jumps straight from `tight` to `normal` (no intermediate step), so 30px is the threshold.
+
+### Typography modes → product archetypes
+
+Three typography modes ship, differing by a uniform **±1px on every step** of the 13-step size scale:
+
+| Mode     | Base | Archetype            | Use for                                                              |
+| -------- | ---- | -------------------- | -------------------------------------------------------------------- |
+| `nova`   | 15px | Tool / dense         | Developer tools, dashboards, data-heavy UIs (Figma / Linear density) |
+| `vega` ★ | 16px | Standard product     | SaaS, consumer apps — the recommended default and bundled mode       |
+| `maia`   | 17px | Editorial / document | Reading-focused UIs, document editors (Notion density)               |
+
+Select via the `--typography` CLI flag (see [Theme Selection](#theme-selection)). All three currently share the Inter / Georgia / JetBrains Mono families — they differ by scale only. Two former modes (`lyra`, `mira`) were byte-duplicates of `vega` and were removed; reintroduce them only with a real typeface or scale-ratio decision behind them.
 
 ## Do Not
 

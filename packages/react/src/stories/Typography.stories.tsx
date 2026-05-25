@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import typographyLyra from '../../../core/tokens/primitives/typography/typography-lyra.json';
 import typographyMaia from '../../../core/tokens/primitives/typography/typography-maia.json';
-import typographyMira from '../../../core/tokens/primitives/typography/typography-mira.json';
 import typographyNova from '../../../core/tokens/primitives/typography/typography-nova.json';
 import typographyVega from '../../../core/tokens/primitives/typography/typography-vega.json';
 
@@ -71,11 +69,82 @@ type TypographyTokenSet = {
 const VEGA = typographyVega satisfies TypographyTokenSet;
 
 const TYPOGRAPHY_MODES: { name: string; tokens: TypographyTokenSet }[] = [
-  { name: 'vega', tokens: VEGA },
-  { name: 'lyra', tokens: typographyLyra satisfies TypographyTokenSet },
-  { name: 'maia', tokens: typographyMaia satisfies TypographyTokenSet },
-  { name: 'mira', tokens: typographyMira satisfies TypographyTokenSet },
   { name: 'nova', tokens: typographyNova satisfies TypographyTokenSet },
+  { name: 'vega', tokens: VEGA },
+  { name: 'maia', tokens: typographyMaia satisfies TypographyTokenSet },
+];
+
+// Product archetype each mode targets. The three modes differ by a uniform
+// ±1px on every size step (nova −1, vega reference, maia +1).
+const MODE_ARCHETYPE: Record<string, string> = {
+  nova: 'Tool / dense',
+  vega: 'Standard product',
+  maia: 'Editorial / document',
+};
+
+// Full literal class strings so Tailwind's content scanner emits each utility
+// (v4 tree-shakes @utility classes not referenced as static literals).
+const COMPOSITE_UTILITIES: {
+  group: string;
+  items: { cls: string; sample: string }[];
+}[] = [
+  {
+    group: 'Display',
+    items: [
+      { cls: 'nx:typography-display-large', sample: 'Display Large' },
+      { cls: 'nx:typography-display-medium', sample: 'Display Medium' },
+    ],
+  },
+  {
+    group: 'Heading',
+    items: [
+      { cls: 'nx:typography-heading-xlarge', sample: 'Heading XLarge' },
+      { cls: 'nx:typography-heading-large', sample: 'Heading Large' },
+      { cls: 'nx:typography-heading-medium', sample: 'Heading Medium' },
+      { cls: 'nx:typography-heading-small', sample: 'Heading Small' },
+      { cls: 'nx:typography-heading-xsmall', sample: 'Heading XSmall' },
+    ],
+  },
+  {
+    group: 'Body',
+    items: [
+      {
+        cls: 'nx:typography-body-large',
+        sample: 'The quick brown fox jumps over the lazy dog.',
+      },
+      {
+        cls: 'nx:typography-body-default',
+        sample: 'The quick brown fox jumps over the lazy dog.',
+      },
+      {
+        cls: 'nx:typography-body-small',
+        sample: 'The quick brown fox jumps over the lazy dog.',
+      },
+      {
+        cls: 'nx:typography-body-xsmall',
+        sample: 'The quick brown fox jumps over the lazy dog.',
+      },
+    ],
+  },
+  {
+    group: 'Label',
+    items: [
+      { cls: 'nx:typography-label-large', sample: 'Label Large' },
+      { cls: 'nx:typography-label-default', sample: 'Label Default' },
+      { cls: 'nx:typography-label-small', sample: 'Label Small' },
+      { cls: 'nx:typography-label-caps', sample: 'Label Caps' },
+    ],
+  },
+  {
+    group: 'Code',
+    items: [
+      {
+        cls: 'nx:typography-code-block',
+        sample: 'const sum = (a, b) => a + b;',
+      },
+      { cls: 'nx:typography-code-inline', sample: 'useState<T>()' },
+    ],
+  },
 ];
 
 const SCALE_SAMPLE = 'Aa Bb 12';
@@ -134,6 +203,11 @@ function ModeSection({
     <section className="nx:flex nx:flex-col nx:gap-3">
       <h3 className="nx:flex nx:items-center nx:gap-2 nx:text-foreground nx:typography-heading-xsmall">
         <span>{mode}</span>
+        {MODE_ARCHETYPE[mode] && (
+          <span className="nx:text-muted-foreground nx:typography-label-small nx:font-normal">
+            {MODE_ARCHETYPE[mode]}
+          </span>
+        )}
         {bundled && (
           <span className="nx:rounded-sm nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:typography-label-small nx:px-1.5 nx:py-0.5">
             Bundled
@@ -308,8 +382,8 @@ export const FontFamilies: Story = {
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
           Sans, serif, and mono font families. Showing the bundled mode only —
           all modes currently ship the same families (Inter / Georgia /
-          JetBrains Mono). Rendering 5 modes with divergent fonts would require
-          loading multiple Google Font payloads on this page.
+          JetBrains Mono). Rendering every mode with divergent fonts would
+          require loading multiple Google Font payloads on this page.
         </p>
       </div>
       <ModeSection mode={BUNDLED_TYPOGRAPHY_MODE} bundled={true}>
@@ -337,6 +411,45 @@ export const FontFamilies: Story = {
           );
         })}
       </ModeSection>
+    </div>
+  ),
+};
+
+export const CompositeUtilities: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-w-fit">
+      <div className="nx:flex nx:flex-col nx:gap-2">
+        <h2 className="nx:text-foreground nx:typography-heading-medium">
+          Composite Utilities
+        </h2>
+        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+          The 17 ready-to-use `nx:typography-*` classes — each bundles
+          font-family, size, weight, line-height, letter-spacing, and
+          `font-optical-sizing: auto` (body tiers also get `text-wrap: pretty`).
+          Prefer these over composing raw size/weight utilities so a mode switch
+          propagates everywhere. Rendered in the bundled mode (vega).
+        </p>
+      </div>
+      {COMPOSITE_UTILITIES.map(({ group, items }) => (
+        <section key={group} className="nx:flex nx:flex-col nx:gap-3">
+          <h3 className="nx:text-foreground nx:typography-heading-xsmall">
+            {group}
+          </h3>
+          <div className="nx:flex nx:flex-col">
+            {items.map(({ cls, sample }) => (
+              <div
+                key={cls}
+                className="nx:flex nx:items-baseline nx:gap-6 nx:py-1.5"
+              >
+                <span className="nx:w-56 nx:shrink-0 nx:text-muted-foreground nx:typography-label-small nx:font-mono">
+                  {cls}
+                </span>
+                <span className={`nx:text-foreground ${cls}`}>{sample}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   ),
 };

@@ -42,7 +42,7 @@
         "fontSize": "{size.3xl}",
         "fontWeight": "{weight.semibold}",
         "lineHeight": "{line-height.3xl}",
-        "letterSpacing": "{letterspacing.normal}"
+        "letterSpacing": "{letterspacing.tight}"
       },
       "$description": "Major section heading, dialog titles, card group headers"
     },
