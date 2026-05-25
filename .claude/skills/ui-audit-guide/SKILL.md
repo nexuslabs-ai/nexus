@@ -27,7 +27,7 @@ Always load and audit against:
 
 ## Prerequisites
 
-- Playwright MCP server must be configured in `.mcp.json` (runs headless by default)
+- **Playwright MCP** server available — provides the `mcp__playwright__*` browser tools this skill uses (runs headless by default). Note: this repo's `.mcp.json` ships `chrome-devtools`, not Playwright, so configure the Playwright MCP at user or project scope if it isn't already available.
 - The application must be running at a known URL
 
 ## Process

@@ -7,7 +7,6 @@ permissionMode: bypassPermissions
 skills:
   - pr-review-guide
   - pr-review-follow-up
-  - shadcn
   - frontend-design
 ---
 
