@@ -1500,15 +1500,18 @@ nx:focus-visible:outline-offset-2</pre>
   <p class="lede">
     Nexus inherits Tailwind v4's 5 default breakpoints with zero customisation and zero
     documented opinion. The cross-check found Dialog already uses <code>nx:sm:</code> in
-    3 places, contradicting any "desktop-primary" stance. Meanwhile 2026 industry consensus
+    3 places, which initially read as at odds with the "desktop-primary" stance (a spike later
+    confirmed it's a legitimate viewport-driven exception — see Decision D). Meanwhile 2026 industry consensus
     has shifted decisively: container queries are now Baseline (Chrome 105+, Safari 16+,
     Firefox 110+ → ~95% coverage) and have largely replaced viewport media queries for
     component-internal responsive behaviour.
     <strong>Recommendation: Option D — Token + Documentation + Container Queries default.</strong>
     Promote 5 breakpoint CSS variables to the semantic namespace, document Narrow/Standard/Wide
     display classes with ≥1024px as the primary target, adopt <code>@container</code> as the
-    canonical pattern for component-internal responsive behaviour, and migrate Dialog's three
-    <code>nx:sm:</code> sites to container queries.
+    canonical pattern for component-internal responsive behaviour, and keep Dialog's three
+    <code>nx:sm:</code> sites as a documented viewport-driven exception (a pre-implementation
+    spike found the naïve <code>@container</code> swap breaks Dialog at 384–640px viewports — see
+    Decision D).
   </p>
 
   <h3 id="bp-problem">The problem — codebase audit</h3>
@@ -1916,8 +1919,8 @@ nx:focus-visible:outline-offset-2</pre>
       <em>viewport</em> (full-bleed sheet vs centred card), not the overlay's own container
       width — so they stay on viewport breakpoints (<code>nx:sm:</code>). The May 2026 spike that
       established this — including the width table showing why a naïve <code>nx:@sm:</code>
-      migration would flip Dialog's rounded corners on at viewports 384–640px — is in Decision D
-      below. In-rule documentation lives in <code>.claude/rules/responsive.md</code> §
+      migration would flip Dialog's rounded corners on prematurely (at viewports 384–640px) — is
+      in Decision D below. In-rule documentation lives in <code>.claude/rules/responsive.md</code> §
       Viewport-driven exceptions.
     </div>
   </div>
