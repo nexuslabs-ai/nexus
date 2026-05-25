@@ -124,6 +124,8 @@
   --color-chart-categorical-3: var(--nx-color-orange-600);
   --color-chart-categorical-4: var(--nx-color-rose-600);
   --color-chart-categorical-5: var(--nx-color-indigo-600);
+  --color-focus-default: var(--nx-focus-color-default);
+  --color-focus-error: var(--nx-focus-color-error);
 
   /* Spacing tokens */
   --spacing-0: var(--nx-size-0);
@@ -216,12 +218,6 @@
   --shadow-inner: inset var(--nx-shadow-inner-layer-1-x)
     var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur)
     var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
-  --shadow-focus-default: var(--nx-focus-geometry-x) var(--nx-focus-geometry-y)
-    var(--nx-focus-geometry-blur) var(--nx-focus-geometry-spread)
-    var(--nx-focus-color-default);
-  --shadow-focus-error: var(--nx-focus-geometry-x) var(--nx-focus-geometry-y)
-    var(--nx-focus-geometry-blur) var(--nx-focus-geometry-spread)
-    var(--nx-focus-color-error);
 }
 
 /* ===== DARK MODE ===== */

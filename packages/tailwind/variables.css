@@ -520,10 +520,6 @@
   /* focus (default) */
   --nx-focus-color-default: oklch(0.5555 0 0);
   --nx-focus-color-error: oklch(0.5771 0.2152 27.325);
-  --nx-focus-geometry-x: 0px;
-  --nx-focus-geometry-y: 0px;
-  --nx-focus-geometry-blur: 0px;
-  --nx-focus-geometry-spread: 2px;
 
   /* radius (sharp) */
   --nx-radius-base: 0px;

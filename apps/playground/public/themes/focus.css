@@ -1,0 +1,6 @@
+/* focus */
+
+:root {
+  --nx-color-focus-default: var(--nx-focus-color-default);
+  --nx-color-focus-error: var(--nx-focus-color-error);
+}

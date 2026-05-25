@@ -1,11 +1,11 @@
 {
-  "color": {
+  "focus": {
     "default": {
-      "$value": "#737373",
+      "$value": "{focus.color.default}",
       "$type": "color"
     },
     "error": {
-      "$value": "#dc2626",
+      "$value": "{focus.color.error}",
       "$type": "color"
     }
   }

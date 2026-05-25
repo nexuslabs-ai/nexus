@@ -255,7 +255,14 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     'brands-blue-light.json',
     primitiveMap
   );
-  const colorTokens = [...baseTokens, ...brandTokens];
+  // Standalone semantic color files (e.g. focus.json): fold their color tokens
+  // into @theme too, so their utilities (outline-focus-*) emit in the playground.
+  const standaloneColorTokens = discoverSemantics(
+    SEMANTIC_DIR
+  ).standalone.flatMap((file) =>
+    collectSemanticColorTokensVarRef(SEMANTIC_DIR, file, primitiveMap)
+  );
+  const colorTokens = [...baseTokens, ...brandTokens, ...standaloneColorTokens];
 
   // Collect other tokens using shared functions
   const spacingTokens = collectSpacingTokens(SEMANTIC_DIR);
