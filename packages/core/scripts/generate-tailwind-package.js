@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 import {
   collectBorderwidthTokens,
+  collectBreakpointsTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
   collectShadowTokens,
@@ -416,6 +417,7 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
   );
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
+  const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
 
   // Generate header
   const header = `/* ===== NEXUS DESIGN SYSTEM - TAILWIND THEME ===== */
@@ -445,6 +447,7 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     borderwidthTokens,
     shadowTokens,
     zIndexTokens,
+    breakpointTokens,
     darkColorTokens,
     darkSelector: '.dark',
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides

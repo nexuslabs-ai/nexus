@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 import {
   collectBorderwidthTokens,
+  collectBreakpointsTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
   collectShadowTokens,
@@ -254,6 +255,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     : [];
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
+  const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
 
   // Generate using shared function
   const header = `/*
@@ -286,6 +288,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     borderwidthTokens,
     shadowTokens,
     zIndexTokens,
+    breakpointTokens,
     // No dark mode block - playground uses dynamic theme switching
   });
 
