@@ -447,5 +447,11 @@ describe('utils', () => {
         }
       );
     });
+
+    it('throws (naming the token) when a number token is missing its $value', () => {
+      withZIndexFixture({ 'z-index-modal': { $type: 'number' } }, (dir) => {
+        expect(() => collectZIndexTokens(dir)).toThrow(/z-index-modal/);
+      });
+    });
   });
 });

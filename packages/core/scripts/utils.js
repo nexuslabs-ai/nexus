@@ -751,6 +751,11 @@ export function collectZIndexTokens(semanticDir) {
         `Z-index token "${key}" has $type "${value.$type}" but must be "number" (${filePath})`
       );
     }
+    if (typeof value.$value !== 'number') {
+      throw new Error(
+        `Z-index token "${key}" has a non-numeric $value ${JSON.stringify(value.$value)} but must be a number (${filePath})`
+      );
+    }
     tokens.push({ cssName: key, value: String(value.$value) });
   }
 
