@@ -209,6 +209,12 @@ size: {
 
 **Exceptions:** Avatars, progress bars, modals may need fixed dimensions.
 
+## Responsive behaviour
+
+Component-internal responsive behaviour uses `@container` queries, not viewport breakpoints — a component should adapt to its parent's width, not the viewport, so it renders consistently whether it lands in a sidebar or a hero. Viewport prefixes (`nx:lg:`, etc.) are reserved for page-shell decisions; full-viewport overlays (e.g. Dialog) are the documented exception, since their trigger is position relative to the viewport.
+
+See [responsive.md](responsive.md) for the decision tree, the display-class table, and the `<Show>` / `<Hide>` primitives.
+
 ## Export Pattern
 
 Always export component, props type, and variants function:
