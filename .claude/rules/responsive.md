@@ -1,6 +1,6 @@
 # Responsive Design Rules
 
-Nexus components are designed for **Standard (≥1024px)** as the primary target. Narrow (<1024px) is graceful degradation; Wide (≥1536px) gets breathing room when available. Use `nx:lg:` as the primary responsive prefix in consumer code.
+Nexus components are designed for **Standard (≥1024px)** as the primary target. Narrow (<1024px) is graceful degradation; Wide (≥1536px) gets breathing room when available. Standard spans `lg` (1024px floor — the prefix you reach for first when writing responsive consumer code) through `xl` (1280px — the design reference width components are tuned against).
 
 > **Consumer-brand inversion.** The ≥1024px primary target is the Nexus reference brand's default — set by `--breakpoint-*` in `packages/tailwind/nexus.css:236-240`. Consumer brands building mobile-first products override by re-aiming `@theme { --breakpoint-* }` and treating a different tier as primary. The display-class labels (Narrow / Standard / Wide) describe defaults, not hard-coded behaviour.
 
@@ -27,11 +27,11 @@ Nexus components are designed for **Standard (≥1024px)** as the primary target
 | `@container` query                    | Component renders differently based on its parent's width | Card that's full-width in a hero, narrow in a sidebar |
 | `nx:lg:` viewport prefix              | Page-shell decisions — nav collapse, side panel hide      | Hide secondary sidebar below `lg`                     |
 | `clamp()` (CSS primitive)             | Continuous adaptation of size — type, padding             | `font-size: clamp(1rem, 0.9rem + 0.5vw, 1.5rem)`      |
-| `svh` / `lvh` / `dvh` (CSS primitive) | Mobile browser-chrome accommodation                       | Full-screen modal: `min-height: 100dvh`               |
+| `svh` / `lvh` / `dvh` (CSS primitive) | Mobile browser-chrome accommodation                       | Modal that must not clip: `min-height: 100svh`        |
 
 ### `container-type` cost policy
 
-Only add `container-type: inline-size` to a component where a **child actually queries the container** via `@container (...)`. Each declaration creates a new formatting context with size containment, and the browser begins tracking that element's dimensions across resizes, scrolls, and animations.
+Only add `container-type: inline-size` to a component where a **child actually queries the container** via `@container (...)`. Each declaration creates a new formatting context with size containment, and the browser begins tracking that element's dimensions across layout-affecting size changes.
 
 Per MDN and web.dev: no element has size containment by default — you manually register a query container with `container-type` when you need it, precisely so the browser can limit the number of elements it tracks. Applying it indiscriminately reintroduces the per-element tracking cost the property was designed to avoid.
 
@@ -50,6 +50,8 @@ A forthcoming declarative primitive (see [#103](https://github.com/nexuslabs-ai/
 <Show containerAbove="md"><Stat /></Show>
 <Hide containerBelow="sm"><Avatar /></Hide>
 ```
+
+> **Proposed — subject to the #103 spike.** Prop names (`above` / `below` / `containerAbove` / `containerBelow`) are the working shape, not the final API. Issue #103 has a mandatory pre-implementation spike on `display: revert` semantics inside flex parents that may force a different shape; the snippet above will be re-synced when #103 lands.
 
 Until that primitive ships, the raw fallback is acceptable but verbose — and easy to invert by mistake.
 
@@ -72,12 +74,12 @@ Prefer the primitive when it ships. Pick the right axis: `above` / `below` for v
 ## Anti-patterns
 
 - **Don't use `nx:sm:` inside component internals.** Use `@container` queries instead. A viewport prefix inside a component leaks page-shell concerns into the component's internal layout — the component then renders inconsistently when dropped into a sidebar vs a hero. The exception is full-viewport overlays; see Viewport-driven exceptions below.
-- **Don't use raw `vh` units.** They reflect the largest possible viewport on mobile and overshoot when browser chrome is visible. Use `svh` for sticky elements (smallest viewport — never clipped), `dvh` for full-screen heroes (dynamic — adjusts as chrome shows/hides), and `lvh` for modals (largest — what the user sees fullscreen).
+- **Don't use raw `vh` units.** They reflect the largest possible viewport on mobile and overshoot when browser chrome is visible. Per [web.dev's viewport-units guide](https://web.dev/blog/viewport-units) and MDN: use `svh` (small viewport — chrome-shown size) for content that must not clip on initial load — modals, sticky elements; use `lvh` (large viewport — chrome-hidden size) for immersive full-bleed heroes; use `dvh` (dynamic) for layouts that should grow and shrink as chrome shows/hides.
 - **Don't write responsive component code that assumes a viewport width.** Components don't know their consumer's page shell. Render decisions should follow the component's parent width (`@container`) or be passed in as props — never inferred from the viewport.
 
 ## Viewport-driven exceptions
 
-Most components use `@container` for internal responsive behaviour. **Full-viewport overlay components are exceptions** — Dialog, future Sheet, future FullScreenOverlay — because their responsive trigger is positioning relative to the viewport, not their own container width.
+Most components use `@container` for internal responsive behaviour — though no shipped Nexus component reaches for it yet (Dialog is the only live datapoint, and it's the viewport-driven exception below). The `@container` default is forward-looking: it sets the bar for the next wave of internal-responsive components, not a pattern to retrofit existing ones against. **Full-viewport overlay components are exceptions** — Dialog, future Sheet, future FullScreenOverlay — because their responsive trigger is positioning relative to the viewport, not their own container width.
 
 A Dialog at 480px viewport is full-bleed (no rounded corners) because _the viewport is narrow_, not because the Dialog's own container is narrow. Migrating to `@container` would flip the rounded-corner threshold to the Dialog's intrinsic width, producing rounded corners on what's still effectively a full-bleed sheet — wrong UX.
 
@@ -94,3 +96,5 @@ Fluid scaling via `clamp()` and dynamic viewport units `svh` / `lvh` / `dvh` are
 - [components.md](components.md) — component-authoring rules; `@container` use in component internals is the responsive corollary of Sizing Convention and Layering model
 - `packages/tailwind/nexus.css:236-240` — the emitted `--breakpoint-*` token values
 - `packages/react/src/components/ui/dialog.tsx` — the live viewport-driven exception
+- [#102](https://github.com/nexuslabs-ai/nexus/issues/102) — cross-links from `components.md` / `figma.md` / `code-quality.md` that point readers at the display-class table here
+- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) — the `<Show>` / `<Hide>` primitive that retires the raw-class fallback in the canonical pattern
