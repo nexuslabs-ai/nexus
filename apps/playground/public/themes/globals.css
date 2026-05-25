@@ -26,6 +26,7 @@
   --spacing-*: initial;
   --radius-*: initial;
   --shadow-*: initial;
+  --breakpoint-*: initial;
 
   /* Semantic color tokens */
   --color-background: var(--nx-color-white);
@@ -229,4 +230,11 @@
   --z-index-popover: 70;
   --z-index-toast: 100;
   --z-index-max: 9999;
+
+  /* Breakpoint tokens */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
 }
