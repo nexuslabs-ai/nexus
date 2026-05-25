@@ -100,6 +100,6 @@ Fluid scaling via `clamp()` and dynamic viewport units `svh` / `lvh` / `dvh` are
 - [components.md](components.md) — component-authoring rules; `@container` use in component internals is the responsive corollary of Sizing Convention and Layering model
 - `packages/tailwind/nexus.css:236-240` — the emitted `--breakpoint-*` token values
 - `packages/react/src/components/ui/dialog.tsx` — the live viewport-driven exception
-- [#102](https://github.com/nexuslabs-ai/nexus/issues/102) — cross-links from `components.md` / `figma.md` / `code-quality.md` that point readers at the display-class table here
+- [#102](https://github.com/nexuslabs-ai/nexus/issues/102) — cross-links from `components.md` / `code-quality.md` that point readers at the display-class table here
 - [#103](https://github.com/nexuslabs-ai/nexus/issues/103) — the shipped `<Show>` / `<Hide>` primitives (`@nexus/react`) used in the canonical pattern above
 - `packages/react/src/components/primitives/` — the `<Show>` / `<Hide>` source, stories, and the spike-conclusion header
