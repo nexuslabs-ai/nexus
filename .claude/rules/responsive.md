@@ -6,7 +6,7 @@ Nexus components are designed for **Standard (≥1024px)** as the primary target
 
 ## Display class table
 
-**This table is the single source of truth.** Other rule files (`components.md`, `figma.md`) link here rather than duplicating these rows.
+**This table is the single source of truth.** Other rule files (`components.md`) link here rather than duplicating these rows.
 
 | Tailwind class | Range (rem / px @16) | Nexus display class | Use as primary target? |
 | -------------- | -------------------- | ------------------- | ---------------------- |
