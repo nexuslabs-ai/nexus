@@ -746,7 +746,11 @@ export function collectZIndexTokens(semanticDir) {
 
   for (const [key, value] of Object.entries(tokenData)) {
     if (key.startsWith('$')) continue;
-    if (value.$type !== 'number') continue;
+    if (value.$type !== 'number') {
+      throw new Error(
+        `Z-index token "${key}" has $type "${value.$type}" but must be "number" (${filePath})`
+      );
+    }
     tokens.push({ cssName: key, value: String(value.$value) });
   }
 
