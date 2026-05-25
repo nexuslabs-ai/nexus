@@ -2060,6 +2060,11 @@ nx:focus-visible:outline-offset-2</pre>
     <h4>E · Ship <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code> primitives (Atlassian-inspired) <span class="verdict verdict-pick">propose</span></h4>
     <p class="sub-q">Two small components that wrap responsive visibility. Removes the most common breakpoint friction in JSX.</p>
 
+    <div class="callout callout-warn">
+      <strong>Superseded by the shipped implementation (#103)</strong>
+      Live spec: <code>.claude/rules/responsive.md</code> § Canonical pattern in JSX. Two details below predate the pre-implementation spike: (1) visibility toggles <code>display: contents</code> ↔ <code>display: none</code>, not <code>display: revert</code> — a <code>contents</code> wrapper makes no box, so inline and flex/grid children keep their layout; (2) the container axes use Tailwind's native <code>@container</code> scale (<code>md</code> = 28rem), distinct from the viewport scale (<code>md</code> = 48rem), so the same breakpoint name resolves to different widths on the two axes.
+    </div>
+
     <p>
       Today, hiding a sidebar below <code>lg</code> in Nexus consumer code looks like:
     </p>

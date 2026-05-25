@@ -22,3 +22,7 @@ export * from '@/components/ui/select';
 export * from '@/components/ui/switch';
 export * from '@/components/ui/tabs';
 export * from '@/components/ui/tooltip';
+
+// Primitives
+export * from '@/components/primitives/hide';
+export * from '@/components/primitives/show';

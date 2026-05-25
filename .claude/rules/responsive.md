@@ -39,7 +39,7 @@ Concrete rule: if you grep your file and find no `@container (...)` rule scoping
 
 ## Canonical pattern in JSX
 
-A forthcoming declarative primitive (see [#103](https://github.com/nexuslabs-ai/nexus/issues/103)) — `<Show>` / `<Hide>` — covers both viewport and container axes:
+The declarative `<Show>` / `<Hide>` primitives ([#103](https://github.com/nexuslabs-ai/nexus/issues/103), exported from `@nexus/react`) express responsive visibility across both axes. They toggle `display: contents` ↔ `display: none` — children always render; only visibility changes (no mount/unmount). Because a `contents` wrapper generates no box of its own, an inline, flex, or grid child keeps its natural layout (this is the conclusion of the #103 spike — `display: block`/`revert` would break those cases).
 
 ```tsx
 // Viewport (page-shell decisions)
@@ -51,9 +51,13 @@ A forthcoming declarative primitive (see [#103](https://github.com/nexuslabs-ai/
 <Hide containerBelow="sm"><Avatar /></Hide>
 ```
 
-> **Proposed — subject to the #103 spike.** Prop names (`above` / `below` / `containerAbove` / `containerBelow`) are the working shape, not the final API. Issue #103 has a mandatory pre-implementation spike on `display: revert` semantics inside flex parents that may force a different shape; the snippet above will be re-synced when #103 lands.
+Provide **exactly one** axis (`above` / `below` / `containerAbove` / `containerBelow`) — a discriminated union rejects zero or two at compile time. Container axes query the nearest `@container` ancestor, so a parent must declare one (e.g. the `nx:@container` utility).
 
-Until that primitive ships, the raw fallback is acceptable but verbose — and easy to invert by mistake.
+> **Two breakpoint scales, same names.** The viewport axes use the `--breakpoint-*` scale (`md` = 48rem); the container axes use Tailwind's native `@container` scale (`md` = 28rem), deliberately smaller because a component reads as "md" at a narrower width than the whole viewport. So `above="md"` and `containerAbove="md"` do **not** fire at the same width.
+
+> **Experimental.** The API is inferred from Atlassian's pattern and may change before it stabilises. Named-container queries (`@container/{name}`) are out of scope for v1 — fall back to raw `nx:@container/{name}/{bp}:` utilities if you need one.
+
+Prefer the primitive over raw class toggling, which is verbose and easy to invert by mistake:
 
 **Anti-pattern (raw class toggling):**
 
@@ -61,7 +65,7 @@ Until that primitive ships, the raw fallback is acceptable but verbose — and e
 <aside className="nx:hidden nx:lg:block">Secondary nav</aside>
 ```
 
-**Correct pattern (declarative primitive, when available):**
+**Correct pattern:**
 
 ```tsx
 <Show above="lg">
@@ -69,7 +73,7 @@ Until that primitive ships, the raw fallback is acceptable but verbose — and e
 </Show>
 ```
 
-Prefer the primitive when it ships. Pick the right axis: `above` / `below` for viewport (page shell), `containerAbove` / `containerBelow` for component-internal — matching the decision tree above.
+Pick the right axis: `above` / `below` for viewport (page shell), `containerAbove` / `containerBelow` for component-internal — matching the decision tree above.
 
 ## Anti-patterns
 
@@ -97,4 +101,5 @@ Fluid scaling via `clamp()` and dynamic viewport units `svh` / `lvh` / `dvh` are
 - `packages/tailwind/nexus.css:236-240` — the emitted `--breakpoint-*` token values
 - `packages/react/src/components/ui/dialog.tsx` — the live viewport-driven exception
 - [#102](https://github.com/nexuslabs-ai/nexus/issues/102) — cross-links from `components.md` / `figma.md` / `code-quality.md` that point readers at the display-class table here
-- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) — the `<Show>` / `<Hide>` primitive that retires the raw-class fallback in the canonical pattern
+- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) — the shipped `<Show>` / `<Hide>` primitives (`@nexus/react`) used in the canonical pattern above
+- `packages/react/src/components/primitives/` — the `<Show>` / `<Hide>` source, stories, and the spike-conclusion header
