@@ -15,6 +15,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  FILES_WITH_DEDICATED_DIMENSION_COLLECTORS,
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
@@ -378,9 +379,10 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     );
   }
 
-  // Collect light color tokens with var() references
-  const lightColorTokens = [];
-  const darkColorTokens = [];
+  // Light + dark semantic accumulators. Holds color tokens and any dimension
+  // tokens contributed by standalone files (e.g. focus.json's focus.offset).
+  const lightSemanticTokens = [];
+  const darkSemanticTokens = [];
 
   for (const themed of semanticFiles.themed) {
     const lightTokens = collectSemanticColorTokensVarRef(
@@ -393,8 +395,8 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
       themed.dark,
       primitiveMap
     );
-    lightColorTokens.push(...lightTokens);
-    darkColorTokens.push(...darkTokens);
+    lightSemanticTokens.push(...lightTokens);
+    darkSemanticTokens.push(...darkTokens);
   }
 
   // Process standalone semantic files (like focus.json) for light tokens.
@@ -402,16 +404,18 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
   // tokens (--<path>) — focus.json's color leaves promote to --color-focus-*
   // utilities, and focus.offset emits as --focus-offset for outline-offset.
   for (const standaloneFile of semanticFiles.standalone) {
-    lightColorTokens.push(
+    lightSemanticTokens.push(
       ...collectSemanticColorTokensVarRef(
         SEMANTIC_DIR,
         standaloneFile,
         primitiveMap
       )
     );
-    lightColorTokens.push(
-      ...collectSemanticDimensionTokens(SEMANTIC_DIR, standaloneFile)
-    );
+    if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(standaloneFile)) {
+      lightSemanticTokens.push(
+        ...collectSemanticDimensionTokens(SEMANTIC_DIR, standaloneFile)
+      );
+    }
   }
 
   // Collect spacing, radius, borderwidth tokens using shared functions
@@ -449,14 +453,14 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
       './borderwidth-utilities.css',
     ],
     tailwindPrefix: 'nx',
-    colorTokens: lightColorTokens,
+    semanticTokens: lightSemanticTokens,
     spacingTokens,
     radiusTokens,
     borderwidthTokens,
     shadowTokens,
     zIndexTokens,
     breakpointTokens,
-    darkColorTokens,
+    darkSemanticTokens,
     darkSelector: '.dark',
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });

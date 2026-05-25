@@ -91,6 +91,12 @@ export const Invalid: Story = {
     'aria-invalid': true,
     'aria-label': 'Invalid email',
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+  },
 };
 
 // ============================================

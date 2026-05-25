@@ -80,7 +80,10 @@ describe('generateTailwindPackage', () => {
   // outline-focus-* utilities. The ring is outline-only — no focus box-shadow
   // tokens of any kind (the geometry-composed --shadow-focus-* are gone).
   // The 2px C40 offset is also tokenised so components share one tune-point.
-  it('promotes focus colours to --color-* and emits --focus-offset; no focus box-shadow', () => {
+  // Count-based assertion on --focus-offset guards against duplicate emission
+  // through the standalone-semantic dimension scan colliding with a dedicated
+  // collector (the same trap that broke --breakpoint-*).
+  it('promotes focus colours to --color-* and emits --focus-offset exactly once; no focus box-shadow', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(
       /--color-focus-default: var\(--nx-focus-color-default\);/
@@ -88,6 +91,7 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(
       /--color-focus-error: var\(--nx-focus-color-error\);/
     );
+    expect(themeBlock.match(/--focus-offset:/g)).toHaveLength(1);
     expect(themeBlock).toMatch(/--focus-offset: 2px;/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
@@ -163,9 +167,19 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(/--z-index-max: 9999;/);
   });
 
-  it('emits breakpoint tokens (with reset) in @theme', () => {
+  // The breakpoint tokens are owned by collectBreakpointsTokens; the generic
+  // standalone-semantic dimension scan must skip breakpoints.json to avoid
+  // double-emission. Asserting exactly one declaration per breakpoint guards
+  // that boundary.
+  it('emits breakpoint tokens (with reset) in @theme exactly once', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(/--breakpoint-\*: initial;/);
+    for (const name of ['sm', 'md', 'lg', 'xl', '2xl']) {
+      const matches = themeBlock.match(
+        new RegExp(`--breakpoint-${name}:`, 'g')
+      );
+      expect(matches, `--breakpoint-${name}`).toHaveLength(1);
+    }
     expect(themeBlock).toMatch(/--breakpoint-sm: 40rem;/);
     expect(themeBlock).toMatch(/--breakpoint-md: 48rem;/);
     expect(themeBlock).toMatch(/--breakpoint-lg: 64rem;/);

@@ -28,7 +28,7 @@
   --shadow-*: initial;
   --breakpoint-*: initial;
 
-  /* Semantic color tokens */
+  /* Semantic tokens */
   --color-background: var(--nx-color-white);
   --color-foreground: var(--nx-color-slate-950);
   --color-background-hover: var(--nx-color-slate-50);
@@ -124,11 +124,6 @@
   --color-secondary-subtle-foreground: var(--nx-color-neutral-600);
   --color-secondary-subtle-hover: var(--nx-color-neutral-200);
   --color-secondary-subtle-active: var(--nx-color-neutral-300);
-  --breakpoint-sm: 40rem;
-  --breakpoint-md: 48rem;
-  --breakpoint-lg: 64rem;
-  --breakpoint-xl: 80rem;
-  --breakpoint-2xl: 96rem;
   --color-focus-default: var(--nx-focus-color-default);
   --color-focus-error: var(--nx-focus-color-error);
   --focus-offset: 2px;

@@ -15,6 +15,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  FILES_WITH_DEDICATED_DIMENSION_COLLECTORS,
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
@@ -251,12 +252,21 @@ function generatePlaygroundGlobalsCSS(
   );
   // Standalone semantic files (e.g. focus.json) contribute both color tokens
   // (--color-focus-*) and dimension tokens (--focus-offset) into @theme so
-  // their utilities emit in the playground build.
-  const standaloneTokens = semantics.standalone.flatMap((file) => [
-    ...collectSemanticColorTokensVarRef(SEMANTIC_DIR, file, primitiveMap),
-    ...collectSemanticDimensionTokens(SEMANTIC_DIR, file),
-  ]);
-  const colorTokens = [...baseTokens, ...brandTokens, ...standaloneTokens];
+  // their utilities emit in the playground build. Files owned by a dedicated
+  // collector (spacing.json, breakpoints.json, z-index.json) are skipped from
+  // the generic dimension scan to avoid duplicate emission.
+  const standaloneTokens = semantics.standalone.flatMap((file) => {
+    const tokens = collectSemanticColorTokensVarRef(
+      SEMANTIC_DIR,
+      file,
+      primitiveMap
+    );
+    if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(file)) {
+      tokens.push(...collectSemanticDimensionTokens(SEMANTIC_DIR, file));
+    }
+    return tokens;
+  });
+  const semanticTokens = [...baseTokens, ...brandTokens, ...standaloneTokens];
 
   // Collect other tokens using shared functions
   const spacingTokens = collectSpacingTokens(SEMANTIC_DIR);
@@ -295,7 +305,7 @@ function generatePlaygroundGlobalsCSS(
       './borderwidth-utilities.css',
     ],
     tailwindPrefix: 'nx',
-    colorTokens,
+    semanticTokens,
     spacingTokens,
     radiusTokens,
     borderwidthTokens,
@@ -306,7 +316,7 @@ function generatePlaygroundGlobalsCSS(
   });
 
   writeModularFile(distDir, 'globals.css', css);
-  return colorTokens.length + spacingTokens.length;
+  return semanticTokens.length + spacingTokens.length;
 }
 
 /**
