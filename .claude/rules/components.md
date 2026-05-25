@@ -274,22 +274,21 @@ See [`surfaces.md` Rule 6](surfaces.md#rules) and [`surfaces.md` § Known overla
 
 ## Focus States
 
-Use the design-system focus token, not Tailwind `ring-*` utilities:
+The canonical focus ring is an **outline** — not a box-shadow, and not Tailwind `ring-*`:
 
 ```
-nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default
+nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2
 ```
 
-For error focus on invalid fields, use `shadow-focus-error`.
+For error focus on invalid fields, swap the colour to `nx:focus-visible:outline-focus-error`.
 
-### Shadow Stacking
+The focus colour (`outline-focus-default` → `--color-focus-default`) is a neutral grey tuned to clear APCA Lc ≥ 45 on every surface it lands on — page, card, muted, primary, error (see [`tokens.md` § APCA contrast gate](tokens.md#apca-contrast-gate)). An outline is surface-invariant and, unlike a box-shadow ring, **survives Windows High Contrast Mode (`forced-colors: active`)**, where the OS forces it to a visible system colour.
 
-`shadow-focus-default` is a box-shadow utility, so it **replaces** any existing elevation shadow during focus. The system avoids this conflict by structurally separating elevation from focusable controls:
+### Outline does not stack with elevation
 
-- **Non-focusable elevated surfaces** — Card (`shadow-sm`), Dialog (`shadow-lg`) — keep their elevation. Their focus rings appear on focusable children (DialogClose, controls inside Card), not on the surface itself.
-- **Focusable controls** — Input, Switch — do not use shadow elevation. They rely on border/background for visual depth. This avoids the elevation/focus conflict by design.
+The focus ring lives on the CSS `outline` property, so it is independent of `box-shadow` and never competes with an elevation shadow. Elevated surfaces (Card `shadow-sm`, Dialog `shadow-lg`) keep their shadow while focusable children render their outline on top — the elevation/focus separation the box-shadow ring once required is no longer needed.
 
-Do not add `nx:shadow-*` utilities to focusable elements.
+Do not use `nx:shadow-*` or `nx:ring-*` utilities for focus.
 
 ## Adding to Exports
 
@@ -312,4 +311,4 @@ Before submitting a component:
 - [ ] Named interface with JSDoc for custom props
 - [ ] Exports include component, props type, and variants function
 - [ ] `asChild` support for interactive components
-- [ ] Focus uses `nx:focus-visible:shadow-focus-default` (not `nx:ring-*`)
+- [ ] Focus uses the outline ring (`nx:focus-visible:outline-focus-default`), not `nx:ring-*` or `nx:shadow-*`
