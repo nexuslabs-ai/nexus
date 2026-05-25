@@ -301,6 +301,10 @@ jobs:
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:contrast
 
+      - name: Color-blind audit
+        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
+        run: yarn workspace @nexus/core audit:colorblind
+
       - name: Tailwind class-ref audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: yarn workspace @nexus/core audit:class-refs
