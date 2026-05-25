@@ -708,7 +708,7 @@
       <li><a href="#bp-problem">Codebase audit</a></li>
       <li><a href="#bp-benchmarks">10-system survey</a></li>
       <li><a href="#bp-headlines">2026 consensus</a></li>
-      <li><a href="#bp-decisions">4 sub-decisions</a></li>
+      <li><a href="#bp-decisions">5 sub-decisions</a></li>
       <li><a href="#bp-demo">Live demo (@container)</a></li>
       <li><a href="#bp-migration">Migration plan</a></li>
       <li><a href="#bp-future">Forward direction</a></li>
@@ -1555,15 +1555,18 @@ nx:focus-visible:outline-offset-2</pre>
   <p class="lede">
     Nexus inherits Tailwind v4's 5 default breakpoints with zero customisation and zero
     documented opinion. The cross-check found Dialog already uses <code>nx:sm:</code> in
-    3 places, contradicting any "desktop-primary" stance. Meanwhile 2026 industry consensus
+    3 places, which initially read as at odds with the "desktop-primary" stance (a spike later
+    confirmed it's a legitimate viewport-driven exception). Meanwhile 2026 industry consensus
     has shifted decisively: container queries are now Baseline (Chrome 105+, Safari 16+,
     Firefox 110+ → ~95% coverage) and have largely replaced viewport media queries for
     component-internal responsive behaviour.
     <strong>Recommendation: Option D — Token + Documentation + Container Queries default.</strong>
     Promote 5 breakpoint CSS variables to the semantic namespace, document Narrow/Standard/Wide
     display classes with ≥1024px as the primary target, adopt <code>@container</code> as the
-    canonical pattern for component-internal responsive behaviour, and migrate Dialog's three
-    <code>nx:sm:</code> sites to container queries.
+    canonical pattern for component-internal responsive behaviour, and keep Dialog's three
+    <code>nx:sm:</code> sites as a documented viewport-driven exception (a pre-implementation
+    spike found the naïve <code>@container</code> swap breaks Dialog at 384–640px viewports — see
+    Decision D).
   </p>
 
   <h3 id="bp-problem">The problem — codebase audit</h3>
@@ -1582,7 +1585,8 @@ nx:focus-visible:outline-offset-2</pre>
     The implication: a new contributor (human or LLM) has no Nexus opinion to follow. They
     default to Tailwind defaults, default to viewport media queries, and default to mobile-first
     — none of which match how a desktop-tool design system actually performs. The gap is almost
-    entirely documentation, with one piece of contradictory code (Dialog).
+    entirely documentation, with one piece of seemingly contradictory code — Dialog, which
+    the spike confirmed is a legitimate viewport-driven exception.
   </p>
 
   <h3 id="bp-benchmarks">Benchmark survey — 10 systems</h3>
@@ -1782,9 +1786,9 @@ nx:focus-visible:outline-offset-2</pre>
     adapt to width" should be <code>@container</code>, not <code>nx:sm:</code>.
   </p>
 
-  <h3 id="bp-decisions">The four decisions</h3>
+  <h3 id="bp-decisions">The five decisions</h3>
   <p>
-    Breakpoint strategy isn't one decision — it's four interleaved. Each addressed below
+    Breakpoint strategy isn't one decision — it's five interleaved. Each addressed below
     with its own recommendation. The end of the section ties them into a single migration plan.
   </p>
 
@@ -1963,6 +1967,18 @@ nx:focus-visible:outline-offset-2</pre>
       depends on the <em>viewport's width</em> (shell-level decisions), use <code>nx:lg:</code>.
       Most Nexus component-internal adaptation falls into the first bucket.
     </p>
+
+    <div class="callout callout-note">
+      <strong>Carve-out: full-viewport overlays (Dialog, Sheet, FullScreenOverlay)</strong>
+      The "component-internal uses <code>@container</code>" rule has one principled exception:
+      full-viewport overlay components. Their responsive trigger is positioning relative to the
+      <em>viewport</em> (full-bleed sheet vs centred card), not the overlay's own container
+      width — so they stay on viewport breakpoints (<code>nx:sm:</code>). The May 2026 spike that
+      established this — including the width table showing why a naïve <code>nx:@sm:</code>
+      migration would flip Dialog's rounded corners on prematurely (at viewports 384–640px) — is
+      in Decision D below. In-rule documentation lives in <code>.claude/rules/responsive.md</code> §
+      Viewport-driven exceptions.
+    </div>
   </div>
 
   <!-- DECISION D -->
