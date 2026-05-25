@@ -7,6 +7,7 @@ import {
   collectBreakpointsTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
+  collectSemanticDimensionTokens,
   collectShadowTokens,
   collectSpacingTokens,
   collectZIndexTokens,
@@ -396,14 +397,21 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     darkColorTokens.push(...darkTokens);
   }
 
-  // Process standalone semantic files (like spacing.json) for light tokens
+  // Process standalone semantic files (like focus.json) for light tokens.
+  // Each file can contribute both color tokens (--color-*) and dimension
+  // tokens (--<path>) — focus.json's color leaves promote to --color-focus-*
+  // utilities, and focus.offset emits as --focus-offset for outline-offset.
   for (const standaloneFile of semanticFiles.standalone) {
-    const standaloneTokens = collectSemanticColorTokensVarRef(
-      SEMANTIC_DIR,
-      standaloneFile,
-      primitiveMap
+    lightColorTokens.push(
+      ...collectSemanticColorTokensVarRef(
+        SEMANTIC_DIR,
+        standaloneFile,
+        primitiveMap
+      )
     );
-    lightColorTokens.push(...standaloneTokens);
+    lightColorTokens.push(
+      ...collectSemanticDimensionTokens(SEMANTIC_DIR, standaloneFile)
+    );
   }
 
   // Collect spacing, radius, borderwidth tokens using shared functions

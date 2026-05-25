@@ -7,6 +7,7 @@ import {
   collectBreakpointsTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
+  collectSemanticDimensionTokens,
   collectShadowTokens,
   collectSpacingTokens,
   collectZIndexTokens,
@@ -216,7 +217,12 @@ function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
 /**
  * Generate globals.css for playground using shared generateThemeCSS function
  */
-function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
+function generatePlaygroundGlobalsCSS(
+  distDir,
+  primitives,
+  primitiveMap,
+  semantics
+) {
   // Get first available typography mode for Google Fonts
   const typographyModes = primitives.typography?.modes || ['vega'];
   const typographyMode = typographyModes[0];
@@ -243,14 +249,14 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     'brands-blue-light.json',
     primitiveMap
   );
-  // Standalone semantic color files (e.g. focus.json): fold their color tokens
-  // into @theme too, so their utilities (outline-focus-*) emit in the playground.
-  const standaloneColorTokens = discoverSemantics(
-    SEMANTIC_DIR
-  ).standalone.flatMap((file) =>
-    collectSemanticColorTokensVarRef(SEMANTIC_DIR, file, primitiveMap)
-  );
-  const colorTokens = [...baseTokens, ...brandTokens, ...standaloneColorTokens];
+  // Standalone semantic files (e.g. focus.json) contribute both color tokens
+  // (--color-focus-*) and dimension tokens (--focus-offset) into @theme so
+  // their utilities emit in the playground build.
+  const standaloneTokens = semantics.standalone.flatMap((file) => [
+    ...collectSemanticColorTokensVarRef(SEMANTIC_DIR, file, primitiveMap),
+    ...collectSemanticDimensionTokens(SEMANTIC_DIR, file),
+  ]);
+  const colorTokens = [...baseTokens, ...brandTokens, ...standaloneTokens];
 
   // Collect other tokens using shared functions
   const spacingTokens = collectSpacingTokens(SEMANTIC_DIR);
@@ -405,7 +411,8 @@ export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
   const globalsTokenCount = generatePlaygroundGlobalsCSS(
     distDir,
     primitives,
-    primitiveMap
+    primitiveMap,
+    semantics
   );
   console.log(`  ✓ globals.css (${globalsTokenCount} tokens)`);
   totalFiles++;

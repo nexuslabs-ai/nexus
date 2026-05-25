@@ -518,8 +518,8 @@
   --nx-color-black-a950: oklch(0.1448 0 0 / 0.9569);
 
   /* focus (default) */
-  --nx-focus-color-default: oklch(0.4991 0.1301 255.276);
-  --nx-focus-color-error: oklch(0.5771 0.2152 27.325);
+  --nx-focus-color-default: oklch(0.3791 0.1378 265.522);
+  --nx-focus-color-error: oklch(0.3958 0.1331 25.723);
 
   /* radius (sharp) */
   --nx-radius-base: 0px;

@@ -85,6 +85,14 @@ export const DisabledWithValue: Story = {
   },
 };
 
+export const Invalid: Story = {
+  args: {
+    defaultValue: 'invalid@',
+    'aria-invalid': true,
+    'aria-label': 'Invalid email',
+  },
+};
+
 // ============================================
 // TYPE STORIES
 // ============================================

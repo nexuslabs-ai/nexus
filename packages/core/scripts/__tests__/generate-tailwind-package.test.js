@@ -79,7 +79,8 @@ describe('generateTailwindPackage', () => {
   // Focus colours are promoted to the --color-* namespace so Tailwind emits
   // outline-focus-* utilities. The ring is outline-only — no focus box-shadow
   // tokens of any kind (the geometry-composed --shadow-focus-* are gone).
-  it('promotes focus colours to --color-* and emits no focus box-shadow', () => {
+  // The 2px C40 offset is also tokenised so components share one tune-point.
+  it('promotes focus colours to --color-* and emits --focus-offset; no focus box-shadow', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(
       /--color-focus-default: var\(--nx-focus-color-default\);/
@@ -87,6 +88,7 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(
       /--color-focus-error: var\(--nx-focus-color-error\);/
     );
+    expect(themeBlock).toMatch(/--focus-offset: 2px;/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 

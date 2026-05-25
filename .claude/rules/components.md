@@ -274,13 +274,19 @@ See [`surfaces.md` Rule 6](surfaces.md#rules) and [`surfaces.md` § Known overla
 
 ## Focus States
 
-Use the design-system focus token with a real `outline` and a 2px `outline-offset`, not Tailwind `ring-*` utilities and not box-shadow:
+Use the design-system focus token with a real `outline` and the tokenised offset (`--focus-offset`, currently `2px`), not Tailwind `ring-*` utilities and not box-shadow:
 
 ```
-nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2
+nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)
 ```
 
-For error focus on invalid fields, use `outline-focus-error`.
+For invalid fields, wire both an always-on error border and an error-coloured focus ring:
+
+```
+nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error
+```
+
+Live consumer: `packages/react/src/components/ui/input.tsx`.
 
 ### Why outline, not box-shadow
 
@@ -293,7 +299,7 @@ The ring is a real `outline` (not `box-shadow`) for two reasons:
 
 Every focusable control — primary / secondary / outline / ghost / destructive, Input, Switch, Tabs, Accordion, Select, Dialog close — uses the **same** `focus-default` colour. There is no per-variant focus colour and no destructive→grey swap. Reason: focus is a system signal ("you are here"), not a brand or status signal. One colour reduces the cognitive load and matches the practice of Linear, Stripe, Geist, and Tailwind's own focus convention.
 
-The focus colour is a **dedicated, theme-split blue** (`#2863ab` light / `#9dc1ee` dark), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) in both themes — even when the surrounding fill is the primary brand colour. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
+The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
 
 ### No shadow on focusable elements
 
@@ -383,4 +389,4 @@ Before submitting a component:
 - [ ] Named interface with JSDoc for custom props
 - [ ] Exports include component, props type, and variants function
 - [ ] `asChild` support for interactive components
-- [ ] Focus uses `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2` (not `nx:ring-*`, not `nx:shadow-focus-*`)
+- [ ] Focus uses `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)` (not `nx:ring-*`, not `nx:shadow-focus-*`)

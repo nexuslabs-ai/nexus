@@ -125,8 +125,14 @@
   --color-chart-categorical-3: var(--nx-color-orange-600);
   --color-chart-categorical-4: var(--nx-color-rose-600);
   --color-chart-categorical-5: var(--nx-color-indigo-600);
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
   --color-focus-default: var(--nx-focus-color-default);
   --color-focus-error: var(--nx-focus-color-error);
+  --focus-offset: 2px;
 
   /* Spacing tokens */
   --spacing-0: var(--nx-size-0);

@@ -258,12 +258,12 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 
 ## Focus Ring Tokens
 
-| shadcn                   | Nexus                                  | Notes                          |
-| ------------------------ | -------------------------------------- | ------------------------------ |
-| `ring-ring`              | `nx:outline-focus-default`             | Focus ring colour (brand blue) |
-| `ring-offset-background` | `nx:focus-visible:outline-offset-2`    | Real outline offset            |
-| `focus-visible:ring-2`   | `nx:focus-visible:outline-2`           | Outline width                  |
-| —                        | `nx:focus-visible:outline-focus-error` | Error ring (invalid inputs)    |
+| shadcn                   | Nexus                                              | Notes                                                           |
+| ------------------------ | -------------------------------------------------- | --------------------------------------------------------------- |
+| `ring-ring`              | `nx:outline-focus-default`                         | Focus ring colour (brand blue)                                  |
+| `ring-offset-background` | `nx:focus-visible:outline-offset-(--focus-offset)` | Real outline offset (tokenised `--focus-offset`, currently 2px) |
+| `focus-visible:ring-2`   | `nx:focus-visible:outline-2`                       | Outline width                                                   |
+| —                        | `nx:focus-visible:outline-focus-error`             | Error ring (invalid inputs)                                     |
 
 **Example transformation:**
 
@@ -272,7 +272,7 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
 // Nexus (uniform brand-blue outline ring)
-'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2';
+'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 ```
 
 ---

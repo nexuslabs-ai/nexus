@@ -967,6 +967,54 @@ export function collectSemanticColorTokensVarRef(
   return tokens;
 }
 
+/**
+ * Collect semantic dimension tokens with **literal** `{value, unit}` shapes
+ * from a standalone file (e.g. focus.json's `focus.offset`). Mirrors
+ * `collectSemanticColorTokensVarRef` but for `$type: dimension` leaves, and
+ * emits the cssName _without_ the `color-` prefix so the path drives the
+ * @theme variable name directly (`focus.offset` → `--focus-offset`).
+ *
+ * Reference-valued dimensions (e.g. `spacing.json`'s `"{0}"` strings) are
+ * intentionally skipped — those files have dedicated collectors
+ * (`collectSpacingTokens`, `collectBreakpointsTokens`) that resolve the refs.
+ *
+ * @param {string} semanticDir - Path to semantic directory
+ * @param {string} fileName - Semantic token file name
+ * @returns {object[]} Array of { cssName, value }
+ */
+export function collectSemanticDimensionTokens(semanticDir, fileName) {
+  const filePath = path.join(semanticDir, fileName);
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Semantic file missing: ${filePath}`);
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  function extractPaths(obj, pathParts = []) {
+    for (const [key, value] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+
+      const currentPath = [...pathParts, key];
+
+      if (
+        value.$value !== undefined &&
+        value.$type === 'dimension' &&
+        !isReference(value.$value)
+      ) {
+        const cssName = currentPath.join('-');
+        const resolvedValue = formatTokenValue(value.$value, 'dimension');
+        tokens.push({ cssName, value: resolvedValue });
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
+        extractPaths(value, currentPath);
+      }
+    }
+  }
+
+  extractPaths(tokenData);
+  return tokens;
+}
+
 // ============================================
 // THEME CSS GENERATION
 // ============================================

@@ -1,11 +1,11 @@
 {
   "color": {
     "default": {
-      "$value": "#2863ab",
+      "$value": "#1e3a8a",
       "$type": "color"
     },
     "error": {
-      "$value": "#dc2626",
+      "$value": "#7f1d1d",
       "$type": "color"
     }
   }
