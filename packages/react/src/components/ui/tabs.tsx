@@ -70,8 +70,8 @@ const tabsTriggerVariants = cva(
   [
     'nx:inline-flex nx:items-center nx:justify-center',
     'nx:whitespace-nowrap',
-    'nx:font-medium nx:text-foreground/70',
-    'nx:transition-all',
+    'nx:font-medium nx:text-muted-foreground',
+    'nx:transition-colors',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:disabled:pointer-events-none nx:disabled:opacity-50',
   ],
@@ -83,17 +83,16 @@ const tabsTriggerVariants = cva(
        */
       variant: {
         default: [
-          'nx:rounded-sm',
+          'nx:rounded-sm nx:border nx:border-transparent',
+          'nx:data-[state=active]:border-border-default',
           'nx:data-[state=active]:bg-background',
           'nx:data-[state=active]:text-foreground',
-          'nx:data-[state=active]:shadow-sm',
         ],
         underline: [
           'nx:rounded-none nx:border-b-2 nx:border-transparent',
           'nx:bg-transparent',
           'nx:data-[state=active]:border-primary-background',
           'nx:data-[state=active]:text-foreground',
-          'nx:data-[state=active]:shadow-none',
         ],
         outline: [
           'nx:rounded-sm nx:border nx:border-transparent',
