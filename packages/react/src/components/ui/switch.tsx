@@ -40,7 +40,7 @@ function Switch({ className, ...props }: SwitchProps) {
         'nx:peer nx:inline-flex nx:h-5 nx:w-9 nx:shrink-0 nx:cursor-pointer nx:items-center',
         'nx:rounded-full nx:border-2 nx:border-transparent',
         'nx:transition-colors',
-        'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2',
         'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
         'nx:data-[state=checked]:bg-primary-background nx:data-[state=unchecked]:bg-muted',
         className
