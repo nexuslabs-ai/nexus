@@ -9,91 +9,91 @@
     },
     "green": {
       "50": {
-        "$value": "#f0f7f0",
+        "$value": "#f1f7ef",
         "$type": "color"
       },
       "100": {
-        "$value": "#e5f3e4",
+        "$value": "#e6f3e3",
         "$type": "color"
       },
       "200": {
-        "$value": "#c9e3c9",
+        "$value": "#cce2c7",
         "$type": "color"
       },
       "300": {
-        "$value": "#a2caa2",
+        "$value": "#a6c99e",
         "$type": "color"
       },
       "400": {
-        "$value": "#79b27a",
+        "$value": "#7fb175",
         "$type": "color"
       },
       "500": {
-        "$value": "#4b9b50",
+        "$value": "#569947",
         "$type": "color"
       },
       "600": {
-        "$value": "#357a3a",
+        "$value": "#3f7932",
         "$type": "color"
       },
       "700": {
-        "$value": "#26652b",
+        "$value": "#306424",
         "$type": "color"
       },
       "800": {
-        "$value": "#1e4e22",
+        "$value": "#264d1c",
         "$type": "color"
       },
       "900": {
-        "$value": "#193c1b",
+        "$value": "#1e3b17",
         "$type": "color"
       },
       "950": {
-        "$value": "#0e2510",
+        "$value": "#12250d",
         "$type": "color"
       },
       "a50": {
-        "$value": "#0e25100a",
+        "$value": "#12250d0a",
         "$type": "color"
       },
       "a100": {
-        "$value": "#0e251010",
+        "$value": "#12250d10",
         "$type": "color"
       },
       "a200": {
-        "$value": "#0e251018",
+        "$value": "#12250d18",
         "$type": "color"
       },
       "a300": {
-        "$value": "#0e251030",
+        "$value": "#12250d30",
         "$type": "color"
       },
       "a400": {
-        "$value": "#0e251050",
+        "$value": "#12250d50",
         "$type": "color"
       },
       "a500": {
-        "$value": "#0e251080",
+        "$value": "#12250d80",
         "$type": "color"
       },
       "a600": {
-        "$value": "#0e2510a0",
+        "$value": "#12250da0",
         "$type": "color"
       },
       "a700": {
-        "$value": "#0e2510c0",
+        "$value": "#12250dc0",
         "$type": "color"
       },
       "a800": {
-        "$value": "#0e2510d8",
+        "$value": "#12250dd8",
         "$type": "color"
       },
       "a900": {
-        "$value": "#0e2510e8",
+        "$value": "#12250de8",
         "$type": "color"
       },
       "a950": {
-        "$value": "#0e2510f4",
+        "$value": "#12250df4",
         "$type": "color"
       }
     },

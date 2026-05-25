@@ -7,7 +7,7 @@ Every color in Nexus is engineered, not picked. The system stores hex on disk, c
 - **Every shade at the same step has the same perceptual lightness, regardless of palette.** `slate.500`, `stone.500`, and `neutral.500` are all exactly as light as each other — only their hue and chroma differ.
 - **OKLCH plus a perceptual lightness grid make this true.** Source hex contributes hue and chroma; the lightness channel is overwritten from a hand-tuned grid shared by every palette.
 - **APCA verifies it.** Every foreground/background pairing is checked against perceptual-contrast thresholds in CI, and a failing pair blocks the build.
-- **Color-blind simulation re-runs the discrimination test for the ~8% of users with a color-vision deficiency.** Every shade and every status pair is checked against Viénot-simulated dichromacy — one finding, [tracked in #141](https://github.com/nexuslabs-ai/nexus/issues/141).
+- **Color-blind simulation re-runs the discrimination test for the ~8% of users with a color-vision deficiency.** Every shade and every status pair is checked against Viénot-simulated dichromacy, gated in CI — currently zero findings across all three deficiencies.
 
 ## Why this matters
 
@@ -111,21 +111,17 @@ Three caveats worth naming:
 
 - **OKLab ΔE, not APCA Lc.** APCA's dark-pair contrast floors at 0 by design — text on a dark surface is unreadable regardless of luminance ratio, and APCA encodes that. But the question here isn't text legibility, it's whether two fills are distinguishable. APCA flagged 339 false positives on the same data (every dark-end adjacent pair, where the visual difference is real but APCA reports 0). OKLab ΔE answers the discrimination question uniformly across the luminance range, so it is the metric here.
 - **Dichromacy is the worst case, not the common case.** The simulation models complete absence of one cone class (≤ 2% of the population combined across all three types). The much more common anomalous trichromacy (~6%) sees the same colors with reduced separation, not collapse. Passing dichromacy is the strict bound — anomalous trichromats clear the same audit by a margin.
-- **The simulation runs in gamma-encoded sRGB.** `@bjornlu/colorblind` divides 8-bit channels by 255 but skips the sRGB→linear-light decode the Viénot model assumes, so its LMS transform operates on gamma-encoded values. The per-deficiency matrix is right, so the simulated hue shifts are correct — but the absolute ΔE _magnitudes_ are directional, not exact. This is worth naming because the single finding below sits only ~17% under the 0.02 floor: read `ΔE 0.0165` as "confusable, near the line," not a precise measurement.
+- **The simulation runs in gamma-encoded sRGB.** `@bjornlu/colorblind` divides 8-bit channels by 255 but skips the sRGB→linear-light decode the Viénot model assumes, so its LMS transform operates on gamma-encoded values. The per-deficiency matrix is right, so the simulated hue shifts are correct — but the absolute ΔE _magnitudes_ are directional, not exact. This matters most near the floor: the closest surviving pair (`green.600 ↔ blue.600` under tritanopia, ΔE 0.0273) clears 0.02 by a modest margin, so read it as "distinguishable, with headroom" rather than a precise measurement.
 
-**Current state.** The audit produces one finding on today's palette:
+**Current state.** The audit is clean — zero findings across all three deficiencies — and its exit-code gate runs in CI (the `audit-tokens` job), so a palette change that reintroduces a collapse fails the build.
 
-| Pair                     | Vision     | OKLab ΔE | Threshold | Tracked                                                  |
-| ------------------------ | ---------- | -------- | --------- | -------------------------------------------------------- |
-| `green.600` ↔ `blue.600` | Tritanopia | 0.0165   | 0.02      | [#141](https://github.com/nexuslabs-ai/nexus/issues/141) |
-
-Both shades back the brand `-background` tier in both themes — `success.background` and `information.background` — so a tritanope (~0.01% prevalence) reads them as the same fill. The 420 within-palette adjacent-shade checks all pass, which is itself a credibility signal: the perceptual-grid pinning preserves L distinction even after dichromat projection. The single cross-status failure is the contract the system has bought; #141 owns the resolution.
+Until [#141](https://github.com/nexuslabs-ai/nexus/issues/141) the audit produced one finding: `green.600 ↔ blue.600` collapsed under tritanopia (OKLab ΔE 0.0165, below the 0.02 floor). Both shades back the brand `-background` tier in both themes — `success.background` and `information.background` — so a tritanope (~0.01% prevalence) read them as the same fill. The fix rotated the whole `green` ramp ~5° toward yellow-green (H≈145°→140°, holding each shade's L and chroma), lifting the pair to ΔE 0.0273 while keeping the green↔amber/red separation and white-on-green APCA intact. All 420 within-palette adjacent-shade checks pass too — itself a credibility signal that the perceptual-grid pinning preserves L distinction even after dichromat projection.
 
 The simulated grid (re-generated by `generate:colorblind-svg`, deterministic across runs):
 
 ![Every Nexus palette under Normal vision, Deuteranopia, Protanopia, and Tritanopia — a 14×11 swatch grid per vision type.](./color-math-colorblind.svg)
 
-Rows are palettes (base / status / chart); columns are shades `50`→`950`; sections are vision types. The `green.600` and `blue.600` cells in the Tritanopia section visibly land at the same fill.
+Rows are palettes (base / status / chart); columns are shades `50`→`950`; sections are vision types. In the Tritanopia section the `green.600` and `blue.600` cells stay distinguishable — the green ramp's yellow-leaning hue holds it apart from blue under the tritan projection.
 
 ## Trade-offs
 
@@ -151,7 +147,7 @@ Run the color-blind validation alongside it:
 yarn workspace @nexus/core audit:colorblind
 ```
 
-It prints one section per CB type per audit kind (adjacent-shade collapse, cross-status pair confusability) and exits `0` when clean, `1` on any finding. The exit-code gate is **not** wired into CI yet — every run exits `1` while [#141](https://github.com/nexuslabs-ai/nexus/issues/141) is open, so wiring it in now would turn the build red. That wiring is sequenced behind the fix and tracked as an acceptance criterion on [#141](https://github.com/nexuslabs-ai/nexus/issues/141); until then the finding is documented inline above.
+It prints one section per CB type per audit kind (adjacent-shade collapse, cross-status pair confusability) and exits `0` when clean, `1` on any finding. That exit-code gate runs in CI (the `audit-tokens` job, alongside the APCA contrast audit), so a palette change that reintroduces a collapse fails the build.
 
 Regenerate the simulated grid (deterministic integer sRGB — identical bytes every run):
 
@@ -159,7 +155,7 @@ Regenerate the simulated grid (deterministic integer sRGB — identical bytes ev
 yarn workspace @nexus/core generate:colorblind-svg
 ```
 
-This is the only piece wired into CI today: the `audit-tokens` job regenerates [`color-math-colorblind.svg`](./color-math-colorblind.svg) and fails on a `git status --porcelain` diff, the same freshness gate the token CSS outputs use, so the committed grid can't drift from `color.json`.
+The grid's freshness is gated in CI too: the `audit-tokens` job regenerates [`color-math-colorblind.svg`](./color-math-colorblind.svg) and fails on a `git status --porcelain` diff, the same freshness gate the token CSS outputs use, so the committed grid can't drift from `color.json`.
 
 To read the engineering directly:
 
