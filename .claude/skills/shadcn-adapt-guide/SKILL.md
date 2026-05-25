@@ -91,6 +91,7 @@ Run these and fix everything before reporting — no deferral (`no-follow-up-def
 Read at the start; re-fire whenever a trigger lights up. The trigger is the thing you're about to type; the arrow is what to do instead.
 
 - _Pasting a shadcn `className`?_ → strip raw Tailwind; put `nx:` **before** every modifier (`nx:hover:…`, not `hover:nx:…`); map each utility to a **semantic** token via `shadcn-divergences.md` — never `bg-primary` (incomplete) or `bg-blue-500` (primitive). (`components.md`, `shadcn-divergences.md`)
+- _See `bg-accent` / `text-accent-foreground` / `hover:bg-accent`?_ → there is **no `accent` token** in Nexus; map **by context** — ghost/control hover → `background-hover`, menu/dropdown item → `popover-hover`, list/card row → `container-hover`. If the surface isn't inferable, ask rather than guess. (`shadcn-divergences.md` § Accent)
 - _See a `dark:` modifier?_ → delete it. Semantic tokens already carry their dark value. (`components.md`)
 - _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)`; invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error`. (`components.md` § Focus)
 - _See a fixed height (`h-10`, `h-9`)?_ → padding-based sizing. Exceptions: progress-bar height, avatar, modal. (`components.md` § Sizing)
@@ -118,5 +119,5 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 
 ## Notes
 
-- **Spacing (temporary):** until the Spacing tokens · Phase 1 milestone lands role-utilities, use numeric `nx:px-*` / `nx:py-*` / `nx:gap-*`, mirroring the shipped components. Once role-utilities land, `nx:px-control` etc. become the target and #124 sweeps existing components — these adapted ones included. Update this note when that milestone closes.
+- **Spacing (temporary):** until the Spacing tokens · Phase 1 milestone lands role-utilities, use numeric `nx:px-*` / `nx:py-*` / `nx:gap-*`, mirroring the shipped components. Once role-utilities land, `nx:px-control` etc. become the target. #124 sweeps only the **12 already-shipped** components — newly-adapted components are built _after_ spacing and adopt role-utilities natively, so they fall **outside** #124's scope. Update this note when that milestone closes.
 - **Don't over-plan.** The recipe above _is_ the plan — no planning doc, no approval gate. Orient, transform, verify, report.
