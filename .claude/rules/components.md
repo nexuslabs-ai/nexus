@@ -291,6 +291,66 @@ For error focus on invalid fields, use `shadow-focus-error`.
 
 Do not add `nx:shadow-*` utilities to focusable elements.
 
+## Layering model
+
+Nexus ships a 6-token z-index scale for stacking overlays. The tokens are semantic and theme-agnostic (no `.dark` variants) — stacking order is structural, not appearance-driven.
+
+**Mental model:** shadow communicates _perceived elevation_; z-index controls _actual paint order_. They are independent axes — a higher z-index does not imply a larger shadow, and the elevation shadows in [`surfaces.md`](surfaces.md) never set stacking. Reach for a z-index token only when two positioned layers can overlap.
+
+### Token scale
+
+| CSS variable        | Utility        | Value | Role                                                             | Nexus usage                   |
+| ------------------- | -------------- | ----- | ---------------------------------------------------------------- | ----------------------------- |
+| `--z-index-overlay` | `nx:z-overlay` | 10    | Low-level backdrops / scrims (e.g. under a non-modal side panel) | reserved — consumer use       |
+| `--z-index-sticky`  | `nx:z-sticky`  | 30    | Sticky chrome (headers, toolbars) — above content, below dialogs | reserved — consumer use       |
+| `--z-index-modal`   | `nx:z-modal`   | 50    | Modal dialogs and their backdrop                                 | Dialog                        |
+| `--z-index-popover` | `nx:z-popover` | 70    | Tooltips, dropdowns, selects, popovers                           | DropdownMenu, Select, Tooltip |
+| `--z-index-toast`   | `nx:z-toast`   | 100   | Toasts / notifications                                           | (not yet shipped)             |
+| `--z-index-max`     | `nx:z-max`     | 9999  | Host-application system UI (AI agent overlays, debug, a11y)      | reserved — consumer-only      |
+
+The `nx:z-*` utilities are generated on demand by the consumer's Tailwind build from these `--z-index-*` theme keys (Tailwind's `z` utility reads the `--z-index-*` namespace), so all six are usable even though only `nx:z-modal` and `nx:z-popover` are referenced by shipped components.
+
+**Popover sits _above_ modal (70 > 50) by design.** A DropdownMenu, Select, or Tooltip opened _inside_ a Dialog must paint above the dialog to stay usable — so the floating-layer token outranks the modal layer. This is the deliberate, non-obvious ordering; do not "fix" it by dropping popover below modal.
+
+**`nx:z-overlay` is not `nx:bg-overlay`.** `nx:z-overlay` is the stacking token (value 10); `nx:bg-overlay` is the scrim _color_ token (see [`shadcn-divergences.md`](shadcn-divergences.md#overlay-token)). A Dialog backdrop uses both `nx:bg-overlay` (tint) and `nx:z-modal` (stacking) — it rides at the modal layer (50), not the `overlay` layer (10), so it stays grouped with the dialog it dims.
+
+### Radix Portal behaviour
+
+Radix appends portal content to `document.body`. For a **single** overlay open by itself (a Dialog with nothing else floating), z-index is largely redundant — the body-appended node already paints above page content in DOM order. The layer tokens become load-bearing when:
+
+- **Two overlays of different types stack** — a DropdownMenu or Select opened inside a Dialog. `nx:z-popover` (70) keeps the menu above the dialog's `nx:z-modal` (50).
+- **A consumer ships a fixed/sticky element** — a navbar or sticky table header competing for stacking. Use `nx:z-sticky` (30): above page content, below modals.
+- **A consumer ships custom, non-Radix overlays** that must interleave with Nexus layers.
+
+### Consumer override
+
+The utilities reference the CSS variable (`nx:z-sticky` → `z-index: var(--z-index-sticky)`), so a consumer re-points a whole layer by overriding the variable — no component changes:
+
+```css
+/* In the consumer's stylesheet, loaded after Nexus */
+:root {
+  --z-index-sticky: 35; /* raise the app shell's sticky chrome above the default 30 */
+}
+```
+
+### Reserved layers
+
+No shipped Nexus component uses these — they exist for the consumer:
+
+- `--z-index-max` (9999) — host-application system UI: AI agent overlays, accessibility tooling, debug surfaces.
+- `--z-index-sticky` (30) — consumer-owned fixed/sticky chrome.
+- `--z-index-overlay` (10) — low-level scrims/backdrops beneath floating layers (a modal's own backdrop rides at `--z-index-modal`, not this).
+
+### Which layer to use
+
+| Surface                                | Utility        |
+| -------------------------------------- | -------------- |
+| Popover, Tooltip, DropdownMenu, Select | `nx:z-popover` |
+| Modal Dialog                           | `nx:z-modal`   |
+| Toast / Sonner-style notification      | `nx:z-toast`   |
+| Backdrop / scrim under a side panel    | `nx:z-overlay` |
+| Consumer fixed/sticky header           | `nx:z-sticky`  |
+
 ## Adding to Exports
 
 After creating a component, add to `src/index.ts`:
