@@ -6,21 +6,22 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { IconLoader2 } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
+const focusBrand =
+  'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-brand nx:focus-visible:outline-offset-2 nx:focus-visible:shadow-focus-glow';
+const focusNeutral =
+  'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2';
+
 const buttonVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default:
-          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover',
-        destructive:
-          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover',
-        outline:
-          'nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:hover:text-foreground',
-        secondary:
-          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover',
-        ghost: 'nx:hover:bg-background-hover nx:hover:text-foreground',
-        link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline',
+        default: `nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover ${focusBrand}`,
+        destructive: `nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover ${focusNeutral}`,
+        outline: `nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:hover:text-foreground ${focusBrand}`,
+        secondary: `nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover ${focusBrand}`,
+        ghost: `nx:hover:bg-background-hover nx:hover:text-foreground ${focusBrand}`,
+        link: `nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline ${focusBrand}`,
       },
       size: {
         default: 'nx:px-4 nx:py-2',

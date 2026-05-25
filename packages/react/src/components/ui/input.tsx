@@ -10,7 +10,7 @@ const inputVariants = cva(
     'nx:bg-background nx:text-foreground nx:transition-colors',
     'nx:file:border-0 nx:file:bg-transparent nx:file:text-sm nx:file:font-medium nx:file:text-foreground',
     'nx:placeholder:text-muted-foreground',
-    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2',
+    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-brand nx:focus-visible:outline-offset-2 nx:focus-visible:shadow-focus-glow',
     'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
   ],
   {

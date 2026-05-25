@@ -145,7 +145,7 @@ function DialogContent({
               'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:opacity-70',
               'nx:transition-opacity',
               'nx:hover:opacity-100',
-              'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2',
+              'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-brand nx:focus-visible:outline-offset-2 nx:focus-visible:shadow-focus-glow',
               'nx:disabled:pointer-events-none',
               'nx:data-[state=open]:bg-muted nx:data-[state=open]:text-muted-foreground'
             )}
