@@ -518,12 +518,8 @@
   --nx-color-black-a950: oklch(0.1448 0 0 / 0.9569);
 
   /* focus (default) */
-  --nx-focus-color-default: oklch(0.5555 0 0);
-  --nx-focus-color-error: oklch(0.5771 0.2152 27.325);
-  --nx-focus-geometry-x: 0px;
-  --nx-focus-geometry-y: 0px;
-  --nx-focus-geometry-blur: 0px;
-  --nx-focus-geometry-spread: 2px;
+  --nx-focus-color-default: oklch(0.3791 0.1378 265.522);
+  --nx-focus-color-error: oklch(0.3958 0.1331 25.723);
 
   /* radius (sharp) */
   --nx-radius-base: 0px;
@@ -692,6 +688,6 @@
 
 .dark {
   /* focus (default dark) */
-  --nx-focus-color-default: oklch(0.7572 0 0);
+  --nx-focus-color-default: oklch(0.8006 0.0751 254.248);
   --nx-focus-color-error: oklch(0.8077 0.1035 19.571);
 }

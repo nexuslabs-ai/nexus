@@ -24,7 +24,7 @@
   --shadow-*: initial;
   --breakpoint-*: initial;
 
-  /* Semantic color tokens */
+  /* Semantic tokens */
   --color-background: var(--nx-color-white);
   --color-foreground: var(--nx-color-stone-950);
   --color-background-hover: var(--nx-color-stone-50);
@@ -102,15 +102,15 @@
   --color-warning-subtle-foreground: var(--nx-color-amber-700);
   --color-warning-subtle-hover: var(--nx-color-amber-100);
   --color-warning-subtle-active: var(--nx-color-amber-200);
-  --color-primary-background: var(--nx-color-neutral-900);
-  --color-primary-background-active: var(--nx-color-neutral-950);
+  --color-primary-background: var(--nx-color-blue-600);
+  --color-primary-background-active: var(--nx-color-blue-800);
   --color-primary-foreground: var(--nx-color-white);
-  --color-primary-background-hover: var(--nx-color-neutral-800);
-  --color-primary-disabled: var(--nx-color-neutral-300);
-  --color-primary-subtle: var(--nx-color-neutral-50);
-  --color-primary-subtle-foreground: var(--nx-color-neutral-900);
-  --color-primary-subtle-hover: var(--nx-color-neutral-100);
-  --color-primary-subtle-active: var(--nx-color-neutral-200);
+  --color-primary-background-hover: var(--nx-color-blue-700);
+  --color-primary-disabled: var(--nx-color-blue-300);
+  --color-primary-subtle: var(--nx-color-blue-50);
+  --color-primary-subtle-foreground: var(--nx-color-blue-600);
+  --color-primary-subtle-hover: var(--nx-color-blue-100);
+  --color-primary-subtle-active: var(--nx-color-blue-200);
   --color-secondary-background: var(--nx-color-neutral-100);
   --color-secondary-foreground: var(--nx-color-neutral-900);
   --color-secondary-background-hover: var(--nx-color-neutral-200);
@@ -125,6 +125,9 @@
   --color-chart-categorical-3: var(--nx-color-orange-600);
   --color-chart-categorical-4: var(--nx-color-rose-600);
   --color-chart-categorical-5: var(--nx-color-indigo-600);
+  --color-focus-default: var(--nx-focus-color-default);
+  --color-focus-error: var(--nx-focus-color-error);
+  --focus-offset: 2px;
 
   /* Spacing tokens */
   --spacing-0: var(--nx-size-0);
@@ -217,12 +220,6 @@
   --shadow-inner: inset var(--nx-shadow-inner-layer-1-x)
     var(--nx-shadow-inner-layer-1-y) var(--nx-shadow-inner-layer-1-blur)
     var(--nx-shadow-inner-layer-1-spread) var(--nx-shadow-inner-layer-1-color);
-  --shadow-focus-default: var(--nx-focus-geometry-x) var(--nx-focus-geometry-y)
-    var(--nx-focus-geometry-blur) var(--nx-focus-geometry-spread)
-    var(--nx-focus-color-default);
-  --shadow-focus-error: var(--nx-focus-geometry-x) var(--nx-focus-geometry-y)
-    var(--nx-focus-geometry-blur) var(--nx-focus-geometry-spread)
-    var(--nx-focus-color-error);
 
   /* Z-index tokens */
   --z-index-overlay: 10;
@@ -319,15 +316,15 @@
   --nx-color-warning-subtle-foreground: var(--nx-color-amber-300);
   --nx-color-warning-subtle-hover: var(--nx-color-amber-900);
   --nx-color-warning-subtle-active: var(--nx-color-amber-800);
-  --nx-color-primary-background: var(--nx-color-neutral-100);
-  --nx-color-primary-background-active: var(--nx-color-neutral-300);
-  --nx-color-primary-foreground: var(--nx-color-neutral-900);
-  --nx-color-primary-background-hover: var(--nx-color-neutral-200);
-  --nx-color-primary-disabled: var(--nx-color-neutral-800);
-  --nx-color-primary-subtle: var(--nx-color-neutral-950);
-  --nx-color-primary-subtle-foreground: var(--nx-color-neutral-50);
-  --nx-color-primary-subtle-hover: var(--nx-color-neutral-900);
-  --nx-color-primary-subtle-active: var(--nx-color-neutral-800);
+  --nx-color-primary-background: var(--nx-color-blue-600);
+  --nx-color-primary-background-active: var(--nx-color-blue-800);
+  --nx-color-primary-foreground: var(--nx-color-white);
+  --nx-color-primary-background-hover: var(--nx-color-blue-700);
+  --nx-color-primary-disabled: var(--nx-color-blue-950);
+  --nx-color-primary-subtle: var(--nx-color-blue-950);
+  --nx-color-primary-subtle-foreground: var(--nx-color-blue-300);
+  --nx-color-primary-subtle-hover: var(--nx-color-blue-900);
+  --nx-color-primary-subtle-active: var(--nx-color-blue-800);
   --nx-color-secondary-background: var(--nx-color-neutral-900);
   --nx-color-secondary-foreground: var(--nx-color-neutral-100);
   --nx-color-secondary-background-hover: var(--nx-color-neutral-700);

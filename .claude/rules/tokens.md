@@ -72,18 +72,18 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 
 `yarn workspace @nexus/core audit:contrast` (implemented in `packages/core/scripts/audit-contrast.js`) runs APCA Lc on every base and brand foreground↔background pair, with thresholds chosen per APCA's intended-use tiers:
 
-| Pair                                                                                | Threshold | Rationale |
-| ----------------------------------------------------------------------------------- | --------- | --------- | ----- | ----------------------------------------------------- |
-| `foreground ↔ background`                                                           | `         | Lc        | ≥ 75` | Body text, fluent reading                             |
-| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`    | `         | Lc        | ≥ 60` | UI labels (buttons, badges)                           |
-| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle` | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills                       |
-| `muted-foreground ↔ muted`                                                          | `         | Lc        | ≥ 45` | Incidental / de-emphasised text                       |
-| `muted-foreground-subtle ↔ muted`                                                   | `         | Lc        | ≥ 45` | Tertiary text — helper text, captions, divider labels |
-| `disabled-foreground ↔ disabled`                                                    | `         | Lc        | ≥ 45` | Disabled-state text, still readable                   |
-| `nav-foreground ↔ nav-{background,item-hover,item-active}`                          | `         | Lc        | ≥ 60` | Nav label text on chrome surfaces                     |
-| `nav-muted-foreground ↔ nav-background`                                             | `         | Lc        | ≥ 45` | Nav helper / metadata text                            |
-| `focus.color.{default,error} ↔ {background,container,popover}`                      | `         | Lc        | ≥ 45` | Focus rings on every surface they hit                 |
-| `chart.categorical.{1..5} ↔ {background,container}`                                 | `         | Lc        | ≥ 60` | Categorical chart marks on every surface              |
+| Pair                                                                                                                    | Threshold | Rationale |
+| ----------------------------------------------------------------------------------------------------------------------- | --------- | --------- | ----- | -------------------------------------------------------------------- |
+| `foreground ↔ background`                                                                                               | `         | Lc        | ≥ 75` | Body text, fluent reading                                            |
+| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`                                        | `         | Lc        | ≥ 60` | UI labels (buttons, badges)                                          |
+| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle`                                     | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills                                      |
+| `muted-foreground ↔ muted`                                                                                              | `         | Lc        | ≥ 45` | Incidental / de-emphasised text                                      |
+| `muted-foreground-subtle ↔ muted`                                                                                       | `         | Lc        | ≥ 45` | Tertiary text — helper text, captions, divider labels                |
+| `disabled-foreground ↔ disabled`                                                                                        | `         | Lc        | ≥ 45` | Disabled-state text, still readable                                  |
+| `nav-foreground ↔ nav-{background,item-hover,item-active}`                                                              | `         | Lc        | ≥ 60` | Nav label text on chrome surfaces                                    |
+| `nav-muted-foreground ↔ nav-background`                                                                                 | `         | Lc        | ≥ 45` | Nav helper / metadata text                                           |
+| `focus.color.{default,error} ↔ {background,container,popover,nav-background,nav-item-hover,nav-item-active,nav-border}` | `         | Lc        | ≥ 45` | Focus rings on every surface they hit (canvas + raised + nav chrome) |
+| `chart.categorical.{1..5} ↔ {background,container}`                                                                     | `         | Lc        | ≥ 60` | Categorical chart marks on every surface                             |
 
 **Scoring is sRGB-equivalent.** APCA reads only `[r, g, b]` ints, so `hexToSrgbInts` re-clamps the (P3-emit) color into sRGB before sampling channels. The audit measures what a legacy sRGB display renders — the lowest-common-denominator surface — so contrast guarantees hold everywhere, P3 hardware or not. APCA scores are byte-stable across the sRGB→P3 emit retarget (issue #86).
 
@@ -103,6 +103,7 @@ Failures must be fixed by adjusting the semantic token reference (which shade a 
 | semantic   | `brands-{name}-{theme}.json`          | `brands-blue-light.json`, `brands-blue-dark.json`                             |
 | semantic   | `chart-{scale}-{mode}-{theme}.json`   | `chart-categorical-default-light.json`, `chart-categorical-default-dark.json` |
 | semantic   | `spacing.json`                        | Standalone semantic (no light/dark variant)                                   |
+| semantic   | `focus.json`                          | Standalone semantic — focus colour refs + the `focus.offset` outline distance |
 | component  | `{component}.json`                    | `button.json` (future)                                                        |
 | styles     | `{name}.json`                         | `styles/shadows.json`, `styles/typography.json`                               |
 
@@ -178,14 +179,15 @@ Primitive colors use Tailwind's shade scale (50-950):
 
 ## Semantic Token Categories
 
-| Category   | Properties                                                                                                    | Example                           |
-| ---------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| Layout     | `background`, `foreground`, `container`, `popover`, `muted`, `muted-foreground-subtle`                        | `--color-background`              |
-| Brand      | `primary.*`, `secondary.*`                                                                                    | `--color-primary-background`      |
-| Status     | `error.*`, `success.*`, `warning.*`, `information.*`                                                          | `--color-error-subtle-foreground` |
-| Borders    | `border.default`, `border.primary`, `border.error`, etc.                                                      | `--color-border-default`          |
-| Navigation | `nav-background`, `nav-foreground`, `nav-muted-foreground`, `nav-item-hover`, `nav-item-active`, `nav-border` | `--color-nav-background`          |
-| Data viz   | `chart.categorical.{1..5}`                                                                                    | `--color-chart-categorical-1`     |
+| Category   | Properties                                                                                                    | Example                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Layout     | `background`, `foreground`, `container`, `popover`, `muted`, `muted-foreground-subtle`                        | `--color-background`                      |
+| Brand      | `primary.*`, `secondary.*`                                                                                    | `--color-primary-background`              |
+| Status     | `error.*`, `success.*`, `warning.*`, `information.*`                                                          | `--color-error-subtle-foreground`         |
+| Borders    | `border.default`, `border.primary`, `border.error`, etc.                                                      | `--color-border-default`                  |
+| Navigation | `nav-background`, `nav-foreground`, `nav-muted-foreground`, `nav-item-hover`, `nav-item-active`, `nav-border` | `--color-nav-background`                  |
+| Focus      | `focus.{default,error}` colour refs; `focus.offset` outline distance                                          | `--color-focus-default`, `--focus-offset` |
+| Data viz   | `chart.categorical.{1..5}`                                                                                    | `--color-chart-categorical-1`             |
 
 Each brand/status group has: `background`, `background-hover`, `background-active`, `foreground`, `disabled`, `subtle`, `subtle-foreground`, `subtle-hover`, `subtle-active`
 

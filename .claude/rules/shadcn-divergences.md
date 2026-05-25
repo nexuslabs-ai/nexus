@@ -14,7 +14,7 @@
 | Accent (hover)     | `hover:bg-accent`      | `nx:hover:bg-background-hover`         |
 | Card/container     | `bg-card`              | `nx:bg-container`                      |
 | Border input       | `border-input`         | `nx:border-border-default`             |
-| Focus ring         | `ring-ring`            | `nx:shadow-focus-default`              |
+| Focus ring         | `ring-ring`            | `nx:outline-focus-default`             |
 | Overlay            | `bg-black/80`          | `nx:bg-overlay`                        |
 | Component sizing   | Fixed heights (`h-10`) | Padding-based (`px-4 py-2`)            |
 | Data attributes    | Optional               | Required                               |
@@ -258,12 +258,12 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 
 ## Focus Ring Tokens
 
-| shadcn                   | Nexus                                   | Notes             |
-| ------------------------ | --------------------------------------- | ----------------- |
-| `ring-ring`              | `nx:shadow-focus-default`               | Focus shadow      |
-| `ring-offset-background` | (handled by shadow)                     | Built into shadow |
-| `focus-visible:ring-2`   | `nx:focus-visible:shadow-focus-default` | Shadow-based      |
-| —                        | `nx:shadow-focus-error`                 | Error focus ring  |
+| shadcn                   | Nexus                                              | Notes                                                           |
+| ------------------------ | -------------------------------------------------- | --------------------------------------------------------------- |
+| `ring-ring`              | `nx:outline-focus-default`                         | Focus ring colour (brand blue)                                  |
+| `ring-offset-background` | `nx:focus-visible:outline-offset-(--focus-offset)` | Real outline offset (tokenised `--focus-offset`, currently 2px) |
+| `focus-visible:ring-2`   | `nx:focus-visible:outline-2`                       | Outline width                                                   |
+| —                        | `nx:focus-visible:outline-focus-error`             | Error ring (invalid inputs)                                     |
 
 **Example transformation:**
 
@@ -271,8 +271,8 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 // shadcn
 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
-// Nexus
-'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default';
+// Nexus (uniform brand-blue outline ring)
+'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 ```
 
 ---

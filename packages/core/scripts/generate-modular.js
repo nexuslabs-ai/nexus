@@ -7,6 +7,7 @@ import {
   collectBreakpointsTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
+  collectSemanticDimensionTokens,
   collectShadowTokens,
   collectSpacingTokens,
   collectZIndexTokens,
@@ -14,6 +15,7 @@ import {
   discoverSemantics,
   ensureDir,
   extractTokens,
+  FILES_WITH_DEDICATED_DIMENSION_COLLECTORS,
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
@@ -216,7 +218,12 @@ function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
 /**
  * Generate globals.css for playground using shared generateThemeCSS function
  */
-function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
+function generatePlaygroundGlobalsCSS(
+  distDir,
+  primitives,
+  primitiveMap,
+  semantics
+) {
   // Get first available typography mode for Google Fonts
   const typographyModes = primitives.typography?.modes || ['vega'];
   const typographyMode = typographyModes[0];
@@ -243,7 +250,23 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
     'brands-blue-light.json',
     primitiveMap
   );
-  const colorTokens = [...baseTokens, ...brandTokens];
+  // Standalone semantic files (e.g. focus.json) contribute both color tokens
+  // (--color-focus-*) and dimension tokens (--focus-offset) into @theme so
+  // their utilities emit in the playground build. Files owned by a dedicated
+  // collector (spacing.json, breakpoints.json, z-index.json) are skipped from
+  // the generic dimension scan to avoid duplicate emission.
+  const standaloneTokens = semantics.standalone.flatMap((file) => {
+    const tokens = collectSemanticColorTokensVarRef(
+      SEMANTIC_DIR,
+      file,
+      primitiveMap
+    );
+    if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(file)) {
+      tokens.push(...collectSemanticDimensionTokens(SEMANTIC_DIR, file));
+    }
+    return tokens;
+  });
+  const semanticTokens = [...baseTokens, ...brandTokens, ...standaloneTokens];
 
   // Collect other tokens using shared functions
   const spacingTokens = collectSpacingTokens(SEMANTIC_DIR);
@@ -282,7 +305,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
       './borderwidth-utilities.css',
     ],
     tailwindPrefix: 'nx',
-    colorTokens,
+    semanticTokens,
     spacingTokens,
     radiusTokens,
     borderwidthTokens,
@@ -293,7 +316,7 @@ function generatePlaygroundGlobalsCSS(distDir, primitives, primitiveMap) {
   });
 
   writeModularFile(distDir, 'globals.css', css);
-  return colorTokens.length + spacingTokens.length;
+  return semanticTokens.length + spacingTokens.length;
 }
 
 /**
@@ -398,7 +421,8 @@ export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
   const globalsTokenCount = generatePlaygroundGlobalsCSS(
     distDir,
     primitives,
-    primitiveMap
+    primitiveMap,
+    semantics
   );
   console.log(`  ✓ globals.css (${globalsTokenCount} tokens)`);
   totalFiles++;

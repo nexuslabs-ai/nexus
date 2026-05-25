@@ -70,7 +70,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
         'nx:px-3 nx:py-2 nx:text-sm',
         'nx:whitespace-nowrap',
         'nx:placeholder:text-muted-foreground',
-        'nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default',
+        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
         'nx:[&>span]:line-clamp-1',
         className

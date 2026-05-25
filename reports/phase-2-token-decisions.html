@@ -1034,6 +1034,61 @@ nx:focus-visible:outline-offset-2</pre>
     the element. The §3 fix (bottom-border indicator) is still worth doing for visual reasons, but
     it's no longer a correctness fix; the stacking violation is gone the moment B lands.
   </div>
+
+  <!-- ── Follow-up research: ring colour & the per-case behaviour ── -->
+  <h3 id="focus-survey">Follow-up survey — ring colour, primary/filled, error &amp; dark (12 systems)</h3>
+  <p>
+    The pick above settles <em>how</em> the ring is drawn (outline + offset). A second question
+    surfaced while polishing the ring: <strong>what colour</strong> should it be, and how should it
+    behave on a <strong>primary/filled button</strong> (where the ring colour can equal the fill),
+    on <strong>error/destructive</strong> controls, and across <strong>light/dark</strong>? Surveyed
+    12 systems — enterprise (a11y-rigorous) and Tier-A product/dev — to ground the call (verified May 2026).
+  </p>
+  <table class="bp-matrix">
+    <thead>
+      <tr>
+        <th>System</th>
+        <th>Ring colour</th>
+        <th>Mechanism</th>
+        <th>Primary / filled (same-colour fill)</th>
+        <th>Error / destructive</th>
+        <th>Light ↔ dark</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>GitHub Primer</strong></td><td>Brand blue (one accent token)</td><td><code>outline</code>, offset <code>-2px</code></td><td><strong>Two-colour</strong>: inset light ring (<code>fgColor-onEmphasis</code>) on filled buttons</td><td>Same blue (danger = primary)</td><td>Re-points the accent token</td></tr>
+      <tr><td><strong>Adobe Spectrum</strong></td><td>Brand blue (<code>blue-800</code>)</td><td><code>box-shadow</code> on <code>::after</code> + gap</td><td>Same ring, transparent gap <em>outside</em> the fill (no special case)</td><td>Same blue (negative variant)</td><td>Nudges the blue per theme</td></tr>
+      <tr><td><strong>IBM Carbon</strong></td><td>Blue (light) / <strong>white (dark)</strong></td><td><code>outline</code> + inset <code>box-shadow</code></td><td><strong>Two-colour</strong>: surface-coloured <code>$focus-inset</code> spacer</td><td>Blue; invalid input → red; danger → red on hover</td><td><strong>Inverts</strong> blue → white</td></tr>
+      <tr><td><strong>Material 3</strong></td><td><code>secondary</code> role</td><td><code>outline</code> (currentColor)</td><td>Same ring, <code>+2px</code> outward offset (no special case)</td><td>Same (no destructive variant)</td><td>Adapts via <code>secondary</code> per theme</td></tr>
+      <tr><td><strong>Microsoft Fluent 2</strong></td><td><strong>Neutral</strong> black/white</td><td><code>box-shadow</code> double ring</td><td><strong>Two-colour</strong>: inner light + outer dark; primary adds on-brand inset</td><td>Same neutral ring</td><td><strong>Inverts</strong> black ↔ white</td></tr>
+      <tr><td><strong>Shopify Polaris</strong></td><td>Brand blue (<code>#005BD3</code>)</td><td><code>outline</code> + positive offset</td><td>Same ring offset onto the canvas (no special case)</td><td>Same blue</td><td><strong>Same in both</strong> (outlier)</td></tr>
+      <tr><td><strong>Atlassian</strong></td><td>Brand blue (Blue500)</td><td><code>outline</code>, offset <code>+2px</code></td><td>Same ring offset onto the canvas (no special case)</td><td>Same blue</td><td>Lightens Blue500 → Blue300</td></tr>
+      <tr><td><strong>Radix Themes</strong></td><td><strong>Accent-derived</strong> (<code>focus-8</code>)</td><td><code>outline</code> (deliberately, not shadow)</td><td><code>solid</code>: <code>+2px</code> offset, lighter accent-8 on accent-9 fill</td><td>Follows accent (red if <code>color=red</code>)</td><td>Accent scale adapts</td></tr>
+      <tr><td><strong>Tailwind / Headless UI</strong></td><td>None — you pick (v4 = currentColor)</td><td><code>ring</code> (shadow) or <code>outline</code></td><td><strong>Two-colour</strong>: <code>ring-offset</code> spacer (bg gap)</td><td>You pick (commonly red)</td><td>Manual</td></tr>
+      <tr><td><strong>Linear</strong></td><td>Dedicated indigo (<code>#5e69d1</code>)</td><td><code>outline</code> + <code>box-shadow</code> double on coloured</td><td><strong>Two-colour</strong>: canvas spacer + indigo ring</td><td>Same indigo</td><td>Adapts (observed dark)</td></tr>
+      <tr><td><strong>Stripe Elements</strong></td><td>Brand primary (blue)</td><td><code>box-shadow</code></td><td>N/A (Elements are inputs, not CTAs)</td><td><strong>Red</strong> (<code>colorDanger</code>) on invalid</td><td>Token-driven</td></tr>
+      <tr><td><strong>Vercel Geist</strong></td><td>Dedicated blue token</td><td><code>outline</code> (filled) / <code>box-shadow</code> double-ring</td><td>Filled → offset outline on canvas; others → <strong>bg-spacer double-ring</strong></td><td>Same blue</td><td>Ring + spacer swap per theme</td></tr>
+    </tbody>
+  </table>
+
+  <h4>What the survey settles</h4>
+  <ul>
+    <li><strong>Colour — brand/accent, not neutral.</strong> ~8 of 12 use a single brand/accent <em>blue</em> ring (Primer, Spectrum, Polaris, Atlassian, Stripe, Geist, Linear-indigo); Radix derives it from the component accent; Material uses <code>secondary</code>. Only <strong>Fluent</strong> uses a neutral black/white ring. A neutral grey ring (Nexus's original issue-#44 choice) is the <em>minority</em> position.</li>
+    <li><strong>Primary/filled — nobody swaps the ring to a neutral colour.</strong> The same-colour-fill problem is solved two ways, both keeping the ring's hue: (a) <strong>offset the ring onto the canvas</strong> with a positive <code>outline-offset</code> (Material, Polaris, Atlassian, Radix, Geist-filled, Spectrum); or (b) a <strong>two-colour "spacer" ring</strong> — a surface/background-coloured gap between fill and ring (Primer, Carbon, Fluent, Linear, Geist, Tailwind <code>ring-offset</code>). This is WCAG technique <a href="https://www.w3.org/WAI/WCAG21/Techniques/css/C40">C40</a> (two-colour focus indicator). <strong>No surveyed system gives the primary button a grey ring.</strong></li>
+    <li><strong>Error/destructive — the ring stays the same.</strong> Destructive <em>buttons</em> keep the normal focus ring in every system (the red fill carries the destructive meaning). A red focus colour shows up only for <strong>invalid form inputs</strong> (Stripe <code>colorDanger</code>, Carbon invalid) — a different case from a destructive button.</li>
+    <li><strong>Dark — adapt the colour.</strong> 11 of 12 shift the ring per theme (Carbon &amp; Fluent fully invert; Atlassian/Spectrum/Geist lighten the blue); only Polaris keeps one colour across themes.</li>
+    <li><strong>Mechanism — <code>outline</code> is the load-bearing ring</strong> (survives forced-colors); <code>box-shadow</code> is used only for the inner spacer where an outline can't express a gap.</li>
+  </ul>
+
+  <div class="callout callout-pick">
+    <strong>Implications for Nexus (revises the in-flight "premium ring" exploration)</strong>
+    <ul>
+      <li><strong>Brand-blue, theme-split ring</strong> — mainstream; supports adopting a brand ring over the original neutral grey, and lightening it in dark mode (matches 11/12).</li>
+      <li><strong>Primary/filled buttons keep the brand ring — do NOT swap to grey.</strong> No surveyed system does. Make it visible with the WCAG C40 two-colour technique: brand ring + a <em>surface-coloured spacer</em> (i.e. <code>outline-offset</code> showing the canvas, optionally reinforced by an inset spacer ring), not a colour change.</li>
+      <li><strong>Destructive buttons keep the brand ring too.</strong> Reserve the red <code>outline-focus-error</code> for <em>invalid inputs</em>, not destructive buttons — the red fill already signals destructive intent.</li>
+      <li><strong>Drop the glow if it muddies the C40 separation</strong> — the spacer/offset is what the standard relies on for legibility on same-colour fills; a same-hue glow works against it.</li>
+    </ul>
+  </div>
 </section>
 
 

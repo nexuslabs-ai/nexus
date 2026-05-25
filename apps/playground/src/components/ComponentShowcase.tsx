@@ -191,7 +191,6 @@ export function ComponentShowcase() {
             <ShadowBox name="xl" shadowClass="nx:shadow-xl" />
             <ShadowBox name="2xl" shadowClass="nx:shadow-2xl" />
             <ShadowBox name="inner" shadowClass="nx:shadow-inner" />
-            <ShadowBox name="focus" shadowClass="nx:shadow-focus-default" />
           </div>
         </Section>
 

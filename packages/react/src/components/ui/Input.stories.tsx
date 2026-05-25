@@ -85,6 +85,20 @@ export const DisabledWithValue: Story = {
   },
 };
 
+export const Invalid: Story = {
+  args: {
+    defaultValue: 'invalid@',
+    'aria-invalid': true,
+    'aria-label': 'Invalid email',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+  },
+};
+
 // ============================================
 // TYPE STORIES
 // ============================================

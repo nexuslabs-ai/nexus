@@ -967,6 +967,80 @@ export function collectSemanticColorTokensVarRef(
   return tokens;
 }
 
+/**
+ * Files in `semanticFiles.standalone` that own a dedicated dimension collector.
+ * Callers iterating standalone files for the generic `collectSemanticDimensionTokens`
+ * scan MUST skip these to avoid duplicate emission of the same `--*` variable
+ * from two different code paths.
+ *
+ *   spacing.json     → collectSpacingTokens  (reference-valued, resolves {N})
+ *   breakpoints.json → collectBreakpointsTokens (literal {value, unit})
+ *   z-index.json     → collectZIndexTokens  ($type: number, not dimension)
+ */
+export const FILES_WITH_DEDICATED_DIMENSION_COLLECTORS = new Set([
+  'breakpoints.json',
+  'spacing.json',
+  'z-index.json',
+]);
+
+/**
+ * Collect literal-valued `$type: dimension` leaves from a token file and
+ * emit them with the path as the CSS-variable name — e.g. `focus.offset` →
+ * `--focus-offset`. Mirrors `collectSemanticColorTokensVarRef` but for
+ * dimensions, and skips the `color-` prefix so the path drives the variable
+ * name directly.
+ *
+ * Filter behavior:
+ * - `$type: dimension` only.
+ * - Reference-valued dimensions (`"$value": "{spacing.0}"`) are skipped here;
+ *   they are emitted by their owning collector instead.
+ * - Literal-valued dimensions in files that ALSO have a dedicated collector
+ *   (breakpoints.json's `{value, unit}` literals) are NOT skipped by this
+ *   function — that gating is the caller's responsibility via
+ *   `FILES_WITH_DEDICATED_DIMENSION_COLLECTORS`.
+ *
+ * Self-namespacing: because no category prefix is added, top-level keys in the
+ * input file must self-namespace their CSS variable name (e.g. `focus.offset`
+ * → `--focus-offset` is fine; a bare top-level `offset`/`padding`/`gap` would
+ * collide with Tailwind utility namespaces).
+ *
+ * @param {string} semanticDir - Path to semantic directory
+ * @param {string} fileName - Semantic token file name
+ * @returns {object[]} Array of { cssName, value }
+ */
+export function collectSemanticDimensionTokens(semanticDir, fileName) {
+  const filePath = path.join(semanticDir, fileName);
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Semantic file missing: ${filePath}`);
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  function extractPaths(obj, pathParts = []) {
+    for (const [key, value] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+
+      const currentPath = [...pathParts, key];
+
+      if (
+        value.$value !== undefined &&
+        value.$type === 'dimension' &&
+        !isReference(value.$value)
+      ) {
+        const cssName = currentPath.join('-');
+        const resolvedValue = formatTokenValue(value.$value, 'dimension');
+        tokens.push({ cssName, value: resolvedValue });
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
+        extractPaths(value, currentPath);
+      }
+    }
+  }
+
+  extractPaths(tokenData);
+  return tokens;
+}
+
 // ============================================
 // THEME CSS GENERATION
 // ============================================
@@ -980,12 +1054,12 @@ export function collectSemanticColorTokensVarRef(
  * @param {string} [config.googleFontsImport] - Google Fonts @import statement
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
- * @param {object[]} config.colorTokens - Array of { cssName, value } for colors
+ * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours and dimensions
  * @param {object[]} config.spacingTokens - Array of { cssName, varRef } for spacing
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
- * @param {object[]} [config.darkColorTokens] - Array of { cssName, value } for dark mode colors
+ * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
  * @param {string} [config.darkSelector='.dark'] - CSS selector for dark mode
  * @param {boolean} [config.prefixDarkVars=false] - Whether to add nx- prefix to dark mode vars
  * @returns {string} Generated CSS content
@@ -996,14 +1070,14 @@ export function generateThemeCSS(config) {
     googleFontsImport,
     imports = [],
     tailwindPrefix = 'nx',
-    colorTokens = [],
+    semanticTokens = [],
     spacingTokens = [],
     radiusTokens = [],
     borderwidthTokens = [],
     shadowTokens = [],
     zIndexTokens = [],
     breakpointTokens = [],
-    darkColorTokens = [],
+    darkSemanticTokens = [],
     darkSelector = '.dark',
     prefixDarkVars = false,
   } = config;
@@ -1035,10 +1109,10 @@ export function generateThemeCSS(config) {
   css += `  --shadow-*: initial;\n`;
   css += `  --breakpoint-*: initial;\n\n`;
 
-  // Color tokens
-  if (colorTokens.length > 0) {
-    css += `  /* Semantic color tokens */\n`;
-    for (const token of colorTokens) {
+  // Semantic tokens (colours + dimensions like --focus-offset)
+  if (semanticTokens.length > 0) {
+    css += `  /* Semantic tokens */\n`;
+    for (const token of semanticTokens) {
       css += `  --${token.cssName}: ${token.value};\n`;
     }
   }
@@ -1094,10 +1168,10 @@ export function generateThemeCSS(config) {
   css += `}\n`;
 
   // Dark mode block (if provided)
-  if (darkColorTokens.length > 0) {
+  if (darkSemanticTokens.length > 0) {
     css += `\n/* ===== DARK MODE ===== */\n`;
     css += `${darkSelector} {\n`;
-    for (const token of darkColorTokens) {
+    for (const token of darkSemanticTokens) {
       const varName = prefixDarkVars ? `nx-${token.cssName}` : token.cssName;
       css += `  --${varName}: ${token.value};\n`;
     }

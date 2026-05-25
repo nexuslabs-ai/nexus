@@ -274,22 +274,39 @@ See [`surfaces.md` Rule 6](surfaces.md#rules) and [`surfaces.md` § Known overla
 
 ## Focus States
 
-Use the design-system focus token, not Tailwind `ring-*` utilities:
+Use the design-system focus token with a real `outline` and the tokenised offset (`--focus-offset`, currently `2px`), not Tailwind `ring-*` utilities and not box-shadow:
 
 ```
-nx:focus-visible:outline-none nx:focus-visible:shadow-focus-default
+nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)
 ```
 
-For error focus on invalid fields, use `shadow-focus-error`.
+For invalid fields, wire both an always-on error border and an error-coloured focus ring:
 
-### Shadow Stacking
+```
+nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error
+```
 
-`shadow-focus-default` is a box-shadow utility, so it **replaces** any existing elevation shadow during focus. The system avoids this conflict by structurally separating elevation from focusable controls:
+Live consumer: `packages/react/src/components/ui/input.tsx`.
+
+### Why outline, not box-shadow
+
+The ring is a real `outline` (not `box-shadow`) for two reasons:
+
+- **WCAG 2.4.7 + technique C40 compliance.** A 2px offset puts the ring on the surface _next to_ the control, so even on a same-coloured fill (primary button on a near-blue canvas) the ring stays legible against the background — without the system needing to detect the surrounding fill.
+- **Windows High Contrast Mode survives.** `forced-colors: active` strips backgrounds and box-shadows but preserves outlines. A box-shadow ring disappears entirely under WHCM; an outline ring renders in the user's system focus colour.
+
+### Uniform brand-blue across variants
+
+Every focusable control — primary / secondary / outline / ghost / destructive, Input, Switch, Tabs, Accordion, Select, Dialog close — uses the **same** `focus-default` colour. There is no per-variant focus colour and no destructive→grey swap. Reason: focus is a system signal ("you are here"), not a brand or status signal. One colour reduces the cognitive load and matches the practice of Linear, Stripe, Geist, and Tailwind's own focus convention.
+
+The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
+
+### No shadow on focusable elements
+
+Do not add `nx:shadow-*` utilities to focusable elements — the structural separation still holds:
 
 - **Non-focusable elevated surfaces** — Card (`shadow-sm`), Dialog (`shadow-lg`) — keep their elevation. Their focus rings appear on focusable children (DialogClose, controls inside Card), not on the surface itself.
-- **Focusable controls** — Input, Switch — do not use shadow elevation. They rely on border/background for visual depth. This avoids the elevation/focus conflict by design.
-
-Do not add `nx:shadow-*` utilities to focusable elements.
+- **Focusable controls** — Input, Switch — do not use shadow elevation. They rely on border/background for visual depth.
 
 ## Layering model
 
@@ -372,4 +389,4 @@ Before submitting a component:
 - [ ] Named interface with JSDoc for custom props
 - [ ] Exports include component, props type, and variants function
 - [ ] `asChild` support for interactive components
-- [ ] Focus uses `nx:focus-visible:shadow-focus-default` (not `nx:ring-*`)
+- [ ] Focus uses `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)` (not `nx:ring-*`, not `nx:shadow-focus-*`)

@@ -30,6 +30,7 @@ const SEMANTIC_PREFIXES = [
   'border',
   'overlay',
   'disabled',
+  'focus',
   'accent', // not a real token in Nexus — surfaces the migration bug
 ];
 

@@ -114,27 +114,5 @@
       "spread": "{inner.layer-1.spread}",
       "color": "{inner.layer-1.color}"
     }
-  },
-  "focus": {
-    "default": {
-      "$type": "shadow",
-      "$value": {
-        "offsetX": "{focus.geometry.x}",
-        "offsetY": "{focus.geometry.y}",
-        "blur": "{focus.geometry.blur}",
-        "spread": "{focus.geometry.spread}",
-        "color": "{focus.color.default}"
-      }
-    },
-    "error": {
-      "$type": "shadow",
-      "$value": {
-        "offsetX": "{focus.geometry.x}",
-        "offsetY": "{focus.geometry.y}",
-        "blur": "{focus.geometry.blur}",
-        "spread": "{focus.geometry.spread}",
-        "color": "{focus.color.error}"
-      }
-    }
   }
 }
