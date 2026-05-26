@@ -14,15 +14,16 @@ The previous version of this script used the literal `## Definition of Done`
 heading as the skip-detector. That marker is too generic — a future issue body
 that legitimately uses the same heading for unrelated content would be silently
 skipped. This version anchors detection on the issue-specific audit command line
-(`audit:storybook-coverage --component <kebab>`), which only appears inside our
-DoD template. Re-running with an unchanged template is a no-op; re-running with
-a changed template rewrites the section in place.
+(`audit:storybook-coverage --component <kebab>\n`), which only appears inside
+our DoD template. The trailing `\n` prevents prefix collisions between
+component names (e.g. `label` vs `label-x`). Re-running with an unchanged
+template is a no-op; re-running with a changed template rewrites in place.
 
 Run
 ---
-    python3 packages/react/scripts/bulk-update-issue-dod.py --dry-run
-    python3 packages/react/scripts/bulk-update-issue-dod.py            # writes to GitHub
-    python3 packages/react/scripts/bulk-update-issue-dod.py --only 162 # one issue
+    python3 scripts/bulk-update-issue-dod.py --dry-run
+    python3 scripts/bulk-update-issue-dod.py            # writes to GitHub
+    python3 scripts/bulk-update-issue-dod.py --only 162 # one issue
 
 Phase 3/4 use
 -------------
@@ -67,7 +68,24 @@ yarn workspace @nexus/react audit:storybook-coverage --component {kebab}
 # exit 0 — no `missing` or `drift` findings
 ```
 
-Per [`testing-react.md` § Definition of Done](https://github.com/nexuslabs-ai/nexus/blob/main/.claude/rules/testing-react.md#definition-of-done) — **Required** for Phase 1 component PRs. You can also invoke the `storybook-coverage-reviewer` subagent (registered under `.claude/agents/` and discoverable by name) — any prompt like _"audit {kebab} story coverage"_ shells out to the script and renders findings with paste-ready snippets."""
+Per [`testing-react.md` § Definition of Done]({repo_url}/.claude/rules/testing-react.md#definition-of-done) — **Required** for Phase 1 component PRs. You can also invoke the `storybook-coverage-reviewer` subagent (registered under `.claude/agents/` and discoverable by name) — any prompt like _"audit {kebab} story coverage"_ shells out to the script and renders findings with paste-ready snippets."""
+
+
+def fetch_repo_url() -> str:
+    """Resolve `https://github.com/{owner}/{repo}/blob/{defaultBranch}` via gh.
+
+    Avoids hardcoding `nexuslabs-ai/nexus/blob/main`; matches the runtime
+    resolution pattern in `.claude/rules/github.md`.
+    """
+    res = subprocess.run(
+        ["gh", "repo", "view", "--json", "owner,name,defaultBranchRef"],
+        capture_output=True, text=True, check=True,
+    )
+    data = json.loads(res.stdout)
+    owner = data["owner"]["login"]
+    name = data["name"]
+    branch = data["defaultBranchRef"]["name"]
+    return f"https://github.com/{owner}/{name}/blob/{branch}"
 
 
 def fetch_body(n: int) -> str:
@@ -75,7 +93,9 @@ def fetch_body(n: int) -> str:
         ["gh", "issue", "view", str(n), "--json", "body"],
         capture_output=True, text=True, check=True,
     )
-    return json.loads(res.stdout)["body"]
+    # Empty issue bodies serialize as JSON `null`; coerce to "" so substring
+    # checks downstream don't TypeError.
+    return json.loads(res.stdout).get("body") or ""
 
 
 def dod_anchor(kebab: str) -> str:
@@ -84,26 +104,29 @@ def dod_anchor(kebab: str) -> str:
 
 
 def has_dod(body: str, kebab: str) -> bool:
-    return dod_anchor(kebab) in body
+    # Trailing `\n` anchors the kebab so `--component label` doesn't false-positive
+    # on `--component label-x`.
+    return f"{dod_anchor(kebab)}\n" in body
 
 
 def strip_existing_dod(body: str) -> str:
     """Remove the existing `## Definition of Done` section (heading + body up
-    to the next H2 heading or the `Part of #161` footer, whichever comes first).
+    to the next H2 heading, the `Part of #161` footer, or end of string —
+    whichever comes first).
     """
-    # Match from "## Definition of Done" through to the next `## ` heading or
-    # the trailing "Part of #161..." footer. Non-greedy so it stops at the
-    # first sibling section.
+    # `\Z` covers the edge case where DoD is the last section with no footer;
+    # without it, the strip would silently no-op and `render` would append a
+    # duplicate block.
     pattern = re.compile(
-        r"\n## Definition of Done\b.*?(?=\n## |\nPart of #161)",
+        r"\n## Definition of Done\b.*?(?=\n## |\nPart of #161|\Z)",
         re.DOTALL,
     )
     return pattern.sub("", body, count=1)
 
 
-def render(body: str, kebab: str) -> str:
+def render(body: str, kebab: str, repo_url: str) -> str:
     """Insert (or replace) the DoD section. Anchors before `Part of #161`."""
-    dod = DOD_TEMPLATE.format(kebab=kebab)
+    dod = DOD_TEMPLATE.format(kebab=kebab, repo_url=repo_url)
 
     if has_dod(body, kebab):
         # Strip existing DoD first so the re-insert lands cleanly.
@@ -116,29 +139,30 @@ def render(body: str, kebab: str) -> str:
     return body.rstrip() + f"\n\n{dod}\n"
 
 
-def write_issue(n: int, new_body: str, dry_run: bool):
+def write_issue(n: int, new_body: str, dry_run: bool) -> None:
     out = Path(f"/tmp/issue-{n}.md")
-    out.write_text(new_body)
     if dry_run:
         print(f"#{n}: would write {len(new_body)} chars to {out}")
         return
+    out.write_text(new_body)
     subprocess.run(
         ["gh", "issue", "edit", str(n), "--body-file", str(out)],
         check=True,
     )
 
 
-def main():
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="don't push to GitHub")
     ap.add_argument("--only", type=int, default=None, help="only this issue number")
     args = ap.parse_args()
 
     targets = {args.only: ISSUES[args.only]} if args.only else ISSUES
+    repo_url = fetch_repo_url()
 
     for n, kebab in sorted(targets.items()):
         body = fetch_body(n)
-        new_body = render(body, kebab)
+        new_body = render(body, kebab, repo_url)
         if new_body == body:
             print(f"#{n} ({kebab}): unchanged — skip")
             continue
