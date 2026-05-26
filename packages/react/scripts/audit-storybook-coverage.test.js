@@ -411,6 +411,37 @@ describe('auditComponent — real fixtures', () => {
     const file = path.join(COMPONENTS_ROOT, 'ui', 'dialog.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
+    // Dialog omits the canonical `Disabled` requirement — display-gate must
+    // surface it as an info entry so the archetype decision is auditable.
+    expect(
+      result.info.some(
+        (i) => i.rule === 'display-gate' && i.name === 'Disabled'
+      )
+    ).toBe(true);
+  });
+
+  it('DropdownMenu passes via WithDisabledItems equivalence for Disabled', () => {
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'dropdown-menu.tsx');
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
+  });
+
+  it('Select passes via DisabledInteraction equivalence', () => {
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'select.tsx');
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
+  });
+
+  it('Accordion passes via ExpandInteraction equivalence for ClickInteraction', () => {
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'accordion.tsx');
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
+  });
+
+  it('Tabs passes via WithDisabledTab/DisabledTabInteraction equivalence', () => {
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'tabs.tsx');
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
   });
 
   it('Show primitive passes with AllAxes showcase from config', () => {

@@ -21,12 +21,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { COMPONENT_SUBDIRS } from './component-paths.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const COMPONENTS_ROOT = path.join(__dirname, '..', 'src', 'components');
 const CONFIG_PATH = path.join(__dirname, 'base-variants.config.json');
-
-const COMPONENT_SUBDIRS = ['ui', 'primitives'];
 const EXCLUDE_PATH_FRAGMENTS = ['__generated__', 'node_modules', 'dist'];
 const STORY_SUFFIX = '.stories.tsx';
 const TEST_SUFFIX = '.test.tsx';
@@ -689,6 +689,13 @@ const SNIPPETS = {
     </div>
   ),
 };`,
+  AllAxes: `export const AllAxes: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-6">
+      {/* Visual grid across every supported axis (e.g. above/below × viewport/container) */}
+    </div>
+  ),
+};`,
   asChild: `export const AsLink: Story = {
   render: (args) => (
     <Component {...args} asChild>
@@ -723,57 +730,54 @@ const DRIFT_ALIASES = {
   Default: ['Basic'],
   AllVariants: ['Variants', 'AllStates'],
   AllSizes: ['Sizes'],
+  AllAxes: ['Axes', 'AllAxis'],
 };
 
-const INTERACTIVE_REQUIREMENTS = ['Disabled', 'ClickInteraction', 'KeyboardInteraction'];
-const BASE_REQUIREMENTS = ['Default', 'WithDataAttributes'];
+// Frozen so the canonical-name array can be safely reused as a fallback value
+// across components without risk of a future helper splicing all of them.
+const INTERACTIVE_REQUIREMENTS = Object.freeze([
+  'Disabled',
+  'ClickInteraction',
+  'KeyboardInteraction',
+]);
+const BASE_REQUIREMENTS = Object.freeze(['Default', 'WithDataAttributes']);
 
-// Canonical interaction requirements by component. Components not listed here
-// fall back to source-based interactive detection.
-const COMPONENT_INTERACTION_REQUIREMENTS = {
-  Accordion: INTERACTIVE_REQUIREMENTS,
-  Button: INTERACTIVE_REQUIREMENTS,
-  Dialog: ['ClickInteraction', 'KeyboardInteraction'],
-  DropdownMenu: ['ClickInteraction', 'KeyboardInteraction'],
-  Input: INTERACTIVE_REQUIREMENTS,
-  Select: INTERACTIVE_REQUIREMENTS,
-  Switch: INTERACTIVE_REQUIREMENTS,
-  Tabs: INTERACTIVE_REQUIREMENTS,
-};
-
-// Accepted equivalents are component-scoped to avoid broad alias matching.
-const COMPONENT_REQUIREMENT_EQUIVALENTS = {
-  Accordion: {
-    ClickInteraction: ['ExpandInteraction'],
-  },
-  Dialog: {
-    ClickInteraction: ['OpenCloseInteraction'],
-  },
-  DropdownMenu: {
-    ClickInteraction: ['OpenCloseInteraction'],
-  },
-  Input: {
-    ClickInteraction: ['FocusBlurInteraction'],
-    KeyboardInteraction: ['TypeInteraction'],
-  },
-  Select: {
-    ClickInteraction: ['OpenCloseInteraction'],
-    Disabled: ['DisabledInteraction'],
-  },
-  Tabs: {
-    Disabled: ['WithDisabledTab', 'DisabledTabInteraction'],
-  },
-};
-
-function interactionRequirementsFor(componentName, isInteractive) {
-  const explicit = COMPONENT_INTERACTION_REQUIREMENTS[componentName];
-  if (explicit) return explicit;
-  return isInteractive ? INTERACTIVE_REQUIREMENTS : [];
+/**
+ * Look up the per-component archetype entry from base-variants.config.json.
+ * Returns the raw entry (with optional `interactions` / `equivalents`) or null
+ * when the component has no config row — keeping callers from re-parsing the
+ * file. Display-gate inference handles the null case.
+ */
+function configEntryFor(componentName) {
+  const config = readConfig();
+  return config.components?.find((c) => c.name === componentName) ?? null;
 }
 
+/**
+ * Resolve the interaction-story requirement list for a component:
+ *   1. Explicit `interactions` in base-variants.config.json wins.
+ *   2. Otherwise, display-gate signal: source-detected interactive (disabled
+ *      prop or on* handler) OR a stories-level `fn()` spy in `meta.args`
+ *      yields the canonical INTERACTIVE_REQUIREMENTS list.
+ *   3. Pure display components return [] — display-gate emits one info entry
+ *      per canonical name so the omission is auditable.
+ */
+function interactionRequirementsFor(componentName, isInteractive) {
+  const entry = configEntryFor(componentName);
+  if (entry?.interactions) return entry.interactions;
+  return isInteractive ? [...INTERACTIVE_REQUIREMENTS] : [];
+}
+
+/**
+ * Build the set of story names that satisfy `requirementName` for a given
+ * component. Always includes the canonical name itself; appends any
+ * component-scoped equivalents declared in base-variants.config.json. Scoping
+ * is per-component (not global) so an unrelated component's alias can't
+ * silently satisfy another's requirement.
+ */
 function acceptedNamesForRequirement(componentName, requirementName) {
-  const extras =
-    COMPONENT_REQUIREMENT_EQUIVALENTS[componentName]?.[requirementName] ?? [];
+  const entry = configEntryFor(componentName);
+  const extras = entry?.equivalents?.[requirementName] ?? [];
   return [requirementName, ...extras];
 }
 
@@ -848,15 +852,23 @@ export function auditComponent(componentFile, opts = {}) {
     showcase,
   ];
 
-  if (interactiveRequirements.length === 0) {
-    for (const name of INTERACTIVE_REQUIREMENTS) {
-      result.info.push({
-        kind: 'info',
-        rule: 'display-gate',
-        name,
-        found: 'n/a (display component — interactive requirements omitted)',
-      });
-    }
+  // Emit one info entry per canonical interaction name that this component
+  // omits — covers both full omission (display components) and partial
+  // omission (Dialog drops `Disabled`). The diff makes every archetype
+  // decision auditable instead of silent.
+  const omitted = INTERACTIVE_REQUIREMENTS.filter(
+    (name) => !interactiveRequirements.includes(name)
+  );
+  const omissionReason = interactiveRequirements.length === 0
+    ? 'display component — no interactive requirements'
+    : 'archetype omits this canonical requirement';
+  for (const name of omitted) {
+    result.info.push({
+      kind: 'info',
+      rule: 'display-gate',
+      name,
+      found: `n/a (${omissionReason})`,
+    });
   }
 
   for (const reqName of requiredNames) {
