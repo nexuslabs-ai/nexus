@@ -6,7 +6,7 @@ export type ThemeConfig = {
   brand: string;
   dark: boolean;
   // Design token modes
-  size: string;
+  spacing: string;
   typography: string;
   shadow: string;
   radius: string;
@@ -41,7 +41,7 @@ export function useTheme() {
     brand: 'blue',
     dark: false,
     // Design token modes
-    size: 'vega',
+    spacing: 'vega',
     typography: 'vega',
     shadow: 'vega',
     radius: 'subtle',
@@ -58,10 +58,9 @@ export function useTheme() {
     loadCSS(`/themes/brands-${theme.brand}.css`, 'brand');
   }, [theme.brand]);
 
-  // Load size mode when it changes
   useEffect(() => {
-    loadCSS(`/themes/size-${theme.size}.css`, 'size');
-  }, [theme.size]);
+    document.documentElement.setAttribute('data-style', theme.spacing);
+  }, [theme.spacing]);
 
   // Load typography mode when it changes
   useEffect(() => {

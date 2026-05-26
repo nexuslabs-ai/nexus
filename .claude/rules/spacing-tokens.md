@@ -1,17 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Forward-looking design spec — NOT yet implemented.** This describes the _target_
-> two-tier, per-mode spacing architecture, authored ahead of the code (#129/#130).
-> The repo does **not** implement it today — spacing is still the three-tier model
-> (`semantic/spacing.json` → `--nx-size-*` primitives → `--spacing-*`); see
-> [`tokens.md`](tokens.md). None of the artifacts below exist yet: no per-mode
-> `spacing-{mode}.json`, no `validate-spacing-modes.js`, no `--control-*` vars, no
-> `nexus/*` lint rules.
->
-> Implementation is tracked as a 12-step epic (#117–#128); only [1/12] is done.
-> Issue **#125 [9/12]** owns syncing this file once the code lands. Until then, treat
-> everything below as the plan, not current behavior — for spacing today, use
-> `tokens.md` and numeric `nx:p-*` / `nx:gap-*` utilities.
+> **Partial implementation status (post-#119).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:h-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. Still pending: `validate-spacing-modes.js` schema validator (#125), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the role-to-component-coupling enforcement (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the validator + lint enforcement which are still ahead.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 
@@ -145,8 +134,8 @@ These are the px values the design system has chosen as its scale. Any value out
 ### For component authors writing JSX
 
 - **Use numeric utilities (`nx:p-2`, `nx:gap-4`, `nx:h-9`)** for layout-level and ad-hoc spacing inside components. They shift with mode automatically.
-- **Use role-named utilities (`nx:px-control`, `nx:h-control-md`, `nx:p-container`)** for component-internal spacing that has a clear semantic role.
-- **Mix freely.** A Button can use `nx:h-control-md nx:px-control nx:gap-2` — height/padding follow the control role, gap is a structural numeric choice.
+- **Use role-named utilities (`nx:px-control-md`, `nx:h-control-md`, `nx:p-container`, `nx:gap-layout-section`)** for component-internal spacing that has a clear semantic role. Control utilities carry an explicit size suffix (`-sm`, `-md`, `-lg`); container/layout utilities have no size suffix.
+- **Mix freely.** A Button can use `nx:h-control-md nx:px-control-md nx:gap-2` — height/padding follow the control role, gap is a structural numeric choice.
 - ❌ Don't write raw px values (`style={{ padding: '10px' }}`). Always go through a token.
 - ❌ Don't use `nx:p-[5px]` arbitrary-value escape hatches. If the canonical set doesn't have what you need, propose the change to the set.
 
@@ -156,21 +145,23 @@ Load these into context when generating Nexus FE code:
 
 1. **The `nx:` prefix is mandatory.** Vanilla `p-3` does not work — every utility must be prefixed.
 2. **Canonical step set above.** Any spacing value emitted should map to one of these.
-3. **Role-named utilities take priority over numeric** when a clear role applies. Button padding → `nx:px-control`, not `nx:px-2.5`.
+3. **Role-named utilities take priority over numeric** when a clear role applies. Button padding → `nx:px-control-md`, not `nx:px-2.5`.
 4. **Mode switching is via `data-style="X"` attribute** on the root or a subtree. To make a component appear in compact density, wrap it in `<div data-style="mira">`.
 
-## Schema validation
+## Schema validation _(planned — #125)_
 
-CI enforces that all 7 mode files have **identical key sets**. The schema is generated from `spacing-vega.json` (the canonical default) and applied to all other modes. A mode file with missing or extra keys fails the build.
+CI **will** enforce that all 7 mode files have **identical key sets**. The schema is to be generated from `spacing-vega.json` (the canonical default) and applied to all other modes. A mode file with missing or extra keys will fail the build.
 
-Implementation: `scripts/validate-spacing-modes.js` reads the Vega key set and validates the other six against it. Runs in pre-commit hook and CI.
+Planned implementation: `scripts/validate-spacing-modes.js` reads the Vega key set and validates the other six against it. Will run in pre-commit hook and CI. Tracked by #125. Until it lands, parity is enforced indirectly by the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js`.
 
-## Lint rules
+## Lint rules _(planned — #127)_
 
-Two ESLint/Stylelint rules guard the architecture:
+Two ESLint/Stylelint rules **will** guard the architecture:
 
 1. **`nexus/canonical-spacing-steps`** — flags any spacing value in `spacing-*.json` mode files outside the canonical step set. Configurable via the canonical step list in this rule file.
 2. **`nexus/prefer-role-utilities`** — flags raw numeric utilities (`nx:p-N`, `nx:h-N`, `nx:gap-N`) in `packages/react/src/components/ui/*.tsx` files when a role-named utility would apply. Reads the role-to-component coupling table (see below). Allow-list with `// nexus-allow-numeric: reason` comment.
+
+Both rules are tracked by #127. Until they land, the architecture is enforced through review.
 
 ## Role-to-component coupling table
 
@@ -200,7 +191,7 @@ When a new component is authored, the author adds a row to this table.
 
 The Figma side of Nexus mirrors this architecture. Figma Variables for spacing live in mode-specific collections (one per mode), each with the same key set as the JSON mode files. There is no Figma "spacing primitives" collection.
 
-The `audit:figma-parity` script compares each mode's Figma collection against the corresponding `spacing-{mode}.json` file. Same intent as the existing primitive audit, but mode-scoped.
+The `audit:figma-parity` script **will** compare each mode's Figma collection against the corresponding `spacing-{mode}.json` file — same intent as the existing color audit, but mode-scoped. The `spacing` category is `Pending` in [`figma.md`](figma.md)'s categories table (tracked under the #117 epic); the audit only supports `--category color` today.
 
 ## When to revisit
 

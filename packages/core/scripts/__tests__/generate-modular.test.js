@@ -72,4 +72,95 @@ describe('generateModular', () => {
     expect(globals).toMatch(/--breakpoint-sm: 40rem;/);
     expect(globals).toMatch(/--breakpoint-2xl: 96rem;/);
   });
+
+  // -----------------------------------------------------------------------
+  // Spacing migration (#119) — per-mode blocks + sibling spacing-utilities.css
+  // -----------------------------------------------------------------------
+
+  it('emits all 7 per-mode [data-style="X"] blocks in playground globals.css', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    expect(matches).toHaveLength(7);
+
+    const modes = new Set(matches.map((m) => m.match(/['"]([a-z]+)['"]/)[1]));
+    expect(modes).toEqual(
+      new Set(['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'])
+    );
+  });
+
+  it('emits Vega numerics in @theme as direct px (not var refs)', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(/--spacing-4:\s*16px;/);
+    expect(globals).toMatch(/--spacing-6:\s*24px;/);
+    expect(globals).not.toMatch(/--spacing-0:\s*var\(/);
+  });
+
+  it('emits role @utility declarations into a sibling spacing-utilities.css (not inlined)', () => {
+    // Symmetric with the bundled-tailwind build: globals.css @imports
+    // spacing-utilities.css; sync-playground-themes.js's STYLES_FILES
+    // allowlist includes the file so it reaches apps/playground/src/styles/.
+    const files = fs.readdirSync(distDir);
+    expect(files).toContain('spacing-utilities.css');
+
+    const spacingUtilities = fs.readFileSync(
+      path.join(distDir, 'spacing-utilities.css'),
+      'utf8'
+    );
+    expect(spacingUtilities).toMatch(/@utility h-control-md \{/);
+    expect(spacingUtilities).toMatch(/@utility p-container \{/);
+    expect(spacingUtilities).toMatch(/@utility gap-layout-section \{/);
+
+    // globals.css does NOT inline role utilities — it @imports them.
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).not.toMatch(/@utility h-control-md \{/);
+    expect(globals).toMatch(/@import\s+['"]\.\/spacing-utilities\.css['"]/);
+  });
+
+  it('@utility declarations bind the right prefixed CSS vars', () => {
+    const spacingUtilities = fs.readFileSync(
+      path.join(distDir, 'spacing-utilities.css'),
+      'utf8'
+    );
+    expect(spacingUtilities).toMatch(
+      /@utility h-control-md \{[\s\S]*?height:\s*var\(--nx-control-h-md\);/
+    );
+    expect(spacingUtilities).toMatch(
+      /@utility p-container \{[\s\S]*?padding:\s*var\(--nx-container-p\);/
+    );
+    expect(spacingUtilities).toMatch(
+      /@utility gap-layout-stack \{[\s\S]*?gap:\s*var\(--nx-layout-stack-gap\);/
+    );
+  });
+
+  it('per-mode override blocks use --nx- prefix (Tailwind only rewrites @theme)', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    // Both numeric AND role tokens inside [data-style="X"] blocks must be
+    // already-prefixed since they live outside @theme.
+    expect(globals).toMatch(
+      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
+    );
+    expect(globals).toMatch(
+      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-control-h-md:\s*32px;/
+    );
+  });
+
+  it('spacingDefault option shifts which mode lands under :root, [data-style="X"]', async () => {
+    // Same contract as the bundled-tailwind build: pass a non-default mode
+    // and confirm the :root combinator moves to it. All 7 mode blocks still
+    // emit; only the `:root` half of the dual selector changes.
+    const dir = makeTmpDir();
+    const originalLog = console.log;
+    console.log = () => {};
+    try {
+      await generateModular({ distDir: dir, spacingDefault: 'maia' });
+    } finally {
+      console.log = originalLog;
+    }
+    const globals = fs.readFileSync(path.join(dir, 'globals.css'), 'utf8');
+
+    expect(globals).toMatch(/:root,\s*\n\s*\[data-style=['"]maia['"]\] \{/);
+    expect(globals).not.toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    expect(matches).toHaveLength(7);
+  });
 });

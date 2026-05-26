@@ -94,7 +94,7 @@ Failures must be fixed by adjusting the semantic token reference (which shade a 
 | Directory  | Pattern                               | Example                                                                       |
 | ---------- | ------------------------------------- | ----------------------------------------------------------------------------- |
 | primitives | `color.json`                          | Single file with all color scales                                             |
-| primitives | `{category}/{category}-{mode}.json`   | `size/size-vega.json`, `radius/radius-subtle.json`                            |
+| primitives | `{category}/{category}-{mode}.json`   | `radius/radius-subtle.json`, `borderwidth/borderwidth-vega.json`              |
 | primitives | `shadow/shadow-{mode}-{theme}.json`   | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json`                      |
 | primitives | `typography/typography-{mode}.json`   | `typography/typography-vega.json`                                             |
 | primitives | `borderwidth/borderwidth-{mode}.json` | `borderwidth/borderwidth-vega.json`                                           |
@@ -102,7 +102,7 @@ Failures must be fixed by adjusting the semantic token reference (which shade a 
 | semantic   | `base-{palette}-{theme}.json`         | `base-slate-light.json`, `base-slate-dark.json`                               |
 | semantic   | `brands-{name}-{theme}.json`          | `brands-blue-light.json`, `brands-blue-dark.json`                             |
 | semantic   | `chart-{scale}-{mode}-{theme}.json`   | `chart-categorical-default-light.json`, `chart-categorical-default-dark.json` |
-| semantic   | `spacing.json`                        | Standalone semantic (no light/dark variant)                                   |
+| semantic   | `spacing-{mode}.json`                 | Per-mode direct-px spacing (no primitive layer — see `spacing-tokens.md`)     |
 | semantic   | `focus.json`                          | Standalone semantic — focus colour refs + the `focus.offset` outline distance |
 | component  | `{component}.json`                    | `button.json` (future)                                                        |
 | styles     | `{name}.json`                         | `styles/shadows.json`, `styles/typography.json`                               |
@@ -281,21 +281,24 @@ Available options:
 
 - **Base**: slate, neutral, zinc, gray, stone
 - **Brand**: blue, gray, neutral, slate, stone
-- **Size**: vega, lyra, maia, mira, nova
 - **Typography**: nova, vega, maia
 - **Shadow**: vega, lyra, maia, mira, nova
 - **Radius**: blunt, sharp, subtle, smooth, mellow
 - **Border Width**: vega, lyra, maia, mira, nova
 
-> **Mode distinctness varies by axis.** A mode listed above means the CLI flag is accepted — not that it resolves to unique values. `shadow` is genuinely distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `size` and `borderwidth` still expose five flags, but several are byte-identical copies of `vega` (`size-mira` = `size-vega`; `borderwidth-lyra` = `borderwidth-mira` = `borderwidth-vega`) — the flag resolves, it just yields the same tokens. Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
+> **Spacing isn't a CLI flag.** Spacing ships all 7 modes (vega, lyra, maia, mira, nova, luma, sera) in every build; mode swap is via the `data-style="X"` attribute on `<html>` (or any subtree) at runtime — no flag, no rebuild. See `spacing-tokens.md`.
+
+> **Mode distinctness varies by axis.** A mode listed above means the CLI flag is accepted — not that it resolves to unique values. `shadow` is genuinely distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `borderwidth` still exposes five flags, but several are byte-identical copies of `vega` (`borderwidth-lyra` = `borderwidth-mira` = `borderwidth-vega`) — the flag resolves, it just yields the same tokens. Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
 
 ## CSS Variable Naming
 
-| Type             | Pattern                  | Example                              |
-| ---------------- | ------------------------ | ------------------------------------ |
-| Primitive        | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-size-4` |
-| Semantic         | `--{category}-{path}`    | `--color-background`, `--spacing-4`  |
-| Tailwind utility | `nx:{utility}`           | `nx:bg-primary`, `nx:p-4`            |
+| Type             | Pattern                  | Example                                 |
+| ---------------- | ------------------------ | --------------------------------------- |
+| Primitive        | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-radius-md` |
+| Semantic         | `--{category}-{path}`    | `--color-background`, `--spacing-4`     |
+| Tailwind utility | `nx:{utility}`           | `nx:bg-primary`, `nx:p-4`               |
+
+> **Spacing has no primitive layer.** `spacing-{mode}.json` files carry direct px values (no `{N}` refs), so there is no `--nx-size-*` namespace — `--nx-spacing-N` is emitted directly from the per-mode semantic files. See `spacing-tokens.md`.
 
 ## Typography Utilities
 

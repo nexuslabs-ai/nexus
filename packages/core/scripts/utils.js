@@ -227,13 +227,19 @@ export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
 export const DEFAULT_CONFIG = {
   base: 'stone',
   brand: 'neutral',
-  size: 'vega',
   typography: 'vega',
   shadow: 'vega',
   radius: 'sharp',
   borderwidth: 'vega',
   focus: 'default',
   'chart-categorical': 'default',
+  // Spacing ships all 7 modes in every build (mode swap is runtime via the
+  // `data-style="X"` attribute). This key only controls which mode lands
+  // under `:root, [data-style="X"]` — i.e. which is the default when no
+  // `data-style` attribute is set on the document. Other modes still emit
+  // their `[data-style="X"]` blocks alongside. Vega is the canonical
+  // baseline per `.claude/rules/spacing-tokens.md`.
+  spacingDefault: 'vega',
 };
 
 // ============================================
@@ -302,6 +308,11 @@ export function discoverSemantics(semanticDir) {
   const result = {
     themed: {},
     standalone: [],
+    // Schema-agnostic bucket for per-mode semantic categories. Today's only
+    // entry is `spacing` (from `spacing-{mode}.json`); a future per-mode
+    // category (e.g., per-mode color shading) would land as a sibling key
+    // here without forking the partition logic.
+    perModeFiles: {},
   };
 
   if (!fs.existsSync(semanticDir)) {
@@ -312,10 +323,25 @@ export function discoverSemantics(semanticDir) {
 
   // Pattern for themed files: {type}-{mode}-{light|dark}.json
   const themedPattern = /^(.+)-(.+)-(light|dark)\.json$/;
+  // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
+  // direct px (no `{N}` refs) and emit per-mode `[data-style="X"]` blocks via
+  // `collectSpacingTokens` — they intentionally bypass the generic
+  // standalone-dimension scan, which would otherwise emit each file's keys
+  // into `@theme` once per mode and last-write-wins.
+  const spacingModePattern = /^spacing-(.+)\.json$/;
 
   for (const file of files) {
-    const match = file.match(themedPattern);
+    const spacingMatch = file.match(spacingModePattern);
+    if (spacingMatch) {
+      const [, mode] = spacingMatch;
+      if (!result.perModeFiles.spacing) {
+        result.perModeFiles.spacing = {};
+      }
+      result.perModeFiles.spacing[mode] = file;
+      continue;
+    }
 
+    const match = file.match(themedPattern);
     if (match) {
       const [, type, mode, variant] = match;
 
@@ -327,7 +353,7 @@ export function discoverSemantics(semanticDir) {
       }
       result.themed[type][mode][variant] = file;
     } else {
-      // Standalone file (no light/dark suffix)
+      // Standalone file (no light/dark suffix, not a spacing mode)
       result.standalone.push(file);
     }
   }
@@ -698,37 +724,369 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
 // TOKEN COLLECTION FOR @THEME BLOCKS
 // ============================================
 
+/*
+ * Spacing has two distinct "default mode" concepts. They look similar and are
+ * easy to conflate, but they live at different layers:
+ *
+ *  - `CANONICAL_SPACING_DEFAULT_MODE` (this constant, hardcoded) drives the
+ *    build-time CONTRACT: which mode's numeric subset seeds `@theme` for
+ *    Tailwind utility codegen, and which mode's role tokens get `@utility`
+ *    declarations emitted. Vega is locked here because tests reference it
+ *    (`VEGA_BASELINE` byte-identity lock, drift guard, etc.). Changing this
+ *    moves the test surface.
+ *
+ *  - `config.spacingDefault` (consumer-configurable, defaults to the constant
+ *    above) drives the runtime CASCADE DEFAULT: which mode lands under
+ *    `:root, [data-style="X"]` so a document with no `data-style` attribute
+ *    resolves to that mode. All seven modes still emit; only the `:root`
+ *    selector moves.
+ *
+ * The build emits the same `@utility` set and the same seven per-mode blocks
+ * regardless of `spacingDefault`. Only the `:root` half of the dual selector
+ * is consumer-pickable.
+ */
+
 /**
- * Collect spacing token mappings from spacing.json
- * Returns array of { cssName, varRef } for @theme block
+ * Canonical default spacing mode. Published under `:root, [data-style="vega"]`
+ * by the per-mode emitter, and used by the generators to pick the mode whose
+ * numeric subset seeds Tailwind's `@theme` block. One constant so the four
+ * sites that pick "the default mode" cannot drift.
+ */
+export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
+
+/**
+ * Collect spacing tokens from per-mode `semantic/spacing-{mode}.json` files.
+ *
+ * Returns a map keyed by mode name; each value is the token list for that
+ * mode. Token `cssName` is the JSON path joined with `-` (e.g. `spacing-0`,
+ * `control-h-md`, `container-p`, `layout-section-gap`) — **without** the
+ * `nx-` prefix. Callers add the prefix at emit time based on context:
+ *
+ *  - `@theme` block (numeric subset only) emits unprefixed (`--spacing-0`).
+ *    Tailwind v4's `prefix(nx)` rewrites these to `--nx-spacing-0` at
+ *    consumer build time, and codegens `nx:p-0` / `nx:m-0` / `nx:gap-0`
+ *    utilities from the `--spacing-*` namespace.
+ *  - Per-mode override blocks (outside `@theme`) emit the already-prefixed
+ *    form (`--nx-spacing-0`) directly, because Tailwind doesn't rewrite
+ *    variables outside `@theme`. See `generateSpacingModesCSS`.
+ *  - `@utility` role declarations reference the prefixed form
+ *    (`var(--nx-control-h-md)`). See `generateSpacingRoleUtilitiesCSS`.
+ *
+ * Throws on cssName collisions across paths within a single mode — two paths
+ * flattening to the same name (e.g. `control.h-md` and `control.h.md` both
+ * → `control-h-md`) would silently lose one declaration.
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object[]} Array of { cssName, varRef }
+ * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
+ *   Modes keyed by name (e.g. `vega`, `lyra`, `maia`, `mira`, `nova`, `luma`, `sera`).
+ *   Each token carries the original JSON `path` so downstream emitters
+ *   (`generateSpacingRoleUtilitiesCSS`) can derive structure without
+ *   reverse-engineering it from `cssName`.
  */
 export function collectSpacingTokens(semanticDir) {
-  const filePath = path.join(semanticDir, 'spacing.json');
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Spacing semantic file missing: ${filePath}`);
+  const { perModeFiles } = discoverSemantics(semanticDir);
+  const spacingFiles = perModeFiles.spacing ?? {};
+
+  const modeNames = Object.keys(spacingFiles);
+  if (modeNames.length === 0) {
+    throw new Error(
+      `collectSpacingTokens: no semantic/spacing-{mode}.json files found in ${semanticDir}`
+    );
   }
 
-  const tokenData = readTokenFile(filePath);
-  const tokens = [];
+  const result = {};
 
-  for (const [key, value] of Object.entries(tokenData)) {
-    if (key.startsWith('$')) continue;
-    if (value.$type !== 'dimension') continue;
+  for (const mode of modeNames) {
+    const filePath = path.join(semanticDir, spacingFiles[mode]);
+    const tokenData = readTokenFile(filePath);
+    const extracted = extractTokens(tokenData);
+    const tokens = [];
+    const seen = new Set();
 
-    const match = value.$value.match(/\{(.+)\}/);
-    if (match) {
-      const sizeKey = match[1];
+    for (const token of extracted) {
+      const cssName = token.path.join('-');
+      if (seen.has(cssName)) {
+        throw new Error(
+          `collectSpacingTokens: cssName collision "${cssName}" in ${spacingFiles[mode]} — two JSON paths flatten to the same variable name`
+        );
+      }
+      seen.add(cssName);
       tokens.push({
-        cssName: key,
-        varRef: `var(--nx-size-${sizeKey})`,
+        cssName,
+        path: token.path,
+        value: formatTokenValue(token.value, token.type, token.path),
       });
+    }
+
+    result[mode] = tokens;
+  }
+
+  return result;
+}
+
+/**
+ * Top-level keys that may appear in `spacing-{mode}.json`. Acts as a closed
+ * allowlist for `splitSpacingTokens` so a future accidental top-level key
+ * (e.g. `motion`, `border`) throws at partition time — close to the JSON
+ * edit — instead of falling through to `deriveRoleUtility` and producing
+ * cryptic "unhandled path shape" errors at the emit step.
+ */
+const SPACING_NUMERIC_ROOTS = new Set(['spacing']);
+const SPACING_ROLE_ROOTS = new Set(['control', 'container', 'layout']);
+
+/**
+ * Split a per-mode token list into `{ numeric, role }` halves. Numeric tokens
+ * (path starts with `spacing`) feed `@theme` for Tailwind's `nx:p-*` /
+ * `nx:m-*` / `nx:gap-*` / `nx:h-*` / `nx:w-*` utility codegen. Role tokens
+ * (`control.*`, `container.*`, `layout.*`) feed only the per-mode
+ * `[data-style="X"]` overrides and the `spacing-utilities` `@utility`
+ * declarations. Role tokens never enter `@theme`, both because Tailwind v4's
+ * `--container-*` namespace would otherwise auto-codegen `nx:w-p` and
+ * friends from `--nx-container-p`, and because role tokens don't map onto
+ * Tailwind's unified `--spacing-*` namespace cleanly.
+ *
+ * Partitioning reads `token.path[0]` — `path` is the structured form,
+ * `cssName` is the flattened output artifact. Throws when a path's root is
+ * outside the two allowlists; extending requires a deliberate edit here.
+ */
+export function splitSpacingTokens(tokens) {
+  const numeric = [];
+  const role = [];
+  for (const token of tokens) {
+    const root = token.path[0];
+    if (SPACING_NUMERIC_ROOTS.has(root)) {
+      numeric.push(token);
+    } else if (SPACING_ROLE_ROOTS.has(root)) {
+      role.push(token);
+    } else {
+      throw new Error(
+        `splitSpacingTokens: unknown top-level key "${root}" in path [${token.path.join('.')}] — extend SPACING_NUMERIC_ROOTS / SPACING_ROLE_ROOTS`
+      );
+    }
+  }
+  return { numeric, role };
+}
+
+/**
+ * Emit per-mode `[data-style="X"]` CSS blocks for spacing.
+ *
+ * The default mode (Vega) is published under `:root, [data-style="vega"]` so
+ * any document with no `data-style` attribute still resolves to Vega. The
+ * remaining six modes emit in alphabetical order for cross-platform
+ * determinism (filesystem order isn't portable; sorting locks it).
+ *
+ * Each block emits ALL spacing tokens for that mode (numeric + role) — even
+ * when a value matches the default. The redundancy is small (~48 lines × 6
+ * non-default modes ≈ 300 lines) and the explicitness is the point: a reader
+ * sees the full per-mode contract in one place.
+ *
+ * Variable names are emitted already-prefixed (`--nx-spacing-N`,
+ * `--nx-control-h-md`, …). Tailwind v4's `prefix(nx)` rewrites variables
+ * inside `@theme` but does NOT rewrite variables declared in `:root` /
+ * attribute-selector blocks, so writing the prefixed form here is what makes
+ * mode-switching actually override the utility's `var(--nx-spacing-N)`
+ * reference. (Mirrors `prefixDarkVars: true` in the `.dark` block.)
+ *
+ * @param {Record<string, {cssName: string, value: string}[]>} modesByName
+ * @param {object} [opts]
+ * @param {string} [opts.defaultMode=CANONICAL_SPACING_DEFAULT_MODE]
+ * @returns {string} CSS string with all per-mode blocks
+ */
+export function generateSpacingModesCSS(modesByName, opts = {}) {
+  const { defaultMode = CANONICAL_SPACING_DEFAULT_MODE } = opts;
+
+  const allModes = Object.keys(modesByName);
+  if (!allModes.includes(defaultMode)) {
+    throw new Error(
+      `generateSpacingModesCSS: defaultMode "${defaultMode}" not found among modes [${allModes.join(', ')}]`
+    );
+  }
+
+  // Intra-mode duplicate-value warning for numeric tokens. Two `spacing-N`
+  // keys resolving to the same px (e.g. Lyra's `spacing-11 === spacing-12 ===
+  // 48px` from #223) is almost always a design oversight. Cheap to detect
+  // here, expensive to chase later. We key off the `spacing-` cssName prefix
+  // (rather than `token.path`) because the function's documented input shape
+  // is `{cssName, value}[]` — `path` may be absent in some callers/tests.
+  // The strict canonical-step check is deferred to the
+  // `nexus/canonical-spacing-steps` lint rule (#127) — the step set itself
+  // is still being reconciled (see `spacing-tokens.md`).
+  for (const mode of allModes) {
+    const valueByName = new Map();
+    for (const token of modesByName[mode]) {
+      if (!token.cssName.startsWith('spacing-')) continue;
+      const collision = valueByName.get(token.value);
+      if (collision) {
+        log.warn(
+          `generateSpacingModesCSS: ${mode} — "${token.cssName}" and "${collision}" both resolve to ${token.value} (intra-mode numeric duplicate)`
+        );
+      } else {
+        valueByName.set(token.value, token.cssName);
+      }
     }
   }
 
-  return tokens;
+  const otherModes = allModes.filter((m) => m !== defaultMode).sort();
+
+  let css = `\n/* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */\n`;
+
+  // Per-mode blocks live OUTSIDE @theme — Tailwind v4's `prefix(nx)` only
+  // rewrites variables declared inside @theme, so we add the `nx-` prefix
+  // here so the declarations actually override the `var(--nx-spacing-*)` /
+  // `var(--nx-control-*)` etc. references in compiled utilities.
+  const writeBlock = (selector, tokens) => {
+    let block = `${selector} {\n`;
+    for (const token of tokens) {
+      block += `  --nx-${token.cssName}: ${token.value};\n`;
+    }
+    block += `}\n`;
+    return block;
+  };
+
+  css += `\n${writeBlock(`:root,\n[data-style="${defaultMode}"]`, modesByName[defaultMode])}`;
+  for (const mode of otherModes) {
+    css += `\n${writeBlock(`[data-style="${mode}"]`, modesByName[mode])}`;
+  }
+
+  return css;
+}
+
+/**
+ * Maps the family segment of a three-segment role-token path to the CSS
+ * properties the utility should set. Hand-maintained because the suffix →
+ * property mapping is a CSS-design decision, not derivable from JSON.
+ *
+ * Three-segment paths only — two-segment paths (`container.p`, `control.gap`,
+ * `layout.section-gap`) are handled inline in `deriveRoleUtility`.
+ *
+ * Adding a new three-segment family (e.g. `m` → `margin`) means adding one
+ * row here. The set of role tokens themselves is JSON-driven — see
+ * `generateSpacingRoleUtilitiesCSS`.
+ */
+const SUFFIX_TO_PROPERTIES = {
+  h: ['height'],
+  'padding-x': ['padding-left', 'padding-right'],
+  'padding-y': ['padding-top', 'padding-bottom'],
+};
+
+/**
+ * Derive a `{utilityName, properties}` for a role-token path.
+ *
+ * Naming convention — `<property-shorthand>-<role>[-<size>]`:
+ *   `control.h.md`            → utility `h-control-md`,        height
+ *   `control.padding-x.sm`    → utility `px-control-sm`,       padding-inline
+ *   `control.padding-y.lg`    → utility `py-control-lg`,       padding-block
+ *   `control.gap`             → utility `gap-control`,         gap
+ *   `container.p`             → utility `p-container`,         padding
+ *   `container.gap`           → utility `gap-container`,       gap
+ *   `layout.section-gap`      → utility `gap-layout-section`,  gap
+ *   `layout.stack-gap`        → utility `gap-layout-stack`,    gap
+ *
+ * Utility-name prefix per property:
+ *   height       → `h-`
+ *   padding      → `p-`
+ *   padding-x    → `px-`
+ *   padding-y    → `py-`
+ *   gap          → `gap-`
+ *
+ * The last path segment selects the property family (and may be a size
+ * suffix like `sm/md/lg`, or the family token itself like `gap`); the
+ * preceding segments form the role name.
+ */
+function deriveRoleUtility(tokenPath) {
+  // Path forms we handle:
+  //   [role, suffix]             — e.g. ['container', 'p'], ['control', 'gap']
+  //   [role, family, size]       — e.g. ['control', 'h', 'md']
+  //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
+  if (tokenPath.length < 2 || tokenPath.length > 3) {
+    throw new Error(
+      `deriveRoleUtility: path [${tokenPath.join('.')}] has ${tokenPath.length} segment(s); only 2- or 3-segment role paths are supported`
+    );
+  }
+  const [role, second, third] = tokenPath;
+
+  // Three-segment path: [role, family, size]. family ∈ {h, padding-x, padding-y}.
+  if (third !== undefined) {
+    const family = second;
+    const size = third;
+    const properties = SUFFIX_TO_PROPERTIES[family];
+    if (!properties) {
+      throw new Error(
+        `deriveRoleUtility: unknown family "${family}" in path [${tokenPath.join('.')}] — extend SUFFIX_TO_PROPERTIES`
+      );
+    }
+    const prefix = familyToUtilityPrefix(family);
+    return { utilityName: `${prefix}-${role}-${size}`, properties };
+  }
+
+  // Two-segment path: [role, suffix].
+  //   suffix === 'gap'         → gap-<role>
+  //   suffix === 'p'           → p-<role>
+  //   suffix === '<x>-gap'     → gap-<role>-<x>  (e.g. layout.section-gap → gap-layout-section)
+  if (second === 'gap') {
+    return { utilityName: `gap-${role}`, properties: ['gap'] };
+  }
+  if (second === 'p') {
+    return { utilityName: `p-${role}`, properties: ['padding'] };
+  }
+  const gapSuffixMatch = second.match(/^(.+)-gap$/);
+  if (gapSuffixMatch) {
+    const [, qualifier] = gapSuffixMatch;
+    return { utilityName: `gap-${role}-${qualifier}`, properties: ['gap'] };
+  }
+
+  throw new Error(
+    `deriveRoleUtility: unhandled path shape [${tokenPath.join('.')}] — extend deriveRoleUtility cases`
+  );
+}
+
+// Three-segment-only helper: `gap` and `p` two-segment paths are handled
+// inline in `deriveRoleUtility` and never reach here.
+function familyToUtilityPrefix(family) {
+  if (family === 'h') return 'h';
+  if (family === 'padding-x') return 'px';
+  if (family === 'padding-y') return 'py';
+  throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);
+}
+
+/**
+ * Generate `@utility` declarations for spacing role tokens.
+ *
+ * Walks the canonical mode's role tokens, derives each utility name +
+ * property set from the token's structured JSON `path`, and emits one
+ * `@utility` declaration referencing the already-prefixed CSS variable.
+ *
+ * Data-driven by design: adding a new role key to `spacing-vega.json` (and
+ * the other six mode files, per the schema contract) automatically grows the
+ * utility set. The Phase 2 drift test asserts utilities ↔ role tokens stay
+ * 1:1.
+ *
+ * @param {{cssName: string, path: string[], value: string}[]} canonicalRoleTokens
+ *   Role tokens from the canonical (Vega) mode. Each carries the original
+ *   JSON `path` so the emitter never reverse-engineers structure that
+ *   already exists upstream.
+ * @returns {{css: string, count: number}}
+ */
+export function generateSpacingRoleUtilitiesCSS(canonicalRoleTokens) {
+  let css = `/* Spacing role utilities — data-driven from canonical mode role tokens. */\n\n`;
+
+  let count = 0;
+  for (const token of canonicalRoleTokens) {
+    const { utilityName, properties } = deriveRoleUtility(token.path);
+
+    css += `@utility ${utilityName} {\n`;
+    for (const prop of properties) {
+      // @utility lives in Tailwind's source-pass, so it WILL pick up the
+      // `prefix(nx)` rewrite — but the var name we're referencing is in our
+      // own per-mode `[data-style="X"]` block, which is already prefixed.
+      // Emit the prefixed form directly so both sides match.
+      css += `  ${prop}: var(--nx-${token.cssName});\n`;
+    }
+    css += `}\n\n`;
+    count += 1;
+  }
+
+  return { css, count };
 }
 
 /**
@@ -978,13 +1336,15 @@ export function collectSemanticColorTokensVarRef(
  * scan MUST skip these to avoid duplicate emission of the same `--*` variable
  * from two different code paths.
  *
- *   spacing.json     → collectSpacingTokens  (reference-valued, resolves {N})
  *   breakpoints.json → collectBreakpointsTokens (literal {value, unit})
  *   z-index.json     → collectZIndexTokens  ($type: number, not dimension)
+ *
+ * Spacing files (`spacing-{mode}.json`) are NOT in this list — `discoverSemantics`
+ * routes them into the `perModeFiles.spacing` bucket so they never enter
+ * `standalone` in the first place.
  */
 export const FILES_WITH_DEDICATED_DIMENSION_COLLECTORS = new Set([
   'breakpoints.json',
-  'spacing.json',
   'z-index.json',
 ]);
 
@@ -1060,7 +1420,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
  * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours and dimensions
- * @param {object[]} config.spacingTokens - Array of { cssName, varRef } for spacing
+ * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (Vega defaults; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
@@ -1122,11 +1482,12 @@ export function generateThemeCSS(config) {
     }
   }
 
-  // Spacing tokens
+  // Spacing tokens (numeric Vega defaults — see generateSpacingModesCSS for
+  // per-mode overrides emitted outside @theme).
   if (spacingTokens.length > 0) {
     css += `\n  /* Spacing tokens */\n`;
     for (const token of spacingTokens) {
-      css += `  --${token.cssName}: ${token.varRef};\n`;
+      css += `  --${token.cssName}: ${token.value};\n`;
     }
   }
 

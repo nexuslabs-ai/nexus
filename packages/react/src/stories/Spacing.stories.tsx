@@ -1,52 +1,100 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import sizeLyra from '../../../core/tokens/primitives/size/size-lyra.json';
-import sizeMaia from '../../../core/tokens/primitives/size/size-maia.json';
-import sizeMira from '../../../core/tokens/primitives/size/size-mira.json';
-import sizeNova from '../../../core/tokens/primitives/size/size-nova.json';
-import sizeVega from '../../../core/tokens/primitives/size/size-vega.json';
-import spacingTokens from '../../../core/tokens/semantic/spacing.json';
+import spacingLuma from '../../../core/tokens/semantic/spacing-luma.json';
+import spacingLyra from '../../../core/tokens/semantic/spacing-lyra.json';
+import spacingMaia from '../../../core/tokens/semantic/spacing-maia.json';
+import spacingMira from '../../../core/tokens/semantic/spacing-mira.json';
+import spacingNova from '../../../core/tokens/semantic/spacing-nova.json';
+import spacingSera from '../../../core/tokens/semantic/spacing-sera.json';
+import spacingVega from '../../../core/tokens/semantic/spacing-vega.json';
 
-const BUNDLED_SIZE_MODE = 'vega';
+const DEFAULT_MODE = 'vega';
 
 type Dimension = { value: number; unit: string };
-type DimensionLiteralToken = { $value: Dimension; $type: string };
-type DimensionReferenceToken = { $value: string; $type: string };
-type PrimitiveSizeMap = Record<string, DimensionLiteralToken>;
-type SemanticSpacingMap = Record<string, DimensionReferenceToken>;
+type DimensionToken = { $value: Dimension; $type: string };
+type ModeFile = Record<string, unknown>;
 
-const SIZE_MODES: { name: string; tokens: PrimitiveSizeMap }[] = [
-  { name: 'vega', tokens: sizeVega as PrimitiveSizeMap },
-  { name: 'lyra', tokens: sizeLyra as PrimitiveSizeMap },
-  { name: 'maia', tokens: sizeMaia as PrimitiveSizeMap },
-  { name: 'mira', tokens: sizeMira as PrimitiveSizeMap },
-  { name: 'nova', tokens: sizeNova as PrimitiveSizeMap },
-];
-
-const SPACING = spacingTokens as SemanticSpacingMap;
-
-function resolveReference(
-  ref: string,
-  primitives: PrimitiveSizeMap
-): Dimension {
-  const key = ref.slice(1, -1);
-  const prim = primitives[key];
-  if (!prim) throw new Error(`Unknown reference: ${ref}`);
-  return prim.$value;
+function isDimensionToken(node: unknown): node is DimensionToken {
+  if (typeof node !== 'object' || node === null) return false;
+  if (!('$value' in node) || !('$type' in node)) return false;
+  if ((node as { $type: unknown }).$type !== 'dimension') return false;
+  const value = (node as { $value: unknown }).$value;
+  if (typeof value !== 'object' || value === null) return false;
+  const dim = value as { value?: unknown; unit?: unknown };
+  return typeof dim.value === 'number' && typeof dim.unit === 'string';
 }
 
-function formatDimension(d: Dimension) {
+const MODES: { name: string; tokens: ModeFile }[] = [
+  { name: 'vega', tokens: spacingVega as ModeFile },
+  { name: 'lyra', tokens: spacingLyra as ModeFile },
+  { name: 'maia', tokens: spacingMaia as ModeFile },
+  { name: 'mira', tokens: spacingMira as ModeFile },
+  { name: 'nova', tokens: spacingNova as ModeFile },
+  { name: 'luma', tokens: spacingLuma as ModeFile },
+  { name: 'sera', tokens: spacingSera as ModeFile },
+];
+
+/**
+ * Walk a per-mode spacing file's `spacing.*` subtree and return ordered
+ * `[name, dim]` rows. The numeric scale carries 30+ keys; rendering them
+ * sorted by px value makes the visual rhythm obvious across modes.
+ */
+function extractNumericRows(mode: ModeFile): [string, Dimension][] {
+  const numeric = (mode.spacing ?? {}) as Record<string, unknown>;
+  const rows: [string, Dimension][] = [];
+  for (const [key, token] of Object.entries(numeric)) {
+    if (isDimensionToken(token)) {
+      rows.push([`spacing-${key}`, token.$value]);
+    }
+  }
+  return rows;
+}
+
+/**
+ * Walk the `control.*`, `container.*`, `layout.*` subtrees and return the
+ * role rows for that mode. Each row name mirrors the JSON path joined with
+ * `-`, matching the emitted CSS variable name (`--control-h-md`,
+ * `--container-p`, `--layout-section-gap`, …).
+ */
+function extractRoleRows(mode: ModeFile): [string, Dimension][] {
+  const rows: [string, Dimension][] = [];
+
+  function walk(node: unknown, path: string[]): void {
+    if (isDimensionToken(node)) {
+      rows.push([path.join('-'), node.$value]);
+      return;
+    }
+    if (typeof node === 'object' && node !== null) {
+      for (const [key, value] of Object.entries(
+        node as Record<string, unknown>
+      )) {
+        if (key.startsWith('$')) continue;
+        walk(value, [...path, key]);
+      }
+    }
+  }
+
+  for (const group of ['control', 'container', 'layout']) {
+    if (group in mode) {
+      walk(mode[group], [group]);
+    }
+  }
+
+  return rows;
+}
+
+function formatDimension(d: Dimension): string {
   return `${d.value}${d.unit}`;
 }
 
-function sortByValue(rows: [string, Dimension][]) {
+function sortByValue(rows: [string, Dimension][]): [string, Dimension][] {
   return [...rows].sort((a, b) => a[1].value - b[1].value);
 }
 
 function Row({ name, dim }: { name: string; dim: Dimension }) {
   return (
     <div className="nx:flex nx:items-center nx:gap-4">
-      <span className="nx:w-32 nx:shrink-0 nx:text-foreground nx:typography-label-default nx:font-mono">
+      <span className="nx:w-48 nx:shrink-0 nx:text-foreground nx:typography-label-default nx:font-mono">
         {name}
       </span>
       <span className="nx:w-16 nx:shrink-0 nx:text-muted-foreground nx:typography-label-small nx:font-mono">
@@ -67,14 +115,14 @@ function ModeSection({
   mode: string;
   rows: [string, Dimension][];
 }) {
-  const isBundled = mode === BUNDLED_SIZE_MODE;
+  const isDefault = mode === DEFAULT_MODE;
   return (
     <section className="nx:flex nx:flex-col nx:gap-3">
       <h3 className="nx:flex nx:items-center nx:gap-2 nx:text-foreground nx:typography-heading-xsmall">
         <span>{mode}</span>
-        {isBundled && (
+        {isDefault && (
           <span className="nx:rounded-sm nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:typography-label-small nx:px-1.5 nx:py-0.5">
-            Bundled
+            Default
           </span>
         )}
       </h3>
@@ -95,7 +143,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Spacing tokens used across the design system. Semantic `--spacing-*` aliases reference numeric `--nx-size-*` primitives. Each size mode (vega, lyra, maia, mira, nova) produces a different scale; the bundled mode is the one @nexus/tailwind currently ships with — see packages/core/package.json#scripts.build:tailwind.',
+          'Spacing tokens are authored per-mode in `packages/core/tokens/semantic/spacing-{mode}.json`. Each mode owns direct px values for both the numeric `--spacing-N` scale and the role-named `--control-*` / `--container-*` / `--layout-*` tokens. Mode switching is via the `data-style="X"` attribute on `<html>` (or any subtree); the active mode is the default `vega` when no attribute is set.',
       },
     },
   },
@@ -104,53 +152,54 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-export const Aliases: Story = {
+export const Numeric: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-w-fit">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <h2 className="nx:text-foreground nx:typography-heading-medium">
-          Spacing Aliases
+          Numeric Spacing Scale
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
-          Semantic `--spacing-*` aliases consumed through Tailwind utilities
-          like `nx:p-4` or `nx:gap-2`. Each row shows the alias name, the
-          resolved pixel value, and a bar drawn at that exact width. Compare
-          modes vertically to see how the scale shifts.
+          The `--spacing-N` scale consumed through Tailwind utilities like
+          `nx:p-4` or `nx:gap-2`. Each row shows the variable name, the resolved
+          pixel value, and a bar drawn at that exact width. Compare modes
+          vertically to see how the scale shifts.
         </p>
       </div>
-      {SIZE_MODES.map(({ name, tokens }) => {
-        const rows = Object.entries(SPACING).map(
-          ([alias, token]) =>
-            [alias, resolveReference(token.$value, tokens)] as [
-              string,
-              Dimension,
-            ]
-        );
-        return <ModeSection key={name} mode={name} rows={sortByValue(rows)} />;
-      })}
+      {MODES.map(({ name, tokens }) => (
+        <ModeSection
+          key={name}
+          mode={name}
+          rows={sortByValue(extractNumericRows(tokens))}
+        />
+      ))}
     </div>
   ),
 };
 
-export const Primitives: Story = {
+export const Roles: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-w-fit">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <h2 className="nx:text-foreground nx:typography-heading-medium">
-          Size Primitives
+          Role Tokens
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
-          Raw `--nx-size-*` dimension primitives indexed by numeric keys. The
-          spacing aliases above reference these directly — the resolved values
-          here are exactly what the design system emits to CSS.
+          Role-named tokens express semantic intent — `control.*` for
+          buttons/inputs/select triggers, `container.*` for cards/dialogs,
+          `layout.*` for between-section and stack rhythm. Consumed through
+          dedicated utilities like `nx:h-control-md`, `nx:p-container`, or
+          `nx:gap-layout-section`. Per-mode variance is the lever for density:
+          Mira shrinks, Maia/Sera/Luma breathe.
         </p>
       </div>
-      {SIZE_MODES.map(({ name, tokens }) => {
-        const rows = Object.entries(tokens).map(
-          ([key, token]) => [`size-${key}`, token.$value] as [string, Dimension]
-        );
-        return <ModeSection key={name} mode={name} rows={sortByValue(rows)} />;
-      })}
+      {MODES.map(({ name, tokens }) => (
+        <ModeSection
+          key={name}
+          mode={name}
+          rows={sortByValue(extractRoleRows(tokens))}
+        />
+      ))}
     </div>
   ),
 };
