@@ -103,23 +103,22 @@ The build emits one CSS block per mode, all in a single bundle:
 ```css
 :root,
 [data-style='vega'] {
-  --spacing-0: 0px;
-  --spacing-1: 4px;
-  --spacing-2: 8px;
+  --nx-spacing-0: 0px;
+  --nx-spacing-1: 4px;
+  --nx-spacing-2: 8px;
   /* ... */
-  --control-h-md: 36px;
-  --control-padding-x-md: 12px;
-  --control-padding-y-md: 8px;
+  --nx-control-h-md: 32px;
+  --nx-control-padding-x-md: 16px;
+  --nx-control-padding-y-md: 8px;
   /* ... */
 }
 
 [data-style='mira'] {
-  --spacing-1: 3px;
-  --spacing-2: 6px;
+  --nx-spacing-2: 6px;
   /* ... */
-  --control-h-md: 28px;
-  --control-padding-x-md: 8px;
-  --control-padding-y-md: 6px;
+  --nx-control-h-md: 28px;
+  --nx-control-padding-x-md: 12px;
+  --nx-control-padding-y-md: 6px;
   /* ... */
 }
 ```

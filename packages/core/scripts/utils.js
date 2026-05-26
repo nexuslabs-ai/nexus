@@ -233,6 +233,7 @@ export const DEFAULT_CONFIG = {
   borderwidth: 'vega',
   focus: 'default',
   'chart-categorical': 'default',
+  // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 7 modes ship)
   spacingDefault: 'vega',
 };
 
