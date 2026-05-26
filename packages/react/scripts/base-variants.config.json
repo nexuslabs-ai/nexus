@@ -1,21 +1,64 @@
 {
-  "//": "chart-categorical-{1..5} tokens are NOT per-cell-scoped (separate token file); opting in a charted component would render its marks under the default base, not the cell's. Add them to the merge in generate-base-variants.mjs first. See storybook.md § Caveats.",
+  "//": "Per-component archetype data — single source of truth for both audit-storybook-coverage.mjs and generate-base-variants.mjs. Optional fields: `interactions` (canonical interaction stories required; absent => display-gate inferred), `equivalents` (component-scoped accepted names per requirement), `sourceDir` (subdir under src/components/; defaults to 'ui'). The doc table in .claude/rules/testing-react.md mirrors this contract.",
+  "//chart-categorical-caveat": "chart-categorical-{1..5} tokens are NOT per-cell-scoped (separate token file); opting in a charted component would render its marks under the default base, not the cell's. Add them to the merge in generate-base-variants.mjs first. See storybook.md § Caveats.",
   "bases": ["slate", "neutral", "gray", "stone", "zinc"],
   "brand": "neutral",
   "themes": ["light", "dark"],
   "components": [
-    { "name": "Accordion", "showcase": "AllVariants" },
+    {
+      "name": "Accordion",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
+      "equivalents": { "ClickInteraction": ["ExpandInteraction"] }
+    },
     { "name": "Alert", "showcase": "AllVariants" },
     { "name": "Avatar", "showcase": "AllSizes" },
     { "name": "Badge", "showcase": "AllVariants" },
     { "name": "Button", "showcase": "AllVariants" },
     { "name": "Card", "showcase": "AllVariants" },
-    { "name": "Dialog", "showcase": "AllVariants" },
-    { "name": "DropdownMenu", "showcase": "AllVariants" },
-    { "name": "Input", "showcase": "AllVariants" },
-    { "name": "Select", "showcase": "AllVariants" },
+    {
+      "name": "Dialog",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"],
+      "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
+    },
+    {
+      "name": "DropdownMenu",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
+      "equivalents": {
+        "ClickInteraction": ["OpenCloseInteraction"],
+        "Disabled": ["WithDisabledItems"]
+      }
+    },
+    {
+      "name": "Input",
+      "showcase": "AllVariants",
+      "equivalents": {
+        "ClickInteraction": ["FocusBlurInteraction"],
+        "KeyboardInteraction": ["TypeInteraction"]
+      }
+    },
+    {
+      "name": "Select",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
+      "equivalents": {
+        "ClickInteraction": ["OpenCloseInteraction"],
+        "Disabled": ["DisabledInteraction"]
+      }
+    },
+    { "name": "Show", "showcase": "AllAxes", "sourceDir": "primitives" },
+    { "name": "Hide", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Switch", "showcase": "AllVariants" },
-    { "name": "Tabs", "showcase": "AllVariants" },
+    {
+      "name": "Tabs",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
+      "equivalents": {
+        "Disabled": ["WithDisabledTab", "DisabledTabInteraction"]
+      }
+    },
     { "name": "Tooltip", "showcase": "AllVariants" }
   ]
 }

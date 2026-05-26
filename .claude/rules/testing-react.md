@@ -103,6 +103,39 @@ in `packages/react/scripts/base-variants.config.json` — e.g. Avatar's showcase
 which name to require. To add or change a component's showcase name, edit the
 config rather than this row.
 
+### Archetype Equivalence Policy (Audit Contract)
+
+The matrix above is canonical by story **purpose**. For a subset of components,
+`audit:storybook-coverage` accepts equivalent story names when the literal name
+would duplicate behavior. The per-component `interactions` and `equivalents`
+fields in `packages/react/scripts/base-variants.config.json` are the runtime
+source of truth; this table mirrors that contract. The audit script reads the
+config — there are no parallel JS constants.
+
+| Archetype           | Components   | Requirement          | Accepted Story Names                                    |
+| ------------------- | ------------ | -------------------- | ------------------------------------------------------- |
+| Trigger-and-overlay | Dialog       | Click interaction    | `ClickInteraction`, `OpenCloseInteraction`              |
+| Trigger-and-overlay | DropdownMenu | Click interaction    | `ClickInteraction`, `OpenCloseInteraction`              |
+| Trigger-and-overlay | DropdownMenu | Disabled behavior    | `Disabled`, `WithDisabledItems`                         |
+| Trigger-and-overlay | Select       | Click interaction    | `ClickInteraction`, `OpenCloseInteraction`              |
+| Trigger-and-overlay | Select       | Disabled behavior    | `Disabled`, `DisabledInteraction`                       |
+| Text input          | Input        | Click interaction    | `ClickInteraction`, `FocusBlurInteraction`              |
+| Text input          | Input        | Keyboard interaction | `KeyboardInteraction`, `TypeInteraction`                |
+| Accordion toggle    | Accordion    | Click interaction    | `ClickInteraction`, `ExpandInteraction`                 |
+| Tab selection       | Tabs         | Disabled behavior    | `Disabled`, `WithDisabledTab`, `DisabledTabInteraction` |
+| Axis toggle         | Show, Hide   | Showcase story       | `AllAxes` (configured in `base-variants.config.json`)   |
+
+Dialog has no `Disabled` requirement — a modal frame has no internal items to
+disable. DropdownMenu and Select do (their items can be individually disabled),
+so each gets a Disabled row with the equivalent name that matches its idiom.
+
+Rules:
+
+1. If one accepted name for that requirement exists, coverage passes.
+2. Drift is only reported when no accepted equivalent exists and a true drift alias is found.
+3. Use canonical names for new components unless a documented archetype equivalence applies.
+4. When a component omits a canonical interaction requirement (e.g. Dialog omits `Disabled`), the audit emits an informational entry per omitted name so the archetype decision is visible in audit output, not silent.
+
 ## Definition of Done
 
 A component PR is complete only when:
