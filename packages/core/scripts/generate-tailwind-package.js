@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import {
+  CANONICAL_SPACING_DEFAULT_MODE,
   collectBorderwidthTokens,
   collectBreakpointsTokens,
   collectRadiusTokens,
@@ -431,7 +432,9 @@ function generateNexusCSS(
   // blocks live outside @theme in `:root, [data-style="X"]` form (see below);
   // role tokens are not registered in @theme — they're consumed by the
   // separately-emitted spacing-utilities.css.
-  const { numeric: vegaSpacingNumeric } = splitSpacingTokens(spacingModes.vega);
+  const { numeric: vegaSpacingNumeric } = splitSpacingTokens(
+    spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
+  );
 
   const radiusMode = usedModes.radius || 'subtle';
   const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
@@ -564,7 +567,9 @@ export async function generateTailwindPackage(
   // dedicated @utility declarations that read the per-mode --nx-control-*,
   // --nx-container-*, --nx-layout-* variables.
   const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
-  const { role: vegaSpacingRole } = splitSpacingTokens(spacingModes.vega);
+  const { role: vegaSpacingRole } = splitSpacingTokens(
+    spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
+  );
   const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
   if (spacingUtilities.css) {
     writeDistFile('spacing-utilities.css', spacingUtilities.css);

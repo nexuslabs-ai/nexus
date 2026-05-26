@@ -625,16 +625,24 @@ describe('utils', () => {
           const result = collectSpacingTokens(dir);
           expect(Object.keys(result).sort()).toEqual(['lyra', 'vega']);
           expect(result.vega).toEqual([
-            { cssName: 'spacing-0', value: '0px' },
-            { cssName: 'spacing-4', value: '16px' },
-            { cssName: 'control-h-md', value: '32px' },
+            { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
+            { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
+            {
+              cssName: 'control-h-md',
+              path: ['control', 'h', 'md'],
+              value: '32px',
+            },
           ]);
           // Per-mode variance is the whole point — the same cssName resolves
           // to different values across modes.
           expect(result.lyra).toEqual([
-            { cssName: 'spacing-0', value: '0px' },
-            { cssName: 'spacing-4', value: '12px' },
-            { cssName: 'control-h-md', value: '28px' },
+            { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
+            { cssName: 'spacing-4', path: ['spacing', '4'], value: '12px' },
+            {
+              cssName: 'control-h-md',
+              path: ['control', 'h', 'md'],
+              value: '28px',
+            },
           ]);
         }
       );
@@ -751,14 +759,46 @@ describe('utils', () => {
   describe('generateSpacingRoleUtilitiesCSS', () => {
     it('emits @utility declarations data-driven from canonical role tokens', () => {
       const canonical = [
-        { cssName: 'control-h-md', value: '32px' },
-        { cssName: 'control-padding-x-sm', value: '12px' },
-        { cssName: 'control-padding-y-lg', value: '12px' },
-        { cssName: 'control-gap', value: '8px' },
-        { cssName: 'container-p', value: '24px' },
-        { cssName: 'container-gap', value: '16px' },
-        { cssName: 'layout-section-gap', value: '32px' },
-        { cssName: 'layout-stack-gap', value: '8px' },
+        {
+          cssName: 'control-h-md',
+          path: ['control', 'h', 'md'],
+          value: '32px',
+        },
+        {
+          cssName: 'control-padding-x-sm',
+          path: ['control', 'padding-x', 'sm'],
+          value: '12px',
+        },
+        {
+          cssName: 'control-padding-y-lg',
+          path: ['control', 'padding-y', 'lg'],
+          value: '12px',
+        },
+        {
+          cssName: 'control-gap',
+          path: ['control', 'gap'],
+          value: '8px',
+        },
+        {
+          cssName: 'container-p',
+          path: ['container', 'p'],
+          value: '24px',
+        },
+        {
+          cssName: 'container-gap',
+          path: ['container', 'gap'],
+          value: '16px',
+        },
+        {
+          cssName: 'layout-section-gap',
+          path: ['layout', 'section-gap'],
+          value: '32px',
+        },
+        {
+          cssName: 'layout-stack-gap',
+          path: ['layout', 'stack-gap'],
+          value: '8px',
+        },
       ];
       const { css, count } = generateSpacingRoleUtilitiesCSS(canonical);
 
@@ -794,8 +834,12 @@ describe('utils', () => {
 
     it('emits exactly one @utility per role token (1:1)', () => {
       const canonical = [
-        { cssName: 'control-h-md', value: '32px' },
-        { cssName: 'container-p', value: '24px' },
+        {
+          cssName: 'control-h-md',
+          path: ['control', 'h', 'md'],
+          value: '32px',
+        },
+        { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
       ];
       const { css, count } = generateSpacingRoleUtilitiesCSS(canonical);
       expect(count).toBe(2);

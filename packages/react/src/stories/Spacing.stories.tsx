@@ -14,6 +14,18 @@ type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
 type ModeFile = Record<string, unknown>;
 
+function isDimensionToken(node: unknown): node is DimensionToken {
+  if (typeof node !== 'object' || node === null) return false;
+  if (!('$value' in node) || !('$type' in node)) return false;
+  const value = (node as { $value: unknown }).$value;
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'value' in value &&
+    'unit' in value
+  );
+}
+
 const MODES: { name: string; tokens: ModeFile }[] = [
   { name: 'vega', tokens: spacingVega as ModeFile },
   { name: 'lyra', tokens: spacingLyra as ModeFile },
@@ -30,10 +42,14 @@ const MODES: { name: string; tokens: ModeFile }[] = [
  * sorted by px value makes the visual rhythm obvious across modes.
  */
 function extractNumericRows(mode: ModeFile): [string, Dimension][] {
-  const numeric = (mode.spacing ?? {}) as Record<string, DimensionToken>;
-  return Object.entries(numeric).map(
-    ([key, token]) => [`spacing-${key}`, token.$value] as [string, Dimension]
-  );
+  const numeric = (mode.spacing ?? {}) as Record<string, unknown>;
+  const rows: [string, Dimension][] = [];
+  for (const [key, token] of Object.entries(numeric)) {
+    if (isDimensionToken(token)) {
+      rows.push([`spacing-${key}`, token.$value]);
+    }
+  }
+  return rows;
 }
 
 /**
@@ -46,15 +62,9 @@ function extractRoleRows(mode: ModeFile): [string, Dimension][] {
   const rows: [string, Dimension][] = [];
 
   function walk(node: unknown, path: string[]): void {
-    if (
-      typeof node === 'object' &&
-      node !== null &&
-      '$value' in node &&
-      '$type' in node
-    ) {
-      const token = node as DimensionToken;
-      if (token.$type === 'dimension') {
-        rows.push([path.join('-'), token.$value]);
+    if (isDimensionToken(node)) {
+      if (node.$type === 'dimension') {
+        rows.push([path.join('-'), node.$value]);
       }
       return;
     }

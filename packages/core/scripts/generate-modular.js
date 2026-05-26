@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import {
+  CANONICAL_SPACING_DEFAULT_MODE,
   collectBorderwidthTokens,
   collectBreakpointsTokens,
   collectRadiusTokens,
@@ -274,7 +275,7 @@ function generatePlaygroundGlobalsCSS(
   // Collect other tokens using shared functions
   const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
   const { numeric: vegaSpacingNumeric, role: vegaSpacingRole } =
-    splitSpacingTokens(spacingModes.vega);
+    splitSpacingTokens(spacingModes[CANONICAL_SPACING_DEFAULT_MODE]);
 
   const radiusTokens = primitives.radius?.modes?.[0]
     ? collectRadiusTokens(TOKENS_DIR, primitives.radius.modes[0])
@@ -313,6 +314,7 @@ function generatePlaygroundGlobalsCSS(
       './focus-default.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
+      './spacing-utilities.css',
     ],
     tailwindPrefix: 'nx',
     semanticTokens,
@@ -328,13 +330,14 @@ function generatePlaygroundGlobalsCSS(
   // Per-mode spacing override blocks (default Vega + 6 alphabetical others).
   css += generateSpacingModesCSS(spacingModes);
 
-  // Spacing role utilities — inlined (not a separate file) so
-  // sync-playground-themes.js's hardcoded STYLES_FILES allowlist covers them
-  // via globals.css.
-  const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
-  css += `\n${spacingUtilities.css}`;
-
   writeModularFile(distDir, 'globals.css', css);
+
+  // Spacing role utilities — emitted as a sibling file (symmetric with the
+  // bundled build). `globals.css` `@import`s it; `sync-playground-themes.js`'s
+  // STYLES_FILES allowlist carries it to `apps/playground/src/styles/`.
+  const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
+  writeModularFile(distDir, 'spacing-utilities.css', spacingUtilities.css);
+
   return (
     semanticTokens.length + vegaSpacingNumeric.length + vegaSpacingRole.length
   );

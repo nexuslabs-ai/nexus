@@ -711,6 +711,14 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
 // ============================================
 
 /**
+ * Canonical default spacing mode. Published under `:root, [data-style="vega"]`
+ * by the per-mode emitter, and used by the generators to pick the mode whose
+ * numeric subset seeds Tailwind's `@theme` block. One constant so the four
+ * sites that pick "the default mode" cannot drift.
+ */
+export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
+
+/**
  * Collect spacing tokens from per-mode `semantic/spacing-{mode}.json` files.
  *
  * Returns a map keyed by mode name; each value is the token list for that
@@ -733,8 +741,11 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
  * → `control-h-md`) would silently lose one declaration.
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {Record<string, {cssName: string, value: string}[]>}
+ * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
  *   Modes keyed by name (e.g. `vega`, `lyra`, `maia`, `mira`, `nova`, `luma`, `sera`).
+ *   Each token carries the original JSON `path` so downstream emitters
+ *   (`generateSpacingRoleUtilitiesCSS`) can derive structure without
+ *   reverse-engineering it from `cssName`.
  */
 export function collectSpacingTokens(semanticDir) {
   const { spacingModes } = discoverSemantics(semanticDir);
@@ -765,6 +776,7 @@ export function collectSpacingTokens(semanticDir) {
       seen.add(cssName);
       tokens.push({
         cssName,
+        path: token.path,
         value: formatTokenValue(token.value, token.type, token.path),
       });
     }
@@ -821,11 +833,11 @@ export function splitSpacingTokens(tokens) {
  *
  * @param {Record<string, {cssName: string, value: string}[]>} modesByName
  * @param {object} [opts]
- * @param {string} [opts.defaultMode='vega']
+ * @param {string} [opts.defaultMode=CANONICAL_SPACING_DEFAULT_MODE]
  * @returns {string} CSS string with all per-mode blocks
  */
 export function generateSpacingModesCSS(modesByName, opts = {}) {
-  const { defaultMode = 'vega' } = opts;
+  const { defaultMode = CANONICAL_SPACING_DEFAULT_MODE } = opts;
 
   const allModes = Object.keys(modesByName);
   if (!allModes.includes(defaultMode)) {
@@ -860,20 +872,21 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
 }
 
 /**
- * Maps the last meaningful suffix of a role-token JSON path to the CSS
+ * Maps the family segment of a three-segment role-token path to the CSS
  * properties the utility should set. Hand-maintained because the suffix →
  * property mapping is a CSS-design decision, not derivable from JSON.
  *
- * Adding a new suffix family (e.g. `inset` → `inset`) means adding one row
- * here. The set of role tokens themselves is JSON-driven — see
+ * Three-segment paths only — two-segment paths (`container.p`, `control.gap`,
+ * `layout.section-gap`) are handled inline in `deriveRoleUtility`.
+ *
+ * Adding a new three-segment family (e.g. `m` → `margin`) means adding one
+ * row here. The set of role tokens themselves is JSON-driven — see
  * `generateSpacingRoleUtilitiesCSS`.
  */
 const SUFFIX_TO_PROPERTIES = {
   h: ['height'],
-  p: ['padding'],
   'padding-x': ['padding-left', 'padding-right'],
   'padding-y': ['padding-top', 'padding-bottom'],
-  gap: ['gap'],
 };
 
 /**
@@ -942,31 +955,31 @@ function deriveRoleUtility(tokenPath) {
   );
 }
 
+// Three-segment-only helper: `gap` and `p` two-segment paths are handled
+// inline in `deriveRoleUtility` and never reach here.
 function familyToUtilityPrefix(family) {
   if (family === 'h') return 'h';
   if (family === 'padding-x') return 'px';
   if (family === 'padding-y') return 'py';
-  if (family === 'gap') return 'gap';
-  if (family === 'p') return 'p';
   throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);
 }
 
 /**
  * Generate `@utility` declarations for spacing role tokens.
  *
- * Walks the canonical mode's role tokens (everything not starting with
- * `nx-spacing-`), derives each utility name + property set via
- * `deriveRoleUtility`, and emits one `@utility` declaration referencing the
- * already-prefixed CSS variable.
+ * Walks the canonical mode's role tokens, derives each utility name +
+ * property set from the token's structured JSON `path`, and emits one
+ * `@utility` declaration referencing the already-prefixed CSS variable.
  *
  * Data-driven by design: adding a new role key to `spacing-vega.json` (and
  * the other six mode files, per the schema contract) automatically grows the
  * utility set. The Phase 2 drift test asserts utilities ↔ role tokens stay
  * 1:1.
  *
- * @param {{cssName: string, value: string}[]} canonicalRoleTokens
- *   Role tokens from the canonical (Vega) mode. cssNames are already
- *   `nx-`-prefixed; we strip that to reconstruct the JSON path.
+ * @param {{cssName: string, path: string[], value: string}[]} canonicalRoleTokens
+ *   Role tokens from the canonical (Vega) mode. Each carries the original
+ *   JSON `path` so the emitter never reverse-engineers structure that
+ *   already exists upstream.
  * @returns {{css: string, count: number}}
  */
 export function generateSpacingRoleUtilitiesCSS(canonicalRoleTokens) {
@@ -974,13 +987,7 @@ export function generateSpacingRoleUtilitiesCSS(canonicalRoleTokens) {
 
   let count = 0;
   for (const token of canonicalRoleTokens) {
-    // cssName is the JSON path joined with `-`. Recover the original path so
-    // we can derive a utility name; the split is greedy on `-`, but
-    // `padding-x` and `section-gap` contain hyphens that aren't path
-    // separators, so `rejoinRolePath` normalises known multi-segment names.
-    const tokenPath = token.cssName.split('-');
-    const normalized = rejoinRolePath(tokenPath);
-    const { utilityName, properties } = deriveRoleUtility(normalized);
+    const { utilityName, properties } = deriveRoleUtility(token.path);
 
     css += `@utility ${utilityName} {\n`;
     for (const prop of properties) {
@@ -995,31 +1002,6 @@ export function generateSpacingRoleUtilitiesCSS(canonicalRoleTokens) {
   }
 
   return { css, count };
-}
-
-/**
- * Recover the JSON path from a `-`-flattened cssName for known role-token
- * shapes. The flattener is lossy (it can't tell `padding-x` apart from
- * `[padding, x]`), so we inspect the path and rejoin known multi-segment
- * names.
- *
- * Keeps the role-utility emitter robust to the existing JSON shape; future
- * paths with new multi-segment suffixes need a row here.
- */
-function rejoinRolePath(rawPath) {
-  // [role, 'padding', 'x'|'y', size] → [role, 'padding-x'|'padding-y', size]
-  if (
-    rawPath.length === 4 &&
-    rawPath[1] === 'padding' &&
-    (rawPath[2] === 'x' || rawPath[2] === 'y')
-  ) {
-    return [rawPath[0], `padding-${rawPath[2]}`, rawPath[3]];
-  }
-  // [role, 'section'|'stack', 'gap'] → [role, 'section-gap'|'stack-gap']
-  if (rawPath.length === 3 && rawPath[2] === 'gap') {
-    return [rawPath[0], `${rawPath[1]}-gap`];
-  }
-  return rawPath;
 }
 
 /**

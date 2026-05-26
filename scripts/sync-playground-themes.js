@@ -17,6 +17,7 @@ const STYLES_FILES = [
   'focus-default.css',
   'typography-utilities.css',
   'borderwidth-utilities.css',
+  'spacing-utilities.css',
 ];
 
 // Sentinel: refuse to wipe a directory that isn't the playground.
