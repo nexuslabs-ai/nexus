@@ -1,6 +1,25 @@
-import type { Preview } from '@storybook/react-vite';
+import { useEffect } from 'react';
+
+import type { Decorator, Preview } from '@storybook/react-vite';
 
 import '../src/index.css';
+
+const ThemeDecorator: Decorator = (Story, context) => {
+  const theme = context.globals.theme;
+  const isDocs = context.viewMode === 'docs';
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  return (
+    <div
+      className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-screen'}`}
+    >
+      <Story />
+    </div>
+  );
+};
 
 const preview: Preview = {
   // Enable autodocs for all stories globally
@@ -62,19 +81,7 @@ const preview: Preview = {
       },
     },
   },
-  decorators: [
-    (Story, context) => {
-      const theme = context.globals.theme;
-      const isDocs = context.viewMode === 'docs';
-      return (
-        <div
-          className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${theme === 'dark' ? 'dark' : ''} ${isDocs ? 'nx:py-12' : 'nx:min-h-screen'}`}
-        >
-          <Story />
-        </div>
-      );
-    },
-  ],
+  decorators: [ThemeDecorator],
 };
 
 export default preview;
