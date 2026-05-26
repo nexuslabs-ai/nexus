@@ -1,4 +1,5 @@
 import { IconShowcase } from './IconShowcase';
+import { PlaygroundIcon } from './PlaygroundIcon';
 
 // Reusable section component
 function Section({
@@ -221,6 +222,90 @@ export function ComponentShowcase() {
             <SpacingBar name="10" className="nx:w-10" />
             <SpacingBar name="12" className="nx:w-12" />
             <SpacingBar name="16" className="nx:w-16" />
+          </div>
+        </Section>
+
+        {/* Role Utilities Section */}
+        <Section
+          title="Role Utilities"
+          description="Per-mode tokens that drive component-internal spacing — switch the Spacing axis to see them flex"
+        >
+          <div className="nx:space-y-6">
+            {/* Controls */}
+            <div className="nx:space-y-2">
+              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+                Controls — h-control-*, px-control-*, py-control-*, gap-control
+              </span>
+              <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-3">
+                <button className="nx:inline-flex nx:items-center nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:text-sm nx:font-medium nx:h-control-sm nx:px-control-sm nx:py-control-sm nx:gap-control">
+                  <PlaygroundIcon name="search" size={14} />
+                  <span>Small</span>
+                </button>
+                <button className="nx:inline-flex nx:items-center nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:text-sm nx:font-medium nx:h-control-md nx:px-control-md nx:py-control-md nx:gap-control">
+                  <PlaygroundIcon name="check" size={14} />
+                  <span>Medium</span>
+                </button>
+                <button className="nx:inline-flex nx:items-center nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:text-sm nx:font-medium nx:h-control-lg nx:px-control-lg nx:py-control-lg nx:gap-control">
+                  <PlaygroundIcon name="chevron-down" size={16} />
+                  <span>Large</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Container */}
+            <div className="nx:space-y-2">
+              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+                Container — p-container, gap-container
+              </span>
+              <div className="nx:bg-container nx:border nx:border-border-default nx:rounded-lg nx:flex nx:flex-col nx:p-container nx:gap-container">
+                <h4 className="nx:text-foreground nx:font-medium">
+                  Card header
+                </h4>
+                <p className="nx:text-sm nx:text-muted-foreground">
+                  Card body — interior padding and the gap between siblings both
+                  scale with the active Spacing mode.
+                </p>
+                <div className="nx:flex nx:flex-wrap nx:gap-2">
+                  <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-3 nx:py-1.5 nx:text-sm nx:font-medium">
+                    Confirm
+                  </button>
+                  <button className="nx:border nx:border-border-default nx:bg-background nx:rounded-md nx:px-3 nx:py-1.5 nx:text-sm nx:font-medium">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Layout */}
+            <div className="nx:space-y-2">
+              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+                Layout — gap-layout-section, gap-layout-stack
+              </span>
+              <div className="nx:flex nx:flex-col nx:gap-layout-section nx:bg-muted nx:rounded-lg nx:p-4">
+                <div className="nx:flex nx:flex-col nx:gap-layout-stack">
+                  <span className="nx:text-xs nx:font-semibold nx:text-foreground">
+                    Section A
+                  </span>
+                  <span className="nx:text-sm nx:text-muted-foreground">
+                    Stack item one
+                  </span>
+                  <span className="nx:text-sm nx:text-muted-foreground">
+                    Stack item two
+                  </span>
+                </div>
+                <div className="nx:flex nx:flex-col nx:gap-layout-stack">
+                  <span className="nx:text-xs nx:font-semibold nx:text-foreground">
+                    Section B
+                  </span>
+                  <span className="nx:text-sm nx:text-muted-foreground">
+                    Stack item one
+                  </span>
+                  <span className="nx:text-sm nx:text-muted-foreground">
+                    Stack item two
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </Section>
 
