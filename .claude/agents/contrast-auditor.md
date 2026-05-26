@@ -156,8 +156,8 @@ Then run the **role-conflict check**:
    - `*-dark.json` → `Dark-mode use` column
 3. Treat any italicised cell — leading `_(` and trailing `)_` — as **no
    documented conflict** and do not surface as a clash. This covers the full
-   no-role family in `color-shades.md`: `_(rarely used)_` (shades 200/300
-   dark), `_(rarely used — too close to white...)_` (shade 100 dark), and
+   no-role family in `color-shades.md`: `_(rarely used)_` (shade 200 dark),
+   `_(rarely used — too close to white...)_` (shade 100 dark), and
    `_(anchor — rarely surfaced...)_` (shade 500 dark).
 4. If the column lists a role for that shade, add a one-line **Notes** entry:
    `role collision ({theme}): reserved for {role}`. Don't refuse the suggestion
