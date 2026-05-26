@@ -725,6 +725,58 @@ const DRIFT_ALIASES = {
   AllSizes: ['Sizes'],
 };
 
+const INTERACTIVE_REQUIREMENTS = ['Disabled', 'ClickInteraction', 'KeyboardInteraction'];
+const BASE_REQUIREMENTS = ['Default', 'WithDataAttributes'];
+
+// Canonical interaction requirements by component. Components not listed here
+// fall back to source-based interactive detection.
+const COMPONENT_INTERACTION_REQUIREMENTS = {
+  Accordion: INTERACTIVE_REQUIREMENTS,
+  Button: INTERACTIVE_REQUIREMENTS,
+  Dialog: ['ClickInteraction', 'KeyboardInteraction'],
+  DropdownMenu: ['ClickInteraction', 'KeyboardInteraction'],
+  Input: INTERACTIVE_REQUIREMENTS,
+  Select: INTERACTIVE_REQUIREMENTS,
+  Switch: INTERACTIVE_REQUIREMENTS,
+  Tabs: INTERACTIVE_REQUIREMENTS,
+};
+
+// Accepted equivalents are component-scoped to avoid broad alias matching.
+const COMPONENT_REQUIREMENT_EQUIVALENTS = {
+  Accordion: {
+    ClickInteraction: ['ExpandInteraction'],
+  },
+  Dialog: {
+    ClickInteraction: ['OpenCloseInteraction'],
+  },
+  DropdownMenu: {
+    ClickInteraction: ['OpenCloseInteraction'],
+  },
+  Input: {
+    ClickInteraction: ['FocusBlurInteraction'],
+    KeyboardInteraction: ['TypeInteraction'],
+  },
+  Select: {
+    ClickInteraction: ['OpenCloseInteraction'],
+    Disabled: ['DisabledInteraction'],
+  },
+  Tabs: {
+    Disabled: ['WithDisabledTab', 'DisabledTabInteraction'],
+  },
+};
+
+function interactionRequirementsFor(componentName, isInteractive) {
+  const explicit = COMPONENT_INTERACTION_REQUIREMENTS[componentName];
+  if (explicit) return explicit;
+  return isInteractive ? INTERACTIVE_REQUIREMENTS : [];
+}
+
+function acceptedNamesForRequirement(componentName, requirementName) {
+  const extras =
+    COMPONENT_REQUIREMENT_EQUIVALENTS[componentName]?.[requirementName] ?? [];
+  return [requirementName, ...extras];
+}
+
 /**
  * Build the required-story checklist for a component and check the stories
  * file against it.
@@ -788,50 +840,53 @@ export function auditComponent(componentFile, opts = {}) {
 
   const showcase = opts.showcase ?? showcaseNameFor(pascal);
 
-  // ── 6 literal-name required stories ────────────────────────────────────────
-  // `Default`, `WithDataAttributes`, and `<showcase>` are always required.
-  // `Disabled`, `ClickInteraction`, `KeyboardInteraction` are required only
-  // when the component is interactive (display-gate).
-  const literalRequired = [
-    { name: 'Default', alwaysRequired: true },
-    { name: 'Disabled', alwaysRequired: false },
-    { name: 'ClickInteraction', alwaysRequired: false },
-    { name: 'KeyboardInteraction', alwaysRequired: false },
-    { name: 'WithDataAttributes', alwaysRequired: true },
-    { name: showcase, alwaysRequired: true },
+  // ── Required stories (canonical + component-scoped equivalents) ───────────
+  const interactiveRequirements = interactionRequirementsFor(pascal, isInteractive);
+  const requiredNames = [
+    ...BASE_REQUIREMENTS,
+    ...interactiveRequirements,
+    showcase,
   ];
 
-  for (const req of literalRequired) {
-    if (!req.alwaysRequired && !isInteractive) {
+  if (interactiveRequirements.length === 0) {
+    for (const name of INTERACTIVE_REQUIREMENTS) {
       result.info.push({
         kind: 'info',
         rule: 'display-gate',
-        name: req.name,
-        found: 'n/a (display component — no `fn()` spy and no `on*`/`disabled` prop)',
+        name,
+        found: 'n/a (display component — interactive requirements omitted)',
       });
-      continue;
     }
-    if (storyNames.has(req.name)) continue;
-    // Check for drift aliases
-    const aliases = DRIFT_ALIASES[req.name] ?? [];
+  }
+
+  for (const reqName of requiredNames) {
+    const accepted = acceptedNamesForRequirement(pascal, reqName);
+    const satisfiedBy = accepted.find((name) => storyNames.has(name));
+    if (satisfiedBy) continue;
+
+    // Check for drift aliases that are not accepted equivalents.
+    const aliases = (DRIFT_ALIASES[reqName] ?? []).filter(
+      (alias) => !accepted.includes(alias)
+    );
     const drifted = aliases.find((alias) => storyNames.has(alias));
     if (drifted) {
       result.findings.push({
         kind: 'drift',
         rule: 'literal-name',
-        name: req.name,
+        name: reqName,
         found: drifted,
-        expected: req.name,
-        snippet: `Rename \`${drifted}\` → \`${req.name}\` (the rule names this story by literal name; drift breaks greppability and base-variants.config.json references).`,
+        expected: accepted.join(' or '),
+        snippet: `Rename \`${drifted}\` to one of: ${accepted.map((name) => `\`${name}\``).join(', ')}.`,
       });
       continue;
     }
+
     result.findings.push({
       kind: 'missing',
       rule: 'literal-name',
-      name: req.name,
-      expected: req.name,
-      snippet: snippetFor(req.name),
+      name: reqName,
+      expected: accepted.join(' or '),
+      snippet: snippetFor(reqName),
     });
   }
 
