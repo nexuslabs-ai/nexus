@@ -44,7 +44,10 @@ Capture stdout and exit code.
 
 ### 2. Exit code 0 — clean
 
-Parse the footer (`Checked N pairs — P passed, 0 failed.`) and report:
+The script always emits a footer of the form
+`Checked N pairs — P passed, F failed.` regardless of count; exit code 0
+guarantees `F = 0`. Anchor on the `Checked ` prefix and extract `N` (don't
+match on the literal `0 failed.`), then report:
 
 ```
 ✓ Contrast clean — N pairs passed
