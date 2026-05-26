@@ -120,6 +120,8 @@ A component PR is complete only when:
 
 ### Scope of the audit gate
 
+The issue ranges below are deliberately literal — each epic gets a scope decision at the moment it lands, not picked up automatically. When a Phase 3+ epic ships, edit this table; the rule does not infer scope from new epic numbers.
+
 | PR type                                                                                                                                                             | Audit gate?                                                                                                                                                      |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Add a new component** (Phase 1 issues under epic [#161](https://github.com/nexuslabs-ai/nexus/issues/161) — `#97`, `#162`–`#177`)                                 | **Required.** `--component <name>` must exit 0 before merge.                                                                                                     |
@@ -137,9 +139,11 @@ yarn workspace @nexus/react audit:storybook-coverage --all
 ```
 
 You can also invoke the natural-language wrapper — any prompt like _"audit Button
-story coverage"_ triggers the [`storybook-coverage-reviewer`](../agents/storybook-coverage-reviewer.md)
-subagent, which shells out to the script and renders the findings with
-paste-ready snippets.
+story coverage"_ triggers the `storybook-coverage-reviewer` subagent, which
+shells out to the script and renders the findings with paste-ready snippets.
+The subagent is registered under `.claude/agents/` and is discoverable by name;
+no file path is referenced here so renaming the agent only touches the agent
+definition itself.
 
 ### Findings on code you didn't touch
 
