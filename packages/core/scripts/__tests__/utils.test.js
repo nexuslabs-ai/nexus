@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   collectBreakpointsTokens,
@@ -727,6 +727,15 @@ describe('utils', () => {
         },
       ]);
     });
+
+    it('throws on a path with an unknown top-level root', () => {
+      const tokens = [
+        { cssName: 'motion-fast', path: ['motion', 'fast'], value: '120ms' },
+      ];
+      expect(() => splitSpacingTokens(tokens)).toThrow(
+        /unknown top-level key "motion"/
+      );
+    });
   });
 
   describe('generateSpacingModesCSS', () => {
@@ -776,6 +785,23 @@ describe('utils', () => {
       expect(() =>
         generateSpacingModesCSS(modes, { defaultMode: 'missing' })
       ).toThrow(/defaultMode "missing"/);
+    });
+
+    it('warns when two numeric tokens in the same mode resolve to the same px', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const duplicateModes = {
+        vega: [
+          { cssName: 'spacing-11', value: '48px' },
+          { cssName: 'spacing-12', value: '48px' },
+        ],
+      };
+      generateSpacingModesCSS(duplicateModes);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringMatching(
+          /vega — "spacing-12" and "spacing-11" both resolve to 48px/
+        )
+      );
+      warn.mockRestore();
     });
   });
 
@@ -867,6 +893,54 @@ describe('utils', () => {
       const { css, count } = generateSpacingRoleUtilitiesCSS(canonical);
       expect(count).toBe(2);
       expect((css.match(/@utility /g) || []).length).toBe(2);
+    });
+
+    it('throws on a path with 1 segment (too short)', () => {
+      const canonical = [
+        { cssName: 'control', path: ['control'], value: '8px' },
+      ];
+      expect(() => generateSpacingRoleUtilitiesCSS(canonical)).toThrow(
+        /\[control\] has 1 segment\(s\); only 2- or 3-segment role paths are supported/
+      );
+    });
+
+    it('throws on a path with 4 segments (too long)', () => {
+      const canonical = [
+        {
+          cssName: 'control-padding-x-md-responsive',
+          path: ['control', 'padding-x', 'md', 'responsive'],
+          value: '12px',
+        },
+      ];
+      expect(() => generateSpacingRoleUtilitiesCSS(canonical)).toThrow(
+        /has 4 segment\(s\); only 2- or 3-segment role paths are supported/
+      );
+    });
+
+    it('throws on a 3-segment path with an unknown family', () => {
+      const canonical = [
+        {
+          cssName: 'control-margin-x-md',
+          path: ['control', 'margin-x', 'md'],
+          value: '12px',
+        },
+      ];
+      expect(() => generateSpacingRoleUtilitiesCSS(canonical)).toThrow(
+        /unknown family "margin-x"/
+      );
+    });
+
+    it('throws on a 2-segment path with an unhandled suffix', () => {
+      const canonical = [
+        {
+          cssName: 'control-flex',
+          path: ['control', 'flex'],
+          value: '1',
+        },
+      ];
+      expect(() => generateSpacingRoleUtilitiesCSS(canonical)).toThrow(
+        /unhandled path shape \[control\.flex\]/
+      );
     });
   });
 });

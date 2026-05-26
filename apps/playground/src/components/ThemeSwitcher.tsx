@@ -1,4 +1,12 @@
-import type { ThemeConfig } from '../hooks/useTheme';
+import {
+  BASES,
+  BRANDS,
+  RADIUS_MODES,
+  SPACING_MODES,
+  type ThemeConfig,
+  TOKEN_MODES,
+  TYPOGRAPHY_MODES,
+} from '../hooks/useTheme';
 import {
   type IconLibrary,
   iconLibraryMeta,
@@ -7,39 +15,6 @@ import {
 
 import { PlaygroundIcon } from './PlaygroundIcon';
 
-// Theme options with metadata
-const BASES = [
-  { value: 'slate', label: 'Slate', color: '#64748b' },
-  { value: 'neutral', label: 'Neutral', color: '#737373' },
-  { value: 'zinc', label: 'Zinc', color: '#71717a' },
-  { value: 'gray', label: 'Gray', color: '#6b7280' },
-  { value: 'stone', label: 'Stone', color: '#78716c' },
-] as const;
-
-const BRANDS = [
-  { value: 'blue', label: 'Blue', color: '#3b82f6' },
-  { value: 'gray', label: 'Gray', color: '#6b7280' },
-  { value: 'neutral', label: 'Neutral', color: '#737373' },
-  { value: 'slate', label: 'Slate', color: '#64748b' },
-  { value: 'stone', label: 'Stone', color: '#78716c' },
-] as const;
-
-const TOKEN_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova'] as const;
-// Spacing grew to 7 modes in #119 (luma + sera authored in #118). Mode swap is
-// via the `data-style` attribute on <html>, not a CSS file load.
-const SPACING_MODES = [
-  'vega',
-  'lyra',
-  'maia',
-  'mira',
-  'nova',
-  'luma',
-  'sera',
-] as const;
-// Typography dropped its byte-duplicate lyra/mira modes (PR #157); their theme
-// CSS no longer exists, so the Typography select offers only the 3 real modes.
-const TYPOGRAPHY_MODES = ['nova', 'vega', 'maia'] as const;
-const RADIUS_MODES = ['blunt', 'sharp', 'subtle', 'smooth', 'mellow'] as const;
 const ICON_LIBRARIES = ['tabler', 'lucide', 'phosphor'] as const;
 
 const DEFAULT_THEME: ThemeConfig = {
@@ -76,7 +51,7 @@ function Section({
   );
 }
 
-function ColorSelect({
+function ColorSelect<TValue extends string>({
   id,
   label,
   value,
@@ -85,9 +60,9 @@ function ColorSelect({
 }: {
   id: string;
   label: string;
-  value: string;
-  options: readonly { value: string; label: string; color: string }[];
-  onChange: (value: string) => void;
+  value: TValue;
+  options: readonly { value: TValue; label: string; color: string }[];
+  onChange: (value: TValue) => void;
 }) {
   const selected = options.find((o) => o.value === value);
 
@@ -100,7 +75,7 @@ function ColorSelect({
         <select
           id={id}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value as TValue)}
           className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-7 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
         >
           {options.map((opt) => (
@@ -125,7 +100,7 @@ function ColorSelect({
   );
 }
 
-function TokenSelect({
+function TokenSelect<TValue extends string>({
   id,
   label,
   value,
@@ -134,9 +109,9 @@ function TokenSelect({
 }: {
   id: string;
   label: string;
-  value: string;
-  options: readonly string[];
-  onChange: (value: string) => void;
+  value: TValue;
+  options: readonly TValue[];
+  onChange: (value: TValue) => void;
 }) {
   return (
     <div className="nx:flex nx:items-center nx:justify-between">
@@ -147,7 +122,7 @@ function TokenSelect({
         <select
           id={id}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value as TValue)}
           className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors nx:capitalize"
         >
           {options.map((opt) => (

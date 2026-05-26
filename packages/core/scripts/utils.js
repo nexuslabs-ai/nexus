@@ -233,12 +233,6 @@ export const DEFAULT_CONFIG = {
   borderwidth: 'vega',
   focus: 'default',
   'chart-categorical': 'default',
-  // Spacing ships all 7 modes in every build (mode swap is runtime via the
-  // `data-style="X"` attribute). This key only controls which mode lands
-  // under `:root, [data-style="X"]` — i.e. which is the default when no
-  // `data-style` attribute is set on the document. Other modes still emit
-  // their `[data-style="X"]` blocks alongside. Vega is the canonical
-  // baseline per `.claude/rules/spacing-tokens.md`.
   spacingDefault: 'vega',
 };
 
@@ -302,16 +296,16 @@ export function discoverPrimitives(primitivesDir) {
  * - Standalone files: {name}.json (no light/dark suffix)
  *
  * @param {string} semanticDir - Path to semantic directory
- * @returns {object} { themed: { type: { mode: { light, dark } } }, standalone: string[] }
+ * @returns {object} { themed: { type: { mode: { light, dark } } }, standalone: string[], perModeFiles: { category: { mode: filename } } }
  */
 export function discoverSemantics(semanticDir) {
   const result = {
     themed: {},
     standalone: [],
-    // Schema-agnostic bucket for per-mode semantic categories. Today's only
-    // entry is `spacing` (from `spacing-{mode}.json`); a future per-mode
-    // category (e.g., per-mode color shading) would land as a sibling key
-    // here without forking the partition logic.
+    // Bucket for per-mode semantic categories. Keyed by category so a future
+    // per-mode category (e.g. per-mode color shading) lands as a sibling key
+    // here. Detection of new categories still requires a regex branch below —
+    // only `spacing` is wired today.
     perModeFiles: {},
   };
 
@@ -328,7 +322,7 @@ export function discoverSemantics(semanticDir) {
   // `collectSpacingTokens` — they intentionally bypass the generic
   // standalone-dimension scan, which would otherwise emit each file's keys
   // into `@theme` once per mode and last-write-wins.
-  const spacingModePattern = /^spacing-(.+)\.json$/;
+  const spacingModePattern = /^spacing-([a-z]+)\.json$/;
 
   for (const file of files) {
     const spacingMatch = file.match(spacingModePattern);
@@ -724,33 +718,13 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
 // TOKEN COLLECTION FOR @THEME BLOCKS
 // ============================================
 
-/*
- * Spacing has two distinct "default mode" concepts. They look similar and are
- * easy to conflate, but they live at different layers:
- *
- *  - `CANONICAL_SPACING_DEFAULT_MODE` (this constant, hardcoded) drives the
- *    build-time CONTRACT: which mode's numeric subset seeds `@theme` for
- *    Tailwind utility codegen, and which mode's role tokens get `@utility`
- *    declarations emitted. Vega is locked here because tests reference it
- *    (`VEGA_BASELINE` byte-identity lock, drift guard, etc.). Changing this
- *    moves the test surface.
- *
- *  - `config.spacingDefault` (consumer-configurable, defaults to the constant
- *    above) drives the runtime CASCADE DEFAULT: which mode lands under
- *    `:root, [data-style="X"]` so a document with no `data-style` attribute
- *    resolves to that mode. All seven modes still emit; only the `:root`
- *    selector moves.
- *
- * The build emits the same `@utility` set and the same seven per-mode blocks
- * regardless of `spacingDefault`. Only the `:root` half of the dual selector
- * is consumer-pickable.
- */
-
 /**
  * Canonical default spacing mode. Published under `:root, [data-style="vega"]`
  * by the per-mode emitter, and used by the generators to pick the mode whose
- * numeric subset seeds Tailwind's `@theme` block. One constant so the four
- * sites that pick "the default mode" cannot drift.
+ * numeric subset seeds Tailwind's `@theme` block (the build-time contract for
+ * utility codegen and the `VEGA_BASELINE` byte-identity test). Distinct from
+ * `config.spacingDefault`, which only moves the runtime `:root` cascade
+ * default — all seven modes still emit either way.
  */
 export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
 
@@ -902,15 +876,9 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
     );
   }
 
-  // Intra-mode duplicate-value warning for numeric tokens. Two `spacing-N`
-  // keys resolving to the same px (e.g. Lyra's `spacing-11 === spacing-12 ===
-  // 48px` from #223) is almost always a design oversight. Cheap to detect
-  // here, expensive to chase later. We key off the `spacing-` cssName prefix
-  // (rather than `token.path`) because the function's documented input shape
-  // is `{cssName, value}[]` — `path` may be absent in some callers/tests.
-  // The strict canonical-step check is deferred to the
-  // `nexus/canonical-spacing-steps` lint rule (#127) — the step set itself
-  // is still being reconciled (see `spacing-tokens.md`).
+  // Intra-mode duplicate-value warning for numeric tokens. Keys off the
+  // `spacing-` cssName prefix because the documented input shape is
+  // `{cssName, value}[]` — `path` may be absent in some callers/tests.
   for (const mode of allModes) {
     const valueByName = new Map();
     for (const token of modesByName[mode]) {

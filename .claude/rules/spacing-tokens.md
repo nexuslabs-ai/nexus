@@ -51,33 +51,48 @@ Every mode file MUST contain the same set of keys — enforced by JSON schema va
 ```json
 {
   "spacing": {
-    "0": { "$value": "0px", "$type": "dimension" },
-    "0_5": { "$value": "2px", "$type": "dimension" },
-    "1": { "$value": "4px", "$type": "dimension" },
-    "2": { "$value": "8px", "$type": "dimension" },
-    "3": { "$value": "12px", "$type": "dimension" },
+    "0": { "$value": { "value": 0, "unit": "px" }, "$type": "dimension" },
+    "1": { "$value": { "value": 4, "unit": "px" }, "$type": "dimension" },
+    "2": { "$value": { "value": 8, "unit": "px" }, "$type": "dimension" },
     "...": "...",
-    "96": { "$value": "384px", "$type": "dimension" }
+    "96": { "$value": { "value": 384, "unit": "px" }, "$type": "dimension" }
   },
-  "space": {
-    "control": {
-      "h-sm": { "$value": "32px", "$type": "dimension" },
-      "h-md": { "$value": "36px", "$type": "dimension" },
-      "h-lg": { "$value": "40px", "$type": "dimension" },
-      "px": { "$value": "10px", "$type": "dimension" },
-      "gap": { "$value": "4px", "$type": "dimension" }
+  "control": {
+    "h": {
+      "sm": { "$value": { "value": 28, "unit": "px" }, "$type": "dimension" },
+      "md": { "$value": { "value": 32, "unit": "px" }, "$type": "dimension" },
+      "lg": { "$value": { "value": 40, "unit": "px" }, "$type": "dimension" }
     },
-    "container": {
-      "p": { "$value": "24px", "$type": "dimension" },
-      "header-py": { "$value": "24px", "$type": "dimension" }
+    "padding-x": {
+      "sm": { "$value": { "value": 12, "unit": "px" }, "$type": "dimension" },
+      "md": { "$value": { "value": 16, "unit": "px" }, "$type": "dimension" },
+      "lg": { "$value": { "value": 32, "unit": "px" }, "$type": "dimension" }
     },
-    "section-gap": { "$value": "32px", "$type": "dimension" },
-    "stack-gap": { "$value": "8px", "$type": "dimension" },
-    "page-gutter": { "$value": "24px", "$type": "dimension" },
-    "inline-gap": { "$value": "8px", "$type": "dimension" }
+    "padding-y": {
+      "sm": { "$value": { "value": 6, "unit": "px" }, "$type": "dimension" },
+      "md": { "$value": { "value": 8, "unit": "px" }, "$type": "dimension" },
+      "lg": { "$value": { "value": 12, "unit": "px" }, "$type": "dimension" }
+    },
+    "gap": { "$value": { "value": 8, "unit": "px" }, "$type": "dimension" }
+  },
+  "container": {
+    "p": { "$value": { "value": 24, "unit": "px" }, "$type": "dimension" },
+    "gap": { "$value": { "value": 16, "unit": "px" }, "$type": "dimension" }
+  },
+  "layout": {
+    "section-gap": {
+      "$value": { "value": 32, "unit": "px" },
+      "$type": "dimension"
+    },
+    "stack-gap": {
+      "$value": { "value": 8, "unit": "px" },
+      "$type": "dimension"
+    }
   }
 }
 ```
+
+Top-level keys are `spacing` (numeric scale), `control`, `container`, `layout` — flat siblings, no enclosing wrapper. `$value` is a DTCG `{ value, unit }` dimension object.
 
 ### Emitted CSS
 
@@ -108,6 +123,12 @@ The build emits one CSS block per mode, all in a single bundle:
 ```
 
 Mode swap = change the `data-style` attribute on `<html>` (or any subtree). CSS variable cascade handles the rest. No rebuild.
+
+### The `data-style` attribute carries spacing density only
+
+`data-style` is the spacing-density attribute. It carries one value at a time (`vega`, `lyra`, `maia`, `mira`, `nova`, `luma`, `sera`) and resolves only the `--nx-spacing-*` / `--nx-control-*` / `--nx-container-*` / `--nx-layout-*` overrides.
+
+If a future per-mode semantic category lands (per-mode color shading, per-mode shadow, etc.), it ships its **own** attribute name (e.g., `data-shadow-mode`, `data-color-density`). `data-style` does not multiplex — the contract is one attribute per per-mode axis, so consumers can compose densities independently (`<div data-style="mira" data-shadow-mode="vega">`) without one attribute meaning two things.
 
 ## The canonical step set
 
