@@ -27,6 +27,7 @@
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:contrast": "yarn workspace @nexus/core audit:contrast",
     "audit:figma-parity": "yarn workspace @nexus/core audit:figma-parity",
+    "audit:storybook-coverage": "yarn workspace @nexus/react audit:storybook-coverage",
     "playground": "cd apps/playground && yarn dev",
     "size-limit": "size-limit",
     "prepare": "husky"
