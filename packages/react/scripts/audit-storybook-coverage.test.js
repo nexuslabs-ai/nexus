@@ -365,6 +365,11 @@ describe('showcaseNameFor', () => {
     expect(showcaseNameFor('Avatar')).toBe('AllSizes');
   });
 
+  it('returns AllAxes for Show/Hide primitives', () => {
+    expect(showcaseNameFor('Show')).toBe('AllAxes');
+    expect(showcaseNameFor('Hide')).toBe('AllAxes');
+  });
+
   it('defaults to AllVariants when not in config', () => {
     expect(showcaseNameFor('NewComponentNotInConfig')).toBe('AllVariants');
   });
@@ -394,6 +399,24 @@ describe('auditComponent — real fixtures', () => {
     expect(result.findings).toEqual([]);
     const extraEnum = result.info.find((i) => i.rule === 'extra-cva-enum');
     expect(extraEnum?.name).toContain('fill');
+  });
+
+  it('Input passes via text-input equivalents', () => {
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'input.tsx');
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
+  });
+
+  it('Dialog passes via trigger-and-overlay click equivalence', () => {
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'dialog.tsx');
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
+  });
+
+  it('Show primitive passes with AllAxes showcase from config', () => {
+    const file = path.join(COMPONENTS_ROOT, 'primitives', 'show.tsx');
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
   });
 });
 
