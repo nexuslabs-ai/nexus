@@ -394,17 +394,21 @@ describe('utils', () => {
     it('has all required configuration keys', () => {
       expect(DEFAULT_CONFIG).toHaveProperty('base');
       expect(DEFAULT_CONFIG).toHaveProperty('brand');
-      expect(DEFAULT_CONFIG).toHaveProperty('size');
       expect(DEFAULT_CONFIG).toHaveProperty('typography');
       expect(DEFAULT_CONFIG).toHaveProperty('shadow');
       expect(DEFAULT_CONFIG).toHaveProperty('radius');
       expect(DEFAULT_CONFIG).toHaveProperty('borderwidth');
     });
 
+    // `size` was removed in #119 — spacing now reads per-mode semantic files
+    // (`spacing-{mode}.json`), not a `--nx-size-*` primitive layer.
+    it('does not have the deprecated size key', () => {
+      expect(DEFAULT_CONFIG).not.toHaveProperty('size');
+    });
+
     it('has expected default values', () => {
       expect(DEFAULT_CONFIG.base).toBe('stone');
       expect(DEFAULT_CONFIG.brand).toBe('neutral');
-      expect(DEFAULT_CONFIG.size).toBe('vega');
       expect(DEFAULT_CONFIG.typography).toBe('vega');
       expect(DEFAULT_CONFIG.shadow).toBe('vega');
       expect(DEFAULT_CONFIG.radius).toBe('sharp');

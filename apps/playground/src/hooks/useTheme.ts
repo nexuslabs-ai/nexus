@@ -58,9 +58,13 @@ export function useTheme() {
     loadCSS(`/themes/brands-${theme.brand}.css`, 'brand');
   }, [theme.brand]);
 
-  // Load size mode when it changes
+  // Spacing mode swaps via the `data-style` attribute on <html> (no CSS
+  // file load — the per-mode `[data-style="X"]` blocks ship together in
+  // globals.css; the cascade picks the active mode at runtime). The
+  // `theme.size` field is kept for backwards compatibility with the
+  // existing ThemeSwitcher UI; #120 will rename it.
   useEffect(() => {
-    loadCSS(`/themes/size-${theme.size}.css`, 'size');
+    document.documentElement.setAttribute('data-style', theme.size);
   }, [theme.size]);
 
   // Load typography mode when it changes

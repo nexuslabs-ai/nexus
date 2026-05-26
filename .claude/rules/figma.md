@@ -53,16 +53,16 @@ Under CI (`CI=true` or `CI=1`), the guard hard-fails if git timestamps are unava
 
 ### Categories
 
-| Category      | Status    | Wired by | Notes                                                   |
-| ------------- | --------- | -------- | ------------------------------------------------------- |
-| `color`       | Supported | #65      | Single-mode (one `color.json`).                         |
-| `size`        | Pending   | #61      | Multi-mode (`size-{vega,lyra,maia,mira,nova}.json`).    |
-| `radius`      | Pending   | #61      | Multi-mode (`radius-{blunt,sharp,subtle,...}.json`).    |
-| `borderwidth` | Pending   | #61      | Multi-mode (`borderwidth-{vega,lyra,...}.json`).        |
-| `typography`  | Pending   | #62      | Multi-mode composite tokens.                            |
-| `shadow`      | Pending   | #63      | Multi-mode × theme (`shadow-{mode}-{light,dark}.json`). |
+| Category      | Status    | Wired by    | Notes                                                                                                     |
+| ------------- | --------- | ----------- | --------------------------------------------------------------------------------------------------------- |
+| `color`       | Supported | #65         | Single-mode (one `color.json`).                                                                           |
+| `spacing`     | Pending   | (#117 epic) | Multi-mode (`semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json`). No primitive layer — per #119. |
+| `radius`      | Pending   | #61         | Multi-mode (`radius-{blunt,sharp,subtle,...}.json`).                                                      |
+| `borderwidth` | Pending   | #61         | Multi-mode (`borderwidth-{vega,lyra,...}.json`).                                                          |
+| `typography`  | Pending   | #62         | Multi-mode composite tokens.                                                                              |
+| `shadow`      | Pending   | #63         | Multi-mode × theme (`shadow-{mode}-{light,dark}.json`).                                                   |
 
-This table is the single source of truth for the audit's category coverage. The script no longer carries a parallel `PENDING_CATEGORIES` map — running `--category size` today fails with an unknown-category error pointing readers back here.
+This table is the single source of truth for the audit's category coverage. The script no longer carries a parallel `PENDING_CATEGORIES` map — running `--category spacing` today fails with an unknown-category error pointing readers back here.
 
 ### Snapshot shape
 
@@ -71,7 +71,7 @@ The snapshot JSON nests by mode so a single capture covers every mode the design
 | Category type | CLI invocation                                | Code file read                             | Snapshot subtree read        |
 | ------------- | --------------------------------------------- | ------------------------------------------ | ---------------------------- |
 | Single-mode   | `--category color`                            | `primitives/color.json`                    | `snapshot.color`             |
-| Multi-mode    | `--category size --mode vega`                 | `primitives/size/size-vega.json`           | `snapshot.size.vega`         |
+| Multi-mode    | `--category spacing --mode vega`              | `semantic/spacing-vega.json`               | `snapshot.spacing.vega`      |
 | Mode × theme  | `--category shadow --mode vega --theme light` | `primitives/shadow/shadow-vega-light.json` | `snapshot.shadow.vega.light` |
 
 Each category subtree carries a `$meta` block — at minimum `capturedAt` (ISO date) and `figmaFileName`. The `$`-prefix is DTCG metadata and is skipped by the token walker, so it never appears as a drift finding. For multi-mode categories the `$meta` lives under the mode (e.g., `snapshot.size.vega.$meta`) so each capture timestamps independently.
@@ -103,24 +103,25 @@ After the designer syncs, refresh the snapshot and re-run the audit. Zero drift 
 
 ## Token Architecture
 
-The design system uses a three-layer token architecture:
+Most axes use a three-layer architecture; spacing is two-layer (no primitives — see `spacing-tokens.md`).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Layer 1: PRIMITIVES (variables.css)                            │
-│  --nx-size-5: 20px                                              │
 │  --nx-radius-md: 4px                                            │
 │  --nx-color-slate-500: #64748b                                  │
 ├─────────────────────────────────────────────────────────────────┤
-│  Layer 2: SEMANTIC (nexus.css @theme)                           │
-│  --spacing-5: var(--nx-size-5)                                  │
+│  Layer 2: SEMANTIC (nexus.css @theme + per-mode blocks)         │
 │  --radius-md: var(--nx-radius-md)                               │
 │  --color-muted: var(--nx-color-slate-100)                       │
+│  --nx-spacing-5: 20px      (direct px, per-mode)                │
+│  --nx-control-h-md: 32px   (direct px, per-mode role token)     │
 ├─────────────────────────────────────────────────────────────────┤
 │  Layer 3: TAILWIND UTILITIES (with nx: prefix)                  │
-│  nx:p-5  →  padding: var(--spacing-5)                           │
-│  nx:rounded-md  →  border-radius: var(--radius-md)              │
-│  nx:bg-muted  →  background: var(--color-muted)                 │
+│  nx:p-5             →  padding: var(--nx-spacing-5)             │
+│  nx:rounded-md      →  border-radius: var(--radius-md)          │
+│  nx:bg-muted        →  background: var(--color-muted)           │
+│  nx:h-control-md    →  height: var(--nx-control-h-md)           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 

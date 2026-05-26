@@ -1,17 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Forward-looking design spec — NOT yet implemented.** This describes the _target_
-> two-tier, per-mode spacing architecture, authored ahead of the code (#129/#130).
-> The repo does **not** implement it today — spacing is still the three-tier model
-> (`semantic/spacing.json` → `--nx-size-*` primitives → `--spacing-*`); see
-> [`tokens.md`](tokens.md). None of the artifacts below exist yet: no per-mode
-> `spacing-{mode}.json`, no `validate-spacing-modes.js`, no `--control-*` vars, no
-> `nexus/*` lint rules.
->
-> Implementation is tracked as a 12-step epic (#117–#128); only [1/12] is done.
-> Issue **#125 [9/12]** owns syncing this file once the code lands. Until then, treat
-> everything below as the plan, not current behavior — for spacing today, use
-> `tokens.md` and numeric `nx:p-*` / `nx:gap-*` utilities.
+> **Partial implementation status (post-#119).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:h-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. Still pending: `validate-spacing-modes.js` schema validator (#125), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the role-to-component-coupling enforcement (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the validator + lint enforcement which are still ahead.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 

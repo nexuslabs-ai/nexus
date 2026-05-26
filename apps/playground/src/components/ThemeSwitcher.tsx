@@ -25,6 +25,17 @@ const BRANDS = [
 ] as const;
 
 const TOKEN_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova'] as const;
+// Spacing grew to 7 modes in #119 (luma + sera authored in #118). Mode swap is
+// via the `data-style` attribute on <html>, not a CSS file load.
+const SPACING_MODES = [
+  'vega',
+  'lyra',
+  'maia',
+  'mira',
+  'nova',
+  'luma',
+  'sera',
+] as const;
 // Typography dropped its byte-duplicate lyra/mira modes (PR #157); their theme
 // CSS no longer exists, so the Typography select offers only the 3 real modes.
 const TYPOGRAPHY_MODES = ['nova', 'vega', 'maia'] as const;
@@ -256,7 +267,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
               id="size-select"
               label="Size"
               value={theme.size}
-              options={TOKEN_MODES}
+              options={SPACING_MODES}
               onChange={(v) => setTheme((t) => ({ ...t, size: v }))}
             />
             <TokenSelect

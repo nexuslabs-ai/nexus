@@ -21,6 +21,8 @@ import {
   formatTokenValue,
   generateBaseLayerCSS,
   generateBorderWidthUtilitiesCSS,
+  generateSpacingModesCSS,
+  generateSpacingRoleUtilitiesCSS,
   generateThemeCSS,
   generateTypographyUtilitiesCSS,
   getGoogleFontsImportFromTokens,
@@ -31,6 +33,7 @@ import {
   pathToCssVarPrefixed,
   readTokenFile,
   resolveValue,
+  splitSpacingTokens,
 } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -364,7 +367,12 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
 /**
  * Generate nexus.css using shared generateThemeCSS function
  */
-function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
+function generateNexusCSS(
+  semanticFiles,
+  primitiveMap,
+  usedModes,
+  spacingModes
+) {
   // Get Google Fonts import
   const typographyMode = usedModes.typography || 'vega';
   const typographyFilePath = path.join(
@@ -418,8 +426,13 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     }
   }
 
-  // Collect spacing, radius, borderwidth tokens using shared functions
-  const spacingTokens = collectSpacingTokens(SEMANTIC_DIR);
+  // Per-mode spacing — Vega numerics seed @theme for Tailwind's spacing-utility
+  // codegen (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The per-mode override
+  // blocks live outside @theme in `:root, [data-style="X"]` form (see below);
+  // role tokens are not registered in @theme — they're consumed by the
+  // separately-emitted spacing-utilities.css.
+  const { numeric: vegaSpacingNumeric } = splitSpacingTokens(spacingModes.vega);
+
   const radiusMode = usedModes.radius || 'subtle';
   const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
   const borderwidthMode = usedModes.borderwidth || 'vega';
@@ -442,7 +455,9 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
 
 `;
 
-  // Generate theme CSS using shared function
+  // Generate theme CSS using shared function. spacingTokens carries only the
+  // numeric Vega subset — role tokens (control/container/layout) live in the
+  // per-mode override blocks below, not in @theme.
   let css = generateThemeCSS({
     header,
     googleFontsImport,
@@ -451,10 +466,11 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
       './variables.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
+      './spacing-utilities.css',
     ],
     tailwindPrefix: 'nx',
     semanticTokens: lightSemanticTokens,
-    spacingTokens,
+    spacingTokens: vegaSpacingNumeric,
     radiusTokens,
     borderwidthTokens,
     shadowTokens,
@@ -464,6 +480,12 @@ function generateNexusCSS(semanticFiles, primitiveMap, usedModes) {
     darkSelector: '.dark',
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
+
+  // Per-mode spacing override blocks (`:root, [data-style="vega"]` for the
+  // default + `[data-style="X"]` for the other six modes). Lives outside
+  // @theme so the cascade can pick the active mode at runtime via the
+  // `data-style` attribute on any ancestor.
+  css += generateSpacingModesCSS(spacingModes);
 
   // Add base layer
   css += generateBaseLayerCSS();
@@ -537,7 +559,24 @@ export async function generateTailwindPackage(
     log.success(`Generated ${borderWidth.count} border width utilities`);
   }
 
-  const nexusCSS = generateNexusCSS(semanticFiles, primitiveMap, usedModes);
+  // Spacing role utilities — data-driven from Vega's role tokens. Numeric
+  // spacing flows through @theme in generateNexusCSS; role tokens get
+  // dedicated @utility declarations that read the per-mode --nx-control-*,
+  // --nx-container-*, --nx-layout-* variables.
+  const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
+  const { role: vegaSpacingRole } = splitSpacingTokens(spacingModes.vega);
+  const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
+  if (spacingUtilities.css) {
+    writeDistFile('spacing-utilities.css', spacingUtilities.css);
+    log.success(`Generated ${spacingUtilities.count} spacing role utilities`);
+  }
+
+  const nexusCSS = generateNexusCSS(
+    semanticFiles,
+    primitiveMap,
+    usedModes,
+    spacingModes
+  );
   writeDistFile('nexus.css', nexusCSS);
 
   await formatDistCssFiles(distDir);
