@@ -23,16 +23,18 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 **Primitives** (`tokens/primitives/`)
 
 - Context-independent base values
-- Colors, spacing, typography, borders, shadows
-- Output: CSS variables with category prefixes
-- Example: `--colors-gray-950`, `--spacing-4`
+- Color, radius, border-width, shadow, typography, focus
+- Output: CSS variables with the `--nx-*` prefix
+- Example: `--nx-color-gray-950`, `--nx-radius-md`
 
 **Semantic** (`tokens/semantic/`)
 
-- Contextual meanings that reference primitives
-- Light and dark theme variants
-- Output: Tailwind v4 `@theme` blocks
-- Example: `--background: var(--colors-white)`
+- Contextual meanings that reference primitives (and per-mode direct values for spacing)
+- Light and dark theme variants for color; per-mode files for spacing
+- Output: Tailwind v4 `@theme` block + per-mode `[data-style="X"]` blocks
+- Example: `--color-background: var(--nx-color-white)`, `--nx-spacing-4: 16px`
+
+> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-style="X"]` blocks plus role utilities (`nx:h-control-md`, `nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-style` attribute on `<html>`. See [`spacing-tokens.md`](../../.claude/rules/spacing-tokens.md).
 
 **Component** (future)
 
@@ -59,7 +61,7 @@ Semantic tokens use DTCG reference syntax:
 This resolves to CSS:
 
 ```css
---background: var(--colors-white);
+--color-background: var(--nx-color-white);
 ```
 
 ## Build Process

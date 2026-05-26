@@ -2,7 +2,7 @@
 
 Token-driven design system for product UI. Three layers compose into one consumable surface:
 
-- **`@nexus/core`** — DTCG design tokens (color, size, radius, shadow, typography). Color emits as OKLCH at build time via a perceptual-L grid.
+- **`@nexus/core`** — DTCG design tokens (color, spacing, radius, shadow, typography). Color emits as OKLCH at build time via a perceptual-L grid; spacing is per-mode (mode swap at runtime via the `data-style` attribute).
 - **`@nexus/tailwind`** — Tailwind CSS theme generated from the tokens. All utilities are namespaced with the `nx:` prefix.
 - **`@nexus/react`** — React components built on Radix UI primitives and the Tailwind layer. Variants via CVA; data-attribute test surface; padding-based sizing.
 
