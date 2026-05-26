@@ -282,28 +282,22 @@ export function ComponentShowcase() {
                 Layout — gap-layout-section, gap-layout-stack
               </span>
               <div className="nx:flex nx:flex-col nx:gap-layout-section nx:bg-muted nx:rounded-lg nx:p-4">
-                <div className="nx:flex nx:flex-col nx:gap-layout-stack">
-                  <span className="nx:text-xs nx:font-semibold nx:text-foreground">
-                    Section A
-                  </span>
-                  <span className="nx:text-sm nx:text-muted-foreground">
-                    Stack item one
-                  </span>
-                  <span className="nx:text-sm nx:text-muted-foreground">
-                    Stack item two
-                  </span>
-                </div>
-                <div className="nx:flex nx:flex-col nx:gap-layout-stack">
-                  <span className="nx:text-xs nx:font-semibold nx:text-foreground">
-                    Section B
-                  </span>
-                  <span className="nx:text-sm nx:text-muted-foreground">
-                    Stack item one
-                  </span>
-                  <span className="nx:text-sm nx:text-muted-foreground">
-                    Stack item two
-                  </span>
-                </div>
+                {['Section A', 'Section B'].map((label) => (
+                  <div
+                    key={label}
+                    className="nx:flex nx:flex-col nx:gap-layout-stack"
+                  >
+                    <span className="nx:text-xs nx:font-semibold nx:text-foreground">
+                      {label}
+                    </span>
+                    <span className="nx:text-sm nx:text-muted-foreground">
+                      Stack item one
+                    </span>
+                    <span className="nx:text-sm nx:text-muted-foreground">
+                      Stack item two
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
