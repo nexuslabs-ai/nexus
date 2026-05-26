@@ -103,6 +103,55 @@ in `packages/react/scripts/base-variants.config.json` — e.g. Avatar's showcase
 which name to require. To add or change a component's showcase name, edit the
 config rather than this row.
 
+## Definition of Done
+
+A component PR is complete only when:
+
+1. All required stories from the matrix above are present.
+2. The audit reports clean for the component:
+
+   ```bash
+   yarn workspace @nexus/react audit:storybook-coverage --component <kebab-name>
+   # exit 0 — no `missing` or `drift` findings
+   ```
+
+3. `yarn test:storybook` passes.
+4. `yarn typecheck` and `yarn lint` are clean.
+
+### Scope of the audit gate
+
+The issue ranges below are deliberately literal — each epic gets a scope decision at the moment it lands, not picked up automatically. When a Phase 3+ epic ships, edit this table; the rule does not infer scope from new epic numbers.
+
+| PR type                                                                                                                                                             | Audit gate?                                                                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Add a new component** (Phase 1 issues under epic [#161](https://github.com/nexuslabs-ai/nexus/issues/161) — `#97`, `#162`–`#177`)                                 | **Required.** `--component <name>` must exit 0 before merge.                                                                                                     |
+| **Polish, motion, or spacing tuning** of an existing component (Phase 2 issues under epic [#181](https://github.com/nexuslabs-ai/nexus/issues/181) — `#183`–`#212`) | Not gated. Run as a sanity check. Pre-existing findings tracked in [#217](https://github.com/nexuslabs-ai/nexus/issues/217) are not yours to fix in a polish PR. |
+| **Refactor or fix** on an existing component (no story changes)                                                                                                     | Not gated.                                                                                                                                                       |
+
+### How to run
+
+```bash
+# Direct CLI
+yarn workspace @nexus/react audit:storybook-coverage --component button
+
+# Sweep every component
+yarn workspace @nexus/react audit:storybook-coverage --all
+```
+
+You can also invoke the natural-language wrapper — any prompt like _"audit Button
+story coverage"_ triggers the `storybook-coverage-reviewer` subagent, which
+shells out to the script and renders the findings with paste-ready snippets.
+The subagent is registered under `.claude/agents/` and is discoverable by name;
+no file path is referenced here so renaming the agent only touches the agent
+definition itself.
+
+### Findings on code you didn't touch
+
+If `--component` reports findings on the component the PR adds, fix them before
+merge. If a sweep (`--all`) surfaces findings on a component the PR didn't
+touch, those are tracked in [#217](https://github.com/nexuslabs-ai/nexus/issues/217)
+— not yours to fix here; the polish/refactor epic addresses them.
+
 ## Play Function Patterns
 
 ### Click Testing
