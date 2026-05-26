@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -369,9 +371,41 @@ describe('auditComponent — real fixtures', () => {
     const extraEnum = result.info.find((i) => i.rule === 'extra-cva-enum');
     expect(extraEnum?.name).toContain('fill');
   });
+});
 
-  it('Input reports DataAttributesTest as drift', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'input.tsx');
+// Drift-detection tests use synthetic fixtures written to a temp dir so they
+// don't depend on the codebase's evolving story names (a real-file fixture
+// would fail the moment Phase 2 renames land).
+describe('auditComponent — drift detection (synthetic)', () => {
+  function writeFixture(name, componentSrc, storiesSrc) {
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'audit-storybook-coverage-')
+    );
+    const uiDir = path.join(dir, 'src', 'components', 'ui');
+    fs.mkdirSync(uiDir, { recursive: true });
+    const pascal = name.charAt(0).toUpperCase() + name.slice(1);
+    fs.writeFileSync(path.join(uiDir, `${name}.tsx`), componentSrc);
+    fs.writeFileSync(path.join(uiDir, `${pascal}.stories.tsx`), storiesSrc);
+    return path.join(uiDir, `${name}.tsx`);
+  }
+
+  it('reports drift when a story uses an aliased name', () => {
+    const componentSrc = `
+      import { cva } from 'class-variance-authority';
+      const v = cva('base', { variants: { variant: { default: '' } } });
+      interface Props { disabled?: boolean; onClick?: () => void }
+      export function Thing(p: Props) { return null; }
+    `;
+    const storiesSrc = `
+      const meta = { args: { onClick: fn() } };
+      export const Default: Story = { args: {} };
+      export const Disabled: Story = { args: { disabled: true } };
+      export const ClickInteraction: Story = { args: {} };
+      export const KeyboardInteraction: Story = { args: {} };
+      export const DataAttributesTest: Story = { args: {} };
+      export const AllVariants: Story = { render: () => null };
+    `;
+    const file = writeFixture('thing', componentSrc, storiesSrc);
     const result = auditComponent(file);
     const drift = result.findings.find(
       (f) => f.kind === 'drift' && f.name === 'WithDataAttributes'
@@ -383,18 +417,27 @@ describe('auditComponent — real fixtures', () => {
     });
   });
 
-  it('Tabs reports both drift and missing on a compound component', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'tabs.tsx');
+  it('reports drift for KeyboardNavigation → KeyboardInteraction', () => {
+    const componentSrc = `
+      import { cva } from 'class-variance-authority';
+      const v = cva('base', { variants: { variant: { default: '' } } });
+      interface Props { disabled?: boolean; onClick?: () => void }
+      export function Thing(p: Props) { return null; }
+    `;
+    const storiesSrc = `
+      const meta = { args: { onClick: fn() } };
+      export const Default: Story = { args: {} };
+      export const Disabled: Story = { args: { disabled: true } };
+      export const ClickInteraction: Story = { args: {} };
+      export const KeyboardNavigation: Story = { args: {} };
+      export const WithDataAttributes: Story = { args: {} };
+      export const AllVariants: Story = { render: () => null };
+    `;
+    const file = writeFixture('thing', componentSrc, storiesSrc);
     const result = auditComponent(file);
-    // Drift: KeyboardNavigation should be KeyboardInteraction
-    const keyboardDrift = result.findings.find(
+    const drift = result.findings.find(
       (f) => f.kind === 'drift' && f.name === 'KeyboardInteraction'
     );
-    expect(keyboardDrift?.found).toBe('KeyboardNavigation');
-    // Drift: DataAttributesTest should be WithDataAttributes
-    const dataDrift = result.findings.find(
-      (f) => f.kind === 'drift' && f.name === 'WithDataAttributes'
-    );
-    expect(dataDrift?.found).toBe('DataAttributesTest');
+    expect(drift?.found).toBe('KeyboardNavigation');
   });
 });

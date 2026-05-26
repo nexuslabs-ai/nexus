@@ -206,7 +206,7 @@ export const FlexParent: Story = {
   },
 };
 
-export const DataAttributes: Story = {
+export const WithDataAttributes: Story = {
   render: () => (
     <Show above="lg" data-testid="el">
       <span>content</span>

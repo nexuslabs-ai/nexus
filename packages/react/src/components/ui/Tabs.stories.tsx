@@ -335,7 +335,7 @@ export const ClickInteraction: Story = {
   },
 };
 
-export const KeyboardNavigation: Story = {
+export const KeyboardInteraction: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>
@@ -421,7 +421,7 @@ export const DisabledTabInteraction: Story = {
   },
 };
 
-export const DataAttributesTest: Story = {
+export const WithDataAttributes: Story = {
   render: (_args) => (
     <Tabs defaultValue="tab1" className="nx:w-[400px]">
       <TabsList>

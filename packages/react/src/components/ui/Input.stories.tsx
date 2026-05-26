@@ -220,7 +220,7 @@ export const DisabledInteraction: Story = {
   },
 };
 
-export const DataAttributesTest: Story = {
+export const WithDataAttributes: Story = {
   args: {
     size: 'lg',
     placeholder: 'Test input',

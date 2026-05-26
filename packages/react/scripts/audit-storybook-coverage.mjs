@@ -725,7 +725,11 @@ const DRIFT_ALIASES = {
   WithDataAttributes: ['DataAttributesTest', 'DataAttrs', 'DataAttributes'],
   Disabled: ['DisabledInteraction', 'DisabledState'],
   ClickInteraction: ['ClickTest', 'OnClick'],
-  KeyboardInteraction: ['KeyboardTest', 'KeyboardNavigation'],
+  KeyboardInteraction: [
+    'KeyboardTest',
+    'KeyboardNavigation',
+    'KeyboardNavigationInteraction',
+  ],
   Default: ['Basic'],
   AllVariants: ['Variants', 'AllStates'],
   AllSizes: ['Sizes'],
