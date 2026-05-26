@@ -557,7 +557,7 @@ describe('utils', () => {
   }
 
   describe('discoverSemantics', () => {
-    it('routes spacing-*.json into the spacingModes bucket (not standalone)', () => {
+    it('routes spacing-*.json into perModeFiles.spacing (not standalone)', () => {
       withSpacingModesFixture(
         {
           vega: { spacing: {} },
@@ -574,9 +574,11 @@ describe('utils', () => {
 
           const result = discoverSemantics(dir);
 
-          expect(result.spacingModes).toEqual({
-            vega: 'spacing-vega.json',
-            lyra: 'spacing-lyra.json',
+          expect(result.perModeFiles).toEqual({
+            spacing: {
+              vega: 'spacing-vega.json',
+              lyra: 'spacing-lyra.json',
+            },
           });
           expect(result.standalone).toEqual(['focus.json']);
           // Confirm spacing files did NOT leak into standalone — without
@@ -587,12 +589,12 @@ describe('utils', () => {
       );
     });
 
-    it('returns empty spacingModes when no spacing-*.json files are present', () => {
+    it('returns empty perModeFiles when no spacing-*.json files are present', () => {
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-disc-test-'));
       try {
         fs.writeFileSync(path.join(dir, 'focus.json'), JSON.stringify({}));
         const result = discoverSemantics(dir);
-        expect(result.spacingModes).toEqual({});
+        expect(result.perModeFiles).toEqual({});
       } finally {
         fs.rmSync(dir, { recursive: true, force: true });
       }

@@ -46,7 +46,7 @@ const DEFAULT_THEME: ThemeConfig = {
   base: 'slate',
   brand: 'blue',
   dark: false,
-  size: 'vega',
+  spacing: 'vega',
   typography: 'vega',
   shadow: 'vega',
   radius: 'subtle',
@@ -264,11 +264,11 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
         <Section title="Design Tokens">
           <div className="nx:space-y-3">
             <TokenSelect
-              id="size-select"
-              label="Size"
-              value={theme.size}
+              id="spacing-select"
+              label="Spacing"
+              value={theme.spacing}
               options={SPACING_MODES}
-              onChange={(v) => setTheme((t) => ({ ...t, size: v }))}
+              onChange={(v) => setTheme((t) => ({ ...t, spacing: v }))}
             />
             <TokenSelect
               id="typography-select"

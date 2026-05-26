@@ -28,6 +28,7 @@ import {
   getGoogleFontsImportFromTokens,
   isReference,
   log,
+  parseArgs,
   partitionThemedModes,
   pathToCssVar,
   processSemanticTokens,
@@ -471,5 +472,10 @@ export async function generateModular({
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  await generateModular();
+  // Surface `--spacingDefault=X` symmetric with `generate-tailwind-package.js`.
+  // Other CLI flags consumed by `parseArgs` (base/brand/typography/...) don't
+  // apply here — the modular build emits every mode of every category — so
+  // we just pluck the one knob this generator honours.
+  const cliConfig = parseArgs();
+  await generateModular({ spacingDefault: cliConfig.spacingDefault });
 }

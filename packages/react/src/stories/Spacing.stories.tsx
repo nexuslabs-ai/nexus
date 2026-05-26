@@ -17,13 +17,11 @@ type ModeFile = Record<string, unknown>;
 function isDimensionToken(node: unknown): node is DimensionToken {
   if (typeof node !== 'object' || node === null) return false;
   if (!('$value' in node) || !('$type' in node)) return false;
+  if ((node as { $type: unknown }).$type !== 'dimension') return false;
   const value = (node as { $value: unknown }).$value;
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'value' in value &&
-    'unit' in value
-  );
+  if (typeof value !== 'object' || value === null) return false;
+  const dim = value as { value?: unknown; unit?: unknown };
+  return typeof dim.value === 'number' && typeof dim.unit === 'string';
 }
 
 const MODES: { name: string; tokens: ModeFile }[] = [
@@ -63,9 +61,7 @@ function extractRoleRows(mode: ModeFile): [string, Dimension][] {
 
   function walk(node: unknown, path: string[]): void {
     if (isDimensionToken(node)) {
-      if (node.$type === 'dimension') {
-        rows.push([path.join('-'), node.$value]);
-      }
+      rows.push([path.join('-'), node.$value]);
       return;
     }
     if (typeof node === 'object' && node !== null) {

@@ -6,7 +6,7 @@ export type ThemeConfig = {
   brand: string;
   dark: boolean;
   // Design token modes
-  size: string;
+  spacing: string;
   typography: string;
   shadow: string;
   radius: string;
@@ -41,7 +41,7 @@ export function useTheme() {
     brand: 'blue',
     dark: false,
     // Design token modes
-    size: 'vega',
+    spacing: 'vega',
     typography: 'vega',
     shadow: 'vega',
     radius: 'subtle',
@@ -58,14 +58,9 @@ export function useTheme() {
     loadCSS(`/themes/brands-${theme.brand}.css`, 'brand');
   }, [theme.brand]);
 
-  // Spacing mode swaps via the `data-style` attribute on <html> (no CSS
-  // file load — the per-mode `[data-style="X"]` blocks ship together in
-  // globals.css; the cascade picks the active mode at runtime). The
-  // `theme.size` field is kept for backwards compatibility with the
-  // existing ThemeSwitcher UI; #120 will rename it.
   useEffect(() => {
-    document.documentElement.setAttribute('data-style', theme.size);
-  }, [theme.size]);
+    document.documentElement.setAttribute('data-style', theme.spacing);
+  }, [theme.spacing]);
 
   // Load typography mode when it changes
   useEffect(() => {
