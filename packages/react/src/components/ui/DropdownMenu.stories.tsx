@@ -278,7 +278,7 @@ export const OpenCloseInteraction: Story = {
   },
 };
 
-export const KeyboardNavigation: Story = {
+export const KeyboardInteraction: Story = {
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -319,7 +319,7 @@ export const KeyboardNavigation: Story = {
   },
 };
 
-export const DataAttributesTest: Story = {
+export const WithDataAttributes: Story = {
   render: (_args) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

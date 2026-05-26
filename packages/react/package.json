@@ -24,6 +24,7 @@
     "clean": "rm -rf dist",
     "typecheck": "yarn generate:base-variants && tsc --noEmit",
     "generate:base-variants": "node scripts/generate-base-variants.mjs",
+    "audit:storybook-coverage": "node scripts/audit-storybook-coverage.mjs",
     "storybook": "yarn generate:base-variants && storybook dev -p 6006",
     "build-storybook": "yarn generate:base-variants && storybook build"
   },

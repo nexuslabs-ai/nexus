@@ -305,7 +305,7 @@ export const SelectItemInteraction: Story = {
   },
 };
 
-export const KeyboardNavigationInteraction: Story = {
+export const KeyboardInteraction: Story = {
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
@@ -371,7 +371,7 @@ export const DisabledInteraction: Story = {
   },
 };
 
-export const DataAttributesTest: Story = {
+export const WithDataAttributes: Story = {
   render: (_args) => (
     <Select>
       <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">

@@ -205,7 +205,7 @@ export const FocusInteraction: Story = {
   },
 };
 
-export const DataAttributesTest: Story = {
+export const WithDataAttributes: Story = {
   render: (_args) => (
     <Tooltip>
       <TooltipTrigger asChild>

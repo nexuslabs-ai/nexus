@@ -295,7 +295,7 @@ export const KeyboardInteraction: Story = {
   },
 };
 
-export const DataAttributesTest: Story = {
+export const WithDataAttributes: Story = {
   render: (_args) => (
     <Dialog>
       <DialogTrigger asChild>
