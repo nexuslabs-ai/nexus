@@ -95,7 +95,13 @@ export const Interactive: Story = {
 | WithDataAttributes      | Verify data-\* attrs      | Yes            |
 | asChild (if applicable) | Composition works         | Yes            |
 | Edge cases              | Empty, long content, etc. | Yes            |
-| AllVariants             | Visual grid reference     | No             |
+| AllVariants ★           | Visual grid reference     | No             |
+
+★ The canonical showcase name is `AllVariants`, but per-component overrides live
+in `packages/react/scripts/base-variants.config.json` — e.g. Avatar's showcase is
+`AllSizes`. The `audit:storybook-coverage` script reads that config to decide
+which name to require. To add or change a component's showcase name, edit the
+config rather than this row.
 
 ## Play Function Patterns
 

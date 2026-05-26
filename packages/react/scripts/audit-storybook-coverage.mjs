@@ -391,17 +391,16 @@ export function detectAsChild(src) {
 
 /**
  * Display-gate signal: is the component interactive? OR of two signals:
- *  (a) the component's source mentions an `on*` event-handler prop name or
- *      the `disabled` token (covers explicit prop interfaces and CVA base
- *      classes like `nx:disabled:` styling hooks); or
+ *  (a) the component's source declares a `disabled` prop (interface field,
+ *      destructure, or JSX assignment) or an `on*` event-handler prop; or
  *  (b) handled by the caller via the stories file's `fn()`-in-`meta.args`.
  * This function returns (a) only; combine with (b) at the call site.
  */
 export function detectInteractiveFromComponent(src) {
-  // Strip `data-state` and similar `[data-*]` attribute selectors so a CVA
-  // class like `nx:data-[state=active]:bg-background` doesn't false-positive
-  // the `disabled` check below via accidental substring matches.
-  if (/\bdisabled\b/.test(src)) return true;
+  // Lookbehind excludes CVA `nx:disabled:` and `aria-disabled=` — both would
+  // otherwise pass `\bdisabled\s*[?:,=]` and false-positive components that
+  // only style a disabled state without exposing the prop (e.g. Tabs).
+  if (/(?<![:-])\bdisabled\s*[?:,=]/.test(src)) return true;
   if (/\bon[A-Z][A-Za-z]+\s*[?:,)]/.test(src)) return true;
   return false;
 }
@@ -450,7 +449,6 @@ export function findStoryExports(src) {
  * or null if absent.
  */
 export function findArgsBlock(src, blockStart) {
-  if (blockStart === -1) return null;
   return findObjectKey(src, blockStart, 'args');
 }
 
@@ -462,7 +460,6 @@ export function findArgsBlock(src, blockStart) {
  *  - name-match (case-folded, suffix-stripped): story name maps to value
  */
 export function storyExercises(src, story, enumName, value) {
-  if (story.blockStart === -1) return false;
   // (1) args-match
   const argsRange = findArgsBlock(src, story.blockStart);
   if (argsRange) {
@@ -609,22 +606,15 @@ export function listAllComponents(root = COMPONENTS_ROOT) {
 // Showcase-name lookup.
 // ─────────────────────────────────────────────────────────────────────────────
 
-let configCache = null;
-
 function readConfig() {
-  if (configCache !== null) return configCache;
-  if (!fs.existsSync(CONFIG_PATH)) {
-    configCache = { components: [] };
-    return configCache;
-  }
+  if (!fs.existsSync(CONFIG_PATH)) return { components: [] };
   try {
-    configCache = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
   } catch (err) {
     throw new ConfigError(
       `failed to parse ${path.relative(REPO_ROOT, CONFIG_PATH)}: ${err.message}`
     );
   }
-  return configCache;
 }
 
 /**
@@ -739,9 +729,14 @@ const DRIFT_ALIASES = {
  * Build the required-story checklist for a component and check the stories
  * file against it.
  *
+ * @param {string} componentFile - absolute path to the component `.tsx`
+ * @param {{ showcase?: string }} [opts] - `showcase` overrides the canonical
+ *   showcase story name (default: looked up via `showcaseNameFor`). Synthetic
+ *   tests pass it directly to stay decoupled from the repo's
+ *   `base-variants.config.json`.
  * @returns {{ component, file, storiesFile, findings, summary, info }}
  */
-export function auditComponent(componentFile) {
+export function auditComponent(componentFile, opts = {}) {
   const src = fs.readFileSync(componentFile, 'utf8');
   const storiesFile = findStoriesFile(componentFile);
   const kebab = path.basename(componentFile, '.tsx');
@@ -791,7 +786,7 @@ export function auditComponent(componentFile) {
     return result;
   }
 
-  const showcase = showcaseNameFor(pascal);
+  const showcase = opts.showcase ?? showcaseNameFor(pascal);
 
   // ── 6 literal-name required stories ────────────────────────────────────────
   // `Default`, `WithDataAttributes`, and `<showcase>` are always required.

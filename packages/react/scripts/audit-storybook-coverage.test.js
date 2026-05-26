@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   auditComponent,
@@ -212,6 +212,30 @@ describe('detectInteractiveFromComponent', () => {
       false
     );
   });
+
+  it('does not match CVA `nx:disabled:` class hooks', () => {
+    expect(
+      detectInteractiveFromComponent(
+        "'nx:disabled:pointer-events-none nx:disabled:opacity-50'"
+      )
+    ).toBe(false);
+  });
+
+  it('does not match `aria-disabled=` on rendered elements', () => {
+    expect(
+      detectInteractiveFromComponent('<button aria-disabled={isDisabled} />')
+    ).toBe(false);
+  });
+
+  it('flags `disabled?:` interface fields as interactive', () => {
+    expect(detectInteractiveFromComponent('disabled?: boolean')).toBe(true);
+  });
+
+  it('flags `disabled,` destructure as interactive', () => {
+    expect(
+      detectInteractiveFromComponent('{ className, disabled, ...props }')
+    ).toBe(true);
+  });
 });
 
 describe('findStoryExports', () => {
@@ -375,12 +399,24 @@ describe('auditComponent — real fixtures', () => {
 
 // Drift-detection tests use synthetic fixtures written to a temp dir so they
 // don't depend on the codebase's evolving story names (a real-file fixture
-// would fail the moment Phase 2 renames land).
+// would fail the moment Phase 2 renames land). Each fixture's tmp dir is
+// tracked and removed after the test; `showcase: 'AllVariants'` is passed to
+// `auditComponent` so the test path doesn't read the repo's
+// `base-variants.config.json`.
 describe('auditComponent — drift detection (synthetic)', () => {
+  const tmpDirs = [];
+
+  afterEach(() => {
+    while (tmpDirs.length) {
+      fs.rmSync(tmpDirs.pop(), { recursive: true, force: true });
+    }
+  });
+
   function writeFixture(name, componentSrc, storiesSrc) {
     const dir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'audit-storybook-coverage-')
     );
+    tmpDirs.push(dir);
     const uiDir = path.join(dir, 'src', 'components', 'ui');
     fs.mkdirSync(uiDir, { recursive: true });
     const pascal = name.charAt(0).toUpperCase() + name.slice(1);
@@ -406,7 +442,7 @@ describe('auditComponent — drift detection (synthetic)', () => {
       export const AllVariants: Story = { render: () => null };
     `;
     const file = writeFixture('thing', componentSrc, storiesSrc);
-    const result = auditComponent(file);
+    const result = auditComponent(file, { showcase: 'AllVariants' });
     const drift = result.findings.find(
       (f) => f.kind === 'drift' && f.name === 'WithDataAttributes'
     );
@@ -434,7 +470,7 @@ describe('auditComponent — drift detection (synthetic)', () => {
       export const AllVariants: Story = { render: () => null };
     `;
     const file = writeFixture('thing', componentSrc, storiesSrc);
-    const result = auditComponent(file);
+    const result = auditComponent(file, { showcase: 'AllVariants' });
     const drift = result.findings.find(
       (f) => f.kind === 'drift' && f.name === 'KeyboardInteraction'
     );
