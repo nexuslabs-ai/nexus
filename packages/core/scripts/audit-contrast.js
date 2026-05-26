@@ -227,7 +227,7 @@ function computeLc(textInts, bgInts) {
   return typeof lc === 'number' ? lc : Number(lc);
 }
 
-function formatLine(passed, label, lc, minLc, tier) {
+export function formatLine(passed, label, lc, minLc, tier) {
   const mark = passed ? '✓' : '✗';
   const lcStr = lc.toFixed(1).padStart(6);
   const tail = passed
@@ -402,4 +402,7 @@ function main() {
   process.exit(failCount === 0 ? 0 : 1);
 }
 
-main();
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain) {
+  main();
+}

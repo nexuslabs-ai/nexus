@@ -23,9 +23,14 @@ LLM reasoning. The audit script is testable and byte-stable. This agent is the
 natural-language surface that parses its failures and proposes the right shade
 reroute, with the perceptual grid and shade-role grid as lookup tables.
 
+The textual contract between script and agent is pinned by
+`packages/core/scripts/__tests__/audit-contrast.test.js`, which snapshots
+`formatLine`'s pass and fail outputs so any layout drift breaks CI before it
+breaks the parser.
+
 A future v1.1 may extract parse + propose into a Node module
-(`packages/core/scripts/lib/contrast-proposer.js`) the agent shells into, giving
-the heuristic fixture-test coverage. Out of scope for v1.
+(`packages/core/scripts/lib/contrast-proposer.js`) the agent shells into,
+giving the heuristic itself fixture-test coverage. Out of scope for v1.
 
 ## Procedure
 
@@ -60,7 +65,9 @@ naïve `audit-contrast: …` matching.
 
 ### 4. Parse with streaming-header tracking
 
-Initialize `activeHeader = null`. Walk stdout line by line.
+Initialize `activeHeader = null`. Walk stdout line by line, skipping blank
+lines — the script emits one between section blocks (`audit-contrast.js:390`,
+`output.push('')`).
 
 **Section-header lines** match `^─── (.+) ───$`. Two forms:
 
@@ -86,7 +93,10 @@ label width, then `Lc` + padded six-char Lc value, then `   FAIL (< {minLc},
 
 **The sign of Lc encodes luminance order:** `Lc > 0` means fg is darker than
 bg; `Lc < 0` means fg is lighter than bg. This is what picks reroute direction
-in step 6 — the agent does not need to compute L deltas itself.
+in step 6 — the agent does not need to compute L deltas itself. **Apply the
+sign rule only after classifying the failure as Case A** (shade-steppable fg);
+Cases B/C/D route around it (B has no shade scale; C tunes a hex at a target
+L; D may swap palettes for hue rotation).
 
 ### 5. Filename → path mapping
 
@@ -100,16 +110,18 @@ From the active header, resolve which JSON file holds the fg token:
 | `focus-default-{light,dark}.json`                          | `packages/core/tokens/primitives/focus/` |
 
 For cross-file headers, the **fg-file** (second filename, after `↔`) is what
-gets resolved here. The bg-file is named only to label the section; the bg
-token's value is read from the same fg-file the audit is testing against.
+gets resolved here. The script opens the bg-file itself
+(`auditPairs(fgData, bgData, …)` at `audit-contrast.js:239`); the agent
+opens only the fg-file because it proposes fg-side reroutes — bg shades stay
+fixed as the surface contract the fg must clear.
 
 **If no pattern hits, hard-fail** with the section header verbatim — don't
 guess paths.
 
 **Use the Read tool for these JSON files, never `Bash + cat`.** The project's
-`PreToolUse` hook at `.claude/settings.json` blocks bash commands containing
-the substring `token`; many of these paths include the word, so shelling out
-via `cat tokens/...` will be blocked. Read sidesteps the regex.
+`PermissionRequest` hook at `.claude/settings.json` blocks bash commands
+containing the substring `token`; many of these paths include the word, so
+shelling out via `cat tokens/...` will be blocked. Read sidesteps the regex.
 
 ### 6. Resolve and propose per failure
 
@@ -139,8 +151,11 @@ Then run the **role-conflict check**:
    suffix:
    - `*-light.json` → `Light-mode use` column
    - `*-dark.json` → `Dark-mode use` column
-3. Treat italicised `_(rarely used)_` as **no documented conflict** — do not
-   surface as a clash.
+3. Treat any italicised cell — leading `_(` and trailing `)_` — as **no
+   documented conflict** and do not surface as a clash. This covers the full
+   no-role family in `color-shades.md`: `_(rarely used)_` (shades 200/300
+   dark), `_(rarely used — too close to white...)_` (shade 100 dark), and
+   `_(anchor — rarely surfaced...)_` (shade 500 dark).
 4. If the column lists a role for that shade, add a one-line **Notes** entry:
    `role collision ({theme}): reserved for {role}`. Don't refuse the suggestion
    — surface the tradeoff so the human can choose.
@@ -185,6 +200,11 @@ at a target L is colour-theory better left to the designer or the
 The failing fg is one of `chart.categorical.{1..5}`, each referencing a
 **different palette per series** for hue rotation (teal → lime → orange →
 rose → indigo, per `tokens.md § Data viz tokens`).
+
+**Skip the role-conflict check for Case D.** `color-shades.md` covers
+slate/neutral/gray/stone/zinc only; the chart palettes (teal/lime/orange/
+rose/indigo) have no rows there, so the grep would silently no-op and add
+nothing.
 
 Naïve shade-stepping risks degrading the categorical rotation: stepping
 `{teal.700}` darker may push its perceived weight too close to a neighbouring
