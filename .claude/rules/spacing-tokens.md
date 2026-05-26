@@ -52,7 +52,9 @@ Every mode file MUST contain the same set of keys — enforced by JSON schema va
 {
   "spacing": {
     "0": { "$value": { "value": 0, "unit": "px" }, "$type": "dimension" },
+    "0_5": { "$value": { "value": 2, "unit": "px" }, "$type": "dimension" },
     "1": { "$value": { "value": 4, "unit": "px" }, "$type": "dimension" },
+    "1_5": { "$value": { "value": 6, "unit": "px" }, "$type": "dimension" },
     "2": { "$value": { "value": 8, "unit": "px" }, "$type": "dimension" },
     "...": "...",
     "96": { "$value": { "value": 384, "unit": "px" }, "$type": "dimension" }
