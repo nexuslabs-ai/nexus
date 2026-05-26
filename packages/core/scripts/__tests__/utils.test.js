@@ -403,6 +403,7 @@ describe('utils', () => {
       expect(DEFAULT_CONFIG).toHaveProperty('shadow');
       expect(DEFAULT_CONFIG).toHaveProperty('radius');
       expect(DEFAULT_CONFIG).toHaveProperty('borderwidth');
+      expect(DEFAULT_CONFIG).toHaveProperty('spacingDefault');
     });
 
     // `size` was removed in #119 — spacing now reads per-mode semantic files
@@ -418,6 +419,10 @@ describe('utils', () => {
       expect(DEFAULT_CONFIG.shadow).toBe('vega');
       expect(DEFAULT_CONFIG.radius).toBe('sharp');
       expect(DEFAULT_CONFIG.borderwidth).toBe('vega');
+      // Vega is the canonical spacing default (per spacing-tokens.md). The
+      // key controls which mode lands under `:root, [data-style="X"]`; other
+      // modes still ship in the bundle.
+      expect(DEFAULT_CONFIG.spacingDefault).toBe('vega');
     });
   });
 

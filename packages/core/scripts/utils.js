@@ -233,6 +233,13 @@ export const DEFAULT_CONFIG = {
   borderwidth: 'vega',
   focus: 'default',
   'chart-categorical': 'default',
+  // Spacing ships all 7 modes in every build (mode swap is runtime via the
+  // `data-style="X"` attribute). This key only controls which mode lands
+  // under `:root, [data-style="X"]` — i.e. which is the default when no
+  // `data-style` attribute is set on the document. Other modes still emit
+  // their `[data-style="X"]` blocks alongside. Vega is the canonical
+  // baseline per `.claude/rules/spacing-tokens.md`.
+  spacingDefault: 'vega',
 };
 
 // ============================================

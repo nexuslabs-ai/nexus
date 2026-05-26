@@ -143,4 +143,24 @@ describe('generateModular', () => {
       /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-control-h-md:\s*32px;/
     );
   });
+
+  it('spacingDefault option shifts which mode lands under :root, [data-style="X"]', async () => {
+    // Same contract as the bundled-tailwind build: pass a non-default mode
+    // and confirm the :root combinator moves to it. All 7 mode blocks still
+    // emit; only the `:root` half of the dual selector changes.
+    const dir = makeTmpDir();
+    const originalLog = console.log;
+    console.log = () => {};
+    try {
+      await generateModular({ distDir: dir, spacingDefault: 'maia' });
+    } finally {
+      console.log = originalLog;
+    }
+    const globals = fs.readFileSync(path.join(dir, 'globals.css'), 'utf8');
+
+    expect(globals).toMatch(/:root,\s*\n\s*\[data-style=['"]maia['"]\] \{/);
+    expect(globals).not.toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    expect(matches).toHaveLength(7);
+  });
 });

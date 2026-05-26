@@ -220,13 +220,19 @@ function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
 }
 
 /**
- * Generate globals.css for playground using shared generateThemeCSS function
+ * Generate globals.css for playground using shared generateThemeCSS function.
+ *
+ * `spacingDefault` controls which mode lands under `:root, [data-style="X"]`
+ * in globals.css — i.e. the no-`data-style` default. All 7 modes still ship
+ * either way (the other six emit as plain `[data-style="X"]` blocks); the
+ * playground's runtime UI swaps via `data-style` regardless.
  */
 function generatePlaygroundGlobalsCSS(
   distDir,
   primitives,
   primitiveMap,
-  semantics
+  semantics,
+  spacingDefault
 ) {
   // Get first available typography mode for Google Fonts
   const typographyModes = primitives.typography?.modes || ['vega'];
@@ -327,8 +333,10 @@ function generatePlaygroundGlobalsCSS(
     // No dark mode block - playground uses dynamic theme switching
   });
 
-  // Per-mode spacing override blocks (default Vega + 6 alphabetical others).
-  css += generateSpacingModesCSS(spacingModes);
+  // Per-mode spacing override blocks. `spacingDefault` picks which mode lands
+  // under `:root, [data-style="X"]`; the other six emit as bare
+  // `[data-style="X"]` blocks (alphabetical for determinism).
+  css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
 
   writeModularFile(distDir, 'globals.css', css);
 
@@ -346,7 +354,10 @@ function generatePlaygroundGlobalsCSS(
 /**
  * Main execution
  */
-export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
+export async function generateModular({
+  distDir = DEFAULT_MODULAR_DIR,
+  spacingDefault = CANONICAL_SPACING_DEFAULT_MODE,
+} = {}) {
   console.log('🎨 Generating modular CSS files...\n');
 
   // Wipe and recreate dist so renamed/removed outputs do not leave orphans.
@@ -446,7 +457,8 @@ export async function generateModular({ distDir = DEFAULT_MODULAR_DIR } = {}) {
     distDir,
     primitives,
     primitiveMap,
-    semantics
+    semantics,
+    spacingDefault
   );
   console.log(`  ✓ globals.css (${globalsTokenCount} tokens)`);
   totalFiles++;

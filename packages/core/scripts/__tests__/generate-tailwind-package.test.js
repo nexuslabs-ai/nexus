@@ -597,4 +597,24 @@ describe('generateTailwindPackage', () => {
       );
     }
   });
+
+  it('config.spacingDefault shifts which mode lands under :root, [data-style="X"]', async () => {
+    // Build with a non-default spacing mode. All 7 mode blocks still emit;
+    // only the `:root` half of the dual selector moves from Vega to Maia.
+    const dir = makeTmpDir();
+    await generateTailwindPackage(
+      { ...DEFAULT_CONFIG, spacingDefault: 'maia' },
+      { distDir: dir }
+    );
+    const css = read(dir, 'nexus.css');
+
+    // :root must combine with [data-style="maia"], not vega.
+    expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]maia['"]\] \{/);
+    // Vega becomes a plain attribute selector (no :root combinator).
+    expect(css).not.toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    // Both blocks still present — the bundle still ships all 7 modes; only
+    // the cascade default moves.
+    const matches = css.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    expect(matches).toHaveLength(7);
+  });
 });

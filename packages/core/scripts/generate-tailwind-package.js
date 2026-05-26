@@ -366,13 +366,21 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
 }
 
 /**
- * Generate nexus.css using shared generateThemeCSS function
+ * Generate nexus.css using shared generateThemeCSS function.
+ *
+ * `spacingDefault` controls which mode lands under `:root, [data-style="X"]`
+ * (i.e. which mode applies when no `data-style` attribute is set). All 7
+ * modes still ship in the bundle either way — the other six emit as plain
+ * `[data-style="X"]` blocks. The @theme numeric subset always comes from the
+ * canonical Vega baseline because @theme drives Tailwind's utility codegen
+ * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
 function generateNexusCSS(
   semanticFiles,
   primitiveMap,
   usedModes,
-  spacingModes
+  spacingModes,
+  spacingDefault
 ) {
   // Get Google Fonts import
   const typographyMode = usedModes.typography || 'vega';
@@ -484,11 +492,11 @@ function generateNexusCSS(
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
 
-  // Per-mode spacing override blocks (`:root, [data-style="vega"]` for the
-  // default + `[data-style="X"]` for the other six modes). Lives outside
-  // @theme so the cascade can pick the active mode at runtime via the
-  // `data-style` attribute on any ancestor.
-  css += generateSpacingModesCSS(spacingModes);
+  // Per-mode spacing override blocks (`:root, [data-style="<default>"]` for
+  // the consumer-chosen default + plain `[data-style="X"]` for the others).
+  // Lives outside @theme so the cascade can pick the active mode at runtime
+  // via the `data-style` attribute on any ancestor.
+  css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
 
   // Add base layer
   css += generateBaseLayerCSS();
@@ -576,11 +584,17 @@ export async function generateTailwindPackage(
     log.success(`Generated ${spacingUtilities.count} spacing role utilities`);
   }
 
+  // `spacingDefault` controls which mode lands under `:root, [data-style="X"]`.
+  // Falls back to the canonical baseline so older config objects without the
+  // key (or hand-rolled test fixtures) still produce a valid build.
+  const spacingDefault =
+    config.spacingDefault || CANONICAL_SPACING_DEFAULT_MODE;
   const nexusCSS = generateNexusCSS(
     semanticFiles,
     primitiveMap,
     usedModes,
-    spacingModes
+    spacingModes,
+    spacingDefault
   );
   writeDistFile('nexus.css', nexusCSS);
 
