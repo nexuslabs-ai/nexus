@@ -103,6 +103,31 @@ in `packages/react/scripts/base-variants.config.json` — e.g. Avatar's showcase
 which name to require. To add or change a component's showcase name, edit the
 config rather than this row.
 
+### Archetype Equivalence Policy (Audit Contract)
+
+The matrix above is canonical by story **purpose**. For a subset of components,
+`audit:storybook-coverage` accepts equivalent story names when the literal name
+would duplicate behavior. The script constants in
+`packages/react/scripts/audit-storybook-coverage.mjs` are the runtime source of
+truth; this table mirrors that contract.
+
+| Archetype         | Components                          | Requirement                  | Accepted Story Names                                        |
+| ----------------- | ----------------------------------- | ---------------------------- | ----------------------------------------------------------- |
+| Trigger-and-overlay | Dialog, DropdownMenu, Select      | Click interaction            | `ClickInteraction`, `OpenCloseInteraction`                  |
+| Trigger-and-overlay | Select                            | Disabled behavior            | `Disabled`, `DisabledInteraction`                           |
+| Trigger-and-overlay | Dialog, DropdownMenu              | Disabled behavior            | `Disabled`, `WithDisabledItems`                             |
+| Text input        | Input                               | Click interaction            | `ClickInteraction`, `FocusBlurInteraction`                  |
+| Text input        | Input                               | Keyboard interaction         | `KeyboardInteraction`, `TypeInteraction`                    |
+| Accordion toggle  | Accordion                           | Click interaction            | `ClickInteraction`, `ExpandInteraction`                     |
+| Tab selection     | Tabs                                | Disabled behavior            | `Disabled`, `WithDisabledTab`, `DisabledTabInteraction`     |
+| Axis toggle       | Show, Hide                          | Showcase story               | `AllAxes` (configured in `base-variants.config.json`)       |
+
+Rules:
+
+1. If one accepted name for that requirement exists, coverage passes.
+2. Drift is only reported when no accepted equivalent exists and a true drift alias is found.
+3. Use canonical names for new components unless a documented archetype equivalence applies.
+
 ## Definition of Done
 
 A component PR is complete only when:
