@@ -5,16 +5,21 @@ import { describe, expect, it } from 'vitest';
 
 import {
   collectBreakpointsTokens,
+  collectSpacingTokens,
   collectZIndexTokens,
   DEFAULT_CONFIG,
+  discoverSemantics,
   extractRefPath,
   extractTokens,
   formatTokenValue,
+  generateSpacingModesCSS,
+  generateSpacingRoleUtilitiesCSS,
   isReference,
   partitionThemedModes,
   pathToCssVar,
   resolveReference,
   resolveValue,
+  splitSpacingTokens,
 } from '../utils.js';
 
 describe('utils', () => {
@@ -523,6 +528,278 @@ describe('utils', () => {
           expect(() => collectBreakpointsTokens(dir)).toThrow(/breakpoint-lg/);
         }
       );
+    });
+  });
+
+  // Shared fixture helper for spacing tests — writes per-mode JSON files into
+  // a temp dir and runs the body. Source data mirrors real spacing-vega.json
+  // structure (numeric `spacing.N` + role `control.h.md`, `container.p`,
+  // `layout.section-gap` subtrees) so the test exercises the same shapes the
+  // build sees.
+  function withSpacingModesFixture(filesByMode, fn) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-spacing-test-'));
+    try {
+      for (const [mode, data] of Object.entries(filesByMode)) {
+        fs.writeFileSync(
+          path.join(dir, `spacing-${mode}.json`),
+          JSON.stringify(data)
+        );
+      }
+      return fn(dir);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  }
+
+  describe('discoverSemantics', () => {
+    it('routes spacing-*.json into the spacingModes bucket (not standalone)', () => {
+      withSpacingModesFixture(
+        {
+          vega: { spacing: {} },
+          lyra: { spacing: {} },
+        },
+        (dir) => {
+          // Also write a true standalone to confirm the partition.
+          fs.writeFileSync(
+            path.join(dir, 'focus.json'),
+            JSON.stringify({
+              offset: { $value: { value: 2, unit: 'px' }, $type: 'dimension' },
+            })
+          );
+
+          const result = discoverSemantics(dir);
+
+          expect(result.spacingModes).toEqual({
+            vega: 'spacing-vega.json',
+            lyra: 'spacing-lyra.json',
+          });
+          expect(result.standalone).toEqual(['focus.json']);
+          // Confirm spacing files did NOT leak into standalone — without
+          // this gate they'd get double-emitted by the generic dimension scan.
+          expect(result.standalone).not.toContain('spacing-vega.json');
+          expect(result.standalone).not.toContain('spacing-lyra.json');
+        }
+      );
+    });
+
+    it('returns empty spacingModes when no spacing-*.json files are present', () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-disc-test-'));
+      try {
+        fs.writeFileSync(path.join(dir, 'focus.json'), JSON.stringify({}));
+        const result = discoverSemantics(dir);
+        expect(result.spacingModes).toEqual({});
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe('collectSpacingTokens', () => {
+    it('returns per-mode tokens with unprefixed cssNames (prefix is added at emit time)', () => {
+      withSpacingModesFixture(
+        {
+          vega: {
+            spacing: {
+              0: { $value: { value: 0, unit: 'px' }, $type: 'dimension' },
+              4: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
+            },
+            control: {
+              h: {
+                md: { $value: { value: 32, unit: 'px' }, $type: 'dimension' },
+              },
+            },
+          },
+          lyra: {
+            spacing: {
+              0: { $value: { value: 0, unit: 'px' }, $type: 'dimension' },
+              4: { $value: { value: 12, unit: 'px' }, $type: 'dimension' },
+            },
+            control: {
+              h: {
+                md: { $value: { value: 28, unit: 'px' }, $type: 'dimension' },
+              },
+            },
+          },
+        },
+        (dir) => {
+          const result = collectSpacingTokens(dir);
+          expect(Object.keys(result).sort()).toEqual(['lyra', 'vega']);
+          expect(result.vega).toEqual([
+            { cssName: 'spacing-0', value: '0px' },
+            { cssName: 'spacing-4', value: '16px' },
+            { cssName: 'control-h-md', value: '32px' },
+          ]);
+          // Per-mode variance is the whole point — the same cssName resolves
+          // to different values across modes.
+          expect(result.lyra).toEqual([
+            { cssName: 'spacing-0', value: '0px' },
+            { cssName: 'spacing-4', value: '12px' },
+            { cssName: 'control-h-md', value: '28px' },
+          ]);
+        }
+      );
+    });
+
+    it('throws when two paths flatten to the same cssName within a mode', () => {
+      // Two paths flattening to the same name would silently overwrite the
+      // first — defensive guard catches a real future risk once independent
+      // contributors add role tokens.
+      withSpacingModesFixture(
+        {
+          vega: {
+            control: {
+              h: {
+                md: { $value: { value: 32, unit: 'px' }, $type: 'dimension' },
+              },
+              'h-md': {
+                $value: { value: 999, unit: 'px' },
+                $type: 'dimension',
+              },
+            },
+          },
+        },
+        (dir) => {
+          expect(() => collectSpacingTokens(dir)).toThrow(/control-h-md/);
+        }
+      );
+    });
+
+    it('throws when no spacing-*.json files exist', () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-empty-test-'));
+      try {
+        expect(() => collectSpacingTokens(dir)).toThrow(
+          /no semantic\/spacing-\{mode\}\.json files found/
+        );
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe('splitSpacingTokens', () => {
+    it('partitions tokens by spacing- prefix', () => {
+      const tokens = [
+        { cssName: 'spacing-0', value: '0px' },
+        { cssName: 'spacing-4', value: '16px' },
+        { cssName: 'control-h-md', value: '32px' },
+        { cssName: 'container-p', value: '24px' },
+        { cssName: 'layout-section-gap', value: '32px' },
+      ];
+      const { numeric, role } = splitSpacingTokens(tokens);
+      expect(numeric).toEqual([
+        { cssName: 'spacing-0', value: '0px' },
+        { cssName: 'spacing-4', value: '16px' },
+      ]);
+      expect(role).toEqual([
+        { cssName: 'control-h-md', value: '32px' },
+        { cssName: 'container-p', value: '24px' },
+        { cssName: 'layout-section-gap', value: '32px' },
+      ]);
+    });
+  });
+
+  describe('generateSpacingModesCSS', () => {
+    const modes = {
+      vega: [
+        { cssName: 'spacing-4', value: '16px' },
+        { cssName: 'control-h-md', value: '32px' },
+      ],
+      lyra: [
+        { cssName: 'spacing-4', value: '12px' },
+        { cssName: 'control-h-md', value: '28px' },
+      ],
+      luma: [
+        { cssName: 'spacing-4', value: '16px' },
+        { cssName: 'control-h-md', value: '32px' },
+      ],
+    };
+
+    it('emits Vega block under :root and [data-style="vega"] selectors', () => {
+      const css = generateSpacingModesCSS(modes);
+      expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    });
+
+    it('emits non-default modes alphabetically (luma before lyra)', () => {
+      const css = generateSpacingModesCSS(modes);
+      // generateSpacingModesCSS returns a raw string with double-quoted
+      // attribute selectors; prettier rewrites to single quotes only after
+      // formatDistCssFiles runs. Match the raw form here.
+      const lumaIdx = css.indexOf('[data-style="luma"]');
+      const lyraIdx = css.indexOf('[data-style="lyra"]');
+      expect(lumaIdx).toBeGreaterThan(-1);
+      expect(lyraIdx).toBeGreaterThan(-1);
+      expect(lumaIdx).toBeLessThan(lyraIdx);
+    });
+
+    it('emits --nx- prefixed declarations (per-mode blocks live outside @theme)', () => {
+      const css = generateSpacingModesCSS(modes);
+      expect(css).toMatch(/--nx-spacing-4: 16px;/);
+      expect(css).toMatch(/--nx-control-h-md: 32px;/);
+      // No bare (unprefixed) declarations — those would not override the
+      // var(--nx-*) references that Tailwind v4 emits in utility bodies.
+      expect(css).not.toMatch(/^\s+--spacing-4:/m);
+      expect(css).not.toMatch(/^\s+--control-h-md:/m);
+    });
+
+    it('throws when defaultMode is not present in modesByName', () => {
+      expect(() =>
+        generateSpacingModesCSS(modes, { defaultMode: 'missing' })
+      ).toThrow(/defaultMode "missing"/);
+    });
+  });
+
+  describe('generateSpacingRoleUtilitiesCSS', () => {
+    it('emits @utility declarations data-driven from canonical role tokens', () => {
+      const canonical = [
+        { cssName: 'control-h-md', value: '32px' },
+        { cssName: 'control-padding-x-sm', value: '12px' },
+        { cssName: 'control-padding-y-lg', value: '12px' },
+        { cssName: 'control-gap', value: '8px' },
+        { cssName: 'container-p', value: '24px' },
+        { cssName: 'container-gap', value: '16px' },
+        { cssName: 'layout-section-gap', value: '32px' },
+        { cssName: 'layout-stack-gap', value: '8px' },
+      ];
+      const { css, count } = generateSpacingRoleUtilitiesCSS(canonical);
+
+      expect(count).toBe(8);
+      // Each utility name follows the role-and-property convention; the var
+      // reference is the prefixed form, so it matches what per-mode blocks
+      // declare.
+      expect(css).toMatch(
+        /@utility h-control-md \{[^}]*height: var\(--nx-control-h-md\);/
+      );
+      expect(css).toMatch(
+        /@utility px-control-sm \{[^}]*padding-left: var\(--nx-control-padding-x-sm\);[^}]*padding-right: var\(--nx-control-padding-x-sm\);/
+      );
+      expect(css).toMatch(
+        /@utility py-control-lg \{[^}]*padding-top: var\(--nx-control-padding-y-lg\);[^}]*padding-bottom: var\(--nx-control-padding-y-lg\);/
+      );
+      expect(css).toMatch(
+        /@utility gap-control \{[^}]*gap: var\(--nx-control-gap\);/
+      );
+      expect(css).toMatch(
+        /@utility p-container \{[^}]*padding: var\(--nx-container-p\);/
+      );
+      expect(css).toMatch(
+        /@utility gap-container \{[^}]*gap: var\(--nx-container-gap\);/
+      );
+      expect(css).toMatch(
+        /@utility gap-layout-section \{[^}]*gap: var\(--nx-layout-section-gap\);/
+      );
+      expect(css).toMatch(
+        /@utility gap-layout-stack \{[^}]*gap: var\(--nx-layout-stack-gap\);/
+      );
+    });
+
+    it('emits exactly one @utility per role token (1:1)', () => {
+      const canonical = [
+        { cssName: 'control-h-md', value: '32px' },
+        { cssName: 'container-p', value: '24px' },
+      ];
+      const { css, count } = generateSpacingRoleUtilitiesCSS(canonical);
+      expect(count).toBe(2);
+      expect((css.match(/@utility /g) || []).length).toBe(2);
     });
   });
 });

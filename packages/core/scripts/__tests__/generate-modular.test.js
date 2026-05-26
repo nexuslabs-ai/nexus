@@ -72,4 +72,67 @@ describe('generateModular', () => {
     expect(globals).toMatch(/--breakpoint-sm: 40rem;/);
     expect(globals).toMatch(/--breakpoint-2xl: 96rem;/);
   });
+
+  // -----------------------------------------------------------------------
+  // Spacing migration (#119) — per-mode blocks + inline role utilities
+  // -----------------------------------------------------------------------
+
+  it('emits all 7 per-mode [data-style="X"] blocks in playground globals.css', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    expect(matches).toHaveLength(7);
+
+    const modes = new Set(matches.map((m) => m.match(/['"]([a-z]+)['"]/)[1]));
+    expect(modes).toEqual(
+      new Set(['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'])
+    );
+  });
+
+  it('emits Vega numerics in @theme as direct px (not var refs)', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(/--spacing-4:\s*16px;/);
+    expect(globals).toMatch(/--spacing-6:\s*24px;/);
+    expect(globals).not.toMatch(/--spacing-0:\s*var\(/);
+  });
+
+  it('inlines role @utility declarations into globals.css (no separate spacing-utilities.css)', () => {
+    // sync-playground-themes' STYLES_FILES allowlist is hardcoded — adding a
+    // new file in dist/modular/ wouldn't carry to apps/playground/src/styles/.
+    // Inlining role utilities into globals.css keeps them inside that
+    // allowlist and reaches the playground's Tailwind build.
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(/@utility h-control-md \{/);
+    expect(globals).toMatch(/@utility p-container \{/);
+    expect(globals).toMatch(/@utility gap-layout-section \{/);
+
+    // No separate spacing-utilities.css in the modular dist (that's the
+    // bundled-tailwind dist's pattern).
+    const files = fs.readdirSync(distDir);
+    expect(files).not.toContain('spacing-utilities.css');
+  });
+
+  it('@utility declarations in globals.css bind the right prefixed CSS vars', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(
+      /@utility h-control-md \{[\s\S]*?height:\s*var\(--nx-control-h-md\);/
+    );
+    expect(globals).toMatch(
+      /@utility p-container \{[\s\S]*?padding:\s*var\(--nx-container-p\);/
+    );
+    expect(globals).toMatch(
+      /@utility gap-layout-stack \{[\s\S]*?gap:\s*var\(--nx-layout-stack-gap\);/
+    );
+  });
+
+  it('per-mode override blocks use --nx- prefix (Tailwind only rewrites @theme)', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    // Both numeric AND role tokens inside [data-style="X"] blocks must be
+    // already-prefixed since they live outside @theme.
+    expect(globals).toMatch(
+      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
+    );
+    expect(globals).toMatch(
+      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-control-h-md:\s*32px;/
+    );
+  });
 });
