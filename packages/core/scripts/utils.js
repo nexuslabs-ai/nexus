@@ -789,17 +789,17 @@ export function collectSpacingTokens(semanticDir) {
 
 /**
  * Split a per-mode token list into `{ numeric, role }` halves. Numeric tokens
- * (cssName matches `^spacing-`) feed `@theme` for Tailwind's `nx:p-*` /
+ * (path starts with `spacing`) feed `@theme` for Tailwind's `nx:p-*` /
  * `nx:m-*` / `nx:gap-*` / `nx:h-*` / `nx:w-*` utility codegen. Role tokens
- * (everything else — `control-*`, `container-*`, `layout-*`) feed only the
+ * (everything else — `control.*`, `container.*`, `layout.*`) feed only the
  * per-mode `[data-style="X"]` overrides and the `spacing-utilities`
  * `@utility` declarations. Role tokens never enter `@theme`, both because
  * Tailwind v4's `--container-*` namespace would otherwise auto-codegen
  * `nx:w-p` and friends from `--nx-container-p`, and because role tokens
  * don't map onto Tailwind's unified `--spacing-*` namespace cleanly.
  *
- * Partitioning reads `token.path[0]` rather than parsing `cssName` —
- * `path` is the structured form, `cssName` is the flattened output artifact.
+ * Partitioning reads `token.path[0]` — `path` is the structured form,
+ * `cssName` is the flattened output artifact.
  */
 export function splitSpacingTokens(tokens) {
   const numeric = [];
