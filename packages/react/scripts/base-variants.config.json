@@ -8,6 +8,7 @@
     {
       "name": "Accordion",
       "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
       "equivalents": { "ClickInteraction": ["ExpandInteraction"] }
     },
     { "name": "Alert", "showcase": "AllVariants" },
@@ -41,6 +42,7 @@
     {
       "name": "Select",
       "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
       "equivalents": {
         "ClickInteraction": ["OpenCloseInteraction"],
         "Disabled": ["DisabledInteraction"]
@@ -52,6 +54,7 @@
     {
       "name": "Tabs",
       "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
       "equivalents": {
         "Disabled": ["WithDisabledTab", "DisabledTabInteraction"]
       }

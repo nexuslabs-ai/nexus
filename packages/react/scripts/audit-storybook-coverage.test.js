@@ -401,47 +401,55 @@ describe('auditComponent — real fixtures', () => {
     expect(extraEnum?.name).toContain('fill');
   });
 
-  it('Input passes via text-input equivalents', () => {
+  // The display-gate info filter — used by the equivalence tests below to
+  // prove that all three canonical interactions were actually enforced (i.e.
+  // satisfied by the canonical name or an accepted equivalent), not silently
+  // skipped because the interactions array resolved to empty.
+  const displayGateNames = (result) =>
+    result.info.filter((i) => i.rule === 'display-gate').map((i) => i.name);
+
+  it('Input passes via text-input equivalents with no skipped requirements', () => {
     const file = path.join(COMPONENTS_ROOT, 'ui', 'input.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
+    expect(displayGateNames(result)).toEqual([]);
   });
 
-  it('Dialog passes via trigger-and-overlay click equivalence', () => {
+  it('Dialog passes via trigger-and-overlay click equivalence; only Disabled is archetype-omitted', () => {
     const file = path.join(COMPONENTS_ROOT, 'ui', 'dialog.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
-    // Dialog omits the canonical `Disabled` requirement — display-gate must
-    // surface it as an info entry so the archetype decision is auditable.
-    expect(
-      result.info.some(
-        (i) => i.rule === 'display-gate' && i.name === 'Disabled'
-      )
-    ).toBe(true);
+    // Dialog explicitly opts out of `Disabled` only — Click and Keyboard
+    // must still be enforced and met (no info entries for them).
+    expect(displayGateNames(result)).toEqual(['Disabled']);
   });
 
-  it('DropdownMenu passes via WithDisabledItems equivalence for Disabled', () => {
+  it('DropdownMenu passes via WithDisabledItems equivalence with no skipped requirements', () => {
     const file = path.join(COMPONENTS_ROOT, 'ui', 'dropdown-menu.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
+    expect(displayGateNames(result)).toEqual([]);
   });
 
-  it('Select passes via DisabledInteraction equivalence', () => {
+  it('Select passes via DisabledInteraction equivalence with no skipped requirements', () => {
     const file = path.join(COMPONENTS_ROOT, 'ui', 'select.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
+    expect(displayGateNames(result)).toEqual([]);
   });
 
-  it('Accordion passes via ExpandInteraction equivalence for ClickInteraction', () => {
+  it('Accordion passes via ExpandInteraction equivalence with no skipped requirements', () => {
     const file = path.join(COMPONENTS_ROOT, 'ui', 'accordion.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
+    expect(displayGateNames(result)).toEqual([]);
   });
 
-  it('Tabs passes via WithDisabledTab/DisabledTabInteraction equivalence', () => {
+  it('Tabs passes via WithDisabledTab/DisabledTabInteraction equivalence with no skipped requirements', () => {
     const file = path.join(COMPONENTS_ROOT, 'ui', 'tabs.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
+    expect(displayGateNames(result)).toEqual([]);
   });
 
   it('Show primitive passes with AllAxes showcase from config', () => {

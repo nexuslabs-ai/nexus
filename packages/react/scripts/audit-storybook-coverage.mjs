@@ -606,10 +606,18 @@ export function listAllComponents(root = COMPONENTS_ROOT) {
 // Showcase-name lookup.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Memoized at module load — the config is read on every component audit
+// (multiple times per `--all` sweep) and never mutated by callers.
+let cachedConfig = null;
 function readConfig() {
-  if (!fs.existsSync(CONFIG_PATH)) return { components: [] };
+  if (cachedConfig) return cachedConfig;
+  if (!fs.existsSync(CONFIG_PATH)) {
+    cachedConfig = { components: [] };
+    return cachedConfig;
+  }
   try {
-    return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    cachedConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    return cachedConfig;
   } catch (err) {
     throw new ConfigError(
       `failed to parse ${path.relative(REPO_ROOT, CONFIG_PATH)}: ${err.message}`
@@ -755,15 +763,14 @@ function configEntryFor(componentName) {
 
 /**
  * Resolve the interaction-story requirement list for a component:
- *   1. Explicit `interactions` in base-variants.config.json wins.
+ *   1. Explicit `entry.interactions` in base-variants.config.json wins.
  *   2. Otherwise, display-gate signal: source-detected interactive (disabled
  *      prop or on* handler) OR a stories-level `fn()` spy in `meta.args`
  *      yields the canonical INTERACTIVE_REQUIREMENTS list.
- *   3. Pure display components return [] — display-gate emits one info entry
- *      per canonical name so the omission is auditable.
+ *   3. Pure display components return [] — auditComponent emits one info
+ *      entry per omitted canonical name so the decision is auditable.
  */
-function interactionRequirementsFor(componentName, isInteractive) {
-  const entry = configEntryFor(componentName);
+function interactionRequirementsFor(entry, isInteractive) {
   if (entry?.interactions) return entry.interactions;
   return isInteractive ? [...INTERACTIVE_REQUIREMENTS] : [];
 }
@@ -775,8 +782,7 @@ function interactionRequirementsFor(componentName, isInteractive) {
  * is per-component (not global) so an unrelated component's alias can't
  * silently satisfy another's requirement.
  */
-function acceptedNamesForRequirement(componentName, requirementName) {
-  const entry = configEntryFor(componentName);
+function acceptedNamesForRequirement(entry, requirementName) {
   const extras = entry?.equivalents?.[requirementName] ?? [];
   return [requirementName, ...extras];
 }
@@ -845,7 +851,8 @@ export function auditComponent(componentFile, opts = {}) {
   const showcase = opts.showcase ?? showcaseNameFor(pascal);
 
   // ── Required stories (canonical + component-scoped equivalents) ───────────
-  const interactiveRequirements = interactionRequirementsFor(pascal, isInteractive);
+  const entry = configEntryFor(pascal);
+  const interactiveRequirements = interactionRequirementsFor(entry, isInteractive);
   const requiredNames = [
     ...BASE_REQUIREMENTS,
     ...interactiveRequirements,
@@ -853,15 +860,22 @@ export function auditComponent(componentFile, opts = {}) {
   ];
 
   // Emit one info entry per canonical interaction name that this component
-  // omits — covers both full omission (display components) and partial
-  // omission (Dialog drops `Disabled`). The diff makes every archetype
-  // decision auditable instead of silent.
+  // omits — covers both full omission (display components, or a config that
+  // explicitly opts out) and partial omission (Dialog drops `Disabled`).
+  // The reason text distinguishes the three cases so a source-detection miss
+  // can't masquerade as a deliberate display-only decision.
   const omitted = INTERACTIVE_REQUIREMENTS.filter(
     (name) => !interactiveRequirements.includes(name)
   );
-  const omissionReason = interactiveRequirements.length === 0
-    ? 'display component — no interactive requirements'
-    : 'archetype omits this canonical requirement';
+  let omissionReason;
+  if (interactiveRequirements.length > 0) {
+    omissionReason = 'archetype omits this canonical requirement';
+  } else if (entry?.interactions) {
+    omissionReason = 'config explicitly declares no interactions';
+  } else {
+    omissionReason =
+      'display-gate signal absent (no `on*`/`disabled` prop and no `fn()` spy)';
+  }
   for (const name of omitted) {
     result.info.push({
       kind: 'info',
@@ -872,7 +886,7 @@ export function auditComponent(componentFile, opts = {}) {
   }
 
   for (const reqName of requiredNames) {
-    const accepted = acceptedNamesForRequirement(pascal, reqName);
+    const accepted = acceptedNamesForRequirement(entry, reqName);
     const satisfiedBy = accepted.find((name) => storyNames.has(name));
     if (satisfiedBy) continue;
 
