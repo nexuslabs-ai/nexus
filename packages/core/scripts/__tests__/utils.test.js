@@ -685,23 +685,39 @@ describe('utils', () => {
   });
 
   describe('splitSpacingTokens', () => {
-    it('partitions tokens by spacing- prefix', () => {
+    it('partitions tokens by path[0] === "spacing"', () => {
       const tokens = [
-        { cssName: 'spacing-0', value: '0px' },
-        { cssName: 'spacing-4', value: '16px' },
-        { cssName: 'control-h-md', value: '32px' },
-        { cssName: 'container-p', value: '24px' },
-        { cssName: 'layout-section-gap', value: '32px' },
+        { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
+        { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
+        {
+          cssName: 'control-h-md',
+          path: ['control', 'h', 'md'],
+          value: '32px',
+        },
+        { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
+        {
+          cssName: 'layout-section-gap',
+          path: ['layout', 'section-gap'],
+          value: '32px',
+        },
       ];
       const { numeric, role } = splitSpacingTokens(tokens);
       expect(numeric).toEqual([
-        { cssName: 'spacing-0', value: '0px' },
-        { cssName: 'spacing-4', value: '16px' },
+        { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
+        { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
       ]);
       expect(role).toEqual([
-        { cssName: 'control-h-md', value: '32px' },
-        { cssName: 'container-p', value: '24px' },
-        { cssName: 'layout-section-gap', value: '32px' },
+        {
+          cssName: 'control-h-md',
+          path: ['control', 'h', 'md'],
+          value: '32px',
+        },
+        { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
+        {
+          cssName: 'layout-section-gap',
+          path: ['layout', 'section-gap'],
+          value: '32px',
+        },
       ]);
     });
   });

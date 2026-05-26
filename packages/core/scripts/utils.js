@@ -797,12 +797,15 @@ export function collectSpacingTokens(semanticDir) {
  * Tailwind v4's `--container-*` namespace would otherwise auto-codegen
  * `nx:w-p` and friends from `--nx-container-p`, and because role tokens
  * don't map onto Tailwind's unified `--spacing-*` namespace cleanly.
+ *
+ * Partitioning reads `token.path[0]` rather than parsing `cssName` —
+ * `path` is the structured form, `cssName` is the flattened output artifact.
  */
 export function splitSpacingTokens(tokens) {
   const numeric = [];
   const role = [];
   for (const token of tokens) {
-    if (token.cssName.startsWith('spacing-')) {
+    if (token.path[0] === 'spacing') {
       numeric.push(token);
     } else {
       role.push(token);
