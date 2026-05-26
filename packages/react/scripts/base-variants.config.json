@@ -14,6 +14,8 @@
     { "name": "DropdownMenu", "showcase": "AllVariants" },
     { "name": "Input", "showcase": "AllVariants" },
     { "name": "Select", "showcase": "AllVariants" },
+    { "name": "Show", "showcase": "AllAxes", "sourceDir": "primitives" },
+    { "name": "Hide", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Switch", "showcase": "AllVariants" },
     { "name": "Tabs", "showcase": "AllVariants" },
     { "name": "Tooltip", "showcase": "AllVariants" }
