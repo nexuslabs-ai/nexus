@@ -286,7 +286,7 @@ Available options:
 - **Radius**: blunt, sharp, subtle, smooth, mellow
 - **Border Width**: vega, lyra, maia, mira, nova
 
-> **Spacing isn't a CLI flag.** Spacing ships all 7 modes (vega, lyra, maia, mira, nova, luma, sera) in every build; mode swap is via the `data-style="X"` attribute on `<html>` (or any subtree) at runtime — no flag, no rebuild. See `spacing-tokens.md`.
+> **Spacing isn't a per-mode CLI flag.** All 7 modes (vega, lyra, maia, mira, nova, luma, sera) ship in every build — there's no single-mode build. Mode swap is via the `data-style="X"` attribute on `<html>` (or any subtree) at runtime, no rebuild needed. `--spacingDefault=<mode>` is the one related CLI option: it only picks which mode lands under the `:root` cascade default (so a document with no `data-style` attribute resolves to that mode); the other six still emit their `[data-style="X"]` blocks alongside. See `spacing-tokens.md`.
 
 > **Mode distinctness varies by axis.** A mode listed above means the CLI flag is accepted — not that it resolves to unique values. `shadow` is genuinely distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `borderwidth` still exposes five flags, but several are byte-identical copies of `vega` (`borderwidth-lyra` = `borderwidth-mira` = `borderwidth-vega`) — the flag resolves, it just yields the same tokens. Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
 
