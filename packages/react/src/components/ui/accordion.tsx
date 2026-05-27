@@ -72,6 +72,7 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
+          // nexus-allow-numeric: item-tier rhythm — Accordion note in spacing-tokens.md
           'nx:flex nx:flex-1 nx:items-center nx:justify-between nx:py-4 nx:text-sm nx:font-medium nx:text-foreground nx:transition-all nx:hover:underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&[data-state=open]>svg]:rotate-180',
           className
         )}

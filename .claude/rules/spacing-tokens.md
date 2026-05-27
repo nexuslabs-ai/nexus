@@ -1,6 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Partial implementation status (post-#126).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Schema validation (cross-mode key-set parity) ships via `validate-spacing-modes.js` (#126) and is gated in pre-commit and CI. Still pending: `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the `audit:figma-parity` wire-up for size category (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
+> **Partial implementation status (post-#127).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Schema validation (cross-mode key-set parity) ships via `validate-spacing-modes.js` (#126), and the two custom ESLint rules `@nexus/canonical-spacing-steps` and `@nexus/prefer-role-utilities` ship in `packages/eslint-plugin-nexus/` (#127). Both are gated at `error` severity by `yarn lint` in CI and on pre-commit via lint-staged. Still pending: the `audit:figma-parity` wire-up for size category (#128) and the canonical-step-set reconciliation noted under "Open Items" in PR #223 — the rule currently accepts the union of every px value shipped across all 7 mode files (~80 values), wider than the documented 30-step set. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 
@@ -198,20 +198,38 @@ The validator runs in two places:
 
 Exit codes mirror `audit-figma-parity`: `0` (match), `1` (drift), `2` (config error — missing baseline, unknown mode file, malformed JSON). Pure-function diffing logic (`leafPathsOf`, `diffKeySets`, `validateModes`, `formatFindings`) is unit-tested in `packages/core/scripts/__tests__/validate-spacing-modes.test.js`; the real-files smoke test in `spacing-modes.test.js` calls into the same `validateModes` entry point.
 
-## Lint rules _(planned — #127)_
+## Lint rules
 
-Two ESLint/Stylelint rules **will** guard the architecture:
+Two custom ESLint rules guard the architecture. Both ship in `packages/eslint-plugin-nexus/` (workspace `@nexus/eslint-plugin`) and are wired into the root `eslint.config.js` at `error` severity.
 
-1. **`nexus/canonical-spacing-steps`** — flags any spacing value in `spacing-*.json` mode files outside the canonical step set. Configurable via the canonical step list in this rule file.
-2. **`nexus/prefer-role-utilities`** — flags raw numeric utilities (`nx:p-N`, `nx:h-N`, `nx:gap-N`) in `packages/react/src/components/ui/*.tsx` files when a role-named utility would apply. Reads the role-to-component coupling table (see below). Allow-list with `// nexus-allow-numeric: reason` comment.
+### `@nexus/canonical-spacing-steps`
 
-Both rules are tracked by #127. Until they land, the architecture is enforced through review.
+Flags any px value in `packages/core/tokens/semantic/spacing-*.json` that is not in the canonical step set. The canonical set lives in `packages/eslint-plugin-nexus/src/canonical-step-set.json` and is the **union** of every px value currently shipped across the 7 mode files (~80 values). Refresh via `yarn workspace @nexus/eslint-plugin refresh:canonical-set` when a mode file legitimately introduces a new value — the refresh is deliberate; pre-commit does not auto-regenerate.
+
+The rule walks the JSONC AST via `'JSONProperty[key.value="$value"] > JSONObjectExpression'`, extracts `(value, unit)` from the DTCG dimension shape, and reports values not in the set. Non-px units are skipped. Negative values flag as off-grid via `JSONUnaryExpression` handling. The aspirational 30-step set documented above is narrower than the shipped union; reconciliation is tracked under PR #223's "Open Items" — until then, the rule prevents **new** drift without forcing snap-to-grid for existing values.
+
+### `@nexus/prefer-role-utilities`
+
+Flags raw numeric padding / gap utilities in `packages/react/src/components/ui/*.tsx` (excluding `*.stories.tsx`) where a role utility exists per the coupling table. Specifically: `nx:(p|px|py|gap)-N` and any modifier-prefixed variant (`nx:hover:p-4`, `nx:dark:hover:p-4`). `nx:(p|px|py|gap)-0` is not flagged — there is no role for "no padding". Out-of-scope prefixes (`pt`, `pb`, `m*`, `h*`, `w*`, `size-*`, `gap-x`, `gap-y`) are silent because no role token exists for them; the rule grows when role families grow.
+
+#### Allowlist syntax
+
+When a raw numeric is intentional, annotate the line **immediately above** the literal:
+
+```tsx
+// nexus-allow-numeric: chip rhythm — Badge note in spacing-tokens.md
+className: 'nx:px-2 nx:py-0.5',
+```
+
+The comment text after the colon is free-form; keep it terse and cite the rule note that justifies the deviation. Only `Line` comments are honoured (not block comments, not trailing same-line). Multiple matches on the next line are silenced by a single comment.
+
+The shipped components all carry such annotations where the role-coupling table calls for numerics (Alert callout rhythm, Accordion item-tier, Badge chip rhythm, Button icon density-stable hit-target, sub-element offsets in Card / Dialog, item-tier menu rows in DropdownMenu / Select, Input px-numeric, Tabs `sm` sub-control). See those files for live examples.
 
 ## Role-to-component coupling table
 
-Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
+Components should use specific roles for specific spacing decisions. This table is authoritative; the `@nexus/prefer-role-utilities` rule references it.
 
-> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. The table is authoritative for current code; `nexus/prefer-role-utilities` (#127) will mechanically enforce it once that lint rule lands.
+> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. The table is authoritative for current code; `@nexus/prefer-role-utilities` (#127) mechanically enforces it.
 
 | Component                                | Role used for                          | Tokens                                                                             |
 | ---------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -279,8 +297,9 @@ The two-tier per-mode architecture described above landed across the [Spacing to
 - **PR #130** — populate this file's role-coupling table with the audit-grounded 14-role version; sync the FE brief.
 - **#230** — add `--control-gap-{sm,md,lg}` per-size gap roles (the `control.gap` token splits from a single value into a size-keyed bundle).
 - **#126** — ship `validate-spacing-modes.js` schema validator; wire to pre-commit (lint-staged) and CI (`audit-tokens` job, before regen).
+- **#127** — ship `@nexus/eslint-plugin` (`packages/eslint-plugin-nexus/`) with `canonical-spacing-steps` and `prefer-role-utilities`; wire both into root `eslint.config.js` at `error`; sweep the 10 UI components to annotate intentional raw-numeric sites with `// nexus-allow-numeric:` comments.
 
-Still ahead on the same milestone: #127 (lint rules), #128 (figma-parity wire-up for size).
+Still ahead on the same milestone: #128 (figma-parity wire-up for size).
 
 ## When to revisit
 

@@ -118,9 +118,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .eslintcache
-          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-${{ github.sha }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-
+            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-
             eslint-${{ runner.os }}-
 
       - name: Lint
@@ -277,6 +277,12 @@ jobs:
       # second — fail-fast for the cheapest possible signal.
       - name: Validate spacing mode files
         run: yarn validate:spacing-modes
+
+      # Guard against drift between the committed canonical-step-set.json
+      # and the live union across spacing-*.json. Same fail-fast tier as
+      # the validator above — stdlib-only, sub-second.
+      - name: Check canonical step set freshness
+        run: yarn workspace @nexus/eslint-plugin refresh:canonical-set --check
 
       - name: Regenerate token outputs (tailwind + modular + colorblind SVG)
         id: regen

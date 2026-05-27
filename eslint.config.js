@@ -1,10 +1,12 @@
 import js from '@eslint/js';
+import nexusPlugin from '@nexus/eslint-plugin';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
+import * as jsoncParser from 'jsonc-eslint-parser';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -198,6 +200,33 @@ export default tseslint.config(
         'error',
         { allowInterfaces: 'with-single-extends' },
       ],
+    },
+  },
+
+  // Nexus: prefer role-named spacing utilities over raw numerics in UI components.
+  // Stories opt out — demo grids legitimately mix numeric utilities for layout chrome.
+  {
+    files: ['packages/react/src/components/ui/**/*.{ts,tsx}'],
+    ignores: ['packages/react/src/components/ui/**/*.stories.tsx'],
+    plugins: {
+      '@nexus': nexusPlugin,
+    },
+    rules: {
+      '@nexus/prefer-role-utilities': 'error',
+    },
+  },
+
+  // Nexus: gate px values in spacing mode files to the canonical step set.
+  {
+    files: ['packages/core/tokens/semantic/spacing-*.json'],
+    languageOptions: {
+      parser: jsoncParser,
+    },
+    plugins: {
+      '@nexus': nexusPlugin,
+    },
+    rules: {
+      '@nexus/canonical-spacing-steps': 'error',
     },
   },
 

@@ -1,0 +1,21 @@
+{
+  "name": "@nexus/eslint-plugin",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Custom ESLint rules for the Nexus design system",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "refresh:canonical-set": "node scripts/refresh-canonical-set.js"
+  },
+  "dependencies": {
+    "jsonc-eslint-parser": "^3.1.0"
+  },
+  "license": "MIT"
+}
