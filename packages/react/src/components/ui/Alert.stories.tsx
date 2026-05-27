@@ -8,7 +8,10 @@ import {
 import { expect, within } from 'storybook/test';
 
 import { SPACING_MODES } from '../../stories/spacing-modes';
-import { expectHeightPinnedAcrossModes } from '../../stories/test-utils';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
 
 import { Alert, AlertDescription, AlertTitle } from './alert';
 
@@ -286,7 +289,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Alert is intentionally density-stable — its `nx:p-4` (16px) sits below `--container-p` (24px in vega) because an alert is a callout, not a container. Migrating to `p-container` would push alert chrome into Card territory and visually compete with adjacent Cards (see `spacing-tokens.md` Alert note). All 7 rows render at the same height regardless of mode. The `AlertIsDensityStable` sentinel below asserts this.',
+          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container` — see `spacing-tokens.md` Alert note. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses the document scale (callout rhythm) instead of the container scale (raised-surface rhythm) — not that it is density-stable.',
       },
     },
   },
@@ -313,29 +316,24 @@ export const AllModes: Story = {
   ),
 };
 
-export const AlertIsDensityStable: Story = {
+export const AlertModesProduceDifferentHeights: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Density-stability sentinel. Alert uses numeric `p-4` only, so every spacing mode renders it at the same canonical 74px height (= border 1 × 2 + `p-4` 16 × 2 + child h-10 40). If a future PR introduces a `container-*` or other role utility on Alert, this test fails for that mode — the regression signal is that intent (callout, mode-stable) has been broken. Per the JSDoc on `expectHeightPinnedAcrossModes`, a failure caused by an intentional architecture change (e.g. a `--callout-padding-*` family lands) is intent-changing rather than a regression — bump the expected px to the new canonical value.',
+          'Cascade sentinel for Alert. Uses the `nova` + `maia` pair — the two modes where `--nx-spacing-4` diverges from the vega cluster (nova 14, maia 18). An Alert scoped to `nova` must render shorter than the same Alert scoped to `maia`. If a future PR accidentally swaps `p-4` for `p-container` the heights would still differ (and the pinned sentinel would catch the change in vega).',
       },
     },
   },
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="alert-host-nova">
+      <div data-style="nova" data-testid="mode-host-nova">
         <Alert className="nx:w-[200px]">
           <div className="nx:h-10" aria-hidden="true" />
         </Alert>
       </div>
-      <div data-style="vega" data-testid="alert-host-vega">
-        <Alert className="nx:w-[200px]">
-          <div className="nx:h-10" aria-hidden="true" />
-        </Alert>
-      </div>
-      <div data-style="sera" data-testid="alert-host-sera">
+      <div data-style="maia" data-testid="mode-host-maia">
         <Alert className="nx:w-[200px]">
           <div className="nx:h-10" aria-hidden="true" />
         </Alert>
@@ -343,9 +341,40 @@ export const AlertIsDensityStable: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinnedAcrossModes(
+    await expectModeCascadeWorks(
       within(canvasElement),
-      ['alert-host-nova', 'alert-host-vega', 'alert-host-sera'],
+      'mode-host-nova',
+      'mode-host-maia',
+      '[data-slot="alert"]'
+    );
+  },
+};
+
+export const AlertVegaHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the stays-numeric outcome: in vega mode, an Alert with a single 40px fixed-height child renders at exactly 74px (= border 1 × 2 + `p-4` 16 × 2 + child 40). If a future PR migrates `p-4` to `p-container`, vega rendering shifts to 90px (= 2 + 24 × 2 + 40) and this test fails — the regression signal is that Alert was promoted out of the document scale into the container scale.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Alert className="nx:w-[200px]">
+        <div className="nx:h-10" aria-hidden="true" />
+      </Alert>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(
+      within(canvasElement),
+      'vega-host',
       74,
       '[data-slot="alert"]'
     );
