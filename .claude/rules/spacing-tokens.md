@@ -1,6 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Partial implementation status (post-#119).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. Still pending: `validate-spacing-modes.js` schema validator (#125), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the role-to-component-coupling enforcement (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the validator + lint enforcement which are still ahead.
+> **Partial implementation status (post-#124).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Still pending: `validate-spacing-modes.js` schema validator (#126), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the `audit:figma-parity` wire-up for size category (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the validator + lint enforcement which are still ahead.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 
@@ -170,11 +170,11 @@ Load these into context when generating Nexus FE code:
 3. **Role-named utilities take priority over numeric** when a clear role applies. Button padding → `nx:px-control-md`, not `nx:px-2.5`.
 4. **Mode switching is via `data-style="X"` attribute** on the root or a subtree. To make a component appear in compact density, wrap it in `<div data-style="mira">`.
 
-## Schema validation _(planned — #125)_
+## Schema validation _(planned — #126)_
 
 CI **will** enforce that all 7 mode files have **identical key sets**. The schema is to be generated from `spacing-vega.json` (the canonical default) and applied to all other modes. A mode file with missing or extra keys will fail the build.
 
-Planned implementation: `scripts/validate-spacing-modes.js` reads the Vega key set and validates the other six against it. Will run in pre-commit hook and CI. Tracked by #125. Until it lands, parity is enforced indirectly by the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js`.
+Planned implementation: `scripts/validate-spacing-modes.js` reads the Vega key set and validates the other six against it. Will run in pre-commit hook and CI. Tracked by #126. Until it lands, parity is enforced indirectly by the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js`.
 
 ## Lint rules _(planned — #127)_
 
@@ -204,7 +204,7 @@ A density mode is a complete spacing scale — numeric steps plus the `control` 
 
 Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
 
-> **Status: target state, not current code.** Button / Input / Select / Tabs / Badge currently use numeric `nx:p-N` utilities; #123 is the migration that moves them onto these role tokens. Read this table as the post-#123 contract that `nexus/prefer-role-utilities` (#127) will enforce — not as a description of what's shipped today.
+> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. The table is authoritative for current code; `nexus/prefer-role-utilities` (#127) will mechanically enforce it once that lint rule lands.
 
 | Component                                | Role used for                          | Tokens                                                                             |
 | ---------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
