@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+
 import { Button } from './button';
 
 const meta: Meta<typeof Button> = {
@@ -473,6 +475,111 @@ export const AllVariants: Story = {
   parameters: {
     // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
     a11y: { test: 'todo' },
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    // 7 rows × 3 buttons each duplicates the same accessible names; the
+    // canonical Default/Primary/etc. stories already cover a11y for Button.
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Vega / Lyra / Luma / Mira currently share identical control padding tokens (so the top 4 rows look the same); Nova compresses, Maia / Sera breathe. See `Tokens/Spacing/Roles` for the per-mode token grid.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Button>Default</Button>
+          <Button size="sm">Sm</Button>
+          <Button size="lg">Lg</Button>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const ModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Regression sentinel for the `data-style` cascade and the role-utility resolver. Buttons scoped to different modes must render at different heights — a typo like `nx:py-control-mdd` would silently fall back to intrinsic and all three buttons would match. The assertion is non-strict (`<`, not exact px) so designer retunes of the role tokens do not break the test; only a broken cascade does.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="mode-host-nova">
+        <Button>btn</Button>
+      </div>
+      <div data-style="vega" data-testid="mode-host-vega">
+        <Button>btn</Button>
+      </div>
+      <div data-style="sera" data-testid="mode-host-sera">
+        <Button>btn</Button>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const heightOf = (testId: string) => {
+      const host = canvas.getByTestId(testId);
+      const button = host.querySelector('button');
+      if (!button) throw new Error(`button not found in ${testId}`);
+      return button.getBoundingClientRect().height;
+    };
+
+    const novaH = heightOf('mode-host-nova');
+    const vegaH = heightOf('mode-host-vega');
+    const seraH = heightOf('mode-host-sera');
+
+    await expect(novaH).toBeLessThan(vegaH);
+    await expect(vegaH).toBeLessThan(seraH);
+  },
+};
+
+export const VegaDefaultHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the migration outcome: in vega mode, a default Button renders at exactly 36px (= `text-sm` 20px line-height + `py-control-md` 8px × 2). If a designer retunes `--control-padding-y-md` or the body type ramp, this test fails and the change must be acknowledged.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Button>Default</Button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    // Wait for Inter to load — fallback metrics would skew the measurement.
+    await document.fonts.ready;
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+    await expect(button.getBoundingClientRect().height).toBe(36);
   },
 };
 
