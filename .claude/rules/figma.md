@@ -74,7 +74,7 @@ The snapshot JSON nests by mode so a single capture covers every mode the design
 | Multi-mode    | `--category spacing --mode vega`              | `semantic/spacing-vega.json`               | `snapshot.spacing.vega`      |
 | Mode × theme  | `--category shadow --mode vega --theme light` | `primitives/shadow/shadow-vega-light.json` | `snapshot.shadow.vega.light` |
 
-Each category subtree carries a `$meta` block — at minimum `capturedAt` (ISO date) and `figmaFileName`. The `$`-prefix is DTCG metadata and is skipped by the token walker, so it never appears as a drift finding. For multi-mode categories the `$meta` lives under the mode (e.g., `snapshot.size.vega.$meta`) so each capture timestamps independently.
+Each category subtree carries a `$meta` block — at minimum `capturedAt` (ISO date) and `figmaFileName`. The `$`-prefix is DTCG metadata and is skipped by the token walker, so it never appears as a drift finding. For multi-mode categories the `$meta` lives under the mode (e.g., `snapshot.spacing.vega.$meta`) so each capture timestamps independently.
 
 This is the intended shape for #61/#62/#63 — only the single-mode (color) row is wired today. Each sub-issue PR adds its category to the registry, wires the path resolver for its row's shape, and (for multi-mode) starts reading `args.mode` (and `args.theme` for shadow). The snapshot/CLI shape itself doesn't change between PRs.
 

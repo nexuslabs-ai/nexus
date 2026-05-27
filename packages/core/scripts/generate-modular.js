@@ -74,7 +74,7 @@ function processSinglePrimitive(category, primitiveMap) {
 }
 
 /**
- * Process a primitive category file (size, typography, shadow, radius,
+ * Process a primitive category file (focus, typography, shadow, radius,
  * borderwidth). Throws if the file does not exist.
  */
 function processPrimitiveFile(category, mode, primitiveMap) {
@@ -144,7 +144,7 @@ function generatePrimitivesCSS(distDir, tokens, category) {
 }
 
 /**
- * Generate mode file (size, typography, shadow, radius, borderwidth)
+ * Generate mode file (typography, radius, borderwidth)
  */
 function generateModeCSS(distDir, category, mode, tokens) {
   let css = `/* ${category}: ${mode} */\n\n:root {\n`;

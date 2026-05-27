@@ -264,6 +264,7 @@ describe('generateTailwindPackage', () => {
     // indicate the deletion was incomplete or the build regressed.
     expect(variablesCSS).not.toMatch(/--nx-size-/);
     expect(nexusCSS).not.toMatch(/--nx-size-/);
+    expect(spacingUtilitiesCSS).not.toMatch(/--nx-size-/);
   });
 
   it('preserves the --spacing-*: initial reset in @theme', () => {
