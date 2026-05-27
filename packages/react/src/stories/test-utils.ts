@@ -37,6 +37,10 @@ export function getControlHeight(
   return Math.round(control.getBoundingClientRect().height);
 }
 
+type HeightMeasurementOptions = {
+  selector?: string;
+};
+
 /**
  * Cascade-regression sentinel — asserts that a control rendered under two
  * different `data-style` mode scopes resolves to different heights, with the
@@ -54,7 +58,7 @@ export async function expectModeCascadeWorks(
   canvas: Canvas,
   smallerModeTestId: string,
   largerModeTestId: string,
-  selector?: string
+  { selector }: HeightMeasurementOptions = {}
 ): Promise<void> {
   await document.fonts.ready;
   const smaller = getControlHeight(canvas, smallerModeTestId, selector);
@@ -73,7 +77,7 @@ export async function expectHeightPinned(
   canvas: Canvas,
   testId: string,
   expectedPx: number,
-  selector?: string
+  { selector }: HeightMeasurementOptions = {}
 ): Promise<void> {
   await document.fonts.ready;
   const actual = getControlHeight(canvas, testId, selector);
@@ -99,7 +103,7 @@ export async function expectHeightPinnedAcrossModes(
   canvas: Canvas,
   testIds: string[],
   expectedPx: number,
-  selector?: string
+  { selector }: HeightMeasurementOptions = {}
 ): Promise<void> {
   await document.fonts.ready;
   for (const testId of testIds) {

@@ -68,10 +68,7 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
   return (
     <div
       data-slot="card-header"
-      className={cn(
-        'nx:flex nx:flex-col nx:gap-1.5 nx:p-container nx:[.nx\\:border-b]:pb-6',
-        className
-      )}
+      className={cn('nx:flex nx:flex-col nx:gap-1.5 nx:p-container', className)}
       {...props}
     />
   );
@@ -164,7 +161,7 @@ function CardAction({ className, ...props }: CardActionProps) {
     <div
       data-slot="card-action"
       className={cn(
-        'nx:absolute nx:right-6 nx:top-6 nx:flex nx:items-center nx:gap-2',
+        'nx:absolute nx:right-(--nx-container-p) nx:top-(--nx-container-p) nx:flex nx:items-center nx:gap-2',
         className
       )}
       {...props}

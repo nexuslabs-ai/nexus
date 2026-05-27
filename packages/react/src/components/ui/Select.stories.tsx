@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectModeCascadeWorks,
@@ -598,16 +602,9 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Select>
             <SelectTrigger
               aria-label={`${mode} select`}
@@ -620,9 +617,9 @@ export const AllModes: Story = {
               <SelectItem value="b">Option B</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 

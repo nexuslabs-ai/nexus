@@ -599,6 +599,8 @@ export const DialogContentResolvesContainerRole: Story = {
     await document.fonts.ready;
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('button', { name: 'Open Dialog' });
+    const previousStyle = document.documentElement.dataset.style;
+    document.documentElement.dataset.style = 'vega';
 
     try {
       await userEvent.click(trigger);
@@ -625,6 +627,11 @@ export const DialogContentResolvesContainerRole: Story = {
           document.querySelector('[data-slot="dialog-content"]')
         ).toBeNull();
       });
+      if (previousStyle === undefined) {
+        delete document.documentElement.dataset.style;
+      } else {
+        document.documentElement.dataset.style = previousStyle;
+      }
     }
   },
 };

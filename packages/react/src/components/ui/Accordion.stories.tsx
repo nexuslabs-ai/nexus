@@ -569,7 +569,7 @@ export const AccordionTriggerModesProduceDifferentHeights: Story = {
       within(canvasElement),
       'accordion-mode-host-nova',
       'accordion-mode-host-maia',
-      '[data-slot="accordion-trigger"]'
+      { selector: '[data-slot="accordion-trigger"]' }
     );
   },
 };
@@ -599,12 +599,9 @@ export const AccordionTriggerVegaHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(
-      within(canvasElement),
-      'accordion-vega-host',
-      52,
-      '[data-slot="accordion-trigger"]'
-    );
+    await expectHeightPinned(within(canvasElement), 'accordion-vega-host', 52, {
+      selector: '[data-slot="accordion-trigger"]',
+    });
   },
 };
 

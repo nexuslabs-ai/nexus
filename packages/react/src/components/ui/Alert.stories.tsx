@@ -342,7 +342,7 @@ export const ModesProduceDifferentHeights: Story = {
       within(canvasElement),
       'alert-mode-host-nova',
       'alert-mode-host-maia',
-      '[data-slot="alert"]'
+      { selector: '[data-slot="alert"]' }
     );
   },
 };
@@ -369,12 +369,9 @@ export const VegaHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(
-      within(canvasElement),
-      'alert-vega-host',
-      74,
-      '[data-slot="alert"]'
-    );
+    await expectHeightPinned(within(canvasElement), 'alert-vega-host', 74, {
+      selector: '[data-slot="alert"]',
+    });
   },
 };
 

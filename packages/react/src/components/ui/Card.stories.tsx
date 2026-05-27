@@ -494,7 +494,7 @@ export const ModesProduceDifferentHeights: Story = {
       within(canvasElement),
       'card-mode-host-nova',
       'card-mode-host-luma',
-      '[data-slot="card"]'
+      { selector: '[data-slot="card"]' }
     );
   },
 };
@@ -523,12 +523,9 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(
-      within(canvasElement),
-      'card-vega-host',
-      66,
-      '[data-slot="card"]'
-    );
+    await expectHeightPinned(within(canvasElement), 'card-vega-host', 66, {
+      selector: '[data-slot="card"]',
+    });
   },
 };
 

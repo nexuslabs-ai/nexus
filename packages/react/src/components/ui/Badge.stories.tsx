@@ -534,7 +534,7 @@ export const BadgeIsDensityStable: Story = {
       within(canvasElement),
       ['badge-host-nova', 'badge-host-vega', 'badge-host-sera'],
       20,
-      '[data-slot="badge"]'
+      { selector: '[data-slot="badge"]' }
     );
   },
 };
