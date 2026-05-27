@@ -1,17 +1,5 @@
 /* Spacing role utilities — data-driven from canonical mode role tokens. */
 
-@utility h-control-sm {
-  height: var(--nx-control-h-sm);
-}
-
-@utility h-control-md {
-  height: var(--nx-control-h-md);
-}
-
-@utility h-control-lg {
-  height: var(--nx-control-h-lg);
-}
-
 @utility px-control-sm {
   padding-left: var(--nx-control-padding-x-sm);
   padding-right: var(--nx-control-padding-x-sm);

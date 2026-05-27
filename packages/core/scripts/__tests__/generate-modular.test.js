@@ -106,13 +106,13 @@ describe('generateModular', () => {
       path.join(distDir, 'spacing-utilities.css'),
       'utf8'
     );
-    expect(spacingUtilities).toMatch(/@utility h-control-md \{/);
+    expect(spacingUtilities).toMatch(/@utility px-control-md \{/);
     expect(spacingUtilities).toMatch(/@utility p-container \{/);
     expect(spacingUtilities).toMatch(/@utility gap-layout-section \{/);
 
     // globals.css does NOT inline role utilities — it @imports them.
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
-    expect(globals).not.toMatch(/@utility h-control-md \{/);
+    expect(globals).not.toMatch(/@utility px-control-md \{/);
     expect(globals).toMatch(/@import\s+['"]\.\/spacing-utilities\.css['"]/);
   });
 
@@ -122,7 +122,7 @@ describe('generateModular', () => {
       'utf8'
     );
     expect(spacingUtilities).toMatch(
-      /@utility h-control-md \{[\s\S]*?height:\s*var\(--nx-control-h-md\);/
+      /@utility px-control-md \{[\s\S]*?padding-left:\s*var\(--nx-control-padding-x-md\);/
     );
     expect(spacingUtilities).toMatch(
       /@utility p-container \{[\s\S]*?padding:\s*var\(--nx-container-p\);/
@@ -140,7 +140,7 @@ describe('generateModular', () => {
       /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
     );
     expect(globals).toMatch(
-      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-control-h-md:\s*32px;/
+      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-control-padding-x-md:\s*16px;/
     );
   });
 

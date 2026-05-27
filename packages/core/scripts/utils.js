@@ -734,8 +734,8 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
  *
  * Returns a map keyed by mode name; each value is the token list for that
  * mode. Token `cssName` is the JSON path joined with `-` (e.g. `spacing-0`,
- * `control-h-md`, `container-p`, `layout-section-gap`) — **without** the
- * `nx-` prefix. Callers add the prefix at emit time based on context:
+ * `control-padding-x-md`, `container-p`, `layout-section-gap`) — **without**
+ * the `nx-` prefix. Callers add the prefix at emit time based on context:
  *
  *  - `@theme` block (numeric subset only) emits unprefixed (`--spacing-0`).
  *    Tailwind v4's `prefix(nx)` rewrites these to `--nx-spacing-0` at
@@ -745,11 +745,12 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
  *    form (`--nx-spacing-0`) directly, because Tailwind doesn't rewrite
  *    variables outside `@theme`. See `generateSpacingModesCSS`.
  *  - `@utility` role declarations reference the prefixed form
- *    (`var(--nx-control-h-md)`). See `generateSpacingRoleUtilitiesCSS`.
+ *    (`var(--nx-control-padding-x-md)`). See `generateSpacingRoleUtilitiesCSS`.
  *
  * Throws on cssName collisions across paths within a single mode — two paths
- * flattening to the same name (e.g. `control.h-md` and `control.h.md` both
- * → `control-h-md`) would silently lose one declaration.
+ * flattening to the same name (e.g. `control.padding-x.md` and
+ * `control.padding-x-md` both → `control-padding-x-md`) would silently lose
+ * one declaration.
  *
  * @param {string} semanticDir - Path to semantic directory
  * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
@@ -856,7 +857,7 @@ export function splitSpacingTokens(tokens) {
  * sees the full per-mode contract in one place.
  *
  * Variable names are emitted already-prefixed (`--nx-spacing-N`,
- * `--nx-control-h-md`, …). Tailwind v4's `prefix(nx)` rewrites variables
+ * `--nx-control-padding-x-md`, …). Tailwind v4's `prefix(nx)` rewrites variables
  * inside `@theme` but does NOT rewrite variables declared in `:root` /
  * attribute-selector blocks, so writing the prefixed form here is what makes
  * mode-switching actually override the utility's `var(--nx-spacing-N)`
@@ -942,7 +943,6 @@ const SUFFIX_TO_PROPERTIES = {
  * Derive a `{utilityName, properties}` for a role-token path.
  *
  * Naming convention — `<property-shorthand>-<role>[-<size>]`:
- *   `control.h.md`            → utility `h-control-md`,        height
  *   `control.padding-x.sm`    → utility `px-control-sm`,       padding-inline
  *   `control.padding-y.lg`    → utility `py-control-lg`,       padding-block
  *   `control.gap`             → utility `gap-control`,         gap
