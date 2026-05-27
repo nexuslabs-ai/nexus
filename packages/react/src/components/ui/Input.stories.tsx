@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
+
 import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
@@ -334,6 +340,105 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input `padding-y` migrates to `py-control-{sm,md,lg}` per size and so responds to mode; `padding-x` stays numeric per the coupling table (Input is narrower than Button at the same size — see `spacing-tokens.md` note). Vega / Lyra / Luma / Mira currently share identical control-y tokens (so those four rows render at the same height); Nova compresses, Maia / Sera breathe.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Input
+            size="sm"
+            placeholder="Sm"
+            aria-label={`${mode} small input`}
+          />
+          <Input
+            size="default"
+            placeholder="Default"
+            aria-label={`${mode} default input`}
+          />
+          <Input
+            size="lg"
+            placeholder="Lg"
+            aria-label={`${mode} large input`}
+          />
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const ModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Regression sentinel for the `data-style` cascade and the role-utility resolver on Input. An Input scoped to `nova` (compact `py`) must render shorter than the same Input scoped to `sera` (breathy `py`). A typo like `nx:py-control-mdd` would fall back to intrinsic and both modes would match — the test catches that.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="mode-host-nova">
+        <Input aria-label="nova input" />
+      </div>
+      <div data-style="sera" data-testid="mode-host-sera">
+        <Input aria-label="sera input" />
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectModeCascadeWorks(
+      within(canvasElement),
+      'mode-host-nova',
+      'mode-host-sera'
+    );
+  },
+};
+
+export const VegaDefaultHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the migration outcome: in vega mode, a default Input renders at exactly 38px (= `text-sm` 20px line-height + `py-control-md` 8px × 2 + border 1px × 2). If a designer retunes `--control-padding-y-md`, the body type ramp, or the border-width token, this test fails and the change must be acknowledged.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Input aria-label="vega default input" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(within(canvasElement), 'vega-host', 38);
   },
 };
 

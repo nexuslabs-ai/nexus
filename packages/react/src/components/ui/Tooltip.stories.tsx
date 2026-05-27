@@ -3,6 +3,8 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+
 import { Button } from './button';
 import {
   Tooltip,
@@ -325,6 +327,98 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          "Each row sets `data-style` on the trigger wrapper to demonstrate the available spacing modes. Note that `TooltipContent` portals to `document.body` and therefore picks up the document-level `data-style`, not the wrapper — opening a tooltip from any row renders content at whatever mode the Style toolbar selected, not the row's mode. The triggers themselves (Buttons) do respond to the wrapper. Vega / Lyra / Luma / Mira currently share identical control padding tokens.",
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline">Hover</Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Tooltip in {mode}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const TooltipContentResolvesRoleUtility: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Regression sentinel — verifies `TooltipContent` resolves the `px-control-sm`/`py-control-sm` role utilities to expected pixel values via `getComputedStyle`. A `toHaveClass` check is insufficient because tailwind-merge would collapse the role class away under a consumer override but the className-presence test would still pass; this measures the actually-applied style. Because the content is portaled, the assertion sees document-level mode resolution — vega (the documented default in the Style toolbar).',
+      },
+    },
+  },
+  render: (_args) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline">Hover me</Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Tooltip content</p>
+      </TooltipContent>
+    </Tooltip>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Hover me' });
+
+    try {
+      await userEvent.hover(trigger);
+
+      const tooltip = await waitFor(() => {
+        const el = document.querySelector<HTMLElement>(
+          '[data-slot="tooltip-content"]'
+        );
+        if (!el) throw new Error('tooltip not visible yet');
+        return el;
+      });
+
+      const styles = getComputedStyle(tooltip);
+      // vega: --nx-control-padding-x-sm = 12px, --nx-control-padding-y-sm = 6px
+      expect(styles.paddingLeft).toBe('12px');
+      expect(styles.paddingRight).toBe('12px');
+      expect(styles.paddingTop).toBe('6px');
+      expect(styles.paddingBottom).toBe('6px');
+    } finally {
+      await userEvent.unhover(trigger);
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slot="tooltip-content"]')
+        ).toBeNull();
+      });
+    }
   },
 };
 

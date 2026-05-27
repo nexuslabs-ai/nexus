@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+import { expectHeightPinnedAcrossModes } from '../../stories/test-utils';
+
 import { Badge } from './badge';
 
 const meta: Meta<typeof Badge> = {
@@ -464,6 +467,75 @@ export const AllVariants: Story = {
     layout: 'padded',
     // TODO: Fix status token contrast ratios across error, warning, success, information
     a11y: { test: 'todo' },
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (density stability)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Badge is intentionally density-stable — its utilities sit on the canonical numeric step set (`px-2`, `py-0.5`, `gap-1`) rather than the `control-*` role family, because a chip is not a control (its padding is sub-control by design — see `spacing-tokens.md` note on Badge / Chip). All 7 rows should render at the same height regardless of mode. The `BadgeIsDensityStable` sentinel below asserts this.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Badge>Default</Badge>
+          <Badge variant="success">Success</Badge>
+          <Badge variant="error" leftIcon={<IconX />}>
+            Error
+          </Badge>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const BadgeIsDensityStable: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Density-stability sentinel. Badge uses numeric `spacing-N` utilities only, so every spacing mode renders it at the same canonical 20px height (= `text-xs` line-height 16px + `py-0.5` 2×2). If a future PR introduces a `control-*` role utility on Badge, this test fails for that mode — the regression signal is that intent (numeric, mode-stable) has been broken.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="badge-host-nova">
+        <Badge>Nova</Badge>
+      </div>
+      <div data-style="vega" data-testid="badge-host-vega">
+        <Badge>Vega</Badge>
+      </div>
+      <div data-style="sera" data-testid="badge-host-sera">
+        <Badge>Sera</Badge>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinnedAcrossModes(
+      within(canvasElement),
+      ['badge-host-nova', 'badge-host-vega', 'badge-host-sera'],
+      20,
+      '[data-slot="badge"]'
+    );
   },
 };
 
