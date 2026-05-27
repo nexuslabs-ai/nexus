@@ -8,7 +8,9 @@ import spacingNova from '../../../core/tokens/semantic/spacing-nova.json';
 import spacingSera from '../../../core/tokens/semantic/spacing-sera.json';
 import spacingVega from '../../../core/tokens/semantic/spacing-vega.json';
 
-const DEFAULT_MODE = 'vega';
+import { SPACING_MODES, type SpacingMode } from './spacing-modes';
+
+const DEFAULT_MODE: SpacingMode = 'vega';
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
@@ -24,15 +26,19 @@ function isDimensionToken(node: unknown): node is DimensionToken {
   return typeof dim.value === 'number' && typeof dim.unit === 'string';
 }
 
-const MODES: { name: string; tokens: ModeFile }[] = [
-  { name: 'vega', tokens: spacingVega as ModeFile },
-  { name: 'lyra', tokens: spacingLyra as ModeFile },
-  { name: 'maia', tokens: spacingMaia as ModeFile },
-  { name: 'mira', tokens: spacingMira as ModeFile },
-  { name: 'nova', tokens: spacingNova as ModeFile },
-  { name: 'luma', tokens: spacingLuma as ModeFile },
-  { name: 'sera', tokens: spacingSera as ModeFile },
-];
+const SPACING_TOKENS: Record<SpacingMode, ModeFile> = {
+  vega: spacingVega as ModeFile,
+  lyra: spacingLyra as ModeFile,
+  maia: spacingMaia as ModeFile,
+  mira: spacingMira as ModeFile,
+  nova: spacingNova as ModeFile,
+  luma: spacingLuma as ModeFile,
+  sera: spacingSera as ModeFile,
+};
+
+const MODES: { name: SpacingMode; tokens: ModeFile }[] = SPACING_MODES.map(
+  (name) => ({ name, tokens: SPACING_TOKENS[name] })
+);
 
 /**
  * Walk a per-mode spacing file's `spacing.*` subtree and return ordered
