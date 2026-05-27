@@ -514,9 +514,7 @@ describe('generateTailwindPackage', () => {
         //   [role, '<x>-gap']     → gap-<role>-<x>
         const [role, second, third] = pathParts;
         if (third !== undefined) {
-          const prefix = { h: 'h', 'padding-x': 'px', 'padding-y': 'py' }[
-            second
-          ];
+          const prefix = { 'padding-x': 'px', 'padding-y': 'py' }[second];
           expected.add(`${prefix}-${role}-${third}`);
         } else if (second === 'gap') {
           expected.add(`gap-${role}`);

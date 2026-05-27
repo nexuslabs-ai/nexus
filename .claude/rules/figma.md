@@ -114,14 +114,14 @@ Most axes use a three-layer architecture; spacing is two-layer (no primitives �
 │  Layer 2: SEMANTIC (nexus.css @theme + per-mode blocks)         │
 │  --radius-md: var(--nx-radius-md)                               │
 │  --color-muted: var(--nx-color-slate-100)                       │
-│  --nx-spacing-5: 20px      (direct px, per-mode)                │
-│  --nx-control-h-md: 32px   (direct px, per-mode role token)     │
+│  --nx-spacing-5: 20px                (direct px, per-mode)      │
+│  --nx-control-padding-x-md: 16px     (direct px, per-mode role) │
 ├─────────────────────────────────────────────────────────────────┤
 │  Layer 3: TAILWIND UTILITIES (with nx: prefix)                  │
 │  nx:p-5             →  padding: var(--nx-spacing-5)             │
 │  nx:rounded-md      →  border-radius: var(--radius-md)          │
 │  nx:bg-muted        →  background: var(--color-muted)           │
-│  nx:h-control-md    →  height: var(--nx-control-h-md)           │
+│  nx:px-control-md   →  padding-inline: var(--nx-control-padding-x-md) │
 └─────────────────────────────────────────────────────────────────┘
 ```
 

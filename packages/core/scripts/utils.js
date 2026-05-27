@@ -934,7 +934,6 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
  * `generateSpacingRoleUtilitiesCSS`.
  */
 const SUFFIX_TO_PROPERTIES = {
-  h: ['height'],
   'padding-x': ['padding-left', 'padding-right'],
   'padding-y': ['padding-top', 'padding-bottom'],
 };
@@ -952,7 +951,6 @@ const SUFFIX_TO_PROPERTIES = {
  *   `layout.stack-gap`        → utility `gap-layout-stack`,    gap
  *
  * Utility-name prefix per property:
- *   height       → `h-`
  *   padding      → `p-`
  *   padding-x    → `px-`
  *   padding-y    → `py-`
@@ -965,7 +963,7 @@ const SUFFIX_TO_PROPERTIES = {
 function deriveRoleUtility(tokenPath) {
   // Path forms we handle:
   //   [role, suffix]             — e.g. ['container', 'p'], ['control', 'gap']
-  //   [role, family, size]       — e.g. ['control', 'h', 'md']
+  //   [role, family, size]       — e.g. ['control', 'padding-x', 'md']
   //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
   if (tokenPath.length < 2 || tokenPath.length > 3) {
     throw new Error(
@@ -974,7 +972,7 @@ function deriveRoleUtility(tokenPath) {
   }
   const [role, second, third] = tokenPath;
 
-  // Three-segment path: [role, family, size]. family ∈ {h, padding-x, padding-y}.
+  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y}.
   if (third !== undefined) {
     const family = second;
     const size = third;
@@ -1012,7 +1010,6 @@ function deriveRoleUtility(tokenPath) {
 // Three-segment-only helper: `gap` and `p` two-segment paths are handled
 // inline in `deriveRoleUtility` and never reach here.
 function familyToUtilityPrefix(family) {
-  if (family === 'h') return 'h';
   if (family === 'padding-x') return 'px';
   if (family === 'padding-y') return 'py';
   throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);
