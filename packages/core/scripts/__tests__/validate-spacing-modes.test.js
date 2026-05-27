@@ -1,9 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  assertCanonicalModeSet,
   BASELINE_MODE,
   CANONICAL_MODES,
+  ConfigError,
   diffKeySets,
+  discoverModes,
   formatFindings,
   leafPathsOf,
   validateModes,
@@ -287,5 +293,86 @@ describe('formatFindings', () => {
     );
     expect(out).toContain('baseline: lyra');
     expect(out).toContain('in spacing-lyra.json but not in spacing-maia.json');
+  });
+});
+
+describe('discoverModes', () => {
+  let tmpDir;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'discover-modes-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  const touch = (name) => fs.writeFileSync(path.join(tmpDir, name), '{}');
+
+  it('returns the matching mode names sorted alphabetically', () => {
+    touch('spacing-vega.json');
+    touch('spacing-luma.json');
+    touch('spacing-maia.json');
+    expect(discoverModes(tmpDir)).toEqual(['luma', 'maia', 'vega']);
+  });
+
+  it('ignores files that do not match the spacing-<mode>.json pattern', () => {
+    touch('spacing-vega.json');
+    touch('base-slate-light.json');
+    touch('spacing-vega.json.bak');
+    touch('Spacing-vega.json');
+    touch('spacing-Vega.json');
+    touch('spacing-vega-extra.json');
+    touch('spacing-.json');
+    touch('README.md');
+    expect(discoverModes(tmpDir)).toEqual(['vega']);
+  });
+
+  it('returns an empty list when the directory has no matching files', () => {
+    touch('README.md');
+    expect(discoverModes(tmpDir)).toEqual([]);
+  });
+});
+
+describe('assertCanonicalModeSet', () => {
+  it('does not throw when the discovered set equals the canonical set', () => {
+    expect(() => assertCanonicalModeSet([...CANONICAL_MODES])).not.toThrow();
+  });
+
+  it('does not depend on input order', () => {
+    expect(() =>
+      assertCanonicalModeSet([...CANONICAL_MODES].reverse())
+    ).not.toThrow();
+  });
+
+  it('throws a ConfigError naming unexpected (alien) mode files', () => {
+    const discovered = [...CANONICAL_MODES, 'foo'];
+    expect(() => assertCanonicalModeSet(discovered)).toThrow(ConfigError);
+    expect(() => assertCanonicalModeSet(discovered)).toThrow(
+      /unexpected mode file\(s\): foo/
+    );
+  });
+
+  it('throws a ConfigError naming missing canonical modes', () => {
+    const discovered = CANONICAL_MODES.filter((m) => m !== 'lyra');
+    expect(() => assertCanonicalModeSet(discovered)).toThrow(ConfigError);
+    expect(() => assertCanonicalModeSet(discovered)).toThrow(
+      /missing canonical mode\(s\): lyra/
+    );
+  });
+
+  it('reports both unexpected and missing modes in one message', () => {
+    const discovered = CANONICAL_MODES.filter((m) => m !== 'lyra').concat([
+      'foo',
+      'bar',
+    ]);
+    try {
+      assertCanonicalModeSet(discovered);
+      throw new Error('expected ConfigError');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ConfigError);
+      expect(err.message).toMatch(/unexpected mode file\(s\): bar, foo/);
+      expect(err.message).toMatch(/missing canonical mode\(s\): lyra/);
+    }
   });
 });

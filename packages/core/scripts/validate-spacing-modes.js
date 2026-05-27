@@ -24,7 +24,7 @@ const EXIT_OK = 0;
 const EXIT_DRIFT = 1;
 const EXIT_CONFIG = 2;
 
-class ConfigError extends Error {}
+export class ConfigError extends Error {}
 
 /**
  * Walk a DTCG token tree and return sorted leaf paths as dotted strings.
@@ -34,11 +34,6 @@ class ConfigError extends Error {}
  * skipped. A typo like `value:` (no $) won't slip through — its parent won't
  * be recognised as a leaf, so the walker keeps descending and the typo'd
  * branch contributes nothing.
- *
- * Deliberately not delegated to utils.js#extractTokens: that helper is
- * token-aware and may grow to handle refs / $extensions, which would silently
- * shift what counts as "a key" here. This validator wants the most minimal
- * possible definition of a leaf path.
  */
 export function leafPathsOf(modeData) {
   const paths = [];
@@ -59,11 +54,6 @@ export function leafPathsOf(modeData) {
 
 /**
  * Per-mode key-set parity check.
- *
- * Output shape is intentionally per-mode (one row per non-baseline file)
- * with two drift arrays, rather than the discriminated-union { kind, path }
- * shape used by audit-figma-parity. Different problem: figma-parity diffs
- * values at known paths; this validator diffs key sets across mode files.
  *
  * @returns {{ missing: string[], extra: string[] }}
  *   missing — paths in baseline but absent from mode
@@ -130,7 +120,7 @@ export function formatFindings(findings, baseline = BASELINE_MODE) {
   return lines.join('\n');
 }
 
-function discoverModes(semanticDir) {
+export function discoverModes(semanticDir) {
   const entries = fs.readdirSync(semanticDir);
   const found = [];
   for (const name of entries) {
@@ -140,7 +130,7 @@ function discoverModes(semanticDir) {
   return found.sort();
 }
 
-function assertCanonicalModeSet(discoveredModes) {
+export function assertCanonicalModeSet(discoveredModes) {
   const discoveredSet = new Set(discoveredModes);
   const canonicalSet = new Set(CANONICAL_MODES);
   const unexpected = [...discoveredSet].filter((m) => !canonicalSet.has(m));
