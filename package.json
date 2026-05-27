@@ -83,6 +83,9 @@
     ],
     "*.{json,md,css}": [
       "prettier --write"
+    ],
+    "packages/core/tokens/semantic/spacing-*.json": [
+      "yarn validate:spacing-modes"
     ]
   },
   "resolutions": {
