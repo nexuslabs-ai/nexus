@@ -1,6 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Partial implementation status (post-#124).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Still pending: `validate-spacing-modes.js` schema validator (#126), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the `audit:figma-parity` wire-up for size category (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
+> **Partial implementation status (post-#126).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Schema validation (cross-mode key-set parity) ships via `validate-spacing-modes.js` (#126) and is gated in pre-commit and CI. Still pending: `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the `audit:figma-parity` wire-up for size category (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 
@@ -174,22 +174,29 @@ Load these into context when generating Nexus FE code:
 
 A density mode is a complete spacing scale — numeric steps plus the `control` / `container` / `layout` role bundles. Adding one is mechanical once the design decisions are made.
 
-1. **Author the JSON.** Copy `packages/core/tokens/semantic/spacing-vega.json` to `spacing-{mode}.json` and edit values for the new mode's design intent. Do not add or remove keys — every mode file must carry the same key set so the schema validator (once #126 lands) accepts it.
+1. **Author the JSON.** Copy `packages/core/tokens/semantic/spacing-vega.json` to `spacing-{mode}.json` and edit values for the new mode's design intent. Do not add or remove keys — every mode file must carry the same key set so the schema validator accepts it.
 2. **Register the mode in both `SPACING_MODES` tuples.** The tuple is duplicated, not cross-imported, so both files need the new entry:
    - `apps/playground/src/hooks/useTheme.ts` — the playground theme switcher source-of-truth.
    - `packages/react/src/stories/spacing-modes.tsx` — the React-workspace tuple consumed by component story sentinels.
 
    Storybook's `Style` toolbar picks up the new mode automatically — `packages/react/.storybook/preview.tsx` spreads `[...SPACING_MODES]` into its `globalTypes.style.toolbar.items`.
 
-3. **Validate.** Run `yarn validate:spacing-modes` once that script lands (#126). Until then, the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js` is the indirect gate — `yarn test:unit` (from the repo root) will fail if the new mode emits a different variable name set than Vega.
+3. **Validate.** Run `yarn validate:spacing-modes` to confirm the new mode file shares the same key set as the others; the script reports any missing or extra paths and exits non-zero on drift. The cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js` is a second-tier check — `yarn test:unit` catches the same shape of drift after regen.
 4. **Regenerate the emitted CSS.** Run `yarn tokens:tailwind` (per-mode CSS bundle for the `@nexus/tailwind` package) followed by `yarn tokens:modular` (which also runs `sync-playground-themes.js` to keep playground theme files in sync).
 5. **Sanity-check.** Open Storybook, switch to the new mode in the `Style` toolbar, and confirm a few migrated components (Button, Card, Dialog) render the expected per-mode padding.
 
-## Schema validation _(planned — #126)_
+## Schema validation
 
-CI **will** enforce that all 7 mode files have **identical key sets**. The schema is to be generated from `spacing-vega.json` (the canonical default) and applied to all other modes. A mode file with missing or extra keys will fail the build.
+CI enforces that all 7 mode files have **identical key sets** via `packages/core/scripts/validate-spacing-modes.js`. The script reads the Vega key set as the canonical baseline and validates the other six against it; a mode file with missing or extra leaf paths fails the build with the offending paths reported on stderr.
 
-Planned implementation: `scripts/validate-spacing-modes.js` reads the Vega key set and validates the other six against it. Will run in pre-commit hook and CI. Tracked by #126. Until it lands, parity is enforced indirectly by the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js`.
+A "leaf path" is determined by the DTCG token contract: a node carrying both `$value` and `$type` is a leaf, and its dotted path enters the key set. Sibling keys starting with `$` (e.g. `$meta`, `$description`) are skipped. A typo like `value:` (no `$`) won't slip through — the walker keeps descending past that branch and contributes nothing, so the parity check still catches the missing token.
+
+The validator runs in two places:
+
+- **Pre-commit** — when any `packages/core/tokens/semantic/spacing-*.json` is staged, lint-staged fires `yarn validate:spacing-modes` ahead of the commit.
+- **CI** — the `audit-tokens` job runs it before token regeneration, so a broken mode-file set fails fast without burning time on downstream audits.
+
+Exit codes mirror `audit-figma-parity`: `0` (match), `1` (drift), `2` (config error — missing baseline, unknown mode file, malformed JSON). Pure-function diffing logic (`leafPathsOf`, `diffKeySets`, `validateModes`, `formatFindings`) is unit-tested in `packages/core/scripts/__tests__/validate-spacing-modes.test.js`; the real-files smoke test in `spacing-modes.test.js` calls into the same `validateModes` entry point.
 
 ## Lint rules _(planned — #127)_
 
@@ -271,8 +278,9 @@ The two-tier per-mode architecture described above landed across the [Spacing to
 - **#124** — roll out role-named utilities to the remaining 12 components.
 - **PR #130** — populate this file's role-coupling table with the audit-grounded 14-role version; sync the FE brief.
 - **#230** — add `--control-gap-{sm,md,lg}` per-size gap roles (the `control.gap` token splits from a single value into a size-keyed bundle).
+- **#126** — ship `validate-spacing-modes.js` schema validator; wire to pre-commit (lint-staged) and CI (`audit-tokens` job, before regen).
 
-Still ahead on the same milestone: #126 (schema validator), #127 (lint rules), #128 (figma-parity wire-up for size).
+Still ahead on the same milestone: #127 (lint rules), #128 (figma-parity wire-up for size).
 
 ## When to revisit
 

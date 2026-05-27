@@ -28,6 +28,7 @@
     "audit:contrast": "yarn workspace @nexus/core audit:contrast",
     "audit:figma-parity": "yarn workspace @nexus/core audit:figma-parity",
     "audit:storybook-coverage": "yarn workspace @nexus/react audit:storybook-coverage",
+    "validate:spacing-modes": "yarn workspace @nexus/core validate:spacing-modes",
     "playground": "cd apps/playground && yarn dev",
     "size-limit": "size-limit",
     "prepare": "husky"
@@ -82,6 +83,9 @@
     ],
     "*.{json,md,css}": [
       "prettier --write"
+    ],
+    "packages/core/tokens/semantic/spacing-*.json": [
+      "yarn validate:spacing-modes"
     ]
   },
   "resolutions": {

@@ -3,15 +3,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
+import { CANONICAL_MODES, validateModes } from '../validate-spacing-modes.js';
+
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
 
-// Spacing ships exactly seven canonical modes per `.claude/rules/spacing-tokens.md`.
-// The generator filesystem-discovers them via the `spacing-{mode}.json`
-// pattern, so adding an unintentional 8th file (or losing one) would
-// silently emit/drop a `[data-style="..."]` block.
-const EXPECTED_MODES = ['luma', 'lyra', 'maia', 'mira', 'nova', 'sera', 'vega'];
-
+// This file is the vitest-side smoke test for the real spacing-{mode}.json
+// content on disk. It complements the pure-function unit tests in
+// validate-spacing-modes.test.js (which run against synthetic data) by
+// exercising the same validator entry point against the actual checked-in
+// files. The CLI gate (yarn validate:spacing-modes in CI and pre-commit) is
+// the production enforcement; this test gives Vitest-level signal too.
 describe('spacing modes', () => {
   it('ships exactly the seven canonical modes', () => {
     const modes = fs
@@ -20,53 +22,25 @@ describe('spacing modes', () => {
       .map((name) => name.slice('spacing-'.length, -'.json'.length))
       .sort();
 
-    expect(modes).toEqual(EXPECTED_MODES);
+    expect(modes).toEqual([...CANONICAL_MODES].sort());
   });
 
-  // Each spacing-{mode}.json carries the same key set — the build assumes
-  // this (and #125's validator will codify it at the schema layer). The test
-  // here is a coarse JSON-shape guarantee on top of the build-side
-  // cross-mode variable-name parity test in generate-tailwind-package.test.js.
-  it('all 7 mode files declare the same JSON path set at the leaves', () => {
-    function collectLeafPaths(node, pathParts) {
-      const paths = [];
-      function walk(n, p) {
-        if (
-          typeof n === 'object' &&
-          n !== null &&
-          '$value' in n &&
-          '$type' in n
-        ) {
-          paths.push(p.join('.'));
-          return;
-        }
-        if (typeof n === 'object' && n !== null) {
-          for (const [key, value] of Object.entries(n)) {
-            if (key.startsWith('$')) continue;
-            walk(value, [...p, key]);
-          }
-        }
-      }
-      walk(node, pathParts);
-      return paths;
-    }
-
-    const modePaths = {};
-    for (const mode of EXPECTED_MODES) {
+  it('all 7 mode files share the same leaf-path key set (vega as baseline)', () => {
+    const modeDataMap = new Map();
+    for (const mode of CANONICAL_MODES) {
       const data = JSON.parse(
         fs.readFileSync(path.join(SEMANTIC_DIR, `spacing-${mode}.json`), 'utf8')
       );
-      modePaths[mode] = new Set(collectLeafPaths(data, []));
+      modeDataMap.set(mode, data);
     }
 
-    const vegaPaths = modePaths.vega;
-    expect(vegaPaths.size).toBeGreaterThan(0);
-    for (const mode of EXPECTED_MODES) {
-      if (mode === 'vega') continue;
-      expect(
-        [...modePaths[mode]].sort(),
-        `spacing-${mode}.json diverges from spacing-vega.json key set`
-      ).toEqual([...vegaPaths].sort());
-    }
+    const findings = validateModes(modeDataMap);
+    const drift = findings.filter(
+      (f) => f.missing.length > 0 || f.extra.length > 0
+    );
+    expect(
+      drift,
+      `Spacing mode files diverge from baseline. Run \`yarn validate:spacing-modes\` for the full report.`
+    ).toEqual([]);
   });
 });
