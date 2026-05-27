@@ -821,9 +821,19 @@ describe('utils', () => {
           value: '12px',
         },
         {
-          cssName: 'control-gap',
-          path: ['control', 'gap'],
+          cssName: 'control-gap-sm',
+          path: ['control', 'gap', 'sm'],
+          value: '6px',
+        },
+        {
+          cssName: 'control-gap-md',
+          path: ['control', 'gap', 'md'],
           value: '8px',
+        },
+        {
+          cssName: 'control-gap-lg',
+          path: ['control', 'gap', 'lg'],
+          value: '10px',
         },
         {
           cssName: 'container-p',
@@ -848,7 +858,7 @@ describe('utils', () => {
       ];
       const { css, count } = generateSpacingRoleUtilitiesCSS(canonical);
 
-      expect(count).toBe(7);
+      expect(count).toBe(9);
       // Each utility name follows the role-and-property convention; the var
       // reference is the prefixed form, so it matches what per-mode blocks
       // declare.
@@ -859,7 +869,13 @@ describe('utils', () => {
         /@utility py-control-lg \{[^}]*padding-top: var\(--nx-control-padding-y-lg\);[^}]*padding-bottom: var\(--nx-control-padding-y-lg\);/
       );
       expect(css).toMatch(
-        /@utility gap-control \{[^}]*gap: var\(--nx-control-gap\);/
+        /@utility gap-control-sm \{[^}]*gap: var\(--nx-control-gap-sm\);/
+      );
+      expect(css).toMatch(
+        /@utility gap-control-md \{[^}]*gap: var\(--nx-control-gap-md\);/
+      );
+      expect(css).toMatch(
+        /@utility gap-control-lg \{[^}]*gap: var\(--nx-control-gap-lg\);/
       );
       expect(css).toMatch(
         /@utility p-container \{[^}]*padding: var\(--nx-container-p\);/

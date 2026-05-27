@@ -282,7 +282,9 @@
   --nx-control-padding-y-sm: 6px;
   --nx-control-padding-y-md: 8px;
   --nx-control-padding-y-lg: 12px;
-  --nx-control-gap: 8px;
+  --nx-control-gap-sm: 6px;
+  --nx-control-gap-md: 8px;
+  --nx-control-gap-lg: 10px;
   --nx-container-p: 24px;
   --nx-container-gap: 16px;
   --nx-layout-section-gap: 32px;
@@ -330,7 +332,9 @@
   --nx-control-padding-y-sm: 6px;
   --nx-control-padding-y-md: 8px;
   --nx-control-padding-y-lg: 12px;
-  --nx-control-gap: 8px;
+  --nx-control-gap-sm: 6px;
+  --nx-control-gap-md: 8px;
+  --nx-control-gap-lg: 10px;
   --nx-container-p: 28px;
   --nx-container-gap: 20px;
   --nx-layout-section-gap: 40px;
@@ -378,7 +382,9 @@
   --nx-control-padding-y-sm: 6px;
   --nx-control-padding-y-md: 8px;
   --nx-control-padding-y-lg: 12px;
-  --nx-control-gap: 8px;
+  --nx-control-gap-sm: 6px;
+  --nx-control-gap-md: 8px;
+  --nx-control-gap-lg: 10px;
   --nx-container-p: 24px;
   --nx-container-gap: 16px;
   --nx-layout-section-gap: 32px;
@@ -426,7 +432,9 @@
   --nx-control-padding-y-sm: 8px;
   --nx-control-padding-y-md: 10px;
   --nx-control-padding-y-lg: 14px;
-  --nx-control-gap: 10px;
+  --nx-control-gap-sm: 8px;
+  --nx-control-gap-md: 10px;
+  --nx-control-gap-lg: 12px;
   --nx-container-p: 28px;
   --nx-container-gap: 20px;
   --nx-layout-section-gap: 40px;
@@ -474,7 +482,9 @@
   --nx-control-padding-y-sm: 6px;
   --nx-control-padding-y-md: 8px;
   --nx-control-padding-y-lg: 12px;
-  --nx-control-gap: 8px;
+  --nx-control-gap-sm: 6px;
+  --nx-control-gap-md: 8px;
+  --nx-control-gap-lg: 10px;
   --nx-container-p: 24px;
   --nx-container-gap: 16px;
   --nx-layout-section-gap: 32px;
@@ -522,7 +532,9 @@
   --nx-control-padding-y-sm: 4px;
   --nx-control-padding-y-md: 6px;
   --nx-control-padding-y-lg: 10px;
-  --nx-control-gap: 6px;
+  --nx-control-gap-sm: 4px;
+  --nx-control-gap-md: 6px;
+  --nx-control-gap-lg: 8px;
   --nx-container-p: 20px;
   --nx-container-gap: 12px;
   --nx-layout-section-gap: 28px;
@@ -570,7 +582,9 @@
   --nx-control-padding-y-sm: 10px;
   --nx-control-padding-y-md: 12px;
   --nx-control-padding-y-lg: 16px;
-  --nx-control-gap: 12px;
+  --nx-control-gap-sm: 10px;
+  --nx-control-gap-md: 12px;
+  --nx-control-gap-lg: 14px;
   --nx-container-p: 40px;
   --nx-container-gap: 24px;
   --nx-layout-section-gap: 56px;

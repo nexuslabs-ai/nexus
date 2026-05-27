@@ -30,8 +30,16 @@
   padding-bottom: var(--nx-control-padding-y-lg);
 }
 
-@utility gap-control {
-  gap: var(--nx-control-gap);
+@utility gap-control-sm {
+  gap: var(--nx-control-gap-sm);
+}
+
+@utility gap-control-md {
+  gap: var(--nx-control-gap-md);
+}
+
+@utility gap-control-lg {
+  gap: var(--nx-control-gap-lg);
 }
 
 @utility p-container {

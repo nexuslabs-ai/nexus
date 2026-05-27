@@ -287,11 +287,27 @@
       }
     },
     "gap": {
-      "$value": {
-        "value": 12,
-        "unit": "px"
+      "sm": {
+        "$value": {
+          "value": 10,
+          "unit": "px"
+        },
+        "$type": "dimension"
       },
-      "$type": "dimension"
+      "md": {
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      },
+      "lg": {
+        "$value": {
+          "value": 14,
+          "unit": "px"
+        },
+        "$type": "dimension"
+      }
     }
   },
   "container": {

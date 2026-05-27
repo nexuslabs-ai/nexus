@@ -922,20 +922,20 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
 }
 
 /**
- * Maps the family segment of a three-segment role-token path to the CSS
- * properties the utility should set. Hand-maintained because the suffix →
- * property mapping is a CSS-design decision, not derivable from JSON.
+ * Three-segment family registry. Each row defines one CSS-design decision —
+ * what utility prefix to emit and which CSS properties to set — for one
+ * family segment of a `[role, family, size]` role-token path. The 2-segment
+ * paths (`container.p`, `container.gap`, `layout.<x>-gap`) are handled
+ * inline in `deriveRoleUtility` and do not go through this map.
  *
- * Three-segment paths only — two-segment paths (`container.p`, `control.gap`,
- * `layout.section-gap`) are handled inline in `deriveRoleUtility`.
- *
- * Adding a new three-segment family (e.g. `m` → `margin`) means adding one
- * row here. The set of role tokens themselves is JSON-driven — see
+ * Adding a new 3-segment family (e.g. `m` → `margin`) means adding one row
+ * here. The set of role tokens themselves is JSON-driven — see
  * `generateSpacingRoleUtilitiesCSS`.
  */
-const SUFFIX_TO_PROPERTIES = {
-  'padding-x': ['padding-left', 'padding-right'],
-  'padding-y': ['padding-top', 'padding-bottom'],
+const FAMILY_TO_UTILITY = {
+  'padding-x': { prefix: 'px', properties: ['padding-left', 'padding-right'] },
+  'padding-y': { prefix: 'py', properties: ['padding-top', 'padding-bottom'] },
+  gap: { prefix: 'gap', properties: ['gap'] },
 };
 
 /**
@@ -944,7 +944,7 @@ const SUFFIX_TO_PROPERTIES = {
  * Naming convention — `<property-shorthand>-<role>[-<size>]`:
  *   `control.padding-x.sm`    → utility `px-control-sm`,       padding-inline
  *   `control.padding-y.lg`    → utility `py-control-lg`,       padding-block
- *   `control.gap`             → utility `gap-control`,         gap
+ *   `control.gap.md`          → utility `gap-control-md`,      gap
  *   `container.p`             → utility `p-container`,         padding
  *   `container.gap`           → utility `gap-container`,       gap
  *   `layout.section-gap`      → utility `gap-layout-section`,  gap
@@ -962,7 +962,7 @@ const SUFFIX_TO_PROPERTIES = {
  */
 function deriveRoleUtility(tokenPath) {
   // Path forms we handle:
-  //   [role, suffix]             — e.g. ['container', 'p'], ['control', 'gap']
+  //   [role, suffix]             — e.g. ['container', 'p'], ['container', 'gap']
   //   [role, family, size]       — e.g. ['control', 'padding-x', 'md']
   //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
   if (tokenPath.length < 2 || tokenPath.length > 3) {
@@ -972,18 +972,20 @@ function deriveRoleUtility(tokenPath) {
   }
   const [role, second, third] = tokenPath;
 
-  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y}.
+  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y, gap}.
   if (third !== undefined) {
     const family = second;
     const size = third;
-    const properties = SUFFIX_TO_PROPERTIES[family];
-    if (!properties) {
+    const entry = FAMILY_TO_UTILITY[family];
+    if (!entry) {
       throw new Error(
-        `deriveRoleUtility: unknown family "${family}" in path [${tokenPath.join('.')}] — extend SUFFIX_TO_PROPERTIES`
+        `deriveRoleUtility: unknown family "${family}" in path [${tokenPath.join('.')}] — extend FAMILY_TO_UTILITY`
       );
     }
-    const prefix = familyToUtilityPrefix(family);
-    return { utilityName: `${prefix}-${role}-${size}`, properties };
+    return {
+      utilityName: `${entry.prefix}-${role}-${size}`,
+      properties: entry.properties,
+    };
   }
 
   // Two-segment path: [role, suffix].
@@ -1005,14 +1007,6 @@ function deriveRoleUtility(tokenPath) {
   throw new Error(
     `deriveRoleUtility: unhandled path shape [${tokenPath.join('.')}] — extend deriveRoleUtility cases`
   );
-}
-
-// Three-segment-only helper: `gap` and `p` two-segment paths are handled
-// inline in `deriveRoleUtility` and never reach here.
-function familyToUtilityPrefix(family) {
-  if (family === 'padding-x') return 'px';
-  if (family === 'padding-y') return 'py';
-  throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);
 }
 
 /**
