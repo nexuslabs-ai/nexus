@@ -7,6 +7,7 @@ import spacingMira from '../../../core/tokens/semantic/spacing-mira.json';
 import spacingNova from '../../../core/tokens/semantic/spacing-nova.json';
 import spacingSera from '../../../core/tokens/semantic/spacing-sera.json';
 import spacingVega from '../../../core/tokens/semantic/spacing-vega.json';
+import { IconCheck } from '../lib/icons';
 
 import { SPACING_MODES, type SpacingMode } from './spacing-modes';
 
@@ -215,7 +216,7 @@ export const ActiveMode: Story = {
     docs: {
       description: {
         story:
-          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:px-control-*`, `nx:py-control-*`, `nx:gap-control`, `nx:p-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact), `vega` (default), `maia` (relaxed), `sera` (most breathing).',
+          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:px-control-*`, `nx:py-control-*`, `nx:gap-control-*`, `nx:p-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact), `vega` (default), `maia` (relaxed), `sera` (most breathing).',
       },
     },
   },
@@ -236,7 +237,7 @@ export const ActiveMode: Story = {
         <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
           nx:px-control-* / nx:py-control-*
         </h3>
-        <div className="nx:flex nx:items-end nx:gap-control">
+        <div className="nx:flex nx:items-end nx:gap-4">
           <div className="nx:px-control-sm nx:py-control-sm nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-small">
             sm
           </div>
@@ -246,6 +247,35 @@ export const ActiveMode: Story = {
           <div className="nx:px-control-lg nx:py-control-lg nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
             lg
           </div>
+        </div>
+      </section>
+
+      <section className="nx:flex nx:flex-col nx:gap-3">
+        <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
+          nx:gap-control-{'{sm,md,lg}'}
+        </h3>
+        <div className="nx:flex nx:items-end nx:gap-4">
+          <button
+            type="button"
+            className="nx:px-control-sm nx:py-control-sm nx:gap-control-sm nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-small"
+          >
+            <IconCheck aria-hidden="true" />
+            sm
+          </button>
+          <button
+            type="button"
+            className="nx:px-control-md nx:py-control-md nx:gap-control-md nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default"
+          >
+            <IconCheck aria-hidden="true" />
+            md
+          </button>
+          <button
+            type="button"
+            className="nx:px-control-lg nx:py-control-lg nx:gap-control-lg nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default"
+          >
+            <IconCheck aria-hidden="true" />
+            lg
+          </button>
         </div>
       </section>
 
