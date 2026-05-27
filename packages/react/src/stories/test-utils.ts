@@ -81,16 +81,19 @@ export async function expectHeightPinned(
  * (`spacing-N`) rather than mode-coupled (`control-*` / `container-*`), so
  * mode changes do not move them. If a future PR introduces a role utility
  * the test fails for that mode — the test surfaces *intent* to remain stable,
- * not just absence of role classes.
+ * not just absence of role classes. The optional `selector` is forwarded to
+ * `getControlHeight` so non-control elements (e.g., a Badge `<span>`) can be
+ * measured via their `data-slot` attribute.
  */
 export async function expectHeightPinnedAcrossModes(
   canvas: Canvas,
   testIds: string[],
-  expectedPx: number
+  expectedPx: number,
+  selector?: string
 ): Promise<void> {
   await document.fonts.ready;
   for (const testId of testIds) {
-    const actual = getControlHeight(canvas, testId);
+    const actual = getControlHeight(canvas, testId, selector);
     expect(actual, `[data-testid="${testId}"] height`).toBe(expectedPx);
   }
 }
