@@ -5,7 +5,10 @@ import {
   IconCircleCheck,
   IconInfoCircle,
 } from '@tabler/icons-react';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
+
+import { SPACING_MODES } from '../../stories/spacing-modes';
+import { expectHeightPinnedAcrossModes } from '../../stories/test-utils';
 
 import { Alert, AlertDescription, AlertTitle } from './alert';
 
@@ -270,6 +273,82 @@ export const AllVariants: Story = {
     layout: 'padded',
     // TODO: Fix status token contrast ratios across error, warning, success
     a11y: { test: 'todo' },
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (density stability)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Alert is intentionally density-stable — its `nx:p-4` (16px) sits below `--container-p` (24px in vega) because an alert is a callout, not a container. Migrating to `p-container` would push alert chrome into Card territory and visually compete with adjacent Cards (see `spacing-tokens.md` Alert note). All 7 rows render at the same height regardless of mode. The `AlertIsDensityStable` sentinel below asserts this.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-3 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Alert className="nx:w-[360px]">
+            <AlertTitle>Heads up · {mode}</AlertTitle>
+            <AlertDescription>
+              Padding does not move with mode.
+            </AlertDescription>
+          </Alert>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const AlertIsDensityStable: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Density-stability sentinel. Alert uses numeric `p-4` only, so every spacing mode renders it at the same canonical 74px height (= border 1 × 2 + `p-4` 16 × 2 + child h-10 40). If a future PR introduces a `container-*` or other role utility on Alert, this test fails for that mode — the regression signal is that intent (callout, mode-stable) has been broken. Per the JSDoc on `expectHeightPinnedAcrossModes`, a failure caused by an intentional architecture change (e.g. a `--callout-padding-*` family lands) is intent-changing rather than a regression — bump the expected px to the new canonical value.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="alert-host-nova">
+        <Alert className="nx:w-[200px]">
+          <div className="nx:h-10" aria-hidden="true" />
+        </Alert>
+      </div>
+      <div data-style="vega" data-testid="alert-host-vega">
+        <Alert className="nx:w-[200px]">
+          <div className="nx:h-10" aria-hidden="true" />
+        </Alert>
+      </div>
+      <div data-style="sera" data-testid="alert-host-sera">
+        <Alert className="nx:w-[200px]">
+          <div className="nx:h-10" aria-hidden="true" />
+        </Alert>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinnedAcrossModes(
+      within(canvasElement),
+      ['alert-host-nova', 'alert-host-vega', 'alert-host-sera'],
+      74,
+      '[data-slot="alert"]'
+    );
   },
 };
 
