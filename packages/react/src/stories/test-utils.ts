@@ -81,9 +81,13 @@ export async function expectHeightPinned(
  * (`spacing-N`) rather than mode-coupled (`control-*` / `container-*`), so
  * mode changes do not move them. If a future PR introduces a role utility
  * the test fails for that mode — the test surfaces *intent* to remain stable,
- * not just absence of role classes. The optional `selector` is forwarded to
- * `getControlHeight` so non-control elements (e.g., a Badge `<span>`) can be
- * measured via their `data-slot` attribute.
+ * not just absence of role classes. A failure caused by a deliberate
+ * architecture change (e.g. a future `--chip-padding-*` family lands and
+ * Badge migrates onto it) is _intent changing_, not a regression — bump the
+ * expected px to the new canonical value rather than chasing it as a bug.
+ * The optional `selector` is forwarded to `getControlHeight` so non-control
+ * elements (e.g., a Badge `<span>`) can be measured via their `data-slot`
+ * attribute.
  */
 export async function expectHeightPinnedAcrossModes(
   canvas: Canvas,
