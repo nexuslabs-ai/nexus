@@ -183,6 +183,8 @@ Both rules are tracked by #127. Until they land, the architecture is enforced th
 
 Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
 
+> **Status: target state, not current code.** Button / Input / Select / Tabs / Badge currently use numeric `nx:p-N` utilities; #123 is the migration that moves them onto these role tokens. Read this table as the post-#123 contract that `nexus/prefer-role-utilities` (#127) will enforce — not as a description of what's shipped today.
+
 | Component                                | Role used for                     | Tokens                                                              |
 | ---------------------------------------- | --------------------------------- | ------------------------------------------------------------------- |
 | Button (default)                         | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap` |
