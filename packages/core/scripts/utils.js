@@ -926,16 +926,20 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
  * properties the utility should set. Hand-maintained because the suffix →
  * property mapping is a CSS-design decision, not derivable from JSON.
  *
- * Three-segment paths only — two-segment paths (`container.p`, `control.gap`,
- * `layout.section-gap`) are handled inline in `deriveRoleUtility`.
+ * Three-segment paths only — two-segment paths (`container.p`,
+ * `container.gap`, `layout.section-gap`) are handled inline in
+ * `deriveRoleUtility`. `gap` lives here for the 3-segment `control.gap.{size}`
+ * shape; the 2-segment `container.gap` form predates per-size and stays on
+ * the inline branch.
  *
  * Adding a new three-segment family (e.g. `m` → `margin`) means adding one
- * row here. The set of role tokens themselves is JSON-driven — see
- * `generateSpacingRoleUtilitiesCSS`.
+ * row here AND one row in `FAMILY_TO_UTILITY_PREFIX`. The set of role tokens
+ * themselves is JSON-driven — see `generateSpacingRoleUtilitiesCSS`.
  */
 const SUFFIX_TO_PROPERTIES = {
   'padding-x': ['padding-left', 'padding-right'],
   'padding-y': ['padding-top', 'padding-bottom'],
+  gap: ['gap'],
 };
 
 /**
@@ -944,7 +948,7 @@ const SUFFIX_TO_PROPERTIES = {
  * Naming convention — `<property-shorthand>-<role>[-<size>]`:
  *   `control.padding-x.sm`    → utility `px-control-sm`,       padding-inline
  *   `control.padding-y.lg`    → utility `py-control-lg`,       padding-block
- *   `control.gap`             → utility `gap-control`,         gap
+ *   `control.gap.md`          → utility `gap-control-md`,      gap
  *   `container.p`             → utility `p-container`,         padding
  *   `container.gap`           → utility `gap-container`,       gap
  *   `layout.section-gap`      → utility `gap-layout-section`,  gap
@@ -1007,12 +1011,23 @@ function deriveRoleUtility(tokenPath) {
   );
 }
 
-// Three-segment-only helper: `gap` and `p` two-segment paths are handled
-// inline in `deriveRoleUtility` and never reach here.
+// Three-segment-only helper: the 2-segment `container.p` / `container.gap` /
+// `layout.<x>-gap` paths are handled inline in `deriveRoleUtility` and never
+// reach here. Keep this map in lockstep with `SUFFIX_TO_PROPERTIES` — every
+// 3-segment family needs both an entry there (CSS properties) and here
+// (utility-name prefix).
+const FAMILY_TO_UTILITY_PREFIX = {
+  'padding-x': 'px',
+  'padding-y': 'py',
+  gap: 'gap',
+};
+
 function familyToUtilityPrefix(family) {
-  if (family === 'padding-x') return 'px';
-  if (family === 'padding-y') return 'py';
-  throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);
+  const prefix = FAMILY_TO_UTILITY_PREFIX[family];
+  if (prefix === undefined) {
+    throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);
+  }
+  return prefix;
 }
 
 /**

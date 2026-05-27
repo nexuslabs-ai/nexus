@@ -465,7 +465,21 @@ describe('generateTailwindPackage', () => {
         prop: 'padding-top',
         cssVar: 'nx-control-padding-y-lg',
       },
-      { utility: 'gap-control', prop: 'gap', cssVar: 'nx-control-gap' },
+      {
+        utility: 'gap-control-sm',
+        prop: 'gap',
+        cssVar: 'nx-control-gap-sm',
+      },
+      {
+        utility: 'gap-control-md',
+        prop: 'gap',
+        cssVar: 'nx-control-gap-md',
+      },
+      {
+        utility: 'gap-control-lg',
+        prop: 'gap',
+        cssVar: 'nx-control-gap-lg',
+      },
       { utility: 'p-container', prop: 'padding', cssVar: 'nx-container-p' },
       { utility: 'gap-container', prop: 'gap', cssVar: 'nx-container-gap' },
       {
@@ -480,7 +494,7 @@ describe('generateTailwindPackage', () => {
       },
     ];
 
-    expect(ROLE_UTILITY_BINDINGS).toHaveLength(11);
+    expect(ROLE_UTILITY_BINDINGS).toHaveLength(13);
     for (const { utility, prop, cssVar } of ROLE_UTILITY_BINDINGS) {
       const block = extractBlock(spacingUtilitiesCSS, `@utility ${utility}`);
       expect(block, `@utility ${utility} body`).toMatch(
@@ -514,7 +528,9 @@ describe('generateTailwindPackage', () => {
         //   [role, '<x>-gap']     → gap-<role>-<x>
         const [role, second, third] = pathParts;
         if (third !== undefined) {
-          const prefix = { 'padding-x': 'px', 'padding-y': 'py' }[second];
+          const prefix = { 'padding-x': 'px', 'padding-y': 'py', gap: 'gap' }[
+            second
+          ];
           expected.add(`${prefix}-${role}-${third}`);
         } else if (second === 'gap') {
           expected.add(`gap-${role}`);
