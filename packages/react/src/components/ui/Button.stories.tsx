@@ -539,7 +539,7 @@ export const ModesProduceDifferentHeights: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    expectModeCascadeWorks(
+    await expectModeCascadeWorks(
       within(canvasElement),
       'mode-host-nova',
       'mode-host-sera'

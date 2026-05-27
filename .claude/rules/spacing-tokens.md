@@ -191,28 +191,34 @@ Components should use specific roles for specific spacing decisions. This table 
 
 > **Status: target state, not current code.** Button / Input / Select / Tabs / Badge currently use numeric `nx:p-N` utilities; #123 is the migration that moves them onto these role tokens. Read this table as the post-#123 contract that `nexus/prefer-role-utilities` (#127) will enforce — not as a description of what's shipped today.
 
-| Component                                | Role used for                     | Tokens                                                                 |
-| ---------------------------------------- | --------------------------------- | ---------------------------------------------------------------------- |
-| Button (default)                         | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap-md` |
-| Button (sm)                              | padding-x, padding-y, gap         | `--control-padding-x-sm`, `--control-padding-y-sm`, `--control-gap-sm` |
-| Button (lg)                              | padding-x, padding-y, gap         | `--control-padding-x-lg`, `--control-padding-y-lg`, `--control-gap-lg` |
-| Button (icon)                            | square padding (numeric)          | `nx:p-2.5` (10px, canonical step) — see note below                     |
-| Input (default)                          | padding-x, padding-y              | `--control-padding-x-md`, `--control-padding-y-md`                     |
-| Select trigger                           | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap-md` |
-| Tabs trigger                             | padding-x, padding-y (sm/md)      | `--control-padding-x-{sm,md}`, `--control-padding-y-{sm,md}`           |
-| Tooltip                                  | padding-x, padding-y              | `--control-padding-x-sm`, `--control-padding-y-sm`                     |
-| Badge / Chip                             | padding-x, padding-y (sm)         | `--control-padding-x-sm`, `--control-padding-y-sm`                     |
-| Card                                     | interior padding, gap             | `--container-p`, `--container-gap`                                     |
-| Card header                              | container padding                 | `--container-p` (sub-element offsets use numeric `spacing-N`)          |
-| Dialog                                   | interior padding, gap             | `--container-p`, `--container-gap`                                     |
-| Avatar                                   | (uses sizing tokens, not spacing) | N/A — see `nx:size-*` numeric utilities                                |
-| Section between blocks                   | vertical gap                      | `--layout-section-gap`                                                 |
-| Stack utility                            | gap between siblings              | `--layout-stack-gap`                                                   |
-| Page gutter, inline groups, layout-level | (no named role yet)               | Use numeric `spacing-N` from canonical step set                        |
+| Component                                | Role used for                     | Tokens                                                                             |
+| ---------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------- |
+| Button (default)                         | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap-md`             |
+| Button (sm)                              | padding-x, padding-y, gap         | `--control-padding-x-sm`, `--control-padding-y-sm`, `--control-gap-sm`             |
+| Button (lg)                              | padding-x, padding-y, gap         | `--control-padding-x-lg`, `--control-padding-y-lg`, `--control-gap-lg`             |
+| Button (icon)                            | square padding (numeric)          | `nx:p-2.5` (10px, canonical step) — see note below                                 |
+| Input ({sm,default,lg})                  | padding-y per size                | `--control-padding-y-{sm,md,lg}`; `padding-x` stays numeric — see note             |
+| Select trigger                           | padding-y, gap                    | `--control-padding-y-md`, `--control-gap-md`; `padding-x` stays numeric — see note |
+| Tabs trigger                             | padding-x, padding-y (sm/md)      | `--control-padding-x-{sm,md}`, `--control-padding-y-{sm,md}`                       |
+| Tooltip                                  | padding-x, padding-y              | `--control-padding-x-sm`, `--control-padding-y-sm` — see portal note               |
+| Badge / Chip                             | (numeric — chip rhythm)           | Use numeric `spacing-N` from canonical step set — see note                         |
+| Card                                     | interior padding, gap             | `--container-p`, `--container-gap`                                                 |
+| Card header                              | container padding                 | `--container-p` (sub-element offsets use numeric `spacing-N`)                      |
+| Dialog                                   | interior padding, gap             | `--container-p`, `--container-gap`                                                 |
+| Avatar                                   | (uses sizing tokens, not spacing) | N/A — see `nx:size-*` numeric utilities                                            |
+| Section between blocks                   | vertical gap                      | `--layout-section-gap`                                                             |
+| Stack utility                            | gap between siblings              | `--layout-stack-gap`                                                               |
+| Page gutter, inline groups, layout-level | (no named role yet)               | Use numeric `spacing-N` from canonical step set                                    |
 
 When a new component is authored, the author adds a row to this table.
 
 **Note — Button (icon) is intentionally density-stable.** An icon-only button has no text to scale and no role-family token (`p-control-*`) exists for square padding. Using `--control-padding-x-{size}` and `--control-padding-y-{size}` together would scale the icon button's hit target down in compact modes (e.g., nova: 12px + 6px ≠ square; the icon becomes vertically squeezed) — so icon buttons stay on the canonical numeric step `nx:p-2.5` (10px). Hit-target size remains identical across all 7 modes by design. A future `--control-icon-p-{size}` family could change this if the design system wants density-aware icon buttons; out of scope for this iteration.
+
+**Note — Input and Select trigger keep `padding-x` numeric.** Input/Select are _narrower_ than Button at the same logical size — Input default `nx:px-3` (12px) vs Button default `nx:px-control-md` (16px in vega). Migrating Input/Select to `--control-padding-x-md` would expand them by +4px each side at default and +16px at `lg`, which conflicts with the shadcn-derived convention Nexus already ships (form inputs sit visually inside their button neighbours, not flush). `padding-y` and `gap` still migrate to the role tokens because they match in vega — height stays mode-coupled, width stays numeric. If the design system later decides Input should align flush with Button at every size, the resolution is either to retune the role-token vega values, or to introduce an `--input-padding-x-*` family — both larger conversations than this migration.
+
+**Note — Tooltip migrates fully but the cascade test is structural.** Tooltip content portals to `document.body`, escaping any subtree `[data-style="X"]` wrapper. The role tokens still resolve at runtime — they pick up the document's mode — so a Tooltip nested in `<div data-style="nova">` _does_ render with whatever data-style sits on `<html>`, not nova. The dimensional cascade sentinels (`expectModeCascadeWorks` / `expectHeightPinned`) therefore can't see the role-utility variation across a wrapper. Tooltip's regression coverage instead asserts `getComputedStyle(content).paddingLeft === '12px'` after opening — verifying the role utility resolved to a valid pixel value, not that the wrapper cascade reached it.
+
+**Note — Badge / Chip stays on the canonical numeric step set.** Badge's existing utilities (`nx:py-0.5` = 2px, `nx:px-2`/`nx:px-2.5` = 8/10px, `nx:gap-1` = 4px) sit _below_ the smallest control token (`--control-padding-x-sm` = 12px / `--control-padding-y-sm` = 6px in vega) — a chip is not a control. Migrating to `control-sm` would 3× the vertical padding (2 → 6) and ~1.5× the horizontal (8 → 12), reshaping the chip into something the size of a `Button(sm)`. A future `--chip-padding-*` family could exist; out of scope for this iteration. Density stability is intentional and is asserted in `Badge.stories.tsx` via `expectHeightPinnedAcrossModes`.
 
 ## How this relates to Figma
 

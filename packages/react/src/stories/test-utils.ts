@@ -45,12 +45,15 @@ export function getControlHeight(
  * designer retunes of any single mode do not break the test — only a broken
  * cascade does. Consumers in different components can pick different pairs
  * (`nova`+`sera`, `nova`+`maia`, …) to spread coverage across the 7 modes.
+ * Awaits `document.fonts.ready` so Inter fallback metrics cannot collapse a
+ * one-pixel cascade difference into equality.
  */
-export function expectModeCascadeWorks(
+export async function expectModeCascadeWorks(
   canvas: Canvas,
   smallerModeTestId: string,
   largerModeTestId: string
-): void {
+): Promise<void> {
+  await document.fonts.ready;
   const smaller = getControlHeight(canvas, smallerModeTestId);
   const larger = getControlHeight(canvas, largerModeTestId);
   expect(smaller).toBeLessThan(larger);
@@ -69,4 +72,25 @@ export async function expectHeightPinned(
   await document.fonts.ready;
   const actual = getControlHeight(canvas, testId);
   expect(actual).toBe(expectedPx);
+}
+
+/**
+ * Density-stability sentinel — asserts that a control rendered under multiple
+ * `data-style` mode scopes resolves to the same canonical pixel height.
+ * Used for components whose spacing utilities are intentionally numeric
+ * (`spacing-N`) rather than mode-coupled (`control-*` / `container-*`), so
+ * mode changes do not move them. If a future PR introduces a role utility
+ * the test fails for that mode — the test surfaces *intent* to remain stable,
+ * not just absence of role classes.
+ */
+export async function expectHeightPinnedAcrossModes(
+  canvas: Canvas,
+  testIds: string[],
+  expectedPx: number
+): Promise<void> {
+  await document.fonts.ready;
+  for (const testId of testIds) {
+    const actual = getControlHeight(canvas, testId);
+    expect(actual, `[data-testid="${testId}"] height`).toBe(expectedPx);
+  }
 }
