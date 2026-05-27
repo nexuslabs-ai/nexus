@@ -3,6 +3,10 @@ import { IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
 
 import { Button } from './button';
 
@@ -520,7 +524,7 @@ export const ModesProduceDifferentHeights: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel for the `data-style` cascade and the role-utility resolver. Buttons scoped to different modes must render at different heights — a typo like `nx:py-control-mdd` would silently fall back to intrinsic and all three buttons would match. The assertion checks only that not all heights are equal; specific ordering between modes is a design contract, not a code contract.',
+          'Regression sentinel for the `data-style` cascade and the role-utility resolver. A Button scoped to `nova` (compact) must render shorter than the same Button scoped to `sera` (breathy) — a typo like `nx:py-control-mdd` would silently fall back to intrinsic and both would match. Pair-wise (not a 3-mode chain) so a designer retune of any single mode does not break this test — only a broken cascade does.',
       },
     },
   },
@@ -529,28 +533,17 @@ export const ModesProduceDifferentHeights: Story = {
       <div data-style="nova" data-testid="mode-host-nova">
         <Button>btn</Button>
       </div>
-      <div data-style="vega" data-testid="mode-host-vega">
-        <Button>btn</Button>
-      </div>
       <div data-style="sera" data-testid="mode-host-sera">
         <Button>btn</Button>
       </div>
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const heightOf = (testId: string) => {
-      const host = canvas.getByTestId(testId);
-      const button = host.querySelector('button');
-      if (!button) throw new Error(`button not found in ${testId}`);
-      return button.getBoundingClientRect().height;
-    };
-
-    const novaH = heightOf('mode-host-nova');
-    const vegaH = heightOf('mode-host-vega');
-    const seraH = heightOf('mode-host-sera');
-
-    expect(new Set([novaH, vegaH, seraH]).size).toBeGreaterThan(1);
+    expectModeCascadeWorks(
+      within(canvasElement),
+      'mode-host-nova',
+      'mode-host-sera'
+    );
   },
 };
 
@@ -574,11 +567,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    // Wait for Inter to load — fallback metrics would skew the measurement.
-    await document.fonts.ready;
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-    await expect(button.getBoundingClientRect().height).toBeCloseTo(36, 0);
+    await expectHeightPinned(within(canvasElement), 'vega-host', 36);
   },
 };
 
