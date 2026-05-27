@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
+
 import { Button } from './button';
 import {
   Card,
@@ -418,6 +424,114 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-6` → `p-container` (24px matches vega byte-identically). Positional offsets (`right-6`, `top-6` on `CardAction`) and sub-element offsets (`gap-1.5` between title/description, `gap-2` between footer buttons, `pt-0` to collapse content into header) stay numeric per the coupling-table Card row. Container-p values across modes: nova 20 / vega-tier 24 / maia & luma 28 / sera 40 — the card visibly grows in breathy modes.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Card className="nx:w-[240px]">
+            <CardHeader>
+              <CardTitle>Title</CardTitle>
+              <CardDescription>Description in {mode}</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const ModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Cascade sentinel for `CardContent` `p-container`. Uses the `nova` + `luma` pair to cover the container-p axis at two distinct values (nova 20, luma 28) — luma had not appeared in any sentinel before; the suite now hits at least one mode beyond the vega-cluster across each major role-token family. Card has no portaled content; dimensional measurement on the wrapper works directly. The Card contains a 40px fixed-height child so the height equation is `border 2 + (pt-0 + child-40 + pb-container)` — vega 66px, nova 62px, luma 70px.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="mode-host-nova">
+        <Card className="nx:w-[160px]">
+          <CardContent>
+            <div className="nx:h-10" aria-hidden="true" />
+          </CardContent>
+        </Card>
+      </div>
+      <div data-style="luma" data-testid="mode-host-luma">
+        <Card className="nx:w-[160px]">
+          <CardContent>
+            <div className="nx:h-10" aria-hidden="true" />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectModeCascadeWorks(
+      within(canvasElement),
+      'mode-host-nova',
+      'mode-host-luma',
+      '[data-slot="card"]'
+    );
+  },
+};
+
+export const VegaDefaultHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the migration outcome: in vega mode, a Card containing a single `CardContent` with a 40px fixed-height child renders at exactly 66px (= border 1px × 2 + `CardContent` pt-0 + child-40 + p-container bottom 24). If a designer retunes `--container-p` or the border-width token, this test fails.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Card className="nx:w-[200px]">
+        <CardContent>
+          <div className="nx:h-10" aria-hidden="true" />
+        </CardContent>
+      </Card>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(
+      within(canvasElement),
+      'vega-host',
+      66,
+      '[data-slot="card"]'
+    );
   },
 };
 
