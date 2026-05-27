@@ -287,7 +287,6 @@
       }
     },
     "gap": {
-      "$description": "Placeholders pending designer tuning — sm = md − 2, lg = md + 2 around each mode's existing md gap, kept on canonical spacing steps.",
       "sm": {
         "$value": {
           "value": 6,

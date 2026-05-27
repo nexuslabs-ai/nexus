@@ -95,6 +95,8 @@ Every mode file MUST contain the same set of keys — enforced by JSON schema va
 
 Top-level keys are `spacing` (numeric scale), `control`, `container`, `layout` — flat siblings, no enclosing wrapper. `$value` is a DTCG `{ value, unit }` dimension object.
 
+> **Placeholder values for `control.gap.{sm,md,lg}`.** The `md` value of each mode is the pre-#230 single `control.gap` value; `sm` and `lg` are seeded with the formula `sm = md − 2`, `lg = md + 2`, snapped to the canonical step set. These are placeholders pending designer tuning — the formula encodes intent (a single density step away from `md` in either direction), not a final design call. Retuning per-mode is fine and expected; the schema only requires the three keys to exist with canonical values.
+
 ### Emitted CSS
 
 The build emits one CSS block per mode, all in a single bundle:
