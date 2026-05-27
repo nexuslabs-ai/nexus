@@ -6,7 +6,7 @@ const DEFAULT_CONTROL_SELECTOR =
 type Canvas = ReturnType<typeof within>;
 
 /**
- * Pixel-rounded height of the first focusable control inside a host element
+ * Pixel-rounded height of the single focusable control inside a host element
  * identified by `data-testid`. If the host element itself matches the selector
  * (e.g. `data-testid` placed directly on a `<button>`), measures the host;
  * otherwise looks for a single descendant match. Throws descriptively when no
@@ -18,11 +18,11 @@ export function getControlHeight(
   testId: string,
   selector = DEFAULT_CONTROL_SELECTOR
 ): number {
-  const host = canvas.getByTestId(testId);
+  const host: HTMLElement = canvas.getByTestId(testId);
   if (host.matches(selector)) {
     return Math.round(host.getBoundingClientRect().height);
   }
-  const controls = host.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const controls = host.querySelectorAll<HTMLElement>(selector);
   if (controls.length > 1) {
     throw new Error(
       `Found ${controls.length} controls matching \`${selector}\` inside [data-testid="${testId}"] — measurement is ambiguous`
@@ -39,11 +39,12 @@ export function getControlHeight(
 
 /**
  * Cascade-regression sentinel — asserts that a control rendered under two
- * different `data-style` mode scopes resolves to different heights. Pair-wise
- * (not a 3-mode chain) so designer retunes of any single mode do not break
- * the test — only a broken cascade does. Consumers in different components
- * can pick different pairs (`nova`+`sera`, `nova`+`maia`, …) to spread
- * coverage across the 7 modes.
+ * different `data-style` mode scopes resolves to different heights, with the
+ * first arg's height strictly less than the second. Pass the smaller-padding
+ * mode first (e.g. `nova` before `sera`). Pair-wise (not a 3-mode chain) so
+ * designer retunes of any single mode do not break the test — only a broken
+ * cascade does. Consumers in different components can pick different pairs
+ * (`nova`+`sera`, `nova`+`maia`, …) to spread coverage across the 7 modes.
  */
 export function expectModeCascadeWorks(
   canvas: Canvas,
