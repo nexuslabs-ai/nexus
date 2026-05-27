@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
+
 import {
   Select,
   SelectContent,
@@ -574,6 +580,123 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` migrates `py-2 gap-2` → `py-control-md gap-control-md` (matches vega byte-identically) and so responds to mode. `px-3` stays numeric per the Input/Select coupling-table note (form fields are narrower than buttons by design; per-mode gap drift between Input/Select and adjacent Buttons is accepted — see `spacing-tokens.md` cross-mode visual consequence note). `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Select>
+            <SelectTrigger
+              aria-label={`${mode} select`}
+              className="nx:w-[200px]"
+            >
+              <SelectValue placeholder="Pick one" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="a">Option A</SelectItem>
+              <SelectItem value="b">Option B</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const ModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Cascade sentinel on `SelectTrigger`. Uses the `maia` + `sera` pair to spread coverage away from the Button/Input nova+sera and Tabs nova+maia pairs — between them the suite covers `control-md-y` at every distinct value (nova 6 / vega-tier 8 / maia 10 / sera 12). Trigger is not portaled so dimensional measurement on the wrapper works directly.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="maia" data-testid="mode-host-maia">
+        <Select>
+          <SelectTrigger aria-label="maia select" className="nx:w-[160px]">
+            <SelectValue placeholder="Pick" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="a">A</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div data-style="sera" data-testid="mode-host-sera">
+        <Select>
+          <SelectTrigger aria-label="sera select" className="nx:w-[160px]">
+            <SelectValue placeholder="Pick" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="a">A</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectModeCascadeWorks(
+      within(canvasElement),
+      'mode-host-maia',
+      'mode-host-sera'
+    );
+  },
+};
+
+export const VegaDefaultHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the migration outcome: in vega mode, the `SelectTrigger` renders at exactly 38px (= `text-sm` 20px line-height + `py-control-md` 8px × 2 + border 1px × 2 — same intrinsic shape as Input default). If a designer retunes `--control-padding-y-md`, the body type ramp, or the border-width token, this test fails.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Select>
+        <SelectTrigger aria-label="vega select" className="nx:w-[200px]">
+          <SelectValue placeholder="Pick one" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="a">A</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(within(canvasElement), 'vega-host', 38);
   },
 };
 
