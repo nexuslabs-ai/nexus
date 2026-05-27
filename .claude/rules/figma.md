@@ -121,7 +121,8 @@ Most axes use a three-layer architecture; spacing is two-layer (no primitives �
 │  nx:p-5             →  padding: var(--nx-spacing-5)             │
 │  nx:rounded-md      →  border-radius: var(--radius-md)          │
 │  nx:bg-muted        →  background: var(--color-muted)           │
-│  nx:px-control-md   →  padding-inline: var(--nx-control-padding-x-md) │
+│  nx:px-control-md   →  padding-inline:                          │
+│                          var(--nx-control-padding-x-md)         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
