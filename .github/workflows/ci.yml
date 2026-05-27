@@ -118,9 +118,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .eslintcache
-          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-${{ github.sha }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js') }}-
+            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-
             eslint-${{ runner.os }}-
 
       - name: Lint

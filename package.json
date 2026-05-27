@@ -87,7 +87,8 @@
       "prettier --write"
     ],
     "packages/core/tokens/semantic/spacing-*.json": [
-      "yarn validate:spacing-modes"
+      "yarn validate:spacing-modes",
+      "eslint --fix --no-warn-ignored"
     ]
   },
   "resolutions": {
