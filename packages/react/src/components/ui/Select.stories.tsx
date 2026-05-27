@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectModeCascadeWorks,
@@ -598,16 +602,9 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Select>
             <SelectTrigger
               aria-label={`${mode} select`}
@@ -620,9 +617,9 @@ export const AllModes: Story = {
               <SelectItem value="b">Option B</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
@@ -638,7 +635,7 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="maia" data-testid="mode-host-maia">
+      <div data-style="maia" data-testid="select-mode-host-maia">
         <Select>
           <SelectTrigger aria-label="maia select" className="nx:w-[160px]">
             <SelectValue placeholder="Pick" />
@@ -648,7 +645,7 @@ export const ModesProduceDifferentHeights: Story = {
           </SelectContent>
         </Select>
       </div>
-      <div data-style="sera" data-testid="mode-host-sera">
+      <div data-style="sera" data-testid="select-mode-host-sera">
         <Select>
           <SelectTrigger aria-label="sera select" className="nx:w-[160px]">
             <SelectValue placeholder="Pick" />
@@ -663,8 +660,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-maia',
-      'mode-host-sera'
+      'select-mode-host-maia',
+      'select-mode-host-sera'
     );
   },
 };
@@ -682,7 +679,7 @@ export const VegaDefaultHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="select-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Select>
@@ -696,7 +693,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'vega-host', 38);
+    await expectHeightPinned(within(canvasElement), 'select-vega-host', 38);
   },
 };
 

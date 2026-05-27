@@ -37,6 +37,10 @@ export function getControlHeight(
   return Math.round(control.getBoundingClientRect().height);
 }
 
+type HeightMeasurementOptions = {
+  selector?: string;
+};
+
 /**
  * Cascade-regression sentinel — asserts that a control rendered under two
  * different `data-style` mode scopes resolves to different heights, with the
@@ -46,31 +50,37 @@ export function getControlHeight(
  * cascade does. Consumers in different components can pick different pairs
  * (`nova`+`sera`, `nova`+`maia`, …) to spread coverage across the 7 modes.
  * Awaits `document.fonts.ready` so Inter fallback metrics cannot collapse a
- * one-pixel cascade difference into equality.
+ * one-pixel cascade difference into equality. The optional `selector` is
+ * forwarded to `getControlHeight` so non-control elements (e.g. a Card root
+ * `<div data-slot="card">`) can be measured.
  */
 export async function expectModeCascadeWorks(
   canvas: Canvas,
   smallerModeTestId: string,
-  largerModeTestId: string
+  largerModeTestId: string,
+  { selector }: HeightMeasurementOptions = {}
 ): Promise<void> {
   await document.fonts.ready;
-  const smaller = getControlHeight(canvas, smallerModeTestId);
-  const larger = getControlHeight(canvas, largerModeTestId);
+  const smaller = getControlHeight(canvas, smallerModeTestId, selector);
+  const larger = getControlHeight(canvas, largerModeTestId, selector);
   expect(smaller).toBeLessThan(larger);
 }
 
 /**
  * Contract pin — asserts that a control rendered under a specific `data-style`
  * scope hits an exact pixel height. Awaits `document.fonts.ready` first; Inter
- * fallback metrics would skew the measurement.
+ * fallback metrics would skew the measurement. The optional `selector` is
+ * forwarded to `getControlHeight` so non-control elements (e.g. a Card root
+ * `<div data-slot="card">`) can be measured.
  */
 export async function expectHeightPinned(
   canvas: Canvas,
   testId: string,
-  expectedPx: number
+  expectedPx: number,
+  { selector }: HeightMeasurementOptions = {}
 ): Promise<void> {
   await document.fonts.ready;
-  const actual = getControlHeight(canvas, testId);
+  const actual = getControlHeight(canvas, testId, selector);
   expect(actual).toBe(expectedPx);
 }
 
@@ -93,7 +103,7 @@ export async function expectHeightPinnedAcrossModes(
   canvas: Canvas,
   testIds: string[],
   expectedPx: number,
-  selector?: string
+  { selector }: HeightMeasurementOptions = {}
 ): Promise<void> {
   await document.fonts.ready;
   for (const testId of testIds) {

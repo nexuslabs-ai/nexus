@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectModeCascadeWorks,
@@ -358,16 +362,9 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Input
             size="sm"
             placeholder="Sm"
@@ -383,9 +380,9 @@ export const AllModes: Story = {
             placeholder="Lg"
             aria-label={`${mode} large input`}
           />
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
@@ -401,10 +398,10 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="mode-host-nova">
+      <div data-style="nova" data-testid="input-mode-host-nova">
         <Input aria-label="nova input" />
       </div>
-      <div data-style="sera" data-testid="mode-host-sera">
+      <div data-style="sera" data-testid="input-mode-host-sera">
         <Input aria-label="sera input" />
       </div>
     </div>
@@ -412,8 +409,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-nova',
-      'mode-host-sera'
+      'input-mode-host-nova',
+      'input-mode-host-sera'
     );
   },
 };
@@ -431,14 +428,14 @@ export const VegaDefaultHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="input-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Input aria-label="vega default input" />
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'vega-host', 38);
+    await expectHeightPinned(within(canvasElement), 'input-vega-host', 38);
   },
 };
 

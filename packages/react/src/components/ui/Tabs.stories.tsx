@@ -3,7 +3,11 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectHeightPinnedAcrossModes,
@@ -615,16 +619,9 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Tabs defaultValue="a">
             <TabsList>
               <TabsTrigger value="a">Default</TabsTrigger>
@@ -641,13 +638,13 @@ export const AllModes: Story = {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
-export const ModesProduceDifferentHeights: Story = {
+export const TabsTriggerModesProduceDifferentHeights: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -659,14 +656,14 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="mode-host-nova">
+      <div data-style="nova" data-testid="tabs-mode-host-nova">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger value="a">Tab</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
-      <div data-style="maia" data-testid="mode-host-maia">
+      <div data-style="maia" data-testid="tabs-mode-host-maia">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger value="a">Tab</TabsTrigger>
@@ -678,13 +675,13 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-nova',
-      'mode-host-maia'
+      'tabs-mode-host-nova',
+      'tabs-mode-host-maia'
     );
   },
 };
 
-export const VegaDefaultHeightPinned: Story = {
+export const TabsTriggerVegaDefaultHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -697,7 +694,7 @@ export const VegaDefaultHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="tabs-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Tabs defaultValue="a">
@@ -708,7 +705,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'vega-host', 34);
+    await expectHeightPinned(within(canvasElement), 'tabs-vega-host', 34);
   },
 };
 
@@ -758,7 +755,7 @@ export const TabsSmIsDensityStable: Story = {
       within(canvasElement),
       ['tabs-sm-host-nova', 'tabs-sm-host-vega', 'tabs-sm-host-sera'],
       26,
-      '[data-slot="tabs-trigger"]'
+      { selector: '[data-slot="tabs-trigger"]' }
     );
   },
 };

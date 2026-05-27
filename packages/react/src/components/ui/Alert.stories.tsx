@@ -5,7 +5,17 @@ import {
   IconCircleCheck,
   IconInfoCircle,
 } from '@tabler/icons-react';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
+
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
 
 import { Alert, AlertDescription, AlertTitle } from './alert';
 
@@ -270,6 +280,98 @@ export const AllVariants: Story = {
     layout: 'padded',
     // TODO: Fix status token contrast ratios across error, warning, success
     a11y: { test: 'todo' },
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (density stability)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container` — see `spacing-tokens.md` Alert note. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses the document scale (callout rhythm) instead of the container scale (raised-surface rhythm) — not that it is density-stable.',
+      },
+    },
+  },
+  render: () => (
+    <AllModesGrid className="nx:gap-3">
+      {SPACING_MODES.map((mode) => (
+        <AllModesRow key={mode} mode={mode}>
+          <Alert className="nx:w-[360px]">
+            <AlertTitle>Heads up · {mode}</AlertTitle>
+            <AlertDescription>
+              Padding does not move with mode.
+            </AlertDescription>
+          </Alert>
+        </AllModesRow>
+      ))}
+    </AllModesGrid>
+  ),
+};
+
+export const ModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Cascade sentinel for Alert. Uses the `nova` + `maia` pair — the two modes where `--nx-spacing-4` diverges from the vega cluster (nova 14, maia 18). An Alert scoped to `nova` must render shorter than the same Alert scoped to `maia`. If a future PR accidentally swaps `p-4` for `p-container` the heights would still differ (and the pinned sentinel would catch the change in vega).',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="alert-mode-host-nova">
+        <Alert className="nx:w-[200px]">
+          <div className="nx:h-10" aria-hidden="true" />
+        </Alert>
+      </div>
+      <div data-style="maia" data-testid="alert-mode-host-maia">
+        <Alert className="nx:w-[200px]">
+          <div className="nx:h-10" aria-hidden="true" />
+        </Alert>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectModeCascadeWorks(
+      within(canvasElement),
+      'alert-mode-host-nova',
+      'alert-mode-host-maia',
+      { selector: '[data-slot="alert"]' }
+    );
+  },
+};
+
+export const VegaHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the stays-numeric outcome: in vega mode, an Alert with a single 40px fixed-height child renders at exactly 74px (= border 1 × 2 + `p-4` 16 × 2 + child 40). If a future PR migrates `p-4` to `p-container`, vega rendering shifts to 90px (= 2 + 24 × 2 + 40) and this test fails — the regression signal is that Alert was promoted out of the document scale into the container scale.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="alert-vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Alert className="nx:w-[200px]">
+        <div className="nx:h-10" aria-hidden="true" />
+      </Alert>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(within(canvasElement), 'alert-vega-host', 74, {
+      selector: '[data-slot="alert"]',
+    });
   },
 };
 

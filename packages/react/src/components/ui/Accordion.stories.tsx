@@ -2,6 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
 import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
+
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -492,6 +502,107 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
+};
+
+// ============================================
+// MODE BEHAVIOUR (density stability)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Accordion stays on the document spacing scale (`nx:py-4`) rather than migrating to `py-control-lg` — see `spacing-tokens.md` Accordion note. Accordion still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the trigger height shifts between nova / vega-cluster / maia rows. The point is item-tier rhythm distinct from controls or containers, not density stability.',
+      },
+    },
+  },
+  render: () => (
+    <AllModesGrid>
+      {SPACING_MODES.map((mode) => (
+        <AllModesRow key={mode} mode={mode}>
+          <Accordion type="single" collapsible className="nx:w-[260px]">
+            <AccordionItem value="a">
+              <AccordionTrigger>Section · {mode}</AccordionTrigger>
+              <AccordionContent>Content not measured.</AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </AllModesRow>
+      ))}
+    </AllModesGrid>
+  ),
+};
+
+export const AccordionTriggerModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Cascade sentinel for AccordionTrigger. Uses the `nova` + `maia` pair — the two modes where `--nx-spacing-4` diverges from the vega cluster (nova 14, maia 18). An AccordionTrigger scoped to `nova` must render shorter than the same trigger scoped to `maia`.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="accordion-mode-host-nova">
+        <Accordion type="single" collapsible className="nx:w-[200px]">
+          <AccordionItem value="a">
+            <AccordionTrigger>Nova</AccordionTrigger>
+            <AccordionContent>x</AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+      <div data-style="maia" data-testid="accordion-mode-host-maia">
+        <Accordion type="single" collapsible className="nx:w-[200px]">
+          <AccordionItem value="a">
+            <AccordionTrigger>Maia</AccordionTrigger>
+            <AccordionContent>x</AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectModeCascadeWorks(
+      within(canvasElement),
+      'accordion-mode-host-nova',
+      'accordion-mode-host-maia',
+      { selector: '[data-slot="accordion-trigger"]' }
+    );
+  },
+};
+
+export const AccordionTriggerVegaHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the stays-numeric outcome: in vega mode, AccordionTrigger renders at exactly 52px (= `text-sm` line-height 20 + `py-4` 16 × 2). If a future PR migrates `py-4` → `py-control-lg`, vega rendering shifts to 44px (= 20 + 12 × 2) and this test fails — the regression signal is that Accordion was promoted out of item-tier rhythm into control-lg rhythm.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="accordion-vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Accordion type="single" collapsible className="nx:w-[200px]">
+        <AccordionItem value="a">
+          <AccordionTrigger>Vega</AccordionTrigger>
+          <AccordionContent>x</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(within(canvasElement), 'accordion-vega-host', 52, {
+      selector: '[data-slot="accordion-trigger"]',
+    });
+  },
 };
 
 // ============================================
