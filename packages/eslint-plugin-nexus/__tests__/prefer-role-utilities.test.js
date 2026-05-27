@@ -1,5 +1,5 @@
 import { ESLint, RuleTester } from 'eslint';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import tseslint from 'typescript-eslint';
@@ -9,6 +9,15 @@ import plugin from '../src/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixturesDir = resolve(__dirname, 'fixtures');
+const uiComponentsDir = resolve(
+  __dirname,
+  '..',
+  '..',
+  'react',
+  'src',
+  'components',
+  'ui'
+);
 
 RuleTester.describe = describe;
 RuleTester.it = it;
@@ -103,6 +112,34 @@ ruleTester.run('prefer-role-utilities', rule, {
       errors: [{ messageId: 'preferRole' }],
     },
   ],
+});
+
+describe('prefer-role-utilities — real-file smoke test', () => {
+  const componentFiles = readdirSync(uiComponentsDir).filter(
+    (name) => /^[a-z][a-z0-9-]*\.tsx$/.test(name) // lowercase = implementation; PascalCase = stories
+  );
+  it.each(componentFiles)(
+    'reports zero findings on %s (after Phase 7 annotations)',
+    async (name) => {
+      const eslint = new ESLint({
+        overrideConfigFile: true,
+        overrideConfig: {
+          files: ['**/*.tsx'],
+          languageOptions: {
+            parser: tseslint.parser,
+            ecmaVersion: 2022,
+            sourceType: 'module',
+          },
+          plugins: { '@nexus': plugin },
+          rules: { '@nexus/prefer-role-utilities': 'error' },
+        },
+      });
+      const filePath = resolve(uiComponentsDir, name);
+      const code = readFileSync(filePath, 'utf8');
+      const messages = await eslint.lintText(code, { filePath });
+      expect(messages[0].errorCount).toBe(0);
+    }
+  );
 });
 
 describe('prefer-role-utilities — bad-fixture smoke test', () => {
