@@ -922,24 +922,20 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
 }
 
 /**
- * Maps the family segment of a three-segment role-token path to the CSS
- * properties the utility should set. Hand-maintained because the suffix →
- * property mapping is a CSS-design decision, not derivable from JSON.
+ * Three-segment family registry. Each row defines one CSS-design decision —
+ * what utility prefix to emit and which CSS properties to set — for one
+ * family segment of a `[role, family, size]` role-token path. The 2-segment
+ * paths (`container.p`, `container.gap`, `layout.<x>-gap`) are handled
+ * inline in `deriveRoleUtility` and do not go through this map.
  *
- * Three-segment paths only — two-segment paths (`container.p`,
- * `container.gap`, `layout.section-gap`) are handled inline in
- * `deriveRoleUtility`. `gap` lives here for the 3-segment `control.gap.{size}`
- * shape; the 2-segment `container.gap` form predates per-size and stays on
- * the inline branch.
- *
- * Adding a new three-segment family (e.g. `m` → `margin`) means adding one
- * row here AND one row in `FAMILY_TO_UTILITY_PREFIX`. The set of role tokens
- * themselves is JSON-driven — see `generateSpacingRoleUtilitiesCSS`.
+ * Adding a new 3-segment family (e.g. `m` → `margin`) means adding one row
+ * here. The set of role tokens themselves is JSON-driven — see
+ * `generateSpacingRoleUtilitiesCSS`.
  */
-const SUFFIX_TO_PROPERTIES = {
-  'padding-x': ['padding-left', 'padding-right'],
-  'padding-y': ['padding-top', 'padding-bottom'],
-  gap: ['gap'],
+const FAMILY_TO_UTILITY = {
+  'padding-x': { prefix: 'px', properties: ['padding-left', 'padding-right'] },
+  'padding-y': { prefix: 'py', properties: ['padding-top', 'padding-bottom'] },
+  gap: { prefix: 'gap', properties: ['gap'] },
 };
 
 /**
@@ -966,7 +962,7 @@ const SUFFIX_TO_PROPERTIES = {
  */
 function deriveRoleUtility(tokenPath) {
   // Path forms we handle:
-  //   [role, suffix]             — e.g. ['container', 'p'], ['control', 'gap']
+  //   [role, suffix]             — e.g. ['container', 'p'], ['container', 'gap']
   //   [role, family, size]       — e.g. ['control', 'padding-x', 'md']
   //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
   if (tokenPath.length < 2 || tokenPath.length > 3) {
@@ -976,18 +972,20 @@ function deriveRoleUtility(tokenPath) {
   }
   const [role, second, third] = tokenPath;
 
-  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y}.
+  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y, gap}.
   if (third !== undefined) {
     const family = second;
     const size = third;
-    const properties = SUFFIX_TO_PROPERTIES[family];
-    if (!properties) {
+    const entry = FAMILY_TO_UTILITY[family];
+    if (!entry) {
       throw new Error(
-        `deriveRoleUtility: unknown family "${family}" in path [${tokenPath.join('.')}] — extend SUFFIX_TO_PROPERTIES`
+        `deriveRoleUtility: unknown family "${family}" in path [${tokenPath.join('.')}] — extend FAMILY_TO_UTILITY`
       );
     }
-    const prefix = familyToUtilityPrefix(family);
-    return { utilityName: `${prefix}-${role}-${size}`, properties };
+    return {
+      utilityName: `${entry.prefix}-${role}-${size}`,
+      properties: entry.properties,
+    };
   }
 
   // Two-segment path: [role, suffix].
@@ -1009,25 +1007,6 @@ function deriveRoleUtility(tokenPath) {
   throw new Error(
     `deriveRoleUtility: unhandled path shape [${tokenPath.join('.')}] — extend deriveRoleUtility cases`
   );
-}
-
-// Three-segment-only helper: the 2-segment `container.p` / `container.gap` /
-// `layout.<x>-gap` paths are handled inline in `deriveRoleUtility` and never
-// reach here. Keep this map in lockstep with `SUFFIX_TO_PROPERTIES` — every
-// 3-segment family needs both an entry there (CSS properties) and here
-// (utility-name prefix).
-const FAMILY_TO_UTILITY_PREFIX = {
-  'padding-x': 'px',
-  'padding-y': 'py',
-  gap: 'gap',
-};
-
-function familyToUtilityPrefix(family) {
-  const prefix = FAMILY_TO_UTILITY_PREFIX[family];
-  if (prefix === undefined) {
-    throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);
-  }
-  return prefix;
 }
 
 /**

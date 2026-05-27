@@ -430,7 +430,7 @@ describe('generateTailwindPackage', () => {
     ).toBe(true);
   });
 
-  it('spacing-utilities.css declares all 11 role utilities with correct property bindings', () => {
+  it('spacing-utilities.css declares all 13 role utilities with correct property bindings', () => {
     // Each @utility binds the right CSS property to the right --nx-* variable.
     // A buggy emitter could pass "utility exists" tests but bind the wrong
     // var (e.g. px-control-sm reading --nx-control-padding-x-md).
