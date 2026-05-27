@@ -3,6 +3,12 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../stories/test-utils';
+
 import {
   Card,
   CardContent,
@@ -591,6 +597,118 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `TabsTrigger` `default` migrates to `control-sm` and `lg` to `control-md` (both byte-identical to vega pre-refactor). The `sm` size stays on its own sub-control rhythm (`px-2 py-1`) and is intentionally density-stable across modes — see `spacing-tokens.md` Tabs `sm` note. Vega / Lyra / Luma / Mira share identical `control-{sm,md}` tokens (top 4 rows look the same); Nova compresses, Maia / Sera breathe.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Tabs defaultValue="a">
+            <TabsList>
+              <TabsTrigger value="a">Default</TabsTrigger>
+              <TabsTrigger value="b">Other</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Tabs defaultValue="a">
+            <TabsList>
+              <TabsTrigger size="lg" value="a">
+                Lg
+              </TabsTrigger>
+              <TabsTrigger size="lg" value="b">
+                Other
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const ModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Cascade sentinel for `TabsTrigger` `default` size. Uses the `nova` + `maia` pair to spread coverage away from the Button/Input nova+sera pair already in use — between them the suite covers `control-sm-y` at 4 / 8 / 12 px (nova / maia / sera).',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="mode-host-nova">
+        <Tabs defaultValue="a">
+          <TabsList>
+            <TabsTrigger value="a">Tab</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      <div data-style="maia" data-testid="mode-host-maia">
+        <Tabs defaultValue="a">
+          <TabsList>
+            <TabsTrigger value="a">Tab</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectModeCascadeWorks(
+      within(canvasElement),
+      'mode-host-nova',
+      'mode-host-maia'
+    );
+  },
+};
+
+export const VegaDefaultHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the migration outcome: in vega mode, a `TabsTrigger` at `default` size renders at exactly 34px (= `text-sm` 20px line-height + `py-control-sm` 6px × 2 + transparent border 1px × 2). If a designer retunes `--control-padding-y-sm`, the body type ramp, or the trigger border, this test fails.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a">Default</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(within(canvasElement), 'vega-host', 34);
+  },
 };
 
 // ============================================
