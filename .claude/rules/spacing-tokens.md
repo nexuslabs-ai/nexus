@@ -113,8 +113,8 @@ The build emits one CSS block per mode, all in a single bundle:
   /* ... */
 }
 
-[data-style='mira'] {
-  --nx-spacing-2: 6px;
+[data-style='nova'] {
+  --nx-spacing-3: 10px;
   /* ... */
   --nx-control-h-md: 28px;
   --nx-control-padding-x-md: 12px;
