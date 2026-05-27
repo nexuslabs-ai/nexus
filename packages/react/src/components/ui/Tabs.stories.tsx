@@ -6,6 +6,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { SPACING_MODES } from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
+  expectHeightPinnedAcrossModes,
   expectModeCascadeWorks,
 } from '../../stories/test-utils';
 
@@ -708,6 +709,57 @@ export const VegaDefaultHeightPinned: Story = {
   ),
   play: async ({ canvasElement }) => {
     await expectHeightPinned(within(canvasElement), 'vega-host', 34);
+  },
+};
+
+export const TabsSmIsDensityStable: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Density-stability sentinel for the `sm` size. `TabsTrigger` `sm` stays on the sub-control numeric rhythm (`px-2 py-1 text-xs`) — see the Tabs `sm` note in `spacing-tokens.md`. Every spacing mode therefore renders it at the same canonical 26px height (= `text-xs` line-height 16px + `py-1` 4px × 2 + transparent border 1px × 2). If a future PR migrates `py-1` → `py-control-sm` (or any other role utility), this test fails for nova/sera — the regression signal is that intent (sub-control, mode-stable) has been broken.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="tabs-sm-host-nova">
+        <Tabs defaultValue="a">
+          <TabsList>
+            <TabsTrigger size="sm" value="a">
+              Tab
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      <div data-style="vega" data-testid="tabs-sm-host-vega">
+        <Tabs defaultValue="a">
+          <TabsList>
+            <TabsTrigger size="sm" value="a">
+              Tab
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      <div data-style="sera" data-testid="tabs-sm-host-sera">
+        <Tabs defaultValue="a">
+          <TabsList>
+            <TabsTrigger size="sm" value="a">
+              Tab
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinnedAcrossModes(
+      within(canvasElement),
+      ['tabs-sm-host-nova', 'tabs-sm-host-vega', 'tabs-sm-host-sera'],
+      26,
+      '[data-slot="tabs-trigger"]'
+    );
   },
 };
 
