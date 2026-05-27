@@ -278,6 +278,12 @@ jobs:
       - name: Validate spacing mode files
         run: yarn validate:spacing-modes
 
+      # Guard against drift between the committed canonical-step-set.json
+      # and the live union across spacing-*.json. Same fail-fast tier as
+      # the validator above — stdlib-only, sub-second.
+      - name: Check canonical step set freshness
+        run: yarn workspace @nexus/eslint-plugin refresh:canonical-set --check
+
       - name: Regenerate token outputs (tailwind + modular + colorblind SVG)
         id: regen
         run: |

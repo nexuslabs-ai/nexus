@@ -227,9 +227,9 @@ The shipped components all carry such annotations where the role-coupling table 
 
 ## Role-to-component coupling table
 
-Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
+Components should use specific roles for specific spacing decisions. This table is authoritative; the `@nexus/prefer-role-utilities` rule references it.
 
-> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. The table is authoritative for current code; `nexus/prefer-role-utilities` (#127) will mechanically enforce it once that lint rule lands.
+> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. The table is authoritative for current code; `@nexus/prefer-role-utilities` (#127) mechanically enforces it.
 
 | Component                                | Role used for                          | Tokens                                                                             |
 | ---------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |

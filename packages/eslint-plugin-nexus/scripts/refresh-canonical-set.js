@@ -37,7 +37,7 @@ function collectPxValues(node, out) {
   }
 }
 
-function main() {
+function computeUnion() {
   const files = fs
     .readdirSync(SEMANTIC_DIR)
     .filter((name) => /^spacing-[a-z]+\.json$/.test(name))
@@ -57,15 +57,56 @@ function main() {
     );
     collectPxValues(data, union);
   }
-  const sorted = [...union].sort((a, b) => a - b);
+  return { files, sorted: [...union].sort((a, b) => a - b) };
+}
+
+function arraysEqual(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+function main() {
+  const check = process.argv.includes('--check');
+  const { files, sorted } = computeUnion();
 
   const existing = fs.existsSync(OUTPUT_PATH)
     ? JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'))
     : null;
 
+  if (check) {
+    if (!existing) {
+      process.stderr.write(
+        `Error: ${OUTPUT_PATH} is missing. Run \`yarn workspace @nexus/eslint-plugin refresh:canonical-set\` and commit the result.\n`
+      );
+      process.exit(1);
+    }
+    const committed = Array.isArray(existing.values) ? existing.values : [];
+    if (arraysEqual(committed, sorted)) {
+      process.stdout.write(
+        `✓ canonical-step-set.json matches the live union (${sorted.length} values across ${files.length} modes).\n`
+      );
+      process.exit(0);
+    }
+    const committedSet = new Set(committed);
+    const liveSet = new Set(sorted);
+    const missing = sorted.filter((n) => !committedSet.has(n));
+    const extra = committed.filter((n) => !liveSet.has(n));
+    process.stderr.write(
+      `Error: canonical-step-set.json is stale.\n` +
+        (missing.length
+          ? `  missing from committed: ${missing.join(', ')}\n`
+          : '') +
+        (extra.length
+          ? `  no longer in any mode file: ${extra.join(', ')}\n`
+          : '') +
+        `Refresh via \`yarn workspace @nexus/eslint-plugin refresh:canonical-set\` and commit the result.\n`
+    );
+    process.exit(1);
+  }
+
   const out = {
     $comment: existing?.$comment ?? defaultComment(),
-    unit: 'px',
     values: sorted,
   };
 
@@ -86,7 +127,7 @@ function main() {
 }
 
 function defaultComment() {
-  return 'Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `yarn workspace @nexus/eslint-plugin refresh:canonical-set`.';
+  return 'Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `yarn workspace @nexus/eslint-plugin refresh:canonical-set`. The aspirational 30-step set in .claude/rules/spacing-tokens.md is narrower; reconciliation tracked separately.';
 }
 
 main();
