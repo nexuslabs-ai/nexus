@@ -75,7 +75,7 @@ function TooltipContent({
         sideOffset={sideOffset}
         className={cn(
           'nx:z-popover nx:overflow-hidden nx:rounded-md',
-          'nx:bg-primary-background nx:px-3 nx:py-1.5',
+          'nx:bg-primary-background nx:px-control-sm nx:py-control-sm',
           'nx:text-xs nx:text-primary-foreground',
           'nx:animate-in nx:fade-in-0 nx:zoom-in-95',
           'nx:data-[state=closed]:animate-out nx:data-[state=closed]:fade-out-0 nx:data-[state=closed]:zoom-out-95',
