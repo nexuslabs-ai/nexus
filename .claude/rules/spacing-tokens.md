@@ -190,6 +190,7 @@ Components should use specific roles for specific spacing decisions. This table 
 | Button (default)                         | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap` |
 | Button (sm)                              | padding-x, padding-y              | `--control-padding-x-sm`, `--control-padding-y-sm`                  |
 | Button (lg)                              | padding-x, padding-y              | `--control-padding-x-lg`, `--control-padding-y-lg`                  |
+| Button (icon)                            | square padding (numeric)          | `nx:p-2.5` (10px, canonical step) — see note below                  |
 | Input (default)                          | padding-x, padding-y              | `--control-padding-x-md`, `--control-padding-y-md`                  |
 | Select trigger                           | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap` |
 | Tabs trigger                             | padding-x, padding-y (sm/md)      | `--control-padding-x-{sm,md}`, `--control-padding-y-{sm,md}`        |
@@ -204,6 +205,8 @@ Components should use specific roles for specific spacing decisions. This table 
 | Page gutter, inline groups, layout-level | (no named role yet)               | Use numeric `spacing-N` from canonical step set                     |
 
 When a new component is authored, the author adds a row to this table.
+
+**Note — Button (icon) is intentionally density-stable.** An icon-only button has no text to scale and no role-family token (`p-control-*`) exists for square padding. Using `--control-padding-x-{size}` and `--control-padding-y-{size}` together would scale the icon button's hit target down in compact modes (e.g., nova: 12px + 6px ≠ square; the icon becomes vertically squeezed) — so icon buttons stay on the canonical numeric step `nx:p-2.5` (10px). Hit-target size remains identical across all 7 modes by design. A future `--control-icon-p-{size}` family could change this if the design system wants density-aware icon buttons; out of scope for this iteration.
 
 ## How this relates to Figma
 
