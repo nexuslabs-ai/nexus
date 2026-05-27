@@ -295,7 +295,7 @@ describe('generateTailwindPackage', () => {
     // declarations driving the targeted utility names.
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).not.toMatch(/--container-p:/);
-    expect(themeBlock).not.toMatch(/--control-h-md:/);
+    expect(themeBlock).not.toMatch(/--control-padding-x-md:/);
     expect(themeBlock).not.toMatch(/--layout-section-gap:/);
   });
 
@@ -326,13 +326,13 @@ describe('generateTailwindPackage', () => {
       // Sample one key from each subtree — full per-mode parity is verified
       // by the cross-mode variable-name parity test below.
       const spacing4 = source.spacing['4'].$value.value;
-      const controlHmd = source.control.h.md.$value.value;
+      const controlPxMd = source.control['padding-x'].md.$value.value;
       const containerP = source.container.p.$value.value;
       const layoutSectionGap = source.layout['section-gap'].$value.value;
 
       expect(block).toMatch(new RegExp(`--nx-spacing-4:\\s*${spacing4}px;`));
       expect(block).toMatch(
-        new RegExp(`--nx-control-h-md:\\s*${controlHmd}px;`)
+        new RegExp(`--nx-control-padding-x-md:\\s*${controlPxMd}px;`)
       );
       expect(block).toMatch(
         new RegExp(`--nx-container-p:\\s*${containerP}px;`)
@@ -430,14 +430,11 @@ describe('generateTailwindPackage', () => {
     ).toBe(true);
   });
 
-  it('spacing-utilities.css declares all 14 role utilities with correct property bindings', () => {
+  it('spacing-utilities.css declares all 11 role utilities with correct property bindings', () => {
     // Each @utility binds the right CSS property to the right --nx-* variable.
     // A buggy emitter could pass "utility exists" tests but bind the wrong
-    // var (e.g. h-control-sm reading --nx-control-h-md).
+    // var (e.g. px-control-sm reading --nx-control-padding-x-md).
     const ROLE_UTILITY_BINDINGS = [
-      { utility: 'h-control-sm', prop: 'height', cssVar: 'nx-control-h-sm' },
-      { utility: 'h-control-md', prop: 'height', cssVar: 'nx-control-h-md' },
-      { utility: 'h-control-lg', prop: 'height', cssVar: 'nx-control-h-lg' },
       {
         utility: 'px-control-sm',
         prop: 'padding-left',
@@ -483,7 +480,7 @@ describe('generateTailwindPackage', () => {
       },
     ];
 
-    expect(ROLE_UTILITY_BINDINGS).toHaveLength(14);
+    expect(ROLE_UTILITY_BINDINGS).toHaveLength(11);
     for (const { utility, prop, cssVar } of ROLE_UTILITY_BINDINGS) {
       const block = extractBlock(spacingUtilitiesCSS, `@utility ${utility}`);
       expect(block, `@utility ${utility} body`).toMatch(
@@ -517,9 +514,7 @@ describe('generateTailwindPackage', () => {
         //   [role, '<x>-gap']     → gap-<role>-<x>
         const [role, second, third] = pathParts;
         if (third !== undefined) {
-          const prefix = { h: 'h', 'padding-x': 'px', 'padding-y': 'py' }[
-            second
-          ];
+          const prefix = { 'padding-x': 'px', 'padding-y': 'py' }[second];
           expected.add(`${prefix}-${role}-${third}`);
         } else if (second === 'gap') {
           expected.add(`gap-${role}`);

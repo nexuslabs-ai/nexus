@@ -1,6 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Partial implementation status (post-#119).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:h-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. Still pending: `validate-spacing-modes.js` schema validator (#125), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the role-to-component-coupling enforcement (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the validator + lint enforcement which are still ahead.
+> **Partial implementation status (post-#119).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. Still pending: `validate-spacing-modes.js` schema validator (#125), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the role-to-component-coupling enforcement (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the validator + lint enforcement which are still ahead.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 
@@ -60,11 +60,6 @@ Every mode file MUST contain the same set of keys — enforced by JSON schema va
     "96": { "$value": { "value": 384, "unit": "px" }, "$type": "dimension" }
   },
   "control": {
-    "h": {
-      "sm": { "$value": { "value": 28, "unit": "px" }, "$type": "dimension" },
-      "md": { "$value": { "value": 32, "unit": "px" }, "$type": "dimension" },
-      "lg": { "$value": { "value": 40, "unit": "px" }, "$type": "dimension" }
-    },
     "padding-x": {
       "sm": { "$value": { "value": 12, "unit": "px" }, "$type": "dimension" },
       "md": { "$value": { "value": 16, "unit": "px" }, "$type": "dimension" },
@@ -107,7 +102,6 @@ The build emits one CSS block per mode, all in a single bundle:
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
   /* ... */
-  --nx-control-h-md: 32px;
   --nx-control-padding-x-md: 16px;
   --nx-control-padding-y-md: 8px;
   /* ... */
@@ -116,7 +110,6 @@ The build emits one CSS block per mode, all in a single bundle:
 [data-style='nova'] {
   --nx-spacing-3: 10px;
   /* ... */
-  --nx-control-h-md: 28px;
   --nx-control-padding-x-md: 12px;
   --nx-control-padding-y-md: 6px;
   /* ... */
@@ -156,8 +149,9 @@ These are the px values the design system has chosen as its scale. Any value out
 ### For component authors writing JSX
 
 - **Use numeric utilities (`nx:p-2`, `nx:gap-4`, `nx:h-9`)** for layout-level and ad-hoc spacing inside components. They shift with mode automatically.
-- **Use role-named utilities (`nx:px-control-md`, `nx:h-control-md`, `nx:p-container`, `nx:gap-layout-section`)** for component-internal spacing that has a clear semantic role. Control utilities carry an explicit size suffix (`-sm`, `-md`, `-lg`); container/layout utilities have no size suffix.
-- **Mix freely.** A Button can use `nx:h-control-md nx:px-control-md nx:gap-2` — height/padding follow the control role, gap is a structural numeric choice.
+- **Use role-named utilities (`nx:px-control-md`, `nx:py-control-md`, `nx:p-container`, `nx:gap-layout-section`)** for component-internal spacing that has a clear semantic role. Control utilities carry an explicit size suffix (`-sm`, `-md`, `-lg`); container/layout utilities have no size suffix.
+- **Mix freely.** A Button can use `nx:px-control-md nx:py-control-md nx:gap-2` — padding follows the control role, gap is a structural numeric choice.
+- **No `control-h` token.** Control heights are intrinsic — they emerge from `py-control-{size}` + the control's content (text line-height or icon size). The earlier `--control-h-*` axis was over-specified (both `h` and `py` set together meant the visual padding eaten by content overflow didn't match the designer's `py` value). Cross-control alignment is achieved by Button / Input / Select / Tabs / Badge sharing the same `py-control-{size}` and same text-size body.
 - ❌ Don't write raw px values (`style={{ padding: '10px' }}`). Always go through a token.
 - ❌ Don't use `nx:p-[5px]` arbitrary-value escape hatches. If the canonical set doesn't have what you need, propose the change to the set.
 
@@ -189,23 +183,25 @@ Both rules are tracked by #127. Until they land, the architecture is enforced th
 
 Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
 
-| Component                                | Role used for                     | Tokens                                                                                |
-| ---------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------- |
-| Button (default)                         | height, padding-x, padding-y, gap | `--control-h-md`, `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap` |
-| Button (sm)                              | height, padding-x, padding-y      | `--control-h-sm`, `--control-padding-x-sm`, `--control-padding-y-sm`                  |
-| Button (lg)                              | height, padding-x, padding-y      | `--control-h-lg`, `--control-padding-x-lg`, `--control-padding-y-lg`                  |
-| Input (default)                          | height, padding-x, padding-y      | `--control-h-md`, `--control-padding-x-md`, `--control-padding-y-md`                  |
-| Select trigger                           | height, padding-x, gap            | `--control-h-md`, `--control-padding-x-md`, `--control-gap`                           |
-| Tabs trigger                             | height (sm/md), padding-x         | `--control-h-{sm,md}`, `--control-padding-x-{sm,md}`                                  |
-| Tooltip                                  | padding-x, padding-y              | `--control-padding-x-sm`, `--control-padding-y-sm`                                    |
-| Badge / Chip                             | height (sm), padding-x            | `--control-h-sm`, `--control-padding-x-sm`                                            |
-| Card                                     | interior padding, gap             | `--container-p`, `--container-gap`                                                    |
-| Card header                              | container padding                 | `--container-p` (sub-element offsets use numeric `spacing-N`)                         |
-| Dialog                                   | interior padding, gap             | `--container-p`, `--container-gap`                                                    |
-| Avatar                                   | (uses sizing tokens, not spacing) | N/A — see `nx:size-*` numeric utilities                                               |
-| Section between blocks                   | vertical gap                      | `--layout-section-gap`                                                                |
-| Stack utility                            | gap between siblings              | `--layout-stack-gap`                                                                  |
-| Page gutter, inline groups, layout-level | (no named role yet)               | Use numeric `spacing-N` from canonical step set                                       |
+> **Status: target state, not current code.** Button / Input / Select / Tabs / Badge currently use numeric `nx:p-N` utilities; #123 is the migration that moves them onto these role tokens. Read this table as the post-#123 contract that `nexus/prefer-role-utilities` (#127) will enforce — not as a description of what's shipped today.
+
+| Component                                | Role used for                     | Tokens                                                              |
+| ---------------------------------------- | --------------------------------- | ------------------------------------------------------------------- |
+| Button (default)                         | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap` |
+| Button (sm)                              | padding-x, padding-y              | `--control-padding-x-sm`, `--control-padding-y-sm`                  |
+| Button (lg)                              | padding-x, padding-y              | `--control-padding-x-lg`, `--control-padding-y-lg`                  |
+| Input (default)                          | padding-x, padding-y              | `--control-padding-x-md`, `--control-padding-y-md`                  |
+| Select trigger                           | padding-x, padding-y, gap         | `--control-padding-x-md`, `--control-padding-y-md`, `--control-gap` |
+| Tabs trigger                             | padding-x, padding-y (sm/md)      | `--control-padding-x-{sm,md}`, `--control-padding-y-{sm,md}`        |
+| Tooltip                                  | padding-x, padding-y              | `--control-padding-x-sm`, `--control-padding-y-sm`                  |
+| Badge / Chip                             | padding-x, padding-y (sm)         | `--control-padding-x-sm`, `--control-padding-y-sm`                  |
+| Card                                     | interior padding, gap             | `--container-p`, `--container-gap`                                  |
+| Card header                              | container padding                 | `--container-p` (sub-element offsets use numeric `spacing-N`)       |
+| Dialog                                   | interior padding, gap             | `--container-p`, `--container-gap`                                  |
+| Avatar                                   | (uses sizing tokens, not spacing) | N/A — see `nx:size-*` numeric utilities                             |
+| Section between blocks                   | vertical gap                      | `--layout-section-gap`                                              |
+| Stack utility                            | gap between siblings              | `--layout-stack-gap`                                                |
+| Page gutter, inline groups, layout-level | (no named role yet)               | Use numeric `spacing-N` from canonical step set                     |
 
 When a new component is authored, the author adds a row to this table.
 

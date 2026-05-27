@@ -538,7 +538,7 @@ describe('utils', () => {
 
   // Shared fixture helper for spacing tests — writes per-mode JSON files into
   // a temp dir and runs the body. Source data mirrors real spacing-vega.json
-  // structure (numeric `spacing.N` + role `control.h.md`, `container.p`,
+  // structure (numeric `spacing.N` + role `control.padding-x.md`, `container.p`,
   // `layout.section-gap` subtrees) so the test exercises the same shapes the
   // build sees.
   function withSpacingModesFixture(filesByMode, fn) {
@@ -611,8 +611,8 @@ describe('utils', () => {
               4: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
             },
             control: {
-              h: {
-                md: { $value: { value: 32, unit: 'px' }, $type: 'dimension' },
+              'padding-x': {
+                md: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
               },
             },
           },
@@ -622,8 +622,8 @@ describe('utils', () => {
               4: { $value: { value: 12, unit: 'px' }, $type: 'dimension' },
             },
             control: {
-              h: {
-                md: { $value: { value: 28, unit: 'px' }, $type: 'dimension' },
+              'padding-x': {
+                md: { $value: { value: 12, unit: 'px' }, $type: 'dimension' },
               },
             },
           },
@@ -635,9 +635,9 @@ describe('utils', () => {
             { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
             { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
             {
-              cssName: 'control-h-md',
-              path: ['control', 'h', 'md'],
-              value: '32px',
+              cssName: 'control-padding-x-md',
+              path: ['control', 'padding-x', 'md'],
+              value: '16px',
             },
           ]);
           // Per-mode variance is the whole point — the same cssName resolves
@@ -646,9 +646,9 @@ describe('utils', () => {
             { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
             { cssName: 'spacing-4', path: ['spacing', '4'], value: '12px' },
             {
-              cssName: 'control-h-md',
-              path: ['control', 'h', 'md'],
-              value: '28px',
+              cssName: 'control-padding-x-md',
+              path: ['control', 'padding-x', 'md'],
+              value: '12px',
             },
           ]);
         }
@@ -663,10 +663,10 @@ describe('utils', () => {
         {
           vega: {
             control: {
-              h: {
-                md: { $value: { value: 32, unit: 'px' }, $type: 'dimension' },
+              'padding-x': {
+                md: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
               },
-              'h-md': {
+              'padding-x-md': {
                 $value: { value: 999, unit: 'px' },
                 $type: 'dimension',
               },
@@ -674,7 +674,9 @@ describe('utils', () => {
           },
         },
         (dir) => {
-          expect(() => collectSpacingTokens(dir)).toThrow(/control-h-md/);
+          expect(() => collectSpacingTokens(dir)).toThrow(
+            /control-padding-x-md/
+          );
         }
       );
     });
@@ -697,9 +699,9 @@ describe('utils', () => {
         { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
         { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
         {
-          cssName: 'control-h-md',
-          path: ['control', 'h', 'md'],
-          value: '32px',
+          cssName: 'control-padding-x-md',
+          path: ['control', 'padding-x', 'md'],
+          value: '16px',
         },
         { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
         {
@@ -715,9 +717,9 @@ describe('utils', () => {
       ]);
       expect(role).toEqual([
         {
-          cssName: 'control-h-md',
-          path: ['control', 'h', 'md'],
-          value: '32px',
+          cssName: 'control-padding-x-md',
+          path: ['control', 'padding-x', 'md'],
+          value: '16px',
         },
         { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
         {
@@ -742,15 +744,15 @@ describe('utils', () => {
     const modes = {
       vega: [
         { cssName: 'spacing-4', value: '16px' },
-        { cssName: 'control-h-md', value: '32px' },
+        { cssName: 'control-padding-x-md', value: '16px' },
       ],
       lyra: [
         { cssName: 'spacing-4', value: '12px' },
-        { cssName: 'control-h-md', value: '28px' },
+        { cssName: 'control-padding-x-md', value: '12px' },
       ],
       luma: [
         { cssName: 'spacing-4', value: '16px' },
-        { cssName: 'control-h-md', value: '32px' },
+        { cssName: 'control-padding-x-md', value: '16px' },
       ],
     };
 
@@ -774,11 +776,11 @@ describe('utils', () => {
     it('emits --nx- prefixed declarations (per-mode blocks live outside @theme)', () => {
       const css = generateSpacingModesCSS(modes);
       expect(css).toMatch(/--nx-spacing-4: 16px;/);
-      expect(css).toMatch(/--nx-control-h-md: 32px;/);
+      expect(css).toMatch(/--nx-control-padding-x-md: 16px;/);
       // No bare (unprefixed) declarations — those would not override the
       // var(--nx-*) references that Tailwind v4 emits in utility bodies.
       expect(css).not.toMatch(/^\s+--spacing-4:/m);
-      expect(css).not.toMatch(/^\s+--control-h-md:/m);
+      expect(css).not.toMatch(/^\s+--control-padding-x-md:/m);
     });
 
     it('throws when defaultMode is not present in modesByName', () => {
@@ -808,11 +810,6 @@ describe('utils', () => {
   describe('generateSpacingRoleUtilitiesCSS', () => {
     it('emits @utility declarations data-driven from canonical role tokens', () => {
       const canonical = [
-        {
-          cssName: 'control-h-md',
-          path: ['control', 'h', 'md'],
-          value: '32px',
-        },
         {
           cssName: 'control-padding-x-sm',
           path: ['control', 'padding-x', 'sm'],
@@ -851,13 +848,10 @@ describe('utils', () => {
       ];
       const { css, count } = generateSpacingRoleUtilitiesCSS(canonical);
 
-      expect(count).toBe(8);
+      expect(count).toBe(7);
       // Each utility name follows the role-and-property convention; the var
       // reference is the prefixed form, so it matches what per-mode blocks
       // declare.
-      expect(css).toMatch(
-        /@utility h-control-md \{[^}]*height: var\(--nx-control-h-md\);/
-      );
       expect(css).toMatch(
         /@utility px-control-sm \{[^}]*padding-left: var\(--nx-control-padding-x-sm\);[^}]*padding-right: var\(--nx-control-padding-x-sm\);/
       );
@@ -884,9 +878,9 @@ describe('utils', () => {
     it('emits exactly one @utility per role token (1:1)', () => {
       const canonical = [
         {
-          cssName: 'control-h-md',
-          path: ['control', 'h', 'md'],
-          value: '32px',
+          cssName: 'control-padding-x-md',
+          path: ['control', 'padding-x', 'md'],
+          value: '16px',
         },
         { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
       ];

@@ -734,8 +734,8 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
  *
  * Returns a map keyed by mode name; each value is the token list for that
  * mode. Token `cssName` is the JSON path joined with `-` (e.g. `spacing-0`,
- * `control-h-md`, `container-p`, `layout-section-gap`) — **without** the
- * `nx-` prefix. Callers add the prefix at emit time based on context:
+ * `control-padding-x-md`, `container-p`, `layout-section-gap`) — **without**
+ * the `nx-` prefix. Callers add the prefix at emit time based on context:
  *
  *  - `@theme` block (numeric subset only) emits unprefixed (`--spacing-0`).
  *    Tailwind v4's `prefix(nx)` rewrites these to `--nx-spacing-0` at
@@ -745,11 +745,12 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
  *    form (`--nx-spacing-0`) directly, because Tailwind doesn't rewrite
  *    variables outside `@theme`. See `generateSpacingModesCSS`.
  *  - `@utility` role declarations reference the prefixed form
- *    (`var(--nx-control-h-md)`). See `generateSpacingRoleUtilitiesCSS`.
+ *    (`var(--nx-control-padding-x-md)`). See `generateSpacingRoleUtilitiesCSS`.
  *
  * Throws on cssName collisions across paths within a single mode — two paths
- * flattening to the same name (e.g. `control.h-md` and `control.h.md` both
- * → `control-h-md`) would silently lose one declaration.
+ * flattening to the same name (e.g. `control.padding-x.md` and
+ * `control.padding-x-md` both → `control-padding-x-md`) would silently lose
+ * one declaration.
  *
  * @param {string} semanticDir - Path to semantic directory
  * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
@@ -856,7 +857,7 @@ export function splitSpacingTokens(tokens) {
  * sees the full per-mode contract in one place.
  *
  * Variable names are emitted already-prefixed (`--nx-spacing-N`,
- * `--nx-control-h-md`, …). Tailwind v4's `prefix(nx)` rewrites variables
+ * `--nx-control-padding-x-md`, …). Tailwind v4's `prefix(nx)` rewrites variables
  * inside `@theme` but does NOT rewrite variables declared in `:root` /
  * attribute-selector blocks, so writing the prefixed form here is what makes
  * mode-switching actually override the utility's `var(--nx-spacing-N)`
@@ -933,7 +934,6 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
  * `generateSpacingRoleUtilitiesCSS`.
  */
 const SUFFIX_TO_PROPERTIES = {
-  h: ['height'],
   'padding-x': ['padding-left', 'padding-right'],
   'padding-y': ['padding-top', 'padding-bottom'],
 };
@@ -942,7 +942,6 @@ const SUFFIX_TO_PROPERTIES = {
  * Derive a `{utilityName, properties}` for a role-token path.
  *
  * Naming convention — `<property-shorthand>-<role>[-<size>]`:
- *   `control.h.md`            → utility `h-control-md`,        height
  *   `control.padding-x.sm`    → utility `px-control-sm`,       padding-inline
  *   `control.padding-y.lg`    → utility `py-control-lg`,       padding-block
  *   `control.gap`             → utility `gap-control`,         gap
@@ -952,7 +951,6 @@ const SUFFIX_TO_PROPERTIES = {
  *   `layout.stack-gap`        → utility `gap-layout-stack`,    gap
  *
  * Utility-name prefix per property:
- *   height       → `h-`
  *   padding      → `p-`
  *   padding-x    → `px-`
  *   padding-y    → `py-`
@@ -965,7 +963,7 @@ const SUFFIX_TO_PROPERTIES = {
 function deriveRoleUtility(tokenPath) {
   // Path forms we handle:
   //   [role, suffix]             — e.g. ['container', 'p'], ['control', 'gap']
-  //   [role, family, size]       — e.g. ['control', 'h', 'md']
+  //   [role, family, size]       — e.g. ['control', 'padding-x', 'md']
   //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
   if (tokenPath.length < 2 || tokenPath.length > 3) {
     throw new Error(
@@ -974,7 +972,7 @@ function deriveRoleUtility(tokenPath) {
   }
   const [role, second, third] = tokenPath;
 
-  // Three-segment path: [role, family, size]. family ∈ {h, padding-x, padding-y}.
+  // Three-segment path: [role, family, size]. family ∈ {padding-x, padding-y}.
   if (third !== undefined) {
     const family = second;
     const size = third;
@@ -1012,7 +1010,6 @@ function deriveRoleUtility(tokenPath) {
 // Three-segment-only helper: `gap` and `p` two-segment paths are handled
 // inline in `deriveRoleUtility` and never reach here.
 function familyToUtilityPrefix(family) {
-  if (family === 'h') return 'h';
   if (family === 'padding-x') return 'px';
   if (family === 'padding-y') return 'py';
   throw new Error(`familyToUtilityPrefix: unknown family "${family}"`);

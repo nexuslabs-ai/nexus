@@ -240,29 +240,6 @@
     }
   },
   "control": {
-    "h": {
-      "sm": {
-        "$value": {
-          "value": 24,
-          "unit": "px"
-        },
-        "$type": "dimension"
-      },
-      "md": {
-        "$value": {
-          "value": 28,
-          "unit": "px"
-        },
-        "$type": "dimension"
-      },
-      "lg": {
-        "$value": {
-          "value": 36,
-          "unit": "px"
-        },
-        "$type": "dimension"
-      }
-    },
     "padding-x": {
       "sm": {
         "$value": {

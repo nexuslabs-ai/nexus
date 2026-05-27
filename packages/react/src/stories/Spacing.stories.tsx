@@ -59,7 +59,7 @@ function extractNumericRows(mode: ModeFile): [string, Dimension][] {
 /**
  * Walk the `control.*`, `container.*`, `layout.*` subtrees and return the
  * role rows for that mode. Each row name mirrors the JSON path joined with
- * `-`, matching the emitted CSS variable name (`--control-h-md`,
+ * `-`, matching the emitted CSS variable name (`--control-padding-x-md`,
  * `--container-p`, `--layout-section-gap`, …).
  */
 function extractRoleRows(mode: ModeFile): [string, Dimension][] {
@@ -194,7 +194,7 @@ export const Roles: Story = {
           Role-named tokens express semantic intent — `control.*` for
           buttons/inputs/select triggers, `container.*` for cards/dialogs,
           `layout.*` for between-section and stack rhythm. Consumed through
-          dedicated utilities like `nx:h-control-md`, `nx:p-container`, or
+          dedicated utilities like `nx:px-control-md`, `nx:p-container`, or
           `nx:gap-layout-section`. Per-mode variance is the lever for density:
           Mira shrinks, Maia/Sera/Luma breathe.
         </p>
@@ -215,7 +215,7 @@ export const ActiveMode: Story = {
     docs: {
       description: {
         story:
-          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:h-control-*`, `nx:p-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact, control-h-md = 28px), `vega` (default, 32px), `maia` (36px), `sera` (breathing, 44px).',
+          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:px-control-*`, `nx:py-control-*`, `nx:gap-control`, `nx:p-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact), `vega` (default), `maia` (relaxed), `sera` (most breathing).',
       },
     },
   },
@@ -234,16 +234,16 @@ export const ActiveMode: Story = {
 
       <section className="nx:flex nx:flex-col nx:gap-3">
         <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
-          nx:h-control-* / nx:px-control-*
+          nx:px-control-* / nx:py-control-*
         </h3>
         <div className="nx:flex nx:items-end nx:gap-control">
-          <div className="nx:h-control-sm nx:px-control-sm nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-small">
+          <div className="nx:px-control-sm nx:py-control-sm nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-small">
             sm
           </div>
-          <div className="nx:h-control-md nx:px-control-md nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
+          <div className="nx:px-control-md nx:py-control-md nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
             md
           </div>
-          <div className="nx:h-control-lg nx:px-control-lg nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
+          <div className="nx:px-control-lg nx:py-control-lg nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
             lg
           </div>
         </div>
