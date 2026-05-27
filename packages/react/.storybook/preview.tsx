@@ -6,11 +6,16 @@ import '../src/index.css';
 
 const ThemeDecorator: Decorator = (Story, context) => {
   const theme = context.globals.theme;
+  const style = context.globals.style;
   const isDocs = context.viewMode === 'docs';
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-style', style);
+  }, [style]);
 
   return (
     <div
@@ -76,6 +81,17 @@ const preview: Preview = {
           { value: 'light', icon: 'sun', title: 'Light' },
           { value: 'dark', icon: 'moon', title: 'Dark' },
         ],
+        showName: true,
+        dynamicTitle: true,
+      },
+    },
+    style: {
+      name: 'Style',
+      description: 'Spacing mode — sets data-style on <html>',
+      defaultValue: 'vega',
+      toolbar: {
+        icon: 'expand',
+        items: ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'],
         showName: true,
         dynamicTitle: true,
       },
