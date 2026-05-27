@@ -185,6 +185,21 @@ Two ESLint/Stylelint rules **will** guard the architecture:
 
 Both rules are tracked by #127. Until they land, the architecture is enforced through review.
 
+## How to add a new mode
+
+A density mode is a complete spacing scale — numeric steps plus the `control` / `container` / `layout` role bundles. Adding one is mechanical once the design decisions are made.
+
+1. **Author the JSON.** Copy `packages/core/tokens/semantic/spacing-vega.json` to `spacing-{mode}.json` and edit values for the new mode's design intent. Do not add or remove keys — every mode file must carry the same key set so the schema validator (once #126 lands) accepts it.
+2. **Register the mode in both `SPACING_MODES` tuples.** The tuple is duplicated, not cross-imported, so both files need the new entry:
+   - `apps/playground/src/hooks/useTheme.ts` — the playground theme switcher source-of-truth.
+   - `packages/react/src/stories/spacing-modes.tsx` — the React-workspace tuple consumed by component story sentinels.
+
+   Storybook's `Style` toolbar picks up the new mode automatically — `packages/react/.storybook/preview.tsx` spreads `[...SPACING_MODES]` into its `globalTypes.style.toolbar.items`.
+
+3. **Validate.** Run `yarn validate:spacing-modes` once that script lands (#126). Until then, the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js` is the indirect gate — `yarn workspace @nexus/core test` will fail if the new mode emits a different variable name set than Vega.
+4. **Regenerate the emitted CSS.** Run `yarn tokens:tailwind` (per-mode CSS bundle for the `@nexus/tailwind` package) followed by `yarn tokens:modular` (which also runs `sync-playground-themes.js` to keep playground theme files in sync).
+5. **Sanity-check.** Open Storybook, switch to the new mode in the `Style` toolbar, and confirm a few migrated components (Button, Card, Dialog) render the expected per-mode padding.
+
 ## Role-to-component coupling table
 
 Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
