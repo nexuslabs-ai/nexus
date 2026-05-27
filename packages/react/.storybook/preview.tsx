@@ -2,15 +2,24 @@ import { useEffect } from 'react';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
+import { SPACING_MODES, type SpacingMode } from '../src/stories/spacing-modes';
+
 import '../src/index.css';
 
 const ThemeDecorator: Decorator = (Story, context) => {
   const theme = context.globals.theme;
+  const style = context.globals.style as SpacingMode | undefined;
   const isDocs = context.viewMode === 'docs';
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  useEffect(() => {
+    if (typeof style === 'string') {
+      document.documentElement.setAttribute('data-style', style);
+    }
+  }, [style]);
 
   return (
     <div
@@ -65,17 +74,30 @@ const preview: Preview = {
       },
     },
   },
+  initialGlobals: {
+    theme: 'light',
+    style: 'vega' satisfies SpacingMode,
+  },
   globalTypes: {
     theme: {
       name: 'Theme',
       description: 'Global theme for components',
-      defaultValue: 'light',
       toolbar: {
         icon: 'circlehollow',
         items: [
           { value: 'light', icon: 'sun', title: 'Light' },
           { value: 'dark', icon: 'moon', title: 'Dark' },
         ],
+        showName: true,
+        dynamicTitle: true,
+      },
+    },
+    style: {
+      name: 'Style',
+      description: 'Spacing mode — sets data-style on <html>',
+      toolbar: {
+        icon: 'expand',
+        items: [...SPACING_MODES],
         showName: true,
         dynamicTitle: true,
       },

@@ -8,7 +8,9 @@ import spacingNova from '../../../core/tokens/semantic/spacing-nova.json';
 import spacingSera from '../../../core/tokens/semantic/spacing-sera.json';
 import spacingVega from '../../../core/tokens/semantic/spacing-vega.json';
 
-const DEFAULT_MODE = 'vega';
+import { SPACING_MODES, type SpacingMode } from './spacing-modes';
+
+const DEFAULT_MODE: SpacingMode = 'vega';
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
@@ -24,15 +26,19 @@ function isDimensionToken(node: unknown): node is DimensionToken {
   return typeof dim.value === 'number' && typeof dim.unit === 'string';
 }
 
-const MODES: { name: string; tokens: ModeFile }[] = [
-  { name: 'vega', tokens: spacingVega as ModeFile },
-  { name: 'lyra', tokens: spacingLyra as ModeFile },
-  { name: 'maia', tokens: spacingMaia as ModeFile },
-  { name: 'mira', tokens: spacingMira as ModeFile },
-  { name: 'nova', tokens: spacingNova as ModeFile },
-  { name: 'luma', tokens: spacingLuma as ModeFile },
-  { name: 'sera', tokens: spacingSera as ModeFile },
-];
+const SPACING_TOKENS: Record<SpacingMode, ModeFile> = {
+  vega: spacingVega as ModeFile,
+  lyra: spacingLyra as ModeFile,
+  maia: spacingMaia as ModeFile,
+  mira: spacingMira as ModeFile,
+  nova: spacingNova as ModeFile,
+  luma: spacingLuma as ModeFile,
+  sera: spacingSera as ModeFile,
+};
+
+const MODES: { name: SpacingMode; tokens: ModeFile }[] = SPACING_MODES.map(
+  (name) => ({ name, tokens: SPACING_TOKENS[name] })
+);
 
 /**
  * Walk a per-mode spacing file's `spacing.*` subtree and return ordered
@@ -200,6 +206,74 @@ export const Roles: Story = {
           rows={sortByValue(extractRoleRows(tokens))}
         />
       ))}
+    </div>
+  ),
+};
+
+export const ActiveMode: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:h-control-*`, `nx:p-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact, control-h-md = 28px), `vega` (default, 32px), `maia` (36px), `sera` (breathing, 44px).',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-w-fit">
+      <div className="nx:flex nx:flex-col nx:gap-2">
+        <h2 className="nx:text-foreground nx:typography-heading-medium">
+          Active Mode
+        </h2>
+        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+          Switch the <strong>Style</strong> toolbar — the boxes below resize as
+          `data-style` toggles on the document root. Numeric tokens are
+          byte-identical across modes; only role tokens vary.
+        </p>
+      </div>
+
+      <section className="nx:flex nx:flex-col nx:gap-3">
+        <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
+          nx:h-control-* / nx:px-control-*
+        </h3>
+        <div className="nx:flex nx:items-end nx:gap-control">
+          <div className="nx:h-control-sm nx:px-control-sm nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-small">
+            sm
+          </div>
+          <div className="nx:h-control-md nx:px-control-md nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
+            md
+          </div>
+          <div className="nx:h-control-lg nx:px-control-lg nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
+            lg
+          </div>
+        </div>
+      </section>
+
+      <section className="nx:flex nx:flex-col nx:gap-3">
+        <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
+          nx:p-container / nx:gap-container
+        </h3>
+        <div className="nx:p-container nx:bg-container nx:border nx:border-border-default nx:rounded-md nx:flex nx:flex-col nx:gap-container nx:max-w-md">
+          <div className="nx:bg-muted nx:rounded-sm nx:h-8" />
+          <div className="nx:bg-muted nx:rounded-sm nx:h-8" />
+        </div>
+      </section>
+
+      <section className="nx:flex nx:flex-col nx:gap-3">
+        <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
+          nx:gap-layout-section / nx:gap-layout-stack
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-layout-section nx:max-w-md">
+          <div className="nx:flex nx:flex-col nx:gap-layout-stack">
+            <div className="nx:bg-muted nx:rounded-sm nx:h-6" />
+            <div className="nx:bg-muted nx:rounded-sm nx:h-6" />
+          </div>
+          <div className="nx:flex nx:flex-col nx:gap-layout-stack">
+            <div className="nx:bg-muted nx:rounded-sm nx:h-6" />
+            <div className="nx:bg-muted nx:rounded-sm nx:h-6" />
+          </div>
+        </div>
+      </section>
     </div>
   ),
 };
