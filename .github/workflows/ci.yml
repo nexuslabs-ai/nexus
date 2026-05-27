@@ -272,6 +272,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # Run BEFORE the regen step so the build doesn't run on a broken
+      # mode-file set. Validator is stdlib-only and runs in well under a
+      # second — fail-fast for the cheapest possible signal.
+      - name: Validate spacing mode files
+        run: yarn validate:spacing-modes
+
       - name: Regenerate token outputs (tailwind + modular + colorblind SVG)
         id: regen
         run: |
