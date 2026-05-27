@@ -1,6 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Partial implementation status (post-#119).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. Still pending: `validate-spacing-modes.js` schema validator (#125), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the role-to-component-coupling enforcement (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the validator + lint enforcement which are still ahead.
+> **Partial implementation status (post-#124).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Still pending: `validate-spacing-modes.js` schema validator (#126), `nexus/canonical-spacing-steps` and `nexus/prefer-role-utilities` lint rules (#127), the `audit:figma-parity` wire-up for size category (#128), and the canonical-step-set reconciliation noted under "Open Items" in PR #223. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 
@@ -170,11 +170,26 @@ Load these into context when generating Nexus FE code:
 3. **Role-named utilities take priority over numeric** when a clear role applies. Button padding → `nx:px-control-md`, not `nx:px-2.5`.
 4. **Mode switching is via `data-style="X"` attribute** on the root or a subtree. To make a component appear in compact density, wrap it in `<div data-style="mira">`.
 
-## Schema validation _(planned — #125)_
+## How to add a new mode
+
+A density mode is a complete spacing scale — numeric steps plus the `control` / `container` / `layout` role bundles. Adding one is mechanical once the design decisions are made.
+
+1. **Author the JSON.** Copy `packages/core/tokens/semantic/spacing-vega.json` to `spacing-{mode}.json` and edit values for the new mode's design intent. Do not add or remove keys — every mode file must carry the same key set so the schema validator (once #126 lands) accepts it.
+2. **Register the mode in both `SPACING_MODES` tuples.** The tuple is duplicated, not cross-imported, so both files need the new entry:
+   - `apps/playground/src/hooks/useTheme.ts` — the playground theme switcher source-of-truth.
+   - `packages/react/src/stories/spacing-modes.tsx` — the React-workspace tuple consumed by component story sentinels.
+
+   Storybook's `Style` toolbar picks up the new mode automatically — `packages/react/.storybook/preview.tsx` spreads `[...SPACING_MODES]` into its `globalTypes.style.toolbar.items`.
+
+3. **Validate.** Run `yarn validate:spacing-modes` once that script lands (#126). Until then, the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js` is the indirect gate — `yarn test:unit` (from the repo root) will fail if the new mode emits a different variable name set than Vega.
+4. **Regenerate the emitted CSS.** Run `yarn tokens:tailwind` (per-mode CSS bundle for the `@nexus/tailwind` package) followed by `yarn tokens:modular` (which also runs `sync-playground-themes.js` to keep playground theme files in sync).
+5. **Sanity-check.** Open Storybook, switch to the new mode in the `Style` toolbar, and confirm a few migrated components (Button, Card, Dialog) render the expected per-mode padding.
+
+## Schema validation _(planned — #126)_
 
 CI **will** enforce that all 7 mode files have **identical key sets**. The schema is to be generated from `spacing-vega.json` (the canonical default) and applied to all other modes. A mode file with missing or extra keys will fail the build.
 
-Planned implementation: `scripts/validate-spacing-modes.js` reads the Vega key set and validates the other six against it. Will run in pre-commit hook and CI. Tracked by #125. Until it lands, parity is enforced indirectly by the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js`.
+Planned implementation: `scripts/validate-spacing-modes.js` reads the Vega key set and validates the other six against it. Will run in pre-commit hook and CI. Tracked by #126. Until it lands, parity is enforced indirectly by the cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js`.
 
 ## Lint rules _(planned — #127)_
 
@@ -189,7 +204,7 @@ Both rules are tracked by #127. Until they land, the architecture is enforced th
 
 Components should use specific roles for specific spacing decisions. This table is authoritative; lint rule #2 references it.
 
-> **Status: target state, not current code.** Button / Input / Select / Tabs / Badge currently use numeric `nx:p-N` utilities; #123 is the migration that moves them onto these role tokens. Read this table as the post-#123 contract that `nexus/prefer-role-utilities` (#127) will enforce — not as a description of what's shipped today.
+> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. The table is authoritative for current code; `nexus/prefer-role-utilities` (#127) will mechanically enforce it once that lint rule lands.
 
 | Component                                | Role used for                          | Tokens                                                                             |
 | ---------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -240,7 +255,24 @@ When a new component is authored, the author adds a row to this table.
 
 The Figma side of Nexus mirrors this architecture. Figma Variables for spacing live in mode-specific collections (one per mode), each with the same key set as the JSON mode files. There is no Figma "spacing primitives" collection.
 
-The `audit:figma-parity` script **will** compare each mode's Figma collection against the corresponding `spacing-{mode}.json` file — same intent as the existing color audit, but mode-scoped. The `spacing` category is `Pending` in [`figma.md`](figma.md)'s categories table (tracked under the #117 epic); the audit only supports `--category color` today.
+The `audit:figma-parity` script **will** compare each mode's Figma collection against the corresponding `spacing-{mode}.json` file — same intent as the existing color audit, but mode-scoped. The `spacing` category is `Pending` in [`figma.md`](figma.md)'s categories table (tracked by #128); the audit only supports `--category color` today.
+
+## Migration history
+
+The two-tier per-mode architecture described above landed across the [Spacing tokens · Phase 1](https://github.com/nexuslabs-ai/nexus/milestone/5) milestone. In chronological order (issue numbers unless prefixed with `PR`):
+
+- **#117** — audit existing spacing utilities, finalise the role vocabulary (`control` / `container` / `layout`).
+- **#118** — author the 7 per-mode `semantic/spacing-{mode}.json` files (vega, lyra, maia, mira, nova, luma, sera).
+- **#119** — switch the token build to read per-mode semantic spacing; emit `[data-style="X"]` blocks.
+- **#120** — refactor playground `useTheme` to activate modes via `data-style`; add Luma + Sera to the picker.
+- **#121** — delete the `--nx-size-*` primitive layer (the two-tier shape becomes load-bearing here).
+- **#122** — add the Storybook `style` globalType + decorator so stories can be exercised across every mode.
+- **#123** — migrate Button to role-named utilities (proof point for the role-token migration).
+- **#124** — roll out role-named utilities to the remaining 12 components.
+- **PR #130** — populate this file's role-coupling table with the audit-grounded 14-role version; sync the FE brief.
+- **#230** — add `--control-gap-{sm,md,lg}` per-size gap roles (the `control.gap` token splits from a single value into a size-keyed bundle).
+
+Still ahead on the same milestone: #126 (schema validator), #127 (lint rules), #128 (figma-parity wire-up for size).
 
 ## When to revisit
 

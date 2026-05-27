@@ -53,14 +53,14 @@ Under CI (`CI=true` or `CI=1`), the guard hard-fails if git timestamps are unava
 
 ### Categories
 
-| Category      | Status    | Wired by    | Notes                                                                                                     |
-| ------------- | --------- | ----------- | --------------------------------------------------------------------------------------------------------- |
-| `color`       | Supported | #65         | Single-mode (one `color.json`).                                                                           |
-| `spacing`     | Pending   | (#117 epic) | Multi-mode (`semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json`). No primitive layer — per #119. |
-| `radius`      | Pending   | #61         | Multi-mode (`radius-{blunt,sharp,subtle,...}.json`).                                                      |
-| `borderwidth` | Pending   | #61         | Multi-mode (`borderwidth-{vega,lyra,...}.json`).                                                          |
-| `typography`  | Pending   | #62         | Multi-mode composite tokens.                                                                              |
-| `shadow`      | Pending   | #63         | Multi-mode × theme (`shadow-{mode}-{light,dark}.json`).                                                   |
+| Category      | Status    | Wired by | Notes                                                                                                     |
+| ------------- | --------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `color`       | Supported | #65      | Single-mode (one `color.json`).                                                                           |
+| `spacing`     | Pending   | #128     | Multi-mode (`semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json`). No primitive layer — per #119. |
+| `radius`      | Pending   | #61      | Multi-mode (`radius-{blunt,sharp,subtle,...}.json`).                                                      |
+| `borderwidth` | Pending   | #61      | Multi-mode (`borderwidth-{vega,lyra,...}.json`).                                                          |
+| `typography`  | Pending   | #62      | Multi-mode composite tokens.                                                                              |
+| `shadow`      | Pending   | #63      | Multi-mode × theme (`shadow-{mode}-{light,dark}.json`).                                                   |
 
 This table is the single source of truth for the audit's category coverage. The script no longer carries a parallel `PENDING_CATEGORIES` map — running `--category spacing` today fails with an unknown-category error pointing readers back here.
 
