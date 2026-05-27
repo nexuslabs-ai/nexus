@@ -3,6 +3,8 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+
 import { Button } from './button';
 import {
   DropdownMenu,
@@ -467,6 +469,97 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          "Each row scopes `data-style` locally on the trigger wrapper. Menu items (`DropdownMenuItem` / `DropdownMenuCheckboxItem` / `DropdownMenuRadioItem` / `DropdownMenuSubTrigger` / `DropdownMenuLabel`) all migrate `py-1.5` → `py-control-sm` so vertical density couples to mode. `px-2` stays numeric because menu rows are intentionally tighter than control rows (see `spacing-tokens.md` menu-item note). `DropdownMenuContent` portals to `document.body`, so opened items pick up the document-level mode — not the row's wrapper mode. Triggers (Buttons) respond to the wrapper.",
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">{mode} menu</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Item</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const ItemPaddingResolvesRoleUtility: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          "Regression sentinel — verifies opened `DropdownMenuItem` resolves `py-control-sm` to vega's 6px. Because the content portals to `document.body`, this asserts the runtime resolution rather than the wrapper cascade (a `toHaveClass` check would survive a `cn()` override and miss the real regression — `getComputedStyle` catches it). Closes the menu in `finally` to avoid leaking the open portal into subsequent stories.",
+      },
+    },
+  },
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Open Menu</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Open Menu' });
+
+    try {
+      await userEvent.click(trigger);
+
+      const item = await waitFor(() => {
+        const el = document.querySelector<HTMLElement>(
+          '[data-slot="dropdown-menu-item"]'
+        );
+        if (!el) throw new Error('dropdown item not visible yet');
+        return el;
+      });
+
+      const styles = getComputedStyle(item);
+      // vega: --nx-control-padding-y-sm = 6px
+      expect(styles.paddingTop).toBe('6px');
+      expect(styles.paddingBottom).toBe('6px');
+    } finally {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slot="dropdown-menu-item"]')
+        ).toBeNull();
+      });
+    }
   },
 };
 

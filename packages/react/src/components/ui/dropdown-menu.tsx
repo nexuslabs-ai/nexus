@@ -91,7 +91,7 @@ function DropdownMenuSubTrigger({
       data-inset={inset}
       className={cn(
         'nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2',
-        'nx:rounded-sm nx:px-2 nx:py-1.5 nx:text-sm nx:outline-none',
+        'nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none',
         'nx:focus:bg-background-hover',
         'nx:data-[state=open]:bg-background-hover',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
@@ -198,7 +198,7 @@ function DropdownMenuContent({
 }
 
 const dropdownMenuItemVariants = cva(
-  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:text-sm nx:outline-none nx:transition-colors nx:focus:bg-background-hover nx:focus:text-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none nx:transition-colors nx:focus:bg-background-hover nx:focus:text-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -293,7 +293,7 @@ function DropdownMenuCheckboxItem({
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
-        'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
+        'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-background-hover nx:focus:text-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
@@ -344,7 +344,7 @@ function DropdownMenuRadioItem({
       data-slot="dropdown-menu-radio-item"
       className={cn(
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
-        'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
+        'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-background-hover nx:focus:text-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
@@ -397,7 +397,7 @@ function DropdownMenuLabel({
       data-slot="dropdown-menu-label"
       data-inset={inset}
       className={cn(
-        'nx:px-2 nx:py-1.5 nx:text-sm nx:font-semibold',
+        'nx:px-2 nx:py-control-sm nx:text-sm nx:font-semibold',
         inset && 'nx:pl-8',
         className
       )}
