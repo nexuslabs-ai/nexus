@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+import { expectHeightPinnedAcrossModes } from '../../stories/test-utils';
+
 import {
   Accordion,
   AccordionContent,
@@ -492,6 +495,91 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
+};
+
+// ============================================
+// MODE BEHAVIOUR (density stability)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Accordion is intentionally density-stable. `AccordionTrigger` `py-4` (16px) sits above `--control-padding-y-lg` (12px in vega) — an accordion row is item-tier, not a control and not a container, with its own document-section rhythm distinct from buttons or popovers (see `spacing-tokens.md` Accordion note). All 7 rows render at the same trigger height regardless of mode. The `AccordionTriggerIsDensityStable` sentinel below asserts this.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Accordion type="single" collapsible className="nx:w-[260px]">
+            <AccordionItem value="a">
+              <AccordionTrigger>Section · {mode}</AccordionTrigger>
+              <AccordionContent>Content not measured.</AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const AccordionTriggerIsDensityStable: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Density-stability sentinel. AccordionTrigger uses numeric `py-4` only, so every spacing mode renders it at the same canonical 52px height (= `text-sm` line-height 20 + `py-4` 16 × 2). If a future PR migrates `py-4` → `py-control-lg` (or any other role utility), this test fails for nova/sera — the regression signal is that intent (item-tier, mode-stable) has been broken.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="accordion-host-nova">
+        <Accordion type="single" collapsible className="nx:w-[200px]">
+          <AccordionItem value="a">
+            <AccordionTrigger>Nova</AccordionTrigger>
+            <AccordionContent>x</AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+      <div data-style="vega" data-testid="accordion-host-vega">
+        <Accordion type="single" collapsible className="nx:w-[200px]">
+          <AccordionItem value="a">
+            <AccordionTrigger>Vega</AccordionTrigger>
+            <AccordionContent>x</AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+      <div data-style="sera" data-testid="accordion-host-sera">
+        <Accordion type="single" collapsible className="nx:w-[200px]">
+          <AccordionItem value="a">
+            <AccordionTrigger>Sera</AccordionTrigger>
+            <AccordionContent>x</AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinnedAcrossModes(
+      within(canvasElement),
+      ['accordion-host-nova', 'accordion-host-vega', 'accordion-host-sera'],
+      52,
+      '[data-slot="accordion-trigger"]'
+    );
+  },
 };
 
 // ============================================
