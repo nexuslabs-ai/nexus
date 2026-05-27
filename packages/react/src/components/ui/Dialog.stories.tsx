@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { SPACING_MODES } from '../../stories/spacing-modes';
+
 import { Button } from './button';
 import {
   Dialog,
@@ -525,6 +527,108 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
+  },
+};
+
+// ============================================
+// MODE BEHAVIOUR (per-mode spacing variance)
+// ============================================
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          "Each row scopes `data-style` locally on the trigger wrapper. `DialogContent` migrates `p-6` → `p-container` and `gap-4` → `gap-container` (24px / 16px match vega byte-identically). DialogContent portals to `document.body`, so opening the dialog from any row resolves to the document-level mode, not the wrapper's — the triggers (Buttons) respond to the wrapper, but the opened dialog renders at the Style-toolbar mode. The `DialogContentResolvesContainerRole` sentinel below verifies the role utilities resolve to the right pixel values at runtime.",
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:gap-2 nx:items-center"
+        >
+          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
+            {mode}
+          </span>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Open ({mode})</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Dialog in {mode}</DialogTitle>
+                <DialogDescription>
+                  Padding renders at document-level mode regardless of row.
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const DialogContentResolvesContainerRole: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          "Regression sentinel — verifies opened `DialogContent` resolves `p-container` to vega's 24px and `gap-container` to vega's 16px. Because content portals to `document.body`, this asserts runtime resolution rather than wrapper cascade (a `toHaveClass` check would survive a `cn()` override and miss the real regression — `getComputedStyle` catches it). Closes the dialog in `finally` via Escape so the open portal does not leak into subsequent stories.",
+      },
+    },
+  },
+  render: () => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open Dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Title</DialogTitle>
+          <DialogDescription>Description</DialogDescription>
+        </DialogHeader>
+        <p>Body row</p>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Open Dialog' });
+
+    try {
+      await userEvent.click(trigger);
+
+      const content = await waitFor(() => {
+        const el = document.querySelector<HTMLElement>(
+          '[data-slot="dialog-content"]'
+        );
+        if (!el) throw new Error('dialog content not visible yet');
+        return el;
+      });
+
+      const styles = getComputedStyle(content);
+      // vega: --nx-container-p = 24px, --nx-container-gap = 16px
+      expect(styles.paddingTop).toBe('24px');
+      expect(styles.paddingRight).toBe('24px');
+      expect(styles.paddingBottom).toBe('24px');
+      expect(styles.paddingLeft).toBe('24px');
+      expect(styles.gap).toBe('16px');
+    } finally {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slot="dialog-content"]')
+        ).toBeNull();
+      });
+    }
   },
 };
 
