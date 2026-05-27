@@ -257,6 +257,23 @@ The Figma side of Nexus mirrors this architecture. Figma Variables for spacing l
 
 The `audit:figma-parity` script **will** compare each mode's Figma collection against the corresponding `spacing-{mode}.json` file — same intent as the existing color audit, but mode-scoped. The `spacing` category is `Pending` in [`figma.md`](figma.md)'s categories table (tracked under the #117 epic); the audit only supports `--category color` today.
 
+## Migration history
+
+The two-tier per-mode architecture described above landed across the [Spacing tokens · Phase 1](https://github.com/nexuslabs-ai/nexus/milestone/5) milestone. In chronological order:
+
+- **#117** — audit existing spacing utilities, finalise the role vocabulary (`control` / `container` / `layout`).
+- **#118** — author the 7 per-mode `semantic/spacing-{mode}.json` files (vega, lyra, maia, mira, nova, luma, sera).
+- **#119** — switch the token build to read per-mode semantic spacing; emit `[data-style="X"]` blocks.
+- **#120** — refactor playground `useTheme` to activate modes via `data-style`; add Luma + Sera to the picker.
+- **#121** — delete the `--nx-size-*` primitive layer (the two-tier shape becomes load-bearing here).
+- **#122** — add the Storybook `style` globalType + decorator so stories can be exercised across every mode.
+- **#123** — migrate Button to role-named utilities (proof point for the role-token migration).
+- **#124** — roll out role-named utilities to the remaining 12 components.
+- **PR #130** — populate this file's role-coupling table with the audit-grounded 14-role version; sync the FE brief.
+- **#230** — add `--control-gap-{sm,md,lg}` per-size gap roles (the `control.gap` token splits from a single value into a size-keyed bundle).
+
+Still ahead on the same milestone: #126 (schema validator), #127 (lint rules), #128 (figma-parity wire-up for size).
+
 ## When to revisit
 
 Architectural decisions are not load-bearing forever. The conditions under which this design would need to be revisited:
