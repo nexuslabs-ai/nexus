@@ -1,12 +1,22 @@
 import { type ClassValue, clsx } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
-/**
- * Create a tailwind-merge instance configured for nx: prefix
- * This ensures proper class merging for Nexus prefixed utilities
- */
+/** Tailwind-merge configured with `nx:` prefix and Nexus role-utility class groups. */
 const twMerge = extendTailwindMerge({
   prefix: 'nx',
+  extend: {
+    classGroups: {
+      px: ['px-control-sm', 'px-control-md', 'px-control-lg'],
+      py: ['py-control-sm', 'py-control-md', 'py-control-lg'],
+      gap: [
+        'gap-control',
+        'gap-container',
+        'gap-layout-section',
+        'gap-layout-stack',
+      ],
+      p: ['p-container'],
+    },
+  },
 });
 
 /**

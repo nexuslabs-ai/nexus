@@ -23,9 +23,9 @@ const buttonVariants = cva(
         link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline',
       },
       size: {
-        default: 'nx:px-4 nx:py-2',
-        sm: 'nx:px-3 nx:py-1.5 nx:text-xs',
-        lg: 'nx:px-8 nx:py-3',
+        default: 'nx:px-control-md nx:py-control-md',
+        sm: 'nx:px-control-sm nx:py-control-sm nx:text-xs',
+        lg: 'nx:px-control-lg nx:py-control-lg',
         icon: 'nx:p-2.5',
       },
     },
