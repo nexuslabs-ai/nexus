@@ -1,13 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
-/**
- * Tailwind-merge with `nx:` prefix + Nexus role-utility groups (custom
- * `@utility` blocks in `packages/tailwind/spacing-utilities.css`). Registering
- * the role utilities in their natural Tailwind groups makes consumer overrides
- * deconflict — e.g. `<Button className="nx:px-6">` correctly replaces
- * `nx:px-control-md` rather than shipping both.
- */
+/** Tailwind-merge configured with `nx:` prefix and Nexus role-utility class groups. */
 const twMerge = extendTailwindMerge({
   prefix: 'nx',
   extend: {
