@@ -7,7 +7,7 @@ import { IconLoader2 } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:gap-2 nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -23,9 +23,9 @@ const buttonVariants = cva(
         link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline',
       },
       size: {
-        default: 'nx:px-control-md nx:py-control-md',
-        sm: 'nx:px-control-sm nx:py-control-sm nx:text-xs',
-        lg: 'nx:px-control-lg nx:py-control-lg',
+        default: 'nx:px-control-md nx:py-control-md nx:gap-control-md',
+        sm: 'nx:px-control-sm nx:py-control-sm nx:gap-control-sm nx:text-xs',
+        lg: 'nx:px-control-lg nx:py-control-lg nx:gap-control-lg',
         icon: 'nx:p-2.5',
       },
     },

@@ -9,7 +9,9 @@ const twMerge = extendTailwindMerge({
       px: ['px-control-sm', 'px-control-md', 'px-control-lg'],
       py: ['py-control-sm', 'py-control-md', 'py-control-lg'],
       gap: [
-        'gap-control',
+        'gap-control-sm',
+        'gap-control-md',
+        'gap-control-lg',
         'gap-container',
         'gap-layout-section',
         'gap-layout-stack',
