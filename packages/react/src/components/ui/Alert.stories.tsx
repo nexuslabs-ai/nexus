@@ -7,7 +7,11 @@ import {
 } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectModeCascadeWorks,
@@ -294,29 +298,22 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-3 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid className="nx:gap-3">
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Alert className="nx:w-[360px]">
             <AlertTitle>Heads up · {mode}</AlertTitle>
             <AlertDescription>
               Padding does not move with mode.
             </AlertDescription>
           </Alert>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
-export const AlertModesProduceDifferentHeights: Story = {
+export const ModesProduceDifferentHeights: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -328,12 +325,12 @@ export const AlertModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="mode-host-nova">
+      <div data-style="nova" data-testid="alert-mode-host-nova">
         <Alert className="nx:w-[200px]">
           <div className="nx:h-10" aria-hidden="true" />
         </Alert>
       </div>
-      <div data-style="maia" data-testid="mode-host-maia">
+      <div data-style="maia" data-testid="alert-mode-host-maia">
         <Alert className="nx:w-[200px]">
           <div className="nx:h-10" aria-hidden="true" />
         </Alert>
@@ -343,14 +340,14 @@ export const AlertModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-nova',
-      'mode-host-maia',
+      'alert-mode-host-nova',
+      'alert-mode-host-maia',
       '[data-slot="alert"]'
     );
   },
 };
 
-export const AlertVegaHeightPinned: Story = {
+export const VegaHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -363,7 +360,7 @@ export const AlertVegaHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="alert-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Alert className="nx:w-[200px]">
@@ -374,7 +371,7 @@ export const AlertVegaHeightPinned: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightPinned(
       within(canvasElement),
-      'vega-host',
+      'alert-vega-host',
       74,
       '[data-slot="alert"]'
     );

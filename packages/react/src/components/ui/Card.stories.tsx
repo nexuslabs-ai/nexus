@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectModeCascadeWorks,
@@ -442,25 +446,18 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Card className="nx:w-[240px]">
             <CardHeader>
               <CardTitle>Title</CardTitle>
               <CardDescription>Description in {mode}</CardDescription>
             </CardHeader>
           </Card>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
@@ -476,14 +473,14 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="mode-host-nova">
+      <div data-style="nova" data-testid="card-mode-host-nova">
         <Card className="nx:w-[160px]">
           <CardContent>
             <div className="nx:h-10" aria-hidden="true" />
           </CardContent>
         </Card>
       </div>
-      <div data-style="luma" data-testid="mode-host-luma">
+      <div data-style="luma" data-testid="card-mode-host-luma">
         <Card className="nx:w-[160px]">
           <CardContent>
             <div className="nx:h-10" aria-hidden="true" />
@@ -495,8 +492,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-nova',
-      'mode-host-luma',
+      'card-mode-host-nova',
+      'card-mode-host-luma',
       '[data-slot="card"]'
     );
   },
@@ -515,7 +512,7 @@ export const VegaDefaultHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="card-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Card className="nx:w-[200px]">
@@ -528,7 +525,7 @@ export const VegaDefaultHeightPinned: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightPinned(
       within(canvasElement),
-      'vega-host',
+      'card-vega-host',
       66,
       '[data-slot="card"]'
     );

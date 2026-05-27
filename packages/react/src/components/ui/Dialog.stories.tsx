@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 
 import { Button } from './button';
 import {
@@ -545,16 +549,9 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">Open ({mode})</Button>
@@ -568,9 +565,9 @@ export const AllModes: Story = {
               </DialogHeader>
             </DialogContent>
           </Dialog>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
@@ -615,12 +612,12 @@ export const DialogContentResolvesContainerRole: Story = {
       });
 
       const styles = getComputedStyle(content);
-      // vega: --nx-container-p = 24px, --nx-container-gap = 16px
       expect(styles.paddingTop).toBe('24px');
       expect(styles.paddingRight).toBe('24px');
       expect(styles.paddingBottom).toBe('24px');
       expect(styles.paddingLeft).toBe('24px');
-      expect(styles.gap).toBe('16px');
+      expect(styles.rowGap).toBe('16px');
+      expect(styles.columnGap).toBe('16px');
     } finally {
       await userEvent.keyboard('{Escape}');
       await waitFor(() => {

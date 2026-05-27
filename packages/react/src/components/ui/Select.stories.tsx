@@ -638,7 +638,7 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="maia" data-testid="mode-host-maia">
+      <div data-style="maia" data-testid="select-mode-host-maia">
         <Select>
           <SelectTrigger aria-label="maia select" className="nx:w-[160px]">
             <SelectValue placeholder="Pick" />
@@ -648,7 +648,7 @@ export const ModesProduceDifferentHeights: Story = {
           </SelectContent>
         </Select>
       </div>
-      <div data-style="sera" data-testid="mode-host-sera">
+      <div data-style="sera" data-testid="select-mode-host-sera">
         <Select>
           <SelectTrigger aria-label="sera select" className="nx:w-[160px]">
             <SelectValue placeholder="Pick" />
@@ -663,8 +663,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-maia',
-      'mode-host-sera'
+      'select-mode-host-maia',
+      'select-mode-host-sera'
     );
   },
 };
@@ -682,7 +682,7 @@ export const VegaDefaultHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="select-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Select>
@@ -696,7 +696,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'vega-host', 38);
+    await expectHeightPinned(within(canvasElement), 'select-vega-host', 38);
   },
 };
 

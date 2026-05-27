@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectModeCascadeWorks,
@@ -499,22 +503,15 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Button>Default</Button>
           <Button size="sm">Sm</Button>
           <Button size="lg">Lg</Button>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
@@ -530,10 +527,10 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="mode-host-nova">
+      <div data-style="nova" data-testid="button-mode-host-nova">
         <Button>btn</Button>
       </div>
-      <div data-style="sera" data-testid="mode-host-sera">
+      <div data-style="sera" data-testid="button-mode-host-sera">
         <Button>btn</Button>
       </div>
     </div>
@@ -541,8 +538,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-nova',
-      'mode-host-sera'
+      'button-mode-host-nova',
+      'button-mode-host-sera'
     );
   },
 };
@@ -560,14 +557,14 @@ export const VegaDefaultHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="button-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Button>Default</Button>
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'vega-host', 36);
+    await expectHeightPinned(within(canvasElement), 'button-vega-host', 36);
   },
 };
 

@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../stories/spacing-modes';
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../stories/spacing-modes';
 import {
   expectHeightPinned,
   expectModeCascadeWorks,
@@ -515,25 +519,18 @@ export const AllModes: Story = {
     },
   },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
+    <AllModesGrid>
       {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
+        <AllModesRow key={mode} mode={mode}>
           <Accordion type="single" collapsible className="nx:w-[260px]">
             <AccordionItem value="a">
               <AccordionTrigger>Section · {mode}</AccordionTrigger>
               <AccordionContent>Content not measured.</AccordionContent>
             </AccordionItem>
           </Accordion>
-        </div>
+        </AllModesRow>
       ))}
-    </div>
+    </AllModesGrid>
   ),
 };
 
@@ -549,7 +546,7 @@ export const AccordionTriggerModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="mode-host-nova">
+      <div data-style="nova" data-testid="accordion-mode-host-nova">
         <Accordion type="single" collapsible className="nx:w-[200px]">
           <AccordionItem value="a">
             <AccordionTrigger>Nova</AccordionTrigger>
@@ -557,7 +554,7 @@ export const AccordionTriggerModesProduceDifferentHeights: Story = {
           </AccordionItem>
         </Accordion>
       </div>
-      <div data-style="maia" data-testid="mode-host-maia">
+      <div data-style="maia" data-testid="accordion-mode-host-maia">
         <Accordion type="single" collapsible className="nx:w-[200px]">
           <AccordionItem value="a">
             <AccordionTrigger>Maia</AccordionTrigger>
@@ -570,8 +567,8 @@ export const AccordionTriggerModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-nova',
-      'mode-host-maia',
+      'accordion-mode-host-nova',
+      'accordion-mode-host-maia',
       '[data-slot="accordion-trigger"]'
     );
   },
@@ -590,7 +587,7 @@ export const AccordionTriggerVegaHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="accordion-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Accordion type="single" collapsible className="nx:w-[200px]">
@@ -604,7 +601,7 @@ export const AccordionTriggerVegaHeightPinned: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightPinned(
       within(canvasElement),
-      'vega-host',
+      'accordion-vega-host',
       52,
       '[data-slot="accordion-trigger"]'
     );

@@ -659,14 +659,14 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="mode-host-nova">
+      <div data-style="nova" data-testid="tabs-mode-host-nova">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger value="a">Tab</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
-      <div data-style="maia" data-testid="mode-host-maia">
+      <div data-style="maia" data-testid="tabs-mode-host-maia">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger value="a">Tab</TabsTrigger>
@@ -678,8 +678,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'mode-host-nova',
-      'mode-host-maia'
+      'tabs-mode-host-nova',
+      'tabs-mode-host-maia'
     );
   },
 };
@@ -697,7 +697,7 @@ export const VegaDefaultHeightPinned: Story = {
   render: () => (
     <div
       data-style="vega"
-      data-testid="vega-host"
+      data-testid="tabs-vega-host"
       className="nx:p-10 nx:bg-background"
     >
       <Tabs defaultValue="a">
@@ -708,7 +708,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'vega-host', 34);
+    await expectHeightPinned(within(canvasElement), 'tabs-vega-host', 34);
   },
 };
 
