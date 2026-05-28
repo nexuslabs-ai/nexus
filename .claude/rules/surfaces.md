@@ -12,7 +12,7 @@
 | 4     | `container`      | `{white}`   | `{p.800}`  | Raised surfaces (cards, dialog bodies).                                |
 | 5     | `popover`        | `{white}`   | `{p.700}`  | Floating overlays (menus, tooltips, dropdowns).                        |
 
-`{p.X}` = palette ref (`slate` / `neutral` / `gray` / `stone` / `zinc`).
+`{p.X}` = palette ref (`slate` / `neutral` / `gray` / `stone` / `zinc`). The value columns here and in the nav table below mirror `base-{palette}-{light,dark}.json` (canonical) — they make the luminance grammar the rules encode concrete; they are not a second source of truth, so sync from the JSON if they ever disagree.
 
 ## Rules
 

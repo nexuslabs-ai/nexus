@@ -1,146 +1,38 @@
 # Spacing Token Architecture Rules
 
-> **Partial implementation status (post-#127).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Schema validation (cross-mode key-set parity) ships via `validate-spacing-modes.js` (#126), and the two custom ESLint rules `@nexus/canonical-spacing-steps` and `@nexus/prefer-role-utilities` ship in `packages/eslint-plugin-nexus/` (#127). Both are gated at `error` severity by `yarn lint` in CI and on pre-commit via lint-staged. Still pending: the canonical-step-set reconciliation noted under "Open Items" in PR #223 — the rule currently accepts the union of every px value shipped across all 7 mode files (~80 values), wider than the documented 30-step set. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
+> **Partial implementation status (post-#127).** The build pipeline reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table reflects shipped code as of #123/#124. Schema validation ships via `validate-spacing-modes.js` (#126); the ESLint rules `@nexus/canonical-spacing-steps` and `@nexus/prefer-role-utilities` ship in `packages/eslint-plugin-nexus/` (#127), both gated at `error`. Still pending: the canonical-step-set reconciliation under PR #223's "Open Items" — the rule currently accepts the union of every px value shipped across the 7 mode files (~80 values), wider than the aspirational 30-step set.
 
-> Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
+> Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow.
 
 ## TL;DR
 
-Spacing in Nexus is a **two-tier** system, not the three-tier (primitive → semantic → component) model used elsewhere in the project. Each mode (`vega`, `nova`, `maia`, `lyra`, `mira`, `luma`, `sera`) owns its own self-contained file with **direct px values** for both numeric tokens and role-named tokens.
-
-There is no `--nx-size-*` primitive layer. Mode files do not reference primitives. Mode files reference px values directly.
+Spacing in Nexus is a **two-tier** system, not the three-tier (primitive → semantic → component) model used elsewhere. Each mode (`vega`, `nova`, `maia`, `lyra`, `mira`, `luma`, `sera`) owns a self-contained file with **direct px values** for both numeric and role-named tokens. There is no `--nx-size-*` primitive layer; mode files reference px directly, not primitives.
 
 ## Why this differs from typography / color
 
-Typography, color, radius, and shadow follow the canonical three-tier model:
+Typography, color, radius, and shadow follow the canonical three-tier model (`--nx-color-blue-500` → `--color-primary-background` → `nx:bg-primary-background`). Spacing was originally on this model too — `--nx-size-*` primitives feeding `--spacing-*` aliases. **The model was abandoned for spacing** because:
 
-```
-primitive  →  semantic alias  →  component utility
---nx-color-blue-500  →  --color-primary-background  →  nx:bg-primary-background
-```
-
-Spacing was originally on this model too — `--nx-size-*` primitives feeding `--spacing-*` semantic aliases. **The model was abandoned for spacing** because:
-
-1. **Cross-mode coupling.** Editing `--nx-size-9` to tune one mode broke every other mode that referenced it. The "additive primitive" workaround (only ever add new primitive values, never edit) added cognitive overhead without earning its place.
-2. **Number mismatch confusion.** Under any per-mode remap (e.g., Lyra's `--spacing-4` pointing to `--nx-size-3`), the utility name `nx:p-4` no longer reflects its intuitive numeric value. The indirection made code harder to read, not easier.
+1. **Cross-mode coupling.** Editing `--nx-size-9` to tune one mode broke every other mode referencing it. The "additive primitive" workaround (only add, never edit) added cognitive overhead without earning its place.
+2. **Number mismatch confusion.** Under a per-mode remap (e.g. Lyra's `--spacing-4` → `--nx-size-3`), the utility name `nx:p-4` no longer reflects its intuitive value. The indirection made code harder to read, not easier.
 3. **Authoring friction.** Mode authors had to think about which primitive to point to rather than just writing the desired value. The primitive layer became a gate, not an aid.
 
-Spacing has more granular variance per mode than the other axes (every component's padding/height/gap shifts when density changes), so the coupling penalty hit harder. Typography has fewer roles and is more stable across modes — primitives still earn their keep there.
+Spacing has more granular variance per mode than the other axes (every component's padding/height/gap shifts with density), so the coupling penalty hit harder. Typography has fewer roles and is more stable across modes — primitives still earn their keep there.
 
 ## The architecture
 
-### File structure
-
-```
-packages/core/tokens/semantic/
-├── spacing-vega.json     # Default mode
-├── spacing-nova.json
-├── spacing-maia.json
-├── spacing-lyra.json
-├── spacing-mira.json
-├── spacing-luma.json
-└── spacing-sera.json
-```
-
-No `packages/core/tokens/primitives/size/` directory. No `size.json`. Spacing primitives do not exist.
-
-### What each mode file contains
-
-Every mode file MUST contain the same set of keys — enforced by JSON schema validation in CI. Each key has a direct px value (or rem where the design system explicitly chose rem).
-
-```json
-{
-  "spacing": {
-    "0": { "$value": { "value": 0, "unit": "px" }, "$type": "dimension" },
-    "0_5": { "$value": { "value": 2, "unit": "px" }, "$type": "dimension" },
-    "1": { "$value": { "value": 4, "unit": "px" }, "$type": "dimension" },
-    "1_5": { "$value": { "value": 6, "unit": "px" }, "$type": "dimension" },
-    "2": { "$value": { "value": 8, "unit": "px" }, "$type": "dimension" },
-    "...": "...",
-    "96": { "$value": { "value": 384, "unit": "px" }, "$type": "dimension" }
-  },
-  "control": {
-    "padding-x": {
-      "sm": { "$value": { "value": 12, "unit": "px" }, "$type": "dimension" },
-      "md": { "$value": { "value": 16, "unit": "px" }, "$type": "dimension" },
-      "lg": { "$value": { "value": 32, "unit": "px" }, "$type": "dimension" }
-    },
-    "padding-y": {
-      "sm": { "$value": { "value": 6, "unit": "px" }, "$type": "dimension" },
-      "md": { "$value": { "value": 8, "unit": "px" }, "$type": "dimension" },
-      "lg": { "$value": { "value": 12, "unit": "px" }, "$type": "dimension" }
-    },
-    "gap": {
-      "sm": { "$value": { "value": 6, "unit": "px" }, "$type": "dimension" },
-      "md": { "$value": { "value": 8, "unit": "px" }, "$type": "dimension" },
-      "lg": { "$value": { "value": 10, "unit": "px" }, "$type": "dimension" }
-    }
-  },
-  "container": {
-    "p": { "$value": { "value": 24, "unit": "px" }, "$type": "dimension" },
-    "gap": { "$value": { "value": 16, "unit": "px" }, "$type": "dimension" }
-  },
-  "layout": {
-    "section-gap": {
-      "$value": { "value": 32, "unit": "px" },
-      "$type": "dimension"
-    },
-    "stack-gap": {
-      "$value": { "value": 8, "unit": "px" },
-      "$type": "dimension"
-    }
-  }
-}
-```
-
-Top-level keys are `spacing` (numeric scale), `control`, `container`, `layout` — flat siblings, no enclosing wrapper. `$value` is a DTCG `{ value, unit }` dimension object.
+No `--nx-size-*` primitive layer exists. Each mode owns a self-contained `semantic/spacing-{mode}.json` with direct px values under four flat top-level keys — `spacing` (the numeric scale), `control`, `container`, `layout` (`$value` is a DTCG `{ value, unit }` dimension). Every mode file MUST carry the **same key set** (schema-enforced — see § Schema validation). The build emits one `[data-style="X"]` CSS block per mode in a single bundle; mode swap is changing the `data-style` attribute on `<html>` (or any subtree) at runtime — the CSS-variable cascade handles the rest, no rebuild.
 
 > **Placeholder values for `control.gap.{sm,md,lg}`.** The `md` value of each mode is the pre-#230 single `control.gap` value; `sm` and `lg` are seeded with the formula `sm = md − 2`, `lg = md + 2`, snapped to the canonical step set. These are placeholders pending designer tuning — the formula encodes intent (a single density step away from `md` in either direction), not a final design call. Retuning per-mode is fine and expected; the schema only requires the three keys to exist with canonical values.
-
-### Emitted CSS
-
-The build emits one CSS block per mode, all in a single bundle:
-
-```css
-:root,
-[data-style='vega'] {
-  --nx-spacing-0: 0px;
-  --nx-spacing-1: 4px;
-  --nx-spacing-2: 8px;
-  /* ... */
-  --nx-control-padding-x-md: 16px;
-  --nx-control-padding-y-md: 8px;
-  /* ... */
-}
-
-[data-style='nova'] {
-  --nx-spacing-3: 10px;
-  /* ... */
-  --nx-control-padding-x-md: 12px;
-  --nx-control-padding-y-md: 6px;
-  /* ... */
-}
-```
-
-Mode swap = change the `data-style` attribute on `<html>` (or any subtree). CSS variable cascade handles the rest. No rebuild.
 
 ### The `data-style` attribute carries spacing density only
 
 `data-style` is the spacing-density attribute. It carries one value at a time (`vega`, `lyra`, `maia`, `mira`, `nova`, `luma`, `sera`) and resolves only the `--nx-spacing-*` / `--nx-control-*` / `--nx-container-*` / `--nx-layout-*` overrides.
 
-If a future per-mode semantic category lands (per-mode color shading, per-mode shadow, etc.), it ships its **own** attribute name (e.g., `data-shadow-mode`, `data-color-density`). `data-style` does not multiplex — the contract is one attribute per per-mode axis, so consumers can compose densities independently (`<div data-style="mira" data-shadow-mode="vega">`) without one attribute meaning two things.
+If a future per-mode semantic category lands (per-mode color shading, per-mode shadow, etc.), it ships its **own** attribute name (e.g. `data-shadow-mode`, `data-color-density`). `data-style` does not multiplex — the contract is one attribute per per-mode axis, so consumers can compose densities independently (`<div data-style="mira" data-shadow-mode="vega">`) without one attribute meaning two things.
 
 ## The canonical step set
 
-Without primitives, the scale must live as a project rule. **All numeric spacing values used in any mode file MUST be drawn from this set:**
-
-```
-0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48, 56, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 320, 384
-```
-
-These are the px values the design system has chosen as its scale. Any value outside this set (e.g., `5px`, `11px`, `17px`) is forbidden in mode files. The set is large enough to express any mode's needs across density variants while small enough to keep visual rhythm consistent.
-
-**Half-step values (1px, 3px, 5px) are not in the canonical set** by design. If a mode needs an odd-pixel value, this is a signal to revisit the mode's design intent rather than introduce off-grid values.
+Without primitives, the scale lives as a project rule: every numeric spacing value in any mode file must be drawn from the canonical step set, which lives in `packages/eslint-plugin-nexus/src/canonical-step-set.json` and is lint-enforced. Values outside it (`5px`, `11px`, `17px`) are forbidden. **Half-steps (1px, 3px, 5px) are excluded by design** — if a mode needs an odd-pixel value, that's a signal to revisit the design intent, not to add an off-grid value. If a design genuinely needs a value the set lacks, propose a change to the set itself rather than a one-off.
 
 ## Authoring rules
 
@@ -157,62 +49,26 @@ These are the px values the design system has chosen as its scale. Any value out
 - **Use numeric utilities (`nx:p-2`, `nx:gap-4`, `nx:h-9`)** for layout-level and ad-hoc spacing inside components. They shift with mode automatically.
 - **Use role-named utilities (`nx:px-control-md`, `nx:py-control-md`, `nx:gap-control-md`, `nx:p-container`, `nx:gap-layout-section`)** for component-internal spacing that has a clear semantic role. Control utilities carry an explicit size suffix (`-sm`, `-md`, `-lg`); container/layout utilities have no size suffix.
 - **Mix freely.** A Button uses `nx:px-control-md nx:py-control-md nx:gap-control-md` for its internal semantic spacing at md; a toolbar wrapping multiple Buttons reaches for `nx:gap-2` to space them apart — role tokens express component-internal intent, numeric utilities space components in context.
-- **No `control-h` token.** Control heights are intrinsic — they emerge from `py-control-{size}` + the control's content (text line-height or icon size). The earlier `--control-h-*` axis was over-specified (both `h` and `py` set together meant the visual padding eaten by content overflow didn't match the designer's `py` value). Cross-control alignment is achieved by Button / Input / Select / Tabs / Badge sharing the same `py-control-{size}` and same text-size body.
+- **No `control-h` token.** Control heights are intrinsic — they emerge from `py-control-{size}` + the control's content (text line-height or icon size). The earlier `--control-h-*` axis was over-specified (setting both `h` and `py` meant the visual padding eaten by content overflow didn't match the designer's `py` value). Cross-control alignment is achieved by Button / Input / Select / Tabs / Badge sharing the same `py-control-{size}` and same text-size body.
 - ❌ Don't write raw px values (`style={{ padding: '10px' }}`). Always go through a token.
 - ❌ Don't use `nx:p-[5px]` arbitrary-value escape hatches. If the canonical set doesn't have what you need, propose the change to the set.
 
-### For LLMs / agents generating component code
-
-Load these into context when generating Nexus FE code:
-
-1. **The `nx:` prefix is mandatory.** Vanilla `p-3` does not work — every utility must be prefixed.
-2. **Canonical step set above.** Any spacing value emitted should map to one of these.
-3. **Role-named utilities take priority over numeric** when a clear role applies. Button padding → `nx:px-control-md`, not `nx:px-2.5`.
-4. **Mode switching is via `data-style="X"` attribute** on the root or a subtree. To make a component appear in compact density, wrap it in `<div data-style="mira">`.
-
 ## How to add a new mode
 
-A density mode is a complete spacing scale — numeric steps plus the `control` / `container` / `layout` role bundles. Adding one is mechanical once the design decisions are made.
-
-1. **Author the JSON.** Copy `packages/core/tokens/semantic/spacing-vega.json` to `spacing-{mode}.json` and edit values for the new mode's design intent. Do not add or remove keys — every mode file must carry the same key set so the schema validator accepts it.
-2. **Register the mode in both `SPACING_MODES` tuples.** The tuple is duplicated, not cross-imported, so both files need the new entry:
-   - `apps/playground/src/hooks/useTheme.ts` — the playground theme switcher source-of-truth.
-   - `packages/react/src/stories/spacing-modes.tsx` — the React-workspace tuple consumed by component story sentinels.
-
-   Storybook's `Style` toolbar picks up the new mode automatically — `packages/react/.storybook/preview.tsx` spreads `[...SPACING_MODES]` into its `globalTypes.style.toolbar.items`.
-
-3. **Validate.** Run `yarn validate:spacing-modes` to confirm the new mode file shares the same key set as the others; the script reports any missing or extra paths and exits non-zero on drift. The cross-mode CSS-variable-name parity assertion in `generate-tailwind-package.test.js` is a second-tier check — `yarn test:unit` catches the same shape of drift after regen.
-4. **Regenerate the emitted CSS.** Run `yarn tokens:tailwind` (per-mode CSS bundle for the `@nexus/tailwind` package) followed by `yarn tokens:modular` (which also runs `sync-playground-themes.js` to keep playground theme files in sync).
-5. **Sanity-check.** Open Storybook, switch to the new mode in the `Style` toolbar, and confirm a few migrated components (Button, Card, Dialog) render the expected per-mode padding.
+Mechanical once the design values are decided: author `spacing-{mode}.json` (copy an existing mode, keep the exact key set), then **register the mode in both `SPACING_MODES` tuples** — `apps/playground/src/hooks/useTheme.ts` and `packages/react/src/stories/spacing-modes.tsx` are duplicated, not cross-imported, so both need the entry (Storybook's `Style` toolbar then picks it up automatically). Run `yarn validate:spacing-modes` (key-set parity), then `yarn tokens:tailwind` + `yarn tokens:modular` to regenerate.
 
 ## Schema validation
 
-CI enforces that all 7 mode files have **identical key sets** via `packages/core/scripts/validate-spacing-modes.js`. The script reads the Vega key set as the canonical baseline and validates the other six against it; a mode file with missing or extra leaf paths fails the build with the offending paths reported on stderr.
-
-A "leaf path" is determined by the DTCG token contract: a node carrying both `$value` and `$type` is a leaf, and its dotted path enters the key set. Sibling keys starting with `$` (e.g. `$meta`, `$description`) are skipped. A typo like `value:` (no `$`) won't slip through — the walker keeps descending past that branch and contributes nothing, so the parity check still catches the missing token.
-
-The validator runs in two places:
-
-- **Pre-commit** — when any `packages/core/tokens/semantic/spacing-*.json` is staged, lint-staged fires `yarn validate:spacing-modes` ahead of the commit.
-- **CI** — the `audit-tokens` job runs it before token regeneration, so a broken mode-file set fails fast without burning time on downstream audits.
-
-Exit codes: `0` (match), `1` (drift), `2` (config error — missing baseline, unknown mode file, malformed JSON). Pure-function diffing logic (`leafPathsOf`, `diffKeySets`, `validateModes`, `formatFindings`) is unit-tested in `packages/core/scripts/__tests__/validate-spacing-modes.test.js`; the real-files smoke test in `spacing-modes.test.js` calls into the same `validateModes` entry point.
+`packages/core/scripts/validate-spacing-modes.js` enforces that all 7 mode files share an **identical key set** (Vega is the baseline; any missing or extra leaf path fails). It runs pre-commit (lint-staged, when a `spacing-*.json` is staged) and in CI (the `audit-tokens` job, before regeneration). Exit codes: `0` match, `1` drift, `2` config error.
 
 ## Lint rules
 
-Two custom ESLint rules guard the architecture. Both ship in `packages/eslint-plugin-nexus/` (workspace `@nexus/eslint-plugin`) and are wired into the root `eslint.config.js` at `error` severity.
+Two custom ESLint rules (in `packages/eslint-plugin-nexus/`, wired into the root `eslint.config.js` at `error`) guard the architecture:
 
-### `@nexus/canonical-spacing-steps`
+- **`@nexus/canonical-spacing-steps`** flags any px value in `spacing-*.json` not in the canonical set. The set lives in `canonical-step-set.json` and is currently the **union** of every value shipped across the 7 modes (~80), wider than the aspirational 30-step set — reconciliation tracked under PR #223's "Open Items", so the rule prevents _new_ drift without forcing snap-to-grid on existing values. Refresh with `yarn workspace @nexus/eslint-plugin refresh:canonical-set` (deliberate; pre-commit does not auto-regenerate).
+- **`@nexus/prefer-role-utilities`** flags raw numeric `p` / `px` / `py` / `gap` utilities (and modifier-prefixed variants like `nx:hover:p-4`) in `components/ui/*.tsx` where a role utility exists per the coupling table. `…-0` is not flagged. Out-of-scope prefixes (`pt`, `pb`, `m*`, `h*`, `w*`, `gap-x/y`, …) are silent — the rule grows as role families grow.
 
-Flags any px value in `packages/core/tokens/semantic/spacing-*.json` that is not in the canonical step set. The canonical set lives in `packages/eslint-plugin-nexus/src/canonical-step-set.json` and is the **union** of every px value currently shipped across the 7 mode files (~80 values). Refresh via `yarn workspace @nexus/eslint-plugin refresh:canonical-set` when a mode file legitimately introduces a new value — the refresh is deliberate; pre-commit does not auto-regenerate.
-
-The rule walks the JSONC AST via `'JSONProperty[key.value="$value"] > JSONObjectExpression'`, extracts `(value, unit)` from the DTCG dimension shape, and reports values not in the set. Non-px units are skipped. Negative values flag as off-grid via `JSONUnaryExpression` handling. The aspirational 30-step set documented above is narrower than the shipped union; reconciliation is tracked under PR #223's "Open Items" — until then, the rule prevents **new** drift without forcing snap-to-grid for existing values.
-
-### `@nexus/prefer-role-utilities`
-
-Flags raw numeric padding / gap utilities in `packages/react/src/components/ui/*.tsx` (excluding `*.stories.tsx`) where a role utility exists per the coupling table. Specifically: `nx:(p|px|py|gap)-N` and any modifier-prefixed variant (`nx:hover:p-4`, `nx:dark:hover:p-4`). `nx:(p|px|py|gap)-0` is not flagged — there is no role for "no padding". Out-of-scope prefixes (`pt`, `pb`, `m*`, `h*`, `w*`, `size-*`, `gap-x`, `gap-y`) are silent because no role token exists for them; the rule grows when role families grow.
-
-#### Allowlist syntax
+### Allowlist syntax
 
 When a raw numeric is intentional, annotate the line **immediately above** the literal:
 
@@ -229,7 +85,7 @@ The shipped components all carry such annotations where the role-coupling table 
 
 Components should use specific roles for specific spacing decisions. This table is authoritative; the `@nexus/prefer-role-utilities` rule references it.
 
-> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. The table is authoritative for current code; `@nexus/prefer-role-utilities` (#127) mechanically enforces it.
+> **Status: shipped (#123, #124).** Button, Input, Select, Tabs, Badge, and the remaining containers/internal components (Card, Dialog, Alert, Accordion, plus DropdownMenu / Tooltip / Tabs internals) now use these role tokens. `@nexus/prefer-role-utilities` (#127) mechanically enforces it.
 
 | Component                                | Role used for                          | Tokens                                                                             |
 | ---------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -278,10 +134,10 @@ When a new component is authored, the author adds a row to this table.
 
 ## Migration history
 
-The two-tier per-mode architecture described above landed across the [Spacing tokens · Phase 1](https://github.com/nexuslabs-ai/nexus/milestone/5) milestone. In chronological order (issue numbers unless prefixed with `PR`):
+The two-tier per-mode architecture landed across the [Spacing tokens · Phase 1](https://github.com/nexuslabs-ai/nexus/milestone/5) milestone (issue numbers unless prefixed with `PR`):
 
 - **#117** — audit existing spacing utilities, finalise the role vocabulary (`control` / `container` / `layout`).
-- **#118** — author the 7 per-mode `semantic/spacing-{mode}.json` files (vega, lyra, maia, mira, nova, luma, sera).
+- **#118** — author the 7 per-mode `semantic/spacing-{mode}.json` files.
 - **#119** — switch the token build to read per-mode semantic spacing; emit `[data-style="X"]` blocks.
 - **#120** — refactor playground `useTheme` to activate modes via `data-style`; add Luma + Sera to the picker.
 - **#121** — delete the `--nx-size-*` primitive layer (the two-tier shape becomes load-bearing here).
@@ -290,15 +146,15 @@ The two-tier per-mode architecture described above landed across the [Spacing to
 - **#124** — roll out role-named utilities to the remaining 12 components.
 - **PR #130** — populate this file's role-coupling table with the audit-grounded 14-role version; sync the FE brief.
 - **#230** — add `--control-gap-{sm,md,lg}` per-size gap roles (the `control.gap` token splits from a single value into a size-keyed bundle).
-- **#126** — ship `validate-spacing-modes.js` schema validator; wire to pre-commit (lint-staged) and CI (`audit-tokens` job, before regen).
-- **#127** — ship `@nexus/eslint-plugin` (`packages/eslint-plugin-nexus/`) with `canonical-spacing-steps` and `prefer-role-utilities`; wire both into root `eslint.config.js` at `error`; sweep the 10 UI components to annotate intentional raw-numeric sites with `// nexus-allow-numeric:` comments.
+- **#126** — ship `validate-spacing-modes.js`; wire to pre-commit (lint-staged) and CI (`audit-tokens` job, before regen).
+- **#127** — ship `@nexus/eslint-plugin` with `canonical-spacing-steps` and `prefer-role-utilities`; wire both into root `eslint.config.js` at `error`; sweep the 10 UI components to annotate intentional raw-numeric sites with `// nexus-allow-numeric:` comments.
 
 ## When to revisit
 
-Architectural decisions are not load-bearing forever. The conditions under which this design would need to be revisited:
+Architectural decisions are not load-bearing forever. Revisit this design when:
 
-- **A real consumer asks for a per-step ad-hoc value** that doesn't fit the canonical set, and the answer "extend the canonical set globally" causes design friction repeatedly. Indicates the canonical set is too restrictive or too coarse.
-- **The schema validation gates become a productivity tax** because adding a new role requires touching 7 files. If this happens frequently, consider introducing a tooling helper that prompts for "value per mode" once and writes all 7 files.
-- **Mode count grows beyond ~10.** The "all modes must have all keys" rule scales linearly; at 10+ modes it becomes painful. Revisit then.
+- **A real consumer asks for a per-step ad-hoc value** that doesn't fit the canonical set, and "extend the canonical set globally" causes design friction repeatedly. Indicates the set is too restrictive or too coarse.
+- **The schema validation gates become a productivity tax** because adding a new role requires touching 7 files. If frequent, consider a tooling helper that prompts for "value per mode" once and writes all 7.
+- **Mode count grows beyond ~10.** The "all modes must have all keys" rule scales linearly; at 10+ modes it becomes painful.
 
 The architecture is **correct for the current scope** (7 modes, ~20 roles, ~30 numeric steps). It is not necessarily correct at 20 modes and 50 roles.

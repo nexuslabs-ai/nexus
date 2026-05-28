@@ -6,7 +6,9 @@ Shade values are perceptually graded (see `tokens.md` § Color Token Pipeline) s
 
 ## Source of truth
 
-The base JSON files at `packages/core/tokens/semantic/base-{slate,neutral,gray,stone,zinc}-{light,dark}.json` are authoritative for which shade each semantic token references. This grid is a **derived reverse-index** — shade-first instead of token-first. When a PR adds or moves a semantic token, the JSON change lands first, then this table is synced. [`surfaces.md`](surfaces.md) owns the 5-level surface contract semantics (what makes a thing a "container" vs a "popover", how elevation is communicated); this file complements it by exposing the full shade→token coverage including non-surface tokens like `border.*`, `disabled*`, and the text tiers.
+The base JSON files at `packages/core/tokens/semantic/base-{slate,neutral,gray,stone,zinc}-{light,dark}.json` are authoritative for which shade each semantic token references. This grid is a **derived reverse-index** — shade-first instead of token-first. When a PR adds or moves a semantic token, the JSON change lands first, then this table is synced.
+
+In the grid below the **Lightness role** column is editorial judgment (not in code); the light/dark token-list columns are the reverse-index synced from the JSON. The `contrast-auditor` agent parses this table row-by-row, so keep its structure stable. [`surfaces.md`](surfaces.md) owns the 5-level surface contract semantics; this file complements it by exposing the full shade→token coverage including non-surface tokens (`border.*`, `disabled*`, the text tiers).
 
 ## The 11-step grid
 

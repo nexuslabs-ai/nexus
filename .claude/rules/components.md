@@ -26,152 +26,25 @@ Every component in `packages/react/src/components/ui/` needs 2 files:
 
 ## Component Template
 
-This is a minimal template showing required structure. Adapt variants and props to your component's needs.
-
-```tsx
-import * as React from 'react';
-
-import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
-
-import { cn } from '@/lib/utils';
-
-const componentVariants = cva(
-  // Base classes - nx: prefix BEFORE pseudo-classes
-  'nx:inline-flex nx:items-center nx:transition-colors',
-  {
-    variants: {
-      variant: {
-        /* enum-style variants */
-      },
-      size: {
-        /* padding-based sizing */
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-);
-
-interface ComponentProps
-  extends
-    React.ComponentProps<'element'>,
-    VariantProps<typeof componentVariants> {
-  asChild?: boolean;
-}
-
-function Component({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: ComponentProps) {
-  const Comp = asChild ? Slot : 'element';
-
-  return (
-    <Comp
-      data-slot="component-name"
-      data-variant={variant}
-      data-size={size}
-      className={cn(componentVariants({ variant, size, className }))}
-      {...props}
-    />
-  );
-}
-
-export { Component, type ComponentProps, componentVariants };
-```
-
-**Live examples:** See `button.tsx`, `badge.tsx` for full implementations.
+Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. After authoring, add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button.tsx` and `badge.tsx` for the canonical implementations.
 
 ## Data Attributes
 
-| Attribute      | Purpose                  | Required?                   |
-| -------------- | ------------------------ | --------------------------- |
-| `data-slot`    | Component identification | Always                      |
-| `data-variant` | Current variant value    | When component has variants |
-| `data-size`    | Current size value       | When component has sizes    |
-
-Additional `data-*` attributes are acceptable for component-specific state (e.g., `data-loading`, `data-fill`).
+`data-slot` is always set (component identification); `data-variant` / `data-size` are set when the component has those props. Additional `data-*` (e.g. `data-loading`, `data-fill`) are fine for component-specific state. These are the CSS / test / state-inspection hooks.
 
 ## Props Pattern
 
-### Interface Definition
-
-Define props as a named interface above the function. Extend from:
-
-- `React.ComponentProps<'element'>` for native element props
-- `VariantProps<typeof componentVariants>` for CVA-generated variant props
-
-### JSDoc Requirements
-
-All custom props (not inherited) must have JSDoc with:
-
-- Description of what the prop does
-- `@default` value if applicable
-- `@example` for non-obvious usage
-
-```tsx
-interface ComponentProps extends React.ComponentProps<'button'> {
-  /**
-   * Brief description of what this does.
-   * @default false
-   */
-  customProp?: boolean;
-}
-```
-
-### Boolean Props
-
-Handle boolean props with ternary operators in component code, not CVA:
-
-```tsx
-// In component body, not CVA variants
-className={cn(
-  componentVariants({ variant, size }),
-  isCompact ? 'nx:p-2' : 'nx:p-4',
-)}
-```
-
-**Why:** Keeps CVA focused on enum-style variants; makes boolean logic explicit.
+Define props as a named interface above the function, extending `React.ComponentProps<'element'>` and/or `VariantProps<typeof componentVariants>`. Custom (non-inherited) props get JSDoc with a description, `@default`, and an `@example` for non-obvious usage. Handle boolean props with ternaries in the component body, **not** CVA variants — keeps CVA focused on enum-style variants and makes the boolean logic explicit.
 
 ## Class Naming
 
 ### nx: Prefix Rule
 
-All Tailwind utilities must use `nx:` prefix. The prefix comes BEFORE all modifiers (pseudo-classes, arbitrary selectors, responsive prefixes):
-
-| Pattern                                | Correct?            |
-| -------------------------------------- | ------------------- |
-| `nx:hover:bg-primary-background-hover` | Yes                 |
-| `hover:nx:bg-primary-background-hover` | No                  |
-| `nx:focus-visible:ring-2`              | Yes                 |
-| `nx:[&>svg]:text-foreground`           | Yes                 |
-| `[&>svg]:nx:text-foreground`           | No                  |
-| `nx:[&_p]:leading-relaxed`             | Yes                 |
-| `[&_p]:nx:leading-relaxed`             | No                  |
-| `nx:md:flex`                           | Yes                 |
-| `md:nx:flex`                           | No                  |
-| `bg-primary-background`                | No (missing prefix) |
-
-**Rule:** `nx:` always comes first, then any modifier (pseudo-class, arbitrary selector, responsive), then the utility.
+All Tailwind utilities use the `nx:` prefix, and it comes BEFORE every modifier — pseudo-class, arbitrary selector, or responsive prefix. So `nx:hover:bg-primary-background-hover`, `nx:[&>svg]:text-foreground`, `nx:md:flex` — never `hover:nx:…`, `[&>svg]:nx:…`, `md:nx:…`, and never an unprefixed utility (`bg-primary-background`).
 
 ### Semantic Token Paths
 
-Use full semantic token paths, not incomplete or primitive values:
-
-| Pattern                        | Correct? | Notes                           |
-| ------------------------------ | -------- | ------------------------------- |
-| `nx:bg-primary-background`     | Yes      | Full path                       |
-| `nx:bg-primary`                | No       | Incomplete                      |
-| `nx:bg-blue-500`               | No       | Primitive color                 |
-| `nx:hover:bg-background-hover` | Yes      | Hover state token               |
-| `nx:hover:bg-accent`           | No       | `accent` doesn't exist in Nexus |
-
-**Reference:** See `packages/tailwind/nexus.css` for available tokens.
+Use full semantic token paths, never incomplete or primitive ones: `nx:bg-primary-background` (not `nx:bg-primary`, not the primitive `nx:bg-blue-500`). There is no `accent` token in Nexus. See `packages/tailwind/nexus.css` for the available tokens.
 
 ### Adaptive-by-Default Semantic Tokens
 
@@ -191,23 +64,7 @@ See [`tokens.md` § Light/Dark Theme Tokens](tokens.md#lightdark-theme-tokens) f
 
 ## Sizing Convention
 
-Use padding for sizing, not fixed heights:
-
-```tsx
-// Padding-based (correct)
-size: {
-  default: 'nx:px-4 nx:py-2',
-  sm: 'nx:px-3 nx:py-1.5',
-  lg: 'nx:px-8 nx:py-3',
-}
-
-// Fixed heights (avoid)
-size: {
-  default: 'nx:h-10 nx:px-4',
-}
-```
-
-**Exceptions:** Avatars, progress bars, modals may need fixed dimensions.
+Use padding for sizing, not fixed heights (`nx:px-4 nx:py-2`, not `nx:h-10 nx:px-4`) — fixed heights break in flex layouts. **Exceptions:** avatars, progress bars, modals may need fixed dimensions.
 
 ## Responsive behaviour
 
@@ -215,49 +72,13 @@ Component-internal responsive behaviour should use `@container` queries, not vie
 
 See [responsive.md](responsive.md) for the decision tree, the display-class table, and the `<Show>` / `<Hide>` primitives.
 
-## Export Pattern
-
-Always export component, props type, and variants function:
-
-```tsx
-export { Component, type ComponentProps, componentVariants };
-```
-
-## Import Order
-
-ESLint auto-sorts, but the expected order is:
-
-1. React
-2. External packages (Radix, CVA)
-3. Internal aliases (`@/lib/*`)
-4. Relative imports
-
 ## Compound Variants
 
-Use `compoundVariants` when styling depends on multiple prop combinations (e.g., `variant` + `fill`):
-
-```tsx
-compoundVariants: [
-  { variant: 'default', fill: 'solid', className: '...' },
-  { variant: 'default', fill: 'light', className: '...' },
-],
-```
-
-**Live example:** See `badge.tsx` for a full compound variants implementation.
+Use `compoundVariants` when styling depends on multiple prop combinations (e.g. `variant` + `fill`). Live example: `badge.tsx`.
 
 ## asChild Pattern
 
-The `asChild` prop enables composition via Radix Slot. Include for interactive components:
-
-```tsx
-// Renders as button
-<Button>Click</Button>
-
-// Renders as anchor with button styles
-<Button asChild>
-  <a href="/link">Link</a>
-</Button>
-```
+The `asChild` prop enables composition via Radix `Slot` — include it for interactive components so a `<Button asChild>` can render an `<a href>` with button styles. Live example: `button.tsx`.
 
 ## State Patterns
 
@@ -307,7 +128,7 @@ The ring is a real `outline` (not `box-shadow`) for two reasons:
 
 Every focusable control — primary / secondary / outline / ghost / destructive, Input, Switch, Tabs, Accordion, Select, Dialog close — uses the **same** `focus-default` colour. There is no per-variant focus colour and no destructive→grey swap. Reason: focus is a system signal ("you are here"), not a brand or status signal. One colour reduces the cognitive load and matches the practice of Linear, Stripe, Geist, and Tailwind's own focus convention.
 
-The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
+The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark; canonical values in `focus-default-{light,dark}.json`), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
 
 ### Surface exception map
 
@@ -350,7 +171,7 @@ Nexus ships a 6-token z-index scale for stacking overlays. The tokens are semant
 | `--z-index-toast`   | `nx:z-toast`   | 100   | Toasts / notifications                                           | (not yet shipped)             |
 | `--z-index-max`     | `nx:z-max`     | 9999  | Host-application system UI (AI agent overlays, debug, a11y)      | reserved — consumer-only      |
 
-The `nx:z-*` utilities are generated on demand by the consumer's Tailwind build from these `--z-index-*` theme keys (Tailwind's `z` utility reads the `--z-index-*` namespace), so all six are usable even though only `nx:z-modal` and `nx:z-popover` are referenced by shipped components.
+The `nx:z-*` utilities are generated on demand by the consumer's Tailwind build from these `--z-index-*` theme keys, so all six are usable even though only `nx:z-modal` and `nx:z-popover` are referenced by shipped components. Values are canonical in `z-index.json`.
 
 **Popover sits _above_ modal (70 > 50) by design.** A DropdownMenu, Select, or Tooltip opened _inside_ a Dialog must paint above the dialog to stay usable — so the floating-layer token outranks the modal layer. This is the deliberate, non-obvious ordering; do not "fix" it by dropping popover below modal.
 
@@ -373,32 +194,6 @@ The utilities reference the CSS variable (`nx:z-sticky` → `z-index: var(--z-in
 :root {
   --z-index-sticky: 35; /* raise the app shell's sticky chrome above the default 30 */
 }
-```
-
-### Reserved layers
-
-No shipped Nexus component uses these — they exist for the consumer:
-
-- `--z-index-max` (9999) — host-application system UI: AI agent overlays, accessibility tooling, debug surfaces.
-- `--z-index-sticky` (30) — consumer-owned fixed/sticky chrome.
-- `--z-index-overlay` (10) — low-level scrims/backdrops beneath floating layers (a modal's own backdrop rides at `--z-index-modal`, not this).
-
-### Which layer to use
-
-| Surface                                | Utility        |
-| -------------------------------------- | -------------- |
-| Popover, Tooltip, DropdownMenu, Select | `nx:z-popover` |
-| Modal Dialog                           | `nx:z-modal`   |
-| Toast / Sonner-style notification      | `nx:z-toast`   |
-| Backdrop / scrim under a side panel    | `nx:z-overlay` |
-| Consumer fixed/sticky header           | `nx:z-sticky`  |
-
-## Adding to Exports
-
-After creating a component, add to `src/index.ts`:
-
-```tsx
-export * from '@/components/ui/new-component';
 ```
 
 ## Checklist
