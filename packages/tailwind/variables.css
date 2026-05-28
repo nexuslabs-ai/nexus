@@ -305,8 +305,7 @@
   --nx-color-amber-800: oklch(0.297 0.0719 75.364);
   --nx-color-amber-900: oklch(0.207 0.0502 74.939);
   --nx-color-amber-950: oklch(0.118 0.0286 74.712);
-  --nx-color-white: oklch(1 0 0);
-  --nx-color-black: oklch(0.1448 0 0);
+  --nx-color-white-base: oklch(1 0 0);
   --nx-color-white-a50: oklch(1 0 0 / 0.0392);
   --nx-color-white-a100: oklch(1 0 0 / 0.0627);
   --nx-color-white-a200: oklch(1 0 0 / 0.0941);
@@ -318,6 +317,7 @@
   --nx-color-white-a800: oklch(1 0 0 / 0.8471);
   --nx-color-white-a900: oklch(1 0 0 / 0.9098);
   --nx-color-white-a950: oklch(1 0 0 / 0.9569);
+  --nx-color-black-base: oklch(0.1448 0 0);
   --nx-color-black-a50: oklch(0.1448 0 0 / 0.0392);
   --nx-color-black-a100: oklch(0.1448 0 0 / 0.0627);
   --nx-color-black-a200: oklch(0.1448 0 0 / 0.0941);

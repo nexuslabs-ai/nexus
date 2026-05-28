@@ -4,7 +4,7 @@
     "$type": "color"
   },
   "foreground": {
-    "$value": "{white}",
+    "$value": "{white.base}",
     "$type": "color"
   },
   "background-hover": {
@@ -46,7 +46,7 @@
     "$type": "color"
   },
   "container-foreground": {
-    "$value": "{white}",
+    "$value": "{white.base}",
     "$type": "color"
   },
   "container-hover": {
@@ -62,7 +62,7 @@
     "$type": "color"
   },
   "popover-foreground": {
-    "$value": "{white}",
+    "$value": "{white.base}",
     "$type": "color"
   },
   "popover-hover": {
@@ -173,7 +173,7 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{white}",
+      "$value": "{white.base}",
       "$type": "color"
     },
     "background-hover": {
@@ -211,7 +211,7 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{white}",
+      "$value": "{white.base}",
       "$type": "color"
     },
     "background-hover": {
@@ -249,7 +249,7 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{white}",
+      "$value": "{white.base}",
       "$type": "color"
     },
     "background-hover": {
@@ -287,7 +287,7 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{white}",
+      "$value": "{white.base}",
       "$type": "color"
     },
     "background-hover": {

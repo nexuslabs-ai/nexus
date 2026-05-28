@@ -3,7 +3,7 @@
 html {
   --nx-color-primary-background: var(--nx-color-stone-900);
   --nx-color-primary-background-active: var(--nx-color-stone-950);
-  --nx-color-primary-foreground: var(--nx-color-white);
+  --nx-color-primary-foreground: var(--nx-color-white-base);
   --nx-color-primary-background-hover: var(--nx-color-stone-800);
   --nx-color-primary-disabled: var(--nx-color-stone-300);
   --nx-color-primary-subtle: var(--nx-color-stone-50);

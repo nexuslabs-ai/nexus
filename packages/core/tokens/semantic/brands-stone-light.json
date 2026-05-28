@@ -9,7 +9,7 @@
       "$type": "color"
     },
     "foreground": {
-      "$value": "{white}",
+      "$value": "{white.base}",
       "$type": "color"
     },
     "background-hover": {

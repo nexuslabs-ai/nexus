@@ -1,7 +1,7 @@
 /* base: stone */
 
 html {
-  --nx-color-background: var(--nx-color-white);
+  --nx-color-background: var(--nx-color-white-base);
   --nx-color-foreground: var(--nx-color-stone-950);
   --nx-color-background-hover: var(--nx-color-stone-50);
   --nx-color-background-hover-alpha: var(--nx-color-stone-a100);
@@ -11,11 +11,11 @@ html {
   --nx-color-muted-foreground-subtle: var(--nx-color-stone-400);
   --nx-color-disabled: var(--nx-color-stone-50);
   --nx-color-disabled-foreground: var(--nx-color-stone-400);
-  --nx-color-container: var(--nx-color-white);
+  --nx-color-container: var(--nx-color-white-base);
   --nx-color-container-foreground: var(--nx-color-stone-950);
   --nx-color-container-hover: var(--nx-color-stone-50);
   --nx-color-container-active: var(--nx-color-stone-100);
-  --nx-color-popover: var(--nx-color-white);
+  --nx-color-popover: var(--nx-color-white-base);
   --nx-color-popover-foreground: var(--nx-color-stone-950);
   --nx-color-popover-hover: var(--nx-color-stone-50);
   --nx-color-popover-active: var(--nx-color-stone-50);
@@ -43,7 +43,7 @@ html {
   --nx-color-border-information: var(--nx-color-blue-200);
   --nx-color-border-information-active: var(--nx-color-blue-400);
   --nx-color-error-background: var(--nx-color-red-600);
-  --nx-color-error-foreground: var(--nx-color-white);
+  --nx-color-error-foreground: var(--nx-color-white-base);
   --nx-color-error-background-hover: var(--nx-color-red-700);
   --nx-color-error-background-active: var(--nx-color-red-800);
   --nx-color-error-disabled: var(--nx-color-red-300);
@@ -52,7 +52,7 @@ html {
   --nx-color-error-subtle-hover: var(--nx-color-red-100);
   --nx-color-error-subtle-active: var(--nx-color-red-200);
   --nx-color-success-background: var(--nx-color-green-600);
-  --nx-color-success-foreground: var(--nx-color-white);
+  --nx-color-success-foreground: var(--nx-color-white-base);
   --nx-color-success-background-hover: var(--nx-color-green-700);
   --nx-color-success-background-active: var(--nx-color-green-800);
   --nx-color-success-disabled: var(--nx-color-green-300);
@@ -61,7 +61,7 @@ html {
   --nx-color-success-subtle-hover: var(--nx-color-green-100);
   --nx-color-success-subtle-active: var(--nx-color-green-200);
   --nx-color-information-background: var(--nx-color-blue-600);
-  --nx-color-information-foreground: var(--nx-color-white);
+  --nx-color-information-foreground: var(--nx-color-white-base);
   --nx-color-information-background-hover: var(--nx-color-blue-700);
   --nx-color-information-background-active: var(--nx-color-blue-800);
   --nx-color-information-disabled: var(--nx-color-blue-300);
@@ -70,7 +70,7 @@ html {
   --nx-color-information-subtle-hover: var(--nx-color-blue-100);
   --nx-color-information-subtle-active: var(--nx-color-blue-200);
   --nx-color-warning-background: var(--nx-color-yellow-600);
-  --nx-color-warning-foreground: var(--nx-color-white);
+  --nx-color-warning-foreground: var(--nx-color-white-base);
   --nx-color-warning-background-hover: var(--nx-color-yellow-700);
   --nx-color-warning-background-active: var(--nx-color-yellow-800);
   --nx-color-warning-disabled: var(--nx-color-yellow-300);
@@ -82,7 +82,7 @@ html {
 
 html.dark {
   --nx-color-background: var(--nx-color-stone-900);
-  --nx-color-foreground: var(--nx-color-white);
+  --nx-color-foreground: var(--nx-color-white-base);
   --nx-color-background-hover: var(--nx-color-stone-800);
   --nx-color-background-hover-alpha: var(--nx-color-stone-a100);
   --nx-color-background-active: var(--nx-color-stone-950);
@@ -92,11 +92,11 @@ html.dark {
   --nx-color-disabled: var(--nx-color-stone-950);
   --nx-color-disabled-foreground: var(--nx-color-stone-300);
   --nx-color-container: var(--nx-color-stone-800);
-  --nx-color-container-foreground: var(--nx-color-white);
+  --nx-color-container-foreground: var(--nx-color-white-base);
   --nx-color-container-hover: var(--nx-color-stone-700);
   --nx-color-container-active: var(--nx-color-stone-800);
   --nx-color-popover: var(--nx-color-stone-700);
-  --nx-color-popover-foreground: var(--nx-color-white);
+  --nx-color-popover-foreground: var(--nx-color-white-base);
   --nx-color-popover-hover: var(--nx-color-stone-600);
   --nx-color-popover-active: var(--nx-color-stone-700);
   --nx-color-popover-alpha: var(--nx-color-stone-a800);
@@ -123,7 +123,7 @@ html.dark {
   --nx-color-border-information: var(--nx-color-blue-700);
   --nx-color-border-information-active: var(--nx-color-blue-500);
   --nx-color-error-background: var(--nx-color-red-600);
-  --nx-color-error-foreground: var(--nx-color-white);
+  --nx-color-error-foreground: var(--nx-color-white-base);
   --nx-color-error-background-hover: var(--nx-color-red-700);
   --nx-color-error-background-active: var(--nx-color-red-800);
   --nx-color-error-disabled: var(--nx-color-red-900);
@@ -132,7 +132,7 @@ html.dark {
   --nx-color-error-subtle-hover: var(--nx-color-red-900);
   --nx-color-error-subtle-active: var(--nx-color-red-800);
   --nx-color-success-background: var(--nx-color-green-600);
-  --nx-color-success-foreground: var(--nx-color-white);
+  --nx-color-success-foreground: var(--nx-color-white-base);
   --nx-color-success-background-hover: var(--nx-color-green-700);
   --nx-color-success-background-active: var(--nx-color-green-800);
   --nx-color-success-disabled: var(--nx-color-green-900);
@@ -141,7 +141,7 @@ html.dark {
   --nx-color-success-subtle-hover: var(--nx-color-green-900);
   --nx-color-success-subtle-active: var(--nx-color-green-800);
   --nx-color-information-background: var(--nx-color-blue-600);
-  --nx-color-information-foreground: var(--nx-color-white);
+  --nx-color-information-foreground: var(--nx-color-white-base);
   --nx-color-information-background-hover: var(--nx-color-blue-700);
   --nx-color-information-background-active: var(--nx-color-blue-800);
   --nx-color-information-disabled: var(--nx-color-blue-900);
@@ -150,7 +150,7 @@ html.dark {
   --nx-color-information-subtle-hover: var(--nx-color-blue-900);
   --nx-color-information-subtle-active: var(--nx-color-blue-800);
   --nx-color-warning-background: var(--nx-color-yellow-600);
-  --nx-color-warning-foreground: var(--nx-color-white);
+  --nx-color-warning-foreground: var(--nx-color-white-base);
   --nx-color-warning-background-hover: var(--nx-color-yellow-700);
   --nx-color-warning-background-active: var(--nx-color-yellow-800);
   --nx-color-warning-disabled: var(--nx-color-yellow-900);
