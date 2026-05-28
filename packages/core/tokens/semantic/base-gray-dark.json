@@ -135,11 +135,11 @@
       "$type": "color"
     },
     "warning": {
-      "$value": "{amber.700}",
+      "$value": "{yellow.700}",
       "$type": "color"
     },
     "warning-active": {
-      "$value": "{amber.500}",
+      "$value": "{yellow.500}",
       "$type": "color"
     },
     "success": {
@@ -283,7 +283,7 @@
   },
   "warning": {
     "background": {
-      "$value": "{amber.600}",
+      "$value": "{yellow.600}",
       "$type": "color"
     },
     "foreground": {
@@ -291,31 +291,31 @@
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{amber.700}",
+      "$value": "{yellow.700}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{amber.800}",
+      "$value": "{yellow.800}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{amber.900}",
+      "$value": "{yellow.900}",
       "$type": "color"
     },
     "subtle": {
-      "$value": "{amber.950}",
+      "$value": "{yellow.950}",
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{amber.300}",
+      "$value": "{yellow.300}",
       "$type": "color"
     },
     "subtle-hover": {
-      "$value": "{amber.900}",
+      "$value": "{yellow.900}",
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{amber.800}",
+      "$value": "{yellow.800}",
       "$type": "color"
     }
   }
