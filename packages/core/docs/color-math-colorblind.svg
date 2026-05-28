@@ -98,18 +98,18 @@
 <rect x="278" y="208" width="22" height="22" fill="#103704" stroke="#e2e8f0" stroke-width="0.5"><title>green.800 — #103704</title></rect>
 <rect x="302" y="208" width="22" height="22" fill="#041e00" stroke="#e2e8f0" stroke-width="0.5"><title>green.900 — #041e00</title></rect>
 <rect x="326" y="208" width="22" height="22" fill="#010800" stroke="#e2e8f0" stroke-width="0.5"><title>green.950 — #010800</title></rect>
-<text class="palette-label" x="80" y="247">amber</text>
-<rect x="86" y="232" width="22" height="22" fill="#fff9f1" stroke="#e2e8f0" stroke-width="0.5"><title>amber.50 — #fff9f1</title></rect>
-<rect x="110" y="232" width="22" height="22" fill="#f7ebdb" stroke="#e2e8f0" stroke-width="0.5"><title>amber.100 — #f7ebdb</title></rect>
-<rect x="134" y="232" width="22" height="22" fill="#e8d0b0" stroke="#e2e8f0" stroke-width="0.5"><title>amber.200 — #e8d0b0</title></rect>
-<rect x="158" y="232" width="22" height="22" fill="#d3ab75" stroke="#e2e8f0" stroke-width="0.5"><title>amber.300 — #d3ab75</title></rect>
-<rect x="182" y="232" width="22" height="22" fill="#bb8736" stroke="#e2e8f0" stroke-width="0.5"><title>amber.400 — #bb8736</title></rect>
-<rect x="206" y="232" width="22" height="22" fill="#9a6700" stroke="#e2e8f0" stroke-width="0.5"><title>amber.500 — #9a6700</title></rect>
-<rect x="230" y="232" width="22" height="22" fill="#774f00" stroke="#e2e8f0" stroke-width="0.5"><title>amber.600 — #774f00</title></rect>
-<rect x="254" y="232" width="22" height="22" fill="#5c3c00" stroke="#e2e8f0" stroke-width="0.5"><title>amber.700 — #5c3c00</title></rect>
-<rect x="278" y="232" width="22" height="22" fill="#3f2800" stroke="#e2e8f0" stroke-width="0.5"><title>amber.800 — #3f2800</title></rect>
-<rect x="302" y="232" width="22" height="22" fill="#231400" stroke="#e2e8f0" stroke-width="0.5"><title>amber.900 — #231400</title></rect>
-<rect x="326" y="232" width="22" height="22" fill="#0a0400" stroke="#e2e8f0" stroke-width="0.5"><title>amber.950 — #0a0400</title></rect>
+<text class="palette-label" x="80" y="247">yellow</text>
+<rect x="86" y="232" width="22" height="22" fill="#fdfbe7" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.50 — #fdfbe7</title></rect>
+<rect x="110" y="232" width="22" height="22" fill="#f5f0ba" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.100 — #f5f0ba</title></rect>
+<rect x="134" y="232" width="22" height="22" fill="#e5d771" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.200 — #e5d771</title></rect>
+<rect x="158" y="232" width="22" height="22" fill="#ceb200" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.300 — #ceb200</title></rect>
+<rect x="182" y="232" width="22" height="22" fill="#b08e00" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.400 — #b08e00</title></rect>
+<rect x="206" y="232" width="22" height="22" fill="#906c00" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.500 — #906c00</title></rect>
+<rect x="230" y="232" width="22" height="22" fill="#774f00" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.600 — #774f00</title></rect>
+<rect x="254" y="232" width="22" height="22" fill="#623900" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.700 — #623900</title></rect>
+<rect x="278" y="232" width="22" height="22" fill="#452400" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.800 — #452400</title></rect>
+<rect x="302" y="232" width="22" height="22" fill="#281100" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.900 — #281100</title></rect>
+<rect x="326" y="232" width="22" height="22" fill="#0d0300" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.950 — #0d0300</title></rect>
 <text class="palette-label" x="80" y="271">blue</text>
 <rect x="86" y="256" width="22" height="22" fill="#f7faff" stroke="#e2e8f0" stroke-width="0.5"><title>blue.50 — #f7faff</title></rect>
 <rect x="110" y="256" width="22" height="22" fill="#e5eefb" stroke="#e2e8f0" stroke-width="0.5"><title>blue.100 — #e5eefb</title></rect>
@@ -278,18 +278,18 @@
 <rect x="278" y="614" width="22" height="22" fill="#2a2a05" stroke="#e2e8f0" stroke-width="0.5"><title>green.800 — #2a2a05</title></rect>
 <rect x="302" y="614" width="22" height="22" fill="#151501" stroke="#e2e8f0" stroke-width="0.5"><title>green.900 — #151501</title></rect>
 <rect x="326" y="614" width="22" height="22" fill="#060600" stroke="#e2e8f0" stroke-width="0.5"><title>green.950 — #060600</title></rect>
-<text class="palette-label" x="80" y="653">amber</text>
-<rect x="86" y="638" width="22" height="22" fill="#fbfbf1" stroke="#e2e8f0" stroke-width="0.5"><title>amber.50 — #fbfbf1</title></rect>
-<rect x="110" y="638" width="22" height="22" fill="#efefdb" stroke="#e2e8f0" stroke-width="0.5"><title>amber.100 — #efefdb</title></rect>
-<rect x="134" y="638" width="22" height="22" fill="#d8d8af" stroke="#e2e8f0" stroke-width="0.5"><title>amber.200 — #d8d8af</title></rect>
-<rect x="158" y="638" width="22" height="22" fill="#b8b874" stroke="#e2e8f0" stroke-width="0.5"><title>amber.300 — #b8b874</title></rect>
-<rect x="182" y="638" width="22" height="22" fill="#989835" stroke="#e2e8f0" stroke-width="0.5"><title>amber.400 — #989835</title></rect>
-<rect x="206" y="638" width="22" height="22" fill="#787800" stroke="#e2e8f0" stroke-width="0.5"><title>amber.500 — #787800</title></rect>
-<rect x="230" y="638" width="22" height="22" fill="#5c5c00" stroke="#e2e8f0" stroke-width="0.5"><title>amber.600 — #5c5c00</title></rect>
-<rect x="254" y="638" width="22" height="22" fill="#474700" stroke="#e2e8f0" stroke-width="0.5"><title>amber.700 — #474700</title></rect>
-<rect x="278" y="638" width="22" height="22" fill="#303000" stroke="#e2e8f0" stroke-width="0.5"><title>amber.800 — #303000</title></rect>
-<rect x="302" y="638" width="22" height="22" fill="#191900" stroke="#e2e8f0" stroke-width="0.5"><title>amber.900 — #191900</title></rect>
-<rect x="326" y="638" width="22" height="22" fill="#060600" stroke="#e2e8f0" stroke-width="0.5"><title>amber.950 — #060600</title></rect>
+<text class="palette-label" x="80" y="653">yellow</text>
+<rect x="86" y="638" width="22" height="22" fill="#fcfce7" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.50 — #fcfce7</title></rect>
+<rect x="110" y="638" width="22" height="22" fill="#f2f2ba" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.100 — #f2f2ba</title></rect>
+<rect x="134" y="638" width="22" height="22" fill="#dcdc71" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.200 — #dcdc71</title></rect>
+<rect x="158" y="638" width="22" height="22" fill="#bbbb00" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.300 — #bbbb00</title></rect>
+<rect x="182" y="638" width="22" height="22" fill="#999900" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.400 — #999900</title></rect>
+<rect x="206" y="638" width="22" height="22" fill="#787800" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.500 — #787800</title></rect>
+<rect x="230" y="638" width="22" height="22" fill="#5c5c00" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.600 — #5c5c00</title></rect>
+<rect x="254" y="638" width="22" height="22" fill="#474700" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.700 — #474700</title></rect>
+<rect x="278" y="638" width="22" height="22" fill="#2f2f00" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.800 — #2f2f00</title></rect>
+<rect x="302" y="638" width="22" height="22" fill="#191900" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.900 — #191900</title></rect>
+<rect x="326" y="638" width="22" height="22" fill="#060600" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.950 — #060600</title></rect>
 <text class="palette-label" x="80" y="677">blue</text>
 <rect x="86" y="662" width="22" height="22" fill="#f9f9ff" stroke="#e2e8f0" stroke-width="0.5"><title>blue.50 — #f9f9ff</title></rect>
 <rect x="110" y="662" width="22" height="22" fill="#ebebfb" stroke="#e2e8f0" stroke-width="0.5"><title>blue.100 — #ebebfb</title></rect>
@@ -458,18 +458,18 @@
 <rect x="278" y="1020" width="22" height="22" fill="#303004" stroke="#e2e8f0" stroke-width="0.5"><title>green.800 — #303004</title></rect>
 <rect x="302" y="1020" width="22" height="22" fill="#1a1a00" stroke="#e2e8f0" stroke-width="0.5"><title>green.900 — #1a1a00</title></rect>
 <rect x="326" y="1020" width="22" height="22" fill="#070700" stroke="#e2e8f0" stroke-width="0.5"><title>green.950 — #070700</title></rect>
-<text class="palette-label" x="80" y="1059">amber</text>
-<rect x="86" y="1044" width="22" height="22" fill="#fafaf1" stroke="#e2e8f0" stroke-width="0.5"><title>amber.50 — #fafaf1</title></rect>
-<rect x="110" y="1044" width="22" height="22" fill="#ededdb" stroke="#e2e8f0" stroke-width="0.5"><title>amber.100 — #ededdb</title></rect>
-<rect x="134" y="1044" width="22" height="22" fill="#d4d4b0" stroke="#e2e8f0" stroke-width="0.5"><title>amber.200 — #d4d4b0</title></rect>
-<rect x="158" y="1044" width="22" height="22" fill="#b2b275" stroke="#e2e8f0" stroke-width="0.5"><title>amber.300 — #b2b275</title></rect>
-<rect x="182" y="1044" width="22" height="22" fill="#909036" stroke="#e2e8f0" stroke-width="0.5"><title>amber.400 — #909036</title></rect>
-<rect x="206" y="1044" width="22" height="22" fill="#707000" stroke="#e2e8f0" stroke-width="0.5"><title>amber.500 — #707000</title></rect>
-<rect x="230" y="1044" width="22" height="22" fill="#565600" stroke="#e2e8f0" stroke-width="0.5"><title>amber.600 — #565600</title></rect>
-<rect x="254" y="1044" width="22" height="22" fill="#414100" stroke="#e2e8f0" stroke-width="0.5"><title>amber.700 — #414100</title></rect>
-<rect x="278" y="1044" width="22" height="22" fill="#2c2c00" stroke="#e2e8f0" stroke-width="0.5"><title>amber.800 — #2c2c00</title></rect>
-<rect x="302" y="1044" width="22" height="22" fill="#171700" stroke="#e2e8f0" stroke-width="0.5"><title>amber.900 — #171700</title></rect>
-<rect x="326" y="1044" width="22" height="22" fill="#050500" stroke="#e2e8f0" stroke-width="0.5"><title>amber.950 — #050500</title></rect>
+<text class="palette-label" x="80" y="1059">yellow</text>
+<rect x="86" y="1044" width="22" height="22" fill="#fbfbe7" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.50 — #fbfbe7</title></rect>
+<rect x="110" y="1044" width="22" height="22" fill="#f1f1ba" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.100 — #f1f1ba</title></rect>
+<rect x="134" y="1044" width="22" height="22" fill="#d9d971" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.200 — #d9d971</title></rect>
+<rect x="158" y="1044" width="22" height="22" fill="#b7b700" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.300 — #b7b700</title></rect>
+<rect x="182" y="1044" width="22" height="22" fill="#949400" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.400 — #949400</title></rect>
+<rect x="206" y="1044" width="22" height="22" fill="#727200" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.500 — #727200</title></rect>
+<rect x="230" y="1044" width="22" height="22" fill="#565600" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.600 — #565600</title></rect>
+<rect x="254" y="1044" width="22" height="22" fill="#404000" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.700 — #404000</title></rect>
+<rect x="278" y="1044" width="22" height="22" fill="#2a2a00" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.800 — #2a2a00</title></rect>
+<rect x="302" y="1044" width="22" height="22" fill="#151500" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.900 — #151500</title></rect>
+<rect x="326" y="1044" width="22" height="22" fill="#050500" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.950 — #050500</title></rect>
 <text class="palette-label" x="80" y="1083">blue</text>
 <rect x="86" y="1068" width="22" height="22" fill="#f9f9ff" stroke="#e2e8f0" stroke-width="0.5"><title>blue.50 — #f9f9ff</title></rect>
 <rect x="110" y="1068" width="22" height="22" fill="#ececfb" stroke="#e2e8f0" stroke-width="0.5"><title>blue.100 — #ececfb</title></rect>
@@ -638,18 +638,18 @@
 <rect x="278" y="1426" width="22" height="22" fill="#163131" stroke="#e2e8f0" stroke-width="0.5"><title>green.800 — #163131</title></rect>
 <rect x="302" y="1426" width="22" height="22" fill="#081a1a" stroke="#e2e8f0" stroke-width="0.5"><title>green.900 — #081a1a</title></rect>
 <rect x="326" y="1426" width="22" height="22" fill="#020707" stroke="#e2e8f0" stroke-width="0.5"><title>green.950 — #020707</title></rect>
-<text class="palette-label" x="80" y="1465">amber</text>
-<rect x="86" y="1450" width="22" height="22" fill="#fff8f8" stroke="#e2e8f0" stroke-width="0.5"><title>amber.50 — #fff8f8</title></rect>
-<rect x="110" y="1450" width="22" height="22" fill="#f9e9e9" stroke="#e2e8f0" stroke-width="0.5"><title>amber.100 — #f9e9e9</title></rect>
-<rect x="134" y="1450" width="22" height="22" fill="#eccccc" stroke="#e2e8f0" stroke-width="0.5"><title>amber.200 — #eccccc</title></rect>
-<rect x="158" y="1450" width="22" height="22" fill="#daa4a4" stroke="#e2e8f0" stroke-width="0.5"><title>amber.300 — #daa4a4</title></rect>
-<rect x="182" y="1450" width="22" height="22" fill="#c57d7d" stroke="#e2e8f0" stroke-width="0.5"><title>amber.400 — #c57d7d</title></rect>
-<rect x="206" y="1450" width="22" height="22" fill="#a75a5a" stroke="#e2e8f0" stroke-width="0.5"><title>amber.500 — #a75a5a</title></rect>
-<rect x="230" y="1450" width="22" height="22" fill="#814545" stroke="#e2e8f0" stroke-width="0.5"><title>amber.600 — #814545</title></rect>
-<rect x="254" y="1450" width="22" height="22" fill="#643434" stroke="#e2e8f0" stroke-width="0.5"><title>amber.700 — #643434</title></rect>
-<rect x="278" y="1450" width="22" height="22" fill="#442323" stroke="#e2e8f0" stroke-width="0.5"><title>amber.800 — #442323</title></rect>
-<rect x="302" y="1450" width="22" height="22" fill="#261111" stroke="#e2e8f0" stroke-width="0.5"><title>amber.900 — #261111</title></rect>
-<rect x="326" y="1450" width="22" height="22" fill="#0b0303" stroke="#e2e8f0" stroke-width="0.5"><title>amber.950 — #0b0303</title></rect>
+<text class="palette-label" x="80" y="1465">yellow</text>
+<rect x="86" y="1450" width="22" height="22" fill="#fff8f8" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.50 — #fff8f8</title></rect>
+<rect x="110" y="1450" width="22" height="22" fill="#fce9e9" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.100 — #fce9e9</title></rect>
+<rect x="134" y="1450" width="22" height="22" fill="#f2caca" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.200 — #f2caca</title></rect>
+<rect x="158" y="1450" width="22" height="22" fill="#e59c9c" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.300 — #e59c9c</title></rect>
+<rect x="182" y="1450" width="22" height="22" fill="#c27c7c" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.400 — #c27c7c</title></rect>
+<rect x="206" y="1450" width="22" height="22" fill="#9e5e5e" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.500 — #9e5e5e</title></rect>
+<rect x="230" y="1450" width="22" height="22" fill="#814545" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.600 — #814545</title></rect>
+<rect x="254" y="1450" width="22" height="22" fill="#693232" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.700 — #693232</title></rect>
+<rect x="278" y="1450" width="22" height="22" fill="#4a1f1f" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.800 — #4a1f1f</title></rect>
+<rect x="302" y="1450" width="22" height="22" fill="#2a0f0f" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.900 — #2a0f0f</title></rect>
+<rect x="326" y="1450" width="22" height="22" fill="#0d0303" stroke="#e2e8f0" stroke-width="0.5"><title>yellow.950 — #0d0303</title></rect>
 <text class="palette-label" x="80" y="1489">blue</text>
 <rect x="86" y="1474" width="22" height="22" fill="#f6fbfb" stroke="#e2e8f0" stroke-width="0.5"><title>blue.50 — #f6fbfb</title></rect>
 <rect x="110" y="1474" width="22" height="22" fill="#e3f0f0" stroke="#e2e8f0" stroke-width="0.5"><title>blue.100 — #e3f0f0</title></rect>

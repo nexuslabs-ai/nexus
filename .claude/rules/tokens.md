@@ -33,9 +33,11 @@ Optional properties: `$description`, `$extensions`
 
 ### Alpha Token Scale
 
-Every palette ships **alpha (transparent) shades** `a50`–`a950` alongside the solid `50`–`950` scale. Translucent surfaces — popover / command-palette backgrounds, modal scrims, hover rows on tinted lists, borders on colored cards — reference these instead of hand-written `rgba()`, so they blend with whatever surface they sit on and theme correctly across every base palette.
+The **5 surface palettes** (`slate`, `neutral`, `gray`, `stone`, `zinc`) ship alpha (transparent) shades `a50`–`a950` alongside the solid `50`–`950` scale, plus standalone `white-a*` and `black-a*` leaves. Chromatic palettes (`red`, `green`, `yellow`, `blue`, etc.) **do not** carry parallel alpha ramps — translucent chromatic effects are computed inline when needed. This mirrors Tier-A practice (Radix, Geist, Stripe Sail, Linear, Atlassian): alpha is reserved for surface chrome (scrims, hovers, frosted panels, borders on translucent cards), not for chromatic tints.
 
-**Structure.** Chromatic palettes nest the alpha shades under the palette (`slate.a200` → `{slate.a200}`). `white` and `black` are standalone leaf tokens, so their alpha shades are **top-level leaves** referenced with a hyphen (`{white-a900}`, `{black-a50}`) — nesting them would break the existing `{white}` / `{black}` references.
+Translucent surfaces — popover / command-palette backgrounds, modal scrims, hover rows on tinted lists — reference these surface-palette alphas instead of hand-written `rgba()`, so they blend with whatever surface they sit on and theme correctly across every base palette.
+
+**Structure.** The 5 surface palettes nest the alpha shades under the palette (`slate.a200` → `{slate.a200}`). `white` and `black` are standalone leaf tokens, so their alpha shades are **top-level leaves** referenced with a hyphen (`{white-a900}`, `{black-a50}`) — nesting them would break the existing `{white}` / `{black}` references.
 
 **Value derivation.** Each alpha shade is the palette's **950 hex** plus an alpha byte from this curve:
 
@@ -199,7 +201,7 @@ Each brand/status group has: `background`, `background-hover`, `background-activ
 
 ### Data viz tokens
 
-Categorical chart palette for data visualization. Hues rotate (teal → lime → orange → rose → indigo) for visual rhythm in stacked/grouped marks and deliberately avoid status-semantic hues (green/amber/red) so a red bar doesn't read as an error series.
+Categorical chart palette for data visualization. Hues rotate (teal → lime → orange → rose → indigo) for visual rhythm in stacked/grouped marks and deliberately avoid status-semantic hues (green/yellow/red) so a red bar doesn't read as an error series.
 
 Theme-aware — lives in `chart-categorical-{mode}-light.json` and `chart-categorical-{mode}-dark.json` (a themed pair). The `categorical` infix locks scale-type in both the filename and the token path (`chart.categorical.{1..5}` → `--color-chart-categorical-{1..5}`), so future scale shapes (sequential, diverging) land as `chart-sequential-default-*.json` with `chart.sequential.N` paths and never collide on the same CSS variable. Light mode uses shade 600–700 primitives (dark colors on a near-white canvas); dark mode uses shade 200–300 (light colors on a near-black canvas). Each chart × surface pair (`chart.categorical.{1..5}` ↔ `background`, `chart.categorical.{1..5}` ↔ `container`) is APCA-validated at Lc ≥ 60 (UI tier) across every base palette by `yarn audit:contrast`.
 

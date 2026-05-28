@@ -312,7 +312,9 @@ import {
 
 ## Accessibility Testing
 
-A11y is automatic. Every story is checked against axe-core rules via `addon-a11y`. Violations fail the test. No separate a11y assertions needed.
+A11y is automatic. Every story is checked against axe-core rules via `addon-a11y` and violations fail the test — keyboard nav, ARIA semantics, focus management, role/landmark structure. No separate a11y assertions needed.
+
+**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model (see [storybook.md § A11y Testing](storybook.md#a11y-testing)). Contrast is verified at the token layer by `yarn workspace @nexus/core audit:contrast`.
 
 ## Running Tests
 
