@@ -278,7 +278,7 @@ describe('findStatusPairConfusable', () => {
   it('flags every status pair when all four converge to one color', () => {
     const same = [120, 120, 120];
     const findings = findStatusPairConfusable(
-      statusPalettes({ red: same, green: same, amber: same, blue: same }),
+      statusPalettes({ red: same, green: same, yellow: same, blue: same }),
       'deuteranopia'
     );
     // 4-choose-2 = 6 pairs; all collapse.
@@ -296,7 +296,7 @@ describe('findStatusPairConfusable', () => {
       statusPalettes({
         red: [255, 0, 0],
         green: [0, 255, 0],
-        amber: [255, 200, 0],
+        yellow: [255, 235, 0],
         blue: [0, 0, 255],
       }),
       'normal'

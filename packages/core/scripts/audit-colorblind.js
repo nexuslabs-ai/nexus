@@ -40,7 +40,7 @@ export const SHADES = [
 // Grouped because the SVG sections them visually and the cross-status pair
 // confusability test only fires for STATUS_PALETTES.
 export { BASE_PALETTES };
-export const STATUS_PALETTES = ['red', 'green', 'amber', 'blue'];
+export const STATUS_PALETTES = ['red', 'green', 'yellow', 'blue'];
 export const CHART_PALETTES = ['teal', 'lime', 'orange', 'rose', 'indigo'];
 export const ALL_PALETTES = [
   ...BASE_PALETTES,
