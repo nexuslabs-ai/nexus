@@ -71,7 +71,7 @@ Parse viewport flag:
 
 **Do this yourself — do NOT spawn an agent.**
 
-1. Read available design references (`.claude/rules/` — especially `components.md`, `shadcn-divergences.md`; the token docs in `packages/core/docs/` — `tokens.md`, `color-shades.md`, `surfaces.md`; and design tokens in `packages/core/tokens/`)
+1. Read available design references (`.claude/rules/` — especially `components.md`, `tokens.md`, `shadcn-divergences.md` — and design tokens in `packages/core/tokens/`)
 2. Use `mcp__playwright__browser_resize` to set the viewport
 3. Use `mcp__playwright__browser_navigate` to go to the URL
 4. Use `mcp__playwright__browser_take_screenshot` to capture the initial state

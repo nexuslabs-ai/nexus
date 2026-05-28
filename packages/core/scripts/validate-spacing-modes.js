@@ -7,7 +7,7 @@ const SEMANTIC_DIR = path.resolve(__dirname, '..', 'tokens', 'semantic');
 
 export const BASELINE_MODE = 'vega';
 
-// The seven canonical density modes per packages/core/docs/spacing-tokens.md.
+// The seven canonical density modes per .claude/rules/spacing-tokens.md.
 // An unknown filename (e.g. spacing-foo.json) or a missing canonical mode
 // is a structural error (exit 2), not key drift (exit 1).
 export const CANONICAL_MODES = [
@@ -144,7 +144,7 @@ export function assertCanonicalModeSet(discoveredModes) {
       parts.push(`missing canonical mode(s): ${missing.sort().join(', ')}`);
     }
     throw new ConfigError(
-      `spacing-*.json file set does not match canonical modes.\n  ${parts.join('\n  ')}\n  Canonical: ${CANONICAL_MODES.join(', ')}\n  See packages/core/docs/spacing-tokens.md`
+      `spacing-*.json file set does not match canonical modes.\n  ${parts.join('\n  ')}\n  Canonical: ${CANONICAL_MODES.join(', ')}\n  See .claude/rules/spacing-tokens.md`
     );
   }
 }
@@ -188,7 +188,7 @@ function main() {
         `  Fix: add the missing keys or remove the extras so every mode file has the same key set.\n`
       );
       process.stderr.write(
-        `  See packages/core/docs/spacing-tokens.md → Schema validation.\n`
+        `  See .claude/rules/spacing-tokens.md → Schema validation.\n`
       );
       process.exit(EXIT_DRIFT);
     }

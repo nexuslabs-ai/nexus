@@ -127,7 +127,7 @@ function main() {
 }
 
 function defaultComment() {
-  return 'Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `yarn workspace @nexus/eslint-plugin refresh:canonical-set`. The aspirational 30-step set in packages/core/docs/spacing-tokens.md is narrower; reconciliation tracked separately.';
+  return 'Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `yarn workspace @nexus/eslint-plugin refresh:canonical-set`. The aspirational 30-step set in .claude/rules/spacing-tokens.md is narrower; reconciliation tracked separately.';
 }
 
 main();

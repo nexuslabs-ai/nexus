@@ -12,7 +12,7 @@ A thin wrapper around `yarn audit:contrast`. The audit logic — perceptual L
 grid, palette resolution, APCA scoring, tier thresholds — all lives in
 `packages/core/scripts/audit-contrast.js`. This agent translates failures into
 proposed semantic-token reroutes, with role-conflict cross-references from
-`packages/core/docs/color-shades.md`. The script is the gate; the agent's proposal
+`.claude/rules/color-shades.md`. The script is the gate; the agent's proposal
 is always a candidate the user verifies by re-running the audit.
 
 ## Why a wrapper, not a body-of-logic agent
@@ -148,7 +148,7 @@ Propose stepping one shade using the **luminance-order rule**:
 
 Then run the **role-conflict check**:
 
-1. Grep `packages/core/docs/color-shades.md` for the row starting with `` | `{N}` ``
+1. Grep `.claude/rules/color-shades.md` for the row starting with `` | `{N}` ``
    where `{N}` is the proposed shade.
 2. Split the row by `|`. Pick the column matching the failing file's theme
    suffix:
@@ -245,7 +245,7 @@ job after they apply the fix (the counterpart may actually pass).
 
 > After applying any reroute, re-run `yarn audit:contrast`. The script is the
 > gate; this proposal is a candidate, not a guaranteed fix. **Thresholds are
-> non-negotiable** per `packages/core/docs/tokens.md` § APCA contrast gate — fix is
+> non-negotiable** per `.claude/rules/tokens.md` § APCA contrast gate — fix is
 > always token reroute or `perceptual-grid.json` edit, never lowering `minLc`.
 
 ## When NOT to invoke this agent
@@ -271,11 +271,11 @@ job after they apply the fix (the counterpart may actually pass).
 - `packages/core/scripts/audit-contrast.js` — the script (`formatLine` at line
   230 is the parser's source of truth; `auditCrossFileLoop` at lines 271-303
   is the cross-file header convention)
-- `packages/core/docs/tokens.md` § APCA contrast gate — threshold tiers and the
+- `.claude/rules/tokens.md` § APCA contrast gate — threshold tiers and the
   non-negotiability rule; § Data viz tokens — hue rotation rationale for Case D
-- `packages/core/docs/color-shades.md` — shade-by-shade role grid (light vs dark
+- `.claude/rules/color-shades.md` — shade-by-shade role grid (light vs dark
   column per theme)
-- `packages/core/docs/surfaces.md` — the 5-level surface contract that constrains
+- `.claude/rules/surfaces.md` — the 5-level surface contract that constrains
   where each shade can sit
 - `packages/core/src/lib/perceptual-grid.json` — the 11-step palette-uniform
   L grid

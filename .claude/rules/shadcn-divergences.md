@@ -106,11 +106,11 @@ shadcn uses `destructive`, Nexus uses `error`:
 
 ### Muted Colors
 
-| shadcn                  | Nexus                             | Notes                                                                                                                                                                                                                                                      |
-| ----------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bg-muted`              | `nx:bg-muted`                     | Same                                                                                                                                                                                                                                                       |
-| `text-muted-foreground` | `nx:text-muted-foreground`        | Same                                                                                                                                                                                                                                                       |
-| —                       | `nx:text-muted-foreground-subtle` | Nexus tertiary text tier (below `muted-foreground`). Paired with `muted` surface. Light mode adds a real third tier; dark mode collapses to the same shade as `muted-foreground` (see [surfaces.md](../../packages/core/docs/surfaces.md#known-overlaps)). |
+| shadcn                  | Nexus                             | Notes                                                                                                                                                                                                                             |
+| ----------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bg-muted`              | `nx:bg-muted`                     | Same                                                                                                                                                                                                                              |
+| `text-muted-foreground` | `nx:text-muted-foreground`        | Same                                                                                                                                                                                                                              |
+| —                       | `nx:text-muted-foreground-subtle` | Nexus tertiary text tier (below `muted-foreground`). Paired with `muted` surface. Light mode adds a real third tier; dark mode collapses to the same shade as `muted-foreground` (see [surfaces.md](surfaces.md#known-overlaps)). |
 
 ### Layout Colors
 
@@ -227,7 +227,7 @@ Nexus provides status colors beyond shadcn's destructive:
 
 ### Navigation (Nexus-Only)
 
-shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalent fixed chrome (sidebar, topbar). Nav is treated as one namespace — `nav-border` is flat (not nested under `border.*`) so the tokens travel as a unit. See [surfaces.md](../../packages/core/docs/surfaces.md#nav-as-a-namespace) for the elevation contract.
+shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalent fixed chrome (sidebar, topbar). Nav is treated as one namespace — `nav-border` is flat (not nested under `border.*`) so the tokens travel as a unit. See [surfaces.md](surfaces.md#nav-as-a-namespace) for the elevation contract.
 
 | Token                          | CSS Variable                   |
 | ------------------------------ | ------------------------------ |
@@ -377,10 +377,10 @@ In Figma designs:
 
 ## Source Files
 
-| Topic               | Authoritative Source                            |
-| ------------------- | ----------------------------------------------- |
-| Component patterns  | [components.md](components.md)                  |
-| Token architecture  | [tokens.md](../../packages/core/docs/tokens.md) |
-| Token format        | [tokens.md](../../packages/core/docs/tokens.md) |
-| Actual token values | `packages/tailwind/nexus.css`                   |
-| Primitive values    | `packages/tailwind/variables.css`               |
+| Topic               | Authoritative Source              |
+| ------------------- | --------------------------------- |
+| Component patterns  | [components.md](components.md)    |
+| Token architecture  | [tokens.md](tokens.md)            |
+| Token format        | [tokens.md](tokens.md)            |
+| Actual token values | `packages/tailwind/nexus.css`     |
+| Primitive values    | `packages/tailwind/variables.css` |

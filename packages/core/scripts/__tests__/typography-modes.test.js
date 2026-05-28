@@ -18,7 +18,7 @@ const TYPOGRAPHY_DIR = path.resolve(
 // filesystem-discovered (`discoverPrimitives` globs the directory), so without
 // this guard, dropping a `typography-lyra.json` back in would silently
 // re-activate a fourth mode. Reintroducing one must be a deliberate edit here,
-// behind a real typeface or scale-ratio decision (see `packages/core/docs/tokens.md`
+// behind a real typeface or scale-ratio decision (see `.claude/rules/tokens.md`
 // § Typography modes → product archetypes).
 const EXPECTED_MODES = ['maia', 'nova', 'vega'];
 

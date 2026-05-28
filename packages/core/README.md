@@ -34,7 +34,7 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 - Output: Tailwind v4 `@theme` block + per-mode `[data-style="X"]` blocks
 - Example: `--color-background: var(--nx-color-white-base)`, `--nx-spacing-4: 16px`
 
-> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-style="X"]` blocks plus role utilities (`nx:px-control-md`, `nx:py-control-md`, `nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-style` attribute on `<html>`. See [`spacing-tokens.md`](docs/spacing-tokens.md).
+> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-style="X"]` blocks plus role utilities (`nx:px-control-md`, `nx:py-control-md`, `nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-style` attribute on `<html>`. See [`spacing-tokens.md`](../../.claude/rules/spacing-tokens.md).
 
 **Component** (future)
 
@@ -43,7 +43,7 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 
 ### Color generation
 
-Color tokens don't ship the values stored on disk. Source files hold hex; the build converts to OKLCH, pins each shade to a perceptual lightness grid (so the same step is equally light across every palette), and gates every text/surface pair with APCA contrast in CI. See [Color math](docs/color-math.md) for the full pipeline and its trade-offs.
+Color tokens don't ship the values stored on disk. Source files hold hex; the build converts to OKLCH, pins each shade to a perceptual lightness grid (so the same step is equally light across every palette), and gates every text/surface pair with APCA contrast in CI.
 
 ## Reference Resolution
 

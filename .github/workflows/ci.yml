@@ -284,13 +284,12 @@ jobs:
       - name: Check canonical step set freshness
         run: yarn workspace @nexus/eslint-plugin refresh:canonical-set --check
 
-      - name: Regenerate token outputs (tailwind + modular + colorblind SVG)
+      - name: Regenerate token outputs (tailwind + modular)
         id: regen
         run: |
           set -euo pipefail
           yarn tokens:tailwind
           yarn tokens:modular
-          yarn workspace @nexus/core generate:colorblind-svg
 
       - name: Check token output freshness
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
@@ -300,12 +299,11 @@ jobs:
           DIRTY=$(git status --porcelain -- \
             packages/tailwind \
             apps/playground/public/themes \
-            apps/playground/src/styles \
-            packages/core/docs/color-math-colorblind.svg)
+            apps/playground/src/styles)
           if [ -n "$DIRTY" ]; then
             echo "::error::Token output is stale. Affected paths:"
             echo "$DIRTY"
-            echo "::error::Run 'yarn tokens:tailwind && yarn tokens:modular && yarn workspace @nexus/core generate:colorblind-svg' and commit the result."
+            echo "::error::Run 'yarn tokens:tailwind && yarn tokens:modular' and commit the result."
             exit 1
           fi
 

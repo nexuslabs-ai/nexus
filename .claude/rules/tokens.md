@@ -6,8 +6,6 @@ All tokens follow the W3C DTCG format: required `$value` + `$type`, optional `$d
 
 ## Color Token Pipeline
 
-> Public-facing companion: [`packages/core/docs/color-math.md`](../../packages/core/docs/color-math.md) narrates this pipeline for designers and external readers.
-
 **On-disk: hex; runtime: OKLCH.** `color.json` stores hex (8-digit for alpha shades, see [§ Alpha Token Scale](#alpha-token-scale)); the build converts to `oklch(...)` at emit time. Hex is the on-disk format because Tokens Studio and Figma Variables hex-normalise on export and cannot round-trip OKLCH — it's the only viable source format for a Figma-driven workflow.
 
 ### Routing modes
@@ -70,7 +68,7 @@ Failures must be fixed by adjusting the semantic token reference (which shade a 
 Token files live under `packages/core/tokens/` — `primitives/` (color, radius, borderwidth, typography, shadow, focus) and `semantic/` (`base-{palette}-{theme}`, `brands-{name}-{theme}`, `chart-{scale}-{mode}-{theme}`, per-mode `spacing-{mode}`, and standalone `focus.json` / `breakpoints.json` / `z-index.json`). The tree is the reference; a few non-obvious choices:
 
 - **Spacing** has no primitive layer — `spacing-{mode}.json` carries direct px (see [`spacing-tokens.md`](spacing-tokens.md)).
-- **`breakpoints.json`** is theme-agnostic and build-time only (see [`responsive.md`](../../../.claude/rules/responsive.md)); **`z-index.json`** is a standalone semantic scale (see [`components.md` § Layering model](../../../.claude/rules/components.md#layering-model)).
+- **`breakpoints.json`** is theme-agnostic and build-time only (see [`responsive.md`](responsive.md)); **`z-index.json`** is a standalone semantic scale (see [`components.md` § Layering model](components.md#layering-model)).
 
 ### Shadow Tokens (Theme-Aware)
 
@@ -88,7 +86,7 @@ Semantic colors group into Layout, Brand (`primary` / `secondary`), Status (`err
 
 - [surfaces.md](surfaces.md) — the 5-level surface contract these tokens compose, elevation grammar, and known overlaps.
 - [color-shades.md](color-shades.md) — what each 50 → 950 shade is for, per mode.
-- [components.md § Layering model](../../../.claude/rules/components.md#layering-model) — the z-index token scale and stacking contract.
+- [components.md § Layering model](components.md#layering-model) — the z-index token scale and stacking contract.
 
 ### Data viz tokens
 
@@ -98,7 +96,7 @@ Categorical chart palette. Hues rotate (teal → lime → orange → rose → in
 
 - **Primitives**: most are theme-agnostic (color, radius, borderwidth, typography). Shadow and focus split light/dark because the rendered value depends on the surface it sits on.
 - **CSS output**: light values in the `@theme` block, dark overrides in the `.dark` selector.
-- **Authoring rule**: because `.dark` already overrides semantic token values, never write `dark:` modifiers on semantic-named utilities in component code — see [`components.md` § Adaptive-by-default semantic tokens](../../../.claude/rules/components.md#adaptive-by-default-semantic-tokens).
+- **Authoring rule**: because `.dark` already overrides semantic token values, never write `dark:` modifiers on semantic-named utilities in component code — see [`components.md` § Adaptive-by-default semantic tokens](components.md#adaptive-by-default-semantic-tokens).
 
 ## Validation
 
