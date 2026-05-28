@@ -17,11 +17,11 @@ const inputVariants = cva(
   {
     variants: {
       size: {
-        // nexus-allow-numeric: Input px stays numeric — Input note in spacing-tokens.md
+        // nexus-allow-numeric: Input px stays numeric
         default: 'nx:px-3 nx:py-control-md nx:text-sm',
-        // nexus-allow-numeric: Input px stays numeric — Input note in spacing-tokens.md
+        // nexus-allow-numeric: Input px stays numeric
         sm: 'nx:px-2.5 nx:py-control-sm nx:text-xs',
-        // nexus-allow-numeric: Input px stays numeric — Input note in spacing-tokens.md
+        // nexus-allow-numeric: Input px stays numeric
         lg: 'nx:px-4 nx:py-control-lg nx:text-base',
       },
     },

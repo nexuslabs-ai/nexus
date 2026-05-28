@@ -162,16 +162,7 @@ Nexus ships a 6-token z-index scale for stacking overlays. The tokens are semant
 
 ### Token scale
 
-| CSS variable        | Utility        | Value | Role                                                             | Nexus usage                   |
-| ------------------- | -------------- | ----- | ---------------------------------------------------------------- | ----------------------------- |
-| `--z-index-overlay` | `nx:z-overlay` | 10    | Low-level backdrops / scrims (e.g. under a non-modal side panel) | reserved — consumer use       |
-| `--z-index-sticky`  | `nx:z-sticky`  | 30    | Sticky chrome (headers, toolbars) — above content, below dialogs | reserved — consumer use       |
-| `--z-index-modal`   | `nx:z-modal`   | 50    | Modal dialogs and their backdrop                                 | Dialog                        |
-| `--z-index-popover` | `nx:z-popover` | 70    | Tooltips, dropdowns, selects, popovers                           | DropdownMenu, Select, Tooltip |
-| `--z-index-toast`   | `nx:z-toast`   | 100   | Toasts / notifications                                           | (not yet shipped)             |
-| `--z-index-max`     | `nx:z-max`     | 9999  | Host-application system UI (AI agent overlays, debug, a11y)      | reserved — consumer-only      |
-
-The `nx:z-*` utilities are generated on demand by the consumer's Tailwind build from these `--z-index-*` theme keys, so all six are usable even though only `nx:z-modal` and `nx:z-popover` are referenced by shipped components. Values are canonical in `z-index.json`.
+Six tokens, low → high: `overlay` (10), `sticky` (30), `modal` (50), `popover` (70), `toast` (100), `max` (9999) — values canonical in `z-index.json`, utilities (`nx:z-modal`, …) generated on demand from the `--z-index-*` theme keys. Only `nx:z-modal` and `nx:z-popover` are used by shipped components (Dialog; DropdownMenu / Select / Tooltip); the rest are reserved for consumers (`sticky` for app-shell chrome, `max` for host system UI, `overlay` for low-level scrims).
 
 **Popover sits _above_ modal (70 > 50) by design.** A DropdownMenu, Select, or Tooltip opened _inside_ a Dialog must paint above the dialog to stay usable — so the floating-layer token outranks the modal layer. This is the deliberate, non-obvious ordering; do not "fix" it by dropping popover below modal.
 

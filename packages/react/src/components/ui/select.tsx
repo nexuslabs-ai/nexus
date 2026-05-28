@@ -67,7 +67,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
       className={cn(
         'nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-control-md',
         'nx:rounded-md nx:border nx:border-border-default nx:bg-background',
-        // nexus-allow-numeric: Select trigger px stays numeric — Input/Select note in spacing-tokens.md
+        // nexus-allow-numeric: Select trigger px stays numeric
         'nx:px-3 nx:py-control-md nx:text-sm',
         'nx:whitespace-nowrap',
         'nx:placeholder:text-muted-foreground',
@@ -99,7 +99,7 @@ function SelectScrollUpButton({
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
       className={cn(
-        // nexus-allow-numeric: popover scroll-button chrome — DropdownMenu/Select note
+        // nexus-allow-numeric: popover scroll-button chrome
         'nx:flex nx:cursor-default nx:items-center nx:justify-center nx:py-1',
         className
       )}
@@ -123,7 +123,7 @@ function SelectScrollDownButton({
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
       className={cn(
-        // nexus-allow-numeric: popover scroll-button chrome — DropdownMenu/Select note
+        // nexus-allow-numeric: popover scroll-button chrome
         'nx:flex nx:cursor-default nx:items-center nx:justify-center nx:py-1',
         className
       )}
@@ -184,7 +184,7 @@ function SelectContent({
         <SelectScrollUpButton />
         <SelectPrimitive.Viewport
           className={cn(
-            // nexus-allow-numeric: popover viewport chrome — DropdownMenu/Select note
+            // nexus-allow-numeric: popover viewport chrome
             'nx:p-1',
             position === 'popper' &&
               'nx:h-(--radix-select-trigger-height) nx:w-full nx:min-w-(--radix-select-trigger-width)'
@@ -225,7 +225,7 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
     <SelectPrimitive.Label
       data-slot="select-label"
       className={cn(
-        // nexus-allow-numeric: menu label item-tier rhythm — DropdownMenu/Select note
+        // nexus-allow-numeric: menu label item-tier rhythm
         'nx:px-2 nx:py-control-sm nx:text-sm nx:font-semibold',
         className
       )}

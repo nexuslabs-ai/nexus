@@ -184,7 +184,7 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
     <div
       data-slot="dialog-header"
       className={cn(
-        // nexus-allow-numeric: DialogHeader sub-element rhythm — Dialog note in spacing-tokens.md
+        // nexus-allow-numeric: DialogHeader sub-element rhythm
         'nx:flex nx:flex-col nx:gap-1.5 nx:text-center nx:sm:text-left',
         className
       )}
@@ -218,7 +218,7 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        // nexus-allow-numeric: DialogFooter sub-element rhythm at sm — Dialog note in spacing-tokens.md
+        // nexus-allow-numeric: DialogFooter sub-element rhythm at sm
         'nx:flex nx:flex-col-reverse nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
         className
       )}
