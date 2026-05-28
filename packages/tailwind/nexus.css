@@ -73,7 +73,7 @@
   --color-error-background-active: var(--nx-color-red-800);
   --color-error-disabled: var(--nx-color-red-300);
   --color-error-subtle: var(--nx-color-red-50);
-  --color-error-subtle-foreground: var(--nx-color-red-700);
+  --color-error-subtle-foreground: var(--nx-color-red-500);
   --color-error-subtle-hover: var(--nx-color-red-100);
   --color-error-subtle-active: var(--nx-color-red-200);
   --color-success-background: var(--nx-color-green-600);
@@ -82,7 +82,7 @@
   --color-success-background-active: var(--nx-color-green-800);
   --color-success-disabled: var(--nx-color-green-300);
   --color-success-subtle: var(--nx-color-green-50);
-  --color-success-subtle-foreground: var(--nx-color-green-700);
+  --color-success-subtle-foreground: var(--nx-color-green-500);
   --color-success-subtle-hover: var(--nx-color-green-100);
   --color-success-subtle-active: var(--nx-color-green-200);
   --color-information-background: var(--nx-color-blue-600);
@@ -91,7 +91,7 @@
   --color-information-background-active: var(--nx-color-blue-800);
   --color-information-disabled: var(--nx-color-blue-300);
   --color-information-subtle: var(--nx-color-blue-50);
-  --color-information-subtle-foreground: var(--nx-color-blue-600);
+  --color-information-subtle-foreground: var(--nx-color-blue-500);
   --color-information-subtle-hover: var(--nx-color-blue-100);
   --color-information-subtle-active: var(--nx-color-blue-200);
   --color-warning-background: var(--nx-color-yellow-600);
@@ -100,7 +100,7 @@
   --color-warning-background-active: var(--nx-color-yellow-800);
   --color-warning-disabled: var(--nx-color-yellow-300);
   --color-warning-subtle: var(--nx-color-yellow-50);
-  --color-warning-subtle-foreground: var(--nx-color-yellow-700);
+  --color-warning-subtle-foreground: var(--nx-color-yellow-500);
   --color-warning-subtle-hover: var(--nx-color-yellow-100);
   --color-warning-subtle-active: var(--nx-color-yellow-200);
   --color-primary-background: var(--nx-color-blue-600);
