@@ -26,7 +26,6 @@
     "tokens:modular": "yarn workspace @nexus/core build:tokens:modular && node scripts/sync-playground-themes.js",
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:contrast": "yarn workspace @nexus/core audit:contrast",
-    "audit:figma-parity": "yarn workspace @nexus/core audit:figma-parity",
     "audit:storybook-coverage": "yarn workspace @nexus/react audit:storybook-coverage",
     "validate:spacing-modes": "yarn workspace @nexus/core validate:spacing-modes",
     "playground": "cd apps/playground && yarn dev",

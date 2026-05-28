@@ -380,7 +380,7 @@ In Figma designs:
 | Topic               | Authoritative Source              |
 | ------------------- | --------------------------------- |
 | Component patterns  | [components.md](components.md)    |
-| Token architecture  | [figma.md](figma.md)              |
+| Token architecture  | [tokens.md](tokens.md)            |
 | Token format        | [tokens.md](tokens.md)            |
 | Actual token values | `packages/tailwind/nexus.css`     |
 | Primitive values    | `packages/tailwind/variables.css` |

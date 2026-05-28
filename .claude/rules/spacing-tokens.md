@@ -1,6 +1,6 @@
 # Spacing Token Architecture Rules
 
-> **Partial implementation status (post-#127).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Schema validation (cross-mode key-set parity) ships via `validate-spacing-modes.js` (#126), and the two custom ESLint rules `@nexus/canonical-spacing-steps` and `@nexus/prefer-role-utilities` ship in `packages/eslint-plugin-nexus/` (#127). Both are gated at `error` severity by `yarn lint` in CI and on pre-commit via lint-staged. Still pending: the `audit:figma-parity` wire-up for size category (#128) and the canonical-step-set reconciliation noted under "Open Items" in PR #223 — the rule currently accepts the union of every px value shipped across all 7 mode files (~80 values), wider than the documented 30-step set. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
+> **Partial implementation status (post-#127).** The build pipeline now reads per-mode `semantic/spacing-{mode}.json` files and emits direct-px `[data-style="X"]` blocks; the `--nx-size-*` primitive layer is gone, `collectSpacingTokens` returns the per-mode shape, and `nx:px-control-*` / `nx:py-control-*` / `nx:p-container` / `nx:gap-layout-*` utilities are generated. The role-to-component coupling table below reflects shipped code as of #123 and #124. Schema validation (cross-mode key-set parity) ships via `validate-spacing-modes.js` (#126), and the two custom ESLint rules `@nexus/canonical-spacing-steps` and `@nexus/prefer-role-utilities` ship in `packages/eslint-plugin-nexus/` (#127). Both are gated at `error` severity by `yarn lint` in CI and on pre-commit via lint-staged. Still pending: the canonical-step-set reconciliation noted under "Open Items" in PR #223 — the rule currently accepts the union of every px value shipped across all 7 mode files (~80 values), wider than the documented 30-step set. Treat sections in this file as the **spec the build now satisfies**, except for the items listed above.
 
 > Companion to `tokens.md`. Spacing has a different architecture than color, typography, radius, etc. — there is **no primitive size layer**. This file documents that decision, the rules that replace what primitives used to enforce, and the authoring patterns that follow from it.
 
@@ -196,7 +196,7 @@ The validator runs in two places:
 - **Pre-commit** — when any `packages/core/tokens/semantic/spacing-*.json` is staged, lint-staged fires `yarn validate:spacing-modes` ahead of the commit.
 - **CI** — the `audit-tokens` job runs it before token regeneration, so a broken mode-file set fails fast without burning time on downstream audits.
 
-Exit codes mirror `audit-figma-parity`: `0` (match), `1` (drift), `2` (config error — missing baseline, unknown mode file, malformed JSON). Pure-function diffing logic (`leafPathsOf`, `diffKeySets`, `validateModes`, `formatFindings`) is unit-tested in `packages/core/scripts/__tests__/validate-spacing-modes.test.js`; the real-files smoke test in `spacing-modes.test.js` calls into the same `validateModes` entry point.
+Exit codes: `0` (match), `1` (drift), `2` (config error — missing baseline, unknown mode file, malformed JSON). Pure-function diffing logic (`leafPathsOf`, `diffKeySets`, `validateModes`, `formatFindings`) is unit-tested in `packages/core/scripts/__tests__/validate-spacing-modes.test.js`; the real-files smoke test in `spacing-modes.test.js` calls into the same `validateModes` entry point.
 
 ## Lint rules
 
@@ -276,12 +276,6 @@ When a new component is authored, the author adds a row to this table.
 
 **Aside — which numeric steps are actually density-stable.** Per the per-mode `spacing-{mode}.json` files, only the small steps are mode-invariant: `0`, `0_5` (2px), `1` (4px), `1_5` (6px), and `2` (8px) hold the same value in all 7 modes. From `2_5` upward the values diverge (e.g. `4`: nova 14 / vega-cluster 16 / maia 18; `10`: nova 38 / vega-cluster 40 / maia 44). Components that should be _genuinely_ density-stable can only assert that via numeric utilities drawn from the stable subset — Badge does this with `nx:px-2 nx:py-0.5 nx:gap-1`, and Tabs `sm` does this with `nx:px-2 nx:py-1`. Both back the claim with `expectHeightPinnedAcrossModes`. Alert / Accordion / Card sub-elements (`gap-1.5`, `pt-0`, etc.) happen to land in the stable subset for the specific offsets used; the components as a whole still mode-couple via their main padding tokens.
 
-## How this relates to Figma
-
-The Figma side of Nexus mirrors this architecture. Figma Variables for spacing live in mode-specific collections (one per mode), each with the same key set as the JSON mode files. There is no Figma "spacing primitives" collection.
-
-The `audit:figma-parity` script **will** compare each mode's Figma collection against the corresponding `spacing-{mode}.json` file — same intent as the existing color audit, but mode-scoped. The `spacing` category is `Pending` in [`figma.md`](figma.md)'s categories table (tracked by #128); the audit only supports `--category color` today.
-
 ## Migration history
 
 The two-tier per-mode architecture described above landed across the [Spacing tokens · Phase 1](https://github.com/nexuslabs-ai/nexus/milestone/5) milestone. In chronological order (issue numbers unless prefixed with `PR`):
@@ -298,8 +292,6 @@ The two-tier per-mode architecture described above landed across the [Spacing to
 - **#230** — add `--control-gap-{sm,md,lg}` per-size gap roles (the `control.gap` token splits from a single value into a size-keyed bundle).
 - **#126** — ship `validate-spacing-modes.js` schema validator; wire to pre-commit (lint-staged) and CI (`audit-tokens` job, before regen).
 - **#127** — ship `@nexus/eslint-plugin` (`packages/eslint-plugin-nexus/`) with `canonical-spacing-steps` and `prefer-role-utilities`; wire both into root `eslint.config.js` at `error`; sweep the 10 UI components to annotate intentional raw-numeric sites with `// nexus-allow-numeric:` comments.
-
-Still ahead on the same milestone: #128 (figma-parity wire-up for size).
 
 ## When to revisit
 

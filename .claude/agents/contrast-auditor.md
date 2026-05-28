@@ -17,7 +17,7 @@ is always a candidate the user verifies by re-running the audit.
 
 ## Why a wrapper, not a body-of-logic agent
 
-Sibling `audit:*` scripts (storybook coverage, figma parity) make the same call:
+Sibling `audit:*` scripts (storybook coverage, class-refs) make the same call:
 deterministic rule-vs-files diffs belong in Node scripts CI can gate on, not in
 LLM reasoning. The audit script is testable and byte-stable. This agent is the
 natural-language surface that parses its failures and proposes the right shade
@@ -254,8 +254,6 @@ job after they apply the fix (the counterpart may actually pass).
   Lc ≥ 60 instead of 45?"). That's a design discussion, not this agent. Edit
   `audit-contrast.js`'s `BASE_PAIRS` / `BRAND_PAIRS` / `FOCUS_PAIRS` directly
   after the discussion.
-- The user wants to **refresh the Figma snapshot**. That's `audit:figma-parity`,
-  a different flow.
 - The user wants the agent to **apply the reroute itself**. Out of scope — the
   agent proposes, the human merges. No Edit/Write tool is available.
 

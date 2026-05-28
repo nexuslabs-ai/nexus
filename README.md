@@ -43,7 +43,6 @@ Each command runs from the repo root.
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
   - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
   - [`tokens.md`](.claude/rules/tokens.md) — token format, OKLCH pipeline, APCA contrast gate
-  - [`figma.md`](.claude/rules/figma.md) — Figma ↔ code parity rules
 - [Issue tracker](../../issues) — bugs and feature requests
 
 ## Browser support

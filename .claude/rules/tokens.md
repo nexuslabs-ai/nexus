@@ -56,8 +56,6 @@ E.g. `slate` (950 = `#020617`) yields `slate.a50` = `#0206170a` and `slate.a500`
 
 **Not APCA-gated.** Alpha tokens blend with their backdrop, so their contrast is context-dependent — they are intentionally excluded from the `audit:contrast` pairs. `oklchToSrgbInts()` throws on an alpha-bearing color, so any future pair that needs one must pre-blend against its surface first.
 
-**Figma parity.** The alpha primitives are mirrored into `figma-snapshot.json` so `audit:figma-parity --category color` sees no drift. Figma is the side that catches up — designers add the matching alpha variables there (code is canonical, per `.claude/rules/figma.md`).
-
 ### Warning for designers
 
 When you change a hex in Figma for a palette shade, only the **hue and chroma** carry through — the **lightness is overwritten by the grid**. `#ff0000` and `#400000` at the same shade key produce identical lightness. To change a shade's lightness, edit `packages/core/src/lib/perceptual-grid.json`, not the hex.
@@ -261,7 +259,6 @@ yarn tokens:modular           # per-theme bundles for the playground
 
 # Verify the change
 yarn audit:contrast                           # APCA fg/bg pairs
-yarn audit:figma-parity --category color      # snapshot drift
 yarn validate:spacing-modes                   # spacing schema parity
 ```
 
