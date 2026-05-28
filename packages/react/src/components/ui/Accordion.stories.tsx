@@ -514,7 +514,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Accordion stays on the document spacing scale (`nx:py-4`) rather than migrating to `py-control-lg` — see `spacing-tokens.md` Accordion note. Accordion still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the trigger height shifts between nova / vega-cluster / maia rows. The point is item-tier rhythm distinct from controls or containers, not density stability.',
+          'Accordion stays on the document spacing scale (`nx:py-4`) rather than migrating to `py-control-lg`. Accordion still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the trigger height shifts between nova / vega-cluster / maia rows. The point is item-tier rhythm distinct from controls or containers, not density stability.',
       },
     },
   },

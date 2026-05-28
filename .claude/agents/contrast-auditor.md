@@ -11,8 +11,8 @@ permissionMode: bypassPermissions
 A thin wrapper around `yarn audit:contrast`. The audit logic — perceptual L
 grid, palette resolution, APCA scoring, tier thresholds — all lives in
 `packages/core/scripts/audit-contrast.js`. This agent translates failures into
-proposed semantic-token reroutes, with role-conflict cross-references from
-`.claude/rules/color-shades.md`. The script is the gate; the agent's proposal
+proposed semantic-token reroutes, with role-conflict checks derived from the
+base token files. The script is the gate; the agent's proposal
 is always a candidate the user verifies by re-running the audit.
 
 ## Why a wrapper, not a body-of-logic agent
@@ -146,22 +146,17 @@ Propose stepping one shade using the **luminance-order rule**:
 | `Lc > 0` | fg darker than bg  | Step fg darker (higher shade number, lower L)  |
 | `Lc < 0` | fg lighter than bg | Step fg lighter (lower shade number, higher L) |
 
-Then run the **role-conflict check**:
+Then run the **role-conflict check** against the base token file — the ground
+truth (a derived shade-role index was removed in favour of this):
 
-1. Grep `.claude/rules/color-shades.md` for the row starting with `` | `{N}` ``
-   where `{N}` is the proposed shade.
-2. Split the row by `|`. Pick the column matching the failing file's theme
-   suffix:
-   - `*-light.json` → `Light-mode use` column
-   - `*-dark.json` → `Dark-mode use` column
-3. Treat any italicised cell — leading `_(` and trailing `)_` — as **no
-   documented conflict** and do not surface as a clash. This covers the full
-   no-role family in `color-shades.md`: `_(rarely used)_` (shade 200 dark),
-   `_(rarely used — too close to white...)_` (shade 100 dark), and
-   `_(anchor — rarely surfaced...)_` (shade 500 dark).
-4. If the column lists a role for that shade, add a one-line **Notes** entry:
-   `role collision ({theme}): reserved for {role}`. Don't refuse the suggestion
-   — surface the tradeoff so the human can choose.
+1. Grep the failing `base-{palette}-{theme}.json` for `"{<palette>.{N}}"` where
+   `{N}` is the proposed shade — this lists every semantic token already
+   pointing at that shade.
+2. If one or more other roles already reference it, add a one-line **Notes**
+   entry: `role collision ({theme}): shade {N} also used by {roles}`. Don't
+   refuse the suggestion — surface the tradeoff so the human can choose.
+3. No matches → no conflict (this naturally covers the rarely-used dark shades
+   like 100/200 that no role occupies).
 
 #### Case B — ref to a leaf primitive (`{white}` or `{black}`)
 
@@ -204,10 +199,9 @@ The failing fg is one of `chart.categorical.{1..5}`, each referencing a
 **different palette per series** for hue rotation (teal → lime → orange →
 rose → indigo, per `tokens.md § Data viz tokens`).
 
-**Skip the role-conflict check for Case D.** `color-shades.md` covers
-slate/neutral/gray/stone/zinc only; the chart palettes (teal/lime/orange/
-rose/indigo) have no rows there, so the grep would silently no-op and add
-nothing.
+**Skip the role-conflict check for Case D.** The chart palettes (teal/lime/
+orange/rose/indigo) aren't in the base surface files' shade space, so the
+base-JSON grep would no-op and add nothing.
 
 Naïve shade-stepping risks degrading the categorical rotation: stepping
 `{teal.700}` darker may push its perceived weight too close to a neighbouring
@@ -273,9 +267,5 @@ job after they apply the fix (the counterpart may actually pass).
   is the cross-file header convention)
 - `.claude/rules/tokens.md` § APCA contrast gate — threshold tiers and the
   non-negotiability rule; § Data viz tokens — hue rotation rationale for Case D
-- `.claude/rules/color-shades.md` — shade-by-shade role grid (light vs dark
-  column per theme)
-- `.claude/rules/surfaces.md` — the 5-level surface contract that constrains
-  where each shade can sit
 - `packages/core/src/lib/perceptual-grid.json` — the 11-step palette-uniform
   L grid

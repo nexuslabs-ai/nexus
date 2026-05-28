@@ -12,7 +12,7 @@ Requires `jsonc-eslint-parser`. Wired in the root `eslint.config.js` to target s
 
 ### `@nexus/prefer-role-utilities`
 
-Flags raw numeric padding / gap utilities (`nx:p-N`, `nx:px-N`, `nx:py-N`, `nx:gap-N`) in `packages/react/src/components/ui/*.tsx` (excluding `*.stories.tsx`) where a role-named utility would apply per the coupling table in `.claude/rules/spacing-tokens.md`.
+Flags raw numeric padding / gap utilities (`nx:p-N`, `nx:px-N`, `nx:py-N`, `nx:gap-N`) in `packages/react/src/components/ui/*.tsx` (excluding `*.stories.tsx`) where a role-named utility would apply per the coupling table.
 
 `nx:(p|px|py|gap)-0` is not flagged — there is no role for "no padding".
 
@@ -21,7 +21,7 @@ Flags raw numeric padding / gap utilities (`nx:p-N`, `nx:px-N`, `nx:py-N`, `nx:g
 When a raw numeric is intentional (chip rhythm, sub-element offset, item-tier menu rows, etc.), annotate the line **immediately above** with:
 
 ```tsx
-// nexus-allow-numeric: chip rhythm — Badge note in spacing-tokens.md
+// nexus-allow-numeric: chip rhythm
 className: 'nx:px-2 nx:py-0.5',
 ```
 
@@ -29,4 +29,4 @@ The comment text after the colon is free-form; keep it terse and cite the rule n
 
 ## Source of truth
 
-The role-to-component coupling table and the canonical step set live in `.claude/rules/spacing-tokens.md`. This plugin enforces what that document specifies.
+The role-to-component coupling table and the canonical step set live. This plugin enforces what that document specifies.

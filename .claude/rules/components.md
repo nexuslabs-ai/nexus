@@ -97,8 +97,6 @@ When a component renders on `container` or `popover` and needs a visible press c
 - `nx:active:shadow-inner` — `inset` shadow primitive, additive on top of the existing fill.
 - `nx:active:border-border-active` — emphasised border, useful when the component already has a border.
 
-See [`surfaces.md` Rule 6](surfaces.md#rules) and [`surfaces.md` § Known overlaps](surfaces.md#known-overlaps) for why these surfaces don't get a distinct active fill.
-
 ## Focus States
 
 Use the design-system focus token with a real `outline` and the tokenised offset (`--focus-offset`, currently `2px`), not Tailwind `ring-*` utilities and not box-shadow:
@@ -158,7 +156,7 @@ Do not add `nx:shadow-*` utilities to focusable elements — the structural sepa
 
 Nexus ships a 6-token z-index scale for stacking overlays. The tokens are semantic and theme-agnostic (no `.dark` variants) — stacking order is structural, not appearance-driven.
 
-**Mental model:** shadow communicates _perceived elevation_; z-index controls _actual paint order_. They are independent axes — a higher z-index does not imply a larger shadow, and the elevation shadows in [`surfaces.md`](surfaces.md) never set stacking. Reach for a z-index token only when two positioned layers can overlap.
+**Mental model:** shadow communicates _perceived elevation_; z-index controls _actual paint order_. They are independent axes — a higher z-index does not imply a larger shadow, and the elevation shadows never set stacking. Reach for a z-index token only when two positioned layers can overlap.
 
 ### Token scale
 

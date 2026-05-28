@@ -482,7 +482,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          "Each row scopes `data-style` locally on the trigger wrapper. Menu items (`DropdownMenuItem` / `DropdownMenuCheckboxItem` / `DropdownMenuRadioItem` / `DropdownMenuSubTrigger` / `DropdownMenuLabel`) all migrate `py-1.5` → `py-control-sm` so vertical density couples to mode. `px-2` stays numeric because menu rows are intentionally tighter than control rows (see `spacing-tokens.md` menu-item note). `DropdownMenuContent` portals to `document.body`, so opened items pick up the document-level mode — not the row's wrapper mode. Triggers (Buttons) respond to the wrapper.",
+          "Each row scopes `data-style` locally on the trigger wrapper. Menu items (`DropdownMenuItem` / `DropdownMenuCheckboxItem` / `DropdownMenuRadioItem` / `DropdownMenuSubTrigger` / `DropdownMenuLabel`) all migrate `py-1.5` → `py-control-sm` so vertical density couples to mode. `px-2` stays numeric because menu rows are intentionally tighter than control rows. `DropdownMenuContent` portals to `document.body`, so opened items pick up the document-level mode — not the row's wrapper mode. Triggers (Buttons) respond to the wrapper.",
       },
     },
   },

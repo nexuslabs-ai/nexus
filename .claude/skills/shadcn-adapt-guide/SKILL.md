@@ -27,9 +27,9 @@ The authoritative rules live in `.claude/rules/*.md`. This guide orchestrates th
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | `shadcn-divergences.md`                                                                                                                                                                                  | **THE** shadcn→Nexus token mapping, sizing, data-attrs, focus, checklist    |
 | `components.md`                                                                                                                                                                                          | Component architecture: CVA, data-slot, `nx:` prefix order, focus, layering |
-| `surfaces.md`                                                                                                                                                                                            | Surface/elevation tokens (container/popover/overlay), the `nav-*` namespace |
+| `base-*.json` (surface/nav tokens)                                                                                                                                                                       | Surface/elevation tokens (container/popover/overlay), the `nav-*` namespace |
 | `storybook.md` / `testing-react.md`                                                                                                                                                                      | Required stories, play-fns, a11y, the base-variants generator               |
-| `tokens.md` / `color-shades.md`                                                                                                                                                                          | Token names — verify a token exists before using it                         |
+| `tokens.md`                                                                                                                                                                                              | Token names — verify a token exists before using it                         |
 | `code-quality.md`, `composition-over-render-props.md`, `extract-inline-handlers.md`, `guard-clauses.md`, `useeffect-escape-hatch.md`, `code-comments.md`, `no-follow-up-deferral.md`, `project-stage.md` | General code discipline                                                     |
 
 ## Input
@@ -48,7 +48,7 @@ Before writing, read the closest **shipped** Nexus component and mirror it exact
 | CVA enum/compound variants              | `button.tsx`, `badge.tsx`         | (variant-heavy components)        |
 | A styled element + focus/aria-invalid   | `input.tsx`                       | textarea, input-otp slot          |
 | Pure markup, no Radix                   | compose primitives + `cn`         | table, skeleton, separator, label |
-| Nav / sidebar chrome                    | `nav-*` tokens (`surfaces.md`)    | sidebar                           |
+| Nav / sidebar chrome                    | `nav-*` tokens                    | sidebar                           |
 
 ## Process
 
@@ -97,14 +97,14 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - _See a fixed height (`h-10`, `h-9`)?_ → padding-based sizing. Exceptions: progress-bar height, avatar, modal. (`components.md` § Sizing)
 - _Adding any element?_ → `data-slot="{name}"` (+ `data-variant`/`data-size` if it has them). (`components.md`)
 - _shadcn uses `destructive`?_ → keep the **variant name** `destructive` in the public API; map internals to `error-*` tokens. (`shadcn-divergences.md`)
-- _Overlay / portal / floating layer?_ → mirror `dialog.tsx`: `nx:bg-overlay` scrim, `nx:bg-container`/`nx:bg-popover` surface, `nx:z-modal` (dialog/sheet/alert-dialog) or `nx:z-popover` (popover/command), tw-animate-css fade/zoom/slide. (`components.md` § Layering, `surfaces.md`)
-- _Nav / sidebar chrome?_ → `nav-*` namespace (`nx:bg-nav-background`, `nx:hover:bg-nav-item-hover`, `nx:border-nav-border`), not the base surface tokens. (`surfaces.md`)
+- _Overlay / portal / floating layer?_ → mirror `dialog.tsx`: `nx:bg-overlay` scrim, `nx:bg-container`/`nx:bg-popover` surface, `nx:z-modal` (dialog/sheet/alert-dialog) or `nx:z-popover` (popover/command), tw-animate-css fade/zoom/slide. (`components.md` § Layering)
+- _Nav / sidebar chrome?_ → `nav-*` namespace (`nx:bg-nav-background`, `nx:hover:bg-nav-item-hover`, `nx:border-nav-border`), not the base surface tokens.
 - _Defining a prop typed `(…) => ReactNode` / `ComponentType` / a `mode` discriminator?_ → use `children`/named slots or per-mode components. (`composition-over-render-props.md`)
 - _Inline JSX handler 3+ lines or branching?_ → extract a named `handleX` above `return`. (`extract-inline-handlers.md`)
 - _Reaching for `useEffect`?_ → external systems only (subscriptions, DOM measurement); never to sync React state. (`useeffect-escape-hatch.md`)
 - _Typing `// TODO` / "for now" / "follow-up"?_ → don't. Fix in this PR, or `// TODO(#N):` against a tracked issue. (`code-comments.md`, `no-follow-up-deferral.md`)
 - _Tempted by a backcompat shim / deprecation / feature flag?_ → delete or rename in place; this is pre-production. (`project-stage.md`)
-- _A semantic token you need doesn't exist?_ → **stop and surface it.** Don't reach for a primitive or invent one; the token set is the contract. (`tokens.md`, `color-shades.md`)
+- _A semantic token you need doesn't exist?_ → **stop and surface it.** Don't reach for a primitive or invent one; the token set is the contract. (`tokens.md`)
 
 ## Definition of done
 

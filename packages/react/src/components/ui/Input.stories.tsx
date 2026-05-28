@@ -357,7 +357,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input `padding-y` migrates to `py-control-{sm,md,lg}` per size and so responds to mode; `padding-x` stays numeric per the coupling table (Input is narrower than Button at the same size — see `spacing-tokens.md` note). Vega / Lyra / Luma / Mira currently share identical control-y tokens (so those four rows render at the same height); Nova compresses, Maia / Sera breathe.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input `padding-y` migrates to `py-control-{sm,md,lg}` per size and so responds to mode; `padding-x` stays numeric per the coupling table (Input is narrower than Button at the same size). Vega / Lyra / Luma / Mira currently share identical control-y tokens (so those four rows render at the same height); Nova compresses, Maia / Sera breathe.',
       },
     },
   },

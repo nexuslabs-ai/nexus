@@ -419,7 +419,7 @@ describe('utils', () => {
       expect(DEFAULT_CONFIG.shadow).toBe('vega');
       expect(DEFAULT_CONFIG.radius).toBe('sharp');
       expect(DEFAULT_CONFIG.borderwidth).toBe('vega');
-      // Vega is the canonical spacing default (per spacing-tokens.md). The
+      // Vega is the canonical spacing default. The
       // key controls which mode lands under `:root, [data-style="X"]`; other
       // modes still ship in the bundle.
       expect(DEFAULT_CONFIG.spacingDefault).toBe('vega');

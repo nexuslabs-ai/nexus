@@ -480,7 +480,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Badge is intentionally density-stable — its utilities sit on the canonical numeric step set (`px-2`, `py-0.5`, `gap-1`) rather than the `control-*` role family, because a chip is not a control (its padding is sub-control by design — see `spacing-tokens.md` note on Badge / Chip). All 7 rows should render at the same height regardless of mode. The `BadgeIsDensityStable` sentinel below asserts this.',
+          'Badge is intentionally density-stable — its utilities sit on the canonical numeric step set (`px-2`, `py-0.5`, `gap-1`) rather than the `control-*` role family, because a chip is not a control (its padding is sub-control by design). All 7 rows should render at the same height regardless of mode. The `BadgeIsDensityStable` sentinel below asserts this.',
       },
     },
   },

@@ -67,7 +67,7 @@ Failures must be fixed by adjusting the semantic token reference (which shade a 
 
 Token files live under `packages/core/tokens/` — `primitives/` (color, radius, borderwidth, typography, shadow, focus) and `semantic/` (`base-{palette}-{theme}`, `brands-{name}-{theme}`, `chart-{scale}-{mode}-{theme}`, per-mode `spacing-{mode}`, and standalone `focus.json` / `breakpoints.json` / `z-index.json`). The tree is the reference; a few non-obvious choices:
 
-- **Spacing** has no primitive layer — `spacing-{mode}.json` carries direct px (see [`spacing-tokens.md`](spacing-tokens.md)).
+- **Spacing** has no primitive layer — `spacing-{mode}.json` carries direct px.
 - **`breakpoints.json`** is theme-agnostic and build-time only (see [`responsive.md`](responsive.md)); **`z-index.json`** is a standalone semantic scale (see [`components.md` § Layering model](components.md#layering-model)).
 
 ### Shadow Tokens (Theme-Aware)
@@ -76,7 +76,7 @@ Shadow primitives split by both mode AND theme (`shadow-{mode}-{theme}.json`) be
 
 ## Color Scale Convention
 
-Primitive colors use an 11-step shade scale (50–950). See [`color-shades.md`](color-shades.md) for what each shade means and what to use it for.
+Primitive colors use an 11-step shade scale (50–950), perceptually graded — each shade's lightness is pinned by `perceptual-grid.json`, so the steps are visual, not RGB-arithmetic.
 
 ## Semantic Token Categories
 
@@ -84,8 +84,6 @@ Semantic colors group into Layout, Brand (`primary` / `secondary`), Status (`err
 
 **See also:**
 
-- [surfaces.md](surfaces.md) — the 5-level surface contract these tokens compose, elevation grammar, and known overlaps.
-- [color-shades.md](color-shades.md) — what each 50 → 950 shade is for, per mode.
 - [components.md § Layering model](components.md#layering-model) — the z-index token scale and stacking contract.
 
 ### Data viz tokens
@@ -118,7 +116,7 @@ After editing token files, regenerate the CSS (`yarn tokens:tailwind` for the `@
 
 Each axis (base, brand, typography, shadow, radius, borderwidth) is selected via a CLI flag on `generate-tailwind-package.js`; the available modes per axis are the files under each `primitives/` subdir and the `base-*` / `brands-*` semantic files.
 
-> **Spacing isn't a per-mode CLI flag.** All 7 modes (vega, lyra, maia, mira, nova, luma, sera) ship in every build — there's no single-mode build. Mode swap is via the `data-style="X"` attribute on `<html>` (or any subtree) at runtime, no rebuild needed. `--spacingDefault=<mode>` only picks which mode lands under the `:root` cascade default; the other six still emit their `[data-style="X"]` blocks. See [`spacing-tokens.md`](spacing-tokens.md).
+> **Spacing isn't a per-mode CLI flag.** All 7 modes (vega, lyra, maia, mira, nova, luma, sera) ship in every build — there's no single-mode build. Mode swap is via the `data-style="X"` attribute on `<html>` (or any subtree) at runtime, no rebuild needed. `--spacingDefault=<mode>` only picks which mode lands under the `:root` cascade default; the other six still emit their `[data-style="X"]` blocks.
 
 > **Mode distinctness varies by axis.** A flag being accepted doesn't mean it resolves to unique values. `shadow` is distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `borderwidth` exposes five flags but only two are distinct: `borderwidth-nova` (1.5px / 3px) and the `vega` cluster (`lyra` = `mira` = `vega` at 1px / 2px). Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
 

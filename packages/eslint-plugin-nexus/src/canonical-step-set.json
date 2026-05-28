@@ -1,5 +1,5 @@
 {
-  "$comment": "Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `yarn workspace @nexus/eslint-plugin refresh:canonical-set`. The aspirational 30-step set in .claude/rules/spacing-tokens.md is narrower; reconciliation tracked separately.",
+  "$comment": "Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `yarn workspace @nexus/eslint-plugin refresh:canonical-set`. The shipped union may exceed the originally-intended scale; reconciliation tracked separately.",
   "values": [
     0, 2, 4, 6, 8, 9, 10, 11, 12, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32,
     34, 36, 38, 40, 42, 44, 46, 48, 52, 56, 60, 64, 68, 76, 80, 84, 92, 96, 100,

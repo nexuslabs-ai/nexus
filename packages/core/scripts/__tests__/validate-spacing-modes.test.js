@@ -18,7 +18,7 @@ import {
 const dim = (n) => ({ $value: { value: n, unit: 'px' }, $type: 'dimension' });
 
 describe('CANONICAL_MODES', () => {
-  it('is the 7-mode set per .claude/rules/spacing-tokens.md', () => {
+  it('is the 7-mode set per the canonical mode list', () => {
     expect([...CANONICAL_MODES].sort()).toEqual([
       'luma',
       'lyra',

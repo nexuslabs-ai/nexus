@@ -293,7 +293,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container` — see `spacing-tokens.md` Alert note. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses the document scale (callout rhythm) instead of the container scale (raised-surface rhythm) — not that it is density-stable.',
+          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container`. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses the document scale (callout rhythm) instead of the container scale (raised-surface rhythm) — not that it is density-stable.',
       },
     },
   },
