@@ -337,7 +337,7 @@ yarn test:storybook:ui     # Interactive UI
 
 A11y is automatic via `addon-a11y` with `a11y: { test: 'error' }` in preview. Every story is checked against axe-core rules and violations fail the test — keyboard nav, ARIA semantics, focus management, role/landmark structure.
 
-**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` (and `color-contrast-enhanced`) rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Color contrast is verified at the token layer by `yarn workspace @nexus/core audit:contrast` (see [tokens.md § APCA contrast gate](tokens.md#apca-contrast-gate)); stories carry no responsibility for re-checking it.
+**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` (and `color-contrast-enhanced`) rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Color contrast is verified at the token layer by `yarn workspace @nexus/core audit:contrast` (see [tokens.md § APCA contrast gate](../../packages/core/docs/tokens.md#apca-contrast-gate)); stories carry no responsibility for re-checking it.
 
 ## Per-Base Variant Generation
 

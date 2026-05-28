@@ -56,11 +56,11 @@ Semantic color tokens adapt to theme automatically. Do not write `dark:` modifie
 | `nx:text-foreground`            | Yes      | Same — `foreground` already carries its dark-mode value |
 | `nx:dark:bg-primary-background` | No       | `dark:` is a no-op; the token already adapts            |
 
-**Rule of thumb:** any class referencing a token from [`tokens.md` § Semantic Token Categories](tokens.md#semantic-token-categories) (Layout, Brand, Status, Borders, Navigation, Data viz) adapts — don't add `dark:`. The `dark:` modifier is reserved for raw primitives, which should be rare in component code.
+**Rule of thumb:** any class referencing a token from [`tokens.md` § Semantic Token Categories](../../packages/core/docs/tokens.md#semantic-token-categories) (Layout, Brand, Status, Borders, Navigation, Data viz) adapts — don't add `dark:`. The `dark:` modifier is reserved for raw primitives, which should be rare in component code.
 
 **Primitive edge case.** Raw primitive utilities (`nx:bg-blue-500 nx:dark:bg-blue-900`) _are_ non-adaptive, so `dark:` is the only mechanism for varying them by theme. But primitives in component code are themselves an anti-pattern (see § Semantic Token Paths above), so this case should almost never come up — if you find yourself reaching for one, prefer adding the missing semantic token instead.
 
-See [`tokens.md` § Light/Dark Theme Tokens](tokens.md#lightdark-theme-tokens) for how the `.dark` selector emit makes this work.
+See [`tokens.md` § Light/Dark Theme Tokens](../../packages/core/docs/tokens.md#lightdark-theme-tokens) for how the `.dark` selector emit makes this work.
 
 ## Sizing Convention
 
@@ -97,7 +97,7 @@ When a component renders on `container` or `popover` and needs a visible press c
 - `nx:active:shadow-inner` — `inset` shadow primitive, additive on top of the existing fill.
 - `nx:active:border-border-active` — emphasised border, useful when the component already has a border.
 
-See [`surfaces.md` Rule 6](surfaces.md#rules) and [`surfaces.md` § Known overlaps](surfaces.md#known-overlaps) for why these surfaces don't get a distinct active fill.
+See [`surfaces.md` Rule 6](../../packages/core/docs/surfaces.md#rules) and [`surfaces.md` § Known overlaps](../../packages/core/docs/surfaces.md#known-overlaps) for why these surfaces don't get a distinct active fill.
 
 ## Focus States
 
@@ -145,7 +145,7 @@ Not every focusable thing takes the outline ring, and not everything that shows 
 
 The dividing line is modality: anything a keyboard user reaches with Tab gets the ring; anything Radix's roving focus moves to on pointer-hover gets the background tint. The tint pattern is live in `dropdown-menu.tsx` and `select.tsx`.
 
-The `focus-default` colour is a dedicated brand-blue tuned to clear [APCA Lc ≥ 45](tokens.md#apca-contrast-gate) on every surface it lands on — see [§ Uniform brand-blue across variants](#uniform-brand-blue-across-variants) for the per-theme values and the surfaces it was validated against.
+The `focus-default` colour is a dedicated brand-blue tuned to clear [APCA Lc ≥ 45](../../packages/core/docs/tokens.md#apca-contrast-gate) on every surface it lands on — see [§ Uniform brand-blue across variants](#uniform-brand-blue-across-variants) for the per-theme values and the surfaces it was validated against.
 
 ### No shadow on focusable elements
 
@@ -158,7 +158,7 @@ Do not add `nx:shadow-*` utilities to focusable elements — the structural sepa
 
 Nexus ships a 6-token z-index scale for stacking overlays. The tokens are semantic and theme-agnostic (no `.dark` variants) — stacking order is structural, not appearance-driven.
 
-**Mental model:** shadow communicates _perceived elevation_; z-index controls _actual paint order_. They are independent axes — a higher z-index does not imply a larger shadow, and the elevation shadows in [`surfaces.md`](surfaces.md) never set stacking. Reach for a z-index token only when two positioned layers can overlap.
+**Mental model:** shadow communicates _perceived elevation_; z-index controls _actual paint order_. They are independent axes — a higher z-index does not imply a larger shadow, and the elevation shadows in [`surfaces.md`](../../packages/core/docs/surfaces.md) never set stacking. Reach for a z-index token only when two positioned layers can overlap.
 
 ### Token scale
 

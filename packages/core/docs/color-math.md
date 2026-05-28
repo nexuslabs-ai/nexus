@@ -97,7 +97,7 @@ Each pair is checked across every applicable base palette and brand, in **both**
 
 **The audit scores the sRGB-equivalent of what you ship.** This is the part that closes the loop. The audit runs each token through the OKLCH-pinning converter the build uses (`hexToSrgbInts` in [`scripts/lib/perceptual-grid.js`](../scripts/lib/perceptual-grid.js)), which re-clamps the (P3-emit) value into sRGB and scores the resulting `[r, g, b]`. APCA reads only RGB ints, and contrast must hold on the lowest-common-denominator display — a legacy sRGB screen — so the gate measures the sRGB projection of the shipped color. A pin that quietly broke contrast cannot pass. A pin that quietly broke contrast cannot pass.
 
-A failing pair is not a threshold to lower. The thresholds come from APCA's published intended-use tiers and are fixed; a failure means the semantic token points at the wrong shade, or the grid L for that shade is wrong. Fix the reference or the grid — [`color-shades.md`](../../../.claude/rules/color-shades.md) maps which shade each role should use.
+A failing pair is not a threshold to lower. The thresholds come from APCA's published intended-use tiers and are fixed; a failure means the semantic token points at the wrong shade, or the grid L for that shade is wrong. Fix the reference or the grid — [`color-shades.md`](color-shades.md) maps which shade each role should use.
 
 ## Color-blind validation
 
@@ -181,6 +181,6 @@ External:
 
 Internal (deeper, agent-facing):
 
-- [`.claude/rules/tokens.md`](../../../.claude/rules/tokens.md) § Color Token Pipeline — the build-side spec this document narrates
-- [`.claude/rules/color-shades.md`](../../../.claude/rules/color-shades.md) — what each `50`–`950` shade is for, per role
-- [`.claude/rules/surfaces.md`](../../../.claude/rules/surfaces.md) — the surface stack the contrast pairs are built on
+- [`tokens.md`](tokens.md) § Color Token Pipeline — the build-side spec this document narrates
+- [`color-shades.md`](color-shades.md) — what each `50`–`950` shade is for, per role
+- [`surfaces.md`](surfaces.md) — the surface stack the contrast pairs are built on

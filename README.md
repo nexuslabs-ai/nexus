@@ -42,7 +42,7 @@ Each command runs from the repo root.
 - [`.claude/rules/`](.claude/rules/) — project conventions (canonical). There is no root `CLAUDE.md`; the rules directory is the authoritative AI-guidance source. High-traffic files:
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
   - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
-  - [`tokens.md`](.claude/rules/tokens.md) — token format, OKLCH pipeline, APCA contrast gate
+- [`packages/core/docs/`](packages/core/docs/) — the token-system reference (not auto-loaded into every session): [`tokens.md`](packages/core/docs/tokens.md) (OKLCH pipeline, APCA gate), [`color-shades.md`](packages/core/docs/color-shades.md), [`surfaces.md`](packages/core/docs/surfaces.md), [`spacing-tokens.md`](packages/core/docs/spacing-tokens.md)
 - [Issue tracker](../../issues) — bugs and feature requests
 
 ## Browser support

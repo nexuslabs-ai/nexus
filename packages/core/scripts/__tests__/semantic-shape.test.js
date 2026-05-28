@@ -33,7 +33,7 @@ function readJson(filePath) {
 }
 
 describe('semantic token shape', () => {
-  // `.claude/rules/tokens.md` documents that each brand/status role exposes
+  // `packages/core/docs/tokens.md` documents that each brand/status role exposes
   // a fixed nine-key shape. Without a test, the doc and the JSON drift
   // (see #54: badge.tsx referenced `*-surface` / `*-text` keys that never
   // existed). Walk every semantic file and prove the shape end-to-end.

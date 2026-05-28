@@ -21,7 +21,7 @@
 3. **Dark mode: container/popover step lighter than canvas.** Shadow is additive but not load-bearing; the luminance step is what reads as raised.
 4. **Direction is consistent across modes.** Raised sits closer to white in light mode, lighter than canvas in dark mode. Recessed sits darker in light mode; in dark mode "more recessed than canvas" is impossible — `muted` stays at `{p.800}` (one lighter than canvas at `{p.900}`) and relies on border/inset framing for the recessed read.
 5. **Components don't pick surfaces, contexts do.** A card inside a sidebar uses `container`; the sidebar uses `nav-background`. A dialog body uses `container`; the dropdown inside the dialog uses `popover`.
-6. **When `-active` cannot step to a distinct shade, the press cue moves off the fill.** The token still resolves (to the same value as rest) so component code has a stable hook, but the visual affordance comes from `nx:active:border-border-active` or `nx:active:shadow-inner` (the `inset`-baked shadow primitive) — applied to the component's `:active` / `[data-state="active"]` selector, not always-on, and not as a fill change. This is forced by dark-mode shade scarcity (`container = {p.800}` has no distinct darker step that doesn't collide with canvas; `popover = {p.700}` has no distinct darker step that doesn't collide with container) and by light-mode near-white compression (`popover-hover` and `popover-active` both sit at `{p.50}`). See § Known overlaps for the specific pairs; see [`components.md` § State Patterns](components.md#state-patterns) for the component-side application.
+6. **When `-active` cannot step to a distinct shade, the press cue moves off the fill.** The token still resolves (to the same value as rest) so component code has a stable hook, but the visual affordance comes from `nx:active:border-border-active` or `nx:active:shadow-inner` (the `inset`-baked shadow primitive) — applied to the component's `:active` / `[data-state="active"]` selector, not always-on, and not as a fill change. This is forced by dark-mode shade scarcity (`container = {p.800}` has no distinct darker step that doesn't collide with canvas; `popover = {p.700}` has no distinct darker step that doesn't collide with container) and by light-mode near-white compression (`popover-hover` and `popover-active` both sit at `{p.50}`). See § Known overlaps for the specific pairs; see [`components.md` § State Patterns](../../../.claude/rules/components.md#state-patterns) for the component-side application.
 
 ## Nav as a namespace
 
@@ -53,5 +53,5 @@ These collisions are intentional — they fall out of the luminance grammar. The
 
 - [color-shades.md](color-shades.md) — what each 50→950 shade is for
 - [tokens.md](tokens.md) — pipeline, OKLCH conversion, APCA gate
-- [shadcn-divergences.md](shadcn-divergences.md) — shadcn → Nexus token mapping
-- [components.md § Layering model](components.md#layering-model) — z-index / stacking order, the structural axis paired with this file's elevation/shadow contract
+- [shadcn-divergences.md](../../../.claude/rules/shadcn-divergences.md) — shadcn → Nexus token mapping
+- [components.md § Layering model](../../../.claude/rules/components.md#layering-model) — z-index / stacking order, the structural axis paired with this file's elevation/shadow contract
