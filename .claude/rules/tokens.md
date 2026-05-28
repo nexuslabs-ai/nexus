@@ -8,14 +8,14 @@ All tokens MUST follow the W3C Design Tokens Community Group format:
 {
   "tokenName": {
     "$value": "value-here",
-    "$type": "color|dimension|fontWeight|shadow|etc",
+    "$type": "color|dimension|fontWeight|shadow|…",
     "$description": "Optional description"
   }
 }
 ```
 
-Required properties: `$value`, `$type`
-Optional properties: `$description`, `$extensions`
+Required properties: `$value`, `$type` (see [§ Validation](#validation) for the full `$type` enumeration).
+Optional properties: `$description`, `$extensions`. Use `$extensions` for tool-specific metadata — see [§ Font Source Extensions](#font-source-extensions) for a working example.
 
 ## Color Token Pipeline
 
@@ -27,9 +27,11 @@ Optional properties: `$description`, `$extensions`
 
 ### Routing modes
 
-**Grid-pinned** — applies whenever the token path has length ≥ 2 and its **last segment** is a shade key (`shade ∈ {50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950}`). This handles both today's flat palette shape (`{palette}.{shade}`) and any future nested grouping (`chart.series.500`). Lightness (L) is overwritten by the perceptual grid loaded from `packages/core/src/lib/perceptual-grid.json`. Chroma comes from culori's parse of the hex and is then clamped via `clampChroma(color, 'oklch', 'p3')` so shades ship at their full chroma up to the Display P3 boundary; only the over-P3 excess clips. The build warns when post-clamp chroma drops by more than 20% (rare under P3 — flags the cases worth a designer's eye). Hue is preserved from the hex.
+The converter has two paths, one per shipped function in `perceptual-grid.js`:
 
-**Mechanical** — applies to everything else: white, black, the alpha shades (`a50`–`a950`, 8-digit hex), and any one-off value whose last path segment isn't a palette shade key. Straight hex→oklch via culori; alpha is preserved from 8-digit hex.
+**Grid-pinned** (`hexToOklchPinned`) — when the token path has length ≥ 2 and its last segment is a shade key (`50`–`950`). Catches today's `{palette}.{shade}` shape and any future nesting like `chart.series.500`. The hex's lightness is replaced by the value in `perceptual-grid.json`; chroma is preserved (clamped to the Display P3 boundary); hue is preserved. This is what makes every palette's shade-500 land at the same perceived depth. The build warns when P3 clipping drops chroma by more than 20%.
+
+**Mechanical** (`hexToOklchMechanical`) — everything else: `white`, `black`, alpha shades (`a50`–`a950`), and any one-off. Straight hex→OKLCH; alpha preserved from 8-digit hex.
 
 ### Alpha Token Scale
 
@@ -37,7 +39,7 @@ The **5 surface palettes** (`slate`, `neutral`, `gray`, `stone`, `zinc`) ship al
 
 Translucent surfaces — popover / command-palette backgrounds, modal scrims, hover rows on tinted lists — reference these surface-palette alphas instead of hand-written `rgba()`, so they blend with whatever surface they sit on and theme correctly across every base palette.
 
-**Structure.** The 5 surface palettes nest the alpha shades under the palette (`slate.a200` → `{slate.a200}`). `white` and `black` are standalone leaf tokens, so their alpha shades are **top-level leaves** referenced with a hyphen (`{white-a900}`, `{black-a50}`) — nesting them would break the existing `{white}` / `{black}` references.
+**Structure.** Alpha shades nest under their solid counterpart, accessed via dotted refs (`{slate.a200}`, `{white.a900}`, `{black.a50}`). The solid value of `white` and `black` lives at `.base` (`{white.base}`, `{black.base}`); the solid values of the 5 surface palettes are the numbered shades (`{slate.500}`).
 
 **Value derivation.** Each alpha shade is the palette's **950 hex** plus an alpha byte from this curve:
 
@@ -58,11 +60,11 @@ E.g. `slate` (950 = `#020617`) yields `slate.a50` = `#0206170a` and `slate.a500`
 
 ### Warning for designers
 
-When you pick a hex in Figma for a palette shade, only the **hue and chroma** of that hex flow through to the generated CSS. The **L is overwritten by the grid**. A vivid `#ff0000` and a dark `#400000` at the same shade key produce identical lightness — only the hue and chroma differ. To change the lightness of a shade, edit `packages/core/src/lib/perceptual-grid.json` — the JSON hex is not the right lever.
+When you change a hex in Figma for a palette shade, only the **hue and chroma** carry through — the **lightness is overwritten by the grid**. `#ff0000` and `#400000` at the same shade key produce identical lightness. To change a shade's lightness, edit `packages/core/src/lib/perceptual-grid.json`, not the hex.
 
 ### DTCG deviation
 
-We keep `$value` as a hex string on disk rather than the DTCG-2025.10 structured-object form (`{ "colorSpace": "oklch", "components": [...] }`). Reason: design tools write hex strings on export, not DTCG objects, so the structured form would be lost on the next round-trip. The string form passes through the existing resolver unchanged. Revisit if a downstream consumer ever needs spec-compliant import.
+We keep `$value` as a hex string on disk, not the DTCG-2025.10 structured-object form (`{ "colorSpace": "oklch", "components": [...] }`). Design tools round-trip hex; they don't round-trip the structured form, so it would be lost on the next Figma export. Revisit if a consumer needs spec-compliant import.
 
 ### Browser floor
 
@@ -74,18 +76,18 @@ OKLCH requires Chrome 111+, Safari 15.4+, Firefox 113+ (Baseline 2023). No hex f
 
 `yarn workspace @nexus/core audit:contrast` (implemented in `packages/core/scripts/audit-contrast.js`) runs APCA Lc on every base and brand foreground↔background pair, with thresholds chosen per APCA's intended-use tiers:
 
-| Pair                                                                                                                    | Threshold | Rationale |
-| ----------------------------------------------------------------------------------------------------------------------- | --------- | --------- | ----- | -------------------------------------------------------------------- |
-| `foreground ↔ background`                                                                                               | `         | Lc        | ≥ 75` | Body text, fluent reading                                            |
-| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`                                        | `         | Lc        | ≥ 60` | UI labels (buttons, badges)                                          |
-| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle`                                     | `         | Lc        | ≥ 60` | Labels on tinted (subtle) fills                                      |
-| `muted-foreground ↔ muted`                                                                                              | `         | Lc        | ≥ 45` | Incidental / de-emphasised text                                      |
-| `muted-foreground-subtle ↔ muted`                                                                                       | `         | Lc        | ≥ 45` | Tertiary text — helper text, captions, divider labels                |
-| `disabled-foreground ↔ disabled`                                                                                        | `         | Lc        | ≥ 45` | Disabled-state text, still readable                                  |
-| `nav-foreground ↔ nav-{background,item-hover,item-active}`                                                              | `         | Lc        | ≥ 60` | Nav label text on chrome surfaces                                    |
-| `nav-muted-foreground ↔ nav-background`                                                                                 | `         | Lc        | ≥ 45` | Nav helper / metadata text                                           |
-| `focus.color.{default,error} ↔ {background,container,popover,nav-background,nav-item-hover,nav-item-active,nav-border}` | `         | Lc        | ≥ 45` | Focus rings on every surface they hit (canvas + raised + nav chrome) |
-| `chart.categorical.{1..5} ↔ {background,container}`                                                                     | `         | Lc        | ≥ 60` | Categorical chart marks on every surface                             |
+| Pair                                                                                                                    | Threshold             | Rationale                                                            |
+| ----------------------------------------------------------------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------- |
+| `foreground ↔ background`                                                                                               | `&#124;Lc&#124; ≥ 75` | Body text, fluent reading                                            |
+| `{primary,secondary,error,success,warning,information}-foreground ↔ -background`                                        | `&#124;Lc&#124; ≥ 60` | UI labels (buttons, badges)                                          |
+| `{primary,secondary,error,success,warning,information}-subtle-foreground ↔ -subtle`                                     | `&#124;Lc&#124; ≥ 60` | Labels on tinted (subtle) fills                                      |
+| `muted-foreground ↔ muted`                                                                                              | `&#124;Lc&#124; ≥ 45` | Incidental / de-emphasised text                                      |
+| `muted-foreground-subtle ↔ muted`                                                                                       | `&#124;Lc&#124; ≥ 45` | Tertiary text — helper text, captions, divider labels                |
+| `disabled-foreground ↔ disabled`                                                                                        | `&#124;Lc&#124; ≥ 45` | Disabled-state text, still readable                                  |
+| `nav-foreground ↔ nav-{background,item-hover,item-active}`                                                              | `&#124;Lc&#124; ≥ 60` | Nav label text on chrome surfaces                                    |
+| `nav-muted-foreground ↔ nav-background`                                                                                 | `&#124;Lc&#124; ≥ 45` | Nav helper / metadata text                                           |
+| `focus.color.{default,error} ↔ {background,container,popover,nav-background,nav-item-hover,nav-item-active,nav-border}` | `&#124;Lc&#124; ≥ 45` | Focus rings on every surface they hit (canvas + raised + nav chrome) |
+| `chart.categorical.{1..5} ↔ {background,container}`                                                                     | `&#124;Lc&#124; ≥ 60` | Categorical chart marks on every surface                             |
 
 **Scoring is sRGB-equivalent.** APCA reads only `[r, g, b]` ints, so `hexToSrgbInts` re-clamps the (P3-emit) color into sRGB before sampling channels. The audit measures what a legacy sRGB display renders — the lowest-common-denominator surface — so contrast guarantees hold everywhere, P3 hardware or not. APCA scores are byte-stable across the sRGB→P3 emit retarget (issue #86).
 
@@ -93,36 +95,28 @@ Failures must be fixed by adjusting the semantic token reference (which shade a 
 
 ## File Naming
 
-| Directory  | Pattern                               | Example                                                                       |
-| ---------- | ------------------------------------- | ----------------------------------------------------------------------------- |
-| primitives | `color.json`                          | Single file with all color scales                                             |
-| primitives | `{category}/{category}-{mode}.json`   | `radius/radius-subtle.json`, `borderwidth/borderwidth-vega.json`              |
-| primitives | `shadow/shadow-{mode}-{theme}.json`   | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json`                      |
-| primitives | `typography/typography-{mode}.json`   | `typography/typography-vega.json`                                             |
-| primitives | `borderwidth/borderwidth-{mode}.json` | `borderwidth/borderwidth-vega.json`                                           |
-| primitives | `focus/focus-{name}-{theme}.json`     | `focus/focus-default-light.json`, `focus-default-dark.json`                   |
-| semantic   | `base-{palette}-{theme}.json`         | `base-slate-light.json`, `base-slate-dark.json`                               |
-| semantic   | `brands-{name}-{theme}.json`          | `brands-blue-light.json`, `brands-blue-dark.json`                             |
-| semantic   | `chart-{scale}-{mode}-{theme}.json`   | `chart-categorical-default-light.json`, `chart-categorical-default-dark.json` |
-| semantic   | `spacing-{mode}.json`                 | Per-mode direct-px spacing (no primitive layer — see `spacing-tokens.md`)     |
-| semantic   | `focus.json`                          | Standalone semantic — focus colour refs + the `focus.offset` outline distance |
-| component  | `{component}.json`                    | `button.json` (future)                                                        |
-| styles     | `{name}.json`                         | `styles/shadows.json`, `styles/typography.json`                               |
+| Directory  | Pattern                               | Example                                                                                     |
+| ---------- | ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| primitives | `color.json`                          | Single file with all color scales                                                           |
+| primitives | `radius/radius-{mode}.json`           | `radius/radius-subtle.json`                                                                 |
+| primitives | `borderwidth/borderwidth-{mode}.json` | `borderwidth/borderwidth-vega.json`                                                         |
+| primitives | `typography/typography-{mode}.json`   | `typography/typography-vega.json`                                                           |
+| primitives | `shadow/shadow-{mode}-{theme}.json`   | `shadow/shadow-vega-light.json`, `shadow-vega-dark.json`                                    |
+| primitives | `focus/focus-{name}-{theme}.json`     | `focus/focus-default-light.json`, `focus-default-dark.json`                                 |
+| semantic   | `base-{palette}-{theme}.json`         | `base-slate-light.json`, `base-slate-dark.json`                                             |
+| semantic   | `brands-{name}-{theme}.json`          | `brands-blue-light.json`, `brands-blue-dark.json`                                           |
+| semantic   | `chart-{scale}-{mode}-{theme}.json`   | `chart-categorical-default-light.json`, `chart-categorical-default-dark.json`               |
+| semantic   | `spacing-{mode}.json`                 | Per-mode direct-px spacing (no primitive layer — see `spacing-tokens.md`)                   |
+| semantic   | `focus.json`                          | Standalone — focus colour refs + the `focus.offset` outline distance                        |
+| semantic   | `breakpoints.json`                    | Standalone — `--breakpoint-*` tokens (theme-agnostic, build-time only; see `responsive.md`) |
+| semantic   | `z-index.json`                        | Standalone — `--z-index-*` stacking scale (see `components.md` § Layering model)            |
+| styles     | `{name}.json`                         | `styles/shadows.json`, `styles/typography.json`                                             |
 
 ### Shadow Tokens (Theme-Aware)
 
-Shadow tokens have light/dark variants because shadows appear differently on light vs dark backgrounds:
+Shadow primitives split by both mode AND theme (`shadow/shadow-{mode}-{theme}.json`) because the same elevation reads differently on a light vs dark canvas — a black-tinted drop-shadow that defines a card edge in light mode disappears against a near-black canvas in dark mode. Each theme tunes its own opacity, offset, and blur.
 
-```
-primitives/shadow/
-├── shadow-vega-light.json    # Vega shadows for light theme
-├── shadow-vega-dark.json     # Vega shadows for dark theme
-├── shadow-lyra-light.json
-├── shadow-lyra-dark.json
-└── ...
-```
-
-Available shadow modes: `vega`, `lyra`, `maia`, `mira`, `nova`
+Available modes: `vega`, `lyra`, `maia`, `mira`, `nova`.
 
 ## Nested Token Structure
 
@@ -148,7 +142,7 @@ This generates CSS variables like `--color-primary-background`, `--color-primary
 
 ## Reference Syntax
 
-Semantic tokens reference primitives using curly brace syntax:
+Semantic tokens reference primitives using curly brace syntax. The path inside the braces mirrors the JSON nesting of the target primitive — dot-separated segments walk from the top of the file down to the leaf.
 
 ```json
 {
@@ -159,37 +153,32 @@ Semantic tokens reference primitives using curly brace syntax:
 }
 ```
 
-The reference path matches the JSON structure: `{colorName.shade}`. At build time the resolver walks this reference to the primitive hex value, then the OKLCH converter emits `var(--nx-color-slate-50)` as an `oklch(...)` value. The hex string stays in JSON; the CSS variable contains OKLCH. See [§ Color Token Pipeline](#color-token-pipeline) for routing details.
+Common reference shapes:
+
+| Form                          | Example                 | Notes                                        |
+| ----------------------------- | ----------------------- | -------------------------------------------- |
+| Palette shade                 | `{slate.50}`            | Solid shade of a 5-palette surface           |
+| Palette alpha                 | `{slate.a200}`          | Alpha shade nested under a palette           |
+| Solid leaf of `white`/`black` | `{white.base}`          | `.base` carries the fully-opaque solid value |
+| 3-segment nested category     | `{focus.color.default}` | Primitives organised under a category        |
+
+At build time the resolver walks the reference to the primitive's hex value, then the OKLCH converter emits `var(--nx-color-{path})` (path joined with hyphens — e.g. `var(--nx-color-slate-50)`, `var(--nx-color-white-base)`) mapped to an `oklch(...)` value. The hex stays in JSON; the CSS variable holds OKLCH. See [§ Color Token Pipeline](#color-token-pipeline) for routing details.
 
 ## Color Scale Convention
 
-Primitive colors use Tailwind's shade scale (50-950):
-
-```
-50   - Lightest (backgrounds)
-100  - Very light
-200  - Light
-300  - Light-medium
-400  - Medium-light
-500  - Base/default
-600  - Medium-dark
-700  - Dark
-800  - Very dark
-900  - Darker
-950  - Darkest (text on light bg)
-```
+Primitive colors use an 11-step shade scale (50–950). See [`color-shades.md`](color-shades.md) for what each shade means and what to use it for.
 
 ## Semantic Token Categories
 
-| Category   | Properties                                                                                                    | Example                                   |
-| ---------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| Layout     | `background`, `foreground`, `container`, `popover`, `muted`, `muted-foreground-subtle`                        | `--color-background`                      |
-| Brand      | `primary.*`, `secondary.*`                                                                                    | `--color-primary-background`              |
-| Status     | `error.*`, `success.*`, `warning.*`, `information.*`                                                          | `--color-error-subtle-foreground`         |
-| Borders    | `border.default`, `border.primary`, `border.error`, etc.                                                      | `--color-border-default`                  |
-| Navigation | `nav-background`, `nav-foreground`, `nav-muted-foreground`, `nav-item-hover`, `nav-item-active`, `nav-border` | `--color-nav-background`                  |
-| Focus      | `focus.{default,error}` colour refs; `focus.offset` outline distance                                          | `--color-focus-default`, `--focus-offset` |
-| Data viz   | `chart.categorical.{1..5}`                                                                                    | `--color-chart-categorical-1`             |
+| Category   | Token groups                                                                                                                                                                                     | Example                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| Layout     | `background`, `foreground`, `container`, `popover`, `muted`, `disabled`, `overlay` — each carries `-foreground` / `-hover` / `-active` variants as applicable (see [`surfaces.md`](surfaces.md)) | `--color-background`                      |
+| Brand      | `primary.*`, `secondary.*` — each with the 9 state keys (see below)                                                                                                                              | `--color-primary-background`              |
+| Status     | `error.*`, `success.*`, `warning.*`, `information.*` — same 9 state keys                                                                                                                         | `--color-error-subtle-foreground`         |
+| Borders    | `border.default`, `border.active`, `border.disabled`, plus `border.{primary,error,success,warning,information}` (most with `-active` variants)                                                   | `--color-border-default`                  |
+| Navigation | `nav-{background,foreground,muted-foreground,item-hover,item-active,border}` — flat namespace (see [`surfaces.md` § Nav as a namespace](surfaces.md#nav-as-a-namespace))                         | `--color-nav-background`                  |
+| Focus      | `focus.{default,error}` colour refs; `focus.offset` outline distance                                                                                                                             | `--color-focus-default`, `--focus-offset` |
+| Data viz   | `chart.categorical.{1..5}` — 5-series rotating palette                                                                                                                                           | `--color-chart-categorical-1`             |
 
 Each brand/status group has: `background`, `background-hover`, `background-active`, `foreground`, `disabled`, `subtle`, `subtle-foreground`, `subtle-hover`, `subtle-active`
 
@@ -207,22 +196,24 @@ Theme-aware — lives in `chart-categorical-{mode}-light.json` and `chart-catego
 
 ## Light/Dark Theme Tokens
 
-- **Primitives**: Single file with all color scales (theme-agnostic)
+- **Primitives**: Most are theme-agnostic (color, radius, borderwidth, typography). Shadow and focus primitives split light/dark because the rendered value depends on the surface it sits on — see [§ File Naming](#file-naming) for the file shapes.
 - **Semantics**: Themed pairs follow `{type}-{mode}-light.json` + `{type}-{mode}-dark.json`. Concrete instances: `base-slate-{light,dark}.json`, `brands-blue-{light,dark}.json`, `chart-categorical-default-{light,dark}.json`.
 - CSS output: Light in `@theme` block, dark in `.dark` selector
 - **Authoring rule**: Because the `.dark` selector already overrides semantic token values, never write `dark:` modifiers on semantic-named utilities in component code — see [`components.md` § Adaptive-by-default semantic tokens](components.md#adaptive-by-default-semantic-tokens).
 
 ## Validation
 
-Valid `$type` values:
+Valid `$type` values used in Nexus token files (per W3C DTCG):
 
-- `color` - Color values (#hex, rgb, hsl)
-- `dimension` - Sizes with units (rem, px)
-- `fontFamily` - Font stack
-- `fontWeight` - Weight values (400, 700)
-- `duration` - Time values (ms, s)
-- `shadow` - Box shadow definitions
-- `number` - Unitless numbers
+- `color` — Color values (hex only — no `rgb()` or `hsl()` in source)
+- `dimension` — Sizes with units (`px`, `rem`)
+- `fontFamily` — Font stack
+- `fontWeight` — Weight values (400, 700)
+- `typography` — Composite token bundling family/size/weight/leading/letter-spacing (see `tokens/styles/typography.json`)
+- `shadow` — Box shadow definitions
+- `number` — Unitless numbers
+
+The build does not enforce a central `$type` schema. Point validators in `utils.js` check specific roles (z-index → `number`, breakpoints → `dimension`, shadows → `shadow`).
 
 ## Font Source Extensions
 
@@ -264,19 +255,31 @@ The `weights` array drives variable-font loading. Listing the full ramp (`[100, 
 After editing token files:
 
 ```bash
-# Generate @nexus/tailwind package CSS
-yarn tokens:tailwind           # Bundled defaults: --base=stone --brand=neutral --radius=sharp
+# Regenerate the emitted CSS
+yarn tokens:tailwind          # @nexus/tailwind primitives + nexus.css
+yarn tokens:modular           # per-theme bundles for the playground
 
-# Modular CSS (all themes for playground)
-yarn tokens:modular
+# Verify the change
+yarn audit:contrast                           # APCA fg/bg pairs
+yarn audit:figma-parity --category color      # snapshot drift
+yarn validate:spacing-modes                   # spacing schema parity
 ```
+
+`yarn tokens:tailwind` defaults to `--base=stone --brand=blue --borderwidth=vega --radius=sharp --shadow=vega --typography=vega`; see [§ Theme Selection](#theme-selection) to override.
 
 ## Theme Selection
 
 Configure theme via CLI arguments:
 
 ```bash
-node scripts/generate-tailwind-package.js --base=stone --brand=neutral
+# Example: override every axis
+node scripts/generate-tailwind-package.js \
+  --base=slate \
+  --brand=gray \
+  --typography=nova \
+  --shadow=lyra \
+  --radius=mellow \
+  --borderwidth=nova
 ```
 
 Available options:
@@ -290,17 +293,19 @@ Available options:
 
 > **Spacing isn't a per-mode CLI flag.** All 7 modes (vega, lyra, maia, mira, nova, luma, sera) ship in every build — there's no single-mode build. Mode swap is via the `data-style="X"` attribute on `<html>` (or any subtree) at runtime, no rebuild needed. `--spacingDefault=<mode>` is the one related CLI option: it only picks which mode lands under the `:root` cascade default (so a document with no `data-style` attribute resolves to that mode); the other six still emit their `[data-style="X"]` blocks alongside. See `spacing-tokens.md`.
 
-> **Mode distinctness varies by axis.** A mode listed above means the CLI flag is accepted — not that it resolves to unique values. `shadow` is genuinely distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `borderwidth` still exposes five flags, but several are byte-identical copies of `vega` (`borderwidth-lyra` = `borderwidth-mira` = `borderwidth-vega`) — the flag resolves, it just yields the same tokens. Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
+> **Mode distinctness varies by axis.** A mode listed above means the CLI flag is accepted — not that it resolves to unique values. `shadow` is genuinely distinct across all five modes. `typography` ships only three (`nova` / `vega` / `maia`); its `lyra` / `mira` were byte-identical to `vega` and removed. `borderwidth` exposes five flags but only two are distinct: `borderwidth-nova` (1.5px / 3px) and the `vega` cluster (`borderwidth-lyra` = `borderwidth-mira` = `borderwidth-vega` at 1px / 2px). Don't read a surviving `lyra` / `mira` flag as a distinct design on every axis.
 
 ## CSS Variable Naming
 
-| Type             | Pattern                  | Example                                 |
-| ---------------- | ------------------------ | --------------------------------------- |
-| Primitive        | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-radius-md` |
-| Semantic         | `--{category}-{path}`    | `--color-background`, `--spacing-4`     |
-| Tailwind utility | `nx:{utility}`           | `nx:bg-primary`, `nx:p-4`               |
+| Type             | Pattern                  | Example                                            |
+| ---------------- | ------------------------ | -------------------------------------------------- |
+| Primitive        | `--nx-{category}-{path}` | `--nx-color-blue-500`, `--nx-radius-md`            |
+| Semantic         | `--{category}-{path}`    | `--color-background`, `--color-primary-background` |
+| Tailwind utility | `nx:{utility}`           | `nx:bg-primary-background`, `nx:p-4`               |
 
-> **Spacing has no primitive layer.** `spacing-{mode}.json` files carry direct px values (no `{N}` refs), so there is no `--nx-size-*` namespace — `--nx-spacing-N` is emitted directly from the per-mode semantic files. See `spacing-tokens.md`.
+> **Spacing emits both forms with different jobs.** `--spacing-{N}` lives in `@theme {}` as a **build-time** input — Tailwind reads it to decide which utility classes to emit (`nx:p-4`, `nx:gap-4`, etc.). `--nx-spacing-{N}` is the **runtime** CSS variable that the emitted utilities reference (`.nx\:p-4 { padding: var(--nx-spacing-4) }`); per-mode `[data-style="X"]` blocks override it, so mode-switching at runtime cascades to every `nx:p-*` utility without a rebuild. For runtime consumption outside Tailwind (inline styles, SVG, canvas), use `var(--nx-spacing-N)` — `var(--spacing-N)` may not exist at runtime. See [`spacing-tokens.md`](spacing-tokens.md).
+
+> **Standalone semantic vars.** `--breakpoint-{sm,md,lg,xl,2xl}` and `--z-index-{overlay,sticky,modal,popover,toast,max}` are semantic-only (no `--nx-` prefix, no primitive layer). The token name IS the full variable; there's no `{category}-` prefix.
 
 ## Typography Utilities
 
@@ -346,7 +351,7 @@ Select via the `--typography` CLI flag (see [Theme Selection](#theme-selection))
 
 ## Do Not
 
-- Edit files in `dist/` or `packages/tailwind/` directly
-- Use raw hex values in semantic tokens (use `{references}`)
-- Forget to create both light and dark variants for semantic files
-- Add tokens without `$type` property
+- Edit files in `dist/` or `packages/tailwind/` directly (they're generated — re-run `yarn tokens:tailwind`)
+- Use raw hex in semantic **color** tokens — reference a primitive (`{slate.500}`)
+- Add a themed color file (`base-*`, `brands-*`, `chart-*`) without **both** light and dark variants
+- Add any token without a `$type` property
