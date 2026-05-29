@@ -149,9 +149,10 @@ Propose stepping one shade using the **luminance-order rule**:
 Then run the **role-conflict check** against the base token file — the ground
 truth (a derived shade-role index was removed in favour of this):
 
-1. Grep the failing `base-{palette}-{theme}.json` for `"{<palette>.{N}}"` where
-   `{N}` is the proposed shade — this lists every semantic token already
-   pointing at that shade.
+1. Grep the failing `base-{palette}-{theme}.json` with `-B1` for `"{<palette>.{N}}"`
+   where `{N}` is the proposed shade. The grep matches each `$value` line; the
+   role it belongs to is the JSON key on the line directly above, so `-B1`
+   surfaces both — giving every role already pointing at that shade.
 2. If one or more other roles already reference it, add a one-line **Notes**
    entry: `role collision ({theme}): shade {N} also used by {roles}`. Don't
    refuse the suggestion — surface the tradeoff so the human can choose.
