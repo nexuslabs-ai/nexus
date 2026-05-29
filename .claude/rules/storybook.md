@@ -1,16 +1,14 @@
 # Storybook Rules
 
-**Note:** All Tailwind utility classes in stories must use `nx:` prefix (e.g., `className="nx:flex nx:gap-2"`).
+**Note:** All Tailwind utility classes in stories must use the `nx:` prefix (e.g. `nx:flex nx:gap-2`).
 
 ## File Naming
 
-Stories file: `{ComponentName}.stories.tsx` (PascalCase)
-
-Example: `Button.stories.tsx`, `Card.stories.tsx`
+Stories file: `{ComponentName}.stories.tsx` (PascalCase) — e.g. `Button.stories.tsx`, `Card.stories.tsx`. No separate `*.test.tsx` for components; tests live in stories.
 
 ## Adaptation Note
 
-This template assumes components with `variant`, `size`, `disabled`, and `asChild` props. **Adapt based on actual component API:**
+The templates assume components with `variant`, `size`, `disabled`, and `asChild` props — adapt to the actual component API:
 
 | Component Type              | Typical Stories                   |
 | --------------------------- | --------------------------------- |
@@ -19,191 +17,19 @@ This template assumes components with `variant`, `size`, `disabled`, and `asChil
 | Display (Badge, Avatar)     | Variants, Sizes                   |
 | Layout (Separator, Spacer)  | Default, Orientation              |
 
-Skip sections that don't apply. Add component-specific stories as needed.
+Skip sections that don't apply; add component-specific stories as needed.
 
 ## Meta Configuration
 
-```tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from 'storybook/test';
-
-import { Component } from './component';
-
-const meta: Meta<typeof Component> = {
-  title: 'Components/Component',
-  component: Component,
-  args: {
-    onClick: fn(), // Spy for callback testing
-  },
-  parameters: {
-    layout: 'centered',
-  },
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'outline'],
-      description: 'The visual style variant',
-    },
-    size: {
-      control: 'select',
-      options: ['default', 'sm', 'lg'],
-      description: 'The size of the component',
-    },
-    disabled: {
-      control: 'boolean',
-      description: 'Whether the component is disabled',
-    },
-    asChild: {
-      control: 'boolean',
-      description: 'Render as child element (for composition)',
-    },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof Component>;
-```
+`meta` sets `title` (`Components/{Name}`), `component`, `args` (with `fn()` spies from `storybook/test` for callbacks), `parameters.layout`, and `argTypes` (a `control` type + `description` per prop — `select` for enums, `boolean` for flags). Export `meta` as default and `type Story = StoryObj<typeof Component>`. See any shipped `*.stories.tsx` for the exact shape.
 
 ## Required Stories
 
-Every component must have these stories:
+Every component has: **Default**; one story **per variant** and **per size**; **Disabled**; the interaction stories (**ClickInteraction**, **KeyboardInteraction**, **WithDataAttributes**, each with a play function); **asChild** where applicable; edge cases (empty / long content); and an **AllVariants** showcase. `testing-react.md` owns the canonical required-stories matrix and the archetype-equivalence contract.
 
-### 1. Default Story
+### AllVariants Grid
 
-```tsx
-export const Default: Story = {
-  args: {
-    children: 'Component',
-  },
-};
-```
-
-### 2. Individual Variant Stories
-
-```tsx
-export const Primary: Story = {
-  args: {
-    children: 'Primary',
-    variant: 'primary',
-  },
-};
-
-export const Secondary: Story = {
-  args: {
-    children: 'Secondary',
-    variant: 'secondary',
-  },
-};
-
-export const Outline: Story = {
-  args: {
-    children: 'Outline',
-    variant: 'outline',
-  },
-};
-```
-
-### 3. Size Stories
-
-```tsx
-export const Small: Story = {
-  args: {
-    children: 'Small',
-    size: 'sm',
-  },
-};
-
-export const Large: Story = {
-  args: {
-    children: 'Large',
-    size: 'lg',
-  },
-};
-```
-
-### 4. Disabled Story
-
-```tsx
-export const Disabled: Story = {
-  args: {
-    children: 'Disabled',
-    disabled: true,
-  },
-};
-```
-
-### 5. AllVariants Grid
-
-```tsx
-export const AllVariants: Story = {
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-6">
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
-          Variants
-        </h3>
-        <div className="nx:flex nx:gap-2">
-          <Component variant="primary">Primary</Component>
-          <Component variant="secondary">Secondary</Component>
-          <Component variant="outline">Outline</Component>
-        </div>
-      </div>
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
-          Sizes
-        </h3>
-        <div className="nx:flex nx:items-center nx:gap-2">
-          <Component size="sm">Small</Component>
-          <Component size="default">Default</Component>
-          <Component size="lg">Large</Component>
-        </div>
-      </div>
-      <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
-          Disabled
-        </h3>
-        <div className="nx:flex nx:gap-2">
-          <Component variant="primary" disabled>
-            Primary
-          </Component>
-          <Component variant="secondary" disabled>
-            Secondary
-          </Component>
-          <Component variant="outline" disabled>
-            Outline
-          </Component>
-        </div>
-      </div>
-    </div>
-  ),
-  parameters: {
-    layout: 'padded',
-  },
-};
-```
-
-### 6. Usage Examples (as needed)
-
-```tsx
-// With Icon
-export const WithIcon: Story = {
-  render: () => (
-    <Component>
-      <IconComponent />
-      With Icon
-    </Component>
-  ),
-};
-
-// As Link (using asChild)
-export const AsLink: Story = {
-  render: () => (
-    <Component asChild>
-      <a href="https://example.com">Visit Website</a>
-    </Component>
-  ),
-};
-```
+A single render-based story that lays out every variant / size / disabled group in labelled rows (`layout: 'padded'`). It's the showcase the per-base variant generator reuses (see § Per-Base Variant Generation), so it must be `render`-based, not args-only.
 
 ## Layout Parameters
 
@@ -215,60 +41,23 @@ export const AsLink: Story = {
 
 ## Theme Testing
 
-Storybook has a theme toggle in the toolbar. Stories automatically support:
-
-- Light mode (default)
-- Dark mode (via `.dark` class wrapper)
+The Storybook toolbar has a theme toggle; stories support light mode (default) and dark mode (via a `.dark` class wrapper) automatically.
 
 ## Running Storybook
 
-```bash
-yarn storybook        # Dev server on port 6006
-yarn build-storybook  # Build static site
-```
+`yarn storybook` runs the dev server (port 6006); `yarn build-storybook` builds the static site.
 
 ## Story Organization
 
-Stories appear in sidebar under `Components/{ComponentName}`:
-
-```
-Components/
-├── Button
-│   ├── Default
-│   ├── Primary
-│   ├── Secondary
-│   ├── Outline
-│   ├── Small
-│   ├── Large
-│   ├── Disabled
-│   ├── AllVariants
-│   ├── WithIcon
-│   └── AsLink
-```
+Stories appear in the sidebar under `Components/{ComponentName}`.
 
 ## Autodocs
 
-Autodocs is enabled globally in `.storybook/preview.tsx` via `tags: ['autodocs']`. All stories automatically get:
-
-- Component description
-- Props table
-- Interactive playground
-- All story examples
-
-To exclude a specific story from autodocs:
-
-```tsx
-export const InternalStory: Story = {
-  tags: ['!autodocs'], // Exclude from docs
-  // ...
-};
-```
+Autodocs is enabled globally in `.storybook/preview.tsx` (`tags: ['autodocs']`) — every story gets a component description, props table, interactive playground, and the story examples. Exclude a single story with `tags: ['!autodocs']`.
 
 ## Play Functions (Testing)
 
-Every interactive component story should include play functions for testing. Stories serve as both documentation and tests.
-
-### Required Play Function Stories
+Interactive component stories include play functions — stories serve as both documentation and tests. Required play-function stories:
 
 | Story               | Tests                                     |
 | ------------------- | ----------------------------------------- |
@@ -277,65 +66,11 @@ Every interactive component story should include play functions for testing. Sto
 | KeyboardInteraction | Tab focuses, Enter/Space triggers         |
 | WithDataAttributes  | Verify data-slot, data-variant, data-size |
 
-### Play Function Template
-
-```tsx
-import { expect, fn, userEvent, within } from 'storybook/test';
-
-export const Interactive: Story = {
-  args: {
-    children: 'Click me',
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const element = canvas.getByRole('button');
-
-    await userEvent.click(element);
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
-  },
-};
-```
-
-### Imports for Play Functions
-
-Always use `storybook/test` imports (Storybook 10):
-
-```tsx
-import { expect, fn, userEvent, within } from 'storybook/test';
-```
-
-**Note:** In Storybook 10, use `storybook/test` (not `@storybook/test`).
-
-### Spying on Callbacks
-
-Use `fn()` in meta args to create spy functions:
-
-```tsx
-const meta: Meta<typeof Button> = {
-  // ...
-  args: {
-    onClick: fn(),
-  },
-};
-```
-
-Then assert in play functions:
-
-```tsx
-await expect(args.onClick).toHaveBeenCalledTimes(1);
-```
-
-### Running Story Tests
-
-```bash
-yarn test:storybook        # Run all story tests
-yarn test:storybook:watch  # Watch mode
-yarn test:storybook:ui     # Interactive UI
-```
+Import test helpers from `storybook/test` (`expect`, `fn`, `userEvent`, `within`) — Storybook 10, **not** `@storybook/test`. Spy on callbacks with `fn()` in `meta.args`, then assert with `expect(args.onClick).toHaveBeenCalledTimes(...)`. Run story tests with `yarn test:storybook` (plus `:watch`, `:ui`).
 
 ### A11y Testing
 
-A11y is automatic via `addon-a11y` with `a11y: { test: 'error' }` in preview. Every story is checked against axe-core rules and violations fail the test — keyboard nav, ARIA semantics, focus management, role/landmark structure.
+A11y is automatic via `addon-a11y` with `a11y: { test: 'error' }` in preview — every story is checked against axe-core (keyboard nav, ARIA semantics, focus management, role/landmark structure) and violations fail the test.
 
 **Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` (and `color-contrast-enhanced`) rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Color contrast is verified at the token layer by `yarn workspace @nexus/core audit:contrast` (see [tokens.md § APCA contrast gate](tokens.md#apca-contrast-gate)); stories carry no responsibility for re-checking it.
 
@@ -356,11 +91,7 @@ The stories run as render/smoke tests under `@storybook/addon-vitest` — they a
 
 ### Opting a component in
 
-Add an entry to `packages/react/scripts/base-variants.config.json`:
-
-```json
-{ "name": "Button", "showcase": "AllVariants" }
-```
+Add an entry to `packages/react/scripts/base-variants.config.json` like `{ "name": "Button", "showcase": "AllVariants" }`:
 
 - `name` — the component. Used as the sidebar title, the output filename prefix, and to locate the canonical stories module (`../ui/{name}.stories`).
 - `showcase` — a **render-based** export from that module (e.g. `AllVariants`; Avatar uses `AllSizes`). The generator reuses this story's `render()` directly, so it must not be args-only. Generation fails fast if the stories file is missing, the export is absent, or the export has no `render:` (args-only).
