@@ -90,7 +90,7 @@ Input (package or workspace)
     ▼
 ┌─────────────────────────────────────┐
 │ 5. Generate Report                  │
-│    - Markdown file in reports/deps/ │
+│    - Markdown file in .deps-reports/ │
 │    - Upgrade recommendations        │
 │    - Risk assessment                │
 └─────────────────────────────────────┘
@@ -318,7 +318,7 @@ Grep(pattern: "require\\(['\"]package-name", glob: "**/*.{js,ts}")
 
 ### Phase 5: Generate Report
 
-**Location:** `reports/deps/{target}-{YYYY-MM-DD}.md`
+**Location:** `.deps-reports/{target}-{YYYY-MM-DD}.md`
 
 Where `{target}` is:
 
