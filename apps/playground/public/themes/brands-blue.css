@@ -3,7 +3,7 @@
 html {
   --nx-color-primary-background: var(--nx-color-blue-600);
   --nx-color-primary-background-active: var(--nx-color-blue-800);
-  --nx-color-primary-foreground: var(--nx-color-white);
+  --nx-color-primary-foreground: var(--nx-color-white-base);
   --nx-color-primary-background-hover: var(--nx-color-blue-700);
   --nx-color-primary-disabled: var(--nx-color-blue-300);
   --nx-color-primary-subtle: var(--nx-color-blue-50);
@@ -24,7 +24,7 @@ html {
 html.dark {
   --nx-color-primary-background: var(--nx-color-blue-600);
   --nx-color-primary-background-active: var(--nx-color-blue-800);
-  --nx-color-primary-foreground: var(--nx-color-white);
+  --nx-color-primary-foreground: var(--nx-color-white-base);
   --nx-color-primary-background-hover: var(--nx-color-blue-700);
   --nx-color-primary-disabled: var(--nx-color-blue-950);
   --nx-color-primary-subtle: var(--nx-color-blue-950);

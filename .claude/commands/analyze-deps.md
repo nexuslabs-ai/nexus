@@ -63,7 +63,7 @@ Parse `$ARGUMENTS` for:
                   ▼
 ┌─────────────────────────────────────────┐
 │         Report Generated                │
-│  • Saved to reports/deps/{name}-{date}  │
+│  • Saved to .deps-reports/{name}-{date}  │
 │  • Summary displayed to user            │
 └─────────────────────────────────────────┘
 ```
@@ -107,7 +107,7 @@ Agent(
      - Research breaking changes (for updates)
      - Scan codebase impact
      - Generate report
-  2. Save report to `reports/deps/{target}-{YYYY-MM-DD}.md`
+  2. Save report to `.deps-reports/{target}-{YYYY-MM-DD}.md`
   3. Return summary of findings
   """
 )
@@ -150,7 +150,7 @@ After analysis is complete, output:
 
 ### Report Location
 
-`reports/deps/{target}-{YYYY-MM-DD}.md`
+`.deps-reports/{target}-{YYYY-MM-DD}.md`
 
 ### Next Steps
 
@@ -161,7 +161,7 @@ After analysis is complete, output:
 
 ## Output Files
 
-Reports are saved to `reports/deps/` with naming:
+Reports are saved to `.deps-reports/` with naming:
 
 | Scope          | Filename Example                      |
 | -------------- | ------------------------------------- |

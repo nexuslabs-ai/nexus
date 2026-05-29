@@ -11,13 +11,13 @@ permissionMode: bypassPermissions
 A thin wrapper around `yarn audit:contrast`. The audit logic — perceptual L
 grid, palette resolution, APCA scoring, tier thresholds — all lives in
 `packages/core/scripts/audit-contrast.js`. This agent translates failures into
-proposed semantic-token reroutes, with role-conflict cross-references from
-`.claude/rules/color-shades.md`. The script is the gate; the agent's proposal
+proposed semantic-token reroutes, with role-conflict checks derived from the
+base token files. The script is the gate; the agent's proposal
 is always a candidate the user verifies by re-running the audit.
 
 ## Why a wrapper, not a body-of-logic agent
 
-Sibling `audit:*` scripts (storybook coverage, figma parity) make the same call:
+Sibling `audit:*` scripts (storybook coverage, class-refs) make the same call:
 deterministic rule-vs-files diffs belong in Node scripts CI can gate on, not in
 LLM reasoning. The audit script is testable and byte-stable. This agent is the
 natural-language surface that parses its failures and proposes the right shade
@@ -146,24 +146,20 @@ Propose stepping one shade using the **luminance-order rule**:
 | `Lc > 0` | fg darker than bg  | Step fg darker (higher shade number, lower L)  |
 | `Lc < 0` | fg lighter than bg | Step fg lighter (lower shade number, higher L) |
 
-Then run the **role-conflict check**:
+Then run the **role-conflict check** against the base token file — the ground
+truth (a derived shade-role index was removed in favour of this):
 
-1. Grep `.claude/rules/color-shades.md` for the row starting with `` | `{N}` ``
-   where `{N}` is the proposed shade.
-2. Split the row by `|`. Pick the column matching the failing file's theme
-   suffix:
-   - `*-light.json` → `Light-mode use` column
-   - `*-dark.json` → `Dark-mode use` column
-3. Treat any italicised cell — leading `_(` and trailing `)_` — as **no
-   documented conflict** and do not surface as a clash. This covers the full
-   no-role family in `color-shades.md`: `_(rarely used)_` (shade 200 dark),
-   `_(rarely used — too close to white...)_` (shade 100 dark), and
-   `_(anchor — rarely surfaced...)_` (shade 500 dark).
-4. If the column lists a role for that shade, add a one-line **Notes** entry:
-   `role collision ({theme}): reserved for {role}`. Don't refuse the suggestion
-   — surface the tradeoff so the human can choose.
+1. Grep the failing `base-{palette}-{theme}.json` with `-B1` for `"{<palette>.{N}}"`
+   where `{N}` is the proposed shade. The grep matches each `$value` line; the
+   role it belongs to is the JSON key on the line directly above, so `-B1`
+   surfaces both — giving every role already pointing at that shade.
+2. If one or more other roles already reference it, add a one-line **Notes**
+   entry: `role collision ({theme}): shade {N} also used by {roles}`. Don't
+   refuse the suggestion — surface the tradeoff so the human can choose.
+3. No matches → no conflict (this naturally covers the rarely-used dark shades
+   like 100/200 that no role occupies).
 
-#### Case B — ref to a leaf primitive (`{white}` or `{black}`)
+#### Case B — ref to a leaf primitive (`{white.base}` or `{black.base}`)
 
 Shade-step doesn't apply. Propose either:
 
@@ -204,10 +200,9 @@ The failing fg is one of `chart.categorical.{1..5}`, each referencing a
 **different palette per series** for hue rotation (teal → lime → orange →
 rose → indigo, per `tokens.md § Data viz tokens`).
 
-**Skip the role-conflict check for Case D.** `color-shades.md` covers
-slate/neutral/gray/stone/zinc only; the chart palettes (teal/lime/orange/
-rose/indigo) have no rows there, so the grep would silently no-op and add
-nothing.
+**Skip the role-conflict check for Case D.** The chart palettes (teal/lime/
+orange/rose/indigo) aren't in the base surface files' shade space, so the
+base-JSON grep would no-op and add nothing.
 
 Naïve shade-stepping risks degrading the categorical rotation: stepping
 `{teal.700}` darker may push its perceived weight too close to a neighbouring
@@ -230,7 +225,7 @@ Use this exact column schema:
 | File                                                         | Pair                                    | Lc    | Threshold       | Current (fg)          | Proposed reroute                              | Notes                                                 |
 | ------------------------------------------------------------ | --------------------------------------- | ----- | --------------- | --------------------- | --------------------------------------------- | ----------------------------------------------------- |
 | base-slate-light.json                                        | foreground ↔ background                 | 42.1  | 75 (body)       | {slate.900} (L 0.207) | {slate.950} (L 0.118)                         | role collision (light): reserved for chrome           |
-| brands-blue-dark.json                                        | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white}               | (case B) move bg or tint fg                   | fg is leaf primitive — no shade-step                  |
+| brands-blue-dark.json                                        | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white.base}          | (case B) move bg or tint fg                   | fg is leaf primitive — no shade-step                  |
 | base-slate-light.json ↔ focus-default-light.json             | color.default ↔ background              | 38.0  | 45 (incidental) | #1e3a8a               | target L ≈ 0.385 (grid row 700)               | edit primitives/focus/focus-default-light.json hex    |
 | base-slate-light.json ↔ chart-categorical-default-light.json | chart.categorical.3 ↔ container         | 56.0  | 60 (ui)         | {orange.700}          | (i) step to {orange.800} or (ii) swap palette | case D — verify hue rotation per tokens.md § Data viz |
 
@@ -254,8 +249,6 @@ job after they apply the fix (the counterpart may actually pass).
   Lc ≥ 60 instead of 45?"). That's a design discussion, not this agent. Edit
   `audit-contrast.js`'s `BASE_PAIRS` / `BRAND_PAIRS` / `FOCUS_PAIRS` directly
   after the discussion.
-- The user wants to **refresh the Figma snapshot**. That's `audit:figma-parity`,
-  a different flow.
 - The user wants the agent to **apply the reroute itself**. Out of scope — the
   agent proposes, the human merges. No Edit/Write tool is available.
 
@@ -275,9 +268,5 @@ job after they apply the fix (the counterpart may actually pass).
   is the cross-file header convention)
 - `.claude/rules/tokens.md` § APCA contrast gate — threshold tiers and the
   non-negotiability rule; § Data viz tokens — hue rotation rationale for Case D
-- `.claude/rules/color-shades.md` — shade-by-shade role grid (light vs dark
-  column per theme)
-- `.claude/rules/surfaces.md` — the 5-level surface contract that constrains
-  where each shade can sit
 - `packages/core/src/lib/perceptual-grid.json` — the 11-step palette-uniform
   L grid

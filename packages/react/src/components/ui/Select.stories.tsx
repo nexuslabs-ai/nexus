@@ -597,7 +597,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` migrates `py-2 gap-2` → `py-control-md gap-control-md` (matches vega byte-identically) and so responds to mode. `px-3` stays numeric per the Input/Select coupling-table note (form fields are narrower than buttons by design; per-mode gap drift between Input/Select and adjacent Buttons is accepted — see `spacing-tokens.md` cross-mode visual consequence note). `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
+          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` migrates `py-2 gap-2` → `py-control-md gap-control-md` (matches vega byte-identically) and so responds to mode. `px-3` stays numeric per the Input/Select coupling-table note (form fields are narrower than buttons by design; per-mode gap drift between Input/Select and adjacent Buttons is accepted). `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
       },
     },
   },

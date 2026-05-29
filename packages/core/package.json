@@ -24,8 +24,6 @@
     "audit:contrast": "node scripts/audit-contrast.js",
     "audit:class-refs": "node scripts/audit-class-refs.js",
     "audit:colorblind": "node scripts/audit-colorblind.js",
-    "audit:figma-parity": "node scripts/audit-figma-parity.js",
-    "generate:colorblind-svg": "node scripts/generate-colorblind-svg.js",
     "validate:spacing-modes": "node scripts/validate-spacing-modes.js"
   },
   "dependencies": {

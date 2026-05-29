@@ -614,7 +614,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `TabsTrigger` `default` migrates to `control-sm` and `lg` to `control-md` (both byte-identical to vega pre-refactor). The `sm` size stays on its own sub-control rhythm (`px-2 py-1`) and is intentionally density-stable across modes — see `spacing-tokens.md` Tabs `sm` note. Vega / Lyra / Luma / Mira share identical `control-{sm,md}` tokens (top 4 rows look the same); Nova compresses, Maia / Sera breathe.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `TabsTrigger` `default` migrates to `control-sm` and `lg` to `control-md` (both byte-identical to vega pre-refactor). The `sm` size stays on its own sub-control rhythm (`px-2 py-1`) and is intentionally density-stable across modes. Vega / Lyra / Luma / Mira share identical `control-{sm,md}` tokens (top 4 rows look the same); Nova compresses, Maia / Sera breathe.',
       },
     },
   },
@@ -715,7 +715,7 @@ export const TabsSmIsDensityStable: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the `sm` size. `TabsTrigger` `sm` stays on the sub-control numeric rhythm (`px-2 py-1 text-xs`) — see the Tabs `sm` note in `spacing-tokens.md`. Every spacing mode therefore renders it at the same canonical 26px height (= `text-xs` line-height 16px + `py-1` 4px × 2 + transparent border 1px × 2). If a future PR migrates `py-1` → `py-control-sm` (or any other role utility), this test fails for nova/sera — the regression signal is that intent (sub-control, mode-stable) has been broken.',
+          'Density-stability sentinel for the `sm` size. `TabsTrigger` `sm` stays on the sub-control numeric rhythm (`px-2 py-1 text-xs`). Every spacing mode therefore renders it at the same canonical 26px height (= `text-xs` line-height 16px + `py-1` 4px × 2 + transparent border 1px × 2). If a future PR migrates `py-1` → `py-control-sm` (or any other role utility), this test fails for nova/sera — the regression signal is that intent (sub-control, mode-stable) has been broken.',
       },
     },
   },

@@ -2,7 +2,7 @@
 
 Nexus components are designed for **Standard (≥1024px)** as the primary target. Narrow (<1024px) is graceful degradation; Wide (≥1536px) gets breathing room when available. Standard spans `lg` (1024px floor — the prefix you reach for first when writing responsive consumer code) through `xl` (1280px — the design reference width components are tuned against).
 
-> **Consumer-brand inversion.** The ≥1024px primary target is the Nexus reference brand's default — set by `--breakpoint-*` in `packages/tailwind/nexus.css:236-240`. Consumer brands building mobile-first products override by re-aiming `@theme { --breakpoint-* }` and treating a different tier as primary. The display-class labels (Narrow / Standard / Wide) describe defaults, not hard-coded behaviour.
+> **Consumer-brand inversion.** The ≥1024px primary target is the Nexus reference brand's default (the `--breakpoint-*` tokens). Consumer brands building mobile-first products override by re-aiming `@theme { --breakpoint-* }` and treating a different tier as primary — the Narrow / Standard / Wide labels describe defaults, not hard-coded behaviour.
 
 ## Display class table
 
@@ -41,39 +41,13 @@ Concrete rule: if you grep your file and find no `@container (...)` rule scoping
 
 The declarative `<Show>` / `<Hide>` primitives ([#103](https://github.com/nexuslabs-ai/nexus/issues/103), exported from `@nexus/react`) express responsive visibility across both axes. They toggle `display: contents` ↔ `display: none` — children always render; only visibility changes (no mount/unmount). Because a `contents` wrapper generates no box of its own, an inline, flex, or grid child keeps its natural layout (this is the conclusion of the #103 spike — `display: block`/`revert` would break those cases).
 
-```tsx
-// Viewport (page-shell decisions)
-<Show above="lg"><aside>Secondary nav</aside></Show>
-<Hide below="md"><span>Tablet-and-up context</span></Hide>
-
-// Container (component-internal — Nexus extension over Atlassian's primitive)
-<Show containerAbove="md"><Stat /></Show>
-<Hide containerBelow="sm"><Avatar /></Hide>
-```
-
 Provide **exactly one** axis (`above` / `below` / `containerAbove` / `containerBelow`) — a discriminated union rejects zero or two at compile time. Container axes query the nearest `@container` ancestor, so a parent must declare one (e.g. the `nx:@container` utility).
 
 > **Two breakpoint scales, same names.** The viewport axes use the `--breakpoint-*` scale (`md` = 48rem); the container axes use Tailwind's native `@container` scale (`md` = 28rem), deliberately smaller because a component reads as "md" at a narrower width than the whole viewport. So `above="md"` and `containerAbove="md"` do **not** fire at the same width.
 
 > **Experimental.** The API is inferred from Atlassian's pattern and may change before it stabilises. Named-container queries (`@container/{name}`) are out of scope for v1 — fall back to raw `nx:@container/{name}/{bp}:` utilities if you need one.
 
-Prefer the primitive over raw class toggling, which is verbose and easy to invert by mistake:
-
-**Anti-pattern (raw class toggling):**
-
-```tsx
-<aside className="nx:hidden nx:lg:block">Secondary nav</aside>
-```
-
-**Correct pattern:**
-
-```tsx
-<Show above="lg">
-  <aside>Secondary nav</aside>
-</Show>
-```
-
-Pick the right axis: `above` / `below` for viewport (page shell), `containerAbove` / `containerBelow` for component-internal — matching the decision tree above.
+Prefer the primitive over raw class toggling (`nx:hidden nx:lg:block`), which is verbose and easy to invert by mistake. Pick the axis to match the decision tree: `above` / `below` for viewport (page shell), `containerAbove` / `containerBelow` for component-internal.
 
 ## Anti-patterns
 
@@ -93,13 +67,11 @@ For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you norma
 
 ## Forward direction
 
-Fluid scaling via `clamp()` and dynamic viewport units `svh` / `lvh` / `dvh` are forthcoming as tokens. Components that genuinely need them today should use the CSS primitives directly; Nexus token wrappers will follow.
+`clamp()` and the dynamic viewport units (`svh` / `lvh` / `dvh`) are not tokenised yet — components that need them today use the CSS primitives directly.
 
 ## See also
 
-- [components.md](components.md) — component-authoring rules; `@container` use in component internals is the responsive corollary of Sizing Convention and Layering model
-- `packages/tailwind/nexus.css:236-240` — the emitted `--breakpoint-*` token values
+- [components.md](components.md) — component-authoring rules; `@container` internal use is the responsive corollary of the Sizing Convention
+- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) + `packages/react/src/components/primitives/` — the shipped `<Show>` / `<Hide>` source, stories, and spike-conclusion header
+- `packages/core/tokens/semantic/breakpoints.json` — the `--breakpoint-*` token values
 - `packages/react/src/components/ui/dialog.tsx` — the live viewport-driven exception
-- [#102](https://github.com/nexuslabs-ai/nexus/issues/102) — cross-links from `components.md` / `code-quality.md` that point readers at the display-class table here
-- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) — the shipped `<Show>` / `<Hide>` primitives (`@nexus/react`) used in the canonical pattern above
-- `packages/react/src/components/primitives/` — the `<Show>` / `<Hide>` source, stories, and the spike-conclusion header

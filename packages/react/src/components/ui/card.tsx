@@ -69,7 +69,7 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
     <div
       data-slot="card-header"
       className={cn(
-        // nexus-allow-numeric: sub-element header rhythm — Card note in spacing-tokens.md
+        // nexus-allow-numeric: sub-element header rhythm
         'nx:flex nx:flex-col nx:gap-1.5 nx:p-container',
         className
       )}
@@ -165,7 +165,7 @@ function CardAction({ className, ...props }: CardActionProps) {
     <div
       data-slot="card-action"
       className={cn(
-        // nexus-allow-numeric: CardAction icon/label rhythm — Card note in spacing-tokens.md
+        // nexus-allow-numeric: CardAction icon/label rhythm
         'nx:absolute nx:right-(--nx-container-p) nx:top-(--nx-container-p) nx:flex nx:items-center nx:gap-2',
         className
       )}
@@ -228,7 +228,7 @@ function CardFooter({ className, ...props }: CardFooterProps) {
     <div
       data-slot="card-footer"
       className={cn(
-        // nexus-allow-numeric: CardFooter sub-element rhythm — Card note in spacing-tokens.md
+        // nexus-allow-numeric: CardFooter sub-element rhythm
         'nx:flex nx:items-center nx:gap-2 nx:p-container nx:pt-0',
         className
       )}

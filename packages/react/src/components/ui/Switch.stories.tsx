@@ -224,7 +224,7 @@ export const WithDataAttributes: Story = {
 export const AllVariants: Story = {
   // Named function + useId so the id/htmlFor pairs are unique. This showcase is
   // reused by base-variant generation (rendered once per cell, 10×); static ids
-  // would collide across cells. See storybook.md § Caveats.
+  // would collide across cells. See testing-react.md § Caveats.
   render: function AllVariantsShowcase() {
     const uid = React.useId();
     return (

@@ -60,6 +60,7 @@ opencode.json
 # Playwright MCP (local browser session logs/snapshots)
 .playwright-mcp/
 
-# Local scratch artifacts (throwaway screenshots, etc.)
+# Local scratch artifacts (throwaway screenshots, dependency reports, etc.)
 /dataviz-*.png
 /scrim-*.png
+/.deps-reports/

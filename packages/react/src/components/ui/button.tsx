@@ -26,7 +26,7 @@ const buttonVariants = cva(
         default: 'nx:px-control-md nx:py-control-md nx:gap-control-md',
         sm: 'nx:px-control-sm nx:py-control-sm nx:gap-control-sm nx:text-xs',
         lg: 'nx:px-control-lg nx:py-control-lg nx:gap-control-lg',
-        // nexus-allow-numeric: density-stable square hit-target — Button (icon) note in spacing-tokens.md
+        // nexus-allow-numeric: density-stable square hit-target
         icon: 'nx:p-2.5',
       },
     },

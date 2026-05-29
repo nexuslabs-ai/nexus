@@ -62,6 +62,16 @@ export const VISION_TYPES = [
 // space are effectively indistinguishable.
 export const ADJACENT_CONFUSABLE_DELTA_E = 0.02;
 
+// Two caveats on interpreting ΔE against this floor:
+//   - @bjornlu/colorblind simulates in gamma-encoded sRGB (it skips the
+//     sRGB→linear decode the Viénot model assumes), so per-deficiency hue
+//     shifts are correct but absolute ΔE magnitudes are directional, not
+//     exact — read a near-floor pass as "distinguishable with headroom."
+//   - Tightest surviving pair is green.600 ↔ blue.600 under tritanopia: it
+//     collapsed pre-#141 (ΔE 0.0165), and rotating the green ramp ~5° toward
+//     yellow-green (H≈145°→140°) lifted it to 0.0273. Don't round green's hue
+//     back without re-running this audit.
+
 function unorderedPairs(items) {
   const pairs = [];
   for (let i = 0; i < items.length - 1; i += 1) {

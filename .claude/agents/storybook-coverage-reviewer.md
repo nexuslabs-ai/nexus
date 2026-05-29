@@ -163,7 +163,6 @@ output:
 
 ## See also
 
-- `.claude/rules/testing-react.md` — the required-story matrix
-- `.claude/rules/storybook.md` — story conventions and play-function patterns
+- `.claude/rules/testing-react.md` — the required-story matrix, story conventions, and play-function patterns
 - `packages/react/scripts/audit-storybook-coverage.mjs` — the script
 - `packages/react/scripts/audit-storybook-coverage.test.js` — the test suite

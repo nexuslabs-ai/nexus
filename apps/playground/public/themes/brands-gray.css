@@ -3,7 +3,7 @@
 html {
   --nx-color-primary-background: var(--nx-color-gray-900);
   --nx-color-primary-background-active: var(--nx-color-gray-950);
-  --nx-color-primary-foreground: var(--nx-color-white);
+  --nx-color-primary-foreground: var(--nx-color-white-base);
   --nx-color-primary-background-hover: var(--nx-color-gray-800);
   --nx-color-primary-disabled: var(--nx-color-gray-300);
   --nx-color-primary-subtle: var(--nx-color-gray-50);

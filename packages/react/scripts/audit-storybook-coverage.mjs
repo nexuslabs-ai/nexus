@@ -13,9 +13,9 @@
  * deterministic scripts that CI can gate on. The repo has four precedents
  * (`packages/core/scripts/audit-*.js`); this audit fits the same mould.
  *
- * See .claude/rules/testing-react.md (matrix), .claude/rules/storybook.md
- * (story conventions), .claude/agents/storybook-coverage-reviewer.md (the
- * natural-language wrapper that shells out to this script).
+ * See .claude/rules/testing-react.md (matrix + story conventions),
+ * .claude/agents/storybook-coverage-reviewer.md (the natural-language
+ * wrapper that shells out to this script).
  */
 import fs from 'node:fs';
 import path from 'node:path';

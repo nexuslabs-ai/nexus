@@ -14,7 +14,7 @@
  * the committed semantic JSON directly keeps this generator free of a token
  * build-order dependency (output is verified byte-identical to dist/modular).
  *
- * See .claude/rules/storybook.md § Per-base variant generation.
+ * See .claude/rules/testing-react.md § Per-Base Variant Generation.
  */
 import fs from 'fs';
 import path from 'path';
@@ -39,7 +39,7 @@ function readJson(filePath) {
 
 /**
  * Flatten the primitive color tree into the set of valid CSS names
- * (`slate-200`, `white`, `slate-a200`) — every resolvable target a `{…}`
+ * (`slate-200`, `white-base`, `slate-a200`) — every resolvable target a `{…}`
  * semantic reference can point at. Built once; `refToVar` validates against it.
  */
 function collectPrimitiveNames(node, prefix = []) {
@@ -62,7 +62,7 @@ function collectPrimitiveNames(node, prefix = []) {
 const PRIMITIVE_NAMES = collectPrimitiveNames(readJson(PRIMITIVES_PATH));
 
 /**
- * Convert a DTCG reference (`{slate.200}`, `{white}`, `{slate.a200}`) to the
+ * Convert a DTCG reference (`{slate.200}`, `{white.base}`, `{slate.a200}`) to the
  * prefixed primitive CSS variable the Tailwind utilities consume.
  * Dots become dashes; everything else is preserved.
  */
