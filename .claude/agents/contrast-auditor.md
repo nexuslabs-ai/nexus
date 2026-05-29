@@ -158,7 +158,7 @@ truth (a derived shade-role index was removed in favour of this):
 3. No matches → no conflict (this naturally covers the rarely-used dark shades
    like 100/200 that no role occupies).
 
-#### Case B — ref to a leaf primitive (`{white}` or `{black}`)
+#### Case B — ref to a leaf primitive (`{white.base}` or `{black.base}`)
 
 Shade-step doesn't apply. Propose either:
 
@@ -224,7 +224,7 @@ Use this exact column schema:
 | File                                                         | Pair                                    | Lc    | Threshold       | Current (fg)          | Proposed reroute                              | Notes                                                 |
 | ------------------------------------------------------------ | --------------------------------------- | ----- | --------------- | --------------------- | --------------------------------------------- | ----------------------------------------------------- |
 | base-slate-light.json                                        | foreground ↔ background                 | 42.1  | 75 (body)       | {slate.900} (L 0.207) | {slate.950} (L 0.118)                         | role collision (light): reserved for chrome           |
-| brands-blue-dark.json                                        | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white}               | (case B) move bg or tint fg                   | fg is leaf primitive — no shade-step                  |
+| brands-blue-dark.json                                        | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white.base}          | (case B) move bg or tint fg                   | fg is leaf primitive — no shade-step                  |
 | base-slate-light.json ↔ focus-default-light.json             | color.default ↔ background              | 38.0  | 45 (incidental) | #1e3a8a               | target L ≈ 0.385 (grid row 700)               | edit primitives/focus/focus-default-light.json hex    |
 | base-slate-light.json ↔ chart-categorical-default-light.json | chart.categorical.3 ↔ container         | 56.0  | 60 (ui)         | {orange.700}          | (i) step to {orange.800} or (ii) swap palette | case D — verify hue rotation per tokens.md § Data viz |
 

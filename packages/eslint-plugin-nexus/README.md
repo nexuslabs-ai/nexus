@@ -12,7 +12,7 @@ Requires `jsonc-eslint-parser`. Wired in the root `eslint.config.js` to target s
 
 ### `@nexus/prefer-role-utilities`
 
-Flags raw numeric padding / gap utilities (`nx:p-N`, `nx:px-N`, `nx:py-N`, `nx:gap-N`) in `packages/react/src/components/ui/*.tsx` (excluding `*.stories.tsx`) where a role-named utility would apply per the coupling table.
+Flags raw numeric padding / gap utilities (`nx:p-N`, `nx:px-N`, `nx:py-N`, `nx:gap-N`) in `packages/react/src/components/ui/*.tsx` (excluding `*.stories.tsx`) where a role-named utility would apply.
 
 `nx:(p|px|py|gap)-0` is not flagged — there is no role for "no padding".
 
@@ -29,4 +29,4 @@ The comment text after the colon is free-form; keep it terse and cite the rule n
 
 ## Source of truth
 
-The role-to-component coupling table and the canonical step set live. This plugin enforces what that document specifies.
+Both rules are self-contained: the canonical step set is `src/canonical-step-set.json` and the role-to-utility mapping lives in `src/rules/prefer-role-utilities.js`. There is no external spec doc — the rule code is the spec.
