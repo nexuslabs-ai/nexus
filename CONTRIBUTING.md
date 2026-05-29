@@ -22,7 +22,7 @@ Hooks and utilities use `*.test.ts` files with `@nexus/test-utils`. Scripts unde
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-The full spec lives in `.claude/rules/testing-react.md`, `.claude/rules/storybook.md`, and `.claude/rules/components.md`. This document is the on-ramp.
+The full spec lives in `.claude/rules/testing-react.md` and `.claude/rules/components.md`. This document is the on-ramp.
 
 ---
 
@@ -173,7 +173,7 @@ export const AsLink: Story = {
 
 ### AllVariants grid
 
-Stories that compose multiple instances for visual comparison. Tailwind utilities here must carry the `nx:` prefix, and colors must use semantic tokens (e.g., `nx:bg-error-background`, not `nx:bg-destructive` — `destructive` is the variant name, not a token). See [`.claude/rules/storybook.md`](.claude/rules/storybook.md) § AllVariants grid for the canonical template.
+Stories that compose multiple instances for visual comparison. Tailwind utilities here must carry the `nx:` prefix, and colors must use semantic tokens (e.g., `nx:bg-error-background`, not `nx:bg-destructive` — `destructive` is the variant name, not a token). See [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) § Per-Base Variant Generation — the generator reuses this render-based showcase.
 
 ### A11y escape hatch
 
@@ -188,7 +188,7 @@ export const Destructive: Story = {
 };
 ```
 
-Use sparingly. The default (and what every other story inherits) is `test: 'error'` — a violation fails CI. See `.claude/rules/storybook.md` for the full pattern.
+Use sparingly. The default (and what every other story inherits) is `test: 'error'` — a violation fails CI. See [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) § Accessibility Testing for the full pattern.
 
 ---
 
@@ -309,8 +309,7 @@ The first run of `yarn test` (or any storybook-project run) launches Storybook i
 
 This file is the on-ramp. The specs are:
 
-- [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
-- [`.claude/rules/storybook.md`](.claude/rules/storybook.md) — story structure, required stories, play function patterns
+- [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) — testing patterns, story structure, required stories, play functions, the base-variants generator
 - [`.claude/rules/components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes, variants
 
 When this doc and a rule file disagree, the rule file wins.

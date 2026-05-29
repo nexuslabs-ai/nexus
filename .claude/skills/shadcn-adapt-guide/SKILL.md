@@ -28,7 +28,7 @@ The authoritative rules live in `.claude/rules/*.md`. This guide orchestrates th
 | `shadcn-divergences.md`                                                                                                                                                                                  | **THE** shadcn→Nexus token mapping, sizing, data-attrs, focus, checklist    |
 | `components.md`                                                                                                                                                                                          | Component architecture: CVA, data-slot, `nx:` prefix order, focus, layering |
 | `base-*.json` (surface/nav tokens)                                                                                                                                                                       | Surface/elevation tokens (container/popover/overlay), the `nav-*` namespace |
-| `storybook.md` / `testing-react.md`                                                                                                                                                                      | Required stories, play-fns, a11y, the base-variants generator               |
+| `testing-react.md`                                                                                                                                                                                       | Required stories, play-fns, a11y, the base-variants generator               |
 | `tokens.md`                                                                                                                                                                                              | Token names — verify a token exists before using it                         |
 | `code-quality.md`, `composition-over-render-props.md`, `extract-inline-handlers.md`, `guard-clauses.md`, `useeffect-escape-hatch.md`, `code-comments.md`, `no-follow-up-deferral.md`, `project-stage.md` | General code discipline                                                     |
 
@@ -69,7 +69,7 @@ Rewrite the source into the Nexus component, mirroring the archetype and applyin
 
 ### Step 4 — Stories
 
-Author `{Name}.stories.tsx` per `storybook.md` + `testing-react.md`: Default, one per variant + size, Disabled, interaction (click/keyboard) with play-fns, WithDataAttributes (play), and a render-based AllVariants. a11y runs automatically. If the render showcase reads well across bases, that's the export base-variants opts into.
+Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + size, Disabled, interaction (click/keyboard) with play-fns, WithDataAttributes (play), and a render-based AllVariants. a11y runs automatically. If the render showcase reads well across bases, that's the export base-variants opts into.
 
 ### Step 5 — Wire
 

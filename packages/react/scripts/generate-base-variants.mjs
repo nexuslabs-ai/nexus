@@ -14,7 +14,7 @@
  * the committed semantic JSON directly keeps this generator free of a token
  * build-order dependency (output is verified byte-identical to dist/modular).
  *
- * See .claude/rules/storybook.md § Per-base variant generation.
+ * See .claude/rules/testing-react.md § Per-Base Variant Generation.
  */
 import fs from 'fs';
 import path from 'path';
