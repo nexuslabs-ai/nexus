@@ -41,16 +41,6 @@ Concrete rule: if you grep your file and find no `@container (...)` rule scoping
 
 The declarative `<Show>` / `<Hide>` primitives ([#103](https://github.com/nexuslabs-ai/nexus/issues/103), exported from `@nexus/react`) express responsive visibility across both axes. They toggle `display: contents` ↔ `display: none` — children always render; only visibility changes (no mount/unmount). Because a `contents` wrapper generates no box of its own, an inline, flex, or grid child keeps its natural layout (this is the conclusion of the #103 spike — `display: block`/`revert` would break those cases).
 
-```tsx
-// Viewport (page-shell decisions)
-<Show above="lg"><aside>Secondary nav</aside></Show>
-<Hide below="md"><span>Tablet-and-up context</span></Hide>
-
-// Container (component-internal — Nexus extension over Atlassian's primitive)
-<Show containerAbove="md"><Stat /></Show>
-<Hide containerBelow="sm"><Avatar /></Hide>
-```
-
 Provide **exactly one** axis (`above` / `below` / `containerAbove` / `containerBelow`) — a discriminated union rejects zero or two at compile time. Container axes query the nearest `@container` ancestor, so a parent must declare one (e.g. the `nx:@container` utility).
 
 > **Two breakpoint scales, same names.** The viewport axes use the `--breakpoint-*` scale (`md` = 48rem); the container axes use Tailwind's native `@container` scale (`md` = 28rem), deliberately smaller because a component reads as "md" at a narrower width than the whole viewport. So `above="md"` and `containerAbove="md"` do **not** fire at the same width.
