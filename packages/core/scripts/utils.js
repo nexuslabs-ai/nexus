@@ -73,7 +73,13 @@ export function formatTokenValue(value, type, tokenPath) {
         : undefined;
 
     if (tokenPath && tokenPath.length >= 2 && isPaletteShadeKey(lastSegment)) {
-      return hexToOklchPinned(value, lastSegment);
+      // The segment before the shade is the palette/hue (e.g. ['blue','500']),
+      // which selects the per-hue lightness curve in the grid.
+      return hexToOklchPinned(
+        value,
+        lastSegment,
+        tokenPath[tokenPath.length - 2]
+      );
     }
 
     if (isPaletteShadeKey(lastSegment)) {

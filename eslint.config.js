@@ -16,6 +16,8 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/dist/**',
       '**/.next/**',
+      // Next.js auto-generates next-env.d.ts (with triple-slash refs); not ours to lint.
+      '**/next-env.d.ts',
       '**/.turbo/**',
       '**/coverage/**',
       '**/generated/**',

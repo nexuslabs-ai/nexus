@@ -1,0 +1,12 @@
+/* radius: mellow */
+
+:root {
+  --nx-radius-base: 12px;
+  --nx-radius-sm: 10px;
+  --nx-radius-md: 12px;
+  --nx-radius-lg: 14px;
+  --nx-radius-xl: 16px;
+  --nx-radius-2xl: 20px;
+  --nx-radius-3xl: 28px;
+  --nx-radius-full: 9999px;
+}

@@ -83,7 +83,7 @@ Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + s
 Run these and fix everything before reporting — no deferral (`no-follow-up-deferral.md`):
 
 - `yarn workspace @nexus/react typecheck`
-- `npx eslint packages` — **not** `yarn lint` / `eslint .`; those recurse `.claude/worktrees/` and fail on unrelated pre-existing errors.
+- `yarn lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
 - Story tests per `testing-react.md` (`yarn test:storybook`); a11y violations fail the run.
 
 ## Reflex Check
@@ -94,7 +94,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - _See `bg-accent` / `text-accent-foreground` / `hover:bg-accent`?_ → there is **no `accent` token** in Nexus; map **by context** — ghost/control hover → `background-hover`, menu/dropdown item → `popover-hover`, list/card row → `container-hover`. If the surface isn't inferable, ask rather than guess. (`shadcn-divergences.md` § Accent)
 - _See a `dark:` modifier?_ → delete it. Semantic tokens already carry their dark value. (`components.md`)
 - _See `ring-*` / `focus:ring` / `ring-offset`?_ → use `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)`; invalid fields add `nx:aria-invalid:focus-visible:outline-focus-error`. (`components.md` § Focus)
-- _See a fixed height (`h-10`, `h-9`)?_ → padding-based sizing. Exceptions: progress-bar height, avatar, modal. (`components.md` § Sizing)
+- _See a fixed height (`h-10`, `h-9`), or about to type numeric `nx:py-*` on a control?_ → padding-based sizing via the density-aware role utility `nx:py-control-{sm,md,lg}` (mirror `button.tsx` / `input.tsx`) — not a fixed height, not numeric `py`. Fixed-dimension exceptions: progress-bar height, avatar, modal. (`components.md` § Sizing)
 - _Adding any element?_ → `data-slot="{name}"` (+ `data-variant`/`data-size` if it has them). (`components.md`)
 - _shadcn uses `destructive`?_ → keep the **variant name** `destructive` in the public API; map internals to `error-*` tokens. (`shadcn-divergences.md`)
 - _Overlay / portal / floating layer?_ → mirror `dialog.tsx`: `nx:bg-overlay` scrim, `nx:bg-container`/`nx:bg-popover` surface, `nx:z-modal` (dialog/sheet/alert-dialog) or `nx:z-popover` (popover/command), tw-animate-css fade/zoom/slide. (`components.md` § Layering)
@@ -119,5 +119,5 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 
 ## Notes
 
-- **Spacing (temporary):** until the Spacing tokens · Phase 1 milestone lands role-utilities, use numeric `nx:px-*` / `nx:py-*` / `nx:gap-*`, mirroring the shipped components. Once role-utilities land, `nx:px-control` etc. become the target. #124 sweeps only the **12 already-shipped** components — newly-adapted components are built _after_ spacing and adopt role-utilities natively, so they fall **outside** #124's scope. Update this note when that milestone closes.
+- **Spacing:** role-named utilities are the norm — mirror the archetype. `nx:py-control-{sm,md,lg}` is the **height mechanism** for a control (it resolves per `data-style` density mode; numeric `nx:py-2` does not). `button.tsx` also uses `nx:px-control-*` / `nx:gap-control-*`; numeric `nx:px-*` / `nx:gap-*` stay only for non-control spacing (icon gaps, internal layout). Never reach for numeric `py` on a control. (Role-utilities rolled out in #124, now closed.)
 - **Don't over-plan.** The recipe above _is_ the plan — no planning doc, no approval gate. Orient, transform, verify, report.

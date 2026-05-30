@@ -18,7 +18,7 @@ Nexus components are designed for **Standard (≥1024px)** as the primary target
 
 **Narrow / Standard / Wide are documentation labels, not utilities.** There is no `nx:standard:` class. Contributors use the standard Tailwind class names (`nx:sm:`, `nx:md:`, `nx:lg:`, `nx:xl:`, `nx:2xl:`) in code; the display-class labels exist to anchor design and review conversations.
 
-> **Zoom-vs-rem.** Breakpoints are rem-based, so they fire at the user's **zoom-adjusted threshold** — not pixel-adjusted. A user at 1280px viewport zoomed to 200% triggers Narrow (`nx:md:` matches, `nx:lg:` does not), because their effective root font-size doubled. This is intended accessibility behaviour: zoom is text scaling, and layout should follow text. Designers should test components at 100%, 150%, and 200% browser zoom.
+> **Rem breakpoints track the user's font-size preference — not zoom.** Breakpoints are rem-based, so they respond to the browser's **default font-size** setting — in a media query, `rem` resolves against that browser default (a user preference), not against any `html { font-size }` the page itself sets. Full-page zoom is _not_ the mechanism: zoom scales every length unit, rem and px alike, so rem-vs-px makes no difference under it. The payoff is for a user who raises their base font size — each rem grows, the breakpoints fire at a _narrower_ viewport, and the layout drops to a roomier tier as the text enlarges (a px-based layout would ignore the preference). Example: doubling the base font to 32px turns `nx:lg:` (64rem) into a 2048px threshold and `nx:md:` (48rem) into 1536px, so a 1280px viewport that is normally Standard (`nx:xl:` matches) now reads Narrow — only `nx:sm:` (40rem → 1280px) still matches. This is intended accessibility behaviour: layout should follow text size. Test components at 100/150/200% zoom (for reflow) **and** with an enlarged browser default font (for breakpoint behaviour).
 
 ## Decision tree — which responsive mechanism
 
@@ -61,7 +61,7 @@ Most components use `@container` for internal responsive behaviour — though no
 
 A Dialog at 480px viewport is full-bleed (no rounded corners) because _the viewport is narrow_, not because the Dialog's own container is narrow. Migrating to `@container` would flip the rounded-corner threshold to the Dialog's intrinsic width, producing rounded corners on what's still effectively a full-bleed sheet — wrong UX.
 
-Live example: `packages/react/src/components/ui/dialog.tsx` uses `nx:sm:` at three sites — content rounding (`:135`), header text alignment (`:187`), footer flex direction and gap (`:220`). Each is a positioning concern relative to the viewport, not a container-width concern. Keep them.
+Live example: `packages/react/src/components/ui/dialog.tsx` uses `nx:sm:` at three sites — content corner rounding, header text alignment, and footer flex-direction/gap (grep `nx:sm:` in that file; only these three). Each is a positioning concern relative to the viewport, not a container-width concern. Keep them.
 
 For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you normally would.
 

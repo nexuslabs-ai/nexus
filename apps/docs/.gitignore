@@ -1,0 +1,16 @@
+# Next.js build output
+/.next/
+/out/
+
+# production build
+/build
+/dist
+
+# Next.js generated types (regenerated on dev/build)
+next-env.d.ts
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
