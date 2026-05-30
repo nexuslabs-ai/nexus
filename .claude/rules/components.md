@@ -26,7 +26,7 @@ Every component in `packages/react/src/components/ui/` needs 2 files:
 
 ## Component Template
 
-Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. After authoring, add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button.tsx` and `badge.tsx` for the canonical implementations.
+Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. Export the component, its props type, and its `cva` variants function, then add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button.tsx` and `badge.tsx` for the canonical implementations.
 
 ## Data Attributes
 
@@ -92,7 +92,7 @@ Components may implement additional state patterns like loading, disabled, or er
 
 ### Active / press states on container & popover
 
-When a component renders on `container` or `popover` and needs a visible press cue, do **not** rely on `*-active` fill changes — those tokens collapse to the rest shade in dark mode (and in light mode for popover) by design. The press cue lives at the component layer, applied to the `:active` / `[data-state="active"]` selector:
+No shipped component needs this yet — it's the rule for the first one that does, not a pattern to retrofit. When a component renders on `container` or `popover` and needs a visible press cue, do **not** rely on `*-active` fill changes — those tokens collapse to the rest shade in dark mode (and in light mode for popover) by design. Apply the press cue at the component layer, on the `:active` / `[data-state="active"]` selector:
 
 - `nx:active:shadow-inner` — `inset` shadow primitive, additive on top of the existing fill.
 - `nx:active:border-border-active` — emphasised border, useful when the component already has a border.
@@ -126,24 +126,22 @@ The ring is a real `outline` (not `box-shadow`) for two reasons:
 
 Every focusable control — primary / secondary / outline / ghost / destructive, Input, Switch, Tabs, Accordion, Select, Dialog close — uses the **same** `focus-default` colour. There is no per-variant focus colour and no destructive→grey swap. Reason: focus is a system signal ("you are here"), not a brand or status signal. One colour reduces the cognitive load and matches the practice of Linear, Stripe, Geist, and Tailwind's own focus convention.
 
-The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark; canonical values in `focus-default-{light,dark}.json`), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
+The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark; canonical values in `focus-default-{light,dark}.json`), tuned to clear [APCA Lc ≥ 45](tokens.md#apca-contrast-gate) on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
 
 ### Surface exception map
 
 Not every focusable thing takes the outline ring, and not everything that shows a `:focus` state is a keyboard control. Which treatment a component gets is decided by its **input modality**, not its visual elevation:
 
-| Component type                                                                                                             | Pattern                                                                                                                                   | Rationale                                                                                                                                                                                                                                                                        |
-| -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Interactive controls** — Button, Input, Select trigger, Switch, Tabs trigger, Accordion trigger, Dialog close            | `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)` — the canonical ring | Keyboard-only ring. The real `outline` survives Windows High Contrast Mode and stays legible on every surface.                                                                                                                                                                   |
-| **Error-state inputs**                                                                                                     | the canonical ring **plus** `nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error`                       | Always-on error border + red focus ring signal an invalid value. Live consumer: `input.tsx`.                                                                                                                                                                                     |
-| **Menu items** — DropdownMenuItem, SelectItem, and the DropdownMenu checkbox / radio items (Radix roving-focus menu items) | `nx:focus:bg-background-hover nx:focus:text-foreground` — background tint, **no ring**                                                    | Radix roving focus moves DOM focus to the item under the pointer, so `:focus` fires on mouse-hover too. A `:focus-visible` ring would flash for pointer users while giving them no steady indicator — wrong UX. A background tint reads correctly for both keyboard and pointer. |
-| **Destructive menu items**                                                                                                 | `nx:focus:bg-error-background nx:focus:text-error-foreground`                                                                             | Same roving-focus tint; the red fill signals a destructive action.                                                                                                                                                                                                               |
-| **Non-focusable elevated surfaces** — Card, Dialog body, popover / menu container                                          | none on the surface itself                                                                                                                | The ring lives on focusable children (DialogClose, controls inside a Card), not the container. See [§ No shadow on focusable elements](#no-shadow-on-focusable-elements).                                                                                                        |
-| **Canvas / direct-manipulation surfaces** (consumer-built)                                                                 | custom cursor / selection model, no ring                                                                                                  | A direct-manipulation surface already shows position through its cursor and selection; a focus ring would be redundant.                                                                                                                                                          |
+| Component type                                                                                                             | Pattern                                                                                                  | Rationale                                                                                                                                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Interactive controls** — Button, Input, Select trigger, Switch, Tabs trigger, Accordion trigger, Dialog close            | the canonical ring — see [§ Focus States](#focus-states)                                                 | Keyboard-only ring. The real `outline` survives Windows High Contrast Mode and stays legible on every surface.                                                                                                                                                                   |
+| **Error-state inputs**                                                                                                     | the canonical ring **plus** the `aria-invalid` error border + ring (see [§ Focus States](#focus-states)) | Always-on error border + red focus ring signal an invalid value. Live consumer: `input.tsx`.                                                                                                                                                                                     |
+| **Menu items** — DropdownMenuItem, SelectItem, and the DropdownMenu checkbox / radio items (Radix roving-focus menu items) | `nx:focus:bg-background-hover nx:focus:text-foreground` — background tint, **no ring**                   | Radix roving focus moves DOM focus to the item under the pointer, so `:focus` fires on mouse-hover too. A `:focus-visible` ring would flash for pointer users while giving them no steady indicator — wrong UX. A background tint reads correctly for both keyboard and pointer. |
+| **Destructive menu items**                                                                                                 | `nx:focus:bg-error-background nx:focus:text-error-foreground`                                            | Same roving-focus tint; the red fill signals a destructive action.                                                                                                                                                                                                               |
+| **Non-focusable elevated surfaces** — Card, Dialog body, popover / menu container                                          | none on the surface itself                                                                               | The ring lives on focusable children (DialogClose, controls inside a Card), not the container. See [§ No shadow on focusable elements](#no-shadow-on-focusable-elements).                                                                                                        |
+| **Canvas / direct-manipulation surfaces** (consumer-built)                                                                 | custom cursor / selection model, no ring                                                                 | A direct-manipulation surface already shows position through its cursor and selection; a focus ring would be redundant.                                                                                                                                                          |
 
 The dividing line is modality: anything a keyboard user reaches with Tab gets the ring; anything Radix's roving focus moves to on pointer-hover gets the background tint. The tint pattern is live in `dropdown-menu.tsx` and `select.tsx`.
-
-The `focus-default` colour is a dedicated brand-blue tuned to clear [APCA Lc ≥ 45](tokens.md#apca-contrast-gate) on every surface it lands on — see [§ Uniform brand-blue across variants](#uniform-brand-blue-across-variants) for the per-theme values and the surfaces it was validated against.
 
 ### No shadow on focusable elements
 
@@ -184,18 +182,3 @@ The utilities reference the CSS variable (`nx:z-sticky` → `z-index: var(--z-in
   --z-index-sticky: 35; /* raise the app shell's sticky chrome above the default 30 */
 }
 ```
-
-## Checklist
-
-Before submitting a component:
-
-- [ ] `nx:` prefix on all utility classes
-- [ ] Prefix before ALL modifiers (`nx:hover:`, `nx:[&>svg]:`, `nx:md:` — not `hover:nx:`, `[&>svg]:nx:`)
-- [ ] Full semantic token paths (not incomplete like `nx:bg-primary`)
-- [ ] No `dark:` modifiers on semantic tokens (they adapt automatically)
-- [ ] `data-slot` attribute present
-- [ ] Padding-based sizing (no fixed heights unless necessary)
-- [ ] Named interface with JSDoc for custom props
-- [ ] Exports include component, props type, and variants function
-- [ ] `asChild` support for interactive components
-- [ ] Focus uses `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)` (not `nx:ring-*`, not `nx:shadow-focus-*`)

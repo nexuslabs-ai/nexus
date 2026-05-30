@@ -1,0 +1,59 @@
+/* Spacing role utilities — data-driven from canonical mode role tokens. */
+
+@utility px-control-sm {
+  padding-left: var(--nx-control-padding-x-sm);
+  padding-right: var(--nx-control-padding-x-sm);
+}
+
+@utility px-control-md {
+  padding-left: var(--nx-control-padding-x-md);
+  padding-right: var(--nx-control-padding-x-md);
+}
+
+@utility px-control-lg {
+  padding-left: var(--nx-control-padding-x-lg);
+  padding-right: var(--nx-control-padding-x-lg);
+}
+
+@utility py-control-sm {
+  padding-top: var(--nx-control-padding-y-sm);
+  padding-bottom: var(--nx-control-padding-y-sm);
+}
+
+@utility py-control-md {
+  padding-top: var(--nx-control-padding-y-md);
+  padding-bottom: var(--nx-control-padding-y-md);
+}
+
+@utility py-control-lg {
+  padding-top: var(--nx-control-padding-y-lg);
+  padding-bottom: var(--nx-control-padding-y-lg);
+}
+
+@utility gap-control-sm {
+  gap: var(--nx-control-gap-sm);
+}
+
+@utility gap-control-md {
+  gap: var(--nx-control-gap-md);
+}
+
+@utility gap-control-lg {
+  gap: var(--nx-control-gap-lg);
+}
+
+@utility p-container {
+  padding: var(--nx-container-p);
+}
+
+@utility gap-container {
+  gap: var(--nx-container-gap);
+}
+
+@utility gap-layout-section {
+  gap: var(--nx-layout-section-gap);
+}
+
+@utility gap-layout-stack {
+  gap: var(--nx-layout-stack-gap);
+}

@@ -1,0 +1,49 @@
+# Install
+
+Nexus ships as a small set of workspace packages: the React components, the
+Tailwind theme they're styled with, and the design tokens underneath. Add the
+two you consume directly.
+
+## Add the packages
+
+```bash
+yarn add @nexus/react @nexus/tailwind
+```
+
+`@nexus/react` provides the components; `@nexus/tailwind` provides the
+`nx:`-prefixed utility theme they're built on. Tokens come along transitively.
+
+## Wire the styles
+
+Import the theme and the prebuilt component styles once, at your app's CSS
+entry point:
+
+```css
+@import '@nexus/tailwind';
+@import '@nexus/react/styles.css';
+```
+
+The second import matters: Tailwind doesn't scan `node_modules`, so the
+utilities used _inside_ the compiled components ship as prebuilt CSS.
+
+## Render a component
+
+Every utility is prefixed with `nx:` and every color is a semantic token, so
+components theme themselves. The buttons below are live `@nexus/react`
+components rendered straight from this Markdown page:
+
+<div className="nx:flex nx:flex-wrap nx:gap-3 nx:my-6">
+  <Button>Primary</Button>
+  <Button variant="secondary">Secondary</Button>
+  <Button variant="outline">Outline</Button>
+  <Button variant="ghost">Ghost</Button>
+</div>
+
+Swap the base, brand, or density in the theme picker (bottom-right) and they
+re-theme live — no rebuild.
+
+## Next steps
+
+- **Theme setup** — pick a base palette and brand, enable dark mode.
+- **Foundations → Color** — how the palette is engineered (OKLCH + APCA).
+- **Components** — the full catalog.

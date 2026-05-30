@@ -1,0 +1,48 @@
+/* typography: vega */
+
+:root {
+  --nx-typography-family-font-sans: Inter;
+  --nx-typography-family-font-serif: Georgia;
+  --nx-typography-family-font-mono: JetBrains Mono;
+  --nx-typography-size-xs: 12px;
+  --nx-typography-size-sm: 14px;
+  --nx-typography-size-base: 16px;
+  --nx-typography-size-lg: 18px;
+  --nx-typography-size-xl: 20px;
+  --nx-typography-size-2xl: 24px;
+  --nx-typography-size-3xl: 30px;
+  --nx-typography-size-4xl: 36px;
+  --nx-typography-size-5xl: 48px;
+  --nx-typography-size-6xl: 60px;
+  --nx-typography-size-7xl: 72px;
+  --nx-typography-size-8xl: 96px;
+  --nx-typography-size-9xl: 128px;
+  --nx-typography-weight-thin: 100;
+  --nx-typography-weight-extralight: 200;
+  --nx-typography-weight-light: 300;
+  --nx-typography-weight-normal: 400;
+  --nx-typography-weight-medium: 500;
+  --nx-typography-weight-semibold: 600;
+  --nx-typography-weight-bold: 700;
+  --nx-typography-weight-extrabold: 800;
+  --nx-typography-weight-black: 900;
+  --nx-typography-line-height-xs: 16px;
+  --nx-typography-line-height-sm: 20px;
+  --nx-typography-line-height-base: 24px;
+  --nx-typography-line-height-lg: 28px;
+  --nx-typography-line-height-xl: 28px;
+  --nx-typography-line-height-2xl: 32px;
+  --nx-typography-line-height-3xl: 36px;
+  --nx-typography-line-height-4xl: 48px;
+  --nx-typography-line-height-5xl: 48px;
+  --nx-typography-line-height-6xl: 60px;
+  --nx-typography-line-height-7xl: 72px;
+  --nx-typography-line-height-8xl: 96px;
+  --nx-typography-line-height-9xl: 128px;
+  --nx-typography-letterspacing-tighter: -0.8px;
+  --nx-typography-letterspacing-tight: -0.4px;
+  --nx-typography-letterspacing-normal: 0px;
+  --nx-typography-letterspacing-wide: 0.4px;
+  --nx-typography-letterspacing-wider: 0.8px;
+  --nx-typography-letterspacing-widest: 1.6px;
+}

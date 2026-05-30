@@ -1,0 +1,6 @@
+/* borderwidth: nova */
+
+:root {
+  --nx-borderwidth-default: 1.5px;
+  --nx-borderwidth-thick: 3px;
+}

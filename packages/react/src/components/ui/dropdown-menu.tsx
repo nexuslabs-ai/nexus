@@ -94,7 +94,7 @@ function DropdownMenuSubTrigger({
         'nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2',
         // nexus-allow-numeric: menu item-tier rhythm
         'nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none',
-        'nx:focus:bg-background-hover',
+        'nx:focus:bg-background-hover nx:focus:text-foreground',
         'nx:data-[state=open]:bg-background-hover',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         inset && 'nx:pl-8',

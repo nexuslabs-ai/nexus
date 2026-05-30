@@ -225,6 +225,19 @@ _React and JSX_
 - _Writing an inline arrow in a JSX prop (`onClick={() => { ... }}`, `onSubmit={...}`, `onChange={...}`)?_
   -> If the body is 3+ lines, branches, or nests a callback, extract a named function (`handleX`) above `return` and pass it by reference. One- and two-line handlers stay inline. Don't wrap a bare reference in an arrow — `onClick={() => doThing()}` is just `onClick={doThing}`. (`extract-inline-handlers.md`)
 
+_Components and styling_
+
+- _Authoring or restyling a component, or writing any `nx:` utility?_
+  -> `nx:` prefix on every utility, **before** every modifier (`nx:hover:`, `nx:[&>svg]:`, `nx:lg:` — never `hover:nx:`). Semantic tokens only, full paths (`nx:bg-primary-background` — never `nx:bg-primary`, never a primitive like `nx:bg-blue-500`); no `dark:` on a semantic token (it already adapts — the modifier is a no-op). Padding for sizing, not fixed heights. `@container` for component-internal responsive; viewport prefixes (`nx:lg:`) are page-shell only (Dialog is the one viewport-driven exception). Focus = a real outline `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)` — never `nx:ring-*` or a shadow. `data-slot` always; `data-variant` / `data-size` when the prop exists. CVA for enum variants; boolean props as ternaries in the body, not CVA. `asChild` via Radix `Slot` for interactive components. (`components.md`, `tokens.md`, `responsive.md`)
+
+- _Reaching for a CSS variable at runtime (inline style, SVG, canvas), or porting a shadcn/ui component?_
+  -> Runtime vars are the **prefixed** form — `var(--nx-color-foo)`, `var(--nx-spacing-4)` — never the build-time `@theme` names (`var(--color-foo)`, `var(--spacing-4)`), which don't exist at runtime. For a shadcn port, map every token through `shadcn-divergences.md` (e.g. `bg-destructive` → `nx:bg-error-background`, but keep the `destructive` **prop** name) — or just run the `/shadcn-adapt` skill. (`tokens.md`, `shadcn-divergences.md`)
+
+_Tests_
+
+- _Adding or changing a component, hook, or utility?_
+  -> **Components: stories are the tests** — no `*.test.tsx`; write play functions in `*.stories.tsx`, importing from `storybook/test` (never `@storybook/test` or `@testing-library/react`). Cover the required-story matrix (Default, each variant + size, Disabled, Click + Keyboard interaction, WithDataAttributes, `asChild` if applicable, edge cases, and the `AllVariants` showcase). For a **new** component the DoD gate is `yarn workspace @nexus/react audit:storybook-coverage --component <name>` exiting 0. a11y is automatic via addon-a11y — don't add manual `axe()` calls; colour contrast is APCA-gated, not axe-gated (`yarn workspace @nexus/core audit:contrast`). **Hooks / utilities** use `*.test.ts` with `@nexus/test-utils`. Assert input → output with partial matching on real fixtures; never commit `skip` / `only`. (`testing-react.md`, `testing.md`)
+
 _Diagnostic noise_
 
 - _Adding a log call?_
