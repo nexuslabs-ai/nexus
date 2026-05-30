@@ -632,7 +632,7 @@ export const SECTIONS = {
       {
         slug: 'rules-mirror',
         label: 'Rules mirror',
-        lede: '[ All 22 rule files · readable on the web · always up to date ]',
+        lede: '[ All 17 rule files · readable on the web · always up to date ]',
         blocks: [
           {
             type: 'placeholder',

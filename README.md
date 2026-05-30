@@ -27,14 +27,14 @@ Each command runs from the repo root.
 
 ## Workspace layout
 
-| Path                  | Purpose                                                      |
-| --------------------- | ------------------------------------------------------------ |
-| `packages/core`       | Internal design tokens and theme definitions (not published) |
-| `packages/tailwind`   | Tailwind CSS theme with `nx:` prefix                         |
-| `packages/react`      | React components built with Radix UI and Tailwind CSS        |
-| `packages/test-utils` | Test utilities for hooks and utilities                       |
-| `apps/playground`     | Theme/token exploration UI                                   |
-| `apps/docs`           | Documentation site (scaffold — no implementation yet)        |
+| Path                  | Purpose                                                       |
+| --------------------- | ------------------------------------------------------------- |
+| `packages/core`       | Internal design tokens and theme definitions (not published)  |
+| `packages/tailwind`   | Tailwind CSS theme with `nx:` prefix                          |
+| `packages/react`      | React components built with Radix UI and Tailwind CSS         |
+| `packages/test-utils` | Test utilities for hooks and utilities                        |
+| `apps/playground`     | Theme/token exploration UI                                    |
+| `apps/docs`           | Documentation site (Next.js — IA shell + live theme explorer) |
 
 ## Where to learn more
 
