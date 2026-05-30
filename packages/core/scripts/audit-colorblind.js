@@ -106,7 +106,7 @@ export function buildPalettesSrgb(primitives) {
           `audit-colorblind: ${palette}.${shade} missing or non-string in primitives`
         );
       }
-      shades[shade] = hexToSrgbInts(entry.$value, shade);
+      shades[shade] = hexToSrgbInts(entry.$value, shade, palette);
     }
     result[palette] = shades;
   }
