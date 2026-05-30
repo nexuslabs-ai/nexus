@@ -92,7 +92,7 @@ Components may implement additional state patterns like loading, disabled, or er
 
 ### Active / press states on container & popover
 
-When a component renders on `container` or `popover` and needs a visible press cue, do **not** rely on `*-active` fill changes — those tokens collapse to the rest shade in dark mode (and in light mode for popover) by design. The press cue lives at the component layer, applied to the `:active` / `[data-state="active"]` selector:
+No shipped component needs this yet — it's the rule for the first one that does, not a pattern to retrofit. When a component renders on `container` or `popover` and needs a visible press cue, do **not** rely on `*-active` fill changes — those tokens collapse to the rest shade in dark mode (and in light mode for popover) by design. Apply the press cue at the component layer, on the `:active` / `[data-state="active"]` selector:
 
 - `nx:active:shadow-inner` — `inset` shadow primitive, additive on top of the existing fill.
 - `nx:active:border-border-active` — emphasised border, useful when the component already has a border.
