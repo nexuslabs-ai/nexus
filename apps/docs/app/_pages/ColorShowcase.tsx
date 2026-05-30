@@ -1,4 +1,4 @@
-import { Breadcrumb } from '../../_components/Breadcrumb';
+import { Breadcrumb } from '../_components/Breadcrumb';
 
 import { PerceptualGrid } from './PerceptualGrid';
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Button } from '../../_components/nexus';
+import { Button } from '../_components/nexus';
 
 /**
  * The perceptual grid + a color-vision-deficiency preview.
