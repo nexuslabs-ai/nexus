@@ -27,8 +27,11 @@ export function Placeholder({
   const variants: Record<PlaceholderVariant, string> = {
     default: 'nx:min-h-12',
     code: 'nx:bg-muted nx:justify-start nx:text-left nx:min-h-12',
+    // Runtime --nx-color-* vars (not build-time @theme --color-*) so the
+    // hatch flips in dark mode. muted + border-default are defined in both
+    // themes (unlike container/background, which depend on the white token).
     storybook:
-      'nx:min-h-60 nx:p-8 nx:bg-[repeating-linear-gradient(45deg,var(--color-container),var(--color-container)_8px,var(--color-muted)_8px,var(--color-muted)_16px)]',
+      'nx:min-h-60 nx:p-8 nx:bg-[repeating-linear-gradient(45deg,var(--nx-color-muted),var(--nx-color-muted)_8px,var(--nx-color-border-default)_8px,var(--nx-color-border-default)_16px)]',
     swatches: 'nx:min-h-16 nx:p-3',
     diagram: 'nx:min-h-44 nx:p-8',
     table: 'nx:min-h-32',
