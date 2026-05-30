@@ -1,13 +1,14 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
 
-import { PerceptualGrid } from './PerceptualGrid';
+import { ColorScales } from './ColorScales';
 
 /**
  * Foundations → Color — the proof-of-depth exemplar page.
  *
- * Server component. The interactive perceptual grid (with the color-vision
- * toggle) is a client island; everything else — the live-token strip, the
- * shade→role and APCA reference tables, the pipeline — is server-rendered.
+ * Server component. The interactive color-scale grids (with the color-vision
+ * toggle) are a client island (ColorScales); everything else — the live-token
+ * strip, the shade→role and APCA reference tables, the pipeline — is server-
+ * rendered.
  * Swatches reference --nx-color-* variables inline; the semantic strip
  * reacts live to the theme picker via the CSS cascade (zero JS).
  *
@@ -162,19 +163,17 @@ export function ColorShowcase() {
         then gated by APCA before it can ship.
       </p>
 
-      {/* ── The perceptual grid (+ CVD preview) ─────────────── */}
+      {/* ── The palettes (+ shared CVD preview) ─────────────── */}
       <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">
-          The perceptual grid
-        </h2>
+        <h2 className="nx:typography-heading-small nx:mb-1">The palettes</h2>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Five base palettes, eleven shades each. Read <em>down</em> any column:
-          every palette&rsquo;s <code>500</code> sits at the same perceptual
-          lightness — only hue and chroma differ. Switch the color-vision filter
-          to preview the palette under each type of color blindness; shade
-          separation must survive all three.
+          Start with the five neutral bases — eleven shades each. Read{' '}
+          <em>down</em> any column: every palette&rsquo;s <code>500</code> sits
+          at the same perceptual lightness, only hue and chroma differ. Below
+          are the chromatic hues brand and status are built from, and the full
+          reference. One color-vision filter applies to them all.
         </p>
-        <PerceptualGrid />
+        <ColorScales />
       </section>
 
       {/* ── Live semantic tokens ────────────────────────────── */}
