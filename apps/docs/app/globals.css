@@ -1,0 +1,8 @@
+/* Nexus tokens + Tailwind utilities (nx: prefix) */
+@import '@nexus/tailwind';
+/* Prebuilt utilities for shipped @nexus/react components.
+   Tailwind 4 doesn't scan node_modules, so utilities used inside the
+   compiled @nexus/react bundle would not be emitted otherwise. */
+@import '@nexus/react/styles.css';
+/* Animations used by Dialog / Dropdown / Select / Tooltip */
+@import 'tw-animate-css';
