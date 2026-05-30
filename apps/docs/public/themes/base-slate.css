@@ -2,13 +2,13 @@
 
 html {
   --nx-color-background: var(--nx-color-white-base);
-  --nx-color-foreground: var(--nx-color-slate-950);
+  --nx-color-foreground: var(--nx-color-black-a900);
   --nx-color-background-hover: var(--nx-color-slate-50);
   --nx-color-background-hover-alpha: var(--nx-color-slate-a100);
   --nx-color-background-active: var(--nx-color-slate-100);
   --nx-color-muted: var(--nx-color-slate-50);
-  --nx-color-muted-foreground: var(--nx-color-slate-500);
-  --nx-color-muted-foreground-subtle: var(--nx-color-slate-400);
+  --nx-color-muted-foreground: var(--nx-color-black-a600);
+  --nx-color-muted-foreground-subtle: var(--nx-color-black-a500);
   --nx-color-disabled: var(--nx-color-slate-50);
   --nx-color-disabled-foreground: var(--nx-color-slate-400);
   --nx-color-container: var(--nx-color-white-base);
@@ -28,7 +28,7 @@ html {
   --nx-color-nav-item-active: var(--nx-color-slate-300);
   --nx-color-nav-border: var(--nx-color-slate-200);
   --nx-color-overlay: var(--nx-color-slate-a700);
-  --nx-color-border-default: var(--nx-color-slate-200);
+  --nx-color-border-default: var(--nx-color-black-a300);
   --nx-color-border-default-alpha: var(--nx-color-slate-a200);
   --nx-color-border-active: var(--nx-color-slate-400);
   --nx-color-border-disabled: var(--nx-color-slate-50);
@@ -82,13 +82,13 @@ html {
 
 html.dark {
   --nx-color-background: var(--nx-color-slate-900);
-  --nx-color-foreground: var(--nx-color-white-base);
+  --nx-color-foreground: var(--nx-color-white-a900);
   --nx-color-background-hover: var(--nx-color-slate-800);
   --nx-color-background-hover-alpha: var(--nx-color-slate-a100);
   --nx-color-background-active: var(--nx-color-slate-950);
   --nx-color-muted: var(--nx-color-slate-800);
-  --nx-color-muted-foreground: var(--nx-color-slate-300);
-  --nx-color-muted-foreground-subtle: var(--nx-color-slate-300);
+  --nx-color-muted-foreground: var(--nx-color-white-a600);
+  --nx-color-muted-foreground-subtle: var(--nx-color-white-a600);
   --nx-color-disabled: var(--nx-color-slate-950);
   --nx-color-disabled-foreground: var(--nx-color-slate-300);
   --nx-color-container: var(--nx-color-slate-800);
@@ -108,7 +108,7 @@ html.dark {
   --nx-color-nav-item-active: var(--nx-color-slate-800);
   --nx-color-nav-border: var(--nx-color-slate-800);
   --nx-color-overlay: var(--nx-color-slate-a800);
-  --nx-color-border-default: var(--nx-color-slate-700);
+  --nx-color-border-default: var(--nx-color-white-a400);
   --nx-color-border-default-alpha: var(--nx-color-slate-a300);
   --nx-color-border-active: var(--nx-color-slate-400);
   --nx-color-border-disabled: var(--nx-color-slate-950);

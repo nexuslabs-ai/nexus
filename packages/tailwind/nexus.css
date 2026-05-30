@@ -27,13 +27,13 @@
 
   /* Semantic tokens */
   --color-background: var(--nx-color-white-base);
-  --color-foreground: var(--nx-color-stone-950);
+  --color-foreground: var(--nx-color-black-a900);
   --color-background-hover: var(--nx-color-stone-50);
   --color-background-hover-alpha: var(--nx-color-stone-a100);
   --color-background-active: var(--nx-color-stone-100);
   --color-muted: var(--nx-color-stone-50);
-  --color-muted-foreground: var(--nx-color-stone-500);
-  --color-muted-foreground-subtle: var(--nx-color-stone-400);
+  --color-muted-foreground: var(--nx-color-black-a600);
+  --color-muted-foreground-subtle: var(--nx-color-black-a500);
   --color-disabled: var(--nx-color-stone-50);
   --color-disabled-foreground: var(--nx-color-stone-400);
   --color-container: var(--nx-color-white-base);
@@ -53,7 +53,7 @@
   --color-nav-item-active: var(--nx-color-stone-300);
   --color-nav-border: var(--nx-color-stone-200);
   --color-overlay: var(--nx-color-stone-a700);
-  --color-border-default: var(--nx-color-stone-200);
+  --color-border-default: var(--nx-color-black-a300);
   --color-border-default-alpha: var(--nx-color-stone-a200);
   --color-border-active: var(--nx-color-stone-400);
   --color-border-disabled: var(--nx-color-stone-50);
@@ -241,13 +241,13 @@
 /* ===== DARK MODE ===== */
 .dark {
   --nx-color-background: var(--nx-color-stone-900);
-  --nx-color-foreground: var(--nx-color-white-base);
+  --nx-color-foreground: var(--nx-color-white-a900);
   --nx-color-background-hover: var(--nx-color-stone-800);
   --nx-color-background-hover-alpha: var(--nx-color-stone-a100);
   --nx-color-background-active: var(--nx-color-stone-950);
   --nx-color-muted: var(--nx-color-stone-800);
-  --nx-color-muted-foreground: var(--nx-color-stone-300);
-  --nx-color-muted-foreground-subtle: var(--nx-color-stone-300);
+  --nx-color-muted-foreground: var(--nx-color-white-a600);
+  --nx-color-muted-foreground-subtle: var(--nx-color-white-a600);
   --nx-color-disabled: var(--nx-color-stone-950);
   --nx-color-disabled-foreground: var(--nx-color-stone-300);
   --nx-color-container: var(--nx-color-stone-800);
@@ -267,7 +267,7 @@
   --nx-color-nav-item-active: var(--nx-color-stone-800);
   --nx-color-nav-border: var(--nx-color-stone-800);
   --nx-color-overlay: var(--nx-color-stone-a800);
-  --nx-color-border-default: var(--nx-color-stone-700);
+  --nx-color-border-default: var(--nx-color-white-a400);
   --nx-color-border-default-alpha: var(--nx-color-stone-a300);
   --nx-color-border-active: var(--nx-color-stone-400);
   --nx-color-border-disabled: var(--nx-color-stone-950);
