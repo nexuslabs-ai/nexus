@@ -283,19 +283,19 @@
   },
   "warning": {
     "background": {
-      "$value": "{yellow.600}",
+      "$value": "{yellow.400}",
       "$type": "color"
     },
     "foreground": {
-      "$value": "{white.base}",
+      "$value": "{yellow.950}",
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{yellow.700}",
+      "$value": "{yellow.500}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{yellow.800}",
+      "$value": "{yellow.600}",
       "$type": "color"
     },
     "disabled": {

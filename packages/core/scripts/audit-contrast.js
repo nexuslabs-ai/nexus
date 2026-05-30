@@ -194,9 +194,11 @@ function resolveToSrgbInts(value, primitiveMap) {
       throw new Error(`audit-contrast: unresolved reference "${value}"`);
     }
     const shade = primitive.path[primitive.path.length - 1];
+    const palette = primitive.path[primitive.path.length - 2];
     return hexToSrgbInts(
       primitive.value,
-      isPaletteShadeKey(shade) ? shade : undefined
+      isPaletteShadeKey(shade) ? shade : undefined,
+      isPaletteShadeKey(shade) ? palette : undefined
     );
   }
 

@@ -62,8 +62,11 @@ describe('utils', () => {
     });
 
     it('pins lightness for palette shade tokens', () => {
+      // blue is hue-curved: shade-500 pins to the hue's L peak (0.623), not the
+      // flat-grid 0.553, and takes chroma at the P3 cusp. The `group` case below
+      // covers the flat-grid fall-through for palettes with no hue curve.
       expect(formatTokenValue('#3b82f6', 'color', ['blue', '500'])).toBe(
-        'oklch(0.553 0.188 259.815)'
+        'oklch(0.623 0.2084 259.815)'
       );
     });
 
