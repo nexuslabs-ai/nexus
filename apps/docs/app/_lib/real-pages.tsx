@@ -11,3 +11,16 @@ import { ColorShowcase } from '../_pages/ColorShowcase';
 export const REAL_PAGES: Record<string, ComponentType> = {
   'foundations/color': ColorShowcase,
 };
+
+/**
+ * MDX content pages, keyed by `${section}/${sub}`. Lazy thunks so each page
+ * code-splits; the dynamic route awaits the import at build time (SSG). Add a
+ * page by dropping content/{section}/{sub}.mdx and an entry here.
+ */
+export const MDX_PAGES: Record<
+  string,
+  () => Promise<{ default: ComponentType }>
+> = {
+  'getting-started/install': () =>
+    import('../../content/getting-started/install.mdx'),
+};

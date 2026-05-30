@@ -6,3 +6,7 @@
 @import '@nexus/react/styles.css';
 /* Animations used by Dialog / Dropdown / Select / Tooltip */
 @import 'tw-animate-css';
+
+/* Scan the MDX content dir for nx: utilities (path relative to this file);
+   Tailwind 4 won't emit classes authored only in MDX otherwise. */
+@source '../content';
