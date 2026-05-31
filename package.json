@@ -36,7 +36,7 @@
     {
       "name": "@nexus/react (ESM)",
       "path": "packages/react/dist/index.mjs",
-      "limit": "62 kB"
+      "limit": "68 kB"
     },
     {
       "name": "@nexus/react (CSS)",

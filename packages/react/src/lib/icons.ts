@@ -27,6 +27,7 @@ export {
   IconCheck,
   IconCircleFilled,
   IconMinus,
+  IconPointFilled,
   IconX,
 } from '@tabler/icons-react';
 
