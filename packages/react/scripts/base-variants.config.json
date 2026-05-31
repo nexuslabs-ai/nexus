@@ -59,6 +59,14 @@
         "Disabled": ["WithDisabledTab", "DisabledTabInteraction"]
       }
     },
+    {
+      "name": "Textarea",
+      "showcase": "AllVariants",
+      "equivalents": {
+        "ClickInteraction": ["FocusBlurInteraction"],
+        "KeyboardInteraction": ["TypeInteraction"]
+      }
+    },
     { "name": "Tooltip", "showcase": "AllVariants" }
   ]
 }
