@@ -12,6 +12,15 @@
       "equivalents": { "ClickInteraction": ["ExpandInteraction"] }
     },
     { "name": "Alert", "showcase": "AllVariants" },
+    {
+      "name": "AlertDialog",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"],
+      "equivalents": {
+        "ClickInteraction": ["OpenConfirm"],
+        "KeyboardInteraction": ["EscapeCancels"]
+      }
+    },
     { "name": "Avatar", "showcase": "AllSizes" },
     { "name": "Badge", "showcase": "AllVariants" },
     { "name": "Button", "showcase": "AllVariants" },
