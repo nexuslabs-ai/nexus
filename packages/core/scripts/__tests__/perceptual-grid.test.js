@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -6,6 +9,7 @@ import {
   hexToSrgbInts,
   isPaletteShadeKey,
   PERCEPTUAL_L_GRID,
+  PERCEPTUAL_L_GRID_HUE,
 } from '../lib/perceptual-grid.js';
 
 const OKLCH_RE = /^oklch\(([-\d.]+) ([-\d.]+) ([-\d.]+)(?: \/ ([\d.]+))?\)$/;
@@ -97,6 +101,36 @@ describe('hexToOklchPinned', () => {
     expect(parsed.c).toBeGreaterThan(0.09);
     expect(parsed.c).toBeLessThan(0.11);
   });
+
+  // A re-pitched chromatic palette pins L to its own hue curve, not the flat
+  // grid (0.553 at shade 500). Before this, only blue.500 was asserted — a
+  // corrupted green/yellow/red band would have shipped silently. Hexes are the
+  // real shade-500 source values from color.json; L is name-driven so the flat
+  // assertion is what catches a regression to the un-tuned grid.
+  const HUE_CURVE_BANDS = [
+    { palette: 'green', hex: '#569947', curveL: 0.72 },
+    { palette: 'yellow', hex: '#facc15', curveL: 0.8 },
+    { palette: 'red', hex: '#d6455b', curveL: 0.637 },
+  ];
+  for (const { palette, hex, curveL } of HUE_CURVE_BANDS) {
+    it(`pins ${palette}.500 to its hue-curve L (${curveL}), not the flat grid`, () => {
+      const { l } = parseOklch(hexToOklchPinned(hex, '500', palette));
+      expect(l).toBeCloseTo(curveL, 3);
+      expect(l).not.toBeCloseTo(PERCEPTUAL_L_GRID['500'], 3);
+    });
+  }
+
+  it('selects the curve by palette NAME — same hex, listed vs unlisted palette', () => {
+    // Opt-in is by name: "blue" has a hue curve, the surface "slate" does not.
+    // Same hex + shade, only the name differs — the listed palette takes its
+    // curve (0.623), the unlisted one falls back to the flat grid (0.553).
+    expect(
+      parseOklch(hexToOklchPinned('#3b82f6', '500', 'blue')).l
+    ).toBeCloseTo(0.623, 3);
+    expect(
+      parseOklch(hexToOklchPinned('#3b82f6', '500', 'slate')).l
+    ).toBeCloseTo(PERCEPTUAL_L_GRID['500'], 3);
+  });
 });
 
 describe('hexToOklchMechanical', () => {
@@ -157,5 +191,42 @@ describe('P3 gamut clip warning', () => {
   it('does not warn on shades within P3 at their pinned L', () => {
     hexToOklchPinned('#3b82f6', '500');
     expect(warnSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('hue curve ↔ color.json coverage', () => {
+  it('every chromatic palette in color.json has a hue-curve entry', () => {
+    // The hue curve is opted into by palette NAME (PERCEPTUAL_L_GRID_HUE[name]),
+    // so a chromatic palette added to color.json but forgotten here silently
+    // falls back to the flat grid — re-muddying it (the bug #248 fixed). Guard
+    // it: anything with real chroma at shade 500 must have a curve. Measured
+    // split at shade 500 (via the pipeline's own mechanical conversion): the 5
+    // non-chromatic palettes top out at chroma 0.041 (slate); the 17 chromatics
+    // start at 0.123 (teal). 0.08 sits midway in that gap, margin on both sides.
+    const CHROMATIC_C_MIN = 0.08;
+    const OKLCH_C = /^oklch\([-\d.]+ ([-\d.]+)/;
+    const chromaOf = (hex) =>
+      Number(OKLCH_C.exec(hexToOklchMechanical(hex))[1]);
+
+    // color.json is keyed by palette name at the top level (no wrapper object):
+    // { green: { '500': { $value } }, … }. Iterate those entries directly.
+    const dir = path.dirname(fileURLToPath(import.meta.url));
+    const palettes = JSON.parse(
+      fs.readFileSync(
+        path.join(dir, '../../tokens/primitives/color.json'),
+        'utf8'
+      )
+    );
+
+    const untuned = [];
+    for (const [name, shades] of Object.entries(palettes)) {
+      const hex = shades?.['500']?.$value;
+      if (typeof hex !== 'string' || !hex.startsWith('#')) continue;
+      if (chromaOf(hex) > CHROMATIC_C_MIN && !(name in PERCEPTUAL_L_GRID_HUE)) {
+        untuned.push(name);
+      }
+    }
+
+    expect(untuned).toEqual([]);
   });
 });

@@ -1,6 +1,37 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatLine } from '../audit-contrast.js';
+import { blendAlphaOver, formatLine } from '../audit-contrast.js';
+
+// The over-operator behind alpha-foreground contrast scoring (#249): an
+// 8-digit hex is composited onto its resolved backdrop before APCA reads it.
+// The full audit exercises this only transitively, so these pin the math
+// directly — a swapped operand or a /256-vs-/255 slip would still "pass
+// 440/440" as long as every real pair stayed above threshold. Expected
+// triples are hand-computed: out = round(fg·a + bg·(1−a)) per channel,
+// with a = byte / 255.
+describe('blendAlphaOver', () => {
+  it('composites 50%-alpha black over white to mid grey (round(255·(1−128/255)) = 127)', () => {
+    expect(blendAlphaOver('#00000080', [255, 255, 255])).toEqual([
+      127, 127, 127,
+    ]);
+  });
+
+  it('composites 50%-alpha white over black to mid grey (round(255·128/255) = 128)', () => {
+    expect(blendAlphaOver('#ffffff80', [0, 0, 0])).toEqual([128, 128, 128]);
+  });
+
+  it('ignores the backdrop when the foreground is fully opaque (a = 1)', () => {
+    expect(blendAlphaOver('#000000ff', [255, 255, 255])).toEqual([0, 0, 0]);
+  });
+
+  it('returns the backdrop unchanged when the foreground is fully transparent (a = 0)', () => {
+    expect(blendAlphaOver('#ffffff00', [10, 20, 30])).toEqual([10, 20, 30]);
+  });
+
+  it('blends each channel independently (red over blue at 50%)', () => {
+    expect(blendAlphaOver('#ff000080', [0, 0, 255])).toEqual([128, 0, 127]);
+  });
+});
 
 // Pins the textual contract `contrast-auditor` agent's parser relies on:
 // 2-space prefix + mark + label padded to 48 + ` Lc ` + 6-char Lc + tail.
