@@ -90,7 +90,9 @@
       "eslint --fix --no-warn-ignored"
     ]
   },
+  "//resolutions": "zod is pinned to dedupe @hookform/resolvers' broad peer range (^3.25.0 || ^4.0.0) onto a single v4 copy, so zodResolver() typechecks in Form.stories.tsx. zod is a story-only devDependency and ships in no package bundle.",
   "resolutions": {
-    "minimatch": "^10.1.2"
+    "minimatch": "^10.1.2",
+    "zod": "^4.4.3"
   }
 }
