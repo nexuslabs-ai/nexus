@@ -40,6 +40,7 @@
         "KeyboardInteraction": ["TypeInteraction"]
       }
     },
+    { "name": "RadioGroup", "showcase": "AllVariants" },
     {
       "name": "Select",
       "showcase": "AllVariants",
