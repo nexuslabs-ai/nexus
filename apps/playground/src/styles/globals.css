@@ -32,13 +32,13 @@
 
   /* Semantic tokens */
   --color-background: var(--nx-color-white-base);
-  --color-foreground: var(--nx-color-slate-950);
+  --color-foreground: var(--nx-color-black-a900);
   --color-background-hover: var(--nx-color-slate-50);
   --color-background-hover-alpha: var(--nx-color-slate-a100);
   --color-background-active: var(--nx-color-slate-100);
   --color-muted: var(--nx-color-slate-50);
-  --color-muted-foreground: var(--nx-color-slate-500);
-  --color-muted-foreground-subtle: var(--nx-color-slate-400);
+  --color-muted-foreground: var(--nx-color-black-a600);
+  --color-muted-foreground-subtle: var(--nx-color-black-a500);
   --color-disabled: var(--nx-color-slate-50);
   --color-disabled-foreground: var(--nx-color-slate-400);
   --color-container: var(--nx-color-white-base);
@@ -58,7 +58,7 @@
   --color-nav-item-active: var(--nx-color-slate-300);
   --color-nav-border: var(--nx-color-slate-200);
   --color-overlay: var(--nx-color-slate-a700);
-  --color-border-default: var(--nx-color-slate-200);
+  --color-border-default: var(--nx-color-black-a300);
   --color-border-default-alpha: var(--nx-color-slate-a200);
   --color-border-active: var(--nx-color-slate-400);
   --color-border-disabled: var(--nx-color-slate-50);

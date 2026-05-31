@@ -179,34 +179,57 @@ function buildPrimitiveHexMap() {
   return map;
 }
 
-function resolveToSrgbInts(value, primitiveMap) {
+// Composite an 8-digit (alpha) hex over an opaque backdrop → opaque sRGB ints.
+function blendAlphaOver(hex8, bgInts) {
+  const h = hex8.slice(1);
+  const a = parseInt(h.slice(6, 8), 16) / 255;
+  const mix = (i) =>
+    Math.round(
+      parseInt(h.slice(i * 2, i * 2 + 2), 16) * a + bgInts[i] * (1 - a)
+    );
+  return [mix(0), mix(1), mix(2)];
+}
+
+function resolveToSrgbInts(value, primitiveMap, bgInts) {
   if (typeof value !== 'string') {
     throw new Error(
       `audit-contrast: expected string color value, got ${typeof value}`
     );
   }
 
+  let hex;
+  let shade;
+  let palette;
   const refMatch = value.match(REF_RE);
   if (refMatch) {
-    const refPath = refMatch[1];
-    const primitive = primitiveMap.get(refPath);
+    const primitive = primitiveMap.get(refMatch[1]);
     if (!primitive) {
       throw new Error(`audit-contrast: unresolved reference "${value}"`);
     }
-    const shade = primitive.path[primitive.path.length - 1];
-    const palette = primitive.path[primitive.path.length - 2];
-    return hexToSrgbInts(
-      primitive.value,
-      isPaletteShadeKey(shade) ? shade : undefined,
-      isPaletteShadeKey(shade) ? palette : undefined
-    );
+    hex = primitive.value;
+    shade = primitive.path[primitive.path.length - 1];
+    palette = primitive.path[primitive.path.length - 2];
+  } else if (value.startsWith('#')) {
+    hex = value;
+  } else {
+    throw new Error(`audit-contrast: unrecognized color value "${value}"`);
   }
 
-  if (value.startsWith('#')) {
-    return hexToSrgbInts(value);
+  // Alpha foreground (8-digit hex): composite over the backdrop before scoring.
+  if (/^#[0-9a-fA-F]{8}$/.test(hex)) {
+    if (!bgInts) {
+      throw new Error(
+        `audit-contrast: alpha colour "${hex}" needs a backdrop to composite against`
+      );
+    }
+    return blendAlphaOver(hex, bgInts);
   }
 
-  throw new Error(`audit-contrast: unrecognized color value "${value}"`);
+  return hexToSrgbInts(
+    hex,
+    isPaletteShadeKey(shade) ? shade : undefined,
+    isPaletteShadeKey(shade) ? palette : undefined
+  );
 }
 
 function findTokenValue(fileData, tokenPath) {
@@ -258,8 +281,9 @@ function auditPairs(fgData, bgData, fileName, pairs, primitiveMap) {
       );
     }
 
-    const fgInts = resolveToSrgbInts(fgValue, primitiveMap);
+    // Resolve the backdrop first so an alpha foreground can composite over it.
     const bgInts = resolveToSrgbInts(bgValue, primitiveMap);
+    const fgInts = resolveToSrgbInts(fgValue, primitiveMap, bgInts);
     const lc = computeLc(fgInts, bgInts);
     const passed = Math.abs(lc) >= minLc;
 
