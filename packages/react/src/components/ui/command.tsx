@@ -22,8 +22,9 @@ interface CommandProps extends React.ComponentProps<typeof CommandPrimitive> {}
  * Command
  *
  * Root component for a searchable command palette, built on cmdk. cmdk owns the
- * filtering and keyboard navigation; pass a `label` for the input's accessible
- * name.
+ * filtering and keyboard navigation. Pass a `label` (or `aria-label`) so the
+ * search input has an accessible name — a bare `<Command>` leaves the combobox
+ * unnamed.
  *
  * @example
  * ```tsx
@@ -145,7 +146,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
     <div
       data-slot="command-input-wrapper"
       // nexus-allow-numeric: command input bar px stays numeric
-      className="nx:flex nx:items-center nx:border-b nx:border-border-default nx:px-3"
+      className="nx:flex nx:items-center nx:border-b nx:border-border-default nx:px-3 nx:focus-within:border-border-active"
     >
       <IconSearch className="nx:mr-2 nx:size-4 nx:shrink-0 nx:opacity-50" />
       <CommandPrimitive.Input
