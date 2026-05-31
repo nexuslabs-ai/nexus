@@ -1,4 +1,12 @@
-/* Nexus Tailwind theme with nx: prefix */
-@import '@nexus/tailwind';
-/* Radix overlay enter/exit + accordion animations (Dialog, Dropdown, Select, Tooltip). */
+/* @nexus/react component styles.
+ *
+ * Ships UTILITIES ONLY — design tokens are NOT emitted here. We @reference the
+ * Nexus theme so Tailwind can generate utilities against it (and resolve the
+ * composite @utility / @custom-variant definitions) without outputting any
+ * `--color-*` / `--nx-color-*` variables. Consumers supply the tokens by
+ * importing `@nexus/tailwind`; that way importing this file can never re-define
+ * (and thus override / stale-out) a consumer's tokens.
+ */
+@import 'tailwindcss' prefix(nx);
+@reference '@nexus/tailwind';
 @import 'tw-animate-css';
