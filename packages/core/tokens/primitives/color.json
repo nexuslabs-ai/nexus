@@ -1005,91 +1005,91 @@
   },
   "stone": {
     "50": {
-      "$value": "#fdf9f7",
+      "$value": "#fbfaf8",
       "$type": "color"
     },
     "100": {
-      "$value": "#f1ece7",
+      "$value": "#eeedeb",
       "$type": "color"
     },
     "200": {
-      "$value": "#dad3cc",
+      "$value": "#d6d4d1",
       "$type": "color"
     },
     "300": {
-      "$value": "#bcb0a5",
+      "$value": "#b6b2ad",
       "$type": "color"
     },
     "400": {
-      "$value": "#9f8f80",
+      "$value": "#95928c",
       "$type": "color"
     },
     "500": {
-      "$value": "#816f5e",
+      "$value": "#75726d",
       "$type": "color"
     },
     "600": {
-      "$value": "#655546",
+      "$value": "#595854",
       "$type": "color"
     },
     "700": {
-      "$value": "#4f4134",
+      "$value": "#444441",
       "$type": "color"
     },
     "800": {
-      "$value": "#352b21",
+      "$value": "#2d2d2d",
       "$type": "color"
     },
     "900": {
-      "$value": "#1d160f",
+      "$value": "#181818",
       "$type": "color"
     },
     "950": {
-      "$value": "#080502",
+      "$value": "#050505",
       "$type": "color"
     },
     "a50": {
-      "$value": "#0f07030a",
+      "$value": "#0b09040a",
       "$type": "color"
     },
     "a100": {
-      "$value": "#0f070310",
+      "$value": "#0b090410",
       "$type": "color"
     },
     "a200": {
-      "$value": "#0f070318",
+      "$value": "#0b090418",
       "$type": "color"
     },
     "a300": {
-      "$value": "#0f070330",
+      "$value": "#0b090430",
       "$type": "color"
     },
     "a400": {
-      "$value": "#0f070350",
+      "$value": "#0b090450",
       "$type": "color"
     },
     "a500": {
-      "$value": "#0f070380",
+      "$value": "#0b090480",
       "$type": "color"
     },
     "a600": {
-      "$value": "#0f0703a0",
+      "$value": "#0b0904a0",
       "$type": "color"
     },
     "a700": {
-      "$value": "#0f0703c0",
+      "$value": "#0b0904c0",
       "$type": "color"
     },
     "a800": {
-      "$value": "#0f0703d8",
+      "$value": "#0b0904d8",
       "$type": "color"
     },
     "a900": {
-      "$value": "#0f0703e8",
+      "$value": "#0b0904e8",
       "$type": "color"
     },
     "a950": {
-      "$value": "#0f0703f4",
+      "$value": "#0b0904f4",
       "$type": "color"
     }
   },
