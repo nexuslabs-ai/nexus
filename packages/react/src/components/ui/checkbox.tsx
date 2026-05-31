@@ -54,6 +54,9 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
         'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:bg-primary-background nx:data-[state=checked]:text-primary-foreground',
         'nx:data-[state=indeterminate]:border-primary-background nx:data-[state=indeterminate]:bg-primary-background nx:data-[state=indeterminate]:text-primary-foreground',
+        // Invalid + checked/indeterminate: this two-condition selector outranks
+        // the data-state primary border above, so the error border still shows.
+        'nx:aria-invalid:data-[state=checked]:border-border-error nx:aria-invalid:data-[state=indeterminate]:border-border-error',
         className
       )}
       {...props}

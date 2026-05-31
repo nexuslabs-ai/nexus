@@ -29,12 +29,6 @@ export const Default: Story = {
   },
 };
 
-export const Unchecked: Story = {
-  args: {
-    'aria-label': 'Unchecked option',
-  },
-};
-
 export const Checked: Story = {
   args: {
     'aria-label': 'Checked option',
