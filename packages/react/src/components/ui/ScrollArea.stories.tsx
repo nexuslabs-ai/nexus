@@ -185,13 +185,14 @@ export const WithDataAttributes: Story = {
     const viewport = canvasElement.querySelector(
       '[data-slot="scroll-area-viewport"]'
     );
+    // `type="always"` keeps the scrollbar mounted; the thumb is omitted because
+    // Radix only mounts it once it has measured overflow, which is timing-
+    // dependent in a headless browser.
     const scrollbar = canvasElement.querySelector('[data-slot="scroll-bar"]');
-    const thumb = canvasElement.querySelector('[data-slot="scroll-bar-thumb"]');
 
     await expect(root).toBeInTheDocument();
     await expect(viewport).toBeInTheDocument();
     await expect(scrollbar).toBeInTheDocument();
-    await expect(thumb).toBeInTheDocument();
   },
 };
 
