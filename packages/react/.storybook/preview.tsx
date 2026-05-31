@@ -4,7 +4,11 @@ import type { Decorator, Preview } from '@storybook/react-vite';
 
 import { SPACING_MODES, type SpacingMode } from '../src/stories/spacing-modes';
 
-import '../src/index.css';
+// Storybook needs the full token set to render. The shipped component CSS
+// (src/index.css) is utilities-only by design — tokens come from the consumer's
+// @nexus/tailwind — so Storybook imports the tokens directly here.
+import '@nexus/tailwind';
+import 'tw-animate-css';
 
 const ThemeDecorator: Decorator = (Story, context) => {
   const theme = context.globals.theme;
