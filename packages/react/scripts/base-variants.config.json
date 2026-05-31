@@ -40,6 +40,12 @@
         "KeyboardInteraction": ["TypeInteraction"]
       }
     },
+    {
+      "name": "Popover",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction"],
+      "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
+    },
     { "name": "RadioGroup", "showcase": "AllVariants" },
     {
       "name": "Select",
