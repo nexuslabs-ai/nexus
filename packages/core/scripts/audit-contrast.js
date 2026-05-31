@@ -180,7 +180,7 @@ function buildPrimitiveHexMap() {
 }
 
 // Composite an 8-digit (alpha) hex over an opaque backdrop → opaque sRGB ints.
-function blendAlphaOver(hex8, bgInts) {
+export function blendAlphaOver(hex8, bgInts) {
   const h = hex8.slice(1);
   const a = parseInt(h.slice(6, 8), 16) / 255;
   const mix = (i) =>
