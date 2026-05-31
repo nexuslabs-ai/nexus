@@ -333,7 +333,7 @@ interface AlertDialogCancelProps
  */
 function AlertDialogCancel({
   className,
-  variant = 'outline',
+  variant,
   size,
   ...props
 }: AlertDialogCancelProps) {
@@ -342,7 +342,10 @@ function AlertDialogCancel({
       data-slot="alert-dialog-cancel"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size }), className)}
+      className={cn(
+        buttonVariants({ variant: variant ?? 'outline', size }),
+        className
+      )}
       {...props}
     />
   );
