@@ -40,7 +40,7 @@ const SHADE_ROLES: {
   {
     shade: 50,
     role: 'Near-white',
-    light: 'background-hover, muted, disabled, container/popover-hover',
+    light: 'muted, disabled, background/container/popover-hover',
     dark: 'nav-foreground',
   },
   {
@@ -52,56 +52,56 @@ const SHADE_ROLES: {
   {
     shade: 200,
     role: 'Light',
-    light: 'border.default, nav-item-hover, nav-border',
+    light: 'nav-item-hover, nav-border',
     dark: '—',
   },
   {
     shade: 300,
     role: 'Light-medium',
-    light: 'nav-item-active, primary.disabled',
-    dark: 'muted-foreground, disabled-foreground, nav-muted-foreground',
+    light: 'nav-item-active',
+    dark: 'disabled-foreground, nav-muted-foreground',
   },
   {
     shade: 400,
     role: 'Medium-light',
-    light: 'border.active, disabled-foreground, muted-foreground-subtle',
+    light: 'border.active, disabled-foreground',
     dark: 'border.active',
   },
   {
     shade: 500,
     role: 'Mid',
-    light: 'muted-foreground — the secondary-text anchor',
+    light: '— (perceptual anchor)',
     dark: '— (anchor)',
   },
   {
     shade: 600,
     role: 'Medium-dark',
     light: 'nav-muted-foreground, brand -background',
-    dark: 'popover-hover',
+    dark: '—',
   },
   {
     shade: 700,
     role: 'Dark',
     light: 'brand -background-hover',
-    dark: 'popover, container-hover, border.default',
+    dark: 'popover-hover',
   },
   {
     shade: 800,
     role: 'Very dark',
     light: 'brand -background-active',
-    dark: 'muted, container, background-hover, nav-item-active',
+    dark: 'popover, container-hover, nav-item-active, nav-border',
   },
   {
     shade: 900,
     role: 'Darker',
-    light: 'foreground, nav-foreground, container-foreground',
-    dark: 'background — the canvas',
+    light: 'container-foreground, popover-foreground, nav-foreground',
+    dark: 'container, muted, background-hover/active, nav-item-hover',
   },
   {
     shade: 950,
     role: 'Near-black',
-    light: 'foreground (some palettes)',
-    dark: 'nav-background, background-active, disabled, border.disabled',
+    light: '— (rarely surfaced)',
+    dark: 'background — the canvas, nav-background, disabled',
   },
 ];
 
@@ -158,9 +158,12 @@ export function ColorShowcase() {
       <h1 className="nx:typography-heading-large">Color</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         Engineered, not picked. Every color is stored as hex, converted to OKLCH
-        at build time, and has its lightness pinned to a shared perceptual grid
-        — so the same shade step is equally light in every palette. Contrast is
-        then gated by APCA before it can ship.
+        at build time, with its lightness pinned to a perceptual grid. The five
+        neutral bases share one grid — the same shade step is equally light in
+        every base — while each chromatic hue follows its own lightness curve,
+        centred where that hue is most vivid, and takes its chroma at the edge
+        of the Display-P3 gamut. Contrast is then gated by APCA before it can
+        ship.
       </p>
 
       {/* ── The palettes (+ shared CVD preview) ─────────────── */}
@@ -168,10 +171,12 @@ export function ColorShowcase() {
         <h2 className="nx:typography-heading-small nx:mb-1">The palettes</h2>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Start with the five neutral bases — eleven shades each. Read{' '}
-          <em>down</em> any column: every palette&rsquo;s <code>500</code> sits
-          at the same perceptual lightness, only hue and chroma differ. Below
-          are the chromatic hues brand and status are built from, and the full
-          reference. One color-vision filter applies to them all.
+          <em>down</em> any column: every base&rsquo;s <code>500</code> sits at
+          the same perceptual lightness, only hue and chroma differ. Below are
+          the chromatic hues brand and status are built from — these each follow
+          their own lightness curve, so a vivid yellow can stay light while red
+          runs deep — then the full reference. One color-vision filter applies
+          to them all.
         </p>
         <ColorScales />
       </section>
@@ -212,7 +217,11 @@ export function ColorShowcase() {
           The shade number is a luminance coordinate, and each step maps to
           specific semantic roles. The mapping is not a simple light/dark flip —
           a shade lands at a different step in dark mode to hold the same
-          perceptual tier.
+          perceptual tier. Text and hairline borders are the exception:{' '}
+          <code>foreground</code>, <code>muted-foreground</code> and{' '}
+          <code>border.default</code> are alpha tokens — transparent black in
+          light, white in dark — so they composite onto any surface instead of
+          binding to a neutral shade.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[720px] nx:border-collapse nx:text-sm">
@@ -317,7 +326,7 @@ export function ColorShowcase() {
             },
             {
               step: 'Pin the lightness',
-              body: 'Each shade key (50–950) has its L overwritten by a shared perceptual grid; hue and chroma come from the source hex (chroma clamped to Display P3).',
+              body: 'Each shade’s L is overwritten by a perceptual grid — the neutral bases share one ladder, while each chromatic hue follows its own curve (yellow peaks light, red deep). Neutrals keep their source chroma; the re-pitched hues take it at the Display-P3 cusp.',
             },
             {
               step: 'Gate with APCA',

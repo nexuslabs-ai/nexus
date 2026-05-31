@@ -97,9 +97,9 @@ export function ColorScales() {
       </h3>
       <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
         The chromatic scales the semantic tokens are built from — same OKLCH
-        pipeline, same perceptual grid. Switch to a color-vision filter and
-        watch the red/green pair (error/success) converge: that&rsquo;s why
-        status never relies on hue alone.
+        pipeline, each on its own hue-aware lightness curve. Switch to a
+        color-vision filter and watch the red/green pair (error/success)
+        converge: that&rsquo;s why status never relies on hue alone.
       </p>
       <SwatchGrid items={FUNCTIONAL} cvd={cvd} />
 
