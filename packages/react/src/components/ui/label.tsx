@@ -15,9 +15,9 @@ interface LabelProps extends React.ComponentProps<typeof LabelPrimitive.Root> {}
  * Label
  *
  * An accessible caption for a form control. Associate it with a control via
- * `htmlFor` (matching the control's `id`) so clicking the label focuses or
- * toggles that control. Dims automatically when a sibling `nx:peer` control is
- * disabled.
+ * `htmlFor` (matching the control's `id`) so clicking the label focuses (or
+ * toggles, for a checkbox/radio) that control. Dims automatically when a
+ * sibling `nx:peer` control is disabled.
  *
  * @example
  * ```tsx

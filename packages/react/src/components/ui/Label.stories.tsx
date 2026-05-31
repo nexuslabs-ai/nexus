@@ -35,20 +35,10 @@ export const WithInput: Story = {
 
 export const Disabled: Story = {
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4">
-      {/* peer-disabled: label follows a disabled sibling control */}
-      <div className="nx:flex nx:items-center nx:gap-2">
-        <input type="checkbox" id="terms" disabled className="nx:peer" />
-        <Label htmlFor="terms">Accept terms (peer-disabled)</Label>
-      </div>
-      {/* group-disabled: an ancestor field group carries data-disabled */}
-      <div
-        className="nx:group nx:flex nx:flex-col nx:gap-2"
-        data-disabled="true"
-      >
-        <Label htmlFor="full-name">Name (group-disabled)</Label>
-        <Input id="full-name" disabled placeholder="Disabled field" />
-      </div>
+    // The label dims when its `nx:peer` sibling control is disabled.
+    <div className="nx:flex nx:items-center nx:gap-2">
+      <input type="checkbox" id="terms" disabled className="nx:peer" />
+      <Label htmlFor="terms">Accept terms</Label>
     </div>
   ),
 };
@@ -110,10 +100,6 @@ export const AllVariants: Story = {
           aria-label="Unavailable option"
         />
         <Label>Peer-disabled</Label>
-      </span>
-
-      <span className="nx:group nx:flex" data-disabled="true">
-        <Label>Group-disabled</Label>
       </span>
     </div>
   ),
