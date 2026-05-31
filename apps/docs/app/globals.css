@@ -1,12 +1,15 @@
-/* Nexus tokens + Tailwind utilities (nx: prefix) */
+/* Nexus design tokens + Tailwind utilities (nx: prefix).
+   @nexus/tailwind is the SINGLE source of token definitions. */
 @import '@nexus/tailwind';
-/* Prebuilt utilities for shipped @nexus/react components.
-   Tailwind 4 doesn't scan node_modules, so utilities used inside the
-   compiled @nexus/react bundle would not be emitted otherwise. */
-@import '@nexus/react/styles.css';
 /* Animations used by Dialog / Dropdown / Select / Tooltip */
 @import 'tw-animate-css';
 
-/* Scan the MDX content dir for nx: utilities (path relative to this file);
-   Tailwind 4 won't emit classes authored only in MDX otherwise. */
+/* Generate the nx: utilities used in MDX content and in the shipped
+   @nexus/react components by scanning their source directly. We deliberately do
+   NOT import @nexus/react's prebuilt CSS: it bundles its own copy of every
+   design token and, imported after @nexus/tailwind, would override the live
+   tokens — and silently go stale whenever tokens change but the package isn't
+   rebuilt. Tailwind 4 skips node_modules, so the component source is pointed at
+   explicitly. Paths are relative to this file. */
 @source '../content';
+@source '../../../packages/react/src';
