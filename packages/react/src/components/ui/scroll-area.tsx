@@ -50,6 +50,10 @@ function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
+        // Keyboard access for the scroll region (WCAG / axe
+        // scrollable-region-focusable): an overflow container with no focusable
+        // children is unreachable by keyboard unless the viewport itself is.
+        tabIndex={0}
         className={cn(
           'nx:size-full nx:rounded-[inherit]',
           'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)'
