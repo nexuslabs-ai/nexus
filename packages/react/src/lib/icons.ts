@@ -30,6 +30,9 @@ export {
   IconX,
 } from '@tabler/icons-react';
 
+// Search / input
+export { IconSearch } from '@tabler/icons-react';
+
 // Alerts/Status
 export {
   IconAlertCircle,
