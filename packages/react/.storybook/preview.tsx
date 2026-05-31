@@ -6,9 +6,9 @@ import { SPACING_MODES, type SpacingMode } from '../src/stories/spacing-modes';
 
 // Storybook needs the full token set to render. The shipped component CSS
 // (src/index.css) is utilities-only by design — tokens come from the consumer's
-// @nexus/tailwind — so Storybook imports the tokens directly here.
-import '@nexus/tailwind';
-import 'tw-animate-css';
+// @nexus/tailwind — so Storybook loads them via preview.css (a CSS @import, so
+// the production build can resolve @nexus/tailwind's .css package entry).
+import './preview.css';
 
 const ThemeDecorator: Decorator = (Story, context) => {
   const theme = context.globals.theme;
