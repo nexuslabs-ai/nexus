@@ -65,6 +65,12 @@
         "Disabled": ["DisabledInteraction"]
       }
     },
+    {
+      "name": "Sheet",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"],
+      "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
+    },
     { "name": "Show", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Hide", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Switch", "showcase": "AllVariants" },
