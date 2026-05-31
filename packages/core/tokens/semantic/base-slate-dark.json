@@ -1,6 +1,6 @@
 {
   "background": {
-    "$value": "{slate.900}",
+    "$value": "{slate.950}",
     "$type": "color"
   },
   "foreground": {
@@ -8,7 +8,7 @@
     "$type": "color"
   },
   "background-hover": {
-    "$value": "{slate.800}",
+    "$value": "{slate.900}",
     "$type": "color"
   },
   "background-hover-alpha": {
@@ -16,11 +16,11 @@
     "$type": "color"
   },
   "background-active": {
-    "$value": "{slate.950}",
+    "$value": "{slate.900}",
     "$type": "color"
   },
   "muted": {
-    "$value": "{slate.800}",
+    "$value": "{slate.900}",
     "$type": "color"
   },
   "muted-foreground": {
@@ -42,7 +42,7 @@
     "$type": "color"
   },
   "container": {
-    "$value": "{slate.800}",
+    "$value": "{slate.900}",
     "$type": "color"
   },
   "container-foreground": {
@@ -50,15 +50,15 @@
     "$type": "color"
   },
   "container-hover": {
-    "$value": "{slate.700}",
-    "$type": "color"
-  },
-  "container-active": {
     "$value": "{slate.800}",
     "$type": "color"
   },
+  "container-active": {
+    "$value": "{slate.900}",
+    "$type": "color"
+  },
   "popover": {
-    "$value": "{slate.700}",
+    "$value": "{slate.800}",
     "$type": "color"
   },
   "popover-foreground": {
@@ -66,11 +66,11 @@
     "$type": "color"
   },
   "popover-hover": {
-    "$value": "{slate.600}",
+    "$value": "{slate.700}",
     "$type": "color"
   },
   "popover-active": {
-    "$value": "{slate.700}",
+    "$value": "{slate.800}",
     "$type": "color"
   },
   "popover-alpha": {
