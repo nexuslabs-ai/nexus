@@ -23,7 +23,12 @@ export {
 } from '@tabler/icons-react';
 
 // Actions
-export { IconCheck, IconCircleFilled, IconX } from '@tabler/icons-react';
+export {
+  IconCheck,
+  IconCircleFilled,
+  IconMinus,
+  IconX,
+} from '@tabler/icons-react';
 
 // Alerts/Status
 export {
