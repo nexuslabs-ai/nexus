@@ -1,29 +1,17 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  toast,
-  Toaster,
-} from '@nexus/react';
+import { useState } from 'react';
+
+import { Button, Toaster } from '@nexus/react';
 
 import { ComponentShowcase } from './components/ComponentShowcase';
+import { SettingsScene } from './components/settings/SettingsScene';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { useTheme } from './hooks/useTheme';
 
+type View = 'reference' | 'scenes';
+
 export default function App() {
   const { theme, setTheme } = useTheme();
+  const [view, setView] = useState<View>('reference');
 
   return (
     <div className="nx:bg-background nx:text-foreground nx:min-h-screen">
@@ -33,68 +21,50 @@ export default function App() {
           {/* Header */}
           <header className="nx:sticky nx:top-0 nx:z-10 nx:bg-background/95 nx:backdrop-blur nx:border-b nx:border-border-default">
             <div className="nx:px-6 nx:py-4">
-              <div className="nx:flex nx:items-center nx:gap-3">
-                <div className="nx:w-8 nx:h-8 nx:rounded-lg nx:bg-primary-background nx:flex nx:items-center nx:justify-center">
-                  <span className="nx:text-primary-foreground nx:font-bold nx:text-sm">
-                    N
-                  </span>
+              <div className="nx:flex nx:items-center nx:justify-between nx:gap-3">
+                <div className="nx:flex nx:items-center nx:gap-3">
+                  <div className="nx:w-8 nx:h-8 nx:rounded-lg nx:bg-primary-background nx:flex nx:items-center nx:justify-center">
+                    <span className="nx:text-primary-foreground nx:font-bold nx:text-sm">
+                      N
+                    </span>
+                  </div>
+                  <div>
+                    <h1 className="nx:text-lg nx:font-semibold nx:text-foreground">
+                      Nexus Theme Playground
+                    </h1>
+                    <p className="nx:text-xs nx:text-muted-foreground">
+                      Preview and customize your design system
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="nx:text-lg nx:font-semibold nx:text-foreground">
-                    Nexus Theme Playground
-                  </h1>
-                  <p className="nx:text-xs nx:text-muted-foreground">
-                    Preview and customize your design system
-                  </p>
+
+                {/* View switch — Reference (token showcase) ↔ Scenes (composed) */}
+                <div className="nx:inline-flex nx:gap-0.5 nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-0.5">
+                  <Button
+                    variant={view === 'reference' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setView('reference')}
+                  >
+                    Reference
+                  </Button>
+                  <Button
+                    variant={view === 'scenes' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setView('scenes')}
+                  >
+                    Scenes
+                  </Button>
                 </div>
               </div>
             </div>
           </header>
 
-          {/* Phase-1 pipeline probe — exercises popover/overlay/container/error
-              tokens via real @nexus/react components. Replaced by the Settings
-              scene in Phase 2. */}
-          <section className="nx:flex nx:flex-wrap nx:items-center nx:gap-4 nx:p-6">
-            <Select defaultValue="pro">
-              <SelectTrigger className="nx:w-48">
-                <SelectValue placeholder="Select a plan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="free">Free</SelectItem>
-                <SelectItem value="pro">Pro</SelectItem>
-                <SelectItem value="team">Team</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">Delete account</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This permanently deletes your account and all of its data.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>Delete</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            <Button
-              onClick={() =>
-                toast.success('Saved', { description: 'Pipeline works.' })
-              }
-            >
-              Show toast
-            </Button>
-          </section>
-
           {/* Content */}
-          <ComponentShowcase />
+          {view === 'reference' ? (
+            <ComponentShowcase />
+          ) : (
+            <SettingsScene theme={theme} setTheme={setTheme} />
+          )}
         </main>
 
         {/* Sidebar */}
