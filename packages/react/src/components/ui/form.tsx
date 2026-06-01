@@ -168,7 +168,10 @@ function FormLabel({ className, ...props }: FormLabelProps) {
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn('nx:data-[error=true]:text-error-foreground', className)}
+      className={cn(
+        'nx:data-[error=true]:text-error-subtle-foreground',
+        className
+      )}
       htmlFor={formItemId}
       {...props}
     />
@@ -256,7 +259,7 @@ function FormMessage({ className, children, ...props }: FormMessageProps) {
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={cn('nx:text-sm nx:text-error-foreground', className)}
+      className={cn('nx:text-sm nx:text-error-subtle-foreground', className)}
       {...props}
     >
       {body}
