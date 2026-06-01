@@ -50,7 +50,7 @@ const OPTIONS: Record<ModeKey, { value: string; label: string }[]> = {
     { value: 'vega', label: 'Vega' },
     { value: 'lyra', label: 'Lyra' },
     { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira' },
+    { value: 'mira', label: 'Mira (≈ Vega)' },
     { value: 'nova', label: 'Nova' },
     { value: 'luma', label: 'Luma' },
     { value: 'sera', label: 'Sera' },
@@ -76,9 +76,9 @@ const OPTIONS: Record<ModeKey, { value: string; label: string }[]> = {
   ],
   borderwidth: [
     { value: 'vega', label: 'Vega' },
-    { value: 'lyra', label: 'Lyra' },
+    { value: 'lyra', label: 'Lyra (≈ Vega)' },
     { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira' },
+    { value: 'mira', label: 'Mira (≈ Vega)' },
     { value: 'nova', label: 'Nova' },
   ],
 };
