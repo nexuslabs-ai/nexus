@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { toggleDarkMode, useDarkMode } from '../_hooks/use-dark-mode';
 
 import { Button } from './nexus';
+import { SearchPalette } from './SearchPalette';
 
 const SECTIONS = [
   { href: '/', label: 'Home', match: '/' },
@@ -58,9 +59,7 @@ export function TopNav() {
           );
         })}
       </nav>
-      <div className="nx:hidden nx:lg:flex nx:items-center nx:px-3 nx:py-1 nx:text-xs nx:text-nav-muted-foreground nx:border nx:border-dashed nx:border-nav-border nx:rounded-sm nx:font-mono">
-        [ Search · ⌘K ]
-      </div>
+      <SearchPalette />
       <Button
         variant="ghost"
         size="sm"
