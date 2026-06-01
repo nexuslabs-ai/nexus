@@ -22,7 +22,7 @@ interface IconState {
 /**
  * Icon Store
  *
- * Zustand store for managing icon library state in the playground.
+ * Zustand store for managing icon library state in the design-system module.
  * Uses selective subscriptions to prevent unnecessary re-renders.
  *
  * @example
