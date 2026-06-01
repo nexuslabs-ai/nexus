@@ -1,35 +1,16 @@
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@nexus/react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus/react';
 
 import type { ThemeConfig } from '../../hooks/useTheme';
 
+import { AccountTab } from './AccountTab';
 import { AppearanceSettings } from './AppearanceSettings';
+import { NotificationsTab } from './NotificationsTab';
 import { ProfileTab } from './ProfileTab';
 
 type SettingsSceneProps = {
   theme: ThemeConfig;
   setTheme: React.Dispatch<React.SetStateAction<ThemeConfig>>;
 };
-
-/** Placeholder for tabs whose content lands in a later phase of this PR. */
-function ComingUp({ title }: { title: string }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>This section is part of the scene.</CardDescription>
-      </CardHeader>
-    </Card>
-  );
-}
 
 /**
  * The composed Settings scene — a realistic product screen assembled entirely
@@ -61,10 +42,10 @@ export function SettingsScene({ theme, setTheme }: SettingsSceneProps) {
           <ProfileTab />
         </TabsContent>
         <TabsContent value="account">
-          <ComingUp title="Account" />
+          <AccountTab />
         </TabsContent>
         <TabsContent value="notifications">
-          <ComingUp title="Notifications" />
+          <NotificationsTab />
         </TabsContent>
         <TabsContent value="appearance">
           <AppearanceSettings theme={theme} setTheme={setTheme} />
