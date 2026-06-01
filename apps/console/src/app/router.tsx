@@ -99,8 +99,8 @@ const signupRoute = createRoute({
 
 // `email` is carried from the login/signup step. Validated loose (optional) so a
 // stray hit doesn't throw a search error — beforeLoad redirects to /login when
-// it's absent. `VerifyRoute` reads it back via `verifyRoute.useSearch()`.
-export const verifyRoute = createRoute({
+// it's absent. `VerifyRoute` reads it back via `getRouteApi('/auth/verify')`.
+const verifyRoute = createRoute({
   getParentRoute: () => authRoute,
   path: '/verify',
   validateSearch: z.object({ email: z.string().optional() }),

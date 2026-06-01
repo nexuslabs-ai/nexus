@@ -15,18 +15,20 @@ import {
   InputOTPSlot,
 } from '@nexus/react';
 import { useMutation } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
 
-// The route owns the `email` search schema; reading it through the route object
-// keeps the value typed. (The route's beforeLoad redirects when email is absent,
-// so the guard below is belt-and-braces.)
-import { verifyRoute } from '../../app/router';
 import { useSession } from '../../app/session';
 import { verifyOtp } from '../../lib/auth-api';
 
+// The route owns the `email` search schema; getRouteApi reads it back typed
+// without importing the route object (which would create a router ↔ screen
+// import cycle). The route's beforeLoad redirects when email is absent, so the
+// guard in the component body is belt-and-braces.
+const verifyApi = getRouteApi('/auth/verify');
+
 export function VerifyRoute() {
   const navigate = useNavigate();
-  const { email } = verifyRoute.useSearch();
+  const { email } = verifyApi.useSearch();
   const signIn = useSession((s) => s.signIn);
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
