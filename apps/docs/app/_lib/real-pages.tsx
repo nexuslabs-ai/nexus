@@ -1,6 +1,11 @@
 import type { ComponentType } from 'react';
 
 import { ColorShowcase } from '../_pages/ColorShowcase';
+import { Layering } from '../_pages/Layering';
+import { Radius } from '../_pages/Radius';
+import { Responsive } from '../_pages/Responsive';
+import { Spacing } from '../_pages/Spacing';
+import { Typography } from '../_pages/Typography';
 
 /**
  * Hand-built "real" pages, keyed by `${section}/${sub}`. The dynamic route
@@ -10,6 +15,11 @@ import { ColorShowcase } from '../_pages/ColorShowcase';
  */
 export const REAL_PAGES: Record<string, ComponentType> = {
   'foundations/color': ColorShowcase,
+  'foundations/typography': Typography,
+  'foundations/spacing': Spacing,
+  'foundations/radius': Radius,
+  'foundations/layering': Layering,
+  'foundations/responsive': Responsive,
 };
 
 /**
