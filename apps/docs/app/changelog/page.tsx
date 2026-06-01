@@ -1,39 +1,116 @@
 import { Breadcrumb } from '../_components/Breadcrumb';
-import { Placeholder } from '../_components/Placeholder';
-import { RightRail } from '../_components/RightRail';
+
+/**
+ * Changelog. Pre-1.0 — grouped by date, not semver, until the first tagged
+ * release. Entries are sourced from merged PRs; link out to GitHub.
+ */
+
+const REPO = 'https://github.com/nexuslabs-ai/nexus';
+
+type Change = {
+  type: 'Added' | 'Changed' | 'Fixed';
+  text: string;
+  pr?: number;
+};
+type Release = { date: string; changes: Change[] };
+
+const RELEASES: Release[] = [
+  {
+    date: '2026-06-01',
+    changes: [
+      { type: 'Added', text: 'Sonner — toast notifications', pr: 274 },
+      { type: 'Added', text: 'Sidebar — collapsible app navigation', pr: 273 },
+      {
+        type: 'Added',
+        text: 'Form — field, label, and validation primitives',
+        pr: 272,
+      },
+    ],
+  },
+  {
+    date: '2026-05-31',
+    changes: [
+      { type: 'Added', text: 'Command — the cmdk command palette', pr: 271 },
+      { type: 'Added', text: 'Input OTP — one-time-code input', pr: 270 },
+      { type: 'Added', text: 'Sheet — edge-anchored overlay panel', pr: 269 },
+      {
+        type: 'Added',
+        text: 'Alert Dialog — confirm / destructive prompts',
+        pr: 268,
+      },
+      {
+        type: 'Added',
+        text: 'Scroll Area — styled custom scrollbars',
+        pr: 267,
+      },
+      { type: 'Added', text: 'Popover — floating content layer', pr: 266 },
+      {
+        type: 'Added',
+        text: 'Progress, Table, Radio Group, Checkbox, Textarea, Skeleton',
+        pr: 260,
+      },
+    ],
+  },
+];
+
+const BADGE: Record<Change['type'], string> = {
+  Added: 'nx:bg-success-subtle nx:text-success-subtle-foreground',
+  Changed: 'nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+  Fixed: 'nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+};
 
 export default function Changelog() {
   return (
-    <div className="nx:grid nx:gap-8 nx:max-w-[1280px] nx:mx-auto nx:px-6 nx:py-8 nx:pb-16 nx:grid-cols-1 nx:lg:grid-cols-[220px_minmax(0,1fr)_200px]">
-      <aside className="nx:sticky nx:top-16 nx:self-start nx:hidden nx:lg:block">
-        <h3 className="nx:text-[11px] nx:font-semibold nx:uppercase nx:tracking-wider nx:text-muted-foreground nx:mb-2">
-          Changelog
-        </h3>
-        <ul className="nx:list-none nx:p-0 nx:m-0 nx:text-sm nx:text-muted-foreground">
-          <li className="nx:px-2 nx:py-1">[ Latest ]</li>
-          <li className="nx:px-2 nx:py-1">[ Previous release ]</li>
-          <li className="nx:px-2 nx:py-1">[ Migration notes ]</li>
-        </ul>
-      </aside>
-      <article className="nx:min-w-0">
-        <Breadcrumb
-          items={[{ label: 'Home', href: '/' }, { label: 'Changelog' }]}
-        />
-        <h1 className="nx:typography-heading-large">[ Changelog ]</h1>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-5">
-          [ Release notes · breaking changes · migration paths ]
-        </p>
-        <Placeholder variant="hero">[ Latest release callout ]</Placeholder>
-        <h2 className="nx:typography-heading-small nx:mt-8 nx:mb-3">
-          [ Version x.y.z ]
-        </h2>
-        <Placeholder>[ Release entry — date, summary, links ]</Placeholder>
-        <h2 className="nx:typography-heading-small nx:mt-8 nx:mb-3">
-          [ Version x.y.z ]
-        </h2>
-        <Placeholder>[ Release entry ]</Placeholder>
-      </article>
-      <RightRail anchors={2} />
+    <div className="nx:max-w-[768px] nx:mx-auto nx:px-6 nx:py-8 nx:pb-16">
+      <Breadcrumb
+        items={[{ label: 'Home', href: '/' }, { label: 'Changelog' }]}
+      />
+      <h1 className="nx:typography-heading-large">Changelog</h1>
+      <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-10 nx:max-w-[64ch]">
+        Notable changes to the Nexus design system. Pre-1.0, so entries are
+        grouped by date rather than semver — that starts at the first tagged
+        release.
+      </p>
+
+      <div className="nx:flex nx:flex-col nx:gap-10">
+        {RELEASES.map((release) => (
+          <section
+            key={release.date}
+            className="nx:grid nx:grid-cols-1 nx:sm:grid-cols-[120px_minmax(0,1fr)] nx:gap-x-8 nx:gap-y-3"
+          >
+            <h2 className="nx:font-mono nx:text-sm nx:text-muted-foreground-subtle nx:sm:pt-1">
+              {release.date}
+            </h2>
+            <ul className="nx:list-none nx:p-0 nx:m-0 nx:flex nx:flex-col nx:gap-3">
+              {release.changes.map((change, i) => (
+                <li key={i} className="nx:flex nx:items-start nx:gap-3">
+                  <span
+                    className={`nx:shrink-0 nx:rounded-full nx:px-2 nx:py-0.5 nx:text-[10px] nx:font-mono nx:uppercase nx:tracking-wider ${BADGE[change.type]}`}
+                  >
+                    {change.type}
+                  </span>
+                  <span className="nx:typography-body-default">
+                    {change.text}
+                    {change.pr && (
+                      <>
+                        {' '}
+                        <a
+                          href={`${REPO}/pull/${change.pr}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="nx:font-mono nx:text-xs nx:text-primary-subtle-foreground nx:hover:underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:rounded-sm"
+                        >
+                          #{change.pr}
+                        </a>
+                      </>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
