@@ -77,20 +77,45 @@ function loadCSS(href: string, id: string): void {
   document.head.appendChild(link);
 }
 
+const STORAGE_KEY = 'nexus-console-theme';
+
+const DEFAULT_THEME: ThemeConfig = {
+  base: 'slate',
+  brand: 'blue',
+  dark: false,
+  spacing: 'vega',
+  typography: 'vega',
+  shadow: 'vega',
+  radius: 'subtle',
+  borderWidth: 'vega',
+};
+
 /**
- * Hook to manage theme state and CSS loading
+ * Read the persisted theme, merging over defaults so a partial or older payload
+ * still yields every axis. Used as a lazy useState initializer, so the first
+ * paint already carries the saved theme (no flash, no localStorage→state effect).
+ */
+function loadInitialTheme(): ThemeConfig {
+  if (typeof window === 'undefined') return DEFAULT_THEME;
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) return { ...DEFAULT_THEME, ...JSON.parse(stored) };
+  } catch {
+    // Ignore malformed storage — fall back to defaults.
+  }
+  return DEFAULT_THEME;
+}
+
+/**
+ * Hook to manage theme state and CSS loading. Mounted once via ThemeProvider.
  */
 export function useTheme() {
-  const [theme, setTheme] = useState<ThemeConfig>({
-    base: 'slate',
-    brand: 'blue',
-    dark: false,
-    spacing: 'vega',
-    typography: 'vega',
-    shadow: 'vega',
-    radius: 'subtle',
-    borderWidth: 'vega',
-  });
+  const [theme, setTheme] = useState<ThemeConfig>(loadInitialTheme);
+
+  // Persist on change — writing to localStorage is an external-system sync.
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+  }, [theme]);
 
   useEffect(() => {
     loadCSS(`/themes/base-${theme.base}.css`, 'base');
