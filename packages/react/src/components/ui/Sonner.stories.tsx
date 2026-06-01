@@ -96,10 +96,11 @@ export const WithAction: Story = {
   },
 };
 
-export const Promise: Story = {
+export const PromiseStory: Story = {
+  name: 'Promise',
   render: () => {
     const save = () =>
-      new globalThis.Promise<void>((resolve) => {
+      new Promise<void>((resolve) => {
         setTimeout(resolve, 1500);
       });
     const showToast = () =>

@@ -12,11 +12,9 @@ import {
 import { cn } from '@/lib/utils';
 
 /**
- * Track the active theme by observing the `.dark` class on the document root —
- * Nexus toggles dark mode there, so this keeps sonner's own `theme` (and the
- * shadows / gray scales it doesn't expose as tokens) aligned with the design
- * system. `useSyncExternalStore` subscribes to the class via MutationObserver
- * without syncing React state through an effect.
+ * Track the active theme by observing the `.dark` class on the document root
+ * (where Nexus toggles dark mode) via MutationObserver, keeping sonner's own
+ * `theme` in sync with the design system.
  */
 function subscribeToTheme(notify: () => void) {
   const observer = new MutationObserver(notify);
@@ -50,11 +48,8 @@ const toasterIcons = {
 
 /**
  * Sonner reads these custom properties off the toaster container to colour each
- * toast; map every one to its Nexus semantic token. Set inline on the container
- * so they beat sonner's own lower-specificity `[data-sonner-toaster]` defaults
- * and inherit down to the toasts — and so they re-resolve under `.dark`
- * automatically. The `-bg`/`-text`/`-border` triples for success/error/warning/
- * info apply when `richColors` is enabled.
+ * toast; map every one to its Nexus semantic token. The `-bg`/`-text`/`-border`
+ * triples for success/error/warning/info apply when `richColors` is enabled.
  */
 const toasterThemeVars = {
   '--normal-bg': 'var(--nx-color-container)',
