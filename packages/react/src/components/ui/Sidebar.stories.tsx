@@ -272,7 +272,11 @@ export const WithDataAttributes: Story = {
     </SidebarProvider>
   ),
   play: async ({ canvasElement }) => {
-    const sidebar = canvasElement.querySelector('[data-slot="sidebar"]');
+    // data-state / data-variant / data-side live on the desktop docked panel,
+    // which renders because the test viewport is above the `lg` floor.
+    const sidebar = canvasElement.querySelector(
+      '[data-slot="sidebar"][data-state]'
+    );
     await expect(sidebar).toBeInTheDocument();
     await expect(sidebar).toHaveAttribute('data-variant', 'floating');
     await expect(sidebar).toHaveAttribute('data-side', 'right');
@@ -298,7 +302,10 @@ export const ClickInteraction: Story = {
     </SidebarProvider>
   ),
   play: async ({ canvasElement }) => {
-    const sidebar = canvasElement.querySelector('[data-slot="sidebar"]');
+    // data-state lives on the desktop docked panel (test viewport ≥ `lg`).
+    const sidebar = canvasElement.querySelector(
+      '[data-slot="sidebar"][data-state]'
+    );
     const trigger = canvasElement.querySelector<HTMLButtonElement>(
       '[data-slot="sidebar-trigger"]'
     );
@@ -320,7 +327,10 @@ export const KeyboardInteraction: Story = {
     </SidebarProvider>
   ),
   play: async ({ canvasElement }) => {
-    const sidebar = canvasElement.querySelector('[data-slot="sidebar"]');
+    // data-state lives on the desktop docked panel (test viewport ≥ `lg`).
+    const sidebar = canvasElement.querySelector(
+      '[data-slot="sidebar"][data-state]'
+    );
     await expect(sidebar).toHaveAttribute('data-state', 'expanded');
 
     // Ctrl/Cmd+B toggles the sidebar from anywhere in the document.

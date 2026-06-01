@@ -31,6 +31,16 @@ const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
+/** Whether the event target is a text-entry element (input, textarea, or contenteditable). */
+function isEditableTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.isContentEditable ||
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA'
+  );
+}
+
 /**
  * SidebarContextProps
  *
@@ -39,7 +49,7 @@ const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 interface SidebarContextProps {
   state: 'expanded' | 'collapsed';
   open: boolean;
-  setOpen: (open: boolean) => void;
+  setOpen: (value: boolean | ((value: boolean) => boolean)) => void;
   openMobile: boolean;
   setOpenMobile: (open: boolean) => void;
   isMobile: boolean;
@@ -76,7 +86,18 @@ function useSidebar() {
 interface SidebarProviderProps extends React.ComponentProps<'div'> {
   /**
    * Whether the sidebar starts open when uncontrolled.
+   *
+   * When uncontrolled, the provider persists the open state to a `sidebar_state`
+   * cookie. It does not read the cookie back — restore across reloads by reading
+   * it server-side and passing the result here.
    * @default true
+   * @example
+   * ```tsx
+   * // Server Component (e.g. Next.js app/layout.tsx)
+   * const store = await cookies();
+   * const defaultOpen = store.get('sidebar_state')?.value !== 'false';
+   * return <SidebarProvider defaultOpen={defaultOpen}>{children}</SidebarProvider>;
+   * ```
    */
   defaultOpen?: boolean;
   /**
@@ -124,11 +145,11 @@ function SidebarProvider({
       const openState = typeof value === 'function' ? value(open) : value;
       if (setOpenProp) {
         setOpenProp(openState);
-      } else {
-        _setOpen(openState);
+        return;
       }
 
-      // Persist the open state across reloads.
+      _setOpen(openState);
+      // Persist uncontrolled open state to a cookie for server-side restore.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
     [setOpenProp, open]
@@ -142,13 +163,13 @@ function SidebarProvider({
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-        (event.metaKey || event.ctrlKey)
-      ) {
-        event.preventDefault();
-        toggleSidebar();
-      }
+      if (event.key !== SIDEBAR_KEYBOARD_SHORTCUT) return;
+      if (!event.metaKey && !event.ctrlKey) return;
+      // Don't hijack Cmd/Ctrl+B (native bold) while typing in an editor.
+      if (isEditableTarget(event.target)) return;
+
+      event.preventDefault();
+      toggleSidebar();
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -239,6 +260,7 @@ function Sidebar({
   variant = 'sidebar',
   collapsible = 'offcanvas',
   className,
+  style,
   children,
   ...props
 }: SidebarProps) {
@@ -252,6 +274,7 @@ function Sidebar({
           'nx:flex nx:h-full nx:w-(--sidebar-width) nx:flex-col nx:bg-nav-background nx:text-nav-foreground',
           className
         )}
+        style={style}
         {...props}
       >
         {children}
@@ -261,17 +284,22 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent
           data-slot="sidebar"
           data-mobile="true"
-          className="nx:w-(--sidebar-width) nx:bg-nav-background nx:p-0 nx:text-nav-foreground nx:[&>button]:hidden"
+          side={side}
+          className={cn(
+            'nx:w-(--sidebar-width) nx:bg-nav-background nx:p-0 nx:text-nav-foreground nx:[&>button]:hidden',
+            className
+          )}
           style={
             {
               '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
+              ...style,
             } as React.CSSProperties
           }
-          side={side}
+          {...props}
         >
           <SheetHeader className="nx:sr-only">
             <SheetTitle>Sidebar</SheetTitle>
@@ -322,6 +350,7 @@ function Sidebar({
             : 'nx:group-data-[collapsible=icon]:w-(--sidebar-width-icon) nx:group-data-[side=left]:border-r nx:group-data-[side=right]:border-l nx:border-nav-border',
           className
         )}
+        style={style}
         {...props}
       >
         <div
@@ -953,9 +982,11 @@ function SidebarMenuSkeleton({
   ...props
 }: SidebarMenuSkeletonProps) {
   // Vary the text-bar width (50–90%) so a stack of skeletons looks organic.
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`;
-  }, []);
+  // Seed from the SSR-stable useId() — Math.random() here would differ between
+  // server and client and trip a hydration mismatch.
+  const id = React.useId();
+  const seed = [...id].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const width = `${50 + (seed % 41)}%`;
 
   return (
     <div

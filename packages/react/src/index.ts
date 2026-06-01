@@ -41,6 +41,3 @@ export * from '@/components/ui/tooltip';
 // Primitives
 export * from '@/components/primitives/hide';
 export * from '@/components/primitives/show';
-
-// Hooks
-export * from '@/hooks/use-mobile';
