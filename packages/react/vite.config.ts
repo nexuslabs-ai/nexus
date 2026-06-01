@@ -28,13 +28,20 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'react-hook-form'],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react-hook-form',
+        'sonner',
+      ],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'jsxRuntime',
           'react-hook-form': 'ReactHookForm',
+          sonner: 'Sonner',
         },
       },
     },

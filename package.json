@@ -36,6 +36,10 @@
     {
       "name": "@nexus/react (ESM)",
       "path": "packages/react/dist/index.mjs",
+      "ignore": [
+        "react-hook-form",
+        "sonner"
+      ],
       "limit": "70 kB"
     },
     {
