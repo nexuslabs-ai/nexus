@@ -12,36 +12,19 @@ import {
   SidebarRail,
 } from '@nexus/react';
 import {
-  IconAddressBook,
-  IconBriefcase,
-  IconChartBar,
   IconComponents,
-  IconCreditCard,
-  IconInbox,
-  IconLayoutDashboard,
   IconLayoutGrid,
   IconPalette,
-  IconSettings,
   IconUserCircle,
-  IconUsers,
 } from '@tabler/icons-react';
 import { Link, useMatchRoute } from '@tanstack/react-router';
+
+import { MODULE_ITEMS } from './modules';
 
 const DESIGN_ITEMS = [
   { label: 'Reference', to: '/design/reference', icon: IconComponents },
   { label: 'Scenes', to: '/design/scenes', icon: IconLayoutGrid },
   { label: 'Appearance', to: '/design/appearance', icon: IconPalette },
-] as const;
-
-const MODULE_ITEMS = [
-  { label: 'Dashboard', module: 'dashboard', icon: IconLayoutDashboard },
-  { label: 'CRM', module: 'crm', icon: IconUsers },
-  { label: 'Projects', module: 'projects', icon: IconBriefcase },
-  { label: 'Inbox', module: 'inbox', icon: IconInbox },
-  { label: 'Billing', module: 'billing', icon: IconCreditCard },
-  { label: 'Analytics', module: 'analytics', icon: IconChartBar },
-  { label: 'People', module: 'people', icon: IconAddressBook },
-  { label: 'Settings', module: 'settings', icon: IconSettings },
 ] as const;
 
 /**

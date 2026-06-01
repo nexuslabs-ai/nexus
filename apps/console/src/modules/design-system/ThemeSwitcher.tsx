@@ -1,32 +1,18 @@
 import {
   BASES,
   BRANDS,
+  DEFAULT_THEME,
   RADIUS_MODES,
   SPACING_MODES,
   type ThemeConfig,
   TOKEN_MODES,
   TYPOGRAPHY_MODES,
-} from '../hooks/useTheme';
-import {
-  type IconLibrary,
-  iconLibraryMeta,
-  useIconStore,
-} from '../store/iconStore';
+} from '../../hooks/useTheme';
 
+import { type IconLibrary, iconLibraryMeta, useIconStore } from './iconStore';
 import { PlaygroundIcon } from './PlaygroundIcon';
 
 const ICON_LIBRARIES = ['tabler', 'lucide', 'phosphor'] as const;
-
-const DEFAULT_THEME: ThemeConfig = {
-  base: 'slate',
-  brand: 'blue',
-  dark: false,
-  spacing: 'vega',
-  typography: 'vega',
-  shadow: 'vega',
-  radius: 'subtle',
-  borderWidth: 'vega',
-};
 
 type ThemeSwitcherProps = {
   theme: ThemeConfig;

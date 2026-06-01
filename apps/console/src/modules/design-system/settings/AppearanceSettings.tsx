@@ -24,7 +24,7 @@ import {
   type ThemeConfig,
   TOKEN_MODES,
   TYPOGRAPHY_MODES,
-} from '../../hooks/useTheme';
+} from '../../../hooks/useTheme';
 
 type AppearanceSettingsProps = {
   theme: ThemeConfig;

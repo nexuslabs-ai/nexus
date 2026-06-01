@@ -1,15 +1,6 @@
 import { useParams } from '@tanstack/react-router';
 
-const MODULE_LABELS: Record<string, string> = {
-  dashboard: 'Dashboard',
-  crm: 'CRM',
-  projects: 'Projects',
-  inbox: 'Inbox',
-  billing: 'Billing',
-  analytics: 'Analytics',
-  people: 'People',
-  settings: 'Settings',
-};
+import { MODULE_ITEMS } from '../shell/modules';
 
 /**
  * Shared placeholder for modules not yet built. One route (`/m/$module`) backs
@@ -18,7 +9,7 @@ const MODULE_LABELS: Record<string, string> = {
  */
 export function ComingSoon() {
   const { module } = useParams({ from: '/m/$module' });
-  const label = MODULE_LABELS[module] ?? module;
+  const label = MODULE_ITEMS.find((m) => m.module === module)?.label ?? module;
   return (
     <div className="nx:flex nx:min-h-[60vh] nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:p-6 nx:text-center">
       <span className="nx:typography-label-small nx:text-muted-foreground-subtle nx:uppercase nx:tracking-wide">

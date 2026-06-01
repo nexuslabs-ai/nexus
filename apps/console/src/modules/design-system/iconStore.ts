@@ -7,7 +7,7 @@ import {
   type IconLibrary,
   iconLibraryMeta,
   type IconName,
-} from '../lib/icon-registry';
+} from './icon-registry';
 
 /**
  * Icon store state

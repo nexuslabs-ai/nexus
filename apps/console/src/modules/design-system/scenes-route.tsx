@@ -1,5 +1,6 @@
 import { useThemeContext } from '../../app/theme-provider';
-import { SettingsScene } from '../../components/settings/SettingsScene';
+
+import { SettingsScene } from './settings/SettingsScene';
 
 /**
  * Design System → Scenes: the composed Settings screen (the Phase 1 capstone),

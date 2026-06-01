@@ -1,4 +1,4 @@
-import { ComponentShowcase } from '../../components/ComponentShowcase';
+import { ComponentShowcase } from './ComponentShowcase';
 
 /**
  * Design System → Reference: the token/component showcase that proves the

@@ -1,5 +1,6 @@
 import { useThemeContext } from '../../app/theme-provider';
-import { ThemeSwitcher } from '../../components/ThemeSwitcher';
+
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 /**
  * Design System → Appearance: the full 8-axis theme control, wired to the root
