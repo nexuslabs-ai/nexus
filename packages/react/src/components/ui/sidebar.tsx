@@ -289,8 +289,9 @@ function Sidebar({
           data-slot="sidebar"
           data-mobile="true"
           side={side}
+          showCloseButton={false}
           className={cn(
-            'nx:w-(--sidebar-width) nx:bg-nav-background nx:p-0 nx:text-nav-foreground nx:[&>button]:hidden',
+            'nx:w-(--sidebar-width) nx:bg-nav-background nx:p-0 nx:text-nav-foreground',
             className
           )}
           style={
@@ -850,6 +851,7 @@ function SidebarMenuButton({
   const button = (
     <Comp
       data-slot="sidebar-menu-button"
+      data-variant={variant}
       data-size={size}
       data-active={isActive}
       className={cn(sidebarMenuButtonVariants({ variant, size }), className)}

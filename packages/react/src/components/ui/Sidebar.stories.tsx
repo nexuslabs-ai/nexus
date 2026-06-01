@@ -123,11 +123,11 @@ function DemoSidebar(props: React.ComponentProps<typeof Sidebar>) {
 function DemoInset({ children }: { children?: React.ReactNode }) {
   return (
     <SidebarInset>
-      <header className="flex h-16 items-center gap-2 border-b border-[var(--nx-color-border-default)] px-4">
+      <header className="nx:flex nx:h-16 nx:items-center nx:gap-2 nx:border-b nx:border-border-default nx:px-4">
         <SidebarTrigger />
-        <span className="text-sm font-medium">Dashboard</span>
+        <span className="nx:text-sm nx:font-medium">Dashboard</span>
       </header>
-      <div className="min-h-[20rem] p-4 text-sm text-[var(--nx-color-muted-foreground)]">
+      <div className="nx:min-h-[20rem] nx:p-4 nx:text-sm nx:text-muted-foreground">
         {children ?? 'Main content area.'}
       </div>
     </SidebarInset>
@@ -350,7 +350,7 @@ export const KeyboardInteraction: Story = {
  */
 export const AllVariants: Story = {
   render: () => (
-    <div className="h-96 w-full overflow-hidden rounded-lg border border-[var(--nx-color-border-default)]">
+    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border nx:border-border-default">
       <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
         <Sidebar collapsible="none">
           <SidebarHeader>
