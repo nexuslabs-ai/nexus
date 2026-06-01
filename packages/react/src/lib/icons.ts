@@ -20,6 +20,7 @@ export {
   IconChevronDown,
   IconChevronRight,
   IconChevronUp,
+  IconLayoutSidebar,
 } from '@tabler/icons-react';
 
 // Actions
