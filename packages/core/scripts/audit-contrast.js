@@ -41,6 +41,21 @@ const BASE_PAIRS = [
     minLc: 60,
     tier: 'ui',
   },
+  // Form error label + message render error-coloured text on the neutral form
+  // surface (page background or a Card container), not on error.subtle — guard
+  // both so the error-text token stays legible there in every base + theme.
+  {
+    fg: 'error.subtle-foreground',
+    bg: 'background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    fg: 'error.subtle-foreground',
+    bg: 'container',
+    minLc: 60,
+    tier: 'ui',
+  },
   {
     fg: 'success.foreground',
     bg: 'success.background',
