@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react';
 
-import { type IconName, useIcon } from '../store/iconStore';
+import { type IconName, useIcon } from './iconStore';
 
 /**
  * PlaygroundIcon props

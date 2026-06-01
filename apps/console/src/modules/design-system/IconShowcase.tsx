@@ -1,5 +1,4 @@
-import { iconLibraryMeta, iconNames, useIconStore } from '../store/iconStore';
-
+import { iconLibraryMeta, iconNames, useIconStore } from './iconStore';
 import { PlaygroundIcon } from './PlaygroundIcon';
 
 /**

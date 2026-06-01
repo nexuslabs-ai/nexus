@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus/react';
 
-import type { ThemeConfig } from '../../hooks/useTheme';
+import type { ThemeConfig } from '../../../hooks/useTheme';
 
 import { AccountTab } from './AccountTab';
 import { AppearanceSettings } from './AppearanceSettings';

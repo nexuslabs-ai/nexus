@@ -77,20 +77,76 @@ function loadCSS(href: string, id: string): void {
   document.head.appendChild(link);
 }
 
+const STORAGE_KEY = 'nexus-console-theme';
+
+export const DEFAULT_THEME: ThemeConfig = {
+  base: 'slate',
+  brand: 'blue',
+  dark: false,
+  spacing: 'vega',
+  typography: 'vega',
+  shadow: 'vega',
+  radius: 'subtle',
+  borderWidth: 'vega',
+};
+
+const BASE_VALUES = BASES.map((b) => b.value);
+const BRAND_VALUES = BRANDS.map((b) => b.value);
+
+/** Keep `value` only if it's a member of `allowed`; otherwise fall back. */
+function pick<T extends string>(
+  value: unknown,
+  allowed: readonly T[],
+  fallback: T
+): T {
+  return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
 /**
- * Hook to manage theme state and CSS loading
+ * Coerce an unknown persisted payload into a valid ThemeConfig: each axis is
+ * narrowed against its known set, so a stale value from a removed mode (e.g. an
+ * old `typography: 'lyra'`) is dropped to its default instead of being handed to
+ * `loadCSS`, which would 404 on the missing theme file.
+ */
+function sanitizeTheme(raw: unknown): ThemeConfig {
+  const p = (raw ?? {}) as Partial<Record<keyof ThemeConfig, unknown>>;
+  return {
+    base: pick(p.base, BASE_VALUES, DEFAULT_THEME.base),
+    brand: pick(p.brand, BRAND_VALUES, DEFAULT_THEME.brand),
+    dark: typeof p.dark === 'boolean' ? p.dark : DEFAULT_THEME.dark,
+    spacing: pick(p.spacing, SPACING_MODES, DEFAULT_THEME.spacing),
+    typography: pick(p.typography, TYPOGRAPHY_MODES, DEFAULT_THEME.typography),
+    shadow: pick(p.shadow, TOKEN_MODES, DEFAULT_THEME.shadow),
+    radius: pick(p.radius, RADIUS_MODES, DEFAULT_THEME.radius),
+    borderWidth: pick(p.borderWidth, TOKEN_MODES, DEFAULT_THEME.borderWidth),
+  };
+}
+
+/**
+ * Read the persisted theme for the lazy useState initializer, so the first paint
+ * already carries the saved theme (no flash, no localStorage→state effect).
+ * Unknown or invalid axes fall back to their default via {@link sanitizeTheme}.
+ */
+function loadInitialTheme(): ThemeConfig {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) return sanitizeTheme(JSON.parse(stored));
+  } catch {
+    // Ignore malformed storage — fall back to defaults.
+  }
+  return DEFAULT_THEME;
+}
+
+/**
+ * Hook to manage theme state and CSS loading. Mounted once via ThemeProvider.
  */
 export function useTheme() {
-  const [theme, setTheme] = useState<ThemeConfig>({
-    base: 'slate',
-    brand: 'blue',
-    dark: false,
-    spacing: 'vega',
-    typography: 'vega',
-    shadow: 'vega',
-    radius: 'subtle',
-    borderWidth: 'vega',
-  });
+  const [theme, setTheme] = useState<ThemeConfig>(loadInitialTheme);
+
+  // Persist on change — writing to localStorage is an external-system sync.
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+  }, [theme]);
 
   useEffect(() => {
     loadCSS(`/themes/base-${theme.base}.css`, 'base');

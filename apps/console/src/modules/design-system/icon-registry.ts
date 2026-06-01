@@ -2,7 +2,7 @@
  * Icon Registry
  *
  * Maps internal DS icon names to their equivalents in each supported library.
- * This enables the playground to preview components with different icon libraries.
+ * This enables the design-system module to preview components with different icon libraries.
  *
  * Supported libraries:
  * - Tabler (DS default): https://tabler.io/icons
