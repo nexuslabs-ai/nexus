@@ -61,13 +61,13 @@ describe('generateModular', () => {
     }
   });
 
-  it('emits z-index tokens in playground globals.css', () => {
+  it('emits z-index tokens in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     expect(globals).toMatch(/--z-index-popover: 70;/);
     expect(globals).toMatch(/--z-index-modal: 50;/);
   });
 
-  it('emits breakpoint tokens in playground globals.css', () => {
+  it('emits breakpoint tokens in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     expect(globals).toMatch(/--breakpoint-sm: 40rem;/);
     expect(globals).toMatch(/--breakpoint-2xl: 96rem;/);
@@ -77,7 +77,7 @@ describe('generateModular', () => {
   // Spacing migration (#119) — per-mode blocks + sibling spacing-utilities.css
   // -----------------------------------------------------------------------
 
-  it('emits all 7 per-mode [data-style="X"] blocks in playground globals.css', () => {
+  it('emits all 7 per-mode [data-style="X"] blocks in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(7);
@@ -97,8 +97,8 @@ describe('generateModular', () => {
 
   it('emits role @utility declarations into a sibling spacing-utilities.css (not inlined)', () => {
     // Symmetric with the bundled-tailwind build: globals.css @imports
-    // spacing-utilities.css; sync-playground-themes.js's STYLES_FILES
-    // allowlist includes the file so it reaches apps/playground/src/styles/.
+    // spacing-utilities.css; sync-console-themes.js's STYLES_FILES
+    // allowlist includes the file so it reaches apps/console/src/styles/.
     const files = fs.readdirSync(distDir);
     expect(files).toContain('spacing-utilities.css');
 

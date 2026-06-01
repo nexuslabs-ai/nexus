@@ -6,7 +6,7 @@ Token-driven design system for product UI. Three layers compose into one consuma
 - **`@nexus/tailwind`** — Tailwind CSS theme generated from the tokens. All utilities are namespaced with the `nx:` prefix.
 - **`@nexus/react`** — React components built on Radix UI primitives and the Tailwind layer. Variants via CVA; data-attribute test surface; padding-based sizing.
 
-A playground app exercises the tokens visually; Storybook hosts the component catalog and runs both visual docs and interaction tests against the real components.
+A console app exercises the tokens visually; Storybook hosts the component catalog and runs both visual docs and interaction tests against the real components.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ A playground app exercises the tokens visually; Storybook hosts the component ca
 ```bash
 yarn install              # install all workspace deps; wires Husky pre-commit hooks
 yarn storybook            # component catalog + interactive playground
-yarn playground           # token / theme explorer app
+yarn console              # token / theme explorer app
 yarn dev                  # turbo watch across every workspace (library dev)
 yarn test                 # run both vitest projects: unit (jsdom) + storybook (chromium)
 ```
@@ -33,7 +33,7 @@ Each command runs from the repo root.
 | `packages/tailwind`   | Tailwind CSS theme with `nx:` prefix                          |
 | `packages/react`      | React components built with Radix UI and Tailwind CSS         |
 | `packages/test-utils` | Test utilities for hooks and utilities                        |
-| `apps/playground`     | Theme/token exploration UI                                    |
+| `apps/console`        | Theme/token exploration UI                                    |
 | `apps/docs`           | Documentation site (Next.js — IA shell + live theme explorer) |
 
 ## Where to learn more

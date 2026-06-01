@@ -221,14 +221,14 @@ function generateThemedPrimitiveCSS(distDir, category, mode, primitiveMap) {
 }
 
 /**
- * Generate globals.css for playground using shared generateThemeCSS function.
+ * Generate the modular globals.css (apps/console + apps/docs) via generateThemeCSS.
  *
  * `spacingDefault` controls which mode lands under `:root, [data-style="X"]`
  * in globals.css — i.e. the no-`data-style` default. All 7 modes still ship
  * either way (the other six emit as plain `[data-style="X"]` blocks); the
- * playground's runtime UI swaps via `data-style` regardless.
+ * app's runtime UI swaps via `data-style` regardless.
  */
-function generatePlaygroundGlobalsCSS(
+function generateModularGlobalsCSS(
   distDir,
   primitives,
   primitiveMap,
@@ -263,7 +263,7 @@ function generatePlaygroundGlobalsCSS(
   );
   // Standalone semantic files (e.g. focus.json) contribute both color tokens
   // (--color-focus-*) and dimension tokens (--focus-offset) into @theme so
-  // their utilities emit in the playground build. Files owned by a dedicated
+  // their utilities emit in the app build. Files owned by a dedicated
   // collector (spacing.json, breakpoints.json, z-index.json) are skipped from
   // the generic dimension scan to avoid duplicate emission.
   const standaloneTokens = semantics.standalone.flatMap((file) => {
@@ -331,7 +331,7 @@ function generatePlaygroundGlobalsCSS(
     shadowTokens,
     zIndexTokens,
     breakpointTokens,
-    // No dark mode block - playground uses dynamic theme switching
+    // No dark mode block - the app uses dynamic theme switching
   });
 
   // Per-mode spacing override blocks. `spacingDefault` picks which mode lands
@@ -342,8 +342,8 @@ function generatePlaygroundGlobalsCSS(
   writeModularFile(distDir, 'globals.css', css);
 
   // Spacing role utilities — emitted as a sibling file (symmetric with the
-  // bundled build). `globals.css` `@import`s it; `sync-playground-themes.js`'s
-  // STYLES_FILES allowlist carries it to `apps/playground/src/styles/`.
+  // bundled build). `globals.css` `@import`s it; `sync-console-themes.js`'s
+  // STYLES_FILES allowlist carries it to `apps/console/src/styles/`.
   const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
   writeModularFile(distDir, 'spacing-utilities.css', spacingUtilities.css);
 
@@ -452,9 +452,9 @@ export async function generateModular({
     totalFiles++;
   }
 
-  // Generate playground globals.css
-  console.log('\nPlayground:');
-  const globalsTokenCount = generatePlaygroundGlobalsCSS(
+  // Generate the modular globals.css
+  console.log('\nGlobals:');
+  const globalsTokenCount = generateModularGlobalsCSS(
     distDir,
     primitives,
     primitiveMap,
