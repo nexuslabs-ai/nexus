@@ -60,7 +60,7 @@ A `fontFamily` token can carry `$extensions.nx-font-source` (`type: "google"` wi
 
 > **Spacing isn't a per-mode build flag.** All 7 spacing modes ship in every build; mode swap is the runtime `data-style="X"` attribute on `<html>` (or any subtree). `--spacingDefault=<mode>` only picks which mode lands under the `:root` cascade default.
 
-> **Mode distinctness varies by axis.** A CLI flag being accepted ≠ unique values. `shadow` is genuinely distinct across its 5 modes; `typography` ships only 3 (`nova` / `vega` / `maia` — `lyra` / `mira` were byte-identical to `vega` and removed); `borderwidth` exposes 5 flags but only 2 designs (`borderwidth-nova` 1.5/3px vs the `vega` cluster `lyra` = `mira` = `vega` 1/2px). Don't read a surviving flag as a distinct design.
+> **Mode distinctness varies by axis.** A CLI flag being accepted ≠ unique values. `shadow` is genuinely distinct across its 5 modes; `typography` ships only 3 (`nova` / `vega` / `maia` — `lyra` / `mira` were byte-identical to `vega` and removed); `borderwidth` exposes 5 flags but only 3 designs (`borderwidth-nova` 1.5/3px, `maia` 1/1px, and the `vega` cluster `lyra` = `mira` = `vega` 1/2px). Don't read a surviving flag as a distinct design.
 
 ## Typography
 

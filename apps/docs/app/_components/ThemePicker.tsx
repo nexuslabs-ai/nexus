@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { usePathname } from 'next/navigation';
+
 import { useThemeStore } from '../_stores/use-theme-store';
 
 import {
@@ -50,7 +52,7 @@ const OPTIONS: Record<ModeKey, { value: string; label: string }[]> = {
     { value: 'vega', label: 'Vega' },
     { value: 'lyra', label: 'Lyra' },
     { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira' },
+    { value: 'mira', label: 'Mira (≈ Vega)' },
     { value: 'nova', label: 'Nova' },
     { value: 'luma', label: 'Luma' },
     { value: 'sera', label: 'Sera' },
@@ -76,9 +78,9 @@ const OPTIONS: Record<ModeKey, { value: string; label: string }[]> = {
   ],
   borderwidth: [
     { value: 'vega', label: 'Vega' },
-    { value: 'lyra', label: 'Lyra' },
+    { value: 'lyra', label: 'Lyra (≈ Vega)' },
     { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira' },
+    { value: 'mira', label: 'Mira (≈ Vega)' },
     { value: 'nova', label: 'Nova' },
   ],
 };
@@ -104,6 +106,11 @@ export function ThemePicker() {
   const borderwidth = useThemeStore((s) => s.borderwidth);
   const update = useThemeStore((s) => s.update);
   const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
+
+  // The landing page ships its own in-page theme swapper; the global corner
+  // picker would overlap it and duplicate its controls, so hide it there.
+  if (pathname === '/') return null;
 
   const onChange = (mode: ModeKey) => (value: string) => {
     update(mode, value);

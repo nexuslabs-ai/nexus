@@ -299,7 +299,8 @@ jobs:
           DIRTY=$(git status --porcelain -- \
             packages/tailwind \
             apps/console/public/themes \
-            apps/console/src/styles)
+            apps/console/src/styles \
+            apps/docs/public/themes)
           if [ -n "$DIRTY" ]; then
             echo "::error::Token output is stale. Affected paths:"
             echo "$DIRTY"
