@@ -1,3 +1,23 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  toast,
+  Toaster,
+} from '@nexus/react';
+
 import { ComponentShowcase } from './components/ComponentShowcase';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { useTheme } from './hooks/useTheme';
@@ -31,6 +51,48 @@ export default function App() {
             </div>
           </header>
 
+          {/* Phase-1 pipeline probe — exercises popover/overlay/container/error
+              tokens via real @nexus/react components. Replaced by the Settings
+              scene in Phase 2. */}
+          <section className="nx:flex nx:flex-wrap nx:items-center nx:gap-4 nx:p-6">
+            <Select defaultValue="pro">
+              <SelectTrigger className="nx:w-48">
+                <SelectValue placeholder="Select a plan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="free">Free</SelectItem>
+                <SelectItem value="pro">Pro</SelectItem>
+                <SelectItem value="team">Team</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">Delete account</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This permanently deletes your account and all of its data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <Button
+              onClick={() =>
+                toast.success('Saved', { description: 'Pipeline works.' })
+              }
+            >
+              Show toast
+            </Button>
+          </section>
+
           {/* Content */}
           <ComponentShowcase />
         </main>
@@ -42,6 +104,8 @@ export default function App() {
           </div>
         </aside>
       </div>
+
+      <Toaster />
     </div>
   );
 }

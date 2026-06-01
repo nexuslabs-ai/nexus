@@ -1,3 +1,13 @@
 /* Nexus Playground - Theme preview with nx: prefixed utilities */
 /* globals.css is copied from core/dist/modular by copy:themes script */
 @import './styles/globals.css';
+
+/* Component overlay animations (Dialog / Select / AlertDialog / Tooltip). */
+@import 'tw-animate-css';
+
+/* Emit the nx: utilities used inside @nexus/react by scanning its source.
+   Do NOT import @nexus/tailwind or @nexus/react/styles.css here — their frozen
+   token values would override the playground's live, switchable tokens and
+   break the theme switcher. Tailwind 4 skips node_modules, so we point at the
+   source directly. */
+@source '../../../packages/react/src';
