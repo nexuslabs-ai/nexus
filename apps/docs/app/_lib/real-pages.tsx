@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 
 import { ColorShowcase } from '../_pages/ColorShowcase';
 import { Layering } from '../_pages/Layering';
+import { MultiBrand } from '../_pages/MultiBrand';
 import { Radius } from '../_pages/Radius';
 import { Responsive } from '../_pages/Responsive';
 import { Spacing } from '../_pages/Spacing';
@@ -20,6 +21,7 @@ export const REAL_PAGES: Record<string, ComponentType> = {
   'foundations/radius': Radius,
   'foundations/layering': Layering,
   'foundations/responsive': Responsive,
+  'theming/multi-brand': MultiBrand,
 };
 
 /**
