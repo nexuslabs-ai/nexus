@@ -1,20 +1,18 @@
 import {
-  Button,
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-  Separator,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-  toast,
 } from '@nexus/react';
 
 import type { ThemeConfig } from '../../hooks/useTheme';
 
 import { AppearanceSettings } from './AppearanceSettings';
+import { ProfileTab } from './ProfileTab';
 
 type SettingsSceneProps = {
   theme: ThemeConfig;
@@ -40,12 +38,6 @@ function ComingUp({ title }: { title: string }) {
  * overlay (Select / AlertDialog) to exercise the surface contract.
  */
 export function SettingsScene({ theme, setTheme }: SettingsSceneProps) {
-  const handleSave = () => {
-    toast.success('Settings saved', {
-      description: 'Your preferences have been updated.',
-    });
-  };
-
   return (
     <div className="nx:mx-auto nx:max-w-3xl nx:space-y-6 nx:p-6">
       <div className="nx:space-y-1">
@@ -66,7 +58,7 @@ export function SettingsScene({ theme, setTheme }: SettingsSceneProps) {
         </TabsList>
 
         <TabsContent value="profile">
-          <ComingUp title="Profile" />
+          <ProfileTab />
         </TabsContent>
         <TabsContent value="account">
           <ComingUp title="Account" />
@@ -78,15 +70,6 @@ export function SettingsScene({ theme, setTheme }: SettingsSceneProps) {
           <AppearanceSettings theme={theme} setTheme={setTheme} />
         </TabsContent>
       </Tabs>
-
-      <Separator />
-
-      <div className="nx:flex nx:justify-end nx:gap-3">
-        <Button variant="outline" onClick={() => toast('Changes discarded')}>
-          Cancel
-        </Button>
-        <Button onClick={handleSave}>Save changes</Button>
-      </div>
     </div>
   );
 }
