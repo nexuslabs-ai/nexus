@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Sibling of sync-playground-themes.js. The docs app loads the modular
+// Sibling of sync-console-themes.js. The docs app loads the modular
 // per-mode CSS at runtime via <link> tags (ThemeBootstrap) for live theme
 // swapping, and gets primitives from @nexus/tailwind — so unlike the
-// playground it only needs public/themes, not a src/styles copy.
+// console app it only needs public/themes, not a src/styles copy.
 //
 // public/themes is a committed copy of the generated dist/modular output;
 // without this sync it silently drifts from the tokens (which is exactly

@@ -255,7 +255,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: changes
     # Gate on `packages` (not `react`): the freshness check covers
-    # apps/playground/** and audit:class-refs scans apps/** sources.
+    # apps/console/** and audit:class-refs scans apps/** sources.
     if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
@@ -298,8 +298,8 @@ jobs:
           set -euo pipefail
           DIRTY=$(git status --porcelain -- \
             packages/tailwind \
-            apps/playground/public/themes \
-            apps/playground/src/styles)
+            apps/console/public/themes \
+            apps/console/src/styles)
           if [ -n "$DIRTY" ]; then
             echo "::error::Token output is stale. Affected paths:"
             echo "$DIRTY"

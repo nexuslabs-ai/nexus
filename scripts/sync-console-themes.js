@@ -6,9 +6,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
 const SOURCE_DIR = path.join(REPO_ROOT, 'packages/core/dist/modular');
-const PLAYGROUND_DIR = path.join(REPO_ROOT, 'apps/playground');
-const THEMES_DIR = path.join(PLAYGROUND_DIR, 'public/themes');
-const STYLES_DIR = path.join(PLAYGROUND_DIR, 'src/styles');
+const CONSOLE_DIR = path.join(REPO_ROOT, 'apps/console');
+const THEMES_DIR = path.join(CONSOLE_DIR, 'public/themes');
+const STYLES_DIR = path.join(CONSOLE_DIR, 'src/styles');
 
 // Files copied to src/styles for build-time Tailwind processing.
 const STYLES_FILES = [
@@ -20,17 +20,17 @@ const STYLES_FILES = [
   'spacing-utilities.css',
 ];
 
-// Sentinel: refuse to wipe a directory that isn't the playground.
-const SENTINEL = path.join(PLAYGROUND_DIR, 'vite.config.ts');
+// Sentinel: refuse to wipe a directory that isn't the console app.
+const SENTINEL = path.join(CONSOLE_DIR, 'vite.config.ts');
 if (!fs.existsSync(SENTINEL)) {
   throw new Error(
-    `sync-playground-themes: sentinel ${SENTINEL} missing — refusing to wipe ${PLAYGROUND_DIR}.`
+    `sync-console-themes: sentinel ${SENTINEL} missing — refusing to wipe ${CONSOLE_DIR}.`
   );
 }
 
 if (!fs.existsSync(SOURCE_DIR)) {
   throw new Error(
-    `sync-playground-themes: source ${SOURCE_DIR} missing — run yarn build:tokens:modular in @nexus/core first.`
+    `sync-console-themes: source ${SOURCE_DIR} missing — run yarn build:tokens:modular in @nexus/core first.`
   );
 }
 
@@ -49,9 +49,7 @@ for (const entry of fs.readdirSync(SOURCE_DIR)) {
 for (const file of STYLES_FILES) {
   const src = path.join(SOURCE_DIR, file);
   if (!fs.existsSync(src)) {
-    throw new Error(
-      `sync-playground-themes: expected ${file} in ${SOURCE_DIR}.`
-    );
+    throw new Error(`sync-console-themes: expected ${file} in ${SOURCE_DIR}.`);
   }
   fs.copyFileSync(src, path.join(STYLES_DIR, file));
 }

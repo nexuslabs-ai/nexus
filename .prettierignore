@@ -13,8 +13,8 @@ package-lock.json
 
 # Auto-generated CSS — produced by @nexus/core token pipeline; do not reformat
 packages/tailwind/*.css
-apps/playground/public/themes/*.css
-apps/playground/src/styles/*.css
+apps/console/public/themes/*.css
+apps/console/src/styles/*.css
 
 # Generated Storybook base-variant stories — produced by generate-base-variants.mjs
 packages/react/src/components/__generated__/
