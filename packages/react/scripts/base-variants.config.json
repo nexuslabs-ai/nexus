@@ -87,6 +87,7 @@
       "showcase": "AllVariants",
       "interactions": ["ClickInteraction", "KeyboardInteraction"]
     },
+    { "name": "Slider", "showcase": "AllVariants" },
     { "name": "Show", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Hide", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Spinner", "showcase": "AllVariants" },
