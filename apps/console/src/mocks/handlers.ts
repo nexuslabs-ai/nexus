@@ -76,7 +76,7 @@ const store: Contact[] = CONTACTS.map((c) => ({ ...c }));
 // a fresh `ATL-` key from a running sequence seeded just past the fixtures.
 type StoredIssue = Issue & { description: string };
 const issuesStore: StoredIssue[] = ISSUES.map((i) => ({ ...i }));
-let nextIssueSeq = 125;
+let nextIssueSeq = 125; // one past the last fixture key (ATL-124)
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -174,10 +174,32 @@ export const handlers: RequestHandler[] = [
   }),
 
   // --- Projects ---
-  // The full issue list; the DataTable sorts/filters/paginates client-side.
+  // The issue list returns the `Issue` shape only — `description` is detail-only,
+  // so it's projected away here. The DataTable sorts/filters/paginates client-side.
   http.get('/api/projects/issues', async () => {
     await delay(500);
-    return HttpResponse.json({ issues: issuesStore });
+    const issues: Issue[] = issuesStore.map(
+      ({
+        id,
+        key,
+        title,
+        status,
+        priority,
+        assignee,
+        createdAt,
+        updatedAt,
+      }) => ({
+        id,
+        key,
+        title,
+        status,
+        priority,
+        assignee,
+        createdAt,
+        updatedAt,
+      })
+    );
+    return HttpResponse.json({ issues });
   }),
 
   // A single issue incl. its long-form description (404 when unknown).

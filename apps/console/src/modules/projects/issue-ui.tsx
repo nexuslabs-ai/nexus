@@ -1,6 +1,11 @@
 import { Badge, type BadgeProps } from '@nexus/react';
 
-import type { IssuePriority, IssueStatus } from '../../lib/projects-api';
+import {
+  ISSUE_PRIORITIES,
+  ISSUE_STATUSES,
+  type IssuePriority,
+  type IssueStatus,
+} from '../../lib/projects-api';
 
 const STATUS_META: Record<
   IssueStatus,
@@ -37,11 +42,13 @@ export function IssuePriorityBadge({ priority }: { priority: IssuePriority }) {
 }
 
 /** The ordered status options for the create/edit form's Select. */
-export const STATUS_OPTIONS = (
-  Object.entries(STATUS_META) as [IssueStatus, { label: string }][]
-).map(([value, { label }]) => ({ value, label }));
+export const STATUS_OPTIONS = ISSUE_STATUSES.map((value) => ({
+  value,
+  label: STATUS_META[value].label,
+}));
 
 /** The ordered priority options for the create/edit form's Select. */
-export const PRIORITY_OPTIONS = (
-  Object.entries(PRIORITY_META) as [IssuePriority, { label: string }][]
-).map(([value, { label }]) => ({ value, label }));
+export const PRIORITY_OPTIONS = ISSUE_PRIORITIES.map((value) => ({
+  value,
+  label: PRIORITY_META[value].label,
+}));

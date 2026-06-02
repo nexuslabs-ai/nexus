@@ -95,7 +95,13 @@ export function IssueFormSheet({
     mutationFn: (values: IssueFormValues) =>
       issue ? updateIssue(issue.id, values) : createIssue(values),
     onSuccess: ({ issue: saved }) => {
-      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      // A create dirties the list; an edit dirties the list + that one detail.
+      queryClient.invalidateQueries({ queryKey: projectKeys.issues });
+      if (issue) {
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.issue(issue.id),
+        });
+      }
       toast.success(isEdit ? 'Issue updated' : 'Issue created', {
         description: saved.title,
       });
