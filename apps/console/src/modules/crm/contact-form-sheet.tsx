@@ -32,6 +32,7 @@ import { z } from 'zod';
 
 import {
   type Contact,
+  CONTACT_STATUSES,
   type ContactStatus,
   createContact,
   crmKeys,
@@ -55,7 +56,7 @@ const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.email('Enter a valid email address'),
   company: z.string().min(1, 'Company is required'),
-  status: z.enum(['active', 'lead', 'churned']),
+  status: z.enum(CONTACT_STATUSES),
   owner: z.string().min(1, 'Owner is required'),
   value: z.number().min(0, 'Open value must be 0 or more'),
 });

@@ -11,8 +11,8 @@ import { crmKeys, fetchContacts } from '../../lib/crm-api';
 import { ContactFormSheet } from './contact-form-sheet';
 import { ContactsBoard } from './contacts-board';
 import { contactColumns } from './contacts-columns';
+import type { ContactsView } from './contacts-search';
 import { ContactsToolbar } from './contacts-toolbar';
-import type { ContactsView } from './saved-views';
 
 const crmRoute = getRouteApi('/app/m/crm');
 
@@ -27,7 +27,15 @@ export function ContactsRoute() {
   const [createOpen, setCreateOpen] = useState(false);
 
   const setSearch = (patch: Partial<ContactsView>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({
+      search: (prev) => {
+        const next = { ...prev, ...patch };
+        // The status facet is table-only — the board is organised by status, so
+        // never carry a hidden status filter into board view (incl. when applying
+        // a saved board view).
+        return next.view === 'board' ? { ...next, status: [] } : next;
+      },
+    });
 
   return (
     <div className="nx:space-y-6 nx:p-6">

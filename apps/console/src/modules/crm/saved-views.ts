@@ -1,13 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import type { ContactStatus } from '../../lib/crm-api';
-
-/** The shareable Contacts view state — mirrors the route's search params. */
-export type ContactsView = {
-  view: 'table' | 'board';
-  status: ContactStatus[];
-};
+import type { ContactsView } from './contacts-search';
 
 export type SavedView = {
   id: string;

@@ -14,10 +14,13 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Separator,
   toast,
 } from '@nexus/react';
 import {
@@ -31,7 +34,8 @@ import {
 
 import type { ContactStatus } from '../../lib/crm-api';
 
-import { type ContactsView, useSavedViews } from './saved-views';
+import type { ContactsView } from './contacts-search';
+import { useSavedViews } from './saved-views';
 
 const STATUS_FILTERS: { value: ContactStatus; label: string }[] = [
   { value: 'active', label: 'Active' },
@@ -142,6 +146,7 @@ function SavedViewsMenu({
   const views = useSavedViews((s) => s.views);
   const save = useSavedViews((s) => s.save);
   const remove = useSavedViews((s) => s.remove);
+  const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState('');
 
@@ -154,55 +159,74 @@ function SavedViewsMenu({
     setDialogOpen(false);
   };
 
+  const applyView = (view: ContactsView) => {
+    setSearch(view);
+    setOpen(false);
+  };
+
+  // A Popover (not a DropdownMenu) so each row carries two sibling buttons —
+  // apply + delete — both keyboard-reachable. A menu's roving focus only lands on
+  // `role="menuitem"` rows, which would strand a nested delete control (and trip
+  // axe's `nested-interactive`).
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button variant="outline" size="sm">
             <IconBookmark />
             Views
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="nx:w-56">
-          <DropdownMenuLabel>Saved views</DropdownMenuLabel>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="nx:w-64 nx:p-0">
+          <p className="nx:typography-label-small nx:text-muted-foreground nx:px-3 nx:pt-3 nx:pb-2">
+            Saved views
+          </p>
           {views.length === 0 ? (
-            <DropdownMenuItem disabled>No saved views yet</DropdownMenuItem>
+            <p className="nx:text-muted-foreground nx:px-3 nx:pb-3 nx:text-sm">
+              No saved views yet.
+            </p>
           ) : (
-            views.map((saved) => (
-              <DropdownMenuItem
-                key={saved.id}
-                onSelect={() => setSearch(saved.view)}
-                className="nx:flex nx:items-center nx:justify-between nx:gap-2"
-              >
-                <span className="nx:truncate">{saved.name}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  aria-label={`Delete view ${saved.name}`}
-                  className="nx:text-muted-foreground nx:hover:text-error-foreground nx:shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    remove(saved.id);
-                  }}
-                  onPointerDown={(e) => e.stopPropagation()}
-                >
-                  <IconTrash className="nx:size-4" />
-                </Button>
-              </DropdownMenuItem>
-            ))
+            <ul className="nx:px-1 nx:pb-1">
+              {views.map((saved) => (
+                <li key={saved.id} className="nx:flex nx:items-center nx:gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => applyView(saved.view)}
+                    className="nx:min-w-0 nx:flex-1 nx:justify-start"
+                  >
+                    <span className="nx:truncate">{saved.name}</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Delete view ${saved.name}`}
+                    onClick={() => remove(saved.id)}
+                    className="nx:text-muted-foreground nx:hover:text-error-foreground nx:shrink-0"
+                  >
+                    <IconTrash className="nx:size-4" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
           )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onSelect={(e) => {
-              e.preventDefault();
-              setDialogOpen(true);
-            }}
-          >
-            <IconPlus />
-            Save current view…
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          <Separator />
+          <div className="nx:p-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setOpen(false);
+                setDialogOpen(true);
+              }}
+              className="nx:w-full nx:justify-start"
+            >
+              <IconPlus />
+              Save current view…
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

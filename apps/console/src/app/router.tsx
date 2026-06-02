@@ -13,6 +13,7 @@ import { VerifyRoute } from '../modules/auth/verify-route';
 import { ComingSoon } from '../modules/coming-soon';
 import { ContactDetailRoute } from '../modules/crm/contact-detail-route';
 import { ContactsRoute } from '../modules/crm/contacts-route';
+import { contactsSearchSchema } from '../modules/crm/contacts-search';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
@@ -84,16 +85,7 @@ const appearanceRoute = createRoute({
 const crmContactsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/m/crm',
-  // `.default` keeps the param optional for navigation (existing `<Link
-  // to="/m/crm">` calls don't pass `search`); `.catch` also recovers an invalid
-  // value (e.g. a stale `?view=foo`) to 'table' instead of throwing a search error.
-  validateSearch: z.object({
-    view: z.enum(['table', 'board']).default('table').catch('table'),
-    status: z
-      .array(z.enum(['active', 'lead', 'churned']))
-      .default([])
-      .catch([]),
-  }),
+  validateSearch: contactsSearchSchema,
   component: ContactsRoute,
 });
 

@@ -4,8 +4,15 @@
  * fetches through these via TanStack Query.
  */
 
+/**
+ * The lifecycle statuses a contact can hold — the single source for the
+ * {@link ContactStatus} union, the route's status facet, and the create/edit
+ * form's status enum (all derive from this `as const` tuple).
+ */
+export const CONTACT_STATUSES = ['active', 'lead', 'churned'] as const;
+
 /** Lifecycle status of a contact — rendered as a status badge. */
-export type ContactStatus = 'active' | 'lead' | 'churned';
+export type ContactStatus = (typeof CONTACT_STATUSES)[number];
 
 export type Contact = {
   id: string;
