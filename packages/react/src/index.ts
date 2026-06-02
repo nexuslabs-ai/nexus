@@ -27,6 +27,7 @@ export * from '@/components/ui/empty-state';
 export * from '@/components/ui/form';
 export * from '@/components/ui/input';
 export * from '@/components/ui/input-otp';
+export * from '@/components/ui/item';
 export * from '@/components/ui/kbd';
 export * from '@/components/ui/label';
 export * from '@/components/ui/pagination';
