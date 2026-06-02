@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -102,13 +103,17 @@ export function ContactFormSheet({
         description: saved.name,
       });
       onOpenChange(false);
-      // Clear after a create so the next "New contact" opens fresh; an edit
-      // keeps the just-saved values (they match the contact).
-      if (!isEdit) form.reset(EMPTY_VALUES);
     },
     onError: (error: Error) =>
       form.setError('root', { message: error.message }),
   });
+
+  // Re-sync the form each time the sheet opens — the instance is persistent, so
+  // without this a cancelled create or unsaved edit would survive into the next
+  // open (and a stale root error would linger). `reset` also clears errors.
+  useEffect(() => {
+    if (open) form.reset(contact ? toFormValues(contact) : EMPTY_VALUES);
+  }, [open, contact, form]);
 
   const onSubmit = (values: ContactFormValues) => mutation.mutate(values);
   const rootError = form.formState.errors.root?.message;
