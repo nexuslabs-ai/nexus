@@ -9,12 +9,13 @@ import { cn } from '@/lib/utils';
 /**
  * ItemGroup
  *
- * A vertical list of `Item`s, exposed to assistive tech as a `list`.
+ * A vertical stack of related `Item`s, divided by `ItemSeparator`. No ARIA
+ * `list` role is imposed — `Item` is also used standalone, so list/listitem
+ * semantics are the consumer's to add when the grouping is truly a list.
  */
 function ItemGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      role="list"
       data-slot="item-group"
       className={cn('nx:group/item-group nx:flex nx:flex-col', className)}
       {...props}
