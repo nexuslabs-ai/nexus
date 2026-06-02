@@ -31,3 +31,26 @@ export async function fetchContacts(): Promise<{ contacts: Contact[] }> {
   }
   return (await res.json()) as { contacts: Contact[] };
 }
+
+export type ActivityKind = 'created' | 'email' | 'status' | 'note';
+
+export type ActivityItem = {
+  id: string;
+  kind: ActivityKind;
+  /** ISO date (YYYY-MM-DD). */
+  date: string;
+  summary: string;
+};
+
+/** A contact plus its activity timeline — the record-detail payload. */
+export type ContactDetail = Contact & { activity: ActivityItem[] };
+
+export async function fetchContact(
+  id: string
+): Promise<{ contact: ContactDetail }> {
+  const res = await fetch(`/api/crm/contacts/${id}`);
+  if (!res.ok) {
+    throw new Error('Failed to load contact.');
+  }
+  return (await res.json()) as { contact: ContactDetail };
+}

@@ -3,8 +3,6 @@ import type { ReactNode } from 'react';
 import {
   Avatar,
   AvatarFallback,
-  Badge,
-  type BadgeProps,
   Button,
   Checkbox,
   DropdownMenu,
@@ -19,36 +17,13 @@ import {
   IconDots,
   IconSelector,
 } from '@tabler/icons-react';
+import { Link } from '@tanstack/react-router';
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
-import type { Contact, ContactStatus } from '../../lib/crm-api';
+import type { Contact } from '../../lib/crm-api';
+import { formatCurrency, formatDate } from '../../lib/format';
 
-const currencyUSD = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
-const dateFmt = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-});
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  const first = parts[0]?.[0] ?? '';
-  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
-  return (first + last).toUpperCase();
-}
-
-const STATUS_META: Record<
-  ContactStatus,
-  { label: string; variant: BadgeProps['variant'] }
-> = {
-  active: { label: 'Active', variant: 'success' },
-  lead: { label: 'Lead', variant: 'information' },
-  churned: { label: 'Churned', variant: 'secondary' },
-};
+import { ContactStatusBadge, initials } from './contact-ui';
 
 /** A clickable column header that cycles the column's sort and shows its state. */
 function SortHeader({
@@ -107,9 +82,13 @@ export const contactColumns: ColumnDef<Contact>[] = [
     accessorKey: 'name',
     header: ({ column }) => <SortHeader column={column}>Name</SortHeader>,
     cell: ({ row }) => (
-      <span className="nx:text-foreground nx:font-medium">
+      <Link
+        to="/m/crm/$id"
+        params={{ id: row.original.id }}
+        className="nx:text-foreground nx:font-medium nx:hover:underline"
+      >
         {row.original.name}
-      </span>
+      </Link>
     ),
   },
   {
@@ -119,10 +98,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => <SortHeader column={column}>Status</SortHeader>,
-    cell: ({ row }) => {
-      const { label, variant } = STATUS_META[row.original.status];
-      return <Badge variant={variant}>{label}</Badge>;
-    },
+    cell: ({ row }) => <ContactStatusBadge status={row.original.status} />,
   },
   {
     accessorKey: 'owner',
@@ -143,7 +119,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
     header: ({ column }) => <SortHeader column={column}>Open value</SortHeader>,
     cell: ({ row }) => (
       <span className="nx:tabular-nums">
-        {currencyUSD.format(row.original.value)}
+        {formatCurrency(row.original.value)}
       </span>
     ),
   },
@@ -154,7 +130,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
     ),
     cell: ({ row }) => (
       <span className="nx:text-muted-foreground">
-        {dateFmt.format(new Date(row.original.lastContacted))}
+        {formatDate(row.original.lastContacted)}
       </span>
     ),
   },
@@ -189,6 +165,11 @@ function RowActions({ contact }: { contact: Contact }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link to="/m/crm/$id" params={{ id: contact.id }}>
+            View details
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => copy('Email', contact.email)}>
           Copy email
         </DropdownMenuItem>
