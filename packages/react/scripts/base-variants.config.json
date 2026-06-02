@@ -80,6 +80,7 @@
     },
     { "name": "Show", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Hide", "showcase": "AllAxes", "sourceDir": "primitives" },
+    { "name": "Spinner", "showcase": "AllVariants" },
     { "name": "Switch", "showcase": "AllVariants" },
     { "name": "Table", "showcase": "AllVariants" },
     {
