@@ -24,7 +24,12 @@ import {
   IconPalette,
   IconUserCircle,
 } from '@tabler/icons-react';
-import { Link, useMatchRoute, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  useMatchRoute,
+  useNavigate,
+  useRouterState,
+} from '@tanstack/react-router';
 
 import { useSession } from '../app/session';
 
@@ -38,12 +43,15 @@ const DESIGN_ITEMS = [
 
 /**
  * The Atlas app-shell sidebar: the wired Design System module plus the full
- * module IA, where unbuilt modules all route to the shared `/m/$module`
- * placeholder.
+ * module IA. Built modules resolve to their own route (e.g. CRM → `/m/crm`);
+ * the rest fall through to the shared `/m/$module` "coming soon" placeholder.
  */
 export function AppSidebar() {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
+  // Workspace items highlight by pathname so it works whether a module resolves
+  // to its own static route (e.g. /m/crm) or the dynamic /m/$module placeholder.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const user = useSession((s) => s.user);
   const signOut = useSession((s) => s.signOut);
 
@@ -98,22 +106,35 @@ export function AppSidebar() {
           <SidebarGroupLabel>Workspace</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {MODULE_ITEMS.map(({ label, module, icon: Icon }) => (
-                <SidebarMenuItem key={module}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={
-                      !!matchRoute({ to: '/m/$module', params: { module } })
-                    }
-                    tooltip={label}
-                  >
-                    <Link to="/m/$module" params={{ module }}>
-                      <Icon />
-                      <span>{label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {MODULE_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  pathname === `/m/${item.module}` ||
+                  pathname.startsWith(`/m/${item.module}/`);
+                return (
+                  <SidebarMenuItem key={item.module}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.label}
+                    >
+                      {/* Built modules link to their real static route; the rest
+                          fall through to the dynamic /m/$module placeholder. */}
+                      {'route' in item ? (
+                        <Link to={item.route}>
+                          <Icon />
+                          <span>{item.label}</span>
+                        </Link>
+                      ) : (
+                        <Link to="/m/$module" params={{ module: item.module }}>
+                          <Icon />
+                          <span>{item.label}</span>
+                        </Link>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -11,6 +11,7 @@ import { LoginRoute } from '../modules/auth/login-route';
 import { SignupRoute } from '../modules/auth/signup-route';
 import { VerifyRoute } from '../modules/auth/verify-route';
 import { ComingSoon } from '../modules/coming-soon';
+import { ContactsRoute } from '../modules/crm/contacts-route';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
@@ -77,6 +78,14 @@ const appearanceRoute = createRoute({
   component: AppearanceRoute,
 });
 
+// CRM Contacts (Phase 2a). The static `/m/crm` path outranks the dynamic
+// `/m/$module` placeholder below, so the real module wins over "coming soon".
+const crmContactsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/crm',
+  component: ContactsRoute,
+});
+
 // One shared placeholder backs every not-yet-built module.
 const moduleRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -125,6 +134,7 @@ const routeTree = rootRoute.addChildren([
     referenceRoute,
     scenesRoute,
     appearanceRoute,
+    crmContactsRoute,
     moduleRoute,
   ]),
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),
