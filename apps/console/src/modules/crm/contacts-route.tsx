@@ -1,21 +1,32 @@
 import { useState } from 'react';
 
 import { Button, Skeleton } from '@nexus/react';
-import { IconPlus, IconUsers } from '@tabler/icons-react';
+import {
+  IconLayoutKanban,
+  IconPlus,
+  IconTable,
+  IconUsers,
+} from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
+import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
-import { fetchContacts } from '../../lib/crm-api';
+import { crmKeys, fetchContacts } from '../../lib/crm-api';
 
 import { ContactFormSheet } from './contact-form-sheet';
+import { ContactsBoard } from './contacts-board';
 import { contactColumns } from './contacts-columns';
+
+const crmRoute = getRouteApi('/app/m/crm');
 
 export function ContactsRoute() {
   const { data, isPending, isError } = useQuery({
-    queryKey: ['crm', 'contacts'],
+    queryKey: crmKeys.contacts,
     queryFn: fetchContacts,
   });
   const contacts = data?.contacts;
+  const { view } = crmRoute.useSearch();
+  const navigate = crmRoute.useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
@@ -35,6 +46,25 @@ export function ContactsRoute() {
         </Button>
       </header>
 
+      <div className="nx:inline-flex nx:gap-1">
+        <Button
+          variant={view === 'table' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => navigate({ search: { view: 'table' } })}
+        >
+          <IconTable />
+          Table
+        </Button>
+        <Button
+          variant={view === 'board' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => navigate({ search: { view: 'board' } })}
+        >
+          <IconLayoutKanban />
+          Board
+        </Button>
+      </div>
+
       {isPending && <ContactsSkeleton />}
       {isError && (
         <p className="nx:text-error-foreground nx:text-sm">
@@ -44,6 +74,8 @@ export function ContactsRoute() {
       {contacts &&
         (contacts.length === 0 ? (
           <ContactsEmpty />
+        ) : view === 'board' ? (
+          <ContactsBoard contacts={contacts} />
         ) : (
           <DataTable
             columns={contactColumns}

@@ -34,6 +34,7 @@ import {
   type Contact,
   type ContactStatus,
   createContact,
+  crmKeys,
   updateContact,
 } from '../../lib/crm-api';
 
@@ -98,7 +99,7 @@ export function ContactFormSheet({
     mutationFn: (values: ContactFormValues) =>
       contact ? updateContact(contact.id, values) : createContact(values),
     onSuccess: ({ contact: saved }) => {
-      queryClient.invalidateQueries({ queryKey: ['crm'] });
+      queryClient.invalidateQueries({ queryKey: crmKeys.all });
       toast.success(isEdit ? 'Contact updated' : 'Contact created', {
         description: saved.name,
       });

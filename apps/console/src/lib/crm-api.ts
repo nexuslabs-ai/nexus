@@ -21,6 +21,17 @@ export type Contact = {
   lastContacted: string;
 };
 
+/**
+ * TanStack Query keys for the CRM module — declared once so the table, board,
+ * detail, and mutations can't drift apart (a mismatched key silently breaks the
+ * optimistic cache writes).
+ */
+export const crmKeys = {
+  all: ['crm'] as const,
+  contacts: ['crm', 'contacts'] as const,
+  contact: (id: string) => ['crm', 'contact', id] as const,
+};
+
 // Returns the server envelope (mirrors the wire shape, like the auth-api
 // wrappers) so a future server-side `{ contacts, totalCount }` for paging is an
 // additive change here, not a new return type.
