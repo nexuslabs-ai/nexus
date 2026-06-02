@@ -1,0 +1,25 @@
+/**
+ * App-wide value formatters. CRM, Billing, and Analytics all render currency and
+ * dates, so these live in `lib/` (per the plan's folder shape) rather than any
+ * one module.
+ *
+ * Dates are formatted in **UTC**: an ISO date like `2026-05-28` parses as UTC
+ * midnight, so rendering in the viewer's local zone would show the previous day
+ * for anyone west of UTC. Pinning the formatter to UTC renders the authored
+ * calendar day everywhere.
+ */
+const currencyFmt = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
+
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+export const formatCurrency = (value: number) => currencyFmt.format(value);
+export const formatDate = (iso: string) => dateFmt.format(new Date(iso));

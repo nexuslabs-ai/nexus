@@ -21,13 +21,9 @@ import { Link } from '@tanstack/react-router';
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import type { Contact } from '../../lib/crm-api';
+import { formatCurrency, formatDate } from '../../lib/format';
 
-import {
-  ContactStatusBadge,
-  formatCurrency,
-  formatDate,
-  initials,
-} from './contact-ui';
+import { ContactStatusBadge, initials } from './contact-ui';
 
 /** A clickable column header that cycles the column's sort and shows its state. */
 function SortHeader({
