@@ -1,0 +1,185 @@
+import type { ReactNode } from 'react';
+import { useState } from 'react';
+
+import {
+  Avatar,
+  AvatarFallback,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Separator,
+  Skeleton,
+} from '@nexus/react';
+import { IconArrowLeft, IconPencil } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
+import { Link, useParams } from '@tanstack/react-router';
+
+import { formatDate, initials } from '../../lib/format';
+import {
+  fetchIssue,
+  type IssueDetail,
+  projectKeys,
+} from '../../lib/projects-api';
+
+import { IssueFormSheet } from './issue-form-sheet';
+import { IssuePriorityBadge, IssueStatusBadge } from './issue-ui';
+
+export function IssueDetailRoute() {
+  const { id } = useParams({ from: '/app/m/projects/$id' });
+  const { data, isPending, isError } = useQuery({
+    queryKey: projectKeys.issue(id),
+    queryFn: () => fetchIssue(id),
+  });
+
+  return (
+    <div className="nx:space-y-6 nx:p-6">
+      <Link
+        to="/m/projects"
+        className="nx:text-muted-foreground nx:hover:text-foreground nx:inline-flex nx:items-center nx:gap-1 nx:text-sm"
+      >
+        <IconArrowLeft className="nx:size-4" />
+        Issues
+      </Link>
+
+      {isPending && <DetailSkeleton />}
+      {isError && <NotFound />}
+      {data && <DetailContent issue={data.issue} />}
+    </div>
+  );
+}
+
+function DetailContent({ issue }: { issue: IssueDetail }) {
+  const [editOpen, setEditOpen] = useState(false);
+
+  return (
+    <>
+      <header className="nx:space-y-3">
+        <div className="nx:flex nx:items-start nx:justify-between nx:gap-4">
+          <div className="nx:space-y-1">
+            <p className="nx:text-muted-foreground nx:text-sm nx:tabular-nums">
+              {issue.key}
+            </p>
+            <h1 className="nx:typography-heading-large nx:text-foreground">
+              {issue.title}
+            </h1>
+          </div>
+          <Button
+            variant="outline"
+            className="nx:shrink-0"
+            onClick={() => setEditOpen(true)}
+          >
+            <IconPencil />
+            Edit
+          </Button>
+        </div>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+          <IssueStatusBadge status={issue.status} />
+          <IssuePriorityBadge priority={issue.priority} />
+        </div>
+      </header>
+
+      <div className="nx:grid nx:gap-6 nx:lg:grid-cols-3">
+        <Card className="nx:lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Description</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {issue.description ? (
+              <p className="nx:text-foreground nx:text-sm nx:leading-relaxed nx:whitespace-pre-wrap">
+                {issue.description}
+              </p>
+            ) : (
+              <p className="nx:text-muted-foreground nx:text-sm">
+                No description.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Row label="Assignee">
+              <div className="nx:flex nx:items-center nx:gap-2">
+                <Avatar className="nx:size-6">
+                  <AvatarFallback className="nx:text-xs">
+                    {initials(issue.assignee)}
+                  </AvatarFallback>
+                </Avatar>
+                <span>{issue.assignee}</span>
+              </div>
+            </Row>
+            <Separator />
+            <Row label="Status">
+              <IssueStatusBadge status={issue.status} />
+            </Row>
+            <Separator />
+            <Row label="Priority">
+              <IssuePriorityBadge priority={issue.priority} />
+            </Row>
+            <Separator />
+            <Row label="Created">{formatDate(issue.createdAt)}</Row>
+            <Separator />
+            <Row label="Updated">{formatDate(issue.updatedAt)}</Row>
+          </CardContent>
+        </Card>
+      </div>
+
+      <IssueFormSheet
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        issue={issue}
+      />
+    </>
+  );
+}
+
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:py-3">
+      <span className="nx:text-muted-foreground nx:text-sm">{label}</span>
+      <div className="nx:text-foreground nx:text-sm nx:font-medium">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function DetailSkeleton() {
+  return (
+    <div className="nx:space-y-6">
+      <div className="nx:space-y-2">
+        <Skeleton className="nx:h-4 nx:w-20" />
+        <Skeleton className="nx:h-7 nx:w-96 nx:max-w-full" />
+      </div>
+      <div className="nx:grid nx:gap-6 nx:lg:grid-cols-3">
+        <Skeleton className="nx:h-48 nx:lg:col-span-2" />
+        <Skeleton className="nx:h-48" />
+      </div>
+    </div>
+  );
+}
+
+// App-local not-found — the polished @nexus/react EmptyState is tracked in #282.
+function NotFound() {
+  return (
+    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
+      <h2 className="nx:typography-heading-medium nx:text-foreground">
+        Issue not found
+      </h2>
+      <p className="nx:text-muted-foreground nx:max-w-sm">
+        This issue doesn&apos;t exist, or may have been removed.
+      </p>
+      <Link
+        to="/m/projects"
+        className="nx:text-primary-subtle-foreground nx:hover:underline"
+      >
+        Back to Issues
+      </Link>
+    </div>
+  );
+}

@@ -32,10 +32,10 @@ import {
   crmKeys,
   fetchContact,
 } from '../../lib/crm-api';
-import { formatCurrency, formatDate } from '../../lib/format';
+import { formatCurrency, formatDate, initials } from '../../lib/format';
 
 import { ContactFormSheet } from './contact-form-sheet';
-import { ContactStatusBadge, initials } from './contact-ui';
+import { ContactStatusBadge } from './contact-ui';
 
 export function ContactDetailRoute() {
   const { id } = useParams({ from: '/app/m/crm/$id' });

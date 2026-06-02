@@ -18,9 +18,7 @@ import {
   crmKeys,
   updateContact,
 } from '../../lib/crm-api';
-import { formatCurrency } from '../../lib/format';
-
-import { initials } from './contact-ui';
+import { formatCurrency, initials } from '../../lib/format';
 
 const COLUMNS: { status: ContactStatus; label: string }[] = [
   { status: 'lead', label: 'Lead' },
