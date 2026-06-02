@@ -1,0 +1,350 @@
+import * as React from 'react';
+
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+
+/**
+ * FieldSet
+ *
+ * A `<fieldset>` grouping related fields — pair with `FieldLegend` for the
+ * group's caption.
+ */
+function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
+  return (
+    <fieldset
+      data-slot="field-set"
+      className={cn(
+        // nexus-allow-numeric: field-group rhythm
+        'nx:flex nx:flex-col nx:gap-6 nx:has-[>[data-slot=checkbox-group]]:gap-3 nx:has-[>[data-slot=radio-group]]:gap-3',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * FieldLegendProps
+ *
+ * Props for the FieldLegend component.
+ */
+interface FieldLegendProps extends React.ComponentProps<'legend'> {
+  /**
+   * Caption emphasis. `legend` is the larger fieldset caption; `label` matches
+   * a field label's size.
+   *
+   * @default 'legend'
+   */
+  variant?: 'legend' | 'label';
+}
+
+/**
+ * FieldLegend
+ *
+ * The caption for a `FieldSet`.
+ */
+function FieldLegend({
+  className,
+  variant = 'legend',
+  ...props
+}: FieldLegendProps) {
+  return (
+    <legend
+      data-slot="field-legend"
+      data-variant={variant}
+      className={cn(
+        // nexus-allow-numeric: legend caption spacing
+        'nx:mb-3 nx:font-medium nx:data-[variant=legend]:text-base nx:data-[variant=label]:text-sm',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * FieldGroup
+ *
+ * A vertical stack of `Field`s. Declares the `field-group` container so a
+ * `Field`'s `responsive` orientation can adapt to the group's width.
+ */
+function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="field-group"
+      className={cn(
+        // nexus-allow-numeric: field-group stack rhythm
+        'nx:group/field-group nx:@container/field-group nx:flex nx:w-full nx:flex-col nx:gap-7 nx:data-[slot=checkbox-group]:gap-3 nx:[&>[data-slot=field-group]]:gap-4',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+const fieldVariants = cva(
+  // nexus-allow-numeric: label/control/description gap
+  'nx:group/field nx:flex nx:w-full nx:gap-3 nx:data-[invalid=true]:text-error-subtle-foreground',
+  {
+    variants: {
+      orientation: {
+        vertical: 'nx:flex-col nx:[&>*]:w-full nx:[&>.sr-only]:w-auto',
+        horizontal:
+          'nx:flex-row nx:items-center nx:[&>[data-slot=field-label]]:flex-auto nx:has-[>[data-slot=field-content]]:items-start nx:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+        responsive:
+          'nx:flex-col nx:@md/field-group:flex-row nx:@md/field-group:items-center nx:[&>*]:w-full nx:@md/field-group:[&>*]:w-auto nx:[&>.sr-only]:w-auto nx:@md/field-group:[&>[data-slot=field-label]]:flex-auto nx:@md/field-group:has-[>[data-slot=field-content]]:items-start nx:@md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+      },
+    },
+    defaultVariants: {
+      orientation: 'vertical',
+    },
+  }
+);
+
+/**
+ * FieldProps
+ *
+ * Props for the Field component.
+ */
+interface FieldProps
+  extends React.ComponentProps<'div'>, VariantProps<typeof fieldVariants> {}
+
+/**
+ * Field
+ *
+ * The labeled-field layout primitive — composes a label, control, description,
+ * and error with their a11y wiring, decoupled from any form library. For the
+ * react-hook-form binding layer, use `Form`, which builds on this structure.
+ *
+ * @example
+ * ```tsx
+ * <Field>
+ *   <FieldLabel htmlFor="email">Email</FieldLabel>
+ *   <Input id="email" type="email" />
+ *   <FieldDescription>We'll never share it.</FieldDescription>
+ * </Field>
+ * ```
+ */
+function Field({ className, orientation = 'vertical', ...props }: FieldProps) {
+  return (
+    <div
+      role="group"
+      data-slot="field"
+      data-orientation={orientation}
+      className={cn(fieldVariants({ orientation }), className)}
+      {...props}
+    />
+  );
+}
+
+/**
+ * FieldContent
+ *
+ * Wraps a control's label + description when they sit beside the control (the
+ * horizontal / checkbox-card layouts).
+ */
+function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="field-content"
+      className={cn(
+        // nexus-allow-numeric: stacked label/description gap
+        'nx:group/field-content nx:flex nx:flex-1 nx:flex-col nx:gap-1.5 nx:leading-snug',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * FieldLabel
+ *
+ * A field's label (wraps `Label`). When it wraps a nested `Field` it becomes a
+ * selectable card (checkbox / radio card) that highlights when its control is
+ * checked.
+ */
+function FieldLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof Label>) {
+  return (
+    <Label
+      data-slot="field-label"
+      className={cn(
+        // nexus-allow-numeric: label gap + card padding
+        'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:leading-snug nx:group-data-[disabled=true]/field:opacity-50',
+        'nx:has-[>[data-slot=field]]:w-full nx:has-[>[data-slot=field]]:flex-col nx:has-[>[data-slot=field]]:rounded-md nx:has-[>[data-slot=field]]:border nx:[&>*]:data-[slot=field]:p-4',
+        'nx:has-data-[state=checked]:border-border-primary nx:has-data-[state=checked]:bg-primary-subtle',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * FieldTitle
+ *
+ * A non-`<label>` title for a field group or card (use when the title isn't
+ * bound to a single control via `htmlFor`).
+ */
+function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="field-label"
+      className={cn(
+        // nexus-allow-numeric: title icon gap
+        'nx:flex nx:w-fit nx:items-center nx:gap-2 nx:text-sm nx:leading-snug nx:font-medium nx:group-data-[disabled=true]/field:opacity-50',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * FieldDescription
+ *
+ * Helper text below a field's control.
+ */
+function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
+  return (
+    <p
+      data-slot="field-description"
+      className={cn(
+        'nx:text-sm nx:leading-normal nx:font-normal nx:text-muted-foreground nx:group-has-[[data-orientation=horizontal]]/field:text-balance',
+        'nx:last:mt-0 nx:nth-last-2:-mt-1 nx:[[data-variant=legend]+&]:-mt-1.5',
+        'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * FieldSeparator
+ *
+ * A divider between fields, optionally with centered content (e.g. "OR").
+ */
+function FieldSeparator({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="field-separator"
+      data-content={!!children}
+      className={cn(
+        // nexus-allow-numeric: separator inset
+        'nx:relative nx:-my-2 nx:h-5 nx:text-sm nx:group-data-[variant=outline]/field-group:-mb-2',
+        className
+      )}
+      {...props}
+    >
+      <Separator className="nx:absolute nx:inset-0 nx:top-1/2" />
+      {children && (
+        <span
+          data-slot="field-separator-content"
+          // nexus-allow-numeric: separator label inset
+          className="nx:relative nx:mx-auto nx:block nx:w-fit nx:bg-background nx:px-2 nx:text-muted-foreground"
+        >
+          {children}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * FieldErrorProps
+ *
+ * Props for the FieldError component.
+ */
+interface FieldErrorProps extends React.ComponentProps<'div'> {
+  /**
+   * Validation errors to render. Deduplicated by message; a single error shows
+   * inline, multiple render as a list. Ignored when `children` is provided.
+   */
+  errors?: Array<{ message?: string } | undefined>;
+}
+
+/**
+ * FieldError
+ *
+ * The error message(s) for a field. Renders nothing when there's no content.
+ */
+function FieldError({
+  className,
+  children,
+  errors,
+  ...props
+}: FieldErrorProps) {
+  const content = React.useMemo(() => {
+    if (children) {
+      return children;
+    }
+
+    if (!errors?.length) {
+      return null;
+    }
+
+    const uniqueErrors = [
+      ...new Map(errors.map((error) => [error?.message, error])).values(),
+    ];
+
+    if (uniqueErrors.length === 1) {
+      return uniqueErrors[0]?.message;
+    }
+
+    return (
+      // nexus-allow-numeric: error list inset
+      <ul className="nx:ml-4 nx:flex nx:list-disc nx:flex-col nx:gap-1">
+        {uniqueErrors.map(
+          (error, index) =>
+            error?.message && <li key={index}>{error.message}</li>
+        )}
+      </ul>
+    );
+  }, [children, errors]);
+
+  if (!content) {
+    return null;
+  }
+
+  return (
+    <div
+      role="alert"
+      data-slot="field-error"
+      className={cn(
+        'nx:text-sm nx:font-normal nx:text-error-subtle-foreground',
+        className
+      )}
+      {...props}
+    >
+      {content}
+    </div>
+  );
+}
+
+export {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  type FieldErrorProps,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  type FieldLegendProps,
+  type FieldProps,
+  FieldSeparator,
+  FieldSet,
+  FieldTitle,
+  fieldVariants,
+};
