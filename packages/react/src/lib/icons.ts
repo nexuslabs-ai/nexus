@@ -18,8 +18,10 @@ export { IconLoader2 } from '@tabler/icons-react';
 // Navigation
 export {
   IconChevronDown,
+  IconChevronLeft,
   IconChevronRight,
   IconChevronUp,
+  IconDots,
   IconLayoutSidebar,
 } from '@tabler/icons-react';
 

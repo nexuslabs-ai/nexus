@@ -49,6 +49,7 @@
         "KeyboardInteraction": ["TypeInteraction"]
       }
     },
+    { "name": "Pagination", "showcase": "AllVariants" },
     {
       "name": "Popover",
       "showcase": "AllVariants",
