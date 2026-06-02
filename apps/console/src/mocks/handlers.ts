@@ -2,9 +2,15 @@ import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
 import type { User } from '../lib/auth-api';
 import type { ActivityItem, Contact, ContactInput } from '../lib/crm-api';
+import type {
+  Conversation,
+  ConversationDetail,
+  ConversationStatus,
+} from '../lib/inbox-api';
 import type { Issue, IssueInput } from '../lib/projects-api';
 
 import { CONTACTS } from './crm-fixtures';
+import { CONVERSATIONS } from './inbox-fixtures';
 import { ISSUES } from './projects-fixtures';
 
 /** The fixed demo OTP — shown as a hint on the verify screen. */
@@ -77,6 +83,15 @@ const store: Contact[] = CONTACTS.map((c) => ({ ...c }));
 type StoredIssue = Issue & { description: string };
 const issuesStore: StoredIssue[] = ISSUES.map((i) => ({ ...i }));
 let nextIssueSeq = 125; // one past the last fixture key (ATL-124)
+
+// In-memory Inbox store (same session lifecycle). Holds the full thread; the
+// list endpoint projects each to its lean preview shape, the detail endpoint
+// returns the messages. The messages array is copied so replies don't mutate the
+// shared fixture.
+const conversationsStore: ConversationDetail[] = CONVERSATIONS.map((c) => ({
+  ...c,
+  messages: c.messages.map((m) => ({ ...m })),
+}));
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -246,4 +261,87 @@ export const handlers: RequestHandler[] = [
     issue.updatedAt = new Date().toISOString().slice(0, 10);
     return HttpResponse.json({ issue });
   }),
+
+  // --- Inbox ---
+  // The conversation list returns the lean `Conversation` shape: base fields plus
+  // a `preview` + `lastMessageAt` derived from the most recent message. The
+  // messages, customer email, and assignee are detail-only, so they're projected
+  // away here. Sorted newest-first by that last-message time.
+  http.get('/api/inbox/conversations', async () => {
+    await delay(500);
+    const conversations: Conversation[] = conversationsStore
+      .map(({ id, customer, subject, status, unread, messages }) => {
+        const last = messages[messages.length - 1];
+        return {
+          id,
+          customer,
+          subject,
+          status,
+          unread,
+          preview: last?.body ?? '',
+          lastMessageAt: last?.at ?? '',
+        };
+      })
+      .sort((a, b) => b.lastMessageAt.localeCompare(a.lastMessageAt));
+    return HttpResponse.json({ conversations });
+  }),
+
+  // A single conversation incl. its full message thread (404 when unknown).
+  http.get('/api/inbox/conversations/:id', async ({ params }) => {
+    await delay(300);
+    const conversation = conversationsStore.find((c) => c.id === params.id);
+    if (!conversation) {
+      return HttpResponse.json(
+        { message: 'Conversation not found.' },
+        { status: 404 }
+      );
+    }
+    return HttpResponse.json({ conversation });
+  }),
+
+  // Reply: append an agent message (signed by the assignee), clear the unread
+  // flag, and return the updated thread.
+  http.post(
+    '/api/inbox/conversations/:id/reply',
+    async ({ params, request }) => {
+      await delay(300);
+      const conversation = conversationsStore.find((c) => c.id === params.id);
+      if (!conversation) {
+        return HttpResponse.json(
+          { message: 'Conversation not found.' },
+          { status: 404 }
+        );
+      }
+      const { body } = (await request.json()) as { body: string };
+      conversation.messages.push({
+        id: crypto.randomUUID(),
+        author: 'agent',
+        authorName: conversation.assignee,
+        body,
+        at: new Date().toISOString(),
+      });
+      conversation.unread = false;
+      return HttpResponse.json({ conversation });
+    }
+  ),
+
+  // Status change: set the lifecycle status in place, return the thread.
+  http.patch(
+    '/api/inbox/conversations/:id/status',
+    async ({ params, request }) => {
+      await delay(300);
+      const conversation = conversationsStore.find((c) => c.id === params.id);
+      if (!conversation) {
+        return HttpResponse.json(
+          { message: 'Conversation not found.' },
+          { status: 404 }
+        );
+      }
+      const { status } = (await request.json()) as {
+        status: ConversationStatus;
+      };
+      conversation.status = status;
+      return HttpResponse.json({ conversation });
+    }
+  ),
 ];
