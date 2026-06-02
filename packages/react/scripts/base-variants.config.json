@@ -29,6 +29,7 @@
     { "name": "ButtonGroup", "showcase": "AllVariants" },
     { "name": "Card", "showcase": "AllVariants" },
     { "name": "Checkbox", "showcase": "AllVariants" },
+    { "name": "Collapsible", "showcase": "AllVariants" },
     {
       "name": "Dialog",
       "showcase": "AllVariants",
