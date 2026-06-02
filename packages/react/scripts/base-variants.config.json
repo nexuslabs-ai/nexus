@@ -23,6 +23,7 @@
     },
     { "name": "Avatar", "showcase": "AllSizes" },
     { "name": "Badge", "showcase": "AllVariants" },
+    { "name": "Breadcrumb", "showcase": "AllVariants" },
     { "name": "Button", "showcase": "AllVariants" },
     { "name": "Card", "showcase": "AllVariants" },
     { "name": "Checkbox", "showcase": "AllVariants" },
