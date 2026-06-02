@@ -1,7 +1,7 @@
 import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
 import type { User } from '../lib/auth-api';
-import type { ActivityItem, Contact } from '../lib/crm-api';
+import type { ActivityItem, Contact, ContactInput } from '../lib/crm-api';
 
 import { CONTACTS } from './crm-fixtures';
 
@@ -64,6 +64,11 @@ function buildActivity(contact: Contact): ActivityItem[] {
   ];
 }
 
+// In-memory CRM store, seeded from the fixtures. Create/edit mutate it so new
+// and edited contacts persist across requests within a session (it resets on a
+// full page reload — there is no real backend).
+const store: Contact[] = CONTACTS.map((c) => ({ ...c }));
+
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
  * credentials check (login/signup) hands the email to the OTP step, which is
@@ -114,13 +119,13 @@ export const handlers: RequestHandler[] = [
   // client-side. The short delay lets the loading Skeleton render in the demo.
   http.get('/api/crm/contacts', async () => {
     await delay(500);
-    return HttpResponse.json({ contacts: CONTACTS });
+    return HttpResponse.json({ contacts: store });
   }),
 
   // A single contact + its synthesised activity timeline (404 when unknown).
   http.get('/api/crm/contacts/:id', async ({ params }) => {
     await delay(300);
-    const contact = CONTACTS.find((c) => c.id === params.id);
+    const contact = store.find((c) => c.id === params.id);
     if (!contact) {
       return HttpResponse.json(
         { message: 'Contact not found.' },
@@ -130,5 +135,32 @@ export const handlers: RequestHandler[] = [
     return HttpResponse.json({
       contact: { ...contact, activity: buildActivity(contact) },
     });
+  }),
+
+  // Create: the server assigns the id and the last-contacted date (today).
+  http.post('/api/crm/contacts', async ({ request }) => {
+    await delay(300);
+    const input = (await request.json()) as ContactInput;
+    const contact: Contact = {
+      ...input,
+      id: crypto.randomUUID(),
+      lastContacted: new Date().toISOString().slice(0, 10),
+    };
+    store.unshift(contact);
+    return HttpResponse.json({ contact }, { status: 201 });
+  }),
+
+  // Edit: patch the mutable fields in place; id + lastContacted are preserved.
+  http.patch('/api/crm/contacts/:id', async ({ params, request }) => {
+    await delay(300);
+    const contact = store.find((c) => c.id === params.id);
+    if (!contact) {
+      return HttpResponse.json(
+        { message: 'Contact not found.' },
+        { status: 404 }
+      );
+    }
+    Object.assign(contact, (await request.json()) as ContactInput);
+    return HttpResponse.json({ contact });
   }),
 ];
