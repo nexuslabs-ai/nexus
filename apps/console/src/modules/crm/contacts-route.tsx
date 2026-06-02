@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
-import { fetchContacts } from '../../lib/crm-api';
+import { crmKeys, fetchContacts } from '../../lib/crm-api';
 
 import { ContactFormSheet } from './contact-form-sheet';
 import { ContactsBoard } from './contacts-board';
@@ -21,7 +21,7 @@ const crmRoute = getRouteApi('/app/m/crm');
 
 export function ContactsRoute() {
   const { data, isPending, isError } = useQuery({
-    queryKey: ['crm', 'contacts'],
+    queryKey: crmKeys.contacts,
     queryFn: fetchContacts,
   });
   const contacts = data?.contacts;

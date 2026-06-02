@@ -29,6 +29,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import {
   type ActivityKind,
   type ContactDetail,
+  crmKeys,
   fetchContact,
 } from '../../lib/crm-api';
 import { formatCurrency, formatDate } from '../../lib/format';
@@ -39,7 +40,7 @@ import { ContactStatusBadge, initials } from './contact-ui';
 export function ContactDetailRoute() {
   const { id } = useParams({ from: '/app/m/crm/$id' });
   const { data, isPending, isError } = useQuery({
-    queryKey: ['crm', 'contact', id],
+    queryKey: crmKeys.contact(id),
     queryFn: () => fetchContact(id),
   });
 

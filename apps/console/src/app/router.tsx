@@ -84,10 +84,11 @@ const appearanceRoute = createRoute({
 const crmContactsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/m/crm',
-  // `.default` (not `.catch`) keeps the param optional for navigation, so the
-  // existing `<Link to="/m/crm">` call sites don't need to pass `search`.
+  // `.default` keeps the param optional for navigation (existing `<Link
+  // to="/m/crm">` calls don't pass `search`); `.catch` also recovers an invalid
+  // value (e.g. a stale `?view=foo`) to 'table' instead of throwing a search error.
   validateSearch: z.object({
-    view: z.enum(['table', 'board']).default('table'),
+    view: z.enum(['table', 'board']).default('table').catch('table'),
   }),
   component: ContactsRoute,
 });

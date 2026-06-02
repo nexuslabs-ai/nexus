@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   type Contact,
   type ContactStatus,
+  crmKeys,
   updateContact,
 } from '../../lib/crm-api';
 import { formatCurrency } from '../../lib/format';
@@ -28,7 +29,6 @@ const COLUMNS: { status: ContactStatus; label: string }[] = [
 ];
 
 type ContactsCache = { contacts: Contact[] };
-const CONTACTS_KEY = ['crm', 'contacts'];
 
 /**
  * Kanban view of the contacts: three status columns, draggable cards. Dropping a
@@ -59,9 +59,11 @@ export function ContactsBoard({ contacts }: { contacts: Contact[] }) {
         value: contact.value,
       }),
     onMutate: async ({ contact, status }) => {
-      await queryClient.cancelQueries({ queryKey: CONTACTS_KEY });
-      const previous = queryClient.getQueryData<ContactsCache>(CONTACTS_KEY);
-      queryClient.setQueryData<ContactsCache>(CONTACTS_KEY, (old) =>
+      await queryClient.cancelQueries({ queryKey: crmKeys.contacts });
+      const previous = queryClient.getQueryData<ContactsCache>(
+        crmKeys.contacts
+      );
+      queryClient.setQueryData<ContactsCache>(crmKeys.contacts, (old) =>
         old
           ? {
               contacts: old.contacts.map((c) =>
@@ -74,10 +76,10 @@ export function ContactsBoard({ contacts }: { contacts: Contact[] }) {
     },
     onError: (_error, _vars, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(CONTACTS_KEY, context.previous);
+        queryClient.setQueryData(crmKeys.contacts, context.previous);
       }
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['crm'] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: crmKeys.all }),
   });
 
   const handleDragEnd = (event: DragEndEvent) => {
