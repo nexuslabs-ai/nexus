@@ -17,6 +17,8 @@ import { contactsSearchSchema } from '../modules/crm/contacts-search';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
+import { IssueDetailRoute } from '../modules/projects/issue-detail-route';
+import { IssuesRoute } from '../modules/projects/issues-route';
 
 import { AuthLayout } from './auth-layout';
 import { NotFound } from './not-found';
@@ -95,6 +97,19 @@ const crmContactDetailRoute = createRoute({
   component: ContactDetailRoute,
 });
 
+// Projects / Issues (Phase 3a). Static `/m/projects` outranks `/m/$module`.
+const projectsIssuesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/projects',
+  component: IssuesRoute,
+});
+
+const projectsIssueDetailRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/projects/$id',
+  component: IssueDetailRoute,
+});
+
 // One shared placeholder backs every not-yet-built module.
 const moduleRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -145,6 +160,8 @@ const routeTree = rootRoute.addChildren([
     appearanceRoute,
     crmContactsRoute,
     crmContactDetailRoute,
+    projectsIssuesRoute,
+    projectsIssueDetailRoute,
     moduleRoute,
   ]),
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),

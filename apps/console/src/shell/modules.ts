@@ -22,7 +22,12 @@ import {
 export const MODULE_ITEMS = [
   { label: 'Dashboard', module: 'dashboard', icon: IconLayoutDashboard },
   { label: 'CRM', module: 'crm', icon: IconUsers, route: '/m/crm' },
-  { label: 'Projects', module: 'projects', icon: IconBriefcase },
+  {
+    label: 'Projects',
+    module: 'projects',
+    icon: IconBriefcase,
+    route: '/m/projects',
+  },
   { label: 'Inbox', module: 'inbox', icon: IconInbox },
   { label: 'Billing', module: 'billing', icon: IconCreditCard },
   { label: 'Analytics', module: 'analytics', icon: IconChartBar },

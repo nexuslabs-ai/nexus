@@ -2,8 +2,10 @@ import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
 import type { User } from '../lib/auth-api';
 import type { ActivityItem, Contact, ContactInput } from '../lib/crm-api';
+import type { Issue, IssueInput } from '../lib/projects-api';
 
 import { CONTACTS } from './crm-fixtures';
+import { ISSUES } from './projects-fixtures';
 
 /** The fixed demo OTP — shown as a hint on the verify screen. */
 const OTP_CODE = '123456';
@@ -68,6 +70,13 @@ function buildActivity(contact: Contact): ActivityItem[] {
 // and edited contacts persist across requests within a session (it resets on a
 // full page reload — there is no real backend).
 const store: Contact[] = CONTACTS.map((c) => ({ ...c }));
+
+// In-memory Projects store (same session lifecycle as the CRM store). Records
+// carry the long-form `description` the detail endpoint returns. New issues draw
+// a fresh `ATL-` key from a running sequence seeded just past the fixtures.
+type StoredIssue = Issue & { description: string };
+const issuesStore: StoredIssue[] = ISSUES.map((i) => ({ ...i }));
+let nextIssueSeq = 125; // one past the last fixture key (ATL-124)
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -162,5 +171,79 @@ export const handlers: RequestHandler[] = [
     }
     Object.assign(contact, (await request.json()) as ContactInput);
     return HttpResponse.json({ contact });
+  }),
+
+  // --- Projects ---
+  // The issue list returns the `Issue` shape only — `description` is detail-only,
+  // so it's projected away here. The DataTable sorts/filters/paginates client-side.
+  http.get('/api/projects/issues', async () => {
+    await delay(500);
+    const issues: Issue[] = issuesStore.map(
+      ({
+        id,
+        key,
+        title,
+        status,
+        priority,
+        assignee,
+        createdAt,
+        updatedAt,
+      }) => ({
+        id,
+        key,
+        title,
+        status,
+        priority,
+        assignee,
+        createdAt,
+        updatedAt,
+      })
+    );
+    return HttpResponse.json({ issues });
+  }),
+
+  // A single issue incl. its long-form description (404 when unknown).
+  http.get('/api/projects/issues/:id', async ({ params }) => {
+    await delay(300);
+    const issue = issuesStore.find((i) => i.id === params.id);
+    if (!issue) {
+      return HttpResponse.json(
+        { message: 'Issue not found.' },
+        { status: 404 }
+      );
+    }
+    return HttpResponse.json({ issue });
+  }),
+
+  // Create: the server assigns the id, the ATL- key, and the timestamps.
+  http.post('/api/projects/issues', async ({ request }) => {
+    await delay(300);
+    const input = (await request.json()) as IssueInput;
+    const today = new Date().toISOString().slice(0, 10);
+    const issue: StoredIssue = {
+      ...input,
+      id: crypto.randomUUID(),
+      key: `ATL-${nextIssueSeq++}`,
+      createdAt: today,
+      updatedAt: today,
+    };
+    issuesStore.unshift(issue);
+    return HttpResponse.json({ issue }, { status: 201 });
+  }),
+
+  // Edit: patch the mutable fields in place + bump updatedAt; id/key/createdAt
+  // are preserved.
+  http.patch('/api/projects/issues/:id', async ({ params, request }) => {
+    await delay(300);
+    const issue = issuesStore.find((i) => i.id === params.id);
+    if (!issue) {
+      return HttpResponse.json(
+        { message: 'Issue not found.' },
+        { status: 404 }
+      );
+    }
+    Object.assign(issue, (await request.json()) as IssueInput);
+    issue.updatedAt = new Date().toISOString().slice(0, 10);
+    return HttpResponse.json({ issue });
   }),
 ];

@@ -20,17 +20,17 @@ import {
 import { Link } from '@tanstack/react-router';
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
-import type { Contact } from '../../lib/crm-api';
-import { formatCurrency, formatDate, initials } from '../../lib/format';
+import { formatDate, initials } from '../../lib/format';
+import type { Issue } from '../../lib/projects-api';
 
-import { ContactStatusBadge } from './contact-ui';
+import { IssuePriorityBadge, IssueStatusBadge } from './issue-ui';
 
 /** A clickable column header that cycles the column's sort and shows its state. */
 function SortHeader({
   column,
   children,
 }: {
-  column: Column<Contact, unknown>;
+  column: Column<Issue, unknown>;
   children: ReactNode;
 }) {
   const sorted = column.getIsSorted();
@@ -53,7 +53,7 @@ function SortHeader({
   );
 }
 
-export const contactColumns: ColumnDef<Contact>[] = [
+export const issueColumns: ColumnDef<Issue>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -73,84 +73,83 @@ export const contactColumns: ColumnDef<Contact>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label={`Select ${row.original.name}`}
+        aria-label={`Select ${row.original.key}`}
       />
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'name',
-    header: ({ column }) => <SortHeader column={column}>Name</SortHeader>,
+    accessorKey: 'key',
+    header: ({ column }) => <SortHeader column={column}>ID</SortHeader>,
     cell: ({ row }) => (
-      <Link
-        to="/m/crm/$id"
-        params={{ id: row.original.id }}
-        className="nx:text-foreground nx:font-medium nx:hover:underline"
-      >
-        {row.original.name}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: 'company',
-    header: ({ column }) => <SortHeader column={column}>Company</SortHeader>,
-  },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => <SortHeader column={column}>Status</SortHeader>,
-    cell: ({ row }) => <ContactStatusBadge status={row.original.status} />,
-  },
-  {
-    accessorKey: 'owner',
-    header: 'Owner',
-    cell: ({ row }) => (
-      <div className="nx:flex nx:items-center nx:gap-2">
-        <Avatar className="nx:size-6">
-          <AvatarFallback className="nx:text-xs">
-            {initials(row.original.owner)}
-          </AvatarFallback>
-        </Avatar>
-        <span>{row.original.owner}</span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'value',
-    header: ({ column }) => <SortHeader column={column}>Open value</SortHeader>,
-    cell: ({ row }) => (
-      <span className="nx:tabular-nums">
-        {formatCurrency(row.original.value)}
+      <span className="nx:text-muted-foreground nx:text-sm nx:tabular-nums">
+        {row.original.key}
       </span>
     ),
   },
   {
-    accessorKey: 'lastContacted',
-    header: ({ column }) => (
-      <SortHeader column={column}>Last contacted</SortHeader>
+    accessorKey: 'title',
+    header: ({ column }) => <SortHeader column={column}>Title</SortHeader>,
+    cell: ({ row }) => (
+      <Link
+        to="/m/projects/$id"
+        params={{ id: row.original.id }}
+        className="nx:text-foreground nx:font-medium nx:hover:underline"
+      >
+        {row.original.title}
+      </Link>
     ),
+  },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => <SortHeader column={column}>Status</SortHeader>,
+    cell: ({ row }) => <IssueStatusBadge status={row.original.status} />,
+  },
+  {
+    accessorKey: 'priority',
+    header: ({ column }) => <SortHeader column={column}>Priority</SortHeader>,
+    cell: ({ row }) => <IssuePriorityBadge priority={row.original.priority} />,
+  },
+  {
+    accessorKey: 'assignee',
+    header: 'Assignee',
+    cell: ({ row }) => (
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <Avatar className="nx:size-6">
+          <AvatarFallback className="nx:text-xs">
+            {initials(row.original.assignee)}
+          </AvatarFallback>
+        </Avatar>
+        <span>{row.original.assignee}</span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'updatedAt',
+    header: ({ column }) => <SortHeader column={column}>Updated</SortHeader>,
     cell: ({ row }) => (
       <span className="nx:text-muted-foreground">
-        {formatDate(row.original.lastContacted)}
+        {formatDate(row.original.updatedAt)}
       </span>
     ),
   },
   {
     id: 'actions',
-    cell: ({ row }) => <RowActions contact={row.original} />,
+    cell: ({ row }) => <RowActions issue={row.original} />,
     enableSorting: false,
   },
 ];
 
-function RowActions({ contact }: { contact: Contact }) {
-  const copy = (label: string, value: string) => {
+function RowActions({ issue }: { issue: Issue }) {
+  const copyId = () => {
     if (!navigator.clipboard) {
       toast.error('Clipboard is unavailable in this context.');
       return;
     }
     navigator.clipboard
-      .writeText(value)
-      .then(() => toast.success(`${label} copied`))
-      .catch(() => toast.error(`Couldn't copy ${label.toLowerCase()}`));
+      .writeText(issue.key)
+      .then(() => toast.success('Issue ID copied'))
+      .catch(() => toast.error("Couldn't copy issue ID"));
   };
 
   return (
@@ -159,23 +158,18 @@ function RowActions({ contact }: { contact: Contact }) {
         <Button
           variant="ghost"
           size="sm"
-          aria-label={`Actions for ${contact.name}`}
+          aria-label={`Actions for ${issue.key}`}
         >
           <IconDots />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link to="/m/crm/$id" params={{ id: contact.id }}>
+          <Link to="/m/projects/$id" params={{ id: issue.id }}>
             View details
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => copy('Email', contact.email)}>
-          Copy email
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => copy('Contact ID', contact.id)}>
-          Copy contact ID
-        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={copyId}>Copy issue ID</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
