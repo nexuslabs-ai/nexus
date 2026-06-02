@@ -185,7 +185,7 @@ function DropdownMenuContent({
           'nx:min-w-[8rem] nx:overflow-x-hidden nx:overflow-y-auto',
           'nx:rounded-md nx:border nx:border-border-default',
           // nexus-allow-numeric: popover chrome (sub-canonical inner padding)
-          'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-md',
+          'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
