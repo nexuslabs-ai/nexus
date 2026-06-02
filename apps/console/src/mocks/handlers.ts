@@ -1,6 +1,8 @@
-import { http, HttpResponse, type RequestHandler } from 'msw';
+import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
 import type { User } from '../lib/auth-api';
+
+import { CONTACTS } from './crm-fixtures';
 
 /** The fixed demo OTP — shown as a hint on the verify screen. */
 const OTP_CODE = '123456';
@@ -21,9 +23,9 @@ type SignupBody = { name?: string; email?: string; password?: string };
 type VerifyBody = { email?: string; code?: string };
 
 /**
- * MSW auth handlers — there is no real backend. The flow is two-step: a
+ * MSW request handlers — there is no real backend. Auth is a two-step flow: a
  * credentials check (login/signup) hands the email to the OTP step, which is
- * what actually authenticates and returns the user.
+ * what actually authenticates and returns the user. CRM handlers follow.
  */
 export const handlers: RequestHandler[] = [
   // Credentials check — no real validation (any email + an 8+ char password
@@ -64,4 +66,12 @@ export const handlers: RequestHandler[] = [
 
   // Always acknowledge — never reveal whether an account exists for the email.
   http.post('/api/auth/forgot', async () => HttpResponse.json({ ok: true })),
+
+  // --- CRM ---
+  // Returns the full contact list; the DataTable sorts/filters/paginates
+  // client-side. The short delay lets the loading Skeleton render in the demo.
+  http.get('/api/crm/contacts', async () => {
+    await delay(500);
+    return HttpResponse.json({ contacts: CONTACTS });
+  }),
 ];
