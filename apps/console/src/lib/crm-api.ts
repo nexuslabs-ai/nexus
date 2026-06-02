@@ -21,11 +21,13 @@ export type Contact = {
   lastContacted: string;
 };
 
-export async function fetchContacts(): Promise<Contact[]> {
+// Returns the server envelope (mirrors the wire shape, like the auth-api
+// wrappers) so a future server-side `{ contacts, totalCount }` for paging is an
+// additive change here, not a new return type.
+export async function fetchContacts(): Promise<{ contacts: Contact[] }> {
   const res = await fetch('/api/crm/contacts');
   if (!res.ok) {
     throw new Error('Failed to load contacts. Please try again.');
   }
-  const data = (await res.json()) as { contacts: Contact[] };
-  return data.contacts;
+  return (await res.json()) as { contacts: Contact[] };
 }

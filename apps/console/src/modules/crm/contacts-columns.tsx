@@ -167,8 +167,14 @@ export const contactColumns: ColumnDef<Contact>[] = [
 
 function RowActions({ contact }: { contact: Contact }) {
   const copy = (label: string, value: string) => {
-    void navigator.clipboard?.writeText(value);
-    toast.success(`${label} copied`);
+    if (!navigator.clipboard) {
+      toast.error('Clipboard is unavailable in this context.');
+      return;
+    }
+    navigator.clipboard
+      .writeText(value)
+      .then(() => toast.success(`${label} copied`))
+      .catch(() => toast.error(`Couldn't copy ${label.toLowerCase()}`));
   };
 
   return (

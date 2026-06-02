@@ -34,20 +34,23 @@ import {
  * Sort/filter/select/paginate only — column reorder/visibility/virtualization
  * stay out until a consumer actually needs them.
  */
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData> {
+  columns: ColumnDef<TData>[];
   data: TData[];
   /** Column id to wire the toolbar search box to (omit to hide the box). */
   filterColumn?: string;
   filterPlaceholder?: string;
+  /** Rows per page (default 10). */
+  pageSize?: number;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
   columns,
   data,
   filterColumn,
   filterPlaceholder,
-}: DataTableProps<TData, TValue>) {
+  pageSize = 10,
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -55,6 +58,7 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
+    initialState: { pagination: { pageSize } },
     state: { sorting, columnFilters, rowSelection },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -71,6 +75,9 @@ export function DataTable<TData, TValue>({
   const filterControl = filterColumn
     ? table.getColumn(filterColumn)
     : undefined;
+  // The select column is opt-in (domain-supplied), so only summarise selection
+  // when a consumer actually wires one — otherwise show a plain row count.
+  const enableSelection = columns.some((column) => column.id === 'select');
 
   return (
     <div className="nx:space-y-4">
@@ -136,7 +143,9 @@ export function DataTable<TData, TValue>({
       {/* App-local pager — the polished @nexus/react Pagination is tracked in #281. */}
       <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
         <p className="nx:text-muted-foreground nx:text-sm">
-          {selectedCount} of {totalCount} row(s) selected.
+          {enableSelection
+            ? `${selectedCount} of ${totalCount} row(s) selected.`
+            : `${totalCount} row(s)`}
         </p>
         <div className="nx:flex nx:items-center nx:gap-3">
           <span className="nx:text-muted-foreground nx:text-sm">

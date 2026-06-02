@@ -8,11 +8,11 @@ import { fetchContacts } from '../../lib/crm-api';
 import { contactColumns } from './contacts-columns';
 
 export function ContactsRoute() {
-  const {
-    data: contacts,
-    isPending,
-    isError,
-  } = useQuery({ queryKey: ['crm', 'contacts'], queryFn: fetchContacts });
+  const { data, isPending, isError } = useQuery({
+    queryKey: ['crm', 'contacts'],
+    queryFn: fetchContacts,
+  });
+  const contacts = data?.contacts;
 
   return (
     <div className="nx:space-y-6 nx:p-6">
