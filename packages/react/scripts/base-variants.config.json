@@ -41,6 +41,7 @@
         "Disabled": ["WithDisabledItems"]
       }
     },
+    { "name": "EmptyState", "showcase": "AllVariants" },
     {
       "name": "Input",
       "showcase": "AllVariants",
