@@ -49,6 +49,7 @@
         "KeyboardInteraction": ["TypeInteraction"]
       }
     },
+    { "name": "Kbd", "showcase": "AllVariants" },
     { "name": "Pagination", "showcase": "AllVariants" },
     {
       "name": "Popover",
