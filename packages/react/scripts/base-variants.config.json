@@ -45,6 +45,7 @@
       }
     },
     { "name": "EmptyState", "showcase": "AllVariants" },
+    { "name": "Field", "showcase": "AllVariants" },
     {
       "name": "Input",
       "showcase": "AllVariants",
