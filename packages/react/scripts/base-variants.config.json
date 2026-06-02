@@ -21,6 +21,7 @@
         "KeyboardInteraction": ["EscapeCancels"]
       }
     },
+    { "name": "AspectRatio", "showcase": "AllVariants" },
     { "name": "Avatar", "showcase": "AllSizes" },
     { "name": "Badge", "showcase": "AllVariants" },
     { "name": "Breadcrumb", "showcase": "AllVariants" },
