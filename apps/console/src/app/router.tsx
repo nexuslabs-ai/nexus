@@ -11,6 +11,7 @@ import { LoginRoute } from '../modules/auth/login-route';
 import { SignupRoute } from '../modules/auth/signup-route';
 import { VerifyRoute } from '../modules/auth/verify-route';
 import { ComingSoon } from '../modules/coming-soon';
+import { ContactDetailRoute } from '../modules/crm/contact-detail-route';
 import { ContactsRoute } from '../modules/crm/contacts-route';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
@@ -86,6 +87,12 @@ const crmContactsRoute = createRoute({
   component: ContactsRoute,
 });
 
+const crmContactDetailRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/crm/$id',
+  component: ContactDetailRoute,
+});
+
 // One shared placeholder backs every not-yet-built module.
 const moduleRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -135,6 +142,7 @@ const routeTree = rootRoute.addChildren([
     scenesRoute,
     appearanceRoute,
     crmContactsRoute,
+    crmContactDetailRoute,
     moduleRoute,
   ]),
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),

@@ -9,6 +9,11 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 60_000,
       refetchOnWindowFocus: false,
+      // The mock API is deterministic — a request either succeeds or 404s, and a
+      // retry never changes that. Skipping retries makes error states (e.g. an
+      // unknown contact id) render instantly instead of after react-query's
+      // backoff. Revisit when a real, transient-failure-prone backend lands.
+      retry: false,
     },
   },
 });

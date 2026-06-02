@@ -1,6 +1,7 @@
 import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
 import type { User } from '../lib/auth-api';
+import type { ActivityItem, Contact } from '../lib/crm-api';
 
 import { CONTACTS } from './crm-fixtures';
 
@@ -21,6 +22,47 @@ function userFromEmail(email: string): User {
 type LoginBody = { email?: string; password?: string };
 type SignupBody = { name?: string; email?: string; password?: string };
 type VerifyBody = { email?: string; code?: string };
+
+/** Shift an ISO date (YYYY-MM-DD) back by `days`, returning the same format. */
+function isoMinusDays(iso: string, days: number): string {
+  const d = new Date(iso);
+  d.setDate(d.getDate() - days);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * A deterministic activity timeline synthesised from the contact's own fields
+ * (no stored events) — newest first, dated by offsets from the last touchpoint.
+ */
+function buildActivity(contact: Contact): ActivityItem[] {
+  const { id, name, owner, status, lastContacted } = contact;
+  return [
+    {
+      id: `${id}-a1`,
+      kind: 'email',
+      date: lastContacted,
+      summary: `Logged an email with ${name}`,
+    },
+    {
+      id: `${id}-a2`,
+      kind: 'note',
+      date: isoMinusDays(lastContacted, 9),
+      summary: `${owner} added a note`,
+    },
+    {
+      id: `${id}-a3`,
+      kind: 'status',
+      date: isoMinusDays(lastContacted, 34),
+      summary: `Status set to ${status}`,
+    },
+    {
+      id: `${id}-a4`,
+      kind: 'created',
+      date: isoMinusDays(lastContacted, 96),
+      summary: `Created and assigned to ${owner}`,
+    },
+  ];
+}
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -73,5 +115,20 @@ export const handlers: RequestHandler[] = [
   http.get('/api/crm/contacts', async () => {
     await delay(500);
     return HttpResponse.json({ contacts: CONTACTS });
+  }),
+
+  // A single contact + its synthesised activity timeline (404 when unknown).
+  http.get('/api/crm/contacts/:id', async ({ params }) => {
+    await delay(300);
+    const contact = CONTACTS.find((c) => c.id === params.id);
+    if (!contact) {
+      return HttpResponse.json(
+        { message: 'Contact not found.' },
+        { status: 404 }
+      );
+    }
+    return HttpResponse.json({
+      contact: { ...contact, activity: buildActivity(contact) },
+    });
   }),
 ];
