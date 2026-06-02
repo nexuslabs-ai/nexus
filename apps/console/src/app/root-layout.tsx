@@ -1,13 +1,14 @@
-import { SidebarInset, SidebarProvider, Toaster } from '@nexus/react';
+import { SidebarInset, SidebarProvider } from '@nexus/react';
 import { Outlet } from '@tanstack/react-router';
 
 import { AppSidebar } from '../shell/app-sidebar';
 import { Topbar } from '../shell/topbar';
 
 /**
- * The app shell rendered by the root route: collapsible sidebar + top bar with
- * the active module's content in the inset. Mounted once, so the sidebar and
- * top bar persist across navigations.
+ * The authenticated app shell, rendered by the `_app` pathless layout route
+ * (which guards it behind a session): collapsible sidebar + top bar with the
+ * active module's content in the inset. Mounted once, so the sidebar and top
+ * bar persist across navigations.
  */
 export function RootLayout() {
   return (
@@ -22,7 +23,6 @@ export function RootLayout() {
           <Outlet />
         </main>
       </SidebarInset>
-      <Toaster />
     </SidebarProvider>
   );
 }

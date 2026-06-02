@@ -84,13 +84,14 @@ apps/console/src/
 
 ## Phased roadmap (each phase = a PR)
 
-| Phase                         | Deliverable                                                                                                                                                            |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **0 · Foundation**            | Rename → `apps/console`; TanStack Router + app shell (sidebar/topbar) + `ThemeProvider` + TanStack Query + MSW skeleton; fold playground into the Design System module |
-| **1 · Auth + Onboarding**     | login/signup/SSO/forgot/OTP/invite + workspace creation + checklist                                                                                                    |
-| **2 · Flagship module (CRM)** | end-to-end: table + kanban + record page + create/edit + filters/saved views (proves the deep patterns once)                                                           |
-| **3 · Breadth**               | Projects, Inbox, Billing, Analytics, People — reusing Phase-2 patterns                                                                                                 |
-| **4 · Cross-cutting**         | ⌘K palette, global search, notifications center, all states (empty/error/404/403), responsive                                                                          |
-| **5 · Polish + theme proof**  | Appearance quick-control, "flip a theme axis → whole app re-themes" demo, a11y/contrast sweep                                                                          |
+| Phase                              | Deliverable                                                                                                                                                                                     |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0 · Foundation**                 | Rename → `apps/console`; TanStack Router + app shell (sidebar/topbar) + `ThemeProvider` + TanStack Query + MSW skeleton; fold playground into the Design System module                          |
+| **1a · Core auth**                 | login · signup · 2FA OTP (`InputOtp`) · forgot-password — MSW-backed, Zustand session, route guards (pathless `_app` / `_auth` layouts), sidebar sign-out                                       |
+| **1b · Auth breadth + onboarding** | SSO/OAuth · magic-link · accept-invite · session-expired · reset-password completion **+** onboarding (create workspace · invite team · choose plan · setup checklist · first-run empty states) |
+| **2 · Flagship module (CRM)**      | end-to-end: table + kanban + record page + create/edit + filters/saved views (proves the deep patterns once)                                                                                    |
+| **3 · Breadth**                    | Projects, Inbox, Billing, Analytics, People — reusing Phase-2 patterns                                                                                                                          |
+| **4 · Cross-cutting**              | ⌘K palette, global search, notifications center, all states (empty/error/404/403), responsive                                                                                                   |
+| **5 · Polish + theme proof**       | Appearance quick-control, "flip a theme axis → whole app re-themes" demo, a11y/contrast sweep                                                                                                   |
 
 Missing components are extracted as their own Nexus component issues as they're hit — never hand-rolled in the app.

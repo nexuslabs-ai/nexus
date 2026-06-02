@@ -8,7 +8,9 @@ import { MODULE_ITEMS } from '../shell/modules';
  * theming, and mock-API layer are already in place beneath it.
  */
 export function ComingSoon() {
-  const { module } = useParams({ from: '/m/$module' });
+  // `from` is the route ID, which the pathless `_app` layout route prefixes
+  // with `/app` (the URL stays `/m/$module`).
+  const { module } = useParams({ from: '/app/m/$module' });
   const label = MODULE_ITEMS.find((m) => m.module === module)?.label ?? module;
   return (
     <div className="nx:flex nx:min-h-[60vh] nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:p-6 nx:text-center">

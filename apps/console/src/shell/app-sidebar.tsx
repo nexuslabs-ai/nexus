@@ -1,4 +1,10 @@
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -14,10 +20,13 @@ import {
 import {
   IconComponents,
   IconLayoutGrid,
+  IconLogout,
   IconPalette,
   IconUserCircle,
 } from '@tabler/icons-react';
-import { Link, useMatchRoute } from '@tanstack/react-router';
+import { Link, useMatchRoute, useNavigate } from '@tanstack/react-router';
+
+import { useSession } from '../app/session';
 
 import { MODULE_ITEMS } from './modules';
 
@@ -34,6 +43,14 @@ const DESIGN_ITEMS = [
  */
 export function AppSidebar() {
   const matchRoute = useMatchRoute();
+  const navigate = useNavigate();
+  const user = useSession((s) => s.user);
+  const signOut = useSession((s) => s.signOut);
+
+  const handleSignOut = () => {
+    signOut();
+    navigate({ to: '/login' });
+  };
 
   return (
     <Sidebar>
@@ -105,10 +122,31 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Account">
-              <IconUserCircle />
-              <span>Account</span>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton tooltip="Account">
+                  <IconUserCircle />
+                  <span>{user?.name ?? 'Account'}</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="end" className="nx:w-56">
+                {user && (
+                  <>
+                    <DropdownMenuLabel className="nx:flex nx:flex-col">
+                      <span>{user.name}</span>
+                      <span className="nx:text-muted-foreground nx:text-xs nx:font-normal">
+                        {user.email}
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem onSelect={handleSignOut}>
+                  <IconLogout />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
