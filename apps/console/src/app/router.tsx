@@ -16,6 +16,7 @@ import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
 
 import { AuthLayout } from './auth-layout';
+import { NotFound } from './not-found';
 import { Root } from './root';
 import { RootLayout } from './root-layout';
 import { useSession } from './session';
@@ -129,7 +130,12 @@ const routeTree = rootRoute.addChildren([
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),
 ]);
 
-export const router = createRouter({ routeTree });
+// `NotFound` renders under the thin root (outside both layouts), so it carries
+// its own base tokens — see its file comment.
+export const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: NotFound,
+});
 
 declare module '@tanstack/react-router' {
   interface Register {

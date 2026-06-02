@@ -7,7 +7,7 @@ const OTP_CODE = '123456';
 
 /** Derive a stable demo user from an email — the mock has no real user table. */
 function userFromEmail(email: string): User {
-  const localPart = email.split('@')[0] ?? 'user';
+  const [localPart = ''] = email.split('@');
   const name = localPart
     .split(/[._-]+/)
     .filter(Boolean)
@@ -26,7 +26,8 @@ type VerifyBody = { email?: string; code?: string };
  * what actually authenticates and returns the user.
  */
 export const handlers: RequestHandler[] = [
-  // Credentials check: any email + an 8+ character password passes → proceed to OTP.
+  // Credentials check — no real validation (any email + an 8+ char password
+  // passes); the OTP step below is the only actual auth gate. Proceeds to OTP.
   http.post('/api/auth/login', async ({ request }) => {
     const { email, password } = (await request.json()) as LoginBody;
     if (!email || !password || password.length < 8) {
