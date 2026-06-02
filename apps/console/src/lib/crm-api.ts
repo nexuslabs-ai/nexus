@@ -54,3 +54,28 @@ export async function fetchContact(
   }
   return (await res.json()) as { contact: ContactDetail };
 }
+
+/** The editable fields of a contact — `id` and `lastContacted` are server-set. */
+export type ContactInput = Omit<Contact, 'id' | 'lastContacted'>;
+
+async function save(
+  url: string,
+  method: 'POST' | 'PATCH',
+  input: ContactInput
+): Promise<{ contact: Contact }> {
+  const res = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) {
+    throw new Error('Failed to save contact. Please try again.');
+  }
+  return (await res.json()) as { contact: Contact };
+}
+
+export const createContact = (input: ContactInput) =>
+  save('/api/crm/contacts', 'POST', input);
+
+export const updateContact = (id: string, input: ContactInput) =>
+  save(`/api/crm/contacts/${id}`, 'PATCH', input);

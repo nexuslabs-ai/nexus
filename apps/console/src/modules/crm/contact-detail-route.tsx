@@ -1,6 +1,9 @@
+import { useState } from 'react';
+
 import {
   Avatar,
   AvatarFallback,
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -17,6 +20,7 @@ import {
   IconFlag,
   IconMail,
   IconNote,
+  IconPencil,
   IconUserPlus,
 } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
@@ -29,6 +33,7 @@ import {
 } from '../../lib/crm-api';
 import { formatCurrency, formatDate } from '../../lib/format';
 
+import { ContactFormSheet } from './contact-form-sheet';
 import { ContactStatusBadge, initials } from './contact-ui';
 
 export function ContactDetailRoute() {
@@ -56,6 +61,8 @@ export function ContactDetailRoute() {
 }
 
 function DetailContent({ contact }: { contact: ContactDetail }) {
+  const [editOpen, setEditOpen] = useState(false);
+
   return (
     <>
       <header className="nx:flex nx:items-center nx:gap-4">
@@ -71,6 +78,14 @@ function DetailContent({ contact }: { contact: ContactDetail }) {
           </div>
           <p className="nx:text-muted-foreground">{contact.company}</p>
         </div>
+        <Button
+          variant="outline"
+          className="nx:ml-auto"
+          onClick={() => setEditOpen(true)}
+        >
+          <IconPencil />
+          Edit
+        </Button>
       </header>
 
       <Tabs defaultValue="overview">
@@ -126,6 +141,12 @@ function DetailContent({ contact }: { contact: ContactDetail }) {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <ContactFormSheet
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        contact={contact}
+      />
     </>
   );
 }

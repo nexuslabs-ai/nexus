@@ -1,10 +1,13 @@
-import { Skeleton } from '@nexus/react';
-import { IconUsers } from '@tabler/icons-react';
+import { useState } from 'react';
+
+import { Button, Skeleton } from '@nexus/react';
+import { IconPlus, IconUsers } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '../../components/data-table';
 import { fetchContacts } from '../../lib/crm-api';
 
+import { ContactFormSheet } from './contact-form-sheet';
 import { contactColumns } from './contacts-columns';
 
 export function ContactsRoute() {
@@ -13,16 +16,23 @@ export function ContactsRoute() {
     queryFn: fetchContacts,
   });
   const contacts = data?.contacts;
+  const [createOpen, setCreateOpen] = useState(false);
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <header className="nx:space-y-1">
-        <h1 className="nx:typography-heading-large nx:text-foreground">
-          Contacts
-        </h1>
-        <p className="nx:text-muted-foreground">
-          Everyone in your pipeline. Sort, filter, and select to act in bulk.
-        </p>
+      <header className="nx:flex nx:items-start nx:justify-between nx:gap-4">
+        <div className="nx:space-y-1">
+          <h1 className="nx:typography-heading-large nx:text-foreground">
+            Contacts
+          </h1>
+          <p className="nx:text-muted-foreground">
+            Everyone in your pipeline. Sort, filter, and select to act in bulk.
+          </p>
+        </div>
+        <Button onClick={() => setCreateOpen(true)}>
+          <IconPlus />
+          New contact
+        </Button>
       </header>
 
       {isPending && <ContactsSkeleton />}
@@ -42,6 +52,8 @@ export function ContactsRoute() {
             filterPlaceholder="Filter by name…"
           />
         ))}
+
+      <ContactFormSheet open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }
