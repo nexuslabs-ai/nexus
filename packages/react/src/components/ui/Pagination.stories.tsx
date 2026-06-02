@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
@@ -88,22 +90,31 @@ export const FewPages: Story = {
 // paging state.
 export const ClickInteraction: Story = {
   args: { onClick: fn() },
-  render: (args) => (
-    <Pagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationLink href="#" onClick={args.onClick}>
-            1
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#" isActive onClick={args.onClick}>
-            2
-          </PaginationLink>
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
-  ),
+  render: (args) => {
+    // Pagination links are anchors; with no router in a story, activating one
+    // performs the default navigation and tears down the test page. Cancel it,
+    // then let the spy observe the click.
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      args.onClick?.(event);
+    };
+    return (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationLink href="#" onClick={handleClick}>
+              1
+            </PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#" isActive onClick={handleClick}>
+              2
+            </PaginationLink>
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const page1 = canvas.getByRole('link', { name: '1' });
@@ -117,20 +128,28 @@ export const ClickInteraction: Story = {
 // pointer users.
 export const KeyboardInteraction: Story = {
   args: { onClick: fn() },
-  render: (args) => (
-    <Pagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationLink href="#" onClick={args.onClick}>
-            1
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">2</PaginationLink>
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
-  ),
+  render: (args) => {
+    // Enter on a focused anchor dispatches a click that would navigate; cancel
+    // the default so the test page survives and the spy still records the call.
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      args.onClick?.(event);
+    };
+    return (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationLink href="#" onClick={handleClick}>
+              1
+            </PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">2</PaginationLink>
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const page1 = canvas.getByRole('link', { name: '1' });
