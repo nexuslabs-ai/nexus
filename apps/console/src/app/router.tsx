@@ -17,6 +17,7 @@ import { contactsSearchSchema } from '../modules/crm/contacts-search';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
+import { InboxRoute } from '../modules/inbox/inbox-route';
 import { IssueDetailRoute } from '../modules/projects/issue-detail-route';
 import { IssuesRoute } from '../modules/projects/issues-route';
 
@@ -110,6 +111,15 @@ const projectsIssueDetailRoute = createRoute({
   component: IssueDetailRoute,
 });
 
+// Inbox (Phase 3b). Static `/m/inbox` outranks `/m/$module`. The open
+// conversation rides in `?c`; an absent/unknown id falls back to the empty pane.
+const inboxRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/inbox',
+  validateSearch: z.object({ c: z.string().optional() }),
+  component: InboxRoute,
+});
+
 // One shared placeholder backs every not-yet-built module.
 const moduleRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -162,6 +172,7 @@ const routeTree = rootRoute.addChildren([
     crmContactDetailRoute,
     projectsIssuesRoute,
     projectsIssueDetailRoute,
+    inboxRoute,
     moduleRoute,
   ]),
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),

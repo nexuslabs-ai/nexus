@@ -21,8 +21,19 @@ const dateFmt = new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC',
 });
 
+// Message timestamps carry a time of day; no year, since threads are recent.
+const dateTimeFmt = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZone: 'UTC',
+});
+
 export const formatCurrency = (value: number) => currencyFmt.format(value);
 export const formatDate = (iso: string) => dateFmt.format(new Date(iso));
+export const formatDateTime = (iso: string) =>
+  dateTimeFmt.format(new Date(iso));
 
 /** First + last initial, e.g. "Ada Lovelace" → "AL". Used for avatar fallbacks. */
 export function initials(name: string): string {
