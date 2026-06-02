@@ -47,6 +47,7 @@
     },
     { "name": "EmptyState", "showcase": "AllVariants" },
     { "name": "Field", "showcase": "AllVariants" },
+    { "name": "HoverCard", "showcase": "AllVariants" },
     {
       "name": "Input",
       "showcase": "AllVariants",
