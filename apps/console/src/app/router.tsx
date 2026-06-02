@@ -84,6 +84,11 @@ const appearanceRoute = createRoute({
 const crmContactsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/m/crm',
+  // `.default` (not `.catch`) keeps the param optional for navigation, so the
+  // existing `<Link to="/m/crm">` call sites don't need to pass `search`.
+  validateSearch: z.object({
+    view: z.enum(['table', 'board']).default('table'),
+  }),
   component: ContactsRoute,
 });
 
