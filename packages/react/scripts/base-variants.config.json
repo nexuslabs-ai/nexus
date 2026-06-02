@@ -56,6 +56,7 @@
     { "name": "InputGroup", "showcase": "AllVariants" },
     { "name": "Item", "showcase": "AllVariants" },
     { "name": "Kbd", "showcase": "AllVariants" },
+    { "name": "NativeSelect", "showcase": "AllVariants" },
     { "name": "Pagination", "showcase": "AllVariants" },
     {
       "name": "Popover",
