@@ -21,11 +21,8 @@ export function ConversationList({
         {conversations.length} conversation
         {conversations.length === 1 ? '' : 's'}
       </div>
-      {/* Plain overflow container, not ScrollArea: the rows truncate (nowrap),
-          and Radix's viewport wraps content in a display:table element that lets
-          truncating children expand the row instead of clipping. The rows are
-          links (focusable), so the scroll region is keyboard-reachable without a
-          tabIndex. */}
+      {/* Plain overflow (not ScrollArea): the truncating rows need a non-table
+          scroll parent; rows are links, so the region stays keyboard-reachable. */}
       <div className="nx:min-h-0 nx:flex-1 nx:overflow-y-auto">
         <ul>
           {conversations.map((conversation) => (
@@ -53,6 +50,7 @@ function ConversationRow({
     <Link
       to="/m/inbox"
       search={{ c: conversation.id }}
+      resetScroll={false}
       data-active={active || undefined}
       className="nx:border-border-default nx:hover:bg-background-hover nx:data-[active]:bg-muted nx:flex nx:gap-3 nx:border-b nx:px-4 nx:py-3"
     >

@@ -112,7 +112,8 @@ const projectsIssueDetailRoute = createRoute({
 });
 
 // Inbox (Phase 3b). Static `/m/inbox` outranks `/m/$module`. The open
-// conversation rides in `?c`; an absent/unknown id falls back to the empty pane.
+// conversation rides in `?c` — absent shows the empty pane; an unknown id
+// surfaces the thread's error state.
 const inboxRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/m/inbox',

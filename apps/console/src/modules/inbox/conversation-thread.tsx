@@ -14,8 +14,9 @@ import {
   Textarea,
   toast,
 } from '@nexus/react';
-import { IconChevronDown, IconSend } from '@tabler/icons-react';
+import { IconArrowLeft, IconChevronDown, IconSend } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 
 import { formatDateTime, initials } from '../../lib/format';
 import {
@@ -41,7 +42,7 @@ export function ConversationThread({ id }: { id: string }) {
   });
 
   if (isPending) return <ThreadSkeleton />;
-  if (isError) return <ThreadNotFound />;
+  if (isError) return <ThreadError />;
   return <ThreadContent conversation={data.conversation} />;
 }
 
@@ -85,6 +86,9 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
   }, [conversation.messages.length]);
 
   const handleSend = () => {
+    // ⌘↵ calls this directly, bypassing the Button's disabled state — guard
+    // against a double-submit within the in-flight round-trip.
+    if (replyMutation.isPending) return;
     const text = body.trim();
     if (!text) return;
     replyMutation.mutate(text);
@@ -100,13 +104,27 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
   return (
     <div className="nx:flex nx:min-h-0 nx:flex-1 nx:flex-col">
       <header className="nx:border-border-default nx:flex nx:items-start nx:justify-between nx:gap-4 nx:border-b nx:px-6 nx:py-4">
-        <div className="nx:min-w-0 nx:space-y-1">
-          <h2 className="nx:typography-heading-medium nx:text-foreground nx:truncate">
-            {conversation.subject}
-          </h2>
-          <p className="nx:text-muted-foreground nx:truncate nx:text-sm">
-            {conversation.customer} · {conversation.customerEmail}
-          </p>
+        <div className="nx:flex nx:min-w-0 nx:items-start nx:gap-2">
+          {/* Below lg the list is hidden once a thread is open, so the thread
+              needs its own way back to it. */}
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="nx:-ml-2 nx:shrink-0 nx:lg:hidden"
+          >
+            <Link to="/m/inbox" search={{}} aria-label="Back to conversations">
+              <IconArrowLeft />
+            </Link>
+          </Button>
+          <div className="nx:min-w-0 nx:space-y-1">
+            <h2 className="nx:typography-heading-medium nx:text-foreground nx:truncate">
+              {conversation.subject}
+            </h2>
+            <p className="nx:text-muted-foreground nx:truncate nx:text-sm">
+              {conversation.customer} · {conversation.customerEmail}
+            </p>
+          </div>
         </div>
         <div className="nx:flex nx:shrink-0 nx:items-center nx:gap-2">
           <ConversationStatusBadge status={conversation.status} />
@@ -172,6 +190,8 @@ function StatusMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        {/* The radio items below are built from CONVERSATION_STATUSES, so the
+            emitted value is always a ConversationStatus — the cast is sound. */}
         <DropdownMenuRadioGroup
           value={status}
           onValueChange={(value) => onChange(value as ConversationStatus)}
@@ -233,15 +253,15 @@ function ThreadSkeleton() {
   );
 }
 
-// App-local not-found — the polished @nexus/react EmptyState is tracked in #282.
-function ThreadNotFound() {
+// App-local error state — the polished @nexus/react EmptyState is tracked in #282.
+function ThreadError() {
   return (
     <div className="nx:flex nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-2 nx:p-12 nx:text-center">
       <h2 className="nx:typography-heading-medium nx:text-foreground">
-        Conversation not found
+        Couldn&apos;t open this conversation
       </h2>
       <p className="nx:text-muted-foreground nx:max-w-sm">
-        This conversation doesn&apos;t exist, or may have been removed.
+        It may have been removed, or failed to load. Pick another from the list.
       </p>
     </div>
   );

@@ -264,15 +264,20 @@ export const handlers: RequestHandler[] = [
 
   // --- Inbox ---
   // The conversation list returns the lean `Conversation` shape: base fields plus
-  // a `preview` + `lastMessageAt` derived from the most recent message (messages
-  // themselves are detail-only). Sorted newest-first by that last-message time.
+  // a `preview` + `lastMessageAt` derived from the most recent message. The
+  // messages, customer email, and assignee are detail-only, so they're projected
+  // away here. Sorted newest-first by that last-message time.
   http.get('/api/inbox/conversations', async () => {
     await delay(500);
     const conversations: Conversation[] = conversationsStore
-      .map(({ messages, ...base }) => {
+      .map(({ id, customer, subject, status, unread, messages }) => {
         const last = messages[messages.length - 1];
         return {
-          ...base,
+          id,
+          customer,
+          subject,
+          status,
+          unread,
           preview: last?.body ?? '',
           lastMessageAt: last?.at ?? '',
         };

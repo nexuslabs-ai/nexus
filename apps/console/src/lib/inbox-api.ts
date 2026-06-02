@@ -29,15 +29,12 @@ export type Message = {
   at: string;
 };
 
-/** Fields shared by the list row and the thread header. */
+/** The fields the list row and the thread both need. */
 type ConversationBase = {
   id: string;
   customer: string;
-  customerEmail: string;
   subject: string;
   status: ConversationStatus;
-  /** Team member handling the conversation — also signs agent replies. */
-  assignee: string;
   /** Whether the latest customer message is still unhandled — shown as a dot. */
   unread: boolean;
 };
@@ -50,8 +47,11 @@ export type Conversation = ConversationBase & {
   lastMessageAt: string;
 };
 
-/** Thread shape: the full message history, without the list-only preview fields. */
+/** Thread shape: the full message history plus the detail-only header fields. */
 export type ConversationDetail = ConversationBase & {
+  customerEmail: string;
+  /** Team member handling the conversation — also signs agent replies. */
+  assignee: string;
   messages: Message[];
 };
 
