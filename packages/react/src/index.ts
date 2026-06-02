@@ -26,6 +26,7 @@ export * from '@/components/ui/dropdown-menu';
 export * from '@/components/ui/empty-state';
 export * from '@/components/ui/form';
 export * from '@/components/ui/input';
+export * from '@/components/ui/input-group';
 export * from '@/components/ui/input-otp';
 export * from '@/components/ui/item';
 export * from '@/components/ui/kbd';
