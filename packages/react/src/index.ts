@@ -17,6 +17,7 @@ export * from '@/components/ui/avatar';
 export * from '@/components/ui/badge';
 export * from '@/components/ui/breadcrumb';
 export * from '@/components/ui/button';
+export * from '@/components/ui/button-group';
 export * from '@/components/ui/card';
 export * from '@/components/ui/checkbox';
 export * from '@/components/ui/command';
