@@ -1,12 +1,7 @@
 import { useState } from 'react';
 
 import { Button, Skeleton } from '@nexus/react';
-import {
-  IconLayoutKanban,
-  IconPlus,
-  IconTable,
-  IconUsers,
-} from '@tabler/icons-react';
+import { IconPlus, IconUsers } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
@@ -16,6 +11,8 @@ import { crmKeys, fetchContacts } from '../../lib/crm-api';
 import { ContactFormSheet } from './contact-form-sheet';
 import { ContactsBoard } from './contacts-board';
 import { contactColumns } from './contacts-columns';
+import { ContactsToolbar } from './contacts-toolbar';
+import type { ContactsView } from './saved-views';
 
 const crmRoute = getRouteApi('/app/m/crm');
 
@@ -25,9 +22,12 @@ export function ContactsRoute() {
     queryFn: fetchContacts,
   });
   const contacts = data?.contacts;
-  const { view } = crmRoute.useSearch();
+  const { view, status } = crmRoute.useSearch();
   const navigate = crmRoute.useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+
+  const setSearch = (patch: Partial<ContactsView>) =>
+    navigate({ search: (prev) => ({ ...prev, ...patch }) });
 
   return (
     <div className="nx:space-y-6 nx:p-6">
@@ -46,24 +46,7 @@ export function ContactsRoute() {
         </Button>
       </header>
 
-      <div className="nx:inline-flex nx:gap-1">
-        <Button
-          variant={view === 'table' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => navigate({ search: { view: 'table' } })}
-        >
-          <IconTable />
-          Table
-        </Button>
-        <Button
-          variant={view === 'board' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => navigate({ search: { view: 'board' } })}
-        >
-          <IconLayoutKanban />
-          Board
-        </Button>
-      </div>
+      <ContactsToolbar view={view} status={status} setSearch={setSearch} />
 
       {isPending && <ContactsSkeleton />}
       {isError && (
@@ -79,7 +62,11 @@ export function ContactsRoute() {
         ) : (
           <DataTable
             columns={contactColumns}
-            data={contacts}
+            data={
+              status.length > 0
+                ? contacts.filter((c) => status.includes(c.status))
+                : contacts
+            }
             filterColumn="name"
             filterPlaceholder="Filter by name…"
           />

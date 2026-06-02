@@ -89,6 +89,10 @@ const crmContactsRoute = createRoute({
   // value (e.g. a stale `?view=foo`) to 'table' instead of throwing a search error.
   validateSearch: z.object({
     view: z.enum(['table', 'board']).default('table').catch('table'),
+    status: z
+      .array(z.enum(['active', 'lead', 'churned']))
+      .default([])
+      .catch([]),
   }),
   component: ContactsRoute,
 });
