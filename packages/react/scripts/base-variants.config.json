@@ -107,6 +107,8 @@
         "KeyboardInteraction": ["TypeInteraction"]
       }
     },
+    { "name": "Toggle", "showcase": "AllVariants" },
+    { "name": "ToggleGroup", "showcase": "AllVariants" },
     { "name": "Tooltip", "showcase": "AllVariants" }
   ]
 }
