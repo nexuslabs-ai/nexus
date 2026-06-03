@@ -56,6 +56,12 @@
       "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
     },
     {
+      "name": "Drawer",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"],
+      "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
+    },
+    {
       "name": "DropdownMenu",
       "showcase": "AllVariants",
       "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
