@@ -42,6 +42,7 @@
     "embla-carousel-react": "^8.6.0",
     "react-day-picker": "^9",
     "react-hook-form": "^7.77.0",
+    "react-resizable-panels": "^4.11.2",
     "recharts": "^3.8.1",
     "sonner": "^2.0.7",
     "storybook": "^10.1.10",
@@ -94,6 +95,7 @@
     "react-day-picker": "^9",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.77.0",
+    "react-resizable-panels": "^4.11.2",
     "recharts": "^3.8.1",
     "sonner": "^2.0.7",
     "vaul": "^1.1.2"
@@ -106,6 +108,9 @@
       "optional": true
     },
     "react-hook-form": {
+      "optional": true
+    },
+    "react-resizable-panels": {
       "optional": true
     },
     "recharts": {

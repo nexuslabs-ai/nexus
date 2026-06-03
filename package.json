@@ -40,11 +40,12 @@
         "embla-carousel-react",
         "react-day-picker",
         "react-hook-form",
+        "react-resizable-panels",
         "recharts",
         "sonner",
         "vaul"
       ],
-      "limit": "85 kB"
+      "limit": "88 kB"
     },
     {
       "name": "@nexus/react (CSS)",
