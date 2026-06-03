@@ -71,16 +71,25 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     enabled: open,
   });
 
-  // Reset the controlled query on every close path so the palette reopens blank
-  // rather than mid-search (it stays mounted, so the state would otherwise stick).
-  const handleOpenChange = (next: boolean) => {
-    if (!next) setQuery('');
-    onOpenChange(next);
-  };
+  // Reset the search when the palette closes so it reopens blank. ⌘K closes by
+  // flipping `open` externally, which Radix does not report through onOpenChange —
+  // so we reset on the open→closed prop edge to catch every close path (Escape,
+  // click-outside, item select, and ⌘K alike), not just Radix's own gestures.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (!open) setQuery('');
+  }
+
+  const anyError =
+    contacts.isError ||
+    issues.isError ||
+    conversations.isError ||
+    members.isError;
 
   // Close first, then act — the palette never lingers behind a navigation.
   const runCommand = (action: () => void) => {
-    handleOpenChange(false);
+    onOpenChange(false);
     action();
   };
 
@@ -97,14 +106,18 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const hasQuery = query.trim().length > 0;
 
   return (
-    <CommandDialog open={open} onOpenChange={handleOpenChange}>
+    <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput
         placeholder="Search or jump to…"
         value={query}
         onValueChange={setQuery}
       />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>
+          {anyError
+            ? 'Couldn’t load results. Please try again.'
+            : 'No results found.'}
+        </CommandEmpty>
 
         <CommandGroup heading="Go to">
           {MODULE_ITEMS.map((item) => {
