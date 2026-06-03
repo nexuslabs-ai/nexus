@@ -4,12 +4,16 @@ import {
   EmptyStateHeader,
   EmptyStateMedia,
   EmptyStateTitle,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   Skeleton,
 } from '@nexus/react';
 import { IconInbox } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
+import { useMediaQuery } from '../../hooks/use-media-query';
 import { fetchConversations, inboxKeys } from '../../lib/inbox-api';
 
 import { ConversationList } from './conversation-list';
@@ -24,6 +28,24 @@ export function InboxRoute() {
   });
   const { c } = inboxRoute.useSearch();
   const conversations = data?.conversations;
+  // The resizable split is a desktop affordance; below lg the panes toggle one
+  // at a time (driven by `c`), so that layout renders instead of a drag handle.
+  const isDesktop = useMediaQuery('(min-width: 64rem)');
+
+  const listPane = (
+    <>
+      {isPending && <ListSkeleton />}
+      {isError && <ListError />}
+      {conversations && (
+        <ConversationList conversations={conversations} activeId={c} />
+      )}
+    </>
+  );
+
+  // key={c} remounts on conversation switch so a drafted reply doesn't bleed
+  // into the next thread's composer (cached data still renders immediately, so
+  // there's no skeleton flash).
+  const threadPane = c ? <ConversationThread id={c} key={c} /> : <EmptyPane />;
 
   return (
     // 3.5rem = the Topbar's fixed h-14, so the two-pane fills the rest of the
@@ -39,29 +61,39 @@ export function InboxRoute() {
         </p>
       </header>
 
-      <div className="nx:border-border-default nx:flex nx:min-h-0 nx:flex-1 nx:overflow-hidden nx:rounded-lg nx:border">
-        {/* List pane — full-width on mobile, fixed on desktop; hidden on mobile
-            once a thread is open so the thread gets the whole screen. */}
-        <aside
-          className={`nx:border-border-default nx:w-full nx:min-h-0 nx:min-w-0 nx:flex-col nx:lg:flex nx:lg:w-80 nx:lg:border-r ${c ? 'nx:hidden' : 'nx:flex'}`}
+      {isDesktop ? (
+        <ResizablePanelGroup
+          orientation="horizontal"
+          className="nx:border-border-default nx:min-h-0 nx:flex-1 nx:overflow-hidden nx:rounded-lg nx:border"
         >
-          {isPending && <ListSkeleton />}
-          {isError && <ListError />}
-          {conversations && (
-            <ConversationList conversations={conversations} activeId={c} />
-          )}
-        </aside>
-
-        {/* Thread pane — hidden on mobile until a conversation is selected. */}
-        <section
-          className={`nx:min-h-0 nx:min-w-0 nx:flex-1 nx:flex-col nx:lg:flex ${c ? 'nx:flex' : 'nx:hidden'}`}
-        >
-          {/* key={c} remounts on conversation switch so a drafted reply doesn't
-              bleed into the next thread's composer (cached data still renders
-              immediately, so there's no skeleton flash). */}
-          {c ? <ConversationThread id={c} key={c} /> : <EmptyPane />}
-        </section>
-      </div>
+          <ResizablePanel
+            defaultSize="28%"
+            minSize="20%"
+            maxSize="45%"
+            className="nx:flex nx:min-h-0 nx:flex-col"
+          >
+            {listPane}
+          </ResizablePanel>
+          <ResizableHandle withHandle aria-label="Resize conversation list" />
+          <ResizablePanel className="nx:flex nx:min-h-0 nx:flex-col">
+            {threadPane}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      ) : (
+        // Below lg only one pane shows at a time, toggled by `c`.
+        <div className="nx:border-border-default nx:flex nx:min-h-0 nx:flex-1 nx:overflow-hidden nx:rounded-lg nx:border">
+          <aside
+            className={`nx:min-h-0 nx:w-full nx:min-w-0 nx:flex-col ${c ? 'nx:hidden' : 'nx:flex'}`}
+          >
+            {listPane}
+          </aside>
+          <section
+            className={`nx:min-h-0 nx:min-w-0 nx:flex-1 nx:flex-col ${c ? 'nx:flex' : 'nx:hidden'}`}
+          >
+            {threadPane}
+          </section>
+        </div>
+      )}
     </div>
   );
 }
