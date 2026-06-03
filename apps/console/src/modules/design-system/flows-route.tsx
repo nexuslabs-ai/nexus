@@ -181,7 +181,7 @@ export function FlowsRoute() {
         title="Empty states"
         description="Unreachable today — fixtures always seed rows — so this is the only way to see a zeroed module."
       >
-        <Sample label="Module list · no records (Contacts, Issues, People)">
+        <Sample label="Module list · no records">
           <ContactsEmpty />
         </Sample>
         <Sample
