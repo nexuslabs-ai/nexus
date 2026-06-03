@@ -37,24 +37,11 @@ import {
   MEMBER_ROLES,
   MEMBER_STATUSES,
   type MemberDetail,
-  type MemberRole,
-  type MemberStatus,
   peopleKeys,
   updateMember,
 } from '../../lib/people-api';
 
-const ROLE_OPTIONS: { value: MemberRole; label: string }[] = [
-  { value: 'owner', label: 'Owner' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'member', label: 'Member' },
-  { value: 'guest', label: 'Guest' },
-];
-
-const STATUS_OPTIONS: { value: MemberStatus; label: string }[] = [
-  { value: 'active', label: 'Active' },
-  { value: 'invited', label: 'Invited' },
-  { value: 'suspended', label: 'Suspended' },
-];
+import { DEPARTMENT_OPTIONS, ROLE_OPTIONS, STATUS_OPTIONS } from './people-ui';
 
 const memberSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -244,9 +231,9 @@ export function MemberFormSheet({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {DEPARTMENTS.map((department) => (
-                          <SelectItem key={department} value={department}>
-                            {department}
+                        {DEPARTMENT_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>

@@ -10,33 +10,14 @@ import {
 } from '@nexus/react';
 import { IconFilter } from '@tabler/icons-react';
 
-import {
-  type Department,
-  DEPARTMENTS,
-  type MemberRole,
-  type MemberStatus,
+import type {
+  Department,
+  MemberRole,
+  MemberStatus,
 } from '../../lib/people-api';
 
 import type { PeopleView } from './people-search';
-
-const ROLE_OPTIONS: { value: MemberRole; label: string }[] = [
-  { value: 'owner', label: 'Owner' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'member', label: 'Member' },
-  { value: 'guest', label: 'Guest' },
-];
-
-// Departments are their own labels — no mapping table to keep in sync.
-const DEPARTMENT_OPTIONS = DEPARTMENTS.map((value) => ({
-  value,
-  label: value,
-}));
-
-const STATUS_OPTIONS: { value: MemberStatus; label: string }[] = [
-  { value: 'active', label: 'Active' },
-  { value: 'invited', label: 'Invited' },
-  { value: 'suspended', label: 'Suspended' },
-];
+import { DEPARTMENT_OPTIONS, ROLE_OPTIONS, STATUS_OPTIONS } from './people-ui';
 
 interface PeopleToolbarProps {
   role: MemberRole[];

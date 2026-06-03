@@ -9,9 +9,17 @@
  * long-form `bio` that has no place in a table row.
  */
 
-/** Workspace roles — single source for {@link MemberRole}, the facet, and the form. */
+/** Workspace roles — the value union; {@link ROLE_LABELS} carries the display labels. */
 export const MEMBER_ROLES = ['owner', 'admin', 'member', 'guest'] as const;
 export type MemberRole = (typeof MEMBER_ROLES)[number];
+
+/** Display label for each role. */
+export const ROLE_LABELS: Record<MemberRole, string> = {
+  owner: 'Owner',
+  admin: 'Admin',
+  member: 'Member',
+  guest: 'Guest',
+};
 
 /** Departments — used as both the value and the label (no mapping needed). */
 export const DEPARTMENTS = [
@@ -28,6 +36,13 @@ export type Department = (typeof DEPARTMENTS)[number];
 /** Membership lifecycle — `invited` is pending acceptance, `suspended` is access-revoked. */
 export const MEMBER_STATUSES = ['active', 'invited', 'suspended'] as const;
 export type MemberStatus = (typeof MEMBER_STATUSES)[number];
+
+/** Display label for each status. */
+export const STATUS_LABELS: Record<MemberStatus, string> = {
+  active: 'Active',
+  invited: 'Invited',
+  suspended: 'Suspended',
+};
 
 /** A directory row — what the People table renders. */
 export type Member = {
