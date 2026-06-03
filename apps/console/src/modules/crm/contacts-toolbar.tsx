@@ -22,6 +22,8 @@ import {
   PopoverTrigger,
   Separator,
   toast,
+  ToggleGroup,
+  ToggleGroupItem,
 } from '@nexus/react';
 import {
   IconBookmark,
@@ -71,25 +73,31 @@ function ViewSwitcher({
   view,
   setSearch,
 }: Pick<ContactsToolbarProps, 'view' | 'setSearch'>) {
+  // Radix single-select emits '' when the active item is re-clicked; ignore it
+  // so the view can never wipe to blank.
+  const onViewChange = (value: string) => {
+    if (value) {
+      setSearch({ view: value as ContactsView['view'] });
+    }
+  };
+
   return (
-    <div className="nx:inline-flex nx:gap-1">
-      <Button
-        variant={view === 'table' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setSearch({ view: 'table' })}
-      >
+    <ToggleGroup
+      type="single"
+      variant="outline"
+      value={view}
+      onValueChange={onViewChange}
+      aria-label="Contacts view"
+    >
+      <ToggleGroupItem value="table">
         <IconTable />
         Table
-      </Button>
-      <Button
-        variant={view === 'board' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setSearch({ view: 'board' })}
-      >
+      </ToggleGroupItem>
+      <ToggleGroupItem value="board">
         <IconLayoutKanban />
         Board
-      </Button>
-    </div>
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 }
 
