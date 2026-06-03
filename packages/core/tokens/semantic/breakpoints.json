@@ -6,7 +6,7 @@
       "unit": "rem"
     },
     "$type": "dimension",
-    "$description": "640px @ 16px root — narrow."
+    "$description": "640px @ 16px root — mobile / narrow (first-class)."
   },
   "breakpoint-md": {
     "$value": {
@@ -14,7 +14,7 @@
       "unit": "rem"
     },
     "$type": "dimension",
-    "$description": "768px @ 16px root — compact."
+    "$description": "768px @ 16px root — large phone / small tablet."
   },
   "breakpoint-lg": {
     "$value": {
@@ -22,7 +22,7 @@
       "unit": "rem"
     },
     "$type": "dimension",
-    "$description": "1024px @ 16px root — standard floor."
+    "$description": "1024px @ 16px root — desktop floor (first-class)."
   },
   "breakpoint-xl": {
     "$value": {
@@ -30,7 +30,7 @@
       "unit": "rem"
     },
     "$type": "dimension",
-    "$description": "1280px @ 16px root — standard reference."
+    "$description": "1280px @ 16px root — desktop reference width."
   },
   "breakpoint-2xl": {
     "$value": {
@@ -38,6 +38,6 @@
       "unit": "rem"
     },
     "$type": "dimension",
-    "$description": "1536px @ 16px root — wide."
+    "$description": "1536px @ 16px root — wide (extra breathing room)."
   }
 }
