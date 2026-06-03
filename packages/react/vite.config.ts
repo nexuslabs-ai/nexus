@@ -36,6 +36,7 @@ export default defineConfig({
         'react-day-picker',
         'react-hook-form',
         'sonner',
+        'vaul',
       ],
       output: {
         globals: {
@@ -46,6 +47,7 @@ export default defineConfig({
           'react-day-picker': 'ReactDayPicker',
           'react-hook-form': 'ReactHookForm',
           sonner: 'Sonner',
+          vaul: 'Vaul',
         },
       },
     },

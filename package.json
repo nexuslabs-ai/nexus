@@ -40,7 +40,8 @@
         "embla-carousel-react",
         "react-day-picker",
         "react-hook-form",
-        "sonner"
+        "sonner",
+        "vaul"
       ],
       "limit": "85 kB"
     },
