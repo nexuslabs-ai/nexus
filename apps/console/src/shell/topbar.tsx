@@ -3,6 +3,8 @@ import { IconMoon, IconSearch, IconSun } from '@tabler/icons-react';
 
 import { useThemeContext } from '../app/theme-provider';
 
+import { NotificationsMenu } from './notifications-menu';
+
 interface TopbarProps {
   /** Opens the ⌘K command palette — fired by the search button. */
   onSearchClick: () => void;
@@ -10,7 +12,8 @@ interface TopbarProps {
 
 /**
  * App-shell top bar: sidebar toggle, the ⌘K search button that opens the
- * command palette, and a dark-mode quick-toggle wired to the root theme.
+ * command palette, the notifications bell, and a dark-mode quick-toggle wired
+ * to the root theme.
  */
 export function Topbar({ onSearchClick }: TopbarProps) {
   const { theme, setTheme } = useThemeContext();
@@ -33,6 +36,8 @@ export function Topbar({ onSearchClick }: TopbarProps) {
       </button>
 
       <div className="nx:flex-1" />
+
+      <NotificationsMenu />
 
       <Button
         variant="ghost"
