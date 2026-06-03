@@ -19,6 +19,9 @@ import { AppearanceRoute } from '../modules/design-system/appearance-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
 import { InboxRoute } from '../modules/inbox/inbox-route';
+import { MemberDetailRoute } from '../modules/people/member-detail-route';
+import { PeopleRoute } from '../modules/people/people-route';
+import { peopleSearchSchema } from '../modules/people/people-search';
 import { IssueDetailRoute } from '../modules/projects/issue-detail-route';
 import { IssuesRoute } from '../modules/projects/issues-route';
 
@@ -130,6 +133,21 @@ const billingRoute = createRoute({
   component: BillingRoute,
 });
 
+// People (Phase 3e). Static `/m/people` outranks `/m/$module`. Three facet
+// filters (role · department · status) ride in the search params.
+const peopleRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/people',
+  validateSearch: peopleSearchSchema,
+  component: PeopleRoute,
+});
+
+const peopleMemberDetailRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/people/$id',
+  component: MemberDetailRoute,
+});
+
 // One shared placeholder backs every not-yet-built module.
 const moduleRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -184,6 +202,8 @@ const routeTree = rootRoute.addChildren([
     projectsIssueDetailRoute,
     inboxRoute,
     billingRoute,
+    peopleRoute,
+    peopleMemberDetailRoute,
     moduleRoute,
   ]),
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),
