@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Atlas — Nexus Console</title>
+    <!-- The categorical chart palette is a fixed (non-switchable) token set, so
+         it loads statically here — unlike the switchable theme axes, which load
+         at runtime via useTheme. Without it, chart series resolve
+         var(--nx-color-chart-categorical-N) to nothing and paint black. -->
+    <link rel="stylesheet" href="/themes/chart-categorical-default.css" />
   </head>
   <body>
     <div id="root"></div>

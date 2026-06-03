@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
+import { ANALYTICS_RANGES, type AnalyticsRange } from '../lib/analytics-api';
 import type { User } from '../lib/auth-api';
 import type {
   BillingOverview,
@@ -15,6 +16,7 @@ import type {
 import type { Member, MemberDetail, MemberInput } from '../lib/people-api';
 import type { Issue, IssueInput } from '../lib/projects-api';
 
+import { analyticsOverview } from './analytics-fixtures';
 import { BILLING_OVERVIEW, INVOICES } from './billing-fixtures';
 import { CONTACTS } from './crm-fixtures';
 import { CONVERSATIONS } from './inbox-fixtures';
@@ -369,6 +371,19 @@ export const handlers: RequestHandler[] = [
 
   // --- Billing ---
   // The overview: current subscription + usage meters + the card on file.
+  // Read-only reporting dashboard. `?range` selects the period; an unknown
+  // value falls back to 30d so a stale or hand-typed URL never errors.
+  http.get('/api/analytics', async ({ request }) => {
+    await delay(500);
+    const param = new URL(request.url).searchParams.get('range');
+    const range: AnalyticsRange = ANALYTICS_RANGES.includes(
+      param as AnalyticsRange
+    )
+      ? (param as AnalyticsRange)
+      : '30d';
+    return HttpResponse.json(analyticsOverview(range));
+  }),
+
   http.get('/api/billing', async () => {
     await delay(500);
     return HttpResponse.json(billing);
