@@ -35,19 +35,19 @@ export function MemberStatusBadge({ status }: { status: MemberStatus }) {
   );
 }
 
-// Option lists for the facet filters and the form selects — derived from the
-// label maps so each label lives in one place ({@link ROLE_LABELS} etc).
-// Departments are their own labels.
+/** Role options for the facet filter and the form select. */
 export const ROLE_OPTIONS = MEMBER_ROLES.map((value) => ({
   value,
   label: ROLE_LABELS[value],
 }));
 
+/** Status options for the facet filter and the form select. */
 export const STATUS_OPTIONS = MEMBER_STATUSES.map((value) => ({
   value,
   label: STATUS_LABELS[value],
 }));
 
+/** Department options — departments are their own labels. */
 export const DEPARTMENT_OPTIONS = DEPARTMENTS.map((value) => ({
   value,
   label: value,
