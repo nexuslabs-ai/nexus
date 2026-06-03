@@ -31,7 +31,10 @@ import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
 import { NotFoundState } from '../../components/not-found-state';
 import type { Subscription, UsageMeter } from '../../lib/billing-api';
-import { NotificationsSkeleton } from '../../shell/notifications-menu';
+import {
+  NotificationsError,
+  NotificationsSkeleton,
+} from '../../shell/notifications-menu';
 import { AnalyticsSkeleton } from '../analytics/analytics-route';
 import {
   BillingSkeleton,
@@ -85,9 +88,7 @@ const DEMO_COLUMNS: ColumnDef<DemoRow>[] = [
 /**
  * The Flows gallery — a design/QA catalog of every conditional UI state in the
  * console (loading, error, not-found, empty, form-validation, dialogs, toasts,
- * auth, status). Each cell renders the *real* component, imported from its
- * module, so the gallery can never drift from production: a renamed or
- * restructured state breaks this import at compile time.
+ * auth, status), each rendered from the real component imported from its module.
  */
 export function FlowsRoute() {
   const [contactOpen, setContactOpen] = useState(false);
@@ -176,9 +177,7 @@ export function FlowsRoute() {
           />
         </Sample>
         <Sample label="Notifications · cold-load error (popover chrome)" span>
-          <p className="nx:text-error-foreground nx:px-3 nx:py-6 nx:text-center nx:text-sm">
-            Couldn’t load notifications. Please try again.
-          </p>
+          <NotificationsError />
         </Sample>
       </Section>
 
