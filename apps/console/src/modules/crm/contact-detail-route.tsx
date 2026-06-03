@@ -3,6 +3,12 @@ import { useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   CardContent,
@@ -16,7 +22,6 @@ import {
   TabsTrigger,
 } from '@nexus/react';
 import {
-  IconArrowLeft,
   IconFlag,
   IconMail,
   IconNote,
@@ -26,6 +31,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 
+import { NotFoundState } from '../../components/not-found-state';
 import {
   type ActivityKind,
   type ContactDetail,
@@ -46,16 +52,29 @@ export function ContactDetailRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <Link
-        to="/m/crm"
-        className="nx:text-muted-foreground nx:hover:text-foreground nx:inline-flex nx:items-center nx:gap-1 nx:text-sm"
-      >
-        <IconArrowLeft className="nx:size-4" />
-        Contacts
-      </Link>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/m/crm">Contacts</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{data?.contact.name ?? 'Contact'}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {isPending && <DetailSkeleton />}
-      {isError && <NotFound />}
+      {isError && (
+        <NotFoundState
+          title="Contact not found"
+          description="This contact doesn't exist, or may have been removed."
+        >
+          <Link to="/m/crm">Back to Contacts</Link>
+        </NotFoundState>
+      )}
       {data && <DetailContent contact={data.contact} />}
     </div>
   );
@@ -186,26 +205,6 @@ function DetailSkeleton() {
         </div>
       </div>
       <Skeleton className="nx:h-64 nx:w-full" />
-    </div>
-  );
-}
-
-// App-local not-found — the polished @nexus/react EmptyState is tracked in #282.
-function NotFound() {
-  return (
-    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        Contact not found
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        This contact doesn&apos;t exist, or may have been removed.
-      </p>
-      <Link
-        to="/m/crm"
-        className="nx:text-primary-subtle-foreground nx:hover:underline"
-      >
-        Back to Contacts
-      </Link>
     </div>
   );
 }

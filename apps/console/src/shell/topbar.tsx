@@ -1,13 +1,21 @@
-import { Button, SidebarTrigger } from '@nexus/react';
+import { Button, Kbd, KbdGroup, SidebarTrigger } from '@nexus/react';
 import { IconMoon, IconSearch, IconSun } from '@tabler/icons-react';
 
 import { useThemeContext } from '../app/theme-provider';
 
+import { NotificationsMenu } from './notifications-menu';
+
+interface TopbarProps {
+  /** Opens the ⌘K command palette — fired by the search button. */
+  onSearchClick: () => void;
+}
+
 /**
- * App-shell top bar: sidebar toggle, a ⌘K search placeholder (the palette
- * lands in Phase 4), and a dark-mode quick-toggle wired to the root theme.
+ * App-shell top bar: sidebar toggle, the ⌘K search button that opens the
+ * command palette, the notifications bell, and a dark-mode quick-toggle wired
+ * to the root theme.
  */
-export function Topbar() {
+export function Topbar({ onSearchClick }: TopbarProps) {
   const { theme, setTheme } = useThemeContext();
 
   return (
@@ -16,17 +24,20 @@ export function Topbar() {
 
       <button
         type="button"
-        disabled
-        className="nx:border-border-default nx:bg-muted nx:text-muted-foreground nx:inline-flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:px-3 nx:py-1.5 nx:text-sm"
+        onClick={onSearchClick}
+        className="nx:border-border-default nx:bg-background nx:text-muted-foreground nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:inline-flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:px-3 nx:py-1.5 nx:text-sm nx:transition-colors nx:focus-visible:outline-2"
       >
         <IconSearch className="nx:size-4" />
         <span>Search…</span>
-        <kbd className="nx:bg-background nx:ml-2 nx:rounded nx:px-1.5 nx:text-xs">
-          ⌘K
-        </kbd>
+        <KbdGroup className="nx:ml-2">
+          <Kbd>⌘</Kbd>
+          <Kbd>K</Kbd>
+        </KbdGroup>
       </button>
 
       <div className="nx:flex-1" />
+
+      <NotificationsMenu />
 
       <Button
         variant="ghost"

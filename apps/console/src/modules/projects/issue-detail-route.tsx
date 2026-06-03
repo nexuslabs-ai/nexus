@@ -4,6 +4,12 @@ import { useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   CardContent,
@@ -12,10 +18,11 @@ import {
   Separator,
   Skeleton,
 } from '@nexus/react';
-import { IconArrowLeft, IconPencil } from '@tabler/icons-react';
+import { IconPencil } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 
+import { NotFoundState } from '../../components/not-found-state';
 import { formatDate, initials } from '../../lib/format';
 import {
   fetchIssue,
@@ -35,16 +42,29 @@ export function IssueDetailRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <Link
-        to="/m/projects"
-        className="nx:text-muted-foreground nx:hover:text-foreground nx:inline-flex nx:items-center nx:gap-1 nx:text-sm"
-      >
-        <IconArrowLeft className="nx:size-4" />
-        Issues
-      </Link>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/m/projects">Issues</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{data?.issue.title ?? 'Issue'}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {isPending && <DetailSkeleton />}
-      {isError && <NotFound />}
+      {isError && (
+        <NotFoundState
+          title="Issue not found"
+          description="This issue doesn't exist, or may have been removed."
+        >
+          <Link to="/m/projects">Back to Issues</Link>
+        </NotFoundState>
+      )}
       {data && <DetailContent issue={data.issue} />}
     </div>
   );
@@ -160,26 +180,6 @@ function DetailSkeleton() {
         <Skeleton className="nx:h-48 nx:lg:col-span-2" />
         <Skeleton className="nx:h-48" />
       </div>
-    </div>
-  );
-}
-
-// App-local not-found — the polished @nexus/react EmptyState is tracked in #282.
-function NotFound() {
-  return (
-    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        Issue not found
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        This issue doesn&apos;t exist, or may have been removed.
-      </p>
-      <Link
-        to="/m/projects"
-        className="nx:text-primary-subtle-foreground nx:hover:underline"
-      >
-        Back to Issues
-      </Link>
     </div>
   );
 }

@@ -168,7 +168,7 @@ function SelectContent({
         data-slot="select-content"
         className={cn(
           'nx:relative nx:z-popover nx:max-h-96 nx:min-w-[8rem] nx:overflow-hidden',
-          'nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-md',
+          'nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',

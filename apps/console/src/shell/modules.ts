@@ -28,9 +28,24 @@ export const MODULE_ITEMS = [
     icon: IconBriefcase,
     route: '/m/projects',
   },
-  { label: 'Inbox', module: 'inbox', icon: IconInbox },
-  { label: 'Billing', module: 'billing', icon: IconCreditCard },
-  { label: 'Analytics', module: 'analytics', icon: IconChartBar },
-  { label: 'People', module: 'people', icon: IconAddressBook },
+  { label: 'Inbox', module: 'inbox', icon: IconInbox, route: '/m/inbox' },
+  {
+    label: 'Billing',
+    module: 'billing',
+    icon: IconCreditCard,
+    route: '/m/billing',
+  },
+  {
+    label: 'Analytics',
+    module: 'analytics',
+    icon: IconChartBar,
+    route: '/m/analytics',
+  },
+  {
+    label: 'People',
+    module: 'people',
+    icon: IconAddressBook,
+    route: '/m/people',
+  },
   { label: 'Settings', module: 'settings', icon: IconSettings },
 ] as const;

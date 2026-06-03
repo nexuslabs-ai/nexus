@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { IconLoader2 } from '@/lib/icons';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -113,7 +113,7 @@ function Button({
       loading ? (
         <>
           {asChildElement.props.children}
-          <IconLoader2 className="nx:animate-spin" aria-hidden="true" />
+          <Spinner aria-hidden="true" />
         </>
       ) : (
         asChildElement.props.children
@@ -122,7 +122,7 @@ function Button({
   ) : loading ? (
     <>
       {children}
-      <IconLoader2 className="nx:animate-spin" aria-hidden="true" />
+      <Spinner aria-hidden="true" />
     </>
   ) : (
     children

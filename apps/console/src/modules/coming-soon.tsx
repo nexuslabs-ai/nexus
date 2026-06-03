@@ -1,3 +1,10 @@
+import {
+  EmptyState,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+} from '@nexus/react';
 import { useParams } from '@tanstack/react-router';
 
 import { MODULE_ITEMS } from '../shell/modules';
@@ -11,19 +18,24 @@ export function ComingSoon() {
   // `from` is the route ID, which the pathless `_app` layout route prefixes
   // with `/app` (the URL stays `/m/$module`).
   const { module } = useParams({ from: '/app/m/$module' });
-  const label = MODULE_ITEMS.find((m) => m.module === module)?.label ?? module;
+  const item = MODULE_ITEMS.find((m) => m.module === module);
+  const label = item?.label ?? module;
+  const Icon = item?.icon;
+
   return (
-    <div className="nx:flex nx:min-h-[60vh] nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:p-6 nx:text-center">
-      <span className="nx:typography-label-small nx:text-muted-foreground-subtle nx:uppercase nx:tracking-wide">
-        Atlas module
-      </span>
-      <h2 className="nx:typography-heading-large nx:text-foreground">
-        {label}
-      </h2>
-      <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-md">
-        This module isn’t built yet — it lands in a later Atlas phase. The
-        shell, routing, theming, and mock-API layer are already wired for it.
-      </p>
-    </div>
+    <EmptyState className="nx:min-h-[60vh]">
+      <EmptyStateHeader>
+        {Icon && (
+          <EmptyStateMedia variant="icon">
+            <Icon />
+          </EmptyStateMedia>
+        )}
+        <EmptyStateTitle>{label}</EmptyStateTitle>
+        <EmptyStateDescription>
+          This module isn’t built yet — it lands in a later Atlas phase. The
+          shell, routing, theming, and mock-API layer are already wired for it.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
   );
 }

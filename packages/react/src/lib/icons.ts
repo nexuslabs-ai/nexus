@@ -17,6 +17,8 @@ export { IconLoader2 } from '@tabler/icons-react';
 
 // Navigation
 export {
+  IconArrowLeft,
+  IconArrowRight,
   IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
@@ -44,3 +46,6 @@ export {
   IconCircleCheck,
   IconInfoCircle,
 } from '@tabler/icons-react';
+
+// Layout
+export { IconGripVertical } from '@tabler/icons-react';

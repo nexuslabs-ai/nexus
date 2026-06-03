@@ -6,10 +6,13 @@ import {
 } from '@tanstack/react-router';
 import { z } from 'zod';
 
+import { AnalyticsRoute } from '../modules/analytics/analytics-route';
+import { analyticsSearchSchema } from '../modules/analytics/analytics-search';
 import { ForgotRoute } from '../modules/auth/forgot-route';
 import { LoginRoute } from '../modules/auth/login-route';
 import { SignupRoute } from '../modules/auth/signup-route';
 import { VerifyRoute } from '../modules/auth/verify-route';
+import { BillingRoute } from '../modules/billing/billing-route';
 import { ComingSoon } from '../modules/coming-soon';
 import { ContactDetailRoute } from '../modules/crm/contact-detail-route';
 import { ContactsRoute } from '../modules/crm/contacts-route';
@@ -17,6 +20,10 @@ import { contactsSearchSchema } from '../modules/crm/contacts-search';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
+import { InboxRoute } from '../modules/inbox/inbox-route';
+import { MemberDetailRoute } from '../modules/people/member-detail-route';
+import { PeopleRoute } from '../modules/people/people-route';
+import { peopleSearchSchema } from '../modules/people/people-search';
 import { IssueDetailRoute } from '../modules/projects/issue-detail-route';
 import { IssuesRoute } from '../modules/projects/issues-route';
 
@@ -110,6 +117,48 @@ const projectsIssueDetailRoute = createRoute({
   component: IssueDetailRoute,
 });
 
+// Inbox (Phase 3b). Static `/m/inbox` outranks `/m/$module`. The open
+// conversation rides in `?c` — absent shows the empty pane; an unknown id
+// surfaces the thread's error state.
+const inboxRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/inbox',
+  validateSearch: z.object({ c: z.string().optional() }),
+  component: InboxRoute,
+});
+
+// Billing (Phase 3c). Static `/m/billing` outranks `/m/$module`. Single-page
+// dashboard — no search params.
+const billingRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/billing',
+  component: BillingRoute,
+});
+
+// Analytics (Phase 3d). Static `/m/analytics` outranks `/m/$module`. The period
+// toggle rides in `?range`; a single-page dashboard otherwise.
+const analyticsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/analytics',
+  validateSearch: analyticsSearchSchema,
+  component: AnalyticsRoute,
+});
+
+// People (Phase 3e). Static `/m/people` outranks `/m/$module`. Three facet
+// filters (role · department · status) ride in the search params.
+const peopleRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/people',
+  validateSearch: peopleSearchSchema,
+  component: PeopleRoute,
+});
+
+const peopleMemberDetailRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/people/$id',
+  component: MemberDetailRoute,
+});
+
 // One shared placeholder backs every not-yet-built module.
 const moduleRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -162,6 +211,11 @@ const routeTree = rootRoute.addChildren([
     crmContactDetailRoute,
     projectsIssuesRoute,
     projectsIssueDetailRoute,
+    inboxRoute,
+    billingRoute,
+    analyticsRoute,
+    peopleRoute,
+    peopleMemberDetailRoute,
     moduleRoute,
   ]),
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),

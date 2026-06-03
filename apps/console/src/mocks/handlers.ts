@@ -1,10 +1,28 @@
 import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
+import { ANALYTICS_RANGES, type AnalyticsRange } from '../lib/analytics-api';
 import type { User } from '../lib/auth-api';
+import type {
+  BillingOverview,
+  Invoice,
+  PlanSelection,
+} from '../lib/billing-api';
 import type { ActivityItem, Contact, ContactInput } from '../lib/crm-api';
+import type {
+  Conversation,
+  ConversationDetail,
+  ConversationStatus,
+} from '../lib/inbox-api';
+import type { Notification } from '../lib/notifications-api';
+import type { Member, MemberDetail, MemberInput } from '../lib/people-api';
 import type { Issue, IssueInput } from '../lib/projects-api';
 
+import { analyticsOverview } from './analytics-fixtures';
+import { BILLING_OVERVIEW, INVOICES } from './billing-fixtures';
 import { CONTACTS } from './crm-fixtures';
+import { CONVERSATIONS } from './inbox-fixtures';
+import { NOTIFICATIONS } from './notifications-fixtures';
+import { MEMBERS } from './people-fixtures';
 import { ISSUES } from './projects-fixtures';
 
 /** The fixed demo OTP — shown as a hint on the verify screen. */
@@ -77,6 +95,33 @@ const store: Contact[] = CONTACTS.map((c) => ({ ...c }));
 type StoredIssue = Issue & { description: string };
 const issuesStore: StoredIssue[] = ISSUES.map((i) => ({ ...i }));
 let nextIssueSeq = 125; // one past the last fixture key (ATL-124)
+
+// In-memory Inbox store (same session lifecycle). Holds the full thread; the
+// list endpoint projects each to its lean preview shape, the detail endpoint
+// returns the messages. The messages array is copied so replies don't mutate the
+// shared fixture.
+const conversationsStore: ConversationDetail[] = CONVERSATIONS.map((c) => ({
+  ...c,
+  messages: c.messages.map((m) => ({ ...m })),
+}));
+
+// In-memory Billing store (same session lifecycle). The subscription mutates
+// (change plan / cancel / reactivate); usage, the card, and invoices are read-only.
+const billing: BillingOverview = {
+  subscription: { ...BILLING_OVERVIEW.subscription },
+  usage: BILLING_OVERVIEW.usage.map((u) => ({ ...u })),
+  paymentMethod: { ...BILLING_OVERVIEW.paymentMethod },
+};
+const invoicesStore: Invoice[] = INVOICES.map((i) => ({ ...i }));
+
+// In-memory People store (same session lifecycle). Holds the full member record
+// incl. `bio`; the list endpoint projects each to its lean table row, the detail
+// endpoint returns the full record.
+const membersStore: MemberDetail[] = MEMBERS.map((m) => ({ ...m }));
+
+// In-memory Notifications store (same session lifecycle). Mark-read mutations
+// flip `read` in place; there is no create or remove, so the feed never empties.
+const notificationsStore: Notification[] = NOTIFICATIONS.map((n) => ({ ...n }));
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -245,5 +290,232 @@ export const handlers: RequestHandler[] = [
     Object.assign(issue, (await request.json()) as IssueInput);
     issue.updatedAt = new Date().toISOString().slice(0, 10);
     return HttpResponse.json({ issue });
+  }),
+
+  // --- Inbox ---
+  // The conversation list returns the lean `Conversation` shape: base fields plus
+  // a `preview` + `lastMessageAt` derived from the most recent message. The
+  // messages, customer email, and assignee are detail-only, so they're projected
+  // away here. Sorted newest-first by that last-message time.
+  http.get('/api/inbox/conversations', async () => {
+    await delay(500);
+    const conversations: Conversation[] = conversationsStore
+      .map(({ id, customer, subject, status, unread, messages }) => {
+        const last = messages[messages.length - 1];
+        return {
+          id,
+          customer,
+          subject,
+          status,
+          unread,
+          preview: last?.body ?? '',
+          lastMessageAt: last?.at ?? '',
+        };
+      })
+      .sort((a, b) => b.lastMessageAt.localeCompare(a.lastMessageAt));
+    return HttpResponse.json({ conversations });
+  }),
+
+  // A single conversation incl. its full message thread (404 when unknown).
+  http.get('/api/inbox/conversations/:id', async ({ params }) => {
+    await delay(300);
+    const conversation = conversationsStore.find((c) => c.id === params.id);
+    if (!conversation) {
+      return HttpResponse.json(
+        { message: 'Conversation not found.' },
+        { status: 404 }
+      );
+    }
+    return HttpResponse.json({ conversation });
+  }),
+
+  // Reply: append an agent message (signed by the assignee), clear the unread
+  // flag, and return the updated thread.
+  http.post(
+    '/api/inbox/conversations/:id/reply',
+    async ({ params, request }) => {
+      await delay(300);
+      const conversation = conversationsStore.find((c) => c.id === params.id);
+      if (!conversation) {
+        return HttpResponse.json(
+          { message: 'Conversation not found.' },
+          { status: 404 }
+        );
+      }
+      const { body } = (await request.json()) as { body: string };
+      conversation.messages.push({
+        id: crypto.randomUUID(),
+        author: 'agent',
+        authorName: conversation.assignee,
+        body,
+        at: new Date().toISOString(),
+      });
+      conversation.unread = false;
+      return HttpResponse.json({ conversation });
+    }
+  ),
+
+  // Status change: set the lifecycle status in place, return the thread.
+  http.patch(
+    '/api/inbox/conversations/:id/status',
+    async ({ params, request }) => {
+      await delay(300);
+      const conversation = conversationsStore.find((c) => c.id === params.id);
+      if (!conversation) {
+        return HttpResponse.json(
+          { message: 'Conversation not found.' },
+          { status: 404 }
+        );
+      }
+      const { status } = (await request.json()) as {
+        status: ConversationStatus;
+      };
+      conversation.status = status;
+      return HttpResponse.json({ conversation });
+    }
+  ),
+
+  // --- Billing ---
+  // The overview: current subscription + usage meters + the card on file.
+  // Read-only reporting dashboard. `?range` selects the period; an unknown
+  // value falls back to 30d so a stale or hand-typed URL never errors.
+  http.get('/api/analytics', async ({ request }) => {
+    await delay(500);
+    const param = new URL(request.url).searchParams.get('range');
+    const range: AnalyticsRange = ANALYTICS_RANGES.includes(
+      param as AnalyticsRange
+    )
+      ? (param as AnalyticsRange)
+      : '30d';
+    return HttpResponse.json(analyticsOverview(range));
+  }),
+
+  http.get('/api/billing', async () => {
+    await delay(500);
+    return HttpResponse.json(billing);
+  }),
+
+  // Past invoices (the transactions table). Read-only; newest first.
+  http.get('/api/billing/invoices', async () => {
+    await delay(400);
+    return HttpResponse.json({ invoices: invoicesStore });
+  }),
+
+  // Change tier and/or cycle — also clears a pending cancellation.
+  http.patch('/api/billing/subscription', async ({ request }) => {
+    await delay(300);
+    const { tier, cycle } = (await request.json()) as PlanSelection;
+    billing.subscription.tier = tier;
+    billing.subscription.cycle = cycle;
+    billing.subscription.status = 'active';
+    return HttpResponse.json({ subscription: billing.subscription });
+  }),
+
+  // Cancel: wind down at period end — stays active until renewsAt.
+  http.post('/api/billing/cancel', async () => {
+    await delay(300);
+    billing.subscription.status = 'canceling';
+    return HttpResponse.json({ subscription: billing.subscription });
+  }),
+
+  // Reactivate: undo a pending cancellation.
+  http.post('/api/billing/reactivate', async () => {
+    await delay(300);
+    billing.subscription.status = 'active';
+    return HttpResponse.json({ subscription: billing.subscription });
+  }),
+
+  // --- People (team directory) ---
+
+  // The directory list — each member projected to its lean table row (no `bio`).
+  http.get('/api/people/members', async () => {
+    await delay(500);
+    const members: Member[] = membersStore.map(
+      ({ id, name, email, title, role, department, status, joinedAt }) => ({
+        id,
+        name,
+        email,
+        title,
+        role,
+        department,
+        status,
+        joinedAt,
+      })
+    );
+    return HttpResponse.json({ members });
+  }),
+
+  // A single member incl. profile-only fields (404 when unknown).
+  http.get('/api/people/members/:id', async ({ params }) => {
+    await delay(300);
+    const member = membersStore.find((m) => m.id === params.id);
+    if (!member) {
+      return HttpResponse.json(
+        { message: 'Member not found.' },
+        { status: 404 }
+      );
+    }
+    return HttpResponse.json({ member });
+  }),
+
+  // Invite: a new member is always `invited` (server-authoritative) and joins
+  // today — the create form never sets status.
+  http.post('/api/people/members', async ({ request }) => {
+    await delay(300);
+    const input = (await request.json()) as MemberInput;
+    const member: MemberDetail = {
+      ...input,
+      id: crypto.randomUUID(),
+      status: 'invited',
+      joinedAt: new Date().toISOString().slice(0, 10),
+    };
+    membersStore.unshift(member);
+    return HttpResponse.json({ member }, { status: 201 });
+  }),
+
+  // Edit: apply the editable fields (incl. status — suspend / reactivate live here).
+  http.patch('/api/people/members/:id', async ({ params, request }) => {
+    await delay(300);
+    const member = membersStore.find((m) => m.id === params.id);
+    if (!member) {
+      return HttpResponse.json(
+        { message: 'Member not found.' },
+        { status: 404 }
+      );
+    }
+    Object.assign(member, (await request.json()) as MemberInput);
+    return HttpResponse.json({ member });
+  }),
+
+  // --- Notifications ---
+
+  // The activity feed for the topbar bell — newest first (the fixtures are
+  // already ordered). The menu derives the unread count client-side.
+  http.get('/api/notifications', async () => {
+    await delay(500);
+    return HttpResponse.json({ notifications: notificationsStore });
+  }),
+
+  // Mark one read in place (404 when unknown).
+  http.patch('/api/notifications/:id/read', async ({ params }) => {
+    await delay(200);
+    const notification = notificationsStore.find((n) => n.id === params.id);
+    if (!notification) {
+      return HttpResponse.json(
+        { message: 'Notification not found.' },
+        { status: 404 }
+      );
+    }
+    notification.read = true;
+    return HttpResponse.json({ notification });
+  }),
+
+  // Mark every notification read; return the updated list.
+  http.post('/api/notifications/read-all', async () => {
+    await delay(200);
+    notificationsStore.forEach((n) => {
+      n.read = true;
+    });
+    return HttpResponse.json({ notifications: notificationsStore });
   }),
 ];

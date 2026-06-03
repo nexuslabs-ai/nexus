@@ -27,11 +27,36 @@
     { "name": "Breadcrumb", "showcase": "AllVariants" },
     { "name": "Button", "showcase": "AllVariants" },
     { "name": "ButtonGroup", "showcase": "AllVariants" },
+    {
+      "name": "Calendar",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"]
+    },
     { "name": "Card", "showcase": "AllVariants" },
+    {
+      "name": "Carousel",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"]
+    },
     { "name": "Checkbox", "showcase": "AllVariants" },
     { "name": "Collapsible", "showcase": "AllVariants" },
     {
+      "name": "ContextMenu",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
+      "equivalents": {
+        "ClickInteraction": ["OpenCloseInteraction"],
+        "Disabled": ["WithDisabledItems"]
+      }
+    },
+    {
       "name": "Dialog",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"],
+      "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
+    },
+    {
+      "name": "Drawer",
       "showcase": "AllVariants",
       "interactions": ["ClickInteraction", "KeyboardInteraction"],
       "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
@@ -47,6 +72,7 @@
     },
     { "name": "EmptyState", "showcase": "AllVariants" },
     { "name": "Field", "showcase": "AllVariants" },
+    { "name": "HoverCard", "showcase": "AllVariants" },
     {
       "name": "Input",
       "showcase": "AllVariants",
@@ -58,7 +84,22 @@
     { "name": "InputGroup", "showcase": "AllVariants" },
     { "name": "Item", "showcase": "AllVariants" },
     { "name": "Kbd", "showcase": "AllVariants" },
+    {
+      "name": "Menubar",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
+      "equivalents": {
+        "ClickInteraction": ["OpenCloseInteraction"],
+        "Disabled": ["WithDisabledItems"]
+      }
+    },
     { "name": "NativeSelect", "showcase": "AllVariants" },
+    {
+      "name": "NavigationMenu",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"],
+      "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
+    },
     { "name": "Pagination", "showcase": "AllVariants" },
     {
       "name": "Popover",
@@ -67,6 +108,11 @@
       "equivalents": { "ClickInteraction": ["OpenCloseInteraction"] }
     },
     { "name": "RadioGroup", "showcase": "AllVariants" },
+    {
+      "name": "Resizable",
+      "showcase": "AllVariants",
+      "interactions": ["KeyboardInteraction"]
+    },
     {
       "name": "Select",
       "showcase": "AllVariants",
@@ -87,6 +133,7 @@
       "showcase": "AllVariants",
       "interactions": ["ClickInteraction", "KeyboardInteraction"]
     },
+    { "name": "Slider", "showcase": "AllVariants" },
     { "name": "Show", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Hide", "showcase": "AllAxes", "sourceDir": "primitives" },
     { "name": "Spinner", "showcase": "AllVariants" },

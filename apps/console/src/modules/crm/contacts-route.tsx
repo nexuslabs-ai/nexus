@@ -1,11 +1,20 @@
 import { useState } from 'react';
 
-import { Button, Skeleton } from '@nexus/react';
+import {
+  Button,
+  EmptyState,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+  Skeleton,
+} from '@nexus/react';
 import { IconPlus, IconUsers } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
+import { ErrorState } from '../../components/error-state';
 import { crmKeys, fetchContacts } from '../../lib/crm-api';
 
 import { ContactFormSheet } from './contact-form-sheet';
@@ -17,7 +26,7 @@ import { ContactsToolbar } from './contacts-toolbar';
 const crmRoute = getRouteApi('/app/m/crm');
 
 export function ContactsRoute() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: crmKeys.contacts,
     queryFn: fetchContacts,
   });
@@ -58,9 +67,11 @@ export function ContactsRoute() {
 
       {isPending && <ContactsSkeleton />}
       {isError && (
-        <p className="nx:text-error-foreground nx:text-sm">
-          Couldn&apos;t load contacts. Please try again.
-        </p>
+        <ErrorState
+          message="Couldn't load contacts."
+          onRetry={refetch}
+          bordered
+        />
       )}
       {contacts &&
         (contacts.length === 0 ? (
@@ -98,20 +109,19 @@ function ContactsSkeleton() {
   );
 }
 
-// App-local empty state — the polished @nexus/react EmptyState is tracked in #282.
 function ContactsEmpty() {
   return (
-    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
-      <div className="nx:bg-muted nx:text-muted-foreground nx:flex nx:size-12 nx:items-center nx:justify-center nx:rounded-full">
-        <IconUsers />
-      </div>
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        No contacts yet
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        Contacts you add will show up here, ready to sort, filter, and work in
-        bulk.
-      </p>
-    </div>
+    <EmptyState className="nx:border nx:border-border-default">
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No contacts yet</EmptyStateTitle>
+        <EmptyStateDescription>
+          Contacts you add will show up here, ready to sort, filter, and work in
+          bulk.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
   );
 }
