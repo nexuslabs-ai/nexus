@@ -1,9 +1,10 @@
 import { Outlet } from '@tanstack/react-router';
 
 /**
- * The shell-less layout for the auth flow (login / signup / verify / forgot):
- * a brand panel on the left (hidden below `lg`) and the active auth screen
- * centered on the right.
+ * The shell-less layout for the auth flow (login / signup / verify / forgot).
+ * The auth screen is the base — centered at every width. The brand panel is a
+ * Standard-tier enhancement, shown alongside it only at `lg` and up
+ * (`nx:lg:flex`).
  *
  * It sets `nx:bg-background nx:text-foreground` on its root because it renders
  * OUTSIDE the app shell — a sibling pathless route, not a child — so it can't

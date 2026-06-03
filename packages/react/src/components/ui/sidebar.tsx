@@ -20,7 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsNarrow } from '@/hooks/use-narrow';
 import { IconLayoutSidebar } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -134,7 +134,7 @@ function SidebarProvider({
   children,
   ...props
 }: SidebarProviderProps) {
-  const isMobile = useIsMobile();
+  const isMobile = useIsNarrow();
   const [openMobile, setOpenMobile] = React.useState(false);
 
   // Internal open state; openProp/setOpenProp take over when controlled.
@@ -244,9 +244,9 @@ interface SidebarProps extends React.ComponentProps<'div'> {
 /**
  * Sidebar
  *
- * The sidebar panel. On viewports below the Standard floor (`lg`) it renders as
- * a Sheet drawer; at or above `lg` it docks to the chosen `side` and collapses
- * per the `collapsible` mode.
+ * The sidebar panel. In the Narrow tier (below `lg`) it renders as a Sheet
+ * drawer; at or above `lg` it docks to the chosen `side` and collapses per the
+ * `collapsible` mode.
  *
  * @example
  * ```tsx
