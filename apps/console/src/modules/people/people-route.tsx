@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
-import { Button, Skeleton } from '@nexus/react';
+import {
+  Button,
+  EmptyState,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+  Skeleton,
+} from '@nexus/react';
 import { IconUserPlus, IconUsers } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
@@ -94,20 +102,19 @@ function PeopleSkeleton() {
   );
 }
 
-// App-local empty state — the polished @nexus/react EmptyState is tracked in #282.
 function PeopleEmpty() {
   return (
-    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
-      <div className="nx:bg-muted nx:text-muted-foreground nx:flex nx:size-12 nx:items-center nx:justify-center nx:rounded-full">
-        <IconUsers />
-      </div>
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        No members yet
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        Invite teammates and they&apos;ll show up here, ready to filter by role,
-        department, and status.
-      </p>
-    </div>
+    <EmptyState className="nx:border nx:border-border-default">
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No members yet</EmptyStateTitle>
+        <EmptyStateDescription>
+          Invite teammates and they&apos;ll show up here, ready to filter by
+          role, department, and status.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
   );
 }

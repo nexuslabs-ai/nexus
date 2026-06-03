@@ -8,6 +8,11 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  EmptyStateContent,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateTitle,
   Separator,
   Skeleton,
   Tabs,
@@ -190,22 +195,23 @@ function DetailSkeleton() {
   );
 }
 
-// App-local not-found — the polished @nexus/react EmptyState is tracked in #282.
 function NotFound() {
   return (
-    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        Contact not found
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        This contact doesn&apos;t exist, or may have been removed.
-      </p>
-      <Link
-        to="/m/crm"
-        className="nx:text-primary-subtle-foreground nx:hover:underline"
-      >
-        Back to Contacts
-      </Link>
-    </div>
+    <EmptyState className="nx:border nx:border-border-default">
+      <EmptyStateHeader>
+        <EmptyStateTitle>Contact not found</EmptyStateTitle>
+        <EmptyStateDescription>
+          This contact doesn&apos;t exist, or may have been removed.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+      <EmptyStateContent>
+        <Link
+          to="/m/crm"
+          className="nx:text-primary-subtle-foreground nx:hover:underline"
+        >
+          Back to Contacts
+        </Link>
+      </EmptyStateContent>
+    </EmptyState>
   );
 }

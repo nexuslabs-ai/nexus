@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
-import { Button, Skeleton } from '@nexus/react';
+import {
+  Button,
+  EmptyState,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+  Skeleton,
+} from '@nexus/react';
 import { IconBriefcase, IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -72,20 +80,19 @@ function IssuesSkeleton() {
   );
 }
 
-// App-local empty state — the polished @nexus/react EmptyState is tracked in #282.
 function IssuesEmpty() {
   return (
-    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
-      <div className="nx:bg-muted nx:text-muted-foreground nx:flex nx:size-12 nx:items-center nx:justify-center nx:rounded-full">
-        <IconBriefcase />
-      </div>
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        No issues yet
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        Issues you create will show up here, ready to sort, filter, and work
-        through.
-      </p>
-    </div>
+    <EmptyState className="nx:border nx:border-border-default">
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconBriefcase />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No issues yet</EmptyStateTitle>
+        <EmptyStateDescription>
+          Issues you create will show up here, ready to sort, filter, and work
+          through.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
   );
 }
