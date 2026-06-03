@@ -13,8 +13,8 @@ interface ErrorStateProps {
   message: string;
   /** Retry handler, typically the query's `refetch`. */
   onRetry: () => void;
-  /** Frame override — pass the slot's border so the error matches its skeleton. Default borderless. */
-  className?: string;
+  /** Border the frame to match a bordered-skeleton slot, so loading→error doesn't reflow. Default borderless. */
+  bordered?: boolean;
 }
 
 /**
@@ -24,9 +24,11 @@ interface ErrorStateProps {
  * reads the same and offers a retry — replacing the ad-hoc one-liners modules
  * used to inline.
  */
-export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
+export function ErrorState({ message, onRetry, bordered }: ErrorStateProps) {
   return (
-    <EmptyState className={className}>
+    <EmptyState
+      className={bordered ? 'nx:border nx:border-border-default' : undefined}
+    >
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">
           <IconAlertTriangle />

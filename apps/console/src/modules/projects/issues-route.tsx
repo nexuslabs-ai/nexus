@@ -50,7 +50,7 @@ export function IssuesRoute() {
         <ErrorState
           message="Couldn't load issues."
           onRetry={refetch}
-          className="nx:border nx:border-border-default"
+          bordered
         />
       )}
       {issues &&

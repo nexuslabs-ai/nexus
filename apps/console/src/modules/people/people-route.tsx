@@ -66,7 +66,7 @@ export function PeopleRoute() {
         <ErrorState
           message="Couldn't load members."
           onRetry={refetch}
-          className="nx:border nx:border-border-default"
+          bordered
         />
       )}
       {members &&

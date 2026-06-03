@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
 import {
   Button,
@@ -17,7 +17,7 @@ interface NotFoundStateProps {
   /** Supporting copy — e.g. "This contact doesn't exist, or may have been removed.". */
   description: string;
   /** The back action — pass a single `<Link>`; it renders as an outline button. */
-  children: ReactNode;
+  children: ReactElement;
 }
 
 /**
@@ -33,8 +33,6 @@ export function NotFoundState({
   children,
 }: NotFoundStateProps) {
   return (
-    // Bordered (unlike the in-flow ErrorState) — a not-found replaces the whole
-    // detail route, so it carries the same frame as the modules' list empties.
     <EmptyState className="nx:border nx:border-border-default">
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">

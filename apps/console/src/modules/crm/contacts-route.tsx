@@ -70,7 +70,7 @@ export function ContactsRoute() {
         <ErrorState
           message="Couldn't load contacts."
           onRetry={refetch}
-          className="nx:border nx:border-border-default"
+          bordered
         />
       )}
       {contacts &&
