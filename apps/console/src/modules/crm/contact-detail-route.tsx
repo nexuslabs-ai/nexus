@@ -3,6 +3,12 @@ import { useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   CardContent,
@@ -21,7 +27,6 @@ import {
   TabsTrigger,
 } from '@nexus/react';
 import {
-  IconArrowLeft,
   IconFlag,
   IconMail,
   IconNote,
@@ -51,13 +56,19 @@ export function ContactDetailRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <Link
-        to="/m/crm"
-        className="nx:text-muted-foreground nx:hover:text-foreground nx:inline-flex nx:items-center nx:gap-1 nx:text-sm"
-      >
-        <IconArrowLeft className="nx:size-4" />
-        Contacts
-      </Link>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/m/crm">Contacts</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{data?.contact.name ?? 'Contact'}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {isPending && <DetailSkeleton />}
       {isError && <NotFound />}

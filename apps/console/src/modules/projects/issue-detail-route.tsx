@@ -4,6 +4,12 @@ import { useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   CardContent,
@@ -17,7 +23,7 @@ import {
   Separator,
   Skeleton,
 } from '@nexus/react';
-import { IconArrowLeft, IconPencil } from '@tabler/icons-react';
+import { IconPencil } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 
@@ -40,13 +46,19 @@ export function IssueDetailRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <Link
-        to="/m/projects"
-        className="nx:text-muted-foreground nx:hover:text-foreground nx:inline-flex nx:items-center nx:gap-1 nx:text-sm"
-      >
-        <IconArrowLeft className="nx:size-4" />
-        Issues
-      </Link>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/m/projects">Issues</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{data?.issue.title ?? 'Issue'}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {isPending && <DetailSkeleton />}
       {isError && <NotFound />}
