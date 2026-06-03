@@ -1,24 +1,31 @@
 # Responsive Design Rules
 
-Nexus components are designed for **Standard (≥1024px)** as the primary target. Narrow (<1024px) is graceful degradation; Wide (≥1536px) gets breathing room when available. Standard spans `lg` (1024px floor — the prefix you reach for first when writing responsive consumer code) through `xl` (1280px — the design reference width components are tuned against).
+Nexus is designed **mobile-first and desktop-first**: **Narrow (mobile) and Standard (desktop) are both first-class targets** — neither is a degradation of the other. Author **mobile-first** — the base (unprefixed) utilities are the Narrow/mobile case, and min-width prefixes (`nx:lg:`, `nx:xl:`) layer on the wider tiers. Components are tuned against **two reference widths — a mobile reference (~390px) and a desktop reference (~1280px)** — and must read well at both. **Wide (≥1536px)** gets extra breathing room when available.
 
-> **Consumer-brand inversion.** The ≥1024px primary target is the Nexus reference brand's default (the `--breakpoint-*` tokens). Consumer brands building mobile-first products override by re-aiming `@theme { --breakpoint-* }` and treating a different tier as primary — the Narrow / Standard / Wide labels describe defaults, not hard-coded behaviour.
+> **Consumer-brand re-aiming.** The reference brand is co-primary (mobile + desktop) out of the box — mobile is _not_ an inversion of a desktop default. Consumer brands can still re-aim `@theme { --breakpoint-* }` to weight a particular tier for their product; the Narrow / Standard / Wide labels describe the reference brand's bands, not hard-coded behaviour.
 
 ## Display class table
 
 **This table is the single source of truth.** Other rule files (`components.md`) link here rather than duplicating these rows.
 
-| Tailwind class | Range (rem / px @16) | Nexus display class | Use as primary target? |
-| -------------- | -------------------- | ------------------- | ---------------------- |
-| `nx:sm:`       | 40rem / 640px+       | Narrow              | No (graceful)          |
-| `nx:md:`       | 48rem / 768px+       | Narrow              | No (graceful)          |
-| `nx:lg:`       | 64rem / 1024px+      | **Standard ★**      | Yes — floor            |
-| `nx:xl:`       | 80rem / 1280px+      | **Standard ★**      | Yes — reference        |
-| `nx:2xl:`      | 96rem / 1536px+      | Wide                | No (extended)          |
+| Tailwind class | Range (rem / px @16) | Nexus display class | Design target                                       |
+| -------------- | -------------------- | ------------------- | --------------------------------------------------- |
+| _(no prefix)_  | base / <640px        | Narrow              | ★ mobile foundation — style here first (~390px ref) |
+| `nx:sm:`       | 40rem / 640px+       | Narrow              | ★ first-class                                       |
+| `nx:md:`       | 48rem / 768px+       | Narrow              | ★ first-class                                       |
+| `nx:lg:`       | 64rem / 1024px+      | Standard            | ★ first-class — desktop floor                       |
+| `nx:xl:`       | 80rem / 1280px+      | Standard            | ★ first-class — desktop reference                   |
+| `nx:2xl:`      | 96rem / 1536px+      | Wide                | extra breathing room                                |
 
 **Narrow / Standard / Wide are documentation labels, not utilities.** There is no `nx:standard:` class. Contributors use the standard Tailwind class names (`nx:sm:`, `nx:md:`, `nx:lg:`, `nx:xl:`, `nx:2xl:`) in code; the display-class labels exist to anchor design and review conversations.
 
 > **Rem breakpoints track the user's font-size preference — not zoom.** Breakpoints are rem-based, so they respond to the browser's **default font-size** setting — in a media query, `rem` resolves against that browser default (a user preference), not against any `html { font-size }` the page itself sets. Full-page zoom is _not_ the mechanism: zoom scales every length unit, rem and px alike, so rem-vs-px makes no difference under it. The payoff is for a user who raises their base font size — each rem grows, the breakpoints fire at a _narrower_ viewport, and the layout drops to a roomier tier as the text enlarges (a px-based layout would ignore the preference). Example: doubling the base font to 32px turns `nx:lg:` (64rem) into a 2048px threshold and `nx:md:` (48rem) into 1536px, so a 1280px viewport that is normally Standard (`nx:xl:` matches) now reads Narrow — only `nx:sm:` (40rem → 1280px) still matches. This is intended accessibility behaviour: layout should follow text size. Test components at 100/150/200% zoom (for reflow) **and** with an enlarged browser default font (for breakpoint behaviour).
+
+## Touch targets
+
+Both Narrow (mobile) and Standard (desktop) are first-class, so every interactive control must be comfortably **tappable**, not just clickable. **Minimum interactive target: ~44px** (WCAG 2.5.5 Target Size · Apple HIG 44pt; Material's 48dp is the roomier bar). This is a **hit-area floor, not a visual-size mandate** — a control may look smaller as long as its tappable area clears ~44px on touch (extend it with padding, or an `::after` hit-area overlay as Sidebar does with `nx:after:-inset-2`).
+
+Because Nexus sizes by padding, not fixed height (see [components.md § Sizing Convention](components.md#sizing-convention)), meet the floor with padding — `nx:p-*` tuned so the rendered hit area reaches ~44px — not a hardcoded `nx:h-11`. Pointer-fine surfaces (mouse) may render denser; the touch case sets the floor.
 
 ## Decision tree — which responsive mechanism
 

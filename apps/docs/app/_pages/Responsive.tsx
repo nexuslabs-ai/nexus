@@ -13,37 +13,43 @@ const BREAKPOINTS: {
   cls: string;
   size: string;
   display: string;
-  primary: string;
+  target: string;
 }[] = [
+  {
+    cls: '(no prefix)',
+    size: 'base / <640px',
+    display: 'Narrow',
+    target: '★ mobile foundation — style here first',
+  },
   {
     cls: 'nx:sm:',
     size: '40rem / 640px',
     display: 'Narrow',
-    primary: 'No (graceful)',
+    target: '★ first-class',
   },
   {
     cls: 'nx:md:',
     size: '48rem / 768px',
     display: 'Narrow',
-    primary: 'No (graceful)',
+    target: '★ first-class',
   },
   {
     cls: 'nx:lg:',
     size: '64rem / 1024px',
-    display: 'Standard ★',
-    primary: 'Yes — floor',
+    display: 'Standard',
+    target: '★ first-class — desktop floor',
   },
   {
     cls: 'nx:xl:',
     size: '80rem / 1280px',
-    display: 'Standard ★',
-    primary: 'Yes — reference',
+    display: 'Standard',
+    target: '★ first-class — desktop reference',
   },
   {
     cls: 'nx:2xl:',
     size: '96rem / 1536px',
     display: 'Wide',
-    primary: 'No (extended)',
+    target: 'extra breathing room',
   },
 ];
 
@@ -75,21 +81,24 @@ export function Responsive() {
       />
       <h1 className="nx:typography-heading-large">Responsive</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        Nexus targets Standard (≥1024px) as the primary design target. Narrow
-        (&lt;1024px) is graceful degradation; Wide (≥1536px) gets breathing room
-        when available. Breakpoints are rem-based, so they track the
-        user&rsquo;s font-size preference — raise the base font and each
-        breakpoint fires at a narrower viewport, dropping the layout to a
-        roomier tier as the text enlarges.
+        Nexus is designed mobile-first and desktop-first — Narrow (mobile) and
+        Standard (desktop) are both first-class targets, neither a degradation
+        of the other. Author mobile-first: base styles are the mobile case, and
+        min-width prefixes layer on the wider tiers. Wide (≥1536px) gets extra
+        breathing room; interactive controls clear a ~44px minimum tap-target
+        for touch. Breakpoints are rem-based, so they track the user&rsquo;s
+        font-size preference — raise the base font and each breakpoint fires at
+        a narrower viewport, dropping the layout to a roomier tier as the text
+        enlarges.
       </p>
 
       {/* ── Breakpoints ─────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Breakpoints</h2>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Five Tailwind classes mapped onto the Narrow / Standard / Wide display
-          labels. Standard spans <code>lg</code> (the floor) through{' '}
-          <code>xl</code> (the reference width components are tuned against).
+          Five Tailwind classes plus the unprefixed base, mapped onto the Narrow
+          / Standard / Wide labels. Components are tuned against two reference
+          widths — mobile ~390px and desktop ~1280px (<code>xl</code>).
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:text-sm">
@@ -100,7 +109,7 @@ export function Responsive() {
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">
                   Display class
                 </th>
-                <th className="nx:py-2 nx:font-semibold">Primary target?</th>
+                <th className="nx:py-2 nx:font-semibold">Design target</th>
               </tr>
             </thead>
             <tbody>
@@ -119,7 +128,7 @@ export function Responsive() {
                     {bp.display}
                   </td>
                   <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
-                    {bp.primary}
+                    {bp.target}
                   </td>
                 </tr>
               ))}

@@ -66,6 +66,8 @@ See [`tokens.md` § Light/Dark Theme Tokens](tokens.md#lightdark-theme-tokens) f
 
 Use padding for sizing, not fixed heights (`nx:px-4 nx:py-2`, not `nx:h-10 nx:px-4`) — fixed heights break in flex layouts. **Exceptions:** avatars, progress bars, modals may need fixed dimensions.
 
+**Touch targets (mobile-first):** interactive controls must clear a **~44px minimum tap-target** — tune `nx:p-*` so the rendered hit area meets it (or extend it with an `::after` overlay), not by shrinking the control. See [responsive.md § Touch targets](responsive.md#touch-targets).
+
 ## Responsive behaviour
 
 Component-internal responsive behaviour should use `@container` queries, not viewport breakpoints — a component adapts to its parent's width, not the viewport, so it renders consistently whether it lands in a sidebar or a hero. Viewport prefixes (`nx:lg:`, etc.) are reserved for page-shell decisions; full-viewport overlays (e.g. Dialog) are the documented exception, since their trigger is position relative to the viewport.
