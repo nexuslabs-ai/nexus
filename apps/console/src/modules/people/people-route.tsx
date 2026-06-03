@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
+import { ErrorState } from '../../components/error-state';
 import { fetchMembers, peopleKeys } from '../../lib/people-api';
 
 import { MemberFormSheet } from './member-form-sheet';
@@ -24,7 +25,7 @@ import { PeopleToolbar } from './people-toolbar';
 const peopleRoute = getRouteApi('/app/m/people');
 
 export function PeopleRoute() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: peopleKeys.members,
     queryFn: fetchMembers,
   });
@@ -62,9 +63,11 @@ export function PeopleRoute() {
 
       {isPending && <PeopleSkeleton />}
       {isError && (
-        <p className="nx:text-error-foreground nx:text-sm">
-          Couldn&apos;t load members. Please try again.
-        </p>
+        <ErrorState
+          message="Couldn't load members."
+          onRetry={refetch}
+          bordered
+        />
       )}
       {members &&
         (members.length === 0 ? (

@@ -13,6 +13,7 @@ import { IconInbox } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
+import { ErrorState } from '../../components/error-state';
 import { useMediaQuery } from '../../hooks/use-media-query';
 import { fetchConversations, inboxKeys } from '../../lib/inbox-api';
 
@@ -22,7 +23,7 @@ import { ConversationThread } from './conversation-thread';
 const inboxRoute = getRouteApi('/app/m/inbox');
 
 export function InboxRoute() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: inboxKeys.conversations,
     queryFn: fetchConversations,
   });
@@ -35,7 +36,9 @@ export function InboxRoute() {
   const listPane = (
     <>
       {isPending && <ListSkeleton />}
-      {isError && <ListError />}
+      {isError && (
+        <ErrorState message="Couldn't load conversations." onRetry={refetch} />
+      )}
       {conversations && (
         <ConversationList conversations={conversations} activeId={c} />
       )}
@@ -108,14 +111,6 @@ function ListSkeleton() {
         </div>
       ))}
     </div>
-  );
-}
-
-function ListError() {
-  return (
-    <p className="nx:text-error-foreground nx:p-4 nx:text-sm">
-      Couldn&apos;t load conversations. Please try again.
-    </p>
   );
 }
 

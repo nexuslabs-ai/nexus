@@ -13,13 +13,14 @@ import { IconBriefcase, IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '../../components/data-table';
+import { ErrorState } from '../../components/error-state';
 import { fetchIssues, projectKeys } from '../../lib/projects-api';
 
 import { IssueFormSheet } from './issue-form-sheet';
 import { issueColumns } from './issues-columns';
 
 export function IssuesRoute() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: projectKeys.issues,
     queryFn: fetchIssues,
   });
@@ -46,9 +47,11 @@ export function IssuesRoute() {
 
       {isPending && <IssuesSkeleton />}
       {isError && (
-        <p className="nx:text-error-foreground nx:text-sm">
-          Couldn&apos;t load issues. Please try again.
-        </p>
+        <ErrorState
+          message="Couldn't load issues."
+          onRetry={refetch}
+          bordered
+        />
       )}
       {issues &&
         (issues.length === 0 ? (

@@ -15,11 +15,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  EmptyState,
-  EmptyStateContent,
-  EmptyStateDescription,
-  EmptyStateHeader,
-  EmptyStateTitle,
   Separator,
   Skeleton,
 } from '@nexus/react';
@@ -27,6 +22,7 @@ import { IconPencil } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 
+import { NotFoundState } from '../../components/not-found-state';
 import { formatDate, initials } from '../../lib/format';
 import {
   fetchIssue,
@@ -61,7 +57,14 @@ export function IssueDetailRoute() {
       </Breadcrumb>
 
       {isPending && <DetailSkeleton />}
-      {isError && <NotFound />}
+      {isError && (
+        <NotFoundState
+          title="Issue not found"
+          description="This issue doesn't exist, or may have been removed."
+        >
+          <Link to="/m/projects">Back to Issues</Link>
+        </NotFoundState>
+      )}
       {data && <DetailContent issue={data.issue} />}
     </div>
   );
@@ -178,26 +181,5 @@ function DetailSkeleton() {
         <Skeleton className="nx:h-48" />
       </div>
     </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <EmptyState className="nx:border nx:border-border-default">
-      <EmptyStateHeader>
-        <EmptyStateTitle>Issue not found</EmptyStateTitle>
-        <EmptyStateDescription>
-          This issue doesn&apos;t exist, or may have been removed.
-        </EmptyStateDescription>
-      </EmptyStateHeader>
-      <EmptyStateContent>
-        <Link
-          to="/m/projects"
-          className="nx:text-primary-subtle-foreground nx:hover:underline"
-        >
-          Back to Issues
-        </Link>
-      </EmptyStateContent>
-    </EmptyState>
   );
 }

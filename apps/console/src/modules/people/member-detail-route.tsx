@@ -14,11 +14,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  EmptyState,
-  EmptyStateContent,
-  EmptyStateDescription,
-  EmptyStateHeader,
-  EmptyStateTitle,
   Separator,
   Skeleton,
 } from '@nexus/react';
@@ -26,6 +21,7 @@ import { IconPencil } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 
+import { NotFoundState } from '../../components/not-found-state';
 import { formatDate, initials } from '../../lib/format';
 import {
   fetchMember,
@@ -60,7 +56,14 @@ export function MemberDetailRoute() {
       </Breadcrumb>
 
       {isPending && <DetailSkeleton />}
-      {isError && <NotFound />}
+      {isError && (
+        <NotFoundState
+          title="Member not found"
+          description="This member doesn't exist, or may have been removed."
+        >
+          <Link to="/m/people">Back to People</Link>
+        </NotFoundState>
+      )}
       {data && <DetailContent member={data.member} />}
     </div>
   );
@@ -153,26 +156,5 @@ function DetailSkeleton() {
       </div>
       <Skeleton className="nx:h-48 nx:w-full" />
     </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <EmptyState className="nx:border nx:border-border-default">
-      <EmptyStateHeader>
-        <EmptyStateTitle>Member not found</EmptyStateTitle>
-        <EmptyStateDescription>
-          This member doesn&apos;t exist, or may have been removed.
-        </EmptyStateDescription>
-      </EmptyStateHeader>
-      <EmptyStateContent>
-        <Link
-          to="/m/people"
-          className="nx:text-primary-subtle-foreground nx:hover:underline"
-        >
-          Back to People
-        </Link>
-      </EmptyStateContent>
-    </EmptyState>
   );
 }

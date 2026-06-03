@@ -29,6 +29,7 @@ import {
 import { IconCreditCard } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { ErrorState } from '../../components/error-state';
 import {
   billingKeys,
   type BillingOverview,
@@ -47,7 +48,7 @@ import { InvoiceStatusBadge, planTier, tierPrice } from './billing-ui';
 import { PlanSheet } from './plan-sheet';
 
 export function BillingRoute() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: billingKeys.overview,
     queryFn: fetchBilling,
   });
@@ -65,9 +66,7 @@ export function BillingRoute() {
 
       {isPending && <BillingSkeleton />}
       {isError && (
-        <p className="nx:text-error-foreground nx:text-sm">
-          Couldn&apos;t load billing. Please try again.
-        </p>
+        <ErrorState message="Couldn't load billing." onRetry={refetch} />
       )}
       {data && <BillingContent overview={data} />}
     </div>
@@ -300,7 +299,7 @@ function UsageMeterBar({ meter }: { meter: UsageMeter }) {
 }
 
 function InvoicesCard() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: billingKeys.invoices,
     queryFn: fetchInvoices,
   });
@@ -313,9 +312,7 @@ function InvoicesCard() {
       <CardContent>
         {isPending && <InvoicesSkeleton />}
         {isError && (
-          <p className="nx:text-error-foreground nx:text-sm">
-            Couldn&apos;t load invoices.
-          </p>
+          <ErrorState message="Couldn't load invoices." onRetry={refetch} />
         )}
         {data && <InvoicesTable invoices={data.invoices} />}
       </CardContent>
