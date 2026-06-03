@@ -63,7 +63,11 @@ export function PeopleRoute() {
 
       {isPending && <PeopleSkeleton />}
       {isError && (
-        <ErrorState message="Couldn't load members." onRetry={refetch} />
+        <ErrorState
+          message="Couldn't load members."
+          onRetry={refetch}
+          className="nx:border nx:border-border-default"
+        />
       )}
       {members &&
         (members.length === 0 ? (

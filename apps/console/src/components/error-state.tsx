@@ -13,6 +13,8 @@ interface ErrorStateProps {
   message: string;
   /** Retry handler, typically the query's `refetch`. */
   onRetry: () => void;
+  /** Frame override — pass the slot's border so the error matches its skeleton. Default borderless. */
+  className?: string;
 }
 
 /**
@@ -22,9 +24,9 @@ interface ErrorStateProps {
  * reads the same and offers a retry — replacing the ad-hoc one-liners modules
  * used to inline.
  */
-export function ErrorState({ message, onRetry }: ErrorStateProps) {
+export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
   return (
-    <EmptyState>
+    <EmptyState className={className}>
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">
           <IconAlertTriangle />

@@ -67,7 +67,11 @@ export function ContactsRoute() {
 
       {isPending && <ContactsSkeleton />}
       {isError && (
-        <ErrorState message="Couldn't load contacts." onRetry={refetch} />
+        <ErrorState
+          message="Couldn't load contacts."
+          onRetry={refetch}
+          className="nx:border nx:border-border-default"
+        />
       )}
       {contacts &&
         (contacts.length === 0 ? (

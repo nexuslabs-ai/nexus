@@ -47,7 +47,11 @@ export function IssuesRoute() {
 
       {isPending && <IssuesSkeleton />}
       {isError && (
-        <ErrorState message="Couldn't load issues." onRetry={refetch} />
+        <ErrorState
+          message="Couldn't load issues."
+          onRetry={refetch}
+          className="nx:border nx:border-border-default"
+        />
       )}
       {issues &&
         (issues.length === 0 ? (
