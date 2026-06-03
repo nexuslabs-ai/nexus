@@ -31,6 +31,15 @@
     { "name": "Checkbox", "showcase": "AllVariants" },
     { "name": "Collapsible", "showcase": "AllVariants" },
     {
+      "name": "ContextMenu",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
+      "equivalents": {
+        "ClickInteraction": ["OpenCloseInteraction"],
+        "Disabled": ["WithDisabledItems"]
+      }
+    },
+    {
       "name": "Dialog",
       "showcase": "AllVariants",
       "interactions": ["ClickInteraction", "KeyboardInteraction"],
