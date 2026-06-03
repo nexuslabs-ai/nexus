@@ -156,14 +156,6 @@ export function useTheme() {
     loadCSS(`/themes/brands-${theme.brand}.css`, 'brand');
   }, [theme.brand]);
 
-  // The categorical chart palette is a fixed (non-switchable) token set that
-  // ships its own light/dark variants, so load it once — without it, chart
-  // series resolve `var(--nx-color-chart-categorical-N)` to nothing and paint
-  // black.
-  useEffect(() => {
-    loadCSS('/themes/chart-categorical-default.css', 'chart');
-  }, []);
-
   useEffect(() => {
     document.documentElement.setAttribute('data-style', theme.spacing);
   }, [theme.spacing]);
