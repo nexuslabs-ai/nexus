@@ -109,6 +109,11 @@
     },
     { "name": "RadioGroup", "showcase": "AllVariants" },
     {
+      "name": "Resizable",
+      "showcase": "AllVariants",
+      "interactions": ["KeyboardInteraction"]
+    },
+    {
       "name": "Select",
       "showcase": "AllVariants",
       "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],

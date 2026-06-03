@@ -46,3 +46,6 @@ export {
   IconCircleCheck,
   IconInfoCircle,
 } from '@tabler/icons-react';
+
+// Layout
+export { IconGripVertical } from '@tabler/icons-react';
