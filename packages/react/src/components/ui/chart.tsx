@@ -236,7 +236,7 @@ function ChartTooltipContent({
                         {itemConfig?.label || item.name}
                       </span>
                     </div>
-                    {item.value && (
+                    {item.value !== undefined && (
                       <span className="nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums">
                         {item.value.toLocaleString()}
                       </span>
@@ -351,7 +351,6 @@ export {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
-  ChartStyle,
   ChartTooltip,
   ChartTooltipContent,
   useChart,

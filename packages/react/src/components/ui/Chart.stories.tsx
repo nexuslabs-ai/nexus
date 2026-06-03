@@ -185,12 +185,9 @@ export const WithDataAttributes: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const chart = canvasElement.querySelector<HTMLElement>(
-      '[data-slot="chart"]'
-    );
-    await expect(chart).not.toBeNull();
-    await expect(chart!).toHaveAttribute('data-slot', 'chart');
-    await expect(chart!).toHaveAttribute('data-chart');
+    const chart = canvasElement.querySelector('[data-slot="chart"]');
+    await expect(chart).toBeInTheDocument();
+    await expect(chart).toHaveAttribute('data-chart');
   },
 };
 
