@@ -13,6 +13,7 @@ import type {
   ConversationDetail,
   ConversationStatus,
 } from '../lib/inbox-api';
+import type { Notification } from '../lib/notifications-api';
 import type { Member, MemberDetail, MemberInput } from '../lib/people-api';
 import type { Issue, IssueInput } from '../lib/projects-api';
 
@@ -20,6 +21,7 @@ import { analyticsOverview } from './analytics-fixtures';
 import { BILLING_OVERVIEW, INVOICES } from './billing-fixtures';
 import { CONTACTS } from './crm-fixtures';
 import { CONVERSATIONS } from './inbox-fixtures';
+import { NOTIFICATIONS } from './notifications-fixtures';
 import { MEMBERS } from './people-fixtures';
 import { ISSUES } from './projects-fixtures';
 
@@ -116,6 +118,10 @@ const invoicesStore: Invoice[] = INVOICES.map((i) => ({ ...i }));
 // incl. `bio`; the list endpoint projects each to its lean table row, the detail
 // endpoint returns the full record.
 const membersStore: MemberDetail[] = MEMBERS.map((m) => ({ ...m }));
+
+// In-memory Notifications store (same session lifecycle). Mark-read mutations
+// flip `read` in place; there is no create or remove, so the feed never empties.
+const notificationsStore: Notification[] = NOTIFICATIONS.map((n) => ({ ...n }));
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -479,5 +485,37 @@ export const handlers: RequestHandler[] = [
     }
     Object.assign(member, (await request.json()) as MemberInput);
     return HttpResponse.json({ member });
+  }),
+
+  // --- Notifications ---
+
+  // The activity feed for the topbar bell — newest first (the fixtures are
+  // already ordered). The menu derives the unread count client-side.
+  http.get('/api/notifications', async () => {
+    await delay(500);
+    return HttpResponse.json({ notifications: notificationsStore });
+  }),
+
+  // Mark one read in place (404 when unknown).
+  http.patch('/api/notifications/:id/read', async ({ params }) => {
+    await delay(200);
+    const notification = notificationsStore.find((n) => n.id === params.id);
+    if (!notification) {
+      return HttpResponse.json(
+        { message: 'Notification not found.' },
+        { status: 404 }
+      );
+    }
+    notification.read = true;
+    return HttpResponse.json({ notification });
+  }),
+
+  // Mark every notification read; return the updated list.
+  http.post('/api/notifications/read-all', async () => {
+    await delay(200);
+    notificationsStore.forEach((n) => {
+      n.read = true;
+    });
+    return HttpResponse.json({ notifications: notificationsStore });
   }),
 ];
