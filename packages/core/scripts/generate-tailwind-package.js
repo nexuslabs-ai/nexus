@@ -617,7 +617,19 @@ export async function generateTailwindPackage(
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('🎨 Generating @nexus/tailwind package from DTCG tokens...');
-  const cliConfig = parseArgs();
+  const cliConfig = parseArgs(undefined, {
+    allowedKeys: [
+      'base',
+      'brand',
+      'typography',
+      'shadow',
+      'radius',
+      'borderwidth',
+      'focus',
+      'chart-categorical',
+      'spacingDefault',
+    ],
+  });
   await generateTailwindPackage(cliConfig);
   console.log('');
   console.log('✨ @nexus/tailwind package generation complete!');

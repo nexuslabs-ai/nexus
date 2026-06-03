@@ -15,6 +15,7 @@ import {
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   isReference,
+  parseArgs,
   partitionThemedModes,
   pathToCssVar,
   resolveReference,
@@ -426,6 +427,51 @@ describe('utils', () => {
       // key controls which mode lands under `:root, [data-style="X"]`; other
       // modes still ship in the bundle.
       expect(DEFAULT_CONFIG.spacingDefault).toBe('vega');
+    });
+  });
+
+  describe('parseArgs', () => {
+    it('parses default generator flags', () => {
+      expect(
+        parseArgs(['--base=zinc', '--brand=blue', '--spacingDefault=maia'])
+      ).toMatchObject({
+        base: 'zinc',
+        brand: 'blue',
+        spacingDefault: 'maia',
+      });
+    });
+
+    it('limits accepted flags per caller', () => {
+      expect(
+        parseArgs(['--spacingDefault=nova'], {
+          allowedKeys: ['spacingDefault'],
+        })
+      ).toMatchObject({ spacingDefault: 'nova' });
+    });
+
+    it('throws for unknown flags', () => {
+      expect(() => parseArgs(['--brnad=blue'])).toThrow(
+        'Unknown CLI flag "--brnad"'
+      );
+    });
+
+    it('throws for flags known globally but ignored by the caller', () => {
+      expect(() =>
+        parseArgs(['--base=slate'], { allowedKeys: ['spacingDefault'] })
+      ).toThrow('Unknown CLI flag "--base"');
+    });
+
+    it('throws for malformed flags', () => {
+      expect(() => parseArgs(['--base'])).toThrow('Invalid CLI flag "--base"');
+      expect(() => parseArgs(['--base='])).toThrow(
+        'Invalid CLI flag "--base="'
+      );
+    });
+
+    it('throws for positional arguments', () => {
+      expect(() => parseArgs(['base=stone'])).toThrow(
+        'Unexpected positional argument "base=stone"'
+      );
     });
   });
 

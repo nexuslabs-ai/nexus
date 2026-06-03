@@ -177,6 +177,21 @@ export const Loading: Story = {
   },
 };
 
+export const ManualBusyState: Story = {
+  args: {
+    'aria-busy': true,
+    children: 'Processing',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    await expect(button).toHaveAttribute('aria-busy', 'true');
+    await expect(button).not.toHaveAttribute('data-loading');
+    await expect(button).not.toBeDisabled();
+  },
+};
+
 export const LoadingWithVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-wrap nx:gap-2">
@@ -354,6 +369,81 @@ export const AsLink: Story = {
 
     await expect(link).toHaveAttribute('href', 'https://example.com');
     await expect(link).toHaveAttribute('data-slot', 'button');
+  },
+};
+
+export const DisabledAsLink: Story = {
+  args: {
+    disabled: true,
+    children: 'Disabled link',
+  },
+  render: ({ children, ...args }) => (
+    <Button {...args} asChild>
+      <a
+        href="#disabled-as-link"
+        onClick={(event) => {
+          event.currentTarget.dataset.childClicked = 'true';
+        }}
+      >
+        {children}
+      </a>
+    </Button>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link');
+
+    await expect(link).not.toHaveAttribute('disabled');
+    await expect(link).not.toHaveAttribute('type');
+    await expect(link).toHaveAttribute('aria-disabled', 'true');
+    await expect(link).toHaveAttribute('tabindex', '-1');
+    await expect(link).toHaveClass('nx:aria-disabled:pointer-events-none');
+    await expect(link).toHaveClass('nx:aria-disabled:opacity-50');
+
+    const clickResult = link.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true })
+    );
+    expect(clickResult).toBe(false);
+    await expect(link).not.toHaveAttribute('data-child-clicked');
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+export const LoadingAsLink: Story = {
+  args: {
+    loading: true,
+    children: 'Loading link',
+  },
+  render: ({ children, ...args }) => (
+    <Button {...args} asChild>
+      <a
+        href="#loading-as-link"
+        onClick={(event) => {
+          event.currentTarget.dataset.childClicked = 'true';
+        }}
+      >
+        {children}
+      </a>
+    </Button>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link');
+
+    await expect(link).not.toHaveAttribute('disabled');
+    await expect(link).not.toHaveAttribute('type');
+    await expect(link).toHaveAttribute('aria-busy', 'true');
+    await expect(link).toHaveAttribute('aria-disabled', 'true');
+    await expect(link).toHaveAttribute('data-loading', 'true');
+    await expect(link).toHaveAttribute('tabindex', '-1');
+    await expect(link.querySelector('svg')).toBeInTheDocument();
+
+    const clickResult = link.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true })
+    );
+    expect(clickResult).toBe(false);
+    await expect(link).not.toHaveAttribute('data-child-clicked');
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
 

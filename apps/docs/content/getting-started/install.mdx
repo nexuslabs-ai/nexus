@@ -2,16 +2,18 @@
 
 Nexus ships as a small set of workspace packages: the React components, the
 Tailwind theme they're styled with, and the design tokens underneath. Add the
-two you consume directly.
+packages you consume directly, plus the form and toast peers required by the
+React entrypoint.
 
 ## Add the packages
 
 ```bash
-yarn add @nexus/react @nexus/tailwind
+yarn add @nexus/react @nexus/tailwind react-hook-form sonner
 ```
 
 `@nexus/react` provides the components; `@nexus/tailwind` provides the
-`nx:`-prefixed utility theme they're built on. Tokens come along transitively.
+`nx:`-prefixed utility theme they're built on. `react-hook-form` and `sonner`
+back the exported Form and Toaster components. Tokens come along transitively.
 
 ## Wire the styles
 
