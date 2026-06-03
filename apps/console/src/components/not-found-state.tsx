@@ -33,7 +33,9 @@ export function NotFoundState({
   children,
 }: NotFoundStateProps) {
   return (
-    <EmptyState>
+    // Bordered (unlike the in-flow ErrorState) — a not-found replaces the whole
+    // detail route, so it carries the same frame as the modules' list empties.
+    <EmptyState className="nx:border nx:border-border-default">
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">
           <IconFileOff />
