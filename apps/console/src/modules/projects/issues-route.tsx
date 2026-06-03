@@ -70,7 +70,7 @@ export function IssuesRoute() {
   );
 }
 
-export function IssuesSkeleton() {
+function IssuesSkeleton() {
   return (
     <div className="nx:space-y-4">
       <Skeleton className="nx:h-9 nx:max-w-xs" />
@@ -83,7 +83,7 @@ export function IssuesSkeleton() {
   );
 }
 
-export function IssuesEmpty() {
+function IssuesEmpty() {
   return (
     <EmptyState className="nx:border nx:border-border-default">
       <EmptyStateHeader>

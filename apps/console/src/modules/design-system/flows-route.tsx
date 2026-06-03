@@ -3,15 +3,6 @@ import { type ReactNode, useState } from 'react';
 import {
   Alert,
   AlertDescription,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Badge,
   Button,
   cn,
@@ -48,12 +39,7 @@ import { ContactFormSheet } from '../crm/contact-form-sheet';
 import { ContactsEmpty, ContactsSkeleton } from '../crm/contacts-route';
 import { ThreadSkeleton } from '../inbox/conversation-thread';
 import { EmptyPane, ListSkeleton } from '../inbox/inbox-route';
-import { DetailSkeleton as MemberDetailSkeleton } from '../people/member-detail-route';
-import { MemberFormSheet } from '../people/member-form-sheet';
-import { PeopleEmpty, PeopleSkeleton } from '../people/people-route';
 import { DetailSkeleton as IssueDetailSkeleton } from '../projects/issue-detail-route';
-import { IssueFormSheet } from '../projects/issue-form-sheet';
-import { IssuesEmpty, IssuesSkeleton } from '../projects/issues-route';
 
 // Mocks for the components that take data props — the gallery renders them in
 // isolation, with no live query behind them.
@@ -85,15 +71,17 @@ const DEMO_COLUMNS: ColumnDef<DemoRow>[] = [
   { accessorKey: 'email', header: 'Email' },
 ];
 
+const retryNoop = () => toast.info('Retry is a no-op in the gallery.');
+
 /**
- * The Flows gallery — a design/QA catalog of every conditional UI state in the
- * console (loading, error, not-found, empty, form-validation, dialogs, toasts,
- * auth, status), each rendered from the real component imported from its module.
+ * The Flows gallery — a design/QA catalog of the console's conditional UI
+ * states (loading, error, not-found, empty, form-validation, dialogs, toasts,
+ * auth, status). One cell per unique pattern: a layout shared across modules
+ * (e.g. the list skeleton, used by Contacts/Issues/People) appears once. Each
+ * cell renders the real component imported from its module.
  */
 export function FlowsRoute() {
   const [contactOpen, setContactOpen] = useState(false);
-  const [issueOpen, setIssueOpen] = useState(false);
-  const [memberOpen, setMemberOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
 
   return (
@@ -103,10 +91,10 @@ export function FlowsRoute() {
           Flows
         </h1>
         <p className="nx:text-muted-foreground nx:max-w-2xl">
-          Every conditional UI state in the console, in one place — rendered
-          from the real components so you can review states you’d otherwise only
-          see by triggering the runtime condition (a failed fetch, an empty
-          dataset, a bad URL).
+          One example of each unique UI state in the console — rendered from the
+          real components so you can review states you’d otherwise only see by
+          triggering the runtime condition. Patterns shared across modules (a
+          list skeleton, a “no records” empty) appear once.
         </p>
       </header>
 
@@ -114,14 +102,14 @@ export function FlowsRoute() {
         title="Loading skeletons"
         description="Shown for ~500ms while a query resolves, then replaced — hard to catch in normal use."
       >
-        <Sample label="Contacts list">
+        <Sample label="List / table · Contacts, Issues, People">
           <ContactsSkeleton />
         </Sample>
-        <Sample label="Issues list">
-          <IssuesSkeleton />
+        <Sample label="Record detail · Contacts, People">
+          <ContactDetailSkeleton />
         </Sample>
-        <Sample label="People directory">
-          <PeopleSkeleton />
+        <Sample label="Issue detail">
+          <IssueDetailSkeleton />
         </Sample>
         <Sample label="Invoices card">
           <InvoicesSkeleton />
@@ -131,15 +119,6 @@ export function FlowsRoute() {
         </Sample>
         <Sample label="Billing page" span>
           <BillingSkeleton />
-        </Sample>
-        <Sample label="Contact detail">
-          <ContactDetailSkeleton />
-        </Sample>
-        <Sample label="Issue detail">
-          <IssueDetailSkeleton />
-        </Sample>
-        <Sample label="Member detail">
-          <MemberDetailSkeleton />
         </Sample>
         <Sample label="Notifications panel" className="nx:max-w-sm nx:p-0">
           <NotificationsSkeleton />
@@ -161,20 +140,20 @@ export function FlowsRoute() {
 
       <Section
         title="Error states"
-        description="A load-error needs a fetch to fail, so these are effectively unreachable in normal use. Bordered variants match a bordered-skeleton slot; borderless ones sit in an already-framed container."
+        description="A load-error needs a fetch to fail, so these are effectively unreachable in normal use. ErrorState is bordered at a bordered-skeleton slot, borderless inside an already-framed container."
       >
-        <Sample label="ErrorState · bordered (Contacts / Issues / People)">
-          <ErrorState
-            message="Couldn't load contacts."
-            onRetry={() => toast.info('Retry is a no-op in the gallery.')}
-            bordered
-          />
-        </Sample>
-        <Sample label="ErrorState · borderless (Analytics / Billing / Inbox)">
-          <ErrorState
-            message="Couldn't load analytics."
-            onRetry={() => toast.info('Retry is a no-op in the gallery.')}
-          />
+        <Sample label="ErrorState · bordered + borderless" span>
+          <div className="nx:grid nx:gap-4 nx:sm:grid-cols-2">
+            <ErrorState
+              message="Couldn't load contacts."
+              onRetry={retryNoop}
+              bordered
+            />
+            <ErrorState
+              message="Couldn't load analytics."
+              onRetry={retryNoop}
+            />
+          </div>
         </Sample>
         <Sample label="Notifications · cold-load error (popover chrome)" span>
           <NotificationsError />
@@ -202,14 +181,8 @@ export function FlowsRoute() {
         title="Empty states"
         description="Unreachable today — fixtures always seed rows — so this is the only way to see a zeroed module."
       >
-        <Sample label="Contacts · no records">
+        <Sample label="Module list · no records">
           <ContactsEmpty />
-        </Sample>
-        <Sample label="Issues · no records">
-          <IssuesEmpty />
-        </Sample>
-        <Sample label="People · no records">
-          <PeopleEmpty />
         </Sample>
         <Sample
           label="Inbox · no conversation selected"
@@ -246,16 +219,10 @@ export function FlowsRoute() {
         title="Form validation"
         description="Open a sheet and submit with empty fields to see inline + root-level errors. Submitting valid data creates a throwaway record that resets on reload."
       >
-        <Sample label="Create contact / issue / member · invite" span>
+        <Sample label="Form sheet · Contacts, Issues, People share this" span>
           <div className="nx:flex nx:flex-wrap nx:gap-2">
             <Button variant="outline" onClick={() => setContactOpen(true)}>
-              Open contact form
-            </Button>
-            <Button variant="outline" onClick={() => setIssueOpen(true)}>
-              Open issue form
-            </Button>
-            <Button variant="outline" onClick={() => setMemberOpen(true)}>
-              Open member form
+              Open form sheet
             </Button>
             <Button variant="outline" onClick={() => setPlanOpen(true)}>
               Open plan picker
@@ -266,39 +233,14 @@ export function FlowsRoute() {
 
       <Section
         title="Dialogs"
-        description="Destructive confirmations — the real AlertDialog flows."
+        description="Destructive confirmation — the real AlertDialog flow."
       >
-        <Sample label="Cancel subscription">
+        <Sample label="AlertDialog · destructive confirm">
           <CancelButton
             planName="Pro"
             renewsAt="2026-07-01"
             onConfirm={() => toast.success('Subscription canceled (demo).')}
           />
-        </Sample>
-        <Sample label="Delete account">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">Delete account</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This permanently deletes your account and removes all of your
-                  data. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  variant="destructive"
-                  onClick={() => toast.error('Account deleted (demo).')}
-                >
-                  Delete account
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </Sample>
       </Section>
 
@@ -363,8 +305,6 @@ export function FlowsRoute() {
 
       {/* Live form sheets, mounted once and toggled by the triggers above. */}
       <ContactFormSheet open={contactOpen} onOpenChange={setContactOpen} />
-      <IssueFormSheet open={issueOpen} onOpenChange={setIssueOpen} />
-      <MemberFormSheet open={memberOpen} onOpenChange={setMemberOpen} />
       <PlanSheet
         open={planOpen}
         onOpenChange={setPlanOpen}
