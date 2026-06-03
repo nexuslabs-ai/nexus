@@ -33,6 +33,11 @@
       "interactions": ["ClickInteraction", "KeyboardInteraction"]
     },
     { "name": "Card", "showcase": "AllVariants" },
+    {
+      "name": "Carousel",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"]
+    },
     { "name": "Checkbox", "showcase": "AllVariants" },
     { "name": "Collapsible", "showcase": "AllVariants" },
     {

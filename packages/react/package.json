@@ -39,6 +39,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
+    "embla-carousel-react": "^8.6.0",
     "react-day-picker": "^9",
     "react-hook-form": "^7.77.0",
     "recharts": "^3.8.1",
@@ -87,6 +88,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "peerDependencies": {
+    "embla-carousel-react": "^8.6.0",
     "react": "^19.0.0",
     "react-day-picker": "^9",
     "react-dom": "^19.0.0",
@@ -94,6 +96,9 @@
     "sonner": "^2.0.7"
   },
   "peerDependenciesMeta": {
+    "embla-carousel-react": {
+      "optional": true
+    },
     "react-day-picker": {
       "optional": true
     },
