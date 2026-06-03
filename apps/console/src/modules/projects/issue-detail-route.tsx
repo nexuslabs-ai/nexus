@@ -9,6 +9,11 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  EmptyStateContent,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateTitle,
   Separator,
   Skeleton,
 } from '@nexus/react';
@@ -164,22 +169,23 @@ function DetailSkeleton() {
   );
 }
 
-// App-local not-found — the polished @nexus/react EmptyState is tracked in #282.
 function NotFound() {
   return (
-    <div className="nx:border-border-default nx:flex nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:rounded-md nx:border nx:border-dashed nx:p-12 nx:text-center">
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        Issue not found
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        This issue doesn&apos;t exist, or may have been removed.
-      </p>
-      <Link
-        to="/m/projects"
-        className="nx:text-primary-subtle-foreground nx:hover:underline"
-      >
-        Back to Issues
-      </Link>
-    </div>
+    <EmptyState className="nx:border nx:border-border-default">
+      <EmptyStateHeader>
+        <EmptyStateTitle>Issue not found</EmptyStateTitle>
+        <EmptyStateDescription>
+          This issue doesn&apos;t exist, or may have been removed.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+      <EmptyStateContent>
+        <Link
+          to="/m/projects"
+          className="nx:text-primary-subtle-foreground nx:hover:underline"
+        >
+          Back to Issues
+        </Link>
+      </EmptyStateContent>
+    </EmptyState>
   );
 }
