@@ -54,7 +54,7 @@ export function NotificationsMenu() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: notificationKeys.list,
     queryFn: fetchNotifications,
   });
@@ -107,8 +107,11 @@ export function NotificationsMenu() {
     onSettled: reconcile,
   });
 
+  // mark-read is idempotent, so the `n.read` guard + the optimistic write are
+  // enough — we don't gate on `markOne.isPending`, which would silently drop a
+  // tap on a second row while the first row's PATCH is still in flight.
   const handleMarkRead = (n: Notification) => {
-    if (n.read || markOne.isPending) return;
+    if (n.read) return;
     markOne.mutate(n.id);
   };
 
@@ -161,7 +164,7 @@ export function NotificationsMenu() {
         </div>
         <Separator />
 
-        {isPending ? (
+        {isPending && (
           <div className="nx:space-y-3 nx:p-3">
             {[0, 1, 2].map((i) => (
               <div key={i} className="nx:flex nx:items-start nx:gap-3">
@@ -173,9 +176,15 @@ export function NotificationsMenu() {
               </div>
             ))}
           </div>
-        ) : (
+        )}
+        {isError && (
+          <p className="nx:text-error-foreground nx:px-3 nx:py-6 nx:text-center nx:text-sm">
+            Couldn’t load notifications. Please try again.
+          </p>
+        )}
+        {data && (
           <ul className="nx:max-h-96 nx:overflow-y-auto nx:p-1">
-            {notifications.map((n) => {
+            {data.notifications.map((n) => {
               const KindIcon = KIND_ICON[n.kind];
               return (
                 <li key={n.id}>
