@@ -36,6 +36,11 @@ export const MODULE_ITEMS = [
     route: '/m/billing',
   },
   { label: 'Analytics', module: 'analytics', icon: IconChartBar },
-  { label: 'People', module: 'people', icon: IconAddressBook },
+  {
+    label: 'People',
+    module: 'people',
+    icon: IconAddressBook,
+    route: '/m/people',
+  },
   { label: 'Settings', module: 'settings', icon: IconSettings },
 ] as const;

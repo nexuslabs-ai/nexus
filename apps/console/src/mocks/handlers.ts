@@ -12,11 +12,13 @@ import type {
   ConversationDetail,
   ConversationStatus,
 } from '../lib/inbox-api';
+import type { Member, MemberDetail, MemberInput } from '../lib/people-api';
 import type { Issue, IssueInput } from '../lib/projects-api';
 
 import { BILLING_OVERVIEW, INVOICES } from './billing-fixtures';
 import { CONTACTS } from './crm-fixtures';
 import { CONVERSATIONS } from './inbox-fixtures';
+import { MEMBERS } from './people-fixtures';
 import { ISSUES } from './projects-fixtures';
 
 /** The fixed demo OTP — shown as a hint on the verify screen. */
@@ -107,6 +109,11 @@ const billing: BillingOverview = {
   paymentMethod: { ...BILLING_OVERVIEW.paymentMethod },
 };
 const invoicesStore: Invoice[] = INVOICES.map((i) => ({ ...i }));
+
+// In-memory People store (same session lifecycle). Holds the full member record
+// incl. `bio`; the list endpoint projects each to its lean table row, the detail
+// endpoint returns the full record.
+const membersStore: MemberDetail[] = MEMBERS.map((m) => ({ ...m }));
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -395,5 +402,67 @@ export const handlers: RequestHandler[] = [
     await delay(300);
     billing.subscription.status = 'active';
     return HttpResponse.json({ subscription: billing.subscription });
+  }),
+
+  // --- People (team directory) ---
+
+  // The directory list — each member projected to its lean table row (no `bio`).
+  http.get('/api/people/members', async () => {
+    await delay(500);
+    const members: Member[] = membersStore.map(
+      ({ id, name, email, title, role, department, status, joinedAt }) => ({
+        id,
+        name,
+        email,
+        title,
+        role,
+        department,
+        status,
+        joinedAt,
+      })
+    );
+    return HttpResponse.json({ members });
+  }),
+
+  // A single member incl. profile-only fields (404 when unknown).
+  http.get('/api/people/members/:id', async ({ params }) => {
+    await delay(300);
+    const member = membersStore.find((m) => m.id === params.id);
+    if (!member) {
+      return HttpResponse.json(
+        { message: 'Member not found.' },
+        { status: 404 }
+      );
+    }
+    return HttpResponse.json({ member });
+  }),
+
+  // Invite: a new member is always `invited` (server-authoritative) and joins
+  // today — the create form never sets status.
+  http.post('/api/people/members', async ({ request }) => {
+    await delay(300);
+    const input = (await request.json()) as MemberInput;
+    const member: MemberDetail = {
+      ...input,
+      id: crypto.randomUUID(),
+      status: 'invited',
+      joinedAt: new Date().toISOString().slice(0, 10),
+    };
+    membersStore.unshift(member);
+    return HttpResponse.json({ member }, { status: 201 });
+  }),
+
+  // Edit: apply the editable fields (incl. status — suspend / reactivate live here).
+  http.patch('/api/people/members/:id', async ({ params, request }) => {
+    await delay(300);
+    const member = membersStore.find((m) => m.id === params.id);
+    if (!member) {
+      return HttpResponse.json(
+        { message: 'Member not found.' },
+        { status: 404 }
+      );
+    }
+    Object.assign(member, (await request.json()) as MemberInput);
+    return HttpResponse.json({ member });
   }),
 ];
