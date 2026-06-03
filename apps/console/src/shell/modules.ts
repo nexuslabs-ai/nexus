@@ -35,7 +35,12 @@ export const MODULE_ITEMS = [
     icon: IconCreditCard,
     route: '/m/billing',
   },
-  { label: 'Analytics', module: 'analytics', icon: IconChartBar },
+  {
+    label: 'Analytics',
+    module: 'analytics',
+    icon: IconChartBar,
+    route: '/m/analytics',
+  },
   {
     label: 'People',
     module: 'people',

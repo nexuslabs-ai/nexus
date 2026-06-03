@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-router';
 import { z } from 'zod';
 
+import { AnalyticsRoute } from '../modules/analytics/analytics-route';
+import { analyticsSearchSchema } from '../modules/analytics/analytics-search';
 import { ForgotRoute } from '../modules/auth/forgot-route';
 import { LoginRoute } from '../modules/auth/login-route';
 import { SignupRoute } from '../modules/auth/signup-route';
@@ -133,6 +135,15 @@ const billingRoute = createRoute({
   component: BillingRoute,
 });
 
+// Analytics (Phase 3d). Static `/m/analytics` outranks `/m/$module`. The period
+// toggle rides in `?range`; a single-page dashboard otherwise.
+const analyticsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/analytics',
+  validateSearch: analyticsSearchSchema,
+  component: AnalyticsRoute,
+});
+
 // People (Phase 3e). Static `/m/people` outranks `/m/$module`. Three facet
 // filters (role · department · status) ride in the search params.
 const peopleRoute = createRoute({
@@ -202,6 +213,7 @@ const routeTree = rootRoute.addChildren([
     projectsIssueDetailRoute,
     inboxRoute,
     billingRoute,
+    analyticsRoute,
     peopleRoute,
     peopleMemberDetailRoute,
     moduleRoute,
