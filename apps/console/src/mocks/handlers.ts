@@ -386,7 +386,7 @@ export const handlers: RequestHandler[] = [
   // Cancel: wind down at period end — stays active until renewsAt.
   http.post('/api/billing/cancel', async () => {
     await delay(300);
-    billing.subscription.status = 'canceled';
+    billing.subscription.status = 'canceling';
     return HttpResponse.json({ subscription: billing.subscription });
   }),
 

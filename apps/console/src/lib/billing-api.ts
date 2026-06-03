@@ -67,8 +67,8 @@ export const PLAN_TIERS: PlanTier[] = [
 
 export type BillingCycle = 'monthly' | 'annual';
 
-/** Whether the subscription is live or wound down (still active until renewal). */
-export type SubscriptionStatus = 'active' | 'canceled';
+/** Live, or canceling at period end — still active until {@link Subscription.renewsAt}. */
+export type SubscriptionStatus = 'active' | 'canceling';
 
 /** The customer's live subscription — what the overview renders. */
 export type Subscription = {
@@ -167,7 +167,7 @@ async function mutateSubscription(
   return (await res.json()) as { subscription: Subscription };
 }
 
-/** Switch tier and/or billing cycle — also reactivates a canceled subscription. */
+/** Switch tier and/or billing cycle — also reactivates a canceling subscription. */
 export const changePlan = (selection: PlanSelection) =>
   mutateSubscription('/api/billing/subscription', 'PATCH', selection);
 

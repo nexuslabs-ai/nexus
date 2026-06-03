@@ -109,7 +109,7 @@ function PlanCard({
   const queryClient = useQueryClient();
   const tier = planTier(subscription.tier);
   const price = tierPrice(tier, subscription.cycle);
-  const canceled = subscription.status === 'canceled';
+  const canceling = subscription.status === 'canceling';
 
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: billingKeys.overview });
@@ -149,7 +149,7 @@ function PlanCard({
               ? 'Free'
               : `${formatCurrency(price)}/mo · billed ${subscription.cycle}`}
           </span>
-          {canceled ? (
+          {canceling ? (
             <Badge variant="warning">Canceling</Badge>
           ) : (
             <Badge variant="success">Active</Badge>
@@ -157,8 +157,8 @@ function PlanCard({
         </div>
 
         <p className="nx:text-muted-foreground nx:text-sm">
-          {canceled
-            ? `Your plan is canceled and ends on ${formatDate(subscription.renewsAt)}. You'll keep access until then.`
+          {canceling
+            ? `Your plan is set to cancel on ${formatDate(subscription.renewsAt)}. You'll keep access until then.`
             : `Renews on ${formatDate(subscription.renewsAt)}.`}
         </p>
 
@@ -166,7 +166,7 @@ function PlanCard({
           <Button variant="outline" onClick={onChangePlan}>
             Change plan
           </Button>
-          {canceled ? (
+          {canceling ? (
             <Button
               variant="secondary"
               onClick={() => reactivateMutation.mutate()}
