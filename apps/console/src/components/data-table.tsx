@@ -2,7 +2,9 @@ import { useState } from 'react';
 
 import {
   Button,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -10,7 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from '@nexus/react';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconSearch,
+} from '@tabler/icons-react';
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -82,13 +88,17 @@ export function DataTable<TData>({
   return (
     <div className="nx:space-y-4">
       {filterControl && (
-        <Input
-          placeholder={filterPlaceholder ?? 'Filter…'}
-          value={(filterControl.getFilterValue() as string) ?? ''}
-          onChange={(e) => filterControl.setFilterValue(e.target.value)}
-          aria-label={filterPlaceholder ?? 'Filter'}
-          className="nx:max-w-xs"
-        />
+        <InputGroup className="nx:max-w-xs">
+          <InputGroupAddon>
+            <IconSearch />
+          </InputGroupAddon>
+          <InputGroupInput
+            placeholder={filterPlaceholder ?? 'Filter…'}
+            value={(filterControl.getFilterValue() as string) ?? ''}
+            onChange={(e) => filterControl.setFilterValue(e.target.value)}
+            aria-label={filterPlaceholder ?? 'Filter'}
+          />
+        </InputGroup>
       )}
 
       <div className="nx:border-border-default nx:overflow-hidden nx:rounded-md nx:border">
