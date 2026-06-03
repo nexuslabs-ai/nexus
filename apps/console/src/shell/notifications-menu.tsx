@@ -177,7 +177,10 @@ export function NotificationsMenu() {
             ))}
           </div>
         )}
-        {isError && (
+        {/* Only on a cold-load failure — `data` is retained on a background
+            refetch error (each mark-read invalidates), so gating on `!data`
+            keeps the stale list instead of stacking an error above it. */}
+        {isError && !data && (
           <p className="nx:text-error-foreground nx:px-3 nx:py-6 nx:text-center nx:text-sm">
             Couldn’t load notifications. Please try again.
           </p>
