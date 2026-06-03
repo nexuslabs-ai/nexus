@@ -17,6 +17,7 @@ import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
+import { ErrorState } from '../../components/error-state';
 import {
   ANALYTICS_RANGES,
   analyticsKeys,
@@ -36,7 +37,7 @@ const analyticsRoute = getRouteApi('/app/m/analytics');
 export function AnalyticsRoute() {
   const { range } = analyticsRoute.useSearch();
   const navigate = analyticsRoute.useNavigate();
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: analyticsKeys.overview(range),
     queryFn: () => fetchAnalytics(range),
   });
@@ -77,9 +78,7 @@ export function AnalyticsRoute() {
 
       {isPending && <AnalyticsSkeleton />}
       {isError && (
-        <p className="nx:text-error-foreground nx:text-sm">
-          Couldn&apos;t load analytics. Please try again.
-        </p>
+        <ErrorState message="Couldn't load analytics." onRetry={refetch} />
       )}
       {data && <AnalyticsContent overview={data} />}
     </div>

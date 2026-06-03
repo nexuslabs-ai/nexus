@@ -20,6 +20,7 @@ import { IconArrowLeft, IconChevronDown, IconSend } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 
+import { ErrorState } from '../../components/error-state';
 import { formatDateTime, initials } from '../../lib/format';
 import {
   type ConversationDetail,
@@ -38,13 +39,20 @@ import {
 } from './inbox-ui';
 
 export function ConversationThread({ id }: { id: string }) {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: inboxKeys.conversation(id),
     queryFn: () => fetchConversation(id),
   });
 
   if (isPending) return <ThreadSkeleton />;
-  if (isError) return <ThreadError />;
+  if (isError) {
+    return (
+      <ErrorState
+        message="Couldn't open this conversation."
+        onRetry={refetch}
+      />
+    );
+  }
   return <ThreadContent conversation={data.conversation} />;
 }
 
@@ -256,20 +264,6 @@ function ThreadSkeleton() {
           <Skeleton key={i} className="nx:h-16 nx:w-3/4" />
         ))}
       </div>
-    </div>
-  );
-}
-
-// App-local error state — the polished @nexus/react EmptyState is tracked in #282.
-function ThreadError() {
-  return (
-    <div className="nx:flex nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-2 nx:p-12 nx:text-center">
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        Couldn&apos;t open this conversation
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        It may have been removed, or failed to load. Pick another from the list.
-      </p>
     </div>
   );
 }

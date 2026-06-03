@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
+import { ErrorState } from '../../components/error-state';
 import { crmKeys, fetchContacts } from '../../lib/crm-api';
 
 import { ContactFormSheet } from './contact-form-sheet';
@@ -25,7 +26,7 @@ import { ContactsToolbar } from './contacts-toolbar';
 const crmRoute = getRouteApi('/app/m/crm');
 
 export function ContactsRoute() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: crmKeys.contacts,
     queryFn: fetchContacts,
   });
@@ -66,9 +67,7 @@ export function ContactsRoute() {
 
       {isPending && <ContactsSkeleton />}
       {isError && (
-        <p className="nx:text-error-foreground nx:text-sm">
-          Couldn&apos;t load contacts. Please try again.
-        </p>
+        <ErrorState message="Couldn't load contacts." onRetry={refetch} />
       )}
       {contacts &&
         (contacts.length === 0 ? (

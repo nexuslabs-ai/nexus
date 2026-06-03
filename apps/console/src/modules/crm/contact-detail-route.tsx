@@ -14,11 +14,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  EmptyState,
-  EmptyStateContent,
-  EmptyStateDescription,
-  EmptyStateHeader,
-  EmptyStateTitle,
   Separator,
   Skeleton,
   Tabs,
@@ -36,6 +31,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 
+import { NotFoundState } from '../../components/not-found-state';
 import {
   type ActivityKind,
   type ContactDetail,
@@ -71,7 +67,14 @@ export function ContactDetailRoute() {
       </Breadcrumb>
 
       {isPending && <DetailSkeleton />}
-      {isError && <NotFound />}
+      {isError && (
+        <NotFoundState
+          title="Contact not found"
+          description="This contact doesn't exist, or may have been removed."
+        >
+          <Link to="/m/crm">Back to Contacts</Link>
+        </NotFoundState>
+      )}
       {data && <DetailContent contact={data.contact} />}
     </div>
   );
@@ -203,26 +206,5 @@ function DetailSkeleton() {
       </div>
       <Skeleton className="nx:h-64 nx:w-full" />
     </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <EmptyState className="nx:border nx:border-border-default">
-      <EmptyStateHeader>
-        <EmptyStateTitle>Contact not found</EmptyStateTitle>
-        <EmptyStateDescription>
-          This contact doesn&apos;t exist, or may have been removed.
-        </EmptyStateDescription>
-      </EmptyStateHeader>
-      <EmptyStateContent>
-        <Link
-          to="/m/crm"
-          className="nx:text-primary-subtle-foreground nx:hover:underline"
-        >
-          Back to Contacts
-        </Link>
-      </EmptyStateContent>
-    </EmptyState>
   );
 }
