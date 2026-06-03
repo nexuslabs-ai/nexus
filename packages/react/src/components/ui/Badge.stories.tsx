@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconCheck, IconX } from '@tabler/icons-react';
-import { expect, within } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { SPACING_MODES } from '../../stories/spacing-modes';
 import { expectHeightPinnedAcrossModes } from '../../stories/test-utils';
 
-import { Badge } from './badge';
+import { Badge, BadgeAction, BadgeDot } from './badge';
+
+const dismissAction = fn();
+const keyboardDismissAction = fn();
+const disabledDismissAction = fn();
 
 const meta: Meta<typeof Badge> = {
   title: 'Components/Badge',
@@ -259,6 +263,104 @@ export const WithBothIcons: Story = {
 };
 
 // ============================================
+// COMPOSABLE AFFORDANCES
+// ============================================
+
+export const WithDot: Story = {
+  render: (_args) => (
+    <Badge variant="success" fill="light" isCaps={false}>
+      <BadgeDot />
+      Live
+    </Badge>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('Live');
+    const dot = canvasElement.querySelector('[data-slot="badge-dot"]');
+
+    await expect(badge).toBeInTheDocument();
+    await expect(dot).toBeInTheDocument();
+    await expect(dot).toHaveAttribute('aria-hidden', 'true');
+  },
+};
+
+export const Dismissible: Story = {
+  render: (_args) => (
+    <Badge variant="secondary" isCaps={false}>
+      Synced
+      <BadgeAction aria-label="Dismiss synced badge" onClick={dismissAction}>
+        <IconX aria-hidden />
+      </BadgeAction>
+    </Badge>
+  ),
+  play: async ({ canvasElement }) => {
+    dismissAction.mockClear();
+
+    const canvas = within(canvasElement);
+    const action = canvas.getByRole('button', {
+      name: 'Dismiss synced badge',
+    });
+
+    await userEvent.click(action);
+    await expect(dismissAction).toHaveBeenCalledTimes(1);
+    await expect(action).toHaveAttribute('data-slot', 'badge-action');
+  },
+};
+
+export const KeyboardDismissible: Story = {
+  render: (_args) => (
+    <Badge variant="default" fill="light" isCaps={false}>
+      Filter
+      <BadgeAction
+        aria-label="Remove filter badge"
+        onClick={keyboardDismissAction}
+      >
+        <IconX aria-hidden />
+      </BadgeAction>
+    </Badge>
+  ),
+  play: async ({ canvasElement }) => {
+    keyboardDismissAction.mockClear();
+
+    const canvas = within(canvasElement);
+    const action = canvas.getByRole('button', {
+      name: 'Remove filter badge',
+    });
+
+    await userEvent.tab();
+    await expect(action).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(keyboardDismissAction).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const DisabledAction: Story = {
+  render: (_args) => (
+    <Badge variant="secondary" fill="light" isCaps={false}>
+      Locked
+      <BadgeAction
+        aria-label="Remove locked badge"
+        disabled
+        onClick={disabledDismissAction}
+      >
+        <IconX aria-hidden />
+      </BadgeAction>
+    </Badge>
+  ),
+  play: async ({ canvasElement }) => {
+    disabledDismissAction.mockClear();
+
+    const canvas = within(canvasElement);
+    const action = canvas.getByRole('button', {
+      name: 'Remove locked badge',
+    });
+
+    await expect(action).toBeDisabled();
+    await expect(disabledDismissAction).not.toHaveBeenCalled();
+  },
+};
+
+// ============================================
 // NUMBER BADGES
 // ============================================
 
@@ -458,6 +560,31 @@ export const AllVariants: Story = {
           </Badge>
           <Badge variant="error" isCaps={false} rightIcon={<IconX />}>
             Label
+          </Badge>
+        </div>
+      </div>
+
+      {/* Composable Affordances */}
+      <div>
+        <h3 className="nx:text-foreground nx:mb-3 nx:text-sm nx:font-medium">
+          Composable Affordances
+        </h3>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+          <Badge variant="success" fill="light" isCaps={false}>
+            <BadgeDot />
+            Live
+          </Badge>
+          <Badge variant="secondary" isCaps={false}>
+            Synced
+            <BadgeAction aria-label="Dismiss synced badge">
+              <IconX aria-hidden />
+            </BadgeAction>
+          </Badge>
+          <Badge variant="information" fill="light" isCaps={false}>
+            Preview
+            <BadgeAction aria-label="Dismiss preview badge">
+              <IconX aria-hidden />
+            </BadgeAction>
           </Badge>
         </div>
       </div>
