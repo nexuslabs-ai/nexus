@@ -96,7 +96,7 @@ export function ContactsRoute() {
   );
 }
 
-function ContactsSkeleton() {
+export function ContactsSkeleton() {
   return (
     <div className="nx:space-y-4">
       <Skeleton className="nx:h-9 nx:max-w-xs" />
@@ -109,7 +109,7 @@ function ContactsSkeleton() {
   );
 }
 
-function ContactsEmpty() {
+export function ContactsEmpty() {
   return (
     <EmptyState className="nx:border nx:border-border-default">
       <EmptyStateHeader>

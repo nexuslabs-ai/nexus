@@ -144,7 +144,7 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-function DetailSkeleton() {
+export function DetailSkeleton() {
   return (
     <div className="nx:space-y-6">
       <div className="nx:flex nx:items-center nx:gap-4">

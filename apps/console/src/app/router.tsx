@@ -18,6 +18,7 @@ import { ContactDetailRoute } from '../modules/crm/contact-detail-route';
 import { ContactsRoute } from '../modules/crm/contacts-route';
 import { contactsSearchSchema } from '../modules/crm/contacts-search';
 import { AppearanceRoute } from '../modules/design-system/appearance-route';
+import { FlowsRoute } from '../modules/design-system/flows-route';
 import { ReferenceRoute } from '../modules/design-system/reference-route';
 import { ScenesRoute } from '../modules/design-system/scenes-route';
 import { InboxRoute } from '../modules/inbox/inbox-route';
@@ -87,6 +88,12 @@ const appearanceRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/design/appearance',
   component: AppearanceRoute,
+});
+
+const flowsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/design/flows',
+  component: FlowsRoute,
 });
 
 // CRM Contacts (Phase 2a). The static `/m/crm` path outranks the dynamic
@@ -207,6 +214,7 @@ const routeTree = rootRoute.addChildren([
     referenceRoute,
     scenesRoute,
     appearanceRoute,
+    flowsRoute,
     crmContactsRoute,
     crmContactDetailRoute,
     projectsIssuesRoute,

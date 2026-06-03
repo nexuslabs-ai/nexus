@@ -101,7 +101,7 @@ export function InboxRoute() {
   );
 }
 
-function ListSkeleton() {
+export function ListSkeleton() {
   return (
     <div className="nx:flex-1 nx:space-y-4 nx:p-4">
       {Array.from({ length: 8 }, (_, i) => (
@@ -114,7 +114,7 @@ function ListSkeleton() {
   );
 }
 
-function EmptyPane() {
+export function EmptyPane() {
   return (
     <EmptyState>
       <EmptyStateHeader>

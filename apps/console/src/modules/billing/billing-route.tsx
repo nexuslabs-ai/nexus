@@ -186,7 +186,7 @@ function PlanCard({
   );
 }
 
-function CancelButton({
+export function CancelButton({
   planName,
   renewsAt,
   onConfirm,
@@ -276,7 +276,7 @@ function UsageCard({ usage }: { usage: UsageMeter[] }) {
   );
 }
 
-function UsageMeterBar({ meter }: { meter: UsageMeter }) {
+export function UsageMeterBar({ meter }: { meter: UsageMeter }) {
   const pct = Math.min(100, Math.round((meter.used / meter.limit) * 100));
   // Tint the figure near the cap — the bar itself has no warning variant.
   const nearCap = meter.used / meter.limit >= 0.9;
@@ -364,7 +364,7 @@ function InvoicesTable({ invoices }: { invoices: Invoice[] }) {
   );
 }
 
-function BillingSkeleton() {
+export function BillingSkeleton() {
   return (
     <div className="nx:space-y-6">
       <div className="nx:grid nx:gap-6 nx:lg:grid-cols-3">
@@ -377,7 +377,7 @@ function BillingSkeleton() {
   );
 }
 
-function InvoicesSkeleton() {
+export function InvoicesSkeleton() {
   return (
     <div className="nx:space-y-3">
       {Array.from({ length: 5 }, (_, i) => (
