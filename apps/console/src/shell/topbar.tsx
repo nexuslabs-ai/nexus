@@ -1,4 +1,4 @@
-import { Button, SidebarTrigger } from '@nexus/react';
+import { Button, Kbd, KbdGroup, SidebarTrigger } from '@nexus/react';
 import { IconMoon, IconSearch, IconSun } from '@tabler/icons-react';
 
 import { useThemeContext } from '../app/theme-provider';
@@ -21,9 +21,10 @@ export function Topbar() {
       >
         <IconSearch className="nx:size-4" />
         <span>Search…</span>
-        <kbd className="nx:bg-background nx:ml-2 nx:rounded nx:px-1.5 nx:text-xs">
-          ⌘K
-        </kbd>
+        <KbdGroup className="nx:ml-2">
+          <Kbd>⌘</Kbd>
+          <Kbd>K</Kbd>
+        </KbdGroup>
       </button>
 
       <div className="nx:flex-1" />

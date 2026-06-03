@@ -9,6 +9,8 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  Kbd,
+  KbdGroup,
   ScrollArea,
   Skeleton,
   Textarea,
@@ -156,7 +158,12 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
         />
         <div className="nx:mt-3 nx:flex nx:items-center nx:justify-between nx:gap-2">
           <p className="nx:text-muted-foreground nx:text-xs">
-            Replies as {conversation.assignee} · ⌘↵ to send
+            Replies as {conversation.assignee} ·{' '}
+            <KbdGroup>
+              <Kbd>⌘</Kbd>
+              <Kbd>↵</Kbd>
+            </KbdGroup>{' '}
+            to send
           </p>
           <Button
             onClick={handleSend}
