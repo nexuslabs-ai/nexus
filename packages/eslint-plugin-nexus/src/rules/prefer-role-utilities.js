@@ -62,6 +62,11 @@ export default {
         if (typeof node.value !== 'string') return;
         check(node, node.value);
       },
+      TemplateLiteral(node) {
+        if (node.expressions.length > 0) return;
+        const quasi = node.quasis[0];
+        check(node, quasi.value.cooked ?? quasi.value.raw);
+      },
     };
   },
 };

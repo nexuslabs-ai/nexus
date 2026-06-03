@@ -113,6 +113,17 @@ export const ButtonSizes: Story = {
       </InputGroup>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const buttons = canvas.getAllByRole('button');
+
+    await document.fonts.ready;
+    buttons.forEach((button) => {
+      expect(button).not.toHaveClass('nx:py-control-md');
+      expect(getComputedStyle(button).paddingTop).toBe('0px');
+      expect(getComputedStyle(button).paddingBottom).toBe('0px');
+    });
+  },
 };
 
 // A textarea with a stacked footer addon.

@@ -448,18 +448,35 @@ export function processSemanticTokens(filePath, primitiveMap) {
  * Parse CLI arguments
  * @returns {object} Configuration object
  */
-export function parseArgs() {
-  const args = process.argv.slice(2);
+export function parseArgs(
+  argv = process.argv.slice(2),
+  { allowedKeys = Object.keys(DEFAULT_CONFIG) } = {}
+) {
   const config = { ...DEFAULT_CONFIG };
+  const validFlags = allowedKeys.map((key) => `--${key}`).join(', ');
+  const allowed = new Set(allowedKeys);
 
-  args.forEach((arg) => {
-    const match = arg.match(/^--([\w-]+)=(.+)$/);
-    if (match) {
-      const [, key, value] = match;
-      if (key in config) {
-        config[key] = value;
-      }
+  argv.forEach((arg) => {
+    if (!arg.startsWith('--')) {
+      throw new Error(
+        `Unexpected positional argument "${arg}". Use --key=value. Valid flags: ${validFlags}`
+      );
     }
+    const match = arg.match(/^--([\w-]+)=(.+)$/);
+    if (!match) {
+      throw new Error(
+        `Invalid CLI flag "${arg}". Use --key=value. Valid flags: ${validFlags}`
+      );
+    }
+
+    const [, key, value] = match;
+    if (!allowed.has(key)) {
+      throw new Error(
+        `Unknown CLI flag "--${key}". Valid flags: ${validFlags}`
+      );
+    }
+
+    config[key] = value;
   });
 
   return config;

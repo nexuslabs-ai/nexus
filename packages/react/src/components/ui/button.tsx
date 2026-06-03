@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:aria-disabled:pointer-events-none nx:aria-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -64,6 +64,11 @@ interface ButtonProps
   loading?: boolean;
 }
 
+type ButtonAsChildElementProps = {
+  children?: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+};
+
 function Button({
   className,
   variant,
@@ -73,32 +78,82 @@ function Button({
   disabled,
   children,
   type = 'button',
+  onClick,
+  tabIndex,
+  'aria-busy': ariaBusy,
+  'aria-disabled': ariaDisabled,
   ...props
 }: ButtonProps) {
   const Comp = asChild ? Slot : 'button';
   const isDisabled = disabled || loading;
+  const asChildElement =
+    asChild && React.isValidElement<ButtonAsChildElementProps>(children)
+      ? children
+      : null;
+  const handleClick: React.MouseEventHandler<HTMLElement> = (event) => {
+    if (isDisabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+  };
+  const handleAsChildClick: React.MouseEventHandler<HTMLElement> = (event) => {
+    if (isDisabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    asChildElement?.props.onClick?.(event);
+  };
+  const content = asChildElement ? (
+    React.cloneElement(
+      asChildElement,
+      { onClick: handleAsChildClick },
+      loading ? (
+        <>
+          {asChildElement.props.children}
+          <Spinner aria-hidden="true" />
+        </>
+      ) : (
+        asChildElement.props.children
+      )
+    )
+  ) : loading ? (
+    <>
+      {children}
+      <Spinner aria-hidden="true" />
+    </>
+  ) : (
+    children
+  );
+  const disabledAria = isDisabled || ariaDisabled || undefined;
+  const busyAria = loading ? true : ariaBusy;
+  const interactionProps = asChild
+    ? {
+        'aria-disabled': disabledAria,
+        tabIndex: isDisabled ? -1 : tabIndex,
+      }
+    : {
+        'aria-disabled': disabledAria,
+        disabled: isDisabled,
+        tabIndex,
+        type,
+      };
 
   return (
     <Comp
-      type={type}
       data-slot="button"
       data-variant={variant}
       data-size={size}
       data-loading={loading || undefined}
       className={cn(buttonVariants({ variant, size, className }))}
-      disabled={isDisabled}
-      aria-busy={loading || undefined}
-      aria-disabled={isDisabled || undefined}
       {...props}
+      {...interactionProps}
+      aria-busy={busyAria}
+      onClick={handleClick}
     >
-      {loading ? (
-        <>
-          {children}
-          <Spinner aria-hidden="true" />
-        </>
-      ) : (
-        children
-      )}
+      {content}
     </Comp>
   );
 }
