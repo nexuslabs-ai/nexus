@@ -164,27 +164,11 @@ export function NotificationsMenu() {
         </div>
         <Separator />
 
-        {isPending && (
-          <div className="nx:space-y-3 nx:p-3">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="nx:flex nx:items-start nx:gap-3">
-                <Skeleton className="nx:size-4 nx:shrink-0 nx:rounded-full" />
-                <div className="nx:flex-1 nx:space-y-1">
-                  <Skeleton className="nx:h-3 nx:w-3/4" />
-                  <Skeleton className="nx:h-3 nx:w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {isPending && <NotificationsSkeleton />}
         {/* Only on a cold-load failure — `data` is retained on a background
             refetch error (each mark-read invalidates), so gating on `!data`
             keeps the stale list instead of stacking an error above it. */}
-        {isError && !data && (
-          <p className="nx:text-error-foreground nx:px-3 nx:py-6 nx:text-center nx:text-sm">
-            Couldn’t load notifications. Please try again.
-          </p>
-        )}
+        {isError && !data && <NotificationsError />}
         {data && (
           <ul className="nx:max-h-96 nx:overflow-y-auto nx:p-1">
             {data.notifications.map((n) => {
@@ -227,5 +211,29 @@ export function NotificationsMenu() {
         )}
       </PopoverContent>
     </Popover>
+  );
+}
+
+export function NotificationsSkeleton() {
+  return (
+    <div className="nx:space-y-3 nx:p-3">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="nx:flex nx:items-start nx:gap-3">
+          <Skeleton className="nx:size-4 nx:shrink-0 nx:rounded-full" />
+          <div className="nx:flex-1 nx:space-y-1">
+            <Skeleton className="nx:h-3 nx:w-3/4" />
+            <Skeleton className="nx:h-3 nx:w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function NotificationsError() {
+  return (
+    <p className="nx:text-error-foreground nx:px-3 nx:py-6 nx:text-center nx:text-sm">
+      Couldn’t load notifications. Please try again.
+    </p>
   );
 }

@@ -92,7 +92,7 @@ export function PeopleRoute() {
   );
 }
 
-function PeopleSkeleton() {
+export function PeopleSkeleton() {
   return (
     <div className="nx:space-y-4">
       <Skeleton className="nx:h-9 nx:max-w-xs" />
@@ -105,7 +105,7 @@ function PeopleSkeleton() {
   );
 }
 
-function PeopleEmpty() {
+export function PeopleEmpty() {
   return (
     <EmptyState className="nx:border nx:border-border-default">
       <EmptyStateHeader>

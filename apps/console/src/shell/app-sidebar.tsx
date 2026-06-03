@@ -22,6 +22,7 @@ import {
   IconLayoutGrid,
   IconLogout,
   IconPalette,
+  IconRoute,
   IconUserCircle,
 } from '@tabler/icons-react';
 import {
@@ -39,6 +40,7 @@ const DESIGN_ITEMS = [
   { label: 'Reference', to: '/design/reference', icon: IconComponents },
   { label: 'Scenes', to: '/design/scenes', icon: IconLayoutGrid },
   { label: 'Appearance', to: '/design/appearance', icon: IconPalette },
+  { label: 'Flows', to: '/design/flows', icon: IconRoute },
 ] as const;
 
 /**
