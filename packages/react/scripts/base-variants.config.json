@@ -27,6 +27,11 @@
     { "name": "Breadcrumb", "showcase": "AllVariants" },
     { "name": "Button", "showcase": "AllVariants" },
     { "name": "ButtonGroup", "showcase": "AllVariants" },
+    {
+      "name": "Calendar",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"]
+    },
     { "name": "Card", "showcase": "AllVariants" },
     { "name": "Checkbox", "showcase": "AllVariants" },
     { "name": "Collapsible", "showcase": "AllVariants" },

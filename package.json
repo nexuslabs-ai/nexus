@@ -37,6 +37,7 @@
       "name": "@nexus/react (ESM)",
       "path": "packages/react/dist/index.mjs",
       "ignore": [
+        "react-day-picker",
         "react-hook-form",
         "sonner"
       ],
