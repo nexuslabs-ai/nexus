@@ -1,4 +1,11 @@
-import { Skeleton } from '@nexus/react';
+import {
+  EmptyState,
+  EmptyStateDescription,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+  Skeleton,
+} from '@nexus/react';
 import { IconInbox } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
@@ -82,16 +89,16 @@ function ListError() {
 
 function EmptyPane() {
   return (
-    <div className="nx:flex nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:p-12 nx:text-center">
-      <div className="nx:bg-muted nx:text-muted-foreground nx:flex nx:size-12 nx:items-center nx:justify-center nx:rounded-full">
-        <IconInbox />
-      </div>
-      <h2 className="nx:typography-heading-medium nx:text-foreground">
-        No conversation selected
-      </h2>
-      <p className="nx:text-muted-foreground nx:max-w-sm">
-        Pick a conversation from the list to read the thread and reply.
-      </p>
-    </div>
+    <EmptyState>
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconInbox />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No conversation selected</EmptyStateTitle>
+        <EmptyStateDescription>
+          Pick a conversation from the list to read the thread and reply.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
   );
 }
