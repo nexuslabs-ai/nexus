@@ -10,6 +10,7 @@ import { ForgotRoute } from '../modules/auth/forgot-route';
 import { LoginRoute } from '../modules/auth/login-route';
 import { SignupRoute } from '../modules/auth/signup-route';
 import { VerifyRoute } from '../modules/auth/verify-route';
+import { BillingRoute } from '../modules/billing/billing-route';
 import { ComingSoon } from '../modules/coming-soon';
 import { ContactDetailRoute } from '../modules/crm/contact-detail-route';
 import { ContactsRoute } from '../modules/crm/contacts-route';
@@ -121,6 +122,14 @@ const inboxRoute = createRoute({
   component: InboxRoute,
 });
 
+// Billing (Phase 3c). Static `/m/billing` outranks `/m/$module`. Single-page
+// dashboard — no search params.
+const billingRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/m/billing',
+  component: BillingRoute,
+});
+
 // One shared placeholder backs every not-yet-built module.
 const moduleRoute = createRoute({
   getParentRoute: () => appRoute,
@@ -174,6 +183,7 @@ const routeTree = rootRoute.addChildren([
     projectsIssuesRoute,
     projectsIssueDetailRoute,
     inboxRoute,
+    billingRoute,
     moduleRoute,
   ]),
   authRoute.addChildren([loginRoute, signupRoute, verifyRoute, forgotRoute]),

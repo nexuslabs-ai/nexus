@@ -1,6 +1,11 @@
 import { delay, http, HttpResponse, type RequestHandler } from 'msw';
 
 import type { User } from '../lib/auth-api';
+import type {
+  BillingOverview,
+  Invoice,
+  PlanSelection,
+} from '../lib/billing-api';
 import type { ActivityItem, Contact, ContactInput } from '../lib/crm-api';
 import type {
   Conversation,
@@ -9,6 +14,7 @@ import type {
 } from '../lib/inbox-api';
 import type { Issue, IssueInput } from '../lib/projects-api';
 
+import { BILLING_OVERVIEW, INVOICES } from './billing-fixtures';
 import { CONTACTS } from './crm-fixtures';
 import { CONVERSATIONS } from './inbox-fixtures';
 import { ISSUES } from './projects-fixtures';
@@ -92,6 +98,15 @@ const conversationsStore: ConversationDetail[] = CONVERSATIONS.map((c) => ({
   ...c,
   messages: c.messages.map((m) => ({ ...m })),
 }));
+
+// In-memory Billing store (same session lifecycle). The subscription mutates
+// (change plan / cancel / reactivate); usage, the card, and invoices are read-only.
+const billing: BillingOverview = {
+  subscription: { ...BILLING_OVERVIEW.subscription },
+  usage: BILLING_OVERVIEW.usage.map((u) => ({ ...u })),
+  paymentMethod: { ...BILLING_OVERVIEW.paymentMethod },
+};
+const invoicesStore: Invoice[] = INVOICES.map((i) => ({ ...i }));
 
 /**
  * MSW request handlers — there is no real backend. Auth is a two-step flow: a
@@ -344,4 +359,41 @@ export const handlers: RequestHandler[] = [
       return HttpResponse.json({ conversation });
     }
   ),
+
+  // --- Billing ---
+  // The overview: current subscription + usage meters + the card on file.
+  http.get('/api/billing', async () => {
+    await delay(500);
+    return HttpResponse.json(billing);
+  }),
+
+  // Past invoices (the transactions table). Read-only; newest first.
+  http.get('/api/billing/invoices', async () => {
+    await delay(400);
+    return HttpResponse.json({ invoices: invoicesStore });
+  }),
+
+  // Change tier and/or cycle — also clears a pending cancellation.
+  http.patch('/api/billing/subscription', async ({ request }) => {
+    await delay(300);
+    const { tier, cycle } = (await request.json()) as PlanSelection;
+    billing.subscription.tier = tier;
+    billing.subscription.cycle = cycle;
+    billing.subscription.status = 'active';
+    return HttpResponse.json({ subscription: billing.subscription });
+  }),
+
+  // Cancel: wind down at period end — stays active until renewsAt.
+  http.post('/api/billing/cancel', async () => {
+    await delay(300);
+    billing.subscription.status = 'canceling';
+    return HttpResponse.json({ subscription: billing.subscription });
+  }),
+
+  // Reactivate: undo a pending cancellation.
+  http.post('/api/billing/reactivate', async () => {
+    await delay(300);
+    billing.subscription.status = 'active';
+    return HttpResponse.json({ subscription: billing.subscription });
+  }),
 ];
