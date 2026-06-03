@@ -14,6 +14,12 @@ const currencyFmt = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 
+// Cents-precise — for invoice line amounts, where whole-dollar would read wrong.
+const moneyFmt = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+});
+
 const dateFmt = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
@@ -31,6 +37,7 @@ const dateTimeFmt = new Intl.DateTimeFormat('en-US', {
 });
 
 export const formatCurrency = (value: number) => currencyFmt.format(value);
+export const formatMoney = (value: number) => moneyFmt.format(value);
 export const formatDate = (iso: string) => dateFmt.format(new Date(iso));
 export const formatDateTime = (iso: string) =>
   dateTimeFmt.format(new Date(iso));
