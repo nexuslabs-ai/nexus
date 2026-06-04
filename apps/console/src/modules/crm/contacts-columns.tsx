@@ -136,6 +136,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
   },
   {
     id: 'actions',
+    header: () => <span className="nx:sr-only">Actions</span>,
     cell: ({ row }) => <RowActions contact={row.original} />,
     enableSorting: false,
   },

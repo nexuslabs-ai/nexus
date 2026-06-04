@@ -34,12 +34,14 @@ export function RootLayout() {
       <AppSidebar />
       <SidebarInset>
         <Topbar onSearchClick={() => setCommandOpen(true)} />
-        {/* nx:text-foreground re-establishes the adaptive base text color for
+        {/* SidebarInset already provides the <main> landmark, so this is a
+            plain <div> (a second <main> trips axe landmark rules).
+            nx:text-foreground re-establishes the adaptive base text color for
             module content — without it, reused content that relies on inherited
             foreground (e.g. the typography showcase) renders black in dark mode. */}
-        <main className="nx:text-foreground nx:min-w-0 nx:flex-1">
+        <div className="nx:text-foreground nx:min-w-0 nx:flex-1">
           <Outlet />
-        </main>
+        </div>
       </SidebarInset>
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
     </SidebarProvider>
