@@ -74,6 +74,7 @@ function DialogOverlay({ className, ...props }: DialogOverlayProps) {
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
         'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
         'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
+        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
         className
       )}
       {...props}
@@ -132,6 +133,7 @@ function DialogContent({
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
           'nx:data-[state=closed]:slide-out-to-left-1/2 nx:data-[state=closed]:slide-out-to-top-[48%]',
           'nx:data-[state=open]:slide-in-from-left-1/2 nx:data-[state=open]:slide-in-from-top-[48%]',
+          'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
           'nx:sm:rounded-lg',
           className
         )}
@@ -144,6 +146,7 @@ function DialogContent({
             className={cn(
               'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:opacity-70',
               'nx:transition-opacity',
+              'nx:motion-reduce:transition-none',
               'nx:hover:opacity-100',
               'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
               'nx:disabled:pointer-events-none',

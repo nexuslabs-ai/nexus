@@ -117,7 +117,7 @@ function NavigationMenuItem({ className, ...props }: NavigationMenuItemProps) {
 
 const navigationMenuTriggerStyle = cva(
   // nexus-allow-numeric: nav trigger rhythm
-  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:outline-none nx:transition-colors nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
+  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:outline-none nx:transition-colors nx:motion-reduce:transition-none nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
 );
 
 /**
@@ -148,7 +148,7 @@ function NavigationMenuTrigger({
     >
       {children}{' '}
       <IconChevronDown
-        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-300 nx:group-data-[state=open]:rotate-180"
+        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-300 nx:motion-reduce:transition-none nx:group-data-[state=open]:rotate-180"
         aria-hidden="true"
       />
     </NavigationMenuPrimitive.Trigger>
@@ -183,6 +183,7 @@ function NavigationMenuContent({
         'nx:data-[motion=from-end]:slide-in-from-right-52 nx:data-[motion=from-start]:slide-in-from-left-52',
         'nx:data-[motion=to-end]:slide-out-to-right-52 nx:data-[motion=to-start]:slide-out-to-left-52',
         'nx:data-[motion^=from-]:animate-in nx:data-[motion^=from-]:fade-in nx:data-[motion^=to-]:animate-out nx:data-[motion^=to-]:fade-out',
+        'nx:motion-reduce:data-[motion^=from-]:animate-none nx:motion-reduce:data-[motion^=to-]:animate-none',
         // @container conversion of shadcn's `md:absolute md:w-auto`
         'nx:@md/navmenu:absolute nx:@md/navmenu:w-auto',
         'nx:group-data-[viewport=false]/navigation-menu:top-full',
@@ -194,6 +195,8 @@ function NavigationMenuContent({
         'nx:group-data-[viewport=false]/navigation-menu:shadow-lg nx:group-data-[viewport=false]/navigation-menu:duration-200',
         'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-out nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:zoom-out-95',
         'nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-in nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:zoom-in-95',
+        'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:duration-0',
+        'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-none nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-none',
         className
       )}
       {...props}
@@ -230,6 +233,7 @@ function NavigationMenuViewport({
           'nx:origin-top-center nx:relative nx:mt-1.5 nx:h-[var(--radix-navigation-menu-viewport-height)] nx:w-full nx:overflow-hidden',
           'nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=closed]:animate-out nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:animate-in nx:data-[state=open]:zoom-in-90',
+          'nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none',
           // @container conversion of shadcn's `md:w-[var(...)]`
           'nx:@md/navmenu:w-[var(--radix-navigation-menu-viewport-width)]',
           className
@@ -261,6 +265,7 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
       className={cn(
         // nexus-allow-numeric: link rhythm
         'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:text-sm nx:outline-none nx:transition-colors',
+        'nx:motion-reduce:transition-none',
         'nx:hover:bg-background-hover nx:hover:text-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:data-[active=true]:bg-background-hover nx:data-[active=true]:text-foreground',
@@ -297,6 +302,7 @@ function NavigationMenuIndicator({
         // nexus-allow-numeric: indicator rail height
         'nx:top-full nx:z-[1] nx:flex nx:h-1.5 nx:items-end nx:justify-center nx:overflow-hidden',
         'nx:data-[state=hidden]:animate-out nx:data-[state=hidden]:fade-out nx:data-[state=visible]:animate-in nx:data-[state=visible]:fade-in',
+        'nx:motion-reduce:data-[state=hidden]:animate-none nx:motion-reduce:data-[state=visible]:animate-none',
         className
       )}
       {...props}

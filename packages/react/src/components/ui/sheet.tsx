@@ -75,6 +75,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
         'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
         'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
+        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
         className
       )}
       {...props}
@@ -93,7 +94,9 @@ const sheetContentVariants = cva(
     'nx:fixed nx:z-modal nx:flex nx:flex-col nx:gap-container',
     'nx:bg-container nx:shadow-lg nx:ease-in-out',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-    'nx:data-[state=open]:duration-500 nx:data-[state=closed]:duration-300'
+    'nx:data-[state=open]:duration-500 nx:data-[state=closed]:duration-300',
+    'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
+    'nx:motion-reduce:data-[state=open]:duration-0 nx:motion-reduce:data-[state=closed]:duration-0'
   ),
   {
     variants: {
@@ -176,6 +179,7 @@ function SheetContent({
             className={cn(
               'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:opacity-70',
               'nx:transition-opacity',
+              'nx:motion-reduce:transition-none',
               'nx:hover:opacity-100',
               'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
               'nx:disabled:pointer-events-none',
