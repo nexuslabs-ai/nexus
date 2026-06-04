@@ -32,10 +32,7 @@ export function RootLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      {/* min-w-0 lets the inset shrink below a wide child's intrinsic width
-          (e.g. an 8-column table) so that child scrolls inside its own
-          container instead of pushing the whole page wider than the viewport. */}
-      <SidebarInset className="nx:min-w-0">
+      <SidebarInset>
         <Topbar onSearchClick={() => setCommandOpen(true)} />
         {/* nx:text-foreground re-establishes the adaptive base text color for
             module content — without it, reused content that relies on inherited

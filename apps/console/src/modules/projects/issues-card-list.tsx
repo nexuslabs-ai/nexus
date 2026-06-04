@@ -5,7 +5,9 @@ import type { Issue } from '../../lib/projects-api';
 
 import { IssueCard } from './issue-card';
 
-const searchIssue = (issue: Issue) => `${issue.key} ${issue.title}`;
+// Title-only, matching the desktop table's `filterColumn="title"` + the
+// "Filter by title…" placeholder — so the two views filter identically.
+const searchIssue = (issue: Issue) => issue.title;
 
 /**
  * The Issues table's `<lg` counterpart: one card per issue, filterable by key or

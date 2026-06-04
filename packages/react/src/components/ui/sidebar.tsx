@@ -449,14 +449,16 @@ interface SidebarInsetProps extends React.ComponentProps<'main'> {}
  * SidebarInset
  *
  * The main content region beside the sidebar. With `variant="inset"` it floats
- * as a rounded card; otherwise it fills the remaining width.
+ * as a rounded card; otherwise it fills the remaining width. `min-w-0` lets a
+ * wide child (e.g. a data table) scroll inside its own container instead of
+ * forcing the inset — and the page — wider than the viewport.
  */
 function SidebarInset({ className, ...props }: SidebarInsetProps) {
   return (
     <main
       data-slot="sidebar-inset"
       className={cn(
-        'nx:relative nx:flex nx:w-full nx:flex-1 nx:flex-col nx:bg-background',
+        'nx:relative nx:flex nx:w-full nx:min-w-0 nx:flex-1 nx:flex-col nx:bg-background',
         'nx:lg:peer-data-[variant=inset]:m-2 nx:lg:peer-data-[variant=inset]:ml-0 nx:lg:peer-data-[variant=inset]:rounded-xl nx:lg:peer-data-[variant=inset]:shadow-sm nx:lg:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',
         className
       )}
