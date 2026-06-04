@@ -377,7 +377,7 @@ export function BillingSkeleton() {
   );
 }
 
-export function InvoicesSkeleton() {
+function InvoicesSkeleton() {
   return (
     <div className="nx:space-y-3">
       {Array.from({ length: 5 }, (_, i) => (
