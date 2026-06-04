@@ -294,14 +294,14 @@ A11y is automatic — every story is axe-checked. No separate a11y story needed.
 
 | Command                     | What it does                                                                                                          |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `yarn test`                 | Run both vitest projects: `unit` (jsdom) and `storybook` (real Chromium via Playwright)                               |
-| `yarn test:unit`            | `unit` project only — fastest feedback loop for hooks/utilities                                                       |
-| `yarn test:storybook`       | `storybook` project only — runs every story's play function in a browser                                              |
-| `yarn test:storybook:watch` | Watch mode for stories                                                                                                |
-| `yarn test:storybook:ui`    | **Debugging entry point** when a play function fails — opens Vitest's interactive UI mounted on the storybook project |
-| `yarn storybook`            | Start the Storybook dev server (the UI you're documenting against)                                                    |
+| `pnpm test`                 | Run both vitest projects: `unit` (jsdom) and `storybook` (real Chromium via Playwright)                               |
+| `pnpm test:unit`            | `unit` project only — fastest feedback loop for hooks/utilities                                                       |
+| `pnpm test:storybook`       | `storybook` project only — runs every story's play function in a browser                                              |
+| `pnpm test:storybook:watch` | Watch mode for stories                                                                                                |
+| `pnpm test:storybook:ui`    | **Debugging entry point** when a play function fails — opens Vitest's interactive UI mounted on the storybook project |
+| `pnpm storybook`            | Start the Storybook dev server (the UI you're documenting against)                                                    |
 
-The first run of `yarn test` (or any storybook-project run) launches Storybook in the background — the first cold start takes a few extra seconds.
+The first run of `pnpm test` (or any storybook-project run) launches Storybook in the background — the first cold start takes a few extra seconds.
 
 ---
 

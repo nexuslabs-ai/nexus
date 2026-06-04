@@ -73,7 +73,7 @@ Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + s
 
 ### Step 5 — Wire
 
-- Add the dep to `packages/react/package.json` (alphabetical) → `yarn install`.
+- Add the dep to `packages/react/package.json` (alphabetical) → `pnpm install`.
 - Add any new icon to `packages/react/src/lib/icons.ts` (Tabler re-export).
 - `export * from '@/components/ui/{name}'` in `packages/react/src/index.ts`.
 - If it has a render showcase, add an entry to `packages/react/scripts/base-variants.config.json`.
@@ -82,9 +82,9 @@ Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + s
 
 Run these and fix everything before reporting — no deferral (`no-follow-up-deferral.md`):
 
-- `yarn workspace @nexus/react typecheck`
-- `yarn lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
-- Story tests per `testing-react.md` (`yarn test:storybook`); a11y violations fail the run.
+- `pnpm --filter @nexus/react typecheck`
+- `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
+- Story tests per `testing-react.md` (`pnpm test:storybook`); a11y violations fail the run.
 
 ## Reflex Check
 

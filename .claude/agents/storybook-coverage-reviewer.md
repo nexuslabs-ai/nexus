@@ -8,7 +8,7 @@ permissionMode: bypassPermissions
 
 # Storybook Coverage Reviewer
 
-A thin wrapper around `yarn audit:storybook-coverage`. The audit logic — file
+A thin wrapper around `pnpm audit:storybook-coverage`. The audit logic — file
 discovery, CVA enum extraction, story-export detection, the required-story
 matrix, the display-gate, the drift-alias map, the snippet templates — all
 lives in `packages/react/scripts/audit-storybook-coverage.mjs`. This agent
@@ -22,7 +22,7 @@ deterministic structural rule-vs-files diffs belong in Node scripts that CI
 can gate on, not in LLM reasoning. The script is testable, byte-stable, and
 runs in under a second. This agent is the natural-language surface that
 sibling agents (PR review, etc.) and the user can call without typing the
-yarn invocation.
+pnpm invocation.
 
 ## Procedure
 
@@ -40,13 +40,13 @@ If the component name is missing or ambiguous, ask back rather than guessing.
 For a single component:
 
 ```bash
-yarn workspace @nexus/react audit:storybook-coverage --component <name> --json
+pnpm --filter @nexus/react audit:storybook-coverage --component <name> --json
 ```
 
 For all components:
 
 ```bash
-yarn workspace @nexus/react audit:storybook-coverage --all --json
+pnpm --filter @nexus/react audit:storybook-coverage --all --json
 ```
 
 The `--json` flag emits the structured shape this agent consumes:
@@ -82,8 +82,8 @@ For `--all`, the output is a JSON array of these objects.
 | 1    | Findings present | Parse JSON, render the table below        |
 | 2    | Config error     | Surface the script's stderr verbatim      |
 
-Yarn wraps non-zero exit codes with its own `error Command failed` line —
-that's noise; report the script's actual stderr above the yarn footer.
+pnpm wraps non-zero exit codes with its own `ELIFECYCLE Command failed` line —
+that's noise; report the script's actual stderr above the pnpm footer.
 
 ### 4. Render findings
 

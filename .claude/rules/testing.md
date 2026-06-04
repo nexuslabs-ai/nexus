@@ -152,7 +152,7 @@ if (!result.success) {
 ## Running Tests
 
 ```bash
-yarn test               # Run all tests
+pnpm test               # Run all tests
 ```
 
 ## Do Not

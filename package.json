@@ -3,33 +3,29 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "eslint . --max-warnings 0",
-    "test": "yarn workspace @nexus/react generate:base-variants && vitest run",
-    "test:watch": "yarn workspace @nexus/react generate:base-variants && vitest",
+    "test": "pnpm --filter @nexus/react generate:base-variants && vitest run",
+    "test:watch": "pnpm --filter @nexus/react generate:base-variants && vitest",
     "test:unit": "vitest run --project=unit",
-    "test:storybook": "yarn workspace @nexus/react generate:base-variants && vitest run --project=storybook",
-    "test:storybook:watch": "yarn workspace @nexus/react generate:base-variants && vitest --project=storybook",
-    "test:storybook:ui": "yarn workspace @nexus/react generate:base-variants && vitest --project=storybook --ui",
-    "storybook": "yarn workspace @nexus/react storybook",
-    "build-storybook": "yarn workspace @nexus/react build-storybook",
+    "test:storybook": "pnpm --filter @nexus/react generate:base-variants && vitest run --project=storybook",
+    "test:storybook:watch": "pnpm --filter @nexus/react generate:base-variants && vitest --project=storybook",
+    "test:storybook:ui": "pnpm --filter @nexus/react generate:base-variants && vitest --project=storybook --ui",
+    "storybook": "pnpm --filter @nexus/react storybook",
+    "build-storybook": "pnpm --filter @nexus/react build-storybook",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\" \".claude/**/*.md\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\" \".claude/**/*.md\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens:modular": "yarn workspace @nexus/core build:tokens:modular && node scripts/sync-console-themes.js && node scripts/sync-docs-themes.js",
-    "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
+    "tokens:modular": "pnpm --filter @nexus/core build:tokens:modular && node scripts/sync-console-themes.js && node scripts/sync-docs-themes.js",
+    "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:browser-support": "node scripts/audit-browser-support.js",
-    "audit:contrast": "yarn workspace @nexus/core audit:contrast",
-    "audit:storybook-coverage": "yarn workspace @nexus/react audit:storybook-coverage",
-    "validate:spacing-modes": "yarn workspace @nexus/core validate:spacing-modes",
-    "console": "cd apps/console && yarn dev",
+    "audit:contrast": "pnpm --filter @nexus/core audit:contrast",
+    "audit:storybook-coverage": "pnpm --filter @nexus/react audit:storybook-coverage",
+    "validate:spacing-modes": "pnpm --filter @nexus/core validate:spacing-modes",
+    "console": "cd apps/console && pnpm dev",
     "size-limit": "size-limit",
     "prepare": "husky"
   },
@@ -56,7 +52,7 @@
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@nexus/eslint-plugin": "*",
+    "@nexus/eslint-plugin": "workspace:*",
     "@size-limit/preset-small-lib": "^12.0.0",
     "@storybook/addon-vitest": "^10.1.11",
     "@vitest/browser": "4.0.18",
@@ -85,7 +81,7 @@
     "typescript-eslint": "^8.50.0",
     "vitest": "4.0.18"
   },
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "pnpm@10.12.1",
   "engines": {
     "node": ">=20.19.0"
   },
@@ -105,13 +101,16 @@
       "prettier --write"
     ],
     "packages/core/tokens/semantic/spacing-*.json": [
-      "yarn validate:spacing-modes",
+      "pnpm validate:spacing-modes",
       "eslint --fix --no-warn-ignored"
     ]
   },
-  "//resolutions": "zod is pinned to dedupe @hookform/resolvers' broad peer range (^3.25.0 || ^4.0.0) onto a single v4 copy, so zodResolver() typechecks in Form.stories.tsx. zod is a story-only devDependency and ships in no package bundle.",
-  "resolutions": {
-    "minimatch": "^10.1.2",
-    "zod": "^4.4.3"
+  "pnpm": {
+    "//overrides": "zod is pinned to dedupe @hookform/resolvers' broad peer range (^3.25.0 || ^4.0.0) onto a single v4 copy, so zodResolver() typechecks in Form.stories.tsx. zod is a story-only devDependency and ships in no package bundle. @radix-ui/react-context is deduped to 1.1.3 (react-menubar pins 1.1.2) so a single, top-level-nameable copy exists — otherwise the .d.ts rollup fails with TS2742 under pnpm.",
+    "overrides": {
+      "minimatch": "^10.1.2",
+      "zod": "^4.4.3",
+      "@radix-ui/react-context": "1.1.3"
+    }
   }
 }

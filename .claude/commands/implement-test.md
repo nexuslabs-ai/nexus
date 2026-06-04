@@ -159,7 +159,7 @@ After tests are implemented, output:
 ### Verification
 
 ```bash
-yarn test path/to/tests
+pnpm test path/to/tests
 ```
 ````
 

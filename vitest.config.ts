@@ -46,7 +46,7 @@ export default defineConfig({
           storybookTest({
             configDir: path.resolve(__dirname, 'packages/react/.storybook'),
             // Auto-start Storybook in watch mode for debugging links
-            storybookScript: 'yarn storybook --no-open',
+            storybookScript: 'pnpm storybook --no-open',
             // Explicitly include all stories (test tag is auto-applied)
             // Use exclude/skip for stories that shouldn't run
             tags: {

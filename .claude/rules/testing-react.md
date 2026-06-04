@@ -143,12 +143,12 @@ A component PR is complete only when:
 2. The audit reports clean for the component:
 
    ```bash
-   yarn workspace @nexus/react audit:storybook-coverage --component <kebab-name>
+   pnpm --filter @nexus/react audit:storybook-coverage --component <kebab-name>
    # exit 0 — no `missing` or `drift` findings
    ```
 
-3. `yarn test:storybook` passes.
-4. `yarn typecheck` and `yarn lint` are clean.
+3. `pnpm test:storybook` passes.
+4. `pnpm typecheck` and `pnpm lint` are clean.
 
 ### Scope of the audit gate
 
@@ -164,10 +164,10 @@ The issue ranges below are deliberately literal — each epic gets a scope decis
 
 ```bash
 # Direct CLI
-yarn workspace @nexus/react audit:storybook-coverage --component button
+pnpm --filter @nexus/react audit:storybook-coverage --component button
 
 # Sweep every component
-yarn workspace @nexus/react audit:storybook-coverage --all
+pnpm --filter @nexus/react audit:storybook-coverage --all
 ```
 
 You can also invoke the natural-language wrapper — any prompt like _"audit Button
@@ -313,7 +313,7 @@ import {
 
 A11y is automatic. Every story is checked against axe-core rules via `addon-a11y` and violations fail the test — keyboard nav, ARIA semantics, focus management, role/landmark structure. No separate a11y assertions needed.
 
-**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Contrast is verified at the token layer by `yarn workspace @nexus/core audit:contrast`.
+**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Contrast is verified at the token layer by `pnpm --filter @nexus/core audit:contrast`.
 
 ## Per-Base Variant Generation
 
@@ -337,7 +337,7 @@ Add an entry to `packages/react/scripts/base-variants.config.json` like `{ "name
 - `name` — the component. Used as the sidebar title, the output filename prefix, and to locate the canonical stories module (`../ui/{name}.stories`).
 - `showcase` — a **render-based** export from that module (e.g. `AllVariants`; Avatar uses `AllSizes`). The generator reuses this story's `render()` directly, so it must not be args-only. Generation fails fast if the stories file is missing, the export is absent, or the export has no `render:` (args-only).
 
-Then re-run `yarn workspace @nexus/react generate:base-variants` (or just `yarn storybook` — see Lifecycle below).
+Then re-run `pnpm --filter @nexus/react generate:base-variants` (or just `pnpm storybook` — see Lifecycle below).
 
 ### How the scoping works
 
@@ -349,7 +349,7 @@ Each cell emits the **full** semantic set (base + the configured `blue` brand) f
 
 - **Inline styles, not `nx:` utilities, for the grid scaffolding.** The wrapper (grid, cell chrome) uses `style={{ … 'var(--nx-color-…)' }}`. This is the one place the `nx:`-prefix rule is intentionally relaxed: generated files are gitignored, and Tailwind's content scanner ignores gitignored paths — so an `nx:` class used _only_ here would never be emitted. The actual component content comes from the reused showcase, whose classes are emitted from the (scanned) canonical story file.
 - **Component decorators are applied; the global one is not.** The reused showcase is wrapped in its own meta + story decorators (e.g. Tooltip's `TooltipProvider`, Input's width wrapper) so it renders faithfully — but the global preview decorator (dark / centering wrapper) is skipped so each cell controls its own theme via `data-nexus-base` + `.dark`.
-- **`a11y: { test: 'off' }`** — a11y and contrast are covered by the canonical stories and `yarn workspace @nexus/core audit:contrast`; these grids are visual-comparison duplicates and would only add noise (duplicated controls / ids across 10 renders).
+- **`a11y: { test: 'off' }`** — a11y and contrast are covered by the canonical stories and `pnpm --filter @nexus/core audit:contrast`; these grids are visual-comparison duplicates and would only add noise (duplicated controls / ids across 10 renders).
 - **`tags: ['!autodocs']`** — no docs page per generated story.
 
 ### Caveats
@@ -364,9 +364,9 @@ Generation is chained ahead of the scripts that consume the stories — it is ne
 
 | Script                                                  | Effect                                                                        |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `yarn storybook` / `yarn build-storybook`               | regenerate, then start / build Storybook                                      |
-| `yarn test` / `yarn test:storybook` (+ `:watch`, `:ui`) | regenerate, then run vitest (addon-vitest sees them)                          |
-| `yarn workspace @nexus/react typecheck`                 | regenerate, then `tsc` — gives generated stories type coverage at the CI gate |
+| `pnpm storybook` / `pnpm build-storybook`               | regenerate, then start / build Storybook                                      |
+| `pnpm test` / `pnpm test:storybook` (+ `:watch`, `:ui`) | regenerate, then run vitest (addon-vitest sees them)                          |
+| `pnpm --filter @nexus/react typecheck`                  | regenerate, then `tsc` — gives generated stories type coverage at the CI gate |
 
 The output is gitignored, so a fresh checkout has no generated files until one of the above runs. Because every consuming script regenerates first, the gitignored output is never relied upon — including the `typecheck` gate, which would otherwise skip the absent files on a fresh checkout.
 
@@ -374,19 +374,19 @@ The output is gitignored, so a fresh checkout has no generated files until one o
 
 ```bash
 # Run all tests (unit + storybook)
-yarn test
+pnpm test
 
 # Run only storybook tests (components)
-yarn test:storybook
+pnpm test:storybook
 
 # Run only unit tests (hooks, utilities)
-yarn test:unit
+pnpm test:unit
 
 # Watch mode for storybook
-yarn test:storybook:watch
+pnpm test:storybook:watch
 
 # Interactive UI
-yarn test:storybook:ui
+pnpm test:storybook:ui
 ```
 
 ## Common Mistakes

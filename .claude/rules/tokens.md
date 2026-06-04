@@ -28,7 +28,7 @@ OKLCH requires Chrome 111+ / Safari 15.4+ / Firefox 113+ (Baseline 2023). No hex
 
 ### APCA contrast gate
 
-`yarn audit:contrast` runs APCA Lc on every foreground↔background pair (the exact pairs + thresholds live in `audit-contrast.js`), gated by intended-use tier:
+`pnpm audit:contrast` runs APCA Lc on every foreground↔background pair (the exact pairs + thresholds live in `audit-contrast.js`), gated by intended-use tier:
 
 - **Body text** `|Lc| ≥ 75` — fluent reading (`foreground ↔ background`).
 - **UI labels** `|Lc| ≥ 60` — buttons, badges, nav labels, chart marks, labels on subtle fills.
@@ -78,7 +78,7 @@ All three share Inter / Georgia / JetBrains Mono — they differ by scale only. 
 
 ## Do Not
 
-- Edit files in `dist/` or `packages/tailwind/` directly (they're generated — re-run `yarn tokens:tailwind`)
+- Edit files in `dist/` or `packages/tailwind/` directly (they're generated — re-run `pnpm tokens:tailwind`)
 - Use raw hex in semantic **color** tokens — reference a primitive (`{slate.500}`)
 - Add a themed color file (`base-*`, `brands-*`, `chart-*`) without **both** light and dark variants
 - Add any token without a `$type` property

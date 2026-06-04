@@ -40,7 +40,7 @@ export default {
     schema: [],
     messages: {
       offGrid:
-        '{{value}}px is not in the canonical spacing step set. Allowed: {{allowed}}. Refresh src/canonical-step-set.json via `yarn workspace @nexus/eslint-plugin refresh:canonical-set` if a mode file legitimately introduces a new value.',
+        '{{value}}px is not in the canonical spacing step set. Allowed: {{allowed}}. Refresh src/canonical-step-set.json via `pnpm --filter @nexus/eslint-plugin refresh:canonical-set` if a mode file legitimately introduces a new value.',
     },
   },
   create(context) {

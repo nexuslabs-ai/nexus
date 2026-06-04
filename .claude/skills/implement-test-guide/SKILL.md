@@ -155,8 +155,8 @@ Always load and follow:
 1. **Run tests:**
 
    ```bash
-   yarn test                    # All tests
-   yarn test path/to/test.ts   # Specific file
+   pnpm test                    # All tests
+   pnpm test path/to/test.ts   # Specific file
    ```
 
 2. **Verify quality:**
@@ -202,7 +202,7 @@ After test implementation is complete:
 ### Verification
 
 ```bash
-yarn test path/to/tests
+pnpm test path/to/tests
 ```
 
 - [ ] All tests passing

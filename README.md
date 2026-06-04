@@ -11,16 +11,16 @@ A console app exercises the tokens visually; Storybook hosts the component catal
 ## Prerequisites
 
 - Node ≥ 20.19.0
-- Yarn 1.x (classic) — pinned via `packageManager: yarn@1.22.22`. Yarn Berry / Yarn 4 / pnpm / npm will install with the wrong dep shape.
+- pnpm — pinned via `packageManager: pnpm@10.12.1`.
 
 ## Quick start
 
 ```bash
-yarn install              # install all workspace deps; wires Husky pre-commit hooks
-yarn storybook            # component catalog + interactive playground
-yarn console              # token / theme explorer app
-yarn dev                  # turbo watch across every workspace (library dev)
-yarn test                 # run both vitest projects: unit (jsdom) + storybook (chromium)
+pnpm install              # install all workspace deps; wires Husky pre-commit hooks
+pnpm storybook            # component catalog + interactive playground
+pnpm console              # token / theme explorer app
+pnpm dev                  # turbo watch across every workspace (library dev)
+pnpm test                 # run both vitest projects: unit (jsdom) + storybook (chromium)
 ```
 
 Each command runs from the repo root.
@@ -58,6 +58,6 @@ Each command runs from the repo root.
 Design tokens use OKLCH color (Baseline 2023). Browsers below these versions do not support OKLCH and will not receive hex fallbacks. Consumers needing older browser support must pin to the last pre-OKLCH-migration tag.
 
 The same floor is encoded in root `package.json#browserslist`. Run
-`yarn audit:browser-support` before adopting a new Modern Web Guidance browser
+`pnpm audit:browser-support` before adopting a new Modern Web Guidance browser
 feature; the audit script records which MWG-recommended features are safe to
 adopt, deferred, or limited to progressive enhancement at this floor.

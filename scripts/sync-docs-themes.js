@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 //
 // public/themes is a committed copy of the generated dist/modular output;
 // without this sync it silently drifts from the tokens (which is exactly
-// how the white→white-base refs went stale). Wired into `yarn tokens:modular`
+// how the white→white-base refs went stale). Wired into `pnpm tokens:modular`
 // so regenerating tokens redistributes to every consumer app at once.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,7 +29,7 @@ if (!fs.existsSync(SENTINEL)) {
 
 if (!fs.existsSync(SOURCE_DIR)) {
   throw new Error(
-    `sync-docs-themes: source ${SOURCE_DIR} missing — run yarn build:tokens:modular in @nexus/core first.`
+    `sync-docs-themes: source ${SOURCE_DIR} missing — run pnpm --filter @nexus/core build:tokens:modular first.`
   );
 }
 
