@@ -86,14 +86,15 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup
+          role={showSectionLabels ? undefined : 'group'}
+          aria-label={showSectionLabels ? undefined : 'Design System'}
+        >
           {showSectionLabels && (
             <SidebarGroupLabel>Design System</SidebarGroupLabel>
           )}
           <SidebarGroupContent>
-            <SidebarMenu
-              aria-label={showSectionLabels ? undefined : 'Design System'}
-            >
+            <SidebarMenu>
               {DESIGN_ITEMS.map(({ label, to, icon: Icon }) => (
                 <SidebarMenuItem key={to}>
                   <SidebarMenuButton
@@ -114,14 +115,15 @@ export function AppSidebar() {
 
         {!showSectionLabels && <SidebarSeparator />}
 
-        <SidebarGroup>
+        <SidebarGroup
+          role={showSectionLabels ? undefined : 'group'}
+          aria-label={showSectionLabels ? undefined : 'Workspace'}
+        >
           {showSectionLabels && (
             <SidebarGroupLabel>Workspace</SidebarGroupLabel>
           )}
           <SidebarGroupContent>
-            <SidebarMenu
-              aria-label={showSectionLabels ? undefined : 'Workspace'}
-            >
+            <SidebarMenu>
               {MODULE_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive =
