@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help setup dev storybook console docs build build-storybook tokens \
+.PHONY: help setup dev dev-all console docs build build-storybook tokens \
         test test-unit test-storybook lint format typecheck audit ci clean \
         docs-up docs-down docs-serve docs-login docs-publish docs-status
 
@@ -22,17 +22,17 @@ setup: ## First-time setup: install deps + Playwright browser (for story tests)
 
 # ── Dev servers ───────────────────────────────────────────────────────────────
 
-dev: ## Watch-build every package (turbo dev)
-	pnpm dev
+dev: ## Storybook — the primary component-dev surface (turbo builds @nexus/core first)
+	pnpm turbo storybook --filter=@nexus/react
 
-storybook: ## Component catalog + interaction tests (Storybook)
-	pnpm storybook
+console: ## Console app + live @nexus/react (turbo: app + react watcher)
+	pnpm turbo dev --filter=@nexus/console...
 
-console: ## Run the console demo app (Vite)
-	pnpm console
+docs: ## Docs site + live @nexus/react (turbo: docs + react watcher)
+	pnpm turbo dev --filter=@nexus/docs...
 
-docs: ## Run the documentation site (Next.js)
-	pnpm --filter @nexus/docs dev
+dev-all: ## Everything: console + docs + storybook + package watchers (turbo)
+	pnpm turbo dev storybook
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 

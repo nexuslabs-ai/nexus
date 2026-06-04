@@ -23,7 +23,7 @@ pnpm dev                  # turbo watch across every workspace (library dev)
 pnpm test                 # run both vitest projects: unit (jsdom) + storybook (chromium)
 ```
 
-Each command runs from the repo root. Most tasks also have a `make` shortcut (`make storybook`, `make test`, `make docs-up`, …) — run `make help` to list them all.
+Each command runs from the repo root. Most tasks also have a `make` shortcut (`make dev`, `make test`, `make docs-up`, …) — run `make help` to list them all.
 
 ## Workspace layout
 
