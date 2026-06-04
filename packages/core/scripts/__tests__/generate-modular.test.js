@@ -73,6 +73,19 @@ describe('generateModular', () => {
     expect(globals).toMatch(/--breakpoint-2xl: 96rem;/);
   });
 
+  it('emits the native browser UI theme policy in globals.css', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(/:root \{\n\s*color-scheme:\s*light dark;\n\s*\}/);
+    expect(globals).toMatch(
+      /:root:not\(\.dark\) \{\n\s*color-scheme:\s*light;\n\s*\}/
+    );
+    expect(globals).toMatch(/\.dark \{\n\s*color-scheme:\s*dark;\n\s*\}/);
+    expect(globals).toMatch(
+      /:where\([\s\S]*input\[type='checkbox'\],[\s\S]*input\[type='radio'\],[\s\S]*input\[type='range'\],[\s\S]*progress[\s\S]*\) \{\n\s*accent-color:\s*var\(--color-primary-background\);\n\s*\}/
+    );
+    expect(globals).not.toMatch(/light-dark\(/);
+  });
+
   // -----------------------------------------------------------------------
   // Spacing migration (#119) — per-mode blocks + sibling spacing-utilities.css
   // -----------------------------------------------------------------------

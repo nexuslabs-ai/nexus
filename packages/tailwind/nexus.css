@@ -695,6 +695,30 @@
   --nx-layout-stack-gap: 16px;
 }
 
+/* ===== NATIVE BROWSER UI THEME ===== */
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  :root:not(.dark) {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  :where(
+    input[type='checkbox'],
+    input[type='radio'],
+    input[type='range'],
+    progress
+  ) {
+    accent-color: var(--color-primary-background);
+  }
+}
+
 /* ===== BASE LAYER ===== */
 @layer base {
   *,
