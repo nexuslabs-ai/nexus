@@ -7,6 +7,8 @@ import { AppSidebar } from '../shell/app-sidebar';
 import { CommandPalette } from '../shell/command-palette';
 import { Topbar } from '../shell/topbar';
 
+import { useSidebarStore } from './sidebar-store';
+
 /**
  * The authenticated app shell, rendered by the `_app` pathless layout route
  * (which guards it behind a session): collapsible sidebar + top bar with the
@@ -15,6 +17,8 @@ import { Topbar } from '../shell/topbar';
  */
 export function RootLayout() {
   const [commandOpen, setCommandOpen] = useState(false);
+  const sidebarOpen = useSidebarStore((s) => s.open);
+  const setSidebarOpen = useSidebarStore((s) => s.setOpen);
 
   // ⌘K / Ctrl+K toggles the command palette from anywhere — a global keyboard
   // subscription, which is exactly what an effect is for.
@@ -30,7 +34,7 @@ export function RootLayout() {
   }, []);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <AppSidebar />
       <SidebarInset>
         <Topbar onSearchClick={() => setCommandOpen(true)} />

@@ -1,3 +1,4 @@
+import { useSidebarStore } from '../../app/sidebar-store';
 import {
   BASES,
   BRANDS,
@@ -171,10 +172,13 @@ function ToggleSwitch({
 export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
   const iconLibrary = useIconStore((s) => s.library);
   const setIconLibrary = useIconStore((s) => s.setLibrary);
+  const sidebarMode = useSidebarStore((s) => s.mode);
+  const setSidebarMode = useSidebarStore((s) => s.setMode);
 
   const handleReset = () => {
     setTheme(DEFAULT_THEME);
     setIconLibrary('tabler');
+    setSidebarMode('icon');
   };
 
   return (
@@ -198,6 +202,16 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
             onChange={(dark) => setTheme((t) => ({ ...t, dark }))}
             labelLeft="Light"
             labelRight="Dark"
+          />
+        </Section>
+
+        {/* Sidebar */}
+        <Section title="Sidebar">
+          <ToggleSwitch
+            checked={sidebarMode === 'offcanvas'}
+            onChange={(full) => setSidebarMode(full ? 'offcanvas' : 'icon')}
+            labelLeft="Icon rail"
+            labelRight="Full collapse"
           />
         </Section>
 
