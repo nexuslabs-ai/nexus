@@ -96,5 +96,5 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 
 1. Edit token files in `tokens/`
 2. Follow DTCG format with `$value`, `$type`, `$description`
-3. Run `pnpm tokens` to regenerate CSS
+3. Run `make tokens` to regenerate CSS
 4. Tokens automatically copied to React package

@@ -1,8 +1,70 @@
 # Contributing to Nexus Design System
 
-Project overview lives in [`README.md`](README.md); this document is the testing on-ramp.
+Project overview lives in [`README.md`](README.md). This is the day-to-day handbook — how to set up, run the dev servers, test, and ship.
 
-## Testing Philosophy
+**Everything routes through `make`.** Run `make help` for the full list. Prefer the `make` targets over raw `pnpm` / `turbo`: they wrap the flags everyone should be using (turbo filters, the docs-MCP lifecycle, the pre-push gate) so the workflow stays consistent across the team.
+
+## Prerequisites
+
+- **Node** ≥ 20.19.0 (see `.nvmrc`)
+- **pnpm** — pinned via `packageManager` in `package.json` (`pnpm@10.12.1`)
+- **Docker Desktop** — for the docs-MCP server only (recommended, not required to build the library)
+
+## Setup
+
+```bash
+make setup        # install all workspace deps + the Playwright browser (for story tests)
+```
+
+That's the whole first-time setup. It also wires the Husky pre-commit hook, which formats and `nx:`-lints your staged files on every commit.
+
+## Day-to-day
+
+Pick the surface you're working on — each is one `make` command that turbo orchestrates (parallel servers, prefixed logs, one Ctrl-C stops all):
+
+| Command        | Brings up                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface.              |
+| `make console` | the console app **+ a live `@nexus/react` watcher** (component edits show up in the app) |
+| `make docs`    | the docs site **+ live `@nexus/react`**                                                  |
+| `make dev-all` | everything: console + docs + storybook + all package watchers                            |
+
+> **First start on a clean checkout:** `console` / `docs` read `@nexus/react`'s `dist`, which the watcher emits a moment after launch — a brief error on the very first start is expected, or run `make build` once beforehand.
+
+Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nexus-docs-mcp)).
+
+## Before you push
+
+```bash
+make verify       # the full gate: lint + format check + typecheck + tests + token/a11y/browser audits
+```
+
+`make verify` is what CI gates on, run locally. For the fast inner loop:
+
+- `make lint` — ESLint (cheap; run it constantly)
+- `make typecheck` — `tsc` across the packages
+- `pnpm test:unit` — just the jsdom unit tests (hooks / utilities)
+- `pnpm test:storybook:ui` — the interactive debugger when a story's `play` function fails
+
+The pre-commit hook already formats and `nx:`-lints staged files, so you rarely format by hand (`pnpm format` does a full-tree pass if you want one).
+
+## Make targets
+
+`make help` prints these with descriptions. The full set:
+
+| Group        | Targets                                                      |
+| ------------ | ------------------------------------------------------------ |
+| **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`        |
+| **Dev**      | `dev` · `console` · `docs` · `dev-all`                       |
+| **Build**    | `build` · `tokens` (regenerate token CSS from `@nexus/core`) |
+| **Quality**  | `lint` · `typecheck` · `audit` · `verify`                    |
+| **Docs MCP** | `up` · `down` · `serve` · `publish`                          |
+
+Anything not wrapped is still a plain pnpm script (`pnpm test`, `pnpm test:storybook:ui`, the per-package `audit:*`).
+
+---
+
+## Testing
 
 A single `*.stories.tsx` file does four jobs at once:
 
@@ -22,15 +84,11 @@ Hooks and utilities use `*.test.ts` files with `@nexus/test-utils`. Scripts unde
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-The full spec lives in `.claude/rules/testing-react.md` and `.claude/rules/components.md`. This document is the on-ramp.
+The full spec lives in `.claude/rules/testing-react.md` and `.claude/rules/components.md`. This section is the on-ramp.
 
----
+### Components: stories as tests
 
-## Components: Stories as Tests
-
-### Imports
-
-Two distinct sources:
+Two distinct import sources:
 
 ```tsx
 // Types
@@ -39,8 +97,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 // Test utilities (Storybook 10 — note: `storybook/test`, NOT `@storybook/test`)
 import { expect, fn, userEvent, within } from 'storybook/test';
 ```
-
-### Story file structure
 
 A real example from `Button.stories.tsx`:
 
@@ -78,23 +134,18 @@ export default meta;
 type Story = StoryObj<typeof Button>;
 ```
 
-Do **not** add `tags: ['autodocs']` to your meta. Autodocs is global; setting it per-story is redundant.
+Do **not** add `tags: ['autodocs']` to your meta — autodocs is global; setting it per-story is redundant.
 
-### Visual stories (no play function)
+**Visual stories** (no play function):
 
 ```tsx
-export const Default: Story = {
-  args: { children: 'Button' },
-};
-
+export const Default: Story = { args: { children: 'Button' } };
 export const Secondary: Story = {
   args: { variant: 'secondary', children: 'Secondary' },
 };
 ```
 
-### Interaction tests (with play functions)
-
-Use data attributes (`data-slot`, `data-variant`, `data-size`) as the stable test surface — not class names. Tailwind classes are subject to the `nx:` prefix and may change as variants are restyled; data attributes are part of the component contract.
+**Interaction tests** (with play functions). Use data attributes (`data-slot`, `data-variant`, `data-size`) as the stable test surface — not class names. Tailwind classes carry the `nx:` prefix and may change as variants are restyled; data attributes are part of the component contract.
 
 ```tsx
 export const ClickInteraction: Story = {
@@ -105,26 +156,6 @@ export const ClickInteraction: Story = {
 
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
-
-    await userEvent.click(button);
-    await expect(args.onClick).toHaveBeenCalledTimes(2);
-  },
-};
-
-export const KeyboardInteraction: Story = {
-  args: { children: 'Press Enter' },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
-
-    await userEvent.tab();
-    await expect(button).toHaveFocus();
-
-    await userEvent.keyboard('{Enter}');
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
-
-    await userEvent.keyboard(' ');
-    await expect(args.onClick).toHaveBeenCalledTimes(2);
   },
 };
 
@@ -152,7 +183,7 @@ export const Disabled: Story = {
 };
 ```
 
-### Composition via `asChild`
+**Composition via `asChild`:**
 
 ```tsx
 export const AsLink: Story = {
@@ -162,62 +193,27 @@ export const AsLink: Story = {
     </Button>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const link = canvas.getByRole('link');
-
+    const link = within(canvasElement).getByRole('link');
     await expect(link).toHaveAttribute('href', 'https://example.com');
     await expect(link).toHaveAttribute('data-slot', 'button');
   },
 };
 ```
 
-### AllVariants grid
-
-Stories that compose multiple instances for visual comparison. Tailwind utilities here must carry the `nx:` prefix, and colors must use semantic tokens (e.g., `nx:bg-error-background`, not `nx:bg-destructive` — `destructive` is the variant name, not a token). See [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) § Per-Base Variant Generation — the generator reuses this render-based showcase.
-
-### A11y escape hatch
-
-Some stories trigger known-broken a11y rules (e.g., a contrast pair that's tracked for token retuning). The escape hatch:
+**A11y escape hatch** — some stories trigger known-broken a11y rules (e.g. a contrast pair tracked for token retuning). Use sparingly; the default every story inherits is `test: 'error'` (a violation fails CI):
 
 ```tsx
 export const Destructive: Story = {
   args: { variant: 'destructive', children: 'Delete' },
-  parameters: {
-    a11y: { test: 'todo' }, // tracked separately; don't fail the suite
-  },
+  parameters: { a11y: { test: 'todo' } }, // tracked separately; don't fail the suite
 };
 ```
 
-Use sparingly. The default (and what every other story inherits) is `test: 'error'` — a violation fails CI. See [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) § Accessibility Testing for the full pattern.
+### Hooks and utilities: `*.test.ts`
 
----
-
-## Hooks and Utilities: `*.test.ts`
-
-Hooks and utility functions use plain Vitest with `@nexus/test-utils`.
-
-### Imports
+Plain Vitest with `@nexus/test-utils` (re-exports `act`, `renderHook`, `waitFor` plus the standard Vitest globals — **not** `render` / `screen` / `userEvent` / `axe`, which only make sense for component tests, and those live in stories):
 
 ```tsx
-import {
-  act,
-  describe,
-  expect,
-  it,
-  renderHook,
-  vi,
-  waitFor,
-} from '@nexus/test-utils';
-```
-
-`@nexus/test-utils` re-exports `act`, `renderHook`, and `waitFor` from `@testing-library/react`, plus the standard Vitest globals. It does **not** export `render`, `screen`, `userEvent`, or `axe` — those would only be useful for component tests, which live in stories.
-
-### Hook test example
-
-Pattern from `.claude/rules/testing-react.md`:
-
-```tsx
-// use-counter.test.ts
 import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
 
 import { useCounter } from './use-counter';
@@ -225,145 +221,95 @@ import { useCounter } from './use-counter';
 describe('useCounter', () => {
   it('increments count', () => {
     const { result } = renderHook(() => useCounter());
-
-    act(() => {
-      result.current.increment();
-    });
-
+    act(() => result.current.increment());
     expect(result.current.count).toBe(1);
   });
 });
 ```
 
-### Utility test example
+### What's out of scope
 
-```tsx
-// format-currency.test.ts
-import { describe, expect, it } from '@nexus/test-utils';
+- **No `*.test.tsx` for components** — `vitest.config.ts` excludes them; move the assertion into a story's `play` function.
+- **Don't assert on Tailwind class names** — they change as variants are restyled. Use `data-*`, ARIA attributes, or accessible queries (`getByRole`, `getByLabelText`).
+- **No play functions for** visual appearance, computed CSS / pixel measurements, `:hover` snapshots, or animation timing.
 
-import { formatCurrency } from './format-currency';
+### Component checklist
 
-describe('formatCurrency', () => {
-  it('formats USD', () => {
-    expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
-  });
-});
-```
+A new (or updated) component ships these stories (fuller table in `.claude/rules/testing-react.md`):
 
-There are no hook tests in the repo today (the single `.test.ts` file, `packages/react/src/exports.test.ts`, is a package-exports smoke test). When a hook lands, the pattern above is ready.
+| Story                                | Play function? | Purpose                                         |
+| ------------------------------------ | -------------- | ----------------------------------------------- |
+| `Default`                            | Optional       | Default args                                    |
+| One per variant / size               | No             | Visual documentation                            |
+| `Disabled`                           | Yes            | Disabled state; `onClick` not called            |
+| `ClickInteraction`                   | Yes            | Click handler fires                             |
+| `KeyboardInteraction`                | Yes            | Tab focuses; Enter/Space triggers               |
+| `WithDataAttributes`                 | Yes            | `data-slot` / `data-variant` / `data-size`      |
+| `AsLink` / `asChild` (if applicable) | Yes            | Composition keeps `data-slot`                   |
+| Edge cases                           | Yes            | Empty / long / special-char children, with icon |
+| `AllVariants`                        | No             | Visual grid for review                          |
 
----
+A11y is automatic — every story is axe-checked, no separate a11y story needed. For a **new** component, the definition-of-done gate is `pnpm --filter @nexus/react audit:storybook-coverage --component <name>` exiting 0 (also run by `make audit`).
 
-## What's Out of Scope
+### Running tests
 
-**Don't write play functions for:**
+`make verify` runs the whole suite (plus lint / typecheck / audits). To run or debug tests directly:
 
-- Visual appearance — the rendered story is the visual. Visual regression isn't currently in scope.
-- Computed CSS values or pixel measurements — read the token, not the resolved style.
-- Hover/focus visual styling — `:hover` snapshots aren't behavior assertions.
-- Animation timing.
+| Command                  | What it does                                                      |
+| ------------------------ | ----------------------------------------------------------------- |
+| `pnpm test`              | both vitest projects — `unit` (jsdom) + `storybook` (Chromium)    |
+| `pnpm test:unit`         | unit only — fastest loop for hooks / utilities                    |
+| `pnpm test:storybook`    | every story's play function in a real browser                     |
+| `pnpm test:storybook:ui` | **debugger** — Vitest's interactive UI when a play function fails |
 
-**Don't write `*.test.tsx` for components** — `vitest.config.ts` excludes them. Move the assertion into a story's `play` function.
-
-**Don't assert on Tailwind class names** — they change as variants are restyled. Use `data-slot`, `data-variant`, `data-size`, ARIA attributes, or accessible queries (`getByRole`, `getByLabelText`).
-
----
-
-## Component Checklist
-
-A new (or updated) component should ship the following stories. The fuller table lives at `.claude/rules/testing-react.md`.
-
-| Story                                | Play function? | Purpose                                                     |
-| ------------------------------------ | -------------- | ----------------------------------------------------------- |
-| `Default`                            | Optional       | Default args                                                |
-| One story per variant                | No             | Visual documentation                                        |
-| One story per size                   | No             | Visual documentation                                        |
-| `Disabled`                           | Yes            | Verify disabled state; `onClick` not called                 |
-| `ClickInteraction`                   | Yes            | Verify click handler fires                                  |
-| `KeyboardInteraction`                | Yes            | Verify Tab focuses; Enter/Space triggers                    |
-| `WithDataAttributes`                 | Yes            | Verify `data-slot`, `data-variant`, `data-size`             |
-| `AsLink` / `asChild` (if applicable) | Yes            | Verify composition keeps `data-slot`                        |
-| Edge cases                           | Yes            | Empty children, long content, special characters, with icon |
-| `AllVariants`                        | No             | Visual grid for review                                      |
-
-A11y is automatic — every story is axe-checked. No separate a11y story needed.
-
----
-
-## Running Tests
-
-| Command                     | What it does                                                                                                          |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `pnpm test`                 | Run both vitest projects: `unit` (jsdom) and `storybook` (real Chromium via Playwright)                               |
-| `pnpm test:unit`            | `unit` project only — fastest feedback loop for hooks/utilities                                                       |
-| `pnpm test:storybook`       | `storybook` project only — runs every story's play function in a browser                                              |
-| `pnpm test:storybook:watch` | Watch mode for stories                                                                                                |
-| `pnpm test:storybook:ui`    | **Debugging entry point** when a play function fails — opens Vitest's interactive UI mounted on the storybook project |
-| `pnpm storybook`            | Start the Storybook dev server (the UI you're documenting against)                                                    |
-
-The first run of `pnpm test` (or any storybook-project run) launches Storybook in the background — the first cold start takes a few extra seconds.
+The first storybook-project run launches Storybook in the background — the cold start takes a few extra seconds.
 
 ---
 
 ## AI Documentation MCP (nexus-docs-mcp)
 
-This project runs a local documentation server that keeps Claude Code up-to-date with the exact library versions used here. Without it, the AI will use stale training data and suggest deprecated APIs.
+A local documentation server keeps Claude Code on the exact library versions used here (Tailwind v4, Storybook 10, Vitest 4, Radix, recharts 3, zod 4, …) instead of stale training data. It ships as a pre-indexed Docker image, so there's nothing to scrape locally.
 
-### For teammates (using docs)
+### Teammates — use it
 
-Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-
-```bash
-# One-time: authenticate with GitHub Container Registry
-pnpm docs:login
-
-# Pull the pre-indexed image and start the server
-pnpm docs:pull
-pnpm docs:start
-```
-
-The server runs at `http://localhost:6282`. Claude Code connects to it automatically via `.mcp.json` — no further setup needed.
-
-To stop: `pnpm docs:stop`
-
-When the maintainer publishes an update, pull and restart:
+Requires Docker. One command brings it up:
 
 ```bash
-pnpm docs:pull && pnpm docs:stop && pnpm docs:start
+make up           # pull the published image + run it at http://localhost:6282
 ```
 
-### For the maintainer (managing docs)
+`.mcp.json` connects Claude Code automatically — no further setup. Stop it with `make down`. After a maintainer publishes an update: `make down && make up`.
+
+> First pull needs registry auth — the image is private to `nexuslabs-ai-bot`. If `make up` 403s, run `pnpm docs:login` once (asks a teammate for the bot credentials).
+
+### Maintainers — update it
 
 ```bash
-# Start the local server for indexing (opens web UI at http://localhost:6282)
-pnpm docs:serve
-
-# Add or update libraries via the web UI / scrape_docs tool, then publish for the team
-pnpm docs:publish   # export DB -> build Docker image -> push to GHCR
+make serve        # local docs-mcp server + web dashboard at :6282 for indexing
+# add/refresh libraries via the dashboard or the scrape_docs tool, then:
+make publish      # login → export DB → build image → push to GHCR
 ```
 
-### Scripts reference
+The index DB ships **inside** the image, never in git. `docs-mcp/index.manifest.json` is not kept — the live index is the source of truth; `list_libraries` shows what's in it.
 
-| Command        | Role       | What it does                                       |
-| -------------- | ---------- | -------------------------------------------------- |
-| `docs:serve`   | Maintainer | Start local server for indexing/managing libraries |
-| `docs:export`  | Maintainer | Copy indexed DB into `docs-mcp/` for building      |
-| `docs:build`   | Maintainer | Build Docker image with baked-in DB                |
-| `docs:login`   | Both       | Authenticate with GitHub Container Registry        |
-| `docs:push`    | Maintainer | Push image to GHCR                                 |
-| `docs:publish` | Maintainer | All-in-one: export + build + push                  |
-| `docs:pull`    | Teammate   | Pull latest image from GHCR                        |
-| `docs:start`   | Teammate   | Start the docs MCP server on `localhost:6282`      |
-| `docs:stop`    | Teammate   | Stop the container (auto-removed on stop)          |
-| `docs:restore` | Maintainer | Pull the published DB back into the local store    |
+### Lifecycle reference
+
+| make           | wraps                                                 | role                               |
+| -------------- | ----------------------------------------------------- | ---------------------------------- |
+| `make up`      | `docs:pull` + `docs:start`                            | teammate — run the published index |
+| `make down`    | `docs:stop`                                           | teammate — stop it                 |
+| `make serve`   | `docs:serve`                                          | maintainer — local indexing server |
+| `make publish` | `docs:login` + `docs:publish` (export → build → push) | maintainer — ship an update        |
+
+The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claude/rules/docs-mcp.md).
 
 ---
 
-## Authoritative Specs
+## Authoritative specs
 
-This file is the on-ramp. The specs are:
+This handbook is the on-ramp. The canonical conventions live in [`.claude/rules/`](.claude/rules/) — there is no root `CLAUDE.md`. When this doc and a rule file disagree, the rule file wins.
 
-- [`.claude/rules/testing-react.md`](.claude/rules/testing-react.md) — testing patterns, story structure, required stories, play functions, the base-variants generator
-- [`.claude/rules/components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes, variants
-
-When this doc and a rule file disagree, the rule file wins.
+- [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns, required stories, the base-variants generator
+- [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes, variants
+- [`tokens.md`](.claude/rules/tokens.md) — token format, the OKLCH pipeline, the APCA contrast gate
+- [`github.md`](.claude/rules/github.md) — branch naming, PR title/body conventions, the review-bot flow

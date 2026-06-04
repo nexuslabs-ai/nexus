@@ -10,20 +10,18 @@ A console app exercises the tokens visually; Storybook hosts the component catal
 
 ## Prerequisites
 
-- Node ≥ 20.19.0
-- pnpm — pinned via `packageManager: pnpm@10.12.1`.
+- **Node** ≥ 20.19.0 (see `.nvmrc`)
+- **pnpm** — pinned via `packageManager: pnpm@10.12.1`
+- **Docker Desktop** — for the docs-MCP server (optional)
 
 ## Quick start
 
 ```bash
-pnpm install              # install all workspace deps; wires Husky pre-commit hooks
-pnpm storybook            # component catalog + interactive playground
-pnpm console              # token / theme explorer app
-pnpm dev                  # turbo watch across every workspace (library dev)
-pnpm test                 # run both vitest projects: unit (jsdom) + storybook (chromium)
+make setup        # install deps + the Playwright browser
+make dev          # Storybook — the component catalog & dev surface
 ```
 
-Each command runs from the repo root. Most tasks also have a `make` shortcut (`make dev`, `make verify`, `make up`, …) — run `make help` to list them all.
+`make help` lists every shortcut. Full setup, the `make` workflow, the testing model, and the docs-MCP are in **[`CONTRIBUTING.md`](CONTRIBUTING.md)**.
 
 ## Workspace layout
 
@@ -38,8 +36,8 @@ Each command runs from the repo root. Most tasks also have a `make` shortcut (`m
 
 ## Where to learn more
 
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — testing model, story patterns, component checklist
-- [`.claude/rules/`](.claude/rules/) — project conventions (canonical). There is no root `CLAUDE.md`; the rules directory is the authoritative AI-guidance source. High-traffic files:
+- **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — setup, the `make` workflow, the testing model, story patterns, and the docs-MCP
+- [`.claude/rules/`](.claude/rules/) — project conventions (canonical; there is no root `CLAUDE.md`). High-traffic files:
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
   - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
   - [`tokens.md`](.claude/rules/tokens.md) — token format, OKLCH pipeline, APCA contrast gate
@@ -55,9 +53,4 @@ Each command runs from the repo root. Most tasks also have a `make` shortcut (`m
 | Safari           | 15.4            |
 | Samsung Internet | 22              |
 
-Design tokens use OKLCH color (Baseline 2023). Browsers below these versions do not support OKLCH and will not receive hex fallbacks. Consumers needing older browser support must pin to the last pre-OKLCH-migration tag.
-
-The same floor is encoded in root `package.json#browserslist`. Run
-`pnpm audit:browser-support` before adopting a new Modern Web Guidance browser
-feature; the audit script records which MWG-recommended features are safe to
-adopt, deferred, or limited to progressive enhancement at this floor.
+Design tokens use OKLCH color (Baseline 2023). Browsers below these versions do not support OKLCH and will not receive hex fallbacks — consumers needing older support must pin to the last pre-OKLCH-migration tag. The same floor is encoded in root `package.json#browserslist`; run `pnpm audit:browser-support` before adopting a new Modern Web Guidance feature.
