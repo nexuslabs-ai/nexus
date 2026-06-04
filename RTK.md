@@ -147,19 +147,18 @@ Read `.claude/rules/tokens.md` before changing tokens or generated token outputs
 - APCA contrast failures must be fixed by changing semantic mappings or palette/grid values, not by lowering thresholds.
 - Spacing mode swaps happen at runtime through `data-style`.
 
-## Claude Commands, Skills, Agents, And Hooks
+## Claude Commands, Skills, Agents, And Settings
 
 The repo still carries useful Claude-specific workflow assets:
 
 - Commands: `.claude/commands/*`
 - Skills: `.claude/skills/*`
 - Agents: `.claude/agents/*`
-- Hooks: `.claude/hooks/*`
-- Claude permissions/hooks config: `.claude/settings.json`
+- Claude permissions/settings config: `.claude/settings.json`
 
-Codex does not automatically execute Claude commands, invoke Claude subagents, or run Claude hooks. When a user mentions a Claude command such as `/implement`, translate the intent into normal Codex work and read the corresponding `.claude/commands/*.md` or `.claude/skills/*/SKILL.md` only for process guidance.
+Codex does not automatically execute Claude commands or invoke Claude subagents. When a user mentions a Claude command such as `/implement`, translate the intent into normal Codex work and read the corresponding `.claude/commands/*.md` or `.claude/skills/*/SKILL.md` only for process guidance.
 
-If you edit files, run formatting/linting explicitly when relevant; do not assume `.claude/hooks` have run.
+Formatting and linting run on commit via the Husky + lint-staged pre-commit hook (`eslint --fix` + `prettier --write` on staged files); the `nx:` Tailwind-class conventions are enforced by the `@nexus/nx-class-conventions` ESLint rule. For immediate feedback, run `pnpm lint` and `pnpm format` explicitly.
 
 ## GitHub And PRs
 

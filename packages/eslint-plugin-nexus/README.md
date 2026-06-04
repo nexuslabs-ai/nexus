@@ -1,6 +1,6 @@
 # @nexus/eslint-plugin
 
-Custom ESLint rules that backfill what the deleted `--nx-size-*` primitive layer used to enforce.
+Custom ESLint rules for the Nexus design system. They split into two groups: **token-layer** rules that backfill what the deleted `--nx-size-*` primitive layer used to enforce, and **component-authoring** rules that machine-enforce conventions documented in `.claude/rules/` (so they fail `pnpm lint` and the pre-commit hook for every contributor, not just code review).
 
 ## Rules
 
@@ -27,6 +27,18 @@ className: 'nx:px-2 nx:py-0.5',
 
 The comment text after the colon is free-form; keep it terse and cite the rule note that justifies the deviation.
 
+### `@nexus/nx-class-conventions`
+
+Enforces the `nx:` Tailwind-class conventions from `.claude/rules/components.md` and `.claude/rules/shadcn-divergences.md` on class strings (string + single-quasi template literals): correct prefix order (`nx:` before every modifier, not `hover:nx:…`), no banned `accent` token, complete semantic token paths (`-background` / `-foreground` / `-subtle`), and no raw primitive colors (`nx:bg-blue-500`). Ported from the former `.claude/hooks/lint-nx-prefix.mjs` so the checks run in `pnpm lint` and the pre-commit hook. Wired for `packages/react/src/**` and `apps/**` `.tsx`.
+
+### `@nexus/no-render-prop-types`
+
+Enforces `.claude/rules/composition-over-render-props.md`: component props must not be typed as render callbacks (`(...) => ReactNode`) or component references (`ComponentType` / `FC` / `ElementType`). Event-handler-named props (`on*`) are exempt. Use `children` / named `ReactNode` slots or per-mode components instead. Third-party-mandated shapes (e.g. recharts) opt out with a scoped `eslint-disable` + reason.
+
+### `@nexus/no-multi-statement-jsx-handler`
+
+Enforces `.claude/rules/extract-inline-handlers.md`: inline JSX handler props (`onClick`, `onChange`, …) with 3+ statements, or containing a nested callback-object argument, must be extracted to a named function above `return`. One- and two-statement handlers stay inline.
+
 ## Source of truth
 
-Both rules are self-contained: the canonical step set is `src/canonical-step-set.json` and the role-to-utility mapping lives in `src/rules/prefer-role-utilities.js`. There is no external spec doc — the rule code is the spec.
+The token-layer rules are self-contained: the canonical step set is `src/canonical-step-set.json` and the role-to-utility mapping lives in `src/rules/prefer-role-utilities.js`. The component rules map 1:1 to the `.claude/rules/*.md` cited above — the rule code plus those docs are the spec. Every rule has RuleTester coverage in `__tests__/`.

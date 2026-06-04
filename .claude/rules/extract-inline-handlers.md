@@ -1,5 +1,7 @@
 # Extract Non-Trivial Inline Handlers
 
+> **Enforced by** `@nexus/no-multi-statement-jsx-handler` — inline JSX handlers with 3+ statements, or a nested callback-object argument, fail `pnpm lint`. One- and two-statement handlers stay inline.
+
 Inline event handlers in JSX (`onClick`, `onSubmit`, `onChange`, …) are fine when the body is a one- or two-line call — a single mutation kick-off, a state setter, a router push. Past that, extract a named function above the `return` and pass it by reference.
 
 A multi-line arrow function buried inside a JSX prop pushes business logic into a place the reader does not expect to find it. The JSX should describe **what** is rendered and **which** handler runs, not the body of the handler. When the handler grows guard branches, nested callbacks, or async wiring, the JSX stops being declarative.
