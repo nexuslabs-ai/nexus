@@ -89,11 +89,36 @@ export const WithError: Story = {
     <div className="nx:w-80">
       <Field data-invalid="true">
         <FieldLabel htmlFor="field-err">Password</FieldLabel>
-        <Input id="field-err" type="password" aria-invalid />
-        <FieldError errors={[{ message: 'Must be at least 8 characters.' }]} />
+        <Input
+          id="field-err"
+          type="password"
+          aria-describedby="field-err-help"
+          aria-errormessage="field-err-message"
+          aria-invalid
+        />
+        <FieldDescription id="field-err-help">
+          Use a memorable passphrase.
+        </FieldDescription>
+        <FieldError
+          id="field-err-message"
+          errors={[{ message: 'Must be at least 8 characters.' }]}
+        />
       </Field>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText('Password');
+    const error = canvas.getByText('Must be at least 8 characters.');
+
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expect(input).toHaveAttribute('aria-describedby', 'field-err-help');
+    await expect(input).toHaveAttribute(
+      'aria-errormessage',
+      error.getAttribute('id')
+    );
+    await expect(error).toHaveAttribute('role', 'alert');
+  },
 };
 
 // A divider between groups of fields, with centered content.

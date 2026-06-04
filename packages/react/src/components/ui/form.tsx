@@ -62,6 +62,8 @@ const FormFieldContext = React.createContext<FormFieldContextValue | null>(
 
 type FormItemContextValue = {
   id: string;
+  hasDescription: boolean;
+  hasMessage: boolean;
 };
 
 const FormItemContext = React.createContext<FormItemContextValue | null>(null);
@@ -94,7 +96,10 @@ function useFormField() {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
   const formContext = useFormContext();
-  const formState = useFormState({ name: fieldContext?.name });
+  const formState = useFormState({
+    name: fieldContext?.name,
+    exact: true,
+  });
 
   if (!fieldContext) {
     throw new Error('useFormField should be used within <FormField>');
@@ -108,7 +113,7 @@ function useFormField() {
   const fieldState = getFieldState(fieldContext.name, formState);
 
   return {
-    id,
+    ...itemContext,
     name: fieldContext.name,
     formItemId: `${id}-form-item`,
     formDescriptionId: `${id}-form-item-description`,
@@ -130,11 +135,12 @@ interface FormItemProps extends React.ComponentProps<'div'> {}
  * Groups one field's label, control, description, and message, and generates
  * the shared `id` that wires them together.
  */
-function FormItem({ className, ...props }: FormItemProps) {
+function FormItem({ className, children, ...props }: FormItemProps) {
   const id = React.useId();
+  const { hasDescription, hasMessage } = getFormItemParts(children);
 
   return (
-    <FormItemContext.Provider value={{ id }}>
+    <FormItemContext.Provider value={{ id, hasDescription, hasMessage }}>
       <div
         data-slot="form-item"
         className={cn(
@@ -143,7 +149,9 @@ function FormItem({ className, ...props }: FormItemProps) {
           className
         )}
         {...props}
-      />
+      >
+        {children}
+      </div>
     </FormItemContext.Provider>
   );
 }
@@ -189,22 +197,37 @@ interface FormControlProps extends React.ComponentProps<typeof Slot> {}
  * FormControl
  *
  * Slot that wires the field's control to the surrounding `FormItem` — setting
- * its `id`, `aria-invalid`, and `aria-describedby` (pointing at the description
- * and, when invalid, the message).
+ * its `id`, `aria-invalid`, `aria-describedby` (helper text only), and
+ * `aria-errormessage` when invalid.
  */
-function FormControl(props: FormControlProps) {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+function FormControl({
+  'aria-describedby': ariaDescribedBy,
+  ...props
+}: FormControlProps) {
+  const {
+    error,
+    formItemId,
+    formDescriptionId,
+    formMessageId,
+    hasDescription,
+    hasMessage,
+  } = useFormField();
+  const hasErrorMessage = Boolean(error?.message);
+  const describedBy =
+    [hasDescription ? formDescriptionId : undefined, ariaDescribedBy]
+      .filter(Boolean)
+      .join(' ') || undefined;
 
   return (
     <Slot
+      {...props}
       data-slot="form-control"
       id={formItemId}
-      aria-describedby={
-        error ? `${formDescriptionId} ${formMessageId}` : formDescriptionId
-      }
+      aria-describedby={describedBy}
       aria-invalid={!!error}
-      {...props}
+      aria-errormessage={
+        hasErrorMessage && hasMessage ? formMessageId : undefined
+      }
     />
   );
 }
@@ -226,10 +249,10 @@ function FormDescription({ className, ...props }: FormDescriptionProps) {
 
   return (
     <p
+      {...props}
       data-slot="form-description"
       id={formDescriptionId}
       className={cn('nx:text-sm nx:text-muted-foreground', className)}
-      {...props}
     />
   );
 }
@@ -244,27 +267,60 @@ interface FormMessageProps extends React.ComponentProps<'p'> {}
 /**
  * FormMessage
  *
- * Validation message for the field. Renders the field's error message, falling
- * back to its `children`, and renders nothing when there is neither.
+ * Validation message for the field. Renders a stable alert region so new
+ * validation text is announced when the field becomes invalid.
  */
-function FormMessage({ className, children, ...props }: FormMessageProps) {
+function FormMessage({
+  className,
+  children,
+  role,
+  ...props
+}: FormMessageProps) {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error.message ?? '') : children;
 
-  if (!body) {
-    return null;
-  }
-
   return (
     <p
+      {...props}
+      role={role ?? 'alert'}
+      aria-atomic="true"
       data-slot="form-message"
       id={formMessageId}
       className={cn('nx:text-sm nx:text-error-subtle-foreground', className)}
-      {...props}
     >
       {body}
     </p>
   );
+}
+
+function getFormItemParts(children: React.ReactNode) {
+  let hasDescription = false;
+  let hasMessage = false;
+
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) {
+      return;
+    }
+
+    if (child.type === React.Fragment) {
+      const fragment = child as React.ReactElement<{
+        children?: React.ReactNode;
+      }>;
+      const parts = getFormItemParts(fragment.props.children);
+      hasDescription ||= parts.hasDescription;
+      hasMessage ||= parts.hasMessage;
+      return;
+    }
+
+    if (child.type === FormDescription) {
+      hasDescription = true;
+    }
+    if (child.type === FormMessage) {
+      hasMessage = true;
+    }
+  });
+
+  return { hasDescription, hasMessage };
 }
 
 export {
