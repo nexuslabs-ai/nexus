@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect } from 'storybook/test';
+import { expect, waitFor } from 'storybook/test';
 
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { ScrollArea, ScrollBar } from './scroll-area';
@@ -41,6 +41,15 @@ const artworks = [
   { title: 'Quartz', artist: 'Liang Wu' },
   { title: 'Meadow', artist: 'Sofia Russo' },
 ];
+
+// Dense operational data that overflows in both directions.
+const jobRuns = Array.from({ length: 28 }, (_, i) => ({
+  id: `run-${4820 - i}`,
+  branch: ['main', 'release/vega', 'codex/ui-polish', 'docs/mwg'][i % 4],
+  owner: ['Mira', 'Omar', 'Jules', 'Nia'][i % 4],
+  duration: `${3 + (i % 9)}m ${10 + ((i * 7) % 50)}s`,
+  status: ['Passed', 'Queued', 'Reviewing', 'Blocked'][i % 4],
+}));
 
 // ============================================
 // BASIC STORIES
@@ -133,6 +142,94 @@ export const Both: Story = {
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
   ),
+};
+
+// Dense panels should not rely on hover to reveal that more content exists.
+export const VisibleAffordance: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`type="always"` pins the custom scrollbar chrome for dense panels where scrollability needs to be visible without hover. The Radix custom scrollbar remains the default; native `scrollbar-color`, `scrollbar-width`, and scroll-state queries are progressive-only relative to the Nexus browser floor.',
+      },
+    },
+  },
+  render: () => (
+    <ScrollArea
+      type="always"
+      className="nx:h-64 nx:w-80 nx:rounded-md nx:border nx:border-border-default"
+    >
+      <div className="nx:w-max nx:p-4">
+        <div className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:pb-2 nx:text-xs nx:font-medium nx:text-muted-foreground">
+          <span>Run</span>
+          <span>Branch</span>
+          <span>Owner</span>
+          <span>Duration</span>
+          <span>Status</span>
+        </div>
+        <div className="nx:flex nx:flex-col">
+          {jobRuns.map((run) => (
+            <div
+              key={run.id}
+              className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:py-2 nx:text-sm nx:text-foreground nx:last:border-b-0"
+            >
+              <span className="nx:font-mono nx:text-xs">{run.id}</span>
+              <span>{run.branch}</span>
+              <span>{run.owner}</span>
+              <span>{run.duration}</span>
+              <span>{run.status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
+  ),
+  play: async ({ canvasElement }) => {
+    const viewport = canvasElement.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    );
+    const verticalScrollbar = canvasElement.querySelector(
+      '[data-slot="scroll-bar"][data-orientation="vertical"]'
+    );
+    const horizontalScrollbar = canvasElement.querySelector(
+      '[data-slot="scroll-bar"][data-orientation="horizontal"]'
+    );
+    const corner = canvasElement.querySelector(
+      '[data-slot="scroll-area-corner"]'
+    );
+
+    await expect(viewport).toHaveAttribute('tabindex', '0');
+    await expect(verticalScrollbar).toBeInTheDocument();
+    await expect(horizontalScrollbar).toBeInTheDocument();
+    await expect(verticalScrollbar).toHaveClass(
+      'nx:forced-colors:bg-[Canvas]',
+      'nx:forced-colors:border-l-[ButtonBorder]'
+    );
+    await expect(horizontalScrollbar).toHaveClass(
+      'nx:forced-colors:bg-[Canvas]',
+      'nx:forced-colors:border-t-[ButtonBorder]'
+    );
+
+    if (corner) {
+      await expect(corner).toHaveClass(
+        'nx:forced-colors:bg-[Canvas]',
+        'nx:forced-colors:border-[ButtonBorder]'
+      );
+    }
+
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelectorAll('[data-slot="scroll-bar-thumb"]').length
+      ).toBeGreaterThan(1);
+    });
+
+    for (const thumb of canvasElement.querySelectorAll(
+      '[data-slot="scroll-bar-thumb"]'
+    )) {
+      await expect(thumb).toHaveClass('nx:forced-colors:bg-[CanvasText]');
+    }
+  },
 };
 
 // Inside a Card — a bounded scroll region keeps a long list from stretching the
