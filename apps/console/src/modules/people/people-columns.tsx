@@ -130,6 +130,7 @@ export const memberColumns: ColumnDef<Member>[] = [
   },
   {
     id: 'actions',
+    header: () => <span className="nx:sr-only">Actions</span>,
     cell: ({ row }) => <RowActions member={row.original} />,
     enableSorting: false,
   },

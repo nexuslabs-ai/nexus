@@ -24,6 +24,8 @@ export function ComingSoon() {
 
   return (
     <EmptyState className="nx:min-h-[60svh]">
+      {/* The page's h1 — the visible title is EmptyStateTitle, not a heading. */}
+      <h1 className="nx:sr-only">{label}</h1>
       <EmptyStateHeader>
         {Icon && (
           <EmptyStateMedia variant="icon">
