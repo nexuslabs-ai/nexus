@@ -41,9 +41,8 @@ function SwatchRow<T extends string>({
               aria-label={`${label}: ${opt.label}`}
               aria-pressed={active}
               title={opt.label}
-              className="nx:hover:bg-background-hover nx:focus-visible:outline-focus-default nx:flex nx:size-9 nx:items-center nx:justify-center nx:rounded-full nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-offset-2"
+              className="nx:hover:bg-background-hover nx:focus-visible:outline-focus-default nx:relative nx:flex nx:size-9 nx:items-center nx:justify-center nx:rounded-full nx:transition-colors nx:after:absolute nx:after:-inset-1 nx:focus-visible:outline-2 nx:focus-visible:outline-offset-(--focus-offset)"
             >
-              {/* Border stays 2px (color-only change) so selecting never shifts layout. */}
               <span
                 className={cn(
                   'nx:size-5 nx:rounded-full nx:border-2 nx:transition-colors',
@@ -83,7 +82,7 @@ export function ThemeQuickControl() {
           <IconPalette />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="nx:w-64 nx:space-y-3">
+      <PopoverContent align="end" className="nx:w-72 nx:space-y-3">
         <SwatchRow
           label="Base"
           value={theme.base}

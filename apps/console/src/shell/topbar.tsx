@@ -13,8 +13,8 @@ interface TopbarProps {
 
 /**
  * App-shell top bar: sidebar toggle, the ⌘K search button that opens the
- * command palette, the notifications bell, and a dark-mode quick-toggle wired
- * to the root theme.
+ * command palette, the notifications bell, the theme quick-control, and a
+ * dark-mode quick-toggle wired to the root theme.
  */
 export function Topbar({ onSearchClick }: TopbarProps) {
   const { theme, setTheme } = useThemeContext();
