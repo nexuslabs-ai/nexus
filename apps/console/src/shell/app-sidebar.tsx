@@ -91,7 +91,9 @@ export function AppSidebar() {
             <SidebarGroupLabel>Design System</SidebarGroupLabel>
           )}
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu
+              aria-label={showSectionLabels ? undefined : 'Design System'}
+            >
               {DESIGN_ITEMS.map(({ label, to, icon: Icon }) => (
                 <SidebarMenuItem key={to}>
                   <SidebarMenuButton
@@ -117,7 +119,9 @@ export function AppSidebar() {
             <SidebarGroupLabel>Workspace</SidebarGroupLabel>
           )}
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu
+              aria-label={showSectionLabels ? undefined : 'Workspace'}
+            >
               {MODULE_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive =
