@@ -2,7 +2,7 @@
   "//": "Per-component archetype data — single source of truth for both audit-storybook-coverage.mjs and generate-base-variants.mjs. Optional fields: `interactions` (canonical interaction stories required; absent => display-gate inferred), `equivalents` (component-scoped accepted names per requirement), `sourceDir` (subdir under src/components/; defaults to 'ui'). The doc table in .claude/rules/testing-react.md mirrors this contract.",
   "//chart-categorical-caveat": "chart-categorical-{1..5} tokens are NOT per-cell-scoped (separate token file); opting in a charted component would render its marks under the default base, not the cell's. Add them to the merge in generate-base-variants.mjs first. See testing-react.md § Caveats.",
   "bases": ["slate", "neutral", "gray", "stone", "zinc"],
-  "brand": "neutral",
+  "brand": "blue",
   "themes": ["light", "dark"],
   "components": [
     {

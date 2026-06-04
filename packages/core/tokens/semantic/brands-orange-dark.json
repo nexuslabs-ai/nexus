@@ -1,11 +1,11 @@
 {
   "primary": {
     "background": {
-      "$value": "{neutral.900}",
+      "$value": "{orange.700}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{neutral.950}",
+      "$value": "{orange.900}",
       "$type": "color"
     },
     "foreground": {
@@ -13,65 +13,65 @@
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{neutral.800}",
+      "$value": "{orange.800}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{neutral.300}",
+      "$value": "{orange.950}",
       "$type": "color"
     },
     "subtle": {
-      "$value": "{neutral.50}",
+      "$value": "{orange.950}",
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{neutral.900}",
+      "$value": "{orange.300}",
       "$type": "color"
     },
     "subtle-hover": {
-      "$value": "{neutral.100}",
+      "$value": "{orange.900}",
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{neutral.200}",
+      "$value": "{orange.800}",
       "$type": "color"
     }
   },
   "secondary": {
     "background": {
-      "$value": "{neutral.100}",
-      "$type": "color"
-    },
-    "foreground": {
       "$value": "{neutral.900}",
       "$type": "color"
     },
-    "background-hover": {
-      "$value": "{neutral.200}",
-      "$type": "color"
-    },
-    "background-active": {
-      "$value": "{neutral.300}",
-      "$type": "color"
-    },
-    "disabled": {
-      "$value": "{neutral.50}",
-      "$type": "color"
-    },
-    "subtle": {
+    "foreground": {
       "$value": "{neutral.100}",
       "$type": "color"
     },
-    "subtle-foreground": {
+    "background-hover": {
+      "$value": "{neutral.700}",
+      "$type": "color"
+    },
+    "background-active": {
       "$value": "{neutral.600}",
       "$type": "color"
     },
-    "subtle-hover": {
+    "disabled": {
+      "$value": "{neutral.950}",
+      "$type": "color"
+    },
+    "subtle": {
+      "$value": "{neutral.800}",
+      "$type": "color"
+    },
+    "subtle-foreground": {
       "$value": "{neutral.200}",
       "$type": "color"
     },
+    "subtle-hover": {
+      "$value": "{neutral.700}",
+      "$type": "color"
+    },
     "subtle-active": {
-      "$value": "{neutral.300}",
+      "$value": "{neutral.600}",
       "$type": "color"
     }
   }

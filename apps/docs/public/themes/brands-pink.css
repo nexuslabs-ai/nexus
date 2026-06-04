@@ -1,0 +1,43 @@
+/* brands: pink */
+
+html {
+  --nx-color-primary-background: var(--nx-color-pink-700);
+  --nx-color-primary-background-active: var(--nx-color-pink-900);
+  --nx-color-primary-foreground: var(--nx-color-white-base);
+  --nx-color-primary-background-hover: var(--nx-color-pink-800);
+  --nx-color-primary-disabled: var(--nx-color-pink-300);
+  --nx-color-primary-subtle: var(--nx-color-pink-50);
+  --nx-color-primary-subtle-foreground: var(--nx-color-pink-700);
+  --nx-color-primary-subtle-hover: var(--nx-color-pink-100);
+  --nx-color-primary-subtle-active: var(--nx-color-pink-200);
+  --nx-color-secondary-background: var(--nx-color-neutral-100);
+  --nx-color-secondary-foreground: var(--nx-color-neutral-900);
+  --nx-color-secondary-background-hover: var(--nx-color-neutral-200);
+  --nx-color-secondary-background-active: var(--nx-color-neutral-300);
+  --nx-color-secondary-disabled: var(--nx-color-neutral-50);
+  --nx-color-secondary-subtle: var(--nx-color-neutral-100);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-600);
+  --nx-color-secondary-subtle-hover: var(--nx-color-neutral-200);
+  --nx-color-secondary-subtle-active: var(--nx-color-neutral-300);
+}
+
+html.dark {
+  --nx-color-primary-background: var(--nx-color-pink-700);
+  --nx-color-primary-background-active: var(--nx-color-pink-900);
+  --nx-color-primary-foreground: var(--nx-color-white-base);
+  --nx-color-primary-background-hover: var(--nx-color-pink-800);
+  --nx-color-primary-disabled: var(--nx-color-pink-950);
+  --nx-color-primary-subtle: var(--nx-color-pink-950);
+  --nx-color-primary-subtle-foreground: var(--nx-color-pink-300);
+  --nx-color-primary-subtle-hover: var(--nx-color-pink-900);
+  --nx-color-primary-subtle-active: var(--nx-color-pink-800);
+  --nx-color-secondary-background: var(--nx-color-neutral-900);
+  --nx-color-secondary-foreground: var(--nx-color-neutral-100);
+  --nx-color-secondary-background-hover: var(--nx-color-neutral-700);
+  --nx-color-secondary-background-active: var(--nx-color-neutral-600);
+  --nx-color-secondary-disabled: var(--nx-color-neutral-950);
+  --nx-color-secondary-subtle: var(--nx-color-neutral-800);
+  --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-200);
+  --nx-color-secondary-subtle-hover: var(--nx-color-neutral-700);
+  --nx-color-secondary-subtle-active: var(--nx-color-neutral-600);
+}

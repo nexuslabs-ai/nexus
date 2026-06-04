@@ -13,7 +13,7 @@ import { Button } from '../_components/nexus';
  * status palette (error=red, success=green) has to survive.
  *
  * Three grids: the 5 neutral bases (the perceptual-consistency proof), the
- * functional chromatic hues wired to brand/status, and a collapsible full
+ * functional palettes wired to brand/status, and a collapsible full
  * reference of all 17 chromatic scales. Swatches reference --nx-color-*
  * primitives inline; the CVD filter is an SVG feColorMatrix.
  */
@@ -31,7 +31,11 @@ const NEUTRAL: Palette[] = [
 ];
 
 const FUNCTIONAL: Palette[] = [
-  { name: 'blue', role: 'primary · information' },
+  { name: 'blue', role: 'brand · information' },
+  { name: 'purple', role: 'brand' },
+  { name: 'pink', role: 'brand' },
+  { name: 'teal', role: 'brand' },
+  { name: 'orange', role: 'brand' },
   { name: 'green', role: 'success' },
   { name: 'yellow', role: 'warning' },
   { name: 'red', role: 'error' },
@@ -96,10 +100,14 @@ export function ColorScales() {
         Brand &amp; status hues
       </h3>
       <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-        The chromatic scales the semantic tokens are built from — same OKLCH
-        pipeline, each on its own hue-aware lightness curve. Switch to a
-        color-vision filter and watch the red/green pair (error/success)
-        converge: that&rsquo;s why status never relies on hue alone.
+        Brand modes are blue, purple, pink, teal, orange, and black. The
+        chromatic brand modes share the OKLCH pipeline; black is a monochrome
+        semantic recipe built from{' '}
+        <code className="nx:typography-code-inline">black.base</code>,{' '}
+        <code className="nx:typography-code-inline">white.base</code>, and
+        neutral support. Switch to a color-vision filter and watch the red/green
+        pair (error/success) converge: that&rsquo;s why status never relies on
+        hue alone.
       </p>
       <SwatchGrid items={FUNCTIONAL} cvd={cvd} />
 
@@ -108,8 +116,9 @@ export function ColorScales() {
           All color scales (17)
         </summary>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:my-3 nx:max-w-[64ch]">
-          The full chromatic set. Most aren&rsquo;t wired to a semantic token —
-          they&rsquo;re raw primitives available for data viz and one-off use.
+          The full chromatic set. Brand uses blue, purple, pink, teal, and
+          orange; status uses red, yellow, green, and blue. The rest are raw
+          primitives available for data viz and one-off use.
         </p>
         <SwatchGrid items={FULL_CHROMATIC} cvd={cvd} />
       </details>

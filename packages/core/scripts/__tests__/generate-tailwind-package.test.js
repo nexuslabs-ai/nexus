@@ -610,6 +610,18 @@ describe('generateTailwindPackage', () => {
     }
   });
 
+  it('throws when the selected brand mode is unavailable', async () => {
+    const dir = makeTmpDir();
+    await expect(
+      generateTailwindPackage(
+        { ...DEFAULT_CONFIG, brand: 'neutral' },
+        { distDir: dir }
+      )
+    ).rejects.toThrow(
+      'getSemanticFiles: themed type "brands" has no mode "neutral"'
+    );
+  });
+
   it('config.spacingDefault shifts which mode lands under :root, [data-style="X"]', async () => {
     // Build with a non-default spacing mode. All 7 mode blocks still emit;
     // only the `:root` half of the dual selector moves from Vega to Maia.

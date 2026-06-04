@@ -32,6 +32,15 @@ export function ThemeBootstrap() {
         radius: 'sharp',
         borderwidth: 'vega',
       };
+      var VALID_MODES = {
+        base: ['slate', 'stone', 'neutral', 'gray', 'zinc'],
+        brand: ['blue', 'purple', 'pink', 'teal', 'orange', 'black'],
+        spacing: ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'],
+        typography: ['vega', 'nova', 'maia'],
+        shadow: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+        radius: ['sharp', 'subtle', 'smooth', 'mellow', 'blunt'],
+        borderwidth: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+      };
       var prefs = Object.assign({}, DEFAULTS);
       var stored = ls.getItem('nexus-docs-tokens');
       if (stored) {
@@ -46,6 +55,11 @@ export function ThemeBootstrap() {
           }
         } catch (e) {}
       }
+      Object.keys(VALID_MODES).forEach(function (key) {
+        if (VALID_MODES[key].indexOf(prefs[key]) === -1) {
+          prefs[key] = DEFAULTS[key];
+        }
+      });
       // focus is single-variant today
       var focusLink = document.createElement('link');
       focusLink.rel = 'stylesheet';

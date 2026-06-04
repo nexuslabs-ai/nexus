@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { BASE_PALETTES } from './lib/palettes.js';
+import { BASE_PALETTES, BRAND_PALETTES } from './lib/palettes.js';
 import { hexToSrgbInts, isPaletteShadeKey } from './lib/perceptual-grid.js';
 import { extractTokens, readTokenFile } from './utils.js';
 
@@ -13,7 +13,6 @@ const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 const PRIMITIVES_FILE = path.join(TOKENS_DIR, 'primitives', 'color.json');
 const FOCUS_PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives', 'focus');
 
-const BRANDS = ['blue', 'gray', 'neutral', 'slate', 'stone'];
 const THEMES = ['light', 'dark'];
 
 // APCA tiers: body 75 (fluent reading), ui 60 (button/badge labels),
@@ -365,10 +364,14 @@ function main() {
     }
   }
 
-  for (const brand of BRANDS) {
+  for (const brand of BRAND_PALETTES) {
     for (const theme of THEMES) {
       const filePath = path.join(SEMANTIC_DIR, `brands-${brand}-${theme}.json`);
-      if (!fs.existsSync(filePath)) continue;
+      if (!fs.existsSync(filePath)) {
+        throw new Error(
+          `audit-contrast: expected brand semantic file missing: ${path.basename(filePath)}`
+        );
+      }
       const fileData = readTokenFile(filePath);
       sections.push(
         auditPairs(

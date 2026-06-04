@@ -10,10 +10,11 @@ export const BASES = [
 
 export const BRANDS = [
   { value: 'blue', label: 'Blue', color: '#3b82f6' },
-  { value: 'gray', label: 'Gray', color: '#6b7280' },
-  { value: 'neutral', label: 'Neutral', color: '#737373' },
-  { value: 'slate', label: 'Slate', color: '#64748b' },
-  { value: 'stone', label: 'Stone', color: '#78716c' },
+  { value: 'purple', label: 'Purple', color: '#9333ea' },
+  { value: 'pink', label: 'Pink', color: '#db2777' },
+  { value: 'teal', label: 'Teal', color: '#0f766e' },
+  { value: 'orange', label: 'Orange', color: '#c2410c' },
+  { value: 'black', label: 'Black', color: '#0a0a0a' },
 ] as const;
 
 export const TOKEN_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova'] as const;

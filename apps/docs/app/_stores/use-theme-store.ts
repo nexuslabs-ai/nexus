@@ -30,6 +30,16 @@ export type ThemeState = {
   borderwidth: string;
 };
 
+const THEME_MODE_VALUES = {
+  base: ['slate', 'stone', 'neutral', 'gray', 'zinc'],
+  brand: ['blue', 'purple', 'pink', 'teal', 'orange', 'black'],
+  spacing: ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'],
+  typography: ['vega', 'nova', 'maia'],
+  shadow: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+  radius: ['sharp', 'subtle', 'smooth', 'mellow', 'blunt'],
+  borderwidth: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+} as const satisfies Record<keyof ThemeState, readonly string[]>;
+
 export const DEFAULTS: ThemeState = {
   base: 'stone',
   brand: 'blue',
@@ -44,6 +54,29 @@ type ThemeStore = ThemeState & {
   update: <K extends keyof ThemeState>(key: K, value: ThemeState[K]) => void;
 };
 
+function sanitizeMode<K extends keyof ThemeState>(
+  key: K,
+  value: unknown
+): ThemeState[K] {
+  return typeof value === 'string' &&
+    (THEME_MODE_VALUES[key] as readonly string[]).includes(value)
+    ? value
+    : DEFAULTS[key];
+}
+
+function sanitizeThemeState(raw: unknown): ThemeState {
+  const state = (raw ?? {}) as Partial<Record<keyof ThemeState, unknown>>;
+  return {
+    base: sanitizeMode('base', state.base),
+    brand: sanitizeMode('brand', state.brand),
+    spacing: sanitizeMode('spacing', state.spacing),
+    typography: sanitizeMode('typography', state.typography),
+    shadow: sanitizeMode('shadow', state.shadow),
+    radius: sanitizeMode('radius', state.radius),
+    borderwidth: sanitizeMode('borderwidth', state.borderwidth),
+  };
+}
+
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
@@ -54,6 +87,12 @@ export const useThemeStore = create<ThemeStore>()(
       name: STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
+      version: 1,
+      migrate: (persisted) => sanitizeThemeState(persisted),
+      merge: (persisted, current) => ({
+        ...current,
+        ...sanitizeThemeState(persisted),
+      }),
       partialize: ({ update: _update, ...rest }) => rest,
     }
   )

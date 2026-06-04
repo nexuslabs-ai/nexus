@@ -343,7 +343,7 @@ Then re-run `yarn workspace @nexus/react generate:base-variants` (or just `yarn 
 
 Tailwind utilities here read **prefixed** theme variables (`nx:bg-background` → `var(--nx-color-background)`), because `@import 'tailwindcss' prefix(nx)` prefixes the `@theme` vars. So the generator emits `--nx-color-{token}: var(--nx-color-{primitive})` scoped to `[data-nexus-base]`. Each grid cell carries `data-nexus-base={base}` (and `dark` on dark rows), so every token-driven utility inside it resolves to that base+theme through CSS custom-property inheritance. Primitives are global (`variables.css` ships all palettes), so the refs resolve everywhere.
 
-Each cell emits the **full** semantic set (base + the `neutral` brand) for its theme, so a cell is hermetic — it never inherits a leaked `--nx-color-primary-*` from the global `.dark` decorator when the toolbar is flipped.
+Each cell emits the **full** semantic set (base + the configured `blue` brand) for its theme, so a cell is hermetic — it never inherits a leaked `--nx-color-primary-*` from the global `.dark` decorator when the toolbar is flipped.
 
 ### Conventions specific to generated stories
 
