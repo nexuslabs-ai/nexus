@@ -320,6 +320,7 @@ function FieldError({
   return (
     <div
       role="alert"
+      aria-atomic="true"
       data-slot="field-error"
       className={cn(
         'nx:text-sm nx:font-normal nx:text-error-subtle-foreground',

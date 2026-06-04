@@ -81,7 +81,7 @@ function SignUpForm({
 /**
  * A single-field form with no resolver — the simplest possible composition.
  */
-function UsernameForm() {
+function UsernameForm({ extraDescriptionId }: { extraDescriptionId?: string }) {
   const form = useForm<{ username: string }>({
     defaultValues: { username: '' },
   });
@@ -95,7 +95,7 @@ function UsernameForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Username</FormLabel>
-              <FormControl>
+              <FormControl aria-describedby={extraDescriptionId}>
                 <Input placeholder="janedoe" {...field} />
               </FormControl>
               <FormDescription>Your public display name.</FormDescription>
@@ -234,6 +234,13 @@ export const ShowErrors: Story = {
   render: (args) => <SignUpForm onSubmit={args.onSubmit} />,
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
+    const username = canvas.getByLabelText('Username');
+    const usernameDescription = canvas.getByText('Your public display name.');
+
+    await expect(
+      canvas.queryByText('Username must be at least 2 characters')
+    ).not.toBeInTheDocument();
+    await expect(username).not.toHaveAttribute('aria-errormessage');
 
     // Submit with empty fields — the resolver should surface messages.
     await userEvent.click(
@@ -246,9 +253,41 @@ export const ShowErrors: Story = {
       ).toBeInTheDocument()
     );
 
-    const username = canvas.getByLabelText('Username');
+    const usernameMessage = canvas.getByText(
+      'Username must be at least 2 characters'
+    );
     await expect(username).toHaveAttribute('aria-invalid', 'true');
+    await expect(username).toHaveAttribute(
+      'aria-describedby',
+      usernameDescription.getAttribute('id')
+    );
+    await expect(username).toHaveAttribute(
+      'aria-errormessage',
+      usernameMessage.getAttribute('id')
+    );
+    await expect(usernameMessage).toHaveAttribute('role', 'alert');
     await expect(args.onSubmit).not.toHaveBeenCalled();
+  },
+};
+
+export const WithMergedDescription: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-[360px] nx:flex-col nx:gap-2">
+      <p id="username-extra-description" className="nx:text-sm">
+        Use letters, numbers, and underscores.
+      </p>
+      <UsernameForm extraDescriptionId="username-extra-description" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText('Username');
+    const description = canvas.getByText('Your public display name.');
+
+    await expect(input).toHaveAttribute(
+      'aria-describedby',
+      `${description.getAttribute('id')} username-extra-description`
+    );
   },
 };
 
@@ -263,13 +302,14 @@ export const WithDataAttributes: Story = {
     const description = canvas.getByText('Your public display name.');
     await expect(description).toHaveAttribute('data-slot', 'form-description');
 
-    // FormControl wires the control's id + aria-describedby to the FormItem.
+    // FormControl wires the control's id + helper description to the FormItem.
     const input = canvas.getByLabelText('Username');
     await expect(input).toHaveAttribute('id', label.getAttribute('for'));
     await expect(input).toHaveAttribute(
       'aria-describedby',
       description.getAttribute('id')
     );
+    await expect(input).not.toHaveAttribute('aria-errormessage');
 
     await expect(
       canvasElement.querySelector('[data-slot="form-item"]')
