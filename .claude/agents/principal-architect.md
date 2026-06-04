@@ -53,6 +53,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | [ripple-effect.md](../rules/ripple-effect.md)                                 | A change isn't done until callers, callees, and adjacent code are consistently clean   |
 | [composition-over-render-props.md](../rules/composition-over-render-props.md) | Component boundaries: compose via `children` or per-mode split, never render callbacks |
 | [project-stage.md](../rules/project-stage.md)                                 | Pre-production: no backcompat, no shims, no feature flags — change code in place       |
+| [docs-mcp.md](../rules/docs-mcp.md)                                           | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory      |
 | [no-follow-up-deferral.md](../rules/no-follow-up-deferral.md)                 | When reviewing: every flagged issue is in scope unless a tracked issue is cited        |
 
 ## Focus Areas

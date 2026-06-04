@@ -305,6 +305,60 @@ The first run of `pnpm test` (or any storybook-project run) launches Storybook i
 
 ---
 
+## AI Documentation MCP (nexus-docs-mcp)
+
+This project runs a local documentation server that keeps Claude Code up-to-date with the exact library versions used here. Without it, the AI will use stale training data and suggest deprecated APIs.
+
+### For teammates (using docs)
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+# One-time: authenticate with GitHub Container Registry
+pnpm docs:login
+
+# Pull the pre-indexed image and start the server
+pnpm docs:pull
+pnpm docs:start
+```
+
+The server runs at `http://localhost:6282`. Claude Code connects to it automatically via `.mcp.json` — no further setup needed.
+
+To stop: `pnpm docs:stop`
+
+When the maintainer publishes an update, pull and restart:
+
+```bash
+pnpm docs:pull && pnpm docs:stop && pnpm docs:start
+```
+
+### For the maintainer (managing docs)
+
+```bash
+# Start the local server for indexing (opens web UI at http://localhost:6282)
+pnpm docs:serve
+
+# Add or update libraries via the web UI / scrape_docs tool, then publish for the team
+pnpm docs:publish   # export DB -> build Docker image -> push to GHCR
+```
+
+### Scripts reference
+
+| Command        | Role       | What it does                                       |
+| -------------- | ---------- | -------------------------------------------------- |
+| `docs:serve`   | Maintainer | Start local server for indexing/managing libraries |
+| `docs:export`  | Maintainer | Copy indexed DB into `docs-mcp/` for building      |
+| `docs:build`   | Maintainer | Build Docker image with baked-in DB                |
+| `docs:login`   | Both       | Authenticate with GitHub Container Registry        |
+| `docs:push`    | Maintainer | Push image to GHCR                                 |
+| `docs:publish` | Maintainer | All-in-one: export + build + push                  |
+| `docs:pull`    | Teammate   | Pull latest image from GHCR                        |
+| `docs:start`   | Teammate   | Start the docs MCP server on `localhost:6282`      |
+| `docs:stop`    | Teammate   | Stop the container (auto-removed on stop)          |
+| `docs:restore` | Maintainer | Pull the published DB back into the local store    |
+
+---
+
 ## Authoritative Specs
 
 This file is the on-ramp. The specs are:

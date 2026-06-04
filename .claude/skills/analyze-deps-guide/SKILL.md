@@ -32,6 +32,7 @@ Always load and follow:
 | Rule                                             | Purpose                                                                          |
 | ------------------------------------------------ | -------------------------------------------------------------------------------- |
 | [project-stage.md](../../rules/project-stage.md) | Pre-production: prefer clean upgrades over migration shims; no backcompat layers |
+| [docs-mcp.md](../../rules/docs-mcp.md)           | MANDATORY: query nexus-docs-mcp for current API surface before flagging breakage |
 
 ## Input Options
 
