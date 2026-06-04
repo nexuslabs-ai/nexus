@@ -8,7 +8,7 @@ import type { Section } from '../_lib/sections';
 export function LeftRail({ section }: { section: Section }) {
   const pathname = usePathname();
   return (
-    <aside className="nx:sticky nx:top-16 nx:self-start nx:max-h-[calc(100vh-80px)] nx:overflow-y-auto nx:pr-2">
+    <aside className="nx:sticky nx:top-16 nx:self-start nx:max-h-[calc(100svh-80px)] nx:overflow-y-auto nx:pr-2">
       <h3 className="nx:text-[11px] nx:font-semibold nx:uppercase nx:tracking-wider nx:text-muted-foreground nx:mb-2">
         {section.title}
       </h3>

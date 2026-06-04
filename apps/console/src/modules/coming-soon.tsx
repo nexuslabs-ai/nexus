@@ -23,7 +23,7 @@ export function ComingSoon() {
   const Icon = item?.icon;
 
   return (
-    <EmptyState className="nx:min-h-[60vh]">
+    <EmptyState className="nx:min-h-[60svh]">
       <EmptyStateHeader>
         {Icon && (
           <EmptyStateMedia variant="icon">
