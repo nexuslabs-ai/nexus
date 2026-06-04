@@ -10,3 +10,12 @@
 @import 'tailwindcss' prefix(nx);
 @reference '@nexus/tailwind';
 @import 'tw-animate-css';
+
+@media (prefers-reduced-motion: reduce) {
+  /* Vaul injects drawer motion CSS at runtime, outside Tailwind utilities. */
+  [data-slot='drawer-content'][data-vaul-drawer],
+  [data-slot='drawer-overlay'][data-vaul-overlay] {
+    animation: none !important;
+    transition: none !important;
+  }
+}

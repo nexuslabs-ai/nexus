@@ -412,6 +412,9 @@ export const ReducedMotionFallbacks: Story = {
         within(dialog).getByRole('button', { name: 'Done' })
       );
     } finally {
+      if (document.querySelector('[role="dialog"]')) {
+        await userEvent.keyboard('{Escape}');
+      }
       await waitFor(() => {
         expect(document.querySelector('[role="dialog"]')).toBeNull();
       });
