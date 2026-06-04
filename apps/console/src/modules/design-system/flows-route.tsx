@@ -22,23 +22,12 @@ import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
 import { NotFoundState } from '../../components/not-found-state';
 import type { Subscription, UsageMeter } from '../../lib/billing-api';
-import {
-  NotificationsError,
-  NotificationsSkeleton,
-} from '../../shell/notifications-menu';
-import { AnalyticsSkeleton } from '../analytics/analytics-route';
-import {
-  BillingSkeleton,
-  CancelButton,
-  UsageMeterBar,
-} from '../billing/billing-route';
+import { NotificationsError } from '../../shell/notifications-menu';
+import { CancelButton, UsageMeterBar } from '../billing/billing-route';
 import { PlanSheet } from '../billing/plan-sheet';
-import { DetailSkeleton as ContactDetailSkeleton } from '../crm/contact-detail-route';
 import { ContactFormSheet } from '../crm/contact-form-sheet';
 import { ContactsEmpty, ContactsSkeleton } from '../crm/contacts-route';
-import { ThreadSkeleton } from '../inbox/conversation-thread';
-import { EmptyPane, ListSkeleton } from '../inbox/inbox-route';
-import { DetailSkeleton as IssueDetailSkeleton } from '../projects/issue-detail-route';
+import { EmptyPane } from '../inbox/inbox-route';
 
 // Mocks for the components that take data props — the gallery renders them in
 // isolation, with no live query behind them.
@@ -98,39 +87,11 @@ export function FlowsRoute() {
       </header>
 
       <Section
-        title="Loading skeletons"
-        description="Shown for ~500ms while a query resolves, then replaced — hard to catch in normal use."
+        title="Loading skeleton"
+        description="While a query resolves (~500ms) a route paints Skeleton placeholders shaped like its content, then swaps in the data. Every route uses the same Skeleton primitive — shown once here; only the arrangement differs per screen."
       >
-        <Sample label="List / table · Contacts, Issues, People">
+        <Sample label="Content loading" span>
           <ContactsSkeleton />
-        </Sample>
-        <Sample label="Record detail · Contacts, People">
-          <ContactDetailSkeleton />
-        </Sample>
-        <Sample label="Issue detail">
-          <IssueDetailSkeleton />
-        </Sample>
-        <Sample label="Analytics dashboard" span>
-          <AnalyticsSkeleton />
-        </Sample>
-        <Sample label="Billing page" span>
-          <BillingSkeleton />
-        </Sample>
-        <Sample label="Notifications panel" className="nx:max-w-sm nx:p-0">
-          <NotificationsSkeleton />
-        </Sample>
-        <Sample
-          label="Inbox list"
-          className="nx:flex nx:h-96 nx:flex-col nx:p-0"
-        >
-          <ListSkeleton />
-        </Sample>
-        <Sample
-          label="Inbox thread"
-          span
-          className="nx:flex nx:h-96 nx:flex-col nx:p-0"
-        >
-          <ThreadSkeleton />
         </Sample>
       </Section>
 

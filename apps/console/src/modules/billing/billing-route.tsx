@@ -364,7 +364,7 @@ function InvoicesTable({ invoices }: { invoices: Invoice[] }) {
   );
 }
 
-export function BillingSkeleton() {
+function BillingSkeleton() {
   return (
     <div className="nx:space-y-6">
       <div className="nx:grid nx:gap-6 nx:lg:grid-cols-3">

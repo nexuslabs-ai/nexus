@@ -101,7 +101,7 @@ export function InboxRoute() {
   );
 }
 
-export function ListSkeleton() {
+function ListSkeleton() {
   return (
     <div className="nx:flex-1 nx:space-y-4 nx:p-4">
       {Array.from({ length: 8 }, (_, i) => (
