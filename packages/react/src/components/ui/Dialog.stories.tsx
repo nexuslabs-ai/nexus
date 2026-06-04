@@ -361,6 +361,64 @@ export const WithDataAttributes: Story = {
   },
 };
 
+export const ReducedMotionFallbacks: Story = {
+  render: (_args) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open reduced-motion dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reduced motion contract</DialogTitle>
+          <DialogDescription>
+            Overlay motion should be disabled when reduced motion is preferred.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button>Done</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open reduced-motion dialog' })
+    );
+
+    try {
+      const body = within(document.body);
+      const dialog = await body.findByRole('dialog');
+      const overlay = document.querySelector('[data-slot="dialog-overlay"]');
+      const closeButton = within(dialog).getByRole('button', {
+        name: 'Close',
+      });
+
+      await expect(overlay).toHaveClass(
+        'nx:motion-reduce:data-[state=open]:animate-none',
+        'nx:motion-reduce:data-[state=closed]:animate-none'
+      );
+      await expect(dialog).toHaveClass(
+        'nx:motion-reduce:duration-0',
+        'nx:motion-reduce:data-[state=open]:animate-none',
+        'nx:motion-reduce:data-[state=closed]:animate-none'
+      );
+      await expect(closeButton).toHaveClass('nx:motion-reduce:transition-none');
+
+      await userEvent.click(
+        within(dialog).getByRole('button', { name: 'Done' })
+      );
+    } finally {
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeNull();
+      });
+    }
+  },
+};
+
 // ============================================
 // NESTED OVERLAY STACKING (z-index layering)
 // ============================================

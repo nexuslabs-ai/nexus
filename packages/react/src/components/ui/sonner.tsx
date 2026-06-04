@@ -43,7 +43,9 @@ const toasterIcons = {
   info: <IconInfoCircle className="nx:size-4" />,
   warning: <IconAlertTriangle className="nx:size-4" />,
   error: <IconAlertCircle className="nx:size-4" />,
-  loading: <IconLoader2 className="nx:size-4 nx:animate-spin" />,
+  loading: (
+    <IconLoader2 className="nx:size-4 nx:animate-spin nx:motion-reduce:animate-none" />
+  ),
 };
 
 /**

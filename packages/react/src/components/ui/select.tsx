@@ -174,6 +174,7 @@ function SelectContent({
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
           'nx:data-[side=bottom]:slide-in-from-top-2 nx:data-[side=left]:slide-in-from-right-2',
           'nx:data-[side=right]:slide-in-from-left-2 nx:data-[side=top]:slide-in-from-bottom-2',
+          'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
           position === 'popper' &&
             'nx:data-[side=bottom]:translate-y-1 nx:data-[side=left]:-translate-x-1 nx:data-[side=right]:translate-x-1 nx:data-[side=top]:-translate-y-1',
           className
