@@ -35,5 +35,10 @@ ruleTester.run('no-multi-statement-jsx-handler', rule, {
       code: 'const x = <button onClick={() => { mutate(input, { onSuccess: () => {} }); }} />;',
       errors: [{ messageId: 'nestedCallback' }],
     },
+    // Expression-body arrow (no braces) with a callback object must also be caught.
+    {
+      code: 'const x = <button onClick={() => mutate(input, { onSuccess: () => {}, onError: () => {} })} />;',
+      errors: [{ messageId: 'nestedCallback' }],
+    },
   ],
 });

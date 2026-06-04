@@ -12,15 +12,15 @@ const CHECKS = [
   },
   {
     messageId: 'bannedAccent',
-    re: /nx:(?:hover:|active:|focus:|focus-visible:)?(?:bg|text)-accent\b/,
+    re: /nx:(?:[\w-]+:)*(?:bg|text)-accent\b/,
   },
   {
     messageId: 'incompletePath',
-    re: /nx:(?:hover:|active:|focus:|focus-visible:)?(?:bg|text|border)-(?:primary|secondary|error|success|warning|information|destructive)(?![\w-])/,
+    re: /nx:(?:[\w-]+:)*(?:bg|text|border)-(?:primary|secondary|error|success|warning|information|destructive)(?![\w-])/,
   },
   {
     messageId: 'rawPrimitive',
-    re: /nx:(?:hover:|active:|focus:|focus-visible:)?(?:bg|text|border)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}/,
+    re: /nx:(?:[\w-]+:)*(?:bg|text|border)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}/,
   },
 ];
 

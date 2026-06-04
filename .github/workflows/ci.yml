@@ -55,7 +55,7 @@ jobs:
               - 'packages/test-utils/**'
             packages:
               - 'packages/**'
-            # Mirrors the source roots scanned by `yarn audit:browser-support`.
+            # Mirrors the source roots scanned by `pnpm audit:browser-support`.
             browser_source:
               - 'apps/**'
               - 'packages/**'

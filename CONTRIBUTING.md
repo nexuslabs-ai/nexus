@@ -280,7 +280,7 @@ make up           # pull the published image + run it at http://localhost:6282
 
 `.mcp.json` connects Claude Code automatically — no further setup. Stop it with `make down`. After a maintainer publishes an update: `make down && make up`.
 
-> First pull needs registry auth — the image is private to `nexuslabs-ai-bot`. If `make up` 403s, run `pnpm docs:login` once (asks a teammate for the bot credentials).
+> The image is public (read-only), so `make up` pulls it anonymously — no auth needed. Registry login (`pnpm docs:login`, with the bot credentials) is only for maintainers **publishing** an update; see below.
 
 ### Maintainers — update it
 

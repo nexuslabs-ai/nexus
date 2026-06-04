@@ -52,6 +52,19 @@ ruleTester.run('nx-class-conventions', rule, {
       code: "const c = 'nx:hover:bg-slate-100';",
       errors: [{ messageId: 'rawPrimitive' }],
     },
+    // Modifiers beyond hover/active/focus must not evade the checks.
+    {
+      code: "const c = 'nx:disabled:bg-primary';",
+      errors: [{ messageId: 'incompletePath' }],
+    },
+    {
+      code: "const c = 'nx:group-hover:bg-accent';",
+      errors: [{ messageId: 'bannedAccent' }],
+    },
+    {
+      code: "const c = 'nx:aria-invalid:bg-blue-500';",
+      errors: [{ messageId: 'rawPrimitive' }],
+    },
     {
       code: 'const c = `nx:bg-blue-500 ${x}`;',
       errors: [{ messageId: 'rawPrimitive' }],

@@ -12,9 +12,31 @@ function countStatements(body) {
   return body.body.length;
 }
 
-function hasCallbackObjectArgument(body) {
-  if (body.type !== 'BlockStatement') {
+function callExpressionHasCallbackObject(expr) {
+  if (!expr || expr.type !== 'CallExpression') {
     return false;
+  }
+  for (const arg of expr.arguments) {
+    if (arg.type !== 'ObjectExpression') {
+      continue;
+    }
+    for (const prop of arg.properties) {
+      if (
+        prop.type === 'Property' &&
+        prop.key.type === 'Identifier' &&
+        HANDLER_NAME.test(prop.key.name)
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function hasCallbackObjectArgument(body) {
+  // Expression-body arrow: `() => mutate(x, { onSuccess, onError })`.
+  if (body.type !== 'BlockStatement') {
+    return callExpressionHasCallbackObject(body);
   }
   for (const stmt of body.body) {
     const expr =
@@ -23,22 +45,8 @@ function hasCallbackObjectArgument(body) {
         : stmt.type === 'ReturnStatement'
           ? stmt.argument
           : null;
-    if (!expr || expr.type !== 'CallExpression') {
-      continue;
-    }
-    for (const arg of expr.arguments) {
-      if (arg.type !== 'ObjectExpression') {
-        continue;
-      }
-      for (const prop of arg.properties) {
-        if (
-          prop.type === 'Property' &&
-          prop.key.type === 'Identifier' &&
-          HANDLER_NAME.test(prop.key.name)
-        ) {
-          return true;
-        }
-      }
+    if (callExpressionHasCallbackObject(expr)) {
+      return true;
     }
   }
   return false;

@@ -236,7 +236,7 @@ _Components and styling_
 _Tests_
 
 - _Adding or changing a component, hook, or utility?_
-  -> **Components: stories are the tests** — no `*.test.tsx`; write play functions in `*.stories.tsx`, importing from `storybook/test` (never `@storybook/test` or `@testing-library/react`). Cover the required-story matrix (Default, each variant + size, Disabled, Click + Keyboard interaction, WithDataAttributes, `asChild` if applicable, edge cases, and the `AllVariants` showcase). For a **new** component the DoD gate is `yarn workspace @nexus/react audit:storybook-coverage --component <name>` exiting 0. a11y is automatic via addon-a11y — don't add manual `axe()` calls; colour contrast is APCA-gated, not axe-gated (`yarn workspace @nexus/core audit:contrast`). **Hooks / utilities** use `*.test.ts` with `@nexus/test-utils`. Assert input → output with partial matching on real fixtures; never commit `skip` / `only`. (`testing-react.md`, `testing.md`)
+  -> **Components: stories are the tests** — no `*.test.tsx`; write play functions in `*.stories.tsx`, importing from `storybook/test` (never `@storybook/test` or `@testing-library/react`). Cover the required-story matrix (Default, each variant + size, Disabled, Click + Keyboard interaction, WithDataAttributes, `asChild` if applicable, edge cases, and the `AllVariants` showcase). For a **new** component the DoD gate is `pnpm --filter @nexus/react audit:storybook-coverage --component <name>` exiting 0. a11y is automatic via addon-a11y — don't add manual `axe()` calls; colour contrast is APCA-gated, not axe-gated (`pnpm --filter @nexus/core audit:contrast`). **Hooks / utilities** use `*.test.ts` with `@nexus/test-utils`. Assert input → output with partial matching on real fixtures; never commit `skip` / `only`. (`testing-react.md`, `testing.md`)
 
 _Diagnostic noise_
 
@@ -266,8 +266,8 @@ When a reflex fires and you're not certain of the spec, open the linked rule fil
 Run after completing:
 
 ```bash
-yarn typecheck
-yarn lint
+pnpm typecheck
+pnpm lint
 ```
 
 Fix all errors before presenting your summary.
