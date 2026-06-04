@@ -222,6 +222,8 @@ describe('audit-browser-support', () => {
       [
         'const rail = "nx:max-h-[calc(100vh-80px)]";',
         'const placeholder = "nx:min-h-[60vh]";',
+        'const tailwindWhitespace = "nx:max-h-[calc(100vh_-_80px)]";',
+        'const tailwindLeadingWhitespace = "nx:max-h-[calc(100%_-_100vh)]";',
       ].join('\n'),
       'fixture.tsx'
     );
@@ -236,6 +238,16 @@ describe('audit-browser-support', () => {
         file: 'fixture.tsx',
         line: 2,
         match: '60vh',
+      }),
+      expect.objectContaining({
+        file: 'fixture.tsx',
+        line: 3,
+        match: '100vh',
+      }),
+      expect.objectContaining({
+        file: 'fixture.tsx',
+        line: 4,
+        match: '100vh',
       }),
     ]);
   });

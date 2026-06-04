@@ -19,7 +19,7 @@ const IGNORED_SOURCE_DIRS = new Set([
   'node_modules',
   'storybook-static',
 ]);
-const RAW_NUMERIC_VH_RE = /\b\d+(?:\.\d+)?vh\b/gi;
+const RAW_NUMERIC_VH_RE = /(?<![a-z0-9.])\d+(?:\.\d+)?vh(?![a-z0-9])/gi;
 const TAILWIND_SCREEN_HEIGHT_RE =
   /\b(?:nx:)?(?:(?:[a-z0-9-]+|\[[^\]]+\]):)*(?:min-h|h|max-h)-screen\b/g;
 const VH_ALLOW_RE = /^\/\/\s*nexus-allow-vh:\s*\S/;
