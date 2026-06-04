@@ -191,6 +191,7 @@ function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
         'nx:data-[side=left]:slide-in-from-right-2',
         'nx:data-[side=right]:slide-in-from-left-2',
         'nx:data-[side=top]:slide-in-from-bottom-2',
+        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
         className
       )}
       {...props}
@@ -246,6 +247,7 @@ function MenubarContent({
           'nx:data-[side=left]:slide-in-from-right-2',
           'nx:data-[side=right]:slide-in-from-left-2',
           'nx:data-[side=top]:slide-in-from-bottom-2',
+          'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
           className
         )}
         {...props}

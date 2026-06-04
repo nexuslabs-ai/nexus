@@ -73,6 +73,7 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
         'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
         'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
+        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
         className
       )}
       {...props}
@@ -125,6 +126,7 @@ function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
           'nx:data-[state=closed]:slide-out-to-left-1/2 nx:data-[state=closed]:slide-out-to-top-[48%]',
           'nx:data-[state=open]:slide-in-from-left-1/2 nx:data-[state=open]:slide-in-from-top-[48%]',
+          'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
           'nx:sm:rounded-lg',
           className
         )}

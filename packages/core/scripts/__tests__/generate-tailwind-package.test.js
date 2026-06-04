@@ -184,6 +184,18 @@ describe('generateTailwindPackage', () => {
     );
   });
 
+  it('emits a class-driven native browser UI theme policy', () => {
+    expect(nexusCSS).toMatch(/:root \{\n\s*color-scheme:\s*light dark;\n\s*\}/);
+    expect(nexusCSS).toMatch(
+      /:root:not\(\.dark\) \{\n\s*color-scheme:\s*light;\n\s*\}/
+    );
+    expect(nexusCSS).toMatch(/\.dark \{\n\s*color-scheme:\s*dark;\n\s*\}/);
+    expect(nexusCSS).toMatch(
+      /:where\([\s\S]*input\[type='checkbox'\],[\s\S]*input\[type='radio'\],[\s\S]*input\[type='range'\],[\s\S]*progress[\s\S]*\) \{\n\s*accent-color:\s*var\(--color-primary-background\);\n\s*\}/
+    );
+    expect(nexusCSS).not.toMatch(/light-dark\(/);
+  });
+
   it('emits z-index tokens in @theme', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(/--z-index-overlay: 10;/);

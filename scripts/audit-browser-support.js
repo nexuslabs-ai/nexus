@@ -70,6 +70,20 @@ export const FEATURE_POLICIES = Object.freeze([
     note: 'Safe to use for native browser UI theming at the Nexus floor.',
   },
   {
+    id: 'accent-color',
+    name: 'accent-color',
+    policy: 'progressive-enhancement',
+    support: {
+      chrome: 93,
+      edge: 93,
+      firefox: 92,
+      safari: 15.4,
+      samsung: 17,
+    },
+    guide: 'brand-consistent-forms',
+    note: 'Scope to native checkbox/radio/range/progress controls; unsupported or partial implementations fall back to UA defaults.',
+  },
+  {
     id: 'viewport-height-units',
     name: 'svh / lvh / dvh viewport units',
     policy: 'adopt',

@@ -80,7 +80,10 @@ export function ForgotRoute() {
                   <FormControl>
                     <Input
                       type="email"
+                      autoComplete="username"
+                      enterKeyHint="send"
                       placeholder="you@example.com"
+                      required
                       {...field}
                     />
                   </FormControl>

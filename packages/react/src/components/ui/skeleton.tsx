@@ -27,7 +27,10 @@ function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
       data-slot="skeleton"
-      className={cn('nx:animate-pulse nx:rounded-md nx:bg-muted', className)}
+      className={cn(
+        'nx:animate-pulse nx:rounded-md nx:bg-muted nx:motion-reduce:animate-none',
+        className
+      )}
       {...props}
     />
   );

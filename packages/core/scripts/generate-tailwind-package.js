@@ -22,6 +22,7 @@ import {
   formatTokenValue,
   generateBaseLayerCSS,
   generateBorderWidthUtilitiesCSS,
+  generateNativeBrowserUIThemeCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   generateThemeCSS,
@@ -510,6 +511,8 @@ function generateNexusCSS(
   // Lives outside @theme so the cascade can pick the active mode at runtime
   // via the `data-style` attribute on any ancestor.
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
+
+  css += generateNativeBrowserUIThemeCSS();
 
   // Add base layer
   css += generateBaseLayerCSS();

@@ -22,10 +22,11 @@ import type { TrendPoint } from '../../lib/analytics-api';
 
 // Fixed height overrides ChartContainer's default `aspect-video` so every
 // dashboard chart is the same height regardless of its grid column's width.
-const CHART_BOX = 'nx:h-[260px] nx:w-full';
+const CHART_BOX = 'nx:h-[260px] nx:w-full nx:min-w-0';
 
+// Single-series hero charts use the brand token; multi-series keep categorical.
 const revenueConfig = {
-  revenue: { label: 'Revenue', color: 'var(--nx-color-chart-categorical-1)' },
+  revenue: { label: 'Revenue', color: 'var(--nx-color-primary-background)' },
 } satisfies ChartConfig;
 
 /** Revenue over the period — the hero metric. Single series, so no legend. */
@@ -102,7 +103,7 @@ export function AudienceChart({ data }: { data: TrendPoint[] }) {
 }
 
 const sessionsConfig = {
-  sessions: { label: 'Sessions', color: 'var(--nx-color-chart-categorical-4)' },
+  sessions: { label: 'Sessions', color: 'var(--nx-color-primary-background)' },
 } satisfies ChartConfig;
 
 /** Session volume trend. Single series, so no legend. */

@@ -15,10 +15,13 @@ import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
+import { PageHeader } from '../../components/page-header';
+import { useMediaQuery } from '../../hooks/use-media-query';
 import { crmKeys, fetchContacts } from '../../lib/crm-api';
 
 import { ContactFormSheet } from './contact-form-sheet';
 import { ContactsBoard } from './contacts-board';
+import { ContactCardList } from './contacts-card-list';
 import { contactColumns } from './contacts-columns';
 import type { ContactsView } from './contacts-search';
 import { ContactsToolbar } from './contacts-toolbar';
@@ -34,6 +37,15 @@ export function ContactsRoute() {
   const { view, status } = crmRoute.useSearch();
   const navigate = crmRoute.useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 64rem)');
+
+  // The status facet applies to the table / card list (board is organised by
+  // status, so it ignores the facet).
+  const tableData = contacts
+    ? status.length > 0
+      ? contacts.filter((c) => status.includes(c.status))
+      : contacts
+    : [];
 
   const setSearch = (patch: Partial<ContactsView>) =>
     navigate({
@@ -48,20 +60,15 @@ export function ContactsRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <header className="nx:flex nx:items-start nx:justify-between nx:gap-4">
-        <div className="nx:space-y-1">
-          <h1 className="nx:typography-heading-large nx:text-foreground">
-            Contacts
-          </h1>
-          <p className="nx:text-muted-foreground">
-            Everyone in your pipeline. Sort, filter, and select to act in bulk.
-          </p>
-        </div>
+      <PageHeader
+        title="Contacts"
+        description="Everyone in your pipeline. Sort, filter, and select to act in bulk."
+      >
         <Button onClick={() => setCreateOpen(true)}>
           <IconPlus />
           New contact
         </Button>
-      </header>
+      </PageHeader>
 
       <ContactsToolbar view={view} status={status} setSearch={setSearch} />
 
@@ -78,17 +85,15 @@ export function ContactsRoute() {
           <ContactsEmpty />
         ) : view === 'board' ? (
           <ContactsBoard contacts={contacts} />
-        ) : (
+        ) : isDesktop ? (
           <DataTable
             columns={contactColumns}
-            data={
-              status.length > 0
-                ? contacts.filter((c) => status.includes(c.status))
-                : contacts
-            }
+            data={tableData}
             filterColumn="name"
             filterPlaceholder="Filter by name…"
           />
+        ) : (
+          <ContactCardList contacts={tableData} />
         ))}
 
       <ContactFormSheet open={createOpen} onOpenChange={setCreateOpen} />

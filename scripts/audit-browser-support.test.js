@@ -90,6 +90,12 @@ describe('audit-browser-support', () => {
           problem: null,
         }),
         expect.objectContaining({
+          id: 'accent-color',
+          policy: 'progressive-enhancement',
+          floorSafe: true,
+          problem: null,
+        }),
+        expect.objectContaining({
           id: 'field-sizing',
           policy: 'progressive-enhancement',
           floorSafe: false,

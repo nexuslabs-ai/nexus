@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
 import { ErrorState } from '../../components/error-state';
+import { PageHeader } from '../../components/page-header';
 import {
   ANALYTICS_RANGES,
   analyticsKeys,
@@ -52,15 +53,10 @@ export function AnalyticsRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <header className="nx:flex nx:flex-wrap nx:items-start nx:justify-between nx:gap-4">
-        <div className="nx:space-y-1">
-          <h1 className="nx:typography-heading-large nx:text-foreground">
-            Analytics
-          </h1>
-          <p className="nx:text-muted-foreground">
-            Revenue, audience, and traffic across your workspace.
-          </p>
-        </div>
+      <PageHeader
+        title="Analytics"
+        description="Revenue, audience, and traffic across your workspace."
+      >
         <ToggleGroup
           type="single"
           variant="outline"
@@ -74,7 +70,7 @@ export function AnalyticsRoute() {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-      </header>
+      </PageHeader>
 
       {isPending && <AnalyticsSkeleton />}
       {isError && (
@@ -157,7 +153,7 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card>
+    <Card className="nx:min-w-0">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>

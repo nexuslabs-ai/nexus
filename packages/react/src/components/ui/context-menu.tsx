@@ -141,6 +141,7 @@ function ContextMenuSubContent({
         'nx:data-[side=left]:slide-in-from-right-2',
         'nx:data-[side=right]:slide-in-from-left-2',
         'nx:data-[side=top]:slide-in-from-bottom-2',
+        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
         className
       )}
       {...props}
@@ -188,6 +189,7 @@ function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
           'nx:data-[side=left]:slide-in-from-right-2',
           'nx:data-[side=right]:slide-in-from-left-2',
           'nx:data-[side=top]:slide-in-from-bottom-2',
+          'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
           className
         )}
         {...props}

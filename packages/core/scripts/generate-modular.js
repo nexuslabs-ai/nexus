@@ -21,6 +21,7 @@ import {
   formatDistCssFiles,
   formatTokenValue,
   generateBorderWidthUtilitiesCSS,
+  generateNativeBrowserUIThemeCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   generateThemeCSS,
@@ -338,6 +339,8 @@ function generateModularGlobalsCSS(
   // under `:root, [data-style="X"]`; the other six emit as bare
   // `[data-style="X"]` blocks (alphabetical for determinism).
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
+
+  css += generateNativeBrowserUIThemeCSS();
 
   writeModularFile(distDir, 'globals.css', css);
 
