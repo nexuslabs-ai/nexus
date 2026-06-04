@@ -12,7 +12,7 @@ import {
   IconSettings,
   IconUser,
 } from '@tabler/icons-react';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 
 import {
   Sidebar,
@@ -291,6 +291,11 @@ export const WithDataAttributes: Story = {
       '[data-slot="sidebar-menu-button"][data-active="true"]'
     );
     await expect(activeButton).toBeInTheDocument();
+
+    // The content region is a labelled navigation landmark (issue #418).
+    await expect(
+      within(canvasElement).getByRole('navigation', { name: 'Sidebar' })
+    ).toBeInTheDocument();
   },
 };
 
