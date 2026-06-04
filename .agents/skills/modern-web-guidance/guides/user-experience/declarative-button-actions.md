@@ -1,4 +1,5 @@
 # Declarative Button Actions
+
 The Invoker Commands API allows buttons to trigger actions on target elements declaratively using HTML attributes. This approach reduces the need for manual event listeners and ensures interactivity as soon as the HTML is parsed.
 
 For custom, application-specific actions, you can define your own command names. Custom commands must be prefixed with a double dash (`--`) to avoid collisions with future built-in browser commands.
@@ -13,49 +14,43 @@ For custom, application-specific actions, you can define your own command names.
 
 ```html
 <!-- The target element that will respond to custom commands -->
-<div id="action-target" class="target">
-  Action Target
-</div>
+<div id="action-target" class="target">Action Target</div>
 
 <!-- Buttons declaratively linked to the target element -->
 <!-- Each button sends a unique custom command starting with '--' -->
-<button commandfor="action-target" command="--spin">
-  Spin
-</button>
+<button commandfor="action-target" command="--spin">Spin</button>
 
-<button commandfor="action-target" command="--grow">
-  Grow
-</button>
+<button commandfor="action-target" command="--grow">Grow</button>
 
-<button commandfor="action-target" command="--reset">
-  Reset All
-</button>
+<button commandfor="action-target" command="--reset">Reset All</button>
 
 <script>
   // Listen for the 'command' event directly on the target element
   // (This is necessary because the native 'command' event does not bubble)
-  document.getElementById('action-target').addEventListener('command', (event) => {
-    // Robustly handle both native API and manual/polyfill fallbacks
-    const command = event.command || event.detail?.command;
-    const target = event.currentTarget;
+  document
+    .getElementById('action-target')
+    .addEventListener('command', (event) => {
+      // Robustly handle both native API and manual/polyfill fallbacks
+      const command = event.command || event.detail?.command;
+      const target = event.currentTarget;
 
-    // Custom commands are checked to identify the requested action
-    if (command === '--spin') {
-      target.classList.toggle('is-spun');
-    } else if (command === '--grow') {
-      target.classList.toggle('is-grown');
-    } else if (command === '--reset') {
-      // Clear all custom classes to return to initial state
-      target.classList.remove('is-spun', 'is-grown');
-    }
-  });
+      // Custom commands are checked to identify the requested action
+      if (command === '--spin') {
+        target.classList.toggle('is-spun');
+      } else if (command === '--grow') {
+        target.classList.toggle('is-grown');
+      } else if (command === '--reset') {
+        // Clear all custom classes to return to initial state
+        target.classList.remove('is-spun', 'is-grown');
+      }
+    });
 </script>
 ```
 
 ## Key constraints
 
-*   **Prefix custom commands**: MANDATORY: All custom command names must start with `--` (e.g., `command="--my-action"`).
-*   **Targeting**: The `commandfor` attribute must match the `id` of an element in the same document tree.
+- **Prefix custom commands**: MANDATORY: All custom command names must start with `--` (e.g., `command="--my-action"`).
+- **Targeting**: The `commandfor` attribute must match the `id` of an element in the same document tree.
 
 ## Fallback strategies
 
@@ -109,22 +104,26 @@ if (!supportsInvokers) {
     const command = button.getAttribute('command');
 
     if (target && command) {
-      target.dispatchEvent(new CustomEvent('command', {
-        bubbles: true,
-        detail: { command }
-      }));
+      target.dispatchEvent(
+        new CustomEvent('command', {
+          bubbles: true,
+          detail: { command },
+        })
+      );
     }
   });
 }
 
 // 3. The unified listener: Registered directly on the target element
-document.getElementById('action-target').addEventListener('command', (event) => {
-  const command = event.command || event.detail?.command;
-  const target = event.currentTarget;
-  const action = commandRegistry[command];
+document
+  .getElementById('action-target')
+  .addEventListener('command', (event) => {
+    const command = event.command || event.detail?.command;
+    const target = event.currentTarget;
+    const action = commandRegistry[command];
 
-  if (action) {
-    action(target);
-  }
-});
+    if (action) {
+      action(target);
+    }
+  });
 ```

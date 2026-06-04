@@ -11,9 +11,7 @@ Popovers can be toggled open and closed using a single button.
 ```html
 <!-- MANDATORY: The commandfor attribute links the invoker to the ID of the target element so the browser knows what to control. -->
 <!-- MANDATORY: The command attribute specifies the action to perform. Use 'toggle-popover' to handle both open and close states automatically. -->
-<button commandfor="my-popover" command="toggle-popover">
-  Toggle Popover
-</button>
+<button commandfor="my-popover" command="toggle-popover">Toggle Popover</button>
 
 <!-- MANDATORY: The target element must have the popover attribute to be controlled as a popover. -->
 <div id="my-popover" popover>
@@ -54,9 +52,7 @@ Unlike popovers, modal dialogs typically use separate buttons for opening and cl
   <p>Are you sure you want to proceed?</p>
 
   <!-- MANDATORY: Use command="close" to dismiss the dialog safely. -->
-  <button commandfor="confirm-dialog" command="close">
-    Cancel
-  </button>
+  <button commandfor="confirm-dialog" command="close">Cancel</button>
 </dialog>
 ```
 
@@ -151,24 +147,28 @@ if (!supportsInvokers) {
     const command = button.getAttribute('command');
 
     if (target && command) {
-      target.dispatchEvent(new CustomEvent('command', {
-        bubbles: true,
-        detail: { command }
-      }));
+      target.dispatchEvent(
+        new CustomEvent('command', {
+          bubbles: true,
+          detail: { command },
+        })
+      );
     }
   });
 }
 
 // 3. The unified listener: Registered directly on the target element
-document.getElementById('action-target').addEventListener('command', (event) => {
-  const command = event.command || event.detail?.command;
-  const target = event.currentTarget;
-  const action = commandRegistry[command];
+document
+  .getElementById('action-target')
+  .addEventListener('command', (event) => {
+    const command = event.command || event.detail?.command;
+    const target = event.currentTarget;
+    const action = commandRegistry[command];
 
-  if (action) {
-    action(target);
-  }
-});
+    if (action) {
+      action(target);
+    }
+  });
 ```
 
 ### Polyfilling the Popover Attribute
@@ -197,9 +197,11 @@ For projects without a bundler, dynamically import the polyfill directly from a 
   // MANDATORY: Feature detect 'popover' on HTMLElement.prototype.
   // Conditionally load the popover-polyfill from a CDN only in browsers lacking native support.
   if (!('popover' in HTMLElement.prototype)) {
-    import('https://unpkg.com/@oddbird/popover-polyfill@latest/dist/popover-fn.js').then(({ apply }) => {
-      apply();
-    });
+    import('https://unpkg.com/@oddbird/popover-polyfill@latest/dist/popover-fn.js').then(
+      ({ apply }) => {
+        apply();
+      }
+    );
   }
 </script>
 ```
