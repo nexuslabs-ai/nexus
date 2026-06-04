@@ -108,6 +108,39 @@ function UsernameForm({ extraDescriptionId }: { extraDescriptionId?: string }) {
   );
 }
 
+function MessageLessErrorForm() {
+  const form = useForm<{ code: string }>({
+    defaultValues: { code: '' },
+  });
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(() => undefined)}
+        className="nx:w-[360px]"
+      >
+        <FormField
+          control={form.control}
+          name="code"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Invite code</FormLabel>
+              <FormControl>
+                <Input placeholder="NX-123" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="nx:mt-4">
+          Redeem code
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
 /**
  * Showcase of the field anatomy across its resting configurations: a full
  * field, a label-plus-control field, and a disabled control. Every field keeps
@@ -288,6 +321,22 @@ export const WithMergedDescription: Story = {
       'aria-describedby',
       `${description.getAttribute('id')} username-extra-description`
     );
+  },
+};
+
+export const WithoutErrorMessage: Story = {
+  render: () => <MessageLessErrorForm />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText('Invite code');
+
+    await userEvent.click(canvas.getByRole('button', { name: /redeem code/i }));
+
+    await waitFor(() => expect(input).toHaveAttribute('aria-invalid', 'true'));
+    await expect(input).not.toHaveAttribute('aria-errormessage');
+    await expect(
+      canvasElement.querySelector('[data-slot="form-message"]')
+    ).toHaveAttribute('role', 'alert');
   },
 };
 

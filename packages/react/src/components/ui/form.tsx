@@ -212,6 +212,7 @@ function FormControl({
     hasDescription,
     hasMessage,
   } = useFormField();
+  const hasErrorMessage = Boolean(error?.message);
   const describedBy =
     [hasDescription ? formDescriptionId : undefined, ariaDescribedBy]
       .filter(Boolean)
@@ -224,7 +225,9 @@ function FormControl({
       id={formItemId}
       aria-describedby={describedBy}
       aria-invalid={!!error}
-      aria-errormessage={error && hasMessage ? formMessageId : undefined}
+      aria-errormessage={
+        hasErrorMessage && hasMessage ? formMessageId : undefined
+      }
     />
   );
 }
