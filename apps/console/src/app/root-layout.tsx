@@ -5,8 +5,9 @@ import { Outlet } from '@tanstack/react-router';
 
 import { AppSidebar } from '../shell/app-sidebar';
 import { CommandPalette } from '../shell/command-palette';
-import { useSidebarStore } from '../shell/sidebar-store';
 import { Topbar } from '../shell/topbar';
+
+import { useSidebarStore } from './sidebar-store';
 
 /**
  * The authenticated app shell, rendered by the `_app` pathless layout route
