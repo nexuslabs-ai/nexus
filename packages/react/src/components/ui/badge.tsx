@@ -261,17 +261,21 @@ function BadgeAction({
   type = 'button',
   ...props
 }: BadgeActionProps) {
-  const Comp = asChild ? Slot : 'button';
+  const classes = cn(
+    // nexus-allow-numeric: chip action affordance
+    'nx:inline-flex nx:size-3.5 nx:items-center nx:justify-center nx:rounded-sm nx:p-0 nx:text-current nx:opacity-70 nx:transition-opacity nx:hover:opacity-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-40 nx:[&_svg]:size-3.5',
+    className
+  );
+
+  if (asChild) {
+    return <Slot data-slot="badge-action" className={classes} {...props} />;
+  }
 
   return (
-    <Comp
+    <button
       type={type}
       data-slot="badge-action"
-      className={cn(
-        // nexus-allow-numeric: chip action affordance
-        'nx:inline-flex nx:size-3.5 nx:items-center nx:justify-center nx:rounded-sm nx:p-0 nx:text-current nx:opacity-70 nx:transition-opacity nx:hover:opacity-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-40 nx:[&_svg]:size-3.5',
-        className
-      )}
+      className={classes}
       {...props}
     />
   );

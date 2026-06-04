@@ -360,6 +360,30 @@ export const DisabledAction: Story = {
   },
 };
 
+export const ActionAsChild: Story = {
+  render: (_args) => (
+    <Badge variant="secondary" fill="light" isCaps={false}>
+      Details
+      <BadgeAction asChild>
+        <a href="https://example.com/badge-action" aria-label="Open details">
+          <IconX aria-hidden />
+        </a>
+      </BadgeAction>
+    </Badge>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const action = canvas.getByRole('link', { name: 'Open details' });
+
+    await expect(action).toHaveAttribute(
+      'href',
+      'https://example.com/badge-action'
+    );
+    await expect(action).toHaveAttribute('data-slot', 'badge-action');
+    await expect(action).not.toHaveAttribute('type');
+  },
+};
+
 // ============================================
 // NUMBER BADGES
 // ============================================
