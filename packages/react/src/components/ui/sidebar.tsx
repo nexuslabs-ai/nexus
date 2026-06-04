@@ -564,18 +564,25 @@ function SidebarSeparator({ className, ...props }: SidebarSeparatorProps) {
  *
  * Props for the SidebarContent component.
  */
-interface SidebarContentProps extends React.ComponentProps<'div'> {}
+interface SidebarContentProps extends React.ComponentProps<'nav'> {}
 
 /**
  * SidebarContent
  *
- * Scrollable middle region holding the sidebar's groups and menus. Hides
- * overflow when collapsed to the icon rail.
+ * The sidebar's scrollable nav region holding its groups and menus. Renders as a
+ * `<nav>` landmark, named via `aria-label` (default "Sidebar"), so assistive tech
+ * can jump to it — pass a distinct `aria-label` when a page has more than one
+ * navigation. Hides overflow when collapsed to the icon rail.
  */
-function SidebarContent({ className, ...props }: SidebarContentProps) {
+function SidebarContent({
+  className,
+  'aria-label': ariaLabel = 'Sidebar',
+  ...props
+}: SidebarContentProps) {
   return (
-    <div
+    <nav
       data-slot="sidebar-content"
+      aria-label={ariaLabel}
       className={cn(
         // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:flex nx:min-h-0 nx:flex-1 nx:flex-col nx:gap-2 nx:overflow-auto nx:group-data-[collapsible=icon]:overflow-hidden',
