@@ -3,13 +3,17 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
+import { DOCS_THEME_BOOTSTRAP_SCRIPT } from './theme-bootstrap-script';
 import {
   DEFAULT_THEME_STATE,
+  DOCS_DARK_MODE_STORAGE_KEY,
+  DOCS_THEME_STORAGE_KEY,
   getThemeStylesheetHref,
   sanitizeMode,
   sanitizeStoredColorScheme,
   sanitizeThemeState,
   THEME_MODE_VALUES,
+  THEME_STYLESHEET_HREFS,
   THEME_STYLESHEET_MODE_KEYS,
 } from './theme-modes';
 
@@ -82,5 +86,55 @@ describe('docs theme modes', () => {
     expect(sanitizeStoredColorScheme('dark')).toBe('dark');
     expect(sanitizeStoredColorScheme('light')).toBe('light');
     expect(sanitizeStoredColorScheme('auto')).toBeNull();
+  });
+
+  it('executes the bootstrap script with sanitized persisted theme values', () => {
+    localStorage.clear();
+    document.head.replaceChildren();
+    document.documentElement.removeAttribute('data-style');
+    document.documentElement.classList.remove('dark');
+
+    localStorage.setItem(
+      DOCS_THEME_STORAGE_KEY,
+      JSON.stringify({
+        state: {
+          base: '../base-slate',
+          brand: '/themes/brands-pink.css',
+          spacing: 'sera);document.body.innerHTML=""',
+          typography: 'nova',
+          shadow: 'javascript:alert(1)',
+          radius: 'smooth',
+          borderwidth: 'mira',
+        },
+      })
+    );
+    localStorage.setItem(DOCS_DARK_MODE_STORAGE_KEY, 'javascript:alert(1)');
+
+    window.eval(DOCS_THEME_BOOTSTRAP_SCRIPT);
+
+    expect(
+      document.head
+        .querySelector<HTMLLinkElement>('link:not([data-theme])')
+        ?.getAttribute('href')
+    ).toBe('/themes/focus-default.css');
+    expect(document.documentElement.getAttribute('data-style')).toBe(
+      DEFAULT_THEME_STATE.spacing
+    );
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+
+    const themeLinks = Array.from(
+      document.head.querySelectorAll<HTMLLinkElement>('link[data-theme]')
+    );
+
+    expect(
+      themeLinks.map((link) => [link.dataset.theme, link.getAttribute('href')])
+    ).toEqual([
+      ['base', THEME_STYLESHEET_HREFS.base[DEFAULT_THEME_STATE.base]],
+      ['brand', THEME_STYLESHEET_HREFS.brand[DEFAULT_THEME_STATE.brand]],
+      ['typography', THEME_STYLESHEET_HREFS.typography.nova],
+      ['shadow', THEME_STYLESHEET_HREFS.shadow[DEFAULT_THEME_STATE.shadow]],
+      ['radius', THEME_STYLESHEET_HREFS.radius.smooth],
+      ['borderwidth', THEME_STYLESHEET_HREFS.borderwidth.mira],
+    ]);
   });
 });
