@@ -68,7 +68,7 @@ export const FEATURE_POLICIES = Object.freeze([
   {
     id: 'popover-api',
     name: 'Popover API',
-    policy: 'defer',
+    policy: 'intentional-divergence',
     support: {
       chrome: 114,
       edge: 114,
@@ -96,7 +96,7 @@ export const FEATURE_POLICIES = Object.freeze([
   {
     id: 'anchor-positioning',
     name: 'CSS Anchor Positioning',
-    policy: 'defer',
+    policy: 'fallback',
     support: {
       chrome: 125,
       edge: 125,
@@ -110,7 +110,7 @@ export const FEATURE_POLICIES = Object.freeze([
   {
     id: 'container-style-queries',
     name: 'Container style queries',
-    policy: 'defer',
+    policy: 'fallback',
     support: {
       chrome: 111,
       edge: 111,
@@ -124,7 +124,7 @@ export const FEATURE_POLICIES = Object.freeze([
   {
     id: 'scroll-state-queries',
     name: 'Container scroll-state queries',
-    policy: 'defer',
+    policy: 'progressive-enhancement',
     support: {
       chrome: 133,
       edge: 133,
@@ -138,7 +138,7 @@ export const FEATURE_POLICIES = Object.freeze([
   {
     id: 'field-sizing',
     name: 'field-sizing: content',
-    policy: 'defer',
+    policy: 'progressive-enhancement',
     support: {
       chrome: 123,
       edge: 123,
@@ -152,7 +152,7 @@ export const FEATURE_POLICIES = Object.freeze([
   {
     id: 'scrollbar-color',
     name: 'scrollbar-color / scrollbar-width',
-    policy: 'defer',
+    policy: 'intentional-divergence',
     support: {
       chrome: 121,
       edge: 121,
@@ -173,9 +173,32 @@ const BROWSER_LABELS = Object.freeze({
   samsung: 'Samsung Internet',
 });
 
-const POLICY_LABELS = Object.freeze({
-  adopt: 'Adopt',
-  defer: 'Defer',
+export const FEATURE_POLICY_DEFINITIONS = Object.freeze({
+  adopt: {
+    label: 'Adopt',
+    requiresFloorSupport: true,
+    reconsiderWhenFloorSafe: false,
+  },
+  'progressive-enhancement': {
+    label: 'Progressive enhancement',
+    requiresFloorSupport: false,
+    reconsiderWhenFloorSafe: false,
+  },
+  fallback: {
+    label: 'Fallback required',
+    requiresFloorSupport: false,
+    reconsiderWhenFloorSafe: false,
+  },
+  'intentional-divergence': {
+    label: 'Intentional divergence',
+    requiresFloorSupport: false,
+    reconsiderWhenFloorSafe: false,
+  },
+  defer: {
+    label: 'Defer',
+    requiresFloorSupport: false,
+    reconsiderWhenFloorSafe: true,
+  },
 });
 
 function compareVersions(actual, required) {
@@ -207,14 +230,17 @@ export function evaluateFeaturePolicies(
 ) {
   return features.map((feature) => {
     const floorSafe = isFeatureSafeAtFloor(feature, floor);
+    const policy = FEATURE_POLICY_DEFINITIONS[feature.policy];
     let problem = null;
 
-    if (feature.policy === 'adopt' && !floorSafe) {
-      problem = 'marked adopt, but does not clear the browser floor';
+    if (!policy) {
+      problem = `uses unknown policy "${feature.policy}"`;
+    } else if (policy.requiresFloorSupport && !floorSafe) {
+      problem = `marked ${policy.label.toLowerCase()}, but does not clear the browser floor`;
     }
 
-    if (feature.policy === 'defer' && floorSafe) {
-      problem = 'marked defer, but now clears the browser floor';
+    if (!problem && policy.reconsiderWhenFloorSafe && floorSafe) {
+      problem = `marked ${policy.label.toLowerCase()}, but now clears the browser floor`;
     }
 
     return {
@@ -278,8 +304,11 @@ function printResult(result) {
   process.stdout.write('\nMWG feature policies:\n');
   for (const feature of result.features) {
     const status = feature.floorSafe ? 'floor-safe' : 'outside floor';
+    const policy =
+      FEATURE_POLICY_DEFINITIONS[feature.policy]?.label ??
+      `Unknown policy "${feature.policy}"`;
     process.stdout.write(
-      `  ${feature.id}: ${POLICY_LABELS[feature.policy]} (${status}) — ${feature.guide}\n`
+      `  ${feature.id}: ${policy} (${status}) — ${feature.guide}\n`
     );
   }
 

@@ -7,6 +7,7 @@ import {
   evaluateFeaturePolicies,
   EXPECTED_BROWSERSLIST,
   FEATURE_POLICIES,
+  FEATURE_POLICY_DEFINITIONS,
   isFeatureSafeAtFloor,
 } from './audit-browser-support.js';
 
@@ -42,6 +43,14 @@ describe('audit-browser-support', () => {
   it('keeps feature policies aligned with floor support', () => {
     const results = evaluateFeaturePolicies();
 
+    expect(Object.keys(FEATURE_POLICY_DEFINITIONS).sort()).toEqual([
+      'adopt',
+      'defer',
+      'fallback',
+      'intentional-divergence',
+      'progressive-enhancement',
+    ]);
+
     expect(results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -52,7 +61,19 @@ describe('audit-browser-support', () => {
         }),
         expect.objectContaining({
           id: 'field-sizing',
-          policy: 'defer',
+          policy: 'progressive-enhancement',
+          floorSafe: false,
+          problem: null,
+        }),
+        expect.objectContaining({
+          id: 'popover-api',
+          policy: 'intentional-divergence',
+          floorSafe: false,
+          problem: null,
+        }),
+        expect.objectContaining({
+          id: 'container-style-queries',
+          policy: 'fallback',
           floorSafe: false,
           problem: null,
         }),
@@ -108,6 +129,32 @@ describe('audit-browser-support', () => {
       expect.objectContaining({
         floorSafe: true,
         problem: 'marked defer, but now clears the browser floor',
+      })
+    );
+  });
+
+  it('flags unknown feature policies', () => {
+    const results = evaluateFeaturePolicies([
+      {
+        id: 'misspelled-policy',
+        name: 'Misspelled Policy',
+        policy: 'adpot',
+        support: {
+          chrome: 111,
+          edge: 111,
+          firefox: 113,
+          safari: 15.4,
+          samsung: 22,
+        },
+        guide: 'css',
+        note: 'test fixture',
+      },
+    ]);
+
+    expect(results[0]).toEqual(
+      expect.objectContaining({
+        floorSafe: true,
+        problem: 'uses unknown policy "adpot"',
       })
     );
   });
