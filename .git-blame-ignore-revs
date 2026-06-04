@@ -1,0 +1,14 @@
+# Revisions to skip in `git blame` — bulk formatting / mechanical passes that
+# add noise, not authorship. GitHub's blame view honors this file automatically;
+# to enable it locally once:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# formatted files
+b50172cfbe522f7a58dc3407fb758930385c2ddc
+
+# style(playground): format with prettier
+565e2f7fdfc61d24f3e98493f24b863d57ca5a08
+
+# After prasad/cleanup merges, add its mechanical passes here — the yarn->pnpm
+# migration and the CONTRIBUTING/README rewrite — once their SHAs settle.
