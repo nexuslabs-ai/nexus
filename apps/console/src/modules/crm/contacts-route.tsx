@@ -15,10 +15,12 @@ import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
+import { useMediaQuery } from '../../hooks/use-media-query';
 import { crmKeys, fetchContacts } from '../../lib/crm-api';
 
 import { ContactFormSheet } from './contact-form-sheet';
 import { ContactsBoard } from './contacts-board';
+import { ContactCardList } from './contacts-card-list';
 import { contactColumns } from './contacts-columns';
 import type { ContactsView } from './contacts-search';
 import { ContactsToolbar } from './contacts-toolbar';
@@ -34,6 +36,15 @@ export function ContactsRoute() {
   const { view, status } = crmRoute.useSearch();
   const navigate = crmRoute.useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 64rem)');
+
+  // The status facet applies to the table / card list (board is organised by
+  // status, so it ignores the facet).
+  const tableData = contacts
+    ? status.length > 0
+      ? contacts.filter((c) => status.includes(c.status))
+      : contacts
+    : [];
 
   const setSearch = (patch: Partial<ContactsView>) =>
     navigate({
@@ -78,17 +89,15 @@ export function ContactsRoute() {
           <ContactsEmpty />
         ) : view === 'board' ? (
           <ContactsBoard contacts={contacts} />
-        ) : (
+        ) : isDesktop ? (
           <DataTable
             columns={contactColumns}
-            data={
-              status.length > 0
-                ? contacts.filter((c) => status.includes(c.status))
-                : contacts
-            }
+            data={tableData}
             filterColumn="name"
             filterPlaceholder="Filter by name…"
           />
+        ) : (
+          <ContactCardList contacts={tableData} />
         ))}
 
       <ContactFormSheet open={createOpen} onOpenChange={setCreateOpen} />

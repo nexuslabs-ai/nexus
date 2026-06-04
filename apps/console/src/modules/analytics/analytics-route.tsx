@@ -157,7 +157,7 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card>
+    <Card className="nx:min-w-0">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>

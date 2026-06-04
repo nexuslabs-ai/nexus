@@ -14,9 +14,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
+import { useMediaQuery } from '../../hooks/use-media-query';
 import { fetchIssues, projectKeys } from '../../lib/projects-api';
 
 import { IssueFormSheet } from './issue-form-sheet';
+import { IssueCardList } from './issues-card-list';
 import { issueColumns } from './issues-columns';
 
 export function IssuesRoute() {
@@ -26,6 +28,7 @@ export function IssuesRoute() {
   });
   const issues = data?.issues;
   const [createOpen, setCreateOpen] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 64rem)');
 
   return (
     <div className="nx:space-y-6 nx:p-6">
@@ -56,13 +59,15 @@ export function IssuesRoute() {
       {issues &&
         (issues.length === 0 ? (
           <IssuesEmpty />
-        ) : (
+        ) : isDesktop ? (
           <DataTable
             columns={issueColumns}
             data={issues}
             filterColumn="title"
             filterPlaceholder="Filter by title…"
           />
+        ) : (
+          <IssueCardList issues={issues} />
         ))}
 
       <IssueFormSheet open={createOpen} onOpenChange={setCreateOpen} />
