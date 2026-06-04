@@ -290,7 +290,7 @@ make serve        # local docs-mcp server + web dashboard at :6282 for indexing
 make publish      # login → export DB → build image → push to GHCR
 ```
 
-The index DB ships **inside** the image, never in git. `docs-mcp/index.manifest.json` is not kept — the live index is the source of truth; `list_libraries` shows what's in it.
+The index DB ships **inside** the image, never in git — the live index is the source of truth, and `list_libraries` shows what's in it.
 
 ### Lifecycle reference
 
