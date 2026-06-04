@@ -123,11 +123,11 @@ Each developer's `gh` CLI is logged in to two accounts:
 | Account                    | Role          | Used For                                                           |
 | -------------------------- | ------------- | ------------------------------------------------------------------ |
 | Your personal GitHub login | Main (active) | Everything except posting reviews — PRs, issues, commits, fetching |
-| `examlly-tech`             | Shared bot    | **Posting** PR reviews only (`POST /pulls/{n}/reviews`)            |
+| `nexuslabs-ai-bot`         | Shared bot    | **Posting** PR reviews only (`POST /pulls/{n}/reviews`)            |
 
-**First-time setup:** run `gh auth login` to add the `examlly-tech` bot (ask a teammate for credentials), then `gh auth switch --user <your-personal-account>` so your own account stays active.
+**First-time setup:** run `gh auth login` to add the `nexuslabs-ai-bot` bot (ask a teammate for credentials), then `gh auth switch --user <your-personal-account>` so your own account stays active.
 
-When posting a PR review, prefix the command with `GH_TOKEN=$(gh auth token --user examlly-tech)` to post from the bot. This keeps review comments attributed to the bot and avoids GitHub's self-authored-PR rejection of `APPROVE` / `REQUEST_CHANGES`, since the bot is never the PR author.
+When posting a PR review, prefix the command with `GH_TOKEN=$(gh auth token --user nexuslabs-ai-bot)` to post from the bot. This keeps review comments attributed to the bot and avoids GitHub's self-authored-PR rejection of `APPROVE` / `REQUEST_CHANGES`, since the bot is never the PR author.
 
 Every other `gh` command — fetching reviews, reading comments, creating PRs, etc. — uses your personal account as-is, no prefix.
 
@@ -186,10 +186,10 @@ gh pr view {pr_number} --json files
 
 ### Creating PR Reviews
 
-Posted from the `examlly-tech` bot account (see [Accounts](#accounts)):
+Posted from the `nexuslabs-ai-bot` bot account (see [Accounts](#accounts)):
 
 ```bash
-GH_TOKEN=$(gh auth token --user examlly-tech) \
+GH_TOKEN=$(gh auth token --user nexuslabs-ai-bot) \
   gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --method POST \
   --input - <<'EOF'
@@ -287,4 +287,4 @@ _Review performed against: `.claude/rules/` guidelines_
 - Forget `Closes #123` in PR body (breaks auto-close on merge)
 - Use `Fixes` inconsistently (prefer `Closes` for consistency)
 - Skip the Test Plan section
-- Post PR reviews without the `GH_TOKEN=$(gh auth token --user examlly-tech)` prefix (reviews must come from the bot)
+- Post PR reviews without the `GH_TOKEN=$(gh auth token --user nexuslabs-ai-bot)` prefix (reviews must come from the bot)
