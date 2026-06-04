@@ -25,6 +25,7 @@
     "typecheck": "turbo run typecheck",
     "tokens:modular": "yarn workspace @nexus/core build:tokens:modular && node scripts/sync-console-themes.js && node scripts/sync-docs-themes.js",
     "tokens:tailwind": "cd packages/core && yarn build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
+    "audit:browser-support": "node scripts/audit-browser-support.js",
     "audit:contrast": "yarn workspace @nexus/core audit:contrast",
     "audit:storybook-coverage": "yarn workspace @nexus/react audit:storybook-coverage",
     "validate:spacing-modes": "yarn workspace @nexus/core validate:spacing-modes",
@@ -88,6 +89,13 @@
   "engines": {
     "node": ">=20.19.0"
   },
+  "browserslist": [
+    "Chrome >= 111",
+    "Edge >= 111",
+    "Firefox >= 113",
+    "Safari >= 15.4",
+    "Samsung >= 22"
+  ],
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix",

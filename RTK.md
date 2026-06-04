@@ -26,7 +26,10 @@ Browser support is Chrome 111+, Edge 111+, Firefox 113+, Safari 15.4+, and
 Samsung Internet 22+. OKLCH is the browser-floor feature and is documented as
 Baseline 2023, but do not treat all Baseline 2023 features as safe by default.
 Check the specific feature's support against this browser floor and use
-progressive enhancement or fallbacks where the floor does not cover it.
+progressive enhancement or fallbacks where the floor does not cover it. The
+canonical floor is also encoded in root `package.json#browserslist`; run
+`yarn audit:browser-support` when adopting or reclassifying browser-platform
+features from Modern Web Guidance.
 
 ## Command Reference
 
@@ -43,6 +46,7 @@ yarn lint
 yarn test
 yarn test:unit
 yarn test:storybook
+yarn audit:browser-support
 yarn audit:contrast
 yarn audit:storybook-coverage
 ```

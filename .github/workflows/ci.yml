@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       react: ${{ steps.filter.outputs.react }}
+      browser: ${{ steps.filter.outputs.browser }}
       # `packages` is true if `packages/**` changed OR if `apps/**` changed
       # outside `apps/docs/**`. See the two paths-filter steps below.
       packages: ${{ steps.filter.outputs.packages == 'true' || steps.filter-apps.outputs.apps == 'true' }}
@@ -53,6 +54,14 @@ jobs:
               - 'packages/test-utils/**'
             packages:
               - 'packages/**'
+            browser:
+              - 'package.json'
+              - 'scripts/audit-browser-support.js'
+              - 'scripts/audit-browser-support.test.js'
+              - 'README.md'
+              - 'AGENTS.md'
+              - 'RTK.md'
+              - '.claude/rules/tokens.md'
             ci:
               - '.github/workflows/**'
 
@@ -79,7 +88,10 @@ jobs:
     name: Format Check
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.packages == 'true' ||
+      needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -100,7 +112,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.packages == 'true' ||
+      needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -129,6 +144,27 @@ jobs:
   # ============================================
   # Build (affected packages only)
   # ============================================
+
+  audit-browser-support:
+    name: Audit Browser Support
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.browser == 'true' || needs.changes.outputs.ci == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Audit browser support floor
+        run: yarn audit:browser-support
 
   build:
     name: Build
@@ -233,7 +269,10 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.react == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.react == 'true' ||
+      needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -443,6 +482,7 @@ jobs:
       - changes
       - format-check
       - lint
+      - audit-browser-support
       - build
       - typecheck
       - test-unit
