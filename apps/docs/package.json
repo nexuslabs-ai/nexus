@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start",
     "gen:themes": "cd ../.. && yarn tokens:tailwind && yarn tokens:modular",
+    "audit:csp": "node scripts/audit-csp-inventory.mjs",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next dist"
   },

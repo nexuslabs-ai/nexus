@@ -1,5 +1,11 @@
 'use client';
 
+import {
+  getThemeStylesheetHref,
+  sanitizeMode,
+  THEME_MODE_OPTIONS,
+  type ThemeStylesheetMode,
+} from '../_lib/theme-modes';
 import { useThemeStore } from '../_stores/use-theme-store';
 
 import { Button } from './nexus';
@@ -11,15 +17,17 @@ import { Button } from './nexus';
  * stays in sync with the picker.
  */
 
-const BASES = ['slate', 'stone', 'neutral', 'gray', 'zinc'] as const;
-const BRANDS = ['blue', 'purple', 'pink', 'teal', 'orange', 'black'] as const;
-const PREFIX = { base: 'base-', brand: 'brands-' } as const;
+type LiveThemeMode = Extract<ThemeStylesheetMode, 'base' | 'brand'>;
 
-function applyTheme(mode: 'base' | 'brand', value: string) {
+const BASES = THEME_MODE_OPTIONS.base.map((option) => option.value);
+const BRANDS = THEME_MODE_OPTIONS.brand.map((option) => option.value);
+
+function applyTheme(mode: LiveThemeMode, value: string) {
+  const safeValue = sanitizeMode(mode, value);
   const link = document.querySelector<HTMLLinkElement>(
     `link[data-theme="${mode}"]`
   );
-  if (link) link.href = `/themes/${PREFIX[mode]}${value}.css`;
+  if (link) link.href = getThemeStylesheetHref(mode, safeValue);
 }
 
 export function LiveThemeSwapper() {
@@ -27,9 +35,10 @@ export function LiveThemeSwapper() {
   const brand = useThemeStore((s) => s.brand);
   const update = useThemeStore((s) => s.update);
 
-  const pick = (mode: 'base' | 'brand', value: string) => {
-    update(mode, value);
-    applyTheme(mode, value);
+  const pick = (mode: LiveThemeMode, value: string) => {
+    const safeValue = sanitizeMode(mode, value);
+    update(mode, safeValue);
+    applyTheme(mode, safeValue);
   };
 
   return (
