@@ -1,28 +1,37 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help setup dev dev-all console docs build build-storybook tokens \
-        test test-unit test-storybook lint format typecheck audit ci clean \
-        docs-up docs-down docs-serve docs-login docs-publish docs-status
+.PHONY: help setup fresh clean dev console docs dev-all build tokens \
+        test test-unit lint format typecheck audit verify \
+        up down serve publish
 
 help: ## Show this help (default)
 	@echo ""
 	@echo "Nexus Design System — make targets"
 	@echo "Usage: make <target>"
 	@echo ""
-	@awk 'BEGIN{FS=":.*## "}/^[a-zA-Z0-9_-]+:.*## /{printf "  \033[36m%-16s\033[0m %s\n",$$1,$$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN{FS=":.*## "}/^[a-zA-Z0-9_-]+:.*## /{printf "  \033[36m%-12s\033[0m %s\n",$$1,$$2}' $(MAKEFILE_LIST)
 	@echo ""
 
-# ── Setup ─────────────────────────────────────────────────────────────────────
+# ── Setup / lifecycle ─────────────────────────────────────────────────────────
 
-setup: ## First-time setup: install deps + Playwright browser (for story tests)
+setup: ## First-time setup: install deps + Playwright browser (story tests)
 	pnpm install
 	pnpm exec playwright install chromium
 	@echo ""
-	@echo "Setup complete. Try: make storybook | make dev | make docs-up"
+	@echo "Setup complete. Try: make dev  (Storybook) | make up (docs-mcp)"
 
-# ── Dev servers ───────────────────────────────────────────────────────────────
+fresh: ## Nuke & rebuild: clean + install + build
+	pnpm clean
+	pnpm install
+	pnpm build
 
-dev: ## Storybook — the primary component-dev surface (turbo builds @nexus/core first)
+clean: ## Stop docs-mcp, remove build outputs + node_modules
+	-pnpm docs:stop
+	pnpm clean
+
+# ── Dev servers (turbo-orchestrated) ──────────────────────────────────────────
+
+dev: ## Storybook — the primary component-dev surface (builds @nexus/core first)
 	pnpm turbo storybook --filter=@nexus/react
 
 console: ## Console app + live @nexus/react (turbo: app + react watcher)
@@ -39,9 +48,6 @@ dev-all: ## Everything: console + docs + storybook + package watchers (turbo)
 build: ## Build all packages (turbo)
 	pnpm build
 
-build-storybook: ## Build static Storybook
-	pnpm build-storybook
-
 tokens: ## Regenerate token outputs (tailwind + modular CSS)
 	pnpm tokens:tailwind
 	pnpm tokens:modular
@@ -51,11 +57,8 @@ tokens: ## Regenerate token outputs (tailwind + modular CSS)
 test: ## Full test suite (unit + storybook)
 	pnpm test
 
-test-unit: ## Unit tests only (jsdom)
+test-unit: ## Unit tests only (jsdom — fast)
 	pnpm test:unit
-
-test-storybook: ## Story / interaction tests (chromium)
-	pnpm test:storybook
 
 lint: ## ESLint — no warnings allowed
 	pnpm lint
@@ -72,36 +75,26 @@ audit: ## Token / a11y / browser audits
 	pnpm audit:contrast
 	pnpm audit:storybook-coverage
 
-ci: ## Fast local CI: lint + format:check + typecheck + build
+verify: ## Full pre-push gate: lint + format + typecheck + test + audits
 	pnpm lint
 	pnpm format:check
 	pnpm typecheck
-	pnpm build
-
-clean: ## Stop docs-mcp, remove build outputs + node_modules
-	-pnpm docs:stop
-	pnpm clean
+	pnpm test
+	@$(MAKE) --no-print-directory audit
 
 # ── Docs MCP (same workflow as examlly) ─────────────────────────────────────────
 
-docs-up: ## Pull + run the published docs-mcp image (teammates)
+up: ## Pull + run the published docs-mcp image (teammates)
 	pnpm docs:pull
 	pnpm docs:start
 
-docs-down: ## Stop the docs-mcp container
+down: ## Stop the docs-mcp container
 	-pnpm docs:stop
 
-docs-serve: ## Run a local docs-mcp server for indexing (maintainer)
+serve: ## Run a local docs-mcp server for indexing (maintainer)
 	pnpm docs:serve
 
-docs-login: ## Authenticate to GHCR as nexuslabs-ai-bot (maintainer)
+publish: ## Login + export + build + push the docs-mcp image to GHCR (maintainer)
 	pnpm docs:login
-
-docs-publish: ## Export + build + push the docs-mcp image to GHCR (maintainer)
 	pnpm docs:publish
-
-docs-status: ## Show docs-mcp container status
-	@docker ps --filter "name=nexus-docs-mcp" --format "{{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -q nexus-docs-mcp \
-		&& docker ps --filter "name=nexus-docs-mcp" --format "{{.Names}}\t{{.Status}}\t{{.Ports}}" \
-		|| echo "Docs MCP is not running"
 
