@@ -5,6 +5,7 @@ The HTML-in-Canvas API allows rendering real DOM directly inside a canvas elemen
 ## How to implement
 
 ### WebGL and WebGPU
+
 When using WebGL or WebGPU, follow these steps:
 
 1. Check if HTML-in-Canvas is supported in the browser:
@@ -39,10 +40,10 @@ const observer = new ResizeObserver(([entry]) => {
 });
 
 const supportsDevicePixelContentBox =
-  typeof ResizeObserverEntry !== "undefined" &&
-  "devicePixelContentBoxSize" in ResizeObserverEntry.prototype;
+  typeof ResizeObserverEntry !== 'undefined' &&
+  'devicePixelContentBoxSize' in ResizeObserverEntry.prototype;
 const options = supportsDevicePixelContentBox
-  ? { box: "device-pixel-content-box" }
+  ? { box: 'device-pixel-content-box' }
   : {};
 observer.observe(canvas, options);
 ```
@@ -60,7 +61,7 @@ canvas.onpaint = () => {
       gl.RGBA,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
-      uiElement,
+      uiElement
     );
   }
 };
@@ -100,7 +101,7 @@ The browser needs to map from the 3D coordinate space into the CSS coordinate sp
 - Convert the MVP Matrix to DOM Matrix.
 - Normalize the HTML element. HTML elements are sized in pixels (for example, 200px wide). WebGL, however, usually treats objects as "unit squares", for example, ranging from 0 to 1. If you don't normalize, your 200px button will look 200 times larger.
 - Map to the canvas viewport. This step is the "re-scaling" phase: it stretches that unit-space math back out to match the actual pixel dimensions of your `<canvas>` element on the screen. It also flips the Y-axis, because in WebGL, up is positive, but in CSS, down is positive.
-- Calculate the final transform. Multiply the matrices in order: Viewport * MVP * Normalization. Combining them into one final transform produces a "map" that tells the browser exactly where that HTML element layer should sit to align with the 3D drawing.
+- Calculate the final transform. Multiply the matrices in order: Viewport _ MVP _ Normalization. Combining them into one final transform produces a "map" that tells the browser exactly where that HTML element layer should sit to align with the 3D drawing.
 - Apply the transform to the HTML element. This moves the HTML element layer to sit directly on top of its rendered pixels. This ensures that when a user clicks a button or selects text, they are actually hitting the real HTML element.
 
 ```js
@@ -135,7 +136,7 @@ if (canvas.getElementTransform) {
   // 5. Apply to the transform
   const computedTransform = canvas.getElementTransform(
     targetHTMLElement,
-    screenSpaceTransform,
+    screenSpaceTransform
   );
   targetHTMLElement.style.transform = computedTransform.toString();
 }
@@ -169,10 +170,11 @@ if ('requestPaint' in HTMLCanvasElement.prototype) {
 2. Create a custom geometry and material for the HTML content.
 
 3. Pass the DOM element into THREE.HTMLTexture:
+
 ```js
-  material.map = new THREE.HTMLTexture(element);
-  mesh = new THREE.Mesh( geometry, material );
-  scene.add( mesh );
+material.map = new THREE.HTMLTexture(element);
+mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
 ```
 
 ## Example code
@@ -188,9 +190,9 @@ if ('requestPaint' in HTMLCanvasElement.prototype) {
 </canvas>
 
 <script>
-  const canvas = document.getElementById("canvas");
-  const gl = canvas.getContext("webgl");
-  const uiElement = document.getElementById("ui-element");
+  const canvas = document.getElementById('canvas');
+  const gl = canvas.getContext('webgl');
+  const uiElement = document.getElementById('ui-element');
 
   // Setup WebGL texture...
   const texture = gl.createTexture();
@@ -205,7 +207,7 @@ if ('requestPaint' in HTMLCanvasElement.prototype) {
         gl.RGBA,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
-        uiElement,
+        uiElement
       );
     }
 
@@ -235,7 +237,7 @@ if ('requestPaint' in HTMLCanvasElement.prototype) {
 
       const computedTransform = canvas.getElementTransform(
         uiElement,
-        screenSpaceTransform,
+        screenSpaceTransform
       );
       uiElement.style.transform = computedTransform.toString();
     }
@@ -253,9 +255,9 @@ if ('requestPaint' in HTMLCanvasElement.prototype) {
 </canvas>
 
 <script>
-  const canvas = document.getElementById("canvas");
-  const context = canvas.getContext("webgpu");
-  const uiElement = document.getElementById("ui-element");
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('webgpu');
+  const uiElement = document.getElementById('ui-element');
 
   // Setup WebGPU...
   // const device = ...
@@ -293,7 +295,7 @@ if ('requestPaint' in HTMLCanvasElement.prototype) {
 
       const computedTransform = canvas.getElementTransform(
         uiElement,
-        screenSpaceTransform,
+        screenSpaceTransform
       );
       uiElement.style.transform = computedTransform.toString();
     }
@@ -316,14 +318,17 @@ const element = document.createElement('div');
 element.innerHTML = '<h1>Hello World</h1>';
 
 // 4. Create geometry and material
-const geometry = new RoundedBoxGeometry( 100, 100, 100, 10, 10 );
-const material = new THREE.MeshStandardMaterial( { roughness: 0, metalness: 0.5 } );
+const geometry = new RoundedBoxGeometry(100, 100, 100, 10, 10);
+const material = new THREE.MeshStandardMaterial({
+  roughness: 0,
+  metalness: 0.5,
+});
 
 // 5. Pass the DOM element into THREE.HTMLTexture
 material.map = new THREE.HTMLTexture(element);
 
-mesh = new THREE.Mesh( geometry, material );
-scene.add( mesh );
+mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
 
 // 6. Render Loop
 function animate() {

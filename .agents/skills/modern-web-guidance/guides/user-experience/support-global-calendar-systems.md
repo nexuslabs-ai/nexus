@@ -31,12 +31,14 @@ const isoDate = Temporal.Now.plainDateISO();
 
 // 3. Convert to Hebrew calendar if supported
 const calendarId = 'hebrew';
-const targetDate = isCalendarSupported(calendarId) 
+const targetDate = isCalendarSupported(calendarId)
   ? isoDate.withCalendar(calendarId)
   : isoDate; // Fallback to ISO if not supported
 
 if (targetDate.calendar.id !== calendarId) {
-  console.warn(`Calendar ${calendarId} not supported; falling back to ISO 8601`);
+  console.warn(
+    `Calendar ${calendarId} not supported; falling back to ISO 8601`
+  );
 }
 
 // 4. Log properties specific to the calendar
@@ -46,7 +48,9 @@ console.log(`Month Code: ${targetDate.monthCode}`); // Stable across leap years
 
 // 5. Safely iterate through months in the current year
 for (let m = 1; m <= targetDate.monthsInYear; m++) {
-  console.log(`Month ${m} has ${targetDate.with({ month: m }).daysInMonth} days.`);
+  console.log(
+    `Month ${m} has ${targetDate.with({ month: m }).daysInMonth} days.`
+  );
 }
 
 // 6. Compare dates within the same calendar
@@ -59,7 +63,7 @@ console.log(`Timeline: ${relative}`);
 const localizedDisplay = targetDate.toLocaleString('en-u-ca-hebrew', {
   day: 'numeric',
   month: 'long',
-  year: 'numeric'
+  year: 'numeric',
 });
 ```
 
@@ -93,7 +97,7 @@ async function getTemporal() {
   if (typeof Temporal !== 'undefined') {
     return Temporal;
   }
-  
+
   try {
     // Load polyfill dynamically from CDN
     const module = await import('https://esm.sh/@js-temporal/polyfill');

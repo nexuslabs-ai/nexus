@@ -20,14 +20,14 @@ const availability = await LanguageModel.availability();
 
 // Do not call create() when unavailable — the model cannot run on this device.
 if (availability !== 'unavailable') {
-	const session = await LanguageModel.create({
-		monitor(m) {
-			// Inform the user while the model downloads so the UI doesn't appear frozen.
-			m.addEventListener('downloadprogress', (e) => {
-				console.log(`Downloaded ${e.loaded * 100}%`);
-			});
-		},
-	});
+  const session = await LanguageModel.create({
+    monitor(m) {
+      // Inform the user while the model downloads so the UI doesn't appear frozen.
+      m.addEventListener('downloadprogress', (e) => {
+        console.log(`Downloaded ${e.loaded * 100}%`);
+      });
+    },
+  });
 }
 ```
 
@@ -54,8 +54,8 @@ outputEl.textContent = result;
 const stream = session.promptStreaming('Write a long story about a robot.');
 let completeResult = '';
 for await (const chunk of stream) {
-	completeResult += chunk;
-	outputEl.append(chunk);
+  completeResult += chunk;
+  outputEl.append(chunk);
 }
 console.log('Full story:', completeResult);
 ```
@@ -66,19 +66,19 @@ The Prompt API supports text, audio, and visual inputs (images, canvas, video fr
 
 ```javascript
 const session = await LanguageModel.create({
-	// Declaring expected input types lets the browser optimize model loading.
-	expectedInputs: [{ type: 'text' }, { type: 'image' }],
-	expectedOutputs: [{ type: 'text' }],
+  // Declaring expected input types lets the browser optimize model loading.
+  expectedInputs: [{ type: 'text' }, { type: 'image' }],
+  expectedOutputs: [{ type: 'text' }],
 });
 
 const response = await session.prompt([
-	{
-		role: 'user',
-		content: [
-			{ type: 'text', value: 'What is in this image?' },
-			{ type: 'image', value: document.querySelector('canvas') },
-		],
-	},
+  {
+    role: 'user',
+    content: [
+      { type: 'text', value: 'What is in this image?' },
+      { type: 'image', value: document.querySelector('canvas') },
+    ],
+  },
 ]);
 ```
 
@@ -96,7 +96,7 @@ Cloning is efficient for starting parallel conversations that share the same ini
 
 ```javascript
 const mainSession = await LanguageModel.create({
-	initialPrompts: [{ role: 'system', content: 'You speak like a pirate.' }],
+  initialPrompts: [{ role: 'system', content: 'You speak like a pirate.' }],
 });
 
 const branchA = await mainSession.clone();
@@ -115,7 +115,7 @@ While a native "restore" feature is in development, you can recreate a session b
 // || '[]' ensures JSON.parse never receives null when the key doesn't exist yet.
 const history = JSON.parse(localStorage.getItem('chat_history') || '[]');
 const session = await LanguageModel.create({
-	initialPrompts: history, // Array of {role, content} objects
+  initialPrompts: history, // Array of {role, content} objects
 });
 ```
 
@@ -128,17 +128,17 @@ To prevent the model from adding "chatter" (e.g., "Sure, here is your JSON:"), u
 ```javascript
 // Pass the schema as a plain object — do not JSON.stringify() it first.
 const schema = {
-	type: 'object',
-	properties: {
-		rating: { type: 'number', minimum: 1, maximum: 5 },
-		is_positive: { type: 'boolean' },
-	},
-	required: ['rating', 'is_positive'],
+  type: 'object',
+  properties: {
+    rating: { type: 'number', minimum: 1, maximum: 5 },
+    is_positive: { type: 'boolean' },
+  },
+  required: ['rating', 'is_positive'],
 };
 
 const result = await session.prompt(
-	"Rate the following feedback: 'The food was great!'",
-	{ responseConstraint: schema },
+  "Rate the following feedback: 'The food was great!'",
+  { responseConstraint: schema }
 );
 
 const data = JSON.parse(result);
@@ -151,8 +151,8 @@ You can guide the model further by prefilling the assistant's response using `pr
 
 ````javascript
 const character = await session.prompt([
-	{ role: 'user', content: 'Create a character sheet' },
-	{ role: 'assistant', content: '```json\n', prefix: true },
+  { role: 'user', content: 'Create a character sheet' },
+  { role: 'assistant', content: '```json\n', prefix: true },
 ]);
 ````
 
@@ -185,5 +185,5 @@ if ('LanguageModel' in self) {
 
 If the Prompt API is unsupported or availability checks return 'unavailable', you must gracefully fall back:
 
-* Remote API Fallback: Redirect the detection request to a server endpoint or a cloud API (such as the Vertex AI Gemini API).
-* Local API Fallback: Redirect the detection request to a local endpoint, for example, using Transformers.js. 
+- Remote API Fallback: Redirect the detection request to a server endpoint or a cloud API (such as the Vertex AI Gemini API).
+- Local API Fallback: Redirect the detection request to a local endpoint, for example, using Transformers.js.
