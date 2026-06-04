@@ -15,6 +15,19 @@ This file is the Codex-facing entrypoint for the Nexus design-system repo. The e
   - `apps/console`: token/theme exploration UI.
   - `apps/docs`: documentation site.
 
+## Modern Web Guidance Policy
+
+Modern Web Guidance is installed outside the repo for agent use. For HTML, CSS,
+client-side JavaScript, accessibility, forms, layout, performance, overlays, and
+browser-platform work, search Modern Web Guidance first and adapt its guidance to
+Nexus conventions.
+
+Browser support is Chrome 111+, Edge 111+, Firefox 113+, Safari 15.4+, and
+Samsung Internet 22+. OKLCH is the browser-floor feature and is documented as
+Baseline 2023, but do not treat all Baseline 2023 features as safe by default.
+Check the specific feature's support against this browser floor and use
+progressive enhancement or fallbacks where the floor does not cover it.
+
 ## Command Reference
 
 Run commands from the repo root.
