@@ -165,6 +165,23 @@ interface BadgeProps
   rightIcon?: React.ReactNode;
 }
 
+interface BadgeActionProps extends React.ComponentProps<'button'> {
+  /**
+   * When true, renders as child element using Radix Slot.
+   * Useful for rendering a custom control while keeping badge action styles.
+   * @default false
+   * @example
+   * ```tsx
+   * <BadgeAction asChild>
+   *   <a href="/dismiss">Dismiss</a>
+   * </BadgeAction>
+   * ```
+   */
+  asChild?: boolean;
+}
+
+type BadgeDotProps = React.ComponentProps<'span'>;
+
 function Badge({
   className,
   variant,
@@ -238,4 +255,53 @@ function Badge({
   );
 }
 
-export { Badge, type BadgeProps, badgeVariants };
+function BadgeAction({
+  className,
+  asChild = false,
+  type = 'button',
+  ...props
+}: BadgeActionProps) {
+  const classes = cn(
+    // nexus-allow-numeric: chip action affordance
+    'nx:inline-flex nx:size-3.5 nx:items-center nx:justify-center nx:rounded-sm nx:p-0 nx:text-current nx:opacity-70 nx:transition-opacity nx:hover:opacity-100 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-40 nx:[&_svg]:size-3.5',
+    className
+  );
+
+  if (asChild) {
+    return <Slot data-slot="badge-action" className={classes} {...props} />;
+  }
+
+  return (
+    <button
+      type={type}
+      data-slot="badge-action"
+      className={classes}
+      {...props}
+    />
+  );
+}
+
+function BadgeDot({ className, ...props }: BadgeDotProps) {
+  return (
+    <span
+      data-slot="badge-dot"
+      aria-hidden="true"
+      className={cn(
+        // nexus-allow-numeric: chip dot affordance
+        'nx:size-1.5 nx:rounded-full nx:bg-current nx:opacity-75',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export {
+  Badge,
+  BadgeAction,
+  type BadgeActionProps,
+  BadgeDot,
+  type BadgeDotProps,
+  type BadgeProps,
+  badgeVariants,
+};
