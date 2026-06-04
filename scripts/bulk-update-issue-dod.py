@@ -64,7 +64,7 @@ DOD_TEMPLATE = """## Definition of Done
 After implementing this component, the audit must report clean before merge:
 
 ```bash
-yarn workspace @nexus/react audit:storybook-coverage --component {kebab}
+pnpm --filter @nexus/react audit:storybook-coverage --component {kebab}
 # exit 0 — no `missing` or `drift` findings
 ```
 

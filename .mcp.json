@@ -1,9 +1,5 @@
 {
   "mcpServers": {
-    "linear": {
-      "type": "http",
-      "url": "https://mcp.linear.app/mcp"
-    },
     "figma": {
       "type": "http",
       "url": "https://mcp.figma.com/mcp"
@@ -14,6 +10,10 @@
         "chrome-devtools-mcp@latest",
         "--executable-path=/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
       ]
+    },
+    "nexus-docs-mcp": {
+      "type": "sse",
+      "url": "http://localhost:6282/sse"
     }
   }
 }

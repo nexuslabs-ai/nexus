@@ -36,6 +36,7 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 | [logging-proportionality.md](../rules/logging-proportionality.md)             | One dense canonical log line beats ten incremental ones                              |
 | [code-comments.md](../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
 | [project-stage.md](../rules/project-stage.md)                                 | Pre-production: no backcompat, no shims, no feature flags — change code in place     |
+| [docs-mcp.md](../rules/docs-mcp.md)                                           | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory    |
 
 ## Focus Areas
 

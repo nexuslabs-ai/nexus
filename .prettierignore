@@ -8,7 +8,6 @@ build
 out
 *.min.js
 pnpm-lock.yaml
-yarn.lock
 package-lock.json
 
 # Auto-generated CSS — produced by @nexus/core token pipeline; do not reformat

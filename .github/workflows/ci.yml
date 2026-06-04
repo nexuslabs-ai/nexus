@@ -55,7 +55,7 @@ jobs:
               - 'packages/test-utils/**'
             packages:
               - 'packages/**'
-            # Mirrors the source roots scanned by `yarn audit:browser-support`.
+            # Mirrors the source roots scanned by `pnpm audit:browser-support`.
             browser_source:
               - 'apps/**'
               - 'packages/**'
@@ -86,8 +86,8 @@ jobs:
               - 'apps/**'
               - '!apps/docs/**'
 
-  # format-check and lint run full-tree to mirror local `yarn lint` /
-  # `yarn format:check`.
+  # format-check and lint run full-tree to mirror local `pnpm lint` /
+  # `pnpm format:check`.
 
   format-check:
     name: Format Check
@@ -101,17 +101,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        run: yarn format:check
+        run: pnpm format:check
 
   lint:
     name: Lint
@@ -125,26 +128,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Restore ESLint cache
         uses: actions/cache@v4
         with:
           path: .eslintcache
-          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-${{ github.sha }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-
+            eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', 'packages/eslint-plugin-nexus/src/**') }}-
             eslint-${{ runner.os }}-
 
       - name: Lint
-        run: yarn lint --cache --cache-location .eslintcache --cache-strategy content
+        run: pnpm lint --cache --cache-location .eslintcache --cache-strategy content
 
   # ============================================
   # Build (affected packages only)
@@ -162,17 +168,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Audit browser support floor
-        run: yarn audit:browser-support
+        run: pnpm audit:browser-support
 
   build:
     name: Build
@@ -185,14 +194,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Restore Turbo cache
         uses: actions/cache@v4
@@ -207,9 +219,9 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            yarn turbo build --filter="...[origin/$BASE_REF]"
+            pnpm turbo build --filter="...[origin/$BASE_REF]"
           else
-            yarn turbo build
+            pnpm turbo build
           fi
 
       - name: Upload build artifacts
@@ -235,14 +247,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -263,9 +278,9 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            yarn turbo typecheck --filter="...[origin/$BASE_REF]"
+            pnpm turbo typecheck --filter="...[origin/$BASE_REF]"
           else
-            yarn turbo typecheck
+            pnpm turbo typecheck
           fi
 
   # ============================================
@@ -285,17 +300,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Run unit tests
-        run: yarn test:unit
+        run: pnpm test:unit
 
   audit-tokens:
     name: Audit Tokens
@@ -310,33 +328,36 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Run BEFORE the regen step so the build doesn't run on a broken
       # mode-file set. Validator is stdlib-only and runs in well under a
       # second — fail-fast for the cheapest possible signal.
       - name: Validate spacing mode files
-        run: yarn validate:spacing-modes
+        run: pnpm validate:spacing-modes
 
       # Guard against drift between the committed canonical-step-set.json
       # and the live union across spacing-*.json. Same fail-fast tier as
       # the validator above — stdlib-only, sub-second.
       - name: Check canonical step set freshness
-        run: yarn workspace @nexus/eslint-plugin refresh:canonical-set --check
+        run: pnpm --filter @nexus/eslint-plugin refresh:canonical-set --check
 
       - name: Regenerate token outputs (tailwind + modular)
         id: regen
         run: |
           set -euo pipefail
-          yarn tokens:tailwind
-          yarn tokens:modular
+          pnpm tokens:tailwind
+          pnpm tokens:modular
 
       - name: Check token output freshness
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
@@ -351,21 +372,21 @@ jobs:
           if [ -n "$DIRTY" ]; then
             echo "::error::Token output is stale. Affected paths:"
             echo "$DIRTY"
-            echo "::error::Run 'yarn tokens:tailwind && yarn tokens:modular' and commit the result."
+            echo "::error::Run 'pnpm tokens:tailwind && pnpm tokens:modular' and commit the result."
             exit 1
           fi
 
       - name: APCA contrast audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: yarn workspace @nexus/core audit:contrast
+        run: pnpm --filter @nexus/core audit:contrast
 
       - name: Color-blind audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: yarn workspace @nexus/core audit:colorblind
+        run: pnpm --filter @nexus/core audit:colorblind
 
       - name: Tailwind class-ref audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: yarn workspace @nexus/core audit:class-refs
+        run: pnpm --filter @nexus/core audit:class-refs
 
   test-react:
     name: Test (React)
@@ -376,27 +397,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # The AdjustContrast story imports @nexus/core, which is consumed via
       # its built dist/runtime entry (package.json exports). Build it so
       # Storybook/Vite can resolve the package during the story tests.
       - name: Build @nexus/core
-        run: yarn workspace @nexus/core build
+        run: pnpm --filter @nexus/core build
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright system deps
         # apt-installed deps aren't part of the browser cache; always install.
@@ -407,7 +431,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run story tests
-        run: yarn test:storybook
+        run: pnpm test:storybook
 
   build-storybook:
     name: Build Storybook
@@ -418,23 +442,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # The AdjustContrast story imports @nexus/core, which is consumed via
       # its built dist/runtime entry (package.json exports). Build it so the
       # Storybook production build can resolve the package.
       - name: Build @nexus/core
-        run: yarn workspace @nexus/core build
+        run: pnpm --filter @nexus/core build
 
       - name: Build Storybook
-        run: yarn build-storybook
+        run: pnpm build-storybook
 
       - name: Upload Storybook build
         uses: actions/upload-artifact@v4
@@ -452,14 +479,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -468,7 +498,7 @@ jobs:
           path: packages
 
       - name: Check bundle size
-        run: yarn size-limit
+        run: pnpm size-limit
 
   # ============================================
   # Aggregator — the single required status check

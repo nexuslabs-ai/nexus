@@ -1,0 +1,3 @@
+# databases shared via Docker image, not git
+data/
+documents.db*

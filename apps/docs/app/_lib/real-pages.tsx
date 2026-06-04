@@ -31,6 +31,7 @@ export const REAL_PAGES: Record<string, ComponentType> = {
  */
 export const MDX_PAGES: Record<
   string,
+  // eslint-disable-next-line @nexus/no-render-prop-types -- `default: ComponentType` is the shape of a lazily-imported MDX module, not a component-as-prop.
   () => Promise<{ default: ComponentType }>
 > = {
   'getting-started/install': () =>

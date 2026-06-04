@@ -38,6 +38,7 @@ Always load and check the new diff against:
 | [code-comments.md](../../rules/code-comments.md)                                 | Flag rationale blocks, unjustified TODOs, comments that restate the code           |
 | [no-follow-up-deferral.md](../../rules/no-follow-up-deferral.md)                 | Reject deferral framing unless a tracked issue is cited                            |
 | [project-stage.md](../../rules/project-stage.md)                                 | Reject new migration files; flag backcompat shims and feature flags                |
+| [docs-mcp.md](../../rules/docs-mcp.md)                                           | Verify third-party API usage via nexus-docs-mcp before approving                   |
 
 ## Prerequisites
 

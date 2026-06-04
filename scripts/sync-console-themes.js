@@ -30,7 +30,7 @@ if (!fs.existsSync(SENTINEL)) {
 
 if (!fs.existsSync(SOURCE_DIR)) {
   throw new Error(
-    `sync-console-themes: source ${SOURCE_DIR} missing — run yarn build:tokens:modular in @nexus/core first.`
+    `sync-console-themes: source ${SOURCE_DIR} missing — run pnpm --filter @nexus/core build:tokens:modular first.`
   );
 }
 

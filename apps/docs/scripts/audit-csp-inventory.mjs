@@ -18,7 +18,7 @@ function walk(dir) {
 }
 
 if (!existsSync(appOutputDir)) {
-  console.error('Missing .next/server/app. Run `yarn build` first.');
+  console.error('Missing .next/server/app. Run `pnpm build` first.');
   process.exit(1);
 }
 

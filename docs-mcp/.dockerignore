@@ -1,0 +1,4 @@
+# `docker build ./docs-mcp` only needs documents.db (baked in by the Dockerfile).
+# Keep the ~50MB local scrape store and git metadata out of the build context.
+data/
+.gitignore

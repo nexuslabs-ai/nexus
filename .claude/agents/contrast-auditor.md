@@ -1,6 +1,6 @@
 ---
 name: contrast-auditor
-description: Audits Nexus design tokens against the APCA contrast gate via `yarn audit:contrast`. Use proactively when the user asks "audit contrast", "why is X failing APCA?", "which shade should X reroute to?", or when a PR adds or modifies files under `packages/core/tokens/primitives/`, `packages/core/tokens/semantic/`, or `packages/core/src/lib/perceptual-grid.json`.
+description: Audits Nexus design tokens against the APCA contrast gate via `pnpm audit:contrast`. Use proactively when the user asks "audit contrast", "why is X failing APCA?", "which shade should X reroute to?", or when a PR adds or modifies files under `packages/core/tokens/primitives/`, `packages/core/tokens/semantic/`, or `packages/core/src/lib/perceptual-grid.json`.
 tools: Bash, Read, Grep
 model: opus
 permissionMode: bypassPermissions
@@ -8,7 +8,7 @@ permissionMode: bypassPermissions
 
 # Contrast Auditor
 
-A thin wrapper around `yarn audit:contrast`. The audit logic — perceptual L
+A thin wrapper around `pnpm audit:contrast`. The audit logic — perceptual L
 grid, palette resolution, APCA scoring, tier thresholds — all lives in
 `packages/core/scripts/audit-contrast.js`. This agent translates failures into
 proposed semantic-token reroutes, with role-conflict checks derived from the
@@ -37,7 +37,7 @@ giving the heuristic itself fixture-test coverage. Out of scope for v1.
 ### 1. Run the audit
 
 ```bash
-yarn audit:contrast
+pnpm audit:contrast
 ```
 
 Capture stdout and exit code.
@@ -238,7 +238,7 @@ job after they apply the fix (the counterpart may actually pass).
 
 ### 8. Close with the verification reminder
 
-> After applying any reroute, re-run `yarn audit:contrast`. The script is the
+> After applying any reroute, re-run `pnpm audit:contrast`. The script is the
 > gate; this proposal is a candidate, not a guaranteed fix. **Thresholds are
 > non-negotiable** per `.claude/rules/tokens.md` § APCA contrast gate — fix is
 > always token reroute or `perceptual-grid.json` edit, never lowering `minLc`.

@@ -1,5 +1,7 @@
 # Composition Over Render Props
 
+> **Enforced by** `@nexus/no-render-prop-types` — props typed as render callbacks (`(...) => ReactNode`) or component references (`ComponentType` / `FC`) fail `pnpm lint`. Genuinely third-party-mandated shapes opt out with a scoped `eslint-disable` + reason.
+
 When a component's internal shape varies by mode, never accept a render-callback or component reference as a prop to inject the varying part. Either compose with `children` (or other `ReactNode` slots), or split into one component per mode.
 
 A `renderItem`, `cardComponent`, or `as` prop hides what the component actually renders. The reader of the consumer sees an opaque closure being passed down; the reader of the implementation sees an opaque thing being called. Both directions lose end-to-end readability, and the indirection earns nothing the language doesn't already give you.

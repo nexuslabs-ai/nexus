@@ -59,6 +59,7 @@ Always load and follow:
 | [logging-proportionality.md](../../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                              |
 | [code-comments.md](../../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
 | [project-stage.md](../../rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place     |
+| [docs-mcp.md](../../rules/docs-mcp.md)                               | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory    |
 | [github.md](../../rules/github.md)                                   | PR title/body templates, branch naming, commit format, `Closes #N`                   |
 
 ## Implementation Process
@@ -155,8 +156,8 @@ Always load and follow:
 1. **Run tests:**
 
    ```bash
-   yarn test                    # All tests
-   yarn test path/to/test.ts   # Specific file
+   pnpm test                    # All tests
+   pnpm test path/to/test.ts   # Specific file
    ```
 
 2. **Verify quality:**
@@ -202,7 +203,7 @@ After test implementation is complete:
 ### Verification
 
 ```bash
-yarn test path/to/tests
+pnpm test path/to/tests
 ```
 
 - [ ] All tests passing

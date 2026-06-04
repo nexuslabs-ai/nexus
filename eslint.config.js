@@ -148,7 +148,17 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      // `allow-as-parameter` (not `never`): a token-driven design system must
+      // cast object literals carrying CSS custom properties (`--nx-*` keys)
+      // to React.CSSProperties at the JSX-attribute / call-argument site —
+      // those keys can't be typed otherwise. Standalone `const x = {} as T`
+      // drift is still flagged.
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        { objectLiteralTypeAssertions: 'allow-as-parameter' },
+      ],
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
@@ -160,7 +170,8 @@ export default tseslint.config(
       'prefer-const': 'error',
       'no-var': 'error',
       eqeqeq: ['error', 'always', { null: 'ignore' }],
-      curly: ['error', 'multi-line'],
+      curly: ['error', 'all'],
+      'no-else-return': 'error',
     },
   },
 
@@ -215,6 +226,33 @@ export default tseslint.config(
     },
     rules: {
       '@nexus/prefer-role-utilities': 'error',
+    },
+  },
+
+  // Nexus: enforce documented component rules as lint — nx: class conventions
+  // (ported from the former lint-nx-prefix Claude hook), composition over
+  // render props, and handler extraction. Scoped to component-bearing source
+  // (React package + apps). Hand-written stories are linted too; only the
+  // gitignored __generated__ base-variant stories are excluded (global ignore).
+  {
+    files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
+    plugins: {
+      '@nexus': nexusPlugin,
+    },
+    rules: {
+      '@nexus/nx-class-conventions': 'error',
+      '@nexus/no-render-prop-types': 'error',
+      '@nexus/no-multi-statement-jsx-handler': 'error',
+    },
+  },
+
+  // Tests and stories assert known fixture invariants (queried elements, seeded
+  // array indices), so non-null assertions are idiomatic there. Keep the rule
+  // on production source only.
+  {
+    files: ['**/*.test.{ts,tsx}', '**/*.stories.tsx'],
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },
 

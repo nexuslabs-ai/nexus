@@ -4,7 +4,7 @@ This file is the Codex-facing entrypoint for the Nexus design-system repo. The e
 
 ## Project Shape
 
-- Monorepo using Yarn classic (`yarn@1.22.22`) and Node `>=20.19.0`.
+- Monorepo using pnpm (`pnpm@10.12.1`) and Node `>=20.19.0`.
 - Workspaces live under `packages/*` and `apps/*`.
 - Core packages:
   - `packages/core`: DTCG design tokens and token build/audit scripts.
@@ -28,7 +28,7 @@ Baseline 2023, but do not treat all Baseline 2023 features as safe by default.
 Check the specific feature's support against this browser floor and use
 progressive enhancement or fallbacks where the floor does not cover it. The
 canonical floor is also encoded in root `package.json#browserslist`; run
-`yarn audit:browser-support` when adopting or reclassifying browser-platform
+`pnpm audit:browser-support` when adopting or reclassifying browser-platform
 features from Modern Web Guidance.
 
 ## Command Reference
@@ -36,32 +36,32 @@ features from Modern Web Guidance.
 Run commands from the repo root.
 
 ```bash
-yarn install
-yarn dev
-yarn storybook
-yarn console
-yarn build
-yarn typecheck
-yarn lint
-yarn test
-yarn test:unit
-yarn test:storybook
-yarn audit:browser-support
-yarn audit:contrast
-yarn audit:storybook-coverage
+pnpm install
+pnpm dev
+pnpm storybook
+pnpm console
+pnpm build
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm test:unit
+pnpm test:storybook
+pnpm audit:browser-support
+pnpm audit:contrast
+pnpm audit:storybook-coverage
 ```
 
 For a single React component story coverage check:
 
 ```bash
-yarn workspace @nexus/react audit:storybook-coverage --component <kebab-name>
+pnpm --filter @nexus/react audit:storybook-coverage --component <kebab-name>
 ```
 
 For token output changes:
 
 ```bash
-yarn tokens:modular
-yarn tokens:tailwind
+pnpm tokens:modular
+pnpm tokens:tailwind
 ```
 
 ## Canonical Rules
@@ -131,10 +131,10 @@ Hooks and utilities use `*.test.ts` with `@nexus/test-utils`. Do not use Storybo
 Before finishing component work, run the narrowest meaningful checks first, then broaden as risk increases:
 
 ```bash
-yarn workspace @nexus/react audit:storybook-coverage --component <kebab-name>
-yarn test:storybook
-yarn typecheck
-yarn lint
+pnpm --filter @nexus/react audit:storybook-coverage --component <kebab-name>
+pnpm test:storybook
+pnpm typecheck
+pnpm lint
 ```
 
 ## Token Work
@@ -147,19 +147,18 @@ Read `.claude/rules/tokens.md` before changing tokens or generated token outputs
 - APCA contrast failures must be fixed by changing semantic mappings or palette/grid values, not by lowering thresholds.
 - Spacing mode swaps happen at runtime through `data-style`.
 
-## Claude Commands, Skills, Agents, And Hooks
+## Claude Commands, Skills, Agents, And Settings
 
 The repo still carries useful Claude-specific workflow assets:
 
 - Commands: `.claude/commands/*`
 - Skills: `.claude/skills/*`
 - Agents: `.claude/agents/*`
-- Hooks: `.claude/hooks/*`
-- Claude permissions/hooks config: `.claude/settings.json`
+- Claude permissions/settings config: `.claude/settings.json`
 
-Codex does not automatically execute Claude commands, invoke Claude subagents, or run Claude hooks. When a user mentions a Claude command such as `/implement`, translate the intent into normal Codex work and read the corresponding `.claude/commands/*.md` or `.claude/skills/*/SKILL.md` only for process guidance.
+Codex does not automatically execute Claude commands or invoke Claude subagents. When a user mentions a Claude command such as `/implement`, translate the intent into normal Codex work and read the corresponding `.claude/commands/*.md` or `.claude/skills/*/SKILL.md` only for process guidance.
 
-If you edit files, run formatting/linting explicitly when relevant; do not assume `.claude/hooks` have run.
+Formatting and linting run on commit via the Husky + lint-staged pre-commit hook (`eslint --fix` + `prettier --write` on staged files); the `nx:` Tailwind-class conventions are enforced by the `@nexus/nx-class-conventions` ESLint rule. For immediate feedback, run `pnpm lint` and `pnpm format` explicitly.
 
 ## GitHub And PRs
 

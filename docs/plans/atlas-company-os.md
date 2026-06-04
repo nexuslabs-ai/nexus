@@ -66,7 +66,7 @@ The token generator `packages/core/scripts/generate-modular.js` writes to `packa
 - `apps/playground/package.json` — package name `@nexus/playground` → `@nexus/console`.
 - Cosmetic: comments in `generate-modular.js` / its test, and `README.md`.
 
-After the rename, run the sync once to confirm it regenerates theme CSS into `apps/console` (avoid the full `yarn tokens:modular`, which also rewrites `packages/core/package.json`'s brand flag — a known drift).
+After the rename, run the sync once to confirm it regenerates theme CSS into `apps/console` (avoid the full `pnpm tokens:modular`, which also rewrites `packages/core/package.json`'s brand flag — a known drift).
 
 ## Folder shape (target)
 

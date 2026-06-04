@@ -32,6 +32,7 @@ Always load and follow:
 | Rule                                             | Purpose                                                                          |
 | ------------------------------------------------ | -------------------------------------------------------------------------------- |
 | [project-stage.md](../../rules/project-stage.md) | Pre-production: prefer clean upgrades over migration shims; no backcompat layers |
+| [docs-mcp.md](../../rules/docs-mcp.md)           | MANDATORY: query nexus-docs-mcp for current API surface before flagging breakage |
 
 ## Input Options
 
@@ -448,9 +449,9 @@ Scope: {description of what was analyzed}
 
 **Migration steps:**
 
-1. Install replacement: `yarn add @scope/package-b-v2`
+1. Install replacement: `pnpm add @scope/package-b-v2`
 2. Update imports in `util.ts`
-3. Remove old package: `yarn remove package-b`
+3. Remove old package: `pnpm remove package-b`
 
 ---
 
@@ -463,7 +464,7 @@ Scope: {description of what was analyzed}
 **Migration steps:**
 
 ```bash
-yarn upgrade package-c@^1.5.0
+pnpm update package-c@^1.5.0
 ```
 ````
 

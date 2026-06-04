@@ -239,12 +239,12 @@ Review against:
 
 Use `architect_final_comments` and `sde2_final_comments` from Phase 4 — never the raw agent output directly.
 
-**Reviews are posted from the `examlly-tech` bot account.** Prefix every `gh api .../reviews --method POST` call with `GH_TOKEN=$(gh auth token --user examlly-tech)`. This keeps review comments attributed to the bot and avoids GitHub's self-authored-PR rejection of `APPROVE` / `REQUEST_CHANGES` (since the bot is never the PR author).
+**Reviews are posted from the `nexuslabs-ai-bot` bot account.** Prefix every `gh api .../reviews --method POST` call with `GH_TOKEN=$(gh auth token --user nexuslabs-ai-bot)`. This keeps review comments attributed to the bot and avoids GitHub's self-authored-PR rejection of `APPROVE` / `REQUEST_CHANGES` (since the bot is never the PR author).
 
 1. **Post Principal Architect review:**
 
    ```bash
-   GH_TOKEN=$(gh auth token --user examlly-tech) \
+   GH_TOKEN=$(gh auth token --user nexuslabs-ai-bot) \
      gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
      --method POST \
      --input - <<'EOF'
@@ -259,7 +259,7 @@ Use `architect_final_comments` and `sde2_final_comments` from Phase 4 — never 
 2. **Post SDE2 review:**
 
    ```bash
-   GH_TOKEN=$(gh auth token --user examlly-tech) \
+   GH_TOKEN=$(gh auth token --user nexuslabs-ai-bot) \
      gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
      --method POST \
      --input - <<'EOF'
@@ -444,10 +444,10 @@ Deduplicate inline comments across both agents (same as Phase 4 in full review m
 
 ### Phase F6: Post Follow-up Review
 
-Post from the `examlly-tech` bot account (same pattern as Phase 6):
+Post from the `nexuslabs-ai-bot` bot account (same pattern as Phase 6):
 
 ```bash
-GH_TOKEN=$(gh auth token --user examlly-tech) \
+GH_TOKEN=$(gh auth token --user nexuslabs-ai-bot) \
   gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --method POST \
   --input - <<'EOF'

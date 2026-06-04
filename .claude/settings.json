@@ -3,18 +3,7 @@
   "permissions": {
     "defaultMode": "bypassPermissions",
     "allow": [
-      "Bash(yarn:*)",
-      "Bash(yarn install)",
-      "Bash(yarn build)",
-      "Bash(yarn dev)",
-      "Bash(yarn lint:*)",
-      "Bash(yarn test:*)",
-      "Bash(yarn tokens)",
-      "Bash(yarn typecheck)",
-      "Bash(yarn clean)",
-      "Bash(yarn format:*)",
-      "Bash(yarn storybook)",
-      "Bash(yarn build-storybook)",
+      "Bash(pnpm:*)",
       "Bash(npx turbo:*)",
       "Bash(npx eslint:*)",
       "Bash(npx tsc:*)",
@@ -60,23 +49,6 @@
           {
             "type": "command",
             "command": "bash -c 'if [[ \"$CLAUDE_TOOL_INPUT\" =~ (credentials|secret|password|api_key|apikey|token) ]]; then echo \"Blocked: command contains sensitive keyword\" >&2; exit 1; fi'"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/format-edited-file.mjs",
-            "timeout": 15
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/lint-nx-prefix.mjs",
-            "timeout": 10
           }
         ]
       }

@@ -12,7 +12,7 @@ const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
 // content on disk. It complements the pure-function unit tests in
 // validate-spacing-modes.test.js (which run against synthetic data) by
 // exercising the same validator entry point against the actual checked-in
-// files. The CLI gate (yarn validate:spacing-modes in CI and pre-commit) is
+// files. The CLI gate (pnpm validate:spacing-modes in CI and pre-commit) is
 // the production enforcement; this test gives Vitest-level signal too.
 describe('spacing modes', () => {
   it('ships exactly the seven canonical modes', () => {
@@ -40,7 +40,7 @@ describe('spacing modes', () => {
     );
     expect(
       drift,
-      `Spacing mode files diverge from baseline. Run \`yarn validate:spacing-modes\` for the full report.`
+      `Spacing mode files diverge from baseline. Run \`pnpm validate:spacing-modes\` for the full report.`
     ).toEqual([]);
   });
 });

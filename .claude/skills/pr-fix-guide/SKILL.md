@@ -130,8 +130,8 @@ Two reflexes specific to fixing:
 1. **Run checks:**
 
    ```bash
-   yarn typecheck
-   yarn lint
+   pnpm typecheck
+   pnpm lint
    ```
 
 2. **Review against original comments:**

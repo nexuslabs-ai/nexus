@@ -46,7 +46,7 @@ const preview: Preview = {
       },
     },
     // A11y violations will fail tests automatically.
-    // Color-contrast is APCA-gated via `yarn workspace @nexus/core audit:contrast`
+    // Color-contrast is APCA-gated via `pnpm --filter @nexus/core audit:contrast`
     // (see .claude/rules/tokens.md § APCA contrast gate), not WCAG 2 — disable
     // axe-core's WCAG-based contrast rules so the two gates don't conflict.
     a11y: {

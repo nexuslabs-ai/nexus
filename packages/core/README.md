@@ -71,8 +71,8 @@ This resolves to CSS:
 ### Generate CSS
 
 ```bash
-yarn build:tailwind       # Generate @nexus/tailwind package CSS
-yarn build:tokens:modular # Generate modular CSS (console + docs apps)
+pnpm build:tailwind       # Generate @nexus/tailwind package CSS
+pnpm build:tokens:modular # Generate modular CSS (console + docs apps)
 ```
 
 ### Output Files
@@ -96,5 +96,5 @@ When multi-platform support is needed, tools like Style Dictionary can be added 
 
 1. Edit token files in `tokens/`
 2. Follow DTCG format with `$value`, `$type`, `$description`
-3. Run `yarn tokens` to regenerate CSS
+3. Run `make tokens` to regenerate CSS
 4. Tokens automatically copied to React package
