@@ -19,14 +19,6 @@ import { createJSONStorage, persist } from 'zustand/middleware';
  */
 
 export const STORAGE_KEY = 'nexus-docs-tokens';
-const BRAND_VALUES = [
-  'blue',
-  'purple',
-  'pink',
-  'teal',
-  'orange',
-  'black',
-] as const;
 
 export type ThemeState = {
   base: string;
@@ -37,6 +29,16 @@ export type ThemeState = {
   radius: string;
   borderwidth: string;
 };
+
+const THEME_MODE_VALUES = {
+  base: ['slate', 'stone', 'neutral', 'gray', 'zinc'],
+  brand: ['blue', 'purple', 'pink', 'teal', 'orange', 'black'],
+  spacing: ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'],
+  typography: ['vega', 'nova', 'maia'],
+  shadow: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+  radius: ['sharp', 'subtle', 'smooth', 'mellow', 'blunt'],
+  borderwidth: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+} as const satisfies Record<keyof ThemeState, readonly string[]>;
 
 export const DEFAULTS: ThemeState = {
   base: 'stone',
@@ -52,26 +54,26 @@ type ThemeStore = ThemeState & {
   update: <K extends keyof ThemeState>(key: K, value: ThemeState[K]) => void;
 };
 
-function sanitizeBrand(value: unknown): string {
-  return BRAND_VALUES.includes(value as (typeof BRAND_VALUES)[number])
-    ? String(value)
-    : DEFAULTS.brand;
-}
-
-function stringOrDefault(value: unknown, fallback: string): string {
-  return typeof value === 'string' ? value : fallback;
+function sanitizeMode<K extends keyof ThemeState>(
+  key: K,
+  value: unknown
+): ThemeState[K] {
+  return typeof value === 'string' &&
+    (THEME_MODE_VALUES[key] as readonly string[]).includes(value)
+    ? value
+    : DEFAULTS[key];
 }
 
 function sanitizeThemeState(raw: unknown): ThemeState {
   const state = (raw ?? {}) as Partial<Record<keyof ThemeState, unknown>>;
   return {
-    base: stringOrDefault(state.base, DEFAULTS.base),
-    brand: sanitizeBrand(state.brand),
-    spacing: stringOrDefault(state.spacing, DEFAULTS.spacing),
-    typography: stringOrDefault(state.typography, DEFAULTS.typography),
-    shadow: stringOrDefault(state.shadow, DEFAULTS.shadow),
-    radius: stringOrDefault(state.radius, DEFAULTS.radius),
-    borderwidth: stringOrDefault(state.borderwidth, DEFAULTS.borderwidth),
+    base: sanitizeMode('base', state.base),
+    brand: sanitizeMode('brand', state.brand),
+    spacing: sanitizeMode('spacing', state.spacing),
+    typography: sanitizeMode('typography', state.typography),
+    shadow: sanitizeMode('shadow', state.shadow),
+    radius: sanitizeMode('radius', state.radius),
+    borderwidth: sanitizeMode('borderwidth', state.borderwidth),
   };
 }
 
