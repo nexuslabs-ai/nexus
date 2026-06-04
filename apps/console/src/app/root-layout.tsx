@@ -5,6 +5,7 @@ import { Outlet } from '@tanstack/react-router';
 
 import { AppSidebar } from '../shell/app-sidebar';
 import { CommandPalette } from '../shell/command-palette';
+import { useSidebarStore } from '../shell/sidebar-store';
 import { Topbar } from '../shell/topbar';
 
 /**
@@ -15,6 +16,8 @@ import { Topbar } from '../shell/topbar';
  */
 export function RootLayout() {
   const [commandOpen, setCommandOpen] = useState(false);
+  const sidebarOpen = useSidebarStore((s) => s.open);
+  const setSidebarOpen = useSidebarStore((s) => s.setOpen);
 
   // ⌘K / Ctrl+K toggles the command palette from anywhere — a global keyboard
   // subscription, which is exactly what an effect is for.
@@ -30,7 +33,7 @@ export function RootLayout() {
   }, []);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <AppSidebar />
       <SidebarInset>
         <Topbar onSearchClick={() => setCommandOpen(true)} />
