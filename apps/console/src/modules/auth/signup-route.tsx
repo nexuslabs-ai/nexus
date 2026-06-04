@@ -74,7 +74,14 @@ export function SignupRoute() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ada Lovelace" {...field} />
+                    <Input
+                      type="text"
+                      autoComplete="name"
+                      enterKeyHint="next"
+                      placeholder="Ada Lovelace"
+                      required
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -89,7 +96,10 @@ export function SignupRoute() {
                   <FormControl>
                     <Input
                       type="email"
+                      autoComplete="username"
+                      enterKeyHint="next"
                       placeholder="you@example.com"
+                      required
                       {...field}
                     />
                   </FormControl>
@@ -104,7 +114,14 @@ export function SignupRoute() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input
+                      type="password"
+                      autoComplete="new-password"
+                      enterKeyHint="go"
+                      placeholder="••••••••"
+                      required
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

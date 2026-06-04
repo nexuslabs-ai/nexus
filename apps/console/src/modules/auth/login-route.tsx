@@ -75,7 +75,10 @@ export function LoginRoute() {
                   <FormControl>
                     <Input
                       type="email"
+                      autoComplete="username"
+                      enterKeyHint="next"
                       placeholder="you@example.com"
+                      required
                       {...field}
                     />
                   </FormControl>
@@ -98,7 +101,14 @@ export function LoginRoute() {
                     </Link>
                   </div>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input
+                      type="password"
+                      autoComplete="current-password"
+                      enterKeyHint="go"
+                      placeholder="••••••••"
+                      required
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
