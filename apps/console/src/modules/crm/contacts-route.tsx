@@ -15,6 +15,7 @@ import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
+import { PageHeader } from '../../components/page-header';
 import { useMediaQuery } from '../../hooks/use-media-query';
 import { crmKeys, fetchContacts } from '../../lib/crm-api';
 
@@ -59,20 +60,15 @@ export function ContactsRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <header className="nx:flex nx:items-start nx:justify-between nx:gap-4">
-        <div className="nx:space-y-1">
-          <h1 className="nx:typography-heading-large nx:text-foreground">
-            Contacts
-          </h1>
-          <p className="nx:text-muted-foreground">
-            Everyone in your pipeline. Sort, filter, and select to act in bulk.
-          </p>
-        </div>
+      <PageHeader
+        title="Contacts"
+        description="Everyone in your pipeline. Sort, filter, and select to act in bulk."
+      >
         <Button onClick={() => setCreateOpen(true)}>
           <IconPlus />
           New contact
         </Button>
-      </header>
+      </PageHeader>
 
       <ContactsToolbar view={view} status={status} setSearch={setSearch} />
 

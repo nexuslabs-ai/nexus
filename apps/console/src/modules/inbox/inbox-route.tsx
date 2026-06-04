@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 
 import { ErrorState } from '../../components/error-state';
+import { PageHeader } from '../../components/page-header';
 import { useMediaQuery } from '../../hooks/use-media-query';
 import { fetchConversations, inboxKeys } from '../../lib/inbox-api';
 
@@ -54,15 +55,10 @@ export function InboxRoute() {
     // 3.5rem = the Topbar's fixed h-14, so the two-pane fills the rest of the
     // viewport and each pane scrolls internally instead of the whole page.
     <div className="nx:flex nx:h-[calc(100svh-3.5rem)] nx:flex-col nx:gap-4 nx:p-6">
-      <header className="nx:space-y-1">
-        <h1 className="nx:typography-heading-large nx:text-foreground">
-          Inbox
-        </h1>
-        <p className="nx:text-muted-foreground">
-          Customer conversations across every channel. Pick one to read and
-          reply.
-        </p>
-      </header>
+      <PageHeader
+        title="Inbox"
+        description="Customer conversations across every channel. Pick one to read and reply."
+      />
 
       {isDesktop ? (
         <ResizablePanelGroup

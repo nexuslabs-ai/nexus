@@ -30,6 +30,7 @@ import { IconCreditCard } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ErrorState } from '../../components/error-state';
+import { PageHeader } from '../../components/page-header';
 import {
   billingKeys,
   type BillingOverview,
@@ -55,14 +56,10 @@ export function BillingRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <header className="nx:space-y-1">
-        <h1 className="nx:typography-heading-large nx:text-foreground">
-          Billing
-        </h1>
-        <p className="nx:text-muted-foreground">
-          Your plan, usage, payment method, and invoice history.
-        </p>
-      </header>
+      <PageHeader
+        title="Billing"
+        description="Your plan, usage, payment method, and invoice history."
+      />
 
       {isPending && <BillingSkeleton />}
       {isError && (
