@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 
 .PHONY: help setup fresh clean dev console docs dev-all build tokens \
-        test test-unit lint format typecheck audit verify \
+        lint typecheck audit verify \
         up down serve publish
 
 help: ## Show this help (default)
@@ -54,17 +54,8 @@ tokens: ## Regenerate token outputs (tailwind + modular CSS)
 
 # ── Test & quality ─────────────────────────────────────────────────────────────
 
-test: ## Full test suite (unit + storybook)
-	pnpm test
-
-test-unit: ## Unit tests only (jsdom — fast)
-	pnpm test:unit
-
 lint: ## ESLint — no warnings allowed
 	pnpm lint
-
-format: ## Prettier — write
-	pnpm format
 
 typecheck: ## TypeScript check across packages
 	pnpm typecheck
