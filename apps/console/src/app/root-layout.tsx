@@ -7,6 +7,8 @@ import { AppSidebar } from '../shell/app-sidebar';
 import { CommandPalette } from '../shell/command-palette';
 import { Topbar } from '../shell/topbar';
 
+import { useSidebarStore } from './sidebar-store';
+
 /**
  * The authenticated app shell, rendered by the `_app` pathless layout route
  * (which guards it behind a session): collapsible sidebar + top bar with the
@@ -15,6 +17,8 @@ import { Topbar } from '../shell/topbar';
  */
 export function RootLayout() {
   const [commandOpen, setCommandOpen] = useState(false);
+  const sidebarOpen = useSidebarStore((s) => s.open);
+  const setSidebarOpen = useSidebarStore((s) => s.setOpen);
 
   // ⌘K / Ctrl+K toggles the command palette from anywhere — a global keyboard
   // subscription, which is exactly what an effect is for.
@@ -30,16 +34,18 @@ export function RootLayout() {
   }, []);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <AppSidebar />
       <SidebarInset>
         <Topbar onSearchClick={() => setCommandOpen(true)} />
-        {/* nx:text-foreground re-establishes the adaptive base text color for
+        {/* SidebarInset already provides the <main> landmark, so this is a
+            plain <div> (a second <main> trips axe landmark rules).
+            nx:text-foreground re-establishes the adaptive base text color for
             module content — without it, reused content that relies on inherited
             foreground (e.g. the typography showcase) renders black in dark mode. */}
-        <main className="nx:text-foreground nx:min-w-0 nx:flex-1">
+        <div className="nx:text-foreground nx:min-w-0 nx:flex-1">
           <Outlet />
-        </main>
+        </div>
       </SidebarInset>
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
     </SidebarProvider>

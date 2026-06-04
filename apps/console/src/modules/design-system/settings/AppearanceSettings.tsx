@@ -16,6 +16,7 @@ import {
   Switch,
 } from '@nexus/react';
 
+import { type SidebarMode, useSidebarStore } from '../../../app/sidebar-store';
 import {
   BASES,
   BRANDS,
@@ -30,6 +31,11 @@ type AppearanceSettingsProps = {
   theme: ThemeConfig;
   setTheme: React.Dispatch<React.SetStateAction<ThemeConfig>>;
 };
+
+const SIDEBAR_MODE_OPTIONS: { value: SidebarMode; label: string }[] = [
+  { value: 'icon', label: 'Icon rail' },
+  { value: 'offcanvas', label: 'Full collapse' },
+];
 
 /** Turn a list of lowercase mode keys into title-cased Select options. */
 function modeOptions<T extends string>(
@@ -83,6 +89,9 @@ export function AppearanceSettings({
   theme,
   setTheme,
 }: AppearanceSettingsProps) {
+  const sidebarMode = useSidebarStore((s) => s.mode);
+  const setSidebarMode = useSidebarStore((s) => s.setMode);
+
   return (
     <div className="nx:space-y-6">
       <Card>
@@ -170,6 +179,23 @@ export function AppearanceSettings({
             onValueChange={(borderWidth) =>
               setTheme((t) => ({ ...t, borderWidth }))
             }
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Sidebar</CardTitle>
+          <CardDescription>
+            How the navigation sidebar collapses.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AxisSelect
+            label="Collapse style"
+            value={sidebarMode}
+            options={SIDEBAR_MODE_OPTIONS}
+            onValueChange={setSidebarMode}
           />
         </CardContent>
       </Card>

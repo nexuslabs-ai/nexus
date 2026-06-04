@@ -10,12 +10,15 @@ import { cn } from '@/lib/utils';
 
 /**
  * Per-series chart configuration. Each key matches a series `dataKey`; the
- * `color` is injected as a `--color-{key}` CSS variable on the chart root so a
- * series can reference its colour with `fill="var(--color-{key})"`.
+ * `color` is exposed as a `--color-{key}` CSS variable on the chart root so a
+ * series can reference its colour with `fill="var(--color-{key})"`. Keys used
+ * for generated color variables must contain only letters, numbers, `_`, or
+ * `-`; other keys can still provide labels and icons.
  *
  * Nexus semantic tokens already adapt across light/dark, so — unlike shadcn —
  * there is no `theme: { light, dark }` split. Point `color` at a Nexus chart
  * token (`var(--nx-color-chart-categorical-N)`) and it tracks the theme for you.
+ * Treat `color` as trusted component CSS, not user-provided data.
  */
 export type ChartConfig = {
   [key: string]: {
@@ -30,6 +33,11 @@ type ChartContextProps = {
 };
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
+const chartColorKeyPattern = /^[A-Za-z0-9_-]+$/;
+
+type ChartRootStyle = React.CSSProperties & {
+  [key: `--color-${string}`]: string | undefined;
+};
 
 function useChart() {
   const context = React.useContext(ChartContext);
@@ -44,6 +52,7 @@ function ChartContainer({
   className,
   children,
   config,
+  style,
   ...props
 }: React.ComponentProps<'div'> & {
   config: ChartConfig;
@@ -52,9 +61,10 @@ function ChartContainer({
   >['children'];
 }) {
   const uniqueId = React.useId();
-  // Strip the colons React emits in some runtimes (`:r0:`) — an unescaped `:` is
-  // invalid inside the `[data-chart=…]` attribute selector ChartStyle writes.
+  // Strip the colons React emits in some runtimes (`:r0:`) so the data attribute
+  // remains convenient to query in tests and consumer CSS.
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`;
+  const chartStyle = getChartStyle(config, style);
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -65,9 +75,9 @@ function ChartContainer({
           "nx:flex nx:aspect-video nx:justify-center nx:text-xs nx:[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground nx:[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-curve.recharts-tooltip-cursor]:stroke-border-default nx:[&_.recharts-dot[stroke='#fff']]:stroke-transparent nx:[&_.recharts-layer]:outline-hidden nx:[&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-radial-bar-background-sector]:fill-muted nx:[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted nx:[&_.recharts-reference-line_[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-sector]:outline-hidden nx:[&_.recharts-sector[stroke='#fff']]:stroke-transparent nx:[&_.recharts-surface]:outline-hidden",
           className
         )}
+        style={chartStyle}
         {...props}
       >
-        <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
           {children}
         </RechartsPrimitive.ResponsiveContainer>
@@ -76,22 +86,28 @@ function ChartContainer({
   );
 }
 
-function ChartStyle({ id, config }: { id: string; config: ChartConfig }) {
-  const colorConfig = Object.entries(config).filter(([, conf]) => conf.color);
+function getChartStyle(
+  config: ChartConfig,
+  style: React.CSSProperties | undefined
+) {
+  const colorStyle = Object.entries(config).reduce<ChartRootStyle>(
+    (acc, [key, conf]) => {
+      if (!conf.color || !chartColorKeyPattern.test(key)) {
+        return acc;
+      }
 
-  if (!colorConfig.length) {
-    return null;
+      acc[`--color-${key}`] = conf.color;
+
+      return acc;
+    },
+    {}
+  );
+
+  if (!Object.keys(colorStyle).length) {
+    return style;
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: `[data-chart=${id}] {\n${colorConfig
-          .map(([key, conf]) => `  --color-${key}: ${conf.color};`)
-          .join('\n')}\n}`,
-      }}
-    />
-  );
+  return { ...colorStyle, ...style };
 }
 
 const ChartTooltip = RechartsPrimitive.Tooltip;

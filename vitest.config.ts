@@ -29,6 +29,8 @@ export default defineConfig({
           environment: 'jsdom',
           globals: true,
           include: [
+            'apps/**/app/**/*.test.{ts,tsx}',
+            'apps/**/src/**/*.test.{ts,tsx}',
             'packages/**/src/**/*.test.{ts,tsx}',
             'packages/**/scripts/**/*.test.{js,ts}',
             'packages/eslint-plugin-nexus/__tests__/**/*.test.js',

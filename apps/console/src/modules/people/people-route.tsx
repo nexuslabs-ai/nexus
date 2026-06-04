@@ -15,6 +15,7 @@ import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
+import { PageHeader } from '../../components/page-header';
 import { useMediaQuery } from '../../hooks/use-media-query';
 import { fetchMembers, peopleKeys } from '../../lib/people-api';
 
@@ -51,20 +52,15 @@ export function PeopleRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <header className="nx:flex nx:items-start nx:justify-between nx:gap-4">
-        <div className="nx:space-y-1">
-          <h1 className="nx:typography-heading-large nx:text-foreground">
-            People
-          </h1>
-          <p className="nx:text-muted-foreground">
-            Everyone in your workspace. Filter by role, department, or status.
-          </p>
-        </div>
+      <PageHeader
+        title="People"
+        description="Everyone in your workspace. Filter by role, department, or status."
+      >
         <Button onClick={() => setInviteOpen(true)}>
           <IconUserPlus />
           Invite member
         </Button>
-      </header>
+      </PageHeader>
 
       <PeopleToolbar
         role={role}

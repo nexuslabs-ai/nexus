@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
+import { PageHeader } from '../../components/page-header';
 import { useMediaQuery } from '../../hooks/use-media-query';
 import { fetchIssues, projectKeys } from '../../lib/projects-api';
 
@@ -32,21 +33,15 @@ export function IssuesRoute() {
 
   return (
     <div className="nx:space-y-6 nx:p-6">
-      <header className="nx:flex nx:items-start nx:justify-between nx:gap-4">
-        <div className="nx:space-y-1">
-          <h1 className="nx:typography-heading-large nx:text-foreground">
-            Issues
-          </h1>
-          <p className="nx:text-muted-foreground">
-            Track work across the team. Sort, filter, and open an issue for the
-            full details.
-          </p>
-        </div>
+      <PageHeader
+        title="Issues"
+        description="Track work across the team. Sort, filter, and open an issue for the full details."
+      >
         <Button onClick={() => setCreateOpen(true)}>
           <IconPlus />
           New issue
         </Button>
-      </header>
+      </PageHeader>
 
       {isPending && <IssuesSkeleton />}
       {isError && (

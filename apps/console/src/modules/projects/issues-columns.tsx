@@ -135,6 +135,7 @@ export const issueColumns: ColumnDef<Issue>[] = [
   },
   {
     id: 'actions',
+    header: () => <span className="nx:sr-only">Actions</span>,
     cell: ({ row }) => <RowActions issue={row.original} />,
     enableSorting: false,
   },

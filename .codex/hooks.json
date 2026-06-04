@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [[ \"$CLAUDE_TOOL_INPUT\" =~ (credentials|secret|password|api_key|apikey|token) ]]; then echo \"Blocked: command contains sensitive keyword\" >&2; exit 1; fi'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.codex/hooks/format-edited-file.mjs",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.codex/hooks/lint-nx-prefix.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

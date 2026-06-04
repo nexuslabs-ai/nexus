@@ -30,6 +30,7 @@ jobs:
     outputs:
       react: ${{ steps.filter.outputs.react }}
       browser: ${{ steps.filter.outputs.browser }}
+      browser_source: ${{ steps.filter.outputs.browser_source }}
       # `packages` is true if `packages/**` changed OR if `apps/**` changed
       # outside `apps/docs/**`. See the two paths-filter steps below.
       packages: ${{ steps.filter.outputs.packages == 'true' || steps.filter-apps.outputs.apps == 'true' }}
@@ -53,6 +54,10 @@ jobs:
               - 'packages/core/**'
               - 'packages/test-utils/**'
             packages:
+              - 'packages/**'
+            # Mirrors the source roots scanned by `yarn audit:browser-support`.
+            browser_source:
+              - 'apps/**'
               - 'packages/**'
             browser:
               - 'package.json'
@@ -155,7 +160,10 @@ jobs:
     name: Audit Browser Support
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.browser == 'true' || needs.changes.outputs.ci == 'true'
+    if: >-
+      needs.changes.outputs.browser == 'true' ||
+      needs.changes.outputs.browser_source == 'true' ||
+      needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
