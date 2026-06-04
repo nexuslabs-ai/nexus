@@ -30,7 +30,6 @@ import { AnalyticsSkeleton } from '../analytics/analytics-route';
 import {
   BillingSkeleton,
   CancelButton,
-  InvoicesSkeleton,
   UsageMeterBar,
 } from '../billing/billing-route';
 import { PlanSheet } from '../billing/plan-sheet';
@@ -110,9 +109,6 @@ export function FlowsRoute() {
         </Sample>
         <Sample label="Issue detail">
           <IssueDetailSkeleton />
-        </Sample>
-        <Sample label="Invoices card">
-          <InvoicesSkeleton />
         </Sample>
         <Sample label="Analytics dashboard" span>
           <AnalyticsSkeleton />
