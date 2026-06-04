@@ -4,6 +4,12 @@ import { useState } from 'react';
 
 import { usePathname } from 'next/navigation';
 
+import {
+  getThemeModeOptions,
+  getThemeStylesheetHref,
+  sanitizeMode,
+  type ThemeMode,
+} from '../_lib/theme-modes';
 import { useThemeStore } from '../_stores/use-theme-store';
 
 import {
@@ -15,86 +21,18 @@ import {
   SelectValue,
 } from './nexus';
 
-type ModeKey =
-  | 'base'
-  | 'brand'
-  | 'spacing'
-  | 'typography'
-  | 'shadow'
-  | 'radius'
-  | 'borderwidth';
+function applyMode(mode: ThemeMode, value: string) {
+  const safeValue = sanitizeMode(mode, value);
 
-const PREFIX: Record<Exclude<ModeKey, 'spacing'>, string> = {
-  base: 'base-',
-  brand: 'brands-',
-  typography: 'typography-',
-  shadow: 'shadow-',
-  radius: 'radius-',
-  borderwidth: 'borderwidth-',
-};
-
-const OPTIONS: Record<ModeKey, { value: string; label: string }[]> = {
-  base: [
-    { value: 'slate', label: 'Slate' },
-    { value: 'stone', label: 'Stone' },
-    { value: 'neutral', label: 'Neutral' },
-    { value: 'gray', label: 'Gray' },
-    { value: 'zinc', label: 'Zinc' },
-  ],
-  brand: [
-    { value: 'blue', label: 'Blue' },
-    { value: 'purple', label: 'Purple' },
-    { value: 'pink', label: 'Pink' },
-    { value: 'teal', label: 'Teal' },
-    { value: 'orange', label: 'Orange' },
-    { value: 'black', label: 'Black' },
-  ],
-  spacing: [
-    { value: 'vega', label: 'Vega' },
-    { value: 'lyra', label: 'Lyra' },
-    { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira (≈ Vega)' },
-    { value: 'nova', label: 'Nova' },
-    { value: 'luma', label: 'Luma' },
-    { value: 'sera', label: 'Sera' },
-  ],
-  typography: [
-    { value: 'vega', label: 'Vega' },
-    { value: 'nova', label: 'Nova' },
-    { value: 'maia', label: 'Maia' },
-  ],
-  shadow: [
-    { value: 'vega', label: 'Vega' },
-    { value: 'lyra', label: 'Lyra' },
-    { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira' },
-    { value: 'nova', label: 'Nova' },
-  ],
-  radius: [
-    { value: 'sharp', label: 'Sharp' },
-    { value: 'subtle', label: 'Subtle' },
-    { value: 'smooth', label: 'Smooth' },
-    { value: 'mellow', label: 'Mellow' },
-    { value: 'blunt', label: 'Blunt' },
-  ],
-  borderwidth: [
-    { value: 'vega', label: 'Vega' },
-    { value: 'lyra', label: 'Lyra (≈ Vega)' },
-    { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira (≈ Vega)' },
-    { value: 'nova', label: 'Nova' },
-  ],
-};
-
-function applyMode(mode: ModeKey, value: string) {
   if (mode === 'spacing') {
-    document.documentElement.setAttribute('data-style', value);
+    document.documentElement.setAttribute('data-style', safeValue);
     return;
   }
+
   const link = document.querySelector<HTMLLinkElement>(
     `link[data-theme="${mode}"]`
   );
-  if (link) link.href = '/themes/' + PREFIX[mode] + value + '.css';
+  if (link) link.href = getThemeStylesheetHref(mode, safeValue);
 }
 
 export function ThemePicker() {
@@ -113,9 +51,10 @@ export function ThemePicker() {
   // picker would overlap it and duplicate its controls, so hide it there.
   if (pathname === '/') return null;
 
-  const onChange = (mode: ModeKey) => (value: string) => {
-    update(mode, value);
-    applyMode(mode, value);
+  const onChange = (mode: ThemeMode) => (value: string) => {
+    const safeValue = sanitizeMode(mode, value);
+    update(mode, safeValue);
+    applyMode(mode, safeValue);
   };
 
   return (
@@ -235,7 +174,7 @@ function ModeSelect({
   value,
   onChange,
 }: {
-  mode: ModeKey;
+  mode: ThemeMode;
   value: string;
   onChange: (v: string) => void;
 }) {
@@ -245,7 +184,7 @@ function ModeSelect({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {OPTIONS[mode].map((o) => (
+        {getThemeModeOptions(mode).map((o) => (
           <SelectItem key={o.value} value={o.value}>
             {o.label}
           </SelectItem>
