@@ -16,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SidebarSeparator,
 } from '@nexus/react';
 import {
   IconComponents,
@@ -33,6 +34,7 @@ import {
 } from '@tanstack/react-router';
 
 import { useSession } from '../app/session';
+import { useSidebarStore } from '../app/sidebar-store';
 
 import { MODULE_ITEMS } from './modules';
 
@@ -56,6 +58,8 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const user = useSession((s) => s.user);
   const signOut = useSession((s) => s.signOut);
+  const sidebarMode = useSidebarStore((s) => s.mode);
+  const showSectionLabels = sidebarMode === 'offcanvas';
 
   const handleSignOut = () => {
     signOut();
@@ -63,7 +67,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible={sidebarMode}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -83,7 +87,9 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Design System</SidebarGroupLabel>
+          {showSectionLabels && (
+            <SidebarGroupLabel>Design System</SidebarGroupLabel>
+          )}
           <SidebarGroupContent>
             <SidebarMenu>
               {DESIGN_ITEMS.map(({ label, to, icon: Icon }) => (
@@ -104,8 +110,12 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {!showSectionLabels && <SidebarSeparator />}
+
         <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          {showSectionLabels && (
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          )}
           <SidebarGroupContent>
             <SidebarMenu>
               {MODULE_ITEMS.map((item) => {
