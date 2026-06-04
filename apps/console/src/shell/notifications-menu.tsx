@@ -214,7 +214,7 @@ export function NotificationsMenu() {
   );
 }
 
-export function NotificationsSkeleton() {
+function NotificationsSkeleton() {
   return (
     <div className="nx:space-y-3 nx:p-3">
       {[0, 1, 2].map((i) => (

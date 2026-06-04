@@ -169,7 +169,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-export function DetailSkeleton() {
+function DetailSkeleton() {
   return (
     <div className="nx:space-y-6">
       <div className="nx:space-y-2">

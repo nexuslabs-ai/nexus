@@ -252,7 +252,7 @@ function MessageBubble({ message }: { message: Message }) {
   );
 }
 
-export function ThreadSkeleton() {
+function ThreadSkeleton() {
   return (
     <div className="nx:flex nx:min-h-0 nx:flex-1 nx:flex-col">
       <div className="nx:border-border-default nx:space-y-2 nx:border-b nx:px-6 nx:py-4">

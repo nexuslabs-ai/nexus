@@ -202,7 +202,7 @@ function SourcesCard({ sources }: { sources: TrafficSource[] }) {
   );
 }
 
-export function AnalyticsSkeleton() {
+function AnalyticsSkeleton() {
   return (
     <div className="nx:space-y-6">
       <div className="nx:grid nx:gap-6 nx:sm:grid-cols-2 nx:xl:grid-cols-4">
