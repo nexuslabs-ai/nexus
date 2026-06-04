@@ -15,9 +15,11 @@ import { getRouteApi } from '@tanstack/react-router';
 
 import { DataTable } from '../../components/data-table';
 import { ErrorState } from '../../components/error-state';
+import { useMediaQuery } from '../../hooks/use-media-query';
 import { fetchMembers, peopleKeys } from '../../lib/people-api';
 
 import { MemberFormSheet } from './member-form-sheet';
+import { MemberCardList } from './people-card-list';
 import { memberColumns } from './people-columns';
 import type { PeopleView } from './people-search';
 import { PeopleToolbar } from './people-toolbar';
@@ -33,6 +35,16 @@ export function PeopleRoute() {
   const { role, department, status } = peopleRoute.useSearch();
   const navigate = peopleRoute.useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 64rem)');
+
+  const tableData = members
+    ? members.filter(
+        (m) =>
+          (role.length === 0 || role.includes(m.role)) &&
+          (department.length === 0 || department.includes(m.department)) &&
+          (status.length === 0 || status.includes(m.status))
+      )
+    : [];
 
   const setSearch = (patch: Partial<PeopleView>) =>
     navigate({ search: (prev) => ({ ...prev, ...patch }) });
@@ -72,19 +84,15 @@ export function PeopleRoute() {
       {members &&
         (members.length === 0 ? (
           <PeopleEmpty />
-        ) : (
+        ) : isDesktop ? (
           <DataTable
             columns={memberColumns}
-            data={members.filter(
-              (m) =>
-                (role.length === 0 || role.includes(m.role)) &&
-                (department.length === 0 ||
-                  department.includes(m.department)) &&
-                (status.length === 0 || status.includes(m.status))
-            )}
+            data={tableData}
             filterColumn="name"
             filterPlaceholder="Filter by name…"
           />
+        ) : (
+          <MemberCardList members={tableData} />
         ))}
 
       <MemberFormSheet open={inviteOpen} onOpenChange={setInviteOpen} />
