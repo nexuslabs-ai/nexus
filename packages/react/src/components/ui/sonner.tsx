@@ -70,7 +70,7 @@ const toasterThemeVars = {
   '--error-bg': 'var(--nx-color-error-background)',
   '--error-text': 'var(--nx-color-error-foreground)',
   '--error-border': 'var(--nx-color-border-error)',
-} as React.CSSProperties;
+};
 
 /**
  * Toaster
@@ -105,7 +105,7 @@ function Toaster({ className, style, ...props }: ToasterProps) {
         theme={theme}
         icons={toasterIcons}
         className={cn('nx:z-toast!', className)}
-        style={{ ...toasterThemeVars, ...style }}
+        style={{ ...toasterThemeVars, ...style } as React.CSSProperties}
         {...props}
       />
     </div>

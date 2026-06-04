@@ -69,11 +69,7 @@ function ToggleGroup({
       data-spacing={spacing}
       // Spacing-scale gap via the runtime spacing var (Nexus resets the base
       // --spacing, so Tailwind's --spacing() function is unavailable here).
-      style={
-        spacing
-          ? ({ gap: `var(--nx-spacing-${spacing})` } as React.CSSProperties)
-          : undefined
-      }
+      style={spacing ? { gap: `var(--nx-spacing-${spacing})` } : undefined}
       className={cn(
         'nx:flex nx:w-fit nx:items-center nx:rounded-md',
         className
