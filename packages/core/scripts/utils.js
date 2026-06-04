@@ -1530,6 +1530,29 @@ export function generateThemeCSS(config) {
   return css;
 }
 
+export function generateNativeBrowserUIThemeCSS() {
+  return `
+/* ===== NATIVE BROWSER UI THEME ===== */
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  :root:not(.dark) {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  :where(input[type='checkbox'], input[type='radio'], input[type='range'], progress) {
+    accent-color: var(--color-primary-background);
+  }
+}
+`;
+}
+
 /**
  * Generate base layer CSS for body defaults
  *
