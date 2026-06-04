@@ -32,6 +32,7 @@ export default defineConfig({
             'packages/**/src/**/*.test.{ts,tsx}',
             'packages/**/scripts/**/*.test.{js,ts}',
             'packages/eslint-plugin-nexus/__tests__/**/*.test.js',
+            'scripts/**/*.test.js',
             // Exclude component tests - they're now in stories
             '!packages/react/src/components/**/*.test.{ts,tsx}',
           ],

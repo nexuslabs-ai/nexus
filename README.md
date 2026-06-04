@@ -56,3 +56,8 @@ Each command runs from the repo root.
 | Samsung Internet | 22              |
 
 Design tokens use OKLCH color (Baseline 2023). Browsers below these versions do not support OKLCH and will not receive hex fallbacks. Consumers needing older browser support must pin to the last pre-OKLCH-migration tag.
+
+The same floor is encoded in root `package.json#browserslist`. Run
+`yarn audit:browser-support` before adopting a new Modern Web Guidance browser
+feature; the audit script records which MWG-recommended features are safe to
+adopt, deferred, or limited to progressive enhancement at this floor.
