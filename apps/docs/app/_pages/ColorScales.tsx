@@ -31,7 +31,7 @@ const NEUTRAL: Palette[] = [
 ];
 
 const FUNCTIONAL: Palette[] = [
-  { name: 'blue', role: 'primary · information' },
+  { name: 'blue', role: 'default brand · information' },
   { name: 'green', role: 'success' },
   { name: 'yellow', role: 'warning' },
   { name: 'red', role: 'error' },

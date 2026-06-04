@@ -105,12 +105,12 @@ L; D may swap palettes for hue rotation).
 
 From the active header, resolve which JSON file holds the fg token:
 
-| Filename pattern                                           | Path                                     |
-| ---------------------------------------------------------- | ---------------------------------------- |
-| `base-{slate,neutral,gray,stone,zinc}-{light,dark}.json`   | `packages/core/tokens/semantic/`         |
-| `brands-{blue,gray,neutral,slate,stone}-{light,dark}.json` | `packages/core/tokens/semantic/`         |
-| `chart-categorical-default-{light,dark}.json`              | `packages/core/tokens/semantic/`         |
-| `focus-default-{light,dark}.json`                          | `packages/core/tokens/primitives/focus/` |
+| Filename pattern                                                | Path                                     |
+| --------------------------------------------------------------- | ---------------------------------------- |
+| `base-{slate,neutral,gray,stone,zinc}-{light,dark}.json`        | `packages/core/tokens/semantic/`         |
+| `brands-{blue,purple,pink,teal,orange,black}-{light,dark}.json` | `packages/core/tokens/semantic/`         |
+| `chart-categorical-default-{light,dark}.json`                   | `packages/core/tokens/semantic/`         |
+| `focus-default-{light,dark}.json`                               | `packages/core/tokens/primitives/focus/` |
 
 For cross-file headers, the **fg-file** (second filename, after `↔`) is what
 gets resolved here. The script opens the bg-file itself

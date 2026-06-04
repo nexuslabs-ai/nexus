@@ -32,6 +32,7 @@ export function ThemeBootstrap() {
         radius: 'sharp',
         borderwidth: 'vega',
       };
+      var VALID_BRANDS = ['blue', 'purple', 'pink', 'teal', 'orange', 'black'];
       var prefs = Object.assign({}, DEFAULTS);
       var stored = ls.getItem('nexus-docs-tokens');
       if (stored) {
@@ -45,6 +46,9 @@ export function ThemeBootstrap() {
             });
           }
         } catch (e) {}
+      }
+      if (VALID_BRANDS.indexOf(prefs.brand) === -1) {
+        prefs.brand = DEFAULTS.brand;
       }
       // focus is single-variant today
       var focusLink = document.createElement('link');

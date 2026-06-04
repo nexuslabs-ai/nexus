@@ -1,77 +1,77 @@
 {
   "primary": {
     "background": {
-      "$value": "{gray.100}",
+      "$value": "{orange.700}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{gray.300}",
+      "$value": "{orange.900}",
       "$type": "color"
     },
     "foreground": {
-      "$value": "{gray.900}",
+      "$value": "{white.base}",
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{gray.200}",
+      "$value": "{orange.800}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{gray.800}",
+      "$value": "{orange.300}",
       "$type": "color"
     },
     "subtle": {
-      "$value": "{gray.950}",
+      "$value": "{orange.50}",
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{gray.50}",
+      "$value": "{orange.700}",
       "$type": "color"
     },
     "subtle-hover": {
-      "$value": "{gray.900}",
+      "$value": "{orange.100}",
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{gray.800}",
+      "$value": "{orange.200}",
       "$type": "color"
     }
   },
   "secondary": {
     "background": {
-      "$value": "{gray.900}",
+      "$value": "{neutral.100}",
       "$type": "color"
     },
     "foreground": {
-      "$value": "{gray.100}",
+      "$value": "{neutral.900}",
       "$type": "color"
     },
     "background-hover": {
-      "$value": "{gray.700}",
+      "$value": "{neutral.200}",
       "$type": "color"
     },
     "background-active": {
-      "$value": "{gray.600}",
+      "$value": "{neutral.300}",
       "$type": "color"
     },
     "disabled": {
-      "$value": "{gray.950}",
+      "$value": "{neutral.50}",
       "$type": "color"
     },
     "subtle": {
-      "$value": "{gray.800}",
+      "$value": "{neutral.100}",
       "$type": "color"
     },
     "subtle-foreground": {
-      "$value": "{gray.200}",
+      "$value": "{neutral.600}",
       "$type": "color"
     },
     "subtle-hover": {
-      "$value": "{gray.700}",
+      "$value": "{neutral.200}",
       "$type": "color"
     },
     "subtle-active": {
-      "$value": "{gray.600}",
+      "$value": "{neutral.300}",
       "$type": "color"
     }
   }

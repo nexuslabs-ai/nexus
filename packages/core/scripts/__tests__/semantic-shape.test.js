@@ -3,8 +3,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
+import { BRAND_PALETTES } from '../lib/palettes.js';
+
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
+const THEMES = ['light', 'dark'];
 
 const REQUIRED_KEYS = [
   'background',
@@ -33,6 +36,17 @@ function readJson(filePath) {
 }
 
 describe('semantic token shape', () => {
+  it('exposes exactly the supported brand mode files', () => {
+    const expected = BRAND_PALETTES.flatMap((brand) =>
+      THEMES.map((theme) => `brands-${brand}-${theme}.json`)
+    ).sort();
+    const actual = semanticFiles('brands')
+      .map((filePath) => path.basename(filePath))
+      .sort();
+
+    expect(actual).toEqual(expected);
+  });
+
   // `.claude/rules/tokens.md` documents that each brand/status role exposes
   // a fixed nine-key shape. Without a test, the doc and the JSON drift
   // (see #54: badge.tsx referenced `*-surface` / `*-text` keys that never

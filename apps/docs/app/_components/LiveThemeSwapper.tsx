@@ -12,7 +12,7 @@ import { Button } from './nexus';
  */
 
 const BASES = ['slate', 'stone', 'neutral', 'gray', 'zinc'] as const;
-const BRANDS = ['blue', 'gray', 'neutral', 'slate', 'stone'] as const;
+const BRANDS = ['blue', 'purple', 'pink', 'teal', 'orange', 'black'] as const;
 const PREFIX = { base: 'base-', brand: 'brands-' } as const;
 
 function applyTheme(mode: 'base' | 'brand', value: string) {

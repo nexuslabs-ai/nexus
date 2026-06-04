@@ -19,6 +19,14 @@ import { createJSONStorage, persist } from 'zustand/middleware';
  */
 
 export const STORAGE_KEY = 'nexus-docs-tokens';
+const BRAND_VALUES = [
+  'blue',
+  'purple',
+  'pink',
+  'teal',
+  'orange',
+  'black',
+] as const;
 
 export type ThemeState = {
   base: string;
@@ -44,6 +52,29 @@ type ThemeStore = ThemeState & {
   update: <K extends keyof ThemeState>(key: K, value: ThemeState[K]) => void;
 };
 
+function sanitizeBrand(value: unknown): string {
+  return BRAND_VALUES.includes(value as (typeof BRAND_VALUES)[number])
+    ? String(value)
+    : DEFAULTS.brand;
+}
+
+function stringOrDefault(value: unknown, fallback: string): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function sanitizeThemeState(raw: unknown): ThemeState {
+  const state = (raw ?? {}) as Partial<Record<keyof ThemeState, unknown>>;
+  return {
+    base: stringOrDefault(state.base, DEFAULTS.base),
+    brand: sanitizeBrand(state.brand),
+    spacing: stringOrDefault(state.spacing, DEFAULTS.spacing),
+    typography: stringOrDefault(state.typography, DEFAULTS.typography),
+    shadow: stringOrDefault(state.shadow, DEFAULTS.shadow),
+    radius: stringOrDefault(state.radius, DEFAULTS.radius),
+    borderwidth: stringOrDefault(state.borderwidth, DEFAULTS.borderwidth),
+  };
+}
+
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
@@ -54,6 +85,12 @@ export const useThemeStore = create<ThemeStore>()(
       name: STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
+      version: 1,
+      migrate: (persisted) => sanitizeThemeState(persisted),
+      merge: (persisted, current) => ({
+        ...current,
+        ...sanitizeThemeState(persisted),
+      }),
       partialize: ({ update: _update, ...rest }) => rest,
     }
   )

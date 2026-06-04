@@ -143,14 +143,27 @@ function getSemanticFiles(discovered, config) {
       selectedMode = modeKeys[0];
     }
 
-    if (modes[selectedMode]) {
-      result.themed.push({
-        type,
-        mode: selectedMode,
-        light: modes[selectedMode].light,
-        dark: modes[selectedMode].dark,
-      });
+    const selectedFiles = modes[selectedMode];
+    if (!selectedFiles) {
+      throw new Error(
+        `getSemanticFiles: themed type "${type}" has no mode "${selectedMode}". Available modes: ${Object.keys(
+          modes
+        ).join(', ')}.`
+      );
     }
+
+    if (!selectedFiles.light || !selectedFiles.dark) {
+      throw new Error(
+        `getSemanticFiles: themed type "${type}" mode "${selectedMode}" must provide both light and dark files.`
+      );
+    }
+
+    result.themed.push({
+      type,
+      mode: selectedMode,
+      light: selectedFiles.light,
+      dark: selectedFiles.dark,
+    });
   }
 
   result.standalone = discovered.standalone;

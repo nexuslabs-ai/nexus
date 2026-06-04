@@ -43,10 +43,11 @@ const OPTIONS: Record<ModeKey, { value: string; label: string }[]> = {
   ],
   brand: [
     { value: 'blue', label: 'Blue' },
-    { value: 'gray', label: 'Gray' },
-    { value: 'neutral', label: 'Neutral' },
-    { value: 'slate', label: 'Slate' },
-    { value: 'stone', label: 'Stone' },
+    { value: 'purple', label: 'Purple' },
+    { value: 'pink', label: 'Pink' },
+    { value: 'teal', label: 'Teal' },
+    { value: 'orange', label: 'Orange' },
+    { value: 'black', label: 'Black' },
   ],
   spacing: [
     { value: 'vega', label: 'Vega' },

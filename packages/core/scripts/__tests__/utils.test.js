@@ -418,7 +418,7 @@ describe('utils', () => {
 
     it('has expected default values', () => {
       expect(DEFAULT_CONFIG.base).toBe('stone');
-      expect(DEFAULT_CONFIG.brand).toBe('neutral');
+      expect(DEFAULT_CONFIG.brand).toBe('blue');
       expect(DEFAULT_CONFIG.typography).toBe('vega');
       expect(DEFAULT_CONFIG.shadow).toBe('vega');
       expect(DEFAULT_CONFIG.radius).toBe('sharp');

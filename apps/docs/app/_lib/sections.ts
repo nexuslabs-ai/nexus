@@ -417,7 +417,7 @@ export const SECTIONS = {
             type: 'placeholder',
             variant: 'tall',
             label:
-              '[ Live brand swapper — render a Card across all 10 permutations ]',
+              '[ Live brand swapper — render a Card across base and brand modes ]',
           },
           {
             type: 'placeholder',

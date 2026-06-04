@@ -19,7 +19,7 @@ const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
   },
   {
     dim: 'Brand',
-    options: 'blue · gray · neutral · slate · stone',
+    options: 'blue · purple · pink · teal · orange · black',
     swap: '<link> swap',
   },
   {
