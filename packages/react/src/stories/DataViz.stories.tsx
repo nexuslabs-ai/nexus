@@ -106,7 +106,7 @@ type Story = StoryObj;
 
 export const Swatches: Story = {
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
+    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-svh nx:w-full">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Chart Palette
@@ -132,7 +132,7 @@ export const Swatches: Story = {
 export const UtilityClasses: Story = {
   name: 'Tailwind Utilities',
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
+    <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-svh nx:w-full">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Tailwind utilities
@@ -181,7 +181,7 @@ export const UtilityClasses: Story = {
 export const BarChartExample: Story = {
   name: 'Bar Chart',
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-svh nx:w-full">
       <h2 className="nx:text-foreground nx:typography-heading-medium">
         Grouped Bar Chart
       </h2>
@@ -238,7 +238,7 @@ export const BarChartExample: Story = {
 export const PieChartExample: Story = {
   name: 'Pie Chart',
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-screen nx:w-full">
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-h-svh nx:w-full">
       <h2 className="nx:text-foreground nx:typography-heading-medium">
         Pie Chart
       </h2>

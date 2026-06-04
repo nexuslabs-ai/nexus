@@ -30,7 +30,7 @@ function Section({
 
 export function ComponentShowcase() {
   return (
-    <div className="nx:bg-muted/30 nx:min-h-screen">
+    <div className="nx:bg-muted/30 nx:min-h-svh">
       <div className="nx:p-6 nx:space-y-6">
         {/* Typography Section */}
         <Section title="Typography" description="Text styles and font scales">

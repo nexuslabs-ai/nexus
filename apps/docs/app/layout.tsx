@@ -27,7 +27,7 @@ export default function RootLayout({
       <head>
         <ThemeBootstrap />
       </head>
-      <body className="nx:bg-background nx:text-foreground nx:min-h-screen">
+      <body className="nx:bg-background nx:text-foreground nx:min-h-svh">
         <TopNav />
         <main>{children}</main>
         <ThemePicker />

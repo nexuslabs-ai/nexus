@@ -27,7 +27,7 @@ const ThemeDecorator: Decorator = (Story, context) => {
 
   return (
     <div
-      className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-screen'}`}
+      className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-svh'}`}
     >
       <Story />
     </div>

@@ -5,6 +5,24 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const PACKAGE_JSON = path.join(REPO_ROOT, 'package.json');
+const DEFAULT_SOURCE_ROOTS = [
+  path.join(REPO_ROOT, 'apps'),
+  path.join(REPO_ROOT, 'packages'),
+];
+const SOURCE_FILE_RE = /\.(?:[cm]js|[cm]ts|jsx|tsx|css|scss|mdx)$/i;
+const IGNORED_SOURCE_DIRS = new Set([
+  '.next',
+  '.turbo',
+  'build',
+  'coverage',
+  'dist',
+  'node_modules',
+  'storybook-static',
+]);
+const RAW_NUMERIC_VH_RE = /\b\d+(?:\.\d+)?vh\b/gi;
+const TAILWIND_SCREEN_HEIGHT_RE =
+  /\b(?:nx:)?(?:(?:[a-z0-9-]+|\[[^\]]+\]):)*(?:min-h|h|max-h)-screen\b/g;
+const VH_ALLOW_RE = /^\/\/\s*nexus-allow-vh:\s*\S/;
 
 export const BROWSER_FLOOR = Object.freeze({
   chrome: 111,
@@ -50,6 +68,20 @@ export const FEATURE_POLICIES = Object.freeze([
     },
     guide: 'css / dark-mode',
     note: 'Safe to use for native browser UI theming at the Nexus floor.',
+  },
+  {
+    id: 'viewport-height-units',
+    name: 'svh / lvh / dvh viewport units',
+    policy: 'adopt',
+    support: {
+      chrome: 108,
+      edge: 108,
+      firefox: 101,
+      safari: 15.4,
+      samsung: 21,
+    },
+    guide: 'css / css-layout',
+    note: 'Use svh, lvh, or dvh instead of raw vh according to browser-chrome intent.',
   },
   {
     id: 'light-dark',
@@ -218,6 +250,85 @@ function formatSupportSummary(feature) {
     .join(', ');
 }
 
+function* walkSourceFiles(dir) {
+  if (!fs.existsSync(dir)) return;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      if (IGNORED_SOURCE_DIRS.has(entry.name)) continue;
+      yield* walkSourceFiles(path.join(dir, entry.name));
+      continue;
+    }
+
+    if (!SOURCE_FILE_RE.test(entry.name)) continue;
+    yield path.join(dir, entry.name);
+  }
+}
+
+function getLocation(content, offset) {
+  const before = content.slice(0, offset);
+  const line = before.split('\n').length;
+  const lineStart = before.lastIndexOf('\n') + 1;
+
+  return {
+    line,
+    column: offset - lineStart + 1,
+  };
+}
+
+function hasVhException(lines, line) {
+  if (line <= 1) return false;
+  return VH_ALLOW_RE.test(lines[line - 2].trim());
+}
+
+function getRawViewportHeightRecommendation(match) {
+  if (match.endsWith('-screen')) {
+    return 'replace screen height with svh, dvh, or lvh based on layout intent';
+  }
+
+  return 'replace vh with svh, dvh, or lvh based on layout intent';
+}
+
+export function findRawViewportHeightUsages(content, file = '') {
+  const lines = content.split('\n');
+  const usages = [];
+  const patterns = [RAW_NUMERIC_VH_RE, TAILWIND_SCREEN_HEIGHT_RE];
+
+  for (const pattern of patterns) {
+    pattern.lastIndex = 0;
+    for (const match of content.matchAll(pattern)) {
+      const location = getLocation(content, match.index);
+      if (hasVhException(lines, location.line)) continue;
+      usages.push({
+        file,
+        line: location.line,
+        column: location.column,
+        match: match[0],
+        recommendation: getRawViewportHeightRecommendation(match[0]),
+      });
+    }
+  }
+
+  return usages.sort((a, b) => {
+    if (a.line !== b.line) return a.line - b.line;
+    return a.column - b.column;
+  });
+}
+
+export function findRawViewportHeightUsagesInSource(sourceRoots) {
+  const usages = [];
+
+  for (const sourceRoot of sourceRoots) {
+    for (const file of walkSourceFiles(sourceRoot)) {
+      const content = fs.readFileSync(file, 'utf8');
+      usages.push(
+        ...findRawViewportHeightUsages(content, path.relative(REPO_ROOT, file))
+      );
+    }
+  }
+
+  return usages;
+}
+
 export function isFeatureSafeAtFloor(feature, floor = BROWSER_FLOOR) {
   return Object.keys(BROWSER_LABELS).every((browser) => {
     return compareVersions(floor[browser], feature.support[browser]);
@@ -268,21 +379,26 @@ export function compareBrowserslist(actual, expected = EXPECTED_BROWSERSLIST) {
   };
 }
 
-export function auditBrowserSupport(packageJson) {
+export function auditBrowserSupport(packageJson, options = {}) {
   const browserslist = normalizeBrowserslist(packageJson.browserslist);
   const browserslistDiff = compareBrowserslist(browserslist);
   const features = evaluateFeaturePolicies();
   const featureProblems = features.filter((feature) => feature.problem);
+  const rawVhUsages =
+    options.rawVhUsages ??
+    findRawViewportHeightUsagesInSource(options.sourceRoots ?? []);
 
   return {
     browserslist,
     browserslistDiff,
     features,
     featureProblems,
+    rawVhUsages,
     ok:
       browserslistDiff.missing.length === 0 &&
       browserslistDiff.extra.length === 0 &&
-      featureProblems.length === 0,
+      featureProblems.length === 0 &&
+      rawVhUsages.length === 0,
   };
 }
 
@@ -339,10 +455,21 @@ function printResult(result) {
       );
     }
   }
+
+  if (result.rawVhUsages.length > 0) {
+    process.stdout.write('\nRaw viewport height usage(s):\n');
+    for (const usage of result.rawVhUsages) {
+      process.stdout.write(
+        `  ${usage.file}:${usage.line}:${usage.column}  "${usage.match}" — ${usage.recommendation}\n`
+      );
+    }
+  }
 }
 
 function main() {
-  const result = auditBrowserSupport(loadPackageJson());
+  const result = auditBrowserSupport(loadPackageJson(), {
+    sourceRoots: DEFAULT_SOURCE_ROOTS,
+  });
   printResult(result);
   process.exit(result.ok ? 0 : 1);
 }

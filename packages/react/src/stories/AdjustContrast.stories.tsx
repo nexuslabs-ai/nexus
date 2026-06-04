@@ -161,7 +161,7 @@ export const Playground: Story = {
     const textColor = result.ok ? result.value : '#888';
 
     return (
-      <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-screen">
+      <div className="nx:flex nx:flex-col nx:gap-8 nx:p-10 nx:bg-background nx:min-h-svh">
         <div className="nx:flex nx:flex-col nx:gap-2">
           <h2 className="nx:text-foreground nx:typography-heading-medium">
             adjustContrast Playground
@@ -217,7 +217,7 @@ export const Playground: Story = {
 export const Showcase: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-h-screen">
+    <div className="nx:flex nx:flex-col nx:gap-10 nx:p-10 nx:bg-background nx:min-h-svh">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Showcase

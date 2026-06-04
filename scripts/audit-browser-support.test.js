@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   auditBrowserSupport,
@@ -8,8 +11,31 @@ import {
   EXPECTED_BROWSERSLIST,
   FEATURE_POLICIES,
   FEATURE_POLICY_DEFINITIONS,
+  findRawViewportHeightUsages,
+  findRawViewportHeightUsagesInSource,
   isFeatureSafeAtFloor,
 } from './audit-browser-support.js';
+
+const tempDirs = [];
+
+afterEach(() => {
+  while (tempDirs.length > 0) {
+    fs.rmSync(tempDirs.pop(), { recursive: true, force: true });
+  }
+});
+
+function makeSourceRoot(files) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-vh-audit-'));
+  tempDirs.push(dir);
+
+  for (const [file, content] of Object.entries(files)) {
+    const fullPath = path.join(dir, file);
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    fs.writeFileSync(fullPath, content);
+  }
+
+  return dir;
+}
 
 describe('audit-browser-support', () => {
   it('matches the documented Nexus browser floor', () => {
@@ -32,11 +58,15 @@ describe('audit-browser-support', () => {
 
   it('treats OKLCH as floor-safe and Popover API as outside the floor', () => {
     const oklch = FEATURE_POLICIES.find((feature) => feature.id === 'oklch');
+    const viewportHeightUnits = FEATURE_POLICIES.find(
+      (feature) => feature.id === 'viewport-height-units'
+    );
     const popover = FEATURE_POLICIES.find(
       (feature) => feature.id === 'popover-api'
     );
 
     expect(isFeatureSafeAtFloor(oklch)).toBe(true);
+    expect(isFeatureSafeAtFloor(viewportHeightUnits)).toBe(true);
     expect(isFeatureSafeAtFloor(popover)).toBe(false);
   });
 
@@ -63,6 +93,12 @@ describe('audit-browser-support', () => {
           id: 'field-sizing',
           policy: 'progressive-enhancement',
           floorSafe: false,
+          problem: null,
+        }),
+        expect.objectContaining({
+          id: 'viewport-height-units',
+          policy: 'adopt',
+          floorSafe: true,
           problem: null,
         }),
         expect.objectContaining({
@@ -179,5 +215,115 @@ describe('audit-browser-support', () => {
     expect(result.ok).toBe(true);
     expect(result.browserslistDiff).toEqual({ missing: [], extra: [] });
     expect(result.featureProblems).toEqual([]);
+  });
+
+  it('detects raw numeric vh values in source text', () => {
+    const usages = findRawViewportHeightUsages(
+      [
+        'const rail = "nx:max-h-[calc(100vh-80px)]";',
+        'const placeholder = "nx:min-h-[60vh]";',
+      ].join('\n'),
+      'fixture.tsx'
+    );
+
+    expect(usages).toEqual([
+      expect.objectContaining({
+        file: 'fixture.tsx',
+        line: 1,
+        match: '100vh',
+      }),
+      expect.objectContaining({
+        file: 'fixture.tsx',
+        line: 2,
+        match: '60vh',
+      }),
+    ]);
+  });
+
+  it('allows svh, dvh, and lvh viewport units', () => {
+    expect(
+      findRawViewportHeightUsages(
+        [
+          'const a = "nx:min-h-[60svh] nx:max-h-[80dvh] nx:h-[100lvh]";',
+          'const b = "nx:min-h-svh nx:h-dvh nx:max-h-lvh";',
+        ].join('\n')
+      )
+    ).toEqual([]);
+  });
+
+  it('detects Tailwind screen height utilities', () => {
+    const usages = findRawViewportHeightUsages(
+      [
+        'const a = "nx:min-h-screen";',
+        'const b = "nx:md:h-screen";',
+        'const c = "nx:[@media(pointer:fine)]:max-h-screen";',
+      ].join('\n'),
+      'fixture.tsx'
+    );
+
+    expect(usages.map((usage) => usage.match)).toEqual([
+      'nx:min-h-screen',
+      'nx:md:h-screen',
+      'nx:[@media(pointer:fine)]:max-h-screen',
+    ]);
+  });
+
+  it('allows raw vh only with an immediate prior-line reason', () => {
+    const usages = findRawViewportHeightUsages(
+      [
+        '// nexus-allow-vh: immersive large-viewport demo',
+        'const allowed = "100vh";',
+        'const trailing = "100vh"; // nexus-allow-vh: not adjacent',
+        '// nexus-allow-vh:',
+        'const missingReason = "100vh";',
+        '// nexus-allow-vh: separated by a blank line',
+        '',
+        'const separated = "100vh";',
+      ].join('\n')
+    );
+
+    expect(usages.map((usage) => usage.line)).toEqual([3, 5, 8]);
+  });
+
+  it('finds raw vh usages in source roots and ignores generated dirs', () => {
+    const sourceRoot = makeSourceRoot({
+      'app/page.tsx': 'export const page = "nx:min-h-screen";',
+      'app/dist/generated.tsx': 'export const generated = "100vh";',
+      'app/node_modules/package/index.js': 'export const dependency = "100vh";',
+      'app/styles.css': '.hero { min-height: 100vh; }',
+      'app/README.md': '100vh in prose is outside the source scan',
+    });
+
+    const usages = findRawViewportHeightUsagesInSource([sourceRoot]);
+
+    expect(usages).toEqual([
+      expect.objectContaining({
+        match: 'nx:min-h-screen',
+      }),
+      expect.objectContaining({
+        match: '100vh',
+      }),
+    ]);
+  });
+
+  it('fails the audit when raw vh usages are present', () => {
+    const sourceRoot = makeSourceRoot({
+      'packages/react/src/example.tsx': 'export const example = "100vh";',
+    });
+    const result = auditBrowserSupport(
+      {
+        browserslist: [...EXPECTED_BROWSERSLIST],
+      },
+      {
+        sourceRoots: [sourceRoot],
+      }
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.rawVhUsages).toEqual([
+      expect.objectContaining({
+        match: '100vh',
+      }),
+    ]);
   });
 });
