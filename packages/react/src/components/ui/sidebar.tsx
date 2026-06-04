@@ -577,12 +577,16 @@ interface SidebarContentProps extends React.ComponentProps<'nav'> {}
 function SidebarContent({
   className,
   'aria-label': ariaLabel = 'Sidebar',
+  'aria-labelledby': ariaLabelledby,
   ...props
 }: SidebarContentProps) {
   return (
     <nav
       data-slot="sidebar-content"
-      aria-label={ariaLabel}
+      // A labelledby reference, when given, names the landmark — so suppress the
+      // default string label rather than emitting both on the <nav> (issue #418).
+      aria-label={ariaLabelledby ? undefined : ariaLabel}
+      aria-labelledby={ariaLabelledby}
       className={cn(
         // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:flex nx:min-h-0 nx:flex-1 nx:flex-col nx:gap-2 nx:overflow-auto nx:group-data-[collapsible=icon]:overflow-hidden',
