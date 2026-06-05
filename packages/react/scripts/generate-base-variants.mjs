@@ -20,7 +20,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { COMPONENT_SUBDIRS } from './component-paths.mjs';
+import { COMPONENT_SUBDIRS, componentDirSegment } from './component-paths.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = path.join(__dirname, 'base-variants.config.json');
@@ -163,14 +163,18 @@ function resolveSourceDir(component) {
  * full generator.
  */
 export function storiesImportPath(component, sourceDir) {
-  return `../${sourceDir}/${component.name}.stories`;
+  return `../${componentDirSegment(sourceDir, component.name)}/${component.name}.stories`;
 }
 
 /**
  * Absolute path to the canonical stories file on disk for `assertShowcaseExists`.
  */
 function storiesFilePath(component, sourceDir) {
-  return path.join(COMPONENTS_DIR, sourceDir, `${component.name}.stories.tsx`);
+  return path.join(
+    COMPONENTS_DIR,
+    componentDirSegment(sourceDir, component.name),
+    `${component.name}.stories.tsx`
+  );
 }
 
 function buildStory(component, config, sourceDir) {

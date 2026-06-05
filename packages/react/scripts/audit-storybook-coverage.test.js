@@ -332,7 +332,7 @@ describe('storyExercises', () => {
 describe('file discovery', () => {
   it('resolves a kebab name to a single file under ui/', () => {
     const file = findComponentFile('button');
-    expect(file.endsWith('/ui/button.tsx')).toBe(true);
+    expect(file.endsWith('/ui/button/button.tsx')).toBe(true);
   });
 
   it('resolves the stories file alongside the component', () => {
@@ -377,14 +377,14 @@ describe('showcaseNameFor', () => {
 
 describe('auditComponent — real fixtures', () => {
   it('Button passes with no findings', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'button.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'button', 'button.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     expect(result.summary.total).toBe(0);
   });
 
   it('Avatar passes via display-gate + AllSizes showcase', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'avatar.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'avatar', 'avatar.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     // Display-gate downgrades Disabled/Click/Keyboard to info entries
@@ -394,7 +394,7 @@ describe('auditComponent — real fixtures', () => {
   });
 
   it('Badge passes via display-gate + surfaces `fill` as extra enum', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'badge.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'badge', 'badge.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     const extraEnum = result.info.find((i) => i.rule === 'extra-cva-enum');
@@ -409,14 +409,14 @@ describe('auditComponent — real fixtures', () => {
     result.info.filter((i) => i.rule === 'display-gate').map((i) => i.name);
 
   it('Input passes via text-input equivalents with no skipped requirements', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'input.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'input', 'input.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     expect(displayGateNames(result)).toEqual([]);
   });
 
   it('Dialog passes via trigger-and-overlay click equivalence; only Disabled is archetype-omitted', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'dialog.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'dialog', 'dialog.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     // Dialog explicitly opts out of `Disabled` only — Click and Keyboard
@@ -425,28 +425,33 @@ describe('auditComponent — real fixtures', () => {
   });
 
   it('DropdownMenu passes via WithDisabledItems equivalence with no skipped requirements', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'dropdown-menu.tsx');
+    const file = path.join(
+      COMPONENTS_ROOT,
+      'ui',
+      'dropdown-menu',
+      'dropdown-menu.tsx'
+    );
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     expect(displayGateNames(result)).toEqual([]);
   });
 
   it('Select passes via DisabledInteraction equivalence with no skipped requirements', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'select.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'select', 'select.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     expect(displayGateNames(result)).toEqual([]);
   });
 
   it('Accordion passes via ExpandInteraction equivalence with no skipped requirements', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'accordion.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'accordion', 'accordion.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     expect(displayGateNames(result)).toEqual([]);
   });
 
   it('Tabs passes via WithDisabledTab/DisabledTabInteraction equivalence with no skipped requirements', () => {
-    const file = path.join(COMPONENTS_ROOT, 'ui', 'tabs.tsx');
+    const file = path.join(COMPONENTS_ROOT, 'ui', 'tabs', 'tabs.tsx');
     const result = auditComponent(file);
     expect(result.findings).toEqual([]);
     expect(displayGateNames(result)).toEqual([]);

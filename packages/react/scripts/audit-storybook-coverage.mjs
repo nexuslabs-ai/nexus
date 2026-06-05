@@ -21,7 +21,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { COMPONENT_SUBDIRS } from './component-paths.mjs';
+import {
+  COMPONENT_SUBDIRS,
+  componentDirSegment,
+  NESTED_SUBDIRS,
+} from './component-paths.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -547,7 +551,11 @@ function isExcludedPath(p) {
 export function findComponentFile(kebab, root = COMPONENTS_ROOT) {
   const matches = [];
   for (const subdir of COMPONENT_SUBDIRS) {
-    const candidate = path.join(root, subdir, `${kebab}.tsx`);
+    const candidate = path.join(
+      root,
+      componentDirSegment(subdir, kebab),
+      `${kebab}.tsx`
+    );
     if (
       fs.existsSync(candidate) &&
       !candidate.endsWith(STORY_SUFFIX) &&
@@ -591,6 +599,15 @@ export function listAllComponents(root = COMPONENTS_ROOT) {
   for (const subdir of COMPONENT_SUBDIRS) {
     const dir = path.join(root, subdir);
     if (!fs.existsSync(dir)) continue;
+    if (NESTED_SUBDIRS.has(subdir)) {
+      // Per-component folder: each child dir holds `{kebab}/{kebab}.tsx`.
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const full = path.join(dir, entry.name, `${entry.name}.tsx`);
+        if (fs.existsSync(full) && !isExcludedPath(full)) out.push(full);
+      }
+      continue;
+    }
     for (const entry of fs.readdirSync(dir)) {
       const full = path.join(dir, entry);
       if (!entry.endsWith('.tsx')) continue;

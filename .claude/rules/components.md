@@ -15,18 +15,30 @@
 
 ## File Structure
 
-Every component in `packages/react/src/components/ui/` needs 2 files:
+Each component under `packages/react/src/components/ui/` lives in its own
+kebab-case folder holding the component, its stories, and a barrel:
 
 ```
-{name}.tsx           # Component (kebab-case)
-{Name}.stories.tsx   # Stories + Tests (PascalCase, play functions)
+ui/{name}/
+├── {name}.tsx          # Component (kebab-case)
+├── {Name}.stories.tsx  # Stories + Tests (PascalCase, play functions)
+└── index.ts            # Barrel: export * from './{name}'
 ```
+
+The folder is kebab-case (`dropdown-menu/`); the stories file stays PascalCase
+(`DropdownMenu.stories.tsx`). The per-folder `index.ts` is what keeps every
+import site stable — `@/components/ui/{name}` resolves to the folder barrel, so
+`src/index.ts` and cross-component imports never reference the nested file.
 
 **No separate `*.test.tsx` files.** Tests are play functions in stories.
 
+> `primitives/` stays flat (`{name}.tsx` directly under the subdir) because
+> Show/Hide share `responsive-visibility.ts` at the subdir root. The tooling
+> (`scripts/component-paths.mjs`) tracks which subdirs are nested.
+
 ## Component Template
 
-Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. Export the component, its props type, and its `cva` variants function, then add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button.tsx` and `badge.tsx` for the canonical implementations.
+Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. Export the component, its props type, and its `cva` variants function, re-export them from the folder's `index.ts` (`export * from './{name}'`), then add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button/button.tsx` and `badge/badge.tsx` for the canonical implementations.
 
 ## Data Attributes
 
