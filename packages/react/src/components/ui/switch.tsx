@@ -38,11 +38,12 @@ function Switch({ className, ...props }: SwitchProps) {
       data-slot="switch"
       className={cn(
         'nx:peer nx:inline-flex nx:h-5 nx:w-9 nx:shrink-0 nx:cursor-pointer nx:items-center',
-        'nx:rounded-full nx:border-2 nx:border-transparent',
+        'nx:rounded-full nx:border-2 nx:border-border-default',
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
-        'nx:data-[state=checked]:bg-primary-background nx:data-[state=unchecked]:bg-muted',
+        'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:bg-primary-background nx:data-[state=checked]:hover:bg-primary-background-hover',
+        'nx:data-[state=unchecked]:bg-control-background nx:data-[state=unchecked]:hover:bg-control-background-hover',
         className
       )}
       {...props}
@@ -51,7 +52,8 @@ function Switch({ className, ...props }: SwitchProps) {
         data-slot="switch-thumb"
         className={cn(
           'nx:pointer-events-none nx:block nx:size-4 nx:rounded-full',
-          'nx:bg-background nx:shadow-lg nx:ring-0 nx:transition-transform',
+          'nx:bg-control-thumb nx:shadow-sm nx:ring-0 nx:transition-[background-color,transform]',
+          'nx:data-[state=checked]:bg-primary-foreground',
           'nx:data-[state=checked]:translate-x-4 nx:data-[state=unchecked]:translate-x-0'
         )}
       />

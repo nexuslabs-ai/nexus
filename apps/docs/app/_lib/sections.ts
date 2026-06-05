@@ -191,7 +191,7 @@ export const SECTIONS = {
             type: 'placeholder',
             variant: 'diagram',
             label:
-              '[ Diagram — 5-level surface stack (canvas / muted / container / popover / nav) ]',
+              '[ Diagram — surface and control stack (canvas / muted / control / container / popover / nav) ]',
           },
           { type: 'h2', text: '[ Accessibility ]' },
           {

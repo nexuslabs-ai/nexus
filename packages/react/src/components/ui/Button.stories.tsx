@@ -81,10 +81,6 @@ export const Destructive: Story = {
     variant: 'destructive',
     children: 'Delete',
   },
-  // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
-  parameters: {
-    a11y: { test: 'todo' },
-  },
 };
 
 export const Outline: Story = {
@@ -209,10 +205,6 @@ export const LoadingWithVariants: Story = {
       </Button>
     </div>
   ),
-  parameters: {
-    // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
-    a11y: { test: 'todo' },
-  },
 };
 
 // ============================================
@@ -570,10 +562,6 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
-  parameters: {
-    // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
-    a11y: { test: 'todo' },
-  },
 };
 
 // ============================================

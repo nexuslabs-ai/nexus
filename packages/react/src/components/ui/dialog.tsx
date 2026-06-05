@@ -147,10 +147,10 @@ function DialogContent({
               'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:opacity-70',
               'nx:transition-opacity',
               'nx:motion-reduce:transition-none',
-              'nx:hover:opacity-100',
+              'nx:hover:bg-background-hover nx:hover:text-foreground nx:hover:opacity-100',
+              'nx:focus-visible:bg-background-hover nx:focus-visible:text-foreground nx:focus-visible:opacity-100',
               'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-              'nx:disabled:pointer-events-none',
-              'nx:data-[state=open]:bg-muted nx:data-[state=open]:text-muted-foreground'
+              'nx:disabled:pointer-events-none'
             )}
           >
             <IconX className="nx:size-4" />

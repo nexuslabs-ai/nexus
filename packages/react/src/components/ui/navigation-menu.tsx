@@ -266,9 +266,9 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
         // nexus-allow-numeric: link rhythm
         'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:text-sm nx:outline-none nx:transition-colors',
         'nx:motion-reduce:transition-none',
-        'nx:hover:bg-background-hover nx:hover:text-foreground',
+        'nx:hover:bg-popover-hover nx:hover:text-popover-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-        'nx:data-[active=true]:bg-background-hover nx:data-[active=true]:text-foreground',
+        'nx:data-[active=true]:bg-popover-hover nx:data-[active=true]:text-popover-foreground',
         'nx:[&_svg:not([class*=size-])]:size-4 nx:[&_svg:not([class*=text-])]:text-muted-foreground',
         className
       )}

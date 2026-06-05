@@ -53,7 +53,7 @@ function TabsList({ className, ...props }: TabsListProps) {
       className={cn(
         'nx:inline-flex nx:items-center nx:justify-center',
         // nexus-allow-numeric: TabsList chrome (sub-canonical inner padding)
-        'nx:rounded-md nx:bg-muted nx:p-1',
+        'nx:rounded-md nx:bg-control-background nx:p-1',
         className
       )}
       {...props}
@@ -85,7 +85,7 @@ const tabsTriggerVariants = cva(
       variant: {
         default: [
           'nx:rounded-sm nx:border nx:border-transparent',
-          'nx:data-[state=inactive]:hover:bg-background/60',
+          'nx:data-[state=inactive]:hover:bg-control-background-hover',
           'nx:data-[state=active]:border-border-default',
           'nx:data-[state=active]:bg-background',
           'nx:data-[state=active]:text-foreground',

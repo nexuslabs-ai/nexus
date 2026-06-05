@@ -228,9 +228,9 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
           Default
-        </h3>
+        </div>
         <Alert className="nx:max-w-md">
           <IconInfoCircle className="nx:size-4" />
           <AlertTitle>Default Alert</AlertTitle>
@@ -241,9 +241,9 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
           Destructive
-        </h3>
+        </div>
         <Alert variant="destructive" className="nx:max-w-md">
           <IconAlertCircle className="nx:size-4" />
           <AlertTitle>Destructive Alert</AlertTitle>
@@ -254,9 +254,9 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
           Success
-        </h3>
+        </div>
         <Alert variant="success" className="nx:max-w-md">
           <IconCircleCheck className="nx:size-4" />
           <AlertTitle>Success Alert</AlertTitle>
@@ -265,9 +265,9 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
           Warning
-        </h3>
+        </div>
         <Alert variant="warning" className="nx:max-w-md">
           <IconAlertTriangle className="nx:size-4" />
           <AlertTitle>Warning Alert</AlertTitle>
@@ -278,8 +278,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    // TODO: Fix status token contrast ratios across error, warning, success
-    a11y: { test: 'todo' },
   },
 };
 

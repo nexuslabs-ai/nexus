@@ -38,7 +38,13 @@ OKLCH requires Chrome 111+ / Safari 15.4+ / Firefox 113+ (Baseline 2023). No hex
 
 ## Semantic Token Categories
 
-Semantic colors group into Layout, Brand (`primary` / `secondary`), Status (`error` / `success` / `warning` / `information`), Borders, Navigation, Focus, and Data viz — the per-group tokens are visible in the `base-*` / `brands-*` files. Each brand/status group carries the same 9 state keys (`background`, `-hover`, `-active`, `foreground`, `disabled`, `subtle`, `subtle-foreground`, `subtle-hover`, `subtle-active`).
+Semantic colors group into Layout, Control, Brand (`primary` / `secondary`), Status (`error` / `success` / `warning` / `information`), Borders, Navigation, Focus, and Data viz — the per-group tokens are visible in the `base-*` / `brands-*` files. Each brand/status group carries the same 9 state keys (`background`, `-hover`, `-active`, `foreground`, `disabled`, `subtle`, `subtle-foreground`, `subtle-hover`, `subtle-active`).
+
+### Control surfaces
+
+Use `control-background` / `control-background-hover` for interactive neutral rails and tracks: switch-off tracks, tab/segmented-control rails, slider tracks, progress tracks, and selected neutral toggle fills. Use `control-thumb` for switch thumbs. Keep `muted` for passive low-emphasis content surfaces such as skeletons, keycaps, empty icon wells, and subdued examples.
+
+For borders, use `border-default` when a control/card edge must remain readable. Use `border-default-alpha` only for intentionally softer separators, translucent layering, or decorative dividers where a faint edge is acceptable.
 
 ### Data viz tokens
 

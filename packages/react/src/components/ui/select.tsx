@@ -261,7 +261,7 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
       className={cn(
         'nx:relative nx:flex nx:w-full nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
-        'nx:focus:bg-background-hover nx:focus:text-foreground',
+        'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
         className
       )}
@@ -302,7 +302,10 @@ function SelectSeparator({ className, ...props }: SelectSeparatorProps) {
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn('nx:-mx-1 nx:my-1 nx:h-px nx:bg-muted', className)}
+      className={cn(
+        'nx:-mx-1 nx:my-1 nx:h-px nx:bg-border-default-alpha',
+        className
+      )}
       {...props}
     />
   );

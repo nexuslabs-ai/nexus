@@ -19,8 +19,10 @@ const SEMANTIC_PREFIXES = [
   'background',
   'foreground',
   'container',
+  'control',
   'popover',
   'muted',
+  'nav',
   'primary',
   'secondary',
   'error',
@@ -31,6 +33,7 @@ const SEMANTIC_PREFIXES = [
   'overlay',
   'disabled',
   'focus',
+  'chart',
   'accent', // not a real token in Nexus — surfaces the migration bug
 ];
 
@@ -111,6 +114,9 @@ function main() {
       const content = fs.readFileSync(file, 'utf8');
       const seen = new Set();
       for (const hit of findClassRefs(content)) {
+        // Documentation placeholders like `nx:bg-chart-categorical-N` are not
+        // real class refs; the regex stops before the uppercase placeholder.
+        if (hit.name.endsWith('-')) continue;
         if (!isSemanticName(hit.name)) continue;
         if (known.has(hit.name)) continue;
         const key = `${file}:${hit.name}`;

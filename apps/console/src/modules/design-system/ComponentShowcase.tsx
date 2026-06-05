@@ -12,8 +12,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="nx:bg-background nx:rounded-xl nx:border nx:border-border-default nx:overflow-hidden">
-      <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-muted/30">
+    <section className="nx:bg-container nx:rounded-xl nx:border nx:border-border-default nx:overflow-hidden">
+      <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-background-hover-alpha">
         <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
           {title}
         </h2>
@@ -30,7 +30,7 @@ function Section({
 
 export function ComponentShowcase() {
   return (
-    <div className="nx:bg-muted/30 nx:min-h-svh">
+    <div className="nx:bg-background-hover-alpha nx:min-h-svh">
       <div className="nx:p-6 nx:space-y-6">
         {/* Typography Section */}
         <Section title="Typography" description="Text styles and font scales">
@@ -111,7 +111,7 @@ export function ComponentShowcase() {
         {/* Colors Section */}
         <Section
           title="Semantic Colors"
-          description="Brand and status color palette"
+          description="Brand, status, and control color palette"
         >
           <div className="nx:grid nx:grid-cols-2 nx:gap-4 nx:sm:grid-cols-3 nx:md:grid-cols-5">
             <ColorSwatch
@@ -133,6 +133,19 @@ export function ComponentShowcase() {
             <ColorSwatch
               name="Muted Foreground Subtle"
               className="nx:bg-muted-foreground-subtle"
+            />
+            <ColorSwatch
+              name="Control Background"
+              className="nx:bg-control-background"
+            />
+            <ColorSwatch
+              name="Control Hover"
+              className="nx:bg-control-background-hover"
+            />
+            <ColorSwatch
+              name="Control Thumb"
+              className="nx:bg-control-thumb"
+              border
             />
             <ColorSwatch name="Success" className="nx:bg-success-background" />
             <ColorSwatch name="Error" className="nx:bg-error-background" />

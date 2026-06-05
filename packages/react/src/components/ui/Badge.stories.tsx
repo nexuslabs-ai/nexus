@@ -91,20 +91,12 @@ export const Error: Story = {
     variant: 'error',
     children: 'Error',
   },
-  // TODO: Fix error-background/error-foreground token contrast (3.76:1, needs 4.5:1)
-  parameters: {
-    a11y: { test: 'todo' },
-  },
 };
 
 export const Warning: Story = {
   args: {
     variant: 'warning',
     children: 'Warning',
-  },
-  // TODO: Fix warning-background/warning-foreground token contrast (2.8:1, needs 4.5:1)
-  parameters: {
-    a11y: { test: 'todo' },
   },
 };
 
@@ -113,20 +105,12 @@ export const Success: Story = {
     variant: 'success',
     children: 'Success',
   },
-  // TODO: Fix success-background/success-foreground token contrast (3.29:1, needs 4.5:1)
-  parameters: {
-    a11y: { test: 'todo' },
-  },
 };
 
 export const Information: Story = {
   args: {
     variant: 'information',
     children: 'Info',
-  },
-  // TODO: Fix information-background/information-foreground token contrast (needs review)
-  parameters: {
-    a11y: { test: 'todo' },
   },
 };
 
@@ -233,10 +217,6 @@ export const WithLeftIcon: Story = {
     isCaps: false,
     leftIcon: <IconCheck />,
   },
-  // TODO: Fix success-background/success-foreground token contrast
-  parameters: {
-    a11y: { test: 'todo' },
-  },
 };
 
 export const WithRightIcon: Story = {
@@ -274,10 +254,6 @@ export const NumberBadgeHighValue: Story = {
     isNumber: true,
     children: '99+',
     variant: 'error',
-  },
-  // TODO: Fix error-background/error-foreground token contrast
-  parameters: {
-    a11y: { test: 'todo' },
   },
 };
 
@@ -465,8 +441,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-    // TODO: Fix status token contrast ratios across error, warning, success, information
-    a11y: { test: 'todo' },
   },
 };
 

@@ -245,7 +245,7 @@ function CommandGroup({ className, ...props }: CommandGroupProps) {
     <CommandPrimitive.Group
       data-slot="command-group"
       className={cn(
-        'nx:overflow-hidden nx:text-foreground',
+        'nx:overflow-hidden nx:text-popover-foreground',
         // nexus-allow-numeric: popover chrome (sub-canonical inner padding)
         'nx:p-1',
         'nx:[&_[cmdk-group-heading]]:px-2 nx:[&_[cmdk-group-heading]]:py-1.5',
@@ -278,7 +278,10 @@ function CommandSeparator({ className, ...props }: CommandSeparatorProps) {
     <CommandPrimitive.Separator
       data-slot="command-separator"
       aria-hidden="true"
-      className={cn('nx:-mx-1 nx:my-1 nx:h-px nx:bg-muted', className)}
+      className={cn(
+        'nx:-mx-1 nx:my-1 nx:h-px nx:bg-border-default-alpha',
+        className
+      )}
       {...props}
     />
   );
@@ -312,7 +315,7 @@ function CommandItem({ className, ...props }: CommandItemProps) {
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:text-sm nx:outline-none',
         // nexus-allow-numeric: command item-tier rhythm
         'nx:gap-2 nx:px-2 nx:py-control-sm',
-        'nx:data-[selected=true]:bg-background-hover nx:data-[selected=true]:text-foreground',
+        'nx:data-[selected=true]:bg-popover-hover nx:data-[selected=true]:text-popover-foreground',
         'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:opacity-50',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className

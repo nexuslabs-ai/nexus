@@ -20,6 +20,8 @@ const THEMES = ['light', 'dark'];
 // See https://git.apcacontrast.com/documentation/APCAeasyIntro.html
 const BASE_PAIRS = [
   { fg: 'foreground', bg: 'background', minLc: 75, tier: 'body' },
+  { fg: 'foreground', bg: 'background-hover', minLc: 60, tier: 'ui' },
+  { fg: 'foreground', bg: 'muted', minLc: 60, tier: 'ui' },
   { fg: 'muted-foreground', bg: 'muted', minLc: 45, tier: 'incidental' },
   {
     fg: 'muted-foreground-subtle',
@@ -32,6 +34,32 @@ const BASE_PAIRS = [
     bg: 'disabled',
     minLc: 45,
     tier: 'incidental',
+  },
+  // Raised/elevated surfaces and their roving-focus row tint.
+  {
+    fg: 'popover-foreground',
+    bg: 'popover',
+    minLc: 75,
+    tier: 'body',
+  },
+  {
+    fg: 'popover-foreground',
+    bg: 'popover-hover',
+    minLc: 60,
+    tier: 'ui',
+  },
+  // Neutral interactive rails and selected states.
+  {
+    fg: 'foreground',
+    bg: 'control-background',
+    minLc: 60,
+    tier: 'ui',
+  },
+  {
+    fg: 'foreground',
+    bg: 'control-background-hover',
+    minLc: 60,
+    tier: 'ui',
   },
   { fg: 'error.foreground', bg: 'error.background', minLc: 60, tier: 'ui' },
   {

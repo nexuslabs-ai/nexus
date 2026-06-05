@@ -29,7 +29,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="nx:bg-background nx:rounded-lg nx:border nx:border-border-default nx:p-3">
+    <div className="nx:bg-container nx:rounded-lg nx:border nx:border-border-default nx:p-3">
       <h3 className="nx:text-xs nx:font-semibold nx:uppercase nx:tracking-wide nx:text-muted-foreground nx:mb-3">
         {title}
       </h3>
@@ -63,7 +63,7 @@ function ColorSelect<TValue extends string>({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value as TValue)}
-          className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-7 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
+          className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-7 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -110,7 +110,7 @@ function TokenSelect<TValue extends string>({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value as TValue)}
-          className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors nx:capitalize"
+          className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors nx:capitalize"
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>
@@ -147,16 +147,19 @@ function ToggleSwitch({
         {labelLeft}
       </span>
       <button
+        type="button"
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`nx:relative nx:w-11 nx:h-6 nx:rounded-full nx:transition-colors nx:border nx:border-border-default ${
-          checked ? 'nx:bg-primary-background' : 'nx:bg-muted'
+        className={`nx:relative nx:w-11 nx:h-6 nx:rounded-full nx:transition-colors nx:border nx:border-border-default nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) ${
+          checked
+            ? 'nx:border-primary-background nx:bg-primary-background nx:hover:bg-primary-background-hover'
+            : 'nx:bg-control-background nx:hover:bg-control-background-hover'
         }`}
       >
         <span
-          className={`nx:absolute nx:top-px nx:left-px nx:w-5 nx:h-5 nx:rounded-full nx:bg-background nx:shadow-sm nx:transition-transform nx:border nx:border-border-default ${
-            checked ? 'nx:translate-x-5' : ''
+          className={`nx:absolute nx:top-px nx:left-px nx:w-5 nx:h-5 nx:rounded-full nx:bg-control-thumb nx:shadow-sm nx:transition-[background-color,transform] nx:border nx:border-border-default ${
+            checked ? 'nx:translate-x-5 nx:bg-primary-foreground' : ''
           }`}
         />
       </button>
@@ -182,7 +185,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
   };
 
   return (
-    <div className="nx:h-full nx:flex nx:flex-col nx:bg-muted/50">
+    <div className="nx:h-full nx:flex nx:flex-col nx:bg-background-hover-alpha">
       {/* Header */}
       <div className="nx:p-4 nx:border-b nx:border-border-default">
         <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
@@ -290,7 +293,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
                 id="icon-library-select"
                 value={iconLibrary}
                 onChange={(e) => setIconLibrary(e.target.value as IconLibrary)}
-                className="nx:appearance-none nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
+                className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
               >
                 {ICON_LIBRARIES.map((lib) => (
                   <option key={lib} value={lib}>

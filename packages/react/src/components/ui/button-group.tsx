@@ -94,7 +94,7 @@ function ButtonGroupText({
       data-slot="button-group-text"
       className={cn(
         // nexus-allow-numeric: addon rhythm matching adjacent controls
-        'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:px-4 nx:typography-label-default nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+        'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:px-4 nx:typography-label-default nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
         className
       )}
       {...props}

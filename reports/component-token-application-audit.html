@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nexus Component Token Application Audit</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-2: #f1f5f9;
+        --surface-3: #e2e8f0;
+        --surface-hover: #f1f5f9;
+        --popover: #ffffff;
+        --popover-hover: #f8fafc;
+        --control: #e2e8f0;
+        --control-hover: #cbd5e1;
+        --line: #cbd5e1;
+        --line-soft: rgba(100, 116, 139, 0.26);
+        --text: #0f172a;
+        --muted: #64748b;
+        --brand: #2563eb;
+        --brand-hover: #1d4ed8;
+        --brand-soft: #dbeafe;
+        --success: #166534;
+        --warning: #92400e;
+        --error: #b91c1c;
+        --info: #1d4ed8;
+        --shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+        --radius: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(180deg, rgba(37, 99, 235, 0.08), transparent 360px),
+          var(--bg);
+        color: var(--text);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      main {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 48px 0 64px;
+      }
+
+      header {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 880px;
+        font-size: clamp(2rem, 4vw, 3.6rem);
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: 1.2rem;
+        line-height: 1.2;
+      }
+
+      h3 {
+        font-size: 0.95rem;
+        line-height: 1.25;
+      }
+
+      .lede {
+        max-width: 840px;
+        color: var(--muted);
+        font-size: 1.02rem;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.74);
+        padding: 4px 10px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .section {
+        margin-top: 26px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .grid.four {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .card {
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: var(--shadow);
+      }
+
+      .card-body {
+        display: grid;
+        gap: 12px;
+        padding: 18px;
+      }
+
+      .rule-card {
+        min-height: 158px;
+      }
+
+      .rule-card p,
+      .priority-card p,
+      .example p {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .token-strip {
+        display: flex;
+        gap: 8px;
+      }
+
+      .swatch {
+        width: 40px;
+        height: 28px;
+        border: 1px solid var(--line-soft);
+        border-radius: 6px;
+      }
+
+      .priority-card {
+        border-left: 4px solid var(--brand);
+      }
+
+      .priority-card.low {
+        border-left-color: var(--success);
+      }
+
+      .priority-card.medium {
+        border-left-color: var(--warning);
+      }
+
+      .priority-card.high {
+        border-left-color: var(--error);
+      }
+
+      .example {
+        display: grid;
+        gap: 12px;
+      }
+
+      .example-stage {
+        display: grid;
+        gap: 10px;
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        background: var(--surface);
+        padding: 14px;
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .mini {
+        display: grid;
+        gap: 8px;
+        min-height: 120px;
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        background: var(--surface);
+        padding: 12px;
+      }
+
+      .mini-title {
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .divider-before,
+      .divider-after {
+        height: 1px;
+        width: 100%;
+      }
+
+      .divider-before {
+        background: var(--surface-3);
+      }
+
+      .divider-after {
+        background: var(--line-soft);
+      }
+
+      .popover-panel {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--popover);
+        padding: 6px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      }
+
+      .menu-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 34px;
+        border-radius: 6px;
+        padding: 0 10px;
+        font-size: 0.86rem;
+      }
+
+      .row-current {
+        background: var(--surface-hover);
+      }
+
+      .row-proposed {
+        background: var(--popover-hover);
+      }
+
+      .tooltip-current,
+      .tooltip-proposed {
+        width: max-content;
+        max-width: 100%;
+        border-radius: 6px;
+        padding: 8px 10px;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .tooltip-current {
+        background: var(--brand);
+        color: #ffffff;
+      }
+
+      .tooltip-proposed {
+        border: 1px solid var(--line);
+        background: #0f172a;
+        color: #ffffff;
+      }
+
+      .row-muted {
+        border-radius: 6px;
+        background: var(--surface-2);
+        padding: 9px 10px;
+      }
+
+      .row-control {
+        border-radius: 6px;
+        background: var(--control);
+        padding: 9px 10px;
+      }
+
+      .close-dot {
+        display: inline-grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        font-weight: 800;
+      }
+
+      .close-muted {
+        background: var(--surface-2);
+        color: var(--muted);
+      }
+
+      .close-hover {
+        background: var(--surface-hover);
+        color: var(--text);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.88);
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line-soft);
+        padding: 12px 14px;
+        text-align: left;
+        vertical-align: top;
+        font-size: 0.88rem;
+      }
+
+      th {
+        background: var(--surface-2);
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      code {
+        border: 1px solid var(--line-soft);
+        border-radius: 5px;
+        background: var(--surface-2);
+        padding: 1px 5px;
+        color: #334155;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        font-size: 0.82em;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 3px 8px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .status.keep {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .status.fix {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .status.decide {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status.docs {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      .footnote {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      @media (max-width: 960px) {
+        .grid.four,
+        .grid.three {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 700px) {
+        main {
+          width: min(100% - 20px, 1180px);
+          padding-top: 28px;
+        }
+
+        .grid.four,
+        .grid.three,
+        .compare {
+          grid-template-columns: 1fr;
+        }
+
+        table,
+        thead,
+        tbody,
+        th,
+        td,
+        tr {
+          display: block;
+        }
+
+        thead {
+          display: none;
+        }
+
+        tr {
+          border-bottom: 1px solid var(--line-soft);
+        }
+
+        tr:last-child {
+          border-bottom: 0;
+        }
+
+        td {
+          border-bottom: 0;
+        }
+
+        td::before {
+          content: attr(data-label);
+          display: block;
+          margin-bottom: 4px;
+          color: var(--muted);
+          font-size: 0.7rem;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="toolbar">
+          <span class="pill">Scope: packages/react/src/components/ui</span>
+          <span class="pill">Includes docs and story token debt</span>
+          <span class="pill">After control-token pass</span>
+        </div>
+        <h1>Nexus Component Token Application Audit</h1>
+        <p class="lede">
+          The component layer is mostly healthy after the brand and control-token
+          work. The remaining improvements are about stricter token ownership:
+          lines should use border tokens, neutral selected states should use
+          control tokens, popover interactions should use popover tokens, and
+          passive illustration/chrome can keep muted.
+        </p>
+      </header>
+
+      <section class="section">
+        <h2>Audit Rubric</h2>
+        <div class="grid four" style="margin-top: 12px">
+          <article class="card rule-card">
+            <div class="card-body">
+              <h3>Surface Tokens</h3>
+              <p>
+                Use <code>background</code>, <code>container</code>,
+                <code>popover</code>, and <code>nav-background</code> for real
+                planes. These are not interchangeable once base modes shift.
+              </p>
+              <div class="token-strip">
+                <span class="swatch" style="background: var(--surface)"></span>
+                <span class="swatch" style="background: var(--popover)"></span>
+                <span class="swatch" style="background: #e2e8f0"></span>
+              </div>
+            </div>
+          </article>
+          <article class="card rule-card">
+            <div class="card-body">
+              <h3>Control Tokens</h3>
+              <p>
+                Use <code>control-background</code> for switch rails, tab rails,
+                sliders, progress tracks, and neutral selected states.
+              </p>
+              <div class="token-strip">
+                <span class="swatch" style="background: var(--control)"></span>
+                <span class="swatch" style="background: var(--control-hover)"></span>
+              </div>
+            </div>
+          </article>
+          <article class="card rule-card">
+            <div class="card-body">
+              <h3>Border Tokens</h3>
+              <p>
+                Use <code>border-default</code> for frames and
+                <code>border-default-alpha</code> for soft 1px separators.
+                Avoid using <code>muted</code> as a divider color.
+              </p>
+              <div class="token-strip">
+                <span class="swatch" style="background: var(--line)"></span>
+                <span class="swatch" style="background: var(--line-soft)"></span>
+              </div>
+            </div>
+          </article>
+          <article class="card rule-card">
+            <div class="card-body">
+              <h3>Text And Status</h3>
+              <p>
+                Keep <code>muted-foreground</code> for secondary copy. Use
+                primary/status tokens only for brand actions and real status
+                meaning, not ordinary informative chrome.
+              </p>
+              <div class="token-strip">
+                <span class="swatch" style="background: var(--brand)"></span>
+                <span class="swatch" style="background: #dcfce7"></span>
+                <span class="swatch" style="background: #fee2e2"></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Cleanup Decisions</h2>
+        <div class="grid three" style="margin-top: 12px">
+          <article class="card priority-card high">
+            <div class="card-body">
+              <h3>1. Menu Separators</h3>
+              <p>
+                DropdownMenu, ContextMenu, Menubar, Select, and Command use
+                <code>bg-muted</code> for 1px separators. Change those to
+                <code>bg-border-default-alpha</code>.
+              </p>
+            </div>
+          </article>
+          <article class="card priority-card high">
+            <div class="card-body">
+              <h3>2. Tooltip Coloring</h3>
+              <p>
+                Tooltip previously used <code>primary-background</code>. With
+                real pink/orange/purple brands, that made tooltips brand-colored.
+                Move it to a compact popover surface with a readable border.
+              </p>
+            </div>
+          </article>
+          <article class="card priority-card medium">
+            <div class="card-body">
+              <h3>3. Popover Row States</h3>
+              <p>
+                Menu items inside <code>bg-popover</code> panels previously used
+                <code>background-hover</code>. Use
+                <code>popover-hover</code> with
+                <code>popover-foreground</code> instead.
+              </p>
+            </div>
+          </article>
+          <article class="card priority-card medium">
+            <div class="card-body">
+              <h3>4. Neutral Selection</h3>
+              <p>
+                Table selected rows use <code>bg-muted</code>. That state is
+                selected, not passive. <code>control-background</code> is a
+                better neutral selection token.
+              </p>
+            </div>
+          </article>
+          <article class="card priority-card low">
+            <div class="card-body">
+              <h3>5. Dialog Close State</h3>
+              <p>
+                Dialog and Sheet close buttons use
+                inert <code>data-state=open:bg-muted</code> classes. Remove
+                those and add explicit hover/focus-visible affordances.
+              </p>
+            </div>
+          </article>
+          <article class="card priority-card low">
+            <div class="card-body">
+              <h3>6. Story TODO Cleanup</h3>
+              <p>
+                Button, Badge, and Alert stories still contain old WCAG contrast
+                TODOs. The repo is APCA-gated, so these comments are stale and
+                violate the tracked-TODO convention.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Visual Examples</h2>
+        <div class="grid three" style="margin-top: 12px">
+          <article class="card example">
+            <div class="card-body">
+              <h3>Menu Separators</h3>
+              <p>Use border alpha for a line, not muted fill.</p>
+              <div class="compare">
+                <div class="mini">
+                  <span class="mini-title">Current</span>
+                  <div class="popover-panel">
+                    <div class="menu-row">Account</div>
+                    <div class="divider-before"></div>
+                    <div class="menu-row">Logout</div>
+                  </div>
+                  <code>bg-muted</code>
+                </div>
+                <div class="mini">
+                  <span class="mini-title">Proposed</span>
+                  <div class="popover-panel">
+                    <div class="menu-row">Account</div>
+                    <div class="divider-after"></div>
+                    <div class="menu-row">Logout</div>
+                  </div>
+                  <code>bg-border-default-alpha</code>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card example">
+            <div class="card-body">
+              <h3>Popover Row Focus</h3>
+              <p>Keep interaction on the same surface family.</p>
+              <div class="compare">
+                <div class="mini">
+                  <span class="mini-title">Current</span>
+                  <div class="popover-panel">
+                    <div class="menu-row row-current">Invite user</div>
+                    <div class="menu-row">Archive</div>
+                  </div>
+                  <code>background-hover</code>
+                </div>
+                <div class="mini">
+                  <span class="mini-title">Proposed</span>
+                  <div class="popover-panel">
+                    <div class="menu-row row-proposed">Invite user</div>
+                    <div class="menu-row">Archive</div>
+                  </div>
+                  <code>popover-hover</code>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card example">
+            <div class="card-body">
+              <h3>Tooltip Surface</h3>
+              <p>Tooltips are information, not brand actions.</p>
+              <div class="compare">
+                <div class="mini">
+                  <span class="mini-title">Current</span>
+                  <span class="tooltip-current">Edit settings</span>
+                  <code>primary-background</code>
+                </div>
+                <div class="mini">
+                  <span class="mini-title">Proposed</span>
+                  <span class="tooltip-proposed">Edit settings</span>
+                  <code>tooltip/popover</code>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card example">
+            <div class="card-body">
+              <h3>Table Selection</h3>
+              <p>Selected is a control state, not passive content chrome.</p>
+              <div class="compare">
+                <div class="mini">
+                  <span class="mini-title">Current</span>
+                  <div class="row-muted">INV-008 selected</div>
+                  <code>bg-muted</code>
+                </div>
+                <div class="mini">
+                  <span class="mini-title">Proposed</span>
+                  <div class="row-control">INV-008 selected</div>
+                  <code>control-background</code>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card example">
+            <div class="card-body">
+              <h3>Dialog Close Button</h3>
+              <p>Open/hover affordance should read as an interactive surface.</p>
+              <div class="compare">
+                <div class="mini">
+                  <span class="mini-title">Current</span>
+                  <span class="close-dot close-muted">x</span>
+                  <code>bg-muted + muted text</code>
+                </div>
+                <div class="mini">
+                  <span class="mini-title">Proposed</span>
+                  <span class="close-dot close-hover">x</span>
+                  <code>background-hover</code>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card example">
+            <div class="card-body">
+              <h3>Keep Muted</h3>
+              <p>Muted is still right for passive placeholders and metadata.</p>
+              <div class="mini">
+                <span class="mini-title">Correct uses</span>
+                <div class="row-muted">Avatar fallback</div>
+                <div class="row-muted">Skeleton block</div>
+                <div style="color: var(--muted)">Helper text and descriptions</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Per Component Audit</h2>
+        <div style="margin-top: 12px">
+          <table>
+            <thead>
+              <tr>
+                <th>Component Area</th>
+                <th>Current Application</th>
+                <th>Recommendation</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Component Area">Button</td>
+                <td data-label="Current Application">
+                  Uses primary, secondary, destructive, outline, ghost, and link
+                  lanes correctly.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. The brand axis now works here because primary is real
+                  chroma.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Badge</td>
+                <td data-label="Current Application">
+                  Uses solid and subtle primary, secondary, and status tokens.
+                </td>
+                <td data-label="Recommendation">
+                  Keep token mapping. Remove stale WCAG TODO comments in the
+                  stories.
+                </td>
+                <td data-label="Status"><span class="status docs">Docs</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Alert</td>
+                <td data-label="Current Application">
+                  Default uses background/border; status variants use status
+                  subtle backgrounds and borders.
+                </td>
+                <td data-label="Recommendation">Keep.</td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Input, Textarea, NativeSelect</td>
+                <td data-label="Current Application">
+                  Field surface uses background, border-default, focus-default,
+                  and border-error.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. Consider disabled text treatment later only if visual
+                  opacity feels too faint in dark mode.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">InputGroup, InputOTP</td>
+                <td data-label="Current Application">
+                  Shared field frame and focus ring are correct; OTP separators
+                  are icon/text, not divider fills.
+                </td>
+                <td data-label="Recommendation">Keep.</td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Checkbox, RadioGroup</td>
+                <td data-label="Current Application">
+                  Unchecked controls use background and border; checked state
+                  uses primary.
+                </td>
+                <td data-label="Recommendation">Keep.</td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">
+                  Switch, Tabs, Toggle, Slider, Progress, ButtonGroup
+                </td>
+                <td data-label="Current Application">
+                  Now uses the new control lane for rails, tracks, unchecked
+                  switch state, and neutral on states.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. This is the clearest win from the current pass.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">DropdownMenu, ContextMenu</td>
+                <td data-label="Current Application">
+                  Popover panel tokens are correct. Items should use popover
+                  hover; separators should use border alpha.
+                </td>
+                <td data-label="Recommendation">
+                  Use border alpha separators and popover-hover row focus/open
+                  states.
+                </td>
+                <td data-label="Status"><span class="status fix">Fix</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Menubar</td>
+                <td data-label="Current Application">
+                  Root menubar is a field-like control. Submenus are popover
+                  surfaces and should use popover row states.
+                </td>
+                <td data-label="Recommendation">
+                  Keep top-level triggers on background-hover; use popover-hover
+                  inside menu panels.
+                </td>
+                <td data-label="Status"><span class="status fix">Fix</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Select, Command</td>
+                <td data-label="Current Application">
+                  Trigger/input surfaces are correct; list content uses popover;
+                  rows and separators should follow popover/border lanes.
+                </td>
+                <td data-label="Recommendation">
+                  Use popover-hover for focused/selected rows and border alpha
+                  for separators.
+                </td>
+                <td data-label="Status"><span class="status fix">Fix</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">NavigationMenu</td>
+                <td data-label="Current Application">
+                  Top triggers use background hover. Flyouts use popover, so
+                  flyout links should use popover-hover.
+                </td>
+                <td data-label="Recommendation">
+                  Keep top triggers; use popover-hover for flyout links.
+                </td>
+                <td data-label="Status"><span class="status fix">Fix</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Tooltip</td>
+                <td data-label="Current Application">
+                  Uses primary background and primary foreground.
+                </td>
+                <td data-label="Recommendation">
+                  Move away from brand color and reuse compact popover styling.
+                </td>
+                <td data-label="Status"><span class="status fix">Fix</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Popover, HoverCard, Chart tooltip</td>
+                <td data-label="Current Application">
+                  Elevated surfaces use popover, popover-foreground, border, and
+                  shadow.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. Chart already uses the desired popover treatment.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Dialog, Sheet</td>
+                <td data-label="Current Application">
+                  Containers use container surface correctly. Close buttons have
+                  inert data-state muted classes.
+                </td>
+                <td data-label="Recommendation">
+                  Remove inert data-state classes and add explicit hover/focus
+                  affordances.
+                </td>
+                <td data-label="Status"><span class="status fix">Fix</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">AlertDialog</td>
+                <td data-label="Current Application">
+                  Container, overlay, and action composition are correct. No
+                  close button.
+                </td>
+                <td data-label="Recommendation">Keep.</td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Drawer</td>
+                <td data-label="Current Application">
+                  Container and overlay are correct. Bottom drag handle uses
+                  muted.
+                </td>
+                <td data-label="Recommendation">
+                  Keep muted. The handle is a passive drag affordance, not a
+                  selected/active control rail.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Table</td>
+                <td data-label="Current Application">
+                  Row hover uses background-hover; selected rows need a control
+                  selected state, while the footer can stay muted.
+                </td>
+                <td data-label="Recommendation">
+                  Keep footer muted. Move selected rows to control-background
+                  and selected hover to control-background-hover.
+                </td>
+                <td data-label="Status"><span class="status fix">Fix</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Card, Accordion, Separator</td>
+                <td data-label="Current Application">
+                  Containers and dividers use container/background and border
+                  tokens. Accordion content text is muted.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. Separator remains the canonical divider component.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Field, Form, Label</td>
+                <td data-label="Current Application">
+                  Field cards use primary-subtle for checked cards; helper/error
+                  text uses semantic text/status tokens.
+                </td>
+                <td data-label="Recommendation">Keep.</td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Item</td>
+                <td data-label="Current Application">
+                  Muted variant and icon medallion use muted as passive row
+                  chrome.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. Do not overcorrect passive muted surfaces.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Avatar, Skeleton, Kbd, EmptyState</td>
+                <td data-label="Current Application">
+                  Muted is used for fallbacks, loading placeholders, keyboard
+                  hints, and empty-state icons.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. These are exactly the passive roles muted should own.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">ScrollArea, Resizable</td>
+                <td data-label="Current Application">
+                  Thumb/handle use border-default; resizable grip is a stronger
+                  visible affordance.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. Border tokens are defensible for visible splitters and
+                  scrollbar thumbs.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Sidebar</td>
+                <td data-label="Current Application">
+                  Uses nav-background, nav-border, nav foreground, nav hover,
+                  and nav active.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. The token-level fix already made hover and active match.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Calendar</td>
+                <td data-label="Current Application">
+                  Uses button variants for day buttons, primary for selected
+                  dates, and primary-subtle for ranges.
+                </td>
+                <td data-label="Recommendation">Keep.</td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Breadcrumb, Pagination, Carousel</td>
+                <td data-label="Current Application">
+                  Uses button/link primitives and muted foreground for passive
+                  trail/ellipsis states.
+                </td>
+                <td data-label="Recommendation">Keep.</td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+              <tr>
+                <td data-label="Component Area">Sonner</td>
+                <td data-label="Current Application">
+                  Maps toast normal and rich status vars to Nexus semantic
+                  tokens.
+                </td>
+                <td data-label="Recommendation">
+                  Keep. Recheck visually after tooltip decision, since both are
+                  transient feedback surfaces.
+                </td>
+                <td data-label="Status"><span class="status keep">Keep</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Suggested Implementation Batches</h2>
+        <div class="grid three" style="margin-top: 12px">
+          <article class="card">
+            <div class="card-body">
+              <h3>Batch A: Surgical Cleanup</h3>
+              <p>
+                Change menu separators to <code>border-default-alpha</code>,
+                remove inert Dialog/Sheet close data-state colors, and remove
+                stale WCAG TODOs in Button/Badge/Alert stories.
+              </p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-body">
+              <h3>Batch B: Interaction Alignment</h3>
+              <p>
+                Move Table selected rows to <code>control-background</code> and
+                <code>control-background-hover</code>, and update overlay rows
+                to <code>popover-hover</code>.
+              </p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-body">
+              <h3>Batch C: Tooltip Neutralization</h3>
+              <p>
+                Reuse compact popover styling for Tooltip. Do not add tooltip
+                semantic tokens in this pass.
+              </p>
+            </div>
+          </article>
+        </div>
+        <p class="footnote">
+          Test scope: <code>pnpm test:storybook</code>,
+          <code>pnpm typecheck</code>, <code>pnpm lint</code>, and
+          <code>pnpm --filter @nexus/core audit:class-refs</code>. Run
+          <code>pnpm audit:contrast</code> to guard the new surface pairings.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

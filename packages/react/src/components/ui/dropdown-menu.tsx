@@ -94,8 +94,8 @@ function DropdownMenuSubTrigger({
         'nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2',
         // nexus-allow-numeric: menu item-tier rhythm
         'nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none',
-        'nx:focus:bg-background-hover nx:focus:text-foreground',
-        'nx:data-[state=open]:bg-background-hover',
+        'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
+        'nx:data-[state=open]:bg-popover-hover nx:data-[state=open]:text-popover-foreground',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         inset && 'nx:pl-8',
         className
@@ -205,7 +205,7 @@ function DropdownMenuContent({
 
 const dropdownMenuItemVariants = cva(
   // nexus-allow-numeric: menu item-tier rhythm
-  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none nx:transition-colors nx:focus:bg-background-hover nx:focus:text-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -302,7 +302,7 @@ function DropdownMenuCheckboxItem({
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
         'nx:transition-colors',
-        'nx:focus:bg-background-hover nx:focus:text-foreground',
+        'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
         className
       )}
@@ -353,7 +353,7 @@ function DropdownMenuRadioItem({
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
         'nx:transition-colors',
-        'nx:focus:bg-background-hover nx:focus:text-foreground',
+        'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
         className
       )}
@@ -435,7 +435,10 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn('nx:-mx-1 nx:my-1 nx:h-px nx:bg-muted', className)}
+      className={cn(
+        'nx:-mx-1 nx:my-1 nx:h-px nx:bg-border-default-alpha',
+        className
+      )}
       {...props}
     />
   );

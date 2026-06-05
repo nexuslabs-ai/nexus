@@ -81,6 +81,18 @@
     "$value": "{neutral.a900}",
     "$type": "color"
   },
+  "control-background": {
+    "$value": "{neutral.800}",
+    "$type": "color"
+  },
+  "control-background-hover": {
+    "$value": "{neutral.700}",
+    "$type": "color"
+  },
+  "control-thumb": {
+    "$value": "{white.base}",
+    "$type": "color"
+  },
   "nav-background": {
     "$value": "{neutral.950}",
     "$type": "color"
@@ -98,7 +110,7 @@
     "$type": "color"
   },
   "nav-item-active": {
-    "$value": "{neutral.800}",
+    "$value": "{neutral.900}",
     "$type": "color"
   },
   "nav-border": {
@@ -111,7 +123,7 @@
   },
   "border": {
     "default": {
-      "$value": "{white.a400}",
+      "$value": "{white.a300}",
       "$type": "color"
     },
     "default-alpha": {

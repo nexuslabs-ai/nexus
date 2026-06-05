@@ -46,19 +46,20 @@ const SHADE_ROLES: {
   {
     shade: 100,
     role: 'Very light',
-    light: 'background-active, container-active, nav-background',
+    light:
+      'background-active, container-active, control-background, nav-background',
     dark: '—',
   },
   {
     shade: 200,
     role: 'Light',
-    light: 'nav-item-hover, nav-border',
+    light: 'control-background-hover, nav-item-hover/active, nav-border',
     dark: '—',
   },
   {
     shade: 300,
     role: 'Light-medium',
-    light: 'nav-item-active',
+    light: '—',
     dark: 'disabled-foreground, nav-muted-foreground',
   },
   {
@@ -83,19 +84,19 @@ const SHADE_ROLES: {
     shade: 700,
     role: 'Dark',
     light: 'brand -background-hover',
-    dark: 'popover-hover',
+    dark: 'control-background-hover, popover-hover',
   },
   {
     shade: 800,
     role: 'Very dark',
     light: 'brand -background-active',
-    dark: 'popover, container-hover, nav-item-active, nav-border',
+    dark: 'control-background, popover, container-hover, nav-border',
   },
   {
     shade: 900,
     role: 'Darker',
     light: 'container-foreground, popover-foreground, nav-foreground',
-    dark: 'container, muted, background-hover/active, nav-item-hover',
+    dark: 'container, muted, background-hover/active, nav-item-hover/active',
   },
   {
     shade: 950,

@@ -81,6 +81,18 @@
     "$value": "{stone.a900}",
     "$type": "color"
   },
+  "control-background": {
+    "$value": "{stone.800}",
+    "$type": "color"
+  },
+  "control-background-hover": {
+    "$value": "{stone.700}",
+    "$type": "color"
+  },
+  "control-thumb": {
+    "$value": "{white.base}",
+    "$type": "color"
+  },
   "nav-background": {
     "$value": "{stone.950}",
     "$type": "color"
@@ -98,7 +110,7 @@
     "$type": "color"
   },
   "nav-item-active": {
-    "$value": "{stone.800}",
+    "$value": "{stone.900}",
     "$type": "color"
   },
   "nav-border": {
@@ -111,7 +123,7 @@
   },
   "border": {
     "default": {
-      "$value": "{white.a400}",
+      "$value": "{white.a300}",
       "$type": "color"
     },
     "default-alpha": {

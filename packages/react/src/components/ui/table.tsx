@@ -137,7 +137,7 @@ function TableRow({ className, ...props }: TableRowProps) {
     <tr
       data-slot="table-row"
       className={cn(
-        'nx:border-b nx:border-border-default nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-muted',
+        'nx:border-b nx:border-border-default nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
         className
       )}
       {...props}

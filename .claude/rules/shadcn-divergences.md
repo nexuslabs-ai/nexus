@@ -29,13 +29,13 @@ Primitives (--nx-*)  →  Semantic (--color-*)  →  Tailwind (nx:bg-*)
 
 shadcn references tokens directly. Nexus adds explicit suffixes for clarity:
 
-| shadcn Pattern | Nexus Pattern                 | Suffix Added  |
-| -------------- | ----------------------------- | ------------- |
-| `primary`      | `primary-background`          | `-background` |
-| `secondary`    | `secondary-background`        | `-background` |
-| `destructive`  | `error-background`            | `-background` |
-| `accent`       | `muted` or `background-hover` | varies        |
-| `card`         | `container`                   | renamed       |
+| shadcn Pattern | Nexus Pattern                                            | Suffix Added     |
+| -------------- | -------------------------------------------------------- | ---------------- |
+| `primary`      | `primary-background`                                     | `-background`    |
+| `secondary`    | `secondary-background`                                   | `-background`    |
+| `destructive`  | `error-background`                                       | `-background`    |
+| `accent`       | `background-hover` / `popover-hover` / `container-hover` | context-specific |
+| `card`         | `container`                                              | renamed          |
 
 ---
 
@@ -89,11 +89,11 @@ shadcn uses `destructive`, Nexus uses `error`:
 
 **Important:** Nexus does NOT have `accent` tokens. shadcn uses `accent` primarily for hover states, so map to the appropriate `-hover` token based on context.
 
-| shadcn                   | Nexus                          | Notes                              |
-| ------------------------ | ------------------------------ | ---------------------------------- |
-| `bg-accent`              | `nx:bg-background-hover`       | Use `-hover` variant of container  |
-| `text-accent-foreground` | `nx:text-foreground`           | Use standard foreground            |
-| `hover:bg-accent`        | `nx:hover:bg-background-hover` | Or `container-hover`, `muted` etc. |
+| shadcn                   | Nexus                          | Notes                                                   |
+| ------------------------ | ------------------------------ | ------------------------------------------------------- |
+| `bg-accent`              | `nx:bg-background-hover`       | Use `-hover` variant of container                       |
+| `text-accent-foreground` | `nx:text-foreground`           | Use standard foreground                                 |
+| `hover:bg-accent`        | `nx:hover:bg-background-hover` | Or `container-hover` / `popover-hover` based on surface |
 
 **Context-specific mapping:**
 
@@ -102,7 +102,8 @@ shadcn uses `destructive`, Nexus uses `error`:
 | Ghost button hover   | `hover:bg-accent` | `nx:hover:bg-background-hover` |
 | Dropdown item hover  | `hover:bg-accent` | `nx:hover:bg-popover-hover`    |
 | List item hover      | `hover:bg-accent` | `nx:hover:bg-container-hover`  |
-| General subtle hover | `bg-accent`       | `nx:bg-muted`                  |
+| Neutral control rail | `bg-accent`       | `nx:bg-control-background`     |
+| General subtle hover | `bg-accent`       | `nx:bg-background-hover`       |
 
 ### Muted Colors
 
@@ -111,6 +112,10 @@ shadcn uses `destructive`, Nexus uses `error`:
 | `bg-muted`              | `nx:bg-muted`                     | Same                                                                                                                                                                              |
 | `text-muted-foreground` | `nx:text-muted-foreground`        | Same                                                                                                                                                                              |
 | —                       | `nx:text-muted-foreground-subtle` | Nexus tertiary text tier (below `muted-foreground`). Paired with `muted` surface. Light mode adds a real third tier; dark mode collapses to the same shade as `muted-foreground`. |
+
+Use `nx:bg-control-background` / `nx:hover:bg-control-background-hover`
+instead of `muted` for interactive neutral rails, tracks, and selected toggle
+fills. Keep `muted` for passive low-emphasis surfaces.
 
 ### Layout Colors
 
