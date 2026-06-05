@@ -553,7 +553,10 @@ function SidebarSeparator({ className, ...props }: SidebarSeparatorProps) {
   return (
     <Separator
       data-slot="sidebar-separator"
-      className={cn('nx:mx-2 nx:w-auto nx:bg-nav-border', className)}
+      className={cn(
+        'nx:mx-2 nx:data-[orientation=horizontal]:w-auto nx:bg-nav-border',
+        className
+      )}
       {...props}
     />
   );
