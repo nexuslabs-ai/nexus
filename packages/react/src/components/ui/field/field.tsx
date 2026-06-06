@@ -74,7 +74,6 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-group"
       className={cn(
-        // nexus-allow-numeric: field-group stack rhythm
         'nx:group/field-group nx:@container/field-group nx:flex nx:w-full nx:flex-col nx:gap-7 nx:data-[slot=checkbox-group]:gap-3 nx:*:data-[slot=field-group]:gap-4',
         className
       )}
@@ -316,7 +315,6 @@ function dedupeErrorMessages(errors: FieldErrorProps['errors']): string[] {
 /** Renders multiple validation messages as a bulleted list. */
 function FieldErrorList({ messages }: { messages: string[] }) {
   return (
-    // nexus-allow-numeric: error list inset
     <ul className="nx:ml-4 nx:flex nx:list-disc nx:flex-col nx:gap-1">
       {messages.map((message) => (
         <li key={message}>{message}</li>

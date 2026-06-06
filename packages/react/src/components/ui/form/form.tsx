@@ -64,9 +64,6 @@ type FormItemContextValue = {
   id: string;
   hasDescription: boolean;
   hasMessage: boolean;
-  /** Called by a mounted part; returns its unregister cleanup. */
-  registerDescription: () => () => void;
-  registerMessage: () => () => void;
 };
 
 const FormItemContext = React.createContext<FormItemContextValue | null>(null);
@@ -140,30 +137,15 @@ interface FormItemProps extends React.ComponentProps<'div'> {}
  */
 function FormItem({ className, children, ...props }: FormItemProps) {
   const id = React.useId();
-  // Parts register themselves on mount so the control wires aria-describedby /
-  // aria-errormessage only to ids that are actually rendered — robust to the
-  // part being wrapped or conditionally rendered, no child-type scanning.
-  const [descriptionCount, setDescriptionCount] = React.useState(0);
-  const [messageCount, setMessageCount] = React.useState(0);
-
-  const registerDescription = React.useCallback(() => {
-    setDescriptionCount((count) => count + 1);
-    return () => setDescriptionCount((count) => count - 1);
-  }, []);
-  const registerMessage = React.useCallback(() => {
-    setMessageCount((count) => count + 1);
-    return () => setMessageCount((count) => count - 1);
-  }, []);
+  const { hasDescription, hasMessage } = getFormItemParts(children);
 
   const value = React.useMemo<FormItemContextValue>(
     () => ({
       id,
-      hasDescription: descriptionCount > 0,
-      hasMessage: messageCount > 0,
-      registerDescription,
-      registerMessage,
+      hasDescription,
+      hasMessage,
     }),
-    [id, descriptionCount, messageCount, registerDescription, registerMessage]
+    [id, hasDescription, hasMessage]
   );
 
   return (
@@ -268,8 +250,7 @@ interface FormDescriptionProps extends React.ComponentProps<'p'> {}
  * Helper text for the field, linked to the control via `aria-describedby`.
  */
 function FormDescription({ className, ...props }: FormDescriptionProps) {
-  const { formDescriptionId, registerDescription } = useFormField();
-  React.useEffect(() => registerDescription(), [registerDescription]);
+  const { formDescriptionId } = useFormField();
 
   return (
     <p
@@ -300,8 +281,7 @@ function FormMessage({
   role,
   ...props
 }: FormMessageProps) {
-  const { error, formMessageId, registerMessage } = useFormField();
-  React.useEffect(() => registerMessage(), [registerMessage]);
+  const { error, formMessageId } = useFormField();
   const body = error ? String(error.message ?? '') : children;
 
   return (
@@ -316,6 +296,36 @@ function FormMessage({
       {body}
     </p>
   );
+}
+
+function getFormItemParts(children: React.ReactNode) {
+  let hasDescription = false;
+  let hasMessage = false;
+
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) {
+      return;
+    }
+
+    if (child.type === React.Fragment) {
+      const fragment = child as React.ReactElement<{
+        children?: React.ReactNode;
+      }>;
+      const parts = getFormItemParts(fragment.props.children);
+      hasDescription ||= parts.hasDescription;
+      hasMessage ||= parts.hasMessage;
+      return;
+    }
+
+    if (child.type === FormDescription) {
+      hasDescription = true;
+    }
+    if (child.type === FormMessage) {
+      hasMessage = true;
+    }
+  });
+
+  return { hasDescription, hasMessage };
 }
 
 export {

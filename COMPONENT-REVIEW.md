@@ -1,8 +1,8 @@
 # Component Review Notes
 
 Issues found reviewing `packages/react/src/components/ui/`. One section per component.
-Escape-hatches (`nexus-allow-numeric`, `eslint-disable`) are deviations to
-reconsider — never assumed fine; each should justify itself or move to a token/role utility.
+Numeric spacing notes call out unresolved raw spacing/rhythm decisions; `eslint-disable`
+comments remain deviations to reconsider and should justify themselves.
 
 ## accordion
 
@@ -11,7 +11,7 @@ Typography — use composites:
 - trigger: `nx:text-sm nx:font-medium` → `nx:typography-label-default`
 - content: `nx:text-sm` → `nx:typography-body-small`
 
-Escape-hatch (review): `nexus-allow-numeric: item-tier rhythm` on trigger `nx:py-4`.
+Numeric spacing note: trigger uses `nx:py-4` for item-tier rhythm.
 
 ## alert
 
@@ -22,7 +22,7 @@ Typography — use composites:
 
 `data-variant` omitted on default variant → use `data-variant={variant ?? 'default'}`.
 
-Escape-hatch (review): `nexus-allow-numeric: callout rhythm` on `nx:p-4` — denser than `p-container` (16px vs 24px). Keep tight or scale like a container?
+Numeric spacing note: `nx:p-4` callout rhythm is denser than `p-container` (16px vs 24px). Keep tight or scale like a container?
 
 Minor: no `information` variant; old shadcn icon pattern with `translate-y-[-3px]` nudge.
 
@@ -37,7 +37,7 @@ Typography — use composites:
 
 Discuss w/ designer: open animation drifts diagonally (top-right → center) instead of a clean centered zoom. Cause: `slide-in-from-left-1/2` + `slide-in-from-top-[48%]` not cancelling the `-translate-x/y-1/2` centering under Tailwind v4. Same block in `dialog.tsx`. Option: drop the directional slide, keep zoom+fade only.
 
-Escape-hatches (review): `nexus-allow-numeric` on header `nx:gap-1.5`, footer `nx:sm:gap-2`.
+Numeric spacing notes: header `nx:gap-1.5`, footer `nx:sm:gap-2`.
 
 ## aspect-ratio
 
@@ -55,7 +55,7 @@ Likely bug: `leftIcon`/`rightIcon` wrapper is `nx:size-3.5` but doesn't constrai
 
 Minor: `data-variant`/`data-fill` omitted on default (`default`/`solid`).
 
-Escape-hatches (review): three `nexus-allow-numeric: chip rhythm` on `gap-1` and chip `px`/`py`.
+Numeric spacing notes: chip rhythm on `gap-1` and chip `px`/`py`.
 
 ## breadcrumb
 
@@ -73,13 +73,13 @@ Touch target (mobile, discuss): `size="icon"` = `p-2.5` (10px) + `size-4` icon =
 
 Minor: `data-variant`/`data-size` omitted on default (`default`/`default`).
 
-Escape-hatch (review): `nexus-allow-numeric: density-stable square hit-target` on icon `p-2.5` (ties into touch-target note).
+Numeric spacing note: density-stable square hit-target on icon `p-2.5` ties into the touch-target note.
 
 ## button-group
 
-No-op escape-hatch (line 10): `nexus-allow-numeric: joined-cluster layout rhythm` on the base — its only numeric (`gap-2`) is inside a `has-[...]` variant the rule can't match. Suppresses nothing; remove.
+Obsolete numeric note (line 10): joined-cluster layout rhythm on the base — its only numeric (`gap-2`) is inside a `has-[...]` variant the old rule could not match. Suppresses nothing; remove.
 
-Escape-hatch (review): line-96 `nexus-allow-numeric` on addon `gap-2`/`px-4`.
+Numeric spacing note: line-96 addon `gap-2`/`px-4`.
 
 Minor: `data-orientation` omitted on default (`horizontal`).
 
@@ -87,9 +87,9 @@ Minor: `data-orientation` omitted on default (`horizontal`).
 
 Typography: pervasive raw (`text-sm`, `font-medium`, `font-normal`, `text-xs`) → composites. Weekday/week-number use arbitrary `nx:text-[0.8rem]` (un-tokenized 12.8px) → `typography-label-small`.
 
-No-op escape-hatch (line 130): `nexus-allow-numeric: week-row rhythm` on `nx:mt-2` — `mt` isn't flagged. Remove.
+Obsolete numeric note (line 130): week-row rhythm on `nx:mt-2` — margins were not flagged. Remove.
 
-Escape-hatches (review): `p-3` (chrome), `gap-4` (month-grid ×2), `gap-1` (nav), `gap-1.5` (dropdown).
+Numeric spacing notes: `p-3` (chrome), `gap-4` (month-grid ×2), `gap-1` (nav), `gap-1.5` (dropdown).
 
 Minor (mobile): day buttons = `--cell-size` (`--nx-spacing-8` = 32px), under ~44px. Inherent to dense calendars.
 
@@ -102,7 +102,7 @@ Typography — use composites:
 
 Discuss: `CardAction` is `absolute` top-right (not grid-reserved), so a long `CardTitle` can render under it. shadcn's newer Card uses CSS grid + `has-data-[slot=card-action]` to reserve the column.
 
-Escape-hatches (review): `nexus-allow-numeric` on header `gap-1.5`, action `gap-2`, footer `gap-2`.
+Numeric spacing notes: header `gap-1.5`, action `gap-2`, footer `gap-2`.
 
 ## carousel
 
@@ -112,7 +112,7 @@ Minor: controls are `size="icon"` (36px), under ~44px (recurring touch-target ba
 
 Typography (raw, lower priority — dense data-viz): `text-xs` (root + tooltip), `font-medium` (tooltip labels) → composites. Value's `font-mono tabular-nums` is intentional, leave it.
 
-Escape-hatch (review): file-level `eslint-disable @nexus/no-render-prop-types` — recharts mandates render-prop shapes (`ChartConfig.icon`, Tooltip formatters). Composition rule permits a third-party opt-out; confirm the scope stays minimal.
+ESLint exception: file-level `eslint-disable @nexus/no-render-prop-types` — recharts mandates render-prop shapes (`ChartConfig.icon`, Tooltip formatters). Composition rule permits a third-party opt-out; confirm the scope stays minimal.
 
 ## checkbox
 
@@ -126,13 +126,13 @@ Minor: `CommandList` `max-h-[300px]` is an un-tokenized magic value.
 
 Minor: `CommandInput` is `outline-none`; focus shown only via wrapper `focus-within:border-border-active` (1px border), not the canonical ring.
 
-Escape-hatches (review): `nexus-allow-numeric` on `px-3` (input), `py-6` (empty), `p-1` (group), `gap-2`/`px-2` (item).
+Numeric spacing notes: `px-3` (input), `py-6` (empty), `p-1` (group), `gap-2`/`px-2` (item).
 
 ## context-menu
 
 Typography (raw): `text-sm` (sub-trigger/items/checkbox/radio), `font-semibold` (label), `text-xs` (shortcut) → composites.
 
-Escape-hatches (review): `nexus-allow-numeric` menu-rhythm on `gap-2`/`px-2` (sub-trigger, item, label), popover `p-1` (content, sub-content).
+Numeric spacing notes: menu rhythm on `gap-2`/`px-2` (sub-trigger, item, label), popover `p-1` (content, sub-content).
 
 ## dialog
 
@@ -145,7 +145,7 @@ Discuss (animation): canonical home of the diagonal-slide block (`slide-in-from-
 
 Touch target (mobile, discuss): close button is `absolute right-4 top-4` with a bare 16px `<IconX>`, no padding → ~16px tap target, under ~44px.
 
-Escape-hatches (review): `nexus-allow-numeric` on header `gap-1.5`, footer `sm:gap-2`.
+Numeric spacing notes: header `gap-1.5`, footer `sm:gap-2`.
 
 ## drawer
 
@@ -154,33 +154,33 @@ Typography — use composites:
 - DrawerTitle: `nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight` → `nx:typography-heading-xsmall`
 - DrawerDescription: `nx:text-sm` → `nx:typography-body-small`
 
-Escape-hatches (review): `nexus-allow-numeric` on header `gap-1.5`, footer `gap-2`.
+Numeric spacing notes: header `gap-1.5`, footer `gap-2`.
 
 ## dropdown-menu (mirrors context-menu)
 
 Typography (raw): `text-sm` (sub-trigger/items/checkbox/radio), `font-semibold` (label), `text-xs` (shortcut) → composites.
 
-Escape-hatches (review): `nexus-allow-numeric` menu-rhythm on `gap-2`/`px-2` (sub-trigger, item, label), popover `p-1` (content, sub-content).
+Numeric spacing notes: menu rhythm on `gap-2`/`px-2` (sub-trigger, item, label), popover `p-1` (content, sub-content).
 
 ## empty-state
 
-No-op escape-hatches: `nexus-allow-numeric: media wrapper rhythm` on `mb-2` (line 83) and `icon medallion footprint` on `size-10` (line 89) — neither `mb` nor `size` is flagged. Remove both. (Uses typography composites correctly — no typography finding.)
+Obsolete numeric notes: media wrapper rhythm on `mb-2` (line 83) and icon medallion footprint on `size-10` (line 89) — neither margin nor `size` needed a rule exemption. Remove both. (Uses typography composites correctly — no typography finding.)
 
-Escape-hatches (review): `gap-6`/`p-6` (root), `gap-2` (header), `gap-4` (content).
+Numeric spacing notes: `gap-6`/`p-6` (root), `gap-2` (header), `gap-4` (content).
 
 ## field
 
 Typography (raw): `text-sm`/`text-base` (legend, title, description, error, separator) + `font-medium`/`font-normal` → composites.
 
-No-op escape-hatches: `nexus-allow-numeric: legend caption spacing` on `mb-3` (line 59) and `separator inset` on `-my-2` (line 244) — margins aren't flagged. Remove.
+Obsolete numeric notes: legend caption spacing on `mb-3` (line 59) and separator inset on `-my-2` (line 244) — margins were not flagged. Remove.
 
-Escape-hatches (review): `gap-6` (fieldset), `gap-7` (field-group), `gap-3` (field base), `gap-1.5` (content), `gap-2` (label, title), `px-2` (separator label), `gap-1` (error list — its comment is mislabeled "inset").
+Numeric spacing notes: `gap-6` (fieldset), `gap-7` (field-group), `gap-3` (field base), `gap-1.5` (content), `gap-2` (label, title), `px-2` (separator label), `gap-1` (error list).
 
 ## form
 
 Typography (raw): `FormDescription` / `FormMessage` use `nx:text-sm` → `nx:typography-body-small`.
 
-Escape-hatch (review): `nexus-allow-numeric` on `FormItem` `gap-2`.
+Numeric spacing note: `FormItem` `gap-2`.
 
 ## input
 
@@ -188,17 +188,17 @@ Typography (raw): `text-sm`/`text-xs`/`text-base` (sizes) + file `text-sm`/`font
 
 Minor: `data-size` omitted on default (`size` not defaulted in destructure).
 
-Escape-hatches (review): `nexus-allow-numeric` on `px-3` (default), `px-2.5` (sm), `px-4` (lg).
+Numeric spacing notes: `px-3` (default), `px-2.5` (sm), `px-4` (lg).
 
 ## input-group
 
-No-op escape-hatch (line 36): `nexus-allow-numeric: field-internal addon/control padding rhythm` on the `InputGroup` base — its insets are `pl/pr/pb/pt` inside `has-[…]` selectors, none flagged. Remove.
+Obsolete numeric note (line 36): field-internal addon/control padding rhythm on the `InputGroup` base — its insets are `pl/pr/pb/pt` inside `has-[…]` selectors, none were flagged. Remove.
 
 Minor typography: `InputGroupButton` uses raw `nx:text-sm` (addon/text use composites) → composite.
 
 Minor: arbitrary magic offsets `ml-[-0.45rem]`/`mr-[-0.35rem]` (button/kbd pull-in) are un-tokenized.
 
-Escape-hatches (review): addon `gap-2`/`py-1.5`, block `px-3`, button `gap`/`px`, text `gap-2`, textarea `py-3`.
+Numeric spacing notes: addon `gap-2`/`py-1.5`, block `px-3`, button `gap`/`px`, text `gap-2`, textarea `py-3`.
 
 ## input-otp
 
@@ -206,39 +206,39 @@ Typography (raw): `InputOTPSlot` uses `nx:text-sm` for the character → composi
 
 ## item
 
-No-op escape-hatches: `nexus-allow-numeric: icon medallion footprint` on `size-8` (line 135) and `thumbnail footprint` on `size-10` (line 137) — `size` isn't flagged. Remove. (Uses typography composites throughout — no typography finding.)
+Obsolete numeric notes: icon medallion footprint on `size-8` (line 135) and thumbnail footprint on `size-10` (line 137) — `size` was not flagged. Remove. (Uses typography composites throughout — no typography finding.)
 
-Escape-hatches (review): `gap-4`/`p-4` (default size), `gap-2.5`/`px-4`/`py-3` (sm size), `gap-2` (media), `gap-1` (content), `gap-2` (title, actions, header, footer).
+Numeric spacing notes: `gap-4`/`p-4` (default size), `gap-2.5`/`px-4`/`py-3` (sm size), `gap-2` (media), `gap-1` (content), `gap-2` (title, actions, header, footer).
 
 ## kbd
 
-Escape-hatches (review): `nexus-allow-numeric` keycap `gap-1`/`px-1`, chord `gap-1`. (Otherwise clean; uses `typography-label-small`.)
+Numeric spacing notes: keycap `gap-1`/`px-1`, chord `gap-1`. (Otherwise clean; uses `typography-label-small`.)
 
 ## label
 
 Typography (raw): `nx:text-sm nx:font-medium nx:leading-none` → `nx:typography-label-default`.
 
-Escape-hatch (review): `nexus-allow-numeric` on `gap-2` (icon gap to nested control).
+Numeric spacing note: `gap-2` icon gap to nested control.
 
 ## menubar (mirrors context-menu/dropdown-menu)
 
 Typography (raw): `text-sm`/`font-medium` (trigger/items), `font-semibold` (label), `text-xs` (shortcut) → composites.
 
-Escape-hatches (review): root `gap-1`/`p-1`, bar trigger `px-2`/`py-1`, sub-trigger + item `gap-2`/`px-2`, content `p-1` (×2), label `px-2`.
+Numeric spacing notes: root `gap-1`/`p-1`, bar trigger `px-2`/`py-1`, sub-trigger + item `gap-2`/`px-2`, content `p-1` (×2), label `px-2`.
 
 ## native-select
 
 Typography (raw): `text-sm`/`text-xs` (sizes) → composites.
 
-Escape-hatches (review): `px-3` (default), `px-2.5` (sm).
+Numeric spacing notes: `px-3` (default), `px-2.5` (sm).
 
 ## navigation-menu
 
 Typography (raw): `text-sm`/`font-medium` (trigger), `text-sm` (link) → composites.
 
-No-op escape-hatches: `mt-1.5` (line 190, "inline-content offset"), `mt-1.5` (line 232, "viewport panel offset"), `h-1.5` (line 302, "indicator rail height") — `mt`/`h` aren't flagged. Remove.
+Obsolete numeric notes: `mt-1.5` (line 190, "inline-content offset"), `mt-1.5` (line 232, "viewport panel offset"), `h-1.5` (line 302, "indicator rail height") — margins/heights were not flagged. Remove.
 
-Escape-hatches (review): list `gap-1`, trigger `px-4`/`py-2`, content `p-2`, link `gap-1`/`p-2`.
+Numeric spacing notes: list `gap-1`, trigger `px-4`/`py-2`, content `p-2`, link `gap-1`/`p-2`.
 
 ## pagination
 
@@ -246,7 +246,7 @@ Redundant ARIA: `role="navigation"` on the `<nav>` (line 55) — `<nav>` already
 
 Keep-in-sync smell: `PaginationEllipsis` hardcodes `nx:p-2.5` (line 219) to match the `size="icon"` link footprint — manual coupling to `buttonVariants` icon padding, drifts silently if that changes.
 
-Escape-hatches (review): content `gap-1` (line 85), ellipsis `p-2.5` (line 219).
+Numeric spacing notes: content `gap-1` (line 85), ellipsis `p-2.5` (line 219).
 
 ## popover
 
@@ -264,7 +264,7 @@ Touch target: control is `nx:size-4` (16px) with no `::after` hit-area overlay o
 
 No error-state wiring: no `aria-invalid:border-border-error` / `aria-invalid:focus-visible:outline-focus-error`, unlike `input.tsx`. Invalid/required group has no visual error cue. (likely shared with checkbox/switch)
 
-Escape-hatch (review): `gap-2` (line 53, group spacing).
+Numeric spacing note: `gap-2` (line 53, group spacing).
 
 ## resizable
 
@@ -274,9 +274,9 @@ Handle hit area below floor: `::after` drag target is `after:w-1` (4px) / `after
 
 Typography (raw): trigger `text-sm` (71), label `text-sm`/`font-semibold` (230), item `text-sm` (263) → composites.
 
-Mixed padding convention: vertical uses `py-control-*` role utilities, horizontal uses raw `px-3` (trigger 71) / `px-2` (label 230) — escape-hatch comments restate ("px stays numeric") rather than justify. Likely should be `px-control-*`, or document the real reason.
+Mixed padding convention: vertical uses `py-control-*` role utilities, horizontal uses raw `px-3` (trigger 71) / `px-2` (label 230) — numeric comments restate ("px stays numeric") rather than justify. Likely should be `px-control-*`, or document the real reason.
 
-Escape-hatches (review): trigger `px-3` (71), scroll-up `py-1` (103), scroll-down `py-1` (127), viewport `p-1` (189), label `px-2` (230).
+Numeric spacing notes: trigger `px-3` (71), scroll-up `py-1` (103), scroll-down `py-1` (127), viewport `p-1` (189), label `px-2` (230).
 
 ## separator
 
@@ -288,7 +288,7 @@ Typography (raw): Title `text-lg font-semibold leading-none tracking-tight` (290
 
 Close-button touch target: `IconX` (16px) with no padding, only `right-4 top-4` positioning → hit area ~16px, below ~44px floor. Add padding or `::after` overlay. (likely mirrors dialog.tsx)
 
-Escape-hatches (review): header `gap-1.5` (224), footer `gap-2` (258). (`sm:max-w-sm` is the sanctioned full-viewport-overlay exception — not flagged.)
+Numeric spacing notes: header `gap-1.5` (224), footer `gap-2` (258). (`sm:max-w-sm` is the sanctioned full-viewport-overlay exception — not flagged.)
 
 ## sidebar
 
@@ -298,7 +298,7 @@ Typography (raw): group-label `text-xs`/`font-medium` (660), group-content `text
 
 Touch targets: SidebarTrigger forced to `size-7` (28px, 394), SidebarInput `h-8` (32px, 486) — under ~44px floor.
 
-Escape-hatches (review): 12, all the same blanket "nav-chrome rhythm" comment — container `p-2` (347), header `gap-2`/`p-2` (508), footer `gap-2`/`p-2` (531), content `gap-2` (594), group `p-2` (620), group-label `px-2` (659), menu `gap-1` (752), menu-button `gap-2`/`p-2` (786), badge `px-1` (966), skeleton `gap-2`/`px-2` (1013), sub `gap-1`/`px-2.5`/`py-0.5` (1056), sub-button `gap-2`/`px-2` (1131). Justification is boilerplate, not per-numeric.
+Numeric spacing notes: 12, all the same blanket "nav-chrome rhythm" comment — container `p-2` (347), header `gap-2`/`p-2` (508), footer `gap-2`/`p-2` (531), content `gap-2` (594), group `p-2` (620), group-label `px-2` (659), menu `gap-1` (752), menu-button `gap-2`/`p-2` (786), badge `px-1` (966), skeleton `gap-2`/`px-2` (1013), sub `gap-1`/`px-2.5`/`py-0.5` (1056), sub-button `gap-2`/`px-2` (1131). Justification is boilerplate, not per-numeric.
 
 (Compound-ancestor selectors `[[data-side=x][data-state=y]_&]` at 430/432/433 — two attrs, same ancestor — have no `in-*` shorthand; leave. Single-attr ones already canonical `in-data-` at 429.)
 
@@ -316,7 +316,7 @@ Touch target: thumb is `nx:size-4` (16px) with no `::after` hit-area or padding 
 
 ## spinner
 
-No-op escape-hatch: `nexus-allow-numeric: default icon footprint` on `nx:size-4` (37) — `size-*` isn't rule-flagged, so it suppresses nothing. Remove.
+Obsolete numeric note: default icon footprint on `nx:size-4` (37) — `size-*` was not rule-flagged, so it suppresses nothing. Remove.
 
 ## switch
 
@@ -328,23 +328,23 @@ Thumb `nx:shadow-sm` (55): components.md § "No shadow on focusable elements" li
 
 Typography (raw): table base `text-sm` (44), footer `font-medium` (114), head `font-medium` (167), caption `text-sm` (217) → composites.
 
-Escape-hatches (review): head `px-2`/`py-2.5` (166), cell `p-2` (192). Justified "not a control". (`tr` element selectors at 67/90/114 and the fixed `translate-y-[2px]` have no shorthand — left as-is.)
+Numeric spacing notes: head `px-2`/`py-2.5` (166), cell `p-2` (192). Justified "not a control". (`tr` element selectors at 67/90/114 and the fixed `translate-y-[2px]` have no shorthand — left as-is.)
 
 ## tabs
 
 Typography (raw): trigger base `font-medium` (74), size text `text-xs`/`text-sm`/`text-base` (106–108) → composites.
 
-Escape-hatches (review): list `p-1` (55), sm size `px-2`/`py-1` (105). sm "dense pill" renders below ~44px on touch (deliberate dense variant; default/lg use `control-*` role utilities).
+Numeric spacing notes: list `p-1` (55), sm size `px-2`/`py-1` (105). sm "dense pill" renders below ~44px on touch (deliberate dense variant; default/lg use `control-*` role utilities).
 
 ## textarea
 
 Typography (raw): `text-sm` (39) → composite.
 
-Escape-hatch (review): `px-3` (38) — same mixed convention as Input/Select (raw `px` + `py-control-md`). (aria-invalid error-state wiring correctly present, line 41.)
+Numeric spacing note: `px-3` (38) — same mixed convention as Input/Select (raw `px` + `py-control-md`). (aria-invalid error-state wiring correctly present, line 41.)
 
 ## toggle
 
-Typography (raw): base `text-sm`/`font-medium` (9), sm `text-xs` (18) → composites. (No escape-hatches — all sizes use `control-*` role utilities.)
+Typography (raw): base `text-sm`/`font-medium` (9), sm `text-xs` (18) → composites. (No numeric spacing notes — all sizes use `control-*` role utilities.)
 
 ## toggle-group
 
@@ -352,4 +352,4 @@ Variant/size precedence contradicts JSDoc: `context.variant || variant` / `conte
 
 ## tooltip
 
-Typography (raw): content `text-xs` (79) → composite. (No escape-hatches — uses `control-*` role utilities.)
+Typography (raw): content `text-xs` (79) → composite. (No numeric spacing notes — uses `control-*` role utilities.)
