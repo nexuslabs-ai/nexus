@@ -36,12 +36,13 @@ type CarouselProps = {
 
 type CarouselContextProps = {
   carouselRef: ReturnType<typeof useEmblaCarousel>[0];
-  api: ReturnType<typeof useEmblaCarousel>[1];
+  api: CarouselApi;
+  orientation: NonNullable<CarouselProps['orientation']>;
   scrollPrev: () => void;
   scrollNext: () => void;
   canScrollPrev: boolean;
   canScrollNext: boolean;
-} & CarouselProps;
+};
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
@@ -100,26 +101,23 @@ function Carousel({
     setCanScrollNext(api.canScrollNext());
   }, []);
 
-  const scrollPrev = React.useCallback(() => {
-    api?.scrollPrev();
-  }, [api]);
+  const scrollPrev = () => api?.scrollPrev();
+  const scrollNext = () => api?.scrollNext();
 
-  const scrollNext = React.useCallback(() => {
-    api?.scrollNext();
-  }, [api]);
-
-  const handleKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        scrollPrev();
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        scrollNext();
-      }
-    },
-    [scrollPrev, scrollNext]
-  );
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    // Don't hijack arrow keys from a focused control that uses them itself.
+    if (
+      (event.target as HTMLElement).closest(
+        'input, textarea, select, [contenteditable="true"]'
+      )
+    ) {
+      return;
+    }
+    event.preventDefault();
+    if (event.key === 'ArrowLeft') scrollPrev();
+    else scrollNext();
+  };
 
   // Hand the Embla API to the consumer once it initialises.
   React.useEffect(() => {
@@ -135,6 +133,7 @@ function Carousel({
     api.on('select', onSelect);
 
     return () => {
+      api?.off('reInit', onSelect);
       api?.off('select', onSelect);
     };
   }, [api, onSelect]);
@@ -143,10 +142,8 @@ function Carousel({
     <CarouselContext.Provider
       value={{
         carouselRef,
-        api: api,
-        opts,
-        orientation:
-          orientation || (opts?.axis === 'y' ? 'vertical' : 'horizontal'),
+        api,
+        orientation,
         scrollPrev,
         scrollNext,
         canScrollPrev,

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 const buttonGroupVariants = cva(
   // nexus-allow-numeric: joined-cluster layout rhythm
-  "nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:[&>*]:focus-visible:relative nx:[&>*]:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit nx:[&>input]:flex-1",
+  "nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit nx:[&>input]:flex-1",
   {
     variants: {
       orientation: {
@@ -127,7 +127,7 @@ function ButtonGroupSeparator({
       data-slot="button-group-separator"
       orientation={orientation}
       className={cn(
-        'nx:relative nx:m-0! nx:self-stretch nx:data-[orientation=vertical]:h-auto',
+        'nx:relative nx:self-stretch nx:data-[orientation=vertical]:h-auto',
         className
       )}
       {...props}

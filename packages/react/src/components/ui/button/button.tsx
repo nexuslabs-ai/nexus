@@ -69,93 +69,115 @@ type ButtonAsChildElementProps = {
   onClick?: React.MouseEventHandler<HTMLElement>;
 };
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  loading = false,
-  disabled,
-  children,
-  type = 'button',
-  onClick,
-  tabIndex,
-  'aria-busy': ariaBusy,
-  'aria-disabled': ariaDisabled,
-  ...props
-}: ButtonProps) {
-  const Comp = asChild ? Slot : 'button';
-  const isDisabled = disabled || loading;
-  const asChildElement =
-    asChild && React.isValidElement<ButtonAsChildElementProps>(children)
-      ? children
-      : null;
-  const handleClick: React.MouseEventHandler<HTMLElement> = (event) => {
-    if (isDisabled) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    onClick?.(event as React.MouseEvent<HTMLButtonElement>);
-  };
-  const handleAsChildClick: React.MouseEventHandler<HTMLElement> = (event) => {
-    if (isDisabled) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    asChildElement?.props.onClick?.(event);
-  };
-  const content = asChildElement ? (
-    React.cloneElement(
-      asChildElement,
-      { onClick: handleAsChildClick },
-      loading ? (
-        <>
-          {asChildElement.props.children}
-          <Spinner aria-hidden="true" />
-        </>
-      ) : (
-        asChildElement.props.children
-      )
-    )
-  ) : loading ? (
+/** Children, plus a trailing spinner while loading. Shared by both render paths. */
+function buttonContent(children: React.ReactNode, loading: boolean) {
+  if (!loading) return children;
+  return (
     <>
       {children}
       <Spinner aria-hidden="true" />
     </>
-  ) : (
-    children
   );
-  const disabledAria = isDisabled || ariaDisabled || undefined;
-  const busyAria = loading ? true : ariaBusy;
-  const interactionProps = asChild
-    ? {
-        'aria-disabled': disabledAria,
-        tabIndex: isDisabled ? -1 : tabIndex,
-      }
-    : {
-        'aria-disabled': disabledAria,
-        disabled: isDisabled,
-        tabIndex,
-        type,
-      };
+}
+
+/**
+ * The default `<button>`. Native `disabled` gives non-interactivity for free —
+ * it blocks the click, focus, and keyboard with no JS guard needed.
+ */
+function NativeButton({
+  className,
+  variant,
+  size,
+  loading = false,
+  disabled,
+  children,
+  type = 'button',
+  'aria-busy': ariaBusy,
+  'aria-disabled': ariaDisabled,
+  ...props
+}: ButtonProps) {
+  const isDisabled = disabled || loading;
 
   return (
-    <Comp
+    <button
       data-slot="button"
       data-variant={variant}
       data-size={size}
       data-loading={loading || undefined}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
-      {...interactionProps}
-      aria-busy={busyAria}
+      type={type}
+      disabled={isDisabled}
+      aria-disabled={isDisabled || ariaDisabled || undefined}
+      aria-busy={loading || ariaBusy}
+    >
+      {buttonContent(children, loading)}
+    </button>
+  );
+}
+
+/**
+ * The `asChild` path. The child (e.g. an `<a>`) ignores native `disabled`, so
+ * non-interactivity is faked with `aria-disabled`, `tabIndex={-1}`, and a click
+ * guard. The child's own `onClick` is pulled onto the guarded handler so it
+ * can't fire while disabled.
+ */
+function SlotButton({
+  className,
+  variant,
+  size,
+  loading = false,
+  disabled,
+  children,
+  onClick,
+  tabIndex,
+  'aria-busy': ariaBusy,
+  'aria-disabled': ariaDisabled,
+  ...props
+}: ButtonProps) {
+  const isDisabled = disabled || loading;
+  const child = React.isValidElement<ButtonAsChildElementProps>(children)
+    ? children
+    : null;
+  const childOnClick = child?.props.onClick;
+
+  const handleClick: React.MouseEventHandler<HTMLElement> = (event) => {
+    if (isDisabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    childOnClick?.(event);
+    onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+  };
+
+  return (
+    <Slot
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      data-loading={loading || undefined}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+      aria-disabled={isDisabled || ariaDisabled || undefined}
+      aria-busy={loading || ariaBusy}
+      tabIndex={isDisabled ? -1 : tabIndex}
       onClick={handleClick}
     >
-      {content}
-    </Comp>
+      {child
+        ? React.cloneElement(
+            child,
+            { onClick: undefined },
+            buttonContent(child.props.children, loading)
+          )
+        : buttonContent(children, loading)}
+    </Slot>
   );
+}
+
+function Button({ asChild = false, type, ...props }: ButtonProps) {
+  if (asChild) return <SlotButton {...props} />;
+  return <NativeButton {...props} type={type} />;
 }
 
 export { Button, type ButtonProps, buttonVariants };

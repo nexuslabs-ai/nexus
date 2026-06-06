@@ -58,7 +58,7 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
       data-slot="breadcrumb-list"
       className={cn(
         // nexus-allow-numeric: tight trail rhythm
-        'nx:flex nx:flex-wrap nx:items-center nx:gap-1.5 nx:break-words nx:typography-body-small nx:text-muted-foreground',
+        'nx:flex nx:flex-wrap nx:items-center nx:gap-1.5 nx:wrap-break-word nx:typography-body-small nx:text-muted-foreground',
         className
       )}
       {...props}

@@ -248,8 +248,8 @@ function CommandGroup({ className, ...props }: CommandGroupProps) {
         'nx:overflow-hidden nx:text-popover-foreground',
         // nexus-allow-numeric: popover chrome (sub-canonical inner padding)
         'nx:p-1',
-        'nx:[&_[cmdk-group-heading]]:px-2 nx:[&_[cmdk-group-heading]]:py-1.5',
-        'nx:[&_[cmdk-group-heading]]:text-xs nx:[&_[cmdk-group-heading]]:font-medium nx:[&_[cmdk-group-heading]]:text-muted-foreground',
+        'nx:**:[[cmdk-group-heading]]:px-2 nx:**:[[cmdk-group-heading]]:py-1.5',
+        'nx:**:[[cmdk-group-heading]]:text-xs nx:**:[[cmdk-group-heading]]:font-medium nx:**:[[cmdk-group-heading]]:text-muted-foreground',
         className
       )}
       {...props}

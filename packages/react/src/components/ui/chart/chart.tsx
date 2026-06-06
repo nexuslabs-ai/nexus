@@ -112,6 +112,74 @@ function getChartStyle(
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+type ChartIndicator = 'line' | 'dot' | 'dashed';
+
+type ChartTooltipFormatter = (
+  value: RechartsPrimitive.TooltipPayloadEntry['value'],
+  name: RechartsPrimitive.TooltipPayloadEntry['name'],
+  item: RechartsPrimitive.TooltipPayloadEntry,
+  index: number,
+  payload: RechartsPrimitive.TooltipPayloadEntry['payload']
+) => React.ReactNode;
+
+interface ChartTooltipContentProps extends Pick<
+  RechartsPrimitive.DefaultTooltipContentProps,
+  'payload' | 'label' | 'labelFormatter' | 'labelClassName'
+> {
+  active?: boolean;
+  className?: string;
+  indicator?: ChartIndicator;
+  hideLabel?: boolean;
+  hideIndicator?: boolean;
+  formatter?: ChartTooltipFormatter;
+  color?: string;
+  nameKey?: string;
+  labelKey?: string;
+}
+
+/** Shared class for one tooltip row (formatter row and default row alike). */
+const tooltipRowClassName = (indicator: ChartIndicator) =>
+  cn(
+    'nx:[&>svg]:text-muted-foreground nx:flex nx:w-full nx:flex-wrap nx:items-stretch nx:gap-control-md nx:[&>svg]:h-2.5 nx:[&>svg]:w-2.5',
+    indicator === 'dot' && 'nx:items-center'
+  );
+
+interface ChartTooltipLabelProps {
+  payload: ReadonlyArray<RechartsPrimitive.TooltipPayloadEntry>;
+  label?: React.ReactNode;
+  labelKey?: string;
+  labelFormatter?: ChartTooltipContentProps['labelFormatter'];
+  labelClassName?: string;
+}
+
+/** The tooltip's leading label, resolved from config / `labelKey` / `labelFormatter`. */
+function ChartTooltipLabel({
+  payload,
+  label,
+  labelKey,
+  labelFormatter,
+  labelClassName,
+}: ChartTooltipLabelProps) {
+  const { config } = useChart();
+  const [item] = payload;
+  const key = `${labelKey || item?.dataKey || item?.name || 'value'}`;
+  const itemConfig = getPayloadConfigFromPayload(config, item, key);
+  const value =
+    !labelKey && typeof label === 'string'
+      ? config[label]?.label || label
+      : itemConfig?.label;
+
+  if (labelFormatter) {
+    return (
+      <div className={cn('nx:font-medium', labelClassName)}>
+        {labelFormatter(value, payload)}
+      </div>
+    );
+  }
+  if (!value) return null;
+  return <div className={cn('nx:font-medium', labelClassName)}>{value}</div>;
+}
+
 function ChartTooltipContent({
   active,
   payload,
@@ -126,73 +194,19 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: {
-  active?: boolean;
-  payload?: RechartsPrimitive.TooltipPayloadEntry[];
-  className?: string;
-  indicator?: 'line' | 'dot' | 'dashed';
-  hideLabel?: boolean;
-  hideIndicator?: boolean;
-  label?: React.ReactNode;
-  labelFormatter?: (
-    value: React.ReactNode,
-    payload: RechartsPrimitive.TooltipPayloadEntry[]
-  ) => React.ReactNode;
-  labelClassName?: string;
-  formatter?: (
-    value: RechartsPrimitive.TooltipPayloadEntry['value'],
-    name: RechartsPrimitive.TooltipPayloadEntry['name'],
-    item: RechartsPrimitive.TooltipPayloadEntry,
-    index: number,
-    payload: RechartsPrimitive.TooltipPayloadEntry['payload']
-  ) => React.ReactNode;
-  color?: string;
-  nameKey?: string;
-  labelKey?: string;
-}) {
-  const { config } = useChart();
-
-  const tooltipLabel = React.useMemo(() => {
-    if (hideLabel || !payload?.length) {
-      return null;
-    }
-
-    const [item] = payload;
-    const key = `${labelKey || item?.dataKey || item?.name || 'value'}`;
-    const itemConfig = getPayloadConfigFromPayload(config, item, key);
-    const value =
-      !labelKey && typeof label === 'string'
-        ? config[label]?.label || label
-        : itemConfig?.label;
-
-    if (labelFormatter) {
-      return (
-        <div className={cn('nx:font-medium', labelClassName)}>
-          {labelFormatter(value, payload)}
-        </div>
-      );
-    }
-
-    if (!value) {
-      return null;
-    }
-
-    return <div className={cn('nx:font-medium', labelClassName)}>{value}</div>;
-  }, [
-    label,
-    labelFormatter,
-    payload,
-    hideLabel,
-    labelClassName,
-    config,
-    labelKey,
-  ]);
-
-  if (!active || !payload?.length) {
-    return null;
-  }
+}: ChartTooltipContentProps) {
+  if (!active || !payload?.length) return null;
 
   const nestLabel = payload.length === 1 && indicator !== 'dot';
+  const tooltipLabel = hideLabel ? null : (
+    <ChartTooltipLabel
+      payload={payload}
+      label={label}
+      labelKey={labelKey}
+      labelFormatter={labelFormatter}
+      labelClassName={labelClassName}
+    />
+  );
 
   return (
     <div
@@ -203,70 +217,128 @@ function ChartTooltipContent({
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="nx:grid nx:gap-control-sm">
-        {payload.map((item, index) => {
-          const key = `${nameKey || item.name || item.dataKey || 'value'}`;
-          const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const indicatorColor = color || item.payload?.fill || item.color;
-
-          return (
+        {payload.map((item, index) =>
+          formatter && item.value !== undefined && item.name ? (
             <div
               key={`${item.dataKey}`}
-              className={cn(
-                'nx:[&>svg]:text-muted-foreground nx:flex nx:w-full nx:flex-wrap nx:items-stretch nx:gap-control-md nx:[&>svg]:h-2.5 nx:[&>svg]:w-2.5',
-                indicator === 'dot' && 'nx:items-center'
-              )}
+              className={tooltipRowClassName(indicator)}
             >
-              {formatter && item?.value !== undefined && item.name ? (
-                formatter(item.value, item.name, item, index, item.payload)
-              ) : (
-                <>
-                  {itemConfig?.icon ? (
-                    <itemConfig.icon />
-                  ) : (
-                    !hideIndicator && (
-                      <div
-                        className={cn(
-                          'nx:shrink-0 nx:rounded-[2px] nx:border-(--color-border) nx:bg-(--color-bg)',
-                          {
-                            'nx:h-2.5 nx:w-2.5': indicator === 'dot',
-                            'nx:w-1': indicator === 'line',
-                            'nx:w-0 nx:border-[1.5px] nx:border-dashed nx:bg-transparent':
-                              indicator === 'dashed',
-                            'nx:my-0.5': nestLabel && indicator === 'dashed',
-                          }
-                        )}
-                        style={
-                          {
-                            '--color-bg': indicatorColor,
-                            '--color-border': indicatorColor,
-                          } as React.CSSProperties
-                        }
-                      />
-                    )
-                  )}
-                  <div
-                    className={cn(
-                      'nx:flex nx:flex-1 nx:justify-between nx:leading-none',
-                      nestLabel ? 'nx:items-end' : 'nx:items-center'
-                    )}
-                  >
-                    <div className="nx:grid nx:gap-control-sm">
-                      {nestLabel ? tooltipLabel : null}
-                      <span className="nx:text-muted-foreground">
-                        {itemConfig?.label || item.name}
-                      </span>
-                    </div>
-                    {item.value !== undefined && (
-                      <span className="nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums">
-                        {item.value.toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                </>
-              )}
+              {formatter(item.value, item.name, item, index, item.payload)}
             </div>
-          );
-        })}
+          ) : (
+            <ChartTooltipItem
+              key={`${item.dataKey}`}
+              item={item}
+              indicator={indicator}
+              hideIndicator={hideIndicator}
+              color={color}
+              nameKey={nameKey}
+              nestLabel={nestLabel}
+            >
+              {nestLabel ? tooltipLabel : null}
+            </ChartTooltipItem>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface ChartTooltipIndicatorProps {
+  itemConfig: ChartConfig[string] | undefined;
+  hideIndicator: boolean;
+  indicator: ChartIndicator;
+  nestLabel: boolean;
+  color: string | undefined;
+}
+
+/** The leading swatch for a tooltip row: a config icon, or the dot/line/dashed mark. */
+function ChartTooltipIndicator({
+  itemConfig,
+  hideIndicator,
+  indicator,
+  nestLabel,
+  color,
+}: ChartTooltipIndicatorProps) {
+  if (itemConfig?.icon) {
+    const Icon = itemConfig.icon;
+    return <Icon />;
+  }
+  if (hideIndicator) return null;
+
+  return (
+    <div
+      className={cn(
+        'nx:shrink-0 nx:rounded-[2px] nx:border-(--color-border) nx:bg-(--color-bg)',
+        {
+          'nx:h-2.5 nx:w-2.5': indicator === 'dot',
+          'nx:w-1': indicator === 'line',
+          'nx:w-0 nx:border-[1.5px] nx:border-dashed nx:bg-transparent':
+            indicator === 'dashed',
+          'nx:my-0.5': nestLabel && indicator === 'dashed',
+        }
+      )}
+      style={
+        {
+          '--color-bg': color,
+          '--color-border': color,
+        } as React.CSSProperties
+      }
+    />
+  );
+}
+
+interface ChartTooltipItemProps {
+  item: RechartsPrimitive.TooltipPayloadEntry;
+  indicator: ChartIndicator;
+  hideIndicator: boolean;
+  color?: string;
+  nameKey?: string;
+  nestLabel: boolean;
+  /** The nested tooltip label, shown before the series name on a single line/dashed row. */
+  children?: React.ReactNode;
+}
+
+/** One default tooltip row: indicator + series name + value. */
+function ChartTooltipItem({
+  item,
+  indicator,
+  hideIndicator,
+  color,
+  nameKey,
+  nestLabel,
+  children,
+}: ChartTooltipItemProps) {
+  const { config } = useChart();
+  const key = `${nameKey || item.name || item.dataKey || 'value'}`;
+  const itemConfig = getPayloadConfigFromPayload(config, item, key);
+
+  return (
+    <div className={tooltipRowClassName(indicator)}>
+      <ChartTooltipIndicator
+        itemConfig={itemConfig}
+        hideIndicator={hideIndicator}
+        indicator={indicator}
+        nestLabel={nestLabel}
+        color={color || item.payload?.fill || item.color}
+      />
+      <div
+        className={cn(
+          'nx:flex nx:flex-1 nx:justify-between nx:leading-none',
+          nestLabel ? 'nx:items-end' : 'nx:items-center'
+        )}
+      >
+        <div className="nx:grid nx:gap-control-sm">
+          {children}
+          <span className="nx:text-muted-foreground">
+            {itemConfig?.label || item.name}
+          </span>
+        </div>
+        {item.value !== undefined && (
+          <span className="nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums">
+            {item.value.toLocaleString()}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -274,19 +346,23 @@ function ChartTooltipContent({
 
 const ChartLegend = RechartsPrimitive.Legend;
 
+interface ChartLegendContentProps extends Pick<
+  RechartsPrimitive.DefaultLegendContentProps,
+  'payload'
+> {
+  className?: string;
+  hideIcon?: boolean;
+  verticalAlign?: 'top' | 'bottom';
+  nameKey?: string;
+}
+
 function ChartLegendContent({
   className,
   hideIcon = false,
   payload,
   verticalAlign = 'bottom',
   nameKey,
-}: {
-  className?: string;
-  hideIcon?: boolean;
-  payload?: RechartsPrimitive.LegendPayload[];
-  verticalAlign?: 'top' | 'bottom';
-  nameKey?: string;
-}) {
+}: ChartLegendContentProps) {
   const { config } = useChart();
 
   if (!payload?.length) {
@@ -326,45 +402,31 @@ function ChartLegendContent({
   );
 }
 
+/** A recharts tooltip or legend payload item; the raw data row sits under `.payload`. */
+type ChartPayloadItem =
+  | RechartsPrimitive.TooltipPayloadEntry
+  | RechartsPrimitive.LegendPayload;
+
+/** Read `key` off an unknown object as a string, else `undefined`. */
+function readKey(source: unknown, key: string): string | undefined {
+  if (typeof source !== 'object' || source === null) return undefined;
+  const value = (source as Record<string, unknown>)[key];
+  return typeof value === 'string' ? value : undefined;
+}
+
 /**
  * Resolve a series' {@link ChartConfig} entry from a recharts payload item.
- * recharts nests the row data under `payload.payload`, so we probe both the
- * outer item and the inner row for a string key before falling back to `key`.
+ * recharts nests the row data under `.payload`, so we probe the outer item then
+ * the inner row for a string key before falling back to `key`.
  */
 function getPayloadConfigFromPayload(
   config: ChartConfig,
-  payload: unknown,
+  item: ChartPayloadItem | undefined,
   key: string
 ) {
-  if (typeof payload !== 'object' || payload === null) {
-    return undefined;
-  }
-
-  const payloadPayload =
-    'payload' in payload &&
-    typeof payload.payload === 'object' &&
-    payload.payload !== null
-      ? payload.payload
-      : undefined;
-
-  let configLabelKey: string = key;
-
-  if (
-    key in payload &&
-    typeof payload[key as keyof typeof payload] === 'string'
-  ) {
-    configLabelKey = payload[key as keyof typeof payload] as string;
-  } else if (
-    payloadPayload &&
-    key in payloadPayload &&
-    typeof payloadPayload[key as keyof typeof payloadPayload] === 'string'
-  ) {
-    configLabelKey = payloadPayload[
-      key as keyof typeof payloadPayload
-    ] as string;
-  }
-
-  return configLabelKey in config ? config[configLabelKey] : config[key];
+  if (!item) return undefined;
+  const configKey = readKey(item, key) ?? readKey(item.payload, key) ?? key;
+  return config[configKey] ?? config[key];
 }
 
 export {

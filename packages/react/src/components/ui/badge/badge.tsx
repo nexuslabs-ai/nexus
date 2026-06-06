@@ -183,16 +183,13 @@ function Badge({
 
   const classes = cn(
     badgeVariants({ variant, fill }),
-    isCaps
-      ? 'nx:typography-label-caps nx:uppercase'
-      : 'nx:typography-label-default',
     isNumber
       ? 'nx:size-5 nx:rounded-full nx:p-0 nx:typography-label-caps'
       : isCaps
         ? // nexus-allow-numeric: chip rhythm
-          'nx:px-2 nx:py-0.5'
+          'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-0.5'
         : // nexus-allow-numeric: chip rhythm
-          'nx:px-2.5 nx:py-0.5',
+          'nx:typography-label-default nx:px-2.5 nx:py-0.5',
     className
   );
 

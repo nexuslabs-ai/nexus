@@ -59,7 +59,7 @@ function Calendar({
       className={cn(
         // nexus-allow-numeric: calendar chrome padding around the day grid
         'nx:group/calendar nx:bg-background nx:p-3 nx:[--cell-size:var(--nx-spacing-8)]',
-        'nx:[[data-slot=card-content]_&]:bg-transparent nx:[[data-slot=popover-content]_&]:bg-transparent',
+        'nx:in-data-[slot=card-content]:bg-transparent nx:in-data-[slot=popover-content]:bg-transparent',
         className
       )}
       captionLayout={captionLayout}
