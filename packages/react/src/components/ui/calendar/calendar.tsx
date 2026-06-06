@@ -57,7 +57,6 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        // nexus-allow-numeric: calendar chrome padding around the day grid
         'nx:group/calendar nx:bg-background nx:p-3 nx:[--cell-size:var(--nx-spacing-8)]',
         'nx:in-data-[slot=card-content]:bg-transparent nx:in-data-[slot=popover-content]:bg-transparent',
         className
@@ -71,17 +70,14 @@ function Calendar({
       classNames={{
         root: cn('nx:w-fit', defaultClassNames.root),
         months: cn(
-          // nexus-allow-numeric: month-grid rhythm
           'nx:relative nx:flex nx:flex-col nx:gap-4',
           defaultClassNames.months
         ),
         month: cn(
-          // nexus-allow-numeric: month-grid rhythm
           'nx:flex nx:w-full nx:flex-col nx:gap-4',
           defaultClassNames.month
         ),
         nav: cn(
-          // nexus-allow-numeric: nav rhythm
           'nx:absolute nx:inset-x-0 nx:top-0 nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-1',
           defaultClassNames.nav
         ),
@@ -100,7 +96,6 @@ function Calendar({
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
-          // nexus-allow-numeric: dropdown rhythm
           'nx:flex nx:h-(--cell-size) nx:w-full nx:items-center nx:justify-center nx:gap-1.5 nx:text-sm nx:font-medium',
           defaultClassNames.dropdowns
         ),
@@ -116,8 +111,7 @@ function Calendar({
           'nx:font-medium nx:select-none',
           captionLayout === 'label'
             ? 'nx:text-sm'
-            : // nexus-allow-numeric: dropdown caption rhythm
-              'nx:flex nx:h-8 nx:items-center nx:gap-1 nx:rounded-md nx:pr-1 nx:pl-2 nx:text-sm nx:[&>svg]:size-3.5 nx:[&>svg]:text-muted-foreground',
+            : 'nx:flex nx:h-8 nx:items-center nx:gap-1 nx:rounded-md nx:pr-1 nx:pl-2 nx:text-sm nx:[&>svg]:size-3.5 nx:[&>svg]:text-muted-foreground',
           defaultClassNames.caption_label
         ),
         table: 'nx:w-full nx:border-collapse',
@@ -126,11 +120,7 @@ function Calendar({
           'nx:flex-1 nx:rounded-md nx:text-[0.8rem] nx:font-normal nx:text-muted-foreground nx:select-none',
           defaultClassNames.weekday
         ),
-        week: cn(
-          // nexus-allow-numeric: week-row rhythm
-          'nx:mt-2 nx:flex nx:w-full',
-          defaultClassNames.week
-        ),
+        week: cn('nx:mt-2 nx:flex nx:w-full', defaultClassNames.week),
         week_number_header: cn(
           'nx:w-(--cell-size) nx:select-none',
           defaultClassNames.week_number_header
@@ -260,7 +250,6 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        // nexus-allow-numeric: day-button rhythm
         'nx:flex nx:aspect-square nx:size-auto nx:w-full nx:min-w-(--cell-size) nx:flex-col nx:gap-1 nx:leading-none nx:font-normal',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',

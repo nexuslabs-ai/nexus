@@ -80,11 +80,7 @@ function PaginationContent({ className, ...props }: PaginationContentProps) {
   return (
     <ul
       data-slot="pagination-content"
-      className={cn(
-        // nexus-allow-numeric: tight gap between pager items
-        'nx:flex nx:flex-row nx:items-center nx:gap-1',
-        className
-      )}
+      className={cn('nx:flex nx:flex-row nx:items-center nx:gap-1', className)}
       {...props}
     />
   );
@@ -215,7 +211,6 @@ function PaginationEllipsis({ className, ...props }: PaginationEllipsisProps) {
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        // nexus-allow-numeric: match the size="icon" link footprint
         'nx:flex nx:items-center nx:justify-center nx:p-2.5',
         className
       )}

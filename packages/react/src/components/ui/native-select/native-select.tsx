@@ -16,9 +16,7 @@ const nativeSelectVariants = cva(
   {
     variants: {
       size: {
-        // nexus-allow-numeric: select padding + chevron room (match Input)
         default: 'nx:px-3 nx:py-control-md nx:pr-9 nx:text-sm',
-        // nexus-allow-numeric: select padding + chevron room (match Input)
         sm: 'nx:px-2.5 nx:py-control-sm nx:pr-9 nx:text-xs',
       },
     },

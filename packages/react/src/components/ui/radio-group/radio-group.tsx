@@ -49,11 +49,7 @@ function RadioGroup({ className, ...props }: RadioGroupProps) {
   return (
     <RadioGroupPrimitive.Root
       data-slot="radio-group"
-      className={cn(
-        // nexus-allow-numeric: spacing between options stacked in the group
-        'nx:grid nx:gap-2',
-        className
-      )}
+      className={cn('nx:grid nx:gap-2', className)}
       {...props}
     />
   );

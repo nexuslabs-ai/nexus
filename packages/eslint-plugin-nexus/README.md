@@ -10,23 +10,6 @@ Flags any px value in `packages/core/tokens/semantic/spacing-*.json` that is not
 
 Requires `jsonc-eslint-parser`. Wired in the root `eslint.config.js` to target spacing mode files only.
 
-### `@nexus/prefer-role-utilities`
-
-Flags raw numeric padding / gap utilities (`nx:p-N`, `nx:px-N`, `nx:py-N`, `nx:gap-N`) in `packages/react/src/components/ui/*.tsx` (excluding `*.stories.tsx`) where a role-named utility would apply.
-
-`nx:(p|px|py|gap)-0` is not flagged — there is no role for "no padding".
-
-#### Allowlist
-
-When a raw numeric is intentional (chip rhythm, sub-element offset, item-tier menu rows, etc.), annotate the line **immediately above** with:
-
-```tsx
-// nexus-allow-numeric: chip rhythm
-className: 'nx:px-2 nx:py-0.5',
-```
-
-The comment text after the colon is free-form; keep it terse and cite the rule note that justifies the deviation.
-
 ### `@nexus/nx-class-conventions`
 
 Enforces the `nx:` Tailwind-class conventions from `.claude/rules/components.md` and `.claude/rules/shadcn-divergences.md` on class strings (string + single-quasi template literals): correct prefix order (`nx:` before every modifier, not `hover:nx:…`), no banned `accent` token, complete semantic token paths (`-background` / `-foreground` / `-subtle`), and no raw primitive colors (`nx:bg-blue-500`). Ported from the former `.claude/hooks/lint-nx-prefix.mjs` so the checks run in `pnpm lint` and the pre-commit hook. Wired for `packages/react/src/**` and `apps/**` `.tsx`.
@@ -41,4 +24,4 @@ Enforces `.claude/rules/extract-inline-handlers.md`: inline JSX handler props (`
 
 ## Source of truth
 
-The token-layer rules are self-contained: the canonical step set is `src/canonical-step-set.json` and the role-to-utility mapping lives in `src/rules/prefer-role-utilities.js`. The component rules map 1:1 to the `.claude/rules/*.md` cited above — the rule code plus those docs are the spec. Every rule has RuleTester coverage in `__tests__/`.
+The token-layer rules are self-contained: the canonical step set is `src/canonical-step-set.json`. The component rules map 1:1 to the `.claude/rules/*.md` cited above — the rule code plus those docs are the spec. Every rule has RuleTester coverage in `__tests__/`.

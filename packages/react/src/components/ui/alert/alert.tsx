@@ -5,7 +5,6 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const alertVariants = cva(
-  // nexus-allow-numeric: callout rhythm
   'nx:relative nx:w-full nx:rounded-lg nx:border nx:p-4 nx:[&>svg~*]:pl-7 nx:[&>svg+div]:translate-y-[-3px] nx:[&>svg]:absolute nx:[&>svg]:left-4 nx:[&>svg]:top-4 nx:[&>svg]:text-foreground',
   {
     variants: {

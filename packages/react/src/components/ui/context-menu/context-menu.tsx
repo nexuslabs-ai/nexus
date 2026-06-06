@@ -90,9 +90,7 @@ function ContextMenuSubTrigger({
       data-slot="context-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        // nexus-allow-numeric: menu item-tier rhythm
         'nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2',
-        // nexus-allow-numeric: menu item-tier rhythm
         'nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-[state=open]:bg-popover-hover nx:data-[state=open]:text-popover-foreground',
@@ -132,7 +130,6 @@ function ContextMenuSubContent({
       className={cn(
         'nx:z-popover nx:min-w-[8rem] nx:overflow-hidden',
         'nx:rounded-md nx:border nx:border-border-default',
-        // nexus-allow-numeric: popover chrome (sub-canonical inner padding)
         'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
         'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
         'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
@@ -180,7 +177,6 @@ function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
           'nx:z-popover nx:max-h-(--radix-context-menu-content-available-height)',
           'nx:min-w-[8rem] nx:overflow-x-hidden nx:overflow-y-auto',
           'nx:rounded-md nx:border nx:border-border-default',
-          // nexus-allow-numeric: popover chrome (sub-canonical inner padding)
           'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
@@ -199,7 +195,6 @@ function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
 }
 
 const contextMenuItemVariants = cva(
-  // nexus-allow-numeric: menu item-tier rhythm
   'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
@@ -399,7 +394,6 @@ function ContextMenuLabel({
       data-slot="context-menu-label"
       data-inset={inset}
       className={cn(
-        // nexus-allow-numeric: menu label item-tier rhythm
         'nx:px-2 nx:py-control-sm nx:text-sm nx:font-semibold',
         inset && 'nx:pl-8',
         className

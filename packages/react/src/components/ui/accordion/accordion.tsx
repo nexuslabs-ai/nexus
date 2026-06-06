@@ -12,7 +12,6 @@ const accordionVariants = cva(
     variants: {
       variant: {
         stacked: '',
-        // nexus-allow-numeric: Figma floating item stack gap
         floating: 'nx:gap-2',
       },
     },
@@ -69,7 +68,6 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
     <AccordionPrimitive.Item
       data-slot="accordion-item"
       className={cn(
-        // nexus-allow-numeric: Figma item inset and expanded bottom padding
         'nx:border-b nx:border-border-default nx:px-4 nx:transition-colors nx:hover:bg-background-hover nx:data-[disabled]:border-border-disabled nx:data-[disabled]:text-disabled-foreground nx:data-[disabled]:hover:bg-transparent nx:data-[state=open]:pb-4',
         'nx:group-data-[variant=stacked]/accordion:last:border-b-0',
         'nx:group-data-[variant=floating]/accordion:rounded-md nx:group-data-[variant=floating]/accordion:border',
@@ -100,7 +98,6 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          // nexus-allow-numeric: item-tier rhythm
           'nx:flex nx:w-full nx:flex-1 nx:items-start nx:gap-4 nx:py-4 nx:typography-label-default nx:text-foreground nx:transition-all nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:disabled:opacity-50 nx:disabled:[&>svg]:text-disabled-foreground nx:[&[data-state=open]>svg]:rotate-180',
           className
         )}

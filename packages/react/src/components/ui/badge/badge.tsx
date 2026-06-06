@@ -6,7 +6,6 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  // nexus-allow-numeric: chip rhythm
   'nx:inline-flex nx:items-center nx:justify-center nx:gap-1 nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:w-fit',
   {
     variants: {
@@ -186,10 +185,8 @@ function Badge({
     isNumber
       ? 'nx:size-5 nx:rounded-full nx:p-0 nx:typography-label-caps'
       : isCaps
-        ? // nexus-allow-numeric: chip rhythm
-          'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-0.5'
-        : // nexus-allow-numeric: chip rhythm
-          'nx:typography-label-default nx:px-2.5 nx:py-0.5',
+        ? 'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-0.5'
+        : 'nx:typography-label-default nx:px-2.5 nx:py-0.5',
     className
   );
 

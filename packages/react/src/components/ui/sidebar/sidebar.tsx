@@ -344,7 +344,6 @@ function Sidebar({
             : 'nx:right-0 nx:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
           // Floating and inset variants gain padding around the panel; the
           // +1rem in the icon-collapse width below matches this inset.
-          // nexus-allow-numeric: floating/inset panel inset
           (variant === 'floating' || variant === 'inset') && 'nx:p-2',
           variant === 'floating' || variant === 'inset'
             ? 'nx:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
@@ -505,7 +504,6 @@ function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
   return (
     <div
       data-slot="sidebar-header"
-      // nexus-allow-numeric: sidebar nav-chrome rhythm
       className={cn('nx:flex nx:flex-col nx:gap-2 nx:p-2', className)}
       {...props}
     />
@@ -528,7 +526,6 @@ function SidebarFooter({ className, ...props }: SidebarFooterProps) {
   return (
     <div
       data-slot="sidebar-footer"
-      // nexus-allow-numeric: sidebar nav-chrome rhythm
       className={cn('nx:flex nx:flex-col nx:gap-2 nx:p-2', className)}
       {...props}
     />
@@ -591,7 +588,6 @@ function SidebarContent({
       aria-label={ariaLabelledby ? undefined : ariaLabel}
       aria-labelledby={ariaLabelledby}
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:flex nx:min-h-0 nx:flex-1 nx:flex-col nx:gap-2 nx:overflow-auto nx:group-data-[collapsible=icon]:overflow-hidden',
         className
       )}
@@ -617,7 +613,6 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
     <div
       data-slot="sidebar-group"
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:relative nx:flex nx:w-full nx:min-w-0 nx:flex-col nx:p-2',
         className
       )}
@@ -656,7 +651,6 @@ function SidebarGroupLabel({
     <Comp
       data-slot="sidebar-group-label"
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:text-xs nx:font-medium nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-200 nx:ease-linear nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:group-data-[collapsible=icon]:-mt-8 nx:group-data-[collapsible=icon]:opacity-0',
         className
@@ -749,7 +743,6 @@ function SidebarMenu({ className, ...props }: SidebarMenuProps) {
     <ul
       data-slot="sidebar-menu"
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:flex nx:w-full nx:min-w-0 nx:flex-col nx:gap-1',
         className
       )}
@@ -783,7 +776,6 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
 
 const sidebarMenuButtonVariants = cva(
   cn(
-    // nexus-allow-numeric: sidebar nav-chrome rhythm
     'nx:peer/menu-button nx:flex nx:w-full nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:p-2 nx:text-left nx:text-sm nx:transition-[width,height,padding]',
     'nx:group-has-data-[slot=sidebar-menu-action]/menu-item:pr-8 nx:group-data-[collapsible=icon]:size-8! nx:group-data-[collapsible=icon]:p-2!',
     'nx:hover:bg-nav-item-hover nx:active:bg-nav-item-active',
@@ -963,7 +955,6 @@ function SidebarMenuBadge({ className, ...props }: SidebarMenuBadgeProps) {
     <div
       data-slot="sidebar-menu-badge"
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:pointer-events-none nx:absolute nx:right-1 nx:flex nx:h-5 nx:min-w-5 nx:items-center nx:justify-center nx:rounded-md nx:px-1 nx:text-xs nx:font-medium nx:text-nav-foreground nx:tabular-nums nx:select-none',
         'nx:peer-data-[size=sm]/menu-button:top-1',
         'nx:peer-data-[size=default]/menu-button:top-1.5',
@@ -1010,7 +1001,6 @@ function SidebarMenuSkeleton({
     <div
       data-slot="sidebar-menu-skeleton"
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:flex nx:h-8 nx:items-center nx:gap-2 nx:rounded-md nx:px-2',
         className
       )}
@@ -1053,7 +1043,6 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
     <ul
       data-slot="sidebar-menu-sub"
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:mx-3.5 nx:flex nx:min-w-0 nx:translate-x-px nx:flex-col nx:gap-1 nx:border-l nx:border-nav-border nx:px-2.5 nx:py-0.5',
         'nx:group-data-[collapsible=icon]:hidden',
         className
@@ -1128,7 +1117,6 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        // nexus-allow-numeric: sidebar nav-chrome rhythm
         'nx:flex nx:h-7 nx:min-w-0 nx:-translate-x-px nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:px-2 nx:text-nav-foreground nx:outline-hidden nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:active:bg-nav-item-active nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:aria-disabled:pointer-events-none nx:aria-disabled:opacity-50 nx:[&>span:last-child]:truncate nx:[&>svg]:size-4 nx:[&>svg]:shrink-0 nx:[&>svg]:text-nav-foreground',
         'nx:data-[active=true]:bg-nav-item-active',
         size === 'sm' && 'nx:text-xs',

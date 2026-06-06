@@ -44,7 +44,6 @@ function EmptyState({ className, ...props }: EmptyStateProps) {
     <div
       data-slot="empty-state"
       className={cn(
-        // nexus-allow-numeric: empty-state layout rhythm
         'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:border-dashed nx:p-6 nx:text-center nx:text-balance',
         className
       )}
@@ -70,7 +69,6 @@ function EmptyStateHeader({ className, ...props }: EmptyStateHeaderProps) {
     <div
       data-slot="empty-state-header"
       className={cn(
-        // nexus-allow-numeric: header sub-element rhythm
         'nx:flex nx:max-w-sm nx:flex-col nx:items-center nx:gap-2 nx:text-center',
         className
       )}
@@ -80,13 +78,11 @@ function EmptyStateHeader({ className, ...props }: EmptyStateHeaderProps) {
 }
 
 const emptyStateMediaVariants = cva(
-  // nexus-allow-numeric: media wrapper rhythm
   'nx:mb-2 nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:[&_svg]:pointer-events-none nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default: 'nx:bg-transparent',
-        // nexus-allow-numeric: icon medallion footprint
         icon: 'nx:size-10 nx:rounded-lg nx:bg-muted nx:text-foreground nx:[&_svg]:size-6',
       },
     },
@@ -195,7 +191,6 @@ function EmptyStateContent({ className, ...props }: EmptyStateContentProps) {
     <div
       data-slot="empty-state-content"
       className={cn(
-        // nexus-allow-numeric: content stack rhythm
         'nx:flex nx:w-full nx:max-w-sm nx:min-w-0 nx:flex-col nx:items-center nx:gap-4 nx:text-balance',
         className
       )}

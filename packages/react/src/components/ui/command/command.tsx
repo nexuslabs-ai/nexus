@@ -145,7 +145,6 @@ function CommandInput({ className, ...props }: CommandInputProps) {
   return (
     <div
       data-slot="command-input-wrapper"
-      // nexus-allow-numeric: command input bar px stays numeric
       className="nx:flex nx:items-center nx:border-b nx:border-border-default nx:px-3 nx:focus-within:border-border-active"
     >
       <IconSearch className="nx:mr-2 nx:size-4 nx:shrink-0 nx:opacity-50" />
@@ -208,11 +207,7 @@ function CommandEmpty({ className, ...props }: CommandEmptyProps) {
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
-      className={cn(
-        // nexus-allow-numeric: empty-state vertical rhythm
-        'nx:py-6 nx:text-center nx:text-sm',
-        className
-      )}
+      className={cn('nx:py-6 nx:text-center nx:text-sm', className)}
       {...props}
     />
   );
@@ -246,7 +241,6 @@ function CommandGroup({ className, ...props }: CommandGroupProps) {
       data-slot="command-group"
       className={cn(
         'nx:overflow-hidden nx:text-popover-foreground',
-        // nexus-allow-numeric: popover chrome (sub-canonical inner padding)
         'nx:p-1',
         'nx:**:[[cmdk-group-heading]]:px-2 nx:**:[[cmdk-group-heading]]:py-1.5',
         'nx:**:[[cmdk-group-heading]]:text-xs nx:**:[[cmdk-group-heading]]:font-medium nx:**:[[cmdk-group-heading]]:text-muted-foreground',
@@ -313,7 +307,6 @@ function CommandItem({ className, ...props }: CommandItemProps) {
       data-slot="command-item"
       className={cn(
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:text-sm nx:outline-none',
-        // nexus-allow-numeric: command item-tier rhythm
         'nx:gap-2 nx:px-2 nx:py-control-sm',
         'nx:data-[selected=true]:bg-popover-hover nx:data-[selected=true]:text-popover-foreground',
         'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:opacity-50',

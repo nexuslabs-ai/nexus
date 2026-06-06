@@ -57,7 +57,6 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        // nexus-allow-numeric: tight trail rhythm
         'nx:flex nx:flex-wrap nx:items-center nx:gap-1.5 nx:wrap-break-word nx:typography-body-small nx:text-muted-foreground',
         className
       )}
@@ -82,11 +81,7 @@ function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn(
-        // nexus-allow-numeric: link/separator gap
-        'nx:inline-flex nx:items-center nx:gap-1.5',
-        className
-      )}
+      className={cn('nx:inline-flex nx:items-center nx:gap-1.5', className)}
       {...props}
     />
   );
@@ -203,7 +198,6 @@ function BreadcrumbEllipsis({ className, ...props }: BreadcrumbEllipsisProps) {
       role="presentation"
       aria-hidden="true"
       className={cn(
-        // nexus-allow-numeric: ellipsis hit-slot footprint
         'nx:flex nx:size-9 nx:items-center nx:justify-center',
         className
       )}

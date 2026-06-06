@@ -17,7 +17,6 @@ function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
     <fieldset
       data-slot="field-set"
       className={cn(
-        // nexus-allow-numeric: field-group rhythm
         'nx:flex nx:flex-col nx:gap-6 nx:has-[>[data-slot=checkbox-group]]:gap-3 nx:has-[>[data-slot=radio-group]]:gap-3',
         className
       )}
@@ -56,7 +55,6 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        // nexus-allow-numeric: legend caption spacing
         'nx:mb-3 nx:font-medium nx:data-[variant=legend]:text-base nx:data-[variant=label]:text-sm',
         className
       )}
@@ -76,7 +74,6 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-group"
       className={cn(
-        // nexus-allow-numeric: field-group stack rhythm
         'nx:group/field-group nx:@container/field-group nx:flex nx:w-full nx:flex-col nx:gap-7 nx:data-[slot=checkbox-group]:gap-3 nx:[&>[data-slot=field-group]]:gap-4',
         className
       )}
@@ -86,7 +83,6 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const fieldVariants = cva(
-  // nexus-allow-numeric: label/control/description gap
   'nx:group/field nx:flex nx:w-full nx:gap-3 nx:data-[invalid=true]:text-error-subtle-foreground',
   {
     variants: {
@@ -151,7 +147,6 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-content"
       className={cn(
-        // nexus-allow-numeric: stacked label/description gap
         'nx:group/field-content nx:flex nx:flex-1 nx:flex-col nx:gap-1.5 nx:leading-snug',
         className
       )}
@@ -175,7 +170,6 @@ function FieldLabel({
     <Label
       data-slot="field-label"
       className={cn(
-        // nexus-allow-numeric: label gap + card padding
         'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:leading-snug nx:group-data-[disabled=true]/field:opacity-50',
         'nx:has-[>[data-slot=field]]:w-full nx:has-[>[data-slot=field]]:flex-col nx:has-[>[data-slot=field]]:rounded-md nx:has-[>[data-slot=field]]:border nx:[&>*]:data-[slot=field]:p-4',
         'nx:has-data-[state=checked]:border-border-primary nx:has-data-[state=checked]:bg-primary-subtle',
@@ -197,7 +191,6 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-label"
       className={cn(
-        // nexus-allow-numeric: title icon gap
         'nx:flex nx:w-fit nx:items-center nx:gap-2 nx:text-sm nx:leading-snug nx:font-medium nx:group-data-[disabled=true]/field:opacity-50',
         className
       )}
@@ -241,7 +234,6 @@ function FieldSeparator({
       data-slot="field-separator"
       data-content={!!children}
       className={cn(
-        // nexus-allow-numeric: separator inset
         'nx:relative nx:-my-2 nx:h-5 nx:text-sm nx:group-data-[variant=outline]/field-group:-mb-2',
         className
       )}
@@ -251,7 +243,6 @@ function FieldSeparator({
       {children && (
         <span
           data-slot="field-separator-content"
-          // nexus-allow-numeric: separator label inset
           className="nx:relative nx:mx-auto nx:block nx:w-fit nx:bg-background nx:px-2 nx:text-muted-foreground"
         >
           {children}
@@ -303,7 +294,6 @@ function FieldError({
     }
 
     return (
-      // nexus-allow-numeric: error list inset
       <ul className="nx:ml-4 nx:flex nx:list-disc nx:flex-col nx:gap-1">
         {uniqueErrors.map(
           (error, index) =>

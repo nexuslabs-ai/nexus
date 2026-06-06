@@ -9,7 +9,7 @@ Typography — use composites:
 - trigger: `nx:text-sm nx:font-medium` → `nx:typography-label-default`
 - content: `nx:text-sm` → `nx:typography-body-small`
 
-Escape-hatch (ok): `nexus-allow-numeric: item-tier rhythm` on trigger `nx:py-4`.
+Numeric spacing note: trigger uses `nx:py-4` for item-tier rhythm.
 
 ## alert
 
@@ -20,7 +20,7 @@ Typography — use composites:
 
 `data-variant` omitted on default variant → use `data-variant={variant ?? 'default'}`.
 
-Escape-hatch (ok): `nexus-allow-numeric: callout rhythm` on `nx:p-4` — alert intentionally denser than `p-container` (16px vs 24px). Design Q: keep tight or scale like a container?
+Numeric spacing note: `nx:p-4` keeps alert intentionally denser than `p-container` (16px vs 24px). Design Q: keep tight or scale like a container?
 
 Minor: no `information` variant; old shadcn icon pattern with `translate-y-[-3px]` nudge.
 
@@ -35,7 +35,7 @@ Typography — use composites:
 
 Discuss w/ designer: open animation drifts diagonally (top-right → center) instead of a clean centered zoom. Cause: `slide-in-from-left-1/2` + `slide-in-from-top-[48%]` not cancelling the `-translate-x/y-1/2` centering under Tailwind v4. Same block in `dialog.tsx`. Option: drop the directional slide, keep zoom+fade only.
 
-Escape-hatches (ok): `nexus-allow-numeric: ... sub-element rhythm` on header `nx:gap-1.5` and footer `nx:sm:gap-2`.
+Numeric spacing notes: header `nx:gap-1.5` and footer `nx:sm:gap-2` are sub-element rhythm.
 
 ## aspect-ratio
 
@@ -53,11 +53,11 @@ Likely bug: `leftIcon`/`rightIcon` wrapper is `nx:size-3.5` but doesn't constrai
 
 Minor: `data-variant`/`data-fill` omitted on default (`default`/`solid`).
 
-Escape-hatches (ok): three `nexus-allow-numeric: chip rhythm` on `gap-1` and chip `px/py`.
+Numeric spacing notes: `gap-1` and chip `px/py` are chip rhythm.
 
 ## breadcrumb
 
-No-op escape-hatch: `nexus-allow-numeric: ellipsis hit-slot footprint` sits on `size-9`, but the rule only flags `p/px/py/gap` — suppresses nothing. Remove or move.
+Numeric spacing note: `size-9` sets the ellipsis hit-slot footprint.
 
 Touch targets (mobile, discuss): breadcrumb links are bare inline text (~20px); ellipsis is `size-9` (36px). Both under the ~44px floor.
 
@@ -71,11 +71,11 @@ Touch target (mobile, discuss): `size="icon"` = `p-2.5` (10px) + `size-4` icon =
 
 Minor: `data-variant`/`data-size` omitted on default (`default`/`default`).
 
-Escape-hatch (ok): `nexus-allow-numeric: density-stable square hit-target` on icon `p-2.5` (ties into touch-target note).
+Numeric spacing note: icon `p-2.5` keeps the density-stable square hit-target (ties into touch-target note).
 
 ## button-group
 
-No-op escape-hatch (line 10): `nexus-allow-numeric: joined-cluster layout rhythm` on the base — its only numeric (`gap-2`) is inside a `has-[...]` variant the rule can't match (verified). Suppresses nothing; remove. (Line-96 hatch on addon `gap-2`/`px-4` is legit.)
+Numeric spacing note: base joined-cluster `gap-2` sits inside a `has-[...]` variant. Addon `gap-2`/`px-4` is intentional.
 
 Minor: `data-orientation` omitted on default (`horizontal`).
 
@@ -83,7 +83,7 @@ Minor: `data-orientation` omitted on default (`horizontal`).
 
 Typography: pervasive raw (`text-sm`, `font-medium`, `font-normal`, `text-xs`) → composites. Weekday/week-number use arbitrary `nx:text-[0.8rem]` (un-tokenized 12.8px) → `typography-label-small`.
 
-No-op escape-hatch (line 130): `nexus-allow-numeric: week-row rhythm` on `nx:mt-2` — `mt` isn't flagged by the rule (verified). Remove. (Other hatches legit.)
+Numeric spacing note: week row uses `nx:mt-2`; other dense calendar gaps/padding are intentional.
 
 Minor (mobile): day buttons = `--cell-size` (`--nx-spacing-8` = 32px), under ~44px. Inherent to dense calendars.
 
@@ -96,7 +96,7 @@ Typography — use composites:
 
 Discuss: `CardAction` is `absolute` top-right (not grid-reserved), so a long `CardTitle` can render under it. shadcn's newer Card uses CSS grid + `has-data-[slot=card-action]` to reserve the column.
 
-Escape-hatches (ok): `nexus-allow-numeric: ... rhythm` on header `gap-1.5`, action `gap-2`, footer `gap-2`.
+Numeric spacing notes: header `gap-1.5`, action `gap-2`, and footer `gap-2` keep card rhythm.
 
 ## carousel
 
@@ -120,10 +120,10 @@ Minor: `CommandList` `max-h-[300px]` is an un-tokenized magic value.
 
 Minor: `CommandInput` is `outline-none`; focus shown only via wrapper `focus-within:border-border-active` (1px border), not the canonical ring.
 
-Escape-hatches (ok): `nexus-allow-numeric` on `px-3` (input), `py-6` (empty), `p-1` (group), `gap-2`/`px-2` (item).
+Numeric spacing notes: `px-3` (input), `py-6` (empty), `p-1` (group), and `gap-2`/`px-2` (item).
 
 ## context-menu
 
 Typography (raw): `text-sm` (sub-trigger/items/checkbox/radio), `font-semibold` (label), `text-xs` (shortcut) → composites.
 
-Escape-hatches (ok): `nexus-allow-numeric` menu-rhythm on `gap-2`/`px-2` (sub-trigger, item, label), popover `p-1` (content, sub-content).
+Numeric spacing notes: menu rhythm uses `gap-2`/`px-2` (sub-trigger, item, label) and popover `p-1` (content, sub-content).

@@ -143,11 +143,7 @@ function FormItem({ className, children, ...props }: FormItemProps) {
     <FormItemContext.Provider value={{ id, hasDescription, hasMessage }}>
       <div
         data-slot="form-item"
-        className={cn(
-          // nexus-allow-numeric: vertical rhythm between label, control, description, message
-          'nx:grid nx:gap-2',
-          className
-        )}
+        className={cn('nx:grid nx:gap-2', className)}
         {...props}
       >
         {children}

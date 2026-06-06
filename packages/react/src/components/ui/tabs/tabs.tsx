@@ -52,7 +52,6 @@ function TabsList({ className, ...props }: TabsListProps) {
       data-slot="tabs-list"
       className={cn(
         'nx:inline-flex nx:items-center nx:justify-center',
-        // nexus-allow-numeric: TabsList chrome (sub-canonical inner padding)
         'nx:rounded-md nx:bg-control-background nx:p-1',
         className
       )}
@@ -102,7 +101,6 @@ const tabsTriggerVariants = cva(
        * @default "default"
        */
       size: {
-        // nexus-allow-numeric: Tabs sm is sub-control "dense pill"
         sm: 'nx:px-2 nx:py-1 nx:text-xs',
         default: 'nx:px-control-sm nx:py-control-sm nx:text-sm',
         lg: 'nx:px-control-md nx:py-control-md nx:text-base',
