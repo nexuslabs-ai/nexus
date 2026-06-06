@@ -182,13 +182,13 @@ export const CenteredWithBodyContent: Story = {
         description="Make changes to your profile here. Click save when you're done."
         body={
           <>
-            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+            <div className="nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
               Slot
             </div>
-            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+            <div className="nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
               Slot
             </div>
-            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+            <div className="nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
               Slot
             </div>
           </>
