@@ -244,7 +244,7 @@
 /* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */
 
 :root,
-[data-style='vega'] {
+[data-style='mira'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -444,56 +444,6 @@
   --nx-layout-stack-gap: 10px;
 }
 
-[data-style='mira'] {
-  --nx-spacing-0: 0px;
-  --nx-spacing-1: 4px;
-  --nx-spacing-2: 8px;
-  --nx-spacing-3: 12px;
-  --nx-spacing-4: 16px;
-  --nx-spacing-5: 20px;
-  --nx-spacing-6: 24px;
-  --nx-spacing-7: 28px;
-  --nx-spacing-8: 32px;
-  --nx-spacing-9: 36px;
-  --nx-spacing-10: 40px;
-  --nx-spacing-11: 44px;
-  --nx-spacing-12: 48px;
-  --nx-spacing-14: 56px;
-  --nx-spacing-16: 64px;
-  --nx-spacing-20: 80px;
-  --nx-spacing-24: 96px;
-  --nx-spacing-28: 112px;
-  --nx-spacing-32: 128px;
-  --nx-spacing-36: 144px;
-  --nx-spacing-40: 160px;
-  --nx-spacing-44: 176px;
-  --nx-spacing-48: 192px;
-  --nx-spacing-52: 208px;
-  --nx-spacing-56: 224px;
-  --nx-spacing-60: 240px;
-  --nx-spacing-64: 256px;
-  --nx-spacing-72: 288px;
-  --nx-spacing-80: 320px;
-  --nx-spacing-96: 384px;
-  --nx-spacing-0_5: 2px;
-  --nx-spacing-1_5: 6px;
-  --nx-spacing-2_5: 10px;
-  --nx-spacing-3_5: 14px;
-  --nx-control-padding-x-sm: 12px;
-  --nx-control-padding-x-md: 16px;
-  --nx-control-padding-x-lg: 32px;
-  --nx-control-padding-y-sm: 6px;
-  --nx-control-padding-y-md: 8px;
-  --nx-control-padding-y-lg: 12px;
-  --nx-control-gap-sm: 6px;
-  --nx-control-gap-md: 8px;
-  --nx-control-gap-lg: 10px;
-  --nx-container-p: 24px;
-  --nx-container-gap: 16px;
-  --nx-layout-section-gap: 32px;
-  --nx-layout-stack-gap: 8px;
-}
-
 [data-style='nova'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
@@ -592,6 +542,56 @@
   --nx-container-gap: 24px;
   --nx-layout-section-gap: 56px;
   --nx-layout-stack-gap: 16px;
+}
+
+[data-style='vega'] {
+  --nx-spacing-0: 0px;
+  --nx-spacing-1: 4px;
+  --nx-spacing-2: 8px;
+  --nx-spacing-3: 12px;
+  --nx-spacing-4: 16px;
+  --nx-spacing-5: 20px;
+  --nx-spacing-6: 24px;
+  --nx-spacing-7: 28px;
+  --nx-spacing-8: 32px;
+  --nx-spacing-9: 36px;
+  --nx-spacing-10: 40px;
+  --nx-spacing-11: 44px;
+  --nx-spacing-12: 48px;
+  --nx-spacing-14: 56px;
+  --nx-spacing-16: 64px;
+  --nx-spacing-20: 80px;
+  --nx-spacing-24: 96px;
+  --nx-spacing-28: 112px;
+  --nx-spacing-32: 128px;
+  --nx-spacing-36: 144px;
+  --nx-spacing-40: 160px;
+  --nx-spacing-44: 176px;
+  --nx-spacing-48: 192px;
+  --nx-spacing-52: 208px;
+  --nx-spacing-56: 224px;
+  --nx-spacing-60: 240px;
+  --nx-spacing-64: 256px;
+  --nx-spacing-72: 288px;
+  --nx-spacing-80: 320px;
+  --nx-spacing-96: 384px;
+  --nx-spacing-0_5: 2px;
+  --nx-spacing-1_5: 6px;
+  --nx-spacing-2_5: 10px;
+  --nx-spacing-3_5: 14px;
+  --nx-control-padding-x-sm: 12px;
+  --nx-control-padding-x-md: 16px;
+  --nx-control-padding-x-lg: 32px;
+  --nx-control-padding-y-sm: 6px;
+  --nx-control-padding-y-md: 8px;
+  --nx-control-padding-y-lg: 12px;
+  --nx-control-gap-sm: 6px;
+  --nx-control-gap-md: 8px;
+  --nx-control-gap-lg: 10px;
+  --nx-container-p: 24px;
+  --nx-container-gap: 16px;
+  --nx-layout-section-gap: 32px;
+  --nx-layout-stack-gap: 8px;
 }
 
 /* ===== NATIVE BROWSER UI THEME ===== */
