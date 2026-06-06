@@ -103,7 +103,7 @@ From the active header, resolve which JSON file holds the fg token:
 | Filename pattern                                           | Path                                     |
 | ---------------------------------------------------------- | ---------------------------------------- |
 | `base-{slate,neutral,gray,stone,zinc}-{light,dark}.json`   | `packages/core/tokens/semantic/`         |
-| `brands-{blue,gray,neutral,slate,stone}-{light,dark}.json` | `packages/core/tokens/semantic/`         |
+| `brands-{blue,purple,pink,teal,orange,black}-{light,dark}.json` | `packages/core/tokens/semantic/`         |
 | `chart-categorical-default-{light,dark}.json`              | `packages/core/tokens/semantic/`         |
 | `focus-default-{light,dark}.json`                          | `packages/core/tokens/primitives/focus/` |
 
@@ -117,7 +117,7 @@ fixed as the surface contract the fg must clear.
 guess paths.
 
 **Use the Read tool for these JSON files, never `Bash + cat`.** The project's
-`PermissionRequest` hook in `.codex/hooks.json` blocks bash commands
+`PermissionRequest` hook at `.codex/hooks.json` blocks bash commands
 containing the substring `token`; many of these paths include the word, so
 shelling out via `cat tokens/...` will be blocked. Read sidesteps the regex.
 

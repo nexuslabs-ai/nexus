@@ -22,6 +22,7 @@
     "tokens:modular": "pnpm --filter @nexus/core build:tokens:modular && node scripts/sync-console-themes.js && node scripts/sync-docs-themes.js",
     "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:browser-support": "node scripts/audit-browser-support.js",
+    "audit:agent-drift": "node scripts/audit-agent-drift.js",
     "audit:contrast": "pnpm --filter @nexus/core audit:contrast",
     "audit:storybook-coverage": "pnpm --filter @nexus/react audit:storybook-coverage",
     "validate:spacing-modes": "pnpm --filter @nexus/core validate:spacing-modes",
