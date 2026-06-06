@@ -28,7 +28,7 @@ const meta: Meta<typeof Alert> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'destructive', 'success', 'warning'],
+      options: ['default', 'information', 'destructive', 'success', 'warning'],
       description: 'The visual style variant',
     },
   },
@@ -58,6 +58,17 @@ export const Destructive: Story = {
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         Your session has expired. Please log in again.
+      </AlertDescription>
+    </Alert>
+  ),
+};
+
+export const Information: Story = {
+  render: (_args) => (
+    <Alert variant="information" className="nx:max-w-md">
+      <AlertTitle>Information</AlertTitle>
+      <AlertDescription>
+        New workspace invitations are available for review.
       </AlertDescription>
     </Alert>
   ),
@@ -108,6 +119,18 @@ export const DestructiveWithIcon: Story = {
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         Something went wrong. Please try again later.
+      </AlertDescription>
+    </Alert>
+  ),
+};
+
+export const InformationWithIcon: Story = {
+  render: (_args) => (
+    <Alert variant="information" className="nx:max-w-md">
+      <IconInfoCircle className="nx:size-4" />
+      <AlertTitle>Information</AlertTitle>
+      <AlertDescription>
+        New workspace invitations are available for review.
       </AlertDescription>
     </Alert>
   ),
@@ -215,8 +238,7 @@ export const DefaultDataAttributes: Story = {
     const alert = canvasElement.querySelector('[data-slot="alert"]');
 
     await expect(alert).toBeInTheDocument();
-    // Default variant should have data-variant undefined or 'default'
-    // CVA doesn't pass undefined variant to data-variant, so it will be 'default'
+    await expect(alert).toHaveAttribute('data-variant', 'default');
   },
 };
 
@@ -228,7 +250,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
-        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Default
         </div>
         <Alert className="nx:max-w-md">
@@ -241,7 +263,18 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Information
+        </div>
+        <Alert variant="information" className="nx:max-w-md">
+          <IconInfoCircle className="nx:size-4" />
+          <AlertTitle>Information Alert</AlertTitle>
+          <AlertDescription>This is an informational alert.</AlertDescription>
+        </Alert>
+      </div>
+
+      <div>
+        <div className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Destructive
         </div>
         <Alert variant="destructive" className="nx:max-w-md">
@@ -254,7 +287,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Success
         </div>
         <Alert variant="success" className="nx:max-w-md">
@@ -265,7 +298,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <div className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <div className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Warning
         </div>
         <Alert variant="warning" className="nx:max-w-md">
@@ -282,7 +315,7 @@ export const AllVariants: Story = {
 };
 
 // ============================================
-// MODE BEHAVIOUR (density stability)
+// MODE BEHAVIOUR (callout rhythm)
 // ============================================
 
 export const AllModes: Story = {
@@ -291,7 +324,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container`. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses the document scale (callout rhythm) instead of the container scale (raised-surface rhythm) — not that it is density-stable.',
+          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container`. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses the document scale (callout rhythm) instead of the container scale (raised-surface rhythm).',
       },
     },
   },
@@ -302,7 +335,7 @@ export const AllModes: Story = {
           <Alert className="nx:w-[360px]">
             <AlertTitle>Heads up · {mode}</AlertTitle>
             <AlertDescription>
-              Padding does not move with mode.
+              Padding follows the spacing-4 mode value.
             </AlertDescription>
           </Alert>
         </AllModesRow>

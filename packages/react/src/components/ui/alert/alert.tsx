@@ -14,6 +14,8 @@ const alertVariants = cva(
           'nx:border-border-error nx:text-error-subtle-foreground nx:bg-error-subtle nx:[&>svg]:text-error-subtle-foreground',
         success:
           'nx:border-border-success nx:text-success-subtle-foreground nx:bg-success-subtle nx:[&>svg]:text-success-subtle-foreground',
+        information:
+          'nx:border-border-information nx:text-information-subtle-foreground nx:bg-information-subtle nx:[&>svg]:text-information-subtle-foreground',
         warning:
           'nx:border-border-warning nx:text-warning-subtle-foreground nx:bg-warning-subtle nx:[&>svg]:text-warning-subtle-foreground',
       },
@@ -64,7 +66,7 @@ function Alert({ className, variant, ...props }: AlertProps) {
   return (
     <div
       data-slot="alert"
-      data-variant={variant}
+      data-variant={variant ?? 'default'}
       role="alert"
       className={cn(alertVariants({ variant }), className)}
       {...props}
@@ -93,10 +95,7 @@ function AlertTitle({ className, children, ...props }: AlertTitleProps) {
   return (
     <h5
       data-slot="alert-title"
-      className={cn(
-        'nx:mb-1 nx:font-medium nx:leading-none nx:tracking-tight',
-        className
-      )}
+      className={cn('nx:mb-1 nx:typography-label-default', className)}
       {...props}
     >
       {children}
@@ -127,7 +126,10 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
   return (
     <div
       data-slot="alert-description"
-      className={cn('nx:text-sm nx:[&_p]:leading-relaxed', className)}
+      className={cn(
+        'nx:typography-body-small nx:[&_p]:leading-relaxed',
+        className
+      )}
       {...props}
     />
   );
