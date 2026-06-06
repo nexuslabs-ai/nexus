@@ -162,7 +162,6 @@ function AlertDialogHeader({ className, ...props }: AlertDialogHeaderProps) {
     <div
       data-slot="alert-dialog-header"
       className={cn(
-        // nexus-allow-numeric: AlertDialogHeader sub-element rhythm
         'nx:flex nx:flex-col nx:gap-1.5 nx:text-center nx:sm:text-left',
         className
       )}
@@ -196,7 +195,6 @@ function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        // nexus-allow-numeric: AlertDialogFooter sub-element rhythm at sm
         'nx:flex nx:flex-col-reverse nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
         className
       )}

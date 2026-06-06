@@ -504,7 +504,7 @@ export const SECTIONS = {
       {
         slug: 'eslint',
         label: 'ESLint plugin',
-        lede: '[ @nexus/eslint-plugin · canonical-spacing-steps · prefer-role-utilities ]',
+        lede: '[ @nexus/eslint-plugin · canonical-spacing-steps · class conventions ]',
         blocks: [
           {
             type: 'placeholder',

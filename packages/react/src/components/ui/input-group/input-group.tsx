@@ -33,7 +33,6 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot="input-group"
       role="group"
       className={cn(
-        // nexus-allow-numeric: field-internal addon/control padding rhythm
         'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border nx:border-border-default nx:shadow-xs nx:transition-[color,box-shadow] nx:outline-none',
         // Alignment: addons push the control's padding to make room.
         'nx:has-[>[data-align=inline-start]]:[&>input]:pl-2',
@@ -53,7 +52,6 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const inputGroupAddonVariants = cva(
-  // nexus-allow-numeric: addon inset rhythm
   'nx:flex nx:h-auto nx:cursor-text nx:items-center nx:justify-start nx:gap-2 nx:py-1.5 nx:typography-label-default nx:text-muted-foreground nx:select-none nx:group-data-[disabled=true]/input-group:opacity-50 nx:[&>kbd]:rounded-sm nx:[&>svg]:size-4',
   {
     variants: {
@@ -62,9 +60,7 @@ const inputGroupAddonVariants = cva(
           'nx:order-first nx:pl-3 nx:has-[>button]:ml-[-0.45rem] nx:has-[>kbd]:ml-[-0.35rem]',
         'inline-end':
           'nx:order-last nx:pr-3 nx:has-[>button]:mr-[-0.45rem] nx:has-[>kbd]:mr-[-0.35rem]',
-        // nexus-allow-numeric: stacked addon inset matches input padding
         'block-start': 'nx:order-first nx:w-full nx:px-3 nx:pt-3',
-        // nexus-allow-numeric: stacked addon inset matches input padding
         'block-end': 'nx:order-last nx:w-full nx:px-3 nx:pb-3',
       },
     },
@@ -111,9 +107,7 @@ const inputGroupButtonVariants = cva(
   {
     variants: {
       size: {
-        // nexus-allow-numeric: dense in-field button footprints
         xs: 'nx:h-6 nx:gap-1 nx:rounded-sm nx:px-2 nx:has-[>svg]:px-2 nx:[&>svg]:size-3.5',
-        // nexus-allow-numeric: dense in-field button footprints
         sm: 'nx:h-8 nx:gap-1.5 nx:rounded-md nx:px-2.5 nx:has-[>svg]:px-2.5',
         'icon-xs': 'nx:size-6 nx:rounded-sm nx:p-0 nx:has-[>svg]:p-0',
         'icon-sm': 'nx:size-8 nx:p-0 nx:has-[>svg]:p-0',
@@ -168,7 +162,6 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
       className={cn(
-        // nexus-allow-numeric: inline addon gap
         'nx:flex nx:items-center nx:gap-2 nx:typography-body-small nx:text-muted-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
         className
       )}
@@ -213,7 +206,6 @@ function InputGroupTextarea({
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        // nexus-allow-numeric: textarea inset
         'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:bg-transparent nx:py-3 nx:shadow-none nx:focus-visible:outline-none',
         className
       )}

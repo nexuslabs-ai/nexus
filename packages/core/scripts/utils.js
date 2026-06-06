@@ -232,15 +232,15 @@ export function resolveValue(value, primitiveMap, type = 'unknown', tokenPath) {
  */
 export const DEFAULT_CONFIG = {
   base: 'stone',
-  brand: 'blue',
+  brand: 'black',
   typography: 'vega',
-  shadow: 'vega',
+  shadow: 'maia',
   radius: 'sharp',
   borderwidth: 'vega',
   focus: 'default',
   'chart-categorical': 'default',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 7 modes ship)
-  spacingDefault: 'vega',
+  spacingDefault: 'mira',
 };
 
 // ============================================
@@ -743,12 +743,11 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
 // ============================================
 
 /**
- * Canonical default spacing mode. Published under `:root, [data-style="vega"]`
- * by the per-mode emitter, and used by the generators to pick the mode whose
- * numeric subset seeds Tailwind's `@theme` block (the build-time contract for
- * utility codegen and the `VEGA_BASELINE` byte-identity test). Distinct from
- * `config.spacingDefault`, which only moves the runtime `:root` cascade
- * default — all seven modes still emit either way.
+ * Canonical spacing codegen baseline. Used by the generators to pick the mode
+ * whose numeric subset seeds Tailwind's `@theme` block (the build-time
+ * contract for utility codegen and the `VEGA_BASELINE` byte-identity test).
+ * Distinct from `config.spacingDefault`, which only moves the runtime `:root`
+ * cascade default — all seven modes still emit either way.
  */
 export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
 
@@ -869,8 +868,8 @@ export function splitSpacingTokens(tokens) {
 /**
  * Emit per-mode `[data-style="X"]` CSS blocks for spacing.
  *
- * The default mode (Vega) is published under `:root, [data-style="vega"]` so
- * any document with no `data-style` attribute still resolves to Vega. The
+ * The selected default mode is published under `:root, [data-style="<mode>"]`
+ * so any document with no `data-style` attribute still resolves to it. The
  * remaining six modes emit in alphabetical order for cross-platform
  * determinism (filesystem order isn't portable; sorting locks it).
  *

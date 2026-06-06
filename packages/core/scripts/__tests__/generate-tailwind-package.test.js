@@ -42,9 +42,9 @@ function extractBlock(css, openSelector) {
 }
 
 // Per-mode spacing blocks open with `[data-style='X']` (single-quoted by
-// prettier). Vega's selector is `:root,\n[data-style='vega']` — multi-line.
-// Match by attribute-selector only since Vega's leading `:root,\n` would
-// otherwise need separate handling for prettier output variance.
+// prettier). The configured default selector is multi-line because it includes
+// `:root`. Match by attribute-selector only so the leading `:root,\n` does
+// not need separate handling for prettier output variance.
 function extractDataStyleBlock(css, mode) {
   const pattern = new RegExp(
     `\\[data-style=['"]${mode}['"]\\] \\{\\n([\\s\\S]*?)^\\}`,
@@ -312,7 +312,7 @@ describe('generateTailwindPackage', () => {
   });
 
   it('emits exactly 7 [data-style="X"] selectors (one per mode)', () => {
-    // Vega's selector is `:root, [data-style='vega']` so it contributes one
+    // The configured default selector is `:root, [data-style='<mode>']`, so it contributes one
     // [data-style=...] match; the other 6 modes each contribute one. Total: 7.
     const matches = nexusCSS.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(7);
@@ -321,12 +321,12 @@ describe('generateTailwindPackage', () => {
     expect(modes).toEqual(new Set(SPACING_MODES));
   });
 
-  it('emits Vega block under :root selector so it is the no-data-style default', () => {
+  it('emits configured spacing default under :root selector', () => {
     // Without the :root half, a document with no data-style attribute would
     // miss the role-token defaults (which only live in per-mode blocks, not
-    // @theme). The :root, [data-style="vega"] form keeps Vega live in both
-    // configurations.
-    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    // @theme). The :root selector keeps the configured default live in both
+    // no-attribute and explicit data-style configurations.
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]mira['"]\] \{/);
   });
 
   it.each(SPACING_MODES)(
@@ -573,17 +573,17 @@ describe('generateTailwindPackage', () => {
     // alphabetically. Luma < Lyra, so luma must appear before lyra.
     const ordered = [...nexusCSS.matchAll(/\[data-style=['"]([a-z]+)['"]\]/g)]
       .map((m) => m[1])
-      // De-dup in case `:root, [data-style="vega"]` produces two captures.
+      // De-dup in case `:root, [data-style="<default>"]` produces two captures.
       .filter((m, i, arr) => arr.indexOf(m) === i);
-    expect(ordered[0]).toBe('vega');
+    expect(ordered[0]).toBe('mira');
     // Other six in alphabetical order:
     expect(ordered.slice(1)).toEqual([
       'luma',
       'lyra',
       'maia',
-      'mira',
       'nova',
       'sera',
+      'vega',
     ]);
   });
 

@@ -47,10 +47,10 @@ export type ThemeModeOption<K extends ThemeMode = ThemeMode> = {
 
 export const DEFAULT_THEME_STATE = {
   base: 'stone',
-  brand: 'blue',
-  spacing: 'vega',
+  brand: 'black',
+  spacing: 'mira',
   typography: 'vega',
-  shadow: 'vega',
+  shadow: 'maia',
   radius: 'sharp',
   borderwidth: 'vega',
 } as const satisfies ThemeState;

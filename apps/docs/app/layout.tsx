@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-style="vega" suppressHydrationWarning>
+    <html lang="en" data-style="mira" suppressHydrationWarning>
       <head>
         <ThemeBootstrap />
       </head>

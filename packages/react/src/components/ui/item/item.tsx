@@ -52,9 +52,7 @@ const itemVariants = cva(
         muted: 'nx:bg-muted',
       },
       size: {
-        // nexus-allow-numeric: row density
         default: 'nx:gap-4 nx:p-4',
-        // nexus-allow-numeric: dense row density
         sm: 'nx:gap-2.5 nx:px-4 nx:py-3',
       },
     },
@@ -126,15 +124,12 @@ function Item({
 }
 
 const itemMediaVariants = cva(
-  // nexus-allow-numeric: media rhythm + description-aligned nudge
   'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-data-[slot=item-description]/item:translate-y-0.5 nx:group-has-data-[slot=item-description]/item:self-start nx:[&_svg]:pointer-events-none',
   {
     variants: {
       variant: {
         default: 'nx:bg-transparent',
-        // nexus-allow-numeric: icon medallion footprint
         icon: 'nx:size-8 nx:rounded-sm nx:border nx:border-border-default nx:bg-muted nx:[&_svg]:size-4',
-        // nexus-allow-numeric: thumbnail footprint
         image:
           'nx:size-10 nx:overflow-hidden nx:rounded-sm nx:[&_img]:size-full nx:[&_img]:object-cover',
       },
@@ -185,7 +180,6 @@ function ItemContent({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="item-content"
       className={cn(
-        // nexus-allow-numeric: title/description stack rhythm
         'nx:flex nx:flex-1 nx:flex-col nx:gap-1 nx:[&+[data-slot=item-content]]:flex-none',
         className
       )}
@@ -204,7 +198,6 @@ function ItemTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="item-title"
       className={cn(
-        // nexus-allow-numeric: inline gap to adjacent marks
         'nx:flex nx:w-fit nx:items-center nx:gap-2 nx:typography-label-default',
         className
       )}
@@ -240,11 +233,7 @@ function ItemActions({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="item-actions"
-      className={cn(
-        // nexus-allow-numeric: action gap
-        'nx:flex nx:items-center nx:gap-2',
-        className
-      )}
+      className={cn('nx:flex nx:items-center nx:gap-2', className)}
       {...props}
     />
   );
@@ -260,7 +249,6 @@ function ItemHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="item-header"
       className={cn(
-        // nexus-allow-numeric: header row gap
         'nx:flex nx:basis-full nx:items-center nx:justify-between nx:gap-2',
         className
       )}
@@ -279,7 +267,6 @@ function ItemFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="item-footer"
       className={cn(
-        // nexus-allow-numeric: footer row gap
         'nx:flex nx:basis-full nx:items-center nx:justify-between nx:gap-2',
         className
       )}

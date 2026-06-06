@@ -21,7 +21,7 @@ Deterministically turn one shadcn/ui component into a first-class Nexus componen
 
 ## Rules are the spec — reference, never duplicate
 
-The authoritative rules live in `.Codex/rules/*.md`. This guide orchestrates them; it never copies the token tables inline (that would drift from the source). Open a rule file when the Reflex Check points you at it.
+The authoritative rules live in `.claude/rules/*.md`. This guide orchestrates them; it never copies the token tables inline (that would drift from the source). Open a rule file when the Reflex Check points you at it.
 
 | Rule                                                                                                                                                                                                     | What it owns                                                                |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -83,7 +83,7 @@ Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + s
 Run these and fix everything before reporting — no deferral (`no-follow-up-deferral.md`):
 
 - `pnpm --filter @nexus/react typecheck`
-- `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.Codex/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
+- `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
 - Story tests per `testing-react.md` (`pnpm test:storybook`); a11y violations fail the run.
 
 ## Reflex Check

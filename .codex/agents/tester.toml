@@ -39,12 +39,13 @@ These rules apply to ALL skills this agent executes. Read and internalize before
 
 | Rule                                                              | Purpose                                                                            |
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [code-quality.md](../rules/code-quality.md)                       | Governing principle: favor simplicity over cleverness; index to per-rule files     |
-| [ripple-effect.md](../rules/ripple-effect.md)                     | Test changes must leave helpers, fixtures, and adjacent tests consistently updated |
-| [guard-clauses.md](../rules/guard-clauses.md)                     | Keep the assertion path at column 0; exit early on setup failures                  |
-| [logging-proportionality.md](../rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                            |
-| [code-comments.md](../rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues  |
-| [project-stage.md](../rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place   |
+| [code-quality.md](../../.claude/rules/code-quality.md)                       | Governing principle: favor simplicity over cleverness; index to per-rule files     |
+| [ripple-effect.md](../../.claude/rules/ripple-effect.md)                     | Test changes must leave helpers, fixtures, and adjacent tests consistently updated |
+| [guard-clauses.md](../../.claude/rules/guard-clauses.md)                     | Keep the assertion path at column 0; exit early on setup failures                  |
+| [logging-proportionality.md](../../.claude/rules/logging-proportionality.md) | One dense canonical log line beats ten incremental ones                            |
+| [code-comments.md](../../.claude/rules/code-comments.md)                     | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues  |
+| [project-stage.md](../../.claude/rules/project-stage.md)                     | Pre-production: no backcompat, no shims, no feature flags — change code in place   |
+| [docs-mcp.md](../../.claude/rules/docs-mcp.md)                               | MANDATORY: query nexus-docs-mcp for any third-party API; do not guess from memory  |
 
 ## Focus Areas
 

@@ -21,9 +21,9 @@ Audit a running web application for UI/UX issues by navigating through user flow
 
 Always load and audit against:
 
-| Rule                                                                 | Purpose                                                                      |
-| -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| [logging-proportionality.md](../../rules/logging-proportionality.md) | Report findings tersely — one dense line per issue, no incremental narration |
+| Rule                                                                            | Purpose                                                                      |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [logging-proportionality.md](../../../.claude/rules/logging-proportionality.md) | Report findings tersely — one dense line per issue, no incremental narration |
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ If flows are not specified, explore the page to identify them:
 
 ### Step 2: Load Design Context
 
-Before testing, read available design references: the `.Codex/rules/` directory (especially `components.md`, `tokens.md`, `shadcn-divergences.md`), and design tokens in `packages/core/tokens/`. Skip any that don't apply.
+Before testing, read available design references: the `.claude/rules/` directory (especially `components.md`, `tokens.md`, `shadcn-divergences.md`), and design tokens in `packages/core/tokens/`. Skip any that don't apply.
 
 Extract and hold onto:
 

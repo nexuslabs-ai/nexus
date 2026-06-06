@@ -219,11 +219,7 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn(
-        // nexus-allow-numeric: SheetHeader sub-element rhythm
-        'nx:flex nx:flex-col nx:gap-1.5 nx:p-container',
-        className
-      )}
+      className={cn('nx:flex nx:flex-col nx:gap-1.5 nx:p-container', className)}
       {...props}
     />
   );
@@ -254,7 +250,6 @@ function SheetFooter({ className, ...props }: SheetFooterProps) {
     <div
       data-slot="sheet-footer"
       className={cn(
-        // nexus-allow-numeric: SheetFooter sub-element rhythm
         'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-container',
         className
       )}

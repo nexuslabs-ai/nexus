@@ -8,7 +8,7 @@ import {
 } from '../../../stories/spacing-modes';
 import {
   expectHeightPinned,
-  expectModeCascadeWorks,
+  expectHeightPinnedAcrossModes,
 } from '../../../stories/test-utils';
 
 import {
@@ -23,6 +23,9 @@ const meta: Meta<typeof Accordion> = {
   component: Accordion,
   parameters: {
     layout: 'padded',
+  },
+  args: {
+    variant: 'stacked',
   },
   argTypes: {
     type: {
@@ -39,6 +42,11 @@ const meta: Meta<typeof Accordion> = {
       control: 'boolean',
       description: 'Whether the accordion is disabled',
     },
+    variant: {
+      control: 'select',
+      options: ['stacked', 'floating'],
+      description: 'Visual treatment for accordion items',
+    },
   },
 };
 
@@ -50,8 +58,43 @@ type Story = StoryObj<typeof Accordion>;
 // ============================================
 
 export const Default: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Is it accessible?</AccordionTrigger>
+        <AccordionContent>
+          Yes. It adheres to the WAI-ARIA design pattern.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Is it styled?</AccordionTrigger>
+        <AccordionContent>
+          Yes. It comes with default styles that match the Nexus design system.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Is it animated?</AccordionTrigger>
+        <AccordionContent>
+          Yes. It has smooth open/close animations built-in.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  ),
+};
+
+export const Stacked: Story = {
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>
@@ -75,8 +118,78 @@ export const Default: Story = {
 };
 
 export const Multiple: Story = {
-  render: (_args) => (
-    <Accordion type="multiple" className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="multiple"
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
+      <AccordionItem value="item-1">
+        <AccordionTrigger>First Section</AccordionTrigger>
+        <AccordionContent>
+          This is the content for the first section. Multiple sections can be
+          open at the same time.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Second Section</AccordionTrigger>
+        <AccordionContent>
+          This is the content for the second section. Try opening both!
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Third Section</AccordionTrigger>
+        <AccordionContent>
+          This is the content for the third section.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  ),
+};
+
+export const Floating: Story = {
+  args: {
+    variant: 'floating',
+  },
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Is it accessible?</AccordionTrigger>
+        <AccordionContent>
+          Yes. It adheres to the WAI-ARIA design pattern.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Is it styled?</AccordionTrigger>
+        <AccordionContent>
+          Yes. It comes with default styles that match the Nexus design system.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Is it animated?</AccordionTrigger>
+        <AccordionContent>
+          Yes. It has smooth open/close animations built-in.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  ),
+};
+
+export const MultipleFloating: Story = {
+  args: {
+    variant: 'floating',
+  },
+  render: ({ variant }) => (
+    <Accordion
+      type="multiple"
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>First Section</AccordionTrigger>
         <AccordionContent>
@@ -101,10 +214,11 @@ export const Multiple: Story = {
 };
 
 export const DefaultOpen: Story = {
-  render: (_args) => (
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
+      variant={variant}
       defaultValue="item-2"
       className="nx:w-full nx:max-w-md"
     >
@@ -128,11 +242,12 @@ export const DefaultOpen: Story = {
 };
 
 export const Disabled: Story = {
-  render: (_args) => (
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
       disabled
+      variant={variant}
       className="nx:w-full nx:max-w-md"
     >
       <AccordionItem value="item-1">
@@ -161,8 +276,13 @@ export const Disabled: Story = {
 };
 
 export const DisabledItem: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Enabled Item</AccordionTrigger>
         <AccordionContent>This item can be toggled.</AccordionContent>
@@ -195,8 +315,13 @@ export const DisabledItem: Story = {
 // ============================================
 
 export const ExpandInteraction: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Click to expand</AccordionTrigger>
         <AccordionContent>
@@ -237,8 +362,12 @@ export const ExpandInteraction: Story = {
 };
 
 export const MultipleExpandInteraction: Story = {
-  render: (_args) => (
-    <Accordion type="multiple" className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="multiple"
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Section 1</AccordionTrigger>
         <AccordionContent>Content for section 1.</AccordionContent>
@@ -273,8 +402,13 @@ export const MultipleExpandInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>First Item</AccordionTrigger>
         <AccordionContent>First item content.</AccordionContent>
@@ -329,10 +463,11 @@ export const KeyboardInteraction: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  render: (_args) => (
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
+      variant={variant}
       defaultValue="item-1"
       className="nx:w-full nx:max-w-md"
     >
@@ -354,9 +489,36 @@ export const WithDataAttributes: Story = {
     );
 
     await expect(accordion).toBeInTheDocument();
+    await expect(accordion).toHaveAttribute('data-variant', 'stacked');
     await expect(item).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'accordion-trigger');
     await expect(content).toBeInTheDocument();
+  },
+};
+
+export const WithFloatingDataAttributes: Story = {
+  args: {
+    variant: 'floating',
+  },
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      defaultValue="item-1"
+      className="nx:w-full nx:max-w-md"
+    >
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Test Item</AccordionTrigger>
+        <AccordionContent>Test content.</AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  ),
+  play: async ({ canvasElement }) => {
+    const accordion = canvasElement.querySelector('[data-slot="accordion"]');
+
+    await expect(accordion).toBeInTheDocument();
+    await expect(accordion).toHaveAttribute('data-variant', 'floating');
   },
 };
 
@@ -365,8 +527,13 @@ export const WithDataAttributes: Story = {
 // ============================================
 
 export const LongContent: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>
           This is a very long trigger text that might wrap to multiple lines
@@ -387,8 +554,13 @@ export const LongContent: Story = {
 };
 
 export const NestedContent: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Item with nested content</AccordionTrigger>
         <AccordionContent>
@@ -410,8 +582,13 @@ export const NestedContent: Story = {
 };
 
 export const SingleItem: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Single accordion item</AccordionTrigger>
         <AccordionContent>This accordion has only one item.</AccordionContent>
@@ -426,10 +603,10 @@ export const SingleItem: Story = {
 
 export const AllVariants: Story = {
   render: (_args) => (
-    <div className="nx:flex nx:flex-col nx:gap-8">
+    <div className="nx:grid nx:gap-8 nx:lg:grid-cols-2">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          Single (Collapsible)
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Single Stacked
         </h3>
         <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
           <AccordionItem value="item-1">
@@ -444,8 +621,8 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          Multiple
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Multiple Stacked
         </h3>
         <Accordion
           type="multiple"
@@ -464,39 +641,45 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          Disabled
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Single Floating
         </h3>
         <Accordion
           type="single"
           collapsible
-          disabled
+          variant="floating"
           className="nx:w-full nx:max-w-md"
         >
           <AccordionItem value="item-1">
-            <AccordionTrigger>Disabled Item</AccordionTrigger>
-            <AccordionContent>Content is not accessible.</AccordionContent>
+            <AccordionTrigger>First Item</AccordionTrigger>
+            <AccordionContent>Content for the first item.</AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2">
+            <AccordionTrigger>Second Item</AccordionTrigger>
+            <AccordionContent>Content for the second item.</AccordionContent>
           </AccordionItem>
         </Accordion>
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-          With Default Value
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Multiple Floating
         </h3>
         <Accordion
-          type="single"
-          collapsible
-          defaultValue="item-1"
+          type="multiple"
+          variant="floating"
+          defaultValue={['item-1', 'item-2']}
           className="nx:w-full nx:max-w-md"
         >
           <AccordionItem value="item-1">
-            <AccordionTrigger>Default Open Item</AccordionTrigger>
+            <AccordionTrigger>First Item (Open)</AccordionTrigger>
             <AccordionContent>This item is open by default.</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
-            <AccordionTrigger>Closed Item</AccordionTrigger>
-            <AccordionContent>This item starts closed.</AccordionContent>
+            <AccordionTrigger>Second Item (Open)</AccordionTrigger>
+            <AccordionContent>
+              This item is also open by default.
+            </AccordionContent>
           </AccordionItem>
         </Accordion>
       </div>
@@ -514,7 +697,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Accordion stays on the document spacing scale (`nx:py-4`) rather than migrating to `py-control-lg`. Accordion still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the trigger height shifts between nova / vega-cluster / maia rows. The point is item-tier rhythm distinct from controls or containers, not density stability.',
+          'Accordion uses numeric `nx:py-4` for item-tier rhythm. This keeps authoring simple and preserves the default vega trigger height without adopting role-based control spacing.',
       },
     },
   },
@@ -534,41 +717,37 @@ export const AllModes: Story = {
   ),
 };
 
-export const AccordionTriggerModesProduceDifferentHeights: Story = {
+export const AccordionTriggerModesStayPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Cascade sentinel for AccordionTrigger. Uses the `nova` + `maia` pair — the two modes where `--nx-spacing-4` diverges from the vega cluster (nova 14, maia 18). An AccordionTrigger scoped to `nova` must render shorter than the same trigger scoped to `maia`.',
+          'Numeric-spacing sentinel for AccordionTrigger. Every spacing mode should render the same 52px trigger height, preserving the default vega output and avoiding role-based control spacing.',
       },
     },
   },
   render: () => (
-    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="accordion-mode-host-nova">
-        <Accordion type="single" collapsible className="nx:w-[200px]">
-          <AccordionItem value="a">
-            <AccordionTrigger>Nova</AccordionTrigger>
-            <AccordionContent>x</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
-      <div data-style="maia" data-testid="accordion-mode-host-maia">
-        <Accordion type="single" collapsible className="nx:w-[200px]">
-          <AccordionItem value="a">
-            <AccordionTrigger>Maia</AccordionTrigger>
-            <AccordionContent>x</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
-    </div>
+    <AllModesGrid>
+      {SPACING_MODES.map((mode) => (
+        <AllModesRow key={mode} mode={mode}>
+          <div data-testid={`accordion-mode-host-${mode}`}>
+            <Accordion type="single" collapsible className="nx:w-[200px]">
+              <AccordionItem value="a">
+                <AccordionTrigger>{mode}</AccordionTrigger>
+                <AccordionContent>x</AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </AllModesRow>
+      ))}
+    </AllModesGrid>
   ),
   play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
+    await expectHeightPinnedAcrossModes(
       within(canvasElement),
-      'accordion-mode-host-nova',
-      'accordion-mode-host-maia',
+      SPACING_MODES.map((mode) => `accordion-mode-host-${mode}`),
+      52,
       { selector: '[data-slot="accordion-trigger"]' }
     );
   },
@@ -580,7 +759,7 @@ export const AccordionTriggerVegaHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the stays-numeric outcome: in vega mode, AccordionTrigger renders at exactly 52px (= `text-sm` line-height 20 + `py-4` 16 × 2). If a future PR migrates `py-4` → `py-control-lg`, vega rendering shifts to 44px (= 20 + 12 × 2) and this test fails — the regression signal is that Accordion was promoted out of item-tier rhythm into control-lg rhythm.',
+          'Pin on the numeric-spacing outcome: in vega mode, AccordionTrigger renders at exactly 52px (= `typography-label-default` line-height 20 + `py-4` 16 x 2).',
       },
     },
   },
@@ -602,6 +781,83 @@ export const AccordionTriggerVegaHeightPinned: Story = {
     await expectHeightPinned(within(canvasElement), 'accordion-vega-host', 52, {
       selector: '[data-slot="accordion-trigger"]',
     });
+  },
+};
+
+export const AccordionFloatingTriggerVegaHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the floating visual variant: the item chrome changes, but the AccordionTrigger remains exactly 52px in vega mode.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="accordion-floating-vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Accordion
+        type="single"
+        collapsible
+        variant="floating"
+        className="nx:w-[200px]"
+      >
+        <AccordionItem value="a">
+          <AccordionTrigger>Vega</AccordionTrigger>
+          <AccordionContent>x</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(
+      within(canvasElement),
+      'accordion-floating-vega-host',
+      52,
+      {
+        selector: '[data-slot="accordion-trigger"]',
+      }
+    );
+  },
+};
+
+export const AccordionExpandedItemVegaHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Pin on the expanded item anatomy: one body-small content line should keep the open item close to the 88px Figma baseline.',
+      },
+    },
+  },
+  render: () => (
+    <div data-style="vega" className="nx:p-10 nx:bg-background">
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="a"
+        className="nx:w-[200px]"
+      >
+        <AccordionItem value="a" data-testid="accordion-expanded-item">
+          <AccordionTrigger>Vega</AccordionTrigger>
+          <AccordionContent>x</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+
+    const item = within(canvasElement).getByTestId('accordion-expanded-item');
+    const actualHeight = Math.round(item.getBoundingClientRect().height);
+
+    await expect(actualHeight).toBeGreaterThanOrEqual(88);
+    await expect(actualHeight).toBeLessThanOrEqual(89);
   },
 };
 

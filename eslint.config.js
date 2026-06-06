@@ -216,19 +216,6 @@ export default tseslint.config(
     },
   },
 
-  // Nexus: prefer role-named spacing utilities over raw numerics in UI components.
-  // Stories opt out — demo grids legitimately mix numeric utilities for layout chrome.
-  {
-    files: ['packages/react/src/components/ui/**/*.{ts,tsx}'],
-    ignores: ['packages/react/src/components/ui/**/*.stories.tsx'],
-    plugins: {
-      '@nexus': nexusPlugin,
-    },
-    rules: {
-      '@nexus/prefer-role-utilities': 'error',
-    },
-  },
-
   // Nexus: enforce documented component rules as lint — nx: class conventions
   // (ported from the former lint-nx-prefix Claude hook), composition over
   // render props, and handler extraction. Scoped to component-bearing source

@@ -81,13 +81,13 @@ function loadCSS(href: string, id: string): void {
 const STORAGE_KEY = 'nexus-console-theme';
 
 export const DEFAULT_THEME: ThemeConfig = {
-  base: 'slate',
-  brand: 'blue',
+  base: 'stone',
+  brand: 'black',
   dark: false,
-  spacing: 'vega',
+  spacing: 'mira',
   typography: 'vega',
-  shadow: 'vega',
-  radius: 'subtle',
+  shadow: 'maia',
+  radius: 'sharp',
   borderWidth: 'vega',
 };
 

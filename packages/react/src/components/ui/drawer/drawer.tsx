@@ -123,7 +123,6 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-header"
       className={cn(
-        // nexus-allow-numeric: DrawerHeader sub-element rhythm
         'nx:flex nx:flex-col nx:gap-1.5 nx:p-container nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center nx:group-data-[vaul-drawer-direction=top]/drawer-content:text-center nx:md:text-left',
         className
       )}
@@ -142,7 +141,6 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-footer"
       className={cn(
-        // nexus-allow-numeric: DrawerFooter sub-element rhythm
         'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-container',
         className
       )}

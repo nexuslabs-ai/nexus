@@ -67,7 +67,7 @@ describe('docs theme modes', () => {
       DEFAULT_THEME_STATE.brand
     );
     expect(getThemeStylesheetHref('brand', '/themes/brands-pink.css')).toBe(
-      '/themes/brands-blue.css'
+      '/themes/brands-black.css'
     );
   });
 

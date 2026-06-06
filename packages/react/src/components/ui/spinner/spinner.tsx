@@ -34,7 +34,6 @@ function Spinner({ className, ...props }: SpinnerProps) {
       aria-label="Loading"
       data-slot="spinner"
       className={cn(
-        // nexus-allow-numeric: default icon footprint
         'nx:size-4 nx:animate-spin nx:motion-reduce:animate-none',
         className
       )}
