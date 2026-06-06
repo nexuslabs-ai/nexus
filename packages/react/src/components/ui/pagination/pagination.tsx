@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { Slot } from '@radix-ui/react-slot';
+
 import { type ButtonProps, buttonVariants } from '@/components/ui/button';
 import { IconChevronLeft, IconChevronRight, IconDots } from '@/lib/icons';
 import { cn } from '@/lib/utils';
@@ -119,6 +121,14 @@ interface PaginationLinkProps
    * @default false
    */
   isActive?: boolean;
+  /**
+   * Render as the child element via Radix Slot — e.g. a framework router link
+   * (`next/link`, TanStack Router `Link`) — keeping the pagination-link
+   * styling. The router link renders its own `<a>`, so this avoids the nested
+   * `<a><a>` that wrapping would produce.
+   * @default false
+   */
+  asChild?: boolean;
 }
 
 /**
@@ -126,17 +136,27 @@ interface PaginationLinkProps
  *
  * A page link styled with the button system. The active page uses the
  * `outline` variant; the rest use `ghost`. Defaults to the square `icon` size,
- * suited to single page numbers.
+ * suited to single page numbers. Pass `asChild` to route through a framework
+ * link instead of the native `<a>`.
+ *
+ * @example
+ * ```tsx
+ * <PaginationLink asChild isActive>
+ *   <Link href="/items?page=2">2</Link>
+ * </PaginationLink>
+ * ```
  */
 function PaginationLink({
   className,
   isActive,
   size = 'icon',
-  children,
+  asChild = false,
   ...props
 }: PaginationLinkProps) {
+  const Comp = asChild ? Slot : 'a';
+
   return (
-    <a
+    <Comp
       aria-current={isActive ? 'page' : undefined}
       data-slot="pagination-link"
       data-active={isActive}
@@ -145,9 +165,7 @@ function PaginationLink({
         className
       )}
       {...props}
-    >
-      {children}
-    </a>
+    />
   );
 }
 
@@ -163,13 +181,19 @@ interface PaginationPreviousProps extends React.ComponentProps<
 /**
  * PaginationPrevious
  *
- * The "previous page" edge control — a left chevron and label.
+ * The "previous page" edge control — a left chevron and label. Defaults to that
+ * content; pass `asChild` with a router link (carrying its own children) to
+ * route through it.
  */
-function PaginationPrevious(props: PaginationPreviousProps) {
+function PaginationPrevious({ children, ...props }: PaginationPreviousProps) {
   return (
     <PaginationLink aria-label="Go to previous page" size="default" {...props}>
-      <IconChevronLeft />
-      <span>Previous</span>
+      {children ?? (
+        <>
+          <IconChevronLeft />
+          <span>Previous</span>
+        </>
+      )}
     </PaginationLink>
   );
 }
@@ -186,13 +210,19 @@ interface PaginationNextProps extends React.ComponentProps<
 /**
  * PaginationNext
  *
- * The "next page" edge control — a label and right chevron.
+ * The "next page" edge control — a label and right chevron. Defaults to that
+ * content; pass `asChild` with a router link (carrying its own children) to
+ * route through it.
  */
-function PaginationNext(props: PaginationNextProps) {
+function PaginationNext({ children, ...props }: PaginationNextProps) {
   return (
     <PaginationLink aria-label="Go to next page" size="default" {...props}>
-      <span>Next</span>
-      <IconChevronRight />
+      {children ?? (
+        <>
+          <span>Next</span>
+          <IconChevronRight />
+        </>
+      )}
     </PaginationLink>
   );
 }

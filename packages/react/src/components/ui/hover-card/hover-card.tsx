@@ -30,7 +30,7 @@ interface HoverCardProps extends React.ComponentProps<
  * </HoverCard>
  * ```
  */
-function HoverCard({ ...props }: HoverCardProps) {
+function HoverCard(props: HoverCardProps) {
   return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />;
 }
 
@@ -49,7 +49,7 @@ interface HoverCardTriggerProps extends React.ComponentProps<
  * The element that reveals the card on hover / focus. Use `asChild` to render
  * as your own element (a link, an avatar).
  */
-function HoverCardTrigger({ ...props }: HoverCardTriggerProps) {
+function HoverCardTrigger(props: HoverCardTriggerProps) {
   return (
     <HoverCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />
   );

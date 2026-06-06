@@ -164,7 +164,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
       data-slot="table-head"
       className={cn(
         // nexus-allow-numeric: table header cell padding (not a control)
-        'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:font-medium nx:whitespace-nowrap nx:text-muted-foreground nx:[&:has([role=checkbox])]:pr-0 nx:[&>[role=checkbox]]:translate-y-[2px]',
+        'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:font-medium nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
         className
       )}
       {...props}
@@ -190,7 +190,7 @@ function TableCell({ className, ...props }: TableCellProps) {
       data-slot="table-cell"
       className={cn(
         // nexus-allow-numeric: table cell padding (not a control)
-        'nx:p-2 nx:align-middle nx:whitespace-nowrap nx:[&:has([role=checkbox])]:pr-0 nx:[&>[role=checkbox]]:translate-y-[2px]',
+        'nx:p-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
         className
       )}
       {...props}
