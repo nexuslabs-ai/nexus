@@ -74,6 +74,133 @@ export const Destructive: Story = {
       </AlertDialogContent>
     </AlertDialog>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const trigger = canvas.getByRole('button', { name: 'Delete account' });
+    await userEvent.click(trigger);
+
+    const dialog = await within(document.body).findByRole('alertdialog');
+    const action = within(dialog).getByRole('button', { name: 'Delete' });
+    await expect(action).toHaveAttribute('data-variant', 'destructive');
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+  },
+};
+
+export const WithBodyContent: Story = {
+  render: (_args) => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Remove payment method</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent
+        title="Remove payment method?"
+        description="This payment method will be removed from the workspace."
+        body={
+          <>
+            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+              Future invoices will use the fallback payment method.
+            </div>
+            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+              Active subscriptions continue until the next billing cycle.
+            </div>
+          </>
+        }
+      >
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="destructive">
+            Remove method
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+};
+
+export const Centered: Story = {
+  render: (_args) => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Show centered dialog</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent
+        variant="center"
+        content={false}
+        title="Dialog Title"
+        description="Make changes to your profile here. Click save when you're done."
+      >
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="destructive">Action</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const trigger = canvas.getByRole('button', {
+      name: 'Show centered dialog',
+    });
+    await userEvent.click(trigger);
+
+    const dialog = await within(document.body).findByRole('alertdialog');
+    await expect(dialog).toHaveAttribute('data-variant', 'center');
+    await expect(dialog).toHaveAttribute('data-button-orientation', 'vertical');
+    await expect(dialog).toHaveAttribute('data-content', 'false');
+
+    const header = document.querySelector('[data-slot="alert-dialog-header"]');
+    const footer = document.querySelector('[data-slot="alert-dialog-footer"]');
+    await expect(header).toHaveAttribute('data-variant', 'center');
+    await expect(footer).toHaveAttribute('data-orientation', 'vertical');
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+  },
+};
+
+export const CenteredWithBodyContent: Story = {
+  render: (_args) => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Review centered content</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent
+        variant="center"
+        title="Dialog Title"
+        description="Make changes to your profile here. Click save when you're done."
+        body={
+          <>
+            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+              Slot
+            </div>
+            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+              Slot
+            </div>
+            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+              Slot
+            </div>
+          </>
+        }
+      >
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="destructive">Action</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
 };
 
 // ============================================
@@ -208,6 +335,54 @@ export const CancelCloses: Story = {
   },
 };
 
+export const FocusManagement: Story = {
+  render: (_args) => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">Show focus dialog</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Archive project?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Archiving hides this project from the default workspace views.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Archive</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const trigger = canvas.getByRole('button', {
+      name: 'Show focus dialog',
+    });
+    await userEvent.click(trigger);
+
+    const dialog = await within(document.body).findByRole('alertdialog');
+    const cancelButton = within(dialog).getByRole('button', { name: 'Cancel' });
+
+    await waitFor(() => {
+      expect(cancelButton).toHaveFocus();
+    });
+
+    await userEvent.click(cancelButton);
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+    await waitFor(() => {
+      expect(trigger).toHaveFocus();
+    });
+  },
+};
+
 export const OverlayDoesNotDismiss: Story = {
   args: {
     onOpenChange: fn(),
@@ -316,6 +491,22 @@ export const WithDataAttributes: Story = {
       ).toBeInTheDocument();
     });
 
+    const content = document.querySelector(
+      '[data-slot="alert-dialog-content"]'
+    );
+    await expect(content).toHaveAttribute('data-variant', 'default');
+    await expect(content).toHaveAttribute(
+      'data-button-orientation',
+      'horizontal'
+    );
+    await expect(content).toHaveAttribute('data-content', 'true');
+
+    const header = document.querySelector('[data-slot="alert-dialog-header"]');
+    await expect(header).toHaveAttribute('data-variant', 'default');
+
+    const footer = document.querySelector('[data-slot="alert-dialog-footer"]');
+    await expect(footer).toHaveAttribute('data-orientation', 'horizontal');
+
     // The cancel/action controls expose their effective default button variants.
     const cancel = document.querySelector('[data-slot="alert-dialog-cancel"]');
     await expect(cancel).toBeInTheDocument();
@@ -384,6 +575,30 @@ export const AllVariants: Story = {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction variant="destructive">
                 Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Centered action stack
+        </h3>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">Show centered dialog</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent
+            variant="center"
+            content={false}
+            title="Dialog Title"
+            description="Make changes to your profile here. Click save when you're done."
+          >
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction variant="destructive">
+                Action
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
