@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
 
@@ -170,6 +170,98 @@ export const EscapeCancels: Story = {
   },
 };
 
+export const CancelCloses: Story = {
+  render: (_args) => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">Show dialog</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Discard draft?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Cancel closes the dialog without confirming the action.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const trigger = canvas.getByRole('button', { name: 'Show dialog' });
+    await userEvent.click(trigger);
+
+    const dialog = await within(document.body).findByRole('alertdialog');
+    const cancelButton = within(dialog).getByRole('button', { name: 'Cancel' });
+    await userEvent.click(cancelButton);
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+  },
+};
+
+export const OverlayDoesNotDismiss: Story = {
+  args: {
+    onOpenChange: fn(),
+  },
+  render: (args) => (
+    <AlertDialog {...args}>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">Show dialog</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Keep dialog open?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Clicking the overlay should not dismiss an alert dialog.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const onOpenChange = args.onOpenChange;
+
+    const trigger = canvas.getByRole('button', { name: 'Show dialog' });
+    await userEvent.click(trigger);
+
+    const dialog = await within(document.body).findByRole('alertdialog');
+    await expect(onOpenChange).toHaveBeenCalledWith(true);
+
+    const overlay = document.querySelector(
+      '[data-slot="alert-dialog-overlay"]'
+    );
+    await expect(overlay).toBeInTheDocument();
+    if (!(overlay instanceof HTMLElement)) {
+      throw new Error('Expected alert dialog overlay to be rendered.');
+    }
+
+    await userEvent.click(overlay);
+    await expect(dialog).toBeInTheDocument();
+    await expect(onOpenChange).not.toHaveBeenCalledWith(false);
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+  },
+};
+
 export const WithDataAttributes: Story = {
   render: (_args) => (
     <AlertDialog>
@@ -185,7 +277,7 @@ export const WithDataAttributes: Story = {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive">Delete</AlertDialogAction>
+          <AlertDialogAction>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -224,10 +316,14 @@ export const WithDataAttributes: Story = {
       ).toBeInTheDocument();
     });
 
-    // The action carries its data-slot and reflects the destructive variant.
+    // The cancel/action controls expose their effective default button variants.
+    const cancel = document.querySelector('[data-slot="alert-dialog-cancel"]');
+    await expect(cancel).toBeInTheDocument();
+    await expect(cancel).toHaveAttribute('data-variant', 'outline');
+
     const action = document.querySelector('[data-slot="alert-dialog-action"]');
     await expect(action).toBeInTheDocument();
-    await expect(action).toHaveAttribute('data-variant', 'destructive');
+    await expect(action).toHaveAttribute('data-variant', 'default');
 
     // Cleanup.
     await userEvent.keyboard('{Escape}');
@@ -247,7 +343,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Confirm (primary action)
         </h3>
         <AlertDialog>
@@ -270,7 +366,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Destructive action
         </h3>
         <AlertDialog>

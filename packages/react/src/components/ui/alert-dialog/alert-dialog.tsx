@@ -119,14 +119,12 @@ function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
         className={cn(
           'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
           'nx:-translate-x-1/2 nx:-translate-y-1/2',
-          'nx:gap-container nx:border nx:border-border-default nx:bg-container nx:p-container nx:shadow-lg',
+          'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:p-6 nx:shadow-lg',
           'nx:data-[state=open]:duration-300 nx:data-[state=closed]:duration-150',
           'nx:data-[state=open]:ease-out nx:data-[state=closed]:ease-in',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
-          'nx:data-[state=closed]:slide-out-to-left-1/2 nx:data-[state=closed]:slide-out-to-top-[48%]',
-          'nx:data-[state=open]:slide-in-from-left-1/2 nx:data-[state=open]:slide-in-from-top-[48%]',
           'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
           'nx:sm:rounded-lg',
           className
@@ -226,10 +224,7 @@ function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
   return (
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
-      className={cn(
-        'nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight',
-        className
-      )}
+      className={cn('nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -263,7 +258,10 @@ function AlertDialogDescription({
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:typography-body-small nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );
@@ -295,7 +293,7 @@ interface AlertDialogActionProps
  */
 function AlertDialogAction({
   className,
-  variant,
+  variant = 'default',
   size,
   ...props
 }: AlertDialogActionProps) {
@@ -334,7 +332,7 @@ interface AlertDialogCancelProps
  */
 function AlertDialogCancel({
   className,
-  variant,
+  variant = 'outline',
   size,
   ...props
 }: AlertDialogCancelProps) {
@@ -343,10 +341,7 @@ function AlertDialogCancel({
       data-slot="alert-dialog-cancel"
       data-variant={variant}
       data-size={size}
-      className={cn(
-        buttonVariants({ variant: variant ?? 'outline', size }),
-        className
-      )}
+      className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />
   );
