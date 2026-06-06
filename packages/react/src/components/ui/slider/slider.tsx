@@ -38,15 +38,11 @@ function Slider({
 }: SliderProps) {
   // Derive the thumb count from the controlled/uncontrolled value; fall back to
   // a two-thumb range spanning the track when neither is provided.
-  const values = React.useMemo(
-    () =>
-      Array.isArray(value)
-        ? value
-        : Array.isArray(defaultValue)
-          ? defaultValue
-          : [min, max],
-    [value, defaultValue, min, max]
-  );
+  const values = Array.isArray(value)
+    ? value
+    : Array.isArray(defaultValue)
+      ? defaultValue
+      : [min, max];
 
   return (
     <SliderPrimitive.Root
@@ -56,7 +52,7 @@ function Slider({
       min={min}
       max={max}
       className={cn(
-        'nx:relative nx:flex nx:w-full nx:touch-none nx:items-center nx:select-none nx:data-[disabled]:opacity-50 nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:min-h-44 nx:data-[orientation=vertical]:w-auto nx:data-[orientation=vertical]:flex-col',
+        'nx:relative nx:flex nx:w-full nx:touch-none nx:items-center nx:select-none nx:data-disabled:opacity-50 nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:min-h-44 nx:data-[orientation=vertical]:w-auto nx:data-[orientation=vertical]:flex-col',
         className
       )}
       {...props}

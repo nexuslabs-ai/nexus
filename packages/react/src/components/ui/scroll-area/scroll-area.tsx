@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
+import { cva } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
@@ -87,6 +88,23 @@ interface ScrollBarProps extends React.ComponentProps<
   typeof ScrollAreaPrimitive.ScrollAreaScrollbar
 > {}
 
+const scrollBarVariants = cva(
+  'nx:flex nx:touch-none nx:select-none nx:p-px nx:transition-colors nx:forced-colors:bg-[Canvas]',
+  {
+    variants: {
+      orientation: {
+        vertical:
+          'nx:h-full nx:w-2.5 nx:border-l nx:border-l-transparent nx:forced-colors:border-l-[ButtonBorder]',
+        horizontal:
+          'nx:h-2.5 nx:flex-col nx:border-t nx:border-t-transparent nx:forced-colors:border-t-[ButtonBorder]',
+      },
+    },
+    defaultVariants: {
+      orientation: 'vertical',
+    },
+  }
+);
+
 /**
  * ScrollBar
  *
@@ -107,16 +125,8 @@ function ScrollBar({
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
       data-slot="scroll-bar"
-      data-orientation={orientation}
       orientation={orientation}
-      className={cn(
-        'nx:flex nx:touch-none nx:select-none nx:p-px nx:transition-colors nx:forced-colors:bg-[Canvas]',
-        orientation === 'vertical' &&
-          'nx:h-full nx:w-2.5 nx:border-l nx:border-l-transparent nx:forced-colors:border-l-[ButtonBorder]',
-        orientation === 'horizontal' &&
-          'nx:h-2.5 nx:flex-col nx:border-t nx:border-t-transparent nx:forced-colors:border-t-[ButtonBorder]',
-        className
-      )}
+      className={cn(scrollBarVariants({ orientation }), className)}
       {...props}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
@@ -127,4 +137,10 @@ function ScrollBar({
   );
 }
 
-export { ScrollArea, type ScrollAreaProps, ScrollBar, type ScrollBarProps };
+export {
+  ScrollArea,
+  type ScrollAreaProps,
+  ScrollBar,
+  type ScrollBarProps,
+  scrollBarVariants,
+};

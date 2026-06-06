@@ -203,6 +203,54 @@ export const WithDataAttributes: Story = {
   },
 };
 
+// Composition: `asChild` routes the link styling onto a framework router link
+// (next/link, TanStack Router) instead of the native <a>. The router link
+// renders its own <a>, so the styling merges onto it — no nested <a><a>. The
+// bare <a> here stands in for that router link.
+export const AsChild: Story = {
+  render: () => (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious asChild>
+            <a href="#prev">Previous</a>
+          </PaginationPrevious>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink asChild>
+            <a href="#page-1">1</a>
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink asChild isActive>
+            <a href="#page-2">2</a>
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationNext asChild>
+            <a href="#next">Next</a>
+          </PaginationNext>
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The styling merges onto the slotted <a>: it carries the data-slot hook,
+    // aria-current, and its own href — with no nested <a><a>.
+    const page2 = canvas.getByRole('link', { name: '2' });
+    await expect(page2).toHaveAttribute('href', '#page-2');
+    await expect(page2).toHaveAttribute('data-slot', 'pagination-link');
+    await expect(page2).toHaveAttribute('aria-current', 'page');
+    await expect(page2.querySelector('a')).toBeNull();
+
+    // Edge controls forward their slotted child too, keeping the preset label.
+    const prev = canvas.getByRole('link', { name: 'Go to previous page' });
+    await expect(prev).toHaveAttribute('href', '#prev');
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================

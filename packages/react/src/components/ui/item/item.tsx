@@ -124,7 +124,8 @@ function Item({
 }
 
 const itemMediaVariants = cva(
-  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-[[data-slot=item-description]]/item:translate-y-0.5 nx:group-has-[[data-slot=item-description]]/item:self-start nx:[&_svg]:pointer-events-none',
+  // nexus-allow-numeric: media rhythm + description-aligned nudge
+  'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:gap-2 nx:group-has-data-[slot=item-description]/item:translate-y-0.5 nx:group-has-data-[slot=item-description]/item:self-start nx:[&_svg]:pointer-events-none',
   {
     variants: {
       variant: {

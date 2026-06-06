@@ -176,7 +176,7 @@ function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
     <MenubarPrimitive.SubContent
       data-slot="menubar-sub-content"
       className={cn(
-        'nx:z-popover nx:min-w-[8rem] nx:overflow-hidden',
+        'nx:z-popover nx:min-w-32 nx:overflow-hidden',
         'nx:rounded-md nx:border nx:border-border-default',
         'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
         'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
@@ -231,7 +231,7 @@ function MenubarContent({
         alignOffset={alignOffset}
         sideOffset={sideOffset}
         className={cn(
-          'nx:z-popover nx:min-w-[12rem] nx:overflow-hidden',
+          'nx:z-popover nx:min-w-48 nx:overflow-hidden',
           'nx:rounded-md nx:border nx:border-border-default',
           'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',

@@ -128,7 +128,7 @@ function DropdownMenuSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       className={cn(
-        'nx:z-popover nx:min-w-[8rem] nx:overflow-hidden',
+        'nx:z-popover nx:min-w-32 nx:overflow-hidden',
         'nx:rounded-md nx:border nx:border-border-default',
         'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
         'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
@@ -180,7 +180,7 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         className={cn(
           'nx:z-popover nx:max-h-(--radix-dropdown-menu-content-available-height)',
-          'nx:min-w-[8rem] nx:overflow-x-hidden nx:overflow-y-auto',
+          'nx:min-w-32 nx:overflow-x-hidden nx:overflow-y-auto',
           'nx:rounded-md nx:border nx:border-border-default',
           'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',

@@ -340,8 +340,8 @@ function Sidebar({
         className={cn(
           'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-200 nx:ease-linear nx:lg:flex',
           side === 'left'
-            ? 'nx:left-0 nx:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
-            : 'nx:right-0 nx:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
+            ? 'nx:left-0 nx:group-data-[collapsible=offcanvas]:-left-(--sidebar-width)'
+            : 'nx:right-0 nx:group-data-[collapsible=offcanvas]:-right-(--sidebar-width)',
           // Floating and inset variants gain padding around the panel; the
           // +1rem in the icon-collapse width below matches this inset.
           (variant === 'floating' || variant === 'inset') && 'nx:p-2',
@@ -424,7 +424,7 @@ function SidebarRail({ className, ...props }: SidebarRailProps) {
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:-translate-x-1/2 nx:transition-all nx:ease-linear nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-[2px] nx:hover:after:bg-nav-border nx:lg:flex',
+        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:-translate-x-1/2 nx:transition-all nx:ease-linear nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:lg:flex',
         'nx:in-data-[side=left]:cursor-w-resize nx:in-data-[side=right]:cursor-e-resize',
         'nx:[[data-side=left][data-state=collapsed]_&]:cursor-e-resize nx:[[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
         'nx:group-data-[collapsible=offcanvas]:translate-x-0 nx:group-data-[collapsible=offcanvas]:after:left-full nx:hover:group-data-[collapsible=offcanvas]:bg-nav-background',

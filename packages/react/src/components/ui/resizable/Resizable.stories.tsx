@@ -19,7 +19,13 @@ export default meta;
 type Story = StoryObj<typeof ResizablePanelGroup>;
 
 const groupClass =
-  'nx:h-[220px] nx:max-w-md nx:overflow-hidden nx:rounded-lg nx:border nx:border-border-default';
+  'nx:max-w-md nx:overflow-hidden nx:rounded-lg nx:border nx:border-border-default';
+
+// react-resizable-panels sets the group to height:100% inline (beating any
+// height class) and spreads consumer style after it — so a fixed demo height
+// goes here, not in groupClass. Without a definite height a vertical group
+// collapses: its flex-grow panels have no height to distribute.
+const groupStyle = { height: 220 } as const;
 
 // react-resizable-panels v4 makes each panel overflow:auto, which axe flags as a
 // scrollable region (scrollable-region-focusable) that the library won't make
@@ -38,7 +44,11 @@ function PanelBody({ label }: { label: string }) {
 // Two horizontal panels with a visible grip handle.
 export const Default: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="horizontal" className={groupClass}>
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className={groupClass}
+      style={groupStyle}
+    >
       <ResizablePanel defaultSize={50} style={panelStyle}>
         <PanelBody label="One" />
       </ResizablePanel>
@@ -53,7 +63,11 @@ export const Default: Story = {
 // Vertical split — the handle flips to a horizontal divider.
 export const Vertical: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="vertical" className={groupClass}>
+    <ResizablePanelGroup
+      orientation="vertical"
+      className={groupClass}
+      style={groupStyle}
+    >
       <ResizablePanel defaultSize={50} style={panelStyle}>
         <PanelBody label="Top" />
       </ResizablePanel>
@@ -68,7 +82,11 @@ export const Vertical: Story = {
 // Three panels with two handles.
 export const ThreePanels: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="horizontal" className={groupClass}>
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className={groupClass}
+      style={groupStyle}
+    >
       <ResizablePanel defaultSize={25} style={panelStyle}>
         <PanelBody label="Nav" />
       </ResizablePanel>
@@ -91,7 +109,11 @@ export const ThreePanels: Story = {
 // Arrow keys on the focused separator resize the panels (aria-valuenow moves).
 export const KeyboardInteraction: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="horizontal" className={groupClass}>
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className={groupClass}
+      style={groupStyle}
+    >
       <ResizablePanel defaultSize={50} style={panelStyle}>
         <PanelBody label="One" />
       </ResizablePanel>
@@ -117,7 +139,11 @@ export const KeyboardInteraction: Story = {
 // data-slot identifies the group, panels, and handle.
 export const WithDataAttributes: Story = {
   render: () => (
-    <ResizablePanelGroup orientation="horizontal" className={groupClass}>
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className={groupClass}
+      style={groupStyle}
+    >
       <ResizablePanel defaultSize={50} style={panelStyle}>
         <PanelBody label="One" />
       </ResizablePanel>
@@ -149,7 +175,11 @@ export const WithDataAttributes: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:gap-4">
-      <ResizablePanelGroup orientation="horizontal" className={groupClass}>
+      <ResizablePanelGroup
+        orientation="horizontal"
+        className={groupClass}
+        style={groupStyle}
+      >
         <ResizablePanel defaultSize={50} style={panelStyle}>
           <PanelBody label="One" />
         </ResizablePanel>
@@ -158,7 +188,11 @@ export const AllVariants: Story = {
           <PanelBody label="Two" />
         </ResizablePanel>
       </ResizablePanelGroup>
-      <ResizablePanelGroup orientation="vertical" className={groupClass}>
+      <ResizablePanelGroup
+        orientation="vertical"
+        className={groupClass}
+        style={groupStyle}
+      >
         <ResizablePanel defaultSize={50} style={panelStyle}>
           <PanelBody label="Top" />
         </ResizablePanel>

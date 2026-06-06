@@ -74,7 +74,8 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-group"
       className={cn(
-        'nx:group/field-group nx:@container/field-group nx:flex nx:w-full nx:flex-col nx:gap-7 nx:data-[slot=checkbox-group]:gap-3 nx:[&>[data-slot=field-group]]:gap-4',
+        // nexus-allow-numeric: field-group stack rhythm
+        'nx:group/field-group nx:@container/field-group nx:flex nx:w-full nx:flex-col nx:gap-7 nx:data-[slot=checkbox-group]:gap-3 nx:*:data-[slot=field-group]:gap-4',
         className
       )}
       {...props}
@@ -87,11 +88,11 @@ const fieldVariants = cva(
   {
     variants: {
       orientation: {
-        vertical: 'nx:flex-col nx:[&>*]:w-full nx:[&>.sr-only]:w-auto',
+        vertical: 'nx:flex-col nx:*:w-full nx:[&>.sr-only]:w-auto',
         horizontal:
-          'nx:flex-row nx:items-center nx:[&>[data-slot=field-label]]:flex-auto nx:has-[>[data-slot=field-content]]:items-start nx:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+          'nx:flex-row nx:items-center nx:*:data-[slot=field-label]:flex-auto nx:has-[>[data-slot=field-content]]:items-start nx:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
         responsive:
-          'nx:flex-col nx:@md/field-group:flex-row nx:@md/field-group:items-center nx:[&>*]:w-full nx:@md/field-group:[&>*]:w-auto nx:[&>.sr-only]:w-auto nx:@md/field-group:[&>[data-slot=field-label]]:flex-auto nx:@md/field-group:has-[>[data-slot=field-content]]:items-start nx:@md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+          'nx:flex-col nx:@md/field-group:flex-row nx:@md/field-group:items-center nx:*:w-full nx:@md/field-group:*:w-auto nx:[&>.sr-only]:w-auto nx:@md/field-group:*:data-[slot=field-label]:flex-auto nx:@md/field-group:has-[>[data-slot=field-content]]:items-start nx:@md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
       },
     },
     defaultVariants: {
@@ -171,7 +172,7 @@ function FieldLabel({
       data-slot="field-label"
       className={cn(
         'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:leading-snug nx:group-data-[disabled=true]/field:opacity-50',
-        'nx:has-[>[data-slot=field]]:w-full nx:has-[>[data-slot=field]]:flex-col nx:has-[>[data-slot=field]]:rounded-md nx:has-[>[data-slot=field]]:border nx:[&>*]:data-[slot=field]:p-4',
+        'nx:has-[>[data-slot=field]]:w-full nx:has-[>[data-slot=field]]:flex-col nx:has-[>[data-slot=field]]:rounded-md nx:has-[>[data-slot=field]]:border nx:*:data-[slot=field]:p-4',
         'nx:has-data-[state=checked]:border-border-primary nx:has-data-[state=checked]:bg-primary-subtle',
         className
       )}
@@ -209,7 +210,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
     <p
       data-slot="field-description"
       className={cn(
-        'nx:text-sm nx:leading-normal nx:font-normal nx:text-muted-foreground nx:group-has-[[data-orientation=horizontal]]/field:text-balance',
+        'nx:text-sm nx:leading-normal nx:font-normal nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
         'nx:last:mt-0 nx:nth-last-2:-mt-1 nx:[[data-variant=legend]+&]:-mt-1.5',
         'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
@@ -276,34 +277,9 @@ function FieldError({
   errors,
   ...props
 }: FieldErrorProps) {
-  const content = React.useMemo(() => {
-    if (children) {
-      return children;
-    }
+  const messages = children ? [] : dedupeErrorMessages(errors);
 
-    if (!errors?.length) {
-      return null;
-    }
-
-    const uniqueErrors = [
-      ...new Map(errors.map((error) => [error?.message, error])).values(),
-    ];
-
-    if (uniqueErrors.length === 1) {
-      return uniqueErrors[0]?.message;
-    }
-
-    return (
-      <ul className="nx:ml-4 nx:flex nx:list-disc nx:flex-col nx:gap-1">
-        {uniqueErrors.map(
-          (error, index) =>
-            error?.message && <li key={index}>{error.message}</li>
-        )}
-      </ul>
-    );
-  }, [children, errors]);
-
-  if (!content) {
+  if (!children && messages.length === 0) {
     return null;
   }
 
@@ -318,8 +294,34 @@ function FieldError({
       )}
       {...props}
     >
-      {content}
+      {children ||
+        (messages.length === 1 ? (
+          messages[0]
+        ) : (
+          <FieldErrorList messages={messages} />
+        ))}
     </div>
+  );
+}
+
+/** Unique, non-empty error messages in first-seen order. */
+function dedupeErrorMessages(errors: FieldErrorProps['errors']): string[] {
+  const seen = new Map<string, string>();
+  for (const error of errors ?? []) {
+    if (error?.message) seen.set(error.message, error.message);
+  }
+  return [...seen.values()];
+}
+
+/** Renders multiple validation messages as a bulleted list. */
+function FieldErrorList({ messages }: { messages: string[] }) {
+  return (
+    // nexus-allow-numeric: error list inset
+    <ul className="nx:ml-4 nx:flex nx:list-disc nx:flex-col nx:gap-1">
+      {messages.map((message) => (
+        <li key={message}>{message}</li>
+      ))}
+    </ul>
   );
 }
 

@@ -163,7 +163,8 @@ function TableHead({ className, ...props }: TableHeadProps) {
     <th
       data-slot="table-head"
       className={cn(
-        'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:font-medium nx:whitespace-nowrap nx:text-muted-foreground nx:[&:has([role=checkbox])]:pr-0 nx:[&>[role=checkbox]]:translate-y-[2px]',
+        // nexus-allow-numeric: table header cell padding (not a control)
+        'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:font-medium nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
         className
       )}
       {...props}
@@ -188,7 +189,8 @@ function TableCell({ className, ...props }: TableCellProps) {
     <td
       data-slot="table-cell"
       className={cn(
-        'nx:p-2 nx:align-middle nx:whitespace-nowrap nx:[&:has([role=checkbox])]:pr-0 nx:[&>[role=checkbox]]:translate-y-[2px]',
+        // nexus-allow-numeric: table cell padding (not a control)
+        'nx:p-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
         className
       )}
       {...props}
