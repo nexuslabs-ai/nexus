@@ -6,6 +6,7 @@ import {
   IconAlertTriangle,
   IconCircleCheck,
   IconInfoCircle,
+  IconX,
 } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -267,6 +268,28 @@ export const WithTitle: Story = {
   ),
 };
 
+export const TitleAsHeading: Story = {
+  render: (args) => (
+    <Alert {...args} className="nx:max-w-md">
+      <AlertTitle asChild>
+        <h2>Semantic heading</h2>
+      </AlertTitle>
+      <AlertDescription>
+        Use this pattern when the alert title belongs in the page outline.
+      </AlertDescription>
+    </Alert>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const heading = canvas.getByRole('heading', {
+      name: 'Semantic heading',
+    });
+
+    await expect(heading).toBeInTheDocument();
+    await expect(heading).toHaveAttribute('data-slot', 'alert-title');
+  },
+};
+
 export const WithDescription: Story = {
   render: (args) => (
     <Alert {...args} className="nx:max-w-md">
@@ -490,6 +513,36 @@ export const DenseHelperBanner: Story = {
       </AlertActions>
     </Alert>
   ),
+};
+
+export const CustomCloseIconLabel: Story = {
+  args: {
+    layout: 'inline',
+    variant: 'information',
+  },
+  render: (args) => (
+    <Alert {...args} className="nx:max-w-xl">
+      <IconInfoCircle aria-hidden="true" className="nx:size-4" />
+      <AlertContent>
+        <AlertTitle>Custom close icon</AlertTitle>
+        <AlertDescription>
+          Icon-only custom children keep a fallback accessible name.
+        </AlertDescription>
+      </AlertContent>
+      <AlertActions>
+        <AlertClose>
+          <IconX aria-hidden="true" />
+        </AlertClose>
+      </AlertActions>
+    </Alert>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const close = canvas.getByRole('button', { name: 'Dismiss alert' });
+
+    await expect(close).toBeInTheDocument();
+    await expect(close).toHaveAttribute('aria-label', 'Dismiss alert');
+  },
 };
 
 // ============================================
@@ -751,7 +804,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container`. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses the document scale (callout rhythm) instead of the container scale (raised-surface rhythm).',
+          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container`. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses numeric document padding even though its default visual surface uses `nx:bg-container`.',
       },
     },
   },

@@ -1,12 +1,16 @@
 import * as React from 'react';
 
+import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconX } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
+const alertStatusTextClassName =
+  'nx:group-data-[variant=destructive]/alert:text-error-subtle-foreground nx:group-data-[variant=success]/alert:text-success-subtle-foreground nx:group-data-[variant=information]/alert:text-information-subtle-foreground nx:group-data-[variant=warning]/alert:text-warning-subtle-foreground';
+
 const alertVariants = cva(
-  'nx:group/alert nx:relative nx:w-full nx:p-4 nx:[&>svg~*]:pl-6 nx:[&>svg]:absolute nx:[&>svg]:top-[calc(var(--nx-spacing-4)+10px)] nx:[&>svg]:left-4 nx:[&>svg]:translate-y-[-50%] nx:[&>svg]:text-foreground',
+  'nx:group/alert nx:relative nx:w-full nx:p-4 nx:[&>svg~*]:pl-6 nx:[&>svg]:absolute nx:[&>svg]:top-[calc(var(--nx-spacing-4)+(var(--nx-typography-line-height-sm)/2))] nx:[&>svg]:left-4 nx:[&>svg]:translate-y-[-50%] nx:[&>svg]:text-foreground',
   {
     variants: {
       variant: {
@@ -74,7 +78,7 @@ interface AlertProps
  * ```tsx
  * // With icon
  * <Alert variant="destructive">
- *   <IconAlertCircle className="nx:size-4" />
+ *   <IconAlertCircle aria-hidden="true" className="nx:size-4" />
  *   <AlertTitle>Error</AlertTitle>
  *   <AlertDescription>
  *     Your session has expired. Please log in again.
@@ -139,31 +143,53 @@ function AlertContent({ className, ...props }: AlertContentProps) {
  *
  * Props for the AlertTitle component.
  */
-interface AlertTitleProps extends React.ComponentProps<'div'> {}
+interface AlertTitleProps extends React.ComponentProps<'div'> {
+  /**
+   * Render the title styles on a child element. Use this when the alert title
+   * needs real heading semantics in the page outline.
+   *
+   * @default false
+   * @example
+   * ```tsx
+   * <AlertTitle asChild>
+   *   <h2>Important Notice</h2>
+   * </AlertTitle>
+   * ```
+   */
+  asChild?: boolean;
+}
 
 /**
  * AlertTitle
  *
- * The title of an alert. Renders as a div so consumers can choose heading
- * levels explicitly when the page outline needs one.
+ * The title of an alert. Renders as a div by default; use `asChild` to apply
+ * alert title styling to a semantic heading when the page outline needs one.
  *
  * @example
  * ```tsx
  * <AlertTitle>Important Notice</AlertTitle>
  * ```
  */
-function AlertTitle({ className, children, ...props }: AlertTitleProps) {
+function AlertTitle({
+  asChild = false,
+  className,
+  children,
+  ...props
+}: AlertTitleProps) {
+  const Comp = asChild ? Slot : 'div';
+
   return (
-    <div
+    <Comp
       data-slot="alert-title"
       className={cn(
-        'nx:mb-1 nx:typography-label-large nx:text-foreground nx:group-data-[variant=destructive]/alert:text-error-subtle-foreground nx:group-data-[variant=success]/alert:text-success-subtle-foreground nx:group-data-[variant=information]/alert:text-information-subtle-foreground nx:group-data-[variant=warning]/alert:text-warning-subtle-foreground',
+        'nx:mb-1 nx:typography-label-large nx:text-foreground',
+        alertStatusTextClassName,
         className
       )}
       {...props}
     >
       {children}
-    </div>
+    </Comp>
   );
 }
 
@@ -191,7 +217,8 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
     <div
       data-slot="alert-description"
       className={cn(
-        'nx:typography-body-small nx:text-muted-foreground nx:group-data-[variant=destructive]/alert:text-error-subtle-foreground nx:group-data-[variant=success]/alert:text-success-subtle-foreground nx:group-data-[variant=information]/alert:text-information-subtle-foreground nx:group-data-[variant=warning]/alert:text-warning-subtle-foreground nx:[&_p]:leading-relaxed',
+        'nx:typography-body-small nx:text-muted-foreground nx:[&_p]:leading-relaxed',
+        alertStatusTextClassName,
         className
       )}
       {...props}
@@ -245,7 +272,9 @@ interface AlertCloseProps extends React.ComponentProps<'button'> {}
  * AlertClose
  *
  * A styled close control for alerts. Dismissal is consumer-controlled: wire
- * `onClick` to app state when the alert should be removed.
+ * `onClick` to app state when the alert should be removed. Custom children get
+ * a fallback `aria-label="Dismiss alert"` unless you provide `aria-label` or
+ * `aria-labelledby`.
  *
  * @example
  * ```tsx
@@ -253,11 +282,19 @@ interface AlertCloseProps extends React.ComponentProps<'button'> {}
  * ```
  */
 function AlertClose({
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
   className,
   children,
   type = 'button',
   ...props
 }: AlertCloseProps) {
+  const hasCustomChildren = children !== undefined && children !== null;
+  const fallbackAriaLabel =
+    hasCustomChildren && !ariaLabel && !ariaLabelledBy
+      ? 'Dismiss alert'
+      : ariaLabel;
+
   return (
     <button
       data-slot="alert-close"
@@ -271,6 +308,8 @@ function AlertClose({
         className
       )}
       type={type}
+      aria-label={fallbackAriaLabel}
+      aria-labelledby={ariaLabelledBy}
       {...props}
     >
       {children ?? (
