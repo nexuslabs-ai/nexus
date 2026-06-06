@@ -24,6 +24,9 @@ const meta: Meta<typeof Accordion> = {
   parameters: {
     layout: 'padded',
   },
+  args: {
+    variant: 'stacked',
+  },
   argTypes: {
     type: {
       control: 'select',
@@ -55,8 +58,13 @@ type Story = StoryObj<typeof Accordion>;
 // ============================================
 
 export const Default: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>
@@ -80,11 +88,11 @@ export const Default: Story = {
 };
 
 export const Stacked: Story = {
-  render: (_args) => (
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
-      variant="stacked"
+      variant={variant}
       className="nx:w-full nx:max-w-md"
     >
       <AccordionItem value="item-1">
@@ -110,8 +118,12 @@ export const Stacked: Story = {
 };
 
 export const Multiple: Story = {
-  render: (_args) => (
-    <Accordion type="multiple" className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="multiple"
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>First Section</AccordionTrigger>
         <AccordionContent>
@@ -136,11 +148,14 @@ export const Multiple: Story = {
 };
 
 export const Floating: Story = {
-  render: (_args) => (
+  args: {
+    variant: 'floating',
+  },
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
-      variant="floating"
+      variant={variant}
       className="nx:w-full nx:max-w-md"
     >
       <AccordionItem value="item-1">
@@ -166,10 +181,13 @@ export const Floating: Story = {
 };
 
 export const MultipleFloating: Story = {
-  render: (_args) => (
+  args: {
+    variant: 'floating',
+  },
+  render: ({ variant }) => (
     <Accordion
       type="multiple"
-      variant="floating"
+      variant={variant}
       className="nx:w-full nx:max-w-md"
     >
       <AccordionItem value="item-1">
@@ -196,10 +214,11 @@ export const MultipleFloating: Story = {
 };
 
 export const DefaultOpen: Story = {
-  render: (_args) => (
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
+      variant={variant}
       defaultValue="item-2"
       className="nx:w-full nx:max-w-md"
     >
@@ -223,11 +242,12 @@ export const DefaultOpen: Story = {
 };
 
 export const Disabled: Story = {
-  render: (_args) => (
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
       disabled
+      variant={variant}
       className="nx:w-full nx:max-w-md"
     >
       <AccordionItem value="item-1">
@@ -256,8 +276,13 @@ export const Disabled: Story = {
 };
 
 export const DisabledItem: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Enabled Item</AccordionTrigger>
         <AccordionContent>This item can be toggled.</AccordionContent>
@@ -290,8 +315,13 @@ export const DisabledItem: Story = {
 // ============================================
 
 export const ExpandInteraction: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Click to expand</AccordionTrigger>
         <AccordionContent>
@@ -332,8 +362,12 @@ export const ExpandInteraction: Story = {
 };
 
 export const MultipleExpandInteraction: Story = {
-  render: (_args) => (
-    <Accordion type="multiple" className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="multiple"
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Section 1</AccordionTrigger>
         <AccordionContent>Content for section 1.</AccordionContent>
@@ -368,8 +402,13 @@ export const MultipleExpandInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>First Item</AccordionTrigger>
         <AccordionContent>First item content.</AccordionContent>
@@ -424,10 +463,11 @@ export const KeyboardInteraction: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  render: (_args) => (
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
+      variant={variant}
       defaultValue="item-1"
       className="nx:w-full nx:max-w-md"
     >
@@ -457,11 +497,14 @@ export const WithDataAttributes: Story = {
 };
 
 export const WithFloatingDataAttributes: Story = {
-  render: (_args) => (
+  args: {
+    variant: 'floating',
+  },
+  render: ({ variant }) => (
     <Accordion
       type="single"
       collapsible
-      variant="floating"
+      variant={variant}
       defaultValue="item-1"
       className="nx:w-full nx:max-w-md"
     >
@@ -484,8 +527,13 @@ export const WithFloatingDataAttributes: Story = {
 // ============================================
 
 export const LongContent: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>
           This is a very long trigger text that might wrap to multiple lines
@@ -506,8 +554,13 @@ export const LongContent: Story = {
 };
 
 export const NestedContent: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Item with nested content</AccordionTrigger>
         <AccordionContent>
@@ -529,8 +582,13 @@ export const NestedContent: Story = {
 };
 
 export const SingleItem: Story = {
-  render: (_args) => (
-    <Accordion type="single" collapsible className="nx:w-full nx:max-w-md">
+  render: ({ variant }) => (
+    <Accordion
+      type="single"
+      collapsible
+      variant={variant}
+      className="nx:w-full nx:max-w-md"
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>Single accordion item</AccordionTrigger>
         <AccordionContent>This accordion has only one item.</AccordionContent>
