@@ -21,7 +21,7 @@ Fix issues identified in PR reviews by combining root cause analysis (normally d
 
 ## Rules
 
-The full ruleset lives in `.Codex/rules/*.md` — those files are the spec. Don't try to keep all of them in working memory.
+The full ruleset lives in `.claude/rules/*.md` — those files are the spec. Don't try to keep all of them in working memory.
 
 The **Reflex Check** lives in [`implement-guide/SKILL.md`](../implement-guide/SKILL.md) (Part 2 → Step 3). It names the actions that should evoke a rule mid-write and points at the relevant file. The same triggers fire when writing a fix patch as when writing fresh code — read it before each fix; open a full rule file only when a reflex actually fires.
 
@@ -163,7 +163,7 @@ If something is genuinely not clean, say so on that trailing line — don't pad 
 
 1. **Architect-first thinking** -- understand root causes before fixing; reviewer suggestions are input, not instructions
 2. **Address the actual feedback** -- read carefully, don't assume
-3. **Follow loaded rules** -- `.Codex/rules/` files are source of truth
+3. **Follow loaded rules** -- `.claude/rules/` files are source of truth
 4. **Terse output** -- plan and completion are one-line-per-fix tables; no root-cause prose, no rationale, no "issues addressed" narrative. The user verifies via the code
 5. **Plan is a preview, not a gate** -- emit the plan table and proceed directly. Pause only on a specific fix that is genuinely ambiguous
 6. **No patches** -- proper solutions only
