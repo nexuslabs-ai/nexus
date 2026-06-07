@@ -6,41 +6,36 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { IconX } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
-const alertStatusTextClassName =
-  'nx:group-data-[variant=destructive]/alert:text-error-subtle-foreground nx:group-data-[variant=success]/alert:text-success-subtle-foreground nx:group-data-[variant=information]/alert:text-information-subtle-foreground nx:group-data-[variant=warning]/alert:text-warning-subtle-foreground';
-
-const alertVariants = cva(
-  'nx:group/alert nx:relative nx:w-full nx:p-4 nx:[&>svg~*]:pl-6 nx:[&>svg]:absolute nx:[&>svg]:top-[calc(var(--nx-spacing-4)+(var(--nx-typography-line-height-sm)/2))] nx:[&>svg]:left-4 nx:[&>svg]:translate-y-[-50%] nx:[&>svg]:text-foreground',
-  {
-    variants: {
-      variant: {
-        default: 'nx:border-border-default nx:bg-container',
-        destructive:
-          'nx:border-border-error nx:bg-error-subtle nx:[&>svg]:text-error-subtle-foreground',
-        success:
-          'nx:border-border-success nx:bg-success-subtle nx:[&>svg]:text-success-subtle-foreground',
-        information:
-          'nx:border-border-information nx:bg-information-subtle nx:[&>svg]:text-information-subtle-foreground',
-        warning:
-          'nx:border-border-warning nx:bg-warning-subtle nx:[&>svg]:text-warning-subtle-foreground',
-      },
-      presentation: {
-        card: 'nx:rounded-md nx:border',
-        banner: 'nx:rounded-none nx:border-b',
-      },
-      layout: {
-        stack: '',
-        inline:
-          'nx:grid nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1',
-      },
+const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:p-4', {
+  variants: {
+    variant: {
+      default: 'nx:border-border-default nx:bg-container nx:text-foreground',
+      destructive:
+        'nx:border-border-error nx:bg-error-subtle nx:text-error-subtle-foreground',
+      success:
+        'nx:border-border-success nx:bg-success-subtle nx:text-success-subtle-foreground',
+      information:
+        'nx:border-border-information nx:bg-information-subtle nx:text-information-subtle-foreground',
+      warning:
+        'nx:border-border-warning nx:bg-warning-subtle nx:text-warning-subtle-foreground',
     },
-    defaultVariants: {
-      variant: 'default',
-      presentation: 'card',
-      layout: 'stack',
+    presentation: {
+      card: 'nx:rounded-md nx:border',
+      banner: 'nx:rounded-none nx:border-b',
     },
-  }
-);
+    layout: {
+      stack:
+        'nx:grid-cols-[auto_minmax(0,1fr)] nx:items-start nx:has-[>[data-slot=alert-icon]]:gap-x-2 nx:*:data-[slot=alert-title]:col-start-2 nx:*:data-[slot=alert-description]:col-start-2 nx:*:data-[slot=alert-content]:col-start-2 nx:*:data-[slot=alert-actions]:col-start-2',
+      inline:
+        'nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:has-[>[data-slot=alert-icon]]:grid-cols-[auto_minmax(0,1fr)_auto]',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    presentation: 'card',
+    layout: 'stack',
+  },
+});
 
 /**
  * AlertProps
@@ -79,7 +74,9 @@ interface AlertProps
  * ```tsx
  * // With icon
  * <Alert variant="destructive">
- *   <IconAlertCircle aria-hidden="true" className="nx:size-4" />
+ *   <AlertIcon>
+ *     <IconAlertCircle />
+ *   </AlertIcon>
  *   <AlertTitle>Error</AlertTitle>
  *   <AlertDescription>
  *     Your session has expired. Please log in again.
@@ -102,6 +99,45 @@ function Alert({
       data-layout={layout ?? 'stack'}
       className={cn(
         alertVariants({ variant, presentation, layout }),
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * AlertIconProps
+ *
+ * Props for the AlertIcon component.
+ */
+interface AlertIconProps extends React.ComponentProps<'span'> {}
+
+/**
+ * AlertIcon
+ *
+ * The leading status icon. Owns the icon's size, its status color (matched to
+ * the Alert `variant`, mirroring the title), and the decorative `aria-hidden`.
+ * Place it as the first child of `Alert` and pass any icon as its child.
+ *
+ * @example
+ * ```tsx
+ * <Alert variant="success">
+ *   <AlertIcon>
+ *     <IconCircleCheck />
+ *   </AlertIcon>
+ *   <AlertTitle>Saved</AlertTitle>
+ * </Alert>
+ * ```
+ */
+function AlertIcon({ className, ...props }: AlertIconProps) {
+  return (
+    <span
+      data-slot="alert-icon"
+      aria-hidden="true"
+      className={cn(
+        'nx:flex nx:[&>svg]:size-4',
+        'nx:group-data-[layout=stack]/alert:translate-y-0.5',
         className
       )}
       {...props}
@@ -134,11 +170,7 @@ function AlertContent({ className, ...props }: AlertContentProps) {
   return (
     <div
       data-slot="alert-content"
-      className={cn(
-        'nx:flex nx:min-w-0 nx:flex-col',
-        'nx:group-data-[layout=inline]/alert:col-start-1',
-        className
-      )}
+      className={cn('nx:flex nx:min-w-0 nx:flex-col', className)}
       {...props}
     />
   );
@@ -188,8 +220,7 @@ function AlertTitle({
     <Comp
       data-slot="alert-title"
       className={cn(
-        'nx:mb-1 nx:last:mb-0 nx:typography-label-large nx:text-foreground',
-        alertStatusTextClassName,
+        'nx:mb-1 nx:last:mb-0 nx:typography-label-large',
         className
       )}
       {...props}
@@ -223,8 +254,7 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
     <div
       data-slot="alert-description"
       className={cn(
-        'nx:typography-body-small nx:text-muted-foreground nx:[&_p]:leading-relaxed',
-        alertStatusTextClassName,
+        'nx:typography-body-small nx:group-data-[variant=default]/alert:text-muted-foreground',
         className
       )}
       {...props}
@@ -260,7 +290,7 @@ function AlertActions({ className, ...props }: AlertActionsProps) {
       data-slot="alert-actions"
       className={cn(
         'nx:mt-3 nx:flex nx:flex-wrap nx:items-center nx:gap-2',
-        'nx:group-data-[layout=inline]/alert:col-start-2 nx:group-data-[layout=inline]/alert:row-start-1 nx:group-data-[layout=inline]/alert:mt-0 nx:group-data-[layout=inline]/alert:self-center nx:group-data-[layout=inline]/alert:justify-self-end nx:group-data-[layout=inline]/alert:pl-0!',
+        'nx:group-data-[layout=inline]/alert:mt-0 nx:group-data-[layout=inline]/alert:self-center',
         className
       )}
       {...props}
@@ -330,6 +360,8 @@ export {
   type AlertContentProps,
   AlertDescription,
   type AlertDescriptionProps,
+  AlertIcon,
+  type AlertIconProps,
   type AlertProps,
   AlertTitle,
   type AlertTitleProps,
