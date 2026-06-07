@@ -34,9 +34,7 @@ type AvatarGroupContextValue = Pick<
   'size' | 'shape'
 >;
 
-// Lets an AvatarGroup size/shape its members in one place — Avatar reads this
-// when its own `size`/`shape` is unset, so it propagates even through wrapper
-// components. An explicit prop on the Avatar always wins.
+// Avatar falls back to this for `size`/`shape` when its own prop is unset.
 const AvatarGroupContext = React.createContext<AvatarGroupContextValue | null>(
   null
 );
@@ -86,6 +84,20 @@ interface AvatarProps
  *   <AvatarImage src="/avatar.png" alt="User" />
  *   <AvatarFallback>JD</AvatarFallback>
  * </Avatar>
+ * ```
+ *
+ * @remarks
+ * The emphasis `ring`, `AvatarStatus`, and `AvatarGroup` separator rings read
+ * the `--avatar-surface` CSS variable (default: `background`). When avatars sit
+ * on a non-default surface, set it on a wrapper so the rings match it instead
+ * of leaving a `background`-coloured halo:
+ *
+ * @example
+ * ```tsx
+ * // On a container surface — rings match the card, no halo
+ * <div className="nx:bg-container nx:[--avatar-surface:var(--nx-color-container)]">
+ *   <AvatarGroup>{avatars}</AvatarGroup>
+ * </div>
  * ```
  */
 function Avatar({
@@ -193,9 +205,6 @@ const avatarStatusVariants = cva(
         busy: 'nx:bg-error-background',
         offline: 'nx:bg-muted',
       },
-    },
-    defaultVariants: {
-      status: 'online',
     },
   }
 );
