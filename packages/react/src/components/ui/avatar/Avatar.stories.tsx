@@ -94,8 +94,13 @@ function TeamAvatar({
 // ============================================
 
 export const Default: Story = {
-  render: (_args) => (
-    <Avatar>
+  args: {
+    size: 'md',
+    shape: 'circle',
+    ring: false,
+  },
+  render: (args) => (
+    <Avatar {...args}>
       <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
       <AvatarFallback>AL</AvatarFallback>
     </Avatar>
