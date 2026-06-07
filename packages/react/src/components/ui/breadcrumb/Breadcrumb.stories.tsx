@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 
 import {
   Breadcrumb,
@@ -89,14 +89,46 @@ export const AsChild: Story = {
   },
 };
 
+// Breadcrumb links follow the native anchor focus contract; the current page is
+// a non-interactive span and stays out of the tab order.
+export const KeyboardInteraction: Story = {
+  render: () => (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Contacts</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link', { name: 'Home' });
+    const page = canvas.getByText('Contacts');
+
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+    await expect(link).toHaveAttribute('data-slot', 'breadcrumb-link');
+    await expect(page).not.toHaveFocus();
+  },
+};
+
 // Every structural part carries a data-slot hook; the current page advertises
-// aria-current.
+// aria-current without pretending to be a disabled link.
 export const WithDataAttributes: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="#">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbEllipsis />
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
@@ -112,6 +144,7 @@ export const WithDataAttributes: Story = {
       'breadcrumb-item',
       'breadcrumb-link',
       'breadcrumb-separator',
+      'breadcrumb-ellipsis',
       'breadcrumb-page',
     ]) {
       await expect(
@@ -121,6 +154,8 @@ export const WithDataAttributes: Story = {
 
     const page = canvasElement.querySelector('[data-slot="breadcrumb-page"]');
     await expect(page).toHaveAttribute('aria-current', 'page');
+    await expect(page).not.toHaveAttribute('role');
+    await expect(page).not.toHaveAttribute('aria-disabled');
   },
 };
 

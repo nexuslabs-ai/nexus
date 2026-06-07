@@ -105,7 +105,8 @@ interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
  * BreadcrumbLink
  *
  * A link to an ancestor page. Muted by default, darkening on hover; carries the
- * canonical focus ring since it is reachable by keyboard.
+ * canonical focus ring since it is reachable by keyboard. Its vertical hit
+ * area is expanded for touch without overlapping neighboring breadcrumbs.
  */
 function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
   const Comp = asChild ? Slot : 'a';
@@ -114,7 +115,7 @@ function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
     <Comp
       data-slot="breadcrumb-link"
       className={cn(
-        'nx:rounded-sm nx:transition-colors nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        "nx:relative nx:rounded-sm nx:transition-colors nx:after:absolute nx:after:inset-x-0 nx:after:-inset-y-3 nx:after:content-[''] nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)",
         className
       )}
       {...props}
@@ -138,10 +139,8 @@ function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
   return (
     <span
       data-slot="breadcrumb-page"
-      role="link"
-      aria-disabled="true"
       aria-current="page"
-      className={cn('nx:font-normal nx:text-foreground', className)}
+      className={cn('nx:text-foreground', className)}
       {...props}
     />
   );
@@ -188,8 +187,8 @@ interface BreadcrumbEllipsisProps extends React.ComponentProps<'span'> {}
 /**
  * BreadcrumbEllipsis
  *
- * Stands in for a collapsed run of middle items; pair with a menu to reveal
- * them.
+ * Decorative overflow marker for a collapsed run of middle items. If it is
+ * wrapped in a real trigger, that trigger must provide its own accessible label.
  */
 function BreadcrumbEllipsis({ className, ...props }: BreadcrumbEllipsisProps) {
   return (
@@ -204,7 +203,6 @@ function BreadcrumbEllipsis({ className, ...props }: BreadcrumbEllipsisProps) {
       {...props}
     >
       <IconDots className="nx:size-4" />
-      <span className="nx:sr-only">More</span>
     </span>
   );
 }

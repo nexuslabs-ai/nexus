@@ -59,11 +59,15 @@ Numeric spacing notes: chip rhythm on `gap-1` and chip `px`/`py`.
 
 ## breadcrumb
 
-Numeric spacing note: `size-9` sets the ellipsis hit-slot footprint.
+Resolved: `size-9` sets the ellipsis footprint; the ellipsis is non-interactive,
+so the touch-target floor does not apply.
 
-Touch targets (mobile, discuss): breadcrumb links are bare inline text (~20px); ellipsis is `size-9` (36px). Both under the ~44px floor.
+Resolved: breadcrumb links keep their visual text footprint but use a
+vertical-only hit-area overlay for the ~44px touch floor. The ellipsis remains
+decorative and unchanged.
 
-Trivial: `BreadcrumbPage` adds raw `nx:font-normal` (list already sets `typography-body-small`).
+Resolved: `BreadcrumbPage` no longer adds raw `nx:font-normal`; the list's
+`typography-body-small` already sets normal weight.
 
 ## button
 
