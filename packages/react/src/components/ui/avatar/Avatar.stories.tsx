@@ -341,6 +341,9 @@ export const WithStatus: Story = {
 
     await expect(statuses).toHaveLength(AVATAR_SIZES.length);
     await expect(statuses[0]).toHaveAttribute('data-status', 'online');
+    // The dot is announced (not aria-hidden): it carries a visually-hidden label.
+    await expect(statuses[0]).not.toHaveAttribute('aria-hidden');
+    await expect(statuses[0]).toHaveTextContent('Online');
   },
 };
 
@@ -355,6 +358,15 @@ export const StatusVariants: Story = {
       ))}
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Each status carries a visually-hidden label, so presence is announced
+    // rather than conveyed by colour alone (WCAG 1.4.1).
+    for (const label of ['Online', 'Away', 'Busy', 'Offline']) {
+      await expect(canvas.getByText(label)).toBeInTheDocument();
+    }
+  },
 };
 
 export const WithRing: Story = {
@@ -412,6 +424,10 @@ export const GroupWithMax: Story = {
 
     await expect(avatars).toHaveLength(4);
     await expect(canvas.getByText('+2')).toBeInTheDocument();
+    // The overflow tile announces its count instead of a bare "+2" glyph.
+    await expect(
+      canvas.getByRole('img', { name: '2 more' })
+    ).toBeInTheDocument();
   },
 };
 
@@ -503,6 +519,7 @@ export const WithDataAttributes: Story = {
     await expect(avatar).toHaveAttribute('data-shape', 'rounded');
     await expect(avatar).toHaveAttribute('data-ring', 'true');
     await expect(image).toHaveAttribute('data-slot', 'avatar-image');
+    await expect(image).toHaveAttribute('decoding', 'async');
     await expect(status).toHaveAttribute('data-status', 'busy');
   },
 };

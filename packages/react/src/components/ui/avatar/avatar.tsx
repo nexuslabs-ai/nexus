@@ -142,15 +142,25 @@ interface AvatarImageProps extends React.ComponentProps<
  *
  * Displays the avatar image. Automatically handles loading states.
  *
+ * @remarks
+ * Defaults `decoding="async"` so the browser can decode off the main thread.
+ * No `loading="lazy"` — Radix preloads the source with `new Image()` before
+ * mounting the `<img>`, so the attribute on the rendered element is inert.
+ *
  * @example
  * ```tsx
  * <AvatarImage src="/avatar.png" alt="John Doe" />
  * ```
  */
-function AvatarImage({ className, ...props }: AvatarImageProps) {
+function AvatarImage({
+  className,
+  decoding = 'async',
+  ...props
+}: AvatarImageProps) {
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
+      decoding={decoding}
       className={cn(
         'nx:aspect-square nx:size-full nx:rounded-[inherit] nx:object-cover',
         'nx:animate-in nx:fade-in-0 nx:duration-150 nx:ease-out nx:motion-reduce:animate-none',
@@ -212,25 +222,71 @@ const avatarStatusVariants = cva(
   }
 );
 
+const STATUS_LABELS = {
+  online: 'Online',
+  away: 'Away',
+  busy: 'Busy',
+  offline: 'Offline',
+} as const satisfies Record<
+  NonNullable<VariantProps<typeof avatarStatusVariants>['status']>,
+  string
+>;
+
 interface AvatarStatusProps
   extends
-    React.ComponentProps<'span'>,
-    VariantProps<typeof avatarStatusVariants> {}
+    Omit<React.ComponentProps<'span'>, 'children'>,
+    VariantProps<typeof avatarStatusVariants> {
+  /**
+   * Visually-hidden text announced by assistive tech in place of the
+   * colour-only dot. Defaults to the capitalised `status`. Pass `''` to opt
+   * out when an adjacent text label already conveys presence.
+   * @default the capitalised `status` ('Online', 'Away', 'Busy', 'Offline')
+   */
+  label?: string;
+}
 
+/**
+ * AvatarStatus
+ *
+ * A presence dot pinned to the avatar's corner. Conveys status with colour and
+ * an attached visually-hidden label, so assistive tech announces it (e.g.
+ * "Online"). Sighted users who cannot rely on colour should be given a
+ * redundant text label by the consumer.
+ *
+ * @remarks
+ * The label only reaches assistive tech when the parent `Avatar` is not atomic.
+ * If the parent sets `role="img"` (the fallback-only pattern), it suppresses
+ * every descendant — including this label — so fold the status into the
+ * parent's name instead: `<Avatar role="img" aria-label="Ada Lovelace, online">`.
+ *
+ * @example
+ * ```tsx
+ * <Avatar>
+ *   <AvatarImage src="/avatar.png" alt="Ada Lovelace" />
+ *   <AvatarFallback>AL</AvatarFallback>
+ *   <AvatarStatus status="online" />
+ * </Avatar>
+ * ```
+ */
 function AvatarStatus({
   className,
   status = 'online',
-  'aria-hidden': ariaHidden = true,
+  label,
   ...props
 }: AvatarStatusProps) {
+  // cva types `status` as nullable; the destructure default only narrows
+  // `undefined`, so coerce the residual `null` for the label lookup.
+  const resolvedLabel = label ?? STATUS_LABELS[status ?? 'online'];
+
   return (
     <span
       data-slot="avatar-status"
       data-status={status}
-      aria-hidden={ariaHidden}
       className={cn(avatarStatusVariants({ status }), className)}
       {...props}
-    />
+    >
+      <span className="nx:sr-only">{resolvedLabel}</span>
+    </span>
   );
 }
 
@@ -283,8 +339,8 @@ function AvatarGroup({
       >
         {visibleItems}
         {overflowCount > 0 && (
-          <Avatar>
-            <AvatarFallback>+{overflowCount}</AvatarFallback>
+          <Avatar role="img" aria-label={`${overflowCount} more`}>
+            <AvatarFallback aria-hidden="true">+{overflowCount}</AvatarFallback>
           </Avatar>
         )}
       </div>
