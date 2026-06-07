@@ -3,7 +3,7 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
 import { SPACING_MODES } from '../../../stories/spacing-modes';
-import { expectHeightPinnedAcrossModes } from '../../../stories/test-utils';
+import { expectHeightFixedAcrossModes } from '../../../stories/test-utils';
 
 import { Badge } from './badge';
 
@@ -486,7 +486,7 @@ export const BadgeIsDensityStable: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel. Badge uses numeric `spacing-N` utilities only, so every spacing mode renders it at the same canonical 20px height (= `text-xs` line-height 16px + `py-0.5` 2×2). If a future PR introduces a `control-*` role utility on Badge, this test fails for that mode — the regression signal is that intent (numeric, mode-stable) has been broken.',
+          'Mode-invariance sentinel. Badge stays 20px in every density mode because its height = `text-xs` line-height 16px + `py-0.5` × 2, and `py-0.5` resolves to `spacing-0_5` = 2px — a small index that is identical across all modes (density cannot meaningfully shrink it). This flatness is the exception, not a rule: numeric spacing is not inherently mode-stable (`spacing-4` is 14/16/18 across nova/vega/maia). If Badge migrates onto a `control-*` role utility its height starts tracking density and this test fails for that mode — bump the expected px to the new canonical value.',
       },
     },
   },
@@ -504,7 +504,7 @@ export const BadgeIsDensityStable: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinnedAcrossModes(
+    await expectHeightFixedAcrossModes(
       within(canvasElement),
       ['badge-host-nova', 'badge-host-vega', 'badge-host-sera'],
       20,
