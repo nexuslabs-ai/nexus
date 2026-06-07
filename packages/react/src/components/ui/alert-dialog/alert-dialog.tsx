@@ -37,8 +37,8 @@ const alertDialogFooterVariants = cva('nx:flex nx:gap-2', {
   variants: {
     orientation: {
       horizontal:
-        'nx:flex-col-reverse nx:sm:flex-row nx:sm:items-center nx:sm:justify-end',
-      vertical: 'nx:flex-col-reverse nx:items-stretch nx:[&>*]:w-full',
+        'nx:flex-col nx:sm:flex-row nx:sm:items-center nx:sm:justify-end',
+      vertical: 'nx:flex-col nx:items-stretch nx:[&>*]:w-full',
     },
   },
   defaultVariants: {
