@@ -31,26 +31,13 @@ const alertVariants = cva(
       layout: {
         stack: '',
         inline:
-          'nx:grid nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:[&>[data-slot=alert-content]]:col-start-1 nx:[&>[data-slot=alert-actions]]:col-start-2 nx:[&>[data-slot=alert-actions]]:row-start-1 nx:[&>[data-slot=alert-actions]]:justify-self-end',
-      },
-      density: {
-        comfortable: '',
-        compact:
-          'nx:py-3 nx:[&>svg]:top-[calc(var(--nx-spacing-3)+(var(--nx-typography-line-height-sm)/2))]',
+          'nx:grid nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1',
       },
     },
-    compoundVariants: [
-      {
-        layout: 'inline',
-        density: 'compact',
-        className: 'nx:gap-x-3 nx:[&>svg]:top-1/2!',
-      },
-    ],
     defaultVariants: {
       variant: 'default',
       presentation: 'card',
       layout: 'stack',
-      density: 'comfortable',
     },
   }
 );
@@ -71,7 +58,10 @@ interface AlertProps
  * Use `presentation="banner"` for the edge-to-edge banner treatment (squared
  * corners, bottom border only).
  * Use `layout="inline"` with `AlertContent` and `AlertActions` when the alert
- * has trailing controls; add `density="compact"` for a tighter banner row.
+ * has trailing controls.
+ * In the default stack layout, use no actions, button actions, or button
+ * actions with `AlertClose`; avoid rendering `AlertClose` as the only action.
+ * Use `layout="inline"` for close-only dismissal.
  * Alerts are passive by default; pass `role="alert"` for urgent dynamic
  * messages or `role="status"` for polite status updates.
  *
@@ -102,7 +92,6 @@ function Alert({
   variant,
   presentation,
   layout,
-  density,
   ...props
 }: AlertProps) {
   return (
@@ -111,9 +100,8 @@ function Alert({
       data-variant={variant ?? 'default'}
       data-presentation={presentation ?? 'card'}
       data-layout={layout ?? 'stack'}
-      data-density={density ?? 'comfortable'}
       className={cn(
-        alertVariants({ variant, presentation, layout, density }),
+        alertVariants({ variant, presentation, layout }),
         className
       )}
       {...props}
@@ -146,7 +134,11 @@ function AlertContent({ className, ...props }: AlertContentProps) {
   return (
     <div
       data-slot="alert-content"
-      className={cn('nx:flex nx:min-w-0 nx:flex-col', className)}
+      className={cn(
+        'nx:flex nx:min-w-0 nx:flex-col',
+        'nx:group-data-[layout=inline]/alert:col-start-1',
+        className
+      )}
       {...props}
     />
   );
@@ -197,6 +189,7 @@ function AlertTitle({
       data-slot="alert-title"
       className={cn(
         'nx:mb-1 nx:typography-label-large nx:text-foreground',
+        'nx:group-data-[layout=inline]/alert:col-start-1',
         alertStatusTextClassName,
         className
       )}
@@ -232,6 +225,7 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
       data-slot="alert-description"
       className={cn(
         'nx:typography-body-small nx:text-muted-foreground nx:[&_p]:leading-relaxed',
+        'nx:group-data-[layout=inline]/alert:col-start-1',
         alertStatusTextClassName,
         className
       )}
@@ -251,6 +245,8 @@ interface AlertActionsProps extends React.ComponentProps<'div'> {}
  * AlertActions
  *
  * Holds one or two alert CTAs. Use the existing Button component for actions.
+ * In stack layout, `AlertClose` should accompany another action rather than sit
+ * alone below the message. For close-only dismissal, use `layout="inline"`.
  *
  * @example
  * ```tsx
@@ -266,7 +262,7 @@ function AlertActions({ className, ...props }: AlertActionsProps) {
       data-slot="alert-actions"
       className={cn(
         'nx:mt-3 nx:flex nx:flex-wrap nx:items-center nx:gap-2',
-        'nx:group-data-[layout=inline]/alert:mt-0 nx:group-data-[layout=inline]/alert:self-center nx:group-data-[layout=inline]/alert:pl-0!',
+        'nx:group-data-[layout=inline]/alert:col-start-2 nx:group-data-[layout=inline]/alert:row-start-1 nx:group-data-[layout=inline]/alert:mt-0 nx:group-data-[layout=inline]/alert:self-center nx:group-data-[layout=inline]/alert:justify-self-end nx:group-data-[layout=inline]/alert:pl-0!',
         className
       )}
       {...props}

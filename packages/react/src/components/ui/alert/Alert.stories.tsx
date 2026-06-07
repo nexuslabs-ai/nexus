@@ -35,10 +35,22 @@ const meta: Meta<typeof Alert> = {
   component: Alert,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+Alert is a composable callout for status, warning, error, success, or informational messages. The root controls status, presentation, and layout; icons, content, actions, and dismissal are composed with children.
+
+Action pattern rules:
+- Stack layout: valid with no actions, one or two button actions, or button action(s) plus AlertClose.
+- Stack layout: do not use AlertClose as the only action, because a lone close icon below the message is not an approved placement.
+- Inline layout: valid with close-only, one or two button actions, or button action(s) plus AlertClose.
+- Dismissal stays consumer-controlled. AlertClose only renders the control; it does not remove the alert by itself.
+        `,
+      },
+    },
   },
   args: {
     layout: 'stack',
-    density: 'comfortable',
     presentation: 'card',
     variant: 'default',
   },
@@ -47,27 +59,164 @@ const meta: Meta<typeof Alert> = {
       control: 'select',
       options: ['default', 'information', 'destructive', 'success', 'warning'],
       description: 'The visual style variant',
+      table: {
+        category: 'Controls',
+      },
     },
     presentation: {
       control: 'select',
       options: ['card', 'banner'],
       description: 'The alert presentation style',
+      table: {
+        category: 'Controls',
+      },
     },
     layout: {
       control: 'select',
       options: ['stack', 'inline'],
       description: 'The alert content/action arrangement',
-    },
-    density: {
-      control: 'select',
-      options: ['comfortable', 'compact'],
-      description: 'The alert spacing density',
+      table: {
+        category: 'Controls',
+      },
     },
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof Alert>;
+
+type PlaygroundIcon =
+  | 'none'
+  | 'information'
+  | 'warning'
+  | 'success'
+  | 'destructive';
+type PlaygroundActions =
+  | 'none'
+  | 'close'
+  | 'primary'
+  | 'primary + close'
+  | 'primary + secondary'
+  | 'primary + secondary + close';
+type PlaygroundStackActions = Exclude<PlaygroundActions, 'close'>;
+type PlaygroundButtonVariant = NonNullable<
+  React.ComponentProps<typeof Button>['variant']
+>;
+type PlaygroundStory = StoryObj<
+  React.ComponentProps<typeof Alert> & {
+    icon: PlaygroundIcon;
+    actionsInline: PlaygroundActions;
+    actionsStack: PlaygroundStackActions;
+    title: string;
+    description: string;
+    primaryActionLabel: string;
+    primaryActionVariant: PlaygroundButtonVariant;
+    secondaryActionLabel: string;
+    secondaryActionVariant: PlaygroundButtonVariant;
+  }
+>;
+
+function renderPlaygroundIcon(icon: PlaygroundIcon) {
+  if (icon === 'none') return null;
+  if (icon === 'destructive') {
+    return <IconAlertCircle aria-hidden="true" className="nx:size-4" />;
+  }
+  if (icon === 'success') {
+    return <IconCircleCheck aria-hidden="true" className="nx:size-4" />;
+  }
+  if (icon === 'warning') {
+    return <IconAlertTriangle aria-hidden="true" className="nx:size-4" />;
+  }
+
+  return <IconInfoCircle aria-hidden="true" className="nx:size-4" />;
+}
+
+function AlertPlaygroundExample({
+  actionsInline,
+  actionsStack,
+  description,
+  icon,
+  layout,
+  presentation,
+  primaryActionLabel,
+  primaryActionVariant,
+  secondaryActionLabel,
+  secondaryActionVariant,
+  title,
+  variant,
+}: React.ComponentProps<typeof Alert> & {
+  icon: PlaygroundIcon;
+  actionsInline: PlaygroundActions;
+  actionsStack: PlaygroundStackActions;
+  title: string;
+  description: string;
+  primaryActionLabel: string;
+  primaryActionVariant: PlaygroundButtonVariant;
+  secondaryActionLabel: string;
+  secondaryActionVariant: PlaygroundButtonVariant;
+}) {
+  const [visible, setVisible] = React.useState(true);
+  const actions = layout === 'inline' ? actionsInline : actionsStack;
+  const hasPrimaryAction = actions.includes('primary');
+  const hasSecondaryAction = actions.includes('secondary');
+  const hasCloseAction = actions.includes('close');
+  const hasActions = actions !== 'none';
+
+  React.useEffect(() => {
+    setVisible(true);
+  }, [
+    actionsInline,
+    actionsStack,
+    description,
+    icon,
+    layout,
+    presentation,
+    primaryActionLabel,
+    primaryActionVariant,
+    secondaryActionLabel,
+    secondaryActionVariant,
+    title,
+    variant,
+  ]);
+
+  if (!visible) {
+    return (
+      <Button variant="outline" onClick={() => setVisible(true)}>
+        Reset alert
+      </Button>
+    );
+  }
+
+  return (
+    <Alert
+      layout={layout}
+      presentation={presentation}
+      variant={variant}
+      className="nx:max-w-2xl"
+    >
+      {renderPlaygroundIcon(icon)}
+      <AlertContent>
+        <AlertTitle>{title}</AlertTitle>
+        <AlertDescription>{description}</AlertDescription>
+      </AlertContent>
+      {hasActions ? (
+        <AlertActions>
+          {hasPrimaryAction ? (
+            <Button variant={primaryActionVariant}>{primaryActionLabel}</Button>
+          ) : null}
+          {hasSecondaryAction ? (
+            <Button variant={secondaryActionVariant}>
+              {secondaryActionLabel}
+            </Button>
+          ) : null}
+          {hasCloseAction ? (
+            <AlertClose onClick={() => setVisible(false)} />
+          ) : null}
+        </AlertActions>
+      ) : null}
+    </Alert>
+  );
+}
 
 function DismissibleCloseButtonExample(
   props: React.ComponentProps<typeof Alert>
@@ -105,6 +254,164 @@ export const Default: Story = {
       </AlertDescription>
     </Alert>
   ),
+};
+
+export const Playground: PlaygroundStory = {
+  args: {
+    actionsInline: 'primary + close',
+    actionsStack: 'primary + close',
+    icon: 'information',
+    layout: 'inline',
+    presentation: 'card',
+    primaryActionLabel: 'Manage',
+    primaryActionVariant: 'outline',
+    secondaryActionLabel: 'View details',
+    secondaryActionVariant: 'ghost',
+    title: 'Storage almost full',
+    description: 'Uploads may fail soon.',
+    variant: 'information',
+  },
+  argTypes: {
+    actionsInline: {
+      name: 'actions (inline story only)',
+      control: 'select',
+      options: [
+        'none',
+        'close',
+        'primary',
+        'primary + close',
+        'primary + secondary',
+        'primary + secondary + close',
+      ],
+      description:
+        'Story-only inline action pattern. Inline permits close-only, one action, two actions, and close combinations.',
+      table: {
+        category: 'Controls',
+      },
+      if: {
+        arg: 'layout',
+        eq: 'inline',
+      },
+    },
+    actionsStack: {
+      name: 'actions (stack story only)',
+      control: 'select',
+      options: [
+        'none',
+        'primary',
+        'primary + close',
+        'primary + secondary',
+        'primary + secondary + close',
+      ],
+      description:
+        'Story-only stack action pattern. Close-only is intentionally omitted because the lone close icon should not sit below the message.',
+      table: {
+        category: 'Controls',
+      },
+      if: {
+        arg: 'layout',
+        eq: 'stack',
+      },
+    },
+    icon: {
+      name: 'icon (story only)',
+      control: 'select',
+      options: ['none', 'information', 'warning', 'success', 'destructive'],
+      description:
+        'Story-only control that renders an icon child before AlertContent.',
+      table: {
+        category: 'Controls',
+      },
+    },
+    title: {
+      control: 'text',
+      description: 'Story-only alert title text.',
+      table: {
+        category: 'Controls',
+      },
+    },
+    description: {
+      control: 'text',
+      description: 'Story-only alert description text.',
+      table: {
+        category: 'Controls',
+      },
+    },
+    primaryActionLabel: {
+      name: 'primary label (story only)',
+      control: 'text',
+      description: 'Story-only primary Button children.',
+      table: {
+        category: 'Controls',
+      },
+    },
+    primaryActionVariant: {
+      name: 'primary variant (story only)',
+      control: 'select',
+      options: ['default', 'destructive', 'outline', 'secondary', 'ghost'],
+      description: 'Story-only primary Button variant.',
+      table: {
+        category: 'Controls',
+      },
+    },
+    secondaryActionLabel: {
+      name: 'secondary label (story only)',
+      control: 'text',
+      description: 'Story-only secondary Button children.',
+      table: {
+        category: 'Controls',
+      },
+    },
+    secondaryActionVariant: {
+      name: 'secondary variant (story only)',
+      control: 'select',
+      options: ['default', 'destructive', 'outline', 'secondary', 'ghost'],
+      description: 'Story-only secondary Button variant.',
+      table: {
+        category: 'Controls',
+      },
+    },
+  },
+  parameters: {
+    controls: {
+      sort: 'alpha',
+    },
+    docs: {
+      description: {
+        story:
+          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. The visible action control changes by layout so stack omits the invalid close-only pattern while inline keeps it available.',
+      },
+      source: {
+        code: `<Alert variant="information" layout="inline">
+  <IconInfoCircle aria-hidden="true" />
+  <AlertContent>
+    <AlertTitle>Storage almost full</AlertTitle>
+    <AlertDescription>Uploads may fail soon.</AlertDescription>
+  </AlertContent>
+  <AlertActions>
+    <Button variant="outline">Manage</Button>
+    <AlertClose onClick={() => setVisible(false)} />
+  </AlertActions>
+</Alert>`,
+      },
+    },
+  },
+  render: (args) => <AlertPlaygroundExample {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const alert = canvasElement.querySelector('[data-slot="alert"]');
+    const content = canvasElement.querySelector('[data-slot="alert-content"]');
+    const actions = canvasElement.querySelector('[data-slot="alert-actions"]');
+    const close = canvas.getByRole('button', { name: 'Dismiss alert' });
+    const primaryAction = canvas.getByRole('button', { name: 'Manage' });
+
+    await expect(alert).toBeInTheDocument();
+    await expect(alert).toHaveAttribute('data-layout', 'inline');
+    await expect(content).toBeInTheDocument();
+    await expect(actions).toBeInTheDocument();
+    await expect(close).toBeInTheDocument();
+    await expect(primaryAction).toBeInTheDocument();
+  },
 };
 
 export const Destructive: Story = {
@@ -494,10 +801,9 @@ export const BannerInlineActions: Story = {
   ),
 };
 
-export const CompactHelperBanner: Story = {
+export const HelperBanner: Story = {
   args: {
     layout: 'inline',
-    density: 'compact',
     presentation: 'banner',
     variant: 'information',
   },
@@ -525,7 +831,6 @@ export const CompactHelperBanner: Story = {
 
     await expect(alert).toBeInTheDocument();
     await expect(alert).toHaveAttribute('data-layout', 'inline');
-    await expect(alert).toHaveAttribute('data-density', 'compact');
   },
 };
 
@@ -612,7 +917,7 @@ export const WithDataAttributes: Story = {
     await expect(alert).toHaveAttribute('data-variant', 'destructive');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
     await expect(alert).toHaveAttribute('data-layout', 'stack');
-    await expect(alert).toHaveAttribute('data-density', 'comfortable');
+    await expect(alert).not.toHaveAttribute('data-density');
     await expect(alert).not.toHaveAttribute('role');
     await expect(title).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
@@ -661,7 +966,7 @@ export const DefaultDataAttributes: Story = {
     await expect(alert).toBeInTheDocument();
     await expect(alert).toHaveAttribute('data-variant', 'default');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
-    await expect(alert).toHaveAttribute('data-density', 'comfortable');
+    await expect(alert).not.toHaveAttribute('data-density');
     await expect(alert).not.toHaveAttribute('role');
   },
 };
