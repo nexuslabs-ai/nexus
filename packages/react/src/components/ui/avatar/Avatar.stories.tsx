@@ -9,6 +9,7 @@ import {
   AvatarImage,
   AvatarStatus,
 } from './avatar';
+import { STARTER_AVATARS } from './avatar-fixtures';
 
 const meta: Meta<typeof Avatar> = {
   title: 'Components/Avatar',
@@ -51,27 +52,18 @@ const AVATAR_SIZES = [
 
 const STATUS_VALUES = ['online', 'away', 'busy', 'offline'] as const;
 
-const TEAM = [
-  { name: 'Ada Lovelace', initials: 'AL' },
-  { name: 'Grace Hopper', initials: 'GH' },
-  { name: 'Katherine Johnson', initials: 'KJ' },
-  { name: 'Mary Jackson', initials: 'MJ' },
-  { name: 'Dorothy Vaughan', initials: 'DV' },
-] as const;
+// The 5 starter portraits double as the demo team roster.
+const TEAM = STARTER_AVATARS;
 
-const AVATAR_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-    <rect width="120" height="120" fill="#dbeafe"/>
-    <circle cx="60" cy="48" r="24" fill="#60a5fa"/>
-    <path d="M24 112c7-29 65-29 72 0" fill="#1d4ed8"/>
-  </svg>
-`)}`;
+// Default single-avatar fixture (Ada) for the size / shape / state stories.
+const AVATAR_URL = STARTER_AVATARS[0].src;
 
+// Deliberately wide (2:1) source so CroppedImage can demonstrate object-fit: cover.
 const WIDE_AVATAR_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90">
-    <rect width="180" height="90" fill="#dcfce7"/>
-    <circle cx="45" cy="45" r="28" fill="#22c55e"/>
-    <rect x="88" y="16" width="68" height="58" rx="12" fill="#166534"/>
+    <rect width="180" height="90" fill="#ddd6fe"/>
+    <circle cx="45" cy="45" r="28" fill="#a78bfa"/>
+    <rect x="88" y="16" width="68" height="58" rx="12" fill="#7c3aed"/>
   </svg>
 `)}`;
 
@@ -90,7 +82,7 @@ function TeamAvatar({
 }) {
   return (
     <Avatar>
-      <AvatarImage src={AVATAR_URL} alt={person.name} />
+      <AvatarImage src={person.src} alt={person.name} />
       <AvatarFallback>{person.initials}</AvatarFallback>
       {status ? <AvatarStatus status={status} /> : null}
     </Avatar>
@@ -185,6 +177,33 @@ export const StandaloneFallbackAccessible: Story = {
 
     await expect(avatar).toHaveAttribute('data-slot', 'avatar');
   },
+};
+
+// ============================================
+// ILLUSTRATED VARIANTS
+// ============================================
+
+export const StarterVariants: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-6">
+      {STARTER_AVATARS.map((person) => (
+        <div
+          key={person.name}
+          className="nx:flex nx:flex-col nx:items-center nx:gap-2"
+        >
+          <Avatar size="xl">
+            <AvatarImage src={person.src} alt="" />
+            <AvatarFallback aria-hidden="true">
+              {person.initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="nx:text-xs nx:text-muted-foreground">
+            {person.name}
+          </span>
+        </div>
+      ))}
+    </div>
+  ),
 };
 
 // ============================================
