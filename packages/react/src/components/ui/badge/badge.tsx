@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { devWarn } from '@/lib/dev-warn';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
@@ -133,7 +134,7 @@ const badgeVariants = cva(
 );
 
 const badgeCapsClasses =
-  'nx:typography-label-caps nx:font-semibold nx:tracking-[0.8px] nx:uppercase nx:px-2 nx:py-1';
+  'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-1';
 
 const badgeSentenceClasses = 'nx:typography-label-default nx:px-2.5 nx:py-1';
 
@@ -144,25 +145,6 @@ const badgeIconOnlyClasses = 'nx:h-5 nx:min-w-5 nx:p-0';
 
 const badgeIconClasses =
   'nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5';
-
-const badgeIconStyles: React.CSSProperties = { width: 14, height: 14 };
-
-type BadgeIconElementProps = {
-  style?: React.CSSProperties;
-};
-
-function renderBadgeIcon(icon: React.ReactNode) {
-  if (!React.isValidElement<BadgeIconElementProps>(icon)) {
-    return icon;
-  }
-
-  return React.cloneElement(icon, {
-    style: {
-      ...icon.props.style,
-      ...badgeIconStyles,
-    },
-  });
-}
 
 interface BadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
@@ -227,6 +209,12 @@ function Badge({
   const showLeftIcon = leftIcon && !isNumber && !isIconOnly;
   const showRightIcon = rightIcon && !isNumber && !isIconOnly;
 
+  devWarn(
+    isIconOnly &&
+      !(props['aria-label'] ?? props['aria-labelledby'] ?? props.title),
+    'Badge: an icon-only badge (no children) has no visible text — pass `aria-label`, `aria-labelledby`, or `title` so assistive tech can name it.'
+  );
+
   const classes = cn(
     badgeVariants({ variant, fill }),
     isNumber
@@ -250,18 +238,10 @@ function Badge({
       className={classes}
       {...props}
     >
-      {isIconOnly && (
-        <span className={badgeIconClasses}>
-          {renderBadgeIcon(iconOnlyIcon)}
-        </span>
-      )}
-      {showLeftIcon && (
-        <span className={badgeIconClasses}>{renderBadgeIcon(leftIcon)}</span>
-      )}
+      {isIconOnly && <span className={badgeIconClasses}>{iconOnlyIcon}</span>}
+      {showLeftIcon && <span className={badgeIconClasses}>{leftIcon}</span>}
       {children}
-      {showRightIcon && (
-        <span className={badgeIconClasses}>{renderBadgeIcon(rightIcon)}</span>
-      )}
+      {showRightIcon && <span className={badgeIconClasses}>{rightIcon}</span>}
     </span>
   );
 }

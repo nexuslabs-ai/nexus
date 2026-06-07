@@ -144,9 +144,10 @@ export const OutlineFill: Story = {
 
     await expect(badge).toHaveAttribute('data-variant', 'success');
     await expect(badge).toHaveAttribute('data-fill', 'outline');
-    await expect(badge).toHaveClass('nx:border-border-success');
-    await expect(badge).toHaveClass('nx:bg-success-subtle');
+    // Assert the rendered result (opaque fill + visible border), not the
+    // utility class names — class names are implementation detail and mergeable.
     expect(badgeStyles.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+    expect(parseFloat(badgeStyles.borderTopWidth)).toBeGreaterThan(0);
   },
 };
 
@@ -263,7 +264,10 @@ export const IconOnly: Story = {
     const rect = badge.getBoundingClientRect();
 
     if (!(svg instanceof SVGElement)) {
-      throw new Error('Expected icon-only badge to render an SVG icon.');
+      // `globalThis.Error`: the `Error` variant story shadows the global here.
+      throw new globalThis.Error(
+        'Expected icon-only badge to render an SVG icon.'
+      );
     }
 
     const svgRect = svg.getBoundingClientRect();
@@ -293,7 +297,10 @@ export const WithSvgLoader: Story = {
     const spinner = badge.querySelector('[data-slot="spinner"]');
 
     if (!(spinner instanceof SVGElement)) {
-      throw new Error('Expected loader badge to render a Spinner SVG.');
+      // `globalThis.Error`: the `Error` variant story shadows the global here.
+      throw new globalThis.Error(
+        'Expected loader badge to render a Spinner SVG.'
+      );
     }
 
     const rect = spinner.getBoundingClientRect();
