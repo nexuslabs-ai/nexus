@@ -35,7 +35,8 @@ const alertVariants = cva(
       },
       density: {
         comfortable: '',
-        compact: 'nx:py-3',
+        compact:
+          'nx:py-3 nx:[&>svg]:top-[calc(var(--nx-spacing-3)+(var(--nx-typography-line-height-sm)/2))]',
       },
     },
     compoundVariants: [
