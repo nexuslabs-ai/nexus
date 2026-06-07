@@ -132,7 +132,6 @@ export const Centered: Story = {
       </AlertDialogTrigger>
       <AlertDialogContent
         variant="center"
-        content={false}
         title="Dialog Title"
         description="Make changes to your profile here. Click save when you're done."
       >
@@ -154,7 +153,6 @@ export const Centered: Story = {
     const dialog = await within(document.body).findByRole('alertdialog');
     await expect(dialog).toHaveAttribute('data-variant', 'center');
     await expect(dialog).toHaveAttribute('data-button-orientation', 'vertical');
-    await expect(dialog).toHaveAttribute('data-content', 'false');
 
     const header = document.querySelector('[data-slot="alert-dialog-header"]');
     const footer = document.querySelector('[data-slot="alert-dialog-footer"]');
@@ -499,7 +497,6 @@ export const WithDataAttributes: Story = {
       'data-button-orientation',
       'horizontal'
     );
-    await expect(content).toHaveAttribute('data-content', 'true');
 
     const header = document.querySelector('[data-slot="alert-dialog-header"]');
     await expect(header).toHaveAttribute('data-variant', 'default');
@@ -591,7 +588,6 @@ export const AllVariants: Story = {
           </AlertDialogTrigger>
           <AlertDialogContent
             variant="center"
-            content={false}
             title="Dialog Title"
             description="Make changes to your profile here. Click save when you're done."
           >

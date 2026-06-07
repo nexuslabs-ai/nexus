@@ -18,24 +18,13 @@ const alertDialogContentVariants = cva(
     'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
     'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
     'nx:sm:rounded-lg',
-  ].join(' '),
-  {
-    variants: {
-      variant: {
-        default: '',
-        center: '',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-    },
-  }
+  ].join(' ')
 );
 
 const alertDialogHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1', {
   variants: {
     variant: {
-      default: 'nx:text-left',
+      default: 'nx:text-center nx:sm:text-left',
       center: 'nx:items-center nx:text-center',
     },
   },
@@ -47,7 +36,8 @@ const alertDialogHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1', {
 const alertDialogFooterVariants = cva('nx:flex nx:gap-2', {
   variants: {
     orientation: {
-      horizontal: 'nx:flex-row nx:items-center nx:justify-end',
+      horizontal:
+        'nx:flex-col-reverse nx:sm:flex-row nx:sm:items-center nx:sm:justify-end',
       vertical: 'nx:flex-col-reverse nx:items-stretch nx:[&>*]:w-full',
     },
   },
@@ -57,7 +47,7 @@ const alertDialogFooterVariants = cva('nx:flex nx:gap-2', {
 });
 
 type AlertDialogVariant = NonNullable<
-  VariantProps<typeof alertDialogContentVariants>['variant']
+  VariantProps<typeof alertDialogHeaderVariants>['variant']
 >;
 type AlertDialogButtonOrientation = NonNullable<
   VariantProps<typeof alertDialogFooterVariants>['orientation']
@@ -164,13 +154,10 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
  *
  * Props for the AlertDialogContent component.
  */
-interface AlertDialogContentProps
-  extends
-    Omit<
-      React.ComponentProps<typeof AlertDialogPrimitive.Content>,
-      'content' | 'title'
-    >,
-    VariantProps<typeof alertDialogContentVariants> {
+interface AlertDialogContentProps extends Omit<
+  React.ComponentProps<typeof AlertDialogPrimitive.Content>,
+  'title'
+> {
   /**
    * Layout variant for the alert dialog content.
    *
@@ -181,16 +168,15 @@ interface AlertDialogContentProps
   variant?: AlertDialogVariant;
 
   /**
-   * Optional title rendered before `children`.
-   * Use this for prop-driven alert dialogs; composed `AlertDialogHeader`
-   * children still work as before.
+   * Optional title for a prop-driven header, rendered before `children`.
+   * Ignored when a composed `AlertDialogHeader` child is present — composed
+   * children take precedence, so only one header (one Radix `Title`) renders.
    */
   title?: React.ReactNode;
 
   /**
-   * Optional description rendered before `children`.
-   * Use this for prop-driven alert dialogs; composed `AlertDialogDescription`
-   * children still work as before.
+   * Optional description for a prop-driven header, rendered before `children`.
+   * Ignored when a composed `AlertDialogHeader` child is present.
    */
   description?: React.ReactNode;
 
@@ -198,12 +184,6 @@ interface AlertDialogContentProps
    * Optional body content rendered between the generated header and `children`.
    */
   body?: React.ReactNode;
-
-  /**
-   * Whether to render `body`.
-   * @default true
-   */
-  content?: boolean;
 
   /**
    * Footer button orientation inherited by `AlertDialogFooter`.
@@ -240,41 +220,36 @@ function AlertDialogContent({
   title,
   description,
   body,
-  content = true,
   buttonOrientation,
   ...props
 }: AlertDialogContentProps) {
-  const resolvedVariant = variant ?? 'default';
   const resolvedButtonOrientation = resolveButtonOrientation(
-    resolvedVariant,
+    variant,
     buttonOrientation
   );
-  const hasGeneratedHeader = title != null || description != null;
+  const hasComposedHeader = React.Children.toArray(children).some(
+    (child) => React.isValidElement(child) && child.type === AlertDialogHeader
+  );
+  const showGeneratedHeader =
+    !hasComposedHeader && (title != null || description != null);
 
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
       <AlertDialogLayoutContext.Provider
-        value={{
-          variant: resolvedVariant,
-          buttonOrientation: resolvedButtonOrientation,
-        }}
+        value={{ variant, buttonOrientation: resolvedButtonOrientation }}
       >
         <AlertDialogPrimitive.Content
           data-slot="alert-dialog-content"
-          data-variant={resolvedVariant}
+          data-variant={variant}
           data-button-orientation={resolvedButtonOrientation}
-          data-content={content}
-          className={cn(
-            alertDialogContentVariants({ variant: resolvedVariant }),
-            className
-          )}
+          className={cn(alertDialogContentVariants(), className)}
           {...props}
         >
-          {hasGeneratedHeader && (
+          {showGeneratedHeader && (
             <AlertDialogHeader title={title} description={description} />
           )}
-          {content && body != null && (
+          {body != null && (
             <div data-slot="alert-dialog-body" className="nx:grid nx:gap-2">
               {body}
             </div>
@@ -360,10 +335,7 @@ function AlertDialogHeader({
  *
  * Props for the AlertDialogFooter component.
  */
-interface AlertDialogFooterProps
-  extends
-    React.ComponentProps<'div'>,
-    VariantProps<typeof alertDialogFooterVariants> {}
+interface AlertDialogFooterProps extends React.ComponentProps<'div'> {}
 
 /**
  * AlertDialogFooter
@@ -378,23 +350,15 @@ interface AlertDialogFooterProps
  * </AlertDialogFooter>
  * ```
  */
-function AlertDialogFooter({
-  className,
-  orientation,
-  ...props
-}: AlertDialogFooterProps) {
+function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
   const layout = React.useContext(AlertDialogLayoutContext);
-  const resolvedOrientation =
-    layout.variant === 'center'
-      ? 'vertical'
-      : (orientation ?? layout.buttonOrientation);
 
   return (
     <div
       data-slot="alert-dialog-footer"
-      data-orientation={resolvedOrientation}
+      data-orientation={layout.buttonOrientation}
       className={cn(
-        alertDialogFooterVariants({ orientation: resolvedOrientation }),
+        alertDialogFooterVariants({ orientation: layout.buttonOrientation }),
         className
       )}
       {...props}
