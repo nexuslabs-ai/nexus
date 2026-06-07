@@ -49,15 +49,9 @@ export default defineConfig({
             configDir: path.resolve(__dirname, 'packages/react/.storybook'),
             // Auto-start Storybook in watch mode for debugging links
             storybookScript: 'pnpm storybook --no-open',
-            // Explicitly include all stories (test tag is auto-applied)
-            // Use exclude/skip for stories that shouldn't run
-            tags: {
-              include: ['test'],
-              exclude: [],
-              skip: [],
-            },
           }),
         ],
+        root: path.resolve(__dirname, 'packages/react'),
         test: {
           name: 'storybook',
           browser: {
@@ -66,7 +60,12 @@ export default defineConfig({
             headless: true,
             instances: [{ browser: 'chromium' }],
           },
-          setupFiles: ['./packages/react/.storybook/vitest.setup.ts'],
+          setupFiles: [
+            path.resolve(
+              __dirname,
+              'packages/react/.storybook/vitest.setup.ts'
+            ),
+          ],
         },
       },
     ],
@@ -77,7 +76,9 @@ export default defineConfig({
     // Timeout
     testTimeout: 10000,
 
-    // Don't fail when no tests found (useful during setup)
-    passWithNoTests: true,
+    // Fail loudly if a project collects zero tests. A 0-collection in the
+    // storybook project was silently green for months (root/path mismatch);
+    // both projects now collect (unit + storybook), so a future 0 is a real bug.
+    passWithNoTests: false,
   },
 });
