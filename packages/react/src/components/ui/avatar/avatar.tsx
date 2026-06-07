@@ -29,6 +29,18 @@ const avatarVariants = cva('nx:relative nx:flex nx:shrink-0', {
   },
 });
 
+type AvatarGroupContextValue = Pick<
+  VariantProps<typeof avatarVariants>,
+  'size' | 'shape'
+>;
+
+// Lets an AvatarGroup size/shape its members in one place — Avatar reads this
+// when its own `size`/`shape` is unset, so it propagates even through wrapper
+// components. An explicit prop on the Avatar always wins.
+const AvatarGroupContext = React.createContext<AvatarGroupContextValue | null>(
+  null
+);
+
 /**
  * AvatarProps
  *
@@ -83,16 +95,20 @@ function Avatar({
   ring = false,
   ...props
 }: AvatarProps) {
+  const group = React.useContext(AvatarGroupContext);
+  const resolvedSize = size ?? group?.size;
+  const resolvedShape = shape ?? group?.shape;
+
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
-      data-size={size}
-      data-shape={shape}
+      data-size={resolvedSize}
+      data-shape={resolvedShape}
       data-ring={ring || undefined}
       className={cn(
-        avatarVariants({ size, shape }),
+        avatarVariants({ size: resolvedSize, shape: resolvedShape }),
         ring &&
-          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-background',
+          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-[color:var(--avatar-surface,var(--nx-color-background))]',
         className
       )}
       {...props}
@@ -168,7 +184,7 @@ function AvatarFallback({ className, ...props }: AvatarFallbackProps) {
 }
 
 const avatarStatusVariants = cva(
-  'nx:absolute nx:right-[0.04em] nx:bottom-[0.04em] nx:size-[0.6em] nx:rounded-full nx:ring-2 nx:ring-background',
+  'nx:absolute nx:right-[0.04em] nx:bottom-[0.04em] nx:size-[0.6em] nx:rounded-full nx:ring-[0.1em] nx:ring-[color:var(--avatar-surface,var(--nx-color-background))]',
   {
     variants: {
       status: {
@@ -206,42 +222,61 @@ function AvatarStatus({
   );
 }
 
-interface AvatarGroupProps extends React.ComponentProps<'div'> {
+interface AvatarGroupProps
+  extends
+    React.ComponentProps<'div'>,
+    Pick<VariantProps<typeof avatarVariants>, 'size' | 'shape'> {
   /**
    * Maximum number of avatars to render before collapsing the remainder into a
    * +N tile.
    * @default undefined
    * @example
    * ```tsx
-   * <AvatarGroup max={3}>{avatars}</AvatarGroup>
+   * <AvatarGroup size="lg" max={3}>{avatars}</AvatarGroup>
    * ```
    */
   max?: number;
 }
 
-function AvatarGroup({ className, children, max, ...props }: AvatarGroupProps) {
+function AvatarGroup({
+  className,
+  children,
+  max,
+  size,
+  shape,
+  ...props
+}: AvatarGroupProps) {
   const items = React.Children.toArray(children);
   const hasMax = typeof max === 'number' && max > 0;
   const visibleItems = hasMax ? items.slice(0, max) : items;
   const overflowCount = hasMax ? items.length - visibleItems.length : 0;
+  const groupContext = React.useMemo(() => ({ size, shape }), [size, shape]);
 
   return (
-    <div
-      data-slot="avatar-group"
-      className={cn(
-        'nx:flex nx:items-center nx:[&>[data-slot=avatar]+[data-slot=avatar]]:-ms-2',
-        'nx:[&>[data-slot=avatar]]:relative nx:[&>[data-slot=avatar]]:ring-2 nx:[&>[data-slot=avatar]]:ring-background',
-        className
-      )}
-      {...props}
-    >
-      {visibleItems}
-      {overflowCount > 0 && (
-        <Avatar data-slot="avatar">
-          <AvatarFallback>+{overflowCount}</AvatarFallback>
-        </Avatar>
-      )}
-    </div>
+    <AvatarGroupContext.Provider value={groupContext}>
+      <div
+        data-slot="avatar-group"
+        data-size={size}
+        data-shape={shape}
+        className={cn(
+          'nx:flex nx:items-center',
+          // Overlap scales with each avatar's font-size (set per size), so the
+          // tuck stays ~proportional from 2xs to 4xl instead of a fixed px.
+          'nx:[&>[data-slot=avatar]+[data-slot=avatar]]:-ms-[0.7em]',
+          'nx:[&>[data-slot=avatar]]:relative',
+          'nx:[&>[data-slot=avatar]]:ring-[0.1em] nx:[&>[data-slot=avatar]]:ring-[color:var(--avatar-surface,var(--nx-color-background))]',
+          className
+        )}
+        {...props}
+      >
+        {visibleItems}
+        {overflowCount > 0 && (
+          <Avatar>
+            <AvatarFallback>+{overflowCount}</AvatarFallback>
+          </Avatar>
+        )}
+      </div>
+    </AvatarGroupContext.Provider>
   );
 }
 

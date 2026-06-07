@@ -410,6 +410,71 @@ export const GroupWithMax: Story = {
   },
 };
 
+export const GroupSizes: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A group sizes its members — and the `+N` overflow tile — in one place via `size`, and the overlap scales with that size. Members inherit it through the `TeamAvatar` wrapper via the size context.',
+      },
+    },
+  },
+  render: (_args) => (
+    <div className="nx:flex nx:flex-col nx:gap-6">
+      {(['sm', 'md', 'lg'] as const).map((size) => (
+        <AvatarGroup
+          key={size}
+          size={size}
+          max={3}
+          role="group"
+          aria-label={`Project team ${size}`}
+        >
+          {TEAM.map((person) => (
+            <TeamAvatar key={person.name} person={person} />
+          ))}
+        </AvatarGroup>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const lgGroup = canvas.getByRole('group', { name: 'Project team lg' });
+    const avatars = lgGroup.querySelectorAll('[data-slot="avatar"]');
+
+    // Members inherit the group size through the TeamAvatar wrapper (context).
+    await expect(avatars[0]).toHaveAttribute('data-size', 'lg');
+    // The +N overflow tile inherits it too — no hardcoded md mismatch.
+    const overflow = within(lgGroup)
+      .getByText('+2')
+      .closest('[data-slot="avatar"]');
+    await expect(overflow).toHaveAttribute('data-size', 'lg');
+  },
+};
+
+export const OnContainerSurface: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Avatars on a `container` surface (e.g. a card). The separator and status rings read `--avatar-surface` — set here to the container colour — so they match the card instead of leaving a `background`-coloured halo.',
+      },
+    },
+  },
+  render: (_args) => (
+    <div className="nx:rounded-xl nx:bg-container nx:p-6 nx:[--avatar-surface:var(--nx-color-container)]">
+      <AvatarGroup max={4} role="group" aria-label="Team on a card">
+        {TEAM.map((person, index) => (
+          <TeamAvatar
+            key={person.name}
+            person={person}
+            status={STATUS_VALUES[index % STATUS_VALUES.length]}
+          />
+        ))}
+      </AvatarGroup>
+    </div>
+  ),
+};
+
 // ============================================
 // DATA ATTRIBUTES TESTS
 // ============================================
