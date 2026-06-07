@@ -38,6 +38,7 @@ const meta: Meta<typeof Alert> = {
   },
   args: {
     layout: 'stack',
+    density: 'comfortable',
     presentation: 'card',
     variant: 'default',
   },
@@ -54,8 +55,13 @@ const meta: Meta<typeof Alert> = {
     },
     layout: {
       control: 'select',
-      options: ['stack', 'inline', 'dense'],
-      description: 'The alert content/action layout',
+      options: ['stack', 'inline'],
+      description: 'The alert content/action arrangement',
+    },
+    density: {
+      control: 'select',
+      options: ['comfortable', 'compact'],
+      description: 'The alert spacing density',
     },
   },
 };
@@ -488,9 +494,10 @@ export const BannerInlineActions: Story = {
   ),
 };
 
-export const DenseHelperBanner: Story = {
+export const CompactHelperBanner: Story = {
   args: {
-    layout: 'dense',
+    layout: 'inline',
+    density: 'compact',
     presentation: 'banner',
     variant: 'information',
   },
@@ -513,6 +520,13 @@ export const DenseHelperBanner: Story = {
       </AlertActions>
     </Alert>
   ),
+  play: async ({ canvasElement }) => {
+    const alert = canvasElement.querySelector('[data-slot="alert"]');
+
+    await expect(alert).toBeInTheDocument();
+    await expect(alert).toHaveAttribute('data-layout', 'inline');
+    await expect(alert).toHaveAttribute('data-density', 'compact');
+  },
 };
 
 export const CustomCloseIconLabel: Story = {
@@ -526,11 +540,11 @@ export const CustomCloseIconLabel: Story = {
       <AlertContent>
         <AlertTitle>Custom close icon</AlertTitle>
         <AlertDescription>
-          Icon-only custom children keep a fallback accessible name.
+          Icon-only custom children need an explicit accessible name.
         </AlertDescription>
       </AlertContent>
       <AlertActions>
-        <AlertClose>
+        <AlertClose aria-label="Dismiss alert">
           <IconX aria-hidden="true" />
         </AlertClose>
       </AlertActions>
@@ -542,6 +556,36 @@ export const CustomCloseIconLabel: Story = {
 
     await expect(close).toBeInTheDocument();
     await expect(close).toHaveAttribute('aria-label', 'Dismiss alert');
+  },
+};
+
+export const TextCloseLabel: Story = {
+  args: {
+    layout: 'inline',
+    variant: 'information',
+  },
+  render: (args) => (
+    <Alert {...args} className="nx:max-w-xl">
+      <IconInfoCircle aria-hidden="true" className="nx:size-4" />
+      <AlertContent>
+        <AlertTitle>Text close control</AlertTitle>
+        <AlertDescription>
+          Text children self-label, so the button keeps its visible name.
+        </AlertDescription>
+      </AlertContent>
+      <AlertActions>
+        <AlertClose className="nx:size-auto nx:px-2 nx:typography-label-small">
+          Close
+        </AlertClose>
+      </AlertActions>
+    </Alert>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const close = canvas.getByRole('button', { name: 'Close' });
+
+    await expect(close).toBeInTheDocument();
+    await expect(close).not.toHaveAttribute('aria-label');
   },
 };
 
@@ -568,6 +612,7 @@ export const WithDataAttributes: Story = {
     await expect(alert).toHaveAttribute('data-variant', 'destructive');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
     await expect(alert).toHaveAttribute('data-layout', 'stack');
+    await expect(alert).toHaveAttribute('data-density', 'comfortable');
     await expect(alert).not.toHaveAttribute('role');
     await expect(title).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
@@ -616,6 +661,7 @@ export const DefaultDataAttributes: Story = {
     await expect(alert).toBeInTheDocument();
     await expect(alert).toHaveAttribute('data-variant', 'default');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
+    await expect(alert).toHaveAttribute('data-density', 'comfortable');
     await expect(alert).not.toHaveAttribute('role');
   },
 };

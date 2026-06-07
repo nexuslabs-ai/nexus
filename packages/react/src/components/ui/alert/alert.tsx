@@ -31,15 +31,25 @@ const alertVariants = cva(
       layout: {
         stack: '',
         inline:
-          'nx:grid nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:[&>[data-slot=alert-content]]:col-start-1 nx:[&>[data-slot=alert-title]]:col-start-1 nx:[&>[data-slot=alert-description]]:col-start-1 nx:[&>[data-slot=alert-actions]]:col-start-2 nx:[&>[data-slot=alert-actions]]:row-start-1 nx:[&>[data-slot=alert-actions]]:justify-self-end',
-        dense:
-          'nx:grid nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-3 nx:gap-y-1 nx:py-3 nx:[&>svg]:top-1/2! nx:[&>[data-slot=alert-content]]:col-start-1 nx:[&>[data-slot=alert-title]]:col-start-1 nx:[&>[data-slot=alert-description]]:col-start-1 nx:[&>[data-slot=alert-actions]]:col-start-2 nx:[&>[data-slot=alert-actions]]:row-start-1 nx:[&>[data-slot=alert-actions]]:justify-self-end',
+          'nx:grid nx:grid-cols-[minmax(0,1fr)_auto] nx:items-center nx:gap-x-4 nx:gap-y-1 nx:[&>[data-slot=alert-content]]:col-start-1 nx:[&>[data-slot=alert-actions]]:col-start-2 nx:[&>[data-slot=alert-actions]]:row-start-1 nx:[&>[data-slot=alert-actions]]:justify-self-end',
+      },
+      density: {
+        comfortable: '',
+        compact: 'nx:py-3',
       },
     },
+    compoundVariants: [
+      {
+        layout: 'inline',
+        density: 'compact',
+        className: 'nx:gap-x-3 nx:[&>svg]:top-1/2!',
+      },
+    ],
     defaultVariants: {
       variant: 'default',
       presentation: 'card',
       layout: 'stack',
+      density: 'comfortable',
     },
   }
 );
@@ -57,10 +67,10 @@ interface AlertProps
  *
  * Displays a callout for user attention with optional icon support.
  * Use for important messages, warnings, errors, or success confirmations.
- * Use `presentation="banner"` for the edge-to-edge banner treatment from
- * Figma's `isBanner=False` variants.
- * Use `layout="inline"` or `layout="dense"` with `AlertContent` and
- * `AlertActions` when the alert includes trailing controls.
+ * Use `presentation="banner"` for the edge-to-edge banner treatment (squared
+ * corners, bottom border only).
+ * Use `layout="inline"` with `AlertContent` and `AlertActions` when the alert
+ * has trailing controls; add `density="compact"` for a tighter banner row.
  * Alerts are passive by default; pass `role="alert"` for urgent dynamic
  * messages or `role="status"` for polite status updates.
  *
@@ -91,6 +101,7 @@ function Alert({
   variant,
   presentation,
   layout,
+  density,
   ...props
 }: AlertProps) {
   return (
@@ -99,8 +110,9 @@ function Alert({
       data-variant={variant ?? 'default'}
       data-presentation={presentation ?? 'card'}
       data-layout={layout ?? 'stack'}
+      data-density={density ?? 'comfortable'}
       className={cn(
-        alertVariants({ variant, presentation, layout }),
+        alertVariants({ variant, presentation, layout, density }),
         className
       )}
       {...props}
@@ -118,7 +130,8 @@ interface AlertContentProps extends React.ComponentProps<'div'> {}
 /**
  * AlertContent
  *
- * Wraps alert title and description when the alert includes actions.
+ * Wraps alert title and description. Required in `layout="inline"` so the
+ * content fills the first grid column beside `AlertActions`.
  *
  * @example
  * ```tsx
@@ -132,7 +145,7 @@ function AlertContent({ className, ...props }: AlertContentProps) {
   return (
     <div
       data-slot="alert-content"
-      className={cn('nx:flex nx:min-w-0 nx:flex-1 nx:flex-col', className)}
+      className={cn('nx:flex nx:min-w-0 nx:flex-col', className)}
       {...props}
     />
   );
@@ -253,7 +266,6 @@ function AlertActions({ className, ...props }: AlertActionsProps) {
       className={cn(
         'nx:mt-3 nx:flex nx:flex-wrap nx:items-center nx:gap-2',
         'nx:group-data-[layout=inline]/alert:mt-0 nx:group-data-[layout=inline]/alert:self-center nx:group-data-[layout=inline]/alert:pl-0!',
-        'nx:group-data-[layout=dense]/alert:mt-0 nx:group-data-[layout=dense]/alert:self-center nx:group-data-[layout=dense]/alert:pl-0!',
         className
       )}
       {...props}
@@ -272,9 +284,10 @@ interface AlertCloseProps extends React.ComponentProps<'button'> {}
  * AlertClose
  *
  * A styled close control for alerts. Dismissal is consumer-controlled: wire
- * `onClick` to app state when the alert should be removed. Custom children get
- * a fallback `aria-label="Dismiss alert"` unless you provide `aria-label` or
- * `aria-labelledby`.
+ * `onClick` to app state when the alert should be removed. The default renders a
+ * close icon with a visually-hidden "Dismiss alert" label. If you pass custom
+ * children, give them their own accessible name — visible text self-labels;
+ * supply `aria-label` for an icon-only child.
  *
  * @example
  * ```tsx
@@ -282,19 +295,11 @@ interface AlertCloseProps extends React.ComponentProps<'button'> {}
  * ```
  */
 function AlertClose({
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
   className,
   children,
   type = 'button',
   ...props
 }: AlertCloseProps) {
-  const hasCustomChildren = children !== undefined && children !== null;
-  const fallbackAriaLabel =
-    hasCustomChildren && !ariaLabel && !ariaLabelledBy
-      ? 'Dismiss alert'
-      : ariaLabel;
-
   return (
     <button
       data-slot="alert-close"
@@ -308,8 +313,6 @@ function AlertClose({
         className
       )}
       type={type}
-      aria-label={fallbackAriaLabel}
-      aria-labelledby={ariaLabelledBy}
       {...props}
     >
       {children ?? (
