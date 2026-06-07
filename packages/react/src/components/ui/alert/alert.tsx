@@ -188,7 +188,7 @@ function AlertTitle({
     <Comp
       data-slot="alert-title"
       className={cn(
-        'nx:mb-1 nx:typography-label-large nx:text-foreground',
+        'nx:mb-1 nx:last:mb-0 nx:typography-label-large nx:text-foreground',
         alertStatusTextClassName,
         className
       )}
