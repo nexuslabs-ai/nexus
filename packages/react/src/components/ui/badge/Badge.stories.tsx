@@ -4,6 +4,7 @@ import { expect, within } from 'storybook/test';
 
 import { SPACING_MODES } from '../../../stories/spacing-modes';
 import { expectHeightPinnedAcrossModes } from '../../../stories/test-utils';
+import { Spinner } from '../spinner';
 
 import { Badge } from './badge';
 
@@ -244,6 +245,64 @@ export const WithBothIcons: Story = {
       expect(Math.round(rect.width)).toBe(14);
       expect(Math.round(rect.height)).toBe(14);
     }
+  },
+};
+
+export const IconOnly: Story = {
+  args: {
+    variant: 'success',
+    fill: 'light',
+    leftIcon: <IconCheck />,
+    role: 'img',
+    'aria-label': 'Approved',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByRole('img', { name: 'Approved' });
+    const svg = badge.querySelector('svg');
+    const rect = badge.getBoundingClientRect();
+
+    if (!(svg instanceof SVGElement)) {
+      throw new Error('Expected icon-only badge to render an SVG icon.');
+    }
+
+    const svgRect = svg.getBoundingClientRect();
+
+    await expect(badge).toHaveAttribute('data-icon-only', 'true');
+    expect(badge.textContent).toBe('');
+    expect(Math.round(rect.height)).toBe(20);
+    expect(Math.round(rect.width)).toBeGreaterThanOrEqual(20);
+    expect(Math.round(svgRect.width)).toBe(14);
+    expect(Math.round(svgRect.height)).toBe(14);
+  },
+};
+
+export const WithSvgLoader: Story = {
+  args: {
+    children: 'Loading',
+    variant: 'information',
+    fill: 'outline',
+    isCaps: false,
+    leftIcon: (
+      <Spinner role="presentation" aria-hidden="true" aria-label={undefined} />
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('Loading');
+    const spinner = badge.querySelector('[data-slot="spinner"]');
+
+    if (!(spinner instanceof SVGElement)) {
+      throw new Error('Expected loader badge to render a Spinner SVG.');
+    }
+
+    const rect = spinner.getBoundingClientRect();
+
+    await expect(spinner).toHaveAttribute('role', 'presentation');
+    await expect(spinner).toHaveAttribute('aria-hidden', 'true');
+    await expect(spinner).not.toHaveAttribute('aria-label');
+    expect(Math.round(rect.width)).toBe(14);
+    expect(Math.round(rect.height)).toBe(14);
   },
 };
 
@@ -493,6 +552,36 @@ export const AllVariants: Story = {
         </div>
       </div>
 
+      {/* Icon Only */}
+      <div>
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
+          Icon Only
+        </h3>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+          <Badge
+            variant="success"
+            fill="light"
+            leftIcon={<IconCheck />}
+            role="img"
+            aria-label="Approved"
+          />
+          <Badge
+            variant="default"
+            fill="solid"
+            leftIcon={<IconCheck />}
+            role="img"
+            aria-label="Verified"
+          />
+          <Badge
+            variant="error"
+            fill="outline"
+            rightIcon={<IconX />}
+            role="img"
+            aria-label="Error"
+          />
+        </div>
+      </div>
+
       {/* With Icons */}
       <div>
         <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
@@ -507,6 +596,43 @@ export const AllVariants: Story = {
           </Badge>
           <Badge variant="error" isCaps={false} rightIcon={<IconX />}>
             Label
+          </Badge>
+        </div>
+      </div>
+
+      {/* With SVG Loader */}
+      <div>
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
+          With SVG Loader
+        </h3>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+          <Badge
+            variant="information"
+            fill="outline"
+            isCaps={false}
+            leftIcon={
+              <Spinner
+                role="presentation"
+                aria-hidden="true"
+                aria-label={undefined}
+              />
+            }
+          >
+            Loading
+          </Badge>
+          <Badge
+            variant="information"
+            fill="light"
+            isCaps={false}
+            leftIcon={
+              <Spinner
+                role="presentation"
+                aria-hidden="true"
+                aria-label={undefined}
+              />
+            }
+          >
+            Syncing
           </Badge>
         </div>
       </div>
@@ -527,7 +653,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Badge is intentionally density-stable — its utilities sit on the canonical numeric step set (`px-2`, `py-0.5`, `gap-1`) rather than the `control-*` role family, because a chip is not a control (its padding is sub-control by design). All 7 rows should render at the same height regardless of mode. The `BadgeIsDensityStable` sentinel below asserts this.',
+          'Badge is intentionally density-stable — its utilities sit on the canonical numeric step set (`px-2`, `py-1`, `gap-1`) rather than the `control-*` role family, because a chip is not a control (its padding is sub-control by design). All 7 rows should render at the same height regardless of mode. The `BadgeIsDensityStable` sentinel below asserts this.',
       },
     },
   },
@@ -559,7 +685,7 @@ export const BadgeIsDensityStable: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel. Badge uses numeric `spacing-N` utilities only, so every spacing mode renders it at the same canonical 20px height (= `text-xs` line-height 16px + `py-0.5` 2×2). If a future PR introduces a `control-*` role utility on Badge, this test fails for that mode — the regression signal is that intent (numeric, mode-stable) has been broken.',
+          'Density-stability sentinel. Badge uses numeric `spacing-N` utilities only, so every spacing mode renders it at the same canonical 24px height (= label-caps line-height 16px + `py-1` 2×4). If a future PR introduces a `control-*` role utility on Badge, this test fails for that mode — the regression signal is that intent (numeric, mode-stable) has been broken.',
       },
     },
   },
@@ -580,7 +706,7 @@ export const BadgeIsDensityStable: Story = {
     await expectHeightPinnedAcrossModes(
       within(canvasElement),
       ['badge-host-nova', 'badge-host-vega', 'badge-host-sera'],
-      20,
+      24,
       { selector: '[data-slot="badge"]' }
     );
   },

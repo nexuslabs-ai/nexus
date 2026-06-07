@@ -132,6 +132,38 @@ const badgeVariants = cva(
   }
 );
 
+const badgeCapsClasses =
+  'nx:typography-label-caps nx:font-semibold nx:tracking-[0.8px] nx:uppercase nx:px-2 nx:py-1';
+
+const badgeSentenceClasses = 'nx:typography-label-default nx:px-2.5 nx:py-1';
+
+const badgeNumberClasses =
+  'nx:min-h-5 nx:min-w-5 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
+
+const badgeIconOnlyClasses = 'nx:h-5 nx:min-w-5 nx:p-0';
+
+const badgeIconClasses =
+  'nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5';
+
+const badgeIconStyles: React.CSSProperties = { width: 14, height: 14 };
+
+type BadgeIconElementProps = {
+  style?: React.CSSProperties;
+};
+
+function renderBadgeIcon(icon: React.ReactNode) {
+  if (!React.isValidElement<BadgeIconElementProps>(icon)) {
+    return icon;
+  }
+
+  return React.cloneElement(icon, {
+    style: {
+      ...icon.props.style,
+      ...badgeIconStyles,
+    },
+  });
+}
+
 interface BadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
   /**
@@ -155,6 +187,7 @@ interface BadgeProps
   /**
    * Icon to display before the label.
    * Icon is automatically sized to 14px (3.5 spacing units).
+   * If the badge has no children, this renders as an icon-only badge.
    * Ignored when `isNumber` is true.
    * @example
    * ```tsx
@@ -166,6 +199,7 @@ interface BadgeProps
   /**
    * Icon to display after the label.
    * Icon is automatically sized to 14px (3.5 spacing units).
+   * If the badge has no children and no `leftIcon`, this renders as an icon-only badge.
    * Ignored when `isNumber` is true.
    * @example
    * ```tsx
@@ -186,16 +220,22 @@ function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const showLeftIcon = leftIcon && !isNumber;
-  const showRightIcon = rightIcon && !isNumber;
+  const hasChildren = React.Children.count(children) > 0;
+  const isIconOnly =
+    !isNumber && !hasChildren && Boolean(leftIcon || rightIcon);
+  const iconOnlyIcon = leftIcon ?? rightIcon;
+  const showLeftIcon = leftIcon && !isNumber && !isIconOnly;
+  const showRightIcon = rightIcon && !isNumber && !isIconOnly;
 
   const classes = cn(
     badgeVariants({ variant, fill }),
     isNumber
-      ? 'nx:min-h-5 nx:min-w-5 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums'
-      : isCaps
-        ? 'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-0.5'
-        : 'nx:typography-label-default nx:px-2.5 nx:py-0.5',
+      ? badgeNumberClasses
+      : isIconOnly
+        ? badgeIconOnlyClasses
+        : isCaps
+          ? badgeCapsClasses
+          : badgeSentenceClasses,
     className
   );
 
@@ -206,19 +246,21 @@ function Badge({
       data-fill={fill ?? 'solid'}
       data-caps={isCaps}
       data-number={isNumber || undefined}
+      data-icon-only={isIconOnly || undefined}
       className={classes}
       {...props}
     >
-      {showLeftIcon && (
-        <span className="nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5">
-          {leftIcon}
+      {isIconOnly && (
+        <span className={badgeIconClasses}>
+          {renderBadgeIcon(iconOnlyIcon)}
         </span>
+      )}
+      {showLeftIcon && (
+        <span className={badgeIconClasses}>{renderBadgeIcon(leftIcon)}</span>
       )}
       {children}
       {showRightIcon && (
-        <span className="nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5">
-          {rightIcon}
-        </span>
+        <span className={badgeIconClasses}>{renderBadgeIcon(rightIcon)}</span>
       )}
     </span>
   );
