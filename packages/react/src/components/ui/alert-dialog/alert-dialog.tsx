@@ -66,14 +66,6 @@ const defaultAlertDialogLayout: AlertDialogLayoutContextValue = {
 const AlertDialogLayoutContext =
   React.createContext<AlertDialogLayoutContextValue>(defaultAlertDialogLayout);
 
-function resolveButtonOrientation(
-  variant: AlertDialogVariant,
-  buttonOrientation?: AlertDialogButtonOrientation | null
-): AlertDialogButtonOrientation {
-  if (variant === 'center') return 'vertical';
-  return buttonOrientation ?? 'horizontal';
-}
-
 function containsComposedHeader(children: React.ReactNode): boolean {
   return React.Children.toArray(children).some((child) => {
     if (!React.isValidElement(child)) return false;
@@ -185,6 +177,8 @@ interface AlertDialogContentProps extends Omit<
    * Optional title for a prop-driven header, rendered before `children`.
    * Ignored when a composed `AlertDialogHeader` child is present — composed
    * children take precedence, so only one header (one Radix `Title`) renders.
+   * Detection covers a direct child or a Fragment-wrapped header; a header
+   * nested inside another element is not detected.
    */
   title?: React.ReactNode;
 
@@ -198,13 +192,6 @@ interface AlertDialogContentProps extends Omit<
    * Optional body content rendered between the generated header and `children`.
    */
   body?: React.ReactNode;
-
-  /**
-   * Footer button orientation inherited by `AlertDialogFooter`.
-   * Center variant always resolves to vertical.
-   * @default "horizontal"
-   */
-  buttonOrientation?: AlertDialogButtonOrientation;
 }
 
 /**
@@ -234,13 +221,10 @@ function AlertDialogContent({
   title,
   description,
   body,
-  buttonOrientation,
   ...props
 }: AlertDialogContentProps) {
-  const resolvedButtonOrientation = resolveButtonOrientation(
-    variant,
-    buttonOrientation
-  );
+  const resolvedButtonOrientation =
+    variant === 'center' ? 'vertical' : 'horizontal';
   const hasBody = body != null;
   const showGeneratedHeader =
     !containsComposedHeader(children) && (title != null || description != null);
@@ -254,10 +238,10 @@ function AlertDialogContent({
         <AlertDialogPrimitive.Content
           data-slot="alert-dialog-content"
           data-variant={variant}
-          data-button-orientation={resolvedButtonOrientation}
+          data-orientation={resolvedButtonOrientation}
           className={cn(
             alertDialogContentVariants(),
-            variant === 'center' && !hasBody && 'nx:max-w-[320px]',
+            variant === 'center' && !hasBody && 'nx:max-w-xs',
             className
           )}
           {...props}
@@ -532,7 +516,6 @@ export {
   AlertDialog,
   AlertDialogAction,
   type AlertDialogActionProps,
-  type AlertDialogButtonOrientation,
   AlertDialogCancel,
   type AlertDialogCancelProps,
   AlertDialogContent,

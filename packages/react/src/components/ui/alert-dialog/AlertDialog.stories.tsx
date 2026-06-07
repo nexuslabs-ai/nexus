@@ -122,6 +122,29 @@ export const WithBodyContent: Story = {
       </AlertDialogContent>
     </AlertDialog>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const trigger = canvas.getByRole('button', {
+      name: 'Remove payment method',
+    });
+    await userEvent.click(trigger);
+
+    await within(document.body).findByRole('alertdialog');
+
+    const body = document.querySelector('[data-slot="alert-dialog-body"]');
+    await expect(body).toBeInTheDocument();
+    await expect(body).toHaveTextContent(
+      'Future invoices will use the fallback payment method.'
+    );
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+  },
 };
 
 export const Centered: Story = {
@@ -152,8 +175,8 @@ export const Centered: Story = {
 
     const dialog = await within(document.body).findByRole('alertdialog');
     await expect(dialog).toHaveAttribute('data-variant', 'center');
-    await expect(dialog).toHaveAttribute('data-button-orientation', 'vertical');
-    await expect(dialog.className).toContain('nx:max-w-[320px]');
+    await expect(dialog).toHaveAttribute('data-orientation', 'vertical');
+    await expect(dialog.className).toContain('nx:max-w-xs');
 
     const header = document.querySelector('[data-slot="alert-dialog-header"]');
     const footer = document.querySelector('[data-slot="alert-dialog-footer"]');
@@ -494,10 +517,7 @@ export const WithDataAttributes: Story = {
       '[data-slot="alert-dialog-content"]'
     );
     await expect(content).toHaveAttribute('data-variant', 'default');
-    await expect(content).toHaveAttribute(
-      'data-button-orientation',
-      'horizontal'
-    );
+    await expect(content).toHaveAttribute('data-orientation', 'horizontal');
 
     const header = document.querySelector('[data-slot="alert-dialog-header"]');
     await expect(header).toHaveAttribute('data-variant', 'default');
