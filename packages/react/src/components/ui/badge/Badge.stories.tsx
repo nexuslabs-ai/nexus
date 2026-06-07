@@ -1,5 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { IconCheck, IconX } from '@tabler/icons-react';
+import {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCheck,
+  IconCircleCheck,
+  IconInfoCircle,
+  IconX,
+} from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
 import { SPACING_MODES } from '../../../stories/spacing-modes';
@@ -305,6 +312,53 @@ export const WithSvgLoader: Story = {
     expect(Math.round(rect.width)).toBe(14);
     expect(Math.round(rect.height)).toBe(14);
   },
+};
+
+export const StatusWithIcons: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Recommended (not enforced): don't rely on color alone for status — pair a status `variant` with clear text and/or a leading icon. The icons here are a suggested set.",
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+      <Badge
+        variant="success"
+        fill="light"
+        isCaps={false}
+        leftIcon={<IconCircleCheck />}
+      >
+        Success
+      </Badge>
+      <Badge
+        variant="warning"
+        fill="light"
+        isCaps={false}
+        leftIcon={<IconAlertTriangle />}
+      >
+        Warning
+      </Badge>
+      <Badge
+        variant="error"
+        fill="light"
+        isCaps={false}
+        leftIcon={<IconAlertCircle />}
+      >
+        Error
+      </Badge>
+      <Badge
+        variant="information"
+        fill="light"
+        isCaps={false}
+        leftIcon={<IconInfoCircle />}
+      >
+        Info
+      </Badge>
+    </div>
+  ),
 };
 
 // ============================================

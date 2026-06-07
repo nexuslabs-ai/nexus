@@ -156,7 +156,8 @@ interface BadgeProps
 
   /**
    * When true, renders as a circular number badge.
-   * Pass the number as children.
+   * Pass the number as children. A bare count is ambiguous to assistive tech —
+   * pass an `aria-label` for context (e.g. `aria-label="8 unread"`).
    * @default false
    * @example
    * ```tsx
@@ -191,6 +192,14 @@ interface BadgeProps
   rightIcon?: React.ReactNode;
 }
 
+/**
+ * Status / label chip — a non-interactive `<span>`.
+ *
+ * Accessibility: status is conveyed by color, so don't rely on color alone —
+ * pair a status `variant` with text or a leading icon. Icon-only badges set
+ * `role="img"` and require an accessible name (dev-warned). The badge is not a
+ * live region; if its status or count updates, wrap it in `aria-live="polite"`.
+ */
 function Badge({
   className,
   variant,
@@ -240,9 +249,17 @@ function Badge({
       {...props}
     >
       {isIconOnly && <span className={badgeIconClasses}>{iconOnlyIcon}</span>}
-      {showLeftIcon && <span className={badgeIconClasses}>{leftIcon}</span>}
+      {showLeftIcon && (
+        <span aria-hidden className={badgeIconClasses}>
+          {leftIcon}
+        </span>
+      )}
       {children}
-      {showRightIcon && <span className={badgeIconClasses}>{rightIcon}</span>}
+      {showRightIcon && (
+        <span aria-hidden className={badgeIconClasses}>
+          {rightIcon}
+        </span>
+      )}
     </span>
   );
 }
