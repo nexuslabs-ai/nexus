@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
@@ -12,7 +11,6 @@ const badgeVariants = cva(
       variant: {
         default: '',
         secondary: '',
-        outline: '',
         error: '',
         warning: '',
         success: '',
@@ -21,6 +19,7 @@ const badgeVariants = cva(
       fill: {
         solid: '',
         light: '',
+        outline: '',
       },
     },
     compoundVariants: [
@@ -34,12 +33,6 @@ const badgeVariants = cva(
         variant: 'secondary',
         fill: 'solid',
         className: 'nx:bg-secondary-background nx:text-secondary-foreground',
-      },
-      {
-        variant: 'outline',
-        fill: 'solid',
-        className:
-          'nx:border nx:border-border-default nx:bg-transparent nx:text-foreground',
       },
       {
         variant: 'error',
@@ -74,12 +67,6 @@ const badgeVariants = cva(
         className: 'nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
       },
       {
-        variant: 'outline',
-        fill: 'light',
-        className:
-          'nx:border nx:border-border-default nx:bg-transparent nx:text-foreground',
-      },
-      {
         variant: 'error',
         fill: 'light',
         className: 'nx:bg-error-subtle nx:text-error-subtle-foreground',
@@ -100,6 +87,43 @@ const badgeVariants = cva(
         className:
           'nx:bg-information-subtle nx:text-information-subtle-foreground',
       },
+      // Outline fill variants
+      {
+        variant: 'default',
+        fill: 'outline',
+        className:
+          'nx:border nx:border-border-primary nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+      },
+      {
+        variant: 'secondary',
+        fill: 'outline',
+        className:
+          'nx:border nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
+      },
+      {
+        variant: 'error',
+        fill: 'outline',
+        className:
+          'nx:border nx:border-border-error nx:bg-error-subtle nx:text-error-subtle-foreground',
+      },
+      {
+        variant: 'warning',
+        fill: 'outline',
+        className:
+          'nx:border nx:border-border-warning nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+      },
+      {
+        variant: 'success',
+        fill: 'outline',
+        className:
+          'nx:border nx:border-border-success nx:bg-success-subtle nx:text-success-subtle-foreground',
+      },
+      {
+        variant: 'information',
+        fill: 'outline',
+        className:
+          'nx:border nx:border-border-information nx:bg-information-subtle nx:text-information-subtle-foreground',
+      },
     ],
     defaultVariants: {
       variant: 'default',
@@ -115,19 +139,6 @@ interface BadgeProps
    * @default true
    */
   isCaps?: boolean;
-
-  /**
-   * When true, renders as child element using Radix Slot.
-   * Useful for composition with links or custom elements.
-   * @default false
-   * @example
-   * ```tsx
-   * <Badge asChild>
-   *   <a href="/status">Active</a>
-   * </Badge>
-   * ```
-   */
-  asChild?: boolean;
 
   /**
    * When true, renders as a circular number badge.
@@ -169,62 +180,43 @@ function Badge({
   variant,
   fill,
   isCaps = true,
-  asChild = false,
   isNumber = false,
   leftIcon,
   rightIcon,
   children,
   ...props
 }: BadgeProps) {
-  // Number badges don't support icons
   const showLeftIcon = leftIcon && !isNumber;
   const showRightIcon = rightIcon && !isNumber;
 
   const classes = cn(
     badgeVariants({ variant, fill }),
     isNumber
-      ? 'nx:size-5 nx:rounded-full nx:p-0 nx:typography-label-caps'
+      ? 'nx:min-h-5 nx:min-w-5 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums'
       : isCaps
         ? 'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-0.5'
         : 'nx:typography-label-default nx:px-2.5 nx:py-0.5',
     className
   );
 
-  // Slot requires exactly one child element
-  if (asChild) {
-    return (
-      <Slot
-        data-slot="badge"
-        data-variant={variant}
-        data-fill={fill}
-        data-caps={isCaps}
-        data-number={isNumber || undefined}
-        className={classes}
-        {...props}
-      >
-        {children}
-      </Slot>
-    );
-  }
-
   return (
     <span
       data-slot="badge"
-      data-variant={variant}
-      data-fill={fill}
+      data-variant={variant ?? 'default'}
+      data-fill={fill ?? 'solid'}
       data-caps={isCaps}
       data-number={isNumber || undefined}
       className={classes}
       {...props}
     >
       {showLeftIcon && (
-        <span className="nx:flex nx:items-center nx:justify-center nx:size-3.5">
+        <span className="nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5">
           {leftIcon}
         </span>
       )}
       {children}
       {showRightIcon && (
-        <span className="nx:flex nx:items-center nx:justify-center nx:size-3.5">
+        <span className="nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5">
           {rightIcon}
         </span>
       )}

@@ -16,7 +16,6 @@ const meta: Meta<typeof Badge> = {
       options: [
         'default',
         'secondary',
-        'outline',
         'error',
         'warning',
         'success',
@@ -26,8 +25,8 @@ const meta: Meta<typeof Badge> = {
     },
     fill: {
       control: 'select',
-      options: ['solid', 'light'],
-      description: 'The fill style (solid or light/surface)',
+      options: ['solid', 'light', 'outline'],
+      description: 'The fill style (solid, light/surface, or outline)',
     },
     isCaps: {
       control: 'boolean',
@@ -45,10 +44,6 @@ const meta: Meta<typeof Badge> = {
       control: false,
       description: 'Icon to display after the label',
     },
-    asChild: {
-      control: 'boolean',
-      description: 'Render as child element (for composition)',
-    },
   },
 };
 
@@ -63,6 +58,14 @@ export const Default: Story = {
   args: {
     children: 'Badge',
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('Badge');
+
+    await expect(badge).toHaveAttribute('data-variant', 'default');
+    await expect(badge).toHaveAttribute('data-fill', 'solid');
+    await expect(badge).toHaveAttribute('data-caps', 'true');
+  },
 };
 
 export const Primary: Story = {
@@ -76,13 +79,6 @@ export const Secondary: Story = {
   args: {
     variant: 'secondary',
     children: 'Secondary',
-  },
-};
-
-export const Outline: Story = {
-  args: {
-    variant: 'outline',
-    children: 'Outline',
   },
 };
 
@@ -131,6 +127,25 @@ export const LightFill: Story = {
     variant: 'default',
     fill: 'light',
     children: 'Light',
+  },
+};
+
+export const OutlineFill: Story = {
+  args: {
+    variant: 'success',
+    fill: 'outline',
+    children: 'Outline',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('Outline');
+    const badgeStyles = getComputedStyle(badge);
+
+    await expect(badge).toHaveAttribute('data-variant', 'success');
+    await expect(badge).toHaveAttribute('data-fill', 'outline');
+    await expect(badge).toHaveClass('nx:border-border-success');
+    await expect(badge).toHaveClass('nx:bg-success-subtle');
+    expect(badgeStyles.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
   },
 };
 
@@ -188,25 +203,6 @@ export const WithCustomClassName: Story = {
 };
 
 // ============================================
-// COMPOSITION (asChild)
-// ============================================
-
-export const AsLink: Story = {
-  render: (_args) => (
-    <Badge asChild>
-      <a href="https://example.com">New</a>
-    </Badge>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const link = canvas.getByRole('link');
-
-    await expect(link).toHaveAttribute('href', 'https://example.com');
-    await expect(link).toHaveAttribute('data-slot', 'badge');
-  },
-};
-
-// ============================================
 // WITH ICONS
 // ============================================
 
@@ -236,6 +232,19 @@ export const WithBothIcons: Story = {
     leftIcon: <IconCheck />,
     rightIcon: <IconX />,
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('Status');
+    const svgs = badge.querySelectorAll('svg');
+
+    await expect(svgs).toHaveLength(2);
+    for (const svg of svgs) {
+      const rect = svg.getBoundingClientRect();
+
+      expect(Math.round(rect.width)).toBe(14);
+      expect(Math.round(rect.height)).toBe(14);
+    }
+  },
 };
 
 // ============================================
@@ -255,6 +264,15 @@ export const NumberBadgeHighValue: Story = {
     children: '99+',
     variant: 'error',
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText('99+');
+    const rect = badge.getBoundingClientRect();
+
+    await expect(badge).toHaveAttribute('data-number', 'true');
+    expect(Math.round(rect.height)).toBe(20);
+    expect(Math.round(rect.width)).toBeGreaterThan(20);
+  },
 };
 
 export const NumberBadgeIgnoresIcons: Story = {
@@ -262,13 +280,15 @@ export const NumberBadgeIgnoresIcons: Story = {
     isNumber: true,
     children: 5,
     leftIcon: <IconCheck />, // Should be ignored
+    rightIcon: <IconX />, // Should be ignored
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const badge = canvas.getByText('5');
 
-    // Should render as number badge without icon
+    // Number mode wins over icons.
     await expect(badge).toHaveAttribute('data-number', 'true');
+    await expect(badge.querySelectorAll('svg')).toHaveLength(0);
   },
 };
 
@@ -298,13 +318,12 @@ export const AllVariants: Story = {
     <div className="nx:flex nx:flex-col nx:gap-8">
       {/* Solid Fill - Caps */}
       <div>
-        <h3 className="nx:text-foreground nx:mb-3 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
           Solid Fill (Caps)
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
           <Badge variant="default">Label</Badge>
           <Badge variant="secondary">Label</Badge>
-          <Badge variant="outline">Label</Badge>
           <Badge variant="error">Label</Badge>
           <Badge variant="warning">Label</Badge>
           <Badge variant="success">Label</Badge>
@@ -314,7 +333,7 @@ export const AllVariants: Story = {
 
       {/* Solid Fill - Sentence */}
       <div>
-        <h3 className="nx:text-foreground nx:mb-3 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
           Solid Fill (Sentence)
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
@@ -322,9 +341,6 @@ export const AllVariants: Story = {
             Label
           </Badge>
           <Badge variant="secondary" isCaps={false}>
-            Label
-          </Badge>
-          <Badge variant="outline" isCaps={false}>
             Label
           </Badge>
           <Badge variant="error" isCaps={false}>
@@ -344,11 +360,14 @@ export const AllVariants: Story = {
 
       {/* Light Fill - Caps */}
       <div>
-        <h3 className="nx:text-foreground nx:mb-3 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
           Light Fill (Caps)
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
           <Badge variant="default" fill="light">
+            Label
+          </Badge>
+          <Badge variant="secondary" fill="light">
             Label
           </Badge>
           <Badge variant="error" fill="light">
@@ -368,11 +387,14 @@ export const AllVariants: Story = {
 
       {/* Light Fill - Sentence */}
       <div>
-        <h3 className="nx:text-foreground nx:mb-3 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
           Light Fill (Sentence)
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
           <Badge variant="default" fill="light" isCaps={false}>
+            Label
+          </Badge>
+          <Badge variant="secondary" fill="light" isCaps={false}>
             Label
           </Badge>
           <Badge variant="error" fill="light" isCaps={false}>
@@ -390,9 +412,63 @@ export const AllVariants: Story = {
         </div>
       </div>
 
+      {/* Outline Fill - Caps */}
+      <div>
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
+          Outline Fill (Caps)
+        </h3>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+          <Badge variant="default" fill="outline">
+            Default
+          </Badge>
+          <Badge variant="secondary" fill="outline">
+            Secondary
+          </Badge>
+          <Badge variant="error" fill="outline">
+            Error
+          </Badge>
+          <Badge variant="warning" fill="outline">
+            Warning
+          </Badge>
+          <Badge variant="success" fill="outline">
+            Success
+          </Badge>
+          <Badge variant="information" fill="outline">
+            Info
+          </Badge>
+        </div>
+      </div>
+
+      {/* Outline Fill - Sentence */}
+      <div>
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
+          Outline Fill (Sentence)
+        </h3>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+          <Badge variant="default" fill="outline" isCaps={false}>
+            Default
+          </Badge>
+          <Badge variant="secondary" fill="outline" isCaps={false}>
+            Secondary
+          </Badge>
+          <Badge variant="error" fill="outline" isCaps={false}>
+            Error
+          </Badge>
+          <Badge variant="warning" fill="outline" isCaps={false}>
+            Warning
+          </Badge>
+          <Badge variant="success" fill="outline" isCaps={false}>
+            Success
+          </Badge>
+          <Badge variant="information" fill="outline" isCaps={false}>
+            Info
+          </Badge>
+        </div>
+      </div>
+
       {/* Number Badges */}
       <div>
-        <h3 className="nx:text-foreground nx:mb-3 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
           Number Badges
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
@@ -400,9 +476,6 @@ export const AllVariants: Story = {
             8
           </Badge>
           <Badge variant="secondary" isNumber>
-            8
-          </Badge>
-          <Badge variant="outline" isNumber>
             8
           </Badge>
           <Badge variant="error" isNumber>
@@ -422,7 +495,7 @@ export const AllVariants: Story = {
 
       {/* With Icons */}
       <div>
-        <h3 className="nx:text-foreground nx:mb-3 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-3 nx:typography-label-default">
           With Icons
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
