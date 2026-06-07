@@ -241,6 +241,7 @@ function AlertDialogContent({
     variant,
     buttonOrientation
   );
+  const hasBody = body != null;
   const showGeneratedHeader =
     !containsComposedHeader(children) && (title != null || description != null);
 
@@ -254,13 +255,17 @@ function AlertDialogContent({
           data-slot="alert-dialog-content"
           data-variant={variant}
           data-button-orientation={resolvedButtonOrientation}
-          className={cn(alertDialogContentVariants(), className)}
+          className={cn(
+            alertDialogContentVariants(),
+            variant === 'center' && !hasBody && 'nx:max-w-[320px]',
+            className
+          )}
           {...props}
         >
           {showGeneratedHeader && (
             <AlertDialogHeader title={title} description={description} />
           )}
-          {body != null && (
+          {hasBody && (
             <div data-slot="alert-dialog-body" className="nx:grid nx:gap-2">
               {body}
             </div>

@@ -153,6 +153,7 @@ export const Centered: Story = {
     const dialog = await within(document.body).findByRole('alertdialog');
     await expect(dialog).toHaveAttribute('data-variant', 'center');
     await expect(dialog).toHaveAttribute('data-button-orientation', 'vertical');
+    await expect(dialog.className).toContain('nx:max-w-[320px]');
 
     const header = document.querySelector('[data-slot="alert-dialog-header"]');
     const footer = document.querySelector('[data-slot="alert-dialog-footer"]');
