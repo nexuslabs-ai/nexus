@@ -206,6 +206,9 @@ const avatarStatusVariants = cva(
         offline: 'nx:bg-muted',
       },
     },
+    defaultVariants: {
+      status: 'online',
+    },
   }
 );
 
