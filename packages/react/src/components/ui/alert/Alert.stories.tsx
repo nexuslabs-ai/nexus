@@ -105,19 +105,18 @@ type PlaygroundStackActions = Extract<
 type PlaygroundButtonVariant = NonNullable<
   React.ComponentProps<typeof Button>['variant']
 >;
-type PlaygroundStory = StoryObj<
-  React.ComponentProps<typeof Alert> & {
-    icon: PlaygroundIcon;
-    actionsInline: PlaygroundActions;
-    actionsStack: PlaygroundStackActions;
-    title: string;
-    description: string;
-    primaryActionLabel: string;
-    primaryActionVariant: PlaygroundButtonVariant;
-    secondaryActionLabel: string;
-    secondaryActionVariant: PlaygroundButtonVariant;
-  }
->;
+type PlaygroundArgs = React.ComponentProps<typeof Alert> & {
+  icon: PlaygroundIcon;
+  actionsInline: PlaygroundActions;
+  actionsStack: PlaygroundStackActions;
+  title: string;
+  description: string;
+  primaryActionLabel: string;
+  primaryActionVariant: PlaygroundButtonVariant;
+  secondaryActionLabel: string;
+  secondaryActionVariant: PlaygroundButtonVariant;
+};
+type PlaygroundStory = StoryObj<PlaygroundArgs>;
 
 function renderPlaygroundIcon(icon: PlaygroundIcon) {
   if (icon === 'none') return null;
@@ -134,16 +133,6 @@ function renderPlaygroundIcon(icon: PlaygroundIcon) {
   return <IconInfoCircle aria-hidden="true" className="nx:size-4" />;
 }
 
-function normalizeStackActions(
-  actions: PlaygroundActions
-): PlaygroundStackActions {
-  if (actions === 'close') return 'none';
-  if (actions === 'primary + close') return 'primary';
-  if (actions === 'primary + secondary + close') return 'primary + secondary';
-
-  return actions;
-}
-
 function AlertPlaygroundExample({
   actionsInline,
   actionsStack,
@@ -157,41 +146,13 @@ function AlertPlaygroundExample({
   secondaryActionVariant,
   title,
   variant,
-}: React.ComponentProps<typeof Alert> & {
-  icon: PlaygroundIcon;
-  actionsInline: PlaygroundActions;
-  actionsStack: PlaygroundStackActions;
-  title: string;
-  description: string;
-  primaryActionLabel: string;
-  primaryActionVariant: PlaygroundButtonVariant;
-  secondaryActionLabel: string;
-  secondaryActionVariant: PlaygroundButtonVariant;
-}) {
+}: PlaygroundArgs) {
   const [visible, setVisible] = React.useState(true);
-  const actions =
-    layout === 'inline' ? actionsInline : normalizeStackActions(actionsStack);
+  const actions = layout === 'inline' ? actionsInline : actionsStack;
   const hasPrimaryAction = actions.includes('primary');
   const hasSecondaryAction = actions.includes('secondary');
   const hasCloseAction = actions.includes('close');
   const hasActions = actions !== 'none';
-
-  React.useEffect(() => {
-    setVisible(true);
-  }, [
-    actionsInline,
-    actionsStack,
-    description,
-    icon,
-    layout,
-    presentation,
-    primaryActionLabel,
-    primaryActionVariant,
-    secondaryActionLabel,
-    secondaryActionVariant,
-    title,
-    variant,
-  ]);
 
   if (!visible) {
     return (
@@ -404,7 +365,9 @@ export const Playground: PlaygroundStory = {
       },
     },
   },
-  render: (args) => <AlertPlaygroundExample {...args} />,
+  render: (args) => (
+    <AlertPlaygroundExample key={JSON.stringify(args)} {...args} />
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const alert = canvasElement.querySelector('[data-slot="alert"]');

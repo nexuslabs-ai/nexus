@@ -189,7 +189,6 @@ function AlertTitle({
       data-slot="alert-title"
       className={cn(
         'nx:mb-1 nx:typography-label-large nx:text-foreground',
-        'nx:group-data-[layout=inline]/alert:col-start-1',
         alertStatusTextClassName,
         className
       )}
@@ -225,7 +224,6 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
       data-slot="alert-description"
       className={cn(
         'nx:typography-body-small nx:text-muted-foreground nx:[&_p]:leading-relaxed',
-        'nx:group-data-[layout=inline]/alert:col-start-1',
         alertStatusTextClassName,
         className
       )}
