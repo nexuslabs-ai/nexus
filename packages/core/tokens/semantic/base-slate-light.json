@@ -138,14 +138,6 @@
       "$value": "{slate.50}",
       "$type": "color"
     },
-    "primary": {
-      "$value": "{blue.200}",
-      "$type": "color"
-    },
-    "primary-active": {
-      "$value": "{blue.400}",
-      "$type": "color"
-    },
     "warning": {
       "$value": "{orange.200}",
       "$type": "color"

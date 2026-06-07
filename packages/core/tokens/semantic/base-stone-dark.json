@@ -138,14 +138,6 @@
       "$value": "{stone.950}",
       "$type": "color"
     },
-    "primary": {
-      "$value": "{blue.700}",
-      "$type": "color"
-    },
-    "primary-active": {
-      "$value": "{blue.500}",
-      "$type": "color"
-    },
     "warning": {
       "$value": "{orange.700}",
       "$type": "color"
