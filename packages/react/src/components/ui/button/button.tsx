@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:aria-disabled:pointer-events-none nx:aria-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:aria-disabled:pointer-events-none nx:aria-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -23,10 +23,10 @@ const buttonVariants = cva(
         link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline',
       },
       size: {
-        default: 'nx:px-control-md nx:py-control-md nx:gap-control-md',
-        sm: 'nx:px-control-sm nx:py-control-sm nx:gap-control-sm nx:text-xs',
-        lg: 'nx:px-control-lg nx:py-control-lg nx:gap-control-lg',
-        icon: 'nx:p-2.5',
+        default: 'nx:typography-label-default nx:px-4 nx:py-2 nx:gap-2',
+        sm: 'nx:px-3 nx:py-1.5 nx:gap-1.5 nx:typography-label-small',
+        lg: 'nx:typography-label-default nx:px-8 nx:py-3 nx:gap-2.5',
+        icon: 'nx:typography-label-default nx:relative nx:p-2.5 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-1',
       },
     },
     defaultVariants: {
@@ -85,8 +85,8 @@ function buttonContent(children: React.ReactNode, loading: boolean) {
  */
 function NativeButton({
   className,
-  variant,
-  size,
+  variant = 'default',
+  size = 'default',
   loading = false,
   disabled,
   children,
@@ -123,8 +123,8 @@ function NativeButton({
  */
 function SlotButton({
   className,
-  variant,
-  size,
+  variant = 'default',
+  size = 'default',
   loading = false,
   disabled,
   children,

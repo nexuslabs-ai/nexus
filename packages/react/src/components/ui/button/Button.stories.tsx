@@ -9,6 +9,7 @@ import {
 } from '../../../stories/spacing-modes';
 import {
   expectHeightPinned,
+  expectHeightPinnedAcrossModes,
   expectModeCascadeWorks,
 } from '../../../stories/test-utils';
 
@@ -127,6 +128,15 @@ export const IconSize: Story = {
     size: 'icon',
     children: <IconStar />,
     'aria-label': 'Star',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Star' });
+
+    await expect(button).toHaveClass('nx:relative');
+    await expect(button).toHaveClass('nx:p-2.5');
+    await expect(button).toHaveClass('nx:pointer-coarse:after:absolute');
+    await expect(button).toHaveClass('nx:pointer-coarse:after:-inset-1');
   },
 };
 
@@ -277,18 +287,29 @@ export const FocusManagement: Story = {
 // ============================================
 
 export const WithDataAttributes: Story = {
-  args: {
-    children: 'Data Attrs',
-    variant: 'secondary',
-    size: 'lg',
-  },
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:gap-2">
+      <Button>Default attrs</Button>
+      <Button variant="secondary" size="lg">
+        Explicit attrs
+      </Button>
+    </div>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
+    const defaultButton = canvas.getByRole('button', {
+      name: 'Default attrs',
+    });
+    const explicitButton = canvas.getByRole('button', {
+      name: 'Explicit attrs',
+    });
 
-    await expect(button).toHaveAttribute('data-slot', 'button');
-    await expect(button).toHaveAttribute('data-variant', 'secondary');
-    await expect(button).toHaveAttribute('data-size', 'lg');
+    await expect(defaultButton).toHaveAttribute('data-slot', 'button');
+    await expect(defaultButton).toHaveAttribute('data-variant', 'default');
+    await expect(defaultButton).toHaveAttribute('data-size', 'default');
+    await expect(explicitButton).toHaveAttribute('data-slot', 'button');
+    await expect(explicitButton).toHaveAttribute('data-variant', 'secondary');
+    await expect(explicitButton).toHaveAttribute('data-size', 'lg');
   },
 };
 
@@ -491,7 +512,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-6">
       <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
           Variants
         </h3>
         <div className="nx:flex nx:flex-wrap nx:gap-2">
@@ -504,7 +525,7 @@ export const AllVariants: Story = {
         </div>
       </div>
       <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
           Sizes
         </h3>
         <div className="nx:flex nx:items-center nx:gap-2">
@@ -517,7 +538,7 @@ export const AllVariants: Story = {
         </div>
       </div>
       <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
           Disabled
         </h3>
         <div className="nx:flex nx:flex-wrap nx:gap-2">
@@ -542,7 +563,7 @@ export const AllVariants: Story = {
         </div>
       </div>
       <div>
-        <h3 className="nx:text-foreground nx:mb-2 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-2 nx:typography-label-default">
           Loading
         </h3>
         <div className="nx:flex nx:flex-wrap nx:gap-2">
@@ -565,7 +586,7 @@ export const AllVariants: Story = {
 };
 
 // ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
+// MODE BEHAVIOUR
 // ============================================
 
 export const AllModes: Story = {
@@ -576,7 +597,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Vega / Lyra / Luma / Mira currently share identical control padding tokens (so the top 4 rows look the same); Nova compresses, Maia / Sera breathe. See `Tokens/Spacing/Roles` for the per-mode token grid.',
+          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button now uses numeric spacing utilities: default and sm pin height/gap across density modes, while lg and horizontal padding still follow the numeric spacing scale where those steps vary.',
       },
     },
   },
@@ -599,25 +620,78 @@ export const ModesProduceDifferentHeights: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel for the `data-style` cascade and the role-utility resolver. A Button scoped to `nova` (compact) must render shorter than the same Button scoped to `sera` (breathy) — a typo like `nx:py-control-mdd` would silently fall back to intrinsic and both would match. Pair-wise (not a 3-mode chain) so a designer retune of any single mode does not break this test — only a broken cascade does.',
+          'Regression sentinel for the remaining density-sensitive Button size. Large Button uses numeric `py-3`, whose spacing step still varies by mode, so a large Button scoped to `nova` must render shorter than one scoped to `sera`.',
       },
     },
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="button-mode-host-nova">
-        <Button>btn</Button>
+      <div data-style="nova" data-testid="button-lg-mode-host-nova">
+        <Button size="lg">btn</Button>
       </div>
-      <div data-style="sera" data-testid="button-mode-host-sera">
-        <Button>btn</Button>
+      <div data-style="sera" data-testid="button-lg-mode-host-sera">
+        <Button size="lg">btn</Button>
       </div>
     </div>
   ),
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'button-mode-host-nova',
-      'button-mode-host-sera'
+      'button-lg-mode-host-nova',
+      'button-lg-mode-host-sera'
+    );
+  },
+};
+
+export const DefaultAndSmallHeightsArePinnedAcrossModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Density-stability sentinel for Button sizes whose numeric vertical padding is mode-invariant. Default uses `py-2` and sm uses `py-1.5`, so every spacing mode should keep those heights pinned.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          className="nx:flex nx:items-center nx:gap-2"
+        >
+          <Button data-testid={`button-default-${mode}`}>Default</Button>
+          <Button size="sm" data-testid={`button-sm-${mode}`}>
+            Sm
+          </Button>
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const defaultButton = canvas.getByTestId('button-default-vega');
+    const smallButton = canvas.getByTestId('button-sm-vega');
+
+    await expect(defaultButton).toHaveClass('nx:typography-label-default');
+    await expect(defaultButton).toHaveClass('nx:px-4');
+    await expect(defaultButton).toHaveClass('nx:py-2');
+    await expect(defaultButton).toHaveClass('nx:gap-2');
+    await expect(smallButton).toHaveClass('nx:typography-label-small');
+    await expect(smallButton).toHaveClass('nx:px-3');
+    await expect(smallButton).toHaveClass('nx:py-1.5');
+    await expect(smallButton).toHaveClass('nx:gap-1.5');
+
+    await expectHeightPinnedAcrossModes(
+      canvas,
+      SPACING_MODES.map((mode) => `button-default-${mode}`),
+      36
+    );
+    await expectHeightPinnedAcrossModes(
+      canvas,
+      SPACING_MODES.map((mode) => `button-sm-${mode}`),
+      28
     );
   },
 };
@@ -628,7 +702,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: in vega mode, a default Button renders at exactly 36px (= `text-sm` 20px line-height + `py-control-md` 8px × 2). If a designer retunes `--control-padding-y-md` or the body type ramp, this test fails and the change must be acknowledged.',
+          'Pin on the numeric-spacing outcome: in vega mode, a default Button renders at exactly 36px (= `typography-label-default` 20px line-height + `py-2` 8px x 2).',
       },
     },
   },
