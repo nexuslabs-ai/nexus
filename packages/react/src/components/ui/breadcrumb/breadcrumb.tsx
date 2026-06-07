@@ -47,7 +47,6 @@ interface BreadcrumbProps extends React.ComponentProps<'nav'> {}
  * ```tsx
  * <Breadcrumb>
  *   <BreadcrumbList>
- *     <BreadcrumbSeparator />
  *     <BreadcrumbItem>
  *       <BreadcrumbLink href="/">Home</BreadcrumbLink>
  *     </BreadcrumbItem>
@@ -245,8 +244,8 @@ interface BreadcrumbSeparatorProps extends React.ComponentProps<'li'> {}
 /**
  * BreadcrumbSeparator
  *
- * The divider before or between items — a slash by default; pass `children` to
- * use a different glyph.
+ * The divider between items — a slash by default; pass `children` to use a
+ * different glyph.
  */
 function BreadcrumbSeparator({
   children,

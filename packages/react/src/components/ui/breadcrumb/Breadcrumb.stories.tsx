@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { IconFolder } from '@tabler/icons-react';
+import { IconFolder, IconHome, IconSettings } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
@@ -28,12 +28,249 @@ const meta: Meta<typeof Breadcrumb> = {
 export default meta;
 type Story = StoryObj<typeof Breadcrumb>;
 
+type PlaygroundArgs = {
+  itemCount: number;
+  showIcons: boolean;
+  iconOnly: boolean;
+  showMenus: boolean;
+  collapseMiddle: boolean;
+  constrainedWidth: boolean;
+};
+
+const playgroundCrumbs = [
+  {
+    label: 'Home',
+    href: '/home',
+    icon: IconHome,
+    menuItems: ['Dashboard', 'Activity', 'Reports'],
+  },
+  {
+    label: 'Workspace',
+    href: '/workspaces/team',
+    icon: IconFolder,
+    menuItems: ['Personal', 'Team', 'Archived'],
+  },
+  {
+    label: 'Projects',
+    href: '/projects',
+    icon: IconFolder,
+    menuItems: ['Components', 'Patterns', 'Tokens'],
+  },
+  {
+    label: 'Breadcrumb settings with a long page name',
+    href: '/components/breadcrumb',
+    icon: IconSettings,
+    menuItems: ['API', 'Stories', 'Changelog'],
+  },
+];
+
+function renderCrumbContent({
+  crumb,
+  iconOnly,
+  isCurrent,
+  showIcons,
+}: {
+  crumb: (typeof playgroundCrumbs)[number];
+  iconOnly: boolean;
+  isCurrent: boolean;
+  showIcons: boolean;
+}) {
+  const CrumbIcon = crumb.icon;
+  const showVisualIcon = showIcons || iconOnly;
+
+  if (iconOnly) {
+    return (
+      <>
+        <CrumbIcon aria-hidden />
+        {isCurrent ? <span className="nx:sr-only">{crumb.label}</span> : null}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {showVisualIcon ? <CrumbIcon aria-hidden /> : null}
+      <span>{crumb.label}</span>
+    </>
+  );
+}
+
+function renderMenuContent(crumb: (typeof playgroundCrumbs)[number]) {
+  return (
+    <DropdownMenuContent align="start">
+      {crumb.menuItems.map((label) => (
+        <DropdownMenuItem key={label} asChild>
+          <a href={`${crumb.href}/${label.toLowerCase()}`}>{label}</a>
+        </DropdownMenuItem>
+      ))}
+    </DropdownMenuContent>
+  );
+}
+
+function renderPlaygroundItem({
+  crumb,
+  iconOnly,
+  isCurrent,
+  showIcons,
+  showMenus,
+}: {
+  crumb: (typeof playgroundCrumbs)[number];
+  iconOnly: boolean;
+  isCurrent: boolean;
+  showIcons: boolean;
+  showMenus: boolean;
+}) {
+  return (
+    <BreadcrumbItem key={crumb.label}>
+      {isCurrent ? (
+        <BreadcrumbPage>
+          {renderCrumbContent({ crumb, iconOnly, isCurrent, showIcons })}
+        </BreadcrumbPage>
+      ) : (
+        <BreadcrumbLink
+          href={crumb.href}
+          aria-label={iconOnly ? crumb.label : undefined}
+        >
+          {renderCrumbContent({ crumb, iconOnly, isCurrent, showIcons })}
+        </BreadcrumbLink>
+      )}
+      {showMenus ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <BreadcrumbMenuTrigger
+              aria-label={
+                isCurrent
+                  ? `Show related pages for ${crumb.label}`
+                  : `Show alternate paths for ${crumb.label}`
+              }
+            />
+          </DropdownMenuTrigger>
+          {renderMenuContent(crumb)}
+        </DropdownMenu>
+      ) : null}
+    </BreadcrumbItem>
+  );
+}
+
+function renderSeparator(key: string) {
+  return <BreadcrumbSeparator key={key} />;
+}
+
+// Compound playground for trying the breadcrumb anatomy without adding runtime
+// props to the component itself.
+export const Playground: StoryObj<PlaygroundArgs> = {
+  args: {
+    itemCount: 4,
+    showIcons: true,
+    iconOnly: false,
+    showMenus: true,
+    collapseMiddle: false,
+    constrainedWidth: false,
+  },
+  argTypes: {
+    itemCount: {
+      control: 'select',
+      options: [2, 3, 4],
+      description: 'Number of breadcrumb items to render',
+    },
+    showIcons: {
+      control: 'boolean',
+      description: 'Show leading icons in each breadcrumb segment',
+    },
+    iconOnly: {
+      control: 'boolean',
+      description:
+        'Render items as icons only while preserving accessible names',
+    },
+    showMenus: {
+      control: 'boolean',
+      description: 'Show dropdown menu triggers next to breadcrumb segments',
+    },
+    collapseMiddle: {
+      control: 'boolean',
+      description: 'Collapse middle items into the ellipsis dropdown',
+    },
+    constrainedWidth: {
+      control: 'boolean',
+      description: 'Render inside a narrow container to preview truncation',
+    },
+  },
+  render: ({
+    collapseMiddle,
+    constrainedWidth,
+    iconOnly,
+    itemCount,
+    showIcons,
+    showMenus,
+  }) => {
+    const selectedCrumbs = playgroundCrumbs.slice(0, itemCount);
+    const shouldCollapse = collapseMiddle && selectedCrumbs.length > 3;
+    const visibleTrail = shouldCollapse
+      ? [
+          renderPlaygroundItem({
+            crumb: selectedCrumbs[0]!,
+            iconOnly,
+            isCurrent: false,
+            showIcons,
+            showMenus,
+          }),
+          renderSeparator('separator-ellipsis'),
+          <BreadcrumbItem key="ellipsis">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <BreadcrumbEllipsis />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {selectedCrumbs.slice(1, -1).map((crumb) => (
+                  <DropdownMenuItem key={crumb.label} asChild>
+                    <a href={crumb.href}>{crumb.label}</a>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </BreadcrumbItem>,
+          renderSeparator('separator-current'),
+          renderPlaygroundItem({
+            crumb: selectedCrumbs[selectedCrumbs.length - 1]!,
+            iconOnly,
+            isCurrent: true,
+            showIcons,
+            showMenus,
+          }),
+        ]
+      : selectedCrumbs.flatMap((crumb, index) => {
+          const isCurrent = index === selectedCrumbs.length - 1;
+          const item = renderPlaygroundItem({
+            crumb,
+            iconOnly,
+            isCurrent,
+            showIcons,
+            showMenus,
+          });
+
+          return index === 0
+            ? [item]
+            : [renderSeparator(`separator-${crumb.label}`), item];
+        });
+    const breadcrumb = (
+      <Breadcrumb>
+        <BreadcrumbList>{visibleTrail}</BreadcrumbList>
+      </Breadcrumb>
+    );
+
+    return constrainedWidth ? (
+      <div className="nx:w-[240px]">{breadcrumb}</div>
+    ) : (
+      breadcrumb
+    );
+  },
+};
+
 // A three-level trail ending on the current page.
 export const Default: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href="#">Home</BreadcrumbLink>
         </BreadcrumbItem>
@@ -55,7 +292,6 @@ export const WithEllipsis: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href="#">Home</BreadcrumbLink>
         </BreadcrumbItem>
@@ -109,7 +345,6 @@ export const WithIcons: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href="#">
             <IconFolder aria-hidden />
@@ -195,6 +430,48 @@ export const WithIcons: Story = {
   },
 };
 
+// Breadcrumb items can be icon-only visually. Links still need an accessible
+// name, and the current page carries screen-reader text because it is not a
+// named interactive control.
+export const IconOnly: Story = {
+  render: () => (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/home" aria-label="Home">
+            <IconHome aria-hidden />
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/projects" aria-label="Projects">
+            <IconFolder aria-hidden />
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>
+            <IconSettings aria-hidden />
+            <span className="nx:sr-only">Settings</span>
+          </BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByRole('link', { name: 'Home' })).toHaveAttribute(
+      'data-slot',
+      'breadcrumb-link'
+    );
+    await expect(
+      canvas.getByRole('link', { name: 'Projects' })
+    ).toHaveAttribute('data-slot', 'breadcrumb-link');
+    await expect(canvas.getByText('Settings')).toHaveClass('nx:sr-only');
+  },
+};
+
 // Breadcrumb labels cap at 150px, then shrink below that when the available
 // breadcrumb width is tighter.
 export const LongContent: Story = {
@@ -202,7 +479,6 @@ export const LongContent: Story = {
     <div className="nx:w-[240px]">
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink href="#">
               Quarterly reporting workspace with an unusually long name
@@ -226,7 +502,6 @@ export const AsChild: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <a href="/contacts" data-testid="router-link">
@@ -255,7 +530,6 @@ export const KeyboardInteraction: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href="#">Home</BreadcrumbLink>
           <DropdownMenu>
@@ -306,7 +580,6 @@ export const WithDataAttributes: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href="#">Home</BreadcrumbLink>
           <DropdownMenu>
@@ -373,7 +646,6 @@ export const AllVariants: Story = {
   render: () => (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href="#">Home</BreadcrumbLink>
         </BreadcrumbItem>
