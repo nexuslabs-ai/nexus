@@ -83,7 +83,8 @@ export const Secondary: Story = {
   },
 };
 
-export const Error: Story = {
+export const ErrorVariant: Story = {
+  name: 'Error',
   args: {
     variant: 'error',
     children: 'Error',
@@ -254,7 +255,6 @@ export const IconOnly: Story = {
     variant: 'success',
     fill: 'light',
     leftIcon: <IconCheck />,
-    role: 'img',
     'aria-label': 'Approved',
   },
   play: async ({ canvasElement }) => {
@@ -264,10 +264,7 @@ export const IconOnly: Story = {
     const rect = badge.getBoundingClientRect();
 
     if (!(svg instanceof SVGElement)) {
-      // `globalThis.Error`: the `Error` variant story shadows the global here.
-      throw new globalThis.Error(
-        'Expected icon-only badge to render an SVG icon.'
-      );
+      throw new Error('Expected icon-only badge to render an SVG icon.');
     }
 
     const svgRect = svg.getBoundingClientRect();
@@ -297,10 +294,7 @@ export const WithSvgLoader: Story = {
     const spinner = badge.querySelector('[data-slot="spinner"]');
 
     if (!(spinner instanceof SVGElement)) {
-      // `globalThis.Error`: the `Error` variant story shadows the global here.
-      throw new globalThis.Error(
-        'Expected loader badge to render a Spinner SVG.'
-      );
+      throw new Error('Expected loader badge to render a Spinner SVG.');
     }
 
     const rect = spinner.getBoundingClientRect();
@@ -569,21 +563,18 @@ export const AllVariants: Story = {
             variant="success"
             fill="light"
             leftIcon={<IconCheck />}
-            role="img"
             aria-label="Approved"
           />
           <Badge
             variant="default"
             fill="solid"
             leftIcon={<IconCheck />}
-            role="img"
             aria-label="Verified"
           />
           <Badge
             variant="error"
             fill="outline"
             rightIcon={<IconX />}
-            role="img"
             aria-label="Error"
           />
         </div>

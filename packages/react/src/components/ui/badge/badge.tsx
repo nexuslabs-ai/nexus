@@ -235,6 +235,7 @@ function Badge({
       data-caps={isCaps}
       data-number={isNumber || undefined}
       data-icon-only={isIconOnly || undefined}
+      role={isIconOnly ? 'img' : undefined}
       className={classes}
       {...props}
     >
