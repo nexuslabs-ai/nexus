@@ -74,6 +74,20 @@ function resolveButtonOrientation(
   return buttonOrientation ?? 'horizontal';
 }
 
+function containsComposedHeader(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) return false;
+    if (child.type === AlertDialogHeader) return true;
+    if (child.type === React.Fragment) {
+      const fragment = child as React.ReactElement<{
+        children?: React.ReactNode;
+      }>;
+      return containsComposedHeader(fragment.props.children);
+    }
+    return false;
+  });
+}
+
 /**
  * AlertDialog
  *
@@ -227,11 +241,8 @@ function AlertDialogContent({
     variant,
     buttonOrientation
   );
-  const hasComposedHeader = React.Children.toArray(children).some(
-    (child) => React.isValidElement(child) && child.type === AlertDialogHeader
-  );
   const showGeneratedHeader =
-    !hasComposedHeader && (title != null || description != null);
+    !containsComposedHeader(children) && (title != null || description != null);
 
   return (
     <AlertDialogPortal>

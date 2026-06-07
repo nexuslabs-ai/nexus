@@ -523,6 +523,62 @@ export const WithDataAttributes: Story = {
   },
 };
 
+export const ComposedHeaderWins: Story = {
+  render: (_args) => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">Show dialog</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent title="Prop title" description="Prop description">
+        {/*
+          A composed header is present (here grouped with the footer in a
+          Fragment), so the prop-driven title/description must be suppressed —
+          the gate has to detect the header *through* the Fragment.
+        */}
+        <>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Composed title</AlertDialogTitle>
+            <AlertDialogDescription>
+              The composed header takes precedence over the title and
+              description props.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const trigger = canvas.getByRole('button', { name: 'Show dialog' });
+    await userEvent.click(trigger);
+
+    const dialog = await within(document.body).findByRole('alertdialog');
+
+    // Composed header wins: exactly one title (the composed one), so there is
+    // no duplicate Radix Title / ambiguous aria-labelledby.
+    const titles = document.querySelectorAll(
+      '[data-slot="alert-dialog-title"]'
+    );
+    await expect(titles).toHaveLength(1);
+    await expect(titles[0]).toHaveTextContent('Composed title');
+    await expect(
+      within(dialog).queryByText('Prop title')
+    ).not.toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
