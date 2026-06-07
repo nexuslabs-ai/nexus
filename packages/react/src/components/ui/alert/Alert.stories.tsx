@@ -41,8 +41,8 @@ const meta: Meta<typeof Alert> = {
 Alert is a composable callout for status, warning, error, success, or informational messages. The root controls status, presentation, and layout; icons, content, actions, and dismissal are composed with children.
 
 Action pattern rules:
-- Stack layout: valid with no actions, one or two button actions, or button action(s) plus AlertClose.
-- Stack layout: do not use AlertClose as the only action, because a lone close icon below the message is not an approved placement.
+- Stack layout: valid with no actions, one button action, or two button actions.
+- Stack layout: do not use AlertClose because the close icon is not an approved below-message placement.
 - Inline layout: valid with close-only, one or two button actions, or button action(s) plus AlertClose.
 - Dismissal stays consumer-controlled. AlertClose only renders the control; it does not remove the alert by itself.
         `,
@@ -98,7 +98,10 @@ type PlaygroundActions =
   | 'primary + close'
   | 'primary + secondary'
   | 'primary + secondary + close';
-type PlaygroundStackActions = Exclude<PlaygroundActions, 'close'>;
+type PlaygroundStackActions = Extract<
+  PlaygroundActions,
+  'none' | 'primary' | 'primary + secondary'
+>;
 type PlaygroundButtonVariant = NonNullable<
   React.ComponentProps<typeof Button>['variant']
 >;
@@ -131,6 +134,16 @@ function renderPlaygroundIcon(icon: PlaygroundIcon) {
   return <IconInfoCircle aria-hidden="true" className="nx:size-4" />;
 }
 
+function normalizeStackActions(
+  actions: PlaygroundActions
+): PlaygroundStackActions {
+  if (actions === 'close') return 'none';
+  if (actions === 'primary + close') return 'primary';
+  if (actions === 'primary + secondary + close') return 'primary + secondary';
+
+  return actions;
+}
+
 function AlertPlaygroundExample({
   actionsInline,
   actionsStack,
@@ -156,7 +169,8 @@ function AlertPlaygroundExample({
   secondaryActionVariant: PlaygroundButtonVariant;
 }) {
   const [visible, setVisible] = React.useState(true);
-  const actions = layout === 'inline' ? actionsInline : actionsStack;
+  const actions =
+    layout === 'inline' ? actionsInline : normalizeStackActions(actionsStack);
   const hasPrimaryAction = actions.includes('primary');
   const hasSecondaryAction = actions.includes('secondary');
   const hasCloseAction = actions.includes('close');
@@ -259,7 +273,7 @@ export const Default: Story = {
 export const Playground: PlaygroundStory = {
   args: {
     actionsInline: 'primary + close',
-    actionsStack: 'primary + close',
+    actionsStack: 'primary',
     icon: 'information',
     layout: 'inline',
     presentation: 'card',
@@ -296,15 +310,9 @@ export const Playground: PlaygroundStory = {
     actionsStack: {
       name: 'actions (stack story only)',
       control: 'select',
-      options: [
-        'none',
-        'primary',
-        'primary + close',
-        'primary + secondary',
-        'primary + secondary + close',
-      ],
+      options: ['none', 'primary', 'primary + secondary'],
       description:
-        'Story-only stack action pattern. Close-only is intentionally omitted because the lone close icon should not sit below the message.',
+        'Story-only stack action pattern. AlertClose is intentionally omitted because the close icon should not sit below the message.',
       table: {
         category: 'Controls',
       },
@@ -379,7 +387,7 @@ export const Playground: PlaygroundStory = {
     docs: {
       description: {
         story:
-          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. The visible action control changes by layout so stack omits the invalid close-only pattern while inline keeps it available.',
+          'Story-only controls render the recommended slot composition. They are not Alert props; production usage still composes icons, Button, AlertActions, and AlertClose as children. The visible action control changes by layout so stack omits AlertClose patterns while inline keeps them available.',
       },
       source: {
         code: `<Alert variant="information" layout="inline">

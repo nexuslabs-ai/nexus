@@ -59,9 +59,9 @@ interface AlertProps
  * corners, bottom border only).
  * Use `layout="inline"` with `AlertContent` and `AlertActions` when the alert
  * has trailing controls.
- * In the default stack layout, use no actions, button actions, or button
- * actions with `AlertClose`; avoid rendering `AlertClose` as the only action.
- * Use `layout="inline"` for close-only dismissal.
+ * In the default stack layout, use no actions or button actions only; avoid
+ * rendering `AlertClose` below the message. Use `layout="inline"` for
+ * dismissal controls.
  * Alerts are passive by default; pass `role="alert"` for urgent dynamic
  * messages or `role="status"` for polite status updates.
  *
@@ -245,8 +245,8 @@ interface AlertActionsProps extends React.ComponentProps<'div'> {}
  * AlertActions
  *
  * Holds one or two alert CTAs. Use the existing Button component for actions.
- * In stack layout, `AlertClose` should accompany another action rather than sit
- * alone below the message. For close-only dismissal, use `layout="inline"`.
+ * In stack layout, use button actions only. For dismissal controls, use
+ * `layout="inline"` so `AlertClose` sits in the trailing action area.
  *
  * @example
  * ```tsx
