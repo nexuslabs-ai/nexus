@@ -622,6 +622,8 @@ export const EndIconSlot: Story = {
 export const LoadingUsesSpinnerOnly: Story = {
   args: {
     loading: true,
+    startIcon: <IconRocket />,
+    endIcon: <IconArrowRight />,
     children: 'Launching',
   },
   play: async ({ canvasElement }) => {
