@@ -524,8 +524,7 @@ export const AsChild: Story = {
   },
 };
 
-// The list is a focusable scroll region (first tab stop); the links then follow
-// the native anchor focus contract, and the current page stays out of the order.
+// Breadcrumb links are native anchors; the current page is a non-interactive span.
 export const KeyboardInteraction: Story = {
   render: () => (
     <Breadcrumb>
