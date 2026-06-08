@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconArrowRight, IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
@@ -67,51 +65,6 @@ const meta: Meta<typeof Button> = {
 
 export default meta;
 type Story = StoryObj<typeof Button>;
-
-class ButtonErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { message?: string }
-> {
-  state: { message?: string } = {};
-
-  static getDerivedStateFromError(error: unknown) {
-    return {
-      message:
-        error instanceof globalThis.Error
-          ? error.message
-          : 'Button configuration failed',
-    };
-  }
-
-  render() {
-    if (this.state.message) {
-      return <p role="alert">{this.state.message}</p>;
-    }
-
-    return this.props.children;
-  }
-}
-
-const invalidStartAndEndIconProps = {
-  startIcon: <IconRocket />,
-  endIcon: <IconArrowRight />,
-  children: 'Launch flow',
-};
-
-const invalidLoadingWithIconProps = {
-  loading: true,
-  startIcon: <IconRocket />,
-  children: 'Launching',
-};
-
-const invalidEmptyChildrenProps = {
-  'aria-label': 'Empty button',
-  children: undefined,
-};
-
-const invalidLongContentProps = {
-  children: 'This button label is too long',
-};
 
 // ============================================
 // VARIANT STORIES (visual documentation)
@@ -184,7 +137,6 @@ export const Link: Story = {
 
     await expect(button).toHaveClass('nx:underline-offset-4');
     await expect(button).toHaveClass('nx:hover:underline');
-    await expect(button).toHaveClass('nx:shadow-none');
     await expect(button).toHaveClass('nx:p-0!');
     await expect(button).not.toHaveClass('nx:hover:bg-primary-subtle-hover');
     await expectHeightPinned(canvas, 'button-link', 20);
@@ -565,7 +517,6 @@ export const DisabledAsLink: Story = {
     await expect(link).toHaveAttribute('tabindex', '-1');
     await expect(link).toHaveClass('nx:aria-disabled:pointer-events-none');
     await expect(link).toHaveClass('nx:aria-disabled:opacity-100');
-    await expect(link).toHaveClass('nx:aria-disabled:shadow-none');
     await expect(link).toHaveClass('nx:aria-disabled:bg-primary-disabled');
 
     const clickResult = link.dispatchEvent(
@@ -619,42 +570,6 @@ export const LoadingAsLink: Story = {
 // EDGE CASES
 // ============================================
 
-export const RejectsEmptyChildren: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-  },
-  render: () => (
-    <ButtonErrorBoundary>
-      <Button {...invalidEmptyChildrenProps} />
-    </ButtonErrorBoundary>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Button requires non-empty children.'
-    );
-  },
-};
-
-export const RejectsLongContent: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-  },
-  render: () => (
-    <ButtonErrorBoundary>
-      <Button {...invalidLongContentProps} />
-    </ButtonErrorBoundary>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Button label must be one or two words.'
-    );
-  },
-};
-
 export const WithIcon: Story = {
   render: (args) => (
     <Button {...args}>
@@ -701,42 +616,6 @@ export const EndIconSlot: Story = {
     await expect(endIcon).toHaveAttribute('aria-hidden', 'true');
     await expect(canvas.getByTestId('end-icon')).toBeInTheDocument();
     await expect(button).toHaveAccessibleName('Continue');
-  },
-};
-
-export const RejectsStartAndEndIconSlots: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-  },
-  render: () => (
-    <ButtonErrorBoundary>
-      <Button {...invalidStartAndEndIconProps} />
-    </ButtonErrorBoundary>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Button supports either startIcon or endIcon, not both.'
-    );
-  },
-};
-
-export const RejectsLoadingWithIconSlots: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-  },
-  render: () => (
-    <ButtonErrorBoundary>
-      <Button {...invalidLoadingWithIconProps} />
-    </ButtonErrorBoundary>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByRole('alert')).toHaveTextContent(
-      'Button icon slots are not supported while loading.'
-    );
   },
 };
 

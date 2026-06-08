@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:inline-flex nx:cursor-pointer nx:items-center nx:justify-center nx:overflow-clip nx:rounded-base nx:whitespace-nowrap nx:shadow-xs nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:disabled:shadow-none nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:aria-disabled:shadow-none nx:[&_svg]:pointer-events-none nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-base nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -25,7 +25,7 @@ const buttonVariants = cva(
           'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover nx:active:bg-secondary-background-active nx:disabled:bg-secondary-disabled nx:aria-disabled:bg-secondary-disabled',
         ghost:
           'nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
-        link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:shadow-none nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
+        link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
       },
       size: {
         sm: 'nx:px-2.5 nx:py-1.5 nx:gap-1 nx:typography-label-small',
@@ -101,7 +101,7 @@ interface ButtonProps
 
   /**
    * Shows a loading indicator and disables the button.
-   * Loading buttons cannot render startIcon or endIcon.
+   * While loading, icon slots are hidden and a spinner is shown.
    * @default false
    * @example
    * ```tsx
@@ -111,14 +111,12 @@ interface ButtonProps
   loading?: boolean;
 
   /**
-   * Decorative icon rendered before the button label.
-   * Mutually exclusive with endIcon and loading.
+   * Decorative icon rendered before the button label. Hidden while loading.
    */
   startIcon?: React.ReactNode;
 
   /**
-   * Decorative icon rendered after the button label.
-   * Mutually exclusive with startIcon and loading.
+   * Decorative icon rendered after the button label. Hidden while loading.
    */
   endIcon?: React.ReactNode;
 
@@ -135,96 +133,8 @@ type ButtonAsChildElementProps = {
   onClick?: React.MouseEventHandler<HTMLElement>;
 };
 
-const MAX_BUTTON_LABEL_WORDS = 2;
-
 function hasIconSlot(icon: React.ReactNode) {
   return icon !== undefined && icon !== null && icon !== false;
-}
-
-function countLabelWords(text: string) {
-  const words = text.trim().split(/\s+/).filter(Boolean);
-  return words.length;
-}
-
-function countButtonLabelWords(content: React.ReactNode): number {
-  if (content === undefined || content === null || content === false) {
-    return 0;
-  }
-
-  if (typeof content === 'string' || typeof content === 'number') {
-    return countLabelWords(String(content));
-  }
-
-  if (Array.isArray(content)) {
-    return content.reduce(
-      (wordCount, child) => wordCount + countButtonLabelWords(child),
-      0
-    );
-  }
-
-  if (React.isValidElement<{ children?: React.ReactNode }>(content)) {
-    return countButtonLabelWords(content.props.children);
-  }
-
-  return 0;
-}
-
-function hasButtonContent(content: React.ReactNode): boolean {
-  if (
-    content === undefined ||
-    content === null ||
-    typeof content === 'boolean'
-  ) {
-    return false;
-  }
-
-  if (typeof content === 'string') {
-    return content.trim().length > 0;
-  }
-
-  if (Array.isArray(content)) {
-    return content.some(hasButtonContent);
-  }
-
-  if (React.isValidElement<{ children?: React.ReactNode }>(content)) {
-    if (content.type === React.Fragment) {
-      return hasButtonContent(content.props.children);
-    }
-    return true;
-  }
-
-  return true;
-}
-
-function validateButtonContent(children: React.ReactNode) {
-  if (!hasButtonContent(children)) {
-    throw new Error('Button requires non-empty children.');
-  }
-
-  if (countButtonLabelWords(children) > MAX_BUTTON_LABEL_WORDS) {
-    throw new Error('Button label must be one or two words.');
-  }
-}
-
-function validateButtonIconSlots({
-  endIcon,
-  loading,
-  startIcon,
-}: {
-  endIcon?: React.ReactNode;
-  loading: boolean;
-  startIcon?: React.ReactNode;
-}) {
-  const hasStartIcon = hasIconSlot(startIcon);
-  const hasEndIcon = hasIconSlot(endIcon);
-
-  if (hasStartIcon && hasEndIcon) {
-    throw new Error('Button supports either startIcon or endIcon, not both.');
-  }
-
-  if (loading && (hasStartIcon || hasEndIcon)) {
-    throw new Error('Button icon slots are not supported while loading.');
-  }
 }
 
 function buttonIconSlot(position: 'start' | 'end', icon: React.ReactNode) {
@@ -254,9 +164,9 @@ function buttonContent({
 }) {
   return (
     <>
-      {buttonIconSlot('start', startIcon)}
+      {!loading && buttonIconSlot('start', startIcon)}
       {children}
-      {buttonIconSlot('end', endIcon)}
+      {!loading && buttonIconSlot('end', endIcon)}
       {loading && <Spinner aria-hidden="true" />}
     </>
   );
@@ -269,7 +179,7 @@ function buttonContent({
 function NativeButton({
   className,
   variant = 'default',
-  size = 'default',
+  size,
   isIconOnly = false,
   loading = false,
   disabled,
@@ -285,8 +195,6 @@ function NativeButton({
   const semanticSize = size ?? 'default';
   const visualSize = getVisualButtonSize(semanticSize, isIconOnly);
   const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
-  validateButtonContent(children);
-  validateButtonIconSlots({ endIcon, loading, startIcon });
 
   return (
     <button
@@ -316,7 +224,7 @@ function NativeButton({
 function SlotButton({
   className,
   variant = 'default',
-  size = 'default',
+  size,
   isIconOnly = false,
   loading = false,
   disabled,
@@ -336,8 +244,6 @@ function SlotButton({
   const child = React.isValidElement<ButtonAsChildElementProps>(children)
     ? children
     : null;
-  validateButtonContent(child ? child.props.children : children);
-  validateButtonIconSlots({ endIcon, loading, startIcon });
   const childOnClick = child?.props.onClick;
 
   const handleClick: React.MouseEventHandler<HTMLElement> = (event) => {
