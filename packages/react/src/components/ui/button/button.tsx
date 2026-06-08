@@ -25,7 +25,7 @@ const buttonVariants = cva(
           'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover nx:active:bg-secondary-background-active nx:disabled:bg-secondary-disabled nx:aria-disabled:bg-secondary-disabled',
         ghost:
           'nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
-        link: 'nx:text-primary-subtle-foreground nx:hover:bg-primary-subtle-hover nx:active:bg-primary-subtle-active nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
+        link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:shadow-none nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
       },
       size: {
         sm: 'nx:px-2.5 nx:py-1.5 nx:gap-1 nx:typography-label-small',
@@ -53,6 +53,11 @@ const buttonVariants = cva(
         variant: ['outline', 'dashed'],
         size: 'lg',
         className: 'nx:px-[13px] nx:py-[7px]',
+      },
+      {
+        variant: 'link',
+        size: ['sm', 'default', 'lg'],
+        className: 'nx:h-auto nx:p-0!',
       },
     ],
     defaultVariants: {
@@ -96,7 +101,7 @@ interface ButtonProps
 
   /**
    * Shows a loading indicator and disables the button.
-   * When loading, the button is non-interactive and shows aria-busy for accessibility.
+   * Loading buttons cannot render startIcon or endIcon.
    * @default false
    * @example
    * ```tsx
@@ -107,11 +112,13 @@ interface ButtonProps
 
   /**
    * Decorative icon rendered before the button label.
+   * Mutually exclusive with endIcon and loading.
    */
   startIcon?: React.ReactNode;
 
   /**
    * Decorative icon rendered after the button label.
+   * Mutually exclusive with startIcon and loading.
    */
   endIcon?: React.ReactNode;
 
@@ -128,8 +135,100 @@ type ButtonAsChildElementProps = {
   onClick?: React.MouseEventHandler<HTMLElement>;
 };
 
+const MAX_BUTTON_LABEL_WORDS = 2;
+
+function hasIconSlot(icon: React.ReactNode) {
+  return icon !== undefined && icon !== null && icon !== false;
+}
+
+function countLabelWords(text: string) {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  return words.length;
+}
+
+function countButtonLabelWords(content: React.ReactNode): number {
+  if (content === undefined || content === null || content === false) {
+    return 0;
+  }
+
+  if (typeof content === 'string' || typeof content === 'number') {
+    return countLabelWords(String(content));
+  }
+
+  if (Array.isArray(content)) {
+    return content.reduce(
+      (wordCount, child) => wordCount + countButtonLabelWords(child),
+      0
+    );
+  }
+
+  if (React.isValidElement<{ children?: React.ReactNode }>(content)) {
+    return countButtonLabelWords(content.props.children);
+  }
+
+  return 0;
+}
+
+function hasButtonContent(content: React.ReactNode): boolean {
+  if (
+    content === undefined ||
+    content === null ||
+    typeof content === 'boolean'
+  ) {
+    return false;
+  }
+
+  if (typeof content === 'string') {
+    return content.trim().length > 0;
+  }
+
+  if (Array.isArray(content)) {
+    return content.some(hasButtonContent);
+  }
+
+  if (React.isValidElement<{ children?: React.ReactNode }>(content)) {
+    if (content.type === React.Fragment) {
+      return hasButtonContent(content.props.children);
+    }
+    return true;
+  }
+
+  return true;
+}
+
+function validateButtonContent(children: React.ReactNode) {
+  if (!hasButtonContent(children)) {
+    throw new Error('Button requires non-empty children.');
+  }
+
+  if (countButtonLabelWords(children) > MAX_BUTTON_LABEL_WORDS) {
+    throw new Error('Button label must be one or two words.');
+  }
+}
+
+function validateButtonIconSlots({
+  endIcon,
+  loading,
+  startIcon,
+}: {
+  endIcon?: React.ReactNode;
+  loading: boolean;
+  startIcon?: React.ReactNode;
+}) {
+  const hasStartIcon = hasIconSlot(startIcon);
+  const hasEndIcon = hasIconSlot(endIcon);
+
+  if (hasStartIcon && hasEndIcon) {
+    throw new Error('Button supports either startIcon or endIcon, not both.');
+  }
+
+  if (loading && (hasStartIcon || hasEndIcon)) {
+    throw new Error('Button icon slots are not supported while loading.');
+  }
+}
+
 function buttonIconSlot(position: 'start' | 'end', icon: React.ReactNode) {
-  if (!icon) return null;
+  if (!hasIconSlot(icon)) return null;
   return (
     <span
       aria-hidden="true"
@@ -186,6 +285,8 @@ function NativeButton({
   const semanticSize = size ?? 'default';
   const visualSize = getVisualButtonSize(semanticSize, isIconOnly);
   const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
+  validateButtonContent(children);
+  validateButtonIconSlots({ endIcon, loading, startIcon });
 
   return (
     <button
@@ -235,6 +336,8 @@ function SlotButton({
   const child = React.isValidElement<ButtonAsChildElementProps>(children)
     ? children
     : null;
+  validateButtonContent(child ? child.props.children : children);
+  validateButtonIconSlots({ endIcon, loading, startIcon });
   const childOnClick = child?.props.onClick;
 
   const handleClick: React.MouseEventHandler<HTMLElement> = (event) => {

@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconArrowRight, IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
@@ -66,6 +68,51 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
+class ButtonErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { message?: string }
+> {
+  state: { message?: string } = {};
+
+  static getDerivedStateFromError(error: unknown) {
+    return {
+      message:
+        error instanceof globalThis.Error
+          ? error.message
+          : 'Button configuration failed',
+    };
+  }
+
+  render() {
+    if (this.state.message) {
+      return <p role="alert">{this.state.message}</p>;
+    }
+
+    return this.props.children;
+  }
+}
+
+const invalidStartAndEndIconProps = {
+  startIcon: <IconRocket />,
+  endIcon: <IconArrowRight />,
+  children: 'Launch flow',
+};
+
+const invalidLoadingWithIconProps = {
+  loading: true,
+  startIcon: <IconRocket />,
+  children: 'Launching',
+};
+
+const invalidEmptyChildrenProps = {
+  'aria-label': 'Empty button',
+  children: undefined,
+};
+
+const invalidLongContentProps = {
+  children: 'This button label is too long',
+};
+
 // ============================================
 // VARIANT STORIES (visual documentation)
 // ============================================
@@ -126,9 +173,21 @@ export const Ghost: Story = {
 };
 
 export const Link: Story = {
-  args: {
-    variant: 'link',
-    children: 'Link',
+  render: () => (
+    <Button variant="link" data-testid="button-link">
+      Link
+    </Button>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Link' });
+
+    await expect(button).toHaveClass('nx:underline-offset-4');
+    await expect(button).toHaveClass('nx:hover:underline');
+    await expect(button).toHaveClass('nx:shadow-none');
+    await expect(button).toHaveClass('nx:p-0!');
+    await expect(button).not.toHaveClass('nx:hover:bg-primary-subtle-hover');
+    await expectHeightPinned(canvas, 'button-link', 20);
   },
 };
 
@@ -560,28 +619,39 @@ export const LoadingAsLink: Story = {
 // EDGE CASES
 // ============================================
 
-export const EmptyChildren: Story = {
-  args: {
-    children: undefined,
-    'aria-label': 'Empty button',
+export const RejectsEmptyChildren: Story = {
+  parameters: {
+    a11y: { test: 'off' },
   },
+  render: () => (
+    <ButtonErrorBoundary>
+      <Button {...invalidEmptyChildrenProps} />
+    </ButtonErrorBoundary>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
 
-    await expect(button).toBeInTheDocument();
+    await expect(canvas.getByRole('alert')).toHaveTextContent(
+      'Button requires non-empty children.'
+    );
   },
 };
 
-export const LongContent: Story = {
-  args: {
-    children: 'This is a very long button text that might wrap or overflow',
+export const RejectsLongContent: Story = {
+  parameters: {
+    a11y: { test: 'off' },
   },
+  render: () => (
+    <ButtonErrorBoundary>
+      <Button {...invalidLongContentProps} />
+    </ButtonErrorBoundary>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
 
-    await expect(button).toHaveTextContent('This is a very long button text');
+    await expect(canvas.getByRole('alert')).toHaveTextContent(
+      'Button label must be one or two words.'
+    );
   },
 };
 
@@ -634,31 +704,45 @@ export const EndIconSlot: Story = {
   },
 };
 
-export const StartAndEndIconSlots: Story = {
-  args: {
-    startIcon: <IconRocket />,
-    endIcon: <IconArrowRight />,
-    children: 'Launch flow',
+export const RejectsStartAndEndIconSlots: Story = {
+  parameters: {
+    a11y: { test: 'off' },
   },
+  render: () => (
+    <ButtonErrorBoundary>
+      <Button {...invalidStartAndEndIconProps} />
+    </ButtonErrorBoundary>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Launch flow' });
 
-    await expect(
-      button.querySelector('[data-slot="button-start-icon"]')
-    ).toBeInTheDocument();
-    await expect(
-      button.querySelector('[data-slot="button-end-icon"]')
-    ).toBeInTheDocument();
-    await expect(button).toHaveAccessibleName('Launch flow');
+    await expect(canvas.getByRole('alert')).toHaveTextContent(
+      'Button supports either startIcon or endIcon, not both.'
+    );
   },
 };
 
-export const LoadingWithIconSlots: Story = {
+export const RejectsLoadingWithIconSlots: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+  },
+  render: () => (
+    <ButtonErrorBoundary>
+      <Button {...invalidLoadingWithIconProps} />
+    </ButtonErrorBoundary>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByRole('alert')).toHaveTextContent(
+      'Button icon slots are not supported while loading.'
+    );
+  },
+};
+
+export const LoadingUsesSpinnerOnly: Story = {
   args: {
     loading: true,
-    startIcon: <IconRocket />,
-    endIcon: <IconArrowRight />,
     children: 'Launching',
   },
   play: async ({ canvasElement }) => {
@@ -669,10 +753,10 @@ export const LoadingWithIconSlots: Story = {
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(
       button.querySelector('[data-slot="button-start-icon"]')
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
     await expect(
       button.querySelector('[data-slot="button-end-icon"]')
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
     await expect(
       button.querySelector('[data-slot="spinner"]')
     ).toBeInTheDocument();
@@ -681,12 +765,7 @@ export const LoadingWithIconSlots: Story = {
 
 export const AsLinkWithIconSlots: Story = {
   render: (args) => (
-    <Button
-      {...args}
-      asChild
-      startIcon={<IconRocket />}
-      endIcon={<IconArrowRight />}
-    >
+    <Button {...args} asChild startIcon={<IconRocket />}>
       <a href="https://example.com">Visit Website</a>
     </Button>
   ),
@@ -700,7 +779,7 @@ export const AsLinkWithIconSlots: Story = {
     ).toBeInTheDocument();
     await expect(
       link.querySelector('[data-slot="button-end-icon"]')
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
     await expect(link).toHaveAccessibleName('Visit Website');
   },
 };
@@ -753,9 +832,6 @@ export const AllVariants: Story = {
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
           <Button startIcon={<IconRocket />}>Start icon</Button>
           <Button endIcon={<IconArrowRight />}>End icon</Button>
-          <Button startIcon={<IconRocket />} endIcon={<IconArrowRight />}>
-            Both icons
-          </Button>
         </div>
       </div>
       <div>
@@ -981,7 +1057,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
       'nx:hover:bg-container-hover'
     );
     await expect(canvas.getByRole('button', { name: 'Link' })).toHaveClass(
-      'nx:hover:bg-primary-subtle-hover'
+      'nx:hover:underline'
     );
   },
 };
