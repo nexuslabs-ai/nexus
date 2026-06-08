@@ -524,8 +524,8 @@ export const AsChild: Story = {
   },
 };
 
-// Breadcrumb links follow the native anchor focus contract; the current page is
-// a non-interactive span and stays out of the tab order.
+// The list is a focusable scroll region (first tab stop); the links then follow
+// the native anchor focus contract, and the current page stays out of the order.
 export const KeyboardInteraction: Story = {
   render: () => (
     <Breadcrumb>
@@ -555,12 +555,17 @@ export const KeyboardInteraction: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const list = canvas.getByRole('list');
     const link = canvas.getByRole('link', { name: 'Home' });
     const trigger = canvas.getByRole('button', {
       name: 'Show alternate paths for Home',
     });
     const page = canvas.getByText('Contacts');
 
+    // The list is a keyboard-focusable scroll region, so it is the first tab
+    // stop; the link and trigger follow, and the current page is never focused.
+    await userEvent.tab();
+    await expect(list).toHaveFocus();
     await userEvent.tab();
     await expect(link).toHaveFocus();
     await expect(link).toHaveAttribute('data-slot', 'breadcrumb-link');
