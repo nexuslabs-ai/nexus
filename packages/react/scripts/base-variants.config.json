@@ -32,6 +32,11 @@
       "showcase": "AllVariants",
       "interactions": ["ClickInteraction", "KeyboardInteraction"]
     },
+    {
+      "name": "DatePickerPanel",
+      "showcase": "AllVariants",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"]
+    },
     { "name": "Card", "showcase": "AllVariants" },
     {
       "name": "Carousel",
