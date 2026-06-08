@@ -7,34 +7,77 @@ import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:opacity-50 nx:aria-disabled:pointer-events-none nx:aria-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:cursor-pointer nx:items-center nx:justify-center nx:overflow-clip nx:rounded-base nx:whitespace-nowrap nx:shadow-xs nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:disabled:shadow-none nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:aria-disabled:shadow-none nx:[&_svg]:pointer-events-none nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default:
-          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover',
+          'nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover nx:active:bg-primary-background-active nx:disabled:bg-primary-disabled nx:aria-disabled:bg-primary-disabled',
+        error:
+          'nx:text-error-subtle-foreground nx:hover:bg-error-subtle-hover nx:active:bg-error-subtle-active nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
         destructive:
-          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover',
+          'nx:bg-error-background nx:text-error-foreground nx:hover:bg-error-background-hover nx:active:bg-error-background-active nx:disabled:bg-error-disabled nx:aria-disabled:bg-error-disabled',
         outline:
-          'nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:hover:text-foreground',
+          'nx:border nx:border-border-default nx:bg-container nx:text-foreground nx:hover:bg-background-hover nx:active:bg-container-active nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:aria-disabled:border-border-disabled nx:aria-disabled:bg-disabled nx:aria-disabled:text-disabled-foreground',
+        dashed:
+          'nx:border nx:border-dashed nx:border-border-default nx:bg-container nx:text-foreground nx:hover:bg-background-hover nx:active:bg-container-active nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:aria-disabled:border-border-disabled nx:aria-disabled:bg-disabled nx:aria-disabled:text-disabled-foreground',
         secondary:
-          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover',
-        ghost: 'nx:hover:bg-background-hover nx:hover:text-foreground',
-        link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline',
+          'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover nx:active:bg-secondary-background-active nx:disabled:bg-secondary-disabled nx:aria-disabled:bg-secondary-disabled',
+        ghost:
+          'nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
+        link: 'nx:text-primary-subtle-foreground nx:hover:bg-primary-subtle-hover nx:active:bg-primary-subtle-active nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
       },
       size: {
-        default: 'nx:typography-label-default nx:px-4 nx:py-2 nx:gap-2',
-        sm: 'nx:px-3 nx:py-1.5 nx:gap-1.5 nx:typography-label-small',
-        lg: 'nx:typography-label-default nx:px-8 nx:py-3 nx:gap-2.5',
-        icon: 'nx:typography-label-default nx:relative nx:p-2.5 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-1',
+        sm: 'nx:px-2.5 nx:py-1.5 nx:gap-1 nx:typography-label-small',
+        default: 'nx:typography-label-default nx:px-3 nx:py-1.5 nx:gap-1',
+        lg: 'nx:typography-label-default nx:px-3.5 nx:py-2 nx:gap-1',
+        'icon-sm':
+          'nx:relative nx:size-[24px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[10px]',
+        icon: 'nx:relative nx:size-[28px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[8px]',
+        'icon-lg':
+          'nx:relative nx:size-[32px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[6px]',
       },
     },
+    compoundVariants: [
+      {
+        variant: ['outline', 'dashed'],
+        size: 'sm',
+        className: 'nx:px-[9px] nx:py-[5px]',
+      },
+      {
+        variant: ['outline', 'dashed'],
+        size: 'default',
+        className: 'nx:px-[11px] nx:py-[5px]',
+      },
+      {
+        variant: ['outline', 'dashed'],
+        size: 'lg',
+        className: 'nx:px-[13px] nx:py-[7px]',
+      },
+    ],
     defaultVariants: {
       variant: 'default',
       size: 'default',
     },
   }
 );
+
+type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>['size']>;
+
+function isIconButtonSize(size: ButtonSize) {
+  return size === 'icon-sm' || size === 'icon' || size === 'icon-lg';
+}
+
+function getVisualButtonSize(
+  size: ButtonSize,
+  isIconOnly: boolean
+): ButtonSize {
+  if (!isIconOnly) return size;
+  if (isIconButtonSize(size)) return size;
+  if (size === 'sm') return 'icon-sm';
+  if (size === 'lg') return 'icon-lg';
+  return 'icon';
+}
 
 interface ButtonProps
   extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
@@ -61,6 +104,23 @@ interface ButtonProps
    * ```
    */
   loading?: boolean;
+
+  /**
+   * Decorative icon rendered before the button label.
+   */
+  startIcon?: React.ReactNode;
+
+  /**
+   * Decorative icon rendered after the button label.
+   */
+  endIcon?: React.ReactNode;
+
+  /**
+   * Uses the Figma icon-only sizing model while preserving the same Button
+   * semantics. `sm`, `default`, and `lg` map to 24px, 28px, and 32px visuals.
+   * @default false
+   */
+  isIconOnly?: boolean;
 }
 
 type ButtonAsChildElementProps = {
@@ -68,13 +128,37 @@ type ButtonAsChildElementProps = {
   onClick?: React.MouseEventHandler<HTMLElement>;
 };
 
-/** Children, plus a trailing spinner while loading. Shared by both render paths. */
-function buttonContent(children: React.ReactNode, loading: boolean) {
-  if (!loading) return children;
+function buttonIconSlot(position: 'start' | 'end', icon: React.ReactNode) {
+  if (!icon) return null;
+  return (
+    <span
+      aria-hidden="true"
+      data-slot={`button-${position}-icon`}
+      className="nx:inline-flex nx:shrink-0"
+    >
+      {icon}
+    </span>
+  );
+}
+
+/** Icon slots, label content, plus a trailing spinner while loading. */
+function buttonContent({
+  children,
+  endIcon,
+  loading,
+  startIcon,
+}: {
+  children: React.ReactNode;
+  endIcon?: React.ReactNode;
+  loading: boolean;
+  startIcon?: React.ReactNode;
+}) {
   return (
     <>
+      {buttonIconSlot('start', startIcon)}
       {children}
-      <Spinner aria-hidden="true" />
+      {buttonIconSlot('end', endIcon)}
+      {loading && <Spinner aria-hidden="true" />}
     </>
   );
 }
@@ -87,30 +171,37 @@ function NativeButton({
   className,
   variant = 'default',
   size = 'default',
+  isIconOnly = false,
   loading = false,
   disabled,
   children,
+  endIcon,
+  startIcon,
   type = 'button',
   'aria-busy': ariaBusy,
   'aria-disabled': ariaDisabled,
   ...props
 }: ButtonProps) {
   const isDisabled = disabled || loading;
+  const semanticSize = size ?? 'default';
+  const visualSize = getVisualButtonSize(semanticSize, isIconOnly);
+  const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
 
   return (
     <button
       data-slot="button"
       data-variant={variant}
-      data-size={size}
+      data-size={semanticSize}
+      data-icon-only={iconOnly || undefined}
       data-loading={loading || undefined}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size: visualSize, className }))}
       {...props}
       type={type}
       disabled={isDisabled}
       aria-disabled={isDisabled || ariaDisabled || undefined}
       aria-busy={loading || ariaBusy}
     >
-      {buttonContent(children, loading)}
+      {buttonContent({ children, endIcon, loading, startIcon })}
     </button>
   );
 }
@@ -125,16 +216,22 @@ function SlotButton({
   className,
   variant = 'default',
   size = 'default',
+  isIconOnly = false,
   loading = false,
   disabled,
   children,
+  endIcon,
   onClick,
+  startIcon,
   tabIndex,
   'aria-busy': ariaBusy,
   'aria-disabled': ariaDisabled,
   ...props
 }: ButtonProps) {
   const isDisabled = disabled || loading;
+  const semanticSize = size ?? 'default';
+  const visualSize = getVisualButtonSize(semanticSize, isIconOnly);
+  const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
   const child = React.isValidElement<ButtonAsChildElementProps>(children)
     ? children
     : null;
@@ -154,9 +251,10 @@ function SlotButton({
     <Slot
       data-slot="button"
       data-variant={variant}
-      data-size={size}
+      data-size={semanticSize}
+      data-icon-only={iconOnly || undefined}
       data-loading={loading || undefined}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size: visualSize, className }))}
       {...props}
       aria-disabled={isDisabled || ariaDisabled || undefined}
       aria-busy={loading || ariaBusy}
@@ -167,9 +265,14 @@ function SlotButton({
         ? React.cloneElement(
             child,
             { onClick: undefined },
-            buttonContent(child.props.children, loading)
+            buttonContent({
+              children: child.props.children,
+              endIcon,
+              loading,
+              startIcon,
+            })
           )
-        : buttonContent(children, loading)}
+        : buttonContent({ children, endIcon, loading, startIcon })}
     </Slot>
   );
 }
