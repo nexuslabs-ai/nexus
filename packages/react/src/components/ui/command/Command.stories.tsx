@@ -44,7 +44,7 @@ export const Default: Story = {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Suggestions">
-          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Date Picker</CommandItem>
           <CommandItem>Search Emoji</CommandItem>
           <CommandItem>Calculator</CommandItem>
         </CommandGroup>
@@ -60,7 +60,7 @@ export const Grouped: Story = {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Suggestions">
-          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Date Picker</CommandItem>
           <CommandItem>Search Emoji</CommandItem>
         </CommandGroup>
         <CommandSeparator />
@@ -86,7 +86,7 @@ export const Empty: Story = {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Suggestions">
-          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Date Picker</CommandItem>
         </CommandGroup>
       </CommandList>
     </Command>
@@ -142,7 +142,7 @@ export const WithDialog: Story = {
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup heading="Suggestions">
               <CommandItem onSelect={() => setOpen(false)}>
-                Calendar
+                Date Picker
               </CommandItem>
               <CommandItem onSelect={() => setOpen(false)}>
                 Search Emoji
@@ -188,7 +188,7 @@ export const Disabled: Story = {
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandGroup heading="Suggestions">
-          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Date Picker</CommandItem>
           <CommandItem disabled>Search Emoji (disabled)</CommandItem>
           <CommandItem>Calculator</CommandItem>
         </CommandGroup>
@@ -217,8 +217,8 @@ export const ClickInteraction: Story = {
           <CommandInput placeholder="Type a command or search..." />
           <CommandList>
             <CommandGroup heading="Suggestions">
-              <CommandItem value="calendar" onSelect={setSelected}>
-                Calendar
+              <CommandItem value="date-picker" onSelect={setSelected}>
+                Date Picker
               </CommandItem>
               <CommandItem value="calculator" onSelect={setSelected}>
                 Calculator
@@ -250,8 +250,8 @@ export const KeyboardInteraction: Story = {
           <CommandInput placeholder="Type a command or search..." />
           <CommandList>
             <CommandGroup heading="Suggestions">
-              <CommandItem value="calendar" onSelect={setSelected}>
-                Calendar
+              <CommandItem value="date-picker" onSelect={setSelected}>
+                Date Picker
               </CommandItem>
               <CommandItem value="calculator" onSelect={setSelected}>
                 Calculator
@@ -292,7 +292,7 @@ export const WithDataAttributes: Story = {
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandGroup heading="Suggestions">
-          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Date Picker</CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Settings">
@@ -341,7 +341,7 @@ export const AllVariants: Story = {
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup heading="Suggestions">
-              <CommandItem>Calendar</CommandItem>
+              <CommandItem>Date Picker</CommandItem>
               <CommandItem>Search Emoji</CommandItem>
               <CommandItem>Calculator</CommandItem>
             </CommandGroup>
@@ -358,7 +358,7 @@ export const AllVariants: Story = {
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup heading="Suggestions">
-              <CommandItem>Calendar</CommandItem>
+              <CommandItem>Date Picker</CommandItem>
               <CommandItem>Search Emoji</CommandItem>
             </CommandGroup>
             <CommandSeparator />

@@ -83,15 +83,13 @@ Numeric spacing note: line-96 addon `gap-2`/`px-4`.
 
 Minor: `data-orientation` omitted on default (`horizontal`).
 
-## calendar
+## date-picker
 
-Typography: pervasive raw (`text-sm`, `font-medium`, `font-normal`, `text-xs`) → composites. Weekday/week-number use arbitrary `nx:text-[0.8rem]` (un-tokenized 12.8px) → `typography-label-small`.
-
-Obsolete numeric note (line 130): week-row rhythm on `nx:mt-2` — margins were not flagged. Remove.
+Typography: pervasive raw (`text-sm`, `font-medium`, `font-normal`, `text-xs`) → composites. Figma weekday labels use `typography-label-default`; week numbers use `typography-label-small`.
 
 Numeric spacing notes: `p-3` (chrome), `gap-4` (month-grid ×2), `gap-1` (nav), `gap-1.5` (dropdown).
 
-Minor (mobile): day buttons = `--cell-size` (`--nx-spacing-8` = 32px), under ~44px. Inherent to dense calendars.
+Minor (mobile): day buttons = `--cell-size` (`--nx-spacing-8` = 32px), under ~44px. Track with the recurring touch-target batch.
 
 ## card
 

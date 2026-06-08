@@ -52,7 +52,7 @@ type Story = StoryObj<typeof Sidebar>;
 const NAV_ITEMS = [
   { title: 'Home', icon: IconHome },
   { title: 'Inbox', icon: IconInbox, badge: '4' },
-  { title: 'Calendar', icon: IconCalendar },
+  { title: 'Date Picker', icon: IconCalendar },
   { title: 'Search', icon: IconSearch },
   { title: 'Settings', icon: IconSettings },
 ];
