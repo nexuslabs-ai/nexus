@@ -73,9 +73,9 @@ small screens), so the ~44px touch-target floor does not apply — segments and
 icon triggers keep their compact sizing and the touch-only hit-area overlays were
 removed (responsive.md: the touch case sets the floor).
 
-Resolved: `BreadcrumbList` uses `overflow-x-auto` with a keyboard-focusable scroll
-region, so an overflowing trail — including the current page — scrolls into reach
-instead of being silently clipped.
+Resolved: `BreadcrumbList` is a keyboard-focusable horizontal scroll region
+(`overflow-x-auto` + `tabIndex`), so an overflowing trail — including the
+non-focusable current page — can be scrolled into reach instead of being clipped.
 
 Note: segment corners use `rounded-[4px]` to match Figma; the Nexus radius scale
 is currently `0px` (sharp), so no token maps to 4px — kept as a deliberate

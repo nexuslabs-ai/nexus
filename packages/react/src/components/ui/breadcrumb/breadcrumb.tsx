@@ -73,15 +73,19 @@ interface BreadcrumbListProps extends React.ComponentProps<'ol'> {}
  * BreadcrumbList
  *
  * The `<ol>` that lays the trail out in one horizontal row. When the trail is
- * wider than its container it scrolls horizontally instead of clipping; the links
- * scroll into view on focus, so the current page is never silently cut off.
+ * wider than its container it becomes a keyboard-focusable horizontal scroll
+ * region, so the current page can be scrolled into view instead of being clipped.
  */
 function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   return (
     <ol
       data-slot="breadcrumb-list"
+      // The current page is a non-focusable <span>, so the list itself must be
+      // keyboard-focusable to scroll an overflowing trail into view (WCAG 2.1.1).
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
       className={cn(
-        'nx:flex nx:min-w-0 nx:max-w-full nx:flex-nowrap nx:items-center nx:gap-0.5 nx:overflow-x-auto nx:px-1.5 nx:py-1.5 nx:typography-body-small nx:text-muted-foreground',
+        'nx:flex nx:min-w-0 nx:max-w-full nx:flex-nowrap nx:items-center nx:gap-0.5 nx:overflow-x-auto nx:px-1.5 nx:py-1.5 nx:typography-body-small nx:text-muted-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         className
       )}
       {...props}
