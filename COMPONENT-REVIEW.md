@@ -59,15 +59,27 @@ Numeric spacing notes: chip rhythm on `gap-1` and chip `px`/`py`.
 
 ## breadcrumb
 
-Resolved: `size-9` sets the ellipsis footprint; the ellipsis is non-interactive,
-so the touch-target floor does not apply.
+Resolved: `BreadcrumbPage` drops raw `nx:font-normal` (the list's
+`typography-body-small` already sets normal weight) and no longer advertises
+`role="link"`/`aria-disabled`; the current page is announced via
+`aria-current="page"` only.
 
-Resolved: breadcrumb links keep their visual text footprint but use a
-vertical-only hit-area overlay for the ~44px touch floor. The ellipsis remains
-decorative and unchanged.
+Resolved: `BreadcrumbEllipsis` and `BreadcrumbMenuTrigger` are interactive
+`<button>` triggers composed with `DropdownMenuTrigger asChild` — no longer a
+presentational span.
 
-Resolved: `BreadcrumbPage` no longer adds raw `nx:font-normal`; the list's
-`typography-body-small` already sets normal weight.
+Decision: breadcrumb is a desktop / pointer-fine control (not used on touch or
+small screens), so the ~44px touch-target floor does not apply — segments and
+icon triggers keep their compact sizing and the touch-only hit-area overlays were
+removed (responsive.md: the touch case sets the floor).
+
+Resolved: `BreadcrumbList` uses `overflow-x-auto` with a keyboard-focusable scroll
+region, so an overflowing trail — including the current page — scrolls into reach
+instead of being silently clipped.
+
+Note: segment corners use `rounded-[4px]` to match Figma; the Nexus radius scale
+is currently `0px` (sharp), so no token maps to 4px — kept as a deliberate
+arbitrary value.
 
 ## button
 
