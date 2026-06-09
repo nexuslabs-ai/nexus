@@ -120,7 +120,7 @@ function Avatar({
       className={cn(
         avatarVariants({ size: resolvedSize, shape: resolvedShape }),
         ring &&
-          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-[color:var(--avatar-surface,var(--nx-color-background))]',
+          'nx:ring-2 nx:ring-border-primary nx:ring-offset-2 nx:ring-offset-(--avatar-surface,var(--nx-color-background))',
         className
       )}
       {...props}
@@ -206,7 +206,7 @@ function AvatarFallback({ className, ...props }: AvatarFallbackProps) {
 }
 
 const avatarStatusVariants = cva(
-  'nx:absolute nx:right-[0.04em] nx:bottom-[0.04em] nx:size-[0.6em] nx:rounded-full nx:ring-[0.1em] nx:ring-[color:var(--avatar-surface,var(--nx-color-background))]',
+  'nx:absolute nx:right-[0.04em] nx:bottom-[0.04em] nx:size-[0.6em] nx:rounded-full nx:ring-[0.1em] nx:ring-(--avatar-surface,var(--nx-color-background))',
   {
     variants: {
       status: {
@@ -330,9 +330,9 @@ function AvatarGroup({
           'nx:flex nx:items-center',
           // Overlap scales with each avatar's font-size (set per size), so the
           // tuck stays ~proportional from 2xs to 4xl instead of a fixed px.
-          'nx:[&>[data-slot=avatar]+[data-slot=avatar]]:-ms-[0.7em]',
-          'nx:[&>[data-slot=avatar]]:relative',
-          'nx:[&>[data-slot=avatar]]:ring-[0.1em] nx:[&>[data-slot=avatar]]:ring-[color:var(--avatar-surface,var(--nx-color-background))]',
+          'nx:[&>[data-slot=avatar]+[data-slot=avatar]]:ms-[-0.7em]',
+          'nx:*:data-[slot=avatar]:relative',
+          'nx:*:data-[slot=avatar]:ring-[0.1em] nx:*:data-[slot=avatar]:ring-(--avatar-surface,var(--nx-color-background))',
           className
         )}
         {...props}
