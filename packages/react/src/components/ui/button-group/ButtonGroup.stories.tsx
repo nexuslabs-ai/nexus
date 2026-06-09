@@ -291,6 +291,36 @@ export const AsChild: Story = {
   },
 };
 
+// A Select trigger joins the group as a button-shaped control, sharing the
+// seam with the adjacent button.
+export const WithSelectTrigger: Story = {
+  render: () => (
+    <ButtonGroup>
+      <Button variant="outline">Filter</Button>
+      <Select defaultValue="all">
+        <SelectTrigger aria-label="Status">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All</SelectItem>
+          <SelectItem value="open">Open</SelectItem>
+          <SelectItem value="closed">Closed</SelectItem>
+        </SelectContent>
+      </Select>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="select-trigger"]'
+    );
+    await expect(trigger).toBeInTheDocument();
+    if (!trigger) return;
+    // The trigger joins the seam like a button: its left border is removed so
+    // it doesn't double up against the previous control.
+    await expect(getComputedStyle(trigger).borderLeftWidth).toBe('0px');
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
