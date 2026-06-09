@@ -323,55 +323,6 @@ export const RangeHoverPreview: Story = {
   },
 };
 
-// Range with a Stripe-style preset rail beside two months — the canonical
-// analytics date-range pattern; numberOfMonths={2} keeps a span on one screen.
-// The component lays months out in a row natively, so no classNames override.
-export const RangeWithPresets: Story = {
-  parameters: { inCard: false },
-  render: function RangeWithPresetsStory() {
-    const [range, setRange] = React.useState<DateRange | undefined>({
-      from: addDays(REFERENCE_TODAY, -7),
-      to: REFERENCE_TODAY,
-    });
-
-    const presets = [
-      { label: 'Today', days: 0 },
-      { label: 'Last 7 days', days: 7 },
-      { label: 'Last 14 days', days: 14 },
-      { label: 'Last 30 days', days: 30 },
-    ];
-    const applyRange = (days: number) =>
-      setRange({ from: addDays(REFERENCE_TODAY, -days), to: REFERENCE_TODAY });
-
-    return (
-      <Card className="nx:w-fit">
-        <CardContent className="nx:flex nx:p-0">
-          <div className="nx:flex nx:flex-col nx:gap-1 nx:border-r nx:border-border-default nx:p-3">
-            {presets.map((preset) => (
-              <Button
-                key={preset.label}
-                variant="ghost"
-                size="sm"
-                className="nx:justify-start"
-                onClick={() => applyRange(preset.days)}
-              >
-                {preset.label}
-              </Button>
-            ))}
-          </div>
-          <DatePicker
-            mode="range"
-            numberOfMonths={2}
-            defaultMonth={REFERENCE_MONTH}
-            selected={range}
-            onSelect={setRange}
-          />
-        </CardContent>
-      </Card>
-    );
-  },
-};
-
 // Multiple discrete dates.
 export const Multiple: Story = {
   render: () => (
@@ -629,7 +580,7 @@ export const WithPresets: Story = {
             fixedWeeks
           />
         </CardContent>
-        <CardFooter className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-t nx:border-border-default nx:pt-4 nx:[&>*:last-child]:col-span-2">
+        <CardFooter className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-t nx:border-border-default nx:p-4 nx:[&>*:last-child]:col-span-2">
           {PRESETS.map((preset) => (
             <Button
               key={preset.label}
@@ -666,7 +617,7 @@ export const WithTime: Story = {
             defaultMonth={REFERENCE_MONTH}
           />
         </CardContent>
-        <CardFooter className="nx:border-t nx:border-border-default nx:pt-4">
+        <CardFooter className="nx:border-t nx:border-border-default nx:p-4">
           <FieldGroup className="nx:gap-4">
             <Field>
               <FieldLabel htmlFor="time-from">Start Time</FieldLabel>
@@ -713,7 +664,7 @@ export const WithTime: Story = {
 // Reused by the per-base variant generator across 5 bases × 2 themes.
 export const AllVariants: Story = {
   render: () => (
-    <div className="nx:flex nx:flex-wrap nx:gap-6">
+    <div className="nx:flex nx:flex-wrap nx:gap-2">
       <DatePicker
         mode="single"
         defaultMonth={REFERENCE_MONTH}

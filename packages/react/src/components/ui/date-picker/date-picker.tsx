@@ -183,7 +183,7 @@ function DatePicker({
             defaultClassNames.week_number_header
           ),
           week_number: cn(
-            'nx:typography-label-small nx:text-muted-foreground nx:select-none',
+            'nx:typography-label-small nx:text-muted-foreground-subtle nx:select-none',
             defaultClassNames.week_number
           ),
           day: cn(
@@ -233,7 +233,10 @@ function DatePicker({
             if (orientation === 'left') {
               return (
                 <IconChevronLeft
-                  className={cn('nx:size-4', className)}
+                  className={cn(
+                    'nx:size-4 nx:text-muted-foreground',
+                    className
+                  )}
                   {...props}
                 />
               );
@@ -242,7 +245,10 @@ function DatePicker({
             if (orientation === 'right') {
               return (
                 <IconChevronRight
-                  className={cn('nx:size-4', className)}
+                  className={cn(
+                    'nx:size-4 nx:text-muted-foreground',
+                    className
+                  )}
                   {...props}
                 />
               );
