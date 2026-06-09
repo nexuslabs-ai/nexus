@@ -133,3 +133,89 @@ describe('themeToCss', () => {
     expect(css).toContain('--nx-color-background:');
   });
 });
+
+// Deterministic spread of dark + light contracts (no RNG — reproducible).
+const SWEEP_SEEDS: ReadonlyArray<{
+  accent: string;
+  background: string;
+  foreground: string;
+  mode: 'light' | 'dark';
+}> = [
+  {
+    accent: '#339cff',
+    background: '#181818',
+    foreground: '#ffffff',
+    mode: 'dark',
+  },
+  {
+    accent: '#0ea5e9',
+    background: '#0b0f14',
+    foreground: '#e6edf3',
+    mode: 'dark',
+  },
+  {
+    accent: '#e0651a',
+    background: '#faf9f7',
+    foreground: '#1a1714',
+    mode: 'light',
+  },
+  {
+    accent: '#16a34a',
+    background: '#ffffff',
+    foreground: '#0a0a0a',
+    mode: 'light',
+  },
+  {
+    accent: '#a855f7',
+    background: '#101014',
+    foreground: '#f5f3ff',
+    mode: 'dark',
+  },
+  {
+    accent: '#db2777',
+    background: '#1c1117',
+    foreground: '#fde7f1',
+    mode: 'dark',
+  },
+];
+
+describe('legibility invariant: every text tier clears its APCA floor', () => {
+  it.each(SWEEP_SEEDS)(
+    'contract %#',
+    ({ accent, background, foreground, mode }) => {
+      const seeds = { accent, background, foreground };
+      const contract: CodexThemeContract = {
+        appearance: mode,
+        light: seeds,
+        dark: seeds,
+        contrast: 55,
+      };
+      const map = deriveTheme(contract)[mode];
+
+      const checks: Array<[string, string, keyof typeof TIER_THRESHOLDS]> = [
+        ['--nx-color-foreground', '--nx-color-background', 'body'],
+        ['--nx-color-container-foreground', '--nx-color-container', 'body'],
+        ['--nx-color-popover-foreground', '--nx-color-popover', 'body'],
+        ['--nx-color-nav-foreground', '--nx-color-nav-background', 'body'],
+        ['--nx-color-muted-foreground', '--nx-color-background', 'ui'],
+        [
+          '--nx-color-muted-foreground-subtle',
+          '--nx-color-background',
+          'incidental',
+        ],
+        [
+          '--nx-color-primary-foreground',
+          '--nx-color-primary-background',
+          'ui',
+        ],
+      ];
+
+      for (const [fg, bg, tier] of checks) {
+        expect(
+          apcaLc(map[fg], map[bg]),
+          `${fg} on ${bg}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
+      }
+    }
+  );
+});
