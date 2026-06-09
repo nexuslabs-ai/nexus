@@ -37,6 +37,10 @@ export const Vertical: Story = {
       <Button variant="outline">Bottom</Button>
     </ButtonGroup>
   ),
+  play: async ({ canvasElement }) => {
+    const group = canvasElement.querySelector('[data-slot="button-group"]');
+    await expect(group).toHaveAttribute('data-orientation', 'vertical');
+  },
 };
 
 // A text addon as a leading prefix.
@@ -47,6 +51,11 @@ export const WithText: Story = {
       <Button variant="outline">nexus.dev</Button>
     </ButtonGroup>
   ),
+  play: async ({ canvasElement }) => {
+    await expect(
+      canvasElement.querySelector('[data-slot="button-group-text"]')
+    ).toBeInTheDocument();
+  },
 };
 
 // A separator divides two sub-clusters.
@@ -59,12 +68,22 @@ export const WithSeparator: Story = {
       <Button variant="outline">Save</Button>
     </ButtonGroup>
   ),
+  play: async ({ canvasElement }) => {
+    const separator = canvasElement.querySelector(
+      '[data-slot="button-group-separator"]'
+    );
+
+    await expect(separator).toBeInTheDocument();
+    await expect(separator).toHaveAttribute('data-orientation', 'vertical');
+  },
 };
 
-// The group is a role=group region that advertises its orientation.
+// The group is a role=group region that advertises its orientation. Rendered
+// with no `orientation` prop so it exercises the default — a regression guard
+// for the default `data-orientation` emit.
 export const WithDataAttributes: Story = {
   render: () => (
-    <ButtonGroup orientation="horizontal">
+    <ButtonGroup>
       <Button variant="outline">One</Button>
       <Button variant="outline">Two</Button>
     </ButtonGroup>
