@@ -17,6 +17,7 @@ import {
 } from '@nexus/react';
 
 import { type SidebarMode, useSidebarStore } from '../../../app/sidebar-store';
+import { useThemeContext } from '../../../app/theme-provider';
 import {
   BASES,
   BRANDS,
@@ -26,6 +27,7 @@ import {
   TOKEN_MODES,
   TYPOGRAPHY_MODES,
 } from '../../../hooks/useTheme';
+import { DEFAULT_CODEX_CONTRACT } from '../../../lib/codex-contract';
 
 type AppearanceSettingsProps = {
   theme: ThemeConfig;
@@ -92,8 +94,45 @@ export function AppearanceSettings({
   const sidebarMode = useSidebarStore((s) => s.mode);
   const setSidebarMode = useSidebarStore((s) => s.setMode);
 
+  const { codexContract, setCodexContract } = useThemeContext();
+  const codexOn = codexContract !== null;
+
+  const toggleCodex = (on: boolean) => {
+    setCodexContract(on ? DEFAULT_CODEX_CONTRACT : null);
+    // keep the preset `.dark` class in step with the contract's appearance
+    setTheme((t) => ({
+      ...t,
+      dark: on ? DEFAULT_CODEX_CONTRACT.appearance === 'dark' : t.dark,
+    }));
+  };
+
   return (
     <div className="nx:space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Codex (derived theme)</CardTitle>
+          <CardDescription>
+            Generate the whole theme at runtime from a few values, instead of a
+            preset. Overrides the controls below while on.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
+            <div className="nx:space-y-0.5">
+              <Label htmlFor="codex-derived">Apply Codex theme</Label>
+              <p className="nx:typography-body-small nx:text-muted-foreground">
+                accent #339CFF · background #181818 · contrast 60
+              </p>
+            </div>
+            <Switch
+              id="codex-derived"
+              checked={codexOn}
+              onCheckedChange={toggleCodex}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Theme</CardTitle>
