@@ -2,7 +2,7 @@ import type { Oklch } from 'culori';
 
 import { apcaLc } from './apca';
 import { type Tier, TIER_THRESHOLDS } from './palette';
-import { formatOklch, seedOklch } from './perceptual-ramp';
+import { formatOklch, rampFromSeed, seedOklch } from './perceptual-ramp';
 
 export interface ThemeSeeds {
   /** Drives the primary family ramp. */
@@ -185,4 +185,30 @@ export function deriveText(
     );
   }
   return out;
+}
+
+/** Pick the on-color (black or white) with the higher APCA contrast against `bg`. */
+function readableOn(bg: string): string {
+  return apcaLc('oklch(1 0 0)', bg) >= apcaLc('oklch(0 0 0)', bg)
+    ? 'oklch(1 0 0)'
+    : 'oklch(0 0 0)';
+}
+
+/** The 9-state primary family + primary borders, from one accent seed. */
+export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
+  const ramp = rampFromSeed(accentHex);
+  const dark = mode === 'dark';
+  return {
+    '--nx-color-primary-background': ramp['600'],
+    '--nx-color-primary-background-hover': ramp['700'],
+    '--nx-color-primary-background-active': ramp['800'],
+    '--nx-color-primary-foreground': readableOn(ramp['600']),
+    '--nx-color-primary-disabled': dark ? ramp['950'] : ramp['300'],
+    '--nx-color-primary-subtle': dark ? ramp['950'] : ramp['50'],
+    '--nx-color-primary-subtle-foreground': dark ? ramp['300'] : ramp['600'],
+    '--nx-color-primary-subtle-hover': dark ? ramp['900'] : ramp['100'],
+    '--nx-color-primary-subtle-active': dark ? ramp['800'] : ramp['200'],
+    '--nx-color-border-primary': dark ? ramp['700'] : ramp['200'],
+    '--nx-color-border-primary-active': dark ? ramp['500'] : ramp['400'],
+  };
 }

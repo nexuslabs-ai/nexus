@@ -2,7 +2,7 @@ import { oklch, parse } from 'culori';
 import { describe, expect, it } from 'vitest';
 
 import { apcaLc } from './apca';
-import { deriveSurfaces, deriveText } from './derive-theme';
+import { derivePrimary, deriveSurfaces, deriveText } from './derive-theme';
 import { TIER_THRESHOLDS } from './palette';
 
 function lOf(oklchStr: string): number {
@@ -69,5 +69,26 @@ describe('deriveText', () => {
   it('does not throw on a pathological mid-grey pairing', () => {
     const mid = deriveSurfaces('#7d7d7d', 'light', 0.05);
     expect(() => deriveText('#808080', mid)).not.toThrow();
+  });
+});
+
+describe('derivePrimary', () => {
+  it('maps primary-background to the 600 shade of the accent ramp', () => {
+    const p = derivePrimary('#339cff', 'light');
+    expect(p['--nx-color-primary-background']).toBeDefined();
+    // hover is darker (700) than background (600)
+    expect(lOf(p['--nx-color-primary-background-hover'])).toBeLessThan(
+      lOf(p['--nx-color-primary-background'])
+    );
+  });
+
+  it('picks an on-primary foreground that clears the ui tier', () => {
+    const p = derivePrimary('#339cff', 'light');
+    expect(
+      apcaLc(
+        p['--nx-color-primary-foreground'],
+        p['--nx-color-primary-background']
+      )
+    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
   });
 });
