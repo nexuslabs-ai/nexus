@@ -389,13 +389,12 @@ export const WithPresets: Story = {
             fixedWeeks
           />
         </CardContent>
-        <CardFooter className="nx:flex-wrap nx:gap-2 nx:border-t nx:border-border-default nx:pt-4">
+        <CardFooter className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-t nx:border-border-default nx:pt-4 nx:[&>*:last-child]:col-span-2">
           {PRESETS.map((preset) => (
             <Button
               key={preset.label}
               variant="outline"
               size="sm"
-              className="nx:flex-1"
               onClick={() => applyPreset(preset.days)}
             >
               {preset.label}
