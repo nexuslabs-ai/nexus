@@ -38,7 +38,7 @@ const alertDialogFooterVariants = cva('nx:flex nx:gap-2', {
     orientation: {
       horizontal:
         'nx:flex-col nx:sm:flex-row nx:sm:items-center nx:sm:justify-end',
-      vertical: 'nx:flex-col nx:items-stretch nx:[&>*]:w-full',
+      vertical: 'nx:flex-col nx:items-stretch nx:*:w-full',
     },
   },
   defaultVariants: {
@@ -65,20 +65,6 @@ const defaultAlertDialogLayout: AlertDialogLayoutContextValue = {
 
 const AlertDialogLayoutContext =
   React.createContext<AlertDialogLayoutContextValue>(defaultAlertDialogLayout);
-
-function containsComposedHeader(children: React.ReactNode): boolean {
-  return React.Children.toArray(children).some((child) => {
-    if (!React.isValidElement(child)) return false;
-    if (child.type === AlertDialogHeader) return true;
-    if (child.type === React.Fragment) {
-      const fragment = child as React.ReactElement<{
-        children?: React.ReactNode;
-      }>;
-      return containsComposedHeader(fragment.props.children);
-    }
-    return false;
-  });
-}
 
 /**
  * AlertDialog
@@ -160,9 +146,8 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
  *
  * Props for the AlertDialogContent component.
  */
-interface AlertDialogContentProps extends Omit<
-  React.ComponentProps<typeof AlertDialogPrimitive.Content>,
-  'title'
+interface AlertDialogContentProps extends React.ComponentProps<
+  typeof AlertDialogPrimitive.Content
 > {
   /**
    * Layout variant for the alert dialog content.
@@ -172,26 +157,6 @@ interface AlertDialogContentProps extends Omit<
    * @default "default"
    */
   variant?: AlertDialogVariant;
-
-  /**
-   * Optional title for a prop-driven header, rendered before `children`.
-   * Ignored when a composed `AlertDialogHeader` child is present — composed
-   * children take precedence, so only one header (one Radix `Title`) renders.
-   * Detection covers a direct child or a Fragment-wrapped header; a header
-   * nested inside another element is not detected.
-   */
-  title?: React.ReactNode;
-
-  /**
-   * Optional description for a prop-driven header, rendered before `children`.
-   * Ignored when a composed `AlertDialogHeader` child is present.
-   */
-  description?: React.ReactNode;
-
-  /**
-   * Optional body content rendered between the generated header and `children`.
-   */
-  body?: React.ReactNode;
 }
 
 /**
@@ -216,46 +181,26 @@ interface AlertDialogContentProps extends Omit<
  */
 function AlertDialogContent({
   className,
-  children,
   variant = 'default',
-  title,
-  description,
-  body,
   ...props
 }: AlertDialogContentProps) {
-  const resolvedButtonOrientation =
-    variant === 'center' ? 'vertical' : 'horizontal';
-  const hasBody = body != null;
-  const showGeneratedHeader =
-    !containsComposedHeader(children) && (title != null || description != null);
+  const buttonOrientation = variant === 'center' ? 'vertical' : 'horizontal';
 
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
-      <AlertDialogLayoutContext.Provider
-        value={{ variant, buttonOrientation: resolvedButtonOrientation }}
-      >
+      <AlertDialogLayoutContext.Provider value={{ variant, buttonOrientation }}>
         <AlertDialogPrimitive.Content
           data-slot="alert-dialog-content"
           data-variant={variant}
-          data-orientation={resolvedButtonOrientation}
+          data-orientation={buttonOrientation}
           className={cn(
             alertDialogContentVariants(),
-            variant === 'center' && !hasBody && 'nx:max-w-xs',
+            variant === 'center' && 'nx:max-w-xs',
             className
           )}
           {...props}
-        >
-          {showGeneratedHeader && (
-            <AlertDialogHeader title={title} description={description} />
-          )}
-          {hasBody && (
-            <div data-slot="alert-dialog-body" className="nx:grid nx:gap-2">
-              {body}
-            </div>
-          )}
-          {children}
-        </AlertDialogPrimitive.Content>
+        />
       </AlertDialogLayoutContext.Provider>
     </AlertDialogPortal>
   );
@@ -268,18 +213,8 @@ function AlertDialogContent({
  */
 interface AlertDialogHeaderProps
   extends
-    Omit<React.ComponentProps<'div'>, 'title'>,
-    VariantProps<typeof alertDialogHeaderVariants> {
-  /**
-   * Optional title text rendered when `children` are not supplied.
-   */
-  title?: React.ReactNode;
-
-  /**
-   * Optional description text rendered when `children` are not supplied.
-   */
-  description?: React.ReactNode;
-}
+    React.ComponentProps<'div'>,
+    VariantProps<typeof alertDialogHeaderVariants> {}
 
 /**
  * AlertDialogHeader
@@ -296,24 +231,11 @@ interface AlertDialogHeaderProps
  */
 function AlertDialogHeader({
   className,
-  children,
   variant,
-  title,
-  description,
   ...props
 }: AlertDialogHeaderProps) {
   const layout = React.useContext(AlertDialogLayoutContext);
   const resolvedVariant = variant ?? layout.variant;
-  const generatedChildren =
-    children ??
-    (title != null || description != null ? (
-      <>
-        {title != null && <AlertDialogTitle>{title}</AlertDialogTitle>}
-        {description != null && (
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        )}
-      </>
-    ) : null);
 
   return (
     <div
@@ -324,9 +246,7 @@ function AlertDialogHeader({
         className
       )}
       {...props}
-    >
-      {generatedChildren}
-    </div>
+    />
   );
 }
 

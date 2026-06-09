@@ -99,20 +99,21 @@ export const WithBodyContent: Story = {
       <AlertDialogTrigger asChild>
         <Button variant="destructive">Remove payment method</Button>
       </AlertDialogTrigger>
-      <AlertDialogContent
-        title="Remove payment method?"
-        description="This payment method will be removed from the workspace."
-        body={
-          <>
-            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
-              Future invoices will use the fallback payment method.
-            </div>
-            <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
-              Active subscriptions continue until the next billing cycle.
-            </div>
-          </>
-        }
-      >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Remove payment method?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This payment method will be removed from the workspace.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="nx:grid nx:gap-2">
+          <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+            Future invoices will use the fallback payment method.
+          </div>
+          <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
+            Active subscriptions continue until the next billing cycle.
+          </div>
+        </div>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive">
@@ -130,11 +131,8 @@ export const WithBodyContent: Story = {
     });
     await userEvent.click(trigger);
 
-    await within(document.body).findByRole('alertdialog');
-
-    const body = document.querySelector('[data-slot="alert-dialog-body"]');
-    await expect(body).toBeInTheDocument();
-    await expect(body).toHaveTextContent(
+    const dialog = await within(document.body).findByRole('alertdialog');
+    await expect(dialog).toHaveTextContent(
       'Future invoices will use the fallback payment method.'
     );
 
@@ -153,11 +151,13 @@ export const Centered: Story = {
       <AlertDialogTrigger asChild>
         <Button variant="destructive">Show centered dialog</Button>
       </AlertDialogTrigger>
-      <AlertDialogContent
-        variant="center"
-        title="Dialog Title"
-        description="Make changes to your profile here. Click save when you're done."
-      >
+      <AlertDialogContent variant="center">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Dialog Title</AlertDialogTitle>
+          <AlertDialogDescription>
+            Make changes to your profile here. Click save when you are done.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive">Action</AlertDialogAction>
@@ -190,39 +190,6 @@ export const Centered: Story = {
       ).toBeNull();
     });
   },
-};
-
-export const CenteredWithBodyContent: Story = {
-  render: (_args) => (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive">Review centered content</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent
-        variant="center"
-        title="Dialog Title"
-        description="Make changes to your profile here. Click save when you're done."
-        body={
-          <>
-            <div className="nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
-              Slot
-            </div>
-            <div className="nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
-              Slot
-            </div>
-            <div className="nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-small">
-              Slot
-            </div>
-          </>
-        }
-      >
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive">Action</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
 };
 
 // ============================================
@@ -544,62 +511,6 @@ export const WithDataAttributes: Story = {
   },
 };
 
-export const ComposedHeaderWins: Story = {
-  render: (_args) => (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Show dialog</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent title="Prop title" description="Prop description">
-        {/*
-          A composed header is present (here grouped with the footer in a
-          Fragment), so the prop-driven title/description must be suppressed —
-          the gate has to detect the header *through* the Fragment.
-        */}
-        <>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Composed title</AlertDialogTitle>
-            <AlertDialogDescription>
-              The composed header takes precedence over the title and
-              description props.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Continue</AlertDialogAction>
-          </AlertDialogFooter>
-        </>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    const trigger = canvas.getByRole('button', { name: 'Show dialog' });
-    await userEvent.click(trigger);
-
-    const dialog = await within(document.body).findByRole('alertdialog');
-
-    // Composed header wins: exactly one title (the composed one), so there is
-    // no duplicate Radix Title / ambiguous aria-labelledby.
-    const titles = document.querySelectorAll(
-      '[data-slot="alert-dialog-title"]'
-    );
-    await expect(titles).toHaveLength(1);
-    await expect(titles[0]).toHaveTextContent('Composed title');
-    await expect(
-      within(dialog).queryByText('Prop title')
-    ).not.toBeInTheDocument();
-
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="alert-dialog-content"]')
-      ).toBeNull();
-    });
-  },
-};
-
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
@@ -663,11 +574,13 @@ export const AllVariants: Story = {
           <AlertDialogTrigger asChild>
             <Button variant="destructive">Show centered dialog</Button>
           </AlertDialogTrigger>
-          <AlertDialogContent
-            variant="center"
-            title="Dialog Title"
-            description="Make changes to your profile here. Click save when you're done."
-          >
+          <AlertDialogContent variant="center">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Dialog Title</AlertDialogTitle>
+              <AlertDialogDescription>
+                Make changes to your profile here. Click save when you are done.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction variant="destructive">
