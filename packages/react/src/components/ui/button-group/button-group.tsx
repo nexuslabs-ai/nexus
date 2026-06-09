@@ -50,7 +50,11 @@ interface ButtonGroupProps
  * </ButtonGroup>
  * ```
  */
-function ButtonGroup({ className, orientation, ...props }: ButtonGroupProps) {
+function ButtonGroup({
+  className,
+  orientation = 'horizontal',
+  ...props
+}: ButtonGroupProps) {
   return (
     <div
       role="group"
