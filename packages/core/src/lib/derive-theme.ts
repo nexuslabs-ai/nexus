@@ -177,9 +177,10 @@ export function deriveText(
   const fg = seedOklch(foregroundHex);
   const out: TokenMap = {};
   for (const [token, { surface, tier, quiet }] of Object.entries(TEXT_ON)) {
+    const surfaceColor = surfaces[surface] ?? foregroundHex;
     out[`--nx-color-${token}`] = quietText(
       fg,
-      surfaces[surface],
+      surfaceColor,
       TIER_THRESHOLDS[tier],
       quiet
     );
