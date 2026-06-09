@@ -1,5 +1,17 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
+import { IconClock } from '@tabler/icons-react';
 import { expect, userEvent, within } from 'storybook/test';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 
 import { DatePicker } from './date-picker';
 
@@ -7,9 +19,38 @@ import { DatePicker } from './date-picker';
 const REFERENCE_MONTH = new Date(2025, 0, 1);
 const REFERENCE_TODAY = new Date(2025, 0, 15);
 
+function addDays(date: Date, days: number) {
+  const next = new Date(date.getTime());
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+const PRESETS = [
+  { label: 'Today', days: 0 },
+  { label: 'Tomorrow', days: 1 },
+  { label: 'In 3 days', days: 3 },
+  { label: 'In a week', days: 7 },
+  { label: 'In 2 weeks', days: 14 },
+];
+
 const meta: Meta<typeof DatePicker> = {
   title: 'Components/DatePicker',
   component: DatePicker,
+  // The grid is a borderless primitive built to sit inside a Card/Popover — it
+  // goes transparent via `in-data-[slot=card-content]`, so the Card supplies the
+  // surface. WithPresets opts out (`parameters.inCard: false`) with its own Card.
+  decorators: [
+    (Story, context) =>
+      context.parameters.inCard === false ? (
+        <Story />
+      ) : (
+        <Card className="nx:w-fit">
+          <CardContent className="nx:p-0">
+            <Story />
+          </CardContent>
+        </Card>
+      ),
+  ],
   argTypes: {
     cellSize: {
       control: 'select',
@@ -318,6 +359,110 @@ export const WithDataAttributes: Story = {
     const canvas = within(canvasElement);
     const day15 = canvas.getByText('15').closest('button');
     await expect(day15).toHaveAttribute('data-day');
+  },
+};
+
+// Calendar in a Card with quick-preset buttons (shadcn's CalendarWithPresets
+// pattern). The grid goes transparent inside CardContent via its
+// `in-data-[slot=card-content]` hook, so the Card supplies the surface.
+export const WithPresets: Story = {
+  parameters: { inCard: false },
+  render: function WithPresetsStory() {
+    const [date, setDate] = React.useState<Date | undefined>(REFERENCE_TODAY);
+    const [month, setMonth] = React.useState<Date>(REFERENCE_MONTH);
+
+    const applyPreset = (days: number) => {
+      const next = addDays(REFERENCE_TODAY, days);
+      setDate(next);
+      setMonth(new Date(next.getFullYear(), next.getMonth(), 1));
+    };
+
+    return (
+      <Card className="nx:w-fit">
+        <CardContent className="nx:p-0">
+          <DatePicker
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            month={month}
+            onMonthChange={setMonth}
+            fixedWeeks
+          />
+        </CardContent>
+        <CardFooter className="nx:flex-wrap nx:gap-2 nx:border-t nx:border-border-default nx:pt-4">
+          {PRESETS.map((preset) => (
+            <Button
+              key={preset.label}
+              variant="outline"
+              size="sm"
+              className="nx:flex-1"
+              onClick={() => applyPreset(preset.days)}
+            >
+              {preset.label}
+            </Button>
+          ))}
+        </CardFooter>
+      </Card>
+    );
+  },
+};
+
+// Calendar in a Card with start/end time inputs in the footer (shadcn's
+// CalendarWithTime). The time fields use Field + InputGroup with a trailing
+// clock addon; the consumer supplies the icon (here from @tabler/icons-react).
+export const WithTime: Story = {
+  parameters: { inCard: false },
+  render: function WithTimeStory() {
+    const [date, setDate] = React.useState<Date | undefined>(
+      new Date(2025, 0, 12)
+    );
+
+    return (
+      <Card className="nx:w-fit">
+        <CardContent className="nx:p-0">
+          <DatePicker
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            defaultMonth={REFERENCE_MONTH}
+          />
+        </CardContent>
+        <CardFooter className="nx:border-t nx:border-border-default nx:pt-4">
+          <FieldGroup className="nx:gap-4">
+            <Field>
+              <FieldLabel htmlFor="time-from">Start Time</FieldLabel>
+              <InputGroup>
+                <InputGroupInput
+                  id="time-from"
+                  type="time"
+                  step="1"
+                  defaultValue="10:30:00"
+                  className="nx:appearance-none nx:[&::-webkit-calendar-picker-indicator]:hidden"
+                />
+                <InputGroupAddon align="inline-end">
+                  <IconClock />
+                </InputGroupAddon>
+              </InputGroup>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="time-to">End Time</FieldLabel>
+              <InputGroup>
+                <InputGroupInput
+                  id="time-to"
+                  type="time"
+                  step="1"
+                  defaultValue="12:30:00"
+                  className="nx:appearance-none nx:[&::-webkit-calendar-picker-indicator]:hidden"
+                />
+                <InputGroupAddon align="inline-end">
+                  <IconClock />
+                </InputGroupAddon>
+              </InputGroup>
+            </Field>
+          </FieldGroup>
+        </CardFooter>
+      </Card>
+    );
   },
 };
 
