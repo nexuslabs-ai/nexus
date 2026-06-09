@@ -36,10 +36,16 @@ interface ButtonGroupProps
 /**
  * ButtonGroup
  *
- * A visually-joined cluster of buttons (or inputs / selects) sharing borders
- * and outer rounding — adjacent children lose their touching corners and the
+ * A visually-joined cluster of button-shaped controls — Buttons, a
+ * `DropdownMenu` or `Select` trigger, a link via `<ButtonGroupText asChild>`,
+ * plus `ButtonGroupText` and `ButtonGroupSeparator` addons — sharing borders
+ * and outer rounding so adjacent children lose their touching corners and the
  * seam between them. Lay out horizontally (default) or vertically with
  * `orientation`.
+ *
+ * For an input or textarea with leading/trailing addons in one shared-focus
+ * field, reach for `InputGroup` instead — composing inputs is its job, not
+ * this one's.
  *
  * @example
  * ```tsx
