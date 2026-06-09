@@ -33,7 +33,7 @@ interface CommandProps extends React.ComponentProps<typeof CommandPrimitive> {}
  *   <CommandList>
  *     <CommandEmpty>No results found.</CommandEmpty>
  *     <CommandGroup heading="Suggestions">
- *       <CommandItem>Date Picker</CommandItem>
+ *       <CommandItem>Calendar</CommandItem>
  *       <CommandItem>Search Emoji</CommandItem>
  *     </CommandGroup>
  *   </CommandList>
@@ -97,7 +97,7 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
  *   <CommandList>
  *     <CommandEmpty>No results found.</CommandEmpty>
  *     <CommandGroup heading="Suggestions">
- *       <CommandItem onSelect={() => setOpen(false)}>Date Picker</CommandItem>
+ *       <CommandItem onSelect={() => setOpen(false)}>Calendar</CommandItem>
  *     </CommandGroup>
  *   </CommandList>
  * </CommandDialog>

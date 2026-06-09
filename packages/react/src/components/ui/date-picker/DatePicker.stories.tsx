@@ -25,6 +25,15 @@ function addDays(date: Date, days: number) {
   return next;
 }
 
+// Resolve a spacing token to px from :root so cell-size assertions track the
+// active spacing mode instead of hardcoding the `vega`-default value.
+function resolveSpacingPx(canvasElement: HTMLElement, varName: string) {
+  const root = canvasElement.ownerDocument.documentElement;
+  return Math.round(
+    parseFloat(getComputedStyle(root).getPropertyValue(varName))
+  );
+}
+
 const PRESETS = [
   { label: 'Today', days: 0 },
   { label: 'Tomorrow', days: 1 },
@@ -54,7 +63,7 @@ const meta: Meta<typeof DatePicker> = {
   argTypes: {
     cellSize: {
       control: 'select',
-      options: ['default', 'large', 'custom'],
+      options: ['default', 'large', 'xlarge'],
       description: 'Visual day-cell size from the Figma variants',
     },
     captionLayout: {
@@ -164,7 +173,7 @@ export const Today: Story = {
   },
 };
 
-// Large date cells mirror Figma's 48px size variant.
+// Large cells use the `large` preset (spacing-12, 48px under the default mode).
 export const LargeCells: Story = {
   render: () => (
     <DatePicker
@@ -181,17 +190,23 @@ export const LargeCells: Story = {
     await expect(
       canvasElement.querySelector('[data-cell-size="large"]')
     ).toBeInTheDocument();
-    expect(Math.round(selected!.getBoundingClientRect().width)).toBe(48);
-    expect(Math.round(selected!.getBoundingClientRect().height)).toBe(48);
+    const largeCellPx = resolveSpacingPx(canvasElement, '--nx-spacing-12');
+    expect(Math.round(selected!.getBoundingClientRect().width)).toBe(
+      largeCellPx
+    );
+    expect(Math.round(selected!.getBoundingClientRect().height)).toBe(
+      largeCellPx
+    );
   },
 };
 
-// Custom date cells support secondary content inside the native day button.
+// Secondary content inside the native day button via renderDayContent; the
+// `xlarge` preset gives the extra row room.
 export const CustomDayContent: Story = {
   render: () => (
     <DatePicker
       mode="single"
-      cellSize="custom"
+      cellSize="xlarge"
       defaultMonth={REFERENCE_MONTH}
       selected={new Date(2025, 0, 15)}
       renderDayContent={({ date }) => (
@@ -209,11 +224,16 @@ export const CustomDayContent: Story = {
     const selected = canvas.getByText('15').closest('button');
 
     await expect(
-      canvasElement.querySelector('[data-cell-size="custom"]')
+      canvasElement.querySelector('[data-cell-size="xlarge"]')
     ).toBeInTheDocument();
     await expect(canvas.getByText('$75')).toBeInTheDocument();
-    expect(Math.round(selected!.getBoundingClientRect().width)).toBe(56);
-    expect(Math.round(selected!.getBoundingClientRect().height)).toBe(56);
+    const xlargeCellPx = resolveSpacingPx(canvasElement, '--nx-spacing-14');
+    expect(Math.round(selected!.getBoundingClientRect().width)).toBe(
+      xlargeCellPx
+    );
+    expect(Math.round(selected!.getBoundingClientRect().height)).toBe(
+      xlargeCellPx
+    );
   },
 };
 

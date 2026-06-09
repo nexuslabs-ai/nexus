@@ -14,11 +14,7 @@ import { cn } from '@/lib/utils';
 
 import { Button, buttonVariants } from '../button';
 
-function toISODate(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
-type DatePickerCellSize = 'default' | 'large' | 'custom';
+type DatePickerCellSize = 'default' | 'large' | 'xlarge';
 
 type DatePickerDayButtonProps = React.ComponentProps<typeof DayButton>;
 
@@ -37,7 +33,7 @@ const cellSizeClassNames: Record<DatePickerCellSize, string> = {
     'nx:[--cell-size:var(--nx-spacing-8)] nx:[--today-marker-size:var(--nx-spacing-6)]',
   large:
     'nx:[--cell-size:var(--nx-spacing-12)] nx:[--today-marker-size:var(--nx-spacing-10)]',
-  custom:
+  xlarge:
     'nx:[--cell-size:var(--nx-spacing-14)] nx:[--today-marker-size:var(--nx-spacing-12)]',
 };
 
@@ -57,18 +53,19 @@ type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
    */
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
   /**
-   * Visual day-cell size. Matches the Figma default / large / custom variants.
+   * Day-cell size preset: `default` (32px), `large` (48px), `xlarge` (56px).
+   * For an arbitrary size, override `--cell-size` via `className`.
    * @default 'default'
    */
   cellSize?: DatePickerCellSize;
   /**
    * Custom content rendered inside each day button while preserving
    * react-day-picker's native button semantics and keyboard behavior.
+   *
+   * A render callback (not a `children` slot) because react-day-picker owns
+   * the per-day render loop, so per-day content cannot be passed as children.
    */
-  // react-day-picker owns the per-day render loop, so a `children` slot cannot
-  // inject per-day content — a render callback is the only viable shape here.
-  // eslint-disable-next-line @nexus/no-render-prop-types
-  renderDayContent?: (props: DatePickerDayContentProps) => React.ReactNode;
+  renderDayContent?: DatePickerDayContent;
 };
 
 /**
@@ -164,7 +161,9 @@ function DatePicker({
           table: 'nx:w-full nx:border-collapse',
           weekdays: cn('nx:flex', defaultClassNames.weekdays),
           weekday: cn(
-            'nx:flex-1 nx:rounded-md nx:typography-label-default nx:text-muted-foreground nx:select-none',
+            // Match the day buttons' type (Button's raw text-sm + font-normal,
+            // inherited family) rather than the label composite (Inter/medium).
+            'nx:flex-1 nx:rounded-md nx:text-sm nx:font-normal nx:text-muted-foreground-subtle nx:select-none',
             defaultClassNames.weekday
           ),
           week: cn('nx:mt-2 nx:flex nx:w-full', defaultClassNames.week),
@@ -197,7 +196,7 @@ function DatePicker({
           ),
           today: defaultClassNames.today,
           outside: cn(
-            'nx:text-muted-foreground nx:aria-selected:text-muted-foreground',
+            'nx:text-muted-foreground-subtle nx:aria-selected:text-muted-foreground-subtle',
             defaultClassNames.outside
           ),
           disabled: cn(
@@ -300,7 +299,7 @@ function DatePickerDayButton({
       ref={ref}
       variant="ghost"
       size="icon"
-      data-day={toISODate(day.date)}
+      data-day={day.isoDate}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&
