@@ -1,5 +1,7 @@
 import type { Oklch } from 'culori';
 
+import { apcaLc } from './apca';
+import { type Tier, TIER_THRESHOLDS } from './palette';
 import { formatOklch, seedOklch } from './perceptual-ramp';
 
 export interface ThemeSeeds {
@@ -88,5 +90,99 @@ export function deriveSurfaces(
     c: c * 0.3,
     h,
   });
+  return out;
+}
+
+/**
+ * Quietest legible text tier. Start `quiet` of the way from the foreground
+ * toward its surface (softer = lower contrast), then walk back toward the
+ * foreground until the APCA floor is met — so muted text is as quiet as
+ * legibility allows, not as loud as the tier permits. `quiet = 0` returns the
+ * foreground itself (full contrast). Never throws: if even the foreground
+ * fails the floor, snap to the higher-contrast black/white endpoint.
+ */
+function quietText(
+  fg: Oklch,
+  surfaceColor: string,
+  floor: number,
+  quiet: number
+): string {
+  const surfL = seedOklch(surfaceColor).l ?? 0;
+  const fgL = fg.l ?? 0;
+  const c = fg.c ?? 0;
+  const h = fg.h ?? 0;
+  for (let q = quiet; q > 0; q -= 0.1) {
+    const candidate = formatOklch({
+      mode: 'oklch',
+      l: clamp01(fgL + (surfL - fgL) * q),
+      c,
+      h,
+    });
+    if (apcaLc(candidate, surfaceColor) >= floor) return candidate;
+  }
+  const fgString = formatOklch({ mode: 'oklch', l: fgL, c, h });
+  if (apcaLc(fgString, surfaceColor) >= floor) return fgString;
+  return apcaLc('oklch(1 0 0)', surfaceColor) >=
+    apcaLc('oklch(0 0 0)', surfaceColor)
+    ? 'oklch(1 0 0)'
+    : 'oklch(0 0 0)';
+}
+
+/** Each text token: the surface it sits on, its APCA floor, and how quiet to aim. */
+const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
+  {
+    foreground: { surface: '--nx-color-background', tier: 'body', quiet: 0 },
+    'container-foreground': {
+      surface: '--nx-color-container',
+      tier: 'body',
+      quiet: 0,
+    },
+    'popover-foreground': {
+      surface: '--nx-color-popover',
+      tier: 'body',
+      quiet: 0,
+    },
+    'nav-foreground': {
+      surface: '--nx-color-nav-background',
+      tier: 'body',
+      quiet: 0,
+    },
+    'muted-foreground': {
+      surface: '--nx-color-background',
+      tier: 'ui',
+      quiet: 0.4,
+    },
+    'nav-muted-foreground': {
+      surface: '--nx-color-nav-background',
+      tier: 'ui',
+      quiet: 0.4,
+    },
+    'muted-foreground-subtle': {
+      surface: '--nx-color-background',
+      tier: 'incidental',
+      quiet: 0.55,
+    },
+    'disabled-foreground': {
+      surface: '--nx-color-disabled',
+      tier: 'incidental',
+      quiet: 0.5,
+    },
+  };
+
+/** Text tiers, each guaranteed to clear its APCA floor on its surface. */
+export function deriveText(
+  foregroundHex: string,
+  surfaces: TokenMap
+): TokenMap {
+  const fg = seedOklch(foregroundHex);
+  const out: TokenMap = {};
+  for (const [token, { surface, tier, quiet }] of Object.entries(TEXT_ON)) {
+    out[`--nx-color-${token}`] = quietText(
+      fg,
+      surfaces[surface],
+      TIER_THRESHOLDS[tier],
+      quiet
+    );
+  }
   return out;
 }
