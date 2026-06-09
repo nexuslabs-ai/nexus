@@ -62,6 +62,7 @@ opencode.json
 # Local scratch artifacts (throwaway screenshots, dependency reports, etc.)
 /dataviz-*.png
 /scrim-*.png
+/codex-*.png
 /.deps-reports/
 
 # Superpowers brainstorming companion (local mockups + server state)
