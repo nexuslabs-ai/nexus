@@ -12,8 +12,8 @@ import {
 } from './derive-theme';
 import { TIER_THRESHOLDS } from './palette';
 
-function lOf(oklchStr: string): number {
-  return oklch(parse(oklchStr)!)!.l!;
+function lOf(oklchStr: string | undefined): number {
+  return oklch(parse(oklchStr!)!)!.l!;
 }
 
 describe('deriveSurfaces', () => {
@@ -56,20 +56,20 @@ describe('deriveText', () => {
   it('produces foreground that clears the body tier on background', () => {
     const t = deriveText('#ffffff', surfaces);
     expect(
-      apcaLc(t['--nx-color-foreground'], surfaces['--nx-color-background'])
+      apcaLc(t['--nx-color-foreground']!, surfaces['--nx-color-background']!)
     ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.body);
   });
 
   it('muted-foreground is quieter than foreground but still clears ui', () => {
     const t = deriveText('#ffffff', surfaces);
-    const bg = surfaces['--nx-color-background'];
-    expect(apcaLc(t['--nx-color-muted-foreground'], bg)).toBeGreaterThanOrEqual(
-      TIER_THRESHOLDS.ui
-    );
+    const bg = surfaces['--nx-color-background']!;
+    expect(
+      apcaLc(t['--nx-color-muted-foreground']!, bg)
+    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
     // genuinely muted: lower contrast than the body foreground (this is what the
     // adjustContrast approach got wrong on dark surfaces — it returned max contrast).
-    expect(apcaLc(t['--nx-color-muted-foreground'], bg)).toBeLessThan(
-      apcaLc(t['--nx-color-foreground'], bg)
+    expect(apcaLc(t['--nx-color-muted-foreground']!, bg)).toBeLessThan(
+      apcaLc(t['--nx-color-foreground']!, bg)
     );
   });
 
@@ -93,8 +93,8 @@ describe('derivePrimary', () => {
     const p = derivePrimary('#339cff', 'light');
     expect(
       apcaLc(
-        p['--nx-color-primary-foreground'],
-        p['--nx-color-primary-background']
+        p['--nx-color-primary-foreground']!,
+        p['--nx-color-primary-background']!
       )
     ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
   });
@@ -212,7 +212,7 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
 
       for (const [fg, bg, tier] of checks) {
         expect(
-          apcaLc(map[fg], map[bg]),
+          apcaLc(map[fg]!, map[bg]!),
           `${fg} on ${bg}`
         ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
       }
