@@ -194,13 +194,15 @@ background seed (tinted neutrals supported, e.g. a warm-gray canvas).
 ### 6.3 Foreground + contrast → text tiers (APCA-gated)
 
 The **primary** foregrounds use the **seed as-is** when it already clears the
-`body` floor on its surface, and are snapped only if they fail — so a pure-white
-fg stays pure white while it's legible. The **muted** tiers are produced by
-**`adjustContrast(foregroundSeed, { background: <the surface it sits on>, tier
-})`**, which walks the grid and returns the first (lightest-touch) shade
-clearing the tier — exactly the "as quiet as legibility allows" behaviour muted
-text wants. Either way the APCA floor is enforced, so no contrast setting can
-produce illegible text:
+`body` floor on its surface, snapping to the higher-contrast black/white endpoint
+only if it fails — so a pure-white fg stays pure white while it's legible. The
+**muted** tiers use a `quietText` walk: start a per-tier fraction of the way from
+the foreground **toward its surface** (softer = lower contrast), then step back
+toward the foreground until the APCA floor is met — so muted text is as quiet as
+legibility allows, on **both light and dark** surfaces. (An earlier
+`adjustContrast`-based approach was wrong here: walking shades `50→950` returns
+the _highest_-contrast shade on a dark surface — the opposite of muted.) The
+floor is always enforced, so no contrast setting can produce illegible text:
 
 | Token                                                                        | APCA tier              | Sits on     |
 | ---------------------------------------------------------------------------- | ---------------------- | ----------- |
@@ -208,8 +210,9 @@ produce illegible text:
 | `muted-foreground`, `nav-muted-foreground`                                   | `ui` (Lc ≥ 60)         | its surface |
 | `muted-foreground-subtle`, `disabled-foreground`                             | `incidental` (Lc ≥ 45) | its surface |
 
-`contrast` biases _which_ tier target the muted ramp aims for (higher contrast →
-push muted tiers toward `body`), but the APCA floor is always enforced.
+Each tier's `quiet` fraction sets how far toward the surface the muted ramp
+starts; the `contrast` scalar moves the surfaces themselves, so both shift where
+the floor lands — and the APCA floor is always the backstop.
 
 ### 6.4 Kept from the preset (not derived)
 
