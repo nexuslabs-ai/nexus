@@ -1,8 +1,9 @@
 import * as React from 'react';
+import type { DateRange } from 'react-day-picker';
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconClock } from '@tabler/icons-react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -32,6 +33,23 @@ function resolveSpacingPx(canvasElement: HTMLElement, varName: string) {
   return Math.round(
     parseFloat(getComputedStyle(root).getPropertyValue(varName))
   );
+}
+
+// Inclusive ascending list of dates between two days (order-agnostic).
+function daysBetween(a: Date, b: Date) {
+  const [start, end] = a <= b ? [a, b] : [b, a];
+  const days: Date[] = [];
+  const cursor = new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    start.getDate()
+  );
+  const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  while (cursor <= last) {
+    days.push(new Date(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return days;
 }
 
 const PRESETS = [
@@ -64,7 +82,8 @@ const meta: Meta<typeof DatePicker> = {
     cellSize: {
       control: 'select',
       options: ['default', 'large', 'xlarge'],
-      description: 'Visual day-cell size from the Figma variants',
+      description:
+        'Day-cell size preset (default 32px / large 48px / xlarge 56px)',
     },
     captionLayout: {
       control: 'select',
@@ -94,6 +113,11 @@ const meta: Meta<typeof DatePicker> = {
     fixedWeeks: {
       control: 'boolean',
       description: 'Always render six weeks',
+    },
+    weekStartsOn: {
+      control: 'select',
+      options: [0, 1, 2, 3, 4, 5, 6],
+      description: 'First day of week (0=Sun … 6=Sat); a `locale` can drive it',
     },
     numberOfMonths: {
       control: 'number',
@@ -248,6 +272,106 @@ export const Range: Story = {
   ),
 };
 
+// Range hover-preview: while a range is half-selected, hovering paints a
+// tentative rail (the `preview` modifier) from the start to the hovered day.
+export const RangeHoverPreview: Story = {
+  parameters: { inCard: false },
+  render: function RangeHoverPreviewStory() {
+    const [range, setRange] = React.useState<DateRange | undefined>({
+      from: new Date(2025, 0, 8),
+      to: undefined,
+    });
+    const [hovered, setHovered] = React.useState<Date | undefined>();
+
+    // Tentative span from the committed start to the hovered day, minus the
+    // start itself (it already shows as the committed endpoint).
+    const preview =
+      range?.from && !range.to && hovered
+        ? daysBetween(range.from, hovered).filter(
+            (d) => d.getTime() !== range.from!.getTime()
+          )
+        : [];
+
+    return (
+      <Card className="nx:w-fit">
+        <CardContent className="nx:p-0">
+          <DatePicker
+            mode="range"
+            defaultMonth={REFERENCE_MONTH}
+            selected={range}
+            onSelect={setRange}
+            modifiers={{ preview }}
+            onDayMouseEnter={(day) => setHovered(day)}
+            onDayMouseLeave={() => setHovered(undefined)}
+          />
+        </CardContent>
+      </Card>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.hover(canvas.getByText('11').closest('button')!);
+
+    // Day 10 sits between the committed start (8) and the hovered day (11),
+    // so its cell should carry the preview rail.
+    const cell = canvas.getByText('10').closest('td');
+    await waitFor(() =>
+      expect(getComputedStyle(cell!).backgroundColor).not.toBe(
+        'rgba(0, 0, 0, 0)'
+      )
+    );
+  },
+};
+
+// Range with a Stripe-style preset rail beside two months — the canonical
+// analytics date-range pattern; numberOfMonths={2} keeps a span on one screen.
+// The component lays months out in a row natively, so no classNames override.
+export const RangeWithPresets: Story = {
+  parameters: { inCard: false },
+  render: function RangeWithPresetsStory() {
+    const [range, setRange] = React.useState<DateRange | undefined>({
+      from: addDays(REFERENCE_TODAY, -7),
+      to: REFERENCE_TODAY,
+    });
+
+    const presets = [
+      { label: 'Today', days: 0 },
+      { label: 'Last 7 days', days: 7 },
+      { label: 'Last 14 days', days: 14 },
+      { label: 'Last 30 days', days: 30 },
+    ];
+    const applyRange = (days: number) =>
+      setRange({ from: addDays(REFERENCE_TODAY, -days), to: REFERENCE_TODAY });
+
+    return (
+      <Card className="nx:w-fit">
+        <CardContent className="nx:flex nx:p-0">
+          <div className="nx:flex nx:flex-col nx:gap-1 nx:border-r nx:border-border-default nx:p-3">
+            {presets.map((preset) => (
+              <Button
+                key={preset.label}
+                variant="ghost"
+                size="sm"
+                className="nx:justify-start"
+                onClick={() => applyRange(preset.days)}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+          <DatePicker
+            mode="range"
+            numberOfMonths={2}
+            defaultMonth={REFERENCE_MONTH}
+            selected={range}
+            onSelect={setRange}
+          />
+        </CardContent>
+      </Card>
+    );
+  },
+};
+
 // Multiple discrete dates.
 export const Multiple: Story = {
   render: () => (
@@ -333,6 +457,54 @@ export const DisabledDays: Story = {
   },
 };
 
+// Unavailable (booked / blackout) days — struck through, distinct from plain
+// disabled. `unavailable` styles the cell; pair it with `disabled` to also block
+// selection (Spectrum's unavailable-vs-disabled distinction).
+export const UnavailableDays: Story = {
+  render: () => {
+    const booked = [new Date(2025, 0, 20), new Date(2025, 0, 21)];
+    return (
+      <DatePicker
+        mode="single"
+        defaultMonth={REFERENCE_MONTH}
+        selected={new Date(2025, 0, 15)}
+        disabled={booked}
+        modifiers={{ unavailable: booked }}
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const cell = canvas.getByText('20').closest('td');
+
+    await expect(cell).toBeInTheDocument();
+    expect(getComputedStyle(cell!).textDecorationLine).toContain(
+      'line-through'
+    );
+  },
+};
+
+// First day of week — Monday-first (matches the Figma reference). Pass a date-fns
+// `locale` instead to derive both the first day and weekday names per region.
+// (Weekday label format itself is locale/formatter-driven and out of scope here.)
+export const WeekStartsMonday: Story = {
+  render: () => (
+    <DatePicker
+      mode="single"
+      weekStartsOn={1}
+      defaultMonth={REFERENCE_MONTH}
+      selected={new Date(2025, 0, 15)}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const weekdays = canvasElement.querySelectorAll('.rdp-weekday');
+
+    // Monday-first → the first weekday header is "Mo", last is "Su".
+    await expect(weekdays[0]).toHaveTextContent('Mo');
+    await expect(weekdays[6]).toHaveTextContent('Su');
+  },
+};
+
 // Week numbers exercise the dedicated week-number typography path.
 export const WeekNumbers: Story = {
   render: () => (
@@ -379,6 +551,54 @@ export const WithDataAttributes: Story = {
     const canvas = within(canvasElement);
     const day15 = canvas.getByText('15').closest('button');
     await expect(day15).toHaveAttribute('data-day');
+  },
+};
+
+// Accessibility: react-day-picker labels each day with its full date plus
+// "Today" / "selected" status, and renders `footer` in an aria-live region so the
+// current selection is announced (additive to rdp's month-change announcement).
+export const Accessibility: Story = {
+  parameters: { inCard: false },
+  render: function AccessibilityStory() {
+    const [date, setDate] = React.useState<Date | undefined>(
+      new Date(2025, 0, 15)
+    );
+
+    return (
+      <Card className="nx:w-fit">
+        <CardContent className="nx:p-0">
+          <DatePicker
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            today={new Date(2025, 0, 8)}
+            defaultMonth={REFERENCE_MONTH}
+            footer={
+              date
+                ? `Selected ${date.toLocaleDateString()}`
+                : 'No date selected'
+            }
+          />
+        </CardContent>
+      </Card>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const selectedLabel =
+      canvas.getByText('15').closest('button')!.getAttribute('aria-label') ??
+      '';
+    const todayLabel =
+      canvas.getByText('8').closest('button')!.getAttribute('aria-label') ?? '';
+
+    // Full date + status come from react-day-picker's labelDayButton.
+    expect(selectedLabel).toContain('January 15th, 2025');
+    expect(selectedLabel).toContain('selected');
+    expect(todayLabel).toContain('Today');
+
+    // `footer` is announced via rdp's aria-live status region.
+    const footer = canvas.getByText(/Selected/);
+    await expect(footer).toHaveAttribute('aria-live', 'polite');
   },
 };
 

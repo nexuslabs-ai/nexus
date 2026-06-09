@@ -90,6 +90,7 @@ function DatePicker({
   cellSize = 'default',
   renderDayContent,
   formatters,
+  modifiersClassNames,
   components,
   ...props
 }: DatePickerProps) {
@@ -111,10 +112,20 @@ function DatePicker({
             date.toLocaleString('default', { month: 'short' }),
           ...formatters,
         }}
+        // Cell-level modifiers a consumer opts into. `unavailable` (pair with
+        // `disabled`) strikes booked/blackout days; `preview` paints a tentative
+        // range rail while a range is half-selected (wire via onDayMouseEnter).
+        modifiersClassNames={{
+          unavailable: 'nx:text-muted-foreground nx:line-through',
+          preview: 'nx:bg-background-hover',
+          ...modifiersClassNames,
+        }}
         classNames={{
           root: cn('nx:w-fit', defaultClassNames.root),
+          // Row layout so numberOfMonths > 1 sits side by side; a single month
+          // is unaffected. The absolute nav positions against this `relative`.
           months: cn(
-            'nx:relative nx:flex nx:flex-col nx:gap-4',
+            'nx:relative nx:flex nx:flex-row nx:gap-4',
             defaultClassNames.months
           ),
           month: cn(
