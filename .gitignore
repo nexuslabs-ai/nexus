@@ -63,3 +63,6 @@ opencode.json
 /dataviz-*.png
 /scrim-*.png
 /.deps-reports/
+
+# Superpowers brainstorming companion (local mockups + server state)
+.superpowers/
