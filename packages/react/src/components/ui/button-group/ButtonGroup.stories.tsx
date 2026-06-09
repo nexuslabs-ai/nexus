@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { IconChevronDown } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
 import {
@@ -7,6 +8,12 @@ import {
 } from '../../../stories/test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../dropdown-menu';
 import {
   Select,
   SelectContent,
@@ -318,6 +325,38 @@ export const WithSelectTrigger: Story = {
     // The trigger joins the seam like a button: its left border is removed so
     // it doesn't double up against the previous control.
     await expect(getComputedStyle(trigger).borderLeftWidth).toBe('0px');
+  },
+};
+
+// A split button: a primary action joined to a DropdownMenu trigger. The
+// trigger renders as a button via asChild, so it joins the seam like any
+// other button-shaped control.
+export const SplitButton: Story = {
+  render: () => (
+    <ButtonGroup>
+      <Button>Deploy</Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="icon" aria-label="Deployment options">
+            <IconChevronDown />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem>Deploy to staging</DropdownMenuItem>
+          <DropdownMenuItem>Deploy to production</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    // The DropdownMenu trigger composes onto a Button via asChild, so it lands
+    // in the group as a button-shaped control (data-slot=button) that opens a
+    // menu.
+    const trigger = canvasElement.querySelector(
+      '[data-slot="button-group"] [aria-haspopup="menu"]'
+    );
+    await expect(trigger).toBeInTheDocument();
+    await expect(trigger).toHaveAttribute('data-slot', 'button');
   },
 };
 
