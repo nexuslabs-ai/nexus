@@ -2,6 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
 import { Button } from '../button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../select';
 
 import {
   ButtonGroup,
@@ -111,6 +118,36 @@ export const AsChild: Story = {
     const link = within(canvasElement).getByRole('link', { name: 'Docs' });
     await expect(link.tagName).toBe('A');
     await expect(link).toHaveAttribute('data-slot', 'button-group-text');
+  },
+};
+
+// A Select trigger joins the group as a button-shaped control, sharing the
+// seam with the adjacent button.
+export const WithSelectTrigger: Story = {
+  render: () => (
+    <ButtonGroup>
+      <Button variant="outline">Filter</Button>
+      <Select defaultValue="all">
+        <SelectTrigger aria-label="Status">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All</SelectItem>
+          <SelectItem value="open">Open</SelectItem>
+          <SelectItem value="closed">Closed</SelectItem>
+        </SelectContent>
+      </Select>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="select-trigger"]'
+    );
+    await expect(trigger).toBeInTheDocument();
+    if (!trigger) return;
+    // The trigger joins the seam like a button: its left border is removed so
+    // it doesn't double up against the previous control.
+    await expect(getComputedStyle(trigger).borderLeftWidth).toBe('0px');
   },
 };
 
