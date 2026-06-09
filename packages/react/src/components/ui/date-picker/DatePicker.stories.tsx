@@ -332,7 +332,9 @@ export const AllVariants: Story = {
     <div className="nx:flex nx:flex-wrap nx:gap-6">
       <DatePicker
         mode="single"
-        selected={new Date()}
+        defaultMonth={REFERENCE_MONTH}
+        today={new Date(2025, 0, 8)}
+        selected={new Date(2025, 0, 15)}
         labels={{ labelNav: () => 'Single date navigation' }}
       />
       <DatePicker

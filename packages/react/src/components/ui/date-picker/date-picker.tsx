@@ -14,6 +14,10 @@ import { cn } from '@/lib/utils';
 
 import { Button, buttonVariants } from '../button';
 
+function toISODate(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 type DatePickerCellSize = 'default' | 'large' | 'custom';
 
 type DatePickerDayButtonProps = React.ComponentProps<typeof DayButton>;
@@ -61,7 +65,10 @@ type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
    * Custom content rendered inside each day button while preserving
    * react-day-picker's native button semantics and keyboard behavior.
    */
-  renderDayContent?: DatePickerDayContent;
+  // react-day-picker owns the per-day render loop, so a `children` slot cannot
+  // inject per-day content — a render callback is the only viable shape here.
+  // eslint-disable-next-line @nexus/no-render-prop-types
+  renderDayContent?: (props: DatePickerDayContentProps) => React.ReactNode;
 };
 
 /**
@@ -188,7 +195,7 @@ function DatePicker({
             'nx:rounded-r-md nx:bg-primary-subtle',
             defaultClassNames.range_end
           ),
-          today: cn(defaultClassNames.today),
+          today: defaultClassNames.today,
           outside: cn(
             'nx:text-muted-foreground nx:aria-selected:text-muted-foreground',
             defaultClassNames.outside
@@ -207,7 +214,7 @@ function DatePicker({
                 data-slot="date-picker"
                 data-cell-size={cellSize}
                 ref={rootRef}
-                className={cn(className)}
+                className={className}
                 {...props}
               />
             );
@@ -293,7 +300,7 @@ function DatePickerDayButton({
       ref={ref}
       variant="ghost"
       size="icon"
-      data-day={day.date.toLocaleDateString()}
+      data-day={toISODate(day.date)}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&
@@ -318,7 +325,7 @@ function DatePickerDayButton({
         'nx:data-[range-end=true]:rounded-md nx:data-[range-end=true]:rounded-r-md nx:data-[range-end=true]:bg-primary-background nx:data-[range-end=true]:text-primary-foreground',
         // Range middle → subtle primary fill (continuous with the cell rail).
         'nx:data-[range-middle=true]:rounded-none nx:data-[range-middle=true]:bg-primary-subtle nx:data-[range-middle=true]:text-primary-subtle-foreground',
-        defaultClassNames.day,
+        defaultClassNames.day_button,
         className
       )}
       {...props}
