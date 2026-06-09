@@ -2,7 +2,14 @@ import { oklch, parse } from 'culori';
 import { describe, expect, it } from 'vitest';
 
 import { apcaLc } from './apca';
-import { derivePrimary, deriveSurfaces, deriveText } from './derive-theme';
+import {
+  type CodexThemeContract,
+  derivePrimary,
+  deriveSurfaces,
+  deriveText,
+  deriveTheme,
+  themeToCss,
+} from './derive-theme';
 import { TIER_THRESHOLDS } from './palette';
 
 function lOf(oklchStr: string): number {
@@ -90,5 +97,39 @@ describe('derivePrimary', () => {
         p['--nx-color-primary-background']
       )
     ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+  });
+});
+
+const CONTRACT: CodexThemeContract = {
+  appearance: 'dark',
+  light: { accent: '#2563eb', background: '#ffffff', foreground: '#0a0a0a' },
+  dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
+  contrast: 60,
+};
+
+describe('deriveTheme', () => {
+  it('returns light and dark maps with the core tokens', () => {
+    const d = deriveTheme(CONTRACT);
+    for (const map of [d.light, d.dark]) {
+      expect(map['--nx-color-background']).toBeDefined();
+      expect(map['--nx-color-foreground']).toBeDefined();
+      expect(map['--nx-color-primary-background']).toBeDefined();
+      expect(map['--nx-color-container']).toBeDefined();
+    }
+  });
+
+  it('uses the per-theme seed blocks', () => {
+    const d = deriveTheme(CONTRACT);
+    expect(lOf(d.dark['--nx-color-background'])).toBeLessThan(0.3); // dark seed
+    expect(lOf(d.light['--nx-color-background'])).toBeGreaterThan(0.9); // light seed
+  });
+});
+
+describe('themeToCss', () => {
+  it('emits html and html.dark blocks', () => {
+    const css = themeToCss(deriveTheme(CONTRACT));
+    expect(css).toMatch(/html\s*\{/);
+    expect(css).toMatch(/html\.dark\s*\{/);
+    expect(css).toContain('--nx-color-background:');
   });
 });

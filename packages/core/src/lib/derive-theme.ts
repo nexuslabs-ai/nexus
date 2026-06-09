@@ -212,3 +212,35 @@ export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
     '--nx-color-border-primary-active': dark ? ramp['500'] : ramp['400'],
   };
 }
+
+function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
+  const delta = contrastDelta(contrast);
+  const surfaces = deriveSurfaces(seeds.background, mode, delta);
+  const text = deriveText(seeds.foreground, surfaces);
+  const primary = derivePrimary(seeds.accent, mode);
+  return { ...surfaces, ...text, ...primary };
+}
+
+/**
+ * Expand a contract into light + dark `--nx-color-*` maps. Only the tokens the
+ * engine computes are emitted (surfaces, text, borders, primary); status and
+ * secondary families keep cascading from the loaded base/brand preset.
+ */
+export function deriveTheme(contract: CodexThemeContract): DerivedTheme {
+  return {
+    light: deriveMode(contract.light, 'light', contract.contrast),
+    dark: deriveMode(contract.dark, 'dark', contract.contrast),
+  };
+}
+
+function block(selector: string, map: TokenMap): string {
+  const body = Object.entries(map)
+    .map(([key, value]) => `  ${key}: ${value};`)
+    .join('\n');
+  return `${selector} {\n${body}\n}`;
+}
+
+/** Serialize a derived theme to CSS text — light on `html`, dark on `html.dark`. */
+export function themeToCss(derived: DerivedTheme): string {
+  return `${block('html', derived.light)}\n${block('html.dark', derived.dark)}\n`;
+}
