@@ -41,6 +41,11 @@
     { "name": "Checkbox", "showcase": "AllVariants" },
     { "name": "Collapsible", "showcase": "AllVariants" },
     {
+      "name": "Command",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"]
+    },
+    {
       "name": "ContextMenu",
       "showcase": "AllVariants",
       "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"],
