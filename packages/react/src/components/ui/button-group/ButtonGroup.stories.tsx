@@ -345,15 +345,13 @@ export const WithSelectTrigger: Story = {
   },
 };
 
-// A split button: a primary action and a DropdownMenu trigger, divided by a
-// rule tinted with the button's own foreground token (primary-foreground) —
-// the default border color is invisible on a filled surface. Works in both
-// themes (the primary fill + foreground pair is theme-stable).
+// A split button: a primary action joined to a DropdownMenu trigger. The
+// trigger renders as a button via asChild, so it joins the seam like any
+// other button-shaped control.
 export const SplitButton: Story = {
   render: () => (
     <ButtonGroup>
       <Button>Deploy</Button>
-      <ButtonGroupSeparator className="nx:bg-primary-foreground" />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="icon" aria-label="Deployment options">
@@ -368,16 +366,14 @@ export const SplitButton: Story = {
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
-    // The DropdownMenu trigger composes onto a Button via asChild (data-slot=
-    // button) and opens a menu; a separator divides it from the primary action.
+    // The DropdownMenu trigger composes onto a Button via asChild, so it lands
+    // in the group as a button-shaped control (data-slot=button) that opens a
+    // menu.
     const trigger = canvasElement.querySelector(
       '[data-slot="button-group"] [aria-haspopup="menu"]'
     );
     await expect(trigger).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'button');
-    await expect(
-      canvasElement.querySelector('[data-slot="button-group-separator"]')
-    ).toBeInTheDocument();
   },
 };
 
