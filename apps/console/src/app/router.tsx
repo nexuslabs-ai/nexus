@@ -13,6 +13,7 @@ import { LoginRoute } from '../modules/auth/login-route';
 import { SignupRoute } from '../modules/auth/signup-route';
 import { VerifyRoute } from '../modules/auth/verify-route';
 import { BillingRoute } from '../modules/billing/billing-route';
+import { CodexRoute } from '../modules/codex/codex-route';
 import { ComingSoon } from '../modules/coming-soon';
 import { ContactDetailRoute } from '../modules/crm/contact-detail-route';
 import { ContactsRoute } from '../modules/crm/contacts-route';
@@ -88,6 +89,12 @@ const appearanceRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/design/appearance',
   component: AppearanceRoute,
+});
+
+const codexRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/design/codex',
+  component: CodexRoute,
 });
 
 const flowsRoute = createRoute({
@@ -214,6 +221,7 @@ const routeTree = rootRoute.addChildren([
     referenceRoute,
     scenesRoute,
     appearanceRoute,
+    codexRoute,
     flowsRoute,
     crmContactsRoute,
     crmContactDetailRoute,
