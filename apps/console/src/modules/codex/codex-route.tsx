@@ -8,6 +8,11 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Slider,
   Switch,
   ToggleGroup,
@@ -21,6 +26,11 @@ import {
   sanitizeContract,
 } from '../../lib/codex-contract';
 import { type CodexPrefs, sanitizePrefs } from '../../lib/codex-prefs';
+import {
+  activePresetName,
+  CODEX_PRESETS,
+  CUSTOM_PRESET,
+} from '../../lib/codex-presets';
 
 import { ColorField } from './color-field';
 import { SettingRow } from './setting-row';
@@ -99,12 +109,32 @@ export function CodexRoute() {
     }
   };
 
+  const applyPreset = (name: string) => {
+    const preset = CODEX_PRESETS.find((p) => p.name === name);
+    if (preset) setCodexContract(preset.contract);
+  };
+
   return (
     <div className="nx:mx-auto nx:max-w-2xl nx:space-y-6 nx:p-6">
       <PageHeader
         title="Appearance"
         description="Edit a few values; the whole console re-themes in real time."
       >
+        <Select value={activePresetName(contract)} onValueChange={applyPreset}>
+          <SelectTrigger className="nx:w-36" aria-label="Theme preset">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CODEX_PRESETS.map((p) => (
+              <SelectItem key={p.name} value={p.name}>
+                {p.name}
+              </SelectItem>
+            ))}
+            <SelectItem value={CUSTOM_PRESET} disabled>
+              {CUSTOM_PRESET}
+            </SelectItem>
+          </SelectContent>
+        </Select>
         <Button variant="ghost" size="sm" onClick={handleImport}>
           Import
         </Button>
