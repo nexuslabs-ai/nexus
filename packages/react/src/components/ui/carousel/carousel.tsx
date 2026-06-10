@@ -69,6 +69,10 @@ function useCarousel() {
  * Keyboard: a horizontal carousel scrolls with Left/Right arrows, a vertical
  * one with Up/Down (arrows for the other axis are ignored).
  *
+ * Layout: the Previous / Next controls render just outside the content frame,
+ * so give the carousel horizontal room (a `max-w-*` with auto margins, or
+ * container padding) — otherwise they clip off-canvas at narrow / mobile widths.
+ *
  * @example
  * ```tsx
  * <Carousel className="nx:w-full nx:max-w-xs" aria-label="Featured products">
