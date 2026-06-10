@@ -49,7 +49,7 @@ A real app is the strongest proof of a design system: every component composed i
 
 **Shipped & exercised:** Accordion, Alert, AlertDialog, Avatar, Badge, Button, Card, Checkbox, Command, Dialog, DropdownMenu, Form, Input, InputOtp, Label, Popover, Progress, RadioGroup, ScrollArea, Select, Separator, Sheet, Sidebar, Skeleton, Sonner, Switch, Table, Tabs, Textarea, Tooltip, Show/Hide.
 
-**Likely-missing (extract as their own Nexus component issues when first hit — do NOT hand-roll in the app):** `DataTable` (sort/filter/paginate/select over Table) · `Combobox`/Autocomplete · `DatePicker`/`DateRangePicker`/`Calendar` · `Pagination` · `Breadcrumb` · **Charts** (recharts + chart tokens exist, no exported components) · `AvatarGroup` · `TagInput`/multi-select · `Stepper` · `EmptyState` · `Spinner` · `Banner` · `KBD`.
+**Likely-missing (extract as their own Nexus component issues when first hit — do NOT hand-roll in the app):** `DataTable` (sort/filter/paginate/select over Table) · `Combobox`/Autocomplete · `DateRangePicker` (range input over the shipped `DatePicker` grid) · `Pagination` · `Breadcrumb` · **Charts** (recharts + chart tokens exist, no exported components) · `AvatarGroup` · `TagInput`/multi-select · `Stepper` · `EmptyState` · `Spinner` · `Banner` · `KBD`.
 
 ## How the playground folds in
 

@@ -28,7 +28,7 @@
     { "name": "Button", "showcase": "AllVariants" },
     { "name": "ButtonGroup", "showcase": "AllVariants" },
     {
-      "name": "Calendar",
+      "name": "DatePicker",
       "showcase": "AllVariants",
       "interactions": ["ClickInteraction", "KeyboardInteraction"]
     },
