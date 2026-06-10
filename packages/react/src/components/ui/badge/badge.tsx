@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { devWarn } from '@/lib/dev-warn';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
@@ -133,18 +132,20 @@ const badgeVariants = cva(
   }
 );
 
-const badgeCapsClasses =
-  'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-1';
-
-const badgeSentenceClasses = 'nx:typography-label-default nx:px-2.5 nx:py-1';
-
-const badgeNumberClasses =
-  'nx:min-h-5 nx:min-w-5 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
-
-const badgeIconOnlyClasses = 'nx:h-5 nx:min-w-5 nx:p-0';
-
 const badgeIconClasses =
   'nx:flex nx:items-center nx:justify-center nx:size-3.5 nx:[&>svg]:size-3.5';
+
+function badgeShapeClasses(
+  isNumber: boolean,
+  isIconOnly: boolean,
+  isCaps: boolean
+) {
+  if (isNumber)
+    return 'nx:min-h-5 nx:min-w-5 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
+  if (isIconOnly) return 'nx:h-5 nx:min-w-5 nx:p-0';
+  if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-1';
+  return 'nx:typography-label-default nx:px-2.5 nx:py-1';
+}
 
 interface BadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
@@ -197,8 +198,9 @@ interface BadgeProps
  *
  * Accessibility: status is conveyed by color, so don't rely on color alone —
  * pair a status `variant` with text or a leading icon. Icon-only badges set
- * `role="img"` and require an accessible name (dev-warned). The badge is not a
- * live region; if its status or count updates, wrap it in `aria-live="polite"`.
+ * `role="img"`, so pass `aria-label`, `aria-labelledby`, or `title` to name
+ * them. The badge is not a live region; if its status or count updates, wrap it
+ * in `aria-live="polite"`.
  */
 function Badge({
   className,
@@ -218,21 +220,9 @@ function Badge({
   const showLeftIcon = leftIcon && !isNumber && !isIconOnly;
   const showRightIcon = rightIcon && !isNumber && !isIconOnly;
 
-  devWarn(
-    isIconOnly &&
-      !(props['aria-label'] ?? props['aria-labelledby'] ?? props.title),
-    'Badge: an icon-only badge (no children) has no visible text — pass `aria-label`, `aria-labelledby`, or `title` so assistive tech can name it.'
-  );
-
   const classes = cn(
     badgeVariants({ variant, fill }),
-    isNumber
-      ? badgeNumberClasses
-      : isIconOnly
-        ? badgeIconOnlyClasses
-        : isCaps
-          ? badgeCapsClasses
-          : badgeSentenceClasses,
+    badgeShapeClasses(isNumber, isIconOnly, isCaps),
     className
   );
 
