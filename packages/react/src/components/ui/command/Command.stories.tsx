@@ -44,11 +44,6 @@ type Story = StoryObj<typeof Command>;
 const paletteClass =
   'nx:w-[480px] nx:rounded-lg nx:border nx:border-border-default nx:shadow-md';
 
-// Design-reference chrome for the Figma CommandContent node. Kept separate
-// from the default story chrome so production Command remains unframed.
-const figmaPaletteClass =
-  'nx:w-[450px] nx:max-h-[360px] nx:rounded-lg nx:border nx:border-border-default nx:shadow-base';
-
 const projectCommands = [
   {
     label: 'Open project plan',
@@ -630,87 +625,6 @@ export const WithDataAttributes: Story = {
       canvasElement.querySelector('[data-slot="command-shortcut"]')
     ).toBeInTheDocument();
   },
-};
-
-// ============================================
-// FIGMA COMPOSITION REFERENCE
-// ============================================
-
-export const FigmaComposition: Story = {
-  render: () => (
-    <Command
-      label="Figma command content reference"
-      className={figmaPaletteClass}
-    >
-      <CommandInput placeholder="Type a command or search..." />
-      <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Heading">
-          {['Item', 'Item 2', 'Item 3', 'Item 4', 'Item 5'].map((item) => (
-            <CommandItem key={item} value={`primary-${item}`}>
-              <span
-                aria-hidden="true"
-                className="nx:size-4 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
-              />
-              {item}
-              <span
-                aria-hidden="true"
-                className="nx:ml-auto nx:size-5 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
-              />
-            </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Heading">
-          {[
-            'Open palette',
-            'Search docs',
-            'Toggle theme',
-            'Go to settings',
-          ].map((item, index) => (
-            <CommandItem key={item} value={`secondary-${item}`}>
-              <span
-                aria-hidden="true"
-                className="nx:size-4 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
-              />
-              {item}
-              {index === 0 ? (
-                <CommandShortcut>⌘K</CommandShortcut>
-              ) : (
-                <span
-                  aria-hidden="true"
-                  className="nx:ml-auto nx:size-5 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
-                />
-              )}
-            </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Heading">
-          {[
-            'Create project',
-            'Invite teammate',
-            'View shortcuts',
-            'Open billing',
-            'Archive item',
-            'Export report',
-          ].map((item) => (
-            <CommandItem key={item} value={`tertiary-${item}`}>
-              <span
-                aria-hidden="true"
-                className="nx:size-4 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
-              />
-              {item}
-              <span
-                aria-hidden="true"
-                className="nx:ml-auto nx:size-5 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
-              />
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
-    </Command>
-  ),
 };
 
 // ============================================

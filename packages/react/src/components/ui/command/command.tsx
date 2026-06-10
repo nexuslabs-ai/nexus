@@ -244,6 +244,7 @@ function CommandLoading({ className, ...props }: CommandLoadingProps) {
       data-slot="command-loading"
       className={cn(
         'nx:px-3 nx:py-2.5',
+        // cmdk nests Loading's children in an inner aria-hidden div — target it to lay the spinner + label out as a row.
         'nx:[&>[aria-hidden=true]]:flex nx:[&>[aria-hidden=true]]:items-center nx:[&>[aria-hidden=true]]:gap-3',
         'nx:typography-body-small nx:text-muted-foreground',
         className
