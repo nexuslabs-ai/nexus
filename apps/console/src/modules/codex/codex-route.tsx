@@ -2,18 +2,25 @@ import { useEffect } from 'react';
 
 import type { CodexThemeContract, ThemeSeeds } from '@nexus/core';
 import {
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  Input,
   Slider,
+  Switch,
   ToggleGroup,
   ToggleGroupItem,
 } from '@nexus/react';
 
 import { useThemeContext } from '../../app/theme-provider';
 import { PageHeader } from '../../components/page-header';
-import { DEFAULT_CODEX_CONTRACT } from '../../lib/codex-contract';
+import {
+  DEFAULT_CODEX_CONTRACT,
+  sanitizeContract,
+} from '../../lib/codex-contract';
+import { type CodexPrefs, sanitizePrefs } from '../../lib/codex-prefs';
 
 import { ColorField } from './color-field';
 import { SettingRow } from './setting-row';
@@ -27,7 +34,8 @@ function editedBlock(
 }
 
 export function CodexRoute() {
-  const { codexContract, setCodexContract } = useThemeContext();
+  const { codexContract, setCodexContract, codexPrefs, setCodexPrefs } =
+    useThemeContext();
 
   // Entering the editor activates the derived theme so edits are visible.
   useEffect(() => {
@@ -57,12 +65,53 @@ export function CodexRoute() {
     setCodexContract({ ...contract, contrast: values[0] ?? contract.contrast });
   };
 
+  const updatePrefs = (patch: Partial<CodexPrefs>) =>
+    setCodexPrefs((p) => ({ ...p, ...patch }));
+
+  const setReduceMotion = (value: string) => {
+    if (value === 'system' || value === 'on' || value === 'off') {
+      updatePrefs({ reduceMotion: value });
+    }
+  };
+
+  const setDiffMarkers = (value: string) => {
+    if (value === 'color' || value === 'symbols') {
+      updatePrefs({ diffMarkers: value });
+    }
+  };
+
+  const handleCopy = () => {
+    void navigator.clipboard.writeText(
+      JSON.stringify({ ...contract, prefs: codexPrefs }, null, 2)
+    );
+  };
+
+  const handleImport = () => {
+    const text = window.prompt('Paste a theme JSON');
+    if (!text) return;
+    try {
+      const parsed: unknown = JSON.parse(text);
+      setCodexContract(sanitizeContract(parsed));
+      const prefsField = (parsed as { prefs?: unknown }).prefs;
+      if (prefsField) setCodexPrefs(sanitizePrefs(prefsField));
+    } catch {
+      window.alert('That was not valid theme JSON.');
+    }
+  };
+
   return (
     <div className="nx:mx-auto nx:max-w-2xl nx:space-y-6 nx:p-6">
       <PageHeader
         title="Appearance"
         description="Edit a few values; the whole console re-themes in real time."
-      />
+      >
+        <Button variant="ghost" size="sm" onClick={handleImport}>
+          Import
+        </Button>
+        <Button variant="ghost" size="sm" onClick={handleCopy}>
+          Copy theme
+        </Button>
+      </PageHeader>
 
       <Card>
         <CardHeader>
@@ -84,7 +133,10 @@ export function CodexRoute() {
               <ToggleGroupItem value="system">System</ToggleGroupItem>
             </ToggleGroup>
           </SettingRow>
-          <ThemeConfigDiff contract={contract} />
+          <ThemeConfigDiff
+            contract={contract}
+            markers={codexPrefs.diffMarkers}
+          />
         </CardContent>
       </Card>
 
@@ -125,6 +177,112 @@ export function CodexRoute() {
               step={1}
               aria-label="Contrast"
               className="nx:w-48"
+            />
+          </SettingRow>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Preferences</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SettingRow label="UI font" description="Font stack for the Codex UI">
+            <Input
+              value={codexPrefs.uiFont}
+              onChange={(e) => updatePrefs({ uiFont: e.target.value })}
+              aria-label="UI font"
+              className="nx:w-56 nx:font-mono nx:text-xs"
+            />
+          </SettingRow>
+          <SettingRow
+            label="Code font"
+            description="Font stack for code & diffs"
+          >
+            <Input
+              value={codexPrefs.codeFont}
+              onChange={(e) => updatePrefs({ codeFont: e.target.value })}
+              aria-label="Code font"
+              className="nx:w-56 nx:font-mono nx:text-xs"
+            />
+          </SettingRow>
+          <SettingRow
+            label="UI font size"
+            description="Base size for the Codex UI"
+          >
+            <Input
+              type="number"
+              min={8}
+              max={32}
+              value={codexPrefs.uiFontSize}
+              onChange={(e) =>
+                updatePrefs({ uiFontSize: Number(e.target.value) })
+              }
+              aria-label="UI font size"
+              className="nx:w-20"
+            />
+          </SettingRow>
+          <SettingRow
+            label="Code font size"
+            description="Base size for code & diffs"
+          >
+            <Input
+              type="number"
+              min={8}
+              max={32}
+              value={codexPrefs.codeFontSize}
+              onChange={(e) =>
+                updatePrefs({ codeFontSize: Number(e.target.value) })
+              }
+              aria-label="Code font size"
+              className="nx:w-20"
+            />
+          </SettingRow>
+          <SettingRow label="Translucent sidebar">
+            <Switch
+              checked={codexPrefs.translucentSidebar}
+              onCheckedChange={(v) => updatePrefs({ translucentSidebar: v })}
+            />
+          </SettingRow>
+          <SettingRow
+            label="Use pointer cursors"
+            description="Pointer cursor on interactive elements"
+          >
+            <Switch
+              checked={codexPrefs.pointerCursors}
+              onCheckedChange={(v) => updatePrefs({ pointerCursors: v })}
+            />
+          </SettingRow>
+          <SettingRow label="Reduce motion">
+            <ToggleGroup
+              type="single"
+              value={codexPrefs.reduceMotion}
+              onValueChange={setReduceMotion}
+              variant="outline"
+            >
+              <ToggleGroupItem value="system">System</ToggleGroupItem>
+              <ToggleGroupItem value="on">On</ToggleGroupItem>
+              <ToggleGroupItem value="off">Off</ToggleGroupItem>
+            </ToggleGroup>
+          </SettingRow>
+          <SettingRow label="Diff markers">
+            <ToggleGroup
+              type="single"
+              value={codexPrefs.diffMarkers}
+              onValueChange={setDiffMarkers}
+              variant="outline"
+            >
+              <ToggleGroupItem value="color">Color</ToggleGroupItem>
+              <ToggleGroupItem value="symbols">+ / -</ToggleGroupItem>
+            </ToggleGroup>
+          </SettingRow>
+          <SettingRow
+            label="Font smoothing"
+            description="Native macOS anti-aliasing"
+          >
+            <Switch
+              checked={codexPrefs.fontSmoothing}
+              onCheckedChange={(v) => updatePrefs({ fontSmoothing: v })}
             />
           </SettingRow>
         </CardContent>
