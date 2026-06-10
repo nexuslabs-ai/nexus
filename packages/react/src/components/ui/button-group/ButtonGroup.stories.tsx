@@ -1,5 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { IconChevronDown } from '@tabler/icons-react';
+import {
+  IconBold,
+  IconChevronDown,
+  IconItalic,
+  IconLink,
+  IconUnderline,
+} from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
 import { Button } from '../button';
@@ -72,14 +78,25 @@ export const WithText: Story = {
   },
 };
 
-// A separator divides two sub-clusters.
+// A separator divides sub-groups in a toolbar of borderless (ghost) controls —
+// the rule is the only division, so it reads clearly. In a row of bordered
+// (outline) buttons the per-button borders sit in the same color and hide it.
 export const WithSeparator: Story = {
   render: () => (
     <ButtonGroup>
-      <Button variant="outline">Undo</Button>
-      <Button variant="outline">Redo</Button>
+      <Button variant="ghost" size="icon" aria-label="Bold">
+        <IconBold />
+      </Button>
+      <Button variant="ghost" size="icon" aria-label="Italic">
+        <IconItalic />
+      </Button>
+      <Button variant="ghost" size="icon" aria-label="Underline">
+        <IconUnderline />
+      </Button>
       <ButtonGroupSeparator />
-      <Button variant="outline">Save</Button>
+      <Button variant="ghost" size="icon" aria-label="Add link">
+        <IconLink />
+      </Button>
     </ButtonGroup>
   ),
   play: async ({ canvasElement }) => {
@@ -207,7 +224,6 @@ export const AllVariants: Story = {
       <ButtonGroup>
         <ButtonGroupText>https://</ButtonGroupText>
         <Button variant="outline">nexus.dev</Button>
-        <ButtonGroupSeparator />
         <Button variant="outline">Go</Button>
       </ButtonGroup>
       <ButtonGroup orientation="vertical">
