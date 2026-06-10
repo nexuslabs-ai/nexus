@@ -122,8 +122,6 @@ export const LongCopyWithLink: Story = {
     const canvas = within(canvasElement);
     const link = canvas.getByRole('link', { name: /learn more/i });
 
-    // The [&>a] hooks only style an <a> that is a direct child of the
-    // description <p> — assert that structure first (CSS-independent).
     await expect(link.parentElement).toHaveAttribute(
       'data-slot',
       'empty-state-description'
@@ -131,7 +129,6 @@ export const LongCopyWithLink: Story = {
     // underline-offset-4 is unique to the hook — no anchor defaults to 4px.
     await expect(link).toHaveStyle({ textUnderlineOffset: '4px' });
 
-    // The link is the only focusable element, so Tab must land on it.
     await userEvent.tab();
     await expect(link).toHaveFocus();
 
