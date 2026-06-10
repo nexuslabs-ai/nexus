@@ -25,7 +25,7 @@ type Story = StoryObj<typeof Checkbox>;
 type CheckboxGroupStory = StoryObj<typeof CheckboxGroup>;
 
 function CheckboxGroupFrame({ children }: { children: React.ReactNode }) {
-  return <div className="nx:w-[478px] nx:max-w-full">{children}</div>;
+  return <div className="nx:w-[478.5px] nx:max-w-full">{children}</div>;
 }
 
 function LabelLeadingIcon() {
@@ -592,7 +592,7 @@ export const AllVariants: Story = {
           <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
             Checkbox Group
           </h3>
-          <div className="nx:grid nx:max-w-5xl nx:grid-cols-1 nx:gap-4 nx:md:grid-cols-2">
+          <div className="nx:grid nx:max-w-5xl nx:grid-cols-1 nx:items-start nx:gap-4 nx:md:grid-cols-2">
             <CheckboxGroup
               label="Default"
               description="Description for label"
@@ -600,6 +600,17 @@ export const AllVariants: Story = {
             />
             <CheckboxGroup
               label="Default checked"
+              description="Description for label"
+              required
+              defaultChecked
+            />
+            <CheckboxGroup
+              label="Trailing"
+              description="Checkbox sits after the label and description"
+              checkboxPosition="after"
+            />
+            <CheckboxGroup
+              label="Trailing checked"
               description="Trailing checkbox with a checked state"
               checkboxPosition="after"
               defaultChecked
@@ -617,17 +628,36 @@ export const AllVariants: Story = {
               defaultChecked
             />
             <CheckboxGroup
+              label="Trailing outline"
+              description="Checkbox sits after the label and description"
+              variant="outline"
+              checkboxPosition="after"
+            />
+            <CheckboxGroup
+              label="Trailing outline checked"
+              description="Floating card with a selected trailing checkbox"
+              variant="outline"
+              checkboxPosition="after"
+              defaultChecked
+            />
+            <CheckboxGroup
               label="Non-floating"
               description="Outline row rendered with only a bottom border"
               variant="outline"
               floating={false}
             />
             <CheckboxGroup
-              label="Trailing outline"
-              description="Checkbox sits after the label and description"
+              label="Trailing row"
+              description="Non-floating row with a trailing checkbox"
               variant="outline"
               checkboxPosition="after"
-              defaultChecked
+              floating={false}
+            />
+            <CheckboxGroup
+              label="Default row"
+              description="Non-floating default row treatment"
+              checkboxPosition="after"
+              floating={false}
             />
             <CheckboxGroup
               label="Disabled"

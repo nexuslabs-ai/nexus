@@ -177,66 +177,115 @@ function CheckboxGroup({
     ariaLabelledBy ?? (ariaLabel === undefined ? labelId : undefined);
   const describedBy = mergeIds(ariaDescribedBy, descriptionId);
   const hasFramedPadding =
-    variant === 'outline' || checkboxPosition === 'after';
+    variant === 'outline' || checkboxPosition === 'after' || !floating;
   const isBefore = checkboxPosition === 'before';
 
-  const textContent = (
+  const labelLeadingContent = labelLeading ? (
     <span
-      data-slot="checkbox-group-content"
-      className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-start"
+      aria-hidden="true"
+      data-slot="checkbox-group-label-leading"
+      className={cn(
+        'nx:flex nx:shrink-0 nx:items-center nx:justify-center nx:text-muted-foreground',
+        isBefore
+          ? 'nx:[&_svg]:size-3.5'
+          : 'nx:size-8 nx:rounded-sm nx:border nx:border-border-default nx:bg-background nx:[&_svg]:size-3.5'
+      )}
     >
+      {labelLeading}
+    </span>
+  ) : null;
+
+  const labelRow = (
+    <span
+      data-slot="checkbox-group-label-row"
+      className="nx:flex nx:min-w-0 nx:items-center nx:gap-0.5"
+    >
+      {isBefore && labelLeadingContent}
       <span
-        data-slot="checkbox-group-label-row"
-        className="nx:flex nx:min-w-0 nx:items-center nx:gap-1"
+        id={labelId}
+        data-slot="checkbox-group-label"
+        className={cn(
+          'nx:min-w-0 nx:typography-label-default',
+          disabled ? 'nx:text-disabled-foreground' : 'nx:text-foreground'
+        )}
       >
-        {labelLeading && (
-          <span
-            aria-hidden="true"
-            data-slot="checkbox-group-label-leading"
-            className="nx:flex nx:shrink-0 nx:items-center nx:text-muted-foreground nx:[&_svg]:size-3.5"
-          >
-            {labelLeading}
-          </span>
-        )}
-        <span
-          id={labelId}
-          data-slot="checkbox-group-label"
-          className={cn(
-            'nx:min-w-0 nx:typography-label-default',
-            disabled ? 'nx:text-disabled-foreground' : 'nx:text-foreground'
-          )}
-        >
-          {label}
-        </span>
-        {required && (
-          <span
-            aria-hidden="true"
-            data-slot="checkbox-group-required"
-            className="nx:shrink-0 nx:text-xs nx:leading-4 nx:font-semibold nx:text-error-subtle-foreground"
-          >
-            *
-          </span>
-        )}
+        {label}
       </span>
-      {description && (
+      {required && (
         <span
-          id={descriptionId}
-          data-slot="checkbox-group-description"
-          className={cn(
-            'nx:block nx:min-w-0 nx:typography-body-small',
-            isBefore && 'nx:pl-6',
-            disabled
-              ? 'nx:text-disabled-foreground'
-              : 'nx:text-muted-foreground'
-          )}
+          aria-hidden="true"
+          data-slot="checkbox-group-required"
+          className="nx:shrink-0 nx:text-xs nx:leading-4 nx:font-semibold nx:text-error-subtle-foreground"
         >
-          {description}
+          *
         </span>
       )}
     </span>
   );
 
-  const control = <CheckboxGroupControl disabled={disabled} />;
+  const descriptionContent = description ? (
+    <span
+      id={descriptionId}
+      data-slot="checkbox-group-description"
+      className={cn(
+        'nx:block nx:min-w-0 nx:typography-body-small',
+        disabled ? 'nx:text-disabled-foreground' : 'nx:text-muted-foreground'
+      )}
+    >
+      {description}
+    </span>
+  ) : null;
+
+  const leadingContent = (
+    <>
+      <span
+        data-slot="checkbox-group-control-row"
+        className="nx:flex nx:w-full nx:min-w-0 nx:items-start nx:gap-2"
+      >
+        <CheckboxGroupControl disabled={disabled} className="nx:mt-0.5" />
+        <span
+          data-slot="checkbox-group-content"
+          className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-start nx:gap-0.5"
+        >
+          {labelRow}
+          {descriptionContent}
+        </span>
+      </span>
+    </>
+  );
+
+  const trailingContent = (
+    <>
+      {!isBefore && labelLeadingContent}
+      <span
+        data-slot="checkbox-group-content"
+        className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-start"
+      >
+        {labelRow}
+        {descriptionContent}
+      </span>
+      <CheckboxGroupControl disabled={disabled} />
+    </>
+  );
+
+  const controlClasses = cn(
+    'nx:group/checkbox-group nx:flex nx:w-full nx:min-w-0 nx:appearance-none nx:overflow-hidden nx:bg-container nx:text-left nx:select-none nx:transition-colors nx:[&_svg]:pointer-events-none',
+    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:aria-invalid:border-border-error nx:aria-invalid:outline-border-error nx:aria-invalid:focus-visible:outline-focus-error',
+    'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:outline-border-disabled',
+    !disabled && 'nx:hover:bg-container-hover nx:active:bg-container-active',
+    hasFramedPadding && 'nx:p-4',
+    isBefore
+      ? 'nx:flex-col nx:items-start nx:justify-center nx:gap-0.5'
+      : 'nx:flex-row nx:items-center nx:gap-3',
+    floating && variant === 'default' && 'nx:border-0',
+    floating &&
+      variant === 'outline' &&
+      'nx:rounded-md nx:outline-1 nx:outline-offset-[-1px] nx:outline-border-default',
+    !floating &&
+      'nx:rounded-none nx:border-x-0 nx:border-t-0 nx:border-b nx:border-border-default',
+    className
+  );
 
   return (
     <CheckboxPrimitive.Root
@@ -245,53 +294,25 @@ function CheckboxGroup({
       data-variant={variant}
       data-checkbox-position={checkboxPosition}
       data-floating={floating}
-      className={cn(
-        'nx:group/checkbox-group nx:flex nx:w-full nx:min-w-0 nx:appearance-none nx:overflow-hidden nx:bg-container nx:text-left nx:select-none nx:transition-colors nx:[&_svg]:pointer-events-none',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-        'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
-        'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
-        !disabled &&
-          'nx:hover:bg-container-hover nx:active:bg-container-active',
-        hasFramedPadding && 'nx:p-4',
-        isBefore
-          ? 'nx:flex-col nx:items-start nx:justify-center nx:gap-0.5'
-          : 'nx:flex-row nx:items-center nx:gap-3',
-        variant === 'default' && 'nx:border-0',
-        variant === 'outline' &&
-          floating &&
-          'nx:rounded-md nx:border nx:border-border-default',
-        variant === 'outline' &&
-          !floating &&
-          'nx:rounded-none nx:border-x-0 nx:border-t-0 nx:border-b nx:border-border-default',
-        className
-      )}
+      className={controlClasses}
       required={required}
       disabled={disabled}
       aria-label={ariaLabel}
       aria-labelledby={labelledBy}
       aria-describedby={describedBy}
     >
-      {isBefore ? (
-        <>
-          <span
-            data-slot="checkbox-group-control-row"
-            className="nx:flex nx:w-full nx:min-w-0 nx:items-center nx:gap-2"
-          >
-            {control}
-            {textContent}
-          </span>
-        </>
-      ) : (
-        <>
-          {textContent}
-          {control}
-        </>
-      )}
+      {isBefore ? leadingContent : trailingContent}
     </CheckboxPrimitive.Root>
   );
 }
 
-function CheckboxGroupControl({ disabled }: { disabled?: boolean }) {
+function CheckboxGroupControl({
+  className,
+  disabled,
+}: {
+  className?: string;
+  disabled?: boolean;
+}) {
   return (
     <span
       aria-hidden="true"
@@ -303,7 +324,8 @@ function CheckboxGroupControl({ disabled }: { disabled?: boolean }) {
         !disabled &&
           'nx:group-data-[state=indeterminate]/checkbox-group:border-primary-background nx:group-data-[state=indeterminate]/checkbox-group:bg-primary-background',
         disabled &&
-          'nx:border-border-disabled nx:bg-disabled nx:text-disabled-foreground'
+          'nx:border-border-disabled nx:bg-disabled nx:text-disabled-foreground',
+        className
       )}
     >
       <span
