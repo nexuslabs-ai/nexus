@@ -25,6 +25,7 @@ import {
   IconPalette,
   IconRoute,
   IconUserCircle,
+  IconWand,
 } from '@tabler/icons-react';
 import {
   Link,
@@ -42,6 +43,7 @@ const DESIGN_ITEMS = [
   { label: 'Reference', to: '/design/reference', icon: IconComponents },
   { label: 'Scenes', to: '/design/scenes', icon: IconLayoutGrid },
   { label: 'Appearance', to: '/design/appearance', icon: IconPalette },
+  { label: 'Codex', to: '/design/codex', icon: IconWand },
   { label: 'Flows', to: '/design/flows', icon: IconRoute },
 ] as const;
 
