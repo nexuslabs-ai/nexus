@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
@@ -80,10 +81,19 @@ export const ClickInteraction: Story = {
   },
 };
 
-// ArrowRight inside the carousel region advances it (onKeyDownCapture).
+// Captures the Embla API so the play fn can read the carousel's position.
+const keyboardApiRef: { current: CarouselApi } = { current: undefined };
+
+// ArrowRight advances a horizontal carousel; ArrowDown is ignored (vertical-only).
 export const KeyboardInteraction: Story = {
   render: () => (
-    <Carousel className="nx:w-full" aria-label="Keyboard demo carousel">
+    <Carousel
+      className="nx:w-full"
+      aria-label="Keyboard demo carousel"
+      setApi={(api) => {
+        keyboardApiRef.current = api;
+      }}
+    >
       <CarouselContent>{slideItems}</CarouselContent>
       <CarouselPrevious />
       <CarouselNext />
@@ -95,8 +105,9 @@ export const KeyboardInteraction: Story = {
     const next = canvas.getByRole('button', { name: 'Next slide' });
     await waitFor(() => expect(next).toBeEnabled());
     next.focus();
+    // Horizontal carousel ignores ArrowDown — it must stay on the first slide.
     await userEvent.keyboard('{ArrowDown}');
-    await expect(prev).toBeDisabled();
+    expect(keyboardApiRef.current?.selectedScrollSnap()).toBe(0);
     await userEvent.keyboard('{ArrowRight}');
     await waitFor(() => expect(prev).toBeEnabled());
   },
@@ -120,6 +131,11 @@ export const VerticalKeyboardInteraction: Story = {
     const prev = canvas.getByRole('button', { name: 'Previous slide' });
     const next = canvas.getByRole('button', { name: 'Next slide' });
     await waitFor(() => expect(next).toBeEnabled());
+
+    await expect(
+      canvasElement.querySelector('[data-slot="carousel"]')
+    ).toHaveAttribute('data-orientation', 'vertical');
+
     next.focus();
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(prev).toBeEnabled());

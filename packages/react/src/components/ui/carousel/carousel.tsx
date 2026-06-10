@@ -34,9 +34,6 @@ type CarouselProps = {
   setApi?: (api: CarouselApi) => void;
 };
 
-const carouselControlClasses =
-  'nx:absolute nx:rounded-full nx:after:absolute nx:after:-inset-2';
-
 type CarouselContextProps = {
   carouselRef: ReturnType<typeof useEmblaCarousel>[0];
   api: CarouselApi;
@@ -46,6 +43,9 @@ type CarouselContextProps = {
   canScrollPrev: boolean;
   canScrollNext: boolean;
 };
+
+const carouselControlClasses =
+  'nx:absolute nx:rounded-full nx:after:absolute nx:after:-inset-2';
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
@@ -65,6 +65,9 @@ function useCarousel() {
  * Slideshow / horizontal (or vertical) scroller built on Embla. Compose with
  * `CarouselContent` + `CarouselItem`, and `CarouselPrevious` / `CarouselNext`
  * for the controls.
+ *
+ * Keyboard: a horizontal carousel scrolls with Left/Right arrows, a vertical
+ * one with Up/Down (arrows for the other axis are ignored).
  *
  * @example
  * ```tsx
