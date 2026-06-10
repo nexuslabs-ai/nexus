@@ -85,7 +85,7 @@ Minor: `data-orientation` omitted on default (`horizontal`).
 
 ## date-picker
 
-Typography: pervasive raw (`text-sm`, `font-medium`, `font-normal`, `text-xs`) → composites. Figma weekday labels use `typography-label-default`; week numbers use `typography-label-small`.
+Typography: pervasive raw (`text-sm`, `font-medium`, `font-normal`, `text-xs`) → composites. Weekday labels deliberately keep raw `text-sm font-normal` to match the day-button type (not the `typography-label-default` composite); week numbers use `typography-label-small`.
 
 Numeric spacing notes: `p-3` (chrome), `gap-4` (month-grid ×2), `gap-1` (nav), `gap-1.5` (dropdown).
 

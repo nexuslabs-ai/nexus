@@ -367,12 +367,13 @@ export const MultipleAdjacent: Story = {
     );
     const firstWidth = Math.round(selectedRects[0]!.width);
     const firstHeight = Math.round(selectedRects[0]!.height);
+    const defaultCell = resolveSpacingPx(canvasElement, '--nx-spacing-8');
 
     for (const rect of selectedRects) {
       expect(Math.round(rect.width)).toBe(firstWidth);
       expect(Math.round(rect.height)).toBe(firstHeight);
-      expect(Math.round(rect.width)).toBeLessThanOrEqual(33);
-      expect(Math.round(rect.height)).toBeLessThanOrEqual(33);
+      expect(Math.round(rect.width)).toBeLessThanOrEqual(defaultCell);
+      expect(Math.round(rect.height)).toBeLessThanOrEqual(defaultCell);
     }
   },
 };
