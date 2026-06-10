@@ -106,6 +106,9 @@ export const Empty: Story = {
     // Typing a query that matches nothing surfaces the empty state.
     await userEvent.type(input, 'zzzzzz');
     await expect(canvas.getByText('No results found.')).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="command-empty"]')
+    ).toBeInTheDocument();
   },
 };
 
@@ -133,7 +136,7 @@ export const WithDialog: Story = {
         <Button variant="outline" onClick={() => setOpen(true)}>
           Open Command Palette
         </Button>
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-small nx:text-muted-foreground">
           Press <kbd className="nx:font-mono">⌘K</kbd> to toggle
         </p>
         <CommandDialog open={open} onOpenChange={setOpen}>
@@ -296,7 +299,10 @@ export const WithDataAttributes: Story = {
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Settings">
-          <CommandItem>Profile</CommandItem>
+          <CommandItem>
+            Profile
+            <CommandShortcut>⌘P</CommandShortcut>
+          </CommandItem>
         </CommandGroup>
       </CommandList>
     </Command>
@@ -307,6 +313,9 @@ export const WithDataAttributes: Story = {
     const input = canvas.getByRole('combobox');
     await expect(input).toHaveAttribute('data-slot', 'command-input');
 
+    await expect(
+      canvasElement.querySelector('[data-slot="command-input-wrapper"]')
+    ).toBeInTheDocument();
     await expect(
       canvasElement.querySelector('[data-slot="command"]')
     ).toBeInTheDocument();
@@ -322,6 +331,9 @@ export const WithDataAttributes: Story = {
     await expect(
       canvasElement.querySelector('[data-slot="command-separator"]')
     ).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="command-shortcut"]')
+    ).toBeInTheDocument();
   },
 };
 
@@ -333,7 +345,7 @@ export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Basic
         </h3>
         <Command label="Basic command menu" className={paletteClass}>
@@ -350,7 +362,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Grouped with shortcuts
         </h3>
         <Command label="Grouped command menu" className={paletteClass}>
