@@ -15,6 +15,9 @@ interface CardProps extends React.ComponentProps<'div'> {}
  * A container component for grouping related content and actions.
  * Use for displaying information in a visually distinct section.
  *
+ * Content is clipped to the rounded corners; pass `nx:overflow-visible` via
+ * `className` for content that must overhang the edge.
+ *
  * @example
  * ```tsx
  * <Card>
@@ -55,6 +58,11 @@ interface CardHeaderProps extends React.ComponentProps<'div'> {}
  * CardHeader
  *
  * Container for the card's header content including title, description, and actions.
+ *
+ * Children lay out in a two-column grid: a flexible content column and an
+ * auto-width column on the right reserved for `CardAction`. `CardTitle` and
+ * `CardDescription` place themselves in the content column; a custom child
+ * should add `nx:col-start-1` to join it.
  *
  * @example
  * ```tsx

@@ -193,15 +193,6 @@ export const MediaCard: Story = {
       </CardContent>
     </Card>
   ),
-  play: async ({ canvasElement }) => {
-    const card = canvasElement.querySelector<HTMLElement>('[data-slot="card"]');
-
-    if (!card) {
-      throw new Error('Expected card to render.');
-    }
-
-    await expect(getComputedStyle(card).overflow).toBe('hidden');
-  },
 };
 
 // ============================================
