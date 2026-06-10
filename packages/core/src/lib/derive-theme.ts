@@ -1,8 +1,9 @@
 import type { Oklch } from 'culori';
 
 import { apcaLc } from './apca';
+import { formatOklch } from './oklch-format';
 import { type Tier, TIER_THRESHOLDS } from './palette';
-import { formatOklch, rampFromSeed, seedOklch } from './perceptual-ramp';
+import { rampFromSeed, seedOklch } from './perceptual-ramp';
 
 export interface ThemeSeeds {
   /** Drives the primary family ramp. */
@@ -241,7 +242,7 @@ function block(selector: string, map: TokenMap): string {
   return `${selector} {\n${body}\n}`;
 }
 
-/** Serialize a derived theme to CSS text — light on `html`, dark on `html.dark`. */
+/** Serialize a derived theme to CSS text — light on `:root`, dark on `:root.dark`. */
 export function themeToCss(derived: DerivedTheme): string {
-  return `${block('html', derived.light)}\n${block('html.dark', derived.dark)}\n`;
+  return `${block(':root', derived.light)}\n${block(':root.dark', derived.dark)}\n`;
 }

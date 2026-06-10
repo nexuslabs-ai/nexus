@@ -2,7 +2,7 @@ import { oklch, parse } from 'culori';
 import { describe, expect, it } from 'vitest';
 
 import { PERCEPTUAL_L_GRID, SHADES } from './palette';
-import { pinnedOklch, rampFromSeed } from './perceptual-ramp';
+import { isColor, pinnedOklch, rampFromSeed } from './perceptual-ramp';
 
 function lOf(oklchStr: string): number {
   return oklch(parse(oklchStr)!)!.l!;
@@ -41,5 +41,18 @@ describe('rampFromSeed', () => {
     const ramp = rampFromSeed('#339cff');
     expect(lOf(ramp['50'])).toBeGreaterThan(lOf(ramp['500']));
     expect(lOf(ramp['500'])).toBeGreaterThan(lOf(ramp['950']));
+  });
+});
+
+describe('isColor', () => {
+  it('accepts parseable CSS colors', () => {
+    expect(isColor('#339cff')).toBe(true);
+    expect(isColor('oklch(0.5 0.1 250)')).toBe(true);
+    expect(isColor('rebeccapurple')).toBe(true);
+  });
+
+  it('rejects unparseable strings', () => {
+    expect(isColor('not-a-color')).toBe(false);
+    expect(isColor('')).toBe(false);
   });
 });

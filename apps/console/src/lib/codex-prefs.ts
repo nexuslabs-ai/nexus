@@ -75,13 +75,15 @@ export function saveCodexPrefs(prefs: CodexPrefs): void {
 
 /** Concrete CSS for the prefs — injected as one <style>, parallel to themeToCss. */
 export function prefsToCss(prefs: CodexPrefs): string {
+  const px = (n: number) =>
+    Math.max(8, Math.min(32, Number.isFinite(n) && n > 0 ? n : 14));
   const blocks: string[] = [
     `:root {
   --nx-typography-family-font-sans: ${prefs.uiFont};
   --nx-typography-family-font-mono: ${prefs.codeFont};
-  font-size: ${prefs.uiFontSize}px;
+  font-size: ${px(prefs.uiFontSize)}px;
 }`,
-    `code, pre, .nx\\:font-mono { font-size: ${prefs.codeFontSize}px; }`,
+    `code, pre, .nx\\:font-mono { font-size: ${px(prefs.codeFontSize)}px; }`,
     `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; }`,
   ];
   if (prefs.pointerCursors) {

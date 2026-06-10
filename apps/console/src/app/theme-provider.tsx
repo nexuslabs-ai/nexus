@@ -26,18 +26,26 @@ type ThemeContextValue = {
   setCodexContract: React.Dispatch<
     React.SetStateAction<CodexThemeContract | null>
   >;
-  /** App-preferences (fonts, motion, cursors…); applied only while a contract is active. */
+  /** App-preferences (fonts, motion, cursors…) — applied app-wide regardless of theme. */
   codexPrefs: CodexPrefs;
   setCodexPrefs: React.Dispatch<React.SetStateAction<CodexPrefs>>;
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+/** Resolve a contract appearance to a concrete light/dark, honoring "system". */
+function appearanceDark(appearance: CodexThemeContract['appearance']): boolean {
+  if (appearance === 'dark') return true;
+  if (appearance === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 /**
  * Mounts the theme engine once at the app root. `useTheme` owns the preset
- * <link> swaps; `useDerivedTheme` owns the runtime-derived <style> + the `.dark`
- * class while a contract is active; `useAppearancePrefs` owns the prefs <style>.
- * Consumers read all of it via `useThemeContext`.
+ * <link> swaps; `useDerivedTheme` injects the derived <style>; `useAppearancePrefs`
+ * injects the prefs <style>. A single arbiter effect below owns the `.dark` class:
+ * the active contract's appearance while a derived theme is live, otherwise the
+ * preset's `theme.dark`. Consumers read everything via `useThemeContext`.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme();
@@ -54,9 +62,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     saveCodexPrefs(codexPrefs);
   }, [codexPrefs]);
 
+  // Single `.dark` arbiter — the contract owns it while active, else the preset.
+  useEffect(() => {
+    const apply = () => {
+      const dark = codexContract
+        ? appearanceDark(codexContract.appearance)
+        : theme.dark;
+      document.documentElement.classList.toggle('dark', dark);
+    };
+    apply();
+    if (codexContract?.appearance === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      mq.addEventListener('change', apply);
+      return () => mq.removeEventListener('change', apply);
+    }
+  }, [codexContract, theme.dark]);
+
   useDerivedTheme(codexContract);
-  // Prefs apply only with a derived theme active — otherwise the preset owns the UI.
-  useAppearancePrefs(codexContract ? codexPrefs : null);
+  useAppearancePrefs(codexPrefs);
 
   return (
     <ThemeContext.Provider

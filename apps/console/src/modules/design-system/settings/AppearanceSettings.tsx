@@ -55,18 +55,24 @@ function AxisSelect<T extends string>({
   value,
   options,
   onValueChange,
+  disabled,
 }: {
   label: string;
   value: T;
   options: readonly { value: T; label: string }[];
   onValueChange: (value: T) => void;
+  disabled?: boolean;
 }) {
   const id = useId();
 
   return (
     <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
       <Label htmlFor={id}>{label}</Label>
-      <Select value={value} onValueChange={(v) => onValueChange(v as T)}>
+      <Select
+        value={value}
+        onValueChange={(v) => onValueChange(v as T)}
+        disabled={disabled}
+      >
         <SelectTrigger id={id} className="nx:w-44">
           <SelectValue />
         </SelectTrigger>
@@ -99,11 +105,6 @@ export function AppearanceSettings({
 
   const toggleCodex = (on: boolean) => {
     setCodexContract(on ? DEFAULT_CODEX_CONTRACT : null);
-    // keep the preset `.dark` class in step with the contract's appearance
-    setTheme((t) => ({
-      ...t,
-      dark: on ? DEFAULT_CODEX_CONTRACT.appearance === 'dark' : t.dark,
-    }));
   };
 
   return (
@@ -151,6 +152,7 @@ export function AppearanceSettings({
             <Switch
               id="appearance-dark"
               checked={theme.dark}
+              disabled={codexOn}
               onCheckedChange={(dark) => setTheme((t) => ({ ...t, dark }))}
             />
           </div>
@@ -159,12 +161,14 @@ export function AppearanceSettings({
             label="Base"
             value={theme.base}
             options={BASES}
+            disabled={codexOn}
             onValueChange={(base) => setTheme((t) => ({ ...t, base }))}
           />
           <AxisSelect
             label="Brand"
             value={theme.brand}
             options={BRANDS}
+            disabled={codexOn}
             onValueChange={(brand) => setTheme((t) => ({ ...t, brand }))}
           />
         </CardContent>

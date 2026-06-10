@@ -1,4 +1,4 @@
-import type { CodexThemeContract, ThemeSeeds } from '@nexus/core';
+import { type CodexThemeContract, isColor, type ThemeSeeds } from '@nexus/core';
 
 /** Codex's own Appearance values — the default derived theme (dogfood). */
 export const DEFAULT_CODEX_CONTRACT: CodexThemeContract = {
@@ -15,8 +15,11 @@ function isSeeds(value: unknown): value is ThemeSeeds {
   const o = value as Record<string, unknown>;
   return (
     typeof o.accent === 'string' &&
+    isColor(o.accent) &&
     typeof o.background === 'string' &&
-    typeof o.foreground === 'string'
+    isColor(o.background) &&
+    typeof o.foreground === 'string' &&
+    isColor(o.foreground)
   );
 }
 
