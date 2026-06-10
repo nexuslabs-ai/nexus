@@ -23,8 +23,18 @@ export const DEFAULT_CODEX_PREFS: CodexPrefs = {
 };
 
 const STORAGE_KEY = 'nexus-console-codex-prefs';
-const clampPx = (n: unknown, fallback: number) =>
-  typeof n === 'number' && n >= 8 && n <= 32 ? n : fallback;
+const FONT_PX_MIN = 8;
+const FONT_PX_MAX = 32;
+
+/**
+ * Clamp a font size into the [8, 32]px range. A non-finite or non-positive value
+ * (a cleared or "0" input) falls back to the field's default. One rule, used at
+ * every site that needs it — load (sanitizePrefs) and emit (prefsToCss).
+ */
+const clampFontSize = (n: unknown, fallback: number): number =>
+  typeof n === 'number' && Number.isFinite(n) && n > 0
+    ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, n))
+    : fallback;
 
 /** Coerce an unknown payload into valid prefs, field by field. */
 export function sanitizePrefs(raw: unknown): CodexPrefs {
@@ -36,8 +46,8 @@ export function sanitizePrefs(raw: unknown): CodexPrefs {
   return {
     uiFont: typeof o.uiFont === 'string' ? o.uiFont : d.uiFont,
     codeFont: typeof o.codeFont === 'string' ? o.codeFont : d.codeFont,
-    uiFontSize: clampPx(o.uiFontSize, d.uiFontSize),
-    codeFontSize: clampPx(o.codeFontSize, d.codeFontSize),
+    uiFontSize: clampFontSize(o.uiFontSize, d.uiFontSize),
+    codeFontSize: clampFontSize(o.codeFontSize, d.codeFontSize),
     translucentSidebar:
       typeof o.translucentSidebar === 'boolean'
         ? o.translucentSidebar
@@ -75,15 +85,18 @@ export function saveCodexPrefs(prefs: CodexPrefs): void {
 
 /** Concrete CSS for the prefs — injected as one <style>, parallel to themeToCss. */
 export function prefsToCss(prefs: CodexPrefs): string {
-  const px = (n: number) =>
-    Math.max(8, Math.min(32, Number.isFinite(n) && n > 0 ? n : 14));
+  const uiPx = clampFontSize(prefs.uiFontSize, DEFAULT_CODEX_PREFS.uiFontSize);
+  const codePx = clampFontSize(
+    prefs.codeFontSize,
+    DEFAULT_CODEX_PREFS.codeFontSize
+  );
   const blocks: string[] = [
     `:root {
   --nx-typography-family-font-sans: ${prefs.uiFont};
   --nx-typography-family-font-mono: ${prefs.codeFont};
-  font-size: ${px(prefs.uiFontSize)}px;
+  font-size: ${uiPx}px;
 }`,
-    `code, pre, .nx\\:font-mono { font-size: ${px(prefs.codeFontSize)}px; }`,
+    `code, pre, .nx\\:font-mono { font-size: ${codePx}px; }`,
     `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; }`,
   ];
   if (prefs.pointerCursors) {

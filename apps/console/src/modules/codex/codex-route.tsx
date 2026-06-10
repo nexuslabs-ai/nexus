@@ -82,11 +82,11 @@ export function CodexRoute() {
   const updatePrefs = (patch: Partial<CodexPrefs>) =>
     setCodexPrefs((p) => ({ ...p, ...patch }));
 
-  // A cleared number input reports valueAsNumber NaN (not 0) — coerce to the
-  // default so it can't persist a 0 that prefsToCss would emit as font-size:0.
-  // The 8–32 range is enforced at emit (prefsToCss) and on load (sanitizePrefs).
+  // A cleared input reports valueAsNumber NaN, a typed "0" reports 0 — neither is
+  // a usable size, so coerce both to the field default. Positive values pass
+  // through; the [8,32] range is clamped on emit (prefsToCss) and load.
   const setFontSize = (key: 'uiFontSize' | 'codeFontSize', n: number) =>
-    updatePrefs({ [key]: Number.isNaN(n) ? DEFAULT_CODEX_PREFS[key] : n });
+    updatePrefs({ [key]: n > 0 ? n : DEFAULT_CODEX_PREFS[key] });
 
   const setReduceMotion = (value: string) => {
     if (value === 'system' || value === 'on' || value === 'off') {
