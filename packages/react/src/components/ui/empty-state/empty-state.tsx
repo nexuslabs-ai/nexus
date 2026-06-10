@@ -9,7 +9,15 @@ import { cn } from '@/lib/utils';
  *
  * Props for the EmptyState component.
  */
-interface EmptyStateProps extends React.ComponentProps<'div'> {}
+interface EmptyStateProps extends React.ComponentProps<'div'> {
+  /**
+   * Render the dashed frame around the empty state — use it to match a
+   * bordered skeleton slot so a loading→empty swap doesn't reflow.
+   *
+   * @default false
+   */
+  bordered?: boolean;
+}
 
 /**
  * EmptyState
@@ -18,8 +26,8 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {}
  * content yet — an icon, a title, a short description, and an optional action.
  * Compose with the sub-components: `EmptyStateHeader` groups the
  * `EmptyStateMedia` (icon), `EmptyStateTitle`, and `EmptyStateDescription`;
- * `EmptyStateContent` holds the call to action. Carries a dashed border style
- * that only shows when a consumer adds a border width.
+ * `EmptyStateContent` holds the call to action. Pass `bordered` to render the
+ * dashed frame (e.g. to match a bordered skeleton slot).
  *
  * @example
  * ```tsx
@@ -39,12 +47,18 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {}
  * </EmptyState>
  * ```
  */
-function EmptyState({ className, ...props }: EmptyStateProps) {
+function EmptyState({
+  className,
+  bordered = false,
+  ...props
+}: EmptyStateProps) {
   return (
     <div
       data-slot="empty-state"
+      data-bordered={bordered || undefined}
       className={cn(
-        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:border-dashed nx:p-6 nx:text-center nx:text-balance',
+        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:p-6 nx:text-center nx:text-balance',
+        bordered && 'nx:border nx:border-dashed nx:border-border-default',
         className
       )}
       {...props}

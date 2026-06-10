@@ -138,6 +138,27 @@ export const LongCopyWithLink: Story = {
   },
 };
 
+// The `bordered` prop renders the dashed frame and advertises via data-bordered.
+export const Bordered: Story = {
+  render: () => (
+    <EmptyState bordered>
+      <EmptyStateHeader>
+        <EmptyStateMedia variant="icon">
+          <IconUsers aria-hidden />
+        </EmptyStateMedia>
+        <EmptyStateTitle>No contacts yet</EmptyStateTitle>
+        <EmptyStateDescription>
+          Add your first contact to get started.
+        </EmptyStateDescription>
+      </EmptyStateHeader>
+    </EmptyState>
+  ),
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-slot="empty-state"]');
+    await expect(root).toHaveAttribute('data-bordered', 'true');
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
@@ -148,7 +169,7 @@ export const LongCopyWithLink: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-6">
-      <EmptyState className="nx:border nx:border-border-default">
+      <EmptyState bordered>
         <EmptyStateHeader>
           <EmptyStateMedia variant="icon">
             <IconUsers aria-hidden />
