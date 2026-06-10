@@ -1,9 +1,19 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
+import {
+  IconBook,
+  IconCreditCard,
+  IconFile,
+  IconSettings,
+  IconUser,
+  IconUsers,
+} from '@tabler/icons-react';
+import { useCommandState } from 'cmdk';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
+import { Spinner } from '../spinner';
 
 import {
   Command,
@@ -13,6 +23,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandLoading,
   CommandSeparator,
   CommandShortcut,
 } from './command';
@@ -31,7 +42,89 @@ type Story = StoryObj<typeof Command>;
 // Presentational chrome for the inline (non-dialog) palette stories — a fixed
 // width with a bordered, elevated surface so the palette reads as a card.
 const paletteClass =
-  'nx:w-[420px] nx:rounded-lg nx:border nx:border-border-default nx:shadow-md';
+  'nx:w-[480px] nx:rounded-lg nx:border nx:border-border-default nx:shadow-md';
+
+// Design-reference chrome for the Figma CommandContent node. Kept separate
+// from the default story chrome so production Command remains unframed.
+const figmaPaletteClass =
+  'nx:w-[450px] nx:max-h-[360px] nx:rounded-lg nx:border nx:border-border-default nx:shadow-base';
+
+const projectCommands = [
+  {
+    label: 'Open project plan',
+    description: 'View roadmap, milestones, and project notes',
+    value: 'open-project-plan',
+    keywords: ['roadmap', 'milestones', 'docs'],
+    icon: IconFile,
+    shortcut: '⌘P',
+  },
+  {
+    label: 'Search documentation',
+    description: 'Find API references and implementation guides',
+    value: 'search-documentation',
+    keywords: ['docs', 'api', 'guide'],
+    icon: IconBook,
+    shortcut: '⌘D',
+  },
+  {
+    label: 'Project settings',
+    description: 'Update members, billing, and notifications',
+    value: 'project-settings',
+    keywords: ['preferences', 'configuration', 'admin'],
+    icon: IconSettings,
+    trailing: 'Admin',
+  },
+  {
+    label: 'Invite teammate',
+    description: 'Add a member to this workspace',
+    value: 'invite-teammate',
+    keywords: ['members', 'users', 'people'],
+    icon: IconUsers,
+  },
+];
+
+function QueryAwareEmptyMessage() {
+  const search = useCommandState((state) => state.search);
+
+  return (
+    <CommandEmpty>
+      {search ? `No results found for "${search}".` : 'No results found.'}
+    </CommandEmpty>
+  );
+}
+
+function CommandRichItem({
+  command,
+}: {
+  command: (typeof projectCommands)[number];
+}) {
+  const Icon = command.icon;
+
+  return (
+    <CommandItem
+      value={command.value}
+      keywords={command.keywords}
+      className="nx:items-start"
+    >
+      <Icon aria-hidden="true" className="nx:mt-0.5 nx:text-muted-foreground" />
+      <span className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-0.5">
+        <span className="nx:truncate">{command.label}</span>
+        <span className="nx:truncate nx:typography-body-small nx:text-muted-foreground">
+          {command.description}
+        </span>
+      </span>
+      {command.shortcut ? (
+        <CommandShortcut className="nx:mt-0.5">
+          {command.shortcut}
+        </CommandShortcut>
+      ) : command.trailing ? (
+        <span className="nx:mt-0.5 nx:ml-auto nx:shrink-0 nx:typography-label-small nx:text-muted-foreground">
+          {command.trailing}
+        </span>
+      ) : null}
+    </CommandItem>
+  );
+}
 
 // ============================================
 // BASIC STORIES
@@ -109,6 +202,208 @@ export const Empty: Story = {
     await expect(
       canvasElement.querySelector('[data-slot="command-empty"]')
     ).toBeInTheDocument();
+  },
+};
+
+export const QueryAwareEmpty: Story = {
+  render: () => (
+    <Command label="Command menu" className={paletteClass}>
+      <CommandInput placeholder="Search commands..." />
+      <CommandList>
+        <QueryAwareEmptyMessage />
+        <CommandGroup heading="Suggestions">
+          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Calculator</CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  ),
+  parameters: {
+    a11y: {
+      config: { rules: [{ id: 'aria-required-children', enabled: false }] },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox');
+
+    await userEvent.type(input, 'roadmap');
+    await expect(
+      canvas.getByText('No results found for "roadmap".')
+    ).toBeInTheDocument();
+  },
+};
+
+export const AsyncLoading: Story = {
+  render: function AsyncLoadingStory() {
+    const [loading, setLoading] = React.useState(true);
+    const [items, setItems] = React.useState([
+      'Recent project',
+      'Team dashboard',
+    ]);
+
+    React.useEffect(() => {
+      const timeout = window.setTimeout(() => {
+        setItems([
+          'Recent project',
+          'Team dashboard',
+          'Design review',
+          'Release notes',
+        ]);
+        setLoading(false);
+      }, 600);
+
+      return () => window.clearTimeout(timeout);
+    }, []);
+
+    return (
+      <Command label="Async command menu" className={paletteClass}>
+        <CommandInput placeholder="Search commands..." />
+        <CommandList>
+          {loading ? (
+            <CommandLoading progress={60} label="Loading command results">
+              <Spinner
+                aria-hidden="true"
+                role="presentation"
+                className="nx:size-3.5"
+              />
+              Loading commands...
+            </CommandLoading>
+          ) : (
+            <CommandEmpty>No results found.</CommandEmpty>
+          )}
+          <CommandGroup heading={loading ? 'Recent' : 'Results'}>
+            {items.map((item) => (
+              <CommandItem key={item} value={item}>
+                {item}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    );
+  },
+};
+
+export const RichItems: Story = {
+  render: () => (
+    <Command label="Project command menu" className={paletteClass}>
+      <CommandInput placeholder="Search project commands..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Project">
+          {projectCommands.map((command) => (
+            <CommandRichItem key={command.value} command={command} />
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  ),
+};
+
+export const AdvancedFiltering: Story = {
+  render: function AdvancedFilteringStory() {
+    const [search, setSearch] = React.useState('');
+    const actionCommands = [
+      {
+        label: 'Invite teammate',
+        value: 'invite-teammate',
+        keywords: ['members', 'users', 'people'],
+        icon: IconUsers,
+      },
+      {
+        label: 'Open billing',
+        value: 'open-billing',
+        keywords: ['invoice', 'payment', 'card'],
+        icon: IconCreditCard,
+      },
+    ];
+    const destinationCommands = [
+      {
+        label: 'Profile',
+        value: 'profile',
+        keywords: ['account', 'user'],
+        icon: IconUser,
+      },
+      {
+        label: 'Settings',
+        value: 'settings',
+        keywords: ['preferences', 'configuration'],
+        icon: IconSettings,
+      },
+    ];
+    const matchesSearch = (command: { label: string; keywords: string[] }) => {
+      const query = search.trim().toLowerCase();
+
+      if (!query) return true;
+
+      return [command.label, ...command.keywords].some((value) =>
+        value.toLowerCase().includes(query)
+      );
+    };
+    const visibleActions = actionCommands.filter(matchesSearch);
+    const visibleDestinations = destinationCommands.filter(matchesSearch);
+
+    return (
+      <Command
+        label="Advanced command menu"
+        className={paletteClass}
+        loop
+        shouldFilter={false}
+      >
+        <CommandInput
+          value={search}
+          onValueChange={setSearch}
+          placeholder="Try members, invoice, or preferences..."
+        />
+        <CommandList>
+          <CommandEmpty>No matching command.</CommandEmpty>
+          {visibleActions.length > 0 ? (
+            <CommandGroup heading="Actions">
+              {visibleActions.map((command) => {
+                const Icon = command.icon;
+
+                return (
+                  <CommandItem key={command.value} value={command.value}>
+                    <Icon aria-hidden="true" />
+                    {command.label}
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          ) : null}
+          {visibleActions.length > 0 && visibleDestinations.length > 0 ? (
+            <CommandSeparator alwaysRender />
+          ) : null}
+          {visibleDestinations.length > 0 ? (
+            <CommandGroup heading="Destinations">
+              {visibleDestinations.map((command) => {
+                const Icon = command.icon;
+
+                return (
+                  <CommandItem key={command.value} value={command.value}>
+                    <Icon aria-hidden="true" />
+                    {command.label}
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          ) : null}
+        </CommandList>
+      </Command>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox');
+
+    await userEvent.type(input, 'members');
+    await expect(
+      canvas.getByRole('option', { name: 'Invite teammate' })
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole('option', { name: 'Open billing' })
+    ).not.toBeInTheDocument();
   },
 };
 
@@ -335,6 +630,87 @@ export const WithDataAttributes: Story = {
       canvasElement.querySelector('[data-slot="command-shortcut"]')
     ).toBeInTheDocument();
   },
+};
+
+// ============================================
+// FIGMA COMPOSITION REFERENCE
+// ============================================
+
+export const FigmaComposition: Story = {
+  render: () => (
+    <Command
+      label="Figma command content reference"
+      className={figmaPaletteClass}
+    >
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Heading">
+          {['Item', 'Item 2', 'Item 3', 'Item 4', 'Item 5'].map((item) => (
+            <CommandItem key={item} value={`primary-${item}`}>
+              <span
+                aria-hidden="true"
+                className="nx:size-4 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
+              />
+              {item}
+              <span
+                aria-hidden="true"
+                className="nx:ml-auto nx:size-5 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
+              />
+            </CommandItem>
+          ))}
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Heading">
+          {[
+            'Open palette',
+            'Search docs',
+            'Toggle theme',
+            'Go to settings',
+          ].map((item, index) => (
+            <CommandItem key={item} value={`secondary-${item}`}>
+              <span
+                aria-hidden="true"
+                className="nx:size-4 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
+              />
+              {item}
+              {index === 0 ? (
+                <CommandShortcut>⌘K</CommandShortcut>
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="nx:ml-auto nx:size-5 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
+                />
+              )}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Heading">
+          {[
+            'Create project',
+            'Invite teammate',
+            'View shortcuts',
+            'Open billing',
+            'Archive item',
+            'Export report',
+          ].map((item) => (
+            <CommandItem key={item} value={`tertiary-${item}`}>
+              <span
+                aria-hidden="true"
+                className="nx:size-4 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
+              />
+              {item}
+              <span
+                aria-hidden="true"
+                className="nx:ml-auto nx:size-5 nx:shrink-0 nx:rounded-sm nx:border nx:border-dashed nx:border-border-default"
+              />
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  ),
 };
 
 // ============================================
