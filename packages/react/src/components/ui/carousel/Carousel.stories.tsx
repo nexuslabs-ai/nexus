@@ -26,7 +26,7 @@ type Story = StoryObj<typeof Carousel>;
 
 // Five numbered slides reused across stories.
 const slideItems = [1, 2, 3, 4, 5].map((n) => (
-  <CarouselItem key={n}>
+  <CarouselItem key={n} aria-label={`Slide ${n} of 5`}>
     <div className="nx:flex nx:aspect-square nx:items-center nx:justify-center nx:rounded-md nx:border nx:border-border-default">
       <span className="nx:text-4xl nx:font-semibold">{n}</span>
     </div>
@@ -95,7 +95,33 @@ export const KeyboardInteraction: Story = {
     const next = canvas.getByRole('button', { name: 'Next slide' });
     await waitFor(() => expect(next).toBeEnabled());
     next.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(prev).toBeDisabled();
     await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(prev).toBeEnabled());
+  },
+};
+
+// Vertical carousels use ArrowDown / ArrowUp instead of horizontal arrows.
+export const VerticalKeyboardInteraction: Story = {
+  render: () => (
+    <Carousel
+      orientation="vertical"
+      className="nx:w-full"
+      aria-label="Vertical keyboard demo carousel"
+    >
+      <CarouselContent className="nx:h-[260px]">{slideItems}</CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const prev = canvas.getByRole('button', { name: 'Previous slide' });
+    const next = canvas.getByRole('button', { name: 'Next slide' });
+    await waitFor(() => expect(next).toBeEnabled());
+    next.focus();
+    await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(prev).toBeEnabled());
   },
 };
@@ -121,6 +147,10 @@ export const WithDataAttributes: Story = {
         canvasElement.querySelector(`[data-slot="${slot}"]`)
       ).toBeInTheDocument();
     }
+
+    await expect(
+      canvasElement.querySelector('[data-slot="carousel"]')
+    ).toHaveAttribute('data-orientation', 'horizontal');
   },
 };
 
