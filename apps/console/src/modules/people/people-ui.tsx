@@ -10,11 +10,14 @@ import {
   STATUS_LABELS,
 } from '../../lib/people-api';
 
-const ROLE_VARIANTS: Record<MemberRole, BadgeProps['variant']> = {
-  owner: 'default',
-  admin: 'information',
-  member: 'secondary',
-  guest: 'outline',
+const ROLE_BADGE_PROPS: Record<
+  MemberRole,
+  Pick<BadgeProps, 'variant' | 'fill'>
+> = {
+  owner: { variant: 'default' },
+  admin: { variant: 'information' },
+  member: { variant: 'secondary' },
+  guest: { variant: 'secondary', fill: 'outline' },
 };
 
 const STATUS_VARIANTS: Record<MemberStatus, BadgeProps['variant']> = {
@@ -25,7 +28,7 @@ const STATUS_VARIANTS: Record<MemberStatus, BadgeProps['variant']> = {
 
 /** The role badge, shared by the directory table and the profile page. */
 export function RoleBadge({ role }: { role: MemberRole }) {
-  return <Badge variant={ROLE_VARIANTS[role]}>{ROLE_LABELS[role]}</Badge>;
+  return <Badge {...ROLE_BADGE_PROPS[role]}>{ROLE_LABELS[role]}</Badge>;
 }
 
 /** The membership-status badge, shared by the directory table and the profile page. */
