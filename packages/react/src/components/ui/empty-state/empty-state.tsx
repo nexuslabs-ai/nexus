@@ -69,7 +69,7 @@ function EmptyStateHeader({ className, ...props }: EmptyStateHeaderProps) {
     <div
       data-slot="empty-state-header"
       className={cn(
-        'nx:flex nx:max-w-sm nx:flex-col nx:items-center nx:gap-2 nx:text-center',
+        'nx:flex nx:max-w-sm nx:flex-col nx:items-center nx:gap-2',
         className
       )}
       {...props}
@@ -82,7 +82,7 @@ const emptyStateMediaVariants = cva(
   {
     variants: {
       variant: {
-        default: 'nx:bg-transparent',
+        default: '',
         icon: 'nx:size-10 nx:rounded-lg nx:bg-muted nx:text-foreground nx:[&_svg]:size-6',
       },
     },
@@ -134,7 +134,8 @@ interface EmptyStateTitleProps extends React.ComponentProps<'div'> {}
 /**
  * EmptyStateTitle
  *
- * The headline of the empty state — what is missing.
+ * The headline of the empty state — what is missing. Renders a `div`, not a
+ * heading element — set the heading level in your app if the region needs one.
  */
 function EmptyStateTitle({ className, ...props }: EmptyStateTitleProps) {
   return (
@@ -191,7 +192,7 @@ function EmptyStateContent({ className, ...props }: EmptyStateContentProps) {
     <div
       data-slot="empty-state-content"
       className={cn(
-        'nx:flex nx:w-full nx:max-w-sm nx:min-w-0 nx:flex-col nx:items-center nx:gap-4 nx:text-balance',
+        'nx:flex nx:w-full nx:max-w-sm nx:min-w-0 nx:flex-col nx:items-center nx:gap-4',
         className
       )}
       {...props}
