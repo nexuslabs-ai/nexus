@@ -75,20 +75,23 @@ function useCarousel() {
  *
  * @example
  * ```tsx
- * <Carousel className="nx:w-full nx:max-w-xs" aria-label="Featured products">
- *   <CarouselContent>
- *     {items.map((item, index) => (
- *       <CarouselItem
- *         key={item.id}
- *         aria-label={`Slide ${index + 1} of ${items.length}`}
- *       >
- *         {item.title}
- *       </CarouselItem>
- *     ))}
- *   </CarouselContent>
- *   <CarouselPrevious />
- *   <CarouselNext />
- * </Carousel>
+ * // px-12 matches the controls' -left-12 / -right-12 offset so they don't clip.
+ * <div className="nx:px-12">
+ *   <Carousel className="nx:w-full" aria-label="Featured products">
+ *     <CarouselContent>
+ *       {items.map((item, index) => (
+ *         <CarouselItem
+ *           key={item.id}
+ *           aria-label={`Slide ${index + 1} of ${items.length}`}
+ *         >
+ *           {item.title}
+ *         </CarouselItem>
+ *       ))}
+ *     </CarouselContent>
+ *     <CarouselPrevious />
+ *     <CarouselNext />
+ *   </Carousel>
+ * </div>
  * ```
  */
 function Carousel({
