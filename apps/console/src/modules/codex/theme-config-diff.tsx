@@ -16,9 +16,14 @@ function toLines(c: CodexThemeContract): { key: string; text: string }[] {
 
 interface ThemeConfigDiffProps {
   contract: CodexThemeContract;
+  /** "color" tints changed lines; "symbols" shows only +/- (the diffMarkers pref). */
+  markers?: 'color' | 'symbols';
 }
 
-export function ThemeConfigDiff({ contract }: ThemeConfigDiffProps) {
+export function ThemeConfigDiff({
+  contract,
+  markers = 'color',
+}: ThemeConfigDiffProps) {
   const prevRef = useRef<CodexThemeContract | null>(null);
   const prev = prevRef.current;
   useEffect(() => {
@@ -30,10 +35,11 @@ export function ThemeConfigDiff({ contract }: ThemeConfigDiffProps) {
     prev ? toLines(prev).map((l) => [l.key, l.text]) : []
   );
 
+  // font-size is driven by the codeFontSize pref (prefsToCss `code, pre` rule).
   return (
     <pre
       className="nx:overflow-x-auto nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:font-mono nx:text-muted-foreground"
-      style={{ fontSize: '12px', lineHeight: '1.7' }}
+      style={{ lineHeight: '1.7' }}
     >
       <code>
         <div>{`const themePreview: ThemeConfig = {`}</div>
@@ -43,11 +49,17 @@ export function ThemeConfigDiff({ contract }: ThemeConfigDiffProps) {
           return (
             <div key={line.key}>
               {changed ? (
-                <div className="nx:bg-error-subtle nx:text-error-subtle-foreground">{`  - ${before}`}</div>
+                <div
+                  className={
+                    markers === 'color'
+                      ? 'nx:bg-error-subtle nx:text-error-subtle-foreground'
+                      : 'nx:text-error-subtle-foreground'
+                  }
+                >{`  - ${before}`}</div>
               ) : null}
               <div
                 className={
-                  changed
+                  changed && markers === 'color'
                     ? 'nx:bg-success-subtle nx:text-success-subtle-foreground'
                     : undefined
                 }
