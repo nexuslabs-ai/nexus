@@ -44,6 +44,9 @@ type CarouselContextProps = {
   canScrollNext: boolean;
 };
 
+const carouselControlClasses =
+  'nx:absolute nx:rounded-full nx:after:absolute nx:after:-inset-2';
+
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
 function useCarousel() {
@@ -63,17 +66,32 @@ function useCarousel() {
  * `CarouselContent` + `CarouselItem`, and `CarouselPrevious` / `CarouselNext`
  * for the controls.
  *
+ * Keyboard: a horizontal carousel scrolls with Left/Right arrows, a vertical
+ * one with Up/Down (arrows for the other axis are ignored).
+ *
+ * Layout: the Previous / Next controls render just outside the content frame,
+ * so give the carousel horizontal room (a `max-w-*` with auto margins, or
+ * container padding) — otherwise they clip off-canvas at narrow / mobile widths.
+ *
  * @example
  * ```tsx
- * <Carousel className="nx:w-full nx:max-w-xs" aria-label="Featured products">
- *   <CarouselContent>
- *     {items.map((item) => (
- *       <CarouselItem key={item.id}>{item.title}</CarouselItem>
- *     ))}
- *   </CarouselContent>
- *   <CarouselPrevious />
- *   <CarouselNext />
- * </Carousel>
+ * // px-12 matches the controls' -left-12 / -right-12 offset so they don't clip.
+ * <div className="nx:px-12">
+ *   <Carousel className="nx:w-full" aria-label="Featured products">
+ *     <CarouselContent>
+ *       {items.map((item, index) => (
+ *         <CarouselItem
+ *           key={item.id}
+ *           aria-label={`Slide ${index + 1} of ${items.length}`}
+ *         >
+ *           {item.title}
+ *         </CarouselItem>
+ *       ))}
+ *     </CarouselContent>
+ *     <CarouselPrevious />
+ *     <CarouselNext />
+ *   </Carousel>
+ * </div>
  * ```
  */
 function Carousel({
@@ -105,7 +123,9 @@ function Carousel({
   const scrollNext = () => api?.scrollNext();
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    const prevKey = orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp';
+    const nextKey = orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown';
+    if (event.key !== prevKey && event.key !== nextKey) return;
     // Don't hijack arrow keys from a focused control that uses them itself.
     if (
       (event.target as HTMLElement).closest(
@@ -114,8 +134,12 @@ function Carousel({
     ) {
       return;
     }
+
+    if (event.key === prevKey && !canScrollPrev) return;
+    if (event.key === nextKey && !canScrollNext) return;
+
     event.preventDefault();
-    if (event.key === 'ArrowLeft') scrollPrev();
+    if (event.key === prevKey) scrollPrev();
     else scrollNext();
   };
 
@@ -156,6 +180,7 @@ function Carousel({
         role="region"
         aria-roledescription="carousel"
         data-slot="carousel"
+        data-orientation={orientation}
         {...props}
       >
         {children}
@@ -217,7 +242,7 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        'nx:absolute nx:rounded-full',
+        carouselControlClasses,
         orientation === 'horizontal'
           ? 'nx:top-1/2 nx:-left-12 nx:-translate-y-1/2'
           : 'nx:-top-12 nx:left-1/2 nx:-translate-x-1/2 nx:rotate-90',
@@ -247,7 +272,7 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        'nx:absolute nx:rounded-full',
+        carouselControlClasses,
         orientation === 'horizontal'
           ? 'nx:top-1/2 nx:-right-12 nx:-translate-y-1/2'
           : 'nx:-bottom-12 nx:left-1/2 nx:-translate-x-1/2 nx:rotate-90',
@@ -270,4 +295,5 @@ export {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselProps,
 };
