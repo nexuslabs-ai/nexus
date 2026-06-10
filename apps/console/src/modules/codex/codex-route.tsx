@@ -25,7 +25,11 @@ import {
   DEFAULT_CODEX_CONTRACT,
   sanitizeContract,
 } from '../../lib/codex-contract';
-import { type CodexPrefs, sanitizePrefs } from '../../lib/codex-prefs';
+import {
+  type CodexPrefs,
+  DEFAULT_CODEX_PREFS,
+  sanitizePrefs,
+} from '../../lib/codex-prefs';
 import {
   activePresetName,
   CODEX_PRESETS,
@@ -77,6 +81,12 @@ export function CodexRoute() {
 
   const updatePrefs = (patch: Partial<CodexPrefs>) =>
     setCodexPrefs((p) => ({ ...p, ...patch }));
+
+  // A cleared number input reports valueAsNumber NaN (not 0) — coerce to the
+  // default so it can't persist a 0 that prefsToCss would emit as font-size:0.
+  // The 8–32 range is enforced at emit (prefsToCss) and on load (sanitizePrefs).
+  const setFontSize = (key: 'uiFontSize' | 'codeFontSize', n: number) =>
+    updatePrefs({ [key]: Number.isNaN(n) ? DEFAULT_CODEX_PREFS[key] : n });
 
   const setReduceMotion = (value: string) => {
     if (value === 'system' || value === 'on' || value === 'off') {
@@ -246,7 +256,7 @@ export function CodexRoute() {
               max={32}
               value={codexPrefs.uiFontSize}
               onChange={(e) =>
-                updatePrefs({ uiFontSize: Number(e.target.value) })
+                setFontSize('uiFontSize', e.target.valueAsNumber)
               }
               aria-label="UI font size"
               className="nx:w-20"
@@ -262,7 +272,7 @@ export function CodexRoute() {
               max={32}
               value={codexPrefs.codeFontSize}
               onChange={(e) =>
-                updatePrefs({ codeFontSize: Number(e.target.value) })
+                setFontSize('codeFontSize', e.target.valueAsNumber)
               }
               aria-label="Code font size"
               className="nx:w-20"

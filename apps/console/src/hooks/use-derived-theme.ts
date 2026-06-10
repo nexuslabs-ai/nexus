@@ -4,21 +4,12 @@ import { type CodexThemeContract, deriveTheme, themeToCss } from '@nexus/core';
 
 const STYLE_ID = 'nexus-derived-theme';
 
-/** Resolve the contract's appearance to a concrete light/dark, honoring "system". */
-function resolveDark(appearance: CodexThemeContract['appearance']): boolean {
-  if (appearance === 'dark') return true;
-  if (appearance === 'light') return false;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
-
 /**
- * Apply a free-form Codex contract at runtime. Derives the token set and injects
- * it as a single <style> appended last in <head>, so its `html` / `html.dark`
- * rules win over the preset base/brand <link>s (equal specificity, later wins),
- * and sets the `.dark` class from the contract's appearance — so while a derived
- * theme is active, the contract owns the rendered light/dark mode. Passing `null`
- * removes the override and restores the preset path. Syncs React state to an
- * external system (the DOM), so it belongs in an effect.
+ * Inject the derived token `<style>` from a free-form contract — appended last
+ * in `<head>` so its `:root` rules win over the preset `<link>`s. Passing `null`
+ * removes the override and restores the preset path. The `.dark` class is owned
+ * by ThemeProvider's single arbiter, not here. Syncs to an external system (the
+ * DOM), so it belongs in an effect.
  */
 export function useDerivedTheme(contract: CodexThemeContract | null): void {
   useEffect(() => {
@@ -32,13 +23,13 @@ export function useDerivedTheme(contract: CodexThemeContract | null): void {
         ? existing
         : document.createElement('style');
     style.id = STYLE_ID;
-    style.textContent = themeToCss(deriveTheme(contract));
-    // appendChild on an already-attached node moves it to the end → stays last.
-    document.head.appendChild(style);
-    // The contract owns the rendered light/dark mode while it's active.
-    document.documentElement.classList.toggle(
-      'dark',
-      resolveDark(contract.appearance)
-    );
+    try {
+      style.textContent = themeToCss(deriveTheme(contract));
+      document.head.appendChild(style);
+    } catch {
+      // A malformed contract (should be filtered upstream by sanitizeContract)
+      // must not crash the app — drop the override and fall back to the preset.
+      style.remove();
+    }
   }, [contract]);
 }

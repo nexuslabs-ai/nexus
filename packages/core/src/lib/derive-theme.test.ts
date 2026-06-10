@@ -126,10 +126,10 @@ describe('deriveTheme', () => {
 });
 
 describe('themeToCss', () => {
-  it('emits html and html.dark blocks', () => {
+  it('emits :root and :root.dark blocks', () => {
     const css = themeToCss(deriveTheme(CONTRACT));
-    expect(css).toMatch(/html\s*\{/);
-    expect(css).toMatch(/html\.dark\s*\{/);
+    expect(css).toMatch(/:root\s*\{/);
+    expect(css).toMatch(/:root\.dark\s*\{/);
     expect(css).toContain('--nx-color-background:');
   });
 });

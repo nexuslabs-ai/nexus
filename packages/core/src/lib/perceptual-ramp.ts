@@ -1,14 +1,15 @@
 import { clampChroma, type Oklch, oklch, parse } from 'culori';
 
+import { formatOklch } from './oklch-format';
 import { PERCEPTUAL_L_GRID, type Shade, SHADES } from './palette';
 
 // emit ships P3 chroma (browsers gamut-map at render); sit just inside the cusp.
 const EMIT_GAMUT = 'p3';
 const CUSP_FRACTION = 0.95;
 
-function round(value: number, decimals: number): number {
-  const factor = 10 ** decimals;
-  return Math.round(value * factor) / factor;
+/** Whether a string is a CSS color culori (and thus the engine) can parse. */
+export function isColor(value: string): boolean {
+  return parse(value) !== undefined;
 }
 
 /** Parse any CSS color string to OKLCH. Throws on unparseable input. */
@@ -20,16 +21,6 @@ export function seedOklch(input: string): Oklch {
   if (!converted)
     throw new Error(`perceptual-ramp: cannot convert '${input}' to OKLCH`);
   return converted;
-}
-
-/** Format an OKLCH color to the project's spot-check string form. */
-export function formatOklch(color: Oklch): string {
-  const finite = (v: number | undefined) =>
-    typeof v === 'number' && Number.isFinite(v) ? v : 0;
-  const l = round(finite(color.l), 4);
-  const c = round(finite(color.c), 4);
-  const h = c && color.h !== undefined ? round(finite(color.h), 3) : 0;
-  return `oklch(${l} ${c} ${h})`;
 }
 
 export interface RampOptions {
