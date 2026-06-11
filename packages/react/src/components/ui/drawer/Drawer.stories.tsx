@@ -119,7 +119,7 @@ export const ScrollableContent: Story = {
           data-testid="drawer-scroll-area"
           // Keyboard-reachable scroll region (axe scrollable-region-focusable).
           tabIndex={0}
-          className="nx:max-h-[45svh] nx:overflow-y-auto nx:px-6 nx:pb-2"
+          className="nx:max-h-[45svh] nx:overflow-y-auto nx:px-6 nx:pb-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
         >
           <ul className="nx:flex nx:flex-col nx:gap-3">
             {SCROLLABLE_ITEMS.map((item) => (
