@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../../stories/spacing-modes';
 import { Button } from '../button';
 
 import {
@@ -215,6 +214,41 @@ export const WithDisabledItems: Story = {
       </DropdownMenuContent>
     </DropdownMenu>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Edit' });
+
+    try {
+      await userEvent.click(trigger);
+
+      const menu = await within(document.body).findByRole('menu');
+      const cutItem = within(menu).getByRole('menuitem', { name: 'Cut' });
+      const copyItem = within(menu).getByRole('menuitem', { name: 'Copy' });
+      const pasteItem = within(menu).getByRole('menuitem', { name: 'Paste' });
+
+      await expect(cutItem).toHaveAttribute('data-disabled');
+      await expect(cutItem).toHaveAttribute('aria-disabled', 'true');
+      await expect(copyItem).toHaveAttribute('data-disabled');
+      await expect(copyItem).toHaveAttribute('aria-disabled', 'true');
+
+      for (
+        let step = 0;
+        step < 5 && !pasteItem.hasAttribute('data-highlighted');
+        step += 1
+      ) {
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(cutItem).not.toHaveAttribute('data-highlighted');
+        await expect(copyItem).not.toHaveAttribute('data-highlighted');
+      }
+
+      await expect(pasteItem).toHaveAttribute('data-highlighted');
+    } finally {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(document.querySelector('[role="menu"]')).toBeNull();
+      });
+    }
+  },
 };
 
 export const WithInsetItems: Story = {
@@ -387,7 +421,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Basic Menu
         </h3>
         <DropdownMenu>
@@ -403,7 +437,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Shortcuts
         </h3>
         <DropdownMenu>
@@ -428,7 +462,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Destructive
         </h3>
         <DropdownMenu>
@@ -445,7 +479,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Submenu
         </h3>
         <DropdownMenu>
@@ -473,51 +507,16 @@ export const AllVariants: Story = {
 };
 
 // ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
+// MODE BEHAVIOUR (item padding pinned across spacing modes)
 // ============================================
 
-export const AllModes: Story = {
+export const ItemPaddingPinnedAcrossModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          "Each row scopes `data-style` locally on the trigger wrapper. Menu items (`DropdownMenuItem` / `DropdownMenuCheckboxItem` / `DropdownMenuRadioItem` / `DropdownMenuSubTrigger` / `DropdownMenuLabel`) all migrate `py-1.5` → `py-control-sm` so vertical density couples to mode. `px-2` stays numeric because menu rows are intentionally tighter than control rows. `DropdownMenuContent` portals to `document.body`, so opened items pick up the document-level mode — not the row's wrapper mode. Triggers (Buttons) respond to the wrapper.",
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
-      {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">{mode} menu</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Item</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ))}
-    </div>
-  ),
-};
-
-export const ItemPaddingResolvesRoleUtility: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          "Regression sentinel — verifies opened `DropdownMenuItem` resolves `py-control-sm` to vega's 6px. Because the content portals to `document.body`, this asserts the runtime resolution rather than the wrapper cascade (a `toHaveClass` check would survive a `cn()` override and miss the real regression — `getComputedStyle` catches it). Closes the menu in `finally` to avoid leaking the open portal into subsequent stories.",
+          'Regression sentinel: opened `DropdownMenuItem` padding stays pinned to numeric `py-1.5` (6px via `--nx-spacing-1_5`) even under document-level spacing modes where `py-control-sm` would differ. Because the content portals to `document.body`, this asserts runtime resolution on the portaled item and restores the document mode in `finally`.',
       },
     },
   },
@@ -533,32 +532,48 @@ export const ItemPaddingResolvesRoleUtility: Story = {
     </DropdownMenu>
   ),
   play: async ({ canvasElement }) => {
-    await document.fonts.ready;
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('button', { name: 'Open Menu' });
+    const originalMode = document.documentElement.getAttribute('data-style');
 
     try {
-      await userEvent.click(trigger);
+      for (const mode of ['nova', 'sera'] as const) {
+        document.documentElement.setAttribute('data-style', mode);
+        await userEvent.click(trigger);
 
-      const item = await waitFor(() => {
-        const el = document.querySelector<HTMLElement>(
-          '[data-slot="dropdown-menu-item"]'
-        );
-        if (!el) throw new Error('dropdown item not visible yet');
-        return el;
-      });
+        const item = await waitFor(() => {
+          const el = document.querySelector<HTMLElement>(
+            '[data-slot="dropdown-menu-item"]'
+          );
+          if (!el) throw new Error('dropdown item not visible yet');
+          return el;
+        });
 
-      const styles = getComputedStyle(item);
-      // vega: --nx-control-padding-y-sm = 6px
-      expect(styles.paddingTop).toBe('6px');
-      expect(styles.paddingBottom).toBe('6px');
+        const styles = getComputedStyle(item);
+        // --nx-spacing-1_5 is 6px in every mode; --nx-control-padding-y-sm would be 4px (nova) / 10px (sera).
+        expect(styles.paddingTop).toBe('6px');
+        expect(styles.paddingBottom).toBe('6px');
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => {
+          expect(
+            document.querySelector('[data-slot="dropdown-menu-item"]')
+          ).toBeNull();
+        });
+      }
     } finally {
-      await userEvent.keyboard('{Escape}');
-      await waitFor(() => {
-        expect(
-          document.querySelector('[data-slot="dropdown-menu-item"]')
-        ).toBeNull();
-      });
+      if (document.querySelector('[role="menu"]')) {
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => {
+          expect(document.querySelector('[role="menu"]')).toBeNull();
+        });
+      }
+
+      if (originalMode === null) {
+        document.documentElement.removeAttribute('data-style');
+      } else {
+        document.documentElement.setAttribute('data-style', originalMode);
+      }
     }
   },
 };
