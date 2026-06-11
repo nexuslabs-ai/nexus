@@ -163,6 +163,38 @@ export const MultipleErrors: Story = {
   },
 };
 
+// Schema issues use the same message pipeline as form-library errors.
+export const SchemaIssues: Story = {
+  render: () => (
+    <div className="nx:w-80">
+      <Field data-invalid="true">
+        <FieldLabel htmlFor="field-issues">Work email</FieldLabel>
+        <Input id="field-issues" type="email" aria-invalid />
+        <FieldError
+          issues={[
+            { message: 'Use a company email address.' },
+            { message: 'Use a company email address.' },
+            { message: 'This domain is not allowed.' },
+            { message: '' },
+          ]}
+        />
+      </Field>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const items = canvas.getAllByRole('listitem');
+
+    await expect(canvas.getByRole('alert')).toHaveAttribute(
+      'aria-atomic',
+      'true'
+    );
+    await expect(items).toHaveLength(2);
+    await expect(items[0]).toHaveTextContent('Use a company email address.');
+    await expect(items[1]).toHaveTextContent('This domain is not allowed.');
+  },
+};
+
 // A divider between groups of fields, with centered content.
 export const WithSeparator: Story = {
   render: () => (

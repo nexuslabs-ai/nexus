@@ -252,6 +252,8 @@ function FieldSeparator({
   );
 }
 
+type FieldErrorMessage = { message?: string } | undefined;
+
 /**
  * FieldErrorProps
  *
@@ -262,7 +264,12 @@ interface FieldErrorProps extends React.ComponentProps<'div'> {
    * Validation errors to render. Deduplicated by message; a single error shows
    * inline, multiple render as a list. Ignored when `children` is provided.
    */
-  errors?: Array<{ message?: string } | undefined>;
+  errors?: FieldErrorMessage[];
+  /**
+   * Schema validation issues to render. Merged with `errors` and deduplicated
+   * by message. Ignored when `children` is provided.
+   */
+  issues?: FieldErrorMessage[];
 }
 
 /**
@@ -274,9 +281,10 @@ function FieldError({
   className,
   children,
   errors,
+  issues,
   ...props
 }: FieldErrorProps) {
-  const messages = children ? [] : dedupeErrorMessages(errors);
+  const messages = children ? [] : dedupeErrorMessages(errors, issues);
 
   if (!children && messages.length === 0) {
     return null;
@@ -304,12 +312,22 @@ function FieldError({
 }
 
 /** Unique, non-empty error messages in first-seen order. */
-function dedupeErrorMessages(errors: FieldErrorProps['errors']): string[] {
-  const seen = new Map<string, string>();
-  for (const error of errors ?? []) {
-    if (error?.message) seen.set(error.message, error.message);
+function dedupeErrorMessages(
+  ...errorGroups: Array<FieldErrorMessage[] | undefined>
+): string[] {
+  const messages: string[] = [];
+  const seen = new Set<string>();
+
+  for (const errors of errorGroups) {
+    for (const error of errors ?? []) {
+      if (error?.message && !seen.has(error.message)) {
+        seen.add(error.message);
+        messages.push(error.message);
+      }
+    }
   }
-  return [...seen.values()];
+
+  return messages;
 }
 
 /** Renders multiple validation messages as a bulleted list. */
