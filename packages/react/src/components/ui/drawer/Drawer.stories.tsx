@@ -116,7 +116,9 @@ export const ScrollableContent: Story = {
           </DrawerDescription>
         </DrawerHeader>
         <div
-          data-slot="drawer-scroll-area"
+          data-testid="drawer-scroll-area"
+          // Keyboard-reachable scroll region (axe scrollable-region-focusable).
+          tabIndex={0}
           className="nx:max-h-[45svh] nx:overflow-y-auto nx:px-6 nx:pb-2"
         >
           <ul className="nx:flex nx:flex-col nx:gap-3">
@@ -150,11 +152,7 @@ export const ScrollableContent: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Open Details' }));
 
     const drawer = await within(document.body).findByRole('dialog');
-    const scrollArea = drawer.querySelector('[data-slot="drawer-scroll-area"]');
-
-    if (!(scrollArea instanceof HTMLElement)) {
-      throw new Error('Expected Drawer scroll area to render.');
-    }
+    const scrollArea = within(drawer).getByTestId('drawer-scroll-area');
 
     await waitFor(() => {
       expect(scrollArea.scrollHeight).toBeGreaterThan(scrollArea.clientHeight);
