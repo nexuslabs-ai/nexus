@@ -21,7 +21,7 @@ import {
 } from './context-menu';
 
 const triggerClass =
-  'nx:flex nx:h-[96px] nx:w-full nx:max-w-md nx:select-none nx:items-center nx:justify-center nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:text-sm nx:text-muted-foreground';
+  'nx:flex nx:h-[96px] nx:w-full nx:max-w-md nx:select-none nx:items-center nx:justify-center nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:typography-body-small nx:text-muted-foreground';
 
 const meta: Meta<typeof ContextMenu> = {
   title: 'Components/ContextMenu',
@@ -406,7 +406,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Basic Menu
         </h3>
         <ContextMenu>
@@ -422,7 +422,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Shortcuts
         </h3>
         <ContextMenu>
@@ -447,7 +447,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Destructive
         </h3>
         <ContextMenu>
@@ -464,7 +464,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Submenu
         </h3>
         <ContextMenu>
