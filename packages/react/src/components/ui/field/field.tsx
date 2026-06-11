@@ -200,6 +200,50 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
+ * FieldRequiredIndicatorProps
+ *
+ * Props for the FieldRequiredIndicator component.
+ */
+interface FieldRequiredIndicatorProps extends React.ComponentProps<'span'> {
+  /**
+   * Optional-field content to render instead of the required marker. This is
+   * only a label affordance; set `required` or `aria-required` on the control
+   * for semantics.
+   */
+  fallback?: React.ReactNode;
+}
+
+/**
+ * FieldRequiredIndicator
+ *
+ * Visual required marker for a `FieldLabel`, with an optional fallback for
+ * fields that should be labelled optional.
+ */
+function FieldRequiredIndicator({
+  className,
+  children,
+  fallback,
+  ...props
+}: FieldRequiredIndicatorProps) {
+  const isOptional = fallback !== undefined;
+
+  return (
+    <span
+      aria-hidden={isOptional ? undefined : true}
+      data-slot="field-required-indicator"
+      data-optional={isOptional ? 'true' : undefined}
+      className={cn(
+        'nx:text-error-subtle-foreground nx:data-[optional=true]:font-normal nx:data-[optional=true]:text-muted-foreground',
+        className
+      )}
+      {...props}
+    >
+      {isOptional ? fallback : (children ?? '*')}
+    </span>
+  );
+}
+
+/**
  * FieldDescription
  *
  * Helper text below a field's control.
@@ -352,6 +396,8 @@ export {
   FieldLegend,
   type FieldLegendProps,
   type FieldProps,
+  FieldRequiredIndicator,
+  type FieldRequiredIndicatorProps,
   FieldSeparator,
   FieldSet,
   FieldTitle,

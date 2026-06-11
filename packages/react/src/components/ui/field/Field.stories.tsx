@@ -12,6 +12,7 @@ import {
   FieldGroup,
   FieldLabel,
   FieldLegend,
+  FieldRequiredIndicator,
   FieldSeparator,
   FieldSet,
   FieldTitle,
@@ -192,6 +193,52 @@ export const SchemaIssues: Story = {
     await expect(items).toHaveLength(2);
     await expect(items[0]).toHaveTextContent('Use a company email address.');
     await expect(items[1]).toHaveTextContent('This domain is not allowed.');
+  },
+};
+
+// Required and optional affordances live in the label; semantics stay on the control.
+export const RequiredAndOptionalIndicators: Story = {
+  render: () => (
+    <FieldGroup className="nx:w-80">
+      <Field>
+        <FieldLabel htmlFor="field-required-email">
+          Email
+          <FieldRequiredIndicator />
+        </FieldLabel>
+        <Input
+          id="field-required-email"
+          type="email"
+          required
+          aria-describedby="field-required-email-help"
+        />
+        <FieldDescription id="field-required-email-help">
+          Required for account recovery.
+        </FieldDescription>
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="field-optional-company">
+          Company
+          <FieldRequiredIndicator fallback="Optional" />
+        </FieldLabel>
+        <Input id="field-optional-company" />
+      </Field>
+    </FieldGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const requiredInput = canvas.getByRole('textbox', { name: /Email/ });
+    const optionalInput = canvas.getByRole('textbox', { name: /Company/ });
+    const marker = canvasElement.querySelector(
+      '[data-slot="field-required-indicator"]'
+    );
+
+    await expect(requiredInput).toBeRequired();
+    await expect(optionalInput).not.toBeRequired();
+    await expect(marker).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas.getByText('Optional')).toHaveAttribute(
+      'data-optional',
+      'true'
+    );
   },
 };
 
