@@ -7,7 +7,7 @@ import { IconCircleFilled } from '@/lib/icons';
 
 import { Label } from '../label';
 
-import { Checkbox, CheckboxGroup } from './checkbox';
+import { Checkbox, CheckboxCard } from './checkbox';
 
 const meta: Meta<typeof Checkbox> = {
   title: 'Components/Checkbox',
@@ -22,9 +22,9 @@ const meta: Meta<typeof Checkbox> = {
 
 export default meta;
 type Story = StoryObj<typeof Checkbox>;
-type CheckboxGroupStory = StoryObj<typeof CheckboxGroup>;
+type CheckboxCardStory = StoryObj<typeof CheckboxCard>;
 
-function CheckboxGroupFrame({ children }: { children: React.ReactNode }) {
+function CheckboxCardFrame({ children }: { children: React.ReactNode }) {
   return <div className="nx:w-[478.5px] nx:max-w-full">{children}</div>;
 }
 
@@ -234,23 +234,23 @@ export const InvalidStates: Story = {
 };
 
 // ============================================
-// CHECKBOX GROUP STORIES
+// CHECKBOX CARD STORIES
 // ============================================
 
-export const GroupDefault: CheckboxGroupStory = {
+export const CardDefault: CheckboxCardStory = {
   args: {
     label: 'Label',
     description: 'Description for label',
     required: true,
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} />
+    </CheckboxCardFrame>
   ),
 };
 
-export const GroupOutline: CheckboxGroupStory = {
+export const CardOutline: CheckboxCardStory = {
   args: {
     label: 'Label',
     description: 'Description for label',
@@ -259,13 +259,13 @@ export const GroupOutline: CheckboxGroupStory = {
     defaultChecked: true,
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} />
+    </CheckboxCardFrame>
   ),
 };
 
-export const GroupTrailingCheckbox: CheckboxGroupStory = {
+export const CardTrailingCheckbox: CheckboxCardStory = {
   args: {
     label: 'Label',
     description: 'Description for label',
@@ -273,13 +273,13 @@ export const GroupTrailingCheckbox: CheckboxGroupStory = {
     checkboxPosition: 'after',
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} />
+    </CheckboxCardFrame>
   ),
 };
 
-export const GroupNonFloating: CheckboxGroupStory = {
+export const CardNonFloating: CheckboxCardStory = {
   args: {
     label: 'Label',
     description: 'Description for label',
@@ -288,13 +288,13 @@ export const GroupNonFloating: CheckboxGroupStory = {
     floating: false,
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} />
+    </CheckboxCardFrame>
   ),
 };
 
-export const GroupWithLeadingSlot: CheckboxGroupStory = {
+export const CardWithLeadingSlot: CheckboxCardStory = {
   args: {
     label: 'Label',
     description: 'Description for label',
@@ -302,13 +302,13 @@ export const GroupWithLeadingSlot: CheckboxGroupStory = {
     variant: 'outline',
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} labelLeading={<LabelLeadingIcon />} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} labelLeading={<LabelLeadingIcon />} />
+    </CheckboxCardFrame>
   ),
 };
 
-export const GroupDisabled: CheckboxGroupStory = {
+export const CardDisabled: CheckboxCardStory = {
   args: {
     label: 'Label',
     description: 'Description for label',
@@ -318,9 +318,9 @@ export const GroupDisabled: CheckboxGroupStory = {
     defaultChecked: true,
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} />
+    </CheckboxCardFrame>
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -333,16 +333,16 @@ export const GroupDisabled: CheckboxGroupStory = {
   },
 };
 
-export const GroupClickInteraction: CheckboxGroupStory = {
+export const CardClickInteraction: CheckboxCardStory = {
   args: {
     label: 'Email updates',
     description: 'Receive product updates and security alerts.',
     onCheckedChange: fn(),
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} />
+    </CheckboxCardFrame>
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -356,16 +356,16 @@ export const GroupClickInteraction: CheckboxGroupStory = {
   },
 };
 
-export const GroupKeyboardInteraction: CheckboxGroupStory = {
+export const CardKeyboardInteraction: CheckboxCardStory = {
   args: {
     label: 'Keyboard option',
     description: 'Toggle this option with the Space key.',
     onCheckedChange: fn(),
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} />
+    </CheckboxCardFrame>
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -380,7 +380,7 @@ export const GroupKeyboardInteraction: CheckboxGroupStory = {
   },
 };
 
-export const GroupWithDataAttributes: CheckboxGroupStory = {
+export const CardWithDataAttributes: CheckboxCardStory = {
   args: {
     label: 'Data attributes',
     description: 'Data-slot hooks are available on the group parts.',
@@ -390,31 +390,31 @@ export const GroupWithDataAttributes: CheckboxGroupStory = {
     defaultChecked: true,
   },
   render: (args) => (
-    <CheckboxGroupFrame>
-      <CheckboxGroup {...args} labelLeading={<LabelLeadingIcon />} />
-    </CheckboxGroupFrame>
+    <CheckboxCardFrame>
+      <CheckboxCard {...args} labelLeading={<LabelLeadingIcon />} />
+    </CheckboxCardFrame>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const checkbox = canvas.getByRole('checkbox', { name: 'Data attributes' });
 
-    await expect(checkbox).toHaveAttribute('data-slot', 'checkbox-group');
+    await expect(checkbox).toHaveAttribute('data-slot', 'checkbox-card');
     await expect(checkbox).toHaveAttribute('data-variant', 'outline');
     await expect(checkbox).toHaveAttribute('data-checkbox-position', 'after');
     await expect(checkbox).toHaveAttribute('data-floating', 'false');
     await expect(checkbox).toHaveAttribute('data-state', 'checked');
 
-    const label = checkbox.querySelector('[data-slot="checkbox-group-label"]');
+    const label = checkbox.querySelector('[data-slot="checkbox-card-label"]');
     const description = checkbox.querySelector(
-      '[data-slot="checkbox-group-description"]'
+      '[data-slot="checkbox-card-description"]'
     );
     const control = checkbox.querySelector(
-      '[data-slot="checkbox-group-control"]'
+      '[data-slot="checkbox-card-control"]'
     );
     const leading = checkbox.querySelector(
-      '[data-slot="checkbox-group-label-leading"]'
+      '[data-slot="checkbox-card-label-leading"]'
     );
-    const check = checkbox.querySelector('[data-slot="checkbox-group-check"]');
+    const check = checkbox.querySelector('[data-slot="checkbox-card-check"]');
 
     await expect(label).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
@@ -423,6 +423,46 @@ export const GroupWithDataAttributes: CheckboxGroupStory = {
     await expect(check).toBeVisible();
     await expect(checkbox).toHaveAttribute('aria-labelledby', label?.id);
     await expect(checkbox).toHaveAttribute('aria-describedby', description?.id);
+  },
+};
+
+export const CardInvalid: CheckboxCardStory = {
+  args: {
+    label: 'Required option',
+    description: 'Selection is required before continuing.',
+    'aria-invalid': true,
+  },
+  render: (args) => (
+    <CheckboxCardFrame>
+      <div className="nx:flex nx:flex-col nx:gap-4">
+        <CheckboxCard {...args} />
+        <CheckboxCard
+          {...args}
+          label="Required option (selected)"
+          defaultChecked
+        />
+      </div>
+    </CheckboxCardFrame>
+  ),
+  // The default (unframed) card has no border frame, so the error affordance
+  // rides on the control box — verify both states render invalid.
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const unchecked = canvas.getByRole('checkbox', {
+      name: 'Required option',
+    });
+    const checked = canvas.getByRole('checkbox', {
+      name: 'Required option (selected)',
+    });
+
+    await expect(unchecked).toHaveAttribute('aria-invalid', 'true');
+    await expect(unchecked).not.toBeChecked();
+    await expect(
+      unchecked.querySelector('[data-slot="checkbox-card-control"]')
+    ).toBeInTheDocument();
+
+    await expect(checked).toHaveAttribute('aria-invalid', 'true');
+    await expect(checked).toBeChecked();
   },
 };
 
@@ -590,83 +630,83 @@ export const AllVariants: Story = {
 
         <div>
           <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-            Checkbox Group
+            Checkbox Card
           </h3>
           <div className="nx:grid nx:max-w-5xl nx:grid-cols-1 nx:items-start nx:gap-4 nx:md:grid-cols-2">
-            <CheckboxGroup
+            <CheckboxCard
               label="Default"
               description="Description for label"
               required
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Default checked"
               description="Description for label"
               required
               defaultChecked
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Trailing"
               description="Checkbox sits after the label and description"
               checkboxPosition="after"
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Trailing checked"
               description="Trailing checkbox with a checked state"
               checkboxPosition="after"
               defaultChecked
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Outline"
               description="Floating card with a leading checkbox"
               variant="outline"
               required
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Outline checked"
               description="Floating card with a selected checkbox"
               variant="outline"
               defaultChecked
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Trailing outline"
               description="Checkbox sits after the label and description"
               variant="outline"
               checkboxPosition="after"
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Trailing outline checked"
               description="Floating card with a selected trailing checkbox"
               variant="outline"
               checkboxPosition="after"
               defaultChecked
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Non-floating"
               description="Outline row rendered with only a bottom border"
               variant="outline"
               floating={false}
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Trailing row"
               description="Non-floating row with a trailing checkbox"
               variant="outline"
               checkboxPosition="after"
               floating={false}
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Default row"
               description="Non-floating default row treatment"
               checkboxPosition="after"
               floating={false}
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="Disabled"
               description="Disabled options keep the same row structure"
               variant="outline"
               disabled
               defaultChecked
             />
-            <CheckboxGroup
+            <CheckboxCard
               label="No description"
               variant="outline"
               labelLeading={<LabelLeadingIcon />}
