@@ -44,7 +44,7 @@ export const Default: Story = {
       input.getBoundingClientRect().top - label.getBoundingClientRect().bottom
     );
 
-    // 8px is the Field label→control gap (gap-2); update if that token changes.
+    // 8px is the Field label→control gap (gap-2).
     await expect(labelToInputGap).toBe(8);
   },
 };
