@@ -20,6 +20,14 @@ const meta: Meta<typeof AlertDialog> = {
   component: AlertDialog,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: [
+          'Use AlertDialog for consequential confirmations where the user must explicitly confirm or cancel before continuing.',
+          'Use Dialog for lower-stakes modal tasks, Sheet for deterministic edge panels such as settings or filters, and Drawer for gesture-driven mobile-style panels with drag-to-dismiss behavior.',
+        ].join(' '),
+      },
+    },
   },
 };
 
