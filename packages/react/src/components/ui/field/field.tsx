@@ -83,7 +83,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const fieldVariants = cva(
-  'nx:group/field nx:flex nx:w-full nx:gap-3 nx:data-[invalid=true]:text-error-subtle-foreground',
+  'nx:group/field nx:flex nx:w-full nx:gap-2 nx:data-[invalid=true]:text-error-subtle-foreground',
   {
     variants: {
       orientation: {

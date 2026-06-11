@@ -36,6 +36,16 @@ export const Default: Story = {
       </Field>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const label = canvas.getByText('Email');
+    const input = canvas.getByLabelText('Email');
+    const labelToInputGap = Math.round(
+      input.getBoundingClientRect().top - label.getBoundingClientRect().bottom
+    );
+
+    await expect(labelToInputGap).toBe(8);
+  },
 };
 
 // The three orientations: vertical, horizontal, and container-responsive.
