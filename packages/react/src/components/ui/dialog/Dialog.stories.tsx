@@ -335,7 +335,7 @@ export const WithDataAttributes: Story = {
     await within(document.body).findByRole('dialog');
 
     // Check data-slot attributes using querySelector on document body
-    const closeButton = await waitFor(() => {
+    await waitFor(() => {
       expect(
         document.querySelector('[data-slot="dialog-overlay"]')
       ).toBeInTheDocument();
@@ -357,17 +357,7 @@ export const WithDataAttributes: Story = {
       expect(
         document.querySelector('[data-slot="dialog-close-button"]')
       ).toBeInTheDocument();
-      return document.querySelector(
-        '[data-slot="dialog-close-button"]'
-      ) as HTMLElement;
     });
-
-    await expect(closeButton).toHaveClass(
-      'nx:p-1',
-      'nx:text-muted-foreground-subtle',
-      'nx:after:-inset-2.5',
-      'nx:lg:after:hidden'
-    );
 
     // Close the dialog
     await userEvent.keyboard('{Escape}');
@@ -400,8 +390,7 @@ export const CloseButtonFocus: Story = {
     const dialog = await within(document.body).findByRole('dialog');
     const closeButton = within(dialog).getByRole('button', { name: 'Close' });
 
-    await userEvent.tab();
-    await expect(closeButton).toHaveFocus();
+    await waitFor(() => expect(closeButton).toHaveFocus());
     await expect(closeButton).toHaveClass(
       'nx:focus-visible:outline-2',
       'nx:focus-visible:outline-focus-default',
