@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../../stories/spacing-modes';
 import { Button } from '../button';
 
 import {
@@ -508,43 +507,8 @@ export const AllVariants: Story = {
 };
 
 // ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
+// MODE BEHAVIOUR (item padding pinned across spacing modes)
 // ============================================
-
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          "DropdownMenu item vertical padding now uses numeric `py-1.5`, so opened item rows stay at 6px across spacing modes. `DropdownMenuContent` portals to `document.body`, so opened items inherit the document-level `data-style`, not the row wrapper; in this grid, the trigger Button is the element that visibly responds to each row's local mode.",
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
-      {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">{mode} menu</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Item</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ))}
-    </div>
-  ),
-};
 
 export const ItemPaddingPinnedAcrossModes: Story = {
   parameters: {
@@ -568,7 +532,6 @@ export const ItemPaddingPinnedAcrossModes: Story = {
     </DropdownMenu>
   ),
   play: async ({ canvasElement }) => {
-    await document.fonts.ready;
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('button', { name: 'Open Menu' });
     const originalMode = document.documentElement.getAttribute('data-style');
@@ -587,7 +550,7 @@ export const ItemPaddingPinnedAcrossModes: Story = {
         });
 
         const styles = getComputedStyle(item);
-        // mira/default and numeric --nx-spacing-1_5 resolve to 6px.
+        // --nx-spacing-1_5 is 6px in every mode; --nx-control-padding-y-sm would be 4px (nova) / 10px (sera).
         expect(styles.paddingTop).toBe('6px');
         expect(styles.paddingBottom).toBe('6px');
 
