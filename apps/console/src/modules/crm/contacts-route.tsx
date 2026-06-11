@@ -116,7 +116,7 @@ export function ContactsSkeleton() {
 
 export function ContactsEmpty() {
   return (
-    <EmptyState className="nx:border nx:border-border-default">
+    <EmptyState bordered>
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">
           <IconUsers />
