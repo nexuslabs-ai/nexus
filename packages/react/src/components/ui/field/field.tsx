@@ -55,7 +55,7 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        'nx:mb-3 nx:font-medium nx:data-[variant=legend]:text-base nx:data-[variant=label]:text-sm',
+        'nx:mb-3 nx:font-medium nx:data-[variant=legend]:text-base nx:data-[variant=label]:typography-label-default',
         className
       )}
       {...props}
@@ -191,7 +191,7 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-label"
       className={cn(
-        'nx:flex nx:w-fit nx:items-center nx:gap-2 nx:text-sm nx:leading-snug nx:font-medium nx:group-data-[disabled=true]/field:opacity-50',
+        'nx:flex nx:w-fit nx:items-center nx:gap-2 nx:typography-label-default nx:group-data-[disabled=true]/field:opacity-50',
         className
       )}
       {...props}
@@ -209,7 +209,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
     <p
       data-slot="field-description"
       className={cn(
-        'nx:text-sm nx:leading-normal nx:font-normal nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
+        'nx:typography-body-small nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
         'nx:last:mt-0 nx:nth-last-2:-mt-1 nx:[[data-variant=legend]+&]:-mt-1.5',
         'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
@@ -234,7 +234,7 @@ function FieldSeparator({
       data-slot="field-separator"
       data-content={!!children}
       className={cn(
-        'nx:relative nx:-my-2 nx:h-5 nx:text-sm nx:group-data-[variant=outline]/field-group:-mb-2',
+        'nx:relative nx:-my-2 nx:h-5 nx:typography-body-small nx:group-data-[variant=outline]/field-group:-mb-2',
         className
       )}
       {...props}
@@ -288,7 +288,7 @@ function FieldError({
       aria-atomic="true"
       data-slot="field-error"
       className={cn(
-        'nx:text-sm nx:font-normal nx:text-error-subtle-foreground',
+        'nx:typography-body-small nx:text-error-subtle-foreground',
         className
       )}
       {...props}
