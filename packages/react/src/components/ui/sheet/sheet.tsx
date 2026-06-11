@@ -91,7 +91,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
  */
 const sheetContentVariants = cva(
   cn(
-    'nx:fixed nx:z-modal nx:flex nx:flex-col nx:gap-container',
+    'nx:fixed nx:z-modal nx:flex nx:flex-col nx:gap-4',
     'nx:bg-container nx:shadow-lg nx:ease-in-out',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
     'nx:data-[state=open]:duration-500 nx:data-[state=closed]:duration-300',
@@ -220,7 +220,7 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn('nx:flex nx:flex-col nx:gap-1 nx:p-container', className)}
+      className={cn('nx:flex nx:flex-col nx:gap-1 nx:p-6', className)}
       {...props}
     />
   );
@@ -251,7 +251,7 @@ function SheetFooter({ className, ...props }: SheetFooterProps) {
     <div
       data-slot="sheet-footer"
       className={cn(
-        'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-container',
+        'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-6',
         className
       )}
       {...props}
