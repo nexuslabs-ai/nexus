@@ -156,6 +156,7 @@ export const Bordered: Story = {
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-slot="empty-state"]');
     await expect(root).toHaveAttribute('data-bordered', 'true');
+    await expect(root).toHaveStyle({ borderStyle: 'dashed' });
   },
 };
 
