@@ -117,7 +117,7 @@ export const ScrollableContent: Story = {
         </DrawerHeader>
         <div
           data-testid="drawer-scroll-area"
-          // Keyboard-reachable scroll region (axe scrollable-region-focusable).
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- scrollable region must be keyboard-reachable (axe scrollable-region-focusable)
           tabIndex={0}
           className="nx:max-h-[45svh] nx:overflow-y-auto nx:px-6 nx:pb-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
         >
