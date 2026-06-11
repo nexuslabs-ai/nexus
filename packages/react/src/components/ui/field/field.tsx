@@ -55,7 +55,7 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        'nx:mb-3 nx:font-medium nx:data-[variant=legend]:text-base nx:data-[variant=label]:typography-label-default',
+        'nx:mb-3 nx:data-[variant=legend]:text-base nx:data-[variant=legend]:font-medium nx:data-[variant=label]:typography-label-default',
         className
       )}
       {...props}
@@ -200,50 +200,6 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
- * FieldRequiredIndicatorProps
- *
- * Props for the FieldRequiredIndicator component.
- */
-interface FieldRequiredIndicatorProps extends React.ComponentProps<'span'> {
-  /**
-   * Optional-field content to render instead of the required marker. This is
-   * only a label affordance; set `required` or `aria-required` on the control
-   * for semantics.
-   */
-  fallback?: React.ReactNode;
-}
-
-/**
- * FieldRequiredIndicator
- *
- * Visual required marker for a `FieldLabel`, with an optional fallback for
- * fields that should be labelled optional.
- */
-function FieldRequiredIndicator({
-  className,
-  children,
-  fallback,
-  ...props
-}: FieldRequiredIndicatorProps) {
-  const isOptional = fallback !== undefined;
-
-  return (
-    <span
-      aria-hidden={isOptional ? undefined : true}
-      data-slot="field-required-indicator"
-      data-optional={isOptional ? 'true' : undefined}
-      className={cn(
-        'nx:text-error-subtle-foreground nx:data-[optional=true]:font-normal nx:data-[optional=true]:text-muted-foreground',
-        className
-      )}
-      {...props}
-    >
-      {isOptional ? fallback : (children ?? '*')}
-    </span>
-  );
-}
-
-/**
  * FieldDescription
  *
  * Helper text below a field's control.
@@ -296,8 +252,6 @@ function FieldSeparator({
   );
 }
 
-type FieldErrorMessage = { message?: string } | undefined;
-
 /**
  * FieldErrorProps
  *
@@ -308,12 +262,7 @@ interface FieldErrorProps extends React.ComponentProps<'div'> {
    * Validation errors to render. Deduplicated by message; a single error shows
    * inline, multiple render as a list. Ignored when `children` is provided.
    */
-  errors?: FieldErrorMessage[];
-  /**
-   * Schema validation issues to render. Merged with `errors` and deduplicated
-   * by message. Ignored when `children` is provided.
-   */
-  issues?: FieldErrorMessage[];
+  errors?: Array<{ message?: string } | undefined>;
 }
 
 /**
@@ -325,10 +274,9 @@ function FieldError({
   className,
   children,
   errors,
-  issues,
   ...props
 }: FieldErrorProps) {
-  const messages = children ? [] : dedupeErrorMessages(errors, issues);
+  const messages = children ? [] : dedupeErrorMessages(errors);
 
   if (!children && messages.length === 0) {
     return null;
@@ -356,22 +304,12 @@ function FieldError({
 }
 
 /** Unique, non-empty error messages in first-seen order. */
-function dedupeErrorMessages(
-  ...errorGroups: Array<FieldErrorMessage[] | undefined>
-): string[] {
-  const messages: string[] = [];
-  const seen = new Set<string>();
-
-  for (const errors of errorGroups) {
-    for (const error of errors ?? []) {
-      if (error?.message && !seen.has(error.message)) {
-        seen.add(error.message);
-        messages.push(error.message);
-      }
-    }
+function dedupeErrorMessages(errors: FieldErrorProps['errors']): string[] {
+  const seen = new Map<string, string>();
+  for (const error of errors ?? []) {
+    if (error?.message) seen.set(error.message, error.message);
   }
-
-  return messages;
+  return [...seen.values()];
 }
 
 /** Renders multiple validation messages as a bulleted list. */
@@ -396,8 +334,6 @@ export {
   FieldLegend,
   type FieldLegendProps,
   type FieldProps,
-  FieldRequiredIndicator,
-  type FieldRequiredIndicatorProps,
   FieldSeparator,
   FieldSet,
   FieldTitle,

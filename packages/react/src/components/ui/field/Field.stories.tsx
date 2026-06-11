@@ -12,7 +12,6 @@ import {
   FieldGroup,
   FieldLabel,
   FieldLegend,
-  FieldRequiredIndicator,
   FieldSeparator,
   FieldSet,
   FieldTitle,
@@ -45,6 +44,7 @@ export const Default: Story = {
       input.getBoundingClientRect().top - label.getBoundingClientRect().bottom
     );
 
+    // 8px is the Field label→control gap (gap-2); update if that token changes.
     await expect(labelToInputGap).toBe(8);
   },
 };
@@ -161,84 +161,6 @@ export const MultipleErrors: Story = {
     await expect(items).toHaveLength(2);
     await expect(items[0]).toHaveTextContent('Must include a symbol.');
     await expect(items[1]).toHaveTextContent('Must include a number.');
-  },
-};
-
-// Schema issues use the same message pipeline as form-library errors.
-export const SchemaIssues: Story = {
-  render: () => (
-    <div className="nx:w-80">
-      <Field data-invalid="true">
-        <FieldLabel htmlFor="field-issues">Work email</FieldLabel>
-        <Input id="field-issues" type="email" aria-invalid />
-        <FieldError
-          issues={[
-            { message: 'Use a company email address.' },
-            { message: 'Use a company email address.' },
-            { message: 'This domain is not allowed.' },
-            { message: '' },
-          ]}
-        />
-      </Field>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const items = canvas.getAllByRole('listitem');
-
-    await expect(canvas.getByRole('alert')).toHaveAttribute(
-      'aria-atomic',
-      'true'
-    );
-    await expect(items).toHaveLength(2);
-    await expect(items[0]).toHaveTextContent('Use a company email address.');
-    await expect(items[1]).toHaveTextContent('This domain is not allowed.');
-  },
-};
-
-// Required and optional affordances live in the label; semantics stay on the control.
-export const RequiredAndOptionalIndicators: Story = {
-  render: () => (
-    <FieldGroup className="nx:w-80">
-      <Field>
-        <FieldLabel htmlFor="field-required-email">
-          Email
-          <FieldRequiredIndicator />
-        </FieldLabel>
-        <Input
-          id="field-required-email"
-          type="email"
-          required
-          aria-describedby="field-required-email-help"
-        />
-        <FieldDescription id="field-required-email-help">
-          Required for account recovery.
-        </FieldDescription>
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="field-optional-company">
-          Company
-          <FieldRequiredIndicator fallback="Optional" />
-        </FieldLabel>
-        <Input id="field-optional-company" />
-      </Field>
-    </FieldGroup>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const requiredInput = canvas.getByRole('textbox', { name: /Email/ });
-    const optionalInput = canvas.getByRole('textbox', { name: /Company/ });
-    const marker = canvasElement.querySelector(
-      '[data-slot="field-required-indicator"]'
-    );
-
-    await expect(requiredInput).toBeRequired();
-    await expect(optionalInput).not.toBeRequired();
-    await expect(marker).toHaveAttribute('aria-hidden', 'true');
-    await expect(canvas.getByText('Optional')).toHaveAttribute(
-      'data-optional',
-      'true'
-    );
   },
 };
 
