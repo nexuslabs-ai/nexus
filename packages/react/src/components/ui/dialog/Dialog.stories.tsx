@@ -26,6 +26,14 @@ const meta: Meta<typeof Dialog> = {
   component: Dialog,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: [
+          'Use Dialog for general modal tasks that temporarily interrupt the page and can be dismissed without forcing a choice.',
+          'Use AlertDialog when the user must explicitly confirm or cancel a consequential action, Sheet for deterministic edge panels such as settings or filters, and Drawer for gesture-driven mobile-style panels with drag-to-dismiss behavior.',
+        ].join(' '),
+      },
+    },
   },
 };
 

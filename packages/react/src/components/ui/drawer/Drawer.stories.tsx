@@ -19,6 +19,14 @@ const meta: Meta<typeof Drawer> = {
   component: Drawer,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: [
+          'Use Drawer for gesture-driven mobile-style panels, especially bottom drawers that can be dragged to dismiss.',
+          'Use Sheet for deterministic side panels, Dialog for centered modal tasks, and AlertDialog for choice-forcing confirmations.',
+        ].join(' '),
+      },
+    },
   },
 };
 
