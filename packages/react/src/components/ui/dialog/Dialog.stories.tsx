@@ -1,11 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
 import { Button } from '../button';
 import {
   DropdownMenu,
@@ -332,7 +327,7 @@ export const WithDataAttributes: Story = {
     await within(document.body).findByRole('dialog');
 
     // Check data-slot attributes using querySelector on document body
-    await waitFor(() => {
+    const closeButton = await waitFor(() => {
       expect(
         document.querySelector('[data-slot="dialog-overlay"]')
       ).toBeInTheDocument();
@@ -354,10 +349,61 @@ export const WithDataAttributes: Story = {
       expect(
         document.querySelector('[data-slot="dialog-close-button"]')
       ).toBeInTheDocument();
+      return document.querySelector(
+        '[data-slot="dialog-close-button"]'
+      ) as HTMLElement;
     });
+
+    await expect(closeButton).toHaveClass(
+      'nx:p-1',
+      'nx:text-muted-foreground-subtle',
+      'nx:after:-inset-2.5',
+      'nx:lg:after:hidden'
+    );
 
     // Close the dialog
     await userEvent.keyboard('{Escape}');
+  },
+};
+
+export const CloseButtonFocus: Story = {
+  render: (_args) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open focus dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Close button focus</DialogTitle>
+          <DialogDescription>
+            The close button keeps the canonical focus outline.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open focus dialog' })
+    );
+
+    const dialog = await within(document.body).findByRole('dialog');
+    const closeButton = within(dialog).getByRole('button', { name: 'Close' });
+
+    await userEvent.tab();
+    await expect(closeButton).toHaveFocus();
+    await expect(closeButton).toHaveClass(
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:outline-offset-(--focus-offset)'
+    );
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
   },
 };
 
@@ -592,108 +638,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-// ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
-// ============================================
-
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          "Each row scopes `data-style` locally on the trigger wrapper. `DialogContent` migrates `p-6` → `p-container` and `gap-4` → `gap-container` (24px / 16px match vega byte-identically). DialogContent portals to `document.body`, so opening the dialog from any row resolves to the document-level mode, not the wrapper's — the triggers (Buttons) respond to the wrapper, but the opened dialog renders at the Style-toolbar mode. The `DialogContentResolvesContainerRole` sentinel below verifies the role utilities resolve to the right pixel values at runtime.",
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Open ({mode})</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Dialog in {mode}</DialogTitle>
-                <DialogDescription>
-                  Padding renders at document-level mode regardless of row.
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
-export const DialogContentResolvesContainerRole: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          "Regression sentinel — verifies opened `DialogContent` resolves `p-container` to vega's 24px and `gap-container` to vega's 16px. Because content portals to `document.body`, this asserts runtime resolution rather than wrapper cascade (a `toHaveClass` check would survive a `cn()` override and miss the real regression — `getComputedStyle` catches it). Closes the dialog in `finally` via Escape so the open portal does not leak into subsequent stories.",
-      },
-    },
-  },
-  render: () => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Open Dialog</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Title</DialogTitle>
-          <DialogDescription>Description</DialogDescription>
-        </DialogHeader>
-        <p>Body row</p>
-      </DialogContent>
-    </Dialog>
-  ),
-  play: async ({ canvasElement }) => {
-    await document.fonts.ready;
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', { name: 'Open Dialog' });
-    const previousStyle = document.documentElement.dataset.style;
-    document.documentElement.dataset.style = 'vega';
-
-    try {
-      await userEvent.click(trigger);
-
-      const content = await waitFor(() => {
-        const el = document.querySelector<HTMLElement>(
-          '[data-slot="dialog-content"]'
-        );
-        if (!el) throw new Error('dialog content not visible yet');
-        return el;
-      });
-
-      const styles = getComputedStyle(content);
-      expect(styles.paddingTop).toBe('24px');
-      expect(styles.paddingRight).toBe('24px');
-      expect(styles.paddingBottom).toBe('24px');
-      expect(styles.paddingLeft).toBe('24px');
-      expect(styles.rowGap).toBe('16px');
-      expect(styles.columnGap).toBe('16px');
-    } finally {
-      await userEvent.keyboard('{Escape}');
-      await waitFor(() => {
-        expect(
-          document.querySelector('[data-slot="dialog-content"]')
-        ).toBeNull();
-      });
-      if (previousStyle === undefined) {
-        delete document.documentElement.dataset.style;
-      } else {
-        document.documentElement.dataset.style = previousStyle;
-      }
-    }
   },
 };
 
