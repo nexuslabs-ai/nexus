@@ -25,22 +25,20 @@ interface CheckboxCardProps extends Omit<
   'children'
 > {
   /**
-   * The visible label for the checkbox option.
+   * The visible label for the checkbox option. Non-interactive content only —
+   * the whole row is a `<button>` (see the CheckboxCard description).
    */
   label: React.ReactNode;
 
   /**
    * Optional supporting text announced through `aria-describedby`.
-   *
-   * The whole row is the checkbox control (a `<button>`), so `description` must
-   * be plain, non-interactive content — do not nest links, buttons, or other
-   * interactive elements inside it (that would be invalid nested-interactive
-   * HTML). Render interactive helper content outside the CheckboxCard.
+   * Non-interactive content only — see the CheckboxCard description.
    */
   description?: React.ReactNode;
 
   /**
    * Optional decorative content before the label text, such as an icon.
+   * Non-interactive content only (the row is a `<button>`).
    */
   labelLeading?: React.ReactNode;
 
@@ -178,8 +176,11 @@ const checkboxCardVariants = cva(
  * A full-row checkbox option matching the Figma checkbox card / group variants.
  * The row/card itself is the checkbox control, so clicking anywhere in the
  * surface toggles it while preserving Radix checkbox semantics and form
- * behavior. Because the row is the control (a `<button>`), keep `description`
- * non-interactive — see {@link CheckboxCardProps.description}.
+ * behavior. Because the row is itself the control (a `<button>`), every slotted
+ * value — `label`, `description`, and `labelLeading` — must be plain,
+ * non-interactive content: nesting a link, button, or other interactive element
+ * inside it is invalid HTML. Render interactive helper content outside the
+ * CheckboxCard.
  *
  * @example
  * ```tsx
@@ -395,4 +396,10 @@ function CheckboxCardControl({
   );
 }
 
-export { Checkbox, CheckboxCard, type CheckboxCardProps, type CheckboxProps };
+export {
+  Checkbox,
+  CheckboxCard,
+  type CheckboxCardProps,
+  checkboxCardVariants,
+  type CheckboxProps,
+};
