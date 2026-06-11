@@ -187,7 +187,7 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
     <div
       data-slot="dialog-header"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1.5 nx:text-center nx:sm:text-left',
+        'nx:flex nx:flex-col nx:gap-1 nx:text-center nx:sm:text-left',
         className
       )}
       {...props}
@@ -251,10 +251,7 @@ function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn(
-        'nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight',
-        className
-      )}
+      className={cn('nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -285,7 +282,10 @@ function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:typography-body-small nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );

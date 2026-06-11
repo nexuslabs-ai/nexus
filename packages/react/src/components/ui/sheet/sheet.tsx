@@ -219,7 +219,7 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn('nx:flex nx:flex-col nx:gap-1.5 nx:p-container', className)}
+      className={cn('nx:flex nx:flex-col nx:gap-1 nx:p-container', className)}
       {...props}
     />
   );
@@ -281,10 +281,7 @@ function SheetTitle({ className, ...props }: SheetTitleProps) {
   return (
     <DialogPrimitive.Title
       data-slot="sheet-title"
-      className={cn(
-        'nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight',
-        className
-      )}
+      className={cn('nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -315,7 +312,10 @@ function SheetDescription({ className, ...props }: SheetDescriptionProps) {
   return (
     <DialogPrimitive.Description
       data-slot="sheet-description"
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:typography-body-small nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );
