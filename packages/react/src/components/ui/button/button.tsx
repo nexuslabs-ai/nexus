@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'nx:inline-flex nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-base nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0',
+  'nx:inline-flex nx:box-border nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-base nx:border nx:border-transparent nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -25,39 +25,24 @@ const buttonVariants = cva(
           'nx:bg-secondary-background nx:text-secondary-foreground nx:hover:bg-secondary-background-hover nx:active:bg-secondary-background-active nx:disabled:bg-secondary-disabled nx:aria-disabled:bg-secondary-disabled',
         ghost:
           'nx:text-foreground nx:hover:bg-container-hover nx:active:bg-container-active nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
-        link: 'nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
+        link: 'nx:border-0 nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
       },
       size: {
-        sm: 'nx:px-2.5 nx:py-1.5 nx:gap-1 nx:typography-label-small',
-        default: 'nx:typography-label-default nx:px-3 nx:py-1.5 nx:gap-1',
-        lg: 'nx:typography-label-default nx:px-3.5 nx:py-2 nx:gap-1',
+        sm: 'nx:h-[32px] nx:min-w-[64px] nx:px-2.5 nx:gap-1 nx:typography-label-small',
+        default:
+          'nx:h-[38px] nx:min-w-[80px] nx:px-3 nx:gap-1 nx:typography-label-default',
+        lg: 'nx:h-[44px] nx:min-w-[96px] nx:px-3.5 nx:gap-1 nx:typography-label-default',
         'icon-sm':
-          'nx:relative nx:size-[24px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[10px]',
-        icon: 'nx:relative nx:size-[28px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[8px]',
-        'icon-lg':
           'nx:relative nx:size-[32px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[6px]',
+        icon: 'nx:relative nx:size-[38px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[3px]',
+        'icon-lg': 'nx:relative nx:size-[44px] nx:gap-0 nx:p-0',
       },
     },
     compoundVariants: [
       {
-        variant: ['outline', 'dashed'],
-        size: 'sm',
-        className: 'nx:px-[9px] nx:py-[5px]',
-      },
-      {
-        variant: ['outline', 'dashed'],
-        size: 'default',
-        className: 'nx:px-[11px] nx:py-[5px]',
-      },
-      {
-        variant: ['outline', 'dashed'],
-        size: 'lg',
-        className: 'nx:px-[13px] nx:py-[7px]',
-      },
-      {
         variant: 'link',
         size: ['sm', 'default', 'lg'],
-        className: 'nx:h-auto nx:p-0!',
+        className: 'nx:h-auto nx:min-w-0 nx:p-0!',
       },
     ],
     defaultVariants: {
@@ -121,8 +106,8 @@ interface ButtonProps
   endIcon?: React.ReactNode;
 
   /**
-   * Uses the Figma icon-only sizing model while preserving the same Button
-   * semantics. `sm`, `default`, and `lg` map to 24px, 28px, and 32px visuals.
+   * Uses the fixed icon-only sizing model while preserving the same Button
+   * semantics. `sm`, `default`, and `lg` map to 32px, 38px, and 44px visuals.
    * @default false
    */
   isIconOnly?: boolean;

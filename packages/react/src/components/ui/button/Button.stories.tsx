@@ -42,7 +42,7 @@ const meta: Meta<typeof Button> = {
     },
     isIconOnly: {
       control: 'boolean',
-      description: 'Use the Figma icon-only sizing model',
+      description: 'Use the fixed icon-only sizing model',
     },
     startIcon: {
       control: false,
@@ -137,6 +137,8 @@ export const Link: Story = {
 
     await expect(button).toHaveClass('nx:underline-offset-4');
     await expect(button).toHaveClass('nx:hover:underline');
+    await expect(button).toHaveClass('nx:border-0');
+    await expect(button).toHaveClass('nx:min-w-0');
     await expect(button).toHaveClass('nx:p-0!');
     await expect(button).not.toHaveClass('nx:hover:bg-primary-subtle-hover');
     await expectHeightPinned(canvas, 'button-link', 20);
@@ -172,10 +174,10 @@ export const IconSize: Story = {
     const button = canvas.getByRole('button', { name: 'Star' });
 
     await expect(button).toHaveClass('nx:relative');
-    await expect(button).toHaveClass('nx:size-[28px]');
+    await expect(button).toHaveClass('nx:size-[38px]');
     await expect(button).toHaveClass('nx:p-0');
     await expect(button).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect(button).toHaveClass('nx:pointer-coarse:after:-inset-[8px]');
+    await expect(button).toHaveClass('nx:pointer-coarse:after:-inset-[3px]');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -190,7 +192,7 @@ export const IconSmallSize: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Small star' });
 
-    await expect(button).toHaveClass('nx:size-[24px]');
+    await expect(button).toHaveClass('nx:size-[32px]');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -205,7 +207,7 @@ export const IconLargeSize: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Large star' });
 
-    await expect(button).toHaveClass('nx:size-[32px]');
+    await expect(button).toHaveClass('nx:size-[44px]');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -229,13 +231,13 @@ export const IconOnlySizes: Story = {
 
     await expect(
       canvas.getByRole('button', { name: 'Small icon' })
-    ).toHaveClass('nx:size-[24px]');
+    ).toHaveClass('nx:size-[32px]');
     await expect(
       canvas.getByRole('button', { name: 'Default icon' })
-    ).toHaveClass('nx:size-[28px]');
+    ).toHaveClass('nx:size-[38px]');
     await expect(
       canvas.getByRole('button', { name: 'Large icon' })
-    ).toHaveClass('nx:size-[32px]');
+    ).toHaveClass('nx:size-[44px]');
   },
 };
 
@@ -787,7 +789,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button uses the Figma numeric padding scale, so sm, default, and lg text-button heights stay pinned across density modes.',
+          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button uses fixed outer heights while inline padding stays on the Nexus spacing scale.',
       },
     },
   },
@@ -810,7 +812,7 @@ export const LargeHeightPinnedAcrossModes: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the large Button size after moving to the compact Figma scale.',
+          'Density-stability sentinel for the large Button size after moving to fixed outer heights.',
       },
     },
   },
@@ -829,7 +831,7 @@ export const LargeHeightPinnedAcrossModes: Story = {
     await expectHeightPinnedAcrossModes(
       within(canvasElement),
       SPACING_MODES.map((mode) => `button-lg-${mode}`),
-      36
+      44
     );
   },
 };
@@ -840,7 +842,7 @@ export const IconHeightsArePinnedAcrossModes: Story = {
     docs: {
       description: {
         story:
-          'Icon-only Button visuals follow Figma at 24px, 28px, and 32px while coarse-pointer hit-area overlays preserve the Nexus touch floor.',
+          'Icon-only Button visuals follow the fixed Button sizing model at 32px, 38px, and 44px; coarse-pointer hit-area overlays preserve the Nexus touch floor for smaller boxes.',
       },
     },
   },
@@ -885,17 +887,17 @@ export const IconHeightsArePinnedAcrossModes: Story = {
     await expectHeightPinnedAcrossModes(
       canvas,
       SPACING_MODES.map((mode) => `button-icon-sm-${mode}`),
-      24
+      32
     );
     await expectHeightPinnedAcrossModes(
       canvas,
       SPACING_MODES.map((mode) => `button-icon-default-${mode}`),
-      28
+      38
     );
     await expectHeightPinnedAcrossModes(
       canvas,
       SPACING_MODES.map((mode) => `button-icon-lg-${mode}`),
-      32
+      44
     );
   },
 };
@@ -943,7 +945,7 @@ export const VariantClassesMatchFigmaTokens: Story = {
   },
 };
 
-export const BorderedVariantsKeepFigmaHeight: Story = {
+export const BorderedVariantsKeepFixedHeight: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
       <div className="nx:flex nx:items-center nx:gap-2">
@@ -973,12 +975,12 @@ export const BorderedVariantsKeepFigmaHeight: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expectHeightPinned(canvas, 'outline-sm', 28);
-    await expectHeightPinned(canvas, 'outline-default', 32);
-    await expectHeightPinned(canvas, 'outline-lg', 36);
-    await expectHeightPinned(canvas, 'dashed-sm', 28);
-    await expectHeightPinned(canvas, 'dashed-default', 32);
-    await expectHeightPinned(canvas, 'dashed-lg', 36);
+    await expectHeightPinned(canvas, 'outline-sm', 32);
+    await expectHeightPinned(canvas, 'outline-default', 38);
+    await expectHeightPinned(canvas, 'outline-lg', 44);
+    await expectHeightPinned(canvas, 'dashed-sm', 32);
+    await expectHeightPinned(canvas, 'dashed-default', 38);
+    await expectHeightPinned(canvas, 'dashed-lg', 44);
   },
 };
 
@@ -988,7 +990,7 @@ export const TextHeightsArePinnedAcrossModes: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the Figma text-button scale. Sm, default, and lg should stay 28px, 32px, and 36px across spacing modes.',
+          'Density-stability sentinel for the fixed-height Button model. Sm, default, and lg should stay 32px, 38px, and 44px across spacing modes while inline padding uses Nexus scale utilities.',
       },
     },
   },
@@ -1015,30 +1017,36 @@ export const TextHeightsArePinnedAcrossModes: Story = {
     const canvas = within(canvasElement);
     const defaultButton = canvas.getByTestId('button-default-vega');
     const smallButton = canvas.getByTestId('button-sm-vega');
+    const largeButton = canvas.getByTestId('button-lg-vega');
 
     await expect(defaultButton).toHaveClass('nx:typography-label-default');
+    await expect(defaultButton).toHaveClass('nx:h-[38px]');
+    await expect(defaultButton).toHaveClass('nx:min-w-[80px]');
     await expect(defaultButton).toHaveClass('nx:px-3');
-    await expect(defaultButton).toHaveClass('nx:py-1.5');
     await expect(defaultButton).toHaveClass('nx:gap-1');
     await expect(smallButton).toHaveClass('nx:typography-label-small');
+    await expect(smallButton).toHaveClass('nx:h-[32px]');
+    await expect(smallButton).toHaveClass('nx:min-w-[64px]');
     await expect(smallButton).toHaveClass('nx:px-2.5');
-    await expect(smallButton).toHaveClass('nx:py-1.5');
     await expect(smallButton).toHaveClass('nx:gap-1');
+    await expect(largeButton).toHaveClass('nx:h-[44px]');
+    await expect(largeButton).toHaveClass('nx:min-w-[96px]');
+    await expect(largeButton).toHaveClass('nx:px-3.5');
 
     await expectHeightPinnedAcrossModes(
       canvas,
       SPACING_MODES.map((mode) => `button-default-${mode}`),
-      32
+      38
     );
     await expectHeightPinnedAcrossModes(
       canvas,
       SPACING_MODES.map((mode) => `button-sm-${mode}`),
-      28
+      32
     );
     await expectHeightPinnedAcrossModes(
       canvas,
       SPACING_MODES.map((mode) => `button-lg-${mode}`),
-      36
+      44
     );
   },
 };
@@ -1049,7 +1057,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the Figma numeric-spacing outcome: in vega mode, a default Button renders at exactly 32px (= `typography-label-default` 20px line-height + `py-1.5` 6px x 2).',
+          'Pin on the fixed-height outcome: in vega mode, a default Button renders at exactly 38px, matching the default Input and SelectTrigger outer height.',
       },
     },
   },
@@ -1063,7 +1071,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'button-vega-host', 32);
+    await expectHeightPinned(within(canvasElement), 'button-vega-host', 38);
   },
 };
 
