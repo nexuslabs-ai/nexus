@@ -8,7 +8,7 @@ const inputVariants = cva(
   [
     'nx:flex nx:w-full nx:rounded-md nx:border nx:border-border-default',
     'nx:bg-background nx:text-foreground nx:transition-colors',
-    'nx:file:border-0 nx:file:bg-transparent nx:file:text-sm nx:file:font-medium nx:file:text-foreground',
+    'nx:file:border-0 nx:file:bg-transparent nx:file:typography-label-default nx:file:text-foreground',
     'nx:placeholder:text-muted-foreground',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
@@ -17,9 +17,9 @@ const inputVariants = cva(
   {
     variants: {
       size: {
-        default: 'nx:px-3 nx:py-control-md nx:text-sm',
-        sm: 'nx:px-2.5 nx:py-control-sm nx:text-xs',
-        lg: 'nx:px-4 nx:py-control-lg nx:text-base',
+        default: 'nx:px-3 nx:py-1 nx:typography-body-default',
+        sm: 'nx:px-3 nx:py-1 nx:typography-body-small',
+        lg: 'nx:px-3 nx:py-1.5 nx:typography-body-default',
       },
     },
     defaultVariants: {
@@ -66,7 +66,7 @@ function Input({ className, type, size, ...props }: InputProps) {
     <input
       type={type}
       data-slot="input"
-      data-size={size}
+      data-size={size ?? 'default'}
       className={cn(inputVariants({ size, className }))}
       {...props}
     />

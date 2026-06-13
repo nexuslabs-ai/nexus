@@ -8,7 +8,7 @@ import {
 } from '../../../stories/spacing-modes';
 import {
   expectHeightPinned,
-  expectModeCascadeWorks,
+  expectHeightPinnedAcrossModes,
 } from '../../../stories/test-utils';
 
 import { Input } from './input';
@@ -348,7 +348,7 @@ export const AllVariants: Story = {
 };
 
 // ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
+// MODE BEHAVIOUR (mode-stable numeric spacing)
 // ============================================
 
 export const AllModes: Story = {
@@ -357,7 +357,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input `padding-y` migrates to `py-control-{sm,md,lg}` per size and so responds to mode; `padding-x` stays numeric per the coupling table (Input is narrower than Button at the same size). Vega / Lyra / Luma / Mira currently share identical control-y tokens (so those four rows render at the same height); Nova compresses, Maia / Sera breathe.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input now follows the Figma node 843:71944 sizing with numeric vertical padding (`py-1` / `py-1.5`) and `px-3`. The old `py-control-*` role utilities varied per mode; the new vertical spacing is mode-invariant, explicitly satisfying the #433 disclosure that numeric spacing may still vary only where the numeric token itself is mode-tuned.',
       },
     },
   },
@@ -386,31 +386,55 @@ export const AllModes: Story = {
   ),
 };
 
-export const ModesProduceDifferentHeights: Story = {
+export const InputIsDensityStable: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Regression sentinel for the `data-style` cascade and the role-utility resolver on Input. An Input scoped to `nova` (compact `py`) must render shorter than the same Input scoped to `sera` (breathy `py`). A typo like `nx:py-control-mdd` would fall back to intrinsic and both modes would match — the test catches that.',
+          'Density-stability sentinel for the Figma-aligned numeric sizing. Input sizes use mode-invariant vertical padding, so sm/default/lg pin to 30/34/38px across representative spacing modes. Horizontal `px-3` may still vary cosmetically by mode, but it does not affect height.',
       },
     },
   },
   render: () => (
-    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="input-mode-host-nova">
-        <Input aria-label="nova input" />
-      </div>
-      <div data-style="sera" data-testid="input-mode-host-sera">
-        <Input aria-label="sera input" />
-      </div>
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
+      {(['nova', 'vega', 'maia', 'sera'] as const).map((mode) => (
+        <div key={mode} data-style={mode} className="nx:flex nx:gap-4">
+          <div data-testid={`input-${mode}-sm`}>
+            <Input size="sm" aria-label={`${mode} small input`} />
+          </div>
+          <div data-testid={`input-${mode}-default`}>
+            <Input aria-label={`${mode} default input`} />
+          </div>
+          <div data-testid={`input-${mode}-lg`}>
+            <Input size="lg" aria-label={`${mode} large input`} />
+          </div>
+        </div>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
-      within(canvasElement),
-      'input-mode-host-nova',
-      'input-mode-host-sera'
+    const canvas = within(canvasElement);
+
+    await expectHeightPinnedAcrossModes(
+      canvas,
+      ['input-nova-sm', 'input-vega-sm', 'input-maia-sm', 'input-sera-sm'],
+      30
+    );
+    await expectHeightPinnedAcrossModes(
+      canvas,
+      [
+        'input-nova-default',
+        'input-vega-default',
+        'input-maia-default',
+        'input-sera-default',
+      ],
+      34
+    );
+    await expectHeightPinnedAcrossModes(
+      canvas,
+      ['input-nova-lg', 'input-vega-lg', 'input-maia-lg', 'input-sera-lg'],
+      38
     );
   },
 };
@@ -421,7 +445,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: in vega mode, a default Input renders at exactly 38px (= `text-sm` 20px line-height + `py-control-md` 8px × 2 + border 1px × 2). If a designer retunes `--control-padding-y-md`, the body type ramp, or the border-width token, this test fails and the change must be acknowledged.',
+          'Pin on the Figma-aligned migration outcome: in vega mode, a default Input renders at exactly 34px (= `typography-body-default` 24px line-height + `py-1` 4px × 2 + border 1px × 2). If a designer retunes the body type ramp, numeric spacing scale, or border-width token, this test fails and the change must be acknowledged.',
       },
     },
   },
@@ -435,7 +459,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'input-vega-host', 38);
+    await expectHeightPinned(within(canvasElement), 'input-vega-host', 34);
   },
 };
 
