@@ -3,11 +3,14 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { Button, type ButtonProps } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
+type ButtonGroupSize = 'sm' | 'default' | 'lg';
+
 const buttonGroupVariants = cva(
-  "nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit nx:[&>input]:flex-1",
+  "nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit nx:[&>input]:flex-1 nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:h-8 nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:min-w-16 nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:px-2.5 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:h-10 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:min-w-20 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:px-3 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:h-11 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:min-w-24 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:px-3.5",
   {
     variants: {
       orientation: {
@@ -23,6 +26,24 @@ const buttonGroupVariants = cva(
   }
 );
 
+const buttonGroupTextVariants = cva(
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:typography-label-default nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+  {
+    variants: {
+      size: {
+        sm: 'nx:h-8 nx:px-2.5',
+        default: 'nx:h-10 nx:px-3',
+        lg: 'nx:h-11 nx:px-3.5',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  }
+);
+
+const ButtonGroupSizeContext = React.createContext<ButtonGroupSize>('default');
+
 /**
  * ButtonGroupProps
  *
@@ -31,7 +52,31 @@ const buttonGroupVariants = cva(
 interface ButtonGroupProps
   extends
     React.ComponentProps<'div'>,
-    VariantProps<typeof buttonGroupVariants> {}
+    VariantProps<typeof buttonGroupVariants> {
+  /**
+   * Size applied to ButtonGroupText and to direct Button children that do not
+   * set their own size.
+   * @default "default"
+   */
+  size?: ButtonGroupSize;
+}
+
+function isButtonElement(
+  child: React.ReactNode
+): child is React.ReactElement<ButtonProps> {
+  return React.isValidElement<ButtonProps>(child) && child.type === Button;
+}
+
+function applyButtonGroupSizeToChildren(
+  children: React.ReactNode,
+  size: ButtonGroupSize
+) {
+  return React.Children.map(children, (child) => {
+    if (!isButtonElement(child)) return child;
+    if (child.props.size !== undefined) return child;
+    return React.cloneElement(child, { size });
+  });
+}
 
 /**
  * ButtonGroup
@@ -53,16 +98,23 @@ interface ButtonGroupProps
 function ButtonGroup({
   className,
   orientation = 'horizontal',
+  size = 'default',
+  children,
   ...props
 }: ButtonGroupProps) {
   return (
-    <div
-      role="group"
-      data-slot="button-group"
-      data-orientation={orientation}
-      className={cn(buttonGroupVariants({ orientation }), className)}
-      {...props}
-    />
+    <ButtonGroupSizeContext.Provider value={size}>
+      <div
+        role="group"
+        data-slot="button-group"
+        data-orientation={orientation}
+        data-size={size}
+        className={cn(buttonGroupVariants({ orientation }), className)}
+        {...props}
+      >
+        {applyButtonGroupSizeToChildren(children, size)}
+      </div>
+    </ButtonGroupSizeContext.Provider>
   );
 }
 
@@ -77,6 +129,12 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
    * @default false
    */
   asChild?: boolean;
+
+  /**
+   * Addon size. Inherits from ButtonGroup when omitted.
+   * @default "default"
+   */
+  size?: ButtonGroupSize;
 }
 
 /**
@@ -88,17 +146,18 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
 function ButtonGroupText({
   className,
   asChild = false,
+  size,
   ...props
 }: ButtonGroupTextProps) {
   const Comp = asChild ? Slot : 'div';
+  const contextSize = React.useContext(ButtonGroupSizeContext);
+  const resolvedSize = size ?? contextSize;
 
   return (
     <Comp
       data-slot="button-group-text"
-      className={cn(
-        'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:px-4 nx:typography-label-default nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
-        className
-      )}
+      data-size={resolvedSize}
+      className={cn(buttonGroupTextVariants({ size: resolvedSize }), className)}
       {...props}
     />
   );
@@ -142,7 +201,9 @@ export {
   type ButtonGroupProps,
   ButtonGroupSeparator,
   type ButtonGroupSeparatorProps,
+  type ButtonGroupSize,
   ButtonGroupText,
   type ButtonGroupTextProps,
+  buttonGroupTextVariants,
   buttonGroupVariants,
 };

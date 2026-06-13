@@ -1,7 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
+import {
+  expectHeightPinned,
+  getControlHeight,
+} from '../../../stories/test-utils';
 import { Button } from '../button';
+import { Input } from '../input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../select';
 
 import {
   ButtonGroup,
@@ -17,6 +29,18 @@ const meta: Meta<typeof ButtonGroup> = {
 export default meta;
 type Story = StoryObj<typeof ButtonGroup>;
 
+const BUTTON_GROUP_SIZE_HEIGHTS = {
+  sm: 32,
+  default: 40,
+  lg: 44,
+} as const;
+
+const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
+  sm: ['nx:h-8', 'nx:px-2.5'],
+  default: ['nx:h-10', 'nx:px-3'],
+  lg: ['nx:h-11', 'nx:px-3.5'],
+} as const;
+
 // Three outline buttons joined into one horizontal cluster.
 export const Default: Story = {
   render: () => (
@@ -28,10 +52,30 @@ export const Default: Story = {
   ),
 };
 
+export const Small: Story = {
+  render: () => (
+    <ButtonGroup size="sm">
+      <ButtonGroupText>View:</ButtonGroupText>
+      <Button variant="outline">Day</Button>
+      <Button variant="outline">Week</Button>
+    </ButtonGroup>
+  ),
+};
+
+export const Large: Story = {
+  render: () => (
+    <ButtonGroup size="lg">
+      <ButtonGroupText>View:</ButtonGroupText>
+      <Button variant="outline">Day</Button>
+      <Button variant="outline">Week</Button>
+    </ButtonGroup>
+  ),
+};
+
 // Vertical orientation stacks the cluster.
 export const Vertical: Story = {
   render: () => (
-    <ButtonGroup orientation="vertical">
+    <ButtonGroup orientation="vertical" size="sm">
       <Button variant="outline">Top</Button>
       <Button variant="outline">Middle</Button>
       <Button variant="outline">Bottom</Button>
@@ -40,6 +84,12 @@ export const Vertical: Story = {
   play: async ({ canvasElement }) => {
     const group = canvasElement.querySelector('[data-slot="button-group"]');
     await expect(group).toHaveAttribute('data-orientation', 'vertical');
+    await expect(group).toHaveAttribute('data-size', 'sm');
+
+    const canvas = within(canvasElement);
+    for (const button of canvas.getAllByRole('button')) {
+      await expect(button).toHaveAttribute('data-size', 'sm');
+    }
   },
 };
 
@@ -93,6 +143,133 @@ export const WithDataAttributes: Story = {
     await expect(group).toBeInTheDocument();
     await expect(group).toHaveAttribute('role', 'group');
     await expect(group).toHaveAttribute('data-orientation', 'horizontal');
+    await expect(group).toHaveAttribute('data-size', 'default');
+  },
+};
+
+export const SizeAlignment: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Vega height sentinel for ButtonGroup size propagation. Text addons use `h-8` / `h-10` / `h-11` without Button min-widths, while direct Button children receive the matching semantic size.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10"
+    >
+      {Object.keys(BUTTON_GROUP_SIZE_HEIGHTS).map((size) => (
+        <ButtonGroup
+          key={size}
+          size={size as keyof typeof BUTTON_GROUP_SIZE_HEIGHTS}
+          aria-label={`${size} button group`}
+        >
+          <ButtonGroupText
+            data-testid={`button-group-text-${size}`}
+          >{`${size}:`}</ButtonGroupText>
+          <Button variant="outline" data-testid={`button-group-button-${size}`}>
+            Action
+          </Button>
+        </ButtonGroup>
+      ))}
+
+      <ButtonGroup size="lg" aria-label="explicit child size">
+        <ButtonGroupText data-testid="button-group-text-explicit">
+          Explicit:
+        </ButtonGroupText>
+        <Button
+          variant="outline"
+          size="sm"
+          data-testid="button-group-button-explicit-sm"
+        >
+          Small
+        </Button>
+      </ButtonGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    for (const [size, expectedHeight] of Object.entries(
+      BUTTON_GROUP_SIZE_HEIGHTS
+    )) {
+      const text = canvas.getByTestId(`button-group-text-${size}`);
+      const button = canvas.getByTestId(`button-group-button-${size}`);
+
+      await expect(text).toHaveAttribute('data-size', size);
+      await expect(button).toHaveAttribute('data-size', size);
+      for (const className of BUTTON_GROUP_TEXT_SIZE_CLASSES[
+        size as keyof typeof BUTTON_GROUP_TEXT_SIZE_CLASSES
+      ]) {
+        await expect(text).toHaveClass(className);
+      }
+
+      await expectHeightPinned(
+        canvas,
+        `button-group-text-${size}`,
+        expectedHeight,
+        {
+          selector: '[data-slot="button-group-text"]',
+        }
+      );
+      await expectHeightPinned(
+        canvas,
+        `button-group-button-${size}`,
+        expectedHeight
+      );
+      expect(
+        getControlHeight(
+          canvas,
+          `button-group-text-${size}`,
+          '[data-slot="button-group-text"]'
+        )
+      ).toBe(getControlHeight(canvas, `button-group-button-${size}`));
+    }
+
+    await expect(
+      canvas.getByTestId('button-group-button-explicit-sm')
+    ).toHaveAttribute('data-size', 'sm');
+    await expectHeightPinned(canvas, 'button-group-button-explicit-sm', 32);
+  },
+};
+
+export const MixedChildren: Story = {
+  render: () => (
+    <ButtonGroup size="lg" aria-label="mixed inline controls">
+      <ButtonGroupText>Account</ButtonGroupText>
+      <Input data-testid="button-group-input" aria-label="Account" />
+      <Select defaultValue="active">
+        <SelectTrigger
+          data-testid="button-group-select-trigger"
+          aria-label="Status"
+          className="nx:w-32"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="paused">Paused</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button variant="outline" data-testid="button-group-mixed-button">
+        Save
+      </Button>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId('button-group-input');
+    const selectTrigger = canvas.getByTestId('button-group-select-trigger');
+
+    await expect(input).not.toHaveAttribute('data-size');
+    await expect(selectTrigger).not.toHaveAttribute('data-size');
+    await expect(
+      canvas.getByTestId('button-group-mixed-button')
+    ).toHaveAttribute('data-size', 'lg');
   },
 };
 
@@ -134,7 +311,7 @@ export const AllVariants: Story = {
         <ButtonGroupSeparator />
         <Button variant="outline">Go</Button>
       </ButtonGroup>
-      <ButtonGroup orientation="vertical">
+      <ButtonGroup orientation="vertical" size="sm">
         <Button variant="outline">Top</Button>
         <Button variant="outline">Middle</Button>
         <Button variant="outline">Bottom</Button>
