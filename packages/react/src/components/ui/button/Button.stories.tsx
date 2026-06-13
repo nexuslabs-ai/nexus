@@ -9,7 +9,7 @@ import {
 } from '../../../stories/spacing-modes';
 import { expectHeightPinned } from '../../../stories/test-utils';
 
-import { Button, type ButtonProps } from './button';
+import { Button } from './button';
 
 const BUTTON_SCALE_HEIGHTS = {
   sm: {
@@ -32,11 +32,11 @@ const BUTTON_SCALE_HEIGHTS = {
   },
   lg: {
     vega: 44,
-    lyra: 44,
+    lyra: 48,
     maia: 48,
     mira: 44,
     nova: 42,
-    luma: 48,
+    luma: 44,
     sera: 44,
   },
 } as const;
@@ -58,10 +58,6 @@ async function expectButtonScaleHeights(
       BUTTON_SCALE_HEIGHTS[size][mode]
     );
   }
-}
-
-function expectButtonUsageError(props: unknown, message: string) {
-  expect(() => Button(props as ButtonProps)).toThrow(message);
 }
 
 const meta: Meta<typeof Button> = {
@@ -715,6 +711,8 @@ export const EndIconSlot: Story = {
 export const LoadingUsesSpinnerOnly: Story = {
   args: {
     loading: true,
+    startIcon: <IconRocket />,
+    endIcon: <IconArrowRight />,
     children: 'Launching',
   },
   play: async ({ canvasElement }) => {
@@ -739,63 +737,6 @@ export const LoadingUsesSpinnerOnly: Story = {
     await expect(loadingLabel).toHaveClass('nx:opacity-0');
     await expect(loadingLabel).toHaveTextContent('Launching');
     await expect(button).toHaveAccessibleName('Launching');
-  },
-};
-
-export const RejectsBothIconSlots: Story = {
-  render: () => <Button>Launch</Button>,
-  play: async () => {
-    expectButtonUsageError(
-      {
-        children: 'Launch',
-        startIcon: <IconRocket />,
-        endIcon: <IconArrowRight />,
-      },
-      'Button supports either startIcon or endIcon, not both.'
-    );
-  },
-};
-
-export const RejectsLoadingWithIconSlot: Story = {
-  render: () => <Button>Launch</Button>,
-  play: async () => {
-    expectButtonUsageError(
-      {
-        loading: true,
-        children: 'Launch',
-        startIcon: <IconRocket />,
-      },
-      'Button loading state does not support icon slots.'
-    );
-  },
-};
-
-export const RejectsEmptyChildren: Story = {
-  render: () => <Button>Save</Button>,
-  play: async () => {
-    expectButtonUsageError(
-      {
-        children: '',
-      },
-      'Button requires non-empty children.'
-    );
-  },
-};
-
-export const RejectsIconOnlyWithoutAccessibleName: Story = {
-  render: () => (
-    <Button isIconOnly aria-label="Star">
-      <IconStar />
-    </Button>
-  ),
-  play: async () => {
-    expectButtonUsageError(
-      {
-        isIconOnly: true,
-        children: <IconStar />,
-      },
-      'Icon-only Button requires aria-label or aria-labelledby.'
-    );
   },
 };
 

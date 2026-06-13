@@ -86,8 +86,8 @@ interface ButtonProps
 
   /**
    * Shows a loading indicator and disables the button.
-   * While loading, visible content is replaced by a spinner.
-   * Icon slots are not supported in the loading state.
+   * While loading, the spinner replaces all visible content and any icon
+   * slots are hidden.
    * @default false
    * @example
    * ```tsx
@@ -97,14 +97,16 @@ interface ButtonProps
   loading?: boolean;
 
   /**
-   * Decorative icon rendered before the button label. Mutually exclusive with
-   * `endIcon` and not supported while `loading`.
+   * Decorative icon rendered before the button label. Use either `startIcon`
+   * or `endIcon` — the Figma anatomy has a single icon slot. Hidden while
+   * `loading` (the spinner replaces all content).
    */
   startIcon?: React.ReactNode;
 
   /**
-   * Decorative icon rendered after the button label. Mutually exclusive with
-   * `startIcon` and not supported while `loading`.
+   * Decorative icon rendered after the button label. Use either `endIcon`
+   * or `startIcon` — the Figma anatomy has a single icon slot. Hidden while
+   * `loading` (the spinner replaces all content).
    */
   endIcon?: React.ReactNode;
 
@@ -120,73 +122,10 @@ interface ButtonProps
 type ButtonAsChildElementProps = {
   children?: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLElement>;
-  'aria-hidden'?: boolean | 'true' | 'false';
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
 };
 
 function hasIconSlot(icon: React.ReactNode) {
   return icon !== undefined && icon !== null && icon !== false;
-}
-
-function hasNonEmptyButtonContent(children: React.ReactNode): boolean {
-  return React.Children.toArray(children).some((child) => {
-    if (typeof child === 'string') return child.trim().length > 0;
-    if (typeof child === 'number') return true;
-    if (!React.isValidElement<ButtonAsChildElementProps>(child)) return false;
-    if (child.props['aria-hidden'] === 'true') return false;
-    return hasNonEmptyButtonContent(child.props.children);
-  });
-}
-
-function hasAccessibleNameProp(
-  ariaLabel?: string,
-  ariaLabelledby?: string
-): boolean {
-  return Boolean(ariaLabel?.trim() || ariaLabelledby?.trim());
-}
-
-function validateButtonUsage({
-  children,
-  endIcon,
-  isIconOnly = false,
-  loading = false,
-  size,
-  startIcon,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledby,
-}: ButtonProps) {
-  const semanticSize = size ?? 'default';
-  const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
-  const hasStartIcon = hasIconSlot(startIcon);
-  const hasEndIcon = hasIconSlot(endIcon);
-  const child = React.isValidElement<ButtonAsChildElementProps>(children)
-    ? children
-    : null;
-  const effectiveAriaLabel = ariaLabel ?? child?.props['aria-label'];
-  const effectiveAriaLabelledby =
-    ariaLabelledby ?? child?.props['aria-labelledby'];
-
-  if (hasStartIcon && hasEndIcon) {
-    throw new Error('Button supports either startIcon or endIcon, not both.');
-  }
-
-  if (loading && (hasStartIcon || hasEndIcon)) {
-    throw new Error('Button loading state does not support icon slots.');
-  }
-
-  if (iconOnly) {
-    if (!hasAccessibleNameProp(effectiveAriaLabel, effectiveAriaLabelledby)) {
-      throw new Error(
-        'Icon-only Button requires aria-label or aria-labelledby.'
-      );
-    }
-    return;
-  }
-
-  if (!hasNonEmptyButtonContent(children)) {
-    throw new Error('Button requires non-empty children.');
-  }
 }
 
 function buttonIconSlot(position: 'start' | 'end', icon: React.ReactNode) {
@@ -357,7 +296,6 @@ function SlotButton({
 }
 
 function Button({ asChild = false, type, ...props }: ButtonProps) {
-  validateButtonUsage(props);
   if (asChild) return <SlotButton {...props} />;
   return <NativeButton {...props} type={type} />;
 }
