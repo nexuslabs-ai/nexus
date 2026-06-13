@@ -230,6 +230,63 @@ export const DisabledInteraction: Story = {
   },
 };
 
+export const VisualStateTokens: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Token sentinel for the corrected Figma node 843:71944 visual-state pass. The primitive remains a native input, while hover and disabled visuals map to Nexus semantic state tokens.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-3 nx:w-[400px]">
+      <Input
+        data-testid="input-hover-token"
+        placeholder="Hover surface"
+        aria-label="Hover surface input"
+      />
+      <Input
+        data-testid="input-disabled-empty"
+        placeholder="Disabled placeholder"
+        disabled
+        aria-label="Disabled empty input"
+      />
+      <Input
+        data-testid="input-disabled-filled"
+        defaultValue="Disabled value"
+        disabled
+        aria-label="Disabled filled input"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const hoverInput = canvas.getByTestId('input-hover-token');
+    const disabledEmpty = canvas.getByTestId('input-disabled-empty');
+    const disabledFilled = canvas.getByTestId('input-disabled-filled');
+
+    await expect(hoverInput).toHaveClass('nx:enabled:hover:bg-container-hover');
+    await userEvent.hover(hoverInput);
+    await expect(hoverInput).toHaveClass('nx:enabled:hover:bg-container-hover');
+
+    await expect(disabledEmpty).toBeDisabled();
+    await expect(disabledFilled).toBeDisabled();
+    await expect(disabledEmpty).toHaveClass('nx:disabled:bg-disabled');
+    await expect(disabledEmpty).toHaveClass(
+      'nx:disabled:text-disabled-foreground'
+    );
+    await expect(disabledEmpty).toHaveClass(
+      'nx:disabled:placeholder:text-disabled-foreground'
+    );
+    await expect(disabledEmpty).toHaveClass(
+      'nx:disabled:border-border-disabled'
+    );
+    await expect(disabledFilled).not.toHaveClass('nx:disabled:opacity-50');
+    await expect(window.getComputedStyle(disabledFilled).opacity).toBe('1');
+  },
+};
+
 export const WithDataAttributes: Story = {
   args: {
     size: 'lg',
@@ -357,7 +414,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input now follows the Figma node 843:71944 sizing with numeric vertical padding (`py-1` / `py-1.5`) and `px-3`. The old `py-control-*` role utilities varied per mode; the new vertical spacing is mode-invariant, explicitly satisfying the #433 disclosure that numeric spacing may still vary only where the numeric token itself is mode-tuned.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. The corrected Figma node 843:71944 shows Input frame sizes at 28/32/36px; Nexus uses body-small text for sm/default and body-default text for lg while pinning browser-rendered heights to match the Button text scale at 28/32/36px. Numeric vertical padding (`py-[3px]` / `py-[5px]`) keeps heights mode-invariant and stable across hover, focus, filled, and typing states.',
       },
     },
   },
@@ -392,7 +449,7 @@ export const InputIsDensityStable: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the Figma-aligned numeric sizing. Input sizes use mode-invariant vertical padding, so sm/default/lg pin to 30/34/38px across representative spacing modes. Horizontal `px-3` may still vary cosmetically by mode, but it does not affect height.',
+          'Density-stability sentinel for the approved text scale. Figma node 843:71944 frames idle Input at 28/32/36px, and Nexus pins sm/default/lg to browser-rendered 28/32/36px across representative spacing modes so Input matches the Button text height scale. Sm/default use 14px body-small text; lg uses 16px body-default text. Horizontal `px-3` may still vary cosmetically by mode, but it does not affect height.',
       },
     },
   },
@@ -419,7 +476,7 @@ export const InputIsDensityStable: Story = {
     await expectHeightPinnedAcrossModes(
       canvas,
       ['input-nova-sm', 'input-vega-sm', 'input-maia-sm', 'input-sera-sm'],
-      30
+      28
     );
     await expectHeightPinnedAcrossModes(
       canvas,
@@ -429,12 +486,19 @@ export const InputIsDensityStable: Story = {
         'input-maia-default',
         'input-sera-default',
       ],
-      34
+      32
     );
     await expectHeightPinnedAcrossModes(
       canvas,
       ['input-nova-lg', 'input-vega-lg', 'input-maia-lg', 'input-sera-lg'],
-      38
+      36
+    );
+
+    await expect(canvas.getByLabelText('vega large input')).toHaveClass(
+      'nx:typography-body-default'
+    );
+    await expect(canvas.getByLabelText('vega large input')).toHaveClass(
+      'nx:py-[5px]'
     );
   },
 };
@@ -445,7 +509,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the Figma-aligned migration outcome: in vega mode, a default Input renders at exactly 34px (= `typography-body-default` 24px line-height + `py-1` 4px × 2 + border 1px × 2). If a designer retunes the body type ramp, numeric spacing scale, or border-width token, this test fails and the change must be acknowledged.',
+          'Pin on the approved default-size text outcome: in vega mode, a default Input renders at exactly 32px (= `typography-body-small` 20px line-height + `py-[5px]` 5px x 2 + border 1px x 2). This keeps the Input default height aligned with the Button text scale. If a designer retunes the body type ramp, numeric spacing scale, or border-width token, this test fails and the change must be acknowledged.',
       },
     },
   },
@@ -459,7 +523,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'input-vega-host', 34);
+    await expectHeightPinned(within(canvasElement), 'input-vega-host', 32);
   },
 };
 
