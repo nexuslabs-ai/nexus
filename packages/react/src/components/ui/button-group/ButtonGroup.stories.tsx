@@ -13,7 +13,6 @@ import {
   getControlHeight,
 } from '../../../stories/test-utils';
 import { Button } from '../button';
-import { Input } from '../input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -263,9 +262,10 @@ export const SizeAlignment: Story = {
 
 export const MixedChildren: Story = {
   render: () => (
-    <ButtonGroup size="lg" aria-label="mixed inline controls">
-      <ButtonGroupText>Account</ButtonGroupText>
-      <Input data-testid="button-group-input" aria-label="Account" />
+    <ButtonGroup size="lg" aria-label="mixed button-shaped controls">
+      <ButtonGroupText data-testid="button-group-mixed-text">
+        Status
+      </ButtonGroupText>
       <Select defaultValue="active">
         <SelectTrigger
           data-testid="button-group-select-trigger"
@@ -286,10 +286,10 @@ export const MixedChildren: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByTestId('button-group-input');
+    const text = canvas.getByTestId('button-group-mixed-text');
     const selectTrigger = canvas.getByTestId('button-group-select-trigger');
 
-    await expect(input).not.toHaveAttribute('data-size');
+    await expect(text).toHaveAttribute('data-size', 'lg');
     await expect(selectTrigger).not.toHaveAttribute('data-size');
     await expect(
       canvas.getByTestId('button-group-mixed-button')
