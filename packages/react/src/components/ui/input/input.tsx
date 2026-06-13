@@ -17,9 +17,9 @@ const inputVariants = cva(
   {
     variants: {
       size: {
-        default: 'nx:px-3 nx:py-[5px] nx:typography-body-small',
-        sm: 'nx:px-3 nx:py-[3px] nx:typography-body-small',
-        lg: 'nx:px-3 nx:py-[5px] nx:typography-body-default',
+        default: 'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-small',
+        sm: 'nx:h-8 nx:px-2.5 nx:py-0 nx:typography-body-small',
+        lg: 'nx:h-11 nx:px-3.5 nx:py-0 nx:typography-body-default',
       },
     },
     defaultVariants: {
