@@ -6,10 +6,7 @@ import {
   AllModesRow,
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
-import {
-  expectHeightPinned,
-  expectHeightPinnedAcrossModes,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/test-utils';
 
 import { Input } from './input';
 
@@ -55,6 +52,55 @@ const meta: Meta<typeof Input> = {
 
 export default meta;
 type Story = StoryObj<typeof Input>;
+
+const INPUT_SCALE_HEIGHTS = {
+  sm: {
+    vega: 32,
+    lyra: 32,
+    maia: 36,
+    mira: 32,
+    nova: 30,
+    luma: 32,
+    sera: 32,
+  },
+  default: {
+    vega: 40,
+    lyra: 42,
+    maia: 44,
+    mira: 40,
+    nova: 38,
+    luma: 40,
+    sera: 40,
+  },
+  lg: {
+    vega: 44,
+    lyra: 48,
+    maia: 48,
+    mira: 44,
+    nova: 42,
+    luma: 44,
+    sera: 44,
+  },
+} as const;
+
+async function expectInputScaleHeights(
+  canvasElement: HTMLElement,
+  size: keyof typeof INPUT_SCALE_HEIGHTS,
+  testIdPrefix: string
+) {
+  await document.fonts.ready;
+  const canvas = within(canvasElement);
+
+  for (const mode of SPACING_MODES) {
+    const actual = Math.round(
+      canvas.getByTestId(`${testIdPrefix}-${mode}`).getBoundingClientRect()
+        .height
+    );
+    expect(actual, `[data-testid="${testIdPrefix}-${mode}"] height`).toBe(
+      INPUT_SCALE_HEIGHTS[size][mode]
+    );
+  }
+}
 
 // ============================================
 // BASIC STORIES
@@ -414,7 +460,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. The corrected Figma node 843:71944 shows Input frame sizes at 28/32/36px; Nexus uses body-small text for sm/default and body-default text for lg while pinning browser-rendered heights to match the Button text scale at 28/32/36px. Numeric vertical padding (`py-[3px]` / `py-[5px]`) keeps heights mode-invariant and stable across hover, focus, filled, and typing states.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input follows the approved Button fixed-height utility scale (`h-8` / `h-10` / `h-11`) without copying Button min-widths. Sm/default use body-small text; lg uses body-default text.',
       },
     },
   },
@@ -443,63 +489,61 @@ export const AllModes: Story = {
   ),
 };
 
-export const InputIsDensityStable: Story = {
+export const InputScaleHeightsFollowModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the approved text scale. Figma node 843:71944 frames idle Input at 28/32/36px, and Nexus pins sm/default/lg to browser-rendered 28/32/36px across representative spacing modes so Input matches the Button text height scale. Sm/default use 14px body-small text; lg uses 16px body-default text. Horizontal `px-3` may still vary cosmetically by mode, but it does not affect height.',
+          'Scale-utility sentinel for the Input sizing model. Text Input sizes use `h-8` / `h-10` / `h-11` and therefore follow the active Nexus spacing mode, matching Button height behavior while keeping Input width layout-controlled.',
       },
     },
   },
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
-      {(['nova', 'vega', 'maia', 'sera'] as const).map((mode) => (
+      {SPACING_MODES.map((mode) => (
         <div key={mode} data-style={mode} className="nx:flex nx:gap-4">
-          <div data-testid={`input-${mode}-sm`}>
-            <Input size="sm" aria-label={`${mode} small input`} />
-          </div>
-          <div data-testid={`input-${mode}-default`}>
-            <Input aria-label={`${mode} default input`} />
-          </div>
-          <div data-testid={`input-${mode}-lg`}>
-            <Input size="lg" aria-label={`${mode} large input`} />
-          </div>
+          <Input
+            size="sm"
+            aria-label={`${mode} small input`}
+            data-testid={`input-sm-${mode}`}
+          />
+          <Input
+            aria-label={`${mode} default input`}
+            data-testid={`input-default-${mode}`}
+          />
+          <Input
+            size="lg"
+            aria-label={`${mode} large input`}
+            data-testid={`input-lg-${mode}`}
+          />
         </div>
       ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const defaultInput = canvas.getByLabelText('vega default input');
+    const smallInput = canvas.getByLabelText('vega small input');
+    const largeInput = canvas.getByLabelText('vega large input');
 
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      ['input-nova-sm', 'input-vega-sm', 'input-maia-sm', 'input-sera-sm'],
-      28
-    );
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      [
-        'input-nova-default',
-        'input-vega-default',
-        'input-maia-default',
-        'input-sera-default',
-      ],
-      32
-    );
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      ['input-nova-lg', 'input-vega-lg', 'input-maia-lg', 'input-sera-lg'],
-      36
-    );
+    await expect(defaultInput).toHaveAttribute('data-size', 'default');
+    await expect(defaultInput).toHaveClass('nx:h-10');
+    await expect(defaultInput).toHaveClass('nx:px-3');
+    await expect(defaultInput).toHaveClass('nx:py-0');
+    await expect(defaultInput).toHaveClass('nx:typography-body-small');
+    await expect(smallInput).toHaveClass('nx:h-8');
+    await expect(smallInput).toHaveClass('nx:px-2.5');
+    await expect(smallInput).toHaveClass('nx:py-0');
+    await expect(smallInput).toHaveClass('nx:typography-body-small');
+    await expect(largeInput).toHaveClass('nx:h-11');
+    await expect(largeInput).toHaveClass('nx:px-3.5');
+    await expect(largeInput).toHaveClass('nx:py-0');
+    await expect(largeInput).toHaveClass('nx:typography-body-default');
 
-    await expect(canvas.getByLabelText('vega large input')).toHaveClass(
-      'nx:typography-body-default'
-    );
-    await expect(canvas.getByLabelText('vega large input')).toHaveClass(
-      'nx:py-[5px]'
-    );
+    await expectInputScaleHeights(canvasElement, 'default', 'input-default');
+    await expectInputScaleHeights(canvasElement, 'sm', 'input-sm');
+    await expectInputScaleHeights(canvasElement, 'lg', 'input-lg');
   },
 };
 
@@ -509,7 +553,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the approved default-size text outcome: in vega mode, a default Input renders at exactly 32px (= `typography-body-small` 20px line-height + `py-[5px]` 5px x 2 + border 1px x 2). This keeps the Input default height aligned with the Button text scale. If a designer retunes the body type ramp, numeric spacing scale, or border-width token, this test fails and the change must be acknowledged.',
+          'Pin on the fixed-height outcome: in vega mode, a default Input renders at exactly 40px via `h-10`.',
       },
     },
   },
@@ -523,7 +567,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'input-vega-host', 32);
+    await expectHeightPinned(within(canvasElement), 'input-vega-host', 40);
   },
 };
 
