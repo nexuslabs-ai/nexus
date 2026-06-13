@@ -83,6 +83,7 @@
     },
     { "name": "InputGroup", "showcase": "AllVariants" },
     { "name": "Item", "showcase": "AllVariants" },
+    { "name": "Label", "showcase": "AllVariants" },
     { "name": "Kbd", "showcase": "AllVariants" },
     {
       "name": "Menubar",

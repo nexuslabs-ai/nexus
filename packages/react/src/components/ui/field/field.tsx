@@ -170,7 +170,7 @@ function FieldLabel({
     <Label
       data-slot="field-label"
       className={cn(
-        'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:leading-snug nx:group-data-[disabled=true]/field:opacity-50',
+        'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:group-data-[disabled=true]/field:opacity-50',
         'nx:has-[>[data-slot=field]]:w-full nx:has-[>[data-slot=field]]:flex-col nx:has-[>[data-slot=field]]:rounded-md nx:has-[>[data-slot=field]]:border nx:*:data-[slot=field]:p-4',
         'nx:has-data-[state=checked]:border-border-primary nx:has-data-[state=checked]:bg-primary-subtle',
         className
