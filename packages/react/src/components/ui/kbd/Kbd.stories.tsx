@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { IconSearch } from '@tabler/icons-react';
+import { expect } from 'storybook/test';
 
 import { Kbd, KbdGroup } from './kbd';
 
@@ -39,6 +40,26 @@ export const SingleKeys: Story = {
   ),
 };
 
+// Existing child composition supports chords that use a literal separator.
+export const SeparatedChord: Story = {
+  render: () => (
+    <KbdGroup className="nx:gap-2">
+      <Kbd>⌘</Kbd>
+      <span className="nx:text-muted-foreground">+</span>
+      <Kbd>K</Kbd>
+    </KbdGroup>
+  ),
+};
+
+// SVG children inherit the keycap icon sizing hook.
+export const WithIcon: Story = {
+  render: () => (
+    <Kbd>
+      <IconSearch aria-hidden />K
+    </Kbd>
+  ),
+};
+
 // Both structural parts carry a data-slot hook for styling and inspection.
 export const WithDataAttributes: Story = {
   render: () => (
@@ -48,14 +69,29 @@ export const WithDataAttributes: Story = {
     </KbdGroup>
   ),
   play: async ({ canvasElement }) => {
-    const group = canvasElement.querySelector('[data-slot="kbd-group"]');
+    const group = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="kbd-group"]'
+    );
     await expect(group).toBeInTheDocument();
+    await expect(group?.tagName).toBe('KBD');
+    await expect(group).not.toHaveAttribute('role');
+    await expect(group).not.toHaveAttribute('tabindex');
 
-    const keys = within(canvasElement).getAllByText(/⌘|K/);
-    await expect(keys.length).toBeGreaterThan(0);
-    await expect(
-      canvasElement.querySelector('[data-slot="kbd"]')
-    ).toBeInTheDocument();
+    const keycaps = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>('[data-slot="kbd"]')
+    );
+    await expect(keycaps).toHaveLength(2);
+
+    const [commandKey, letterKey] = keycaps;
+    await expect(commandKey?.tagName).toBe('KBD');
+    await expect(commandKey?.textContent).toBe('⌘');
+    await expect(commandKey).not.toHaveAttribute('role');
+    await expect(commandKey).not.toHaveAttribute('tabindex');
+
+    await expect(letterKey?.tagName).toBe('KBD');
+    await expect(letterKey?.textContent).toBe('K');
+    await expect(letterKey).not.toHaveAttribute('role');
+    await expect(letterKey).not.toHaveAttribute('tabindex');
   },
 };
 
