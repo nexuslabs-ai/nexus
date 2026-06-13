@@ -7,16 +7,74 @@ import {
   AllModesRow,
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
-import {
-  expectHeightPinned,
-  expectHeightPinnedAcrossModes,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/test-utils';
 
-import { Button } from './button';
+import { Button, type ButtonProps } from './button';
+
+const BUTTON_SCALE_HEIGHTS = {
+  sm: {
+    vega: 32,
+    lyra: 32,
+    maia: 36,
+    mira: 32,
+    nova: 30,
+    luma: 32,
+    sera: 32,
+  },
+  default: {
+    vega: 40,
+    lyra: 42,
+    maia: 44,
+    mira: 40,
+    nova: 38,
+    luma: 40,
+    sera: 40,
+  },
+  lg: {
+    vega: 44,
+    lyra: 44,
+    maia: 48,
+    mira: 44,
+    nova: 42,
+    luma: 48,
+    sera: 44,
+  },
+} as const;
+
+async function expectButtonScaleHeights(
+  canvasElement: HTMLElement,
+  size: keyof typeof BUTTON_SCALE_HEIGHTS,
+  testIdPrefix: string
+) {
+  await document.fonts.ready;
+  const canvas = within(canvasElement);
+
+  for (const mode of SPACING_MODES) {
+    const actual = Math.round(
+      canvas.getByTestId(`${testIdPrefix}-${mode}`).getBoundingClientRect()
+        .height
+    );
+    expect(actual, `[data-testid="${testIdPrefix}-${mode}"] height`).toBe(
+      BUTTON_SCALE_HEIGHTS[size][mode]
+    );
+  }
+}
+
+function expectButtonUsageError(props: unknown, message: string) {
+  expect(() => Button(props as ButtonProps)).toThrow(message);
+}
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
   component: Button,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Use Button for concise visible action labels. Use exactly one decorative icon slot when needed; loading buttons render spinner-only visually and do not support icon slots. Icon-only buttons must provide an accessible name with `aria-label` or `aria-labelledby`.',
+      },
+    },
+  },
   args: {
     onClick: fn(), // Spy function for testing
   },
@@ -174,10 +232,10 @@ export const IconSize: Story = {
     const button = canvas.getByRole('button', { name: 'Star' });
 
     await expect(button).toHaveClass('nx:relative');
-    await expect(button).toHaveClass('nx:size-[38px]');
+    await expect(button).toHaveClass('nx:size-10');
     await expect(button).toHaveClass('nx:p-0');
     await expect(button).toHaveClass('nx:pointer-coarse:after:absolute');
-    await expect(button).toHaveClass('nx:pointer-coarse:after:-inset-[3px]');
+    await expect(button).toHaveClass('nx:pointer-coarse:after:-inset-0.5');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -192,7 +250,7 @@ export const IconSmallSize: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Small star' });
 
-    await expect(button).toHaveClass('nx:size-[32px]');
+    await expect(button).toHaveClass('nx:size-8');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -207,7 +265,7 @@ export const IconLargeSize: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Large star' });
 
-    await expect(button).toHaveClass('nx:size-[44px]');
+    await expect(button).toHaveClass('nx:size-11');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -231,13 +289,13 @@ export const IconOnlySizes: Story = {
 
     await expect(
       canvas.getByRole('button', { name: 'Small icon' })
-    ).toHaveClass('nx:size-[32px]');
+    ).toHaveClass('nx:size-8');
     await expect(
       canvas.getByRole('button', { name: 'Default icon' })
-    ).toHaveClass('nx:size-[38px]');
+    ).toHaveClass('nx:size-10');
     await expect(
       canvas.getByRole('button', { name: 'Large icon' })
-    ).toHaveClass('nx:size-[44px]');
+    ).toHaveClass('nx:size-11');
   },
 };
 
@@ -271,16 +329,55 @@ export const Loading: Story = {
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const button = canvas.getByRole('button');
+    const button = canvas.getByRole('button', { name: 'Submitting' });
+    const loadingLabel = button.querySelector(
+      '[data-slot="button-loading-label"]'
+    );
 
     // Loading button should be disabled
     await expect(button).toBeDisabled();
     await expect(button).toHaveAttribute('aria-busy', 'true');
     await expect(button).toHaveAttribute('aria-disabled', 'true');
     await expect(button).toHaveAttribute('data-loading', 'true');
+    await expect(
+      button.querySelector('[data-slot="spinner"]')
+    ).toBeInTheDocument();
+    await expect(loadingLabel).toBeInTheDocument();
+    await expect(loadingLabel).toHaveClass('nx:opacity-0');
+    await expect(loadingLabel).toHaveTextContent('Submitting');
+    await expect(button).toHaveAccessibleName('Submitting');
 
     // Click should not trigger onClick
     await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+export const LoadingPreservesDefaultWidth: Story = {
+  render: () => (
+    <div className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background">
+      <Button data-testid="button-ready">Save changes</Button>
+      <Button loading data-testid="button-loading">
+        Save changes
+      </Button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const readyButton = canvas.getByTestId('button-ready');
+    const loadingButton = canvas.getByTestId('button-loading');
+    const loadingContent = loadingButton.querySelector(
+      '[data-slot="button-loading-content"]'
+    );
+    const loadingLabel = loadingButton.querySelector(
+      '[data-slot="button-loading-label"]'
+    );
+
+    expect(Math.round(loadingButton.getBoundingClientRect().width)).toBe(
+      Math.round(readyButton.getBoundingClientRect().width)
+    );
+    await expect(loadingContent).toBeInTheDocument();
+    await expect(loadingLabel).toHaveClass('nx:opacity-0');
+    await expect(loadingButton).toHaveAccessibleName('Save changes');
   },
 };
 
@@ -549,7 +646,10 @@ export const LoadingAsLink: Story = {
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const link = canvas.getByRole('link');
+    const link = canvas.getByRole('link', { name: 'Loading link' });
+    const loadingLabel = link.querySelector(
+      '[data-slot="button-loading-label"]'
+    );
 
     await expect(link).not.toHaveAttribute('disabled');
     await expect(link).not.toHaveAttribute('type');
@@ -557,7 +657,13 @@ export const LoadingAsLink: Story = {
     await expect(link).toHaveAttribute('aria-disabled', 'true');
     await expect(link).toHaveAttribute('data-loading', 'true');
     await expect(link).toHaveAttribute('tabindex', '-1');
-    await expect(link.querySelector('svg')).toBeInTheDocument();
+    await expect(
+      link.querySelector('[data-slot="spinner"]')
+    ).toBeInTheDocument();
+    await expect(loadingLabel).toBeInTheDocument();
+    await expect(loadingLabel).toHaveClass('nx:opacity-0');
+    await expect(loadingLabel).toHaveTextContent('Loading link');
+    await expect(link).toHaveAccessibleName('Loading link');
 
     const clickResult = link.dispatchEvent(
       new MouseEvent('click', { bubbles: true, cancelable: true })
@@ -569,23 +675,8 @@ export const LoadingAsLink: Story = {
 };
 
 // ============================================
-// EDGE CASES
+// AUTHORING CONTRACTS
 // ============================================
-
-export const WithIcon: Story = {
-  render: (args) => (
-    <Button {...args}>
-      <IconRocket data-testid="icon" />
-      Launch
-    </Button>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByTestId('icon')).toBeInTheDocument();
-    await expect(canvas.getByRole('button')).toHaveTextContent('Launch');
-  },
-};
 
 export const StartIconSlot: Story = {
   args: {
@@ -624,13 +715,14 @@ export const EndIconSlot: Story = {
 export const LoadingUsesSpinnerOnly: Story = {
   args: {
     loading: true,
-    startIcon: <IconRocket />,
-    endIcon: <IconArrowRight />,
     children: 'Launching',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Launching' });
+    const loadingLabel = button.querySelector(
+      '[data-slot="button-loading-label"]'
+    );
 
     await expect(button).toBeDisabled();
     await expect(button).toHaveAttribute('aria-busy', 'true');
@@ -643,6 +735,67 @@ export const LoadingUsesSpinnerOnly: Story = {
     await expect(
       button.querySelector('[data-slot="spinner"]')
     ).toBeInTheDocument();
+    await expect(loadingLabel).toBeInTheDocument();
+    await expect(loadingLabel).toHaveClass('nx:opacity-0');
+    await expect(loadingLabel).toHaveTextContent('Launching');
+    await expect(button).toHaveAccessibleName('Launching');
+  },
+};
+
+export const RejectsBothIconSlots: Story = {
+  render: () => <Button>Launch</Button>,
+  play: async () => {
+    expectButtonUsageError(
+      {
+        children: 'Launch',
+        startIcon: <IconRocket />,
+        endIcon: <IconArrowRight />,
+      },
+      'Button supports either startIcon or endIcon, not both.'
+    );
+  },
+};
+
+export const RejectsLoadingWithIconSlot: Story = {
+  render: () => <Button>Launch</Button>,
+  play: async () => {
+    expectButtonUsageError(
+      {
+        loading: true,
+        children: 'Launch',
+        startIcon: <IconRocket />,
+      },
+      'Button loading state does not support icon slots.'
+    );
+  },
+};
+
+export const RejectsEmptyChildren: Story = {
+  render: () => <Button>Save</Button>,
+  play: async () => {
+    expectButtonUsageError(
+      {
+        children: '',
+      },
+      'Button requires non-empty children.'
+    );
+  },
+};
+
+export const RejectsIconOnlyWithoutAccessibleName: Story = {
+  render: () => (
+    <Button isIconOnly aria-label="Star">
+      <IconStar />
+    </Button>
+  ),
+  play: async () => {
+    expectButtonUsageError(
+      {
+        isIconOnly: true,
+        children: <IconStar />,
+      },
+      'Icon-only Button requires aria-label or aria-labelledby.'
+    );
   },
 };
 
@@ -789,7 +942,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button uses fixed outer heights while inline padding stays on the Nexus spacing scale.',
+          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button sizes use Nexus scale utilities (`h-8`/`h-10`/`h-11`) so they follow the active spacing mode.',
       },
     },
   },
@@ -806,13 +959,13 @@ export const AllModes: Story = {
   ),
 };
 
-export const LargeHeightPinnedAcrossModes: Story = {
+export const LargeScaleHeightAcrossModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the large Button size after moving to fixed outer heights.',
+          'Scale-utility sentinel for the large Button size. The class is `h-11`, so the rendered height follows the active Nexus spacing mode.',
       },
     },
   },
@@ -828,21 +981,17 @@ export const LargeHeightPinnedAcrossModes: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinnedAcrossModes(
-      within(canvasElement),
-      SPACING_MODES.map((mode) => `button-lg-${mode}`),
-      44
-    );
+    await expectButtonScaleHeights(canvasElement, 'lg', 'button-lg');
   },
 };
 
-export const IconHeightsArePinnedAcrossModes: Story = {
+export const IconScaleHeightsAcrossModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Icon-only Button visuals follow the fixed Button sizing model at 32px, 38px, and 44px; coarse-pointer hit-area overlays preserve the Nexus touch floor for smaller boxes.',
+          'Icon-only Button visuals follow the text Button size classes (`size-8`/`size-10`/`size-11`). Coarse-pointer hit-area overlays preserve the Nexus touch floor for smaller boxes.',
       },
     },
   },
@@ -882,23 +1031,13 @@ export const IconHeightsArePinnedAcrossModes: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      SPACING_MODES.map((mode) => `button-icon-sm-${mode}`),
-      32
+    await expectButtonScaleHeights(canvasElement, 'sm', 'button-icon-sm');
+    await expectButtonScaleHeights(
+      canvasElement,
+      'default',
+      'button-icon-default'
     );
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      SPACING_MODES.map((mode) => `button-icon-default-${mode}`),
-      38
-    );
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      SPACING_MODES.map((mode) => `button-icon-lg-${mode}`),
-      44
-    );
+    await expectButtonScaleHeights(canvasElement, 'lg', 'button-icon-lg');
   },
 };
 
@@ -976,21 +1115,21 @@ export const BorderedVariantsKeepFixedHeight: Story = {
     const canvas = within(canvasElement);
 
     await expectHeightPinned(canvas, 'outline-sm', 32);
-    await expectHeightPinned(canvas, 'outline-default', 38);
+    await expectHeightPinned(canvas, 'outline-default', 40);
     await expectHeightPinned(canvas, 'outline-lg', 44);
     await expectHeightPinned(canvas, 'dashed-sm', 32);
-    await expectHeightPinned(canvas, 'dashed-default', 38);
+    await expectHeightPinned(canvas, 'dashed-default', 40);
     await expectHeightPinned(canvas, 'dashed-lg', 44);
   },
 };
 
-export const TextHeightsArePinnedAcrossModes: Story = {
+export const TextScaleHeightsAcrossModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the fixed-height Button model. Sm, default, and lg should stay 32px, 38px, and 44px across spacing modes while inline padding uses Nexus scale utilities.',
+          'Scale-utility sentinel for the Button sizing model. Text Button sizes use `h-8`/`h-10`/`h-11` and therefore follow the active Nexus spacing mode. Inline padding uses Nexus scale utilities.',
       },
     },
   },
@@ -1020,34 +1159,22 @@ export const TextHeightsArePinnedAcrossModes: Story = {
     const largeButton = canvas.getByTestId('button-lg-vega');
 
     await expect(defaultButton).toHaveClass('nx:typography-label-default');
-    await expect(defaultButton).toHaveClass('nx:h-[38px]');
-    await expect(defaultButton).toHaveClass('nx:min-w-[80px]');
+    await expect(defaultButton).toHaveClass('nx:h-10');
+    await expect(defaultButton).toHaveClass('nx:min-w-20');
     await expect(defaultButton).toHaveClass('nx:px-3');
     await expect(defaultButton).toHaveClass('nx:gap-1');
     await expect(smallButton).toHaveClass('nx:typography-label-small');
-    await expect(smallButton).toHaveClass('nx:h-[32px]');
-    await expect(smallButton).toHaveClass('nx:min-w-[64px]');
+    await expect(smallButton).toHaveClass('nx:h-8');
+    await expect(smallButton).toHaveClass('nx:min-w-16');
     await expect(smallButton).toHaveClass('nx:px-2.5');
     await expect(smallButton).toHaveClass('nx:gap-1');
-    await expect(largeButton).toHaveClass('nx:h-[44px]');
-    await expect(largeButton).toHaveClass('nx:min-w-[96px]');
+    await expect(largeButton).toHaveClass('nx:h-11');
+    await expect(largeButton).toHaveClass('nx:min-w-24');
     await expect(largeButton).toHaveClass('nx:px-3.5');
 
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      SPACING_MODES.map((mode) => `button-default-${mode}`),
-      38
-    );
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      SPACING_MODES.map((mode) => `button-sm-${mode}`),
-      32
-    );
-    await expectHeightPinnedAcrossModes(
-      canvas,
-      SPACING_MODES.map((mode) => `button-lg-${mode}`),
-      44
-    );
+    await expectButtonScaleHeights(canvasElement, 'default', 'button-default');
+    await expectButtonScaleHeights(canvasElement, 'sm', 'button-sm');
+    await expectButtonScaleHeights(canvasElement, 'lg', 'button-lg');
   },
 };
 
@@ -1057,7 +1184,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the fixed-height outcome: in vega mode, a default Button renders at exactly 38px, matching the default Input and SelectTrigger outer height.',
+          'Pin on the fixed-height outcome: in vega mode, a default Button renders at exactly 40px via `h-10`.',
       },
     },
   },
@@ -1071,7 +1198,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'button-vega-host', 38);
+    await expectHeightPinned(within(canvasElement), 'button-vega-host', 40);
   },
 };
 

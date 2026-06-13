@@ -28,14 +28,14 @@ const buttonVariants = cva(
         link: 'nx:border-0 nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
       },
       size: {
-        sm: 'nx:h-[32px] nx:min-w-[64px] nx:px-2.5 nx:gap-1 nx:typography-label-small',
+        sm: 'nx:h-8 nx:min-w-16 nx:px-2.5 nx:gap-1 nx:typography-label-small',
         default:
-          'nx:h-[38px] nx:min-w-[80px] nx:px-3 nx:gap-1 nx:typography-label-default',
-        lg: 'nx:h-[44px] nx:min-w-[96px] nx:px-3.5 nx:gap-1 nx:typography-label-default',
+          'nx:h-10 nx:min-w-20 nx:px-3 nx:gap-1 nx:typography-label-default',
+        lg: 'nx:h-11 nx:min-w-24 nx:px-3.5 nx:gap-1 nx:typography-label-default',
         'icon-sm':
-          'nx:relative nx:size-[32px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[6px]',
-        icon: 'nx:relative nx:size-[38px] nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-[3px]',
-        'icon-lg': 'nx:relative nx:size-[44px] nx:gap-0 nx:p-0',
+          'nx:relative nx:size-8 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-1.5',
+        icon: 'nx:relative nx:size-10 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-0.5',
+        'icon-lg': 'nx:relative nx:size-11 nx:gap-0 nx:p-0',
       },
     },
     compoundVariants: [
@@ -86,7 +86,8 @@ interface ButtonProps
 
   /**
    * Shows a loading indicator and disables the button.
-   * While loading, icon slots are hidden and a spinner is shown.
+   * While loading, visible content is replaced by a spinner.
+   * Icon slots are not supported in the loading state.
    * @default false
    * @example
    * ```tsx
@@ -96,18 +97,21 @@ interface ButtonProps
   loading?: boolean;
 
   /**
-   * Decorative icon rendered before the button label. Hidden while loading.
+   * Decorative icon rendered before the button label. Mutually exclusive with
+   * `endIcon` and not supported while `loading`.
    */
   startIcon?: React.ReactNode;
 
   /**
-   * Decorative icon rendered after the button label. Hidden while loading.
+   * Decorative icon rendered after the button label. Mutually exclusive with
+   * `startIcon` and not supported while `loading`.
    */
   endIcon?: React.ReactNode;
 
   /**
    * Uses the fixed icon-only sizing model while preserving the same Button
-   * semantics. `sm`, `default`, and `lg` map to 32px, 38px, and 44px visuals.
+   * semantics. `sm`, `default`, and `lg` map to the 8/10/11 spacing scale.
+   * Icon-only buttons require `aria-label` or `aria-labelledby`.
    * @default false
    */
   isIconOnly?: boolean;
@@ -116,10 +120,73 @@ interface ButtonProps
 type ButtonAsChildElementProps = {
   children?: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLElement>;
+  'aria-hidden'?: boolean | 'true' | 'false';
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
 };
 
 function hasIconSlot(icon: React.ReactNode) {
   return icon !== undefined && icon !== null && icon !== false;
+}
+
+function hasNonEmptyButtonContent(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (typeof child === 'string') return child.trim().length > 0;
+    if (typeof child === 'number') return true;
+    if (!React.isValidElement<ButtonAsChildElementProps>(child)) return false;
+    if (child.props['aria-hidden'] === 'true') return false;
+    return hasNonEmptyButtonContent(child.props.children);
+  });
+}
+
+function hasAccessibleNameProp(
+  ariaLabel?: string,
+  ariaLabelledby?: string
+): boolean {
+  return Boolean(ariaLabel?.trim() || ariaLabelledby?.trim());
+}
+
+function validateButtonUsage({
+  children,
+  endIcon,
+  isIconOnly = false,
+  loading = false,
+  size,
+  startIcon,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledby,
+}: ButtonProps) {
+  const semanticSize = size ?? 'default';
+  const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
+  const hasStartIcon = hasIconSlot(startIcon);
+  const hasEndIcon = hasIconSlot(endIcon);
+  const child = React.isValidElement<ButtonAsChildElementProps>(children)
+    ? children
+    : null;
+  const effectiveAriaLabel = ariaLabel ?? child?.props['aria-label'];
+  const effectiveAriaLabelledby =
+    ariaLabelledby ?? child?.props['aria-labelledby'];
+
+  if (hasStartIcon && hasEndIcon) {
+    throw new Error('Button supports either startIcon or endIcon, not both.');
+  }
+
+  if (loading && (hasStartIcon || hasEndIcon)) {
+    throw new Error('Button loading state does not support icon slots.');
+  }
+
+  if (iconOnly) {
+    if (!hasAccessibleNameProp(effectiveAriaLabel, effectiveAriaLabelledby)) {
+      throw new Error(
+        'Icon-only Button requires aria-label or aria-labelledby.'
+      );
+    }
+    return;
+  }
+
+  if (!hasNonEmptyButtonContent(children)) {
+    throw new Error('Button requires non-empty children.');
+  }
 }
 
 function buttonIconSlot(position: 'start' | 'end', icon: React.ReactNode) {
@@ -135,7 +202,24 @@ function buttonIconSlot(position: 'start' | 'end', icon: React.ReactNode) {
   );
 }
 
-/** Icon slots, label content, plus a trailing spinner while loading. */
+function buttonLoadingContent(children: React.ReactNode) {
+  return (
+    <span
+      data-slot="button-loading-content"
+      className="nx:relative nx:inline-flex nx:items-center nx:justify-center"
+    >
+      <span data-slot="button-loading-label" className="nx:opacity-0">
+        {children}
+      </span>
+      <Spinner
+        aria-hidden="true"
+        className="nx:absolute nx:left-1/2 nx:top-1/2 nx:-translate-x-1/2 nx:-translate-y-1/2"
+      />
+    </span>
+  );
+}
+
+/** Icon slots and label content; loading renders spinner-only visually. */
 function buttonContent({
   children,
   endIcon,
@@ -147,12 +231,13 @@ function buttonContent({
   loading: boolean;
   startIcon?: React.ReactNode;
 }) {
+  if (loading) return buttonLoadingContent(children);
+
   return (
     <>
-      {!loading && buttonIconSlot('start', startIcon)}
+      {buttonIconSlot('start', startIcon)}
       {children}
-      {!loading && buttonIconSlot('end', endIcon)}
-      {loading && <Spinner aria-hidden="true" />}
+      {buttonIconSlot('end', endIcon)}
     </>
   );
 }
@@ -272,6 +357,7 @@ function SlotButton({
 }
 
 function Button({ asChild = false, type, ...props }: ButtonProps) {
+  validateButtonUsage(props);
   if (asChild) return <SlotButton {...props} />;
   return <NativeButton {...props} type={type} />;
 }
