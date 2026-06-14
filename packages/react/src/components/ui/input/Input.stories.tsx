@@ -312,9 +312,9 @@ export const VisualStateTokens: Story = {
     const disabledEmpty = canvas.getByTestId('input-disabled-empty');
     const disabledFilled = canvas.getByTestId('input-disabled-filled');
 
-    await expect(hoverInput).toHaveClass('nx:enabled:hover:bg-container-hover');
-    await userEvent.hover(hoverInput);
-    await expect(hoverInput).toHaveClass('nx:enabled:hover:bg-container-hover');
+    await expect(hoverInput).toHaveClass(
+      'nx:enabled:hover:bg-background-hover'
+    );
 
     await expect(disabledEmpty).toBeDisabled();
     await expect(disabledFilled).toBeDisabled();
