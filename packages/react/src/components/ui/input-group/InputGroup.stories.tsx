@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconEye, IconMail, IconSearch, IconX } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { expectHeightPinned } from '../../../stories/test-utils';
+
 import {
   InputGroup,
   InputGroupAddon,
@@ -138,14 +140,18 @@ export const WithTextarea: Story = {
   ),
 };
 
-// The group is a role=group field; the control + addon carry data-slot hooks.
+// The group is a role=group field; control, addon, text, and button carry
+// data-slot hooks, and the control mirrors Input's data-size.
 export const WithDataAttributes: Story = {
   render: () => (
     <InputGroup className="nx:w-80">
       <InputGroupAddon>
-        <IconSearch aria-hidden />
+        <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput aria-label="Search" placeholder="Search…" />
+      <InputGroupInput aria-label="Site URL" placeholder="nexus.dev" />
+      <InputGroupAddon align="inline-end">
+        <InputGroupButton aria-label="Clear">Clear</InputGroupButton>
+      </InputGroupAddon>
     </InputGroup>
   ),
   play: async ({ canvasElement }) => {
@@ -156,8 +162,20 @@ export const WithDataAttributes: Story = {
       canvasElement.querySelector('[data-slot="input-group-addon"]')
     ).toBeInTheDocument();
     await expect(
-      canvasElement.querySelector('[data-slot="input-group-control"]')
+      canvasElement.querySelector('[data-slot="input-group-text"]')
     ).toBeInTheDocument();
+
+    const control = canvasElement.querySelector(
+      '[data-slot="input-group-control"]'
+    );
+    await expect(control).toBeInTheDocument();
+    await expect(control).toHaveAttribute('data-size', 'default');
+
+    const button = canvasElement.querySelector(
+      '[data-slot="input-group-button"]'
+    );
+    await expect(button).toBeInTheDocument();
+    await expect(button).toHaveAttribute('data-size', 'xs');
   },
 };
 
@@ -217,6 +235,186 @@ export const Disabled: Story = {
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();
+  },
+};
+
+// The three sizes — sm / default (implicit) / lg — match standalone Input.
+export const Sizes: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
+      <InputGroup>
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput size="sm" aria-label="Small" placeholder="sm" />
+      </InputGroup>
+      <InputGroup>
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput
+          aria-label="Default"
+          placeholder="default (implicit)"
+        />
+      </InputGroup>
+      <InputGroup>
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput size="lg" aria-label="Large" placeholder="lg" />
+      </InputGroup>
+    </div>
+  ),
+};
+
+// The visible frame takes the control's size height (h-8 / h-10 / h-12) so the
+// group is never taller than a standalone Input. Heights follow the active
+// spacing mode like Input, so the px pin is scoped to vega.
+export const HeightsFollowModes: Story = {
+  parameters: { a11y: { test: 'off' } },
+  render: () => (
+    <div
+      data-style="vega"
+      className="nx:flex nx:w-80 nx:flex-col nx:gap-4 nx:bg-background nx:p-10"
+    >
+      <InputGroup data-testid="ig-sm">
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput size="sm" aria-label="Small" placeholder="sm" />
+      </InputGroup>
+      <InputGroup data-testid="ig-default">
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput aria-label="Default" placeholder="default" />
+      </InputGroup>
+      <InputGroup data-testid="ig-lg">
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput size="lg" aria-label="Large" placeholder="lg" />
+      </InputGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const groupSelector = { selector: '[data-slot="input-group"]' };
+
+    // Child carries Input's data-size; the frame follows it.
+    await expect(
+      canvas.getByRole('textbox', { name: 'Small' })
+    ).toHaveAttribute('data-size', 'sm');
+    await expect(
+      canvas.getByRole('textbox', { name: 'Default' })
+    ).toHaveAttribute('data-size', 'default');
+    await expect(
+      canvas.getByRole('textbox', { name: 'Large' })
+    ).toHaveAttribute('data-size', 'lg');
+
+    // Outer group heights (vega): h-8 / h-10 / h-12.
+    await expectHeightPinned(canvas, 'ig-sm', 32, groupSelector);
+    await expectHeightPinned(canvas, 'ig-default', 40, groupSelector);
+    await expectHeightPinned(canvas, 'ig-lg', 48, groupSelector);
+  },
+};
+
+// Hover + disabled map to Input's semantic state tokens — no opacity dimming.
+export const VisualStateTokens: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
+      <InputGroup data-testid="ig-hover">
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput aria-label="Hover surface" placeholder="hover" />
+      </InputGroup>
+      <InputGroup data-testid="ig-disabled" data-disabled="true">
+        <InputGroupAddon data-testid="ig-disabled-addon">
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput
+          aria-label="Disabled"
+          placeholder="disabled"
+          disabled
+        />
+      </InputGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const hover = canvas.getByTestId('ig-hover');
+    const disabled = canvas.getByTestId('ig-disabled');
+    const addon = canvas.getByTestId('ig-disabled-addon');
+
+    await expect(hover).toHaveClass(
+      'nx:not-data-[disabled=true]:hover:bg-background-hover'
+    );
+    await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
+    await expect(disabled).toHaveClass(
+      'nx:data-[disabled=true]:border-border-disabled'
+    );
+    // Addon dims via a semantic colour token, not opacity.
+    await expect(addon).toHaveClass(
+      'nx:group-data-[disabled=true]/input-group:text-disabled-foreground'
+    );
+    await expect(window.getComputedStyle(addon).opacity).toBe('1');
+  },
+};
+
+// An invalid control reddens the group border (always-on, focus-independent).
+export const Invalid: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
+      <InputGroup data-testid="ig-valid">
+        <InputGroupAddon>
+          <IconMail aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput aria-label="Valid email" placeholder="valid" />
+      </InputGroup>
+      <InputGroup data-testid="ig-invalid">
+        <InputGroupAddon>
+          <IconMail aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput
+          aria-label="Invalid email"
+          placeholder="invalid"
+          aria-invalid
+        />
+      </InputGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('textbox', { name: 'Invalid email' })
+    ).toHaveAttribute('aria-invalid', 'true');
+
+    // Error border fires: the invalid group's border colour differs from valid.
+    const valid = canvas.getByTestId('ig-valid');
+    const invalid = canvas.getByTestId('ig-invalid');
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      window.getComputedStyle(valid).borderTopColor
+    );
+  },
+};
+
+// A trailing kbd hint pulls toward the field edge by the canonical −1.5 step.
+export const WithKbd: Story = {
+  render: () => (
+    <InputGroup className="nx:w-80">
+      <InputGroupInput aria-label="Search" placeholder="Search…" />
+      <InputGroupAddon align="inline-end" data-testid="ig-kbd-addon">
+        <kbd>⌘K</kbd>
+      </InputGroupAddon>
+    </InputGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // has-[>kbd]:-mr-1.5 → −6px (spacing-1.5 is mode-invariant).
+    await expect(
+      window.getComputedStyle(canvas.getByTestId('ig-kbd-addon')).marginRight
+    ).toBe('-6px');
   },
 };
 
