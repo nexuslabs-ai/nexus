@@ -151,6 +151,7 @@ export const WithDataAttributes: Story = {
     const textarea = canvas.getByRole('textbox');
 
     await expect(textarea).toHaveAttribute('data-slot', 'textarea');
+    await expect(textarea).toHaveClass('nx:enabled:hover:bg-background-hover');
   },
 };
 
