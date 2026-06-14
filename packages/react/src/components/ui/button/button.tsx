@@ -31,7 +31,7 @@ const buttonVariants = cva(
         sm: 'nx:h-8 nx:min-w-16 nx:px-2.5 nx:gap-1 nx:typography-label-default',
         default:
           'nx:h-10 nx:min-w-20 nx:px-3 nx:gap-1 nx:typography-label-default',
-        lg: 'nx:h-11 nx:min-w-24 nx:px-3.5 nx:gap-1 nx:typography-label-default',
+        lg: 'nx:h-11 nx:min-w-24 nx:px-3.5 nx:gap-1 nx:typography-label-large',
         'icon-sm':
           'nx:relative nx:size-8 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-1.5',
         icon: 'nx:relative nx:size-10 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-0.5',
