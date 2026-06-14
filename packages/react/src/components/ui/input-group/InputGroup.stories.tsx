@@ -347,16 +347,14 @@ export const VisualStateTokens: Story = {
     const disabled = canvas.getByTestId('ig-disabled');
     const addon = canvas.getByTestId('ig-disabled-addon');
 
-    // Hover token is wired. CSS :hover can't be driven by synthetic userEvent
-    // (no repo story asserts a hover-driven computed style), so this guards the
-    // token name — it caught a container→background regression in review; the
-    // rule itself is verified at the CSS layer.
+    // Token-name sentinel: synthetic userEvent can't toggle CSS :hover.
     await expect(hover).toHaveClass(
       'nx:not-data-[disabled=true]:hover:bg-background-hover'
     );
 
-    // Disabled uses semantic surface tokens, not opacity: the disabled frame's
-    // resolved background differs from the enabled frame, and nothing is dimmed.
+    // Disabled uses semantic surface tokens, not opacity: the resolved
+    // background differs from the enabled frame, and nothing is dimmed.
+    await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
     await expect(disabled).toHaveClass(
       'nx:data-[disabled=true]:border-border-disabled'
     );
