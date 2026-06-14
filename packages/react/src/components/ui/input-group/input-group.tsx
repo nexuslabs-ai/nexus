@@ -8,6 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 /**
+ * InputGroupProps
+ *
+ * Props for the InputGroup component.
+ */
+interface InputGroupProps extends React.ComponentProps<'div'> {}
+
+/**
  * InputGroup
  *
  * Wraps an input (or textarea) with leading/trailing addons — icons, text,
@@ -16,6 +23,11 @@ import { cn } from '@/lib/utils';
  * more `InputGroupAddon`s (positioned with `align`) around it; the whole group
  * lights up when the control is focused, and reflects the control's invalid
  * state.
+ *
+ * The visible frame matches a standalone `Input`: an inline group takes the
+ * control's `size` height (`sm` / `default` / `lg` → `h-8` / `h-10` / `h-12`),
+ * so the wrapper border never makes the field taller than a bare `Input`.
+ * Stacked (block-aligned) groups stay auto-height.
  *
  * @example
  * ```tsx
@@ -27,23 +39,40 @@ import { cn } from '@/lib/utils';
  * </InputGroup>
  * ```
  */
-function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
+function InputGroup({ className, ...props }: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
       role="group"
       className={cn(
-        'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border nx:border-border-default nx:shadow-xs nx:transition-[color,box-shadow] nx:outline-none',
+        'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:transition-colors nx:outline-none',
+        // Size: an inline group matches standalone Input's height for the
+        // control's data-size. Scoped to non-stacked layouts (no block addon
+        // present) so the fixed-height rule and the auto-height stacked case are
+        // mutually exclusive — they never both match. Heights follow the active
+        // spacing mode (h-8/h-10/h-12), exactly like Input.
+        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:has-[[data-slot=input-group-control][data-size=sm]]:h-8',
+        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:has-[[data-slot=input-group-control][data-size=default]]:h-10',
+        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:has-[[data-slot=input-group-control][data-size=lg]]:h-12',
+        // The control fills the fixed-height frame without adding height (the
+        // compound :has() selector outranks Input's own h-* by specificity).
+        // Released in the stacked case, where the control keeps its own height.
+        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:[&>input]:h-full',
         // Alignment: addons push the control's padding to make room.
         'nx:has-[>[data-align=inline-start]]:[&>input]:pl-2',
         'nx:has-[>[data-align=inline-end]]:[&>input]:pr-2',
         'nx:has-[>[data-align=block-start]]:flex-col nx:has-[>[data-align=block-start]]:[&>input]:pb-3',
         'nx:has-[>[data-align=block-end]]:flex-col nx:has-[>[data-align=block-end]]:[&>input]:pt-3',
+        // Hover / disabled: Input's semantic state tokens (no opacity dimming).
+        'nx:not-data-[disabled=true]:hover:bg-background-hover',
+        'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:border-border-disabled nx:data-[disabled=true]:bg-disabled',
         // Focus: the group shows the ring when the inner control is focused
         // (the control suppresses its own outline).
         'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-2 nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default nx:has-[[data-slot=input-group-control]:focus-visible]:outline-offset-(--focus-offset)',
-        // Error: an invalid inner control reddens the group border.
+        // Error: an invalid control reddens the border; an invalid focused
+        // control switches the ring to the error colour (matches Input).
         'nx:has-[[data-slot][aria-invalid=true]]:border-border-error',
+        'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error',
         className
       )}
       {...props}
@@ -52,14 +81,14 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const inputGroupAddonVariants = cva(
-  'nx:flex nx:h-auto nx:cursor-text nx:items-center nx:justify-start nx:gap-2 nx:py-1.5 nx:typography-label-default nx:text-muted-foreground nx:select-none nx:group-data-[disabled=true]/input-group:opacity-50 nx:[&>kbd]:rounded-sm nx:[&>svg]:size-4',
+  'nx:flex nx:h-auto nx:cursor-text nx:items-center nx:justify-start nx:gap-2 nx:py-1.5 nx:typography-label-default nx:text-muted-foreground nx:select-none nx:group-data-[disabled=true]/input-group:text-disabled-foreground nx:[&>kbd]:rounded-sm nx:[&>svg]:size-4',
   {
     variants: {
       align: {
         'inline-start':
-          'nx:order-first nx:pl-3 nx:has-[>button]:ml-[-0.45rem] nx:has-[>kbd]:ml-[-0.35rem]',
+          'nx:order-first nx:pl-3 nx:has-[>button]:-ml-2 nx:has-[>kbd]:-ml-1.5',
         'inline-end':
-          'nx:order-last nx:pr-3 nx:has-[>button]:mr-[-0.45rem] nx:has-[>kbd]:mr-[-0.35rem]',
+          'nx:order-last nx:pr-3 nx:has-[>button]:-mr-2 nx:has-[>kbd]:-mr-1.5',
         'block-start': 'nx:order-first nx:w-full nx:px-3 nx:pt-3',
         'block-end': 'nx:order-last nx:w-full nx:px-3 nx:pb-3',
       },
@@ -103,7 +132,7 @@ function InputGroupAddon({
 }
 
 const inputGroupButtonVariants = cva(
-  'nx:flex nx:items-center nx:py-0 nx:text-sm nx:shadow-none',
+  'nx:flex nx:items-center nx:py-0 nx:typography-label-default nx:shadow-none',
   {
     variants: {
       size: {
@@ -145,6 +174,7 @@ function InputGroupButton({
   return (
     <Button
       type={type}
+      data-slot="input-group-button"
       data-size={size}
       variant={variant}
       className={cn(inputGroupButtonVariants({ size }), className)}
@@ -154,13 +184,21 @@ function InputGroupButton({
 }
 
 /**
+ * InputGroupTextProps
+ *
+ * Props for the InputGroupText component.
+ */
+interface InputGroupTextProps extends React.ComponentProps<'span'> {}
+
+/**
  * InputGroupText
  *
  * Inline addon text — a unit, a label, a prefix.
  */
-function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
+function InputGroupText({ className, ...props }: InputGroupTextProps) {
   return (
     <span
+      data-slot="input-group-text"
       className={cn(
         'nx:flex nx:items-center nx:gap-2 nx:typography-body-default nx:text-muted-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
         className
@@ -171,20 +209,25 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 }
 
 /**
+ * InputGroupInputProps
+ *
+ * Props for the InputGroupInput component.
+ */
+interface InputGroupInputProps extends React.ComponentProps<typeof Input> {}
+
+/**
  * InputGroupInput
  *
  * The text input inside an `InputGroup` — borderless and transparent so the
- * group provides the frame and focus ring.
+ * group provides the frame and focus ring. Keeps `Input`'s per-size padding and
+ * typography; the group supplies the height.
  */
-function InputGroupInput({
-  className,
-  ...props
-}: React.ComponentProps<typeof Input>) {
+function InputGroupInput({ className, ...props }: InputGroupInputProps) {
   return (
     <Input
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:rounded-none nx:border-0 nx:bg-transparent nx:shadow-none nx:focus-visible:outline-none',
+        'nx:flex-1 nx:rounded-none nx:border-0 nx:bg-transparent nx:focus-visible:outline-none',
         className
       )}
       {...props}
@@ -193,15 +236,21 @@ function InputGroupInput({
 }
 
 /**
+ * InputGroupTextareaProps
+ *
+ * Props for the InputGroupTextarea component.
+ */
+interface InputGroupTextareaProps extends React.ComponentProps<
+  typeof Textarea
+> {}
+
+/**
  * InputGroupTextarea
  *
  * The textarea inside an `InputGroup` — borderless and transparent so the group
  * provides the frame and focus ring.
  */
-function InputGroupTextarea({
-  className,
-  ...props
-}: React.ComponentProps<typeof Textarea>) {
+function InputGroupTextarea({ className, ...props }: InputGroupTextareaProps) {
   return (
     <Textarea
       data-slot="input-group-control"
@@ -223,6 +272,10 @@ export {
   type InputGroupButtonProps,
   inputGroupButtonVariants,
   InputGroupInput,
+  type InputGroupInputProps,
+  type InputGroupProps,
   InputGroupText,
   InputGroupTextarea,
+  type InputGroupTextareaProps,
+  type InputGroupTextProps,
 };
