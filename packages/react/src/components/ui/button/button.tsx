@@ -112,7 +112,7 @@ interface ButtonProps
 
   /**
    * Uses the fixed icon-only sizing model while preserving the same Button
-   * semantics. `sm`, `default`, and `lg` map to the 8/10/11 spacing scale.
+   * semantics. `sm`, `default`, and `lg` map to the 8/10/12 spacing scale.
    * Icon-only buttons require `aria-label` or `aria-labelledby`.
    * @default false
    */
