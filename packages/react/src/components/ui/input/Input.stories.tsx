@@ -73,13 +73,13 @@ const INPUT_SCALE_HEIGHTS = {
     sera: 40,
   },
   lg: {
-    vega: 44,
+    vega: 48,
     lyra: 48,
-    maia: 48,
-    mira: 44,
-    nova: 42,
-    luma: 44,
-    sera: 44,
+    maia: 52,
+    mira: 48,
+    nova: 46,
+    luma: 48,
+    sera: 48,
   },
 } as const;
 
@@ -460,7 +460,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input follows the approved Button fixed-height utility scale (`h-8` / `h-10` / `h-11`) without copying Button min-widths. Sm/default use body-small text; lg uses body-default text.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input follows the approved fixed-height utility scale (`h-8` / `h-10` / `h-12`) without copying Button min-widths. Sm/default use body-small text; lg uses body-default text.',
       },
     },
   },
@@ -495,7 +495,7 @@ export const InputScaleHeightsFollowModes: Story = {
     docs: {
       description: {
         story:
-          'Scale-utility sentinel for the Input sizing model. Text Input sizes use `h-8` / `h-10` / `h-11` and therefore follow the active Nexus spacing mode, matching Button height behavior while keeping Input width layout-controlled.',
+          'Scale-utility sentinel for the Input sizing model. Text Input sizes use `h-8` / `h-10` / `h-12` and therefore follow the active Nexus spacing mode while keeping Input width layout-controlled.',
       },
     },
   },
@@ -536,7 +536,7 @@ export const InputScaleHeightsFollowModes: Story = {
     await expect(smallInput).toHaveClass('nx:px-2.5');
     await expect(smallInput).toHaveClass('nx:py-0');
     await expect(smallInput).toHaveClass('nx:typography-body-small');
-    await expect(largeInput).toHaveClass('nx:h-11');
+    await expect(largeInput).toHaveClass('nx:h-12');
     await expect(largeInput).toHaveClass('nx:px-3.5');
     await expect(largeInput).toHaveClass('nx:py-0');
     await expect(largeInput).toHaveClass('nx:typography-body-default');
