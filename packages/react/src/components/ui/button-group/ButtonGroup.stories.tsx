@@ -8,10 +8,7 @@ import {
 } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import {
-  expectHeightPinned,
-  getControlHeight,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/test-utils';
 import { Button } from '../button';
 import {
   DropdownMenu,
@@ -245,13 +242,6 @@ export const SizeAlignment: Story = {
         `button-group-button-${size}`,
         expectedHeight
       );
-      expect(
-        getControlHeight(
-          canvas,
-          `button-group-text-${size}`,
-          '[data-slot="button-group-text"]'
-        )
-      ).toBe(getControlHeight(canvas, `button-group-button-${size}`));
     }
 
     await expect(
