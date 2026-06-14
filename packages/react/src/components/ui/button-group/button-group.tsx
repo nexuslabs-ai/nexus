@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 type ButtonGroupSize = 'sm' | 'default' | 'lg';
 
 const buttonGroupVariants = cva(
-  'nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:h-8 nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:min-w-16 nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:px-2.5 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:h-10 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:min-w-20 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:px-3 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:h-11 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:min-w-24 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:px-3.5',
+  'nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:h-8 nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:min-w-16 nx:[&>[data-slot=button][data-size=sm]:not([data-icon-only])]:px-2.5 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:h-10 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:min-w-20 nx:[&>[data-slot=button][data-size=default]:not([data-icon-only])]:px-3 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:h-12 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:min-w-24 nx:[&>[data-slot=button][data-size=lg]:not([data-icon-only])]:px-3.5',
   {
     variants: {
       orientation: {
@@ -27,13 +27,13 @@ const buttonGroupVariants = cva(
 );
 
 const buttonGroupTextVariants = cva(
-  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:typography-label-default nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
   {
     variants: {
       size: {
-        sm: 'nx:h-8 nx:px-2.5',
-        default: 'nx:h-10 nx:px-3',
-        lg: 'nx:h-11 nx:px-3.5',
+        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-small',
+        default: 'nx:h-10 nx:px-3 nx:typography-label-default',
+        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-large',
       },
     },
     defaultVariants: {

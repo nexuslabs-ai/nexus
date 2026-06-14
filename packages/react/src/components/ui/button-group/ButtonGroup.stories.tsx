@@ -19,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../dropdown-menu';
+import { Input } from '../input';
 import {
   Select,
   SelectContent,
@@ -44,13 +45,13 @@ type Story = StoryObj<typeof ButtonGroup>;
 const BUTTON_GROUP_SIZE_HEIGHTS = {
   sm: 32,
   default: 40,
-  lg: 44,
+  lg: 48,
 } as const;
 
 const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
-  sm: ['nx:h-8', 'nx:px-2.5'],
-  default: ['nx:h-10', 'nx:px-3'],
-  lg: ['nx:h-11', 'nx:px-3.5'],
+  sm: ['nx:h-8', 'nx:px-2.5', 'nx:typography-label-small'],
+  default: ['nx:h-10', 'nx:px-3', 'nx:typography-label-default'],
+  lg: ['nx:h-12', 'nx:px-3.5', 'nx:typography-label-large'],
 } as const;
 
 // Three outline buttons joined into one horizontal cluster.
@@ -176,7 +177,7 @@ export const SizeAlignment: Story = {
     docs: {
       description: {
         story:
-          'Vega height sentinel for ButtonGroup size propagation. Text addons use `h-8` / `h-10` / `h-11` without Button min-widths, while direct Button children receive the matching semantic size.',
+          'Vega height sentinel for ButtonGroup size propagation. Text addons use `h-8` / `h-10` / `h-12` without Button min-widths, while direct Button children receive the matching semantic size.',
       },
     },
   },
@@ -260,12 +261,19 @@ export const SizeAlignment: Story = {
   },
 };
 
+// Compatibility sentinel: raw input layouts should generally use InputGroup,
+// but ButtonGroup must not mutate or break non-Button children.
 export const MixedChildren: Story = {
   render: () => (
     <ButtonGroup size="lg" aria-label="mixed button-shaped controls">
       <ButtonGroupText data-testid="button-group-mixed-text">
         Status
       </ButtonGroupText>
+      <Input
+        data-testid="button-group-input"
+        aria-label="Search status"
+        className="nx:w-40"
+      />
       <Select defaultValue="active">
         <SelectTrigger
           data-testid="button-group-select-trigger"
@@ -287,9 +295,11 @@ export const MixedChildren: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const text = canvas.getByTestId('button-group-mixed-text');
+    const input = canvas.getByTestId('button-group-input');
     const selectTrigger = canvas.getByTestId('button-group-select-trigger');
 
     await expect(text).toHaveAttribute('data-size', 'lg');
+    await expect(input).not.toHaveAttribute('data-size');
     await expect(selectTrigger).not.toHaveAttribute('data-size');
     await expect(
       canvas.getByTestId('button-group-mixed-button')
