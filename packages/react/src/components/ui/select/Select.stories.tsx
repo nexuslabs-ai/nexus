@@ -403,6 +403,7 @@ export const WithDataAttributes: Story = {
     // Check trigger data-slot
     const trigger = canvas.getByRole('combobox');
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
+    await expect(trigger).toHaveClass('nx:enabled:hover:bg-background-hover');
 
     // Open the select
     await userEvent.click(trigger);
