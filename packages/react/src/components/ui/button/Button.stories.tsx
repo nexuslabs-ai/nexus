@@ -31,13 +31,13 @@ const BUTTON_SCALE_HEIGHTS = {
     sera: 40,
   },
   lg: {
-    vega: 44,
+    vega: 48,
     lyra: 48,
-    maia: 48,
-    mira: 44,
-    nova: 42,
-    luma: 44,
-    sera: 44,
+    maia: 52,
+    mira: 48,
+    nova: 46,
+    luma: 48,
+    sera: 48,
   },
 } as const;
 
@@ -261,7 +261,7 @@ export const IconLargeSize: Story = {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Large star' });
 
-    await expect(button).toHaveClass('nx:size-11');
+    await expect(button).toHaveClass('nx:size-12');
     await expect(button).toHaveAttribute('data-icon-only', 'true');
   },
 };
@@ -291,7 +291,7 @@ export const IconOnlySizes: Story = {
     ).toHaveClass('nx:size-10');
     await expect(
       canvas.getByRole('button', { name: 'Large icon' })
-    ).toHaveClass('nx:size-11');
+    ).toHaveClass('nx:size-12');
   },
 };
 
@@ -883,7 +883,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button sizes use Nexus scale utilities (`h-8`/`h-10`/`h-11`) so they follow the active spacing mode.',
+          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button sizes use Nexus scale utilities (`h-8`/`h-10`/`h-12`) so they follow the active spacing mode.',
       },
     },
   },
@@ -906,7 +906,7 @@ export const LargeScaleHeightAcrossModes: Story = {
     docs: {
       description: {
         story:
-          'Scale-utility sentinel for the large Button size. The class is `h-11`, so the rendered height follows the active Nexus spacing mode.',
+          'Scale-utility sentinel for the large Button size. The class is `h-12`, so the rendered height follows the active Nexus spacing mode.',
       },
     },
   },
@@ -932,7 +932,7 @@ export const IconScaleHeightsAcrossModes: Story = {
     docs: {
       description: {
         story:
-          'Icon-only Button visuals follow the text Button size classes (`size-8`/`size-10`/`size-11`). Coarse-pointer hit-area overlays preserve the Nexus touch floor for smaller boxes.',
+          'Icon-only Button visuals follow the text Button size classes (`size-8`/`size-10`/`size-12`). Coarse-pointer hit-area overlays preserve the Nexus touch floor for smaller boxes.',
       },
     },
   },
@@ -1057,10 +1057,10 @@ export const BorderedVariantsKeepFixedHeight: Story = {
 
     await expectHeightPinned(canvas, 'outline-sm', 32);
     await expectHeightPinned(canvas, 'outline-default', 40);
-    await expectHeightPinned(canvas, 'outline-lg', 44);
+    await expectHeightPinned(canvas, 'outline-lg', 48);
     await expectHeightPinned(canvas, 'dashed-sm', 32);
     await expectHeightPinned(canvas, 'dashed-default', 40);
-    await expectHeightPinned(canvas, 'dashed-lg', 44);
+    await expectHeightPinned(canvas, 'dashed-lg', 48);
   },
 };
 
@@ -1070,7 +1070,7 @@ export const TextScaleHeightsAcrossModes: Story = {
     docs: {
       description: {
         story:
-          'Scale-utility sentinel for the Button sizing model. Text Button sizes use `h-8`/`h-10`/`h-11` and therefore follow the active Nexus spacing mode. Inline padding uses Nexus scale utilities.',
+          'Scale-utility sentinel for the Button sizing model. Text Button sizes use `h-8`/`h-10`/`h-12` and therefore follow the active Nexus spacing mode. Inline padding uses Nexus scale utilities.',
       },
     },
   },
@@ -1110,7 +1110,7 @@ export const TextScaleHeightsAcrossModes: Story = {
     await expect(smallButton).toHaveClass('nx:px-2.5');
     await expect(smallButton).toHaveClass('nx:gap-1');
     await expect(largeButton).toHaveClass('nx:typography-label-large');
-    await expect(largeButton).toHaveClass('nx:h-11');
+    await expect(largeButton).toHaveClass('nx:h-12');
     await expect(largeButton).toHaveClass('nx:min-w-24');
     await expect(largeButton).toHaveClass('nx:px-3.5');
 
