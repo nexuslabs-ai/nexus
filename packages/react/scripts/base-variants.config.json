@@ -82,6 +82,7 @@
       }
     },
     { "name": "InputGroup", "showcase": "AllVariants" },
+    { "name": "InputOtp", "showcase": "AllVariants" },
     { "name": "Item", "showcase": "AllVariants" },
     { "name": "Kbd", "showcase": "AllVariants" },
     {
