@@ -66,7 +66,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
       data-slot="select-trigger"
       className={cn(
         'nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-control-md',
-        'nx:rounded-md nx:border nx:border-border-default nx:bg-background',
+        'nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover',
         'nx:px-3 nx:py-control-md nx:text-sm',
         'nx:whitespace-nowrap',
         'nx:placeholder:text-muted-foreground',
