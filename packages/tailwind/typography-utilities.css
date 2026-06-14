@@ -95,7 +95,7 @@
 @utility typography-label-large {
   font-family: var(--nx-typography-family-font-sans);
   font-size: var(--nx-typography-size-base);
-  font-weight: var(--nx-typography-weight-semibold);
+  font-weight: var(--nx-typography-weight-medium);
   line-height: var(--nx-typography-line-height-base);
   letter-spacing: var(--nx-typography-letterspacing-normal);
 }
