@@ -1104,7 +1104,7 @@ export const TextScaleHeightsAcrossModes: Story = {
     await expect(defaultButton).toHaveClass('nx:min-w-20');
     await expect(defaultButton).toHaveClass('nx:px-3');
     await expect(defaultButton).toHaveClass('nx:gap-1');
-    await expect(smallButton).toHaveClass('nx:typography-label-small');
+    await expect(smallButton).toHaveClass('nx:typography-label-default');
     await expect(smallButton).toHaveClass('nx:h-8');
     await expect(smallButton).toHaveClass('nx:min-w-16');
     await expect(smallButton).toHaveClass('nx:px-2.5');

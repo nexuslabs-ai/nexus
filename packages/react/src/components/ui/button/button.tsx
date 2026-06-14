@@ -28,7 +28,7 @@ const buttonVariants = cva(
         link: 'nx:border-0 nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
       },
       size: {
-        sm: 'nx:h-8 nx:min-w-16 nx:px-2.5 nx:gap-1 nx:typography-label-small',
+        sm: 'nx:h-8 nx:min-w-16 nx:px-2.5 nx:gap-1 nx:typography-label-default',
         default:
           'nx:h-10 nx:min-w-20 nx:px-3 nx:gap-1 nx:typography-label-default',
         lg: 'nx:h-11 nx:min-w-24 nx:px-3.5 nx:gap-1 nx:typography-label-default',
