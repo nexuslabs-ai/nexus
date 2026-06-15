@@ -3,11 +3,13 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { Button, type ButtonProps } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
-type ButtonGroupSize = 'sm' | 'default' | 'lg';
+import {
+  type ButtonGroupSize,
+  ButtonGroupSizeContext,
+} from './button-group-context';
 
 const buttonGroupVariants = cva(
   'nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md',
@@ -42,8 +44,6 @@ const buttonGroupTextVariants = cva(
   }
 );
 
-const ButtonGroupSizeContext = React.createContext<ButtonGroupSize>('default');
-
 /**
  * ButtonGroupProps
  *
@@ -54,28 +54,12 @@ interface ButtonGroupProps
     React.ComponentProps<'div'>,
     VariantProps<typeof buttonGroupVariants> {
   /**
-   * Size applied to ButtonGroupText and to direct Button children that do not
-   * set their own size.
+   * Size shared with ButtonGroupText and any Button member that doesn't set its
+   * own size. Inherited through context, so a Button nested inside a trigger
+   * wrapper (a split button) picks it up too.
    * @default "default"
    */
   size?: ButtonGroupSize;
-}
-
-function isButtonElement(
-  child: React.ReactNode
-): child is React.ReactElement<ButtonProps> {
-  return React.isValidElement<ButtonProps>(child) && child.type === Button;
-}
-
-function applyButtonGroupSizeToChildren(
-  children: React.ReactNode,
-  size: ButtonGroupSize
-) {
-  return React.Children.map(children, (child) => {
-    if (!isButtonElement(child)) return child;
-    if (child.props.size !== undefined) return child;
-    return React.cloneElement(child, { size });
-  });
 }
 
 /**
@@ -118,7 +102,7 @@ function ButtonGroup({
         className={cn(buttonGroupVariants({ orientation }), className)}
         {...props}
       >
-        {applyButtonGroupSizeToChildren(children, size)}
+        {children}
       </div>
     </ButtonGroupSizeContext.Provider>
   );
@@ -157,7 +141,7 @@ function ButtonGroupText({
 }: ButtonGroupTextProps) {
   const Comp = asChild ? Slot : 'div';
   const contextSize = React.useContext(ButtonGroupSizeContext);
-  const resolvedSize = size ?? contextSize;
+  const resolvedSize = size ?? contextSize ?? 'default';
 
   return (
     <Comp

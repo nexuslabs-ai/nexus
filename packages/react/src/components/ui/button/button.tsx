@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { ButtonGroupSizeContext } from '@/components/ui/button-group/button-group-context';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
@@ -291,10 +292,14 @@ function SlotButton({
   );
 }
 
-function Button({ asChild = false, type, ...props }: ButtonProps) {
+function Button({ asChild = false, size, type, ...props }: ButtonProps) {
+  // Inherit the enclosing ButtonGroup's size when no explicit size is set, so a
+  // Button nested inside a trigger wrapper (a split button) still picks it up.
+  const groupSize = React.useContext(ButtonGroupSizeContext);
+  const resolvedSize = size ?? groupSize;
   if (asChild && React.isValidElement(props.children))
-    return <SlotButton {...props} />;
-  return <NativeButton {...props} type={type} />;
+    return <SlotButton {...props} size={resolvedSize} />;
+  return <NativeButton {...props} size={resolvedSize} type={type} />;
 }
 
 export { Button, type ButtonProps, buttonVariants };
