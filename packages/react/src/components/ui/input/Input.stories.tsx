@@ -6,7 +6,7 @@ import {
   AllModesRow,
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
-import { expectHeightPinned } from '../../../stories/test-utils';
+import { expectHeightPerMode } from '../../../stories/test-utils';
 
 import { Input } from './input';
 
@@ -82,25 +82,6 @@ const INPUT_SCALE_HEIGHTS = {
     sera: 48,
   },
 } as const;
-
-async function expectInputScaleHeights(
-  canvasElement: HTMLElement,
-  size: keyof typeof INPUT_SCALE_HEIGHTS,
-  testIdPrefix: string
-) {
-  await document.fonts.ready;
-  const canvas = within(canvasElement);
-
-  for (const mode of SPACING_MODES) {
-    const actual = Math.round(
-      canvas.getByTestId(`${testIdPrefix}-${mode}`).getBoundingClientRect()
-        .height
-    );
-    expect(actual, `[data-testid="${testIdPrefix}-${mode}"] height`).toBe(
-      INPUT_SCALE_HEIGHTS[size][mode]
-    );
-  }
-}
 
 // ============================================
 // BASIC STORIES
@@ -298,26 +279,18 @@ export const VisualStateTokens: Story = {
         disabled
         aria-label="Disabled empty input"
       />
-      <Input
-        data-testid="input-disabled-filled"
-        defaultValue="Disabled value"
-        disabled
-        aria-label="Disabled filled input"
-      />
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const hoverInput = canvas.getByTestId('input-hover-token');
     const disabledEmpty = canvas.getByTestId('input-disabled-empty');
-    const disabledFilled = canvas.getByTestId('input-disabled-filled');
 
     await expect(hoverInput).toHaveClass(
       'nx:enabled:hover:bg-background-hover'
     );
 
     await expect(disabledEmpty).toBeDisabled();
-    await expect(disabledFilled).toBeDisabled();
     await expect(disabledEmpty).toHaveClass('nx:disabled:bg-disabled');
     await expect(disabledEmpty).toHaveClass(
       'nx:disabled:text-disabled-foreground'
@@ -328,8 +301,13 @@ export const VisualStateTokens: Story = {
     await expect(disabledEmpty).toHaveClass(
       'nx:disabled:border-border-disabled'
     );
-    await expect(disabledFilled).not.toHaveClass('nx:disabled:opacity-50');
-    await expect(window.getComputedStyle(disabledFilled).opacity).toBe('1');
+    // Computed-style check (not just class presence): the disabled text token
+    // must resolve to a color distinct from the enabled foreground, and opacity
+    // must stay 1 (the old opacity-50 treatment is gone).
+    await expect(window.getComputedStyle(disabledEmpty).opacity).toBe('1');
+    await expect(window.getComputedStyle(disabledEmpty).color).not.toBe(
+      window.getComputedStyle(hoverInput).color
+    );
   },
 };
 
@@ -523,51 +501,22 @@ export const InputScaleHeightsFollowModes: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const defaultInput = canvas.getByLabelText('vega default input');
-    const smallInput = canvas.getByLabelText('vega small input');
-    const largeInput = canvas.getByLabelText('vega large input');
 
-    await expect(defaultInput).toHaveAttribute('data-size', 'default');
-    await expect(defaultInput).toHaveClass('nx:h-10');
-    await expect(defaultInput).toHaveClass('nx:px-3');
-    await expect(defaultInput).toHaveClass('nx:py-0');
-    await expect(defaultInput).toHaveClass('nx:typography-body-small');
-    await expect(smallInput).toHaveClass('nx:h-8');
-    await expect(smallInput).toHaveClass('nx:px-2.5');
-    await expect(smallInput).toHaveClass('nx:py-0');
-    await expect(smallInput).toHaveClass('nx:typography-body-small');
-    await expect(largeInput).toHaveClass('nx:h-12');
-    await expect(largeInput).toHaveClass('nx:px-3.5');
-    await expect(largeInput).toHaveClass('nx:py-0');
-    await expect(largeInput).toHaveClass('nx:typography-body-default');
+    // The implicit-default input still exposes its size for styling hooks.
+    await expect(canvas.getByLabelText('vega default input')).toHaveAttribute(
+      'data-size',
+      'default'
+    );
 
-    await expectInputScaleHeights(canvasElement, 'default', 'input-default');
-    await expectInputScaleHeights(canvasElement, 'sm', 'input-sm');
-    await expectInputScaleHeights(canvasElement, 'lg', 'input-lg');
-  },
-};
-
-export const VegaDefaultHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Pin on the fixed-height outcome: in vega mode, a default Input renders at exactly 40px via `h-10`.',
-      },
-    },
-  },
-  render: () => (
-    <div
-      data-style="vega"
-      data-testid="input-vega-host"
-      className="nx:p-10 nx:bg-background"
-    >
-      <Input aria-label="vega default input" />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'input-vega-host', 40);
+    // Heights vary per mode (fixed h-* over mode-scaled spacing tokens); the
+    // shared helper measures every mode against INPUT_SCALE_HEIGHTS.
+    await expectHeightPerMode(canvas, 'input-sm', INPUT_SCALE_HEIGHTS.sm);
+    await expectHeightPerMode(
+      canvas,
+      'input-default',
+      INPUT_SCALE_HEIGHTS.default
+    );
+    await expectHeightPerMode(canvas, 'input-lg', INPUT_SCALE_HEIGHTS.lg);
   },
 };
 

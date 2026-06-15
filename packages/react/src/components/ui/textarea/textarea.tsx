@@ -12,7 +12,7 @@ interface TextareaProps extends React.ComponentProps<'textarea'> {}
 /**
  * Textarea
  *
- * A multi-line text input. Mirrors Input's token, focus, and `aria-invalid`
+ * A multi-line text input. Mirrors Input's surface, focus, and `aria-invalid`
  * treatment and accepts all native textarea attributes. Use `rows` (or a
  * `min-height` override via `className`) to set the initial height.
  *
