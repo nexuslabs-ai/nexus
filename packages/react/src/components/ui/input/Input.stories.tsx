@@ -429,7 +429,7 @@ export const AllVariants: Story = {
 };
 
 // ============================================
-// MODE BEHAVIOUR (mode-stable numeric spacing)
+// MODE BEHAVIOUR (per-mode heights)
 // ============================================
 
 export const AllModes: Story = {
