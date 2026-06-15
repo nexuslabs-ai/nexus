@@ -377,6 +377,41 @@ export const SplitButton: Story = {
   },
 };
 
+// Regression guard for context-based size propagation: a Button nested inside a
+// trigger wrapper (a DropdownMenu trigger, asChild) is not a direct child of the
+// group, yet it inherits the group size — the case the old cloneElement walk
+// over direct children missed.
+export const NestedTriggerInheritsSize: Story = {
+  render: () => (
+    <ButtonGroup size="sm">
+      <Button data-testid="nested-direct">Deploy</Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button data-testid="nested-wrapped">Options</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem>Staging</DropdownMenuItem>
+          <DropdownMenuItem>Production</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </ButtonGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The wrapped trigger sets no size of its own; it inherits the group's "sm"
+    // through context despite not being a direct child.
+    await expect(canvas.getByTestId('nested-wrapped')).toHaveAttribute(
+      'data-size',
+      'sm'
+    );
+    // A direct child resolves the same way.
+    await expect(canvas.getByTestId('nested-direct')).toHaveAttribute(
+      'data-size',
+      'sm'
+    );
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
