@@ -352,14 +352,11 @@ export const VisualStateTokens: Story = {
       'nx:not-data-[disabled=true]:hover:bg-background-hover'
     );
 
-    // Disabled uses semantic surface tokens, not opacity: the resolved
-    // background differs from the enabled frame, and nothing is dimmed.
+    // Disabled = semantic tokens, not opacity (opacity stays 1). No computed
+    // bg check: bg-disabled / background / -hover collapse in dark mode.
     await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
     await expect(disabled).toHaveClass(
       'nx:data-[disabled=true]:border-border-disabled'
-    );
-    await expect(window.getComputedStyle(disabled).backgroundColor).not.toBe(
-      window.getComputedStyle(hover).backgroundColor
     );
     await expect(window.getComputedStyle(addon).opacity).toBe('1');
     await expect(addon).toHaveClass(
