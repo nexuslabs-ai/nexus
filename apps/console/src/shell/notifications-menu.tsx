@@ -125,7 +125,7 @@ export function NotificationsMenu() {
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon-sm"
           className="nx:relative"
           aria-label={
             unreadCount > 0

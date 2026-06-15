@@ -192,7 +192,6 @@ export const Link: Story = {
     await expect(button).toHaveClass('nx:underline-offset-4');
     await expect(button).toHaveClass('nx:hover:underline');
     await expect(button).toHaveClass('nx:border-0');
-    await expect(button).toHaveClass('nx:min-w-0');
     await expect(button).toHaveClass('nx:p-0!');
     await expect(button).not.toHaveClass('nx:hover:bg-primary-subtle-hover');
     await expectHeightPinned(canvas, 'button-link', 20);
@@ -582,6 +581,19 @@ export const AsLink: Story = {
 
     await expect(link).toHaveAttribute('href', 'https://example.com');
     await expect(link).toHaveAttribute('data-slot', 'button');
+  },
+};
+
+export const AsChildWithStringChild: Story = {
+  render: () => <Button asChild>Plain text child</Button>,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // asChild needs a single element to clone onto; a non-element child falls
+    // back to the native <button> rather than rendering an unstyled fragment.
+    const button = canvas.getByRole('button', { name: 'Plain text child' });
+
+    await expect(button.tagName).toBe('BUTTON');
+    await expect(button).toHaveAttribute('data-slot', 'button');
   },
 };
 
@@ -1101,17 +1113,14 @@ export const TextScaleHeightsAcrossModes: Story = {
 
     await expect(defaultButton).toHaveClass('nx:typography-label-default');
     await expect(defaultButton).toHaveClass('nx:h-10');
-    await expect(defaultButton).toHaveClass('nx:min-w-20');
     await expect(defaultButton).toHaveClass('nx:px-3');
     await expect(defaultButton).toHaveClass('nx:gap-1');
     await expect(smallButton).toHaveClass('nx:typography-label-default');
     await expect(smallButton).toHaveClass('nx:h-8');
-    await expect(smallButton).toHaveClass('nx:min-w-16');
     await expect(smallButton).toHaveClass('nx:px-2.5');
     await expect(smallButton).toHaveClass('nx:gap-1');
     await expect(largeButton).toHaveClass('nx:typography-label-large');
     await expect(largeButton).toHaveClass('nx:h-12');
-    await expect(largeButton).toHaveClass('nx:min-w-24');
     await expect(largeButton).toHaveClass('nx:px-3.5');
 
     await expectButtonScaleHeights(canvasElement, 'default', 'button-default');

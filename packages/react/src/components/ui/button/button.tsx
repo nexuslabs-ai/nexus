@@ -28,10 +28,9 @@ const buttonVariants = cva(
         link: 'nx:border-0 nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
       },
       size: {
-        sm: 'nx:h-8 nx:min-w-16 nx:px-2.5 nx:gap-1 nx:typography-label-default',
-        default:
-          'nx:h-10 nx:min-w-20 nx:px-3 nx:gap-1 nx:typography-label-default',
-        lg: 'nx:h-12 nx:min-w-24 nx:px-3.5 nx:gap-1 nx:typography-label-large',
+        sm: 'nx:h-8 nx:px-2.5 nx:gap-1 nx:typography-label-default',
+        default: 'nx:h-10 nx:px-3 nx:gap-1 nx:typography-label-default',
+        lg: 'nx:h-12 nx:px-3.5 nx:gap-1 nx:typography-label-large',
         'icon-sm':
           'nx:relative nx:size-8 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-1.5',
         icon: 'nx:relative nx:size-10 nx:gap-0 nx:p-0 nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-0.5',
@@ -42,7 +41,7 @@ const buttonVariants = cva(
       {
         variant: 'link',
         size: ['sm', 'default', 'lg'],
-        className: 'nx:h-auto nx:min-w-0 nx:p-0!',
+        className: 'nx:h-auto nx:p-0!',
       },
     ],
     defaultVariants: {
@@ -217,7 +216,7 @@ function NativeButton({
       type={type}
       disabled={isDisabled}
       aria-disabled={isDisabled || ariaDisabled || undefined}
-      aria-busy={loading || ariaBusy}
+      aria-busy={loading || ariaBusy || undefined}
     >
       {buttonContent({ children, endIcon, loading, startIcon })}
     </button>
@@ -246,14 +245,13 @@ function SlotButton({
   'aria-disabled': ariaDisabled,
   ...props
 }: ButtonProps) {
+  if (!React.isValidElement<ButtonAsChildElementProps>(children)) return null;
+
   const isDisabled = disabled || loading;
   const semanticSize = size ?? 'default';
   const visualSize = getVisualButtonSize(semanticSize, isIconOnly);
   const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
-  const child = React.isValidElement<ButtonAsChildElementProps>(children)
-    ? children
-    : null;
-  const childOnClick = child?.props.onClick;
+  const childOnClick = children.props.onClick;
 
   const handleClick: React.MouseEventHandler<HTMLElement> = (event) => {
     if (isDisabled) {
@@ -275,28 +273,27 @@ function SlotButton({
       className={cn(buttonVariants({ variant, size: visualSize, className }))}
       {...props}
       aria-disabled={isDisabled || ariaDisabled || undefined}
-      aria-busy={loading || ariaBusy}
+      aria-busy={loading || ariaBusy || undefined}
       tabIndex={isDisabled ? -1 : tabIndex}
       onClick={handleClick}
     >
-      {child
-        ? React.cloneElement(
-            child,
-            { onClick: undefined },
-            buttonContent({
-              children: child.props.children,
-              endIcon,
-              loading,
-              startIcon,
-            })
-          )
-        : buttonContent({ children, endIcon, loading, startIcon })}
+      {React.cloneElement(
+        children,
+        { onClick: undefined },
+        buttonContent({
+          children: children.props.children,
+          endIcon,
+          loading,
+          startIcon,
+        })
+      )}
     </Slot>
   );
 }
 
 function Button({ asChild = false, type, ...props }: ButtonProps) {
-  if (asChild) return <SlotButton {...props} />;
+  if (asChild && React.isValidElement(props.children))
+    return <SlotButton {...props} />;
   return <NativeButton {...props} type={type} />;
 }
 
