@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 type ButtonGroupSize = 'sm' | 'default' | 'lg';
 
 const buttonGroupVariants = cva(
-  'nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=button][data-size=sm]]:h-8 nx:[&>[data-slot=button][data-size=sm]]:min-w-16 nx:[&>[data-slot=button][data-size=sm]]:px-2.5 nx:[&>[data-slot=button][data-size=default]]:h-10 nx:[&>[data-slot=button][data-size=default]]:min-w-20 nx:[&>[data-slot=button][data-size=default]]:px-3 nx:[&>[data-slot=button][data-size=lg]]:h-12 nx:[&>[data-slot=button][data-size=lg]]:min-w-24 nx:[&>[data-slot=button][data-size=lg]]:px-3.5',
+  'nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md',
   {
     variants: {
       orientation: {
