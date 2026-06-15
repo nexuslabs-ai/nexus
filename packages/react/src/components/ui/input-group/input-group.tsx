@@ -47,17 +47,17 @@ function InputGroup({ className, ...props }: InputGroupProps) {
       className={cn(
         'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:transition-colors nx:outline-none',
         // Size: an inline group matches standalone Input's height for the
-        // control's data-size. Scoped to non-stacked layouts (no block addon
-        // present) so the fixed-height rule and the auto-height stacked case are
-        // mutually exclusive — they never both match. Heights follow the active
-        // spacing mode (h-8/h-10/h-12), exactly like Input.
-        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:has-[[data-slot=input-group-control][data-size=sm]]:h-8',
-        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:has-[[data-slot=input-group-control][data-size=default]]:h-10',
-        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:has-[[data-slot=input-group-control][data-size=lg]]:h-12',
+        // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
+        // non-stacked layouts (no block addon) so the fixed-height rule and the
+        // auto-height stacked case are mutually exclusive — they never both
+        // match. Heights follow the active spacing mode (h-8/h-10/h-12), like Input.
+        'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=sm]]:h-8',
+        'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=default]]:h-10',
+        'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=lg]]:h-12',
         // The control fills the fixed-height frame without adding height (the
         // compound :has() selector outranks Input's own h-* by specificity).
         // Released in the stacked case, where the control keeps its own height.
-        'nx:not-has-[>[data-align=block-start]]:not-has-[>[data-align=block-end]]:[&>input]:h-full',
+        'nx:not-has-[>[data-align^=block]]:[&>input]:h-full',
         // Alignment: addons push the control's padding to make room.
         'nx:has-[>[data-align=inline-start]]:[&>input]:pl-2',
         'nx:has-[>[data-align=inline-end]]:[&>input]:pr-2',
@@ -132,7 +132,7 @@ function InputGroupAddon({
 }
 
 const inputGroupButtonVariants = cva(
-  'nx:flex nx:items-center nx:py-0 nx:typography-label-default nx:shadow-none',
+  'nx:flex nx:items-center nx:py-0 nx:typography-label-default nx:shadow-none nx:group-data-[disabled=true]/input-group:text-disabled-foreground',
   {
     variants: {
       size: {
