@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconEye, IconMail, IconSearch, IconX } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../../stories/test-utils';
+import { SPACING_MODES } from '../../../stories/spacing-modes';
+import { expectHeightPerMode } from '../../../stories/test-utils';
 
 import {
   InputGroup,
@@ -267,34 +268,61 @@ export const Sizes: Story = {
   ),
 };
 
-// The visible frame takes the control's size height (h-8 / h-10 / h-12) so the
-// group is never taller than a standalone Input. Heights follow the active
-// spacing mode like Input, so the px pin is scoped to vega.
+// The visible frame takes the control's size height (h-8 / h-10 / h-12), so the
+// group is never taller than a standalone Input. Like Input, those heights
+// follow the active spacing mode, so they are pinned per mode — the same scale
+// as Input, since the frame height is the control's h-*.
+const GROUP_SCALE_HEIGHTS = {
+  sm: { vega: 32, lyra: 32, maia: 36, mira: 32, nova: 30, luma: 32, sera: 32 },
+  default: {
+    vega: 40,
+    lyra: 42,
+    maia: 44,
+    mira: 40,
+    nova: 38,
+    luma: 40,
+    sera: 40,
+  },
+  lg: { vega: 48, lyra: 48, maia: 52, mira: 48, nova: 46, luma: 48, sera: 48 },
+} as const;
+
 export const HeightsFollowModes: Story = {
   parameters: { a11y: { test: 'off' } },
   render: () => (
-    <div
-      data-style="vega"
-      className="nx:flex nx:w-80 nx:flex-col nx:gap-4 nx:bg-background nx:p-10"
-    >
-      <InputGroup data-testid="ig-sm">
-        <InputGroupAddon>
-          <IconSearch aria-hidden />
-        </InputGroupAddon>
-        <InputGroupInput size="sm" aria-label="Small" placeholder="sm" />
-      </InputGroup>
-      <InputGroup data-testid="ig-default">
-        <InputGroupAddon>
-          <IconSearch aria-hidden />
-        </InputGroupAddon>
-        <InputGroupInput aria-label="Default" placeholder="default" />
-      </InputGroup>
-      <InputGroup data-testid="ig-lg">
-        <InputGroupAddon>
-          <IconSearch aria-hidden />
-        </InputGroupAddon>
-        <InputGroupInput size="lg" aria-label="Large" placeholder="lg" />
-      </InputGroup>
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:bg-background nx:p-10">
+      {SPACING_MODES.map((mode) => (
+        <div key={mode} data-style={mode} className="nx:flex nx:gap-4">
+          <InputGroup data-testid={`ig-sm-${mode}`}>
+            <InputGroupAddon>
+              <IconSearch aria-hidden />
+            </InputGroupAddon>
+            <InputGroupInput
+              size="sm"
+              aria-label={`${mode} small`}
+              placeholder="sm"
+            />
+          </InputGroup>
+          <InputGroup data-testid={`ig-default-${mode}`}>
+            <InputGroupAddon>
+              <IconSearch aria-hidden />
+            </InputGroupAddon>
+            <InputGroupInput
+              aria-label={`${mode} default`}
+              placeholder="default"
+            />
+          </InputGroup>
+          <InputGroup data-testid={`ig-lg-${mode}`}>
+            <InputGroupAddon>
+              <IconSearch aria-hidden />
+            </InputGroupAddon>
+            <InputGroupInput
+              size="lg"
+              aria-label={`${mode} large`}
+              placeholder="lg"
+            />
+          </InputGroup>
+        </div>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -302,20 +330,31 @@ export const HeightsFollowModes: Story = {
     const groupSelector = { selector: '[data-slot="input-group"]' };
 
     // Child carries Input's data-size; the frame follows it.
-    await expect(
-      canvas.getByRole('textbox', { name: 'Small' })
-    ).toHaveAttribute('data-size', 'sm');
-    await expect(
-      canvas.getByRole('textbox', { name: 'Default' })
-    ).toHaveAttribute('data-size', 'default');
-    await expect(
-      canvas.getByRole('textbox', { name: 'Large' })
-    ).toHaveAttribute('data-size', 'lg');
+    await expect(canvas.getByLabelText('vega default')).toHaveAttribute(
+      'data-size',
+      'default'
+    );
 
-    // Outer group heights (vega): h-8 / h-10 / h-12.
-    await expectHeightPinned(canvas, 'ig-sm', 32, groupSelector);
-    await expectHeightPinned(canvas, 'ig-default', 40, groupSelector);
-    await expectHeightPinned(canvas, 'ig-lg', 48, groupSelector);
+    // Frame heights follow the active spacing mode (h-8 / h-10 / h-12 over
+    // mode-scaled tokens), measured on the group across every mode.
+    await expectHeightPerMode(
+      canvas,
+      'ig-sm',
+      GROUP_SCALE_HEIGHTS.sm,
+      groupSelector
+    );
+    await expectHeightPerMode(
+      canvas,
+      'ig-default',
+      GROUP_SCALE_HEIGHTS.default,
+      groupSelector
+    );
+    await expectHeightPerMode(
+      canvas,
+      'ig-lg',
+      GROUP_SCALE_HEIGHTS.lg,
+      groupSelector
+    );
   },
 };
 
