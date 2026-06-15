@@ -5,28 +5,6 @@ import { Slot } from '@radix-ui/react-slot';
 import { IconChevronDown } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
-function renderBreadcrumbText(children: React.ReactNode) {
-  return React.Children.map(children, (child) => {
-    if (typeof child === 'string' || typeof child === 'number') {
-      return <span>{child}</span>;
-    }
-
-    return child;
-  });
-}
-
-function renderSlottedBreadcrumbText(children: React.ReactNode) {
-  const child = React.Children.only(children);
-
-  if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
-    return child;
-  }
-
-  return React.cloneElement(child, {
-    children: renderBreadcrumbText(child.props.children),
-  });
-}
-
 /**
  * BreadcrumbProps
  *
@@ -136,31 +114,22 @@ interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
  * BreadcrumbLink
  *
  * A link to an ancestor page. It follows the compact Figma item rhythm and keeps
- * the canonical focus ring since it is reachable by keyboard. Bare text children
- * are wrapped so long labels truncate; when composing an icon with text, wrap the
- * text in a `<span>` so it truncates.
+ * the canonical focus ring since it is reachable by keyboard. Wrap the label in a
+ * `<span>` so it truncates at the 150px cap — both for plain text and when
+ * composing an icon with text.
  */
-function BreadcrumbLink({
-  asChild,
-  children,
-  className,
-  ...props
-}: BreadcrumbLinkProps) {
+function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
   const Comp = asChild ? Slot : 'a';
 
   return (
     <Comp
       data-slot="breadcrumb-link"
       className={cn(
-        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-[4px] nx:px-1.5 nx:typography-label-default nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-md nx:px-1.5 nx:typography-label-default nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}
       {...props}
-    >
-      {asChild
-        ? renderSlottedBreadcrumbText(children)
-        : renderBreadcrumbText(children)}
-    </Comp>
+    />
   );
 }
 
@@ -174,25 +143,20 @@ interface BreadcrumbPageProps extends React.ComponentProps<'span'> {}
 /**
  * BreadcrumbPage
  *
- * The current page — non-interactive, announced via `aria-current="page"`.
+ * The current page — non-interactive, announced via `aria-current="page"`. Wrap
+ * the label in a `<span>` so it truncates at the 150px cap.
  */
-function BreadcrumbPage({
-  children,
-  className,
-  ...props
-}: BreadcrumbPageProps) {
+function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
   return (
     <span
       data-slot="breadcrumb-page"
       aria-current="page"
       className={cn(
-        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-[4px] nx:px-1.5 nx:typography-label-default nx:text-foreground nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-md nx:px-1.5 nx:typography-label-default nx:text-foreground nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}
       {...props}
-    >
-      {renderBreadcrumbText(children)}
-    </span>
+    />
   );
 }
 
@@ -225,7 +189,7 @@ function BreadcrumbMenuTrigger({
       type={type}
       aria-label={ariaLabel}
       className={cn(
-        'nx:inline-flex nx:size-5 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-[4px] nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        'nx:inline-flex nx:size-5 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}
       {...props}
@@ -296,7 +260,7 @@ function BreadcrumbEllipsis({
       type={type}
       aria-label={ariaLabel}
       className={cn(
-        'nx:inline-flex nx:shrink-0 nx:items-center nx:justify-center nx:rounded-[4px] nx:px-1.5 nx:typography-body-small nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:inline-flex nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:px-1.5 nx:typography-body-small nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         className
       )}
       {...props}

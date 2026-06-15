@@ -481,13 +481,15 @@ export const LongContent: Story = {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="#">
-              Quarterly reporting workspace with an unusually long name
+              <span>
+                Quarterly reporting workspace with an unusually long name
+              </span>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>
-              Budget assumptions and approval workflow details
+              <span>Budget assumptions and approval workflow details</span>
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
