@@ -53,7 +53,7 @@ export const Vertical: Story = {
       className="nx:w-full"
       aria-label="Vertical carousel"
     >
-      <CarouselContent className="nx:h-[260px]">{slideItems}</CarouselContent>
+      <CarouselContent className="nx:h-[350px]">{slideItems}</CarouselContent>
       <CarouselPrevious />
       <CarouselNext />
     </Carousel>
@@ -121,7 +121,7 @@ export const VerticalKeyboardInteraction: Story = {
       className="nx:w-full"
       aria-label="Vertical keyboard demo carousel"
     >
-      <CarouselContent className="nx:h-[260px]">{slideItems}</CarouselContent>
+      <CarouselContent className="nx:h-[350px]">{slideItems}</CarouselContent>
       <CarouselPrevious />
       <CarouselNext />
     </Carousel>
