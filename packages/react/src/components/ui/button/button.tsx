@@ -57,22 +57,13 @@ function isIconButtonSize(size: ButtonSize) {
   return size === 'icon-sm' || size === 'icon' || size === 'icon-lg';
 }
 
-function getVisualButtonSize(
-  size: ButtonSize,
-  isIconOnly: boolean
-): ButtonSize {
-  if (!isIconOnly) return size;
-  if (isIconButtonSize(size)) return size;
-  if (size === 'sm') return 'icon-sm';
-  if (size === 'lg') return 'icon-lg';
-  return 'icon';
-}
-
 interface ButtonProps
   extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   /**
-   * When true, the button will render as its child element (using Radix Slot).
-   * Useful for rendering as a link or custom element while keeping button styles.
+   * When true, the button renders as its child element (via Radix Slot),
+   * applying button styling to e.g. an `<a>` while leaving the child's own
+   * content untouched — compose icons inside the child. `loading` and the
+   * `startIcon` / `endIcon` slots apply to the native `<button>` only.
    * @default false
    * @example
    * ```tsx
@@ -84,9 +75,8 @@ interface ButtonProps
   asChild?: boolean;
 
   /**
-   * Shows a loading indicator and disables the button.
-   * While loading, the spinner replaces all visible content and any icon
-   * slots are hidden.
+   * Shows a loading indicator and disables the button. While loading, the
+   * spinner replaces all visible content and any icon slots are hidden.
    * @default false
    * @example
    * ```tsx
@@ -108,193 +98,126 @@ interface ButtonProps
    * `loading` (the spinner replaces all content).
    */
   endIcon?: React.ReactNode;
-
-  /**
-   * Uses the fixed icon-only sizing model while preserving the same Button
-   * semantics. `sm`, `default`, and `lg` map to the 8/10/12 spacing scale.
-   * Icon-only buttons require `aria-label` or `aria-labelledby`.
-   * @default false
-   */
-  isIconOnly?: boolean;
 }
-
-type ButtonAsChildElementProps = {
-  children?: React.ReactNode;
-  onClick?: React.MouseEventHandler<HTMLElement>;
-};
 
 function hasIconSlot(icon: React.ReactNode) {
   return icon !== undefined && icon !== null && icon !== false;
 }
 
-function buttonIconSlot(position: 'start' | 'end', icon: React.ReactNode) {
-  if (!hasIconSlot(icon)) return null;
+function ButtonIcon({
+  position,
+  children,
+}: {
+  position: 'start' | 'end';
+  children: React.ReactNode;
+}) {
+  if (!hasIconSlot(children)) return null;
   return (
     <span
       aria-hidden="true"
       data-slot={`button-${position}-icon`}
       className="nx:inline-flex nx:shrink-0"
     >
-      {icon}
-    </span>
-  );
-}
-
-function buttonLoadingContent(children: React.ReactNode) {
-  return (
-    <span
-      data-slot="button-loading-content"
-      className="nx:relative nx:inline-flex nx:items-center nx:justify-center"
-    >
-      <span data-slot="button-loading-label" className="nx:opacity-0">
-        {children}
-      </span>
-      <Spinner
-        aria-hidden="true"
-        className="nx:absolute nx:left-1/2 nx:top-1/2 nx:-translate-x-1/2 nx:-translate-y-1/2"
-      />
+      {children}
     </span>
   );
 }
 
 /** Icon slots and label content; loading renders spinner-only visually. */
-function buttonContent({
-  children,
-  endIcon,
+function ButtonContent({
   loading,
   startIcon,
+  endIcon,
+  children,
 }: {
-  children: React.ReactNode;
-  endIcon?: React.ReactNode;
   loading: boolean;
   startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
+  children: React.ReactNode;
 }) {
-  if (loading) return buttonLoadingContent(children);
+  if (loading)
+    return (
+      <span
+        data-slot="button-loading-content"
+        className="nx:relative nx:inline-flex nx:items-center nx:justify-center"
+      >
+        <span data-slot="button-loading-label" className="nx:opacity-0">
+          {children}
+        </span>
+        <Spinner
+          aria-hidden="true"
+          className="nx:absolute nx:left-1/2 nx:top-1/2 nx:-translate-x-1/2 nx:-translate-y-1/2"
+        />
+      </span>
+    );
 
   return (
     <>
-      {buttonIconSlot('start', startIcon)}
+      <ButtonIcon position="start">{startIcon}</ButtonIcon>
       {children}
-      {buttonIconSlot('end', endIcon)}
+      <ButtonIcon position="end">{endIcon}</ButtonIcon>
     </>
   );
 }
 
 /**
- * The default `<button>`. Native `disabled` gives non-interactivity for free —
- * it blocks the click, focus, and keyboard with no JS guard needed.
+ * Native `<button>` by default. With `asChild`, the consumer's element renders
+ * through Radix `Slot` with button styling and its own content untouched. A
+ * non-button element ignores native `disabled`, so the disabled state there is
+ * best-effort: `aria-disabled`, `tabIndex={-1}`, and the
+ * `aria-disabled:pointer-events-none` class block real interaction.
  */
-function NativeButton({
+function Button({
+  asChild = false,
   className,
   variant = 'default',
   size,
-  isIconOnly = false,
   loading = false,
   disabled,
   children,
-  endIcon,
   startIcon,
+  endIcon,
   type = 'button',
-  'aria-busy': ariaBusy,
-  'aria-disabled': ariaDisabled,
-  ...props
-}: ButtonProps) {
-  const isDisabled = disabled || loading;
-  const semanticSize = size ?? 'default';
-  const visualSize = getVisualButtonSize(semanticSize, isIconOnly);
-  const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
-
-  return (
-    <button
-      data-slot="button"
-      data-variant={variant}
-      data-size={semanticSize}
-      data-icon-only={iconOnly || undefined}
-      data-loading={loading || undefined}
-      className={cn(buttonVariants({ variant, size: visualSize, className }))}
-      {...props}
-      type={type}
-      disabled={isDisabled}
-      aria-disabled={isDisabled || ariaDisabled || undefined}
-      aria-busy={loading || ariaBusy || undefined}
-    >
-      {buttonContent({ children, endIcon, loading, startIcon })}
-    </button>
-  );
-}
-
-/**
- * The `asChild` path. The child (e.g. an `<a>`) ignores native `disabled`, so
- * non-interactivity is faked with `aria-disabled`, `tabIndex={-1}`, and a click
- * guard. The child's own `onClick` is pulled onto the guarded handler so it
- * can't fire while disabled.
- */
-function SlotButton({
-  className,
-  variant = 'default',
-  size,
-  isIconOnly = false,
-  loading = false,
-  disabled,
-  children,
-  endIcon,
-  onClick,
-  startIcon,
   tabIndex,
   'aria-busy': ariaBusy,
   'aria-disabled': ariaDisabled,
   ...props
 }: ButtonProps) {
-  if (!React.isValidElement<ButtonAsChildElementProps>(children)) return null;
-
-  const isDisabled = disabled || loading;
   const semanticSize = size ?? 'default';
-  const visualSize = getVisualButtonSize(semanticSize, isIconOnly);
-  const iconOnly = isIconOnly || isIconButtonSize(semanticSize);
-  const childOnClick = children.props.onClick;
+  const isDisabled = disabled || loading;
+  const iconOnly = isIconButtonSize(semanticSize);
 
-  const handleClick: React.MouseEventHandler<HTMLElement> = (event) => {
-    if (isDisabled) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    childOnClick?.(event);
-    onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+  const sharedProps = {
+    'data-slot': 'button',
+    'data-variant': variant,
+    'data-size': semanticSize,
+    'data-icon-only': iconOnly || undefined,
+    'data-loading': loading || undefined,
+    className: cn(buttonVariants({ variant, size: semanticSize, className })),
+    'aria-busy': loading || ariaBusy || undefined,
+    'aria-disabled': isDisabled || ariaDisabled || undefined,
   };
 
-  return (
-    <Slot
-      data-slot="button"
-      data-variant={variant}
-      data-size={semanticSize}
-      data-icon-only={iconOnly || undefined}
-      data-loading={loading || undefined}
-      className={cn(buttonVariants({ variant, size: visualSize, className }))}
-      {...props}
-      aria-disabled={isDisabled || ariaDisabled || undefined}
-      aria-busy={loading || ariaBusy || undefined}
-      tabIndex={isDisabled ? -1 : tabIndex}
-      onClick={handleClick}
-    >
-      {React.cloneElement(
-        children,
-        { onClick: undefined },
-        buttonContent({
-          children: children.props.children,
-          endIcon,
-          loading,
-          startIcon,
-        })
-      )}
-    </Slot>
-  );
-}
+  if (asChild && React.isValidElement(children))
+    return (
+      <Slot {...sharedProps} {...props} tabIndex={isDisabled ? -1 : tabIndex}>
+        {children}
+      </Slot>
+    );
 
-function Button({ asChild = false, type, ...props }: ButtonProps) {
-  if (asChild && React.isValidElement(props.children))
-    return <SlotButton {...props} />;
-  return <NativeButton {...props} type={type} />;
+  return (
+    <button
+      {...sharedProps}
+      {...props}
+      type={type}
+      disabled={isDisabled}
+      tabIndex={tabIndex}
+    >
+      <ButtonContent loading={loading} startIcon={startIcon} endIcon={endIcon}>
+        {children}
+      </ButtonContent>
+    </button>
+  );
 }
 
 export { Button, type ButtonProps, buttonVariants };

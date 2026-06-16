@@ -94,10 +94,6 @@ const meta: Meta<typeof Button> = {
       options: ['default', 'sm', 'lg', 'icon-sm', 'icon', 'icon-lg'],
       description: 'The size of the button',
     },
-    isIconOnly: {
-      control: 'boolean',
-      description: 'Use the fixed icon-only sizing model',
-    },
     startIcon: {
       control: false,
       description: 'Decorative icon rendered before the button label',
@@ -268,13 +264,13 @@ export const IconLargeSize: Story = {
 export const IconOnlySizes: Story = {
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-2">
-      <Button size="sm" isIconOnly aria-label="Small icon">
+      <Button size="icon-sm" aria-label="Small icon">
         <IconStar />
       </Button>
-      <Button isIconOnly aria-label="Default icon">
+      <Button size="icon" aria-label="Default icon">
         <IconStar />
       </Button>
-      <Button size="lg" isIconOnly aria-label="Large icon">
+      <Button size="icon-lg" aria-label="Large icon">
         <IconStar />
       </Button>
     </div>
@@ -604,20 +600,16 @@ export const DisabledAsLink: Story = {
   },
   render: ({ children, ...args }) => (
     <Button {...args} asChild>
-      <a
-        href="#disabled-as-link"
-        onClick={(event) => {
-          event.currentTarget.dataset.childClicked = 'true';
-        }}
-      >
-        {children}
-      </a>
+      <a href="#disabled-as-link">{children}</a>
     </Button>
   ),
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const link = canvas.getByRole('link');
 
+    // asChild disabled is best-effort: an <a> ignores native `disabled`, so
+    // non-interactivity comes from aria-disabled + tabIndex=-1 + the
+    // aria-disabled:pointer-events-none class (no JS click guard).
     await expect(link).not.toHaveAttribute('disabled');
     await expect(link).not.toHaveAttribute('type');
     await expect(link).toHaveAttribute('aria-disabled', 'true');
@@ -625,60 +617,6 @@ export const DisabledAsLink: Story = {
     await expect(link).toHaveClass('nx:aria-disabled:pointer-events-none');
     await expect(link).toHaveClass('nx:aria-disabled:opacity-100');
     await expect(link).toHaveClass('nx:aria-disabled:bg-primary-disabled');
-
-    const clickResult = link.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true })
-    );
-    expect(clickResult).toBe(false);
-    await expect(link).not.toHaveAttribute('data-child-clicked');
-    await expect(args.onClick).not.toHaveBeenCalled();
-  },
-};
-
-export const LoadingAsLink: Story = {
-  args: {
-    loading: true,
-    children: 'Loading link',
-  },
-  render: ({ children, ...args }) => (
-    <Button {...args} asChild>
-      <a
-        href="#loading-as-link"
-        onClick={(event) => {
-          event.currentTarget.dataset.childClicked = 'true';
-        }}
-      >
-        {children}
-      </a>
-    </Button>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const link = canvas.getByRole('link', { name: 'Loading link' });
-    const loadingLabel = link.querySelector(
-      '[data-slot="button-loading-label"]'
-    );
-
-    await expect(link).not.toHaveAttribute('disabled');
-    await expect(link).not.toHaveAttribute('type');
-    await expect(link).toHaveAttribute('aria-busy', 'true');
-    await expect(link).toHaveAttribute('aria-disabled', 'true');
-    await expect(link).toHaveAttribute('data-loading', 'true');
-    await expect(link).toHaveAttribute('tabindex', '-1');
-    await expect(
-      link.querySelector('[data-slot="spinner"]')
-    ).toBeInTheDocument();
-    await expect(loadingLabel).toBeInTheDocument();
-    await expect(loadingLabel).toHaveClass('nx:opacity-0');
-    await expect(loadingLabel).toHaveTextContent('Loading link');
-    await expect(link).toHaveAccessibleName('Loading link');
-
-    const clickResult = link.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true })
-    );
-    expect(clickResult).toBe(false);
-    await expect(link).not.toHaveAttribute('data-child-clicked');
-    await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
 
@@ -752,27 +690,6 @@ export const LoadingUsesSpinnerOnly: Story = {
   },
 };
 
-export const AsLinkWithIconSlots: Story = {
-  render: (args) => (
-    <Button {...args} asChild startIcon={<IconRocket />}>
-      <a href="https://example.com">Visit Website</a>
-    </Button>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const link = canvas.getByRole('link', { name: 'Visit Website' });
-
-    await expect(link).toHaveAttribute('data-slot', 'button');
-    await expect(
-      link.querySelector('[data-slot="button-start-icon"]')
-    ).toBeInTheDocument();
-    await expect(
-      link.querySelector('[data-slot="button-end-icon"]')
-    ).not.toBeInTheDocument();
-    await expect(link).toHaveAccessibleName('Visit Website');
-  },
-};
-
 // ============================================
 // ALL VARIANTS GRID (visual reference)
 // ============================================
@@ -803,13 +720,13 @@ export const AllVariants: Story = {
           <Button size="sm">Small</Button>
           <Button size="default">Default</Button>
           <Button size="lg">Large</Button>
-          <Button size="sm" isIconOnly aria-label="Small icon">
+          <Button size="icon-sm" aria-label="Small icon">
             <IconStar />
           </Button>
           <Button size="icon" aria-label="Icon">
             <IconStar />
           </Button>
-          <Button size="lg" isIconOnly aria-label="Large icon">
+          <Button size="icon-lg" aria-label="Large icon">
             <IconStar />
           </Button>
         </div>
@@ -957,23 +874,21 @@ export const IconScaleHeightsAcrossModes: Story = {
           className="nx:flex nx:items-center nx:gap-2"
         >
           <Button
-            size="sm"
-            isIconOnly
+            size="icon-sm"
             aria-label={`Small icon ${mode}`}
             data-testid={`button-icon-sm-${mode}`}
           >
             <IconStar />
           </Button>
           <Button
-            isIconOnly
+            size="icon"
             aria-label={`Default icon ${mode}`}
             data-testid={`button-icon-default-${mode}`}
           >
             <IconStar />
           </Button>
           <Button
-            size="lg"
-            isIconOnly
+            size="icon-lg"
             aria-label={`Large icon ${mode}`}
             data-testid={`button-icon-lg-${mode}`}
           >
