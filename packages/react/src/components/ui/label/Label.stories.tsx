@@ -44,6 +44,16 @@ export const Disabled: Story = {
   ),
 };
 
+export const LongContent: Story = {
+  render: () => (
+    <div className="nx:w-56">
+      <Label>
+        Notification preference for product updates and workspace activity
+      </Label>
+    </div>
+  ),
+};
+
 // ============================================
 // INTERACTION TESTS
 // ============================================
@@ -87,6 +97,12 @@ export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-4">
       <Label>Default label</Label>
+
+      <div className="nx:w-56">
+        <Label>
+          Notification preference for product updates and workspace activity
+        </Label>
+      </div>
 
       <Label>
         <input type="checkbox" aria-label="Nested checkbox" />
