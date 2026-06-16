@@ -176,6 +176,25 @@ export const LongContent: Story = {
   ),
 };
 
+export const MediaCard: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <div aria-hidden="true" className="nx:aspect-video nx:bg-muted nx:p-6">
+        <div className="nx:size-full nx:rounded-lg nx:border nx:border-border-default nx:bg-container" />
+      </div>
+      <CardHeader>
+        <CardTitle>Campaign Snapshot</CardTitle>
+        <CardDescription>Updated 12 minutes ago</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>
+          Performance improved across three regions after the latest rollout.
+        </p>
+      </CardContent>
+    </Card>
+  ),
+};
+
 // ============================================
 // USE CASE EXAMPLES
 // ============================================
@@ -194,7 +213,7 @@ export const LoginCard: Story = {
           <div className="nx:flex nx:flex-col nx:gap-2">
             <label
               htmlFor="email"
-              className="nx:text-sm nx:font-medium nx:text-foreground"
+              className="nx:typography-label-default nx:text-foreground"
             >
               Email
             </label>
@@ -203,7 +222,7 @@ export const LoginCard: Story = {
           <div className="nx:flex nx:flex-col nx:gap-2">
             <label
               htmlFor="password"
-              className="nx:text-sm nx:font-medium nx:text-foreground"
+              className="nx:typography-label-default nx:text-foreground"
             >
               Password
             </label>
@@ -222,6 +241,33 @@ export const LoginCard: Story = {
   ),
 };
 
+export const BorderedFooter: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Plan Usage</CardTitle>
+        <CardDescription>
+          Seats and billing are managed together.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="nx:flex nx:items-baseline nx:gap-2">
+          <span className="nx:typography-heading-medium nx:text-foreground">
+            $49
+          </span>
+          <span className="nx:typography-body-small nx:text-muted-foreground">
+            per seat
+          </span>
+        </div>
+      </CardContent>
+      <CardFooter className="nx:border-t nx:border-border-default nx:bg-muted nx:pt-6">
+        <Button variant="outline">Compare</Button>
+        <Button>Upgrade</Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
 export const NotificationCard: Story = {
   render: (_args) => (
     <Card className="nx:w-[350px]">
@@ -234,7 +280,7 @@ export const NotificationCard: Story = {
           <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
             <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
             <div>
-              <p className="nx:text-sm nx:font-medium">New message</p>
+              <p className="nx:typography-label-default">New message</p>
               <p className="nx:text-sm nx:text-foreground/70">
                 John sent you a message
               </p>
@@ -243,7 +289,7 @@ export const NotificationCard: Story = {
           <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
             <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
             <div>
-              <p className="nx:text-sm nx:font-medium">Update available</p>
+              <p className="nx:typography-label-default">Update available</p>
               <p className="nx:text-sm nx:text-foreground/70">
                 Version 2.0 is now available
               </p>
@@ -265,7 +311,9 @@ export const StatsCard: Story = {
     <Card className="nx:w-[200px]">
       <CardHeader className="nx:pb-2">
         <CardDescription>Total Revenue</CardDescription>
-        <CardTitle className="nx:text-3xl">$45,231</CardTitle>
+        <p className="nx:col-start-1 nx:min-w-0 nx:typography-heading-large nx:text-foreground">
+          $45,231
+        </p>
       </CardHeader>
       <CardContent>
         <p className="nx:text-xs nx:text-muted-foreground">
@@ -274,6 +322,48 @@ export const StatsCard: Story = {
       </CardContent>
     </Card>
   ),
+};
+
+export const LongTitleWithAction: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[320px]">
+      <CardHeader>
+        <CardTitle>
+          Quarterly revenue operations review with customer expansion notes
+        </CardTitle>
+        <CardDescription>
+          The action should keep its own reserved column.
+        </CardDescription>
+        <CardAction>
+          <Button size="sm" variant="outline">
+            Edit
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <p>Header text wraps before it reaches the action.</p>
+      </CardContent>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+
+    const title = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="card-title"]'
+    );
+    const action = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="card-action"]'
+    );
+
+    if (!title || !action) {
+      throw new Error('Expected card title and action to render.');
+    }
+
+    const titleRect = title.getBoundingClientRect();
+    const actionRect = action.getBoundingClientRect();
+
+    await expect(titleRect.right).toBeLessThanOrEqual(actionRect.left + 0.5);
+  },
 };
 
 // ============================================
@@ -346,7 +436,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Basic Card
         </h3>
         <Card className="nx:w-[350px]">
@@ -361,7 +451,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Card with Footer
         </h3>
         <Card className="nx:w-[350px]">
@@ -380,7 +470,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Card with Action
         </h3>
         <Card className="nx:w-[350px]">
@@ -400,14 +490,16 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Stats Card
         </h3>
         <div className="nx:flex nx:gap-4">
           <Card className="nx:w-[180px]">
             <CardHeader className="nx:pb-2">
               <CardDescription>Revenue</CardDescription>
-              <CardTitle className="nx:text-2xl">$12,345</CardTitle>
+              <p className="nx:col-start-1 nx:min-w-0 nx:typography-heading-medium nx:text-foreground">
+                $12,345
+              </p>
             </CardHeader>
             <CardContent>
               <p className="nx:text-xs nx:text-muted-foreground">+12% growth</p>
@@ -416,7 +508,9 @@ export const AllVariants: Story = {
           <Card className="nx:w-[180px]">
             <CardHeader className="nx:pb-2">
               <CardDescription>Users</CardDescription>
-              <CardTitle className="nx:text-2xl">1,234</CardTitle>
+              <p className="nx:col-start-1 nx:min-w-0 nx:typography-heading-medium nx:text-foreground">
+                1,234
+              </p>
             </CardHeader>
             <CardContent>
               <p className="nx:text-xs nx:text-muted-foreground">+5% growth</p>
@@ -441,7 +535,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-6` → `p-container` (24px matches vega byte-identically). Positional offsets (`right-6`, `top-6` on `CardAction`) and sub-element offsets (`gap-1.5` between title/description, `gap-2` between footer buttons, `pt-0` to collapse content into header) stay numeric per the coupling-table Card row. Container-p values across modes: nova 20 / vega-tier 24 / maia & luma 28 / sera 40 — the card visibly grows in breathy modes.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-container` → `p-6` to preserve the vega 24px default while leaving the container-role curve. `p-6` follows the standard spacing scale: nova 22 / maia 28 / all other modes 24. `CardAction` is in-flow grid content, with the header padding supplying the inset; `gap-1.5`, `gap-2`, and `pt-0` stay numeric.',
       },
     },
   },
@@ -467,7 +561,7 @@ export const ModesProduceDifferentHeights: Story = {
     docs: {
       description: {
         story:
-          'Cascade sentinel for `CardContent` `p-container`. Uses the `nova` + `luma` pair to cover the container-p axis at two distinct values (nova 20, luma 28) — luma had not appeared in any sentinel before; the suite now hits at least one mode beyond the vega-cluster across each major role-token family. Card has no portaled content; dimensional measurement on the wrapper works directly. The Card contains a 40px fixed-height child so the height equation is `border 2 + (pt-0 + child-40 + pb-container)` — vega 66px, nova 62px, luma 70px.',
+          'Cascade sentinel for numeric `CardContent` `p-6`. Card has no portaled content, so dimensional measurement on the wrapper works directly. The Card contains a 40px fixed-height child, making the height equation `border 2 + pt-0 + child 40 + p-6 bottom`; nova resolves to 64px and luma resolves to 66px.',
       },
     },
   },
@@ -505,7 +599,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: in vega mode, a Card containing a single `CardContent` with a 40px fixed-height child renders at exactly 66px (= border 1px × 2 + `CardContent` pt-0 + child-40 + p-container bottom 24). If a designer retunes `--container-p` or the border-width token, this test fails.',
+          'Pin on the migration outcome: in vega mode, a Card containing a single `CardContent` with a 40px fixed-height child renders at exactly 66px (= border 1px × 2 + `CardContent` pt-0 + child 40 + `p-6` bottom 24). If a designer retunes spacing-6 or the border-width token, this test fails.',
       },
     },
   },

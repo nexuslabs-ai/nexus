@@ -151,7 +151,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          'nx:flex nx:w-full nx:bg-transparent nx:py-control-md nx:text-sm nx:outline-none',
+          'nx:flex nx:w-full nx:bg-transparent nx:py-2 nx:typography-body-small nx:outline-none',
           'nx:placeholder:text-muted-foreground',
           'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
           className
@@ -181,7 +181,7 @@ function CommandList({ className, ...props }: CommandListProps) {
     <CommandPrimitive.List
       data-slot="command-list"
       className={cn(
-        'nx:max-h-[300px] nx:overflow-y-auto nx:overflow-x-hidden',
+        'nx:max-h-[300px] nx:overflow-y-auto nx:overflow-x-hidden nx:scroll-py-2',
         className
       )}
       {...props}
@@ -207,7 +207,48 @@ function CommandEmpty({ className, ...props }: CommandEmptyProps) {
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
-      className={cn('nx:py-6 nx:text-center nx:text-sm', className)}
+      className={cn(
+        'nx:py-6 nx:text-center nx:typography-body-small',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * CommandLoadingProps
+ *
+ * Props for the CommandLoading component.
+ */
+interface CommandLoadingProps extends React.ComponentProps<
+  typeof CommandPrimitive.Loading
+> {}
+
+/**
+ * CommandLoading
+ *
+ * Rendered while asynchronous command results are loading. Pass `progress` and
+ * `label` when you can estimate loading state for assistive technology.
+ *
+ * @example
+ * ```tsx
+ * <CommandLoading label="Loading command results">
+ *   Loading commands...
+ * </CommandLoading>
+ * ```
+ */
+function CommandLoading({ className, ...props }: CommandLoadingProps) {
+  return (
+    <CommandPrimitive.Loading
+      data-slot="command-loading"
+      className={cn(
+        'nx:px-3 nx:py-2.5',
+        // cmdk nests Loading's children in an inner aria-hidden div — target it to lay the spinner + label out as a row.
+        'nx:*:aria-hidden:flex nx:*:aria-hidden:items-center nx:*:aria-hidden:gap-3',
+        'nx:typography-body-small nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );
@@ -241,9 +282,9 @@ function CommandGroup({ className, ...props }: CommandGroupProps) {
       data-slot="command-group"
       className={cn(
         'nx:overflow-hidden nx:text-popover-foreground',
-        'nx:p-1',
+        'nx:p-2',
         'nx:**:[[cmdk-group-heading]]:px-2 nx:**:[[cmdk-group-heading]]:py-1.5',
-        'nx:**:[[cmdk-group-heading]]:text-xs nx:**:[[cmdk-group-heading]]:font-medium nx:**:[[cmdk-group-heading]]:text-muted-foreground',
+        'nx:**:[[cmdk-group-heading]]:typography-label-small nx:**:[[cmdk-group-heading]]:text-muted-foreground',
         className
       )}
       {...props}
@@ -306,8 +347,8 @@ function CommandItem({ className, ...props }: CommandItemProps) {
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:text-sm nx:outline-none',
-        'nx:gap-2 nx:px-2 nx:py-control-sm',
+        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:typography-body-small nx:outline-none',
+        'nx:gap-3 nx:px-3 nx:py-2.5',
         'nx:data-[selected=true]:bg-popover-hover nx:data-[selected=true]:text-popover-foreground',
         'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:opacity-50',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
@@ -364,6 +405,8 @@ export {
   type CommandItemProps,
   CommandList,
   type CommandListProps,
+  CommandLoading,
+  type CommandLoadingProps,
   type CommandProps,
   CommandSeparator,
   type CommandSeparatorProps,

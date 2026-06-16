@@ -32,7 +32,7 @@ export function DataPager({
         </span>
         <Button
           variant="outline"
-          size="sm"
+          size="icon-sm"
           onClick={onPrev}
           disabled={page === 0}
           aria-label="Previous page"
@@ -41,7 +41,7 @@ export function DataPager({
         </Button>
         <Button
           variant="outline"
-          size="sm"
+          size="icon-sm"
           onClick={onNext}
           disabled={page >= pageCount - 1}
           aria-label="Next page"
