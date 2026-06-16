@@ -210,7 +210,6 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
       data-slot="field-description"
       className={cn(
         'nx:typography-body-small nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
-        'nx:last:mt-0 nx:nth-last-2:-mt-1 nx:[[data-variant=legend]+&]:-mt-1.5',
         'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
