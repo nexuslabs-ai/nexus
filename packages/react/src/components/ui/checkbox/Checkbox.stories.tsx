@@ -3,11 +3,20 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { IconCircleFilled } from '@/lib/icons';
-
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+  FieldTitle,
+} from '../field';
 import { Label } from '../label';
 
-import { Checkbox, CheckboxCard } from './checkbox';
+import { Checkbox } from './checkbox';
 
 const meta: Meta<typeof Checkbox> = {
   title: 'Components/Checkbox',
@@ -22,14 +31,32 @@ const meta: Meta<typeof Checkbox> = {
 
 export default meta;
 type Story = StoryObj<typeof Checkbox>;
-type CheckboxCardStory = StoryObj<typeof CheckboxCard>;
 
-function CheckboxCardFrame({ children }: { children: React.ReactNode }) {
-  return <div className="nx:w-[478.5px] nx:max-w-full">{children}</div>;
-}
+// A selectable card's *frame* is the wrapper's concern, not the checkbox's. In
+// the old monolith these were the `variant` / `floating` props; here the inner
+// `Field + Checkbox + FieldContent` core is identical and only `FieldLabel`'s
+// border classes change. `FieldLabel`'s default is the floating rounded card;
+// these two overrides collapse it to a bottom-border list row or a plain row.
+const BOTTOM_BORDER_ROW =
+  'nx:has-[>[data-slot=field]]:rounded-none nx:has-[>[data-slot=field]]:border-t-0 nx:has-[>[data-slot=field]]:border-x-0';
+const BORDERLESS_ROW =
+  'nx:has-[>[data-slot=field]]:rounded-none nx:has-[>[data-slot=field]]:border-0 nx:*:data-[slot=field]:p-0 nx:has-data-[state=checked]:bg-transparent';
 
-function LabelLeadingIcon() {
-  return <IconCircleFilled aria-hidden="true" className="nx:size-3.5" />;
+function FrameSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="nx:flex nx:flex-col nx:gap-2">
+      <h4 className="nx:typography-label-small nx:text-muted-foreground">
+        {title}
+      </h4>
+      {children}
+    </div>
+  );
 }
 
 // ============================================
@@ -234,235 +261,209 @@ export const InvalidStates: Story = {
 };
 
 // ============================================
-// CHECKBOX CARD STORIES
+// SELECTABLE CARD STORIES (composition)
 // ============================================
+// A selectable card is composed, not a bespoke primitive: a `FieldLabel`
+// wrapping a `Field` turns the whole surface into a label for the real
+// `Checkbox`. Clicking anywhere toggles the atom via native `htmlFor`, and the
+// card highlights from the checkbox's own `data-state` (`FieldLabel`'s
+// `has-data-[state=checked]`). The checkbox stays the single focusable control,
+// so the description may hold links — no invalid button-in-button nesting.
 
-export const CardDefault: CheckboxCardStory = {
-  args: {
-    label: 'Label',
-    description: 'Description for label',
-    required: true,
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} />
-    </CheckboxCardFrame>
+export const SelectableCard: Story = {
+  render: () => (
+    <div className="nx:w-80">
+      <FieldLabel htmlFor="card-2fa">
+        <Field orientation="horizontal">
+          <Checkbox id="card-2fa" aria-labelledby="card-2fa-title" />
+          <FieldContent>
+            <FieldTitle id="card-2fa-title">Enable two-factor auth</FieldTitle>
+            <FieldDescription>
+              Add an extra layer of security to your account.
+            </FieldDescription>
+          </FieldContent>
+        </Field>
+      </FieldLabel>
+    </div>
   ),
-};
-
-export const CardOutline: CheckboxCardStory = {
-  args: {
-    label: 'Label',
-    description: 'Description for label',
-    required: true,
-    variant: 'outline',
-    defaultChecked: true,
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} />
-    </CheckboxCardFrame>
-  ),
-};
-
-export const CardTrailingCheckbox: CheckboxCardStory = {
-  args: {
-    label: 'Label',
-    description: 'Description for label',
-    required: true,
-    checkboxPosition: 'after',
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} />
-    </CheckboxCardFrame>
-  ),
-};
-
-export const CardNonFloating: CheckboxCardStory = {
-  args: {
-    label: 'Label',
-    description: 'Description for label',
-    required: true,
-    variant: 'outline',
-    floating: false,
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} />
-    </CheckboxCardFrame>
-  ),
-};
-
-export const CardWithLeadingSlot: CheckboxCardStory = {
-  args: {
-    label: 'Label',
-    description: 'Description for label',
-    required: true,
-    variant: 'outline',
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} labelLeading={<LabelLeadingIcon />} />
-    </CheckboxCardFrame>
-  ),
-};
-
-export const CardDisabled: CheckboxCardStory = {
-  args: {
-    label: 'Label',
-    description: 'Description for label',
-    required: true,
-    variant: 'outline',
-    disabled: true,
-    defaultChecked: true,
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} />
-    </CheckboxCardFrame>
-  ),
-  play: async ({ canvasElement, args }) => {
+  // Clicking the description — anywhere in the label — toggles the real control.
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const checkbox = canvas.getByRole('checkbox', { name: 'Label' });
-
-    await expect(checkbox).toBeDisabled();
-
-    await userEvent.click(checkbox);
-    await expect(args.onCheckedChange).not.toHaveBeenCalled();
-  },
-};
-
-export const CardClickInteraction: CheckboxCardStory = {
-  args: {
-    label: 'Email updates',
-    description: 'Receive product updates and security alerts.',
-    onCheckedChange: fn(),
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} />
-    </CheckboxCardFrame>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const checkbox = canvas.getByRole('checkbox', { name: 'Email updates' });
+    const checkbox = canvas.getByRole('checkbox', {
+      name: 'Enable two-factor auth',
+    });
 
     await expect(checkbox).not.toBeChecked();
 
-    await userEvent.click(checkbox);
+    await userEvent.click(
+      canvas.getByText('Add an extra layer of security to your account.')
+    );
     await expect(checkbox).toBeChecked();
-    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
-  },
-};
-
-export const CardKeyboardInteraction: CheckboxCardStory = {
-  args: {
-    label: 'Keyboard option',
-    description: 'Toggle this option with the Space key.',
-    onCheckedChange: fn(),
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} />
-    </CheckboxCardFrame>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const checkbox = canvas.getByRole('checkbox', { name: 'Keyboard option' });
-
-    await userEvent.tab();
-    await expect(checkbox).toHaveFocus();
-
-    await userEvent.keyboard(' ');
-    await expect(checkbox).toBeChecked();
-    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
-  },
-};
-
-export const CardWithDataAttributes: CheckboxCardStory = {
-  args: {
-    label: 'Data attributes',
-    description: 'Data-slot hooks are available on the group parts.',
-    variant: 'outline',
-    checkboxPosition: 'after',
-    floating: false,
-    defaultChecked: true,
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <CheckboxCard {...args} labelLeading={<LabelLeadingIcon />} />
-    </CheckboxCardFrame>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const checkbox = canvas.getByRole('checkbox', { name: 'Data attributes' });
-
-    await expect(checkbox).toHaveAttribute('data-slot', 'checkbox-card');
-    await expect(checkbox).toHaveAttribute('data-variant', 'outline');
-    await expect(checkbox).toHaveAttribute('data-checkbox-position', 'after');
-    await expect(checkbox).toHaveAttribute('data-floating', 'false');
     await expect(checkbox).toHaveAttribute('data-state', 'checked');
-
-    const label = checkbox.querySelector('[data-slot="checkbox-card-label"]');
-    const description = checkbox.querySelector(
-      '[data-slot="checkbox-card-description"]'
-    );
-    const control = checkbox.querySelector(
-      '[data-slot="checkbox-card-control"]'
-    );
-    const leading = checkbox.querySelector(
-      '[data-slot="checkbox-card-label-leading"]'
-    );
-    const check = checkbox.querySelector('[data-slot="checkbox-card-check"]');
-
-    await expect(label).toBeInTheDocument();
-    await expect(description).toBeInTheDocument();
-    await expect(control).toBeInTheDocument();
-    await expect(leading).toBeInTheDocument();
-    await expect(check).toBeVisible();
-    await expect(checkbox).toHaveAttribute('aria-labelledby', label?.id);
-    await expect(checkbox).toHaveAttribute('aria-describedby', description?.id);
   },
 };
 
-export const CardInvalid: CheckboxCardStory = {
-  args: {
-    label: 'Required option',
-    description: 'Selection is required before continuing.',
-    'aria-invalid': true,
-  },
-  render: (args) => (
-    <CheckboxCardFrame>
-      <div className="nx:flex nx:flex-col nx:gap-4">
-        <CheckboxCard {...args} />
-        <CheckboxCard
-          {...args}
-          label="Required option (selected)"
-          defaultChecked
-        />
-      </div>
-    </CheckboxCardFrame>
+export const SelectableCardTrailing: Story = {
+  render: () => (
+    <div className="nx:w-80">
+      <FieldLabel htmlFor="card-trailing">
+        <Field orientation="horizontal">
+          <FieldContent>
+            <FieldTitle id="card-trailing-title">Email updates</FieldTitle>
+            <FieldDescription>
+              Receive product updates and security alerts.
+            </FieldDescription>
+          </FieldContent>
+          <Checkbox
+            id="card-trailing"
+            defaultChecked
+            aria-labelledby="card-trailing-title"
+          />
+        </Field>
+      </FieldLabel>
+    </div>
   ),
-  // The default (unframed) card has no border frame, so the error affordance
-  // rides on the control box — verify both states render invalid.
+};
+
+export const SelectableCardGroup: Story = {
+  render: () => (
+    <FieldSet className="nx:w-80">
+      <FieldLegend>Notifications</FieldLegend>
+      <FieldGroup data-slot="checkbox-group">
+        <FieldLabel htmlFor="card-grp-product">
+          <Field orientation="horizontal">
+            <Checkbox
+              id="card-grp-product"
+              defaultChecked
+              aria-labelledby="card-grp-product-title"
+            />
+            <FieldContent>
+              <FieldTitle id="card-grp-product-title">
+                Product updates
+              </FieldTitle>
+              <FieldDescription>
+                News about features and improvements.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldLabel>
+        <FieldLabel htmlFor="card-grp-security">
+          <Field orientation="horizontal">
+            <Checkbox
+              id="card-grp-security"
+              aria-labelledby="card-grp-security-title"
+            />
+            <FieldContent>
+              <FieldTitle id="card-grp-security-title">
+                Security alerts
+              </FieldTitle>
+              <FieldDescription>
+                Critical notices about your account.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldLabel>
+      </FieldGroup>
+    </FieldSet>
+  ),
+};
+
+export const SelectableCardInvalid: Story = {
+  render: () => (
+    <div className="nx:w-80">
+      <FieldLabel htmlFor="card-invalid">
+        <Field orientation="horizontal" data-invalid="true">
+          <Checkbox
+            id="card-invalid"
+            aria-invalid
+            aria-labelledby="card-invalid-title"
+            aria-describedby="card-invalid-error"
+          />
+          <FieldContent>
+            <FieldTitle id="card-invalid-title">Accept the policy</FieldTitle>
+            <FieldDescription>
+              You must accept before continuing.
+            </FieldDescription>
+            <FieldError
+              id="card-invalid-error"
+              errors={[{ message: 'This selection is required.' }]}
+            />
+          </FieldContent>
+        </Field>
+      </FieldLabel>
+    </div>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const unchecked = canvas.getByRole('checkbox', {
-      name: 'Required option',
+    const checkbox = canvas.getByRole('checkbox', {
+      name: 'Accept the policy',
     });
-    const checked = canvas.getByRole('checkbox', {
-      name: 'Required option (selected)',
-    });
+    const error = canvas.getByText('This selection is required.');
 
-    await expect(unchecked).toHaveAttribute('aria-invalid', 'true');
-    await expect(unchecked).not.toBeChecked();
-    await expect(
-      unchecked.querySelector('[data-slot="checkbox-card-control"]')
-    ).toBeInTheDocument();
+    await expect(checkbox).toHaveAttribute('aria-invalid', 'true');
+    await expect(checkbox).toHaveAttribute('aria-describedby', error.id);
+    await expect(error).toHaveAttribute('role', 'alert');
+  },
+};
 
-    await expect(checked).toHaveAttribute('aria-invalid', 'true');
-    await expect(checked).toBeChecked();
+// The non-floating "row" frame: the same FieldLabel cards with their border
+// collapsed to a bottom rule, stacked flush so they read as a divided list. Only
+// the wrapper's border classes change — see BOTTOM_BORDER_ROW.
+export const SelectableRowList: Story = {
+  render: () => (
+    <FieldSet className="nx:w-96 nx:max-w-full">
+      <FieldLegend>Notifications</FieldLegend>
+      <div className="nx:flex nx:flex-col">
+        <FieldLabel htmlFor="row-product" className={BOTTOM_BORDER_ROW}>
+          <Field orientation="horizontal">
+            <Checkbox
+              id="row-product"
+              defaultChecked
+              aria-labelledby="row-product-title"
+            />
+            <FieldContent>
+              <FieldTitle id="row-product-title">Product updates</FieldTitle>
+              <FieldDescription>
+                News about features and improvements.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldLabel>
+        <FieldLabel htmlFor="row-security" className={BOTTOM_BORDER_ROW}>
+          <Field orientation="horizontal">
+            <Checkbox id="row-security" aria-labelledby="row-security-title" />
+            <FieldContent>
+              <FieldTitle id="row-security-title">Security alerts</FieldTitle>
+              <FieldDescription>
+                Critical notices about your account.
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldLabel>
+        <FieldLabel htmlFor="row-billing" className={BOTTOM_BORDER_ROW}>
+          <Field orientation="horizontal">
+            <FieldContent>
+              <FieldTitle id="row-billing-title">Billing</FieldTitle>
+              <FieldDescription>
+                Invoices and payment receipts.
+              </FieldDescription>
+            </FieldContent>
+            <Checkbox id="row-billing" aria-labelledby="row-billing-title" />
+          </Field>
+        </FieldLabel>
+      </div>
+    </FieldSet>
+  ),
+  // The whole row is the label — clicking the description toggles the control.
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const security = canvas.getByRole('checkbox', { name: 'Security alerts' });
+
+    await expect(security).not.toBeChecked();
+    await userEvent.click(
+      canvas.getByText('Critical notices about your account.')
+    );
+    await expect(security).toBeChecked();
   },
 };
 
@@ -630,87 +631,121 @@ export const AllVariants: Story = {
 
         <div>
           <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
-            Checkbox Card
+            Selectable Cards
           </h3>
-          <div className="nx:grid nx:max-w-5xl nx:grid-cols-1 nx:items-start nx:gap-4 nx:md:grid-cols-2">
-            <CheckboxCard
-              label="Default"
-              description="Description for label"
-              required
-            />
-            <CheckboxCard
-              label="Default checked"
-              description="Description for label"
-              required
-              defaultChecked
-            />
-            <CheckboxCard
-              label="Trailing"
-              description="Checkbox sits after the label and description"
-              checkboxPosition="after"
-            />
-            <CheckboxCard
-              label="Trailing checked"
-              description="Trailing checkbox with a checked state"
-              checkboxPosition="after"
-              defaultChecked
-            />
-            <CheckboxCard
-              label="Outline"
-              description="Floating card with a leading checkbox"
-              variant="outline"
-              required
-            />
-            <CheckboxCard
-              label="Outline checked"
-              description="Floating card with a selected checkbox"
-              variant="outline"
-              defaultChecked
-            />
-            <CheckboxCard
-              label="Trailing outline"
-              description="Checkbox sits after the label and description"
-              variant="outline"
-              checkboxPosition="after"
-            />
-            <CheckboxCard
-              label="Trailing outline checked"
-              description="Floating card with a selected trailing checkbox"
-              variant="outline"
-              checkboxPosition="after"
-              defaultChecked
-            />
-            <CheckboxCard
-              label="Non-floating"
-              description="Outline row rendered with only a bottom border"
-              variant="outline"
-              floating={false}
-            />
-            <CheckboxCard
-              label="Trailing row"
-              description="Non-floating row with a trailing checkbox"
-              variant="outline"
-              checkboxPosition="after"
-              floating={false}
-            />
-            <CheckboxCard
-              label="Default row"
-              description="Non-floating default row treatment"
-              checkboxPosition="after"
-              floating={false}
-            />
-            <CheckboxCard
-              label="Disabled"
-              description="Disabled options keep the same row structure"
-              variant="outline"
-              disabled
-              defaultChecked
-            />
-            <CheckboxCard
-              label="No description"
-              variant="outline"
-              labelLeading={<LabelLeadingIcon />}
-            />
+          <div className="nx:grid nx:max-w-3xl nx:grid-cols-1 nx:items-start nx:gap-6 nx:md:grid-cols-3">
+            <FrameSection title="Floating card">
+              <div className="nx:flex nx:flex-col nx:gap-3">
+                <FieldLabel htmlFor={`${uid}-card-a`}>
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id={`${uid}-card-a`}
+                      aria-labelledby={`${uid}-card-a-title`}
+                    />
+                    <FieldContent>
+                      <FieldTitle id={`${uid}-card-a-title`}>
+                        Default
+                      </FieldTitle>
+                      <FieldDescription>Description for label</FieldDescription>
+                    </FieldContent>
+                  </Field>
+                </FieldLabel>
+                <FieldLabel htmlFor={`${uid}-card-b`}>
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id={`${uid}-card-b`}
+                      defaultChecked
+                      aria-labelledby={`${uid}-card-b-title`}
+                    />
+                    <FieldContent>
+                      <FieldTitle id={`${uid}-card-b-title`}>
+                        Selected
+                      </FieldTitle>
+                      <FieldDescription>
+                        Highlights when checked
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
+                </FieldLabel>
+              </div>
+            </FrameSection>
+            <FrameSection title="Bottom-border row">
+              <div className="nx:flex nx:flex-col">
+                <FieldLabel
+                  htmlFor={`${uid}-card-c`}
+                  className={BOTTOM_BORDER_ROW}
+                >
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id={`${uid}-card-c`}
+                      aria-labelledby={`${uid}-card-c-title`}
+                    />
+                    <FieldContent>
+                      <FieldTitle id={`${uid}-card-c-title`}>Row</FieldTitle>
+                      <FieldDescription>Only a bottom border</FieldDescription>
+                    </FieldContent>
+                  </Field>
+                </FieldLabel>
+                <FieldLabel
+                  htmlFor={`${uid}-card-d`}
+                  className={BOTTOM_BORDER_ROW}
+                >
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldTitle id={`${uid}-card-d-title`}>
+                        Trailing row
+                      </FieldTitle>
+                      <FieldDescription>
+                        Checkbox after content
+                      </FieldDescription>
+                    </FieldContent>
+                    <Checkbox
+                      id={`${uid}-card-d`}
+                      defaultChecked
+                      aria-labelledby={`${uid}-card-d-title`}
+                    />
+                  </Field>
+                </FieldLabel>
+              </div>
+            </FrameSection>
+            <FrameSection title="Borderless row">
+              <div className="nx:flex nx:flex-col nx:gap-3">
+                <FieldLabel
+                  htmlFor={`${uid}-card-e`}
+                  className={BORDERLESS_ROW}
+                >
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id={`${uid}-card-e`}
+                      aria-labelledby={`${uid}-card-e-title`}
+                    />
+                    <FieldContent>
+                      <FieldTitle id={`${uid}-card-e-title`}>Plain</FieldTitle>
+                      <FieldDescription>No frame at all</FieldDescription>
+                    </FieldContent>
+                  </Field>
+                </FieldLabel>
+                <FieldLabel
+                  htmlFor={`${uid}-card-f`}
+                  className={BORDERLESS_ROW}
+                >
+                  <Field orientation="horizontal" data-disabled="true">
+                    <Checkbox
+                      id={`${uid}-card-f`}
+                      disabled
+                      defaultChecked
+                      aria-labelledby={`${uid}-card-f-title`}
+                    />
+                    <FieldContent>
+                      <FieldTitle id={`${uid}-card-f-title`}>
+                        Disabled
+                      </FieldTitle>
+                      <FieldDescription>Not selectable</FieldDescription>
+                    </FieldContent>
+                  </Field>
+                </FieldLabel>
+              </div>
+            </FrameSection>
           </div>
         </div>
 
