@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { ButtonGroupSizeContext } from '@/components/ui/button-group/button-group-context';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
@@ -183,7 +184,10 @@ function Button({
   'aria-disabled': ariaDisabled,
   ...props
 }: ButtonProps) {
-  const semanticSize = size ?? 'default';
+  // Inherit the enclosing ButtonGroup's size when no explicit size is set, so a
+  // Button nested inside a trigger wrapper (a split button) still picks it up.
+  const groupSize = React.useContext(ButtonGroupSizeContext);
+  const semanticSize = size ?? groupSize ?? 'default';
   const isDisabled = disabled || loading;
   const iconOnly = isIconButtonSize(semanticSize);
 
