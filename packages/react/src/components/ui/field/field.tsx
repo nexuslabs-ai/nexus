@@ -234,7 +234,7 @@ function FieldSeparator({
       data-slot="field-separator"
       data-content={!!children}
       className={cn(
-        'nx:relative nx:-my-2 nx:h-5 nx:typography-body-small nx:group-data-[variant=outline]/field-group:-mb-2',
+        'nx:relative nx:-my-2 nx:h-5 nx:typography-body-small',
         className
       )}
       {...props}
