@@ -44,7 +44,7 @@ export function Topbar({ onSearchClick }: TopbarProps) {
 
       <Button
         variant="ghost"
-        size="sm"
+        size="icon-sm"
         onClick={() => setTheme((t) => ({ ...t, dark: !t.dark }))}
         aria-label={
           theme.dark ? 'Switch to light theme' : 'Switch to dark theme'

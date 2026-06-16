@@ -158,7 +158,7 @@ function RowActions({ issue }: { issue: Issue }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon-sm"
           aria-label={`Actions for ${issue.key}`}
         >
           <IconDots />

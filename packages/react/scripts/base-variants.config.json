@@ -24,7 +24,11 @@
     { "name": "AspectRatio", "showcase": "AllVariants" },
     { "name": "Avatar", "showcase": "AllSizes" },
     { "name": "Badge", "showcase": "AllVariants" },
-    { "name": "Breadcrumb", "showcase": "AllVariants" },
+    {
+      "name": "Breadcrumb",
+      "showcase": "AllVariants",
+      "interactions": ["KeyboardInteraction"]
+    },
     { "name": "Button", "showcase": "AllVariants" },
     { "name": "ButtonGroup", "showcase": "AllVariants" },
     {

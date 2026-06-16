@@ -111,7 +111,7 @@ function PeopleSkeleton() {
 
 function PeopleEmpty() {
   return (
-    <EmptyState className="nx:border nx:border-border-default">
+    <EmptyState bordered>
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">
           <IconUsers />
