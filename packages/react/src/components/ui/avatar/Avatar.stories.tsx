@@ -2,7 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconUser } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarImage,
+  AvatarStatus,
+} from './avatar';
+import { STARTER_AVATARS } from './avatar-fixtures';
 
 const meta: Meta<typeof Avatar> = {
   title: 'Components/Avatar',
@@ -21,53 +28,186 @@ const meta: Meta<typeof Avatar> = {
       options: ['circle', 'rounded'],
       description: 'The shape of the avatar',
     },
+    ring: {
+      control: 'boolean',
+      description: 'Adds a non-interactive emphasis ring',
+    },
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof Avatar>;
 
-// Sample avatar image URL
-const AVATAR_URL =
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face';
+const AVATAR_SIZES = [
+  '2xs',
+  'xs',
+  'sm',
+  'md',
+  'lg',
+  'xl',
+  '2xl',
+  '3xl',
+  '4xl',
+] as const;
+
+const STATUS_VALUES = ['online', 'away', 'busy', 'offline'] as const;
+
+// The 5 starter portraits double as the demo team roster.
+const TEAM = STARTER_AVATARS;
+
+// Default single-avatar fixture (Ada) for the size / shape / state stories.
+const AVATAR_URL = STARTER_AVATARS[0].src;
+
+// Deliberately wide (2:1) source so CroppedImage can demonstrate object-fit: cover.
+const WIDE_AVATAR_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90">
+    <rect width="180" height="90" fill="#ddd6fe"/>
+    <circle cx="45" cy="45" r="28" fill="#a78bfa"/>
+    <rect x="88" y="16" width="68" height="58" rx="12" fill="#7c3aed"/>
+  </svg>
+`)}`;
+
+function avatarLabel(size: (typeof AVATAR_SIZES)[number]) {
+  if (size === '2xs') return '2X';
+  if (size === 'xs') return 'XS';
+  return size.toUpperCase();
+}
+
+function TeamAvatar({
+  person,
+  status,
+}: {
+  person: (typeof TEAM)[number];
+  status?: (typeof STATUS_VALUES)[number];
+}) {
+  return (
+    <Avatar>
+      <AvatarImage src={person.src} alt={person.name} />
+      <AvatarFallback>{person.initials}</AvatarFallback>
+      {status ? <AvatarStatus status={status} /> : null}
+    </Avatar>
+  );
+}
 
 // ============================================
 // BASIC STORIES
 // ============================================
 
 export const Default: Story = {
-  render: (_args) => (
-    <Avatar>
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+  args: {
+    size: 'md',
+    shape: 'circle',
+    ring: false,
+  },
+  render: (args) => (
+    <Avatar {...args}>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
 
 export const WithFallback: Story = {
   render: (_args) => (
-    <Avatar>
-      <AvatarImage src="/broken-image.jpg" alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+    <Avatar role="img" aria-label="Ada Lovelace">
+      <AvatarImage src="/broken-image.jpg" alt="" />
+      <AvatarFallback aria-hidden="true">AL</AvatarFallback>
     </Avatar>
   ),
 };
 
 export const FallbackOnly: Story = {
   render: (_args) => (
-    <Avatar>
-      <AvatarFallback>AB</AvatarFallback>
+    <Avatar role="img" aria-label="Ada Byron">
+      <AvatarFallback aria-hidden="true">AB</AvatarFallback>
     </Avatar>
   ),
 };
 
 export const WithIcon: Story = {
   render: (_args) => (
-    <Avatar>
-      <AvatarFallback>
-        <IconUser className="nx:size-5" />
+    <Avatar role="img" aria-label="Unknown user">
+      <AvatarFallback aria-hidden="true">
+        <IconUser aria-hidden="true" className="nx:size-5" />
       </AvatarFallback>
     </Avatar>
+  ),
+};
+
+export const CroppedImage: Story = {
+  render: (_args) => (
+    <Avatar size="4xl" shape="rounded">
+      <AvatarImage src={WIDE_AVATAR_URL} alt="Wide portrait crop" />
+      <AvatarFallback>WC</AvatarFallback>
+    </Avatar>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const image = await canvas.findByAltText('Wide portrait crop');
+
+    await expect(getComputedStyle(image).objectFit).toBe('cover');
+  },
+};
+
+export const Decorative: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:items-center nx:gap-3">
+      <Avatar size="sm">
+        <AvatarImage src={AVATAR_URL} alt="" />
+        <AvatarFallback aria-hidden="true">AL</AvatarFallback>
+      </Avatar>
+      <span className="nx:text-sm nx:font-medium nx:text-foreground">
+        Ada Lovelace
+      </span>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await canvas.findByText('Ada Lovelace');
+
+    const image = canvasElement.querySelector('[data-slot="avatar-image"]');
+    await expect(image).toHaveAttribute('alt', '');
+  },
+};
+
+export const StandaloneFallbackAccessible: Story = {
+  render: (_args) => (
+    <Avatar role="img" aria-label="Ada Lovelace">
+      <AvatarFallback aria-hidden="true">AL</AvatarFallback>
+    </Avatar>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const avatar = canvas.getByRole('img', { name: 'Ada Lovelace' });
+
+    await expect(avatar).toHaveAttribute('data-slot', 'avatar');
+  },
+};
+
+// ============================================
+// ILLUSTRATED VARIANTS
+// ============================================
+
+export const StarterVariants: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-6">
+      {STARTER_AVATARS.map((person) => (
+        <div
+          key={person.name}
+          className="nx:flex nx:flex-col nx:items-center nx:gap-2"
+        >
+          <Avatar size="xl">
+            <AvatarImage src={person.src} alt="" />
+            <AvatarFallback aria-hidden="true">
+              {person.initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="nx:text-xs nx:text-muted-foreground">
+            {person.name}
+          </span>
+        </div>
+      ))}
+    </div>
   ),
 };
 
@@ -78,8 +218,8 @@ export const WithIcon: Story = {
 export const Size2xs: Story = {
   render: (_args) => (
     <Avatar size="2xs">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -87,8 +227,8 @@ export const Size2xs: Story = {
 export const SizeXs: Story = {
   render: (_args) => (
     <Avatar size="xs">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -96,8 +236,8 @@ export const SizeXs: Story = {
 export const SizeSm: Story = {
   render: (_args) => (
     <Avatar size="sm">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -105,8 +245,8 @@ export const SizeSm: Story = {
 export const SizeMd: Story = {
   render: (_args) => (
     <Avatar size="md">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -114,8 +254,8 @@ export const SizeMd: Story = {
 export const SizeLg: Story = {
   render: (_args) => (
     <Avatar size="lg">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -123,8 +263,8 @@ export const SizeLg: Story = {
 export const SizeXl: Story = {
   render: (_args) => (
     <Avatar size="xl">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -132,8 +272,8 @@ export const SizeXl: Story = {
 export const Size2xl: Story = {
   render: (_args) => (
     <Avatar size="2xl">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -141,8 +281,8 @@ export const Size2xl: Story = {
 export const Size3xl: Story = {
   render: (_args) => (
     <Avatar size="3xl">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -150,8 +290,8 @@ export const Size3xl: Story = {
 export const Size4xl: Story = {
   render: (_args) => (
     <Avatar size="4xl">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -163,8 +303,8 @@ export const Size4xl: Story = {
 export const ShapeCircle: Story = {
   render: (_args) => (
     <Avatar shape="circle">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
   ),
 };
@@ -172,9 +312,187 @@ export const ShapeCircle: Story = {
 export const ShapeRounded: Story = {
   render: (_args) => (
     <Avatar shape="rounded">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
     </Avatar>
+  ),
+};
+
+// ============================================
+// STATUS, RING, AND GROUP STORIES
+// ============================================
+
+export const WithStatus: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:items-end nx:gap-4">
+      {AVATAR_SIZES.map((size) => (
+        <Avatar key={size} size={size}>
+          <AvatarImage src={AVATAR_URL} alt={`Ada Lovelace ${size}`} />
+          <AvatarFallback>{avatarLabel(size)}</AvatarFallback>
+          <AvatarStatus />
+        </Avatar>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const statuses = canvasElement.querySelectorAll(
+      '[data-slot="avatar-status"]'
+    );
+
+    await expect(statuses).toHaveLength(AVATAR_SIZES.length);
+    await expect(statuses[0]).toHaveAttribute('data-status', 'online');
+    // The dot is announced (not aria-hidden): it carries a visually-hidden label.
+    await expect(statuses[0]).not.toHaveAttribute('aria-hidden');
+    await expect(statuses[0]).toHaveTextContent('Online');
+  },
+};
+
+export const StatusVariants: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:items-center nx:gap-4">
+      {STATUS_VALUES.map((status, index) => (
+        <Avatar key={status} size="lg">
+          <AvatarFallback>{TEAM[index]?.initials ?? 'NA'}</AvatarFallback>
+          <AvatarStatus status={status} />
+        </Avatar>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Each status carries a visually-hidden label, so presence is announced
+    // rather than conveyed by colour alone (WCAG 1.4.1).
+    for (const label of ['Online', 'Away', 'Busy', 'Offline']) {
+      await expect(canvas.getByText(label)).toBeInTheDocument();
+    }
+  },
+};
+
+export const WithRing: Story = {
+  render: (_args) => (
+    <Avatar ring>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
+    </Avatar>
+  ),
+  play: async ({ canvasElement }) => {
+    const avatar = canvasElement.querySelector('[data-slot="avatar"]');
+
+    await expect(avatar).toHaveAttribute('data-ring', 'true');
+  },
+};
+
+export const Group: Story = {
+  render: (_args) => (
+    <AvatarGroup role="group" aria-label="Project team">
+      {TEAM.slice(0, 4).map((person, index) => (
+        <TeamAvatar
+          key={person.name}
+          person={person}
+          status={STATUS_VALUES[index]}
+        />
+      ))}
+    </AvatarGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const group = within(canvasElement).getByRole('group', {
+      name: 'Project team',
+    });
+    const avatars = group.querySelectorAll('[data-slot="avatar"]');
+
+    await expect(avatars).toHaveLength(4);
+  },
+};
+
+export const GroupWithMax: Story = {
+  render: (_args) => (
+    <AvatarGroup max={3} role="group" aria-label="Project team">
+      {TEAM.map((person, index) => (
+        <TeamAvatar
+          key={person.name}
+          person={person}
+          status={STATUS_VALUES[index % STATUS_VALUES.length]}
+        />
+      ))}
+    </AvatarGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', { name: 'Project team' });
+    const avatars = group.querySelectorAll('[data-slot="avatar"]');
+
+    await expect(avatars).toHaveLength(4);
+    await expect(canvas.getByText('+2')).toBeInTheDocument();
+    // The overflow tile announces its count instead of a bare "+2" glyph.
+    await expect(
+      canvas.getByRole('img', { name: '2 more' })
+    ).toBeInTheDocument();
+  },
+};
+
+export const GroupSizes: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A group sizes its members — and the `+N` overflow tile — in one place via `size`, and the overlap scales with that size. Members inherit it through the `TeamAvatar` wrapper via the size context.',
+      },
+    },
+  },
+  render: (_args) => (
+    <div className="nx:flex nx:flex-col nx:gap-6">
+      {(['sm', 'md', 'lg'] as const).map((size) => (
+        <AvatarGroup
+          key={size}
+          size={size}
+          max={3}
+          role="group"
+          aria-label={`Project team ${size}`}
+        >
+          {TEAM.map((person) => (
+            <TeamAvatar key={person.name} person={person} />
+          ))}
+        </AvatarGroup>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const lgGroup = canvas.getByRole('group', { name: 'Project team lg' });
+    const avatars = lgGroup.querySelectorAll('[data-slot="avatar"]');
+
+    // Members inherit the group size through the TeamAvatar wrapper (context).
+    await expect(avatars[0]).toHaveAttribute('data-size', 'lg');
+    // The +N overflow tile inherits it too — no hardcoded md mismatch.
+    const overflow = within(lgGroup)
+      .getByText('+2')
+      .closest('[data-slot="avatar"]');
+    await expect(overflow).toHaveAttribute('data-size', 'lg');
+  },
+};
+
+export const OnContainerSurface: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Avatars on a `container` surface (e.g. a card). The separator and status rings read `--avatar-surface` — set here to the container colour — so they match the card instead of leaving a `background`-coloured halo.',
+      },
+    },
+  },
+  render: (_args) => (
+    <div className="nx:rounded-xl nx:bg-container nx:p-6 nx:[--avatar-surface:var(--nx-color-container)]">
+      <AvatarGroup max={4} role="group" aria-label="Team on a card">
+        {TEAM.map((person, index) => (
+          <TeamAvatar
+            key={person.name}
+            person={person}
+            status={STATUS_VALUES[index % STATUS_VALUES.length]}
+          />
+        ))}
+      </AvatarGroup>
+    </div>
   ),
 };
 
@@ -184,39 +502,43 @@ export const ShapeRounded: Story = {
 
 export const WithDataAttributes: Story = {
   render: (_args) => (
-    <Avatar size="lg" shape="rounded">
-      <AvatarImage src={AVATAR_URL} alt="User avatar" />
-      <AvatarFallback>JD</AvatarFallback>
+    <Avatar size="lg" shape="rounded" ring>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
+      <AvatarStatus status="busy" />
     </Avatar>
   ),
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const image = await canvas.findByAltText('Ada Lovelace');
     const avatar = canvasElement.querySelector('[data-slot="avatar"]');
-    const image = canvasElement.querySelector('[data-slot="avatar-image"]');
+    const status = canvasElement.querySelector('[data-slot="avatar-status"]');
 
     await expect(avatar).toBeInTheDocument();
     await expect(avatar).toHaveAttribute('data-size', 'lg');
     await expect(avatar).toHaveAttribute('data-shape', 'rounded');
-    await expect(image).toBeInTheDocument();
+    await expect(avatar).toHaveAttribute('data-ring', 'true');
+    await expect(image).toHaveAttribute('data-slot', 'avatar-image');
+    await expect(image).toHaveAttribute('decoding', 'async');
+    await expect(status).toHaveAttribute('data-status', 'busy');
   },
 };
 
 export const FallbackDataAttributes: Story = {
   render: (_args) => (
-    <Avatar>
-      <AvatarFallback>AB</AvatarFallback>
+    <Avatar role="img" aria-label="Ada Byron">
+      <AvatarFallback aria-hidden="true">AB</AvatarFallback>
     </Avatar>
   ),
   play: async ({ canvasElement }) => {
     const fallback = canvasElement.querySelector(
       '[data-slot="avatar-fallback"]'
     );
+    const canvas = within(canvasElement);
+    const avatar = canvas.getByRole('img', { name: 'Ada Byron' });
 
     await expect(fallback).toBeInTheDocument();
-
-    // Check fallback text
-    const canvas = within(canvasElement);
-    const fallbackText = canvas.getByText('AB');
-    await expect(fallbackText).toBeInTheDocument();
+    await expect(avatar).toHaveAttribute('data-slot', 'avatar');
   },
 };
 
@@ -228,92 +550,43 @@ export const AllSizes: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
           All Sizes (Circle)
         </h3>
         <div className="nx:flex nx:items-end nx:gap-4">
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="2xs">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>2X</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">2xs</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="xs">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>XS</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">xs</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="sm">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>SM</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">sm</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="md">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>MD</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">md</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="lg">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>LG</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">lg</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="xl">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>XL</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">xl</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="2xl">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>2X</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">2xl</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="3xl">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>3X</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">3xl</span>
-          </div>
-          <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="4xl">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>4X</AvatarFallback>
-            </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">4xl</span>
-          </div>
+          {AVATAR_SIZES.map((size) => (
+            <div
+              key={size}
+              className="nx:flex nx:flex-col nx:items-center nx:gap-2"
+            >
+              <Avatar size={size}>
+                <AvatarImage src={AVATAR_URL} alt={`Ada Lovelace ${size}`} />
+                <AvatarFallback>{avatarLabel(size)}</AvatarFallback>
+              </Avatar>
+              <span className="nx:text-xs nx:text-muted-foreground">
+                {size}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
           Shapes
         </h3>
         <div className="nx:flex nx:items-center nx:gap-4">
           <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
             <Avatar size="xl" shape="circle">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={AVATAR_URL} alt="Ada Lovelace circle" />
+              <AvatarFallback>AL</AvatarFallback>
             </Avatar>
             <span className="nx:text-xs nx:text-muted-foreground">circle</span>
           </div>
           <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
             <Avatar size="xl" shape="rounded">
-              <AvatarImage src={AVATAR_URL} alt="User" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={AVATAR_URL} alt="Ada Lovelace rounded" />
+              <AvatarFallback>AL</AvatarFallback>
             </Avatar>
             <span className="nx:text-xs nx:text-muted-foreground">rounded</span>
           </div>
@@ -321,26 +594,48 @@ export const AllSizes: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
           Fallback States
         </h3>
         <div className="nx:flex nx:items-center nx:gap-4">
           <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="xl">
-              <AvatarFallback>JD</AvatarFallback>
+            <Avatar size="xl" role="img" aria-label="Ada Lovelace">
+              <AvatarFallback aria-hidden="true">AL</AvatarFallback>
             </Avatar>
             <span className="nx:text-xs nx:text-muted-foreground">
               Initials
             </span>
           </div>
           <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
-            <Avatar size="xl">
-              <AvatarFallback>
-                <IconUser className="nx:size-6" />
+            <Avatar size="xl" role="img" aria-label="Unknown user">
+              <AvatarFallback aria-hidden="true">
+                <IconUser aria-hidden="true" className="nx:size-6" />
               </AvatarFallback>
             </Avatar>
             <span className="nx:text-xs nx:text-muted-foreground">Icon</span>
           </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
+          Status, Ring, and Group
+        </h3>
+        <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-6">
+          <Avatar size="xl" ring>
+            <AvatarImage src={AVATAR_URL} alt="Ada Lovelace selected" />
+            <AvatarFallback>AL</AvatarFallback>
+            <AvatarStatus status="online" />
+          </Avatar>
+          <AvatarGroup max={3}>
+            {TEAM.map((person, index) => (
+              <TeamAvatar
+                key={person.name}
+                person={person}
+                status={STATUS_VALUES[index % STATUS_VALUES.length]}
+              />
+            ))}
+          </AvatarGroup>
         </div>
       </div>
     </div>

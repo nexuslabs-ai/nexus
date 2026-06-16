@@ -30,7 +30,7 @@ function Label({ className, ...props }: LabelProps) {
     <LabelPrimitive.Root
       data-slot="label"
       className={cn(
-        'nx:flex nx:items-center nx:gap-2 nx:select-none nx:text-sm nx:font-medium nx:leading-none nx:text-foreground',
+        'nx:flex nx:items-center nx:gap-2 nx:select-none nx:typography-label-default nx:text-foreground',
         'nx:peer-disabled:cursor-not-allowed nx:peer-disabled:opacity-50',
         className
       )}

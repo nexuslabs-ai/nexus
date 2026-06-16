@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
@@ -26,7 +27,7 @@ type Story = StoryObj<typeof Carousel>;
 
 // Five numbered slides reused across stories.
 const slideItems = [1, 2, 3, 4, 5].map((n) => (
-  <CarouselItem key={n}>
+  <CarouselItem key={n} aria-label={`Slide ${n} of 5`}>
     <div className="nx:flex nx:aspect-square nx:items-center nx:justify-center nx:rounded-md nx:border nx:border-border-default">
       <span className="nx:text-4xl nx:font-semibold">{n}</span>
     </div>
@@ -52,7 +53,7 @@ export const Vertical: Story = {
       className="nx:w-full"
       aria-label="Vertical carousel"
     >
-      <CarouselContent className="nx:h-[260px]">{slideItems}</CarouselContent>
+      <CarouselContent className="nx:h-[350px]">{slideItems}</CarouselContent>
       <CarouselPrevious />
       <CarouselNext />
     </Carousel>
@@ -80,10 +81,19 @@ export const ClickInteraction: Story = {
   },
 };
 
-// ArrowRight inside the carousel region advances it (onKeyDownCapture).
+// Captures the Embla API so the play fn can read the carousel's position.
+const keyboardApiRef: { current: CarouselApi } = { current: undefined };
+
+// ArrowRight advances a horizontal carousel; ArrowDown is ignored (vertical-only).
 export const KeyboardInteraction: Story = {
   render: () => (
-    <Carousel className="nx:w-full" aria-label="Keyboard demo carousel">
+    <Carousel
+      className="nx:w-full"
+      aria-label="Keyboard demo carousel"
+      setApi={(api) => {
+        keyboardApiRef.current = api;
+      }}
+    >
       <CarouselContent>{slideItems}</CarouselContent>
       <CarouselPrevious />
       <CarouselNext />
@@ -95,7 +105,39 @@ export const KeyboardInteraction: Story = {
     const next = canvas.getByRole('button', { name: 'Next slide' });
     await waitFor(() => expect(next).toBeEnabled());
     next.focus();
+    // Horizontal carousel ignores ArrowDown — it must stay on the first slide.
+    await userEvent.keyboard('{ArrowDown}');
+    expect(keyboardApiRef.current?.selectedScrollSnap()).toBe(0);
     await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(prev).toBeEnabled());
+  },
+};
+
+// Vertical carousels use ArrowDown / ArrowUp instead of horizontal arrows.
+export const VerticalKeyboardInteraction: Story = {
+  render: () => (
+    <Carousel
+      orientation="vertical"
+      className="nx:w-full"
+      aria-label="Vertical keyboard demo carousel"
+    >
+      <CarouselContent className="nx:h-[350px]">{slideItems}</CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const prev = canvas.getByRole('button', { name: 'Previous slide' });
+    const next = canvas.getByRole('button', { name: 'Next slide' });
+    await waitFor(() => expect(next).toBeEnabled());
+
+    await expect(
+      canvasElement.querySelector('[data-slot="carousel"]')
+    ).toHaveAttribute('data-orientation', 'vertical');
+
+    next.focus();
+    await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(prev).toBeEnabled());
   },
 };
@@ -121,6 +163,10 @@ export const WithDataAttributes: Story = {
         canvasElement.querySelector(`[data-slot="${slot}"]`)
       ).toBeInTheDocument();
     }
+
+    await expect(
+      canvasElement.querySelector('[data-slot="carousel"]')
+    ).toHaveAttribute('data-orientation', 'horizontal');
   },
 };
 

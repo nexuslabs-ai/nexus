@@ -36,6 +36,17 @@ export const Default: Story = {
       </Field>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const label = canvas.getByText('Email');
+    const input = canvas.getByLabelText('Email');
+    const labelToInputGap = Math.round(
+      input.getBoundingClientRect().top - label.getBoundingClientRect().bottom
+    );
+
+    // 8px is the Field label→control gap (gap-2).
+    await expect(labelToInputGap).toBe(8);
+  },
 };
 
 // The three orientations: vertical, horizontal, and container-responsive.
@@ -119,6 +130,37 @@ export const WithError: Story = {
       error.getAttribute('id')
     );
     await expect(error).toHaveAttribute('role', 'alert');
+    await expect(error).toHaveAttribute('aria-atomic', 'true');
+  },
+};
+
+// Multiple errors render as a deduplicated list and ignore empty messages.
+export const MultipleErrors: Story = {
+  render: () => (
+    <div className="nx:w-80">
+      <Field data-invalid="true">
+        <FieldLabel htmlFor="field-errors">Password</FieldLabel>
+        <Input id="field-errors" type="password" aria-invalid />
+        <FieldError
+          errors={[
+            { message: 'Must include a symbol.' },
+            { message: 'Must include a symbol.' },
+            { message: 'Must include a number.' },
+            { message: '' },
+          ]}
+        />
+      </Field>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const error = canvas.getByRole('alert');
+    const items = canvas.getAllByRole('listitem');
+
+    await expect(error).toHaveAttribute('aria-atomic', 'true');
+    await expect(items).toHaveLength(2);
+    await expect(items[0]).toHaveTextContent('Must include a symbol.');
+    await expect(items[1]).toHaveTextContent('Must include a number.');
   },
 };
 

@@ -24,7 +24,11 @@
     { "name": "AspectRatio", "showcase": "AllVariants" },
     { "name": "Avatar", "showcase": "AllSizes" },
     { "name": "Badge", "showcase": "AllVariants" },
-    { "name": "Breadcrumb", "showcase": "AllVariants" },
+    {
+      "name": "Breadcrumb",
+      "showcase": "AllVariants",
+      "interactions": ["KeyboardInteraction"]
+    },
     { "name": "Button", "showcase": "AllVariants" },
     { "name": "ButtonGroup", "showcase": "AllVariants" },
     {
@@ -40,6 +44,11 @@
     },
     { "name": "Checkbox", "showcase": "AllVariants" },
     { "name": "Collapsible", "showcase": "AllVariants" },
+    {
+      "name": "Command",
+      "showcase": "AllVariants",
+      "interactions": ["Disabled", "ClickInteraction", "KeyboardInteraction"]
+    },
     {
       "name": "ContextMenu",
       "showcase": "AllVariants",
@@ -84,6 +93,7 @@
     { "name": "InputGroup", "showcase": "AllVariants" },
     { "name": "Item", "showcase": "AllVariants" },
     { "name": "Kbd", "showcase": "AllVariants" },
+    { "name": "Label", "showcase": "AllVariants" },
     {
       "name": "Menubar",
       "showcase": "AllVariants",

@@ -19,6 +19,8 @@ html {
   --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-600);
   --nx-color-secondary-subtle-hover: var(--nx-color-neutral-200);
   --nx-color-secondary-subtle-active: var(--nx-color-neutral-300);
+  --nx-color-border-primary: var(--nx-color-orange-200);
+  --nx-color-border-primary-active: var(--nx-color-orange-400);
 }
 
 html.dark {
@@ -40,4 +42,6 @@ html.dark {
   --nx-color-secondary-subtle-foreground: var(--nx-color-neutral-200);
   --nx-color-secondary-subtle-hover: var(--nx-color-neutral-700);
   --nx-color-secondary-subtle-active: var(--nx-color-neutral-600);
+  --nx-color-border-primary: var(--nx-color-orange-700);
+  --nx-color-border-primary-active: var(--nx-color-orange-500);
 }

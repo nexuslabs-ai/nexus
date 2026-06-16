@@ -74,5 +74,15 @@
       "$value": "{neutral.300}",
       "$type": "color"
     }
+  },
+  "border": {
+    "primary": {
+      "$value": "{orange.200}",
+      "$type": "color"
+    },
+    "primary-active": {
+      "$value": "{orange.400}",
+      "$type": "color"
+    }
   }
 }
