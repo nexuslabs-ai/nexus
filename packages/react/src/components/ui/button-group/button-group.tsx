@@ -12,7 +12,7 @@ import {
 } from './button-group-context';
 
 const buttonGroupVariants = cva(
-  'nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md',
+  'nx:flex nx:w-fit nx:items-stretch nx:*:focus-visible:relative nx:*:focus-visible:z-10',
   {
     variants: {
       orientation: {
