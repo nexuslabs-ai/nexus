@@ -36,7 +36,6 @@ type CarouselProps = {
 
 type CarouselContextProps = {
   carouselRef: ReturnType<typeof useEmblaCarousel>[0];
-  api: CarouselApi;
   orientation: NonNullable<CarouselProps['orientation']>;
   scrollPrev: () => void;
   scrollNext: () => void;
@@ -123,9 +122,11 @@ function Carousel({
   const scrollNext = () => api?.scrollNext();
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const prevKey = orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp';
-    const nextKey = orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown';
-    if (event.key !== prevKey && event.key !== nextKey) return;
+    const isPrev =
+      event.key === (orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp');
+    const isNext =
+      event.key === (orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown');
+    if (!isPrev && !isNext) return;
     // Don't hijack arrow keys from a focused control that uses them itself.
     if (
       (event.target as HTMLElement).closest(
@@ -135,11 +136,11 @@ function Carousel({
       return;
     }
 
-    if (event.key === prevKey && !canScrollPrev) return;
-    if (event.key === nextKey && !canScrollNext) return;
+    if (isPrev && !canScrollPrev) return;
+    if (isNext && !canScrollNext) return;
 
     event.preventDefault();
-    if (event.key === prevKey) scrollPrev();
+    if (isPrev) scrollPrev();
     else scrollNext();
   };
 
@@ -166,7 +167,6 @@ function Carousel({
     <CarouselContext.Provider
       value={{
         carouselRef,
-        api,
         orientation,
         scrollPrev,
         scrollNext,
