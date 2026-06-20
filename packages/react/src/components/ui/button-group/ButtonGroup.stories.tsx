@@ -48,7 +48,7 @@ const BUTTON_GROUP_SIZE_HEIGHTS = {
 const BUTTON_GROUP_TEXT_SIZE_CLASSES = {
   sm: ['nx:h-8', 'nx:px-2.5', 'nx:typography-label-default'],
   default: ['nx:h-10', 'nx:px-3', 'nx:typography-label-default'],
-  lg: ['nx:h-12', 'nx:px-3.5', 'nx:typography-label-large'],
+  lg: ['nx:h-12', 'nx:px-3.5', 'nx:typography-label-default'],
 } as const;
 
 // Three outline buttons joined into one horizontal cluster.

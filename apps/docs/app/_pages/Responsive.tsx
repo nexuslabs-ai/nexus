@@ -95,7 +95,7 @@ export function Responsive() {
       {/* ── Breakpoints ─────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Breakpoints</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Five Tailwind classes plus the unprefixed base, mapped onto the Narrow
           / Standard / Wide labels. Components are tuned against two reference
           widths — mobile ~390px and desktop ~1280px (<code>xl</code>).
@@ -142,7 +142,7 @@ export function Responsive() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           Show / Hide primitives
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The declarative <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code>{' '}
           primitives from <code>@nexus/react</code> express responsive
           visibility. Provide exactly one axis: <code>above</code> /{' '}
@@ -172,7 +172,7 @@ export function Responsive() {
       {/* ── Which mechanism ─────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Which mechanism</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Components prefer <code>@container</code> — they adapt to their
           parent&rsquo;s width, so they render consistently in a sidebar or a
           hero. Viewport prefixes are reserved for page-shell decisions and

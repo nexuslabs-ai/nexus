@@ -47,7 +47,7 @@ export function Layering() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           The z-index scale
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Six tokens, low to high. Utilities run <code>nx:z-overlay</code>{' '}
           through <code>nx:z-max</code>.
         </p>
@@ -87,7 +87,7 @@ export function Layering() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           Why popover sits above modal
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Popover (70) outranks modal (50) by design. A dropdown, select, or
           tooltip opened <em>inside</em> a Dialog must paint above the dialog to
           stay usable — so the floating-layer token deliberately sits above the
@@ -101,7 +101,7 @@ export function Layering() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           Shadow vs z-index
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Shadow is perceived elevation; z-index is paint order. They are
           independent — reach for a z-index token only when two positioned
           layers can actually overlap. Radix portals append their content to{' '}

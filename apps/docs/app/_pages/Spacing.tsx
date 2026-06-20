@@ -93,7 +93,7 @@ export function Spacing() {
       {/* ── The scale ───────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">The scale</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Fourteen steps from 2px to 128px. Each bar&rsquo;s width is the
           runtime <code>--nx-spacing-N</code> var, so the whole ladder rescales
           when the Size mode changes.
@@ -122,7 +122,7 @@ export function Spacing() {
       {/* ── Role tokens ─────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Role tokens</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Components don&rsquo;t reach for raw steps — they consume these
           semantic roles (e.g. a button&rsquo;s padding). Because the roles map
           onto the active density mode, swapping Size rescales whole components,
@@ -164,7 +164,7 @@ export function Spacing() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           Seven density modes
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Every build ships all seven. Swapping the &ldquo;Size&rdquo; control
           in the theme picker rescales the whole page live. Note{' '}
           <code>mira</code> is byte-identical to <code>vega</code>.

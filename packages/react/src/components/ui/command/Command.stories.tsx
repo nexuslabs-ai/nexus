@@ -104,7 +104,7 @@ function CommandRichItem({
       <Icon aria-hidden="true" className="nx:mt-0.5 nx:text-muted-foreground" />
       <span className="nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:gap-0.5">
         <span className="nx:truncate">{command.label}</span>
-        <span className="nx:truncate nx:typography-body-small nx:text-muted-foreground">
+        <span className="nx:truncate nx:typography-body-default nx:text-muted-foreground">
           {command.description}
         </span>
       </span>
@@ -426,7 +426,7 @@ export const WithDialog: Story = {
         <Button variant="outline" onClick={() => setOpen(true)}>
           Open Command Palette
         </Button>
-        <p className="nx:typography-body-small nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Press <kbd className="nx:font-mono">⌘K</kbd> to toggle
         </p>
         <CommandDialog open={open} onOpenChange={setOpen}>

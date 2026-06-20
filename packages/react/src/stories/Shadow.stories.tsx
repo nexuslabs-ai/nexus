@@ -154,7 +154,7 @@ export const Light: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Shadows — Light
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Elevation shadows applied to cards on a light background. Each
           mode&apos;s light JSON defines per-layer values that compose into the
           CSS `box-shadow` string.
@@ -180,7 +180,7 @@ export const Dark: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Shadows — Dark
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Same elevation tokens, but each mode&apos;s dark JSON tunes colors and
           opacities for dark UI. Use these when the surrounding page or panel
           uses a dark background.

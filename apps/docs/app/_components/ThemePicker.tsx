@@ -39,7 +39,6 @@ export function ThemePicker() {
   const base = useThemeStore((s) => s.base);
   const brand = useThemeStore((s) => s.brand);
   const spacing = useThemeStore((s) => s.spacing);
-  const typography = useThemeStore((s) => s.typography);
   const shadow = useThemeStore((s) => s.shadow);
   const radius = useThemeStore((s) => s.radius);
   const borderwidth = useThemeStore((s) => s.borderwidth);
@@ -100,13 +99,6 @@ export function ThemePicker() {
                 mode="spacing"
                 value={spacing}
                 onChange={onChange('spacing')}
-              />
-            </Row>
-            <Row label="Typography">
-              <ModeSelect
-                mode="typography"
-                value={typography}
-                onChange={onChange('typography')}
               />
             </Row>
             <Row label="Shadow">

@@ -21,7 +21,7 @@ import {
 } from './context-menu';
 
 const triggerClass =
-  'nx:flex nx:h-[96px] nx:w-full nx:max-w-md nx:select-none nx:items-center nx:justify-center nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:typography-body-small nx:text-muted-foreground';
+  'nx:flex nx:h-[96px] nx:w-full nx:max-w-md nx:select-none nx:items-center nx:justify-center nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:typography-body-default nx:text-muted-foreground';
 
 const meta: Meta<typeof ContextMenu> = {
   title: 'Components/ContextMenu',

@@ -99,7 +99,7 @@ export function ColorScales() {
       <h3 className="nx:typography-heading-xsmall nx:mt-8 nx:mb-1">
         Brand &amp; status hues
       </h3>
-      <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+      <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
         Brand modes are blue, purple, pink, teal, orange, and black. The
         chromatic brand modes share the OKLCH pipeline; black is a monochrome
         semantic recipe built from{' '}
@@ -115,7 +115,7 @@ export function ColorScales() {
         <summary className="nx:cursor-pointer nx:typography-heading-xsmall nx:mb-1 nx:select-none nx:text-foreground">
           All color scales (17)
         </summary>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:my-3 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:my-3 nx:max-w-[64ch]">
           The full chromatic set. Brand uses blue, purple, pink, teal, and
           orange; status uses red, yellow, green, and blue. The rest are raw
           primitives available for data viz and one-off use.

@@ -139,7 +139,7 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
     <p
       data-slot="card-description"
       className={cn(
-        'nx:col-start-1 nx:min-w-0 nx:typography-body-small nx:text-muted-foreground',
+        'nx:col-start-1 nx:min-w-0 nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}

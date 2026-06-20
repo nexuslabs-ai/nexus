@@ -24,7 +24,6 @@ import {
   SPACING_MODES,
   type ThemeConfig,
   TOKEN_MODES,
-  TYPOGRAPHY_MODES,
 } from '../../../hooks/useTheme';
 
 type AppearanceSettingsProps = {
@@ -105,7 +104,7 @@ export function AppearanceSettings({
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
             <div className="nx:space-y-0.5">
               <Label htmlFor="appearance-dark">Dark mode</Label>
-              <p className="nx:typography-body-small nx:text-muted-foreground">
+              <p className="nx:typography-body-default nx:text-muted-foreground">
                 Switch between light and dark.
               </p>
             </div>
@@ -133,8 +132,8 @@ export function AppearanceSettings({
 
       <Card>
         <CardHeader>
-          <CardTitle>Density &amp; type</CardTitle>
-          <CardDescription>Spacing rhythm and the type scale.</CardDescription>
+          <CardTitle>Density</CardTitle>
+          <CardDescription>Spacing rhythm.</CardDescription>
         </CardHeader>
         <CardContent className="nx:space-y-4">
           <AxisSelect
@@ -142,14 +141,6 @@ export function AppearanceSettings({
             value={theme.spacing}
             options={modeOptions(SPACING_MODES)}
             onValueChange={(spacing) => setTheme((t) => ({ ...t, spacing }))}
-          />
-          <AxisSelect
-            label="Typography"
-            value={theme.typography}
-            options={modeOptions(TYPOGRAPHY_MODES)}
-            onValueChange={(typography) =>
-              setTheme((t) => ({ ...t, typography }))
-            }
           />
         </CardContent>
       </Card>

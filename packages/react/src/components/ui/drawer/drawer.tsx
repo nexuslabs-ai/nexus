@@ -184,7 +184,7 @@ function DrawerDescription({
     <DrawerPrimitive.Description
       data-slot="drawer-description"
       className={cn(
-        'nx:typography-body-small nx:text-muted-foreground',
+        'nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}
