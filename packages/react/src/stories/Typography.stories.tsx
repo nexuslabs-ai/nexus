@@ -91,16 +91,8 @@ const COMPOSITE_UTILITIES: {
   items: { cls: string; sample: string }[];
 }[] = [
   {
-    group: 'Display',
-    items: [
-      { cls: 'nx:typography-display-large', sample: 'Display Large' },
-      { cls: 'nx:typography-display-medium', sample: 'Display Medium' },
-    ],
-  },
-  {
     group: 'Heading',
     items: [
-      { cls: 'nx:typography-heading-xlarge', sample: 'Heading XLarge' },
       { cls: 'nx:typography-heading-large', sample: 'Heading Large' },
       { cls: 'nx:typography-heading-medium', sample: 'Heading Medium' },
       { cls: 'nx:typography-heading-small', sample: 'Heading Small' },
@@ -111,10 +103,6 @@ const COMPOSITE_UTILITIES: {
     group: 'Body',
     items: [
       {
-        cls: 'nx:typography-body-large',
-        sample: 'The quick brown fox jumps over the lazy dog.',
-      },
-      {
         cls: 'nx:typography-body-default',
         sample: 'The quick brown fox jumps over the lazy dog.',
       },
@@ -122,16 +110,11 @@ const COMPOSITE_UTILITIES: {
         cls: 'nx:typography-body-small',
         sample: 'The quick brown fox jumps over the lazy dog.',
       },
-      {
-        cls: 'nx:typography-body-xsmall',
-        sample: 'The quick brown fox jumps over the lazy dog.',
-      },
     ],
   },
   {
     group: 'Label',
     items: [
-      { cls: 'nx:typography-label-large', sample: 'Label Large' },
       { cls: 'nx:typography-label-default', sample: 'Label Default' },
       { cls: 'nx:typography-label-small', sample: 'Label Small' },
       { cls: 'nx:typography-label-caps', sample: 'LABEL CAPS' },
@@ -442,7 +425,7 @@ export const CompositeUtilities: Story = {
           Composite Utilities
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
-          The 17 ready-to-use `nx:typography-*` classes — each bundles
+          The 11 ready-to-use `nx:typography-*` classes — each bundles
           font-family, size, weight, line-height, and letter-spacing (body tiers
           also get `text-wrap: pretty`). Prefer these over composing raw
           size/weight utilities so a mode switch propagates everywhere. Rendered

@@ -209,7 +209,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
     <p
       data-slot="field-description"
       className={cn(
-        'nx:typography-body-small nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
+        'nx:typography-body-default nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
         'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
@@ -233,7 +233,7 @@ function FieldSeparator({
       data-slot="field-separator"
       data-content={!!children}
       className={cn(
-        'nx:relative nx:-my-2 nx:h-5 nx:typography-body-small',
+        'nx:relative nx:-my-2 nx:h-5 nx:typography-body-default',
         className
       )}
       {...props}
@@ -287,7 +287,7 @@ function FieldError({
       aria-atomic="true"
       data-slot="field-error"
       className={cn(
-        'nx:typography-body-small nx:text-error-subtle-foreground',
+        'nx:typography-body-default nx:text-error-subtle-foreground',
         className
       )}
       {...props}

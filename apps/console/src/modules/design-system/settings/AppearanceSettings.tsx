@@ -105,7 +105,7 @@ export function AppearanceSettings({
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
             <div className="nx:space-y-0.5">
               <Label htmlFor="appearance-dark">Dark mode</Label>
-              <p className="nx:typography-body-small nx:text-muted-foreground">
+              <p className="nx:typography-body-default nx:text-muted-foreground">
                 Switch between light and dark.
               </p>
             </div>

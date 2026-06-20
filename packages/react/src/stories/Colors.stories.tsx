@@ -97,7 +97,7 @@ export const Palettes: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Color Palettes
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Chips render the OKLCH values emitted by the build. Lightness per
           shade is fixed by the perceptual L grid; hue and chroma flow through
           from the source hex. Vivid mid-range shades (yellow, cyan, fuchsia,

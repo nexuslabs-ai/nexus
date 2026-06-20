@@ -111,7 +111,7 @@ export const Swatches: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Chart Palette
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Hues are rotated (teal → lime → orange → rose → indigo) to maximize
           perceptual distance between adjacent series in stacked or grouped
           marks. None of the chart hues collide with status semantics
@@ -137,14 +137,14 @@ export const UtilityClasses: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Tailwind utilities
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Chart tokens emit standard color utilities under the <code>nx:</code>{' '}
           prefix. Background, text, and border variants are demonstrated per
           series.
         </p>
       </div>
 
-      <table className="nx:typography-body-small">
+      <table className="nx:typography-body-default">
         <thead>
           <tr className="nx:text-left nx:text-muted-foreground">
             <th className="nx:p-2">Series</th>

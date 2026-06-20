@@ -72,7 +72,7 @@ A `fontFamily` token can carry `$extensions.nx-font-source` (`type: "google"` wi
 
 ## Typography
 
-`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. Letter-spacing is **proportional**: `tight` (−0.4px) on display + headings ≥ 30px, `normal` (0) at 24px and below — there's no intermediate step, so 30px is the threshold. Three modes differ by a uniform ±1px per size step, mapped to product archetypes:
+`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. The two body tiers are `body-default` (14px) and `body-small` (12px). Letter-spacing is uniformly `normal` (0) across all eleven tiers — the lone exception is `label-caps` at `wider` (+0.8px) for all-caps legibility. For inline emphasis in body copy, apply `nx:font-bold` (700); the bold weight is loaded but deliberately not bound to its own composite. Three modes differ by a uniform ±1px per size step, mapped to product archetypes:
 
 | Mode     | Archetype            | Use for                                                        |
 | -------- | -------------------- | -------------------------------------------------------------- |

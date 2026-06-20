@@ -151,7 +151,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          'nx:flex nx:w-full nx:bg-transparent nx:py-2 nx:typography-body-small nx:outline-none',
+          'nx:flex nx:w-full nx:bg-transparent nx:py-2 nx:typography-body-default nx:outline-none',
           'nx:placeholder:text-muted-foreground',
           'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
           className
@@ -208,7 +208,7 @@ function CommandEmpty({ className, ...props }: CommandEmptyProps) {
     <CommandPrimitive.Empty
       data-slot="command-empty"
       className={cn(
-        'nx:py-6 nx:text-center nx:typography-body-small',
+        'nx:py-6 nx:text-center nx:typography-body-default',
         className
       )}
       {...props}
@@ -246,7 +246,7 @@ function CommandLoading({ className, ...props }: CommandLoadingProps) {
         'nx:px-3 nx:py-2.5',
         // cmdk nests Loading's children in an inner aria-hidden div — target it to lay the spinner + label out as a row.
         'nx:*:aria-hidden:flex nx:*:aria-hidden:items-center nx:*:aria-hidden:gap-3',
-        'nx:typography-body-small nx:text-muted-foreground',
+        'nx:typography-body-default nx:text-muted-foreground',
         className
       )}
       {...props}
@@ -347,7 +347,7 @@ function CommandItem({ className, ...props }: CommandItemProps) {
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:typography-body-small nx:outline-none',
+        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:typography-body-default nx:outline-none',
         'nx:gap-3 nx:px-3 nx:py-2.5',
         'nx:data-[selected=true]:bg-popover-hover nx:data-[selected=true]:text-popover-foreground',
         'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:opacity-50',

@@ -228,7 +228,7 @@ export const SECTIONS = {
           {
             type: 'placeholder',
             variant: 'table',
-            label: '[ Table — 17 typography utilities ]',
+            label: '[ Table — 11 typography utilities ]',
           },
         ],
       },

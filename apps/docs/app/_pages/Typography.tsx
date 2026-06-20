@@ -17,28 +17,8 @@ const SCALE: {
   tiers: { cls: string; name: string; sample: string }[];
 }[] = [
   {
-    group: 'Display',
-    tiers: [
-      {
-        cls: 'nx:typography-display-large',
-        name: 'display-large',
-        sample: 'Design once.',
-      },
-      {
-        cls: 'nx:typography-display-medium',
-        name: 'display-medium',
-        sample: 'Ship every brand.',
-      },
-    ],
-  },
-  {
     group: 'Heading',
     tiers: [
-      {
-        cls: 'nx:typography-heading-xlarge',
-        name: 'heading-xlarge',
-        sample: 'Perceptual consistency',
-      },
       {
         cls: 'nx:typography-heading-large',
         name: 'heading-large',
@@ -65,12 +45,6 @@ const SCALE: {
     group: 'Body',
     tiers: [
       {
-        cls: 'nx:typography-body-large',
-        name: 'body-large',
-        sample:
-          'The body-large tier leads a section — slightly roomier than default for an opening paragraph.',
-      },
-      {
         cls: 'nx:typography-body-default',
         name: 'body-default',
         sample:
@@ -82,22 +56,11 @@ const SCALE: {
         sample:
           'Body-small carries supporting copy, captions, and the secondary text under a heading.',
       },
-      {
-        cls: 'nx:typography-body-xsmall',
-        name: 'body-xsmall',
-        sample:
-          'Body-xsmall is the smallest reading tier — fine print and dense table cells.',
-      },
     ],
   },
   {
     group: 'Label',
     tiers: [
-      {
-        cls: 'nx:typography-label-large',
-        name: 'label-large',
-        sample: 'Label large',
-      },
       {
         cls: 'nx:typography-label-default',
         name: 'label-default',
@@ -185,9 +148,9 @@ export function Typography() {
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">The scale</h2>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-6 nx:max-w-[64ch]">
-          Seventeen tiers across five groups. Display and headings ≥ 30px take
-          tight tracking (−0.4px); 24px and below sit at normal — there is no
-          intermediate step, so 30px is the threshold.
+          Eleven tiers across four groups, every one at normal (0)
+          letter-spacing — the lone exception is label-caps, which adds +0.8px
+          for all-caps legibility.
         </p>
         {SCALE.map((group) => (
           <div key={group.group} className="nx:mb-8">

@@ -35,26 +35,16 @@ export function ComponentShowcase() {
         {/* Typography Section */}
         <Section title="Typography" description="Text styles and font scales">
           <div className="nx:space-y-6">
-            {/* Display */}
-            <div className="nx:space-y-2">
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
-                Display
-              </span>
-              <div className="nx:space-y-1">
-                <p className="nx:typography-display-large">Display Large</p>
-                <p className="nx:typography-display-medium">Display Medium</p>
-              </div>
-            </div>
-
             {/* Headings */}
             <div className="nx:space-y-2">
               <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
                 Headings
               </span>
               <div className="nx:space-y-1">
-                <p className="nx:typography-heading-xlarge">Heading XLarge</p>
                 <p className="nx:typography-heading-large">Heading Large</p>
                 <p className="nx:typography-heading-medium">Heading Medium</p>
+                <p className="nx:typography-heading-small">Heading Small</p>
+                <p className="nx:typography-heading-xsmall">Heading XSmall</p>
               </div>
             </div>
 
@@ -64,9 +54,6 @@ export function ComponentShowcase() {
                 Body
               </span>
               <div className="nx:space-y-2">
-                <p className="nx:typography-body-large">
-                  Body Large - The quick brown fox jumps over the lazy dog.
-                </p>
                 <p className="nx:typography-body-default">
                   Body Default - The quick brown fox jumps over the lazy dog.
                 </p>
@@ -83,7 +70,6 @@ export function ComponentShowcase() {
                   Labels
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
-                  <span className="nx:typography-label-large">Label Large</span>
                   <span className="nx:typography-label-default">
                     Label Default
                   </span>

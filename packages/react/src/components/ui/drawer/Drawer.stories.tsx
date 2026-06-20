@@ -69,7 +69,7 @@ export const Default: Story = {
             Drag down or press Escape to dismiss this drawer.
           </DrawerDescription>
         </DrawerHeader>
-        <p className="nx:px-4 nx:typography-body-small nx:text-foreground">
+        <p className="nx:px-4 nx:typography-body-default nx:text-foreground">
           Drawer content goes here. On touch devices it can be dragged to
           dismiss.
         </p>
@@ -138,7 +138,7 @@ export const ScrollableContent: Story = {
                 <p className="nx:typography-label-default nx:text-foreground">
                   {item.title}
                 </p>
-                <p className="nx:typography-body-small nx:text-muted-foreground">
+                <p className="nx:typography-body-default nx:text-muted-foreground">
                   {item.description}
                 </p>
               </li>
@@ -198,7 +198,7 @@ export const WithHeaderActions: Story = {
             </Button>
           </DrawerClose>
         </DrawerHeader>
-        <div className="nx:px-6 nx:pb-6 nx:typography-body-small nx:text-foreground">
+        <div className="nx:px-6 nx:pb-6 nx:typography-body-default nx:text-foreground">
           Header actions are regular composition: consumers place controls in
           the header and keep Vaul responsible for dismissal.
         </div>

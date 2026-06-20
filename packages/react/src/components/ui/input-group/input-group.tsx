@@ -162,7 +162,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
       className={cn(
-        'nx:flex nx:items-center nx:gap-2 nx:typography-body-small nx:text-muted-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+        'nx:flex nx:items-center nx:gap-2 nx:typography-body-default nx:text-muted-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
         className
       )}
       {...props}

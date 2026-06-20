@@ -71,7 +71,7 @@ export function MultiBrand() {
       {/* ── Dimensions ──────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">The dimensions</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Two color axes plus five design-token axes and dark mode. Each is
           orthogonal — base × brand × density × … combine freely.
         </p>
@@ -109,7 +109,7 @@ export function MultiBrand() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           Two runtime mechanisms
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Colors and most design tokens swap by re-pointing a stylesheet
           <code className="nx:typography-code-inline">
             {' '}
@@ -133,7 +133,7 @@ export function MultiBrand() {
       {/* ── Live ────────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">See it live</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Open the theme picker (bottom-right) and swap Base or Brand — these
           components and swatches re-resolve instantly.
         </p>
@@ -159,7 +159,7 @@ export function MultiBrand() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           Re-theme as a consumer
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Override the token variables in a stylesheet loaded after Nexus, or
           set a density mode on any subtree. No component changes — the cascade
           does the rest. See <strong>Consumer overrides</strong> for the full
@@ -179,7 +179,7 @@ export function MultiBrand() {
       {/* ── For agents ──────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">For agents</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:max-w-[64ch]">
           The same dimensions are published as structured DTCG tokens, a{' '}
           <code className="nx:typography-code-inline">llms.txt</code> manifest,
           and a mirror of the authoring rules — so an agent re-themes by reading

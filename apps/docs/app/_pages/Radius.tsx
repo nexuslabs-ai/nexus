@@ -67,7 +67,7 @@ export function Radius() {
       {/* ── Radius ──────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Radius</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Six radius utilities, each reacting to the active Radius mode. Swap
           the mode and every corner re-rounds.
         </p>
@@ -116,7 +116,7 @@ export function Radius() {
       {/* ── Border widths ───────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Border widths</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The picker offers five border-width modes, but only three are distinct
           designs — <code>lyra</code> and <code>mira</code> are byte-identical
           to <code>vega</code>. The box below sets its width from the runtime{' '}
@@ -171,7 +171,7 @@ export function Radius() {
       {/* ── Shadows ─────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Shadows</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Seven elevation tiers plus an inset shadow, each reacting to the
           active Shadow mode. Shadows are theme-split — tuned per light and
           dark, since a drop-shadow that defines a card edge in light vanishes

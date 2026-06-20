@@ -63,7 +63,7 @@ function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       className={cn(
-        'nx:flex nx:min-w-0 nx:max-w-full nx:flex-nowrap nx:items-center nx:gap-0.5 nx:overflow-x-auto nx:px-1.5 nx:py-1.5 nx:typography-body-small nx:text-muted-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:flex nx:min-w-0 nx:max-w-full nx:flex-nowrap nx:items-center nx:gap-0.5 nx:overflow-x-auto nx:px-1.5 nx:py-1.5 nx:typography-body-default nx:text-muted-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         className
       )}
       {...props}
@@ -223,7 +223,7 @@ function BreadcrumbSeparator({
       role="presentation"
       aria-hidden="true"
       className={cn(
-        'nx:inline-flex nx:shrink-0 nx:items-center nx:typography-body-small nx:text-muted-foreground nx:[&>svg]:size-3.5',
+        'nx:inline-flex nx:shrink-0 nx:items-center nx:typography-body-default nx:text-muted-foreground nx:[&>svg]:size-3.5',
         className
       )}
       {...props}
@@ -260,7 +260,7 @@ function BreadcrumbEllipsis({
       type={type}
       aria-label={ariaLabel}
       className={cn(
-        'nx:inline-flex nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:px-1.5 nx:typography-body-small nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:inline-flex nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:px-1.5 nx:typography-body-default nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         className
       )}
       {...props}

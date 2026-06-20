@@ -46,7 +46,7 @@ export function NotificationsTab() {
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
             <div className="nx:space-y-0.5">
               <Label htmlFor="notify-product">Product updates</Label>
-              <p className="nx:typography-body-small nx:text-muted-foreground">
+              <p className="nx:typography-body-default nx:text-muted-foreground">
                 News about features and improvements.
               </p>
             </div>
@@ -59,7 +59,7 @@ export function NotificationsTab() {
           <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
             <div className="nx:space-y-0.5">
               <Label htmlFor="notify-security">Security alerts</Label>
-              <p className="nx:typography-body-small nx:text-muted-foreground">
+              <p className="nx:typography-body-default nx:text-muted-foreground">
                 Critical alerts about your account.
               </p>
             </div>

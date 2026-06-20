@@ -170,7 +170,7 @@ export function ColorShowcase() {
       {/* ── The palettes (+ shared CVD preview) ─────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">The palettes</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Start with the five neutral bases — eleven shades each. Read{' '}
           <em>down</em> any column: every base&rsquo;s <code>500</code> sits at
           the same perceptual lightness, only hue and chroma differ. Below are
@@ -185,7 +185,7 @@ export function ColorShowcase() {
       {/* ── Live semantic tokens ────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Live tokens</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Semantic surface/text pairs — the real tokens components use. Open the
           theme picker (bottom-right) and swap base, brand, or dark mode: every
           pair re-resolves live, and each clears the APCA gate by construction.
@@ -214,7 +214,7 @@ export function ColorShowcase() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           What each shade is for
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The shade number is a luminance coordinate, and each step maps to
           specific semantic roles. The mapping is not a simple light/dark flip —
           a shade lands at a different step in dark mode to hold the same
@@ -274,7 +274,7 @@ export function ColorShowcase() {
       {/* ── Accessibility / APCA gate ───────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Accessibility</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Contrast is gated by APCA (not WCAG 2 ratios), with thresholds set per
           intended use. A failing pair blocks the build — thresholds are not
           negotiable per finding. The palette is also validated against
@@ -343,7 +343,7 @@ export function ColorShowcase() {
               </span>
               <div>
                 <div className="nx:text-sm nx:font-semibold">{item.step}</div>
-                <p className="nx:typography-body-small nx:text-muted-foreground nx:mt-0.5">
+                <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-0.5">
                   {item.body}
                 </p>
               </div>

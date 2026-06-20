@@ -220,7 +220,7 @@ function AlertTitle({
     <Comp
       data-slot="alert-title"
       className={cn(
-        'nx:mb-1 nx:last:mb-0 nx:typography-label-large',
+        'nx:mb-1 nx:last:mb-0 nx:typography-label-default',
         className
       )}
       {...props}
@@ -254,7 +254,7 @@ function AlertDescription({ className, ...props }: AlertDescriptionProps) {
     <div
       data-slot="alert-description"
       className={cn(
-        'nx:typography-body-small nx:group-data-[variant=default]/alert:text-muted-foreground',
+        'nx:typography-body-default nx:group-data-[variant=default]/alert:text-muted-foreground',
         className
       )}
       {...props}

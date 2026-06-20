@@ -255,7 +255,7 @@ export const BorderedFooter: Story = {
           <span className="nx:typography-heading-medium nx:text-foreground">
             $49
           </span>
-          <span className="nx:typography-body-small nx:text-muted-foreground">
+          <span className="nx:typography-body-default nx:text-muted-foreground">
             per seat
           </span>
         </div>

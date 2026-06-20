@@ -85,7 +85,7 @@ function ResultRow({
     >
       <div className="nx:min-w-32">
         <p
-          className="nx:typography-body-small nx:font-semibold"
+          className="nx:typography-body-default nx:font-semibold"
           style={{ color: textColor }}
         >
           {result.ok ? 'Sample label' : '⚠ no shade passes'}
@@ -166,7 +166,7 @@ export const Playground: Story = {
           <h2 className="nx:text-foreground nx:typography-heading-medium">
             adjustContrast Playground
           </h2>
-          <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+          <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
             Edit the controls below to see how an arbitrary input color is
             snapped to the nearest Nexus palette shade that passes the requested
             APCA tier on the target background.
@@ -222,7 +222,7 @@ export const Showcase: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Showcase
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Six representative inputs run through every APCA tier on a light
           surface (#ffffff) and a dark surface (#0a0a0a). The same input
           produces different shades per tier — body needs the most contrast,
