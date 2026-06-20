@@ -68,6 +68,18 @@ export const WithSeparator: Story = {
       </InputOTPGroup>
     </InputOTP>
   ),
+  play: async ({ canvasElement }) => {
+    const separator = canvasElement.querySelector(
+      '[data-slot="input-otp-separator"]'
+    );
+
+    await expect(separator).toBeInTheDocument();
+    await expect(separator).toHaveAttribute('aria-hidden', 'true');
+    await expect(separator).not.toHaveAttribute('role');
+    await expect(
+      canvasElement.querySelectorAll('[data-slot="input-otp-group"]').length
+    ).toBe(2);
+  },
 };
 
 export const Disabled: Story = {
@@ -146,12 +158,15 @@ export const WithDataAttributes: Story = {
     await expect(input).toBeInTheDocument();
     // The data-slot must land on the <input> — every play-fn query depends on it.
     await expect(input?.tagName).toBe('INPUT');
+    await expect(input).toHaveAccessibleName(/one-time password/i);
+    await expect(input).toHaveAttribute('autocomplete', 'one-time-code');
 
     const group = canvasElement.querySelector('[data-slot="input-otp-group"]');
     await expect(group).toBeInTheDocument();
 
-    const slot = canvasElement.querySelector('[data-slot="input-otp-slot"]');
-    await expect(slot).toHaveAttribute('data-slot', 'input-otp-slot');
+    await expect(
+      canvasElement.querySelectorAll('[data-slot="input-otp-slot"]').length
+    ).toBe(6);
   },
 };
 
