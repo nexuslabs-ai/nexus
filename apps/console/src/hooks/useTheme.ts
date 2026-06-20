@@ -100,7 +100,7 @@ function pick<T extends string>(
 /**
  * Coerce an unknown persisted payload into a valid ThemeConfig: each axis is
  * narrowed against its known set, so a stale value from a removed mode (e.g. an
- * old `typography: 'maia'`) is dropped to its default instead of being handed to
+ * old `spacing: 'compact'`) is dropped to its default instead of being handed to
  * `loadCSS`, which would 404 on the missing theme file.
  */
 function sanitizeTheme(raw: unknown): ThemeConfig {
