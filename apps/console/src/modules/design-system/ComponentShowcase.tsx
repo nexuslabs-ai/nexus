@@ -32,10 +32,8 @@ export function ComponentShowcase() {
   return (
     <div className="nx:bg-background-hover-alpha nx:min-h-svh">
       <div className="nx:p-6 nx:space-y-6">
-        {/* Typography Section */}
         <Section title="Typography" description="Text styles and font scales">
           <div className="nx:space-y-6">
-            {/* Headings */}
             <div className="nx:space-y-2">
               <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
                 Headings
@@ -48,7 +46,6 @@ export function ComponentShowcase() {
               </div>
             </div>
 
-            {/* Body */}
             <div className="nx:space-y-2">
               <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
                 Body
@@ -63,7 +60,6 @@ export function ComponentShowcase() {
               </div>
             </div>
 
-            {/* Labels & Code */}
             <div className="nx:grid nx:grid-cols-2 nx:gap-6">
               <div className="nx:space-y-2">
                 <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">

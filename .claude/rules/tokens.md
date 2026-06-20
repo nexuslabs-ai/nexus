@@ -68,19 +68,13 @@ A `fontFamily` token can carry `$extensions.nx-font-source` (`type: "google"` wi
 
 > **Spacing isn't a per-mode build flag.** All 7 spacing modes ship in every build; mode swap is the runtime `data-style="X"` attribute on `<html>` (or any subtree). `--spacingDefault=<mode>` only picks which mode lands under the `:root` cascade default.
 
-> **Mode distinctness varies by axis.** A CLI flag being accepted ≠ unique values. `shadow` is genuinely distinct across its 5 modes; `typography` ships only 3 (`nova` / `vega` / `maia` — `lyra` / `mira` were byte-identical to `vega` and removed); `borderwidth` exposes 5 flags but only 3 designs (`borderwidth-nova` 1.5/3px, `maia` 1/1px, and the `vega` cluster `lyra` = `mira` = `vega` 1/2px). Don't read a surviving flag as a distinct design.
+> **Mode distinctness varies by axis.** A CLI flag being accepted ≠ unique values. `shadow` is genuinely distinct across its 5 modes; `typography` ships a single mode (`vega`); `borderwidth` exposes 5 flags but only 3 designs (`borderwidth-nova` 1.5/3px, `maia` 1/1px, and the `vega` cluster `lyra` = `mira` = `vega` 1/2px). Don't read a surviving flag as a distinct design.
 
 ## Typography
 
-`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. The two body tiers are `body-default` (14px) and `body-small` (12px). Letter-spacing is uniformly `normal` (0) across all eleven tiers — the lone exception is `label-caps` at `wider` (+0.8px) for all-caps legibility. For inline emphasis in body copy, apply `nx:font-bold` (700); the bold weight is loaded but deliberately not bound to its own composite. Three modes differ by a uniform ±1px per size step, mapped to product archetypes:
+`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. The two body tiers are `body-default` (14px) and `body-small` (12px). Letter-spacing is uniformly `normal` (0) across all eleven tiers — the lone exception is `label-caps` at `wider` (+0.8px) for all-caps legibility. For inline emphasis in body copy, apply `nx:font-bold` (700); the bold weight is loaded but deliberately not bound to its own composite.
 
-| Mode     | Archetype            | Use for                                                        |
-| -------- | -------------------- | -------------------------------------------------------------- |
-| `nova`   | Tool / dense         | dashboards, data-heavy UIs (Figma / Linear density)            |
-| `vega` ★ | Standard product     | SaaS, consumer apps — the recommended default and bundled mode |
-| `maia`   | Editorial / document | reading-focused UIs, document editors (Notion density)         |
-
-All three share Inter / Georgia / JetBrains Mono — they differ by scale only. `lyra` / `mira` were byte-duplicates of `vega` and removed; reintroduce them only with a real typeface or scale-ratio decision behind them.
+Typography ships a **single scale** (`vega`) on Inter / Georgia / JetBrains Mono — the former `nova` / `maia` density modes were removed, leaving it the lone single-mode token axis (every other axis — base, brand, spacing, shadow, radius, borderwidth — remains multi-mode). Reintroduce a typography mode only behind a real typeface or scale-ratio decision.
 
 ## Do Not
 

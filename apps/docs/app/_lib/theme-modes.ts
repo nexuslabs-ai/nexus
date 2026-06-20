@@ -5,7 +5,6 @@ export const THEME_MODE_KEYS = [
   'base',
   'brand',
   'spacing',
-  'typography',
   'shadow',
   'radius',
   'borderwidth',
@@ -18,7 +17,6 @@ export type StoredColorScheme = 'light' | 'dark';
 export const THEME_STYLESHEET_MODE_KEYS = [
   'base',
   'brand',
-  'typography',
   'shadow',
   'radius',
   'borderwidth',
@@ -28,7 +26,6 @@ export const THEME_MODE_VALUES = {
   base: ['slate', 'stone', 'neutral', 'gray', 'zinc'],
   brand: ['blue', 'purple', 'pink', 'teal', 'orange', 'black'],
   spacing: ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'],
-  typography: ['vega', 'nova', 'maia'],
   shadow: ['vega', 'lyra', 'maia', 'mira', 'nova'],
   radius: ['sharp', 'subtle', 'smooth', 'mellow', 'blunt'],
   borderwidth: ['vega', 'lyra', 'maia', 'mira', 'nova'],
@@ -49,7 +46,6 @@ export const DEFAULT_THEME_STATE = {
   base: 'stone',
   brand: 'black',
   spacing: 'mira',
-  typography: 'vega',
   shadow: 'maia',
   radius: 'sharp',
   borderwidth: 'vega',
@@ -79,11 +75,6 @@ export const THEME_MODE_OPTIONS = {
     { value: 'nova', label: 'Nova' },
     { value: 'luma', label: 'Luma' },
     { value: 'sera', label: 'Sera' },
-  ],
-  typography: [
-    { value: 'vega', label: 'Vega' },
-    { value: 'nova', label: 'Nova' },
-    { value: 'maia', label: 'Maia' },
   ],
   shadow: [
     { value: 'vega', label: 'Vega' },
@@ -125,11 +116,6 @@ export const THEME_STYLESHEET_HREFS = {
     teal: '/themes/brands-teal.css',
     orange: '/themes/brands-orange.css',
     black: '/themes/brands-black.css',
-  },
-  typography: {
-    vega: '/themes/typography-vega.css',
-    nova: '/themes/typography-nova.css',
-    maia: '/themes/typography-maia.css',
   },
   shadow: {
     vega: '/themes/shadow-vega.css',
@@ -183,7 +169,6 @@ export function sanitizeThemeState(raw: unknown): ThemeState {
     base: sanitizeMode('base', state.base),
     brand: sanitizeMode('brand', state.brand),
     spacing: sanitizeMode('spacing', state.spacing),
-    typography: sanitizeMode('typography', state.typography),
     shadow: sanitizeMode('shadow', state.shadow),
     radius: sanitizeMode('radius', state.radius),
     borderwidth: sanitizeMode('borderwidth', state.borderwidth),
@@ -199,10 +184,6 @@ export function getThemeStylesheetHref(
       return THEME_STYLESHEET_HREFS.base[sanitizeMode('base', value)];
     case 'brand':
       return THEME_STYLESHEET_HREFS.brand[sanitizeMode('brand', value)];
-    case 'typography':
-      return THEME_STYLESHEET_HREFS.typography[
-        sanitizeMode('typography', value)
-      ];
     case 'shadow':
       return THEME_STYLESHEET_HREFS.shadow[sanitizeMode('shadow', value)];
     case 'radius':
