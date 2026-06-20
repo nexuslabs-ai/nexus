@@ -56,9 +56,9 @@ CSS output: light values in the `@theme` block, dark overrides in the `.dark` se
 
 The generated global CSS also owns native browser UI theming. `:root` advertises `color-scheme: light dark`, `:root:not(.dark)` pins native controls/scrollbars to light, and `.dark` pins them to dark so browser-rendered UI follows the same class switch as semantic tokens. Native checkbox, radio, range, and progress controls receive `accent-color: var(--color-primary-background)`; custom Nexus controls remain token-styled components. Keep `light-dark()` out of emitted token CSS until it clears the repo browser floor.
 
-## Font loading — variable-font axes
+## Font loading — system stack, no web fonts
 
-A `fontFamily` token can carry `$extensions.nx-font-source` (`type: "google"` with `family`/`weights`/`styles`, or `"system"`) to drive `@import` generation. The `weights` array requests Inter's variable `wght` axis as a single payload. **Only `wght` is requested** — Inter also ships an `opsz` (optical-size) axis, but Google Fonts serves only the axes named in the request URL, so `opsz` is never delivered and the utilities deliberately do **not** emit `font-optical-sizing: auto` (a no-op without the axis loaded). Activating it would mean requesting `opsz` in the import; no token field consumes one today.
+All three families ship as **system fonts**: `font-sans` → the OS `ui-sans-serif` stack, `font-mono` → `ui-monospace`, `font-serif` → Georgia. Because none is a web font, **no Google Fonts `@import` is generated and the design system pulls zero font payload**. The mechanism still exists for re-aiming: a `fontFamily` token's `$extensions.nx-font-source` is either `{ type: "system" }` (emit the `$value` stack verbatim, no import) or `{ type: "google", family, weights, styles }` (drive an `@import url(...)` for that family). `extractGoogleFonts` collects only `type: "google"` families, so a consumer brand can re-aim any family to a hosted face without touching the generator — and with all three `system` today, the import line is omitted entirely.
 
 ## Spacing & CSS-variable gotchas
 
@@ -72,9 +72,9 @@ A `fontFamily` token can carry `$extensions.nx-font-source` (`type: "google"` wi
 
 ## Typography
 
-`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. The two body tiers are `body-default` (14px) and `body-small` (12px). Letter-spacing is uniformly `normal` (0) across all eleven tiers — the lone exception is `label-caps` at `wider` (+0.8px) for all-caps legibility. For inline emphasis in body copy, apply `nx:font-bold` (700); the bold weight is loaded but deliberately not bound to its own composite.
+`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. The two body tiers are `body-default` (14px) and `body-small` (12px). Letter-spacing is uniformly `normal` (0) across all eleven tiers — the lone exception is `label-caps` at `wider` (+0.8px) for all-caps legibility. For inline emphasis in body copy, apply `nx:font-bold` (700) — not bound to its own composite. The scale uses weights 400 / 500 / 600 + 700 for emphasis; **weight 300 is retired** (system fonts don't reliably ship it).
 
-Typography ships a **single scale** (`vega`) on Inter / Georgia / JetBrains Mono — the former `nova` / `maia` density modes were removed, leaving it the lone single-mode token axis (every other axis — base, brand, spacing, shadow, radius, borderwidth — remains multi-mode). Reintroduce a typography mode only behind a real typeface or scale-ratio decision.
+Typography ships a **single scale** (`vega`) on the OS system sans / Georgia / system monospace stacks — the former `nova` / `maia` density modes were removed, leaving it the lone single-mode token axis (every other axis — base, brand, spacing, shadow, radius, borderwidth — remains multi-mode). Reintroduce a typography mode only behind a real typeface or scale-ratio decision.
 
 ## Do Not
 

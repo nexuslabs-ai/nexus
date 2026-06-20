@@ -87,7 +87,7 @@ const FAMILIES: {
   style?: React.CSSProperties;
 }[] = [
   {
-    name: 'Inter',
+    name: 'System UI',
     role: 'Sans — UI, headings, body',
     sample: 'The quick brown fox jumps over the lazy dog',
   },
@@ -98,7 +98,7 @@ const FAMILIES: {
     style: { fontFamily: 'Georgia, "Times New Roman", serif' },
   },
   {
-    name: 'JetBrains Mono',
+    name: 'System mono',
     role: 'Mono — code, token names, labels',
     sample: 'const token = "--nx-color-primary-background"',
     cls: 'nx:font-mono',
@@ -119,7 +119,8 @@ export function Typography() {
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         One scale for the whole system. Every tier is a composite utility —
         size, weight, line-height, and letter-spacing in one class — built on
-        Inter, with Georgia for editorial accents and JetBrains Mono for code.
+        the OS system font stack, with Georgia for editorial accents and the
+        system monospace stack for code.
       </p>
 
       {/* ── The scale ───────────────────────────────────────── */}
