@@ -120,7 +120,7 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
           <Button
             asChild
             variant="ghost"
-            size="sm"
+            size="icon-sm"
             className="nx:-ml-2 nx:shrink-0 nx:lg:hidden"
           >
             <Link to="/m/inbox" search={{}} aria-label="Back to conversations">

@@ -20,6 +20,14 @@ const meta: Meta<typeof Sheet> = {
   component: Sheet,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: [
+          'Use Sheet for deterministic edge panels such as settings, filters, navigation, or supporting forms tied to a viewport side.',
+          'Use Dialog for centered modal tasks, AlertDialog for choice-forcing confirmations, and Drawer for gesture-driven mobile-style panels with drag-to-dismiss behavior.',
+        ].join(' '),
+      },
+    },
   },
 };
 

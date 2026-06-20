@@ -131,12 +131,12 @@
       "$type": "typography",
       "$value": {
         "fontFamily": "{family.font-sans}",
-        "fontSize": "{size.sm}",
-        "fontWeight": "{weight.semibold}",
-        "lineHeight": "{line-height.sm}",
+        "fontSize": "{size.base}",
+        "fontWeight": "{weight.medium}",
+        "lineHeight": "{line-height.base}",
         "letterSpacing": "{letterspacing.normal}"
       },
-      "$description": "14"
+      "$description": "16"
     },
     "default": {
       "$type": "typography",

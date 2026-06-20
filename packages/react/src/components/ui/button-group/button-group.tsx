@@ -6,8 +6,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
+import {
+  type ButtonGroupSize,
+  ButtonGroupSizeContext,
+} from './button-group-context';
+
 const buttonGroupVariants = cva(
-  "nx:flex nx:w-fit nx:items-stretch nx:has-[>[data-slot=button-group]]:gap-2 nx:*:focus-visible:relative nx:*:focus-visible:z-10 nx:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md nx:[&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit nx:[&>input]:flex-1",
+  'nx:flex nx:w-fit nx:items-stretch nx:*:focus-visible:relative nx:*:focus-visible:z-10',
   {
     variants: {
       orientation: {
@@ -23,6 +28,22 @@ const buttonGroupVariants = cva(
   }
 );
 
+const buttonGroupTextVariants = cva(
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+  {
+    variants: {
+      size: {
+        sm: 'nx:h-8 nx:px-2.5 nx:typography-label-default',
+        default: 'nx:h-10 nx:px-3 nx:typography-label-default',
+        lg: 'nx:h-12 nx:px-3.5 nx:typography-label-large',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  }
+);
+
 /**
  * ButtonGroupProps
  *
@@ -31,15 +52,29 @@ const buttonGroupVariants = cva(
 interface ButtonGroupProps
   extends
     React.ComponentProps<'div'>,
-    VariantProps<typeof buttonGroupVariants> {}
+    VariantProps<typeof buttonGroupVariants> {
+  /**
+   * Size shared with ButtonGroupText and any Button member that doesn't set its
+   * own size. Inherited through context, so a Button nested inside a trigger
+   * wrapper (a split button) picks it up too.
+   * @default "default"
+   */
+  size?: ButtonGroupSize;
+}
 
 /**
  * ButtonGroup
  *
- * A visually-joined cluster of buttons (or inputs / selects) sharing borders
- * and outer rounding — adjacent children lose their touching corners and the
+ * A visually-joined cluster of button-shaped controls — Buttons, a
+ * `DropdownMenu` or `Select` trigger, a link via `<ButtonGroupText asChild>`,
+ * plus `ButtonGroupText` and `ButtonGroupSeparator` addons — sharing borders
+ * and outer rounding so adjacent children lose their touching corners and the
  * seam between them. Lay out horizontally (default) or vertically with
  * `orientation`.
+ *
+ * For an input or textarea with leading/trailing addons in one shared-focus
+ * field, reach for `InputGroup` instead — composing inputs is its job, not
+ * this one's.
  *
  * @example
  * ```tsx
@@ -50,15 +85,26 @@ interface ButtonGroupProps
  * </ButtonGroup>
  * ```
  */
-function ButtonGroup({ className, orientation, ...props }: ButtonGroupProps) {
+function ButtonGroup({
+  className,
+  orientation = 'horizontal',
+  size = 'default',
+  children,
+  ...props
+}: ButtonGroupProps) {
   return (
-    <div
-      role="group"
-      data-slot="button-group"
-      data-orientation={orientation}
-      className={cn(buttonGroupVariants({ orientation }), className)}
-      {...props}
-    />
+    <ButtonGroupSizeContext.Provider value={size}>
+      <div
+        role="group"
+        data-slot="button-group"
+        data-orientation={orientation}
+        data-size={size}
+        className={cn(buttonGroupVariants({ orientation }), className)}
+        {...props}
+      >
+        {children}
+      </div>
+    </ButtonGroupSizeContext.Provider>
   );
 }
 
@@ -73,6 +119,12 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
    * @default false
    */
   asChild?: boolean;
+
+  /**
+   * Addon size. Inherits from ButtonGroup when omitted.
+   * @default "default"
+   */
+  size?: ButtonGroupSize;
 }
 
 /**
@@ -84,17 +136,18 @@ interface ButtonGroupTextProps extends React.ComponentProps<'div'> {
 function ButtonGroupText({
   className,
   asChild = false,
+  size,
   ...props
 }: ButtonGroupTextProps) {
   const Comp = asChild ? Slot : 'div';
+  const contextSize = React.useContext(ButtonGroupSizeContext);
+  const resolvedSize = size ?? contextSize ?? 'default';
 
   return (
     <Comp
       data-slot="button-group-text"
-      className={cn(
-        'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:px-4 nx:typography-label-default nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
-        className
-      )}
+      data-size={resolvedSize}
+      className={cn(buttonGroupTextVariants({ size: resolvedSize }), className)}
       {...props}
     />
   );
@@ -138,7 +191,9 @@ export {
   type ButtonGroupProps,
   ButtonGroupSeparator,
   type ButtonGroupSeparatorProps,
+  type ButtonGroupSize,
   ButtonGroupText,
   type ButtonGroupTextProps,
+  buttonGroupTextVariants,
   buttonGroupVariants,
 };

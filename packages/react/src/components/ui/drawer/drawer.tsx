@@ -106,7 +106,10 @@ function DrawerContent({
         )}
         {...props}
       >
-        <div className="nx:mx-auto nx:mt-4 nx:hidden nx:h-2 nx:w-[100px] nx:shrink-0 nx:rounded-full nx:bg-muted nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
+        <div
+          data-slot="drawer-handle"
+          className="nx:mx-auto nx:mt-4 nx:hidden nx:h-2 nx:w-[100px] nx:shrink-0 nx:rounded-full nx:bg-muted nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:block"
+        />
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>
@@ -123,7 +126,7 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-header"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1.5 nx:p-container nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center nx:group-data-[vaul-drawer-direction=top]/drawer-content:text-center nx:md:text-left',
+        'nx:flex nx:flex-col nx:gap-1.5 nx:p-6 nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center nx:group-data-[vaul-drawer-direction=top]/drawer-content:text-center nx:md:text-left',
         className
       )}
       {...props}
@@ -141,7 +144,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-footer"
       className={cn(
-        'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-container',
+        'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-6',
         className
       )}
       {...props}
@@ -162,10 +165,7 @@ function DrawerTitle({
   return (
     <DrawerPrimitive.Title
       data-slot="drawer-title"
-      className={cn(
-        'nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight',
-        className
-      )}
+      className={cn('nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -183,7 +183,10 @@ function DrawerDescription({
   return (
     <DrawerPrimitive.Description
       data-slot="drawer-description"
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:typography-body-small nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );

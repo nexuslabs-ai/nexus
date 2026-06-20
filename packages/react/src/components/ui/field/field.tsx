@@ -55,7 +55,7 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        'nx:mb-3 nx:font-medium nx:data-[variant=legend]:text-base nx:data-[variant=label]:text-sm',
+        'nx:mb-3 nx:data-[variant=legend]:text-base nx:data-[variant=legend]:font-medium nx:data-[variant=label]:typography-label-default',
         className
       )}
       {...props}
@@ -83,7 +83,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const fieldVariants = cva(
-  'nx:group/field nx:flex nx:w-full nx:gap-3 nx:data-[invalid=true]:text-error-subtle-foreground',
+  'nx:group/field nx:flex nx:w-full nx:gap-2 nx:data-[invalid=true]:text-error-subtle-foreground',
   {
     variants: {
       orientation: {
@@ -170,7 +170,7 @@ function FieldLabel({
     <Label
       data-slot="field-label"
       className={cn(
-        'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:leading-snug nx:group-data-[disabled=true]/field:opacity-50',
+        'nx:group/field-label nx:peer/field-label nx:flex nx:w-fit nx:gap-2 nx:group-data-[disabled=true]/field:opacity-50',
         'nx:has-[>[data-slot=field]]:w-full nx:has-[>[data-slot=field]]:flex-col nx:has-[>[data-slot=field]]:rounded-md nx:has-[>[data-slot=field]]:border nx:*:data-[slot=field]:p-4',
         'nx:has-data-[state=checked]:border-border-primary nx:has-data-[state=checked]:bg-primary-subtle',
         className
@@ -191,7 +191,7 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="field-label"
       className={cn(
-        'nx:flex nx:w-fit nx:items-center nx:gap-2 nx:text-sm nx:leading-snug nx:font-medium nx:group-data-[disabled=true]/field:opacity-50',
+        'nx:flex nx:w-fit nx:items-center nx:gap-2 nx:typography-label-default nx:group-data-[disabled=true]/field:opacity-50',
         className
       )}
       {...props}
@@ -209,8 +209,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
     <p
       data-slot="field-description"
       className={cn(
-        'nx:text-sm nx:leading-normal nx:font-normal nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
-        'nx:last:mt-0 nx:nth-last-2:-mt-1 nx:[[data-variant=legend]+&]:-mt-1.5',
+        'nx:typography-body-small nx:text-muted-foreground nx:group-has-data-[orientation=horizontal]/field:text-balance',
         'nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
@@ -234,7 +233,7 @@ function FieldSeparator({
       data-slot="field-separator"
       data-content={!!children}
       className={cn(
-        'nx:relative nx:-my-2 nx:h-5 nx:text-sm nx:group-data-[variant=outline]/field-group:-mb-2',
+        'nx:relative nx:-my-2 nx:h-5 nx:typography-body-small',
         className
       )}
       {...props}
@@ -288,7 +287,7 @@ function FieldError({
       aria-atomic="true"
       data-slot="field-error"
       className={cn(
-        'nx:text-sm nx:font-normal nx:text-error-subtle-foreground',
+        'nx:typography-body-small nx:text-error-subtle-foreground',
         className
       )}
       {...props}
