@@ -31,9 +31,6 @@ export const SPACING_MODES = [
   'sera',
 ] as const;
 
-// Typography dropped its byte-duplicate lyra/mira modes (PR #157); their theme
-// CSS no longer exists, so only the 3 real modes are listed.
-export const TYPOGRAPHY_MODES = ['nova', 'vega', 'maia'] as const;
 export const RADIUS_MODES = [
   'blunt',
   'sharp',
@@ -46,7 +43,6 @@ export type Base = (typeof BASES)[number]['value'];
 export type Brand = (typeof BRANDS)[number]['value'];
 export type TokenMode = (typeof TOKEN_MODES)[number];
 export type SpacingMode = (typeof SPACING_MODES)[number];
-export type TypographyMode = (typeof TYPOGRAPHY_MODES)[number];
 export type RadiusMode = (typeof RADIUS_MODES)[number];
 
 export type ThemeConfig = {
@@ -54,7 +50,6 @@ export type ThemeConfig = {
   brand: Brand;
   dark: boolean;
   spacing: SpacingMode;
-  typography: TypographyMode;
   shadow: TokenMode;
   radius: RadiusMode;
   borderWidth: TokenMode;
@@ -85,7 +80,6 @@ export const DEFAULT_THEME: ThemeConfig = {
   brand: 'black',
   dark: false,
   spacing: 'mira',
-  typography: 'vega',
   shadow: 'maia',
   radius: 'sharp',
   borderWidth: 'vega',
@@ -106,7 +100,7 @@ function pick<T extends string>(
 /**
  * Coerce an unknown persisted payload into a valid ThemeConfig: each axis is
  * narrowed against its known set, so a stale value from a removed mode (e.g. an
- * old `typography: 'lyra'`) is dropped to its default instead of being handed to
+ * old `spacing: 'compact'`) is dropped to its default instead of being handed to
  * `loadCSS`, which would 404 on the missing theme file.
  */
 function sanitizeTheme(raw: unknown): ThemeConfig {
@@ -116,7 +110,6 @@ function sanitizeTheme(raw: unknown): ThemeConfig {
     brand: pick(p.brand, BRAND_VALUES, DEFAULT_THEME.brand),
     dark: typeof p.dark === 'boolean' ? p.dark : DEFAULT_THEME.dark,
     spacing: pick(p.spacing, SPACING_MODES, DEFAULT_THEME.spacing),
-    typography: pick(p.typography, TYPOGRAPHY_MODES, DEFAULT_THEME.typography),
     shadow: pick(p.shadow, TOKEN_MODES, DEFAULT_THEME.shadow),
     radius: pick(p.radius, RADIUS_MODES, DEFAULT_THEME.radius),
     borderWidth: pick(p.borderWidth, TOKEN_MODES, DEFAULT_THEME.borderWidth),
@@ -161,9 +154,12 @@ export function useTheme() {
     document.documentElement.setAttribute('data-style', theme.spacing);
   }, [theme.spacing]);
 
+  // Typography collapsed to a single mode (vega); load it once for the
+  // --nx-typography-* variable definitions that the @utility classes resolve
+  // against (the console has no other static source for them).
   useEffect(() => {
-    loadCSS(`/themes/typography-${theme.typography}.css`, 'typography');
-  }, [theme.typography]);
+    loadCSS('/themes/typography-vega.css', 'typography');
+  }, []);
 
   useEffect(() => {
     loadCSS(`/themes/shadow-${theme.shadow}.css`, 'shadow');

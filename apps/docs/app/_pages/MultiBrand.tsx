@@ -27,7 +27,6 @@ const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
     options: '7 modes — nova · vega · maia · …',
     swap: 'data-style attr',
   },
-  { dim: 'Typography', options: 'nova · vega · maia', swap: '<link> swap' },
   { dim: 'Shadow', options: '5 modes', swap: '<link> swap' },
   {
     dim: 'Radius',

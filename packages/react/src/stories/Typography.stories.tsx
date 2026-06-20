@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect } from 'storybook/test';
 
-import typographyMaia from '../../../core/tokens/primitives/typography/typography-maia.json';
-import typographyNova from '../../../core/tokens/primitives/typography/typography-nova.json';
 import typographyVega from '../../../core/tokens/primitives/typography/typography-vega.json';
 import typographyStyles from '../../../core/tokens/styles/typography.json';
-
-const BUNDLED_TYPOGRAPHY_MODE = 'vega';
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
@@ -69,20 +65,6 @@ type TypographyTokenSet = {
 };
 
 const VEGA = typographyVega satisfies TypographyTokenSet;
-
-const TYPOGRAPHY_MODES: { name: string; tokens: TypographyTokenSet }[] = [
-  { name: 'nova', tokens: typographyNova satisfies TypographyTokenSet },
-  { name: 'vega', tokens: VEGA },
-  { name: 'maia', tokens: typographyMaia satisfies TypographyTokenSet },
-];
-
-// Product archetype each mode targets. The three modes differ by a uniform
-// ±1px on every size step (nova −1, vega reference, maia +1).
-const MODE_ARCHETYPE: Record<string, string> = {
-  nova: 'Tool / dense',
-  vega: 'Standard product',
-  maia: 'Editorial / document',
-};
 
 // Full literal class strings so Tailwind's content scanner emits each utility
 // (v4 tree-shakes @utility classes not referenced as static literals).
@@ -192,35 +174,6 @@ function TokenRow({
   );
 }
 
-function ModeSection({
-  mode,
-  bundled,
-  children,
-}: {
-  mode: string;
-  bundled: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="nx:flex nx:flex-col nx:gap-3">
-      <h3 className="nx:flex nx:items-center nx:gap-2 nx:text-foreground nx:typography-heading-xsmall">
-        <span>{mode}</span>
-        {MODE_ARCHETYPE[mode] && (
-          <span className="nx:text-muted-foreground nx:typography-label-small nx:font-normal">
-            {MODE_ARCHETYPE[mode]}
-          </span>
-        )}
-        {bundled && (
-          <span className="nx:rounded-sm nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:typography-label-small nx:px-1.5 nx:py-0.5">
-            Bundled
-          </span>
-        )}
-      </h3>
-      <div className="nx:flex nx:flex-col">{children}</div>
-    </section>
-  );
-}
-
 const meta: Meta = {
   title: 'Tokens/Typography',
   parameters: {
@@ -229,7 +182,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Typography primitive tokens — sizes, weights, line-heights, and font families. The bundled mode is the one @nexus/tailwind currently ships with — see packages/core/package.json#scripts.build:tailwind. Weights are identical across modes; font families currently match across modes, so families are shown for the bundled mode only.',
+          'Typography tokens — sizes, weights, line-heights, and font families — plus the composite `nx:typography-*` utilities. The system ships a single type scale.',
       },
     },
   },
@@ -247,39 +200,32 @@ export const Scale: Story = {
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
           Raw `--nx-typography-size-*` primitives applied via `font-size` to a
-          short sample. Mode differences are subtle (often 1–2px shifts) —
-          compare `xs` or `base` across modes to spot the pattern.
+          short sample.
         </p>
       </div>
-      {TYPOGRAPHY_MODES.map(({ name, tokens }) => (
-        <ModeSection
-          key={name}
-          mode={name}
-          bundled={name === BUNDLED_TYPOGRAPHY_MODE}
-        >
-          {SIZE_KEYS.map((sk) => {
-            const dim = tokens.size[sk].$value;
-            return (
-              <TokenRow
-                key={sk}
-                label={sk}
-                value={formatDimension(dim)}
-                preview={
-                  <span
-                    className="nx:text-foreground"
-                    style={{
-                      fontSize: `${dim.value}${dim.unit}`,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {SCALE_SAMPLE}
-                  </span>
-                }
-              />
-            );
-          })}
-        </ModeSection>
-      ))}
+      <section className="nx:flex nx:flex-col">
+        {SIZE_KEYS.map((sk) => {
+          const dim = VEGA.size[sk].$value;
+          return (
+            <TokenRow
+              key={sk}
+              label={sk}
+              value={formatDimension(dim)}
+              preview={
+                <span
+                  className="nx:text-foreground"
+                  style={{
+                    fontSize: `${dim.value}${dim.unit}`,
+                    lineHeight: 1,
+                  }}
+                >
+                  {SCALE_SAMPLE}
+                </span>
+              }
+            />
+          );
+        })}
+      </section>
     </div>
   ),
 };
@@ -293,8 +239,7 @@ export const Weights: Story = {
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
           Weight tokens map descriptive names (thin … black) to numeric weights
-          (100 … 900). These values are identical across all typography modes,
-          so a single ramp is shown — rendered in the bundled `font-sans`.
+          (100 … 900), rendered in `font-sans`.
         </p>
       </div>
       <section className="nx:flex nx:flex-col">
@@ -337,39 +282,33 @@ export const LineHeights: Story = {
           where line-height rhythm matters most.
         </p>
       </div>
-      {TYPOGRAPHY_MODES.map(({ name, tokens }) => (
-        <ModeSection
-          key={name}
-          mode={name}
-          bundled={name === BUNDLED_TYPOGRAPHY_MODE}
-        >
-          {LINE_HEIGHT_DISPLAY_KEYS.map((sk) => {
-            const size = tokens.size[sk].$value;
-            const lineHeight = tokens['line-height'][sk].$value;
-            return (
-              <TokenRow
-                key={sk}
-                label={sk}
-                value={`${size.value}/${lineHeight.value}`}
-                labelWidth="nx:w-12"
-                valueWidth="nx:w-16"
-                alignStart={true}
-                preview={
-                  <p
-                    className="nx:text-foreground nx:max-w-md"
-                    style={{
-                      fontSize: `${size.value}${size.unit}`,
-                      lineHeight: `${lineHeight.value}${lineHeight.unit}`,
-                    }}
-                  >
-                    {LINE_HEIGHT_SAMPLE}
-                  </p>
-                }
-              />
-            );
-          })}
-        </ModeSection>
-      ))}
+      <section className="nx:flex nx:flex-col">
+        {LINE_HEIGHT_DISPLAY_KEYS.map((sk) => {
+          const size = VEGA.size[sk].$value;
+          const lineHeight = VEGA['line-height'][sk].$value;
+          return (
+            <TokenRow
+              key={sk}
+              label={sk}
+              value={`${size.value}/${lineHeight.value}`}
+              labelWidth="nx:w-12"
+              valueWidth="nx:w-16"
+              alignStart={true}
+              preview={
+                <p
+                  className="nx:text-foreground nx:max-w-md"
+                  style={{
+                    fontSize: `${size.value}${size.unit}`,
+                    lineHeight: `${lineHeight.value}${lineHeight.unit}`,
+                  }}
+                >
+                  {LINE_HEIGHT_SAMPLE}
+                </p>
+              }
+            />
+          );
+        })}
+      </section>
     </div>
   ),
 };
@@ -382,13 +321,11 @@ export const FontFamilies: Story = {
           Font Families
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
-          Sans, serif, and mono font families. Showing the bundled mode only —
-          all modes currently ship the same families (Inter / Georgia /
-          JetBrains Mono). Rendering every mode with divergent fonts would
-          require loading multiple Google Font payloads on this page.
+          Sans, serif, and mono font families — Inter, Georgia, and JetBrains
+          Mono.
         </p>
       </div>
-      <ModeSection mode={BUNDLED_TYPOGRAPHY_MODE} bundled={true}>
+      <section className="nx:flex nx:flex-col">
         {FAMILY_KEYS.map((fk) => {
           const family = VEGA.family[fk].$value;
           return (
@@ -412,7 +349,7 @@ export const FontFamilies: Story = {
             />
           );
         })}
-      </ModeSection>
+      </section>
     </div>
   ),
 };
@@ -428,8 +365,7 @@ export const CompositeUtilities: Story = {
           The 11 ready-to-use `nx:typography-*` classes — each bundles
           font-family, size, weight, line-height, and letter-spacing (body tiers
           also get `text-wrap: pretty`). Prefer these over composing raw
-          size/weight utilities so a mode switch propagates everywhere. Rendered
-          in the bundled mode (vega).
+          size/weight utilities so every consumer stays consistent.
         </p>
       </div>
       {COMPOSITE_UTILITIES.map(({ group, items }) => (

@@ -2,12 +2,11 @@ import { Breadcrumb } from '../_components/Breadcrumb';
 
 /**
  * Foundations → Typography. Server component — a live specimen of the type
- * scale (every `typography-*` tier rendered at size), the three scale modes,
- * the type families, and the letter-spacing / text-wrap rules.
+ * scale (every `typography-*` tier rendered at size), the type families, and
+ * the letter-spacing / text-wrap rules.
  *
  * The tier classes are stored as full literal strings so Tailwind's scanner
- * emits them; the composites also ship wholesale via @nexus/tailwind. Swap the
- * Typography control in the theme picker to see the scale re-render live.
+ * emits them; the composites also ship wholesale via @nexus/tailwind.
  *
  * Source: .claude/rules/tokens.md § Typography.
  */
@@ -80,24 +79,6 @@ const SCALE: {
   },
 ];
 
-const MODES: { mode: string; archetype: string; use: string }[] = [
-  {
-    mode: 'nova',
-    archetype: 'Tool / dense',
-    use: 'Dashboards, data-heavy UIs (Figma / Linear density)',
-  },
-  {
-    mode: 'vega ★',
-    archetype: 'Standard product',
-    use: 'SaaS and consumer apps — the recommended default, bundled mode',
-  },
-  {
-    mode: 'maia',
-    archetype: 'Editorial / document',
-    use: 'Reading-focused UIs, document editors (Notion density)',
-  },
-];
-
 const FAMILIES: {
   name: string;
   role: string;
@@ -136,12 +117,9 @@ export function Typography() {
       />
       <h1 className="nx:typography-heading-large">Typography</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
-        One scale, three densities. Every tier is a composite utility — size,
-        weight, line-height, and letter-spacing in one class — built on Inter,
-        with Georgia for editorial accents and JetBrains Mono for code. The
-        three modes differ only by scale, so swapping density never changes the
-        typeface. Open the Typography control in the theme picker (bottom-right)
-        and watch the whole specimen below re-render.
+        One scale for the whole system. Every tier is a composite utility —
+        size, weight, line-height, and letter-spacing in one class — built on
+        Inter, with Georgia for editorial accents and JetBrains Mono for code.
       </p>
 
       {/* ── The scale ───────────────────────────────────────── */}
@@ -194,50 +172,11 @@ export function Typography() {
         </pre>
       </section>
 
-      {/* ── Three modes ─────────────────────────────────────── */}
-      <section className="nx:mb-12">
-        <h2 className="nx:typography-heading-small nx:mb-1">Three modes</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Each mode maps the same tiers to a product archetype, differing by a
-          uniform step per size. They share Inter / Georgia / JetBrains Mono —
-          only the scale changes.
-        </p>
-        <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:text-sm">
-            <thead>
-              <tr className="nx:border-b nx:border-border-default nx:text-left">
-                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Mode</th>
-                <th className="nx:py-2 nx:pr-3 nx:font-semibold">Archetype</th>
-                <th className="nx:py-2 nx:font-semibold">Use for</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MODES.map((m) => (
-                <tr
-                  key={m.mode}
-                  className="nx:border-b nx:border-border-default"
-                >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs nx:capitalize">
-                    {m.mode}
-                  </td>
-                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground">
-                    {m.archetype}
-                  </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
-                    {m.use}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       {/* ── Families ────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Families</h2>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Three typefaces, shared across every mode.
+          Three typefaces — one system.
         </p>
         <div className="nx:flex nx:flex-col nx:gap-4">
           {FAMILIES.map((f) => (
