@@ -121,7 +121,7 @@ export async function expectHeightFixedAcrossModes(
 }
 
 /**
- * Per-mode height sentinel — the counterpart to `expectHeightPinnedAcrossModes`
+ * Per-mode height sentinel — the counterpart to `expectHeightFixedAcrossModes`
  * for controls whose height intentionally *varies* per `data-style` mode (fixed
  * `h-*` utilities backed by mode-scaled spacing tokens). Pass a `mode → expected
  * px` map; each control is located by `${testIdPrefix}-${mode}`. Awaits
