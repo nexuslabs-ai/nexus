@@ -259,7 +259,7 @@ export const AsyncLoading: Story = {
     const canvas = within(canvasElement);
     const progressbar = canvas.getByRole('progressbar');
     // The progressbar must not be a child of CommandList's role="listbox"
-    // (axe aria-required-children) — assert the fix holds, not just that it renders.
+    // (axe aria-required-children).
     await expect(progressbar.closest('[role="listbox"]')).toBeNull();
   },
 };
