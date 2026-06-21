@@ -72,7 +72,7 @@ All three families ship as **system fonts**: `font-sans` → the OS `ui-sans-ser
 
 ## Typography
 
-`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. The two body tiers are `body-default` (14px) and `body-small` (12px). Letter-spacing is uniformly `normal` (0) across all eleven tiers — the lone exception is `label-caps` at `wider` (+0.8px) for all-caps legibility. For inline emphasis in body copy, apply `nx:font-bold` (700) — not bound to its own composite. The scale uses weights 400 / 500 / 600 + 700 for emphasis; **weight 300 is retired** (system fonts don't reliably ship it).
+`typography-*` composite utilities emit `text-wrap: pretty` on the **body tier only** — orphan/widow protection for multi-line copy, unwanted on headings. The two body tiers are `body-default` (14px) and `body-small` (12px). Letter-spacing is uniformly `normal` (0) across all eleven tiers — the lone exception is `label-caps` at `wider` (+0.8px) for all-caps legibility. For inline emphasis in body copy, apply `nx:font-bold` (700) — not bound to its own composite. The scale uses weights 400 / 500 / 600 + 700 for emphasis; **weight 300 is retired from the composite scale** (system fonts don't reliably ship it) — the raw weight primitives keep the full 100–900 ramp.
 
 Typography ships a **single scale** (`vega`) on the OS system sans / Georgia / system monospace stacks — the former `nova` / `maia` density modes were removed, leaving it the lone single-mode token axis (every other axis — base, brand, spacing, shadow, radius, borderwidth — remains multi-mode). Reintroduce a typography mode only behind a real typeface or scale-ratio decision.
 
