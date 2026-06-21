@@ -92,7 +92,7 @@ export async function expectHeightPinned(
  * across the modes under test: a fixed px, the type line-height, or a *small*
  * spacing index density can't differentiate (`spacing-0_5` = 2px and
  * `spacing-1` = 4px are flat across every mode). That flatness is why Badge
- * (`py-0.5`) and Tabs `sm` (`py-1`) are genuinely mode-stable.
+ * and Tabs `sm` (both `py-1`) are genuinely mode-stable.
  *
  * This is NOT a general "numeric spacing doesn't move" check — it does. Larger
  * indices diverge per mode (`spacing-4` = 14/16/18 across nova/vega/maia), so a

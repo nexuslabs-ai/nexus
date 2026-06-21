@@ -230,55 +230,37 @@ export const QueryAwareEmpty: Story = {
 };
 
 export const AsyncLoading: Story = {
-  render: function AsyncLoadingStory() {
-    const [loading, setLoading] = React.useState(true);
-    const [items, setItems] = React.useState([
-      'Recent project',
-      'Team dashboard',
-    ]);
-
-    React.useEffect(() => {
-      const timeout = window.setTimeout(() => {
-        setItems([
-          'Recent project',
-          'Team dashboard',
-          'Design review',
-          'Release notes',
-        ]);
-        setLoading(false);
-      }, 600);
-
-      return () => window.clearTimeout(timeout);
-    }, []);
-
-    return (
-      <Command label="Async command menu" className={paletteClass}>
-        <CommandInput placeholder="Search commands..." />
-        {/* Loading lives outside CommandList: cmdk's Loading carries
-            role="progressbar", which is an invalid child of the list's
-            role="listbox" (axe aria-required-children). */}
-        {loading && (
-          <CommandLoading progress={60} label="Loading command results">
-            <Spinner
-              aria-hidden="true"
-              role="presentation"
-              className="nx:size-3.5"
-            />
-            Loading commands...
-          </CommandLoading>
-        )}
-        <CommandList>
-          {!loading && <CommandEmpty>No results found.</CommandEmpty>}
-          <CommandGroup heading={loading ? 'Recent' : 'Results'}>
-            {items.map((item) => (
-              <CommandItem key={item} value={item}>
-                {item}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
-      </Command>
-    );
+  render: () => (
+    <Command label="Async command menu" className={paletteClass}>
+      <CommandInput placeholder="Search commands..." />
+      {/* Loading lives outside CommandList: cmdk's Loading carries
+          role="progressbar", which is an invalid child of the list's
+          role="listbox" (axe aria-required-children). */}
+      <CommandLoading progress={60} label="Loading command results">
+        <Spinner
+          aria-hidden="true"
+          role="presentation"
+          className="nx:size-3.5"
+        />
+        Loading commands...
+      </CommandLoading>
+      <CommandList>
+        <CommandGroup heading="Recent">
+          {['Recent project', 'Team dashboard'].map((item) => (
+            <CommandItem key={item} value={item}>
+              {item}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const progressbar = canvas.getByRole('progressbar');
+    // The progressbar must not be a child of CommandList's role="listbox"
+    // (axe aria-required-children) — assert the fix holds, not just that it renders.
+    await expect(progressbar.closest('[role="listbox"]')).toBeNull();
   },
 };
 
@@ -464,11 +446,8 @@ export const WithDialog: Story = {
     await userEvent.click(input);
     await expect(input).toHaveFocus();
 
-    // Escape dismisses the palette. Assert the dismissed *state* rather than
-    // full DOM removal: cmdk's re-renders during the Dialog's exit animation
-    // defer Radix Presence's unmount in the browser test runner, but
-    // data-state="closed" is the signal the user perceives as closed (and a
-    // real Escape regression would leave it "open", still failing this).
+    // Assert the dismissed state, not DOM removal: cmdk defers Radix's unmount
+    // in the test runner, but data-state flips to "closed" on Escape.
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {
       const dialog = document.querySelector('[role="dialog"]');
