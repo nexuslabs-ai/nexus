@@ -263,13 +263,16 @@ function DatePicker({
             );
           },
           DayButton: DatePickerDayButton,
-          WeekNumber: ({ children, ...props }) => {
+          // react-day-picker passes `scope="row"` / `role="rowheader"`, valid
+          // only on a <th> — match its default element (and drop the non-DOM
+          // `week` prop) so the cell stays accessible.
+          WeekNumber: ({ week: _week, children, ...props }) => {
             return (
-              <td {...props}>
+              <th {...props}>
                 <div className="nx:flex nx:size-(--cell-size) nx:items-center nx:justify-center nx:text-center">
                   {children}
                 </div>
-              </td>
+              </th>
             );
           },
           ...components,

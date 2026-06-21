@@ -68,7 +68,7 @@ const meta: Meta<typeof DatePicker> = {
   // surface. WithPresets opts out (`parameters.inCard: false`) with its own Card.
   decorators: [
     (Story, context) =>
-      context.parameters.inCard === false ? (
+      context.parameters?.inCard === false ? (
         <Story />
       ) : (
         <Card className="nx:w-fit">
