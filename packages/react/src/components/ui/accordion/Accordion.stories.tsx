@@ -8,7 +8,7 @@ import {
 } from '../../../stories/spacing-modes';
 import {
   expectHeightPinned,
-  expectHeightPinnedAcrossModes,
+  expectModeCascadeWorks,
 } from '../../../stories/test-utils';
 
 import {
@@ -672,11 +672,11 @@ export const AllVariants: Story = {
           className="nx:w-full nx:max-w-md"
         >
           <AccordionItem value="item-1">
-            <AccordionTrigger>First Item (Open)</AccordionTrigger>
+            <AccordionTrigger>Floating First Item (Open)</AccordionTrigger>
             <AccordionContent>This item is open by default.</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
-            <AccordionTrigger>Second Item (Open)</AccordionTrigger>
+            <AccordionTrigger>Floating Second Item (Open)</AccordionTrigger>
             <AccordionContent>
               This item is also open by default.
             </AccordionContent>
@@ -697,7 +697,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Accordion uses numeric `nx:py-4` for item-tier rhythm. This keeps authoring simple and preserves the default vega trigger height without adopting role-based control spacing.',
+          'Accordion uses numeric `nx:py-4` for item-tier rhythm — simple authoring, no role-based control spacing. Numeric spacing still cascades per density mode, so the trigger height tracks the active mode (48px nova → 56px maia).',
       },
     },
   },
@@ -717,19 +717,19 @@ export const AllModes: Story = {
   ),
 };
 
-export const AccordionTriggerModesStayPinned: Story = {
+export const AccordionTriggerModesCascade: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Numeric-spacing sentinel for AccordionTrigger. Every spacing mode should render the same 52px trigger height, preserving the default vega output and avoiding role-based control spacing.',
+          'Density-cascade sentinel for AccordionTrigger. Its numeric `nx:py-4` resolves to a per-mode `--nx-spacing-4` (nova 14 → maia 18), so the trigger height tracks the active spacing mode — 48px in nova, 56px in maia. Asserts the cascade is wired through (nova < maia); the exact vega contract (52px) is pinned in `AccordionTriggerVegaHeightPinned`.',
       },
     },
   },
   render: () => (
     <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
+      {(['nova', 'maia'] as const).map((mode) => (
         <AllModesRow key={mode} mode={mode}>
           <div data-testid={`accordion-mode-host-${mode}`}>
             <Accordion type="single" collapsible className="nx:w-[200px]">
@@ -744,10 +744,10 @@ export const AccordionTriggerModesStayPinned: Story = {
     </AllModesGrid>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinnedAcrossModes(
+    await expectModeCascadeWorks(
       within(canvasElement),
-      SPACING_MODES.map((mode) => `accordion-mode-host-${mode}`),
-      52,
+      'accordion-mode-host-nova',
+      'accordion-mode-host-maia',
       { selector: '[data-slot="accordion-trigger"]' }
     );
   },

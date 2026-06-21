@@ -85,21 +85,29 @@ export async function expectHeightPinned(
 }
 
 /**
- * Density-stability sentinel — asserts that a control rendered under multiple
- * `data-style` mode scopes resolves to the same canonical pixel height.
- * Used for components whose spacing utilities are intentionally numeric
- * (`spacing-N`) rather than mode-coupled (`control-*` / `container-*`), so
- * mode changes do not move them. If a future PR introduces a role utility
- * the test fails for that mode — the test surfaces *intent* to remain stable,
- * not just absence of role classes. A failure caused by a deliberate
- * architecture change (e.g. a future `--chip-padding-*` family lands and
- * Badge migrates onto it) is _intent changing_, not a regression — bump the
- * expected px to the new canonical value rather than chasing it as a bug.
- * The optional `selector` is forwarded to `getControlHeight` so non-control
- * elements (e.g., a Badge `<span>`) can be measured via their `data-slot`
- * attribute.
+ * Mode-invariance sentinel — asserts that a control rendered under multiple
+ * `data-style` mode scopes resolves to the *same* canonical pixel height.
+ *
+ * Valid ONLY when the measured height derives from values that are identical
+ * across the modes under test: a fixed px, the type line-height, or a *small*
+ * spacing index density can't differentiate (`spacing-0_5` = 2px and
+ * `spacing-1` = 4px are flat across every mode). That flatness is why Badge
+ * and Tabs `sm` (both `py-1`) are genuinely mode-stable.
+ *
+ * This is NOT a general "numeric spacing doesn't move" check — it does. Larger
+ * indices diverge per mode (`spacing-4` = 14/16/18 across nova/vega/maia), so a
+ * control padded with `nx:py-4` renders 48/52/56px. For a control whose height
+ * *should* track density — the default for padded controls — use
+ * `expectModeCascadeWorks`; pinning it here would assert a height the
+ * spacing-mode system is designed to move.
+ *
+ * A failure from a deliberate change (e.g. a control migrates onto a future
+ * `--chip-padding-*` family) is intent changing, not a regression — bump
+ * `expectedPx` to the new canonical value. Awaits `document.fonts.ready` (Inter
+ * fallback metrics would skew the measurement); `selector` is forwarded to
+ * `getControlHeight` for non-control elements (e.g. a Badge `<span>`).
  */
-export async function expectHeightPinnedAcrossModes(
+export async function expectHeightFixedAcrossModes(
   canvas: Canvas,
   testIds: string[],
   expectedPx: number,

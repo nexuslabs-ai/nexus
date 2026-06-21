@@ -335,6 +335,13 @@ export const WithEllipsis: Story = {
         })
       ).toBeVisible();
     });
+
+    // Close the menu before the a11y scan: an open Radix menu aria-hides the
+    // still-focusable breadcrumb trail, which axe flags as aria-hidden-focus.
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="menu"]')).toBeNull();
+    });
   },
 };
 
@@ -426,6 +433,13 @@ export const WithIcons: Story = {
       await expect(
         within(document.body).getByRole('menuitem', { name: 'Team' })
       ).toBeVisible();
+    });
+
+    // Close the menu before the a11y scan: an open Radix menu aria-hides the
+    // still-focusable breadcrumb trail, which axe flags as aria-hidden-focus.
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="menu"]')).toBeNull();
     });
   },
 };
