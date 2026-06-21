@@ -166,9 +166,8 @@ function DatePicker({
           ),
           caption_label: cn(
             'nx:typography-label-default nx:select-none',
-            captionLayout === 'label'
-              ? ''
-              : 'nx:flex nx:h-8 nx:items-center nx:gap-1 nx:rounded-md nx:pr-1 nx:pl-2 nx:[&>svg]:size-3.5 nx:[&>svg]:text-muted-foreground',
+            captionLayout !== 'label' &&
+              'nx:flex nx:h-8 nx:items-center nx:gap-1 nx:rounded-md nx:pr-1 nx:pl-2 nx:[&>svg]:size-3.5 nx:[&>svg]:text-muted-foreground',
             defaultClassNames.caption_label
           ),
           table: 'nx:w-full nx:border-collapse',
@@ -329,7 +328,7 @@ function DatePickerDayButton({
       data-range-middle={modifiers.range_middle}
       data-today={isToday}
       className={cn(
-        'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:flex-col nx:gap-1 nx:text-sm nx:leading-none nx:font-normal',
+        'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:text-sm nx:leading-none nx:font-normal',
         'nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',
@@ -339,8 +338,8 @@ function DatePickerDayButton({
         "nx:data-[today=true]:before:content-['']",
         // Selected single + range endpoints → solid primary fill.
         'nx:data-[selected-single=true]:bg-primary-background nx:data-[selected-single=true]:text-primary-foreground',
-        'nx:data-[range-start=true]:rounded-md nx:data-[range-start=true]:rounded-l-md nx:data-[range-start=true]:bg-primary-background nx:data-[range-start=true]:text-primary-foreground',
-        'nx:data-[range-end=true]:rounded-md nx:data-[range-end=true]:rounded-r-md nx:data-[range-end=true]:bg-primary-background nx:data-[range-end=true]:text-primary-foreground',
+        'nx:data-[range-start=true]:rounded-md nx:data-[range-start=true]:bg-primary-background nx:data-[range-start=true]:text-primary-foreground',
+        'nx:data-[range-end=true]:rounded-md nx:data-[range-end=true]:bg-primary-background nx:data-[range-end=true]:text-primary-foreground',
         // Range middle → subtle primary fill (continuous with the cell rail).
         'nx:data-[range-middle=true]:rounded-none nx:data-[range-middle=true]:bg-primary-subtle nx:data-[range-middle=true]:text-primary-subtle-foreground',
         defaultClassNames.day_button,
