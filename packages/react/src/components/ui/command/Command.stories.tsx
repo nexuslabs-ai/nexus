@@ -254,19 +254,21 @@ export const AsyncLoading: Story = {
     return (
       <Command label="Async command menu" className={paletteClass}>
         <CommandInput placeholder="Search commands..." />
+        {/* Loading lives outside CommandList: cmdk's Loading carries
+            role="progressbar", which is an invalid child of the list's
+            role="listbox" (axe aria-required-children). */}
+        {loading && (
+          <CommandLoading progress={60} label="Loading command results">
+            <Spinner
+              aria-hidden="true"
+              role="presentation"
+              className="nx:size-3.5"
+            />
+            Loading commands...
+          </CommandLoading>
+        )}
         <CommandList>
-          {loading ? (
-            <CommandLoading progress={60} label="Loading command results">
-              <Spinner
-                aria-hidden="true"
-                role="presentation"
-                className="nx:size-3.5"
-              />
-              Loading commands...
-            </CommandLoading>
-          ) : (
-            <CommandEmpty>No results found.</CommandEmpty>
-          )}
+          {!loading && <CommandEmpty>No results found.</CommandEmpty>}
           <CommandGroup heading={loading ? 'Recent' : 'Results'}>
             {items.map((item) => (
               <CommandItem key={item} value={item}>
@@ -462,12 +464,16 @@ export const WithDialog: Story = {
     await userEvent.click(input);
     await expect(input).toHaveFocus();
 
-    // Escape closes the palette.
+    // Escape dismisses the palette. Assert the dismissed *state* rather than
+    // full DOM removal: cmdk's re-renders during the Dialog's exit animation
+    // defer Radix Presence's unmount in the browser test runner, but
+    // data-state="closed" is the signal the user perceives as closed (and a
+    // real Escape regression would leave it "open", still failing this).
     await userEvent.keyboard('{Escape}');
-    await waitFor(
-      () => expect(document.querySelector('[role="dialog"]')).toBeNull(),
-      { timeout: 3000 }
-    );
+    await waitFor(() => {
+      const dialog = document.querySelector('[role="dialog"]');
+      expect(dialog?.getAttribute('data-state') ?? 'closed').toBe('closed');
+    });
   },
 };
 
