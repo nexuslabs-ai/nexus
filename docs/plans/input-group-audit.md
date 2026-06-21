@@ -1,7 +1,7 @@
 # InputGroup Audit — Input fixed-height parity (implemented)
 
-> **Status:** Implemented on `aish/component-input-group-audit` (commit `835c70a`),
-> stacked on `aish/component-input-audit` (the completed fixed-height Input).
+> **Status:** Implemented and combined with the Input fixed-height audit into a
+> single PR against `prasad/components-cleanup`.
 > Council-reviewed (4-lens) and advisor-checked before implementation.
 
 ## What shipped
@@ -16,10 +16,9 @@ InputGroup's composition API and native input behavior. Two files changed:
 The mechanism keys on the **new Input** (`data-size={size ?? 'default'}` +
 `h-8/h-10/h-12` + semantic state tokens). The old Input (`data-size={size}`,
 `py-control-*`, `opacity-50`) makes it inert — a default control emits no
-`data-size`, so the height selector never matches. This branch was therefore
-**fast-forwarded onto `aish/component-input-audit`** (`738c8ed`, a clean FF — the
-audit branch had no unique commits). The eventual PR stacks on the Input audit
-(or lands after it merges into `prasad/components-cleanup`).
+`data-size`, so the height selector never matches. Because of this dependency, the InputGroup work and the Input fixed-height audit
+ship together in a **single combined PR** to `prasad/components-cleanup` — the
+InputGroup changes cannot land without the new Input.
 
 ## 1. Outer height parity (`sm` h-8 · default h-10 · lg h-12)
 
