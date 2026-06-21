@@ -32,41 +32,25 @@ export function ComponentShowcase() {
   return (
     <div className="nx:bg-background-hover-alpha nx:min-h-svh">
       <div className="nx:p-6 nx:space-y-6">
-        {/* Typography Section */}
         <Section title="Typography" description="Text styles and font scales">
           <div className="nx:space-y-6">
-            {/* Display */}
-            <div className="nx:space-y-2">
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
-                Display
-              </span>
-              <div className="nx:space-y-1">
-                <p className="nx:typography-display-large">Display Large</p>
-                <p className="nx:typography-display-medium">Display Medium</p>
-              </div>
-            </div>
-
-            {/* Headings */}
             <div className="nx:space-y-2">
               <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
                 Headings
               </span>
               <div className="nx:space-y-1">
-                <p className="nx:typography-heading-xlarge">Heading XLarge</p>
                 <p className="nx:typography-heading-large">Heading Large</p>
                 <p className="nx:typography-heading-medium">Heading Medium</p>
+                <p className="nx:typography-heading-small">Heading Small</p>
+                <p className="nx:typography-heading-xsmall">Heading XSmall</p>
               </div>
             </div>
 
-            {/* Body */}
             <div className="nx:space-y-2">
               <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
                 Body
               </span>
               <div className="nx:space-y-2">
-                <p className="nx:typography-body-large">
-                  Body Large - The quick brown fox jumps over the lazy dog.
-                </p>
                 <p className="nx:typography-body-default">
                   Body Default - The quick brown fox jumps over the lazy dog.
                 </p>
@@ -76,14 +60,12 @@ export function ComponentShowcase() {
               </div>
             </div>
 
-            {/* Labels & Code */}
             <div className="nx:grid nx:grid-cols-2 nx:gap-6">
               <div className="nx:space-y-2">
                 <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
                   Labels
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
-                  <span className="nx:typography-label-large">Label Large</span>
                   <span className="nx:typography-label-default">
                     Label Default
                   </span>

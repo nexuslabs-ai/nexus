@@ -126,13 +126,11 @@ function DialogContent({
         className={cn(
           'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
           'nx:-translate-x-1/2 nx:-translate-y-1/2',
-          'nx:gap-container nx:border nx:border-border-default nx:bg-container nx:p-container nx:shadow-lg',
+          'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:p-6 nx:shadow-lg',
           'nx:duration-200',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
-          'nx:data-[state=closed]:slide-out-to-left-1/2 nx:data-[state=closed]:slide-out-to-top-[48%]',
-          'nx:data-[state=open]:slide-in-from-left-1/2 nx:data-[state=open]:slide-in-from-top-[48%]',
           'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
           'nx:sm:rounded-lg',
           className
@@ -144,11 +142,12 @@ function DialogContent({
           <DialogPrimitive.Close
             data-slot="dialog-close-button"
             className={cn(
-              'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:opacity-70',
-              'nx:transition-opacity',
+              'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:p-1 nx:text-muted-foreground-subtle',
+              'nx:after:absolute nx:after:-inset-2.5 nx:lg:after:hidden',
+              'nx:transition-colors',
               'nx:motion-reduce:transition-none',
-              'nx:hover:bg-background-hover nx:hover:text-foreground nx:hover:opacity-100',
-              'nx:focus-visible:bg-background-hover nx:focus-visible:text-foreground nx:focus-visible:opacity-100',
+              'nx:hover:bg-background-hover nx:hover:text-foreground',
+              'nx:focus-visible:bg-background-hover nx:focus-visible:text-foreground',
               'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
               'nx:disabled:pointer-events-none'
             )}
@@ -187,7 +186,7 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
     <div
       data-slot="dialog-header"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1.5 nx:text-center nx:sm:text-left',
+        'nx:flex nx:flex-col nx:gap-1 nx:text-center nx:sm:text-left',
         className
       )}
       {...props}
@@ -251,10 +250,7 @@ function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn(
-        'nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight',
-        className
-      )}
+      className={cn('nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -285,7 +281,10 @@ function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:typography-body-default nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );

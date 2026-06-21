@@ -136,7 +136,7 @@ function AccordionContent({
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="nx:overflow-hidden nx:typography-body-small nx:text-muted-foreground nx:transition-all nx:data-[state=closed]:animate-accordion-up nx:data-[state=open]:animate-accordion-down nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none"
+      className="nx:overflow-hidden nx:typography-body-default nx:text-muted-foreground nx:transition-all nx:data-[state=closed]:animate-accordion-up nx:data-[state=open]:animate-accordion-down nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none"
       {...props}
     >
       <div className={className}>{children}</div>

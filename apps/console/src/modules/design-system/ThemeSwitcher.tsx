@@ -7,7 +7,6 @@ import {
   SPACING_MODES,
   type ThemeConfig,
   TOKEN_MODES,
-  TYPOGRAPHY_MODES,
 } from '../../hooks/useTheme';
 
 import { type IconLibrary, iconLibraryMeta, useIconStore } from './iconStore';
@@ -247,13 +246,6 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
               value={theme.spacing}
               options={SPACING_MODES}
               onChange={(v) => setTheme((t) => ({ ...t, spacing: v }))}
-            />
-            <TokenSelect
-              id="typography-select"
-              label="Typography"
-              value={theme.typography}
-              options={TYPOGRAPHY_MODES}
-              onChange={(v) => setTheme((t) => ({ ...t, typography: v }))}
             />
             <TokenSelect
               id="shadow-select"

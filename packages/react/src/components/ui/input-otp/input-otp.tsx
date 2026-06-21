@@ -53,8 +53,9 @@ function InputOTP({
   return (
     <OTPInput
       data-slot="input-otp"
+      autoComplete="one-time-code"
       containerClassName={cn(
-        'nx:flex nx:items-center nx:gap-control-md nx:has-[:disabled]:opacity-50',
+        'nx:flex nx:items-center nx:gap-2 nx:has-[:disabled]:opacity-50',
         containerClassName
       )}
       className={cn('nx:disabled:cursor-not-allowed', className)}
@@ -118,7 +119,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       className={cn(
         'nx:relative nx:flex nx:size-10 nx:items-center nx:justify-center',
         'nx:border-y nx:border-r nx:border-border-default',
-        'nx:bg-background nx:text-foreground nx:text-sm nx:transition-all',
+        'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-all',
         'nx:first:rounded-l-md nx:first:border-l nx:last:rounded-r-md',
         'nx:data-[active=true]:z-10 nx:data-[active=true]:outline-2 nx:data-[active=true]:outline-focus-default nx:data-[active=true]:outline-offset-(--focus-offset)',
         className
@@ -128,7 +129,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       {char}
       {hasFakeCaret && (
         <div className="nx:pointer-events-none nx:absolute nx:inset-0 nx:flex nx:items-center nx:justify-center">
-          <div className="nx:h-4 nx:w-px nx:animate-caret-blink nx:bg-foreground nx:duration-1000" />
+          <div className="nx:h-4 nx:w-px nx:animate-caret-blink nx:bg-foreground nx:duration-1000 nx:motion-reduce:animate-none" />
         </div>
       )}
     </div>
@@ -151,14 +152,11 @@ function InputOTPSeparator({ className, ...props }: InputOTPSeparatorProps) {
   return (
     <div
       data-slot="input-otp-separator"
-      role="separator"
+      aria-hidden="true"
       className={cn('nx:flex nx:items-center', className)}
       {...props}
     >
-      <IconPointFilled
-        aria-hidden="true"
-        className="nx:size-2.5 nx:text-muted-foreground"
-      />
+      <IconPointFilled className="nx:size-2.5 nx:text-muted-foreground" />
     </div>
   );
 }

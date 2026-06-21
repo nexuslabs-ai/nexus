@@ -139,13 +139,13 @@ function DatePicker({
             defaultClassNames.nav
           ),
           button_previous: cn(
-            buttonVariants({ variant: buttonVariant }),
-            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:aria-disabled:opacity-50',
+            buttonVariants({ variant: buttonVariant, size: 'icon' }),
+            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
             defaultClassNames.button_previous
           ),
           button_next: cn(
-            buttonVariants({ variant: buttonVariant }),
-            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:aria-disabled:opacity-50',
+            buttonVariants({ variant: buttonVariant, size: 'icon' }),
+            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
             defaultClassNames.button_next
           ),
           month_caption: cn(
@@ -330,6 +330,7 @@ function DatePickerDayButton({
       data-today={isToday}
       className={cn(
         'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:flex-col nx:gap-1 nx:text-sm nx:leading-none nx:font-normal',
+        'nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',
         // Today → Figma's inner error circle while keeping the button target at cell size.

@@ -209,26 +209,18 @@ export const SECTIONS = {
       {
         slug: 'typography',
         label: 'Typography',
-        lede: '[ 13-step scale · three product modes (nova / vega / maia) ]',
+        lede: '[ Type scale · 11 composite utilities ]',
         blocks: [
           {
             type: 'placeholder',
             variant: 'hero',
             label: '[ Live type scale — render every step ]',
           },
-          { type: 'h2', text: '[ Modes ]' },
-          {
-            type: 'row',
-            blocks: [
-              { label: '[ Comparison — nova / vega / maia ]' },
-              { label: '[ Toggle ]' },
-            ],
-          },
           { type: 'h2', text: '[ Utilities ]' },
           {
             type: 'placeholder',
             variant: 'table',
-            label: '[ Table — 17 typography utilities ]',
+            label: '[ Table — 11 typography utilities ]',
           },
         ],
       },
@@ -429,7 +421,7 @@ export const SECTIONS = {
       {
         slug: 'density-modes',
         label: 'Density modes',
-        lede: '[ Spacing × typography density via data-style ]',
+        lede: '[ Spacing density via data-style ]',
         blocks: [
           {
             type: 'placeholder',

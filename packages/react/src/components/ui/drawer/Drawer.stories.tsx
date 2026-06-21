@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { IconX } from '@/lib/icons';
+
 import { Button } from '../button';
 
 import {
@@ -19,6 +21,14 @@ const meta: Meta<typeof Drawer> = {
   component: Drawer,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: [
+          'Use Drawer for gesture-driven mobile-style panels, especially bottom drawers that can be dragged to dismiss.',
+          'Use Sheet for deterministic side panels, Dialog for centered modal tasks, and AlertDialog for choice-forcing confirmations.',
+        ].join(' '),
+      },
+    },
   },
 };
 
@@ -26,6 +36,20 @@ export default meta;
 type Story = StoryObj<typeof Drawer>;
 
 const DIRECTIONS = ['top', 'right', 'bottom', 'left'] as const;
+const SCROLLABLE_ITEMS = Array.from({ length: 18 }, (_, index) => ({
+  title: `Audit item ${index + 1}`,
+  description:
+    'A representative row that keeps the drawer body scrollable while actions remain available.',
+}));
+
+const waitForDrawerToClose = async () => {
+  await waitFor(
+    () => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    },
+    { timeout: 3000 }
+  );
+};
 
 // ============================================
 // BASIC STORIES
@@ -45,7 +69,7 @@ export const Default: Story = {
             Drag down or press Escape to dismiss this drawer.
           </DrawerDescription>
         </DrawerHeader>
-        <p className="nx:px-4 nx:text-sm nx:text-foreground">
+        <p className="nx:px-4 nx:typography-body-default nx:text-foreground">
           Drawer content goes here. On touch devices it can be dragged to
           dismiss.
         </p>
@@ -82,6 +106,120 @@ export const Right: Story = {
       </DrawerContent>
     </Drawer>
   ),
+};
+
+// A longer body keeps actions visible while only the content region scrolls.
+export const ScrollableContent: Story = {
+  render: () => (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button variant="outline">Open Details</Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Review changes</DrawerTitle>
+          <DrawerDescription>
+            Long drawers keep the action footer reachable while the body
+            scrolls.
+          </DrawerDescription>
+        </DrawerHeader>
+        <div
+          data-testid="drawer-scroll-area"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- scrollable region must be keyboard-reachable (axe scrollable-region-focusable)
+          tabIndex={0}
+          className="nx:max-h-[45svh] nx:overflow-y-auto nx:px-6 nx:pb-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+        >
+          <ul className="nx:flex nx:flex-col nx:gap-3">
+            {SCROLLABLE_ITEMS.map((item) => (
+              <li
+                key={item.title}
+                className="nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:p-4"
+              >
+                <p className="nx:typography-label-default nx:text-foreground">
+                  {item.title}
+                </p>
+                <p className="nx:typography-body-default nx:text-muted-foreground">
+                  {item.description}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <DrawerFooter className="nx:border-t nx:border-border-default">
+          <Button>Save changes</Button>
+          <DrawerClose asChild>
+            <Button variant="outline">Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Open Details' }));
+
+    const drawer = await within(document.body).findByRole('dialog');
+    const scrollArea = within(drawer).getByTestId('drawer-scroll-area');
+
+    await waitFor(() => {
+      expect(scrollArea.scrollHeight).toBeGreaterThan(scrollArea.clientHeight);
+    });
+    await expect(
+      within(drawer).getByRole('button', { name: 'Save changes' })
+    ).toBeVisible();
+
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Close' })
+    );
+
+    await waitForDrawerToClose();
+  },
+};
+
+// Header actions can provide an explicit close affordance without changing API.
+export const WithHeaderActions: Story = {
+  render: () => (
+    <Drawer direction="right">
+      <DrawerTrigger asChild>
+        <Button variant="outline">Open Actions</Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="nx:flex-row nx:items-start nx:justify-between nx:gap-4">
+          <div className="nx:flex nx:min-w-0 nx:flex-col nx:gap-1.5">
+            <DrawerTitle>Filters</DrawerTitle>
+            <DrawerDescription>
+              Refine the visible records without leaving the current view.
+            </DrawerDescription>
+          </div>
+          <DrawerClose asChild>
+            <Button variant="ghost" size="icon" aria-label="Close drawer">
+              <IconX aria-hidden="true" />
+            </Button>
+          </DrawerClose>
+        </DrawerHeader>
+        <div className="nx:px-6 nx:pb-6 nx:typography-body-default nx:text-foreground">
+          Header actions are regular composition: consumers place controls in
+          the header and keep Vaul responsible for dismissal.
+        </div>
+      </DrawerContent>
+    </Drawer>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Open Actions' }));
+
+    const drawer = await within(document.body).findByRole('dialog');
+    const closeButton = within(drawer).getByRole('button', {
+      name: 'Close drawer',
+    });
+
+    await expect(closeButton).toBeVisible();
+    await userEvent.click(closeButton);
+
+    await waitForDrawerToClose();
+  },
 };
 
 // ============================================
@@ -127,9 +265,7 @@ export const OpenCloseInteraction: Story = {
       within(drawer).getByRole('button', { name: 'Dismiss' })
     );
 
-    await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeNull();
-    });
+    await waitForDrawerToClose();
   },
 };
 
@@ -162,9 +298,7 @@ export const KeyboardInteraction: Story = {
     await within(document.body).findByRole('dialog');
     await userEvent.keyboard('{Escape}');
 
-    await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeNull();
-    });
+    await waitForDrawerToClose();
   },
 };
 
@@ -201,6 +335,7 @@ export const WithDataAttributes: Story = {
         'drawer-overlay',
         'drawer-content',
         'drawer-header',
+        'drawer-handle',
         'drawer-title',
         'drawer-description',
         'drawer-footer',
@@ -212,6 +347,130 @@ export const WithDataAttributes: Story = {
     });
 
     await userEvent.keyboard('{Escape}');
+  },
+};
+
+// Every Vaul direction is reflected on content for styling and inspection.
+export const DirectionBehavior: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:gap-4">
+      {DIRECTIONS.map((direction) => (
+        <Drawer key={direction} direction={direction}>
+          <DrawerTrigger asChild>
+            <Button variant="outline">Open {direction} drawer</Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle className="nx:capitalize">
+                {direction} behavior
+              </DrawerTitle>
+              <DrawerDescription>
+                The content exposes the active Vaul direction.
+              </DrawerDescription>
+            </DrawerHeader>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button>Close {direction} drawer</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    for (const direction of DIRECTIONS) {
+      await userEvent.click(
+        canvas.getByRole('button', { name: `Open ${direction} drawer` })
+      );
+
+      const drawer = await within(document.body).findByRole('dialog');
+      await expect(drawer).toHaveAttribute(
+        'data-vaul-drawer-direction',
+        direction
+      );
+
+      await userEvent.click(
+        within(drawer).getByRole('button', {
+          name: `Close ${direction} drawer`,
+        })
+      );
+
+      await waitForDrawerToClose();
+    }
+  },
+};
+
+// The drag handle is a bottom-drawer affordance only.
+export const BottomDragHandleVisibility: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-wrap nx:gap-4">
+      <Drawer>
+        <DrawerTrigger asChild>
+          <Button variant="outline">Open Bottom Handle</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Bottom drawer</DrawerTitle>
+            <DrawerDescription>The handle is visible here.</DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button>Close bottom handle</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+      <Drawer direction="right">
+        <DrawerTrigger asChild>
+          <Button variant="outline">Open Right Handle</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Right drawer</DrawerTitle>
+            <DrawerDescription>The handle stays hidden here.</DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button>Close right handle</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open Bottom Handle' })
+    );
+
+    let drawer = await within(document.body).findByRole('dialog');
+    let handle = drawer.querySelector('[data-slot="drawer-handle"]');
+
+    await expect(handle).toBeVisible();
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Close bottom handle' })
+    );
+
+    await waitForDrawerToClose();
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open Right Handle' })
+    );
+
+    drawer = await within(document.body).findByRole('dialog');
+    handle = drawer.querySelector('[data-slot="drawer-handle"]');
+
+    await expect(handle).not.toBeVisible();
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Close right handle' })
+    );
+
+    await waitForDrawerToClose();
   },
 };
 

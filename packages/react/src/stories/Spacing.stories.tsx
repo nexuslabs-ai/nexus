@@ -166,7 +166,7 @@ export const Numeric: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Numeric Spacing Scale
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           The `--spacing-N` scale consumed through Tailwind utilities like
           `nx:p-4` or `nx:gap-2`. Each row shows the variable name, the resolved
           pixel value, and a bar drawn at that exact width. Compare modes
@@ -191,7 +191,7 @@ export const Roles: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Role Tokens
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Role-named tokens express semantic intent — `control.*` for
           buttons/inputs/select triggers, `container.*` for cards/dialogs,
           `layout.*` for between-section and stack rhythm. Consumed through
@@ -226,7 +226,7 @@ export const ActiveMode: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Active Mode
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Switch the <strong>Style</strong> toolbar — the boxes below resize as
           `data-style` toggles on the document root. Numeric tokens are
           byte-identical across modes; only role tokens vary.

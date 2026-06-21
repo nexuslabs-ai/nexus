@@ -26,9 +26,7 @@ interface ErrorStateProps {
  */
 export function ErrorState({ message, onRetry, bordered }: ErrorStateProps) {
   return (
-    <EmptyState
-      className={bordered ? 'nx:border nx:border-border-default' : undefined}
-    >
+    <EmptyState bordered={bordered}>
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">
           <IconAlertTriangle />

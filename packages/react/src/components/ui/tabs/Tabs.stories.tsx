@@ -9,8 +9,8 @@ import {
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
 import {
+  expectHeightFixedAcrossModes,
   expectHeightPinned,
-  expectHeightPinnedAcrossModes,
   expectModeCascadeWorks,
 } from '../../../stories/test-utils';
 import {
@@ -751,7 +751,7 @@ export const TabsSmIsDensityStable: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinnedAcrossModes(
+    await expectHeightFixedAcrossModes(
       within(canvasElement),
       ['tabs-sm-host-nova', 'tabs-sm-host-vega', 'tabs-sm-host-sera'],
       26,

@@ -48,7 +48,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    li: (props) => <li className="nx:typography-body-small" {...props} />,
+    li: (props) => <li className="nx:typography-body-default" {...props} />,
     a: ({ children, ...props }) => (
       <a
         className="nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2"

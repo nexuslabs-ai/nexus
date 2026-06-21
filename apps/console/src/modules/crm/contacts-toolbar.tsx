@@ -207,7 +207,7 @@ function SavedViewsMenu({
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon-sm"
                     aria-label={`Delete view ${saved.name}`}
                     onClick={() => remove(saved.id)}
                     className="nx:text-muted-foreground nx:hover:text-error-foreground nx:shrink-0"

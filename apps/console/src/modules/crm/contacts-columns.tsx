@@ -159,7 +159,7 @@ function RowActions({ contact }: { contact: Contact }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon-sm"
           aria-label={`Actions for ${contact.name}`}
         >
           <IconDots />

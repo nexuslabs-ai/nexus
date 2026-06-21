@@ -15,6 +15,9 @@ interface CardProps extends React.ComponentProps<'div'> {}
  * A container component for grouping related content and actions.
  * Use for displaying information in a visually distinct section.
  *
+ * Content is clipped to the rounded corners; pass `nx:overflow-visible` via
+ * `className` for content that must overhang the edge.
+ *
  * @example
  * ```tsx
  * <Card>
@@ -36,7 +39,7 @@ function Card({ className, ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        'nx:relative nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
+        'nx:overflow-hidden nx:rounded-xl nx:border nx:border-border-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
         className
       )}
       {...props}
@@ -56,6 +59,11 @@ interface CardHeaderProps extends React.ComponentProps<'div'> {}
  *
  * Container for the card's header content including title, description, and actions.
  *
+ * Children lay out in a two-column grid: a flexible content column and an
+ * auto-width column on the right reserved for `CardAction`. `CardTitle` and
+ * `CardDescription` place themselves in the content column; a custom child
+ * should add `nx:col-start-1` to join it.
+ *
  * @example
  * ```tsx
  * <CardHeader>
@@ -68,7 +76,10 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
   return (
     <div
       data-slot="card-header"
-      className={cn('nx:flex nx:flex-col nx:gap-1.5 nx:p-container', className)}
+      className={cn(
+        'nx:grid nx:grid-cols-[minmax(0,1fr)_auto] nx:items-start nx:gap-y-1.5 nx:p-6',
+        className
+      )}
       {...props}
     />
   );
@@ -96,7 +107,7 @@ function CardTitle({ className, children, ...props }: CardTitleProps) {
     <h3
       data-slot="card-title"
       className={cn(
-        'nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight',
+        'nx:col-start-1 nx:min-w-0 nx:typography-heading-xsmall',
         className
       )}
       {...props}
@@ -127,7 +138,10 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (
     <p
       data-slot="card-description"
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:col-start-1 nx:min-w-0 nx:typography-body-default nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );
@@ -144,7 +158,7 @@ interface CardActionProps extends React.ComponentProps<'div'> {}
  * CardAction
  *
  * Container for action elements (buttons, badges) in the card header.
- * Positioned to the right of the title and description.
+ * Placed in the header action column beside the title and description.
  *
  * @example
  * ```tsx
@@ -161,7 +175,7 @@ function CardAction({ className, ...props }: CardActionProps) {
     <div
       data-slot="card-action"
       className={cn(
-        'nx:absolute nx:right-(--nx-container-p) nx:top-(--nx-container-p) nx:flex nx:items-center nx:gap-2',
+        'nx:col-start-2 nx:row-start-1 nx:row-span-2 nx:flex nx:items-center nx:gap-2 nx:self-start nx:justify-self-end nx:pl-4',
         className
       )}
       {...props}
@@ -192,7 +206,7 @@ function CardContent({ className, ...props }: CardContentProps) {
   return (
     <div
       data-slot="card-content"
-      className={cn('nx:p-container nx:pt-0', className)}
+      className={cn('nx:p-6 nx:pt-0', className)}
       {...props}
     />
   );
@@ -223,7 +237,7 @@ function CardFooter({ className, ...props }: CardFooterProps) {
     <div
       data-slot="card-footer"
       className={cn(
-        'nx:flex nx:items-center nx:gap-2 nx:p-container nx:pt-0',
+        'nx:flex nx:items-center nx:gap-2 nx:p-6 nx:pt-0',
         className
       )}
       {...props}

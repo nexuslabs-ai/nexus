@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
 
-import { IconChevronRight, IconDots } from '@/lib/icons';
+import { IconChevronDown } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 /**
@@ -18,8 +18,8 @@ interface BreadcrumbProps extends React.ComponentProps<'nav'> {}
  * A hierarchical navigation trail wrapped in the `navigation` landmark. Compose
  * with the sub-components: `BreadcrumbList` lays out a row of `BreadcrumbItem`s,
  * each holding a `BreadcrumbLink` (an ancestor) or `BreadcrumbPage` (the current
- * page); `BreadcrumbSeparator` divides them and `BreadcrumbEllipsis` stands in
- * for a collapsed middle.
+ * page); `BreadcrumbSeparator` divides them and `BreadcrumbEllipsis` reveals a
+ * collapsed middle when composed with a menu.
  *
  * @example
  * ```tsx
@@ -50,14 +50,20 @@ interface BreadcrumbListProps extends React.ComponentProps<'ol'> {}
 /**
  * BreadcrumbList
  *
- * The `<ol>` that lays the trail out in a horizontal, wrapping row.
+ * The `<ol>` that lays the trail out in one horizontal row. When the trail is
+ * wider than its container it becomes a keyboard-focusable horizontal scroll
+ * region, so the current page can be scrolled into view instead of being clipped.
  */
 function BreadcrumbList({ className, ...props }: BreadcrumbListProps) {
   return (
     <ol
       data-slot="breadcrumb-list"
+      // The current page is a non-focusable <span>, so the list itself must be
+      // keyboard-focusable to scroll an overflowing trail into view (WCAG 2.1.1).
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
       className={cn(
-        'nx:flex nx:flex-wrap nx:items-center nx:gap-1.5 nx:wrap-break-word nx:typography-body-small nx:text-muted-foreground',
+        'nx:flex nx:min-w-0 nx:max-w-full nx:flex-nowrap nx:items-center nx:gap-0.5 nx:overflow-x-auto nx:px-1.5 nx:py-1.5 nx:typography-body-default nx:text-muted-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         className
       )}
       {...props}
@@ -81,7 +87,10 @@ function BreadcrumbItem({ className, ...props }: BreadcrumbItemProps) {
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn('nx:inline-flex nx:items-center nx:gap-1.5', className)}
+      className={cn(
+        'nx:inline-flex nx:min-w-0 nx:items-center nx:gap-0',
+        className
+      )}
       {...props}
     />
   );
@@ -104,8 +113,10 @@ interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
 /**
  * BreadcrumbLink
  *
- * A link to an ancestor page. Muted by default, darkening on hover; carries the
- * canonical focus ring since it is reachable by keyboard.
+ * A link to an ancestor page. It follows the compact Figma item rhythm and keeps
+ * the canonical focus ring since it is reachable by keyboard. Wrap the label in a
+ * `<span>` so it truncates at the 150px cap — both for plain text and when
+ * composing an icon with text.
  */
 function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
   const Comp = asChild ? Slot : 'a';
@@ -114,7 +125,7 @@ function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
     <Comp
       data-slot="breadcrumb-link"
       className={cn(
-        'nx:rounded-sm nx:transition-colors nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-md nx:px-1.5 nx:typography-label-default nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}
       {...props}
@@ -132,18 +143,59 @@ interface BreadcrumbPageProps extends React.ComponentProps<'span'> {}
 /**
  * BreadcrumbPage
  *
- * The current page — non-interactive, announced via `aria-current="page"`.
+ * The current page — non-interactive, announced via `aria-current="page"`. Wrap
+ * the label in a `<span>` so it truncates at the 150px cap.
  */
 function BreadcrumbPage({ className, ...props }: BreadcrumbPageProps) {
   return (
     <span
       data-slot="breadcrumb-page"
-      role="link"
-      aria-disabled="true"
       aria-current="page"
-      className={cn('nx:font-normal nx:text-foreground', className)}
+      className={cn(
+        'nx:inline-flex nx:min-w-0 nx:max-w-[150px] nx:items-center nx:gap-1 nx:rounded-md nx:px-1.5 nx:typography-label-default nx:text-foreground nx:[&>span]:min-w-0 nx:[&>span]:truncate nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        className
+      )}
       {...props}
     />
+  );
+}
+
+/**
+ * BreadcrumbMenuTriggerProps
+ *
+ * Props for the BreadcrumbMenuTrigger component.
+ */
+interface BreadcrumbMenuTriggerProps extends React.ComponentProps<'button'> {}
+
+/**
+ * BreadcrumbMenuTrigger
+ *
+ * An icon button for revealing alternate paths for the adjacent breadcrumb
+ * segment. Compose it with `DropdownMenuTrigger asChild`; do not nest it inside
+ * a `BreadcrumbLink`.
+ */
+function BreadcrumbMenuTrigger({
+  children,
+  className,
+  ref,
+  type = 'button',
+  'aria-label': ariaLabel = 'Show alternate paths',
+  ...props
+}: BreadcrumbMenuTriggerProps) {
+  return (
+    <button
+      ref={ref}
+      data-slot="breadcrumb-menu-trigger"
+      type={type}
+      aria-label={ariaLabel}
+      className={cn(
+        'nx:inline-flex nx:size-5 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        className
+      )}
+      {...props}
+    >
+      {children ?? <IconChevronDown aria-hidden="true" />}
+    </button>
   );
 }
 
@@ -157,8 +209,8 @@ interface BreadcrumbSeparatorProps extends React.ComponentProps<'li'> {}
 /**
  * BreadcrumbSeparator
  *
- * The divider between items — a right chevron by default; pass `children` to
- * use a different glyph.
+ * The divider between items — a slash by default; pass `children` to use a
+ * different glyph.
  */
 function BreadcrumbSeparator({
   children,
@@ -170,10 +222,13 @@ function BreadcrumbSeparator({
       data-slot="breadcrumb-separator"
       role="presentation"
       aria-hidden="true"
-      className={cn('nx:[&>svg]:size-3.5', className)}
+      className={cn(
+        'nx:inline-flex nx:shrink-0 nx:items-center nx:typography-body-default nx:text-muted-foreground nx:[&>svg]:size-3.5',
+        className
+      )}
       {...props}
     >
-      {children ?? <IconChevronRight />}
+      {children ?? '/'}
     </li>
   );
 }
@@ -183,29 +238,35 @@ function BreadcrumbSeparator({
  *
  * Props for the BreadcrumbEllipsis component.
  */
-interface BreadcrumbEllipsisProps extends React.ComponentProps<'span'> {}
+interface BreadcrumbEllipsisProps extends React.ComponentProps<'button'> {}
 
 /**
  * BreadcrumbEllipsis
  *
- * Stands in for a collapsed run of middle items; pair with a menu to reveal
- * them.
+ * Overflow trigger for a collapsed run of middle items. Compose it with
+ * `DropdownMenuTrigger asChild` and put the hidden paths in the menu content.
  */
-function BreadcrumbEllipsis({ className, ...props }: BreadcrumbEllipsisProps) {
+function BreadcrumbEllipsis({
+  className,
+  ref,
+  type = 'button',
+  'aria-label': ariaLabel = 'Show hidden breadcrumbs',
+  ...props
+}: BreadcrumbEllipsisProps) {
   return (
-    <span
+    <button
+      ref={ref}
       data-slot="breadcrumb-ellipsis"
-      role="presentation"
-      aria-hidden="true"
+      type={type}
+      aria-label={ariaLabel}
       className={cn(
-        'nx:flex nx:size-9 nx:items-center nx:justify-center',
+        'nx:inline-flex nx:shrink-0 nx:items-center nx:justify-center nx:rounded-md nx:px-1.5 nx:typography-body-default nx:transition-colors nx:hover:bg-background-hover nx:active:bg-background-active nx:data-[state=open]:bg-background-active nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         className
       )}
       {...props}
     >
-      <IconDots className="nx:size-4" />
-      <span className="nx:sr-only">More</span>
-    </span>
+      ...
+    </button>
   );
 }
 
@@ -219,6 +280,8 @@ export {
   type BreadcrumbLinkProps,
   BreadcrumbList,
   type BreadcrumbListProps,
+  BreadcrumbMenuTrigger,
+  type BreadcrumbMenuTriggerProps,
   BreadcrumbPage,
   type BreadcrumbPageProps,
   type BreadcrumbProps,

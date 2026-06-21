@@ -1,10 +1,70 @@
 import * as React from 'react';
 
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
-import type { VariantProps } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+
+const alertDialogContentVariants = cva(
+  [
+    'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
+    'nx:-translate-x-1/2 nx:-translate-y-1/2',
+    'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:p-6 nx:shadow-lg',
+    'nx:data-[state=open]:duration-300 nx:data-[state=closed]:duration-150',
+    'nx:data-[state=open]:ease-out nx:data-[state=closed]:ease-in',
+    'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
+    'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
+    'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
+    'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
+    'nx:sm:rounded-lg',
+  ].join(' ')
+);
+
+const alertDialogHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1', {
+  variants: {
+    variant: {
+      default: 'nx:text-center nx:sm:text-left',
+      center: 'nx:items-center nx:text-center',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
+
+const alertDialogFooterVariants = cva('nx:flex nx:gap-2', {
+  variants: {
+    orientation: {
+      horizontal:
+        'nx:flex-col nx:sm:flex-row nx:sm:items-center nx:sm:justify-end',
+      vertical: 'nx:flex-col nx:items-stretch nx:*:w-full',
+    },
+  },
+  defaultVariants: {
+    orientation: 'horizontal',
+  },
+});
+
+type AlertDialogVariant = NonNullable<
+  VariantProps<typeof alertDialogHeaderVariants>['variant']
+>;
+type AlertDialogButtonOrientation = NonNullable<
+  VariantProps<typeof alertDialogFooterVariants>['orientation']
+>;
+
+type AlertDialogLayoutContextValue = {
+  variant: AlertDialogVariant;
+  buttonOrientation: AlertDialogButtonOrientation;
+};
+
+const defaultAlertDialogLayout: AlertDialogLayoutContextValue = {
+  variant: 'default',
+  buttonOrientation: 'horizontal',
+};
+
+const AlertDialogLayoutContext =
+  React.createContext<AlertDialogLayoutContextValue>(defaultAlertDialogLayout);
 
 /**
  * AlertDialog
@@ -88,7 +148,16 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
  */
 interface AlertDialogContentProps extends React.ComponentProps<
   typeof AlertDialogPrimitive.Content
-> {}
+> {
+  /**
+   * Layout variant for the alert dialog content.
+   *
+   * `default` keeps the header left-aligned and footer actions horizontal.
+   * `center` centers the header and stacks full-width footer actions.
+   * @default "default"
+   */
+  variant?: AlertDialogVariant;
+}
 
 /**
  * AlertDialogContent
@@ -110,29 +179,29 @@ interface AlertDialogContentProps extends React.ComponentProps<
  * </AlertDialogContent>
  * ```
  */
-function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
+function AlertDialogContent({
+  className,
+  variant = 'default',
+  ...props
+}: AlertDialogContentProps) {
+  const buttonOrientation = variant === 'center' ? 'vertical' : 'horizontal';
+
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
-      <AlertDialogPrimitive.Content
-        data-slot="alert-dialog-content"
-        className={cn(
-          'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
-          'nx:-translate-x-1/2 nx:-translate-y-1/2',
-          'nx:gap-container nx:border nx:border-border-default nx:bg-container nx:p-container nx:shadow-lg',
-          'nx:data-[state=open]:duration-300 nx:data-[state=closed]:duration-150',
-          'nx:data-[state=open]:ease-out nx:data-[state=closed]:ease-in',
-          'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-          'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-          'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
-          'nx:data-[state=closed]:slide-out-to-left-1/2 nx:data-[state=closed]:slide-out-to-top-[48%]',
-          'nx:data-[state=open]:slide-in-from-left-1/2 nx:data-[state=open]:slide-in-from-top-[48%]',
-          'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
-          'nx:sm:rounded-lg',
-          className
-        )}
-        {...props}
-      />
+      <AlertDialogLayoutContext.Provider value={{ variant, buttonOrientation }}>
+        <AlertDialogPrimitive.Content
+          data-slot="alert-dialog-content"
+          data-variant={variant}
+          data-orientation={buttonOrientation}
+          className={cn(
+            alertDialogContentVariants(),
+            variant === 'center' && 'nx:max-w-xs',
+            className
+          )}
+          {...props}
+        />
+      </AlertDialogLayoutContext.Provider>
     </AlertDialogPortal>
   );
 }
@@ -142,7 +211,10 @@ function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
  *
  * Props for the AlertDialogHeader component.
  */
-interface AlertDialogHeaderProps extends React.ComponentProps<'div'> {}
+interface AlertDialogHeaderProps
+  extends
+    React.ComponentProps<'div'>,
+    VariantProps<typeof alertDialogHeaderVariants> {}
 
 /**
  * AlertDialogHeader
@@ -157,12 +229,20 @@ interface AlertDialogHeaderProps extends React.ComponentProps<'div'> {}
  * </AlertDialogHeader>
  * ```
  */
-function AlertDialogHeader({ className, ...props }: AlertDialogHeaderProps) {
+function AlertDialogHeader({
+  className,
+  variant,
+  ...props
+}: AlertDialogHeaderProps) {
+  const layout = React.useContext(AlertDialogLayoutContext);
+  const resolvedVariant = variant ?? layout.variant;
+
   return (
     <div
       data-slot="alert-dialog-header"
+      data-variant={resolvedVariant}
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1.5 nx:text-center nx:sm:text-left',
+        alertDialogHeaderVariants({ variant: resolvedVariant }),
         className
       )}
       {...props}
@@ -191,11 +271,14 @@ interface AlertDialogFooterProps extends React.ComponentProps<'div'> {}
  * ```
  */
 function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
+  const layout = React.useContext(AlertDialogLayoutContext);
+
   return (
     <div
       data-slot="alert-dialog-footer"
+      data-orientation={layout.buttonOrientation}
       className={cn(
-        'nx:flex nx:flex-col-reverse nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
+        alertDialogFooterVariants({ orientation: layout.buttonOrientation }),
         className
       )}
       {...props}
@@ -226,10 +309,7 @@ function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
   return (
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
-      className={cn(
-        'nx:text-lg nx:font-semibold nx:leading-none nx:tracking-tight',
-        className
-      )}
+      className={cn('nx:typography-heading-xsmall', className)}
       {...props}
     />
   );
@@ -263,7 +343,10 @@ function AlertDialogDescription({
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:typography-body-default nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );
@@ -295,7 +378,7 @@ interface AlertDialogActionProps
  */
 function AlertDialogAction({
   className,
-  variant,
+  variant = 'default',
   size,
   ...props
 }: AlertDialogActionProps) {
@@ -334,7 +417,7 @@ interface AlertDialogCancelProps
  */
 function AlertDialogCancel({
   className,
-  variant,
+  variant = 'outline',
   size,
   ...props
 }: AlertDialogCancelProps) {
@@ -343,10 +426,7 @@ function AlertDialogCancel({
       data-slot="alert-dialog-cancel"
       data-variant={variant}
       data-size={size}
-      className={cn(
-        buttonVariants({ variant: variant ?? 'outline', size }),
-        className
-      )}
+      className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />
   );
@@ -372,4 +452,5 @@ export {
   AlertDialogTitle,
   type AlertDialogTitleProps,
   AlertDialogTrigger,
+  type AlertDialogVariant,
 };

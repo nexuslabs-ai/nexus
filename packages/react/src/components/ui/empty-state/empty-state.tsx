@@ -9,7 +9,15 @@ import { cn } from '@/lib/utils';
  *
  * Props for the EmptyState component.
  */
-interface EmptyStateProps extends React.ComponentProps<'div'> {}
+interface EmptyStateProps extends React.ComponentProps<'div'> {
+  /**
+   * Render the dashed frame around the empty state — use it to match a
+   * bordered skeleton slot so a loading→empty swap doesn't reflow.
+   *
+   * @default false
+   */
+  bordered?: boolean;
+}
 
 /**
  * EmptyState
@@ -18,8 +26,8 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {}
  * content yet — an icon, a title, a short description, and an optional action.
  * Compose with the sub-components: `EmptyStateHeader` groups the
  * `EmptyStateMedia` (icon), `EmptyStateTitle`, and `EmptyStateDescription`;
- * `EmptyStateContent` holds the call to action. Carries a dashed border style
- * that only shows when a consumer adds a border width.
+ * `EmptyStateContent` holds the call to action. Pass `bordered` to render the
+ * dashed frame (e.g. to match a bordered skeleton slot).
  *
  * @example
  * ```tsx
@@ -39,12 +47,18 @@ interface EmptyStateProps extends React.ComponentProps<'div'> {}
  * </EmptyState>
  * ```
  */
-function EmptyState({ className, ...props }: EmptyStateProps) {
+function EmptyState({
+  className,
+  bordered = false,
+  ...props
+}: EmptyStateProps) {
   return (
     <div
       data-slot="empty-state"
+      data-bordered={bordered || undefined}
       className={cn(
-        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:border-dashed nx:p-6 nx:text-center nx:text-balance',
+        'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:p-6 nx:text-center nx:text-balance',
+        bordered && 'nx:border nx:border-dashed nx:border-border-default',
         className
       )}
       {...props}
@@ -69,7 +83,7 @@ function EmptyStateHeader({ className, ...props }: EmptyStateHeaderProps) {
     <div
       data-slot="empty-state-header"
       className={cn(
-        'nx:flex nx:max-w-sm nx:flex-col nx:items-center nx:gap-2 nx:text-center',
+        'nx:flex nx:max-w-sm nx:flex-col nx:items-center nx:gap-2',
         className
       )}
       {...props}
@@ -82,7 +96,7 @@ const emptyStateMediaVariants = cva(
   {
     variants: {
       variant: {
-        default: 'nx:bg-transparent',
+        default: '',
         icon: 'nx:size-10 nx:rounded-lg nx:bg-muted nx:text-foreground nx:[&_svg]:size-6',
       },
     },
@@ -134,7 +148,8 @@ interface EmptyStateTitleProps extends React.ComponentProps<'div'> {}
 /**
  * EmptyStateTitle
  *
- * The headline of the empty state — what is missing.
+ * The headline of the empty state — what is missing. Renders a `div`, not a
+ * heading element — set the heading level in your app if the region needs one.
  */
 function EmptyStateTitle({ className, ...props }: EmptyStateTitleProps) {
   return (
@@ -166,7 +181,7 @@ function EmptyStateDescription({
     <p
       data-slot="empty-state-description"
       className={cn(
-        'nx:typography-body-small nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
+        'nx:typography-body-default nx:text-muted-foreground nx:[&>a]:underline nx:[&>a]:underline-offset-4 nx:[&>a:hover]:text-primary-subtle-foreground',
         className
       )}
       {...props}
@@ -191,7 +206,7 @@ function EmptyStateContent({ className, ...props }: EmptyStateContentProps) {
     <div
       data-slot="empty-state-content"
       className={cn(
-        'nx:flex nx:w-full nx:max-w-sm nx:min-w-0 nx:flex-col nx:items-center nx:gap-4 nx:text-balance',
+        'nx:flex nx:w-full nx:max-w-sm nx:min-w-0 nx:flex-col nx:items-center nx:gap-4',
         className
       )}
       {...props}
