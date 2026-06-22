@@ -598,7 +598,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` migrates `py-2 gap-2` → `py-control-md gap-control-md` (matches vega byte-identically) and so responds to mode. `px-3` stays numeric per the Input/Select coupling-table note (form fields are narrower than buttons by design; per-mode gap drift between Input/Select and adjacent Buttons is accepted). `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
+          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` uses `py-control-md gap-control-md` and `typography-body-default`, so its vertical rhythm and body text follow mode. `px-3` stays numeric because `px-control-*` would over-widen form-field insets across looser modes. `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
       },
     },
   },
@@ -673,7 +673,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: in vega mode, the `SelectTrigger` renders at exactly 38px (= `text-sm` 20px line-height + `py-control-md` 8px × 2 + border 1px × 2 — same intrinsic shape as Input default). If a designer retunes `--control-padding-y-md`, the body type ramp, or the border-width token, this test fails.',
+          'Pin on the migration outcome: in vega mode, the `SelectTrigger` renders at exactly 38px (= `typography-body-default` 20px line-height + `py-control-md` 8px × 2 + border 1px × 2 — same intrinsic shape as Input default). If a designer retunes `--control-padding-y-md`, the body type ramp, or the border-width token, this test fails.',
       },
     },
   },

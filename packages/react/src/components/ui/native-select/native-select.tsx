@@ -16,8 +16,8 @@ const nativeSelectVariants = cva(
   {
     variants: {
       size: {
-        default: 'nx:px-3 nx:py-control-md nx:pr-9 nx:text-sm',
-        sm: 'nx:px-2.5 nx:py-control-sm nx:pr-9 nx:text-xs',
+        default: 'nx:px-3 nx:py-control-md nx:pr-9 nx:typography-body-default',
+        sm: 'nx:px-2.5 nx:py-control-sm nx:pr-9 nx:typography-body-small',
       },
     },
     defaultVariants: {

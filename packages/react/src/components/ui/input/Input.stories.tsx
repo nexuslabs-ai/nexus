@@ -438,7 +438,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input follows the approved fixed-height utility scale (`h-8` / `h-10` / `h-12`) without copying Button min-widths. Sm/default use body-small text; lg uses body-default text.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input follows the approved fixed-height utility scale (`h-8` / `h-10` / `h-12`) without copying Button min-widths. Sm uses body-small text; default/lg use body-default text.',
       },
     },
   },
