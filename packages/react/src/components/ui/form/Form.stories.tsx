@@ -6,6 +6,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { z } from 'zod';
 
 import { Button } from '../button';
+import { Field, FieldDescription, FieldLabel } from '../field';
 import { Input } from '../input';
 
 import {
@@ -203,6 +204,127 @@ function AnatomyForm() {
   );
 }
 
+function FieldVsFormErgonomicsExample() {
+  const form = useForm<{ email: string }>({
+    defaultValues: { email: '' },
+  });
+
+  return (
+    <div className="nx:grid nx:max-w-3xl nx:gap-6 nx:lg:grid-cols-2">
+      <section className="nx:grid nx:gap-3 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+        <h3 className="nx:typography-label-default nx:text-foreground">
+          Field
+        </h3>
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          Low-level and library-agnostic. You own ids, validation state, and
+          form-library wiring.
+        </p>
+        <Field>
+          <FieldLabel htmlFor="field-library-email">Library email</FieldLabel>
+          <Input
+            id="field-library-email"
+            type="email"
+            placeholder="jane@example.com"
+          />
+          <FieldDescription>
+            Use Field when the form library is not React Hook Form.
+          </FieldDescription>
+        </Field>
+      </section>
+      <section className="nx:grid nx:gap-3 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+        <h3 className="nx:typography-label-default nx:text-foreground">Form</h3>
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          React Hook Form-specific. FormField and FormControl wire ids,
+          descriptions, invalid state, and messages from RHF state.
+        </p>
+        <Form {...form}>
+          <form className="nx:grid nx:gap-3">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>RHF email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="jane@example.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Use Form when React Hook Form owns field state.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+      </section>
+    </div>
+  );
+}
+
+function RequiredOptionalHouseRuleExample() {
+  return (
+    <div className="nx:grid nx:max-w-3xl nx:gap-6 nx:lg:grid-cols-2">
+      <section className="nx:grid nx:gap-4 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+        <div className="nx:grid nx:gap-1">
+          <h3 className="nx:typography-label-default nx:text-foreground">
+            Most fields required
+          </h3>
+          <p className="nx:typography-body-small nx:text-muted-foreground">
+            Mark only the exceptions as optional.
+          </p>
+        </div>
+        <Field>
+          <FieldLabel htmlFor="required-house-company">Company</FieldLabel>
+          <Input id="required-house-company" />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="required-house-email">Work email</FieldLabel>
+          <Input id="required-house-email" type="email" />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="required-house-po">
+            Purchase order{' '}
+            <span className="nx:text-muted-foreground">(optional)</span>
+          </FieldLabel>
+          <Input id="required-house-po" />
+        </Field>
+      </section>
+      <section className="nx:grid nx:gap-4 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+        <div className="nx:grid nx:gap-1">
+          <h3 className="nx:typography-label-default nx:text-foreground">
+            Most fields optional
+          </h3>
+          <p className="nx:typography-body-small nx:text-muted-foreground">
+            Mark only the required fields.
+          </p>
+        </div>
+        <Field>
+          <FieldLabel htmlFor="optional-house-linkedin">
+            LinkedIn profile
+          </FieldLabel>
+          <Input id="optional-house-linkedin" type="url" />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="optional-house-phone">Phone</FieldLabel>
+          <Input id="optional-house-phone" type="tel" />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="optional-house-email">
+            Work email{' '}
+            <span className="nx:text-muted-foreground">(required)</span>
+          </FieldLabel>
+          <Input id="optional-house-email" type="email" required />
+        </Field>
+      </section>
+    </div>
+  );
+}
+
 const meta = {
   title: 'Components/Form',
   component: Form,
@@ -234,6 +356,44 @@ export const BasicValidation: Story = {
           'Fields are validated with a Zod schema via `zodResolver`. Each FormItem composes a label, control, description, and message; FormMessage renders the resolver error when a field is invalid.',
       },
     },
+  },
+};
+
+export const FieldVsFormErgonomics: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Field is the low-level, library-agnostic field anatomy. Form is the React Hook Form-specific binding layer. PR 1 keeps this as story/docs guidance; read-only source semantics, warning source semantics, rich Select slots, and Combobox/MultiSelect boundaries stay in later roadmap PRs.',
+      },
+    },
+  },
+  render: () => <FieldVsFormErgonomicsExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const fieldInput = canvas.getByLabelText('Library email');
+    const formInput = canvas.getByLabelText('RHF email');
+
+    await expect(fieldInput).toHaveAttribute('id', 'field-library-email');
+    await expect(formInput).toHaveAttribute('aria-describedby');
+  },
+};
+
+export const RequiredOptionalHouseRule: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'House rule: when most fields are required, mark optional exceptions. When most fields are optional, mark required exceptions. Avoid marking every field in both directions.',
+      },
+    },
+  },
+  render: () => <RequiredOptionalHouseRuleExample />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText('(optional)')).toBeInTheDocument();
+    await expect(canvas.getByText('(required)')).toBeInTheDocument();
   },
 };
 

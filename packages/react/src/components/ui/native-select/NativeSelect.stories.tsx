@@ -93,6 +93,65 @@ export const Disabled: Story = {
   },
 };
 
+export const ReadOnlyBoundary: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'NativeSelect wraps a native `select`, which has disabled but no native readOnly state. Use disabled when the control is unavailable. If a locked value must still submit with a form, render a display-only value and a hidden input instead of passing a readOnly prop.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:w-[320px] nx:flex-col nx:gap-4">
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Disabled native select
+        </span>
+        <NativeSelect
+          aria-label="Disabled native plan"
+          defaultValue="pro"
+          disabled
+        >
+          <NativeSelectOption value="free">Free</NativeSelectOption>
+          <NativeSelectOption value="pro">Pro</NativeSelectOption>
+        </NativeSelect>
+      </div>
+      <form className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Display-only submission value
+        </span>
+        <div
+          data-testid="native-select-display-only-value"
+          className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:px-3 nx:py-2 nx:typography-body-default nx:text-foreground"
+        >
+          Pro
+        </div>
+        <input type="hidden" name="plan" value="pro" />
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          The hidden input carries the locked value through native form
+          submission.
+        </p>
+      </form>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const select = canvas.getByRole('combobox', {
+      name: 'Disabled native plan',
+    });
+    const hiddenInput = canvasElement.querySelector('input[type="hidden"]');
+
+    await expect(select).toBeDisabled();
+    await expect(select).not.toHaveAttribute('readonly');
+    await expect(
+      canvas.getByTestId('native-select-display-only-value')
+    ).toHaveTextContent('Pro');
+    await expect(hiddenInput).toHaveAttribute('name', 'plan');
+    await expect(hiddenInput).toHaveAttribute('value', 'pro');
+  },
+};
+
 // Selecting an option updates the value and fires onChange.
 export const ClickInteraction: Story = {
   args: { onChange: fn() },

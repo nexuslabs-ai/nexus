@@ -10,6 +10,7 @@ import {
   expectHeightFixedAcrossModes,
   expectHeightPinned,
 } from '../../../stories/test-utils';
+import { NativeSelect, NativeSelectOption } from '../native-select';
 
 import {
   Select,
@@ -97,6 +98,169 @@ export const WithDisabledItems: Story = {
         <SelectItem value="option3">Available</SelectItem>
       </SelectContent>
     </Select>
+  ),
+};
+
+export const CapabilityLadder: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Capability ladder: use NativeSelect for native form submission and OS pickers with simple text options; use Select for a styled trigger/listbox with groups, separators, and disabled items. Future Combobox and MultiSelect remain roadmap-only boundaries in PR 5 and are not implemented here.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:grid nx:max-w-3xl nx:gap-4 nx:md:grid-cols-2">
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+        <h3 className="nx:typography-label-default nx:text-foreground">
+          NativeSelect
+        </h3>
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          Native picker, native form semantics, simple text options.
+        </p>
+        <NativeSelect aria-label="Native plan" defaultValue="pro">
+          <NativeSelectOption value="free">Free</NativeSelectOption>
+          <NativeSelectOption value="pro">Pro</NativeSelectOption>
+          <NativeSelectOption value="team">Team</NativeSelectOption>
+        </NativeSelect>
+      </section>
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+        <h3 className="nx:typography-label-default nx:text-foreground">
+          Select
+        </h3>
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          Styled trigger and listbox, groups, separators, disabled items.
+        </p>
+        <Select defaultValue="pro">
+          <SelectTrigger aria-label="Styled plan">
+            <SelectValue placeholder="Plan" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Plans</SelectLabel>
+              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="pro">Pro</SelectItem>
+              <SelectItem value="team" disabled>
+                Team
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </section>
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:p-4">
+        <h3 className="nx:typography-label-default nx:text-foreground">
+          Future Combobox
+        </h3>
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          Roadmap boundary for searchable or async single selection.
+        </p>
+      </section>
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:p-4">
+        <h3 className="nx:typography-label-default nx:text-foreground">
+          Future MultiSelect
+        </h3>
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          Roadmap boundary for multiple selected values and chip summaries.
+        </p>
+      </section>
+    </div>
+  ),
+};
+
+export const ReadOnlyBoundary: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Select has disabled state today, but no first-class read-only state. Use disabled when users cannot interact and the value should not behave like an editable control. If a locked value still needs to submit with a form, render a display-only value plus a hidden input.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:w-[360px] nx:flex-col nx:gap-4">
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Disabled Select
+        </span>
+        <Select disabled defaultValue="team">
+          <SelectTrigger aria-label="Disabled team select">
+            <SelectValue placeholder="Team" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="team">Team</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <form className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Display-only submission value
+        </span>
+        <div
+          data-testid="select-display-only-value"
+          className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:px-3 nx:py-2 nx:typography-body-default nx:text-foreground"
+        >
+          Team
+        </div>
+        <input type="hidden" name="plan" value="team" />
+        <p className="nx:typography-body-small nx:text-muted-foreground">
+          Hidden input preserves form submission without exposing an editable
+          select.
+        </p>
+      </form>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', {
+      name: 'Disabled team select',
+    });
+    const hiddenInput = canvasElement.querySelector('input[type="hidden"]');
+
+    await expect(trigger).toBeDisabled();
+    await expect(
+      canvas.getByTestId('select-display-only-value')
+    ).toHaveTextContent('Team');
+    await expect(hiddenInput).toHaveAttribute('name', 'plan');
+    await expect(hiddenInput).toHaveAttribute('value', 'team');
+  },
+};
+
+export const RichItemFutureBoundary: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Current Select items are text-first options with disabled support. Rich item affordances such as description, icon/avatar, metadata, and disabled reason belong to a future compositional-slot API, not render props, and are intentionally not implemented in this PR.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:grid nx:max-w-xl nx:gap-4">
+      <Select defaultValue="owner">
+        <SelectTrigger className="nx:w-[260px]" aria-label="Current role">
+          <SelectValue placeholder="Role" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="owner">Owner</SelectItem>
+          <SelectItem value="admin" disabled>
+            Billing admin unavailable
+          </SelectItem>
+          <SelectItem value="viewer">Viewer</SelectItem>
+        </SelectContent>
+      </Select>
+      <div className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:p-4">
+        <h3 className="nx:typography-label-default nx:text-foreground">
+          Future rich item slots
+        </h3>
+        <ul className="nx:ml-4 nx:list-disc nx:typography-body-small nx:text-muted-foreground">
+          <li>Icon or avatar slot before item text.</li>
+          <li>Description slot below the primary label.</li>
+          <li>Metadata slot aligned to the far edge.</li>
+          <li>Disabled reason slot for unavailable choices.</li>
+        </ul>
+      </div>
+    </div>
   ),
 };
 

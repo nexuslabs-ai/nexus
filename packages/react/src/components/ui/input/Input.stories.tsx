@@ -136,6 +136,141 @@ export const Invalid: Story = {
   },
 };
 
+export const ReadOnlyVsDisabled: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Read-only keeps the control focusable and submittable while preventing edits. Disabled removes the control from editing and native form submission. Input has no special read-only visual treatment today, so pair read-only fields with helper copy when the distinction matters.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:w-[400px] nx:flex-col nx:gap-4">
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Read-only
+        </span>
+        <Input
+          aria-label="Read-only account id"
+          aria-describedby="input-readonly-note"
+          defaultValue="acct_1024"
+          readOnly
+        />
+        <p
+          id="input-readonly-note"
+          className="nx:typography-body-small nx:text-muted-foreground"
+        >
+          Value can be selected and submitted, but not edited here.
+        </p>
+      </div>
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Disabled
+        </span>
+        <Input
+          aria-label="Disabled account id"
+          aria-describedby="input-disabled-note"
+          defaultValue="acct_1024"
+          disabled
+        />
+        <p
+          id="input-disabled-note"
+          className="nx:typography-body-small nx:text-muted-foreground"
+        >
+          Value is unavailable and should not be submitted from this control.
+        </p>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const readOnly = canvas.getByRole('textbox', {
+      name: 'Read-only account id',
+    });
+    const disabled = canvas.getByRole('textbox', {
+      name: 'Disabled account id',
+    });
+
+    await expect(readOnly).toHaveAttribute('readonly');
+    await expect(readOnly).not.toBeDisabled();
+    await expect(disabled).toBeDisabled();
+  },
+};
+
+export const WarningVsError: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Warning is advisory guidance and must not set `aria-invalid`. Error means the current value is invalid, so it uses `aria-invalid` and an error message relationship. First-class warning source semantics are intentionally left for the warning semantics follow-up PR.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:w-[400px] nx:flex-col nx:gap-4">
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Warning
+        </span>
+        <Input
+          aria-label="Warning budget"
+          aria-describedby="input-warning-message"
+          defaultValue="95"
+          className="nx:border-border-warning"
+        />
+        <p
+          id="input-warning-message"
+          className="nx:typography-body-small nx:text-warning-subtle-foreground"
+        >
+          Near the monthly limit. You can continue.
+        </p>
+      </div>
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Error
+        </span>
+        <Input
+          aria-label="Invalid budget"
+          aria-describedby="input-error-help"
+          aria-errormessage="input-error-message"
+          aria-invalid
+          defaultValue="125"
+        />
+        <p
+          id="input-error-help"
+          className="nx:typography-body-small nx:text-muted-foreground"
+        >
+          Enter a value from 0 to 100.
+        </p>
+        <p
+          id="input-error-message"
+          role="alert"
+          className="nx:typography-body-small nx:text-error-subtle-foreground"
+        >
+          Budget cannot exceed 100.
+        </p>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warning = canvas.getByRole('textbox', { name: 'Warning budget' });
+    const error = canvas.getByRole('textbox', { name: 'Invalid budget' });
+
+    await expect(warning).not.toHaveAttribute('aria-invalid');
+    await expect(warning).toHaveAttribute(
+      'aria-describedby',
+      'input-warning-message'
+    );
+    await expect(error).toHaveAttribute('aria-invalid', 'true');
+    await expect(error).toHaveAttribute(
+      'aria-errormessage',
+      'input-error-message'
+    );
+  },
+};
+
 // ============================================
 // TYPE STORIES
 // ============================================
