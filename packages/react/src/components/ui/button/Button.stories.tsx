@@ -148,6 +148,14 @@ export const Destructive: Story = {
 };
 
 export const Error: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Low-emphasis destructive action: transparent at rest (a destructive-tinted ghost) with subtle error fills on hover/active. Use for secondary or in-context destructive actions; reach for the solid `destructive` variant for the primary destructive action in a view.',
+      },
+    },
+  },
   args: {
     variant: 'error',
     children: 'Error',

@@ -278,8 +278,8 @@ export const IconOnly: Story = {
 
     await expect(badge).toHaveAttribute('data-icon-only', 'true');
     expect(badge.textContent).toBe('');
-    expect(Math.round(rect.height)).toBe(20);
-    expect(Math.round(rect.width)).toBeGreaterThanOrEqual(20);
+    expect(Math.round(rect.height)).toBe(24);
+    expect(Math.round(rect.width)).toBeGreaterThanOrEqual(24);
     expect(Math.round(svgRect.width)).toBe(14);
     expect(Math.round(svgRect.height)).toBe(14);
   },
@@ -384,8 +384,8 @@ export const NumberBadgeHighValue: Story = {
     const rect = badge.getBoundingClientRect();
 
     await expect(badge).toHaveAttribute('data-number', 'true');
-    expect(Math.round(rect.height)).toBe(20);
-    expect(Math.round(rect.width)).toBeGreaterThan(20);
+    expect(Math.round(rect.height)).toBe(24);
+    expect(Math.round(rect.width)).toBeGreaterThan(24);
   },
 };
 
