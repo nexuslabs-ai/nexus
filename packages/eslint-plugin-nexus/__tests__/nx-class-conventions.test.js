@@ -22,6 +22,13 @@ ruleTester.run('nx-class-conventions', rule, {
     'const c = `nx:p-4 ${cond} nx:gap-2`;',
     // Non-nx classes are ignored.
     "const c = 'flex items-center gap-2';",
+    // Live typography composites must not be flagged — negative guard for the
+    // deadTypography check across the label / body / heading families.
+    "const c = 'nx:typography-label-default';",
+    "const c = 'nx:px-2 nx:py-1.5 nx:typography-body-default';",
+    "const c = 'nx:typography-heading-xsmall';",
+    // A typography-* substring without the nx: prefix (e.g. a filename) is ignored.
+    "const path = '../tokens/typography/typography-vega.json';",
   ],
   invalid: [
     {
@@ -68,6 +75,19 @@ ruleTester.run('nx-class-conventions', rule, {
     {
       code: 'const c = `nx:bg-blue-500 ${x}`;',
       errors: [{ messageId: 'rawPrimitive' }],
+    },
+    // Dead typography composites (removed by the #459 trim) render nothing.
+    {
+      code: "const c = 'nx:typography-label-large';",
+      errors: [{ messageId: 'deadTypography' }],
+    },
+    {
+      code: "const c = 'nx:px-2 nx:typography-body-xsmall nx:opacity-70';",
+      errors: [{ messageId: 'deadTypography' }],
+    },
+    {
+      code: "const c = 'nx:hover:typography-display-large';",
+      errors: [{ messageId: 'deadTypography' }],
     },
   ],
 });
