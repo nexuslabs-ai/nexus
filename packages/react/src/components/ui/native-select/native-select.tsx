@@ -41,8 +41,9 @@ interface NativeSelectProps
  *
  * A styled wrapper over the native `<select>` — on mobile it opens the OS
  * picker (iOS wheel / Android sheet), the preferred dense-form UX there. The
- * closed trigger is styled to match `Input`; the open list is OS-rendered.
- * For rich options (icons, descriptions, grouping) on desktop, use `Select`.
+ * closed trigger matches `Input`'s styling — though not its height (38px via
+ * `py-2` vs Input's fixed 40px `h-10`); the open list is OS-rendered. For rich
+ * options (icons, descriptions, grouping) on desktop, use `Select`.
  *
  * @example
  * ```tsx
