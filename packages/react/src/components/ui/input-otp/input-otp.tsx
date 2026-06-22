@@ -55,7 +55,7 @@ function InputOTP({
       data-slot="input-otp"
       autoComplete="one-time-code"
       containerClassName={cn(
-        'nx:flex nx:items-center nx:gap-2 nx:has-[:disabled]:opacity-50',
+        'nx:group/input-otp nx:flex nx:items-center nx:gap-2',
         containerClassName
       )}
       className={cn('nx:disabled:cursor-not-allowed', className)}
@@ -119,6 +119,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       className={cn(
         'nx:relative nx:flex nx:size-10 nx:items-center nx:justify-center',
         'nx:border-y nx:border-r nx:border-border-default',
+        'nx:group-has-[:disabled]/input-otp:border-border-disabled nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
         'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-all',
         'nx:first:rounded-l-md nx:first:border-l nx:last:rounded-r-md',
         'nx:data-[active=true]:z-10 nx:data-[active=true]:outline-2 nx:data-[active=true]:outline-focus-default nx:data-[active=true]:outline-offset-(--focus-offset)',

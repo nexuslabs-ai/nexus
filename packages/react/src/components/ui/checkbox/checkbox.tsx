@@ -59,7 +59,7 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
-        'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
+        'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled',
         'nx:enabled:data-[state=unchecked]:hover:bg-background-hover nx:enabled:data-[state=unchecked]:active:bg-background-active',
         'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:bg-primary-background nx:data-[state=checked]:text-primary-foreground',
         'nx:enabled:data-[state=checked]:hover:border-primary-background-hover nx:enabled:data-[state=checked]:hover:bg-primary-background-hover',
@@ -67,6 +67,8 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:data-[state=indeterminate]:border-primary-background nx:data-[state=indeterminate]:bg-primary-background nx:data-[state=indeterminate]:text-primary-foreground',
         'nx:enabled:data-[state=indeterminate]:hover:border-primary-background-hover nx:enabled:data-[state=indeterminate]:hover:bg-primary-background-hover',
         'nx:enabled:data-[state=indeterminate]:active:border-primary-background-hover nx:enabled:data-[state=indeterminate]:active:bg-primary-background-active',
+        'nx:data-[state=checked]:disabled:border-primary-disabled nx:data-[state=checked]:disabled:bg-primary-disabled',
+        'nx:data-[state=indeterminate]:disabled:border-primary-disabled nx:data-[state=indeterminate]:disabled:bg-primary-disabled',
         // Invalid + checked/indeterminate follows Figma's destructive checkbox
         // treatment while preserving aria-invalid as the single authoring hook.
         'nx:aria-invalid:data-[state=checked]:border-border-error nx:aria-invalid:data-[state=checked]:bg-error-background nx:aria-invalid:data-[state=checked]:text-error-foreground',

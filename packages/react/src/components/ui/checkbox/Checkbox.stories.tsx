@@ -121,6 +121,10 @@ export const Disabled: Story = {
 
     await expect(checkbox).toBeDisabled();
 
+    // Disabled state uses a semantic border token at full opacity (not a fade).
+    await expect(checkbox).toHaveClass('nx:disabled:border-border-disabled');
+    await expect(getComputedStyle(checkbox).opacity).toBe('1');
+
     // Click should not toggle
     await userEvent.click(checkbox);
     await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
