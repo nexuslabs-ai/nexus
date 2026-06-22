@@ -257,7 +257,7 @@ export const CustomDayContent: Story = {
       renderDayContent={({ date }) => (
         <>
           <span>{date.getDate()}</span>
-          <span className="nx:typography-body-xsmall nx:opacity-70">
+          <span className="nx:typography-body-small nx:opacity-70">
             ${date.getDate() * 5}
           </span>
         </>
