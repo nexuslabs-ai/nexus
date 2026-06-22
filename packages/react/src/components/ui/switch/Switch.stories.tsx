@@ -41,6 +41,16 @@ export const Disabled: Story = {
     'aria-label': 'Toggle switch',
     disabled: true,
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const switchEl = canvas.getByRole('switch');
+
+    await expect(switchEl).toBeDisabled();
+    // An unchecked-disabled switch recolors its border via a semantic disabled
+    // token at full opacity (not a fade).
+    await expect(switchEl).toHaveClass('nx:disabled:border-border-disabled');
+    await expect(getComputedStyle(switchEl).opacity).toBe('1');
+  },
 };
 
 export const DisabledChecked: Story = {
@@ -48,6 +58,18 @@ export const DisabledChecked: Story = {
     'aria-label': 'Toggle switch',
     disabled: true,
     defaultChecked: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const switchEl = canvas.getByRole('switch');
+
+    await expect(switchEl).toBeDisabled();
+    // A checked-disabled switch fills via a semantic primary-disabled token at
+    // full opacity (not a fade).
+    await expect(switchEl).toHaveClass(
+      'nx:data-[state=checked]:disabled:bg-primary-disabled'
+    );
+    await expect(getComputedStyle(switchEl).opacity).toBe('1');
   },
 };
 
@@ -57,7 +79,7 @@ export const WithLabel: Story = {
       <Switch id="airplane-mode" />
       <label
         htmlFor="airplane-mode"
-        className="nx:text-sm nx:font-medium nx:leading-none nx:peer-disabled:cursor-not-allowed nx:peer-disabled:opacity-70"
+        className="nx:text-sm nx:font-medium nx:leading-none nx:peer-disabled:cursor-not-allowed nx:peer-disabled:text-disabled-foreground"
       >
         Airplane Mode
       </label>
