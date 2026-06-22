@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { IconUser } from '@tabler/icons-react';
-import { expect, within } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 
 import {
   Avatar,
@@ -107,6 +107,21 @@ export const Default: Story = {
   ),
 };
 
+export const DefaultDataAttributes: Story = {
+  // With size/shape omitted, the cva defaults (md / circle) must still surface
+  // on data-size / data-shape so CSS and test hooks can target the default.
+  render: (_args) => (
+    <Avatar role="img" aria-label="Default avatar">
+      <AvatarFallback aria-hidden="true">AL</AvatarFallback>
+    </Avatar>
+  ),
+  play: async ({ canvasElement }) => {
+    const avatar = canvasElement.querySelector('[data-slot="avatar"]');
+    await expect(avatar).toHaveAttribute('data-size', 'md');
+    await expect(avatar).toHaveAttribute('data-shape', 'circle');
+  },
+};
+
 export const WithFallback: Story = {
   render: (_args) => (
     <Avatar role="img" aria-label="Ada Lovelace">
@@ -165,7 +180,13 @@ export const Decorative: Story = {
     const canvas = within(canvasElement);
     await canvas.findByText('Ada Lovelace');
 
-    const image = canvasElement.querySelector('[data-slot="avatar-image"]');
+    // Radix mounts the <img> only after its (async) load resolves, so wait for
+    // it rather than querying synchronously — a sync read races the load.
+    const image = await waitFor(() => {
+      const img = canvasElement.querySelector('[data-slot="avatar-image"]');
+      if (!img) throw new Error('avatar image has not mounted yet');
+      return img;
+    });
     await expect(image).toHaveAttribute('alt', '');
   },
 };
