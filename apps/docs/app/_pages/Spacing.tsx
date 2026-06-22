@@ -30,21 +30,6 @@ const SCALE: { name: string; px: number }[] = [
 ];
 
 const ROLES: { token: string; px: string; use: string }[] = [
-  {
-    token: 'control-padding-x',
-    px: '12 / 16 / 32',
-    use: 'Horizontal padding for controls (sm / md / lg)',
-  },
-  {
-    token: 'control-padding-y',
-    px: '6 / 8 / 12',
-    use: 'Vertical padding for controls (sm / md / lg)',
-  },
-  {
-    token: 'control-gap',
-    px: '6 / 8 / 10',
-    use: 'Gap between a control’s icon and label (sm / md / lg)',
-  },
   { token: 'container-p', px: '24', use: 'Card / panel inner padding' },
   {
     token: 'container-gap',

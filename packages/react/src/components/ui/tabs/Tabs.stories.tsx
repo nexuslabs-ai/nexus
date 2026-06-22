@@ -11,7 +11,6 @@ import {
 import {
   expectHeightFixedAcrossModes,
   expectHeightPinned,
-  expectModeCascadeWorks,
 } from '../../../stories/test-utils';
 import {
   Card,
@@ -614,7 +613,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `TabsTrigger` `default` migrates to `control-sm` and `lg` to `control-md` (both byte-identical to vega pre-refactor). The `sm` size stays on its own sub-control rhythm (`px-2 py-1`) and is intentionally density-stable across modes. Vega / Lyra / Luma / Mira share identical `control-{sm,md}` tokens (top 4 rows look the same); Nova compresses, Maia / Sera breathe.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `TabsTrigger` `default` uses `px-3 py-1.5`, `lg` uses `px-4 py-2`, and `sm` stays on `px-2 py-1`. Vertical padding (`py-1.5` / `py-2`) is mode-invariant, so trigger heights are identical across every mode; only the horizontal padding (`px-3` / `px-4`) varies — Nova compresses, Maia / Sera breathe.',
       },
     },
   },
@@ -644,50 +643,13 @@ export const AllModes: Story = {
   ),
 };
 
-export const TabsTriggerModesProduceDifferentHeights: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Cascade sentinel for `TabsTrigger` `default` size. Uses the `nova` + `maia` pair to spread coverage away from the Button/Input nova+sera pair already in use — between them the suite covers `control-sm-y` at 4 / 8 / 12 px (nova / maia / sera).',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="tabs-mode-host-nova">
-        <Tabs defaultValue="a">
-          <TabsList>
-            <TabsTrigger value="a">Tab</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      <div data-style="maia" data-testid="tabs-mode-host-maia">
-        <Tabs defaultValue="a">
-          <TabsList>
-            <TabsTrigger value="a">Tab</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
-      within(canvasElement),
-      'tabs-mode-host-nova',
-      'tabs-mode-host-maia'
-    );
-  },
-};
-
 export const TabsTriggerVegaDefaultHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: in vega mode, a `TabsTrigger` at `default` size renders at exactly 34px (= `text-sm` 20px line-height + `py-control-sm` 6px × 2 + transparent border 1px × 2). If a designer retunes `--control-padding-y-sm`, the body type ramp, or the trigger border, this test fails.',
+          'Pin on the migration outcome: a `TabsTrigger` at `default` size renders at exactly 34px (= `text-sm` 20px line-height + `py-1.5` 6px × 2 + transparent border 1px × 2). `py-1.5` is mode-invariant, so this height now holds in every mode. If a designer retunes `--nx-spacing-1_5`, the body type ramp, or the trigger border, this test fails.',
       },
     },
   },
@@ -715,7 +677,7 @@ export const TabsSmIsDensityStable: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the `sm` size. `TabsTrigger` `sm` stays on the sub-control numeric rhythm (`px-2 py-1 text-xs`). Every spacing mode therefore renders it at the same canonical 26px height (= `text-xs` line-height 16px + `py-1` 4px × 2 + transparent border 1px × 2). If a future PR migrates `py-1` → `py-control-sm` (or any other role utility), this test fails for nova/sera — the regression signal is that intent (sub-control, mode-stable) has been broken.',
+          'Density-stability sentinel for the `sm` size. `TabsTrigger` `sm` stays on the sub-control numeric rhythm (`px-2 py-1 text-xs`). Every spacing mode therefore renders it at the same canonical 26px height (= `text-xs` line-height 16px + `py-1` 4px × 2 + transparent border 1px × 2). If a future PR migrates `py-1` → a mode-varying step (e.g. `py-3`, which resolves 10 / 12 / 14px across nova / vega / maia), this test fails for nova/sera — the regression signal is that intent (sub-control, mode-stable) has been broken.',
       },
     },
   },

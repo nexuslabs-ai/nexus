@@ -1,5 +1,4 @@
 import { IconShowcase } from './IconShowcase';
-import { PlaygroundIcon } from './PlaygroundIcon';
 
 // Reusable section component
 function Section({
@@ -226,27 +225,6 @@ export function ComponentShowcase() {
           description="Per-mode tokens that drive component-internal spacing — switch the Spacing axis to see them flex"
         >
           <div className="nx:space-y-6">
-            {/* Controls */}
-            <div className="nx:space-y-2">
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
-                Controls — px-control-*, py-control-*, gap-control-*
-              </span>
-              <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-3">
-                <button className="nx:inline-flex nx:items-center nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:text-sm nx:font-medium nx:px-control-sm nx:py-control-sm nx:gap-control-sm">
-                  <PlaygroundIcon name="search" size={14} />
-                  <span>Small</span>
-                </button>
-                <button className="nx:inline-flex nx:items-center nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:text-sm nx:font-medium nx:px-control-md nx:py-control-md nx:gap-control-md">
-                  <PlaygroundIcon name="check" size={14} />
-                  <span>Medium</span>
-                </button>
-                <button className="nx:inline-flex nx:items-center nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:text-sm nx:font-medium nx:px-control-lg nx:py-control-lg nx:gap-control-lg">
-                  <PlaygroundIcon name="chevron-down" size={16} />
-                  <span>Large</span>
-                </button>
-              </div>
-            </div>
-
             {/* Container */}
             <div className="nx:space-y-2">
               <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">

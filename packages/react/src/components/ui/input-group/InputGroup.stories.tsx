@@ -123,7 +123,6 @@ export const ButtonSizes: Story = {
 
     await document.fonts.ready;
     buttons.forEach((button) => {
-      expect(button).not.toHaveClass('nx:py-control-md');
       expect(getComputedStyle(button).paddingTop).toBe('0px');
       expect(getComputedStyle(button).paddingBottom).toBe('0px');
     });

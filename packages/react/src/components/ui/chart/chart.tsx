@@ -140,7 +140,7 @@ interface ChartTooltipContentProps extends Pick<
 /** Shared class for one tooltip row (formatter row and default row alike). */
 const tooltipRowClassName = (indicator: ChartIndicator) =>
   cn(
-    'nx:[&>svg]:text-muted-foreground nx:flex nx:w-full nx:flex-wrap nx:items-stretch nx:gap-control-md nx:[&>svg]:h-2.5 nx:[&>svg]:w-2.5',
+    'nx:[&>svg]:text-muted-foreground nx:flex nx:w-full nx:flex-wrap nx:items-stretch nx:gap-2 nx:[&>svg]:h-2.5 nx:[&>svg]:w-2.5',
     indicator === 'dot' && 'nx:items-center'
   );
 
@@ -211,12 +211,12 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        'nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:grid nx:min-w-32 nx:items-start nx:gap-control-sm nx:rounded-md nx:border nx:px-control-sm nx:py-control-sm nx:text-xs nx:shadow-lg',
+        'nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:grid nx:min-w-32 nx:items-start nx:gap-1.5 nx:rounded-md nx:border nx:px-3 nx:py-1.5 nx:text-xs nx:shadow-lg',
         className
       )}
     >
       {!nestLabel ? tooltipLabel : null}
-      <div className="nx:grid nx:gap-control-sm">
+      <div className="nx:grid nx:gap-1.5">
         {payload.map((item, index) =>
           formatter && item.value !== undefined && item.name ? (
             <div
@@ -328,7 +328,7 @@ function ChartTooltipItem({
           nestLabel ? 'nx:items-end' : 'nx:items-center'
         )}
       >
-        <div className="nx:grid nx:gap-control-sm">
+        <div className="nx:grid nx:gap-1.5">
           {children}
           <span className="nx:text-muted-foreground">
             {itemConfig?.label || item.name}
@@ -372,7 +372,7 @@ function ChartLegendContent({
   return (
     <div
       className={cn(
-        'nx:flex nx:items-center nx:justify-center nx:gap-control-lg',
+        'nx:flex nx:items-center nx:justify-center nx:gap-2.5',
         verticalAlign === 'top' ? 'nx:pb-3' : 'nx:pt-3',
         className
       )}
@@ -384,7 +384,7 @@ function ChartLegendContent({
         return (
           <div
             key={`${item.value}`}
-            className="nx:[&>svg]:text-muted-foreground nx:flex nx:items-center nx:gap-control-sm nx:[&>svg]:h-3 nx:[&>svg]:w-3"
+            className="nx:[&>svg]:text-muted-foreground nx:flex nx:items-center nx:gap-1.5 nx:[&>svg]:h-3 nx:[&>svg]:w-3"
           >
             {itemConfig?.icon && !hideIcon ? (
               <itemConfig.icon />
