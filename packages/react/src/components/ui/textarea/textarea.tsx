@@ -12,7 +12,7 @@ interface TextareaProps extends React.ComponentProps<'textarea'> {}
 /**
  * Textarea
  *
- * A multi-line text input. Mirrors Input's token, focus, and `aria-invalid`
+ * A multi-line text input. Mirrors Input's surface, focus, and `aria-invalid`
  * treatment and accepts all native textarea attributes. Use `rows` (or a
  * `min-height` override via `className`) to set the initial height.
  *
@@ -33,12 +33,12 @@ function Textarea({ className, ...props }: TextareaProps) {
       data-slot="textarea"
       className={cn(
         'nx:flex nx:min-h-16 nx:w-full nx:rounded-md nx:border nx:border-border-default',
-        'nx:bg-background nx:text-foreground nx:transition-colors',
+        'nx:bg-background nx:text-foreground nx:transition-colors nx:enabled:hover:bg-background-hover',
         'nx:placeholder:text-muted-foreground',
-        'nx:px-3 nx:py-control-md nx:text-sm',
+        'nx:px-3 nx:py-2 nx:typography-body-default',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
-        'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
+        'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
         className
       )}
       {...props}

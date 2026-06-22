@@ -257,7 +257,10 @@ function FormDescription({ className, ...props }: FormDescriptionProps) {
       {...props}
       data-slot="form-description"
       id={formDescriptionId}
-      className={cn('nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:typography-body-small nx:text-muted-foreground',
+        className
+      )}
     />
   );
 }
@@ -291,7 +294,10 @@ function FormMessage({
       aria-atomic="true"
       data-slot="form-message"
       id={formMessageId}
-      className={cn('nx:text-sm nx:text-error-subtle-foreground', className)}
+      className={cn(
+        'nx:typography-body-small nx:text-error-subtle-foreground',
+        className
+      )}
     >
       {body}
     </p>

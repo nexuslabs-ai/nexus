@@ -16,8 +16,8 @@ const nativeSelectVariants = cva(
   {
     variants: {
       size: {
-        default: 'nx:px-3 nx:py-control-md nx:pr-9 nx:text-sm',
-        sm: 'nx:px-2.5 nx:py-control-sm nx:pr-9 nx:text-xs',
+        default: 'nx:px-3 nx:py-2 nx:pr-9 nx:typography-body-default',
+        sm: 'nx:px-2.5 nx:py-1.5 nx:pr-9 nx:typography-body-small',
       },
     },
     defaultVariants: {
@@ -60,18 +60,22 @@ function NativeSelect({
   return (
     <div
       data-slot="native-select-wrapper"
-      className="nx:group/native-select nx:relative nx:w-fit nx:has-[select:disabled]:opacity-50"
+      className="nx:group/native-select nx:relative nx:w-fit"
     >
       <select
         data-slot="native-select"
         data-size={size}
-        className={cn(nativeSelectVariants({ size }), className)}
+        className={cn(
+          nativeSelectVariants({ size }),
+          'nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
+          className
+        )}
         {...props}
       />
       <IconChevronDown
         aria-hidden="true"
         data-slot="native-select-icon"
-        className="nx:pointer-events-none nx:absolute nx:top-1/2 nx:right-3.5 nx:size-4 nx:-translate-y-1/2 nx:text-muted-foreground nx:opacity-50 nx:select-none"
+        className="nx:pointer-events-none nx:absolute nx:top-1/2 nx:right-3.5 nx:size-4 nx:-translate-y-1/2 nx:text-muted-foreground nx:select-none nx:group-has-[select:disabled]/native-select:text-disabled-foreground"
       />
     </div>
   );

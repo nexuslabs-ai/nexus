@@ -61,7 +61,7 @@
   --color-border-default: var(--nx-color-black-a200);
   --color-border-default-alpha: var(--nx-color-slate-a200);
   --color-border-active: var(--nx-color-slate-400);
-  --color-border-disabled: var(--nx-color-slate-50);
+  --color-border-disabled: var(--nx-color-black-a200);
   --color-border-warning: var(--nx-color-orange-200);
   --color-border-warning-active: var(--nx-color-orange-400);
   --color-border-success: var(--nx-color-green-200);

@@ -7,19 +7,19 @@ import { cn } from '@/lib/utils';
 const inputVariants = cva(
   [
     'nx:flex nx:w-full nx:rounded-md nx:border nx:border-border-default',
-    'nx:bg-background nx:text-foreground nx:transition-colors',
-    'nx:file:border-0 nx:file:bg-transparent nx:file:text-sm nx:file:font-medium nx:file:text-foreground',
+    'nx:bg-background nx:text-foreground nx:transition-colors nx:enabled:hover:bg-background-hover',
+    'nx:file:border-0 nx:file:bg-transparent nx:file:typography-label-default nx:file:text-foreground nx:disabled:file:text-disabled-foreground',
     'nx:placeholder:text-muted-foreground',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
-    'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
+    'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
   ],
   {
     variants: {
       size: {
-        default: 'nx:px-3 nx:py-control-md nx:text-sm',
-        sm: 'nx:px-2.5 nx:py-control-sm nx:text-xs',
-        lg: 'nx:px-4 nx:py-control-lg nx:text-base',
+        default: 'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
+        sm: 'nx:h-8 nx:px-2.5 nx:py-0 nx:typography-body-small',
+        lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
       },
     },
     defaultVariants: {
@@ -66,7 +66,7 @@ function Input({ className, type, size, ...props }: InputProps) {
     <input
       type={type}
       data-slot="input"
-      data-size={size}
+      data-size={size ?? 'default'}
       className={cn(inputVariants({ size, className }))}
       {...props}
     />

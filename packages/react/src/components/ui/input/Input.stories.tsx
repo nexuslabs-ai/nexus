@@ -6,10 +6,7 @@ import {
   AllModesRow,
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
-import {
-  expectHeightPinned,
-  expectModeCascadeWorks,
-} from '../../../stories/test-utils';
+import { expectHeightPerMode } from '../../../stories/test-utils';
 
 import { Input } from './input';
 
@@ -55,6 +52,36 @@ const meta: Meta<typeof Input> = {
 
 export default meta;
 type Story = StoryObj<typeof Input>;
+
+const INPUT_SCALE_HEIGHTS = {
+  sm: {
+    vega: 32,
+    lyra: 32,
+    maia: 36,
+    mira: 32,
+    nova: 30,
+    luma: 32,
+    sera: 32,
+  },
+  default: {
+    vega: 40,
+    lyra: 42,
+    maia: 44,
+    mira: 40,
+    nova: 38,
+    luma: 40,
+    sera: 40,
+  },
+  lg: {
+    vega: 48,
+    lyra: 48,
+    maia: 52,
+    mira: 48,
+    nova: 46,
+    luma: 48,
+    sera: 48,
+  },
+} as const;
 
 // ============================================
 // BASIC STORIES
@@ -230,6 +257,55 @@ export const DisabledInteraction: Story = {
   },
 };
 
+export const VisualStateTokens: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Token sentinel for the corrected Figma node 843:71944 visual-state pass. The primitive remains a native input, while hover and disabled visuals map to Nexus semantic state tokens.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-3 nx:w-[400px]">
+      <Input
+        data-testid="input-hover-token"
+        placeholder="Hover surface"
+        aria-label="Hover surface input"
+      />
+      <Input
+        data-testid="input-disabled-empty"
+        placeholder="Disabled placeholder"
+        disabled
+        aria-label="Disabled empty input"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const hoverTokenInput = canvas.getByTestId('input-hover-token');
+    const disabledEmpty = canvas.getByTestId('input-disabled-empty');
+
+    await expect(hoverTokenInput).toHaveClass(
+      'nx:enabled:hover:bg-background-hover'
+    );
+
+    await expect(disabledEmpty).toBeDisabled();
+    await expect(disabledEmpty).toHaveClass('nx:disabled:bg-disabled');
+    await expect(disabledEmpty).toHaveClass(
+      'nx:disabled:text-disabled-foreground'
+    );
+    await expect(disabledEmpty).toHaveClass(
+      'nx:disabled:placeholder:text-disabled-foreground'
+    );
+    await expect(disabledEmpty).toHaveClass(
+      'nx:disabled:border-border-disabled'
+    );
+    // Disabled uses a token color, not opacity-50 — opacity stays 1.
+    await expect(window.getComputedStyle(disabledEmpty).opacity).toBe('1');
+  },
+};
+
 export const WithDataAttributes: Story = {
   args: {
     size: 'lg',
@@ -348,7 +424,7 @@ export const AllVariants: Story = {
 };
 
 // ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
+// MODE BEHAVIOUR (per-mode heights)
 // ============================================
 
 export const AllModes: Story = {
@@ -357,7 +433,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input `padding-y` migrates to `py-control-{sm,md,lg}` per size and so responds to mode; `padding-x` stays numeric per the coupling table (Input is narrower than Button at the same size). Vega / Lyra / Luma / Mira currently share identical control-y tokens (so those four rows render at the same height); Nova compresses, Maia / Sera breathe.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input follows the approved fixed-height utility scale (`h-8` / `h-10` / `h-12`) without copying Button min-widths. Sm uses body-small text; default/lg use body-default text.',
       },
     },
   },
@@ -386,56 +462,56 @@ export const AllModes: Story = {
   ),
 };
 
-export const ModesProduceDifferentHeights: Story = {
+export const InputScaleHeightsFollowModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Regression sentinel for the `data-style` cascade and the role-utility resolver on Input. An Input scoped to `nova` (compact `py`) must render shorter than the same Input scoped to `sera` (breathy `py`). A typo like `nx:py-control-mdd` would fall back to intrinsic and both modes would match — the test catches that.',
+          'Scale-utility sentinel for the Input sizing model. Text Input sizes use `h-8` / `h-10` / `h-12` and therefore follow the active Nexus spacing mode while keeping Input width layout-controlled.',
       },
     },
   },
   render: () => (
-    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="input-mode-host-nova">
-        <Input aria-label="nova input" />
-      </div>
-      <div data-style="sera" data-testid="input-mode-host-sera">
-        <Input aria-label="sera input" />
-      </div>
+    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
+      {SPACING_MODES.map((mode) => (
+        <div key={mode} data-style={mode} className="nx:flex nx:gap-4">
+          <Input
+            size="sm"
+            aria-label={`${mode} small input`}
+            data-testid={`input-sm-${mode}`}
+          />
+          <Input
+            aria-label={`${mode} default input`}
+            data-testid={`input-default-${mode}`}
+          />
+          <Input
+            size="lg"
+            aria-label={`${mode} large input`}
+            data-testid={`input-lg-${mode}`}
+          />
+        </div>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
-      within(canvasElement),
-      'input-mode-host-nova',
-      'input-mode-host-sera'
-    );
-  },
-};
+    const canvas = within(canvasElement);
 
-export const VegaDefaultHeightPinned: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Pin on the migration outcome: in vega mode, a default Input renders at exactly 38px (= `text-sm` 20px line-height + `py-control-md` 8px × 2 + border 1px × 2). If a designer retunes `--control-padding-y-md`, the body type ramp, or the border-width token, this test fails and the change must be acknowledged.',
-      },
-    },
-  },
-  render: () => (
-    <div
-      data-style="vega"
-      data-testid="input-vega-host"
-      className="nx:p-10 nx:bg-background"
-    >
-      <Input aria-label="vega default input" />
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'input-vega-host', 38);
+    // The implicit-default input still exposes its size for styling hooks.
+    await expect(canvas.getByLabelText('vega default input')).toHaveAttribute(
+      'data-size',
+      'default'
+    );
+
+    // Heights vary per mode (fixed h-* over mode-scaled spacing tokens); the
+    // shared helper measures every mode against INPUT_SCALE_HEIGHTS.
+    await expectHeightPerMode(canvas, 'input-sm', INPUT_SCALE_HEIGHTS.sm);
+    await expectHeightPerMode(
+      canvas,
+      'input-default',
+      INPUT_SCALE_HEIGHTS.default
+    );
+    await expectHeightPerMode(canvas, 'input-lg', INPUT_SCALE_HEIGHTS.lg);
   },
 };
 

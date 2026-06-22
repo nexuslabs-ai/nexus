@@ -135,7 +135,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{slate.50}",
+      "$value": "{black.a200}",
       "$type": "color"
     },
     "warning": {

@@ -123,3 +123,30 @@ export async function expectHeightFixedAcrossModes(
     expect(actual, `[data-testid="${testId}"] height`).toBe(expectedPx);
   }
 }
+
+/**
+ * Per-mode height sentinel — the counterpart to `expectHeightFixedAcrossModes`
+ * for controls whose height intentionally *varies* per `data-style` mode (fixed
+ * `h-*` utilities backed by mode-scaled spacing tokens). Pass a `mode → expected
+ * px` map; each control is located by `${testIdPrefix}-${mode}`. Awaits
+ * `document.fonts.ready` so Inter fallback metrics cannot skew the measurement.
+ * The optional `selector` is forwarded to `getControlHeight`.
+ */
+export async function expectHeightPerMode(
+  canvas: Canvas,
+  testIdPrefix: string,
+  expectedByMode: Record<string, number>,
+  { selector }: HeightMeasurementOptions = {}
+): Promise<void> {
+  await document.fonts.ready;
+  for (const [mode, expectedPx] of Object.entries(expectedByMode)) {
+    const actual = getControlHeight(
+      canvas,
+      `${testIdPrefix}-${mode}`,
+      selector
+    );
+    expect(actual, `[data-testid="${testIdPrefix}-${mode}"] height`).toBe(
+      expectedPx
+    );
+  }
+}

@@ -56,7 +56,7 @@
   --color-border-default: var(--nx-color-black-a200);
   --color-border-default-alpha: var(--nx-color-stone-a200);
   --color-border-active: var(--nx-color-stone-400);
-  --color-border-disabled: var(--nx-color-stone-50);
+  --color-border-disabled: var(--nx-color-black-a200);
   --color-border-warning: var(--nx-color-orange-200);
   --color-border-warning-active: var(--nx-color-orange-400);
   --color-border-success: var(--nx-color-green-200);
@@ -273,7 +273,7 @@
   --nx-color-border-default: var(--nx-color-white-a300);
   --nx-color-border-default-alpha: var(--nx-color-stone-a300);
   --nx-color-border-active: var(--nx-color-stone-400);
-  --nx-color-border-disabled: var(--nx-color-stone-950);
+  --nx-color-border-disabled: var(--nx-color-white-a300);
   --nx-color-border-warning: var(--nx-color-orange-700);
   --nx-color-border-warning-active: var(--nx-color-orange-500);
   --nx-color-border-success: var(--nx-color-green-700);
