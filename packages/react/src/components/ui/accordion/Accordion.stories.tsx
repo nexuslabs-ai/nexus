@@ -272,6 +272,12 @@ export const Disabled: Story = {
     for (const trigger of triggers) {
       await expect(trigger).toBeDisabled();
     }
+
+    // Disabled state uses a semantic text token at full opacity (not a fade).
+    await expect(triggers[0]).toHaveClass(
+      'nx:disabled:text-disabled-foreground'
+    );
+    await expect(getComputedStyle(triggers[0]!).opacity).toBe('1');
   },
 };
 

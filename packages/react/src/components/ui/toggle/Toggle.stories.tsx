@@ -110,6 +110,11 @@ export const Disabled: Story = {
     const canvas = within(canvasElement);
     const toggle = canvas.getByRole('button', { name: 'Bold' });
     await expect(toggle).toBeDisabled();
+
+    // Disabled state uses a semantic text token at full opacity (not a fade).
+    await expect(toggle).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(getComputedStyle(toggle).opacity).toBe('1');
+
     // No click: a disabled toggle has pointer-events: none, which makes
     // userEvent.click throw. The disabled attribute is the sufficient signal.
     await expect(args.onPressedChange).not.toHaveBeenCalled();

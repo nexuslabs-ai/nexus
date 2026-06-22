@@ -42,6 +42,16 @@ export const Disabled: Story = {
       <Label htmlFor="terms">Accept terms</Label>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const label = canvas.getByText('Accept terms');
+
+    // Peer-disabled label uses a semantic text token at full opacity (not a fade).
+    await expect(label).toHaveClass(
+      'nx:peer-disabled:text-disabled-foreground'
+    );
+    await expect(getComputedStyle(label).opacity).toBe('1');
+  },
 };
 
 export const LongContent: Story = {

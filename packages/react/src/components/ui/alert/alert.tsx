@@ -333,7 +333,7 @@ function AlertClose({
         'nx:transition-colors nx:hover:bg-background-hover nx:hover:text-foreground',
         'nx:focus-visible:bg-background-hover nx:focus-visible:text-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-        'nx:disabled:pointer-events-none nx:disabled:opacity-50',
+        'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
         'nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}

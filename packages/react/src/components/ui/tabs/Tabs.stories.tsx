@@ -268,6 +268,18 @@ export const WithDisabledTab: Story = {
       </TabsContent>
     </Tabs>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const disabledTab = canvas.getByRole('tab', { name: 'Settings' });
+
+    await expect(disabledTab).toBeDisabled();
+
+    // Disabled state uses a semantic text token at full opacity (not a fade).
+    await expect(disabledTab).toHaveClass(
+      'nx:disabled:text-disabled-foreground'
+    );
+    await expect(getComputedStyle(disabledTab).opacity).toBe('1');
+  },
 };
 
 export const FullWidth: Story = {
