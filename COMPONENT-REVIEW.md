@@ -356,7 +356,7 @@ Numeric spacing notes: list `p-1` (55), sm size `px-2`/`py-1` (105). sm "dense p
 
 Resolved in PR #462: `Textarea` uses `nx:typography-body-default`.
 
-Numeric spacing note: `px-3` (38) stays numeric to preserve the fixed form-field geometry; `py-control-md` remains density-responsive. (`aria-invalid` error-state wiring correctly present, line 40.)
+Numeric spacing note: `px-3`/`py-2` (38) stays numeric to preserve the fixed form-field geometry. (`aria-invalid` error-state wiring correctly present, line 40.)
 
 ## toggle
 
