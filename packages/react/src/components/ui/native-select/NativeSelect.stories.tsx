@@ -68,7 +68,7 @@ export const Invalid: Story = {
   ),
 };
 
-// Disabled — the select and its chevron dim together (wrapper has-[select:disabled]).
+// Disabled — semantic disabled tokens on the select and chevron.
 export const Disabled: Story = {
   render: () => (
     <NativeSelect aria-label="Plan" defaultValue="free" disabled>
@@ -78,7 +78,18 @@ export const Disabled: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('combobox', { name: 'Plan' })).toBeDisabled();
+    const select = canvas.getByRole('combobox', { name: 'Plan' });
+    await expect(select).toBeDisabled();
+    await expect(select).toHaveClass('nx:disabled:border-border-disabled');
+    await expect(select).toHaveClass('nx:disabled:bg-disabled');
+    await expect(select).toHaveClass('nx:disabled:text-disabled-foreground');
+
+    const icon = canvasElement.querySelector(
+      '[data-slot="native-select-icon"]'
+    );
+    await expect(icon).toHaveClass(
+      'nx:group-has-[select:disabled]/native-select:text-disabled-foreground'
+    );
   },
 };
 

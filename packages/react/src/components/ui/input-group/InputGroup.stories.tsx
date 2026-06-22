@@ -372,6 +372,7 @@ export const VisualStateTokens: Story = {
         <InputGroupAddon data-testid="ig-disabled-addon">
           <IconSearch aria-hidden />
         </InputGroupAddon>
+        <InputGroupText data-testid="ig-disabled-text">USD</InputGroupText>
         <InputGroupInput
           aria-label="Disabled"
           placeholder="disabled"
@@ -385,6 +386,7 @@ export const VisualStateTokens: Story = {
     const hover = canvas.getByTestId('ig-hover');
     const disabled = canvas.getByTestId('ig-disabled');
     const addon = canvas.getByTestId('ig-disabled-addon');
+    const text = canvas.getByTestId('ig-disabled-text');
 
     // Token-name sentinel: synthetic userEvent can't toggle CSS :hover.
     await expect(hover).toHaveClass(
@@ -399,6 +401,9 @@ export const VisualStateTokens: Story = {
     );
     await expect(window.getComputedStyle(addon).opacity).toBe('1');
     await expect(addon).toHaveClass(
+      'nx:group-data-[disabled=true]/input-group:text-disabled-foreground'
+    );
+    await expect(text).toHaveClass(
       'nx:group-data-[disabled=true]/input-group:text-disabled-foreground'
     );
   },

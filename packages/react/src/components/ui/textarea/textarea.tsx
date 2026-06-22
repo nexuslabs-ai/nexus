@@ -38,7 +38,7 @@ function Textarea({ className, ...props }: TextareaProps) {
         'nx:px-3 nx:py-2 nx:typography-body-default',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
-        'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
+        'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
         className
       )}
       {...props}

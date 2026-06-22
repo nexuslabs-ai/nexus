@@ -69,6 +69,13 @@ export const Disabled: Story = {
     const textarea = canvas.getByRole('textbox');
 
     await expect(textarea).toBeDisabled();
+    await expect(textarea).toHaveClass('nx:disabled:border-border-disabled');
+    await expect(textarea).toHaveClass('nx:disabled:bg-disabled');
+    await expect(textarea).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(textarea).toHaveClass(
+      'nx:disabled:placeholder:text-disabled-foreground'
+    );
+    await expect(window.getComputedStyle(textarea).opacity).toBe('1');
   },
 };
 

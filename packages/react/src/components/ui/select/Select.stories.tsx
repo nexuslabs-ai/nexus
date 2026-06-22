@@ -372,6 +372,14 @@ export const DisabledInteraction: Story = {
     // Trigger should be disabled
     const trigger = canvas.getByRole('combobox');
     await expect(trigger).toBeDisabled();
+    await expect(trigger).toHaveClass('nx:disabled:border-border-disabled');
+    await expect(trigger).toHaveClass('nx:disabled:bg-disabled');
+    await expect(trigger).toHaveClass('nx:disabled:text-disabled-foreground');
+
+    const icon = trigger.querySelector('svg');
+    await expect(icon).toHaveClass(
+      'nx:group-disabled/select-trigger:text-disabled-foreground'
+    );
 
     // Try to click - should not open
     await userEvent.click(trigger);
