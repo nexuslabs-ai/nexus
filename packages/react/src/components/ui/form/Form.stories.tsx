@@ -364,7 +364,7 @@ export const FieldVsFormErgonomics: Story = {
     docs: {
       description: {
         story:
-          'Field is the low-level, library-agnostic field anatomy. Form is the React Hook Form-specific binding layer. PR 1 keeps this as story/docs guidance; read-only source semantics, warning source semantics, rich Select slots, and Combobox/MultiSelect boundaries stay in later roadmap PRs.',
+          'Field is the low-level, library-agnostic field anatomy. Form is the React Hook Form-specific binding layer. This story is documentation guidance only; read-only source semantics, warning source semantics, rich Select slots, and Combobox/MultiSelect boundaries remain on the roadmap.',
       },
     },
   },

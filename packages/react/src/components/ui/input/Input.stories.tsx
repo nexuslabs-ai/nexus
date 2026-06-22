@@ -203,7 +203,7 @@ export const WarningVsError: Story = {
     docs: {
       description: {
         story:
-          'Warning is advisory guidance and must not set `aria-invalid`. Error means the current value is invalid, so it uses `aria-invalid` and an error message relationship. First-class warning source semantics are intentionally left for the warning semantics follow-up PR.',
+          'Warning is advisory guidance and must not set `aria-invalid`. Error means the current value is invalid, so it uses `aria-invalid` and an error message relationship. First-class warning source semantics are intentionally left for a future iteration.',
       },
     },
   },

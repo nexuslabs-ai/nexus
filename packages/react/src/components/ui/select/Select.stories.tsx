@@ -106,7 +106,7 @@ export const CapabilityLadder: Story = {
     docs: {
       description: {
         story:
-          'Capability ladder: use NativeSelect for native form submission and OS pickers with simple text options; use Select for a styled trigger/listbox with groups, separators, and disabled items. Future Combobox and MultiSelect remain roadmap-only boundaries in PR 5 and are not implemented here.',
+          'Capability ladder: use NativeSelect for native form submission and OS pickers with simple text options; use Select for a styled trigger/listbox with groups, separators, and disabled items. Future Combobox and MultiSelect remain roadmap-only boundaries and are not implemented here.',
       },
     },
   },
