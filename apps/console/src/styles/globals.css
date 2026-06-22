@@ -10,9 +10,6 @@
  * Color theme switching loads different primitive CSS files; spacing mode
  * switching uses [data-style="X"] on <html> (no file load).
  */
-/* Google Fonts - auto-generated from typography tokens */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
 @import 'tailwindcss' prefix(nx);
 @import './color.css';
 @import './focus-default.css';

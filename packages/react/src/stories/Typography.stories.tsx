@@ -136,6 +136,11 @@ const WEIGHT_SAMPLE = 'The quick brown fox';
 const LINE_HEIGHT_SAMPLE =
   'Typography is the art and technique of arranging type to make written language legible, readable, and appealing when displayed.';
 const FAMILY_SAMPLE = 'The quick brown fox jumps over the lazy dog. 0123456789';
+const FAMILY_LABEL: Record<FamilyKey, string> = {
+  'font-sans': 'System UI',
+  'font-serif': 'Georgia',
+  'font-mono': 'System mono',
+};
 
 function formatDimension(d: Dimension) {
   return `${d.value}${d.unit}`;
@@ -321,8 +326,8 @@ export const FontFamilies: Story = {
           Font Families
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
-          Sans, serif, and mono font families — Inter, Georgia, and JetBrains
-          Mono.
+          Sans, serif, and mono font families — the OS system stack, Georgia,
+          and the system monospace stack. No web fonts are loaded.
         </p>
       </div>
       <section className="nx:flex nx:flex-col">
@@ -332,7 +337,7 @@ export const FontFamilies: Story = {
             <TokenRow
               key={fk}
               label={fk}
-              value={family}
+              value={FAMILY_LABEL[fk]}
               labelWidth="nx:w-24"
               valueWidth="nx:w-32"
               preview={
@@ -340,7 +345,7 @@ export const FontFamilies: Story = {
                   className="nx:text-foreground"
                   style={{
                     fontSize: 18,
-                    fontFamily: `'${family}', system-ui, sans-serif`,
+                    fontFamily: family,
                   }}
                 >
                   {FAMILY_SAMPLE}

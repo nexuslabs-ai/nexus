@@ -85,7 +85,7 @@ export default function Home() {
           <span className="nx:size-1.5 nx:rounded-full nx:bg-primary-background" />
           AI-native design system
         </span>
-        <h1 className="nx:text-[clamp(2.5rem,5vw,3.75rem)] nx:font-light nx:leading-[1.05] nx:tracking-[-0.01em] nx:mt-6 nx:text-balance">
+        <h1 className="nx:text-[clamp(2.5rem,5vw,3.75rem)] nx:font-normal nx:leading-[1.05] nx:tracking-[-0.01em] nx:mt-6 nx:text-balance">
           Design once. Ship every brand.
         </h1>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-5 nx:max-w-[36rem] nx:mx-auto nx:text-pretty">

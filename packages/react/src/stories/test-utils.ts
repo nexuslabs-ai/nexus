@@ -49,8 +49,10 @@ type HeightMeasurementOptions = {
  * designer retunes of any single mode do not break the test — only a broken
  * cascade does. Consumers in different components can pick different pairs
  * (`nova`+`sera`, `nova`+`maia`, …) to spread coverage across the 7 modes.
- * Awaits `document.fonts.ready` so Inter fallback metrics cannot collapse a
- * one-pixel cascade difference into equality. The optional `selector` is
+ * Awaits `document.fonts.ready` so a loading web-font's fallback metrics
+ * cannot collapse a one-pixel cascade difference into equality — a no-op under
+ * the system-font stack, kept so a brand that re-aims to a web font stays
+ * covered. The optional `selector` is
  * forwarded to `getControlHeight` so non-control elements (e.g. a Card root
  * `<div data-slot="card">`) can be measured.
  */
@@ -68,8 +70,10 @@ export async function expectModeCascadeWorks(
 
 /**
  * Contract pin — asserts that a control rendered under a specific `data-style`
- * scope hits an exact pixel height. Awaits `document.fonts.ready` first; Inter
- * fallback metrics would skew the measurement. The optional `selector` is
+ * scope hits an exact pixel height. Awaits `document.fonts.ready` first; a
+ * loading web-font's fallback metrics would skew the measurement (a no-op
+ * under the system-font stack, kept for brands that re-aim to a web font). The
+ * optional `selector` is
  * forwarded to `getControlHeight` so non-control elements (e.g. a Card root
  * `<div data-slot="card">`) can be measured.
  */
