@@ -55,7 +55,7 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        'nx:mb-3 nx:data-[variant=legend]:text-base nx:data-[variant=legend]:font-medium nx:data-[variant=label]:typography-label-default',
+        'nx:mb-3 nx:data-[variant=legend]:typography-heading-xsmall nx:data-[variant=label]:typography-label-default',
         className
       )}
       {...props}
