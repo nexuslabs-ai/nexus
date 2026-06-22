@@ -177,6 +177,26 @@ export const Default: Story = {
       selected={new Date(2025, 0, 15)}
     />
   ),
+  play: async ({ canvasElement }) => {
+    const currentMonthDay = canvasElement.querySelector<HTMLButtonElement>(
+      'button[data-day="2025-01-01"]'
+    );
+    const outsideMonthDay = canvasElement.querySelector<HTMLButtonElement>(
+      'button[data-day="2024-12-29"]'
+    );
+    const outsideMonthCell = outsideMonthDay?.closest('.rdp-day');
+
+    await expect(currentMonthDay).toBeInTheDocument();
+    await expect(outsideMonthDay).toBeInTheDocument();
+    await expect(outsideMonthDay).toHaveAttribute('data-outside', 'true');
+
+    const currentColor = getComputedStyle(currentMonthDay!).color;
+    const outsideColor = getComputedStyle(outsideMonthDay!).color;
+    const outsideCellColor = getComputedStyle(outsideMonthCell!).color;
+
+    expect(outsideColor).not.toBe(currentColor);
+    expect(outsideColor).toBe(outsideCellColor);
+  },
 };
 
 // Today uses the Figma red inner-circle treatment.
