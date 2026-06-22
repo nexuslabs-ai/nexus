@@ -188,6 +188,7 @@ export const Default: Story = {
 
     await expect(currentMonthDay).toBeInTheDocument();
     await expect(outsideMonthDay).toBeInTheDocument();
+    await expect(outsideMonthCell).toBeInTheDocument();
     await expect(outsideMonthDay).toHaveAttribute('data-outside', 'true');
 
     const currentColor = getComputedStyle(currentMonthDay!).color;

@@ -336,8 +336,7 @@ function DatePickerDayButton({
       className={cn(
         'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:text-sm nx:leading-none nx:font-normal',
         'nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
-        isOutside &&
-          'nx:text-muted-foreground-subtle nx:hover:text-muted-foreground-subtle',
+        isOutside && 'nx:text-muted-foreground-subtle',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',
         // Today → Figma's inner error circle while keeping the button target at cell size.
