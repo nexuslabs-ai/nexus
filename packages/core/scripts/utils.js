@@ -829,7 +829,7 @@ export function collectSpacingTokens(semanticDir) {
  * cryptic "unhandled path shape" errors at the emit step.
  */
 const SPACING_NUMERIC_ROOTS = new Set(['spacing']);
-const SPACING_ROLE_ROOTS = new Set(['control', 'container', 'layout']);
+const SPACING_ROLE_ROOTS = new Set(['container', 'layout']);
 
 /**
  * Split a per-mode token list into `{ numeric, role }` halves. Numeric tokens
@@ -963,9 +963,7 @@ const FAMILY_TO_UTILITY = {
  * Derive a `{utilityName, properties}` for a role-token path.
  *
  * Naming convention — `<property-shorthand>-<role>[-<size>]`:
- *   `control.padding-x.sm`    → utility `px-control-sm`,       padding-inline
- *   `control.padding-y.lg`    → utility `py-control-lg`,       padding-block
- *   `control.gap.md`          → utility `gap-control-md`,      gap
+ *   `<role>.<family>.<size>`  → utility `<prefix>-<role>-<size>` (3-segment form)
  *   `container.p`             → utility `p-container`,         padding
  *   `container.gap`           → utility `gap-container`,       gap
  *   `layout.section-gap`      → utility `gap-layout-section`,  gap
@@ -984,7 +982,7 @@ const FAMILY_TO_UTILITY = {
 function deriveRoleUtility(tokenPath) {
   // Path forms we handle:
   //   [role, suffix]             — e.g. ['container', 'p'], ['container', 'gap']
-  //   [role, family, size]       — e.g. ['control', 'padding-x', 'md']
+  //   [role, family, size]       — 3-segment form (e.g. ['<role>', 'padding-x', 'md'])
   //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
   if (tokenPath.length < 2 || tokenPath.length > 3) {
     throw new Error(
