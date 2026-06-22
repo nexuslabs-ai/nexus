@@ -195,8 +195,10 @@ export const InvalidStates: Story = {
   render: function InvalidStatesStory() {
     const uncheckedId = React.useId();
     const checkedId = React.useId();
+    const indeterminateId = React.useId();
     const uncheckedErrorId = `${uncheckedId}-error`;
     const checkedErrorId = `${checkedId}-error`;
+    const indeterminateErrorId = `${indeterminateId}-error`;
 
     return (
       <div className="nx:flex nx:flex-col nx:gap-4">
@@ -234,6 +236,26 @@ export const InvalidStates: Story = {
             Resolve the related error before continuing.
           </p>
         </div>
+
+        <div className="nx:grid nx:gap-2">
+          <div className="nx:flex nx:items-center nx:gap-2">
+            <Checkbox
+              id={indeterminateId}
+              checked="indeterminate"
+              aria-invalid
+              aria-describedby={indeterminateErrorId}
+            />
+            <Label htmlFor={indeterminateId}>
+              Indeterminate invalid option
+            </Label>
+          </div>
+          <p
+            id={indeterminateErrorId}
+            className="nx:text-sm nx:text-error-subtle-foreground"
+          >
+            Review the partially selected options.
+          </p>
+        </div>
       </div>
     );
   },
@@ -244,6 +266,9 @@ export const InvalidStates: Story = {
     });
     const checked = canvas.getByRole('checkbox', {
       name: 'Checked invalid option',
+    });
+    const indeterminate = canvas.getByRole('checkbox', {
+      name: 'Indeterminate invalid option',
     });
 
     await expect(unchecked).not.toBeChecked();
@@ -258,11 +283,21 @@ export const InvalidStates: Story = {
       'Resolve the related error before continuing.'
     );
 
+    await expect(indeterminate).toHaveAttribute('data-state', 'indeterminate');
+    await expect(indeterminate).toHaveAttribute('aria-invalid', 'true');
+    await expect(indeterminate).toHaveAccessibleDescription(
+      'Review the partially selected options.'
+    );
+
     // The invalid pressed state can't be triggered deterministically in a play
     // fn, so assert the press token resolves to the -active shade (not the rest
-    // shade) via the class contract.
+    // shade) via the class contract — for both checked and indeterminate, since
+    // the source swaps both.
     await expect(checked).toHaveClass(
       'nx:enabled:aria-invalid:data-[state=checked]:active:bg-error-background-active'
+    );
+    await expect(indeterminate).toHaveClass(
+      'nx:enabled:aria-invalid:data-[state=indeterminate]:active:bg-error-background-active'
     );
   },
 };

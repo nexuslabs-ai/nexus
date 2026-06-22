@@ -44,6 +44,8 @@ const DatePickerDayContentContext =
 const defaultClassNames = getDefaultClassNames();
 
 // Prop-independent slot class names — merged once at module load, not per render.
+// `satisfies` keeps the slot-key typo-checking the inline `classNames` literal
+// had: a misspelled key would otherwise spread in silently and ship its default.
 // The four prop-dependent slots (button_previous/next, caption_label, day) stay
 // inline in the component because they read buttonVariant / captionLayout /
 // showWeekNumber.
@@ -115,7 +117,7 @@ const staticDayPickerClassNames = {
     defaultClassNames.disabled
   ),
   hidden: cn('nx:invisible', defaultClassNames.hidden),
-};
+} satisfies NonNullable<React.ComponentProps<typeof DayPicker>['classNames']>;
 
 /**
  * DatePickerProps
