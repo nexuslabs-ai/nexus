@@ -7,8 +7,8 @@ import {
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
 import {
+  expectHeightFixedAcrossModes,
   expectHeightPinned,
-  expectModeCascadeWorks,
 } from '../../../stories/test-utils';
 
 import {
@@ -598,7 +598,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` uses `py-control-md gap-control-md` and `typography-body-default`, so its vertical rhythm and body text follow mode. `px-3` stays numeric because `px-control-*` would over-widen form-field insets across looser modes. `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
+          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` uses numeric `py-2 gap-2 px-3` with `typography-body-default`, matching the fixed form-field rhythm instead of role spacing utilities. `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
       },
     },
   },
@@ -624,45 +624,44 @@ export const AllModes: Story = {
   ),
 };
 
-export const ModesProduceDifferentHeights: Story = {
+export const SelectTriggerIsDensityStable: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Cascade sentinel on `SelectTrigger`. Uses the `maia` + `sera` pair to spread coverage away from the Button/Input nova+sera and Tabs nova+maia pairs — between them the suite covers `control-md-y` at every distinct value (nova 6 / vega-tier 8 / maia 10 / sera 12). Trigger is not portaled so dimensional measurement on the wrapper works directly.',
+          'Density-stability sentinel for `SelectTrigger`. It stays on numeric `py-2 gap-2 px-3` rather than role spacing utilities, so every spacing mode resolves to the same canonical 38px height. Trigger is not portaled so dimensional measurement on the wrapper works directly.',
       },
     },
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="maia" data-testid="select-mode-host-maia">
-        <Select>
-          <SelectTrigger aria-label="maia select" className="nx:w-[160px]">
-            <SelectValue placeholder="Pick" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a">A</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div data-style="sera" data-testid="select-mode-host-sera">
-        <Select>
-          <SelectTrigger aria-label="sera select" className="nx:w-[160px]">
-            <SelectValue placeholder="Pick" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a">A</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {SPACING_MODES.map((mode) => (
+        <div
+          key={mode}
+          data-style={mode}
+          data-testid={`select-stable-host-${mode}`}
+        >
+          <Select>
+            <SelectTrigger
+              aria-label={`${mode} select`}
+              className="nx:w-[160px]"
+            >
+              <SelectValue placeholder="Pick" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="a">A</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
+    await expectHeightFixedAcrossModes(
       within(canvasElement),
-      'select-mode-host-maia',
-      'select-mode-host-sera'
+      SPACING_MODES.map((mode) => `select-stable-host-${mode}`),
+      38
     );
   },
 };
@@ -673,7 +672,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: in vega mode, the `SelectTrigger` renders at exactly 38px (= `typography-body-default` 20px line-height + `py-control-md` 8px × 2 + border 1px × 2 — same intrinsic shape as Input default). If a designer retunes `--control-padding-y-md`, the body type ramp, or the border-width token, this test fails.',
+          'Pin on the migration outcome: in vega mode, the `SelectTrigger` renders at exactly 38px (= `typography-body-default` 20px line-height + `py-2` 8px × 2 + border 1px × 2 — same intrinsic shape as Input default). If a designer retunes `--nx-spacing-2`, the body type ramp, or the border-width token, this test fails.',
       },
     },
   },

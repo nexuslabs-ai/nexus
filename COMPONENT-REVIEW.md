@@ -242,9 +242,9 @@ Numeric spacing notes: root `gap-1`/`p-1`, bar trigger `px-2`/`py-1`, sub-trigge
 
 ## native-select
 
-Resolved in PR #462: default uses `nx:typography-body-default`; `sm` uses `nx:typography-body-small`.
+Resolved in PR #462: default uses `nx:typography-body-default`; `sm` uses `nx:typography-body-small`. Vertical padding also stays numeric (`py-2` / `py-1.5`) to match the Input/InputGroup form-field rhythm.
 
-Numeric spacing notes: `px-3` (default), `px-2.5` (sm), `pr-9` (chevron clearance). Horizontal padding stays numeric to preserve the fixed form-field geometry; `px-control-*` would over-widen field insets across looser modes.
+Numeric spacing notes: `px-3`/`py-2` (default), `px-2.5`/`py-1.5` (sm), `pr-9` (chevron clearance). Padding stays numeric to preserve the fixed form-field geometry; role spacing utilities would over-widen / over-tall field insets across looser modes.
 
 ## navigation-menu
 
@@ -288,9 +288,9 @@ Handle hit area below floor: `::after` drag target is `after:w-1` (4px) / `after
 
 Resolved in PR #462: `SelectTrigger` and `SelectItem` use `nx:typography-body-default`; `SelectLabel` uses `nx:typography-label-default`. The label intentionally moves from 600 to 500 weight because no 14px/600 composite exists.
 
-Mixed padding convention resolved by documentation: vertical uses `py-control-*` role utilities while horizontal padding stays numeric because `px-control-*` would over-widen form-field insets across looser modes.
+Role-spacing follow-up resolved: trigger, label, and item spacing now use numeric utilities, matching the Input/InputGroup form-field rhythm.
 
-Numeric spacing notes: trigger `px-3` (70), scroll-up `py-1` (101), scroll-down `py-1` (124), viewport `p-1` (185), label `px-2` (225).
+Numeric spacing notes: trigger `gap-2`/`px-3`/`py-2` (68/70), scroll-up `py-1` (101), scroll-down `py-1` (124), viewport `p-1` (185), label `px-2`/`py-1.5` (225), item `py-1.5` (258).
 
 ## separator
 

@@ -65,9 +65,9 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        'nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-control-md',
+        'nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-2',
         'nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:transition-colors nx:enabled:hover:bg-background-hover',
-        'nx:px-3 nx:py-control-md nx:typography-body-default',
+        'nx:px-3 nx:py-2 nx:typography-body-default',
         'nx:whitespace-nowrap',
         'nx:placeholder:text-muted-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
@@ -221,10 +221,7 @@ function SelectLabel({ className, ...props }: SelectLabelProps) {
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn(
-        'nx:px-2 nx:py-control-sm nx:typography-label-default',
-        className
-      )}
+      className={cn('nx:px-2 nx:py-1.5 nx:typography-label-default', className)}
       {...props}
     />
   );
@@ -255,7 +252,7 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
       data-slot="select-item"
       className={cn(
         'nx:relative nx:flex nx:w-full nx:cursor-default nx:select-none nx:items-center',
-        'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
+        'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
         className
