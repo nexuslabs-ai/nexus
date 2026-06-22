@@ -231,6 +231,12 @@ export const WithDisabledItems: Story = {
       await expect(copyItem).toHaveAttribute('data-disabled');
       await expect(copyItem).toHaveAttribute('aria-disabled', 'true');
 
+      // Disabled items use a semantic text token at full opacity (not a fade).
+      await expect(cutItem).toHaveClass(
+        'nx:data-disabled:text-disabled-foreground'
+      );
+      await expect(getComputedStyle(cutItem).opacity).toBe('1');
+
       for (
         let step = 0;
         step < 5 && !pasteItem.hasAttribute('data-highlighted');

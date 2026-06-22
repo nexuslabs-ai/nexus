@@ -200,7 +200,7 @@ function DropdownMenuContent({
 }
 
 const dropdownMenuItemVariants = cva(
-  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:typography-body-small nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:typography-body-small nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -298,7 +298,7 @@ function DropdownMenuCheckboxItem({
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-small nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
-        'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
+        'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
         className
       )}
       checked={checked}
@@ -349,7 +349,7 @@ function DropdownMenuRadioItem({
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-small nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
-        'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
+        'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
         className
       )}
       {...props}

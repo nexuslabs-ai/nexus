@@ -153,7 +153,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
         className={cn(
           'nx:flex nx:w-full nx:bg-transparent nx:py-2 nx:typography-body-default nx:outline-none',
           'nx:placeholder:text-muted-foreground',
-          'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
+          'nx:disabled:cursor-not-allowed nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
           className
         )}
         {...props}
@@ -350,7 +350,7 @@ function CommandItem({ className, ...props }: CommandItemProps) {
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:rounded-sm nx:typography-body-default nx:outline-none',
         'nx:gap-3 nx:px-3 nx:py-2.5',
         'nx:data-[selected=true]:bg-popover-hover nx:data-[selected=true]:text-popover-foreground',
-        'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:opacity-50',
+        'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:text-disabled-foreground',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
         className
       )}
