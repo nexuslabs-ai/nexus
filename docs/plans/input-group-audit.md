@@ -72,8 +72,8 @@ comes from the wrapper's `[&>input]:h-full` (inline) or Input's own `h-*`
 No Button `min-w-*`; no new InputGroup props / Geist-style API (height is
 `:has()`-reactive); **`InputGroupTextarea` unchanged** — the height/fill rules
 are inline+input-scoped, so the textarea (block, auto-height, no `data-size`)
-is untouched (its base-`Textarea` `opacity-50` is a separate audit — disclosed
-cross-control inconsistency); no manual edits to generated base-variant stories.
+is untouched (base-`Textarea`'s disabled `opacity-50` was replaced with the
+semantic disabled-token set in this PR); no manual edits to generated base-variant stories.
 
 ## Retained from the earlier audit pass
 

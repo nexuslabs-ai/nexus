@@ -257,7 +257,6 @@ function FormDescription({ className, ...props }: FormDescriptionProps) {
       {...props}
       data-slot="form-description"
       id={formDescriptionId}
-      // Keep className last so consumer typography overrides win by source order.
       className={cn(
         'nx:typography-body-small nx:text-muted-foreground',
         className
@@ -295,7 +294,6 @@ function FormMessage({
       aria-atomic="true"
       data-slot="form-message"
       id={formMessageId}
-      // Keep className last so consumer typography overrides win by source order.
       className={cn(
         'nx:typography-body-small nx:text-error-subtle-foreground',
         className
