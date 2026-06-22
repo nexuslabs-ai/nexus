@@ -72,9 +72,9 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:aria-invalid:data-[state=checked]:border-border-error nx:aria-invalid:data-[state=checked]:bg-error-background nx:aria-invalid:data-[state=checked]:text-error-foreground',
         'nx:aria-invalid:data-[state=indeterminate]:border-border-error nx:aria-invalid:data-[state=indeterminate]:bg-error-background nx:aria-invalid:data-[state=indeterminate]:text-error-foreground',
         'nx:enabled:aria-invalid:data-[state=checked]:hover:border-border-error nx:enabled:aria-invalid:data-[state=checked]:hover:bg-error-background-hover',
-        'nx:enabled:aria-invalid:data-[state=checked]:active:border-border-error nx:enabled:aria-invalid:data-[state=checked]:active:bg-error-background',
+        'nx:enabled:aria-invalid:data-[state=checked]:active:border-border-error nx:enabled:aria-invalid:data-[state=checked]:active:bg-error-background-active',
         'nx:enabled:aria-invalid:data-[state=indeterminate]:hover:border-border-error nx:enabled:aria-invalid:data-[state=indeterminate]:hover:bg-error-background-hover',
-        'nx:enabled:aria-invalid:data-[state=indeterminate]:active:border-border-error nx:enabled:aria-invalid:data-[state=indeterminate]:active:bg-error-background',
+        'nx:enabled:aria-invalid:data-[state=indeterminate]:active:border-border-error nx:enabled:aria-invalid:data-[state=indeterminate]:active:bg-error-background-active',
         className
       )}
       {...props}

@@ -257,6 +257,13 @@ export const InvalidStates: Story = {
     await expect(checked).toHaveAccessibleDescription(
       'Resolve the related error before continuing.'
     );
+
+    // The invalid pressed state can't be triggered deterministically in a play
+    // fn, so assert the press token resolves to the -active shade (not the rest
+    // shade) via the class contract.
+    await expect(checked).toHaveClass(
+      'nx:enabled:aria-invalid:data-[state=checked]:active:bg-error-background-active'
+    );
   },
 };
 

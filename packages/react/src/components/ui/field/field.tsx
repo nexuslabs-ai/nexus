@@ -89,9 +89,9 @@ const fieldVariants = cva(
       orientation: {
         vertical: 'nx:flex-col nx:*:w-full nx:[&>.sr-only]:w-auto',
         horizontal:
-          'nx:flex-row nx:items-center nx:*:data-[slot=field-label]:flex-auto nx:has-[>[data-slot=field-content]]:items-start nx:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+          'nx:flex-row nx:items-center nx:*:data-[slot=field-label]:flex-auto nx:has-[>[data-slot=field-content]]:items-start nx:has-[>[data-slot=field-content]]:[&>[role=checkbox]]:mt-px nx:has-[>[data-slot=field-content]]:[&>[role=radio]]:mt-px',
         responsive:
-          'nx:flex-col nx:@md/field-group:flex-row nx:@md/field-group:items-center nx:*:w-full nx:@md/field-group:*:w-auto nx:[&>.sr-only]:w-auto nx:@md/field-group:*:data-[slot=field-label]:flex-auto nx:@md/field-group:has-[>[data-slot=field-content]]:items-start nx:@md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+          'nx:flex-col nx:@md/field-group:flex-row nx:@md/field-group:items-center nx:*:w-full nx:@md/field-group:*:w-auto nx:[&>.sr-only]:w-auto nx:@md/field-group:*:data-[slot=field-label]:flex-auto nx:@md/field-group:has-[>[data-slot=field-content]]:items-start nx:@md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox]]:mt-px nx:@md/field-group:has-[>[data-slot=field-content]]:[&>[role=radio]]:mt-px',
       },
     },
     defaultVariants: {

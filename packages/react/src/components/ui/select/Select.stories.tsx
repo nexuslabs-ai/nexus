@@ -419,6 +419,10 @@ export const OpenCloseInteraction: Story = {
     await expect(trigger).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
 
+    // With no value selected, Radix marks the trigger data-placeholder — the
+    // hook the muted-placeholder style targets (a button has no ::placeholder).
+    await expect(trigger).toHaveAttribute('data-placeholder');
+
     // Open the select
     await userEvent.click(trigger);
 
