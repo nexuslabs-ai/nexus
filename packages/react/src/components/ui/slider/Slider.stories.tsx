@@ -90,12 +90,22 @@ export const Disabled: Story = {
   ),
   play: async ({ canvasElement }) => {
     const slider = canvasElement.querySelector('[data-slot="slider"]');
-    // Radix marks the disabled state with data-disabled on the root; the thumb
-    // is dimmed via the root's opacity, and interaction is blocked by Radix.
+    // Radix marks disabled with data-disabled on the root; the track/range
+    // recolor to semantic disabled tokens at full opacity (not a fade), and
+    // Radix blocks interaction.
     await expect(slider).toHaveAttribute('data-disabled');
     await expect(
       canvasElement.querySelector('[data-slot="slider"]')
     ).toBeInTheDocument();
+
+    const track = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="slider-track"]'
+    )!;
+    await expect(track).toHaveClass('nx:data-disabled:bg-disabled');
+    const root = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="slider"]'
+    )!;
+    await expect(getComputedStyle(root).opacity).toBe('1');
   },
 };
 

@@ -52,18 +52,18 @@ function Slider({
       min={min}
       max={max}
       className={cn(
-        'nx:relative nx:flex nx:w-full nx:touch-none nx:items-center nx:select-none nx:data-disabled:opacity-50 nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:min-h-44 nx:data-[orientation=vertical]:w-auto nx:data-[orientation=vertical]:flex-col',
+        'nx:relative nx:flex nx:w-full nx:touch-none nx:items-center nx:select-none nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:min-h-44 nx:data-[orientation=vertical]:w-auto nx:data-[orientation=vertical]:flex-col',
         className
       )}
       {...props}
     >
       <SliderPrimitive.Track
         data-slot="slider-track"
-        className="nx:relative nx:grow nx:overflow-hidden nx:rounded-full nx:bg-control-background nx:data-[orientation=horizontal]:h-1.5 nx:data-[orientation=horizontal]:w-full nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:w-1.5"
+        className="nx:relative nx:grow nx:overflow-hidden nx:rounded-full nx:bg-control-background nx:data-disabled:bg-disabled nx:data-[orientation=horizontal]:h-1.5 nx:data-[orientation=horizontal]:w-full nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:w-1.5"
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
-          className="nx:absolute nx:bg-primary-background nx:data-[orientation=horizontal]:h-full nx:data-[orientation=vertical]:w-full"
+          className="nx:absolute nx:bg-primary-background nx:data-disabled:bg-primary-disabled nx:data-[orientation=horizontal]:h-full nx:data-[orientation=vertical]:w-full"
         />
       </SliderPrimitive.Track>
       {Array.from({ length: values.length }, (_, index) => (
