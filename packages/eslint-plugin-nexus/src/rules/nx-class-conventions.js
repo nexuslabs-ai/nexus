@@ -5,10 +5,12 @@
 // `pnpm lint` and the pre-commit hook for every contributor — not only on
 // in-session Claude edits.
 
-// The typography composites emitted by packages/tailwind/typography-utilities.css.
-// Any other `nx:…typography-*` utility is dead — it renders nothing (e.g. the
-// `label-large` / `body-xsmall` tiers removed by the #459 typography trim).
-const LIVE_TYPOGRAPHY = [
+// The 11 live typography composites emitted as `@utility typography-*` by
+// packages/tailwind/typography-utilities.css; any other `nx:…typography-*` is
+// dead — it renders nothing (e.g. the `label-large` / `body-xsmall` tiers dropped
+// by the #459 trim). A drift guard in the rule's test fails if this list and the
+// emitted set diverge, so it can't silently rot.
+export const LIVE_TYPOGRAPHY = [
   'body-default',
   'body-small',
   'code-block',
