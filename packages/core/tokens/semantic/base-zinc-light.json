@@ -135,7 +135,7 @@
       "$type": "color"
     },
     "disabled": {
-      "$value": "{zinc.50}",
+      "$value": "{black.a200}",
       "$type": "color"
     },
     "warning": {

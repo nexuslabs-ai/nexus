@@ -200,7 +200,7 @@ function InputGroupText({ className, ...props }: InputGroupTextProps) {
     <span
       data-slot="input-group-text"
       className={cn(
-        'nx:flex nx:items-center nx:gap-2 nx:typography-body-default nx:text-muted-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+        'nx:flex nx:items-center nx:gap-2 nx:typography-body-default nx:text-muted-foreground nx:group-data-[disabled=true]/input-group:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
         className
       )}
       {...props}

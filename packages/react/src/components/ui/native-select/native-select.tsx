@@ -60,18 +60,22 @@ function NativeSelect({
   return (
     <div
       data-slot="native-select-wrapper"
-      className="nx:group/native-select nx:relative nx:w-fit nx:has-[select:disabled]:opacity-50"
+      className="nx:group/native-select nx:relative nx:w-fit"
     >
       <select
         data-slot="native-select"
         data-size={size}
-        className={cn(nativeSelectVariants({ size }), className)}
+        className={cn(
+          nativeSelectVariants({ size }),
+          'nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
+          className
+        )}
         {...props}
       />
       <IconChevronDown
         aria-hidden="true"
         data-slot="native-select-icon"
-        className="nx:pointer-events-none nx:absolute nx:top-1/2 nx:right-3.5 nx:size-4 nx:-translate-y-1/2 nx:text-muted-foreground nx:opacity-50 nx:select-none"
+        className="nx:pointer-events-none nx:absolute nx:top-1/2 nx:right-3.5 nx:size-4 nx:-translate-y-1/2 nx:text-muted-foreground nx:select-none nx:group-has-[select:disabled]/native-select:text-disabled-foreground"
       />
     </div>
   );
