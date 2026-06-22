@@ -289,7 +289,7 @@ export const MixedChildren: Story = {
     const selectTrigger = canvas.getByTestId('button-group-select-trigger');
 
     await expect(text).toHaveAttribute('data-size', 'lg');
-    await expect(input).not.toHaveAttribute('data-size');
+    await expect(input).toHaveAttribute('data-size', 'default');
     await expect(selectTrigger).not.toHaveAttribute('data-size');
     await expect(
       canvas.getByTestId('button-group-mixed-button')

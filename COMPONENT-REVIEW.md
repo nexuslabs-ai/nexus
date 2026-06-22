@@ -186,7 +186,7 @@ Numeric spacing notes: `gap-6`/`p-6` (root), `gap-2` (header), `gap-4` (content)
 
 ## field
 
-Typography (raw): `text-sm`/`text-base` (legend, title, description, error, separator) + `font-medium`/`font-normal` → composites.
+Unresolved: raw typography remains in `field.tsx`; the legend's 16px/500 treatment has no size-preserving composite, so `field.tsx` stays out of PR #462.
 
 Obsolete numeric notes: legend caption spacing on `mb-3` (line 59) and separator inset on `-my-2` (line 244) — margins were not flagged. Remove.
 
@@ -194,25 +194,25 @@ Numeric spacing notes: `gap-6` (fieldset), `gap-7` (field-group), `gap-3` (field
 
 ## form
 
-Typography (raw): `FormDescription` / `FormMessage` use `nx:text-sm` → `nx:typography-body-small`.
+Resolved in PR #462: `FormDescription` / `FormMessage` use `nx:typography-body-small`; `className` remains last so consumer typography overrides still win by source order.
 
 Numeric spacing note: `FormItem` `gap-2`.
 
 ## input
 
-Typography (raw): `text-sm`/`text-xs`/`text-base` (sizes) + file `text-sm`/`font-medium` → composites.
+Resolved in PR #462: size typography now uses composites (`sm` → `nx:typography-body-small`, `default`/`lg` → `nx:typography-body-default`, file button → `nx:typography-label-default`).
 
-Minor: `data-size` omitted on default (`size` not defaulted in destructure).
+Resolved in PR #462: `data-size` is emitted for the default size.
 
-Numeric spacing notes: `px-3` (default), `px-2.5` (sm), `px-4` (lg).
+Numeric spacing notes: `px-3` (default), `px-2.5` (sm), `px-3.5` (lg). Horizontal padding stays numeric to preserve the fixed form-field geometry; `px-control-*` would over-widen field insets across looser modes.
 
 ## input-group
 
-Obsolete numeric note (line 36): field-internal addon/control padding rhythm on the `InputGroup` base — its insets are `pl/pr/pb/pt` inside `has-[…]` selectors, none were flagged. Remove.
+Resolved in PR #462: obsolete numeric note on field-internal addon/control padding rhythm removed; those `pl`/`pr`/`pb`/`pt` insets live inside `has-[…]` selectors and were not rule findings.
 
-Minor typography: `InputGroupButton` uses raw `nx:text-sm` (addon/text use composites) → composite.
+Resolved in PR #462: `InputGroupButton` uses `nx:typography-label-default` (addon/text already used composites).
 
-Minor: arbitrary magic offsets `ml-[-0.45rem]`/`mr-[-0.35rem]` (button/kbd pull-in) are un-tokenized.
+Resolved in PR #462: arbitrary pull-in offsets use scale utilities instead of magic values.
 
 Numeric spacing notes: addon `gap-2`/`py-1.5`, block `px-3`, button `gap`/`px`, text `gap-2`, textarea `py-3`.
 
@@ -244,9 +244,9 @@ Numeric spacing notes: root `gap-1`/`p-1`, bar trigger `px-2`/`py-1`, sub-trigge
 
 ## native-select
 
-Typography (raw): `text-sm`/`text-xs` (sizes) → composites.
+Resolved in PR #462: default uses `nx:typography-body-default`; `sm` uses `nx:typography-body-small`.
 
-Numeric spacing notes: `px-3` (default), `px-2.5` (sm).
+Numeric spacing notes: `px-3` (default), `px-2.5` (sm), `pr-9` (chevron clearance). Horizontal padding stays numeric to preserve the fixed form-field geometry; `px-control-*` would over-widen field insets across looser modes.
 
 ## navigation-menu
 
@@ -288,11 +288,11 @@ Handle hit area below floor: `::after` drag target is `after:w-1` (4px) / `after
 
 ## select
 
-Typography (raw): trigger `text-sm` (71), label `text-sm`/`font-semibold` (230), item `text-sm` (263) → composites.
+Resolved in PR #462: `SelectTrigger` and `SelectItem` use `nx:typography-body-default`; `SelectLabel` uses `nx:typography-label-default`. The label intentionally moves from 600 to 500 weight because no 14px/600 composite exists.
 
-Mixed padding convention: vertical uses `py-control-*` role utilities, horizontal uses raw `px-3` (trigger 71) / `px-2` (label 230) — numeric comments restate ("px stays numeric") rather than justify. Likely should be `px-control-*`, or document the real reason.
+Mixed padding convention resolved by documentation: vertical uses `py-control-*` role utilities while horizontal padding stays numeric because `px-control-*` would over-widen form-field insets across looser modes.
 
-Numeric spacing notes: trigger `px-3` (71), scroll-up `py-1` (103), scroll-down `py-1` (127), viewport `p-1` (189), label `px-2` (230).
+Numeric spacing notes: trigger `px-3` (70), scroll-up `py-1` (101), scroll-down `py-1` (124), viewport `p-1` (185), label `px-2` (225).
 
 ## separator
 
@@ -354,9 +354,9 @@ Numeric spacing notes: list `p-1` (55), sm size `px-2`/`py-1` (105). sm "dense p
 
 ## textarea
 
-Typography (raw): `text-sm` (39) → composite.
+Resolved in PR #462: `Textarea` uses `nx:typography-body-default`.
 
-Numeric spacing note: `px-3` (38) — same mixed convention as Input/Select (raw `px` + `py-control-md`). (aria-invalid error-state wiring correctly present, line 41.)
+Numeric spacing note: `px-3` (38) stays numeric to preserve the fixed form-field geometry; `py-control-md` remains density-responsive. (`aria-invalid` error-state wiring correctly present, line 40.)
 
 ## toggle
 
