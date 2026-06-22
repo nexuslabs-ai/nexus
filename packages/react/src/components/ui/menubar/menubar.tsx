@@ -446,7 +446,7 @@ function MenubarLabel({ className, inset, ...props }: MenubarLabelProps) {
       data-slot="menubar-label"
       data-inset={inset}
       className={cn(
-        'nx:px-2 nx:py-control-sm nx:text-sm nx:font-semibold',
+        'nx:px-2 nx:py-control-sm nx:typography-label-default',
         inset && 'nx:pl-8',
         className
       )}
