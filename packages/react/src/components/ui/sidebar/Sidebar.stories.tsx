@@ -347,6 +347,39 @@ export const KeyboardInteraction: Story = {
   },
 };
 
+export const Disabled: Story = {
+  render: () => (
+    <SidebarProvider>
+      <Sidebar collapsible="none">
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton disabled>
+                    <IconHome />
+                    <span>Disabled item</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </SidebarProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Disabled item' });
+
+    await expect(button).toBeDisabled();
+    // A disabled menu button recolors via a semantic disabled-text token at
+    // full opacity (not a fade).
+    await expect(button).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(getComputedStyle(button).opacity).toBe('1');
+  },
+};
+
 /**
  * Visual grid reference for every `SidebarMenuButton` variant, size, and the
  * `asChild` composition. Uses `collapsible="none"` and a bounded height so the
