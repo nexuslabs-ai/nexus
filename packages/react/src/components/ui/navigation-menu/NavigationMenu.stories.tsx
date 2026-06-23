@@ -308,6 +308,9 @@ export const WithDataAttributes: Story = {
       'data-slot',
       'navigation-menu-trigger'
     );
+    // #470: trigger reuses navigationMenuTriggerStyle → typography-label-default
+    // (migrated from raw nx:text-sm nx:font-medium).
+    await expect(trigger).toHaveClass('nx:typography-label-default');
 
     // Open → content + link slots render
     await userEvent.click(trigger);
@@ -319,6 +322,10 @@ export const WithDataAttributes: Story = {
         canvasElement.querySelector('[data-slot="navigation-menu-link"]')
       ).toBeInTheDocument();
     });
+    // #470: flyout link migrated raw nx:text-sm → typography-body-default.
+    await expect(
+      canvasElement.querySelector('[data-slot="navigation-menu-link"]')
+    ).toHaveClass('nx:typography-body-default');
 
     await userEvent.keyboard('{Escape}');
   },
