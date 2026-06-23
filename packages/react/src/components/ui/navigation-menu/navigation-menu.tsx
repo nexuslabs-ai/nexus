@@ -115,7 +115,7 @@ function NavigationMenuItem({ className, ...props }: NavigationMenuItemProps) {
 }
 
 const navigationMenuTriggerStyle = cva(
-  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:outline-none nx:transition-colors nx:motion-reduce:transition-none nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
+  'nx:group nx:inline-flex nx:w-max nx:items-center nx:justify-center nx:rounded-md nx:bg-background nx:px-4 nx:py-2 nx:typography-label-default nx:outline-none nx:transition-colors nx:motion-reduce:transition-none nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground'
 );
 
 /**
@@ -256,7 +256,7 @@ function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:text-sm nx:outline-none nx:transition-colors',
+        'nx:flex nx:flex-col nx:gap-1 nx:rounded-sm nx:p-2 nx:typography-body-default nx:outline-none nx:transition-colors',
         'nx:motion-reduce:transition-none',
         'nx:hover:bg-popover-hover nx:hover:text-popover-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
