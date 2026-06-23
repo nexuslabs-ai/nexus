@@ -76,7 +76,7 @@ function TooltipContent({
         className={cn(
           'nx:z-popover nx:overflow-hidden nx:rounded-md',
           'nx:border nx:border-border-default nx:bg-popover nx:px-control-sm nx:py-control-sm nx:shadow-lg',
-          'nx:text-xs nx:text-popover-foreground',
+          'nx:typography-body-small nx:text-popover-foreground',
           'nx:animate-in nx:fade-in-0 nx:zoom-in-95',
           'nx:data-[state=closed]:animate-out nx:data-[state=closed]:fade-out-0 nx:data-[state=closed]:zoom-out-95',
           'nx:data-[side=bottom]:slide-in-from-top-2',

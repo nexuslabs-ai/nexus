@@ -422,6 +422,54 @@ export const TooltipContentResolvesRoleUtility: Story = {
   },
 };
 
+export const TooltipContentUsesTypographyComposite: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Regression sentinel — verifies `TooltipContent` carries the canonical `nx:typography-body-small` composite (replacing raw `text-xs`). `toHaveClass` is sufficient here because `typography-*` composites are invisible to the tailwind-merge conflict groups, so the class cannot be silently collapsed under a consumer override. The content is portaled, so the assertion queries `document`.',
+      },
+    },
+  },
+  render: (_args) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline">Hover me</Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Tooltip content</p>
+      </TooltipContent>
+    </Tooltip>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Hover me' });
+
+    try {
+      await userEvent.hover(trigger);
+
+      const tooltip = await waitFor(() => {
+        const el = document.querySelector<HTMLElement>(
+          '[data-slot="tooltip-content"]'
+        );
+        if (!el) throw new Error('tooltip not visible yet');
+        return el;
+      });
+
+      expect(tooltip).toHaveClass('nx:typography-body-small');
+    } finally {
+      await userEvent.unhover(trigger);
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slot="tooltip-content"]')
+        ).toBeNull();
+      });
+    }
+  },
+};
+
 // ============================================
 // A11Y is tested automatically on ALL stories
 // via addon-a11y with test: 'error'
