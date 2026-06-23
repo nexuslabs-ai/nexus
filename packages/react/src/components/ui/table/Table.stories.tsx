@@ -1026,3 +1026,161 @@ export const RowLink: Story = {
     await expect(link).toHaveAccessibleName('INV001');
   },
 };
+
+// Stacked cards on a narrow screen. Rather than restyle tr/td to display:block
+// (which strips <table> semantics for screen readers and would need ARIA grid
+// roles re-applied), swap structures by container width: a real <table> when
+// roomy, a real card list when narrow. Each is correct on its own; neither
+// relies on display:block. (Shown here at a fixed 20rem container = card state.)
+export const StackedCard: Story = {
+  render: () => (
+    <div className="nx:@container nx:w-[20rem]">
+      <div className="nx:@max-sm:hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="nx:text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invoices.slice(0, 3).map((row) => (
+              <TableRow key={row.invoice}>
+                <TableRowHeader>{row.invoice}</TableRowHeader>
+                <TableCell>{row.status}</TableCell>
+                <TableCell className="nx:text-right nx:tabular-nums">
+                  {row.amount}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <ul className="nx:hidden nx:flex-col nx:gap-2 nx:@max-sm:flex">
+        {invoices.slice(0, 3).map((row) => (
+          <li
+            key={row.invoice}
+            className="nx:space-y-1 nx:rounded-md nx:border nx:border-border-default-alpha nx:p-3"
+          >
+            <div className="nx:flex nx:justify-between">
+              <span className="nx:text-muted-foreground">Invoice</span>
+              <span className="nx:font-medium">{row.invoice}</span>
+            </div>
+            <div className="nx:flex nx:justify-between">
+              <span className="nx:text-muted-foreground">Status</span>
+              <span>{row.status}</span>
+            </div>
+            <div className="nx:flex nx:justify-between">
+              <span className="nx:text-muted-foreground">Amount</span>
+              <span className="nx:tabular-nums">{row.amount}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const cards = canvasElement.querySelector('ul');
+    const table = canvasElement.querySelector('[data-slot="table-container"]');
+    // At a narrow container the card list shows and the table is hidden — each a
+    // correct structure, so table semantics are never stripped by display:block.
+    await expect(cards).toBeVisible();
+    await expect(table).not.toBeVisible();
+  },
+};
+
+// An empty body renders cleanly: the header keeps its scope, and a single
+// column-spanning row carries the empty-state message. Striping is a no-op here.
+export const EmptyState: Story = {
+  render: () => (
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell
+            colSpan={3}
+            className="nx:py-8 nx:text-center nx:text-muted-foreground"
+          >
+            No invoices yet.
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const head = canvasElement.querySelector('[data-slot="table-head"]');
+    await expect(head).toHaveAttribute('scope', 'col');
+    await expect(
+      canvasElement.querySelector('[colspan="3"]')
+    ).toBeInTheDocument();
+  },
+};
+
+// Announce async table changes (sort, filter, load) to screen readers via an
+// aria-live region. Debounce the announcement (~750ms) in production so a burst
+// of fast updates doesn't flood the buffer; this demo announces immediately.
+function LiveRegionDemo() {
+  const [dir, setDir] = useState<'ascending' | 'descending'>('ascending');
+  const rows = [...invoices.slice(0, 3)].sort((a, b) =>
+    dir === 'ascending'
+      ? a.amount.localeCompare(b.amount)
+      : b.amount.localeCompare(a.amount)
+  );
+  return (
+    <div className="nx:space-y-2">
+      <Button
+        size="sm"
+        variant="secondary"
+        onClick={() =>
+          setDir((d) => (d === 'ascending' ? 'descending' : 'ascending'))
+        }
+      >
+        Toggle sort
+      </Button>
+      <div role="status" aria-live="polite" className="nx:sr-only">
+        Sorted by amount, {dir}
+      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Invoice</TableHead>
+            <TableHead aria-sort={dir} className="nx:text-right">
+              Amount
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.invoice}>
+              <TableRowHeader>{row.invoice}</TableRowHeader>
+              <TableCell className="nx:text-right nx:tabular-nums">
+                {row.amount}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+export const LiveRegionAnnouncements: Story = {
+  render: () => <LiveRegionDemo />,
+  play: async ({ canvasElement }) => {
+    const status = canvasElement.querySelector('[role="status"]');
+    await expect(status).toHaveTextContent('Sorted by amount, ascending');
+    await userEvent.click(canvasElement.querySelector('button') as Element);
+    await expect(status).toHaveTextContent('Sorted by amount, descending');
+  },
+};
+
+// The full sort/filter/paginate DataTable recipe — TanStack Table wired over
+// these primitives — lives at apps/console/src/components/data-table.tsx (the
+// logic engine stays a consumer dependency, out of the published bundle).
