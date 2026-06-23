@@ -345,6 +345,7 @@ export const WithDataAttributes: Story = {
         'drawer-handle',
         'drawer-title',
         'drawer-description',
+        'drawer-body',
         'drawer-footer',
       ]) {
         expect(
