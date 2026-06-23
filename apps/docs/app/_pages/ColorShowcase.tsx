@@ -12,7 +12,7 @@ import { ColorScales } from './ColorScales';
  * Swatches reference --nx-color-* variables inline; the semantic strip
  * reacts live to the theme picker via the CSS cascade (zero JS).
  *
- * Sources: .claude/rules/tokens.md (pipeline + APCA gate),
+ * Sources: packages/core/tokens/ + audit-contrast.js (pipeline + APCA gate),
  * color-shades.md (the 11-step shade→role grid).
  */
 
@@ -106,7 +106,7 @@ const SHADE_ROLES: {
   },
 ];
 
-// APCA contrast tiers (tokens.md § APCA contrast gate).
+// APCA contrast tiers (see packages/core/scripts/audit-contrast.js).
 const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
   { pair: 'foreground ↔ background', lc: '≥ 75', covers: 'Body text' },
   {

@@ -8,7 +8,7 @@ import { Breadcrumb } from '../_components/Breadcrumb';
  * vars; the border box reads the runtime `--nx-borderwidth-thick` var inline so
  * it tracks the active border-width mode.
  *
- * Source: .claude/rules/tokens.md (radius / borderwidth / shadow modes).
+ * Source: packages/core/tokens/ (radius / borderwidth / shadow modes).
  */
 
 const RADII: { cls: string; label: string }[] = [

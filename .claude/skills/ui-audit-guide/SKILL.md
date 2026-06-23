@@ -49,7 +49,7 @@ If flows are not specified, explore the page to identify them:
 
 ### Step 2: Load Design Context
 
-Before testing, read available design references: the `.claude/rules/` directory (especially `components.md`, `tokens.md`, `shadcn-divergences.md`), and design tokens in `packages/core/tokens/`. Skip any that don't apply.
+Before testing, read available design references: the `.claude/rules/` directory (especially `components.md`, `shadcn-divergences.md`), and design tokens in `packages/core/tokens/`. Skip any that don't apply.
 
 Extract and hold onto:
 

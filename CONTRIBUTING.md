@@ -311,5 +311,4 @@ This handbook is the on-ramp. The canonical conventions live in [`.claude/rules/
 
 - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns, required stories, the base-variants generator
 - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes, variants
-- [`tokens.md`](.claude/rules/tokens.md) — token format, the OKLCH pipeline, the APCA contrast gate
 - [`github.md`](.claude/rules/github.md) — branch naming, PR title/body conventions, the review-bot flow

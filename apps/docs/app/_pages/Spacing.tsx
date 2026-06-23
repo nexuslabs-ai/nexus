@@ -9,7 +9,7 @@ import { Breadcrumb } from '../_components/Breadcrumb';
  * the moment the Size control in the theme picker swaps the active density via
  * the `data-style` attribute on `<html>`. Role-token rows are static spec.
  *
- * Source: .claude/rules/tokens.md § Spacing & CSS-variable gotchas.
+ * Source: packages/core/tokens/ (spacing modes).
  */
 
 const SCALE: { name: string; px: number }[] = [

@@ -8,7 +8,7 @@ import { Button } from '../_components/nexus';
  * dimensions, the two runtime swap mechanisms, consumer overrides, and the
  * humans/agents framing.
  *
- * Sources: .claude/rules/tokens.md, components.md, shadcn-divergences.md.
+ * Sources: packages/core/tokens/, components.md, shadcn-divergences.md.
  */
 
 const DIMENSIONS: { dim: string; options: string; swap: string }[] = [

@@ -198,7 +198,7 @@ at a target L is colour-theory better left to the designer or the
 
 The failing fg is one of `chart.categorical.{1..5}`, each referencing a
 **different palette per series** for hue rotation (teal → lime → orange →
-rose → indigo, per `tokens.md § Data viz tokens`).
+rose → indigo).
 
 **Skip the role-conflict check for Case D.** The chart palettes (teal/lime/
 orange/rose/indigo) aren't in the base surface files' shade space, so the
@@ -210,8 +210,8 @@ series. Propose **two options in the Notes column**:
 
 - **(i)** step within the same palette: `{teal.700}` → `{teal.800}`, with a
   caveat about hue proximity.
-- **(ii)** consider swapping this series' palette — see hue rotation in
-  `tokens.md § Data viz tokens`.
+- **(ii)** consider swapping this series' palette — mind the hue rotation
+  shown above.
 
 Do not propose option (i) silently; surface the trade-off.
 
@@ -222,12 +222,12 @@ Use this exact column schema:
 ```markdown
 ## Contrast failures — {N} pairs
 
-| File                                                         | Pair                                    | Lc    | Threshold       | Current (fg)          | Proposed reroute                              | Notes                                                 |
-| ------------------------------------------------------------ | --------------------------------------- | ----- | --------------- | --------------------- | --------------------------------------------- | ----------------------------------------------------- |
-| base-slate-light.json                                        | foreground ↔ background                 | 42.1  | 75 (body)       | {slate.900} (L 0.207) | {slate.950} (L 0.118)                         | role collision (light): reserved for chrome           |
-| brands-blue-dark.json                                        | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white.base}          | (case B) move bg or tint fg                   | fg is leaf primitive — no shade-step                  |
-| base-slate-light.json ↔ focus-default-light.json             | color.default ↔ background              | 38.0  | 45 (incidental) | #1e3a8a               | target L ≈ 0.385 (grid row 700)               | edit primitives/focus/focus-default-light.json hex    |
-| base-slate-light.json ↔ chart-categorical-default-light.json | chart.categorical.3 ↔ container         | 56.0  | 60 (ui)         | {orange.700}          | (i) step to {orange.800} or (ii) swap palette | case D — verify hue rotation per tokens.md § Data viz |
+| File                                                         | Pair                                    | Lc    | Threshold       | Current (fg)          | Proposed reroute                              | Notes                                              |
+| ------------------------------------------------------------ | --------------------------------------- | ----- | --------------- | --------------------- | --------------------------------------------- | -------------------------------------------------- |
+| base-slate-light.json                                        | foreground ↔ background                 | 42.1  | 75 (body)       | {slate.900} (L 0.207) | {slate.950} (L 0.118)                         | role collision (light): reserved for chrome        |
+| brands-blue-dark.json                                        | primary.foreground ↔ primary.background | -52.0 | 60 (ui)         | {white.base}          | (case B) move bg or tint fg                   | fg is leaf primitive — no shade-step               |
+| base-slate-light.json ↔ focus-default-light.json             | color.default ↔ background              | 38.0  | 45 (incidental) | #1e3a8a               | target L ≈ 0.385 (grid row 700)               | edit primitives/focus/focus-default-light.json hex |
+| base-slate-light.json ↔ chart-categorical-default-light.json | chart.categorical.3 ↔ container         | 56.0  | 60 (ui)         | {orange.700}          | (i) step to {orange.800} or (ii) swap palette | case D — verify hue rotation                       |
 
 Light-mode failures may have dark-mode counterparts — verify `base-{palette}-dark.json` and `brands-{brand}-dark.json` after applying any fix.
 ```
@@ -240,7 +240,7 @@ job after they apply the fix (the counterpart may actually pass).
 
 > After applying any reroute, re-run `pnpm audit:contrast`. The script is the
 > gate; this proposal is a candidate, not a guaranteed fix. **Thresholds are
-> non-negotiable** per `.claude/rules/tokens.md` § APCA contrast gate — fix is
+> non-negotiable** — fix is
 > always token reroute or `perceptual-grid.json` edit, never lowering `minLc`.
 
 ## When NOT to invoke this agent
@@ -266,7 +266,5 @@ job after they apply the fix (the counterpart may actually pass).
 - `packages/core/scripts/audit-contrast.js` — the script (`formatLine` at line
   230 is the parser's source of truth; `auditCrossFileLoop` at lines 271-303
   is the cross-file header convention)
-- `.claude/rules/tokens.md` § APCA contrast gate — threshold tiers and the
-  non-negotiability rule; § Data viz tokens — hue rotation rationale for Case D
 - `packages/core/src/lib/perceptual-grid.json` — the 11-step palette-uniform
   L grid

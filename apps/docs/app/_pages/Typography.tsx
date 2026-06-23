@@ -8,7 +8,7 @@ import { Breadcrumb } from '../_components/Breadcrumb';
  * The tier classes are stored as full literal strings so Tailwind's scanner
  * emits them; the composites also ship wholesale via @nexus/tailwind.
  *
- * Source: .claude/rules/tokens.md § Typography.
+ * Source: packages/core/tokens/ (typography).
  */
 
 const SCALE: {

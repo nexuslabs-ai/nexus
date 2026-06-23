@@ -40,7 +40,6 @@ make dev          # Storybook — the component catalog & dev surface
 - [`.claude/rules/`](.claude/rules/) — project conventions (canonical; there is no root `CLAUDE.md`). High-traffic files:
   - [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns for the React package
   - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes
-  - [`tokens.md`](.claude/rules/tokens.md) — token format, OKLCH pipeline, APCA contrast gate
 - [Issue tracker](../../issues) — bugs and feature requests
 
 ## Browser support
