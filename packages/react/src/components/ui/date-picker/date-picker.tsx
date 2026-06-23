@@ -81,9 +81,7 @@ const staticDayPickerClassNames = {
   table: 'nx:w-full nx:border-collapse',
   weekdays: cn('nx:flex', defaultClassNames.weekdays),
   weekday: cn(
-    // Match the day buttons' type (Button's raw text-sm + font-normal,
-    // inherited family).
-    'nx:flex-1 nx:rounded-md nx:text-sm nx:font-normal nx:text-muted-foreground-subtle nx:select-none',
+    'nx:flex-1 nx:rounded-md nx:typography-body-default nx:text-muted-foreground-subtle nx:select-none',
     defaultClassNames.weekday
   ),
   week: cn('nx:mt-2 nx:flex nx:w-full', defaultClassNames.week),
@@ -338,7 +336,7 @@ function DatePickerDayButton({
       data-today={isToday}
       data-outside={isOutside || undefined}
       className={cn(
-        'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:text-sm nx:leading-none nx:font-normal',
+        'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:typography-body-default nx:leading-none',
         'nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
         isOutside && 'nx:text-muted-foreground-subtle',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
