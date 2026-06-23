@@ -419,6 +419,11 @@ export const CloseButtonFocus: Story = {
       'nx:focus-visible:outline-focus-default',
       'nx:focus-visible:outline-offset-(--focus-offset)'
     );
+    await expect(closeButton).toHaveClass(
+      'nx:after:absolute',
+      'nx:after:-inset-2.5',
+      'nx:lg:after:hidden'
+    );
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {

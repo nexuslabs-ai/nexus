@@ -7,6 +7,7 @@ import { Button } from '../button';
 
 import {
   Drawer,
+  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
@@ -69,10 +70,12 @@ export const Default: Story = {
             Drag down or press Escape to dismiss this drawer.
           </DrawerDescription>
         </DrawerHeader>
-        <p className="nx:px-4 nx:typography-body-default nx:text-foreground">
-          Drawer content goes here. On touch devices it can be dragged to
-          dismiss.
-        </p>
+        <DrawerBody>
+          <p className="nx:typography-body-default nx:text-foreground">
+            Drawer content goes here. On touch devices it can be dragged to
+            dismiss.
+          </p>
+        </DrawerBody>
         <DrawerFooter>
           <Button>Submit</Button>
           <DrawerClose asChild>
@@ -123,11 +126,10 @@ export const ScrollableContent: Story = {
             scrolls.
           </DrawerDescription>
         </DrawerHeader>
-        <div
+        <DrawerBody
           data-testid="drawer-scroll-area"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- scrollable region must be keyboard-reachable (axe scrollable-region-focusable)
           tabIndex={0}
-          className="nx:max-h-[45svh] nx:overflow-y-auto nx:px-6 nx:pb-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+          className="nx:max-h-[45svh] nx:overflow-y-auto nx:pb-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
         >
           <ul className="nx:flex nx:flex-col nx:gap-3">
             {SCROLLABLE_ITEMS.map((item) => (
@@ -144,7 +146,7 @@ export const ScrollableContent: Story = {
               </li>
             ))}
           </ul>
-        </div>
+        </DrawerBody>
         <DrawerFooter className="nx:border-t nx:border-border-default">
           <Button>Save changes</Button>
           <DrawerClose asChild>
@@ -198,10 +200,10 @@ export const WithHeaderActions: Story = {
             </Button>
           </DrawerClose>
         </DrawerHeader>
-        <div className="nx:px-6 nx:pb-6 nx:typography-body-default nx:text-foreground">
+        <DrawerBody className="nx:pb-6 nx:typography-body-default nx:text-foreground">
           Header actions are regular composition: consumers place controls in
           the header and keep Vaul responsible for dismissal.
-        </div>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   ),
@@ -314,6 +316,11 @@ export const WithDataAttributes: Story = {
           <DrawerTitle>Data Attributes</DrawerTitle>
           <DrawerDescription>Testing data-slot attributes.</DrawerDescription>
         </DrawerHeader>
+        <DrawerBody>
+          <p className="nx:typography-body-default nx:text-foreground">
+            Content here
+          </p>
+        </DrawerBody>
         <DrawerFooter>
           <DrawerClose asChild>
             <Button>Close</Button>
@@ -338,6 +345,7 @@ export const WithDataAttributes: Story = {
         'drawer-handle',
         'drawer-title',
         'drawer-description',
+        'drawer-body',
         'drawer-footer',
       ]) {
         expect(

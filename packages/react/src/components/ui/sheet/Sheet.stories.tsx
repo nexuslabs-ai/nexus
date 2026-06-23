@@ -6,6 +6,7 @@ import { Input } from '../input';
 
 import {
   Sheet,
+  SheetBody,
   SheetClose,
   SheetContent,
   SheetDescription,
@@ -53,9 +54,11 @@ export const Default: Story = {
             This panel slides in from the right edge by default.
           </SheetDescription>
         </SheetHeader>
-        <p className="nx:px-4 nx:text-sm nx:text-foreground">
-          Sheet content goes here. You can add any content you need.
-        </p>
+        <SheetBody>
+          <p className="nx:text-sm nx:text-foreground">
+            Sheet content goes here. You can add any content you need.
+          </p>
+        </SheetBody>
         <SheetFooter>
           <SheetClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -139,7 +142,7 @@ export const WithForm: Story = {
             Update your profile here, then save when you are done.
           </SheetDescription>
         </SheetHeader>
-        <div className="nx:grid nx:flex-1 nx:gap-4 nx:px-4">
+        <SheetBody className="nx:grid nx:gap-4">
           <div className="nx:grid nx:gap-1.5">
             <label htmlFor="sheet-name" className="nx:text-sm nx:font-medium">
               Name
@@ -155,12 +158,46 @@ export const WithForm: Story = {
             </label>
             <Input id="sheet-username" defaultValue="@johndoe" />
           </div>
-        </div>
+        </SheetBody>
         <SheetFooter>
           <SheetClose asChild>
             <Button variant="outline">Cancel</Button>
           </SheetClose>
           <Button type="submit">Save changes</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  ),
+};
+
+export const ScrollableContent: Story = {
+  render: (_args) => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">Terms & Conditions</Button>
+      </SheetTrigger>
+      <SheetContent className="nx:overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Terms of Service</SheetTitle>
+          <SheetDescription>
+            Please read the following terms carefully.
+          </SheetDescription>
+        </SheetHeader>
+        <SheetBody className="nx:space-y-4 nx:text-sm nx:text-foreground">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <p key={i}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+          ))}
+        </SheetBody>
+        <SheetFooter>
+          <SheetClose asChild>
+            <Button variant="outline">Decline</Button>
+          </SheetClose>
+          <Button>Accept</Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -269,7 +306,9 @@ export const WithDataAttributes: Story = {
           <SheetTitle>Data Attributes</SheetTitle>
           <SheetDescription>Testing data-slot attributes.</SheetDescription>
         </SheetHeader>
-        <p className="nx:px-4 nx:text-sm">Content here</p>
+        <SheetBody>
+          <p className="nx:text-sm">Content here</p>
+        </SheetBody>
         <SheetFooter>
           <SheetClose asChild>
             <Button>Close</Button>
@@ -303,6 +342,9 @@ export const WithDataAttributes: Story = {
         document.querySelector('[data-slot="sheet-description"]')
       ).toBeInTheDocument();
       expect(
+        document.querySelector('[data-slot="sheet-body"]')
+      ).toBeInTheDocument();
+      expect(
         document.querySelector('[data-slot="sheet-footer"]')
       ).toBeInTheDocument();
       expect(
@@ -314,6 +356,14 @@ export const WithDataAttributes: Story = {
     await expect(
       document.querySelector('[data-slot="sheet-content"]')
     ).toHaveAttribute('data-side', 'right');
+
+    await expect(
+      document.querySelector('[data-slot="sheet-close-button"]')
+    ).toHaveClass(
+      'nx:after:absolute',
+      'nx:after:-inset-2.5',
+      'nx:lg:after:hidden'
+    );
 
     await userEvent.keyboard('{Escape}');
   },

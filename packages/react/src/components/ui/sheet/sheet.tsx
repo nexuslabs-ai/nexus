@@ -91,7 +91,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
  */
 const sheetContentVariants = cva(
   cn(
-    'nx:fixed nx:z-modal nx:flex nx:flex-col nx:gap-4',
+    'nx:fixed nx:z-modal nx:flex nx:flex-col',
     'nx:bg-container nx:shadow-lg nx:ease-in-out',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
     'nx:data-[state=open]:duration-500 nx:data-[state=closed]:duration-300',
@@ -227,6 +227,37 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
 }
 
 /**
+ * SheetBodyProps
+ *
+ * Props for the SheetBody component.
+ */
+interface SheetBodyProps extends React.ComponentProps<'div'> {}
+
+/**
+ * SheetBody
+ *
+ * Container for the sheet's main content between the header and footer. Insets
+ * its content horizontally to match SheetHeader and SheetFooter; vertical
+ * separation comes from the header's and footer's padding.
+ *
+ * @example
+ * ```tsx
+ * <SheetBody>
+ *   <p>Main content.</p>
+ * </SheetBody>
+ * ```
+ */
+function SheetBody({ className, ...props }: SheetBodyProps) {
+  return (
+    <div
+      data-slot="sheet-body"
+      className={cn('nx:px-6', className)}
+      {...props}
+    />
+  );
+}
+
+/**
  * SheetFooterProps
  *
  * Props for the SheetFooter component.
@@ -324,6 +355,8 @@ function SheetDescription({ className, ...props }: SheetDescriptionProps) {
 
 export {
   Sheet,
+  SheetBody,
+  type SheetBodyProps,
   SheetClose,
   SheetContent,
   type SheetContentProps,
