@@ -6,6 +6,7 @@ import { Button } from '../button';
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -114,14 +115,14 @@ export const WithBodyContent: Story = {
             This payment method will be removed from the workspace.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="nx:grid nx:gap-2">
+        <AlertDialogBody className="nx:grid nx:gap-2">
           <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
             Future invoices will use the fallback payment method.
           </div>
           <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
             Active subscriptions continue until the next billing cycle.
           </div>
-        </div>
+        </AlertDialogBody>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive">
@@ -143,6 +144,18 @@ export const WithBodyContent: Story = {
     await expect(dialog).toHaveTextContent(
       'Future invoices will use the fallback payment method.'
     );
+
+    await expect(dialog).toHaveClass('nx:py-6', 'nx:gap-4');
+    await expect(dialog).not.toHaveClass('nx:p-6');
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-header"]')
+    ).toHaveClass('nx:px-6');
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-footer"]')
+    ).toHaveClass('nx:px-6');
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-body"]')
+    ).toHaveClass('nx:px-6');
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {
