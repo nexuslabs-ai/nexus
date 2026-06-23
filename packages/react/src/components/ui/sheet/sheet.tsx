@@ -237,8 +237,7 @@ interface SheetBodyProps extends React.ComponentProps<'div'> {}
  * SheetBody
  *
  * Container for the sheet's main content between the header and footer. Pads its
- * content to the same inset as SheetHeader and SheetFooter and grows to fill the
- * panel.
+ * content to the same inset as SheetHeader and SheetFooter.
  *
  * @example
  * ```tsx
@@ -251,7 +250,7 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
   return (
     <div
       data-slot="sheet-body"
-      className={cn('nx:flex-1 nx:p-6', className)}
+      className={cn('nx:p-6', className)}
       {...props}
     />
   );
