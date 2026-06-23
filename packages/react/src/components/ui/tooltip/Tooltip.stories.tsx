@@ -369,13 +369,13 @@ export const AllModes: Story = {
   ),
 };
 
-export const TooltipContentResolvesRoleUtility: Story = {
+export const TooltipContentUsesNumericSpacing: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Regression sentinel — verifies `TooltipContent` resolves the `px-control-sm`/`py-control-sm` role utilities to expected pixel values via `getComputedStyle`. A `toHaveClass` check is insufficient because tailwind-merge would collapse the role class away under a consumer override but the className-presence test would still pass; this measures the actually-applied style. Because the content is portaled, the assertion sees document-level mode resolution — vega (the documented default in the Style toolbar).',
+          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — vega (the documented default in the Style toolbar), where `px-3` is 12px and `py-1.5` is 6px.',
       },
     },
   },
@@ -406,11 +406,58 @@ export const TooltipContentResolvesRoleUtility: Story = {
       });
 
       const styles = getComputedStyle(tooltip);
-      // vega: --nx-control-padding-x-sm = 12px, --nx-control-padding-y-sm = 6px
       expect(styles.paddingLeft).toBe('12px');
       expect(styles.paddingRight).toBe('12px');
       expect(styles.paddingTop).toBe('6px');
       expect(styles.paddingBottom).toBe('6px');
+    } finally {
+      await userEvent.unhover(trigger);
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slot="tooltip-content"]')
+        ).toBeNull();
+      });
+    }
+  },
+};
+
+export const TooltipContentUsesTypographyComposite: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Regression sentinel — verifies `TooltipContent` carries the canonical `nx:typography-body-small` composite (replacing raw `text-xs`). `toHaveClass` is sufficient here because `typography-*` composites are invisible to the tailwind-merge conflict groups, so the class cannot be silently collapsed under a consumer override. The content is portaled, so the assertion queries `document`.',
+      },
+    },
+  },
+  render: (_args) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline">Hover me</Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Tooltip content</p>
+      </TooltipContent>
+    </Tooltip>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Hover me' });
+
+    try {
+      await userEvent.hover(trigger);
+
+      const tooltip = await waitFor(() => {
+        const el = document.querySelector<HTMLElement>(
+          '[data-slot="tooltip-content"]'
+        );
+        if (!el) throw new Error('tooltip not visible yet');
+        return el;
+      });
+
+      expect(tooltip).toHaveClass('nx:typography-body-small');
     } finally {
       await userEvent.unhover(trigger);
       await waitFor(() => {

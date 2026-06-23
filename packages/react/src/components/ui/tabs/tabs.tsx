@@ -102,8 +102,8 @@ const tabsTriggerVariants = cva(
        */
       size: {
         sm: 'nx:px-2 nx:py-1 nx:text-xs',
-        default: 'nx:px-control-sm nx:py-control-sm nx:text-sm',
-        lg: 'nx:px-control-md nx:py-control-md nx:text-base',
+        default: 'nx:px-3 nx:py-1.5 nx:text-sm',
+        lg: 'nx:px-4 nx:py-2 nx:text-base',
       },
     },
     defaultVariants: {

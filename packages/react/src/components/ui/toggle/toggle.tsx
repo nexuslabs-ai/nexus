@@ -14,9 +14,9 @@ const toggleVariants = cva(
         outline: 'nx:border nx:border-border-default nx:bg-transparent',
       },
       size: {
-        default: 'nx:px-control-md nx:py-control-md nx:gap-control-md',
-        sm: 'nx:px-control-sm nx:py-control-sm nx:gap-control-sm nx:text-xs',
-        lg: 'nx:px-control-lg nx:py-control-lg nx:gap-control-lg',
+        default: 'nx:px-4 nx:py-2 nx:gap-2',
+        sm: 'nx:px-3 nx:py-1.5 nx:gap-1.5 nx:text-xs',
+        lg: 'nx:px-8 nx:py-3 nx:gap-2.5',
       },
     },
     defaultVariants: {

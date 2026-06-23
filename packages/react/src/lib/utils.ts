@@ -11,16 +11,7 @@ import { extendTailwindMerge } from 'tailwind-merge';
  * Not re-exported from the package's public entry — internal coupling only.
  */
 export const ROLE_CLASS_GROUPS = {
-  px: ['px-control-sm', 'px-control-md', 'px-control-lg'],
-  py: ['py-control-sm', 'py-control-md', 'py-control-lg'],
-  gap: [
-    'gap-control-sm',
-    'gap-control-md',
-    'gap-control-lg',
-    'gap-container',
-    'gap-layout-section',
-    'gap-layout-stack',
-  ],
+  gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
 };
 

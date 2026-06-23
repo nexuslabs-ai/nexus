@@ -114,8 +114,8 @@ function Avatar({
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
-      data-size={resolvedSize}
-      data-shape={resolvedShape}
+      data-size={resolvedSize ?? 'md'}
+      data-shape={resolvedShape ?? 'circle'}
       data-ring={ring || undefined}
       className={cn(
         avatarVariants({ size: resolvedSize, shape: resolvedShape }),

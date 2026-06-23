@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
@@ -41,6 +43,80 @@ const meta: Meta<typeof Textarea> = {
 
 export default meta;
 type Story = StoryObj<typeof Textarea>;
+
+function CharacterCounterTextarea() {
+  const textareaId = React.useId();
+  const descriptionId = React.useId();
+  const counterId = React.useId();
+  const maxLength = 160;
+  const [value, setValue] = React.useState(
+    'Shipped keyboard fixes and updated the empty state copy.'
+  );
+
+  return (
+    <div className="nx:grid nx:gap-2">
+      <Label htmlFor={textareaId}>Release note</Label>
+      <Textarea
+        id={textareaId}
+        aria-describedby={`${descriptionId} ${counterId}`}
+        value={value}
+        maxLength={maxLength}
+        onChange={(event) => setValue(event.currentTarget.value)}
+      />
+      <div className="nx:flex nx:items-start nx:justify-between nx:gap-3">
+        <p
+          id={descriptionId}
+          className="nx:typography-body-small nx:text-muted-foreground"
+        >
+          Keep the note short enough for the activity feed.
+        </p>
+        <p
+          id={counterId}
+          className="nx:shrink-0 nx:typography-body-small nx:text-muted-foreground"
+        >
+          {value.length} / {maxLength} characters
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function WordCounterTextarea() {
+  const textareaId = React.useId();
+  const descriptionId = React.useId();
+  const counterId = React.useId();
+  const [value, setValue] = React.useState(
+    'Summarize the customer outcome and the next decision.'
+  );
+  const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
+
+  return (
+    <div className="nx:grid nx:gap-2">
+      <Label htmlFor={textareaId}>Executive summary</Label>
+      <Textarea
+        id={textareaId}
+        aria-describedby={`${descriptionId} ${counterId}`}
+        value={value}
+        rows={5}
+        onChange={(event) => setValue(event.currentTarget.value)}
+      />
+      <div className="nx:flex nx:items-start nx:justify-between nx:gap-3">
+        <p
+          id={descriptionId}
+          className="nx:typography-body-small nx:text-muted-foreground"
+        >
+          Aim for one short paragraph.
+        </p>
+        <p
+          id={counterId}
+          className="nx:shrink-0 nx:typography-body-small nx:text-muted-foreground"
+        >
+          {wordCount} words
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // ============================================
 // BASIC STORIES
@@ -109,6 +185,80 @@ export const WithLabel: Story = {
     const textarea = canvas.getByLabelText('Bio');
 
     await expect(textarea).toBeInTheDocument();
+  },
+};
+
+export const CharacterCounter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Character counters are story-local composition: keep the count in local state and connect both helper text and counter with `aria-describedby`.',
+      },
+    },
+  },
+  render: () => <CharacterCounterTextarea />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const textarea = canvas.getByLabelText('Release note');
+    const counter = canvas.getByText(/characters$/);
+
+    await expect(textarea).toHaveAttribute(
+      'aria-describedby',
+      expect.stringContaining(counter.id)
+    );
+    await expect(counter).toHaveTextContent('characters');
+  },
+};
+
+export const WordCounter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Word counters follow the same pattern as character counters: local story state, visible count, and `aria-describedby` on the textarea.',
+      },
+    },
+  },
+  render: () => <WordCounterTextarea />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const textarea = canvas.getByLabelText('Executive summary');
+    const counter = canvas.getByText(/words$/);
+
+    await expect(textarea).toHaveAttribute(
+      'aria-describedby',
+      expect.stringContaining(counter.id)
+    );
+    await expect(counter).toHaveTextContent('words');
+  },
+};
+
+export const ResizeGuidance: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Textarea accepts native textarea attributes and className overrides. Use `rows` for the initial height and `nx:resize-y` when standalone vertical resizing is useful; InputGroupTextarea keeps `resize-none` so the grouped frame stays stable.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:grid nx:gap-2">
+      <Label htmlFor="textarea-resize">Resizable notes</Label>
+      <Textarea
+        id="textarea-resize"
+        rows={5}
+        className="nx:resize-y"
+        placeholder="Drag the bottom edge to resize vertically."
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByLabelText('Resizable notes')).toHaveClass(
+      'nx:resize-y'
+    );
   },
 };
 

@@ -4,6 +4,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { SPACING_MODES } from '../../../stories/spacing-modes';
 import { expectHeightPerMode } from '../../../stories/test-utils';
+import { Spinner } from '../spinner';
 
 import {
   InputGroup,
@@ -122,7 +123,6 @@ export const ButtonSizes: Story = {
 
     await document.fonts.ready;
     buttons.forEach((button) => {
-      expect(button).not.toHaveClass('nx:py-control-md');
       expect(getComputedStyle(button).paddingTop).toBe('0px');
       expect(getComputedStyle(button).paddingBottom).toBe('0px');
     });
@@ -236,6 +236,155 @@ export const Disabled: Story = {
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();
+  },
+};
+
+export const StateMatrix: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Form-field state guidance using current APIs only. Default, read-only, disabled, error, warning, and loading are composed in stories; warning remains advisory and does not use `aria-invalid`, while loading uses InputGroup plus Spinner rather than adding a loading prop.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:w-[420px] nx:flex-col nx:gap-4">
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Default
+        </span>
+        <InputGroup>
+          <InputGroupInput
+            aria-label="Default email"
+            placeholder="jane@example.com"
+          />
+        </InputGroup>
+      </div>
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Read-only
+        </span>
+        <InputGroup>
+          <InputGroupInput
+            aria-label="Read-only email"
+            aria-describedby="state-readonly-message"
+            defaultValue="jane@example.com"
+            readOnly
+          />
+          <InputGroupAddon align="block-end">
+            <InputGroupText id="state-readonly-message">
+              Submitted value; selectable, focusable, and not editable here.
+            </InputGroupText>
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Disabled
+        </span>
+        <InputGroup data-disabled="true">
+          <InputGroupInput
+            aria-label="Disabled email"
+            defaultValue="jane@example.com"
+            disabled
+          />
+        </InputGroup>
+      </div>
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Warning
+        </span>
+        <InputGroup className="nx:border-border-warning">
+          <InputGroupInput
+            aria-label="Warning email"
+            aria-describedby="state-warning-message"
+            defaultValue="jane@contractor.example"
+          />
+          <InputGroupAddon align="block-end">
+            <InputGroupText
+              id="state-warning-message"
+              className="nx:text-warning-subtle-foreground"
+            >
+              External domain. You can continue after review.
+            </InputGroupText>
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Error
+        </span>
+        <InputGroup>
+          <InputGroupInput
+            aria-label="Invalid email"
+            aria-errormessage="state-error-message"
+            aria-invalid
+            defaultValue="jane@"
+          />
+          <InputGroupAddon align="block-end">
+            <InputGroupText
+              id="state-error-message"
+              role="alert"
+              className="nx:text-error-subtle-foreground"
+            >
+              Enter a complete email address.
+            </InputGroupText>
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+      <div className="nx:grid nx:gap-1.5">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Loading
+        </span>
+        <InputGroup data-testid="state-loading-group" aria-busy="true">
+          <InputGroupInput
+            aria-label="Loading username"
+            aria-describedby="state-loading-message"
+            defaultValue="janedoe"
+          />
+          <InputGroupAddon align="inline-end">
+            <Spinner
+              aria-label="Checking username"
+              className="nx:text-muted-foreground"
+            />
+          </InputGroupAddon>
+          <InputGroupAddon align="block-end">
+            <InputGroupText id="state-loading-message">
+              Checking availability...
+            </InputGroupText>
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const readOnly = canvas.getByRole('textbox', { name: 'Read-only email' });
+    const disabled = canvas.getByRole('textbox', { name: 'Disabled email' });
+    const warning = canvas.getByRole('textbox', { name: 'Warning email' });
+    const error = canvas.getByRole('textbox', { name: 'Invalid email' });
+
+    await expect(readOnly).toHaveAttribute('readonly');
+    await expect(readOnly).not.toBeDisabled();
+    await expect(disabled).toBeDisabled();
+    await expect(warning).not.toHaveAttribute('aria-invalid');
+    await expect(warning).toHaveAttribute(
+      'aria-describedby',
+      'state-warning-message'
+    );
+    await expect(error).toHaveAttribute('aria-invalid', 'true');
+    await expect(error).toHaveAttribute(
+      'aria-errormessage',
+      'state-error-message'
+    );
+    await expect(canvas.getByTestId('state-loading-group')).toHaveAttribute(
+      'aria-busy',
+      'true'
+    );
+    await expect(
+      canvas.getByRole('status', { name: 'Checking username' })
+    ).toBeInTheDocument();
   },
 };
 

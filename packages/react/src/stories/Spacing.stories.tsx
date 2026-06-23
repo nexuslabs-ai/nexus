@@ -7,7 +7,6 @@ import spacingMira from '../../../core/tokens/semantic/spacing-mira.json';
 import spacingNova from '../../../core/tokens/semantic/spacing-nova.json';
 import spacingSera from '../../../core/tokens/semantic/spacing-sera.json';
 import spacingVega from '../../../core/tokens/semantic/spacing-vega.json';
-import { IconCheck } from '../lib/icons';
 
 import { SPACING_MODES, type SpacingMode } from './spacing-modes';
 
@@ -58,10 +57,9 @@ function extractNumericRows(mode: ModeFile): [string, Dimension][] {
 }
 
 /**
- * Walk the `control.*`, `container.*`, `layout.*` subtrees and return the
- * role rows for that mode. Each row name mirrors the JSON path joined with
- * `-`, matching the emitted CSS variable name (`--control-padding-x-md`,
- * `--container-p`, `--layout-section-gap`, …).
+ * Walk the `container.*` and `layout.*` subtrees and return the role rows for
+ * that mode. Each row name mirrors the JSON path joined with `-`, matching the
+ * emitted CSS variable name (`--container-p`, `--layout-section-gap`, …).
  */
 function extractRoleRows(mode: ModeFile): [string, Dimension][] {
   const rows: [string, Dimension][] = [];
@@ -81,7 +79,7 @@ function extractRoleRows(mode: ModeFile): [string, Dimension][] {
     }
   }
 
-  for (const group of ['control', 'container', 'layout']) {
+  for (const group of ['container', 'layout']) {
     if (group in mode) {
       walk(mode[group], [group]);
     }
@@ -150,7 +148,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Spacing tokens are authored per-mode in `packages/core/tokens/semantic/spacing-{mode}.json`. Each mode owns direct px values for both the numeric `--spacing-N` scale and the role-named `--control-*` / `--container-*` / `--layout-*` tokens. Mode switching is via the `data-style="X"` attribute on `<html>` (or any subtree); the active mode is the default `vega` when no attribute is set.',
+          'Spacing tokens are authored per-mode in `packages/core/tokens/semantic/spacing-{mode}.json`. Each mode owns direct px values for both the numeric `--spacing-N` scale and the role-named `--container-*` / `--layout-*` tokens. Mode switching is via the `data-style="X"` attribute on `<html>` (or any subtree); the active mode is the default `vega` when no attribute is set.',
       },
     },
   },
@@ -192,10 +190,9 @@ export const Roles: Story = {
           Role Tokens
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
-          Role-named tokens express semantic intent — `control.*` for
-          buttons/inputs/select triggers, `container.*` for cards/dialogs,
-          `layout.*` for between-section and stack rhythm. Consumed through
-          dedicated utilities like `nx:px-control-md`, `nx:p-container`, or
+          Role-named tokens express semantic intent — `container.*` for
+          cards/dialogs, `layout.*` for between-section and stack rhythm.
+          Consumed through dedicated utilities like `nx:p-container` or
           `nx:gap-layout-section`. Per-mode variance is the lever for density:
           Mira shrinks, Maia/Sera/Luma breathe.
         </p>
@@ -216,7 +213,7 @@ export const ActiveMode: Story = {
     docs: {
       description: {
         story:
-          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:px-control-*`, `nx:py-control-*`, `nx:gap-control-*`, `nx:p-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact), `vega` (default), `maia` (relaxed), `sera` (most breathing).',
+          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:p-container`, `nx:gap-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact), `vega` (default), `maia` (relaxed), `sera` (most breathing).',
       },
     },
   },
@@ -232,52 +229,6 @@ export const ActiveMode: Story = {
           byte-identical across modes; only role tokens vary.
         </p>
       </div>
-
-      <section className="nx:flex nx:flex-col nx:gap-3">
-        <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
-          nx:px-control-* / nx:py-control-*
-        </h3>
-        <div className="nx:flex nx:items-end nx:gap-4">
-          <div className="nx:px-control-sm nx:py-control-sm nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-small">
-            sm
-          </div>
-          <div className="nx:px-control-md nx:py-control-md nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
-            md
-          </div>
-          <div className="nx:px-control-lg nx:py-control-lg nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default">
-            lg
-          </div>
-        </div>
-      </section>
-
-      <section className="nx:flex nx:flex-col nx:gap-3">
-        <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
-          nx:gap-control-{'{sm,md,lg}'}
-        </h3>
-        <div className="nx:flex nx:items-end nx:gap-4">
-          <button
-            type="button"
-            className="nx:px-control-sm nx:py-control-sm nx:gap-control-sm nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-small"
-          >
-            <IconCheck aria-hidden="true" />
-            sm
-          </button>
-          <button
-            type="button"
-            className="nx:px-control-md nx:py-control-md nx:gap-control-md nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default"
-          >
-            <IconCheck aria-hidden="true" />
-            md
-          </button>
-          <button
-            type="button"
-            className="nx:px-control-lg nx:py-control-lg nx:gap-control-lg nx:inline-flex nx:items-center nx:rounded-md nx:bg-primary-background nx:text-primary-foreground nx:typography-label-default"
-          >
-            <IconCheck aria-hidden="true" />
-            lg
-          </button>
-        </div>
-      </section>
 
       <section className="nx:flex nx:flex-col nx:gap-3">
         <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">

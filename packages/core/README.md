@@ -34,7 +34,7 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 - Output: Tailwind v4 `@theme` block + per-mode `[data-style="X"]` blocks
 - Example: `--color-background: var(--nx-color-white-base)`, `--nx-spacing-4: 16px`
 
-> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-style="X"]` blocks plus role utilities (`nx:px-control-md`, `nx:py-control-md`, `nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-style` attribute on `<html>`.
+> **Spacing is two-tier, not three.** Unlike color/radius/shadow/typography, spacing has no `--nx-size-*` primitive layer — `semantic/spacing-{mode}.json` files carry direct px values, and the build emits per-mode `[data-style="X"]` blocks plus role utilities (`nx:p-container`, `nx:gap-layout-section`, …). Mode swap is runtime via the `data-style` attribute on `<html>`.
 
 **Component** (future)
 

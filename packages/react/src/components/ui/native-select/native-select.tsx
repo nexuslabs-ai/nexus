@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const nativeSelectVariants = cva(
   [
     'nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border nx:border-border-default',
-    'nx:bg-background nx:text-foreground nx:shadow-xs nx:transition-colors nx:outline-none',
+    'nx:bg-background nx:text-foreground nx:transition-colors nx:enabled:hover:bg-background-hover nx:outline-none',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
     'nx:disabled:cursor-not-allowed',
@@ -41,8 +41,8 @@ interface NativeSelectProps
  *
  * A styled wrapper over the native `<select>` — on mobile it opens the OS
  * picker (iOS wheel / Android sheet), the preferred dense-form UX there. The
- * closed trigger is styled to match `Input`; the open list is OS-rendered.
- * For rich options (icons, descriptions, grouping) on desktop, use `Select`.
+ * open list is OS-rendered. For rich options (icons, descriptions, grouping)
+ * on desktop, use `Select`.
  *
  * @example
  * ```tsx
@@ -60,7 +60,7 @@ function NativeSelect({
   return (
     <div
       data-slot="native-select-wrapper"
-      className="nx:group/native-select nx:relative nx:w-fit"
+      className="nx:group/native-select nx:relative nx:w-full"
     >
       <select
         data-slot="native-select"

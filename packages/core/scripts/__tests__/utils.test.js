@@ -745,11 +745,6 @@ describe('utils', () => {
       const tokens = [
         { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
         { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
-        {
-          cssName: 'control-padding-x-md',
-          path: ['control', 'padding-x', 'md'],
-          value: '16px',
-        },
         { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
         {
           cssName: 'layout-section-gap',
@@ -763,11 +758,6 @@ describe('utils', () => {
         { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
       ]);
       expect(role).toEqual([
-        {
-          cssName: 'control-padding-x-md',
-          path: ['control', 'padding-x', 'md'],
-          value: '16px',
-        },
         { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
         {
           cssName: 'layout-section-gap',
@@ -783,6 +773,19 @@ describe('utils', () => {
       ];
       expect(() => splitSpacingTokens(tokens)).toThrow(
         /unknown top-level key "motion"/
+      );
+    });
+
+    it('throws on a control-rooted path (control is no longer a spacing role root)', () => {
+      const tokens = [
+        {
+          cssName: 'control-padding-x-md',
+          path: ['control', 'padding-x', 'md'],
+          value: '16px',
+        },
+      ];
+      expect(() => splitSpacingTokens(tokens)).toThrow(
+        /unknown top-level key "control"/
       );
     });
   });

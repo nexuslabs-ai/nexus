@@ -43,6 +43,79 @@ const DatePickerDayContentContext =
 // react-day-picker's default class names are static — compute once at module load.
 const defaultClassNames = getDefaultClassNames();
 
+// Prop-independent slot class names — merged once at module load, not per render.
+// `satisfies` keeps the slot-key typo-checking the inline `classNames` literal
+// had: a misspelled key would otherwise spread in silently and ship its default.
+// The four prop-dependent slots (button_previous/next, caption_label, day) stay
+// inline in the component because they read buttonVariant / captionLayout /
+// showWeekNumber.
+const staticDayPickerClassNames = {
+  root: cn('nx:w-fit', defaultClassNames.root),
+  // Row layout so numberOfMonths > 1 sits side by side; a single month
+  // is unaffected. The absolute nav positions against this `relative`.
+  months: cn(
+    'nx:relative nx:flex nx:flex-row nx:gap-4',
+    defaultClassNames.months
+  ),
+  month: cn('nx:flex nx:w-full nx:flex-col nx:gap-4', defaultClassNames.month),
+  nav: cn(
+    'nx:absolute nx:inset-x-0 nx:top-0 nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-1',
+    defaultClassNames.nav
+  ),
+  month_caption: cn(
+    'nx:flex nx:h-(--cell-size) nx:w-full nx:items-center nx:justify-center nx:px-(--cell-size)',
+    defaultClassNames.month_caption
+  ),
+  dropdowns: cn(
+    'nx:flex nx:h-(--cell-size) nx:w-full nx:items-center nx:justify-center nx:gap-1.5 nx:typography-label-default',
+    defaultClassNames.dropdowns
+  ),
+  dropdown_root: cn(
+    'nx:relative nx:rounded-md nx:border nx:border-border-default nx:shadow-xs nx:has-focus:border-border-active',
+    defaultClassNames.dropdown_root
+  ),
+  dropdown: cn(
+    'nx:absolute nx:inset-0 nx:bg-popover nx:opacity-0',
+    defaultClassNames.dropdown
+  ),
+  table: 'nx:w-full nx:border-collapse',
+  weekdays: cn('nx:flex', defaultClassNames.weekdays),
+  weekday: cn(
+    // Match the day buttons' type (Button's raw text-sm + font-normal,
+    // inherited family) rather than the label composite (Inter/medium).
+    'nx:flex-1 nx:rounded-md nx:text-sm nx:font-normal nx:text-muted-foreground-subtle nx:select-none',
+    defaultClassNames.weekday
+  ),
+  week: cn('nx:mt-2 nx:flex nx:w-full', defaultClassNames.week),
+  week_number_header: cn(
+    'nx:w-(--cell-size) nx:select-none',
+    defaultClassNames.week_number_header
+  ),
+  week_number: cn(
+    'nx:typography-label-small nx:text-muted-foreground-subtle nx:select-none',
+    defaultClassNames.week_number
+  ),
+  range_start: cn(
+    'nx:rounded-l-md nx:bg-primary-subtle',
+    defaultClassNames.range_start
+  ),
+  range_middle: cn(
+    'nx:rounded-none nx:bg-primary-subtle',
+    defaultClassNames.range_middle
+  ),
+  range_end: cn(
+    'nx:rounded-r-md nx:bg-primary-subtle',
+    defaultClassNames.range_end
+  ),
+  today: defaultClassNames.today,
+  outside: cn(
+    'nx:text-muted-foreground-subtle nx:aria-selected:text-muted-foreground-subtle',
+    defaultClassNames.outside
+  ),
+  disabled: cn('nx:text-disabled-foreground', defaultClassNames.disabled),
+  hidden: cn('nx:invisible', defaultClassNames.hidden),
+} satisfies NonNullable<React.ComponentProps<typeof DayPicker>['classNames']>;
+
 /**
  * DatePickerProps
  *
@@ -123,21 +196,7 @@ function DatePicker({
           ...modifiersClassNames,
         }}
         classNames={{
-          root: cn('nx:w-fit', defaultClassNames.root),
-          // Row layout so numberOfMonths > 1 sits side by side; a single month
-          // is unaffected. The absolute nav positions against this `relative`.
-          months: cn(
-            'nx:relative nx:flex nx:flex-row nx:gap-4',
-            defaultClassNames.months
-          ),
-          month: cn(
-            'nx:flex nx:w-full nx:flex-col nx:gap-4',
-            defaultClassNames.month
-          ),
-          nav: cn(
-            'nx:absolute nx:inset-x-0 nx:top-0 nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-1',
-            defaultClassNames.nav
-          ),
+          ...staticDayPickerClassNames,
           button_previous: cn(
             buttonVariants({ variant: buttonVariant, size: 'icon' }),
             'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
@@ -148,44 +207,11 @@ function DatePicker({
             'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
             defaultClassNames.button_next
           ),
-          month_caption: cn(
-            'nx:flex nx:h-(--cell-size) nx:w-full nx:items-center nx:justify-center nx:px-(--cell-size)',
-            defaultClassNames.month_caption
-          ),
-          dropdowns: cn(
-            'nx:flex nx:h-(--cell-size) nx:w-full nx:items-center nx:justify-center nx:gap-1.5 nx:typography-label-default',
-            defaultClassNames.dropdowns
-          ),
-          dropdown_root: cn(
-            'nx:relative nx:rounded-md nx:border nx:border-border-default nx:shadow-xs nx:has-focus:border-border-active',
-            defaultClassNames.dropdown_root
-          ),
-          dropdown: cn(
-            'nx:absolute nx:inset-0 nx:bg-popover nx:opacity-0',
-            defaultClassNames.dropdown
-          ),
           caption_label: cn(
             'nx:typography-label-default nx:select-none',
             captionLayout !== 'label' &&
               'nx:flex nx:h-8 nx:items-center nx:gap-1 nx:rounded-md nx:pr-1 nx:pl-2 nx:[&>svg]:size-3.5 nx:[&>svg]:text-muted-foreground',
             defaultClassNames.caption_label
-          ),
-          table: 'nx:w-full nx:border-collapse',
-          weekdays: cn('nx:flex', defaultClassNames.weekdays),
-          weekday: cn(
-            // Match the day buttons' type (Button's raw text-sm + font-normal,
-            // inherited family) rather than the label composite (Inter/medium).
-            'nx:flex-1 nx:rounded-md nx:text-sm nx:font-normal nx:text-muted-foreground-subtle nx:select-none',
-            defaultClassNames.weekday
-          ),
-          week: cn('nx:mt-2 nx:flex nx:w-full', defaultClassNames.week),
-          week_number_header: cn(
-            'nx:w-(--cell-size) nx:select-none',
-            defaultClassNames.week_number_header
-          ),
-          week_number: cn(
-            'nx:typography-label-small nx:text-muted-foreground-subtle nx:select-none',
-            defaultClassNames.week_number
           ),
           day: cn(
             'nx:group/day nx:relative nx:flex nx:aspect-square nx:h-full nx:w-full nx:items-center nx:justify-center nx:p-0 nx:text-center nx:select-none nx:[&:last-child[data-selected=true]_button]:rounded-r-md',
@@ -194,28 +220,6 @@ function DatePicker({
               : 'nx:[&:first-child[data-selected=true]_button]:rounded-l-md',
             defaultClassNames.day
           ),
-          range_start: cn(
-            'nx:rounded-l-md nx:bg-primary-subtle',
-            defaultClassNames.range_start
-          ),
-          range_middle: cn(
-            'nx:rounded-none nx:bg-primary-subtle',
-            defaultClassNames.range_middle
-          ),
-          range_end: cn(
-            'nx:rounded-r-md nx:bg-primary-subtle',
-            defaultClassNames.range_end
-          ),
-          today: defaultClassNames.today,
-          outside: cn(
-            'nx:text-muted-foreground-subtle nx:aria-selected:text-muted-foreground-subtle',
-            defaultClassNames.outside
-          ),
-          disabled: cn(
-            'nx:text-disabled-foreground',
-            defaultClassNames.disabled
-          ),
-          hidden: cn('nx:invisible', defaultClassNames.hidden),
           ...classNames,
         }}
         components={{
@@ -310,6 +314,8 @@ function DatePickerDayButton({
     modifiers.range_middle ||
     modifiers.range_end;
   const isToday = modifiers.today && !isSelected && !modifiers.disabled;
+  const isOutside =
+    modifiers.outside && !isSelected && !isToday && !modifiers.disabled;
   const content = renderDayContent
     ? renderDayContent({ date: day.date, day, modifiers })
     : children;
@@ -330,9 +336,11 @@ function DatePickerDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       data-today={isToday}
+      data-outside={isOutside || undefined}
       className={cn(
         'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:text-sm nx:leading-none nx:font-normal',
         'nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
+        isOutside && 'nx:text-muted-foreground-subtle',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',
         // Today → Figma's inner error circle while keeping the button target at cell size.

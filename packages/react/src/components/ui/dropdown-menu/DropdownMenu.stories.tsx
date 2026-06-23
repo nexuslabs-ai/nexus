@@ -522,7 +522,7 @@ export const ItemPaddingPinnedAcrossModes: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel: opened `DropdownMenuItem` padding stays pinned to numeric `py-1.5` (6px via `--nx-spacing-1_5`) even under document-level spacing modes where `py-control-sm` would differ. Because the content portals to `document.body`, this asserts runtime resolution on the portaled item and restores the document mode in `finally`.',
+          'Regression sentinel: opened `DropdownMenuItem` padding stays pinned to numeric `py-1.5` (6px via `--nx-spacing-1_5`) across document-level spacing modes — `py-1.5` is mode-invariant. Because the content portals to `document.body`, this asserts runtime resolution on the portaled item and restores the document mode in `finally`.',
       },
     },
   },
@@ -556,7 +556,6 @@ export const ItemPaddingPinnedAcrossModes: Story = {
         });
 
         const styles = getComputedStyle(item);
-        // --nx-spacing-1_5 is 6px in every mode; --nx-control-padding-y-sm would be 4px (nova) / 10px (sera).
         expect(styles.paddingTop).toBe('6px');
         expect(styles.paddingBottom).toBe('6px');
 
