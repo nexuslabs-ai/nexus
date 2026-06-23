@@ -17,8 +17,7 @@ const TYPOGRAPHY_DIR = path.resolve(
 // modes were removed; modes are filesystem-discovered (`discoverPrimitives` globs
 // the directory), so without this guard, dropping a `typography-nova.json` back
 // in would silently re-activate a second mode. Reintroducing one must be a
-// deliberate edit here, behind a real typeface or scale-ratio decision (see
-// `.claude/rules/tokens.md` § Typography).
+// deliberate edit here, behind a real typeface or scale-ratio decision.
 const EXPECTED_MODES = ['vega'];
 
 describe('typography modes', () => {

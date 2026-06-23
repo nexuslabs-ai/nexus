@@ -72,7 +72,7 @@ The `.claude/rules` directory is the detailed source of truth for repo conventio
 - React components: `.claude/rules/components.md`
 - React testing and Storybook coverage: `.claude/rules/testing-react.md`
 - Core testing philosophy: `.claude/rules/testing.md`
-- Design tokens: `.claude/rules/tokens.md`
+- Design tokens: `packages/core/tokens/`
 - Responsive behavior: `.claude/rules/responsive.md`
 - GitHub/PR conventions: `.claude/rules/github.md`
 - shadcn adaptation differences: `.claude/rules/shadcn-divergences.md`
@@ -139,7 +139,7 @@ pnpm lint
 
 ## Token Work
 
-Read `.claude/rules/tokens.md` before changing tokens or generated token outputs.
+Read the token sources in `packages/core/tokens/` before changing tokens or generated token outputs.
 
 - Token source lives under `packages/core/tokens/`.
 - Do not edit `dist/` or `packages/tailwind/` directly; regenerate outputs.
