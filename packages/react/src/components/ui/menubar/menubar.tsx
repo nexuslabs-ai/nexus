@@ -100,7 +100,7 @@ function MenubarTrigger({ className, ...props }: MenubarTriggerProps) {
       data-slot="menubar-trigger"
       className={cn(
         'nx:flex nx:select-none nx:items-center nx:rounded-sm nx:px-2 nx:py-1',
-        'nx:text-sm nx:font-medium nx:outline-none',
+        'nx:typography-label-default nx:outline-none',
         'nx:focus:bg-background-hover nx:focus:text-foreground',
         'nx:data-[state=open]:bg-background-hover nx:data-[state=open]:text-foreground',
         className
@@ -142,7 +142,7 @@ function MenubarSubTrigger({
       data-inset={inset}
       className={cn(
         'nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2',
-        'nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none',
+        'nx:rounded-sm nx:px-2 nx:py-control-sm nx:typography-body-default nx:outline-none',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-[state=open]:bg-popover-hover nx:data-[state=open]:text-popover-foreground',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
@@ -251,7 +251,7 @@ function MenubarContent({
 }
 
 const menubarItemVariants = cva(
-  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-control-sm nx:text-sm nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-control-sm nx:typography-body-default nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -346,7 +346,7 @@ function MenubarCheckboxItem({
       data-slot="menubar-checkbox-item"
       className={cn(
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
-        'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
+        'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
@@ -397,7 +397,7 @@ function MenubarRadioItem({
       data-slot="menubar-radio-item"
       className={cn(
         'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
-        'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:text-sm nx:outline-none',
+        'nx:rounded-sm nx:py-control-sm nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:opacity-50',
@@ -446,7 +446,7 @@ function MenubarLabel({ className, inset, ...props }: MenubarLabelProps) {
       data-slot="menubar-label"
       data-inset={inset}
       className={cn(
-        'nx:px-2 nx:py-control-sm nx:text-sm nx:font-semibold',
+        'nx:px-2 nx:py-control-sm nx:typography-label-default',
         inset && 'nx:pl-8',
         className
       )}

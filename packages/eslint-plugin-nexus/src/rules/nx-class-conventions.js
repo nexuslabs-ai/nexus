@@ -5,6 +5,25 @@
 // `pnpm lint` and the pre-commit hook for every contributor — not only on
 // in-session Claude edits.
 
+// The 11 live typography composites emitted as `@utility typography-*` by
+// packages/tailwind/typography-utilities.css; any other `nx:…typography-*` is
+// dead — it renders nothing (e.g. the `label-large` / `body-xsmall` tiers dropped
+// by the #459 trim). A drift guard in the rule's test fails if this list and the
+// emitted set diverge, so it can't silently rot.
+export const LIVE_TYPOGRAPHY = [
+  'body-default',
+  'body-small',
+  'code-block',
+  'code-inline',
+  'heading-large',
+  'heading-medium',
+  'heading-small',
+  'heading-xsmall',
+  'label-caps',
+  'label-default',
+  'label-small',
+];
+
 const CHECKS = [
   {
     messageId: 'prefixOrder',
@@ -21,6 +40,12 @@ const CHECKS = [
   {
     messageId: 'rawPrimitive',
     re: /nx:(?:[\w-]+:)*(?:bg|text|border)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}/,
+  },
+  {
+    messageId: 'deadTypography',
+    re: new RegExp(
+      `nx:(?:[\\w-]+:)*typography-(?!(?:${LIVE_TYPOGRAPHY.join('|')})\\b)[\\w-]+`
+    ),
   },
 ];
 
@@ -51,6 +76,8 @@ export default {
         'Incomplete semantic token path — add a `-background`, `-foreground`, or `-subtle` suffix (e.g. `nx:bg-primary-background`).',
       rawPrimitive:
         'Raw Tailwind primitive color — use a semantic token instead (e.g. `nx:bg-primary-background`, not `nx:bg-blue-500`).',
+      deadTypography:
+        'Unknown typography composite — this `nx:typography-*` utility is not emitted by typography-utilities.css and renders nothing. Use a live tier (e.g. `nx:typography-body-default`, `nx:typography-label-default`).',
     },
   },
   create(context) {

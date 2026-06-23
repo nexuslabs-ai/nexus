@@ -141,8 +141,8 @@ function badgeShapeClasses(
   isCaps: boolean
 ) {
   if (isNumber)
-    return 'nx:min-h-5 nx:min-w-5 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
-  if (isIconOnly) return 'nx:h-5 nx:min-w-5 nx:p-0';
+    return 'nx:min-h-6 nx:min-w-6 nx:rounded-full nx:px-1.5 nx:py-0 nx:typography-label-caps nx:tabular-nums';
+  if (isIconOnly) return 'nx:h-6 nx:min-w-6 nx:p-0';
   if (isCaps) return 'nx:typography-label-caps nx:uppercase nx:px-2 nx:py-1';
   return 'nx:typography-label-default nx:px-2.5 nx:py-1';
 }
