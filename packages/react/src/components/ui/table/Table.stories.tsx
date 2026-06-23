@@ -367,7 +367,7 @@ export const ScrollRegionFocus: Story = {
     await expect(container).toHaveClass(
       'nx:focus-visible:outline-2',
       'nx:focus-visible:outline-focus-default',
-      'nx:focus-visible:outline-offset-(--focus-offset)'
+      'nx:focus-visible:[outline-offset:-2px]'
     );
 
     // The container is the only focusable element, so the first Tab lands on it.

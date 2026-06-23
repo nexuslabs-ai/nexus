@@ -116,7 +116,9 @@ function Table({
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         className={cn(
-          'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+          // Inset (negative) outline: an outward focus ring is clipped to nothing
+          // by an overflow-hidden ancestor (Card, the console's bordered wrapper).
+          'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
           stickyHeader && 'nx:overflow-y-auto',
           containerClassName
         )}
