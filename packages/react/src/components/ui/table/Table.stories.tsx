@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
@@ -326,5 +326,48 @@ export const TokenizedTypography: Story = {
     await expect(footer).toBeInTheDocument();
     await expect(footer).toHaveClass('nx:typography-label-default');
     await expect(footer).not.toHaveClass('nx:font-medium');
+  },
+};
+
+// Keyboard access for the horizontal scroll region: with no focusable cells, the
+// container itself takes focus so a wide table can be scrolled into view.
+export const ScrollRegionFocus: Story = {
+  render: () => (
+    <Table>
+      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((row) => (
+          <TableRow key={row.invoice}>
+            <TableCell>{row.invoice}</TableCell>
+            <TableCell>{row.status}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const container = canvasElement.querySelector(
+      '[data-slot="table-container"]'
+    );
+
+    await expect(container).toBeInTheDocument();
+    await expect(container).toHaveAttribute('tabindex', '0');
+    await expect(container).toHaveClass(
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:outline-offset-(--focus-offset)'
+    );
+
+    // The container is the only focusable element, so the first Tab lands on it.
+    await userEvent.tab();
+    await expect(container).toHaveFocus();
   },
 };

@@ -38,7 +38,15 @@ interface TableProps extends React.ComponentProps<'table'> {}
  */
 function Table({ className, ...props }: TableProps) {
   return (
-    <div data-slot="table-container" className="nx:w-full nx:overflow-x-auto">
+    <div
+      data-slot="table-container"
+      // A wide table overflows horizontally and holds no focusable children, so
+      // the container itself must be keyboard-focusable to scroll into view
+      // (axe scrollable-region-focusable / WCAG 2.1.1).
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
+      className="nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+    >
       <table
         data-slot="table"
         className={cn(
