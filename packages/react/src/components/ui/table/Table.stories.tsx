@@ -466,6 +466,49 @@ export const AriaSortIndicator: Story = {
   },
 };
 
+// Zebra striping tints alternating body rows. Selection and hover beat the
+// stripe — a selected even row shows the selection tint, not the stripe.
+export const Striped: Story = {
+  render: () => (
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.slice(0, 4).map((row, i) => (
+          <TableRow
+            key={row.invoice}
+            data-state={i === 1 ? 'selected' : undefined}
+          >
+            <TableRowHeader>{row.invoice}</TableRowHeader>
+            <TableCell>{row.status}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const rows = canvasElement.querySelectorAll(
+      'tbody [data-slot="table-row"]'
+    );
+    const bg = (el: Element) => getComputedStyle(el).backgroundColor;
+    const oddRest = rows[0] as Element; // 1st body row: odd, no stripe
+    const evenSelected = rows[1] as Element; // 2nd body row: even + selected
+    const evenRest = rows[3] as Element; // 4th body row: even, striped
+
+    await expect(rows).toHaveLength(4);
+    // Striping: an even (unselected) row is tinted; an odd row is not.
+    await expect(bg(evenRest)).not.toBe(bg(oddRest));
+    // Selection beats the stripe: the selected even row shows the selection tint.
+    await expect(bg(evenSelected)).not.toBe(bg(evenRest));
+  },
+};
+
 // The three border treatments: `borderless` drops the internal rules (Stripe /
 // Linear feel), `default` keeps softened row rules + a header underline, and
 // `grid` adds column rules for a full cell grid (Notion).

@@ -64,6 +64,13 @@ interface TableProps extends React.ComponentProps<'table'> {
    */
   stickyHeader?: boolean;
   /**
+   * Zebra striping — tint alternating body rows so the eye tracks across a wide
+   * row. Selection and hover take precedence over the stripe.
+   *
+   * @default false
+   */
+  striped?: boolean;
+  /**
    * Classes for the scroll container (the element that owns horizontal — and,
    * with `stickyHeader`, vertical — overflow). Use it to bound the height
    * (`"nx:max-h-96"`) or set the surface. `className` still targets the `<table>`.
@@ -103,6 +110,7 @@ function Table({
   variant = 'default',
   density = 'comfortable',
   stickyHeader = false,
+  striped = false,
   containerClassName,
   ...props
 }: TableProps) {
@@ -126,8 +134,9 @@ function Table({
           data-variant={variant}
           data-density={density}
           data-sticky-header={stickyHeader || undefined}
+          data-striped={striped || undefined}
           className={cn(
-            'nx:w-full nx:caption-bottom nx:typography-body-default',
+            'nx:w-full nx:caption-bottom nx:typography-body-default nx:[&[data-striped]_tbody_tr:nth-child(even):not(:hover):not([data-state=selected])]:bg-muted',
             className
           )}
           {...props}
