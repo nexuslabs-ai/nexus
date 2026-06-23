@@ -10,11 +10,13 @@ type TableDensity = 'comfortable' | 'compact';
 interface TableContextValue {
   variant: TableVariant;
   density: TableDensity;
+  stickyHeader: boolean;
 }
 
 const TableContext = React.createContext<TableContextValue>({
   variant: 'default',
   density: 'comfortable',
+  stickyHeader: false,
 });
 
 function useTableContext() {
@@ -50,6 +52,23 @@ interface TableProps extends React.ComponentProps<'table'> {
    * @default 'comfortable'
    */
   density?: TableDensity;
+  /**
+   * Pin the header row while the body scrolls vertically.
+   *
+   * Requires a height-bounded scroll container — set one via `containerClassName`
+   * (e.g. `"nx:max-h-96"`), or there is nothing to scroll. The header paints on
+   * `background`; on a `Card` / `container` surface, override it with
+   * `<TableHeader className="nx:bg-container">`.
+   *
+   * @default false
+   */
+  stickyHeader?: boolean;
+  /**
+   * Classes for the scroll container (the element that owns horizontal — and,
+   * with `stickyHeader`, vertical — overflow). Use it to bound the height
+   * (`"nx:max-h-96"`) or set the surface. `className` still targets the `<table>`.
+   */
+  containerClassName?: string;
 }
 
 /**
@@ -83,10 +102,12 @@ function Table({
   className,
   variant = 'default',
   density = 'comfortable',
+  stickyHeader = false,
+  containerClassName,
   ...props
 }: TableProps) {
   return (
-    <TableContext.Provider value={{ variant, density }}>
+    <TableContext.Provider value={{ variant, density, stickyHeader }}>
       <div
         data-slot="table-container"
         // A wide table overflows horizontally and holds no focusable children, so
@@ -94,7 +115,11 @@ function Table({
         // (axe scrollable-region-focusable / WCAG 2.1.1).
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
-        className="nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+        className={cn(
+          'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+          stickyHeader && 'nx:overflow-y-auto',
+          containerClassName
+        )}
       >
         <table
           data-slot="table"
@@ -247,8 +272,16 @@ const tableHeadVariants = cva(
         comfortable: 'nx:py-3',
         compact: 'nx:py-2.5',
       },
+      stickyHeader: {
+        true: 'nx:sticky nx:top-0 nx:z-sticky nx:bg-background',
+        false: '',
+      },
     },
-    defaultVariants: { variant: 'default', density: 'comfortable' },
+    defaultVariants: {
+      variant: 'default',
+      density: 'comfortable',
+      stickyHeader: false,
+    },
   }
 );
 
@@ -259,11 +292,14 @@ const tableHeadVariants = cva(
  * above the data it labels.
  */
 function TableHead({ className, ...props }: TableHeadProps) {
-  const { variant, density } = useTableContext();
+  const { variant, density, stickyHeader } = useTableContext();
   return (
     <th
       data-slot="table-head"
-      className={cn(tableHeadVariants({ variant, density }), className)}
+      className={cn(
+        tableHeadVariants({ variant, density, stickyHeader }),
+        className
+      )}
       {...props}
     />
   );

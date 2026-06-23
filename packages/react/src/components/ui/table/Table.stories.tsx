@@ -480,3 +480,37 @@ export const Density: Story = {
     await expect(compactCell).toHaveClass('nx:py-2');
   },
 };
+
+// A pinned header: the body scrolls within a height-capped container while the
+// column headers stay visible.
+export const StickyHeader: Story = {
+  render: () => (
+    <Table stickyHeader containerClassName="nx:max-h-64">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Method</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {[...invoices, ...invoices, ...invoices].map((row, i) => (
+          <TableRow key={`${row.invoice}-${i}`}>
+            <TableCell>{row.invoice}</TableCell>
+            <TableCell>{row.status}</TableCell>
+            <TableCell>{row.method}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const head = canvasElement.querySelector('[data-slot="table-head"]');
+
+    await expect(head).toBeInTheDocument();
+    await expect(head).toHaveClass('nx:sticky', 'nx:top-0');
+    await expect(getComputedStyle(head as Element).position).toBe('sticky');
+  },
+};
