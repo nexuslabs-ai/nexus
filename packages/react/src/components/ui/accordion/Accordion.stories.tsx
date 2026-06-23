@@ -693,10 +693,6 @@ export const AllVariants: Story = {
   ),
 };
 
-// ============================================
-// MODE BEHAVIOUR (density stability)
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -729,7 +725,7 @@ export const AccordionTriggerModesCascade: Story = {
     docs: {
       description: {
         story:
-          'Density-cascade sentinel for AccordionTrigger. Its numeric `nx:py-4` resolves to a per-mode `--nx-spacing-4` (nova 14 → maia 18), so the trigger height tracks the active spacing mode — 48px in nova, 56px in maia. Asserts the cascade is wired through (nova < maia); the exact vega contract (52px) is pinned in `AccordionTriggerVegaHeightPinned`.',
+          'Density-cascade sentinel: the AccordionTrigger height tracks the active spacing mode.',
       },
     },
   },

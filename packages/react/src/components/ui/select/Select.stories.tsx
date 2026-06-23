@@ -764,10 +764,6 @@ export const AllVariants: Story = {
   },
 };
 
-// ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -848,7 +844,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: in vega mode, the `SelectTrigger` renders at exactly 38px (= `typography-body-default` 20px line-height + `py-2` 8px × 2 + border 1px × 2). It is mode-stable via numeric `py-2`; Input instead uses a fixed `h-10` (= per-mode `--nx-spacing-10`, 40px in vega) and so tracks density — the two are deliberately not the same height. If a designer retunes `--nx-spacing-2`, the body type ramp, or the border-width token, this test fails.',
+          'Regression sentinel: pins the `SelectTrigger` height in vega mode.',
       },
     },
   },

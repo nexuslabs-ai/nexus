@@ -181,7 +181,6 @@ function NavigationMenuContent({
         'nx:data-[motion=to-end]:slide-out-to-right-52 nx:data-[motion=to-start]:slide-out-to-left-52',
         'nx:data-[motion^=from-]:animate-in nx:data-[motion^=from-]:fade-in nx:data-[motion^=to-]:animate-out nx:data-[motion^=to-]:fade-out',
         'nx:motion-reduce:data-[motion^=from-]:animate-none nx:motion-reduce:data-[motion^=to-]:animate-none',
-        // @container conversion of shadcn's `md:absolute md:w-auto`
         'nx:@md/navmenu:absolute nx:@md/navmenu:w-auto',
         'nx:group-data-[viewport=false]/navigation-menu:top-full',
         'nx:group-data-[viewport=false]/navigation-menu:mt-1.5',
@@ -229,7 +228,6 @@ function NavigationMenuViewport({
           'nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=closed]:animate-out nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:animate-in nx:data-[state=open]:zoom-in-90',
           'nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none',
-          // @container conversion of shadcn's `md:w-[var(...)]`
           'nx:@md/navmenu:w-(--radix-navigation-menu-viewport-width)',
           className
         )}

@@ -525,10 +525,6 @@ export const AllVariants: Story = {
   },
 };
 
-// ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -598,8 +594,7 @@ export const VegaDefaultHeightPinned: Story = {
     a11y: { test: 'off' },
     docs: {
       description: {
-        story:
-          'Pin on the migration outcome: in vega mode, a Card containing a single `CardContent` with a 40px fixed-height child renders at exactly 66px (= border 1px × 2 + `CardContent` pt-0 + child 40 + `p-6` bottom 24). If a designer retunes spacing-6 or the border-width token, this test fails.',
+        story: 'Regression sentinel: pins the Card height in vega mode.',
       },
     },
   },
