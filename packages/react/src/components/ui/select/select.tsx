@@ -69,7 +69,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
         'nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:transition-colors nx:enabled:hover:bg-background-hover',
         'nx:px-3 nx:py-2 nx:typography-body-default',
         'nx:whitespace-nowrap',
-        'nx:placeholder:text-muted-foreground',
+        'nx:data-[placeholder]:text-muted-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
         'nx:[&>span]:line-clamp-1',

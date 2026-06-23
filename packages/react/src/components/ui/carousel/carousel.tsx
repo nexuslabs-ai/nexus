@@ -118,8 +118,8 @@ function Carousel({
     setCanScrollNext(api.canScrollNext());
   }, []);
 
-  const scrollPrev = () => api?.scrollPrev();
-  const scrollNext = () => api?.scrollNext();
+  const scrollPrev = React.useCallback(() => api?.scrollPrev(), [api]);
+  const scrollNext = React.useCallback(() => api?.scrollNext(), [api]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const isPrev =
@@ -163,17 +163,27 @@ function Carousel({
     };
   }, [api, onSelect]);
 
+  const contextValue = React.useMemo(
+    () => ({
+      carouselRef,
+      orientation,
+      scrollPrev,
+      scrollNext,
+      canScrollPrev,
+      canScrollNext,
+    }),
+    [
+      carouselRef,
+      orientation,
+      scrollPrev,
+      scrollNext,
+      canScrollPrev,
+      canScrollNext,
+    ]
+  );
+
   return (
-    <CarouselContext.Provider
-      value={{
-        carouselRef,
-        orientation,
-        scrollPrev,
-        scrollNext,
-        canScrollPrev,
-        canScrollNext,
-      }}
-    >
+    <CarouselContext.Provider value={contextValue}>
       <div
         onKeyDownCapture={handleKeyDown}
         className={cn('nx:relative', className)}
