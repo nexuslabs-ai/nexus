@@ -1,13 +1,44 @@
 import * as React from 'react';
 
+import { cva } from 'class-variance-authority';
+
 import { cn } from '@/lib/utils';
+
+type TableVariant = 'default' | 'borderless' | 'grid';
+
+interface TableContextValue {
+  variant: TableVariant;
+}
+
+const TableContext = React.createContext<TableContextValue>({
+  variant: 'default',
+});
+
+function useTableContext() {
+  return React.useContext(TableContext);
+}
 
 /**
  * TableProps
  *
  * Props for the Table component.
  */
-interface TableProps extends React.ComponentProps<'table'> {}
+interface TableProps extends React.ComponentProps<'table'> {
+  /**
+   * Border treatment for the table's internal lines.
+   *
+   * - `default` — softened horizontal row rules + a header underline.
+   * - `borderless` — no internal lines; rows separate by hover + spacing.
+   * - `grid` — row **and** column rules (a full cell grid).
+   *
+   * @default 'default'
+   * @example
+   * ```tsx
+   * <Table variant="borderless">…</Table>
+   * ```
+   */
+  variant?: TableVariant;
+}
 
 /**
  * Table
@@ -36,26 +67,29 @@ interface TableProps extends React.ComponentProps<'table'> {}
  * </Table>
  * ```
  */
-function Table({ className, ...props }: TableProps) {
+function Table({ className, variant = 'default', ...props }: TableProps) {
   return (
-    <div
-      data-slot="table-container"
-      // A wide table overflows horizontally and holds no focusable children, so
-      // the container itself must be keyboard-focusable to scroll into view
-      // (axe scrollable-region-focusable / WCAG 2.1.1).
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-      tabIndex={0}
-      className="nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
-    >
-      <table
-        data-slot="table"
-        className={cn(
-          'nx:w-full nx:caption-bottom nx:typography-body-default',
-          className
-        )}
-        {...props}
-      />
-    </div>
+    <TableContext.Provider value={{ variant }}>
+      <div
+        data-slot="table-container"
+        // A wide table overflows horizontally and holds no focusable children, so
+        // the container itself must be keyboard-focusable to scroll into view
+        // (axe scrollable-region-focusable / WCAG 2.1.1).
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        tabIndex={0}
+        className="nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+      >
+        <table
+          data-slot="table"
+          data-variant={variant}
+          className={cn(
+            'nx:w-full nx:caption-bottom nx:typography-body-default',
+            className
+          )}
+          {...props}
+        />
+      </div>
+    </TableContext.Provider>
   );
 }
 
@@ -69,16 +103,11 @@ interface TableHeaderProps extends React.ComponentProps<'thead'> {}
 /**
  * TableHeader
  *
- * The `<thead>` grouping for column-header rows.
+ * The `<thead>` grouping for column-header rows. The underline beneath the
+ * header comes from its `TableRow`'s bottom border, so it tracks the `variant`.
  */
 function TableHeader({ className, ...props }: TableHeaderProps) {
-  return (
-    <thead
-      data-slot="table-header"
-      className={cn('nx:[&_tr]:border-b', className)}
-      {...props}
-    />
-  );
+  return <thead data-slot="table-header" className={className} {...props} />;
 }
 
 /**
@@ -111,6 +140,20 @@ function TableBody({ className, ...props }: TableBodyProps) {
  */
 interface TableFooterProps extends React.ComponentProps<'tfoot'> {}
 
+const tableFooterVariants = cva(
+  'nx:bg-muted nx:typography-label-default nx:[&>tr]:last:border-b-0',
+  {
+    variants: {
+      variant: {
+        default: 'nx:border-t nx:border-border-default-alpha',
+        borderless: '',
+        grid: 'nx:border-t nx:border-border-default-alpha',
+      },
+    },
+    defaultVariants: { variant: 'default' },
+  }
+);
+
 /**
  * TableFooter
  *
@@ -118,13 +161,11 @@ interface TableFooterProps extends React.ComponentProps<'tfoot'> {}
  * weight set it apart from the data rows above.
  */
 function TableFooter({ className, ...props }: TableFooterProps) {
+  const { variant } = useTableContext();
   return (
     <tfoot
       data-slot="table-footer"
-      className={cn(
-        'nx:border-t nx:border-border-default nx:bg-muted nx:typography-label-default nx:[&>tr]:last:border-b-0',
-        className
-      )}
+      className={cn(tableFooterVariants({ variant }), className)}
       {...props}
     />
   );
@@ -137,6 +178,20 @@ function TableFooter({ className, ...props }: TableFooterProps) {
  */
 interface TableRowProps extends React.ComponentProps<'tr'> {}
 
+const tableRowVariants = cva(
+  'nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
+  {
+    variants: {
+      variant: {
+        default: 'nx:border-b nx:border-border-default-alpha',
+        borderless: '',
+        grid: 'nx:border-b nx:border-border-default-alpha',
+      },
+    },
+    defaultVariants: { variant: 'default' },
+  }
+);
+
 /**
  * TableRow
  *
@@ -144,13 +199,11 @@ interface TableRowProps extends React.ComponentProps<'tr'> {}
  * `data-state="selected"` to mark a row as part of the current selection.
  */
 function TableRow({ className, ...props }: TableRowProps) {
+  const { variant } = useTableContext();
   return (
     <tr
       data-slot="table-row"
-      className={cn(
-        'nx:border-b nx:border-border-default nx:transition-colors nx:hover:bg-background-hover nx:data-[state=selected]:bg-control-background nx:data-[state=selected]:hover:bg-control-background-hover',
-        className
-      )}
+      className={cn(tableRowVariants({ variant }), className)}
       {...props}
     />
   );
@@ -163,6 +216,20 @@ function TableRow({ className, ...props }: TableRowProps) {
  */
 interface TableHeadProps extends React.ComponentProps<'th'> {}
 
+const tableHeadVariants = cva(
+  'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
+  {
+    variants: {
+      variant: {
+        default: '',
+        borderless: '',
+        grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
+      },
+    },
+    defaultVariants: { variant: 'default' },
+  }
+);
+
 /**
  * TableHead
  *
@@ -170,13 +237,11 @@ interface TableHeadProps extends React.ComponentProps<'th'> {}
  * above the data it labels.
  */
 function TableHead({ className, ...props }: TableHeadProps) {
+  const { variant } = useTableContext();
   return (
     <th
       data-slot="table-head"
-      className={cn(
-        'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
-        className
-      )}
+      className={cn(tableHeadVariants({ variant }), className)}
       {...props}
     />
   );
@@ -189,19 +254,31 @@ function TableHead({ className, ...props }: TableHeadProps) {
  */
 interface TableCellProps extends React.ComponentProps<'td'> {}
 
+const tableCellVariants = cva(
+  'nx:p-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
+  {
+    variants: {
+      variant: {
+        default: '',
+        borderless: '',
+        grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
+      },
+    },
+    defaultVariants: { variant: 'default' },
+  }
+);
+
 /**
  * TableCell
  *
  * A data cell (`<td>`).
  */
 function TableCell({ className, ...props }: TableCellProps) {
+  const { variant } = useTableContext();
   return (
     <td
       data-slot="table-cell"
-      className={cn(
-        'nx:p-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
-        className
-      )}
+      className={cn(tableCellVariants({ variant }), className)}
       {...props}
     />
   );

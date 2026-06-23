@@ -371,3 +371,72 @@ export const ScrollRegionFocus: Story = {
     await expect(container).toHaveFocus();
   },
 };
+
+// The three border treatments: `borderless` drops the internal rules (Stripe /
+// Linear feel), `default` keeps softened row rules + a header underline, and
+// `grid` adds column rules for a full cell grid (Notion).
+export const Borderless: Story = {
+  render: () => (
+    <Table variant="borderless">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.slice(0, 3).map((row) => (
+          <TableRow key={row.invoice}>
+            <TableCell>{row.invoice}</TableCell>
+            <TableCell>{row.status}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const table = canvasElement.querySelector('[data-slot="table"]');
+    const row = canvasElement.querySelector('[data-slot="table-row"]');
+
+    await expect(table).toHaveAttribute('data-variant', 'borderless');
+    await expect(row).not.toHaveClass('nx:border-b');
+  },
+};
+
+// A full cell grid — row rules plus column rules — for spreadsheet-style data.
+export const Grid: Story = {
+  render: () => (
+    <Table variant="grid">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.slice(0, 3).map((row) => (
+          <TableRow key={row.invoice}>
+            <TableCell>{row.invoice}</TableCell>
+            <TableCell>{row.status}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const table = canvasElement.querySelector('[data-slot="table"]');
+    const row = canvasElement.querySelector('[data-slot="table-row"]');
+    const cell = canvasElement.querySelector('[data-slot="table-cell"]');
+
+    await expect(table).toHaveAttribute('data-variant', 'grid');
+    await expect(row).toHaveClass(
+      'nx:border-b',
+      'nx:border-border-default-alpha'
+    );
+    await expect(cell).toHaveClass('nx:border-r');
+  },
+};
