@@ -440,3 +440,43 @@ export const Grid: Story = {
     await expect(cell).toHaveClass('nx:border-r');
   },
 };
+
+// Row density. `comfortable` (the default) gives roomier ~44px rows; `compact`
+// tightens to ~36px for dense data.
+export const Density: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-6">
+      {(['comfortable', 'compact'] as const).map((density) => (
+        <Table key={density} density={density}>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Invoice</TableHead>
+              <TableHead className="nx:text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invoices.slice(0, 2).map((row) => (
+              <TableRow key={row.invoice}>
+                <TableCell>{row.invoice}</TableCell>
+                <TableCell className="nx:text-right">{row.amount}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const comfyCell = canvasElement.querySelector(
+      '[data-density="comfortable"] [data-slot="table-cell"]'
+    );
+    const compactCell = canvasElement.querySelector(
+      '[data-density="compact"] [data-slot="table-cell"]'
+    );
+
+    await expect(comfyCell).toBeInTheDocument();
+    await expect(comfyCell).toHaveClass('nx:py-3');
+    await expect(compactCell).toBeInTheDocument();
+    await expect(compactCell).toHaveClass('nx:py-2');
+  },
+};

@@ -5,13 +5,16 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 type TableVariant = 'default' | 'borderless' | 'grid';
+type TableDensity = 'comfortable' | 'compact';
 
 interface TableContextValue {
   variant: TableVariant;
+  density: TableDensity;
 }
 
 const TableContext = React.createContext<TableContextValue>({
   variant: 'default',
+  density: 'comfortable',
 });
 
 function useTableContext() {
@@ -38,6 +41,15 @@ interface TableProps extends React.ComponentProps<'table'> {
    * ```
    */
   variant?: TableVariant;
+  /**
+   * Row density.
+   *
+   * - `comfortable` — roomier ~44px rows (the default).
+   * - `compact` — tighter ~36px rows for dense data.
+   *
+   * @default 'comfortable'
+   */
+  density?: TableDensity;
 }
 
 /**
@@ -67,9 +79,14 @@ interface TableProps extends React.ComponentProps<'table'> {
  * </Table>
  * ```
  */
-function Table({ className, variant = 'default', ...props }: TableProps) {
+function Table({
+  className,
+  variant = 'default',
+  density = 'comfortable',
+  ...props
+}: TableProps) {
   return (
-    <TableContext.Provider value={{ variant }}>
+    <TableContext.Provider value={{ variant, density }}>
       <div
         data-slot="table-container"
         // A wide table overflows horizontally and holds no focusable children, so
@@ -82,6 +99,7 @@ function Table({ className, variant = 'default', ...props }: TableProps) {
         <table
           data-slot="table"
           data-variant={variant}
+          data-density={density}
           className={cn(
             'nx:w-full nx:caption-bottom nx:typography-body-default',
             className
@@ -217,7 +235,7 @@ function TableRow({ className, ...props }: TableRowProps) {
 interface TableHeadProps extends React.ComponentProps<'th'> {}
 
 const tableHeadVariants = cva(
-  'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
+  'nx:px-2 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
   {
     variants: {
       variant: {
@@ -225,8 +243,12 @@ const tableHeadVariants = cva(
         borderless: '',
         grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
       },
+      density: {
+        comfortable: 'nx:py-3',
+        compact: 'nx:py-2.5',
+      },
     },
-    defaultVariants: { variant: 'default' },
+    defaultVariants: { variant: 'default', density: 'comfortable' },
   }
 );
 
@@ -237,11 +259,11 @@ const tableHeadVariants = cva(
  * above the data it labels.
  */
 function TableHead({ className, ...props }: TableHeadProps) {
-  const { variant } = useTableContext();
+  const { variant, density } = useTableContext();
   return (
     <th
       data-slot="table-head"
-      className={cn(tableHeadVariants({ variant }), className)}
+      className={cn(tableHeadVariants({ variant, density }), className)}
       {...props}
     />
   );
@@ -255,7 +277,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
 interface TableCellProps extends React.ComponentProps<'td'> {}
 
 const tableCellVariants = cva(
-  'nx:p-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
+  'nx:px-2 nx:align-middle nx:whitespace-nowrap nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
   {
     variants: {
       variant: {
@@ -263,8 +285,12 @@ const tableCellVariants = cva(
         borderless: '',
         grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
       },
+      density: {
+        comfortable: 'nx:py-3',
+        compact: 'nx:py-2',
+      },
     },
-    defaultVariants: { variant: 'default' },
+    defaultVariants: { variant: 'default', density: 'comfortable' },
   }
 );
 
@@ -274,11 +300,11 @@ const tableCellVariants = cva(
  * A data cell (`<td>`).
  */
 function TableCell({ className, ...props }: TableCellProps) {
-  const { variant } = useTableContext();
+  const { variant, density } = useTableContext();
   return (
     <td
       data-slot="table-cell"
-      className={cn(tableCellVariants({ variant }), className)}
+      className={cn(tableCellVariants({ variant, density }), className)}
       {...props}
     />
   );
