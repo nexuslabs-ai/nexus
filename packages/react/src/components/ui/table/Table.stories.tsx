@@ -242,40 +242,44 @@ export const WithDataAttributes: Story = {
 // ALL VARIANTS GRID
 // ============================================
 
-// The full anatomy in one table: muted column headers, a selected row, hover
-// highlight, a footer totals row, and a caption.
+// The three border variants across the full anatomy — muted headers, a selected
+// row, and a footer totals row — at the default comfortable density.
 export const AllVariants: Story = {
   render: () => (
-    <Table>
-      <TableCaption>Recent invoices — full table anatomy.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="nx:text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.slice(0, 4).map((row, i) => (
-          <TableRow
-            key={row.invoice}
-            data-state={i === 1 ? 'selected' : undefined}
-          >
-            <TableCell className="nx:font-medium">{row.invoice}</TableCell>
-            <TableCell>{row.status}</TableCell>
-            <TableCell>{row.method}</TableCell>
-            <TableCell className="nx:text-right">{row.amount}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="nx:text-right">$1,400.00</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
+    <div className="nx:flex nx:flex-col nx:gap-8">
+      {(['default', 'borderless', 'grid'] as const).map((variant) => (
+        <Table key={variant} variant={variant}>
+          <TableCaption>{variant}</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Method</TableHead>
+              <TableHead className="nx:text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invoices.slice(0, 3).map((row, i) => (
+              <TableRow
+                key={row.invoice}
+                data-state={i === 1 ? 'selected' : undefined}
+              >
+                <TableCell className="nx:font-medium">{row.invoice}</TableCell>
+                <TableCell>{row.status}</TableCell>
+                <TableCell>{row.method}</TableCell>
+                <TableCell className="nx:text-right">{row.amount}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell className="nx:text-right">$750.00</TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      ))}
+    </div>
   ),
 };
 
