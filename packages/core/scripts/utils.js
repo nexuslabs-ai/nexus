@@ -755,7 +755,7 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
  *
  * Returns a map keyed by mode name; each value is the token list for that
  * mode. Token `cssName` is the JSON path joined with `-` (e.g. `spacing-0`,
- * `control-padding-x-md`, `container-p`, `layout-section-gap`) — **without**
+ * `container-p`, `layout-section-gap`) — **without**
  * the `nx-` prefix. Callers add the prefix at emit time based on context:
  *
  *  - `@theme` block (numeric subset only) emits unprefixed (`--spacing-0`).
@@ -766,11 +766,11 @@ export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
  *    form (`--nx-spacing-0`) directly, because Tailwind doesn't rewrite
  *    variables outside `@theme`. See `generateSpacingModesCSS`.
  *  - `@utility` role declarations reference the prefixed form
- *    (`var(--nx-control-padding-x-md)`). See `generateSpacingRoleUtilitiesCSS`.
+ *    (`var(--nx-container-p)`). See `generateSpacingRoleUtilitiesCSS`.
  *
  * Throws on cssName collisions across paths within a single mode — two paths
- * flattening to the same name (e.g. `control.padding-x.md` and
- * `control.padding-x-md` both → `control-padding-x-md`) would silently lose
+ * flattening to the same name (e.g. `layout.section-gap` and
+ * `layout.section.gap` both → `layout-section-gap`) would silently lose
  * one declaration.
  *
  * @param {string} semanticDir - Path to semantic directory
@@ -829,13 +829,13 @@ export function collectSpacingTokens(semanticDir) {
  * cryptic "unhandled path shape" errors at the emit step.
  */
 const SPACING_NUMERIC_ROOTS = new Set(['spacing']);
-const SPACING_ROLE_ROOTS = new Set(['control', 'container', 'layout']);
+const SPACING_ROLE_ROOTS = new Set(['container', 'layout']);
 
 /**
  * Split a per-mode token list into `{ numeric, role }` halves. Numeric tokens
  * (path starts with `spacing`) feed `@theme` for Tailwind's `nx:p-*` /
  * `nx:m-*` / `nx:gap-*` / `nx:h-*` / `nx:w-*` utility codegen. Role tokens
- * (`control.*`, `container.*`, `layout.*`) feed only the per-mode
+ * (`container.*`, `layout.*`) feed only the per-mode
  * `[data-style="X"]` overrides and the `spacing-utilities` `@utility`
  * declarations. Role tokens never enter `@theme`, both because Tailwind v4's
  * `--container-*` namespace would otherwise auto-codegen `nx:w-p` and
@@ -878,7 +878,7 @@ export function splitSpacingTokens(tokens) {
  * sees the full per-mode contract in one place.
  *
  * Variable names are emitted already-prefixed (`--nx-spacing-N`,
- * `--nx-control-padding-x-md`, …). Tailwind v4's `prefix(nx)` rewrites variables
+ * `--nx-container-p`, …). Tailwind v4's `prefix(nx)` rewrites variables
  * inside `@theme` but does NOT rewrite variables declared in `:root` /
  * attribute-selector blocks, so writing the prefixed form here is what makes
  * mode-switching actually override the utility's `var(--nx-spacing-N)`
@@ -924,7 +924,7 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
   // Per-mode blocks live OUTSIDE @theme — Tailwind v4's `prefix(nx)` only
   // rewrites variables declared inside @theme, so we add the `nx-` prefix
   // here so the declarations actually override the `var(--nx-spacing-*)` /
-  // `var(--nx-control-*)` etc. references in compiled utilities.
+  // `var(--nx-container-*)` etc. references in compiled utilities.
   const writeBlock = (selector, tokens) => {
     let block = `${selector} {\n`;
     for (const token of tokens) {
@@ -963,9 +963,7 @@ const FAMILY_TO_UTILITY = {
  * Derive a `{utilityName, properties}` for a role-token path.
  *
  * Naming convention — `<property-shorthand>-<role>[-<size>]`:
- *   `control.padding-x.sm`    → utility `px-control-sm`,       padding-inline
- *   `control.padding-y.lg`    → utility `py-control-lg`,       padding-block
- *   `control.gap.md`          → utility `gap-control-md`,      gap
+ *   `<role>.<family>.<size>`  → utility `<prefix>-<role>-<size>` (3-segment form)
  *   `container.p`             → utility `p-container`,         padding
  *   `container.gap`           → utility `gap-container`,       gap
  *   `layout.section-gap`      → utility `gap-layout-section`,  gap
@@ -984,7 +982,7 @@ const FAMILY_TO_UTILITY = {
 function deriveRoleUtility(tokenPath) {
   // Path forms we handle:
   //   [role, suffix]             — e.g. ['container', 'p'], ['container', 'gap']
-  //   [role, family, size]       — e.g. ['control', 'padding-x', 'md']
+  //   [role, family, size]       — 3-segment form (e.g. ['<role>', 'padding-x', 'md'])
   //   [role, 'X-gap']            — e.g. ['layout', 'section-gap'] (composite suffix)
   if (tokenPath.length < 2 || tokenPath.length > 3) {
     throw new Error(

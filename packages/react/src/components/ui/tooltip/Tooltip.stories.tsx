@@ -369,13 +369,13 @@ export const AllModes: Story = {
   ),
 };
 
-export const TooltipContentResolvesRoleUtility: Story = {
+export const TooltipContentUsesNumericSpacing: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Regression sentinel — verifies `TooltipContent` resolves the `px-control-sm`/`py-control-sm` role utilities to expected pixel values via `getComputedStyle`. A `toHaveClass` check is insufficient because tailwind-merge would collapse the role class away under a consumer override but the className-presence test would still pass; this measures the actually-applied style. Because the content is portaled, the assertion sees document-level mode resolution — vega (the documented default in the Style toolbar).',
+          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — vega (the documented default in the Style toolbar), where `px-3` is 12px and `py-1.5` is 6px.',
       },
     },
   },
@@ -406,7 +406,6 @@ export const TooltipContentResolvesRoleUtility: Story = {
       });
 
       const styles = getComputedStyle(tooltip);
-      // vega: --nx-control-padding-x-sm = 12px, --nx-control-padding-y-sm = 6px
       expect(styles.paddingLeft).toBe('12px');
       expect(styles.paddingRight).toBe('12px');
       expect(styles.paddingTop).toBe('6px');
