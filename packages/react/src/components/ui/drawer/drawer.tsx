@@ -135,6 +135,22 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
+ * DrawerBody
+ *
+ * Container for the drawer's main content between the header and footer. Insets
+ * its content horizontally to match the header and footer.
+ */
+function DrawerBody({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="drawer-body"
+      className={cn('nx:px-6', className)}
+      {...props}
+    />
+  );
+}
+
+/**
  * DrawerFooter
  *
  * Container for the drawer action buttons. Pinned to the bottom of the panel.
@@ -194,6 +210,7 @@ function DrawerDescription({
 
 export {
   Drawer,
+  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
