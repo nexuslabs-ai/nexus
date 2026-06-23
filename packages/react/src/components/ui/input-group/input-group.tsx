@@ -25,9 +25,7 @@ interface InputGroupProps extends React.ComponentProps<'div'> {}
  * state.
  *
  * The visible frame matches a standalone `Input`: an inline group takes the
- * control's `size` height (`sm` / `default` / `lg` → `h-8` / `h-10` / `h-12`),
- * so the wrapper border never makes the field taller than a bare `Input`.
- * Stacked (block-aligned) groups stay auto-height.
+ * control's `size` height. Stacked (block-aligned) groups stay auto-height.
  *
  * @example
  * ```tsx
@@ -50,7 +48,7 @@ function InputGroup({ className, ...props }: InputGroupProps) {
         // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
         // non-stacked layouts (no block addon) so the fixed-height rule and the
         // auto-height stacked case are mutually exclusive — they never both
-        // match. Heights follow the active spacing mode (h-8/h-10/h-12), like Input.
+        // match.
         'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=sm]]:h-8',
         'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=default]]:h-10',
         'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=lg]]:h-12',

@@ -615,17 +615,13 @@ export const AllVariants: Story = {
   ),
 };
 
-// ============================================
-// MODE BEHAVIOUR (per-mode spacing variance)
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `TabsTrigger` `default` uses `px-3 py-1.5`, `lg` uses `px-4 py-2`, and `sm` stays on `px-2 py-1`. Vertical padding (`py-1.5` / `py-2`) is mode-invariant, so trigger heights are identical across every mode; only the horizontal padding (`px-3` / `px-4`) varies — Nova compresses, Maia / Sera breathe.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side.',
       },
     },
   },
@@ -661,7 +657,7 @@ export const TabsTriggerVegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the migration outcome: a `TabsTrigger` at `default` size renders at exactly 34px (= `text-sm` 20px line-height + `py-1.5` 6px × 2 + transparent border 1px × 2). `py-1.5` is mode-invariant, so this height now holds in every mode. If a designer retunes `--nx-spacing-1_5`, the body type ramp, or the trigger border, this test fails.',
+          'Regression sentinel: pins the `default` `TabsTrigger` height in vega mode.',
       },
     },
   },
@@ -689,7 +685,7 @@ export const TabsSmIsDensityStable: Story = {
     docs: {
       description: {
         story:
-          'Density-stability sentinel for the `sm` size. `TabsTrigger` `sm` stays on the sub-control numeric rhythm (`px-2 py-1 text-xs`). Every spacing mode therefore renders it at the same canonical 26px height (= `text-xs` line-height 16px + `py-1` 4px × 2 + transparent border 1px × 2). If a future PR migrates `py-1` → a mode-varying step (e.g. `py-3`, which resolves 10 / 12 / 14px across nova / vega / maia), this test fails for nova/sera — the regression signal is that intent (sub-control, mode-stable) has been broken.',
+          'Density-stability sentinel: the `sm` `TabsTrigger` renders at the same height across spacing modes.',
       },
     },
   },

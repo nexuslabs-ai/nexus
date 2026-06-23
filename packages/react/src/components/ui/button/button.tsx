@@ -88,15 +88,15 @@ interface ButtonProps
 
   /**
    * Decorative icon rendered before the button label. Use either `startIcon`
-   * or `endIcon` — the Figma anatomy has a single icon slot. Hidden while
-   * `loading` (the spinner replaces all content).
+   * or `endIcon`, not both. Hidden while `loading` (the spinner replaces all
+   * content).
    */
   startIcon?: React.ReactNode;
 
   /**
    * Decorative icon rendered after the button label. Use either `endIcon`
-   * or `startIcon` — the Figma anatomy has a single icon slot. Hidden while
-   * `loading` (the spinner replaces all content).
+   * or `startIcon`, not both. Hidden while `loading` (the spinner replaces all
+   * content).
    */
   endIcon?: React.ReactNode;
 }

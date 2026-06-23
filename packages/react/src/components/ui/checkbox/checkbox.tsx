@@ -69,8 +69,7 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         'nx:enabled:data-[state=indeterminate]:active:border-primary-background-hover nx:enabled:data-[state=indeterminate]:active:bg-primary-background-active',
         'nx:data-[state=checked]:disabled:border-primary-disabled nx:data-[state=checked]:disabled:bg-primary-disabled',
         'nx:data-[state=indeterminate]:disabled:border-primary-disabled nx:data-[state=indeterminate]:disabled:bg-primary-disabled',
-        // Invalid + checked/indeterminate follows Figma's destructive checkbox
-        // treatment while preserving aria-invalid as the single authoring hook.
+        // Invalid + checked/indeterminate: aria-invalid is the single authoring hook.
         'nx:aria-invalid:data-[state=checked]:border-border-error nx:aria-invalid:data-[state=checked]:bg-error-background nx:aria-invalid:data-[state=checked]:text-error-foreground',
         'nx:aria-invalid:data-[state=indeterminate]:border-border-error nx:aria-invalid:data-[state=indeterminate]:bg-error-background nx:aria-invalid:data-[state=indeterminate]:text-error-foreground',
         'nx:enabled:aria-invalid:data-[state=checked]:hover:border-border-error nx:enabled:aria-invalid:data-[state=checked]:hover:bg-error-background-hover',

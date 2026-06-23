@@ -558,10 +558,6 @@ export const AllVariants: Story = {
   },
 };
 
-// ============================================
-// MODE BEHAVIOUR (per-mode heights)
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     a11y: { test: 'off' },

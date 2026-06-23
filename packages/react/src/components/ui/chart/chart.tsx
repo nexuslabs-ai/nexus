@@ -15,9 +15,9 @@ import { cn } from '@/lib/utils';
  * for generated color variables must contain only letters, numbers, `_`, or
  * `-`; other keys can still provide labels and icons.
  *
- * Nexus semantic tokens already adapt across light/dark, so — unlike shadcn —
- * there is no `theme: { light, dark }` split. Point `color` at a Nexus chart
- * token (`var(--nx-color-chart-categorical-N)`) and it tracks the theme for you.
+ * Nexus semantic tokens already adapt across light/dark, so there is no
+ * `theme: { light, dark }` split. Point `color` at a Nexus chart token
+ * (`var(--nx-color-chart-categorical-N)`) and it tracks the theme for you.
  * Treat `color` as trusted component CSS, not user-provided data.
  */
 export type ChartConfig = {

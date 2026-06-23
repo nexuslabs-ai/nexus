@@ -113,10 +113,9 @@ interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
 /**
  * BreadcrumbLink
  *
- * A link to an ancestor page. It follows the compact Figma item rhythm and keeps
- * the canonical focus ring since it is reachable by keyboard. Wrap the label in a
- * `<span>` so it truncates at the 150px cap — both for plain text and when
- * composing an icon with text.
+ * A link to an ancestor page. It keeps the canonical focus ring since it is
+ * reachable by keyboard. Wrap the label in a `<span>` so it truncates at the
+ * 150px cap — both for plain text and when composing an icon with text.
  */
 function BreadcrumbLink({ asChild, className, ...props }: BreadcrumbLinkProps) {
   const Comp = asChild ? Slot : 'a';

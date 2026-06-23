@@ -695,17 +695,13 @@ export const AllVariants: Story = {
   },
 };
 
-// ============================================
-// MODE BEHAVIOUR (density stability)
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Badge is intentionally density-stable — its utilities sit on the canonical numeric step set (`px-2`, `py-1`, `gap-1`) rather than the `control-*` role family, because a chip is not a control (its padding is sub-control by design). All 7 rows should render at the same height regardless of mode. The `BadgeIsDensityStable` sentinel below asserts this.',
+          'All spacing-mode rows render at the same Badge height; the `BadgeIsDensityStable` sentinel below asserts it.',
       },
     },
   },
@@ -737,7 +733,7 @@ export const BadgeIsDensityStable: Story = {
     docs: {
       description: {
         story:
-          'Mode-invariance sentinel. Badge stays 24px in every density mode because its height = label-caps line-height 16px + `py-1` × 2, and `py-1` resolves to `spacing-1` = 4px — a small index that is identical across all modes (density cannot meaningfully shrink it). This flatness is the exception, not a rule: numeric spacing is not inherently mode-stable (`spacing-4` is 14/16/18 across nova/vega/maia). If Badge migrates onto a `control-*` role utility its height starts tracking density and this test fails for that mode — bump the expected px to the new canonical value.',
+          'Mode-invariance sentinel: Badge renders at the same height in every spacing mode.',
       },
     },
   },

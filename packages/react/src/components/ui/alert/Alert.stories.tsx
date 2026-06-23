@@ -1225,17 +1225,13 @@ export const AllBannerVariants: Story = {
   },
 };
 
-// ============================================
-// MODE BEHAVIOUR (callout rhythm)
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Alert stays on the document spacing scale (`nx:p-4`) rather than migrating to `p-container`. Alert still mode-couples through `--nx-spacing-4` (nova 14 / vega-cluster 16 / maia 18), so the visual height shifts between nova / vega-cluster / maia rows. The point is that Alert uses numeric document padding even though its default visual surface uses `nx:bg-container`.',
+          'Each row scopes `data-style` locally so the spacing modes render side-by-side.',
       },
     },
   },
@@ -1261,7 +1257,7 @@ export const ModesProduceDifferentHeights: Story = {
     docs: {
       description: {
         story:
-          'Cascade sentinel for Alert. Uses the `nova` + `maia` pair — the two modes where `--nx-spacing-4` diverges from the vega cluster (nova 14, maia 18). An Alert scoped to `nova` must render shorter than the same Alert scoped to `maia`. If a future PR accidentally swaps `p-4` for `p-container` the heights would still differ (and the pinned sentinel would catch the change in vega).',
+          'Sentinel: an Alert renders at different heights across spacing modes.',
       },
     },
   },

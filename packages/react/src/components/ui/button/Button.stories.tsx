@@ -808,10 +808,6 @@ export const AllVariants: Story = {
   ),
 };
 
-// ============================================
-// MODE BEHAVIOUR
-// ============================================
-
 export const AllModes: Story = {
   parameters: {
     // 7 rows × 3 buttons each duplicates the same accessible names; the
@@ -820,7 +816,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally, so the 7 spacing modes render side-by-side regardless of the Style toolbar. Button sizes use Nexus scale utilities (`h-8`/`h-10`/`h-12`) so they follow the active spacing mode.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side.',
       },
     },
   },

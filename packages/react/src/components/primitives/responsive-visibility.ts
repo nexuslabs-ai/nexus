@@ -6,14 +6,14 @@
  * no box of its own, so its children keep their natural flow: inline stays
  * inline, flex/grid children stay flex/grid items. Forcing `block` (or reverting
  * to the element's UA default) would override the wrapper's display and break
- * those layouts. This is the conclusion of the #103 pre-implementation spike.
+ * those layouts.
  *
  * Class strings are full static literals in the maps below: Tailwind only emits
  * a utility it can see as a complete string, so a computed `nx:${bp}:contents`
  * would never ship in the CSS bundle.
  *
  * Container axes use Tailwind's native `@container` scale (`@md` = 28rem), which
- * is intentionally smaller than the viewport scale (`md` = 48rem) — a component
+ * is smaller than the viewport scale (`md` = 48rem) — a component
  * reads as "md" at a narrower width than the whole viewport. The two axes
  * therefore resolve the same breakpoint name to different rem values.
  */
@@ -55,7 +55,7 @@ export type VisibilityAxis =
 export type ResponsiveVisibilityProps = HTMLAttributes<HTMLElement> & {
   /**
    * Wrapper tag: `span` (inline) or `div` (block) — match the child's layout.
-   * Tag-only by design and intentionally non-semantic: `display: contents` can
+   * Tag-only and non-semantic: `display: contents` can
    * drop a semantic element's box from the accessibility tree, so put semantics
    * on a child *inside* `<Show>` / `<Hide>` instead.
    * @default 'span'

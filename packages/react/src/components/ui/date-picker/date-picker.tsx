@@ -82,7 +82,7 @@ const staticDayPickerClassNames = {
   weekdays: cn('nx:flex', defaultClassNames.weekdays),
   weekday: cn(
     // Match the day buttons' type (Button's raw text-sm + font-normal,
-    // inherited family) rather than the label composite (Inter/medium).
+    // inherited family).
     'nx:flex-1 nx:rounded-md nx:text-sm nx:font-normal nx:text-muted-foreground-subtle nx:select-none',
     defaultClassNames.weekday
   ),
@@ -343,7 +343,7 @@ function DatePickerDayButton({
         isOutside && 'nx:text-muted-foreground-subtle',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',
-        // Today → Figma's inner error circle while keeping the button target at cell size.
+        // Today → inner error circle while keeping the button target at cell size.
         'nx:data-[today=true]:relative nx:data-[today=true]:bg-transparent nx:data-[today=true]:font-medium nx:data-[today=true]:text-error-foreground nx:data-[today=true]:hover:bg-transparent nx:data-[today=true]:hover:text-error-foreground',
         'nx:data-[today=true]:before:absolute nx:data-[today=true]:before:top-1/2 nx:data-[today=true]:before:left-1/2 nx:data-[today=true]:before:size-(--today-marker-size) nx:data-[today=true]:before:-translate-x-1/2 nx:data-[today=true]:before:-translate-y-1/2 nx:data-[today=true]:before:rounded-full nx:data-[today=true]:before:bg-error-background nx:data-[today=true]:hover:before:bg-error-background-hover',
         "nx:data-[today=true]:before:content-['']",

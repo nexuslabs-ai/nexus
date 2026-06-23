@@ -512,17 +512,13 @@ export const AllVariants: Story = {
   },
 };
 
-// ============================================
-// MODE BEHAVIOUR (item padding pinned across spacing modes)
-// ============================================
-
 export const ItemPaddingPinnedAcrossModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Regression sentinel: opened `DropdownMenuItem` padding stays pinned to numeric `py-1.5` (6px via `--nx-spacing-1_5`) across document-level spacing modes — `py-1.5` is mode-invariant. Because the content portals to `document.body`, this asserts runtime resolution on the portaled item and restores the document mode in `finally`.',
+          'Regression sentinel: opened `DropdownMenuItem` padding stays constant across document spacing modes.',
       },
     },
   },
