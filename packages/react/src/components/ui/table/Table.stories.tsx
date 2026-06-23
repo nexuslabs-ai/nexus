@@ -1,4 +1,7 @@
+import { useState } from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { expect, userEvent } from 'storybook/test';
 
 import { Button } from '../button';
@@ -841,4 +844,185 @@ export const Bleed: Story = {
       </TableBody>
     </Table>
   ),
+};
+
+// Sortable header: a <button> in the <th>, with aria-sort mapped from the app's
+// sort state to the valid ascending/descending/none values (never the 'asc'/'desc'
+// a sort lib returns). The chevron is aria-hidden; sort logic stays the consumer's
+// (a local useState here; TanStack Table in production).
+function SortableHeaderDemo() {
+  const [sort, setSort] = useState<'asc' | 'desc'>('asc');
+  const ariaSort = sort === 'asc' ? 'ascending' : 'descending';
+  const Icon = sort === 'asc' ? ChevronUp : ChevronDown;
+  const rows = [...invoices].sort((a, b) =>
+    sort === 'asc'
+      ? a.amount.localeCompare(b.amount)
+      : b.amount.localeCompare(a.amount)
+  );
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead aria-sort={ariaSort} className="nx:text-right">
+            <button
+              type="button"
+              onClick={() => setSort((s) => (s === 'asc' ? 'desc' : 'asc'))}
+              className="nx:ml-auto nx:inline-flex nx:items-center nx:gap-1 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+            >
+              Amount
+              <Icon className="nx:size-4" aria-hidden />
+            </button>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rows.map((row) => (
+          <TableRow key={row.invoice}>
+            <TableRowHeader>{row.invoice}</TableRowHeader>
+            <TableCell className="nx:text-right nx:tabular-nums">
+              {row.amount}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export const SortableHeader: Story = {
+  render: () => <SortableHeaderDemo />,
+  play: async ({ canvasElement }) => {
+    const header = canvasElement.querySelector('[aria-sort]');
+    const button = canvasElement.querySelector('th button');
+    // aria-sort carries the valid token, never the lib's 'asc'/'desc'.
+    await expect(header).toHaveAttribute('aria-sort', 'ascending');
+    await userEvent.click(button as Element);
+    await expect(header).toHaveAttribute('aria-sort', 'descending');
+  },
+};
+
+// Multi-select with a partial-state header checkbox and a bulk-action bar that
+// appears on selection. Select-all toggles every row; the header checkbox reads
+// indeterminate while the selection is partial. Selection state is local here;
+// in production it's TanStack Table's row-selection model.
+function SelectionDemo() {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const allSelected = selected.size === invoices.length;
+  const someSelected = selected.size > 0 && !allSelected;
+  const toggleAll = () =>
+    setSelected(
+      allSelected ? new Set() : new Set(invoices.map((r) => r.invoice))
+    );
+  const toggleRow = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  return (
+    <div className="nx:space-y-2">
+      {selected.size > 0 && (
+        <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-muted nx:px-3 nx:py-2 nx:typography-label-default">
+          <span>{selected.size} selected</span>
+          <Button size="sm" variant="secondary">
+            Export
+          </Button>
+          <Button size="sm" variant="destructive">
+            Delete
+          </Button>
+        </div>
+      )}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>
+              <Checkbox
+                checked={
+                  allSelected ? true : someSelected ? 'indeterminate' : false
+                }
+                onCheckedChange={toggleAll}
+                aria-label="Select all rows"
+              />
+            </TableHead>
+            <TableHead>Invoice</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {invoices.map((row) => (
+            <TableRow
+              key={row.invoice}
+              data-state={selected.has(row.invoice) ? 'selected' : undefined}
+            >
+              <TableCell>
+                <Checkbox
+                  checked={selected.has(row.invoice)}
+                  onCheckedChange={() => toggleRow(row.invoice)}
+                  aria-label={`Select ${row.invoice}`}
+                />
+              </TableCell>
+              <TableRowHeader>{row.invoice}</TableRowHeader>
+              <TableCell>{row.status}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+export const SelectionWithBulkActions: Story = {
+  render: () => <SelectionDemo />,
+  play: async ({ canvasElement }) => {
+    const selectAll = canvasElement.querySelector(
+      '[aria-label="Select all rows"]'
+    );
+    await userEvent.click(selectAll as Element);
+    // Select-all selects every row (and reveals the bulk-action bar).
+    const selectedRows = canvasElement.querySelectorAll(
+      'tbody [data-slot="table-row"][data-state="selected"]'
+    );
+    await expect(selectedRows).toHaveLength(invoices.length);
+  },
+};
+
+// Whole-row link: an <a> in the row header whose absolutely-positioned ::after
+// covers the positioned row, so a click anywhere on the row follows the link —
+// without nesting other interactive controls under the overlay.
+export const RowLink: Story = {
+  render: () => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.slice(0, 3).map((row) => (
+          <TableRow
+            key={row.invoice}
+            className="nx:relative nx:hover:bg-background-hover nx:focus-within:bg-background-hover"
+          >
+            <TableRowHeader>
+              <a
+                href={`#/invoices/${row.invoice}`}
+                className="nx:after:absolute nx:after:inset-0 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+              >
+                {row.invoice}
+              </a>
+            </TableRowHeader>
+            <TableCell>{row.status}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const link = canvasElement.querySelector('a[href^="#/invoices/"]');
+    await expect(link).toBeInTheDocument();
+    await expect(link).toHaveAccessibleName('INV001');
+  },
 };
