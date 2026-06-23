@@ -91,7 +91,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
  */
 const sheetContentVariants = cva(
   cn(
-    'nx:fixed nx:z-modal nx:flex nx:flex-col nx:gap-4',
+    'nx:fixed nx:z-modal nx:flex nx:flex-col',
     'nx:bg-container nx:shadow-lg nx:ease-in-out',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
     'nx:data-[state=open]:duration-500 nx:data-[state=closed]:duration-300',
@@ -236,8 +236,9 @@ interface SheetBodyProps extends React.ComponentProps<'div'> {}
 /**
  * SheetBody
  *
- * Container for the sheet's main content between the header and footer. Pads its
- * content to the same inset as SheetHeader and SheetFooter.
+ * Container for the sheet's main content between the header and footer. Insets
+ * its content horizontally to match SheetHeader and SheetFooter; vertical
+ * separation comes from the header's and footer's padding.
  *
  * @example
  * ```tsx
@@ -250,7 +251,7 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
   return (
     <div
       data-slot="sheet-body"
-      className={cn('nx:p-6', className)}
+      className={cn('nx:px-6', className)}
       {...props}
     />
   );
