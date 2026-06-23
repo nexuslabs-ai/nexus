@@ -167,6 +167,40 @@ export const WithForm: Story = {
   ),
 };
 
+export const ScrollableContent: Story = {
+  render: (_args) => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">Terms & Conditions</Button>
+      </SheetTrigger>
+      <SheetContent className="nx:overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Terms of Service</SheetTitle>
+          <SheetDescription>
+            Please read the following terms carefully.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="nx:space-y-4 nx:px-4 nx:text-sm nx:text-foreground">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <p key={i}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+          ))}
+        </div>
+        <SheetFooter>
+          <SheetClose asChild>
+            <Button variant="outline">Decline</Button>
+          </SheetClose>
+          <Button>Accept</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  ),
+};
+
 // ============================================
 // INTERACTION TESTS
 // ============================================
@@ -314,6 +348,14 @@ export const WithDataAttributes: Story = {
     await expect(
       document.querySelector('[data-slot="sheet-content"]')
     ).toHaveAttribute('data-side', 'right');
+
+    await expect(
+      document.querySelector('[data-slot="sheet-close-button"]')
+    ).toHaveClass(
+      'nx:after:absolute',
+      'nx:after:-inset-2.5',
+      'nx:lg:after:hidden'
+    );
 
     await userEvent.keyboard('{Escape}');
   },
