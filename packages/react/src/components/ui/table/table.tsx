@@ -291,6 +291,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
   const { variant, density, stickyHeader } = useTableContext();
   return (
     <th
+      scope="col"
       data-slot="table-head"
       className={cn(
         tableHeadVariants({ variant, density }),
@@ -344,6 +345,37 @@ function TableCell({ className, ...props }: TableCellProps) {
 }
 
 /**
+ * TableRowHeaderProps
+ *
+ * Props for the TableRowHeader component.
+ */
+interface TableRowHeaderProps extends React.ComponentProps<'th'> {}
+
+/**
+ * TableRowHeader
+ *
+ * The identifying header cell of a row (`<th scope="row">`) — an invoice number,
+ * a person's name. Scoping it to the row gives every row an accessible name, so
+ * a screen reader announces which row a data cell belongs to. Styled like a data
+ * cell but with medium weight.
+ */
+function TableRowHeader({ className, ...props }: TableRowHeaderProps) {
+  const { variant, density } = useTableContext();
+  return (
+    <th
+      scope="row"
+      data-slot="table-row-header"
+      className={cn(
+        tableCellVariants({ variant, density }),
+        'nx:font-medium',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
  * TableCaptionProps
  *
  * Props for the TableCaption component.
@@ -384,5 +416,7 @@ export {
   type TableHeadProps,
   type TableProps,
   TableRow,
+  TableRowHeader,
+  type TableRowHeaderProps,
   type TableRowProps,
 };

@@ -13,6 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableRowHeader,
 } from './table';
 
 const meta: Meta<typeof Table> = {
@@ -373,6 +374,51 @@ export const ScrollRegionFocus: Story = {
     // The container is the only focusable element, so the first Tab lands on it.
     await userEvent.tab();
     await expect(container).toHaveFocus();
+  },
+};
+
+// Column headers default to scope="col"; the row's identifying cell uses
+// <TableRowHeader> (scope="row") so each row gets an accessible name. The blank
+// top-left corner opts out with scope={undefined}.
+export const SemanticScope: Story = {
+  render: () => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead scope={undefined}>
+            <span className="nx:sr-only">Invoice</span>
+          </TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((row) => (
+          <TableRow key={row.invoice}>
+            <TableRowHeader>{row.invoice}</TableRowHeader>
+            <TableCell>{row.status}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const heads = canvasElement.querySelectorAll('[data-slot="table-head"]');
+    const corner = heads[0];
+    const columnHead = heads[1];
+    const rowHeader = canvasElement.querySelector(
+      '[data-slot="table-row-header"]'
+    );
+
+    // Column header defaults to scope="col".
+    await expect(columnHead).toHaveAttribute('scope', 'col');
+    // The blank corner drops scope via scope={undefined}.
+    await expect(corner).not.toHaveAttribute('scope');
+    // The row's identifying cell is a real <th scope="row">.
+    await expect(rowHeader).toBeInTheDocument();
+    await expect(rowHeader).toHaveProperty('tagName', 'TH');
+    await expect(rowHeader).toHaveAttribute('scope', 'row');
   },
 };
 
