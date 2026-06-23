@@ -57,8 +57,8 @@ interface TableProps extends React.ComponentProps<'table'> {
    *
    * Requires a height-bounded scroll container — set one via `containerClassName`
    * (e.g. `"nx:max-h-96"`), or there is nothing to scroll. The header paints on
-   * `background`; on a `Card` / `container` surface, override it with
-   * `<TableHeader className="nx:bg-container">`.
+   * `background`; on a `Card` / `container` surface, override the cells with
+   * `<TableHeader className="nx:[&_th]:bg-container">`.
    *
    * @default false
    */

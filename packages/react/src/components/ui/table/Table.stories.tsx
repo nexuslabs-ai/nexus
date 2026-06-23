@@ -490,7 +490,7 @@ export const Density: Story = {
 export const StickyHeader: Story = {
   render: () => (
     <Table stickyHeader containerClassName="nx:max-h-64">
-      <TableHeader>
+      <TableHeader className="nx:[&_th]:bg-container">
         <TableRow>
           <TableHead>Invoice</TableHead>
           <TableHead>Status</TableHead>
@@ -511,8 +511,11 @@ export const StickyHeader: Story = {
     </Table>
   ),
   play: async ({ canvasElement }) => {
+    const header = canvasElement.querySelector('[data-slot="table-header"]');
     const head = canvasElement.querySelector('[data-slot="table-head"]');
 
+    await expect(header).toBeInTheDocument();
+    await expect(header).toHaveClass('nx:[&_th]:bg-container');
     await expect(head).toBeInTheDocument();
     await expect(head).toHaveClass('nx:sticky', 'nx:top-0');
     await expect(getComputedStyle(head as Element).position).toBe('sticky');
