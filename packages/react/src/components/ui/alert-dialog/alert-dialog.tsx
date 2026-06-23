@@ -10,7 +10,7 @@ const alertDialogContentVariants = cva(
   [
     'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
     'nx:-translate-x-1/2 nx:-translate-y-1/2',
-    'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:p-6 nx:shadow-lg',
+    'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
     'nx:data-[state=open]:duration-300 nx:data-[state=closed]:duration-150',
     'nx:data-[state=open]:ease-out nx:data-[state=closed]:ease-in',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
@@ -21,7 +21,7 @@ const alertDialogContentVariants = cva(
   ].join(' ')
 );
 
-const alertDialogHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1', {
+const alertDialogHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1 nx:px-6', {
   variants: {
     variant: {
       default: 'nx:text-center nx:sm:text-left',
@@ -33,7 +33,7 @@ const alertDialogHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1', {
   },
 });
 
-const alertDialogFooterVariants = cva('nx:flex nx:gap-2', {
+const alertDialogFooterVariants = cva('nx:flex nx:gap-2 nx:px-6', {
   variants: {
     orientation: {
       horizontal:
@@ -251,6 +251,36 @@ function AlertDialogHeader({
 }
 
 /**
+ * AlertDialogBodyProps
+ *
+ * Props for the AlertDialogBody component.
+ */
+interface AlertDialogBodyProps extends React.ComponentProps<'div'> {}
+
+/**
+ * AlertDialogBody
+ *
+ * Container for the alert dialog's body content. Insets content horizontally to
+ * align with the header and footer.
+ *
+ * @example
+ * ```tsx
+ * <AlertDialogBody>
+ *   <p>Supporting detail.</p>
+ * </AlertDialogBody>
+ * ```
+ */
+function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
+  return (
+    <div
+      data-slot="alert-dialog-body"
+      className={cn('nx:px-6', className)}
+      {...props}
+    />
+  );
+}
+
+/**
  * AlertDialogFooterProps
  *
  * Props for the AlertDialogFooter component.
@@ -436,6 +466,8 @@ export {
   AlertDialog,
   AlertDialogAction,
   type AlertDialogActionProps,
+  AlertDialogBody,
+  type AlertDialogBodyProps,
   AlertDialogCancel,
   type AlertDialogCancelProps,
   AlertDialogContent,

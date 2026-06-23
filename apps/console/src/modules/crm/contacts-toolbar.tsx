@@ -4,6 +4,7 @@ import {
   Badge,
   Button,
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -244,15 +245,17 @@ function SavedViewsMenu({
               Name this view and filter combination to reuse it later.
             </DialogDescription>
           </DialogHeader>
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Active deals"
-            aria-label="View name"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSave();
-            }}
-          />
+          <DialogBody>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Active deals"
+              aria-label="View name"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave();
+              }}
+            />
+          </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>

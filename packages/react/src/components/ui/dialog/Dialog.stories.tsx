@@ -12,6 +12,7 @@ import { Input } from '../input';
 
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -57,9 +58,11 @@ export const Default: Story = {
             This is a basic dialog with a title and description.
           </DialogDescription>
         </DialogHeader>
-        <p className="nx:text-sm nx:text-foreground">
-          Dialog content goes here. You can add any content you need.
-        </p>
+        <DialogBody>
+          <p className="nx:text-sm nx:text-foreground">
+            Dialog content goes here. You can add any content you need.
+          </p>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -84,7 +87,7 @@ export const WithDescription: Story = {
             Make changes to your profile here. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <div className="nx:grid nx:gap-4 nx:py-4">
+        <DialogBody className="nx:grid nx:gap-4 nx:py-4">
           <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
             <label
               htmlFor="name"
@@ -111,7 +114,7 @@ export const WithDescription: Story = {
               className="nx:col-span-3"
             />
           </div>
-        </div>
+        </DialogBody>
         <DialogFooter>
           <Button type="submit">Save changes</Button>
         </DialogFooter>
@@ -160,9 +163,11 @@ export const CustomCloseButton: Story = {
             This dialog uses a custom close button in the footer.
           </DialogDescription>
         </DialogHeader>
-        <p className="nx:text-sm nx:text-foreground">
-          You can customize how users close the dialog.
-        </p>
+        <DialogBody>
+          <p className="nx:text-sm nx:text-foreground">
+            You can customize how users close the dialog.
+          </p>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="ghost">Dismiss</Button>
@@ -186,7 +191,7 @@ export const ScrollableContent: Story = {
             Please read the following terms carefully.
           </DialogDescription>
         </DialogHeader>
-        <div className="nx:space-y-4 nx:text-sm nx:text-foreground">
+        <DialogBody className="nx:space-y-4 nx:text-sm nx:text-foreground">
           {Array.from({ length: 10 }).map((_, i) => (
             <p key={i}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -195,7 +200,7 @@ export const ScrollableContent: Story = {
               nisi ut aliquip ex ea commodo consequat.
             </p>
           ))}
-        </div>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Decline</Button>
@@ -315,7 +320,9 @@ export const WithDataAttributes: Story = {
           <DialogTitle>Data Attributes</DialogTitle>
           <DialogDescription>Testing data-slot attributes.</DialogDescription>
         </DialogHeader>
-        <p className="nx:text-sm">Content here</p>
+        <DialogBody>
+          <p className="nx:text-sm">Content here</p>
+        </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
             <Button>Close</Button>
@@ -357,7 +364,23 @@ export const WithDataAttributes: Story = {
       expect(
         document.querySelector('[data-slot="dialog-close-button"]')
       ).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-slot="dialog-body"]')
+      ).toBeInTheDocument();
     });
+
+    const content = document.querySelector('[data-slot="dialog-content"]');
+    await expect(content).toHaveClass('nx:py-6', 'nx:gap-4');
+    await expect(content).not.toHaveClass('nx:p-6');
+    await expect(
+      document.querySelector('[data-slot="dialog-header"]')
+    ).toHaveClass('nx:px-6');
+    await expect(
+      document.querySelector('[data-slot="dialog-footer"]')
+    ).toHaveClass('nx:px-6');
+    await expect(
+      document.querySelector('[data-slot="dialog-body"]')
+    ).toHaveClass('nx:px-6');
 
     // Close the dialog
     await userEvent.keyboard('{Escape}');
@@ -487,15 +510,17 @@ export const NestedOverlayStacking: Story = {
             The dropdown below must appear above this dialog.
           </DialogDescription>
         </DialogHeader>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Open menu</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DialogBody>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Open menu</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   ),
