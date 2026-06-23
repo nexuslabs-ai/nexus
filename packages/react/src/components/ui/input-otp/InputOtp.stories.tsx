@@ -92,6 +92,16 @@ export const Disabled: Story = {
     );
 
     await expect(input).toBeDisabled();
+
+    // A disabled OTP field dims its slots via the group's has-[:disabled] hook,
+    // using a semantic border token at full opacity (not a fade).
+    const slot = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="input-otp-slot"]'
+    )!;
+    await expect(slot).toHaveClass(
+      'nx:group-has-[:disabled]/input-otp:border-border-disabled'
+    );
+    await expect(getComputedStyle(slot).opacity).toBe('1');
   },
 };
 

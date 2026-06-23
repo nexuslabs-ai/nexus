@@ -150,6 +150,37 @@ export const WithIndicator: Story = {
   ),
 };
 
+export const Disabled: Story = {
+  render: (_args) => (
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger disabled>Products</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="nx:grid nx:w-[320px] nx:gap-1 nx:p-2">
+              <li>
+                <NavigationMenuLink href="#analytics">
+                  Analytics
+                </NavigationMenuLink>
+              </li>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: /Products/i });
+
+    await expect(trigger).toBeDisabled();
+
+    // Disabled trigger uses a semantic text token at full opacity (not a fade).
+    await expect(trigger).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(getComputedStyle(trigger).opacity).toBe('1');
+  },
+};
+
 // ============================================
 // INTERACTION TESTS
 // ============================================

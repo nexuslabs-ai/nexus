@@ -41,9 +41,9 @@ function Switch({ className, ...props }: SwitchProps) {
         'nx:rounded-full nx:border-2 nx:border-border-default',
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-        'nx:disabled:cursor-not-allowed nx:disabled:opacity-50',
-        'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:bg-primary-background nx:data-[state=checked]:hover:bg-primary-background-hover',
-        'nx:data-[state=unchecked]:bg-control-background nx:data-[state=unchecked]:hover:bg-control-background-hover',
+        'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled',
+        'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:bg-primary-background nx:enabled:data-[state=checked]:hover:bg-primary-background-hover nx:data-[state=checked]:disabled:border-primary-disabled nx:data-[state=checked]:disabled:bg-primary-disabled',
+        'nx:data-[state=unchecked]:bg-control-background nx:enabled:data-[state=unchecked]:hover:bg-control-background-hover nx:data-[state=unchecked]:disabled:bg-disabled',
         className
       )}
       {...props}

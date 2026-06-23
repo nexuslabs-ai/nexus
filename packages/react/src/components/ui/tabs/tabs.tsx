@@ -73,7 +73,7 @@ const tabsTriggerVariants = cva(
     'nx:font-medium nx:text-muted-foreground',
     'nx:transition-colors',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-    'nx:disabled:pointer-events-none nx:disabled:opacity-50',
+    'nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground',
   ],
   {
     variants: {

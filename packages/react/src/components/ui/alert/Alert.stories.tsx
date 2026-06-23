@@ -794,6 +794,40 @@ export const InlineActionsWithClose: Story = {
   ),
 };
 
+export const DisabledClose: Story = {
+  args: {
+    layout: 'inline',
+    variant: 'success',
+  },
+  render: (args) => (
+    <Alert {...args} className="nx:max-w-2xl">
+      <AlertIcon>
+        <IconCircleCheck />
+      </AlertIcon>
+      <AlertContent>
+        <AlertTitle>Deployment complete</AlertTitle>
+        <AlertDescription>
+          Version 2.4.0 is live in the production environment.
+        </AlertDescription>
+      </AlertContent>
+      <AlertActions>
+        <Button variant="outline">View release</Button>
+        <AlertClose disabled />
+      </AlertActions>
+    </Alert>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const close = canvas.getByRole('button', { name: 'Dismiss alert' });
+
+    await expect(close).toBeDisabled();
+
+    // Disabled close uses a semantic text token at full opacity (not a fade).
+    await expect(close).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(getComputedStyle(close).opacity).toBe('1');
+  },
+};
+
 export const BannerInlineActions: Story = {
   args: {
     layout: 'inline',

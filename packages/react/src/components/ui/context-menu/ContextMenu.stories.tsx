@@ -328,6 +328,12 @@ export const WithDisabledItems: Story = {
     await expect(disabledItem).toHaveAttribute('data-disabled');
     await expect(disabledItem).toHaveAttribute('aria-disabled', 'true');
 
+    // Disabled items use a semantic text token at full opacity (not a fade).
+    await expect(disabledItem).toHaveClass(
+      'nx:data-disabled:text-disabled-foreground'
+    );
+    await expect(getComputedStyle(disabledItem).opacity).toBe('1');
+
     // An enabled item is reachable
     const enabledItem = within(menu).getByRole('menuitem', { name: 'Paste' });
     await expect(enabledItem).not.toHaveAttribute('data-disabled');

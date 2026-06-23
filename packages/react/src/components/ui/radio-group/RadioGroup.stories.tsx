@@ -141,6 +141,10 @@ export const Disabled: Story = {
     await expect(one).toBeDisabled();
     await expect(two).toBeDisabled();
 
+    // Disabled state uses a semantic border token at full opacity (not a fade).
+    await expect(one).toHaveClass('nx:disabled:border-border-disabled');
+    await expect(getComputedStyle(one).opacity).toBe('1');
+
     // Clicking a disabled option does not change the selection
     await userEvent.click(two);
     await expect(args.onValueChange).not.toHaveBeenCalled();

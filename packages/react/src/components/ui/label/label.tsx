@@ -31,7 +31,7 @@ function Label({ className, ...props }: LabelProps) {
       data-slot="label"
       className={cn(
         'nx:flex nx:items-center nx:gap-2 nx:select-none nx:typography-label-default nx:text-foreground',
-        'nx:peer-disabled:cursor-not-allowed nx:peer-disabled:opacity-50',
+        'nx:peer-disabled:cursor-not-allowed nx:peer-disabled:text-disabled-foreground',
         className
       )}
       {...props}

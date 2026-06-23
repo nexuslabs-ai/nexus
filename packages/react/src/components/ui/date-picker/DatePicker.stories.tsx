@@ -425,6 +425,10 @@ export const DisabledDays: Story = {
     const day10 = canvas.getByText('10').closest('button');
 
     await expect(day10).toBeDisabled();
+    // A disabled day recolors via a semantic disabled-text token at full
+    // opacity (not a fade).
+    await expect(day10).toHaveClass('nx:disabled:text-disabled-foreground');
+    await expect(getComputedStyle(day10!).opacity).toBe('1');
     await userEvent.click(day10!, { pointerEventsCheck: 0 });
     await expect(day10).not.toHaveAttribute('data-selected-single', 'true');
   },

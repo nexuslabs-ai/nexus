@@ -284,6 +284,16 @@ export const Disabled: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('textbox')).toBeDisabled();
+
+    // The FieldLabel dims via the field group's data-disabled, using a semantic
+    // text token at full opacity (not a fade).
+    const fieldLabel = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="field-label"]'
+    )!;
+    await expect(fieldLabel).toHaveClass(
+      'nx:group-data-[disabled=true]/field:text-disabled-foreground'
+    );
+    await expect(getComputedStyle(fieldLabel).opacity).toBe('1');
   },
 };
 

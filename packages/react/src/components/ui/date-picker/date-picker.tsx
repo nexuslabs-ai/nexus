@@ -112,10 +112,7 @@ const staticDayPickerClassNames = {
     'nx:text-muted-foreground-subtle nx:aria-selected:text-muted-foreground-subtle',
     defaultClassNames.outside
   ),
-  disabled: cn(
-    'nx:text-muted-foreground nx:opacity-50',
-    defaultClassNames.disabled
-  ),
+  disabled: cn('nx:text-disabled-foreground', defaultClassNames.disabled),
   hidden: cn('nx:invisible', defaultClassNames.hidden),
 } satisfies NonNullable<React.ComponentProps<typeof DayPicker>['classNames']>;
 
@@ -202,12 +199,12 @@ function DatePicker({
           ...staticDayPickerClassNames,
           button_previous: cn(
             buttonVariants({ variant: buttonVariant, size: 'icon' }),
-            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
+            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
             defaultClassNames.button_previous
           ),
           button_next: cn(
             buttonVariants({ variant: buttonVariant, size: 'icon' }),
-            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
+            'nx:size-(--cell-size) nx:p-0 nx:select-none nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
             defaultClassNames.button_next
           ),
           caption_label: cn(
@@ -342,7 +339,7 @@ function DatePickerDayButton({
       data-outside={isOutside || undefined}
       className={cn(
         'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:text-sm nx:leading-none nx:font-normal',
-        'nx:disabled:opacity-50 nx:aria-disabled:opacity-50',
+        'nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
         isOutside && 'nx:text-muted-foreground-subtle',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',
