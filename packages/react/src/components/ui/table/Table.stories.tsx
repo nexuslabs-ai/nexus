@@ -422,6 +422,50 @@ export const SemanticScope: Story = {
   },
 };
 
+// A sorted column reads as active: TableHead emphasizes its text (muted →
+// foreground) when it carries aria-sort="ascending"/"descending", but not for a
+// merely-sortable "none". The interactive sort control is a recipe (SortableHeader).
+export const AriaSortIndicator: Story = {
+  render: () => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead aria-sort="ascending">Invoice</TableHead>
+          <TableHead aria-sort="none">Status</TableHead>
+          <TableHead aria-sort="descending" className="nx:text-right">
+            Amount
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableRowHeader>INV001</TableRowHeader>
+          <TableCell>Paid</TableCell>
+          <TableCell className="nx:text-right">$250.00</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const asc = canvasElement.querySelector('[aria-sort="ascending"]');
+    const none = canvasElement.querySelector('[aria-sort="none"]');
+    const desc = canvasElement.querySelector('[aria-sort="descending"]');
+
+    // aria-sort carries only valid values — never asc/desc.
+    await expect(asc).toBeInTheDocument();
+    await expect(none).toBeInTheDocument();
+    await expect(desc).toBeInTheDocument();
+
+    // The emphasis fires for an actively-sorted column, not a sortable-but-unsorted one.
+    await expect(getComputedStyle(asc as Element).color).not.toBe(
+      getComputedStyle(none as Element).color
+    );
+    await expect(getComputedStyle(desc as Element).color).not.toBe(
+      getComputedStyle(none as Element).color
+    );
+  },
+};
+
 // The three border treatments: `borderless` drops the internal rules (Stripe /
 // Linear feel), `default` keeps softened row rules + a header underline, and
 // `grid` adds column rules for a full cell grid (Notion).
