@@ -278,3 +278,53 @@ export const AllVariants: Story = {
     </Table>
   ),
 };
+
+// Regression sentinel: each typography-bearing slot carries its canonical
+// `nx:typography-*` composite and no longer the raw utility it replaced.
+export const TokenizedTypography: Story = {
+  render: () => (
+    <Table>
+      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>INV001</TableCell>
+          <TableCell className="nx:text-right">$250.00</TableCell>
+        </TableRow>
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell>Total</TableCell>
+          <TableCell className="nx:text-right">$250.00</TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const table = canvasElement.querySelector('[data-slot="table"]');
+    const caption = canvasElement.querySelector('[data-slot="table-caption"]');
+    const head = canvasElement.querySelector('[data-slot="table-head"]');
+    const footer = canvasElement.querySelector('[data-slot="table-footer"]');
+
+    await expect(table).toBeInTheDocument();
+    await expect(table).toHaveClass('nx:typography-body-default');
+    await expect(table).not.toHaveClass('nx:text-sm');
+
+    await expect(caption).toBeInTheDocument();
+    await expect(caption).toHaveClass('nx:typography-body-small');
+    await expect(caption).not.toHaveClass('nx:text-sm');
+
+    await expect(head).toBeInTheDocument();
+    await expect(head).toHaveClass('nx:typography-label-default');
+    await expect(head).not.toHaveClass('nx:font-medium');
+
+    await expect(footer).toBeInTheDocument();
+    await expect(footer).toHaveClass('nx:typography-label-default');
+    await expect(footer).not.toHaveClass('nx:font-medium');
+  },
+};

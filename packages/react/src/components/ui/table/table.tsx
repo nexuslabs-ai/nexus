@@ -41,7 +41,10 @@ function Table({ className, ...props }: TableProps) {
     <div data-slot="table-container" className="nx:w-full nx:overflow-x-auto">
       <table
         data-slot="table"
-        className={cn('nx:w-full nx:caption-bottom nx:text-sm', className)}
+        className={cn(
+          'nx:w-full nx:caption-bottom nx:typography-body-default',
+          className
+        )}
         {...props}
       />
     </div>
@@ -111,7 +114,7 @@ function TableFooter({ className, ...props }: TableFooterProps) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        'nx:border-t nx:border-border-default nx:bg-muted nx:font-medium nx:[&>tr]:last:border-b-0',
+        'nx:border-t nx:border-border-default nx:bg-muted nx:typography-label-default nx:[&>tr]:last:border-b-0',
         className
       )}
       {...props}
@@ -163,7 +166,7 @@ function TableHead({ className, ...props }: TableHeadProps) {
     <th
       data-slot="table-head"
       className={cn(
-        'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:font-medium nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
+        'nx:px-2 nx:py-2.5 nx:text-left nx:align-middle nx:typography-label-default nx:whitespace-nowrap nx:text-muted-foreground nx:has-[[role=checkbox]]:pr-0 nx:*:[[role=checkbox]]:translate-y-0.5',
         className
       )}
       {...props}
@@ -212,7 +215,10 @@ function TableCaption({ className, ...props }: TableCaptionProps) {
   return (
     <caption
       data-slot="table-caption"
-      className={cn('nx:mt-4 nx:text-sm nx:text-muted-foreground', className)}
+      className={cn(
+        'nx:mt-4 nx:typography-body-small nx:text-muted-foreground',
+        className
+      )}
       {...props}
     />
   );
