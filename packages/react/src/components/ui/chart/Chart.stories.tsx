@@ -197,6 +197,8 @@ export const WithDataAttributes: Story = {
     const chart = canvasElement.querySelector('[data-slot="chart"]');
     await expect(chart).toBeInTheDocument();
     await expect(chart).toHaveAttribute('data-chart');
+    // #497: chart base text migrated raw nx:text-xs → typography-body-small (12px).
+    await expect(chart).toHaveClass('nx:typography-body-small');
   },
 };
 
