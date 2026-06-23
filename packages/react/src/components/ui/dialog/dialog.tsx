@@ -126,7 +126,7 @@ function DialogContent({
         className={cn(
           'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
           'nx:-translate-x-1/2 nx:-translate-y-1/2',
-          'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:p-6 nx:shadow-lg',
+          'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
           'nx:data-[state=open]:duration-300 nx:data-[state=closed]:duration-150',
           'nx:data-[state=open]:ease-out nx:data-[state=closed]:ease-in',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
@@ -187,9 +187,39 @@ function DialogHeader({ className, ...props }: DialogHeaderProps) {
     <div
       data-slot="dialog-header"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1 nx:text-center nx:sm:text-left',
+        'nx:flex nx:flex-col nx:gap-1 nx:px-6 nx:text-center nx:sm:text-left',
         className
       )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * DialogBodyProps
+ *
+ * Props for the DialogBody component.
+ */
+interface DialogBodyProps extends React.ComponentProps<'div'> {}
+
+/**
+ * DialogBody
+ *
+ * Container for the dialog's body content. Insets content horizontally to align
+ * with the header and footer.
+ *
+ * @example
+ * ```tsx
+ * <DialogBody>
+ *   <p>Main dialog content.</p>
+ * </DialogBody>
+ * ```
+ */
+function DialogBody({ className, ...props }: DialogBodyProps) {
+  return (
+    <div
+      data-slot="dialog-body"
+      className={cn('nx:px-6', className)}
       {...props}
     />
   );
@@ -220,7 +250,7 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        'nx:flex nx:flex-col-reverse nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
+        'nx:flex nx:flex-col-reverse nx:px-6 nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
         className
       )}
       {...props}
@@ -293,6 +323,8 @@ function DialogDescription({ className, ...props }: DialogDescriptionProps) {
 
 export {
   Dialog,
+  DialogBody,
+  type DialogBodyProps,
   DialogClose,
   DialogContent,
   type DialogContentProps,
