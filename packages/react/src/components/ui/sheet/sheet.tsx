@@ -227,6 +227,37 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
 }
 
 /**
+ * SheetBodyProps
+ *
+ * Props for the SheetBody component.
+ */
+interface SheetBodyProps extends React.ComponentProps<'div'> {}
+
+/**
+ * SheetBody
+ *
+ * Container for the sheet's main content between the header and footer. Pads its
+ * content to the same inset as SheetHeader and SheetFooter and grows to fill the
+ * panel.
+ *
+ * @example
+ * ```tsx
+ * <SheetBody>
+ *   <p>Main content.</p>
+ * </SheetBody>
+ * ```
+ */
+function SheetBody({ className, ...props }: SheetBodyProps) {
+  return (
+    <div
+      data-slot="sheet-body"
+      className={cn('nx:flex-1 nx:p-6', className)}
+      {...props}
+    />
+  );
+}
+
+/**
  * SheetFooterProps
  *
  * Props for the SheetFooter component.
@@ -324,6 +355,8 @@ function SheetDescription({ className, ...props }: SheetDescriptionProps) {
 
 export {
   Sheet,
+  SheetBody,
+  type SheetBodyProps,
   SheetClose,
   SheetContent,
   type SheetContentProps,
