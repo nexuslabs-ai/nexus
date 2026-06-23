@@ -656,3 +656,189 @@ export const StickyHeader: Story = {
     await expect(getComputedStyle(head as Element).position).toBe('sticky');
   },
 };
+
+// ============================================
+// RECIPES — patterns a consumer composes; zero added to the published bundle
+// ============================================
+
+// Numeric columns right-align and use tabular figures so digits line up by place
+// value. Apply `nx:text-right nx:tabular-nums` to the header and its cells.
+export const NumericColumn: Story = {
+  render: () => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead className="nx:text-right nx:tabular-nums">
+            Amount
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((row) => (
+          <TableRow key={row.invoice}>
+            <TableRowHeader>{row.invoice}</TableRowHeader>
+            <TableCell className="nx:text-right nx:tabular-nums">
+              {row.amount}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+};
+
+// Cells default to nowrap. To clip overflow with an ellipsis, wrap the content in
+// a width-bounded `nx:truncate` box — truncate is inert without a constrained
+// width (table-layout is auto), so the box, not the cell, sets the bound.
+export const TruncatedCells: Story = {
+  render: () => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Note</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableRowHeader>INV001</TableRowHeader>
+          <TableCell>
+            <div className="nx:max-w-[16ch] nx:truncate">
+              A long memo that exceeds the cell width and must be clipped
+            </div>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const clip = canvasElement.querySelector('[data-slot="table-cell"] div');
+    await expect(clip).toBeInTheDocument();
+    // The text genuinely overflows its box — proves real clipping, not just the class.
+    await expect((clip as Element).scrollWidth).toBeGreaterThan(
+      (clip as Element).clientWidth
+    );
+  },
+};
+
+// Pin a column during horizontal scroll with data-sticky + sticky utilities. The
+// row carries an opaque surface bg and the sticky cell uses `nx:bg-inherit`, so
+// the pinned cell tracks the row's hover/selected/stripe state instead of a flat
+// fill that would mismatch on a tinted row.
+export const StickyColumn: Story = {
+  render: () => (
+    <Table>
+      <TableHeader>
+        <TableRow className="nx:bg-background">
+          <TableHead
+            data-sticky="start"
+            className="nx:sticky nx:left-0 nx:z-10 nx:bg-inherit"
+          >
+            Invoice
+          </TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Method</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((row, i) => (
+          <TableRow
+            key={row.invoice}
+            className="nx:bg-background"
+            data-state={i === 0 ? 'selected' : undefined}
+          >
+            <TableRowHeader
+              data-sticky="start"
+              className="nx:sticky nx:left-0 nx:z-10 nx:bg-inherit"
+            >
+              {row.invoice}
+            </TableRowHeader>
+            <TableCell>{row.status}</TableCell>
+            <TableCell>{row.method}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const selectedRow = canvasElement.querySelector(
+      'tbody [data-slot="table-row"][data-state="selected"]'
+    );
+    const stickyCell = selectedRow?.querySelector('[data-sticky="start"]');
+
+    await expect(stickyCell).toBeInTheDocument();
+    // The column is actually pinned.
+    await expect(getComputedStyle(stickyCell as Element).position).toBe(
+      'sticky'
+    );
+    // bg-inherit makes the sticky cell resolve to its row's bg — the selection
+    // tint here, not a flat fill that would show a mismatched stripe.
+    await expect(getComputedStyle(stickyCell as Element).backgroundColor).toBe(
+      getComputedStyle(selectedRow as Element).backgroundColor
+    );
+  },
+};
+
+// Drop low-priority columns on a narrow container. Apply a container-query hide
+// (`nx:@max-md:hidden`) to BOTH the column's header and its cells, so the column
+// vanishes cleanly instead of leaving a gap. Drive it off `@container` (the
+// table's own width), not the viewport.
+export const ColumnPriority: Story = {
+  render: () => (
+    <div className="nx:@container nx:w-[20rem]">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Invoice</TableHead>
+            <TableHead className="nx:@max-md:hidden">Method</TableHead>
+            <TableHead className="nx:text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {invoices.slice(0, 3).map((row) => (
+            <TableRow key={row.invoice}>
+              <TableRowHeader>{row.invoice}</TableRowHeader>
+              <TableCell className="nx:@max-md:hidden">{row.method}</TableCell>
+              <TableCell className="nx:text-right">{row.amount}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const heads = canvasElement.querySelectorAll('[data-slot="table-head"]');
+    const methodHead = heads[1]; // the @max-md:hidden Method column header
+    await expect(methodHead).toBeInTheDocument();
+    // At a 20rem container (< md) the low-priority column is hidden.
+    await expect(getComputedStyle(methodHead as Element).display).toBe('none');
+  },
+};
+
+// `bleed`: let the scroll area run flush to the edge on a narrow screen via a
+// single `--gutter` var on the container — negative margin out, padding back in.
+export const Bleed: Story = {
+  render: () => (
+    <Table containerClassName="nx:[--gutter:1rem] nx:-mx-(--gutter) nx:px-(--gutter)">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="nx:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.slice(0, 3).map((row) => (
+          <TableRow key={row.invoice}>
+            <TableRowHeader>{row.invoice}</TableRowHeader>
+            <TableCell>{row.status}</TableCell>
+            <TableCell className="nx:text-right">{row.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+};
