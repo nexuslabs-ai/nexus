@@ -34,6 +34,7 @@ function Slider({
   max = 100,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledby,
+  'aria-invalid': ariaInvalid,
   ...props
 }: SliderProps) {
   // Derive the thumb count from the controlled/uncontrolled value; fall back to
@@ -70,12 +71,13 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          // Radix names the thumb (role="slider") from its own aria-label, not
-          // the Root's — forward it to the thumb (and keep it off the role-less
-          // Root span, where it would be a prohibited ARIA attribute).
+          // Radix puts role="slider" on the thumb, not the role-less Root span:
+          // forward the thumb-owned ARIA here (naming + invalid state) so it lands
+          // on the right element and stays off the Root, where it'd be prohibited.
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledby}
-          className="nx:block nx:size-4 nx:shrink-0 nx:rounded-full nx:border nx:border-border-primary nx:bg-background nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+          aria-invalid={ariaInvalid}
+          className="nx:block nx:size-4 nx:shrink-0 nx:rounded-full nx:border nx:border-border-primary nx:bg-background nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:aria-invalid:focus-visible:outline-focus-error"
         />
       ))}
     </SliderPrimitive.Root>

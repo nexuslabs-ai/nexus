@@ -128,6 +128,31 @@ export const WithDataAttributes: Story = {
   },
 };
 
+// aria-invalid surfaces the error focus ring on the thumb. It is forwarded to
+// every role="slider" element, so a two-thumb range reddens both.
+export const Invalid: Story = {
+  render: () => (
+    <Slider
+      aria-invalid
+      defaultValue={[25, 75]}
+      max={100}
+      step={1}
+      aria-label="Price range"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const thumbs = canvas.getAllByRole('slider');
+    await expect(thumbs).toHaveLength(2);
+    for (const thumb of thumbs) {
+      await expect(thumb).toHaveAttribute('aria-invalid', 'true');
+      await expect(thumb).toHaveClass(
+        'nx:aria-invalid:focus-visible:outline-focus-error'
+      );
+    }
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
