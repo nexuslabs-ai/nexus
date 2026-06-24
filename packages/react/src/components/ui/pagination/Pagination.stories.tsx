@@ -203,6 +203,28 @@ export const WithDataAttributes: Story = {
   },
 };
 
+// The pagination root is a navigation landmark named by its aria-label — the
+// <nav> element already is that landmark, so it carries no redundant `role`.
+export const NavigationLandmark: Story = {
+  render: () => (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationLink href="#" isActive>
+            1
+          </PaginationLink>
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const nav = canvas.getByRole('navigation', { name: 'pagination' });
+
+    await expect(nav).not.toHaveAttribute('role');
+  },
+};
+
 // Composition: `asChild` routes the link styling onto a framework router link
 // (next/link, TanStack Router) instead of the native <a>. The router link
 // renders its own <a>, so the styling merges onto it — no nested <a><a>. The

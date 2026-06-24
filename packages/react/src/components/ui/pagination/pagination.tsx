@@ -54,7 +54,6 @@ interface PaginationProps extends React.ComponentProps<'nav'> {}
 function Pagination({ className, ...props }: PaginationProps) {
   return (
     <nav
-      role="navigation"
       aria-label="pagination"
       data-slot="pagination"
       className={cn(
