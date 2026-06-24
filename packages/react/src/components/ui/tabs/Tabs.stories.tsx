@@ -125,7 +125,6 @@ export const SmallSize: Story = {
     const canvas = within(canvasElement);
     const tab = canvas.getByRole('tab', { name: 'Small Tab' });
 
-    // Typography composite + numeric padding (#471)
     await expect(tab).toHaveClass(
       'nx:typography-label-small',
       'nx:px-2',
@@ -492,7 +491,6 @@ export const WithDataAttributes: Story = {
     const tabPanel = canvas.getByRole('tabpanel');
     await expect(tabPanel).toHaveAttribute('data-slot', 'tabs-content');
 
-    // Typography composite + numeric padding (#471)
     await expect(tab1).toHaveClass(
       'nx:typography-label-default',
       'nx:px-3',
