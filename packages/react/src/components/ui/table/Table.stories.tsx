@@ -988,7 +988,9 @@ export const SelectionWithBulkActions: Story = {
       'tbody [data-slot="table-row"][data-state="selected"]'
     );
     await expect(selectedRows).toHaveLength(invoices.length);
-    await expect(canvasElement).toHaveTextContent('5 selected');
+    await expect(canvasElement).toHaveTextContent(
+      `${invoices.length} selected`
+    );
   },
 };
 
@@ -1028,8 +1030,7 @@ export const RowLink: Story = {
     const link = canvasElement.querySelector('a[href^="#/invoices/"]');
     await expect(link).toBeInTheDocument();
     await expect(link).toHaveAccessibleName('INV001');
-    // The ::after overlay actually generates a box and spans the row, so a click
-    // anywhere on the row follows the link.
+    // after:content-[''] is required for ::after to generate a box at all.
     const overlay = getComputedStyle(link as Element, '::after');
     await expect(overlay.content).not.toBe('none');
     await expect(overlay.position).toBe('absolute');
