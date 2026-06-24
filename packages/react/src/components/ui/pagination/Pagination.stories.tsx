@@ -203,6 +203,68 @@ export const WithDataAttributes: Story = {
   },
 };
 
+// The pagination root is a navigation landmark named by its aria-label — the
+// <nav> element already is that landmark, so it carries no redundant `role`.
+export const NavigationLandmark: Story = {
+  render: () => (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationLink href="#" isActive>
+            1
+          </PaginationLink>
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const nav = canvas.getByRole('navigation', { name: 'pagination' });
+
+    await expect(nav).not.toHaveAttribute('role');
+  },
+};
+
+// The ellipsis matches an icon page link's footprint, and a consumer className
+// can still override it.
+export const EllipsisFootprint: Story = {
+  render: () => (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationLink href="#">1</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationEllipsis />
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationEllipsis className="nx:size-8" />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link', { name: '1' });
+    const [ellipsis, overridden] = canvasElement.querySelectorAll(
+      '[data-slot="pagination-ellipsis"]'
+    );
+    if (!ellipsis || !overridden) {
+      throw new Error('EllipsisFootprint expects two ellipsis slots');
+    }
+
+    // Parity: the ellipsis carries the icon link's own size token, so this
+    // breaks if buttonVariants' icon size ever moves.
+    const linkSize = link.className.match(/nx:size-\d+/)?.[0];
+    const ellipsisSize = ellipsis.className.match(/nx:size-\d+/)?.[0];
+    await expect(linkSize).toBe('nx:size-10');
+    await expect(ellipsisSize).toBe(linkSize);
+
+    await expect(overridden).toHaveClass('nx:size-8');
+    await expect(overridden).not.toHaveClass('nx:size-10');
+  },
+};
+
 // Composition: `asChild` routes the link styling onto a framework router link
 // (next/link, TanStack Router) instead of the native <a>. The router link
 // renders its own <a>, so the styling merges onto it — no nested <a><a>. The

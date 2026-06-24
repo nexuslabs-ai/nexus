@@ -54,7 +54,6 @@ interface PaginationProps extends React.ComponentProps<'nav'> {}
 function Pagination({ className, ...props }: PaginationProps) {
   return (
     <nav
-      role="navigation"
       aria-label="pagination"
       data-slot="pagination"
       className={cn(
@@ -242,7 +241,7 @@ function PaginationEllipsis({ className, ...props }: PaginationEllipsisProps) {
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        'nx:flex nx:items-center nx:justify-center nx:p-2.5',
+        'nx:flex nx:items-center nx:justify-center nx:size-10',
         className
       )}
       {...props}
