@@ -116,8 +116,6 @@ function Table({
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         className={cn(
-          // Inset (negative) outline: an outward focus ring is clipped to nothing
-          // by an overflow-hidden ancestor (Card, the console's bordered wrapper).
           'nx:w-full nx:overflow-x-auto nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:[outline-offset:-2px]',
           stickyHeader && 'nx:overflow-y-auto',
           containerClassName
@@ -127,6 +125,7 @@ function Table({
           data-slot="table"
           data-variant={variant}
           data-density={density}
+          data-sticky-header={stickyHeader || undefined}
           className={cn(
             'nx:w-full nx:caption-bottom nx:typography-body-default',
             className
@@ -193,7 +192,7 @@ const tableFooterVariants = cva(
         default: 'nx:border-t nx:border-border-default-alpha',
         borderless: '',
         grid: 'nx:border-t nx:border-border-default-alpha',
-      },
+      } satisfies Record<TableVariant, string>,
     },
     defaultVariants: { variant: 'default' },
   }
@@ -231,7 +230,7 @@ const tableRowVariants = cva(
         default: 'nx:border-b nx:border-border-default-alpha',
         borderless: '',
         grid: 'nx:border-b nx:border-border-default-alpha',
-      },
+      } satisfies Record<TableVariant, string>,
     },
     defaultVariants: { variant: 'default' },
   }
@@ -269,20 +268,15 @@ const tableHeadVariants = cva(
         default: '',
         borderless: '',
         grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
-      },
+      } satisfies Record<TableVariant, string>,
       density: {
         comfortable: 'nx:py-3',
         compact: 'nx:py-2.5',
-      },
-      stickyHeader: {
-        true: 'nx:sticky nx:top-0 nx:z-sticky nx:bg-background',
-        false: '',
-      },
+      } satisfies Record<TableDensity, string>,
     },
     defaultVariants: {
       variant: 'default',
       density: 'comfortable',
-      stickyHeader: false,
     },
   }
 );
@@ -299,7 +293,8 @@ function TableHead({ className, ...props }: TableHeadProps) {
     <th
       data-slot="table-head"
       className={cn(
-        tableHeadVariants({ variant, density, stickyHeader }),
+        tableHeadVariants({ variant, density }),
+        stickyHeader && 'nx:sticky nx:top-0 nx:z-sticky nx:bg-background',
         className
       )}
       {...props}
@@ -322,11 +317,11 @@ const tableCellVariants = cva(
         default: '',
         borderless: '',
         grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
-      },
+      } satisfies Record<TableVariant, string>,
       density: {
         comfortable: 'nx:py-3',
         compact: 'nx:py-2',
-      },
+      } satisfies Record<TableDensity, string>,
     },
     defaultVariants: { variant: 'default', density: 'comfortable' },
   }

@@ -511,9 +511,11 @@ export const StickyHeader: Story = {
     </Table>
   ),
   play: async ({ canvasElement }) => {
+    const table = canvasElement.querySelector('[data-slot="table"]');
     const header = canvasElement.querySelector('[data-slot="table-header"]');
     const head = canvasElement.querySelector('[data-slot="table-head"]');
 
+    await expect(table).toHaveAttribute('data-sticky-header', 'true');
     await expect(header).toBeInTheDocument();
     await expect(header).toHaveClass('nx:[&_th]:bg-container');
     await expect(head).toBeInTheDocument();
