@@ -166,6 +166,35 @@ export const WithDataAttributes: Story = {
   },
 };
 
+// The handle's invisible ::after hit area widens to ~44px on coarse (touch)
+// pointers while the slim grip stays put on fine pointers. The class is always
+// present in the attribute; the pointer-coarse media query gates when it applies.
+export const TouchTarget: Story = {
+  render: () => (
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className={groupClass}
+      style={groupStyle}
+    >
+      <ResizablePanel defaultSize={50} style={panelStyle}>
+        <PanelBody label="One" />
+      </ResizablePanel>
+      <ResizableHandle withHandle aria-label="Resize panels" />
+      <ResizablePanel defaultSize={50} style={panelStyle}>
+        <PanelBody label="Two" />
+      </ResizablePanel>
+    </ResizablePanelGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const handle = canvas.getByRole('separator');
+    await expect(handle).toHaveClass('nx:pointer-coarse:after:w-11');
+    await expect(handle).toHaveClass(
+      'nx:pointer-coarse:aria-[orientation=horizontal]:after:h-11'
+    );
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
