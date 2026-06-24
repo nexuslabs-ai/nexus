@@ -1,5 +1,6 @@
-/* Indeterminate sweep keyframe — must be @imported by both Tailwind roots
- * (src/index.css and .storybook/preview.css). */
+/* Indeterminate sweep keyframe for the Progress indicator, registered the way
+ * tw-animate-css registers its own (@theme inline so the named utility compiles
+ * without emitting a :root var). Imported by src/index.css. */
 @theme inline {
   --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out
     infinite;
