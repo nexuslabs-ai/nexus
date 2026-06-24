@@ -19,6 +19,13 @@ export const Default: Story = {
       <IconBold />
     </Toggle>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name: 'Bold' });
+    await expect(toggle).toHaveAttribute('data-slot', 'toggle');
+    await expect(toggle).toHaveAttribute('data-variant', 'default');
+    await expect(toggle).toHaveAttribute('data-size', 'default');
+  },
 };
 
 // The two variants: borderless default and bordered outline.
@@ -50,6 +57,22 @@ export const Sizes: Story = {
       </Toggle>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sm = canvas.getByRole('button', { name: 'Small' });
+    const md = canvas.getByRole('button', { name: 'Default' });
+    const lg = canvas.getByRole('button', { name: 'Large' });
+
+    await expect(sm).toHaveClass('nx:typography-label-small');
+    await expect(sm).not.toHaveClass('nx:text-xs');
+    await expect(sm).toHaveClass('nx:px-3', 'nx:py-1.5', 'nx:gap-1.5');
+
+    await expect(md).toHaveClass('nx:typography-label-default');
+    await expect(md).not.toHaveClass('nx:text-sm');
+    await expect(md).toHaveClass('nx:px-4', 'nx:py-2', 'nx:gap-2');
+    await expect(lg).toHaveClass('nx:typography-label-default');
+    await expect(lg).toHaveClass('nx:px-8', 'nx:py-3', 'nx:gap-2.5');
+  },
 };
 
 // A toggle with text alongside the icon, shown pressed.
