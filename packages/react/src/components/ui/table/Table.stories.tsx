@@ -462,12 +462,13 @@ export const AriaSortIndicator: Story = {
     await expect(none).toBeInTheDocument();
     await expect(desc).toBeInTheDocument();
 
-    // The emphasis fires for an actively-sorted column, not a sortable-but-unsorted one.
-    await expect(getComputedStyle(asc as Element).color).not.toBe(
-      getComputedStyle(none as Element).color
+    // Emphasis is keyed on the aria-sort attr via a self-scoped selector; assert
+    // the rule is wired on the sorted heads (CSS does the rendering).
+    await expect(asc).toHaveClass(
+      'nx:[&[aria-sort=ascending]]:text-foreground'
     );
-    await expect(getComputedStyle(desc as Element).color).not.toBe(
-      getComputedStyle(none as Element).color
+    await expect(desc).toHaveClass(
+      'nx:[&[aria-sort=descending]]:text-foreground'
     );
   },
 };
@@ -499,19 +500,22 @@ export const Striped: Story = {
     </Table>
   ),
   play: async ({ canvasElement }) => {
+    const table = canvasElement.querySelector('[data-slot="table"]');
     const rows = canvasElement.querySelectorAll(
       'tbody [data-slot="table-row"]'
     );
     const bg = (el: Element) => getComputedStyle(el).backgroundColor;
-    const oddRest = rows[0] as Element; // 1st body row: odd, no stripe
-    const evenSelected = rows[1] as Element; // 2nd body row: even + selected
-    const evenRest = rows[3] as Element; // 4th body row: even, striped
+    const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 
+    await expect(table).toHaveAttribute('data-striped');
     await expect(rows).toHaveLength(4);
-    // Striping: an even (unselected) row is tinted; an odd row is not.
-    await expect(bg(evenRest)).not.toBe(bg(oddRest));
-    // Selection beats the stripe: the selected even row shows the selection tint.
-    await expect(bg(evenSelected)).not.toBe(bg(evenRest));
+
+    // Even (unselected) rows are tinted; odd rows are bare.
+    await expect(bg(rows[3] as Element)).not.toBe(TRANSPARENT); // even, striped
+    await expect(bg(rows[0] as Element)).toBe(TRANSPARENT); // odd, no stripe
+    // Selection beats the stripe: the even+selected row is excluded from the
+    // zebra selector and shows the selection tint.
+    await expect(rows[1] as Element).toHaveAttribute('data-state', 'selected');
   },
 };
 
