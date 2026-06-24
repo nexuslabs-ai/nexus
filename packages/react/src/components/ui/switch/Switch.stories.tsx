@@ -73,6 +73,45 @@ export const DisabledChecked: Story = {
   },
 };
 
+export const Invalid: Story = {
+  args: {
+    'aria-invalid': true,
+  },
+  render: function InvalidStory(args) {
+    const switchId = React.useId();
+    const errorId = React.useId();
+
+    return (
+      <div className="nx:grid nx:gap-2">
+        <div className="nx:flex nx:items-center nx:gap-2">
+          <Switch {...args} id={switchId} aria-describedby={errorId} />
+          <label htmlFor={switchId} className="nx:text-sm nx:font-medium">
+            Enable required setting
+          </label>
+        </div>
+        <p id={errorId} className="nx:text-sm nx:text-error-subtle-foreground">
+          This setting must be enabled to continue.
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const switchEl = canvas.getByRole('switch');
+    const error = canvas.getByText('This setting must be enabled to continue.');
+
+    await expect(switchEl).toHaveAttribute('aria-invalid', 'true');
+    await expect(switchEl).toHaveAttribute('aria-describedby', error.id);
+    await expect(switchEl).toHaveAccessibleDescription(
+      'This setting must be enabled to continue.'
+    );
+    await expect(switchEl).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(switchEl).toHaveClass(
+      'nx:aria-invalid:focus-visible:outline-focus-error'
+    );
+  },
+};
+
 export const WithLabel: Story = {
   render: (_args) => (
     <div className="nx:flex nx:items-center nx:gap-2">
