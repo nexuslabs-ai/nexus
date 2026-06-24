@@ -183,6 +183,14 @@ export const Invalid: Story = {
     await expect(card).toHaveClass(
       'nx:aria-invalid:data-[state=checked]:border-border-error'
     );
+
+    // Checked invalid also reddens the selection dot (matches checkbox).
+    const cardDot = card.querySelector(
+      '[data-slot="radio-group-indicator"] svg'
+    );
+    await expect(cardDot).toHaveClass(
+      'nx:group-aria-invalid:text-error-background'
+    );
   },
 };
 
@@ -319,6 +327,26 @@ export const AllVariants: Story = {
               </RadioGroup>
               <span className="nx:text-xs nx:text-muted-foreground">
                 Disabled selected
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <RadioGroup aria-label="Invalid state">
+                <RadioGroupItem value="a" aria-invalid aria-label="Invalid" />
+              </RadioGroup>
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Invalid
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <RadioGroup defaultValue="a" aria-label="Invalid selected state">
+                <RadioGroupItem
+                  value="a"
+                  aria-invalid
+                  aria-label="Invalid selected"
+                />
+              </RadioGroup>
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Invalid selected
               </span>
             </div>
           </div>
