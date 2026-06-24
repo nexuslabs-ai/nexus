@@ -109,6 +109,9 @@ export const Invalid: Story = {
     await expect(switchEl).toHaveClass(
       'nx:aria-invalid:focus-visible:outline-focus-error'
     );
+    await expect(switchEl).toHaveClass(
+      'nx:aria-invalid:data-[state=checked]:border-primary-background'
+    );
   },
 };
 
