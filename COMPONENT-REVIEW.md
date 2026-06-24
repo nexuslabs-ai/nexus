@@ -256,11 +256,9 @@ Numeric spacing notes: list `gap-1`, trigger `px-4`/`py-2`, content `p-2`, link 
 
 ## pagination
 
-Redundant ARIA: `role="navigation"` on the `<nav>` (line 55) — `<nav>` already is the navigation landmark; only the `aria-label` is needed.
+Resolved in #480: dropped the redundant `role="navigation"` on the `<nav>` (the element already is the navigation landmark, so only `aria-label` is needed), and replaced `PaginationEllipsis`'s hardcoded `nx:p-2.5` with `nx:size-10` — the icon link's own footprint token — so the two can't drift. (The old `p-2.5` rendered a 36px box and never actually matched the 40px icon link; the swap also aligns them.)
 
-Keep-in-sync smell: `PaginationEllipsis` hardcodes `nx:p-2.5` (line 219) to match the `size="icon"` link footprint — manual coupling to `buttonVariants` icon padding, drifts silently if that changes.
-
-Numeric spacing notes: content `gap-1` (line 85), ellipsis `p-2.5` (line 219).
+Numeric spacing note: content `gap-1`.
 
 ## popover
 

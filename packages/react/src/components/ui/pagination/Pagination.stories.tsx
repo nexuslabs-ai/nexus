@@ -225,6 +225,48 @@ export const NavigationLandmark: Story = {
   },
 };
 
+// The ellipsis stands in at the same footprint as an icon page link, tracking
+// the link's live size token rather than a hand-copied value; a consumer
+// className can still override it.
+export const EllipsisFootprint: Story = {
+  render: () => (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationLink href="#">1</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationEllipsis />
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationEllipsis className="nx:size-8" />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link', { name: '1' });
+    const [ellipsis, overridden] = canvasElement.querySelectorAll(
+      '[data-slot="pagination-ellipsis"]'
+    );
+    if (!ellipsis || !overridden) {
+      throw new Error('EllipsisFootprint expects two ellipsis slots');
+    }
+
+    // Parity: the ellipsis carries the icon link's own size token, so this
+    // breaks if buttonVariants' icon size ever moves.
+    const linkSize = link.className.match(/nx:size-\d+/)?.[0];
+    const ellipsisSize = ellipsis.className.match(/nx:size-\d+/)?.[0];
+    await expect(linkSize).toBe('nx:size-10');
+    await expect(ellipsisSize).toBe(linkSize);
+
+    // A consumer className still overrides the footprint.
+    await expect(overridden).toHaveClass('nx:size-8');
+    await expect(overridden).not.toHaveClass('nx:size-10');
+  },
+};
+
 // Composition: `asChild` routes the link styling onto a framework router link
 // (next/link, TanStack Router) instead of the native <a>. The router link
 // renders its own <a>, so the styling merges onto it — no nested <a><a>. The
