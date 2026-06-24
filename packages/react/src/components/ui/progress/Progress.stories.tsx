@@ -37,6 +37,13 @@ export const Default: Story = {
 
 export const Empty: Story = {
   args: { value: 0 },
+  play: async ({ canvasElement }) => {
+    const indicator = canvasElement.querySelector(
+      '[data-slot="progress-indicator"]'
+    );
+    // 0 is determinate (data-state="loading"), not indeterminate — no sweep
+    await expect(indicator).toHaveAttribute('data-state', 'loading');
+  },
 };
 
 export const Half: Story = {
@@ -45,6 +52,37 @@ export const Half: Story = {
 
 export const Full: Story = {
   args: { value: 100 },
+  play: async ({ canvasElement }) => {
+    const indicator = canvasElement.querySelector(
+      '[data-slot="progress-indicator"]'
+    );
+    await expect(indicator).toHaveAttribute('data-state', 'complete');
+  },
+};
+
+// ============================================
+// INDETERMINATE
+// ============================================
+
+// Value omitted while the total is unknown — the indicator runs the sweep.
+export const Indeterminate: Story = {
+  args: { 'aria-label': 'Loading' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const progress = canvas.getByRole('progressbar');
+    const indicator = canvasElement.querySelector(
+      '[data-slot="progress-indicator"]'
+    );
+
+    // Radix marks the bar indeterminate and omits the numeric value
+    await expect(indicator).toHaveAttribute('data-state', 'indeterminate');
+    await expect(progress).not.toHaveAttribute('aria-valuenow');
+    // The sweep animation and its reduced-motion suppression are wired
+    await expect(indicator).toHaveClass(
+      'nx:data-[state=indeterminate]:animate-progress-indeterminate'
+    );
+    await expect(indicator).toHaveClass('nx:motion-reduce:animate-none');
+  },
 };
 
 // ============================================
@@ -64,6 +102,7 @@ export const WithDataAttributes: Story = {
     await expect(indicator).toHaveAttribute('data-slot', 'progress-indicator');
     // value is forwarded to the Radix root, so it reports a determinate value
     await expect(progress).toHaveAttribute('aria-valuenow', '40');
+    await expect(indicator).toHaveAttribute('data-state', 'loading');
   },
 };
 
