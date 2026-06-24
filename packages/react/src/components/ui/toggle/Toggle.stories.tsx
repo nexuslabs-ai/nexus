@@ -22,7 +22,6 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const toggle = canvas.getByRole('button', { name: 'Bold' });
-    // data-variant / data-size fall back to 'default' when no prop is set.
     await expect(toggle).toHaveAttribute('data-slot', 'toggle');
     await expect(toggle).toHaveAttribute('data-variant', 'default');
     await expect(toggle).toHaveAttribute('data-size', 'default');
@@ -64,12 +63,10 @@ export const Sizes: Story = {
     const md = canvas.getByRole('button', { name: 'Default' });
     const lg = canvas.getByRole('button', { name: 'Large' });
 
-    // sm uses the label-small composite; the raw text-xs is gone.
     await expect(sm).toHaveClass('nx:typography-label-small');
     await expect(sm).not.toHaveClass('nx:text-xs');
     await expect(sm).toHaveClass('nx:px-3', 'nx:py-1.5', 'nx:gap-1.5');
 
-    // default + lg use label-default; the base no longer carries text-sm.
     await expect(md).toHaveClass('nx:typography-label-default');
     await expect(md).not.toHaveClass('nx:text-sm');
     await expect(md).toHaveClass('nx:px-4', 'nx:py-2', 'nx:gap-2');
