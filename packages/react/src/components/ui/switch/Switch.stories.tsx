@@ -152,7 +152,6 @@ export const WithLabel: Story = {
 };
 
 export const WithLabelAndDescription: Story = {
-  // Description spans row 2 via `col-start-2`; switch + label share row 1.
   render: (_args) => (
     <div className="nx:grid nx:grid-cols-[auto_1fr] nx:items-center nx:gap-x-3 nx:gap-y-1.5">
       <Switch id="notifications" />
