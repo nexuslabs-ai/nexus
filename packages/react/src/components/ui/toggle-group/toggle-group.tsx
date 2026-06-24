@@ -9,8 +9,6 @@ import { cn } from '@/lib/utils';
 const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants> & { spacing?: number }
 >({
-  size: 'default',
-  variant: 'default',
   spacing: 0,
 });
 
@@ -64,8 +62,8 @@ function ToggleGroup({
   return (
     <ToggleGroupPrimitive.Root
       data-slot="toggle-group"
-      data-variant={variant}
-      data-size={size}
+      data-variant={variant ?? 'default'}
+      data-size={size ?? 'default'}
       data-spacing={spacing}
       // Spacing-scale gap via the runtime spacing var (Nexus resets the base
       // --spacing, so Tailwind's --spacing() function is unavailable here).
@@ -107,18 +105,17 @@ function ToggleGroupItem({
   ...props
 }: ToggleGroupItemProps) {
   const context = React.useContext(ToggleGroupContext);
+  const resolvedVariant = variant ?? context.variant ?? 'default';
+  const resolvedSize = size ?? context.size ?? 'default';
 
   return (
     <ToggleGroupPrimitive.Item
       data-slot="toggle-group-item"
-      data-variant={context.variant || variant}
-      data-size={context.size || size}
+      data-variant={resolvedVariant}
+      data-size={resolvedSize}
       data-spacing={context.spacing}
       className={cn(
-        toggleVariants({
-          variant: context.variant || variant,
-          size: context.size || size,
-        }),
+        toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
         'nx:min-w-0 nx:shrink-0',
         // When joined (spacing=0): drop inner rounding/borders so items share
         // edges; round only the group's ends.
