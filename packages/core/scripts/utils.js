@@ -1398,7 +1398,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {string} [config.googleFontsImport] - Google Fonts @import statement
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
- * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours and dimensions
+ * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours (dimensions emit at :root via generateRootDimensionsCSS)
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (Vega defaults; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
@@ -1453,7 +1453,7 @@ export function generateThemeCSS(config) {
   css += `  --shadow-*: initial;\n`;
   css += `  --breakpoint-*: initial;\n\n`;
 
-  // Semantic tokens (colours + dimensions like --focus-offset)
+  // Semantic colour tokens (dimensions like --focus-offset emit at :root)
   if (semanticTokens.length > 0) {
     css += `  /* Semantic tokens */\n`;
     for (const token of semanticTokens) {
@@ -1523,6 +1523,28 @@ export function generateThemeCSS(config) {
     css += `}\n`;
   }
 
+  return css;
+}
+
+/**
+ * Emit fixed dimension primitives (e.g. --focus-offset) as a `:root {}` block.
+ *
+ * Kept out of @theme: they're consumed only via arbitrary utilities like
+ * `outline-offset-(--focus-offset)`, which Tailwind doesn't track as @theme
+ * usage and therefore tree-shakes from the runtime cascade (#506).
+ *
+ * @param {object[]} dimensionTokens - Array of { cssName, value }
+ * @returns {string} CSS `:root {}` block, or '' when empty
+ */
+export function generateRootDimensionsCSS(dimensionTokens = []) {
+  if (dimensionTokens.length === 0) return '';
+
+  let css = `\n/* ===== RUNTIME DIMENSION TOKENS ===== */\n`;
+  css += `:root {\n`;
+  for (const token of dimensionTokens) {
+    css += `  --${token.cssName}: ${token.value};\n`;
+  }
+  css += `}\n`;
   return css;
 }
 

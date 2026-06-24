@@ -107,10 +107,10 @@ describe('generateTailwindPackage', () => {
   // outline-focus-* utilities. The ring is outline-only — no focus box-shadow
   // tokens of any kind (the geometry-composed --shadow-focus-* are gone).
   // The 2px C40 offset is also tokenised so components share one tune-point.
-  // Count-based assertion on --focus-offset guards against duplicate emission
-  // through the standalone-semantic dimension scan colliding with a dedicated
-  // collector (the same trap that broke --breakpoint-*).
-  it('promotes focus colours to --color-* and emits --focus-offset exactly once; no focus box-shadow', () => {
+  // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
+  // vars referenced only via arbitrary utilities, #506). The count guard also
+  // catches duplicate emission via the dimension scan (the --breakpoint-* trap).
+  it('promotes focus colours to --color-* and emits --focus-offset once at :root; no focus box-shadow', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(
       /--color-focus-default: var\(--nx-focus-color-default\);/
@@ -118,8 +118,9 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(
       /--color-focus-error: var\(--nx-focus-color-error\);/
     );
-    expect(themeBlock.match(/--focus-offset:/g)).toHaveLength(1);
-    expect(themeBlock).toMatch(/--focus-offset: 2px;/);
+    expect(nexusCSS.match(/--focus-offset:/g)).toHaveLength(1);
+    expect(themeBlock).not.toMatch(/--focus-offset/);
+    expect(nexusCSS).toMatch(/:root\s*\{[^}]*--focus-offset: 2px;[^}]*\}/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 

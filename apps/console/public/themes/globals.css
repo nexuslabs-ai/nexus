@@ -128,7 +128,6 @@
   --color-border-primary-active: var(--nx-color-blue-400);
   --color-focus-default: var(--nx-focus-color-default);
   --color-focus-error: var(--nx-focus-color-error);
-  --focus-offset: 2px;
 
   /* Spacing tokens */
   --spacing-0: 0px;
@@ -236,6 +235,11 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 96rem;
+}
+
+/* ===== RUNTIME DIMENSION TOKENS ===== */
+:root {
+  --focus-offset: 2px;
 }
 
 /* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */
