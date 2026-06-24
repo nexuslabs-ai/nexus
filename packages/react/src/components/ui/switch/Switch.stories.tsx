@@ -115,6 +115,28 @@ export const Invalid: Story = {
   },
 };
 
+// ============================================
+// SIZE STORIES
+// ============================================
+
+export const Small: Story = {
+  args: {
+    size: 'sm',
+    'aria-label': 'Toggle switch',
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const switchEl = canvas.getByRole('switch');
+
+    await expect(switchEl).toHaveAttribute('data-size', 'sm');
+
+    // The smaller control still toggles (geometry-only size change).
+    await userEvent.click(switchEl);
+    await expect(switchEl).toHaveAttribute('data-state', 'checked');
+    await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
+  },
+};
+
 export const WithLabel: Story = {
   render: (_args) => (
     <div className="nx:flex nx:items-center nx:gap-2">
@@ -131,19 +153,17 @@ export const WithLabel: Story = {
 
 export const WithLabelAndDescription: Story = {
   render: (_args) => (
-    <div className="nx:flex nx:items-start nx:gap-3">
-      <Switch id="notifications" className="nx:mt-0.5" />
-      <div className="nx:grid nx:gap-1.5">
-        <label
-          htmlFor="notifications"
-          className="nx:text-sm nx:font-medium nx:leading-none"
-        >
-          Enable Notifications
-        </label>
-        <p className="nx:text-sm nx:text-muted-foreground">
-          Receive notifications when someone mentions you.
-        </p>
-      </div>
+    <div className="nx:grid nx:grid-cols-[auto_1fr] nx:items-center nx:gap-x-3 nx:gap-y-1.5">
+      <Switch id="notifications" />
+      <label
+        htmlFor="notifications"
+        className="nx:text-sm nx:font-medium nx:leading-none"
+      >
+        Enable Notifications
+      </label>
+      <p className="nx:col-start-2 nx:text-sm nx:text-muted-foreground">
+        Receive notifications when someone mentions you.
+      </p>
     </div>
   ),
 };
@@ -275,6 +295,9 @@ export const WithDataAttributes: Story = {
     // Check data-slot attribute
     await expect(switchEl).toHaveAttribute('data-slot', 'switch');
 
+    // Default size resolves to data-size="default"
+    await expect(switchEl).toHaveAttribute('data-size', 'default');
+
     // Check thumb has data-slot
     const thumb = switchEl.querySelector('[data-slot="switch-thumb"]');
     await expect(thumb).toBeInTheDocument();
@@ -321,6 +344,70 @@ export const AllVariants: Story = {
               <span className="nx:text-xs nx:text-muted-foreground">
                 Disabled Checked
               </span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+            Sizes
+          </h3>
+          <div className="nx:flex nx:items-center nx:gap-6">
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch size="default" aria-label="Default size" />
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Default
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch
+                size="default"
+                defaultChecked
+                aria-label="Default size checked"
+              />
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Default checked
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch size="sm" aria-label="Small size" />
+              <span className="nx:text-xs nx:text-muted-foreground">Small</span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <Switch
+                size="sm"
+                defaultChecked
+                aria-label="Small size checked"
+              />
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Small checked
+              </span>
+            </div>
+          </div>
+          <div className="nx:mt-6 nx:flex nx:flex-col nx:gap-4">
+            <div className="nx:grid nx:grid-cols-[auto_1fr] nx:items-center nx:gap-x-3 nx:gap-y-1.5">
+              <Switch size="default" id={`${uid}-desc-default`} />
+              <label
+                htmlFor={`${uid}-desc-default`}
+                className="nx:text-sm nx:font-medium nx:leading-none"
+              >
+                Default with description
+              </label>
+              <p className="nx:col-start-2 nx:text-sm nx:text-muted-foreground">
+                The control centers with the label&apos;s first line.
+              </p>
+            </div>
+            <div className="nx:grid nx:grid-cols-[auto_1fr] nx:items-center nx:gap-x-3 nx:gap-y-1.5">
+              <Switch size="sm" id={`${uid}-desc-sm`} />
+              <label
+                htmlFor={`${uid}-desc-sm`}
+                className="nx:text-sm nx:font-medium nx:leading-none"
+              >
+                Small with description
+              </label>
+              <p className="nx:col-start-2 nx:text-sm nx:text-muted-foreground">
+                Alignment holds at the smaller size too.
+              </p>
             </div>
           </div>
         </div>
