@@ -1,7 +1,9 @@
-/* Storybook-only stylesheet: load the full Nexus token set + utilities for
- * rendering. The shipped component CSS (src/index.css) is utilities-only by
- * design (tokens come from the consumer's @nexus/tailwind), so Storybook pulls
- * the tokens in here. Imported via CSS @import (not a JS import) so the Rollup
- * production build can resolve @nexus/tailwind, whose package entry is a .css. */
+/* Storybook-only stylesheet: render against exactly what consumers get. The
+ * shipped src/index.css is utilities-only by design (tokens come from the
+ * consumer's @nexus/tailwind), so Storybook layers the two the same way a
+ * consumer does — tokens from @nexus/tailwind, then the shipped utilities,
+ * tw-animate-css, and component keyframes from src/index.css. Imported via CSS
+ * @import (not a JS import) so the Rollup production build can resolve
+ * @nexus/tailwind, whose package entry is a .css. */
 @import '@nexus/tailwind';
-@import 'tw-animate-css';
+@import '../src/index.css';
