@@ -225,9 +225,8 @@ export const NavigationLandmark: Story = {
   },
 };
 
-// The ellipsis stands in at the same footprint as an icon page link, tracking
-// the link's live size token rather than a hand-copied value; a consumer
-// className can still override it.
+// The ellipsis matches an icon page link's footprint, and a consumer className
+// can still override it.
 export const EllipsisFootprint: Story = {
   render: () => (
     <Pagination>
@@ -261,7 +260,6 @@ export const EllipsisFootprint: Story = {
     await expect(linkSize).toBe('nx:size-10');
     await expect(ellipsisSize).toBe(linkSize);
 
-    // A consumer className still overrides the footprint.
     await expect(overridden).toHaveClass('nx:size-8');
     await expect(overridden).not.toHaveClass('nx:size-10');
   },
