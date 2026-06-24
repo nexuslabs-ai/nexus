@@ -152,6 +152,40 @@ export const Disabled: Story = {
   },
 };
 
+export const Invalid: Story = {
+  render: (args) => (
+    <RadioGroup {...args} defaultValue="card" aria-label="Payment method">
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <RadioGroupItem value="card" id="invalid-card" aria-invalid />
+        <Label htmlFor="invalid-card">Credit card</Label>
+      </div>
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <RadioGroupItem value="paypal" id="invalid-paypal" aria-invalid />
+        <Label htmlFor="invalid-paypal">PayPal</Label>
+      </div>
+    </RadioGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const card = canvas.getByRole('radio', { name: 'Credit card' });
+    const paypal = canvas.getByRole('radio', { name: 'PayPal' });
+
+    await expect(card).toHaveAttribute('aria-invalid', 'true');
+    await expect(paypal).toHaveAttribute('aria-invalid', 'true');
+    await expect(card).toHaveAttribute('data-state', 'checked');
+
+    // Unchecked invalid → base error border + error focus ring.
+    await expect(paypal).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(paypal).toHaveClass(
+      'nx:aria-invalid:focus-visible:outline-focus-error'
+    );
+    // Checked invalid → combinatorial override outranks the checked primary border.
+    await expect(card).toHaveClass(
+      'nx:aria-invalid:data-[state=checked]:border-border-error'
+    );
+  },
+};
+
 export const ClickInteraction: Story = {
   render: (args) => (
     <RadioGroup {...args} aria-label="Pick one">

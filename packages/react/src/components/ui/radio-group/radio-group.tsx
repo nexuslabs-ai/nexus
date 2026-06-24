@@ -69,8 +69,10 @@ function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
         'nx:size-4 nx:shrink-0 nx:cursor-pointer nx:rounded-full nx:border nx:border-border-default nx:bg-background',
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+        'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
         'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled',
         'nx:data-[state=checked]:border-primary-background nx:data-[state=checked]:disabled:border-primary-disabled',
+        'nx:aria-invalid:data-[state=checked]:border-border-error',
         className
       )}
       {...props}
