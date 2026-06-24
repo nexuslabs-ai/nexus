@@ -170,7 +170,7 @@ Nexus ships a 6-token z-index scale for stacking overlays. The tokens are semant
 
 ### Token scale
 
-Six tokens, low → high: `overlay` (10), `sticky` (30), `modal` (50), `popover` (70), `toast` (100), `max` (9999) — values canonical in `z-index.json`, utilities (`nx:z-modal`, …) generated on demand from the `--z-index-*` theme keys. `nx:z-modal`, `nx:z-popover`, `nx:z-sticky`, and `nx:z-toast` are used by shipped components; `nx:z-overlay` (low-level scrims) and `nx:z-max` (host system UI) are reserved for consumers.
+Six tokens, low → high: `overlay` (10), `sticky` (30), `modal` (50), `popover` (70), `toast` (100), `max` (9999) — values canonical in `z-index.json`, utilities (`nx:z-modal`, …) generated on demand from the `--z-index-*` theme keys. Only `nx:z-modal` and `nx:z-popover` are used by shipped components (Dialog; DropdownMenu / Select / Tooltip); the rest are reserved for consumers (`sticky` for app-shell chrome, `max` for host system UI, `overlay` for low-level scrims).
 
 **Popover sits _above_ modal (70 > 50) by design.** A DropdownMenu, Select, or Tooltip opened _inside_ a Dialog must paint above the dialog to stay usable — so the floating-layer token outranks the modal layer. This is the deliberate, non-obvious ordering; do not "fix" it by dropping popover below modal.
 
