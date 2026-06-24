@@ -1,9 +1,12 @@
 import { useState } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { expect, userEvent } from 'storybook/test';
 
+import { IconChevronDown, IconChevronUp } from '@/lib/icons';
+
+import { Hide } from '../../primitives/hide';
+import { Show } from '../../primitives/show';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 
@@ -853,7 +856,7 @@ export const Bleed: Story = {
 function SortableHeaderDemo() {
   const [sort, setSort] = useState<'asc' | 'desc'>('asc');
   const ariaSort = sort === 'asc' ? 'ascending' : 'descending';
-  const Icon = sort === 'asc' ? ChevronUp : ChevronDown;
+  const Icon = sort === 'asc' ? IconChevronUp : IconChevronDown;
   const rows = [...invoices].sort((a, b) =>
     sort === 'asc'
       ? a.amount.localeCompare(b.amount)
@@ -980,11 +983,12 @@ export const SelectionWithBulkActions: Story = {
       '[aria-label="Select all rows"]'
     );
     await userEvent.click(selectAll as Element);
-    // Select-all selects every row (and reveals the bulk-action bar).
+    // Select-all selects every row and reveals the bulk-action bar.
     const selectedRows = canvasElement.querySelectorAll(
       'tbody [data-slot="table-row"][data-state="selected"]'
     );
     await expect(selectedRows).toHaveLength(invoices.length);
+    await expect(canvasElement).toHaveTextContent('5 selected');
   },
 };
 
@@ -1009,7 +1013,7 @@ export const RowLink: Story = {
             <TableRowHeader>
               <a
                 href={`#/invoices/${row.invoice}`}
-                className="nx:after:absolute nx:after:inset-0 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+                className="nx:after:absolute nx:after:inset-0 nx:after:content-[''] nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
               >
                 {row.invoice}
               </a>
@@ -1024,6 +1028,11 @@ export const RowLink: Story = {
     const link = canvasElement.querySelector('a[href^="#/invoices/"]');
     await expect(link).toBeInTheDocument();
     await expect(link).toHaveAccessibleName('INV001');
+    // The ::after overlay actually generates a box and spans the row, so a click
+    // anywhere on the row follows the link.
+    const overlay = getComputedStyle(link as Element, '::after');
+    await expect(overlay.content).not.toBe('none');
+    await expect(overlay.position).toBe('absolute');
   },
 };
 
@@ -1035,7 +1044,7 @@ export const RowLink: Story = {
 export const StackedCard: Story = {
   render: () => (
     <div className="nx:@container nx:w-[20rem]">
-      <div className="nx:@max-sm:hidden">
+      <Hide as="div" containerBelow="sm">
         <Table>
           <TableHeader>
             <TableRow>
@@ -1056,28 +1065,30 @@ export const StackedCard: Story = {
             ))}
           </TableBody>
         </Table>
-      </div>
-      <ul className="nx:hidden nx:flex-col nx:gap-2 nx:@max-sm:flex">
-        {invoices.slice(0, 3).map((row) => (
-          <li
-            key={row.invoice}
-            className="nx:space-y-1 nx:rounded-md nx:border nx:border-border-default-alpha nx:p-3"
-          >
-            <div className="nx:flex nx:justify-between">
-              <span className="nx:text-muted-foreground">Invoice</span>
-              <span className="nx:font-medium">{row.invoice}</span>
-            </div>
-            <div className="nx:flex nx:justify-between">
-              <span className="nx:text-muted-foreground">Status</span>
-              <span>{row.status}</span>
-            </div>
-            <div className="nx:flex nx:justify-between">
-              <span className="nx:text-muted-foreground">Amount</span>
-              <span className="nx:tabular-nums">{row.amount}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
+      </Hide>
+      <Show as="div" containerBelow="sm">
+        <ul className="nx:flex nx:flex-col nx:gap-2">
+          {invoices.slice(0, 3).map((row) => (
+            <li
+              key={row.invoice}
+              className="nx:space-y-1 nx:rounded-md nx:border nx:border-border-default-alpha nx:p-3"
+            >
+              <div className="nx:flex nx:justify-between">
+                <span className="nx:text-muted-foreground">Invoice</span>
+                <span className="nx:font-medium">{row.invoice}</span>
+              </div>
+              <div className="nx:flex nx:justify-between">
+                <span className="nx:text-muted-foreground">Status</span>
+                <span>{row.status}</span>
+              </div>
+              <div className="nx:flex nx:justify-between">
+                <span className="nx:text-muted-foreground">Amount</span>
+                <span className="nx:tabular-nums">{row.amount}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Show>
     </div>
   ),
   play: async ({ canvasElement }) => {
