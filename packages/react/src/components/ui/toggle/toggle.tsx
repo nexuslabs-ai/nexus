@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const toggleVariants = cva(
-  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:text-sm nx:font-medium nx:whitespace-nowrap nx:transition-colors nx:outline-none nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error nx:data-[state=on]:bg-control-background nx:data-[state=on]:text-foreground nx:data-[state=on]:hover:bg-control-background-hover nx:[&_svg]:pointer-events-none nx:[&_svg]:shrink-0 nx:[&_svg]:size-4',
+  'nx:inline-flex nx:items-center nx:justify-center nx:rounded-md nx:whitespace-nowrap nx:transition-colors nx:outline-none nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error nx:data-[state=on]:bg-control-background nx:data-[state=on]:text-foreground nx:data-[state=on]:hover:bg-control-background-hover nx:[&_svg]:pointer-events-none nx:[&_svg]:shrink-0 nx:[&_svg]:size-4',
   {
     variants: {
       variant: {
@@ -14,9 +14,9 @@ const toggleVariants = cva(
         outline: 'nx:border nx:border-border-default nx:bg-transparent',
       },
       size: {
-        default: 'nx:px-4 nx:py-2 nx:gap-2',
-        sm: 'nx:px-3 nx:py-1.5 nx:gap-1.5 nx:text-xs',
-        lg: 'nx:px-8 nx:py-3 nx:gap-2.5',
+        default: 'nx:px-4 nx:py-2 nx:gap-2 nx:typography-label-default',
+        sm: 'nx:px-3 nx:py-1.5 nx:gap-1.5 nx:typography-label-small',
+        lg: 'nx:px-8 nx:py-3 nx:gap-2.5 nx:typography-label-default',
       },
     },
     defaultVariants: {
@@ -53,8 +53,8 @@ function Toggle({ className, variant, size, ...props }: ToggleProps) {
   return (
     <TogglePrimitive.Root
       data-slot="toggle"
-      data-variant={variant}
-      data-size={size}
+      data-variant={variant ?? 'default'}
+      data-size={size ?? 'default'}
       className={cn(toggleVariants({ variant, size }), className)}
       {...props}
     />
