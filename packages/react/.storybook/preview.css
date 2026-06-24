@@ -5,3 +5,4 @@
  * production build can resolve @nexus/tailwind, whose package entry is a .css. */
 @import '@nexus/tailwind';
 @import 'tw-animate-css';
+@import '../src/components/ui/progress/progress.css';

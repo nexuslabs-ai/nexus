@@ -1,0 +1,16 @@
+/* Indeterminate Progress sweep keyframe. @imported by both Tailwind roots that
+ * render Progress — src/index.css (shipped) and .storybook/preview.css — so the
+ * animation compiles in both. */
+@theme inline {
+  --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out
+    infinite;
+
+  @keyframes progress-indeterminate {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(300%);
+    }
+  }
+}

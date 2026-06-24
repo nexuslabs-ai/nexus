@@ -46,8 +46,12 @@ function Progress({ className, value, ...props }: ProgressProps) {
     >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className="nx:h-full nx:w-full nx:flex-1 nx:bg-primary-background nx:transition-all"
-        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+        className="nx:h-full nx:w-full nx:flex-1 nx:bg-primary-background nx:transition-transform nx:data-[state=indeterminate]:w-1/3 nx:data-[state=indeterminate]:animate-progress-indeterminate nx:motion-reduce:animate-none"
+        style={
+          value == null
+            ? undefined
+            : { transform: `translateX(-${100 - value}%)` }
+        }
       />
     </ProgressPrimitive.Root>
   );

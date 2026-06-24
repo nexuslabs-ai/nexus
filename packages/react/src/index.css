@@ -10,6 +10,7 @@
 @import 'tailwindcss' prefix(nx);
 @reference '@nexus/tailwind';
 @import 'tw-animate-css';
+@import './components/ui/progress/progress.css';
 
 @media (prefers-reduced-motion: reduce) {
   /* Vaul injects drawer motion CSS at runtime, outside Tailwind utilities. */
