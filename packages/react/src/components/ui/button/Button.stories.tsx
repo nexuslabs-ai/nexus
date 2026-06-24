@@ -479,6 +479,13 @@ export const FocusManagement: Story = {
     await userEvent.tab();
     await expect(button).toHaveFocus();
 
+    // #506: --focus-offset must resolve to 2px at runtime, not collapse to 0.
+    const root = canvasElement.ownerDocument.documentElement;
+    await expect(
+      getComputedStyle(root).getPropertyValue('--focus-offset').trim()
+    ).toBe('2px');
+    await expect(getComputedStyle(button).outlineOffset).toBe('2px');
+
     // Shift+Tab should blur
     await userEvent.tab({ shift: true });
     await expect(button).not.toHaveFocus();

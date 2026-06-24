@@ -23,6 +23,7 @@ import {
   generateBaseLayerCSS,
   generateBorderWidthUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
+  generateRootDimensionsCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   generateThemeCSS,
@@ -410,10 +411,12 @@ function generateNexusCSS(
     );
   }
 
-  // Light + dark semantic accumulators. Holds color tokens and any dimension
-  // tokens contributed by standalone files (e.g. focus.json's focus.offset).
+  // Light + dark semantic color accumulators. Dimension tokens (e.g.
+  // focus.offset) are collected separately into `dimensionTokens` so they emit
+  // at :root, not @theme (see generateRootDimensionsCSS / #506).
   const lightSemanticTokens = [];
   const darkSemanticTokens = [];
+  const dimensionTokens = [];
 
   for (const themed of semanticFiles.themed) {
     const lightTokens = collectSemanticColorTokensVarRef(
@@ -430,10 +433,9 @@ function generateNexusCSS(
     darkSemanticTokens.push(...darkTokens);
   }
 
-  // Process standalone semantic files (like focus.json) for light tokens.
-  // Each file can contribute both color tokens (--color-*) and dimension
-  // tokens (--<path>) — focus.json's color leaves promote to --color-focus-*
-  // utilities, and focus.offset emits as --focus-offset for outline-offset.
+  // Process standalone semantic files (like focus.json). Color leaves promote to
+  // --color-focus-* utilities in @theme; dimension leaves (focus.offset) go to
+  // dimensionTokens for the :root block, not @theme (see generateRootDimensionsCSS).
   for (const standaloneFile of semanticFiles.standalone) {
     lightSemanticTokens.push(
       ...collectSemanticColorTokensVarRef(
@@ -443,7 +445,7 @@ function generateNexusCSS(
       )
     );
     if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(standaloneFile)) {
-      lightSemanticTokens.push(
+      dimensionTokens.push(
         ...collectSemanticDimensionTokens(SEMANTIC_DIR, standaloneFile)
       );
     }
@@ -505,6 +507,9 @@ function generateNexusCSS(
     darkSelector: '.dark',
     prefixDarkVars: true, // Use --nx-color-* for dark mode overrides
   });
+
+  // Fixed dimension primitives at :root (e.g. --focus-offset) — see #506.
+  css += generateRootDimensionsCSS(dimensionTokens);
 
   // Per-mode spacing override blocks (`:root, [data-style="<default>"]` for
   // the consumer-chosen default + plain `[data-style="X"]` for the others).
