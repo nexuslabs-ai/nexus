@@ -152,6 +152,46 @@ export const Disabled: Story = {
   },
 };
 
+export const Invalid: Story = {
+  render: (args) => (
+    <RadioGroup {...args} defaultValue="card" aria-label="Payment method">
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <RadioGroupItem value="card" id="invalid-card" aria-invalid />
+        <Label htmlFor="invalid-card">Credit card</Label>
+      </div>
+      <div className="nx:flex nx:items-center nx:gap-2">
+        <RadioGroupItem value="paypal" id="invalid-paypal" aria-invalid />
+        <Label htmlFor="invalid-paypal">PayPal</Label>
+      </div>
+    </RadioGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const card = canvas.getByRole('radio', { name: 'Credit card' });
+    const paypal = canvas.getByRole('radio', { name: 'PayPal' });
+
+    await expect(card).toHaveAttribute('aria-invalid', 'true');
+    await expect(paypal).toHaveAttribute('aria-invalid', 'true');
+    await expect(card).toHaveAttribute('data-state', 'checked');
+
+    // Unchecked invalid → base error border + error focus ring.
+    await expect(paypal).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(paypal).toHaveClass(
+      'nx:aria-invalid:focus-visible:outline-focus-error'
+    );
+    // Checked invalid → combinatorial override outranks the checked primary border.
+    await expect(card).toHaveClass(
+      'nx:aria-invalid:data-[state=checked]:border-border-error'
+    );
+
+    // Checked invalid also reddens the selection dot — the item drives the
+    // color and the dot inherits via currentColor (matches checkbox).
+    await expect(card).toHaveClass(
+      'nx:aria-invalid:data-[state=checked]:text-error-background'
+    );
+  },
+};
+
 export const ClickInteraction: Story = {
   render: (args) => (
     <RadioGroup {...args} aria-label="Pick one">
@@ -285,6 +325,26 @@ export const AllVariants: Story = {
               </RadioGroup>
               <span className="nx:text-xs nx:text-muted-foreground">
                 Disabled selected
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <RadioGroup aria-label="Invalid state">
+                <RadioGroupItem value="a" aria-invalid aria-label="Invalid" />
+              </RadioGroup>
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Invalid
+              </span>
+            </div>
+            <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
+              <RadioGroup defaultValue="a" aria-label="Invalid selected state">
+                <RadioGroupItem
+                  value="a"
+                  aria-invalid
+                  aria-label="Invalid selected"
+                />
+              </RadioGroup>
+              <span className="nx:text-xs nx:text-muted-foreground">
+                Invalid selected
               </span>
             </div>
           </div>
