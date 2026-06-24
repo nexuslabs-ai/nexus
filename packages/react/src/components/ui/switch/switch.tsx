@@ -21,7 +21,7 @@ const switchVariants = cva(
     variants: {
       size: {
         default: 'nx:h-5 nx:w-9',
-        sm: 'nx:h-[18px] nx:w-8',
+        sm: 'nx:h-[18px] nx:w-[32px]',
       },
     },
     defaultVariants: {
@@ -41,7 +41,7 @@ const switchThumbVariants = cva(
     variants: {
       size: {
         default: 'nx:size-4 nx:data-[state=checked]:translate-x-4',
-        sm: 'nx:size-3.5 nx:data-[state=checked]:translate-x-[14px]',
+        sm: 'nx:size-[14px] nx:data-[state=checked]:translate-x-[14px]',
       },
     },
     defaultVariants: {
