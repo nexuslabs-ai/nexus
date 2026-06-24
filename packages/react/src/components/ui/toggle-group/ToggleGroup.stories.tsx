@@ -20,6 +20,7 @@ export default meta;
 type Story = StoryObj<typeof ToggleGroup>;
 
 // Single-select: behaves like a radio group (exactly one item pressed).
+// Also guards invariant #3 — data-variant / data-size are emitted on the default.
 export const Default: Story = {
   render: () => (
     <ToggleGroup type="single" defaultValue="left">
@@ -34,6 +35,14 @@ export const Default: Story = {
       </ToggleGroupItem>
     </ToggleGroup>
   ),
+  play: async ({ canvasElement }) => {
+    const group = canvasElement.querySelector('[data-slot="toggle-group"]');
+    await expect(group).toHaveAttribute('data-variant', 'default');
+    await expect(group).toHaveAttribute('data-size', 'default');
+    const item = canvasElement.querySelector('[data-slot="toggle-group-item"]');
+    await expect(item).toHaveAttribute('data-variant', 'default');
+    await expect(item).toHaveAttribute('data-size', 'default');
+  },
 };
 
 // Multiple-select: any number of items pressed at once.
@@ -177,7 +186,7 @@ export const Disabled: Story = {
   },
 };
 
-// The group carries data-slot / data-variant / data-size; items carry data-slot.
+// The group carries data-variant / data-size; items inherit them through context.
 export const WithDataAttributes: Story = {
   render: () => (
     <ToggleGroup type="single" variant="outline" size="sm" defaultValue="left">
@@ -193,9 +202,33 @@ export const WithDataAttributes: Story = {
     const group = canvasElement.querySelector('[data-slot="toggle-group"]');
     await expect(group).toHaveAttribute('data-variant', 'outline');
     await expect(group).toHaveAttribute('data-size', 'sm');
-    await expect(
-      canvasElement.querySelector('[data-slot="toggle-group-item"]')
-    ).toBeInTheDocument();
+    const item = canvasElement.querySelector('[data-slot="toggle-group-item"]');
+    await expect(item).toHaveAttribute('data-variant', 'outline');
+    await expect(item).toHaveAttribute('data-size', 'sm');
+  },
+};
+
+// Item-wins precedence: a per-item variant overrides the group's. The group is
+// outline; the first item opts back to the borderless default, the second inherits.
+export const ItemOverridesGroup: Story = {
+  render: () => (
+    <ToggleGroup type="single" variant="outline" defaultValue="left">
+      <ToggleGroupItem value="left" variant="default" aria-label="Align left">
+        <IconAlignLeft />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="center" aria-label="Align center">
+        <IconAlignCenter />
+      </ToggleGroupItem>
+    </ToggleGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const [override, inherited] = canvasElement.querySelectorAll(
+      '[data-slot="toggle-group-item"]'
+    );
+    await expect(override).toHaveAttribute('data-variant', 'default');
+    await expect(override).not.toHaveClass('nx:border-border-default');
+    await expect(inherited).toHaveAttribute('data-variant', 'outline');
+    await expect(inherited).toHaveClass('nx:border-border-default');
   },
 };
 
