@@ -184,12 +184,10 @@ export const Invalid: Story = {
       'nx:aria-invalid:data-[state=checked]:border-border-error'
     );
 
-    // Checked invalid also reddens the selection dot (matches checkbox).
-    const cardDot = card.querySelector(
-      '[data-slot="radio-group-indicator"] svg'
-    );
-    await expect(cardDot).toHaveClass(
-      'nx:group-aria-invalid:text-error-background'
+    // Checked invalid also reddens the selection dot — the item drives the
+    // color and the dot inherits via currentColor (matches checkbox).
+    await expect(card).toHaveClass(
+      'nx:aria-invalid:data-[state=checked]:text-error-background'
     );
   },
 };
