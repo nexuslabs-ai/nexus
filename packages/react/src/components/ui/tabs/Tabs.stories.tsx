@@ -121,6 +121,17 @@ export const SmallSize: Story = {
       </TabsContent>
     </Tabs>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tab = canvas.getByRole('tab', { name: 'Small Tab' });
+
+    await expect(tab).toHaveClass(
+      'nx:typography-label-small',
+      'nx:px-2',
+      'nx:py-1'
+    );
+    await expect(getComputedStyle(tab).fontSize).toBe('12px');
+  },
 };
 
 export const LargeSize: Story = {
@@ -479,6 +490,20 @@ export const WithDataAttributes: Story = {
     // Check tabpanel has data-slot
     const tabPanel = canvas.getByRole('tabpanel');
     await expect(tabPanel).toHaveAttribute('data-slot', 'tabs-content');
+
+    await expect(tab1).toHaveClass(
+      'nx:typography-label-default',
+      'nx:px-3',
+      'nx:py-1.5'
+    );
+    await expect(getComputedStyle(tab1).fontSize).toBe('14px');
+
+    await expect(tab2).toHaveClass(
+      'nx:typography-label-default',
+      'nx:px-4',
+      'nx:py-2'
+    );
+    await expect(getComputedStyle(tab2).fontSize).toBe('14px');
   },
 };
 
