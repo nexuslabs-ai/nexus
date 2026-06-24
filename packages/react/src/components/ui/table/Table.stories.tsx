@@ -462,8 +462,8 @@ export const AriaSortIndicator: Story = {
     await expect(none).toBeInTheDocument();
     await expect(desc).toBeInTheDocument();
 
-    // Emphasis is keyed on the aria-sort attr via a self-scoped selector; assert
-    // the rule is wired on the sorted heads (CSS does the rendering).
+    // Smoke check that the emphasis utility ships on the head (it's on the cva
+    // base, so every <th> carries it — the aria-sort attr selects which renders).
     await expect(asc).toHaveClass(
       'nx:[&[aria-sort=ascending]]:text-foreground'
     );
@@ -513,8 +513,8 @@ export const Striped: Story = {
     // Even (unselected) rows are tinted; odd rows are bare.
     await expect(bg(rows[3] as Element)).not.toBe(TRANSPARENT); // even, striped
     await expect(bg(rows[0] as Element)).toBe(TRANSPARENT); // odd, no stripe
-    // Selection beats the stripe: the even+selected row is excluded from the
-    // zebra selector and shows the selection tint.
+    // Precondition for selection-beats-stripe: the even row is marked selected,
+    // which the zebra selector excludes ([data-state=selected]).
     await expect(rows[1] as Element).toHaveAttribute('data-state', 'selected');
   },
 };
