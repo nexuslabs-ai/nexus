@@ -1,0 +1,15 @@
+/* motion: snappy */
+
+:root {
+  --nx-motion-duration-0: 0ms;
+  --nx-motion-duration-faster: 100ms;
+  --nx-motion-duration-fast: 150ms;
+  --nx-motion-duration-default: 200ms;
+  --nx-motion-duration-moderate: 240ms;
+  --nx-motion-duration-slow: 300ms;
+  --nx-motion-duration-slower: 500ms;
+  --nx-motion-ease-linear: linear;
+  --nx-motion-ease-enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --nx-motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --nx-motion-ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+}

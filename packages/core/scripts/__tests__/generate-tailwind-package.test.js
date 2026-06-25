@@ -310,6 +310,39 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(/--text-\*:\s*initial;/);
   });
 
+  it('emits named motion tokens without resetting Tailwind default motion namespaces yet', () => {
+    const rootBlock = extractBlock(variablesCSS, ':root');
+    expect(rootBlock).toMatch(/--nx-motion-duration-fast:\s*150ms;/);
+    expect(rootBlock).toMatch(/--nx-motion-duration-default:\s*200ms;/);
+    expect(rootBlock).toMatch(
+      /--nx-motion-ease-enter:\s*cubic-bezier\(0\.23, 1, 0\.32, 1\);/
+    );
+    expect(rootBlock).toMatch(
+      /--nx-motion-ease-move:\s*cubic-bezier\(0\.77, 0, 0\.175, 1\);/
+    );
+
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(
+      /--duration-fast:\s*var\(--nx-motion-duration-fast\);/
+    );
+    expect(themeBlock).toMatch(
+      /--duration-default:\s*var\(--nx-motion-duration-default\);/
+    );
+    expect(themeBlock).toMatch(
+      /--ease-enter:\s*var\(--nx-motion-ease-enter\);/
+    );
+    expect(themeBlock).toMatch(
+      /--ease-move:\s*var\(--nx-motion-ease-move\);/
+    );
+
+    // The repo-wide motion migration is tracked separately (#530). Until
+    // hardcoded consumers are migrated, keep Tailwind's default duration/ease
+    // utilities available so existing classes do not silently lose motion.
+    expect(themeBlock).not.toMatch(/--duration-\*:\s*initial;/);
+    expect(themeBlock).not.toMatch(/--ease-\*:\s*initial;/);
+    expect(themeBlock).not.toMatch(/--animate-\*:\s*initial;/);
+  });
+
   it('registers numeric --spacing-N in @theme with direct px (not var() refs)', () => {
     // The numeric subset seeds @theme so Tailwind codegens nx:p-N / nx:m-N /
     // nx:h-N / nx:gap-N. After migration these are direct px values, not

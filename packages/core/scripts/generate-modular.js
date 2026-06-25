@@ -6,6 +6,7 @@ import {
   CANONICAL_SPACING_DEFAULT_MODE,
   collectBorderwidthTokens,
   collectBreakpointsTokens,
+  collectMotionTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
   collectSemanticDimensionTokens,
@@ -296,6 +297,9 @@ function generateModularGlobalsCSS(
   const borderwidthTokens = primitives.borderwidth?.modes?.[0]
     ? collectBorderwidthTokens(TOKENS_DIR, primitives.borderwidth.modes[0])
     : [];
+  const motionTokens = primitives.motion?.modes?.[0]
+    ? collectMotionTokens(TOKENS_DIR, primitives.motion.modes[0])
+    : [];
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
   const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
@@ -325,6 +329,7 @@ function generateModularGlobalsCSS(
       'tailwindcss',
       './color.css',
       './focus-default.css',
+      './motion-snappy.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
       './spacing-utilities.css',
@@ -334,6 +339,7 @@ function generateModularGlobalsCSS(
     spacingTokens: vegaSpacingNumeric,
     radiusTokens,
     borderwidthTokens,
+    motionTokens,
     shadowTokens,
     zIndexTokens,
     breakpointTokens,
@@ -352,9 +358,9 @@ function generateModularGlobalsCSS(
 
   writeModularFile(distDir, 'globals.css', css);
 
-  // Spacing role utilities — emitted as a sibling file (symmetric with the
-  // bundled build). `globals.css` `@import`s it; `sync-console-themes.js`'s
-  // STYLES_FILES allowlist carries it to `apps/console/src/styles/`.
+  // Sibling utility/primitive files are imported by `globals.css`; keep the
+  // console sync allowlist in step so build-time Tailwind processing can load
+  // the same local graph.
   const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
   writeModularFile(distDir, 'spacing-utilities.css', spacingUtilities.css);
 

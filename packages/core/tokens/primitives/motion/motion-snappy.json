@@ -1,0 +1,61 @@
+{
+  "duration": {
+    "0": {
+      "$value": "0ms",
+      "$type": "duration",
+      "$description": "Instant state changes and reduced-motion fallbacks."
+    },
+    "faster": {
+      "$value": "100ms",
+      "$type": "duration",
+      "$description": "Tiny feedback transitions such as pressed states."
+    },
+    "fast": {
+      "$value": "150ms",
+      "$type": "duration",
+      "$description": "Frequent lightweight UI transitions such as tab indicators and small fades."
+    },
+    "default": {
+      "$value": "200ms",
+      "$type": "duration",
+      "$description": "Default component motion for popovers, menus, and routine state changes."
+    },
+    "moderate": {
+      "$value": "240ms",
+      "$type": "duration",
+      "$description": "Slightly larger routine transitions that need a little more legibility."
+    },
+    "slow": {
+      "$value": "300ms",
+      "$type": "duration",
+      "$description": "Larger surfaces such as dialogs and compact sheets."
+    },
+    "slower": {
+      "$value": "500ms",
+      "$type": "duration",
+      "$description": "Large or rare surface motion where extra continuity is useful."
+    }
+  },
+  "ease": {
+    "linear": {
+      "$value": "linear",
+      "$type": "cubicBezier",
+      "$description": "Constant-rate motion for loops and progress-like animations."
+    },
+    "enter": {
+      "$value": "cubic-bezier(0.23, 1, 0.32, 1)",
+      "$type": "cubicBezier",
+      "$description": "Strong ease-out curve for elements entering or becoming active."
+    },
+    "exit": {
+      "$value": "cubic-bezier(0.4, 0, 1, 1)",
+      "$type": "cubicBezier",
+      "$description": "Accelerating curve for elements exiting or becoming hidden."
+    },
+    "move": {
+      "$value": "cubic-bezier(0.77, 0, 0.175, 1)",
+      "$type": "cubicBezier",
+      "$description": "Intentional on-screen movement between persistent positions."
+    }
+  }
+}

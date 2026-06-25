@@ -236,6 +236,7 @@ export const DEFAULT_CONFIG = {
   shadow: 'maia',
   radius: 'sharp',
   borderwidth: 'vega',
+  motion: 'snappy',
   focus: 'default',
   'chart-categorical': 'default',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 7 modes ship)
@@ -1215,6 +1216,50 @@ export function collectBorderwidthTokens(tokensDir, mode) {
 }
 
 /**
+ * Collect motion token mappings from a mode file.
+ * Returns array of { cssName, varRef } for @theme block. The source primitive
+ * variables stay namespaced as --nx-motion-* while Tailwind sees the standard
+ * --duration-* and --ease-* namespaces for utility generation.
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @param {string} mode - Motion mode (e.g., 'snappy')
+ * @returns {object[]} Array of { cssName, varRef }
+ */
+export function collectMotionTokens(tokensDir, mode) {
+  const filePath = path.join(
+    tokensDir,
+    `primitives/motion/motion-${mode}.json`
+  );
+  if (!fs.existsSync(filePath)) {
+    throw new Error(
+      `Motion primitive file missing: ${filePath} (mode "${mode}")`
+    );
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const tokens = [];
+
+  for (const group of ['duration', 'ease']) {
+    const groupData = tokenData[group];
+    if (!groupData || typeof groupData !== 'object') {
+      throw new Error(
+        `Motion primitive file ${filePath} must include a "${group}" group`
+      );
+    }
+
+    for (const key of Object.keys(groupData)) {
+      if (key.startsWith('$')) continue;
+      tokens.push({
+        cssName: `${group}-${key}`,
+        varRef: `var(--nx-motion-${group}-${key})`,
+      });
+    }
+  }
+
+  return tokens;
+}
+
+/**
  * Collect shadow token CSS values with var() references
  * Returns array of { cssName, value } for @theme block
  */
@@ -1402,6 +1447,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (Vega defaults; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
+ * @param {object[]} config.motionTokens - Array of { cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
  * @param {string} [config.darkSelector='.dark'] - CSS selector for dark mode
@@ -1418,6 +1464,7 @@ export function generateThemeCSS(config) {
     spacingTokens = [],
     radiusTokens = [],
     borderwidthTokens = [],
+    motionTokens = [],
     shadowTokens = [],
     zIndexTokens = [],
     breakpointTokens = [],
@@ -1483,6 +1530,14 @@ export function generateThemeCSS(config) {
   if (borderwidthTokens.length > 0) {
     css += `\n  /* Border width tokens */\n`;
     for (const token of borderwidthTokens) {
+      css += `  --${token.cssName}: ${token.varRef};\n`;
+    }
+  }
+
+  // Motion tokens
+  if (motionTokens.length > 0) {
+    css += `\n  /* Motion tokens */\n`;
+    for (const token of motionTokens) {
       css += `  --${token.cssName}: ${token.varRef};\n`;
     }
   }

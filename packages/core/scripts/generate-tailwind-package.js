@@ -6,6 +6,7 @@ import {
   CANONICAL_SPACING_DEFAULT_MODE,
   collectBorderwidthTokens,
   collectBreakpointsTokens,
+  collectMotionTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
   collectSemanticDimensionTokens,
@@ -467,6 +468,8 @@ function generateNexusCSS(
     TOKENS_DIR,
     borderwidthMode
   );
+  const motionMode = usedModes.motion || 'snappy';
+  const motionTokens = collectMotionTokens(TOKENS_DIR, motionMode);
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
   const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
@@ -500,6 +503,7 @@ function generateNexusCSS(
     spacingTokens: vegaSpacingNumeric,
     radiusTokens,
     borderwidthTokens,
+    motionTokens,
     shadowTokens,
     zIndexTokens,
     breakpointTokens,
@@ -646,6 +650,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       'shadow',
       'radius',
       'borderwidth',
+      'motion',
       'focus',
       'chart-categorical',
       'spacingDefault',
