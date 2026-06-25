@@ -146,7 +146,7 @@ function NavigationMenuTrigger({
     >
       {children}{' '}
       <IconChevronDown
-        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-300 nx:motion-reduce:transition-none nx:group-data-[state=open]:rotate-180"
+        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-slow nx:motion-reduce:transition-none nx:group-data-[state=open]:rotate-180"
         aria-hidden="true"
       />
     </NavigationMenuPrimitive.Trigger>
