@@ -107,6 +107,24 @@ export const Default: Story = {
   ),
 };
 
+export const MotionTokenBridge: Story = {
+  render: (_args) => (
+    <Avatar>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
+    </Avatar>
+  ),
+  play: async ({ canvasElement }) => {
+    const image = await waitFor(() => {
+      const img = canvasElement.querySelector('[data-slot="avatar-image"]');
+      if (!img) throw new Error('avatar image has not mounted yet');
+      return img;
+    });
+
+    await expect(getComputedStyle(image).animationDuration).toBe('0.15s');
+  },
+};
+
 export const DefaultDataAttributes: Story = {
   // With size/shape omitted, the cva defaults (md / circle) must still surface
   // on data-size / data-shape so CSS and test hooks can target the default.

@@ -163,7 +163,7 @@ function AvatarImage({
       decoding={decoding}
       className={cn(
         'nx:aspect-square nx:size-full nx:rounded-[inherit] nx:object-cover',
-        'nx:animate-in nx:fade-in-0 nx:duration-150 nx:ease-out nx:motion-reduce:animate-none',
+        'nx:animate-in nx:fade-in-0 nx:duration-fast nx:ease-enter nx:motion-reduce:animate-none',
         className
       )}
       {...props}
@@ -197,7 +197,7 @@ function AvatarFallback({ className, ...props }: AvatarFallbackProps) {
       data-slot="avatar-fallback"
       className={cn(
         'nx:flex nx:size-full nx:items-center nx:justify-center nx:rounded-[inherit] nx:bg-muted nx:text-foreground nx:font-medium nx:leading-none',
-        'nx:animate-in nx:fade-in-0 nx:duration-150 nx:ease-out nx:motion-reduce:animate-none',
+        'nx:animate-in nx:fade-in-0 nx:duration-fast nx:ease-enter nx:motion-reduce:animate-none',
         className
       )}
       {...props}
