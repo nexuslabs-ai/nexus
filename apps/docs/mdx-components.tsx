@@ -26,7 +26,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </h2>
     ),
     h3: ({ children, ...props }) => (
-      <h3 className="nx:text-sm nx:font-semibold nx:mt-6 nx:mb-2" {...props}>
+      <h3
+        className="nx:typography-label-default nx:font-semibold nx:mt-6 nx:mb-2"
+        {...props}
+      >
         {children}
       </h3>
     ),
@@ -48,7 +51,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    li: (props) => <li className="nx:typography-body-small" {...props} />,
+    li: (props) => <li className="nx:typography-body-default" {...props} />,
     a: ({ children, ...props }) => (
       <a
         className="nx:text-primary-subtle-foreground nx:underline nx:underline-offset-2"
@@ -59,13 +62,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     code: (props) => (
       <code
-        className="nx:font-mono nx:text-sm nx:bg-muted nx:px-1 nx:py-0.5 nx:rounded-sm"
+        className="nx:font-mono nx:typography-code-inline nx:bg-muted nx:px-1 nx:py-0.5 nx:rounded-sm"
         {...props}
       />
     ),
     pre: (props) => (
       <pre
-        className="nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:mb-4 nx:overflow-x-auto nx:text-sm nx:[&_code]:bg-transparent nx:[&_code]:p-0"
+        className="nx:bg-muted nx:border nx:border-border-default nx:rounded-md nx:p-4 nx:mb-4 nx:overflow-x-auto nx:typography-code-block nx:[&_code]:bg-transparent nx:[&_code]:p-0 nx:[&_code]:typography-code-block"
         {...props}
       />
     ),

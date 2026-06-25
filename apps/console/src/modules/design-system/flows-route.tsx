@@ -287,7 +287,7 @@ function Section({
           {title}
         </h2>
         {description && (
-          <p className="nx:text-muted-foreground nx:max-w-3xl nx:text-sm">
+          <p className="nx:text-muted-foreground nx:max-w-3xl nx:typography-body-default">
             {description}
           </p>
         )}

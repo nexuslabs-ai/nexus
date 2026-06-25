@@ -54,7 +54,7 @@ export function SearchPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="nx:hidden nx:lg:flex nx:items-center nx:gap-2 nx:px-3 nx:py-1 nx:text-xs nx:text-nav-muted-foreground nx:border nx:border-nav-border nx:rounded-sm nx:transition-colors nx:hover:bg-nav-item-hover nx:hover:text-nav-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2"
+        className="nx:hidden nx:lg:flex nx:items-center nx:gap-2 nx:px-3 nx:py-1 nx:typography-label-small nx:text-nav-muted-foreground nx:border nx:border-nav-border nx:rounded-sm nx:transition-colors nx:hover:bg-nav-item-hover nx:hover:text-nav-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2"
       >
         Search
         <kbd className="nx:font-mono nx:text-[10px] nx:rounded-sm nx:border nx:border-nav-border nx:px-1 nx:py-0.5">

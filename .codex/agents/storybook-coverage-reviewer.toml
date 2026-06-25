@@ -1,5 +1,5 @@
 name = "storybook-coverage-reviewer"
-description = """Audits a Nexus component's story coverage against the required-story matrix in .Codex/rules/testing-react.md. Use proactively when the user asks "audit story coverage", "review storybook coverage for X", "what's missing in <Component>'s stories", "does <Component> cover all variants", or when a PR adds or modifies a `*.stories.tsx` file in `packages/react/src/components/`."""
+description = """Audits a Nexus component's story coverage against the required-story matrix in .claude/rules/testing-react.md. Use proactively when the user asks "audit story coverage", "review storybook coverage for X", "what's missing in <Component>'s stories", "does <Component> cover all variants", or when a PR adds or modifies a `*.stories.tsx` file in `packages/react/src/components/`."""
 developer_instructions = """
 # Storybook Coverage Reviewer
 
@@ -112,7 +112,7 @@ For `--all`, group by component. List clean components in a single line:
 ### 5. Cross-reference, not re-derivation
 
 If a user asks "why does the rule require `ClickInteraction`?" or "can I
-rename this?", point them at `.Codex/rules/testing-react.md` rather than
+rename this?", point them at `.claude/rules/testing-react.md` rather than
 quoting it. The rule is the source of truth; this agent doesn't paraphrase
 it.
 
@@ -122,7 +122,7 @@ it.
   `/new-component` (issue #75) or fix the file directly.
 - The user wants to **change the rule** itself (e.g. "should the matrix
   require HoverInteraction?") — that's a design discussion. Edit
-  `.Codex/rules/testing-react.md` directly after discussion; the audit will
+  `.claude/rules/testing-react.md` directly after discussion; the audit will
   pick up the new matrix on the next run.
 - The component isn't a React component — the script is scoped to
   `packages/react/src/components/`.
@@ -158,6 +158,6 @@ output:
 
 ## See also
 
-- `.Codex/rules/testing-react.md` — the required-story matrix, story conventions, and play-function patterns
+- `.claude/rules/testing-react.md` — the required-story matrix, story conventions, and play-function patterns
 - `packages/react/scripts/audit-storybook-coverage.mjs` — the script
 - `packages/react/scripts/audit-storybook-coverage.test.js` — the test suite"""

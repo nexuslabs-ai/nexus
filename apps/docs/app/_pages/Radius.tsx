@@ -8,7 +8,7 @@ import { Breadcrumb } from '../_components/Breadcrumb';
  * vars; the border box reads the runtime `--nx-borderwidth-thick` var inline so
  * it tracks the active border-width mode.
  *
- * Source: .claude/rules/tokens.md (radius / borderwidth / shadow modes).
+ * Source: packages/core/tokens/ (radius / borderwidth / shadow modes).
  */
 
 const RADII: { cls: string; label: string }[] = [
@@ -67,7 +67,7 @@ export function Radius() {
       {/* ── Radius ──────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Radius</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Six radius utilities, each reacting to the active Radius mode. Swap
           the mode and every corner re-rounds.
         </p>
@@ -80,14 +80,14 @@ export function Radius() {
               <div
                 className={`nx:size-20 nx:bg-muted nx:border nx:border-border-default ${r.cls}`}
               />
-              <span className="nx:font-mono nx:text-xs nx:text-muted-foreground-subtle">
+              <span className="nx:font-mono nx:typography-label-small nx:text-muted-foreground-subtle">
                 {r.label}
               </span>
             </div>
           ))}
         </div>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[360px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[360px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Mode</th>
@@ -100,10 +100,10 @@ export function Radius() {
                   key={m.mode}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {m.mode}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {m.md}
                   </td>
                 </tr>
@@ -116,7 +116,7 @@ export function Radius() {
       {/* ── Border widths ───────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Border widths</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The picker offers five border-width modes, but only three are distinct
           designs — <code>lyra</code> and <code>mira</code> are byte-identical
           to <code>vega</code>. The box below sets its width from the runtime{' '}
@@ -124,7 +124,7 @@ export function Radius() {
           you swap the Border control.
         </p>
         <div className="nx:overflow-x-auto nx:mb-6">
-          <table className="nx:w-full nx:min-w-[360px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[360px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Mode</th>
@@ -140,13 +140,13 @@ export function Radius() {
                   key={b.mode}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {b.mode}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:typography-label-small">
                     {b.def}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {b.thick}
                   </td>
                 </tr>
@@ -162,7 +162,7 @@ export function Radius() {
               borderWidth: 'var(--nx-borderwidth-thick)',
             }}
           />
-          <span className="nx:font-mono nx:text-xs nx:text-muted-foreground-subtle">
+          <span className="nx:font-mono nx:typography-label-small nx:text-muted-foreground-subtle">
             border-width: var(--nx-borderwidth-thick)
           </span>
         </div>
@@ -171,7 +171,7 @@ export function Radius() {
       {/* ── Shadows ─────────────────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Shadows</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Seven elevation tiers plus an inset shadow, each reacting to the
           active Shadow mode. Shadows are theme-split — tuned per light and
           dark, since a drop-shadow that defines a card edge in light vanishes
@@ -186,7 +186,7 @@ export function Radius() {
               <div
                 className={`nx:size-20 nx:bg-container nx:rounded-lg ${s.cls}`}
               />
-              <span className="nx:font-mono nx:text-xs nx:text-muted-foreground-subtle">
+              <span className="nx:font-mono nx:typography-label-small nx:text-muted-foreground-subtle">
                 {s.label}
               </span>
             </div>
@@ -194,7 +194,7 @@ export function Radius() {
         </div>
         <div className="nx:flex nx:flex-col nx:items-center nx:gap-2 nx:w-20">
           <div className="nx:size-20 nx:bg-container nx:rounded-lg nx:shadow-inner" />
-          <span className="nx:font-mono nx:text-xs nx:text-muted-foreground-subtle">
+          <span className="nx:font-mono nx:typography-label-small nx:text-muted-foreground-subtle">
             inner
           </span>
         </div>

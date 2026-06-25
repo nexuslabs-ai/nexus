@@ -49,8 +49,10 @@ type HeightMeasurementOptions = {
  * designer retunes of any single mode do not break the test — only a broken
  * cascade does. Consumers in different components can pick different pairs
  * (`nova`+`sera`, `nova`+`maia`, …) to spread coverage across the 7 modes.
- * Awaits `document.fonts.ready` so Inter fallback metrics cannot collapse a
- * one-pixel cascade difference into equality. The optional `selector` is
+ * Awaits `document.fonts.ready` so a loading web-font's fallback metrics
+ * cannot collapse a one-pixel cascade difference into equality — a no-op under
+ * the system-font stack, kept so a brand that re-aims to a web font stays
+ * covered. The optional `selector` is
  * forwarded to `getControlHeight` so non-control elements (e.g. a Card root
  * `<div data-slot="card">`) can be measured.
  */
@@ -68,8 +70,10 @@ export async function expectModeCascadeWorks(
 
 /**
  * Contract pin — asserts that a control rendered under a specific `data-style`
- * scope hits an exact pixel height. Awaits `document.fonts.ready` first; Inter
- * fallback metrics would skew the measurement. The optional `selector` is
+ * scope hits an exact pixel height. Awaits `document.fonts.ready` first; a
+ * loading web-font's fallback metrics would skew the measurement (a no-op
+ * under the system-font stack, kept for brands that re-aim to a web font). The
+ * optional `selector` is
  * forwarded to `getControlHeight` so non-control elements (e.g. a Card root
  * `<div data-slot="card">`) can be measured.
  */
@@ -85,21 +89,29 @@ export async function expectHeightPinned(
 }
 
 /**
- * Density-stability sentinel — asserts that a control rendered under multiple
- * `data-style` mode scopes resolves to the same canonical pixel height.
- * Used for components whose spacing utilities are intentionally numeric
- * (`spacing-N`) rather than mode-coupled (`control-*` / `container-*`), so
- * mode changes do not move them. If a future PR introduces a role utility
- * the test fails for that mode — the test surfaces *intent* to remain stable,
- * not just absence of role classes. A failure caused by a deliberate
- * architecture change (e.g. a future `--chip-padding-*` family lands and
- * Badge migrates onto it) is _intent changing_, not a regression — bump the
- * expected px to the new canonical value rather than chasing it as a bug.
- * The optional `selector` is forwarded to `getControlHeight` so non-control
- * elements (e.g., a Badge `<span>`) can be measured via their `data-slot`
- * attribute.
+ * Mode-invariance sentinel — asserts that a control rendered under multiple
+ * `data-style` mode scopes resolves to the *same* canonical pixel height.
+ *
+ * Valid ONLY when the measured height derives from values that are identical
+ * across the modes under test: a fixed px, the type line-height, or a *small*
+ * spacing index density can't differentiate (`spacing-0_5` = 2px and
+ * `spacing-1` = 4px are flat across every mode). That flatness is why Badge
+ * and Tabs `sm` (both `py-1`) are genuinely mode-stable.
+ *
+ * This is NOT a general "numeric spacing doesn't move" check — it does. Larger
+ * indices diverge per mode (`spacing-4` = 14/16/18 across nova/vega/maia), so a
+ * control padded with `nx:py-4` renders 48/52/56px. For a control whose height
+ * *should* track density — the default for padded controls — use
+ * `expectModeCascadeWorks`; pinning it here would assert a height the
+ * spacing-mode system is designed to move.
+ *
+ * A failure from a deliberate change (e.g. a control migrates onto a future
+ * `--chip-padding-*` family) is intent changing, not a regression — bump
+ * `expectedPx` to the new canonical value. Awaits `document.fonts.ready` (Inter
+ * fallback metrics would skew the measurement); `selector` is forwarded to
+ * `getControlHeight` for non-control elements (e.g. a Badge `<span>`).
  */
-export async function expectHeightPinnedAcrossModes(
+export async function expectHeightFixedAcrossModes(
   canvas: Canvas,
   testIds: string[],
   expectedPx: number,
@@ -109,5 +121,32 @@ export async function expectHeightPinnedAcrossModes(
   for (const testId of testIds) {
     const actual = getControlHeight(canvas, testId, selector);
     expect(actual, `[data-testid="${testId}"] height`).toBe(expectedPx);
+  }
+}
+
+/**
+ * Per-mode height sentinel — the counterpart to `expectHeightFixedAcrossModes`
+ * for controls whose height intentionally *varies* per `data-style` mode (fixed
+ * `h-*` utilities backed by mode-scaled spacing tokens). Pass a `mode → expected
+ * px` map; each control is located by `${testIdPrefix}-${mode}`. Awaits
+ * `document.fonts.ready` so Inter fallback metrics cannot skew the measurement.
+ * The optional `selector` is forwarded to `getControlHeight`.
+ */
+export async function expectHeightPerMode(
+  canvas: Canvas,
+  testIdPrefix: string,
+  expectedByMode: Record<string, number>,
+  { selector }: HeightMeasurementOptions = {}
+): Promise<void> {
+  await document.fonts.ready;
+  for (const [mode, expectedPx] of Object.entries(expectedByMode)) {
+    const actual = getControlHeight(
+      canvas,
+      `${testIdPrefix}-${mode}`,
+      selector
+    );
+    expect(actual, `[data-testid="${testIdPrefix}-${mode}"] height`).toBe(
+      expectedPx
+    );
   }
 }

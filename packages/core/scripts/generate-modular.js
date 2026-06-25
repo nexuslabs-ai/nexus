@@ -22,6 +22,7 @@ import {
   formatTokenValue,
   generateBorderWidthUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
+  generateRootDimensionsCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   generateThemeCSS,
@@ -262,11 +263,13 @@ function generateModularGlobalsCSS(
     'brands-blue-light.json',
     primitiveMap
   );
-  // Standalone semantic files (e.g. focus.json) contribute both color tokens
-  // (--color-focus-*) and dimension tokens (--focus-offset) into @theme so
-  // their utilities emit in the app build. Files owned by a dedicated
-  // collector (spacing.json, breakpoints.json, z-index.json) are skipped from
-  // the generic dimension scan to avoid duplicate emission.
+  // Standalone semantic files (e.g. focus.json) contribute color tokens
+  // (--color-focus-* utilities in @theme) and dimension tokens (--focus-offset).
+  // Dimensions go to a :root block, not @theme — used only via arbitrary utilities
+  // Tailwind doesn't track as @theme usage (see generateRootDimensionsCSS / #506).
+  // Files owned by a dedicated collector (spacing/breakpoints/z-index) are skipped
+  // from the generic dimension scan to avoid duplicate emission.
+  const dimensionTokens = [];
   const standaloneTokens = semantics.standalone.flatMap((file) => {
     const tokens = collectSemanticColorTokensVarRef(
       SEMANTIC_DIR,
@@ -274,7 +277,9 @@ function generateModularGlobalsCSS(
       primitiveMap
     );
     if (!FILES_WITH_DEDICATED_DIMENSION_COLLECTORS.has(file)) {
-      tokens.push(...collectSemanticDimensionTokens(SEMANTIC_DIR, file));
+      dimensionTokens.push(
+        ...collectSemanticDimensionTokens(SEMANTIC_DIR, file)
+      );
     }
     return tokens;
   });
@@ -334,6 +339,9 @@ function generateModularGlobalsCSS(
     breakpointTokens,
     // No dark mode block - the app uses dynamic theme switching
   });
+
+  // Fixed dimension primitives at :root (e.g. --focus-offset) — see #506.
+  css += generateRootDimensionsCSS(dimensionTokens);
 
   // Per-mode spacing override blocks. `spacingDefault` picks which mode lands
   // under `:root, [data-style="X"]`; the other six emit as bare

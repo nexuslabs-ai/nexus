@@ -106,7 +106,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
     cell: ({ row }) => (
       <div className="nx:flex nx:items-center nx:gap-2">
         <Avatar className="nx:size-6">
-          <AvatarFallback className="nx:text-xs">
+          <AvatarFallback className="nx:typography-label-small">
             {initials(row.original.owner)}
           </AvatarFallback>
         </Avatar>
@@ -159,7 +159,7 @@ function RowActions({ contact }: { contact: Contact }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon-sm"
           aria-label={`Actions for ${contact.name}`}
         >
           <IconDots />

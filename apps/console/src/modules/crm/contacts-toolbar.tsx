@@ -4,6 +4,7 @@ import {
   Badge,
   Button,
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -190,7 +191,7 @@ function SavedViewsMenu({
             Saved views
           </p>
           {views.length === 0 ? (
-            <p className="nx:text-muted-foreground nx:px-3 nx:pb-3 nx:text-sm">
+            <p className="nx:text-muted-foreground nx:px-3 nx:pb-3 nx:typography-body-default">
               No saved views yet.
             </p>
           ) : (
@@ -207,7 +208,7 @@ function SavedViewsMenu({
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon-sm"
                     aria-label={`Delete view ${saved.name}`}
                     onClick={() => remove(saved.id)}
                     className="nx:text-muted-foreground nx:hover:text-error-foreground nx:shrink-0"
@@ -244,15 +245,17 @@ function SavedViewsMenu({
               Name this view and filter combination to reuse it later.
             </DialogDescription>
           </DialogHeader>
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Active deals"
-            aria-label="View name"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSave();
-            }}
-          />
+          <DialogBody>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Active deals"
+              aria-label="View name"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave();
+              }}
+            />
+          </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>

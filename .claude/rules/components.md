@@ -15,18 +15,30 @@
 
 ## File Structure
 
-Every component in `packages/react/src/components/ui/` needs 2 files:
+Each component under `packages/react/src/components/ui/` lives in its own
+kebab-case folder holding the component, its stories, and a barrel:
 
 ```
-{name}.tsx           # Component (kebab-case)
-{Name}.stories.tsx   # Stories + Tests (PascalCase, play functions)
+ui/{name}/
+├── {name}.tsx          # Component (kebab-case)
+├── {Name}.stories.tsx  # Stories + Tests (PascalCase, play functions)
+└── index.ts            # Barrel: export * from './{name}'
 ```
+
+The folder is kebab-case (`dropdown-menu/`); the stories file stays PascalCase
+(`DropdownMenu.stories.tsx`). The per-folder `index.ts` is what keeps every
+import site stable — `@/components/ui/{name}` resolves to the folder barrel, so
+`src/index.ts` and cross-component imports never reference the nested file.
 
 **No separate `*.test.tsx` files.** Tests are play functions in stories.
 
+> `primitives/` stays flat (`{name}.tsx` directly under the subdir) because
+> Show/Hide share `responsive-visibility.ts` at the subdir root. The tooling
+> (`scripts/component-paths.mjs`) tracks which subdirs are nested.
+
 ## Component Template
 
-Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. Export the component, its props type, and its `cva` variants function, then add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button.tsx` and `badge.tsx` for the canonical implementations.
+Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. Export the component, its props type, and its `cva` variants function, re-export them from the folder's `index.ts` (`export * from './{name}'`), then add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button/button.tsx` and `badge/badge.tsx` for the canonical implementations.
 
 ## Data Attributes
 
@@ -56,11 +68,9 @@ Semantic color tokens adapt to theme automatically. Do not write `dark:` modifie
 | `nx:text-foreground`            | Yes      | Same — `foreground` already carries its dark-mode value |
 | `nx:dark:bg-primary-background` | No       | `dark:` is a no-op; the token already adapts            |
 
-**Rule of thumb:** any class referencing a token from [`tokens.md` § Semantic Token Categories](tokens.md#semantic-token-categories) (Layout, Control, Brand, Status, Borders, Navigation, Focus, Data viz) adapts — don't add `dark:`. The `dark:` modifier is reserved for raw primitives, which should be rare in component code.
+**Rule of thumb:** any class referencing a semantic colour token (Layout, Control, Brand, Status, Borders, Navigation, Focus, Data viz) adapts — don't add `dark:`. The `dark:` modifier is reserved for raw primitives, which should be rare in component code.
 
 **Primitive edge case.** Raw primitive utilities (`nx:bg-blue-500 nx:dark:bg-blue-900`) _are_ non-adaptive, so `dark:` is the only mechanism for varying them by theme. But primitives in component code are themselves an anti-pattern (see § Semantic Token Paths above), so this case should almost never come up — if you find yourself reaching for one, prefer adding the missing semantic token instead.
-
-See [`tokens.md` § Light/Dark Theme Tokens](tokens.md#lightdark-theme-tokens) for how the `.dark` selector emit makes this work.
 
 ## Sizing Convention
 
@@ -128,7 +138,7 @@ The ring is a real `outline` (not `box-shadow`) for two reasons:
 
 Every focusable control — primary / secondary / outline / ghost / destructive, Input, Switch, Tabs, Accordion, Select, Dialog close — uses the **same** `focus-default` colour. There is no per-variant focus colour and no destructive→grey swap. Reason: focus is a system signal ("you are here"), not a brand or status signal. One colour reduces the cognitive load and matches the practice of Linear, Stripe, Geist, and Tailwind's own focus convention.
 
-The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark; canonical values in `focus-default-{light,dark}.json`), tuned to clear [APCA Lc ≥ 45](tokens.md#apca-contrast-gate) on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
+The focus colour is a **dedicated, theme-split blue** (`#1e3a8a` light / `#9dc1ee` dark; canonical values in `focus-default-{light,dark}.json`), tuned to clear APCA Lc ≥ 45 on every shipped surface (background / container / popover) and on nav chrome (nav-background / nav-item-{hover,active} / nav-border) in both themes — even when the surrounding fill is the primary brand colour or a tinted sidebar row. It is not derived from `primary.*`, so swapping the brand palette does not move the focus colour.
 
 ### Surface exception map
 
@@ -160,7 +170,7 @@ Nexus ships a 6-token z-index scale for stacking overlays. The tokens are semant
 
 ### Token scale
 
-Six tokens, low → high: `overlay` (10), `sticky` (30), `modal` (50), `popover` (70), `toast` (100), `max` (9999) — values canonical in `z-index.json`, utilities (`nx:z-modal`, …) generated on demand from the `--z-index-*` theme keys. Only `nx:z-modal` and `nx:z-popover` are used by shipped components (Dialog; DropdownMenu / Select / Tooltip); the rest are reserved for consumers (`sticky` for app-shell chrome, `max` for host system UI, `overlay` for low-level scrims).
+Six tokens, low → high: `overlay` (10), `sticky` (30), `modal` (50), `popover` (70), `toast` (100), `max` (9999) — values canonical in `z-index.json`, utilities (`nx:z-modal`, …) generated on demand from the `--z-index-*` theme keys. `nx:z-modal`, `nx:z-popover`, `nx:z-sticky`, and `nx:z-toast` are used by shipped components; `nx:z-overlay` (low-level scrims) and `nx:z-max` (host system UI) are reserved for consumers.
 
 **Popover sits _above_ modal (70 > 50) by design.** A DropdownMenu, Select, or Tooltip opened _inside_ a Dialog must paint above the dialog to stay usable — so the floating-layer token outranks the modal layer. This is the deliberate, non-obvious ordering; do not "fix" it by dropping popover below modal.
 
@@ -176,11 +186,11 @@ Radix appends portal content to `document.body`. For a **single** overlay open b
 
 ### Consumer override
 
-The utilities reference the CSS variable (`nx:z-sticky` → `z-index: var(--z-index-sticky)`), so a consumer re-points a whole layer by overriding the variable — no component changes:
+The utilities reference the prefixed runtime CSS variable (`nx:z-sticky` → `z-index: var(--nx-z-index-sticky)` — the `nx` prefix lands on the runtime variable even though the `@theme` source key is unprefixed), so a consumer re-points a whole layer by overriding it — no component changes:
 
 ```css
 /* In the consumer's stylesheet, loaded after Nexus */
 :root {
-  --z-index-sticky: 35; /* raise the app shell's sticky chrome above the default 30 */
+  --nx-z-index-sticky: 35; /* raise the app shell's sticky chrome above the default 30 */
 }
 ```

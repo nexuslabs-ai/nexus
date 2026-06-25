@@ -39,7 +39,6 @@ export function ThemePicker() {
   const base = useThemeStore((s) => s.base);
   const brand = useThemeStore((s) => s.brand);
   const spacing = useThemeStore((s) => s.spacing);
-  const typography = useThemeStore((s) => s.typography);
   const shadow = useThemeStore((s) => s.shadow);
   const radius = useThemeStore((s) => s.radius);
   const borderwidth = useThemeStore((s) => s.borderwidth);
@@ -102,13 +101,6 @@ export function ThemePicker() {
                 onChange={onChange('spacing')}
               />
             </Row>
-            <Row label="Typography">
-              <ModeSelect
-                mode="typography"
-                value={typography}
-                onChange={onChange('typography')}
-              />
-            </Row>
             <Row label="Shadow">
               <ModeSelect
                 mode="shadow"
@@ -163,7 +155,7 @@ function Row({
 }) {
   return (
     <div className="nx:grid nx:grid-cols-[1fr_auto] nx:items-center nx:gap-3 nx:py-1">
-      <label className="nx:text-sm">{label}</label>
+      <label className="nx:typography-label-default">{label}</label>
       {children}
     </div>
   );
@@ -180,7 +172,7 @@ function ModeSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="nx:w-[120px] nx:h-8 nx:text-xs nx:capitalize">
+      <SelectTrigger className="nx:w-[120px] nx:h-8 nx:typography-label-small nx:capitalize">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

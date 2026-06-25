@@ -120,7 +120,7 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
           <Button
             asChild
             variant="ghost"
-            size="sm"
+            size="icon-sm"
             className="nx:-ml-2 nx:shrink-0 nx:lg:hidden"
           >
             <Link to="/m/inbox" search={{}} aria-label="Back to conversations">
@@ -131,7 +131,7 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
             <h2 className="nx:typography-heading-medium nx:text-foreground nx:truncate">
               {conversation.subject}
             </h2>
-            <p className="nx:text-muted-foreground nx:truncate nx:text-sm">
+            <p className="nx:text-muted-foreground nx:truncate nx:typography-body-default">
               {conversation.customer} · {conversation.customerEmail}
             </p>
           </div>
@@ -165,7 +165,7 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
           aria-label="Reply message"
         />
         <div className="nx:mt-3 nx:flex nx:items-center nx:justify-between nx:gap-2">
-          <p className="nx:text-muted-foreground nx:text-xs">
+          <p className="nx:text-muted-foreground nx:typography-label-small">
             Replies as {conversation.assignee} ·{' '}
             <KbdGroup>
               <Kbd>⌘</Kbd>
@@ -227,7 +227,7 @@ function MessageBubble({ message }: { message: Message }) {
   return (
     <div className={`nx:flex nx:gap-3 ${isAgent ? 'nx:flex-row-reverse' : ''}`}>
       <Avatar className="nx:size-8 nx:shrink-0">
-        <AvatarFallback className="nx:text-xs">
+        <AvatarFallback className="nx:typography-label-small">
           {initials(message.authorName)}
         </AvatarFallback>
       </Avatar>
@@ -235,15 +235,15 @@ function MessageBubble({ message }: { message: Message }) {
         <div
           className={`nx:flex nx:items-baseline nx:gap-2 ${isAgent ? 'nx:flex-row-reverse' : ''}`}
         >
-          <span className="nx:text-foreground nx:text-sm nx:font-medium">
+          <span className="nx:text-foreground nx:typography-label-default">
             {message.authorName}
           </span>
-          <span className="nx:text-muted-foreground nx:text-xs">
+          <span className="nx:text-muted-foreground nx:typography-label-small">
             {formatDateTime(message.at)}
           </span>
         </div>
         <div
-          className={`nx:mt-1 nx:rounded-lg nx:px-3 nx:py-2 nx:text-sm nx:whitespace-pre-wrap ${isAgent ? 'nx:bg-primary-subtle nx:text-primary-subtle-foreground' : 'nx:bg-muted nx:text-foreground'}`}
+          className={`nx:mt-1 nx:rounded-lg nx:px-3 nx:py-2 nx:typography-body-default nx:whitespace-pre-wrap ${isAgent ? 'nx:bg-primary-subtle nx:text-primary-subtle-foreground' : 'nx:bg-muted nx:text-foreground'}`}
         >
           {message.body}
         </div>

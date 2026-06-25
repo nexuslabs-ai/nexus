@@ -10,9 +10,6 @@
  * Color theme switching loads different primitive CSS files; spacing mode
  * switching uses [data-style="X"] on <html> (no file load).
  */
-/* Google Fonts - auto-generated from typography tokens */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
 @import 'tailwindcss' prefix(nx);
 @import './color.css';
 @import './focus-default.css';
@@ -26,6 +23,7 @@
   /* Reset default Tailwind namespaces to enforce semantic tokens only */
   --color-*: initial;
   --spacing-*: initial;
+  --text-*: initial;
   --radius-*: initial;
   --shadow-*: initial;
   --breakpoint-*: initial;
@@ -64,11 +62,9 @@
   --color-border-default: var(--nx-color-black-a200);
   --color-border-default-alpha: var(--nx-color-slate-a200);
   --color-border-active: var(--nx-color-slate-400);
-  --color-border-disabled: var(--nx-color-slate-50);
-  --color-border-primary: var(--nx-color-blue-200);
-  --color-border-primary-active: var(--nx-color-blue-400);
-  --color-border-warning: var(--nx-color-yellow-200);
-  --color-border-warning-active: var(--nx-color-yellow-400);
+  --color-border-disabled: var(--nx-color-black-a200);
+  --color-border-warning: var(--nx-color-orange-200);
+  --color-border-warning-active: var(--nx-color-orange-400);
   --color-border-success: var(--nx-color-green-200);
   --color-border-success-active: var(--nx-color-green-400);
   --color-border-error: var(--nx-color-red-200);
@@ -102,15 +98,15 @@
   --color-information-subtle-foreground: var(--nx-color-blue-600);
   --color-information-subtle-hover: var(--nx-color-blue-100);
   --color-information-subtle-active: var(--nx-color-blue-200);
-  --color-warning-background: var(--nx-color-yellow-400);
-  --color-warning-foreground: var(--nx-color-yellow-950);
-  --color-warning-background-hover: var(--nx-color-yellow-500);
-  --color-warning-background-active: var(--nx-color-yellow-600);
-  --color-warning-disabled: var(--nx-color-yellow-300);
-  --color-warning-subtle: var(--nx-color-yellow-50);
-  --color-warning-subtle-foreground: var(--nx-color-yellow-800);
-  --color-warning-subtle-hover: var(--nx-color-yellow-100);
-  --color-warning-subtle-active: var(--nx-color-yellow-200);
+  --color-warning-background: var(--nx-color-orange-600);
+  --color-warning-foreground: var(--nx-color-white-base);
+  --color-warning-background-hover: var(--nx-color-orange-700);
+  --color-warning-background-active: var(--nx-color-orange-800);
+  --color-warning-disabled: var(--nx-color-orange-300);
+  --color-warning-subtle: var(--nx-color-orange-50);
+  --color-warning-subtle-foreground: var(--nx-color-orange-600);
+  --color-warning-subtle-hover: var(--nx-color-orange-100);
+  --color-warning-subtle-active: var(--nx-color-orange-200);
   --color-primary-background: var(--nx-color-blue-600);
   --color-primary-background-active: var(--nx-color-blue-800);
   --color-primary-foreground: var(--nx-color-white-base);
@@ -129,9 +125,10 @@
   --color-secondary-subtle-foreground: var(--nx-color-neutral-600);
   --color-secondary-subtle-hover: var(--nx-color-neutral-200);
   --color-secondary-subtle-active: var(--nx-color-neutral-300);
+  --color-border-primary: var(--nx-color-blue-200);
+  --color-border-primary-active: var(--nx-color-blue-400);
   --color-focus-default: var(--nx-focus-color-default);
   --color-focus-error: var(--nx-focus-color-error);
-  --focus-offset: 2px;
 
   /* Spacing tokens */
   --spacing-0: 0px;
@@ -241,10 +238,15 @@
   --breakpoint-2xl: 96rem;
 }
 
+/* ===== RUNTIME DIMENSION TOKENS ===== */
+:root {
+  --focus-offset: 2px;
+}
+
 /* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */
 
 :root,
-[data-style='vega'] {
+[data-style='mira'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -279,15 +281,6 @@
   --nx-spacing-1_5: 6px;
   --nx-spacing-2_5: 10px;
   --nx-spacing-3_5: 14px;
-  --nx-control-padding-x-sm: 12px;
-  --nx-control-padding-x-md: 16px;
-  --nx-control-padding-x-lg: 32px;
-  --nx-control-padding-y-sm: 6px;
-  --nx-control-padding-y-md: 8px;
-  --nx-control-padding-y-lg: 12px;
-  --nx-control-gap-sm: 6px;
-  --nx-control-gap-md: 8px;
-  --nx-control-gap-lg: 10px;
   --nx-container-p: 24px;
   --nx-container-gap: 16px;
   --nx-layout-section-gap: 32px;
@@ -329,15 +322,6 @@
   --nx-spacing-1_5: 6px;
   --nx-spacing-2_5: 10px;
   --nx-spacing-3_5: 14px;
-  --nx-control-padding-x-sm: 12px;
-  --nx-control-padding-x-md: 16px;
-  --nx-control-padding-x-lg: 32px;
-  --nx-control-padding-y-sm: 6px;
-  --nx-control-padding-y-md: 8px;
-  --nx-control-padding-y-lg: 12px;
-  --nx-control-gap-sm: 6px;
-  --nx-control-gap-md: 8px;
-  --nx-control-gap-lg: 10px;
   --nx-container-p: 28px;
   --nx-container-gap: 20px;
   --nx-layout-section-gap: 40px;
@@ -379,15 +363,6 @@
   --nx-spacing-1_5: 6px;
   --nx-spacing-2_5: 10px;
   --nx-spacing-3_5: 15px;
-  --nx-control-padding-x-sm: 12px;
-  --nx-control-padding-x-md: 16px;
-  --nx-control-padding-x-lg: 32px;
-  --nx-control-padding-y-sm: 6px;
-  --nx-control-padding-y-md: 8px;
-  --nx-control-padding-y-lg: 12px;
-  --nx-control-gap-sm: 6px;
-  --nx-control-gap-md: 8px;
-  --nx-control-gap-lg: 10px;
   --nx-container-p: 24px;
   --nx-container-gap: 16px;
   --nx-layout-section-gap: 32px;
@@ -429,69 +404,10 @@
   --nx-spacing-1_5: 6px;
   --nx-spacing-2_5: 11px;
   --nx-spacing-3_5: 16px;
-  --nx-control-padding-x-sm: 14px;
-  --nx-control-padding-x-md: 20px;
-  --nx-control-padding-x-lg: 36px;
-  --nx-control-padding-y-sm: 8px;
-  --nx-control-padding-y-md: 10px;
-  --nx-control-padding-y-lg: 14px;
-  --nx-control-gap-sm: 8px;
-  --nx-control-gap-md: 10px;
-  --nx-control-gap-lg: 12px;
   --nx-container-p: 28px;
   --nx-container-gap: 20px;
   --nx-layout-section-gap: 40px;
   --nx-layout-stack-gap: 10px;
-}
-
-[data-style='mira'] {
-  --nx-spacing-0: 0px;
-  --nx-spacing-1: 4px;
-  --nx-spacing-2: 8px;
-  --nx-spacing-3: 12px;
-  --nx-spacing-4: 16px;
-  --nx-spacing-5: 20px;
-  --nx-spacing-6: 24px;
-  --nx-spacing-7: 28px;
-  --nx-spacing-8: 32px;
-  --nx-spacing-9: 36px;
-  --nx-spacing-10: 40px;
-  --nx-spacing-11: 44px;
-  --nx-spacing-12: 48px;
-  --nx-spacing-14: 56px;
-  --nx-spacing-16: 64px;
-  --nx-spacing-20: 80px;
-  --nx-spacing-24: 96px;
-  --nx-spacing-28: 112px;
-  --nx-spacing-32: 128px;
-  --nx-spacing-36: 144px;
-  --nx-spacing-40: 160px;
-  --nx-spacing-44: 176px;
-  --nx-spacing-48: 192px;
-  --nx-spacing-52: 208px;
-  --nx-spacing-56: 224px;
-  --nx-spacing-60: 240px;
-  --nx-spacing-64: 256px;
-  --nx-spacing-72: 288px;
-  --nx-spacing-80: 320px;
-  --nx-spacing-96: 384px;
-  --nx-spacing-0_5: 2px;
-  --nx-spacing-1_5: 6px;
-  --nx-spacing-2_5: 10px;
-  --nx-spacing-3_5: 14px;
-  --nx-control-padding-x-sm: 12px;
-  --nx-control-padding-x-md: 16px;
-  --nx-control-padding-x-lg: 32px;
-  --nx-control-padding-y-sm: 6px;
-  --nx-control-padding-y-md: 8px;
-  --nx-control-padding-y-lg: 12px;
-  --nx-control-gap-sm: 6px;
-  --nx-control-gap-md: 8px;
-  --nx-control-gap-lg: 10px;
-  --nx-container-p: 24px;
-  --nx-container-gap: 16px;
-  --nx-layout-section-gap: 32px;
-  --nx-layout-stack-gap: 8px;
 }
 
 [data-style='nova'] {
@@ -529,15 +445,6 @@
   --nx-spacing-1_5: 6px;
   --nx-spacing-2_5: 9px;
   --nx-spacing-3_5: 12px;
-  --nx-control-padding-x-sm: 10px;
-  --nx-control-padding-x-md: 12px;
-  --nx-control-padding-x-lg: 28px;
-  --nx-control-padding-y-sm: 4px;
-  --nx-control-padding-y-md: 6px;
-  --nx-control-padding-y-lg: 10px;
-  --nx-control-gap-sm: 4px;
-  --nx-control-gap-md: 6px;
-  --nx-control-gap-lg: 8px;
   --nx-container-p: 20px;
   --nx-container-gap: 12px;
   --nx-layout-section-gap: 28px;
@@ -579,19 +486,51 @@
   --nx-spacing-1_5: 6px;
   --nx-spacing-2_5: 10px;
   --nx-spacing-3_5: 14px;
-  --nx-control-padding-x-sm: 16px;
-  --nx-control-padding-x-md: 24px;
-  --nx-control-padding-x-lg: 40px;
-  --nx-control-padding-y-sm: 10px;
-  --nx-control-padding-y-md: 12px;
-  --nx-control-padding-y-lg: 16px;
-  --nx-control-gap-sm: 10px;
-  --nx-control-gap-md: 12px;
-  --nx-control-gap-lg: 14px;
   --nx-container-p: 40px;
   --nx-container-gap: 24px;
   --nx-layout-section-gap: 56px;
   --nx-layout-stack-gap: 16px;
+}
+
+[data-style='vega'] {
+  --nx-spacing-0: 0px;
+  --nx-spacing-1: 4px;
+  --nx-spacing-2: 8px;
+  --nx-spacing-3: 12px;
+  --nx-spacing-4: 16px;
+  --nx-spacing-5: 20px;
+  --nx-spacing-6: 24px;
+  --nx-spacing-7: 28px;
+  --nx-spacing-8: 32px;
+  --nx-spacing-9: 36px;
+  --nx-spacing-10: 40px;
+  --nx-spacing-11: 44px;
+  --nx-spacing-12: 48px;
+  --nx-spacing-14: 56px;
+  --nx-spacing-16: 64px;
+  --nx-spacing-20: 80px;
+  --nx-spacing-24: 96px;
+  --nx-spacing-28: 112px;
+  --nx-spacing-32: 128px;
+  --nx-spacing-36: 144px;
+  --nx-spacing-40: 160px;
+  --nx-spacing-44: 176px;
+  --nx-spacing-48: 192px;
+  --nx-spacing-52: 208px;
+  --nx-spacing-56: 224px;
+  --nx-spacing-60: 240px;
+  --nx-spacing-64: 256px;
+  --nx-spacing-72: 288px;
+  --nx-spacing-80: 320px;
+  --nx-spacing-96: 384px;
+  --nx-spacing-0_5: 2px;
+  --nx-spacing-1_5: 6px;
+  --nx-spacing-2_5: 10px;
+  --nx-spacing-3_5: 14px;
+  --nx-container-p: 24px;
+  --nx-container-gap: 16px;
+  --nx-layout-section-gap: 32px;
+  --nx-layout-stack-gap: 8px;
 }
 
 /* ===== NATIVE BROWSER UI THEME ===== */

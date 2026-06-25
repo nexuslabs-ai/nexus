@@ -127,7 +127,7 @@ function BoardColumn({
         <span className="nx:typography-label-default nx:text-foreground">
           {label}
         </span>
-        <span className="nx:text-muted-foreground nx:text-xs">
+        <span className="nx:text-muted-foreground nx:typography-label-small">
           {contacts.length}
         </span>
       </div>
@@ -155,21 +155,21 @@ function BoardCard({ contact }: { contact: Contact }) {
       }`}
     >
       <div className="nx:text-foreground nx:font-medium">{contact.name}</div>
-      <div className="nx:text-muted-foreground nx:text-sm">
+      <div className="nx:text-muted-foreground nx:typography-label-default">
         {contact.company}
       </div>
       <div className="nx:flex nx:items-center nx:justify-between">
         <div className="nx:flex nx:items-center nx:gap-2">
           <Avatar className="nx:size-6">
-            <AvatarFallback className="nx:text-xs">
+            <AvatarFallback className="nx:typography-label-small">
               {initials(contact.owner)}
             </AvatarFallback>
           </Avatar>
-          <span className="nx:text-muted-foreground nx:text-xs">
+          <span className="nx:text-muted-foreground nx:typography-label-small">
             {contact.owner}
           </span>
         </div>
-        <span className="nx:text-xs nx:tabular-nums">
+        <span className="nx:typography-label-small nx:tabular-nums">
           {formatCurrency(contact.value)}
         </span>
       </div>

@@ -17,7 +17,7 @@ export function ConversationList({
 }: ConversationListProps) {
   return (
     <div className="nx:flex nx:min-h-0 nx:flex-1 nx:flex-col">
-      <div className="nx:border-border-default nx:text-muted-foreground nx:border-b nx:px-4 nx:py-3 nx:text-sm">
+      <div className="nx:border-border-default nx:text-muted-foreground nx:border-b nx:px-4 nx:py-3 nx:typography-label-default">
         {conversations.length} conversation
         {conversations.length === 1 ? '' : 's'}
       </div>
@@ -70,15 +70,15 @@ function ConversationRow({
           >
             {conversation.customer}
           </span>
-          <span className="nx:text-muted-foreground nx:shrink-0 nx:text-xs">
+          <span className="nx:text-muted-foreground nx:shrink-0 nx:typography-label-small">
             {formatDateTime(conversation.lastMessageAt)}
           </span>
         </div>
-        <p className="nx:text-foreground nx:truncate nx:text-sm">
+        <p className="nx:text-foreground nx:truncate nx:typography-body-default">
           {conversation.subject}
         </p>
         <div className="nx:flex nx:items-center nx:justify-between nx:gap-2">
-          <p className="nx:text-muted-foreground nx:truncate nx:text-sm">
+          <p className="nx:text-muted-foreground nx:truncate nx:typography-body-default">
             {conversation.preview}
           </p>
           <ConversationStatusBadge status={conversation.status} />

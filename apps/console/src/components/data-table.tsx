@@ -152,18 +152,18 @@ export function DataTable<TData>({
 
       {/* App-local pager — the polished @nexus/react Pagination is tracked in #281. */}
       <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
-        <p className="nx:text-muted-foreground nx:text-sm">
+        <p className="nx:text-muted-foreground nx:typography-body-default">
           {enableSelection
             ? `${selectedCount} of ${totalCount} row(s) selected.`
             : `${totalCount} row(s)`}
         </p>
         <div className="nx:flex nx:items-center nx:gap-3">
-          <span className="nx:text-muted-foreground nx:text-sm">
+          <span className="nx:text-muted-foreground nx:typography-label-default">
             Page {pageIndex + 1} of {Math.max(table.getPageCount(), 1)}
           </span>
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
             aria-label="Previous page"
@@ -172,7 +172,7 @@ export function DataTable<TData>({
           </Button>
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
             aria-label="Next page"

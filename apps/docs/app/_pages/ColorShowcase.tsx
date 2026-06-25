@@ -12,7 +12,7 @@ import { ColorScales } from './ColorScales';
  * Swatches reference --nx-color-* variables inline; the semantic strip
  * reacts live to the theme picker via the CSS cascade (zero JS).
  *
- * Sources: .claude/rules/tokens.md (pipeline + APCA gate),
+ * Sources: packages/core/tokens/ + audit-contrast.js (pipeline + APCA gate),
  * color-shades.md (the 11-step shade→role grid).
  */
 
@@ -106,7 +106,7 @@ const SHADE_ROLES: {
   },
 ];
 
-// APCA contrast tiers (tokens.md § APCA contrast gate).
+// APCA contrast tiers (see packages/core/scripts/audit-contrast.js).
 const APCA_TIERS: { pair: string; lc: string; covers: string }[] = [
   { pair: 'foreground ↔ background', lc: '≥ 75', covers: 'Body text' },
   {
@@ -170,7 +170,7 @@ export function ColorShowcase() {
       {/* ── The palettes (+ shared CVD preview) ─────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">The palettes</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Start with the five neutral bases — eleven shades each. Read{' '}
           <em>down</em> any column: every base&rsquo;s <code>500</code> sits at
           the same perceptual lightness, only hue and chroma differ. Below are
@@ -185,7 +185,7 @@ export function ColorShowcase() {
       {/* ── Live semantic tokens ────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Live tokens</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Semantic surface/text pairs — the real tokens components use. Open the
           theme picker (bottom-right) and swap base, brand, or dark mode: every
           pair re-resolves live, and each clears the APCA gate by construction.
@@ -200,7 +200,7 @@ export function ColorShowcase() {
                 color: `var(--nx-color-${pair.text})`,
               }}
             >
-              <span className="nx:text-sm nx:font-medium">Aa</span>
+              <span className="nx:typography-label-default">Aa</span>
               <span className="nx:text-[11px] nx:font-mono nx:opacity-80">
                 {pair.label}
               </span>
@@ -214,7 +214,7 @@ export function ColorShowcase() {
         <h2 className="nx:typography-heading-small nx:mb-1">
           What each shade is for
         </h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The shade number is a luminance coordinate, and each step maps to
           specific semantic roles. The mapping is not a simple light/dark flip —
           a shade lands at a different step in dark mode to hold the same
@@ -225,7 +225,7 @@ export function ColorShowcase() {
           binding to a neutral shade.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[720px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[720px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Shade</th>
@@ -250,7 +250,7 @@ export function ColorShowcase() {
                           background: `var(--nx-color-slate-${row.shade})`,
                         }}
                       />
-                      <span className="nx:font-mono nx:text-xs">
+                      <span className="nx:font-mono nx:typography-label-small">
                         {row.shade}
                       </span>
                     </span>
@@ -258,10 +258,10 @@ export function ColorShowcase() {
                   <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground">
                     {row.role}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:typography-label-small">
                     {row.light}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {row.dark}
                   </td>
                 </tr>
@@ -274,7 +274,7 @@ export function ColorShowcase() {
       {/* ── Accessibility / APCA gate ───────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Accessibility</h2>
-        <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Contrast is gated by APCA (not WCAG 2 ratios), with thresholds set per
           intended use. A failing pair blocks the build — thresholds are not
           negotiable per finding. The palette is also validated against
@@ -282,7 +282,7 @@ export function ColorShowcase() {
           preview of that test.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Pair</th>
@@ -296,13 +296,13 @@ export function ColorShowcase() {
                   key={tier.pair}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {tier.pair}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs nx:whitespace-nowrap">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small nx:whitespace-nowrap">
                     Lc {tier.lc}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {tier.covers}
                   </td>
                 </tr>
@@ -338,12 +338,14 @@ export function ColorShowcase() {
               key={item.step}
               className="nx:flex nx:gap-3 nx:rounded-md nx:border nx:border-border-default nx:bg-container nx:p-4"
             >
-              <span className="nx:text-sm nx:font-mono nx:text-muted-foreground-subtle">
+              <span className="nx:typography-label-default nx:font-mono nx:text-muted-foreground-subtle">
                 {i + 1}
               </span>
               <div>
-                <div className="nx:text-sm nx:font-semibold">{item.step}</div>
-                <p className="nx:typography-body-small nx:text-muted-foreground nx:mt-0.5">
+                <div className="nx:typography-label-default nx:font-semibold">
+                  {item.step}
+                </div>
+                <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-0.5">
                   {item.body}
                 </p>
               </div>

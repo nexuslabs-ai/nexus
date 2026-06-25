@@ -24,10 +24,10 @@
 ### Components (Story-First)
 
 ```
-ComponentName/
-├── component-name.tsx        # Implementation
-├── ComponentName.stories.tsx # Stories = Tests
-└── index.ts                  # Exports
+component-name/              # kebab-case folder
+├── component-name.tsx        # Implementation (kebab-case)
+├── ComponentName.stories.tsx # Stories = Tests (PascalCase)
+└── index.ts                  # Barrel: export * from './component-name'
 ```
 
 **No separate `*.test.tsx` files for components.** Tests live in stories.

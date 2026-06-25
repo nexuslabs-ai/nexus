@@ -385,7 +385,7 @@ In Figma designs:
 | Topic               | Authoritative Source              |
 | ------------------- | --------------------------------- |
 | Component patterns  | [components.md](components.md)    |
-| Token architecture  | [tokens.md](tokens.md)            |
-| Token format        | [tokens.md](tokens.md)            |
+| Token architecture  | `packages/core/README.md`         |
+| Token format        | `packages/core/README.md`         |
 | Actual token values | `packages/tailwind/nexus.css`     |
 | Primitive values    | `packages/tailwind/variables.css` |

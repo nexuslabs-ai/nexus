@@ -29,9 +29,10 @@ On-demand dependency analysis that checks for available updates, breaking change
 
 Always load and follow:
 
-| Rule                                             | Purpose                                                                          |
-| ------------------------------------------------ | -------------------------------------------------------------------------------- |
-| [project-stage.md](../../rules/project-stage.md) | Pre-production: prefer clean upgrades over migration shims; no backcompat layers |
+| Rule                                                        | Purpose                                                                          |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [project-stage.md](../../../.claude/rules/project-stage.md) | Pre-production: prefer clean upgrades over migration shims; no backcompat layers |
+| [docs-mcp.md](../../../.claude/rules/docs-mcp.md)           | MANDATORY: query nexus-docs-mcp for current API surface before flagging breakage |
 
 ## Input Options
 

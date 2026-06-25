@@ -23,7 +23,7 @@ export function Placeholder({
   className?: string;
 }) {
   const base =
-    'nx:flex nx:items-center nx:justify-center nx:p-4 nx:border nx:border-dashed nx:border-border-default nx:rounded-md nx:bg-container nx:text-muted-foreground-subtle nx:text-xs nx:font-mono nx:text-center';
+    'nx:flex nx:items-center nx:justify-center nx:p-4 nx:border nx:border-dashed nx:border-border-default nx:rounded-md nx:bg-container nx:text-muted-foreground-subtle nx:typography-label-small nx:font-mono nx:text-center';
   const variants: Record<PlaceholderVariant, string> = {
     default: 'nx:min-h-12',
     code: 'nx:bg-muted nx:justify-start nx:text-left nx:min-h-12',
@@ -35,7 +35,7 @@ export function Placeholder({
     swatches: 'nx:min-h-16 nx:p-3',
     diagram: 'nx:min-h-44 nx:p-8',
     table: 'nx:min-h-32',
-    hero: 'nx:min-h-24 nx:p-6 nx:text-sm',
+    hero: 'nx:min-h-24 nx:p-6 nx:typography-label-default',
     tall: 'nx:min-h-56',
   };
   return (

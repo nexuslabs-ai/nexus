@@ -1,14 +1,11 @@
 {
   "family": {
     "font-sans": {
-      "$value": "Inter",
+      "$value": "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
       "$type": "fontFamily",
       "$extensions": {
         "nx-font-source": {
-          "type": "google",
-          "family": "Inter",
-          "weights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-          "styles": ["normal"]
+          "type": "system"
         }
       }
     },
@@ -22,14 +19,11 @@
       }
     },
     "font-mono": {
-      "$value": "JetBrains Mono",
+      "$value": "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
       "$type": "fontFamily",
       "$extensions": {
         "nx-font-source": {
-          "type": "google",
-          "family": "JetBrains+Mono",
-          "weights": [400, 500, 600, 700],
-          "styles": ["normal"]
+          "type": "system"
         }
       }
     }

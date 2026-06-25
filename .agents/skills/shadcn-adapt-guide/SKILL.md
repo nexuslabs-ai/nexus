@@ -21,7 +21,7 @@ Deterministically turn one shadcn/ui component into a first-class Nexus componen
 
 ## Rules are the spec — reference, never duplicate
 
-The authoritative rules live in `.Codex/rules/*.md`. This guide orchestrates them; it never copies the token tables inline (that would drift from the source). Open a rule file when the Reflex Check points you at it.
+The authoritative rules live in `.claude/rules/*.md`. This guide orchestrates them; it never copies the token tables inline (that would drift from the source). Open a rule file when the Reflex Check points you at it.
 
 | Rule                                                                                                                                                                                                     | What it owns                                                                |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -29,7 +29,7 @@ The authoritative rules live in `.Codex/rules/*.md`. This guide orchestrates the
 | `components.md`                                                                                                                                                                                          | Component architecture: CVA, data-slot, `nx:` prefix order, focus, layering |
 | `base-*.json` (surface/nav tokens)                                                                                                                                                                       | Surface/elevation tokens (container/popover/overlay), the `nav-*` namespace |
 | `testing-react.md`                                                                                                                                                                                       | Required stories, play-fns, a11y, the base-variants generator               |
-| `tokens.md`                                                                                                                                                                                              | Token names — verify a token exists before using it                         |
+| `packages/core/tokens/`                                                                                                                                                                                  | Token names — verify a token exists before using it                         |
 | `code-quality.md`, `composition-over-render-props.md`, `extract-inline-handlers.md`, `guard-clauses.md`, `useeffect-escape-hatch.md`, `code-comments.md`, `no-follow-up-deferral.md`, `project-stage.md` | General code discipline                                                     |
 
 ## Input
@@ -83,7 +83,7 @@ Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + s
 Run these and fix everything before reporting — no deferral (`no-follow-up-deferral.md`):
 
 - `pnpm --filter @nexus/react typecheck`
-- `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.Codex/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
+- `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
 - Story tests per `testing-react.md` (`pnpm test:storybook`); a11y violations fail the run.
 
 ## Reflex Check
@@ -104,7 +104,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - _Reaching for `useEffect`?_ → external systems only (subscriptions, DOM measurement); never to sync React state. (`useeffect-escape-hatch.md`)
 - _Typing `// TODO` / "for now" / "follow-up"?_ → don't. Fix in this PR, or `// TODO(#N):` against a tracked issue. (`code-comments.md`, `no-follow-up-deferral.md`)
 - _Tempted by a backcompat shim / deprecation / feature flag?_ → delete or rename in place; this is pre-production. (`project-stage.md`)
-- _A semantic token you need doesn't exist?_ → **stop and surface it.** Don't reach for a primitive or invent one; the token set is the contract. (`tokens.md`)
+- _A semantic token you need doesn't exist?_ → **stop and surface it.** Don't reach for a primitive or invent one; the token set is the contract. (`packages/core/tokens/`)
 
 ## Definition of done
 

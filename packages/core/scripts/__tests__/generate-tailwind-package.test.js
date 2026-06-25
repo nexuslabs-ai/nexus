@@ -42,9 +42,9 @@ function extractBlock(css, openSelector) {
 }
 
 // Per-mode spacing blocks open with `[data-style='X']` (single-quoted by
-// prettier). Vega's selector is `:root,\n[data-style='vega']` — multi-line.
-// Match by attribute-selector only since Vega's leading `:root,\n` would
-// otherwise need separate handling for prettier output variance.
+// prettier). The configured default selector is multi-line because it includes
+// `:root`. Match by attribute-selector only so the leading `:root,\n` does
+// not need separate handling for prettier output variance.
 function extractDataStyleBlock(css, mode) {
   const pattern = new RegExp(
     `\\[data-style=['"]${mode}['"]\\] \\{\\n([\\s\\S]*?)^\\}`,
@@ -107,10 +107,10 @@ describe('generateTailwindPackage', () => {
   // outline-focus-* utilities. The ring is outline-only — no focus box-shadow
   // tokens of any kind (the geometry-composed --shadow-focus-* are gone).
   // The 2px C40 offset is also tokenised so components share one tune-point.
-  // Count-based assertion on --focus-offset guards against duplicate emission
-  // through the standalone-semantic dimension scan colliding with a dedicated
-  // collector (the same trap that broke --breakpoint-*).
-  it('promotes focus colours to --color-* and emits --focus-offset exactly once; no focus box-shadow', () => {
+  // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
+  // vars referenced only via arbitrary utilities, #506). The count guard also
+  // catches duplicate emission via the dimension scan (the --breakpoint-* trap).
+  it('promotes focus colours to --color-* and emits --focus-offset once at :root; no focus box-shadow', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(
       /--color-focus-default: var\(--nx-focus-color-default\);/
@@ -118,8 +118,9 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(
       /--color-focus-error: var\(--nx-focus-color-error\);/
     );
-    expect(themeBlock.match(/--focus-offset:/g)).toHaveLength(1);
-    expect(themeBlock).toMatch(/--focus-offset: 2px;/);
+    expect(nexusCSS.match(/--focus-offset:/g)).toHaveLength(1);
+    expect(themeBlock).not.toMatch(/--focus-offset/);
+    expect(nexusCSS).toMatch(/:root\s*\{[^}]*--focus-offset: 2px;[^}]*\}/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 
@@ -242,6 +243,21 @@ describe('generateTailwindPackage', () => {
     expect(typographyCSS).not.toMatch(/line-height: auto/);
   });
 
+  it('emits typography-shortcut from the shortcut composite token', () => {
+    const block = extractBlock(typographyCSS, '@utility typography-shortcut');
+    expect(block).toMatch(
+      /font-family: var\(--nx-typography-family-font-sans\);/
+    );
+    expect(block).toMatch(/font-size: var\(--nx-typography-size-xs\);/);
+    expect(block).toMatch(/font-weight: var\(--nx-typography-weight-normal\);/);
+    expect(block).toMatch(
+      /line-height: var\(--nx-typography-line-height-xs\);/
+    );
+    expect(block).toMatch(
+      /letter-spacing: var\(--nx-typography-letterspacing-widest\);/
+    );
+  });
+
   // Regenerating tokens used to produce a noisy whitespace diff against the
   // committed CSS because the generator emitted raw output but the committed
   // files were prettier-formatted. The generator now formats every emitted
@@ -287,6 +303,13 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(/--spacing-\*:\s*initial;/);
   });
 
+  it('preserves the --text-*: initial reset in @theme', () => {
+    // Raw named Tailwind font-size utilities must not leak around the
+    // typography composites that own type sizing.
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(/--text-\*:\s*initial;/);
+  });
+
   it('registers numeric --spacing-N in @theme with direct px (not var() refs)', () => {
     // The numeric subset seeds @theme so Tailwind codegens nx:p-N / nx:m-N /
     // nx:h-N / nx:gap-N. After migration these are direct px values, not
@@ -307,12 +330,11 @@ describe('generateTailwindPackage', () => {
     // declarations driving the targeted utility names.
     const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).not.toMatch(/--container-p:/);
-    expect(themeBlock).not.toMatch(/--control-padding-x-md:/);
     expect(themeBlock).not.toMatch(/--layout-section-gap:/);
   });
 
   it('emits exactly 7 [data-style="X"] selectors (one per mode)', () => {
-    // Vega's selector is `:root, [data-style='vega']` so it contributes one
+    // The configured default selector is `:root, [data-style='<mode>']`, so it contributes one
     // [data-style=...] match; the other 6 modes each contribute one. Total: 7.
     const matches = nexusCSS.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(7);
@@ -321,12 +343,12 @@ describe('generateTailwindPackage', () => {
     expect(modes).toEqual(new Set(SPACING_MODES));
   });
 
-  it('emits Vega block under :root selector so it is the no-data-style default', () => {
+  it('emits configured spacing default under :root selector', () => {
     // Without the :root half, a document with no data-style attribute would
     // miss the role-token defaults (which only live in per-mode blocks, not
-    // @theme). The :root, [data-style="vega"] form keeps Vega live in both
-    // configurations.
-    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    // @theme). The :root selector keeps the configured default live in both
+    // no-attribute and explicit data-style configurations.
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]mira['"]\] \{/);
   });
 
   it.each(SPACING_MODES)(
@@ -338,14 +360,10 @@ describe('generateTailwindPackage', () => {
       // Sample one key from each subtree — full per-mode parity is verified
       // by the cross-mode variable-name parity test below.
       const spacing4 = source.spacing['4'].$value.value;
-      const controlPxMd = source.control['padding-x'].md.$value.value;
       const containerP = source.container.p.$value.value;
       const layoutSectionGap = source.layout['section-gap'].$value.value;
 
       expect(block).toMatch(new RegExp(`--nx-spacing-4:\\s*${spacing4}px;`));
-      expect(block).toMatch(
-        new RegExp(`--nx-control-padding-x-md:\\s*${controlPxMd}px;`)
-      );
       expect(block).toMatch(
         new RegExp(`--nx-container-p:\\s*${containerP}px;`)
       );
@@ -442,56 +460,10 @@ describe('generateTailwindPackage', () => {
     ).toBe(true);
   });
 
-  it('spacing-utilities.css declares all 13 role utilities with correct property bindings', () => {
+  it('spacing-utilities.css declares all 4 role utilities with correct property bindings', () => {
     // Each @utility binds the right CSS property to the right --nx-* variable.
-    // A buggy emitter could pass "utility exists" tests but bind the wrong
-    // var (e.g. px-control-sm reading --nx-control-padding-x-md).
+    // A buggy emitter could pass "utility exists" tests but bind the wrong var.
     const ROLE_UTILITY_BINDINGS = [
-      {
-        utility: 'px-control-sm',
-        prop: 'padding-left',
-        cssVar: 'nx-control-padding-x-sm',
-      },
-      {
-        utility: 'px-control-md',
-        prop: 'padding-left',
-        cssVar: 'nx-control-padding-x-md',
-      },
-      {
-        utility: 'px-control-lg',
-        prop: 'padding-left',
-        cssVar: 'nx-control-padding-x-lg',
-      },
-      {
-        utility: 'py-control-sm',
-        prop: 'padding-top',
-        cssVar: 'nx-control-padding-y-sm',
-      },
-      {
-        utility: 'py-control-md',
-        prop: 'padding-top',
-        cssVar: 'nx-control-padding-y-md',
-      },
-      {
-        utility: 'py-control-lg',
-        prop: 'padding-top',
-        cssVar: 'nx-control-padding-y-lg',
-      },
-      {
-        utility: 'gap-control-sm',
-        prop: 'gap',
-        cssVar: 'nx-control-gap-sm',
-      },
-      {
-        utility: 'gap-control-md',
-        prop: 'gap',
-        cssVar: 'nx-control-gap-md',
-      },
-      {
-        utility: 'gap-control-lg',
-        prop: 'gap',
-        cssVar: 'nx-control-gap-lg',
-      },
       { utility: 'p-container', prop: 'padding', cssVar: 'nx-container-p' },
       { utility: 'gap-container', prop: 'gap', cssVar: 'nx-container-gap' },
       {
@@ -506,7 +478,7 @@ describe('generateTailwindPackage', () => {
       },
     ];
 
-    expect(ROLE_UTILITY_BINDINGS).toHaveLength(13);
+    expect(ROLE_UTILITY_BINDINGS).toHaveLength(4);
     for (const { utility, prop, cssVar } of ROLE_UTILITY_BINDINGS) {
       const block = extractBlock(spacingUtilitiesCSS, `@utility ${utility}`);
       expect(block, `@utility ${utility} body`).toMatch(
@@ -573,17 +545,17 @@ describe('generateTailwindPackage', () => {
     // alphabetically. Luma < Lyra, so luma must appear before lyra.
     const ordered = [...nexusCSS.matchAll(/\[data-style=['"]([a-z]+)['"]\]/g)]
       .map((m) => m[1])
-      // De-dup in case `:root, [data-style="vega"]` produces two captures.
+      // De-dup in case `:root, [data-style="<default>"]` produces two captures.
       .filter((m, i, arr) => arr.indexOf(m) === i);
-    expect(ordered[0]).toBe('vega');
+    expect(ordered[0]).toBe('mira');
     // Other six in alphabetical order:
     expect(ordered.slice(1)).toEqual([
       'luma',
       'lyra',
       'maia',
-      'mira',
       'nova',
       'sera',
+      'vega',
     ]);
   });
 

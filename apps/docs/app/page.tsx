@@ -81,14 +81,14 @@ export default function Home() {
     <div className="nx:max-w-[960px] nx:mx-auto nx:px-6">
       {/* Hero */}
       <section className="nx:text-center nx:pt-20 nx:pb-16">
-        <span className="nx:inline-flex nx:items-center nx:gap-2 nx:font-mono nx:text-xs nx:uppercase nx:tracking-[0.14em] nx:text-primary-subtle-foreground">
+        <span className="nx:inline-flex nx:items-center nx:gap-2 nx:font-mono nx:typography-label-caps nx:uppercase nx:tracking-[0.14em] nx:text-primary-subtle-foreground">
           <span className="nx:size-1.5 nx:rounded-full nx:bg-primary-background" />
           AI-native design system
         </span>
-        <h1 className="nx:typography-display-large nx:mt-6 nx:text-balance">
+        <h1 className="nx:text-[clamp(2.5rem,5vw,3.75rem)] nx:font-normal nx:leading-[1.05] nx:tracking-[-0.01em] nx:mt-6 nx:text-balance">
           Design once. Ship every brand.
         </h1>
-        <p className="nx:typography-body-large nx:text-muted-foreground nx:mt-5 nx:max-w-[36rem] nx:mx-auto nx:text-pretty">
+        <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-5 nx:max-w-[36rem] nx:mx-auto nx:text-pretty">
           A multi-brand design system tuned for perceptual consistency across
           five bases — authored from a single source of truth by humans and
           agents alike.
@@ -153,7 +153,7 @@ export default function Home() {
                 <CardTitle className="nx:typography-heading-xsmall">
                   {s.title}
                 </CardTitle>
-                <CardDescription className="nx:text-xs">
+                <CardDescription className="nx:typography-body-small">
                   {s.desc}
                 </CardDescription>
               </CardHeader>
@@ -178,7 +178,7 @@ export default function Home() {
             </span>
           </div>
           <div>
-            <div className="nx:text-sm nx:text-muted-foreground nx:mb-2">
+            <div className="nx:typography-label-default nx:text-muted-foreground nx:mb-2">
               Brand · Blue
             </div>
             <div className="nx:flex nx:h-12 nx:overflow-hidden nx:rounded-lg nx:border nx:border-border-default">
@@ -193,7 +193,7 @@ export default function Home() {
             </div>
           </div>
           <div className="nx:mt-auto">
-            <div className="nx:text-sm nx:text-muted-foreground nx:mb-2">
+            <div className="nx:typography-label-default nx:text-muted-foreground nx:mb-2">
               5 bases · perceptually aligned
             </div>
             <div className="nx:grid nx:grid-cols-5 nx:gap-2">

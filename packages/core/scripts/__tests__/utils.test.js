@@ -403,7 +403,6 @@ describe('utils', () => {
     it('has all required configuration keys', () => {
       expect(DEFAULT_CONFIG).toHaveProperty('base');
       expect(DEFAULT_CONFIG).toHaveProperty('brand');
-      expect(DEFAULT_CONFIG).toHaveProperty('typography');
       expect(DEFAULT_CONFIG).toHaveProperty('shadow');
       expect(DEFAULT_CONFIG).toHaveProperty('radius');
       expect(DEFAULT_CONFIG).toHaveProperty('borderwidth');
@@ -418,15 +417,14 @@ describe('utils', () => {
 
     it('has expected default values', () => {
       expect(DEFAULT_CONFIG.base).toBe('stone');
-      expect(DEFAULT_CONFIG.brand).toBe('blue');
-      expect(DEFAULT_CONFIG.typography).toBe('vega');
-      expect(DEFAULT_CONFIG.shadow).toBe('vega');
+      expect(DEFAULT_CONFIG.brand).toBe('black');
+      expect(DEFAULT_CONFIG.shadow).toBe('maia');
       expect(DEFAULT_CONFIG.radius).toBe('sharp');
       expect(DEFAULT_CONFIG.borderwidth).toBe('vega');
-      // Vega is the canonical spacing default. The
+      // Mira is the runtime spacing default. The
       // key controls which mode lands under `:root, [data-style="X"]`; other
       // modes still ship in the bundle.
-      expect(DEFAULT_CONFIG.spacingDefault).toBe('vega');
+      expect(DEFAULT_CONFIG.spacingDefault).toBe('mira');
     });
   });
 
@@ -747,11 +745,6 @@ describe('utils', () => {
       const tokens = [
         { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
         { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
-        {
-          cssName: 'control-padding-x-md',
-          path: ['control', 'padding-x', 'md'],
-          value: '16px',
-        },
         { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
         {
           cssName: 'layout-section-gap',
@@ -765,11 +758,6 @@ describe('utils', () => {
         { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
       ]);
       expect(role).toEqual([
-        {
-          cssName: 'control-padding-x-md',
-          path: ['control', 'padding-x', 'md'],
-          value: '16px',
-        },
         { cssName: 'container-p', path: ['container', 'p'], value: '24px' },
         {
           cssName: 'layout-section-gap',
@@ -785,6 +773,19 @@ describe('utils', () => {
       ];
       expect(() => splitSpacingTokens(tokens)).toThrow(
         /unknown top-level key "motion"/
+      );
+    });
+
+    it('throws on a control-rooted path (control is no longer a spacing role root)', () => {
+      const tokens = [
+        {
+          cssName: 'control-padding-x-md',
+          path: ['control', 'padding-x', 'md'],
+          value: '16px',
+        },
+      ];
+      expect(() => splitSpacingTokens(tokens)).toThrow(
+        /unknown top-level key "control"/
       );
     });
   });

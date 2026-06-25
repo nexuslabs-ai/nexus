@@ -147,7 +147,7 @@ export const Radii: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Border Radii
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Raw `--nx-radius-*` primitive scale. `full` resolves to 9999px so the
           corner becomes a perfect arc on any container.
         </p>
@@ -174,7 +174,7 @@ export const BorderWidths: Story = {
         <h2 className="nx:text-foreground nx:typography-heading-medium">
           Border Widths
         </h2>
-        <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
+        <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
           Raw `--nx-borderwidth-*` primitives. The Tailwind utilities
           `nx:border-default` and `nx:border-thick` consume these.
         </p>

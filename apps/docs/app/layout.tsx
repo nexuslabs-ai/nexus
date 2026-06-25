@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-style="vega" suppressHydrationWarning>
+    <html lang="en" data-style="mira" suppressHydrationWarning>
       <head>
         <ThemeBootstrap />
       </head>
@@ -39,7 +39,7 @@ export default function RootLayout({
                 MIT · v0.0.1
               </span>
             </div>
-            <nav className="nx:flex nx:items-center nx:gap-5 nx:text-sm nx:text-muted-foreground">
+            <nav className="nx:flex nx:items-center nx:gap-5 nx:typography-label-default nx:text-muted-foreground">
               {FOOTER_LINKS.map((link) => {
                 const isExternal = link.href.startsWith('http');
                 return (

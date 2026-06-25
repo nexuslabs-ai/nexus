@@ -1,0 +1,628 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { expect, within } from 'storybook/test';
+
+import {
+  AllModesGrid,
+  AllModesRow,
+  SPACING_MODES,
+} from '../../../stories/spacing-modes';
+import {
+  expectHeightPinned,
+  expectModeCascadeWorks,
+} from '../../../stories/test-utils';
+import { Button } from '../button';
+import { Input } from '../input';
+
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './card';
+
+const meta: Meta<typeof Card> = {
+  title: 'Components/Card',
+  component: Card,
+  parameters: {
+    layout: 'padded',
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof Card>;
+
+// ============================================
+// BASIC STORIES
+// ============================================
+
+export const Default: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Card Title</CardTitle>
+        <CardDescription>Card description goes here.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>Card content goes here.</p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline">Cancel</Button>
+        <Button>Submit</Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
+export const Simple: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Simple Card</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>A simple card with just a title and content.</p>
+      </CardContent>
+    </Card>
+  ),
+};
+
+export const WithDescription: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Card with Description</CardTitle>
+        <CardDescription>
+          This is a longer description that provides more context about the card
+          content.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>Main content area of the card.</p>
+      </CardContent>
+    </Card>
+  ),
+};
+
+export const WithAction: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Card with Action</CardTitle>
+        <CardDescription>This card has an action button.</CardDescription>
+        <CardAction>
+          <Button size="sm" variant="outline">
+            Edit
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <p>Content with an action button in the header.</p>
+      </CardContent>
+    </Card>
+  ),
+};
+
+export const WithFooter: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Card with Footer</CardTitle>
+        <CardDescription>This card demonstrates footer usage.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>The footer is useful for action buttons.</p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline">Cancel</Button>
+        <Button>Save Changes</Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
+// ============================================
+// CONTENT VARIATIONS
+// ============================================
+
+export const ContentOnly: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardContent className="nx:pt-6">
+        <p>A card with only content, no header or footer.</p>
+      </CardContent>
+    </Card>
+  ),
+};
+
+export const HeaderOnly: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Header Only Card</CardTitle>
+        <CardDescription>
+          This card only has a header section with title and description.
+        </CardDescription>
+      </CardHeader>
+    </Card>
+  ),
+};
+
+export const LongContent: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[400px]">
+      <CardHeader>
+        <CardTitle>Article Title</CardTitle>
+        <CardDescription>Published on January 23, 2026</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="nx:mb-4">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris.
+        </p>
+        <p>
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+          dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident.
+        </p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="link">Read more</Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
+export const MediaCard: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <div aria-hidden="true" className="nx:aspect-video nx:bg-muted nx:p-6">
+        <div className="nx:size-full nx:rounded-lg nx:border nx:border-border-default nx:bg-container" />
+      </div>
+      <CardHeader>
+        <CardTitle>Campaign Snapshot</CardTitle>
+        <CardDescription>Updated 12 minutes ago</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>
+          Performance improved across three regions after the latest rollout.
+        </p>
+      </CardContent>
+    </Card>
+  ),
+};
+
+// ============================================
+// USE CASE EXAMPLES
+// ============================================
+
+export const LoginCard: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Login</CardTitle>
+        <CardDescription>
+          Enter your credentials to access your account.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="nx:flex nx:flex-col nx:gap-4">
+          <div className="nx:flex nx:flex-col nx:gap-2">
+            <label
+              htmlFor="email"
+              className="nx:typography-label-default nx:text-foreground"
+            >
+              Email
+            </label>
+            <Input id="email" type="email" placeholder="Enter your email" />
+          </div>
+          <div className="nx:flex nx:flex-col nx:gap-2">
+            <label
+              htmlFor="password"
+              className="nx:typography-label-default nx:text-foreground"
+            >
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+            />
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button className="nx:w-full">Sign In</Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
+export const BorderedFooter: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Plan Usage</CardTitle>
+        <CardDescription>
+          Seats and billing are managed together.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="nx:flex nx:items-baseline nx:gap-2">
+          <span className="nx:typography-heading-medium nx:text-foreground">
+            $49
+          </span>
+          <span className="nx:typography-body-default nx:text-muted-foreground">
+            per seat
+          </span>
+        </div>
+      </CardContent>
+      <CardFooter className="nx:border-t nx:border-border-default nx:bg-muted nx:pt-6">
+        <Button variant="outline">Compare</Button>
+        <Button>Upgrade</Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
+export const NotificationCard: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Notifications</CardTitle>
+        <CardDescription>You have 3 unread messages.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="nx:flex nx:flex-col nx:gap-3">
+          <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
+            <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
+            <div>
+              <p className="nx:typography-body-default">New message</p>
+              <p className="nx:typography-body-default nx:text-foreground/70">
+                John sent you a message
+              </p>
+            </div>
+          </div>
+          <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
+            <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
+            <div>
+              <p className="nx:typography-body-default">Update available</p>
+              <p className="nx:typography-body-default nx:text-foreground/70">
+                Version 2.0 is now available
+              </p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline" className="nx:w-full">
+          View all
+        </Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
+export const StatsCard: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[200px]">
+      <CardHeader className="nx:pb-2">
+        <CardDescription>Total Revenue</CardDescription>
+        <p className="nx:col-start-1 nx:min-w-0 nx:typography-heading-large nx:text-foreground">
+          $45,231
+        </p>
+      </CardHeader>
+      <CardContent>
+        <p className="nx:typography-label-small nx:text-muted-foreground">
+          +20.1% from last month
+        </p>
+      </CardContent>
+    </Card>
+  ),
+};
+
+export const LongTitleWithAction: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[320px]">
+      <CardHeader>
+        <CardTitle>
+          Quarterly revenue operations review with customer expansion notes
+        </CardTitle>
+        <CardDescription>
+          The action should keep its own reserved column.
+        </CardDescription>
+        <CardAction>
+          <Button size="sm" variant="outline">
+            Edit
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <p>Header text wraps before it reaches the action.</p>
+      </CardContent>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+
+    const title = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="card-title"]'
+    );
+    const action = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="card-action"]'
+    );
+
+    if (!title || !action) {
+      throw new Error('Expected card title and action to render.');
+    }
+
+    const titleRect = title.getBoundingClientRect();
+    const actionRect = action.getBoundingClientRect();
+
+    await expect(titleRect.right).toBeLessThanOrEqual(actionRect.left + 0.5);
+  },
+};
+
+// ============================================
+// DATA ATTRIBUTES TESTS
+// ============================================
+
+export const WithDataAttributes: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Data Attributes Test</CardTitle>
+        <CardDescription>Testing data-slot attributes.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>Content area.</p>
+      </CardContent>
+      <CardFooter>
+        <Button>Action</Button>
+      </CardFooter>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Check data-slot attributes
+    const card = canvasElement.querySelector('[data-slot="card"]');
+    const header = canvasElement.querySelector('[data-slot="card-header"]');
+    const title = canvasElement.querySelector('[data-slot="card-title"]');
+    const description = canvasElement.querySelector(
+      '[data-slot="card-description"]'
+    );
+    const content = canvasElement.querySelector('[data-slot="card-content"]');
+    const footer = canvasElement.querySelector('[data-slot="card-footer"]');
+
+    await expect(card).toBeInTheDocument();
+    await expect(header).toBeInTheDocument();
+    await expect(title).toBeInTheDocument();
+    await expect(description).toBeInTheDocument();
+    await expect(content).toBeInTheDocument();
+    await expect(footer).toBeInTheDocument();
+
+    // Verify title text
+    const titleElement = canvas.getByText('Data Attributes Test');
+    await expect(titleElement).toBeInTheDocument();
+  },
+};
+
+export const ActionDataAttributes: Story = {
+  render: (_args) => (
+    <Card className="nx:w-[350px]">
+      <CardHeader>
+        <CardTitle>Action Test</CardTitle>
+        <CardAction>
+          <Button size="sm">Edit</Button>
+        </CardAction>
+      </CardHeader>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    const action = canvasElement.querySelector('[data-slot="card-action"]');
+    await expect(action).toBeInTheDocument();
+  },
+};
+
+// ============================================
+// ALL VARIANTS GRID
+// ============================================
+
+export const AllVariants: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:flex-col nx:gap-8">
+      <div>
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Basic Card
+        </h3>
+        <Card className="nx:w-[350px]">
+          <CardHeader>
+            <CardTitle>Card Title</CardTitle>
+            <CardDescription>Card description text.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Card content goes here.</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div>
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Card with Footer
+        </h3>
+        <Card className="nx:w-[350px]">
+          <CardHeader>
+            <CardTitle>Card with Footer</CardTitle>
+            <CardDescription>Includes action buttons.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Main content area.</p>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline">Cancel</Button>
+            <Button>Confirm</Button>
+          </CardFooter>
+        </Card>
+      </div>
+
+      <div>
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Card with Action
+        </h3>
+        <Card className="nx:w-[350px]">
+          <CardHeader>
+            <CardTitle>Card with Action</CardTitle>
+            <CardDescription>Has an action in the header.</CardDescription>
+            <CardAction>
+              <Button size="sm" variant="outline">
+                Edit
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent>
+            <p>Content with header action.</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div>
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
+          Stats Card
+        </h3>
+        <div className="nx:flex nx:gap-4">
+          <Card className="nx:w-[180px]">
+            <CardHeader className="nx:pb-2">
+              <CardDescription>Revenue</CardDescription>
+              <p className="nx:col-start-1 nx:min-w-0 nx:typography-heading-medium nx:text-foreground">
+                $12,345
+              </p>
+            </CardHeader>
+            <CardContent>
+              <p className="nx:typography-label-small nx:text-muted-foreground">
+                +12% growth
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="nx:w-[180px]">
+            <CardHeader className="nx:pb-2">
+              <CardDescription>Users</CardDescription>
+              <p className="nx:col-start-1 nx:min-w-0 nx:typography-heading-medium nx:text-foreground">
+                1,234
+              </p>
+            </CardHeader>
+            <CardContent>
+              <p className="nx:typography-label-small nx:text-muted-foreground">
+                +5% growth
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  ),
+  parameters: {
+    layout: 'padded',
+  },
+};
+
+export const AllModes: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-container` → `p-6` to preserve the vega 24px default while leaving the container-role curve. `p-6` follows the standard spacing scale: nova 22 / maia 28 / all other modes 24. `CardAction` is in-flow grid content, with the header padding supplying the inset; `gap-1.5`, `gap-2`, and `pt-0` stay numeric.',
+      },
+    },
+  },
+  render: () => (
+    <AllModesGrid>
+      {SPACING_MODES.map((mode) => (
+        <AllModesRow key={mode} mode={mode}>
+          <Card className="nx:w-[240px]">
+            <CardHeader>
+              <CardTitle>Title</CardTitle>
+              <CardDescription>Description in {mode}</CardDescription>
+            </CardHeader>
+          </Card>
+        </AllModesRow>
+      ))}
+    </AllModesGrid>
+  ),
+};
+
+export const ModesProduceDifferentHeights: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Cascade sentinel for numeric `CardContent` `p-6`. Card has no portaled content, so dimensional measurement on the wrapper works directly. The Card contains a 40px fixed-height child, making the height equation `border 2 + pt-0 + child 40 + p-6 bottom`; nova resolves to 64px and luma resolves to 66px.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
+      <div data-style="nova" data-testid="card-mode-host-nova">
+        <Card className="nx:w-[160px]">
+          <CardContent>
+            <div className="nx:h-10" aria-hidden="true" />
+          </CardContent>
+        </Card>
+      </div>
+      <div data-style="luma" data-testid="card-mode-host-luma">
+        <Card className="nx:w-[160px]">
+          <CardContent>
+            <div className="nx:h-10" aria-hidden="true" />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectModeCascadeWorks(
+      within(canvasElement),
+      'card-mode-host-nova',
+      'card-mode-host-luma',
+      { selector: '[data-slot="card"]' }
+    );
+  },
+};
+
+export const VegaDefaultHeightPinned: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story: 'Regression sentinel: pins the Card height in vega mode.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      data-testid="card-vega-host"
+      className="nx:p-10 nx:bg-background"
+    >
+      <Card className="nx:w-[200px]">
+        <CardContent>
+          <div className="nx:h-10" aria-hidden="true" />
+        </CardContent>
+      </Card>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expectHeightPinned(within(canvasElement), 'card-vega-host', 66, {
+      selector: '[data-slot="card"]',
+    });
+  },
+};
+
+// ============================================
+// A11Y is tested automatically on ALL stories
+// via addon-a11y with test: 'error'
+// ============================================

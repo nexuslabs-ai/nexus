@@ -1,6 +1,6 @@
 ---
 name: implement-guide
-description: Plan and implement features directly without agent delegation. Combines architectural planning and implementation into a single-agent flow.
+description: Draft a plan, stress-test it with a parallel review council, then implement in the main session. Only plan review is delegated; drafting and implementation stay single-agent.
 allowed-tools:
   - Read
   - Grep
@@ -17,15 +17,15 @@ user-invocable: false
 
 ## Purpose
 
-Plan and implement features in a single-agent flow. You handle both the architectural planning (normally done by Principal Architect) and the implementation (normally done by SDE2) directly.
+Plan and implement features in the main session. You draft the plan and do all implementation yourself; the one delegated step is a parallel review council that stress-tests the draft plan against the codebase before you finalize it. Implementation is never delegated.
 
 ## Rules
 
-The full ruleset lives in `.Codex/rules/*.md` — those files are the spec. Don't try to keep all of them in working memory.
+The full ruleset lives in `.claude/rules/*.md` — those files are the spec. Don't try to keep all of them in working memory.
 
 The **Reflex Check** in Part 2 → Step 3 names the actions that should evoke a rule mid-write and points at the relevant file. Read the Reflex Check at the start of every phase; open a full rule file only when a reflex actually fires while you're writing.
 
-Operational rules (`github.md`, `project-stage.md`) are referenced inline by the step they govern.
+Operational rules (`docs-mcp.md`, `github.md`, `project-stage.md`) are referenced inline by the step they govern.
 
 ## Part 1: Planning
 
@@ -95,9 +95,9 @@ Before designing, understand the technologies involved.
    - Component/module boundaries
    - Interfaces between parts
 
-### Step 5: Create Implementation Plan
+### Step 5: Create the Draft Plan
 
-Break down into ordered, independently testable phases.
+Break the work into ordered, independently testable phases. This is the **draft** — Steps 6 and 7 review and revise it before the user sees it.
 
 **For each phase, specify:**
 
@@ -166,7 +166,51 @@ Break down into ordered, independently testable phases.
 | {item} | Risk/Decision | {details} |
 ```
 
-**After presenting the plan: WAIT for user approval before implementing.**
+### Step 6: Plan Review Council
+
+The draft is a hypothesis. Before the user sees it, fan it out to a review council — independent subagents that each attack the plan from **one lens** and report gaps, wrong assumptions about existing code, and over-reach. Lenses are organized by what they attack, not by job title, so coverage doesn't overlap.
+
+Spawn all four in a single message so they run concurrently. Each receives the full draft plan and the task source, applies one lens, and verifies every claim against the actual source.
+
+| Lens                   | Agent                 | Attacks                                                                                                                                                                                                                                   |
+| ---------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Codebase reality-check | `Explore`             | Do the files, APIs, helpers, and patterns the plan assumes actually exist and behave as claimed? Every claim about existing code is verified `file:line`.                                                                                 |
+| Architecture & ripple  | `principal-architect` | Integration points and callers/callees the plan ignores; whether the change respects the ripple-effect rule and the pre-production stage (delete, don't shim); whether the phase split is sound. (`ripple-effect.md`, `project-stage.md`) |
+| Simplicity & reuse     | `sde2`                | Over-engineering, speculative abstraction, a second copy of a helper that already exists, scope drifting past the issue. (`code-quality.md`)                                                                                              |
+| Edge cases & states    | `tester`              | Boundary inputs and failure modes the plan omits; missing loading / empty / error states; phases with no concrete verification step.                                                                                                      |
+
+**Return contract** — each agent returns ONLY a findings list, no preamble, no restating the plan. Per finding:
+
+| Field      | Value                                        |
+| ---------- | -------------------------------------------- |
+| `severity` | `blocker` \| `should-fix` \| `optional`      |
+| `claim`    | the plan assumption or step being challenged |
+| `evidence` | `file:line`, or one-line reasoning           |
+| `change`   | the concrete plan edit being proposed        |
+
+A lens that finds nothing returns `No gaps found.`
+
+### Step 7: Synthesize the Revised Plan
+
+Collect every finding and finalize the plan yourself — not by accepting all of them, but by ruling on each.
+
+- **Dedup first** — multiple lenses flagging one gap collapse to a single entry.
+- **Accept** → edit the plan to incorporate the change.
+- **Reject** → drop it with a one-line reason (already covered, out of scope, factually wrong).
+- **No silent scope creep** — a finding that broadens the work past the issue's acceptance criteria is rejected-with-reason, unless it is a correctness `blocker` (in scope by definition — see `no-follow-up-deferral.md`).
+- **Blockers are never deferred** — a `blocker` is fixed in the revised plan, or the plan was wrong.
+
+Output the **revised plan** (same Planning Output Format) followed by a **Council Delta** so the review's effect is visible:
+
+```markdown
+### Council Delta
+
+| Finding | Lens   | Verdict             | Note                           |
+| ------- | ------ | ------------------- | ------------------------------ |
+| {gap}   | {lens} | Accepted / Rejected | {what changed, or why dropped} |
+```
+
+**After presenting the revised plan and Council Delta: WAIT for user approval before implementing.**
 
 ---
 
@@ -228,10 +272,10 @@ _React and JSX_
 _Components and styling_
 
 - _Authoring or restyling a component, or writing any `nx:` utility?_
-  -> `nx:` prefix on every utility, **before** every modifier (`nx:hover:`, `nx:[&>svg]:`, `nx:lg:` — never `hover:nx:`). Semantic tokens only, full paths (`nx:bg-primary-background` — never `nx:bg-primary`, never a primitive like `nx:bg-blue-500`); no `dark:` on a semantic token (it already adapts — the modifier is a no-op). Padding for sizing, not fixed heights. `@container` for component-internal responsive; viewport prefixes (`nx:lg:`) are page-shell only (Dialog is the one viewport-driven exception). Focus = a real outline `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)` — never `nx:ring-*` or a shadow. `data-slot` always; `data-variant` / `data-size` when the prop exists. CVA for enum variants; boolean props as ternaries in the body, not CVA. `asChild` via Radix `Slot` for interactive components. (`components.md`, `tokens.md`, `responsive.md`)
+  -> `nx:` prefix on every utility, **before** every modifier (`nx:hover:`, `nx:[&>svg]:`, `nx:lg:` — never `hover:nx:`). Semantic tokens only, full paths (`nx:bg-primary-background` — never `nx:bg-primary`, never a primitive like `nx:bg-blue-500`); no `dark:` on a semantic token (it already adapts — the modifier is a no-op). Padding for sizing, not fixed heights. `@container` for component-internal responsive; viewport prefixes (`nx:lg:`) are page-shell only (Dialog is the one viewport-driven exception). Focus = a real outline `nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)` — never `nx:ring-*` or a shadow. `data-slot` always; `data-variant` / `data-size` when the prop exists. CVA for enum variants; boolean props as ternaries in the body, not CVA. `asChild` via Radix `Slot` for interactive components. (`components.md`, `responsive.md`)
 
 - _Reaching for a CSS variable at runtime (inline style, SVG, canvas), or porting a shadcn/ui component?_
-  -> Runtime vars are the **prefixed** form — `var(--nx-color-foo)`, `var(--nx-spacing-4)` — never the build-time `@theme` names (`var(--color-foo)`, `var(--spacing-4)`), which don't exist at runtime. For a shadcn port, map every token through `shadcn-divergences.md` (e.g. `bg-destructive` → `nx:bg-error-background`, but keep the `destructive` **prop** name) — or just run the `/shadcn-adapt` skill. (`tokens.md`, `shadcn-divergences.md`)
+  -> Runtime vars are the **prefixed** form — `var(--nx-color-foo)`, `var(--nx-spacing-4)` — never the build-time `@theme` names (`var(--color-foo)`, `var(--spacing-4)`), which don't exist at runtime. For a shadcn port, map every token through `shadcn-divergences.md` (e.g. `bg-destructive` → `nx:bg-error-background`, but keep the `destructive` **prop** name) — or just run the `/shadcn-adapt` skill. (`shadcn-divergences.md`)
 
 _Tests_
 
@@ -310,7 +354,8 @@ git add -A && git commit -m "phase {n}: {phase name}"
 
 1. **Read before write** -- understand existing patterns first
 2. **Research before coding** -- look up libraries, never guess
-3. **Follow loaded rules** -- `.Codex/rules/` files are source of truth
+3. **Follow loaded rules** -- `.claude/rules/` files are source of truth
 4. **One phase at a time** -- do not implement beyond the current phase
 5. **Plan is not code** -- planning and implementation are distinct steps
-6. **Ask when blocked** -- surface ambiguity rather than assuming
+6. **Draft, then review** -- the council reviews the plan before approval; implementation stays in the main session
+7. **Ask when blocked** -- surface ambiguity rather than assuming

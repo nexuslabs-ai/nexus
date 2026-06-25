@@ -85,7 +85,7 @@ function IssuesSkeleton() {
 
 function IssuesEmpty() {
   return (
-    <EmptyState className="nx:border nx:border-border-default">
+    <EmptyState bordered>
       <EmptyStateHeader>
         <EmptyStateMedia variant="icon">
           <IconBriefcase />

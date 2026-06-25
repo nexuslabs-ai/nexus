@@ -25,14 +25,16 @@ export function DataPager({
 }: DataPagerProps) {
   return (
     <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
-      <p className="nx:text-muted-foreground nx:text-sm">{total} row(s)</p>
+      <p className="nx:text-muted-foreground nx:typography-body-default">
+        {total} row(s)
+      </p>
       <div className="nx:flex nx:items-center nx:gap-3">
-        <span className="nx:text-muted-foreground nx:text-sm">
+        <span className="nx:text-muted-foreground nx:typography-label-default">
           Page {page + 1} of {pageCount}
         </span>
         <Button
           variant="outline"
-          size="sm"
+          size="icon-sm"
           onClick={onPrev}
           disabled={page === 0}
           aria-label="Previous page"
@@ -41,7 +43,7 @@ export function DataPager({
         </Button>
         <Button
           variant="outline"
-          size="sm"
+          size="icon-sm"
           onClick={onNext}
           disabled={page >= pageCount - 1}
           aria-label="Next page"

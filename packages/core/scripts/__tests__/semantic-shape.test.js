@@ -47,10 +47,10 @@ describe('semantic token shape', () => {
     expect(actual).toEqual(expected);
   });
 
-  // `.claude/rules/tokens.md` documents that each brand/status role exposes
-  // a fixed nine-key shape. Without a test, the doc and the JSON drift
-  // (see #54: badge.tsx referenced `*-surface` / `*-text` keys that never
-  // existed). Walk every semantic file and prove the shape end-to-end.
+  // Each brand/status role exposes a fixed nine-key shape. Without a test,
+  // the JSON could drift from that contract (see #54: badge.tsx referenced
+  // `*-surface` / `*-text` keys that never existed). Walk every semantic
+  // file and prove the shape end-to-end.
   it.each(semanticFiles('base'))(
     'base file %s exposes the 9-key shape for status roles',
     (filePath) => {

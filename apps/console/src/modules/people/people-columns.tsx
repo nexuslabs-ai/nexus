@@ -84,7 +84,7 @@ export const memberColumns: ColumnDef<Member>[] = [
     cell: ({ row }) => (
       <div className="nx:flex nx:items-center nx:gap-3">
         <Avatar className="nx:size-8">
-          <AvatarFallback className="nx:text-xs">
+          <AvatarFallback className="nx:typography-label-small">
             {initials(row.original.name)}
           </AvatarFallback>
         </Avatar>
@@ -153,7 +153,7 @@ function RowActions({ member }: { member: Member }) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon-sm"
           aria-label={`Actions for ${member.name}`}
         >
           <IconDots />

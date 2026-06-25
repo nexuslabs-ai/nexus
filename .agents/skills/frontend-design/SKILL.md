@@ -11,14 +11,14 @@ The user provides frontend requirements: a component, page, application, or inte
 
 Always load and follow:
 
-| Rule                                                                             | Purpose                                                                              |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [code-quality.md](../../rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files       |
-| [ripple-effect.md](../../rules/ripple-effect.md)                                 | A change isn't done until callers, callees, and adjacent code are consistently clean |
-| [composition-over-render-props.md](../../rules/composition-over-render-props.md) | `children` or per-mode components; never `renderItem` / `mode` discriminators        |
-| [useeffect-escape-hatch.md](../../rules/useeffect-escape-hatch.md)               | Effects sync with external systems, not React state                                  |
-| [guard-clauses.md](../../rules/guard-clauses.md)                                 | Keep the happy path at column 0; exit early                                          |
-| [code-comments.md](../../rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
+| Rule                                                                                        | Purpose                                                                              |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [code-quality.md](../../../.claude/rules/code-quality.md)                                   | Governing principle: favor simplicity over cleverness; index to per-rule files       |
+| [ripple-effect.md](../../../.claude/rules/ripple-effect.md)                                 | A change isn't done until callers, callees, and adjacent code are consistently clean |
+| [composition-over-render-props.md](../../../.claude/rules/composition-over-render-props.md) | `children` or per-mode components; never `renderItem` / `mode` discriminators        |
+| [useeffect-escape-hatch.md](../../../.claude/rules/useeffect-escape-hatch.md)               | Effects sync with external systems, not React state                                  |
+| [guard-clauses.md](../../../.claude/rules/guard-clauses.md)                                 | Keep the happy path at column 0; exit early                                          |
+| [code-comments.md](../../../.claude/rules/code-comments.md)                                 | Comment only non-obvious logic; no rationale blocks; TODOs require tracked issues    |
 
 ## Design Thinking
 

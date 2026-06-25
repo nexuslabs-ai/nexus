@@ -12,9 +12,12 @@ describe('storiesImportPath', () => {
     );
   });
 
-  it('uses ui for the standard component subdir', () => {
+  it('nests ui entries under their per-component folder', () => {
     expect(storiesImportPath({ name: 'Button' }, 'ui')).toBe(
-      '../ui/Button.stories'
+      '../ui/button/Button.stories'
+    );
+    expect(storiesImportPath({ name: 'DropdownMenu' }, 'ui')).toBe(
+      '../ui/dropdown-menu/DropdownMenu.stories'
     );
   });
 });

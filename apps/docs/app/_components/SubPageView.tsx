@@ -27,7 +27,7 @@ export function SubPageView({
         ]}
       />
       <h1 className="nx:typography-heading-large">[ {sub.label} ]</h1>
-      <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-5">
+      <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-5">
         {sub.lede}
       </p>
       {sub.blocks.map((block, i) => (
