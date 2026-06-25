@@ -38,6 +38,16 @@ function appearanceDark(appearance: CodexThemeContract['appearance']): boolean {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
+function syncColorSchemeMeta(
+  appearance: CodexThemeContract['appearance']
+): void {
+  const meta = document.querySelector<HTMLMetaElement>(
+    'meta[name="color-scheme"]'
+  );
+  if (!meta) return;
+  meta.content = appearance === 'system' ? 'light dark' : appearance;
+}
+
 /**
  * Mounts the theme engine once at the app root. `useTheme` owns the neutral
  * tone + shape <link> swaps; `useDerivedTheme` injects the derived color
@@ -63,6 +73,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const apply = () => {
       const dark = appearanceDark(codexContract.appearance);
       document.documentElement.classList.toggle('dark', dark);
+      syncColorSchemeMeta(codexContract.appearance);
     };
     apply();
     if (codexContract.appearance === 'system') {
