@@ -129,6 +129,18 @@ ruleTester.run('nx-class-conventions', rule, {
       errors: [{ messageId: 'rawFontWeight' }],
     },
     {
+      code: "const c = 'nx:**:font-medium';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
+      code: "const c = 'nx:**:[[cmdk-group-heading]]:font-semibold';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
+      code: "const c = 'nx:[&[data-state=open]]:font-bold';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
       code: "const c = 'nx:leading-none';",
       errors: [{ messageId: 'rawLineHeight' }],
     },
@@ -143,6 +155,23 @@ ruleTester.run('nx-class-conventions', rule, {
     {
       code: 'const c = `nx:tracking-[0.14em] ${x}`;',
       errors: [{ messageId: 'rawLetterSpacing' }],
+    },
+    {
+      code: "const c = 'nx:flex nx:size-full nx:items-center nx:justify-center nx:rounded-[inherit] nx:bg-muted nx:text-foreground nx:font-medium nx:leading-none nx:tracking-wide';",
+      filename: '/repo/packages/react/src/components/ui/avatar/avatar.tsx',
+      errors: [
+        { messageId: 'rawFontWeight' },
+        { messageId: 'rawLineHeight' },
+        { messageId: 'rawLetterSpacing' },
+      ],
+    },
+    {
+      code: "const c = 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums nx:tracking-wide';",
+      filename: '/repo/packages/react/src/components/ui/chart/chart.tsx',
+      errors: [
+        { messageId: 'rawFontWeight' },
+        { messageId: 'rawLetterSpacing' },
+      ],
     },
     {
       code: "const c = 'nx:text-sm nx:font-medium nx:leading-tight';",

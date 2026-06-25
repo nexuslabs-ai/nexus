@@ -55,7 +55,10 @@ export const RAW_LETTER_SPACINGS = [
   'widest',
 ];
 
-const NX_MODIFIER_CHAIN = String.raw`(?:[\w-]+(?:\[[^\]]+\])?(?:\/[\w-]+)?:|\[[^\]]+\]:|\*:)*`;
+const NAMED_VARIANT = String.raw`[\w-]+(?:\[[^\]]+\])?(?:\/[\w-]+)?:`;
+const ARBITRARY_VARIANT = String.raw`\[[^\s]+?\]:`;
+const CHILD_VARIANT = String.raw`\*{1,2}:`;
+const NX_MODIFIER_CHAIN = String.raw`(?:${NAMED_VARIANT}|${ARBITRARY_VARIANT}|${CHILD_VARIANT})*`;
 
 const CHECKS = [
   {
@@ -121,24 +124,34 @@ function isDocsFile(filename) {
   return /(?:^|[/\\])apps[/\\]docs[/\\]/.test(filename);
 }
 
-function isRawTypographyException(filename, raw) {
-  const isAvatarFallback =
-    /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]ui[/\\]avatar[/\\]avatar\.tsx$/.test(
-      filename
-    ) &&
-    raw.includes('nx:size-full') &&
-    raw.includes('nx:font-medium') &&
-    raw.includes('nx:leading-none');
+const RAW_TYPOGRAPHY_EXCEPTIONS = [
+  {
+    filename:
+      /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]ui[/\\]avatar[/\\]avatar\.tsx$/,
+    className:
+      'nx:flex nx:size-full nx:items-center nx:justify-center nx:rounded-[inherit] nx:bg-muted nx:text-foreground nx:font-medium nx:leading-none',
+    messageIds: new Set(['rawFontWeight', 'rawLineHeight']),
+  },
+  {
+    filename:
+      /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]ui[/\\]chart[/\\]chart\.tsx$/,
+    className: 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums',
+    messageIds: new Set(['rawFontWeight']),
+  },
+];
 
-  const isChartMonospaceValue =
-    /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]ui[/\\]chart[/\\]chart\.tsx$/.test(
-      filename
-    ) &&
-    raw.includes('nx:font-mono') &&
-    raw.includes('nx:font-medium') &&
-    raw.includes('nx:tabular-nums');
+function normalizeClassName(raw) {
+  return raw.trim().replace(/\s+/g, ' ');
+}
 
-  return isAvatarFallback || isChartMonospaceValue;
+function isRawTypographyException(check, filename, raw) {
+  const normalized = normalizeClassName(raw);
+  return RAW_TYPOGRAPHY_EXCEPTIONS.some(
+    (exception) =>
+      exception.filename.test(filename) &&
+      exception.className === normalized &&
+      exception.messageIds.has(check.messageId)
+  );
 }
 
 function shouldRunCheck(check, filename, raw) {
@@ -148,7 +161,7 @@ function shouldRunCheck(check, filename, raw) {
   if (isStoryFile(filename) || isDocsFile(filename)) {
     return false;
   }
-  return !isRawTypographyException(filename, raw);
+  return !isRawTypographyException(check, filename, raw);
 }
 
 function matchedMessageIds(raw, filename) {
