@@ -537,8 +537,6 @@ export const StylingContracts: Story = {
     );
 
     await expect(defaultButton).toHaveClass('nx:typography-body-default');
-    // Active is colour-only (no weight/size change): text brightens to the
-    // full nav foreground; it must not re-introduce a label/weight composite.
     await expect(defaultButton).toHaveClass(
       'nx:data-[active=true]:text-nav-foreground'
     );
@@ -614,6 +612,12 @@ export const StylingContracts: Story = {
     );
     await expect(defaultSubButton).toHaveClass('nx:typography-body-default');
     await expect(defaultSubButton).not.toHaveClass('nx:text-sm');
+    await expect(defaultSubButton).not.toHaveClass(
+      'nx:[&>svg]:text-nav-muted-foreground'
+    );
+    await expect(defaultSubButton).not.toHaveClass(
+      'nx:data-[active=true]:[&>svg]:text-nav-foreground'
+    );
     await expect(smallSubButton).toHaveClass('nx:typography-body-small');
     await expect(smallSubButton).not.toHaveClass('nx:text-xs');
 
