@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { Label } from '@nexus/react';
 
-interface SettingRowProps {
+interface AppearanceSettingRowProps {
   label: string;
   description?: string;
   /** Associates the label with the control for a11y. */
@@ -10,16 +10,15 @@ interface SettingRowProps {
   children: ReactNode;
 }
 
-/** One Codex settings row: label (+ optional description) left, control right. */
-export function SettingRow({
+export function AppearanceSettingRow({
   label,
   description,
   htmlFor,
   children,
-}: SettingRowProps) {
+}: AppearanceSettingRowProps) {
   return (
-    <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:py-3">
-      <div className="nx:space-y-0.5">
+    <div className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-4 nx:py-3">
+      <div className="nx:min-w-44 nx:space-y-0.5">
         <Label htmlFor={htmlFor}>{label}</Label>
         {description ? (
           <p className="nx:typography-body-small nx:text-muted-foreground">

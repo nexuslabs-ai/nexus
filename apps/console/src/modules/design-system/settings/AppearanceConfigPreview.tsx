@@ -2,47 +2,62 @@ import { useEffect, useRef } from 'react';
 
 import type { CodexThemeContract } from '@nexus/core';
 
-/** The lines we surface in the preview (the derivation-relevant fields). */
-function toLines(c: CodexThemeContract): { key: string; text: string }[] {
-  const seeds = c.appearance === 'light' ? c.light : c.dark;
+import type { Base } from '../../../hooks/useTheme';
+
+function editedBlock(
+  appearance: CodexThemeContract['appearance']
+): 'light' | 'dark' {
+  return appearance === 'light' ? 'light' : 'dark';
+}
+
+/** The derivation-relevant fields shown in the compact preview. */
+function toLines(
+  contract: CodexThemeContract,
+  base: Base
+): { key: string; text: string }[] {
+  const seeds = contract[editedBlock(contract.appearance)];
   return [
-    { key: 'appearance', text: `appearance: "${c.appearance}",` },
-    { key: 'accent', text: `accent: "${seeds.accent}",` },
+    { key: 'appearance', text: `appearance: "${contract.appearance}",` },
+    { key: 'brand', text: `brand: "${seeds.accent}",` },
+    { key: 'base', text: `base: "${base}",` },
     { key: 'background', text: `background: "${seeds.background}",` },
     { key: 'foreground', text: `foreground: "${seeds.foreground}",` },
-    { key: 'contrast', text: `contrast: ${c.contrast},` },
+    { key: 'contrast', text: `contrast: ${contract.contrast},` },
   ];
 }
 
-interface ThemeConfigDiffProps {
+interface AppearanceConfigPreviewProps {
   contract: CodexThemeContract;
-  /** "color" tints changed lines; "symbols" shows only +/- (the diffMarkers pref). */
+  base: Base;
+  /** "color" tints changed lines; "symbols" shows only +/- markers. */
   markers?: 'color' | 'symbols';
 }
 
-export function ThemeConfigDiff({
+export function AppearanceConfigPreview({
   contract,
+  base,
   markers = 'color',
-}: ThemeConfigDiffProps) {
-  const prevRef = useRef<CodexThemeContract | null>(null);
+}: AppearanceConfigPreviewProps) {
+  const prevRef = useRef<{ contract: CodexThemeContract; base: Base } | null>(
+    null
+  );
   const prev = prevRef.current;
   useEffect(() => {
-    prevRef.current = contract;
+    prevRef.current = { contract, base };
   });
 
-  const nextLines = toLines(contract);
+  const nextLines = toLines(contract, base);
   const prevByKey = new Map(
-    prev ? toLines(prev).map((l) => [l.key, l.text]) : []
+    prev ? toLines(prev.contract, prev.base).map((l) => [l.key, l.text]) : []
   );
 
-  // font-size is driven by the codeFontSize pref (prefsToCss `code, pre` rule).
   return (
     <pre
       className="nx:overflow-x-auto nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:font-mono nx:text-muted-foreground"
       style={{ lineHeight: '1.7' }}
     >
       <code>
-        <div>{`const themePreview: ThemeConfig = {`}</div>
+        <div>{`const appearance = {`}</div>
         {nextLines.map((line) => {
           const before = prevByKey.get(line.key);
           const changed = before !== undefined && before !== line.text;

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Input } from '@nexus/react';
 
-interface ColorFieldProps {
+interface AppearanceColorFieldProps {
   /** Committed hex value, e.g. "#339cff". */
   value: string;
   /** Called only with a valid #rrggbb hex. */
@@ -12,9 +12,11 @@ interface ColorFieldProps {
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
-export function ColorField({ value, onChange, label }: ColorFieldProps) {
-  // Local draft lets the user type a partial hex without the controlled input
-  // rejecting keystrokes; we only commit when it's a valid #rrggbb.
+export function AppearanceColorField({
+  value,
+  onChange,
+  label,
+}: AppearanceColorFieldProps) {
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
 

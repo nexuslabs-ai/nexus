@@ -21,11 +21,9 @@ import {
 type ThemeContextValue = {
   theme: ThemeConfig;
   setTheme: React.Dispatch<React.SetStateAction<ThemeConfig>>;
-  /** Active free-form Codex theme, or null when the curated preset path is active. */
-  codexContract: CodexThemeContract | null;
-  setCodexContract: React.Dispatch<
-    React.SetStateAction<CodexThemeContract | null>
-  >;
+  /** Active derived Appearance theme. */
+  codexContract: CodexThemeContract;
+  setCodexContract: React.Dispatch<React.SetStateAction<CodexThemeContract>>;
   /** App-preferences (fonts, motion, cursors…) — applied app-wide regardless of theme. */
   codexPrefs: CodexPrefs;
   setCodexPrefs: React.Dispatch<React.SetStateAction<CodexPrefs>>;
@@ -41,17 +39,15 @@ function appearanceDark(appearance: CodexThemeContract['appearance']): boolean {
 }
 
 /**
- * Mounts the theme engine once at the app root. `useTheme` owns the preset
- * <link> swaps; `useDerivedTheme` injects the derived <style>; `useAppearancePrefs`
- * injects the prefs <style>. A single arbiter effect below owns the `.dark` class:
- * the active contract's appearance while a derived theme is live, otherwise the
- * preset's `theme.dark`. Consumers read everything via `useThemeContext`.
+ * Mounts the theme engine once at the app root. `useTheme` owns the neutral
+ * tone + shape <link> swaps; `useDerivedTheme` injects the derived color
+ * <style>; `useAppearancePrefs` injects the prefs <style>. The contract's
+ * appearance is the single owner of the `.dark` class.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme();
-  const [codexContract, setCodexContract] = useState<CodexThemeContract | null>(
-    loadCodexContract
-  );
+  const [codexContract, setCodexContract] =
+    useState<CodexThemeContract>(loadCodexContract);
   const [codexPrefs, setCodexPrefs] = useState<CodexPrefs>(loadCodexPrefs);
 
   // Persist on change — writing to localStorage is an external-system sync.
@@ -62,21 +58,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     saveCodexPrefs(codexPrefs);
   }, [codexPrefs]);
 
-  // Single `.dark` arbiter — the contract owns it while active, else the preset.
+  // Single `.dark` arbiter — the unified Appearance contract owns it.
   useEffect(() => {
     const apply = () => {
-      const dark = codexContract
-        ? appearanceDark(codexContract.appearance)
-        : theme.dark;
+      const dark = appearanceDark(codexContract.appearance);
       document.documentElement.classList.toggle('dark', dark);
     };
     apply();
-    if (codexContract?.appearance === 'system') {
+    if (codexContract.appearance === 'system') {
       const mq = window.matchMedia('(prefers-color-scheme: dark)');
       mq.addEventListener('change', apply);
       return () => mq.removeEventListener('change', apply);
     }
-  }, [codexContract, theme.dark]);
+  }, [codexContract]);
 
   useDerivedTheme(codexContract);
   useAppearancePrefs(codexPrefs);

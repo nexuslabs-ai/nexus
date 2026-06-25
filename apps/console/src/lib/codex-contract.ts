@@ -1,10 +1,14 @@
 import { type CodexThemeContract, isColor, type ThemeSeeds } from '@nexus/core';
 
+import { BASE_TONE_SEEDS, DEFAULT_BRAND_COLOR } from './appearance-theme';
+
+const DEFAULT_BASE_TONE = BASE_TONE_SEEDS.stone;
+
 /** Codex's own Appearance values — the default derived theme (dogfood). */
 export const DEFAULT_CODEX_CONTRACT: CodexThemeContract = {
   appearance: 'dark',
-  light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
-  dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
+  light: { accent: DEFAULT_BRAND_COLOR, ...DEFAULT_BASE_TONE.light },
+  dark: { accent: DEFAULT_BRAND_COLOR, ...DEFAULT_BASE_TONE.dark },
   contrast: 60,
 };
 
@@ -41,24 +45,20 @@ export function sanitizeContract(raw: unknown): CodexThemeContract {
   return { appearance, light: o.light, dark: o.dark, contrast };
 }
 
-/** Read the persisted contract, or null = preset path active. Never throws. */
-export function loadCodexContract(): CodexThemeContract | null {
+/** Read the persisted contract. Never throws. */
+export function loadCodexContract(): CodexThemeContract {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? sanitizeContract(JSON.parse(raw)) : null;
+    return raw ? sanitizeContract(JSON.parse(raw)) : DEFAULT_CODEX_CONTRACT;
   } catch {
-    return null;
+    return DEFAULT_CODEX_CONTRACT;
   }
 }
 
-/** Persist the contract, or clear it when null. Never throws. */
-export function saveCodexContract(contract: CodexThemeContract | null): void {
+/** Persist the active contract. Never throws. */
+export function saveCodexContract(contract: CodexThemeContract): void {
   try {
-    if (contract) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(contract));
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(contract));
   } catch {
     // ignore storage failures (private mode, quota)
   }

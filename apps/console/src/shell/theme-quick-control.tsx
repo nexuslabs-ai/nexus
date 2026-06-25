@@ -12,7 +12,12 @@ import { IconPalette } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 
 import { useThemeContext } from '../app/theme-provider';
-import { BASES, BRANDS } from '../hooks/useTheme';
+import {
+  applyBaseTone,
+  applyBrandColor,
+  BASE_TONE_OPTIONS,
+} from '../lib/appearance-theme';
+import { AppearanceColorField } from '../modules/design-system/settings/AppearanceColorField';
 
 function SwatchRow<T extends string>({
   label,
@@ -59,20 +64,32 @@ function SwatchRow<T extends string>({
 }
 
 /**
- * Topbar theme quick-control — a Popover to flip the app's base + brand palette
- * from anywhere, turning the live re-theme engine into an instant demo (every
- * surface re-themes on click, the popover included). Dark mode stays a one-click
- * topbar button; the full token axes live behind "Customize…" (Appearance).
+ * Topbar theme quick-control — a Popover for the highest-frequency Appearance
+ * controls. The full token axes live behind "Customize…" (Appearance).
  */
 export function ThemeQuickControl() {
-  const { theme, setTheme } = useThemeContext();
+  const { theme, setTheme, codexContract, setCodexContract } =
+    useThemeContext();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const accent =
+    codexContract.appearance === 'light'
+      ? codexContract.light.accent
+      : codexContract.dark.accent;
 
   // Close the popover before navigating so it doesn't linger over Appearance.
   const openAppearance = () => {
     setOpen(false);
     navigate({ to: '/design/appearance' });
+  };
+
+  const setBaseTone = (base: typeof theme.base) => {
+    setTheme((t) => ({ ...t, base }));
+    setCodexContract((contract) => applyBaseTone(contract, base));
+  };
+
+  const setBrandColor = (hex: string) => {
+    setCodexContract((contract) => applyBrandColor(contract, hex));
   };
 
   return (
@@ -84,17 +101,21 @@ export function ThemeQuickControl() {
       </PopoverTrigger>
       <PopoverContent align="end" className="nx:w-72 nx:space-y-3">
         <SwatchRow
-          label="Base"
+          label="Base tone"
           value={theme.base}
-          options={BASES}
-          onSelect={(base) => setTheme((t) => ({ ...t, base }))}
+          options={BASE_TONE_OPTIONS}
+          onSelect={setBaseTone}
         />
-        <SwatchRow
-          label="Brand"
-          value={theme.brand}
-          options={BRANDS}
-          onSelect={(brand) => setTheme((t) => ({ ...t, brand }))}
-        />
+        <div className="nx:space-y-1.5">
+          <p className="nx:typography-label-small nx:text-muted-foreground">
+            Brand color
+          </p>
+          <AppearanceColorField
+            label="Brand color"
+            value={accent}
+            onChange={setBrandColor}
+          />
+        </div>
         <Separator />
         <Button
           variant="ghost"

@@ -5,19 +5,14 @@ import { type CodexThemeContract, deriveTheme, themeToCss } from '@nexus/core';
 const STYLE_ID = 'nexus-derived-theme';
 
 /**
- * Inject the derived token `<style>` from a free-form contract — appended last
- * in `<head>` so its `:root` rules win over the preset `<link>`s. Passing `null`
- * removes the override and restores the preset path. The `.dark` class is owned
- * by ThemeProvider's single arbiter, not here. Syncs to an external system (the
- * DOM), so it belongs in an effect.
+ * Inject the derived token `<style>` from the Appearance contract — appended
+ * last in `<head>` so its `:root` rules win over the preset `<link>`s. The
+ * `.dark` class is owned by ThemeProvider's single arbiter, not here. Syncs to
+ * an external system (the DOM), so it belongs in an effect.
  */
-export function useDerivedTheme(contract: CodexThemeContract | null): void {
+export function useDerivedTheme(contract: CodexThemeContract): void {
   useEffect(() => {
     const existing = document.getElementById(STYLE_ID);
-    if (!contract) {
-      existing?.remove();
-      return;
-    }
     const style =
       existing instanceof HTMLStyleElement
         ? existing
@@ -28,7 +23,7 @@ export function useDerivedTheme(contract: CodexThemeContract | null): void {
       document.head.appendChild(style);
     } catch {
       // A malformed contract (should be filtered upstream by sanitizeContract)
-      // must not crash the app — drop the override and fall back to the preset.
+      // must not crash the app.
       style.remove();
     }
   }, [contract]);
