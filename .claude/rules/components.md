@@ -2,6 +2,7 @@
 
 > Architectural guidelines for Nexus React components.
 > For token mappings from shadcn/ui, see [shadcn-divergences.md](shadcn-divergences.md).
+> For the Tier-A completion bar, see [polish.md](polish.md).
 
 ## Core Principles
 
