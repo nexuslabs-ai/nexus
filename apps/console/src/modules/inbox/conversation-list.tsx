@@ -65,9 +65,7 @@ function ConversationRow({
       </div>
       <div className="nx:min-w-0 nx:flex-1 nx:space-y-1">
         <div className="nx:flex nx:items-baseline nx:justify-between nx:gap-2">
-          <span
-            className={`nx:text-foreground nx:truncate ${conversation.unread ? 'nx:font-semibold' : 'nx:font-medium'}`}
-          >
+          <span className="nx:text-foreground nx:truncate nx:typography-label-default">
             {conversation.customer}
           </span>
           <span className="nx:text-muted-foreground nx:shrink-0 nx:typography-label-small">

@@ -182,7 +182,7 @@ function SourcesCard({ sources }: { sources: TrafficSource[] }) {
           <TableBody>
             {sources.map((source) => (
               <TableRow key={source.source}>
-                <TableCell className="nx:text-foreground nx:font-medium">
+                <TableCell className="nx:text-foreground nx:typography-label-default">
                   {source.source}
                 </TableCell>
                 <TableCell className="nx:text-right nx:tabular-nums">

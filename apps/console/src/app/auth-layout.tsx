@@ -17,14 +17,14 @@ export function AuthLayout() {
       <aside className="nx:bg-primary-background nx:text-primary-foreground nx:hidden nx:w-1/2 nx:flex-col nx:justify-between nx:p-12 nx:lg:flex">
         <div className="nx:flex nx:items-center nx:gap-2">
           <div className="nx:bg-primary-foreground nx:flex nx:size-8 nx:items-center nx:justify-center nx:rounded-lg">
-            <span className="nx:text-primary-background nx:typography-label-default nx:font-bold">
+            <span className="nx:text-primary-background nx:typography-label-caps">
               A
             </span>
           </div>
           <span className="nx:typography-heading-xsmall">Atlas</span>
         </div>
         <div className="nx:space-y-3">
-          <p className="nx:typography-heading-medium nx:leading-snug">
+          <p className="nx:typography-heading-medium">
             The operating system for your whole company.
           </p>
           <p className="nx:text-primary-foreground/80 nx:typography-body-default">

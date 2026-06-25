@@ -19,7 +19,7 @@ export function IssueCard({ issue }: { issue: Issue }) {
           <span className="nx:text-muted-foreground nx:typography-label-default nx:tabular-nums">
             {issue.key}
           </span>{' '}
-          <span className="nx:text-foreground nx:font-medium">
+          <span className="nx:text-foreground nx:typography-label-default">
             {issue.title}
           </span>
         </Link>

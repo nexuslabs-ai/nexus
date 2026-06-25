@@ -3,7 +3,6 @@ import { useState } from 'react';
 import {
   Badge,
   Button,
-  cn,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -182,12 +181,7 @@ export function NotificationsMenu() {
                   >
                     <KindIcon className="nx:text-muted-foreground nx:mt-0.5 nx:size-4 nx:shrink-0" />
                     <span className="nx:min-w-0 nx:flex-1">
-                      <span
-                        className={cn(
-                          'nx:block nx:typography-label-default',
-                          !n.read && 'nx:font-medium'
-                        )}
-                      >
+                      <span className="nx:block nx:typography-label-default">
                         {n.title}
                       </span>
                       <span className="nx:text-muted-foreground nx:block nx:truncate nx:typography-label-default">

@@ -5,7 +5,11 @@ import { fileURLToPath } from 'url';
 import { describe, expect, it } from 'vitest';
 
 import plugin from '../src/index.js';
-import { LIVE_TYPOGRAPHY } from '../src/rules/nx-class-conventions.js';
+import {
+  LIVE_TYPOGRAPHY,
+  RAW_FONT_WEIGHTS,
+  RAW_LETTER_SPACINGS,
+} from '../src/rules/nx-class-conventions.js';
 
 RuleTester.describe = describe;
 RuleTester.it = it;
@@ -49,6 +53,31 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = 'nx:text-[clamp(1rem,2vw,3rem)]';",
     "const c = 'nx:text-muted-foreground';",
     "const c = 'nx:text-foreground';",
+    // Font families are still legal; the raw typography guard targets weight,
+    // line-height, and tracking utilities that bypass the composite scale.
+    "const c = 'nx:font-mono nx:tabular-nums';",
+    // The raw typography guard is runtime-scoped. Stories and docs remain useful
+    // demo surfaces, but are not part of this hard gate.
+    {
+      code: "const c = 'nx:font-medium nx:leading-none nx:tracking-wide';",
+      filename:
+        '/repo/packages/react/src/components/ui/table/Table.stories.tsx',
+    },
+    {
+      code: "const c = 'nx:font-semibold nx:tracking-wider';",
+      filename: '/repo/apps/docs/app/page.tsx',
+    },
+    // Avatar initials inherit diameter-driven text size from the root variant;
+    // this stays a narrow exception until there is an Avatar-specific typography
+    // token that preserves that relationship.
+    {
+      code: "const c = 'nx:flex nx:size-full nx:items-center nx:justify-center nx:rounded-[inherit] nx:bg-muted nx:text-foreground nx:font-medium nx:leading-none';",
+      filename: '/repo/packages/react/src/components/ui/avatar/avatar.tsx',
+    },
+    {
+      code: "const c = 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums';",
+      filename: '/repo/packages/react/src/components/ui/chart/chart.tsx',
+    },
   ],
   invalid: [
     {
@@ -90,6 +119,38 @@ ruleTester.run('nx-class-conventions', rule, {
     {
       code: "const c = 'nx:text-sm nx:bg-primary';",
       errors: [{ messageId: 'incompletePath' }, { messageId: 'rawFontSize' }],
+    },
+    {
+      code: "const c = 'nx:font-medium';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
+      code: "const c = 'nx:data-[today=true]:font-semibold';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
+      code: "const c = 'nx:leading-none';",
+      errors: [{ messageId: 'rawLineHeight' }],
+    },
+    {
+      code: "const c = 'nx:group-hover:leading-[1.1]';",
+      errors: [{ messageId: 'rawLineHeight' }],
+    },
+    {
+      code: "const c = 'nx:tracking-wide';",
+      errors: [{ messageId: 'rawLetterSpacing' }],
+    },
+    {
+      code: 'const c = `nx:tracking-[0.14em] ${x}`;',
+      errors: [{ messageId: 'rawLetterSpacing' }],
+    },
+    {
+      code: "const c = 'nx:text-sm nx:font-medium nx:leading-tight';",
+      errors: [
+        { messageId: 'rawFontSize' },
+        { messageId: 'rawFontWeight' },
+        { messageId: 'rawLineHeight' },
+      ],
     },
     // Modifiers beyond hover/active/focus must not evade the checks.
     {
@@ -140,5 +201,41 @@ describe('LIVE_TYPOGRAPHY drift guard', () => {
     );
 
     expect([...emitted].sort()).toEqual([...LIVE_TYPOGRAPHY].sort());
+  });
+});
+
+describe('raw typography guard drift checks', () => {
+  it('keeps raw font-weight names aligned with the typography primitive tokens', () => {
+    const dir = path.dirname(fileURLToPath(import.meta.url));
+    const tokens = JSON.parse(
+      fs.readFileSync(
+        path.resolve(
+          dir,
+          '../../core/tokens/primitives/typography/typography-vega.json'
+        ),
+        'utf8'
+      )
+    );
+
+    expect([...Object.keys(tokens.weight)].sort()).toEqual(
+      [...RAW_FONT_WEIGHTS].sort()
+    );
+  });
+
+  it('keeps raw letter-spacing names aligned with the typography primitive tokens', () => {
+    const dir = path.dirname(fileURLToPath(import.meta.url));
+    const tokens = JSON.parse(
+      fs.readFileSync(
+        path.resolve(
+          dir,
+          '../../core/tokens/primitives/typography/typography-vega.json'
+        ),
+        'utf8'
+      )
+    );
+
+    expect([...Object.keys(tokens.letterspacing)].sort()).toEqual(
+      [...RAW_LETTER_SPACINGS].sort()
+    );
   });
 });

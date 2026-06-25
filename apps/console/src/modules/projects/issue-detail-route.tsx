@@ -107,7 +107,7 @@ function DetailContent({ issue }: { issue: IssueDetail }) {
           </CardHeader>
           <CardContent>
             {issue.description ? (
-              <p className="nx:text-foreground nx:typography-body-default nx:leading-relaxed nx:whitespace-pre-wrap">
+              <p className="nx:text-foreground nx:typography-body-default nx:whitespace-pre-wrap">
                 {issue.description}
               </p>
             ) : (

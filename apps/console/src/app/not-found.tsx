@@ -10,7 +10,7 @@ import { Link } from '@tanstack/react-router';
 export function NotFound() {
   return (
     <div className="nx:bg-background nx:text-foreground nx:flex nx:min-h-svh nx:flex-col nx:items-center nx:justify-center nx:gap-3 nx:p-6 nx:text-center">
-      <p className="nx:typography-label-small nx:text-muted-foreground-subtle nx:uppercase nx:tracking-wide">
+      <p className="nx:typography-label-caps nx:text-muted-foreground-subtle nx:uppercase">
         404
       </p>
       <h1 className="nx:typography-heading-large">Page not found</h1>

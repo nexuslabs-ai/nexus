@@ -74,11 +74,11 @@ export function AppSidebar() {
             <SidebarMenuButton size="lg" asChild>
               <Link to="/design/reference">
                 <div className="nx:flex nx:size-8 nx:items-center nx:justify-center nx:rounded-lg nx:bg-primary-background">
-                  <span className="nx:typography-label-default nx:font-bold nx:text-primary-foreground">
+                  <span className="nx:typography-label-caps nx:text-primary-foreground">
                     A
                   </span>
                 </div>
-                <span className="nx:font-semibold">Atlas</span>
+                <span className="nx:typography-label-default">Atlas</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -173,7 +173,7 @@ export function AppSidebar() {
                   <>
                     <DropdownMenuLabel className="nx:flex nx:flex-col">
                       <span>{user.name}</span>
-                      <span className="nx:text-muted-foreground nx:typography-label-small nx:font-normal">
+                      <span className="nx:text-muted-foreground nx:typography-body-small">
                         {user.email}
                       </span>
                     </DropdownMenuLabel>

@@ -55,7 +55,10 @@ export function VerifyRoute() {
         <CardTitle>Check your email</CardTitle>
         <CardDescription>
           Enter the 6-digit code we sent to {email}. Demo code:{' '}
-          <span className="nx:text-foreground nx:font-medium">123456</span>.
+          <span className="nx:text-foreground nx:typography-label-default">
+            123456
+          </span>
+          .
         </CardDescription>
       </CardHeader>
       <CardContent className="nx:flex nx:flex-col nx:items-center nx:gap-5">

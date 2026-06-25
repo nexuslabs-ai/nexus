@@ -376,7 +376,7 @@ function TableRowHeader({ className, ...props }: TableRowHeaderProps) {
       data-slot="table-row-header"
       className={cn(
         tableCellVariants({ variant, density }),
-        'nx:font-medium',
+        'nx:typography-label-default',
         className
       )}
       {...props}

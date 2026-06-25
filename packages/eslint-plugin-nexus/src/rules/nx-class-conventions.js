@@ -25,6 +25,38 @@ export const LIVE_TYPOGRAPHY = [
   'shortcut',
 ];
 
+export const RAW_FONT_WEIGHTS = [
+  'thin',
+  'extralight',
+  'light',
+  'normal',
+  'medium',
+  'semibold',
+  'bold',
+  'extrabold',
+  'black',
+];
+
+export const RAW_LINE_HEIGHTS = [
+  'none',
+  'tight',
+  'snug',
+  'normal',
+  'relaxed',
+  'loose',
+];
+
+export const RAW_LETTER_SPACINGS = [
+  'tighter',
+  'tight',
+  'normal',
+  'wide',
+  'wider',
+  'widest',
+];
+
+const NX_MODIFIER_CHAIN = String.raw`(?:[\w-]+(?:\[[^\]]+\])?(?:\/[\w-]+)?:|\[[^\]]+\]:|\*:)*`;
+
 const CHECKS = [
   {
     messageId: 'prefixOrder',
@@ -32,31 +64,100 @@ const CHECKS = [
   },
   {
     messageId: 'bannedAccent',
-    re: /nx:(?:[\w-]+:)*(?:bg|text)-accent\b/,
+    re: new RegExp(`nx:${NX_MODIFIER_CHAIN}(?:bg|text)-accent\\b`),
   },
   {
     messageId: 'incompletePath',
-    re: /nx:(?:[\w-]+:)*(?:bg|text|border)-(?:primary|secondary|error|success|warning|information|destructive)(?![\w-])/,
+    re: new RegExp(
+      `nx:${NX_MODIFIER_CHAIN}(?:bg|text|border)-(?:primary|secondary|error|success|warning|information|destructive)(?![\\w-])`
+    ),
   },
   {
     messageId: 'rawPrimitive',
-    re: /nx:(?:[\w-]+:)*(?:bg|text|border)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}/,
+    re: new RegExp(
+      `nx:${NX_MODIFIER_CHAIN}(?:bg|text|border)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\\d{2,3}`
+    ),
   },
   {
     messageId: 'rawFontSize',
-    re: /nx:(?:[\w-]+:)*text-(?:xs|sm|base|lg|xl|[2-9]xl)\b/,
+    re: new RegExp(
+      `nx:${NX_MODIFIER_CHAIN}text-(?:xs|sm|base|lg|xl|[2-9]xl)\\b`
+    ),
+  },
+  {
+    messageId: 'rawFontWeight',
+    re: new RegExp(
+      `nx:${NX_MODIFIER_CHAIN}font-(?:${RAW_FONT_WEIGHTS.join('|')})\\b`
+    ),
+    runtimeOnly: true,
+  },
+  {
+    messageId: 'rawLineHeight',
+    re: new RegExp(
+      `nx:${NX_MODIFIER_CHAIN}leading-(?:${RAW_LINE_HEIGHTS.join('|')}|\\d+|\\[)`
+    ),
+    runtimeOnly: true,
+  },
+  {
+    messageId: 'rawLetterSpacing',
+    re: new RegExp(
+      `nx:${NX_MODIFIER_CHAIN}tracking-(?:${RAW_LETTER_SPACINGS.join('|')}|\\[)`
+    ),
+    runtimeOnly: true,
   },
   {
     messageId: 'deadTypography',
     re: new RegExp(
-      `nx:(?:[\\w-]+:)*typography-(?!(?:${LIVE_TYPOGRAPHY.join('|')})\\b)[\\w-]+`
+      `nx:${NX_MODIFIER_CHAIN}typography-(?!(?:${LIVE_TYPOGRAPHY.join('|')})\\b)[\\w-]+`
     ),
   },
 ];
 
-function matchedMessageIds(raw) {
+function isStoryFile(filename) {
+  return /\.stories\.[jt]sx?$/.test(filename);
+}
+
+function isDocsFile(filename) {
+  return /(?:^|[/\\])apps[/\\]docs[/\\]/.test(filename);
+}
+
+function isRawTypographyException(filename, raw) {
+  const isAvatarFallback =
+    /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]ui[/\\]avatar[/\\]avatar\.tsx$/.test(
+      filename
+    ) &&
+    raw.includes('nx:size-full') &&
+    raw.includes('nx:font-medium') &&
+    raw.includes('nx:leading-none');
+
+  const isChartMonospaceValue =
+    /(?:^|[/\\])packages[/\\]react[/\\]src[/\\]components[/\\]ui[/\\]chart[/\\]chart\.tsx$/.test(
+      filename
+    ) &&
+    raw.includes('nx:font-mono') &&
+    raw.includes('nx:font-medium') &&
+    raw.includes('nx:tabular-nums');
+
+  return isAvatarFallback || isChartMonospaceValue;
+}
+
+function shouldRunCheck(check, filename, raw) {
+  if (!check.runtimeOnly) {
+    return true;
+  }
+  if (isStoryFile(filename) || isDocsFile(filename)) {
+    return false;
+  }
+  return !isRawTypographyException(filename, raw);
+}
+
+function matchedMessageIds(raw, filename) {
   const matched = new Set();
-  for (const { messageId, re } of CHECKS) {
+  for (const check of CHECKS) {
+    const { messageId, re } = check;
+    if (!shouldRunCheck(check, filename, raw)) {
+      continue;
+    }
     if (re.test(raw)) {
       matched.add(messageId);
     }
@@ -83,13 +184,19 @@ export default {
         'Raw Tailwind primitive color — use a semantic token instead (e.g. `nx:bg-primary-background`, not `nx:bg-blue-500`).',
       rawFontSize:
         'Raw Tailwind font-size utility — use a typography composite instead (e.g. `nx:typography-body-default`, not `nx:text-sm`).',
+      rawFontWeight:
+        'Raw Tailwind font-weight utility — use a typography composite instead (e.g. `nx:typography-label-default`, not `nx:font-medium`).',
+      rawLineHeight:
+        'Raw Tailwind line-height utility — let a typography composite own line-height instead of `nx:leading-*`.',
+      rawLetterSpacing:
+        'Raw Tailwind letter-spacing utility — use a typography composite such as `nx:typography-label-caps` instead of `nx:tracking-*`.',
       deadTypography:
         'Unknown typography composite — this `nx:typography-*` utility is not emitted by typography-utilities.css and renders nothing. Use a live tier (e.g. `nx:typography-body-default`, `nx:typography-label-default`).',
     },
   },
   create(context) {
     function report(node, raw) {
-      for (const messageId of matchedMessageIds(raw)) {
+      for (const messageId of matchedMessageIds(raw, context.filename ?? '')) {
         context.report({ node, messageId });
       }
     }
@@ -105,7 +212,7 @@ export default {
         const matched = new Set();
         for (const quasi of node.quasis) {
           const raw = quasi.value.cooked ?? quasi.value.raw;
-          for (const id of matchedMessageIds(raw)) {
+          for (const id of matchedMessageIds(raw, context.filename ?? '')) {
             matched.add(id);
           }
         }
