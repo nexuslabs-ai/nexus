@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 
 import { useThemeContext } from '../app/theme-provider';
+import { toggledAppearance } from '../lib/appearance-theme';
 import { crmKeys, fetchContacts } from '../lib/crm-api';
 import { fetchConversations, inboxKeys } from '../lib/inbox-api';
 import { fetchMembers, peopleKeys } from '../lib/people-api';
@@ -45,8 +46,9 @@ interface CommandPaletteProps {
  */
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
-  const { theme, setTheme } = useThemeContext();
+  const { codexContract, setCodexContract } = useThemeContext();
   const [query, setQuery] = useState('');
+  const dark = codexContract.appearance === 'dark';
 
   // Prefetch the four record sets the moment the palette opens (not on type) so
   // the lists are warm before the first keystroke — no empty-state flash.
@@ -101,6 +103,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       return;
     }
     navigate({ to: '/m/$module', params: { module: item.module } });
+  };
+
+  const toggleAppearance = () => {
+    setCodexContract((contract) => ({
+      ...contract,
+      appearance: toggledAppearance(contract.appearance),
+    }));
   };
 
   const hasQuery = query.trim().length > 0;
@@ -237,11 +246,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           <CommandItem
             value="toggle-theme"
             keywords={['theme', 'dark', 'light', 'mode']}
-            onSelect={() =>
-              runCommand(() => setTheme((t) => ({ ...t, dark: !t.dark })))
-            }
+            onSelect={() => runCommand(toggleAppearance)}
           >
-            {theme.dark ? <IconSun /> : <IconMoon />}
+            {dark ? <IconSun /> : <IconMoon />}
             <span>Toggle theme</span>
           </CommandItem>
           <CommandItem

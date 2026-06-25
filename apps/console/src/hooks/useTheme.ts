@@ -173,9 +173,5 @@ export function useTheme() {
     loadCSS(`/themes/borderwidth-${theme.borderWidth}.css`, 'borderwidth');
   }, [theme.borderWidth]);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme.dark);
-  }, [theme.dark]);
-
   return { theme, setTheme };
 }

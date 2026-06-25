@@ -2,6 +2,7 @@ import { Button, Kbd, KbdGroup, SidebarTrigger } from '@nexus/react';
 import { IconMoon, IconSearch, IconSun } from '@tabler/icons-react';
 
 import { useThemeContext } from '../app/theme-provider';
+import { toggledAppearance } from '../lib/appearance-theme';
 
 import { NotificationsMenu } from './notifications-menu';
 import { ThemeQuickControl } from './theme-quick-control';
@@ -17,7 +18,14 @@ interface TopbarProps {
  * dark-mode quick-toggle wired to the root theme.
  */
 export function Topbar({ onSearchClick }: TopbarProps) {
-  const { theme, setTheme } = useThemeContext();
+  const { codexContract, setCodexContract } = useThemeContext();
+  const dark = codexContract.appearance === 'dark';
+  const toggleAppearance = () => {
+    setCodexContract((contract) => ({
+      ...contract,
+      appearance: toggledAppearance(contract.appearance),
+    }));
+  };
 
   return (
     <header className="nx:bg-background nx:border-border-default nx:flex nx:h-14 nx:items-center nx:gap-3 nx:border-b nx:px-4">
@@ -45,12 +53,10 @@ export function Topbar({ onSearchClick }: TopbarProps) {
       <Button
         variant="ghost"
         size="icon-sm"
-        onClick={() => setTheme((t) => ({ ...t, dark: !t.dark }))}
-        aria-label={
-          theme.dark ? 'Switch to light theme' : 'Switch to dark theme'
-        }
+        onClick={toggleAppearance}
+        aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
       >
-        {theme.dark ? <IconSun /> : <IconMoon />}
+        {dark ? <IconSun /> : <IconMoon />}
       </Button>
     </header>
   );
