@@ -113,12 +113,13 @@ describe('generateModular', () => {
     expect(globals).not.toMatch(/--spacing-0:\s*var\(/);
   });
 
-  it('emits role @utility declarations into a sibling spacing-utilities.css (not inlined)', () => {
-    // Symmetric with the bundled-tailwind build: globals.css @imports
-    // spacing-utilities.css; sync-console-themes.js's STYLES_FILES
-    // allowlist includes the file so it reaches apps/console/src/styles/.
+  it('emits role and motion @utility declarations into sibling utility files', () => {
+    // Symmetric with the bundled-tailwind build: globals.css @imports sibling
+    // utility files; sync-console-themes.js's STYLES_FILES allowlist includes
+    // them so they reach apps/console/src/styles/.
     const files = fs.readdirSync(distDir);
     expect(files).toContain('spacing-utilities.css');
+    expect(files).toContain('motion-utilities.css');
 
     const spacingUtilities = fs.readFileSync(
       path.join(distDir, 'spacing-utilities.css'),
@@ -127,10 +128,21 @@ describe('generateModular', () => {
     expect(spacingUtilities).toMatch(/@utility p-container \{/);
     expect(spacingUtilities).toMatch(/@utility gap-layout-section \{/);
 
-    // globals.css does NOT inline role utilities — it @imports them.
+    const motionUtilities = fs.readFileSync(
+      path.join(distDir, 'motion-utilities.css'),
+      'utf8'
+    );
+    expect(motionUtilities).toMatch(/@utility duration-fast \{/);
+    expect(motionUtilities).toMatch(
+      /transition-duration:\s*var\(--nx-motion-duration-fast\);/
+    );
+
+    // globals.css does NOT inline sibling utilities — it @imports them.
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     expect(globals).not.toMatch(/@utility p-container \{/);
+    expect(globals).not.toMatch(/@utility duration-fast \{/);
     expect(globals).toMatch(/@import\s+['"]\.\/spacing-utilities\.css['"]/);
+    expect(globals).toMatch(/@import\s+['"]\.\/motion-utilities\.css['"]/);
   });
 
   it('@utility declarations bind the right prefixed CSS vars', () => {

@@ -16,6 +16,7 @@
 @import './motion-snappy.css';
 @import './typography-utilities.css';
 @import './borderwidth-utilities.css';
+@import './motion-utilities.css';
 @import './spacing-utilities.css';
 
 @custom-variant dark (&:is(.dark *));
@@ -182,13 +183,6 @@
   --border-thick: var(--nx-borderwidth-thick);
 
   /* Motion tokens */
-  --duration-0: var(--nx-motion-duration-0);
-  --duration-faster: var(--nx-motion-duration-faster);
-  --duration-fast: var(--nx-motion-duration-fast);
-  --duration-default: var(--nx-motion-duration-default);
-  --duration-moderate: var(--nx-motion-duration-moderate);
-  --duration-slow: var(--nx-motion-duration-slow);
-  --duration-slower: var(--nx-motion-duration-slower);
   --ease-linear: var(--nx-motion-ease-linear);
   --ease-enter: var(--nx-motion-ease-enter);
   --ease-exit: var(--nx-motion-ease-exit);

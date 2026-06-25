@@ -22,6 +22,7 @@ import {
   formatDistCssFiles,
   formatTokenValue,
   generateBorderWidthUtilitiesCSS,
+  generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
   generateRootDimensionsCSS,
   generateSpacingModesCSS,
@@ -332,6 +333,7 @@ function generateModularGlobalsCSS(
       './motion-snappy.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
+      './motion-utilities.css',
       './spacing-utilities.css',
     ],
     tailwindPrefix: 'nx',
@@ -466,6 +468,16 @@ export async function generateModular({
     const borderWidth = generateBorderWidthUtilitiesCSS(borderwidthTokens);
     writeModularFile(distDir, 'borderwidth-utilities.css', borderWidth.css);
     console.log(`  ✓ ${borderWidth.count} border width utilities`);
+    totalFiles++;
+  }
+
+  // Generate motion duration utilities (use first mode as reference)
+  if (primitives.motion && primitives.motion.modes) {
+    const firstMode = primitives.motion.modes[0];
+    const motionTokens = collectMotionTokens(TOKENS_DIR, firstMode);
+    const motionUtilities = generateMotionUtilitiesCSS(motionTokens);
+    writeModularFile(distDir, 'motion-utilities.css', motionUtilities.css);
+    console.log(`  ✓ ${motionUtilities.count} motion duration utilities`);
     totalFiles++;
   }
 

@@ -18,6 +18,7 @@ const STYLES_FILES = [
   'motion-snappy.css',
   'typography-utilities.css',
   'borderwidth-utilities.css',
+  'motion-utilities.css',
   'spacing-utilities.css',
 ];
 

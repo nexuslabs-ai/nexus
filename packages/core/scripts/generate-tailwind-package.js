@@ -23,6 +23,7 @@ import {
   formatTokenValue,
   generateBaseLayerCSS,
   generateBorderWidthUtilitiesCSS,
+  generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
   generateRootDimensionsCSS,
   generateSpacingModesCSS,
@@ -496,6 +497,7 @@ function generateNexusCSS(
       './variables.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
+      './motion-utilities.css',
       './spacing-utilities.css',
     ],
     tailwindPrefix: 'nx',
@@ -607,6 +609,14 @@ export async function generateTailwindPackage(
   if (spacingUtilities.css) {
     writeDistFile('spacing-utilities.css', spacingUtilities.css);
     log.success(`Generated ${spacingUtilities.count} spacing role utilities`);
+  }
+
+  const motionUtilities = generateMotionUtilitiesCSS(
+    collectMotionTokens(TOKENS_DIR, usedModes.motion || 'snappy')
+  );
+  if (motionUtilities.css) {
+    writeDistFile('motion-utilities.css', motionUtilities.css);
+    log.success(`Generated ${motionUtilities.count} motion duration utilities`);
   }
 
   // `spacingDefault` controls which mode lands under `:root, [data-style="X"]`.

@@ -1217,9 +1217,11 @@ export function collectBorderwidthTokens(tokensDir, mode) {
 
 /**
  * Collect motion token mappings from a mode file.
- * Returns array of { cssName, varRef } for @theme block. The source primitive
- * variables stay namespaced as --nx-motion-* while Tailwind sees the standard
- * --duration-* and --ease-* namespaces for utility generation.
+ * Returns array of { group, key, cssName, varRef }. The source primitive
+ * variables stay namespaced as --nx-motion-*; easing tokens also enter
+ * Tailwind's --ease-* namespace, while duration tokens use explicit
+ * @utility declarations because Tailwind v4 does not codegen named
+ * duration-* utilities from --duration-* theme vars.
  *
  * @param {string} tokensDir - Path to tokens directory
  * @param {string} mode - Motion mode (e.g., 'snappy')
@@ -1250,6 +1252,8 @@ export function collectMotionTokens(tokensDir, mode) {
     for (const key of Object.keys(groupData)) {
       if (key.startsWith('$')) continue;
       tokens.push({
+        group,
+        key,
         cssName: `${group}-${key}`,
         varRef: `var(--nx-motion-${group}-${key})`,
       });
@@ -1257,6 +1261,37 @@ export function collectMotionTokens(tokensDir, mode) {
   }
 
   return tokens;
+}
+
+/**
+ * Generate `@utility` declarations for motion duration tokens.
+ *
+ * Tailwind v4 codegens named easing utilities from --ease-* theme vars, but
+ * not named duration utilities from --duration-* vars. Emit duration-* as
+ * explicit utilities so classes such as nx:duration-fast are real.
+ *
+ * @param {{group?: string, key?: string, cssName: string, varRef: string}[]} motionTokens
+ * @returns {{css: string, count: number}}
+ */
+export function generateMotionUtilitiesCSS(motionTokens) {
+  const durationTokens = motionTokens.filter(
+    (token) => token.group === 'duration'
+  );
+
+  if (durationTokens.length === 0) {
+    return { css: '', count: 0 };
+  }
+
+  let css = `/* Motion duration utilities - data-driven from canonical motion tokens. */\n\n`;
+
+  for (const token of durationTokens) {
+    css += `@utility duration-${token.key} {\n`;
+    css += `  --tw-duration: ${token.varRef};\n`;
+    css += `  transition-duration: ${token.varRef};\n`;
+    css += `}\n\n`;
+  }
+
+  return { css, count: durationTokens.length };
 }
 
 /**
@@ -1447,7 +1482,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (Vega defaults; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
- * @param {object[]} config.motionTokens - Array of { cssName, varRef } for duration/ease
+ * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
  * @param {object[]} config.shadowTokens - Array of { cssName, value } for shadows
  * @param {object[]} [config.darkSemanticTokens] - Array of { cssName, value } for dark mode semantic tokens
  * @param {string} [config.darkSelector='.dark'] - CSS selector for dark mode
@@ -1537,7 +1572,9 @@ export function generateThemeCSS(config) {
   // Motion tokens
   if (motionTokens.length > 0) {
     css += `\n  /* Motion tokens */\n`;
-    for (const token of motionTokens) {
+    for (const token of motionTokens.filter(
+      (motionToken) => motionToken.group === 'ease'
+    )) {
       css += `  --${token.cssName}: ${token.varRef};\n`;
     }
   }
