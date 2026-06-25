@@ -28,6 +28,19 @@ entry point:
 The second import matters: Tailwind doesn't scan `node_modules`, so the
 utilities used _inside_ the compiled components ship as prebuilt CSS.
 
+## Declare native color scheme
+
+Add this to your app shell so the browser can theme native controls and the
+initial page canvas before JavaScript loads:
+
+```html
+<meta name="color-scheme" content="light dark" />
+```
+
+`@nexus/tailwind` also emits the matching CSS policy: `:root` advertises
+light/dark support, `.dark` pins native UI to dark, and light mode stays pinned
+when `.dark` is absent.
+
 ## Render a component
 
 Every utility is prefixed with `nx:` and every color is a semantic token, so
