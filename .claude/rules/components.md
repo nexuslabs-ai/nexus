@@ -186,11 +186,11 @@ Radix appends portal content to `document.body`. For a **single** overlay open b
 
 ### Consumer override
 
-The utilities reference the CSS variable (`nx:z-sticky` → `z-index: var(--z-index-sticky)`), so a consumer re-points a whole layer by overriding the variable — no component changes:
+The utilities reference the prefixed runtime CSS variable (`nx:z-sticky` → `z-index: var(--nx-z-index-sticky)` — the `nx` prefix lands on the runtime variable even though the `@theme` source key is unprefixed), so a consumer re-points a whole layer by overriding it — no component changes:
 
 ```css
 /* In the consumer's stylesheet, loaded after Nexus */
 :root {
-  --z-index-sticky: 35; /* raise the app shell's sticky chrome above the default 30 */
+  --nx-z-index-sticky: 35; /* raise the app shell's sticky chrome above the default 30 */
 }
 ```
