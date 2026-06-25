@@ -120,7 +120,7 @@ export function PlanSheet({
                   />
                   <div className="nx:flex-1 nx:space-y-1">
                     <div className="nx:flex nx:items-baseline nx:justify-between nx:gap-2">
-                      <span className="nx:text-foreground nx:font-medium">
+                      <span className="nx:text-foreground nx:typography-label-default">
                         {plan.name}
                       </span>
                       <span className="nx:text-foreground nx:typography-label-default">

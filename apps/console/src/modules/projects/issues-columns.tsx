@@ -94,7 +94,7 @@ export const issueColumns: ColumnDef<Issue>[] = [
       <Link
         to="/m/projects/$id"
         params={{ id: row.original.id }}
-        className="nx:text-foreground nx:font-medium nx:hover:underline"
+        className="nx:text-foreground nx:typography-label-default nx:hover:underline"
       >
         {row.original.title}
       </Link>

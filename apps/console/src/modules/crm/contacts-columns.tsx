@@ -85,7 +85,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
       <Link
         to="/m/crm/$id"
         params={{ id: row.original.id }}
-        className="nx:text-foreground nx:font-medium nx:hover:underline"
+        className="nx:text-foreground nx:typography-label-default nx:hover:underline"
       >
         {row.original.name}
       </Link>

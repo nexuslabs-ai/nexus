@@ -336,13 +336,13 @@ function DatePickerDayButton({
       data-today={isToday}
       data-outside={isOutside || undefined}
       className={cn(
-        'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:typography-body-default nx:leading-none',
+        'nx:flex nx:aspect-square nx:size-(--cell-size) nx:min-w-(--cell-size) nx:typography-body-default',
         'nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
         isOutside && 'nx:text-muted-foreground-subtle',
         // Keyboard-focus ring on the focused day (modality-independent — paints above neighbours).
         'nx:group-data-[focused=true]/day:relative nx:group-data-[focused=true]/day:z-10 nx:group-data-[focused=true]/day:outline-2 nx:group-data-[focused=true]/day:outline-focus-default nx:group-data-[focused=true]/day:outline-offset-(--focus-offset)',
         // Today → inner error circle while keeping the button target at cell size.
-        'nx:data-[today=true]:relative nx:data-[today=true]:bg-transparent nx:data-[today=true]:font-medium nx:data-[today=true]:text-error-foreground nx:data-[today=true]:hover:bg-transparent nx:data-[today=true]:hover:text-error-foreground',
+        'nx:data-[today=true]:relative nx:data-[today=true]:bg-transparent nx:data-[today=true]:typography-label-default nx:data-[today=true]:text-error-foreground nx:data-[today=true]:hover:bg-transparent nx:data-[today=true]:hover:text-error-foreground',
         'nx:data-[today=true]:before:absolute nx:data-[today=true]:before:top-1/2 nx:data-[today=true]:before:left-1/2 nx:data-[today=true]:before:size-(--today-marker-size) nx:data-[today=true]:before:-translate-x-1/2 nx:data-[today=true]:before:-translate-y-1/2 nx:data-[today=true]:before:rounded-full nx:data-[today=true]:before:bg-error-background nx:data-[today=true]:hover:before:bg-error-background-hover',
         "nx:data-[today=true]:before:content-['']",
         // Selected single + range endpoints → solid primary fill.

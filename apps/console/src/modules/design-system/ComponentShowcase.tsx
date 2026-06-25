@@ -231,7 +231,7 @@ export function ComponentShowcase() {
                 Container — p-container, gap-container
               </span>
               <div className="nx:bg-container nx:border nx:border-border-default nx:rounded-lg nx:flex nx:flex-col nx:p-container nx:gap-container">
-                <h4 className="nx:text-foreground nx:font-medium">
+                <h4 className="nx:text-foreground nx:typography-label-default">
                   Card header
                 </h4>
                 <p className="nx:typography-body-default nx:text-muted-foreground">
@@ -260,7 +260,7 @@ export function ComponentShowcase() {
                     key={label}
                     className="nx:flex nx:flex-col nx:gap-layout-stack"
                   >
-                    <span className="nx:typography-label-small nx:font-semibold nx:text-foreground">
+                    <span className="nx:typography-label-caps nx:text-foreground">
                       {label}
                     </span>
                     <span className="nx:typography-label-default nx:text-muted-foreground">
@@ -309,25 +309,27 @@ export function ComponentShowcase() {
         >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
             <div className="nx:border nx:border-border-default nx:bg-container nx:rounded-lg nx:p-4">
-              <h3 className="nx:font-medium">Container</h3>
+              <h3 className="nx:typography-label-default">Container</h3>
               <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Default container background
               </p>
             </div>
             <div className="nx:border nx:border-border-default nx:bg-popover nx:rounded-lg nx:p-4">
-              <h3 className="nx:font-medium">Popover</h3>
+              <h3 className="nx:typography-label-default">Popover</h3>
               <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Popover background color
               </p>
             </div>
             <div className="nx:bg-muted nx:rounded-lg nx:p-4">
-              <h3 className="nx:text-muted-foreground nx:font-medium">Muted</h3>
+              <h3 className="nx:text-muted-foreground nx:typography-label-default">
+                Muted
+              </h3>
               <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Muted background with muted foreground
               </p>
             </div>
             <div className="nx:bg-background-hover nx:rounded-lg nx:p-4">
-              <h3 className="nx:text-foreground nx:font-medium">
+              <h3 className="nx:text-foreground nx:typography-label-default">
                 Background Hover
               </h3>
               <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">

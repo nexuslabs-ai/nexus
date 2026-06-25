@@ -239,7 +239,7 @@ function PaymentCard({ method }: { method: PaymentMethod }) {
             <IconCreditCard />
           </div>
           <div className="nx:min-w-0">
-            <p className="nx:text-foreground nx:font-medium">
+            <p className="nx:text-foreground nx:typography-label-default">
               {method.brand} ···· {method.last4}
             </p>
             <p className="nx:text-muted-foreground nx:typography-body-default nx:tabular-nums">

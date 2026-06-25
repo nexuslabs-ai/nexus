@@ -48,7 +48,7 @@ export function IconShowcase() {
                 size={20}
                 className="nx:text-foreground"
               />
-              <span className="nx:text-muted-foreground nx:text-[10px] nx:text-center nx:leading-tight">
+              <span className="nx:text-muted-foreground nx:text-[10px] nx:text-center">
                 {name}
               </span>
             </div>

@@ -171,13 +171,17 @@ function ChartTooltipLabel({
 
   if (labelFormatter) {
     return (
-      <div className={cn('nx:font-medium', labelClassName)}>
+      <div className={cn('nx:typography-label-default', labelClassName)}>
         {labelFormatter(value, payload)}
       </div>
     );
   }
   if (!value) return null;
-  return <div className={cn('nx:font-medium', labelClassName)}>{value}</div>;
+  return (
+    <div className={cn('nx:typography-label-default', labelClassName)}>
+      {value}
+    </div>
+  );
 }
 
 function ChartTooltipContent({
@@ -324,7 +328,7 @@ function ChartTooltipItem({
       />
       <div
         className={cn(
-          'nx:flex nx:flex-1 nx:justify-between nx:leading-none',
+          'nx:flex nx:flex-1 nx:justify-between',
           nestLabel ? 'nx:items-end' : 'nx:items-center'
         )}
       >

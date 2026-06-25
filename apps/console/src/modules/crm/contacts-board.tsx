@@ -154,7 +154,9 @@ function BoardCard({ contact }: { contact: Contact }) {
         isDragging ? 'nx:opacity-50' : ''
       }`}
     >
-      <div className="nx:text-foreground nx:font-medium">{contact.name}</div>
+      <div className="nx:text-foreground nx:typography-label-default">
+        {contact.name}
+      </div>
       <div className="nx:text-muted-foreground nx:typography-label-default">
         {contact.company}
       </div>

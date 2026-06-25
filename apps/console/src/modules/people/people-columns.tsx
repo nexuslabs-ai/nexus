@@ -91,7 +91,7 @@ export const memberColumns: ColumnDef<Member>[] = [
         <Link
           to="/m/people/$id"
           params={{ id: row.original.id }}
-          className="nx:text-foreground nx:font-medium nx:hover:underline"
+          className="nx:text-foreground nx:typography-label-default nx:hover:underline"
         >
           {row.original.name}
         </Link>

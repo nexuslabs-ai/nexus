@@ -14,7 +14,7 @@ export function ContactCard({ contact }: { contact: Contact }) {
         <Link
           to="/m/crm/$id"
           params={{ id: contact.id }}
-          className="nx:text-foreground nx:font-medium nx:hover:underline"
+          className="nx:text-foreground nx:typography-label-default nx:hover:underline"
         >
           {contact.name}
         </Link>
