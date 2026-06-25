@@ -2,8 +2,23 @@ import * as React from 'react';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
+import {
+  containsComposedSlot,
+  defaultOverlayLayout,
+  overlayContentVariants,
+  overlayHeaderVariants,
+  type OverlayLayoutContextValue,
+} from '@/components/ui/overlay-layout/overlay-layout';
 import { IconX } from '@/lib/icons';
 import { cn } from '@/lib/utils';
+
+type DialogLayoutContextValue = Pick<
+  OverlayLayoutContextValue,
+  'variant' | 'buttonOrientation'
+>;
+
+const DialogLayoutContext =
+  React.createContext<DialogLayoutContextValue>(defaultOverlayLayout);
 
 /**
  * Dialog
@@ -87,14 +102,35 @@ function DialogOverlay({ className, ...props }: DialogOverlayProps) {
  *
  * Props for the DialogContent component.
  */
-interface DialogContentProps extends React.ComponentProps<
-  typeof DialogPrimitive.Content
+interface DialogContentProps extends Omit<
+  React.ComponentProps<typeof DialogPrimitive.Content>,
+  'title'
 > {
   /**
    * Whether to show the close button in the top-right corner.
    * @default true
    */
   showCloseButton?: boolean;
+
+  /**
+   * Optional title for a prop-driven header, rendered before `children`.
+   * Ignored when a composed `DialogHeader` child is present. Detection covers
+   * a direct child or a Fragment-wrapped header; a header nested inside another
+   * element is not detected.
+   */
+  title?: React.ReactNode;
+
+  /**
+   * Optional description for a prop-driven header, rendered before `children`.
+   * Ignored when a composed `DialogHeader` child is present.
+   */
+  description?: React.ReactNode;
+
+  /**
+   * Optional body content rendered in a generated `DialogBody` before
+   * `children`. Ignored when a composed `DialogBody` child is present.
+   */
+  body?: React.ReactNode;
 }
 
 /**
@@ -115,49 +151,59 @@ interface DialogContentProps extends React.ComponentProps<
 function DialogContent({
   className,
   children,
+  title,
+  description,
+  body,
   showCloseButton = true,
   ...props
 }: DialogContentProps) {
+  const showGeneratedHeader =
+    !containsComposedSlot(children, DialogHeader) &&
+    (title != null || description != null);
+  const showGeneratedBody =
+    !containsComposedSlot(children, DialogBody) && body != null;
+
   return (
     <DialogPortal>
       <DialogOverlay />
-      <DialogPrimitive.Content
-        data-slot="dialog-content"
-        className={cn(
-          'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
-          'nx:-translate-x-1/2 nx:-translate-y-1/2',
-          'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
-          'nx:data-[state=open]:duration-300 nx:data-[state=closed]:duration-150',
-          'nx:data-[state=open]:ease-out nx:data-[state=closed]:ease-in',
-          'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-          'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-          'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
-          'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
-          'nx:sm:rounded-lg',
-          className
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close-button"
-            className={cn(
-              'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:p-1 nx:text-muted-foreground-subtle',
-              'nx:after:absolute nx:after:-inset-2.5 nx:lg:after:hidden',
-              'nx:transition-colors',
-              'nx:motion-reduce:transition-none',
-              'nx:hover:bg-background-hover nx:hover:text-foreground',
-              'nx:focus-visible:bg-background-hover nx:focus-visible:text-foreground',
-              'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-              'nx:disabled:pointer-events-none'
-            )}
-          >
-            <IconX className="nx:size-4" />
-            <span className="nx:sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
+      <DialogLayoutContext.Provider value={defaultOverlayLayout}>
+        <DialogPrimitive.Content
+          data-slot="dialog-content"
+          data-variant={defaultOverlayLayout.variant}
+          data-orientation={defaultOverlayLayout.buttonOrientation}
+          className={cn(overlayContentVariants(), className)}
+          {...props}
+        >
+          {showGeneratedHeader && (
+            <DialogHeader>
+              {title != null && <DialogTitle>{title}</DialogTitle>}
+              {description != null && (
+                <DialogDescription>{description}</DialogDescription>
+              )}
+            </DialogHeader>
+          )}
+          {showGeneratedBody && <DialogBody>{body}</DialogBody>}
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close
+              data-slot="dialog-close-button"
+              className={cn(
+                'nx:absolute nx:right-4 nx:top-4 nx:rounded-sm nx:p-1 nx:text-muted-foreground-subtle',
+                'nx:after:absolute nx:after:-inset-2.5 nx:lg:after:hidden',
+                'nx:transition-colors',
+                'nx:motion-reduce:transition-none',
+                'nx:hover:bg-background-hover nx:hover:text-foreground',
+                'nx:focus-visible:bg-background-hover nx:focus-visible:text-foreground',
+                'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+                'nx:disabled:pointer-events-none'
+              )}
+            >
+              <IconX className="nx:size-4" />
+              <span className="nx:sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </DialogLayoutContext.Provider>
     </DialogPortal>
   );
 }
@@ -183,11 +229,14 @@ interface DialogHeaderProps extends React.ComponentProps<'div'> {}
  * ```
  */
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
+  const layout = React.useContext(DialogLayoutContext);
+
   return (
     <div
       data-slot="dialog-header"
+      data-variant={layout.variant}
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1 nx:px-6 nx:text-center nx:sm:text-left',
+        overlayHeaderVariants({ variant: layout.variant }),
         className
       )}
       {...props}
@@ -246,9 +295,12 @@ interface DialogFooterProps extends React.ComponentProps<'div'> {}
  * ```
  */
 function DialogFooter({ className, ...props }: DialogFooterProps) {
+  const layout = React.useContext(DialogLayoutContext);
+
   return (
     <div
       data-slot="dialog-footer"
+      data-orientation={layout.buttonOrientation}
       className={cn(
         'nx:flex nx:flex-col-reverse nx:px-6 nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
         className

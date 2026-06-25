@@ -1,70 +1,25 @@
 import * as React from 'react';
 
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
-import { cva, type VariantProps } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
 
 import { buttonVariants } from '@/components/ui/button';
+import {
+  defaultOverlayLayout,
+  overlayContentVariants,
+  overlayFooterVariants,
+  overlayHeaderVariants,
+  type OverlayLayoutContextValue,
+  type OverlayVariant,
+  resolveOverlayButtonOrientation,
+} from '@/components/ui/overlay-layout/overlay-layout';
 import { cn } from '@/lib/utils';
 
-const alertDialogContentVariants = cva(
-  [
-    'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
-    'nx:-translate-x-1/2 nx:-translate-y-1/2',
-    'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
-    'nx:data-[state=open]:duration-300 nx:data-[state=closed]:duration-150',
-    'nx:data-[state=open]:ease-out nx:data-[state=closed]:ease-in',
-    'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-    'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-    'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
-    'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
-    'nx:sm:rounded-lg',
-  ].join(' ')
-);
-
-const alertDialogHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1 nx:px-6', {
-  variants: {
-    variant: {
-      default: 'nx:text-center nx:sm:text-left',
-      center: 'nx:items-center nx:text-center',
-    },
-  },
-  defaultVariants: {
-    variant: 'default',
-  },
-});
-
-const alertDialogFooterVariants = cva('nx:flex nx:gap-2 nx:px-6', {
-  variants: {
-    orientation: {
-      horizontal:
-        'nx:flex-col nx:sm:flex-row nx:sm:items-center nx:sm:justify-end',
-      vertical: 'nx:flex-col nx:items-stretch nx:*:w-full',
-    },
-  },
-  defaultVariants: {
-    orientation: 'horizontal',
-  },
-});
-
-type AlertDialogVariant = NonNullable<
-  VariantProps<typeof alertDialogHeaderVariants>['variant']
->;
-type AlertDialogButtonOrientation = NonNullable<
-  VariantProps<typeof alertDialogFooterVariants>['orientation']
->;
-
-type AlertDialogLayoutContextValue = {
-  variant: AlertDialogVariant;
-  buttonOrientation: AlertDialogButtonOrientation;
-};
-
-const defaultAlertDialogLayout: AlertDialogLayoutContextValue = {
-  variant: 'default',
-  buttonOrientation: 'horizontal',
-};
+type AlertDialogVariant = OverlayVariant;
+type AlertDialogLayoutContextValue = OverlayLayoutContextValue;
 
 const AlertDialogLayoutContext =
-  React.createContext<AlertDialogLayoutContextValue>(defaultAlertDialogLayout);
+  React.createContext<AlertDialogLayoutContextValue>(defaultOverlayLayout);
 
 /**
  * AlertDialog
@@ -184,7 +139,7 @@ function AlertDialogContent({
   variant = 'default',
   ...props
 }: AlertDialogContentProps) {
-  const buttonOrientation = variant === 'center' ? 'vertical' : 'horizontal';
+  const buttonOrientation = resolveOverlayButtonOrientation(variant);
 
   return (
     <AlertDialogPortal>
@@ -195,7 +150,7 @@ function AlertDialogContent({
           data-variant={variant}
           data-orientation={buttonOrientation}
           className={cn(
-            alertDialogContentVariants(),
+            overlayContentVariants(),
             variant === 'center' && 'nx:max-w-xs',
             className
           )}
@@ -214,7 +169,7 @@ function AlertDialogContent({
 interface AlertDialogHeaderProps
   extends
     React.ComponentProps<'div'>,
-    VariantProps<typeof alertDialogHeaderVariants> {}
+    VariantProps<typeof overlayHeaderVariants> {}
 
 /**
  * AlertDialogHeader
@@ -242,7 +197,7 @@ function AlertDialogHeader({
       data-slot="alert-dialog-header"
       data-variant={resolvedVariant}
       className={cn(
-        alertDialogHeaderVariants({ variant: resolvedVariant }),
+        overlayHeaderVariants({ variant: resolvedVariant }),
         className
       )}
       {...props}
@@ -308,7 +263,7 @@ function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
       data-slot="alert-dialog-footer"
       data-orientation={layout.buttonOrientation}
       className={cn(
-        alertDialogFooterVariants({ orientation: layout.buttonOrientation }),
+        overlayFooterVariants({ orientation: layout.buttonOrientation }),
         className
       )}
       {...props}
