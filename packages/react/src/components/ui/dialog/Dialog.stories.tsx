@@ -212,6 +212,180 @@ export const ScrollableContent: Story = {
   ),
 };
 
+export const PropDrivenContent: Story = {
+  render: (_args) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open invite dialog</Button>
+      </DialogTrigger>
+      <DialogContent
+        title="Invite teammate"
+        description="Send an invitation to a teammate and assign their first workspace role."
+        body={
+          <p className="nx:typography-body-default nx:text-foreground">
+            The invitation expires in seven days and can be revoked from team
+            settings.
+          </p>
+        }
+      >
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button>Send invite</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open invite dialog' })
+    );
+
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Invite teammate',
+    });
+    await expect(dialog).toHaveAttribute('data-variant', 'default');
+    await expect(dialog).toHaveAttribute('data-orientation', 'horizontal');
+
+    await expect(
+      document.querySelector('[data-slot="dialog-header"]')
+    ).toHaveAttribute('data-variant', 'default');
+    await expect(
+      document.querySelector('[data-slot="dialog-title"]')
+    ).toHaveTextContent('Invite teammate');
+    await expect(
+      document.querySelector('[data-slot="dialog-description"]')
+    ).toHaveTextContent('Send an invitation to a teammate');
+    await expect(
+      document.querySelector('[data-slot="dialog-body"]')
+    ).toHaveClass('nx:px-6');
+    await expect(dialog).toHaveTextContent(
+      'The invitation expires in seven days'
+    );
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
+  },
+};
+
+export const ComposedHeaderPrecedence: Story = {
+  render: (_args) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open precedence dialog</Button>
+      </DialogTrigger>
+      <DialogContent
+        title="Prop title"
+        description="Prop description"
+        body="Prop body"
+      >
+        <>
+          <DialogHeader>
+            <DialogTitle>Composed title</DialogTitle>
+            <DialogDescription>
+              The composed header takes precedence over generated title props.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogBody>
+            <p className="nx:typography-body-default">
+              The composed body takes precedence over the body prop.
+            </p>
+          </DialogBody>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button>Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open precedence dialog' })
+    );
+
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Composed title',
+    });
+    const titles = document.querySelectorAll('[data-slot="dialog-title"]');
+    const bodies = document.querySelectorAll('[data-slot="dialog-body"]');
+
+    await expect(titles).toHaveLength(1);
+    await expect(titles[0]).toHaveTextContent('Composed title');
+    await expect(bodies).toHaveLength(1);
+    await expect(dialog).not.toHaveTextContent('Prop title');
+    await expect(dialog).not.toHaveTextContent('Prop description');
+    await expect(dialog).not.toHaveTextContent('Prop body');
+    await expect(dialog).toHaveTextContent(
+      'The composed body takes precedence over the body prop.'
+    );
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
+  },
+};
+
+export const ComposedUsageCompatibility: Story = {
+  render: (_args) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open composed dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Composed API</DialogTitle>
+          <DialogDescription>
+            Existing composed Dialog usage continues to render without prop
+            shorthands.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody>
+          <p className="nx:typography-body-default">
+            This body is authored with DialogBody.
+          </p>
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button>Done</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open composed dialog' })
+    );
+
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Composed API',
+    });
+    await expect(dialog).toHaveTextContent(
+      'Existing composed Dialog usage continues to render'
+    );
+    await expect(
+      document.querySelector('[data-slot="dialog-body"]')
+    ).toHaveTextContent('This body is authored with DialogBody.');
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
+  },
+};
+
 // ============================================
 // INTERACTION TESTS
 // ============================================
@@ -370,14 +544,22 @@ export const WithDataAttributes: Story = {
     });
 
     const content = document.querySelector('[data-slot="dialog-content"]');
+    await expect(content).toHaveAttribute('data-variant', 'default');
+    await expect(content).toHaveAttribute('data-orientation', 'horizontal');
     await expect(content).toHaveClass('nx:py-6', 'nx:gap-4');
     await expect(content).not.toHaveClass('nx:p-6');
     await expect(
       document.querySelector('[data-slot="dialog-header"]')
     ).toHaveClass('nx:px-6');
     await expect(
+      document.querySelector('[data-slot="dialog-header"]')
+    ).toHaveAttribute('data-variant', 'default');
+    await expect(
       document.querySelector('[data-slot="dialog-footer"]')
     ).toHaveClass('nx:px-6');
+    await expect(
+      document.querySelector('[data-slot="dialog-footer"]')
+    ).toHaveAttribute('data-orientation', 'horizontal');
     await expect(
       document.querySelector('[data-slot="dialog-body"]')
     ).toHaveClass('nx:px-6');
