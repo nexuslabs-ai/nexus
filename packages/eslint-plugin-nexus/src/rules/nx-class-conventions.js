@@ -55,7 +55,7 @@ export const RAW_LETTER_SPACINGS = [
   'widest',
 ];
 
-const NAMED_VARIANT = String.raw`[\w-]+(?:\[[^\]]+\])?(?:\/[\w-]+)?:`;
+const NAMED_VARIANT = String.raw`@?[\w-]+(?:\[[^\s]+?\])?(?:\/[\w-]+)?:`;
 const ARBITRARY_VARIANT = String.raw`\[[^\s]+?\]:`;
 const CHILD_VARIANT = String.raw`\*{1,2}:`;
 const NX_MODIFIER_CHAIN = String.raw`(?:${NAMED_VARIANT}|${ARBITRARY_VARIANT}|${CHILD_VARIANT})*`;

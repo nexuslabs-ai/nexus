@@ -141,6 +141,18 @@ ruleTester.run('nx-class-conventions', rule, {
       errors: [{ messageId: 'rawFontWeight' }],
     },
     {
+      code: "const c = 'nx:has-[[role=checkbox]]:font-medium';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
+      code: "const c = 'nx:group-has-[[role=checkbox]]:font-semibold';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
+      code: "const c = 'nx:@md/field-group:font-medium';",
+      errors: [{ messageId: 'rawFontWeight' }],
+    },
+    {
       code: "const c = 'nx:leading-none';",
       errors: [{ messageId: 'rawLineHeight' }],
     },
@@ -149,11 +161,19 @@ ruleTester.run('nx-class-conventions', rule, {
       errors: [{ messageId: 'rawLineHeight' }],
     },
     {
+      code: "const c = 'nx:not-has-[>[data-align^=block]]:leading-tight';",
+      errors: [{ messageId: 'rawLineHeight' }],
+    },
+    {
       code: "const c = 'nx:tracking-wide';",
       errors: [{ messageId: 'rawLetterSpacing' }],
     },
     {
       code: 'const c = `nx:tracking-[0.14em] ${x}`;',
+      errors: [{ messageId: 'rawLetterSpacing' }],
+    },
+    {
+      code: "const c = 'nx:has-[[data-slot=input-group-control]:focus-visible]:tracking-wide';",
       errors: [{ messageId: 'rawLetterSpacing' }],
     },
     {
