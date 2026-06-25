@@ -38,6 +38,8 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = 'nx:focus:typography-label-default';",
     // The code-* family is live too.
     "const c = 'nx:typography-code-block';",
+    // Shortcut hint typography is a live one-level composite.
+    "const c = 'nx:ml-auto nx:typography-shortcut nx:text-muted-foreground';",
   ],
   invalid: [
     {

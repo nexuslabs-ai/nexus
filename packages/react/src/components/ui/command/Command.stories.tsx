@@ -615,6 +615,13 @@ export const WithDataAttributes: Story = {
     await expect(
       canvasElement.querySelector('[data-slot="command-shortcut"]')
     ).toBeInTheDocument();
+
+    const shortcut = canvasElement.querySelector(
+      '[data-slot="command-shortcut"]'
+    );
+    await expect(shortcut).toHaveClass('nx:typography-shortcut');
+    await expect(shortcut).not.toHaveClass('nx:text-xs');
+    await expect(shortcut).not.toHaveClass('nx:tracking-widest');
   },
 };
 

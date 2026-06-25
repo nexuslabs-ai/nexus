@@ -77,6 +77,16 @@ const SCALE: {
       },
     ],
   },
+  {
+    group: 'Shortcut',
+    tiers: [
+      {
+        cls: 'nx:typography-shortcut',
+        name: 'shortcut',
+        sample: '⌘⇧P',
+      },
+    ],
+  },
 ];
 
 const FAMILIES: {
@@ -127,9 +137,9 @@ export function Typography() {
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">The scale</h2>
         <p className="nx:typography-body-small nx:text-muted-foreground nx:mb-6 nx:max-w-[64ch]">
-          Eleven tiers across four groups, every one at normal (0)
-          letter-spacing — the lone exception is label-caps, which adds +0.8px
-          for all-caps legibility.
+          Twelve composite tiers across five groups. Most use normal (0)
+          letter-spacing; label-caps adds +0.8px for all-caps legibility, and
+          shortcut adds +1.6px for compact key-command hints.
         </p>
         {SCALE.map((group) => (
           <div key={group.group} className="nx:mb-8">

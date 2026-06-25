@@ -50,6 +50,14 @@
   text-wrap: pretty;
 }
 
+@utility typography-shortcut {
+  font-family: var(--nx-typography-family-font-sans);
+  font-size: var(--nx-typography-size-xs);
+  font-weight: var(--nx-typography-weight-normal);
+  line-height: var(--nx-typography-line-height-xs);
+  letter-spacing: var(--nx-typography-letterspacing-widest);
+}
+
 @utility typography-label-default {
   font-family: var(--nx-typography-family-font-sans);
   font-size: var(--nx-typography-size-sm);

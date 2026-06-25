@@ -69,6 +69,17 @@
       "$description": "12"
     }
   },
+  "shortcut": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "{family.font-sans}",
+      "fontSize": "{size.xs}",
+      "fontWeight": "{weight.normal}",
+      "lineHeight": "{line-height.xs}",
+      "letterSpacing": "{letterspacing.widest}"
+    },
+    "$description": "Keyboard shortcut hint text in command palettes, menus, and menubars"
+  },
   "label": {
     "default": {
       "$type": "typography",

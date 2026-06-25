@@ -312,7 +312,10 @@ export const WithDataAttributes: Story = {
         <MenubarContent>
           <MenubarLabel>Actions</MenubarLabel>
           <MenubarSeparator />
-          <MenubarItem>Open</MenubarItem>
+          <MenubarItem>
+            Open
+            <MenubarShortcut>⌘O</MenubarShortcut>
+          </MenubarItem>
           <MenubarItem variant="destructive">Delete</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
@@ -342,7 +345,15 @@ export const WithDataAttributes: Story = {
       expect(
         document.querySelector('[data-slot="menubar-item"]')
       ).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-slot="menubar-shortcut"]')
+      ).toBeInTheDocument();
     });
+
+    const shortcut = document.querySelector('[data-slot="menubar-shortcut"]');
+    await expect(shortcut).toHaveClass('nx:typography-shortcut');
+    await expect(shortcut).not.toHaveClass('nx:text-xs');
+    await expect(shortcut).not.toHaveClass('nx:tracking-widest');
 
     // Check destructive variant
     const destructiveItem = document.querySelector(
