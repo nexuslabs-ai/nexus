@@ -64,9 +64,9 @@ function ResizableHandle({
       data-slot="resizable-handle"
       className={cn(
         'nx:relative nx:flex nx:w-px nx:items-center nx:justify-center nx:bg-border-default',
-        'nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-1 nx:after:-translate-x-1/2',
+        'nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-1 nx:after:-translate-x-1/2 nx:pointer-coarse:after:w-11',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-        'nx:aria-[orientation=horizontal]:h-px nx:aria-[orientation=horizontal]:w-full nx:aria-[orientation=horizontal]:after:left-0 nx:aria-[orientation=horizontal]:after:h-1 nx:aria-[orientation=horizontal]:after:w-full nx:aria-[orientation=horizontal]:after:translate-x-0 nx:aria-[orientation=horizontal]:after:-translate-y-1/2',
+        'nx:aria-[orientation=horizontal]:h-px nx:aria-[orientation=horizontal]:w-full nx:aria-[orientation=horizontal]:after:left-0 nx:aria-[orientation=horizontal]:after:h-1 nx:aria-[orientation=horizontal]:after:w-full nx:aria-[orientation=horizontal]:after:translate-x-0 nx:aria-[orientation=horizontal]:after:-translate-y-1/2 nx:pointer-coarse:aria-[orientation=horizontal]:after:h-11',
         'nx:aria-[orientation=horizontal]:[&>div]:rotate-90',
         className
       )}

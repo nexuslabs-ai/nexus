@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../button';
 
@@ -148,6 +148,31 @@ export const WithDataAttributes: Story = {
     const toaster = canvasElement.querySelector('[data-slot="toaster"]');
     await expect(toaster).toBeInTheDocument();
     await expect(toaster).toHaveAttribute('data-slot', 'toaster');
+  },
+};
+
+// The toaster rides the Nexus toast layer (z-index 100) via an inline style,
+// which outranks sonner's injected z-index:999999999 without `!important`.
+// Sonner only mounts its container once a toast exists, so fire one first.
+export const ToastLayer: Story = {
+  render: () => (
+    <>
+      <Button onClick={() => toast('Event has been created')}>
+        Show toast
+      </Button>
+      <Toaster />
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Show toast' }));
+    await waitFor(() => {
+      const toaster = document.body.querySelector<HTMLElement>(
+        '[data-sonner-toaster]'
+      );
+      expect(toaster).not.toBeNull();
+      expect(getComputedStyle(toaster as HTMLElement).zIndex).toBe('100');
+    });
   },
 };
 

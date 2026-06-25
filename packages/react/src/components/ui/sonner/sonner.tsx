@@ -9,7 +9,6 @@ import {
   IconInfoCircle,
   IconLoader2,
 } from '@/lib/icons';
-import { cn } from '@/lib/utils';
 
 /**
  * Track the active theme by observing the `.dark` class on the document root
@@ -75,8 +74,8 @@ const toasterThemeVars = {
 /**
  * Toaster
  *
- * Renders toast notifications, themed to Nexus tokens and riding the toast
- * layer (`nx:z-toast`). Mount once near the root of your app, then call
+ * Renders toast notifications, themed to Nexus tokens and riding the Nexus
+ * toast layer (z-index 100). Mount once near the root of your app, then call
  * `toast(...)` (re-exported here) from anywhere. The active theme follows the
  * `.dark` class automatically.
  *
@@ -94,18 +93,23 @@ const toasterThemeVars = {
  * }
  * ```
  */
-function Toaster({ className, style, ...props }: ToasterProps) {
+function Toaster({ style, ...props }: ToasterProps) {
   const theme = useToasterTheme();
-  // Force the toast layer with `!`: sonner injects a runtime <style> that
-  // hardcodes the container to z-index 999999999, which a non-important utility
-  // can't override.
   return (
     <div data-slot="toaster">
       <Sonner
         theme={theme}
         icons={toasterIcons}
-        className={cn('nx:z-toast!', className)}
-        style={{ ...toasterThemeVars, ...style } as React.CSSProperties}
+        style={
+          {
+            ...toasterThemeVars,
+            // Sonner injects a runtime <style> pinning the toaster to
+            // z-index:999999999 (not !important); an inline style outranks that
+            // selector rule, keeping us on the Nexus toast layer without `!`.
+            zIndex: 'var(--nx-z-index-toast, 100)',
+            ...style,
+          } as React.CSSProperties
+        }
         {...props}
       />
     </div>
