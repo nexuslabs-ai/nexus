@@ -1449,6 +1449,7 @@ export function generateThemeCSS(config) {
   css += `  /* Reset default Tailwind namespaces to enforce semantic tokens only */\n`;
   css += `  --color-*: initial;\n`;
   css += `  --spacing-*: initial;\n`;
+  css += `  --text-*: initial;\n`;
   css += `  --radius-*: initial;\n`;
   css += `  --shadow-*: initial;\n`;
   css += `  --breakpoint-*: initial;\n\n`;

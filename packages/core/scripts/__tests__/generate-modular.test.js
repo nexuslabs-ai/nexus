@@ -73,6 +73,11 @@ describe('generateModular', () => {
     expect(globals).toMatch(/--breakpoint-2xl: 96rem;/);
   });
 
+  it('emits the --text-*: initial reset in globals.css', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+    expect(globals).toMatch(/--text-\*:\s*initial;/);
+  });
+
   it('emits the native browser UI theme policy in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     expect(globals).toMatch(/:root \{\n\s*color-scheme:\s*light dark;\n\s*\}/);

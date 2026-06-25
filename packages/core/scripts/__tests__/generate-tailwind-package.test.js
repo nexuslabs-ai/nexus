@@ -303,6 +303,13 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(/--spacing-\*:\s*initial;/);
   });
 
+  it('preserves the --text-*: initial reset in @theme', () => {
+    // Raw named Tailwind font-size utilities must not leak around the
+    // typography composites that own type sizing.
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).toMatch(/--text-\*:\s*initial;/);
+  });
+
   it('registers numeric --spacing-N in @theme with direct px (not var() refs)', () => {
     // The numeric subset seeds @theme so Tailwind codegens nx:p-N / nx:m-N /
     // nx:h-N / nx:gap-N. After migration these are direct px values, not

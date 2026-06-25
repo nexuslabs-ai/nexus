@@ -18,6 +18,7 @@
   /* Reset default Tailwind namespaces to enforce semantic tokens only */
   --color-*: initial;
   --spacing-*: initial;
+  --text-*: initial;
   --radius-*: initial;
   --shadow-*: initial;
   --breakpoint-*: initial;
