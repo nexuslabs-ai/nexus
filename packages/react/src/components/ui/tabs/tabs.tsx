@@ -5,6 +5,9 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
+const useIsomorphicLayoutEffect =
+  typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+
 /**
  * Tabs
  *
@@ -29,8 +32,9 @@ const Tabs = TabsPrimitive.Root;
  *
  * Props for the TabsList component.
  */
-interface TabsListProps extends React.ComponentProps<
-  typeof TabsPrimitive.List
+interface TabsListProps extends Omit<
+  React.ComponentProps<typeof TabsPrimitive.List>,
+  'asChild'
 > {}
 
 /**
@@ -46,17 +50,116 @@ interface TabsListProps extends React.ComponentProps<
  * </TabsList>
  * ```
  */
-function TabsList({ className, ...props }: TabsListProps) {
+function TabsList({ className, children, ref, ...props }: TabsListProps) {
+  const listRef = React.useRef<HTMLDivElement | null>(null);
+  const indicatorRef = React.useRef<HTMLSpanElement | null>(null);
+  const readyRef = React.useRef(false);
+  const [ready, setReady] = React.useState(false);
+
+  const setListRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      listRef.current = node;
+
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref]
+  );
+
+  useIsomorphicLayoutEffect(() => {
+    const list = listRef.current;
+    const indicator = indicatorRef.current;
+
+    if (!list || !indicator) return;
+
+    let raf = 0;
+
+    const measure = () => {
+      const active = list.querySelector<HTMLElement>(
+        '[data-slot="tabs-trigger"][data-state="active"]'
+      );
+
+      if (!active) {
+        indicator.style.opacity = '0';
+        return;
+      }
+
+      const variant = active.dataset.variant ?? 'default';
+      const height = active.offsetHeight;
+      const y =
+        variant === 'underline'
+          ? active.offsetTop + Math.max(height - 2, 0)
+          : active.offsetTop;
+
+      indicator.dataset.variant = variant;
+      indicator.style.transform = `translate3d(${active.offsetLeft}px, ${y}px, 0)`;
+      indicator.style.width = `${active.offsetWidth}px`;
+      indicator.style.height = variant === 'underline' ? '2px' : `${height}px`;
+      indicator.style.opacity = '1';
+
+      if (!readyRef.current) {
+        readyRef.current = true;
+        setReady(true);
+      }
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
+
+    schedule();
+
+    const mutationObserver = new MutationObserver(schedule);
+    mutationObserver.observe(list, {
+      attributes: true,
+      attributeFilter: ['data-state'],
+      childList: true,
+      subtree: true,
+    });
+
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(list);
+
+    window.addEventListener('resize', schedule);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      mutationObserver.disconnect();
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', schedule);
+    };
+  }, []);
+
   return (
     <TabsPrimitive.List
+      ref={setListRef}
       data-slot="tabs-list"
       className={cn(
-        'nx:inline-flex nx:items-center nx:justify-center',
+        'nx:relative nx:isolate nx:inline-flex nx:items-center nx:justify-center',
         'nx:rounded-md nx:bg-control-background nx:p-1',
         className
       )}
       {...props}
-    />
+    >
+      <span
+        ref={indicatorRef}
+        aria-hidden
+        data-slot="tabs-indicator"
+        data-variant="default"
+        className={cn(
+          'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0',
+          'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
+          'nx:data-[variant=underline]:bg-primary-background',
+          ready &&
+            'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move nx:motion-reduce:transition-none'
+        )}
+      />
+      {children}
+    </TabsPrimitive.List>
   );
 }
 
@@ -68,7 +171,7 @@ function TabsList({ className, ...props }: TabsListProps) {
 const tabsTriggerVariants = cva(
   // Base classes
   [
-    'nx:inline-flex nx:items-center nx:justify-center',
+    'nx:relative nx:z-1 nx:inline-flex nx:items-center nx:justify-center',
     'nx:whitespace-nowrap',
     'nx:text-muted-foreground',
     'nx:transition-colors',
@@ -85,14 +188,11 @@ const tabsTriggerVariants = cva(
         default: [
           'nx:rounded-sm nx:border nx:border-transparent',
           'nx:data-[state=inactive]:hover:bg-control-background-hover',
-          'nx:data-[state=active]:border-border-default',
-          'nx:data-[state=active]:bg-background',
           'nx:data-[state=active]:text-foreground',
         ],
         underline: [
           'nx:rounded-none nx:border-b-2 nx:border-transparent',
           'nx:bg-transparent',
-          'nx:data-[state=active]:border-primary-background',
           'nx:data-[state=active]:text-foreground',
         ],
       },
@@ -138,7 +238,12 @@ interface TabsTriggerProps
  * <TabsTrigger value="account" variant="underline" size="lg">Account</TabsTrigger>
  * ```
  */
-function TabsTrigger({ className, variant, size, ...props }: TabsTriggerProps) {
+function TabsTrigger({
+  className,
+  variant = 'default',
+  size = 'default',
+  ...props
+}: TabsTriggerProps) {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"

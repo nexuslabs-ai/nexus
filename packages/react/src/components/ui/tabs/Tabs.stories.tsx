@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   AllModesGrid,
@@ -33,6 +33,22 @@ const meta: Meta<typeof Tabs> = {
 
 export default meta;
 type Story = StoryObj<typeof Tabs>;
+
+function getTabsIndicator(canvasElement: HTMLElement) {
+  const indicator = canvasElement.querySelector<HTMLElement>(
+    '[data-slot="tabs-indicator"]'
+  );
+
+  if (!indicator) {
+    throw new Error('Expected Tabs indicator to be rendered');
+  }
+
+  return indicator;
+}
+
+async function waitForIndicatorReady(indicator: HTMLElement) {
+  await waitFor(() => expect(indicator.style.opacity).toBe('1'));
+}
 
 // ============================================
 // BASIC STORIES
@@ -94,6 +110,25 @@ export const UnderlineVariant: Story = {
       </TabsContent>
     </Tabs>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const accountTab = canvas.getByRole('tab', { name: 'Account' });
+    const passwordTab = canvas.getByRole('tab', { name: 'Password' });
+    const indicator = getTabsIndicator(canvasElement);
+
+    await expect(accountTab).toHaveAttribute('data-state', 'active');
+    await waitForIndicatorReady(indicator);
+    await expect(indicator).toHaveAttribute('data-variant', 'underline');
+
+    const before = indicator.style.transform;
+
+    await userEvent.click(passwordTab);
+    await expect(passwordTab).toHaveAttribute('data-state', 'active');
+    await waitFor(() => expect(indicator.style.transform).not.toBe(before));
+    await expect(
+      canvas.getByText('Password settings with underline variant tabs.')
+    ).toBeVisible();
+  },
 };
 
 // ============================================
@@ -347,30 +382,35 @@ export const ClickInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Tab 1 should be active by default
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
     const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
+    const indicator = getTabsIndicator(canvasElement);
 
     await expect(tab1).toHaveAttribute('data-state', 'active');
     await expect(tab2).toHaveAttribute('data-state', 'inactive');
-
-    // Active state is cued by the segmented-control border (not a shadow)
-    await expect(tab1).toHaveClass(
-      'nx:data-[state=active]:border-border-default'
-    );
-
-    // Content 1 should be visible
+    await waitForIndicatorReady(indicator);
+    await expect(indicator).toHaveAttribute('data-variant', 'default');
     await expect(canvas.getByText('Content 1')).toBeVisible();
 
-    // Click Tab 2
+    const before = indicator.style.transform;
+
     await userEvent.click(tab2);
 
-    // Tab 2 should now be active
     await expect(tab1).toHaveAttribute('data-state', 'inactive');
     await expect(tab2).toHaveAttribute('data-state', 'active');
-
-    // Content 2 should be visible
+    await waitFor(() => expect(indicator.style.transform).not.toBe(before));
     await expect(canvas.getByText('Content 2')).toBeVisible();
+  },
+};
+
+export const ReducedMotion: Story = {
+  render: Default.render,
+  play: async ({ canvasElement }) => {
+    const indicator = getTabsIndicator(canvasElement);
+
+    await waitFor(() =>
+      expect(indicator).toHaveClass('nx:motion-reduce:transition-none')
+    );
   },
 };
 
@@ -441,21 +481,29 @@ export const DisabledTabInteraction: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Disabled tab should have disabled attribute
     const disabledTab = canvas.getByRole('tab', { name: 'Tab 2 (Disabled)' });
     await expect(disabledTab).toBeDisabled();
 
-    // Tab 1 should be active by default
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
-    await expect(tab1).toHaveAttribute('data-state', 'active');
+    const indicator = getTabsIndicator(canvasElement);
 
-    // Content should be Content 1
+    await expect(tab1).toHaveAttribute('data-state', 'active');
+    await waitForIndicatorReady(indicator);
     await expect(canvas.getByText('Content 1')).toBeVisible();
 
-    // Click Tab 3 (enabled) to verify navigation still works
+    const beforeDisabledSkip = indicator.style.transform;
+
+    await userEvent.click(tab1);
+    await userEvent.keyboard('{ArrowRight}');
+
     const tab3 = canvas.getByRole('tab', { name: 'Tab 3' });
-    await userEvent.click(tab3);
+    await expect(tab3).toHaveFocus();
+    await expect(tab1).toHaveAttribute('data-state', 'inactive');
+    await expect(disabledTab).toHaveAttribute('data-state', 'inactive');
     await expect(tab3).toHaveAttribute('data-state', 'active');
+    await waitFor(() =>
+      expect(indicator.style.transform).not.toBe(beforeDisabledSkip)
+    );
     await expect(canvas.getByText('Content 3')).toBeVisible();
   },
 };
@@ -486,6 +534,8 @@ export const WithDataAttributes: Story = {
 
     const tab1 = canvas.getByRole('tab', { name: 'Tab 1' });
     await expect(tab1).toHaveAttribute('data-slot', 'tabs-trigger');
+    await expect(tab1).toHaveAttribute('data-variant', 'default');
+    await expect(tab1).toHaveAttribute('data-size', 'default');
 
     // Check data-variant and data-size on tab with explicit values
     const tab2 = canvas.getByRole('tab', { name: 'Tab 2' });
