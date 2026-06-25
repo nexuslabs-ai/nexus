@@ -111,8 +111,7 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
       raf = requestAnimationFrame(measure);
     };
 
-    // First positioning runs synchronously in the layout effect (before paint)
-    // so the indicator never paints a frame at opacity-0; observers use rAF.
+    // Measure synchronously before paint so the indicator never flashes at opacity-0.
     measure();
 
     const mutationObserver = new MutationObserver(schedule);
