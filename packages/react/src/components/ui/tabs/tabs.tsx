@@ -111,7 +111,9 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
       raf = requestAnimationFrame(measure);
     };
 
-    schedule();
+    // First positioning runs synchronously in the layout effect (before paint)
+    // so the indicator never paints a frame at opacity-0; observers use rAF.
+    measure();
 
     const mutationObserver = new MutationObserver(schedule);
     mutationObserver.observe(list, {
@@ -124,13 +126,10 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
     const resizeObserver = new ResizeObserver(schedule);
     resizeObserver.observe(list);
 
-    window.addEventListener('resize', schedule);
-
     return () => {
       cancelAnimationFrame(raf);
       mutationObserver.disconnect();
       resizeObserver.disconnect();
-      window.removeEventListener('resize', schedule);
     };
   }, []);
 

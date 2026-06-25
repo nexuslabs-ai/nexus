@@ -10,6 +10,7 @@ import {
   overlayFooterVariants,
   overlayHeaderVariants,
   type OverlayLayoutContextValue,
+  overlayScrimVariants,
   type OverlayVariant,
   resolveOverlayButtonOrientation,
 } from '@/components/ui/overlay-layout/overlay-layout';
@@ -84,15 +85,7 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
   return (
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
-      className={cn(
-        'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
-        'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-        'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-        'nx:data-[state=open]:duration-slow nx:data-[state=open]:ease-enter',
-        'nx:data-[state=closed]:duration-default nx:data-[state=closed]:ease-exit',
-        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
-        className
-      )}
+      className={cn(overlayScrimVariants(), className)}
       {...props}
     />
   );
