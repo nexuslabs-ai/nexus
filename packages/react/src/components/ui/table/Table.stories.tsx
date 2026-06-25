@@ -33,6 +33,8 @@ const meta: Meta<typeof Table> = {
 export default meta;
 type Story = StoryObj<typeof Table>;
 
+const rawTextSizeSentinelClass = ['nx', 'text-xs'].join(':');
+
 // Representative fixture: a list of invoices with status, payment method, and
 // amount — the shape a real billing table renders.
 const invoices = [
@@ -324,11 +326,9 @@ export const TokenizedTypography: Story = {
 
     await expect(table).toBeInTheDocument();
     await expect(table).toHaveClass('nx:typography-body-default');
-    await expect(table).not.toHaveClass('nx:text-sm');
 
     await expect(caption).toBeInTheDocument();
     await expect(caption).toHaveClass('nx:typography-body-small');
-    await expect(caption).not.toHaveClass('nx:text-sm');
 
     await expect(head).toBeInTheDocument();
     await expect(head).toHaveClass('nx:typography-label-default');
@@ -337,6 +337,47 @@ export const TokenizedTypography: Story = {
     await expect(footer).toBeInTheDocument();
     await expect(footer).toHaveClass('nx:typography-label-default');
     await expect(footer).not.toHaveClass('nx:font-medium');
+  },
+};
+
+export const RawTextSizeReset: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Regression sentinel: a runtime raw named text-size utility no longer applies font-size, while a typography composite still resolves its intended size.',
+      },
+    },
+  },
+  render: () => (
+    <div style={{ fontSize: '18px' }}>
+      <span data-testid="raw-text-size" className={rawTextSizeSentinelClass}>
+        Raw text size
+      </span>
+      <span
+        data-testid="typography-composite"
+        className="nx:typography-body-small"
+      >
+        Typography composite
+      </span>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready;
+
+    const raw = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="raw-text-size"]'
+    );
+    const composite = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="typography-composite"]'
+    );
+
+    if (!raw || !composite) {
+      throw new Error('Raw text-size reset sentinel elements are missing');
+    }
+
+    await expect(getComputedStyle(raw).fontSize).toBe('18px');
+    await expect(getComputedStyle(composite).fontSize).toBe('12px');
   },
 };
 

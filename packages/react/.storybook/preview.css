@@ -7,3 +7,5 @@
  * @nexus/tailwind, whose package entry is a .css. */
 @import '@nexus/tailwind';
 @import '../src/index.css';
+
+@source inline('nx:text-xs');

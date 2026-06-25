@@ -40,6 +40,15 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = 'nx:typography-code-block';",
     // Shortcut hint typography is a live one-level composite.
     "const c = 'nx:ml-auto nx:typography-shortcut nx:text-muted-foreground';",
+    // Text alignment, wrapping, arbitrary values, and colours are not font-size
+    // utilities and must stay legal.
+    "const c = 'nx:text-center';",
+    "const c = 'nx:text-wrap';",
+    "const c = 'nx:text-balance';",
+    "const c = 'nx:text-ellipsis';",
+    "const c = 'nx:text-[clamp(1rem,2vw,3rem)]';",
+    "const c = 'nx:text-muted-foreground';",
+    "const c = 'nx:text-foreground';",
   ],
   invalid: [
     {
@@ -69,6 +78,18 @@ ruleTester.run('nx-class-conventions', rule, {
     {
       code: "const c = 'nx:hover:bg-slate-100';",
       errors: [{ messageId: 'rawPrimitive' }],
+    },
+    {
+      code: "const c = 'nx:text-sm nx:text-muted-foreground';",
+      errors: [{ messageId: 'rawFontSize' }],
+    },
+    {
+      code: "const c = 'nx:group-hover:text-2xl';",
+      errors: [{ messageId: 'rawFontSize' }],
+    },
+    {
+      code: "const c = 'nx:text-sm nx:bg-primary';",
+      errors: [{ messageId: 'incompletePath' }, { messageId: 'rawFontSize' }],
     },
     // Modifiers beyond hover/active/focus must not evade the checks.
     {

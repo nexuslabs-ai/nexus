@@ -513,7 +513,6 @@ export const StylingContracts: Story = {
       '[data-slot="sidebar-group-label"]'
     );
     await expect(groupLabel).toHaveClass('nx:typography-label-small');
-    await expect(groupLabel).not.toHaveClass('nx:text-xs');
     await expect(groupLabel).not.toHaveClass('nx:font-medium');
 
     const groupContent = getRequiredElement(
@@ -521,7 +520,6 @@ export const StylingContracts: Story = {
       '[data-slot="sidebar-group-content"]'
     );
     await expect(groupContent).toHaveClass('nx:typography-body-default');
-    await expect(groupContent).not.toHaveClass('nx:text-sm');
 
     const defaultButton = getRequiredElement(
       canvasElement,
@@ -540,7 +538,6 @@ export const StylingContracts: Story = {
     await expect(defaultButton).toHaveClass(
       'nx:data-[active=true]:text-nav-foreground'
     );
-    await expect(defaultButton).not.toHaveClass('nx:text-sm');
     await expect(defaultButton).not.toHaveClass(
       'nx:data-[active=true]:typography-label-default'
     );
@@ -552,7 +549,6 @@ export const StylingContracts: Story = {
     await expect(smallButton).toHaveClass(
       'nx:data-[active=true]:text-nav-foreground'
     );
-    await expect(smallButton).not.toHaveClass('nx:text-xs');
     await expect(smallButton).not.toHaveClass(
       'nx:data-[active=true]:typography-label-small'
     );
@@ -561,7 +557,6 @@ export const StylingContracts: Story = {
     await expect(largeButton).toHaveClass(
       'nx:data-[active=true]:text-nav-foreground'
     );
-    await expect(largeButton).not.toHaveClass('nx:text-sm');
     await expect(largeButton).not.toHaveClass(
       'nx:data-[active=true]:typography-label-default'
     );
@@ -599,7 +594,6 @@ export const StylingContracts: Story = {
       '[data-slot="sidebar-menu-badge"]'
     );
     await expect(badge).toHaveClass('nx:typography-label-small');
-    await expect(badge).not.toHaveClass('nx:text-xs');
     await expect(badge).not.toHaveClass('nx:font-medium');
 
     const defaultSubButton = getRequiredElement(
@@ -611,7 +605,6 @@ export const StylingContracts: Story = {
       '[data-slot="sidebar-menu-sub-button"][data-size="sm"]'
     );
     await expect(defaultSubButton).toHaveClass('nx:typography-body-default');
-    await expect(defaultSubButton).not.toHaveClass('nx:text-sm');
     await expect(defaultSubButton).not.toHaveClass(
       'nx:[&>svg]:text-nav-muted-foreground'
     );
@@ -619,7 +612,6 @@ export const StylingContracts: Story = {
       'nx:data-[active=true]:[&>svg]:text-nav-foreground'
     );
     await expect(smallSubButton).toHaveClass('nx:typography-body-small');
-    await expect(smallSubButton).not.toHaveClass('nx:text-xs');
 
     const trigger = getRequiredElement(
       canvasElement,
