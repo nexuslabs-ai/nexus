@@ -232,7 +232,7 @@ export function CodexRoute() {
               value={codexPrefs.uiFont}
               onChange={(e) => updatePrefs({ uiFont: e.target.value })}
               aria-label="UI font"
-              className="nx:w-56 nx:font-mono nx:text-xs"
+              className="nx:w-56 nx:font-mono nx:typography-body-small"
             />
           </SettingRow>
           <SettingRow
@@ -243,7 +243,7 @@ export function CodexRoute() {
               value={codexPrefs.codeFont}
               onChange={(e) => updatePrefs({ codeFont: e.target.value })}
               aria-label="Code font"
-              className="nx:w-56 nx:font-mono nx:text-xs"
+              className="nx:w-56 nx:font-mono nx:typography-body-small"
             />
           </SettingRow>
           <SettingRow
