@@ -23,9 +23,10 @@ All tokens follow the [Design Tokens Community Group](https://tr.designtokens.or
 **Primitives** (`tokens/primitives/`)
 
 - Context-independent base values
-- Color, radius, border-width, shadow, typography, focus
+- Color, radius, border-width, shadow, typography, focus, motion
 - Output: CSS variables with the `--nx-*` prefix
 - Example: `--nx-color-gray-950`, `--nx-radius-md`
+- Motion primitives also promote named Tailwind utilities such as `nx:duration-fast` and `nx:ease-enter`: durations are emitted as explicit `@utility` rules, while easing uses Tailwind's `@theme` namespace. Existing Tailwind numeric duration/ease defaults remain available until the repo-wide migration lands.
 
 **Semantic** (`tokens/semantic/`)
 

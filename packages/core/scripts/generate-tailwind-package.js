@@ -6,6 +6,7 @@ import {
   CANONICAL_SPACING_DEFAULT_MODE,
   collectBorderwidthTokens,
   collectBreakpointsTokens,
+  collectMotionTokens,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
   collectSemanticDimensionTokens,
@@ -22,6 +23,7 @@ import {
   formatTokenValue,
   generateBaseLayerCSS,
   generateBorderWidthUtilitiesCSS,
+  generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
   generateRootDimensionsCSS,
   generateSpacingModesCSS,
@@ -467,6 +469,8 @@ function generateNexusCSS(
     TOKENS_DIR,
     borderwidthMode
   );
+  const motionMode = usedModes.motion || 'snappy';
+  const motionTokens = collectMotionTokens(TOKENS_DIR, motionMode);
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
   const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
@@ -493,6 +497,7 @@ function generateNexusCSS(
       './variables.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
+      './motion-utilities.css',
       './spacing-utilities.css',
     ],
     tailwindPrefix: 'nx',
@@ -500,6 +505,7 @@ function generateNexusCSS(
     spacingTokens: vegaSpacingNumeric,
     radiusTokens,
     borderwidthTokens,
+    motionTokens,
     shadowTokens,
     zIndexTokens,
     breakpointTokens,
@@ -605,6 +611,14 @@ export async function generateTailwindPackage(
     log.success(`Generated ${spacingUtilities.count} spacing role utilities`);
   }
 
+  const motionUtilities = generateMotionUtilitiesCSS(
+    collectMotionTokens(TOKENS_DIR, usedModes.motion || 'snappy')
+  );
+  if (motionUtilities.css) {
+    writeDistFile('motion-utilities.css', motionUtilities.css);
+    log.success(`Generated ${motionUtilities.count} motion duration utilities`);
+  }
+
   // `spacingDefault` controls which mode lands under `:root, [data-style="X"]`.
   // Falls back to the canonical baseline so older config objects without the
   // key (or hand-rolled test fixtures) still produce a valid build.
@@ -646,6 +660,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       'shadow',
       'radius',
       'borderwidth',
+      'motion',
       'focus',
       'chart-categorical',
       'spacingDefault',

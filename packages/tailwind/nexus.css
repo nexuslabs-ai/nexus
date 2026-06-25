@@ -10,6 +10,7 @@
 @import './variables.css';
 @import './typography-utilities.css';
 @import './borderwidth-utilities.css';
+@import './motion-utilities.css';
 @import './spacing-utilities.css';
 
 @custom-variant dark (&:is(.dark *));
@@ -179,6 +180,12 @@
   /* Border width tokens */
   --border-default: var(--nx-borderwidth-default);
   --border-thick: var(--nx-borderwidth-thick);
+
+  /* Motion tokens */
+  --ease-linear: var(--nx-motion-ease-linear);
+  --ease-enter: var(--nx-motion-ease-enter);
+  --ease-exit: var(--nx-motion-ease-exit);
+  --ease-move: var(--nx-motion-ease-move);
 
   /* Shadow tokens */
   --shadow-2xs: var(--nx-shadow-2xs-layer-1-x) var(--nx-shadow-2xs-layer-1-y)

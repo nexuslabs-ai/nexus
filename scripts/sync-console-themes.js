@@ -15,8 +15,10 @@ const STYLES_FILES = [
   'globals.css',
   'color.css',
   'focus-default.css',
+  'motion-snappy.css',
   'typography-utilities.css',
   'borderwidth-utilities.css',
+  'motion-utilities.css',
   'spacing-utilities.css',
 ];
 

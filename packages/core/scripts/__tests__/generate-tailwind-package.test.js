@@ -1,7 +1,9 @@
 import fs from 'fs';
+import { createRequire } from 'module';
 import os from 'os';
 import path from 'path';
 import * as prettier from 'prettier';
+import { compile } from 'tailwindcss';
 import { fileURLToPath } from 'url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
@@ -10,6 +12,8 @@ import { DEFAULT_CONFIG } from '../utils.js';
 
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
+const require = createRequire(import.meta.url);
+const TAILWIND_ENTRY = require.resolve('tailwindcss/index.css');
 
 const SPACING_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'];
 
@@ -57,6 +61,29 @@ function extractDataStyleBlock(css, mode) {
   return match[1];
 }
 
+async function compileGeneratedTailwind(distDir, candidates) {
+  const source = [
+    `@import './nexus.css';`,
+    `@source inline("${candidates.join(' ')}");`,
+  ].join('\n');
+
+  const compiler = await compile(source, {
+    base: distDir,
+    loadStylesheet: async (id, base) => {
+      const filePath =
+        id === 'tailwindcss' ? TAILWIND_ENTRY : path.resolve(base, id);
+
+      return {
+        content: fs.readFileSync(filePath, 'utf8'),
+        path: filePath,
+        base: path.dirname(filePath),
+      };
+    },
+  });
+
+  return compiler.build([]);
+}
+
 afterAll(() => {
   while (tmpDirs.length > 0) {
     const dir = tmpDirs.pop();
@@ -69,6 +96,7 @@ describe('generateTailwindPackage', () => {
   let variablesCSS;
   let nexusCSS;
   let typographyCSS;
+  let motionUtilitiesCSS;
   let spacingUtilitiesCSS;
   let warnings;
 
@@ -87,6 +115,7 @@ describe('generateTailwindPackage', () => {
     variablesCSS = read(distDir, 'variables.css');
     nexusCSS = read(distDir, 'nexus.css');
     typographyCSS = read(distDir, 'typography-utilities.css');
+    motionUtilitiesCSS = read(distDir, 'motion-utilities.css');
     spacingUtilitiesCSS = read(distDir, 'spacing-utilities.css');
   });
 
@@ -310,6 +339,81 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).toMatch(/--text-\*:\s*initial;/);
   });
 
+  it('emits named motion tokens without resetting Tailwind default motion namespaces yet', () => {
+    const rootBlock = extractBlock(variablesCSS, ':root');
+    expect(rootBlock).toMatch(/--nx-motion-duration-fast:\s*150ms;/);
+    expect(rootBlock).toMatch(/--nx-motion-duration-default:\s*200ms;/);
+    expect(rootBlock).toMatch(
+      /--nx-motion-ease-enter:\s*cubic-bezier\(0\.23, 1, 0\.32, 1\);/
+    );
+    expect(rootBlock).toMatch(
+      /--nx-motion-ease-move:\s*cubic-bezier\(0\.77, 0, 0\.175, 1\);/
+    );
+
+    const themeBlock = extractBlock(nexusCSS, '@theme');
+    expect(themeBlock).not.toMatch(/--duration-fast:/);
+    expect(themeBlock).not.toMatch(/--duration-default:/);
+    expect(themeBlock).toMatch(
+      /--ease-enter:\s*var\(--nx-motion-ease-enter\);/
+    );
+    expect(themeBlock).toMatch(/--ease-move:\s*var\(--nx-motion-ease-move\);/);
+
+    // The repo-wide motion migration is tracked separately (#530). Until
+    // hardcoded consumers are migrated, keep Tailwind's default duration/ease
+    // utilities available so existing classes do not silently lose motion.
+    expect(themeBlock).not.toMatch(/--duration-\*:\s*initial;/);
+    expect(themeBlock).not.toMatch(/--ease-\*:\s*initial;/);
+    expect(themeBlock).not.toMatch(/--animate-\*:\s*initial;/);
+
+    const fastBlock = extractBlock(
+      motionUtilitiesCSS,
+      '@utility duration-fast'
+    );
+    expect(fastBlock).toMatch(
+      /--tw-duration:\s*var\(--nx-motion-duration-fast\);/
+    );
+    expect(fastBlock).toMatch(
+      /transition-duration:\s*var\(--nx-motion-duration-fast\);/
+    );
+
+    const defaultBlock = extractBlock(
+      motionUtilitiesCSS,
+      '@utility duration-default'
+    );
+    expect(defaultBlock).toMatch(
+      /--tw-duration:\s*var\(--nx-motion-duration-default\);/
+    );
+    expect(defaultBlock).toMatch(
+      /transition-duration:\s*var\(--nx-motion-duration-default\);/
+    );
+  });
+
+  it('compiles named motion utilities through Tailwind', async () => {
+    const compiledCSS = await compileGeneratedTailwind(distDir, [
+      'nx:duration-fast',
+      'nx:duration-default',
+      'nx:duration-150',
+      'nx:duration-(--nx-motion-duration-fast)',
+      'nx:ease-enter',
+    ]);
+
+    expect(compiledCSS).toMatch(
+      /\.nx\\:duration-fast\s*\{[\s\S]*?--tw-duration:\s*var\(--nx-motion-duration-fast\);[\s\S]*?transition-duration:\s*var\(--nx-motion-duration-fast\);/
+    );
+    expect(compiledCSS).toMatch(
+      /\.nx\\:duration-default\s*\{[\s\S]*?--tw-duration:\s*var\(--nx-motion-duration-default\);[\s\S]*?transition-duration:\s*var\(--nx-motion-duration-default\);/
+    );
+    expect(compiledCSS).toMatch(
+      /\.nx\\:duration-150\s*\{[\s\S]*?transition-duration:\s*150ms;/
+    );
+    expect(compiledCSS).toMatch(
+      /\.nx\\:duration-\\\(--nx-motion-duration-fast\\\)\s*\{[\s\S]*?transition-duration:\s*var\(--nx-motion-duration-fast\);/
+    );
+    expect(compiledCSS).toMatch(
+      /\.nx\\:ease-enter\s*\{[\s\S]*?transition-timing-function:\s*var\(--nx-ease-enter\);/
+    );
+  });
+
   it('registers numeric --spacing-N in @theme with direct px (not var() refs)', () => {
     // The numeric subset seeds @theme so Tailwind codegens nx:p-N / nx:m-N /
     // nx:h-N / nx:gap-N. After migration these are direct px values, not
@@ -445,19 +549,21 @@ describe('generateTailwindPackage', () => {
     }
   });
 
-  it('nexus.css imports ./spacing-utilities.css and the file resolves', () => {
-    const importMatch = nexusCSS.match(
-      /@import\s+['"](\.\/spacing-utilities\.css)['"]/
-    );
-    expect(
-      importMatch,
-      'nexus.css must @import ./spacing-utilities.css'
-    ).not.toBeNull();
-    const resolved = path.resolve(distDir, importMatch[1]);
-    expect(
-      fs.existsSync(resolved),
-      `imported file ${importMatch[1]} must exist`
-    ).toBe(true);
+  it('nexus.css imports generated utility files and each import resolves', () => {
+    for (const fileName of ['motion-utilities.css', 'spacing-utilities.css']) {
+      const importMatch = nexusCSS.match(
+        new RegExp(`@import\\s+['"](\\./${fileName})['"]`)
+      );
+      expect(
+        importMatch,
+        `nexus.css must @import ./${fileName}`
+      ).not.toBeNull();
+      const resolved = path.resolve(distDir, importMatch[1]);
+      expect(
+        fs.existsSync(resolved),
+        `imported file ${importMatch[1]} must exist`
+      ).toBe(true);
+    }
   });
 
   it('spacing-utilities.css declares all 4 role utilities with correct property bindings', () => {
@@ -586,6 +692,7 @@ describe('generateTailwindPackage', () => {
     for (const file of [
       'variables.css',
       'nexus.css',
+      'motion-utilities.css',
       'spacing-utilities.css',
     ]) {
       expect(read(dirA, file), `${file} differs across runs`).toBe(
