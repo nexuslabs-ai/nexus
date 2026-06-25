@@ -327,7 +327,7 @@ function Sidebar({
       <div
         data-slot="sidebar-gap"
         className={cn(
-          'nx:relative nx:w-(--sidebar-width) nx:bg-transparent nx:transition-[width] nx:duration-200 nx:ease-linear',
+          'nx:relative nx:w-(--sidebar-width) nx:bg-transparent nx:transition-[width] nx:duration-default nx:ease-linear',
           'nx:group-data-[collapsible=offcanvas]:w-0',
           'nx:group-data-[side=right]:rotate-180',
           variant === 'floating' || variant === 'inset'
@@ -338,7 +338,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-200 nx:ease-linear nx:lg:flex',
+          'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-default nx:ease-linear nx:lg:flex',
           side === 'left'
             ? 'nx:left-0 nx:group-data-[collapsible=offcanvas]:-left-(--sidebar-width)'
             : 'nx:right-0 nx:group-data-[collapsible=offcanvas]:-right-(--sidebar-width)',
@@ -654,7 +654,7 @@ function SidebarGroupLabel({
     <Comp
       data-slot="sidebar-group-label"
       className={cn(
-        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-200 nx:ease-linear nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-default nx:ease-linear nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:group-data-[collapsible=icon]:-mt-8 nx:group-data-[collapsible=icon]:opacity-0',
         className
       )}

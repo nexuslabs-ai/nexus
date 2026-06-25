@@ -8,6 +8,7 @@ import {
   overlayContentVariants,
   overlayHeaderVariants,
   type OverlayLayoutContextValue,
+  overlayScrimVariants,
 } from '@/components/ui/overlay-layout/overlay-layout';
 import { IconX } from '@/lib/icons';
 import { cn } from '@/lib/utils';
@@ -85,13 +86,7 @@ function DialogOverlay({ className, ...props }: DialogOverlayProps) {
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
-      className={cn(
-        'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
-        'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-        'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
-        className
-      )}
+      className={cn(overlayScrimVariants(), className)}
       {...props}
     />
   );

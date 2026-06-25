@@ -146,7 +146,7 @@ function NavigationMenuTrigger({
     >
       {children}{' '}
       <IconChevronDown
-        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-300 nx:motion-reduce:transition-none nx:group-data-[state=open]:rotate-180"
+        className="nx:relative nx:top-px nx:ml-1 nx:size-3 nx:transition nx:duration-slow nx:motion-reduce:transition-none nx:group-data-[state=open]:rotate-180"
         aria-hidden="true"
       />
     </NavigationMenuPrimitive.Trigger>
@@ -180,6 +180,8 @@ function NavigationMenuContent({
         'nx:data-[motion=from-end]:slide-in-from-right-52 nx:data-[motion=from-start]:slide-in-from-left-52',
         'nx:data-[motion=to-end]:slide-out-to-right-52 nx:data-[motion=to-start]:slide-out-to-left-52',
         'nx:data-[motion^=from-]:animate-in nx:data-[motion^=from-]:fade-in nx:data-[motion^=to-]:animate-out nx:data-[motion^=to-]:fade-out',
+        'nx:data-[motion^=from-]:duration-default nx:data-[motion^=from-]:ease-enter',
+        'nx:data-[motion^=to-]:duration-fast nx:data-[motion^=to-]:ease-exit',
         'nx:motion-reduce:data-[motion^=from-]:animate-none nx:motion-reduce:data-[motion^=to-]:animate-none',
         'nx:@md/navmenu:absolute nx:@md/navmenu:w-auto',
         'nx:group-data-[viewport=false]/navigation-menu:top-full',
@@ -187,9 +189,11 @@ function NavigationMenuContent({
         'nx:group-data-[viewport=false]/navigation-menu:overflow-hidden nx:group-data-[viewport=false]/navigation-menu:rounded-md',
         'nx:group-data-[viewport=false]/navigation-menu:border nx:group-data-[viewport=false]/navigation-menu:border-border-default',
         'nx:group-data-[viewport=false]/navigation-menu:bg-popover nx:group-data-[viewport=false]/navigation-menu:text-popover-foreground',
-        'nx:group-data-[viewport=false]/navigation-menu:shadow-lg nx:group-data-[viewport=false]/navigation-menu:duration-200',
+        'nx:group-data-[viewport=false]/navigation-menu:shadow-lg',
         'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-out nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:zoom-out-95',
         'nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-in nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:zoom-in-95',
+        'nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:duration-default nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:ease-enter',
+        'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:duration-fast nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:ease-exit',
         'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:duration-0',
         'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-none nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-none',
         className
@@ -227,6 +231,8 @@ function NavigationMenuViewport({
           'nx:origin-top-center nx:relative nx:mt-1.5 nx:h-(--radix-navigation-menu-viewport-height) nx:w-full nx:overflow-hidden',
           'nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg',
           'nx:data-[state=closed]:animate-out nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:animate-in nx:data-[state=open]:zoom-in-90',
+          'nx:data-[state=open]:duration-default nx:data-[state=open]:ease-enter',
+          'nx:data-[state=closed]:duration-fast nx:data-[state=closed]:ease-exit',
           'nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none',
           'nx:@md/navmenu:w-(--radix-navigation-menu-viewport-width)',
           className
@@ -293,6 +299,8 @@ function NavigationMenuIndicator({
       className={cn(
         'nx:top-full nx:z-1 nx:flex nx:h-1.5 nx:items-end nx:justify-center nx:overflow-hidden',
         'nx:data-[state=hidden]:animate-out nx:data-[state=hidden]:fade-out nx:data-[state=visible]:animate-in nx:data-[state=visible]:fade-in',
+        'nx:data-[state=visible]:duration-default nx:data-[state=visible]:ease-enter',
+        'nx:data-[state=hidden]:duration-fast nx:data-[state=hidden]:ease-exit',
         'nx:motion-reduce:data-[state=hidden]:animate-none nx:motion-reduce:data-[state=visible]:animate-none',
         className
       )}

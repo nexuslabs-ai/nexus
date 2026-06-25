@@ -94,6 +94,8 @@ function HoverCardContent({
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
+          'nx:data-[state=open]:duration-fast nx:data-[state=open]:ease-enter',
+          'nx:data-[state=closed]:duration-fast nx:data-[state=closed]:ease-exit',
           'nx:data-[side=bottom]:slide-in-from-top-2 nx:data-[side=left]:slide-in-from-right-2',
           'nx:data-[side=right]:slide-in-from-left-2 nx:data-[side=top]:slide-in-from-bottom-2',
           'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
