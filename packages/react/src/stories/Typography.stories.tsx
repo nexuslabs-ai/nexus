@@ -103,6 +103,10 @@ const COMPOSITE_UTILITIES: {
     ],
   },
   {
+    group: 'Shortcut',
+    items: [{ cls: 'nx:typography-shortcut', sample: '⌘⇧P' }],
+  },
+  {
     group: 'Code',
     items: [
       {
@@ -120,16 +124,27 @@ const COMPOSITE_UTILITIES: {
 // truth. Derive the expected set from that source and assert parity in the
 // CompositeUtilities play function below, so a token add/rename can't silently
 // desync the specimen.
-const EXPECTED_UTILITY_CLASSES = Object.entries(
-  typographyStyles as Record<string, Record<string, unknown>>
-)
-  .filter(([tier]) => !tier.startsWith('$'))
-  .flatMap(([tier, group]) =>
-    Object.keys(group)
-      .filter((name) => !name.startsWith('$'))
-      .map((name) => `nx:typography-${tier}-${name}`)
-  )
-  .sort();
+function collectTypographyUtilityClasses(
+  node: Record<string, unknown>,
+  path: string[] = []
+): string[] {
+  return Object.entries(node).flatMap(([key, value]) => {
+    if (key.startsWith('$') || !value || typeof value !== 'object') return [];
+
+    const child = value as Record<string, unknown>;
+    const nextPath = [...path, key];
+
+    if (child.$type === 'typography') {
+      return [`nx:typography-${nextPath.join('-')}`];
+    }
+
+    return collectTypographyUtilityClasses(child, nextPath);
+  });
+}
+
+const EXPECTED_UTILITY_CLASSES = collectTypographyUtilityClasses(
+  typographyStyles as Record<string, unknown>
+).sort();
 
 const SCALE_SAMPLE = 'Aa Bb 12';
 const WEIGHT_SAMPLE = 'The quick brown fox';
@@ -367,10 +382,10 @@ export const CompositeUtilities: Story = {
           Composite Utilities
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-small nx:max-w-2xl">
-          The 11 ready-to-use `nx:typography-*` classes — each bundles
-          font-family, size, weight, line-height, and letter-spacing (body tiers
-          also get `text-wrap: pretty`). Prefer these over composing raw
-          size/weight utilities so every consumer stays consistent.
+          The ready-to-use `nx:typography-*` classes — each bundles font-family,
+          size, weight, line-height, and letter-spacing (body tiers also get
+          `text-wrap: pretty`). Prefer these over composing raw size/weight
+          utilities so every consumer stays consistent.
         </p>
       </div>
       {COMPOSITE_UTILITIES.map(({ group, items }) => (

@@ -383,7 +383,7 @@ function CommandShortcut({ className, ...props }: CommandShortcutProps) {
     <span
       data-slot="command-shortcut"
       className={cn(
-        'nx:ml-auto nx:text-xs nx:tracking-widest nx:text-muted-foreground',
+        'nx:ml-auto nx:typography-shortcut nx:text-muted-foreground',
         className
       )}
       {...props}

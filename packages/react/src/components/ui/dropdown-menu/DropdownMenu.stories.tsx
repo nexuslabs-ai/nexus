@@ -370,7 +370,10 @@ export const WithDataAttributes: Story = {
       <DropdownMenuContent>
         <DropdownMenuLabel>Label</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Item</DropdownMenuItem>
+        <DropdownMenuItem>
+          Item
+          <DropdownMenuShortcut>⌘I</DropdownMenuShortcut>
+        </DropdownMenuItem>
         <DropdownMenuItem variant="destructive">Destructive</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -399,7 +402,17 @@ export const WithDataAttributes: Story = {
       expect(
         document.querySelector('[data-slot="dropdown-menu-item"]')
       ).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-slot="dropdown-menu-shortcut"]')
+      ).toBeInTheDocument();
     });
+
+    const shortcut = document.querySelector(
+      '[data-slot="dropdown-menu-shortcut"]'
+    );
+    await expect(shortcut).toHaveClass('nx:typography-shortcut');
+    await expect(shortcut).not.toHaveClass('nx:text-xs');
+    await expect(shortcut).not.toHaveClass('nx:tracking-widest');
 
     // Check destructive variant
     const destructiveItem = document.querySelector(

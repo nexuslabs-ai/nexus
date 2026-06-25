@@ -506,7 +506,7 @@ function MenubarShortcut({ className, ...props }: MenubarShortcutProps) {
     <span
       data-slot="menubar-shortcut"
       className={cn(
-        'nx:ml-auto nx:text-xs nx:tracking-widest nx:text-muted-foreground',
+        'nx:ml-auto nx:typography-shortcut nx:text-muted-foreground',
         className
       )}
       {...props}

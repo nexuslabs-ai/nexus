@@ -243,6 +243,21 @@ describe('generateTailwindPackage', () => {
     expect(typographyCSS).not.toMatch(/line-height: auto/);
   });
 
+  it('emits typography-shortcut from the shortcut composite token', () => {
+    const block = extractBlock(typographyCSS, '@utility typography-shortcut');
+    expect(block).toMatch(
+      /font-family: var\(--nx-typography-family-font-sans\);/
+    );
+    expect(block).toMatch(/font-size: var\(--nx-typography-size-xs\);/);
+    expect(block).toMatch(/font-weight: var\(--nx-typography-weight-normal\);/);
+    expect(block).toMatch(
+      /line-height: var\(--nx-typography-line-height-xs\);/
+    );
+    expect(block).toMatch(
+      /letter-spacing: var\(--nx-typography-letterspacing-widest\);/
+    );
+  });
+
   // Regenerating tokens used to produce a noisy whitespace diff against the
   // committed CSS because the generator emitted raw output but the committed
   // files were prettier-formatted. The generator now formats every emitted
