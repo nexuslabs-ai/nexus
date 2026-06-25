@@ -52,9 +52,27 @@ PR, then fall back to the local Modern Web Guidance skill/docs:
 - [`../../.agents/skills/modern-web-guidance/SKILL.md`](../../.agents/skills/modern-web-guidance/SKILL.md)
 - the active Codex Modern Web Guidance skill, if the repo-local copy is missing
 
+If neither NPX nor local Modern Web Guidance is available, the plan must say:
+`Modern Web Guidance unavailable; proceeding with documented fallback sources.`
+Use primary sources for the fallback, such as MDN, W3C WCAG/APG, Storybook docs,
+and browser compatibility references, and cite them in the PR.
+
 Apply the guidance through Nexus conventions, not as a blind copy-paste. Radix
 composition, generated stories, token emission, and repo-specific browser policy
 still control the final implementation.
+
+Every polish plan must include:
+
+- **Modern Web Guidance Findings:** the search query, retrieved guide IDs, or
+  the explicit fallback path used.
+- **Browser-Floor Decision:** whether the feature is safe for the Nexus browser
+  floor.
+- **Fallback / Progressive Enhancement:** what happens when the feature falls
+  outside the floor.
+- **Rejected Approaches:** why heavier or less compatible approaches were not
+  used.
+- **Validation Evidence:** Storybook, accessibility, visual/manual, and command
+  evidence required for review.
 
 ## Browser Floor
 
@@ -72,7 +90,21 @@ progressive enhancement or fallbacks when support falls outside it. Run
 `pnpm audit:browser-support` when adopting or reclassifying browser-platform
 features.
 
-## Component Polish Matrix
+## Research Anchors
+
+Use these anchors to keep polish decisions grounded:
+
+| Topic                  | Source                                                                                                                                                                                                                                                      | Nexus rule                                                                                               |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Purposeful motion      | [Carbon Motion](https://carbondesignsystem.com/elements/motion/overview/)                                                                                                                                                                                   | Motion should clarify, guide, or give feedback; decorative motion is not polish.                         |
+| Animation performance  | [web.dev high-performance CSS animations](https://web.dev/articles/animations-guide)                                                                                                                                                                        | Prefer `transform` and `opacity`; avoid layout/paint-heavy animation unless the PR explains why.         |
+| Reduced motion         | [MDN `prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)                                                                                                                                              | Animated polish must reduce, replace, or remove non-essential motion for users who request it.           |
+| Accessibility criteria | [WCAG 2.2](https://www.w3.org/TR/WCAG22/)                                                                                                                                                                                                                   | Polish must include focus, motion, pointer, target-size, name/role/value, and error-state behavior.      |
+| Component behavior     | [WAI-ARIA APG patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)                                                                                                                                                                                          | Match the APG pattern for tabs, dialogs, menus, tooltips, sliders, and other composite widgets.          |
+| Story evidence         | [Storybook interaction tests](https://storybook.js.org/docs/writing-tests/interaction-testing), [a11y tests](https://storybook.js.org/docs/writing-tests/accessibility-testing), [visual tests](https://storybook.js.org/docs/writing-tests/visual-testing) | Prove polish with state stories, play functions, a11y checks, and visual review where relevant.          |
+| Usability clarity      | [NN/g usability heuristics](https://www.nngroup.com/articles/ten-usability-heuristics/)                                                                                                                                                                     | Optimize for feedback, consistency, error prevention, recognition over recall, and aesthetic minimalism. |
+
+## Universal Polish Matrix
 
 | Area                       | Tier-A question                                                                                     | Evidence                                                                                            |
 | -------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -84,17 +116,34 @@ features.
 | Theme and browser floor    | Does the component hold up in light/dark themes and the supported browser floor?                    | Semantic-token usage, no unsupported feature without fallback, browser-support audit when relevant. |
 | Composed-scene fit         | Does it sit naturally beside benchmark-quality controls such as Linear or Stripe?                   | UI audit screenshots or composed stories, not only isolated variants.                               |
 
+## Component-Family Matrix
+
+Use the family matrix to decide which evidence is mandatory for a polish PR.
+Components can belong to more than one family.
+
+| Component family                                           | Polish focus                                                                                                                               |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Buttons, toggles, checkboxes, radios, switches             | Hover, active, pressed/checked, disabled, focus-visible, target size, and tactile feedback.                                                |
+| Inputs, select, textarea, form, field                      | Label rhythm, helper/error text, invalid states, disabled/read-only states, density alignment, autofill/mobile behavior, and long content. |
+| Menus, popovers, dialogs, sheets, tooltips                 | Entrance/exit motion, focus trap or focus return, keyboard behavior, layering, collision, dismissal, reduced motion, and portal evidence.  |
+| Tabs, navigation, sidebar, breadcrumbs                     | Active/current indicator, keyboard navigation, location clarity, responsive overflow, and density behavior.                                |
+| Table, pagination, chart, data views                       | Loading/empty/error states, density, scan rhythm, numeric/text alignment, sortable/filter states, and overflow behavior.                   |
+| Toast, alert, progress, spinner, skeleton, empty-state     | Status clarity, timing, motion restraint, accessible announcements, and recovery action clarity.                                           |
+| Card, separator, resizable, scroll-area, layout primitives | Optical rhythm, drag/focus affordance, spacing consistency, overflow behavior, and composed-scene fit.                                     |
+
 ## PR Evidence Checklist
 
 Every Tier-A polish PR should include:
 
 - [ ] Modern Web Guidance search terms, retrieved guide IDs, or the NPX failure
-      plus local-skill fallback used.
+      plus local-skill or primary-source fallback used.
 - [ ] Browser-floor decision notes for any browser-platform feature touched.
 - [ ] Storybook links, screenshots, or story names that prove the polish states.
 - [ ] Keyboard and focus evidence for interactive surfaces.
 - [ ] Reduced-motion evidence for animated or transitioning surfaces.
 - [ ] Density/theme evidence when spacing, sizing, color, or motion changed.
+- [ ] Before/after notes for any visual change that is not obvious from the diff.
+- [ ] Validation commands run and any unavailable validation called out plainly.
 - [ ] A short note explaining what was deliberately left unpolished.
 
 Use `emil-design-eng` for product-feel review when a component needs taste-level
@@ -111,8 +160,12 @@ motion decisions to #159:
   scale in component code.
 - Until #159 lands, keep new motion conservative and document the desired token
   relationship instead of hard-coding a new system.
-- Prefer opacity, transform, and layout-stable transitions. Avoid motion that
-  changes reading order, shifts focus targets, or delays task completion.
+- Motion must have a job: guide, clarify, give feedback, or communicate state.
+  Avoid expressive moments unless the product moment is genuinely important.
+- Prefer opacity, transform, and layout-stable transitions. Avoid layout or
+  paint-heavy animation unless the PR explains why it is necessary.
+- Use durations/easing that feel responsive and unobtrusive; avoid bounce,
+  stretch, or novelty easing in normal component work.
 - Always support `prefers-reduced-motion`; reduced motion should remove
   non-essential movement while preserving the state change.
 - Exit motion should clarify dismissal, not make overlays feel slow.
@@ -128,11 +181,15 @@ Check at least:
 - Keyboard reachability and expected key bindings for the pattern.
 - Visible focus treatment that follows
   [components.md](components.md#focus-states).
+- Focus not obscured by author-created overlays, sticky chrome, or portal layers.
 - Accessible names, descriptions, roles, states, and relationships.
 - APG-aligned roving focus, selection, disclosure, dialog, menu, tab, and
   composite-widget behavior when those patterns apply.
-- Target size and coarse-pointer usability for touch contexts.
+- Pointer cancellation, dragging alternatives, target size, and coarse-pointer
+  usability for touch contexts.
 - Reduced-motion behavior for animated surfaces.
+- Name/role/value and status/error announcements for controls, feedback, and
+  form surfaces.
 
 When Radix provides semantics, preserve them unless the PR explains why the
 pattern requires an override.
@@ -149,6 +206,10 @@ should have enough stories to make regressions obvious:
 - Density/theme/composed-scene stories for changes that affect rhythm or fit.
 - Play-function assertions for behavior and accessibility contracts that are
   easy to regress.
+- Accessibility addon or equivalent a11y evidence for roles, names, contrast,
+  and manually confirmed incomplete checks.
+- Visual review or visual-regression evidence when the PR changes layout,
+  spacing, motion, or state appearance.
 
 Generated `AllVariants` stories are useful inventory, but they are not enough for
 Tier-A proof. Add focused stories when polish depends on interaction, layout, or
