@@ -17,21 +17,21 @@ export function AuthLayout() {
       <aside className="nx:bg-primary-background nx:text-primary-foreground nx:hidden nx:w-1/2 nx:flex-col nx:justify-between nx:p-12 nx:lg:flex">
         <div className="nx:flex nx:items-center nx:gap-2">
           <div className="nx:bg-primary-foreground nx:flex nx:size-8 nx:items-center nx:justify-center nx:rounded-lg">
-            <span className="nx:text-primary-background nx:text-sm nx:font-bold">
+            <span className="nx:text-primary-background nx:typography-label-default nx:font-bold">
               A
             </span>
           </div>
-          <span className="nx:text-lg nx:font-semibold">Atlas</span>
+          <span className="nx:typography-heading-xsmall">Atlas</span>
         </div>
         <div className="nx:space-y-3">
-          <p className="nx:text-2xl nx:font-semibold nx:leading-snug">
+          <p className="nx:typography-heading-medium nx:leading-snug">
             The operating system for your whole company.
           </p>
-          <p className="nx:text-primary-foreground/80 nx:text-sm">
+          <p className="nx:text-primary-foreground/80 nx:typography-body-default">
             CRM, projects, billing, and analytics — themed end to end by Nexus.
           </p>
         </div>
-        <p className="nx:text-primary-foreground/70 nx:text-xs">
+        <p className="nx:text-primary-foreground/70 nx:typography-label-small">
           Built on the Nexus design system.
         </p>
       </aside>

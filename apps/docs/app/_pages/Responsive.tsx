@@ -101,7 +101,7 @@ export function Responsive() {
           widths — mobile ~390px and desktop ~1280px (<code>xl</code>).
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Class</th>
@@ -118,16 +118,16 @@ export function Responsive() {
                   key={bp.cls}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {bp.cls}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:text-xs nx:whitespace-nowrap">
+                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:typography-label-small nx:whitespace-nowrap">
                     {bp.size}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:typography-label-small">
                     {bp.display}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {bp.target}
                   </td>
                 </tr>
@@ -180,7 +180,7 @@ export function Responsive() {
           the viewport.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Mechanism</th>
@@ -193,10 +193,10 @@ export function Responsive() {
                   key={m.mechanism}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs nx:whitespace-nowrap">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small nx:whitespace-nowrap">
                     {m.mechanism}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {m.use}
                   </td>
                 </tr>

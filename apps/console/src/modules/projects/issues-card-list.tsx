@@ -26,7 +26,7 @@ export function IssueCardList({ issues }: { issues: Issue[] }) {
         placeholder="Filter by title…"
       />
       {pageItems.length === 0 ? (
-        <p className="nx:text-muted-foreground nx:py-8 nx:text-center nx:text-sm">
+        <p className="nx:text-muted-foreground nx:py-8 nx:text-center nx:typography-body-default">
           No results.
         </p>
       ) : (

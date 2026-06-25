@@ -156,7 +156,7 @@ function SwatchGrid({ items, cvd }: { items: Palette[]; cvd: CvdMode }) {
             style={{ gridTemplateColumns: GRID_COLS }}
           >
             <div className="nx:pr-2 nx:leading-tight">
-              <span className="nx:text-xs nx:capitalize nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:capitalize nx:text-muted-foreground">
                 {item.name}
               </span>
               {item.role && (

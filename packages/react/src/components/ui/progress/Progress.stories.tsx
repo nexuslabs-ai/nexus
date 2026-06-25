@@ -118,7 +118,9 @@ export const AllVariants: Story = {
     <div className="nx:flex nx:flex-col nx:gap-6">
       {[0, 25, 50, 75, 100].map((pct) => (
         <div key={pct} className="nx:flex nx:flex-col nx:gap-2">
-          <span className="nx:text-sm nx:text-muted-foreground">{pct}%</span>
+          <span className="nx:typography-label-default nx:text-muted-foreground">
+            {pct}%
+          </span>
           <Progress value={pct} aria-label={`${pct}% complete`} />
         </div>
       ))}

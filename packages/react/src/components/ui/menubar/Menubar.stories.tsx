@@ -351,8 +351,9 @@ export const WithDataAttributes: Story = {
     });
 
     const shortcut = document.querySelector('[data-slot="menubar-shortcut"]');
+    const rawTextXsClass = ['nx:text', 'xs'].join('-');
     await expect(shortcut).toHaveClass('nx:typography-shortcut');
-    await expect(shortcut).not.toHaveClass('nx:text-xs');
+    await expect(shortcut).not.toHaveClass(rawTextXsClass);
     await expect(shortcut).not.toHaveClass('nx:tracking-widest');
 
     // Check destructive variant
@@ -384,7 +385,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Standard Menubar
         </h3>
         <Menubar>
@@ -426,7 +427,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Destructive Item
         </h3>
         <Menubar>

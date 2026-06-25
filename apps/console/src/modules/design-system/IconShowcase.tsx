@@ -16,10 +16,10 @@ export function IconShowcase() {
       <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-background-hover-alpha">
         <div className="nx:flex nx:items-center nx:justify-between">
           <div>
-            <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
+            <h2 className="nx:typography-heading-xsmall nx:text-foreground">
               Icons
             </h2>
-            <p className="nx:text-sm nx:text-muted-foreground nx:mt-0.5">
+            <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-0.5">
               Internal DS icons from{' '}
               <a
                 href={meta.url}
@@ -31,7 +31,7 @@ export function IconShowcase() {
               </a>
             </p>
           </div>
-          <span className="nx:text-xs nx:text-muted-foreground nx:bg-muted nx:px-2 nx:py-1 nx:rounded-full">
+          <span className="nx:typography-label-small nx:text-muted-foreground nx:bg-muted nx:px-2 nx:py-1 nx:rounded-full">
             {meta.iconCount} available
           </span>
         </div>

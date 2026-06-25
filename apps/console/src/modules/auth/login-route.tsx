@@ -95,7 +95,7 @@ export function LoginRoute() {
                     <FormLabel>Password</FormLabel>
                     <Link
                       to="/forgot"
-                      className="nx:text-primary-subtle-foreground nx:text-sm nx:hover:underline"
+                      className="nx:text-primary-subtle-foreground nx:typography-label-default nx:hover:underline"
                     >
                       Forgot password?
                     </Link>
@@ -123,7 +123,7 @@ export function LoginRoute() {
             >
               Continue
             </Button>
-            <p className="nx:text-muted-foreground nx:text-sm">
+            <p className="nx:text-muted-foreground nx:typography-body-default">
               No account?{' '}
               <Link
                 to="/signup"

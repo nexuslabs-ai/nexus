@@ -152,7 +152,7 @@ function PlanCard({
           )}
         </div>
 
-        <p className="nx:text-muted-foreground nx:text-sm">
+        <p className="nx:text-muted-foreground nx:typography-body-default">
           {canceling
             ? `Your plan is set to cancel on ${formatDate(subscription.renewsAt)}. You'll keep access until then.`
             : `Renews on ${formatDate(subscription.renewsAt)}.`}
@@ -242,7 +242,7 @@ function PaymentCard({ method }: { method: PaymentMethod }) {
             <p className="nx:text-foreground nx:font-medium">
               {method.brand} ···· {method.last4}
             </p>
-            <p className="nx:text-muted-foreground nx:text-sm nx:tabular-nums">
+            <p className="nx:text-muted-foreground nx:typography-body-default nx:tabular-nums">
               Expires {String(method.expMonth).padStart(2, '0')}/
               {method.expYear}
             </p>
@@ -281,11 +281,11 @@ export function UsageMeterBar({ meter }: { meter: UsageMeter }) {
   return (
     <div className="nx:space-y-2">
       <div className="nx:flex nx:items-baseline nx:justify-between nx:gap-2">
-        <span className="nx:text-foreground nx:text-sm nx:font-medium">
+        <span className="nx:text-foreground nx:typography-label-default">
           {meter.label}
         </span>
         <span
-          className={`nx:text-xs nx:tabular-nums ${nearCap ? 'nx:text-warning-subtle-foreground' : 'nx:text-muted-foreground'}`}
+          className={`nx:typography-label-small nx:tabular-nums ${nearCap ? 'nx:text-warning-subtle-foreground' : 'nx:text-muted-foreground'}`}
         >
           {meter.used} / {meter.limit} {meter.unit}
         </span>

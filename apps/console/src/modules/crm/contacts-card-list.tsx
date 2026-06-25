@@ -24,7 +24,7 @@ export function ContactCardList({ contacts }: { contacts: Contact[] }) {
         placeholder="Filter by name…"
       />
       {pageItems.length === 0 ? (
-        <p className="nx:text-muted-foreground nx:py-8 nx:text-center nx:text-sm">
+        <p className="nx:text-muted-foreground nx:py-8 nx:text-center nx:typography-body-default">
           No results.
         </p>
       ) : (

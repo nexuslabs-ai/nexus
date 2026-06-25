@@ -152,7 +152,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 >
                   <IconUsers />
                   <span>{contact.name}</span>
-                  <span className="nx:text-muted-foreground nx:ml-auto nx:text-xs">
+                  <span className="nx:text-muted-foreground nx:ml-auto nx:typography-label-small">
                     {contact.company}
                   </span>
                 </CommandItem>
@@ -176,7 +176,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 >
                   <IconBriefcase />
                   <span>{issue.title}</span>
-                  <span className="nx:text-muted-foreground nx:ml-auto nx:text-xs">
+                  <span className="nx:text-muted-foreground nx:ml-auto nx:typography-label-small">
                     {issue.key}
                   </span>
                 </CommandItem>
@@ -200,7 +200,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 >
                   <IconInbox />
                   <span>{conversation.subject}</span>
-                  <span className="nx:text-muted-foreground nx:ml-auto nx:text-xs">
+                  <span className="nx:text-muted-foreground nx:ml-auto nx:typography-label-small">
                     {conversation.customer}
                   </span>
                 </CommandItem>
@@ -224,7 +224,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 >
                   <IconAddressBook />
                   <span>{member.name}</span>
-                  <span className="nx:text-muted-foreground nx:ml-auto nx:text-xs">
+                  <span className="nx:text-muted-foreground nx:ml-auto nx:typography-label-small">
                     {member.title}
                   </span>
                 </CommandItem>

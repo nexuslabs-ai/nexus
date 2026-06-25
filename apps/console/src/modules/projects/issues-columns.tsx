@@ -82,7 +82,7 @@ export const issueColumns: ColumnDef<Issue>[] = [
     accessorKey: 'key',
     header: ({ column }) => <SortHeader column={column}>ID</SortHeader>,
     cell: ({ row }) => (
-      <span className="nx:text-muted-foreground nx:text-sm nx:tabular-nums">
+      <span className="nx:text-muted-foreground nx:typography-label-default nx:tabular-nums">
         {row.original.key}
       </span>
     ),
@@ -116,7 +116,7 @@ export const issueColumns: ColumnDef<Issue>[] = [
     cell: ({ row }) => (
       <div className="nx:flex nx:items-center nx:gap-2">
         <Avatar className="nx:size-6">
-          <AvatarFallback className="nx:text-xs">
+          <AvatarFallback className="nx:typography-label-small">
             {initials(row.original.assignee)}
           </AvatarFallback>
         </Avatar>

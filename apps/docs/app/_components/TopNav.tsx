@@ -35,7 +35,7 @@ export function TopNav() {
 
   return (
     <header className="nx:sticky nx:top-0 nx:z-30 nx:flex nx:items-center nx:gap-6 nx:px-6 nx:py-3 nx:bg-nav-background nx:text-nav-foreground nx:border-b nx:border-nav-border">
-      <div className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:text-sm">
+      <div className="nx:flex nx:items-center nx:gap-2 nx:font-semibold nx:typography-label-default">
         Nexus DS
         <span className="nx:text-[10px] nx:uppercase nx:tracking-wider nx:text-nav-muted-foreground nx:px-1.5 nx:py-0.5 nx:border nx:border-dashed nx:border-nav-border nx:rounded-sm">
           docs
@@ -50,8 +50,8 @@ export function TopNav() {
               href={s.href}
               className={
                 active
-                  ? 'nx:px-3 nx:py-1 nx:text-sm nx:rounded-sm nx:font-medium nx:bg-nav-item-active nx:text-primary-subtle-foreground'
-                  : 'nx:px-3 nx:py-1 nx:text-sm nx:rounded-sm nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover'
+                  ? 'nx:px-3 nx:py-1 nx:typography-label-default nx:rounded-sm nx:bg-nav-item-active nx:text-primary-subtle-foreground'
+                  : 'nx:px-3 nx:py-1 nx:typography-label-default nx:rounded-sm nx:text-nav-muted-foreground nx:hover:text-nav-foreground nx:hover:bg-nav-item-hover'
               }
             >
               {s.label}

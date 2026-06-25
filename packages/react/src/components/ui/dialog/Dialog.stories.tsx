@@ -59,7 +59,7 @@ export const Default: Story = {
           </DialogDescription>
         </DialogHeader>
         <DialogBody>
-          <p className="nx:text-sm nx:text-foreground">
+          <p className="nx:typography-body-default nx:text-foreground">
             Dialog content goes here. You can add any content you need.
           </p>
         </DialogBody>
@@ -91,7 +91,7 @@ export const WithDescription: Story = {
           <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
             <label
               htmlFor="name"
-              className="nx:text-right nx:text-sm nx:font-medium"
+              className="nx:text-right nx:typography-label-default"
             >
               Name
             </label>
@@ -104,7 +104,7 @@ export const WithDescription: Story = {
           <div className="nx:grid nx:grid-cols-4 nx:items-center nx:gap-4">
             <label
               htmlFor="username"
-              className="nx:text-right nx:text-sm nx:font-medium"
+              className="nx:text-right nx:typography-label-default"
             >
               Username
             </label>
@@ -164,7 +164,7 @@ export const CustomCloseButton: Story = {
           </DialogDescription>
         </DialogHeader>
         <DialogBody>
-          <p className="nx:text-sm nx:text-foreground">
+          <p className="nx:typography-body-default nx:text-foreground">
             You can customize how users close the dialog.
           </p>
         </DialogBody>
@@ -191,7 +191,7 @@ export const ScrollableContent: Story = {
             Please read the following terms carefully.
           </DialogDescription>
         </DialogHeader>
-        <DialogBody className="nx:space-y-4 nx:text-sm nx:text-foreground">
+        <DialogBody className="nx:space-y-4 nx:typography-label-default nx:text-foreground">
           {Array.from({ length: 10 }).map((_, i) => (
             <p key={i}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -495,7 +495,7 @@ export const WithDataAttributes: Story = {
           <DialogDescription>Testing data-slot attributes.</DialogDescription>
         </DialogHeader>
         <DialogBody>
-          <p className="nx:text-sm">Content here</p>
+          <p className="nx:typography-body-default">Content here</p>
         </DialogBody>
         <DialogFooter>
           <DialogClose asChild>
@@ -756,7 +756,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Dialog Trigger Variants
         </h3>
         <div className="nx:flex nx:gap-4">
@@ -796,7 +796,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Dialog with Footer Actions
         </h3>
         <Dialog>
@@ -821,7 +821,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Dialog without Close Button
         </h3>
         <Dialog>

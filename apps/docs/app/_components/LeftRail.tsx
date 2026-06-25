@@ -22,8 +22,8 @@ export function LeftRail({ section }: { section: Section }) {
                 href={href}
                 className={
                   active
-                    ? 'nx:block nx:px-2 nx:py-1 nx:text-sm nx:rounded-sm nx:font-medium nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-l-2 nx:border-focus-default nx:no-underline'
-                    : 'nx:block nx:px-2 nx:py-1 nx:text-sm nx:rounded-sm nx:text-muted-foreground nx:border-l-2 nx:border-transparent nx:no-underline nx:hover:text-foreground nx:hover:bg-container-hover'
+                    ? 'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:border-l-2 nx:border-focus-default nx:no-underline'
+                    : 'nx:block nx:px-2 nx:py-1 nx:typography-label-default nx:rounded-sm nx:text-muted-foreground nx:border-l-2 nx:border-transparent nx:no-underline nx:hover:text-foreground nx:hover:bg-container-hover'
                 }
               >
                 {sub.label}
@@ -33,7 +33,7 @@ export function LeftRail({ section }: { section: Section }) {
                   {sub.nested.map((label) => (
                     <li
                       key={label}
-                      className="nx:px-2 nx:py-0.5 nx:text-xs nx:text-muted-foreground-subtle"
+                      className="nx:px-2 nx:py-0.5 nx:typography-label-small nx:text-muted-foreground-subtle"
                     >
                       [ {label} ]
                     </li>

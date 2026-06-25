@@ -53,7 +53,7 @@ export const AllVariants: Story = {
         <Spinner className="nx:size-6" />
         <Spinner className="nx:size-8" />
       </div>
-      <div className="nx:flex nx:items-center nx:gap-2 nx:text-sm nx:text-muted-foreground">
+      <div className="nx:flex nx:items-center nx:gap-2 nx:typography-label-default nx:text-muted-foreground">
         <Spinner className="nx:size-4" />
         <span>Loading more…</span>
       </div>

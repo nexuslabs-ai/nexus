@@ -22,10 +22,10 @@ export const Default: Story = {
       </HoverCardTrigger>
       <HoverCardContent>
         <div className="nx:flex nx:flex-col nx:gap-1">
-          <p className="nx:text-sm nx:font-semibold nx:text-foreground">
+          <p className="nx:typography-label-default nx:font-semibold nx:text-foreground">
             @nexus
           </p>
-          <p className="nx:text-sm nx:text-muted-foreground">
+          <p className="nx:typography-body-default nx:text-muted-foreground">
             The AI-native design system. Joined March 2026.
           </p>
         </div>

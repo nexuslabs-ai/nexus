@@ -24,7 +24,7 @@ export const Default: Story = {
     <Collapsible className="nx:flex nx:w-72 nx:flex-col">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
-          <span className="nx:text-sm nx:font-medium nx:text-foreground">
+          <span className="nx:typography-label-default nx:text-foreground">
             @nexus starred 3 repositories
           </span>
           <CollapsibleTrigger asChild>
@@ -33,7 +33,7 @@ export const Default: Story = {
             </Button>
           </CollapsibleTrigger>
         </div>
-        <div className="nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-foreground">
+        <div className="nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-foreground">
           @radix-ui/react-collapsible
         </div>
       </div>
@@ -41,10 +41,10 @@ export const Default: Story = {
           there is no parent flex `gap` to snap when it collapses to height 0. */}
       <CollapsibleContent>
         <div className="nx:mt-2 nx:flex nx:flex-col nx:gap-2">
-          <div className="nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-foreground">
+          <div className="nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-foreground">
             @radix-ui/react-toggle
           </div>
-          <div className="nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-foreground">
+          <div className="nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-foreground">
             @radix-ui/react-slider
           </div>
         </div>
@@ -61,7 +61,7 @@ export const Open: Story = {
         <Button variant="outline">Toggle details</Button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-muted-foreground">
+        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-muted-foreground">
           Revealed content shown while open.
         </div>
       </CollapsibleContent>
@@ -81,7 +81,7 @@ export const ClickInteraction: Story = {
         <Button variant="outline">Toggle details</Button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-foreground">
+        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-foreground">
           Now you see me.
         </div>
       </CollapsibleContent>
@@ -110,7 +110,7 @@ export const KeyboardInteraction: Story = {
         <Button variant="outline">Toggle details</Button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-foreground">
+        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-foreground">
           Keyboard-revealed content.
         </div>
       </CollapsibleContent>
@@ -140,7 +140,7 @@ export const Disabled: Story = {
         <Button variant="outline">Toggle details</Button>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-foreground">
+        <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-foreground">
           Unreachable while disabled.
         </div>
       </CollapsibleContent>
@@ -196,7 +196,7 @@ export const AllVariants: Story = {
           <Button variant="outline">Closed by default</Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-muted-foreground">
+          <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-muted-foreground">
             Hidden until toggled.
           </div>
         </CollapsibleContent>
@@ -206,7 +206,7 @@ export const AllVariants: Story = {
           <Button variant="outline">Open by default</Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:text-sm nx:text-muted-foreground">
+          <div className="nx:mt-2 nx:rounded-md nx:border nx:border-border-default nx:px-4 nx:py-2 nx:typography-label-default nx:text-muted-foreground">
             Visible on first render.
           </div>
         </CollapsibleContent>

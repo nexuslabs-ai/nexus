@@ -55,7 +55,7 @@ export const VerticalWithLabels: Story = {
         />
         <div className="nx:grid nx:gap-1">
           <Label htmlFor="vertical-starter">Starter</Label>
-          <p className="nx:text-sm nx:text-muted-foreground">
+          <p className="nx:typography-body-default nx:text-muted-foreground">
             For individuals getting started.
           </p>
         </div>
@@ -64,7 +64,7 @@ export const VerticalWithLabels: Story = {
         <RadioGroupItem value="pro" id="vertical-pro" className="nx:mt-0.5" />
         <div className="nx:grid nx:gap-1">
           <Label htmlFor="vertical-pro">Pro</Label>
-          <p className="nx:text-sm nx:text-muted-foreground">
+          <p className="nx:typography-body-default nx:text-muted-foreground">
             For growing teams that need more.
           </p>
         </div>
@@ -77,7 +77,7 @@ export const VerticalWithLabels: Story = {
         />
         <div className="nx:grid nx:gap-1">
           <Label htmlFor="vertical-enterprise">Enterprise</Label>
-          <p className="nx:text-sm nx:text-muted-foreground">
+          <p className="nx:typography-body-default nx:text-muted-foreground">
             Advanced controls and support.
           </p>
         </div>
@@ -287,7 +287,7 @@ export const AllVariants: Story = {
     return (
       <div className="nx:flex nx:flex-col nx:gap-8">
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             States
           </h3>
           <div className="nx:flex nx:items-center nx:gap-6">
@@ -295,7 +295,7 @@ export const AllVariants: Story = {
               <RadioGroup aria-label="Unselected state">
                 <RadioGroupItem value="a" aria-label="Unselected" />
               </RadioGroup>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Unselected
               </span>
             </div>
@@ -303,7 +303,7 @@ export const AllVariants: Story = {
               <RadioGroup defaultValue="a" aria-label="Selected state">
                 <RadioGroupItem value="a" aria-label="Selected" />
               </RadioGroup>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Selected
               </span>
             </div>
@@ -311,7 +311,7 @@ export const AllVariants: Story = {
               <RadioGroup aria-label="Disabled state">
                 <RadioGroupItem value="a" disabled aria-label="Disabled" />
               </RadioGroup>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Disabled
               </span>
             </div>
@@ -323,7 +323,7 @@ export const AllVariants: Story = {
                   aria-label="Disabled selected"
                 />
               </RadioGroup>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Disabled selected
               </span>
             </div>
@@ -331,7 +331,7 @@ export const AllVariants: Story = {
               <RadioGroup aria-label="Invalid state">
                 <RadioGroupItem value="a" aria-invalid aria-label="Invalid" />
               </RadioGroup>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Invalid
               </span>
             </div>
@@ -343,7 +343,7 @@ export const AllVariants: Story = {
                   aria-label="Invalid selected"
                 />
               </RadioGroup>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Invalid selected
               </span>
             </div>
@@ -351,7 +351,7 @@ export const AllVariants: Story = {
         </div>
 
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             With labels
           </h3>
           <RadioGroup defaultValue="comfortable" aria-label="Density">

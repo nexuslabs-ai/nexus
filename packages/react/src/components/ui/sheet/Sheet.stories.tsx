@@ -55,7 +55,7 @@ export const Default: Story = {
           </SheetDescription>
         </SheetHeader>
         <SheetBody>
-          <p className="nx:text-sm nx:text-foreground">
+          <p className="nx:typography-body-default nx:text-foreground">
             Sheet content goes here. You can add any content you need.
           </p>
         </SheetBody>
@@ -144,7 +144,7 @@ export const WithForm: Story = {
         </SheetHeader>
         <SheetBody className="nx:grid nx:gap-4">
           <div className="nx:grid nx:gap-1.5">
-            <label htmlFor="sheet-name" className="nx:text-sm nx:font-medium">
+            <label htmlFor="sheet-name" className="nx:typography-label-default">
               Name
             </label>
             <Input id="sheet-name" defaultValue="John Doe" />
@@ -152,7 +152,7 @@ export const WithForm: Story = {
           <div className="nx:grid nx:gap-1.5">
             <label
               htmlFor="sheet-username"
-              className="nx:text-sm nx:font-medium"
+              className="nx:typography-label-default"
             >
               Username
             </label>
@@ -183,7 +183,7 @@ export const ScrollableContent: Story = {
             Please read the following terms carefully.
           </SheetDescription>
         </SheetHeader>
-        <SheetBody className="nx:space-y-4 nx:text-sm nx:text-foreground">
+        <SheetBody className="nx:space-y-4 nx:typography-label-default nx:text-foreground">
           {Array.from({ length: 12 }).map((_, i) => (
             <p key={i}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -307,7 +307,7 @@ export const WithDataAttributes: Story = {
           <SheetDescription>Testing data-slot attributes.</SheetDescription>
         </SheetHeader>
         <SheetBody>
-          <p className="nx:text-sm">Content here</p>
+          <p className="nx:typography-body-default">Content here</p>
         </SheetBody>
         <SheetFooter>
           <SheetClose asChild>

@@ -75,7 +75,7 @@ export function MultiBrand() {
           orthogonal — base × brand × density × … combine freely.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Dimension</th>
@@ -93,7 +93,7 @@ export function MultiBrand() {
                   <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground">
                     {d.options}
                   </td>
-                  <td className="nx:py-2 nx:font-mono nx:text-xs nx:text-muted-foreground">
+                  <td className="nx:py-2 nx:font-mono nx:typography-label-small nx:text-muted-foreground">
                     {d.swap}
                   </td>
                 </tr>

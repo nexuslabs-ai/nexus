@@ -173,7 +173,10 @@ export const Invalid: Story = {
           <Checkbox {...args} id={checkboxId} aria-describedby={errorId} />
           <Label htmlFor={checkboxId}>Accept terms and conditions</Label>
         </div>
-        <p id={errorId} className="nx:text-sm nx:text-error-subtle-foreground">
+        <p
+          id={errorId}
+          className="nx:typography-body-default nx:text-error-subtle-foreground"
+        >
           Choose at least one required option.
         </p>
       </div>
@@ -217,7 +220,7 @@ export const InvalidStates: Story = {
           </div>
           <p
             id={uncheckedErrorId}
-            className="nx:text-sm nx:text-error-subtle-foreground"
+            className="nx:typography-body-default nx:text-error-subtle-foreground"
           >
             Choose this option before continuing.
           </p>
@@ -235,7 +238,7 @@ export const InvalidStates: Story = {
           </div>
           <p
             id={checkedErrorId}
-            className="nx:text-sm nx:text-error-subtle-foreground"
+            className="nx:typography-body-default nx:text-error-subtle-foreground"
           >
             Resolve the related error before continuing.
           </p>
@@ -255,7 +258,7 @@ export const InvalidStates: Story = {
           </div>
           <p
             id={indeterminateErrorId}
-            className="nx:text-sm nx:text-error-subtle-foreground"
+            className="nx:typography-body-default nx:text-error-subtle-foreground"
           >
             Review the partially selected options.
           </p>
@@ -604,37 +607,37 @@ export const AllVariants: Story = {
     return (
       <div className="nx:flex nx:flex-col nx:gap-8">
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             States
           </h3>
           <div className="nx:flex nx:items-center nx:gap-6">
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Checkbox aria-label="Unchecked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Unchecked
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Checkbox defaultChecked aria-label="Checked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Checked
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Checkbox checked="indeterminate" aria-label="Indeterminate" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Indeterminate
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Checkbox disabled aria-label="Disabled unchecked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Disabled
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Checkbox disabled defaultChecked aria-label="Disabled checked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Disabled Checked
               </span>
             </div>
@@ -644,7 +647,7 @@ export const AllVariants: Story = {
                 checked="indeterminate"
                 aria-label="Disabled indeterminate"
               />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Disabled Mixed
               </span>
             </div>
@@ -652,13 +655,13 @@ export const AllVariants: Story = {
         </div>
 
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             Validation
           </h3>
           <div className="nx:flex nx:items-center nx:gap-6">
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Checkbox aria-invalid aria-label="Unchecked invalid" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Invalid
               </span>
             </div>
@@ -668,7 +671,7 @@ export const AllVariants: Story = {
                 aria-invalid
                 aria-label="Checked invalid"
               />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Invalid Checked
               </span>
             </div>
@@ -676,7 +679,7 @@ export const AllVariants: Story = {
         </div>
 
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             Selectable Cards
           </h3>
           <div className="nx:grid nx:max-w-3xl nx:grid-cols-1 nx:items-start nx:gap-6 nx:md:grid-cols-3">
@@ -796,7 +799,7 @@ export const AllVariants: Story = {
         </div>
 
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             With Labels
           </h3>
           <div className="nx:flex nx:flex-col nx:gap-4">
@@ -818,7 +821,7 @@ export const AllVariants: Story = {
                 </Label>
                 <p
                   id={termsDescriptionId}
-                  className="nx:text-sm nx:text-muted-foreground"
+                  className="nx:typography-body-default nx:text-muted-foreground"
                 >
                   You agree to our Terms of Service and Privacy Policy.
                 </p>

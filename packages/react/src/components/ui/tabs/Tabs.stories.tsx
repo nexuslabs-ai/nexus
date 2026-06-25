@@ -46,12 +46,12 @@ export const Default: Story = {
         <TabsTrigger value="password">Password</TabsTrigger>
       </TabsList>
       <TabsContent value="account">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Make changes to your account here. Click save when you&apos;re done.
         </p>
       </TabsContent>
       <TabsContent value="password">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Change your password here. After saving, you&apos;ll be logged out.
         </p>
       </TabsContent>
@@ -78,17 +78,17 @@ export const UnderlineVariant: Story = {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="account">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Account settings with underline variant tabs.
         </p>
       </TabsContent>
       <TabsContent value="password">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Password settings with underline variant tabs.
         </p>
       </TabsContent>
       <TabsContent value="settings">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           General settings with underline variant tabs.
         </p>
       </TabsContent>
@@ -115,7 +115,7 @@ export const SmallSize: Story = {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Small size tabs content.
         </p>
       </TabsContent>
@@ -149,7 +149,7 @@ export const LargeSize: Story = {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Large size tabs content.
         </p>
       </TabsContent>
@@ -177,7 +177,7 @@ export const WithCards: Story = {
             <div className="nx:space-y-1">
               <label
                 htmlFor="name"
-                className="nx:text-sm nx:font-medium nx:leading-none"
+                className="nx:typography-label-default nx:leading-none"
               >
                 Name
               </label>
@@ -186,7 +186,7 @@ export const WithCards: Story = {
             <div className="nx:space-y-1">
               <label
                 htmlFor="username"
-                className="nx:text-sm nx:font-medium nx:leading-none"
+                className="nx:typography-label-default nx:leading-none"
               >
                 Username
               </label>
@@ -208,7 +208,7 @@ export const WithCards: Story = {
             <div className="nx:space-y-1">
               <label
                 htmlFor="current"
-                className="nx:text-sm nx:font-medium nx:leading-none"
+                className="nx:typography-label-default nx:leading-none"
               >
                 Current password
               </label>
@@ -217,7 +217,7 @@ export const WithCards: Story = {
             <div className="nx:space-y-1">
               <label
                 htmlFor="new"
-                className="nx:text-sm nx:font-medium nx:leading-none"
+                className="nx:typography-label-default nx:leading-none"
               >
                 New password
               </label>
@@ -239,17 +239,17 @@ export const ThreeTabs: Story = {
         <TabsTrigger value="reports">Reports</TabsTrigger>
       </TabsList>
       <TabsContent value="overview">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Overview of your dashboard metrics and key performance indicators.
         </p>
       </TabsContent>
       <TabsContent value="analytics">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Detailed analytics showing user engagement and traffic patterns.
         </p>
       </TabsContent>
       <TabsContent value="reports">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Generated reports for stakeholders and team reviews.
         </p>
       </TabsContent>
@@ -268,13 +268,19 @@ export const WithDisabledTab: Story = {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="account">
-        <p className="nx:text-sm nx:text-muted-foreground">Account content</p>
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Account content
+        </p>
       </TabsContent>
       <TabsContent value="password">
-        <p className="nx:text-sm nx:text-muted-foreground">Password content</p>
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Password content
+        </p>
       </TabsContent>
       <TabsContent value="settings">
-        <p className="nx:text-sm nx:text-muted-foreground">Settings content</p>
+        <p className="nx:typography-body-default nx:text-muted-foreground">
+          Settings content
+        </p>
       </TabsContent>
     </Tabs>
   ),
@@ -301,17 +307,17 @@ export const FullWidth: Story = {
         <TabsTrigger value="tab3">Third Tab</TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Content for the first tab.
         </p>
       </TabsContent>
       <TabsContent value="tab2">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Content for the second tab.
         </p>
       </TabsContent>
       <TabsContent value="tab3">
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Content for the third tab.
         </p>
       </TabsContent>
@@ -515,7 +521,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Default Variant
         </h3>
         <Tabs defaultValue="tab1" className="nx:w-[400px]">
@@ -525,7 +531,7 @@ export const AllVariants: Story = {
             <TabsTrigger value="tab3">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
-            <p className="nx:text-sm nx:text-muted-foreground">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
               Default variant (pill style)
             </p>
           </TabsContent>
@@ -533,7 +539,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Underline Variant
         </h3>
         <Tabs defaultValue="tab1" className="nx:w-[400px]">
@@ -549,7 +555,7 @@ export const AllVariants: Story = {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
-            <p className="nx:text-sm nx:text-muted-foreground">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
               Underline variant (border-bottom style)
             </p>
           </TabsContent>
@@ -557,7 +563,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Sizes (Small, Default, Large)
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-4">
@@ -601,7 +607,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Disabled Tab
         </h3>
         <Tabs defaultValue="tab1" className="nx:w-[400px]">
@@ -613,7 +619,7 @@ export const AllVariants: Story = {
             <TabsTrigger value="tab3">Another</TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
-            <p className="nx:text-sm nx:text-muted-foreground">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
               Active content
             </p>
           </TabsContent>
@@ -621,7 +627,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Grid Layout
         </h3>
         <Tabs defaultValue="tab1" className="nx:w-[400px]">
@@ -630,7 +636,7 @@ export const AllVariants: Story = {
             <TabsTrigger value="tab2">Second</TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
-            <p className="nx:text-sm nx:text-muted-foreground">
+            <p className="nx:typography-body-default nx:text-muted-foreground">
               Grid layout content
             </p>
           </TabsContent>

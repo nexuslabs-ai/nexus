@@ -90,7 +90,7 @@ export function VerifyRoute() {
         </Button>
         <Link
           to="/login"
-          className="nx:text-muted-foreground nx:text-sm nx:hover:underline"
+          className="nx:text-muted-foreground nx:typography-label-default nx:hover:underline"
         >
           Back to sign in
         </Link>

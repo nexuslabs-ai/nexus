@@ -280,8 +280,8 @@ export const NotificationCard: Story = {
           <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
             <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
             <div>
-              <p className="nx:typography-label-default">New message</p>
-              <p className="nx:text-sm nx:text-foreground/70">
+              <p className="nx:typography-body-default">New message</p>
+              <p className="nx:typography-body-default nx:text-foreground/70">
                 John sent you a message
               </p>
             </div>
@@ -289,8 +289,8 @@ export const NotificationCard: Story = {
           <div className="nx:flex nx:items-start nx:gap-3 nx:rounded-lg nx:bg-muted nx:p-3">
             <div className="nx:size-2 nx:mt-2 nx:rounded-full nx:bg-primary-background" />
             <div>
-              <p className="nx:typography-label-default">Update available</p>
-              <p className="nx:text-sm nx:text-foreground/70">
+              <p className="nx:typography-body-default">Update available</p>
+              <p className="nx:typography-body-default nx:text-foreground/70">
                 Version 2.0 is now available
               </p>
             </div>
@@ -316,7 +316,7 @@ export const StatsCard: Story = {
         </p>
       </CardHeader>
       <CardContent>
-        <p className="nx:text-xs nx:text-muted-foreground">
+        <p className="nx:typography-label-small nx:text-muted-foreground">
           +20.1% from last month
         </p>
       </CardContent>
@@ -502,7 +502,9 @@ export const AllVariants: Story = {
               </p>
             </CardHeader>
             <CardContent>
-              <p className="nx:text-xs nx:text-muted-foreground">+12% growth</p>
+              <p className="nx:typography-label-small nx:text-muted-foreground">
+                +12% growth
+              </p>
             </CardContent>
           </Card>
           <Card className="nx:w-[180px]">
@@ -513,7 +515,9 @@ export const AllVariants: Story = {
               </p>
             </CardHeader>
             <CardContent>
-              <p className="nx:text-xs nx:text-muted-foreground">+5% growth</p>
+              <p className="nx:typography-label-small nx:text-muted-foreground">
+                +5% growth
+              </p>
             </CardContent>
           </Card>
         </div>

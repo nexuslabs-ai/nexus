@@ -85,11 +85,14 @@ export const Invalid: Story = {
       <div className="nx:grid nx:gap-2">
         <div className="nx:flex nx:items-center nx:gap-2">
           <Switch {...args} id={switchId} aria-describedby={errorId} />
-          <label htmlFor={switchId} className="nx:text-sm nx:font-medium">
+          <label htmlFor={switchId} className="nx:typography-label-default">
             Enable required setting
           </label>
         </div>
-        <p id={errorId} className="nx:text-sm nx:text-error-subtle-foreground">
+        <p
+          id={errorId}
+          className="nx:typography-body-default nx:text-error-subtle-foreground"
+        >
           This setting must be enabled to continue.
         </p>
       </div>
@@ -143,7 +146,7 @@ export const WithLabel: Story = {
       <Switch id="airplane-mode" />
       <label
         htmlFor="airplane-mode"
-        className="nx:text-sm nx:font-medium nx:leading-none nx:peer-disabled:cursor-not-allowed nx:peer-disabled:text-disabled-foreground"
+        className="nx:typography-label-default nx:leading-none nx:peer-disabled:cursor-not-allowed nx:peer-disabled:text-disabled-foreground"
       >
         Airplane Mode
       </label>
@@ -157,11 +160,11 @@ export const WithLabelAndDescription: Story = {
       <Switch id="notifications" />
       <label
         htmlFor="notifications"
-        className="nx:text-sm nx:font-medium nx:leading-none"
+        className="nx:typography-label-default nx:leading-none"
       >
         Enable Notifications
       </label>
-      <p className="nx:col-start-2 nx:text-sm nx:text-muted-foreground">
+      <p className="nx:col-start-2 nx:typography-body-default nx:text-muted-foreground">
         Receive notifications when someone mentions you.
       </p>
     </div>
@@ -174,11 +177,11 @@ export const LabelOnLeft: Story = {
       <div className="nx:space-y-0.5">
         <label
           htmlFor="marketing"
-          className="nx:text-sm nx:font-medium nx:leading-none"
+          className="nx:typography-label-default nx:leading-none"
         >
           Marketing emails
         </label>
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Receive emails about new products and features.
         </p>
       </div>
@@ -203,11 +206,11 @@ export const Controlled: Story = {
             checked={checked}
             onCheckedChange={setChecked}
           />
-          <label htmlFor="controlled" className="nx:text-sm nx:font-medium">
+          <label htmlFor="controlled" className="nx:typography-label-default">
             Controlled Switch
           </label>
         </div>
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Switch is {checked ? 'on' : 'off'}
         </p>
       </div>
@@ -317,31 +320,31 @@ export const AllVariants: Story = {
     return (
       <div className="nx:flex nx:flex-col nx:gap-8">
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             States
           </h3>
           <div className="nx:flex nx:items-center nx:gap-6">
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Switch aria-label="Unchecked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Unchecked
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Switch defaultChecked aria-label="Checked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Checked
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Switch disabled aria-label="Disabled unchecked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Disabled
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Switch disabled defaultChecked aria-label="Disabled checked" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Disabled Checked
               </span>
             </div>
@@ -349,13 +352,13 @@ export const AllVariants: Story = {
         </div>
 
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             Sizes
           </h3>
           <div className="nx:flex nx:items-center nx:gap-6">
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Switch size="default" aria-label="Default size" />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Default
               </span>
             </div>
@@ -365,13 +368,15 @@ export const AllVariants: Story = {
                 defaultChecked
                 aria-label="Default size checked"
               />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Default checked
               </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Switch size="sm" aria-label="Small size" />
-              <span className="nx:text-xs nx:text-muted-foreground">Small</span>
+              <span className="nx:typography-label-small nx:text-muted-foreground">
+                Small
+              </span>
             </div>
             <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
               <Switch
@@ -379,7 +384,7 @@ export const AllVariants: Story = {
                 defaultChecked
                 aria-label="Small size checked"
               />
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 Small checked
               </span>
             </div>
@@ -389,11 +394,11 @@ export const AllVariants: Story = {
               <Switch size="default" id={`${uid}-desc-default`} />
               <label
                 htmlFor={`${uid}-desc-default`}
-                className="nx:text-sm nx:font-medium nx:leading-none"
+                className="nx:typography-label-default nx:leading-none"
               >
                 Default with description
               </label>
-              <p className="nx:col-start-2 nx:text-sm nx:text-muted-foreground">
+              <p className="nx:col-start-2 nx:typography-body-default nx:text-muted-foreground">
                 The control centers with the label&apos;s first line.
               </p>
             </div>
@@ -401,11 +406,11 @@ export const AllVariants: Story = {
               <Switch size="sm" id={`${uid}-desc-sm`} />
               <label
                 htmlFor={`${uid}-desc-sm`}
-                className="nx:text-sm nx:font-medium nx:leading-none"
+                className="nx:typography-label-default nx:leading-none"
               >
                 Small with description
               </label>
-              <p className="nx:col-start-2 nx:text-sm nx:text-muted-foreground">
+              <p className="nx:col-start-2 nx:typography-body-default nx:text-muted-foreground">
                 Alignment holds at the smaller size too.
               </p>
             </div>
@@ -413,7 +418,7 @@ export const AllVariants: Story = {
         </div>
 
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             With Labels
           </h3>
           <div className="nx:flex nx:flex-col nx:gap-4">
@@ -421,7 +426,7 @@ export const AllVariants: Story = {
               <Switch id={`${uid}-label-right`} />
               <label
                 htmlFor={`${uid}-label-right`}
-                className="nx:text-sm nx:font-medium"
+                className="nx:typography-label-default"
               >
                 Label on right
               </label>
@@ -429,7 +434,7 @@ export const AllVariants: Story = {
             <div className="nx:flex nx:items-center nx:gap-2">
               <label
                 htmlFor={`${uid}-label-left`}
-                className="nx:text-sm nx:font-medium"
+                className="nx:typography-label-default"
               >
                 Label on left
               </label>
@@ -439,14 +444,14 @@ export const AllVariants: Story = {
         </div>
 
         <div>
-          <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+          <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
             Settings Pattern
           </h3>
           <div className="nx:w-80 nx:space-y-4">
             <div className="nx:flex nx:items-center nx:justify-between">
               <label
                 htmlFor={`${uid}-setting1`}
-                className="nx:text-sm nx:font-medium"
+                className="nx:typography-label-default"
               >
                 Enable feature
               </label>
@@ -455,7 +460,7 @@ export const AllVariants: Story = {
             <div className="nx:flex nx:items-center nx:justify-between">
               <label
                 htmlFor={`${uid}-setting2`}
-                className="nx:text-sm nx:font-medium"
+                className="nx:typography-label-default"
               >
                 Show previews
               </label>
@@ -464,7 +469,7 @@ export const AllVariants: Story = {
             <div className="nx:flex nx:items-center nx:justify-between">
               <label
                 htmlFor={`${uid}-setting3`}
-                className="nx:text-sm nx:font-medium nx:text-muted-foreground"
+                className="nx:typography-label-default nx:text-muted-foreground"
               >
                 Beta features (disabled)
               </label>

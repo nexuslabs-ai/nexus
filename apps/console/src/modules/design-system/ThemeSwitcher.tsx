@@ -29,7 +29,7 @@ function Section({
 }) {
   return (
     <div className="nx:bg-container nx:rounded-lg nx:border nx:border-border-default nx:p-3">
-      <h3 className="nx:text-xs nx:font-semibold nx:uppercase nx:tracking-wide nx:text-muted-foreground nx:mb-3">
+      <h3 className="nx:typography-label-caps nx:uppercase nx:text-muted-foreground nx:mb-3">
         {title}
       </h3>
       {children}
@@ -54,7 +54,10 @@ function ColorSelect<TValue extends string>({
 
   return (
     <div className="nx:flex nx:items-center nx:justify-between">
-      <label htmlFor={id} className="nx:text-sm nx:text-foreground">
+      <label
+        htmlFor={id}
+        className="nx:typography-label-default nx:text-foreground"
+      >
         {label}
       </label>
       <div className="nx:relative">
@@ -62,7 +65,7 @@ function ColorSelect<TValue extends string>({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value as TValue)}
-          className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-7 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
+          className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-7 nx:pr-8 nx:py-1.5 nx:typography-label-default nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -101,7 +104,10 @@ function TokenSelect<TValue extends string>({
 }) {
   return (
     <div className="nx:flex nx:items-center nx:justify-between">
-      <label htmlFor={id} className="nx:text-sm nx:text-foreground">
+      <label
+        htmlFor={id}
+        className="nx:typography-label-default nx:text-foreground"
+      >
         {label}
       </label>
       <div className="nx:relative">
@@ -109,7 +115,7 @@ function TokenSelect<TValue extends string>({
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value as TValue)}
-          className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors nx:capitalize"
+          className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:typography-label-default nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors nx:capitalize"
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>
@@ -141,7 +147,7 @@ function ToggleSwitch({
   return (
     <div className="nx:flex nx:items-center nx:justify-center nx:gap-3">
       <span
-        className={`nx:text-sm ${!checked ? 'nx:text-foreground nx:font-medium' : 'nx:text-muted-foreground'}`}
+        className={`nx:typography-label-default ${!checked ? 'nx:text-foreground' : 'nx:text-muted-foreground'}`}
       >
         {labelLeft}
       </span>
@@ -163,7 +169,7 @@ function ToggleSwitch({
         />
       </button>
       <span
-        className={`nx:text-sm ${checked ? 'nx:text-foreground nx:font-medium' : 'nx:text-muted-foreground'}`}
+        className={`nx:typography-label-default ${checked ? 'nx:text-foreground' : 'nx:text-muted-foreground'}`}
       >
         {labelRight}
       </span>
@@ -187,10 +193,10 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
     <div className="nx:h-full nx:flex nx:flex-col nx:bg-background-hover-alpha">
       {/* Header */}
       <div className="nx:p-4 nx:border-b nx:border-border-default">
-        <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
+        <h2 className="nx:typography-heading-xsmall nx:text-foreground">
           Customize Theme
         </h2>
-        <p className="nx:text-xs nx:text-muted-foreground nx:mt-0.5">
+        <p className="nx:typography-label-small nx:text-muted-foreground nx:mt-0.5">
           Adjust colors, tokens, and icons
         </p>
       </div>
@@ -276,7 +282,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
           <div className="nx:flex nx:items-center nx:justify-between">
             <label
               htmlFor="icon-library-select"
-              className="nx:text-sm nx:text-foreground"
+              className="nx:typography-label-default nx:text-foreground"
             >
               Library
             </label>
@@ -285,7 +291,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
                 id="icon-library-select"
                 value={iconLibrary}
                 onChange={(e) => setIconLibrary(e.target.value as IconLibrary)}
-                className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:text-sm nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
+                className="nx:appearance-none nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:pl-3 nx:pr-8 nx:py-1.5 nx:typography-label-default nx:cursor-pointer nx:hover:bg-background-hover nx:transition-colors"
               >
                 {ICON_LIBRARIES.map((lib) => (
                   <option key={lib} value={lib}>
@@ -300,7 +306,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
               />
             </div>
           </div>
-          <p className="nx:text-xs nx:text-muted-foreground nx:mt-2">
+          <p className="nx:typography-label-small nx:text-muted-foreground nx:mt-2">
             {iconLibraryMeta[iconLibrary].iconCount} icons available
           </p>
         </Section>
@@ -310,7 +316,7 @@ export function ThemeSwitcher({ theme, setTheme }: ThemeSwitcherProps) {
       <div className="nx:p-4 nx:border-t nx:border-border-default">
         <button
           onClick={handleReset}
-          className="nx:w-full nx:flex nx:items-center nx:justify-center nx:gap-2 nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:bg-background-hover nx:transition-colors"
+          className="nx:w-full nx:flex nx:items-center nx:justify-center nx:gap-2 nx:bg-background nx:border nx:border-border-default nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:hover:bg-background-hover nx:transition-colors"
         >
           <PlaygroundIcon name="x" size={14} />
           Reset to Default
