@@ -921,3 +921,45 @@ export const Compact: Story = {
     </SidebarProvider>
   ),
 };
+
+/**
+ * The minimal shape: a flat `SidebarMenu` of buttons with no group wrapper or
+ * label. `SidebarGroup`/`-Label`/`-Content` are dropped; the `SidebarMenu` /
+ * `SidebarMenuItem` list stays (accessibility + badge/action anchoring). The
+ * `p-2` that `SidebarGroup` normally supplies is moved onto `SidebarContent`.
+ */
+export const Flat: Story = {
+  name: 'Flat (no groups)',
+  render: () => (
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarContent className="nx:p-2">
+          <SidebarMenu>
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={item.title === 'Home'}
+                  >
+                    <Icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                  {item.badge && (
+                    <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                  )}
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+      <DemoInset>
+        Flat structure — no SidebarGroup/-Label/-Content, just a SidebarMenu of
+        buttons.
+      </DemoInset>
+    </SidebarProvider>
+  ),
+};
