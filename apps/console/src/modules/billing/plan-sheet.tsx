@@ -87,7 +87,7 @@ export function PlanSheet({
           <div className="nx:border-border-default nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border nx:p-3">
             <div className="nx:space-y-0.5">
               <Label htmlFor="billing-cycle">Annual billing</Label>
-              <p className="nx:text-muted-foreground nx:text-sm">
+              <p className="nx:text-muted-foreground nx:typography-body-default">
                 Save with a yearly commitment.
               </p>
             </div>
@@ -123,14 +123,14 @@ export function PlanSheet({
                       <span className="nx:text-foreground nx:font-medium">
                         {plan.name}
                       </span>
-                      <span className="nx:text-foreground nx:text-sm">
+                      <span className="nx:text-foreground nx:typography-label-default">
                         {price === 0 ? 'Free' : `${formatCurrency(price)}/mo`}
                       </span>
                     </div>
-                    <p className="nx:text-muted-foreground nx:text-sm">
+                    <p className="nx:text-muted-foreground nx:typography-body-default">
                       {plan.blurb}
                     </p>
-                    <ul className="nx:text-muted-foreground nx:space-y-1 nx:pt-1 nx:text-sm">
+                    <ul className="nx:text-muted-foreground nx:space-y-1 nx:pt-1 nx:typography-label-default">
                       {plan.features.map((feature) => (
                         <li
                           key={feature}

@@ -136,7 +136,7 @@ export function SignupRoute() {
             >
               Create account
             </Button>
-            <p className="nx:text-muted-foreground nx:text-sm">
+            <p className="nx:text-muted-foreground nx:typography-body-default">
               Already have an account?{' '}
               <Link
                 to="/login"

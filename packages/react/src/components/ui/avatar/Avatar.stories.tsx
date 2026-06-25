@@ -121,7 +121,7 @@ export const DefaultDataAttributes: Story = {
     await expect(avatar).toHaveAttribute('data-shape', 'circle');
     // #496: initials text scales with the avatar diameter via arbitrary rem
     // (16px/36px have no composite, so the whole scale stays arbitrary, matching
-    // the pre-existing 2xs/xs). md → text-[1rem], migrated from raw nx:text-base.
+    // the pre-existing 2xs/xs). md → text-[1rem], migrated from the raw named text-size utility.
     await expect(avatar).toHaveClass('nx:text-[1rem]');
   },
 };
@@ -175,7 +175,7 @@ export const Decorative: Story = {
         <AvatarImage src={AVATAR_URL} alt="" />
         <AvatarFallback aria-hidden="true">AL</AvatarFallback>
       </Avatar>
-      <span className="nx:text-sm nx:font-medium nx:text-foreground">
+      <span className="nx:typography-label-default nx:text-foreground">
         Ada Lovelace
       </span>
     </div>
@@ -227,7 +227,7 @@ export const StarterVariants: Story = {
               {person.initials}
             </AvatarFallback>
           </Avatar>
-          <span className="nx:text-xs nx:text-muted-foreground">
+          <span className="nx:typography-label-small nx:text-muted-foreground">
             {person.name}
           </span>
         </div>
@@ -575,7 +575,7 @@ export const AllSizes: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           All Sizes (Circle)
         </h3>
         <div className="nx:flex nx:items-end nx:gap-4">
@@ -588,7 +588,7 @@ export const AllSizes: Story = {
                 <AvatarImage src={AVATAR_URL} alt={`Ada Lovelace ${size}`} />
                 <AvatarFallback>{avatarLabel(size)}</AvatarFallback>
               </Avatar>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 {size}
               </span>
             </div>
@@ -597,7 +597,7 @@ export const AllSizes: Story = {
       </div>
 
       <div>
-        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Shapes
         </h3>
         <div className="nx:flex nx:items-center nx:gap-4">
@@ -606,20 +606,24 @@ export const AllSizes: Story = {
               <AvatarImage src={AVATAR_URL} alt="Ada Lovelace circle" />
               <AvatarFallback>AL</AvatarFallback>
             </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">circle</span>
+            <span className="nx:typography-label-small nx:text-muted-foreground">
+              circle
+            </span>
           </div>
           <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
             <Avatar size="xl" shape="rounded">
               <AvatarImage src={AVATAR_URL} alt="Ada Lovelace rounded" />
               <AvatarFallback>AL</AvatarFallback>
             </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">rounded</span>
+            <span className="nx:typography-label-small nx:text-muted-foreground">
+              rounded
+            </span>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Fallback States
         </h3>
         <div className="nx:flex nx:items-center nx:gap-4">
@@ -627,7 +631,7 @@ export const AllSizes: Story = {
             <Avatar size="xl" role="img" aria-label="Ada Lovelace">
               <AvatarFallback aria-hidden="true">AL</AvatarFallback>
             </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">
+            <span className="nx:typography-label-small nx:text-muted-foreground">
               Initials
             </span>
           </div>
@@ -637,13 +641,15 @@ export const AllSizes: Story = {
                 <IconUser aria-hidden="true" className="nx:size-6" />
               </AvatarFallback>
             </Avatar>
-            <span className="nx:text-xs nx:text-muted-foreground">Icon</span>
+            <span className="nx:typography-label-small nx:text-muted-foreground">
+              Icon
+            </span>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="nx:mb-4 nx:text-sm nx:font-medium nx:text-foreground">
+        <h3 className="nx:mb-4 nx:typography-label-default nx:text-foreground">
           Status, Ring, and Group
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-6">

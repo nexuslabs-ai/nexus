@@ -52,7 +52,7 @@ export function Layering() {
           through <code>nx:z-max</code>.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Token</th>
@@ -66,13 +66,13 @@ export function Layering() {
                   key={layer.token}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     nx:z-{layer.token}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {layer.value}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {layer.use}
                   </td>
                 </tr>

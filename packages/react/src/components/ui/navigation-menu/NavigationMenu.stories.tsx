@@ -308,8 +308,7 @@ export const WithDataAttributes: Story = {
       'data-slot',
       'navigation-menu-trigger'
     );
-    // #470: trigger reuses navigationMenuTriggerStyle → typography-label-default
-    // (migrated from raw nx:text-sm nx:font-medium).
+    // #470: trigger reuses navigationMenuTriggerStyle -> typography-label-default.
     await expect(trigger).toHaveClass('nx:typography-label-default');
 
     // Open → content + link slots render
@@ -322,7 +321,7 @@ export const WithDataAttributes: Story = {
         canvasElement.querySelector('[data-slot="navigation-menu-link"]')
       ).toBeInTheDocument();
     });
-    // #470: flyout link migrated raw nx:text-sm → typography-body-default.
+    // #470: flyout link migrated from the raw named text-size utility.
     await expect(
       canvasElement.querySelector('[data-slot="navigation-menu-link"]')
     ).toHaveClass('nx:typography-body-default');
@@ -339,7 +338,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Flyout Triggers
         </h3>
         <NavigationMenu aria-label="Flyout navigation">
@@ -376,7 +375,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Simple Links (no flyout)
         </h3>
         <NavigationMenu aria-label="Simple links navigation">

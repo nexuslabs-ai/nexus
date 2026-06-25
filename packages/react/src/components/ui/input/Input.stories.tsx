@@ -463,24 +463,24 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8 nx:w-[400px]">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Sizes
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-3">
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               sm
             </span>
             <Input size="sm" placeholder="Small input" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               default
             </span>
             <Input size="default" placeholder="Default input" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               lg
             </span>
             <Input size="lg" placeholder="Large input" />
@@ -489,24 +489,24 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           States
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-3">
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               empty
             </span>
             <Input placeholder="Placeholder text" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               filled
             </span>
             <Input defaultValue="Filled value" aria-label="Filled input" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               disabled
             </span>
             <Input placeholder="Disabled" disabled />
@@ -515,36 +515,36 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Types
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-3">
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               text
             </span>
             <Input type="text" placeholder="Text input" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               email
             </span>
             <Input type="email" placeholder="email@example.com" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               password
             </span>
             <Input type="password" placeholder="••••••••" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               number
             </span>
             <Input type="number" placeholder="0" />
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16">
               file
             </span>
             <Input type="file" aria-label="File upload" />

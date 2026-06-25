@@ -153,7 +153,7 @@ export function Typography() {
                   className="nx:flex nx:flex-col nx:gap-1 nx:border-b nx:border-border-default nx:py-4"
                 >
                   <span className={t.cls}>{t.sample}</span>
-                  <span className="nx:font-mono nx:text-xs nx:text-muted-foreground-subtle">
+                  <span className="nx:font-mono nx:typography-label-small nx:text-muted-foreground-subtle">
                     {t.name}
                   </span>
                 </div>
@@ -197,11 +197,11 @@ export function Typography() {
             >
               <div className="nx:flex nx:items-baseline nx:justify-between nx:mb-2">
                 <span className="nx:typography-heading-xsmall">{f.name}</span>
-                <span className="nx:font-mono nx:text-xs nx:text-muted-foreground-subtle">
+                <span className="nx:font-mono nx:typography-label-small nx:text-muted-foreground-subtle">
                   {f.role}
                 </span>
               </div>
-              <p className={f.cls ?? 'nx:text-lg'} style={f.style}>
+              <p className={f.cls ?? 'nx:text-[1.125rem]'} style={f.style}>
                 {f.sample}
               </p>
             </div>

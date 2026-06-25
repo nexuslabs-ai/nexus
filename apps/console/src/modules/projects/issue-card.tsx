@@ -16,7 +16,7 @@ export function IssueCard({ issue }: { issue: Issue }) {
           params={{ id: issue.id }}
           className="nx:hover:underline"
         >
-          <span className="nx:text-muted-foreground nx:text-sm nx:tabular-nums">
+          <span className="nx:text-muted-foreground nx:typography-label-default nx:tabular-nums">
             {issue.key}
           </span>{' '}
           <span className="nx:text-foreground nx:font-medium">

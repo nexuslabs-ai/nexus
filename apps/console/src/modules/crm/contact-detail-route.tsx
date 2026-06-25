@@ -147,10 +147,10 @@ function DetailContent({ contact }: { contact: ContactDetail }) {
                       <ActivityIcon kind={item.kind} />
                     </div>
                     <div className="nx:space-y-0.5">
-                      <p className="nx:text-foreground nx:text-sm">
+                      <p className="nx:text-foreground nx:typography-body-default">
                         {item.summary}
                       </p>
-                      <p className="nx:text-muted-foreground nx:text-xs">
+                      <p className="nx:text-muted-foreground nx:typography-label-small">
                         {formatDate(item.date)}
                       </p>
                     </div>
@@ -174,8 +174,10 @@ function DetailContent({ contact }: { contact: ContactDetail }) {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div className="nx:flex nx:items-center nx:justify-between nx:py-3">
-      <span className="nx:text-muted-foreground nx:text-sm">{label}</span>
-      <span className="nx:text-foreground nx:text-sm nx:font-medium">
+      <span className="nx:text-muted-foreground nx:typography-label-default">
+        {label}
+      </span>
+      <span className="nx:text-foreground nx:typography-label-default">
         {value}
       </span>
     </div>

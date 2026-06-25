@@ -613,12 +613,12 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Basic States
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-4">
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-24">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
               Default
             </span>
             <Select>
@@ -635,7 +635,7 @@ export const AllVariants: Story = {
             </Select>
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-24">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
               With value
             </span>
             <Select defaultValue="option1">
@@ -652,7 +652,7 @@ export const AllVariants: Story = {
             </Select>
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-24">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
               Disabled
             </span>
             <Select disabled>
@@ -671,7 +671,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Groups
         </h3>
         <Select>
@@ -695,12 +695,12 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Widths
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-4">
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-24">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
               Small (120px)
             </span>
             <Select>
@@ -718,7 +718,7 @@ export const AllVariants: Story = {
             </Select>
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-24">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
               Medium (180px)
             </span>
             <Select>
@@ -735,7 +735,7 @@ export const AllVariants: Story = {
             </Select>
           </div>
           <div className="nx:flex nx:items-center nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-24">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
               Large (280px)
             </span>
             <Select>

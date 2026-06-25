@@ -320,18 +320,18 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8 nx:w-[400px]">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           States
         </h3>
         <div className="nx:flex nx:flex-col nx:gap-3">
           <div className="nx:flex nx:items-start nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16 nx:pt-2">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16 nx:pt-2">
               empty
             </span>
             <Textarea placeholder="Placeholder text" />
           </div>
           <div className="nx:flex nx:items-start nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16 nx:pt-2">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16 nx:pt-2">
               filled
             </span>
             <Textarea
@@ -340,13 +340,13 @@ export const AllVariants: Story = {
             />
           </div>
           <div className="nx:flex nx:items-start nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16 nx:pt-2">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16 nx:pt-2">
               disabled
             </span>
             <Textarea placeholder="Disabled" disabled />
           </div>
           <div className="nx:flex nx:items-start nx:gap-4">
-            <span className="nx:text-xs nx:text-muted-foreground nx:w-16 nx:pt-2">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-16 nx:pt-2">
               invalid
             </span>
             <Textarea

@@ -61,7 +61,7 @@ const jobRuns = Array.from({ length: 28 }, (_, i) => ({
 export const Default: Story = {
   render: () => (
     <ScrollArea className="nx:h-48 nx:w-72 nx:rounded-md nx:border nx:border-border-default">
-      <div className="nx:flex nx:flex-col nx:gap-3 nx:p-4 nx:text-sm nx:text-foreground">
+      <div className="nx:flex nx:flex-col nx:gap-3 nx:p-4 nx:typography-label-default nx:text-foreground">
         <h4 className="nx:font-medium nx:leading-none">Release notes</h4>
         {releaseNotes.map((note, i) => (
           <p key={i} className="nx:text-muted-foreground">
@@ -78,14 +78,14 @@ export const VerticalList: Story = {
   render: () => (
     <ScrollArea className="nx:h-72 nx:w-56 nx:rounded-md nx:border nx:border-border-default">
       <div className="nx:p-4">
-        <h4 className="nx:mb-3 nx:text-sm nx:font-medium nx:leading-none nx:text-foreground">
+        <h4 className="nx:mb-3 nx:typography-label-default nx:leading-none nx:text-foreground">
           Builds
         </h4>
         <ul className="nx:flex nx:flex-col">
           {versions.map((version) => (
             <li
               key={version}
-              className="nx:border-b nx:border-border-default nx:py-2 nx:text-sm nx:text-foreground nx:last:border-b-0"
+              className="nx:border-b nx:border-border-default nx:py-2 nx:typography-label-default nx:text-foreground nx:last:border-b-0"
             >
               {version}
             </li>
@@ -105,11 +105,11 @@ export const HorizontalRow: Story = {
         {artworks.map((artwork) => (
           <figure key={artwork.title} className="nx:shrink-0">
             <div className="nx:flex nx:h-40 nx:w-32 nx:items-end nx:rounded-md nx:bg-muted nx:p-3">
-              <span className="nx:text-sm nx:font-medium nx:text-foreground">
+              <span className="nx:typography-label-default nx:text-foreground">
                 {artwork.title}
               </span>
             </div>
-            <figcaption className="nx:pt-2 nx:text-xs nx:text-muted-foreground">
+            <figcaption className="nx:pt-2 nx:typography-label-small nx:text-muted-foreground">
               by {artwork.artist}
             </figcaption>
           </figure>
@@ -132,7 +132,7 @@ export const Both: Story = {
             {Array.from({ length: 15 }, (_, col) => (
               <div
                 key={col}
-                className="nx:flex nx:size-12 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:text-xs nx:text-muted-foreground"
+                className="nx:flex nx:size-12 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
               >
                 {row * 15 + col}
               </div>
@@ -161,7 +161,7 @@ export const VisibleAffordance: Story = {
       className="nx:h-64 nx:w-80 nx:rounded-md nx:border nx:border-border-default"
     >
       <div className="nx:w-max nx:p-4">
-        <div className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:pb-2 nx:text-xs nx:font-medium nx:text-muted-foreground">
+        <div className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:pb-2 nx:typography-label-small nx:text-muted-foreground">
           <span>Run</span>
           <span>Branch</span>
           <span>Owner</span>
@@ -172,9 +172,11 @@ export const VisibleAffordance: Story = {
           {jobRuns.map((run) => (
             <div
               key={run.id}
-              className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:py-2 nx:text-sm nx:text-foreground nx:last:border-b-0"
+              className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:py-2 nx:typography-label-default nx:text-foreground nx:last:border-b-0"
             >
-              <span className="nx:font-mono nx:text-xs">{run.id}</span>
+              <span className="nx:font-mono nx:typography-label-small">
+                {run.id}
+              </span>
               <span>{run.branch}</span>
               <span>{run.owner}</span>
               <span>{run.duration}</span>
@@ -247,7 +249,7 @@ export const InCard: Story = {
             {versions.map((version) => (
               <li
                 key={version}
-                className="nx:border-b nx:border-border-default nx:py-2 nx:text-sm nx:text-container-foreground nx:last:border-b-0"
+                className="nx:border-b nx:border-border-default nx:py-2 nx:typography-label-default nx:text-container-foreground nx:last:border-b-0"
               >
                 {version}
               </li>
@@ -271,7 +273,7 @@ export const WithDataAttributes: Story = {
       type="always"
       className="nx:h-32 nx:w-48 nx:rounded-md nx:border nx:border-border-default"
     >
-      <div className="nx:flex nx:flex-col nx:gap-2 nx:p-4 nx:text-sm nx:text-foreground">
+      <div className="nx:flex nx:flex-col nx:gap-2 nx:p-4 nx:typography-label-default nx:text-foreground">
         {Array.from({ length: 12 }, (_, i) => (
           <span key={i}>Line {i + 1}</span>
         ))}
@@ -300,7 +302,7 @@ export const WithDataAttributes: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-6 nx:text-sm nx:text-foreground">
+    <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-6 nx:typography-label-default nx:text-foreground">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <span className="nx:text-muted-foreground">Vertical</span>
         <ScrollArea className="nx:h-40 nx:w-48 nx:rounded-md nx:border nx:border-border-default">
@@ -324,7 +326,7 @@ export const AllVariants: Story = {
             {artworks.map((artwork) => (
               <div
                 key={artwork.title}
-                className="nx:flex nx:size-24 nx:shrink-0 nx:items-end nx:rounded-md nx:bg-muted nx:p-2 nx:text-xs nx:font-medium"
+                className="nx:flex nx:size-24 nx:shrink-0 nx:items-end nx:rounded-md nx:bg-muted nx:p-2 nx:typography-label-small"
               >
                 {artwork.title}
               </div>
@@ -343,7 +345,7 @@ export const AllVariants: Story = {
                 {Array.from({ length: 10 }, (_, col) => (
                   <div
                     key={col}
-                    className="nx:flex nx:size-10 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:text-xs nx:text-muted-foreground"
+                    className="nx:flex nx:size-10 nx:shrink-0 nx:items-center nx:justify-center nx:rounded nx:bg-muted nx:typography-label-small nx:text-muted-foreground"
                   >
                     {row * 10 + col}
                   </div>

@@ -124,12 +124,14 @@ function KpiCard({ kpi }: { kpi: Kpi }) {
 
   return (
     <Card className="nx:space-y-1 nx:p-6">
-      <p className="nx:text-muted-foreground nx:text-sm">{kpi.label}</p>
+      <p className="nx:text-muted-foreground nx:typography-body-default">
+        {kpi.label}
+      </p>
       <p className="nx:typography-heading-medium nx:text-foreground nx:tabular-nums">
         {formatKpi(kpi)}
       </p>
       <p
-        className={`nx:flex nx:items-center nx:gap-1 nx:text-xs nx:tabular-nums ${
+        className={`nx:flex nx:items-center nx:gap-1 nx:typography-label-small nx:tabular-nums ${
           up
             ? 'nx:text-success-subtle-foreground'
             : 'nx:text-error-subtle-foreground'

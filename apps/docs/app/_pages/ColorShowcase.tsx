@@ -200,7 +200,7 @@ export function ColorShowcase() {
                 color: `var(--nx-color-${pair.text})`,
               }}
             >
-              <span className="nx:text-sm nx:font-medium">Aa</span>
+              <span className="nx:typography-label-default">Aa</span>
               <span className="nx:text-[11px] nx:font-mono nx:opacity-80">
                 {pair.label}
               </span>
@@ -225,7 +225,7 @@ export function ColorShowcase() {
           binding to a neutral shade.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[720px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[720px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Shade</th>
@@ -250,7 +250,7 @@ export function ColorShowcase() {
                           background: `var(--nx-color-slate-${row.shade})`,
                         }}
                       />
-                      <span className="nx:font-mono nx:text-xs">
+                      <span className="nx:font-mono nx:typography-label-small">
                         {row.shade}
                       </span>
                     </span>
@@ -258,10 +258,10 @@ export function ColorShowcase() {
                   <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground">
                     {row.role}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:text-muted-foreground nx:typography-label-small">
                     {row.light}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {row.dark}
                   </td>
                 </tr>
@@ -282,7 +282,7 @@ export function ColorShowcase() {
           preview of that test.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Pair</th>
@@ -296,13 +296,13 @@ export function ColorShowcase() {
                   key={tier.pair}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {tier.pair}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs nx:whitespace-nowrap">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small nx:whitespace-nowrap">
                     Lc {tier.lc}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {tier.covers}
                   </td>
                 </tr>
@@ -338,11 +338,13 @@ export function ColorShowcase() {
               key={item.step}
               className="nx:flex nx:gap-3 nx:rounded-md nx:border nx:border-border-default nx:bg-container nx:p-4"
             >
-              <span className="nx:text-sm nx:font-mono nx:text-muted-foreground-subtle">
+              <span className="nx:typography-label-default nx:font-mono nx:text-muted-foreground-subtle">
                 {i + 1}
               </span>
               <div>
-                <div className="nx:text-sm nx:font-semibold">{item.step}</div>
+                <div className="nx:typography-label-default nx:font-semibold">
+                  {item.step}
+                </div>
                 <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-0.5">
                   {item.body}
                 </p>

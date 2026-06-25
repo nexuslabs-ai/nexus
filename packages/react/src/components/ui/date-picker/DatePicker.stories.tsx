@@ -529,7 +529,7 @@ export const WithDataAttributes: Story = {
     const day15 = canvas.getByText('15').closest('button');
     await expect(day15).toHaveAttribute('data-day');
     // #498: day cells + weekday headers use the typography-body-default composite
-    // (migrated from raw nx:text-sm); both share the same 14px/400 type.
+    // (migrated from the raw named text-size utility); both share the same 14px/400 type.
     await expect(day15).toHaveClass('nx:typography-body-default');
     await expect(canvasElement.querySelector('.rdp-weekday')).toHaveClass(
       'nx:typography-body-default'

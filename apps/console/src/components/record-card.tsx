@@ -25,7 +25,7 @@ export function RecordCard({ title, badge, children }: RecordCardProps) {
         <div className="nx:min-w-0 nx:flex-1">{title}</div>
         {badge ? <div className="nx:shrink-0">{badge}</div> : null}
       </div>
-      <div className="nx:text-muted-foreground nx:mt-2 nx:space-y-1 nx:text-sm">
+      <div className="nx:text-muted-foreground nx:mt-2 nx:space-y-1 nx:typography-label-default">
         {children}
       </div>
     </li>

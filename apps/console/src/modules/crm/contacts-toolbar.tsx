@@ -191,7 +191,7 @@ function SavedViewsMenu({
             Saved views
           </p>
           {views.length === 0 ? (
-            <p className="nx:text-muted-foreground nx:px-3 nx:pb-3 nx:text-sm">
+            <p className="nx:text-muted-foreground nx:px-3 nx:pb-3 nx:typography-body-default">
               No saved views yet.
             </p>
           ) : (

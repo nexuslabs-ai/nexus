@@ -467,7 +467,7 @@ export const ShowErrors: Story = {
 export const WithMergedDescription: Story = {
   render: () => (
     <div className="nx:flex nx:w-[360px] nx:flex-col nx:gap-2">
-      <p id="username-extra-description" className="nx:text-sm">
+      <p id="username-extra-description" className="nx:typography-body-default">
         Use letters, numbers, and underscores.
       </p>
       <UsernameForm extraDescriptionId="username-extra-description" />

@@ -78,7 +78,7 @@ function DetailContent({ issue }: { issue: IssueDetail }) {
       <header className="nx:space-y-3">
         <div className="nx:flex nx:items-start nx:justify-between nx:gap-4">
           <div className="nx:space-y-1">
-            <p className="nx:text-muted-foreground nx:text-sm nx:tabular-nums">
+            <p className="nx:text-muted-foreground nx:typography-body-default nx:tabular-nums">
               {issue.key}
             </p>
             <h1 className="nx:typography-heading-large nx:text-foreground">
@@ -107,11 +107,11 @@ function DetailContent({ issue }: { issue: IssueDetail }) {
           </CardHeader>
           <CardContent>
             {issue.description ? (
-              <p className="nx:text-foreground nx:text-sm nx:leading-relaxed nx:whitespace-pre-wrap">
+              <p className="nx:text-foreground nx:typography-body-default nx:leading-relaxed nx:whitespace-pre-wrap">
                 {issue.description}
               </p>
             ) : (
-              <p className="nx:text-muted-foreground nx:text-sm">
+              <p className="nx:text-muted-foreground nx:typography-body-default">
                 No description.
               </p>
             )}
@@ -126,7 +126,7 @@ function DetailContent({ issue }: { issue: IssueDetail }) {
             <Row label="Assignee">
               <div className="nx:flex nx:items-center nx:gap-2">
                 <Avatar className="nx:size-6">
-                  <AvatarFallback className="nx:text-xs">
+                  <AvatarFallback className="nx:typography-label-small">
                     {initials(issue.assignee)}
                   </AvatarFallback>
                 </Avatar>
@@ -161,8 +161,10 @@ function DetailContent({ issue }: { issue: IssueDetail }) {
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:py-3">
-      <span className="nx:text-muted-foreground nx:text-sm">{label}</span>
-      <div className="nx:text-foreground nx:text-sm nx:font-medium">
+      <span className="nx:text-muted-foreground nx:typography-label-default">
+        {label}
+      </span>
+      <div className="nx:text-foreground nx:typography-label-default">
         {children}
       </div>
     </div>

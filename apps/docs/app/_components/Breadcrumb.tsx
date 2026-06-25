@@ -6,7 +6,7 @@ export function Breadcrumb({
   items: { label: string; href?: string }[];
 }) {
   return (
-    <nav className="nx:text-xs nx:text-muted-foreground-subtle nx:mb-3">
+    <nav className="nx:typography-label-small nx:text-muted-foreground-subtle nx:mb-3">
       {items.map((item, i) => (
         <span key={i}>
           {item.href ? (

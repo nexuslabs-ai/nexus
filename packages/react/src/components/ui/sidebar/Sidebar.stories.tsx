@@ -125,9 +125,9 @@ function DemoInset({ children }: { children?: React.ReactNode }) {
     <SidebarInset>
       <header className="nx:flex nx:h-16 nx:items-center nx:gap-2 nx:border-b nx:border-border-default nx:px-4">
         <SidebarTrigger />
-        <span className="nx:text-sm nx:font-medium">Dashboard</span>
+        <span className="nx:typography-label-default">Dashboard</span>
       </header>
-      <div className="nx:min-h-[20rem] nx:p-4 nx:text-sm nx:text-muted-foreground">
+      <div className="nx:min-h-[20rem] nx:p-4 nx:typography-label-default nx:text-muted-foreground">
         {children ?? 'Main content area.'}
       </div>
     </SidebarInset>

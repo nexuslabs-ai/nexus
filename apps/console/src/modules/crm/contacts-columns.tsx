@@ -106,7 +106,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
     cell: ({ row }) => (
       <div className="nx:flex nx:items-center nx:gap-2">
         <Avatar className="nx:size-6">
-          <AvatarFallback className="nx:text-xs">
+          <AvatarFallback className="nx:typography-label-small">
             {initials(row.original.owner)}
           </AvatarFallback>
         </Avatar>

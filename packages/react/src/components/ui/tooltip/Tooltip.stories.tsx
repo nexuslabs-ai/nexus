@@ -250,7 +250,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Side Variants
         </h3>
         <div className="nx:flex nx:items-center nx:justify-center nx:gap-4">
@@ -290,7 +290,7 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           With Different Content
         </h3>
         <div className="nx:flex nx:items-center nx:justify-center nx:gap-4">

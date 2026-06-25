@@ -13,11 +13,11 @@ function Section({
   return (
     <section className="nx:bg-container nx:rounded-xl nx:border nx:border-border-default nx:overflow-hidden">
       <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-background-hover-alpha">
-        <h2 className="nx:text-base nx:font-semibold nx:text-foreground">
+        <h2 className="nx:typography-heading-xsmall nx:text-foreground">
           {title}
         </h2>
         {description && (
-          <p className="nx:text-sm nx:text-muted-foreground nx:mt-0.5">
+          <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-0.5">
             {description}
           </p>
         )}
@@ -34,7 +34,7 @@ export function ComponentShowcase() {
         <Section title="Typography" description="Text styles and font scales">
           <div className="nx:space-y-6">
             <div className="nx:space-y-2">
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+              <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                 Headings
               </span>
               <div className="nx:space-y-1">
@@ -46,7 +46,7 @@ export function ComponentShowcase() {
             </div>
 
             <div className="nx:space-y-2">
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+              <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                 Body
               </span>
               <div className="nx:space-y-2">
@@ -61,7 +61,7 @@ export function ComponentShowcase() {
 
             <div className="nx:grid nx:grid-cols-2 nx:gap-6">
               <div className="nx:space-y-2">
-                <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+                <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                   Labels
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
@@ -73,7 +73,7 @@ export function ComponentShowcase() {
                 </div>
               </div>
               <div className="nx:space-y-2">
-                <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+                <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                   Code
                 </span>
                 <div className="nx:flex nx:flex-wrap nx:gap-4">
@@ -166,10 +166,10 @@ export function ComponentShowcase() {
             <ColorSwatch name="Nav Border" className="nx:bg-nav-border" />
           </div>
           <div className="nx:mt-4 nx:bg-nav-background nx:border nx:border-nav-border nx:rounded-md nx:p-4">
-            <p className="nx:text-nav-foreground nx:text-sm nx:font-medium">
+            <p className="nx:text-nav-foreground nx:typography-label-default">
               Nav item label
             </p>
-            <p className="nx:text-nav-muted-foreground nx:text-xs nx:mt-1">
+            <p className="nx:text-nav-muted-foreground nx:typography-label-small nx:mt-1">
               Nav muted helper text
             </p>
           </div>
@@ -227,22 +227,22 @@ export function ComponentShowcase() {
           <div className="nx:space-y-6">
             {/* Container */}
             <div className="nx:space-y-2">
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+              <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                 Container — p-container, gap-container
               </span>
               <div className="nx:bg-container nx:border nx:border-border-default nx:rounded-lg nx:flex nx:flex-col nx:p-container nx:gap-container">
                 <h4 className="nx:text-foreground nx:font-medium">
                   Card header
                 </h4>
-                <p className="nx:text-sm nx:text-muted-foreground">
+                <p className="nx:typography-body-default nx:text-muted-foreground">
                   Card body — interior padding and the gap between siblings both
                   scale with the active Spacing mode.
                 </p>
                 <div className="nx:flex nx:flex-wrap nx:gap-2">
-                  <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-3 nx:py-1.5 nx:text-sm nx:font-medium">
+                  <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-3 nx:py-1.5 nx:typography-label-default">
                     Confirm
                   </button>
-                  <button className="nx:border nx:border-border-default nx:bg-background nx:rounded-md nx:px-3 nx:py-1.5 nx:text-sm nx:font-medium">
+                  <button className="nx:border nx:border-border-default nx:bg-background nx:rounded-md nx:px-3 nx:py-1.5 nx:typography-label-default">
                     Cancel
                   </button>
                 </div>
@@ -251,7 +251,7 @@ export function ComponentShowcase() {
 
             {/* Layout */}
             <div className="nx:space-y-2">
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+              <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                 Layout — gap-layout-section, gap-layout-stack
               </span>
               <div className="nx:flex nx:flex-col nx:gap-layout-section nx:bg-muted nx:rounded-lg nx:p-4">
@@ -260,13 +260,13 @@ export function ComponentShowcase() {
                     key={label}
                     className="nx:flex nx:flex-col nx:gap-layout-stack"
                   >
-                    <span className="nx:text-xs nx:font-semibold nx:text-foreground">
+                    <span className="nx:typography-label-small nx:font-semibold nx:text-foreground">
                       {label}
                     </span>
-                    <span className="nx:text-sm nx:text-muted-foreground">
+                    <span className="nx:typography-label-default nx:text-muted-foreground">
                       Stack item one
                     </span>
-                    <span className="nx:text-sm nx:text-muted-foreground">
+                    <span className="nx:typography-label-default nx:text-muted-foreground">
                       Stack item two
                     </span>
                   </div>
@@ -283,19 +283,19 @@ export function ComponentShowcase() {
         <Section title="Buttons" description="Interactive button variants">
           <div className="nx:space-y-4">
             <div className="nx:flex nx:flex-wrap nx:gap-3">
-              <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:opacity-90 nx:transition-opacity">
+              <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:hover:opacity-90 nx:transition-opacity">
                 Primary
               </button>
-              <button className="nx:bg-secondary-background nx:text-secondary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:opacity-90 nx:transition-opacity">
+              <button className="nx:bg-secondary-background nx:text-secondary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:hover:opacity-90 nx:transition-opacity">
                 Secondary
               </button>
-              <button className="nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:transition-colors">
+              <button className="nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:transition-colors">
                 Outline
               </button>
-              <button className="nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:transition-colors">
+              <button className="nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:transition-colors">
                 Ghost
               </button>
-              <button className="nx:bg-error-background nx:text-error-foreground nx:rounded-md nx:px-4 nx:py-2 nx:text-sm nx:font-medium nx:hover:opacity-90 nx:transition-opacity">
+              <button className="nx:bg-error-background nx:text-error-foreground nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:hover:opacity-90 nx:transition-opacity">
                 Destructive
               </button>
             </div>
@@ -310,19 +310,19 @@ export function ComponentShowcase() {
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
             <div className="nx:border nx:border-border-default nx:bg-container nx:rounded-lg nx:p-4">
               <h3 className="nx:font-medium">Container</h3>
-              <p className="nx:text-muted-foreground nx:mt-1 nx:text-sm">
+              <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Default container background
               </p>
             </div>
             <div className="nx:border nx:border-border-default nx:bg-popover nx:rounded-lg nx:p-4">
               <h3 className="nx:font-medium">Popover</h3>
-              <p className="nx:text-muted-foreground nx:mt-1 nx:text-sm">
+              <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Popover background color
               </p>
             </div>
             <div className="nx:bg-muted nx:rounded-lg nx:p-4">
               <h3 className="nx:text-muted-foreground nx:font-medium">Muted</h3>
-              <p className="nx:text-muted-foreground nx:mt-1 nx:text-sm">
+              <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Muted background with muted foreground
               </p>
             </div>
@@ -330,7 +330,7 @@ export function ComponentShowcase() {
               <h3 className="nx:text-foreground nx:font-medium">
                 Background Hover
               </h3>
-              <p className="nx:text-muted-foreground nx:mt-1 nx:text-sm">
+              <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Hover-state background color
               </p>
             </div>
@@ -341,36 +341,36 @@ export function ComponentShowcase() {
         <Section title="Borders" description="Border widths and colors">
           <div className="nx:space-y-4">
             <div>
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+              <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                 Width
               </span>
               <div className="nx:flex nx:flex-wrap nx:gap-3 nx:mt-2">
-                <div className="nx:border nx:border-border-default nx:border-default nx:rounded nx:px-4 nx:py-2 nx:text-sm">
+                <div className="nx:border nx:border-border-default nx:border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   default
                 </div>
-                <div className="nx:border nx:border-border-default nx:border-thick nx:rounded nx:px-4 nx:py-2 nx:text-sm">
+                <div className="nx:border nx:border-border-default nx:border-thick nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   thick
                 </div>
               </div>
             </div>
             <div>
-              <span className="nx:text-xs nx:font-medium nx:text-muted-foreground nx:uppercase nx:tracking-wide">
+              <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                 Colors
               </span>
               <div className="nx:flex nx:flex-wrap nx:gap-3 nx:mt-2">
-                <div className="nx:border-2 nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:text-sm">
+                <div className="nx:border-2 nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Default
                 </div>
-                <div className="nx:border-2 nx:border-border-primary nx:rounded nx:px-4 nx:py-2 nx:text-sm">
+                <div className="nx:border-2 nx:border-border-primary nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Primary
                 </div>
-                <div className="nx:border-2 nx:border-border-success nx:rounded nx:px-4 nx:py-2 nx:text-sm">
+                <div className="nx:border-2 nx:border-border-success nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Success
                 </div>
-                <div className="nx:border-2 nx:border-border-error nx:rounded nx:px-4 nx:py-2 nx:text-sm">
+                <div className="nx:border-2 nx:border-border-error nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Error
                 </div>
-                <div className="nx:border-2 nx:border-border-information nx:rounded nx:px-4 nx:py-2 nx:text-sm">
+                <div className="nx:border-2 nx:border-border-information nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   Info
                 </div>
               </div>
@@ -386,25 +386,25 @@ export function ComponentShowcase() {
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
             <div className="nx:bg-success-subtle nx:border nx:border-border-success nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-success-background" />
-              <span className="nx:text-success-subtle-foreground nx:text-sm nx:font-medium">
+              <span className="nx:text-success-subtle-foreground nx:typography-label-default">
                 Success message
               </span>
             </div>
             <div className="nx:bg-error-subtle nx:border nx:border-border-error nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-error-background" />
-              <span className="nx:text-error-subtle-foreground nx:text-sm nx:font-medium">
+              <span className="nx:text-error-subtle-foreground nx:typography-label-default">
                 Error message
               </span>
             </div>
             <div className="nx:bg-warning-subtle nx:border nx:border-border-warning nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-warning-background" />
-              <span className="nx:text-warning-subtle-foreground nx:text-sm nx:font-medium">
+              <span className="nx:text-warning-subtle-foreground nx:typography-label-default">
                 Warning message
               </span>
             </div>
             <div className="nx:bg-information-subtle nx:border nx:border-border-information nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-information-background" />
-              <span className="nx:text-information-subtle-foreground nx:text-sm nx:font-medium">
+              <span className="nx:text-information-subtle-foreground nx:typography-label-default">
                 Info message
               </span>
             </div>
@@ -433,7 +433,7 @@ function ColorSwatch({
       }`}
     >
       <span
-        className={`nx:text-xs nx:font-medium ${textDark ? 'nx:text-background' : 'nx:text-inherit'}`}
+        className={`nx:typography-label-small ${textDark ? 'nx:text-background' : 'nx:text-inherit'}`}
       >
         {name}
       </span>
@@ -452,7 +452,7 @@ function ShadowBox({
     <div
       className={`nx:bg-background nx:flex nx:h-16 nx:w-full nx:items-center nx:justify-center nx:rounded-lg ${shadowClass}`}
     >
-      <span className="nx:text-muted-foreground nx:text-xs nx:font-medium">
+      <span className="nx:text-muted-foreground nx:typography-label-small">
         {name}
       </span>
     </div>
@@ -464,7 +464,7 @@ function RadiusBox({ name, className }: { name: string; className: string }) {
     <div
       className={`nx:border-2 nx:border-primary-background nx:bg-muted nx:flex nx:h-14 nx:w-14 nx:items-center nx:justify-center ${className}`}
     >
-      <span className="nx:text-xs nx:font-medium">{name}</span>
+      <span className="nx:typography-label-small">{name}</span>
     </div>
   );
 }
@@ -472,7 +472,7 @@ function RadiusBox({ name, className }: { name: string; className: string }) {
 function SpacingBar({ name, className }: { name: string; className: string }) {
   return (
     <div className="nx:flex nx:items-center nx:gap-3">
-      <span className="nx:text-muted-foreground nx:w-8 nx:text-xs nx:text-right nx:font-mono">
+      <span className="nx:text-muted-foreground nx:w-8 nx:typography-label-small nx:text-right nx:font-mono">
         {name}
       </span>
       <div

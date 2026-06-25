@@ -36,7 +36,7 @@ export const Default: Story = {
         <Button variant="outline">Open popover</Button>
       </PopoverTrigger>
       <PopoverContent>
-        <p className="nx:text-sm nx:text-muted-foreground">
+        <p className="nx:typography-body-default nx:text-muted-foreground">
           Place content for the popover here.
         </p>
       </PopoverContent>
@@ -57,10 +57,10 @@ export const WithForm: Story = {
         <PopoverContent className="nx:w-80">
           <div className="nx:flex nx:flex-col nx:gap-4">
             <div className="nx:flex nx:flex-col nx:gap-1.5">
-              <h4 className="nx:text-sm nx:font-medium nx:leading-none">
+              <h4 className="nx:typography-label-default nx:leading-none">
                 Dimensions
               </h4>
-              <p className="nx:text-sm nx:text-muted-foreground">
+              <p className="nx:typography-body-default nx:text-muted-foreground">
                 Set the dimensions for the layer.
               </p>
             </div>
@@ -98,7 +98,7 @@ export const Placements: Story = {
             <Button variant="outline">side: {side}</Button>
           </PopoverTrigger>
           <PopoverContent side={side}>
-            <p className="nx:text-sm">Opens on {side}.</p>
+            <p className="nx:typography-body-default">Opens on {side}.</p>
           </PopoverContent>
         </Popover>
       ))}
@@ -108,7 +108,7 @@ export const Placements: Story = {
             <Button variant="outline">align: {align}</Button>
           </PopoverTrigger>
           <PopoverContent align={align}>
-            <p className="nx:text-sm">Aligned {align}.</p>
+            <p className="nx:typography-body-default">Aligned {align}.</p>
           </PopoverContent>
         </Popover>
       ))}
@@ -120,7 +120,7 @@ export const WithAnchor: Story = {
   render: (_args) => (
     <Popover>
       <PopoverAnchor asChild>
-        <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-container nx:text-sm nx:text-muted-foreground">
+        <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-container nx:typography-label-default nx:text-muted-foreground">
           The popover positions against this anchor box.
         </div>
       </PopoverAnchor>
@@ -130,7 +130,7 @@ export const WithAnchor: Story = {
         </PopoverTrigger>
       </div>
       <PopoverContent>
-        <p className="nx:text-sm">
+        <p className="nx:typography-body-default">
           Positioned relative to the anchor box, not the trigger button.
         </p>
       </PopoverContent>
@@ -149,7 +149,7 @@ export const OpenCloseInteraction: Story = {
         <Button variant="outline">Open popover</Button>
       </PopoverTrigger>
       <PopoverContent>
-        <p className="nx:text-sm">Popover content</p>
+        <p className="nx:typography-body-default">Popover content</p>
       </PopoverContent>
     </Popover>
   ),
@@ -183,7 +183,7 @@ export const WithDataAttributes: Story = {
         <Button variant="outline">Open popover</Button>
       </PopoverTrigger>
       <PopoverContent>
-        <p className="nx:text-sm">Popover content</p>
+        <p className="nx:typography-body-default">Popover content</p>
       </PopoverContent>
     </Popover>
   ),
@@ -216,7 +216,7 @@ export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Trigger Variants
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-4">
@@ -225,7 +225,7 @@ export const AllVariants: Story = {
               <Button variant="outline">Outline trigger</Button>
             </PopoverTrigger>
             <PopoverContent>
-              <p className="nx:text-sm">Popover content</p>
+              <p className="nx:typography-body-default">Popover content</p>
             </PopoverContent>
           </Popover>
           <Popover>
@@ -233,7 +233,7 @@ export const AllVariants: Story = {
               <Button variant="secondary">Secondary trigger</Button>
             </PopoverTrigger>
             <PopoverContent>
-              <p className="nx:text-sm">Popover content</p>
+              <p className="nx:typography-body-default">Popover content</p>
             </PopoverContent>
           </Popover>
           <Popover>
@@ -241,14 +241,14 @@ export const AllVariants: Story = {
               <Button variant="ghost">Ghost trigger</Button>
             </PopoverTrigger>
             <PopoverContent>
-              <p className="nx:text-sm">Popover content</p>
+              <p className="nx:typography-body-default">Popover content</p>
             </PopoverContent>
           </Popover>
         </div>
       </div>
 
       <div>
-        <h3 className="nx:text-foreground nx:mb-4 nx:text-sm nx:font-medium">
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Placements
         </h3>
         <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-4">
@@ -257,7 +257,7 @@ export const AllVariants: Story = {
               <Button variant="outline">Top</Button>
             </PopoverTrigger>
             <PopoverContent side="top">
-              <p className="nx:text-sm">Top</p>
+              <p className="nx:typography-body-default">Top</p>
             </PopoverContent>
           </Popover>
           <Popover>
@@ -265,7 +265,7 @@ export const AllVariants: Story = {
               <Button variant="outline">Right</Button>
             </PopoverTrigger>
             <PopoverContent side="right">
-              <p className="nx:text-sm">Right</p>
+              <p className="nx:typography-body-default">Right</p>
             </PopoverContent>
           </Popover>
           <Popover>
@@ -273,7 +273,7 @@ export const AllVariants: Story = {
               <Button variant="outline">Bottom</Button>
             </PopoverTrigger>
             <PopoverContent side="bottom">
-              <p className="nx:text-sm">Bottom</p>
+              <p className="nx:typography-body-default">Bottom</p>
             </PopoverContent>
           </Popover>
           <Popover>
@@ -281,7 +281,7 @@ export const AllVariants: Story = {
               <Button variant="outline">Left</Button>
             </PopoverTrigger>
             <PopoverContent side="left">
-              <p className="nx:text-sm">Left</p>
+              <p className="nx:typography-body-default">Left</p>
             </PopoverContent>
           </Popover>
         </div>

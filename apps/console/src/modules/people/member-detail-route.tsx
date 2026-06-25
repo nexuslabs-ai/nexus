@@ -117,9 +117,13 @@ function DetailContent({ member }: { member: MemberDetail }) {
         </CardHeader>
         <CardContent>
           {member.bio ? (
-            <p className="nx:text-foreground nx:text-sm">{member.bio}</p>
+            <p className="nx:text-foreground nx:typography-body-default">
+              {member.bio}
+            </p>
           ) : (
-            <p className="nx:text-muted-foreground nx:text-sm">No bio yet.</p>
+            <p className="nx:text-muted-foreground nx:typography-body-default">
+              No bio yet.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -136,8 +140,10 @@ function DetailContent({ member }: { member: MemberDetail }) {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div className="nx:flex nx:items-center nx:justify-between nx:py-3">
-      <span className="nx:text-muted-foreground nx:text-sm">{label}</span>
-      <span className="nx:text-foreground nx:text-sm nx:font-medium">
+      <span className="nx:text-muted-foreground nx:typography-label-default">
+        {label}
+      </span>
+      <span className="nx:text-foreground nx:typography-label-default">
         {value}
       </span>
     </div>

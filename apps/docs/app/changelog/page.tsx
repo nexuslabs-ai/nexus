@@ -78,7 +78,7 @@ export default function Changelog() {
             key={release.date}
             className="nx:grid nx:grid-cols-1 nx:sm:grid-cols-[120px_minmax(0,1fr)] nx:gap-x-8 nx:gap-y-3"
           >
-            <h2 className="nx:font-mono nx:text-sm nx:text-muted-foreground-subtle nx:sm:pt-1">
+            <h2 className="nx:font-mono nx:typography-label-default nx:text-muted-foreground-subtle nx:sm:pt-1">
               {release.date}
             </h2>
             <ul className="nx:list-none nx:p-0 nx:m-0 nx:flex nx:flex-col nx:gap-3">
@@ -98,7 +98,7 @@ export default function Changelog() {
                           href={`${REPO}/pull/${change.pr}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="nx:font-mono nx:text-xs nx:text-primary-subtle-foreground nx:hover:underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:rounded-sm"
+                          className="nx:font-mono nx:typography-label-small nx:text-primary-subtle-foreground nx:hover:underline nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-2 nx:rounded-sm"
                         >
                           #{change.pr}
                         </a>

@@ -184,16 +184,16 @@ export function NotificationsMenu() {
                     <span className="nx:min-w-0 nx:flex-1">
                       <span
                         className={cn(
-                          'nx:block nx:text-sm',
+                          'nx:block nx:typography-label-default',
                           !n.read && 'nx:font-medium'
                         )}
                       >
                         {n.title}
                       </span>
-                      <span className="nx:text-muted-foreground nx:block nx:truncate nx:text-sm">
+                      <span className="nx:text-muted-foreground nx:block nx:truncate nx:typography-label-default">
                         {n.body}
                       </span>
-                      <span className="nx:text-muted-foreground nx:mt-0.5 nx:block nx:text-xs">
+                      <span className="nx:text-muted-foreground nx:mt-0.5 nx:block nx:typography-label-small">
                         {formatDateTime(n.at)}
                       </span>
                     </span>
@@ -232,7 +232,7 @@ function NotificationsSkeleton() {
 
 export function NotificationsError() {
   return (
-    <p className="nx:text-error-foreground nx:px-3 nx:py-6 nx:text-center nx:text-sm">
+    <p className="nx:text-error-foreground nx:px-3 nx:py-6 nx:text-center nx:typography-body-default">
       Couldn’t load notifications. Please try again.
     </p>
   );

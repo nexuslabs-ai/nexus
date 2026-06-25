@@ -93,10 +93,10 @@ export function Spacing() {
                   height: '12px',
                 }}
               />
-              <span className="nx:font-mono nx:text-xs nx:text-muted-foreground-subtle">
+              <span className="nx:font-mono nx:typography-label-small nx:text-muted-foreground-subtle">
                 --nx-spacing-{step.name}
               </span>
-              <span className="nx:text-xs nx:text-muted-foreground">
+              <span className="nx:typography-label-small nx:text-muted-foreground">
                 {step.px}px
               </span>
             </div>
@@ -114,7 +114,7 @@ export function Spacing() {
           not just bare utilities. Values shown are the vega defaults.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Token</th>
@@ -128,13 +128,13 @@ export function Spacing() {
                   key={row.token}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {row.token}
                   </td>
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs nx:whitespace-nowrap">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small nx:whitespace-nowrap">
                     {row.px}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {row.use}
                   </td>
                 </tr>
@@ -155,7 +155,7 @@ export function Spacing() {
           <code>mira</code> is byte-identical to <code>vega</code>.
         </p>
         <div className="nx:overflow-x-auto">
-          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:text-sm">
+          <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">
             <thead>
               <tr className="nx:border-b nx:border-border-default nx:text-left">
                 <th className="nx:py-2 nx:pr-3 nx:font-semibold">Mode</th>
@@ -168,10 +168,10 @@ export function Spacing() {
                   key={m.mode}
                   className="nx:border-b nx:border-border-default"
                 >
-                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:text-xs">
+                  <td className="nx:py-2 nx:pr-3 nx:font-mono nx:typography-label-small">
                     {m.mode}
                   </td>
-                  <td className="nx:py-2 nx:text-muted-foreground nx:text-xs">
+                  <td className="nx:py-2 nx:text-muted-foreground nx:typography-label-small">
                     {m.archetype}
                   </td>
                 </tr>
