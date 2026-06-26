@@ -16,13 +16,18 @@ export interface ThemeSeeds {
 
 export type SurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
 
-export interface CodexThemeContract {
-  appearance: 'light' | 'dark' | 'system';
+/** The derivation seeds `deriveTheme` consumes — no display preference. */
+export interface ThemeDerivationInput {
   surfaceTone?: SurfaceTone;
   light: ThemeSeeds;
   dark: ThemeSeeds;
   /** 0–100. Separation between background↔surfaces and foreground↔text. */
   contrast: number;
+}
+
+export interface CodexThemeContract extends ThemeDerivationInput {
+  /** Consumer display preference; not read by `deriveTheme`. */
+  appearance: 'light' | 'dark' | 'system';
 }
 
 export type Mode = 'light' | 'dark';
@@ -61,11 +66,6 @@ const SURFACE_TONE: Record<
 const PAPER_L = 0.987;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FLAT_IN_LIGHT = new Set(['container', 'popover']);
-
-/** Δ (per-step lightness offset) for a 0–100 contrast value. */
-export function contrastDelta(contrast: number): number {
-  return contrastProfile('light', contrast).surfaceDelta;
-}
 
 function anchoredContrastLerp(
   contrast: number,
@@ -293,16 +293,19 @@ function legibleShade(
   return readableOn(bg);
 }
 
+/** Which ramp shades back a family's solid background/hover/active fills. */
+interface SolidShades {
+  background?: Shade;
+  hover?: Shade;
+  active?: Shade;
+}
+
 /** 11 tokens for a named color family (background, foreground, subtle, borders). */
 export function deriveFamily(
   name: string,
   ramp: Record<Shade, string>,
   mode: Mode,
-  solid: {
-    background?: Shade;
-    hover?: Shade;
-    active?: Shade;
-  } = {}
+  solid: SolidShades = {}
 ): TokenMap {
   const dark = mode === 'dark';
   const p = `--nx-color-${name}`;
@@ -338,7 +341,7 @@ const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
 
 type StatusFamily = (typeof STATUS_FAMILIES)[number];
 
-const STATUS_RAMP = {
+export const STATUS_RAMP = {
   success: {
     '50': 'oklch(0.982 0.035 137.785)',
     '100': 'oklch(0.96 0.0789 139.835)',
@@ -394,23 +397,18 @@ const STATUS_RAMP = {
 } satisfies Record<StatusFamily, Record<Shade, string>>;
 
 function deriveStatus(mode: Mode): TokenMap {
-  return Object.assign(
-    {},
-    ...STATUS_FAMILIES.map((family) => {
-      const solid =
-        family === 'warning'
-          ? ({ background: '700', hover: '800', active: '900' } satisfies {
-              background: Shade;
-              hover: Shade;
-              active: Shade;
-            })
-          : {};
-      return deriveFamily(family, STATUS_RAMP[family], mode, solid);
-    })
-  );
+  const out: TokenMap = {};
+  for (const family of STATUS_FAMILIES) {
+    const solid: SolidShades =
+      family === 'warning'
+        ? { background: '700', hover: '800', active: '900' }
+        : {};
+    Object.assign(out, deriveFamily(family, STATUS_RAMP[family], mode, solid));
+  }
+  return out;
 }
 
-const CHART_LIGHT = [
+export const CHART_LIGHT = [
   'oklch(0.52 0.1168 186.391)',
   'oklch(0.52 0.1871 140.022)',
   'oklch(0.62 0.2044 41.116)',
@@ -418,7 +416,7 @@ const CHART_LIGHT = [
   'oklch(0.49 0.2912 276.966)',
 ] as const;
 
-const CHART_DARK = [
+export const CHART_DARK = [
   'oklch(0.9 0.1682 180.426)',
   'oklch(0.93 0.2278 124.321)',
   'oklch(0.91 0.0819 70.697)',
@@ -447,28 +445,28 @@ function deriveAlpha(
 ): TokenMap {
   const tone = SURFACE_TONE[surfaceTone];
   const dark = mode === 'dark';
-  const borderAlpha = formatAlpha(profile.borderAlpha);
-  const hoverAlpha = formatAlpha(profile.hoverAlpha);
-  const toneInk = (alpha: number | string) =>
-    `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${alpha})`;
-  const contrastInk = (alpha: number | string) =>
-    dark ? `oklch(1 0 0 / ${alpha})` : `oklch(0.1448 0 0 / ${alpha})`;
+  const toneInk = (alpha: number) =>
+    `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${formatAlpha(alpha)})`;
+  const contrastInk = (alpha: number) =>
+    dark
+      ? `oklch(1 0 0 / ${formatAlpha(alpha)})`
+      : `oklch(0.1448 0 0 / ${formatAlpha(alpha)})`;
 
   return {
     '--nx-color-overlay': toneInk(dark ? 0.8471 : 0.7529),
     '--nx-color-popover-backdrop': toneInk(0.9098),
-    '--nx-color-border-default-alpha': toneInk(borderAlpha),
-    '--nx-color-background-hover-alpha': toneInk(hoverAlpha),
+    '--nx-color-border-default-alpha': toneInk(profile.borderAlpha),
+    '--nx-color-background-hover-alpha': toneInk(profile.hoverAlpha),
     '--nx-color-popover-alpha': dark
       ? toneInk(0.8471)
       : 'oklch(1 0 0 / 0.9098)',
-    '--nx-color-border-default': contrastInk(borderAlpha),
-    '--nx-color-border-disabled': contrastInk(borderAlpha),
+    '--nx-color-border-default': contrastInk(profile.borderAlpha),
+    '--nx-color-border-disabled': contrastInk(profile.borderAlpha),
   };
 }
 
 /** Tone-independent neutral surface family (9 tokens, no borders). */
-const NEUTRAL = {
+export const NEUTRAL = {
   '50': 'oklch(0.985 0 0)',
   '100': 'oklch(0.945 0 0)',
   '200': 'oklch(0.87 0 0)',
@@ -527,15 +525,16 @@ function deriveMode(
 }
 
 /**
- * Expand a contract into light + dark `--nx-color-*` maps. Only the tokens the
- * engine computes are emitted (surfaces, text, borders, primary, secondary,
- * status, chart, alpha/translucent).
+ * Expand derivation seeds into light + dark `--nx-color-*` maps. Both modes are
+ * always derived; the consumer's `appearance` choice selects one at runtime.
+ * Only tokens the engine computes are emitted (surfaces, text, borders, primary,
+ * secondary, status, chart, alpha/translucent).
  */
-export function deriveTheme(contract: CodexThemeContract): DerivedTheme {
-  const surfaceTone = contract.surfaceTone ?? 'neutral';
+export function deriveTheme(input: ThemeDerivationInput): DerivedTheme {
+  const surfaceTone = input.surfaceTone ?? 'neutral';
   return {
-    light: deriveMode(contract.light, surfaceTone, 'light', contract.contrast),
-    dark: deriveMode(contract.dark, surfaceTone, 'dark', contract.contrast),
+    light: deriveMode(input.light, surfaceTone, 'light', input.contrast),
+    dark: deriveMode(input.dark, surfaceTone, 'dark', input.contrast),
   };
 }
 

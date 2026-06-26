@@ -49,7 +49,6 @@ describe('deriveTheme key parity', () => {
     'emits exactly the curated %s color key set',
     (mode) => {
       const theme = deriveTheme({
-        appearance: mode,
         surfaceTone: 'slate',
         light: {
           accent: '#2563eb',

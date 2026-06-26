@@ -10,12 +10,12 @@ import { describe, expect, it } from 'vitest';
 
 import { apcaLc } from './apca';
 import {
-  type CodexThemeContract,
   derivePrimary,
   deriveSurfaces,
   deriveText,
   deriveTheme,
   type SurfaceTone,
+  type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
 import { TIER_THRESHOLDS } from './palette';
@@ -212,8 +212,7 @@ describe('derivePrimary', () => {
   });
 });
 
-const CONTRACT: CodexThemeContract = {
-  appearance: 'dark',
+const CONTRACT: ThemeDerivationInput = {
   light: { accent: '#2563eb', background: '#ffffff', foreground: '#0a0a0a' },
   dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
   contrast: 60,
@@ -236,6 +235,26 @@ describe('deriveTheme', () => {
     }
   });
 
+  it('derives both modes from seeds alone — no appearance field', () => {
+    // The engine takes ThemeDerivationInput, not the full contract: it always
+    // derives light + dark; the consumer's `appearance` choice selects one at
+    // runtime, outside deriveTheme. This is the engine/preference decoupling.
+    const seedsOnly: ThemeDerivationInput = {
+      surfaceTone: 'slate',
+      light: {
+        accent: '#2563eb',
+        background: '#ffffff',
+        foreground: '#181818',
+      },
+      dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+      contrast: 60,
+    };
+    const { light, dark } = deriveTheme(seedsOnly);
+    expect(light['--nx-color-background']).toBeDefined();
+    expect(dark['--nx-color-background']).toBeDefined();
+    expect(Object.keys(dark)).toEqual(Object.keys(light));
+  });
+
   it('uses the per-theme seed blocks', () => {
     const d = deriveTheme(CONTRACT);
     expect(lOf(d.dark['--nx-color-background'])).toBeLessThan(0.3); // dark seed
@@ -247,7 +266,6 @@ describe('deriveTheme', () => {
     (mode) => {
       const at = (contrast: number) =>
         deriveTheme({
-          appearance: mode,
           surfaceTone: 'stone',
           ...SURFACE_TONE_SEEDS,
           contrast,
@@ -272,7 +290,6 @@ describe('deriveTheme', () => {
     (mode) => {
       const at = (contrast: number) =>
         deriveTheme({
-          appearance: mode,
           surfaceTone: 'slate',
           ...SURFACE_TONE_SEEDS,
           contrast,
@@ -314,7 +331,6 @@ describe('deriveSecondary', () => {
 
   it('secondary exactly matches the curated neutral map (both modes)', () => {
     const { light, dark } = deriveTheme({
-      appearance: 'light',
       light: {
         accent: '#2563eb',
         background: '#ffffff',
@@ -363,7 +379,6 @@ describe('status families', () => {
     'uses curated hues + is APCA-legible on background and subtle in %s mode',
     (mode) => {
       const theme = deriveTheme({
-        appearance: mode,
         light: {
           accent: '#2563eb',
           background: '#ffffff',
@@ -404,12 +419,10 @@ describe('status families', () => {
 describe('surfaceTone surfaces', () => {
   it('keeps light base flat while tone tints light paper and stepped surfaces', () => {
     const slate = deriveTheme({
-      appearance: 'light',
       surfaceTone: 'slate',
       ...SURFACE_TONE_SEEDS,
     }).light;
     const neutral = deriveTheme({
-      appearance: 'light',
       surfaceTone: 'neutral',
       ...SURFACE_TONE_SEEDS,
     }).light;
@@ -429,20 +442,9 @@ describe('surfaceTone surfaces', () => {
 });
 
 describe('chart colors', () => {
-  const CHART_LIGHT = [
-    'oklch(0.52 0.1168 186.391)',
-    'oklch(0.52 0.1871 140.022)',
-    'oklch(0.62 0.2044 41.116)',
-    'oklch(0.58 0.2489 17.585)',
-    'oklch(0.49 0.2912 276.966)',
-  ];
-  const CHART_DARK = [
-    'oklch(0.9 0.1682 180.426)',
-    'oklch(0.93 0.2278 124.321)',
-    'oklch(0.91 0.0819 70.697)',
-    'oklch(0.885 0.0771 10.001)',
-    'oklch(0.865 0.069 274.039)',
-  ];
+  // Exact chart values are ground-truthed against color.json in
+  // tone-parity.test.ts (value parity); here we assert structure, not a copy.
+  const OKLCH_RE = /^oklch\([\d.]+ [\d.]+ [\d.]+\)$/;
 
   const chartTokens = (map: Record<string, string>) =>
     Array.from(
@@ -450,17 +452,22 @@ describe('chart colors', () => {
       (_, index) => map[`--nx-color-chart-categorical-${index + 1}`]
     );
 
-  it('emits the fixed 5-color chart set, distinct per mode', () => {
+  it('emits 5 valid, mutually distinct chart colors per mode', () => {
     const { light, dark } = deriveTheme({
-      appearance: 'light',
       surfaceTone: 'neutral',
       ...SURFACE_TONE_SEEDS,
     });
+    const lightSet = chartTokens(light);
+    const darkSet = chartTokens(dark);
 
-    expect(chartTokens(light)).toEqual(CHART_LIGHT);
-    expect(chartTokens(dark)).toEqual(CHART_DARK);
-    expect(light['--nx-color-chart-categorical-1']).not.toBe(
-      dark['--nx-color-chart-categorical-1']
+    for (const set of [lightSet, darkSet]) {
+      expect(set).toHaveLength(5);
+      for (const value of set) expect(value).toMatch(OKLCH_RE);
+      expect(new Set(set).size, 'distinct within mode').toBe(5);
+    }
+    // every series is re-toned per mode
+    lightSet.forEach((value, index) =>
+      expect(value, `chart ${index + 1}`).not.toBe(darkSet[index])
     );
   });
 });
@@ -470,7 +477,6 @@ describe('derived colorblind distinguishability', () => {
     'keeps emitted chart and status colors distinguishable in %s mode',
     (mode) => {
       const map = deriveTheme({
-        appearance: mode,
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
       })[mode];
@@ -497,7 +503,6 @@ describe('derived colorblind distinguishability', () => {
 describe('alpha and translucent colors', () => {
   it('emits tone-ink + contrast-ink alpha tokens with correct L C H alpha in both modes', () => {
     const { light, dark } = deriveTheme({
-      appearance: 'light',
       surfaceTone: 'slate',
       ...SURFACE_TONE_SEEDS,
     });
@@ -543,7 +548,6 @@ describe('alpha and translucent colors', () => {
   it('scales default border alpha with contrast, anchored at the curated default', () => {
     const at = (contrast: number) =>
       deriveTheme({
-        appearance: 'dark',
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
         contrast,
@@ -580,12 +584,19 @@ describe('alpha and translucent colors', () => {
     expect(at(100).dark['--nx-color-border-default-alpha']).toBe(
       'oklch(0.13 0.0400 264.7 / 0.2337)'
     );
+    // contrast 30 exercises the sub-anchor lerp branch + toFixed rounding —
+    // every assertion above is an endpoint (0/100) or the c===60 early return.
+    expect(at(30).dark['--nx-color-border-default']).toBe(
+      'oklch(1 0 0 / 0.1541)'
+    );
+    expect(at(30).light['--nx-color-border-default']).toBe(
+      'oklch(0.1448 0 0 / 0.0771)'
+    );
   });
 
   it('scales background-hover-alpha with contrast while leaving scrims anchored', () => {
     const at = (contrast: number) =>
       deriveTheme({
-        appearance: 'dark',
         surfaceTone: 'slate',
         ...SURFACE_TONE_SEEDS,
         contrast,
@@ -719,8 +730,7 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
     'contract %#',
     ({ accent, background, foreground, mode, surfaceTone, contrast }) => {
       const seeds = { accent, background, foreground };
-      const contract: CodexThemeContract = {
-        appearance: mode,
+      const contract: ThemeDerivationInput = {
         surfaceTone,
         light: seeds,
         dark: seeds,

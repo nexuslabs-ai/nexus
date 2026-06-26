@@ -8,6 +8,7 @@ export type {
   CodexThemeContract,
   DerivedTheme,
   SurfaceTone,
+  ThemeDerivationInput,
   ThemeSeeds,
   TokenMap,
 } from './lib/derive-theme';

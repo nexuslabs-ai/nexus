@@ -4,7 +4,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { deriveTheme, type Mode } from './derive-theme';
+import {
+  CHART_DARK,
+  CHART_LIGHT,
+  deriveTheme,
+  type Mode,
+  NEUTRAL,
+  STATUS_RAMP,
+} from './derive-theme';
 import lightFixture from './light-tone.fixture.json';
 import perceptualGrid from './perceptual-grid.json';
 import perceptualGridHue from './perceptual-grid-hue.json';
@@ -59,6 +66,11 @@ const PRIMITIVE_COLOR_FILE = path.join(
   'primitives',
   'color.json'
 );
+// Light tone parity is a frozen CHANGE-DETECTOR, not an independent oracle: the
+// fixture was generated from the engine's own first run and human-reviewed (light
+// intentionally diverges from curated near-white, so there is no external value to
+// assert against). It catches unintended drift; the human sign-off proves the
+// values are right.
 const LIGHT_FIXTURE = lightFixture as Fixture;
 const SHADE_RE = /^(50|100|200|300|400|500|600|700|800|900|950)$/;
 const EMIT_GAMUT = 'p3';
@@ -139,6 +151,11 @@ function parseToOklch(input: string): Oklch {
   return color;
 }
 
+// Reproduces the build-time curated-primitive grinder (`scripts/lib/
+// perceptual-grid.js` → `hexToOklchPinned`): per-hue L curves + P3-cusp chroma.
+// This is NOT `perceptual-ramp.ts`'s `pinnedOklch` — that is the runtime
+// brand-ramp grinder (flat L grid, chroma capped at the seed), a different
+// algorithm. `rootDir: ./src` blocks importing the build script from a test.
 function primitiveOklch(ref: string): string {
   const [palette, shade] = ref.slice(1, -1).split('.');
   const value =
@@ -267,7 +284,6 @@ describe('tone parity', () => {
   it.each(TONES)('%s matches the mode-split tone oracle', (tone) => {
     for (const mode of ['light', 'dark'] as const) {
       const got = deriveTheme({
-        appearance: mode,
         surfaceTone: tone,
         light: {
           accent: '#2563eb',
@@ -309,11 +325,94 @@ describe('tone parity', () => {
 
   it('keeps non-neutral light paper visibly distinct from neutral', () => {
     const paper = Object.fromEntries(
-      TONES.map((tone) => [tone, comps(LIGHT_FIXTURE.tones[tone].background)])
+      TONES.map((tone) => {
+        const light = deriveTheme({
+          surfaceTone: tone,
+          light: {
+            accent: '#2563eb',
+            background: '#ffffff',
+            foreground: '#181818',
+          },
+          dark: {
+            accent: '#2563eb',
+            background: '#181818',
+            foreground: '#ffffff',
+          },
+          contrast: TONE_CONTRAST,
+        }).light;
+        return [tone, comps(light['--nx-color-background']!)];
+      })
     );
     expect(paper.slate!.c).toBeGreaterThan(paper.gray!.c);
     expect(paper.gray!.c).toBeGreaterThan(paper.zinc!.c);
     expect(paper.zinc!.c).toBeGreaterThan(paper.neutral!.c);
     expect(paper.stone!.c).toBeGreaterThan(paper.neutral!.c);
+  });
+});
+
+// Value parity: the engine's hand-typed primitive tables must equal the
+// hue-curve-ground `color.json` primitives, so editing color.json (or mistyping a
+// table entry) fails here instead of silently shipping a drifted value.
+describe('engine color tables match ground color.json primitives', () => {
+  const grind = (palette: string, shade: string): string =>
+    primitiveOklch(`{${palette}.${shade}}`);
+  const ALL_SHADES = [
+    '50',
+    '100',
+    '200',
+    '300',
+    '400',
+    '500',
+    '600',
+    '700',
+    '800',
+    '900',
+    '950',
+  ] as const;
+
+  it.each([
+    ['success', 'green'],
+    ['warning', 'orange'],
+    ['error', 'red'],
+    ['information', 'blue'],
+  ] as const)('%s ramp equals ground %s', (family, palette) => {
+    for (const shade of ALL_SHADES) {
+      expect(STATUS_RAMP[family][shade], `${family}.${shade}`).toBe(
+        grind(palette, shade)
+      );
+    }
+  });
+
+  it('chart-light/dark sets equal their ground primitives', () => {
+    const lightPrimitives = [
+      ['teal', '700'],
+      ['green', '700'],
+      ['orange', '600'],
+      ['rose', '600'],
+      ['indigo', '600'],
+    ] as const;
+    const darkPrimitives = [
+      ['teal', '200'],
+      ['lime', '200'],
+      ['orange', '200'],
+      ['rose', '200'],
+      ['indigo', '200'],
+    ] as const;
+    CHART_LIGHT.forEach((value, index) =>
+      expect(value, `chart-light ${index}`).toBe(
+        grind(lightPrimitives[index]![0], lightPrimitives[index]![1])
+      )
+    );
+    CHART_DARK.forEach((value, index) =>
+      expect(value, `chart-dark ${index}`).toBe(
+        grind(darkPrimitives[index]![0], darkPrimitives[index]![1])
+      )
+    );
+  });
+
+  it('neutral family equals ground neutral', () => {
+    for (const shade of Object.keys(NEUTRAL) as (keyof typeof NEUTRAL)[]) {
+      expect(NEUTRAL[shade], `neutral.${shade}`).toBe(grind('neutral', shade));
+    }
   });
 });
