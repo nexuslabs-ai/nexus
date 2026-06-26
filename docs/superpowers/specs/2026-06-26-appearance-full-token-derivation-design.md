@@ -47,10 +47,30 @@ Generalize `derivePrimary` into `deriveFamily(name, ramp, mode)` — it takes a 
 
 ## Surfaces, nav, borders, alpha — tinted by `surfaceTone`
 
-- **`deriveSurfaces(background, surfaceTone, mode, delta)`** — lightness from the step model + the `background` seed; **hue/chroma from `surfaceTone`** (the white light-background can't carry it). Chroma fades toward white (`tone.c * (1 - L)`): slate-50 ≈ C 0.003 … slate-950 ≈ C 0.04. Only base `container`/`popover` flatten in light (Q4); `muted` + states keep stepped, tone-tinted.
+- **`deriveSurfaces(background, surfaceTone, mode, delta)`** — lightness from the step model; **hue/chroma from `surfaceTone`** via two baked anchors, `lightC` and `darkC` (see Q6). In **light**, tinted tones anchor at a **paper lightness ≈ 0.987** (not pure white — white can't hold the tint) so the tone is visible; `neutral` stays white. In **dark**, surfaces carry `darkC`. Only base `container`/`popover` flatten in light (Q4); `muted` + states stay stepped, tone-tinted.
 - **nav + `border-active`** flow through the surface machinery (opaque, tone-tinted; add `nav-border` to the step set). **`border-default` / `border-disabled` are ALPHA** (contrast-ink: black light / white dark) — emitted by `deriveAlpha`, **not** opaque surface steps.
 - **`deriveAlpha(surfaceTone, mode)`** — the translucent "ink" carries the **tone** tint (slate overlay ≠ neutral overlay), at mode-specific α (overlay 0.7529/0.8471, border-default-alpha 0.0941/0.1882, popover-backdrop 0.9098; `popover-alpha` is white in light, tone-ink in dark).
 - **text** — keep `deriveText` (APCA `quietText`). **chart** — fixed colorblind set, re-toned per mode.
+
+## Evident light-mode tones (Q6)
+
+**Decision:** light surfaces carry a deliberate tonal tint — the page **paper** (background) _and_ the surfaces on it — so the five tones are _nameable at a glance_ in light, not only in dark. Degree **B** (clearly tonal: warm-paper stone vs cool-paper slate), mechanism **C** (tinted paper + tinted surfaces), strength **Tonal**, baked into `SURFACE_TONE` (a design-time calibration, **not** a runtime knob). This **diverges from curated/Tailwind** (whose light ramps are near-neutral) — a conscious Nexus stance, folded into Phase A calibration.
+
+**Why a paper tint is required:** chroma rides on darkness — at pure-white lightness there's no gamut room for tint, so curated light tones are imperceptibly different. Holding a visible tint means dropping the light paper off pure `#fff` to ≈ 0.987 lightness, where a small chroma reads as colored paper.
+
+**Baked calibration (Tonal):**
+
+| tone    | hue    | lightC (paper) | darkC | reads as   |
+| ------- | ------ | -------------- | ----- | ---------- |
+| slate   | 264.7° | 0.011          | 0.040 | cool       |
+| gray    | 261.7° | 0.008          | 0.027 | cool-mid   |
+| zinc    | 262.8° | 0.005          | 0.005 | faint cool |
+| stone   | 70°    | 0.008          | 0.006 | warm       |
+| neutral | —      | 0              | 0     | true grey  |
+
+**Known limit (accepted):** slate / gray / zinc share the cool hue family (~262–264°), so in light they differ by _intensity_, not hue; only stone (warm) and neutral (grey) are hue-distinct. Stronger per-tone light separation would require spreading the tone hues — out of scope for Phase A (it would redefine the tones).
+
+**Consequences:** (1) light `--nx-color-background` is tinted paper, **not pure `#fff`** (documented divergence; iOS/macOS do the same). (2) The tone-parity gate is **mode-split** — dark vs curated, light vs the new evident values (see Invariants).
 
 ## Parity & cutover (the C-gate)
 
@@ -62,7 +82,7 @@ Generalize `derivePrimary` into `deriveFamily(name, ramp, mode)` — it takes a 
 - **Exact key-parity test:** derived `--nx-color-*` keys **exactly equal** (no missing, **no extras**) the curated set in **both** modes — sourced from `@nexus/core`'s own `tokens/semantic/*.json` (base + brand + chart), never `apps/console`.
 - **APCA sweep (extended):** every status family **and secondary**, `-foreground` on `-background` **and** `-subtle-foreground` on `-subtle`, both modes.
 - **Colorblind:** the fixed chart set passes `audit:colorblind`.
-- **Tone parity (both modes):** each named tone reproduces curated within tolerance — and demonstrably tints **light** `muted` / `nav-background` / `nav-border` / `border-active` / `overlay` (differs from `neutral`), not only dark surfaces.
+- **Tone parity (mode-split):** **dark** matches **curated** within tolerance; **light** matches the new calibrated **evident-tone** values (light deliberately diverges — curated light is near-white). Every named tone visibly tints **light** `paper`/`muted`/`nav`/`border-active`/`overlay` (differs from `neutral`), not only dark.
 - **No `light-dark()`** in emitted CSS — direct assertion on `themeToCss` output.
 
 ## Out of scope (Phase A)

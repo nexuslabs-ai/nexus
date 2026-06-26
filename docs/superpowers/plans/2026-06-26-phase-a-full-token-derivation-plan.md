@@ -238,7 +238,7 @@ const STATUS_RAMP = {
 
 **Files:** Modify the contract type + `SURFACE_STEPS` + `deriveSurfaces` + `deriveMode`/`deriveTheme`; Test: `derive-theme.test.ts`
 
-**Interfaces:** Add `export type SurfaceTone = 'stone'|'neutral'|'zinc'|'slate'|'gray'`; contract gains `surfaceTone?: SurfaceTone` (default `'neutral'`). `SURFACE_TONE` (runtime-owned, the calibrated source of truth) maps each tone → `{ h, c }`. **Remove `border-default` + `border-disabled` from `SURFACE_STEPS`** (they're alpha, Task 6). Keep `border-active` (opaque tone). `deriveSurfaces(background, surfaceTone, mode, delta)` tints hue/chroma from the tone; only base `container`/`popover` flatten in light.
+**Interfaces:** Add `export type SurfaceTone = 'stone'|'neutral'|'zinc'|'slate'|'gray'`; contract gains `surfaceTone?: SurfaceTone` (default `'neutral'`). `SURFACE_TONE` (runtime-owned, the calibrated source of truth) maps each tone → `{ h, lightC, darkC }` — two chroma anchors, because **light is now a tinted _paper_, not pure white** (degree B / mechanism C, baked at the Tonal strength). **Remove `border-default` + `border-disabled` from `SURFACE_STEPS`** (they're alpha, Task 6). Keep `border-active` (opaque tone). `deriveSurfaces(background, surfaceTone, mode, delta)` tints hue/chroma from the tone; only base `container`/`popover` flatten in light.
 
 - [ ] **Step 1: Failing tests**
 
@@ -275,13 +275,20 @@ it('light base flat; muted/hover stepped; tone tints light (slate≠neutral)', (
 
 ```ts
 export type SurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
-const SURFACE_TONE: Record<SurfaceTone, { h: number; c: number }> = {
-  slate: { h: 264.7, c: 0.04 },
-  gray: { h: 261.7, c: 0.027 },
-  zinc: { h: 262.8, c: 0.005 },
-  neutral: { h: 0, c: 0 },
-  stone: { h: 70, c: 0.006 },
+// Two baked chroma anchors per tone: lightC = the tinted "paper" (at the chosen
+// Tonal strength) and darkC = curated dark. Light is NO LONGER pure white — it's
+// tinted paper. neutral stays a true grey (both anchors 0).
+const SURFACE_TONE: Record<
+  SurfaceTone,
+  { h: number; lightC: number; darkC: number }
+> = {
+  slate: { h: 264.7, lightC: 0.011, darkC: 0.04 },
+  gray: { h: 261.7, lightC: 0.008, darkC: 0.027 },
+  zinc: { h: 262.8, lightC: 0.005, darkC: 0.005 },
+  neutral: { h: 0, lightC: 0, darkC: 0 },
+  stone: { h: 70, lightC: 0.008, darkC: 0.006 },
 };
+const PAPER_L = 0.987; // tinted tones anchor here in light so the tint is displayable (pure white can't hold chroma)
 const FLAT_IN_LIGHT = new Set(['container', 'popover']); // base surfaces only
 // SURFACE_STEPS: delete 'border-default' and 'border-disabled' entries; keep 'border-active'.
 
@@ -293,15 +300,21 @@ export function deriveSurfaces(
 ): TokenMap {
   const bg = seedOklch(backgroundHex);
   const tone = SURFACE_TONE[surfaceTone];
-  const dir = mode === 'dark' ? 1 : -1;
+  const dark = mode === 'dark';
+  const dir = dark ? 1 : -1;
+  // light: tinted tones drop from pure white to "paper" so the tint shows; neutral stays white.
+  const anchorL = dark ? (bg.l ?? 0) : tone.lightC > 0 ? PAPER_L : (bg.l ?? 1);
+  const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
   for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
-    const step = mode === 'light' && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
-    const l = clamp01((bg.l ?? 0) + dir * step * delta);
+    const step = !dark && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
+    const l = clamp01(anchorL + dir * step * delta);
+    // tint holds at the paper and rises modestly on deeper light surfaces; dark uses darkC. k (1.4) tuned in Task 9.
+    const c = dark ? baseC : baseC * (1 + (1 - l) * 1.4);
     out[`--nx-color-${token}`] = formatOklch({
       mode: 'oklch',
       l,
-      c: tone.c * (1 - l),
+      c,
       h: tone.h,
     });
   }
@@ -310,8 +323,8 @@ export function deriveSurfaces(
 // deriveMode/deriveTheme thread `contract.surfaceTone ?? 'neutral'` into deriveSurfaces + deriveAlpha.
 ```
 
-- [ ] **Step 4: Run → PASS.** (Light step magnitudes calibrated in Task 9.)
-- [ ] **Step 5: Commit** — `git commit -am "feat(core): surfaceTone-tinted surfaces; flat light base; border-default→alpha"`
+- [ ] **Step 4: Run → PASS.** Light surfaces are now tinted **paper** (background ≈ L0.987, not pure `#fff`) at the baked **Tonal** strength; neutral stays true white. The depth multiplier `k` (1.4) + light step magnitudes are calibrated against the light fixture in Task 9.
+- [ ] **Step 5: Commit** — `git commit -am "feat(core): surfaceTone-tinted paper (evident light tones); flat base; border-default→alpha"`
 
 ---
 
@@ -435,8 +448,9 @@ it('emits tone-ink + contrast-ink alpha tokens with correct L C H α (both modes
 ```ts
 function deriveAlpha(surfaceTone: SurfaceTone, mode: Mode): TokenMap {
   const tone = SURFACE_TONE[surfaceTone];
-  const toneInk = (a: number) =>
-    `oklch(0.13 ${tone.c.toFixed(4)} ${tone.h.toFixed(1)} / ${a})`;
+  const toneInk = (
+    a: number // ink sits at L0.13 → carries the tone's dark chroma
+  ) => `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${a})`;
   const dark = mode === 'dark';
   const contrastInk = (a: number) =>
     dark ? `oklch(1 0 0 / ${a})` : `oklch(0.1448 0 0 / ${a})`;
@@ -570,9 +584,9 @@ for (const fam of [
 
 **Files:** Create `packages/core/src/lib/tone-parity.test.ts`; the calibrated `SURFACE_TONE` (Task 4) is the runtime source of truth — no separate test-only seed table.
 
-**Interfaces:** For each `surfaceTone`, every **tone-owned** base token must match the core curated value within tolerance (ΔL ≤ 0.04, ΔC ≤ 0.01, ΔH ≤ 4°, Δα ≤ 0.02) in **both** modes. This is exhaustive for tone-owned base leaves, not a representative subset: surfaces, state surfaces, tone foregrounds, nav, control, `border-active`, and tone alpha tokens are all included. Curated values resolve from `packages/core/tokens/semantic/base-{tone}-{light,dark}.json` → primitives. Contrast-ink tokens (`border-default`, `border-disabled`) are intentionally not tone-owned and are asserted in Task 6. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
+**Interfaces:** the gate is **mode-split** (the evident-light-tones change in Task 4 makes light intentionally diverge from curated). In **dark**, every **tone-owned** base token matches the **curated** value (`base-{tone}-dark.json` → primitives) within tolerance (ΔL ≤ 0.04, ΔC ≤ 0.01, ΔH ≤ 4°, Δα ≤ 0.02). In **light**, tones now carry a deliberate tint (curated light is near-white), so they're gated against the **new calibrated evident-tone values** — a committed `light-tone.fixture.json` (built once from the agreed `SURFACE_TONE` lightC + the paper model, then frozen) — **not** curated. Both modes are exhaustive over tone-owned leaves: surfaces, state surfaces, tone foregrounds, nav, control, `border-active`, and tone alpha tokens. (Contrast-ink `border-default`/`border-disabled` are not tone-owned; asserted in Task 6.) Contrast-ink tokens (`border-default`, `border-disabled`) are intentionally not tone-owned and are asserted in Task 6. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
 
-- [ ] **Step 1: Build the core-sourced oracle** — a helper that resolves `base-{tone}-{mode}.json` `{primitive}` refs against `packages/core/tokens/primitives/*.json` to concrete `oklch()` for every token in `TONE_TOKENS` below. Do not stop at `{muted, container, popover, nav-background, nav-border, border-active, overlay}`; that was only a smoke-test subset.
+- [ ] **Step 1: Build the mode-split oracle** — `expectedTone(tone, mode, tok)`: for **dark**, resolve `base-{tone}-dark.json` `{primitive}` refs against `packages/core/tokens/primitives/*.json` to concrete `oklch()`; for **light**, read the committed `light-tone.fixture.json` (the agreed evident-tone values — light deliberately diverges from curated). Cover every token in `TONE_TOKENS` below, not just a smoke-test subset.
 
 - [ ] **Step 2: Parity test (both modes, L/C/H/α tolerance)**
 
@@ -631,7 +645,7 @@ it.each(['slate', 'neutral', 'zinc', 'gray', 'stone'])(
       })[mode];
       for (const tok of TONE_TOKENS) {
         const g = comps(got[`--nx-color-${tok}`]),
-          w = comps(curatedTone(tone, mode, tok));
+          w = comps(expectedTone(tone, mode, tok)); // dark=curated, light=evident fixture
         expect(Math.abs(g.l - w.l)).toBeLessThanOrEqual(0.04);
         expect(Math.abs(g.c - w.c)).toBeLessThanOrEqual(0.01);
         if (g.c > 0.002 && w.c > 0.002)
