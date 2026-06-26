@@ -49,7 +49,8 @@ Generalize `derivePrimary` into `deriveFamily(name, ramp, mode)` — it takes a 
 
 - **`deriveSurfaces(background, surfaceTone, mode, delta)`** — lightness from the step model; **hue/chroma from `surfaceTone`** via two baked anchors, `lightC` and `darkC` (see Q6). In **light**, tinted tones anchor at a **paper lightness ≈ 0.987** (not pure white — white can't hold the tint) so the tone is visible; `neutral` stays white. In **dark**, surfaces carry `darkC` and use a calibrated dark step table so tone-owned surfaces line up with the curated 950/900/800/700/400 ladder. Only base `container`/`popover` flatten in light (Q4); `muted` + states stay stepped, tone-tinted.
 - **nav + `border-active`** flow through the surface machinery (opaque, tone-tinted; add `nav-border` to the step set). **`border-default` / `border-disabled` are ALPHA** (contrast-ink: black light / white dark) — emitted by `deriveAlpha`, **not** opaque surface steps.
-- **`deriveAlpha(surfaceTone, mode)`** — the translucent "ink" carries the **tone** tint (slate overlay ≠ neutral overlay), at mode-specific α (overlay 0.7529/0.8471, border-default-alpha 0.0941/0.1882, popover-backdrop 0.9098; `popover-alpha` is white in light, tone-ink in dark).
+- **`deriveAlpha(surfaceTone, mode, contrast)`** — the translucent "ink" carries the **tone** tint (slate overlay ≠ neutral overlay). Overlay/popover α stays mode-specific (overlay 0.7529/0.8471, popover-backdrop 0.9098; `popover-alpha` is white in light, tone-ink in dark). Default border α and `background-hover-alpha` are contrast-aware, anchored to their curated defaults at contrast 60, so ordinary component borders and hover fills move with the same Appearance contrast slider as nav borders.
+- **contrast** — the Appearance contrast slider controls structural separation only: surface steps, hover fills, nav states, and contrast-ink borders. It does **not** re-tone the typography hierarchy; text tiers and quiet aims stay fixed, while APCA-derived surface-riding text may track moving surfaces just enough to remain legible.
 - **text** — keep `deriveText` (APCA `quietText`). **chart** — fixed colorblind set, re-toned per mode.
 
 ## Evident light-mode tones (Q6)
@@ -95,5 +96,5 @@ Generalize `derivePrimary` into `deriveFamily(name, ramp, mode)` — it takes a 
 
 - Exact canonical status hues/chromas (calibrate to `green/orange/red/blue`).
 - The fixed chart-categorical 5-set values (clear `audit:colorblind` in both modes).
-- Per-token alpha opacities (read from the curated `*-a*` primitives).
+- Per-token alpha opacities (read from the curated `*-a*` primitives), with default border α anchored to the curated value at contrast 60 and scaled softly below/above it.
 - The per-`surfaceTone` hue/chroma + light step-size calibration (the parity pass).

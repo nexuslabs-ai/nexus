@@ -35,8 +35,17 @@ export interface DerivedTheme {
 // --- Tunable contrast model (spec §10.1) ---------------------------------
 const DELTA_MIN = 0.02;
 const DELTA_MAX = 0.08;
+const CONTRAST_ANCHOR = 60;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (l: number) => Math.max(0.03, Math.min(1, l));
+const clampContrast = (contrast: number) =>
+  Math.max(0, Math.min(100, contrast));
+
+interface ContrastProfile {
+  surfaceDelta: number;
+  borderAlpha: number;
+  hoverAlpha: number;
+}
 
 const SURFACE_TONE: Record<
   SurfaceTone,
@@ -55,8 +64,41 @@ const FLAT_IN_LIGHT = new Set(['container', 'popover']);
 
 /** Δ (per-step lightness offset) for a 0–100 contrast value. */
 export function contrastDelta(contrast: number): number {
-  const t = Math.max(0, Math.min(100, contrast)) / 100;
-  return lerp(DELTA_MIN, DELTA_MAX, t);
+  return contrastProfile('light', contrast).surfaceDelta;
+}
+
+function anchoredContrastLerp(
+  contrast: number,
+  min: number,
+  anchor: number,
+  max: number
+): number {
+  const c = clampContrast(contrast);
+  if (c === CONTRAST_ANCHOR) return anchor;
+  const value =
+    c < CONTRAST_ANCHOR
+      ? lerp(min, anchor, c / CONTRAST_ANCHOR)
+      : lerp(anchor, max, (c - CONTRAST_ANCHOR) / (100 - CONTRAST_ANCHOR));
+  return Number(value.toFixed(4));
+}
+
+function contrastProfile(mode: Mode, contrast: number): ContrastProfile {
+  const dark = mode === 'dark';
+  return {
+    surfaceDelta: lerp(DELTA_MIN, DELTA_MAX, clampContrast(contrast) / 100),
+    borderAlpha: anchoredContrastLerp(
+      contrast,
+      dark ? 0.12 : 0.06,
+      dark ? 0.1882 : 0.0941,
+      dark ? 0.2337 : 0.1168
+    ),
+    hoverAlpha: anchoredContrastLerp(
+      contrast,
+      dark ? 0.04 : 0.035,
+      0.0627,
+      dark ? 0.09 : 0.085
+    ),
+  };
 }
 
 /** Steps (in Δ units) each opaque surface sits from the page background. */
@@ -394,24 +436,34 @@ function deriveChart(mode: Mode): TokenMap {
   );
 }
 
-function deriveAlpha(surfaceTone: SurfaceTone, mode: Mode): TokenMap {
+function formatAlpha(alpha: number): string {
+  return alpha.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+}
+
+function deriveAlpha(
+  surfaceTone: SurfaceTone,
+  mode: Mode,
+  profile: ContrastProfile
+): TokenMap {
   const tone = SURFACE_TONE[surfaceTone];
   const dark = mode === 'dark';
-  const toneInk = (alpha: number) =>
+  const borderAlpha = formatAlpha(profile.borderAlpha);
+  const hoverAlpha = formatAlpha(profile.hoverAlpha);
+  const toneInk = (alpha: number | string) =>
     `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${alpha})`;
-  const contrastInk = (alpha: number) =>
+  const contrastInk = (alpha: number | string) =>
     dark ? `oklch(1 0 0 / ${alpha})` : `oklch(0.1448 0 0 / ${alpha})`;
 
   return {
     '--nx-color-overlay': toneInk(dark ? 0.8471 : 0.7529),
     '--nx-color-popover-backdrop': toneInk(0.9098),
-    '--nx-color-border-default-alpha': toneInk(dark ? 0.1882 : 0.0941),
-    '--nx-color-background-hover-alpha': toneInk(0.0627),
+    '--nx-color-border-default-alpha': toneInk(borderAlpha),
+    '--nx-color-background-hover-alpha': toneInk(hoverAlpha),
     '--nx-color-popover-alpha': dark
       ? toneInk(0.8471)
       : 'oklch(1 0 0 / 0.9098)',
-    '--nx-color-border-default': contrastInk(dark ? 0.1882 : 0.0941),
-    '--nx-color-border-disabled': contrastInk(dark ? 0.1882 : 0.0941),
+    '--nx-color-border-default': contrastInk(borderAlpha),
+    '--nx-color-border-disabled': contrastInk(borderAlpha),
   };
 }
 
@@ -450,14 +502,19 @@ function deriveMode(
   mode: Mode,
   contrast: number
 ): TokenMap {
-  const delta = contrastDelta(contrast);
-  const surfaces = deriveSurfaces(seeds.background, surfaceTone, mode, delta);
+  const profile = contrastProfile(mode, contrast);
+  const surfaces = deriveSurfaces(
+    seeds.background,
+    surfaceTone,
+    mode,
+    profile.surfaceDelta
+  );
   const text = deriveText(seeds.foreground, surfaces);
   const primary = derivePrimary(seeds.accent, mode);
   const secondary = deriveSecondary(mode);
   const status = deriveStatus(mode);
   const chart = deriveChart(mode);
-  const alpha = deriveAlpha(surfaceTone, mode);
+  const alpha = deriveAlpha(surfaceTone, mode, profile);
   return {
     ...surfaces,
     ...text,

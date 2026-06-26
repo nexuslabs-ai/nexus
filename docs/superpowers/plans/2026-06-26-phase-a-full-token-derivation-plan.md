@@ -4,7 +4,7 @@
 
 **Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` **key set** equals the curated base+brand+chart set — every token key derived from the contract, none cascading from static CSS. Values are verified by family gates: dark tone-owned values match curated, light tone-owned values match the committed evident-tone fixture, and status/secondary/chart families keep their own exact gates.
 
-**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). Warning keeps the orange ramp but promotes its solid tier to `orange.700` (`orange.800`/`orange.900` hover/active) so emitted success/warning clear the derived colorblind gate. A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed curated APCA + colorblind set; light series 1/2 use `teal.700` + `green.700` so marks clear light-paper contrast and remain distinguishable from orange/red under colorblind simulation without bespoke chart-only colors. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
+**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). Warning keeps the orange ramp but promotes its solid tier to `orange.700` (`orange.800`/`orange.900` hover/active) so emitted success/warning clear the derived colorblind gate. A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `contrastProfile(mode, contrast)` is the single internal reader for structure strength: surface step delta, contrast-ink border alpha, and hover-fill alpha, all anchored at contrast 60. `deriveAlpha` emits the translucent tokens (tone-ink scrims), `background-hover-alpha`, and the alpha-based `border-default`/`border-disabled` (contrast-ink); modal scrims stay fixed while ordinary component borders and hover fills move with the Appearance contrast slider. Chart = fixed curated APCA + colorblind set; light series 1/2 use `teal.700` + `green.700` so marks clear light-paper contrast and remain distinguishable from orange/red under colorblind simulation without bespoke chart-only colors. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
 
 **Tech Stack:** TypeScript, culori + apca-w3, vitest (`pnpm test:unit`). All work in `packages/core/src/lib/`; the parity oracle is `packages/core/tokens/semantic/*.json` (never `apps/console`).
 
@@ -15,7 +15,8 @@
 - **`deriveTheme` returns DATA** (`TokenMap`); `themeToCss` is the only web applier.
 - **Contract may change in Phase A; Phase B freezes the public API.** It carries `surfaceTone: 'stone'|'neutral'|'zinc'|'slate'|'gray'` (optional, default `'neutral'`) — the neutral surface family. `background` remains the input seed; in light, non-neutral tones emit `--nx-color-background` as tinted paper (`PAPER_L`), while `neutral` stays true white. The **tone**, not the background seed, supplies surface/nav/border/alpha hue+chroma.
 - **Status hues are fixed and brand-independent** — emit the **curated** green/orange/red/blue ramps, don't regenerate them via `rampFromSeed` (it uses Nexus's perceptual grid, which need not match the curated primitive ramps). Warning uses the orange ramp's `700` tier as the solid background to avoid success/warning colorblind collapse.
-- **`border-default` / `border-disabled` are ALPHA** (curated: `black-a200` light / `white-a300` dark) — contrast-ink, NOT opaque surface steps. `border-active` IS opaque (tone).
+- **`border-default` / `border-disabled` are ALPHA** (curated anchor at contrast 60: `black-a200` light / `white-a300` dark) — contrast-ink, NOT opaque surface steps. Their alpha scales softly with the Appearance contrast slider so ordinary component borders move with nav borders. `border-active` IS opaque (tone).
+- **Contrast is structure only** — it scales surface separation, hover fills, nav states, and contrast-ink borders. It does not re-tone the typography hierarchy: text tiers and quiet aims are constants, while APCA-derived surface-riding text may track moving surfaces just enough to stay legible.
 - **Parity oracle = `@nexus/core`'s own token JSON** (`packages/core/tokens/semantic/base-*.json` + brand + chart), never `apps/console/public/themes/*.css`.
 - **Tests:** core unit tests live in `packages/core/src/lib/*.test.ts`, import `{ describe, expect, it } from 'vitest'`, run via `pnpm test:unit`. `git add` any NEW test/fixture file before committing (`-am` won't stage it).
 - **Secondary is tone-independent neutral grey** (curated `neutral-*` in every brand) — its own deriver, not `deriveFamily`.
@@ -421,7 +422,7 @@ function deriveChart(mode: Mode): TokenMap {
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-**Interfaces:** `deriveAlpha(surfaceTone, mode)` emits two ink families: **tone-ink** (`overlay`, `popover-backdrop`, `border-default-alpha`, `background-hover-alpha`; `popover-alpha` = white light / tone-ink dark) carrying the tone tint; and **contrast-ink** (`border-default`, `border-disabled` = black light / white dark) — the alpha borders moved out of `SURFACE_STEPS` (Task 4). Tests assert the full normalized `oklch(L C H / α)` value from `SURFACE_TONE`, not only α; Task 9 handles source parity against curated primitives by tolerance.
+**Interfaces:** `contrastProfile(mode, contrast)` owns the structure knobs: `surfaceDelta`, `borderAlpha`, and `hoverAlpha`, all anchored at contrast 60. `deriveAlpha(surfaceTone, mode, profile)` emits two ink families: **tone-ink** (`overlay`, `popover-backdrop`, `border-default-alpha`, `background-hover-alpha`; `popover-alpha` = white light / tone-ink dark) carrying the tone tint; and **contrast-ink** (`border-default`, `border-disabled` = black light / white dark) — the alpha borders moved out of `SURFACE_STEPS` (Task 4). Default border α and `background-hover-alpha` scale softly with contrast; modal scrims (`overlay`, `popover-backdrop`, `popover-alpha`) stay fixed. Tests assert the full normalized `oklch(L C H / α)` value from `SURFACE_TONE`, not only α; Task 9 handles source parity against curated primitives by tolerance.
 
 - [ ] **Step 1: Failing test (full value, both modes)**
 
@@ -469,6 +470,22 @@ it('emits tone-ink + contrast-ink alpha tokens with correct L C H α (both modes
     'oklch(0.1448 0 0 / 0.0941)'
   );
   expect(dark['--nx-color-border-disabled']).toBe('oklch(1 0 0 / 0.1882)');
+  expect(
+    deriveTheme({
+      appearance: 'dark',
+      surfaceTone: 'slate',
+      ...base,
+      contrast: 0,
+    }).dark['--nx-color-border-default']
+  ).toBe('oklch(1 0 0 / 0.12)');
+  expect(
+    deriveTheme({
+      appearance: 'dark',
+      surfaceTone: 'slate',
+      ...base,
+      contrast: 100,
+    }).dark['--nx-color-border-default']
+  ).toBe('oklch(1 0 0 / 0.2337)');
 });
 ```
 
@@ -477,27 +494,64 @@ it('emits tone-ink + contrast-ink alpha tokens with correct L C H α (both modes
 - [ ] **Step 3: Implement**
 
 ```ts
-function deriveAlpha(surfaceTone: SurfaceTone, mode: Mode): TokenMap {
+function anchoredContrastLerp(
+  contrast: number,
+  min: number,
+  anchor: number,
+  max: number
+): number {
+  // Piecewise interpolation keeps contrast 60 byte-for-byte aligned with
+  // curated primitives while making structure tokens slider-aware.
+  // ...
+}
+
+function contrastProfile(mode: Mode, contrast: number): ContrastProfile {
+  const dark = mode === 'dark';
+  return {
+    surfaceDelta: lerp(0.02, 0.08, clampContrast(contrast) / 100),
+    borderAlpha: anchoredContrastLerp(
+      contrast,
+      dark ? 0.12 : 0.06,
+      dark ? 0.1882 : 0.0941,
+      dark ? 0.2337 : 0.1168
+    ),
+    hoverAlpha: anchoredContrastLerp(
+      contrast,
+      dark ? 0.04 : 0.035,
+      0.0627,
+      dark ? 0.09 : 0.085
+    ),
+  };
+}
+
+function deriveAlpha(
+  surfaceTone: SurfaceTone,
+  mode: Mode,
+  profile: ContrastProfile
+): TokenMap {
   const tone = SURFACE_TONE[surfaceTone];
+  const borderAlpha = formatAlpha(profile.borderAlpha);
+  const hoverAlpha = formatAlpha(profile.hoverAlpha);
   const toneInk = (
-    a: number // ink sits at L0.13 → carries the tone's dark chroma
+    a: number | string // ink sits at L0.13 → carries the tone's dark chroma
   ) => `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${a})`;
   const dark = mode === 'dark';
-  const contrastInk = (a: number) =>
+  const contrastInk = (a: number | string) =>
     dark ? `oklch(1 0 0 / ${a})` : `oklch(0.1448 0 0 / ${a})`;
   return {
     '--nx-color-overlay': toneInk(dark ? 0.8471 : 0.7529),
     '--nx-color-popover-backdrop': toneInk(0.9098),
-    '--nx-color-border-default-alpha': toneInk(dark ? 0.1882 : 0.0941),
-    '--nx-color-background-hover-alpha': toneInk(0.0627),
+    '--nx-color-border-default-alpha': toneInk(borderAlpha),
+    '--nx-color-background-hover-alpha': toneInk(hoverAlpha),
     '--nx-color-popover-alpha': dark
       ? toneInk(0.8471)
       : 'oklch(1 0 0 / 0.9098)',
-    '--nx-color-border-default': contrastInk(dark ? 0.1882 : 0.0941),
-    '--nx-color-border-disabled': contrastInk(dark ? 0.1882 : 0.0941),
+    '--nx-color-border-default': contrastInk(borderAlpha),
+    '--nx-color-border-disabled': contrastInk(borderAlpha),
   };
 }
-// deriveMode: add `...deriveAlpha(surfaceTone, mode)`
+// deriveMode: build `const profile = contrastProfile(mode, contrast)`, pass
+// `profile.surfaceDelta` to deriveSurfaces and `profile` to deriveAlpha.
 ```
 
 - [ ] **Step 4: Run → PASS.**
