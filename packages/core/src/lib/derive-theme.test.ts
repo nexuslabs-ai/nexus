@@ -378,8 +378,8 @@ describe('surfaceTone surfaces', () => {
 
 describe('chart colors', () => {
   const CHART_LIGHT = [
-    'oklch(0.59 0.1405 184.704)',
-    'oklch(0.57 0.19 141)',
+    'oklch(0.52 0.1168 186.391)',
+    'oklch(0.52 0.1871 140.022)',
     'oklch(0.62 0.2044 41.116)',
     'oklch(0.58 0.2489 17.585)',
     'oklch(0.49 0.2912 276.966)',

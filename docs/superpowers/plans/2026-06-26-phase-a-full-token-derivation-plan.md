@@ -4,7 +4,7 @@
 
 **Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` **key set** equals the curated base+brand+chart set — every token key derived from the contract, none cascading from static CSS. Values are verified by family gates: dark tone-owned values match curated, light tone-owned values match the committed evident-tone fixture, and status/secondary/chart families keep their own exact gates.
 
-**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). Warning keeps the orange ramp but promotes its solid tier to `orange.700` (`orange.800`/`orange.900` hover/active) so emitted success/warning clear the derived colorblind gate. A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed APCA + colorblind set; light series 1/2 are calibrated together so marks clear light-paper contrast and remain distinguishable from orange/red under colorblind simulation. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
+**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). Warning keeps the orange ramp but promotes its solid tier to `orange.700` (`orange.800`/`orange.900` hover/active) so emitted success/warning clear the derived colorblind gate. A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed curated APCA + colorblind set; light series 1/2 use `teal.700` + `green.700` so marks clear light-paper contrast and remain distinguishable from orange/red under colorblind simulation without bespoke chart-only colors. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
 
 **Tech Stack:** TypeScript, culori + apca-w3, vitest (`pnpm test:unit`). All work in `packages/core/src/lib/`; the parity oracle is `packages/core/tokens/semantic/*.json` (never `apps/console`).
 
@@ -363,8 +363,8 @@ export function deriveSurfaces(
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-- [ ] **Step 1: Provenance** — resolve the fixed chart primitives from core JSON into generator-formatted OKLCH, not by grepping CSS variable names. Light series 1/2 are then calibrated as emitted OKLCH values so the derived chart set clears both APCA on light paper and the derived colorblind gate:
-      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const sets = { light: [["teal","600"],["lime","700"],["orange","600"],["rose","600"],["indigo","600"]], dark: [["teal","200"],["lime","200"],["orange","200"],["rose","200"],["indigo","200"]] }; for (const [mode, entries] of Object.entries(sets)) console.log(mode, entries.map(([p, s]) => formatTokenValue(color[p][s].$value, "color", [p, s])));'`
+- [ ] **Step 1: Provenance** — resolve the fixed chart primitives from core JSON into generator-formatted OKLCH, not by grepping CSS variable names. Light series 1/2 use curated `teal.700` and `green.700` so the derived chart set clears both APCA on light paper and the derived colorblind gate:
+      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const sets = { light: [["teal","700"],["green","700"],["orange","600"],["rose","600"],["indigo","600"]], dark: [["teal","200"],["lime","200"],["orange","200"],["rose","200"],["indigo","200"]] }; for (const [mode, entries] of Object.entries(sets)) console.log(mode, entries.map(([p, s]) => formatTokenValue(color[p][s].$value, "color", [p, s])));'`
 
 - [ ] **Step 2: Failing test**
 
@@ -390,8 +390,8 @@ it('emits the fixed 5-color chart set, distinct per mode', () => {
 
 ```ts
 const CHART_LIGHT = [
-  'oklch(0.59 0.1405 184.704)',
-  'oklch(0.57 0.19 141)',
+  'oklch(0.52 0.1168 186.391)',
+  'oklch(0.52 0.1871 140.022)',
   'oklch(0.62 0.2044 41.116)',
   'oklch(0.58 0.2489 17.585)',
   'oklch(0.49 0.2912 276.966)',
