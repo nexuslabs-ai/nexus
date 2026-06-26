@@ -280,8 +280,8 @@ function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
 
 /**
  * Expand a contract into light + dark `--nx-color-*` maps. Only the tokens the
- * engine computes are emitted (surfaces, text, borders, primary); status and
- * secondary families keep cascading from the loaded base/brand preset.
+ * engine computes are emitted (surfaces, text, borders, primary, secondary); status
+ * families keep cascading from the loaded base/brand preset.
  */
 export function deriveTheme(contract: CodexThemeContract): DerivedTheme {
   return {
