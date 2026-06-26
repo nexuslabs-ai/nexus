@@ -13,7 +13,7 @@
 - **APCA gate:** every text/surface pair clears its tier floor (`TIER_THRESHOLDS`); never throws (snap to black/white endpoint).
 - **No `light-dark()`** in emitted CSS — `themeToCss` stays `:root` / `:root.dark`.
 - **`deriveTheme` returns DATA** (`TokenMap`); `themeToCss` is the only web applier. Don't fold serialization into derivation.
-- **No new contract inputs** — `{ appearance, light/dark:{accent,background,foreground}, contrast }` is frozen.
+- **Contract may change in Phase A; Phase B freezes the public API** — so get the abstraction right now. The contract gains a first-class **`surfaceTone: 'stone'|'neutral'|'zinc'|'slate'|'gray'`** (optional, default `'neutral'`) selecting the neutral surface family. `background` stays the literal page background (white in light); the tone — not the background seed — supplies the hue/chroma tint for surfaces, nav, borders, and alpha. (Rejected Option 1 "derive tone from the dark-block seed": it makes light-mode tint secretly depend on the dark seed — spooky cross-mode coupling we won't freeze into the API.)
 - **Tests:** core unit tests live in `packages/core/src/lib/*.test.ts`, import `{ describe, expect, it } from 'vitest'`, run via `pnpm test:unit`.
 - **Canonical status seeds** (curated `*-600`): success `oklch(0.62 0.2233 140.055)`, warning `oklch(0.62 0.2044 41.116)`, error `oklch(0.577 0.2523 27.926)`, information `oklch(0.546 0.2205 255.276)`.
 - **Secondary is tone-independent neutral grey** (curated references `neutral-*` in every brand file, identical across bases) — derive it from the neutral ramp, NOT the background tone and NOT a solid color ramp.
@@ -236,49 +236,99 @@ const status = Object.assign(
 
 ---
 
-### Task 4: Per-mode surface-step model (flat light)
+### Task 4: Surface-tone–driven surface model (flat light base + tone tint)
 
-**Files:** Modify `deriveSurfaces` in `derive-theme.ts`; Test: `derive-theme.test.ts`
+**Files:** Modify the contract type + `deriveSurfaces` + `deriveMode`/`deriveTheme` in `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-- [ ] **Step 1: Failing test**
+**Interfaces:** Add `export type SurfaceTone = 'stone'|'neutral'|'zinc'|'slate'|'gray'`; the contract gains `surfaceTone?: SurfaceTone` (optional, default `'neutral'`). `deriveSurfaces(backgroundHex, surfaceTone, mode, delta)` takes the **tone** for hue/chroma (the white light-background can't carry it). **Only base `container` + `popover` are flat in light** — `muted` and the `*-hover`/`*-active` states keep stepped + tone-tinted, so containers still show hover feedback and the tone reaches light surfaces/nav/borders.
+
+- [ ] **Step 1: Failing tests** — base surfaces flat, but tone reaches muted/border and light tones differ:
 
 ```ts
-it('light surfaces are flat (container/popover == background L); dark stays stepped', () => {
-  const c = {
-    appearance: 'light' as const,
-    light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
-    dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
-    contrast: 60,
-  };
-  const { light, dark } = deriveTheme(c);
+const SEEDS = {
+  light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
+  dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+  contrast: 60,
+} as const;
+
+it('light: base container/popover flat; muted + hover keep stepped', () => {
+  const { light } = deriveTheme({
+    appearance: 'light',
+    surfaceTone: 'slate',
+    ...SEEDS,
+  });
   expect(light['--nx-color-container']).toBe(light['--nx-color-background']);
   expect(light['--nx-color-popover']).toBe(light['--nx-color-background']);
-  expect(dark['--nx-color-container']).not.toBe(dark['--nx-color-background']);
+  expect(light['--nx-color-muted']).not.toBe(light['--nx-color-background']); // muted is NOT flat
+  expect(light['--nx-color-container-hover']).not.toBe(
+    light['--nx-color-container']
+  ); // hover feedback
+});
+
+it('surfaceTone tints light surfaces (slate ≠ neutral) — no collapse to grey', () => {
+  const slate = deriveTheme({
+    appearance: 'light',
+    surfaceTone: 'slate',
+    ...SEEDS,
+  }).light;
+  const neutral = deriveTheme({
+    appearance: 'light',
+    surfaceTone: 'neutral',
+    ...SEEDS,
+  }).light;
+  expect(slate['--nx-color-muted']).not.toBe(neutral['--nx-color-muted']);
+  expect(slate['--nx-color-border-active']).not.toBe(
+    neutral['--nx-color-border-active']
+  );
 });
 ```
 
-- [ ] **Step 2: Run → FAIL** (light container is currently stepped).
+- [ ] **Step 2: Run → FAIL.**
 
-- [ ] **Step 3: Implement** — in `deriveSurfaces`, zero the elevation steps in light. Rename the loop var to `rawStep`:
+- [ ] **Step 3: Implement** — add the tone, tint surfaces from it, flatten only the base surfaces:
 
 ```ts
-const FLAT_IN_LIGHT = new Set([
-  'container',
-  'container-hover',
-  'container-active',
-  'popover',
-  'popover-hover',
-  'popover-active',
-  'muted',
-]);
-for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
-  const step = mode === 'light' && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
-  // ...existing clamp01(bg.l + dir * step * delta)...
+export type SurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
+
+// hue + (max) chroma per tone, from each tone's neutral ramp; exact values calibrated in Task 9
+const SURFACE_TONE: Record<SurfaceTone, { h: number; c: number }> = {
+  slate: { h: 264.7, c: 0.04 },
+  gray: { h: 261.7, c: 0.027 },
+  zinc: { h: 262.8, c: 0.005 },
+  neutral: { h: 0, c: 0 },
+  stone: { h: 70, c: 0.006 },
+};
+
+const FLAT_IN_LIGHT = new Set(['container', 'popover']); // base surfaces only
+
+export function deriveSurfaces(
+  backgroundHex: string,
+  surfaceTone: SurfaceTone,
+  mode: Mode,
+  delta: number
+): TokenMap {
+  const bg = seedOklch(backgroundHex);
+  const tone = SURFACE_TONE[surfaceTone];
+  const dir = mode === 'dark' ? 1 : -1;
+  const out: TokenMap = {};
+  for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
+    const step = mode === 'light' && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
+    const l = clamp01((bg.l ?? 0) + dir * step * delta);
+    const c = tone.c * (1 - l); // tint fades toward white: slate-50 C≈0.003 … slate-950 C≈0.04
+    out[`--nx-color-${token}`] = formatOklch({
+      mode: 'oklch',
+      l,
+      c,
+      h: tone.h,
+    });
+  }
+  return out; // keep the existing control-thumb special-case
 }
+// deriveMode + deriveTheme thread `contract.surfaceTone ?? 'neutral'` into deriveSurfaces (and deriveAlpha, Task 6).
 ```
 
-- [ ] **Step 4: Run → PASS.**
-- [ ] **Step 5: Commit** — `git commit -am "feat(core): flat light surfaces, stepped dark (per-mode surface model)"`
+- [ ] **Step 4: Run → PASS.** (Light step _magnitudes_ for `muted`/`*-hover` are calibrated against curated in Task 9 — the step model may overshoot the gentle curated light steps; that's a calibration, not a structural, gap.)
+- [ ] **Step 5: Commit** — `git commit -am "feat(core): surfaceTone-driven surfaces; flat light base, tone-tinted states"`
 
 ---
 
@@ -344,7 +394,7 @@ function deriveChart(mode: Mode): TokenMap {
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-**Interfaces:** `deriveAlpha(backgroundHex: string, mode: Mode): TokenMap`. The translucent tokens are **mode-dependent** (verified against curated): `overlay` α `0.7529` light / `0.8471` dark; `border-default-alpha` α `0.0941` light / `0.1882` dark; `popover-alpha` is **white** in light (`oklch(1 0 0 / 0.9098)`) but a dark ink in dark (`α 0.8471`); `popover-backdrop` α `0.9098` both; `background-hover-alpha` α `0.0627` both. The "ink" tint = the background seed's hue/chroma at a fixed dark L (`0.13`), matching the curated `*-a*` tone alphas.
+**Interfaces:** `deriveAlpha(surfaceTone: SurfaceTone, mode: Mode): TokenMap`. The translucent tokens are **mode-dependent** (verified against curated): `overlay` α `0.7529` light / `0.8471` dark; `border-default-alpha` α `0.0941` light / `0.1882` dark; `popover-alpha` is **white** in light (`oklch(1 0 0 / 0.9098)`) but a dark ink in dark (`α 0.8471`); `popover-backdrop` α `0.9098` both; `background-hover-alpha` α `0.0627` both. The "ink" tint = the **surfaceTone's** hue/chroma at a fixed dark L (`0.13`) — so a slate overlay reads slate, not neutral grey — matching the curated `*-a*` tone alphas.
 
 - [ ] **Step 1: Failing test — assert BOTH modes**
 
@@ -376,10 +426,10 @@ it('emits mode-correct translucent tokens', () => {
 - [ ] **Step 3: Implement**
 
 ```ts
-function deriveAlpha(backgroundHex: string, mode: Mode): TokenMap {
-  const s = seedOklch(backgroundHex);
-  const c = (s.c ?? 0).toFixed(4),
-    h = (s.h ?? 0).toFixed(1);
+function deriveAlpha(surfaceTone: SurfaceTone, mode: Mode): TokenMap {
+  const tone = SURFACE_TONE[surfaceTone]; // ink carries the tone tint (curated overlay = slate-a700, not neutral)
+  const c = tone.c.toFixed(4),
+    h = tone.h.toFixed(1);
   const ink = (a: number) => `oklch(0.13 ${c} ${h} / ${a})`;
   const dark = mode === 'dark';
   return {
@@ -390,7 +440,7 @@ function deriveAlpha(backgroundHex: string, mode: Mode): TokenMap {
     '--nx-color-popover-alpha': dark ? ink(0.8471) : 'oklch(1 0 0 / 0.9098)',
   };
 }
-// in deriveMode: add `...deriveAlpha(seeds.background, mode)`
+// in deriveMode: add `...deriveAlpha(surfaceTone, mode)` — slate overlay ≠ neutral overlay in BOTH modes
 ```
 
 - [ ] **Step 4: Run → PASS.**
@@ -478,7 +528,7 @@ for (const fam of ['success', 'warning', 'error', 'information', 'secondary']) {
 
 **Interfaces:** For each of the 5 named tones, the derived surfaces must be within tolerance of today's curated values. **Phase A is not complete until all five tones pass** — there is no "ship anyway and keep the curated file" follow-up. If a tone genuinely cannot be matched, that is a blocking decision: either fix the derivation or make those specific tokens an _explicit, documented_ item of the public package contract (Phase B), not a silent residual.
 
-- [ ] **Step 1: Build the curated fixture** — run the extraction (the approach in `reports/curated-vs-engine-tones.html` / a small node script over `base-*.css` + `color.css`) to get curated `{background,muted,container,popover,border-default}` per tone/mode; write `tone-curated.fixture.json`.
+- [ ] **Step 1: Build the curated fixture** — run the extraction (the approach in `reports/curated-vs-engine-tones.html` / a small node script over `base-*.css` + `color.css`) to get curated `{background,muted,container,popover,border-default,border-active,nav-background,nav-border,overlay}` per tone/mode; write `tone-curated.fixture.json`.
 
 - [ ] **Step 2: Write the parity test** (dark surfaces; light is flat by Q4 so background drives it):
 
@@ -500,6 +550,33 @@ it.each(['slate', 'neutral', 'zinc', 'gray', 'stone'])(
       expect(
         Math.abs(L(dark[`--nx-color-${tok}`]) - L(curated[tone].dark[tok]))
       ).toBeLessThanOrEqual(0.04);
+    }
+  }
+);
+
+// the tone must reach LIGHT surfaces/nav/borders/alpha — not only dark (Codex P1b)
+const TONE_LIGHT_TOKENS = [
+  'muted',
+  'nav-background',
+  'nav-border',
+  'border-active',
+  'overlay',
+];
+it.each(['slate', 'zinc', 'gray', 'stone'])(
+  '%s tints light muted/nav/border/overlay (differs from neutral)',
+  (tone) => {
+    const seed = TONE_SEEDS[tone];
+    const args = (t: SurfaceTone) => ({
+      appearance: 'light' as const,
+      surfaceTone: t,
+      light: seed.light,
+      dark: seed.dark,
+      contrast: TONE_CONTRAST,
+    });
+    const t = deriveTheme(args(tone)).light;
+    const n = deriveTheme(args('neutral')).light;
+    for (const tok of TONE_LIGHT_TOKENS) {
+      expect(t[`--nx-color-${tok}`]).not.toBe(n[`--nx-color-${tok}`]);
     }
   }
 );
