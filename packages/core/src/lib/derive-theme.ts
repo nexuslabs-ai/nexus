@@ -81,6 +81,27 @@ const SURFACE_STEPS: Record<string, number> = {
   'border-active': 3.2,
 };
 
+const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
+  background: 0,
+  'background-hover': 1.6,
+  'background-active': 1.6,
+  muted: 1.6,
+  container: 1.6,
+  'container-hover': 3.2,
+  'container-active': 1.6,
+  popover: 3.2,
+  'popover-hover': 4.8,
+  'popover-active': 3.2,
+  'control-background': 3.2,
+  'control-background-hover': 4.8,
+  'nav-background': 0,
+  'nav-item-hover': 1.6,
+  'nav-item-active': 1.6,
+  'nav-border': 3.2,
+  disabled: 0,
+  'border-active': 9.68,
+};
+
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
 export function deriveSurfaces(
   backgroundHex: string,
@@ -96,7 +117,11 @@ export function deriveSurfaces(
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
   for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
-    const step = !dark && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
+    const step = dark
+      ? (DARK_SURFACE_STEPS[token] ?? rawStep)
+      : FLAT_IN_LIGHT.has(token)
+        ? 0
+        : rawStep;
     const l = clamp01(anchorL + dir * step * delta);
     const c = dark
       ? baseC

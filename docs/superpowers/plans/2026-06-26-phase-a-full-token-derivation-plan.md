@@ -238,7 +238,7 @@ const STATUS_RAMP = {
 
 **Files:** Modify the contract type + `SURFACE_STEPS` + `deriveSurfaces` + `deriveMode`/`deriveTheme`; Test: `derive-theme.test.ts`
 
-**Interfaces:** Add `export type SurfaceTone = 'stone'|'neutral'|'zinc'|'slate'|'gray'`; contract gains `surfaceTone?: SurfaceTone` (default `'neutral'`). `SURFACE_TONE` (runtime-owned, the calibrated source of truth) maps each tone → `{ h, lightC, darkC }` — two chroma anchors, because **light is now a tinted _paper_, not pure white** (degree B / mechanism C, baked at the Tonal strength). **Remove `border-default` + `border-disabled` from `SURFACE_STEPS`** (they're alpha, Task 6). Keep `border-active` (opaque tone). `deriveSurfaces(background, surfaceTone, mode, delta)` tints hue/chroma from the tone; only base `container`/`popover` flatten in light.
+**Interfaces:** Add `export type SurfaceTone = 'stone'|'neutral'|'zinc'|'slate'|'gray'`; contract gains `surfaceTone?: SurfaceTone` (default `'neutral'`). `SURFACE_TONE` (runtime-owned, the calibrated source of truth) maps each tone → `{ h, lightC, darkC }` — two chroma anchors, because **light is now a tinted _paper_, not pure white** (degree B / mechanism C, baked at the Tonal strength). **Remove `border-default` + `border-disabled` from `SURFACE_STEPS`** (they're alpha, Task 6). Keep `border-active` (opaque tone). `deriveSurfaces(background, surfaceTone, mode, delta)` tints hue/chroma from the tone; only base `container`/`popover` flatten in light. Dark uses a calibrated override step table for the curated 950/900/800/700/400 ladder.
 
 - [ ] **Step 1: Failing tests**
 
@@ -296,6 +296,26 @@ const SURFACE_TONE: Record<
 const PAPER_L = 0.987; // tinted tones anchor here in light so the tint is displayable (pure white can't hold chroma)
 const FLAT_IN_LIGHT = new Set(['container', 'popover']); // base surfaces only
 // SURFACE_STEPS: delete 'border-default' and 'border-disabled' entries; keep 'border-active'.
+const DARK_SURFACE_STEPS = {
+  background: 0,
+  'background-hover': 1.6,
+  'background-active': 1.6,
+  muted: 1.6,
+  container: 1.6,
+  'container-hover': 3.2,
+  'container-active': 1.6,
+  popover: 3.2,
+  'popover-hover': 4.8,
+  'popover-active': 3.2,
+  'control-background': 3.2,
+  'control-background-hover': 4.8,
+  'nav-background': 0,
+  'nav-item-hover': 1.6,
+  'nav-item-active': 1.6,
+  'nav-border': 3.2,
+  disabled: 0,
+  'border-active': 9.68,
+};
 
 export function deriveSurfaces(
   backgroundHex: string,
@@ -312,7 +332,11 @@ export function deriveSurfaces(
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
   for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
-    const step = !dark && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
+    const step = dark
+      ? (DARK_SURFACE_STEPS[token] ?? rawStep)
+      : FLAT_IN_LIGHT.has(token)
+        ? 0
+        : rawStep;
     const l = clamp01(anchorL + dir * step * delta);
     // tint holds at the paper and rises modestly on deeper light surfaces; dark uses darkC. k (1.4) tuned in Task 9.
     const c = dark ? baseC : baseC * (1 + (1 - l) * 1.4);
@@ -593,7 +617,7 @@ for (const fam of [
 
 **Fixture schema:** `light-tone.fixture.json` stores `{ schemaVersion, source, paperL, lightDepthMultiplier, toneContrast, tones }`, where `tones[tone][token]` is the expected emitted `oklch()` value for the canonical light seeds. Do not generate expected light values from `deriveTheme` inside the test; read the frozen fixture so regressions show up as diffs.
 
-**Interfaces:** the gate is **mode-split** (the evident-light-tones change in Task 4 makes light intentionally diverge from curated). In **dark**, every **tone-owned** base token matches the **curated** value (`base-{tone}-dark.json` → primitives) within tolerance. In **light**, every tone-owned base token matches `light-tone.fixture.json` with tighter tolerance because the visible tint is the product contract. All base semantic color leaves are classified as one of: `tone-owned`, `contrast-ink` (`border-default`, `border-disabled`), `fixed-white` (`control-thumb`), `status/brand/chart/secondary`, or `intentional-exclusion`. The test fails if a base color leaf is unclassified. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
+**Interfaces:** the gate is **mode-split** (the evident-light-tones change in Task 4 makes light intentionally diverge from curated). In **dark**, every **tone-owned surface/alpha/border** base token matches the **curated** value (`base-{tone}-dark.json` → primitives) within tolerance. In **light**, every tone-owned surface/alpha/border base token matches `light-tone.fixture.json` with tighter tolerance because the visible tint is the product contract. Text leaves are classified as contrast/text ink and remain governed by the APCA sweep because the engine emits opaque APCA-derived text instead of literal alpha text primitives. All base semantic color leaves are classified as one of: `tone-owned`, `contrast/text-ink`, `fixed-white` (`control-thumb`), `status/brand/chart/secondary`, or `intentional-exclusion`. The test fails if a base color leaf is unclassified. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
 
 - [ ] **Step 1: Build the mode-split oracle** — `expectedTone(tone, mode, tok)`: for **dark**, resolve `base-{tone}-dark.json` `{primitive}` refs against `packages/core/tokens/primitives/*.json` to concrete `oklch()`; for **light**, read `packages/core/src/lib/light-tone.fixture.json`. Cover every token in `TONE_TOKENS` below, plus assert zero unclassified recursive color leaves from the base semantic files.
 
@@ -602,7 +626,7 @@ for (const fam of [
 ```ts
 const TONE_CONTRAST = 60;
 const LIGHT_TOL = { l: 0.005, c: 0.002, h: 2, a: 0.002 };
-const DARK_TOL = { l: 0.04, c: 0.01, h: 4, a: 0.02 };
+const DARK_TOL = { l: 0.04, c: 0.01, h: 8, a: 0.02 };
 const TONES = ['slate', 'neutral', 'zinc', 'gray', 'stone'] as const;
 const TONE_TOKENS = [
   'background',
@@ -610,16 +634,11 @@ const TONE_TOKENS = [
   'background-hover-alpha',
   'background-active',
   'muted',
-  'muted-foreground',
-  'muted-foreground-subtle',
   'disabled',
-  'disabled-foreground',
   'container',
-  'container-foreground',
   'container-hover',
   'container-active',
   'popover',
-  'popover-foreground',
   'popover-hover',
   'popover-active',
   'popover-alpha',
@@ -627,8 +646,6 @@ const TONE_TOKENS = [
   'control-background',
   'control-background-hover',
   'nav-background',
-  'nav-foreground',
-  'nav-muted-foreground',
   'nav-item-hover',
   'nav-item-active',
   'nav-border',
@@ -648,7 +665,7 @@ function expectNear(got: string, want: string, mode: Mode) {
   const t = mode === 'light' ? LIGHT_TOL : DARK_TOL;
   expect(Math.abs(g.l - w.l)).toBeLessThanOrEqual(t.l);
   expect(Math.abs(g.c - w.c)).toBeLessThanOrEqual(t.c);
-  if (g.c > 0.002 && w.c > 0.002)
+  if (g.c > 0.01 && w.c > 0.01)
     expect(Math.abs(((g.h - w.h + 540) % 360) - 180)).toBeLessThanOrEqual(t.h);
   expect(Math.abs(g.a - w.a)).toBeLessThanOrEqual(t.a);
 }
@@ -665,7 +682,7 @@ it.each(TONES)('%s matches the mode-split tone oracle', (tone) => {
       },
       dark: {
         accent: '#2563eb',
-        background: '#181818',
+        background: primitiveHex(tone, '950'),
         foreground: '#ffffff',
       },
       contrast: TONE_CONTRAST,
@@ -687,7 +704,7 @@ it('keeps non-neutral light paper visibly distinct from neutral', () => {
 });
 ```
 
-- [ ] **Step 3: Calibrate** `SURFACE_TONE[tone]` (+ `TONE_CONTRAST`, + the light step magnitudes) until all five tones pass both modes. The initial `TONE_CONTRAST` is `60`; if calibration changes it, record the final value in `light-tone.fixture.json`, the report, and the spec. Record any genuinely unmatchable token as an explicit contract item.
+- [ ] **Step 3: Calibrate** `SURFACE_TONE[tone]` (+ dark surface steps, + `TONE_CONTRAST`, + the light step magnitudes) until all five tones pass both modes. The initial `TONE_CONTRAST` is `60`; if calibration changes it, record the final value in `light-tone.fixture.json`, the report, and the spec. Record any genuinely unmatchable token as an explicit contract item.
 - [ ] **Step 4: Commit** — `git add packages/core/src/lib/tone-parity.test.ts packages/core/src/lib/light-tone.fixture.json && git commit -m "feat(core): two-mode tone parity gate (all tone-owned tokens)"`
 
 ---

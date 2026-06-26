@@ -253,17 +253,12 @@ describe('themeToCss', () => {
 });
 
 describe('deriveSecondary', () => {
-  const N = {
-    '50': 'oklch(0.985 0 0)',
-    '100': 'oklch(0.945 0 0)',
-    '200': 'oklch(0.87 0 0)',
-    '300': 'oklch(0.765 0 0)',
-    '600': 'oklch(0.46 0 0)',
-    '700': 'oklch(0.385 0 0)',
-    '800': 'oklch(0.297 0 0)',
-    '900': 'oklch(0.207 0 0)',
-    '950': 'oklch(0.118 0 0)',
-  };
+  const secondaryTokens = (map: Record<string, string>) =>
+    Object.fromEntries(
+      Object.entries(map).filter(([key]) =>
+        key.startsWith('--nx-color-secondary-')
+      )
+    );
 
   it('secondary exactly matches the curated neutral map (both modes)', () => {
     const { light, dark } = deriveTheme({
@@ -276,13 +271,31 @@ describe('deriveSecondary', () => {
       dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
       contrast: 60,
     });
-    expect(light['--nx-color-secondary-background']).toBe(N['100']);
-    expect(light['--nx-color-secondary-foreground']).toBe(N['900']);
-    expect(light['--nx-color-secondary-subtle-foreground']).toBe(N['600']);
-    expect(dark['--nx-color-secondary-background']).toBe(N['900']);
-    expect(dark['--nx-color-secondary-foreground']).toBe(N['100']);
-    expect(dark['--nx-color-secondary-subtle']).toBe(N['800']);
+
+    expect(secondaryTokens(light)).toEqual({
+      '--nx-color-secondary-background': 'oklch(0.945 0 0)',
+      '--nx-color-secondary-background-active': 'oklch(0.765 0 0)',
+      '--nx-color-secondary-background-hover': 'oklch(0.87 0 0)',
+      '--nx-color-secondary-disabled': 'oklch(0.985 0 0)',
+      '--nx-color-secondary-foreground': 'oklch(0.207 0 0)',
+      '--nx-color-secondary-subtle': 'oklch(0.945 0 0)',
+      '--nx-color-secondary-subtle-active': 'oklch(0.765 0 0)',
+      '--nx-color-secondary-subtle-foreground': 'oklch(0.46 0 0)',
+      '--nx-color-secondary-subtle-hover': 'oklch(0.87 0 0)',
+    });
+    expect(secondaryTokens(dark)).toEqual({
+      '--nx-color-secondary-background': 'oklch(0.207 0 0)',
+      '--nx-color-secondary-background-active': 'oklch(0.46 0 0)',
+      '--nx-color-secondary-background-hover': 'oklch(0.385 0 0)',
+      '--nx-color-secondary-disabled': 'oklch(0.118 0 0)',
+      '--nx-color-secondary-foreground': 'oklch(0.945 0 0)',
+      '--nx-color-secondary-subtle': 'oklch(0.297 0 0)',
+      '--nx-color-secondary-subtle-active': 'oklch(0.46 0 0)',
+      '--nx-color-secondary-subtle-foreground': 'oklch(0.87 0 0)',
+      '--nx-color-secondary-subtle-hover': 'oklch(0.385 0 0)',
+    });
     expect(light['--nx-color-border-secondary']).toBeUndefined();
+    expect(dark['--nx-color-border-secondary']).toBeUndefined();
   });
 });
 
