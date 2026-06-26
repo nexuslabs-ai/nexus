@@ -294,6 +294,43 @@ describe('surfaceTone surfaces', () => {
   });
 });
 
+describe('chart colors', () => {
+  const CHART_LIGHT = [
+    'oklch(0.62 0.1405 184.704)',
+    'oklch(0.61 0.1871 131.589)',
+    'oklch(0.62 0.2044 41.116)',
+    'oklch(0.58 0.2489 17.585)',
+    'oklch(0.49 0.2912 276.966)',
+  ];
+  const CHART_DARK = [
+    'oklch(0.9 0.1682 180.426)',
+    'oklch(0.93 0.2278 124.321)',
+    'oklch(0.91 0.0819 70.697)',
+    'oklch(0.885 0.0771 10.001)',
+    'oklch(0.865 0.069 274.039)',
+  ];
+
+  const chartTokens = (map: Record<string, string>) =>
+    Array.from(
+      { length: 5 },
+      (_, index) => map[`--nx-color-chart-categorical-${index + 1}`]
+    );
+
+  it('emits the fixed 5-color chart set, distinct per mode', () => {
+    const { light, dark } = deriveTheme({
+      appearance: 'light',
+      surfaceTone: 'neutral',
+      ...SURFACE_TONE_SEEDS,
+    });
+
+    expect(chartTokens(light)).toEqual(CHART_LIGHT);
+    expect(chartTokens(dark)).toEqual(CHART_DARK);
+    expect(light['--nx-color-chart-categorical-1']).not.toBe(
+      dark['--nx-color-chart-categorical-1']
+    );
+  });
+});
+
 // Deterministic spread of dark + light contracts (no RNG — reproducible).
 const SWEEP_SEEDS: ReadonlyArray<{
   accent: string;

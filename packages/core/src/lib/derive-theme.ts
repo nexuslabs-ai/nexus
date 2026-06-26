@@ -326,6 +326,32 @@ function deriveStatus(mode: Mode): TokenMap {
   );
 }
 
+const CHART_LIGHT = [
+  'oklch(0.62 0.1405 184.704)',
+  'oklch(0.61 0.1871 131.589)',
+  'oklch(0.62 0.2044 41.116)',
+  'oklch(0.58 0.2489 17.585)',
+  'oklch(0.49 0.2912 276.966)',
+] as const;
+
+const CHART_DARK = [
+  'oklch(0.9 0.1682 180.426)',
+  'oklch(0.93 0.2278 124.321)',
+  'oklch(0.91 0.0819 70.697)',
+  'oklch(0.885 0.0771 10.001)',
+  'oklch(0.865 0.069 274.039)',
+] as const;
+
+function deriveChart(mode: Mode): TokenMap {
+  const set = mode === 'dark' ? CHART_DARK : CHART_LIGHT;
+  return Object.fromEntries(
+    set.map((value, index) => [
+      `--nx-color-chart-categorical-${index + 1}`,
+      value,
+    ])
+  );
+}
+
 /** Tone-independent neutral surface family (9 tokens, no borders). */
 const NEUTRAL = {
   '50': 'oklch(0.985 0 0)',
@@ -367,13 +393,21 @@ function deriveMode(
   const primary = derivePrimary(seeds.accent, mode);
   const secondary = deriveSecondary(mode);
   const status = deriveStatus(mode);
-  return { ...surfaces, ...text, ...primary, ...secondary, ...status };
+  const chart = deriveChart(mode);
+  return {
+    ...surfaces,
+    ...text,
+    ...primary,
+    ...secondary,
+    ...status,
+    ...chart,
+  };
 }
 
 /**
  * Expand a contract into light + dark `--nx-color-*` maps. Only the tokens the
  * engine computes are emitted (surfaces, text, borders, primary, secondary,
- * status); chart and alpha/translucent tokens keep cascading from static CSS.
+ * status, chart); alpha/translucent tokens keep cascading from static CSS.
  */
 export function deriveTheme(contract: CodexThemeContract): DerivedTheme {
   const surfaceTone = contract.surfaceTone ?? 'neutral';
