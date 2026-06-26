@@ -243,6 +243,11 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
           '--nx-color-primary-background',
           'ui',
         ],
+        [
+          '--nx-color-primary-subtle-foreground',
+          '--nx-color-primary-subtle',
+          'ui',
+        ],
       ];
 
       for (const [fg, bg, tier] of checks) {
