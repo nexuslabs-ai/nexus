@@ -230,16 +230,24 @@ function legibleShade(
 export function deriveFamily(
   name: string,
   ramp: Record<Shade, string>,
-  mode: Mode
+  mode: Mode,
+  solid: {
+    background?: Shade;
+    hover?: Shade;
+    active?: Shade;
+  } = {}
 ): TokenMap {
   const dark = mode === 'dark';
   const p = `--nx-color-${name}`;
   const subtle = dark ? ramp['950'] : ramp['50'];
+  const background = solid.background ?? '600';
+  const hover = solid.hover ?? '700';
+  const active = solid.active ?? '800';
   return {
-    [`${p}-background`]: ramp['600'],
-    [`${p}-background-hover`]: ramp['700'],
-    [`${p}-background-active`]: ramp['800'],
-    [`${p}-foreground`]: readableOn(ramp['600']),
+    [`${p}-background`]: ramp[background],
+    [`${p}-background-hover`]: ramp[hover],
+    [`${p}-background-active`]: ramp[active],
+    [`${p}-foreground`]: readableOn(ramp[background]),
     [`${p}-disabled`]: dark ? ramp['950'] : ramp['300'],
     [`${p}-subtle`]: subtle,
     [`${p}-subtle-foreground`]: legibleShade(
@@ -321,15 +329,23 @@ const STATUS_RAMP = {
 function deriveStatus(mode: Mode): TokenMap {
   return Object.assign(
     {},
-    ...STATUS_FAMILIES.map((family) =>
-      deriveFamily(family, STATUS_RAMP[family], mode)
-    )
+    ...STATUS_FAMILIES.map((family) => {
+      const solid =
+        family === 'warning'
+          ? ({ background: '700', hover: '800', active: '900' } satisfies {
+              background: Shade;
+              hover: Shade;
+              active: Shade;
+            })
+          : {};
+      return deriveFamily(family, STATUS_RAMP[family], mode, solid);
+    })
   );
 }
 
 const CHART_LIGHT = [
   'oklch(0.62 0.1405 184.704)',
-  'oklch(0.61 0.1871 131.589)',
+  'oklch(0.73 0.2243 131.684)',
   'oklch(0.62 0.2044 41.116)',
   'oklch(0.58 0.2489 17.585)',
   'oklch(0.49 0.2912 276.966)',

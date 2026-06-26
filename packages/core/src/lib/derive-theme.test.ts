@@ -1,4 +1,11 @@
-import { oklch, parse } from 'culori';
+import { simulate } from '@bjornlu/colorblind';
+import {
+  clampChroma,
+  converter,
+  differenceEuclidean,
+  oklch,
+  parse,
+} from 'culori';
 import { describe, expect, it } from 'vitest';
 
 import { apcaLc } from './apca';
@@ -19,6 +26,69 @@ function lOf(oklchStr: string | undefined): number {
 
 function hOf(oklchStr: string | undefined): number {
   return oklch(parse(oklchStr!)!)!.h!;
+}
+
+const toRgb = converter('rgb');
+const oklabDelta = differenceEuclidean('oklab');
+const COLORBLIND_DELTA_E = 0.02;
+const VISION_TYPES = [
+  'normal',
+  'deuteranopia',
+  'protanopia',
+  'tritanopia',
+] as const;
+
+function toSrgbInts(input: string): [number, number, number] {
+  const parsed = parse(input);
+  if (!parsed) throw new Error(`cannot parse color '${input}'`);
+  const rgb = toRgb(clampChroma(oklch(parsed)!, 'oklch', 'rgb'));
+  const channel = (value: number) =>
+    Math.max(0, Math.min(255, Math.round(value * 255)));
+  return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
+}
+
+function simulatedRgb(
+  color: string,
+  visionType: (typeof VISION_TYPES)[number]
+): [number, number, number] {
+  const rgb = toSrgbInts(color);
+  if (visionType === 'normal') return rgb;
+  const sim = simulate({ r: rgb[0], g: rgb[1], b: rgb[2] }, visionType);
+  return [sim.r, sim.g, sim.b];
+}
+
+function rgbToCulori([r, g, b]: [number, number, number]) {
+  return { mode: 'rgb' as const, r: r / 255, g: g / 255, b: b / 255 };
+}
+
+function deltaE(
+  colorA: string,
+  colorB: string,
+  visionType: (typeof VISION_TYPES)[number]
+): number {
+  return oklabDelta(
+    rgbToCulori(simulatedRgb(colorA, visionType)),
+    rgbToCulori(simulatedRgb(colorB, visionType))
+  );
+}
+
+function expectPairwiseDistinguishable(
+  label: string,
+  colors: Record<string, string>
+): void {
+  const entries = Object.entries(colors);
+  for (const visionType of VISION_TYPES) {
+    for (let i = 0; i < entries.length - 1; i += 1) {
+      for (let j = i + 1; j < entries.length; j += 1) {
+        const [nameA, colorA] = entries[i]!;
+        const [nameB, colorB] = entries[j]!;
+        expect(
+          deltaE(colorA, colorB, visionType),
+          `${label} ${nameA} vs ${nameB} under ${visionType}`
+        ).toBeGreaterThanOrEqual(COLORBLIND_DELTA_E);
+      }
+    }
+  }
 }
 
 describe('deriveSurfaces', () => {
@@ -219,7 +289,7 @@ describe('deriveSecondary', () => {
 describe('status families', () => {
   const STATUS_HUES = {
     success: 140.055,
-    warning: 41.116,
+    warning: 38.402,
     error: 27.926,
     information: 255.276,
   };
@@ -296,7 +366,7 @@ describe('surfaceTone surfaces', () => {
 describe('chart colors', () => {
   const CHART_LIGHT = [
     'oklch(0.62 0.1405 184.704)',
-    'oklch(0.61 0.1871 131.589)',
+    'oklch(0.73 0.2243 131.684)',
     'oklch(0.62 0.2044 41.116)',
     'oklch(0.58 0.2489 17.585)',
     'oklch(0.49 0.2912 276.966)',
@@ -328,6 +398,35 @@ describe('chart colors', () => {
       dark['--nx-color-chart-categorical-1']
     );
   });
+});
+
+describe('derived colorblind distinguishability', () => {
+  it.each(['light', 'dark'] as const)(
+    'keeps emitted chart and status colors distinguishable in %s mode',
+    (mode) => {
+      const map = deriveTheme({
+        appearance: mode,
+        surfaceTone: 'slate',
+        ...SURFACE_TONE_SEEDS,
+      })[mode];
+
+      expectPairwiseDistinguishable(
+        `${mode} chart`,
+        Object.fromEntries(
+          Array.from({ length: 5 }, (_, index) => [
+            `chart-${index + 1}`,
+            map[`--nx-color-chart-categorical-${index + 1}`]!,
+          ])
+        )
+      );
+      expectPairwiseDistinguishable(`${mode} status`, {
+        success: map['--nx-color-success-background']!,
+        warning: map['--nx-color-warning-background']!,
+        error: map['--nx-color-error-background']!,
+        information: map['--nx-color-information-background']!,
+      });
+    }
+  );
 });
 
 describe('alpha and translucent colors', () => {

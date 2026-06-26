@@ -4,7 +4,7 @@
 
 **Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` **key set** equals the curated base+brand+chart set — every token key derived from the contract, none cascading from static CSS. Values are verified by family gates: dark tone-owned values match curated, light tone-owned values match the committed evident-tone fixture, and status/secondary/chart families keep their own exact gates.
 
-**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed colorblind set. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
+**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). Warning keeps the orange ramp but promotes its solid tier to `orange.700` (`orange.800`/`orange.900` hover/active) so emitted success/warning clear the derived colorblind gate. A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed colorblind set; light series 2 uses `lime.600` rather than `lime.700` so lime/orange clear deuteranopia. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
 
 **Tech Stack:** TypeScript, culori + apca-w3, vitest (`pnpm test:unit`). All work in `packages/core/src/lib/`; the parity oracle is `packages/core/tokens/semantic/*.json` (never `apps/console`).
 
@@ -14,7 +14,7 @@
 - **No `light-dark()`** in emitted CSS — `themeToCss` stays `:root` / `:root.dark`.
 - **`deriveTheme` returns DATA** (`TokenMap`); `themeToCss` is the only web applier.
 - **Contract may change in Phase A; Phase B freezes the public API.** It carries `surfaceTone: 'stone'|'neutral'|'zinc'|'slate'|'gray'` (optional, default `'neutral'`) — the neutral surface family. `background` remains the input seed; in light, non-neutral tones emit `--nx-color-background` as tinted paper (`PAPER_L`), while `neutral` stays true white. The **tone**, not the background seed, supplies surface/nav/border/alpha hue+chroma.
-- **Status hues are fixed and brand-independent** — emit the **curated** green/orange/red/blue ramps, don't regenerate them via `rampFromSeed` (it uses Nexus's perceptual grid, which need not match the curated primitive ramps).
+- **Status hues are fixed and brand-independent** — emit the **curated** green/orange/red/blue ramps, don't regenerate them via `rampFromSeed` (it uses Nexus's perceptual grid, which need not match the curated primitive ramps). Warning uses the orange ramp's `700` tier as the solid background to avoid success/warning colorblind collapse.
 - **`border-default` / `border-disabled` are ALPHA** (curated: `black-a200` light / `white-a300` dark) — contrast-ink, NOT opaque surface steps. `border-active` IS opaque (tone).
 - **Parity oracle = `@nexus/core`'s own token JSON** (`packages/core/tokens/semantic/base-*.json` + brand + chart), never `apps/console/public/themes/*.css`.
 - **Tests:** core unit tests live in `packages/core/src/lib/*.test.ts`, import `{ describe, expect, it } from 'vitest'`, run via `pnpm test:unit`. `git add` any NEW test/fixture file before committing (`-am` won't stage it).
@@ -170,10 +170,10 @@ export function deriveSecondary(mode: Mode): TokenMap {
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-**Interfaces:** `STATUS_RAMP: Record<'success'|'warning'|'error'|'information', Record<Shade,string>>` = the **curated** green/orange/red/blue ramps. Status = `deriveFamily(name, STATUS_RAMP[name], mode)` — so status hues are the curated ones, not Nexus-grid regenerations.
+**Interfaces:** `STATUS_RAMP: Record<'success'|'warning'|'error'|'information', Record<Shade,string>>` = the **curated** green/orange/red/blue ramps. Status = `deriveFamily(name, STATUS_RAMP[name], mode)` — so status hues are the curated ones, not Nexus-grid regenerations. Warning is a deliberate exception only in the solid tier selection: it keeps the orange ramp but uses `orange.700` for `warning-background`, `orange.800` for hover, and `orange.900` for active so emitted success/warning pass the derived colorblind gate.
 
 - [ ] **Step 1: Provenance** — inline the four ramps from the core JSON source (fixed, brand-independent). Do not grep for CSS variable names here; `color.json` is nested JSON. Resolve the primitive hex values to the same OKLCH formatting the generators emit:
-      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const shades = ["50","100","200","300","400","500","600","700","800","900","950"]; for (const p of ["green","orange","red","blue"]) console.log(p, Object.fromEntries(shades.map((s) => [s, formatTokenValue(color[p][s].$value, "color", [p, s])])));'`
+      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const shades = ["50","100","200","300","400","500","600","700","800","900","950"]; for (const p of ["green","orange","red","blue"]) console.log(p, Object.fromEntries(shades.map((s) => [s, formatTokenValue(color[p][s].$value, "color", [p, s])]))); console.log("warning solid retune", formatTokenValue(color.orange["700"].$value, "color", ["orange", "700"]));'`
       (use the `packages/core` primitive source as canonical).
 
 - [ ] **Step 2: Failing test** (curated hue + APCA on background AND subtle, both modes):
@@ -215,7 +215,7 @@ const STATUS_RAMP = {
     /* green-50..950 */
   },
   warning: {
-    /* orange-50..950 */
+    /* orange-50..950; solid emits 700/800/900 for bg/hover/active */
   },
   error: {
     /* red-50..950 */
@@ -224,7 +224,7 @@ const STATUS_RAMP = {
     /* blue-50..950 */
   },
 } satisfies Record<string, Record<Shade, string>>;
-// deriveMode: const status = Object.assign({}, ...Object.keys(STATUS_RAMP).map((n) => deriveFamily(n, STATUS_RAMP[n], mode)));
+// deriveMode: const status = Object.assign({}, ...Object.keys(STATUS_RAMP).map((n) => deriveFamily(n, STATUS_RAMP[n], mode, n === 'warning' ? { background: '700', hover: '800', active: '900' } : undefined)));
 ```
 
 (Fill each ramp from Step 1's grep. `error.600` is `oklch(0.577 0.2523 27.926)`, etc.)
@@ -339,8 +339,8 @@ export function deriveSurfaces(
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-- [ ] **Step 1: Provenance** — resolve the fixed chart primitives from core JSON into generator-formatted OKLCH, not by grepping CSS variable names:
-      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const sets = { light: [["teal","600"],["lime","700"],["orange","600"],["rose","600"],["indigo","600"]], dark: [["teal","200"],["lime","200"],["orange","200"],["rose","200"],["indigo","200"]] }; for (const [mode, entries] of Object.entries(sets)) console.log(mode, entries.map(([p, s]) => formatTokenValue(color[p][s].$value, "color", [p, s])));'`
+- [ ] **Step 1: Provenance** — resolve the fixed chart primitives from core JSON into generator-formatted OKLCH, not by grepping CSS variable names. Light series 2 intentionally uses `lime.600` (not `lime.700`) so lime/orange clear the derived colorblind gate:
+      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const sets = { light: [["teal","600"],["lime","600"],["orange","600"],["rose","600"],["indigo","600"]], dark: [["teal","200"],["lime","200"],["orange","200"],["rose","200"],["indigo","200"]] }; for (const [mode, entries] of Object.entries(sets)) console.log(mode, entries.map(([p, s]) => formatTokenValue(color[p][s].$value, "color", [p, s])));'`
 
 - [ ] **Step 2: Failing test**
 
@@ -367,7 +367,7 @@ it('emits the fixed 5-color chart set, distinct per mode', () => {
 ```ts
 const CHART_LIGHT = [
   'oklch(0.62 0.1405 184.704)',
-  'oklch(0.61 0.1871 131.589)',
+  'oklch(0.73 0.2243 131.684)',
   'oklch(0.62 0.2044 41.116)',
   'oklch(0.58 0.2489 17.585)',
   'oklch(0.49 0.2912 276.966)',
@@ -582,7 +582,7 @@ for (const fam of [
 }
 ```
 
-- [ ] **Step 2: Derived-value contrast + colorblind** — sweep all five `surfaceTone`s × both modes for base text, nav foreground/muted foreground, hover/active surfaces, focus-adjacent surfaces, and chart/status colors on `background`/`container`. Assert the **emitted** `chart-categorical-1..5` and status backgrounds are pairwise-distinguishable under the project's colorblind metric. Feed derived `{ success: green, warning: orange, error: red, information: blue }` and chart values into the helper; do not rely only on `audit-colorblind.js`'s static `STATUS_PALETTES`.
+- [ ] **Step 2: Derived-value contrast + colorblind** — sweep all five `surfaceTone`s × both modes for base text, nav foreground/muted foreground, hover/active surfaces, focus-adjacent surfaces, and chart/status colors on `background`/`container`. Assert the **emitted** `chart-categorical-1..5` and status backgrounds are pairwise-distinguishable under the project's colorblind metric. Feed derived `{ success: green, warning: orange700, error: red, information: blue }` and chart values (`lime600` in light) into the helper; do not rely only on `audit-colorblind.js`'s static `STATUS_PALETTES`.
 - [ ] **Step 3: Commit** — `git commit -am "test(core): APCA sweep (primary+secondary+status, bg+subtle) + derived colorblind"`
 
 ---
