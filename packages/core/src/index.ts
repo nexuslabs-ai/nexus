@@ -7,6 +7,7 @@ export { adjustContrast } from './lib/adjust-contrast';
 export type {
   CodexThemeContract,
   DerivedTheme,
+  SurfaceTone,
   ThemeSeeds,
   TokenMap,
 } from './lib/derive-theme';

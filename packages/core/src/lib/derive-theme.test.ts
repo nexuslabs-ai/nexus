@@ -8,6 +8,7 @@ import {
   deriveSurfaces,
   deriveText,
   deriveTheme,
+  type SurfaceTone,
   themeToCss,
 } from './derive-theme';
 import { TIER_THRESHOLDS } from './palette';
@@ -21,28 +22,30 @@ function hOf(oklchStr: string | undefined): number {
 }
 
 describe('deriveSurfaces', () => {
+  const surfaceTone: SurfaceTone = 'neutral';
+
   it('keeps background at the seed lightness', () => {
-    const s = deriveSurfaces('#181818', 'dark', 0.05);
+    const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
     expect(lOf(s['--nx-color-background'])).toBeCloseTo(lOf('#181818'), 1);
   });
 
   it('elevates container lighter than background in dark mode', () => {
-    const s = deriveSurfaces('#181818', 'dark', 0.05);
+    const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
     expect(lOf(s['--nx-color-container'])).toBeGreaterThan(
       lOf(s['--nx-color-background'])
     );
   });
 
   it('recedes hover darker than background in light mode', () => {
-    const s = deriveSurfaces('#ffffff', 'light', 0.05);
+    const s = deriveSurfaces('#ffffff', surfaceTone, 'light', 0.05);
     expect(lOf(s['--nx-color-background-hover'])).toBeLessThan(
       lOf(s['--nx-color-background'])
     );
   });
 
   it('widens the ladder as contrast (delta) grows', () => {
-    const lo = deriveSurfaces('#181818', 'dark', 0.02);
-    const hi = deriveSurfaces('#181818', 'dark', 0.08);
+    const lo = deriveSurfaces('#181818', surfaceTone, 'dark', 0.02);
+    const hi = deriveSurfaces('#181818', surfaceTone, 'dark', 0.08);
     const spread = (s: Record<string, string>) =>
       lOf(s['--nx-color-popover']) - lOf(s['--nx-color-background']);
     expect(spread(hi)).toBeGreaterThan(spread(lo));
@@ -50,7 +53,7 @@ describe('deriveSurfaces', () => {
 });
 
 describe('deriveText', () => {
-  const surfaces = deriveSurfaces('#181818', 'dark', 0.05);
+  const surfaces = deriveSurfaces('#181818', 'neutral', 'dark', 0.05);
 
   it('keeps a white foreground that already passes body', () => {
     const t = deriveText('#ffffff', surfaces);
@@ -78,7 +81,7 @@ describe('deriveText', () => {
   });
 
   it('does not throw on a pathological mid-grey pairing', () => {
-    const mid = deriveSurfaces('#7d7d7d', 'light', 0.05);
+    const mid = deriveSurfaces('#7d7d7d', 'neutral', 'light', 0.05);
     expect(() => deriveText('#808080', mid)).not.toThrow();
   });
 });
@@ -145,6 +148,12 @@ const CONTRACT: CodexThemeContract = {
   dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
   contrast: 60,
 };
+
+const SURFACE_TONE_SEEDS = {
+  light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
+  dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+  contrast: 60,
+} as const;
 
 describe('deriveTheme', () => {
   it('returns light and dark maps with the core tokens', () => {
@@ -255,6 +264,34 @@ describe('status families', () => {
       }
     }
   );
+});
+
+describe('surfaceTone surfaces', () => {
+  it('keeps light base flat while tone tints light paper and stepped surfaces', () => {
+    const slate = deriveTheme({
+      appearance: 'light',
+      surfaceTone: 'slate',
+      ...SURFACE_TONE_SEEDS,
+    }).light;
+    const neutral = deriveTheme({
+      appearance: 'light',
+      surfaceTone: 'neutral',
+      ...SURFACE_TONE_SEEDS,
+    }).light;
+
+    expect(slate['--nx-color-container']).toBe(slate['--nx-color-background']);
+    expect(slate['--nx-color-background']).not.toBe(
+      neutral['--nx-color-background']
+    );
+    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.987, 3);
+    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(1, 3);
+    expect(slate['--nx-color-muted']).not.toBe(slate['--nx-color-background']);
+    expect(slate['--nx-color-container-hover']).not.toBe(
+      slate['--nx-color-container']
+    );
+    expect(slate['--nx-color-muted']).not.toBe(neutral['--nx-color-muted']);
+    expect(slate['--nx-color-border-default']).toBeUndefined();
+  });
 });
 
 // Deterministic spread of dark + light contracts (no RNG — reproducible).

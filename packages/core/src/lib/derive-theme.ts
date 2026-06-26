@@ -8,14 +8,17 @@ import { rampFromSeed, seedOklch } from './perceptual-ramp';
 export interface ThemeSeeds {
   /** Drives the primary family ramp. */
   accent: string;
-  /** Drives the surface tiers. */
+  /** Drives surface lightness. Hue/chroma come from `surfaceTone`. */
   background: string;
   /** Drives the text tiers. */
   foreground: string;
 }
 
+export type SurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
+
 export interface CodexThemeContract {
   appearance: 'light' | 'dark' | 'system';
+  surfaceTone?: SurfaceTone;
   light: ThemeSeeds;
   dark: ThemeSeeds;
   /** 0–100. Separation between background↔surfaces and foreground↔text. */
@@ -33,7 +36,22 @@ export interface DerivedTheme {
 const DELTA_MIN = 0.02;
 const DELTA_MAX = 0.08;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const clamp01 = (l: number) => Math.max(0.03, Math.min(0.99, l));
+const clamp01 = (l: number) => Math.max(0.03, Math.min(1, l));
+
+const SURFACE_TONE: Record<
+  SurfaceTone,
+  { h: number; lightC: number; darkC: number }
+> = {
+  slate: { h: 264.7, lightC: 0.011, darkC: 0.04 },
+  gray: { h: 261.7, lightC: 0.008, darkC: 0.027 },
+  zinc: { h: 262.8, lightC: 0.005, darkC: 0.005 },
+  neutral: { h: 0, lightC: 0, darkC: 0 },
+  stone: { h: 70, lightC: 0.008, darkC: 0.006 },
+};
+
+const PAPER_L = 0.987;
+const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
+const FLAT_IN_LIGHT = new Set(['container', 'popover']);
 
 /** Δ (per-step lightness offset) for a 0–100 contrast value. */
 export function contrastDelta(contrast: number): number {
@@ -59,38 +77,38 @@ const SURFACE_STEPS: Record<string, number> = {
   'nav-item-hover': 1.6,
   'nav-item-active': 1.6,
   disabled: 0.8,
-  'border-default': 2.4,
   'border-active': 3.2,
-  'border-disabled': 0.8,
 };
 
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
 export function deriveSurfaces(
   backgroundHex: string,
+  surfaceTone: SurfaceTone,
   mode: Mode,
   delta: number
 ): TokenMap {
   const bg = seedOklch(backgroundHex);
-  const dir = mode === 'dark' ? 1 : -1;
-  const c = bg.c ?? 0;
-  const h = bg.h ?? 0;
+  const tone = SURFACE_TONE[surfaceTone];
+  const dark = mode === 'dark';
+  const dir = dark ? 1 : -1;
+  const anchorL = dark ? (bg.l ?? 0) : tone.lightC > 0 ? PAPER_L : (bg.l ?? 1);
+  const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
-  for (const [token, step] of Object.entries(SURFACE_STEPS)) {
+  for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
+    const step = !dark && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
+    const l = clamp01(anchorL + dir * step * delta);
+    const c = dark
+      ? baseC
+      : baseC * (1 + (1 - l) * LIGHT_CHROMA_DEPTH_MULTIPLIER);
     const color: Oklch = {
       mode: 'oklch',
-      l: clamp01((bg.l ?? 0) + dir * step * delta),
+      l,
       c,
-      h,
+      h: tone.h,
     };
     out[`--nx-color-${token}`] = formatOklch(color);
   }
-  // control-thumb is always a near-white knob (matches base presets in both themes).
-  out['--nx-color-control-thumb'] = formatOklch({
-    mode: 'oklch',
-    l: mode === 'dark' ? 0.97 : 0.99,
-    c: c * 0.3,
-    h,
-  });
+  out['--nx-color-control-thumb'] = 'oklch(1 0 0)';
   return out;
 }
 
@@ -337,9 +355,14 @@ export function deriveSecondary(mode: Mode): TokenMap {
   };
 }
 
-function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
+function deriveMode(
+  seeds: ThemeSeeds,
+  surfaceTone: SurfaceTone,
+  mode: Mode,
+  contrast: number
+): TokenMap {
   const delta = contrastDelta(contrast);
-  const surfaces = deriveSurfaces(seeds.background, mode, delta);
+  const surfaces = deriveSurfaces(seeds.background, surfaceTone, mode, delta);
   const text = deriveText(seeds.foreground, surfaces);
   const primary = derivePrimary(seeds.accent, mode);
   const secondary = deriveSecondary(mode);
@@ -353,9 +376,10 @@ function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
  * status); chart and alpha/translucent tokens keep cascading from static CSS.
  */
 export function deriveTheme(contract: CodexThemeContract): DerivedTheme {
+  const surfaceTone = contract.surfaceTone ?? 'neutral';
   return {
-    light: deriveMode(contract.light, 'light', contract.contrast),
-    dark: deriveMode(contract.dark, 'dark', contract.contrast),
+    light: deriveMode(contract.light, surfaceTone, 'light', contract.contrast),
+    dark: deriveMode(contract.dark, surfaceTone, 'dark', contract.contrast),
   };
 }
 
