@@ -40,8 +40,8 @@ describe('sanitizeContract', () => {
   });
 
   it('drops a prototype-chain key as the surface tone', () => {
-    // `'toString' in BASE_TONE_SEEDS` is true (inherited); `Object.hasOwn` rejects
-    // it, so a crafted value can't slip through and crash the engine downstream.
+    // `'toString' in BASE_TONE_SEEDS` is true (inherited); the own-property check
+    // rejects it, so a crafted value can't slip through and crash the engine.
     const result = sanitizeContract({ ...VALID, surfaceTone: 'toString' });
     expect(result.surfaceTone).toBe(DEFAULT_CODEX_CONTRACT.surfaceTone);
   });
