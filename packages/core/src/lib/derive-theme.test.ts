@@ -290,7 +290,6 @@ describe('surfaceTone surfaces', () => {
       slate['--nx-color-container']
     );
     expect(slate['--nx-color-muted']).not.toBe(neutral['--nx-color-muted']);
-    expect(slate['--nx-color-border-default']).toBeUndefined();
   });
 });
 
@@ -328,6 +327,53 @@ describe('chart colors', () => {
     expect(light['--nx-color-chart-categorical-1']).not.toBe(
       dark['--nx-color-chart-categorical-1']
     );
+  });
+});
+
+describe('alpha and translucent colors', () => {
+  it('emits tone-ink + contrast-ink alpha tokens with correct L C H alpha in both modes', () => {
+    const { light, dark } = deriveTheme({
+      appearance: 'light',
+      surfaceTone: 'slate',
+      ...SURFACE_TONE_SEEDS,
+    });
+
+    expect(light['--nx-color-overlay']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.7529)'
+    );
+    expect(dark['--nx-color-overlay']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.8471)'
+    );
+    expect(light['--nx-color-popover-backdrop']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.9098)'
+    );
+    expect(dark['--nx-color-popover-backdrop']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.9098)'
+    );
+    expect(light['--nx-color-border-default-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0941)'
+    );
+    expect(dark['--nx-color-border-default-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.1882)'
+    );
+    expect(light['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
+    );
+    expect(dark['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
+    );
+    expect(light['--nx-color-popover-alpha']).toBe('oklch(1 0 0 / 0.9098)');
+    expect(dark['--nx-color-popover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.8471)'
+    );
+    expect(light['--nx-color-border-default']).toBe(
+      'oklch(0.1448 0 0 / 0.0941)'
+    );
+    expect(dark['--nx-color-border-default']).toBe('oklch(1 0 0 / 0.1882)');
+    expect(light['--nx-color-border-disabled']).toBe(
+      'oklch(0.1448 0 0 / 0.0941)'
+    );
+    expect(dark['--nx-color-border-disabled']).toBe('oklch(1 0 0 / 0.1882)');
   });
 });
 

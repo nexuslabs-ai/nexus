@@ -352,6 +352,27 @@ function deriveChart(mode: Mode): TokenMap {
   );
 }
 
+function deriveAlpha(surfaceTone: SurfaceTone, mode: Mode): TokenMap {
+  const tone = SURFACE_TONE[surfaceTone];
+  const dark = mode === 'dark';
+  const toneInk = (alpha: number) =>
+    `oklch(0.13 ${tone.darkC.toFixed(4)} ${tone.h.toFixed(1)} / ${alpha})`;
+  const contrastInk = (alpha: number) =>
+    dark ? `oklch(1 0 0 / ${alpha})` : `oklch(0.1448 0 0 / ${alpha})`;
+
+  return {
+    '--nx-color-overlay': toneInk(dark ? 0.8471 : 0.7529),
+    '--nx-color-popover-backdrop': toneInk(0.9098),
+    '--nx-color-border-default-alpha': toneInk(dark ? 0.1882 : 0.0941),
+    '--nx-color-background-hover-alpha': toneInk(0.0627),
+    '--nx-color-popover-alpha': dark
+      ? toneInk(0.8471)
+      : 'oklch(1 0 0 / 0.9098)',
+    '--nx-color-border-default': contrastInk(dark ? 0.1882 : 0.0941),
+    '--nx-color-border-disabled': contrastInk(dark ? 0.1882 : 0.0941),
+  };
+}
+
 /** Tone-independent neutral surface family (9 tokens, no borders). */
 const NEUTRAL = {
   '50': 'oklch(0.985 0 0)',
@@ -394,6 +415,7 @@ function deriveMode(
   const secondary = deriveSecondary(mode);
   const status = deriveStatus(mode);
   const chart = deriveChart(mode);
+  const alpha = deriveAlpha(surfaceTone, mode);
   return {
     ...surfaces,
     ...text,
@@ -401,13 +423,14 @@ function deriveMode(
     ...secondary,
     ...status,
     ...chart,
+    ...alpha,
   };
 }
 
 /**
  * Expand a contract into light + dark `--nx-color-*` maps. Only the tokens the
  * engine computes are emitted (surfaces, text, borders, primary, secondary,
- * status, chart); alpha/translucent tokens keep cascading from static CSS.
+ * status, chart, alpha/translucent).
  */
 export function deriveTheme(contract: CodexThemeContract): DerivedTheme {
   const surfaceTone = contract.surfaceTone ?? 'neutral';
