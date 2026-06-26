@@ -76,6 +76,7 @@ const SURFACE_STEPS: Record<string, number> = {
   'nav-background': 0.6,
   'nav-item-hover': 1.6,
   'nav-item-active': 1.6,
+  'nav-border': 2.4,
   disabled: 0.8,
   'border-active': 3.2,
 };
