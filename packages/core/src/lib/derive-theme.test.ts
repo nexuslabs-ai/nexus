@@ -169,6 +169,40 @@ describe('themeToCss', () => {
   });
 });
 
+describe('deriveSecondary', () => {
+  const N = {
+    '50': 'oklch(0.985 0 0)',
+    '100': 'oklch(0.945 0 0)',
+    '200': 'oklch(0.87 0 0)',
+    '300': 'oklch(0.765 0 0)',
+    '600': 'oklch(0.46 0 0)',
+    '700': 'oklch(0.385 0 0)',
+    '800': 'oklch(0.297 0 0)',
+    '900': 'oklch(0.207 0 0)',
+    '950': 'oklch(0.118 0 0)',
+  };
+
+  it('secondary exactly matches the curated neutral map (both modes)', () => {
+    const { light, dark } = deriveTheme({
+      appearance: 'light',
+      light: {
+        accent: '#2563eb',
+        background: '#ffffff',
+        foreground: '#181818',
+      },
+      dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+      contrast: 60,
+    });
+    expect(light['--nx-color-secondary-background']).toBe(N['100']);
+    expect(light['--nx-color-secondary-foreground']).toBe(N['900']);
+    expect(light['--nx-color-secondary-subtle-foreground']).toBe(N['600']);
+    expect(dark['--nx-color-secondary-background']).toBe(N['900']);
+    expect(dark['--nx-color-secondary-foreground']).toBe(N['100']);
+    expect(dark['--nx-color-secondary-subtle']).toBe(N['800']);
+    expect(light['--nx-color-border-secondary']).toBeUndefined();
+  });
+});
+
 // Deterministic spread of dark + light contracts (no RNG — reproducible).
 const SWEEP_SEEDS: ReadonlyArray<{
   accent: string;

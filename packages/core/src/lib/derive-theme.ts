@@ -240,12 +240,42 @@ export function deriveFamily(
 export const derivePrimary = (accentHex: string, mode: Mode): TokenMap =>
   deriveFamily('primary', rampFromSeed(accentHex), mode);
 
+/** Tone-independent neutral surface family (9 tokens, no borders). */
+const NEUTRAL: Record<string, string> = {
+  '50': 'oklch(0.985 0 0)',
+  '100': 'oklch(0.945 0 0)',
+  '200': 'oklch(0.87 0 0)',
+  '300': 'oklch(0.765 0 0)',
+  '600': 'oklch(0.46 0 0)',
+  '700': 'oklch(0.385 0 0)',
+  '800': 'oklch(0.297 0 0)',
+  '900': 'oklch(0.207 0 0)',
+  '950': 'oklch(0.118 0 0)',
+};
+
+export function deriveSecondary(mode: Mode): TokenMap {
+  const d = mode === 'dark';
+  const n = NEUTRAL;
+  return {
+    '--nx-color-secondary-background': d ? n['900'] : n['100'],
+    '--nx-color-secondary-background-hover': d ? n['700'] : n['200'],
+    '--nx-color-secondary-background-active': d ? n['600'] : n['300'],
+    '--nx-color-secondary-foreground': d ? n['100'] : n['900'],
+    '--nx-color-secondary-disabled': d ? n['950'] : n['50'],
+    '--nx-color-secondary-subtle': d ? n['800'] : n['100'],
+    '--nx-color-secondary-subtle-foreground': d ? n['200'] : n['600'],
+    '--nx-color-secondary-subtle-hover': d ? n['700'] : n['200'],
+    '--nx-color-secondary-subtle-active': d ? n['600'] : n['300'],
+  };
+}
+
 function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
   const delta = contrastDelta(contrast);
   const surfaces = deriveSurfaces(seeds.background, mode, delta);
   const text = deriveText(seeds.foreground, surfaces);
   const primary = derivePrimary(seeds.accent, mode);
-  return { ...surfaces, ...text, ...primary };
+  const secondary = deriveSecondary(mode);
+  return { ...surfaces, ...text, ...primary, ...secondary };
 }
 
 /**
