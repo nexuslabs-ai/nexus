@@ -89,6 +89,7 @@ export function applyBaseTone(
   const tone = BASE_TONE_SEEDS[base];
   return {
     ...contract,
+    surfaceTone: base,
     light: { ...contract.light, ...tone.light },
     dark: { ...contract.dark, ...tone.dark },
   };

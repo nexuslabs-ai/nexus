@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { BASE_TONE_SEEDS } from './appearance-theme';
 import { DEFAULT_CODEX_CONTRACT, sanitizeContract } from './codex-contract';
 
 const VALID = {
   appearance: 'light' as const,
+  surfaceTone: 'neutral' as const,
   light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
   dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
   contrast: 55,
@@ -28,6 +30,24 @@ describe('sanitizeContract', () => {
     const result = sanitizeContract({ ...VALID, contrast: 999 });
     expect(result.contrast).toBe(DEFAULT_CODEX_CONTRACT.contrast);
     expect(result.light).toEqual(VALID.light);
+  });
+
+  it('drops an invalid surface tone to the default, keeping valid seeds', () => {
+    const result = sanitizeContract({ ...VALID, surfaceTone: 'purple' });
+    expect(result.surfaceTone).toBe(DEFAULT_CODEX_CONTRACT.surfaceTone);
+    expect(result.light).toEqual(VALID.light);
+    expect(result.dark).toEqual(VALID.dark);
+  });
+
+  it('infers surface tone from legacy saved seed blocks', () => {
+    const legacy = {
+      appearance: 'dark' as const,
+      light: { accent: '#339cff', ...BASE_TONE_SEEDS.slate.light },
+      dark: { accent: '#339cff', ...BASE_TONE_SEEDS.slate.dark },
+      contrast: 60,
+    };
+
+    expect(sanitizeContract(legacy).surfaceTone).toBe('slate');
   });
 
   it('falls back on a non-object payload', () => {

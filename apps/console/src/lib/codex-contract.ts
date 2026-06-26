@@ -1,12 +1,19 @@
-import { type CodexThemeContract, isColor, type ThemeSeeds } from '@nexus/core';
+import {
+  type CodexThemeContract,
+  isColor,
+  type SurfaceTone,
+  type ThemeSeeds,
+} from '@nexus/core';
 
 import { BASE_TONE_SEEDS, DEFAULT_BRAND_COLOR } from './appearance-theme';
 
 const DEFAULT_BASE_TONE = BASE_TONE_SEEDS.stone;
+const DEFAULT_SURFACE_TONE: SurfaceTone = 'stone';
 
 /** Codex's own Appearance values — the default derived theme (dogfood). */
 export const DEFAULT_CODEX_CONTRACT: CodexThemeContract = {
   appearance: 'dark',
+  surfaceTone: DEFAULT_SURFACE_TONE,
   light: { accent: DEFAULT_BRAND_COLOR, ...DEFAULT_BASE_TONE.light },
   dark: { accent: DEFAULT_BRAND_COLOR, ...DEFAULT_BASE_TONE.dark },
   contrast: 60,
@@ -27,6 +34,26 @@ function isSeeds(value: unknown): value is ThemeSeeds {
   );
 }
 
+function isSurfaceTone(value: unknown): value is SurfaceTone {
+  return typeof value === 'string' && value in BASE_TONE_SEEDS;
+}
+
+function sameSeeds(a: ThemeSeeds, b: Omit<ThemeSeeds, 'accent'>): boolean {
+  return a.background === b.background && a.foreground === b.foreground;
+}
+
+function surfaceToneFromSeeds(
+  light: ThemeSeeds,
+  dark: ThemeSeeds
+): SurfaceTone {
+  for (const [tone, seeds] of Object.entries(BASE_TONE_SEEDS)) {
+    if (sameSeeds(light, seeds.light) && sameSeeds(dark, seeds.dark)) {
+      return tone as SurfaceTone;
+    }
+  }
+  return DEFAULT_SURFACE_TONE;
+}
+
 /** Coerce an unknown payload into a valid contract, falling back to the default. */
 export function sanitizeContract(raw: unknown): CodexThemeContract {
   if (typeof raw !== 'object' || raw === null) return DEFAULT_CODEX_CONTRACT;
@@ -42,7 +69,10 @@ export function sanitizeContract(raw: unknown): CodexThemeContract {
     typeof o.contrast === 'number' && o.contrast >= 0 && o.contrast <= 100
       ? o.contrast
       : DEFAULT_CODEX_CONTRACT.contrast;
-  return { appearance, light: o.light, dark: o.dark, contrast };
+  const surfaceTone = isSurfaceTone(o.surfaceTone)
+    ? o.surfaceTone
+    : surfaceToneFromSeeds(o.light, o.dark);
+  return { appearance, surfaceTone, light: o.light, dark: o.dark, contrast };
 }
 
 /** Read the persisted contract. Never throws. */

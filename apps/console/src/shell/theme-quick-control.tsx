@@ -76,6 +76,7 @@ export function ThemeQuickControl() {
     codexContract.appearance === 'light'
       ? codexContract.light.accent
       : codexContract.dark.accent;
+  const selectedBase = codexContract.surfaceTone ?? theme.base;
 
   // Close the popover before navigating so it doesn't linger over Appearance.
   const openAppearance = () => {
@@ -102,7 +103,7 @@ export function ThemeQuickControl() {
       <PopoverContent align="end" className="nx:w-72 nx:space-y-3">
         <SwatchRow
           label="Base tone"
-          value={theme.base}
+          value={selectedBase}
           options={BASE_TONE_OPTIONS}
           onSelect={setBaseTone}
         />
