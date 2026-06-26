@@ -35,7 +35,10 @@ function isSeeds(value: unknown): value is ThemeSeeds {
 }
 
 function isSurfaceTone(value: unknown): value is SurfaceTone {
-  return typeof value === 'string' && value in BASE_TONE_SEEDS;
+  return (
+    typeof value === 'string' &&
+    Object.prototype.hasOwnProperty.call(BASE_TONE_SEEDS, value)
+  );
 }
 
 function sameSeeds(a: ThemeSeeds, b: Omit<ThemeSeeds, 'accent'>): boolean {

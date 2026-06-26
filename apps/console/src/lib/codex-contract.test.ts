@@ -39,6 +39,13 @@ describe('sanitizeContract', () => {
     expect(result.dark).toEqual(VALID.dark);
   });
 
+  it('drops a prototype-chain key as the surface tone', () => {
+    // `'toString' in BASE_TONE_SEEDS` is true (inherited); `Object.hasOwn` rejects
+    // it, so a crafted value can't slip through and crash the engine downstream.
+    const result = sanitizeContract({ ...VALID, surfaceTone: 'toString' });
+    expect(result.surfaceTone).toBe(DEFAULT_CODEX_CONTRACT.surfaceTone);
+  });
+
   it('infers surface tone from legacy saved seed blocks', () => {
     const legacy = {
       appearance: 'dark' as const,
