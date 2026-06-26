@@ -16,6 +16,10 @@ function lOf(oklchStr: string | undefined): number {
   return oklch(parse(oklchStr!)!)!.l!;
 }
 
+function hOf(oklchStr: string | undefined): number {
+  return oklch(parse(oklchStr!)!)!.h!;
+}
+
 describe('deriveSurfaces', () => {
   it('keeps background at the seed lightness', () => {
     const s = deriveSurfaces('#181818', 'dark', 0.05);
@@ -201,6 +205,56 @@ describe('deriveSecondary', () => {
     expect(dark['--nx-color-secondary-subtle']).toBe(N['800']);
     expect(light['--nx-color-border-secondary']).toBeUndefined();
   });
+});
+
+describe('status families', () => {
+  const STATUS_HUES = {
+    success: 140.055,
+    warning: 41.116,
+    error: 27.926,
+    information: 255.276,
+  };
+
+  it.each(['light', 'dark'] as const)(
+    'uses curated hues + is APCA-legible on background and subtle in %s mode',
+    (mode) => {
+      const theme = deriveTheme({
+        appearance: mode,
+        light: {
+          accent: '#2563eb',
+          background: '#ffffff',
+          foreground: '#181818',
+        },
+        dark: {
+          accent: '#2563eb',
+          background: '#181818',
+          foreground: '#ffffff',
+        },
+        contrast: 60,
+      })[mode];
+
+      for (const [status, hue] of Object.entries(STATUS_HUES)) {
+        expect(
+          hOf(theme[`--nx-color-${status}-background`]),
+          `${status} background hue`
+        ).toBeCloseTo(hue, 0);
+        expect(
+          apcaLc(
+            theme[`--nx-color-${status}-foreground`]!,
+            theme[`--nx-color-${status}-background`]!
+          ),
+          `${status} foreground on background`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+        expect(
+          apcaLc(
+            theme[`--nx-color-${status}-subtle-foreground`]!,
+            theme[`--nx-color-${status}-subtle`]!
+          ),
+          `${status} subtle foreground on subtle`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+      }
+    }
+  );
 });
 
 // Deterministic spread of dark + light contracts (no RNG — reproducible).

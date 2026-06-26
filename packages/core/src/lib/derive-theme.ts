@@ -240,8 +240,76 @@ export function deriveFamily(
 export const derivePrimary = (accentHex: string, mode: Mode): TokenMap =>
   deriveFamily('primary', rampFromSeed(accentHex), mode);
 
+const STATUS_FAMILIES = ['success', 'warning', 'error', 'information'] as const;
+
+type StatusFamily = (typeof STATUS_FAMILIES)[number];
+
+const STATUS_RAMP = {
+  success: {
+    '50': 'oklch(0.982 0.035 137.785)',
+    '100': 'oklch(0.96 0.0789 139.835)',
+    '200': 'oklch(0.925 0.1596 139.892)',
+    '300': 'oklch(0.87 0.3119 139.843)',
+    '400': 'oklch(0.79 0.2864 140.349)',
+    '500': 'oklch(0.72 0.2591 140.014)',
+    '600': 'oklch(0.62 0.2233 140.055)',
+    '700': 'oklch(0.52 0.1871 140.022)',
+    '800': 'oklch(0.43 0.1534 139.623)',
+    '900': 'oklch(0.34 0.1216 139.757)',
+    '950': 'oklch(0.25 0.0887 139.4)',
+  },
+  warning: {
+    '50': 'oklch(0.98 0.0185 73.684)',
+    '100': 'oklch(0.955 0.0435 75.164)',
+    '200': 'oklch(0.91 0.0819 70.697)',
+    '300': 'oklch(0.84 0.142 66.29)',
+    '400': 'oklch(0.78 0.1803 55.934)',
+    '500': 'oklch(0.71 0.2099 47.604)',
+    '600': 'oklch(0.62 0.2044 41.116)',
+    '700': 'oklch(0.52 0.1809 38.402)',
+    '800': 'oklch(0.43 0.153 37.304)',
+    '900': 'oklch(0.34 0.1188 38.172)',
+    '950': 'oklch(0.25 0.091 36.259)',
+  },
+  error: {
+    '50': 'oklch(0.971 0.0176 28.865)',
+    '100': 'oklch(0.936 0.0399 27.342)',
+    '200': 'oklch(0.885 0.0747 27.394)',
+    '300': 'oklch(0.808 0.1333 28.058)',
+    '400': 'oklch(0.704 0.2267 27.842)',
+    '500': 'oklch(0.637 0.2786 27.978)',
+    '600': 'oklch(0.577 0.2523 27.926)',
+    '700': 'oklch(0.505 0.2209 27.946)',
+    '800': 'oklch(0.42 0.1838 28.144)',
+    '900': 'oklch(0.34 0.1487 28.057)',
+    '950': 'oklch(0.25 0.1094 28.309)',
+  },
+  information: {
+    '50': 'oklch(0.97 0.0152 252.81)',
+    '100': 'oklch(0.932 0.0342 257.472)',
+    '200': 'oklch(0.882 0.0612 253.613)',
+    '300': 'oklch(0.809 0.1012 254.248)',
+    '400': 'oklch(0.707 0.1599 255.225)',
+    '500': 'oklch(0.623 0.2112 255.145)',
+    '600': 'oklch(0.546 0.2205 255.276)',
+    '700': 'oklch(0.488 0.197 255.267)',
+    '800': 'oklch(0.41 0.1633 254.871)',
+    '900': 'oklch(0.33 0.1316 254.902)',
+    '950': 'oklch(0.25 0.1042 256.214)',
+  },
+} satisfies Record<StatusFamily, Record<Shade, string>>;
+
+function deriveStatus(mode: Mode): TokenMap {
+  return Object.assign(
+    {},
+    ...STATUS_FAMILIES.map((family) =>
+      deriveFamily(family, STATUS_RAMP[family], mode)
+    )
+  );
+}
+
 /** Tone-independent neutral surface family (9 tokens, no borders). */
-const NEUTRAL: Record<string, string> = {
+const NEUTRAL = {
   '50': 'oklch(0.985 0 0)',
   '100': 'oklch(0.945 0 0)',
   '200': 'oklch(0.87 0 0)',
@@ -251,7 +319,7 @@ const NEUTRAL: Record<string, string> = {
   '800': 'oklch(0.297 0 0)',
   '900': 'oklch(0.207 0 0)',
   '950': 'oklch(0.118 0 0)',
-};
+} satisfies Record<Exclude<Shade, '400' | '500'>, string>;
 
 export function deriveSecondary(mode: Mode): TokenMap {
   const d = mode === 'dark';
@@ -275,13 +343,14 @@ function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
   const text = deriveText(seeds.foreground, surfaces);
   const primary = derivePrimary(seeds.accent, mode);
   const secondary = deriveSecondary(mode);
-  return { ...surfaces, ...text, ...primary, ...secondary };
+  const status = deriveStatus(mode);
+  return { ...surfaces, ...text, ...primary, ...secondary, ...status };
 }
 
 /**
  * Expand a contract into light + dark `--nx-color-*` maps. Only the tokens the
- * engine computes are emitted (surfaces, text, borders, primary, secondary); status
- * families keep cascading from the loaded base/brand preset.
+ * engine computes are emitted (surfaces, text, borders, primary, secondary,
+ * status); chart and alpha/translucent tokens keep cascading from static CSS.
  */
 export function deriveTheme(contract: CodexThemeContract): DerivedTheme {
   return {
