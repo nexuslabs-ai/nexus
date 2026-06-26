@@ -38,17 +38,17 @@ Extend the engine so its output token set **equals** the curated set — every `
 
 ## Core abstraction — one family deriver
 
-Generalize `derivePrimary` into `deriveFamily(name, seedHex, mode, { borders? })` (ramp + APCA on-color), applied to:
+Generalize `derivePrimary` into `deriveFamily(name, ramp, mode)` — it takes a **ramp object** + APCA-derived on-colors (including an APCA-checked `-subtle-foreground`, not a hoped-to-pass fixed shade), applied to:
 
-- **primary** — `deriveFamily('primary', accent, mode)`
-- **success / warning / error / information** — `deriveFamily(name, CANON_HUE[name], mode)`, hues calibrated to the existing `green/orange/red/blue` ramps
+- **primary** — `deriveFamily('primary', rampFromSeed(accent), mode)` (brand-derived)
+- **success / warning / error / information** — `deriveFamily(name, STATUS_RAMP[name], mode)`, where `STATUS_RAMP` is the **fixed curated** green/orange/red/blue ramps. Status is emitted from the curated ramps, **not** regenerated via `rampFromSeed` (Nexus's perceptual grid need not reproduce the curated primitive ramps — so regrinding would shift the status hues).
 
 **Secondary is NOT this shape.** A dedicated `deriveSecondary(mode)` emits a **subtle tone-independent neutral** surface family (curated maps it to `neutral-*` in every brand: light `bg=100/fg=900`, dark `bg=900/fg=100`) — not a solid ramp-600.
 
 ## Surfaces, nav, borders, alpha — tinted by `surfaceTone`
 
 - **`deriveSurfaces(background, surfaceTone, mode, delta)`** — lightness from the step model + the `background` seed; **hue/chroma from `surfaceTone`** (the white light-background can't carry it). Chroma fades toward white (`tone.c * (1 - L)`): slate-50 ≈ C 0.003 … slate-950 ≈ C 0.04. Only base `container`/`popover` flatten in light (Q4); `muted` + states keep stepped, tone-tinted.
-- **nav + borders** flow through the same surface machinery (add `nav-border` to the step set).
+- **nav + `border-active`** flow through the surface machinery (opaque, tone-tinted; add `nav-border` to the step set). **`border-default` / `border-disabled` are ALPHA** (contrast-ink: black light / white dark) — emitted by `deriveAlpha`, **not** opaque surface steps.
 - **`deriveAlpha(surfaceTone, mode)`** — the translucent "ink" carries the **tone** tint (slate overlay ≠ neutral overlay), at mode-specific α (overlay 0.7529/0.8471, border-default-alpha 0.0941/0.1882, popover-backdrop 0.9098; `popover-alpha` is white in light, tone-ink in dark).
 - **text** — keep `deriveText` (APCA `quietText`). **chart** — fixed colorblind set, re-toned per mode.
 
@@ -59,7 +59,7 @@ Generalize `derivePrimary` into `deriveFamily(name, seedHex, mode, { borders? })
 
 ## Invariants & tests
 
-- **Key-parity test:** derived `--nx-color-*` keys **equal** the curated base+brand+**chart** key set — fails on any omission.
+- **Exact key-parity test:** derived `--nx-color-*` keys **exactly equal** (no missing, **no extras**) the curated set in **both** modes — sourced from `@nexus/core`'s own `tokens/semantic/*.json` (base + brand + chart), never `apps/console`.
 - **APCA sweep (extended):** every status family **and secondary**, `-foreground` on `-background` **and** `-subtle-foreground` on `-subtle`, both modes.
 - **Colorblind:** the fixed chart set passes `audit:colorblind`.
 - **Tone parity (both modes):** each named tone reproduces curated within tolerance — and demonstrably tints **light** `muted` / `nav-background` / `nav-border` / `border-active` / `overlay` (differs from `neutral`), not only dark surfaces.
