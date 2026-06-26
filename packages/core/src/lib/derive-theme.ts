@@ -2,7 +2,7 @@ import type { Oklch } from 'culori';
 
 import { apcaLc } from './apca';
 import { formatOklch } from './oklch-format';
-import { type Tier, TIER_THRESHOLDS } from './palette';
+import { type Shade, type Tier, TIER_THRESHOLDS } from './palette';
 import { rampFromSeed, seedOklch } from './perceptual-ramp';
 
 export interface ThemeSeeds {
@@ -196,24 +196,49 @@ function readableOn(bg: string): string {
     : 'oklch(0 0 0)';
 }
 
-/** The 9-state primary family + primary borders, from one accent seed. */
-export function derivePrimary(accentHex: string, mode: Mode): TokenMap {
-  const ramp = rampFromSeed(accentHex);
+/** First shade (in `order`) that clears `floor` against `bg`; else the black/white endpoint. */
+function legibleShade(
+  ramp: Record<Shade, string>,
+  bg: string,
+  floor: number,
+  order: Shade[]
+): string {
+  for (const k of order) if (apcaLc(ramp[k], bg) >= floor) return ramp[k];
+  return readableOn(bg);
+}
+
+/** 11 tokens for a named color family (background, foreground, subtle, borders). */
+export function deriveFamily(
+  name: string,
+  ramp: Record<Shade, string>,
+  mode: Mode
+): TokenMap {
   const dark = mode === 'dark';
+  const p = `--nx-color-${name}`;
+  const subtle = dark ? ramp['950'] : ramp['50'];
   return {
-    '--nx-color-primary-background': ramp['600'],
-    '--nx-color-primary-background-hover': ramp['700'],
-    '--nx-color-primary-background-active': ramp['800'],
-    '--nx-color-primary-foreground': readableOn(ramp['600']),
-    '--nx-color-primary-disabled': dark ? ramp['950'] : ramp['300'],
-    '--nx-color-primary-subtle': dark ? ramp['950'] : ramp['50'],
-    '--nx-color-primary-subtle-foreground': dark ? ramp['300'] : ramp['600'],
-    '--nx-color-primary-subtle-hover': dark ? ramp['900'] : ramp['100'],
-    '--nx-color-primary-subtle-active': dark ? ramp['800'] : ramp['200'],
-    '--nx-color-border-primary': dark ? ramp['700'] : ramp['200'],
-    '--nx-color-border-primary-active': dark ? ramp['500'] : ramp['400'],
+    [`${p}-background`]: ramp['600'],
+    [`${p}-background-hover`]: ramp['700'],
+    [`${p}-background-active`]: ramp['800'],
+    [`${p}-foreground`]: readableOn(ramp['600']),
+    [`${p}-disabled`]: dark ? ramp['950'] : ramp['300'],
+    [`${p}-subtle`]: subtle,
+    [`${p}-subtle-foreground`]: legibleShade(
+      ramp,
+      subtle,
+      TIER_THRESHOLDS.ui,
+      dark ? ['300', '200', '100', '50'] : ['600', '700', '800', '900']
+    ),
+    [`${p}-subtle-hover`]: dark ? ramp['900'] : ramp['100'],
+    [`${p}-subtle-active`]: dark ? ramp['800'] : ramp['200'],
+    [`--nx-color-border-${name}`]: dark ? ramp['700'] : ramp['200'],
+    [`--nx-color-border-${name}-active`]: dark ? ramp['500'] : ramp['400'],
   };
 }
+
+/** The 11-token primary family, from one accent seed. */
+export const derivePrimary = (accentHex: string, mode: Mode): TokenMap =>
+  deriveFamily('primary', rampFromSeed(accentHex), mode);
 
 function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
   const delta = contrastDelta(contrast);
