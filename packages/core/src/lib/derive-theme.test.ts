@@ -422,6 +422,15 @@ const SWEEP_SEEDS: ReadonlyArray<{
   },
 ];
 
+const DERIVED_FAMILIES = [
+  'primary',
+  'secondary',
+  'success',
+  'warning',
+  'error',
+  'information',
+] as const;
+
 describe('legibility invariant: every text tier clears its APCA floor', () => {
   it.each(SWEEP_SEEDS)(
     'contract %#',
@@ -446,17 +455,21 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
           '--nx-color-background',
           'incidental',
         ],
-        [
-          '--nx-color-primary-foreground',
-          '--nx-color-primary-background',
-          'ui',
-        ],
-        [
-          '--nx-color-primary-subtle-foreground',
-          '--nx-color-primary-subtle',
-          'ui',
-        ],
       ];
+      for (const family of DERIVED_FAMILIES) {
+        checks.push(
+          [
+            `--nx-color-${family}-foreground`,
+            `--nx-color-${family}-background`,
+            'ui',
+          ],
+          [
+            `--nx-color-${family}-subtle-foreground`,
+            `--nx-color-${family}-subtle`,
+            'ui',
+          ]
+        );
+      }
 
       for (const [fg, bg, tier] of checks) {
         expect(
