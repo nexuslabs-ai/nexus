@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` set **equals** the curated base+brand+chart set — every token derived from the contract, none cascading from static CSS — verified by exact two-mode parity against `@nexus/core`'s own token source.
+**Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` **key set** equals the curated base+brand+chart set — every token key derived from the contract, none cascading from static CSS. Values are verified by family gates: dark tone-owned values match curated, light tone-owned values match the committed evident-tone fixture, and status/secondary/chart families keep their own exact gates.
 
 **Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed colorblind set. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
 
@@ -13,7 +13,7 @@
 - **APCA gate:** every text/surface pair clears its tier floor (`TIER_THRESHOLDS`); never throws (snap to black/white endpoint). `-subtle-foreground` is APCA-derived, not a hoped-to-pass fixed shade.
 - **No `light-dark()`** in emitted CSS — `themeToCss` stays `:root` / `:root.dark`.
 - **`deriveTheme` returns DATA** (`TokenMap`); `themeToCss` is the only web applier.
-- **Contract may change in Phase A; Phase B freezes the public API.** It carries `surfaceTone: 'stone'|'neutral'|'zinc'|'slate'|'gray'` (optional, default `'neutral'`) — the neutral surface family. `background` is the literal page background (white in light); the **tone**, not the background seed, supplies surface/nav/border/alpha hue+chroma.
+- **Contract may change in Phase A; Phase B freezes the public API.** It carries `surfaceTone: 'stone'|'neutral'|'zinc'|'slate'|'gray'` (optional, default `'neutral'`) — the neutral surface family. `background` remains the input seed; in light, non-neutral tones emit `--nx-color-background` as tinted paper (`PAPER_L`), while `neutral` stays true white. The **tone**, not the background seed, supplies surface/nav/border/alpha hue+chroma.
 - **Status hues are fixed and brand-independent** — emit the **curated** green/orange/red/blue ramps, don't regenerate them via `rampFromSeed` (it uses Nexus's perceptual grid, which need not match the curated primitive ramps).
 - **`border-default` / `border-disabled` are ALPHA** (curated: `black-a200` light / `white-a300` dark) — contrast-ink, NOT opaque surface steps. `border-active` IS opaque (tone).
 - **Parity oracle = `@nexus/core`'s own token JSON** (`packages/core/tokens/semantic/base-*.json` + brand + chart), never `apps/console/public/themes/*.css`.
@@ -260,6 +260,11 @@ it('light base flat; muted/hover stepped; tone tints light (slate≠neutral)', (
     ...SEEDS,
   }).light;
   expect(slate['--nx-color-container']).toBe(slate['--nx-color-background']);
+  expect(slate['--nx-color-background']).not.toBe(
+    neutral['--nx-color-background']
+  );
+  expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.987, 3);
+  expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(1, 3);
   expect(slate['--nx-color-muted']).not.toBe(slate['--nx-color-background']);
   expect(slate['--nx-color-container-hover']).not.toBe(
     slate['--nx-color-container']
@@ -318,7 +323,9 @@ export function deriveSurfaces(
       h: tone.h,
     });
   }
-  return out; // keep control-thumb special-case
+  // control-thumb is a fixed white knob in the curated base files; it is not tone-owned.
+  out['--nx-color-control-thumb'] = 'oklch(1 0 0)';
+  return out;
 }
 // deriveMode/deriveTheme thread `contract.surfaceTone ?? 'neutral'` into deriveSurfaces + deriveAlpha.
 ```
@@ -390,7 +397,7 @@ function deriveChart(mode: Mode): TokenMap {
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-**Interfaces:** `deriveAlpha(surfaceTone, mode)` emits two ink families: **tone-ink** (`overlay`, `popover-backdrop`, `border-default-alpha`, `background-hover-alpha`; `popover-alpha` = white light / tone-ink dark) carrying the tone tint; and **contrast-ink** (`border-default`, `border-disabled` = black light / white dark) — the alpha borders moved out of `SURFACE_STEPS` (Task 4). Tests assert the full `oklch(L C H / α)` value, not only α.
+**Interfaces:** `deriveAlpha(surfaceTone, mode)` emits two ink families: **tone-ink** (`overlay`, `popover-backdrop`, `border-default-alpha`, `background-hover-alpha`; `popover-alpha` = white light / tone-ink dark) carrying the tone tint; and **contrast-ink** (`border-default`, `border-disabled` = black light / white dark) — the alpha borders moved out of `SURFACE_STEPS` (Task 4). Tests assert the full normalized `oklch(L C H / α)` value from `SURFACE_TONE`, not only α; Task 9 handles source parity against curated primitives by tolerance.
 
 - [ ] **Step 1: Failing test (full value, both modes)**
 
@@ -575,27 +582,36 @@ for (const fam of [
 }
 ```
 
-- [ ] **Step 2: Derived-value colorblind** — assert the **emitted** `chart-categorical-1..5` (and status backgrounds) are pairwise-distinguishable under the project's colorblind metric (reuse the `audit:colorblind` helper on the derived values, not just the static set). Run → PASS.
+- [ ] **Step 2: Derived-value contrast + colorblind** — sweep all five `surfaceTone`s × both modes for base text, nav foreground/muted foreground, hover/active surfaces, focus-adjacent surfaces, and chart/status colors on `background`/`container`. Assert the **emitted** `chart-categorical-1..5` and status backgrounds are pairwise-distinguishable under the project's colorblind metric. Feed derived `{ success: green, warning: orange, error: red, information: blue }` and chart values into the helper; do not rely only on `audit-colorblind.js`'s static `STATUS_PALETTES`.
 - [ ] **Step 3: Commit** — `git commit -am "test(core): APCA sweep (primary+secondary+status, bg+subtle) + derived colorblind"`
 
 ---
 
-### Task 9: Tone parity — both modes, all tone-owned tokens, vs the core source
+### Task 9: Tone parity — both modes, all classified tone leaves
 
-**Files:** Create `packages/core/src/lib/tone-parity.test.ts`; the calibrated `SURFACE_TONE` (Task 4) is the runtime source of truth — no separate test-only seed table.
+**Files:** Create `packages/core/src/lib/tone-parity.test.ts` and `packages/core/src/lib/light-tone.fixture.json`. The calibrated `SURFACE_TONE` (Task 4) is the runtime source of truth; the fixture is the frozen **light output oracle**, not a second seed table. If `SURFACE_TONE`, `PAPER_L`, light step magnitudes, or `TONE_CONTRAST` change, regenerate the fixture and review the diff in the same commit.
 
-**Interfaces:** the gate is **mode-split** (the evident-light-tones change in Task 4 makes light intentionally diverge from curated). In **dark**, every **tone-owned** base token matches the **curated** value (`base-{tone}-dark.json` → primitives) within tolerance (ΔL ≤ 0.04, ΔC ≤ 0.01, ΔH ≤ 4°, Δα ≤ 0.02). In **light**, tones now carry a deliberate tint (curated light is near-white), so they're gated against the **new calibrated evident-tone values** — a committed `light-tone.fixture.json` (built once from the agreed `SURFACE_TONE` lightC + the paper model, then frozen) — **not** curated. Both modes are exhaustive over tone-owned leaves: surfaces, state surfaces, tone foregrounds, nav, control, `border-active`, and tone alpha tokens. (Contrast-ink `border-default`/`border-disabled` are not tone-owned; asserted in Task 6.) Contrast-ink tokens (`border-default`, `border-disabled`) are intentionally not tone-owned and are asserted in Task 6. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
+**Fixture schema:** `light-tone.fixture.json` stores `{ schemaVersion, source, paperL, lightDepthMultiplier, toneContrast, tones }`, where `tones[tone][token]` is the expected emitted `oklch()` value for the canonical light seeds. Do not generate expected light values from `deriveTheme` inside the test; read the frozen fixture so regressions show up as diffs.
 
-- [ ] **Step 1: Build the mode-split oracle** — `expectedTone(tone, mode, tok)`: for **dark**, resolve `base-{tone}-dark.json` `{primitive}` refs against `packages/core/tokens/primitives/*.json` to concrete `oklch()`; for **light**, read the committed `light-tone.fixture.json` (the agreed evident-tone values — light deliberately diverges from curated). Cover every token in `TONE_TOKENS` below, not just a smoke-test subset.
+**Interfaces:** the gate is **mode-split** (the evident-light-tones change in Task 4 makes light intentionally diverge from curated). In **dark**, every **tone-owned** base token matches the **curated** value (`base-{tone}-dark.json` → primitives) within tolerance. In **light**, every tone-owned base token matches `light-tone.fixture.json` with tighter tolerance because the visible tint is the product contract. All base semantic color leaves are classified as one of: `tone-owned`, `contrast-ink` (`border-default`, `border-disabled`), `fixed-white` (`control-thumb`), `status/brand/chart/secondary`, or `intentional-exclusion`. The test fails if a base color leaf is unclassified. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
 
-- [ ] **Step 2: Parity test (both modes, L/C/H/α tolerance)**
+- [ ] **Step 1: Build the mode-split oracle** — `expectedTone(tone, mode, tok)`: for **dark**, resolve `base-{tone}-dark.json` `{primitive}` refs against `packages/core/tokens/primitives/*.json` to concrete `oklch()`; for **light**, read `packages/core/src/lib/light-tone.fixture.json`. Cover every token in `TONE_TOKENS` below, plus assert zero unclassified recursive color leaves from the base semantic files.
+
+- [ ] **Step 2: Parity test (both modes, token-specific L/C/H/α tolerance)**
 
 ```ts
+const TONE_CONTRAST = 60;
+const LIGHT_TOL = { l: 0.005, c: 0.002, h: 2, a: 0.002 };
+const DARK_TOL = { l: 0.04, c: 0.01, h: 4, a: 0.02 };
+const TONES = ['slate', 'neutral', 'zinc', 'gray', 'stone'] as const;
 const TONE_TOKENS = [
+  'background',
   'background-hover',
   'background-hover-alpha',
   'background-active',
   'muted',
+  'muted-foreground',
+  'muted-foreground-subtle',
   'disabled',
   'disabled-foreground',
   'container',
@@ -606,6 +622,7 @@ const TONE_TOKENS = [
   'popover-foreground',
   'popover-hover',
   'popover-active',
+  'popover-alpha',
   'popover-backdrop',
   'control-background',
   'control-background-hover',
@@ -618,49 +635,60 @@ const TONE_TOKENS = [
   'border-default-alpha',
   'border-active',
   'overlay',
-];
+] as const;
+
 function comps(s: string) {
   const m = s.match(/oklch\(([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?/)!;
   return { l: +m[1], c: +m[2], h: +m[3], a: m[4] ? +m[4] : 1 };
 }
 
-it.each(['slate', 'neutral', 'zinc', 'gray', 'stone'])(
-  '%s matches curated within tolerance (both modes)',
-  (tone) => {
-    for (const mode of ['light', 'dark'] as const) {
-      const got = deriveTheme({
-        appearance: mode,
-        surfaceTone: tone,
-        light: {
-          accent: '#2563eb',
-          background: '#ffffff',
-          foreground: '#181818',
-        },
-        dark: {
-          accent: '#2563eb',
-          background: '#181818',
-          foreground: '#ffffff',
-        },
-        contrast: TONE_CONTRAST,
-      })[mode];
-      for (const tok of TONE_TOKENS) {
-        const g = comps(got[`--nx-color-${tok}`]),
-          w = comps(expectedTone(tone, mode, tok)); // dark=curated, light=evident fixture
-        expect(Math.abs(g.l - w.l)).toBeLessThanOrEqual(0.04);
-        expect(Math.abs(g.c - w.c)).toBeLessThanOrEqual(0.01);
-        if (g.c > 0.002 && w.c > 0.002)
-          expect(Math.abs(((g.h - w.h + 540) % 360) - 180)).toBeLessThanOrEqual(
-            4
-          );
-        expect(Math.abs(g.a - w.a)).toBeLessThanOrEqual(0.02);
-      }
+function expectNear(got: string, want: string, mode: Mode) {
+  const g = comps(got);
+  const w = comps(want);
+  const t = mode === 'light' ? LIGHT_TOL : DARK_TOL;
+  expect(Math.abs(g.l - w.l)).toBeLessThanOrEqual(t.l);
+  expect(Math.abs(g.c - w.c)).toBeLessThanOrEqual(t.c);
+  if (g.c > 0.002 && w.c > 0.002)
+    expect(Math.abs(((g.h - w.h + 540) % 360) - 180)).toBeLessThanOrEqual(t.h);
+  expect(Math.abs(g.a - w.a)).toBeLessThanOrEqual(t.a);
+}
+
+it.each(TONES)('%s matches the mode-split tone oracle', (tone) => {
+  for (const mode of ['light', 'dark'] as const) {
+    const got = deriveTheme({
+      appearance: mode,
+      surfaceTone: tone,
+      light: {
+        accent: '#2563eb',
+        background: '#ffffff',
+        foreground: '#181818',
+      },
+      dark: {
+        accent: '#2563eb',
+        background: '#181818',
+        foreground: '#ffffff',
+      },
+      contrast: TONE_CONTRAST,
+    })[mode];
+    for (const tok of TONE_TOKENS) {
+      expectNear(got[`--nx-color-${tok}`], expectedTone(tone, mode, tok), mode);
     }
   }
-);
+});
+
+it('keeps non-neutral light paper visibly distinct from neutral', () => {
+  const paper = Object.fromEntries(
+    TONES.map((tone) => [tone, comps(lightFixture.tones[tone].background)])
+  );
+  expect(paper.slate.c).toBeGreaterThan(paper.gray.c);
+  expect(paper.gray.c).toBeGreaterThan(paper.zinc.c);
+  expect(paper.zinc.c).toBeGreaterThan(paper.neutral.c);
+  expect(paper.stone.c).toBeGreaterThan(paper.neutral.c);
+});
 ```
 
-- [ ] **Step 3: Calibrate** `SURFACE_TONE[tone]` (+ `TONE_CONTRAST`, + the light step magnitudes) until all five tones pass both modes. Record any genuinely unmatchable token as an explicit contract item.
-- [ ] **Step 4: Commit** — `git add packages/core/src/lib/tone-parity.test.ts && git commit -m "feat(core): two-mode tone parity gate (all tone-owned tokens)"`
+- [ ] **Step 3: Calibrate** `SURFACE_TONE[tone]` (+ `TONE_CONTRAST`, + the light step magnitudes) until all five tones pass both modes. The initial `TONE_CONTRAST` is `60`; if calibration changes it, record the final value in `light-tone.fixture.json`, the report, and the spec. Record any genuinely unmatchable token as an explicit contract item.
+- [ ] **Step 4: Commit** — `git add packages/core/src/lib/tone-parity.test.ts packages/core/src/lib/light-tone.fixture.json && git commit -m "feat(core): two-mode tone parity gate (all tone-owned tokens)"`
 
 ---
 
@@ -668,6 +696,7 @@ it.each(['slate', 'neutral', 'zinc', 'gray', 'stone'])(
 
 - `pnpm test:unit` green: exact two-mode key parity (Task 7), APCA sweep incl. **primary** (Task 8), derived colorblind, and tone parity for **all five tones, both modes** (Task 9).
 - `pnpm --filter @nexus/core audit:colorblind` green.
+- `pnpm --filter @nexus/core audit:contrast` green, or the derived-token equivalent is checked in and run by `pnpm test:unit`.
 - `pnpm typecheck && pnpm lint` clean.
 - `deriveTheme` emits **exactly** the core curated semantic `--nx-color-*` key set (no missing, no extras) — against `@nexus/core`'s own token source, not `apps/console`.
 - No tone left on static CSS as a silent follow-up.

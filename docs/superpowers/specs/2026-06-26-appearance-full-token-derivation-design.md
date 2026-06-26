@@ -10,7 +10,7 @@
 
 ## Goal
 
-Extend the engine so its output token set **equals** the curated set — every `--nx-color-*` is derived, none cascades from static CSS. The engine becomes the single source of truth; static base CSS is retired **per-tone, gated on parity**. The neutral surface family is selected by a first-class **`surfaceTone`** enum.
+Extend the engine so its output token **key set** equals the curated set — every `--nx-color-*` key is derived, none cascades from static CSS. Values are gated by family: dark tone values match curated, light tone values match the new evident-tone contract, and status/secondary/chart values keep their own exact gates. The engine becomes the single source of truth; static base CSS is retired **per-tone, gated on parity**. The neutral surface family is selected by a first-class **`surfaceTone`** enum.
 
 ## Decisions (recorded)
 
@@ -34,7 +34,7 @@ Extend the engine so its output token set **equals** the curated set — every `
 
 **Why the contract changes now:** Phase B freezes the public package API, so the abstraction must be right _before_ freezing — patching it after is a breaking change for consumers. The earlier "no new inputs" rule is **retired**.
 
-**Why `surfaceTone` and not "derive the tone from a seed":** curated light themes have a **pure-white `background`** (chroma 0) yet **tone-tinted** `muted` / `nav` / `border-active` / `overlay` (e.g. `overlay: slate-a700`). The tint cannot come from the white background seed. The rejected alternative — read the tone from the _dark-block_ background seed — works but makes light-mode tint secretly depend on the dark seed: spooky cross-mode coupling, and `background` would mean two different things. An explicit `surfaceTone` says what it means: _page background is white; the neutral surface family is Slate._
+**Why `surfaceTone` and not "derive the tone from a seed":** curated light themes used a **pure-white `background`** seed (chroma 0) while still carrying **tone-tinted** `muted` / `nav` / `border-active` / `overlay` (e.g. `overlay: slate-a700`). The tint cannot come from the white background seed. The rejected alternative — read the tone from the _dark-block_ background seed — works but makes light-mode tint secretly depend on the dark seed: spooky cross-mode coupling, and `background` would mean two different things. An explicit `surfaceTone` says what it means: _the input seed may be white; the emitted light paper and surfaces are Slate._
 
 ## Core abstraction — one family deriver
 
@@ -74,15 +74,15 @@ Generalize `derivePrimary` into `deriveFamily(name, ramp, mode)` — it takes a 
 
 ## Parity & cutover (the C-gate)
 
-1. Calibrate each `surfaceTone`'s hue/chroma + the light step magnitudes so derived neutrals match today's curated values within tolerance — in **both** modes.
+1. Calibrate each `surfaceTone`'s hue/chroma + the light step magnitudes with a mode-split gate: **dark** tone-owned values match today's curated values within tolerance; **light** tone-owned values match the committed evident-tone fixture within tighter tolerance because light intentionally diverges from curated near-white.
 2. Per-tone sign-off **before** deleting that tone's static CSS. **Phase A is not complete until all five tones pass** (no silent "keep the curated file" follow-up). A genuinely unmatchable token becomes an _explicit, documented_ public-contract item, not a silent residual.
 
 ## Invariants & tests
 
 - **Exact key-parity test:** derived `--nx-color-*` keys **exactly equal** (no missing, **no extras**) the curated set in **both** modes — sourced from `@nexus/core`'s own `tokens/semantic/*.json` (base + brand + chart), never `apps/console`.
 - **APCA sweep (extended):** every status family **and secondary**, `-foreground` on `-background` **and** `-subtle-foreground` on `-subtle`, both modes.
-- **Colorblind:** the fixed chart set passes `audit:colorblind`.
-- **Tone parity (mode-split):** **dark** matches **curated** within tolerance; **light** matches the new calibrated **evident-tone** values (light deliberately diverges — curated light is near-white). Every named tone visibly tints **light** `paper`/`muted`/`nav`/`border-active`/`overlay` (differs from `neutral`), not only dark.
+- **Colorblind:** the fixed chart set passes `audit:colorblind`; derived status backgrounds use emitted `success`/`warning`/`error`/`information` values, including `warning=orange`, rather than relying only on the static primitive helper.
+- **Tone parity (mode-split):** **dark** matches **curated** within tolerance; **light** matches the new calibrated **evident-tone** fixture (light deliberately diverges — curated light is near-white). Every named tone visibly tints **light** `paper`/`muted`/`nav`/`border-active`/`overlay` (differs from `neutral`), not only dark. The gate classifies every base semantic color leaf as tone-owned, contrast-ink, fixed-white, status/brand/chart/secondary, or intentionally excluded, and fails on unclassified leaves.
 - **No `light-dark()`** in emitted CSS — direct assertion on `themeToCss` output.
 
 ## Out of scope (Phase A)
