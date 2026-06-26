@@ -4,7 +4,7 @@
 
 **Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` set **equals** the curated base+brand+chart set — every token derived from the contract, none cascading from static CSS — verified by exact two-mode parity against `@nexus/core`'s own token source.
 
-**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed colorblind set. A parity test asserts exact key+value equality against the core token JSON.
+**Architecture:** `deriveFamily(name, ramp, mode)` builds a family from a **ramp object** + APCA on-color: primary passes `rampFromSeed(accent)` (brand-derived); the four status families pass the **fixed curated status ramps** (NOT regrubbed through `rampFromSeed`). A dedicated `deriveSecondary` emits the tone-independent neutral surface family. `deriveSurfaces` tints surface hue/chroma from `surfaceTone` with a per-mode step model (dark stepped / light base-flat). `deriveAlpha` emits the translucent tokens (tone-ink scrims) **and** the alpha-based `border-default`/`border-disabled` (contrast-ink). Chart = fixed colorblind set. The parity gates are split deliberately: Task 7 asserts exact two-mode **key** parity against the recursive core token JSON leaves; Task 9 and the family-specific tests assert value parity for the tone/status/secondary/chart surfaces they own.
 
 **Tech Stack:** TypeScript, culori + apca-w3, vitest (`pnpm test:unit`). All work in `packages/core/src/lib/`; the parity oracle is `packages/core/tokens/semantic/*.json` (never `apps/console`).
 
@@ -172,9 +172,9 @@ export function deriveSecondary(mode: Mode): TokenMap {
 
 **Interfaces:** `STATUS_RAMP: Record<'success'|'warning'|'error'|'information', Record<Shade,string>>` = the **curated** green/orange/red/blue ramps. Status = `deriveFamily(name, STATUS_RAMP[name], mode)` — so status hues are the curated ones, not Nexus-grid regenerations.
 
-- [ ] **Step 1: Provenance** — inline the four ramps from the core source (fixed, brand-independent):
-      `grep -E '\--nx-color-(green|orange|red|blue)-(50|100|200|300|400|500|600|700|800|900|950):' packages/core/tokens/primitives/*.json apps/console/public/themes/color.css`
-      (use the `packages/core` primitive source as canonical; the console CSS is only a cross-check).
+- [ ] **Step 1: Provenance** — inline the four ramps from the core JSON source (fixed, brand-independent). Do not grep for CSS variable names here; `color.json` is nested JSON. Resolve the primitive hex values to the same OKLCH formatting the generators emit:
+      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const shades = ["50","100","200","300","400","500","600","700","800","900","950"]; for (const p of ["green","orange","red","blue"]) console.log(p, Object.fromEntries(shades.map((s) => [s, formatTokenValue(color[p][s].$value, "color", [p, s])])));'`
+      (use the `packages/core` primitive source as canonical).
 
 - [ ] **Step 2: Failing test** (curated hue + APCA on background AND subtle, both modes):
 
@@ -319,7 +319,8 @@ export function deriveSurfaces(
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-- [ ] **Step 1: Provenance** — `grep -E '\--nx-color-(teal-600|lime-700|orange-600|rose-600|indigo-600|teal-200|lime-200|orange-200|rose-200|indigo-200):' packages/core/tokens/primitives/*.json`
+- [ ] **Step 1: Provenance** — resolve the fixed chart primitives from core JSON into generator-formatted OKLCH, not by grepping CSS variable names:
+      `node --input-type=module -e 'import { readTokenFile, formatTokenValue } from "./packages/core/scripts/utils.js"; const color = readTokenFile("packages/core/tokens/primitives/color.json"); const sets = { light: [["teal","600"],["lime","700"],["orange","600"],["rose","600"],["indigo","600"]], dark: [["teal","200"],["lime","200"],["orange","200"],["rose","200"],["indigo","200"]] }; for (const [mode, entries] of Object.entries(sets)) console.log(mode, entries.map(([p, s]) => formatTokenValue(color[p][s].$value, "color", [p, s])));'`
 
 - [ ] **Step 2: Failing test**
 
@@ -395,10 +396,35 @@ it('emits tone-ink + contrast-ink alpha tokens with correct L C H α (both modes
   // tone-ink overlay: slate hue/chroma, mode-specific alpha
   expect(light['--nx-color-overlay']).toBe('oklch(0.13 0.0400 264.7 / 0.7529)');
   expect(dark['--nx-color-overlay']).toBe('oklch(0.13 0.0400 264.7 / 0.8471)');
-  // contrast-ink border-default: black in light, white in dark (NOT tone)
+  expect(light['--nx-color-popover-backdrop']).toBe(
+    'oklch(0.13 0.0400 264.7 / 0.9098)'
+  );
+  expect(dark['--nx-color-popover-backdrop']).toBe(
+    'oklch(0.13 0.0400 264.7 / 0.9098)'
+  );
+  expect(light['--nx-color-border-default-alpha']).toBe(
+    'oklch(0.13 0.0400 264.7 / 0.0941)'
+  );
+  expect(dark['--nx-color-border-default-alpha']).toBe(
+    'oklch(0.13 0.0400 264.7 / 0.1882)'
+  );
+  expect(light['--nx-color-background-hover-alpha']).toBe(
+    'oklch(0.13 0.0400 264.7 / 0.0627)'
+  );
+  expect(dark['--nx-color-background-hover-alpha']).toBe(
+    'oklch(0.13 0.0400 264.7 / 0.0627)'
+  );
+  expect(light['--nx-color-popover-alpha']).toBe('oklch(1 0 0 / 0.9098)');
+  expect(dark['--nx-color-popover-alpha']).toBe(
+    'oklch(0.13 0.0400 264.7 / 0.8471)'
+  );
+  // contrast-ink borders: black in light, white in dark (NOT tone)
   expect(light['--nx-color-border-default']).toBe('oklch(0.1448 0 0 / 0.0941)');
   expect(dark['--nx-color-border-default']).toBe('oklch(1 0 0 / 0.1882)');
-  expect(light['--nx-color-popover-alpha']).toBe('oklch(1 0 0 / 0.9098)');
+  expect(light['--nx-color-border-disabled']).toBe(
+    'oklch(0.1448 0 0 / 0.0941)'
+  );
+  expect(dark['--nx-color-border-disabled']).toBe('oklch(1 0 0 / 0.1882)');
 });
 ```
 
@@ -438,7 +464,7 @@ function deriveAlpha(surfaceTone: SurfaceTone, mode: Mode): TokenMap {
 
 **Files:** Create `packages/core/src/lib/derive-theme.parity.test.ts`
 
-**Interfaces:** Oracle = `@nexus/core`'s own `tokens/semantic/base-slate-{light,dark}.json` (+ the brand + chart semantic sources) — top-level keys are the semantic token names. Assert **exact set equality** (no missing AND no extras) for **both** modes.
+**Interfaces:** Oracle = `@nexus/core`'s own `tokens/semantic/base-slate-{light,dark}.json` (+ the brand + chart semantic sources). Semantic files are nested, so collect **recursive color leaves** and join their path segments (`border.default` → `--nx-color-border-default`, `chart.categorical.1` → `--nx-color-chart-categorical-1`). Assert **exact key-set equality** (no missing AND no extras) for **both** modes.
 
 - [ ] **Step 1: Write the test**
 
@@ -455,11 +481,23 @@ function curatedKeys(mode: 'light' | 'dark'): Set<string> {
     `chart-categorical-default-${mode}`,
   ];
   const keys = new Set<string>();
+  function collectColorLeaves(obj: unknown, path: string[] = []) {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
+    const record = obj as Record<string, unknown>;
+    if (record.$type === 'color' && typeof record.$value === 'string') {
+      keys.add(`--nx-color-${path.join('-')}`);
+      return;
+    }
+    for (const [key, value] of Object.entries(record)) {
+      if (key.startsWith('$')) continue;
+      collectColorLeaves(value, [...path, key]);
+    }
+  }
   for (const f of files) {
     const json = JSON.parse(
       readFileSync(`packages/core/tokens/semantic/${f}.json`, 'utf8')
     );
-    for (const k of Object.keys(json)) keys.add(`--nx-color-${k}`);
+    collectColorLeaves(json);
   }
   return keys;
 }
@@ -532,19 +570,38 @@ for (const fam of [
 
 **Files:** Create `packages/core/src/lib/tone-parity.test.ts`; the calibrated `SURFACE_TONE` (Task 4) is the runtime source of truth — no separate test-only seed table.
 
-**Interfaces:** For each `surfaceTone`, every **tone-owned** token (surfaces, nav, `border-active`, `overlay`/alpha) must match the core curated value within tolerance (ΔL ≤ 0.04, ΔC ≤ 0.01, ΔH ≤ 4°, Δα ≤ 0.02) in **both** modes. Curated values resolved from `packages/core/tokens/semantic/base-{tone}-{light,dark}.json` → primitives. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
+**Interfaces:** For each `surfaceTone`, every **tone-owned** base token must match the core curated value within tolerance (ΔL ≤ 0.04, ΔC ≤ 0.01, ΔH ≤ 4°, Δα ≤ 0.02) in **both** modes. This is exhaustive for tone-owned base leaves, not a representative subset: surfaces, state surfaces, tone foregrounds, nav, control, `border-active`, and tone alpha tokens are all included. Curated values resolve from `packages/core/tokens/semantic/base-{tone}-{light,dark}.json` → primitives. Contrast-ink tokens (`border-default`, `border-disabled`) are intentionally not tone-owned and are asserted in Task 6. **Phase A is not complete until all five tones pass both modes** — an unmatchable token is an explicit, documented public-contract item, not a silent residual.
 
-- [ ] **Step 1: Build the core-sourced oracle** — a helper that resolves `base-{tone}-{mode}.json` `{primitive}` refs against `packages/core/tokens/primitives/*.json` to concrete `oklch()` for the tone-owned set `{muted, container, popover, nav-background, nav-border, border-active, overlay}`.
+- [ ] **Step 1: Build the core-sourced oracle** — a helper that resolves `base-{tone}-{mode}.json` `{primitive}` refs against `packages/core/tokens/primitives/*.json` to concrete `oklch()` for every token in `TONE_TOKENS` below. Do not stop at `{muted, container, popover, nav-background, nav-border, border-active, overlay}`; that was only a smoke-test subset.
 
 - [ ] **Step 2: Parity test (both modes, L/C/H/α tolerance)**
 
 ```ts
 const TONE_TOKENS = [
+  'background-hover',
+  'background-hover-alpha',
+  'background-active',
   'muted',
+  'disabled',
+  'disabled-foreground',
   'container',
+  'container-foreground',
+  'container-hover',
+  'container-active',
   'popover',
+  'popover-foreground',
+  'popover-hover',
+  'popover-active',
+  'popover-backdrop',
+  'control-background',
+  'control-background-hover',
   'nav-background',
+  'nav-foreground',
+  'nav-muted-foreground',
+  'nav-item-hover',
+  'nav-item-active',
   'nav-border',
+  'border-default-alpha',
   'border-active',
   'overlay',
 ];
