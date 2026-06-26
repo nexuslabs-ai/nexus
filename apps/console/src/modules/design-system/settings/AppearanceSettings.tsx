@@ -35,7 +35,10 @@ import {
   ELEVATION_OPTIONS,
   STROKE_OPTIONS,
 } from '../../../lib/appearance-theme';
-import { sanitizeContract } from '../../../lib/codex-contract';
+import {
+  DEFAULT_SURFACE_TONE,
+  sanitizeContract,
+} from '../../../lib/codex-contract';
 import {
   type CodexPrefs,
   DEFAULT_CODEX_PREFS,
@@ -92,7 +95,7 @@ export function AppearanceSettings({
     useThemeContext();
   const block = editedBlock(codexContract.appearance);
   const seeds = codexContract[block];
-  const selectedBase: Base = codexContract.surfaceTone ?? theme.base;
+  const selectedBase: Base = codexContract.surfaceTone ?? DEFAULT_SURFACE_TONE;
 
   const setAppearance = (value: string) => {
     if (value === 'light' || value === 'dark' || value === 'system') {
@@ -104,7 +107,6 @@ export function AppearanceSettings({
   };
 
   const setBaseTone = (base: Base) => {
-    setTheme((t) => ({ ...t, base }));
     setCodexContract((contract) => applyBaseTone(contract, base));
   };
 
@@ -166,7 +168,6 @@ export function AppearanceSettings({
       const parsed: unknown = JSON.parse(text);
       const nextContract = sanitizeContract(parsed);
       setCodexContract(nextContract);
-      setTheme((t) => ({ ...t, base: nextContract.surfaceTone ?? t.base }));
       const prefsField = (parsed as { prefs?: unknown }).prefs;
       if (prefsField) setCodexPrefs(sanitizePrefs(prefsField));
     } catch {

@@ -8,7 +8,7 @@ import {
 import { BASE_TONE_SEEDS, DEFAULT_BRAND_COLOR } from './appearance-theme';
 
 const DEFAULT_BASE_TONE = BASE_TONE_SEEDS.stone;
-const DEFAULT_SURFACE_TONE: SurfaceTone = 'stone';
+export const DEFAULT_SURFACE_TONE: SurfaceTone = 'stone';
 
 /** Codex's own Appearance values — the default derived theme (dogfood). */
 export const DEFAULT_CODEX_CONTRACT: CodexThemeContract = {

@@ -12,11 +12,13 @@ import { IconPalette } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 
 import { useThemeContext } from '../app/theme-provider';
+import type { Base } from '../hooks/useTheme';
 import {
   applyBaseTone,
   applyBrandColor,
   BASE_TONE_OPTIONS,
 } from '../lib/appearance-theme';
+import { DEFAULT_SURFACE_TONE } from '../lib/codex-contract';
 import { AppearanceColorField } from '../modules/design-system/settings/AppearanceColorField';
 
 function SwatchRow<T extends string>({
@@ -68,15 +70,14 @@ function SwatchRow<T extends string>({
  * controls. The full token axes live behind "Customize…" (Appearance).
  */
 export function ThemeQuickControl() {
-  const { theme, setTheme, codexContract, setCodexContract } =
-    useThemeContext();
+  const { codexContract, setCodexContract } = useThemeContext();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const accent =
     codexContract.appearance === 'light'
       ? codexContract.light.accent
       : codexContract.dark.accent;
-  const selectedBase = codexContract.surfaceTone ?? theme.base;
+  const selectedBase = codexContract.surfaceTone ?? DEFAULT_SURFACE_TONE;
 
   // Close the popover before navigating so it doesn't linger over Appearance.
   const openAppearance = () => {
@@ -84,8 +85,7 @@ export function ThemeQuickControl() {
     navigate({ to: '/design/appearance' });
   };
 
-  const setBaseTone = (base: typeof theme.base) => {
-    setTheme((t) => ({ ...t, base }));
+  const setBaseTone = (base: Base) => {
     setCodexContract((contract) => applyBaseTone(contract, base));
   };
 
