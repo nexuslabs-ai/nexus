@@ -378,8 +378,8 @@ describe('surfaceTone surfaces', () => {
 
 describe('chart colors', () => {
   const CHART_LIGHT = [
-    'oklch(0.62 0.1405 184.704)',
-    'oklch(0.73 0.2243 131.684)',
+    'oklch(0.59 0.1405 184.704)',
+    'oklch(0.57 0.19 141)',
     'oklch(0.62 0.2044 41.116)',
     'oklch(0.58 0.2489 17.585)',
     'oklch(0.49 0.2912 276.966)',
@@ -543,52 +543,87 @@ const DERIVED_FAMILIES = [
   'information',
 ] as const;
 
+const SURFACE_TONES: readonly SurfaceTone[] = [
+  'stone',
+  'neutral',
+  'zinc',
+  'slate',
+  'gray',
+];
+
+const BASE_CONTRAST_CHECKS: ReadonlyArray<
+  [string, string, keyof typeof TIER_THRESHOLDS]
+> = [
+  ['--nx-color-foreground', '--nx-color-background', 'body'],
+  ['--nx-color-foreground', '--nx-color-background-hover', 'ui'],
+  ['--nx-color-foreground', '--nx-color-muted', 'ui'],
+  ['--nx-color-muted-foreground', '--nx-color-muted', 'incidental'],
+  ['--nx-color-muted-foreground-subtle', '--nx-color-muted', 'incidental'],
+  ['--nx-color-disabled-foreground', '--nx-color-disabled', 'incidental'],
+  ['--nx-color-container-foreground', '--nx-color-container', 'body'],
+  ['--nx-color-popover-foreground', '--nx-color-popover', 'body'],
+  ['--nx-color-popover-foreground', '--nx-color-popover-hover', 'ui'],
+  ['--nx-color-foreground', '--nx-color-control-background', 'ui'],
+  ['--nx-color-foreground', '--nx-color-control-background-hover', 'ui'],
+  ['--nx-color-nav-foreground', '--nx-color-nav-background', 'ui'],
+  [
+    '--nx-color-nav-muted-foreground',
+    '--nx-color-nav-background',
+    'incidental',
+  ],
+  ['--nx-color-nav-foreground', '--nx-color-nav-item-hover', 'ui'],
+  ['--nx-color-nav-foreground', '--nx-color-nav-item-active', 'ui'],
+];
+
 describe('legibility invariant: every text tier clears its APCA floor', () => {
-  it.each(SWEEP_SEEDS)(
-    'contract %#',
-    ({ accent, background, foreground, mode }) => {
-      const seeds = { accent, background, foreground };
-      const contract: CodexThemeContract = {
-        appearance: mode,
-        light: seeds,
-        dark: seeds,
-        contrast: 55,
-      };
-      const map = deriveTheme(contract)[mode];
+  it.each(
+    SWEEP_SEEDS.flatMap((seed) =>
+      SURFACE_TONES.map((surfaceTone) => ({ ...seed, surfaceTone }))
+    )
+  )('contract %#', ({ accent, background, foreground, mode, surfaceTone }) => {
+    const seeds = { accent, background, foreground };
+    const contract: CodexThemeContract = {
+      appearance: mode,
+      surfaceTone,
+      light: seeds,
+      dark: seeds,
+      contrast: 55,
+    };
+    const map = deriveTheme(contract)[mode];
 
-      const checks: Array<[string, string, keyof typeof TIER_THRESHOLDS]> = [
-        ['--nx-color-foreground', '--nx-color-background', 'body'],
-        ['--nx-color-container-foreground', '--nx-color-container', 'body'],
-        ['--nx-color-popover-foreground', '--nx-color-popover', 'body'],
-        ['--nx-color-nav-foreground', '--nx-color-nav-background', 'body'],
-        ['--nx-color-muted-foreground', '--nx-color-background', 'ui'],
+    const checks: Array<[string, string, keyof typeof TIER_THRESHOLDS]> = [
+      ...BASE_CONTRAST_CHECKS,
+    ];
+    for (const family of DERIVED_FAMILIES) {
+      checks.push(
         [
-          '--nx-color-muted-foreground-subtle',
-          '--nx-color-background',
-          'incidental',
+          `--nx-color-${family}-foreground`,
+          `--nx-color-${family}-background`,
+          'ui',
         ],
-      ];
-      for (const family of DERIVED_FAMILIES) {
-        checks.push(
-          [
-            `--nx-color-${family}-foreground`,
-            `--nx-color-${family}-background`,
-            'ui',
-          ],
-          [
-            `--nx-color-${family}-subtle-foreground`,
-            `--nx-color-${family}-subtle`,
-            'ui',
-          ]
-        );
-      }
-
-      for (const [fg, bg, tier] of checks) {
-        expect(
-          apcaLc(map[fg]!, map[bg]!),
-          `${fg} on ${bg}`
-        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
-      }
+        [
+          `--nx-color-${family}-subtle-foreground`,
+          `--nx-color-${family}-subtle`,
+          'ui',
+        ]
+      );
     }
-  );
+    for (let index = 1; index <= 5; index += 1) {
+      checks.push(
+        [
+          `--nx-color-chart-categorical-${index}`,
+          '--nx-color-background',
+          'ui',
+        ],
+        [`--nx-color-chart-categorical-${index}`, '--nx-color-container', 'ui']
+      );
+    }
+
+    for (const [fg, bg, tier] of checks) {
+      expect(
+        apcaLc(map[fg]!, map[bg]!),
+        `${surfaceTone} ${mode}: ${fg} on ${bg}`
+      ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
+    }
+  });
 });

@@ -203,7 +203,7 @@ const TEXT_ON: Record<string, { surface: string; tier: Tier; quiet: number }> =
       quiet: 0.4,
     },
     'muted-foreground-subtle': {
-      surface: '--nx-color-background',
+      surface: '--nx-color-muted',
       tier: 'incidental',
       quiet: 0.55,
     },
@@ -369,8 +369,8 @@ function deriveStatus(mode: Mode): TokenMap {
 }
 
 const CHART_LIGHT = [
-  'oklch(0.62 0.1405 184.704)',
-  'oklch(0.73 0.2243 131.684)',
+  'oklch(0.59 0.1405 184.704)',
+  'oklch(0.57 0.19 141)',
   'oklch(0.62 0.2044 41.116)',
   'oklch(0.58 0.2489 17.585)',
   'oklch(0.49 0.2912 276.966)',
