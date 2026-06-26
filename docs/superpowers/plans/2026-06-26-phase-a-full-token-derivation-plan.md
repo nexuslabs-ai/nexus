@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` set **equals** the curated base+brand set — every token derived from the contract, none cascading from static CSS.
+**Goal:** Extend `@nexus/core`'s `deriveTheme` so its emitted `--nx-color-*` set **equals** the curated base+brand+chart set — every token derived from the contract, none cascading from static CSS.
 
-**Architecture:** Generalize the existing `derivePrimary` into one reusable `deriveFamily` (ramp + APCA on-color) and apply it to primary, secondary, and the four status families. Add a fixed colorblind-safe chart set, a fixed-opacity alpha formula, and a per-mode surface-step model (stepped dark / flat light). A token-parity test makes "every curated key is derived" a hard invariant.
+**Architecture:** Generalize `derivePrimary` into one reusable `deriveFamily` (solid ramp + APCA on-color) for primary and the four status families; add a **separate** `deriveSecondary` (subtle neutral surface family — secondary is NOT a solid ramp); add a fixed colorblind-safe chart set, a mode-aware fixed-opacity alpha formula, and a per-mode surface-step model (stepped dark / flat light). A token key-parity test makes "every curated key is derived" a hard invariant.
 
 **Tech Stack:** TypeScript, culori + apca-w3, vitest (`pnpm test:unit`). All work is in `packages/core/src/lib/`.
 
@@ -15,7 +15,8 @@
 - **`deriveTheme` returns DATA** (`TokenMap`); `themeToCss` is the only web applier. Don't fold serialization into derivation.
 - **No new contract inputs** — `{ appearance, light/dark:{accent,background,foreground}, contrast }` is frozen.
 - **Tests:** core unit tests live in `packages/core/src/lib/*.test.ts`, import `{ describe, expect, it } from 'vitest'`, run via `pnpm test:unit`.
-- **Canonical status seeds** (curated `*-600`, the solid backgrounds): success `oklch(0.62 0.2233 140.055)`, warning `oklch(0.62 0.2044 41.116)`, error `oklch(0.577 0.2523 27.926)`, information `oklch(0.546 0.2205 255.276)`.
+- **Canonical status seeds** (curated `*-600`): success `oklch(0.62 0.2233 140.055)`, warning `oklch(0.62 0.2044 41.116)`, error `oklch(0.577 0.2523 27.926)`, information `oklch(0.546 0.2205 255.276)`.
+- **Secondary is tone-independent neutral grey** (curated references `neutral-*` in every brand file, identical across bases) — derive it from the neutral ramp, NOT the background tone and NOT a solid color ramp.
 
 ---
 
@@ -31,22 +32,21 @@
 - Produces: `deriveFamily(name: string, seedHex: string, mode: Mode, opts?: { borders?: boolean }): TokenMap` — emits `--nx-color-${name}-{background,background-hover,background-active,foreground,disabled,subtle,subtle-foreground,subtle-hover,subtle-active}` and, when `opts.borders !== false`, `--nx-color-border-${name}` + `--nx-color-border-${name}-active`.
 - `derivePrimary(accentHex, mode)` becomes `deriveFamily('primary', accentHex, mode)`.
 
-- [ ] **Step 1: Write the failing test** (primary output must be byte-identical after the refactor)
+- [ ] **Step 1: Pin the current output with a snapshot — BEFORE refactoring.** A `deriveFamily('primary') === derivePrimary()` test is tautological once `derivePrimary` is an alias, so it can't catch a regression. Capture the _real current values_ instead:
 
 ```ts
-// in derive-theme.test.ts
-import { deriveFamily, derivePrimary } from './derive-theme';
-
-it('deriveFamily("primary") equals the previous derivePrimary output', () => {
-  const accent = '#2563eb';
-  expect(deriveFamily('primary', accent, 'light')).toEqual(
-    derivePrimary(accent, 'light')
-  );
-  expect(deriveFamily('primary', accent, 'dark')).toEqual(
-    derivePrimary(accent, 'dark')
-  );
+// derive-theme.test.ts — add while derivePrimary is still the original implementation
+it('primary token values are unchanged by the deriveFamily refactor', () => {
+  expect(derivePrimary('#2563eb', 'light')).toMatchInlineSnapshot();
+  expect(derivePrimary('#2563eb', 'dark')).toMatchInlineSnapshot();
 });
+```
 
+- [ ] **Step 2: Fill + freeze the snapshot** — run `pnpm test:unit derive-theme -u` **once, before touching `derivePrimary`**, so vitest writes the real token objects into the `toMatchInlineSnapshot()` calls. Eyeball the filled values (they're the live primary tokens), then **do not pass `-u` again** — the snapshot is now the regression guard.
+
+- [ ] **Step 3: Add the `deriveFamily` shape test** (borders toggle):
+
+```ts
 it('deriveFamily omits border tokens when borders:false', () => {
   const out = deriveFamily('secondary', '#888888', 'light', { borders: false });
   expect(out['--nx-color-border-secondary']).toBeUndefined();
@@ -54,9 +54,9 @@ it('deriveFamily omits border tokens when borders:false', () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails** — `pnpm test:unit derive-theme` → FAIL (`deriveFamily` not exported).
+Run → FAIL (`deriveFamily` not exported).
 
-- [ ] **Step 3: Implement** — replace the body of `derivePrimary` with a generic deriver:
+- [ ] **Step 4: Implement** — replace the body of `derivePrimary` with a generic deriver:
 
 ```ts
 export function deriveFamily(
@@ -90,53 +90,86 @@ export const derivePrimary = (accentHex: string, mode: Mode): TokenMap =>
   deriveFamily('primary', accentHex, mode);
 ```
 
-- [ ] **Step 4: Run to verify it passes** — `pnpm test:unit derive-theme` → PASS.
-
-- [ ] **Step 5: Commit** — `git commit -am "refactor(core): generalize derivePrimary into deriveFamily"`
+- [ ] **Step 5: Run → both tests PASS** (snapshot unchanged, borders test green): `pnpm test:unit derive-theme`.
+- [ ] **Step 6: Commit** — `git commit -am "refactor(core): generalize derivePrimary into deriveFamily (snapshot-pinned)"`
 
 ---
 
-### Task 2: Add the `secondary` family (neutral-derived)
+### Task 2: Add the `secondary` family (dedicated neutral-surface deriver)
 
-**Files:** Modify `derive-theme.ts` (`deriveMode`); Test: `derive-theme.test.ts`
+**Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-**Interfaces:** Consumes `deriveFamily` (Task 1). Secondary has **no border tokens** (curated has no `border-secondary`) → pass `{ borders: false }`. Seed = the background seed (neutral counterpart to primary).
+**Interfaces:** `deriveSecondary(mode: Mode): TokenMap`. Secondary is a **subtle neutral surface** family — curated maps it to the `neutral-*` ramp (light `bg=100/fg=900/subtle=100`, dark `bg=900/fg=100/subtle=800`), identical across every brand/base. It is **not** `deriveFamily('secondary', …)` (that sets `background=ramp-600`, a strong mid color — wrong). No border tokens.
 
-- [ ] **Step 1: Failing test**
+- [ ] **Step 1: Failing test** — assert secondary is a light surface in light / dark surface in dark, with the inverted foreground (not a mid ramp):
 
 ```ts
-it('derives a secondary family from the background seed, no border tokens', () => {
-  const { light } = deriveTheme({
-    appearance: 'light',
+function L(s: string) {
+  return Number(s.match(/oklch\(([\d.]+)/)![1]);
+}
+
+it('secondary is a subtle neutral surface family (not a solid ramp)', () => {
+  const c = {
+    appearance: 'light' as const,
     light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
     dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
     contrast: 60,
-  });
-  expect(light['--nx-color-secondary-background']).toBeTruthy();
-  expect(light['--nx-color-secondary-foreground']).toBeTruthy();
+  };
+  const { light, dark } = deriveTheme(c);
+  // light: background is a LIGHT neutral surface (L high), foreground is dark
+  expect(L(light['--nx-color-secondary-background'])).toBeGreaterThan(0.9);
+  expect(L(light['--nx-color-secondary-foreground'])).toBeLessThan(0.3);
+  // dark: inverted
+  expect(L(dark['--nx-color-secondary-background'])).toBeLessThan(0.3);
+  expect(L(dark['--nx-color-secondary-foreground'])).toBeGreaterThan(0.9);
+  // neutral: near-zero chroma
+  expect(light['--nx-color-secondary-background']).toMatch(
+    /oklch\([\d.]+ 0(\.0+)? /
+  );
   expect(light['--nx-color-border-secondary']).toBeUndefined();
 });
 ```
 
-- [ ] **Step 2: Run → FAIL** (`secondary-background` undefined).
+- [ ] **Step 2: Run → FAIL.**
 
-- [ ] **Step 3: Implement** — in `deriveMode`, add secondary off the background seed:
+- [ ] **Step 3: Provenance check** — confirm the neutral ramp values are current:
+      `grep -hE '\--nx-color-neutral-(50|100|200|300|600|700|800|900|950):' apps/console/public/themes/color.css`
+
+- [ ] **Step 4: Implement** — a fixed neutral ramp + the curated shade mapping:
 
 ```ts
-function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
-  const delta = contrastDelta(contrast);
-  const surfaces = deriveSurfaces(seeds.background, mode, delta);
-  const text = deriveText(seeds.foreground, surfaces);
-  const primary = deriveFamily('primary', seeds.accent, mode);
-  const secondary = deriveFamily('secondary', seeds.background, mode, {
-    borders: false,
-  });
-  return { ...surfaces, ...text, ...primary, ...secondary };
+const NEUTRAL: Record<string, string> = {
+  '50': 'oklch(0.985 0 0)',
+  '100': 'oklch(0.945 0 0)',
+  '200': 'oklch(0.87 0 0)',
+  '300': 'oklch(0.765 0 0)',
+  '600': 'oklch(0.46 0 0)',
+  '700': 'oklch(0.385 0 0)',
+  '800': 'oklch(0.297 0 0)',
+  '900': 'oklch(0.207 0 0)',
+  '950': 'oklch(0.118 0 0)',
+};
+
+export function deriveSecondary(mode: Mode): TokenMap {
+  const d = mode === 'dark';
+  const n = NEUTRAL;
+  return {
+    '--nx-color-secondary-background': d ? n['900'] : n['100'],
+    '--nx-color-secondary-background-hover': d ? n['700'] : n['200'],
+    '--nx-color-secondary-background-active': d ? n['600'] : n['300'],
+    '--nx-color-secondary-foreground': d ? n['100'] : n['900'],
+    '--nx-color-secondary-disabled': d ? n['950'] : n['50'],
+    '--nx-color-secondary-subtle': d ? n['800'] : n['100'],
+    '--nx-color-secondary-subtle-foreground': d ? n['200'] : n['600'],
+    '--nx-color-secondary-subtle-hover': d ? n['700'] : n['200'],
+    '--nx-color-secondary-subtle-active': d ? n['600'] : n['300'],
+  };
 }
+// in deriveMode: add `...deriveSecondary(mode)` to the returned map
 ```
 
-- [ ] **Step 4: Run → PASS.**
-- [ ] **Step 5: Commit** — `git commit -am "feat(core): derive the secondary family from the neutral seed"`
+- [ ] **Step 5: Run → PASS.**
+- [ ] **Step 6: Commit** — `git commit -am "feat(core): derive the secondary neutral-surface family"`
 
 ---
 
@@ -146,7 +179,7 @@ function deriveMode(seeds: ThemeSeeds, mode: Mode, contrast: number): TokenMap {
 
 **Interfaces:** Consumes `deriveFamily`. Add module constant `STATUS_SEEDS`. Status families **have** borders.
 
-- [ ] **Step 1: Failing test** (keys present + APCA on background and subtle)
+- [ ] **Step 1: Failing test** (keys present + APCA on background AND subtle)
 
 ```ts
 import { apcaLc } from './apca';
@@ -160,11 +193,18 @@ it('derives all four status families, APCA-legible on background and subtle', ()
     contrast: 60,
   });
   for (const s of ['success', 'warning', 'error', 'information']) {
-    const fg = dark[`--nx-color-${s}-foreground`];
     expect(
-      apcaLc(fg, dark[`--nx-color-${s}-background`])
+      apcaLc(
+        dark[`--nx-color-${s}-foreground`],
+        dark[`--nx-color-${s}-background`]
+      )
     ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
-    expect(dark[`--nx-color-${s}-subtle-foreground`]).toBeTruthy();
+    expect(
+      apcaLc(
+        dark[`--nx-color-${s}-subtle-foreground`],
+        dark[`--nx-color-${s}-subtle`]
+      )
+    ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
     expect(dark[`--nx-color-border-${s}`]).toBeTruthy();
   }
 });
@@ -172,30 +212,26 @@ it('derives all four status families, APCA-legible on background and subtle', ()
 
 - [ ] **Step 2: Run → FAIL.**
 
-- [ ] **Step 3: Implement** — add the constant and fold status into `deriveMode`:
+- [ ] **Step 3: Implement** — constant + fold into `deriveMode`:
 
 ```ts
 const STATUS_SEEDS: Record<string, string> = {
-  success: 'oklch(0.62 0.2233 140.055)', // green-600
-  warning: 'oklch(0.62 0.2044 41.116)', // orange-600
-  error: 'oklch(0.577 0.2523 27.926)', // red-600
-  information: 'oklch(0.546 0.2205 255.276)', // blue-600
+  success: 'oklch(0.62 0.2233 140.055)',
+  warning: 'oklch(0.62 0.2044 41.116)',
+  error: 'oklch(0.577 0.2523 27.926)',
+  information: 'oklch(0.546 0.2205 255.276)',
 };
-
-// in deriveMode, after `secondary`:
-const status = Object.entries(STATUS_SEEDS).flatMap(([name, seed]) =>
-  Object.entries(deriveFamily(name, seed, mode))
+// in deriveMode, build status and spread it:
+const status = Object.assign(
+  {},
+  ...Object.entries(STATUS_SEEDS).map(([name, seed]) =>
+    deriveFamily(name, seed, mode)
+  )
 );
-return {
-  ...surfaces,
-  ...text,
-  ...primary,
-  ...secondary,
-  ...Object.fromEntries(status),
-};
+// return { ...surfaces, ...text, ...primary, ...secondary, ...status, ...chart, ...alpha };
 ```
 
-- [ ] **Step 4: Run → PASS.**
+- [ ] **Step 4: Run → PASS.** (If a `-subtle-foreground` fails the floor, `quietText`/`readableOn`'s endpoint fallback already guarantees legibility — confirm the subtle deriver uses an APCA-checked on-color, not a fixed ramp shade, for `-subtle-foreground`.)
 - [ ] **Step 5: Commit** — `git commit -am "feat(core): derive the four status families from fixed canonical hues"`
 
 ---
@@ -203,8 +239,6 @@ return {
 ### Task 4: Per-mode surface-step model (flat light)
 
 **Files:** Modify `deriveSurfaces` in `derive-theme.ts`; Test: `derive-theme.test.ts`
-
-**Interfaces:** In `light`, `container` / `container-hover` / `container-active` / `popover` / `popover-hover` / `popover-active` / `muted` collapse to step 0 (flat — equal to background L); in `dark`, keep current steps.
 
 - [ ] **Step 1: Failing test**
 
@@ -225,7 +259,7 @@ it('light surfaces are flat (container/popover == background L); dark stays step
 
 - [ ] **Step 2: Run → FAIL** (light container is currently stepped).
 
-- [ ] **Step 3: Implement** — in `deriveSurfaces`, zero the elevation steps in light:
+- [ ] **Step 3: Implement** — in `deriveSurfaces`, zero the elevation steps in light. Rename the loop var to `rawStep`:
 
 ```ts
 const FLAT_IN_LIGHT = new Set([
@@ -237,11 +271,11 @@ const FLAT_IN_LIGHT = new Set([
   'popover-active',
   'muted',
 ]);
-// inside the for-loop, before computing L:
-const step = mode === 'light' && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
+for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
+  const step = mode === 'light' && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
+  // ...existing clamp01(bg.l + dir * step * delta)...
+}
 ```
-
-(Rename the loop variable: `for (const [token, rawStep] of Object.entries(SURFACE_STEPS))`.)
 
 - [ ] **Step 4: Run → PASS.**
 - [ ] **Step 5: Commit** — `git commit -am "feat(core): flat light surfaces, stepped dark (per-mode surface model)"`
@@ -252,9 +286,7 @@ const step = mode === 'light' && FLAT_IN_LIGHT.has(token) ? 0 : rawStep;
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-**Interfaces:** Add `CHART_LIGHT` / `CHART_DARK` constants (5 each) and emit `--nx-color-chart-categorical-{1..5}` per mode. Values are the existing audited set: light = teal-600 / lime-700 / orange-600 / rose-600 / indigo-600; dark = teal-200 / lime-200 / orange-200 / rose-200 / indigo-200.
-
-- [ ] **Step 1: Provenance check** — the constant values below are the curated set read from `color.css`; verify they still match before encoding:
+- [ ] **Step 1: Provenance check** — the constants below are the curated audited set; verify they still match:
       `grep -E '\--nx-color-(teal-600|lime-700|orange-600|rose-600|indigo-600|teal-200|lime-200|orange-200|rose-200|indigo-200):' apps/console/public/themes/color.css`
 
 - [ ] **Step 2: Failing test**
@@ -303,66 +335,76 @@ function deriveChart(mode: Mode): TokenMap {
 // add `...deriveChart(mode)` to deriveMode's return
 ```
 
-- [ ] **Step 4: Run → PASS**, then `pnpm --filter @nexus/core audit:colorblind` → green (the set is already audited).
+- [ ] **Step 4: Run → PASS**, then `pnpm --filter @nexus/core audit:colorblind` → green.
 - [ ] **Step 5: Commit** — `git commit -am "feat(core): emit the fixed colorblind-safe chart-categorical set"`
 
 ---
 
-### Task 6: Alpha / translucent tokens
+### Task 6: Mode-aware alpha / translucent tokens
 
 **Files:** Modify `derive-theme.ts`; Test: `derive-theme.test.ts`
 
-**Interfaces:** Emit `--nx-color-overlay`, `--nx-color-popover-backdrop`, `--nx-color-border-default-alpha`, `--nx-color-background-hover-alpha`, `--nx-color-popover-alpha`. Formula: the neutral seed's hue/chroma at a fixed dark lightness + a fixed per-token α (from the curated `*-a*` primitives): overlay α `0.7529`, popover-backdrop α `0.9098`, border-default-alpha α `0.0941`, background-hover-alpha α `0.0627`; `popover-alpha` is white at α `0.9098`.
+**Interfaces:** `deriveAlpha(backgroundHex: string, mode: Mode): TokenMap`. The translucent tokens are **mode-dependent** (verified against curated): `overlay` α `0.7529` light / `0.8471` dark; `border-default-alpha` α `0.0941` light / `0.1882` dark; `popover-alpha` is **white** in light (`oklch(1 0 0 / 0.9098)`) but a dark ink in dark (`α 0.8471`); `popover-backdrop` α `0.9098` both; `background-hover-alpha` α `0.0627` both. The "ink" tint = the background seed's hue/chroma at a fixed dark L (`0.13`), matching the curated `*-a*` tone alphas.
 
-- [ ] **Step 1: Failing test**
+- [ ] **Step 1: Failing test — assert BOTH modes**
 
 ```ts
-it('emits translucent tokens with the expected alphas', () => {
-  const { dark } = deriveTheme({
-    appearance: 'dark',
+it('emits mode-correct translucent tokens', () => {
+  const base = {
     light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
     dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
     contrast: 60,
-  });
-  expect(dark['--nx-color-overlay']).toMatch(/\/ 0\.7529\)$/);
-  expect(dark['--nx-color-popover-backdrop']).toMatch(/\/ 0\.9098\)$/);
-  expect(dark['--nx-color-border-default-alpha']).toMatch(/\/ 0\.0941\)$/);
+  };
+  const { light, dark } = deriveTheme({ appearance: 'light', ...base });
+  // overlay: alpha differs by mode
+  expect(light['--nx-color-overlay']).toMatch(/\/ 0\.7529\)$/);
+  expect(dark['--nx-color-overlay']).toMatch(/\/ 0\.8471\)$/);
+  // border-default-alpha: alpha differs by mode
+  expect(light['--nx-color-border-default-alpha']).toMatch(/\/ 0\.0941\)$/);
+  expect(dark['--nx-color-border-default-alpha']).toMatch(/\/ 0\.1882\)$/);
+  // popover-alpha: white in light, dark ink in dark
+  expect(light['--nx-color-popover-alpha']).toBe('oklch(1 0 0 / 0.9098)');
+  expect(dark['--nx-color-popover-alpha']).toMatch(/^oklch\(0\.13 /);
+  // backdrop + bg-hover-alpha: same alpha both modes
+  expect(light['--nx-color-popover-backdrop']).toMatch(/\/ 0\.9098\)$/);
+  expect(light['--nx-color-background-hover-alpha']).toMatch(/\/ 0\.0627\)$/);
 });
 ```
 
 - [ ] **Step 2: Run → FAIL.**
 
-- [ ] **Step 3: Implement** — seed hue/chroma from the background, fixed dark L:
+- [ ] **Step 3: Implement**
 
 ```ts
-function deriveAlpha(backgroundHex: string): TokenMap {
+function deriveAlpha(backgroundHex: string, mode: Mode): TokenMap {
   const s = seedOklch(backgroundHex);
   const c = (s.c ?? 0).toFixed(4),
     h = (s.h ?? 0).toFixed(1);
-  const tint = (a: number) => `oklch(0.13 ${c} ${h} / ${a})`;
+  const ink = (a: number) => `oklch(0.13 ${c} ${h} / ${a})`;
+  const dark = mode === 'dark';
   return {
-    '--nx-color-overlay': tint(0.7529),
-    '--nx-color-popover-backdrop': tint(0.9098),
-    '--nx-color-border-default-alpha': tint(0.0941),
-    '--nx-color-background-hover-alpha': tint(0.0627),
-    '--nx-color-popover-alpha': 'oklch(1 0 0 / 0.9098)',
+    '--nx-color-overlay': ink(dark ? 0.8471 : 0.7529),
+    '--nx-color-popover-backdrop': ink(0.9098),
+    '--nx-color-border-default-alpha': ink(dark ? 0.1882 : 0.0941),
+    '--nx-color-background-hover-alpha': ink(0.0627),
+    '--nx-color-popover-alpha': dark ? ink(0.8471) : 'oklch(1 0 0 / 0.9098)',
   };
 }
-// add `...deriveAlpha(seeds.background)` to deriveMode's return
+// in deriveMode: add `...deriveAlpha(seeds.background, mode)`
 ```
 
 - [ ] **Step 4: Run → PASS.**
-- [ ] **Step 5: Commit** — `git commit -am "feat(core): derive translucent/alpha tokens from the neutral seed"`
+- [ ] **Step 5: Commit** — `git commit -am "feat(core): derive mode-aware translucent/alpha tokens"`
 
 ---
 
-### Task 7: Token-parity invariant (derived keys == curated keys)
+### Task 7: Token KEY-parity invariant (derived keys == curated keys, incl. charts)
 
 **Files:** Test: `packages/core/src/lib/derive-theme.parity.test.ts` (new)
 
-**Interfaces:** Consumes `deriveTheme`. Reads the curated key set from `apps/console/public/themes/base-slate.css` + `brands-blue.css` (the canonical full set), filtered to `--nx-color-*` **semantic** keys (exclude primitive ramps `*-50..950` / `*-a*` and the `chart-categorical` which we now own).
+**Interfaces:** Consumes `deriveTheme`. Reads the curated key set from `base-slate.css` + `brands-blue.css` **+ `chart-categorical-default.css`** (chart tokens live in their own file — without it the parity gate never proves chart coverage). This asserts **key** parity (names), not value parity.
 
-- [ ] **Step 1: Write the test** — it will fail on any missing key, which is the point:
+- [ ] **Step 1: Write the test**
 
 ```ts
 import { readFileSync } from 'node:fs';
@@ -371,18 +413,17 @@ import { deriveTheme } from './derive-theme';
 
 const PRIMITIVE = /-(50|100|200|300|400|500|600|700|800|900|950|base|a\d+)$/;
 function curatedKeys(): Set<string> {
-  const css = ['base-slate', 'brands-blue']
+  const css = ['base-slate', 'brands-blue', 'chart-categorical-default']
     .map((f) => readFileSync(`apps/console/public/themes/${f}.css`, 'utf8'))
     .join('\n');
   const keys = new Set<string>();
   for (const m of css.matchAll(/(--nx-color-[\w-]+):/g)) {
-    const k = m[1];
-    if (!PRIMITIVE.test(k)) keys.add(k);
+    if (!PRIMITIVE.test(m[1])) keys.add(m[1]); // chart-categorical-1..5 survive (not primitives)
   }
   return keys;
 }
 
-it('deriveTheme emits every curated semantic --nx-color-* key', () => {
+it('deriveTheme emits every curated semantic --nx-color-* key (key parity)', () => {
   const { light } = deriveTheme({
     appearance: 'light',
     light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
@@ -395,52 +436,60 @@ it('deriveTheme emits every curated semantic --nx-color-* key', () => {
 });
 ```
 
-- [ ] **Step 2: Run → FAIL**, listing whatever keys remain underived (e.g. `control-thumb` edge cases, `nav-border`). Fix each by adding it to the relevant deriver (e.g. `nav-border` to `SURFACE_STEPS`, `disabled-foreground` already present). Iterate until `missing` is `[]`.
-
+- [ ] **Step 2: Run → FAIL**, listing remaining underived keys (e.g. `nav-border`, any stray border/control token). Add each to its deriver (`nav-border` → `SURFACE_STEPS`, etc.) until `missing` is `[]`.
 - [ ] **Step 3: Run → PASS.**
-- [ ] **Step 4: Commit** — `git commit -am "test(core): assert deriveTheme emits the full curated token set"`
+- [ ] **Step 4: Commit** — `git commit -am "test(core): assert deriveTheme key-parity with the full curated set (incl. charts)"`
 
 ---
 
-### Task 8: Extend the APCA legibility sweep + colorblind
+### Task 8: Extend the APCA legibility sweep (background AND subtle) + colorblind
 
 **Files:** Modify the legibility sweep in `derive-theme.test.ts`
 
-**Interfaces:** The existing free-form-contract sweep must also assert status `-foreground` on `-background` AND on `-subtle`, and `secondary-foreground` on `secondary-background`, across the sweep's seed matrix, at the tier thresholds.
+**Interfaces:** Across the sweep's seed matrix and both modes, assert, for every status family **and secondary**: `-foreground` on `-background`, **and** `-subtle-foreground` on `-subtle`.
 
-- [ ] **Step 1: Extend the sweep** — inside the existing loop over seed contracts/modes, add:
+- [ ] **Step 1: Extend the sweep** — inside the existing loop over seed contracts/modes:
 
 ```ts
 for (const fam of ['success', 'warning', 'error', 'information', 'secondary']) {
-  const bg = tokens[`--nx-color-${fam}-background`];
-  const fg = tokens[`--nx-color-${fam}-foreground`];
-  expect(apcaLc(fg, bg)).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+  expect(
+    apcaLc(
+      tokens[`--nx-color-${fam}-foreground`],
+      tokens[`--nx-color-${fam}-background`]
+    )
+  ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+  expect(
+    apcaLc(
+      tokens[`--nx-color-${fam}-subtle-foreground`],
+      tokens[`--nx-color-${fam}-subtle`]
+    )
+  ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
 }
 ```
 
-- [ ] **Step 2: Run → PASS** (status uses readable on-color; if any fail, the `readableOn` fallback already guarantees the higher-contrast endpoint).
-- [ ] **Step 3: Commit** — `git commit -am "test(core): extend APCA sweep to status + secondary families"`
+- [ ] **Step 2: Run → PASS.** If a `-subtle-foreground` fails, make that token APCA-derived (run it through the same `readableOn`/`quietText` check against its subtle surface) rather than a fixed ramp shade. Re-run → PASS.
+- [ ] **Step 3: Commit** — `git commit -am "test(core): APCA sweep covers status + secondary on background AND subtle"`
 
 ---
 
-### Task 9: Tone-seed calibration (the parity cutover gate)
+### Task 9: Tone-seed calibration + the cutover gate (no silent escape hatch)
 
-**Files:** Test: `packages/core/src/lib/tone-parity.test.ts` (new); data: a `TONE_SEEDS` constant (in `derive-theme.ts` or a sibling) holding the 5 calibrated seeds.
+**Files:** Test: `packages/core/src/lib/tone-parity.test.ts` (new); fixture: `tone-curated.fixture.json`; data: a `TONE_SEEDS` constant.
 
-**Interfaces:** For each named tone, the derived surfaces must be within tolerance of today's curated values (extracted as in the `curated-vs-engine-tones` artifact). This is the gate that authorizes deleting a tone's static CSS (in Phase D).
+**Interfaces:** For each of the 5 named tones, the derived surfaces must be within tolerance of today's curated values. **Phase A is not complete until all five tones pass** — there is no "ship anyway and keep the curated file" follow-up. If a tone genuinely cannot be matched, that is a blocking decision: either fix the derivation or make those specific tokens an _explicit, documented_ item of the public package contract (Phase B), not a silent residual.
 
-- [ ] **Step 1: Encode the curated reference** — reuse the extraction from `reports/curated-vs-engine-tones.html` (or re-run the `/tmp/extract-tones.mjs` approach) to get curated `{background,muted,container,popover,border-default}` per tone/mode. Commit them as a fixture `tone-curated.fixture.json`.
+- [ ] **Step 1: Build the curated fixture** — run the extraction (the approach in `reports/curated-vs-engine-tones.html` / a small node script over `base-*.css` + `color.css`) to get curated `{background,muted,container,popover,border-default}` per tone/mode; write `tone-curated.fixture.json`.
 
-- [ ] **Step 2: Write the parity test** (tolerance ΔL ≤ 0.04 on dark surfaces; light is flat by Q4 so background drives it):
+- [ ] **Step 2: Write the parity test** (dark surfaces; light is flat by Q4 so background drives it):
 
 ```ts
-import curated from './tone-curated.fixture.json'; // the Step 1 fixture
-const parseL = (s: string) => Number(s.match(/oklch\(([\d.]+)/)![1]);
+import curated from './tone-curated.fixture.json';
+const L = (s: string) => Number(s.match(/oklch\(([\d.]+)/)![1]);
 
 it.each(['slate', 'neutral', 'zinc', 'gray', 'stone'])(
   'engine reproduces the %s tone within tolerance (dark)',
   (tone) => {
-    const seed = TONE_SEEDS[tone]; // calibrated { light:{bg,fg}, dark:{bg,fg} }
+    const seed = TONE_SEEDS[tone]; // { light:{accent,background,foreground}, dark:{...} }
     const { dark } = deriveTheme({
       appearance: 'dark',
       light: seed.light,
@@ -448,27 +497,26 @@ it.each(['slate', 'neutral', 'zinc', 'gray', 'stone'])(
       contrast: TONE_CONTRAST,
     });
     for (const tok of ['container', 'popover', 'muted']) {
-      const dl = Math.abs(
-        parseL(dark[`--nx-color-${tok}`]) - parseL(curated[tone].dark[tok])
-      );
-      expect(dl).toBeLessThanOrEqual(0.04);
+      expect(
+        Math.abs(L(dark[`--nx-color-${tok}`]) - L(curated[tone].dark[tok]))
+      ).toBeLessThanOrEqual(0.04);
     }
   }
 );
 ```
 
-- [ ] **Step 3: Calibrate** — start `TONE_SEEDS[tone]` = the curated background/foreground for that tone; run the test; if a surface exceeds tolerance, adjust `TONE_CONTRAST` (curated dark sits near Δ≈0.09 → contrast ≈ 90) and/or the seed L until green. Record any tone that can't be matched as a follow-up (it keeps its curated CSS).
-
-- [ ] **Step 4: Run → PASS** for every matchable tone.
-- [ ] **Step 5: Commit** — `git commit -am "feat(core): calibrate the 5 tone seeds + parity gate for static-CSS cutover"`
+- [ ] **Step 3: Calibrate** — start `TONE_SEEDS[tone]` = the curated background/foreground; run; if a surface exceeds tolerance, adjust `TONE_CONTRAST` (curated dark sits near Δ≈0.09 → contrast ≈ 90) and/or the seed L until green. **All five must pass** before this task is done.
+- [ ] **Step 4: Run → PASS for all five.**
+- [ ] **Step 5: Commit** — `git commit -am "feat(core): calibrate 5 tone seeds; full-parity cutover gate"`
 
 ---
 
 ## Done when
 
-- `pnpm test:unit` green, including the parity invariant (Task 7) and the extended APCA sweep (Task 8).
+- `pnpm test:unit` green: the key-parity invariant (Task 7), the extended APCA sweep (Task 8, background + subtle), and tone parity for **all five** tones (Task 9).
 - `pnpm --filter @nexus/core audit:colorblind` green.
 - `pnpm typecheck && pnpm lint` clean.
-- A `deriveTheme` call emits **every** curated semantic `--nx-color-*` key — verified, not asserted by hand.
+- A `deriveTheme` call emits **every** curated semantic `--nx-color-*` key (incl. `chart-categorical-*`) — verified, not asserted by hand.
+- No tone left on static CSS as a silent follow-up: every named tone is either derived within tolerance or its residual tokens are an explicit, documented public-contract item.
 
-Phase B (packaging) consumes this surface; do not start it until Task 7 is green (the token set is the public contract B freezes).
+Phase B (packaging) consumes this surface; do not start it until Task 7 + Task 9 are green (the token set is the public contract B freezes).
