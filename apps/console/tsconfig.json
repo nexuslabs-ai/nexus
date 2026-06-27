@@ -1,6 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@nexus/react/appearance": ["packages/react/src/appearance/index.ts"]
+    },
     "useDefineForClassFields": true,
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",

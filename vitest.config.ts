@@ -8,6 +8,10 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './packages/react/src'),
       '@nexus/core': path.resolve(__dirname, './packages/core/src/index.ts'),
+      '@nexus/react/appearance': path.resolve(
+        __dirname,
+        './packages/react/src/appearance/index.ts'
+      ),
     },
   },
   optimizeDeps: {
