@@ -1,11 +1,9 @@
-import { Button, Kbd, KbdGroup, SidebarTrigger } from '@nexus/react';
-import { IconMoon, IconSearch, IconSun } from '@tabler/icons-react';
-
-import { useThemeContext } from '../app/theme-provider';
-import { toggledAppearance } from '../lib/appearance-theme';
+import { Kbd, KbdGroup, SidebarTrigger } from '@nexus/react';
+import { NexusThemeQuickControl } from '@nexus/react/appearance';
+import { IconSearch } from '@tabler/icons-react';
+import { useNavigate } from '@tanstack/react-router';
 
 import { NotificationsMenu } from './notifications-menu';
-import { ThemeQuickControl } from './theme-quick-control';
 
 interface TopbarProps {
   /** Opens the ⌘K command palette — fired by the search button. */
@@ -14,18 +12,11 @@ interface TopbarProps {
 
 /**
  * App-shell top bar: sidebar toggle, the ⌘K search button that opens the
- * command palette, the notifications bell, the theme quick-control, and a
- * dark-mode quick-toggle wired to the root theme.
+ * command palette, the notifications bell, and the package-owned appearance
+ * quick-control wired to the shared root appearance provider.
  */
 export function Topbar({ onSearchClick }: TopbarProps) {
-  const { codexContract, setCodexContract } = useThemeContext();
-  const dark = codexContract.appearance === 'dark';
-  const toggleAppearance = () => {
-    setCodexContract((contract) => ({
-      ...contract,
-      appearance: toggledAppearance(contract.appearance),
-    }));
-  };
+  const navigate = useNavigate();
 
   return (
     <header className="nx:bg-background nx:border-border-default nx:flex nx:h-14 nx:items-center nx:gap-3 nx:border-b nx:px-4">
@@ -48,16 +39,9 @@ export function Topbar({ onSearchClick }: TopbarProps) {
 
       <NotificationsMenu />
 
-      <ThemeQuickControl />
-
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        onClick={toggleAppearance}
-        aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
-      >
-        {dark ? <IconSun /> : <IconMoon />}
-      </Button>
+      <NexusThemeQuickControl
+        onCustomize={() => navigate({ to: '/design/appearance' })}
+      />
     </header>
   );
 }

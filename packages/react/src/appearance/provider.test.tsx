@@ -9,6 +9,7 @@ import {
   deriveTheme,
   type NexusAppearanceState,
   sanitizeNexusAppearance,
+  SNAPSHOT_VERSION,
   themeToCss,
 } from '@nexus/core';
 import { act, render, renderHook, waitFor } from '@testing-library/react';
@@ -178,7 +179,11 @@ describe('NexusAppearanceProvider', () => {
     new Function(createNexusAppearanceBootstrapScript())();
     expect(
       document.querySelector('style[data-nexus-appearance-theme]')?.textContent
-    ).toBe('STALE');
+    ).toBe(
+      themeToCss(
+        deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE))
+      )
+    );
 
     renderHook(() => useNexusAppearance(), {
       wrapper: wrapperFor(),
@@ -260,7 +265,7 @@ describe('NexusAppearanceProvider', () => {
       const snapshot = JSON.parse(window.localStorage.getItem(key) ?? '{}');
 
       expect(snapshot).toMatchObject({
-        version: 1,
+        version: SNAPSHOT_VERSION,
         state: { surfaceTone: 'slate' },
       });
       expect(typeof snapshot.themeCss).toBe('string');
@@ -299,7 +304,7 @@ describe('NexusAppearanceProvider', () => {
       const snapshot = JSON.parse(window.localStorage.getItem(key) ?? '{}');
 
       expect(snapshot).toMatchObject({
-        version: 1,
+        version: SNAPSHOT_VERSION,
         state: { mode: 'dark', surfaceTone: 'gray' },
       });
       expect(snapshot.themeCss).not.toBe('STALE');

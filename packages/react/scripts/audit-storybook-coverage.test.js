@@ -341,6 +341,14 @@ describe('file discovery', () => {
     expect(stories.endsWith('Button.stories.tsx')).toBe(true);
   });
 
+  it('resolves appearance components from src/appearance', () => {
+    const file = findComponentFile('appearance-settings');
+    expect(file.endsWith('/src/appearance/appearance-settings.tsx')).toBe(true);
+
+    const result = auditComponent(file);
+    expect(result.findings).toEqual([]);
+  });
+
   it('throws ConfigError for missing components', () => {
     expect(() => findComponentFile('nonexistent-component')).toThrow(
       /not found/

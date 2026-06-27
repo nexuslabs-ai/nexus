@@ -122,7 +122,7 @@ export function NexusAppearanceSettings() {
   };
 
   return (
-    <div className="nx:space-y-6">
+    <div data-slot="appearance-settings" className="nx:space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Theme</CardTitle>

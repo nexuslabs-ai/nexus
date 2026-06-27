@@ -20,15 +20,21 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { COMPONENT_SUBDIRS, componentDirSegment } from './component-paths.mjs';
+import {
+  APPEARANCE_SOURCE_DIR,
+  COMPONENT_SOURCE_DIRS,
+  componentDirSegment,
+  sourceRootSegment,
+} from './component-paths.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = path.join(__dirname, 'base-variants.config.json');
 const SEMANTIC_DIR = path.join(__dirname, '../../core/tokens/semantic');
 const PRIMITIVES_PATH = path.join(__dirname, '../../core/tokens/primitives/color.json');
+const SRC_DIR = path.join(__dirname, '../src');
 const COMPONENTS_DIR = path.join(__dirname, '../src/components');
 const OUT_DIR = path.join(__dirname, '../src/components/__generated__');
-const KNOWN_SOURCE_DIRS = new Set(COMPONENT_SUBDIRS);
+const KNOWN_SOURCE_DIRS = new Set(COMPONENT_SOURCE_DIRS);
 
 function readJson(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -163,6 +169,10 @@ function resolveSourceDir(component) {
  * full generator.
  */
 export function storiesImportPath(component, sourceDir) {
+  if (sourceDir === APPEARANCE_SOURCE_DIR) {
+    return `../../appearance/${component.name}.stories`;
+  }
+
   return `../${componentDirSegment(sourceDir, component.name)}/${component.name}.stories`;
 }
 
@@ -171,7 +181,8 @@ export function storiesImportPath(component, sourceDir) {
  */
 function storiesFilePath(component, sourceDir) {
   return path.join(
-    COMPONENTS_DIR,
+    SRC_DIR,
+    sourceRootSegment(sourceDir),
     componentDirSegment(sourceDir, component.name),
     `${component.name}.stories.tsx`
   );

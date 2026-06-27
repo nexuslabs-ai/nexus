@@ -19,7 +19,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\" \".claude/**/*.md\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens:modular": "pnpm --filter @nexus/core build:tokens:modular && node scripts/sync-console-themes.js && node scripts/sync-docs-themes.js",
+    "tokens:modular": "pnpm --filter @nexus/core build:tokens:modular && node scripts/sync-docs-themes.js",
     "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:browser-support": "node scripts/audit-browser-support.js",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",

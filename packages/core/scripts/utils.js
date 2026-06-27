@@ -1755,14 +1755,6 @@ export function generateThemeCSS(config) {
   css += `  --shadow-*: initial;\n`;
   css += `  --breakpoint-*: initial;\n\n`;
 
-  // Semantic colour tokens (dimensions like --focus-offset emit at :root)
-  if (semanticTokens.length > 0) {
-    css += `  /* Semantic tokens */\n`;
-    for (const token of semanticTokens) {
-      css += `  --${token.cssName}: ${token.value};\n`;
-    }
-  }
-
   // Spacing tokens (numeric Vega defaults — see generateSpacingModesCSS for
   // per-mode overrides emitted outside @theme).
   if (spacingTokens.length > 0) {
@@ -1823,6 +1815,30 @@ export function generateThemeCSS(config) {
   }
 
   css += `}\n`;
+
+  // Semantic colour utilities need their fallback expression inlined into the
+  // generated utility, otherwise Tailwind's `prefix(nx)` rewrites the @theme
+  // variable to the same `--nx-color-*` name that the runtime provider owns.
+  if (semanticTokens.length > 0) {
+    css += `\n@theme inline {\n`;
+    css += `  /* Semantic tokens */\n`;
+    for (const token of semanticTokens) {
+      const value = token.cssName.startsWith('color-')
+        ? `var(--nx-${token.cssName}, ${token.value})`
+        : token.value;
+      css += `  --${token.cssName}: ${value};\n`;
+    }
+    css += `}\n`;
+
+    css += `\n/* ===== RUNTIME COLOR ALIASES ===== */\n`;
+    css += `:root {\n`;
+    for (const token of semanticTokens.filter((token) =>
+      token.cssName.startsWith('color-')
+    )) {
+      css += `  --${token.cssName}: var(--nx-${token.cssName}, ${token.value});\n`;
+    }
+    css += `}\n`;
+  }
 
   // Dark mode block (if provided)
   if (darkSemanticTokens.length > 0) {

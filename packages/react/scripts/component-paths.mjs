@@ -1,6 +1,6 @@
 /*
- * component-paths.mjs — canonical layout of the subdirectories under
- * packages/react/src/components/ that hold first-party Nexus components.
+ * component-paths.mjs — canonical layout of the source directories that hold
+ * first-party Nexus components.
  *
  * Imported by both audit-storybook-coverage.mjs (resolves component files by
  * kebab name) and generate-base-variants.mjs (validates the optional
@@ -9,6 +9,11 @@
  */
 
 export const COMPONENT_SUBDIRS = ['ui', 'primitives'];
+export const APPEARANCE_SOURCE_DIR = 'appearance';
+export const COMPONENT_SOURCE_DIRS = [
+  ...COMPONENT_SUBDIRS,
+  APPEARANCE_SOURCE_DIR,
+];
 
 /*
  * Subdirs using the per-component folder layout: each component lives in
@@ -32,5 +37,10 @@ export function toKebab(name) {
  * Nested: `{subdir}/{kebab}`. Flat: `{subdir}`.
  */
 export function componentDirSegment(subdir, name) {
+  if (subdir === APPEARANCE_SOURCE_DIR) return '';
   return NESTED_SUBDIRS.has(subdir) ? `${subdir}/${toKebab(name)}` : subdir;
+}
+
+export function sourceRootSegment(sourceDir) {
+  return sourceDir === APPEARANCE_SOURCE_DIR ? 'appearance' : 'components';
 }

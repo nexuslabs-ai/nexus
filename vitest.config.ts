@@ -5,10 +5,27 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './packages/react/src'),
-      '@nexus/core': path.resolve(__dirname, './packages/core/src/index.ts'),
-    },
+    alias: [
+      {
+        find: '@nexus/core',
+        replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
+      },
+      {
+        find: '@nexus/react/appearance',
+        replacement: path.resolve(
+          __dirname,
+          './packages/react/src/appearance/index.ts'
+        ),
+      },
+      {
+        find: /^@nexus\/react$/,
+        replacement: path.resolve(__dirname, './packages/react/src/index.ts'),
+      },
+      {
+        find: /^@\//,
+        replacement: `${path.resolve(__dirname, './packages/react/src')}/`,
+      },
+    ],
   },
   optimizeDeps: {
     include: [

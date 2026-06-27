@@ -8,6 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from '@nexus/react';
+import { useNexusAppearance } from '@nexus/react/appearance';
 import {
   IconAddressBook,
   IconBriefcase,
@@ -20,14 +21,13 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 
-import { useThemeContext } from '../app/theme-provider';
-import { toggledAppearance } from '../lib/appearance-theme';
 import { crmKeys, fetchContacts } from '../lib/crm-api';
 import { fetchConversations, inboxKeys } from '../lib/inbox-api';
 import { fetchMembers, peopleKeys } from '../lib/people-api';
 import { fetchIssues, projectKeys } from '../lib/projects-api';
 
 import { MODULE_ITEMS } from './modules';
+import { nextMode } from './next-mode';
 
 interface CommandPaletteProps {
   /** Whether the palette is open — lifted to the app shell (⌘K toggles it). */
@@ -46,9 +46,9 @@ interface CommandPaletteProps {
  */
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
-  const { codexContract, setCodexContract } = useThemeContext();
+  const { resolvedMode, setState } = useNexusAppearance();
   const [query, setQuery] = useState('');
-  const dark = codexContract.appearance === 'dark';
+  const dark = resolvedMode === 'dark';
 
   // Prefetch the four record sets the moment the palette opens (not on type) so
   // the lists are warm before the first keystroke — no empty-state flash.
@@ -106,9 +106,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   };
 
   const toggleAppearance = () => {
-    setCodexContract((contract) => ({
-      ...contract,
-      appearance: toggledAppearance(contract.appearance),
+    setState((state) => ({
+      ...state,
+      mode: nextMode(state.mode, resolvedMode),
     }));
   };
 

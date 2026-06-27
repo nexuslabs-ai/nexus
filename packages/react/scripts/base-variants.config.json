@@ -168,6 +168,18 @@
     },
     { "name": "Toggle", "showcase": "AllVariants" },
     { "name": "ToggleGroup", "showcase": "AllVariants" },
+    {
+      "name": "AppearanceSettings",
+      "sourceDir": "appearance",
+      "showcase": "Default",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"]
+    },
+    {
+      "name": "ThemeQuickControl",
+      "sourceDir": "appearance",
+      "showcase": "Default",
+      "interactions": ["ClickInteraction", "KeyboardInteraction"]
+    },
     { "name": "Tooltip", "showcase": "AllVariants" }
   ]
 }

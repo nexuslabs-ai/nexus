@@ -1,5 +1,3 @@
-import { useThemeContext } from '../../app/theme-provider';
-
 import { SettingsScene } from './settings/SettingsScene';
 
 /**
@@ -8,6 +6,5 @@ import { SettingsScene } from './settings/SettingsScene';
  * the console.
  */
 export function ScenesRoute() {
-  const { theme, setTheme } = useThemeContext();
-  return <SettingsScene theme={theme} setTheme={setTheme} />;
+  return <SettingsScene />;
 }
