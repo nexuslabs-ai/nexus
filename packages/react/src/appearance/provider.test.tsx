@@ -1,15 +1,8 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import { DEFAULT_NEXUS_APPEARANCE } from '@nexus/core';
-import {
-  act,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  renderHook,
-  vi,
-} from '@nexus/test-utils';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { NexusAppearanceProvider, useNexusAppearance } from './provider';
 
