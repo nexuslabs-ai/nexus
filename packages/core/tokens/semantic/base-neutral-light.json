@@ -74,7 +74,7 @@
     "$type": "color"
   },
   "popover-alpha": {
-    "$value": "{white.a900}",
+    "$value": "{white.a700}",
     "$type": "color"
   },
   "popover-backdrop": {

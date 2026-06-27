@@ -481,8 +481,8 @@ function deriveAlpha(
     '--nx-color-border-default-alpha': toneInk(profile.borderAlpha),
     '--nx-color-background-hover-alpha': toneInk(profile.hoverAlpha),
     '--nx-color-popover-alpha': dark
-      ? toneInk(0.8471)
-      : 'oklch(1 0 0 / 0.9098)',
+      ? toneInk(0.7529)
+      : 'oklch(1 0 0 / 0.7529)',
     '--nx-color-border-default': contrastInk(profile.borderAlpha),
     '--nx-color-border-disabled': contrastInk(profile.borderAlpha),
   };
