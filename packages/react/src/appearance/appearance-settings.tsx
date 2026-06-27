@@ -108,7 +108,6 @@ export function NexusAppearanceSettings() {
   };
 
   const setFontSize = (key: 'uiFontSize' | 'codeFontSize', value: number) => {
-    // The provider sanitizes every update (NaN → default, clamp [8,32]).
     if (key === 'uiFontSize') {
       updatePrefs({ uiFontSize: value });
       return;
@@ -141,6 +140,7 @@ export function NexusAppearanceSettings() {
               value={state.mode}
               onValueChange={setMode}
               variant="outline"
+              aria-label="Mode"
             >
               <ToggleGroupItem value="light">Light</ToggleGroupItem>
               <ToggleGroupItem value="dark">Dark</ToggleGroupItem>
@@ -318,6 +318,7 @@ export function NexusAppearanceSettings() {
               onCheckedChange={(pointerCursors) =>
                 updatePrefs({ pointerCursors })
               }
+              aria-label="Use pointer cursors"
             />
           </NexusAppearanceSettingRow>
           <NexusAppearanceSettingRow label="Reduce motion">
@@ -326,6 +327,7 @@ export function NexusAppearanceSettings() {
               value={state.prefs.reduceMotion}
               onValueChange={setReduceMotion}
               variant="outline"
+              aria-label="Reduce motion"
             >
               <ToggleGroupItem value="system">System</ToggleGroupItem>
               <ToggleGroupItem value="on">On</ToggleGroupItem>
@@ -341,6 +343,7 @@ export function NexusAppearanceSettings() {
               onCheckedChange={(fontSmoothing) =>
                 updatePrefs({ fontSmoothing })
               }
+              aria-label="Font smoothing"
             />
           </NexusAppearanceSettingRow>
         </CardContent>

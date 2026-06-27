@@ -7,6 +7,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -146,8 +147,6 @@ export function NexusAppearanceProvider({
   const [internalState, setInternalState] = useState<NexusAppearanceState>(() =>
     readStoredState(storageKey, initialState)
   );
-  // Controlled state is trusted as-is — the parent owns it. `sanitizeNexusAppearance`
-  // is exported for parents to validate untrusted input before passing it in.
   const activeState = state ?? internalState;
   const [resolvedMode, setResolvedMode] = useState<NexusResolvedAppearanceMode>(
     () => resolveAppearanceMode(activeState.mode)
@@ -163,14 +162,11 @@ export function NexusAppearanceProvider({
 
   const setState = useCallback<Dispatch<SetStateAction<NexusAppearanceState>>>(
     (update) => {
-      // Uncontrolled path uses the functional updater so synchronous
-      // back-to-back updates compose instead of collapsing onto the render
-      // snapshot. Controlled mode never owns internal state — the parent does.
-      if (!isControlled) {
-        setInternalState((previous) => nextAppearanceState(update, previous));
+      if (isControlled) {
+        onStateChange?.(nextAppearanceState(update, activeState));
+        return;
       }
-
-      onStateChange?.(nextAppearanceState(update, activeState));
+      setInternalState((previous) => nextAppearanceState(update, previous));
     },
     [activeState, isControlled, onStateChange]
   );
@@ -178,6 +174,19 @@ export function NexusAppearanceProvider({
   const reset = useCallback(() => {
     setState(initialState);
   }, [initialState, setState]);
+
+  // First effect run is the initial mount; skip it so we notify only on updates.
+  const onStateChangeRef = useRef(onStateChange);
+  onStateChangeRef.current = onStateChange;
+  const notifiedOnceRef = useRef(false);
+  useEffect(() => {
+    if (isControlled) return;
+    if (!notifiedOnceRef.current) {
+      notifiedOnceRef.current = true;
+      return;
+    }
+    onStateChangeRef.current?.(internalState);
+  }, [internalState, isControlled]);
 
   useEffect(() => {
     if (!isControlled) {
