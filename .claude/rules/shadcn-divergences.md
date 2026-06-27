@@ -5,19 +5,18 @@
 
 ## Quick Reference
 
-| Category           | shadcn/ui              | Nexus                                  |
-| ------------------ | ---------------------- | -------------------------------------- |
-| CSS Prefix         | none                   | `nx:`                                  |
-| Token path         | `bg-primary`           | `nx:bg-primary-background`             |
-| Destructive naming | `destructive`          | `error`                                |
-| Hover states       | `hover:bg-primary/90`  | `nx:hover:bg-primary-background-hover` |
-| Accent (hover)     | `hover:bg-accent`      | `nx:hover:bg-background-hover`         |
-| Card/container     | `bg-card`              | `nx:bg-container`                      |
-| Border input       | `border-input`         | `nx:border-border-default`             |
-| Focus ring         | `ring-ring`            | `nx:outline-focus-default`             |
-| Overlay            | `bg-black/80`          | `nx:bg-overlay`                        |
-| Component sizing   | Fixed heights (`h-10`) | Padding-based (`px-4 py-2`)            |
-| Data attributes    | Optional               | Required                               |
+| Category           | shadcn/ui             | Nexus                                  |
+| ------------------ | --------------------- | -------------------------------------- |
+| CSS Prefix         | none                  | `nx:`                                  |
+| Token path         | `bg-primary`          | `nx:bg-primary-background`             |
+| Destructive naming | `destructive`         | `error`                                |
+| Hover states       | `hover:bg-primary/90` | `nx:hover:bg-primary-background-hover` |
+| Accent (hover)     | `hover:bg-accent`     | `nx:hover:bg-background-hover`         |
+| Card/container     | `bg-card`             | `nx:bg-container`                      |
+| Border input       | `border-input`        | `nx:border-border-default`             |
+| Focus ring         | `ring-ring`           | `nx:outline-focus-default`             |
+| Overlay            | `bg-black/80`         | `nx:bg-overlay`                        |
+| Data attributes    | Optional              | Required                               |
 
 ## Token Architecture
 
@@ -296,14 +295,20 @@ The Nexus `overlay` token has built-in opacity appropriate for modal overlays.
 
 ### Sizing
 
-| shadcn             | Nexus               | Notes                |
-| ------------------ | ------------------- | -------------------- |
-| `h-10 px-4 py-2`   | `nx:px-4 nx:py-2`   | Remove fixed heights |
-| `h-9 px-3`         | `nx:px-3 nx:py-1.5` | Padding-based        |
-| `h-11 px-8`        | `nx:px-8 nx:py-3`   | Padding-based        |
-| `h-10 w-10` (icon) | `nx:p-2.5`          | Square padding       |
+Use [components.md § Sizing Convention](components.md#sizing-convention) for
+surfaces with an explicit sizing contract. The examples below are translations
+for listed surfaces, not general defaults for every adapted component.
 
-**Why:** Fixed heights break in flex layouts. Padding-based sizing is more robust.
+| shadcn             | Nexus                       | Applies to                                 |
+| ------------------ | --------------------------- | ------------------------------------------ |
+| `h-10 px-4 py-2`   | `nx:h-10 nx:px-3 nx:py-0`   | Default `Button`, `Input`, `SelectTrigger` |
+| `h-9 px-3`         | `nx:h-8 nx:px-2.5 nx:py-0`  | Compact `Button` and `Input`               |
+| `h-11 px-8`        | `nx:h-12 nx:px-3.5 nx:py-0` | Large `Button` and `Input`                 |
+| `h-10 w-10` (icon) | `nx:size-10 nx:p-0`         | Default icon-only `Button`                 |
+
+For any adapted component not listed there, do not copy a row by analogy.
+Inspect the component, choose the contract explicitly, and update the table in
+the same PR.
 
 ### Data Attributes (Required)
 
@@ -354,7 +359,7 @@ When adapting shadcn components:
 
 ### Component Structure
 
-- [ ] Remove fixed heights (`h-10`, `h-9`, `h-11`), use padding
+- [ ] Match sizing to `components.md` § Sizing Convention; add a row there before introducing a new sizing contract
 - [ ] Add `data-slot`, `data-variant`, `data-size` attributes
 - [ ] Keep variant prop names unchanged (`destructive` not `error`)
 

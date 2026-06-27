@@ -105,7 +105,8 @@ Tailwind conventions:
 - Put `nx:` before modifiers: `nx:hover:*`, `nx:md:*`, `nx:[&>svg]:*`.
 - Use semantic token utilities, not raw primitives, in component code.
 - Do not add `dark:` modifiers to semantic token utilities; semantic tokens already adapt by theme.
-- Prefer padding-based sizing over fixed heights, except for components where fixed dimensions are intrinsic.
+- Treat `.claude/rules/components.md` § Sizing Convention as the single source
+  for component sizing values; do not infer a value from a similar component.
 - Use the canonical focus outline tokens from `.claude/rules/components.md`.
 
 Responsive conventions:
