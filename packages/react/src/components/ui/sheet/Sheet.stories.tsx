@@ -360,6 +360,8 @@ export const WithDataAttributes: Story = {
     await expect(
       document.querySelector('[data-slot="sheet-close-button"]')
     ).toHaveClass(
+      'nx:right-6',
+      'nx:top-6',
       'nx:after:absolute',
       'nx:after:-inset-2.5',
       'nx:lg:after:hidden'

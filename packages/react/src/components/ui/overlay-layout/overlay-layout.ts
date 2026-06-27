@@ -53,6 +53,17 @@ const overlayFooterVariants = cva('nx:flex nx:gap-2 nx:px-6', {
   },
 });
 
+const overlayCloseButtonClassName = [
+  'nx:absolute nx:right-6 nx:top-6 nx:rounded-sm nx:p-1 nx:text-muted-foreground-subtle',
+  'nx:after:absolute nx:after:-inset-2.5 nx:lg:after:hidden',
+  'nx:transition-colors',
+  'nx:motion-reduce:transition-none',
+  'nx:hover:bg-background-hover nx:hover:text-foreground',
+  'nx:focus-visible:bg-background-hover nx:focus-visible:text-foreground',
+  'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+  'nx:disabled:pointer-events-none',
+].join(' ');
+
 type OverlayVariant = NonNullable<
   VariantProps<typeof overlayHeaderVariants>['variant']
 >;
@@ -98,6 +109,7 @@ export {
   containsComposedSlot,
   defaultOverlayLayout,
   type OverlayButtonOrientation,
+  overlayCloseButtonClassName,
   overlayContentVariants,
   overlayFooterVariants,
   overlayHeaderVariants,
