@@ -48,14 +48,14 @@ describe('runtime mode collectors', () => {
     const modes = collectShadowModes(TOKENS);
 
     expect(Object.keys(modes).sort()).toEqual([
-      'lyra',
-      'maia',
-      'mira',
-      'nova',
-      'vega',
+      'flat',
+      'quiet',
+      'soft',
+      'standard',
+      'strong',
     ]);
-    const lightNames = modes.maia.light.map((token) => token.cssName);
-    const darkNames = modes.maia.dark.map((token) => token.cssName);
+    const lightNames = modes.quiet.light.map((token) => token.cssName);
+    const darkNames = modes.quiet.dark.map((token) => token.cssName);
     expect(lightNames.some((name) => name.includes('-layer-'))).toBe(true);
     expect(lightNames).toContain('shadow-sm-layer-1-color');
     expect(lightNames).not.toContain('shadow-sm');

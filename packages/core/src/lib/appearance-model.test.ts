@@ -26,7 +26,7 @@ describe('appearance model', () => {
       contrast: 60,
       density: 'default',
       corners: 'sharp',
-      elevation: 'maia',
+      elevation: 'quiet',
       stroke: 'vega',
       prefs: {
         uiFontSize: 14,
@@ -79,9 +79,9 @@ describe('appearance model', () => {
       { value: 'mellow', label: 'Round' },
     ]);
     expect(ELEVATION_OPTIONS).toEqual([
-      { value: 'maia', label: 'Quiet' },
-      { value: 'mira', label: 'Standard' },
-      { value: 'nova', label: 'Strong' },
+      { value: 'quiet', label: 'Quiet' },
+      { value: 'standard', label: 'Standard' },
+      { value: 'strong', label: 'Strong' },
     ]);
     expect(STROKE_OPTIONS).toEqual([
       { value: 'maia', label: 'Fine' },
@@ -106,7 +106,7 @@ describe('sanitizeNexusAppearance', () => {
       contrast: 42,
       density: 'spacious' as const,
       corners: 'mellow' as const,
-      elevation: 'nova' as const,
+      elevation: 'strong' as const,
       stroke: 'maia' as const,
       prefs: {
         ...DEFAULT_NEXUS_APPEARANCE.prefs,
@@ -159,6 +159,12 @@ describe('sanitizeNexusAppearance', () => {
   it('normalizes a persisted density codename to its friendly value', () => {
     expect(sanitizeNexusAppearance({ density: 'nova' }).density).toBe(
       'compact'
+    );
+  });
+
+  it('normalizes a persisted elevation codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ elevation: 'maia' }).elevation).toBe(
+      'quiet'
     );
   });
 

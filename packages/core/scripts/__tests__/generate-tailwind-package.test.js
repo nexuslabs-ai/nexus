@@ -25,7 +25,7 @@ const SPACING_MODES = [
   'spacious',
 ];
 const RADIUS_MODES = ['blunt', 'mellow', 'sharp', 'smooth', 'subtle'];
-const SHADOW_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
+const SHADOW_MODES = ['flat', 'quiet', 'soft', 'standard', 'strong'];
 const BORDERWIDTH_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
 
 function readSpacingModeJson(mode) {
@@ -541,12 +541,12 @@ describe('generateTailwindPackage', () => {
 
   it('emits runtime mode selectors for radius, shadow, and border width', () => {
     expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-radius=['"]sharp['"]\] \{/);
-    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-shadow=['"]maia['"]\] \{/);
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-shadow=['"]quiet['"]\] \{/);
     expect(nexusCSS).toMatch(
       /:root,\s*\n\s*\[data-borderwidth=['"]vega['"]\] \{/
     );
     expect(nexusCSS).toContain("[data-radius='blunt']");
-    expect(nexusCSS).toContain("[data-shadow='lyra']");
+    expect(nexusCSS).toContain("[data-shadow='soft']");
     expect(nexusCSS).toContain("[data-borderwidth='nova']");
     expect(nexusCSS).not.toContain('light-dark(');
   });
@@ -575,10 +575,10 @@ describe('generateTailwindPackage', () => {
     }
 
     const lightBaselineVars = cssVarNames(
-      extractDataAttrBlock(nexusCSS, 'data-shadow', 'maia')
+      extractDataAttrBlock(nexusCSS, 'data-shadow', 'quiet')
     );
     const darkBaselineVars = cssVarNames(
-      extractDarkDataAttrBlock(nexusCSS, 'data-shadow', 'maia')
+      extractDarkDataAttrBlock(nexusCSS, 'data-shadow', 'quiet')
     );
     expect(lightBaselineVars.length).toBeGreaterThan(0);
     expect(darkBaselineVars).toEqual(lightBaselineVars);

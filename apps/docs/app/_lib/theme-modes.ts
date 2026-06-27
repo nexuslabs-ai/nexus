@@ -34,7 +34,7 @@ export const THEME_MODE_VALUES = {
     'comfortable',
     'spacious',
   ],
-  shadow: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+  shadow: ['flat', 'soft', 'quiet', 'standard', 'strong'],
   radius: ['sharp', 'subtle', 'smooth', 'mellow', 'blunt'],
   borderwidth: ['vega', 'lyra', 'maia', 'mira', 'nova'],
 } as const;
@@ -54,7 +54,7 @@ export const DEFAULT_THEME_STATE = {
   base: 'stone',
   brand: 'black',
   spacing: 'default',
-  shadow: 'maia',
+  shadow: 'quiet',
   radius: 'sharp',
   borderwidth: 'vega',
 } as const satisfies ThemeState;
@@ -85,11 +85,11 @@ export const THEME_MODE_OPTIONS = {
     { value: 'spacious', label: 'Spacious' },
   ],
   shadow: [
-    { value: 'vega', label: 'Vega' },
-    { value: 'lyra', label: 'Lyra' },
-    { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira' },
-    { value: 'nova', label: 'Nova' },
+    { value: 'flat', label: 'Flat' },
+    { value: 'soft', label: 'Soft' },
+    { value: 'quiet', label: 'Quiet' },
+    { value: 'standard', label: 'Standard' },
+    { value: 'strong', label: 'Strong' },
   ],
   radius: [
     { value: 'sharp', label: 'Sharp' },
@@ -126,11 +126,11 @@ export const THEME_STYLESHEET_HREFS = {
     black: '/themes/brands-black.css',
   },
   shadow: {
-    vega: '/themes/shadow-vega.css',
-    lyra: '/themes/shadow-lyra.css',
-    maia: '/themes/shadow-maia.css',
-    mira: '/themes/shadow-mira.css',
-    nova: '/themes/shadow-nova.css',
+    flat: '/themes/shadow-flat.css',
+    soft: '/themes/shadow-soft.css',
+    quiet: '/themes/shadow-quiet.css',
+    standard: '/themes/shadow-standard.css',
+    strong: '/themes/shadow-strong.css',
   },
   radius: {
     sharp: '/themes/radius-sharp.css',

@@ -418,7 +418,7 @@ describe('utils', () => {
     it('has expected default values', () => {
       expect(DEFAULT_CONFIG.base).toBe('stone');
       expect(DEFAULT_CONFIG.brand).toBe('black');
-      expect(DEFAULT_CONFIG.shadow).toBe('maia');
+      expect(DEFAULT_CONFIG.shadow).toBe('quiet');
       expect(DEFAULT_CONFIG.radius).toBe('sharp');
       expect(DEFAULT_CONFIG.borderwidth).toBe('vega');
       // Mira is the runtime spacing default. The

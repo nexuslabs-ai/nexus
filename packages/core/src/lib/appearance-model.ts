@@ -10,7 +10,7 @@ type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 export type NexusAppearanceMode = 'light' | 'dark' | 'system';
 export type NexusDensity = 'compact' | 'default' | 'comfortable' | 'spacious';
 export type NexusCorners = 'sharp' | 'subtle' | 'smooth' | 'mellow';
-export type NexusElevation = 'maia' | 'mira' | 'nova';
+export type NexusElevation = 'quiet' | 'standard' | 'strong';
 export type NexusStroke = 'maia' | 'vega' | 'nova';
 
 export interface NexusAppearancePrefs {
@@ -90,9 +90,9 @@ export const CORNER_OPTIONS = [
 ] as const satisfies readonly { value: NexusCorners; label: string }[];
 
 export const ELEVATION_OPTIONS = [
-  { value: 'maia', label: 'Quiet' },
-  { value: 'mira', label: 'Standard' },
-  { value: 'nova', label: 'Strong' },
+  { value: 'quiet', label: 'Quiet' },
+  { value: 'standard', label: 'Standard' },
+  { value: 'strong', label: 'Strong' },
 ] as const satisfies readonly { value: NexusElevation; label: string }[];
 
 export const STROKE_OPTIONS = [
@@ -108,7 +108,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   contrast: 60,
   density: 'default',
   corners: 'sharp',
-  elevation: 'maia',
+  elevation: 'quiet',
   stroke: 'vega',
   prefs: {
     uiFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -189,7 +189,11 @@ const PUBLIC_MODE_RENAME: Record<
     sera: 'spacious',
   },
   corners: {},
-  elevation: {},
+  elevation: {
+    maia: 'quiet',
+    mira: 'standard',
+    nova: 'strong',
+  },
   stroke: {},
 };
 

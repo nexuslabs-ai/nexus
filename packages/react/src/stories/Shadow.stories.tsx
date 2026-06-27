@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import shadowLyraDark from '../../../core/tokens/primitives/shadow/shadow-lyra-dark.json';
-import shadowLyraLight from '../../../core/tokens/primitives/shadow/shadow-lyra-light.json';
-import shadowMaiaDark from '../../../core/tokens/primitives/shadow/shadow-maia-dark.json';
-import shadowMaiaLight from '../../../core/tokens/primitives/shadow/shadow-maia-light.json';
-import shadowMiraDark from '../../../core/tokens/primitives/shadow/shadow-mira-dark.json';
-import shadowMiraLight from '../../../core/tokens/primitives/shadow/shadow-mira-light.json';
-import shadowNovaDark from '../../../core/tokens/primitives/shadow/shadow-nova-dark.json';
-import shadowNovaLight from '../../../core/tokens/primitives/shadow/shadow-nova-light.json';
-import shadowVegaDark from '../../../core/tokens/primitives/shadow/shadow-vega-dark.json';
-import shadowVegaLight from '../../../core/tokens/primitives/shadow/shadow-vega-light.json';
+import shadowFlatDark from '../../../core/tokens/primitives/shadow/shadow-flat-dark.json';
+import shadowFlatLight from '../../../core/tokens/primitives/shadow/shadow-flat-light.json';
+import shadowQuietDark from '../../../core/tokens/primitives/shadow/shadow-quiet-dark.json';
+import shadowQuietLight from '../../../core/tokens/primitives/shadow/shadow-quiet-light.json';
+import shadowSoftDark from '../../../core/tokens/primitives/shadow/shadow-soft-dark.json';
+import shadowSoftLight from '../../../core/tokens/primitives/shadow/shadow-soft-light.json';
+import shadowStandardDark from '../../../core/tokens/primitives/shadow/shadow-standard-dark.json';
+import shadowStandardLight from '../../../core/tokens/primitives/shadow/shadow-standard-light.json';
+import shadowStrongDark from '../../../core/tokens/primitives/shadow/shadow-strong-dark.json';
+import shadowStrongLight from '../../../core/tokens/primitives/shadow/shadow-strong-light.json';
 
-const BUNDLED_SHADOW_MODE = 'vega';
+const BUNDLED_SHADOW_MODE = 'flat';
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
@@ -49,19 +49,19 @@ const DISPLAY_SHADOW_KEYS = [
 ] as const satisfies readonly ShadowKey[];
 
 const SHADOW_MODES_LIGHT: { name: string; tokens: ShadowSet }[] = [
-  { name: 'vega', tokens: shadowVegaLight as ShadowSet },
-  { name: 'lyra', tokens: shadowLyraLight as ShadowSet },
-  { name: 'maia', tokens: shadowMaiaLight as ShadowSet },
-  { name: 'mira', tokens: shadowMiraLight as ShadowSet },
-  { name: 'nova', tokens: shadowNovaLight as ShadowSet },
+  { name: 'flat', tokens: shadowFlatLight as ShadowSet },
+  { name: 'soft', tokens: shadowSoftLight as ShadowSet },
+  { name: 'quiet', tokens: shadowQuietLight as ShadowSet },
+  { name: 'standard', tokens: shadowStandardLight as ShadowSet },
+  { name: 'strong', tokens: shadowStrongLight as ShadowSet },
 ];
 
 const SHADOW_MODES_DARK: { name: string; tokens: ShadowSet }[] = [
-  { name: 'vega', tokens: shadowVegaDark as ShadowSet },
-  { name: 'lyra', tokens: shadowLyraDark as ShadowSet },
-  { name: 'maia', tokens: shadowMaiaDark as ShadowSet },
-  { name: 'mira', tokens: shadowMiraDark as ShadowSet },
-  { name: 'nova', tokens: shadowNovaDark as ShadowSet },
+  { name: 'flat', tokens: shadowFlatDark as ShadowSet },
+  { name: 'soft', tokens: shadowSoftDark as ShadowSet },
+  { name: 'quiet', tokens: shadowQuietDark as ShadowSet },
+  { name: 'standard', tokens: shadowStandardDark as ShadowSet },
+  { name: 'strong', tokens: shadowStrongDark as ShadowSet },
 ];
 
 function formatPx(d: Dimension) {

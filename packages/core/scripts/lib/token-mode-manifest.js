@@ -35,7 +35,13 @@ export const CANONICAL_BORDERWIDTH_MODES = [
   'nova',
   'vega',
 ];
-export const CANONICAL_SHADOW_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
+export const CANONICAL_SHADOW_MODES = [
+  'flat',
+  'quiet',
+  'soft',
+  'standard',
+  'strong',
+];
 
 export function tokenModeFamilies({
   semanticDir = SEMANTIC_DIR,
@@ -108,7 +114,7 @@ export function keyParityModeFamilyConfigs({
       name: 'shadow-light',
       reportName: 'shadow light',
       dir: path.join(primitivesDir, 'shadow'),
-      baseline: 'maia',
+      baseline: 'quiet',
       expectedModes: CANONICAL_SHADOW_MODES,
       modePattern: /^shadow-([a-z]+)-light\.json$/,
       fileName: (mode) => `shadow-${mode}-light.json`,
@@ -117,7 +123,7 @@ export function keyParityModeFamilyConfigs({
       name: 'shadow-dark',
       reportName: 'shadow dark',
       dir: path.join(primitivesDir, 'shadow'),
-      baseline: 'maia',
+      baseline: 'quiet',
       expectedModes: CANONICAL_SHADOW_MODES,
       modePattern: /^shadow-([a-z]+)-dark\.json$/,
       fileName: (mode) => `shadow-${mode}-dark.json`,

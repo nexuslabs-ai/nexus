@@ -140,7 +140,7 @@ describe('resolveFirstPaint', () => {
     expect(result.dataAttrs).toEqual({
       'data-style': 'default',
       'data-radius': 'sharp',
-      'data-shadow': 'maia',
+      'data-shadow': 'quiet',
       'data-borderwidth': 'vega',
     });
   });

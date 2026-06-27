@@ -25,7 +25,7 @@ describe('docs theme modes', () => {
       base: 'slate',
       brand: 'teal',
       spacing: 'spacious',
-      shadow: 'mira',
+      shadow: 'standard',
       radius: 'smooth',
       borderwidth: 'maia',
     });
@@ -34,7 +34,7 @@ describe('docs theme modes', () => {
       base: 'slate',
       brand: 'teal',
       spacing: 'spacious',
-      shadow: 'mira',
+      shadow: 'standard',
       radius: 'smooth',
       borderwidth: 'maia',
     });
@@ -52,7 +52,6 @@ describe('docs theme modes', () => {
 
     expect(state).toMatchObject({
       ...DEFAULT_THEME_STATE,
-      shadow: 'nova',
       radius: 'smooth',
       borderwidth: 'mira',
     });

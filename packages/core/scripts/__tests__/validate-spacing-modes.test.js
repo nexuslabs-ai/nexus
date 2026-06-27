@@ -50,8 +50,8 @@ describe('mode family configs', () => {
       ['spacing', 'regular', CANONICAL_MODES],
       ['radius', 'sharp', CANONICAL_RADIUS_MODES],
       ['borderwidth', 'vega', CANONICAL_BORDERWIDTH_MODES],
-      ['shadow-light', 'maia', CANONICAL_SHADOW_MODES],
-      ['shadow-dark', 'maia', CANONICAL_SHADOW_MODES],
+      ['shadow-light', 'quiet', CANONICAL_SHADOW_MODES],
+      ['shadow-dark', 'quiet', CANONICAL_SHADOW_MODES],
     ]);
   });
 

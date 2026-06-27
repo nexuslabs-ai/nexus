@@ -87,7 +87,7 @@ describe('NexusAppearanceProvider', () => {
 
     expect(root).toHaveAttribute('data-style', 'default');
     expect(root).toHaveAttribute('data-radius', 'sharp');
-    expect(root).toHaveAttribute('data-shadow', 'maia');
+    expect(root).toHaveAttribute('data-shadow', 'quiet');
     expect(root).toHaveAttribute('data-borderwidth', 'vega');
     expect(root).not.toHaveClass('dark');
     expect(root.style.colorScheme).toBe('light');
@@ -139,7 +139,7 @@ describe('NexusAppearanceProvider', () => {
           surfaceTone: 'slate',
           density: 'compact',
           corners: 'mellow',
-          elevation: 'nova',
+          elevation: 'strong',
           stroke: 'nova',
         })
       )
