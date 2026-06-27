@@ -195,6 +195,17 @@ describe('sanitizeNexusAppearancePrefs', () => {
       pointerCursors: true,
     });
   });
+
+  it('rejects font families with CSS-breaking characters', () => {
+    // appearancePrefsToCss interpolates these into a <style> rule.
+    expect(
+      sanitizeNexusAppearancePrefs({ uiFont: 'Inter } body { display:none' })
+        .uiFont
+    ).toBe(DEFAULT_NEXUS_APPEARANCE.prefs.uiFont);
+    expect(
+      sanitizeNexusAppearancePrefs({ codeFont: 'Mono; color:red' }).codeFont
+    ).toBe(DEFAULT_NEXUS_APPEARANCE.prefs.codeFont);
+  });
 });
 
 describe('createNexusThemeContract', () => {

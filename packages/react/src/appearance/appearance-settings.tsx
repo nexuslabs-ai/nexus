@@ -1,7 +1,6 @@
 import {
   BASE_TONE_OPTIONS,
   CORNER_OPTIONS,
-  DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
   type NexusAppearanceMode,
@@ -109,15 +108,13 @@ export function NexusAppearanceSettings() {
   };
 
   const setFontSize = (key: 'uiFontSize' | 'codeFontSize', value: number) => {
-    const fallback = DEFAULT_NEXUS_APPEARANCE.prefs[key];
-    const size = Number.isFinite(value) ? value : fallback;
-
+    // The provider sanitizes every update (NaN → default, clamp [8,32]).
     if (key === 'uiFontSize') {
-      updatePrefs({ uiFontSize: size });
+      updatePrefs({ uiFontSize: value });
       return;
     }
 
-    updatePrefs({ codeFontSize: size });
+    updatePrefs({ codeFontSize: value });
   };
 
   const setReduceMotion = (value: string) => {

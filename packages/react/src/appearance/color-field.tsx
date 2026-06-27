@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Input } from '@/components/ui/input';
 
@@ -16,9 +16,13 @@ export function NexusAppearanceColorField({
   label,
 }: NexusAppearanceColorFieldProps) {
   const [draft, setDraft] = useState(value);
+  // Re-sync the draft when the committed value changes, during render (no effect).
+  const [lastValue, setLastValue] = useState(value);
+  if (value !== lastValue) {
+    setLastValue(value);
+    setDraft(value);
+  }
   const committedHex = HEX_RE.test(value) ? value : '#000000';
-
-  useEffect(() => setDraft(value), [value]);
 
   const commit = (next: string) => {
     setDraft(next);

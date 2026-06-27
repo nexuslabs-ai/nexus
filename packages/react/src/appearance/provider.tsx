@@ -104,10 +104,22 @@ function upsertStyle(selector: string, attribute: string): HTMLStyleElement {
   return style;
 }
 
-function removeAppearanceStyles(): void {
+function removeAppearanceArtifacts(): void {
   document
     .querySelectorAll(`${THEME_STYLE_SELECTOR}, ${PREFS_STYLE_SELECTOR}`)
     .forEach((style) => style.remove());
+
+  const root = document.documentElement;
+  root.classList.remove('dark');
+  root.style.removeProperty('color-scheme');
+  for (const attr of [
+    'data-style',
+    'data-radius',
+    'data-shadow',
+    'data-borderwidth',
+  ]) {
+    root.removeAttribute(attr);
+  }
 }
 
 function nextAppearanceState(
@@ -131,14 +143,12 @@ export function NexusAppearanceProvider({
     () => sanitizeNexusAppearance(defaultState ?? DEFAULT_NEXUS_APPEARANCE),
     [defaultState]
   );
-  const controlledState = useMemo(
-    () => (state === undefined ? undefined : sanitizeNexusAppearance(state)),
-    [state]
-  );
   const [internalState, setInternalState] = useState<NexusAppearanceState>(() =>
     readStoredState(storageKey, initialState)
   );
-  const activeState = controlledState ?? internalState;
+  // Controlled state is trusted as-is — the parent owns it. `sanitizeNexusAppearance`
+  // is exported for parents to validate untrusted input before passing it in.
+  const activeState = state ?? internalState;
   const [resolvedMode, setResolvedMode] = useState<NexusResolvedAppearanceMode>(
     () => resolveAppearanceMode(activeState.mode)
   );
@@ -153,13 +163,14 @@ export function NexusAppearanceProvider({
 
   const setState = useCallback<Dispatch<SetStateAction<NexusAppearanceState>>>(
     (update) => {
-      const nextState = nextAppearanceState(update, activeState);
-
+      // Uncontrolled path uses the functional updater so synchronous
+      // back-to-back updates compose instead of collapsing onto the render
+      // snapshot. Controlled mode never owns internal state — the parent does.
       if (!isControlled) {
-        setInternalState(nextState);
+        setInternalState((previous) => nextAppearanceState(update, previous));
       }
 
-      onStateChange?.(nextState);
+      onStateChange?.(nextAppearanceState(update, activeState));
     },
     [activeState, isControlled, onStateChange]
   );
@@ -239,7 +250,7 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (!canUseDOM()) return;
 
-    return removeAppearanceStyles;
+    return removeAppearanceArtifacts;
   }, []);
 
   const value = useMemo<NexusAppearanceContextValue>(

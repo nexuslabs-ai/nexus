@@ -1,24 +1,23 @@
 import type { ReactNode } from 'react';
 
-import { Label } from '@/components/ui/label';
-
 interface NexusAppearanceSettingRowProps {
   label: string;
   description?: string;
-  htmlFor?: string;
   children: ReactNode;
 }
 
 export function NexusAppearanceSettingRow({
   label,
   description,
-  htmlFor,
   children,
 }: NexusAppearanceSettingRowProps) {
   return (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-4 nx:py-3">
       <div className="nx:min-w-44 nx:space-y-0.5">
-        <Label htmlFor={htmlFor}>{label}</Label>
+        {/* Visual row label; the control itself carries the accessible name via aria-label. */}
+        <span className="nx:typography-label-default nx:text-foreground">
+          {label}
+        </span>
         {description ? (
           <p className="nx:typography-body-small nx:text-muted-foreground">
             {description}

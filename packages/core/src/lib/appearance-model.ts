@@ -153,8 +153,15 @@ const REDUCE_MOTION = new Set<NexusAppearancePrefs['reduceMotion']>([
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
-const stringOr = (value: unknown, fallback: string): string =>
-  typeof value === 'string' ? value : fallback;
+// Font families are interpolated into a `<style>` rule, so reject characters that
+// could break out of the declaration (`;` `{` `}`) or open a tag (`<`).
+const FONT_FAMILY_UNSAFE = /[;{}<]/;
+const fontFamilyOr = (value: unknown, fallback: string): string =>
+  typeof value === 'string' &&
+  value.length > 0 &&
+  !FONT_FAMILY_UNSAFE.test(value)
+    ? value
+    : fallback;
 
 const boolOr = (value: unknown, fallback: boolean): boolean =>
   typeof value === 'boolean' ? value : fallback;
@@ -177,8 +184,8 @@ export function sanitizeNexusAppearancePrefs(
   const o = isRecord(raw) ? raw : {};
   const d = DEFAULT_NEXUS_APPEARANCE.prefs;
   return {
-    uiFont: stringOr(o.uiFont, d.uiFont),
-    codeFont: stringOr(o.codeFont, d.codeFont),
+    uiFont: fontFamilyOr(o.uiFont, d.uiFont),
+    codeFont: fontFamilyOr(o.codeFont, d.codeFont),
     uiFontSize: clampFontSize(o.uiFontSize, d.uiFontSize),
     codeFontSize: clampFontSize(o.codeFontSize, d.codeFontSize),
     reduceMotion: enumOr(o.reduceMotion, REDUCE_MOTION, d.reduceMotion),
