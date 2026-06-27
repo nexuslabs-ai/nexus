@@ -24,6 +24,8 @@
     "audit:contrast": "node scripts/audit-contrast.js",
     "audit:class-refs": "node scripts/audit-class-refs.js",
     "audit:colorblind": "node scripts/audit-colorblind.js",
+    "audit:mode-codenames": "node scripts/audit-mode-codenames.js",
+    "capture:mode-values": "node scripts/capture-mode-values.js",
     "validate:spacing-modes": "node scripts/validate-spacing-modes.js"
   },
   "dependencies": {
