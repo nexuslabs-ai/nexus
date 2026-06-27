@@ -1,16 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus/react';
-
-import type { ThemeConfig } from '../../../hooks/useTheme';
+import { NexusAppearanceSettings } from '@nexus/react/appearance';
 
 import { AccountTab } from './AccountTab';
-import { AppearanceSettings } from './AppearanceSettings';
 import { NotificationsTab } from './NotificationsTab';
 import { ProfileTab } from './ProfileTab';
-
-type SettingsSceneProps = {
-  theme: ThemeConfig;
-  setTheme: React.Dispatch<React.SetStateAction<ThemeConfig>>;
-};
 
 /**
  * The composed Settings scene — a realistic product screen assembled entirely
@@ -18,7 +11,7 @@ type SettingsSceneProps = {
  * realistic settings forms. Layers background → container (Card) → popover /
  * overlay (Select / AlertDialog) to exercise the surface contract.
  */
-export function SettingsScene({ theme, setTheme }: SettingsSceneProps) {
+export function SettingsScene() {
   return (
     <div className="nx:mx-auto nx:max-w-3xl nx:space-y-6 nx:p-6">
       <div className="nx:space-y-1">
@@ -48,7 +41,7 @@ export function SettingsScene({ theme, setTheme }: SettingsSceneProps) {
           <NotificationsTab />
         </TabsContent>
         <TabsContent value="appearance">
-          <AppearanceSettings theme={theme} setTheme={setTheme} />
+          <NexusAppearanceSettings />
         </TabsContent>
       </Tabs>
     </div>
