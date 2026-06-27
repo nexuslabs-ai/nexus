@@ -4,6 +4,7 @@ import {
   BASE_TONE_OPTIONS,
   BASE_TONE_SEEDS,
   CORNER_OPTIONS,
+  createNexusThemeContract,
   DEFAULT_BRAND_COLOR,
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
@@ -12,6 +13,7 @@ import {
   sanitizeNexusAppearancePrefs,
   STROKE_OPTIONS,
 } from './appearance-model';
+import { deriveTheme } from './derive-theme';
 
 describe('appearance model', () => {
   it('uses the agreed package defaults', () => {
@@ -192,4 +194,48 @@ describe('sanitizeNexusAppearancePrefs', () => {
       pointerCursors: true,
     });
   });
+});
+
+describe('createNexusThemeContract', () => {
+  it('puts brand color on both light and dark accent seeds', () => {
+    const contract = createNexusThemeContract({
+      ...DEFAULT_NEXUS_APPEARANCE,
+      brandColor: '#ff0000',
+    });
+
+    expect(contract.light.accent).toBe('#ff0000');
+    expect(contract.dark.accent).toBe('#ff0000');
+  });
+
+  it('pulls background and foreground seeds from the selected surface tone', () => {
+    const contract = createNexusThemeContract({
+      ...DEFAULT_NEXUS_APPEARANCE,
+      surfaceTone: 'slate',
+    });
+
+    expect(contract.light.background).toBe(
+      BASE_TONE_SEEDS.slate.light.background
+    );
+    expect(contract.dark.foreground).toBe(
+      BASE_TONE_SEEDS.slate.dark.foreground
+    );
+    expect(contract.surfaceTone).toBe('slate');
+    expect(contract.contrast).toBe(60);
+  });
+
+  it.each(['stone', 'neutral', 'zinc', 'slate', 'gray'] as const)(
+    'round-trips through deriveTheme without missing keys (%s)',
+    (surfaceTone) => {
+      const contract = createNexusThemeContract({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        surfaceTone,
+      });
+      const theme = deriveTheme(contract);
+
+      expect(Object.keys(theme.light).length).toBeGreaterThan(60);
+      expect(Object.keys(theme.dark).length).toBe(
+        Object.keys(theme.light).length
+      );
+    }
+  );
 });

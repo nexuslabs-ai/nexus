@@ -1,4 +1,8 @@
-import type { NexusSurfaceTone, ThemeSeeds } from './derive-theme';
+import type {
+  NexusSurfaceTone,
+  ThemeDerivationInput,
+  ThemeSeeds,
+} from './derive-theme';
 import { isColor } from './perceptual-ramp';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
@@ -204,5 +208,17 @@ export function sanitizeNexusAppearance(raw: unknown): NexusAppearanceState {
     elevation: enumOr(raw.elevation, ELEVATIONS, d.elevation),
     stroke: enumOr(raw.stroke, STROKES, d.stroke),
     prefs: sanitizeNexusAppearancePrefs(raw.prefs),
+  };
+}
+
+export function createNexusThemeContract(
+  state: NexusAppearanceState
+): ThemeDerivationInput {
+  const tone = BASE_TONE_SEEDS[state.surfaceTone];
+  return {
+    surfaceTone: state.surfaceTone,
+    contrast: state.contrast,
+    light: { accent: state.brandColor, ...tone.light },
+    dark: { accent: state.brandColor, ...tone.dark },
   };
 }
