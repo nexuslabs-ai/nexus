@@ -560,12 +560,42 @@ git commit -m "feat(core): add context-scoped token-mode codename audit (#546)"
 
 ## PR-2 — Per-Family Atomic Cutover
 
-> Each task leaves the build green (`pnpm typecheck`, `pnpm test:unit`, `pnpm validate:spacing-modes`) and runtime theming correct. Tasks 2.2–2.6 are independent families; they share files (`appearance-model.ts`, `validate-spacing-modes.js`, `utils.js`, `package.json`, `theme-modes.ts`), so run them **sequentially** (or as stacked PRs), not in parallel. Task 2.1 lands first; Task 2.7 lands last.
+> **Revised 2026-06-28** — after #549 (PR-1) merged and an alternative cutover plan was evaluated. Deltas vs the original PR-2: (1) added **Task 2.0** (shared discovery manifest, carry-forward from the #549 architect follow-up) and moved the radius-regex widening into it; (2) threaded the **build-critical token-JSON story imports** (`packages/react/src/stories/*.stories.tsx`) into each family slice — they were missing and would break the `@nexus/react` typecheck/build the instant a token file moves; (3) **removed the `git checkout packages/core/package.json` drift step** — verified no generator writes `package.json`, so that line would have reverted the intended flag edits; (4) recorded two **deliberate exclusions** (no docs persisted-state normalization, no bootstrap v2-snapshot salvage) so an executor doesn't add the over-scope an alternative plan proposed.
+
+> Each task leaves the build green (`pnpm typecheck`, `pnpm test:unit`, `pnpm validate:spacing-modes`) and runtime theming correct. Tasks 2.2–2.6 are independent families; they share files (`appearance-model.ts`, the discovery manifest, `utils.js`, `package.json`, `theme-modes.ts`, and `Radius.stories.tsx`), so run them **sequentially**, not in parallel. Task 2.0 lands first, then 2.1; Task 2.7 lands last.
 
 **Pre-flight (run once before Task 2.2):**
 
 - [ ] Read `packages/core/scripts/generate-modular.js` and `packages/core/scripts/generate-tailwind-package.js` end-to-end and confirm they resolve default modes **only** from `DEFAULT_CONFIG`/CLI flags (Task 2.x updates those) — not from a stray hardcoded `'maia'`/`'vega'`/`'sharp'`/`'mira'` literal. If a hardcoded default exists, add its update to the relevant family slice's Step 4. (The CSS audit + golden test are nets, but a hardcoded _default_ would silently ship the wrong baseline, not a leftover codename.)
 - [ ] Grep consumers for hardcoded mode literals rather than option iteration: `rg -n "'(nova|mira|maia|vega|lyra|luma|sera|sharp|mellow|blunt)'" packages/react/src apps/console/src` (or the console source root). Expect matches only where a `Record`/`switch` keys on a literal — those break when the type flips and must move to the family slice. Provider/`ThemeControls` should iterate `*_OPTIONS`; if they do, the type flip is safe.
+- [ ] Confirm the build-critical story imports: `rg -n "tokens/.*(spacing|shadow|radius|borderwidth|typography)-" packages/react/src/stories`. Expected hits (verified 2026-06-28): `Spacing.stories.tsx` (7 spacing), `Shadow.stories.tsx` (10 shadow ×light/dark), `Radius.stories.tsx` (3 radius + 5 borderwidth), `Typography.stories.tsx` (1). These `import … from '../../../core/tokens/…'` by codename path, so each family slice MUST update the matching imports in the same commit as its `git mv` (see each slice's story step) or `@nexus/react` typecheck breaks. `spacing-modes.tsx` has **no** token-JSON import — it is PR-3 prose, not build-critical.
+
+### Task 2.0: Extract a shared token-mode discovery manifest
+
+> Carry-forward from the #549 review (architect follow-up). The token-mode `(dir, regex, expected-modes, baseline, fileName)` layout is duplicated across `validate-spacing-modes.js` (`modeFamilyConfigs`), `capture-mode-values.js`, and `mode-rename-map.test.js`. Consolidate **before** the cutover edits every site. **No behavior change.**
+
+**Files:**
+
+- Create: `packages/core/scripts/lib/token-mode-manifest.js`
+- Modify: `packages/core/scripts/validate-spacing-modes.js`, `packages/core/scripts/capture-mode-values.js`, `packages/core/scripts/lib/__tests__/mode-rename-map.test.js`
+
+> **Decision — keep it scripts-internal; do NOT export from `@nexus/core`.** The consumers are three same-package `.js` modules. The review floated a `@nexus/core` public export so the docs `.ts` test could bind to it too — but a `.js`→`.ts` import across the package boundary into core's unpublished `scripts/` is worse than the small duplication it removes (typecheck friction + still reaching into unpublished source). So the manifest serves the three `.js` consumers only; the docs `theme-modes.test.ts` keeps its own local discovery (already widened and reading core `tokens/` since #549 — a test-only monorepo read). If a consumer-facing "available modes" list is ever wanted, promote the manifest to a typed public export then — out of scope here.
+
+- [ ] **Step 1: Create the manifest** — move the per-family config out of `validate-spacing-modes.js` into `token-mode-manifest.js`, exporting two explicit views:
+  - `TOKEN_MODE_FAMILIES` for every discoverable rename family: spacing, shadow, radius, borderwidth, typography.
+  - `KEY_PARITY_MODE_FAMILY_CONFIGS` for the families the validator should compare: spacing, radius, borderwidth, shadow-light, shadow-dark. Typography stays discovery-only because it is a single mode, not a key-parity family.
+    Each key-parity entry keeps the existing `{ name, reportName, dir, baseline, expectedModes, modePattern, fileName }` shape, and the manifest also exports the `CANONICAL_*_MODES` arrays and `BASELINE_MODE`. **Widen the radius `modePattern` here, now**, to `/^radius-([a-z]+(?:-[a-z]+)*)\.json$/` — a superset of `([a-z]+)`, so current single-word files match identically (no behavior change) and the radius slice (2.4) just adds `radius-extra-round.json` without touching the regex.
+
+- [ ] **Step 2: Refactor the three consumers** — `validate-spacing-modes.js` imports `KEY_PARITY_MODE_FAMILY_CONFIGS` / canonicals from the manifest (keeping its CLI + exit-code logic and re-exporting the canonicals it already exported); `capture-mode-values.js` and `mode-rename-map.test.js` import `TOKEN_MODE_FAMILIES` from the manifest instead of re-declaring token directories and regexes.
+
+- [ ] **Step 3: Verify no behavior change** — `pnpm validate:spacing-modes && pnpm test:unit` pass; re-run `pnpm --filter @nexus/core capture:mode-values` and confirm `git diff packages/core/scripts/__tests__/__fixtures__/pre-rename-mode-values.json` is **empty** (the oracle is byte-identical).
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add -A
+git commit -m "refactor(core): extract shared token-mode discovery manifest (#546)"
+```
 
 ### Task 2.1: Add the normalizer and bump the snapshot version
 
@@ -578,6 +608,11 @@ git commit -m "feat(core): add context-scoped token-mode codename audit (#546)"
 **Interfaces:** Produces `normalizeAppearanceModeIds(raw: unknown): unknown` — a pure function that, for the four public-mode fields, maps any retired codename → its friendly name (identity on already-friendly values and on non-strings). Consumed by `sanitizeNexusAppearance` (wired per-family in 2.2–2.5).
 
 > **project-stage.md note.** This normalizer is the one deliberate back-compat shim (it lets a returning dogfooder's persisted `density:'nova'` resolve to `'compact'` instead of resetting to default). It is included to honor #546's "accept old persisted values." If the team prefers the strict project-stage.md path (clean over safe), delete this task: the `SNAPSHOT_VERSION` bump alone forces a recompute, and `enumOr` already falls stale values back to defaults. The rest of the plan does not depend on the normalizer existing.
+
+> **Two exclusions — do NOT add these (an alternative plan proposed them; both are out of scope):**
+>
+> 1. **No bootstrap v2-snapshot salvage.** The `SNAPSHOT_VERSION` bump to 3 is required — without it a stale v2 snapshot would set `data-style="nova"` against the renamed CSS and break spacing. But do **not** teach `createNexusAppearanceBootstrapScript` to read v2 snapshots and normalize old IDs inline: the bump already invalidates v2 → `sanitizeNexusAppearance` recovers the state on hydrate (correct second paint; a one-time _flash_, not a reset), and the engine-free bootstrap cannot recompute `themeCss`, so colors flash to default regardless — the salvage only rescues the `data-*` attrs. It is a back-compat path in an inline script against project-stage.md for a half-fixed one-time flash. Skip it.
+> 2. **No docs persisted-state normalization.** Old docs picker selections fall back to defaults on the rename deploy (`sanitizeThemeState` per-field fallback) — one-time, pre-production-acceptable. If docs persistence is later wanted, it must normalize against the **full** per-family map (docs storage holds the hidden modes too — `lyra`/`vega`/`maia`/`blunt`/…), **not** the public-only `PUBLIC_MODE_RENAME`, which would silently drop hidden values.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -768,14 +803,15 @@ In `apps/docs/app/_lib/theme-modes.ts`:
 
 In `apps/docs/app/layout.tsx`: `data-style="mira"` → `data-style="default"`.
 
+- [ ] **Step 6b: Update the build-critical story imports** — in `packages/react/src/stories/Spacing.stories.tsx`, update the 7 token-JSON import **paths** to the friendly filenames (`spacing-nova.json` → `spacing-compact.json`, `spacing-mira.json` → `spacing-default.json`, … `spacing-vega.json` → `spacing-regular.json`); rename the local bindings to match for readability (`spacingNova` → `spacingCompact`, …). This MUST be in this commit — `@nexus/react` typecheck/build resolves these paths and breaks the moment the token files move. The story's _displayed_ mode labels are PR-3 prose.
+
 - [ ] **Step 7: Regenerate artifacts**
 
 ```bash
 pnpm tokens:tailwind && pnpm tokens:modular
-git checkout packages/core/package.json   # tokens:modular rewrites --brand as drift; revert that line if changed
 ```
 
-> Per [[tokens-modular-rewrites-package-json]], `tokens:modular` rewrites `build:tailwind`'s `--brand` flag. After regenerating, confirm `git diff packages/core/package.json` shows only your intended `--spacingDefault` change; `git checkout` the file and re-apply if it flipped `--brand`.
+> Then confirm the regen touched only generated outputs: `git diff --stat packages/core/package.json` should be **empty** (no generator writes `package.json` — verified 2026-06-28; the historical `--brand` drift no longer applies). If it is somehow non-empty, investigate before committing — do **not** blind-`checkout`, which would revert the intended `--spacingDefault` edit from Step 4.
 
 - [ ] **Step 8: Validate, typecheck, test**
 
@@ -820,28 +856,25 @@ cd -
 
 - [ ] **Step 6: Update docs shadow infra** — in `theme-modes.ts`: `THEME_MODE_VALUES.shadow` → `['flat','soft','quiet','standard','strong']`; `DEFAULT_THEME_STATE.shadow: 'maia'` → `'quiet'`; `THEME_MODE_OPTIONS.shadow` values+labels → friendly; `THEME_STYLESHEET_HREFS.shadow` → `{ flat:'/themes/shadow-flat.css', soft:'/themes/shadow-soft.css', quiet:'/themes/shadow-quiet.css', standard:'/themes/shadow-standard.css', strong:'/themes/shadow-strong.css' }`.
 
-- [ ] **Step 7: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular && git checkout packages/core/package.json` (re-apply intended `--shadow` change if reverted).
+- [ ] **Step 6b: Story imports** — in `packages/react/src/stories/Shadow.stories.tsx`, update the 10 shadow token-JSON import paths + bindings to friendly (`shadow-maia-{light,dark}.json` → `shadow-quiet-{light,dark}.json`, `shadow-mira-*` → `shadow-standard-*`, `shadow-nova-*` → `shadow-strong-*`, `shadow-vega-*` → `shadow-flat-*`, `shadow-lyra-*` → `shadow-soft-*`). Same commit as the `git mv` (build-critical).
+
+- [ ] **Step 7: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular`; then confirm `git diff --stat packages/core/package.json` is empty (no generator writes it — do not blind-`checkout`).
 
 - [ ] **Step 8: Validate + test** — `pnpm validate:spacing-modes && pnpm typecheck && pnpm test:unit` → PASS.
 
 - [ ] **Step 9: Commit** — `git add -A && git commit -m "feat(core): rename shadow elevation modes to friendly names (#546)"`
 
-### Task 2.4: Migrate the radius (corners) family — incl. hyphen regex fix
+### Task 2.4: Migrate the radius (corners) family — adds the hyphenated `extra-round`
 
-**Files:** `git mv` 3 files under `packages/core/tokens/primitives/radius/` (subtle/smooth untouched); modify `validate-spacing-modes.js` (incl. `modePattern`), `utils.js`, `package.json`, `appearance-model.ts`, `theme-modes.ts`; regenerate; update tests.
+**Files:** `git mv` 3 files under `packages/core/tokens/primitives/radius/` (subtle/smooth untouched); modify the manifest (radius `baseline`; regex already widened in 2.0), `utils.js`, `package.json`, `appearance-model.ts`, `theme-modes.ts`, `Radius.stories.tsx` (radius imports); regenerate; update tests.
 
 - [ ] **Step 1: Update test expectations to friendly (failing)** — corners default `'sharp'` → `'square'`; `CORNER_OPTIONS` values `sharp`→`square`, `mellow`→`round` (subtle/smooth unchanged); `appearance-snapshot.test.ts` `'data-radius': 'sharp'` → `'square'`; `scripts/__tests__/mode-collectors.test.js` radius selectors/list → friendly; `theme-modes.test.ts` radius fixtures → friendly; add `expect(sanitizeNexusAppearance({ corners: 'mellow' }).corners).toBe('round');`.
 
 - [ ] **Step 2: Run to verify failure** — FAIL.
 
-- [ ] **Step 3: Widen the radius modePattern for the hyphenated `extra-round`**
+- [ ] **Step 3: Confirm the radius regex (widened in 2.0) + flip the baseline**
 
-In `validate-spacing-modes.js`, the `radius` entry in `modeFamilyConfigs`:
-
-- `modePattern: /^radius-([a-z]+)\.json$/` → `modePattern: /^radius-([a-z]+(?:-[a-z]+)*)\.json$/`
-- `baseline: 'sharp'` → `baseline: 'square'`
-
-(The generator's own `discoverPrimitives` uses `/^${category}-(.+)\.json$/`, which already accepts hyphens — only the validator pattern needed widening.)
+The radius `modePattern` was already widened to `/^radius-([a-z]+(?:-[a-z]+)*)\.json$/` in the Task 2.0 manifest, so `radius-extra-round.json` is discoverable. Here: confirm that's in place, and flip the radius `baseline` in the manifest `'sharp'` → `'square'`. (The generator's own `discoverPrimitives` uses `/^${category}-(.+)\.json$/`, which already accepts hyphens.)
 
 - [ ] **Step 4: Rename token files**
 
@@ -859,7 +892,9 @@ cd -
 
 - [ ] **Step 7: Update docs radius infra** — in `theme-modes.ts`: `THEME_MODE_VALUES.radius` → `['square','subtle','smooth','round','extra-round']`; `DEFAULT_THEME_STATE.radius: 'sharp'` → `'square'`; `THEME_MODE_OPTIONS.radius` values+labels → friendly (`Square`, `Subtle`, `Smooth`, `Round`, `Extra round`); `THEME_STYLESHEET_HREFS.radius` → `{ square:'/themes/radius-square.css', subtle:'/themes/radius-subtle.css', smooth:'/themes/radius-smooth.css', round:'/themes/radius-round.css', 'extra-round':'/themes/radius-extra-round.css' }`.
 
-- [ ] **Step 8: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular && git checkout packages/core/package.json` (re-apply `--radius`).
+- [ ] **Step 7b: Story imports (radius only)** — in `packages/react/src/stories/Radius.stories.tsx`, update the 3 **radius** token-JSON imports + bindings to friendly (`radius-sharp.json` → `radius-square.json`, `radius-mellow.json` → `radius-round.json`, `radius-blunt.json` → `radius-extra-round.json`). Leave the 5 `borderwidth-*` imports in this same file untouched — those still resolve (renamed in Task 2.5). Build-critical: same commit as the `git mv`.
+
+- [ ] **Step 8: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular`; then confirm `git diff --stat packages/core/package.json` is empty (do not blind-`checkout`).
 
 - [ ] **Step 9: Validate + test** — `pnpm validate:spacing-modes && pnpm typecheck && pnpm test:unit` → PASS. Confirm the `[data-radius="extra-round"]` selector is present in `packages/tailwind/nexus.css` (proves the widened pattern + hyphen survived generation).
 
@@ -891,7 +926,9 @@ cd -
 
 - [ ] **Step 6: Update docs borderwidth infra** — in `theme-modes.ts`: `THEME_MODE_VALUES.borderwidth` → `['normal','medium','fine','bold','strong']`; `DEFAULT_THEME_STATE.borderwidth: 'vega'` → `'normal'`; `THEME_MODE_OPTIONS.borderwidth` values+labels → friendly; `THEME_STYLESHEET_HREFS.borderwidth` → `{ normal:'/themes/borderwidth-normal.css', medium:'/themes/borderwidth-medium.css', fine:'/themes/borderwidth-fine.css', bold:'/themes/borderwidth-bold.css', strong:'/themes/borderwidth-strong.css' }`.
 
-- [ ] **Step 7: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular && git checkout packages/core/package.json` (re-apply `--borderwidth`).
+- [ ] **Step 6b: Story imports (borderwidth in `Radius.stories.tsx`)** — update the 5 **borderwidth** token-JSON imports + bindings to friendly (`borderwidth-maia.json` → `borderwidth-fine.json`, `borderwidth-vega.json` → `borderwidth-normal.json`, `borderwidth-nova.json` → `borderwidth-strong.json`, `borderwidth-lyra.json` → `borderwidth-medium.json`, `borderwidth-mira.json` → `borderwidth-bold.json`). This completes `Radius.stories.tsx` (its radius imports moved in 2.4). Build-critical: same commit as the `git mv`.
+
+- [ ] **Step 7: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular`; then confirm `git diff --stat packages/core/package.json` is empty (do not blind-`checkout`).
 
 - [ ] **Step 8: Validate + test** — `pnpm validate:spacing-modes && pnpm typecheck && pnpm test:unit` → PASS.
 
@@ -911,19 +948,21 @@ cd -
 git mv packages/core/tokens/primitives/typography/typography-vega.json packages/core/tokens/primitives/typography/typography-default.json
 ```
 
-- [ ] **Step 4: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular && git checkout packages/core/package.json`. Confirm `apps/docs/public/themes/typography-default.css` now exists and `typography-vega.css` is gone.
+- [ ] **Step 3b: Story import** — in `packages/react/src/stories/Typography.stories.tsx`, update the import path + binding (`typography-vega.json` → `typography-default.json`; `typographyVega` → `typographyDefault`). Build-critical: same commit as the `git mv`.
+
+- [ ] **Step 4: Regenerate** — `pnpm tokens:tailwind && pnpm tokens:modular`; confirm `apps/docs/public/themes/typography-default.css` now exists, `typography-vega.css` is gone, and `git diff --stat packages/core/package.json` is empty (do not blind-`checkout`).
 
 - [ ] **Step 5: Test** — `pnpm test:unit && pnpm typecheck` → PASS.
 
 - [ ] **Step 6: Commit** — `git add -A && git commit -m "feat(core): rename typography mode vega→default (#546)"`
 
-### Task 2.7: Golden value-preservation proof
+### Task 2.7: Golden value-preservation + generated-CSS + audit boundary
 
 **Files:**
 
 - Create: `packages/core/scripts/__tests__/mode-rename-value-preservation.test.js`
 
-**Interfaces:** Consumes the PR-1 oracle (`pre-rename-mode-values.json`) and `MODE_RENAME`. Asserts every renamed (friendly) token file reproduces the exact `$value` set its codename source had — the honest "rename only, zero value change" proof.
+**Interfaces:** Consumes the PR-1 oracle (`pre-rename-mode-values.json`) and `MODE_RENAME`. Asserts every renamed (friendly) token file reproduces the exact `$value` set its codename source had — the honest "rename only, zero value change" proof — then asserts the generated CSS flipped selectors, and records the audit's PR-3 boundary.
 
 - [ ] **Step 1: Write the test**
 
@@ -1006,12 +1045,65 @@ describe('token-mode rename preserves every value', () => {
 Run: `pnpm test:unit packages/core/scripts/__tests__/mode-rename-value-preservation.test.js`
 Expected: PASS — every friendly file reproduces its codename source's values. (A FAIL means a `git mv` pointed at the wrong file or a value drifted — fix before proceeding.)
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 2b: Assert the generated CSS flipped selectors**
+
+Add a second test in the same file, reading the committed `packages/tailwind/nexus.css` (the artifact consumers load). It proves the rename reached the emitted selectors — friendly present, every retired codename gone:
+
+```js
+it('emits friendly data-* selectors and no retired ones', () => {
+  const css = fs.readFileSync(
+    path.resolve(__dirname, '..', '..', '..', 'tailwind', 'nexus.css'),
+    'utf8'
+  );
+  for (const sel of [
+    '[data-style="default"]',
+    '[data-radius="square"]',
+    '[data-radius="extra-round"]',
+    '[data-shadow="quiet"]',
+    '[data-borderwidth="normal"]',
+  ]) {
+    expect(css.includes(sel), `missing ${sel}`).toBe(true);
+  }
+  for (const c of [
+    'nova',
+    'mira',
+    'maia',
+    'vega',
+    'lyra',
+    'luma',
+    'sera',
+    'sharp',
+    'mellow',
+    'blunt',
+  ]) {
+    expect(
+      new RegExp(`\\[data-(style|radius|shadow|borderwidth)="${c}"\\]`).test(
+        css
+      ),
+      `retired selector for "${c}" still emitted`
+    ).toBe(false);
+  }
+});
+```
+
+- [ ] **Step 3: Run both tests** — `pnpm test:unit packages/core/scripts/__tests__/mode-rename-value-preservation.test.js` → PASS. (Value FAIL = a `git mv` pointed at the wrong file; selector FAIL = a generator default/flag still codename, or a regen was skipped.)
+
+- [ ] **Step 4: Audit boundary — record the PR-3 residual**
+
+Run `pnpm --filter @nexus/core audit:mode-codenames`. It still exits 1 — that is expected at the end of PR-2. Confirm **every** remaining hit is a PR-3-scoped **prose/demo `data-*`** reference (e.g. `apps/docs/app/_pages/MultiBrand.tsx` `data-style="nova"`), and that **zero** hits are token filenames, generated CSS (`packages/tailwind/*`, `apps/docs/public/themes/*`), package runtime, or docs theme infra (`theme-modes.ts`). Paste the residual list into the PR description as the PR-3 work-list. If any non-prose hit appears, a slice missed a regen or a consumer — fix it here, not in PR-3.
+
+- [ ] **Step 5: Commit**
 
 ```bash
 git add packages/core/scripts/__tests__/mode-rename-value-preservation.test.js
-git commit -m "test(core): prove token-mode rename preserved all values (#546)"
+git commit -m "test(core): prove token-mode rename preserved values + flipped selectors (#546)"
 ```
+
+### Task 2.8: PR-2 finalization
+
+- [ ] **Step 1: Full regen + validation** — `pnpm tokens:tailwind && pnpm tokens:modular && pnpm validate:spacing-modes && pnpm typecheck && pnpm test:unit` → all green. (`pnpm typecheck` is turbo-wide and includes `@nexus/react`, so it is the real guard that every `*.stories.tsx` token-JSON import resolved post-rename.)
+- [ ] **Step 2: Builds** — `pnpm --filter @nexus/core build && pnpm --filter @nexus/react build` → both succeed (catches any dist-level fallout the typecheck missed).
+- [ ] **Step 3: Open the PR** — branch `codex/issue-546-friendly-mode-cutover`, base `main`. Write the body to a file and use `gh pr create --body-file` (not an inline `$(cat <<EOF)`). Body: `Part of #546`, the per-family commit list, the **audit residual** from Task 2.7 Step 4 as the PR-3 work-list, and the two deliberate exclusions (no bootstrap v2 salvage, no docs persisted-state normalization).
 
 ---
 
