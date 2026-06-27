@@ -222,6 +222,26 @@ describe('createNexusAppearanceBootstrapScript', () => {
     ).toBe('light dark');
   });
 
+  it('does not force dark in system mode when matchMedia is unavailable', () => {
+    const system = createNexusAppearanceSnapshot(
+      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'system' },
+      ':root {}',
+      ':root {}'
+    );
+    window.localStorage.setItem('nexus-appearance', JSON.stringify(system));
+    Reflect.set(window, 'matchMedia', undefined);
+
+    new Function(createNexusAppearanceBootstrapScript())();
+
+    const root = document.documentElement;
+    expect(root.classList.contains('dark')).toBe(false);
+    expect(root.style.colorScheme).toBe('light');
+    expect(
+      document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
+        ?.content
+    ).toBe('light dark');
+  });
+
   it.each([
     ['light', false],
     ['light', true],
