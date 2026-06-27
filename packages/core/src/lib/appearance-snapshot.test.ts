@@ -37,6 +37,10 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
+  it('uses snapshot version 2 for runtime focus-token CSS', () => {
+    expect(SNAPSHOT_VERSION).toBe(2);
+  });
+
   it('stores pre-derived CSS verbatim', () => {
     const theme = themeCss();
     const prefs = prefsCss();
@@ -71,6 +75,35 @@ describe('NexusAppearanceSnapshot', () => {
     expect(snapshot.state).toEqual(dark);
     expect(snapshot.themeCss).toBe(themeCss(dark));
     expect(snapshot.prefsCss).toBe(prefsCss(dark));
+  });
+
+  it('refreshes a v1 snapshot without resetting the stored state', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'dark' as const,
+      surfaceTone: 'slate' as const,
+      brandColor: '#2563eb',
+    };
+    const snapshot = sanitizeNexusAppearanceSnapshot({
+      version: 1,
+      state,
+      themeCss: ':root { --nx-color-background: stale; }',
+      prefsCss: ':root { --stale-prefs: stale; }',
+    });
+
+    expect(snapshot.version).toBe(SNAPSHOT_VERSION);
+    expect(snapshot.state).toEqual(state);
+    expect(snapshot.themeCss).toBe(themeCss(state));
+    expect(snapshot.themeCss).toContain('--nx-color-focus-default:');
+    expect(snapshot.themeCss).toContain('--nx-color-focus-error:');
+    expect(snapshot.prefsCss).toBe(prefsCss(state));
+  });
+
+  it('embeds runtime focus tokens in the default first-paint snapshot', () => {
+    const script = createNexusAppearanceBootstrapScript();
+
+    expect(script).toContain('--nx-color-focus-default');
+    expect(script).toContain('--nx-color-focus-error');
   });
 
   it('resets to the default snapshot on unreadable payloads', () => {

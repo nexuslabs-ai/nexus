@@ -33,6 +33,7 @@ function curatedKeys(mode: Mode): Set<string> {
     `base-slate-${mode}.json`,
     `brands-blue-${mode}.json`,
     `chart-categorical-default-${mode}.json`,
+    'focus.json',
   ];
   const keys = new Set<string>();
   for (const file of files) {

@@ -10,6 +10,10 @@ import { describe, expect, it } from 'vitest';
 
 import { apcaLc } from './apca';
 import {
+  createNexusThemeContract,
+  DEFAULT_NEXUS_APPEARANCE,
+} from './appearance-model';
+import {
   derivePrimary,
   deriveSurfaces,
   deriveText,
@@ -31,6 +35,7 @@ function hOf(oklchStr: string | undefined): number {
 const toRgb = converter('rgb');
 const oklabDelta = differenceEuclidean('oklab');
 const COLORBLIND_DELTA_E = 0.02;
+const RUNTIME_SEMANTIC_COLOR_COUNT = 105;
 const VISION_TYPES = [
   'normal',
   'deuteranopia',
@@ -260,6 +265,47 @@ describe('deriveTheme', () => {
     expect(lOf(d.dark['--nx-color-background'])).toBeLessThan(0.3); // dark seed
     expect(lOf(d.light['--nx-color-background'])).toBeGreaterThan(0.9); // light seed
   });
+
+  it('emits all semantic colors, including runtime focus tokens', () => {
+    const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
+
+    for (const map of [d.light, d.dark]) {
+      const colorKeys = Object.keys(map).filter((key) =>
+        key.startsWith('--nx-color-')
+      );
+      expect(colorKeys).toHaveLength(RUNTIME_SEMANTIC_COLOR_COUNT);
+      expect(map['--nx-color-focus-default']).toBeDefined();
+      expect(map['--nx-color-focus-error']).toBeDefined();
+    }
+  });
+
+  it.each(['light', 'dark'] as const)(
+    'keeps focus tokens APCA-safe on key surfaces in %s mode',
+    (mode) => {
+      const map = deriveTheme(
+        createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE)
+      )[mode];
+      const surfaces = [
+        '--nx-color-background',
+        '--nx-color-container',
+        '--nx-color-popover',
+        '--nx-color-nav-background',
+        '--nx-color-muted',
+      ];
+
+      for (const focusToken of [
+        '--nx-color-focus-default',
+        '--nx-color-focus-error',
+      ]) {
+        for (const surface of surfaces) {
+          expect(
+            apcaLc(map[focusToken]!, map[surface]!),
+            `${mode}: ${focusToken} on ${surface}`
+          ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
+        }
+      }
+    }
+  );
 
   it.each(['light', 'dark'] as const)(
     'moves structure tokens as contrast changes in %s mode',

@@ -66,6 +66,11 @@ const SURFACE_TONE: Record<
 const PAPER_L = 0.987;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FLAT_IN_LIGHT = new Set(['container', 'popover']);
+const FOCUS_APCA_FLOOR = 45;
+const FOCUS_SEEDS = {
+  light: { default: '#1e3a8a', error: '#7f1d1d' },
+  dark: { default: '#9dc1ee', error: '#fca5a5' },
+} as const;
 
 function anchoredContrastLerp(
   contrast: number,
@@ -282,6 +287,24 @@ function readableOn(bg: string): string {
     : 'oklch(0 0 0)';
 }
 
+function apcaSafeAgainst(color: string, bg: string, mode: Mode): string {
+  const seed = seedOklch(color);
+  const c = seed.c ?? 0;
+  const h = seed.h ?? 0;
+  const initialL = seed.l ?? (mode === 'dark' ? 1 : 0);
+  const direction = mode === 'dark' ? 1 : -1;
+  for (let step = 0; step <= 100; step += 1) {
+    const candidate = formatOklch({
+      mode: 'oklch',
+      l: clamp01(initialL + direction * step * 0.01),
+      c,
+      h,
+    });
+    if (apcaLc(candidate, bg) >= FOCUS_APCA_FLOOR) return candidate;
+  }
+  return readableOn(bg);
+}
+
 /** First shade (in `order`) that clears `floor` against `bg`; else the black/white endpoint. */
 function legibleShade(
   ramp: Record<Shade, string>,
@@ -465,6 +488,21 @@ function deriveAlpha(
   };
 }
 
+function deriveFocus(mode: Mode, surfaces: TokenMap): TokenMap {
+  const seeds = FOCUS_SEEDS[mode];
+  const background =
+    surfaces['--nx-color-background'] ??
+    (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
+  return {
+    '--nx-color-focus-default': apcaSafeAgainst(
+      seeds.default,
+      background,
+      mode
+    ),
+    '--nx-color-focus-error': apcaSafeAgainst(seeds.error, background, mode),
+  };
+}
+
 /** Tone-independent neutral surface family (9 tokens, no borders). */
 export const NEUTRAL = {
   '50': 'oklch(0.985 0 0)',
@@ -513,6 +551,7 @@ function deriveMode(
   const status = deriveStatus(mode);
   const chart = deriveChart(mode);
   const alpha = deriveAlpha(surfaceTone, mode, profile);
+  const focus = deriveFocus(mode, surfaces);
   return {
     ...surfaces,
     ...text,
@@ -521,6 +560,7 @@ function deriveMode(
     ...status,
     ...chart,
     ...alpha,
+    ...focus,
   };
 }
 
@@ -528,7 +568,7 @@ function deriveMode(
  * Expand derivation seeds into light + dark `--nx-color-*` maps. Both modes are
  * always derived; the consumer's `appearance` choice selects one at runtime.
  * Only tokens the engine computes are emitted (surfaces, text, borders, primary,
- * secondary, status, chart, alpha/translucent).
+ * secondary, status, chart, alpha/translucent, focus).
  */
 export function deriveTheme(input: ThemeDerivationInput): DerivedTheme {
   const surfaceTone = input.surfaceTone ?? 'neutral';
