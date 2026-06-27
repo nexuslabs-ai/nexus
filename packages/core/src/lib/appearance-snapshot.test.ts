@@ -157,8 +157,8 @@ describe('createNexusAppearanceBootstrapScript', () => {
 
     new Function(createNexusAppearanceBootstrapScript())();
 
-    expect(document.documentElement).toHaveClass('dark');
-    expect(document.documentElement).toHaveAttribute('data-radius', 'sharp');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.getAttribute('data-radius')).toBe('sharp');
     expect(document.documentElement.style.colorScheme).toBe('dark');
     expect(
       document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
@@ -183,8 +183,8 @@ describe('createNexusAppearanceBootstrapScript', () => {
       })
     )();
 
-    expect(document.documentElement).toHaveAttribute('data-style', 'mira');
-    expect(document.documentElement).not.toHaveClass('dark');
+    expect(document.documentElement.getAttribute('data-style')).toBe('mira');
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(
       document.querySelectorAll('style[data-nexus-appearance-theme]')
     ).toHaveLength(1);
@@ -211,7 +211,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
 
     new Function(createNexusAppearanceBootstrapScript())();
 
-    expect(document.documentElement).toHaveClass('dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
     expect(
       document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
         ?.content
