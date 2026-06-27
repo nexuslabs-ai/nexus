@@ -1074,12 +1074,27 @@ In root `package.json` `lint-staged`, extend the token-file globs to also run th
 ],
 ```
 
-- [ ] **Step 3: Run the full audit + a dry-run commit**
+- [ ] **Step 3: Add the post-cutover value-list exclusion**
+
+PR-1's drift guard binds the public value-lists to `MODE_RENAME` (catches typos/unmapped names) but, by construction, **cannot** assert "no value is a retired codename" pre-migration (the values _are_ codenames until the cutover). Now that the repo is friendly, close that half: extend `mode-rename-map.test.js`'s value-list binding (and the docs `theme-modes.test.ts` guard) with an exclusion assertion — every `appearance-model.ts` OPTIONS/DEFAULT value and every docs `THEME_MODE_VALUES` entry is **not** in `RETIRED_CODENAMES`:
+
+```js
+// in the existing "binds the public appearance-model value-lists" test
+for (const [family, options] of Object.entries(optionsByFamily)) {
+  for (const { value } of options) {
+    expect(RETIRED_CODENAMES, `${family} option ${value}`).not.toContain(value);
+  }
+}
+```
+
+This is the assertion the context-scoped audit cannot make (it never scans bare strings); together with the audit gate it makes acceptance-criterion #1 provable for the type/option surface as well as DOM/CSS.
+
+- [ ] **Step 4: Run the full audit + a dry-run commit**
 
 Run: `pnpm audit:mode-codenames`
 Expected: `✅ No retired token-mode codenames`.
 
-- [ ] **Step 4: Commit** — `git add -A && git commit -m "ci: gate on token-mode codename audit (#546)"`
+- [ ] **Step 5: Commit** — `git add -A && git commit -m "ci: gate on token-mode codename audit (#546)"`
 
 ### Task 3.4: Visual QA + final validation
 

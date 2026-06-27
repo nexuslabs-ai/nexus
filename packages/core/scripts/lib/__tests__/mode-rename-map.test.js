@@ -3,6 +3,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
+import {
+  CORNER_OPTIONS,
+  DEFAULT_NEXUS_APPEARANCE,
+  DENSITY_OPTIONS,
+  ELEVATION_OPTIONS,
+  STROKE_OPTIONS,
+} from '../../../src/lib/appearance-model';
 import { MODE_RENAME, RETIRED_CODENAMES } from '../mode-rename-map.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -53,10 +60,20 @@ describe('mode-rename-map', () => {
   });
 
   it('derives RETIRED_CODENAMES as the sorted union of every codename', () => {
-    const expected = [
-      ...new Set(Object.values(MODE_RENAME).flatMap((map) => Object.keys(map))),
-    ].sort();
-    expect(RETIRED_CODENAMES).toEqual(expected);
+    // Pinned literal (not re-derived from MODE_RENAME) so adding, removing, or
+    // typo'ing a codename is caught — the point of a freeze PR.
+    expect(RETIRED_CODENAMES).toEqual([
+      'blunt',
+      'luma',
+      'lyra',
+      'maia',
+      'mellow',
+      'mira',
+      'nova',
+      'sera',
+      'sharp',
+      'vega',
+    ]);
   });
 
   it('covers every current spacing token file', () => {
@@ -85,5 +102,44 @@ describe('mode-rename-map', () => {
   it('leaves already-friendly radius modes unchanged', () => {
     expect(MODE_RENAME.radius.subtle).toBeUndefined();
     expect(MODE_RENAME.radius.smooth).toBeUndefined();
+  });
+
+  it('keeps codenames disjoint from friendly targets', () => {
+    // The audit's `RETIRED_CODENAMES` alternation and `expectModeCovered`'s
+    // `||` branch both assume a codename is never also a friendly name. (Not a
+    // global friendly-uniqueness check — `default`/`strong` are reused across
+    // families on purpose.)
+    const friendly = new Set(
+      Object.values(MODE_RENAME).flatMap((map) => Object.values(map))
+    );
+    for (const codename of RETIRED_CODENAMES) {
+      expect(
+        friendly.has(codename),
+        `${codename} is also a friendly target — would break the audit alternation`
+      ).toBe(false);
+    }
+  });
+
+  it('binds the public appearance-model value-lists to the rename map', () => {
+    // The model re-encodes the mapping as its own literals (`NexusDensity`
+    // etc.); without this, a typo'd or unmapped option value passes typecheck
+    // and the context-scoped audit (which cannot see bare strings). Green today
+    // (codenames) and after the cutover (friendly names).
+    const optionsByFamily = {
+      spacing: DENSITY_OPTIONS,
+      shadow: ELEVATION_OPTIONS,
+      radius: CORNER_OPTIONS,
+      borderwidth: STROKE_OPTIONS,
+    };
+    const defaultByFamily = {
+      spacing: DEFAULT_NEXUS_APPEARANCE.density,
+      shadow: DEFAULT_NEXUS_APPEARANCE.elevation,
+      radius: DEFAULT_NEXUS_APPEARANCE.corners,
+      borderwidth: DEFAULT_NEXUS_APPEARANCE.stroke,
+    };
+    for (const [family, options] of Object.entries(optionsByFamily)) {
+      for (const { value } of options) expectModeCovered(family, value);
+      expectModeCovered(family, defaultByFamily[family]);
+    }
   });
 });

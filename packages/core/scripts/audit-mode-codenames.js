@@ -96,7 +96,10 @@ export function findCodenameViolations({
 } = {}) {
   const violations = [];
   const isAllowed = (relativePath) =>
-    allowlist.some((allowed) => relativePath.startsWith(allowed));
+    allowlist.some(
+      (allowed) =>
+        relativePath === allowed || relativePath.startsWith(`${allowed}/`)
+    );
 
   for (const root of roots) {
     const absoluteRoot = path.join(REPO_ROOT, root);
