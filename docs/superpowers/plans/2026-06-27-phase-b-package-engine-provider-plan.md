@@ -495,7 +495,7 @@ git diff --cached --quiet || git commit -m "refactor(console): follow core Nexus
 
 **Interfaces:**
 
-- Produces: `collectRadiusModes(tokensDir)`, `collectBorderwidthModes(tokensDir)`, `collectShadowModes(tokensDir)` — each returns a **mode-keyed literal map** `{ [mode]: Array<{cssName, value}> }`, the shape `generateSpacingModesCSS` consumes. (Distinct from the existing single-mode `collectRadiusTokens(dir, mode)` / `collectBorderwidthTokens(dir, mode)` / `collectShadowTokens(dir, primitiveMap)`, which are `@theme`-shaped and stay.)
+- Produces: `collectRadiusModes(tokensDir)`, `collectBorderwidthModes(tokensDir)`, `collectShadowModes(tokensDir)`. Radius and borderwidth return **mode-keyed literal maps** `{ [mode]: Array<{cssName, value}> }`; shadow returns `{ [mode]: { light: Array<{cssName, value}>, dark: Array<{cssName, value}> } }` because shadow primitives are shipped as `shadow-{mode}-{light|dark}.json`. (Distinct from the existing single-mode `collectRadiusTokens(dir, mode)` / `collectBorderwidthTokens(dir, mode)` / `collectShadowTokens(dir, primitiveMap)`, which are `@theme`-shaped and stay.)
 
 > **Implementer note (anti-fabrication):** read `collectSpacingTokens` (`utils.js:784`) end-to-end first — it is the exact template (iterate `modeNames`, read each `spacing-{mode}.json`, flatten to `{cssName, value}` with a collision guard). Mirror it for the three new families, reading per-mode primitive files from `packages/core/tokens/primitives/{radius,borderwidth,shadow}/*`. For **shadow**, the per-mode value is a **primitive-layer override** (e.g. `--nx-shadow-sm-layer-1-color`), NOT the composite `--shadow-sm` — confirm against `apps/console/public/themes/shadow-maia.css` (which emits `--nx-shadow-*-layer-*-*`). This is Decision/blocker B3: a composite-literal collector would be wrong.
 
@@ -532,7 +532,8 @@ test('radius collector returns all 5 modes incl. blunt', () => {
 test('shadow collector emits primitive-layer tokens, not the composite', () => {
   const m = collectShadowModes(TOKENS);
   expect(Object.keys(m)).toContain('maia');
-  const names = m.maia.map((t) => t.cssName);
+  const names = m.maia.light.map((t) => t.cssName);
+  expect(m.maia.dark.map((t) => t.cssName)).toEqual(names);
   expect(names.some((n) => n.includes('-layer-'))).toBe(true);
   expect(names).not.toContain('shadow-sm'); // composite stays in @theme
 });

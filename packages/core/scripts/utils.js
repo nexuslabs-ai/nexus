@@ -1150,6 +1150,168 @@ export function collectBreakpointsTokens(semanticDir) {
 }
 
 /**
+ * Flatten one primitive mode file into runtime override literals.
+ *
+ * @param {string} filePath - Primitive token file path
+ * @param {string} cssPrefix - CSS variable family prefix, e.g. "radius"
+ * @param {string} caller - Function name for error messages
+ * @returns {{cssName: string, path: string[], value: string}[]}
+ */
+function collectPrimitiveModeFile(filePath, cssPrefix, caller) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`${caller}: primitive file missing: ${filePath}`);
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const extracted = extractTokens(tokenData);
+  const tokens = [];
+  const seen = new Set();
+
+  for (const token of extracted) {
+    const cssName = `${cssPrefix}-${token.path.join('-')}`;
+    if (seen.has(cssName)) {
+      throw new Error(
+        `${caller}: cssName collision "${cssName}" in ${filePath} — two JSON paths flatten to the same variable name`
+      );
+    }
+    seen.add(cssName);
+    tokens.push({
+      cssName,
+      path: token.path,
+      value: formatTokenValue(token.value, token.type, token.path),
+    });
+  }
+
+  return tokens;
+}
+
+function discoverPrimitiveModeFiles(tokensDir, category, caller) {
+  const dir = path.join(tokensDir, 'primitives', category);
+  if (!fs.existsSync(dir)) {
+    throw new Error(`${caller}: primitive directory missing: ${dir}`);
+  }
+
+  const filesByMode = {};
+  for (const file of fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith('.json'))) {
+    const match = file.match(new RegExp(`^${category}-(.+)\\.json$`));
+    if (!match) continue;
+    filesByMode[match[1]] = file;
+  }
+
+  const modes = Object.keys(filesByMode);
+  if (modes.length === 0) {
+    throw new Error(
+      `${caller}: no ${category}-{mode}.json files found in ${dir}`
+    );
+  }
+
+  return { dir, filesByMode, modes };
+}
+
+/**
+ * Collect all radius primitive modes as runtime override literals.
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
+ */
+export function collectRadiusModes(tokensDir) {
+  const { dir, filesByMode, modes } = discoverPrimitiveModeFiles(
+    tokensDir,
+    'radius',
+    'collectRadiusModes'
+  );
+  const result = {};
+  for (const mode of modes) {
+    result[mode] = collectPrimitiveModeFile(
+      path.join(dir, filesByMode[mode]),
+      'radius',
+      'collectRadiusModes'
+    );
+  }
+  return result;
+}
+
+/**
+ * Collect all border width primitive modes as runtime override literals.
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
+ */
+export function collectBorderwidthModes(tokensDir) {
+  const { dir, filesByMode, modes } = discoverPrimitiveModeFiles(
+    tokensDir,
+    'borderwidth',
+    'collectBorderwidthModes'
+  );
+  const result = {};
+  for (const mode of modes) {
+    result[mode] = collectPrimitiveModeFile(
+      path.join(dir, filesByMode[mode]),
+      'borderwidth',
+      'collectBorderwidthModes'
+    );
+  }
+  return result;
+}
+
+/**
+ * Collect all shadow primitive modes as runtime override literals, preserving
+ * light/dark partners for the themed shadow primitive files.
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @returns {Record<string, {light: {cssName: string, path: string[], value: string}[], dark: {cssName: string, path: string[], value: string}[]}>}
+ */
+export function collectShadowModes(tokensDir) {
+  const dir = path.join(tokensDir, 'primitives', 'shadow');
+  if (!fs.existsSync(dir)) {
+    throw new Error(`collectShadowModes: primitive directory missing: ${dir}`);
+  }
+
+  const filesByMode = {};
+  for (const file of fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith('.json'))) {
+    const match = file.match(/^shadow-(.+)-(light|dark)\.json$/);
+    if (!match) continue;
+    const [, mode, variant] = match;
+    filesByMode[mode] ??= {};
+    filesByMode[mode][variant] = file;
+  }
+
+  const modes = Object.keys(filesByMode);
+  if (modes.length === 0) {
+    throw new Error(
+      `collectShadowModes: no shadow-{mode}-{light|dark}.json files found in ${dir}`
+    );
+  }
+
+  const result = {};
+  for (const mode of modes) {
+    const pair = filesByMode[mode];
+    if (!pair.light || !pair.dark) {
+      throw new Error(
+        `collectShadowModes: mode "${mode}" must provide both light and dark primitive files`
+      );
+    }
+    result[mode] = {
+      light: collectPrimitiveModeFile(
+        path.join(dir, pair.light),
+        'shadow',
+        'collectShadowModes'
+      ),
+      dark: collectPrimitiveModeFile(
+        path.join(dir, pair.dark),
+        'shadow',
+        'collectShadowModes'
+      ),
+    };
+  }
+  return result;
+}
+
+/**
  * Collect radius token mappings from a mode file
  * Returns array of { cssName, varRef } for @theme block
  *
