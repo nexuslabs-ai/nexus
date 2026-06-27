@@ -115,8 +115,7 @@ describe('generateModular', () => {
 
   it('emits role and motion @utility declarations into sibling utility files', () => {
     // Symmetric with the bundled-tailwind build: globals.css @imports sibling
-    // utility files; sync-console-themes.js's STYLES_FILES allowlist includes
-    // them so they reach apps/console/src/styles/.
+    // utility files so modular consumers can serve the same utility layer.
     const files = fs.readdirSync(distDir);
     expect(files).toContain('spacing-utilities.css');
     expect(files).toContain('motion-utilities.css');
