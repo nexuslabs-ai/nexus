@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 
+import { popoverSurfaceClassName } from '@/components/ui/overlay-layout/overlay-layout';
 import { cn } from '@/lib/utils';
 
 /**
@@ -72,7 +73,7 @@ function PopoverContent({
         sideOffset={sideOffset}
         className={cn(
           'nx:z-popover nx:w-72 nx:p-container nx:outline-none',
-          'nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg',
+          popoverSurfaceClassName,
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',

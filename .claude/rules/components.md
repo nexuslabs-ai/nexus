@@ -176,6 +176,12 @@ Not every focusable thing takes the outline ring, and not everything that shows 
 
 The dividing line is modality and surface: anything a keyboard user reaches with Tab gets the ring; anything Radix's roving focus moves to on pointer-hover gets a background tint from the surface it lives on. Overlay rows use `popover-hover`; ordinary page controls use `background-hover`.
 
+### Popover / menu surface policy
+
+Popover-layer containers — Popover, DropdownMenu, ContextMenu, HoverCard, Menubar floating content, NavigationMenu flyouts, Select content, Tooltip, and equivalent first-party floating surfaces — use the shared solid popover recipe by default: `popoverSurfaceClassName` (`nx:bg-popover`, `nx:text-popover-foreground`, `nx:border-border-default`, `nx:shadow-lg`, rounded radius).
+
+Do not add `nx:bg-popover-alpha`, `nx:backdrop-blur-*`, or component-specific translucent menu fills to these default surfaces. The alpha/backdrop tokens remain available for a future audited visual direction, but the default component family stays solid so menu text and `popover-hover` / `popover-active` row states remain predictable over both quiet and busy page backgrounds.
+
 ### No shadow on focusable elements
 
 Do not add `nx:shadow-*` utilities to focusable elements — the structural separation still holds:
