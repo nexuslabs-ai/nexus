@@ -178,6 +178,26 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
+const PUBLIC_MODE_RENAME: Record<
+  'density' | 'corners' | 'elevation' | 'stroke',
+  Record<string, string>
+> = {
+  density: {},
+  corners: {},
+  elevation: {},
+  stroke: {},
+};
+
+export function normalizeAppearanceModeIds(raw: unknown): unknown {
+  if (!isRecord(raw)) return raw;
+  const out: Record<string, unknown> = { ...raw };
+  for (const [field, map] of Object.entries(PUBLIC_MODE_RENAME)) {
+    const value = out[field];
+    if (typeof value === 'string' && value in map) out[field] = map[value];
+  }
+  return out;
+}
+
 export function sanitizeNexusAppearancePrefs(
   raw: unknown
 ): NexusAppearancePrefs {
@@ -194,8 +214,11 @@ export function sanitizeNexusAppearancePrefs(
   };
 }
 
-export function sanitizeNexusAppearance(raw: unknown): NexusAppearanceState {
-  if (!isRecord(raw)) return DEFAULT_NEXUS_APPEARANCE;
+export function sanitizeNexusAppearance(
+  rawInput: unknown
+): NexusAppearanceState {
+  if (!isRecord(rawInput)) return DEFAULT_NEXUS_APPEARANCE;
+  const raw = normalizeAppearanceModeIds(rawInput) as Record<string, unknown>;
   const d = DEFAULT_NEXUS_APPEARANCE;
   return {
     mode: enumOr(raw.mode, APPEARANCE_MODES, d.mode),

@@ -7,7 +7,7 @@ import {
 } from './appearance-model';
 import { deriveTheme, themeToCss } from './derive-theme';
 
-export const SNAPSHOT_VERSION = 2;
+export const SNAPSHOT_VERSION = 3;
 
 export interface NexusAppearanceSnapshot {
   version: typeof SNAPSHOT_VERSION;

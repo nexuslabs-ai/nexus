@@ -37,8 +37,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 2 for runtime focus-token CSS', () => {
-    expect(SNAPSHOT_VERSION).toBe(2);
+  it('uses snapshot version 3 for friendly token-mode ids', () => {
+    expect(SNAPSHOT_VERSION).toBe(3);
   });
 
   it('stores pre-derived CSS verbatim', () => {

@@ -10,6 +10,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
+  normalizeAppearanceModeIds,
   sanitizeNexusAppearance,
   sanitizeNexusAppearancePrefs,
   STROKE_OPTIONS,
@@ -162,6 +163,18 @@ describe('sanitizeNexusAppearance', () => {
         mode: 'system',
       }).mode
     ).toBe('system');
+  });
+});
+
+describe('normalizeAppearanceModeIds', () => {
+  it('is identity on already-friendly values and non-strings', () => {
+    expect(
+      normalizeAppearanceModeIds({ density: 'compact', corners: 7 })
+    ).toMatchObject({ density: 'compact', corners: 7 });
+  });
+
+  it('passes non-records through unchanged', () => {
+    expect(normalizeAppearanceModeIds('nope')).toBe('nope');
   });
 });
 
