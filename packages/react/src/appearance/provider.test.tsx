@@ -141,11 +141,12 @@ describe('NexusAppearanceProvider', () => {
 
     act(() => {
       result.current.setState((state) => ({ ...state, surfaceTone: 'zinc' }));
+      result.current.setState((state) => ({ ...state, mode: 'dark' }));
     });
 
-    expect(onStateChange).toHaveBeenCalledTimes(1);
-    expect(onStateChange).toHaveBeenCalledWith(
-      expect.objectContaining({ surfaceTone: 'zinc' })
+    expect(onStateChange).toHaveBeenCalledTimes(2);
+    expect(onStateChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ surfaceTone: 'zinc', mode: 'dark' })
     );
   });
 
