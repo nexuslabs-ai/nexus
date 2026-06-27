@@ -699,7 +699,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Accordion uses numeric `nx:py-4` for item-tier rhythm — simple authoring, no role-based control spacing. Numeric spacing still cascades per density mode, so the trigger height tracks the active mode (48px nova → 56px maia).',
+          'Accordion uses numeric `nx:py-4` for item-tier rhythm — simple authoring, no role-based control spacing. Numeric spacing still cascades per density mode, so the trigger height tracks the active mode (48px compact → 56px relaxed).',
       },
     },
   },
@@ -731,7 +731,7 @@ export const AccordionTriggerModesCascade: Story = {
   },
   render: () => (
     <AllModesGrid>
-      {(['nova', 'maia'] as const).map((mode) => (
+      {(['compact', 'relaxed'] as const).map((mode) => (
         <AllModesRow key={mode} mode={mode}>
           <div data-testid={`accordion-mode-host-${mode}`}>
             <Accordion type="single" collapsible className="nx:w-[200px]">
@@ -748,8 +748,8 @@ export const AccordionTriggerModesCascade: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'accordion-mode-host-nova',
-      'accordion-mode-host-maia',
+      'accordion-mode-host-compact',
+      'accordion-mode-host-relaxed',
       { selector: '[data-slot="accordion-trigger"]' }
     );
   },
@@ -761,14 +761,14 @@ export const AccordionTriggerVegaHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the numeric-spacing outcome: in vega mode, AccordionTrigger renders at exactly 52px (= `typography-label-default` line-height 20 + `py-4` 16 x 2).',
+          'Pin on the numeric-spacing outcome: in regular mode, AccordionTrigger renders at exactly 52px (= `typography-label-default` line-height 20 + `py-4` 16 x 2).',
       },
     },
   },
   render: () => (
     <div
-      data-style="vega"
-      data-testid="accordion-vega-host"
+      data-style="regular"
+      data-testid="accordion-regular-host"
       className="nx:p-10 nx:bg-background"
     >
       <Accordion type="single" collapsible className="nx:w-[200px]">
@@ -780,9 +780,14 @@ export const AccordionTriggerVegaHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'accordion-vega-host', 52, {
-      selector: '[data-slot="accordion-trigger"]',
-    });
+    await expectHeightPinned(
+      within(canvasElement),
+      'accordion-regular-host',
+      52,
+      {
+        selector: '[data-slot="accordion-trigger"]',
+      }
+    );
   },
 };
 
@@ -792,14 +797,14 @@ export const AccordionFloatingTriggerVegaHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the floating visual variant: the item chrome changes, but the AccordionTrigger remains exactly 52px in vega mode.',
+          'Pin on the floating visual variant: the item chrome changes, but the AccordionTrigger remains exactly 52px in regular mode.',
       },
     },
   },
   render: () => (
     <div
-      data-style="vega"
-      data-testid="accordion-floating-vega-host"
+      data-style="regular"
+      data-testid="accordion-floating-regular-host"
       className="nx:p-10 nx:bg-background"
     >
       <Accordion
@@ -818,7 +823,7 @@ export const AccordionFloatingTriggerVegaHeightPinned: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightPinned(
       within(canvasElement),
-      'accordion-floating-vega-host',
+      'accordion-floating-regular-host',
       52,
       {
         selector: '[data-slot="accordion-trigger"]',
@@ -838,7 +843,7 @@ export const AccordionExpandedItemVegaHeightPinned: Story = {
     },
   },
   render: () => (
-    <div data-style="vega" className="nx:p-10 nx:bg-background">
+    <div data-style="regular" className="nx:p-10 nx:bg-background">
       <Accordion
         type="single"
         collapsible

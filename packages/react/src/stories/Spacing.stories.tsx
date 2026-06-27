@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import spacingLuma from '../../../core/tokens/semantic/spacing-luma.json';
-import spacingLyra from '../../../core/tokens/semantic/spacing-lyra.json';
-import spacingMaia from '../../../core/tokens/semantic/spacing-maia.json';
-import spacingMira from '../../../core/tokens/semantic/spacing-mira.json';
-import spacingNova from '../../../core/tokens/semantic/spacing-nova.json';
-import spacingSera from '../../../core/tokens/semantic/spacing-sera.json';
-import spacingVega from '../../../core/tokens/semantic/spacing-vega.json';
+import spacingComfortable from '../../../core/tokens/semantic/spacing-comfortable.json';
+import spacingCompact from '../../../core/tokens/semantic/spacing-compact.json';
+import spacingDefault from '../../../core/tokens/semantic/spacing-default.json';
+import spacingRegular from '../../../core/tokens/semantic/spacing-regular.json';
+import spacingRelaxed from '../../../core/tokens/semantic/spacing-relaxed.json';
+import spacingSpacious from '../../../core/tokens/semantic/spacing-spacious.json';
+import spacingTight from '../../../core/tokens/semantic/spacing-tight.json';
 
 import { SPACING_MODES, type SpacingMode } from './spacing-modes';
 
-const DEFAULT_MODE: SpacingMode = 'vega';
+const DEFAULT_MODE: SpacingMode = 'regular';
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
@@ -27,13 +27,13 @@ function isDimensionToken(node: unknown): node is DimensionToken {
 }
 
 const SPACING_TOKENS: Record<SpacingMode, ModeFile> = {
-  vega: spacingVega as ModeFile,
-  lyra: spacingLyra as ModeFile,
-  maia: spacingMaia as ModeFile,
-  mira: spacingMira as ModeFile,
-  nova: spacingNova as ModeFile,
-  luma: spacingLuma as ModeFile,
-  sera: spacingSera as ModeFile,
+  regular: spacingRegular as ModeFile,
+  tight: spacingTight as ModeFile,
+  relaxed: spacingRelaxed as ModeFile,
+  default: spacingDefault as ModeFile,
+  compact: spacingCompact as ModeFile,
+  comfortable: spacingComfortable as ModeFile,
+  spacious: spacingSpacious as ModeFile,
 };
 
 const MODES: { name: SpacingMode; tokens: ModeFile }[] = SPACING_MODES.map(
@@ -148,7 +148,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Spacing tokens are authored per-mode in `packages/core/tokens/semantic/spacing-{mode}.json`. Each mode owns direct px values for both the numeric `--spacing-N` scale and the role-named `--container-*` / `--layout-*` tokens. Mode switching is via the `data-style="X"` attribute on `<html>` (or any subtree); the active mode is the default `vega` when no attribute is set.',
+          'Spacing tokens are authored per-mode in `packages/core/tokens/semantic/spacing-{mode}.json`. Each mode owns direct px values for both the numeric `--spacing-N` scale and the role-named `--container-*` / `--layout-*` tokens. Mode switching is via the `data-style="X"` attribute on `<html>` (or any subtree); the active mode is the default `regular` when no attribute is set.',
       },
     },
   },
@@ -213,7 +213,7 @@ export const ActiveMode: Story = {
     docs: {
       description: {
         story:
-          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:p-container`, `nx:gap-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `nova` (compact), `vega` (default), `maia` (relaxed), `sera` (most breathing).',
+          'Live render of role-named utilities under the active `data-style` mode (controlled by the **Style** toolbar). Switching modes resizes the boxes; numeric utilities like `nx:p-4` are byte-identical across modes today, so only role utilities (`nx:p-container`, `nx:gap-container`, `nx:gap-layout-*`) reveal the per-mode variance. Try `compact` (compact), `regular` (default), `relaxed` (relaxed), `spacious` (most breathing).',
       },
     },
   },

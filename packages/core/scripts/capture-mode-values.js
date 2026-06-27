@@ -2,40 +2,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_MODE_FAMILIES } from './lib/token-mode-manifest.js';
 import { leafPathsOf } from './validate-spacing-modes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TOKENS = path.resolve(__dirname, '..', 'tokens');
 const OUT = path.join(
   __dirname,
   '__tests__',
   '__fixtures__',
   'pre-rename-mode-values.json'
 );
-
-const FAMILIES = [
-  ['spacing', path.join(TOKENS, 'semantic'), /^spacing-([a-z]+)\.json$/],
-  [
-    'shadow',
-    path.join(TOKENS, 'primitives', 'shadow'),
-    /^shadow-([a-z]+)-(light|dark)\.json$/,
-  ],
-  [
-    'radius',
-    path.join(TOKENS, 'primitives', 'radius'),
-    /^radius-([a-z]+)\.json$/,
-  ],
-  [
-    'borderwidth',
-    path.join(TOKENS, 'primitives', 'borderwidth'),
-    /^borderwidth-([a-z]+)\.json$/,
-  ],
-  [
-    'typography',
-    path.join(TOKENS, 'primitives', 'typography'),
-    /^typography-([a-z]+)\.json$/,
-  ],
-];
 
 export function leafValues(data) {
   const values = {};
@@ -49,10 +25,10 @@ export function leafValues(data) {
 
 export function captureModeValues() {
   const result = {};
-  for (const [family, dir, pattern] of FAMILIES) {
+  for (const { family, dir, modePattern } of TOKEN_MODE_FAMILIES) {
     const files = fs.readdirSync(dir).sort();
     for (const file of files) {
-      const match = file.match(pattern);
+      const match = file.match(modePattern);
       if (!match) continue;
 
       const codename = match[1];

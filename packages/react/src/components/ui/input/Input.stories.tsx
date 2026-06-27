@@ -55,31 +55,31 @@ type Story = StoryObj<typeof Input>;
 
 const INPUT_SCALE_HEIGHTS = {
   sm: {
-    vega: 32,
-    lyra: 32,
-    maia: 36,
-    mira: 32,
-    nova: 30,
-    luma: 32,
-    sera: 32,
+    regular: 32,
+    tight: 32,
+    relaxed: 36,
+    default: 32,
+    compact: 30,
+    comfortable: 32,
+    spacious: 32,
   },
   default: {
-    vega: 40,
-    lyra: 42,
-    maia: 44,
-    mira: 40,
-    nova: 38,
-    luma: 40,
-    sera: 40,
+    regular: 40,
+    tight: 42,
+    relaxed: 44,
+    default: 40,
+    compact: 38,
+    comfortable: 40,
+    spacious: 40,
   },
   lg: {
-    vega: 48,
-    lyra: 48,
-    maia: 52,
-    mira: 48,
-    nova: 46,
-    luma: 48,
-    sera: 48,
+    regular: 48,
+    tight: 48,
+    relaxed: 52,
+    default: 48,
+    compact: 46,
+    comfortable: 48,
+    spacious: 48,
   },
 } as const;
 
@@ -629,10 +629,9 @@ export const InputScaleHeightsFollowModes: Story = {
     const canvas = within(canvasElement);
 
     // The implicit-default input still exposes its size for styling hooks.
-    await expect(canvas.getByLabelText('vega default input')).toHaveAttribute(
-      'data-size',
-      'default'
-    );
+    await expect(
+      canvas.getByLabelText('regular default input')
+    ).toHaveAttribute('data-size', 'default');
 
     // Heights vary per mode (fixed h-* over mode-scaled spacing tokens); the
     // shared helper measures every mode against INPUT_SCALE_HEIGHTS.

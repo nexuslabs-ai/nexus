@@ -1,6 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -11,16 +9,7 @@ import {
   STROKE_OPTIONS,
 } from '../../../src/lib/appearance-model';
 import { MODE_RENAME, RETIRED_CODENAMES } from '../mode-rename-map.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TOKENS = path.resolve(__dirname, '..', '..', '..', 'tokens');
-
-const PRIMITIVE_FAMILIES = {
-  shadow: /^shadow-([a-z]+)-(?:light|dark)\.json$/,
-  radius: /^radius-([a-z]+(?:-[a-z]+)*)\.json$/,
-  borderwidth: /^borderwidth-([a-z]+)\.json$/,
-  typography: /^typography-([a-z]+)\.json$/,
-};
+import { TOKEN_MODE_FAMILIES } from '../token-mode-manifest.js';
 
 const UNCHANGED = {
   radius: new Set(['subtle', 'smooth']),
@@ -76,28 +65,19 @@ describe('mode-rename-map', () => {
     ]);
   });
 
-  it('covers every current spacing token file', () => {
-    const codenames = collectModes(
-      path.join(TOKENS, 'semantic'),
-      /^spacing-([a-z]+)\.json$/
-    );
+  it.each(
+    TOKEN_MODE_FAMILIES.map(({ family, dir, modePattern }) => [
+      family,
+      dir,
+      modePattern,
+    ])
+  )('covers every current %s token file', (family, dir, pattern) => {
+    const codenames = collectModes(dir, pattern);
 
     for (const codename of codenames) {
-      expectModeCovered('spacing', codename);
+      expectModeCovered(family, codename);
     }
   });
-
-  it.each(Object.entries(PRIMITIVE_FAMILIES))(
-    'covers every current %s token file',
-    (family, pattern) => {
-      const dir = path.join(TOKENS, 'primitives', family);
-      const codenames = collectModes(dir, pattern);
-
-      for (const codename of codenames) {
-        expectModeCovered(family, codename);
-      }
-    }
-  );
 
   it('leaves already-friendly radius modes unchanged', () => {
     expect(MODE_RENAME.radius.subtle).toBeUndefined();

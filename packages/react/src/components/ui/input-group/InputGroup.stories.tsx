@@ -422,17 +422,33 @@ export const Sizes: Story = {
 // follow the active spacing mode, so they are pinned per mode — the same scale
 // as Input, since the frame height is the control's h-*.
 const GROUP_SCALE_HEIGHTS = {
-  sm: { vega: 32, lyra: 32, maia: 36, mira: 32, nova: 30, luma: 32, sera: 32 },
-  default: {
-    vega: 40,
-    lyra: 42,
-    maia: 44,
-    mira: 40,
-    nova: 38,
-    luma: 40,
-    sera: 40,
+  sm: {
+    regular: 32,
+    tight: 32,
+    relaxed: 36,
+    default: 32,
+    compact: 30,
+    comfortable: 32,
+    spacious: 32,
   },
-  lg: { vega: 48, lyra: 48, maia: 52, mira: 48, nova: 46, luma: 48, sera: 48 },
+  default: {
+    regular: 40,
+    tight: 42,
+    relaxed: 44,
+    default: 40,
+    compact: 38,
+    comfortable: 40,
+    spacious: 40,
+  },
+  lg: {
+    regular: 48,
+    tight: 48,
+    relaxed: 52,
+    default: 48,
+    compact: 46,
+    comfortable: 48,
+    spacious: 48,
+  },
 } as const;
 
 export const HeightsFollowModes: Story = {
@@ -479,7 +495,7 @@ export const HeightsFollowModes: Story = {
     const groupSelector = { selector: '[data-slot="input-group"]' };
 
     // Child carries Input's data-size; the frame follows it.
-    await expect(canvas.getByLabelText('vega default')).toHaveAttribute(
+    await expect(canvas.getByLabelText('regular default')).toHaveAttribute(
       'data-size',
       'default'
     );

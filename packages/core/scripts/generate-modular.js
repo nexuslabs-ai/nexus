@@ -240,7 +240,7 @@ function generateModularGlobalsCSS(
   spacingDefault
 ) {
   // Get first available typography mode for Google Fonts
-  const typographyModes = primitives.typography?.modes || ['vega'];
+  const typographyModes = primitives.typography?.modes || ['default'];
   const typographyMode = typographyModes[0];
   const typographyFilePath = path.join(
     TOKENS_DIR,

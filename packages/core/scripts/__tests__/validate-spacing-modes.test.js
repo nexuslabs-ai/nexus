@@ -22,13 +22,13 @@ const dim = (n) => ({ $value: { value: n, unit: 'px' }, $type: 'dimension' });
 describe('CANONICAL_MODES', () => {
   it('is the 7-mode set per the canonical mode list', () => {
     expect([...CANONICAL_MODES].sort()).toEqual([
-      'luma',
-      'lyra',
-      'maia',
-      'mira',
-      'nova',
-      'sera',
-      'vega',
+      'comfortable',
+      'compact',
+      'default',
+      'regular',
+      'relaxed',
+      'spacious',
+      'tight',
     ]);
   });
 
@@ -47,11 +47,11 @@ describe('mode family configs', () => {
         config.expectedModes,
       ])
     ).toEqual([
-      ['spacing', 'vega', CANONICAL_MODES],
-      ['radius', 'sharp', CANONICAL_RADIUS_MODES],
-      ['borderwidth', 'vega', CANONICAL_BORDERWIDTH_MODES],
-      ['shadow-light', 'maia', CANONICAL_SHADOW_MODES],
-      ['shadow-dark', 'maia', CANONICAL_SHADOW_MODES],
+      ['spacing', 'regular', CANONICAL_MODES],
+      ['radius', 'square', CANONICAL_RADIUS_MODES],
+      ['borderwidth', 'normal', CANONICAL_BORDERWIDTH_MODES],
+      ['shadow-light', 'quiet', CANONICAL_SHADOW_MODES],
+      ['shadow-dark', 'quiet', CANONICAL_SHADOW_MODES],
     ]);
   });
 
@@ -238,9 +238,9 @@ describe('validateModes', () => {
   it('returns an empty findings list when all modes match the baseline', () => {
     const data = { spacing: { 0: dim(0), 1: dim(4) } };
     const modeMap = new Map([
-      ['vega', data],
-      ['lyra', data],
-      ['maia', data],
+      ['regular', data],
+      ['tight', data],
+      ['relaxed', data],
     ]);
     const findings = validateModes(modeMap);
     expect(findings).toHaveLength(2);
@@ -253,75 +253,77 @@ describe('validateModes', () => {
   it('skips the baseline mode in the output', () => {
     const data = { spacing: { 0: dim(0) } };
     const modeMap = new Map([
-      ['vega', data],
-      ['lyra', data],
+      ['regular', data],
+      ['tight', data],
     ]);
-    expect(validateModes(modeMap).map((f) => f.mode)).toEqual(['lyra']);
+    expect(validateModes(modeMap).map((f) => f.mode)).toEqual(['tight']);
   });
 
   it('reports per-mode drift for multiple diverging modes', () => {
     const baseline = { spacing: { 0: dim(0), 1: dim(4), 2: dim(8) } };
-    const luma = { spacing: { 0: dim(0), 2: dim(8) } }; // missing spacing.1
-    const lyra = { spacing: { 0: dim(0), 1: dim(4), 2: dim(8), 3: dim(12) } }; // extra spacing.3
+    const comfortable = { spacing: { 0: dim(0), 2: dim(8) } }; // missing spacing.1
+    const tight = { spacing: { 0: dim(0), 1: dim(4), 2: dim(8), 3: dim(12) } }; // extra spacing.3
     const modeMap = new Map([
-      ['vega', baseline],
-      ['luma', luma],
-      ['lyra', lyra],
+      ['regular', baseline],
+      ['comfortable', comfortable],
+      ['tight', tight],
     ]);
     const findings = validateModes(modeMap);
     expect(findings).toEqual([
-      { mode: 'luma', missing: ['spacing.1'], extra: [] },
-      { mode: 'lyra', missing: [], extra: ['spacing.3'] },
+      { mode: 'comfortable', missing: ['spacing.1'], extra: [] },
+      { mode: 'tight', missing: [], extra: ['spacing.3'] },
     ]);
   });
 
   it('sorts findings by mode name for stable output', () => {
     const data = { spacing: { 0: dim(0) } };
     const modeMap = new Map([
-      ['vega', data],
-      ['sera', data],
-      ['nova', data],
-      ['luma', data],
+      ['regular', data],
+      ['spacious', data],
+      ['compact', data],
+      ['comfortable', data],
     ]);
     expect(validateModes(modeMap).map((f) => f.mode)).toEqual([
-      'luma',
-      'nova',
-      'sera',
+      'comfortable',
+      'compact',
+      'spacious',
     ]);
   });
 
   it('reports every non-baseline mode as drifting when the baseline itself has a stray key', () => {
-    // If vega gets a new key the other modes haven't picked up yet, every
+    // If regular gets a new key the other modes haven't picked up yet, every
     // non-baseline mode reports it as missing — the validator surfaces the
     // drift symmetrically rather than special-casing the baseline.
-    const vega = { spacing: { 0: dim(0), 99: dim(396) } };
+    const regular = { spacing: { 0: dim(0), 99: dim(396) } };
     const clean = { spacing: { 0: dim(0) } };
     const modeMap = new Map([
-      ['vega', vega],
-      ['lyra', clean],
-      ['maia', clean],
+      ['regular', regular],
+      ['tight', clean],
+      ['relaxed', clean],
     ]);
     const findings = validateModes(modeMap);
     expect(findings).toEqual([
-      { mode: 'lyra', missing: ['spacing.99'], extra: [] },
-      { mode: 'maia', missing: ['spacing.99'], extra: [] },
+      { mode: 'relaxed', missing: ['spacing.99'], extra: [] },
+      { mode: 'tight', missing: ['spacing.99'], extra: [] },
     ]);
   });
 
   it('throws when the baseline mode is absent from the input map', () => {
-    const modeMap = new Map([['lyra', { spacing: { 0: dim(0) } }]]);
+    const modeMap = new Map([['tight', { spacing: { 0: dim(0) } }]]);
     expect(() => validateModes(modeMap)).toThrow(
-      /baseline mode "vega" not found/
+      /baseline mode "regular" not found/
     );
   });
 
   it('honours a custom baseline argument', () => {
     const data = { spacing: { 0: dim(0) } };
     const modeMap = new Map([
-      ['lyra', data],
-      ['maia', data],
+      ['tight', data],
+      ['relaxed', data],
     ]);
-    expect(validateModes(modeMap, 'lyra').map((f) => f.mode)).toEqual(['maia']);
+    expect(validateModes(modeMap, 'tight').map((f) => f.mode)).toEqual([
+      'relaxed',
+    ]);
   });
 });
 
@@ -345,15 +347,15 @@ describe('assertCanonicalModeSet', () => {
   });
 
   it('throws a ConfigError naming missing canonical modes', () => {
-    const discovered = CANONICAL_MODES.filter((m) => m !== 'lyra');
+    const discovered = CANONICAL_MODES.filter((m) => m !== 'tight');
     expect(() => assertCanonicalModeSet(discovered)).toThrow(ConfigError);
     expect(() => assertCanonicalModeSet(discovered)).toThrow(
-      /missing canonical mode\(s\): lyra/
+      /missing canonical mode\(s\): tight/
     );
   });
 
   it('reports both unexpected and missing modes in one message', () => {
-    const discovered = CANONICAL_MODES.filter((m) => m !== 'lyra').concat([
+    const discovered = CANONICAL_MODES.filter((m) => m !== 'tight').concat([
       'foo',
       'bar',
     ]);
@@ -363,7 +365,7 @@ describe('assertCanonicalModeSet', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(ConfigError);
       expect(err.message).toMatch(/unexpected mode file\(s\): bar, foo/);
-      expect(err.message).toMatch(/missing canonical mode\(s\): lyra/);
+      expect(err.message).toMatch(/missing canonical mode\(s\): tight/);
     }
   });
 });

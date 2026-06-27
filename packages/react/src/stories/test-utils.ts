@@ -45,10 +45,10 @@ type HeightMeasurementOptions = {
  * Cascade-regression sentinel — asserts that a control rendered under two
  * different `data-style` mode scopes resolves to different heights, with the
  * first arg's height strictly less than the second. Pass the smaller-padding
- * mode first (e.g. `nova` before `sera`). Pair-wise (not a 3-mode chain) so
+ * mode first (e.g. `compact` before `spacious`). Pair-wise (not a 3-mode chain) so
  * designer retunes of any single mode do not break the test — only a broken
  * cascade does. Consumers in different components can pick different pairs
- * (`nova`+`sera`, `nova`+`maia`, …) to spread coverage across the 7 modes.
+ * (`compact`+`spacious`, `compact`+`relaxed`, …) to spread coverage across the 7 modes.
  * Awaits `document.fonts.ready` so a loading web-font's fallback metrics
  * cannot collapse a one-pixel cascade difference into equality — a no-op under
  * the system-font stack, kept so a brand that re-aims to a web font stays
@@ -99,7 +99,7 @@ export async function expectHeightPinned(
  * and Tabs `sm` (both `py-1`) are genuinely mode-stable.
  *
  * This is NOT a general "numeric spacing doesn't move" check — it does. Larger
- * indices diverge per mode (`spacing-4` = 14/16/18 across nova/vega/maia), so a
+ * indices diverge per mode (`spacing-4` = 14/16/18 across compact/regular/relaxed), so a
  * control padded with `nx:py-4` renders 48/52/56px. For a control whose height
  * *should* track density — the default for padded controls — use
  * `expectModeCascadeWorks`; pinning it here would assert a height the

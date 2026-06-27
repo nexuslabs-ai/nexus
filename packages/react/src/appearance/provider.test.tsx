@@ -85,10 +85,10 @@ describe('NexusAppearanceProvider', () => {
 
     const root = document.documentElement;
 
-    expect(root).toHaveAttribute('data-style', 'mira');
-    expect(root).toHaveAttribute('data-radius', 'sharp');
-    expect(root).toHaveAttribute('data-shadow', 'maia');
-    expect(root).toHaveAttribute('data-borderwidth', 'vega');
+    expect(root).toHaveAttribute('data-style', 'default');
+    expect(root).toHaveAttribute('data-radius', 'square');
+    expect(root).toHaveAttribute('data-shadow', 'quiet');
+    expect(root).toHaveAttribute('data-borderwidth', 'normal');
     expect(root).not.toHaveClass('dark');
     expect(root.style.colorScheme).toBe('light');
   });
@@ -137,10 +137,10 @@ describe('NexusAppearanceProvider', () => {
           ...DEFAULT_NEXUS_APPEARANCE,
           mode: 'system',
           surfaceTone: 'slate',
-          density: 'nova',
-          corners: 'mellow',
-          elevation: 'nova',
-          stroke: 'nova',
+          density: 'compact',
+          corners: 'round',
+          elevation: 'strong',
+          stroke: 'strong',
         })
       )
     );

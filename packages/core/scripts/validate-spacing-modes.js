@@ -5,40 +5,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TOKENS_DIR = path.resolve(__dirname, '..', 'tokens');
-const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
-const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
+import {
+  BASELINE_MODE,
+  CANONICAL_BORDERWIDTH_MODES,
+  CANONICAL_MODES,
+  CANONICAL_RADIUS_MODES,
+  CANONICAL_SHADOW_MODES,
+  KEY_PARITY_MODE_FAMILY_CONFIGS,
+  keyParityModeFamilyConfigs,
+} from './lib/token-mode-manifest.js';
 
-export const BASELINE_MODE = 'vega';
-
-// The seven canonical density modes.
-// An unknown filename (e.g. spacing-foo.json) or a missing canonical mode
-// is a structural error (exit 2), not key drift (exit 1).
-export const CANONICAL_MODES = [
-  'luma',
-  'lyra',
-  'maia',
-  'mira',
-  'nova',
-  'sera',
-  'vega',
-];
-export const CANONICAL_RADIUS_MODES = [
-  'blunt',
-  'mellow',
-  'sharp',
-  'smooth',
-  'subtle',
-];
-export const CANONICAL_BORDERWIDTH_MODES = [
-  'lyra',
-  'maia',
-  'mira',
-  'nova',
-  'vega',
-];
-export const CANONICAL_SHADOW_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
+export {
+  BASELINE_MODE,
+  CANONICAL_BORDERWIDTH_MODES,
+  CANONICAL_MODES,
+  CANONICAL_RADIUS_MODES,
+  CANONICAL_SHADOW_MODES,
+};
 
 const EXIT_OK = 0;
 const EXIT_DRIFT = 1;
@@ -46,58 +29,7 @@ const EXIT_CONFIG = 2;
 
 export class ConfigError extends Error {}
 
-export function modeFamilyConfigs({
-  semanticDir = SEMANTIC_DIR,
-  primitivesDir = PRIMITIVES_DIR,
-} = {}) {
-  return [
-    {
-      name: 'spacing',
-      reportName: 'spacing',
-      dir: semanticDir,
-      baseline: BASELINE_MODE,
-      expectedModes: CANONICAL_MODES,
-      modePattern: /^spacing-([a-z]+)\.json$/,
-      fileName: (mode) => `spacing-${mode}.json`,
-    },
-    {
-      name: 'radius',
-      reportName: 'radius',
-      dir: path.join(primitivesDir, 'radius'),
-      baseline: 'sharp',
-      expectedModes: CANONICAL_RADIUS_MODES,
-      modePattern: /^radius-([a-z]+)\.json$/,
-      fileName: (mode) => `radius-${mode}.json`,
-    },
-    {
-      name: 'borderwidth',
-      reportName: 'borderwidth',
-      dir: path.join(primitivesDir, 'borderwidth'),
-      baseline: 'vega',
-      expectedModes: CANONICAL_BORDERWIDTH_MODES,
-      modePattern: /^borderwidth-([a-z]+)\.json$/,
-      fileName: (mode) => `borderwidth-${mode}.json`,
-    },
-    {
-      name: 'shadow-light',
-      reportName: 'shadow light',
-      dir: path.join(primitivesDir, 'shadow'),
-      baseline: 'maia',
-      expectedModes: CANONICAL_SHADOW_MODES,
-      modePattern: /^shadow-([a-z]+)-light\.json$/,
-      fileName: (mode) => `shadow-${mode}-light.json`,
-    },
-    {
-      name: 'shadow-dark',
-      reportName: 'shadow dark',
-      dir: path.join(primitivesDir, 'shadow'),
-      baseline: 'maia',
-      expectedModes: CANONICAL_SHADOW_MODES,
-      modePattern: /^shadow-([a-z]+)-dark\.json$/,
-      fileName: (mode) => `shadow-${mode}-dark.json`,
-    },
-  ];
-}
+export const modeFamilyConfigs = keyParityModeFamilyConfigs;
 
 /**
  * Walk a DTCG token tree and return sorted leaf paths as dotted strings.
@@ -231,12 +163,7 @@ export function validateModeFamily(config) {
   };
 }
 
-export function validateModeFamilies(
-  configs = modeFamilyConfigs({
-    semanticDir: SEMANTIC_DIR,
-    primitivesDir: PRIMITIVES_DIR,
-  })
-) {
+export function validateModeFamilies(configs = KEY_PARITY_MODE_FAMILY_CONFIGS) {
   return configs.map((config) => validateModeFamily(config));
 }
 

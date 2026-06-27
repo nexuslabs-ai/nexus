@@ -1263,12 +1263,12 @@ export const ModesProduceDifferentHeights: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="alert-mode-host-nova">
+      <div data-style="compact" data-testid="alert-mode-host-compact">
         <Alert className="nx:w-[200px]">
           <div className="nx:h-10" aria-hidden="true" />
         </Alert>
       </div>
-      <div data-style="maia" data-testid="alert-mode-host-maia">
+      <div data-style="relaxed" data-testid="alert-mode-host-relaxed">
         <Alert className="nx:w-[200px]">
           <div className="nx:h-10" aria-hidden="true" />
         </Alert>
@@ -1278,8 +1278,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'alert-mode-host-nova',
-      'alert-mode-host-maia',
+      'alert-mode-host-compact',
+      'alert-mode-host-relaxed',
       { selector: '[data-slot="alert"]' }
     );
   },
@@ -1291,14 +1291,14 @@ export const VegaHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the stays-numeric outcome: in vega mode, an Alert with a single 40px fixed-height child renders at exactly 74px (= border 1 × 2 + `p-4` 16 × 2 + child 40). If a future PR migrates `p-4` to `p-container`, vega rendering shifts to 90px (= 2 + 24 × 2 + 40) and this test fails — the regression signal is that Alert was promoted out of the document scale into the container scale.',
+          'Pin on the stays-numeric outcome: in regular mode, an Alert with a single 40px fixed-height child renders at exactly 74px (= border 1 × 2 + `p-4` 16 × 2 + child 40). If a future PR migrates `p-4` to `p-container`, regular rendering shifts to 90px (= 2 + 24 × 2 + 40) and this test fails — the regression signal is that Alert was promoted out of the document scale into the container scale.',
       },
     },
   },
   render: () => (
     <div
-      data-style="vega"
-      data-testid="alert-vega-host"
+      data-style="regular"
+      data-testid="alert-regular-host"
       className="nx:p-10 nx:bg-background"
     >
       <Alert className="nx:w-[200px]">
@@ -1307,7 +1307,7 @@ export const VegaHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'alert-vega-host', 74, {
+    await expectHeightPinned(within(canvasElement), 'alert-regular-host', 74, {
       selector: '[data-slot="alert"]',
     });
   },

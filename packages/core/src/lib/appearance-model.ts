@@ -8,10 +8,10 @@ import { isColor } from './perceptual-ramp';
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
 export type NexusAppearanceMode = 'light' | 'dark' | 'system';
-export type NexusDensity = 'nova' | 'mira' | 'luma' | 'sera';
-export type NexusCorners = 'sharp' | 'subtle' | 'smooth' | 'mellow';
-export type NexusElevation = 'maia' | 'mira' | 'nova';
-export type NexusStroke = 'maia' | 'vega' | 'nova';
+export type NexusDensity = 'compact' | 'default' | 'comfortable' | 'spacious';
+export type NexusCorners = 'square' | 'subtle' | 'smooth' | 'round';
+export type NexusElevation = 'quiet' | 'standard' | 'strong';
+export type NexusStroke = 'fine' | 'normal' | 'strong';
 
 export interface NexusAppearancePrefs {
   uiFont: string;
@@ -76,29 +76,29 @@ export const BASE_TONE_SEEDS: Record<
 };
 
 export const DENSITY_OPTIONS = [
-  { value: 'nova', label: 'Compact' },
-  { value: 'mira', label: 'Default' },
-  { value: 'luma', label: 'Comfortable' },
-  { value: 'sera', label: 'Spacious' },
+  { value: 'compact', label: 'Compact' },
+  { value: 'default', label: 'Default' },
+  { value: 'comfortable', label: 'Comfortable' },
+  { value: 'spacious', label: 'Spacious' },
 ] as const satisfies readonly { value: NexusDensity; label: string }[];
 
 export const CORNER_OPTIONS = [
-  { value: 'sharp', label: 'Square' },
+  { value: 'square', label: 'Square' },
   { value: 'subtle', label: 'Subtle' },
   { value: 'smooth', label: 'Smooth' },
-  { value: 'mellow', label: 'Round' },
+  { value: 'round', label: 'Round' },
 ] as const satisfies readonly { value: NexusCorners; label: string }[];
 
 export const ELEVATION_OPTIONS = [
-  { value: 'maia', label: 'Quiet' },
-  { value: 'mira', label: 'Standard' },
-  { value: 'nova', label: 'Strong' },
+  { value: 'quiet', label: 'Quiet' },
+  { value: 'standard', label: 'Standard' },
+  { value: 'strong', label: 'Strong' },
 ] as const satisfies readonly { value: NexusElevation; label: string }[];
 
 export const STROKE_OPTIONS = [
-  { value: 'maia', label: 'Fine' },
-  { value: 'vega', label: 'Normal' },
-  { value: 'nova', label: 'Strong' },
+  { value: 'fine', label: 'Fine' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'strong', label: 'Strong' },
 ] as const satisfies readonly { value: NexusStroke; label: string }[];
 
 export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
@@ -106,10 +106,10 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'stone',
   contrast: 60,
-  density: 'mira',
-  corners: 'sharp',
-  elevation: 'maia',
-  stroke: 'vega',
+  density: 'default',
+  corners: 'square',
+  elevation: 'quiet',
+  stroke: 'normal',
   prefs: {
     uiFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     codeFont: 'ui-monospace, "SF Mono", Menlo, monospace',
@@ -178,6 +178,49 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
+// Retired public-mode codename -> friendly, applied to persisted state on read
+// (see normalizeAppearanceModeIds). Internal; correctness is covered behaviorally
+// by the sanitize codename->friendly tests, so it is not part of the public API.
+const PUBLIC_MODE_RENAME: Record<
+  'density' | 'corners' | 'elevation' | 'stroke',
+  Record<string, string>
+> = {
+  density: {
+    nova: 'compact',
+    mira: 'default',
+    luma: 'comfortable',
+    sera: 'spacious',
+  },
+  corners: {
+    sharp: 'square',
+    mellow: 'round',
+  },
+  elevation: {
+    maia: 'quiet',
+    mira: 'standard',
+    nova: 'strong',
+  },
+  stroke: {
+    maia: 'fine',
+    vega: 'normal',
+    nova: 'strong',
+  },
+};
+
+export function normalizeAppearanceModeIds(raw: unknown): unknown {
+  if (!isRecord(raw)) return raw;
+  const out: Record<string, unknown> = { ...raw };
+  for (const [field, map] of Object.entries(PUBLIC_MODE_RENAME)) {
+    const value = out[field];
+    if (
+      typeof value === 'string' &&
+      Object.prototype.hasOwnProperty.call(map, value)
+    )
+      out[field] = map[value];
+  }
+  return out;
+}
+
 export function sanitizeNexusAppearancePrefs(
   raw: unknown
 ): NexusAppearancePrefs {
@@ -194,8 +237,11 @@ export function sanitizeNexusAppearancePrefs(
   };
 }
 
-export function sanitizeNexusAppearance(raw: unknown): NexusAppearanceState {
-  if (!isRecord(raw)) return DEFAULT_NEXUS_APPEARANCE;
+export function sanitizeNexusAppearance(
+  rawInput: unknown
+): NexusAppearanceState {
+  if (!isRecord(rawInput)) return DEFAULT_NEXUS_APPEARANCE;
+  const raw = normalizeAppearanceModeIds(rawInput) as Record<string, unknown>;
   const d = DEFAULT_NEXUS_APPEARANCE;
   return {
     mode: enumOr(raw.mode, APPEARANCE_MODES, d.mode),

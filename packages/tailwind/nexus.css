@@ -1036,7 +1036,7 @@
 /* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */
 
 :root,
-[data-style='mira'] {
+[data-style='default'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1077,7 +1077,7 @@
   --nx-layout-stack-gap: 8px;
 }
 
-[data-style='luma'] {
+[data-style='comfortable'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1118,89 +1118,7 @@
   --nx-layout-stack-gap: 10px;
 }
 
-[data-style='lyra'] {
-  --nx-spacing-0: 0px;
-  --nx-spacing-1: 4px;
-  --nx-spacing-2: 8px;
-  --nx-spacing-3: 12px;
-  --nx-spacing-4: 16px;
-  --nx-spacing-5: 20px;
-  --nx-spacing-6: 24px;
-  --nx-spacing-7: 30px;
-  --nx-spacing-8: 32px;
-  --nx-spacing-9: 36px;
-  --nx-spacing-10: 42px;
-  --nx-spacing-11: 48px;
-  --nx-spacing-12: 48px;
-  --nx-spacing-14: 60px;
-  --nx-spacing-16: 64px;
-  --nx-spacing-20: 80px;
-  --nx-spacing-24: 96px;
-  --nx-spacing-28: 120px;
-  --nx-spacing-32: 128px;
-  --nx-spacing-36: 144px;
-  --nx-spacing-40: 160px;
-  --nx-spacing-44: 180px;
-  --nx-spacing-48: 192px;
-  --nx-spacing-52: 210px;
-  --nx-spacing-56: 224px;
-  --nx-spacing-60: 240px;
-  --nx-spacing-64: 256px;
-  --nx-spacing-72: 288px;
-  --nx-spacing-80: 320px;
-  --nx-spacing-96: 384px;
-  --nx-spacing-0_5: 2px;
-  --nx-spacing-1_5: 6px;
-  --nx-spacing-2_5: 10px;
-  --nx-spacing-3_5: 15px;
-  --nx-container-p: 24px;
-  --nx-container-gap: 16px;
-  --nx-layout-section-gap: 32px;
-  --nx-layout-stack-gap: 8px;
-}
-
-[data-style='maia'] {
-  --nx-spacing-0: 0px;
-  --nx-spacing-1: 4px;
-  --nx-spacing-2: 8px;
-  --nx-spacing-3: 14px;
-  --nx-spacing-4: 18px;
-  --nx-spacing-5: 22px;
-  --nx-spacing-6: 28px;
-  --nx-spacing-7: 32px;
-  --nx-spacing-8: 36px;
-  --nx-spacing-9: 40px;
-  --nx-spacing-10: 44px;
-  --nx-spacing-11: 48px;
-  --nx-spacing-12: 52px;
-  --nx-spacing-14: 60px;
-  --nx-spacing-16: 68px;
-  --nx-spacing-20: 84px;
-  --nx-spacing-24: 100px;
-  --nx-spacing-28: 116px;
-  --nx-spacing-32: 132px;
-  --nx-spacing-36: 148px;
-  --nx-spacing-40: 164px;
-  --nx-spacing-44: 180px;
-  --nx-spacing-48: 196px;
-  --nx-spacing-52: 212px;
-  --nx-spacing-56: 228px;
-  --nx-spacing-60: 244px;
-  --nx-spacing-64: 260px;
-  --nx-spacing-72: 292px;
-  --nx-spacing-80: 324px;
-  --nx-spacing-96: 388px;
-  --nx-spacing-0_5: 2px;
-  --nx-spacing-1_5: 6px;
-  --nx-spacing-2_5: 11px;
-  --nx-spacing-3_5: 16px;
-  --nx-container-p: 28px;
-  --nx-container-gap: 20px;
-  --nx-layout-section-gap: 40px;
-  --nx-layout-stack-gap: 10px;
-}
-
-[data-style='nova'] {
+[data-style='compact'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1241,48 +1159,7 @@
   --nx-layout-stack-gap: 6px;
 }
 
-[data-style='sera'] {
-  --nx-spacing-0: 0px;
-  --nx-spacing-1: 4px;
-  --nx-spacing-2: 8px;
-  --nx-spacing-3: 12px;
-  --nx-spacing-4: 16px;
-  --nx-spacing-5: 20px;
-  --nx-spacing-6: 24px;
-  --nx-spacing-7: 28px;
-  --nx-spacing-8: 32px;
-  --nx-spacing-9: 36px;
-  --nx-spacing-10: 40px;
-  --nx-spacing-11: 44px;
-  --nx-spacing-12: 48px;
-  --nx-spacing-14: 56px;
-  --nx-spacing-16: 64px;
-  --nx-spacing-20: 80px;
-  --nx-spacing-24: 96px;
-  --nx-spacing-28: 112px;
-  --nx-spacing-32: 128px;
-  --nx-spacing-36: 144px;
-  --nx-spacing-40: 160px;
-  --nx-spacing-44: 176px;
-  --nx-spacing-48: 192px;
-  --nx-spacing-52: 208px;
-  --nx-spacing-56: 224px;
-  --nx-spacing-60: 240px;
-  --nx-spacing-64: 256px;
-  --nx-spacing-72: 288px;
-  --nx-spacing-80: 320px;
-  --nx-spacing-96: 384px;
-  --nx-spacing-0_5: 2px;
-  --nx-spacing-1_5: 6px;
-  --nx-spacing-2_5: 10px;
-  --nx-spacing-3_5: 14px;
-  --nx-container-p: 40px;
-  --nx-container-gap: 24px;
-  --nx-layout-section-gap: 56px;
-  --nx-layout-stack-gap: 16px;
-}
-
-[data-style='vega'] {
+[data-style='regular'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1323,10 +1200,133 @@
   --nx-layout-stack-gap: 8px;
 }
 
+[data-style='relaxed'] {
+  --nx-spacing-0: 0px;
+  --nx-spacing-1: 4px;
+  --nx-spacing-2: 8px;
+  --nx-spacing-3: 14px;
+  --nx-spacing-4: 18px;
+  --nx-spacing-5: 22px;
+  --nx-spacing-6: 28px;
+  --nx-spacing-7: 32px;
+  --nx-spacing-8: 36px;
+  --nx-spacing-9: 40px;
+  --nx-spacing-10: 44px;
+  --nx-spacing-11: 48px;
+  --nx-spacing-12: 52px;
+  --nx-spacing-14: 60px;
+  --nx-spacing-16: 68px;
+  --nx-spacing-20: 84px;
+  --nx-spacing-24: 100px;
+  --nx-spacing-28: 116px;
+  --nx-spacing-32: 132px;
+  --nx-spacing-36: 148px;
+  --nx-spacing-40: 164px;
+  --nx-spacing-44: 180px;
+  --nx-spacing-48: 196px;
+  --nx-spacing-52: 212px;
+  --nx-spacing-56: 228px;
+  --nx-spacing-60: 244px;
+  --nx-spacing-64: 260px;
+  --nx-spacing-72: 292px;
+  --nx-spacing-80: 324px;
+  --nx-spacing-96: 388px;
+  --nx-spacing-0_5: 2px;
+  --nx-spacing-1_5: 6px;
+  --nx-spacing-2_5: 11px;
+  --nx-spacing-3_5: 16px;
+  --nx-container-p: 28px;
+  --nx-container-gap: 20px;
+  --nx-layout-section-gap: 40px;
+  --nx-layout-stack-gap: 10px;
+}
+
+[data-style='spacious'] {
+  --nx-spacing-0: 0px;
+  --nx-spacing-1: 4px;
+  --nx-spacing-2: 8px;
+  --nx-spacing-3: 12px;
+  --nx-spacing-4: 16px;
+  --nx-spacing-5: 20px;
+  --nx-spacing-6: 24px;
+  --nx-spacing-7: 28px;
+  --nx-spacing-8: 32px;
+  --nx-spacing-9: 36px;
+  --nx-spacing-10: 40px;
+  --nx-spacing-11: 44px;
+  --nx-spacing-12: 48px;
+  --nx-spacing-14: 56px;
+  --nx-spacing-16: 64px;
+  --nx-spacing-20: 80px;
+  --nx-spacing-24: 96px;
+  --nx-spacing-28: 112px;
+  --nx-spacing-32: 128px;
+  --nx-spacing-36: 144px;
+  --nx-spacing-40: 160px;
+  --nx-spacing-44: 176px;
+  --nx-spacing-48: 192px;
+  --nx-spacing-52: 208px;
+  --nx-spacing-56: 224px;
+  --nx-spacing-60: 240px;
+  --nx-spacing-64: 256px;
+  --nx-spacing-72: 288px;
+  --nx-spacing-80: 320px;
+  --nx-spacing-96: 384px;
+  --nx-spacing-0_5: 2px;
+  --nx-spacing-1_5: 6px;
+  --nx-spacing-2_5: 10px;
+  --nx-spacing-3_5: 14px;
+  --nx-container-p: 40px;
+  --nx-container-gap: 24px;
+  --nx-layout-section-gap: 56px;
+  --nx-layout-stack-gap: 16px;
+}
+
+[data-style='tight'] {
+  --nx-spacing-0: 0px;
+  --nx-spacing-1: 4px;
+  --nx-spacing-2: 8px;
+  --nx-spacing-3: 12px;
+  --nx-spacing-4: 16px;
+  --nx-spacing-5: 20px;
+  --nx-spacing-6: 24px;
+  --nx-spacing-7: 30px;
+  --nx-spacing-8: 32px;
+  --nx-spacing-9: 36px;
+  --nx-spacing-10: 42px;
+  --nx-spacing-11: 48px;
+  --nx-spacing-12: 48px;
+  --nx-spacing-14: 60px;
+  --nx-spacing-16: 64px;
+  --nx-spacing-20: 80px;
+  --nx-spacing-24: 96px;
+  --nx-spacing-28: 120px;
+  --nx-spacing-32: 128px;
+  --nx-spacing-36: 144px;
+  --nx-spacing-40: 160px;
+  --nx-spacing-44: 180px;
+  --nx-spacing-48: 192px;
+  --nx-spacing-52: 210px;
+  --nx-spacing-56: 224px;
+  --nx-spacing-60: 240px;
+  --nx-spacing-64: 256px;
+  --nx-spacing-72: 288px;
+  --nx-spacing-80: 320px;
+  --nx-spacing-96: 384px;
+  --nx-spacing-0_5: 2px;
+  --nx-spacing-1_5: 6px;
+  --nx-spacing-2_5: 10px;
+  --nx-spacing-3_5: 15px;
+  --nx-container-p: 24px;
+  --nx-container-gap: 16px;
+  --nx-layout-section-gap: 32px;
+  --nx-layout-stack-gap: 8px;
+}
+
 /* ===== PER-MODE RADIUS (mode swap via [data-radius="X"] on any ancestor) ===== */
 
 :root,
-[data-radius='sharp'] {
+[data-radius='square'] {
   --nx-radius-base: 0px;
   --nx-radius-sm: 0px;
   --nx-radius-md: 0px;
@@ -1337,7 +1337,7 @@
   --nx-radius-full: 9999px;
 }
 
-[data-radius='blunt'] {
+[data-radius='extra-round'] {
   --nx-radius-base: 16px;
   --nx-radius-sm: 14px;
   --nx-radius-md: 16px;
@@ -1348,7 +1348,7 @@
   --nx-radius-full: 9999px;
 }
 
-[data-radius='mellow'] {
+[data-radius='round'] {
   --nx-radius-base: 12px;
   --nx-radius-sm: 10px;
   --nx-radius-md: 12px;
@@ -1384,7 +1384,7 @@
 /* ===== PER-MODE SHADOW (mode swap via [data-shadow="X"] on any ancestor) ===== */
 
 :root,
-[data-shadow='maia'] {
+[data-shadow='quiet'] {
   --nx-shadow-2xs-layer-1-x: 0px;
   --nx-shadow-2xs-layer-1-y: 1px;
   --nx-shadow-2xs-layer-1-blur: 3px;
@@ -1458,8 +1458,8 @@
 }
 
 .dark,
-.dark[data-shadow='maia'],
-.dark [data-shadow='maia'] {
+.dark[data-shadow='quiet'],
+.dark [data-shadow='quiet'] {
   --nx-shadow-2xs-layer-1-x: 0px;
   --nx-shadow-2xs-layer-1-y: 1px;
   --nx-shadow-2xs-layer-1-blur: 3px;
@@ -1532,448 +1532,7 @@
   --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0392);
 }
 
-[data-shadow='lyra'] {
-  --nx-shadow-2xs-layer-1-x: 0px;
-  --nx-shadow-2xs-layer-1-y: 1px;
-  --nx-shadow-2xs-layer-1-blur: 3px;
-  --nx-shadow-2xs-layer-1-spread: 0px;
-  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.051);
-  --nx-shadow-xs-layer-1-x: 0px;
-  --nx-shadow-xs-layer-1-y: 1px;
-  --nx-shadow-xs-layer-1-blur: 3px;
-  --nx-shadow-xs-layer-1-spread: 0px;
-  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.051);
-  --nx-shadow-sm-layer-1-x: 0px;
-  --nx-shadow-sm-layer-1-y: 1px;
-  --nx-shadow-sm-layer-1-blur: 3px;
-  --nx-shadow-sm-layer-1-spread: 0px;
-  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-sm-layer-2-x: 0px;
-  --nx-shadow-sm-layer-2-y: 2px;
-  --nx-shadow-sm-layer-2-blur: 3px;
-  --nx-shadow-sm-layer-2-spread: -1px;
-  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-base-layer-1-x: 0px;
-  --nx-shadow-base-layer-1-y: 1px;
-  --nx-shadow-base-layer-1-blur: 3px;
-  --nx-shadow-base-layer-1-spread: 0px;
-  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-base-layer-2-x: 0px;
-  --nx-shadow-base-layer-2-y: 2px;
-  --nx-shadow-base-layer-2-blur: 3px;
-  --nx-shadow-base-layer-2-spread: -1px;
-  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-md-layer-1-x: 0px;
-  --nx-shadow-md-layer-1-y: 1px;
-  --nx-shadow-md-layer-1-blur: 3px;
-  --nx-shadow-md-layer-1-spread: 0px;
-  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-md-layer-2-x: 0px;
-  --nx-shadow-md-layer-2-y: 3px;
-  --nx-shadow-md-layer-2-blur: 5px;
-  --nx-shadow-md-layer-2-spread: -1px;
-  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-lg-layer-1-x: 0px;
-  --nx-shadow-lg-layer-1-y: 1px;
-  --nx-shadow-lg-layer-1-blur: 3px;
-  --nx-shadow-lg-layer-1-spread: 0px;
-  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-lg-layer-2-x: 0px;
-  --nx-shadow-lg-layer-2-y: 6px;
-  --nx-shadow-lg-layer-2-blur: 9px;
-  --nx-shadow-lg-layer-2-spread: -1px;
-  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-xl-layer-1-x: 0px;
-  --nx-shadow-xl-layer-1-y: 1px;
-  --nx-shadow-xl-layer-1-blur: 3px;
-  --nx-shadow-xl-layer-1-spread: 0px;
-  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-xl-layer-2-x: 0px;
-  --nx-shadow-xl-layer-2-y: 12px;
-  --nx-shadow-xl-layer-2-blur: 16px;
-  --nx-shadow-xl-layer-2-spread: -1px;
-  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-2xl-layer-1-x: 0px;
-  --nx-shadow-2xl-layer-1-y: 1px;
-  --nx-shadow-2xl-layer-1-blur: 3px;
-  --nx-shadow-2xl-layer-1-spread: 0px;
-  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.251);
-  --nx-shadow-inner-layer-1-x: 0px;
-  --nx-shadow-inner-layer-1-y: 2px;
-  --nx-shadow-inner-layer-1-blur: 5px;
-  --nx-shadow-inner-layer-1-spread: 0px;
-  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.051);
-}
-
-.dark[data-shadow='lyra'],
-.dark [data-shadow='lyra'] {
-  --nx-shadow-2xs-layer-1-x: 0px;
-  --nx-shadow-2xs-layer-1-y: 1px;
-  --nx-shadow-2xs-layer-1-blur: 3px;
-  --nx-shadow-2xs-layer-1-spread: 0px;
-  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.051);
-  --nx-shadow-xs-layer-1-x: 0px;
-  --nx-shadow-xs-layer-1-y: 1px;
-  --nx-shadow-xs-layer-1-blur: 3px;
-  --nx-shadow-xs-layer-1-spread: 0px;
-  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.051);
-  --nx-shadow-sm-layer-1-x: 0px;
-  --nx-shadow-sm-layer-1-y: 1px;
-  --nx-shadow-sm-layer-1-blur: 3px;
-  --nx-shadow-sm-layer-1-spread: 0px;
-  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-sm-layer-2-x: 0px;
-  --nx-shadow-sm-layer-2-y: 2px;
-  --nx-shadow-sm-layer-2-blur: 3px;
-  --nx-shadow-sm-layer-2-spread: -1px;
-  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-base-layer-1-x: 0px;
-  --nx-shadow-base-layer-1-y: 1px;
-  --nx-shadow-base-layer-1-blur: 3px;
-  --nx-shadow-base-layer-1-spread: 0px;
-  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-base-layer-2-x: 0px;
-  --nx-shadow-base-layer-2-y: 2px;
-  --nx-shadow-base-layer-2-blur: 3px;
-  --nx-shadow-base-layer-2-spread: -1px;
-  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-md-layer-1-x: 0px;
-  --nx-shadow-md-layer-1-y: 1px;
-  --nx-shadow-md-layer-1-blur: 3px;
-  --nx-shadow-md-layer-1-spread: 0px;
-  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-md-layer-2-x: 0px;
-  --nx-shadow-md-layer-2-y: 3px;
-  --nx-shadow-md-layer-2-blur: 5px;
-  --nx-shadow-md-layer-2-spread: -1px;
-  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-lg-layer-1-x: 0px;
-  --nx-shadow-lg-layer-1-y: 1px;
-  --nx-shadow-lg-layer-1-blur: 3px;
-  --nx-shadow-lg-layer-1-spread: 0px;
-  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-lg-layer-2-x: 0px;
-  --nx-shadow-lg-layer-2-y: 6px;
-  --nx-shadow-lg-layer-2-blur: 9px;
-  --nx-shadow-lg-layer-2-spread: -1px;
-  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-xl-layer-1-x: 0px;
-  --nx-shadow-xl-layer-1-y: 1px;
-  --nx-shadow-xl-layer-1-blur: 3px;
-  --nx-shadow-xl-layer-1-spread: 0px;
-  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-xl-layer-2-x: 0px;
-  --nx-shadow-xl-layer-2-y: 12px;
-  --nx-shadow-xl-layer-2-blur: 16px;
-  --nx-shadow-xl-layer-2-spread: -1px;
-  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-2xl-layer-1-x: 0px;
-  --nx-shadow-2xl-layer-1-y: 1px;
-  --nx-shadow-2xl-layer-1-blur: 3px;
-  --nx-shadow-2xl-layer-1-spread: 0px;
-  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.251);
-  --nx-shadow-inner-layer-1-x: 0px;
-  --nx-shadow-inner-layer-1-y: 2px;
-  --nx-shadow-inner-layer-1-blur: 5px;
-  --nx-shadow-inner-layer-1-spread: 0px;
-  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.051);
-}
-
-[data-shadow='mira'] {
-  --nx-shadow-2xs-layer-1-x: 0px;
-  --nx-shadow-2xs-layer-1-y: 1px;
-  --nx-shadow-2xs-layer-1-blur: 3px;
-  --nx-shadow-2xs-layer-1-spread: 0px;
-  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0392);
-  --nx-shadow-xs-layer-1-x: 0px;
-  --nx-shadow-xs-layer-1-y: 1px;
-  --nx-shadow-xs-layer-1-blur: 3px;
-  --nx-shadow-xs-layer-1-spread: 0px;
-  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0392);
-  --nx-shadow-sm-layer-1-x: 0px;
-  --nx-shadow-sm-layer-1-y: 1px;
-  --nx-shadow-sm-layer-1-blur: 3px;
-  --nx-shadow-sm-layer-1-spread: 0px;
-  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.051);
-  --nx-shadow-sm-layer-2-x: 0px;
-  --nx-shadow-sm-layer-2-y: 1px;
-  --nx-shadow-sm-layer-2-blur: 2px;
-  --nx-shadow-sm-layer-2-spread: -1px;
-  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-base-layer-1-x: 0px;
-  --nx-shadow-base-layer-1-y: 1px;
-  --nx-shadow-base-layer-1-blur: 3px;
-  --nx-shadow-base-layer-1-spread: 0px;
-  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-base-layer-2-x: 0px;
-  --nx-shadow-base-layer-2-y: 1px;
-  --nx-shadow-base-layer-2-blur: 2px;
-  --nx-shadow-base-layer-2-spread: 0px;
-  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-md-layer-1-x: 0px;
-  --nx-shadow-md-layer-1-y: 1px;
-  --nx-shadow-md-layer-1-blur: 3px;
-  --nx-shadow-md-layer-1-spread: 0px;
-  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-md-layer-2-x: 0px;
-  --nx-shadow-md-layer-2-y: 2px;
-  --nx-shadow-md-layer-2-blur: 4px;
-  --nx-shadow-md-layer-2-spread: -1px;
-  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-lg-layer-1-x: 0px;
-  --nx-shadow-lg-layer-1-y: 1px;
-  --nx-shadow-lg-layer-1-blur: 3px;
-  --nx-shadow-lg-layer-1-spread: 0px;
-  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-lg-layer-2-x: 0px;
-  --nx-shadow-lg-layer-2-y: 5px;
-  --nx-shadow-lg-layer-2-blur: 8px;
-  --nx-shadow-lg-layer-2-spread: -1px;
-  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-xl-layer-1-x: 0px;
-  --nx-shadow-xl-layer-1-y: 1px;
-  --nx-shadow-xl-layer-1-blur: 3px;
-  --nx-shadow-xl-layer-1-spread: 0px;
-  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-xl-layer-2-x: 0px;
-  --nx-shadow-xl-layer-2-y: 10px;
-  --nx-shadow-xl-layer-2-blur: 14px;
-  --nx-shadow-xl-layer-2-spread: -1px;
-  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-2xl-layer-1-x: 0px;
-  --nx-shadow-2xl-layer-1-y: 1px;
-  --nx-shadow-2xl-layer-1-blur: 4px;
-  --nx-shadow-2xl-layer-1-spread: 0px;
-  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.2196);
-  --nx-shadow-inner-layer-1-x: 0px;
-  --nx-shadow-inner-layer-1-y: 1px;
-  --nx-shadow-inner-layer-1-blur: 4px;
-  --nx-shadow-inner-layer-1-spread: 0px;
-  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0392);
-}
-
-.dark[data-shadow='mira'],
-.dark [data-shadow='mira'] {
-  --nx-shadow-2xs-layer-1-x: 0px;
-  --nx-shadow-2xs-layer-1-y: 1px;
-  --nx-shadow-2xs-layer-1-blur: 3px;
-  --nx-shadow-2xs-layer-1-spread: 0px;
-  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0392);
-  --nx-shadow-xs-layer-1-x: 0px;
-  --nx-shadow-xs-layer-1-y: 1px;
-  --nx-shadow-xs-layer-1-blur: 3px;
-  --nx-shadow-xs-layer-1-spread: 0px;
-  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0392);
-  --nx-shadow-sm-layer-1-x: 0px;
-  --nx-shadow-sm-layer-1-y: 1px;
-  --nx-shadow-sm-layer-1-blur: 3px;
-  --nx-shadow-sm-layer-1-spread: 0px;
-  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.051);
-  --nx-shadow-sm-layer-2-x: 0px;
-  --nx-shadow-sm-layer-2-y: 1px;
-  --nx-shadow-sm-layer-2-blur: 2px;
-  --nx-shadow-sm-layer-2-spread: -1px;
-  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-base-layer-1-x: 0px;
-  --nx-shadow-base-layer-1-y: 1px;
-  --nx-shadow-base-layer-1-blur: 3px;
-  --nx-shadow-base-layer-1-spread: 0px;
-  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-base-layer-2-x: 0px;
-  --nx-shadow-base-layer-2-y: 1px;
-  --nx-shadow-base-layer-2-blur: 2px;
-  --nx-shadow-base-layer-2-spread: 0px;
-  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-md-layer-1-x: 0px;
-  --nx-shadow-md-layer-1-y: 1px;
-  --nx-shadow-md-layer-1-blur: 3px;
-  --nx-shadow-md-layer-1-spread: 0px;
-  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-md-layer-2-x: 0px;
-  --nx-shadow-md-layer-2-y: 2px;
-  --nx-shadow-md-layer-2-blur: 4px;
-  --nx-shadow-md-layer-2-spread: -1px;
-  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-lg-layer-1-x: 0px;
-  --nx-shadow-lg-layer-1-y: 1px;
-  --nx-shadow-lg-layer-1-blur: 3px;
-  --nx-shadow-lg-layer-1-spread: 0px;
-  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-lg-layer-2-x: 0px;
-  --nx-shadow-lg-layer-2-y: 5px;
-  --nx-shadow-lg-layer-2-blur: 8px;
-  --nx-shadow-lg-layer-2-spread: -1px;
-  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-xl-layer-1-x: 0px;
-  --nx-shadow-xl-layer-1-y: 1px;
-  --nx-shadow-xl-layer-1-blur: 3px;
-  --nx-shadow-xl-layer-1-spread: 0px;
-  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-xl-layer-2-x: 0px;
-  --nx-shadow-xl-layer-2-y: 10px;
-  --nx-shadow-xl-layer-2-blur: 14px;
-  --nx-shadow-xl-layer-2-spread: -1px;
-  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.102);
-  --nx-shadow-2xl-layer-1-x: 0px;
-  --nx-shadow-2xl-layer-1-y: 1px;
-  --nx-shadow-2xl-layer-1-blur: 4px;
-  --nx-shadow-2xl-layer-1-spread: 0px;
-  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.2196);
-  --nx-shadow-inner-layer-1-x: 0px;
-  --nx-shadow-inner-layer-1-y: 1px;
-  --nx-shadow-inner-layer-1-blur: 4px;
-  --nx-shadow-inner-layer-1-spread: 0px;
-  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0392);
-}
-
-[data-shadow='nova'] {
-  --nx-shadow-2xs-layer-1-x: 0px;
-  --nx-shadow-2xs-layer-1-y: 1px;
-  --nx-shadow-2xs-layer-1-blur: 3px;
-  --nx-shadow-2xs-layer-1-spread: 0px;
-  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-xs-layer-1-x: 0px;
-  --nx-shadow-xs-layer-1-y: 1px;
-  --nx-shadow-xs-layer-1-blur: 3px;
-  --nx-shadow-xs-layer-1-spread: 0px;
-  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-sm-layer-1-x: 0px;
-  --nx-shadow-sm-layer-1-y: 1px;
-  --nx-shadow-sm-layer-1-blur: 3px;
-  --nx-shadow-sm-layer-1-spread: 0px;
-  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-sm-layer-2-x: 0px;
-  --nx-shadow-sm-layer-2-y: 2px;
-  --nx-shadow-sm-layer-2-blur: 4px;
-  --nx-shadow-sm-layer-2-spread: -1px;
-  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-base-layer-1-x: 0px;
-  --nx-shadow-base-layer-1-y: 1px;
-  --nx-shadow-base-layer-1-blur: 3px;
-  --nx-shadow-base-layer-1-spread: 0px;
-  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-base-layer-2-x: 0px;
-  --nx-shadow-base-layer-2-y: 3px;
-  --nx-shadow-base-layer-2-blur: 6px;
-  --nx-shadow-base-layer-2-spread: -1px;
-  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-md-layer-1-x: 0px;
-  --nx-shadow-md-layer-1-y: 1px;
-  --nx-shadow-md-layer-1-blur: 3px;
-  --nx-shadow-md-layer-1-spread: 0px;
-  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-md-layer-2-x: 0px;
-  --nx-shadow-md-layer-2-y: 4px;
-  --nx-shadow-md-layer-2-blur: 8px;
-  --nx-shadow-md-layer-2-spread: -1px;
-  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-lg-layer-1-x: 0px;
-  --nx-shadow-lg-layer-1-y: 1px;
-  --nx-shadow-lg-layer-1-blur: 3px;
-  --nx-shadow-lg-layer-1-spread: 0px;
-  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.149);
-  --nx-shadow-lg-layer-2-x: 0px;
-  --nx-shadow-lg-layer-2-y: 8px;
-  --nx-shadow-lg-layer-2-blur: 16px;
-  --nx-shadow-lg-layer-2-spread: -1px;
-  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.149);
-  --nx-shadow-xl-layer-1-x: 0px;
-  --nx-shadow-xl-layer-1-y: 1px;
-  --nx-shadow-xl-layer-1-blur: 3px;
-  --nx-shadow-xl-layer-1-spread: 0px;
-  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1804);
-  --nx-shadow-xl-layer-2-x: 0px;
-  --nx-shadow-xl-layer-2-y: 16px;
-  --nx-shadow-xl-layer-2-blur: 24px;
-  --nx-shadow-xl-layer-2-spread: -1px;
-  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1804);
-  --nx-shadow-2xl-layer-1-x: 0px;
-  --nx-shadow-2xl-layer-1-y: 1px;
-  --nx-shadow-2xl-layer-1-blur: 3px;
-  --nx-shadow-2xl-layer-1-spread: 0px;
-  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.302);
-  --nx-shadow-inner-layer-1-x: 0px;
-  --nx-shadow-inner-layer-1-y: 2px;
-  --nx-shadow-inner-layer-1-blur: 6px;
-  --nx-shadow-inner-layer-1-spread: 0px;
-  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0784);
-}
-
-.dark[data-shadow='nova'],
-.dark [data-shadow='nova'] {
-  --nx-shadow-2xs-layer-1-x: 0px;
-  --nx-shadow-2xs-layer-1-y: 1px;
-  --nx-shadow-2xs-layer-1-blur: 3px;
-  --nx-shadow-2xs-layer-1-spread: 0px;
-  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-xs-layer-1-x: 0px;
-  --nx-shadow-xs-layer-1-y: 1px;
-  --nx-shadow-xs-layer-1-blur: 3px;
-  --nx-shadow-xs-layer-1-spread: 0px;
-  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0784);
-  --nx-shadow-sm-layer-1-x: 0px;
-  --nx-shadow-sm-layer-1-y: 1px;
-  --nx-shadow-sm-layer-1-blur: 3px;
-  --nx-shadow-sm-layer-1-spread: 0px;
-  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-sm-layer-2-x: 0px;
-  --nx-shadow-sm-layer-2-y: 2px;
-  --nx-shadow-sm-layer-2-blur: 4px;
-  --nx-shadow-sm-layer-2-spread: -1px;
-  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-base-layer-1-x: 0px;
-  --nx-shadow-base-layer-1-y: 1px;
-  --nx-shadow-base-layer-1-blur: 3px;
-  --nx-shadow-base-layer-1-spread: 0px;
-  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-base-layer-2-x: 0px;
-  --nx-shadow-base-layer-2-y: 3px;
-  --nx-shadow-base-layer-2-blur: 6px;
-  --nx-shadow-base-layer-2-spread: -1px;
-  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-md-layer-1-x: 0px;
-  --nx-shadow-md-layer-1-y: 1px;
-  --nx-shadow-md-layer-1-blur: 3px;
-  --nx-shadow-md-layer-1-spread: 0px;
-  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-md-layer-2-x: 0px;
-  --nx-shadow-md-layer-2-y: 4px;
-  --nx-shadow-md-layer-2-blur: 8px;
-  --nx-shadow-md-layer-2-spread: -1px;
-  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.1216);
-  --nx-shadow-lg-layer-1-x: 0px;
-  --nx-shadow-lg-layer-1-y: 1px;
-  --nx-shadow-lg-layer-1-blur: 3px;
-  --nx-shadow-lg-layer-1-spread: 0px;
-  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.149);
-  --nx-shadow-lg-layer-2-x: 0px;
-  --nx-shadow-lg-layer-2-y: 8px;
-  --nx-shadow-lg-layer-2-blur: 16px;
-  --nx-shadow-lg-layer-2-spread: -1px;
-  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.149);
-  --nx-shadow-xl-layer-1-x: 0px;
-  --nx-shadow-xl-layer-1-y: 1px;
-  --nx-shadow-xl-layer-1-blur: 3px;
-  --nx-shadow-xl-layer-1-spread: 0px;
-  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1804);
-  --nx-shadow-xl-layer-2-x: 0px;
-  --nx-shadow-xl-layer-2-y: 16px;
-  --nx-shadow-xl-layer-2-blur: 24px;
-  --nx-shadow-xl-layer-2-spread: -1px;
-  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1804);
-  --nx-shadow-2xl-layer-1-x: 0px;
-  --nx-shadow-2xl-layer-1-y: 1px;
-  --nx-shadow-2xl-layer-1-blur: 3px;
-  --nx-shadow-2xl-layer-1-spread: 0px;
-  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.302);
-  --nx-shadow-inner-layer-1-x: 0px;
-  --nx-shadow-inner-layer-1-y: 2px;
-  --nx-shadow-inner-layer-1-blur: 6px;
-  --nx-shadow-inner-layer-1-spread: 0px;
-  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0784);
-}
-
-[data-shadow='vega'] {
+[data-shadow='flat'] {
   --nx-shadow-2xs-layer-1-x: 0px;
   --nx-shadow-2xs-layer-1-y: 1px;
   --nx-shadow-2xs-layer-1-blur: 3px;
@@ -2046,8 +1605,8 @@
   --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.051);
 }
 
-.dark[data-shadow='vega'],
-.dark [data-shadow='vega'] {
+.dark[data-shadow='flat'],
+.dark [data-shadow='flat'] {
   --nx-shadow-2xs-layer-1-x: 0px;
   --nx-shadow-2xs-layer-1-y: 1px;
   --nx-shadow-2xs-layer-1-blur: 3px;
@@ -2118,32 +1677,473 @@
   --nx-shadow-inner-layer-1-blur: 4px;
   --nx-shadow-inner-layer-1-spread: 0px;
   --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.051);
+}
+
+[data-shadow='soft'] {
+  --nx-shadow-2xs-layer-1-x: 0px;
+  --nx-shadow-2xs-layer-1-y: 1px;
+  --nx-shadow-2xs-layer-1-blur: 3px;
+  --nx-shadow-2xs-layer-1-spread: 0px;
+  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-xs-layer-1-x: 0px;
+  --nx-shadow-xs-layer-1-y: 1px;
+  --nx-shadow-xs-layer-1-blur: 3px;
+  --nx-shadow-xs-layer-1-spread: 0px;
+  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-sm-layer-1-x: 0px;
+  --nx-shadow-sm-layer-1-y: 1px;
+  --nx-shadow-sm-layer-1-blur: 3px;
+  --nx-shadow-sm-layer-1-spread: 0px;
+  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-sm-layer-2-x: 0px;
+  --nx-shadow-sm-layer-2-y: 2px;
+  --nx-shadow-sm-layer-2-blur: 3px;
+  --nx-shadow-sm-layer-2-spread: -1px;
+  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-base-layer-1-x: 0px;
+  --nx-shadow-base-layer-1-y: 1px;
+  --nx-shadow-base-layer-1-blur: 3px;
+  --nx-shadow-base-layer-1-spread: 0px;
+  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-base-layer-2-x: 0px;
+  --nx-shadow-base-layer-2-y: 2px;
+  --nx-shadow-base-layer-2-blur: 3px;
+  --nx-shadow-base-layer-2-spread: -1px;
+  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-md-layer-1-x: 0px;
+  --nx-shadow-md-layer-1-y: 1px;
+  --nx-shadow-md-layer-1-blur: 3px;
+  --nx-shadow-md-layer-1-spread: 0px;
+  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-md-layer-2-x: 0px;
+  --nx-shadow-md-layer-2-y: 3px;
+  --nx-shadow-md-layer-2-blur: 5px;
+  --nx-shadow-md-layer-2-spread: -1px;
+  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-lg-layer-1-x: 0px;
+  --nx-shadow-lg-layer-1-y: 1px;
+  --nx-shadow-lg-layer-1-blur: 3px;
+  --nx-shadow-lg-layer-1-spread: 0px;
+  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-lg-layer-2-x: 0px;
+  --nx-shadow-lg-layer-2-y: 6px;
+  --nx-shadow-lg-layer-2-blur: 9px;
+  --nx-shadow-lg-layer-2-spread: -1px;
+  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-xl-layer-1-x: 0px;
+  --nx-shadow-xl-layer-1-y: 1px;
+  --nx-shadow-xl-layer-1-blur: 3px;
+  --nx-shadow-xl-layer-1-spread: 0px;
+  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-xl-layer-2-x: 0px;
+  --nx-shadow-xl-layer-2-y: 12px;
+  --nx-shadow-xl-layer-2-blur: 16px;
+  --nx-shadow-xl-layer-2-spread: -1px;
+  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-2xl-layer-1-x: 0px;
+  --nx-shadow-2xl-layer-1-y: 1px;
+  --nx-shadow-2xl-layer-1-blur: 3px;
+  --nx-shadow-2xl-layer-1-spread: 0px;
+  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.251);
+  --nx-shadow-inner-layer-1-x: 0px;
+  --nx-shadow-inner-layer-1-y: 2px;
+  --nx-shadow-inner-layer-1-blur: 5px;
+  --nx-shadow-inner-layer-1-spread: 0px;
+  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.051);
+}
+
+.dark[data-shadow='soft'],
+.dark [data-shadow='soft'] {
+  --nx-shadow-2xs-layer-1-x: 0px;
+  --nx-shadow-2xs-layer-1-y: 1px;
+  --nx-shadow-2xs-layer-1-blur: 3px;
+  --nx-shadow-2xs-layer-1-spread: 0px;
+  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-xs-layer-1-x: 0px;
+  --nx-shadow-xs-layer-1-y: 1px;
+  --nx-shadow-xs-layer-1-blur: 3px;
+  --nx-shadow-xs-layer-1-spread: 0px;
+  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-sm-layer-1-x: 0px;
+  --nx-shadow-sm-layer-1-y: 1px;
+  --nx-shadow-sm-layer-1-blur: 3px;
+  --nx-shadow-sm-layer-1-spread: 0px;
+  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-sm-layer-2-x: 0px;
+  --nx-shadow-sm-layer-2-y: 2px;
+  --nx-shadow-sm-layer-2-blur: 3px;
+  --nx-shadow-sm-layer-2-spread: -1px;
+  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-base-layer-1-x: 0px;
+  --nx-shadow-base-layer-1-y: 1px;
+  --nx-shadow-base-layer-1-blur: 3px;
+  --nx-shadow-base-layer-1-spread: 0px;
+  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-base-layer-2-x: 0px;
+  --nx-shadow-base-layer-2-y: 2px;
+  --nx-shadow-base-layer-2-blur: 3px;
+  --nx-shadow-base-layer-2-spread: -1px;
+  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-md-layer-1-x: 0px;
+  --nx-shadow-md-layer-1-y: 1px;
+  --nx-shadow-md-layer-1-blur: 3px;
+  --nx-shadow-md-layer-1-spread: 0px;
+  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-md-layer-2-x: 0px;
+  --nx-shadow-md-layer-2-y: 3px;
+  --nx-shadow-md-layer-2-blur: 5px;
+  --nx-shadow-md-layer-2-spread: -1px;
+  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-lg-layer-1-x: 0px;
+  --nx-shadow-lg-layer-1-y: 1px;
+  --nx-shadow-lg-layer-1-blur: 3px;
+  --nx-shadow-lg-layer-1-spread: 0px;
+  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-lg-layer-2-x: 0px;
+  --nx-shadow-lg-layer-2-y: 6px;
+  --nx-shadow-lg-layer-2-blur: 9px;
+  --nx-shadow-lg-layer-2-spread: -1px;
+  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-xl-layer-1-x: 0px;
+  --nx-shadow-xl-layer-1-y: 1px;
+  --nx-shadow-xl-layer-1-blur: 3px;
+  --nx-shadow-xl-layer-1-spread: 0px;
+  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-xl-layer-2-x: 0px;
+  --nx-shadow-xl-layer-2-y: 12px;
+  --nx-shadow-xl-layer-2-blur: 16px;
+  --nx-shadow-xl-layer-2-spread: -1px;
+  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-2xl-layer-1-x: 0px;
+  --nx-shadow-2xl-layer-1-y: 1px;
+  --nx-shadow-2xl-layer-1-blur: 3px;
+  --nx-shadow-2xl-layer-1-spread: 0px;
+  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.251);
+  --nx-shadow-inner-layer-1-x: 0px;
+  --nx-shadow-inner-layer-1-y: 2px;
+  --nx-shadow-inner-layer-1-blur: 5px;
+  --nx-shadow-inner-layer-1-spread: 0px;
+  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.051);
+}
+
+[data-shadow='standard'] {
+  --nx-shadow-2xs-layer-1-x: 0px;
+  --nx-shadow-2xs-layer-1-y: 1px;
+  --nx-shadow-2xs-layer-1-blur: 3px;
+  --nx-shadow-2xs-layer-1-spread: 0px;
+  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0392);
+  --nx-shadow-xs-layer-1-x: 0px;
+  --nx-shadow-xs-layer-1-y: 1px;
+  --nx-shadow-xs-layer-1-blur: 3px;
+  --nx-shadow-xs-layer-1-spread: 0px;
+  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0392);
+  --nx-shadow-sm-layer-1-x: 0px;
+  --nx-shadow-sm-layer-1-y: 1px;
+  --nx-shadow-sm-layer-1-blur: 3px;
+  --nx-shadow-sm-layer-1-spread: 0px;
+  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-sm-layer-2-x: 0px;
+  --nx-shadow-sm-layer-2-y: 1px;
+  --nx-shadow-sm-layer-2-blur: 2px;
+  --nx-shadow-sm-layer-2-spread: -1px;
+  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-base-layer-1-x: 0px;
+  --nx-shadow-base-layer-1-y: 1px;
+  --nx-shadow-base-layer-1-blur: 3px;
+  --nx-shadow-base-layer-1-spread: 0px;
+  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-base-layer-2-x: 0px;
+  --nx-shadow-base-layer-2-y: 1px;
+  --nx-shadow-base-layer-2-blur: 2px;
+  --nx-shadow-base-layer-2-spread: 0px;
+  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-md-layer-1-x: 0px;
+  --nx-shadow-md-layer-1-y: 1px;
+  --nx-shadow-md-layer-1-blur: 3px;
+  --nx-shadow-md-layer-1-spread: 0px;
+  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-md-layer-2-x: 0px;
+  --nx-shadow-md-layer-2-y: 2px;
+  --nx-shadow-md-layer-2-blur: 4px;
+  --nx-shadow-md-layer-2-spread: -1px;
+  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-lg-layer-1-x: 0px;
+  --nx-shadow-lg-layer-1-y: 1px;
+  --nx-shadow-lg-layer-1-blur: 3px;
+  --nx-shadow-lg-layer-1-spread: 0px;
+  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-lg-layer-2-x: 0px;
+  --nx-shadow-lg-layer-2-y: 5px;
+  --nx-shadow-lg-layer-2-blur: 8px;
+  --nx-shadow-lg-layer-2-spread: -1px;
+  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-xl-layer-1-x: 0px;
+  --nx-shadow-xl-layer-1-y: 1px;
+  --nx-shadow-xl-layer-1-blur: 3px;
+  --nx-shadow-xl-layer-1-spread: 0px;
+  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-xl-layer-2-x: 0px;
+  --nx-shadow-xl-layer-2-y: 10px;
+  --nx-shadow-xl-layer-2-blur: 14px;
+  --nx-shadow-xl-layer-2-spread: -1px;
+  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-2xl-layer-1-x: 0px;
+  --nx-shadow-2xl-layer-1-y: 1px;
+  --nx-shadow-2xl-layer-1-blur: 4px;
+  --nx-shadow-2xl-layer-1-spread: 0px;
+  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.2196);
+  --nx-shadow-inner-layer-1-x: 0px;
+  --nx-shadow-inner-layer-1-y: 1px;
+  --nx-shadow-inner-layer-1-blur: 4px;
+  --nx-shadow-inner-layer-1-spread: 0px;
+  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0392);
+}
+
+.dark[data-shadow='standard'],
+.dark [data-shadow='standard'] {
+  --nx-shadow-2xs-layer-1-x: 0px;
+  --nx-shadow-2xs-layer-1-y: 1px;
+  --nx-shadow-2xs-layer-1-blur: 3px;
+  --nx-shadow-2xs-layer-1-spread: 0px;
+  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0392);
+  --nx-shadow-xs-layer-1-x: 0px;
+  --nx-shadow-xs-layer-1-y: 1px;
+  --nx-shadow-xs-layer-1-blur: 3px;
+  --nx-shadow-xs-layer-1-spread: 0px;
+  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0392);
+  --nx-shadow-sm-layer-1-x: 0px;
+  --nx-shadow-sm-layer-1-y: 1px;
+  --nx-shadow-sm-layer-1-blur: 3px;
+  --nx-shadow-sm-layer-1-spread: 0px;
+  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-sm-layer-2-x: 0px;
+  --nx-shadow-sm-layer-2-y: 1px;
+  --nx-shadow-sm-layer-2-blur: 2px;
+  --nx-shadow-sm-layer-2-spread: -1px;
+  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-base-layer-1-x: 0px;
+  --nx-shadow-base-layer-1-y: 1px;
+  --nx-shadow-base-layer-1-blur: 3px;
+  --nx-shadow-base-layer-1-spread: 0px;
+  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-base-layer-2-x: 0px;
+  --nx-shadow-base-layer-2-y: 1px;
+  --nx-shadow-base-layer-2-blur: 2px;
+  --nx-shadow-base-layer-2-spread: 0px;
+  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-md-layer-1-x: 0px;
+  --nx-shadow-md-layer-1-y: 1px;
+  --nx-shadow-md-layer-1-blur: 3px;
+  --nx-shadow-md-layer-1-spread: 0px;
+  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-md-layer-2-x: 0px;
+  --nx-shadow-md-layer-2-y: 2px;
+  --nx-shadow-md-layer-2-blur: 4px;
+  --nx-shadow-md-layer-2-spread: -1px;
+  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-lg-layer-1-x: 0px;
+  --nx-shadow-lg-layer-1-y: 1px;
+  --nx-shadow-lg-layer-1-blur: 3px;
+  --nx-shadow-lg-layer-1-spread: 0px;
+  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-lg-layer-2-x: 0px;
+  --nx-shadow-lg-layer-2-y: 5px;
+  --nx-shadow-lg-layer-2-blur: 8px;
+  --nx-shadow-lg-layer-2-spread: -1px;
+  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-xl-layer-1-x: 0px;
+  --nx-shadow-xl-layer-1-y: 1px;
+  --nx-shadow-xl-layer-1-blur: 3px;
+  --nx-shadow-xl-layer-1-spread: 0px;
+  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-xl-layer-2-x: 0px;
+  --nx-shadow-xl-layer-2-y: 10px;
+  --nx-shadow-xl-layer-2-blur: 14px;
+  --nx-shadow-xl-layer-2-spread: -1px;
+  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.102);
+  --nx-shadow-2xl-layer-1-x: 0px;
+  --nx-shadow-2xl-layer-1-y: 1px;
+  --nx-shadow-2xl-layer-1-blur: 4px;
+  --nx-shadow-2xl-layer-1-spread: 0px;
+  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.2196);
+  --nx-shadow-inner-layer-1-x: 0px;
+  --nx-shadow-inner-layer-1-y: 1px;
+  --nx-shadow-inner-layer-1-blur: 4px;
+  --nx-shadow-inner-layer-1-spread: 0px;
+  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0392);
+}
+
+[data-shadow='strong'] {
+  --nx-shadow-2xs-layer-1-x: 0px;
+  --nx-shadow-2xs-layer-1-y: 1px;
+  --nx-shadow-2xs-layer-1-blur: 3px;
+  --nx-shadow-2xs-layer-1-spread: 0px;
+  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-xs-layer-1-x: 0px;
+  --nx-shadow-xs-layer-1-y: 1px;
+  --nx-shadow-xs-layer-1-blur: 3px;
+  --nx-shadow-xs-layer-1-spread: 0px;
+  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-sm-layer-1-x: 0px;
+  --nx-shadow-sm-layer-1-y: 1px;
+  --nx-shadow-sm-layer-1-blur: 3px;
+  --nx-shadow-sm-layer-1-spread: 0px;
+  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-sm-layer-2-x: 0px;
+  --nx-shadow-sm-layer-2-y: 2px;
+  --nx-shadow-sm-layer-2-blur: 4px;
+  --nx-shadow-sm-layer-2-spread: -1px;
+  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-base-layer-1-x: 0px;
+  --nx-shadow-base-layer-1-y: 1px;
+  --nx-shadow-base-layer-1-blur: 3px;
+  --nx-shadow-base-layer-1-spread: 0px;
+  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-base-layer-2-x: 0px;
+  --nx-shadow-base-layer-2-y: 3px;
+  --nx-shadow-base-layer-2-blur: 6px;
+  --nx-shadow-base-layer-2-spread: -1px;
+  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-md-layer-1-x: 0px;
+  --nx-shadow-md-layer-1-y: 1px;
+  --nx-shadow-md-layer-1-blur: 3px;
+  --nx-shadow-md-layer-1-spread: 0px;
+  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-md-layer-2-x: 0px;
+  --nx-shadow-md-layer-2-y: 4px;
+  --nx-shadow-md-layer-2-blur: 8px;
+  --nx-shadow-md-layer-2-spread: -1px;
+  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-lg-layer-1-x: 0px;
+  --nx-shadow-lg-layer-1-y: 1px;
+  --nx-shadow-lg-layer-1-blur: 3px;
+  --nx-shadow-lg-layer-1-spread: 0px;
+  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.149);
+  --nx-shadow-lg-layer-2-x: 0px;
+  --nx-shadow-lg-layer-2-y: 8px;
+  --nx-shadow-lg-layer-2-blur: 16px;
+  --nx-shadow-lg-layer-2-spread: -1px;
+  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.149);
+  --nx-shadow-xl-layer-1-x: 0px;
+  --nx-shadow-xl-layer-1-y: 1px;
+  --nx-shadow-xl-layer-1-blur: 3px;
+  --nx-shadow-xl-layer-1-spread: 0px;
+  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1804);
+  --nx-shadow-xl-layer-2-x: 0px;
+  --nx-shadow-xl-layer-2-y: 16px;
+  --nx-shadow-xl-layer-2-blur: 24px;
+  --nx-shadow-xl-layer-2-spread: -1px;
+  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1804);
+  --nx-shadow-2xl-layer-1-x: 0px;
+  --nx-shadow-2xl-layer-1-y: 1px;
+  --nx-shadow-2xl-layer-1-blur: 3px;
+  --nx-shadow-2xl-layer-1-spread: 0px;
+  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.302);
+  --nx-shadow-inner-layer-1-x: 0px;
+  --nx-shadow-inner-layer-1-y: 2px;
+  --nx-shadow-inner-layer-1-blur: 6px;
+  --nx-shadow-inner-layer-1-spread: 0px;
+  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0784);
+}
+
+.dark[data-shadow='strong'],
+.dark [data-shadow='strong'] {
+  --nx-shadow-2xs-layer-1-x: 0px;
+  --nx-shadow-2xs-layer-1-y: 1px;
+  --nx-shadow-2xs-layer-1-blur: 3px;
+  --nx-shadow-2xs-layer-1-spread: 0px;
+  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-xs-layer-1-x: 0px;
+  --nx-shadow-xs-layer-1-y: 1px;
+  --nx-shadow-xs-layer-1-blur: 3px;
+  --nx-shadow-xs-layer-1-spread: 0px;
+  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-sm-layer-1-x: 0px;
+  --nx-shadow-sm-layer-1-y: 1px;
+  --nx-shadow-sm-layer-1-blur: 3px;
+  --nx-shadow-sm-layer-1-spread: 0px;
+  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-sm-layer-2-x: 0px;
+  --nx-shadow-sm-layer-2-y: 2px;
+  --nx-shadow-sm-layer-2-blur: 4px;
+  --nx-shadow-sm-layer-2-spread: -1px;
+  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-base-layer-1-x: 0px;
+  --nx-shadow-base-layer-1-y: 1px;
+  --nx-shadow-base-layer-1-blur: 3px;
+  --nx-shadow-base-layer-1-spread: 0px;
+  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-base-layer-2-x: 0px;
+  --nx-shadow-base-layer-2-y: 3px;
+  --nx-shadow-base-layer-2-blur: 6px;
+  --nx-shadow-base-layer-2-spread: -1px;
+  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-md-layer-1-x: 0px;
+  --nx-shadow-md-layer-1-y: 1px;
+  --nx-shadow-md-layer-1-blur: 3px;
+  --nx-shadow-md-layer-1-spread: 0px;
+  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-md-layer-2-x: 0px;
+  --nx-shadow-md-layer-2-y: 4px;
+  --nx-shadow-md-layer-2-blur: 8px;
+  --nx-shadow-md-layer-2-spread: -1px;
+  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.1216);
+  --nx-shadow-lg-layer-1-x: 0px;
+  --nx-shadow-lg-layer-1-y: 1px;
+  --nx-shadow-lg-layer-1-blur: 3px;
+  --nx-shadow-lg-layer-1-spread: 0px;
+  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.149);
+  --nx-shadow-lg-layer-2-x: 0px;
+  --nx-shadow-lg-layer-2-y: 8px;
+  --nx-shadow-lg-layer-2-blur: 16px;
+  --nx-shadow-lg-layer-2-spread: -1px;
+  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.149);
+  --nx-shadow-xl-layer-1-x: 0px;
+  --nx-shadow-xl-layer-1-y: 1px;
+  --nx-shadow-xl-layer-1-blur: 3px;
+  --nx-shadow-xl-layer-1-spread: 0px;
+  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1804);
+  --nx-shadow-xl-layer-2-x: 0px;
+  --nx-shadow-xl-layer-2-y: 16px;
+  --nx-shadow-xl-layer-2-blur: 24px;
+  --nx-shadow-xl-layer-2-spread: -1px;
+  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1804);
+  --nx-shadow-2xl-layer-1-x: 0px;
+  --nx-shadow-2xl-layer-1-y: 1px;
+  --nx-shadow-2xl-layer-1-blur: 3px;
+  --nx-shadow-2xl-layer-1-spread: 0px;
+  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.302);
+  --nx-shadow-inner-layer-1-x: 0px;
+  --nx-shadow-inner-layer-1-y: 2px;
+  --nx-shadow-inner-layer-1-blur: 6px;
+  --nx-shadow-inner-layer-1-spread: 0px;
+  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0784);
 }
 
 /* ===== PER-MODE BORDER WIDTH (mode swap via [data-borderwidth="X"] on any ancestor) ===== */
 
 :root,
-[data-borderwidth='vega'] {
+[data-borderwidth='normal'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 }
 
-[data-borderwidth='lyra'] {
+[data-borderwidth='bold'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 }
 
-[data-borderwidth='maia'] {
+[data-borderwidth='fine'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 1px;
 }
 
-[data-borderwidth='mira'] {
+[data-borderwidth='medium'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 }
 
-[data-borderwidth='nova'] {
+[data-borderwidth='strong'] {
   --nx-borderwidth-default: 1.5px;
   --nx-borderwidth-thick: 3px;
 }

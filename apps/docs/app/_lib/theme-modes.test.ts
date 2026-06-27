@@ -24,19 +24,19 @@ describe('docs theme modes', () => {
     const state = sanitizeThemeState({
       base: 'slate',
       brand: 'teal',
-      spacing: 'sera',
-      shadow: 'mira',
+      spacing: 'spacious',
+      shadow: 'standard',
       radius: 'smooth',
-      borderwidth: 'maia',
+      borderwidth: 'fine',
     });
 
     expect(state).toMatchObject({
       base: 'slate',
       brand: 'teal',
-      spacing: 'sera',
-      shadow: 'mira',
+      spacing: 'spacious',
+      shadow: 'standard',
       radius: 'smooth',
-      borderwidth: 'maia',
+      borderwidth: 'fine',
     });
   });
 
@@ -44,7 +44,7 @@ describe('docs theme modes', () => {
     const state = sanitizeThemeState({
       base: '../base-slate',
       brand: 'blue.css',
-      spacing: 'compact',
+      spacing: 'nova',
       shadow: 'nova',
       radius: 'smooth',
       borderwidth: 'mira',
@@ -52,9 +52,7 @@ describe('docs theme modes', () => {
 
     expect(state).toMatchObject({
       ...DEFAULT_THEME_STATE,
-      shadow: 'nova',
       radius: 'smooth',
-      borderwidth: 'mira',
     });
   });
 
@@ -144,7 +142,7 @@ describe('docs theme modes', () => {
           spacing: 'sera);document.body.innerHTML=""',
           shadow: 'javascript:alert(1)',
           radius: 'smooth',
-          borderwidth: 'mira',
+          borderwidth: 'javascript:alert(1)',
         },
       })
     );
@@ -173,7 +171,10 @@ describe('docs theme modes', () => {
       ['brand', THEME_STYLESHEET_HREFS.brand[DEFAULT_THEME_STATE.brand]],
       ['shadow', THEME_STYLESHEET_HREFS.shadow[DEFAULT_THEME_STATE.shadow]],
       ['radius', THEME_STYLESHEET_HREFS.radius.smooth],
-      ['borderwidth', THEME_STYLESHEET_HREFS.borderwidth.mira],
+      [
+        'borderwidth',
+        THEME_STYLESHEET_HREFS.borderwidth[DEFAULT_THEME_STATE.borderwidth],
+      ],
     ]);
   });
 });

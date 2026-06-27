@@ -36,7 +36,7 @@ ruleTester.run('nx-class-conventions', rule, {
     "const c = 'nx:px-2 nx:py-1.5 nx:typography-body-default';",
     "const c = 'nx:typography-heading-xsmall';",
     // A typography-* substring without the nx: prefix (e.g. a filename) is ignored.
-    "const path = '../tokens/typography/typography-vega.json';",
+    "const path = '../tokens/typography/typography-default.json';",
     // A modifier-prefixed live tier passes — the `(?:[\\w-]+:)*` branch must exempt
     // a valid composite, not just flag dead ones (cf. the invalid hover case below).
     "const c = 'nx:focus:typography-label-default';",
@@ -260,7 +260,7 @@ describe('raw typography guard drift checks', () => {
       fs.readFileSync(
         path.resolve(
           dir,
-          '../../core/tokens/primitives/typography/typography-vega.json'
+          '../../core/tokens/primitives/typography/typography-default.json'
         ),
         'utf8'
       )
@@ -277,7 +277,7 @@ describe('raw typography guard drift checks', () => {
       fs.readFileSync(
         path.resolve(
           dir,
-          '../../core/tokens/primitives/typography/typography-vega.json'
+          '../../core/tokens/primitives/typography/typography-default.json'
         ),
         'utf8'
       )

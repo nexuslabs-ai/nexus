@@ -37,8 +37,8 @@ function mockSystemPrefersDark(matches: boolean): void {
 }
 
 describe('NexusAppearanceSnapshot', () => {
-  it('uses snapshot version 2 for runtime focus-token CSS', () => {
-    expect(SNAPSHOT_VERSION).toBe(2);
+  it('uses snapshot version 3 for friendly token-mode ids', () => {
+    expect(SNAPSHOT_VERSION).toBe(3);
   });
 
   it('stores pre-derived CSS verbatim', () => {
@@ -138,10 +138,10 @@ describe('resolveFirstPaint', () => {
     expect(result.colorScheme).toBe('dark');
     expect(result.metaColorScheme).toBe('dark');
     expect(result.dataAttrs).toEqual({
-      'data-style': 'mira',
-      'data-radius': 'sharp',
-      'data-shadow': 'maia',
-      'data-borderwidth': 'vega',
+      'data-style': 'default',
+      'data-radius': 'square',
+      'data-shadow': 'quiet',
+      'data-borderwidth': 'normal',
     });
   });
 
@@ -205,7 +205,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
     new Function(createNexusAppearanceBootstrapScript())();
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(document.documentElement.getAttribute('data-radius')).toBe('sharp');
+    expect(document.documentElement.getAttribute('data-radius')).toBe('square');
     expect(document.documentElement.style.colorScheme).toBe('dark');
     expect(
       document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
@@ -230,7 +230,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
       })
     )();
 
-    expect(document.documentElement.getAttribute('data-style')).toBe('mira');
+    expect(document.documentElement.getAttribute('data-style')).toBe('default');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(
       document.querySelectorAll('style[data-nexus-appearance-theme]')

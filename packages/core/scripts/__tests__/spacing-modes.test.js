@@ -25,7 +25,7 @@ describe('spacing modes', () => {
     expect(modes).toEqual([...CANONICAL_MODES].sort());
   });
 
-  it('all 7 mode files share the same leaf-path key set (vega as baseline)', () => {
+  it('all 7 mode files share the same leaf-path key set (regular as baseline)', () => {
     const modeDataMap = new Map();
     for (const mode of CANONICAL_MODES) {
       const data = JSON.parse(

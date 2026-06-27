@@ -10,6 +10,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
+  normalizeAppearanceModeIds,
   sanitizeNexusAppearance,
   sanitizeNexusAppearancePrefs,
   STROKE_OPTIONS,
@@ -23,10 +24,10 @@ describe('appearance model', () => {
       brandColor: DEFAULT_BRAND_COLOR,
       surfaceTone: 'stone',
       contrast: 60,
-      density: 'mira',
-      corners: 'sharp',
-      elevation: 'maia',
-      stroke: 'vega',
+      density: 'default',
+      corners: 'square',
+      elevation: 'quiet',
+      stroke: 'normal',
       prefs: {
         uiFontSize: 14,
         codeFontSize: 12,
@@ -66,26 +67,26 @@ describe('appearance model', () => {
 
   it('maps friendly layout labels to token axes', () => {
     expect(DENSITY_OPTIONS).toEqual([
-      { value: 'nova', label: 'Compact' },
-      { value: 'mira', label: 'Default' },
-      { value: 'luma', label: 'Comfortable' },
-      { value: 'sera', label: 'Spacious' },
+      { value: 'compact', label: 'Compact' },
+      { value: 'default', label: 'Default' },
+      { value: 'comfortable', label: 'Comfortable' },
+      { value: 'spacious', label: 'Spacious' },
     ]);
     expect(CORNER_OPTIONS).toEqual([
-      { value: 'sharp', label: 'Square' },
+      { value: 'square', label: 'Square' },
       { value: 'subtle', label: 'Subtle' },
       { value: 'smooth', label: 'Smooth' },
-      { value: 'mellow', label: 'Round' },
+      { value: 'round', label: 'Round' },
     ]);
     expect(ELEVATION_OPTIONS).toEqual([
-      { value: 'maia', label: 'Quiet' },
-      { value: 'mira', label: 'Standard' },
-      { value: 'nova', label: 'Strong' },
+      { value: 'quiet', label: 'Quiet' },
+      { value: 'standard', label: 'Standard' },
+      { value: 'strong', label: 'Strong' },
     ]);
     expect(STROKE_OPTIONS).toEqual([
-      { value: 'maia', label: 'Fine' },
-      { value: 'vega', label: 'Normal' },
-      { value: 'nova', label: 'Strong' },
+      { value: 'fine', label: 'Fine' },
+      { value: 'normal', label: 'Normal' },
+      { value: 'strong', label: 'Strong' },
     ]);
   });
 });
@@ -103,10 +104,10 @@ describe('sanitizeNexusAppearance', () => {
       brandColor: '#2563eb',
       surfaceTone: 'slate' as const,
       contrast: 42,
-      density: 'sera' as const,
-      corners: 'mellow' as const,
-      elevation: 'nova' as const,
-      stroke: 'maia' as const,
+      density: 'spacious' as const,
+      corners: 'round' as const,
+      elevation: 'strong' as const,
+      stroke: 'fine' as const,
       prefs: {
         ...DEFAULT_NEXUS_APPEARANCE.prefs,
         uiFontSize: 16,
@@ -152,7 +153,29 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         density: 'wat',
       }).density
-    ).toBe('mira');
+    ).toBe('default');
+  });
+
+  it('normalizes a persisted density codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ density: 'nova' }).density).toBe(
+      'compact'
+    );
+  });
+
+  it('normalizes a persisted elevation codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ elevation: 'maia' }).elevation).toBe(
+      'quiet'
+    );
+  });
+
+  it('normalizes a persisted corner codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ corners: 'mellow' }).corners).toBe(
+      'round'
+    );
+  });
+
+  it('normalizes a persisted stroke codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ stroke: 'maia' }).stroke).toBe('fine');
   });
 
   it('preserves system mode verbatim', () => {
@@ -162,6 +185,18 @@ describe('sanitizeNexusAppearance', () => {
         mode: 'system',
       }).mode
     ).toBe('system');
+  });
+});
+
+describe('normalizeAppearanceModeIds', () => {
+  it('is identity on already-friendly values and non-strings', () => {
+    expect(
+      normalizeAppearanceModeIds({ density: 'compact', corners: 7 })
+    ).toMatchObject({ density: 'compact', corners: 7 });
+  });
+
+  it('passes non-records through unchanged', () => {
+    expect(normalizeAppearanceModeIds('nope')).toBe('nope');
   });
 });
 

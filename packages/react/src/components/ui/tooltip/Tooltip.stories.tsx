@@ -371,7 +371,7 @@ export const TooltipContentUsesNumericSpacing: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — vega (the documented default in the Style toolbar), where `px-3` is 12px and `py-1.5` is 6px.',
+          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — regular (the documented default in the Style toolbar), where `px-3` is 12px and `py-1.5` is 6px.',
       },
     },
   },

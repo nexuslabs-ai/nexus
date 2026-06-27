@@ -406,7 +406,7 @@ function generateNexusCSS(
   runtimeModes
 ) {
   // Get Google Fonts import
-  const typographyMode = usedModes.typography || 'vega';
+  const typographyMode = usedModes.typography || 'default';
   const typographyFilePath = path.join(
     TOKENS_DIR,
     `primitives/typography/typography-${typographyMode}.json`
@@ -468,9 +468,9 @@ function generateNexusCSS(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
   );
 
-  const radiusMode = usedModes.radius || 'subtle';
+  const radiusMode = usedModes.radius || DEFAULT_CONFIG.radius;
   const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
-  const borderwidthMode = usedModes.borderwidth || 'vega';
+  const borderwidthMode = usedModes.borderwidth || DEFAULT_CONFIG.borderwidth;
   const borderwidthTokens = collectBorderwidthTokens(
     TOKENS_DIR,
     borderwidthMode

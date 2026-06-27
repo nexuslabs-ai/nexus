@@ -12,17 +12,17 @@ const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS = path.resolve(TEST_DIR, '..', '..', 'tokens');
 
 describe('runtime mode collectors', () => {
-  it('collects all radius modes including blunt', () => {
+  it('collects all radius modes including extra-round', () => {
     const modes = collectRadiusModes(TOKENS);
 
     expect(Object.keys(modes).sort()).toEqual([
-      'blunt',
-      'mellow',
-      'sharp',
+      'extra-round',
+      'round',
       'smooth',
+      'square',
       'subtle',
     ]);
-    expect(modes.sharp).toContainEqual({
+    expect(modes.square).toContainEqual({
       cssName: 'radius-base',
       path: ['base'],
       value: '0px',
@@ -33,13 +33,13 @@ describe('runtime mode collectors', () => {
     const modes = collectBorderwidthModes(TOKENS);
 
     expect(Object.keys(modes).sort()).toEqual([
-      'lyra',
-      'maia',
-      'mira',
-      'nova',
-      'vega',
+      'bold',
+      'fine',
+      'medium',
+      'normal',
+      'strong',
     ]);
-    const names = modes.vega.map((token) => token.cssName);
+    const names = modes.normal.map((token) => token.cssName);
     expect(names).toContain('borderwidth-default');
     expect(names).not.toContain('border-default');
   });
@@ -48,14 +48,14 @@ describe('runtime mode collectors', () => {
     const modes = collectShadowModes(TOKENS);
 
     expect(Object.keys(modes).sort()).toEqual([
-      'lyra',
-      'maia',
-      'mira',
-      'nova',
-      'vega',
+      'flat',
+      'quiet',
+      'soft',
+      'standard',
+      'strong',
     ]);
-    const lightNames = modes.maia.light.map((token) => token.cssName);
-    const darkNames = modes.maia.dark.map((token) => token.cssName);
+    const lightNames = modes.quiet.light.map((token) => token.cssName);
+    const darkNames = modes.quiet.dark.map((token) => token.cssName);
     expect(lightNames.some((name) => name.includes('-layer-'))).toBe(true);
     expect(lightNames).toContain('shadow-sm-layer-1-color');
     expect(lightNames).not.toContain('shadow-sm');

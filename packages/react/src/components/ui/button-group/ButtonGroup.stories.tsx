@@ -180,7 +180,7 @@ export const SizeAlignment: Story = {
   },
   render: () => (
     <div
-      data-style="vega"
+      data-style="regular"
       className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10"
     >
       {Object.keys(BUTTON_GROUP_SIZE_HEIGHTS).map((size) => (

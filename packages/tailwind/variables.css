@@ -3,7 +3,7 @@
 /* All primitives use --nx-* prefix for namespace isolation */
 
 :root {
-  /* borderwidth (vega) */
+  /* borderwidth (normal) */
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 
@@ -347,7 +347,7 @@
   --nx-motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --nx-motion-ease-move: cubic-bezier(0.77, 0, 0.175, 1);
 
-  /* radius (sharp) */
+  /* radius (square) */
   --nx-radius-base: 0px;
   --nx-radius-sm: 0px;
   --nx-radius-md: 0px;
@@ -357,7 +357,7 @@
   --nx-radius-3xl: 0px;
   --nx-radius-full: 9999px;
 
-  /* shadow (maia) */
+  /* shadow (quiet) */
   --nx-shadow-2xs-layer-1-x: 0px;
   --nx-shadow-2xs-layer-1-y: 1px;
   --nx-shadow-2xs-layer-1-blur: 3px;
@@ -429,7 +429,7 @@
   --nx-shadow-inner-layer-1-spread: 0px;
   --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.0392);
 
-  /* typography (vega) */
+  /* typography (default) */
   --nx-typography-family-font-sans:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;

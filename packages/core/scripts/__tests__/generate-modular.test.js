@@ -102,11 +102,19 @@ describe('generateModular', () => {
 
     const modes = new Set(matches.map((m) => m.match(/['"]([a-z]+)['"]/)[1]));
     expect(modes).toEqual(
-      new Set(['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'])
+      new Set([
+        'regular',
+        'tight',
+        'relaxed',
+        'default',
+        'compact',
+        'comfortable',
+        'spacious',
+      ])
     );
   });
 
-  it('emits Vega numerics in @theme as direct px (not var refs)', () => {
+  it('emits Regular numerics in @theme as direct px (not var refs)', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     expect(globals).toMatch(/--spacing-4:\s*16px;/);
     expect(globals).toMatch(/--spacing-6:\s*24px;/);
@@ -162,10 +170,10 @@ describe('generateModular', () => {
     // Both numeric AND role tokens inside [data-style="X"] blocks must be
     // already-prefixed since they live outside @theme.
     expect(globals).toMatch(
-      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
+      /\[data-style=['"]regular['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
     );
     expect(globals).toMatch(
-      /\[data-style=['"]vega['"]\] \{[\s\S]*?--nx-container-p:\s*24px;/
+      /\[data-style=['"]regular['"]\] \{[\s\S]*?--nx-container-p:\s*24px;/
     );
   });
 
@@ -177,14 +185,16 @@ describe('generateModular', () => {
     const originalLog = console.log;
     console.log = () => {};
     try {
-      await generateModular({ distDir: dir, spacingDefault: 'maia' });
+      await generateModular({ distDir: dir, spacingDefault: 'relaxed' });
     } finally {
       console.log = originalLog;
     }
     const globals = fs.readFileSync(path.join(dir, 'globals.css'), 'utf8');
 
-    expect(globals).toMatch(/:root,\s*\n\s*\[data-style=['"]maia['"]\] \{/);
-    expect(globals).not.toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    expect(globals).toMatch(/:root,\s*\n\s*\[data-style=['"]relaxed['"]\] \{/);
+    expect(globals).not.toMatch(
+      /:root,\s*\n\s*\[data-style=['"]regular['"]\] \{/
+    );
     const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(7);
   });
