@@ -282,6 +282,9 @@ jobs:
             pnpm turbo typecheck
           fi
 
+      - name: Appearance dist-type contract
+        run: pnpm --filter @nexus/react typecheck:dist-appearance
+
   # ============================================
   # React Package Jobs
   # ============================================
