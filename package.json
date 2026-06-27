@@ -124,6 +124,9 @@
     "packages/core/tokens/semantic/spacing-*.json": [
       "pnpm validate:spacing-modes",
       "eslint --fix --no-warn-ignored"
+    ],
+    "packages/core/tokens/primitives/{radius,borderwidth,shadow}/*.json": [
+      "pnpm validate:spacing-modes"
     ]
   },
   "pnpm": {

@@ -1,3 +1,6 @@
+// Validates per-mode key-set parity across ALL runtime token mode families —
+// spacing (semantic) plus radius / borderwidth / shadow (primitives), see
+// `modeFamilyConfigs` — despite the historical `spacing-modes` filename.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -158,48 +161,6 @@ export function validateModes(modeDataMap, baseline = BASELINE_MODE) {
     results.push({ mode, ...diff });
   }
   return results.sort((a, b) => a.mode.localeCompare(b.mode));
-}
-
-/**
- * Format a per-mode findings list into a human-readable multi-line report.
- * Only non-empty findings (a mode with at least one missing or extra path)
- * are emitted as failure lines; clean modes get a ✓ line.
- */
-export function formatFindings(findings, baseline = BASELINE_MODE) {
-  const lines = [];
-  lines.push(
-    `─── validate-token-mode-family: spacing (baseline: ${baseline}) ───`
-  );
-  for (const { mode, missing, extra } of findings) {
-    if (missing.length === 0 && extra.length === 0) {
-      lines.push(`  ✓ spacing-${mode}.json (matches baseline)`);
-      continue;
-    }
-    lines.push(
-      `  ✗ spacing-${mode}.json (${missing.length} missing, ${extra.length} extra)`
-    );
-    for (const p of missing) {
-      lines.push(
-        `      missing: ${p} (in spacing-${baseline}.json but not in spacing-${mode}.json)`
-      );
-    }
-    for (const p of extra) {
-      lines.push(
-        `      extra:   ${p} (in spacing-${mode}.json but not in spacing-${baseline}.json)`
-      );
-    }
-  }
-  return lines.join('\n');
-}
-
-export function discoverModes(semanticDir) {
-  const entries = fs.readdirSync(semanticDir);
-  const found = [];
-  for (const name of entries) {
-    const match = name.match(/^spacing-([a-z]+)\.json$/);
-    if (match) found.push(match[1]);
-  }
-  return found.sort();
 }
 
 export function assertCanonicalModeSet(
