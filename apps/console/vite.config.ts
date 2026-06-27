@@ -24,6 +24,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      '@': fileURLToPath(new URL('../../packages/react/src', import.meta.url)),
       '@nexus/react/appearance': fileURLToPath(
         new URL('../../packages/react/src/appearance/index.ts', import.meta.url)
       ),

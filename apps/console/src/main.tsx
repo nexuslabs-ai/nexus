@@ -4,8 +4,8 @@ import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
 
+import { CONSOLE_APPEARANCE } from './app/appearance-config';
 import { router } from './app/router';
-import { ThemeProvider } from './app/theme-provider';
 import { queryClient } from './lib/query-client';
 
 import './App.css';
@@ -25,11 +25,11 @@ enableMocking().then(() => {
   }
   createRoot(rootElement).render(
     <StrictMode>
-      <ThemeProvider>
+      <CONSOLE_APPEARANCE.NexusAppearanceProvider>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
         </QueryClientProvider>
-      </ThemeProvider>
+      </CONSOLE_APPEARANCE.NexusAppearanceProvider>
     </StrictMode>
   );
 });
