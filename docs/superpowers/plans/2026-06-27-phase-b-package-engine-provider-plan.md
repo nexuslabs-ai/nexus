@@ -573,13 +573,24 @@ git commit -m "feat(core): per-mode literal collectors for radius/shadow/borderw
 **Files:**
 
 - Modify: `packages/core/scripts/utils.js` (`generateSpacingModesCSS` → parameterized), `packages/core/scripts/generate-tailwind-package.js` (call it for the 3 new families)
-- Test: `packages/core/scripts/__tests__/` generator output assertions
+- Modify: `packages/core/scripts/validate-spacing-modes.js` into a mode-family parity guard that still covers spacing and now also covers radius / shadow / borderwidth.
+- Test: `packages/core/scripts/__tests__/` generator output assertions + validator coverage.
 
 **Interfaces:**
 
 - Consumes: the Task 6 collectors. Produces: `nexus.css` containing `:root, [data-radius="sharp"]{…}` + plain `[data-radius="…"]` blocks (and shadow/borderwidth), matching the existing `[data-style]` shape.
 
 - [ ] **Step 1: Parameterize the emitter.** In `generateSpacingModesCSS` (`utils.js:893`), replace the hardcoded `[data-style]` attribute name and the `spacing-`-prefixed dedup check with an `attrName` + `prefix` parameter (default to the spacing values so the existing call is unchanged). Confirm the existing spacing test still passes after the refactor.
+
+- [ ] **Step 1b: Generalize the mode-family parity guard (review gap #92).** Extend the existing `validate-spacing-modes.js` guard instead of leaving the new families unprotected:
+  - Keep spacing validation intact.
+  - Add family configs for:
+    - `radius`: `tokens/primitives/radius/radius-{mode}.json`, baseline `sharp`, expected modes `blunt,mellow,sharp,smooth,subtle`.
+    - `borderwidth`: `tokens/primitives/borderwidth/borderwidth-{mode}.json`, baseline `vega`, expected modes `lyra,maia,mira,nova,vega`.
+    - `shadow`: `tokens/primitives/shadow/shadow-{mode}-{light|dark}.json`, baseline `maia`, expected modes `lyra,maia,mira,nova,vega`, validating light and dark key parity separately.
+  - Reuse the same `leafPathsOf` / `diffKeySets` logic so a missing primitive-layer token fails before `nexus.css` emits a partial `[data-*]` block.
+  - Add tests in `validate-spacing-modes.test.js` (or a renamed sibling if the script is renamed) that prove at least one synthetic drift case fails for each new family and the checked-in files pass.
+  - Update the script label/docs if the existing `validate:spacing-modes` command now validates more than spacing; do not leave a misleading CLI report.
 
 - [ ] **Step 2: Write failing generator tests.**
 
@@ -610,13 +621,13 @@ Expected: FAIL.
 
 - [ ] **Step 5: Run generator + tests — expect pass; verify no-attribute defaults still resolve.**
 
-Run: `pnpm --filter @nexus/core build:tailwind && pnpm test:unit packages/core/scripts/__tests__/generate-tailwind-package.test.js`
-Expected: PASS; `nexus.css` contains the new blocks; `light-dark(` absent.
+Run: `pnpm --filter @nexus/core build:tailwind && pnpm validate:spacing-modes && pnpm test:unit packages/core/scripts/__tests__/generate-tailwind-package.test.js packages/core/scripts/__tests__/validate-spacing-modes.test.js`
+Expected: PASS; `nexus.css` contains the new blocks; `light-dark(` absent; the validator checks spacing + radius + borderwidth + shadow key parity.
 
 - [ ] **Step 6: Commit.**
 
 ```bash
-git add packages/core/scripts packages/tailwind
+git add packages/core/scripts packages/core/package.json package.json packages/tailwind
 git commit -m "feat(core): emit data-radius/data-shadow/data-borderwidth mode blocks"
 ```
 
@@ -644,7 +655,7 @@ git commit -m "feat(core): emit data-radius/data-shadow/data-borderwidth mode bl
 - [ ] **Step 3: Build — verify both entries emit and core is NOT bundled.**
 
 Run: `pnpm --filter @nexus/react build`
-Expected: `dist/index.mjs`, `dist/appearance.mjs`, `dist/appearance.d.ts`, `dist/react.css` all present. Then:
+Expected: `dist/index.mjs`, `dist/appearance.mjs`, `dist/appearance.d.ts`, `dist/react.css` all present and `dist/appearance.d.ts` is non-empty (explicit TS2742 / declaration-emit guard; review minor #93). Then:
 
 Run: `! rg -q "createNexusThemeContract|deriveTheme" packages/react/dist/index.mjs`
 Expected: PASS (engine not in the main barrel).
@@ -780,6 +791,7 @@ git commit -m "feat(react): NexusAppearanceProvider + useNexusAppearance"
 - Consumes: `useNexusAppearance` (Task 9), the `*_OPTIONS` maps (Task 1). Produces: `NexusAppearanceSettings`, `NexusThemeQuickControl` (prop `onCustomize?: () => void`).
 
 > **Promotion rules:** promote from `apps/console/src/modules/design-system/settings/Appearance{Settings,ColorField,ConfigPreview,SettingRow}.tsx`, applying: (a) source colour/layout values come from `useNexusAppearance` state + the core option maps, not console hooks; (b) **drop** the Import/Copy theme-prompt UI, the `translucentSidebar` toggle, and the `diffMarkers` control + `AppearanceConfigPreview`'s `markers` prop (Decision 3); (c) **do not import from `@nexus/react`'s main barrel** inside `src/appearance/*` — import UI primitives (Button, Select, etc.) from their local `@/components/ui/*` source paths to avoid a circular entry import; (d) `config-preview.tsx` mirrors the **applied** theme only (Decision 6). Sections to keep: Mode, Brand color, Surface tone, Contrast, Typography (fonts + sizes), Layout Feel (the 4 axes), Preferences (reduce-motion, pointer cursors, font smoothing).
+> **Promotion inventory note (review minor #90):** console-only helpers such as `toggledAppearance` are not package API. When promoting the Mode control, either inline the mode update in the package component or add a package helper only if the UI truly needs it; do not blindly export console helper names.
 
 - [ ] **Step 1: Build the internal field components** (`color-field` — hex-only native `<input type="color">` + regex, promoted from `AppearanceColorField.tsx`; `setting-row`; `config-preview`).
 
@@ -836,7 +848,8 @@ node -e "require.resolve('@nexus/react/appearance', { paths: ['apps/console'] })
 - **Blocker B2 (generator collectors):** Task 6 writes the 3 per-mode literal collectors (template = `collectSpacingTokens`). ✔
 - **Blocker B3 (shadow mechanism):** Task 6 implementer note + Task 7 emit shadow as primitive-override; Task 7 asserts no `light-dark(`. ✔
 - **Blocker B4 (unrunnable audit / sequencing):** stories/audit moved to Phase D (Task 10 note); rename + console import update folded into Task 1, then audited in Task 5 with a `pnpm typecheck` gate. ✔
-- **Should-fixes:** orphan type dropped + state-as-SSOT (Task 1/Decision 7); `createNexusThemeContract` spec + 5-tone parity (Task 3); compact single-key persistence (Task 9/Decision 2); generic prefs, console selectors dropped (Tasks 1/4/Decision 3); config-preview = applied-theme-only (Task 10/Decision 6); appearance size-limit number + `ignore` (Task 8); migrate console suites (Tasks 2-4 reuse those cases). ✔
+- **Review gap #92:** Task 7 now generalizes the existing spacing key-parity guard to radius / borderwidth / shadow, so the new `[data-*]` mode families cannot silently emit partial blocks. ✔
+- **Should-fixes:** orphan type dropped + state-as-SSOT (Task 1/Decision 7); `createNexusThemeContract` spec + 5-tone parity (Task 3); compact single-key persistence (Task 9/Decision 2); generic prefs, console selectors dropped (Tasks 1/4/Decision 3); config-preview = applied-theme-only (Task 10/Decision 6); appearance size-limit number + `ignore` (Task 8); migrate console suites (Tasks 2-4 reuse those cases); `appearance.d.ts` emit explicitly checked (Task 8 / review minor #93); console-only helper promotion is inventoried, not blindly exported (Task 10 / review minor #90). ✔
 - **Refuted findings deliberately NOT acted on:** no scoped serializer (Decision 6), core stays optional-peer not hard-required (Decision 1), emit-all kept (Decision 4). ✔
 - **Placeholder scan:** generator collector/emitter bodies are specified by template-reference (the implementer reads `collectSpacingTokens` + `shadow-maia.css`) rather than fabricated — this is deliberate, to avoid inventing internals not yet read. All test code is concrete.
 - **Type consistency:** `NexusAppearanceState` (editor SSOT) vs `NexusThemeContract` (engine `appearance`-bearing contract, = renamed `CodexThemeContract`) vs `ThemeDerivationInput` (what `createNexusThemeContract` returns + `deriveTheme` consumes) are used consistently across Tasks 1, 3, 9.
