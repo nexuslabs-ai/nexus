@@ -160,13 +160,18 @@ export function NexusAppearanceProvider({
     [activeState.prefs]
   );
 
+  const internalStateRef = useRef(internalState);
+
   const setState = useCallback<Dispatch<SetStateAction<NexusAppearanceState>>>(
     (update) => {
       if (isControlled) {
         onStateChange?.(nextAppearanceState(update, activeState));
         return;
       }
-      setInternalState((previous) => nextAppearanceState(update, previous));
+      const next = nextAppearanceState(update, internalStateRef.current);
+      internalStateRef.current = next;
+      setInternalState(next);
+      onStateChange?.(next);
     },
     [activeState, isControlled, onStateChange]
   );
@@ -174,19 +179,6 @@ export function NexusAppearanceProvider({
   const reset = useCallback(() => {
     setState(initialState);
   }, [initialState, setState]);
-
-  // First effect run is the initial mount; skip it so we notify only on updates.
-  const onStateChangeRef = useRef(onStateChange);
-  onStateChangeRef.current = onStateChange;
-  const notifiedOnceRef = useRef(false);
-  useEffect(() => {
-    if (isControlled) return;
-    if (!notifiedOnceRef.current) {
-      notifiedOnceRef.current = true;
-      return;
-    }
-    onStateChangeRef.current?.(internalState);
-  }, [internalState, isControlled]);
 
   useEffect(() => {
     if (!isControlled) {

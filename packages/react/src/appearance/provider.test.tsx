@@ -131,6 +131,24 @@ describe('NexusAppearanceProvider', () => {
     expect(window.localStorage.getItem('controlled-appearance')).toBeNull();
   });
 
+  it('notifies onStateChange with the composed next state in uncontrolled mode', () => {
+    const onStateChange = vi.fn();
+    const { result } = renderHook(() => useNexusAppearance(), {
+      wrapper: wrapperFor({ onStateChange, storageKey: false }),
+    });
+
+    expect(onStateChange).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.setState((state) => ({ ...state, surfaceTone: 'zinc' }));
+    });
+
+    expect(onStateChange).toHaveBeenCalledTimes(1);
+    expect(onStateChange).toHaveBeenCalledWith(
+      expect.objectContaining({ surfaceTone: 'zinc' })
+    );
+  });
+
   it('resolves system mode from matchMedia changes', () => {
     let listener: ((event: MediaQueryListEvent) => void) | undefined;
     const mediaQueryList: Partial<MediaQueryList> & { matches: boolean } = {
