@@ -118,6 +118,9 @@ importers:
       '@nexus/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@nexus/tailwind':
+        specifier: workspace:*
+        version: link:../../packages/tailwind
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
