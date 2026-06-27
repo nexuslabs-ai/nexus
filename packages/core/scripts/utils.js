@@ -888,10 +888,18 @@ export function splitSpacingTokens(tokens) {
  * @param {Record<string, {cssName: string, value: string}[]>} modesByName
  * @param {object} [opts]
  * @param {string} [opts.defaultMode=CANONICAL_SPACING_DEFAULT_MODE]
+ * @param {string} [opts.attrName='data-style']
+ * @param {string} [opts.commentLabel='SPACING']
+ * @param {string} [opts.duplicateValuePrefix='spacing-']
  * @returns {string} CSS string with all per-mode blocks
  */
 export function generateSpacingModesCSS(modesByName, opts = {}) {
-  const { defaultMode = CANONICAL_SPACING_DEFAULT_MODE } = opts;
+  const {
+    defaultMode = CANONICAL_SPACING_DEFAULT_MODE,
+    attrName = 'data-style',
+    commentLabel = 'SPACING',
+    duplicateValuePrefix = 'spacing-',
+  } = opts;
 
   const allModes = Object.keys(modesByName);
   if (!allModes.includes(defaultMode)) {
@@ -906,7 +914,12 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
   for (const mode of allModes) {
     const valueByName = new Map();
     for (const token of modesByName[mode]) {
-      if (!token.cssName.startsWith('spacing-')) continue;
+      if (!duplicateValuePrefix) {
+        continue;
+      }
+      if (!token.cssName.startsWith(duplicateValuePrefix)) {
+        continue;
+      }
       const collision = valueByName.get(token.value);
       if (collision) {
         log.warn(
@@ -920,7 +933,7 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
 
   const otherModes = allModes.filter((m) => m !== defaultMode).sort();
 
-  let css = `\n/* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */\n`;
+  let css = `\n/* ===== PER-MODE ${commentLabel} (mode swap via [${attrName}="X"] on any ancestor) ===== */\n`;
 
   // Per-mode blocks live OUTSIDE @theme — Tailwind v4's `prefix(nx)` only
   // rewrites variables declared inside @theme, so we add the `nx-` prefix
@@ -935,9 +948,53 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
     return block;
   };
 
-  css += `\n${writeBlock(`:root,\n[data-style="${defaultMode}"]`, modesByName[defaultMode])}`;
+  css += `\n${writeBlock(`:root,\n[${attrName}="${defaultMode}"]`, modesByName[defaultMode])}`;
   for (const mode of otherModes) {
-    css += `\n${writeBlock(`[data-style="${mode}"]`, modesByName[mode])}`;
+    css += `\n${writeBlock(`[${attrName}="${mode}"]`, modesByName[mode])}`;
+  }
+
+  return css;
+}
+
+/**
+ * Emit light/dark per-mode CSS blocks for themed primitive families.
+ *
+ * @param {Record<string, {light: {cssName: string, value: string}[], dark: {cssName: string, value: string}[]}>} modesByName
+ * @param {object} opts
+ * @param {string} opts.defaultMode
+ * @param {string} opts.attrName
+ * @param {string} opts.commentLabel
+ * @returns {string} CSS string with all per-mode light + dark blocks
+ */
+export function generateThemedModesCSS(modesByName, opts) {
+  const { defaultMode, attrName, commentLabel } = opts;
+
+  const allModes = Object.keys(modesByName);
+  if (!allModes.includes(defaultMode)) {
+    throw new Error(
+      `generateThemedModesCSS: defaultMode "${defaultMode}" not found among modes [${allModes.join(', ')}]`
+    );
+  }
+
+  const writeBlock = (selector, tokens) => {
+    let block = `${selector} {\n`;
+    for (const token of tokens) {
+      block += `  --nx-${token.cssName}: ${token.value};\n`;
+    }
+    block += `}\n`;
+    return block;
+  };
+
+  const otherModes = allModes.filter((m) => m !== defaultMode).sort();
+
+  let css = `\n/* ===== PER-MODE ${commentLabel} (mode swap via [${attrName}="X"] on any ancestor) ===== */\n`;
+
+  css += `\n${writeBlock(`:root,\n[${attrName}="${defaultMode}"]`, modesByName[defaultMode].light)}`;
+  css += `\n${writeBlock(`.dark,\n.dark[${attrName}="${defaultMode}"],\n.dark [${attrName}="${defaultMode}"]`, modesByName[defaultMode].dark)}`;
+
+  for (const mode of otherModes) {
+    css += `\n${writeBlock(`[${attrName}="${mode}"]`, modesByName[mode].light)}`;
+    css += `\n${writeBlock(`.dark[${attrName}="${mode}"],\n.dark [${attrName}="${mode}"]`, modesByName[mode].dark)}`;
   }
 
   return css;

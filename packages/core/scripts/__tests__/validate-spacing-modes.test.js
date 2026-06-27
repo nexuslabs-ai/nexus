@@ -6,12 +6,19 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   assertCanonicalModeSet,
   BASELINE_MODE,
+  CANONICAL_BORDERWIDTH_MODES,
   CANONICAL_MODES,
+  CANONICAL_RADIUS_MODES,
+  CANONICAL_SHADOW_MODES,
   ConfigError,
   diffKeySets,
+  discoverFamilyModes,
   discoverModes,
+  formatFamilyFindings,
   formatFindings,
   leafPathsOf,
+  modeFamilyConfigs,
+  validateModeFamilies,
   validateModes,
 } from '../validate-spacing-modes.js';
 
@@ -33,6 +40,79 @@ describe('CANONICAL_MODES', () => {
   it('contains the baseline', () => {
     expect(CANONICAL_MODES).toContain(BASELINE_MODE);
   });
+});
+
+describe('mode family configs', () => {
+  it('declares the canonical runtime mode families and baselines', () => {
+    const configs = modeFamilyConfigs();
+    expect(
+      configs.map((config) => [
+        config.name,
+        config.baseline,
+        config.expectedModes,
+      ])
+    ).toEqual([
+      ['spacing', 'vega', CANONICAL_MODES],
+      ['radius', 'sharp', CANONICAL_RADIUS_MODES],
+      ['borderwidth', 'vega', CANONICAL_BORDERWIDTH_MODES],
+      ['shadow-light', 'maia', CANONICAL_SHADOW_MODES],
+      ['shadow-dark', 'maia', CANONICAL_SHADOW_MODES],
+    ]);
+  });
+
+  it('discovers the checked-in modes for every configured family', () => {
+    for (const config of modeFamilyConfigs()) {
+      expect(discoverFamilyModes(config), config.name).toEqual(
+        [...config.expectedModes].sort()
+      );
+    }
+  });
+
+  it('validates checked-in spacing/radius/borderwidth/shadow key parity', () => {
+    const results = validateModeFamilies();
+
+    expect(results.map((result) => result.config.name)).toEqual([
+      'spacing',
+      'radius',
+      'borderwidth',
+      'shadow-light',
+      'shadow-dark',
+    ]);
+    for (const { config, findings } of results) {
+      const drift = findings.filter(
+        (finding) => finding.missing.length > 0 || finding.extra.length > 0
+      );
+      expect(drift, `${config.name} should match its baseline`).toEqual([]);
+    }
+  });
+
+  it.each(['radius', 'borderwidth', 'shadow-light', 'shadow-dark'])(
+    'reports synthetic key drift for %s',
+    (familyName) => {
+      const config = modeFamilyConfigs().find(
+        (candidate) => candidate.name === familyName
+      );
+      const [comparisonMode] = config.expectedModes.filter(
+        (mode) => mode !== config.baseline
+      );
+      const baseline = { token: { a: dim(1), b: dim(2) } };
+      const drifted = { token: { a: dim(1) } };
+      const findings = validateModes(
+        new Map([
+          [config.baseline, baseline],
+          [comparisonMode, drifted],
+        ]),
+        config.baseline
+      );
+
+      expect(findings).toEqual([
+        { mode: comparisonMode, missing: ['token.b'], extra: [] },
+      ]);
+      expect(formatFamilyFindings({ config, findings })).toContain(
+        config.fileName(comparisonMode)
+      );
+    }
+  );
 });
 
 describe('leafPathsOf', () => {

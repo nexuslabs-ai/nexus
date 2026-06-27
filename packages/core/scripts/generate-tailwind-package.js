@@ -4,15 +4,19 @@ import { fileURLToPath } from 'url';
 
 import {
   CANONICAL_SPACING_DEFAULT_MODE,
+  collectBorderwidthModes,
   collectBorderwidthTokens,
   collectBreakpointsTokens,
   collectMotionTokens,
+  collectRadiusModes,
   collectRadiusTokens,
   collectSemanticColorTokensVarRef,
   collectSemanticDimensionTokens,
+  collectShadowModes,
   collectShadowTokens,
   collectSpacingTokens,
   collectZIndexTokens,
+  DEFAULT_CONFIG,
   discoverPrimitives,
   discoverSemantics,
   ensureDir,
@@ -29,6 +33,7 @@ import {
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   generateThemeCSS,
+  generateThemedModesCSS,
   generateTypographyUtilitiesCSS,
   getGoogleFontsImportFromTokens,
   isReference,
@@ -397,7 +402,8 @@ function generateNexusCSS(
   primitiveMap,
   usedModes,
   spacingModes,
-  spacingDefault
+  spacingDefault,
+  runtimeModes
 ) {
   // Get Google Fonts import
   const typographyMode = usedModes.typography || 'vega';
@@ -522,6 +528,23 @@ function generateNexusCSS(
   // Lives outside @theme so the cascade can pick the active mode at runtime
   // via the `data-style` attribute on any ancestor.
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
+  css += generateSpacingModesCSS(runtimeModes.radiusModes, {
+    defaultMode: usedModes.radius || DEFAULT_CONFIG.radius,
+    attrName: 'data-radius',
+    commentLabel: 'RADIUS',
+    duplicateValuePrefix: null,
+  });
+  css += generateThemedModesCSS(runtimeModes.shadowModes, {
+    defaultMode: usedModes.shadow || DEFAULT_CONFIG.shadow,
+    attrName: 'data-shadow',
+    commentLabel: 'SHADOW',
+  });
+  css += generateSpacingModesCSS(runtimeModes.borderwidthModes, {
+    defaultMode: usedModes.borderwidth || DEFAULT_CONFIG.borderwidth,
+    attrName: 'data-borderwidth',
+    commentLabel: 'BORDER WIDTH',
+    duplicateValuePrefix: null,
+  });
 
   css += generateNativeBrowserUIThemeCSS();
 
@@ -624,12 +647,18 @@ export async function generateTailwindPackage(
   // key (or hand-rolled test fixtures) still produce a valid build.
   const spacingDefault =
     config.spacingDefault || CANONICAL_SPACING_DEFAULT_MODE;
+  const runtimeModes = {
+    radiusModes: collectRadiusModes(TOKENS_DIR),
+    shadowModes: collectShadowModes(TOKENS_DIR),
+    borderwidthModes: collectBorderwidthModes(TOKENS_DIR),
+  };
   const nexusCSS = generateNexusCSS(
     semanticFiles,
     primitiveMap,
     usedModes,
     spacingModes,
-    spacingDefault
+    spacingDefault,
+    runtimeModes
   );
   writeDistFile('nexus.css', nexusCSS);
 
