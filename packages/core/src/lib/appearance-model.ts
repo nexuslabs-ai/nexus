@@ -222,3 +222,34 @@ export function createNexusThemeContract(
     dark: { accent: state.brandColor, ...tone.dark },
   };
 }
+
+export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
+  const uiPx = clampFontSize(
+    prefs.uiFontSize,
+    DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize
+  );
+  const codePx = clampFontSize(
+    prefs.codeFontSize,
+    DEFAULT_NEXUS_APPEARANCE.prefs.codeFontSize
+  );
+  const blocks: string[] = [
+    `:root {
+  --nx-typography-family-font-sans: ${prefs.uiFont};
+  --nx-typography-family-font-mono: ${prefs.codeFont};
+  font-size: ${uiPx}px;
+}`,
+    `code, pre, .nx\\:font-mono { font-size: ${codePx}px; }`,
+    `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; }`,
+  ];
+  if (prefs.pointerCursors) {
+    blocks.push(
+      `button:not(:disabled), [role="button"], [role="tab"], [role="radio"], a[href], summary { cursor: pointer; }`
+    );
+  }
+  if (prefs.reduceMotion === 'on') {
+    blocks.push(
+      `*, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }`
+    );
+  }
+  return blocks.join('\n');
+}

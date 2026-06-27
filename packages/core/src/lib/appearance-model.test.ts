@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  appearancePrefsToCss,
   BASE_TONE_OPTIONS,
   BASE_TONE_SEEDS,
   CORNER_OPTIONS,
@@ -238,4 +239,52 @@ describe('createNexusThemeContract', () => {
       );
     }
   );
+});
+
+describe('appearancePrefsToCss', () => {
+  const prefs = DEFAULT_NEXUS_APPEARANCE.prefs;
+
+  it('emits font variables, clamped root size, code size, and smoothing', () => {
+    const css = appearancePrefsToCss({
+      ...prefs,
+      uiFont: 'Inter',
+      codeFont: 'JetBrains Mono',
+      uiFontSize: 99,
+      codeFontSize: 0,
+    });
+
+    expect(css).toContain('--nx-typography-family-font-sans: Inter;');
+    expect(css).toContain('--nx-typography-family-font-mono: JetBrains Mono;');
+    expect(css).toContain('font-size: 32px;');
+    expect(css).toContain('code, pre, .nx\\:font-mono { font-size: 12px; }');
+    expect(css).toContain('-webkit-font-smoothing: antialiased');
+  });
+
+  it('emits the reduced-motion block only when reduceMotion is on', () => {
+    expect(appearancePrefsToCss({ ...prefs, reduceMotion: 'on' })).toContain(
+      'transition-duration: 0.01ms'
+    );
+    expect(
+      appearancePrefsToCss({ ...prefs, reduceMotion: 'off' })
+    ).not.toContain('0.01ms');
+    expect(
+      appearancePrefsToCss({ ...prefs, reduceMotion: 'system' })
+    ).not.toContain('0.01ms');
+  });
+
+  it('emits the pointer cursor rule only when pointer cursors are enabled', () => {
+    expect(appearancePrefsToCss({ ...prefs, pointerCursors: true })).toContain(
+      'cursor: pointer'
+    );
+    expect(
+      appearancePrefsToCss({ ...prefs, pointerCursors: false })
+    ).not.toContain('cursor: pointer');
+  });
+
+  it('never emits console-only selectors', () => {
+    const css = appearancePrefsToCss(prefs);
+
+    expect(css).not.toContain('sidebar-container');
+    expect(css).not.toContain('diff');
+  });
 });
