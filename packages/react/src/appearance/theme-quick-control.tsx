@@ -86,6 +86,11 @@ export function NexusThemeQuickControl({
     onCustomize();
   };
 
+  const handleModeChange = (mode: string) => {
+    if (!mode) return;
+    setState((current) => ({ ...current, mode: mode as NexusAppearanceMode }));
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -114,13 +119,7 @@ export function NexusThemeQuickControl({
             size="sm"
             aria-label="Theme mode"
             className="nx:grid nx:w-full nx:grid-cols-3"
-            onValueChange={(mode) => {
-              if (!mode) return;
-              setState((current) => ({
-                ...current,
-                mode: mode as NexusAppearanceMode,
-              }));
-            }}
+            onValueChange={handleModeChange}
           >
             {MODE_OPTIONS.map((option) => (
               <ToggleGroupItem
