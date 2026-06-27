@@ -407,6 +407,9 @@ importers:
       '@nexus/core':
         specifier: workspace:*
         version: link:../core
+      '@nexus/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
       '@storybook/addon-a11y':
         specifier: ^10.1.10
         version: 10.4.2(storybook@10.4.2(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))

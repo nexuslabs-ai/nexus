@@ -37,6 +37,7 @@
     "@hookform/resolvers": "^5.4.0",
     "@microsoft/api-extractor": "^7.58.9",
     "@nexus/core": "workspace:*",
+    "@nexus/test-utils": "workspace:*",
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/addon-docs": "^10.1.10",
     "@storybook/react-vite": "^10.1.10",
