@@ -1,4 +1,5 @@
 import type { NexusSurfaceTone, ThemeSeeds } from './derive-theme';
+import { isColor } from './perceptual-ramp';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
@@ -115,3 +116,93 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
     fontSmoothing: true,
   },
 };
+
+const FONT_PX_MIN = 8;
+const FONT_PX_MAX = 32;
+
+const APPEARANCE_MODES = new Set<NexusAppearanceMode>([
+  'light',
+  'dark',
+  'system',
+]);
+const SURFACE_TONES = new Set<NexusSurfaceTone>(
+  BASE_TONE_OPTIONS.map((option) => option.value)
+);
+const DENSITIES = new Set<NexusDensity>(
+  DENSITY_OPTIONS.map((option) => option.value)
+);
+const CORNERS = new Set<NexusCorners>(
+  CORNER_OPTIONS.map((option) => option.value)
+);
+const ELEVATIONS = new Set<NexusElevation>(
+  ELEVATION_OPTIONS.map((option) => option.value)
+);
+const STROKES = new Set<NexusStroke>(
+  STROKE_OPTIONS.map((option) => option.value)
+);
+const REDUCE_MOTION = new Set<NexusAppearancePrefs['reduceMotion']>([
+  'system',
+  'on',
+  'off',
+]);
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const stringOr = (value: unknown, fallback: string): string =>
+  typeof value === 'string' ? value : fallback;
+
+const boolOr = (value: unknown, fallback: boolean): boolean =>
+  typeof value === 'boolean' ? value : fallback;
+
+const enumOr = <T extends string>(
+  value: unknown,
+  values: ReadonlySet<T>,
+  fallback: T
+): T =>
+  typeof value === 'string' && values.has(value as T) ? (value as T) : fallback;
+
+const clampFontSize = (value: unknown, fallback: number): number =>
+  typeof value === 'number' && Number.isFinite(value) && value > 0
+    ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
+    : fallback;
+
+export function sanitizeNexusAppearancePrefs(
+  raw: unknown
+): NexusAppearancePrefs {
+  const o = isRecord(raw) ? raw : {};
+  const d = DEFAULT_NEXUS_APPEARANCE.prefs;
+  return {
+    uiFont: stringOr(o.uiFont, d.uiFont),
+    codeFont: stringOr(o.codeFont, d.codeFont),
+    uiFontSize: clampFontSize(o.uiFontSize, d.uiFontSize),
+    codeFontSize: clampFontSize(o.codeFontSize, d.codeFontSize),
+    reduceMotion: enumOr(o.reduceMotion, REDUCE_MOTION, d.reduceMotion),
+    pointerCursors: boolOr(o.pointerCursors, d.pointerCursors),
+    fontSmoothing: boolOr(o.fontSmoothing, d.fontSmoothing),
+  };
+}
+
+export function sanitizeNexusAppearance(raw: unknown): NexusAppearanceState {
+  if (!isRecord(raw)) return DEFAULT_NEXUS_APPEARANCE;
+  const d = DEFAULT_NEXUS_APPEARANCE;
+  return {
+    mode: enumOr(raw.mode, APPEARANCE_MODES, d.mode),
+    brandColor:
+      typeof raw.brandColor === 'string' && isColor(raw.brandColor)
+        ? raw.brandColor
+        : d.brandColor,
+    surfaceTone: enumOr(raw.surfaceTone, SURFACE_TONES, d.surfaceTone),
+    contrast:
+      typeof raw.contrast === 'number' &&
+      raw.contrast >= 0 &&
+      raw.contrast <= 100
+        ? raw.contrast
+        : d.contrast,
+    density: enumOr(raw.density, DENSITIES, d.density),
+    corners: enumOr(raw.corners, CORNERS, d.corners),
+    elevation: enumOr(raw.elevation, ELEVATIONS, d.elevation),
+    stroke: enumOr(raw.stroke, STROKES, d.stroke),
+    prefs: sanitizeNexusAppearancePrefs(raw.prefs),
+  };
+}

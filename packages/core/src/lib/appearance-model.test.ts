@@ -8,6 +8,8 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
+  sanitizeNexusAppearance,
+  sanitizeNexusAppearancePrefs,
   STROKE_OPTIONS,
 } from './appearance-model';
 
@@ -82,5 +84,112 @@ describe('appearance model', () => {
       { value: 'vega', label: 'Normal' },
       { value: 'nova', label: 'Strong' },
     ]);
+  });
+});
+
+describe('sanitizeNexusAppearance', () => {
+  it('falls back to default on non-object payloads', () => {
+    expect(sanitizeNexusAppearance(null)).toEqual(DEFAULT_NEXUS_APPEARANCE);
+    expect(sanitizeNexusAppearance('x')).toEqual(DEFAULT_NEXUS_APPEARANCE);
+  });
+
+  it('passes a valid state through unchanged', () => {
+    const valid = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'system' as const,
+      brandColor: '#2563eb',
+      surfaceTone: 'slate' as const,
+      contrast: 42,
+      density: 'sera' as const,
+      corners: 'mellow' as const,
+      elevation: 'nova' as const,
+      stroke: 'maia' as const,
+      prefs: {
+        ...DEFAULT_NEXUS_APPEARANCE.prefs,
+        uiFontSize: 16,
+        codeFontSize: 13,
+        reduceMotion: 'on' as const,
+        pointerCursors: true,
+      },
+    };
+
+    expect(sanitizeNexusAppearance(valid)).toEqual(valid);
+  });
+
+  it('rejects prototype-chain keys as tones', () => {
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        surfaceTone: 'toString',
+      }).surfaceTone
+    ).toBe('stone');
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        surfaceTone: 'hasOwnProperty',
+      }).surfaceTone
+    ).toBe('stone');
+  });
+
+  it('rejects invalid brand color, contrast, and enum values', () => {
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        brandColor: 'not-a-color',
+      }).brandColor
+    ).toBe('#339cff');
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        contrast: 999,
+      }).contrast
+    ).toBe(60);
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        density: 'wat',
+      }).density
+    ).toBe('mira');
+  });
+
+  it('preserves system mode verbatim', () => {
+    expect(
+      sanitizeNexusAppearance({
+        ...DEFAULT_NEXUS_APPEARANCE,
+        mode: 'system',
+      }).mode
+    ).toBe('system');
+  });
+});
+
+describe('sanitizeNexusAppearancePrefs', () => {
+  it('clamps font sizes into [8,32] and falls back per field', () => {
+    expect(sanitizeNexusAppearancePrefs({ uiFontSize: 99 }).uiFontSize).toBe(
+      32
+    );
+    expect(sanitizeNexusAppearancePrefs({ codeFontSize: 2 }).codeFontSize).toBe(
+      8
+    );
+    expect(sanitizeNexusAppearancePrefs({ uiFontSize: 0 }).uiFontSize).toBe(14);
+    expect(sanitizeNexusAppearancePrefs({ codeFontSize: 0 }).codeFontSize).toBe(
+      12
+    );
+  });
+
+  it('falls back per preference field without restoring the whole object', () => {
+    const result = sanitizeNexusAppearancePrefs({
+      uiFont: 'Inter',
+      codeFont: 123,
+      reduceMotion: 'off',
+      pointerCursors: true,
+      fontSmoothing: 'yes',
+    });
+
+    expect(result).toEqual({
+      ...DEFAULT_NEXUS_APPEARANCE.prefs,
+      uiFont: 'Inter',
+      reduceMotion: 'off',
+      pointerCursors: true,
+    });
   });
 });
