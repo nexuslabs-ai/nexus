@@ -6,7 +6,6 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   DENSITY_OPTIONS,
   ELEVATION_OPTIONS,
-  PUBLIC_MODE_RENAME,
   STROKE_OPTIONS,
 } from '../../../src/lib/appearance-model';
 import { MODE_RENAME, RETIRED_CODENAMES } from '../mode-rename-map.js';
@@ -121,25 +120,6 @@ describe('mode-rename-map', () => {
     for (const [family, options] of Object.entries(optionsByFamily)) {
       for (const { value } of options) expectModeCovered(family, value);
       expectModeCovered(family, defaultByFamily[family]);
-    }
-  });
-
-  it('pins PUBLIC_MODE_RENAME to the build-time MODE_RENAME public rows', () => {
-    // The runtime normalizer map (appearance-model.ts) re-encodes the public
-    // rows of the build map; this catches drift if either is edited.
-    const fieldToFamily = {
-      density: 'spacing',
-      corners: 'radius',
-      elevation: 'shadow',
-      stroke: 'borderwidth',
-    };
-    for (const [field, map] of Object.entries(PUBLIC_MODE_RENAME)) {
-      const family = fieldToFamily[field];
-      for (const [codename, friendly] of Object.entries(map)) {
-        expect(MODE_RENAME[family][codename], `${field} ${codename}`).toBe(
-          friendly
-        );
-      }
     }
   });
 });

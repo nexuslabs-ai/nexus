@@ -178,9 +178,10 @@ const clampFontSize = (value: unknown, fallback: number): number =>
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
 
-// Public mode rename map (codename -> friendly), pinned to the build-time
-// MODE_RENAME public rows by a test in appearance-model.test.ts.
-export const PUBLIC_MODE_RENAME: Record<
+// Retired public-mode codename -> friendly, applied to persisted state on read
+// (see normalizeAppearanceModeIds). Internal; correctness is covered behaviorally
+// by the sanitize codename->friendly tests, so it is not part of the public API.
+const PUBLIC_MODE_RENAME: Record<
   'density' | 'corners' | 'elevation' | 'stroke',
   Record<string, string>
 > = {
