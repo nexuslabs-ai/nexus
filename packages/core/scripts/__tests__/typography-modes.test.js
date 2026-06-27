@@ -13,15 +13,15 @@ const TYPOGRAPHY_DIR = path.resolve(
   'typography'
 );
 
-// Typography ships exactly one mode (vega). The former `nova` / `maia` density
+// Typography ships exactly one mode (default). The former `nova` / `maia` density
 // modes were removed; modes are filesystem-discovered (`discoverPrimitives` globs
 // the directory), so without this guard, dropping a `typography-nova.json` back
 // in would silently re-activate a second mode. Reintroducing one must be a
 // deliberate edit here, behind a real typeface or scale-ratio decision.
-const EXPECTED_MODES = ['vega'];
+const EXPECTED_MODES = ['default'];
 
 describe('typography modes', () => {
-  it('ships exactly vega (single mode)', () => {
+  it('ships exactly default (single mode)', () => {
     const modes = fs
       .readdirSync(TYPOGRAPHY_DIR)
       .filter(

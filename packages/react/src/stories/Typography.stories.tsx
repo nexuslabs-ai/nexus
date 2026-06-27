@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect } from 'storybook/test';
 
-import typographyVega from '../../../core/tokens/primitives/typography/typography-vega.json';
+import typographyDefault from '../../../core/tokens/primitives/typography/typography-default.json';
 import typographyStyles from '../../../core/tokens/styles/typography.json';
 
 type Dimension = { value: number; unit: string };
@@ -64,7 +64,7 @@ type TypographyTokenSet = {
   letterspacing: Record<LetterspacingKey, DimensionToken>;
 };
 
-const VEGA = typographyVega satisfies TypographyTokenSet;
+const DEFAULT_TYPOGRAPHY = typographyDefault satisfies TypographyTokenSet;
 
 // Full literal class strings so Tailwind's content scanner emits each utility
 // (v4 tree-shakes @utility classes not referenced as static literals).
@@ -225,7 +225,7 @@ export const Scale: Story = {
       </div>
       <section className="nx:flex nx:flex-col">
         {SIZE_KEYS.map((sk) => {
-          const dim = VEGA.size[sk].$value;
+          const dim = DEFAULT_TYPOGRAPHY.size[sk].$value;
           return (
             <TokenRow
               key={sk}
@@ -264,7 +264,7 @@ export const Weights: Story = {
       </div>
       <section className="nx:flex nx:flex-col">
         {WEIGHT_KEYS.map((wk) => {
-          const weight = VEGA.weight[wk].$value;
+          const weight = DEFAULT_TYPOGRAPHY.weight[wk].$value;
           return (
             <TokenRow
               key={wk}
@@ -304,8 +304,8 @@ export const LineHeights: Story = {
       </div>
       <section className="nx:flex nx:flex-col">
         {LINE_HEIGHT_DISPLAY_KEYS.map((sk) => {
-          const size = VEGA.size[sk].$value;
-          const lineHeight = VEGA['line-height'][sk].$value;
+          const size = DEFAULT_TYPOGRAPHY.size[sk].$value;
+          const lineHeight = DEFAULT_TYPOGRAPHY['line-height'][sk].$value;
           return (
             <TokenRow
               key={sk}
@@ -347,7 +347,7 @@ export const FontFamilies: Story = {
       </div>
       <section className="nx:flex nx:flex-col">
         {FAMILY_KEYS.map((fk) => {
-          const family = VEGA.family[fk].$value;
+          const family = DEFAULT_TYPOGRAPHY.family[fk].$value;
           return (
             <TokenRow
               key={fk}

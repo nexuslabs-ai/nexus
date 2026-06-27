@@ -406,7 +406,7 @@ function generateNexusCSS(
   runtimeModes
 ) {
   // Get Google Fonts import
-  const typographyMode = usedModes.typography || 'vega';
+  const typographyMode = usedModes.typography || 'default';
   const typographyFilePath = path.join(
     TOKENS_DIR,
     `primitives/typography/typography-${typographyMode}.json`

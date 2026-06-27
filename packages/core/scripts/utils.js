@@ -547,7 +547,7 @@ export function formatShadowComposite(value, primitiveMap, isInset = false) {
  * Extract Google Fonts information from typography token file
  * Reads font family tokens with $extensions.nx-font-source
  *
- * @param {string} typographyFilePath - Path to typography token file (e.g., typography-vega.json)
+ * @param {string} typographyFilePath - Path to typography token file (e.g., typography-default.json)
  * @returns {object[]} Array of { family, weights, styles } for Google Fonts
  */
 function extractGoogleFonts(typographyFilePath) {
