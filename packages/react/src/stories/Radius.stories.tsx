@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import borderwidthLyra from '../../../core/tokens/primitives/borderwidth/borderwidth-lyra.json';
-import borderwidthMaia from '../../../core/tokens/primitives/borderwidth/borderwidth-maia.json';
-import borderwidthMira from '../../../core/tokens/primitives/borderwidth/borderwidth-mira.json';
-import borderwidthNova from '../../../core/tokens/primitives/borderwidth/borderwidth-nova.json';
-import borderwidthVega from '../../../core/tokens/primitives/borderwidth/borderwidth-vega.json';
+import borderwidthBold from '../../../core/tokens/primitives/borderwidth/borderwidth-bold.json';
+import borderwidthFine from '../../../core/tokens/primitives/borderwidth/borderwidth-fine.json';
+import borderwidthMedium from '../../../core/tokens/primitives/borderwidth/borderwidth-medium.json';
+import borderwidthNormal from '../../../core/tokens/primitives/borderwidth/borderwidth-normal.json';
+import borderwidthStrong from '../../../core/tokens/primitives/borderwidth/borderwidth-strong.json';
 import radiusExtraRound from '../../../core/tokens/primitives/radius/radius-extra-round.json';
 import radiusRound from '../../../core/tokens/primitives/radius/radius-round.json';
 import radiusSmooth from '../../../core/tokens/primitives/radius/radius-smooth.json';
@@ -12,7 +12,7 @@ import radiusSquare from '../../../core/tokens/primitives/radius/radius-square.j
 import radiusSubtle from '../../../core/tokens/primitives/radius/radius-subtle.json';
 
 const BUNDLED_RADIUS_MODE = 'square';
-const BUNDLED_BORDERWIDTH_MODE = 'vega';
+const BUNDLED_BORDERWIDTH_MODE = 'normal';
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
@@ -43,11 +43,11 @@ const RADIUS_MODES: { name: string; tokens: RadiusMap }[] = [
 ];
 
 const BORDERWIDTH_MODES: { name: string; tokens: BorderWidthMap }[] = [
-  { name: 'vega', tokens: borderwidthVega as BorderWidthMap },
-  { name: 'lyra', tokens: borderwidthLyra as BorderWidthMap },
-  { name: 'maia', tokens: borderwidthMaia as BorderWidthMap },
-  { name: 'mira', tokens: borderwidthMira as BorderWidthMap },
-  { name: 'nova', tokens: borderwidthNova as BorderWidthMap },
+  { name: 'normal', tokens: borderwidthNormal as BorderWidthMap },
+  { name: 'medium', tokens: borderwidthMedium as BorderWidthMap },
+  { name: 'fine', tokens: borderwidthFine as BorderWidthMap },
+  { name: 'bold', tokens: borderwidthBold as BorderWidthMap },
+  { name: 'strong', tokens: borderwidthStrong as BorderWidthMap },
 ];
 
 function formatDimension(d: Dimension) {

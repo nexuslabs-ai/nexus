@@ -2123,27 +2123,27 @@
 /* ===== PER-MODE BORDER WIDTH (mode swap via [data-borderwidth="X"] on any ancestor) ===== */
 
 :root,
-[data-borderwidth='vega'] {
+[data-borderwidth='normal'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 }
 
-[data-borderwidth='lyra'] {
+[data-borderwidth='bold'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 }
 
-[data-borderwidth='maia'] {
+[data-borderwidth='fine'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 1px;
 }
 
-[data-borderwidth='mira'] {
+[data-borderwidth='medium'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 }
 
-[data-borderwidth='nova'] {
+[data-borderwidth='strong'] {
   --nx-borderwidth-default: 1.5px;
   --nx-borderwidth-thick: 3px;
 }

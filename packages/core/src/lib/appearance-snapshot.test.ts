@@ -141,7 +141,7 @@ describe('resolveFirstPaint', () => {
       'data-style': 'default',
       'data-radius': 'square',
       'data-shadow': 'quiet',
-      'data-borderwidth': 'vega',
+      'data-borderwidth': 'normal',
     });
   });
 

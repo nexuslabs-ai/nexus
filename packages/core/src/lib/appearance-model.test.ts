@@ -27,7 +27,7 @@ describe('appearance model', () => {
       density: 'default',
       corners: 'square',
       elevation: 'quiet',
-      stroke: 'vega',
+      stroke: 'normal',
       prefs: {
         uiFontSize: 14,
         codeFontSize: 12,
@@ -84,9 +84,9 @@ describe('appearance model', () => {
       { value: 'strong', label: 'Strong' },
     ]);
     expect(STROKE_OPTIONS).toEqual([
-      { value: 'maia', label: 'Fine' },
-      { value: 'vega', label: 'Normal' },
-      { value: 'nova', label: 'Strong' },
+      { value: 'fine', label: 'Fine' },
+      { value: 'normal', label: 'Normal' },
+      { value: 'strong', label: 'Strong' },
     ]);
   });
 });
@@ -107,7 +107,7 @@ describe('sanitizeNexusAppearance', () => {
       density: 'spacious' as const,
       corners: 'round' as const,
       elevation: 'strong' as const,
-      stroke: 'maia' as const,
+      stroke: 'fine' as const,
       prefs: {
         ...DEFAULT_NEXUS_APPEARANCE.prefs,
         uiFontSize: 16,
@@ -172,6 +172,10 @@ describe('sanitizeNexusAppearance', () => {
     expect(sanitizeNexusAppearance({ corners: 'mellow' }).corners).toBe(
       'round'
     );
+  });
+
+  it('normalizes a persisted stroke codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ stroke: 'maia' }).stroke).toBe('fine');
   });
 
   it('preserves system mode verbatim', () => {

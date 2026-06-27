@@ -26,7 +26,7 @@ const SPACING_MODES = [
 ];
 const RADIUS_MODES = ['extra-round', 'round', 'smooth', 'square', 'subtle'];
 const SHADOW_MODES = ['flat', 'quiet', 'soft', 'standard', 'strong'];
-const BORDERWIDTH_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
+const BORDERWIDTH_MODES = ['bold', 'fine', 'medium', 'normal', 'strong'];
 
 function readSpacingModeJson(mode) {
   return JSON.parse(
@@ -543,11 +543,11 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-radius=['"]square['"]\] \{/);
     expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-shadow=['"]quiet['"]\] \{/);
     expect(nexusCSS).toMatch(
-      /:root,\s*\n\s*\[data-borderwidth=['"]vega['"]\] \{/
+      /:root,\s*\n\s*\[data-borderwidth=['"]normal['"]\] \{/
     );
     expect(nexusCSS).toContain("[data-radius='extra-round']");
     expect(nexusCSS).toContain("[data-shadow='soft']");
-    expect(nexusCSS).toContain("[data-borderwidth='nova']");
+    expect(nexusCSS).toContain("[data-borderwidth='strong']");
     expect(nexusCSS).not.toContain('light-dark(');
   });
 
@@ -557,7 +557,7 @@ describe('generateTailwindPackage', () => {
       {
         attrName: 'data-borderwidth',
         modes: BORDERWIDTH_MODES,
-        baseline: 'vega',
+        baseline: 'normal',
       },
     ];
 

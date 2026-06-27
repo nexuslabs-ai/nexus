@@ -29,11 +29,11 @@ export const CANONICAL_RADIUS_MODES = [
   'subtle',
 ];
 export const CANONICAL_BORDERWIDTH_MODES = [
-  'lyra',
-  'maia',
-  'mira',
-  'nova',
-  'vega',
+  'bold',
+  'fine',
+  'medium',
+  'normal',
+  'strong',
 ];
 export const CANONICAL_SHADOW_MODES = [
   'flat',
@@ -105,7 +105,7 @@ export function keyParityModeFamilyConfigs({
       name: 'borderwidth',
       reportName: 'borderwidth',
       dir: path.join(primitivesDir, 'borderwidth'),
-      baseline: 'vega',
+      baseline: 'normal',
       expectedModes: CANONICAL_BORDERWIDTH_MODES,
       modePattern: /^borderwidth-([a-z]+)\.json$/,
       fileName: (mode) => `borderwidth-${mode}.json`,

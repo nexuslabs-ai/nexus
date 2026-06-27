@@ -420,7 +420,7 @@ describe('utils', () => {
       expect(DEFAULT_CONFIG.brand).toBe('black');
       expect(DEFAULT_CONFIG.shadow).toBe('quiet');
       expect(DEFAULT_CONFIG.radius).toBe('square');
-      expect(DEFAULT_CONFIG.borderwidth).toBe('vega');
+      expect(DEFAULT_CONFIG.borderwidth).toBe('normal');
       // Mira is the runtime spacing default. The
       // key controls which mode lands under `:root, [data-style="X"]`; other
       // modes still ship in the bundle.

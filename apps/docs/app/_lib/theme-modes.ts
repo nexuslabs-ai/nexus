@@ -36,7 +36,7 @@ export const THEME_MODE_VALUES = {
   ],
   shadow: ['flat', 'soft', 'quiet', 'standard', 'strong'],
   radius: ['square', 'subtle', 'smooth', 'round', 'extra-round'],
-  borderwidth: ['vega', 'lyra', 'maia', 'mira', 'nova'],
+  borderwidth: ['normal', 'medium', 'fine', 'bold', 'strong'],
 } as const;
 
 type ThemeModeValues = typeof THEME_MODE_VALUES;
@@ -56,7 +56,7 @@ export const DEFAULT_THEME_STATE = {
   spacing: 'default',
   shadow: 'quiet',
   radius: 'square',
-  borderwidth: 'vega',
+  borderwidth: 'normal',
 } as const satisfies ThemeState;
 
 export const THEME_MODE_OPTIONS = {
@@ -99,11 +99,11 @@ export const THEME_MODE_OPTIONS = {
     { value: 'extra-round', label: 'Extra round' },
   ],
   borderwidth: [
-    { value: 'vega', label: 'Vega' },
-    { value: 'lyra', label: 'Lyra (≈ Vega)' },
-    { value: 'maia', label: 'Maia' },
-    { value: 'mira', label: 'Mira (≈ Vega)' },
-    { value: 'nova', label: 'Nova' },
+    { value: 'normal', label: 'Normal' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'fine', label: 'Fine' },
+    { value: 'bold', label: 'Bold' },
+    { value: 'strong', label: 'Strong' },
   ],
 } as const satisfies {
   [K in ThemeMode]: readonly ThemeModeOption<K>[];
@@ -140,11 +140,11 @@ export const THEME_STYLESHEET_HREFS = {
     'extra-round': '/themes/radius-extra-round.css',
   },
   borderwidth: {
-    vega: '/themes/borderwidth-vega.css',
-    lyra: '/themes/borderwidth-lyra.css',
-    maia: '/themes/borderwidth-maia.css',
-    mira: '/themes/borderwidth-mira.css',
-    nova: '/themes/borderwidth-nova.css',
+    normal: '/themes/borderwidth-normal.css',
+    medium: '/themes/borderwidth-medium.css',
+    fine: '/themes/borderwidth-fine.css',
+    bold: '/themes/borderwidth-bold.css',
+    strong: '/themes/borderwidth-strong.css',
   },
 } as const satisfies {
   [K in ThemeStylesheetMode]: Record<ThemeState[K], `/themes/${string}.css`>;

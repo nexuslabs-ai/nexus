@@ -235,7 +235,7 @@ export const DEFAULT_CONFIG = {
   brand: 'black',
   shadow: 'quiet',
   radius: 'square',
-  borderwidth: 'vega',
+  borderwidth: 'normal',
   motion: 'snappy',
   focus: 'default',
   'chart-categorical': 'default',

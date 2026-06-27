@@ -470,7 +470,7 @@ function generateNexusCSS(
 
   const radiusMode = usedModes.radius || DEFAULT_CONFIG.radius;
   const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
-  const borderwidthMode = usedModes.borderwidth || 'vega';
+  const borderwidthMode = usedModes.borderwidth || DEFAULT_CONFIG.borderwidth;
   const borderwidthTokens = collectBorderwidthTokens(
     TOKENS_DIR,
     borderwidthMode

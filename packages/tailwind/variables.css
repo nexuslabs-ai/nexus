@@ -3,7 +3,7 @@
 /* All primitives use --nx-* prefix for namespace isolation */
 
 :root {
-  /* borderwidth (vega) */
+  /* borderwidth (normal) */
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 2px;
 

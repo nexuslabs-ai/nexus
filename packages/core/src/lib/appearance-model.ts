@@ -11,7 +11,7 @@ export type NexusAppearanceMode = 'light' | 'dark' | 'system';
 export type NexusDensity = 'compact' | 'default' | 'comfortable' | 'spacious';
 export type NexusCorners = 'square' | 'subtle' | 'smooth' | 'round';
 export type NexusElevation = 'quiet' | 'standard' | 'strong';
-export type NexusStroke = 'maia' | 'vega' | 'nova';
+export type NexusStroke = 'fine' | 'normal' | 'strong';
 
 export interface NexusAppearancePrefs {
   uiFont: string;
@@ -96,9 +96,9 @@ export const ELEVATION_OPTIONS = [
 ] as const satisfies readonly { value: NexusElevation; label: string }[];
 
 export const STROKE_OPTIONS = [
-  { value: 'maia', label: 'Fine' },
-  { value: 'vega', label: 'Normal' },
-  { value: 'nova', label: 'Strong' },
+  { value: 'fine', label: 'Fine' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'strong', label: 'Strong' },
 ] as const satisfies readonly { value: NexusStroke; label: string }[];
 
 export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
@@ -109,7 +109,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   density: 'default',
   corners: 'square',
   elevation: 'quiet',
-  stroke: 'vega',
+  stroke: 'normal',
   prefs: {
     uiFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     codeFont: 'ui-monospace, "SF Mono", Menlo, monospace',
@@ -197,7 +197,11 @@ const PUBLIC_MODE_RENAME: Record<
     mira: 'standard',
     nova: 'strong',
   },
-  stroke: {},
+  stroke: {
+    maia: 'fine',
+    vega: 'normal',
+    nova: 'strong',
+  },
 };
 
 export function normalizeAppearanceModeIds(raw: unknown): unknown {

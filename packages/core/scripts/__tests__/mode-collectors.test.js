@@ -33,13 +33,13 @@ describe('runtime mode collectors', () => {
     const modes = collectBorderwidthModes(TOKENS);
 
     expect(Object.keys(modes).sort()).toEqual([
-      'lyra',
-      'maia',
-      'mira',
-      'nova',
-      'vega',
+      'bold',
+      'fine',
+      'medium',
+      'normal',
+      'strong',
     ]);
-    const names = modes.vega.map((token) => token.cssName);
+    const names = modes.normal.map((token) => token.cssName);
     expect(names).toContain('borderwidth-default');
     expect(names).not.toContain('border-default');
   });
