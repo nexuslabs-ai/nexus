@@ -346,11 +346,7 @@ describe('file discovery', () => {
     expect(file.endsWith('/src/appearance/appearance-settings.tsx')).toBe(true);
 
     const result = auditComponent(file);
-    expect(result.findings).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ rule: 'stories-file' }),
-      ])
-    );
+    expect(result.findings).toEqual([]);
   });
 
   it('throws ConfigError for missing components', () => {

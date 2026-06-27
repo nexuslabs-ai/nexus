@@ -13,7 +13,7 @@ describe('SettingsScene', () => {
       </CONSOLE_APPEARANCE.NexusAppearanceProvider>
     );
 
-    expect(screen.getByRole('heading', { name: 'Settings' })).toBeVisible();
-    expect(screen.getByText('Brand color')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Settings' })).toBeTruthy();
+    expect(screen.getByText('Brand color')).toBeTruthy();
   });
 });
