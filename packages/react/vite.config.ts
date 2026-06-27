@@ -13,6 +13,42 @@ export default defineConfig({
       exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
       outDir: 'dist',
       rollupTypes: true,
+      beforeWriteFile(filePath, content) {
+        const normalizedPath = filePath.split(path.sep).join('/');
+
+        if (normalizedPath.endsWith('/dist/appearance/index.d.ts')) {
+          return {
+            filePath: path.resolve(__dirname, 'dist/appearance.d.ts'),
+            content: content.replace(
+              '//# sourceMappingURL=index.d.ts.map',
+              '//# sourceMappingURL=appearance.d.ts.map'
+            ),
+          };
+        }
+
+        if (normalizedPath.endsWith('/dist/appearance/index.d.ts.map')) {
+          const appearanceMapPath = path.resolve(
+            __dirname,
+            'dist/appearance.d.ts.map'
+          );
+
+          try {
+            const sourceMap = JSON.parse(content) as { file?: string };
+
+            sourceMap.file = 'appearance.d.ts';
+
+            return {
+              filePath: appearanceMapPath,
+              content: JSON.stringify(sourceMap),
+            };
+          } catch {
+            return {
+              filePath: appearanceMapPath,
+              content,
+            };
+          }
+        }
+      },
     }),
   ],
   resolve: {
@@ -22,13 +58,19 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'),
+      entry: {
+        index: path.resolve(__dirname, 'src/index.ts'),
+        appearance: path.resolve(__dirname, 'src/appearance/index.ts'),
+      },
       name: 'NexusReact',
       formats: ['es', 'cjs'],
-      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`,
+      fileName: (format, entryName) =>
+        `${entryName}.${format === 'es' ? 'mjs' : 'js'}`,
+      cssFileName: 'react',
     },
     rollupOptions: {
       external: [
+        '@nexus/core',
         'react',
         'react-dom',
         'react/jsx-runtime',
@@ -42,6 +84,7 @@ export default defineConfig({
       ],
       output: {
         globals: {
+          '@nexus/core': 'NexusCore',
           react: 'React',
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'jsxRuntime',

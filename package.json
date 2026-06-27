@@ -59,6 +59,16 @@
       "name": "@nexus/react (CSS)",
       "path": "packages/react/dist/react.css",
       "limit": "30 kB"
+    },
+    {
+      "name": "@nexus/react/appearance (ESM)",
+      "path": "packages/react/dist/appearance.mjs",
+      "ignore": [
+        "@nexus/core",
+        "react",
+        "react-dom"
+      ],
+      "limit": "20 kB"
     }
   ],
   "devDependencies": {
