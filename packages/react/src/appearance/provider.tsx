@@ -12,18 +12,14 @@ import {
 } from 'react';
 
 import {
-  appearancePrefsToCss,
-  createNexusAppearanceSnapshot,
-  createNexusThemeContract,
+  createNexusAppearanceSnapshotFromState,
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
-  deriveTheme,
   type NexusAppearanceSnapshot,
   type NexusAppearanceState,
   resolveFirstPaint,
   sanitizeNexusAppearance,
   sanitizeNexusAppearanceSnapshot,
-  themeToCss,
 } from '@nexus/core';
 
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
@@ -182,17 +178,9 @@ export function NexusAppearanceProvider({
   const [resolvedMode, setResolvedMode] = useState<NexusResolvedAppearanceMode>(
     () => resolveAppearanceMode(activeState.mode)
   );
-  const themeCss = useMemo(
-    () => themeToCss(deriveTheme(createNexusThemeContract(activeState))),
-    [activeState]
-  );
-  const prefsCss = useMemo(
-    () => appearancePrefsToCss(activeState.prefs),
-    [activeState.prefs]
-  );
   const activeSnapshot = useMemo(
-    () => createNexusAppearanceSnapshot(activeState, themeCss, prefsCss),
-    [activeState, prefsCss, themeCss]
+    () => createNexusAppearanceSnapshotFromState(activeState),
+    [activeState]
   );
   const firstPaint = useMemo(
     () => resolveFirstPaint(activeSnapshot, resolvedMode === 'dark'),

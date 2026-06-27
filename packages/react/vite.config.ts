@@ -12,7 +12,6 @@ export default defineConfig({
       include: ['src'],
       exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
       outDir: 'dist',
-      rollupTypes: true,
       beforeWriteFile(filePath, content) {
         const normalizedPath = filePath.split(path.sep).join('/');
 
@@ -20,10 +19,7 @@ export default defineConfig({
           return {
             filePath: path.resolve(__dirname, 'dist/appearance.d.ts'),
             content: content
-              .replace(
-                /export \* from '\.\/([^']+)';/g,
-                "export * from './appearance/$1';"
-              )
+              .replace(/from '\.\/([^']+)'/g, "from './appearance/$1'")
               .replace(
                 '//# sourceMappingURL=index.d.ts.map',
                 '//# sourceMappingURL=appearance.d.ts.map'
