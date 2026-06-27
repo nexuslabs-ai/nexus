@@ -1,4 +1,4 @@
-import type { CodexThemeContract, ThemeSeeds } from '@nexus/core';
+import type { NexusThemeContract, ThemeSeeds } from '@nexus/core';
 
 import type {
   Base,
@@ -72,9 +72,9 @@ export const STROKE_OPTIONS = [
 ] as const satisfies readonly { value: TokenMode; label: string }[];
 
 export function applyBrandColor(
-  contract: CodexThemeContract,
+  contract: NexusThemeContract,
   accent: string
-): CodexThemeContract {
+): NexusThemeContract {
   return {
     ...contract,
     light: { ...contract.light, accent },
@@ -83,9 +83,9 @@ export function applyBrandColor(
 }
 
 export function applyBaseTone(
-  contract: CodexThemeContract,
+  contract: NexusThemeContract,
   base: Base
-): CodexThemeContract {
+): NexusThemeContract {
   const tone = BASE_TONE_SEEDS[base];
   return {
     ...contract,
@@ -96,7 +96,7 @@ export function applyBaseTone(
 }
 
 export function toggledAppearance(
-  appearance: CodexThemeContract['appearance']
-): CodexThemeContract['appearance'] {
+  appearance: NexusThemeContract['appearance']
+): NexusThemeContract['appearance'] {
   return appearance === 'dark' ? 'light' : 'dark';
 }

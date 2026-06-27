@@ -14,7 +14,7 @@ import {
   deriveSurfaces,
   deriveText,
   deriveTheme,
-  type SurfaceTone,
+  type NexusSurfaceTone,
   type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
@@ -92,7 +92,7 @@ function expectPairwiseDistinguishable(
 }
 
 describe('deriveSurfaces', () => {
-  const surfaceTone: SurfaceTone = 'neutral';
+  const surfaceTone: NexusSurfaceTone = 'neutral';
 
   it('keeps background at the seed lightness', () => {
     const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
@@ -683,7 +683,7 @@ const DERIVED_FAMILIES = [
   'information',
 ] as const;
 
-const SURFACE_TONES: readonly SurfaceTone[] = [
+const SURFACE_TONES: readonly NexusSurfaceTone[] = [
   'stone',
   'neutral',
   'zinc',

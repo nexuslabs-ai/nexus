@@ -1,17 +1,19 @@
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   assertCanonicalModeSet,
   BASELINE_MODE,
+  CANONICAL_BORDERWIDTH_MODES,
   CANONICAL_MODES,
+  CANONICAL_RADIUS_MODES,
+  CANONICAL_SHADOW_MODES,
   ConfigError,
   diffKeySets,
-  discoverModes,
-  formatFindings,
+  discoverFamilyModes,
+  formatFamilyFindings,
   leafPathsOf,
+  modeFamilyConfigs,
+  validateModeFamilies,
   validateModes,
 } from '../validate-spacing-modes.js';
 
@@ -33,6 +35,79 @@ describe('CANONICAL_MODES', () => {
   it('contains the baseline', () => {
     expect(CANONICAL_MODES).toContain(BASELINE_MODE);
   });
+});
+
+describe('mode family configs', () => {
+  it('declares the canonical runtime mode families and baselines', () => {
+    const configs = modeFamilyConfigs();
+    expect(
+      configs.map((config) => [
+        config.name,
+        config.baseline,
+        config.expectedModes,
+      ])
+    ).toEqual([
+      ['spacing', 'vega', CANONICAL_MODES],
+      ['radius', 'sharp', CANONICAL_RADIUS_MODES],
+      ['borderwidth', 'vega', CANONICAL_BORDERWIDTH_MODES],
+      ['shadow-light', 'maia', CANONICAL_SHADOW_MODES],
+      ['shadow-dark', 'maia', CANONICAL_SHADOW_MODES],
+    ]);
+  });
+
+  it('discovers the checked-in modes for every configured family', () => {
+    for (const config of modeFamilyConfigs()) {
+      expect(discoverFamilyModes(config), config.name).toEqual(
+        [...config.expectedModes].sort()
+      );
+    }
+  });
+
+  it('validates checked-in spacing/radius/borderwidth/shadow key parity', () => {
+    const results = validateModeFamilies();
+
+    expect(results.map((result) => result.config.name)).toEqual([
+      'spacing',
+      'radius',
+      'borderwidth',
+      'shadow-light',
+      'shadow-dark',
+    ]);
+    for (const { config, findings } of results) {
+      const drift = findings.filter(
+        (finding) => finding.missing.length > 0 || finding.extra.length > 0
+      );
+      expect(drift, `${config.name} should match its baseline`).toEqual([]);
+    }
+  });
+
+  it.each(['radius', 'borderwidth', 'shadow-light', 'shadow-dark'])(
+    'reports synthetic key drift for %s',
+    (familyName) => {
+      const config = modeFamilyConfigs().find(
+        (candidate) => candidate.name === familyName
+      );
+      const [comparisonMode] = config.expectedModes.filter(
+        (mode) => mode !== config.baseline
+      );
+      const baseline = { token: { a: dim(1), b: dim(2) } };
+      const drifted = { token: { a: dim(1) } };
+      const findings = validateModes(
+        new Map([
+          [config.baseline, baseline],
+          [comparisonMode, drifted],
+        ]),
+        config.baseline
+      );
+
+      expect(findings).toEqual([
+        { mode: comparisonMode, missing: ['token.b'], extra: [] },
+      ]);
+      expect(formatFamilyFindings({ config, findings })).toContain(
+        config.fileName(comparisonMode)
+      );
+    }
+  );
 });
 
 describe('leafPathsOf', () => {
@@ -247,90 +322,6 @@ describe('validateModes', () => {
       ['maia', data],
     ]);
     expect(validateModes(modeMap, 'lyra').map((f) => f.mode)).toEqual(['maia']);
-  });
-});
-
-describe('formatFindings', () => {
-  it('renders a ✓ line for a clean mode', () => {
-    const out = formatFindings([{ mode: 'lyra', missing: [], extra: [] }]);
-    expect(out).toContain('✓ spacing-lyra.json (matches baseline)');
-  });
-
-  it('renders a ✗ line with missing-path details for a mode with missing keys', () => {
-    const out = formatFindings([
-      { mode: 'luma', missing: ['spacing.4'], extra: [] },
-    ]);
-    expect(out).toContain('✗ spacing-luma.json (1 missing, 0 extra)');
-    expect(out).toContain('missing: spacing.4');
-    expect(out).toContain('in spacing-vega.json but not in spacing-luma.json');
-  });
-
-  it('renders a ✗ line with extra-path details for a mode with extra keys', () => {
-    const out = formatFindings([
-      { mode: 'lyra', missing: [], extra: ['spacing.99'] },
-    ]);
-    expect(out).toContain('✗ spacing-lyra.json (0 missing, 1 extra)');
-    expect(out).toContain('extra:');
-    expect(out).toContain('spacing.99');
-  });
-
-  it('renders both kinds in a single report and includes the baseline name in the header', () => {
-    const out = formatFindings([
-      { mode: 'luma', missing: ['spacing.1'], extra: [] },
-      { mode: 'lyra', missing: [], extra: ['spacing.99'] },
-      { mode: 'maia', missing: [], extra: [] },
-    ]);
-    expect(out).toContain('baseline: vega');
-    expect(out).toContain('spacing-luma.json (1 missing, 0 extra)');
-    expect(out).toContain('spacing-lyra.json (0 missing, 1 extra)');
-    expect(out).toContain('spacing-maia.json (matches baseline)');
-  });
-
-  it('uses the custom baseline name when provided', () => {
-    const out = formatFindings(
-      [{ mode: 'maia', missing: ['spacing.1'], extra: [] }],
-      'lyra'
-    );
-    expect(out).toContain('baseline: lyra');
-    expect(out).toContain('in spacing-lyra.json but not in spacing-maia.json');
-  });
-});
-
-describe('discoverModes', () => {
-  let tmpDir;
-
-  beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'discover-modes-'));
-  });
-
-  afterEach(() => {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  });
-
-  const touch = (name) => fs.writeFileSync(path.join(tmpDir, name), '{}');
-
-  it('returns the matching mode names sorted alphabetically', () => {
-    touch('spacing-vega.json');
-    touch('spacing-luma.json');
-    touch('spacing-maia.json');
-    expect(discoverModes(tmpDir)).toEqual(['luma', 'maia', 'vega']);
-  });
-
-  it('ignores files that do not match the spacing-<mode>.json pattern', () => {
-    touch('spacing-vega.json');
-    touch('base-slate-light.json');
-    touch('spacing-vega.json.bak');
-    touch('Spacing-vega.json');
-    touch('spacing-Vega.json');
-    touch('spacing-vega-extra.json');
-    touch('spacing-.json');
-    touch('README.md');
-    expect(discoverModes(tmpDir)).toEqual(['vega']);
-  });
-
-  it('returns an empty list when the directory has no matching files', () => {
-    touch('README.md');
-    expect(discoverModes(tmpDir)).toEqual([]);
   });
 });
 

@@ -16,6 +16,9 @@ const require = createRequire(import.meta.url);
 const TAILWIND_ENTRY = require.resolve('tailwindcss/index.css');
 
 const SPACING_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'];
+const RADIUS_MODES = ['blunt', 'mellow', 'sharp', 'smooth', 'subtle'];
+const SHADOW_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
+const BORDERWIDTH_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
 
 function readSpacingModeJson(mode) {
   return JSON.parse(
@@ -50,15 +53,41 @@ function extractBlock(css, openSelector) {
 // `:root`. Match by attribute-selector only so the leading `:root,\n` does
 // not need separate handling for prettier output variance.
 function extractDataStyleBlock(css, mode) {
+  return extractDataAttrBlock(css, 'data-style', mode);
+}
+
+function extractDataAttrBlock(css, attrName, mode) {
   const pattern = new RegExp(
-    `\\[data-style=['"]${mode}['"]\\] \\{\\n([\\s\\S]*?)^\\}`,
+    `\\[${attrName}=['"]${mode}['"]\\] \\{\\n([\\s\\S]*?)^\\}`,
     'm'
   );
   const match = css.match(pattern);
   if (!match) {
-    throw new Error(`Per-mode block "[data-style='${mode}']" not found in CSS`);
+    throw new Error(
+      `Per-mode block "[${attrName}='${mode}']" not found in CSS`
+    );
   }
   return match[1];
+}
+
+function extractDarkDataAttrBlock(css, attrName, mode) {
+  const pattern = new RegExp(
+    `\\.dark(?:\\[${attrName}=['"]${mode}['"]\\]| \\[${attrName}=['"]${mode}['"]\\]) \\{\\n([\\s\\S]*?)^\\}`,
+    'm'
+  );
+  const match = css.match(pattern);
+  if (!match) {
+    throw new Error(
+      `Dark per-mode block ".dark[${attrName}='${mode}']" not found in CSS`
+    );
+  }
+  return match[1];
+}
+
+function cssVarNames(block) {
+  return [...block.matchAll(/^\s*(--[a-z0-9-_]+):/gm)]
+    .map((match) => match[1])
+    .sort();
 }
 
 async function compileGeneratedTailwind(distDir, candidates) {
@@ -453,6 +482,62 @@ describe('generateTailwindPackage', () => {
     // @theme). The :root selector keeps the configured default live in both
     // no-attribute and explicit data-style configurations.
     expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]mira['"]\] \{/);
+  });
+
+  it('emits runtime mode selectors for radius, shadow, and border width', () => {
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-radius=['"]sharp['"]\] \{/);
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-shadow=['"]maia['"]\] \{/);
+    expect(nexusCSS).toMatch(
+      /:root,\s*\n\s*\[data-borderwidth=['"]vega['"]\] \{/
+    );
+    expect(nexusCSS).toContain("[data-radius='blunt']");
+    expect(nexusCSS).toContain("[data-shadow='lyra']");
+    expect(nexusCSS).toContain("[data-borderwidth='nova']");
+    expect(nexusCSS).not.toContain('light-dark(');
+  });
+
+  it('each runtime mode block declares the same variable names per family', () => {
+    const families = [
+      { attrName: 'data-radius', modes: RADIUS_MODES, baseline: 'sharp' },
+      {
+        attrName: 'data-borderwidth',
+        modes: BORDERWIDTH_MODES,
+        baseline: 'vega',
+      },
+    ];
+
+    for (const { attrName, modes, baseline } of families) {
+      const baselineVars = cssVarNames(
+        extractDataAttrBlock(nexusCSS, attrName, baseline)
+      );
+      expect(baselineVars.length).toBeGreaterThan(0);
+      for (const mode of modes) {
+        expect(
+          cssVarNames(extractDataAttrBlock(nexusCSS, attrName, mode)),
+          `${attrName}="${mode}"`
+        ).toEqual(baselineVars);
+      }
+    }
+
+    const lightBaselineVars = cssVarNames(
+      extractDataAttrBlock(nexusCSS, 'data-shadow', 'maia')
+    );
+    const darkBaselineVars = cssVarNames(
+      extractDarkDataAttrBlock(nexusCSS, 'data-shadow', 'maia')
+    );
+    expect(lightBaselineVars.length).toBeGreaterThan(0);
+    expect(darkBaselineVars).toEqual(lightBaselineVars);
+
+    for (const mode of SHADOW_MODES) {
+      expect(
+        cssVarNames(extractDataAttrBlock(nexusCSS, 'data-shadow', mode)),
+        `data-shadow="${mode}" light`
+      ).toEqual(lightBaselineVars);
+      expect(
+        cssVarNames(extractDarkDataAttrBlock(nexusCSS, 'data-shadow', mode)),
+        `data-shadow="${mode}" dark`
+      ).toEqual(darkBaselineVars);
+    }
   });
 
   it.each(SPACING_MODES)(

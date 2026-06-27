@@ -1,18 +1,18 @@
 import { useEffect, useRef } from 'react';
 
-import type { CodexThemeContract } from '@nexus/core';
+import type { NexusThemeContract } from '@nexus/core';
 
 import type { Base } from '../../../hooks/useTheme';
 
 function editedBlock(
-  appearance: CodexThemeContract['appearance']
+  appearance: NexusThemeContract['appearance']
 ): 'light' | 'dark' {
   return appearance === 'light' ? 'light' : 'dark';
 }
 
 /** The derivation-relevant fields shown in the compact preview. */
 function toLines(
-  contract: CodexThemeContract,
+  contract: NexusThemeContract,
   base: Base
 ): { key: string; text: string }[] {
   const seeds = contract[editedBlock(contract.appearance)];
@@ -27,7 +27,7 @@ function toLines(
 }
 
 interface AppearanceConfigPreviewProps {
-  contract: CodexThemeContract;
+  contract: NexusThemeContract;
   base: Base;
   /** "color" tints changed lines; "symbols" shows only +/- markers. */
   markers?: 'color' | 'symbols';
@@ -38,7 +38,7 @@ export function AppearanceConfigPreview({
   base,
   markers = 'color',
 }: AppearanceConfigPreviewProps) {
-  const prevRef = useRef<{ contract: CodexThemeContract; base: Base } | null>(
+  const prevRef = useRef<{ contract: NexusThemeContract; base: Base } | null>(
     null
   );
   const prev = prevRef.current;

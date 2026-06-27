@@ -4,10 +4,11 @@ export type {
   AdjustContrastTier,
 } from './lib/adjust-contrast';
 export { adjustContrast } from './lib/adjust-contrast';
+export * from './lib/appearance-model';
 export type {
-  CodexThemeContract,
   DerivedTheme,
-  SurfaceTone,
+  NexusSurfaceTone,
+  NexusThemeContract,
   ThemeDerivationInput,
   ThemeSeeds,
   TokenMap,

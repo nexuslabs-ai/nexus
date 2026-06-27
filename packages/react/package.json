@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "React components built with Radix UI and Tailwind CSS",
   "//": [
-    "@nexus/core in devDependencies covers two needs: (1) a turbo-affected-graph hint so a core/scripts change that doesn't regenerate packages/tailwind/*.css still rebuilds @nexus/react (and bundle-size keeps its dist input); (2) dev-time resolution for Storybook stories that import runtime utilities from @nexus/core (e.g. adjustContrast). Story imports never reach the published @nexus/react bundle.",
+    "@nexus/core in devDependencies keeps local Storybook/tests/builds resolvable and preserves turbo affected-graph behavior. It is also an optional peer for @nexus/react/appearance; Vite marks it external so the runtime theme engine is consumed from @nexus/core, not bundled into @nexus/react.",
     "Tracked for restructure: https://github.com/nexuslabs-ai/nexus/issues/66 (move to @nexus/tailwind dependsOn @nexus/core#build:tailwind in turbo)."
   ],
   "type": "module",
@@ -15,6 +15,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./appearance": {
+      "types": "./dist/appearance.d.ts",
+      "import": "./dist/appearance.mjs",
+      "require": "./dist/appearance.js"
     },
     "./styles.css": "./dist/react.css"
   },
@@ -35,6 +40,8 @@
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/addon-docs": "^10.1.10",
     "@storybook/react-vite": "^10.1.10",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.1",
     "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
@@ -91,6 +98,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "peerDependencies": {
+    "@nexus/core": "workspace:*",
     "embla-carousel-react": "^8.6.0",
     "react": "^19.0.0",
     "react-day-picker": "^9",
@@ -102,6 +110,9 @@
     "vaul": "^1.1.2"
   },
   "peerDependenciesMeta": {
+    "@nexus/core": {
+      "optional": true
+    },
     "embla-carousel-react": {
       "optional": true
     },

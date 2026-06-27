@@ -888,10 +888,18 @@ export function splitSpacingTokens(tokens) {
  * @param {Record<string, {cssName: string, value: string}[]>} modesByName
  * @param {object} [opts]
  * @param {string} [opts.defaultMode=CANONICAL_SPACING_DEFAULT_MODE]
+ * @param {string} [opts.attrName='data-style']
+ * @param {string} [opts.commentLabel='SPACING']
+ * @param {string} [opts.duplicateValuePrefix='spacing-']
  * @returns {string} CSS string with all per-mode blocks
  */
 export function generateSpacingModesCSS(modesByName, opts = {}) {
-  const { defaultMode = CANONICAL_SPACING_DEFAULT_MODE } = opts;
+  const {
+    defaultMode = CANONICAL_SPACING_DEFAULT_MODE,
+    attrName = 'data-style',
+    commentLabel = 'SPACING',
+    duplicateValuePrefix = 'spacing-',
+  } = opts;
 
   const allModes = Object.keys(modesByName);
   if (!allModes.includes(defaultMode)) {
@@ -906,7 +914,12 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
   for (const mode of allModes) {
     const valueByName = new Map();
     for (const token of modesByName[mode]) {
-      if (!token.cssName.startsWith('spacing-')) continue;
+      if (!duplicateValuePrefix) {
+        continue;
+      }
+      if (!token.cssName.startsWith(duplicateValuePrefix)) {
+        continue;
+      }
       const collision = valueByName.get(token.value);
       if (collision) {
         log.warn(
@@ -920,7 +933,7 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
 
   const otherModes = allModes.filter((m) => m !== defaultMode).sort();
 
-  let css = `\n/* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */\n`;
+  let css = `\n/* ===== PER-MODE ${commentLabel} (mode swap via [${attrName}="X"] on any ancestor) ===== */\n`;
 
   // Per-mode blocks live OUTSIDE @theme — Tailwind v4's `prefix(nx)` only
   // rewrites variables declared inside @theme, so we add the `nx-` prefix
@@ -935,9 +948,53 @@ export function generateSpacingModesCSS(modesByName, opts = {}) {
     return block;
   };
 
-  css += `\n${writeBlock(`:root,\n[data-style="${defaultMode}"]`, modesByName[defaultMode])}`;
+  css += `\n${writeBlock(`:root,\n[${attrName}="${defaultMode}"]`, modesByName[defaultMode])}`;
   for (const mode of otherModes) {
-    css += `\n${writeBlock(`[data-style="${mode}"]`, modesByName[mode])}`;
+    css += `\n${writeBlock(`[${attrName}="${mode}"]`, modesByName[mode])}`;
+  }
+
+  return css;
+}
+
+/**
+ * Emit light/dark per-mode CSS blocks for themed primitive families.
+ *
+ * @param {Record<string, {light: {cssName: string, value: string}[], dark: {cssName: string, value: string}[]}>} modesByName
+ * @param {object} opts
+ * @param {string} opts.defaultMode
+ * @param {string} opts.attrName
+ * @param {string} opts.commentLabel
+ * @returns {string} CSS string with all per-mode light + dark blocks
+ */
+export function generateThemedModesCSS(modesByName, opts) {
+  const { defaultMode, attrName, commentLabel } = opts;
+
+  const allModes = Object.keys(modesByName);
+  if (!allModes.includes(defaultMode)) {
+    throw new Error(
+      `generateThemedModesCSS: defaultMode "${defaultMode}" not found among modes [${allModes.join(', ')}]`
+    );
+  }
+
+  const writeBlock = (selector, tokens) => {
+    let block = `${selector} {\n`;
+    for (const token of tokens) {
+      block += `  --nx-${token.cssName}: ${token.value};\n`;
+    }
+    block += `}\n`;
+    return block;
+  };
+
+  const otherModes = allModes.filter((m) => m !== defaultMode).sort();
+
+  let css = `\n/* ===== PER-MODE ${commentLabel} (mode swap via [${attrName}="X"] on any ancestor) ===== */\n`;
+
+  css += `\n${writeBlock(`:root,\n[${attrName}="${defaultMode}"]`, modesByName[defaultMode].light)}`;
+  css += `\n${writeBlock(`.dark,\n.dark[${attrName}="${defaultMode}"],\n.dark [${attrName}="${defaultMode}"]`, modesByName[defaultMode].dark)}`;
+
+  for (const mode of otherModes) {
+    css += `\n${writeBlock(`[${attrName}="${mode}"]`, modesByName[mode].light)}`;
+    css += `\n${writeBlock(`.dark[${attrName}="${mode}"],\n.dark [${attrName}="${mode}"]`, modesByName[mode].dark)}`;
   }
 
   return css;
@@ -1147,6 +1204,168 @@ export function collectBreakpointsTokens(semanticDir) {
   }
 
   return tokens;
+}
+
+/**
+ * Flatten one primitive mode file into runtime override literals.
+ *
+ * @param {string} filePath - Primitive token file path
+ * @param {string} cssPrefix - CSS variable family prefix, e.g. "radius"
+ * @param {string} caller - Function name for error messages
+ * @returns {{cssName: string, path: string[], value: string}[]}
+ */
+function collectPrimitiveModeFile(filePath, cssPrefix, caller) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`${caller}: primitive file missing: ${filePath}`);
+  }
+
+  const tokenData = readTokenFile(filePath);
+  const extracted = extractTokens(tokenData);
+  const tokens = [];
+  const seen = new Set();
+
+  for (const token of extracted) {
+    const cssName = `${cssPrefix}-${token.path.join('-')}`;
+    if (seen.has(cssName)) {
+      throw new Error(
+        `${caller}: cssName collision "${cssName}" in ${filePath} — two JSON paths flatten to the same variable name`
+      );
+    }
+    seen.add(cssName);
+    tokens.push({
+      cssName,
+      path: token.path,
+      value: formatTokenValue(token.value, token.type, token.path),
+    });
+  }
+
+  return tokens;
+}
+
+function discoverPrimitiveModeFiles(tokensDir, category, caller) {
+  const dir = path.join(tokensDir, 'primitives', category);
+  if (!fs.existsSync(dir)) {
+    throw new Error(`${caller}: primitive directory missing: ${dir}`);
+  }
+
+  const filesByMode = {};
+  for (const file of fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith('.json'))) {
+    const match = file.match(new RegExp(`^${category}-(.+)\\.json$`));
+    if (!match) continue;
+    filesByMode[match[1]] = file;
+  }
+
+  const modes = Object.keys(filesByMode);
+  if (modes.length === 0) {
+    throw new Error(
+      `${caller}: no ${category}-{mode}.json files found in ${dir}`
+    );
+  }
+
+  return { dir, filesByMode, modes };
+}
+
+/**
+ * Collect all radius primitive modes as runtime override literals.
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
+ */
+export function collectRadiusModes(tokensDir) {
+  const { dir, filesByMode, modes } = discoverPrimitiveModeFiles(
+    tokensDir,
+    'radius',
+    'collectRadiusModes'
+  );
+  const result = {};
+  for (const mode of modes) {
+    result[mode] = collectPrimitiveModeFile(
+      path.join(dir, filesByMode[mode]),
+      'radius',
+      'collectRadiusModes'
+    );
+  }
+  return result;
+}
+
+/**
+ * Collect all border width primitive modes as runtime override literals.
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @returns {Record<string, {cssName: string, path: string[], value: string}[]>}
+ */
+export function collectBorderwidthModes(tokensDir) {
+  const { dir, filesByMode, modes } = discoverPrimitiveModeFiles(
+    tokensDir,
+    'borderwidth',
+    'collectBorderwidthModes'
+  );
+  const result = {};
+  for (const mode of modes) {
+    result[mode] = collectPrimitiveModeFile(
+      path.join(dir, filesByMode[mode]),
+      'borderwidth',
+      'collectBorderwidthModes'
+    );
+  }
+  return result;
+}
+
+/**
+ * Collect all shadow primitive modes as runtime override literals, preserving
+ * light/dark partners for the themed shadow primitive files.
+ *
+ * @param {string} tokensDir - Path to tokens directory
+ * @returns {Record<string, {light: {cssName: string, path: string[], value: string}[], dark: {cssName: string, path: string[], value: string}[]}>}
+ */
+export function collectShadowModes(tokensDir) {
+  const dir = path.join(tokensDir, 'primitives', 'shadow');
+  if (!fs.existsSync(dir)) {
+    throw new Error(`collectShadowModes: primitive directory missing: ${dir}`);
+  }
+
+  const filesByMode = {};
+  for (const file of fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith('.json'))) {
+    const match = file.match(/^shadow-(.+)-(light|dark)\.json$/);
+    if (!match) continue;
+    const [, mode, variant] = match;
+    filesByMode[mode] ??= {};
+    filesByMode[mode][variant] = file;
+  }
+
+  const modes = Object.keys(filesByMode);
+  if (modes.length === 0) {
+    throw new Error(
+      `collectShadowModes: no shadow-{mode}-{light|dark}.json files found in ${dir}`
+    );
+  }
+
+  const result = {};
+  for (const mode of modes) {
+    const pair = filesByMode[mode];
+    if (!pair.light || !pair.dark) {
+      throw new Error(
+        `collectShadowModes: mode "${mode}" must provide both light and dark primitive files`
+      );
+    }
+    result[mode] = {
+      light: collectPrimitiveModeFile(
+        path.join(dir, pair.light),
+        'shadow',
+        'collectShadowModes'
+      ),
+      dark: collectPrimitiveModeFile(
+        path.join(dir, pair.dark),
+        'shadow',
+        'collectShadowModes'
+      ),
+    };
+  }
+  return result;
 }
 
 /**

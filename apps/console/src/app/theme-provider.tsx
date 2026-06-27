@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 
-import type { CodexThemeContract } from '@nexus/core';
+import type { NexusThemeContract } from '@nexus/core';
 
 import { useAppearancePrefs } from '../hooks/use-appearance-prefs';
 import { useDerivedTheme } from '../hooks/use-derived-theme';
@@ -22,8 +22,8 @@ type ThemeContextValue = {
   theme: ThemeConfig;
   setTheme: React.Dispatch<React.SetStateAction<ThemeConfig>>;
   /** Active derived Appearance theme. */
-  codexContract: CodexThemeContract;
-  setCodexContract: React.Dispatch<React.SetStateAction<CodexThemeContract>>;
+  codexContract: NexusThemeContract;
+  setCodexContract: React.Dispatch<React.SetStateAction<NexusThemeContract>>;
   /** App-preferences (fonts, motion, cursors…) — applied app-wide regardless of theme. */
   codexPrefs: CodexPrefs;
   setCodexPrefs: React.Dispatch<React.SetStateAction<CodexPrefs>>;
@@ -32,14 +32,14 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 /** Resolve a contract appearance to a concrete light/dark, honoring "system". */
-function appearanceDark(appearance: CodexThemeContract['appearance']): boolean {
+function appearanceDark(appearance: NexusThemeContract['appearance']): boolean {
   if (appearance === 'dark') return true;
   if (appearance === 'light') return false;
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
 function syncColorSchemeMeta(
-  appearance: CodexThemeContract['appearance']
+  appearance: NexusThemeContract['appearance']
 ): void {
   const meta = document.querySelector<HTMLMetaElement>(
     'meta[name="color-scheme"]'
@@ -57,7 +57,7 @@ function syncColorSchemeMeta(
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme();
   const [codexContract, setCodexContract] =
-    useState<CodexThemeContract>(loadCodexContract);
+    useState<NexusThemeContract>(loadCodexContract);
   const [codexPrefs, setCodexPrefs] = useState<CodexPrefs>(loadCodexPrefs);
 
   // Persist on change — writing to localStorage is an external-system sync.

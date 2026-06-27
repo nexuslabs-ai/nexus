@@ -14,18 +14,18 @@ export interface ThemeSeeds {
   foreground: string;
 }
 
-export type SurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
+export type NexusSurfaceTone = 'stone' | 'neutral' | 'zinc' | 'slate' | 'gray';
 
 /** The derivation seeds `deriveTheme` consumes — no display preference. */
 export interface ThemeDerivationInput {
-  surfaceTone?: SurfaceTone;
+  surfaceTone?: NexusSurfaceTone;
   light: ThemeSeeds;
   dark: ThemeSeeds;
   /** 0–100. Separation between background↔surfaces and foreground↔text. */
   contrast: number;
 }
 
-export interface CodexThemeContract extends ThemeDerivationInput {
+export interface NexusThemeContract extends ThemeDerivationInput {
   /** Consumer display preference; not read by `deriveTheme`. */
   appearance: 'light' | 'dark' | 'system';
 }
@@ -53,7 +53,7 @@ interface ContrastProfile {
 }
 
 const SURFACE_TONE: Record<
-  SurfaceTone,
+  NexusSurfaceTone,
   { h: number; lightC: number; darkC: number }
 > = {
   slate: { h: 264.7, lightC: 0.011, darkC: 0.04 },
@@ -147,7 +147,7 @@ const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
 export function deriveSurfaces(
   backgroundHex: string,
-  surfaceTone: SurfaceTone,
+  surfaceTone: NexusSurfaceTone,
   mode: Mode,
   delta: number
 ): TokenMap {
@@ -439,7 +439,7 @@ function formatAlpha(alpha: number): string {
 }
 
 function deriveAlpha(
-  surfaceTone: SurfaceTone,
+  surfaceTone: NexusSurfaceTone,
   mode: Mode,
   profile: ContrastProfile
 ): TokenMap {
@@ -496,7 +496,7 @@ export function deriveSecondary(mode: Mode): TokenMap {
 
 function deriveMode(
   seeds: ThemeSeeds,
-  surfaceTone: SurfaceTone,
+  surfaceTone: NexusSurfaceTone,
   mode: Mode,
   contrast: number
 ): TokenMap {
