@@ -13,11 +13,15 @@ import {
 
 import {
   appearancePrefsToCss,
+  createNexusAppearanceSnapshot,
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
   deriveTheme,
+  type NexusAppearanceSnapshot,
   type NexusAppearanceState,
+  resolveFirstPaint,
   sanitizeNexusAppearance,
+  sanitizeNexusAppearanceSnapshot,
   themeToCss,
 } from '@nexus/core';
 
@@ -25,6 +29,12 @@ const DEFAULT_STORAGE_KEY = 'nexus-appearance';
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';
 const PREFS_STYLE_SELECTOR = 'style[data-nexus-appearance-prefs]';
+const APPEARANCE_DATA_ATTRS = [
+  'data-style',
+  'data-radius',
+  'data-shadow',
+  'data-borderwidth',
+] as const;
 
 export type NexusResolvedAppearanceMode = 'light' | 'dark';
 
@@ -32,6 +42,7 @@ export interface NexusAppearanceContextValue {
   state: NexusAppearanceState;
   setState: Dispatch<SetStateAction<NexusAppearanceState>>;
   resolvedMode: NexusResolvedAppearanceMode;
+  mounted: boolean;
   reset: () => void;
 }
 
@@ -50,39 +61,67 @@ const canUseDOM = (): boolean =>
   typeof window !== 'undefined' && typeof document !== 'undefined';
 
 function resolveAppearanceMode(
-  mode: NexusAppearanceState['mode']
+  mode: NexusAppearanceState['mode'],
+  systemPrefersDark = false
 ): NexusResolvedAppearanceMode {
   if (mode === 'dark') return 'dark';
   if (mode === 'light') return 'light';
-  if (!canUseDOM() || typeof window.matchMedia !== 'function') return 'light';
-  return window.matchMedia(COLOR_SCHEME_QUERY).matches ? 'dark' : 'light';
+  return systemPrefersDark ? 'dark' : 'light';
 }
 
-function readStoredState(
+function systemPrefersDark(): boolean {
+  if (!canUseDOM() || typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia(COLOR_SCHEME_QUERY).matches;
+}
+
+function snapshotFromState(
+  state: NexusAppearanceState
+): NexusAppearanceSnapshot {
+  return createNexusAppearanceSnapshot(
+    state,
+    themeToCss(deriveTheme(createNexusThemeContract(state))),
+    appearancePrefsToCss(state.prefs)
+  );
+}
+
+function readStoredSnapshot(
   storageKey: string | false,
-  fallback: NexusAppearanceState
-): NexusAppearanceState {
+  fallback: NexusAppearanceSnapshot
+): NexusAppearanceSnapshot {
   if (!canUseDOM() || storageKey === false) return fallback;
 
   try {
     const raw = window.localStorage.getItem(storageKey);
 
-    return raw ? sanitizeNexusAppearance(JSON.parse(raw)) : fallback;
+    return raw ? sanitizeNexusAppearanceSnapshot(JSON.parse(raw)) : fallback;
   } catch {
     return fallback;
   }
 }
 
-function writeStoredState(
+function writeStoredSnapshot(
   storageKey: string | false,
-  state: NexusAppearanceState
+  snapshot: NexusAppearanceSnapshot
 ): void {
   if (!canUseDOM() || storageKey === false) return;
 
   try {
-    window.localStorage.setItem(storageKey, JSON.stringify(state));
+    window.localStorage.setItem(storageKey, JSON.stringify(snapshot));
   } catch {
     // Storage can fail in privacy modes or quota-constrained embeds.
+  }
+}
+
+function syncColorSchemeMeta(content: 'light' | 'dark' | 'light dark'): void {
+  const meta =
+    document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]') ??
+    document.createElement('meta');
+
+  meta.setAttribute('name', 'color-scheme');
+  meta.setAttribute('content', content);
+
+  if (!meta.parentNode) {
+    document.head.appendChild(meta);
   }
 }
 
@@ -144,10 +183,10 @@ export function NexusAppearanceProvider({
     () => sanitizeNexusAppearance(defaultState ?? DEFAULT_NEXUS_APPEARANCE),
     [defaultState]
   );
-  const [internalState, setInternalState] = useState<NexusAppearanceState>(() =>
-    readStoredState(storageKey, initialState)
-  );
+  const [internalState, setInternalState] =
+    useState<NexusAppearanceState>(initialState);
   const activeState = state ?? internalState;
+  const [mounted, setMounted] = useState(false);
   const [resolvedMode, setResolvedMode] = useState<NexusResolvedAppearanceMode>(
     () => resolveAppearanceMode(activeState.mode)
   );
@@ -159,8 +198,39 @@ export function NexusAppearanceProvider({
     () => appearancePrefsToCss(activeState.prefs),
     [activeState.prefs]
   );
+  const activeSnapshot = useMemo(
+    () => createNexusAppearanceSnapshot(activeState, themeCss, prefsCss),
+    [activeState, prefsCss, themeCss]
+  );
+  const firstPaint = useMemo(
+    () => resolveFirstPaint(activeSnapshot, resolvedMode === 'dark'),
+    [activeSnapshot, resolvedMode]
+  );
 
   const internalStateRef = useRef(internalState);
+
+  useEffect(() => {
+    if (!canUseDOM()) return;
+
+    if (isControlled) {
+      setResolvedMode(
+        resolveAppearanceMode((state ?? initialState).mode, systemPrefersDark())
+      );
+      setMounted(true);
+      return;
+    }
+
+    const snapshot = readStoredSnapshot(
+      storageKey,
+      snapshotFromState(initialState)
+    );
+    internalStateRef.current = snapshot.state;
+    setInternalState(snapshot.state);
+    setResolvedMode(
+      resolveAppearanceMode(snapshot.state.mode, systemPrefersDark())
+    );
+    setMounted(true);
+  }, [initialState, isControlled, state, storageKey]);
 
   const setState = useCallback<Dispatch<SetStateAction<NexusAppearanceState>>>(
     (update) => {
@@ -181,27 +251,28 @@ export function NexusAppearanceProvider({
   }, [initialState, setState]);
 
   useEffect(() => {
-    if (!isControlled) {
-      writeStoredState(storageKey, activeState);
+    if (mounted && !isControlled) {
+      writeStoredSnapshot(storageKey, activeSnapshot);
     }
-  }, [activeState, isControlled, storageKey]);
+  }, [activeSnapshot, isControlled, mounted, storageKey]);
 
   useEffect(() => {
-    if (!canUseDOM()) return;
+    if (!canUseDOM() || !mounted) return;
 
     const root = document.documentElement;
 
-    root.setAttribute('data-style', activeState.density);
-    root.setAttribute('data-radius', activeState.corners);
-    root.setAttribute('data-shadow', activeState.elevation);
-    root.setAttribute('data-borderwidth', activeState.stroke);
-  }, [activeState]);
+    for (const attr of APPEARANCE_DATA_ATTRS) {
+      root.setAttribute(attr, firstPaint.dataAttrs[attr]);
+    }
+  }, [firstPaint, mounted]);
 
   useEffect(() => {
-    if (!canUseDOM()) return;
+    if (!canUseDOM() || !mounted) return;
 
     const apply = () => {
-      setResolvedMode(resolveAppearanceMode(activeState.mode));
+      setResolvedMode(
+        resolveAppearanceMode(activeState.mode, systemPrefersDark())
+      );
     };
 
     apply();
@@ -217,36 +288,37 @@ export function NexusAppearanceProvider({
     mediaQuery.addEventListener('change', apply);
 
     return () => mediaQuery.removeEventListener('change', apply);
-  }, [activeState.mode]);
+  }, [activeState.mode, mounted]);
 
   useEffect(() => {
-    if (!canUseDOM()) return;
+    if (!canUseDOM() || !mounted) return;
 
     const root = document.documentElement;
 
-    root.classList.toggle('dark', resolvedMode === 'dark');
-    root.style.colorScheme = resolvedMode;
-  }, [resolvedMode]);
+    root.classList.toggle('dark', firstPaint.className === 'dark');
+    root.style.colorScheme = firstPaint.colorScheme;
+    syncColorSchemeMeta(firstPaint.metaColorScheme);
+  }, [firstPaint, mounted]);
 
   useEffect(() => {
-    if (!canUseDOM()) return;
+    if (!canUseDOM() || !mounted) return;
 
     const themeStyle = upsertStyle(
       THEME_STYLE_SELECTOR,
       'data-nexus-appearance-theme'
     );
-    themeStyle.textContent = themeCss;
-  }, [themeCss]);
+    themeStyle.textContent = firstPaint.themeCss;
+  }, [firstPaint, mounted]);
 
   useEffect(() => {
-    if (!canUseDOM()) return;
+    if (!canUseDOM() || !mounted) return;
 
     const prefsStyle = upsertStyle(
       PREFS_STYLE_SELECTOR,
       'data-nexus-appearance-prefs'
     );
-    prefsStyle.textContent = prefsCss;
-  }, [prefsCss]);
+    prefsStyle.textContent = firstPaint.prefsCss;
+  }, [firstPaint, mounted]);
 
   useEffect(() => {
     if (!canUseDOM()) return;
@@ -255,8 +327,8 @@ export function NexusAppearanceProvider({
   }, []);
 
   const value = useMemo<NexusAppearanceContextValue>(
-    () => ({ state: activeState, setState, resolvedMode, reset }),
-    [activeState, reset, resolvedMode, setState]
+    () => ({ state: activeState, setState, resolvedMode, mounted, reset }),
+    [activeState, mounted, reset, resolvedMode, setState]
   );
 
   return (

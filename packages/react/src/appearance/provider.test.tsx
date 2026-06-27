@@ -1,7 +1,10 @@
 import type { ComponentProps, ReactNode } from 'react';
 
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus/core';
-import { act, renderHook } from '@testing-library/react';
+import {
+  createNexusAppearanceSnapshot,
+  DEFAULT_NEXUS_APPEARANCE,
+} from '@nexus/core';
+import { act, render, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { NexusAppearanceProvider, useNexusAppearance } from './provider';
@@ -54,6 +57,35 @@ describe('NexusAppearanceProvider', () => {
     expect(root.style.colorScheme).toBe('light');
   });
 
+  it('first renders default state, then adopts stored state after mount', async () => {
+    window.localStorage.setItem(
+      'nexus-appearance',
+      JSON.stringify(
+        createNexusAppearanceSnapshot(
+          { ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'slate' },
+          '',
+          ''
+        )
+      )
+    );
+    const seen: string[] = [];
+
+    function Probe() {
+      const { mounted, state } = useNexusAppearance();
+      seen.push(`${mounted}:${state.surfaceTone}`);
+      return null;
+    }
+
+    render(
+      <NexusAppearanceProvider>
+        <Probe />
+      </NexusAppearanceProvider>
+    );
+
+    expect(seen[0]).toBe('false:stone');
+    await waitFor(() => expect(seen[seen.length - 1]).toBe('true:slate'));
+  });
+
   it('injects exactly one theme and prefs style tag across updates', () => {
     const { result, rerender } = renderHook(() => useNexusAppearance(), {
       wrapper: wrapperFor({ storageKey: false }),
@@ -85,19 +117,25 @@ describe('NexusAppearanceProvider', () => {
     ).toContain('font-size: 16px');
   });
 
-  it('round-trips uncontrolled state through storage', () => {
+  it('writes uncontrolled state as a versioned snapshot', async () => {
     const key = 'test-appearance';
-    const { result, unmount } = renderHook(() => useNexusAppearance(), {
+    const { result } = renderHook(() => useNexusAppearance(), {
       wrapper: wrapperFor({ storageKey: key }),
     });
 
     act(() => {
       result.current.setState((state) => ({ ...state, surfaceTone: 'slate' }));
     });
-    unmount();
 
-    expect(JSON.parse(window.localStorage.getItem(key) ?? '{}')).toMatchObject({
-      surfaceTone: 'slate',
+    await waitFor(() => {
+      const snapshot = JSON.parse(window.localStorage.getItem(key) ?? '{}');
+
+      expect(snapshot).toMatchObject({
+        version: 1,
+        state: { surfaceTone: 'slate' },
+      });
+      expect(typeof snapshot.themeCss).toBe('string');
+      expect(typeof snapshot.prefsCss).toBe('string');
     });
   });
 
@@ -129,6 +167,29 @@ describe('NexusAppearanceProvider', () => {
       expect.objectContaining({ surfaceTone: 'gray' })
     );
     expect(window.localStorage.getItem('controlled-appearance')).toBeNull();
+  });
+
+  it('reuses bootstrap-created style tags instead of stacking duplicates', async () => {
+    const theme = document.createElement('style');
+    theme.setAttribute('data-nexus-appearance-theme', '');
+    theme.textContent = '/* boot theme */';
+    const prefs = document.createElement('style');
+    prefs.setAttribute('data-nexus-appearance-prefs', '');
+    prefs.textContent = '/* boot prefs */';
+    document.head.append(theme, prefs);
+
+    renderHook(() => useNexusAppearance(), {
+      wrapper: wrapperFor({ storageKey: false }),
+    });
+
+    await waitFor(() => {
+      expect(
+        document.querySelectorAll('style[data-nexus-appearance-theme]')
+      ).toHaveLength(1);
+      expect(
+        document.querySelectorAll('style[data-nexus-appearance-prefs]')
+      ).toHaveLength(1);
+    });
   });
 
   it('notifies onStateChange with the composed next state in uncontrolled mode', () => {
