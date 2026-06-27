@@ -1,6 +1,10 @@
 import { useState } from 'react';
 
-import { BASE_TONE_OPTIONS, type NexusSurfaceTone } from '@nexus/core';
+import {
+  BASE_TONE_OPTIONS,
+  type NexusAppearanceMode,
+  type NexusSurfaceTone,
+} from '@nexus/core';
 import { IconPalette } from '@tabler/icons-react';
 
 import { Button } from '@/components/ui/button';
@@ -10,6 +14,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 
 import { NexusAppearanceColorField } from './color-field';
@@ -24,6 +29,15 @@ interface SwatchRowProps {
 export interface NexusThemeQuickControlProps {
   onCustomize?: () => void;
 }
+
+const MODE_OPTIONS: ReadonlyArray<{
+  value: NexusAppearanceMode;
+  label: string;
+}> = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'System' },
+];
 
 function SwatchRow({ label, value, onSelect }: SwatchRowProps) {
   return (
@@ -80,6 +94,37 @@ export function NexusThemeQuickControl({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="nx:w-72 nx:space-y-3">
+        <div className="nx:space-y-1.5">
+          <p className="nx:typography-label-small nx:text-muted-foreground">
+            Mode
+          </p>
+          <ToggleGroup
+            type="single"
+            value={state.mode}
+            variant="outline"
+            size="sm"
+            aria-label="Theme mode"
+            className="nx:grid nx:w-full nx:grid-cols-3"
+            onValueChange={(mode) => {
+              if (!mode) return;
+              setState((current) => ({
+                ...current,
+                mode: mode as NexusAppearanceMode,
+              }));
+            }}
+          >
+            {MODE_OPTIONS.map((option) => (
+              <ToggleGroupItem
+                key={option.value}
+                value={option.value}
+                aria-label={option.label}
+                className="nx:w-full"
+              >
+                {option.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
         <SwatchRow
           label="Surface tone"
           value={state.surfaceTone}
