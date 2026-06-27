@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { BusyOverlayStage } from '../../../stories/overlay-visuals';
 import { SPACING_MODES } from '../../../stories/spacing-modes';
 import { Button } from '../button';
 
@@ -464,25 +463,6 @@ export const TooltipContentUsesTypographyComposite: Story = {
       });
     }
   },
-};
-
-export const BusyBackground: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    layout: 'fullscreen',
-  },
-  render: (_args) => (
-    <BusyOverlayStage>
-      <Tooltip defaultOpen>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Hover me</Button>
-        </TooltipTrigger>
-        <TooltipContent sideOffset={8}>
-          <p>Sync status saved</p>
-        </TooltipContent>
-      </Tooltip>
-    </BusyOverlayStage>
-  ),
 };
 
 // ============================================

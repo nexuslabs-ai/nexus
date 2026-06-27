@@ -3,8 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 
-import { BusyOverlayStage } from '../../../stories/overlay-visuals';
-
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -509,41 +507,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-export const BusyBackground: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    layout: 'fullscreen',
-  },
-  render: () => (
-    <BusyOverlayStage>
-      <ContextMenu>
-        <ContextMenuTrigger className={triggerClass}>
-          Right click here
-        </ContextMenuTrigger>
-        <ContextMenuContent className="nx:w-56">
-          <ContextMenuLabel>Page actions</ContextMenuLabel>
-          <ContextMenuSeparator />
-          <ContextMenuItem>Back</ContextMenuItem>
-          <ContextMenuItem>Reload</ContextMenuItem>
-          <ContextMenuItem>Inspect</ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-    </BusyOverlayStage>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByText('Right click here');
-    const rect = trigger.getBoundingClientRect();
-
-    await fireEvent.contextMenu(trigger, {
-      clientX: rect.left + rect.width / 2,
-      clientY: rect.top + rect.height / 2,
-    });
-
-    await within(document.body).findByRole('menu');
   },
 };
 

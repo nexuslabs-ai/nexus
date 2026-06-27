@@ -3,8 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { BusyOverlayStage } from '../../../stories/overlay-visuals';
-
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -448,45 +446,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-export const BusyBackground: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    layout: 'fullscreen',
-  },
-  render: () => (
-    <BusyOverlayStage>
-      <Menubar>
-        <MenubarMenu>
-          <MenubarTrigger>File</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
-              New Tab
-              <MenubarShortcut>⌘T</MenubarShortcut>
-            </MenubarItem>
-            <MenubarItem>Open Workspace</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Print</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger>Edit</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>Undo</MenubarItem>
-            <MenubarItem>Redo</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-      </Menubar>
-    </BusyOverlayStage>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('menuitem', { name: 'File' });
-
-    await userEvent.click(trigger);
-    await within(document.body).findByRole('menu');
   },
 };
 

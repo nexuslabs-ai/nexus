@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { BusyOverlayStage } from '../../../stories/overlay-visuals';
 import { Button } from '../button';
 
 import {
@@ -592,29 +591,6 @@ export const ItemPaddingPinnedAcrossModes: Story = {
       }
     }
   },
-};
-
-export const BusyBackground: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    layout: 'fullscreen',
-  },
-  render: () => (
-    <BusyOverlayStage>
-      <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Open menu</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="nx:w-56" align="center">
-          <DropdownMenuLabel>Workspace</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Open project</DropdownMenuItem>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Archive</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </BusyOverlayStage>
-  ),
 };
 
 // ============================================

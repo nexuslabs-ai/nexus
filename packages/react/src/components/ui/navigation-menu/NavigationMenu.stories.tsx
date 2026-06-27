@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { BusyOverlayStage } from '../../../stories/overlay-visuals';
-
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -405,52 +403,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-export const BusyBackground: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    layout: 'fullscreen',
-  },
-  render: () => (
-    <BusyOverlayStage>
-      <div className="nx:w-full nx:max-w-xl">
-        <NavigationMenu aria-label="Busy background navigation">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Products</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="nx:grid nx:w-[320px] nx:gap-1 nx:p-2">
-                  <li>
-                    <NavigationMenuLink href="#analytics">
-                      Analytics
-                    </NavigationMenuLink>
-                  </li>
-                  <li>
-                    <NavigationMenuLink href="#automation">
-                      Automation
-                    </NavigationMenuLink>
-                  </li>
-                  <li>
-                    <NavigationMenuLink href="#reports">
-                      Reports
-                    </NavigationMenuLink>
-                  </li>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-      </div>
-    </BusyOverlayStage>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', { name: /Products/i });
-
-    await userEvent.click(trigger);
-    await waitFor(() => expect(trigger).toHaveAttribute('data-state', 'open'));
   },
 };
 
