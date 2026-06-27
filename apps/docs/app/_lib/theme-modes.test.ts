@@ -24,7 +24,7 @@ describe('docs theme modes', () => {
     const state = sanitizeThemeState({
       base: 'slate',
       brand: 'teal',
-      spacing: 'sera',
+      spacing: 'spacious',
       shadow: 'mira',
       radius: 'smooth',
       borderwidth: 'maia',
@@ -33,7 +33,7 @@ describe('docs theme modes', () => {
     expect(state).toMatchObject({
       base: 'slate',
       brand: 'teal',
-      spacing: 'sera',
+      spacing: 'spacious',
       shadow: 'mira',
       radius: 'smooth',
       borderwidth: 'maia',
@@ -44,7 +44,7 @@ describe('docs theme modes', () => {
     const state = sanitizeThemeState({
       base: '../base-slate',
       brand: 'blue.css',
-      spacing: 'compact',
+      spacing: 'nova',
       shadow: 'nova',
       radius: 'smooth',
       borderwidth: 'mira',

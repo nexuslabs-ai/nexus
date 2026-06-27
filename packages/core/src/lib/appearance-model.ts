@@ -8,7 +8,7 @@ import { isColor } from './perceptual-ramp';
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
 export type NexusAppearanceMode = 'light' | 'dark' | 'system';
-export type NexusDensity = 'nova' | 'mira' | 'luma' | 'sera';
+export type NexusDensity = 'compact' | 'default' | 'comfortable' | 'spacious';
 export type NexusCorners = 'sharp' | 'subtle' | 'smooth' | 'mellow';
 export type NexusElevation = 'maia' | 'mira' | 'nova';
 export type NexusStroke = 'maia' | 'vega' | 'nova';
@@ -76,10 +76,10 @@ export const BASE_TONE_SEEDS: Record<
 };
 
 export const DENSITY_OPTIONS = [
-  { value: 'nova', label: 'Compact' },
-  { value: 'mira', label: 'Default' },
-  { value: 'luma', label: 'Comfortable' },
-  { value: 'sera', label: 'Spacious' },
+  { value: 'compact', label: 'Compact' },
+  { value: 'default', label: 'Default' },
+  { value: 'comfortable', label: 'Comfortable' },
+  { value: 'spacious', label: 'Spacious' },
 ] as const satisfies readonly { value: NexusDensity; label: string }[];
 
 export const CORNER_OPTIONS = [
@@ -106,7 +106,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   brandColor: DEFAULT_BRAND_COLOR,
   surfaceTone: 'stone',
   contrast: 60,
-  density: 'mira',
+  density: 'default',
   corners: 'sharp',
   elevation: 'maia',
   stroke: 'vega',
@@ -182,7 +182,12 @@ const PUBLIC_MODE_RENAME: Record<
   'density' | 'corners' | 'elevation' | 'stroke',
   Record<string, string>
 > = {
-  density: {},
+  density: {
+    nova: 'compact',
+    mira: 'default',
+    luma: 'comfortable',
+    sera: 'spacious',
+  },
   corners: {},
   elevation: {},
   stroke: {},

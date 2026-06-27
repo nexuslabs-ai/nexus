@@ -15,7 +15,15 @@ const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
 const require = createRequire(import.meta.url);
 const TAILWIND_ENTRY = require.resolve('tailwindcss/index.css');
 
-const SPACING_MODES = ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'];
+const SPACING_MODES = [
+  'regular',
+  'tight',
+  'relaxed',
+  'default',
+  'compact',
+  'comfortable',
+  'spacious',
+];
 const RADIUS_MODES = ['blunt', 'mellow', 'sharp', 'smooth', 'subtle'];
 const SHADOW_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
 const BORDERWIDTH_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
@@ -528,7 +536,7 @@ describe('generateTailwindPackage', () => {
     // miss the role-token defaults (which only live in per-mode blocks, not
     // @theme). The :root selector keeps the configured default live in both
     // no-attribute and explicit data-style configurations.
-    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]mira['"]\] \{/);
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]default['"]\] \{/);
   });
 
   it('emits runtime mode selectors for radius, shadow, and border width', () => {
@@ -609,11 +617,11 @@ describe('generateTailwindPackage', () => {
     }
   );
 
-  // Vega numeric baseline — locks in the pre-migration shipped values.
-  // Drift here means the migration changed numeric Vega output; any change
+  // Regular numeric baseline — locks in the pre-migration shipped Vega values.
+  // Drift here means the migration changed numeric Regular output; any change
   // requires explicit reviewer acknowledgement by updating this table.
-  it('Vega numeric values are byte-identical to the pre-#119 shipped scale', () => {
-    const VEGA_BASELINE = {
+  it('Regular numeric values are byte-identical to the pre-#119 shipped scale', () => {
+    const REGULAR_BASELINE = {
       'spacing-0': '0px',
       'spacing-0_5': '2px',
       'spacing-1': '4px',
@@ -649,10 +657,10 @@ describe('generateTailwindPackage', () => {
       'spacing-80': '320px',
       'spacing-96': '384px',
     };
-    const block = extractDataStyleBlock(nexusCSS, 'vega');
-    for (const [name, expected] of Object.entries(VEGA_BASELINE)) {
+    const block = extractDataStyleBlock(nexusCSS, 'regular');
+    for (const [name, expected] of Object.entries(REGULAR_BASELINE)) {
       const match = block.match(new RegExp(`--nx-${name}:\\s*([^;]+);`));
-      expect(match, `--nx-${name} missing from Vega block`).not.toBeNull();
+      expect(match, `--nx-${name} missing from Regular block`).not.toBeNull();
       expect(match[1].trim(), `--nx-${name} drifted from baseline`).toBe(
         expected
       );
@@ -671,13 +679,13 @@ describe('generateTailwindPackage', () => {
       return [mode, vars];
     });
 
-    const [, vegaVars] = blocks[0];
-    expect(vegaVars.length).toBeGreaterThan(0);
+    const [, defaultVars] = blocks[0];
+    expect(defaultVars.length).toBeGreaterThan(0);
     for (const [mode, vars] of blocks.slice(1)) {
       expect(
         vars,
-        `mode "${mode}" CSS variable set diverges from vega`
-      ).toEqual(vegaVars);
+        `mode "${mode}" CSS variable set diverges from default`
+      ).toEqual(defaultVars);
     }
   });
 
@@ -726,15 +734,15 @@ describe('generateTailwindPackage', () => {
   });
 
   it('role @utility names match the role-token set 1:1 (drift guard)', () => {
-    // If a new role key lands in spacing-vega.json without a matching emitter
+    // If a new role key lands in spacing-regular.json without a matching emitter
     // row, this catches it — utility set must equal the role-token set.
     const utilityMatches = [
       ...spacingUtilitiesCSS.matchAll(/@utility ([a-z-]+) \{/g),
     ].map((m) => m[1]);
     const utilities = new Set(utilityMatches);
 
-    // Derive expected utility names from spacing-vega.json's role subtrees.
-    const vega = readSpacingModeJson('vega');
+    // Derive expected utility names from spacing-regular.json's role subtrees.
+    const regular = readSpacingModeJson('regular');
     const expected = new Set();
     function walk(node, pathParts) {
       if (
@@ -772,7 +780,7 @@ describe('generateTailwindPackage', () => {
       }
     }
     for (const group of ['control', 'container', 'layout']) {
-      if (group in vega) walk(vega[group], [group]);
+      if (group in regular) walk(regular[group], [group]);
     }
 
     expect(utilities).toEqual(expected);
@@ -780,20 +788,20 @@ describe('generateTailwindPackage', () => {
 
   it('emits 7 per-mode spacing blocks in deterministic alphabetical order (non-default modes)', () => {
     // Filesystem order isn't portable; the emitter sorts non-default modes
-    // alphabetically. Luma < Lyra, so luma must appear before lyra.
-    const ordered = [...nexusCSS.matchAll(/\[data-style=['"]([a-z]+)['"]\]/g)]
+    // alphabetically.
+    const ordered = [...nexusCSS.matchAll(/\[data-style=['"]([a-z-]+)['"]\]/g)]
       .map((m) => m[1])
       // De-dup in case `:root, [data-style="<default>"]` produces two captures.
       .filter((m, i, arr) => arr.indexOf(m) === i);
-    expect(ordered[0]).toBe('mira');
+    expect(ordered[0]).toBe('default');
     // Other six in alphabetical order:
     expect(ordered.slice(1)).toEqual([
-      'luma',
-      'lyra',
-      'maia',
-      'nova',
-      'sera',
-      'vega',
+      'comfortable',
+      'compact',
+      'regular',
+      'relaxed',
+      'spacious',
+      'tight',
     ]);
   });
 
@@ -847,18 +855,18 @@ describe('generateTailwindPackage', () => {
 
   it('config.spacingDefault shifts which mode lands under :root, [data-style="X"]', async () => {
     // Build with a non-default spacing mode. All 7 mode blocks still emit;
-    // only the `:root` half of the dual selector moves from Vega to Maia.
+    // only the `:root` half of the dual selector moves from Default to Relaxed.
     const dir = makeTmpDir();
     await generateTailwindPackage(
-      { ...DEFAULT_CONFIG, spacingDefault: 'maia' },
+      { ...DEFAULT_CONFIG, spacingDefault: 'relaxed' },
       { distDir: dir }
     );
     const css = read(dir, 'nexus.css');
 
-    // :root must combine with [data-style="maia"], not vega.
-    expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]maia['"]\] \{/);
-    // Vega becomes a plain attribute selector (no :root combinator).
-    expect(css).not.toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+    // :root must combine with [data-style="relaxed"], not regular.
+    expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]relaxed['"]\] \{/);
+    // Regular becomes a plain attribute selector (no :root combinator).
+    expect(css).not.toMatch(/:root,\s*\n\s*\[data-style=['"]regular['"]\] \{/);
     // Both blocks still present — the bundle still ships all 7 modes; only
     // the cascade default moves.
     const matches = css.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];

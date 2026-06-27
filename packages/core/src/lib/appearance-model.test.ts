@@ -24,7 +24,7 @@ describe('appearance model', () => {
       brandColor: DEFAULT_BRAND_COLOR,
       surfaceTone: 'stone',
       contrast: 60,
-      density: 'mira',
+      density: 'default',
       corners: 'sharp',
       elevation: 'maia',
       stroke: 'vega',
@@ -67,10 +67,10 @@ describe('appearance model', () => {
 
   it('maps friendly layout labels to token axes', () => {
     expect(DENSITY_OPTIONS).toEqual([
-      { value: 'nova', label: 'Compact' },
-      { value: 'mira', label: 'Default' },
-      { value: 'luma', label: 'Comfortable' },
-      { value: 'sera', label: 'Spacious' },
+      { value: 'compact', label: 'Compact' },
+      { value: 'default', label: 'Default' },
+      { value: 'comfortable', label: 'Comfortable' },
+      { value: 'spacious', label: 'Spacious' },
     ]);
     expect(CORNER_OPTIONS).toEqual([
       { value: 'sharp', label: 'Square' },
@@ -104,7 +104,7 @@ describe('sanitizeNexusAppearance', () => {
       brandColor: '#2563eb',
       surfaceTone: 'slate' as const,
       contrast: 42,
-      density: 'sera' as const,
+      density: 'spacious' as const,
       corners: 'mellow' as const,
       elevation: 'nova' as const,
       stroke: 'maia' as const,
@@ -153,7 +153,13 @@ describe('sanitizeNexusAppearance', () => {
         ...DEFAULT_NEXUS_APPEARANCE,
         density: 'wat',
       }).density
-    ).toBe('mira');
+    ).toBe('default');
+  });
+
+  it('normalizes a persisted density codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ density: 'nova' }).density).toBe(
+      'compact'
+    );
   });
 
   it('preserves system mode verbatim', () => {

@@ -5,6 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
+import { KEY_PARITY_MODE_FAMILY_CONFIGS } from '../../core/scripts/lib/token-mode-manifest.js';
 import plugin from '../src/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -96,9 +97,12 @@ ruleTester.run('canonical-spacing-steps', rule, {
 });
 
 describe('canonical-spacing-steps — real-file smoke test', () => {
-  const modes = ['vega', 'lyra', 'maia', 'mira', 'nova', 'luma', 'sera'];
-  for (const mode of modes) {
-    it(`reports zero findings on spacing-${mode}.json`, async () => {
+  const spacingConfig = KEY_PARITY_MODE_FAMILY_CONFIGS.find(
+    (config) => config.name === 'spacing'
+  );
+  const spacingFiles = spacingConfig.expectedModes.map(spacingConfig.fileName);
+  for (const fileName of spacingFiles) {
+    it(`reports zero findings on ${fileName}`, async () => {
       const eslint = new ESLint({
         overrideConfigFile: true,
         overrideConfig: {
@@ -108,7 +112,7 @@ describe('canonical-spacing-steps — real-file smoke test', () => {
           rules: { '@nexus/canonical-spacing-steps': 'error' },
         },
       });
-      const filePath = resolve(semanticDir, `spacing-${mode}.json`);
+      const filePath = resolve(semanticDir, fileName);
       const code = readFileSync(filePath, 'utf8');
       const messages = await eslint.lintText(code, { filePath });
       expect(messages[0].errorCount).toBe(0);

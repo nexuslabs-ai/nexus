@@ -424,27 +424,27 @@ describe('utils', () => {
       // Mira is the runtime spacing default. The
       // key controls which mode lands under `:root, [data-style="X"]`; other
       // modes still ship in the bundle.
-      expect(DEFAULT_CONFIG.spacingDefault).toBe('mira');
+      expect(DEFAULT_CONFIG.spacingDefault).toBe('default');
     });
   });
 
   describe('parseArgs', () => {
     it('parses default generator flags', () => {
       expect(
-        parseArgs(['--base=zinc', '--brand=blue', '--spacingDefault=maia'])
+        parseArgs(['--base=zinc', '--brand=blue', '--spacingDefault=relaxed'])
       ).toMatchObject({
         base: 'zinc',
         brand: 'blue',
-        spacingDefault: 'maia',
+        spacingDefault: 'relaxed',
       });
     });
 
     it('limits accepted flags per caller', () => {
       expect(
-        parseArgs(['--spacingDefault=nova'], {
+        parseArgs(['--spacingDefault=compact'], {
           allowedKeys: ['spacingDefault'],
         })
-      ).toMatchObject({ spacingDefault: 'nova' });
+      ).toMatchObject({ spacingDefault: 'compact' });
     });
 
     it('throws for unknown flags', () => {
@@ -584,7 +584,7 @@ describe('utils', () => {
   });
 
   // Shared fixture helper for spacing tests — writes per-mode JSON files into
-  // a temp dir and runs the body. Source data mirrors real spacing-vega.json
+  // a temp dir and runs the body. Source data mirrors real spacing-regular.json
   // structure (numeric `spacing.N` + role `control.padding-x.md`, `container.p`,
   // `layout.section-gap` subtrees) so the test exercises the same shapes the
   // build sees.
@@ -607,8 +607,8 @@ describe('utils', () => {
     it('routes spacing-*.json into perModeFiles.spacing (not standalone)', () => {
       withSpacingModesFixture(
         {
-          vega: { spacing: {} },
-          lyra: { spacing: {} },
+          regular: { spacing: {} },
+          tight: { spacing: {} },
         },
         (dir) => {
           // Also write a true standalone to confirm the partition.
@@ -623,15 +623,15 @@ describe('utils', () => {
 
           expect(result.perModeFiles).toEqual({
             spacing: {
-              vega: 'spacing-vega.json',
-              lyra: 'spacing-lyra.json',
+              regular: 'spacing-regular.json',
+              tight: 'spacing-tight.json',
             },
           });
           expect(result.standalone).toEqual(['focus.json']);
           // Confirm spacing files did NOT leak into standalone — without
           // this gate they'd get double-emitted by the generic dimension scan.
-          expect(result.standalone).not.toContain('spacing-vega.json');
-          expect(result.standalone).not.toContain('spacing-lyra.json');
+          expect(result.standalone).not.toContain('spacing-regular.json');
+          expect(result.standalone).not.toContain('spacing-tight.json');
         }
       );
     });
@@ -652,7 +652,7 @@ describe('utils', () => {
     it('returns per-mode tokens with unprefixed cssNames (prefix is added at emit time)', () => {
       withSpacingModesFixture(
         {
-          vega: {
+          regular: {
             spacing: {
               0: { $value: { value: 0, unit: 'px' }, $type: 'dimension' },
               4: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
@@ -663,7 +663,7 @@ describe('utils', () => {
               },
             },
           },
-          lyra: {
+          tight: {
             spacing: {
               0: { $value: { value: 0, unit: 'px' }, $type: 'dimension' },
               4: { $value: { value: 12, unit: 'px' }, $type: 'dimension' },
@@ -677,8 +677,8 @@ describe('utils', () => {
         },
         (dir) => {
           const result = collectSpacingTokens(dir);
-          expect(Object.keys(result).sort()).toEqual(['lyra', 'vega']);
-          expect(result.vega).toEqual([
+          expect(Object.keys(result).sort()).toEqual(['regular', 'tight']);
+          expect(result.regular).toEqual([
             { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
             { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
             {
@@ -689,7 +689,7 @@ describe('utils', () => {
           ]);
           // Per-mode variance is the whole point — the same cssName resolves
           // to different values across modes.
-          expect(result.lyra).toEqual([
+          expect(result.tight).toEqual([
             { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
             { cssName: 'spacing-4', path: ['spacing', '4'], value: '12px' },
             {
@@ -708,7 +708,7 @@ describe('utils', () => {
       // contributors add role tokens.
       withSpacingModesFixture(
         {
-          vega: {
+          regular: {
             control: {
               'padding-x': {
                 md: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
@@ -792,35 +792,35 @@ describe('utils', () => {
 
   describe('generateSpacingModesCSS', () => {
     const modes = {
-      vega: [
+      regular: [
         { cssName: 'spacing-4', value: '16px' },
         { cssName: 'control-padding-x-md', value: '16px' },
       ],
-      lyra: [
+      tight: [
         { cssName: 'spacing-4', value: '12px' },
         { cssName: 'control-padding-x-md', value: '12px' },
       ],
-      luma: [
+      comfortable: [
         { cssName: 'spacing-4', value: '16px' },
         { cssName: 'control-padding-x-md', value: '16px' },
       ],
     };
 
-    it('emits Vega block under :root and [data-style="vega"] selectors', () => {
+    it('emits Regular block under :root and [data-style="regular"] selectors', () => {
       const css = generateSpacingModesCSS(modes);
-      expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]vega['"]\] \{/);
+      expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]regular['"]\] \{/);
     });
 
-    it('emits non-default modes alphabetically (luma before lyra)', () => {
+    it('emits non-default modes alphabetically (comfortable before tight)', () => {
       const css = generateSpacingModesCSS(modes);
       // generateSpacingModesCSS returns a raw string with double-quoted
       // attribute selectors; prettier rewrites to single quotes only after
       // formatDistCssFiles runs. Match the raw form here.
-      const lumaIdx = css.indexOf('[data-style="luma"]');
-      const lyraIdx = css.indexOf('[data-style="lyra"]');
-      expect(lumaIdx).toBeGreaterThan(-1);
-      expect(lyraIdx).toBeGreaterThan(-1);
-      expect(lumaIdx).toBeLessThan(lyraIdx);
+      const comfortableIdx = css.indexOf('[data-style="comfortable"]');
+      const tightIdx = css.indexOf('[data-style="tight"]');
+      expect(comfortableIdx).toBeGreaterThan(-1);
+      expect(tightIdx).toBeGreaterThan(-1);
+      expect(comfortableIdx).toBeLessThan(tightIdx);
     });
 
     it('emits --nx- prefixed declarations (per-mode blocks live outside @theme)', () => {
@@ -842,7 +842,7 @@ describe('utils', () => {
     it('warns when two numeric tokens in the same mode resolve to the same px', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const duplicateModes = {
-        vega: [
+        regular: [
           { cssName: 'spacing-11', value: '48px' },
           { cssName: 'spacing-12', value: '48px' },
         ],
@@ -850,7 +850,7 @@ describe('utils', () => {
       generateSpacingModesCSS(duplicateModes);
       expect(warn).toHaveBeenCalledWith(
         expect.stringMatching(
-          /vega — "spacing-12" and "spacing-11" both resolve to 48px/
+          /regular — "spacing-12" and "spacing-11" both resolve to 48px/
         )
       );
       warn.mockRestore();

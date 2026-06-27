@@ -19,8 +19,8 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "build:tokens:modular": "node scripts/generate-modular.js --spacingDefault=mira",
-    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=black --borderwidth=vega --radius=sharp --shadow=maia --motion=snappy --spacingDefault=mira",
+    "build:tokens:modular": "node scripts/generate-modular.js --spacingDefault=default",
+    "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=black --borderwidth=vega --radius=sharp --shadow=maia --motion=snappy --spacingDefault=default",
     "audit:contrast": "node scripts/audit-contrast.js",
     "audit:class-refs": "node scripts/audit-class-refs.js",
     "audit:colorblind": "node scripts/audit-colorblind.js",

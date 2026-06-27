@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import spacingLuma from '../../../core/tokens/semantic/spacing-luma.json';
-import spacingLyra from '../../../core/tokens/semantic/spacing-lyra.json';
-import spacingMaia from '../../../core/tokens/semantic/spacing-maia.json';
-import spacingMira from '../../../core/tokens/semantic/spacing-mira.json';
-import spacingNova from '../../../core/tokens/semantic/spacing-nova.json';
-import spacingSera from '../../../core/tokens/semantic/spacing-sera.json';
-import spacingVega from '../../../core/tokens/semantic/spacing-vega.json';
+import spacingComfortable from '../../../core/tokens/semantic/spacing-comfortable.json';
+import spacingCompact from '../../../core/tokens/semantic/spacing-compact.json';
+import spacingDefault from '../../../core/tokens/semantic/spacing-default.json';
+import spacingRegular from '../../../core/tokens/semantic/spacing-regular.json';
+import spacingRelaxed from '../../../core/tokens/semantic/spacing-relaxed.json';
+import spacingSpacious from '../../../core/tokens/semantic/spacing-spacious.json';
+import spacingTight from '../../../core/tokens/semantic/spacing-tight.json';
 
 import { SPACING_MODES, type SpacingMode } from './spacing-modes';
 
@@ -27,13 +27,13 @@ function isDimensionToken(node: unknown): node is DimensionToken {
 }
 
 const SPACING_TOKENS: Record<SpacingMode, ModeFile> = {
-  vega: spacingVega as ModeFile,
-  lyra: spacingLyra as ModeFile,
-  maia: spacingMaia as ModeFile,
-  mira: spacingMira as ModeFile,
-  nova: spacingNova as ModeFile,
-  luma: spacingLuma as ModeFile,
-  sera: spacingSera as ModeFile,
+  vega: spacingRegular as ModeFile,
+  lyra: spacingTight as ModeFile,
+  maia: spacingRelaxed as ModeFile,
+  mira: spacingDefault as ModeFile,
+  nova: spacingCompact as ModeFile,
+  luma: spacingComfortable as ModeFile,
+  sera: spacingSpacious as ModeFile,
 };
 
 const MODES: { name: SpacingMode; tokens: ModeFile }[] = SPACING_MODES.map(

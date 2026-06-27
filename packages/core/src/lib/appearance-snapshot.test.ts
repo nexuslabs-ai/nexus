@@ -138,7 +138,7 @@ describe('resolveFirstPaint', () => {
     expect(result.colorScheme).toBe('dark');
     expect(result.metaColorScheme).toBe('dark');
     expect(result.dataAttrs).toEqual({
-      'data-style': 'mira',
+      'data-style': 'default',
       'data-radius': 'sharp',
       'data-shadow': 'maia',
       'data-borderwidth': 'vega',
@@ -230,7 +230,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
       })
     )();
 
-    expect(document.documentElement.getAttribute('data-style')).toBe('mira');
+    expect(document.documentElement.getAttribute('data-style')).toBe('default');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(
       document.querySelectorAll('style[data-nexus-appearance-theme]')

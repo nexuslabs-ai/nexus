@@ -240,7 +240,7 @@ export const DEFAULT_CONFIG = {
   focus: 'default',
   'chart-categorical': 'default',
   // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 7 modes ship)
-  spacingDefault: 'mira',
+  spacingDefault: 'default',
 };
 
 // ============================================
@@ -749,7 +749,7 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
  * Distinct from `config.spacingDefault`, which only moves the runtime `:root`
  * cascade default — all seven modes still emit either way.
  */
-export const CANONICAL_SPACING_DEFAULT_MODE = 'vega';
+export const CANONICAL_SPACING_DEFAULT_MODE = 'regular';
 
 /**
  * Collect spacing tokens from per-mode `semantic/spacing-{mode}.json` files.
@@ -1093,13 +1093,13 @@ function deriveRoleUtility(tokenPath) {
  * property set from the token's structured JSON `path`, and emits one
  * `@utility` declaration referencing the already-prefixed CSS variable.
  *
- * Data-driven by design: adding a new role key to `spacing-vega.json` (and
+ * Data-driven by design: adding a new role key to `spacing-regular.json` (and
  * the other six mode files, per the schema contract) automatically grows the
  * utility set. The Phase 2 drift test asserts utilities ↔ role tokens stay
  * 1:1.
  *
  * @param {{cssName: string, path: string[], value: string}[]} canonicalRoleTokens
- *   Role tokens from the canonical (Vega) mode. Each carries the original
+ *   Role tokens from the canonical (regular) mode. Each carries the original
  *   JSON `path` so the emitter never reverse-engineers structure that
  *   already exists upstream.
  * @returns {{css: string, count: number}}
