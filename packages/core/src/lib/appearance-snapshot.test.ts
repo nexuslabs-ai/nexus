@@ -22,6 +22,20 @@ function prefsCss(state = DEFAULT_NEXUS_APPEARANCE): string {
   return appearancePrefsToCss(state.prefs);
 }
 
+function mockSystemPrefersDark(matches: boolean): void {
+  const mediaQuery: MediaQueryList = {
+    matches,
+    media: '(prefers-color-scheme: dark)',
+    onchange: null,
+    addEventListener: vi.fn(),
+    addListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    removeEventListener: vi.fn(),
+    removeListener: vi.fn(),
+  };
+  window.matchMedia = vi.fn(() => mediaQuery);
+}
+
 describe('NexusAppearanceSnapshot', () => {
   it('stores pre-derived CSS verbatim', () => {
     const theme = themeCss();
@@ -197,17 +211,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
       ':root {}'
     );
     window.localStorage.setItem('nexus-appearance', JSON.stringify(system));
-    const mediaQuery: MediaQueryList = {
-      matches: true,
-      media: '(prefers-color-scheme: dark)',
-      onchange: null,
-      addEventListener: vi.fn(),
-      addListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-      removeEventListener: vi.fn(),
-      removeListener: vi.fn(),
-    };
-    window.matchMedia = vi.fn(() => mediaQuery);
+    mockSystemPrefersDark(true);
 
     new Function(createNexusAppearanceBootstrapScript())();
 
@@ -217,4 +221,45 @@ describe('createNexusAppearanceBootstrapScript', () => {
         ?.content
     ).toBe('light dark');
   });
+
+  it.each([
+    ['light', false],
+    ['light', true],
+    ['dark', false],
+    ['dark', true],
+    ['system', false],
+    ['system', true],
+  ] as const)(
+    'applies the same resolution as resolveFirstPaint (mode=%s, systemPrefersDark=%s)',
+    (mode, prefersDark) => {
+      const snapshot = createNexusAppearanceSnapshot(
+        { ...DEFAULT_NEXUS_APPEARANCE, mode },
+        ':root { --t: 1; }',
+        ':root { --p: 1; }'
+      );
+      const expected = resolveFirstPaint(snapshot, prefersDark);
+      window.localStorage.setItem('nexus-appearance', JSON.stringify(snapshot));
+      mockSystemPrefersDark(prefersDark);
+
+      new Function(createNexusAppearanceBootstrapScript())();
+
+      const root = document.documentElement;
+      expect(root.classList.contains('dark')).toBe(
+        expected.className === 'dark'
+      );
+      expect(root.style.colorScheme).toBe(expected.colorScheme);
+      expect(
+        document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
+          ?.content
+      ).toBe(expected.metaColorScheme);
+      for (const attr of [
+        'data-style',
+        'data-radius',
+        'data-shadow',
+        'data-borderwidth',
+      ] as const) {
+        expect(root.getAttribute(attr)).toBe(expected.dataAttrs[attr]);
+      }
+    }
+  );
 });

@@ -16,6 +16,7 @@ import {
   createNexusAppearanceSnapshot,
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
+  DEFAULT_STORAGE_KEY,
   deriveTheme,
   type NexusAppearanceSnapshot,
   type NexusAppearanceState,
@@ -25,7 +26,6 @@ import {
   themeToCss,
 } from '@nexus/core';
 
-const DEFAULT_STORAGE_KEY = 'nexus-appearance';
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';
 const PREFS_STYLE_SELECTOR = 'style[data-nexus-appearance-prefs]';
@@ -74,26 +74,18 @@ function systemPrefersDark(): boolean {
   return window.matchMedia(COLOR_SCHEME_QUERY).matches;
 }
 
-function snapshotFromState(
-  state: NexusAppearanceState
-): NexusAppearanceSnapshot {
-  return createNexusAppearanceSnapshot(
-    state,
-    themeToCss(deriveTheme(createNexusThemeContract(state))),
-    appearancePrefsToCss(state.prefs)
-  );
-}
-
-function readStoredSnapshot(
+function readStoredState(
   storageKey: string | false,
-  fallback: NexusAppearanceSnapshot
-): NexusAppearanceSnapshot {
+  fallback: NexusAppearanceState
+): NexusAppearanceState {
   if (!canUseDOM() || storageKey === false) return fallback;
 
   try {
     const raw = window.localStorage.getItem(storageKey);
 
-    return raw ? sanitizeNexusAppearanceSnapshot(JSON.parse(raw)) : fallback;
+    return raw
+      ? sanitizeNexusAppearanceSnapshot(JSON.parse(raw)).state
+      : fallback;
   } catch {
     return fallback;
   }
@@ -220,15 +212,10 @@ export function NexusAppearanceProvider({
       return;
     }
 
-    const snapshot = readStoredSnapshot(
-      storageKey,
-      snapshotFromState(initialState)
-    );
-    internalStateRef.current = snapshot.state;
-    setInternalState(snapshot.state);
-    setResolvedMode(
-      resolveAppearanceMode(snapshot.state.mode, systemPrefersDark())
-    );
+    const nextState = readStoredState(storageKey, initialState);
+    internalStateRef.current = nextState;
+    setInternalState(nextState);
+    setResolvedMode(resolveAppearanceMode(nextState.mode, systemPrefersDark()));
     setMounted(true);
   }, [initialState, isControlled, state, storageKey]);
 

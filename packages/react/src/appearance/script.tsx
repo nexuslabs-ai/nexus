@@ -1,13 +1,9 @@
 import {
-  appearancePrefsToCss,
+  createDefaultNexusAppearanceSnapshot,
   createNexusAppearanceBootstrapScript,
-  createNexusAppearanceSnapshot,
-  createNexusThemeContract,
-  DEFAULT_NEXUS_APPEARANCE,
-  deriveTheme,
+  createNexusAppearanceSnapshotFromState,
   type NexusAppearanceState,
   sanitizeNexusAppearance,
-  themeToCss,
 } from '@nexus/core';
 
 import {
@@ -32,15 +28,11 @@ type ConfiguredProviderProps = Omit<
 >;
 
 function defaultSnapshotFor(defaultState: NexusAppearanceState | undefined) {
-  const state = sanitizeNexusAppearance(
-    defaultState ?? DEFAULT_NEXUS_APPEARANCE
-  );
-
-  return createNexusAppearanceSnapshot(
-    state,
-    themeToCss(deriveTheme(createNexusThemeContract(state))),
-    appearancePrefsToCss(state.prefs)
-  );
+  return defaultState
+    ? createNexusAppearanceSnapshotFromState(
+        sanitizeNexusAppearance(defaultState)
+      )
+    : createDefaultNexusAppearanceSnapshot();
 }
 
 export function NexusAppearanceScript({
