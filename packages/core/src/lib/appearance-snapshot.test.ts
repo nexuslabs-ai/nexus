@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   appearancePrefsToCss,
@@ -6,6 +6,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
 } from './appearance-model';
 import {
+  createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshot,
   resolveFirstPaint,
   sanitizeNexusAppearanceSnapshot,
@@ -113,5 +114,107 @@ describe('resolveFirstPaint', () => {
 
     expect(result.themeCss).toBe('THEME');
     expect(result.prefsCss).toBe('PREFS');
+  });
+});
+
+describe('createNexusAppearanceBootstrapScript', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    window.matchMedia = originalMatchMedia;
+    document.documentElement.classList.remove('dark');
+    document.documentElement.removeAttribute('data-style');
+    document.documentElement.removeAttribute('data-radius');
+    document.documentElement.removeAttribute('data-shadow');
+    document.documentElement.removeAttribute('data-borderwidth');
+    document.documentElement.style.colorScheme = '';
+    document
+      .querySelectorAll(
+        'meta[name="color-scheme"], style[data-nexus-appearance-theme], style[data-nexus-appearance-prefs]'
+      )
+      .forEach((node) => node.remove());
+  });
+
+  it('is engine-free and safe to inline in a classic script tag', () => {
+    const script = createNexusAppearanceBootstrapScript();
+
+    expect(script).not.toMatch(
+      /culori|apca|deriveTheme|themeToCss|rampFromSeed|seedOklch/i
+    );
+    expect(script).not.toContain('</script');
+    expect(script).not.toContain('light-dark(');
+    expect(script).not.toMatch(/\u2028|\u2029/);
+  });
+
+  it('applies a stored dark snapshot to the document', () => {
+    const dark = createNexusAppearanceSnapshot(
+      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
+      ':root { --test-theme: dark; }',
+      ':root { --test-prefs: dark; }'
+    );
+    window.localStorage.setItem('nexus-appearance', JSON.stringify(dark));
+
+    new Function(createNexusAppearanceBootstrapScript())();
+
+    expect(document.documentElement).toHaveClass('dark');
+    expect(document.documentElement).toHaveAttribute('data-radius', 'sharp');
+    expect(document.documentElement.style.colorScheme).toBe('dark');
+    expect(
+      document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
+        ?.content
+    ).toBe('dark');
+    expect(
+      document.querySelector('style[data-nexus-appearance-theme]')?.textContent
+    ).toBe(':root { --test-theme: dark; }');
+    expect(
+      document.querySelector('style[data-nexus-appearance-prefs]')?.textContent
+    ).toBe(':root { --test-prefs: dark; }');
+  });
+
+  it('falls back to the embedded default snapshot on empty storage', () => {
+    new Function(
+      createNexusAppearanceBootstrapScript({
+        defaultSnapshot: createNexusAppearanceSnapshot(
+          DEFAULT_NEXUS_APPEARANCE,
+          '',
+          ''
+        ),
+      })
+    )();
+
+    expect(document.documentElement).toHaveAttribute('data-style', 'mira');
+    expect(document.documentElement).not.toHaveClass('dark');
+    expect(
+      document.querySelectorAll('style[data-nexus-appearance-theme]')
+    ).toHaveLength(1);
+  });
+
+  it('uses matchMedia for system mode', () => {
+    const system = createNexusAppearanceSnapshot(
+      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'system' },
+      ':root {}',
+      ':root {}'
+    );
+    window.localStorage.setItem('nexus-appearance', JSON.stringify(system));
+    const mediaQuery: MediaQueryList = {
+      matches: true,
+      media: '(prefers-color-scheme: dark)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      addListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      removeEventListener: vi.fn(),
+      removeListener: vi.fn(),
+    };
+    window.matchMedia = vi.fn(() => mediaQuery);
+
+    new Function(createNexusAppearanceBootstrapScript())();
+
+    expect(document.documentElement).toHaveClass('dark');
+    expect(
+      document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
+        ?.content
+    ).toBe('light dark');
   });
 });
