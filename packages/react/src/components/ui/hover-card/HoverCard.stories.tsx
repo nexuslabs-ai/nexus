@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { BusyOverlayStage } from '../../../stories/overlay-visuals';
 import { Button } from '../button';
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
@@ -108,6 +109,32 @@ export const WithDataAttributes: Story = {
       ).toBeInTheDocument();
     });
   },
+};
+
+export const BusyBackground: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    layout: 'fullscreen',
+  },
+  render: () => (
+    <BusyOverlayStage>
+      <HoverCard defaultOpen openDelay={0} closeDelay={0}>
+        <HoverCardTrigger asChild>
+          <Button variant="link">@nexus</Button>
+        </HoverCardTrigger>
+        <HoverCardContent sideOffset={8}>
+          <div className="nx:flex nx:flex-col nx:gap-1">
+            <p className="nx:typography-label-default nx:font-semibold nx:text-foreground">
+              @nexus
+            </p>
+            <p className="nx:typography-body-default nx:text-muted-foreground">
+              Design system releases and component notes.
+            </p>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
+    </BusyOverlayStage>
+  ),
 };
 
 // ============================================

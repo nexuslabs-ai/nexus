@@ -6,6 +6,7 @@ import {
   AllModesRow,
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
+import { BusyOverlayStage } from '../../../stories/overlay-visuals';
 import {
   expectHeightPerMode,
   expectHeightPinned,
@@ -877,6 +878,32 @@ export const VegaDefaultHeightPinned: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightPinned(within(canvasElement), 'select-regular-host', 40);
   },
+};
+
+export const BusyBackground: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    layout: 'fullscreen',
+  },
+  render: () => (
+    <BusyOverlayStage>
+      <Select defaultOpen defaultValue="banana">
+        <SelectTrigger className="nx:w-[220px]" aria-label="Select a fruit">
+          <SelectValue placeholder="Select a fruit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Fruits</SelectLabel>
+            <SelectItem value="apple">Apple</SelectItem>
+            <SelectItem value="banana">Banana</SelectItem>
+            <SelectItem value="orange">Orange</SelectItem>
+          </SelectGroup>
+          <SelectSeparator />
+          <SelectItem value="mango">Mango</SelectItem>
+        </SelectContent>
+      </Select>
+    </BusyOverlayStage>
+  ),
 };
 
 // ============================================
