@@ -3,6 +3,12 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  popoverSurfaceClassName,
+  tooltipSurfaceClassName,
+} from '@/components/ui/overlay-layout/overlay-layout';
+import { cn } from '@/lib/utils';
+
 import { Button } from '../button';
 import { Input } from '../input';
 import { Label } from '../label';
@@ -291,6 +297,79 @@ export const AllVariants: Story = {
   parameters: {
     layout: 'padded',
   },
+};
+
+const BUSY_BACKDROP_STYLE = {
+  backgroundColor: 'var(--nx-color-background)',
+  backgroundImage:
+    'linear-gradient(135deg, #ef4444 0 14%, transparent 14% 100%), repeating-linear-gradient(45deg, #3b82f6 0 24px, #22c55e 24px 48px, #eab308 48px 72px, #a855f7 72px 96px)',
+} satisfies React.CSSProperties;
+
+const SURFACE_FAMILY = [
+  'Popover',
+  'DropdownMenu',
+  'ContextMenu',
+  'HoverCard',
+  'Menubar',
+  'NavigationMenu',
+  'Select',
+] as const;
+
+function SurfaceExample({
+  label,
+  className,
+}: {
+  label: string;
+  className: string;
+}) {
+  return (
+    <div className={cn(className, 'nx:min-w-0 nx:p-4')}>
+      <p className="nx:typography-label-default">{label}</p>
+      <ul className="nx:mt-3 nx:space-y-1">
+        <li className="nx:rounded-sm nx:bg-popover-hover nx:px-2 nx:py-1 nx:typography-body-small">
+          Open item
+        </li>
+        <li className="nx:rounded-sm nx:px-2 nx:py-1 nx:typography-body-small">
+          Share
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+function BusySurfacePanel({ dark = false }: { dark?: boolean }) {
+  return (
+    <section
+      className={cn(
+        'nx:min-w-0 nx:p-6 nx:text-foreground',
+        dark ? 'dark' : undefined
+      )}
+      style={BUSY_BACKDROP_STYLE}
+    >
+      <div className="nx:grid nx:grid-cols-1 nx:gap-4">
+        {SURFACE_FAMILY.map((label) => (
+          <SurfaceExample
+            key={label}
+            label={label}
+            className={popoverSurfaceClassName}
+          />
+        ))}
+        <SurfaceExample label="Tooltip" className={tooltipSurfaceClassName} />
+      </div>
+    </section>
+  );
+}
+
+export const TranslucentSurfacesOverBusyBackground: Story = {
+  parameters: {
+    layout: 'fullscreen',
+  },
+  render: () => (
+    <div className="nx:grid nx:grid-cols-1 nx:md:grid-cols-2">
+      <BusySurfacePanel />
+      <BusySurfacePanel dark />
+    </div>
+  ),
 };
 
 // ============================================

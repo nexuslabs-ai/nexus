@@ -98,6 +98,20 @@ export const FEATURE_POLICIES = Object.freeze([
     note: 'Use svh, lvh, or dvh instead of raw vh according to browser-chrome intent.',
   },
   {
+    id: 'backdrop-filter',
+    name: 'backdrop-filter',
+    policy: 'adopt',
+    support: {
+      chrome: 76,
+      edge: 79,
+      firefox: 103,
+      safari: 9,
+      samsung: 12,
+    },
+    guide: 'css',
+    note: 'Safe for translucent popover/menu surfaces; Tailwind emits the WebKit-prefixed declaration Safari needs.',
+  },
+  {
     id: 'light-dark',
     name: 'light-dark()',
     policy: 'defer',
