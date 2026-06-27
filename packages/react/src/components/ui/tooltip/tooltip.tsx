@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
-import { popoverSurfaceClassName } from '@/components/ui/overlay-layout/overlay-layout';
+import { tooltipSurfaceClassName } from '@/components/ui/overlay-layout/overlay-layout';
 import { cn } from '@/lib/utils';
 
 /**
@@ -76,7 +76,7 @@ function TooltipContent({
         sideOffset={sideOffset}
         className={cn(
           'nx:z-popover nx:overflow-hidden',
-          popoverSurfaceClassName,
+          tooltipSurfaceClassName,
           'nx:px-3 nx:py-1.5',
           'nx:typography-body-small',
           'nx:animate-in nx:fade-in-0 nx:zoom-in-95 nx:duration-fast nx:ease-enter',

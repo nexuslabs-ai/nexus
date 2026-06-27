@@ -3,11 +3,21 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 /**
- * Popover-family surfaces are intentionally solid and tokenized by default.
- * Keep alpha/backdrop blur out of the shared recipe until readability is
- * explicitly audited over varied page backgrounds.
+ * Popover-family surfaces share the translucent/blurred recipe; Tooltip uses a
+ * solid carve-out because its small, brief text appears over arbitrary content.
  */
 const popoverSurfaceClassName = [
+  'nx:rounded-md',
+  'nx:border',
+  'nx:border-border-default',
+  'nx:bg-popover-alpha',
+  'nx:backdrop-blur-lg',
+  'nx:text-popover-foreground',
+  'nx:shadow-lg',
+  'nx:reduce-transparency:bg-popover',
+].join(' ');
+
+const tooltipSurfaceClassName = [
   'nx:rounded-md',
   'nx:border',
   'nx:border-border-default',
@@ -20,9 +30,11 @@ const navigationMenuInlinePopoverSurfaceClassName = [
   'nx:group-data-[viewport=false]/navigation-menu:rounded-md',
   'nx:group-data-[viewport=false]/navigation-menu:border',
   'nx:group-data-[viewport=false]/navigation-menu:border-border-default',
-  'nx:group-data-[viewport=false]/navigation-menu:bg-popover',
+  'nx:group-data-[viewport=false]/navigation-menu:bg-popover-alpha',
+  'nx:group-data-[viewport=false]/navigation-menu:backdrop-blur-lg',
   'nx:group-data-[viewport=false]/navigation-menu:text-popover-foreground',
   'nx:group-data-[viewport=false]/navigation-menu:shadow-lg',
+  'nx:group-data-[viewport=false]/navigation-menu:reduce-transparency:bg-popover',
 ].join(' ');
 
 const overlayContentVariants = cva(
@@ -142,4 +154,5 @@ export {
   type OverlayVariant,
   popoverSurfaceClassName,
   resolveOverlayButtonOrientation,
+  tooltipSurfaceClassName,
 };
