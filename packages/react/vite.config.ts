@@ -19,10 +19,15 @@ export default defineConfig({
         if (normalizedPath.endsWith('/dist/appearance/index.d.ts')) {
           return {
             filePath: path.resolve(__dirname, 'dist/appearance.d.ts'),
-            content: content.replace(
-              '//# sourceMappingURL=index.d.ts.map',
-              '//# sourceMappingURL=appearance.d.ts.map'
-            ),
+            content: content
+              .replace(
+                "export * from './provider';",
+                "export * from './appearance/provider';"
+              )
+              .replace(
+                '//# sourceMappingURL=index.d.ts.map',
+                '//# sourceMappingURL=appearance.d.ts.map'
+              ),
           };
         }
 
