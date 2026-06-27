@@ -67,7 +67,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
       className={cn(
         'nx:group/select-trigger nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-2',
         'nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:transition-colors nx:enabled:hover:bg-background-hover',
-        'nx:px-3 nx:py-2 nx:typography-body-default',
+        'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
         'nx:whitespace-nowrap',
         'nx:data-[placeholder]:text-muted-foreground',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',

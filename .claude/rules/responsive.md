@@ -23,9 +23,16 @@ Nexus is designed **mobile-first and desktop-first**: **Narrow (mobile) and Stan
 
 ## Touch targets
 
-Both Narrow (mobile) and Standard (desktop) are first-class, so every interactive control must be comfortably **tappable**, not just clickable. **Minimum interactive target: ~44px** (WCAG 2.5.5 Target Size · Apple HIG 44pt; Material's 48dp is the roomier bar). This is a **hit-area floor, not a visual-size mandate** — a control may look smaller as long as its tappable area clears ~44px on touch (extend it with padding, or an `::after` hit-area overlay as Sidebar does with `nx:after:-inset-2`).
-
-Because Nexus sizes by padding, not fixed height (see [components.md § Sizing Convention](components.md#sizing-convention)), meet the floor with padding — `nx:p-*` tuned so the rendered hit area reaches ~44px — not a hardcoded `nx:h-11`. Pointer-fine surfaces (mouse) may render denser; the touch case sets the floor.
+Both Narrow (mobile) and Standard (desktop) are first-class, so every interactive
+component must be comfortably **tappable**, not just clickable. **Minimum
+interactive target: ~44px** (WCAG 2.5.5 Target Size · Apple HIG 44pt;
+Material's 48dp is the roomier bar). This is a **hit-area floor, not a
+visual-size mandate** — a component may look smaller as long as its tappable
+area clears ~44px on touch. Component visual sizes are defined in
+[components.md § Sizing Convention](components.md#sizing-convention); this
+section only governs the extra hit area. For touch, extend the hit area with
+padding where it fits or with a coarse-pointer `::after` overlay such as
+Sidebar's `nx:after:-inset-2` pattern.
 
 ## Decision tree — which responsive mechanism
 

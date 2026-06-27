@@ -7,7 +7,7 @@ import {
   SPACING_MODES,
 } from '../../../stories/spacing-modes';
 import {
-  expectHeightFixedAcrossModes,
+  expectHeightPerMode,
   expectHeightPinned,
 } from '../../../stories/test-utils';
 import { NativeSelect, NativeSelectOption } from '../native-select';
@@ -33,6 +33,16 @@ const meta: Meta<typeof Select> = {
 
 export default meta;
 type Story = StoryObj<typeof Select>;
+
+const SELECT_TRIGGER_HEIGHTS = {
+  vega: 40,
+  lyra: 42,
+  maia: 44,
+  mira: 40,
+  nova: 38,
+  luma: 40,
+  sera: 40,
+} as const;
 
 // ============================================
 // BASIC STORIES
@@ -770,7 +780,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` uses numeric `py-2 gap-2 px-3` with `typography-body-default`, matching the fixed form-field rhythm instead of role spacing utilities. `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
+          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` uses the single-line control height scale (`h-10`) with numeric `px-3 gap-2`, matching Button/Input/ButtonGroup mechanics. `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
       },
     },
   },
@@ -796,13 +806,13 @@ export const AllModes: Story = {
   ),
 };
 
-export const SelectTriggerIsDensityStable: Story = {
+export const SelectTriggerScaleHeightFollowsModes: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Density-stability sentinel for `SelectTrigger`. It stays on numeric `py-2 gap-2 px-3` rather than role spacing utilities, so every spacing mode resolves to the same canonical 38px height. Trigger is not portaled so dimensional measurement on the wrapper works directly.',
+          'Scale-utility sentinel for `SelectTrigger`. It uses `h-10`, so the rendered height follows the active Nexus spacing mode like the other single-line controls. Trigger is not portaled so dimensional measurement on the wrapper works directly.',
       },
     },
   },
@@ -830,10 +840,10 @@ export const SelectTriggerIsDensityStable: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightFixedAcrossModes(
+    await expectHeightPerMode(
       within(canvasElement),
-      SPACING_MODES.map((mode) => `select-stable-host-${mode}`),
-      38
+      'select-stable-host',
+      SELECT_TRIGGER_HEIGHTS
     );
   },
 };
@@ -844,7 +854,7 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel: pins the `SelectTrigger` height in vega mode.',
+          'Regression sentinel: pins the `SelectTrigger` height in vega mode to the default single-line control scale.',
       },
     },
   },
@@ -865,7 +875,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'select-vega-host', 38);
+    await expectHeightPinned(within(canvasElement), 'select-vega-host', 40);
   },
 };
 

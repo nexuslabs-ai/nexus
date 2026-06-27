@@ -380,6 +380,51 @@ export const LoadingPreservesDefaultWidth: Story = {
   },
 };
 
+export const TextButtonsStayContentWidth: Story = {
+  parameters: {
+    a11y: { test: 'off' },
+    docs: {
+      description: {
+        story:
+          'Decision sentinel: labeled Buttons do not carry a min-width floor. Text buttons remain content-width, while icon-only buttons keep their dedicated square size so width rules cannot leak between the two contracts.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      data-style="vega"
+      className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background"
+    >
+      <Button data-testid="button-content-short">Go</Button>
+      <Button data-testid="button-content-long">Confirm transfer</Button>
+      <Button size="icon" aria-label="Icon action">
+        <IconStar />
+      </Button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const shortButton = canvas.getByTestId('button-content-short');
+    const longButton = canvas.getByTestId('button-content-long');
+    const iconButton = canvas.getByLabelText('Icon action');
+    const hasMinWidthClass = (element: HTMLElement) =>
+      Array.from(element.classList).some((className) =>
+        className.startsWith('nx:min-w-')
+      );
+
+    expect(hasMinWidthClass(shortButton)).toBe(false);
+    expect(hasMinWidthClass(longButton)).toBe(false);
+    expect(Math.round(shortButton.getBoundingClientRect().width)).toBeLessThan(
+      64
+    );
+    expect(
+      Math.round(longButton.getBoundingClientRect().width)
+    ).toBeGreaterThan(Math.round(shortButton.getBoundingClientRect().width));
+    await expect(iconButton).toHaveClass('nx:size-10');
+    expect(Math.round(iconButton.getBoundingClientRect().width)).toBe(40);
+  },
+};
+
 export const ManualBusyState: Story = {
   args: {
     'aria-busy': true,

@@ -9,7 +9,6 @@
 | Principle                 | Why                                                              |
 | ------------------------- | ---------------------------------------------------------------- |
 | **Semantic tokens only**  | Enables theming; primitives are implementation details           |
-| **Padding-based sizing**  | Fixed heights break in flex layouts                              |
 | **Data attributes**       | Enable CSS hooks for testing, styling, and state inspection      |
 | **CVA for enum variants** | Clear variant-to-class mapping; boolean logic stays in component |
 | **Named interfaces**      | Self-documenting; enables JSDoc; better IDE experience           |
@@ -75,9 +74,30 @@ Semantic color tokens adapt to theme automatically. Do not write `dark:` modifie
 
 ## Sizing Convention
 
-Use padding for sizing, not fixed heights (`nx:px-4 nx:py-2`, not `nx:h-10 nx:px-4`) — fixed heights break in flex layouts. **Exceptions:** avatars, progress bars, modals may need fixed dimensions.
+This table records component surfaces with an explicit sizing contract. It is
+not a complete component inventory. For an unlisted component or surface,
+inspect its source and define or update its contract in the same PR before
+changing sizing.
 
-**Touch targets (mobile-first):** interactive controls must clear a **~44px minimum tap-target** — tune `nx:p-*` so the rendered hit area meets it (or extend it with an `::after` overlay), not by shrinking the control. See [responsive.md § Touch targets](responsive.md#touch-targets).
+| Component surface             | Visual box                                                        | Inline spacing                                    | Width contract                                 |
+| ----------------------------- | ----------------------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------- |
+| `Button` text sizes           | `sm/default/lg`: `nx:h-8` / `nx:h-10` / `nx:h-12`                 | `nx:px-2.5` / `nx:px-3` / `nx:px-3.5`, `nx:gap-1` | Content-width; no base `min-w-*` floor         |
+| `Button` icon sizes           | `icon-sm/icon/icon-lg`: `nx:size-8` / `nx:size-10` / `nx:size-12` | `nx:p-0`, `nx:gap-0`                              | Square visual box                              |
+| `Input`                       | `sm/default/lg`: `nx:h-8` / `nx:h-10` / `nx:h-12`                 | `nx:px-2.5` / `nx:px-3` / `nx:px-3.5`, `nx:py-0`  | Layout-controlled `nx:w-full`                  |
+| `SelectTrigger`               | default only: `nx:h-10`                                           | `nx:px-3`, `nx:py-0`, `nx:gap-2`                  | Layout-controlled `nx:w-full`                  |
+| `ButtonGroupText`             | `sm/default/lg`: `nx:h-8` / `nx:h-10` / `nx:h-12`                 | `nx:px-2.5` / `nx:px-3` / `nx:px-3.5`, `nx:gap-2` | Content-width addon                            |
+| `Button` inside `ButtonGroup` | Inherits the `Button` row through `ButtonGroupSizeContext`        | Inherits the `Button` row                         | Same as the `Button` row                       |
+| `Textarea`                    | `nx:min-h-16`                                                     | `nx:px-3`, `nx:py-2`                              | Layout-controlled `nx:w-full`; rows may expand |
+
+Button minimum widths are intentionally not part of the base variant contract.
+If a future product surface needs a minimum labeled action width, add a
+component-specific class or API at that surface so the width cannot leak onto
+icon-only or composed Buttons.
+
+**Touch targets (mobile-first):** interactive components must clear a **~44px
+minimum tap-target**. A visual box may be denser on pointer-fine surfaces; for
+touch, use padding where it fits or a coarse-pointer hit-area overlay such as an
+`::after` inset. See [responsive.md § Touch targets](responsive.md#touch-targets).
 
 ## Responsive behaviour
 
