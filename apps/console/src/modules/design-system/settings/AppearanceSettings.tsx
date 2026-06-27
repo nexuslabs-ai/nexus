@@ -1,4 +1,4 @@
-import type { CodexThemeContract } from '@nexus/core';
+import type { NexusThemeContract } from '@nexus/core';
 import {
   Button,
   Card,
@@ -55,7 +55,7 @@ type AppearanceSettingsProps = {
 };
 
 function editedBlock(
-  appearance: CodexThemeContract['appearance']
+  appearance: NexusThemeContract['appearance']
 ): 'light' | 'dark' {
   return appearance === 'light' ? 'light' : 'dark';
 }

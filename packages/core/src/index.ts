@@ -5,9 +5,28 @@ export type {
 } from './lib/adjust-contrast';
 export { adjustContrast } from './lib/adjust-contrast';
 export type {
-  CodexThemeContract,
+  NexusAppearanceMode,
+  NexusAppearancePrefs,
+  NexusAppearanceState,
+  NexusCorners,
+  NexusDensity,
+  NexusElevation,
+  NexusStroke,
+} from './lib/appearance-model';
+export {
+  BASE_TONE_OPTIONS,
+  BASE_TONE_SEEDS,
+  CORNER_OPTIONS,
+  DEFAULT_BRAND_COLOR,
+  DEFAULT_NEXUS_APPEARANCE,
+  DENSITY_OPTIONS,
+  ELEVATION_OPTIONS,
+  STROKE_OPTIONS,
+} from './lib/appearance-model';
+export type {
   DerivedTheme,
-  SurfaceTone,
+  NexusSurfaceTone,
+  NexusThemeContract,
   ThemeDerivationInput,
   ThemeSeeds,
   TokenMap,

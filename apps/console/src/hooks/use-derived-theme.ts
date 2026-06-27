@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { type CodexThemeContract, deriveTheme, themeToCss } from '@nexus/core';
+import { deriveTheme, type NexusThemeContract, themeToCss } from '@nexus/core';
 
 const STYLE_ID = 'nexus-derived-theme';
 
@@ -10,7 +10,7 @@ const STYLE_ID = 'nexus-derived-theme';
  * `.dark` class is owned by ThemeProvider's single arbiter, not here. Syncs to
  * an external system (the DOM), so it belongs in an effect.
  */
-export function useDerivedTheme(contract: CodexThemeContract): void {
+export function useDerivedTheme(contract: NexusThemeContract): void {
   useEffect(() => {
     const existing = document.getElementById(STYLE_ID);
     const style =

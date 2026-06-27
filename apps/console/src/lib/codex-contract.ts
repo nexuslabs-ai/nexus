@@ -1,17 +1,17 @@
 import {
-  type CodexThemeContract,
   isColor,
-  type SurfaceTone,
+  type NexusSurfaceTone,
+  type NexusThemeContract,
   type ThemeSeeds,
 } from '@nexus/core';
 
 import { BASE_TONE_SEEDS, DEFAULT_BRAND_COLOR } from './appearance-theme';
 
 const DEFAULT_BASE_TONE = BASE_TONE_SEEDS.stone;
-export const DEFAULT_SURFACE_TONE: SurfaceTone = 'stone';
+export const DEFAULT_SURFACE_TONE: NexusSurfaceTone = 'stone';
 
 /** Codex's own Appearance values — the default derived theme (dogfood). */
-export const DEFAULT_CODEX_CONTRACT: CodexThemeContract = {
+export const DEFAULT_CODEX_CONTRACT: NexusThemeContract = {
   appearance: 'dark',
   surfaceTone: DEFAULT_SURFACE_TONE,
   light: { accent: DEFAULT_BRAND_COLOR, ...DEFAULT_BASE_TONE.light },
@@ -34,7 +34,7 @@ function isSeeds(value: unknown): value is ThemeSeeds {
   );
 }
 
-function isSurfaceTone(value: unknown): value is SurfaceTone {
+function isSurfaceTone(value: unknown): value is NexusSurfaceTone {
   return (
     typeof value === 'string' &&
     Object.prototype.hasOwnProperty.call(BASE_TONE_SEEDS, value)
@@ -48,17 +48,17 @@ function sameSeeds(a: ThemeSeeds, b: Omit<ThemeSeeds, 'accent'>): boolean {
 function surfaceToneFromSeeds(
   light: ThemeSeeds,
   dark: ThemeSeeds
-): SurfaceTone {
+): NexusSurfaceTone {
   for (const [tone, seeds] of Object.entries(BASE_TONE_SEEDS)) {
     if (sameSeeds(light, seeds.light) && sameSeeds(dark, seeds.dark)) {
-      return tone as SurfaceTone;
+      return tone as NexusSurfaceTone;
     }
   }
   return DEFAULT_SURFACE_TONE;
 }
 
 /** Coerce an unknown payload into a valid contract, falling back to the default. */
-export function sanitizeContract(raw: unknown): CodexThemeContract {
+export function sanitizeContract(raw: unknown): NexusThemeContract {
   if (typeof raw !== 'object' || raw === null) return DEFAULT_CODEX_CONTRACT;
   const o = raw as Record<string, unknown>;
   if (!isSeeds(o.light) || !isSeeds(o.dark)) return DEFAULT_CODEX_CONTRACT;
@@ -79,7 +79,7 @@ export function sanitizeContract(raw: unknown): CodexThemeContract {
 }
 
 /** Read the persisted contract. Never throws. */
-export function loadCodexContract(): CodexThemeContract {
+export function loadCodexContract(): NexusThemeContract {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     return raw ? sanitizeContract(JSON.parse(raw)) : DEFAULT_CODEX_CONTRACT;
@@ -89,7 +89,7 @@ export function loadCodexContract(): CodexThemeContract {
 }
 
 /** Persist the active contract. Never throws. */
-export function saveCodexContract(contract: CodexThemeContract): void {
+export function saveCodexContract(contract: NexusThemeContract): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(contract));
   } catch {

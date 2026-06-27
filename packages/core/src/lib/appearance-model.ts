@@ -1,13 +1,34 @@
-import type { NexusThemeContract, ThemeSeeds } from '@nexus/core';
-
-import type {
-  Base,
-  RadiusMode,
-  SpacingMode,
-  TokenMode,
-} from '../hooks/useTheme';
+import type { NexusSurfaceTone, ThemeSeeds } from './derive-theme';
 
 type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
+
+export type NexusAppearanceMode = 'light' | 'dark' | 'system';
+export type NexusDensity = 'nova' | 'mira' | 'luma' | 'sera';
+export type NexusCorners = 'sharp' | 'subtle' | 'smooth' | 'mellow';
+export type NexusElevation = 'maia' | 'mira' | 'nova';
+export type NexusStroke = 'maia' | 'vega' | 'nova';
+
+export interface NexusAppearancePrefs {
+  uiFont: string;
+  codeFont: string;
+  uiFontSize: number;
+  codeFontSize: number;
+  reduceMotion: 'system' | 'on' | 'off';
+  pointerCursors: boolean;
+  fontSmoothing: boolean;
+}
+
+export interface NexusAppearanceState {
+  mode: NexusAppearanceMode;
+  brandColor: string;
+  surfaceTone: NexusSurfaceTone;
+  contrast: number;
+  density: NexusDensity;
+  corners: NexusCorners;
+  elevation: NexusElevation;
+  stroke: NexusStroke;
+  prefs: NexusAppearancePrefs;
+}
 
 export const DEFAULT_BRAND_COLOR = '#339cff';
 
@@ -17,10 +38,14 @@ export const BASE_TONE_OPTIONS = [
   { value: 'zinc', label: 'Zinc', color: '#71717a' },
   { value: 'slate', label: 'Slate', color: '#64748b' },
   { value: 'gray', label: 'Gray', color: '#6b7280' },
-] as const satisfies readonly { value: Base; label: string; color: string }[];
+] as const satisfies readonly {
+  value: NexusSurfaceTone;
+  label: string;
+  color: string;
+}[];
 
 export const BASE_TONE_SEEDS: Record<
-  Base,
+  NexusSurfaceTone,
   { light: ModeSeeds; dark: ModeSeeds }
 > = {
   stone: {
@@ -50,53 +75,43 @@ export const DENSITY_OPTIONS = [
   { value: 'mira', label: 'Default' },
   { value: 'luma', label: 'Comfortable' },
   { value: 'sera', label: 'Spacious' },
-] as const satisfies readonly { value: SpacingMode; label: string }[];
+] as const satisfies readonly { value: NexusDensity; label: string }[];
 
 export const CORNER_OPTIONS = [
   { value: 'sharp', label: 'Square' },
   { value: 'subtle', label: 'Subtle' },
   { value: 'smooth', label: 'Smooth' },
   { value: 'mellow', label: 'Round' },
-] as const satisfies readonly { value: RadiusMode; label: string }[];
+] as const satisfies readonly { value: NexusCorners; label: string }[];
 
 export const ELEVATION_OPTIONS = [
   { value: 'maia', label: 'Quiet' },
   { value: 'mira', label: 'Standard' },
   { value: 'nova', label: 'Strong' },
-] as const satisfies readonly { value: TokenMode; label: string }[];
+] as const satisfies readonly { value: NexusElevation; label: string }[];
 
 export const STROKE_OPTIONS = [
   { value: 'maia', label: 'Fine' },
   { value: 'vega', label: 'Normal' },
   { value: 'nova', label: 'Strong' },
-] as const satisfies readonly { value: TokenMode; label: string }[];
+] as const satisfies readonly { value: NexusStroke; label: string }[];
 
-export function applyBrandColor(
-  contract: NexusThemeContract,
-  accent: string
-): NexusThemeContract {
-  return {
-    ...contract,
-    light: { ...contract.light, accent },
-    dark: { ...contract.dark, accent },
-  };
-}
-
-export function applyBaseTone(
-  contract: NexusThemeContract,
-  base: Base
-): NexusThemeContract {
-  const tone = BASE_TONE_SEEDS[base];
-  return {
-    ...contract,
-    surfaceTone: base,
-    light: { ...contract.light, ...tone.light },
-    dark: { ...contract.dark, ...tone.dark },
-  };
-}
-
-export function toggledAppearance(
-  appearance: NexusThemeContract['appearance']
-): NexusThemeContract['appearance'] {
-  return appearance === 'dark' ? 'light' : 'dark';
-}
+export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
+  mode: 'light',
+  brandColor: DEFAULT_BRAND_COLOR,
+  surfaceTone: 'stone',
+  contrast: 60,
+  density: 'mira',
+  corners: 'sharp',
+  elevation: 'maia',
+  stroke: 'vega',
+  prefs: {
+    uiFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    codeFont: 'ui-monospace, "SF Mono", Menlo, monospace',
+    uiFontSize: 14,
+    codeFontSize: 12,
+    reduceMotion: 'system',
+    pointerCursors: false,
+    fontSmoothing: true,
+  },
+};
