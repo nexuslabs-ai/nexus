@@ -22,6 +22,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  APPEARANCE_SOURCE_DIR,
   COMPONENT_SUBDIRS,
   componentDirSegment,
   NESTED_SUBDIRS,
@@ -29,7 +30,9 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
-const COMPONENTS_ROOT = path.join(__dirname, '..', 'src', 'components');
+const SRC_ROOT = path.join(__dirname, '..', 'src');
+const COMPONENTS_ROOT = path.join(SRC_ROOT, 'components');
+const APPEARANCE_ROOT = path.join(SRC_ROOT, 'appearance');
 const CONFIG_PATH = path.join(__dirname, 'base-variants.config.json');
 const EXCLUDE_PATH_FRAGMENTS = ['__generated__', 'node_modules', 'dist'];
 const STORY_SUFFIX = '.stories.tsx';
@@ -43,6 +46,10 @@ const KNOWN_FLAGS = new Set(['component', 'all', 'json']);
 const FLAG_PATTERN = /^--([a-zA-Z][a-zA-Z0-9-]*)(?:=(.+))?$/;
 
 const DOCS_HINT = 'see .claude/rules/testing-react.md';
+const DEFAULT_SEARCH_ROOTS = [
+  { root: COMPONENTS_ROOT, sourceDirs: COMPONENT_SUBDIRS },
+  { root: APPEARANCE_ROOT, sourceDirs: [APPEARANCE_SOURCE_DIR] },
+];
 
 class ConfigError extends Error {}
 
@@ -550,24 +557,35 @@ function isExcludedPath(p) {
  */
 export function findComponentFile(kebab, root = COMPONENTS_ROOT) {
   const matches = [];
-  for (const subdir of COMPONENT_SUBDIRS) {
-    const candidate = path.join(
-      root,
-      componentDirSegment(subdir, kebab),
-      `${kebab}.tsx`
-    );
-    if (
-      fs.existsSync(candidate) &&
-      !candidate.endsWith(STORY_SUFFIX) &&
-      !candidate.endsWith(TEST_SUFFIX) &&
-      !isExcludedPath(candidate)
-    ) {
-      matches.push(candidate);
+  const searchRoots =
+    root === COMPONENTS_ROOT
+      ? DEFAULT_SEARCH_ROOTS
+      : [{ root, sourceDirs: COMPONENT_SUBDIRS }];
+
+  for (const { root: searchRoot, sourceDirs } of searchRoots) {
+    for (const sourceDir of sourceDirs) {
+      const candidate = path.join(
+        searchRoot,
+        componentDirSegment(sourceDir, kebab),
+        `${kebab}.tsx`
+      );
+      if (
+        fs.existsSync(candidate) &&
+        !candidate.endsWith(STORY_SUFFIX) &&
+        !candidate.endsWith(TEST_SUFFIX) &&
+        !isExcludedPath(candidate)
+      ) {
+        matches.push(candidate);
+      }
     }
   }
   if (matches.length === 0) {
     throw new ConfigError(
-      `component "${kebab}" not found under ${path.relative(REPO_ROOT, root)}/{${COMPONENT_SUBDIRS.join(',')}}/`
+      `component "${kebab}" not found under ${searchRoots
+        .map(({ root, sourceDirs }) =>
+          `${path.relative(REPO_ROOT, root)}/{${sourceDirs.join(',')}}/`
+        )
+        .join(' or ')}`
     );
   }
   if (matches.length > 1) {
@@ -596,24 +614,35 @@ export function findStoriesFile(componentFile) {
  */
 export function listAllComponents(root = COMPONENTS_ROOT) {
   const out = [];
-  for (const subdir of COMPONENT_SUBDIRS) {
-    const dir = path.join(root, subdir);
-    if (!fs.existsSync(dir)) continue;
-    if (NESTED_SUBDIRS.has(subdir)) {
-      // Per-component folder: each child dir holds `{kebab}/{kebab}.tsx`.
-      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-        if (!entry.isDirectory()) continue;
-        const full = path.join(dir, entry.name, `${entry.name}.tsx`);
-        if (fs.existsSync(full) && !isExcludedPath(full)) out.push(full);
+  const searchRoots =
+    root === COMPONENTS_ROOT
+      ? DEFAULT_SEARCH_ROOTS
+      : [{ root, sourceDirs: COMPONENT_SUBDIRS }];
+
+  for (const { root: searchRoot, sourceDirs } of searchRoots) {
+    for (const sourceDir of sourceDirs) {
+      const dir =
+        sourceDir === APPEARANCE_SOURCE_DIR
+          ? searchRoot
+          : path.join(searchRoot, sourceDir);
+      if (!fs.existsSync(dir)) continue;
+      if (NESTED_SUBDIRS.has(sourceDir)) {
+        // Per-component folder: each child dir holds `{kebab}/{kebab}.tsx`.
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          if (!entry.isDirectory()) continue;
+          const full = path.join(dir, entry.name, `${entry.name}.tsx`);
+          if (fs.existsSync(full) && !isExcludedPath(full)) out.push(full);
+        }
+        continue;
       }
-      continue;
-    }
-    for (const entry of fs.readdirSync(dir)) {
-      const full = path.join(dir, entry);
-      if (!entry.endsWith('.tsx')) continue;
-      if (entry.endsWith(STORY_SUFFIX) || entry.endsWith(TEST_SUFFIX)) continue;
-      if (isExcludedPath(full)) continue;
-      out.push(full);
+      for (const entry of fs.readdirSync(dir)) {
+        const full = path.join(dir, entry);
+        if (!entry.endsWith('.tsx')) continue;
+        if (entry.endsWith(STORY_SUFFIX) || entry.endsWith(TEST_SUFFIX))
+          continue;
+        if (isExcludedPath(full)) continue;
+        out.push(full);
+      }
     }
   }
   return out.sort();

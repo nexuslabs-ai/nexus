@@ -20,4 +20,10 @@ describe('storiesImportPath', () => {
       '../ui/dropdown-menu/DropdownMenu.stories'
     );
   });
+
+  it('imports appearance stories from the sibling src/appearance root', () => {
+    expect(
+      storiesImportPath({ name: 'AppearanceSettings' }, 'appearance')
+    ).toBe('../../appearance/AppearanceSettings.stories');
+  });
 });
