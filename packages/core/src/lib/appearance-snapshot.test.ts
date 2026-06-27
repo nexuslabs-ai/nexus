@@ -7,6 +7,7 @@ import {
 } from './appearance-model';
 import {
   createNexusAppearanceSnapshot,
+  resolveFirstPaint,
   sanitizeNexusAppearanceSnapshot,
   SNAPSHOT_VERSION,
 } from './appearance-snapshot';
@@ -72,5 +73,45 @@ describe('NexusAppearanceSnapshot', () => {
     });
 
     expect(snapshot.state).toEqual(DEFAULT_NEXUS_APPEARANCE);
+  });
+});
+
+describe('resolveFirstPaint', () => {
+  const snapshotFor = (state = DEFAULT_NEXUS_APPEARANCE) =>
+    createNexusAppearanceSnapshot(state, 'THEME', 'PREFS');
+
+  it('resolves pinned dark mode concretely', () => {
+    const result = resolveFirstPaint(
+      snapshotFor({ ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' }),
+      false
+    );
+
+    expect(result.className).toBe('dark');
+    expect(result.colorScheme).toBe('dark');
+    expect(result.metaColorScheme).toBe('dark');
+    expect(result.dataAttrs).toEqual({
+      'data-style': 'mira',
+      'data-radius': 'sharp',
+      'data-shadow': 'maia',
+      'data-borderwidth': 'vega',
+    });
+  });
+
+  it('resolves system mode from the OS preference and keeps meta dual-scheme', () => {
+    const result = resolveFirstPaint(
+      snapshotFor({ ...DEFAULT_NEXUS_APPEARANCE, mode: 'system' }),
+      true
+    );
+
+    expect(result.className).toBe('dark');
+    expect(result.colorScheme).toBe('dark');
+    expect(result.metaColorScheme).toBe('light dark');
+  });
+
+  it('passes snapshot CSS through without derivation', () => {
+    const result = resolveFirstPaint(snapshotFor(), false);
+
+    expect(result.themeCss).toBe('THEME');
+    expect(result.prefsCss).toBe('PREFS');
   });
 });

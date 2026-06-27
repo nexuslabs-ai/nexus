@@ -16,6 +16,20 @@ export interface NexusAppearanceSnapshot {
   prefsCss: string;
 }
 
+export interface NexusFirstPaintResolution {
+  className: '' | 'dark';
+  dataAttrs: {
+    'data-style': string;
+    'data-radius': string;
+    'data-shadow': string;
+    'data-borderwidth': string;
+  };
+  colorScheme: 'light' | 'dark';
+  metaColorScheme: 'light' | 'dark' | 'light dark';
+  themeCss: string;
+  prefsCss: string;
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
@@ -70,4 +84,28 @@ export function sanitizeNexusAppearanceSnapshot(
     deriveThemeCss(state),
     derivePrefsCss(state)
   );
+}
+
+export function resolveFirstPaint(
+  snapshot: NexusAppearanceSnapshot,
+  systemPrefersDark: boolean
+): NexusFirstPaintResolution {
+  const { state } = snapshot;
+  const dark =
+    state.mode === 'dark' ||
+    (state.mode === 'system' && systemPrefersDark === true);
+
+  return {
+    className: dark ? 'dark' : '',
+    dataAttrs: {
+      'data-style': state.density,
+      'data-radius': state.corners,
+      'data-shadow': state.elevation,
+      'data-borderwidth': state.stroke,
+    },
+    colorScheme: dark ? 'dark' : 'light',
+    metaColorScheme: state.mode === 'system' ? 'light dark' : state.mode,
+    themeCss: snapshot.themeCss,
+    prefsCss: snapshot.prefsCss,
+  };
 }
