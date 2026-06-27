@@ -9,7 +9,7 @@ type ModeSeeds = Pick<ThemeSeeds, 'background' | 'foreground'>;
 
 export type NexusAppearanceMode = 'light' | 'dark' | 'system';
 export type NexusDensity = 'compact' | 'default' | 'comfortable' | 'spacious';
-export type NexusCorners = 'sharp' | 'subtle' | 'smooth' | 'mellow';
+export type NexusCorners = 'square' | 'subtle' | 'smooth' | 'round';
 export type NexusElevation = 'quiet' | 'standard' | 'strong';
 export type NexusStroke = 'maia' | 'vega' | 'nova';
 
@@ -83,10 +83,10 @@ export const DENSITY_OPTIONS = [
 ] as const satisfies readonly { value: NexusDensity; label: string }[];
 
 export const CORNER_OPTIONS = [
-  { value: 'sharp', label: 'Square' },
+  { value: 'square', label: 'Square' },
   { value: 'subtle', label: 'Subtle' },
   { value: 'smooth', label: 'Smooth' },
-  { value: 'mellow', label: 'Round' },
+  { value: 'round', label: 'Round' },
 ] as const satisfies readonly { value: NexusCorners; label: string }[];
 
 export const ELEVATION_OPTIONS = [
@@ -107,7 +107,7 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
   surfaceTone: 'stone',
   contrast: 60,
   density: 'default',
-  corners: 'sharp',
+  corners: 'square',
   elevation: 'quiet',
   stroke: 'vega',
   prefs: {
@@ -188,7 +188,10 @@ const PUBLIC_MODE_RENAME: Record<
     luma: 'comfortable',
     sera: 'spacious',
   },
-  corners: {},
+  corners: {
+    sharp: 'square',
+    mellow: 'round',
+  },
   elevation: {
     maia: 'quiet',
     mira: 'standard',

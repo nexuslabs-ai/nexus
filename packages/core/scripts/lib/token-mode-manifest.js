@@ -22,10 +22,10 @@ export const CANONICAL_MODES = [
   'tight',
 ];
 export const CANONICAL_RADIUS_MODES = [
-  'blunt',
-  'mellow',
-  'sharp',
+  'extra-round',
+  'round',
   'smooth',
+  'square',
   'subtle',
 ];
 export const CANONICAL_BORDERWIDTH_MODES = [
@@ -96,7 +96,7 @@ export function keyParityModeFamilyConfigs({
       name: 'radius',
       reportName: 'radius',
       dir: path.join(primitivesDir, 'radius'),
-      baseline: 'sharp',
+      baseline: 'square',
       expectedModes: CANONICAL_RADIUS_MODES,
       modePattern: /^radius-([a-z]+(?:-[a-z]+)*)\.json$/,
       fileName: (mode) => `radius-${mode}.json`,

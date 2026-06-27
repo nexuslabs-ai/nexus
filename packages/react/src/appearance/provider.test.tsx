@@ -86,7 +86,7 @@ describe('NexusAppearanceProvider', () => {
     const root = document.documentElement;
 
     expect(root).toHaveAttribute('data-style', 'default');
-    expect(root).toHaveAttribute('data-radius', 'sharp');
+    expect(root).toHaveAttribute('data-radius', 'square');
     expect(root).toHaveAttribute('data-shadow', 'quiet');
     expect(root).toHaveAttribute('data-borderwidth', 'vega');
     expect(root).not.toHaveClass('dark');
@@ -138,7 +138,7 @@ describe('NexusAppearanceProvider', () => {
           mode: 'system',
           surfaceTone: 'slate',
           density: 'compact',
-          corners: 'mellow',
+          corners: 'round',
           elevation: 'strong',
           stroke: 'nova',
         })

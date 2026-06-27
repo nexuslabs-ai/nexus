@@ -347,7 +347,7 @@
   --nx-motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --nx-motion-ease-move: cubic-bezier(0.77, 0, 0.175, 1);
 
-  /* radius (sharp) */
+  /* radius (square) */
   --nx-radius-base: 0px;
   --nx-radius-sm: 0px;
   --nx-radius-md: 0px;

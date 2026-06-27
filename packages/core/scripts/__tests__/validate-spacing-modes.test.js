@@ -48,7 +48,7 @@ describe('mode family configs', () => {
       ])
     ).toEqual([
       ['spacing', 'regular', CANONICAL_MODES],
-      ['radius', 'sharp', CANONICAL_RADIUS_MODES],
+      ['radius', 'square', CANONICAL_RADIUS_MODES],
       ['borderwidth', 'vega', CANONICAL_BORDERWIDTH_MODES],
       ['shadow-light', 'quiet', CANONICAL_SHADOW_MODES],
       ['shadow-dark', 'quiet', CANONICAL_SHADOW_MODES],

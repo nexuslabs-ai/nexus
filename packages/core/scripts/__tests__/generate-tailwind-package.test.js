@@ -24,7 +24,7 @@ const SPACING_MODES = [
   'comfortable',
   'spacious',
 ];
-const RADIUS_MODES = ['blunt', 'mellow', 'sharp', 'smooth', 'subtle'];
+const RADIUS_MODES = ['extra-round', 'round', 'smooth', 'square', 'subtle'];
 const SHADOW_MODES = ['flat', 'quiet', 'soft', 'standard', 'strong'];
 const BORDERWIDTH_MODES = ['lyra', 'maia', 'mira', 'nova', 'vega'];
 
@@ -540,12 +540,12 @@ describe('generateTailwindPackage', () => {
   });
 
   it('emits runtime mode selectors for radius, shadow, and border width', () => {
-    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-radius=['"]sharp['"]\] \{/);
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-radius=['"]square['"]\] \{/);
     expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-shadow=['"]quiet['"]\] \{/);
     expect(nexusCSS).toMatch(
       /:root,\s*\n\s*\[data-borderwidth=['"]vega['"]\] \{/
     );
-    expect(nexusCSS).toContain("[data-radius='blunt']");
+    expect(nexusCSS).toContain("[data-radius='extra-round']");
     expect(nexusCSS).toContain("[data-shadow='soft']");
     expect(nexusCSS).toContain("[data-borderwidth='nova']");
     expect(nexusCSS).not.toContain('light-dark(');
@@ -553,7 +553,7 @@ describe('generateTailwindPackage', () => {
 
   it('each runtime mode block declares the same variable names per family', () => {
     const families = [
-      { attrName: 'data-radius', modes: RADIUS_MODES, baseline: 'sharp' },
+      { attrName: 'data-radius', modes: RADIUS_MODES, baseline: 'square' },
       {
         attrName: 'data-borderwidth',
         modes: BORDERWIDTH_MODES,

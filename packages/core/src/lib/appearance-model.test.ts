@@ -25,7 +25,7 @@ describe('appearance model', () => {
       surfaceTone: 'stone',
       contrast: 60,
       density: 'default',
-      corners: 'sharp',
+      corners: 'square',
       elevation: 'quiet',
       stroke: 'vega',
       prefs: {
@@ -73,10 +73,10 @@ describe('appearance model', () => {
       { value: 'spacious', label: 'Spacious' },
     ]);
     expect(CORNER_OPTIONS).toEqual([
-      { value: 'sharp', label: 'Square' },
+      { value: 'square', label: 'Square' },
       { value: 'subtle', label: 'Subtle' },
       { value: 'smooth', label: 'Smooth' },
-      { value: 'mellow', label: 'Round' },
+      { value: 'round', label: 'Round' },
     ]);
     expect(ELEVATION_OPTIONS).toEqual([
       { value: 'quiet', label: 'Quiet' },
@@ -105,7 +105,7 @@ describe('sanitizeNexusAppearance', () => {
       surfaceTone: 'slate' as const,
       contrast: 42,
       density: 'spacious' as const,
-      corners: 'mellow' as const,
+      corners: 'round' as const,
       elevation: 'strong' as const,
       stroke: 'maia' as const,
       prefs: {
@@ -165,6 +165,12 @@ describe('sanitizeNexusAppearance', () => {
   it('normalizes a persisted elevation codename to its friendly value', () => {
     expect(sanitizeNexusAppearance({ elevation: 'maia' }).elevation).toBe(
       'quiet'
+    );
+  });
+
+  it('normalizes a persisted corner codename to its friendly value', () => {
+    expect(sanitizeNexusAppearance({ corners: 'mellow' }).corners).toBe(
+      'round'
     );
   });
 

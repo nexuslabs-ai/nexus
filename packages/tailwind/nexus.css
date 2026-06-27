@@ -1326,7 +1326,7 @@
 /* ===== PER-MODE RADIUS (mode swap via [data-radius="X"] on any ancestor) ===== */
 
 :root,
-[data-radius='sharp'] {
+[data-radius='square'] {
   --nx-radius-base: 0px;
   --nx-radius-sm: 0px;
   --nx-radius-md: 0px;
@@ -1337,7 +1337,7 @@
   --nx-radius-full: 9999px;
 }
 
-[data-radius='blunt'] {
+[data-radius='extra-round'] {
   --nx-radius-base: 16px;
   --nx-radius-sm: 14px;
   --nx-radius-md: 16px;
@@ -1348,7 +1348,7 @@
   --nx-radius-full: 9999px;
 }
 
-[data-radius='mellow'] {
+[data-radius='round'] {
   --nx-radius-base: 12px;
   --nx-radius-sm: 10px;
   --nx-radius-md: 12px;

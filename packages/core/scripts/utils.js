@@ -234,7 +234,7 @@ export const DEFAULT_CONFIG = {
   base: 'stone',
   brand: 'black',
   shadow: 'quiet',
-  radius: 'sharp',
+  radius: 'square',
   borderwidth: 'vega',
   motion: 'snappy',
   focus: 'default',

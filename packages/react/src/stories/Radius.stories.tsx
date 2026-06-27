@@ -5,13 +5,13 @@ import borderwidthMaia from '../../../core/tokens/primitives/borderwidth/borderw
 import borderwidthMira from '../../../core/tokens/primitives/borderwidth/borderwidth-mira.json';
 import borderwidthNova from '../../../core/tokens/primitives/borderwidth/borderwidth-nova.json';
 import borderwidthVega from '../../../core/tokens/primitives/borderwidth/borderwidth-vega.json';
-import radiusBlunt from '../../../core/tokens/primitives/radius/radius-blunt.json';
-import radiusMellow from '../../../core/tokens/primitives/radius/radius-mellow.json';
-import radiusSharp from '../../../core/tokens/primitives/radius/radius-sharp.json';
+import radiusExtraRound from '../../../core/tokens/primitives/radius/radius-extra-round.json';
+import radiusRound from '../../../core/tokens/primitives/radius/radius-round.json';
 import radiusSmooth from '../../../core/tokens/primitives/radius/radius-smooth.json';
+import radiusSquare from '../../../core/tokens/primitives/radius/radius-square.json';
 import radiusSubtle from '../../../core/tokens/primitives/radius/radius-subtle.json';
 
-const BUNDLED_RADIUS_MODE = 'sharp';
+const BUNDLED_RADIUS_MODE = 'square';
 const BUNDLED_BORDERWIDTH_MODE = 'vega';
 
 type Dimension = { value: number; unit: string };
@@ -35,10 +35,10 @@ type RadiusMap = Record<RadiusKey, DimensionToken>;
 type BorderWidthMap = Record<BorderWidthKey, DimensionToken>;
 
 const RADIUS_MODES: { name: string; tokens: RadiusMap }[] = [
-  { name: 'blunt', tokens: radiusBlunt as RadiusMap },
-  { name: 'mellow', tokens: radiusMellow as RadiusMap },
-  { name: 'sharp', tokens: radiusSharp as RadiusMap },
+  { name: 'extra-round', tokens: radiusExtraRound as RadiusMap },
+  { name: 'round', tokens: radiusRound as RadiusMap },
   { name: 'smooth', tokens: radiusSmooth as RadiusMap },
+  { name: 'square', tokens: radiusSquare as RadiusMap },
   { name: 'subtle', tokens: radiusSubtle as RadiusMap },
 ];
 

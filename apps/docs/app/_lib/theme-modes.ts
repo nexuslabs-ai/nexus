@@ -35,7 +35,7 @@ export const THEME_MODE_VALUES = {
     'spacious',
   ],
   shadow: ['flat', 'soft', 'quiet', 'standard', 'strong'],
-  radius: ['sharp', 'subtle', 'smooth', 'mellow', 'blunt'],
+  radius: ['square', 'subtle', 'smooth', 'round', 'extra-round'],
   borderwidth: ['vega', 'lyra', 'maia', 'mira', 'nova'],
 } as const;
 
@@ -55,7 +55,7 @@ export const DEFAULT_THEME_STATE = {
   brand: 'black',
   spacing: 'default',
   shadow: 'quiet',
-  radius: 'sharp',
+  radius: 'square',
   borderwidth: 'vega',
 } as const satisfies ThemeState;
 
@@ -92,11 +92,11 @@ export const THEME_MODE_OPTIONS = {
     { value: 'strong', label: 'Strong' },
   ],
   radius: [
-    { value: 'sharp', label: 'Sharp' },
+    { value: 'square', label: 'Square' },
     { value: 'subtle', label: 'Subtle' },
     { value: 'smooth', label: 'Smooth' },
-    { value: 'mellow', label: 'Mellow' },
-    { value: 'blunt', label: 'Blunt' },
+    { value: 'round', label: 'Round' },
+    { value: 'extra-round', label: 'Extra round' },
   ],
   borderwidth: [
     { value: 'vega', label: 'Vega' },
@@ -133,11 +133,11 @@ export const THEME_STYLESHEET_HREFS = {
     strong: '/themes/shadow-strong.css',
   },
   radius: {
-    sharp: '/themes/radius-sharp.css',
+    square: '/themes/radius-square.css',
     subtle: '/themes/radius-subtle.css',
     smooth: '/themes/radius-smooth.css',
-    mellow: '/themes/radius-mellow.css',
-    blunt: '/themes/radius-blunt.css',
+    round: '/themes/radius-round.css',
+    'extra-round': '/themes/radius-extra-round.css',
   },
   borderwidth: {
     vega: '/themes/borderwidth-vega.css',

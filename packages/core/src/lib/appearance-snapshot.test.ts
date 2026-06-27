@@ -139,7 +139,7 @@ describe('resolveFirstPaint', () => {
     expect(result.metaColorScheme).toBe('dark');
     expect(result.dataAttrs).toEqual({
       'data-style': 'default',
-      'data-radius': 'sharp',
+      'data-radius': 'square',
       'data-shadow': 'quiet',
       'data-borderwidth': 'vega',
     });
@@ -205,7 +205,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
     new Function(createNexusAppearanceBootstrapScript())();
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(document.documentElement.getAttribute('data-radius')).toBe('sharp');
+    expect(document.documentElement.getAttribute('data-radius')).toBe('square');
     expect(document.documentElement.style.colorScheme).toBe('dark');
     expect(
       document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')

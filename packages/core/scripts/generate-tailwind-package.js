@@ -468,7 +468,7 @@ function generateNexusCSS(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
   );
 
-  const radiusMode = usedModes.radius || 'subtle';
+  const radiusMode = usedModes.radius || DEFAULT_CONFIG.radius;
   const radiusTokens = collectRadiusTokens(TOKENS_DIR, radiusMode);
   const borderwidthMode = usedModes.borderwidth || 'vega';
   const borderwidthTokens = collectBorderwidthTokens(

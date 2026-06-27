@@ -12,17 +12,17 @@ const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const TOKENS = path.resolve(TEST_DIR, '..', '..', 'tokens');
 
 describe('runtime mode collectors', () => {
-  it('collects all radius modes including blunt', () => {
+  it('collects all radius modes including extra-round', () => {
     const modes = collectRadiusModes(TOKENS);
 
     expect(Object.keys(modes).sort()).toEqual([
-      'blunt',
-      'mellow',
-      'sharp',
+      'extra-round',
+      'round',
       'smooth',
+      'square',
       'subtle',
     ]);
-    expect(modes.sharp).toContainEqual({
+    expect(modes.square).toContainEqual({
       cssName: 'radius-base',
       path: ['base'],
       value: '0px',
