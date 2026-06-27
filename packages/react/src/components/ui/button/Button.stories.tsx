@@ -13,31 +13,31 @@ import { Button } from './button';
 
 const BUTTON_SCALE_HEIGHTS = {
   sm: {
-    vega: 32,
-    lyra: 32,
-    maia: 36,
-    mira: 32,
-    nova: 30,
-    luma: 32,
-    sera: 32,
+    regular: 32,
+    tight: 32,
+    relaxed: 36,
+    default: 32,
+    compact: 30,
+    comfortable: 32,
+    spacious: 32,
   },
   default: {
-    vega: 40,
-    lyra: 42,
-    maia: 44,
-    mira: 40,
-    nova: 38,
-    luma: 40,
-    sera: 40,
+    regular: 40,
+    tight: 42,
+    relaxed: 44,
+    default: 40,
+    compact: 38,
+    comfortable: 40,
+    spacious: 40,
   },
   lg: {
-    vega: 48,
-    lyra: 48,
-    maia: 52,
-    mira: 48,
-    nova: 46,
-    luma: 48,
-    sera: 48,
+    regular: 48,
+    tight: 48,
+    relaxed: 52,
+    default: 48,
+    compact: 46,
+    comfortable: 48,
+    spacious: 48,
   },
 } as const;
 
@@ -392,7 +392,7 @@ export const TextButtonsStayContentWidth: Story = {
   },
   render: () => (
     <div
-      data-style="vega"
+      data-style="regular"
       className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background"
     >
       <Button data-testid="button-content-short">Go</Button>
@@ -1078,9 +1078,9 @@ export const TextScaleHeightsAcrossModes: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const defaultButton = canvas.getByTestId('button-default-vega');
-    const smallButton = canvas.getByTestId('button-sm-vega');
-    const largeButton = canvas.getByTestId('button-lg-vega');
+    const defaultButton = canvas.getByTestId('button-default-regular');
+    const smallButton = canvas.getByTestId('button-sm-regular');
+    const largeButton = canvas.getByTestId('button-lg-regular');
 
     await expect(defaultButton).toHaveClass('nx:typography-label-default');
     await expect(defaultButton).toHaveClass('nx:h-10');
@@ -1106,21 +1106,21 @@ export const VegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Pin on the fixed-height outcome: in vega mode, a default Button renders at exactly 40px via `h-10`.',
+          'Pin on the fixed-height outcome: in regular mode, a default Button renders at exactly 40px via `h-10`.',
       },
     },
   },
   render: () => (
     <div
-      data-style="vega"
-      data-testid="button-vega-host"
+      data-style="regular"
+      data-testid="button-regular-host"
       className="nx:p-10 nx:bg-background"
     >
       <Button>Default</Button>
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'button-vega-host', 40);
+    await expectHeightPinned(within(canvasElement), 'button-regular-host', 40);
   },
 };
 

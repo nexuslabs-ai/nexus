@@ -676,7 +676,7 @@ export const CloseButtonTracksSpacingModes: Story = {
     const previousStyle = document.documentElement.getAttribute('data-style');
     const canvas = within(canvasElement);
 
-    document.documentElement.setAttribute('data-style', 'nova');
+    document.documentElement.setAttribute('data-style', 'compact');
 
     try {
       await userEvent.click(
@@ -689,7 +689,7 @@ export const CloseButtonTracksSpacingModes: Story = {
       await expect(closeButton).toHaveClass('nx:right-6', 'nx:top-6');
       await expectCloseButtonInsets(dialog, closeButton, 22);
 
-      document.documentElement.setAttribute('data-style', 'maia');
+      document.documentElement.setAttribute('data-style', 'relaxed');
       await expectCloseButtonInsets(dialog, closeButton, 28);
 
       await userEvent.keyboard('{Escape}');

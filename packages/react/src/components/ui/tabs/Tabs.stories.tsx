@@ -738,14 +738,14 @@ export const TabsTriggerVegaDefaultHeightPinned: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel: pins the `default` `TabsTrigger` height in vega mode.',
+          'Regression sentinel: pins the `default` `TabsTrigger` height in regular mode.',
       },
     },
   },
   render: () => (
     <div
-      data-style="vega"
-      data-testid="tabs-vega-host"
+      data-style="regular"
+      data-testid="tabs-regular-host"
       className="nx:p-10 nx:bg-background"
     >
       <Tabs defaultValue="a">
@@ -756,7 +756,7 @@ export const TabsTriggerVegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'tabs-vega-host', 34);
+    await expectHeightPinned(within(canvasElement), 'tabs-regular-host', 34);
   },
 };
 
@@ -772,7 +772,7 @@ export const TabsSmIsDensityStable: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="tabs-sm-host-nova">
+      <div data-style="compact" data-testid="tabs-sm-host-compact">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger size="sm" value="a">
@@ -781,7 +781,7 @@ export const TabsSmIsDensityStable: Story = {
           </TabsList>
         </Tabs>
       </div>
-      <div data-style="vega" data-testid="tabs-sm-host-vega">
+      <div data-style="regular" data-testid="tabs-sm-host-regular">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger size="sm" value="a">
@@ -790,7 +790,7 @@ export const TabsSmIsDensityStable: Story = {
           </TabsList>
         </Tabs>
       </div>
-      <div data-style="sera" data-testid="tabs-sm-host-sera">
+      <div data-style="spacious" data-testid="tabs-sm-host-spacious">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger size="sm" value="a">
@@ -804,7 +804,7 @@ export const TabsSmIsDensityStable: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightFixedAcrossModes(
       within(canvasElement),
-      ['tabs-sm-host-nova', 'tabs-sm-host-vega', 'tabs-sm-host-sera'],
+      ['tabs-sm-host-compact', 'tabs-sm-host-regular', 'tabs-sm-host-spacious'],
       26,
       { selector: '[data-slot="tabs-trigger"]' }
     );

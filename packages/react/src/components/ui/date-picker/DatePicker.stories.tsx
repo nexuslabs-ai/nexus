@@ -27,7 +27,7 @@ function addDays(date: Date, days: number) {
 }
 
 // Resolve a spacing token to px from :root so cell-size assertions track the
-// active spacing mode instead of hardcoding the `vega`-default value.
+// active spacing mode instead of hardcoding the `regular`-default value.
 function resolveSpacingPx(canvasElement: HTMLElement, varName: string) {
   const root = canvasElement.ownerDocument.documentElement;
   return Math.round(

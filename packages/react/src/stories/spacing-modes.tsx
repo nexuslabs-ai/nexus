@@ -3,13 +3,13 @@ import type { ReactNode } from 'react';
 import { cn } from '../lib/utils';
 
 export const SPACING_MODES = [
-  'vega',
-  'lyra',
-  'maia',
-  'mira',
-  'nova',
-  'luma',
-  'sera',
+  'regular',
+  'tight',
+  'relaxed',
+  'default',
+  'compact',
+  'comfortable',
+  'spacious',
 ] as const;
 
 export type SpacingMode = (typeof SPACING_MODES)[number];

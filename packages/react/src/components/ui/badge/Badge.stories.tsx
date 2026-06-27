@@ -739,13 +739,13 @@ export const BadgeIsDensityStable: Story = {
   },
   render: () => (
     <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="badge-host-nova">
+      <div data-style="compact" data-testid="badge-host-compact">
         <Badge>Nova</Badge>
       </div>
-      <div data-style="vega" data-testid="badge-host-vega">
+      <div data-style="regular" data-testid="badge-host-regular">
         <Badge>Vega</Badge>
       </div>
-      <div data-style="sera" data-testid="badge-host-sera">
+      <div data-style="spacious" data-testid="badge-host-spacious">
         <Badge>Sera</Badge>
       </div>
     </div>
@@ -753,7 +753,7 @@ export const BadgeIsDensityStable: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightFixedAcrossModes(
       within(canvasElement),
-      ['badge-host-nova', 'badge-host-vega', 'badge-host-sera'],
+      ['badge-host-compact', 'badge-host-regular', 'badge-host-spacious'],
       24,
       { selector: '[data-slot="badge"]' }
     );

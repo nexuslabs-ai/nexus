@@ -535,7 +535,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-container` → `p-6` to preserve the vega 24px default while leaving the container-role curve. `p-6` follows the standard spacing scale: nova 22 / maia 28 / all other modes 24. `CardAction` is in-flow grid content, with the header padding supplying the inset; `gap-1.5`, `gap-2`, and `pt-0` stay numeric.',
+          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-container` → `p-6` to preserve the regular 24px default while leaving the container-role curve. `p-6` follows the standard spacing scale: compact 22 / relaxed 28 / all other modes 24. `CardAction` is in-flow grid content, with the header padding supplying the inset; `gap-1.5`, `gap-2`, and `pt-0` stay numeric.',
       },
     },
   },
@@ -561,20 +561,20 @@ export const ModesProduceDifferentHeights: Story = {
     docs: {
       description: {
         story:
-          'Cascade sentinel for numeric `CardContent` `p-6`. Card has no portaled content, so dimensional measurement on the wrapper works directly. The Card contains a 40px fixed-height child, making the height equation `border 2 + pt-0 + child 40 + p-6 bottom`; nova resolves to 64px and luma resolves to 66px.',
+          'Cascade sentinel for numeric `CardContent` `p-6`. Card has no portaled content, so dimensional measurement on the wrapper works directly. The Card contains a 40px fixed-height child, making the height equation `border 2 + pt-0 + child 40 + p-6 bottom`; compact resolves to 64px and comfortable resolves to 66px.',
       },
     },
   },
   render: () => (
     <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="nova" data-testid="card-mode-host-nova">
+      <div data-style="compact" data-testid="card-mode-host-compact">
         <Card className="nx:w-[160px]">
           <CardContent>
             <div className="nx:h-10" aria-hidden="true" />
           </CardContent>
         </Card>
       </div>
-      <div data-style="luma" data-testid="card-mode-host-luma">
+      <div data-style="comfortable" data-testid="card-mode-host-comfortable">
         <Card className="nx:w-[160px]">
           <CardContent>
             <div className="nx:h-10" aria-hidden="true" />
@@ -586,8 +586,8 @@ export const ModesProduceDifferentHeights: Story = {
   play: async ({ canvasElement }) => {
     await expectModeCascadeWorks(
       within(canvasElement),
-      'card-mode-host-nova',
-      'card-mode-host-luma',
+      'card-mode-host-compact',
+      'card-mode-host-comfortable',
       { selector: '[data-slot="card"]' }
     );
   },
@@ -598,14 +598,14 @@ export const VegaDefaultHeightPinned: Story = {
     a11y: { test: 'off' },
     docs: {
       description: {
-        story: 'Regression sentinel: pins the Card height in vega mode.',
+        story: 'Regression sentinel: pins the Card height in regular mode.',
       },
     },
   },
   render: () => (
     <div
-      data-style="vega"
-      data-testid="card-vega-host"
+      data-style="regular"
+      data-testid="card-regular-host"
       className="nx:p-10 nx:bg-background"
     >
       <Card className="nx:w-[200px]">
@@ -616,7 +616,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'card-vega-host', 66, {
+    await expectHeightPinned(within(canvasElement), 'card-regular-host', 66, {
       selector: '[data-slot="card"]',
     });
   },

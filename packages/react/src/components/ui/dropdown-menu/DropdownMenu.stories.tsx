@@ -553,7 +553,7 @@ export const ItemPaddingPinnedAcrossModes: Story = {
     const originalMode = document.documentElement.getAttribute('data-style');
 
     try {
-      for (const mode of ['nova', 'sera'] as const) {
+      for (const mode of ['compact', 'spacious'] as const) {
         document.documentElement.setAttribute('data-style', mode);
         await userEvent.click(trigger);
 
