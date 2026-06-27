@@ -1,13 +1,21 @@
-import { oklch, parse } from 'culori';
+import { simulate } from '@bjornlu/colorblind';
+import {
+  clampChroma,
+  converter,
+  differenceEuclidean,
+  oklch,
+  parse,
+} from 'culori';
 import { describe, expect, it } from 'vitest';
 
 import { apcaLc } from './apca';
 import {
-  type CodexThemeContract,
   derivePrimary,
   deriveSurfaces,
   deriveText,
   deriveTheme,
+  type SurfaceTone,
+  type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
 import { TIER_THRESHOLDS } from './palette';
@@ -16,29 +24,98 @@ function lOf(oklchStr: string | undefined): number {
   return oklch(parse(oklchStr!)!)!.l!;
 }
 
+function hOf(oklchStr: string | undefined): number {
+  return oklch(parse(oklchStr!)!)!.h!;
+}
+
+const toRgb = converter('rgb');
+const oklabDelta = differenceEuclidean('oklab');
+const COLORBLIND_DELTA_E = 0.02;
+const VISION_TYPES = [
+  'normal',
+  'deuteranopia',
+  'protanopia',
+  'tritanopia',
+] as const;
+
+function toSrgbInts(input: string): [number, number, number] {
+  const parsed = parse(input);
+  if (!parsed) throw new Error(`cannot parse color '${input}'`);
+  const rgb = toRgb(clampChroma(oklch(parsed)!, 'oklch', 'rgb'));
+  const channel = (value: number) =>
+    Math.max(0, Math.min(255, Math.round(value * 255)));
+  return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
+}
+
+function simulatedRgb(
+  color: string,
+  visionType: (typeof VISION_TYPES)[number]
+): [number, number, number] {
+  const rgb = toSrgbInts(color);
+  if (visionType === 'normal') return rgb;
+  const sim = simulate({ r: rgb[0], g: rgb[1], b: rgb[2] }, visionType);
+  return [sim.r, sim.g, sim.b];
+}
+
+function rgbToCulori([r, g, b]: [number, number, number]) {
+  return { mode: 'rgb' as const, r: r / 255, g: g / 255, b: b / 255 };
+}
+
+function deltaE(
+  colorA: string,
+  colorB: string,
+  visionType: (typeof VISION_TYPES)[number]
+): number {
+  return oklabDelta(
+    rgbToCulori(simulatedRgb(colorA, visionType)),
+    rgbToCulori(simulatedRgb(colorB, visionType))
+  );
+}
+
+function expectPairwiseDistinguishable(
+  label: string,
+  colors: Record<string, string>
+): void {
+  const entries = Object.entries(colors);
+  for (const visionType of VISION_TYPES) {
+    for (let i = 0; i < entries.length - 1; i += 1) {
+      for (let j = i + 1; j < entries.length; j += 1) {
+        const [nameA, colorA] = entries[i]!;
+        const [nameB, colorB] = entries[j]!;
+        expect(
+          deltaE(colorA, colorB, visionType),
+          `${label} ${nameA} vs ${nameB} under ${visionType}`
+        ).toBeGreaterThanOrEqual(COLORBLIND_DELTA_E);
+      }
+    }
+  }
+}
+
 describe('deriveSurfaces', () => {
+  const surfaceTone: SurfaceTone = 'neutral';
+
   it('keeps background at the seed lightness', () => {
-    const s = deriveSurfaces('#181818', 'dark', 0.05);
+    const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
     expect(lOf(s['--nx-color-background'])).toBeCloseTo(lOf('#181818'), 1);
   });
 
   it('elevates container lighter than background in dark mode', () => {
-    const s = deriveSurfaces('#181818', 'dark', 0.05);
+    const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
     expect(lOf(s['--nx-color-container'])).toBeGreaterThan(
       lOf(s['--nx-color-background'])
     );
   });
 
   it('recedes hover darker than background in light mode', () => {
-    const s = deriveSurfaces('#ffffff', 'light', 0.05);
+    const s = deriveSurfaces('#ffffff', surfaceTone, 'light', 0.05);
     expect(lOf(s['--nx-color-background-hover'])).toBeLessThan(
       lOf(s['--nx-color-background'])
     );
   });
 
   it('widens the ladder as contrast (delta) grows', () => {
-    const lo = deriveSurfaces('#181818', 'dark', 0.02);
-    const hi = deriveSurfaces('#181818', 'dark', 0.08);
+    const lo = deriveSurfaces('#181818', surfaceTone, 'dark', 0.02);
+    const hi = deriveSurfaces('#181818', surfaceTone, 'dark', 0.08);
     const spread = (s: Record<string, string>) =>
       lOf(s['--nx-color-popover']) - lOf(s['--nx-color-background']);
     expect(spread(hi)).toBeGreaterThan(spread(lo));
@@ -46,7 +123,7 @@ describe('deriveSurfaces', () => {
 });
 
 describe('deriveText', () => {
-  const surfaces = deriveSurfaces('#181818', 'dark', 0.05);
+  const surfaces = deriveSurfaces('#181818', 'neutral', 'dark', 0.05);
 
   it('keeps a white foreground that already passes body', () => {
     const t = deriveText('#ffffff', surfaces);
@@ -74,8 +151,43 @@ describe('deriveText', () => {
   });
 
   it('does not throw on a pathological mid-grey pairing', () => {
-    const mid = deriveSurfaces('#7d7d7d', 'light', 0.05);
+    const mid = deriveSurfaces('#7d7d7d', 'neutral', 'light', 0.05);
     expect(() => deriveText('#808080', mid)).not.toThrow();
+  });
+});
+
+describe('deriveFamily / derivePrimary snapshot', () => {
+  it('primary token values are unchanged by the deriveFamily refactor', () => {
+    expect(derivePrimary('#2563eb', 'light')).toMatchInlineSnapshot(`
+      {
+        "--nx-color-border-primary": "oklch(0.87 0.066 262.881)",
+        "--nx-color-border-primary-active": "oklch(0.66 0.1849 262.881)",
+        "--nx-color-primary-background": "oklch(0.46 0.2152 262.881)",
+        "--nx-color-primary-background-active": "oklch(0.297 0.173 262.881)",
+        "--nx-color-primary-background-hover": "oklch(0.385 0.2152 262.881)",
+        "--nx-color-primary-disabled": "oklch(0.765 0.1236 262.881)",
+        "--nx-color-primary-foreground": "oklch(1 0 0)",
+        "--nx-color-primary-subtle": "oklch(0.985 0.0073 262.881)",
+        "--nx-color-primary-subtle-active": "oklch(0.87 0.066 262.881)",
+        "--nx-color-primary-subtle-foreground": "oklch(0.46 0.2152 262.881)",
+        "--nx-color-primary-subtle-hover": "oklch(0.945 0.0273 262.881)",
+      }
+    `);
+    expect(derivePrimary('#2563eb', 'dark')).toMatchInlineSnapshot(`
+      {
+        "--nx-color-border-primary": "oklch(0.385 0.2152 262.881)",
+        "--nx-color-border-primary-active": "oklch(0.553 0.2152 262.881)",
+        "--nx-color-primary-background": "oklch(0.46 0.2152 262.881)",
+        "--nx-color-primary-background-active": "oklch(0.297 0.173 262.881)",
+        "--nx-color-primary-background-hover": "oklch(0.385 0.2152 262.881)",
+        "--nx-color-primary-disabled": "oklch(0.118 0.0687 262.881)",
+        "--nx-color-primary-foreground": "oklch(1 0 0)",
+        "--nx-color-primary-subtle": "oklch(0.118 0.0687 262.881)",
+        "--nx-color-primary-subtle-active": "oklch(0.297 0.173 262.881)",
+        "--nx-color-primary-subtle-foreground": "oklch(0.765 0.1236 262.881)",
+        "--nx-color-primary-subtle-hover": "oklch(0.207 0.1206 262.881)",
+      }
+    `);
   });
 });
 
@@ -100,12 +212,17 @@ describe('derivePrimary', () => {
   });
 });
 
-const CONTRACT: CodexThemeContract = {
-  appearance: 'dark',
+const CONTRACT: ThemeDerivationInput = {
   light: { accent: '#2563eb', background: '#ffffff', foreground: '#0a0a0a' },
   dark: { accent: '#339cff', background: '#181818', foreground: '#ffffff' },
   contrast: 60,
 };
+
+const SURFACE_TONE_SEEDS = {
+  light: { accent: '#2563eb', background: '#ffffff', foreground: '#181818' },
+  dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+  contrast: 60,
+} as const;
 
 describe('deriveTheme', () => {
   it('returns light and dark maps with the core tokens', () => {
@@ -118,11 +235,80 @@ describe('deriveTheme', () => {
     }
   });
 
+  it('derives both modes from seeds alone — no appearance field', () => {
+    // The engine takes ThemeDerivationInput, not the full contract: it always
+    // derives light + dark; the consumer's `appearance` choice selects one at
+    // runtime, outside deriveTheme. This is the engine/preference decoupling.
+    const seedsOnly: ThemeDerivationInput = {
+      surfaceTone: 'slate',
+      light: {
+        accent: '#2563eb',
+        background: '#ffffff',
+        foreground: '#181818',
+      },
+      dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+      contrast: 60,
+    };
+    const { light, dark } = deriveTheme(seedsOnly);
+    expect(light['--nx-color-background']).toBeDefined();
+    expect(dark['--nx-color-background']).toBeDefined();
+    expect(Object.keys(dark)).toEqual(Object.keys(light));
+  });
+
   it('uses the per-theme seed blocks', () => {
     const d = deriveTheme(CONTRACT);
     expect(lOf(d.dark['--nx-color-background'])).toBeLessThan(0.3); // dark seed
     expect(lOf(d.light['--nx-color-background'])).toBeGreaterThan(0.9); // light seed
   });
+
+  it.each(['light', 'dark'] as const)(
+    'moves structure tokens as contrast changes in %s mode',
+    (mode) => {
+      const at = (contrast: number) =>
+        deriveTheme({
+          surfaceTone: 'stone',
+          ...SURFACE_TONE_SEEDS,
+          contrast,
+        })[mode];
+      const soft = at(0);
+      const strong = at(100);
+
+      for (const token of [
+        '--nx-color-nav-border',
+        '--nx-color-nav-item-active',
+        '--nx-color-control-background',
+        '--nx-color-muted',
+        '--nx-color-container-hover',
+      ]) {
+        expect(strong[token], `${mode} ${token}`).not.toBe(soft[token]);
+      }
+    }
+  );
+
+  it.each(['light', 'dark'] as const)(
+    'keeps background-anchored text stable as contrast changes in %s mode',
+    (mode) => {
+      const at = (contrast: number) =>
+        deriveTheme({
+          surfaceTone: 'slate',
+          ...SURFACE_TONE_SEEDS,
+          contrast,
+        })[mode];
+      const soft = at(0);
+      const defaultContrast = at(60);
+      const strong = at(100);
+
+      for (const token of [
+        '--nx-color-foreground',
+        '--nx-color-muted-foreground',
+      ]) {
+        expect(defaultContrast[token], `${mode} ${token} at 60`).toBe(
+          soft[token]
+        );
+        expect(strong[token], `${mode} ${token} at 100`).toBe(soft[token]);
+      }
+    }
+  );
 });
 
 describe('themeToCss', () => {
@@ -131,6 +317,315 @@ describe('themeToCss', () => {
     expect(css).toMatch(/:root\s*\{/);
     expect(css).toMatch(/:root\.dark\s*\{/);
     expect(css).toContain('--nx-color-background:');
+    expect(css).not.toContain('light-dark(');
+  });
+});
+
+describe('deriveSecondary', () => {
+  const secondaryTokens = (map: Record<string, string>) =>
+    Object.fromEntries(
+      Object.entries(map).filter(([key]) =>
+        key.startsWith('--nx-color-secondary-')
+      )
+    );
+
+  it('secondary exactly matches the curated neutral map (both modes)', () => {
+    const { light, dark } = deriveTheme({
+      light: {
+        accent: '#2563eb',
+        background: '#ffffff',
+        foreground: '#181818',
+      },
+      dark: { accent: '#2563eb', background: '#181818', foreground: '#ffffff' },
+      contrast: 60,
+    });
+
+    expect(secondaryTokens(light)).toEqual({
+      '--nx-color-secondary-background': 'oklch(0.945 0 0)',
+      '--nx-color-secondary-background-active': 'oklch(0.765 0 0)',
+      '--nx-color-secondary-background-hover': 'oklch(0.87 0 0)',
+      '--nx-color-secondary-disabled': 'oklch(0.985 0 0)',
+      '--nx-color-secondary-foreground': 'oklch(0.207 0 0)',
+      '--nx-color-secondary-subtle': 'oklch(0.945 0 0)',
+      '--nx-color-secondary-subtle-active': 'oklch(0.765 0 0)',
+      '--nx-color-secondary-subtle-foreground': 'oklch(0.46 0 0)',
+      '--nx-color-secondary-subtle-hover': 'oklch(0.87 0 0)',
+    });
+    expect(secondaryTokens(dark)).toEqual({
+      '--nx-color-secondary-background': 'oklch(0.207 0 0)',
+      '--nx-color-secondary-background-active': 'oklch(0.46 0 0)',
+      '--nx-color-secondary-background-hover': 'oklch(0.385 0 0)',
+      '--nx-color-secondary-disabled': 'oklch(0.118 0 0)',
+      '--nx-color-secondary-foreground': 'oklch(0.945 0 0)',
+      '--nx-color-secondary-subtle': 'oklch(0.297 0 0)',
+      '--nx-color-secondary-subtle-active': 'oklch(0.46 0 0)',
+      '--nx-color-secondary-subtle-foreground': 'oklch(0.87 0 0)',
+      '--nx-color-secondary-subtle-hover': 'oklch(0.385 0 0)',
+    });
+    expect(light['--nx-color-border-secondary']).toBeUndefined();
+    expect(dark['--nx-color-border-secondary']).toBeUndefined();
+  });
+});
+
+describe('status families', () => {
+  const STATUS_HUES = {
+    success: 140.055,
+    warning: 38.402,
+    error: 27.926,
+    information: 255.276,
+  };
+
+  it.each(['light', 'dark'] as const)(
+    'uses curated hues + is APCA-legible on background and subtle in %s mode',
+    (mode) => {
+      const theme = deriveTheme({
+        light: {
+          accent: '#2563eb',
+          background: '#ffffff',
+          foreground: '#181818',
+        },
+        dark: {
+          accent: '#2563eb',
+          background: '#181818',
+          foreground: '#ffffff',
+        },
+        contrast: 60,
+      })[mode];
+
+      for (const [status, hue] of Object.entries(STATUS_HUES)) {
+        expect(
+          hOf(theme[`--nx-color-${status}-background`]),
+          `${status} background hue`
+        ).toBeCloseTo(hue, 0);
+        expect(
+          apcaLc(
+            theme[`--nx-color-${status}-foreground`]!,
+            theme[`--nx-color-${status}-background`]!
+          ),
+          `${status} foreground on background`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+        expect(
+          apcaLc(
+            theme[`--nx-color-${status}-subtle-foreground`]!,
+            theme[`--nx-color-${status}-subtle`]!
+          ),
+          `${status} subtle foreground on subtle`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.ui);
+      }
+    }
+  );
+});
+
+describe('surfaceTone surfaces', () => {
+  it('keeps light base flat while tone tints light paper and stepped surfaces', () => {
+    const slate = deriveTheme({
+      surfaceTone: 'slate',
+      ...SURFACE_TONE_SEEDS,
+    }).light;
+    const neutral = deriveTheme({
+      surfaceTone: 'neutral',
+      ...SURFACE_TONE_SEEDS,
+    }).light;
+
+    expect(slate['--nx-color-container']).toBe(slate['--nx-color-background']);
+    expect(slate['--nx-color-background']).not.toBe(
+      neutral['--nx-color-background']
+    );
+    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.987, 3);
+    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(1, 3);
+    expect(slate['--nx-color-muted']).not.toBe(slate['--nx-color-background']);
+    expect(slate['--nx-color-container-hover']).not.toBe(
+      slate['--nx-color-container']
+    );
+    expect(slate['--nx-color-muted']).not.toBe(neutral['--nx-color-muted']);
+  });
+});
+
+describe('chart colors', () => {
+  // Exact chart values are ground-truthed against color.json in
+  // tone-parity.test.ts (value parity); here we assert structure, not a copy.
+  const OKLCH_RE = /^oklch\([\d.]+ [\d.]+ [\d.]+\)$/;
+
+  const chartTokens = (map: Record<string, string>) =>
+    Array.from(
+      { length: 5 },
+      (_, index) => map[`--nx-color-chart-categorical-${index + 1}`]
+    );
+
+  it('emits 5 valid, mutually distinct chart colors per mode', () => {
+    const { light, dark } = deriveTheme({
+      surfaceTone: 'neutral',
+      ...SURFACE_TONE_SEEDS,
+    });
+    const lightSet = chartTokens(light);
+    const darkSet = chartTokens(dark);
+
+    for (const set of [lightSet, darkSet]) {
+      expect(set).toHaveLength(5);
+      for (const value of set) expect(value).toMatch(OKLCH_RE);
+      expect(new Set(set).size, 'distinct within mode').toBe(5);
+    }
+    // every series is re-toned per mode
+    lightSet.forEach((value, index) =>
+      expect(value, `chart ${index + 1}`).not.toBe(darkSet[index])
+    );
+  });
+});
+
+describe('derived colorblind distinguishability', () => {
+  it.each(['light', 'dark'] as const)(
+    'keeps emitted chart and status colors distinguishable in %s mode',
+    (mode) => {
+      const map = deriveTheme({
+        surfaceTone: 'slate',
+        ...SURFACE_TONE_SEEDS,
+      })[mode];
+
+      expectPairwiseDistinguishable(
+        `${mode} chart`,
+        Object.fromEntries(
+          Array.from({ length: 5 }, (_, index) => [
+            `chart-${index + 1}`,
+            map[`--nx-color-chart-categorical-${index + 1}`]!,
+          ])
+        )
+      );
+      expectPairwiseDistinguishable(`${mode} status`, {
+        success: map['--nx-color-success-background']!,
+        warning: map['--nx-color-warning-background']!,
+        error: map['--nx-color-error-background']!,
+        information: map['--nx-color-information-background']!,
+      });
+    }
+  );
+});
+
+describe('alpha and translucent colors', () => {
+  it('emits tone-ink + contrast-ink alpha tokens with correct L C H alpha in both modes', () => {
+    const { light, dark } = deriveTheme({
+      surfaceTone: 'slate',
+      ...SURFACE_TONE_SEEDS,
+    });
+
+    expect(light['--nx-color-overlay']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.7529)'
+    );
+    expect(dark['--nx-color-overlay']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.8471)'
+    );
+    expect(light['--nx-color-popover-backdrop']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.9098)'
+    );
+    expect(dark['--nx-color-popover-backdrop']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.9098)'
+    );
+    expect(light['--nx-color-border-default-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0941)'
+    );
+    expect(dark['--nx-color-border-default-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.1882)'
+    );
+    expect(light['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
+    );
+    expect(dark['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
+    );
+    expect(light['--nx-color-popover-alpha']).toBe('oklch(1 0 0 / 0.9098)');
+    expect(dark['--nx-color-popover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.8471)'
+    );
+    expect(light['--nx-color-border-default']).toBe(
+      'oklch(0.1448 0 0 / 0.0941)'
+    );
+    expect(dark['--nx-color-border-default']).toBe('oklch(1 0 0 / 0.1882)');
+    expect(light['--nx-color-border-disabled']).toBe(
+      'oklch(0.1448 0 0 / 0.0941)'
+    );
+    expect(dark['--nx-color-border-disabled']).toBe('oklch(1 0 0 / 0.1882)');
+  });
+
+  it('scales default border alpha with contrast, anchored at the curated default', () => {
+    const at = (contrast: number) =>
+      deriveTheme({
+        surfaceTone: 'slate',
+        ...SURFACE_TONE_SEEDS,
+        contrast,
+      });
+
+    expect(at(0).light['--nx-color-border-default']).toBe(
+      'oklch(0.1448 0 0 / 0.06)'
+    );
+    expect(at(0).dark['--nx-color-border-default']).toBe('oklch(1 0 0 / 0.12)');
+    expect(at(0).light['--nx-color-border-disabled']).toBe(
+      'oklch(0.1448 0 0 / 0.06)'
+    );
+    expect(at(0).dark['--nx-color-border-disabled']).toBe(
+      'oklch(1 0 0 / 0.12)'
+    );
+    expect(at(60).light['--nx-color-border-default']).toBe(
+      'oklch(0.1448 0 0 / 0.0941)'
+    );
+    expect(at(60).dark['--nx-color-border-default']).toBe(
+      'oklch(1 0 0 / 0.1882)'
+    );
+    expect(at(60).light['--nx-color-border-default-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0941)'
+    );
+    expect(at(60).dark['--nx-color-border-default-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.1882)'
+    );
+    expect(at(100).light['--nx-color-border-default']).toBe(
+      'oklch(0.1448 0 0 / 0.1168)'
+    );
+    expect(at(100).dark['--nx-color-border-default']).toBe(
+      'oklch(1 0 0 / 0.2337)'
+    );
+    expect(at(100).dark['--nx-color-border-default-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.2337)'
+    );
+    // contrast 30 exercises the sub-anchor lerp branch + toFixed rounding —
+    // every assertion above is an endpoint (0/100) or the c===60 early return.
+    expect(at(30).dark['--nx-color-border-default']).toBe(
+      'oklch(1 0 0 / 0.1541)'
+    );
+    expect(at(30).light['--nx-color-border-default']).toBe(
+      'oklch(0.1448 0 0 / 0.0771)'
+    );
+  });
+
+  it('scales background-hover-alpha with contrast while leaving scrims anchored', () => {
+    const at = (contrast: number) =>
+      deriveTheme({
+        surfaceTone: 'slate',
+        ...SURFACE_TONE_SEEDS,
+        contrast,
+      });
+
+    expect(at(0).light['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.035)'
+    );
+    expect(at(0).dark['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.04)'
+    );
+    expect(at(60).light['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
+    );
+    expect(at(60).dark['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
+    );
+    expect(at(100).light['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.085)'
+    );
+    expect(at(100).dark['--nx-color-background-hover-alpha']).toBe(
+      'oklch(0.13 0.0400 264.7 / 0.09)'
+    );
+    expect(at(0).dark['--nx-color-overlay']).toBe(
+      at(100).dark['--nx-color-overlay']
+    );
+    expect(at(0).dark['--nx-color-popover-alpha']).toBe(
+      at(100).dark['--nx-color-popover-alpha']
+    );
   });
 });
 
@@ -179,41 +674,106 @@ const SWEEP_SEEDS: ReadonlyArray<{
   },
 ];
 
+const DERIVED_FAMILIES = [
+  'primary',
+  'secondary',
+  'success',
+  'warning',
+  'error',
+  'information',
+] as const;
+
+const SURFACE_TONES: readonly SurfaceTone[] = [
+  'stone',
+  'neutral',
+  'zinc',
+  'slate',
+  'gray',
+];
+
+const BASE_CONTRAST_CHECKS: ReadonlyArray<
+  [string, string, keyof typeof TIER_THRESHOLDS]
+> = [
+  ['--nx-color-foreground', '--nx-color-background', 'body'],
+  ['--nx-color-foreground', '--nx-color-background-hover', 'ui'],
+  ['--nx-color-foreground', '--nx-color-muted', 'ui'],
+  ['--nx-color-muted-foreground', '--nx-color-muted', 'incidental'],
+  ['--nx-color-muted-foreground-subtle', '--nx-color-muted', 'incidental'],
+  ['--nx-color-disabled-foreground', '--nx-color-disabled', 'incidental'],
+  ['--nx-color-container-foreground', '--nx-color-container', 'body'],
+  ['--nx-color-popover-foreground', '--nx-color-popover', 'body'],
+  ['--nx-color-popover-foreground', '--nx-color-popover-hover', 'ui'],
+  ['--nx-color-foreground', '--nx-color-control-background', 'ui'],
+  ['--nx-color-foreground', '--nx-color-control-background-hover', 'ui'],
+  ['--nx-color-nav-foreground', '--nx-color-nav-background', 'ui'],
+  [
+    '--nx-color-nav-muted-foreground',
+    '--nx-color-nav-background',
+    'incidental',
+  ],
+  ['--nx-color-nav-foreground', '--nx-color-nav-item-hover', 'ui'],
+  ['--nx-color-nav-foreground', '--nx-color-nav-item-active', 'ui'],
+];
+
 describe('legibility invariant: every text tier clears its APCA floor', () => {
-  it.each(SWEEP_SEEDS)(
+  it.each(
+    SWEEP_SEEDS.flatMap((seed) =>
+      SURFACE_TONES.flatMap((surfaceTone) =>
+        [0, 60, 100].map((contrast) => ({
+          ...seed,
+          surfaceTone,
+          contrast,
+        }))
+      )
+    )
+  )(
     'contract %#',
-    ({ accent, background, foreground, mode }) => {
+    ({ accent, background, foreground, mode, surfaceTone, contrast }) => {
       const seeds = { accent, background, foreground };
-      const contract: CodexThemeContract = {
-        appearance: mode,
+      const contract: ThemeDerivationInput = {
+        surfaceTone,
         light: seeds,
         dark: seeds,
-        contrast: 55,
+        contrast,
       };
       const map = deriveTheme(contract)[mode];
 
       const checks: Array<[string, string, keyof typeof TIER_THRESHOLDS]> = [
-        ['--nx-color-foreground', '--nx-color-background', 'body'],
-        ['--nx-color-container-foreground', '--nx-color-container', 'body'],
-        ['--nx-color-popover-foreground', '--nx-color-popover', 'body'],
-        ['--nx-color-nav-foreground', '--nx-color-nav-background', 'body'],
-        ['--nx-color-muted-foreground', '--nx-color-background', 'ui'],
-        [
-          '--nx-color-muted-foreground-subtle',
-          '--nx-color-background',
-          'incidental',
-        ],
-        [
-          '--nx-color-primary-foreground',
-          '--nx-color-primary-background',
-          'ui',
-        ],
+        ...BASE_CONTRAST_CHECKS,
       ];
+      for (const family of DERIVED_FAMILIES) {
+        checks.push(
+          [
+            `--nx-color-${family}-foreground`,
+            `--nx-color-${family}-background`,
+            'ui',
+          ],
+          [
+            `--nx-color-${family}-subtle-foreground`,
+            `--nx-color-${family}-subtle`,
+            'ui',
+          ]
+        );
+      }
+      for (let index = 1; index <= 5; index += 1) {
+        checks.push(
+          [
+            `--nx-color-chart-categorical-${index}`,
+            '--nx-color-background',
+            'ui',
+          ],
+          [
+            `--nx-color-chart-categorical-${index}`,
+            '--nx-color-container',
+            'ui',
+          ]
+        );
+      }
 
       for (const [fg, bg, tier] of checks) {
         expect(
           apcaLc(map[fg]!, map[bg]!),
-          `${fg} on ${bg}`
+          `${surfaceTone} ${mode}: ${fg} on ${bg}`
         ).toBeGreaterThanOrEqual(TIER_THRESHOLDS[tier]);
       }
     }

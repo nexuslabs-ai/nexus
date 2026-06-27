@@ -35,7 +35,10 @@ import {
   ELEVATION_OPTIONS,
   STROKE_OPTIONS,
 } from '../../../lib/appearance-theme';
-import { sanitizeContract } from '../../../lib/codex-contract';
+import {
+  DEFAULT_SURFACE_TONE,
+  sanitizeContract,
+} from '../../../lib/codex-contract';
 import {
   type CodexPrefs,
   DEFAULT_CODEX_PREFS,
@@ -92,6 +95,7 @@ export function AppearanceSettings({
     useThemeContext();
   const block = editedBlock(codexContract.appearance);
   const seeds = codexContract[block];
+  const selectedBase: Base = codexContract.surfaceTone ?? DEFAULT_SURFACE_TONE;
 
   const setAppearance = (value: string) => {
     if (value === 'light' || value === 'dark' || value === 'system') {
@@ -103,7 +107,6 @@ export function AppearanceSettings({
   };
 
   const setBaseTone = (base: Base) => {
-    setTheme((t) => ({ ...t, base }));
     setCodexContract((contract) => applyBaseTone(contract, base));
   };
 
@@ -163,7 +166,8 @@ export function AppearanceSettings({
     if (!text) return;
     try {
       const parsed: unknown = JSON.parse(text);
-      setCodexContract(sanitizeContract(parsed));
+      const nextContract = sanitizeContract(parsed);
+      setCodexContract(nextContract);
       const prefsField = (parsed as { prefs?: unknown }).prefs;
       if (prefsField) setCodexPrefs(sanitizePrefs(prefsField));
     } catch {
@@ -212,7 +216,7 @@ export function AppearanceSettings({
             description="Neutral surfaces, borders, and muted UI"
           >
             <AxisSelect
-              value={theme.base}
+              value={selectedBase}
               options={BASE_TONE_OPTIONS}
               onValueChange={setBaseTone}
               ariaLabel="Base tone"
@@ -234,7 +238,7 @@ export function AppearanceSettings({
           </AppearanceSettingRow>
           <AppearanceConfigPreview
             contract={codexContract}
-            base={theme.base}
+            base={selectedBase}
             markers={codexPrefs.diffMarkers}
           />
         </CardContent>

@@ -46,7 +46,6 @@ export type SpacingMode = (typeof SPACING_MODES)[number];
 export type RadiusMode = (typeof RADIUS_MODES)[number];
 
 export type ThemeConfig = {
-  base: Base;
   brand: Brand;
   dark: boolean;
   spacing: SpacingMode;
@@ -76,7 +75,6 @@ function loadCSS(href: string, id: string): void {
 const STORAGE_KEY = 'nexus-console-theme';
 
 export const DEFAULT_THEME: ThemeConfig = {
-  base: 'stone',
   brand: 'black',
   dark: false,
   spacing: 'mira',
@@ -85,7 +83,6 @@ export const DEFAULT_THEME: ThemeConfig = {
   borderWidth: 'vega',
 };
 
-const BASE_VALUES = BASES.map((b) => b.value);
 const BRAND_VALUES = BRANDS.map((b) => b.value);
 
 /** Keep `value` only if it's a member of `allowed`; otherwise fall back. */
@@ -106,7 +103,6 @@ function pick<T extends string>(
 function sanitizeTheme(raw: unknown): ThemeConfig {
   const p = (raw ?? {}) as Partial<Record<keyof ThemeConfig, unknown>>;
   return {
-    base: pick(p.base, BASE_VALUES, DEFAULT_THEME.base),
     brand: pick(p.brand, BRAND_VALUES, DEFAULT_THEME.brand),
     dark: typeof p.dark === 'boolean' ? p.dark : DEFAULT_THEME.dark,
     spacing: pick(p.spacing, SPACING_MODES, DEFAULT_THEME.spacing),
@@ -141,10 +137,6 @@ export function useTheme() {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
   }, [theme]);
-
-  useEffect(() => {
-    loadCSS(`/themes/base-${theme.base}.css`, 'base');
-  }, [theme.base]);
 
   useEffect(() => {
     loadCSS(`/themes/brands-${theme.brand}.css`, 'brand');

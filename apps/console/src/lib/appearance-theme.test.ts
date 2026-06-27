@@ -45,6 +45,7 @@ describe('appearance theme helpers', () => {
 
   it('applies the selected neutral base tone to both mode seed blocks', () => {
     const contract = applyBaseTone(DEFAULT_CODEX_CONTRACT, 'slate');
+    expect(contract.surfaceTone).toBe('slate');
     expect(contract.light).toMatchObject(BASE_TONE_SEEDS.slate.light);
     expect(contract.dark).toMatchObject(BASE_TONE_SEEDS.slate.dark);
   });
