@@ -8,5 +8,10 @@ export type {
   NexusResolvedAppearanceMode,
 } from './provider';
 export { NexusAppearanceProvider, useNexusAppearance } from './provider';
+export type {
+  CreateNexusAppearanceOptions,
+  NexusAppearanceScriptProps,
+} from './script';
+export { createNexusAppearance, NexusAppearanceScript } from './script';
 export type { NexusThemeQuickControlProps } from './theme-quick-control';
 export { NexusThemeQuickControl } from './theme-quick-control';

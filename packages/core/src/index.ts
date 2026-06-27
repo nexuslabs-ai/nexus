@@ -5,6 +5,7 @@ export type {
 } from './lib/adjust-contrast';
 export { adjustContrast } from './lib/adjust-contrast';
 export * from './lib/appearance-model';
+export * from './lib/appearance-snapshot';
 export type {
   DerivedTheme,
   NexusSurfaceTone,
