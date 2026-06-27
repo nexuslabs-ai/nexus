@@ -68,7 +68,7 @@
         "react",
         "react-dom"
       ],
-      "limit": "20 kB"
+      "limit": "45 kB"
     }
   ],
   "devDependencies": {

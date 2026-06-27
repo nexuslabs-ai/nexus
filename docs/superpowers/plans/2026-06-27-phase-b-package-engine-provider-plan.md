@@ -673,16 +673,16 @@ Expected: PASS (engine not in the main barrel).
   "name": "@nexus/react/appearance (ESM)",
   "path": "packages/react/dist/appearance.mjs",
   "ignore": ["@nexus/core", "react", "react-dom"],
-  "limit": "20 kB"
+  "limit": "45 kB"
 }
 ```
 
-(`ignore: ['@nexus/core']` because Decision 1 keeps it external; the 20 kB target is provisional — tighten once the UI lands.)
+(`ignore: ['@nexus/core']` because Decision 1 keeps it external. The entry started at 20 kB for the empty Task 8 stub; after Task 10 lands the full editor UI, calibrate this to the measured full-entry size plus modest headroom.)
 
 - [ ] **Step 6: Verify the main barrel budget is unmoved + the new entry passes.**
 
 Run: `pnpm size-limit`
-Expected: `@nexus/react (ESM)` still ≤ 88 kB (assert it did not jump from the entry split — blocker-adjacent B4), `appearance (ESM)` ≤ 20 kB.
+Expected: `@nexus/react (ESM)` still ≤ 88 kB (assert it did not jump from the entry split — blocker-adjacent B4), `appearance (ESM)` ≤ the calibrated budget.
 
 - [ ] **Step 7: Commit.**
 

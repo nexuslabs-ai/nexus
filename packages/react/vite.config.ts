@@ -21,8 +21,8 @@ export default defineConfig({
             filePath: path.resolve(__dirname, 'dist/appearance.d.ts'),
             content: content
               .replace(
-                "export * from './provider';",
-                "export * from './appearance/provider';"
+                /export \* from '\.\/([^']+)';/g,
+                "export * from './appearance/$1';"
               )
               .replace(
                 '//# sourceMappingURL=index.d.ts.map',
