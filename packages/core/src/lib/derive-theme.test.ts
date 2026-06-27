@@ -52,6 +52,27 @@ function toSrgbInts(input: string): [number, number, number] {
   return [channel(rgb.r), channel(rgb.g), channel(rgb.b)];
 }
 
+function compositeOver(
+  foreground: [number, number, number],
+  alpha: number,
+  background: [number, number, number]
+): [number, number, number] {
+  return [
+    Math.round(foreground[0] * alpha + background[0] * (1 - alpha)),
+    Math.round(foreground[1] * alpha + background[1] * (1 - alpha)),
+    Math.round(foreground[2] * alpha + background[2] * (1 - alpha)),
+  ];
+}
+
+function alphaOf(color: string): number {
+  const match = color.match(/\/\s*([0-9.]+)\s*\)/);
+  return match ? Number(match[1]) : 1;
+}
+
+function rgbString([r, g, b]: [number, number, number]): string {
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 function simulatedRgb(
   color: string,
   visionType: (typeof VISION_TYPES)[number]
@@ -736,6 +757,41 @@ const SURFACE_TONES: readonly NexusSurfaceTone[] = [
   'slate',
   'gray',
 ];
+
+describe('popover-alpha worst-case readability', () => {
+  it.each(SURFACE_TONES)(
+    '%s: popover-foreground stays legible over the harshest backdrop',
+    (surfaceTone) => {
+      const { light, dark } = deriveTheme({
+        surfaceTone,
+        ...SURFACE_TONE_SEEDS,
+      });
+
+      const lightSurface = light['--nx-color-popover-alpha']!;
+      const lightBg = compositeOver(
+        toSrgbInts(lightSurface),
+        alphaOf(lightSurface),
+        [0, 0, 0]
+      );
+      const lightLc = Math.abs(
+        apcaLc(light['--nx-color-popover-foreground']!, rgbString(lightBg))
+      );
+
+      const darkSurface = dark['--nx-color-popover-alpha']!;
+      const darkBg = compositeOver(
+        toSrgbInts(darkSurface),
+        alphaOf(darkSurface),
+        [255, 255, 255]
+      );
+      const darkLc = Math.abs(
+        apcaLc(dark['--nx-color-popover-foreground']!, rgbString(darkBg))
+      );
+
+      expect(lightLc, `${surfaceTone} light`).toBeGreaterThanOrEqual(60);
+      expect(darkLc, `${surfaceTone} dark`).toBeGreaterThanOrEqual(60);
+    }
+  );
+});
 
 const BASE_CONTRAST_CHECKS: ReadonlyArray<
   [string, string, keyof typeof TIER_THRESHOLDS]
