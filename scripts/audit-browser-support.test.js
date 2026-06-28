@@ -61,12 +61,16 @@ describe('audit-browser-support', () => {
     const viewportHeightUnits = FEATURE_POLICIES.find(
       (feature) => feature.id === 'viewport-height-units'
     );
+    const backdropFilter = FEATURE_POLICIES.find(
+      (feature) => feature.id === 'backdrop-filter'
+    );
     const popover = FEATURE_POLICIES.find(
       (feature) => feature.id === 'popover-api'
     );
 
     expect(isFeatureSafeAtFloor(oklch)).toBe(true);
     expect(isFeatureSafeAtFloor(viewportHeightUnits)).toBe(true);
+    expect(isFeatureSafeAtFloor(backdropFilter)).toBe(true);
     expect(isFeatureSafeAtFloor(popover)).toBe(false);
   });
 
@@ -103,6 +107,12 @@ describe('audit-browser-support', () => {
         }),
         expect.objectContaining({
           id: 'viewport-height-units',
+          policy: 'adopt',
+          floorSafe: true,
+          problem: null,
+        }),
+        expect.objectContaining({
+          id: 'backdrop-filter',
           policy: 'adopt',
           floorSafe: true,
           problem: null,

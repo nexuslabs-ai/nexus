@@ -8,6 +8,7 @@
  * (and thus override / stale-out) a consumer's tokens.
  */
 @import 'tailwindcss' prefix(nx);
+@custom-variant reduce-transparency (@media (prefers-reduced-transparency: reduce));
 @reference '@nexus/tailwind';
 @import 'tw-animate-css';
 @import './components/ui/progress/progress.css';

@@ -197,7 +197,7 @@
   );
   --color-popover-alpha: var(
     --nx-color-popover-alpha,
-    var(--nx-color-white-a900)
+    var(--nx-color-white-a700)
   );
   --color-popover-backdrop: var(
     --nx-color-popover-backdrop,
@@ -588,7 +588,7 @@
   );
   --color-popover-alpha: var(
     --nx-color-popover-alpha,
-    var(--nx-color-white-a900)
+    var(--nx-color-white-a700)
   );
   --color-popover-backdrop: var(
     --nx-color-popover-backdrop,
@@ -941,7 +941,7 @@
   --nx-color-popover-foreground: var(--nx-color-white-base);
   --nx-color-popover-hover: var(--nx-color-stone-700);
   --nx-color-popover-active: var(--nx-color-stone-800);
-  --nx-color-popover-alpha: var(--nx-color-stone-a800);
+  --nx-color-popover-alpha: var(--nx-color-stone-a700);
   --nx-color-popover-backdrop: var(--nx-color-stone-a900);
   --nx-color-control-background: var(--nx-color-stone-800);
   --nx-color-control-background-hover: var(--nx-color-stone-700);

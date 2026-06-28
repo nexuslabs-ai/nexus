@@ -3,6 +3,10 @@ import * as React from 'react';
 import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu';
 import { cva } from 'class-variance-authority';
 
+import {
+  navigationMenuInlinePopoverSurfaceClassName,
+  popoverSurfaceClassName,
+} from '@/components/ui/overlay-layout/overlay-layout';
 import { IconChevronDown } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -186,10 +190,8 @@ function NavigationMenuContent({
         'nx:@md/navmenu:absolute nx:@md/navmenu:w-auto',
         'nx:group-data-[viewport=false]/navigation-menu:top-full',
         'nx:group-data-[viewport=false]/navigation-menu:mt-1.5',
-        'nx:group-data-[viewport=false]/navigation-menu:overflow-hidden nx:group-data-[viewport=false]/navigation-menu:rounded-md',
-        'nx:group-data-[viewport=false]/navigation-menu:border nx:group-data-[viewport=false]/navigation-menu:border-border-default',
-        'nx:group-data-[viewport=false]/navigation-menu:bg-popover nx:group-data-[viewport=false]/navigation-menu:text-popover-foreground',
-        'nx:group-data-[viewport=false]/navigation-menu:shadow-lg',
+        'nx:group-data-[viewport=false]/navigation-menu:overflow-hidden',
+        navigationMenuInlinePopoverSurfaceClassName,
         'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-out nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:zoom-out-95',
         'nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-in nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:zoom-in-95',
         'nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:duration-default nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:ease-enter',
@@ -229,7 +231,7 @@ function NavigationMenuViewport({
         data-slot="navigation-menu-viewport"
         className={cn(
           'nx:origin-top-center nx:relative nx:mt-1.5 nx:h-(--radix-navigation-menu-viewport-height) nx:w-full nx:overflow-hidden',
-          'nx:rounded-md nx:border nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:shadow-lg',
+          popoverSurfaceClassName,
           'nx:data-[state=closed]:animate-out nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:animate-in nx:data-[state=open]:zoom-in-90',
           'nx:data-[state=open]:duration-default nx:data-[state=open]:ease-enter',
           'nx:data-[state=closed]:duration-fast nx:data-[state=closed]:ease-exit',

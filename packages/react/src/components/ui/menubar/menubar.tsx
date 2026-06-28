@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as MenubarPrimitive from '@radix-ui/react-menubar';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { popoverSurfaceClassName } from '@/components/ui/overlay-layout/overlay-layout';
 import { IconCheck, IconChevronRight, IconCircleFilled } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -177,8 +178,8 @@ function MenubarSubContent({ className, ...props }: MenubarSubContentProps) {
       data-slot="menubar-sub-content"
       className={cn(
         'nx:z-popover nx:min-w-32 nx:overflow-hidden',
-        'nx:rounded-md nx:border nx:border-border-default',
-        'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
+        popoverSurfaceClassName,
+        'nx:p-1',
         'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
         'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
         'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
@@ -234,8 +235,8 @@ function MenubarContent({
         sideOffset={sideOffset}
         className={cn(
           'nx:z-popover nx:min-w-48 nx:overflow-hidden',
-          'nx:rounded-md nx:border nx:border-border-default',
-          'nx:bg-popover nx:p-1 nx:text-popover-foreground nx:shadow-lg',
+          popoverSurfaceClassName,
+          'nx:p-1',
           'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
           'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
           'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',

@@ -202,7 +202,7 @@
   );
   --color-popover-alpha: var(
     --nx-color-popover-alpha,
-    var(--nx-color-white-a900)
+    var(--nx-color-white-a700)
   );
   --color-popover-backdrop: var(
     --nx-color-popover-backdrop,
@@ -573,7 +573,7 @@
   );
   --color-popover-alpha: var(
     --nx-color-popover-alpha,
-    var(--nx-color-white-a900)
+    var(--nx-color-white-a700)
   );
   --color-popover-backdrop: var(
     --nx-color-popover-backdrop,
