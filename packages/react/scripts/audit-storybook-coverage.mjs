@@ -352,7 +352,11 @@ export function extractCvaEnums(src) {
     const remainder = argsRegion.slice(firstArgEnd).trimStart();
     if (!remainder.startsWith(',')) continue;
     const configStart =
-      call.start + 1 + firstArgEnd + (argsRegion.slice(firstArgEnd).length - remainder.length) + 1;
+      call.start +
+      1 +
+      firstArgEnd +
+      (argsRegion.slice(firstArgEnd).length - remainder.length) +
+      1;
     // Find the next `{` from configStart that is the config object
     let i = configStart;
     while (i < call.end && /\s/.test(src[i])) i++;
@@ -582,8 +586,9 @@ export function findComponentFile(kebab, root = COMPONENTS_ROOT) {
   if (matches.length === 0) {
     throw new ConfigError(
       `component "${kebab}" not found under ${searchRoots
-        .map(({ root, sourceDirs }) =>
-          `${path.relative(REPO_ROOT, root)}/{${sourceDirs.join(',')}}/`
+        .map(
+          ({ root, sourceDirs }) =>
+            `${path.relative(REPO_ROOT, root)}/{${sourceDirs.join(',')}}/`
         )
         .join(' or ')}`
     );
@@ -911,7 +916,10 @@ export function auditComponent(componentFile, opts = {}) {
 
   // ── Required stories (canonical + component-scoped equivalents) ───────────
   const entry = configEntryFor(pascal);
-  const interactiveRequirements = interactionRequirementsFor(entry, isInteractive);
+  const interactiveRequirements = interactionRequirementsFor(
+    entry,
+    isInteractive
+  );
   const requiredNames = [
     ...BASE_REQUIREMENTS,
     ...interactiveRequirements,
@@ -1003,7 +1011,8 @@ export function auditComponent(componentFile, opts = {}) {
         kind: 'missing',
         rule: 'as-child',
         name: 'asChild story',
-        expected: 'a story rendering the component with `asChild` to verify composition',
+        expected:
+          'a story rendering the component with `asChild` to verify composition',
         snippet: snippetFor('asChild'),
       });
     }
@@ -1023,7 +1032,8 @@ export function auditComponent(componentFile, opts = {}) {
       kind: 'info',
       rule: 'compound-component',
       name: `${cvaCount} CVA blocks`,
-      found: 'compound component — CVA enums unioned across blocks for the audit',
+      found:
+        'compound component — CVA enums unioned across blocks for the audit',
     });
   }
 
@@ -1036,8 +1046,12 @@ function capitalize(s) {
 }
 
 function finalize(result) {
-  result.summary.missing = result.findings.filter((f) => f.kind === 'missing').length;
-  result.summary.drift = result.findings.filter((f) => f.kind === 'drift').length;
+  result.summary.missing = result.findings.filter(
+    (f) => f.kind === 'missing'
+  ).length;
+  result.summary.drift = result.findings.filter(
+    (f) => f.kind === 'drift'
+  ).length;
   result.summary.info = result.info.length;
   result.summary.total = result.findings.length;
 }
@@ -1130,9 +1144,10 @@ function main() {
   } else {
     // Accept Pascal or kebab; canonicalize to kebab for filesystem lookup.
     const input = args.component;
-    const kebab = input.includes('-') || input === input.toLowerCase()
-      ? input
-      : pascalToKebab(input);
+    const kebab =
+      input.includes('-') || input === input.toLowerCase()
+        ? input
+        : pascalToKebab(input);
     files = [findComponentFile(kebab)];
   }
 
