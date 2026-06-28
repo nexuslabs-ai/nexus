@@ -217,7 +217,9 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "${{ needs.changes.outputs.ci }}" = "true" ]; then
+            pnpm turbo build
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
             pnpm turbo build --filter="...[origin/$BASE_REF]"
           else
             pnpm turbo build
@@ -276,7 +278,9 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "${{ needs.changes.outputs.ci }}" = "true" ]; then
+            pnpm turbo typecheck
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
             pnpm turbo typecheck --filter="...[origin/$BASE_REF]"
           else
             pnpm turbo typecheck
