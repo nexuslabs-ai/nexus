@@ -5,6 +5,7 @@ import {
   diffLeaves,
   DISTINCTNESS_ALLOWLIST,
   findViolations,
+  leafValues,
 } from '../mode-distinctness.js';
 
 const px = (value) => ({ value, unit: 'px' });
@@ -14,6 +15,22 @@ describe('mode-distinctness core', () => {
     const a = { 'container.p': px(24), 'container.gap': px(16) };
     const b = { 'container.p': px(22), 'container.gap': px(16) };
     expect(diffLeaves(a, b)).toEqual(['container.p']);
+  });
+
+  it('leafValues flattens DTCG leaves to dotted paths', () => {
+    expect(
+      leafValues({
+        spacing: {
+          4: { $value: px(16), $type: 'dimension' },
+        },
+        container: {
+          p: { $value: px(24), $type: 'dimension' },
+        },
+      })
+    ).toEqual({
+      'container.p': px(24),
+      'spacing.4': px(16),
+    });
   });
 
   it('comparePairs flags an identical pair with 0 differing leaves', () => {
