@@ -1,5 +1,8 @@
 import js from '@eslint/js';
-import nexusPlugin from '@nexus/eslint-plugin';
+import {
+  nexusComponentConfig,
+  nexusSpacingTokenConfig,
+} from '@nexus/eslint-plugin/config';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
@@ -223,14 +226,7 @@ export default tseslint.config(
   // gitignored __generated__ base-variant stories are excluded (global ignore).
   {
     files: ['packages/react/src/**/*.{ts,tsx}', 'apps/**/*.{ts,tsx}'],
-    plugins: {
-      '@nexus': nexusPlugin,
-    },
-    rules: {
-      '@nexus/nx-class-conventions': 'error',
-      '@nexus/no-render-prop-types': 'error',
-      '@nexus/no-multi-statement-jsx-handler': 'error',
-    },
+    ...nexusComponentConfig(),
   },
 
   // Tests and stories assert known fixture invariants (queried elements, seeded
@@ -246,15 +242,7 @@ export default tseslint.config(
   // Nexus: gate px values in spacing mode files to the canonical step set.
   {
     files: ['packages/core/tokens/semantic/spacing-*.json'],
-    languageOptions: {
-      parser: jsoncParser,
-    },
-    plugins: {
-      '@nexus': nexusPlugin,
-    },
-    rules: {
-      '@nexus/canonical-spacing-steps': 'error',
-    },
+    ...nexusSpacingTokenConfig({ parser: jsoncParser }),
   },
 
   // Disable rules that conflict with Prettier
