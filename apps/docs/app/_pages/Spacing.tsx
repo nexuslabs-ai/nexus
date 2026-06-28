@@ -50,7 +50,7 @@ const MODES: { mode: string; archetype: string }[] = [
     mode: 'regular',
     archetype: 'Standard scale — the @theme numeric baseline',
   },
-  { mode: 'relaxed', archetype: 'Comfortable / editorial' },
+  { mode: 'relaxed', archetype: 'Editorial / airy' },
   { mode: 'tight', archetype: '≈ regular' },
   {
     mode: 'default ★',

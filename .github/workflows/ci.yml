@@ -294,8 +294,10 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: changes
+    # Runs the whole unit suite (packages + apps), so gate on `browser_source`
+    # (apps/** + packages/**), not `react` which intentionally excludes apps/.
     if: >-
-      needs.changes.outputs.react == 'true' ||
+      needs.changes.outputs.browser_source == 'true' ||
       needs.changes.outputs.browser == 'true' ||
       needs.changes.outputs.ci == 'true'
     steps:
@@ -321,9 +323,10 @@ jobs:
     name: Audit Tokens
     runs-on: ubuntu-latest
     needs: changes
-    # Gate on `packages` (not `react`): the freshness check covers
-    # apps/console/** and audit:class-refs scans apps/** sources.
-    if: needs.changes.outputs.packages == 'true' || needs.changes.outputs.ci == 'true'
+    # Gate on `browser_source` (apps/** + packages/**): the freshness check
+    # and the audit:class-refs / audit:mode-codenames steps scan apps/**
+    # sources — including apps/docs, which the `packages` filter excludes.
+    if: needs.changes.outputs.browser_source == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

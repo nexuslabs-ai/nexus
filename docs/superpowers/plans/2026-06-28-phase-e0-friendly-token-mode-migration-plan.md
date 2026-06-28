@@ -1199,7 +1199,7 @@ In root `package.json` `lint-staged`, extend the token-file globs to also run th
 
 - [ ] **Step 3: Add the post-cutover value-list exclusion**
 
-PR-1's drift guard binds the public value-lists to `MODE_RENAME` (catches typos/unmapped names) but, by construction, **cannot** assert "no value is a retired codename" pre-migration (the values _are_ codenames until the cutover). Now that the repo is friendly, close that half: extend `mode-rename-map.test.js`'s value-list binding (and the docs `theme-modes.test.ts` guard) with an exclusion assertion — every `appearance-model.ts` OPTIONS/DEFAULT value and every docs `THEME_MODE_VALUES` entry is **not** in `RETIRED_CODENAMES`:
+PR-1's drift guard binds the public value-lists to `MODE_RENAME` via `expectModeCovered`, which accepts the codename∪friendly **union** — so a leftover codename still passes. Now that the repo is friendly, close that half: extend `mode-rename-map.test.js`'s value-list binding with an exclusion assertion — every `appearance-model.ts` OPTIONS/DEFAULT value is **not** in `RETIRED_CODENAMES`. (The docs `theme-modes.test.ts` needs **no** separate exclusion: its existing "keeps THEME_MODE_VALUES in sync with the shipped core token modes" test already asserts set-**equality** with the friendly token filenames, which is strictly stronger — a codename has no token file, so it fails that guard.)
 
 ```js
 // in the existing "binds the public appearance-model value-lists" test

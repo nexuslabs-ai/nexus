@@ -18,18 +18,6 @@ import {
 } from './theme-modes';
 
 const docsRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const RETIRED_TOKEN_MODE_CODENAMES = new Set([
-  'blunt',
-  'luma',
-  'lyra',
-  'maia',
-  'mellow',
-  'mira',
-  'nova',
-  'sera',
-  'sharp',
-  'vega',
-]);
 
 describe('docs theme modes', () => {
   it('keeps valid theme state values', () => {
@@ -119,17 +107,6 @@ describe('docs theme modes', () => {
       expect(new Set<string>(THEME_MODE_VALUES[family]), family).toEqual(
         tokenModes[family]
       );
-    }
-  });
-
-  it('keeps docs theme mode values free of retired token-mode codenames', () => {
-    for (const [family, values] of Object.entries(THEME_MODE_VALUES)) {
-      for (const value of values) {
-        expect(
-          RETIRED_TOKEN_MODE_CODENAMES.has(value),
-          `${family}:${value} must be a friendly mode`
-        ).toBe(false);
-      }
     }
   });
 
