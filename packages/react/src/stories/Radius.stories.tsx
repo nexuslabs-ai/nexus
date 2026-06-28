@@ -131,7 +131,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Border radius and border width primitive scales. Each mode (radius: blunt/mellow/sharp/smooth/subtle; borderwidth: vega/lyra/maia/mira/nova) produces a different scale; the bundled mode is the one @nexus/tailwind currently ships with — see packages/core/package.json#scripts.build:tailwind.',
+          'Border radius and border width primitive scales. Each mode (radius: square/subtle/smooth/round/extra-round; borderwidth: normal/medium/fine/bold/strong) produces a different scale; the bundled mode is the one @nexus/tailwind currently ships with — see packages/core/package.json#scripts.build:tailwind.',
       },
     },
   },

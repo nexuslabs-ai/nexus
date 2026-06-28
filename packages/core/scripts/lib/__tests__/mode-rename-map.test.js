@@ -118,8 +118,18 @@ describe('mode-rename-map', () => {
       borderwidth: DEFAULT_NEXUS_APPEARANCE.stroke,
     };
     for (const [family, options] of Object.entries(optionsByFamily)) {
-      for (const { value } of options) expectModeCovered(family, value);
+      for (const { value } of options) {
+        expectModeCovered(family, value);
+        expect(
+          RETIRED_CODENAMES,
+          `${family} option ${value} must be a friendly mode`
+        ).not.toContain(value);
+      }
       expectModeCovered(family, defaultByFamily[family]);
+      expect(
+        RETIRED_CODENAMES,
+        `${family} default must be a friendly mode`
+      ).not.toContain(defaultByFamily[family]);
     }
   });
 });

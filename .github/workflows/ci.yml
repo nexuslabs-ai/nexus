@@ -390,6 +390,10 @@ jobs:
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: pnpm --filter @nexus/core audit:class-refs
 
+      - name: Token-mode codename audit
+        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
+        run: pnpm audit:mode-codenames
+
   test-react:
     name: Test (React)
     runs-on: ubuntu-latest

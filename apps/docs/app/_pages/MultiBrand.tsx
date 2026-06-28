@@ -24,18 +24,18 @@ const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
   },
   {
     dim: 'Spacing (density)',
-    options: '7 modes — nova · vega · maia · …',
+    options: '7 modes — compact · default · comfortable · …',
     swap: 'data-style attr',
   },
   { dim: 'Shadow', options: '5 modes', swap: '<link> swap' },
   {
     dim: 'Radius',
-    options: 'sharp · subtle · smooth · mellow · blunt',
+    options: 'square · subtle · smooth · round · extra-round',
     swap: '<link> swap',
   },
   {
     dim: 'Border width',
-    options: '3 designs (vega · maia · nova)',
+    options: '3 designs (normal · fine · strong)',
     swap: '<link> swap',
   },
   { dim: 'Dark mode', options: 'light · dark', swap: '.dark class' },
@@ -171,7 +171,7 @@ export function MultiBrand() {
 }
 
 /* density on a subtree */
-<section data-style="nova"> … compact … </section>`}
+<section data-style="compact"> … compact … </section>`}
         </pre>
       </section>
 
