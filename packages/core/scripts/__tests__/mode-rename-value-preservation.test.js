@@ -39,6 +39,7 @@ const LOCATION = {
   ],
 };
 const SHADOW_DIR = path.join(TOKENS, 'primitives', 'shadow');
+const PUBLIC_SHADOW_MODES = new Set(['quiet', 'standard', 'strong']);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -90,10 +91,10 @@ describe('token-mode rename preserves migration values', () => {
             Object.keys(expected).sort()
           );
 
-          if (variant === 'dark') {
+          if (variant === 'dark' && PUBLIC_SHADOW_MODES.has(friendly)) {
             // #558 intentionally recalibrates dark shadow colour leaves after
-            // the codename migration. Geometry still proves the rename did not
-            // mutate the shadow recipe shape.
+            // the codename migration for public Appearance modes. Geometry still
+            // proves the rename did not mutate the shadow recipe shape.
             expect(withoutColorLeaves(actual)).toEqual(
               withoutColorLeaves(expected)
             );
