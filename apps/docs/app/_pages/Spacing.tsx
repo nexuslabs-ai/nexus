@@ -45,13 +45,20 @@ const ROLES: { token: string; px: string; use: string }[] = [
 ];
 
 const MODES: { mode: string; archetype: string }[] = [
-  { mode: 'nova', archetype: 'Compact / tool' },
-  { mode: 'vega ★', archetype: 'Standard — the default, bundled mode' },
-  { mode: 'maia', archetype: 'Comfortable / editorial' },
-  { mode: 'lyra', archetype: '≈ vega' },
-  { mode: 'mira', archetype: '≈ vega (byte-identical)' },
-  { mode: 'luma', archetype: 'Density variant' },
-  { mode: 'sera', archetype: 'Density variant' },
+  { mode: 'compact', archetype: 'Compact / tool' },
+  {
+    mode: 'regular',
+    archetype: 'Standard scale — the @theme numeric baseline',
+  },
+  { mode: 'relaxed', archetype: 'Editorial / airy' },
+  { mode: 'tight', archetype: '≈ regular' },
+  {
+    mode: 'default ★',
+    archetype:
+      'Bundled :root default (no data-style) — byte-identical to regular',
+  },
+  { mode: 'comfortable', archetype: 'Density variant' },
+  { mode: 'spacious', archetype: 'Density variant' },
 ];
 
 export function Spacing() {
@@ -111,7 +118,7 @@ export function Spacing() {
           Components don&rsquo;t reach for raw steps — they consume these
           semantic roles (e.g. a button&rsquo;s padding). Because the roles map
           onto the active density mode, swapping Size rescales whole components,
-          not just bare utilities. Values shown are the vega defaults.
+          not just bare utilities. Values shown are the regular baseline.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
@@ -152,7 +159,7 @@ export function Spacing() {
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           Every build ships all seven. Swapping the &ldquo;Size&rdquo; control
           in the theme picker rescales the whole page live. Note{' '}
-          <code>mira</code> is byte-identical to <code>vega</code>.
+          <code>default</code> is byte-identical to <code>regular</code>.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">

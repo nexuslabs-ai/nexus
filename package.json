@@ -24,6 +24,7 @@
     "audit:browser-support": "node scripts/audit-browser-support.js",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",
     "audit:contrast": "pnpm --filter @nexus/core audit:contrast",
+    "audit:mode-codenames": "pnpm --filter @nexus/core audit:mode-codenames",
     "audit:storybook-coverage": "pnpm --filter @nexus/react audit:storybook-coverage",
     "validate:spacing-modes": "pnpm --filter @nexus/core validate:spacing-modes",
     "console": "cd apps/console && pnpm dev",
@@ -127,6 +128,9 @@
     ],
     "packages/core/tokens/primitives/{radius,borderwidth,shadow}/*.json": [
       "pnpm validate:spacing-modes"
+    ],
+    "packages/core/tokens/**/*.json": [
+      "pnpm audit:mode-codenames"
     ]
   },
   "pnpm": {

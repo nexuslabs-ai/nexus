@@ -1116,35 +1116,59 @@ git commit -m "test(core): prove token-mode rename preserved values + flipped se
 
 > The functional docs theme infra (`theme-modes.ts`, `layout.tsx`) already migrated in PR-2. This PR finishes consumer-facing **content**, turns the audit into a gate, and does visual QA.
 
+> **Completion oracle — "audit clean" ≠ "prose clean".** `audit:mode-codenames` is context-scoped: it matches only literal `data-{family}="codename"`, generated selectors, `/themes/*.css` hrefs, and token filenames. It is **blind to free-string prose, JS map-keys, and `data-testid` suffixes** — the exact surfaces this PR cleans. So a green audit proves the load-bearing DOM/CSS is migrated, **not** that the docs read correctly. PR-3 is done only when **all three** hold: (a) `audit:mode-codenames` clean (load-bearing), (b) `test:storybook` green (behavioral — per-mode play functions), and (c) human review of the four known prose files (Task 3.2). A grep is a _pointer_ for that review, **never a gate** — it would flag the rename map, the value fixture, the normalizer tests, and this plan itself (all legitimately retain codenames).
+
 ### Task 3.1: Update docs prose and example pages
 
 **Files:** `apps/docs/app/_pages/Spacing.tsx`, `apps/docs/app/_pages/MultiBrand.tsx`, `apps/docs/app/_pages/Radius.tsx`
 
 - [ ] **Step 1: Update the example codenames to friendly**
 
-- `Spacing.tsx` `MODES` array: replace codename `mode` strings with friendly names + restate archetypes (`compact`, `default ★ — the bundled default`, `comfortable`, `tight (≈ regular)`, `default (≈ regular, byte-identical)` notes rephrased to friendly); update the inline `<code>mira</code>`/`<code>vega</code>` prose to `<code>default</code>`/`<code>regular</code>`.
+- `Spacing.tsx` `MODES` array (7 rows, `apps/docs/app/_pages/Spacing.tsx:47-54`): rename in place, **same row order**, codename → friendly: `nova→compact`, `vega→regular`, `maia→relaxed`, `lyra→tight`, `mira→default`, `luma→comfortable`, `sera→spacious`.
+
+  **⚠️ Correctness — the `★`/"bundled" marker is a _semantic_ move, not a mechanical rename.** Today `★` sits on the `vega` row (`'vega ★'`, archetype `'Standard — the default, bundled mode'`). A find-replace would land it on `regular` — **wrong.** The `:root`/bundled mode is `default` (←`mira`): `packages/core/package.json` ships `--spacingDefault=default`, and `regular` (←`vega`) is only `CANONICAL_SPACING_DEFAULT_MODE`, the `@theme` numeric baseline (`utils.js:243,752`). `spacing-default.json` and `spacing-regular.json` are byte-identical (verified), so the values match but the **label must follow the flag**. Result archetypes:
+  - `regular` → `'Standard scale — the @theme numeric baseline'` (drop `★`, drop "bundled")
+  - `default ★` → `'Bundled :root default (no data-style) — byte-identical to regular'` (move `★` here)
+  - `tight` → `'≈ regular'` (was `'≈ vega'`)
+  - `compact`/`relaxed`/`comfortable`/`spacious` keep their existing archetype prose.
+
+  Also fix the two free-string prose lines the rename map misses: `Spacing.tsx:114` `'Values shown are the vega defaults.'` → `'Values shown are the regular baseline.'`; `Spacing.tsx:155` `<code>mira</code> is byte-identical to <code>vega</code>` → `<code>default</code> is byte-identical to <code>regular</code>`.
+
 - `MultiBrand.tsx` `DIMENSIONS`: spacing options `'7 modes — compact · default · comfortable · …'`; radius `'square · subtle · smooth · round · extra-round'`; border `'3 designs (normal · fine · strong)'`; and the code example `<section data-style="nova">` → `<section data-style="compact">`.
 - `Radius.tsx` `RADIUS_MODES` → `square/subtle/smooth/round/extra-round`; `BORDER_DESIGNS` → `normal/fine/strong`; prose "lyra and mira are byte-identical to vega" → "medium and bold are byte-identical to normal".
 
 - [ ] **Step 2: Verify docs typecheck**
 
 Run: `pnpm --filter @nexus/docs typecheck` (or `cd apps/docs && pnpm typecheck`)
-Expected: PASS — the `THEME_MODE_OPTIONS`/`THEME_STYLESHEET_HREFS` types (migrated in PR-2) now require friendly literals, so any missed codename in these pages surfaces as a type error.
+Expected: PASS. Typecheck catches a stale codename **only where it flows into a friendly-typed surface** — `THEME_MODE_OPTIONS` / `THEME_STYLESHEET_HREFS` references (migrated in PR-2). It does **not** catch the local `MODES` / `RADIUS_MODES` / `BORDER_DESIGNS` / `DIMENSIONS` arrays edited in Step 1: those are typed `{ mode: string; … }[]`, so a missed `'vega'` is a valid `string` and passes typecheck **and** the audit. Those rows are verified by human review (read the rendered table) — not by a gate. This is why Step 1 lists exact line numbers.
 
 - [ ] **Step 3: Commit** — `git add -A && git commit -m "docs: switch Appearance example pages to friendly token-mode names (#546)"`
 
-### Task 3.2: Sweep stories and remaining source
+### Task 3.2: Sweep stories and remaining source for audit-invisible codenames
 
-**Files:** any `*.stories.tsx` / source under `packages/react/src`, `apps/console` referencing modes.
+**Files:** `packages/react/src/stories/Radius.stories.tsx` (and any sibling story JSDoc); `apps/console` is model-driven, so expect it clean.
 
-- [ ] **Step 1: Run the audit to find remaining load-bearing codenames**
+> By this point Task 3.1 has cleared the only audit-**visible** residual (`MultiBrand.tsx:174`), so `audit:mode-codenames` already reports clean. The work here is the codenames the audit **cannot** see — story `component:` descriptions and JSDoc prose (see the PR-3 callout). Find them by reading the known file below, not by re-running the audit.
 
-Run: `pnpm --filter @nexus/core audit:mode-codenames`
-Expected: zero or a short list. For each hit, replace the codename with its family-friendly name. (Console gets its modes from the migrated model, so it should be clean; this catches any hardcoded `data-style="…"` in stories or fixtures.)
+- [ ] **Step 1: Fix the known story prose**
 
-- [ ] **Step 2: Re-run to confirm clean** — `pnpm --filter @nexus/core audit:mode-codenames` → `✅ No retired token-mode codenames`.
+`Radius.stories.tsx` `meta.parameters.docs.description.component` (`packages/react/src/stories/Radius.stories.tsx:134`) lists raw token modes by codename:
+`'… (radius: blunt/mellow/sharp/smooth/subtle; borderwidth: vega/lyra/maia/mira/nova) …'`
+→ friendly, **keeping all 5 radius + all 5 borderwidth modes**. This is the raw token-mode list, **not** the 3-design list — do **not** collapse borderwidth to `normal/fine/strong` here (that framing belongs only to `Radius.tsx` `BORDER_DESIGNS` and MultiBrand):
+`'… (radius: square/subtle/smooth/round/extra-round; borderwidth: normal/medium/fine/bold/strong) …'`
+(`blunt→extra-round`, `mellow→round`, `sharp→square`; `vega→normal`, `lyra→medium`, `maia→fine`, `mira→bold`, `nova→strong`.)
 
-- [ ] **Step 3: Commit (if anything changed)** — `git add -A && git commit -m "refactor: replace remaining token-mode codenames in stories/source (#546)"`
+- [ ] **Step 2: Grep as a pointer (not a gate) for sibling prose**
+
+Run: `git grep -nE '\b(nova|vega|maia|lyra|mira|luma|sera|sharp|mellow|blunt)\b' -- packages/react/src apps/docs`
+Triage each hit by hand. Replace only codenames that name a **live mode** to a reader; leave the legitimately-retained ones (rename map, value fixtures, normalizer tests — see the PR-3 callout). This grep is a pointer for review, not a CI gate.
+
+- [ ] **Step 3: Prove completion — the triad (see the PR-3 callout)**
+  - `pnpm --filter @nexus/core audit:mode-codenames` → `✅ No retired token-mode codenames` (load-bearing DOM/CSS).
+  - `pnpm test:storybook` → green (behavioral; per-mode play functions — the only gate that catches `data-style` / testid / map-key drift).
+  - Human review: re-read the rendered tables/descriptions in `Spacing.tsx`, `Radius.tsx`, `MultiBrand.tsx`, `Radius.stories.tsx` — no codename names a live mode.
+
+- [ ] **Step 4: Commit (if anything changed)** — `git add -A && git commit -m "refactor: replace remaining token-mode codenames in stories/source (#546)"`
 
 ### Task 3.3: Promote the audit to a blocking gate
 
@@ -1160,6 +1184,8 @@ Add `audit:mode-codenames` to the root `package.json` audit scripts:
 
 Add it to the CI job that runs the other `audit:*` checks (mirror how `audit:contrast` / `audit:agent-drift` are invoked in `.github/workflows`). Confirm the workflow step runs `pnpm audit:mode-codenames`.
 
+> The gate is **position-scoped** (literal `data-{family}="codename"` / selectors / hrefs / token filenames). The codenames that legitimately remain — `MODE_RENAME` / `RETIRED_CODENAMES` in the rename map, the pre-rename value fixture, and the `sanitizeNexusAppearance({density:'nova'})` normalizer tests — are bare strings / map-keys, so they are invisible **by construction** and will not trip the gate. They need **no allowlist entry**; do not add one (an over-broad allowlist would blind the gate to a real reintroduction in those paths).
+
 - [ ] **Step 2: Add a pre-commit guard for token files**
 
 In root `package.json` `lint-staged`, extend the token-file globs to also run the audit (cheap, catches a reintroduced codename at commit time):
@@ -1173,7 +1199,7 @@ In root `package.json` `lint-staged`, extend the token-file globs to also run th
 
 - [ ] **Step 3: Add the post-cutover value-list exclusion**
 
-PR-1's drift guard binds the public value-lists to `MODE_RENAME` (catches typos/unmapped names) but, by construction, **cannot** assert "no value is a retired codename" pre-migration (the values _are_ codenames until the cutover). Now that the repo is friendly, close that half: extend `mode-rename-map.test.js`'s value-list binding (and the docs `theme-modes.test.ts` guard) with an exclusion assertion — every `appearance-model.ts` OPTIONS/DEFAULT value and every docs `THEME_MODE_VALUES` entry is **not** in `RETIRED_CODENAMES`:
+PR-1's drift guard binds the public value-lists to `MODE_RENAME` via `expectModeCovered`, which accepts the codename∪friendly **union** — so a leftover codename still passes. Now that the repo is friendly, close that half: extend `mode-rename-map.test.js`'s value-list binding with an exclusion assertion — every `appearance-model.ts` OPTIONS/DEFAULT value is **not** in `RETIRED_CODENAMES`. (The docs `theme-modes.test.ts` needs **no** separate exclusion: its existing "keeps THEME_MODE_VALUES in sync with the shipped core token modes" test already asserts set-**equality** with the friendly token filenames, which is strictly stronger — a codename has no token file, so it fails that guard.)
 
 ```js
 // in the existing "binds the public appearance-model value-lists" test
@@ -1206,7 +1232,7 @@ Run `pnpm --filter @nexus/docs dev`, open the docs, and exercise the theme picke
 
 - [ ] **Step 3: Console parity smoke test**
 
-Run `pnpm console`, open Settings → Appearance, change density/corners/elevation/stroke, reload. Confirm the selection persists (normalizer + version-3 snapshot) and the topbar quick control + command palette agree.
+The console runs from the **built `dist`** of `@nexus/core` + `@nexus/react`, so this depends on Step 1's `pnpm build` — if running Step 3 standalone, re-run `pnpm build` first or the console reflects pre-rename state. Then run `pnpm console`, open Settings → Appearance, change density/corners/elevation/stroke, reload. Confirm the selection persists (normalizer + version-3 snapshot) and the topbar quick control + command palette agree.
 
 - [ ] **Step 4: Update #546 / #531**
 
@@ -1226,7 +1252,7 @@ Run `pnpm console`, open Settings → Appearance, change density/corners/elevati
 - ✅ PR3 "docs theme-mode metadata + examples + stories + old-name audit gate + visual QA + confirm migration" → Tasks 3.1–3.4.
 - ✅ Out-of-scope honored: no value retuning (Task 2.7 enforces), no UI redesign, no brand/color/status/chart renames, `snappy`/`subtle`/`smooth` untouched.
 
-**Beyond #546 (review hardening):** collision stated as a Global Constraint + enforced by family-scoped maps; docs `theme-modes.ts` recognized as runtime-functional and migrated in PR-2 (not deferred); audit context-scoped (not allowlist-on-grep); PR-2 sliced per family with normalize wired in lockstep; golden value oracle; `extra-round` regex fix; `tokens:modular` drift-rewrite guarded at every regenerate.
+**Beyond #546 (review hardening):** collision stated as a Global Constraint + enforced by family-scoped maps; docs `theme-modes.ts` recognized as runtime-functional and migrated in PR-2 (not deferred); audit context-scoped (not allowlist-on-grep); PR-2 sliced per family with normalize wired in lockstep; golden value oracle; `extra-round` regex fix; `tokens:modular` drift-rewrite guarded at every regenerate. **PR-3 hardening:** completion oracle is the triad (audit + `test:storybook` + human review of the four named prose files), since the audit and typecheck are both blind to free-string prose / map-keys / testids — grep is a pointer, never a gate; the spacing `★`/"bundled" marker is a _semantic_ move to `default` (←`mira`, `--spacingDefault=default`), not a mechanical `vega→regular` rename; `Radius.stories.tsx:134` keeps the full 5+5 raw-mode list, not the 3-design collapse.
 
 **Placeholder scan:** none — every path, `git mv`, list value, flag, and selector is concrete.
 

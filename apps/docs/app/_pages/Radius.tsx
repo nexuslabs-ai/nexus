@@ -21,17 +21,17 @@ const RADII: { cls: string; label: string }[] = [
 ];
 
 const RADIUS_MODES: { mode: string; md: number }[] = [
-  { mode: 'sharp', md: 0 },
+  { mode: 'square', md: 0 },
   { mode: 'subtle', md: 4 },
   { mode: 'smooth', md: 8 },
-  { mode: 'mellow', md: 12 },
-  { mode: 'blunt', md: 16 },
+  { mode: 'round', md: 12 },
+  { mode: 'extra-round', md: 16 },
 ];
 
 const BORDER_DESIGNS: { mode: string; def: string; thick: string }[] = [
-  { mode: 'vega', def: '1', thick: '2' },
-  { mode: 'maia', def: '1', thick: '1' },
-  { mode: 'nova', def: '1.5', thick: '3' },
+  { mode: 'normal', def: '1', thick: '2' },
+  { mode: 'fine', def: '1', thick: '1' },
+  { mode: 'strong', def: '1.5', thick: '3' },
 ];
 
 const SHADOWS: { cls: string; label: string }[] = [
@@ -118,8 +118,8 @@ export function Radius() {
         <h2 className="nx:typography-heading-small nx:mb-1">Border widths</h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The picker offers five border-width modes, but only three are distinct
-          designs — <code>lyra</code> and <code>mira</code> are byte-identical
-          to <code>vega</code>. The box below sets its width from the runtime{' '}
+          designs — <code>medium</code> and <code>bold</code> are byte-identical
+          to <code>normal</code>. The box below sets its width from the runtime{' '}
           <code>--nx-borderwidth-thick</code> var, so it thickens or thins as
           you swap the Border control.
         </p>
