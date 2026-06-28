@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>#553 Fluid-Inspired Shadow Lab</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --page: #101010;
+        --ink: #f5f5f5;
+        --muted: #a3a3a3;
+        --line: #ffffff14;
+        --panel: #171717;
+        --panel-2: #1f1f1f;
+        --accent: #8ce4d0;
+        --accent-dim: #8ce4d026;
+        --warn: #ffd28a;
+        --danger: #ffaaa5;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font-family: var(--sans);
+        line-height: 1.45;
+      }
+
+      header,
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding-inline: 28px;
+      }
+
+      header {
+        padding-block: 42px 24px;
+      }
+
+      main {
+        padding-bottom: 56px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 940px;
+        font-size: clamp(34px, 6vw, 68px);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: 26px;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        font-size: 14px;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      p {
+        max-width: 840px;
+        color: var(--muted);
+      }
+
+      code,
+      .mono {
+        font-family: var(--mono);
+      }
+
+      .kicker {
+        color: var(--accent);
+        font: 12px var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+
+      .lede {
+        margin-top: 16px;
+        font-size: 17px;
+      }
+
+      section {
+        margin-top: 22px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 18px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px 9px;
+        color: var(--accent);
+        background: var(--accent-dim);
+        font: 12px var(--mono);
+        white-space: nowrap;
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .theme-pair {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .theme-block {
+        --theme-page: #101010;
+        --theme-panel: #171717;
+        --theme-card: #252525;
+        --theme-ink: #f5f5f5;
+        --theme-muted: #a3a3a3;
+        --theme-line: #ffffff14;
+        --s1: #171717;
+        --s2: #1e1e1e;
+        --s3: #252525;
+        --s4: #2c2c2c;
+        --s5: #333333;
+        --s6: #3a3a3a;
+        --s7: #414141;
+        --s8: #484848;
+        --shadow-1: inset 0 0 0 1px #ffffff05;
+        --shadow-2: inset 0 1px 0 0 #ffffff03,
+          inset 0 0 0 1px #ffffff05, 0 1px 1px -0.5px #0000002e;
+        --shadow-3: inset 0 1px 0 0 #ffffff05,
+          inset 0 0 0 1px #ffffff05, 0 0 0 1px #0000001f,
+          0 1px 1px -0.5px #0000002e, 0 3px 3px -1.5px #0000002e;
+        --shadow-4: inset 0 1px 0 0 #ffffff05,
+          inset 0 0 0 1px #ffffff0a, 0 0 0 1px #00000024,
+          0 1px 1px -0.5px #0000002e, 0 3px 3px -1.5px #0000002e,
+          0 6px 6px -3px #0000002e;
+        --shadow-5: inset 0 1px 0 0 #ffffff0a,
+          inset 0 0 0 1px #ffffff0a, 0 0 0 1px #00000029,
+          0 1px 1px -0.5px #0000002e, 0 3px 3px -1.5px #0000002e,
+          0 6px 6px -3px #0000002e, 0 12px 12px -6px #0000002e;
+        --shadow-6: inset 0 1px 0 0 #ffffff0a,
+          inset 0 0 0 1px #ffffff0f, 0 0 0 1px #0000002e,
+          0 1px 1px -0.5px #0000002e, 0 3px 3px -1.5px #0000002e,
+          0 6px 6px -3px #0000002e, 0 12px 12px -6px #0000002e,
+          0 24px 24px -12px #0000002e;
+        --shadow-7: inset 0 1px 0 0 #ffffff0f,
+          inset 0 0 0 1px #ffffff0f, 0 0 0 1px #0003,
+          0 1px 1px -0.5px #0000002e, 0 3px 3px -1.5px #0000002e,
+          0 6px 6px -3px #0000002e, 0 12px 12px -6px #0000002e,
+          0 24px 24px -12px #0000002e, 0 48px 48px -24px #0000002e;
+        --shadow-8: inset 0 1px 0 0 #ffffff0f,
+          inset 0 0 0 1px #ffffff0f, 0 0 0 1px #00000038,
+          0 1px 1px -0.5px #0000002e, 0 3px 3px -1.5px #0000002e,
+          0 6px 6px -3px #0000002e, 0 12px 12px -6px #0000002e,
+          0 24px 24px -12px #0000002e, 0 48px 48px -24px #0000002e,
+          0 96px 96px -48px #0000002e;
+
+        border: 1px solid var(--theme-line);
+        border-radius: 8px;
+        padding: 18px;
+        background: var(--theme-page);
+        color: var(--theme-ink);
+      }
+
+      .theme-block.light {
+        --theme-page: #f4f4f5;
+        --theme-panel: #fafafa;
+        --theme-card: #ffffff;
+        --theme-ink: #171717;
+        --theme-muted: #737373;
+        --theme-line: #00000014;
+        --s1: #fafafa;
+        --s2: #fcfcfc;
+        --s3: #ffffff;
+        --s4: #ffffff;
+        --s5: #ffffff;
+        --s6: #ffffff;
+        --s7: #ffffff;
+        --s8: #ffffff;
+        --shadow-color: #0000000f;
+        --shadow-1: 0 0 0 1px var(--shadow-color);
+        --shadow-2: 0 0 0 1px var(--shadow-color),
+          0 1px 1px -0.5px var(--shadow-color);
+        --shadow-3: 0 0 0 1px var(--shadow-color),
+          0 1px 1px -0.5px var(--shadow-color),
+          0 3px 3px -1.5px var(--shadow-color);
+        --shadow-4: 0 0 0 1px var(--shadow-color),
+          0 1px 1px -0.5px var(--shadow-color),
+          0 3px 3px -1.5px var(--shadow-color),
+          0 6px 6px -3px var(--shadow-color);
+        --shadow-5: 0 0 0 1px var(--shadow-color),
+          0 1px 1px -0.5px var(--shadow-color),
+          0 3px 3px -1.5px var(--shadow-color),
+          0 6px 6px -3px var(--shadow-color),
+          0 12px 12px -6px var(--shadow-color);
+        --shadow-6: 0 0 0 1px var(--shadow-color),
+          0 1px 1px -0.5px var(--shadow-color),
+          0 3px 3px -1.5px var(--shadow-color),
+          0 6px 6px -3px var(--shadow-color),
+          0 12px 12px -6px var(--shadow-color),
+          0 24px 24px -12px var(--shadow-color);
+        --shadow-7: 0 0 0 1px var(--shadow-color),
+          0 1px 1px -0.5px var(--shadow-color),
+          0 3px 3px -1.5px var(--shadow-color),
+          0 6px 6px -3px var(--shadow-color),
+          0 12px 12px -6px var(--shadow-color),
+          0 24px 24px -12px var(--shadow-color),
+          0 48px 48px -24px var(--shadow-color);
+        --shadow-8: 0 0 0 1px var(--shadow-color),
+          0 1px 1px -0.5px var(--shadow-color),
+          0 3px 3px -1.5px var(--shadow-color),
+          0 6px 6px -3px var(--shadow-color),
+          0 12px 12px -6px var(--shadow-color),
+          0 24px 24px -12px var(--shadow-color),
+          0 48px 48px -24px var(--shadow-color),
+          0 96px 96px -48px var(--shadow-color);
+      }
+
+      .theme-block h3 {
+        color: var(--theme-ink);
+        margin-bottom: 12px;
+      }
+
+      .theme-block p,
+      .theme-block .tiny {
+        color: var(--theme-muted);
+      }
+
+      .surfaces {
+        grid-template-columns: repeat(8, minmax(74px, 1fr));
+      }
+
+      .surface {
+        min-height: 86px;
+        display: grid;
+        align-content: space-between;
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid var(--theme-line);
+      }
+
+      .surface strong {
+        font: 13px var(--mono);
+      }
+
+      .surface span {
+        color: var(--theme-muted);
+        font: 12px var(--mono);
+      }
+
+      .shadow-grid {
+        grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+      }
+
+      .shadow-cell {
+        min-height: 132px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--theme-panel);
+        border: 1px solid var(--theme-line);
+      }
+
+      .sample {
+        height: 74px;
+        border-radius: 8px;
+        background: var(--theme-card);
+        display: grid;
+        place-items: center;
+        color: var(--theme-ink);
+        font: 12px var(--mono);
+      }
+
+      .matrix {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      th,
+      td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--line);
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      th:first-child,
+      td:first-child {
+        text-align: left;
+        position: sticky;
+        left: 0;
+        background: var(--panel);
+        font-family: var(--mono);
+      }
+
+      th {
+        color: var(--muted);
+        font-family: var(--mono);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .proposal-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .mode-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        background: var(--panel-2);
+      }
+
+      .mode-card h3 {
+        color: var(--ink);
+        margin-bottom: 10px;
+      }
+
+      .component {
+        border-radius: 8px;
+        padding: 14px;
+        color: var(--theme-ink, var(--ink));
+        background: var(--theme-card, var(--surface-3, #252525));
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .tiny {
+        font: 12px var(--mono);
+        color: var(--muted);
+      }
+
+      .callout {
+        border-left: 3px solid var(--accent);
+        padding: 10px 12px;
+        background: var(--accent-dim);
+        border-radius: 6px;
+      }
+
+      @media (max-width: 960px) {
+        header,
+        main {
+          padding-inline: 18px;
+        }
+
+        .theme-pair {
+          grid-template-columns: 1fr;
+        }
+
+        .surfaces {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .section-head {
+          display: grid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="kicker">Issue #553 / shadow design lab</div>
+      <h1>Fluid-style elevation in light and dark, translated for Nexus.</h1>
+      <p class="lede">
+        This is not a token edit. It is a visual decision artifact for the
+        shadow model you pasted: light mode stays mostly flat white while
+        shadows carry elevation; dark mode combines brighter surfaces with
+        inset highlights, rings, and stacked drop layers.
+      </p>
+    </header>
+
+    <main>
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Reference Surface Ladders</h2>
+            <p>
+              The pasted model has an explicit 1-to-8 surface ladder. Light
+              mode flattens to white after the first few steps. Dark mode keeps
+              stepping the panel color from <code>#171717</code> to
+              <code>#484848</code>.
+            </p>
+          </div>
+          <span class="pill">source values pasted by user</span>
+        </div>
+        <div class="grid theme-pair">
+          <div class="theme-block light">
+            <h3>Light surfaces</h3>
+            <div class="grid surfaces">
+              <div class="surface" style="background: var(--s1)">
+                <strong>surface 1</strong><span>#fafafa</span>
+              </div>
+              <div class="surface" style="background: var(--s2)">
+                <strong>surface 2</strong><span>#fcfcfc</span>
+              </div>
+              <div class="surface" style="background: var(--s3)">
+                <strong>surface 3</strong><span>#ffffff</span>
+              </div>
+              <div class="surface" style="background: var(--s4)">
+                <strong>surface 4</strong><span>#ffffff</span>
+              </div>
+              <div class="surface" style="background: var(--s5)">
+                <strong>surface 5</strong><span>#ffffff</span>
+              </div>
+              <div class="surface" style="background: var(--s6)">
+                <strong>surface 6</strong><span>#ffffff</span>
+              </div>
+              <div class="surface" style="background: var(--s7)">
+                <strong>surface 7</strong><span>#ffffff</span>
+              </div>
+              <div class="surface" style="background: var(--s8)">
+                <strong>surface 8</strong><span>#ffffff</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="theme-block">
+            <h3>Dark surfaces</h3>
+            <div class="grid surfaces">
+              <div class="surface" style="background: var(--s1)">
+                <strong>surface 1</strong><span>#171717</span>
+              </div>
+              <div class="surface" style="background: var(--s2)">
+                <strong>surface 2</strong><span>#1e1e1e</span>
+              </div>
+              <div class="surface" style="background: var(--s3)">
+                <strong>surface 3</strong><span>#252525</span>
+              </div>
+              <div class="surface" style="background: var(--s4)">
+                <strong>surface 4</strong><span>#2c2c2c</span>
+              </div>
+              <div class="surface" style="background: var(--s5)">
+                <strong>surface 5</strong><span>#333333</span>
+              </div>
+              <div class="surface" style="background: var(--s6)">
+                <strong>surface 6</strong><span>#3a3a3a</span>
+              </div>
+              <div class="surface" style="background: var(--s7)">
+                <strong>surface 7</strong><span>#414141</span>
+              </div>
+              <div class="surface" style="background: var(--s8)">
+                <strong>surface 8</strong><span>#484848</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Reference Shadows</h2>
+            <p>
+              Light mode uses a single black alpha color and progressively
+              longer drop layers. Dark mode uses inset white highlights, faint
+              rings, and the same progressively longer drop layers.
+            </p>
+          </div>
+          <span class="pill">visual eye check</span>
+        </div>
+        <div class="grid theme-pair">
+          <div class="theme-block light">
+            <h3>Light shadow ladder</h3>
+            <div class="grid shadow-grid">
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-1)">1</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-2)">2</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-3)">3</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-4)">4</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-5)">5</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-6)">6</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-7)">7</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-8)">8</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="theme-block">
+            <h3>Dark shadow ladder</h3>
+            <div class="grid shadow-grid">
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-1)">1</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-2)">2</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-3)">3</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-4)">4</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-5)">5</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-6)">6</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-7)">7</div>
+              </div>
+              <div class="shadow-cell">
+                <div class="sample" style="box-shadow: var(--shadow-8)">8</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Nexus Surfaces vs Pasted Surfaces</h2>
+            <p>
+              The useful thing to borrow is not the exact surface names. Nexus
+              already has semantic surfaces. The thing worth stealing is the
+              way elevation is rendered differently in light and dark.
+            </p>
+          </div>
+          <span class="pill">model difference</span>
+        </div>
+        <div class="matrix">
+          <table>
+            <thead>
+              <tr>
+                <th>area</th>
+                <th>pasted Fluid model</th>
+                <th>current Nexus model</th>
+                <th>what it means for #553</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>surface names</td>
+                <td>numbered levels: surface 1 through 8</td>
+                <td>
+                  semantic tokens: background, muted, container, popover, nav,
+                  control, disabled, border-active
+                </td>
+                <td>do not rename Nexus surfaces to numbered levels</td>
+              </tr>
+              <tr>
+                <td>light mode</td>
+                <td>#fafafa, #fcfcfc, then #fff for levels 3 through 8</td>
+                <td>
+                  tinted paper at <code>PAPER_L = 0.987</code> for non-neutral
+                  tones; container and popover stay flat in light
+                </td>
+                <td>keep Nexus tint model; use Fluid mainly for shadow shape</td>
+              </tr>
+              <tr>
+                <td>dark mode</td>
+                <td>fixed greys from #171717 to #484848</td>
+                <td>
+                  derived from selected surface tone and background, with dark
+                  role steps like container 1.6, popover 3.2, border-active 9.68
+                </td>
+                <td>dark elevation can improve without hardcoding one grey ramp</td>
+              </tr>
+              <tr>
+                <td>contrast slider</td>
+                <td>not represented in the pasted values</td>
+                <td>
+                  <code>contrastProfile</code> changes surface delta, border
+                  alpha, and hover alpha
+                </td>
+                <td>new shadow recipes must still work at contrast 0, 60, 100</td>
+              </tr>
+              <tr>
+                <td>shadow strategy</td>
+                <td>
+                  light: black alpha stack; dark: inset highlight, ring, drop
+                  stack
+                </td>
+                <td>
+                  current shadow modes use fixed one- or two-layer composition
+                  for most sizes
+                </td>
+                <td>
+                  real adoption needs generated multi-layer shadow composition
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Nexus Mapping Proposal</h2>
+            <p>
+              Nexus has shadow <em>modes</em> and shadow <em>sizes</em>. I
+              would not copy the reference variable names. I would use its
+              recipe as the renderer behind our existing sizes.
+            </p>
+          </div>
+          <span class="pill">recommended direction</span>
+        </div>
+        <div class="matrix">
+          <table>
+            <thead>
+              <tr>
+                <th>mode</th>
+                <th>2xs</th>
+                <th>xs</th>
+                <th>sm</th>
+                <th>base</th>
+                <th>md</th>
+                <th>lg</th>
+                <th>xl</th>
+                <th>2xl</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>flat</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>quiet</td>
+                <td>1</td>
+                <td>1</td>
+                <td>2</td>
+                <td>2</td>
+                <td>3</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>soft</td>
+                <td>1</td>
+                <td>2</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>standard</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>strong</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+                <td>8</td>
+                <td>8</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grid proposal-grid" style="margin-top: 16px">
+          <div class="theme-block light">
+            <h3>light standard sample</h3>
+            <div class="component" style="box-shadow: var(--shadow-6)">
+              black-alpha layered lift
+            </div>
+          </div>
+          <div class="theme-block">
+            <h3>dark standard sample</h3>
+            <div class="component" style="box-shadow: var(--shadow-7)">
+              highlight, ring, and lift
+            </div>
+          </div>
+          <div class="mode-card">
+            <h3>flat</h3>
+            <div class="component" style="box-shadow: inset 0 0 0 1px #ffffff05">
+              ring only
+            </div>
+          </div>
+          <div class="mode-card">
+            <h3>strong</h3>
+            <div
+              class="component"
+              style="
+                background: #252525;
+                box-shadow:
+                  inset 0 1px 0 0 #ffffff0f,
+                  inset 0 0 0 1px #ffffff0f,
+                  0 0 0 1px #00000038,
+                  0 1px 1px -0.5px #0000002e,
+                  0 3px 3px -1.5px #0000002e,
+                  0 6px 6px -3px #0000002e,
+                  0 12px 12px -6px #0000002e,
+                  0 24px 24px -12px #0000002e,
+                  0 48px 48px -24px #0000002e,
+                  0 96px 96px -48px #0000002e;
+              "
+            >
+              pronounced
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Implementation Notes</h2>
+            <p>
+              The clean path is still two-step: first land #553 for spacing and
+              stroke distinctness, then use #556 for the nested surface/elevation
+              and Fluid-style shadow renderer follow-up if this visual direction
+              feels right.
+            </p>
+          </div>
+          <span class="pill">not a token edit yet</span>
+        </div>
+        <div class="stack">
+          <div class="theme-block light">
+            <div class="component" style="box-shadow: var(--shadow-4)">
+              <div class="row">
+                <strong>Light mode takeaway</strong>
+                <span class="tiny">shadow carries elevation</span>
+              </div>
+              <p>
+                The pasted light surfaces are nearly flat. That is why the
+                shadow stack matters: it separates cards without making the
+                whole page look grey.
+              </p>
+            </div>
+          </div>
+          <div class="theme-block">
+            <div class="component" style="box-shadow: var(--shadow-5)">
+              <div class="row">
+                <strong>Dark mode takeaway</strong>
+                <span class="tiny">highlight plus ring</span>
+              </div>
+              <p>
+                The pasted dark recipe avoids muddy black blobs. It uses a
+                tiny top highlight, a faint outline, and layered drops so
+                elevation is visible on dark surfaces.
+              </p>
+            </div>
+          </div>
+          <div class="callout">
+            <p>
+              Recommendation: do not hardcode Fluid's surface colors into
+              Nexus. Keep Nexus semantic derived surfaces, then explore a
+              Fluid-style shadow renderer that can emit the light and dark
+              recipes shown here in follow-up issue #556.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
