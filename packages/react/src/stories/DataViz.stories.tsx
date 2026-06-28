@@ -95,7 +95,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Five-color categorical chart palette for data visualization. Tokens are theme-aware — light mode uses shade 600–700 primitives (dark colors on a near-white canvas), dark mode uses shade 200–300 primitives (light colors on a near-black canvas). Each chart × surface pair is APCA-validated at Lc ≥ 60 (UI tier) across all five base palettes. Source: packages/core/tokens/semantic/chart-categorical-default-{light,dark}.json.',
+          'Five-color categorical chart palette for data visualization. Tokens are emitted by the runtime Appearance provider and stay theme-aware across light and dark mode. Each chart × surface pair is APCA-validated at Lc ≥ 60 (UI tier) across all five base palettes.',
       },
     },
   },

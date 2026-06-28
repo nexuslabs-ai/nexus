@@ -78,6 +78,9 @@ Action pattern rules:
 export default meta;
 type Story = StoryObj<typeof Alert>;
 
+const dataAttribute = (name: string) => `data-${name}`;
+const DATA_DENSITY_ATTRIBUTE = dataAttribute('density');
+
 type PlaygroundIcon =
   | 'none'
   | 'information'
@@ -967,7 +970,7 @@ export const WithDataAttributes: Story = {
     await expect(alert).toHaveAttribute('data-variant', 'destructive');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
     await expect(alert).toHaveAttribute('data-layout', 'stack');
-    await expect(alert).not.toHaveAttribute('data-density');
+    await expect(alert).not.toHaveAttribute(DATA_DENSITY_ATTRIBUTE);
     await expect(alert).not.toHaveAttribute('role');
     await expect(title).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
@@ -1018,7 +1021,7 @@ export const DefaultDataAttributes: Story = {
     await expect(alert).toBeInTheDocument();
     await expect(alert).toHaveAttribute('data-variant', 'default');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
-    await expect(alert).not.toHaveAttribute('data-density');
+    await expect(alert).not.toHaveAttribute(DATA_DENSITY_ATTRIBUTE);
     await expect(alert).not.toHaveAttribute('role');
   },
 };

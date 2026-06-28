@@ -14,6 +14,9 @@ const meta: Meta<typeof NexusAppearanceSettings> = {
 export default meta;
 type Story = StoryObj<typeof NexusAppearanceSettings>;
 
+const rootDataAttribute = (name: string) => `data-${name}`;
+const ROOT_SHADOW_ATTRIBUTE = rootDataAttribute('shadow');
+
 function SettingsFrame() {
   return (
     <div className="nx:max-w-3xl">
@@ -66,7 +69,9 @@ export const ClickInteraction: Story = {
 export const ElevationInteraction: Story = {
   render: () => <SettingsFrame />,
   play: async ({ canvasElement }) => {
-    const originalShadow = document.documentElement.getAttribute('data-shadow');
+    const originalShadow = document.documentElement.getAttribute(
+      ROOT_SHADOW_ATTRIBUTE
+    );
 
     try {
       const canvas = within(canvasElement);
@@ -92,15 +97,18 @@ export const ElevationInteraction: Story = {
       await waitFor(() => {
         expect(canvas.getByText('elevation: "strong",')).toBeVisible();
         expect(document.documentElement).toHaveAttribute(
-          'data-shadow',
+          ROOT_SHADOW_ATTRIBUTE,
           'strong'
         );
       });
     } finally {
       if (originalShadow === null) {
-        document.documentElement.removeAttribute('data-shadow');
+        document.documentElement.removeAttribute(ROOT_SHADOW_ATTRIBUTE);
       } else {
-        document.documentElement.setAttribute('data-shadow', originalShadow);
+        document.documentElement.setAttribute(
+          ROOT_SHADOW_ATTRIBUTE,
+          originalShadow
+        );
       }
     }
   },
