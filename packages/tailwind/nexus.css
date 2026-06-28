@@ -1159,47 +1159,6 @@
   --nx-layout-stack-gap: 6px;
 }
 
-[data-style='regular'] {
-  --nx-spacing-0: 0px;
-  --nx-spacing-1: 4px;
-  --nx-spacing-2: 8px;
-  --nx-spacing-3: 12px;
-  --nx-spacing-4: 16px;
-  --nx-spacing-5: 20px;
-  --nx-spacing-6: 24px;
-  --nx-spacing-7: 28px;
-  --nx-spacing-8: 32px;
-  --nx-spacing-9: 36px;
-  --nx-spacing-10: 40px;
-  --nx-spacing-11: 44px;
-  --nx-spacing-12: 48px;
-  --nx-spacing-14: 56px;
-  --nx-spacing-16: 64px;
-  --nx-spacing-20: 80px;
-  --nx-spacing-24: 96px;
-  --nx-spacing-28: 112px;
-  --nx-spacing-32: 128px;
-  --nx-spacing-36: 144px;
-  --nx-spacing-40: 160px;
-  --nx-spacing-44: 176px;
-  --nx-spacing-48: 192px;
-  --nx-spacing-52: 208px;
-  --nx-spacing-56: 224px;
-  --nx-spacing-60: 240px;
-  --nx-spacing-64: 256px;
-  --nx-spacing-72: 288px;
-  --nx-spacing-80: 320px;
-  --nx-spacing-96: 384px;
-  --nx-spacing-0_5: 2px;
-  --nx-spacing-1_5: 6px;
-  --nx-spacing-2_5: 10px;
-  --nx-spacing-3_5: 14px;
-  --nx-container-p: 24px;
-  --nx-container-gap: 16px;
-  --nx-layout-section-gap: 32px;
-  --nx-layout-stack-gap: 8px;
-}
-
 [data-style='relaxed'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
@@ -2128,19 +2087,9 @@
   --nx-borderwidth-thick: 2px;
 }
 
-[data-borderwidth='bold'] {
-  --nx-borderwidth-default: 1px;
-  --nx-borderwidth-thick: 2px;
-}
-
 [data-borderwidth='fine'] {
   --nx-borderwidth-default: 1px;
   --nx-borderwidth-thick: 1px;
-}
-
-[data-borderwidth='medium'] {
-  --nx-borderwidth-default: 1px;
-  --nx-borderwidth-thick: 2px;
 }
 
 [data-borderwidth='strong'] {

@@ -20,12 +20,11 @@ import {
 const dim = (n) => ({ $value: { value: n, unit: 'px' }, $type: 'dimension' });
 
 describe('CANONICAL_MODES', () => {
-  it('is the 7-mode set per the canonical mode list', () => {
+  it('is the 6-mode set per the canonical mode list', () => {
     expect([...CANONICAL_MODES].sort()).toEqual([
       'comfortable',
       'compact',
       'default',
-      'regular',
       'relaxed',
       'spacious',
       'tight',
@@ -47,7 +46,7 @@ describe('mode family configs', () => {
         config.expectedModes,
       ])
     ).toEqual([
-      ['spacing', 'regular', CANONICAL_MODES],
+      ['spacing', 'default', CANONICAL_MODES],
       ['radius', 'square', CANONICAL_RADIUS_MODES],
       ['borderwidth', 'normal', CANONICAL_BORDERWIDTH_MODES],
       ['shadow-light', 'quiet', CANONICAL_SHADOW_MODES],
@@ -238,7 +237,7 @@ describe('validateModes', () => {
   it('returns an empty findings list when all modes match the baseline', () => {
     const data = { spacing: { 0: dim(0), 1: dim(4) } };
     const modeMap = new Map([
-      ['regular', data],
+      ['default', data],
       ['tight', data],
       ['relaxed', data],
     ]);
@@ -253,7 +252,7 @@ describe('validateModes', () => {
   it('skips the baseline mode in the output', () => {
     const data = { spacing: { 0: dim(0) } };
     const modeMap = new Map([
-      ['regular', data],
+      ['default', data],
       ['tight', data],
     ]);
     expect(validateModes(modeMap).map((f) => f.mode)).toEqual(['tight']);
@@ -264,7 +263,7 @@ describe('validateModes', () => {
     const comfortable = { spacing: { 0: dim(0), 2: dim(8) } }; // missing spacing.1
     const tight = { spacing: { 0: dim(0), 1: dim(4), 2: dim(8), 3: dim(12) } }; // extra spacing.3
     const modeMap = new Map([
-      ['regular', baseline],
+      ['default', baseline],
       ['comfortable', comfortable],
       ['tight', tight],
     ]);
@@ -278,7 +277,7 @@ describe('validateModes', () => {
   it('sorts findings by mode name for stable output', () => {
     const data = { spacing: { 0: dim(0) } };
     const modeMap = new Map([
-      ['regular', data],
+      ['default', data],
       ['spacious', data],
       ['compact', data],
       ['comfortable', data],
@@ -291,13 +290,13 @@ describe('validateModes', () => {
   });
 
   it('reports every non-baseline mode as drifting when the baseline itself has a stray key', () => {
-    // If regular gets a new key the other modes haven't picked up yet, every
+    // If default gets a new key the other modes haven't picked up yet, every
     // non-baseline mode reports it as missing — the validator surfaces the
     // drift symmetrically rather than special-casing the baseline.
-    const regular = { spacing: { 0: dim(0), 99: dim(396) } };
+    const baseline = { spacing: { 0: dim(0), 99: dim(396) } };
     const clean = { spacing: { 0: dim(0) } };
     const modeMap = new Map([
-      ['regular', regular],
+      ['default', baseline],
       ['tight', clean],
       ['relaxed', clean],
     ]);
@@ -311,7 +310,7 @@ describe('validateModes', () => {
   it('throws when the baseline mode is absent from the input map', () => {
     const modeMap = new Map([['tight', { spacing: { 0: dim(0) } }]]);
     expect(() => validateModes(modeMap)).toThrow(
-      /baseline mode "regular" not found/
+      /baseline mode "default" not found/
     );
   });
 

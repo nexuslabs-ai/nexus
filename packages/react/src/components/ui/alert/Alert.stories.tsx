@@ -1285,20 +1285,20 @@ export const ModesProduceDifferentHeights: Story = {
   },
 };
 
-export const VegaHeightPinned: Story = {
+export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Pin on the stays-numeric outcome: in regular mode, an Alert with a single 40px fixed-height child renders at exactly 74px (= border 1 × 2 + `p-4` 16 × 2 + child 40). If a future PR migrates `p-4` to `p-container`, regular rendering shifts to 90px (= 2 + 24 × 2 + 40) and this test fails — the regression signal is that Alert was promoted out of the document scale into the container scale.',
+          'Pin on the stays-numeric outcome: in default mode, an Alert with a single 40px fixed-height child renders at exactly 74px (= border 1 × 2 + `p-4` 16 × 2 + child 40). If a future PR migrates `p-4` to `p-container`, default rendering shifts to 90px (= 2 + 24 × 2 + 40) and this test fails — the regression signal is that Alert was promoted out of the document scale into the container scale.',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
-      data-testid="alert-regular-host"
+      data-style="default"
+      data-testid="alert-default-host"
       className="nx:p-10 nx:bg-background"
     >
       <Alert className="nx:w-[200px]">
@@ -1307,7 +1307,7 @@ export const VegaHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'alert-regular-host', 74, {
+    await expectHeightPinned(within(canvasElement), 'alert-default-host', 74, {
       selector: '[data-slot="alert"]',
     });
   },

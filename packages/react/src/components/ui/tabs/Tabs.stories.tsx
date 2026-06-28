@@ -732,20 +732,20 @@ export const AllModes: Story = {
   ),
 };
 
-export const TabsTriggerVegaDefaultHeightPinned: Story = {
+export const TabsTriggerDefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Regression sentinel: pins the `default` `TabsTrigger` height in regular mode.',
+          'Regression sentinel: pins the `default` `TabsTrigger` height in default mode.',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
-      data-testid="tabs-regular-host"
+      data-style="default"
+      data-testid="tabs-default-host"
       className="nx:p-10 nx:bg-background"
     >
       <Tabs defaultValue="a">
@@ -756,7 +756,7 @@ export const TabsTriggerVegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'tabs-regular-host', 34);
+    await expectHeightPinned(within(canvasElement), 'tabs-default-host', 34);
   },
 };
 
@@ -781,7 +781,7 @@ export const TabsSmIsDensityStable: Story = {
           </TabsList>
         </Tabs>
       </div>
-      <div data-style="regular" data-testid="tabs-sm-host-regular">
+      <div data-style="default" data-testid="tabs-sm-host-default">
         <Tabs defaultValue="a">
           <TabsList>
             <TabsTrigger size="sm" value="a">
@@ -804,7 +804,7 @@ export const TabsSmIsDensityStable: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightFixedAcrossModes(
       within(canvasElement),
-      ['tabs-sm-host-compact', 'tabs-sm-host-regular', 'tabs-sm-host-spacious'],
+      ['tabs-sm-host-compact', 'tabs-sm-host-default', 'tabs-sm-host-spacious'],
       26,
       { selector: '[data-slot="tabs-trigger"]' }
     );

@@ -16,7 +16,6 @@ const require = createRequire(import.meta.url);
 const TAILWIND_ENTRY = require.resolve('tailwindcss/index.css');
 
 const SPACING_MODES = [
-  'regular',
   'tight',
   'relaxed',
   'default',
@@ -26,7 +25,7 @@ const SPACING_MODES = [
 ];
 const RADIUS_MODES = ['extra-round', 'round', 'smooth', 'square', 'subtle'];
 const SHADOW_MODES = ['flat', 'quiet', 'soft', 'standard', 'strong'];
-const BORDERWIDTH_MODES = ['bold', 'fine', 'medium', 'normal', 'strong'];
+const BORDERWIDTH_MODES = ['fine', 'normal', 'strong'];
 
 function readSpacingModeJson(mode) {
   return JSON.parse(
@@ -521,11 +520,11 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).not.toMatch(/--layout-section-gap:/);
   });
 
-  it('emits exactly 7 [data-style="X"] selectors (one per mode)', () => {
+  it('emits exactly 6 [data-style="X"] selectors (one per mode)', () => {
     // The configured default selector is `:root, [data-style='<mode>']`, so it contributes one
-    // [data-style=...] match; the other 6 modes each contribute one. Total: 7.
+    // [data-style=...] match; the other 5 modes each contribute one. Total: 6.
     const matches = nexusCSS.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
-    expect(matches).toHaveLength(7);
+    expect(matches).toHaveLength(6);
 
     const modes = new Set(matches.map((m) => m.match(/['"]([a-z]+)['"]/)[1]));
     expect(modes).toEqual(new Set(SPACING_MODES));
@@ -617,10 +616,10 @@ describe('generateTailwindPackage', () => {
     }
   );
 
-  // Regular numeric baseline — locks in the pre-migration shipped Vega values.
-  // Drift here means the migration changed numeric Regular output; any change
+  // Default numeric baseline — locks in the bundled shipped values.
+  // Drift here means the migration changed numeric Default output; any change
   // requires explicit reviewer acknowledgement by updating this table.
-  it('Regular numeric values are byte-identical to the pre-#119 shipped scale', () => {
+  it('Default numeric values are byte-identical to the pre-#119 shipped scale', () => {
     const REGULAR_BASELINE = {
       'spacing-0': '0px',
       'spacing-0_5': '2px',
@@ -657,10 +656,10 @@ describe('generateTailwindPackage', () => {
       'spacing-80': '320px',
       'spacing-96': '384px',
     };
-    const block = extractDataStyleBlock(nexusCSS, 'regular');
+    const block = extractDataStyleBlock(nexusCSS, 'default');
     for (const [name, expected] of Object.entries(REGULAR_BASELINE)) {
       const match = block.match(new RegExp(`--nx-${name}:\\s*([^;]+);`));
-      expect(match, `--nx-${name} missing from Regular block`).not.toBeNull();
+      expect(match, `--nx-${name} missing from Default block`).not.toBeNull();
       expect(match[1].trim(), `--nx-${name} drifted from baseline`).toBe(
         expected
       );
@@ -734,15 +733,15 @@ describe('generateTailwindPackage', () => {
   });
 
   it('role @utility names match the role-token set 1:1 (drift guard)', () => {
-    // If a new role key lands in spacing-regular.json without a matching emitter
+    // If a new role key lands in the canonical spacing mode without a matching emitter
     // row, this catches it — utility set must equal the role-token set.
     const utilityMatches = [
       ...spacingUtilitiesCSS.matchAll(/@utility ([a-z-]+) \{/g),
     ].map((m) => m[1]);
     const utilities = new Set(utilityMatches);
 
-    // Derive expected utility names from spacing-regular.json's role subtrees.
-    const regular = readSpacingModeJson('regular');
+    // Derive expected utility names from spacing-default.json's role subtrees.
+    const defaultMode = readSpacingModeJson('default');
     const expected = new Set();
     function walk(node, pathParts) {
       if (
@@ -780,13 +779,13 @@ describe('generateTailwindPackage', () => {
       }
     }
     for (const group of ['control', 'container', 'layout']) {
-      if (group in regular) walk(regular[group], [group]);
+      if (group in defaultMode) walk(defaultMode[group], [group]);
     }
 
     expect(utilities).toEqual(expected);
   });
 
-  it('emits 7 per-mode spacing blocks in deterministic alphabetical order (non-default modes)', () => {
+  it('emits 6 per-mode spacing blocks in deterministic alphabetical order (non-default modes)', () => {
     // Filesystem order isn't portable; the emitter sorts non-default modes
     // alphabetically.
     const ordered = [...nexusCSS.matchAll(/\[data-style=['"]([a-z-]+)['"]\]/g)]
@@ -794,11 +793,10 @@ describe('generateTailwindPackage', () => {
       // De-dup in case `:root, [data-style="<default>"]` produces two captures.
       .filter((m, i, arr) => arr.indexOf(m) === i);
     expect(ordered[0]).toBe('default');
-    // Other six in alphabetical order:
+    // Other five in alphabetical order:
     expect(ordered.slice(1)).toEqual([
       'comfortable',
       'compact',
-      'regular',
       'relaxed',
       'spacious',
       'tight',
@@ -854,7 +852,7 @@ describe('generateTailwindPackage', () => {
   });
 
   it('config.spacingDefault shifts which mode lands under :root, [data-style="X"]', async () => {
-    // Build with a non-default spacing mode. All 7 mode blocks still emit;
+    // Build with a non-default spacing mode. All 6 mode blocks still emit;
     // only the `:root` half of the dual selector moves from Default to Relaxed.
     const dir = makeTmpDir();
     await generateTailwindPackage(
@@ -863,13 +861,13 @@ describe('generateTailwindPackage', () => {
     );
     const css = read(dir, 'nexus.css');
 
-    // :root must combine with [data-style="relaxed"], not regular.
+    // :root must combine with [data-style="relaxed"], not default.
     expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]relaxed['"]\] \{/);
-    // Regular becomes a plain attribute selector (no :root combinator).
-    expect(css).not.toMatch(/:root,\s*\n\s*\[data-style=['"]regular['"]\] \{/);
-    // Both blocks still present — the bundle still ships all 7 modes; only
+    // Default becomes a plain attribute selector (no :root combinator).
+    expect(css).not.toMatch(/:root,\s*\n\s*\[data-style=['"]default['"]\] \{/);
+    // Both blocks still present — the bundle still ships all 6 modes; only
     // the cascade default moves.
     const matches = css.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
-    expect(matches).toHaveLength(7);
+    expect(matches).toHaveLength(6);
   });
 });

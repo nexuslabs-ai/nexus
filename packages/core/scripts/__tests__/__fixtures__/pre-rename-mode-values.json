@@ -923,160 +923,6 @@
       "unit": "px"
     }
   },
-  "spacing.vega": {
-    "container.gap": {
-      "value": 16,
-      "unit": "px"
-    },
-    "container.p": {
-      "value": 24,
-      "unit": "px"
-    },
-    "layout.section-gap": {
-      "value": 32,
-      "unit": "px"
-    },
-    "layout.stack-gap": {
-      "value": 8,
-      "unit": "px"
-    },
-    "spacing.0": {
-      "value": 0,
-      "unit": "px"
-    },
-    "spacing.0_5": {
-      "value": 2,
-      "unit": "px"
-    },
-    "spacing.1": {
-      "value": 4,
-      "unit": "px"
-    },
-    "spacing.10": {
-      "value": 40,
-      "unit": "px"
-    },
-    "spacing.11": {
-      "value": 44,
-      "unit": "px"
-    },
-    "spacing.12": {
-      "value": 48,
-      "unit": "px"
-    },
-    "spacing.14": {
-      "value": 56,
-      "unit": "px"
-    },
-    "spacing.16": {
-      "value": 64,
-      "unit": "px"
-    },
-    "spacing.1_5": {
-      "value": 6,
-      "unit": "px"
-    },
-    "spacing.2": {
-      "value": 8,
-      "unit": "px"
-    },
-    "spacing.20": {
-      "value": 80,
-      "unit": "px"
-    },
-    "spacing.24": {
-      "value": 96,
-      "unit": "px"
-    },
-    "spacing.28": {
-      "value": 112,
-      "unit": "px"
-    },
-    "spacing.2_5": {
-      "value": 10,
-      "unit": "px"
-    },
-    "spacing.3": {
-      "value": 12,
-      "unit": "px"
-    },
-    "spacing.32": {
-      "value": 128,
-      "unit": "px"
-    },
-    "spacing.36": {
-      "value": 144,
-      "unit": "px"
-    },
-    "spacing.3_5": {
-      "value": 14,
-      "unit": "px"
-    },
-    "spacing.4": {
-      "value": 16,
-      "unit": "px"
-    },
-    "spacing.40": {
-      "value": 160,
-      "unit": "px"
-    },
-    "spacing.44": {
-      "value": 176,
-      "unit": "px"
-    },
-    "spacing.48": {
-      "value": 192,
-      "unit": "px"
-    },
-    "spacing.5": {
-      "value": 20,
-      "unit": "px"
-    },
-    "spacing.52": {
-      "value": 208,
-      "unit": "px"
-    },
-    "spacing.56": {
-      "value": 224,
-      "unit": "px"
-    },
-    "spacing.6": {
-      "value": 24,
-      "unit": "px"
-    },
-    "spacing.60": {
-      "value": 240,
-      "unit": "px"
-    },
-    "spacing.64": {
-      "value": 256,
-      "unit": "px"
-    },
-    "spacing.7": {
-      "value": 28,
-      "unit": "px"
-    },
-    "spacing.72": {
-      "value": 288,
-      "unit": "px"
-    },
-    "spacing.8": {
-      "value": 32,
-      "unit": "px"
-    },
-    "spacing.80": {
-      "value": 320,
-      "unit": "px"
-    },
-    "spacing.9": {
-      "value": 36,
-      "unit": "px"
-    },
-    "spacing.96": {
-      "value": 384,
-      "unit": "px"
-    }
-  },
   "shadow.lyra-dark": {
     "2xl.layer-1.blur": {
       "value": 3,
@@ -3647,16 +3493,6 @@
       "unit": "px"
     }
   },
-  "borderwidth.lyra": {
-    "default": {
-      "value": 1,
-      "unit": "px"
-    },
-    "thick": {
-      "value": 2,
-      "unit": "px"
-    }
-  },
   "borderwidth.maia": {
     "default": {
       "value": 1,
@@ -3664,16 +3500,6 @@
     },
     "thick": {
       "value": 1,
-      "unit": "px"
-    }
-  },
-  "borderwidth.mira": {
-    "default": {
-      "value": 1,
-      "unit": "px"
-    },
-    "thick": {
-      "value": 2,
       "unit": "px"
     }
   },

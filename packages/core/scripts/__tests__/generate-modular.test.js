@@ -95,15 +95,14 @@ describe('generateModular', () => {
   // Spacing migration (#119) — per-mode blocks + sibling spacing-utilities.css
   // -----------------------------------------------------------------------
 
-  it('emits all 7 per-mode [data-style="X"] blocks in globals.css', () => {
+  it('emits all 6 per-mode [data-style="X"] blocks in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
-    expect(matches).toHaveLength(7);
+    expect(matches).toHaveLength(6);
 
     const modes = new Set(matches.map((m) => m.match(/['"]([a-z]+)['"]/)[1]));
     expect(modes).toEqual(
       new Set([
-        'regular',
         'tight',
         'relaxed',
         'default',
@@ -114,7 +113,7 @@ describe('generateModular', () => {
     );
   });
 
-  it('emits Regular numerics in @theme as direct px (not var refs)', () => {
+  it('emits Default numerics in @theme as direct px (not var refs)', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     expect(globals).toMatch(/--spacing-4:\s*16px;/);
     expect(globals).toMatch(/--spacing-6:\s*24px;/);
@@ -170,16 +169,16 @@ describe('generateModular', () => {
     // Both numeric AND role tokens inside [data-style="X"] blocks must be
     // already-prefixed since they live outside @theme.
     expect(globals).toMatch(
-      /\[data-style=['"]regular['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
+      /\[data-style=['"]default['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
     );
     expect(globals).toMatch(
-      /\[data-style=['"]regular['"]\] \{[\s\S]*?--nx-container-p:\s*24px;/
+      /\[data-style=['"]default['"]\] \{[\s\S]*?--nx-container-p:\s*24px;/
     );
   });
 
   it('spacingDefault option shifts which mode lands under :root, [data-style="X"]', async () => {
     // Same contract as the bundled-tailwind build: pass a non-default mode
-    // and confirm the :root combinator moves to it. All 7 mode blocks still
+    // and confirm the :root combinator moves to it. All 6 mode blocks still
     // emit; only the `:root` half of the dual selector changes.
     const dir = makeTmpDir();
     const originalLog = console.log;
@@ -193,9 +192,9 @@ describe('generateModular', () => {
 
     expect(globals).toMatch(/:root,\s*\n\s*\[data-style=['"]relaxed['"]\] \{/);
     expect(globals).not.toMatch(
-      /:root,\s*\n\s*\[data-style=['"]regular['"]\] \{/
+      /:root,\s*\n\s*\[data-style=['"]default['"]\] \{/
     );
     const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
-    expect(matches).toHaveLength(7);
+    expect(matches).toHaveLength(6);
   });
 });

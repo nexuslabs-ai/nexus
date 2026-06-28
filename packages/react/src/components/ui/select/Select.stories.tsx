@@ -35,7 +35,6 @@ export default meta;
 type Story = StoryObj<typeof Select>;
 
 const SELECT_TRIGGER_HEIGHTS = {
-  regular: 40,
   tight: 42,
   relaxed: 44,
   default: 40,
@@ -848,24 +847,24 @@ export const SelectTriggerScaleHeightFollowsModes: Story = {
   },
 };
 
-export const VegaDefaultHeightPinned: Story = {
+export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Regression sentinel: pins the `SelectTrigger` height in regular mode to the default single-line control scale.',
+          'Regression sentinel: pins the `SelectTrigger` height in default mode to the default single-line control scale.',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
-      data-testid="select-regular-host"
+      data-style="default"
+      data-testid="select-default-host"
       className="nx:p-10 nx:bg-background"
     >
       <Select>
-        <SelectTrigger aria-label="regular select" className="nx:w-[200px]">
+        <SelectTrigger aria-label="default select" className="nx:w-[200px]">
           <SelectValue placeholder="Pick one" />
         </SelectTrigger>
         <SelectContent>
@@ -875,7 +874,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'select-regular-host', 40);
+    await expectHeightPinned(within(canvasElement), 'select-default-host', 40);
   },
 };
 

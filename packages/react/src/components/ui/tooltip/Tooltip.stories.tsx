@@ -336,7 +336,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          "Each row sets `data-style` on the trigger wrapper to demonstrate the available spacing modes. Note that `TooltipContent` portals to `document.body` and therefore picks up the document-level `data-style`, not the wrapper — opening a tooltip from any row renders content at whatever mode the Style toolbar selected, not the row's mode. The triggers themselves (Buttons) do respond to the wrapper. Vega / Lyra / Luma / Mira currently share identical control padding tokens.",
+          "Each row sets `data-style` on the trigger wrapper to demonstrate the available spacing modes. Note that `TooltipContent` portals to `document.body` and therefore picks up the document-level `data-style`, not the wrapper — opening a tooltip from any row renders content at whatever mode the Style toolbar selected, not the row's mode. The triggers themselves (Buttons) do respond to the wrapper.",
       },
     },
   },
@@ -371,7 +371,7 @@ export const TooltipContentUsesNumericSpacing: Story = {
     docs: {
       description: {
         story:
-          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — regular (the documented default in the Style toolbar), where `px-3` is 12px and `py-1.5` is 6px.',
+          'Regression sentinel — verifies `TooltipContent` keeps its intended numeric padding (`px-3` / `py-1.5`) at the resolved pixel values via `getComputedStyle`. Because the content is portaled, the assertion sees document-level mode resolution — default, where `px-3` is 12px and `py-1.5` is 6px.',
       },
     },
   },

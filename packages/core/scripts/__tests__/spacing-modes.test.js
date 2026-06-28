@@ -15,7 +15,7 @@ const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
 // files. The CLI gate (pnpm validate:spacing-modes in CI and pre-commit) is
 // the production enforcement; this test gives Vitest-level signal too.
 describe('spacing modes', () => {
-  it('ships exactly the seven canonical modes', () => {
+  it('ships exactly the canonical modes', () => {
     const modes = fs
       .readdirSync(SEMANTIC_DIR)
       .filter((name) => name.startsWith('spacing-') && name.endsWith('.json'))
@@ -25,7 +25,7 @@ describe('spacing modes', () => {
     expect(modes).toEqual([...CANONICAL_MODES].sort());
   });
 
-  it('all 7 mode files share the same leaf-path key set (regular as baseline)', () => {
+  it('all mode files share the same leaf-path key set (default as baseline)', () => {
     const modeDataMap = new Map();
     for (const mode of CANONICAL_MODES) {
       const data = JSON.parse(

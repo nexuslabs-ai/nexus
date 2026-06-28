@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { cn } from '../lib/utils';
 
 export const SPACING_MODES = [
-  'regular',
   'tight',
   'relaxed',
   'default',

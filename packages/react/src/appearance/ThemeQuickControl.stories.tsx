@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { NexusAppearanceProvider, useNexusAppearance } from './provider';
 import { NexusThemeQuickControl } from './theme-quick-control';
@@ -86,8 +86,10 @@ export const KeyboardInteraction: Story = {
     await userEvent.keyboard('{Enter}');
 
     const popover = await within(document.body).findByRole('dialog');
-    await expect(
-      within(popover).getByRole('group', { name: 'Theme mode' })
-    ).toBeVisible();
+    await waitFor(async () => {
+      await expect(
+        within(popover).getByRole('group', { name: 'Theme mode' })
+      ).toBeVisible();
+    });
   },
 };

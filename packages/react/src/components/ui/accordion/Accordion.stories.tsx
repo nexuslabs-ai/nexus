@@ -755,25 +755,25 @@ export const AccordionTriggerModesCascade: Story = {
   },
 };
 
-export const AccordionTriggerVegaHeightPinned: Story = {
+export const AccordionTriggerDefaultHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Pin on the numeric-spacing outcome: in regular mode, AccordionTrigger renders at exactly 52px (= `typography-label-default` line-height 20 + `py-4` 16 x 2).',
+          'Pin on the numeric-spacing outcome: in default mode, AccordionTrigger renders at exactly 52px (= `typography-label-default` line-height 20 + `py-4` 16 x 2).',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
-      data-testid="accordion-regular-host"
+      data-style="default"
+      data-testid="accordion-default-host"
       className="nx:p-10 nx:bg-background"
     >
       <Accordion type="single" collapsible className="nx:w-[200px]">
         <AccordionItem value="a">
-          <AccordionTrigger>Vega</AccordionTrigger>
+          <AccordionTrigger>Default</AccordionTrigger>
           <AccordionContent>x</AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -782,7 +782,7 @@ export const AccordionTriggerVegaHeightPinned: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightPinned(
       within(canvasElement),
-      'accordion-regular-host',
+      'accordion-default-host',
       52,
       {
         selector: '[data-slot="accordion-trigger"]',
@@ -791,20 +791,20 @@ export const AccordionTriggerVegaHeightPinned: Story = {
   },
 };
 
-export const AccordionFloatingTriggerVegaHeightPinned: Story = {
+export const AccordionFloatingTriggerDefaultHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Pin on the floating visual variant: the item chrome changes, but the AccordionTrigger remains exactly 52px in regular mode.',
+          'Pin on the floating visual variant: the item chrome changes, but the AccordionTrigger remains exactly 52px in default mode.',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
-      data-testid="accordion-floating-regular-host"
+      data-style="default"
+      data-testid="accordion-floating-default-host"
       className="nx:p-10 nx:bg-background"
     >
       <Accordion
@@ -814,7 +814,7 @@ export const AccordionFloatingTriggerVegaHeightPinned: Story = {
         className="nx:w-[200px]"
       >
         <AccordionItem value="a">
-          <AccordionTrigger>Vega</AccordionTrigger>
+          <AccordionTrigger>Default</AccordionTrigger>
           <AccordionContent>x</AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -823,7 +823,7 @@ export const AccordionFloatingTriggerVegaHeightPinned: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightPinned(
       within(canvasElement),
-      'accordion-floating-regular-host',
+      'accordion-floating-default-host',
       52,
       {
         selector: '[data-slot="accordion-trigger"]',
@@ -832,7 +832,7 @@ export const AccordionFloatingTriggerVegaHeightPinned: Story = {
   },
 };
 
-export const AccordionExpandedItemVegaHeightPinned: Story = {
+export const AccordionExpandedItemDefaultHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
@@ -843,7 +843,7 @@ export const AccordionExpandedItemVegaHeightPinned: Story = {
     },
   },
   render: () => (
-    <div data-style="regular" className="nx:p-10 nx:bg-background">
+    <div data-style="default" className="nx:p-10 nx:bg-background">
       <Accordion
         type="single"
         collapsible
@@ -851,7 +851,7 @@ export const AccordionExpandedItemVegaHeightPinned: Story = {
         className="nx:w-[200px]"
       >
         <AccordionItem value="a" data-testid="accordion-expanded-item">
-          <AccordionTrigger>Vega</AccordionTrigger>
+          <AccordionTrigger>Default</AccordionTrigger>
           <AccordionContent>x</AccordionContent>
         </AccordionItem>
       </Accordion>

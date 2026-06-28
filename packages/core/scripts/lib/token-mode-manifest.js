@@ -7,16 +7,15 @@ export const TOKENS_DIR = path.resolve(__dirname, '..', '..', 'tokens');
 export const SEMANTIC_DIR = path.join(TOKENS_DIR, 'semantic');
 export const PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives');
 
-export const BASELINE_MODE = 'regular';
+export const BASELINE_MODE = 'default';
 
-// The seven canonical density modes.
+// The six canonical density modes.
 // An unknown filename (e.g. spacing-foo.json) or a missing canonical mode
 // is a structural error (exit 2), not key drift (exit 1).
 export const CANONICAL_MODES = [
   'comfortable',
   'compact',
   'default',
-  'regular',
   'relaxed',
   'spacious',
   'tight',
@@ -28,13 +27,7 @@ export const CANONICAL_RADIUS_MODES = [
   'square',
   'subtle',
 ];
-export const CANONICAL_BORDERWIDTH_MODES = [
-  'bold',
-  'fine',
-  'medium',
-  'normal',
-  'strong',
-];
+export const CANONICAL_BORDERWIDTH_MODES = ['fine', 'normal', 'strong'];
 export const CANONICAL_SHADOW_MODES = [
   'flat',
   'quiet',

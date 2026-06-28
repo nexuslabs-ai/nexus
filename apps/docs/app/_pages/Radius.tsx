@@ -117,11 +117,9 @@ export function Radius() {
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">Border widths</h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          The picker offers five border-width modes, but only three are distinct
-          designs — <code>medium</code> and <code>bold</code> are byte-identical
-          to <code>normal</code>. The box below sets its width from the runtime{' '}
-          <code>--nx-borderwidth-thick</code> var, so it thickens or thins as
-          you swap the Border control.
+          The picker offers three distinct border-width designs. The box below
+          sets its width from the runtime <code>--nx-borderwidth-thick</code>{' '}
+          var, so it thickens or thins as you swap the Border control.
         </p>
         <div className="nx:overflow-x-auto nx:mb-6">
           <table className="nx:w-full nx:min-w-[360px] nx:border-collapse nx:typography-label-default">

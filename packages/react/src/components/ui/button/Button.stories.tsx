@@ -13,7 +13,6 @@ import { Button } from './button';
 
 const BUTTON_SCALE_HEIGHTS = {
   sm: {
-    regular: 32,
     tight: 32,
     relaxed: 36,
     default: 32,
@@ -22,7 +21,6 @@ const BUTTON_SCALE_HEIGHTS = {
     spacious: 32,
   },
   default: {
-    regular: 40,
     tight: 42,
     relaxed: 44,
     default: 40,
@@ -31,7 +29,6 @@ const BUTTON_SCALE_HEIGHTS = {
     spacious: 40,
   },
   lg: {
-    regular: 48,
     tight: 48,
     relaxed: 52,
     default: 48,
@@ -392,7 +389,7 @@ export const TextButtonsStayContentWidth: Story = {
   },
   render: () => (
     <div
-      data-style="regular"
+      data-style="default"
       className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background"
     >
       <Button data-testid="button-content-short">Go</Button>
@@ -1078,9 +1075,9 @@ export const TextScaleHeightsAcrossModes: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const defaultButton = canvas.getByTestId('button-default-regular');
-    const smallButton = canvas.getByTestId('button-sm-regular');
-    const largeButton = canvas.getByTestId('button-lg-regular');
+    const defaultButton = canvas.getByTestId('button-default-default');
+    const smallButton = canvas.getByTestId('button-sm-default');
+    const largeButton = canvas.getByTestId('button-lg-default');
 
     await expect(defaultButton).toHaveClass('nx:typography-label-default');
     await expect(defaultButton).toHaveClass('nx:h-10');
@@ -1100,27 +1097,27 @@ export const TextScaleHeightsAcrossModes: Story = {
   },
 };
 
-export const VegaDefaultHeightPinned: Story = {
+export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
         story:
-          'Pin on the fixed-height outcome: in regular mode, a default Button renders at exactly 40px via `h-10`.',
+          'Pin on the fixed-height outcome: in default mode, a default Button renders at exactly 40px via `h-10`.',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
-      data-testid="button-regular-host"
+      data-style="default"
+      data-testid="button-default-host"
       className="nx:p-10 nx:bg-background"
     >
       <Button>Default</Button>
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'button-regular-host', 40);
+    await expectHeightPinned(within(canvasElement), 'button-default-host', 40);
   },
 };
 

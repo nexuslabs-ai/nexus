@@ -55,7 +55,6 @@ type Story = StoryObj<typeof Input>;
 
 const INPUT_SCALE_HEIGHTS = {
   sm: {
-    regular: 32,
     tight: 32,
     relaxed: 36,
     default: 32,
@@ -64,7 +63,6 @@ const INPUT_SCALE_HEIGHTS = {
     spacious: 32,
   },
   default: {
-    regular: 40,
     tight: 42,
     relaxed: 44,
     default: 40,
@@ -73,7 +71,6 @@ const INPUT_SCALE_HEIGHTS = {
     spacious: 40,
   },
   lg: {
-    regular: 48,
     tight: 48,
     relaxed: 52,
     default: 48,
@@ -630,7 +627,7 @@ export const InputScaleHeightsFollowModes: Story = {
 
     // The implicit-default input still exposes its size for styling hooks.
     await expect(
-      canvas.getByLabelText('regular default input')
+      canvas.getByLabelText('default default input')
     ).toHaveAttribute('data-size', 'default');
 
     // Heights vary per mode (fixed h-* over mode-scaled spacing tokens); the
