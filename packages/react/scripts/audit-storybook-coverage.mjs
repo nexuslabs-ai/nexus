@@ -610,7 +610,10 @@ export function findStoriesFile(componentFile) {
 }
 
 /**
- * List every component file under COMPONENTS_ROOT for `--all` mode.
+ * List every audited component file for `--all` mode. Component/primitives
+ * folders are discovered structurally. Appearance is intentionally config-led:
+ * private composition files live flat beside public entries, so only explicit
+ * storybook-coverage.config.json rows join the sweep.
  */
 export function listAllComponents(root = COMPONENTS_ROOT) {
   const out = [];
@@ -626,6 +629,16 @@ export function listAllComponents(root = COMPONENTS_ROOT) {
           ? searchRoot
           : path.join(searchRoot, sourceDir);
       if (!fs.existsSync(dir)) continue;
+      if (sourceDir === APPEARANCE_SOURCE_DIR) {
+        const config = readConfig();
+        for (const entry of config.components ?? []) {
+          if (entry.sourceDir !== APPEARANCE_SOURCE_DIR) continue;
+          const kebab = pascalToKebab(entry.name);
+          const full = path.join(dir, `${kebab}.tsx`);
+          if (fs.existsSync(full) && !isExcludedPath(full)) out.push(full);
+        }
+        continue;
+      }
       if (NESTED_SUBDIRS.has(sourceDir)) {
         // Per-component folder: each child dir holds `{kebab}/{kebab}.tsx`.
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
