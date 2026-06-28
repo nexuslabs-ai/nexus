@@ -66,6 +66,49 @@ export const ClickInteraction: Story = {
   },
 };
 
+export const ElevationInteraction: Story = {
+  render: () => <ProviderFrame />,
+  play: async ({ canvasElement }) => {
+    const originalShadow = document.documentElement.getAttribute('data-shadow');
+
+    try {
+      const canvas = within(canvasElement);
+      const elevationTrigger = canvas.getByRole('combobox', {
+        name: 'Elevation',
+      });
+
+      await userEvent.click(elevationTrigger);
+
+      const listbox = await within(document.body).findByRole('listbox');
+      const options = within(listbox).getAllByRole('option');
+
+      expect(options.map((option) => option.textContent)).toEqual([
+        'Quiet',
+        'Standard',
+        'Strong',
+      ]);
+
+      await userEvent.click(
+        within(listbox).getByRole('option', { name: 'Strong' })
+      );
+
+      await waitFor(() => {
+        expect(canvas.getByText('elevation: "strong",')).toBeVisible();
+        expect(document.documentElement).toHaveAttribute(
+          'data-shadow',
+          'strong'
+        );
+      });
+    } finally {
+      if (originalShadow === null) {
+        document.documentElement.removeAttribute('data-shadow');
+      } else {
+        document.documentElement.setAttribute('data-shadow', originalShadow);
+      }
+    }
+  },
+};
+
 export const KeyboardInteraction: Story = {
   render: () => <ProviderFrame />,
   play: async ({ canvasElement }) => {

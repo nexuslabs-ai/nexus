@@ -98,6 +98,14 @@ function cssVarNames(block) {
     .sort();
 }
 
+function cssDeclarations(block) {
+  return Object.fromEntries(
+    [...block.matchAll(/^\s*(--[a-z0-9-_]+):\s*([^;]+);/gm)].map(
+      ([, name, value]) => [name, compactCss(value)]
+    )
+  );
+}
+
 function themeColorLines(themeBlock) {
   return [...themeBlock.matchAll(/--color-([a-z0-9-]+):\s*([^;]+);/g)];
 }
@@ -264,14 +272,16 @@ describe('generateTailwindPackage', () => {
 
   // The .dark block must contain only dark tokens whose value diverges from
   // their `:root` counterpart by cssName. Focus colors live in their own
-  // primitive category (primitives/focus/) and supply the dark divergence;
-  // shadow tokens reference focus colors and stay byte-identical across
-  // themes, so none of the 80 dark shadow tokens reach the .dark block.
+  // primitive category (primitives/focus/) and supply the focus divergence.
+  // Default elevation shadows now also carry dark-only color tuning; geometry
+  // stays shared, so only the diverging shadow colour leaves should appear.
   it('.dark block contains only tokens that diverge from :root by value', () => {
     const darkBlock = extractBlock(variablesCSS, '.dark');
 
     expect(darkBlock).toMatch(/--nx-focus-color-default:/);
     expect(darkBlock).toMatch(/--nx-focus-color-error:/);
+    expect(darkBlock).toMatch(/--nx-shadow-2xs-layer-1-color:/);
+    expect(darkBlock).toMatch(/--nx-shadow-sm-layer-1-color:/);
 
     expect(darkBlock).not.toMatch(/--nx-shadow-focus-default-color:/);
     expect(darkBlock).not.toMatch(/--nx-shadow-focus-error-color:/);
@@ -497,6 +507,28 @@ describe('generateTailwindPackage', () => {
     );
   });
 
+  it('compiles shadow utilities through runtime shadow variables', async () => {
+    const compiledCSS = await compileGeneratedTailwind(distDir, [
+      'nx:shadow-sm',
+      'nx:shadow-lg',
+      'nx:shadow-xl',
+      'nx:shadow-2xl',
+    ]);
+
+    for (const tier of ['sm', 'lg', 'xl', '2xl']) {
+      expect(compiledCSS).toMatch(
+        new RegExp(
+          `\\.nx\\\\:shadow-${tier}\\s*\\{[\\s\\S]*?--tw-shadow:\\s*var\\(--nx-shadow-${tier}-`
+        )
+      );
+      expect(compiledCSS).toMatch(
+        new RegExp(
+          `\\.nx\\\\:shadow-${tier}\\s*\\{[\\s\\S]*?box-shadow:[\\s\\S]*?var\\(--tw-shadow\\);`
+        )
+      );
+    }
+  });
+
   it('registers numeric --spacing-N in @theme with direct px (not var() refs)', () => {
     // The numeric subset seeds @theme so Tailwind codegens nx:p-N / nx:m-N /
     // nx:h-N / nx:gap-N. After migration these are direct px values, not
@@ -592,6 +624,42 @@ describe('generateTailwindPackage', () => {
         `data-shadow="${mode}" dark`
       ).toEqual(darkBaselineVars);
     }
+  });
+
+  it('calibrates public shadow runtime blocks by mode and scheme', () => {
+    const publicModes = ['quiet', 'standard', 'strong'];
+
+    for (const mode of publicModes) {
+      const light = cssDeclarations(
+        extractDataAttrBlock(nexusCSS, 'data-shadow', mode)
+      );
+      const dark = cssDeclarations(
+        extractDarkDataAttrBlock(nexusCSS, 'data-shadow', mode)
+      );
+      const colorDiffs = Object.keys(light).filter(
+        (name) => name.startsWith('--nx-shadow-') && light[name] !== dark[name]
+      );
+
+      expect(colorDiffs.length, `${mode} light/dark`).toBeGreaterThan(0);
+      expect(colorDiffs, `${mode} color calibration`).toContain(
+        '--nx-shadow-sm-layer-1-color'
+      );
+    }
+
+    for (const scheme of ['light', 'dark']) {
+      const blocks = publicModes.map((mode) =>
+        scheme === 'light'
+          ? cssDeclarations(extractDataAttrBlock(nexusCSS, 'data-shadow', mode))
+          : cssDeclarations(
+              extractDarkDataAttrBlock(nexusCSS, 'data-shadow', mode)
+            )
+      );
+
+      expect(blocks[0]).not.toEqual(blocks[1]);
+      expect(blocks[1]).not.toEqual(blocks[2]);
+    }
+
+    expect(nexusCSS).not.toMatch(/\{[a-z0-9_.-]+\}/);
   });
 
   it.each(SPACING_MODES)(

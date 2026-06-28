@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, within } from 'storybook/test';
 
 import shadowFlatDark from '../../../core/tokens/primitives/shadow/shadow-flat-dark.json';
 import shadowFlatLight from '../../../core/tokens/primitives/shadow/shadow-flat-light.json';
@@ -11,7 +12,8 @@ import shadowStandardLight from '../../../core/tokens/primitives/shadow/shadow-s
 import shadowStrongDark from '../../../core/tokens/primitives/shadow/shadow-strong-dark.json';
 import shadowStrongLight from '../../../core/tokens/primitives/shadow/shadow-strong-light.json';
 
-const BUNDLED_SHADOW_MODE = 'flat';
+const PUBLIC_APPEARANCE_DEFAULT_SHADOW_MODE = 'quiet';
+const TOKEN_DOCS_ONLY_SHADOW_MODES = new Set(['flat', 'soft']);
 
 type Dimension = { value: number; unit: string };
 type DimensionToken = { $value: Dimension; $type: string };
@@ -47,6 +49,23 @@ const DISPLAY_SHADOW_KEYS = [
   'xl',
   '2xl',
 ] as const satisfies readonly ShadowKey[];
+
+const RUNTIME_SHADOW_MODES = [
+  'quiet',
+  'standard',
+  'strong',
+] as const satisfies readonly string[];
+
+const RUNTIME_SHADOW_TIERS = [
+  { name: '2xs', className: 'nx:shadow-2xs' },
+  { name: 'xs', className: 'nx:shadow-xs' },
+  { name: 'sm', className: 'nx:shadow-sm' },
+  { name: 'base', className: 'nx:shadow-base' },
+  { name: 'md', className: 'nx:shadow-md' },
+  { name: 'lg', className: 'nx:shadow-lg' },
+  { name: 'xl', className: 'nx:shadow-xl' },
+  { name: '2xl', className: 'nx:shadow-2xl' },
+] as const;
 
 const SHADOW_MODES_LIGHT: { name: string; tokens: ShadowSet }[] = [
   { name: 'flat', tokens: shadowFlatLight as ShadowSet },
@@ -103,26 +122,91 @@ function ShadowCard({ name, token }: { name: string; token: ShadowToken }) {
 
 function ModeSection({
   mode,
-  bundled,
+  appearanceDefault,
+  tokenOnly,
   tokens,
 }: {
   mode: string;
-  bundled: boolean;
+  appearanceDefault: boolean;
+  tokenOnly: boolean;
   tokens: ShadowSet;
 }) {
   return (
     <section className="nx:flex nx:flex-col nx:gap-4">
       <h3 className="nx:flex nx:items-center nx:gap-2 nx:text-foreground nx:typography-heading-xsmall">
         <span>{mode}</span>
-        {bundled && (
+        {appearanceDefault && (
           <span className="nx:rounded-sm nx:bg-primary-subtle nx:text-primary-subtle-foreground nx:typography-label-small nx:px-1.5 nx:py-0.5">
-            Bundled
+            Appearance default
+          </span>
+        )}
+        {tokenOnly && (
+          <span className="nx:rounded-sm nx:bg-muted nx:text-muted-foreground nx:typography-label-small nx:px-1.5 nx:py-0.5">
+            Token mode
           </span>
         )}
       </h3>
       <div className="nx:flex nx:flex-wrap nx:items-end nx:gap-8 nx:px-2 nx:py-6">
         {DISPLAY_SHADOW_KEYS.map((sk) => (
           <ShadowCard key={sk} name={sk} token={tokens[sk]} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RuntimeUtilityCard({
+  scheme,
+  mode,
+  tier,
+  className,
+}: {
+  scheme: 'light' | 'dark';
+  mode: string;
+  tier: string;
+  className: string;
+}) {
+  return (
+    <article
+      className={`nx:flex nx:h-24 nx:flex-col nx:justify-between nx:rounded-lg nx:border nx:border-default nx:bg-container nx:p-3 ${className}`}
+      data-testid={`${scheme}-${mode}-${tier}`}
+    >
+      <span className="nx:text-foreground nx:typography-label-default">
+        {tier}
+      </span>
+      <span className="nx:text-muted-foreground nx:typography-label-small">
+        nx:shadow-{tier}
+      </span>
+    </article>
+  );
+}
+
+function RuntimeModeSection({
+  scheme,
+  mode,
+}: {
+  scheme: 'light' | 'dark';
+  mode: string;
+}) {
+  return (
+    <section className="nx:flex nx:flex-col nx:gap-4" data-shadow={mode}>
+      <div className="nx:flex nx:items-center nx:justify-between nx:gap-3">
+        <h3 className="nx:text-foreground nx:typography-heading-xsmall">
+          {mode}
+        </h3>
+        <span className="nx:text-muted-foreground nx:typography-label-small">
+          data-shadow=&quot;{mode}&quot;
+        </span>
+      </div>
+      <div className="nx:grid nx:grid-cols-2 nx:gap-4 nx:md:grid-cols-4">
+        {RUNTIME_SHADOW_TIERS.map(({ name, className }) => (
+          <RuntimeUtilityCard
+            key={name}
+            scheme={scheme}
+            mode={mode}
+            tier={name}
+            className={className}
+          />
         ))}
       </div>
     </section>
@@ -164,7 +248,8 @@ export const Light: Story = {
         <ModeSection
           key={name}
           mode={name}
-          bundled={name === BUNDLED_SHADOW_MODE}
+          appearanceDefault={name === PUBLIC_APPEARANCE_DEFAULT_SHADOW_MODE}
+          tokenOnly={TOKEN_DOCS_ONLY_SHADOW_MODES.has(name)}
           tokens={tokens}
         />
       ))}
@@ -190,10 +275,49 @@ export const Dark: Story = {
         <ModeSection
           key={name}
           mode={name}
-          bundled={name === BUNDLED_SHADOW_MODE}
+          appearanceDefault={name === PUBLIC_APPEARANCE_DEFAULT_SHADOW_MODE}
+          tokenOnly={TOKEN_DOCS_ONLY_SHADOW_MODES.has(name)}
           tokens={tokens}
         />
       ))}
     </div>
   ),
+};
+
+export const RuntimeUtilities: Story = {
+  render: () => (
+    <div className="nx:grid nx:min-w-fit nx:grid-cols-1 nx:gap-0 nx:bg-background nx:lg:grid-cols-2">
+      {(['light', 'dark'] as const).map((scheme) => (
+        <div
+          key={scheme}
+          className={`nx:flex nx:flex-col nx:gap-8 nx:p-10 ${
+            scheme === 'dark' ? 'dark nx:bg-background' : 'nx:bg-background'
+          }`}
+        >
+          <div className="nx:flex nx:flex-col nx:gap-2">
+            <h2 className="nx:text-foreground nx:typography-heading-medium">
+              Runtime shadows — {scheme}
+            </h2>
+            <p className="nx:max-w-2xl nx:text-muted-foreground nx:typography-body-default">
+              Real `nx:shadow-*` utilities rendered under the public Appearance
+              elevation modes. `flat` and `soft` remain token/docs modes only.
+            </p>
+          </div>
+          {RUNTIME_SHADOW_MODES.map((mode) => (
+            <RuntimeModeSection key={mode} scheme={scheme} mode={mode} />
+          ))}
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const strongDark = canvas.getByTestId('dark-strong-lg');
+    const quietLight = canvas.getByTestId('light-quiet-sm');
+
+    await expect(strongDark).toBeVisible();
+    await expect(quietLight).toBeVisible();
+    expect(getComputedStyle(strongDark).boxShadow).not.toBe('none');
+    expect(getComputedStyle(quietLight).boxShadow).not.toBe('none');
+  },
 };
