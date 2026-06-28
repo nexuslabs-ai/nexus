@@ -9,11 +9,12 @@ const packageRoot = path.resolve(scriptDir, '..');
 const repoRoot = path.resolve(packageRoot, '../..');
 const consumerRoot = path.join(repoRoot, 'apps', 'console');
 const probeDir = path.join(consumerRoot, '.appearance-dist-typecheck');
-const probePath = path.join(probeDir, 'probe.ts');
+const probePath = path.join(probeDir, 'probe.tsx');
 const tsconfigPath = path.join(probeDir, 'tsconfig.json');
 const tscBin = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
 
 const requiredDistFiles = [
+  path.join(packageRoot, 'dist', 'index.d.ts'),
   path.join(packageRoot, 'dist', 'appearance.d.ts'),
   path.join(packageRoot, '..', 'core', 'dist', 'runtime', 'index.d.ts'),
 ];
@@ -31,8 +32,17 @@ await mkdir(probeDir, { recursive: true });
 
 await writeFile(
   probePath,
-  `import type { NexusAppearanceState } from '@nexus/core';
+  `import { Button } from '@nexus/react';
+import type { NexusAppearanceState } from '@nexus/core';
+import { NexusAppearanceProvider, NexusThemeQuickControl } from '@nexus/react/appearance';
 import { useNexusAppearance } from '@nexus/react/appearance';
+
+const element = (
+  <NexusAppearanceProvider storageKey={false}>
+    <Button>Confirm</Button>
+    <NexusThemeQuickControl />
+  </NexusAppearanceProvider>
+);
 
 const { setState } = useNexusAppearance();
 
@@ -45,6 +55,8 @@ setState((state) => {
 
   return { ...inferred, mode };
 });
+
+void element;
 `
 );
 
@@ -52,12 +64,19 @@ await writeFile(
   tsconfigPath,
   JSON.stringify(
     {
-      extends: '../../../tsconfig.base.json',
       compilerOptions: {
-        noEmit: true,
+        target: 'ES2020',
+        lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+        module: 'ESNext',
+        moduleResolution: 'bundler',
         jsx: 'react-jsx',
+        strict: true,
+        noEmit: true,
+        esModuleInterop: true,
+        skipLibCheck: true,
+        forceConsistentCasingInFileNames: true,
       },
-      include: ['probe.ts'],
+      include: ['probe.tsx'],
     },
     null,
     2

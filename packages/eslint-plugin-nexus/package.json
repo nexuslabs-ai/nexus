@@ -6,7 +6,8 @@
   "description": "Custom ESLint rules for the Nexus design system",
   "main": "./src/index.js",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./config": "./src/config.js"
   },
   "files": [
     "src"

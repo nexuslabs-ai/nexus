@@ -25,3 +25,12 @@ Enforces `.claude/rules/extract-inline-handlers.md`: inline JSX handler props (`
 ## Source of truth
 
 The token-layer rules are self-contained: the canonical step set is `src/canonical-step-set.json`. The component rules map 1:1 to the `.claude/rules/*.md` cited above — the rule code plus those docs are the spec. Every rule has RuleTester coverage in `__tests__/`.
+
+## Shareable config
+
+`@nexus/eslint-plugin/config` exports small flat-config helpers for consumers
+that want the Nexus rules without copying this monorepo's full lint setup:
+
+- `nexusComponentConfig({ files })` wires the component-authoring rules.
+- `nexusSpacingTokenConfig({ files, parser })` wires the spacing-token rule; pass
+  `jsonc-eslint-parser` when linting JSON token files.

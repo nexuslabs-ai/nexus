@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { NexusAppearanceProvider, useNexusAppearance } from './provider';
+import { useNexusAppearance } from './provider';
 import { NexusThemeQuickControl } from './theme-quick-control';
 
 const meta: Meta<typeof NexusThemeQuickControl> = {
@@ -30,21 +30,21 @@ function StateProbe() {
   );
 }
 
-function ProviderFrame() {
+function QuickControlFrame() {
   return (
-    <NexusAppearanceProvider storageKey={false}>
+    <>
       <NexusThemeQuickControl />
       <StateProbe />
-    </NexusAppearanceProvider>
+    </>
   );
 }
 
 export const Default: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <QuickControlFrame />,
 };
 
 export const WithDataAttributes: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <QuickControlFrame />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -56,7 +56,7 @@ export const WithDataAttributes: Story = {
 };
 
 export const ClickInteraction: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <QuickControlFrame />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -77,7 +77,7 @@ export const ClickInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <QuickControlFrame />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 

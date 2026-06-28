@@ -33,8 +33,8 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const SRC_ROOT = path.join(__dirname, '..', 'src');
 const COMPONENTS_ROOT = path.join(SRC_ROOT, 'components');
 const APPEARANCE_ROOT = path.join(SRC_ROOT, 'appearance');
-const CONFIG_PATH = path.join(__dirname, 'base-variants.config.json');
-const EXCLUDE_PATH_FRAGMENTS = ['__generated__', 'node_modules', 'dist'];
+const CONFIG_PATH = path.join(__dirname, 'storybook-coverage.config.json');
+const EXCLUDE_PATH_FRAGMENTS = ['node_modules', 'dist'];
 const STORY_SUFFIX = '.stories.tsx';
 const TEST_SUFFIX = '.test.tsx';
 
@@ -352,7 +352,11 @@ export function extractCvaEnums(src) {
     const remainder = argsRegion.slice(firstArgEnd).trimStart();
     if (!remainder.startsWith(',')) continue;
     const configStart =
-      call.start + 1 + firstArgEnd + (argsRegion.slice(firstArgEnd).length - remainder.length) + 1;
+      call.start +
+      1 +
+      firstArgEnd +
+      (argsRegion.slice(firstArgEnd).length - remainder.length) +
+      1;
     // Find the next `{` from configStart that is the config object
     let i = configStart;
     while (i < call.end && /\s/.test(src[i])) i++;
@@ -582,8 +586,9 @@ export function findComponentFile(kebab, root = COMPONENTS_ROOT) {
   if (matches.length === 0) {
     throw new ConfigError(
       `component "${kebab}" not found under ${searchRoots
-        .map(({ root, sourceDirs }) =>
-          `${path.relative(REPO_ROOT, root)}/{${sourceDirs.join(',')}}/`
+        .map(
+          ({ root, sourceDirs }) =>
+            `${path.relative(REPO_ROOT, root)}/{${sourceDirs.join(',')}}/`
         )
         .join(' or ')}`
     );
@@ -610,7 +615,10 @@ export function findStoriesFile(componentFile) {
 }
 
 /**
- * List every component file under COMPONENTS_ROOT for `--all` mode.
+ * List every audited component file for `--all` mode. Component/primitives
+ * folders are discovered structurally. Appearance is intentionally config-led:
+ * private composition files live flat beside public entries, so only explicit
+ * storybook-coverage.config.json rows join the sweep.
  */
 export function listAllComponents(root = COMPONENTS_ROOT) {
   const out = [];
@@ -626,6 +634,16 @@ export function listAllComponents(root = COMPONENTS_ROOT) {
           ? searchRoot
           : path.join(searchRoot, sourceDir);
       if (!fs.existsSync(dir)) continue;
+      if (sourceDir === APPEARANCE_SOURCE_DIR) {
+        const config = readConfig();
+        for (const entry of config.components ?? []) {
+          if (entry.sourceDir !== APPEARANCE_SOURCE_DIR) continue;
+          const kebab = pascalToKebab(entry.name);
+          const full = path.join(dir, `${kebab}.tsx`);
+          if (fs.existsSync(full) && !isExcludedPath(full)) out.push(full);
+        }
+        continue;
+      }
       if (NESTED_SUBDIRS.has(sourceDir)) {
         // Per-component folder: each child dir holds `{kebab}/{kebab}.tsx`.
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -797,7 +815,7 @@ const INTERACTIVE_REQUIREMENTS = Object.freeze([
 const BASE_REQUIREMENTS = Object.freeze(['Default', 'WithDataAttributes']);
 
 /**
- * Look up the per-component archetype entry from base-variants.config.json.
+ * Look up the per-component archetype entry from storybook-coverage.config.json.
  * Returns the raw entry (with optional `interactions` / `equivalents`) or null
  * when the component has no config row — keeping callers from re-parsing the
  * file. Display-gate inference handles the null case.
@@ -809,7 +827,7 @@ function configEntryFor(componentName) {
 
 /**
  * Resolve the interaction-story requirement list for a component:
- *   1. Explicit `entry.interactions` in base-variants.config.json wins.
+ *   1. Explicit `entry.interactions` in storybook-coverage.config.json wins.
  *   2. Otherwise, display-gate signal: source-detected interactive (disabled
  *      prop or on* handler) OR a stories-level `fn()` spy in `meta.args`
  *      yields the canonical INTERACTIVE_REQUIREMENTS list.
@@ -824,7 +842,7 @@ function interactionRequirementsFor(entry, isInteractive) {
 /**
  * Build the set of story names that satisfy `requirementName` for a given
  * component. Always includes the canonical name itself; appends any
- * component-scoped equivalents declared in base-variants.config.json. Scoping
+ * component-scoped equivalents declared in storybook-coverage.config.json. Scoping
  * is per-component (not global) so an unrelated component's alias can't
  * silently satisfy another's requirement.
  */
@@ -841,7 +859,7 @@ function acceptedNamesForRequirement(entry, requirementName) {
  * @param {{ showcase?: string }} [opts] - `showcase` overrides the canonical
  *   showcase story name (default: looked up via `showcaseNameFor`). Synthetic
  *   tests pass it directly to stay decoupled from the repo's
- *   `base-variants.config.json`.
+ *   `storybook-coverage.config.json`.
  * @returns {{ component, file, storiesFile, findings, summary, info }}
  */
 export function auditComponent(componentFile, opts = {}) {
@@ -898,7 +916,10 @@ export function auditComponent(componentFile, opts = {}) {
 
   // ── Required stories (canonical + component-scoped equivalents) ───────────
   const entry = configEntryFor(pascal);
-  const interactiveRequirements = interactionRequirementsFor(entry, isInteractive);
+  const interactiveRequirements = interactionRequirementsFor(
+    entry,
+    isInteractive
+  );
   const requiredNames = [
     ...BASE_REQUIREMENTS,
     ...interactiveRequirements,
@@ -990,7 +1011,8 @@ export function auditComponent(componentFile, opts = {}) {
         kind: 'missing',
         rule: 'as-child',
         name: 'asChild story',
-        expected: 'a story rendering the component with `asChild` to verify composition',
+        expected:
+          'a story rendering the component with `asChild` to verify composition',
         snippet: snippetFor('asChild'),
       });
     }
@@ -1010,7 +1032,8 @@ export function auditComponent(componentFile, opts = {}) {
       kind: 'info',
       rule: 'compound-component',
       name: `${cvaCount} CVA blocks`,
-      found: 'compound component — CVA enums unioned across blocks for the audit',
+      found:
+        'compound component — CVA enums unioned across blocks for the audit',
     });
   }
 
@@ -1023,8 +1046,12 @@ function capitalize(s) {
 }
 
 function finalize(result) {
-  result.summary.missing = result.findings.filter((f) => f.kind === 'missing').length;
-  result.summary.drift = result.findings.filter((f) => f.kind === 'drift').length;
+  result.summary.missing = result.findings.filter(
+    (f) => f.kind === 'missing'
+  ).length;
+  result.summary.drift = result.findings.filter(
+    (f) => f.kind === 'drift'
+  ).length;
   result.summary.info = result.info.length;
   result.summary.total = result.findings.length;
 }
@@ -1117,9 +1144,10 @@ function main() {
   } else {
     // Accept Pascal or kebab; canonicalize to kebab for filesystem lookup.
     const input = args.component;
-    const kebab = input.includes('-') || input === input.toLowerCase()
-      ? input
-      : pascalToKebab(input);
+    const kebab =
+      input.includes('-') || input === input.toLowerCase()
+        ? input
+        : pascalToKebab(input);
     files = [findComponentFile(kebab)];
   }
 

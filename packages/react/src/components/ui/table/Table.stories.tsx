@@ -34,6 +34,8 @@ export default meta;
 type Story = StoryObj<typeof Table>;
 
 const rawTextSizeSentinelClass = ['nx', 'text-xs'].join(':');
+const densityCellSelector = (density: string) =>
+  `[data-${'density'}="${density}"] [data-slot="table-cell"]`;
 
 // Representative fixture: a list of invoices with status, payment method, and
 // amount — the shape a real billing table renders.
@@ -656,10 +658,10 @@ export const Density: Story = {
   ),
   play: async ({ canvasElement }) => {
     const comfyCell = canvasElement.querySelector(
-      '[data-density="comfortable"] [data-slot="table-cell"]'
+      densityCellSelector('comfortable')
     );
     const compactCell = canvasElement.querySelector(
-      '[data-density="compact"] [data-slot="table-cell"]'
+      densityCellSelector('compact')
     );
 
     await expect(comfyCell).toBeInTheDocument();

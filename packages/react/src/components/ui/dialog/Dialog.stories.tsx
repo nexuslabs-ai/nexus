@@ -41,37 +41,6 @@ const meta: Meta<typeof Dialog> = {
 export default meta;
 type Story = StoryObj<typeof Dialog>;
 
-function getCloseButtonInsets(surface: HTMLElement, closeButton: HTMLElement) {
-  const surfaceRect = surface.getBoundingClientRect();
-  const closeButtonRect = closeButton.getBoundingClientRect();
-
-  return {
-    top: Math.round(closeButtonRect.top - surfaceRect.top),
-    right: Math.round(surfaceRect.right - closeButtonRect.right),
-  };
-}
-
-async function expectCloseButtonInsets(
-  surface: HTMLElement,
-  closeButton: HTMLElement,
-  expectedPx: number
-) {
-  await waitFor(() => {
-    const insets = getCloseButtonInsets(surface, closeButton);
-    expect(insets.top).toBe(expectedPx);
-    expect(insets.right).toBe(expectedPx);
-  });
-}
-
-function restoreDocumentStyleMode(previousStyle: string | null) {
-  if (previousStyle == null) {
-    document.documentElement.removeAttribute('data-style');
-    return;
-  }
-
-  document.documentElement.setAttribute('data-style', previousStyle);
-}
-
 // ============================================
 // BASIC STORIES
 // ============================================
@@ -644,68 +613,6 @@ export const CloseButtonFocus: Story = {
     await waitFor(() => {
       expect(document.querySelector('[role="dialog"]')).toBeNull();
     });
-  },
-};
-
-export const CloseButtonTracksSpacingModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Regression sentinel: the built-in close button uses the same `spacing-6` inset as Dialog chrome, so it follows the active `data-style` mode instead of staying on a smaller fixed offset.',
-      },
-    },
-  },
-  render: (_args) => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Open spacing dialog</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Spacing-mode close offset</DialogTitle>
-          <DialogDescription>
-            The close button should stay aligned to the dialog chrome inset.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  ),
-  play: async ({ canvasElement }) => {
-    const previousStyle = document.documentElement.getAttribute('data-style');
-    const canvas = within(canvasElement);
-
-    document.documentElement.setAttribute('data-style', 'compact');
-
-    try {
-      await userEvent.click(
-        canvas.getByRole('button', { name: 'Open spacing dialog' })
-      );
-
-      const dialog = await within(document.body).findByRole('dialog');
-      const closeButton = within(dialog).getByRole('button', { name: 'Close' });
-
-      await expect(closeButton).toHaveClass('nx:right-6', 'nx:top-6');
-      await expectCloseButtonInsets(dialog, closeButton, 22);
-
-      document.documentElement.setAttribute('data-style', 'relaxed');
-      await expectCloseButtonInsets(dialog, closeButton, 28);
-
-      await userEvent.keyboard('{Escape}');
-      await waitFor(() => {
-        expect(document.querySelector('[role="dialog"]')).toBeNull();
-      });
-    } finally {
-      restoreDocumentStyleMode(previousStyle);
-
-      if (document.querySelector('[role="dialog"]')) {
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => {
-          expect(document.querySelector('[role="dialog"]')).toBeNull();
-        });
-      }
-    }
   },
 };
 

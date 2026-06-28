@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconEye, IconMail, IconSearch, IconX } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../../stories/spacing-modes';
-import { expectHeightPerMode } from '../../../stories/test-utils';
 import { Spinner } from '../spinner';
 
 import {
@@ -415,109 +413,6 @@ export const Sizes: Story = {
       </InputGroup>
     </div>
   ),
-};
-
-// The visible frame takes the control's size height (h-8 / h-10 / h-12), so the
-// group is never taller than a standalone Input. Like Input, those heights
-// follow the active spacing mode, so they are pinned per mode — the same scale
-// as Input, since the frame height is the control's h-*.
-const GROUP_SCALE_HEIGHTS = {
-  sm: {
-    tight: 32,
-    relaxed: 36,
-    default: 32,
-    compact: 30,
-    comfortable: 32,
-    spacious: 32,
-  },
-  default: {
-    tight: 42,
-    relaxed: 44,
-    default: 40,
-    compact: 38,
-    comfortable: 40,
-    spacious: 40,
-  },
-  lg: {
-    tight: 48,
-    relaxed: 52,
-    default: 48,
-    compact: 46,
-    comfortable: 48,
-    spacious: 48,
-  },
-} as const;
-
-export const HeightsFollowModes: Story = {
-  parameters: { a11y: { test: 'off' } },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:bg-background nx:p-10">
-      {SPACING_MODES.map((mode) => (
-        <div key={mode} data-style={mode} className="nx:flex nx:gap-4">
-          <InputGroup data-testid={`ig-sm-${mode}`}>
-            <InputGroupAddon>
-              <IconSearch aria-hidden />
-            </InputGroupAddon>
-            <InputGroupInput
-              size="sm"
-              aria-label={`${mode} small`}
-              placeholder="sm"
-            />
-          </InputGroup>
-          <InputGroup data-testid={`ig-default-${mode}`}>
-            <InputGroupAddon>
-              <IconSearch aria-hidden />
-            </InputGroupAddon>
-            <InputGroupInput
-              aria-label={`${mode} default`}
-              placeholder="default"
-            />
-          </InputGroup>
-          <InputGroup data-testid={`ig-lg-${mode}`}>
-            <InputGroupAddon>
-              <IconSearch aria-hidden />
-            </InputGroupAddon>
-            <InputGroupInput
-              size="lg"
-              aria-label={`${mode} large`}
-              placeholder="lg"
-            />
-          </InputGroup>
-        </div>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const groupSelector = { selector: '[data-slot="input-group"]' };
-
-    // Child carries Input's data-size; the frame follows it.
-    await expect(canvas.getByLabelText('default default')).toHaveAttribute(
-      'data-size',
-      'default'
-    );
-
-    // Frame heights follow the active spacing mode (h-8 / h-10 / h-12 over
-    // mode-scaled tokens), measured on the group across every mode.
-    await expectHeightPerMode(
-      canvas,
-      'ig-sm',
-      GROUP_SCALE_HEIGHTS.sm,
-      groupSelector
-    );
-    await expectHeightPerMode(
-      canvas,
-      'ig-default',
-      GROUP_SCALE_HEIGHTS.default,
-      groupSelector
-    );
-    await expectHeightPerMode(
-      canvas,
-      'ig-lg',
-      GROUP_SCALE_HEIGHTS.lg,
-      groupSelector
-    );
-  },
 };
 
 // Hover + disabled map to Input's semantic state tokens — no opacity dimming.

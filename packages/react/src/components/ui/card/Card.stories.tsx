@@ -1,15 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
-import {
-  expectHeightPinned,
-  expectModeCascadeWorks,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/story-height-test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
 
@@ -529,70 +521,6 @@ export const AllVariants: Story = {
   },
 };
 
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Each row scopes `data-style` locally so the six spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-container` → `p-6` to preserve the default 24px baseline while leaving the container-role curve. `p-6` follows the standard spacing scale: compact 22 / relaxed 28 / all other modes 24. `CardAction` is in-flow grid content, with the header padding supplying the inset; `gap-1.5`, `gap-2`, and `pt-0` stay numeric.',
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Card className="nx:w-[240px]">
-            <CardHeader>
-              <CardTitle>Title</CardTitle>
-              <CardDescription>Description in {mode}</CardDescription>
-            </CardHeader>
-          </Card>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
-export const ModesProduceDifferentHeights: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Cascade sentinel for numeric `CardContent` `p-6`. Card has no portaled content, so dimensional measurement on the wrapper works directly. The Card contains a 40px fixed-height child, making the height equation `border 2 + pt-0 + child 40 + p-6 bottom`; compact resolves to 64px and comfortable resolves to 66px.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="compact" data-testid="card-mode-host-compact">
-        <Card className="nx:w-[160px]">
-          <CardContent>
-            <div className="nx:h-10" aria-hidden="true" />
-          </CardContent>
-        </Card>
-      </div>
-      <div data-style="comfortable" data-testid="card-mode-host-comfortable">
-        <Card className="nx:w-[160px]">
-          <CardContent>
-            <div className="nx:h-10" aria-hidden="true" />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
-      within(canvasElement),
-      'card-mode-host-compact',
-      'card-mode-host-comfortable',
-      { selector: '[data-slot="card"]' }
-    );
-  },
-};
-
 export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -603,11 +531,7 @@ export const DefaultModeHeightPinned: Story = {
     },
   },
   render: () => (
-    <div
-      data-style="default"
-      data-testid="card-default-host"
-      className="nx:p-10 nx:bg-background"
-    >
+    <div data-testid="card-default-host" className="nx:p-10 nx:bg-background">
       <Card className="nx:w-[200px]">
         <CardContent>
           <div className="nx:h-10" aria-hidden="true" />

@@ -28,7 +28,7 @@ The authoritative rules live in `.claude/rules/*.md`. This guide orchestrates th
 | `shadcn-divergences.md`                                                                                                                                                                                  | **THE** shadcn→Nexus token mapping, sizing, data-attrs, focus, checklist    |
 | `components.md`                                                                                                                                                                                          | Component architecture: CVA, data-slot, `nx:` prefix order, focus, layering |
 | `base-*.json` (surface/nav tokens)                                                                                                                                                                       | Surface/elevation tokens (container/popover/overlay), the `nav-*` namespace |
-| `testing-react.md`                                                                                                                                                                                       | Required stories, play-fns, a11y, the base-variants generator               |
+| `testing-react.md`                                                                                                                                                                                       | Required stories, play-fns, a11y, and story coverage audit                  |
 | `packages/core/tokens/`                                                                                                                                                                                  | Token names — verify a token exists before using it                         |
 | `code-quality.md`, `composition-over-render-props.md`, `extract-inline-handlers.md`, `guard-clauses.md`, `useeffect-escape-hatch.md`, `code-comments.md`, `no-follow-up-deferral.md`, `project-stage.md` | General code discipline                                                     |
 
@@ -69,14 +69,14 @@ Rewrite the source into the Nexus component, mirroring the archetype and applyin
 
 ### Step 4 — Stories
 
-Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + size, Disabled, interaction (click/keyboard) with play-fns, WithDataAttributes (play), and a render-based AllVariants. a11y runs automatically. If the render showcase reads well across bases, that's the export base-variants opts into.
+Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + size, Disabled, interaction (click/keyboard) with play-fns, WithDataAttributes (play), and a render-based AllVariants. a11y runs automatically. If the component needs a non-standard showcase name or interaction equivalence, add metadata to `packages/react/scripts/storybook-coverage.config.json`.
 
 ### Step 5 — Wire
 
 - Add the dep to `packages/react/package.json` (alphabetical) → `pnpm install`.
 - Add any new icon to `packages/react/src/lib/icons.ts` (Tabler re-export).
 - `export * from '@/components/ui/{name}'` in `packages/react/src/index.ts`.
-- If it has a render showcase, add an entry to `packages/react/scripts/base-variants.config.json`.
+- If it needs showcase or interaction audit metadata, add an entry to `packages/react/scripts/storybook-coverage.config.json`.
 
 ### Step 6 — Verify (real gates; fix until green)
 
@@ -112,7 +112,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - [ ] `nx:` prefix before all modifiers; semantic token paths only; no `dark:` on semantic tokens
 - [ ] `data-slot` (+ `data-variant`/`data-size`); padding-based sizing (documented exceptions only)
 - [ ] Named interface + JSDoc on custom props; focus ring = `outline-focus-default` + tokenised offset
-- [ ] Stories with play-fns + AllVariants; a11y clean; base-variants opt-in where it fits
+- [ ] Stories with play-fns + AllVariants; a11y clean; story coverage metadata updated where needed
 - [ ] Dep added + installed; icons added; exported from `src/index.ts`
 - [ ] `typecheck` + `eslint packages` + story tests all green
 - [ ] One component, one commit, `Closes #N`

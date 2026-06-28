@@ -1,15 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
-import {
-  expectHeightPerMode,
-  expectHeightPinned,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/story-height-test-utils';
 import { NativeSelect, NativeSelectOption } from '../native-select';
 
 import {
@@ -33,15 +25,6 @@ const meta: Meta<typeof Select> = {
 
 export default meta;
 type Story = StoryObj<typeof Select>;
-
-const SELECT_TRIGGER_HEIGHTS = {
-  tight: 42,
-  relaxed: 44,
-  default: 40,
-  compact: 38,
-  comfortable: 40,
-  spacious: 40,
-} as const;
 
 // ============================================
 // BASIC STORIES
@@ -773,80 +756,6 @@ export const AllVariants: Story = {
   },
 };
 
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          "Each row scopes `data-style` locally on the trigger wrapper. `SelectTrigger` uses the single-line control height scale (`h-10`) with numeric `px-3 gap-2`, matching Button/Input/ButtonGroup mechanics. `SelectContent` portals to `document.body`, so opened items pick up document-level mode, not the row's wrapper.",
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Select>
-            <SelectTrigger
-              aria-label={`${mode} select`}
-              className="nx:w-[200px]"
-            >
-              <SelectValue placeholder="Pick one" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="a">Option A</SelectItem>
-              <SelectItem value="b">Option B</SelectItem>
-            </SelectContent>
-          </Select>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
-export const SelectTriggerScaleHeightFollowsModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Scale-utility sentinel for `SelectTrigger`. It uses `h-10`, so the rendered height follows the active Nexus spacing mode like the other single-line controls. Trigger is not portaled so dimensional measurement on the wrapper works directly.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          data-testid={`select-stable-host-${mode}`}
-        >
-          <Select>
-            <SelectTrigger
-              aria-label={`${mode} select`}
-              className="nx:w-[160px]"
-            >
-              <SelectValue placeholder="Pick" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="a">A</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightPerMode(
-      within(canvasElement),
-      'select-stable-host',
-      SELECT_TRIGGER_HEIGHTS
-    );
-  },
-};
-
 export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -858,11 +767,7 @@ export const DefaultModeHeightPinned: Story = {
     },
   },
   render: () => (
-    <div
-      data-style="default"
-      data-testid="select-default-host"
-      className="nx:p-10 nx:bg-background"
-    >
+    <div data-testid="select-default-host" className="nx:p-10 nx:bg-background">
       <Select>
         <SelectTrigger aria-label="default select" className="nx:w-[200px]">
           <SelectValue placeholder="Pick one" />

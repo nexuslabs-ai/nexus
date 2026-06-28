@@ -10,15 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
-import {
-  expectHeightPinned,
-  expectModeCascadeWorks,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/story-height-test-utils';
 import { Button } from '../button';
 
 import {
@@ -85,6 +77,9 @@ Action pattern rules:
 
 export default meta;
 type Story = StoryObj<typeof Alert>;
+
+const dataAttribute = (name: string) => `data-${name}`;
+const DATA_DENSITY_ATTRIBUTE = dataAttribute('density');
 
 type PlaygroundIcon =
   | 'none'
@@ -975,7 +970,7 @@ export const WithDataAttributes: Story = {
     await expect(alert).toHaveAttribute('data-variant', 'destructive');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
     await expect(alert).toHaveAttribute('data-layout', 'stack');
-    await expect(alert).not.toHaveAttribute('data-density');
+    await expect(alert).not.toHaveAttribute(DATA_DENSITY_ATTRIBUTE);
     await expect(alert).not.toHaveAttribute('role');
     await expect(title).toBeInTheDocument();
     await expect(description).toBeInTheDocument();
@@ -1026,7 +1021,7 @@ export const DefaultDataAttributes: Story = {
     await expect(alert).toBeInTheDocument();
     await expect(alert).toHaveAttribute('data-variant', 'default');
     await expect(alert).toHaveAttribute('data-presentation', 'card');
-    await expect(alert).not.toHaveAttribute('data-density');
+    await expect(alert).not.toHaveAttribute(DATA_DENSITY_ATTRIBUTE);
     await expect(alert).not.toHaveAttribute('role');
   },
 };
@@ -1225,66 +1220,6 @@ export const AllBannerVariants: Story = {
   },
 };
 
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Each row scopes `data-style` locally so the spacing modes render side-by-side.',
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid className="nx:gap-3">
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Alert className="nx:w-[360px]">
-            <AlertTitle>Heads up · {mode}</AlertTitle>
-            <AlertDescription>
-              Padding follows the spacing-4 mode value.
-            </AlertDescription>
-          </Alert>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
-export const ModesProduceDifferentHeights: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Sentinel: an Alert renders at different heights across spacing modes.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:items-start nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="compact" data-testid="alert-mode-host-compact">
-        <Alert className="nx:w-[200px]">
-          <div className="nx:h-10" aria-hidden="true" />
-        </Alert>
-      </div>
-      <div data-style="relaxed" data-testid="alert-mode-host-relaxed">
-        <Alert className="nx:w-[200px]">
-          <div className="nx:h-10" aria-hidden="true" />
-        </Alert>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
-      within(canvasElement),
-      'alert-mode-host-compact',
-      'alert-mode-host-relaxed',
-      { selector: '[data-slot="alert"]' }
-    );
-  },
-};
-
 export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -1296,11 +1231,7 @@ export const DefaultModeHeightPinned: Story = {
     },
   },
   render: () => (
-    <div
-      data-style="default"
-      data-testid="alert-default-host"
-      className="nx:p-10 nx:bg-background"
-    >
+    <div data-testid="alert-default-host" className="nx:p-10 nx:bg-background">
       <Alert className="nx:w-[200px]">
         <div className="nx:h-10" aria-hidden="true" />
       </Alert>

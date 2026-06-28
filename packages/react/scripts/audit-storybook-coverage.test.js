@@ -355,12 +355,20 @@ describe('file discovery', () => {
     );
   });
 
-  it('lists every component file under ui/ and primitives/', () => {
+  it('lists every component file under ui/primitives and configured appearance entries', () => {
     const files = listAllComponents();
     expect(files.length).toBeGreaterThan(10);
     expect(files.every((f) => f.endsWith('.tsx'))).toBe(true);
-    expect(files.every((f) => !f.includes('__generated__'))).toBe(true);
     expect(files.every((f) => !f.endsWith('.stories.tsx'))).toBe(true);
+    expect(
+      files.some((f) => f.endsWith('/src/appearance/appearance-settings.tsx'))
+    ).toBe(true);
+    expect(
+      files.some((f) => f.endsWith('/src/appearance/theme-quick-control.tsx'))
+    ).toBe(true);
+    expect(
+      files.some((f) => f.endsWith('/src/appearance/color-field.tsx'))
+    ).toBe(false);
   });
 });
 
@@ -477,7 +485,7 @@ describe('auditComponent — real fixtures', () => {
 // would fail the moment Phase 2 renames land). Each fixture's tmp dir is
 // tracked and removed after the test; `showcase: 'AllVariants'` is passed to
 // `auditComponent` so the test path doesn't read the repo's
-// `base-variants.config.json`.
+// `storybook-coverage.config.json`.
 describe('auditComponent — drift detection (synthetic)', () => {
   const tmpDirs = [];
 

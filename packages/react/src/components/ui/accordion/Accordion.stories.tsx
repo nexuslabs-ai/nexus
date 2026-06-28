@@ -1,15 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
-import {
-  expectHeightPinned,
-  expectModeCascadeWorks,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/story-height-test-utils';
 
 import {
   Accordion,
@@ -693,68 +685,6 @@ export const AllVariants: Story = {
   ),
 };
 
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Accordion uses numeric `nx:py-4` for item-tier rhythm — simple authoring, no role-based control spacing. Numeric spacing still cascades per density mode, so the trigger height tracks the active mode (48px compact → 56px relaxed).',
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Accordion type="single" collapsible className="nx:w-[260px]">
-            <AccordionItem value="a">
-              <AccordionTrigger>Section · {mode}</AccordionTrigger>
-              <AccordionContent>Content not measured.</AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
-export const AccordionTriggerModesCascade: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Density-cascade sentinel: the AccordionTrigger height tracks the active spacing mode.',
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {(['compact', 'relaxed'] as const).map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <div data-testid={`accordion-mode-host-${mode}`}>
-            <Accordion type="single" collapsible className="nx:w-[200px]">
-              <AccordionItem value="a">
-                <AccordionTrigger>{mode}</AccordionTrigger>
-                <AccordionContent>x</AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectModeCascadeWorks(
-      within(canvasElement),
-      'accordion-mode-host-compact',
-      'accordion-mode-host-relaxed',
-      { selector: '[data-slot="accordion-trigger"]' }
-    );
-  },
-};
-
 export const AccordionTriggerDefaultHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -767,7 +697,6 @@ export const AccordionTriggerDefaultHeightPinned: Story = {
   },
   render: () => (
     <div
-      data-style="default"
       data-testid="accordion-default-host"
       className="nx:p-10 nx:bg-background"
     >
@@ -803,7 +732,6 @@ export const AccordionFloatingTriggerDefaultHeightPinned: Story = {
   },
   render: () => (
     <div
-      data-style="default"
       data-testid="accordion-floating-default-host"
       className="nx:p-10 nx:bg-background"
     >
@@ -843,7 +771,7 @@ export const AccordionExpandedItemDefaultHeightPinned: Story = {
     },
   },
   render: () => (
-    <div data-style="default" className="nx:p-10 nx:bg-background">
+    <div className="nx:p-10 nx:bg-background">
       <Accordion
         type="single"
         collapsible

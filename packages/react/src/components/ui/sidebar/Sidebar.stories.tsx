@@ -635,8 +635,7 @@ export const StylingContracts: Story = {
 /**
  * Visual grid reference for every `SidebarMenuButton` variant, size, and the
  * `asChild` composition. Uses `collapsible="none"` and a bounded height so the
- * panel sits inline (not viewport-fixed) — this is the export the base-variants
- * generator reuses to render the sidebar across all 5 bases × 2 themes.
+ * panel sits inline (not viewport-fixed).
  */
 export const AllVariants: Story = {
   render: () => (

@@ -81,7 +81,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Every primitive color palette × shade. Rendered with OKLCH values from the build pipeline. The source hex lives in packages/core/tokens/primitives/color.json and is converted at build time via packages/core/scripts/lib/perceptual-grid.js — lightness is pinned to the perceptual grid per shade, hue and chroma flow through from the hex (chroma clamped to fit sRGB).',
+          'Every primitive color palette × shade rendered from the active runtime CSS variables. Lightness is pinned to the perceptual OKLCH grid per shade, with hue and chroma flowing through from the source palette.',
       },
     },
   },
@@ -98,7 +98,7 @@ export const Palettes: Story = {
           Color Palettes
         </h2>
         <p className="nx:text-muted-foreground nx:typography-body-default nx:max-w-2xl">
-          Chips render the OKLCH values emitted by the build. Lightness per
+          Chips render the OKLCH values available at runtime. Lightness per
           shade is fixed by the perceptual L grid; hue and chroma flow through
           from the source hex. Vivid mid-range shades (yellow, cyan, fuchsia,
           violet) may show reduced chroma where the pinned L sits outside sRGB —
