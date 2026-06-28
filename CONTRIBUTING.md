@@ -309,6 +309,6 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 This handbook is the on-ramp. The canonical conventions live in [`.claude/rules/`](.claude/rules/) — there is no root `CLAUDE.md`. When this doc and a rule file disagree, the rule file wins.
 
-- [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns, required stories, the base-variants generator
+- [`testing-react.md`](.claude/rules/testing-react.md) — testing patterns and required stories
 - [`components.md`](.claude/rules/components.md) — component architecture, `nx:` prefix, data attributes, variants
 - [`github.md`](.claude/rules/github.md) — branch naming, PR title/body conventions, the review-bot flow

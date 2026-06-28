@@ -33,8 +33,8 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const SRC_ROOT = path.join(__dirname, '..', 'src');
 const COMPONENTS_ROOT = path.join(SRC_ROOT, 'components');
 const APPEARANCE_ROOT = path.join(SRC_ROOT, 'appearance');
-const CONFIG_PATH = path.join(__dirname, 'base-variants.config.json');
-const EXCLUDE_PATH_FRAGMENTS = ['__generated__', 'node_modules', 'dist'];
+const CONFIG_PATH = path.join(__dirname, 'storybook-coverage.config.json');
+const EXCLUDE_PATH_FRAGMENTS = ['node_modules', 'dist'];
 const STORY_SUFFIX = '.stories.tsx';
 const TEST_SUFFIX = '.test.tsx';
 
@@ -797,7 +797,7 @@ const INTERACTIVE_REQUIREMENTS = Object.freeze([
 const BASE_REQUIREMENTS = Object.freeze(['Default', 'WithDataAttributes']);
 
 /**
- * Look up the per-component archetype entry from base-variants.config.json.
+ * Look up the per-component archetype entry from storybook-coverage.config.json.
  * Returns the raw entry (with optional `interactions` / `equivalents`) or null
  * when the component has no config row — keeping callers from re-parsing the
  * file. Display-gate inference handles the null case.
@@ -809,7 +809,7 @@ function configEntryFor(componentName) {
 
 /**
  * Resolve the interaction-story requirement list for a component:
- *   1. Explicit `entry.interactions` in base-variants.config.json wins.
+ *   1. Explicit `entry.interactions` in storybook-coverage.config.json wins.
  *   2. Otherwise, display-gate signal: source-detected interactive (disabled
  *      prop or on* handler) OR a stories-level `fn()` spy in `meta.args`
  *      yields the canonical INTERACTIVE_REQUIREMENTS list.
@@ -824,7 +824,7 @@ function interactionRequirementsFor(entry, isInteractive) {
 /**
  * Build the set of story names that satisfy `requirementName` for a given
  * component. Always includes the canonical name itself; appends any
- * component-scoped equivalents declared in base-variants.config.json. Scoping
+ * component-scoped equivalents declared in storybook-coverage.config.json. Scoping
  * is per-component (not global) so an unrelated component's alias can't
  * silently satisfy another's requirement.
  */
@@ -841,7 +841,7 @@ function acceptedNamesForRequirement(entry, requirementName) {
  * @param {{ showcase?: string }} [opts] - `showcase` overrides the canonical
  *   showcase story name (default: looked up via `showcaseNameFor`). Synthetic
  *   tests pass it directly to stay decoupled from the repo's
- *   `base-variants.config.json`.
+ *   `storybook-coverage.config.json`.
  * @returns {{ component, file, storiesFile, findings, summary, info }}
  */
 export function auditComponent(componentFile, opts = {}) {

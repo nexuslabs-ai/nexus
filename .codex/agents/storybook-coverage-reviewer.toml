@@ -149,7 +149,7 @@ output:
   DropdownMenu) get their variant enums unioned across blocks.
 - **Variant/size detection** — args-match, then render-JSX, then case-folded
   suffix-stripped name match.
-- **Showcase name** — read from `packages/react/scripts/base-variants.config.json`
+- **Showcase name** — read from `packages/react/scripts/storybook-coverage.config.json`
   (Avatar uses `AllSizes`, everyone else `AllVariants`, defaulting to
   `AllVariants` for components not in the config).
 - **Naming drift** — canonical hard misses for the six literal-named

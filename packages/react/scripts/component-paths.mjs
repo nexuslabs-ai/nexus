@@ -2,9 +2,9 @@
  * component-paths.mjs — canonical layout of the source directories that hold
  * first-party Nexus components.
  *
- * Imported by both audit-storybook-coverage.mjs (resolves component files by
- * kebab name) and generate-base-variants.mjs (validates the optional
- * `sourceDir` field in base-variants.config.json and builds import paths).
+ * Imported by audit-storybook-coverage.mjs to resolve component files by
+ * kebab name and honor the optional `sourceDir` field in
+ * storybook-coverage.config.json.
  * One source of truth — keeps the two scripts from drifting silently.
  */
 

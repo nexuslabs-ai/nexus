@@ -68,7 +68,7 @@ Per `.claude/rules/github.md`:
 
 ### Phase 3: Adapt (follow the guide)
 
-Read `.claude/skills/shadcn-adapt-guide/SKILL.md` and execute its recipe end-to-end — orient on the archetype reference component, fetch the canonical shadcn source, transform deterministically (applying the guide's Reflex Check), author the stories, and wire deps/icons/exports/base-variants.
+Read `.claude/skills/shadcn-adapt-guide/SKILL.md` and execute its recipe end-to-end — orient on the archetype reference component, fetch the canonical shadcn source, transform deterministically (applying the guide's Reflex Check), author the stories, and wire deps/icons/exports/story-coverage metadata.
 
 ### Phase 4: Surface (not a gate)
 
@@ -80,7 +80,7 @@ Show a one-screen summary so the user can interrupt — do **not** wait for appr
 | Exports | {Component, sub-components, types} |
 | New dep | {package or "none"} |
 | New icons | {IconX or "none"} |
-| base-variants | {yes / no} |
+| story coverage metadata | {yes / no} |
 
 Key remaps: {2–4 bullet token mappings specific to this component}
 
