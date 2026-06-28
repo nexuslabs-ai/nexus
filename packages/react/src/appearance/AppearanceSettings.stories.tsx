@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { NexusAppearanceSettings } from './appearance-settings';
-import { NexusAppearanceProvider } from './provider';
 
 const meta: Meta<typeof NexusAppearanceSettings> = {
   title: 'Appearance/AppearanceSettings',
@@ -15,22 +14,20 @@ const meta: Meta<typeof NexusAppearanceSettings> = {
 export default meta;
 type Story = StoryObj<typeof NexusAppearanceSettings>;
 
-function ProviderFrame() {
+function SettingsFrame() {
   return (
-    <NexusAppearanceProvider storageKey={false}>
-      <div className="nx:max-w-3xl">
-        <NexusAppearanceSettings />
-      </div>
-    </NexusAppearanceProvider>
+    <div className="nx:max-w-3xl">
+      <NexusAppearanceSettings />
+    </div>
   );
 }
 
 export const Default: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <SettingsFrame />,
 };
 
 export const WithDataAttributes: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <SettingsFrame />,
   play: async ({ canvasElement }) => {
     await expect(
       canvasElement.querySelector('[data-slot="appearance-settings"]')
@@ -39,7 +36,7 @@ export const WithDataAttributes: Story = {
 };
 
 export const ClickInteraction: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <SettingsFrame />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const brandInput = canvas.getByRole('textbox', {
@@ -67,7 +64,7 @@ export const ClickInteraction: Story = {
 };
 
 export const ElevationInteraction: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <SettingsFrame />,
   play: async ({ canvasElement }) => {
     const originalShadow = document.documentElement.getAttribute('data-shadow');
 
@@ -110,7 +107,7 @@ export const ElevationInteraction: Story = {
 };
 
 export const KeyboardInteraction: Story = {
-  render: () => <ProviderFrame />,
+  render: () => <SettingsFrame />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const lightMode = canvas.getByRole('radio', { name: 'Light' });
