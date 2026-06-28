@@ -168,7 +168,7 @@ function RuntimeUtilityCard({
 }) {
   return (
     <article
-      className={`nx:flex nx:h-24 nx:flex-col nx:justify-between nx:rounded-lg nx:border nx:border-default nx:bg-container nx:p-3 ${className}`}
+      className={`nx:flex nx:h-24 nx:flex-col nx:justify-between nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-3 ${className}`}
       data-testid={`${scheme}-${mode}-${tier}`}
     >
       <span className="nx:text-foreground nx:typography-label-default">

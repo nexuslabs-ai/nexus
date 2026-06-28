@@ -27,6 +27,21 @@ function readShadowMode(mode, scheme) {
   );
 }
 
+function shadowWithLayer(layer) {
+  return {
+    '2xs': {
+      'layer-1': {
+        x: { $value: { value: 0, unit: 'px' } },
+        y: { $value: { value: 1, unit: 'px' } },
+        blur: { $value: { value: 3, unit: 'px' } },
+        spread: { $value: { value: 0, unit: 'px' } },
+        color: { $value: '#0000000d' },
+        ...layer,
+      },
+    },
+  };
+}
+
 describe('shadow strength diagnostics', () => {
   it('scores public shadow modes in ascending elevation order', () => {
     for (const scheme of ['light', 'dark']) {
@@ -57,19 +72,17 @@ describe('shadow strength diagnostics', () => {
     }
   });
 
-  it('rejects unsupported colour and dimension formats', () => {
+  it('rejects unsupported colour formats', () => {
     expect(() =>
-      shadowStrengthScore({
-        '2xs': {
-          'layer-1': {
-            x: { $value: { value: 0, unit: 'px' } },
-            y: { $value: { value: 1, unit: 'px' } },
-            blur: { $value: { value: 3, unit: 'px' } },
-            spread: { $value: { value: 0, unit: 'px' } },
-            color: { $value: '#000' },
-          },
-        },
-      })
+      shadowStrengthScore(shadowWithLayer({ color: { $value: '#000' } }))
     ).toThrow(/8-digit hex color/);
+  });
+
+  it('rejects unsupported dimension formats', () => {
+    expect(() =>
+      shadowStrengthScore(
+        shadowWithLayer({ blur: { $value: { value: 3, unit: 'rem' } } })
+      )
+    ).toThrow(/px dimension token/);
   });
 });
