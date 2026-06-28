@@ -742,8 +742,8 @@ export const BadgeIsDensityStable: Story = {
       <div data-style="compact" data-testid="badge-host-compact">
         <Badge>Nova</Badge>
       </div>
-      <div data-style="regular" data-testid="badge-host-regular">
-        <Badge>Vega</Badge>
+      <div data-style="default" data-testid="badge-host-default">
+        <Badge>Default</Badge>
       </div>
       <div data-style="spacious" data-testid="badge-host-spacious">
         <Badge>Sera</Badge>
@@ -753,7 +753,7 @@ export const BadgeIsDensityStable: Story = {
   play: async ({ canvasElement }) => {
     await expectHeightFixedAcrossModes(
       within(canvasElement),
-      ['badge-host-compact', 'badge-host-regular', 'badge-host-spacious'],
+      ['badge-host-compact', 'badge-host-default', 'badge-host-spacious'],
       24,
       { selector: '[data-slot="badge"]' }
     );

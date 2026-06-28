@@ -535,7 +535,7 @@ export const AllModes: Story = {
     docs: {
       description: {
         story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-container` → `p-6` to preserve the regular 24px default while leaving the container-role curve. `p-6` follows the standard spacing scale: compact 22 / relaxed 28 / all other modes 24. `CardAction` is in-flow grid content, with the header padding supplying the inset; `gap-1.5`, `gap-2`, and `pt-0` stay numeric.',
+          'Each row scopes `data-style` locally so the six spacing modes render side-by-side. `CardHeader`, `CardContent`, and `CardFooter` migrate `p-container` → `p-6` to preserve the default 24px baseline while leaving the container-role curve. `p-6` follows the standard spacing scale: compact 22 / relaxed 28 / all other modes 24. `CardAction` is in-flow grid content, with the header padding supplying the inset; `gap-1.5`, `gap-2`, and `pt-0` stay numeric.',
       },
     },
   },
@@ -593,19 +593,19 @@ export const ModesProduceDifferentHeights: Story = {
   },
 };
 
-export const VegaDefaultHeightPinned: Story = {
+export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
     docs: {
       description: {
-        story: 'Regression sentinel: pins the Card height in regular mode.',
+        story: 'Regression sentinel: pins the Card height in default mode.',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
-      data-testid="card-regular-host"
+      data-style="default"
+      data-testid="card-default-host"
       className="nx:p-10 nx:bg-background"
     >
       <Card className="nx:w-[200px]">
@@ -616,7 +616,7 @@ export const VegaDefaultHeightPinned: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
-    await expectHeightPinned(within(canvasElement), 'card-regular-host', 66, {
+    await expectHeightPinned(within(canvasElement), 'card-default-host', 66, {
       selector: '[data-slot="card"]',
     });
   },

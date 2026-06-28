@@ -423,7 +423,6 @@ export const Sizes: Story = {
 // as Input, since the frame height is the control's h-*.
 const GROUP_SCALE_HEIGHTS = {
   sm: {
-    regular: 32,
     tight: 32,
     relaxed: 36,
     default: 32,
@@ -432,7 +431,6 @@ const GROUP_SCALE_HEIGHTS = {
     spacious: 32,
   },
   default: {
-    regular: 40,
     tight: 42,
     relaxed: 44,
     default: 40,
@@ -441,7 +439,6 @@ const GROUP_SCALE_HEIGHTS = {
     spacious: 40,
   },
   lg: {
-    regular: 48,
     tight: 48,
     relaxed: 52,
     default: 48,
@@ -495,7 +492,7 @@ export const HeightsFollowModes: Story = {
     const groupSelector = { selector: '[data-slot="input-group"]' };
 
     // Child carries Input's data-size; the frame follows it.
-    await expect(canvas.getByLabelText('regular default')).toHaveAttribute(
+    await expect(canvas.getByLabelText('default default')).toHaveAttribute(
       'data-size',
       'default'
     );

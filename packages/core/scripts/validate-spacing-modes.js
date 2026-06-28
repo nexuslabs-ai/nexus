@@ -75,7 +75,7 @@ export function diffKeySets(baselinePaths, modePaths) {
 
 /**
  * @param {Map<string, object>} modeDataMap  mode name → parsed JSON
- * @param {string} baseline                  default 'vega'
+ * @param {string} baseline                  default 'default'
  * @returns {{ mode: string, missing: string[], extra: string[] }[]}
  *   one entry per non-baseline mode, sorted by mode name
  * @throws when the baseline mode is absent from the map

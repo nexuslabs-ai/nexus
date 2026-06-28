@@ -174,13 +174,13 @@ export const SizeAlignment: Story = {
     docs: {
       description: {
         story:
-          'Vega height sentinel for ButtonGroup size propagation. Text addons use `h-8` / `h-10` / `h-12` without Button min-widths, while direct Button children receive the matching semantic size.',
+          'Default-mode height sentinel for ButtonGroup size propagation. Text addons use `h-8` / `h-10` / `h-12` without Button min-widths, while direct Button children receive the matching semantic size.',
       },
     },
   },
   render: () => (
     <div
-      data-style="regular"
+      data-style="default"
       className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10"
     >
       {Object.keys(BUTTON_GROUP_SIZE_HEIGHTS).map((size) => (

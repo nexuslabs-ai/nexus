@@ -2,7 +2,7 @@ import { Breadcrumb } from '../_components/Breadcrumb';
 
 /**
  * Foundations → Spacing. Server component — a live specimen of the 4px-based
- * scale, the semantic role tokens components consume, and the seven density
+ * scale, the semantic role tokens components consume, and the six density
  * modes.
  *
  * The bars reference the runtime `--nx-spacing-N` var inline, so they rescale
@@ -46,16 +46,11 @@ const ROLES: { token: string; px: string; use: string }[] = [
 
 const MODES: { mode: string; archetype: string }[] = [
   { mode: 'compact', archetype: 'Compact / tool' },
-  {
-    mode: 'regular',
-    archetype: 'Standard scale — the @theme numeric baseline',
-  },
   { mode: 'relaxed', archetype: 'Editorial / airy' },
-  { mode: 'tight', archetype: '≈ regular' },
+  { mode: 'tight', archetype: 'Tighter utility scale' },
   {
     mode: 'default ★',
-    archetype:
-      'Bundled :root default (no data-style) — byte-identical to regular',
+    archetype: 'Bundled :root default and @theme numeric baseline',
   },
   { mode: 'comfortable', archetype: 'Density variant' },
   { mode: 'spacious', archetype: 'Density variant' },
@@ -74,10 +69,10 @@ export function Spacing() {
       <h1 className="nx:typography-heading-large">Spacing</h1>
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         A 4px-based scale, exposed as named steps only — there is no base{' '}
-        <code>--spacing</code> token. All seven density modes ship in every
-        build and swap at runtime through the <code>data-style</code> attribute
-        on <code>&lt;html&gt;</code> — the &ldquo;Size&rdquo; control in the
-        theme picker (bottom-right) — cascading to every <code>nx:p-*</code> and{' '}
+        <code>--spacing</code> token. All six density modes ship in every build
+        and swap at runtime through the <code>data-style</code> attribute on{' '}
+        <code>&lt;html&gt;</code> — the &ldquo;Size&rdquo; control in the theme
+        picker (bottom-right) — cascading to every <code>nx:p-*</code> and{' '}
         <code>nx:gap-*</code> utility at once. The bars below read the live var,
         so swap the control and watch them rescale.
       </p>
@@ -118,7 +113,7 @@ export function Spacing() {
           Components don&rsquo;t reach for raw steps — they consume these
           semantic roles (e.g. a button&rsquo;s padding). Because the roles map
           onto the active density mode, swapping Size rescales whole components,
-          not just bare utilities. Values shown are the regular baseline.
+          not just bare utilities. Values shown are the default baseline.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[560px] nx:border-collapse nx:typography-label-default">
@@ -151,15 +146,15 @@ export function Spacing() {
         </div>
       </section>
 
-      {/* ── Seven density modes ─────────────────────────────── */}
+      {/* ── Six density modes ─────────────────────────────── */}
       <section className="nx:mb-12">
         <h2 className="nx:typography-heading-small nx:mb-1">
-          Seven density modes
+          Six density modes
         </h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
-          Every build ships all seven. Swapping the &ldquo;Size&rdquo; control
-          in the theme picker rescales the whole page live. Note{' '}
-          <code>default</code> is byte-identical to <code>regular</code>.
+          Every build ships all six. Swapping the &ldquo;Size&rdquo; control in
+          the theme picker rescales the whole page live. The{' '}
+          <code>default</code> mode is the bundled baseline.
         </p>
         <div className="nx:overflow-x-auto">
           <table className="nx:w-full nx:min-w-[480px] nx:border-collapse nx:typography-label-default">

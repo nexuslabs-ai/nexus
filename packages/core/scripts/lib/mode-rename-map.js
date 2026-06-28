@@ -8,7 +8,6 @@ export const MODE_RENAME = {
     luma: 'comfortable',
     sera: 'spacious',
     lyra: 'tight',
-    vega: 'regular',
     maia: 'relaxed',
   },
   shadow: {
@@ -27,8 +26,6 @@ export const MODE_RENAME = {
     maia: 'fine',
     vega: 'normal',
     nova: 'strong',
-    lyra: 'medium',
-    mira: 'bold',
   },
   typography: {
     vega: 'default',

@@ -239,7 +239,7 @@ export const DEFAULT_CONFIG = {
   motion: 'snappy',
   focus: 'default',
   'chart-categorical': 'default',
-  // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 7 modes ship)
+  // see CANONICAL_SPACING_DEFAULT_MODE — controls :root cascade only (all 6 modes ship)
   spacingDefault: 'default',
 };
 
@@ -747,9 +747,9 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
  * whose numeric subset seeds Tailwind's `@theme` block (the build-time
  * contract for utility codegen and the `VEGA_BASELINE` byte-identity test).
  * Distinct from `config.spacingDefault`, which only moves the runtime `:root`
- * cascade default — all seven modes still emit either way.
+ * cascade default — all six modes still emit either way.
  */
-export const CANONICAL_SPACING_DEFAULT_MODE = 'regular';
+export const CANONICAL_SPACING_DEFAULT_MODE = 'default';
 
 /**
  * Collect spacing tokens from per-mode `semantic/spacing-{mode}.json` files.
@@ -1093,13 +1093,13 @@ function deriveRoleUtility(tokenPath) {
  * property set from the token's structured JSON `path`, and emits one
  * `@utility` declaration referencing the already-prefixed CSS variable.
  *
- * Data-driven by design: adding a new role key to `spacing-regular.json` (and
+ * Data-driven by design: adding a new role key to the canonical spacing mode (and
  * the other six mode files, per the schema contract) automatically grows the
  * utility set. The Phase 2 drift test asserts utilities ↔ role tokens stay
  * 1:1.
  *
  * @param {{cssName: string, path: string[], value: string}[]} canonicalRoleTokens
- *   Role tokens from the canonical (regular) mode. Each carries the original
+ *   Role tokens from the canonical spacing mode. Each carries the original
  *   JSON `path` so the emitter never reverse-engineers structure that
  *   already exists upstream.
  * @returns {{css: string, count: number}}
@@ -1698,7 +1698,7 @@ export function collectSemanticDimensionTokens(semanticDir, fileName) {
  * @param {string[]} config.imports - CSS imports (e.g., ['tailwindcss', './variables.css'])
  * @param {string} [config.tailwindPrefix='nx'] - Tailwind prefix
  * @param {object[]} config.semanticTokens - Array of { cssName, value } for semantic colours (dimensions emit at :root via generateRootDimensionsCSS)
- * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (Vega defaults; per-mode overrides live outside @theme)
+ * @param {object[]} config.spacingTokens - Array of { cssName, value } for numeric spacing (default baseline; per-mode overrides live outside @theme)
  * @param {object[]} config.radiusTokens - Array of { cssName, varRef } for radius
  * @param {object[]} config.borderwidthTokens - Array of { cssName, varRef } for borderwidth
  * @param {object[]} config.motionTokens - Array of { group, key, cssName, varRef } for duration/ease
@@ -1755,7 +1755,7 @@ export function generateThemeCSS(config) {
   css += `  --shadow-*: initial;\n`;
   css += `  --breakpoint-*: initial;\n\n`;
 
-  // Spacing tokens (numeric Vega defaults — see generateSpacingModesCSS for
+  // Spacing tokens (numeric default baseline — see generateSpacingModesCSS for
   // per-mode overrides emitted outside @theme).
   if (spacingTokens.length > 0) {
     css += `\n  /* Spacing tokens */\n`;

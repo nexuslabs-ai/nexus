@@ -26,7 +26,6 @@ export const THEME_MODE_VALUES = {
   base: ['slate', 'stone', 'neutral', 'gray', 'zinc'],
   brand: ['blue', 'purple', 'pink', 'teal', 'orange', 'black'],
   spacing: [
-    'regular',
     'tight',
     'relaxed',
     'default',
@@ -36,7 +35,7 @@ export const THEME_MODE_VALUES = {
   ],
   shadow: ['flat', 'soft', 'quiet', 'standard', 'strong'],
   radius: ['square', 'subtle', 'smooth', 'round', 'extra-round'],
-  borderwidth: ['normal', 'medium', 'fine', 'bold', 'strong'],
+  borderwidth: ['normal', 'fine', 'strong'],
 } as const;
 
 type ThemeModeValues = typeof THEME_MODE_VALUES;
@@ -76,7 +75,6 @@ export const THEME_MODE_OPTIONS = {
     { value: 'black', label: 'Black' },
   ],
   spacing: [
-    { value: 'regular', label: 'Regular' },
     { value: 'tight', label: 'Tight' },
     { value: 'relaxed', label: 'Relaxed' },
     { value: 'default', label: 'Default' },
@@ -100,9 +98,7 @@ export const THEME_MODE_OPTIONS = {
   ],
   borderwidth: [
     { value: 'normal', label: 'Normal' },
-    { value: 'medium', label: 'Medium' },
     { value: 'fine', label: 'Fine' },
-    { value: 'bold', label: 'Bold' },
     { value: 'strong', label: 'Strong' },
   ],
 } as const satisfies {
@@ -141,9 +137,7 @@ export const THEME_STYLESHEET_HREFS = {
   },
   borderwidth: {
     normal: '/themes/borderwidth-normal.css',
-    medium: '/themes/borderwidth-medium.css',
     fine: '/themes/borderwidth-fine.css',
-    bold: '/themes/borderwidth-bold.css',
     strong: '/themes/borderwidth-strong.css',
   },
 } as const satisfies {

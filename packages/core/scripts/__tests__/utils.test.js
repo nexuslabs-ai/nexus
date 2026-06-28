@@ -584,7 +584,7 @@ describe('utils', () => {
   });
 
   // Shared fixture helper for spacing tests — writes per-mode JSON files into
-  // a temp dir and runs the body. Source data mirrors real spacing-regular.json
+  // a temp dir and runs the body. Source data mirrors real spacing-default.json
   // structure (numeric `spacing.N` + role `control.padding-x.md`, `container.p`,
   // `layout.section-gap` subtrees) so the test exercises the same shapes the
   // build sees.
@@ -607,7 +607,7 @@ describe('utils', () => {
     it('routes spacing-*.json into perModeFiles.spacing (not standalone)', () => {
       withSpacingModesFixture(
         {
-          regular: { spacing: {} },
+          default: { spacing: {} },
           tight: { spacing: {} },
         },
         (dir) => {
@@ -623,14 +623,14 @@ describe('utils', () => {
 
           expect(result.perModeFiles).toEqual({
             spacing: {
-              regular: 'spacing-regular.json',
+              default: 'spacing-default.json',
               tight: 'spacing-tight.json',
             },
           });
           expect(result.standalone).toEqual(['focus.json']);
           // Confirm spacing files did NOT leak into standalone — without
           // this gate they'd get double-emitted by the generic dimension scan.
-          expect(result.standalone).not.toContain('spacing-regular.json');
+          expect(result.standalone).not.toContain('spacing-default.json');
           expect(result.standalone).not.toContain('spacing-tight.json');
         }
       );
@@ -652,7 +652,7 @@ describe('utils', () => {
     it('returns per-mode tokens with unprefixed cssNames (prefix is added at emit time)', () => {
       withSpacingModesFixture(
         {
-          regular: {
+          default: {
             spacing: {
               0: { $value: { value: 0, unit: 'px' }, $type: 'dimension' },
               4: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
@@ -677,8 +677,8 @@ describe('utils', () => {
         },
         (dir) => {
           const result = collectSpacingTokens(dir);
-          expect(Object.keys(result).sort()).toEqual(['regular', 'tight']);
-          expect(result.regular).toEqual([
+          expect(Object.keys(result).sort()).toEqual(['default', 'tight']);
+          expect(result.default).toEqual([
             { cssName: 'spacing-0', path: ['spacing', '0'], value: '0px' },
             { cssName: 'spacing-4', path: ['spacing', '4'], value: '16px' },
             {
@@ -708,7 +708,7 @@ describe('utils', () => {
       // contributors add role tokens.
       withSpacingModesFixture(
         {
-          regular: {
+          default: {
             control: {
               'padding-x': {
                 md: { $value: { value: 16, unit: 'px' }, $type: 'dimension' },
@@ -792,7 +792,7 @@ describe('utils', () => {
 
   describe('generateSpacingModesCSS', () => {
     const modes = {
-      regular: [
+      default: [
         { cssName: 'spacing-4', value: '16px' },
         { cssName: 'control-padding-x-md', value: '16px' },
       ],
@@ -806,9 +806,9 @@ describe('utils', () => {
       ],
     };
 
-    it('emits Regular block under :root and [data-style="regular"] selectors', () => {
+    it('emits Default block under :root and [data-style="default"] selectors', () => {
       const css = generateSpacingModesCSS(modes);
-      expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]regular['"]\] \{/);
+      expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]default['"]\] \{/);
     });
 
     it('emits non-default modes alphabetically (comfortable before tight)', () => {
@@ -842,7 +842,7 @@ describe('utils', () => {
     it('warns when two numeric tokens in the same mode resolve to the same px', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const duplicateModes = {
-        regular: [
+        default: [
           { cssName: 'spacing-11', value: '48px' },
           { cssName: 'spacing-12', value: '48px' },
         ],
@@ -850,7 +850,7 @@ describe('utils', () => {
       generateSpacingModesCSS(duplicateModes);
       expect(warn).toHaveBeenCalledWith(
         expect.stringMatching(
-          /regular — "spacing-12" and "spacing-11" both resolve to 48px/
+          /default — "spacing-12" and "spacing-11" both resolve to 48px/
         )
       );
       warn.mockRestore();

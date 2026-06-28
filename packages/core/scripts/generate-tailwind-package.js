@@ -391,10 +391,10 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
  * Generate nexus.css using shared generateThemeCSS function.
  *
  * `spacingDefault` controls which mode lands under `:root, [data-style="X"]`
- * (i.e. which mode applies when no `data-style` attribute is set). All 7
- * modes still ship in the bundle either way — the other six emit as plain
+ * (i.e. which mode applies when no `data-style` attribute is set). All six
+ * modes still ship in the bundle either way — the other five emit as plain
  * `[data-style="X"]` blocks. The @theme numeric subset always comes from the
- * canonical Vega baseline because @theme drives Tailwind's utility codegen
+ * canonical default baseline because @theme drives Tailwind's utility codegen
  * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
 function generateNexusCSS(
@@ -459,12 +459,12 @@ function generateNexusCSS(
     }
   }
 
-  // Per-mode spacing — Vega numerics seed @theme for Tailwind's spacing-utility
+  // Per-mode spacing — default numerics seed @theme for Tailwind's spacing-utility
   // codegen (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The per-mode override
   // blocks live outside @theme in `:root, [data-style="X"]` form (see below);
   // role tokens are not registered in @theme — they're consumed by the
   // separately-emitted spacing-utilities.css.
-  const { numeric: vegaSpacingNumeric } = splitSpacingTokens(
+  const { numeric: defaultSpacingNumeric } = splitSpacingTokens(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
   );
 
@@ -494,7 +494,7 @@ function generateNexusCSS(
 `;
 
   // Generate theme CSS using shared function. spacingTokens carries only the
-  // numeric Vega subset — role tokens (control/container/layout) live in the
+  // numeric default subset — role tokens (control/container/layout) live in the
   // per-mode override blocks below, not in @theme.
   let css = generateThemeCSS({
     header,
@@ -509,7 +509,7 @@ function generateNexusCSS(
     ],
     tailwindPrefix: 'nx',
     semanticTokens: lightSemanticTokens,
-    spacingTokens: vegaSpacingNumeric,
+    spacingTokens: defaultSpacingNumeric,
     radiusTokens,
     borderwidthTokens,
     motionTokens,
@@ -621,15 +621,15 @@ export async function generateTailwindPackage(
     log.success(`Generated ${borderWidth.count} border width utilities`);
   }
 
-  // Spacing role utilities — data-driven from Vega's role tokens. Numeric
+  // Spacing role utilities — data-driven from default role tokens. Numeric
   // spacing flows through @theme in generateNexusCSS; role tokens get
   // dedicated @utility declarations that read the per-mode --nx-control-*,
   // --nx-container-*, --nx-layout-* variables.
   const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
-  const { role: vegaSpacingRole } = splitSpacingTokens(
+  const { role: defaultSpacingRole } = splitSpacingTokens(
     spacingModes[CANONICAL_SPACING_DEFAULT_MODE]
   );
-  const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
+  const spacingUtilities = generateSpacingRoleUtilitiesCSS(defaultSpacingRole);
   if (spacingUtilities.css) {
     writeDistFile('spacing-utilities.css', spacingUtilities.css);
     log.success(`Generated ${spacingUtilities.count} spacing role utilities`);

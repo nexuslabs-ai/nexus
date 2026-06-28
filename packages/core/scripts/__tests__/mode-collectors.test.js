@@ -32,13 +32,7 @@ describe('runtime mode collectors', () => {
   it('collects all border width modes under the borderwidth namespace', () => {
     const modes = collectBorderwidthModes(TOKENS);
 
-    expect(Object.keys(modes).sort()).toEqual([
-      'bold',
-      'fine',
-      'medium',
-      'normal',
-      'strong',
-    ]);
+    expect(Object.keys(modes).sort()).toEqual(['fine', 'normal', 'strong']);
     const names = modes.normal.map((token) => token.cssName);
     expect(names).toContain('borderwidth-default');
     expect(names).not.toContain('border-default');

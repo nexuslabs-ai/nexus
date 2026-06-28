@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import borderwidthBold from '../../../core/tokens/primitives/borderwidth/borderwidth-bold.json';
 import borderwidthFine from '../../../core/tokens/primitives/borderwidth/borderwidth-fine.json';
-import borderwidthMedium from '../../../core/tokens/primitives/borderwidth/borderwidth-medium.json';
 import borderwidthNormal from '../../../core/tokens/primitives/borderwidth/borderwidth-normal.json';
 import borderwidthStrong from '../../../core/tokens/primitives/borderwidth/borderwidth-strong.json';
 import radiusExtraRound from '../../../core/tokens/primitives/radius/radius-extra-round.json';
@@ -44,9 +42,7 @@ const RADIUS_MODES: { name: string; tokens: RadiusMap }[] = [
 
 const BORDERWIDTH_MODES: { name: string; tokens: BorderWidthMap }[] = [
   { name: 'normal', tokens: borderwidthNormal as BorderWidthMap },
-  { name: 'medium', tokens: borderwidthMedium as BorderWidthMap },
   { name: 'fine', tokens: borderwidthFine as BorderWidthMap },
-  { name: 'bold', tokens: borderwidthBold as BorderWidthMap },
   { name: 'strong', tokens: borderwidthStrong as BorderWidthMap },
 ];
 
@@ -131,7 +127,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Border radius and border width primitive scales. Each mode (radius: square/subtle/smooth/round/extra-round; borderwidth: normal/medium/fine/bold/strong) produces a different scale; the bundled mode is the one @nexus/tailwind currently ships with — see packages/core/package.json#scripts.build:tailwind.',
+          'Border radius and border width primitive scales. Each mode (radius: square/subtle/smooth/round/extra-round; borderwidth: normal/fine/strong) produces a different scale; the bundled mode is the one @nexus/tailwind currently ships with — see packages/core/package.json#scripts.build:tailwind.',
       },
     },
   },

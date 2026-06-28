@@ -289,7 +289,7 @@ function generateModularGlobalsCSS(
 
   // Collect other tokens using shared functions
   const spacingModes = collectSpacingTokens(SEMANTIC_DIR);
-  const { numeric: vegaSpacingNumeric, role: vegaSpacingRole } =
+  const { numeric: defaultSpacingNumeric, role: defaultSpacingRole } =
     splitSpacingTokens(spacingModes[CANONICAL_SPACING_DEFAULT_MODE]);
 
   const radiusTokens = primitives.radius?.modes?.[0]
@@ -305,7 +305,7 @@ function generateModularGlobalsCSS(
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
   const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
 
-  // Generate using shared function. Spacing is split: numeric Vega tokens
+  // Generate using shared function. Spacing is split: numeric default tokens
   // seed @theme for Tailwind utility codegen; role tokens drive the inline
   // @utility declarations below; per-mode override blocks live outside
   // @theme so the cascade switches via [data-style="X"] on any ancestor.
@@ -338,7 +338,7 @@ function generateModularGlobalsCSS(
     ],
     tailwindPrefix: 'nx',
     semanticTokens,
-    spacingTokens: vegaSpacingNumeric,
+    spacingTokens: defaultSpacingNumeric,
     radiusTokens,
     borderwidthTokens,
     motionTokens,
@@ -352,7 +352,7 @@ function generateModularGlobalsCSS(
   css += generateRootDimensionsCSS(dimensionTokens);
 
   // Per-mode spacing override blocks. `spacingDefault` picks which mode lands
-  // under `:root, [data-style="X"]`; the other six emit as bare
+  // under `:root, [data-style="X"]`; the other five emit as bare
   // `[data-style="X"]` blocks (alphabetical for determinism).
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
 
@@ -363,11 +363,13 @@ function generateModularGlobalsCSS(
   // Sibling utility/primitive files are imported by `globals.css`; keep the
   // console sync allowlist in step so build-time Tailwind processing can load
   // the same local graph.
-  const spacingUtilities = generateSpacingRoleUtilitiesCSS(vegaSpacingRole);
+  const spacingUtilities = generateSpacingRoleUtilitiesCSS(defaultSpacingRole);
   writeModularFile(distDir, 'spacing-utilities.css', spacingUtilities.css);
 
   return (
-    semanticTokens.length + vegaSpacingNumeric.length + vegaSpacingRole.length
+    semanticTokens.length +
+    defaultSpacingNumeric.length +
+    defaultSpacingRole.length
   );
 }
 
