@@ -401,6 +401,10 @@ jobs:
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
         run: pnpm audit:mode-codenames
 
+      - name: Token-mode distinctness audit
+        if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
+        run: pnpm audit:mode-distinctness
+
   test-react:
     name: Test (React)
     runs-on: ubuntu-latest
