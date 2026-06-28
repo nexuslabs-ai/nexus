@@ -74,4 +74,18 @@ html {
 }
 
 html.dark {
+  --nx-shadow-2xs-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-xs-layer-1-color: oklch(0 0 0 / 0.051);
+  --nx-shadow-sm-layer-1-color: oklch(0 0 0 / 0.0706);
+  --nx-shadow-sm-layer-2-color: oklch(0 0 0 / 0.0627);
+  --nx-shadow-base-layer-1-color: oklch(0 0 0 / 0.0706);
+  --nx-shadow-base-layer-2-color: oklch(0 0 0 / 0.0706);
+  --nx-shadow-md-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-md-layer-2-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-lg-layer-1-color: oklch(0 0 0 / 0.0784);
+  --nx-shadow-lg-layer-2-color: oklch(0 0 0 / 0.1098);
+  --nx-shadow-xl-layer-1-color: oklch(0 0 0 / 0.1098);
+  --nx-shadow-xl-layer-2-color: oklch(0 0 0 / 0.1412);
+  --nx-shadow-2xl-layer-1-color: oklch(0 0 0 / 0.2);
+  --nx-shadow-inner-layer-1-color: oklch(0 0 0 / 0.051);
 }

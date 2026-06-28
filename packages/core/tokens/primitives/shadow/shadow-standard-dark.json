@@ -30,7 +30,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000a",
+        "$value": "#00000010",
         "$type": "color"
       }
     }
@@ -66,7 +66,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000a",
+        "$value": "#00000010",
         "$type": "color"
       }
     }
@@ -102,7 +102,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000d",
+        "$value": "#00000016",
         "$type": "color"
       }
     },
@@ -136,7 +136,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#00000022",
         "$type": "color"
       }
     }
@@ -172,7 +172,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#00000020",
         "$type": "color"
       }
     },
@@ -206,7 +206,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#00000022",
         "$type": "color"
       }
     }
@@ -242,7 +242,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#00000020",
         "$type": "color"
       }
     },
@@ -276,7 +276,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000014",
+        "$value": "#00000024",
         "$type": "color"
       }
     }
@@ -312,7 +312,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000001a",
+        "$value": "#00000024",
         "$type": "color"
       }
     },
@@ -346,7 +346,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000001a",
+        "$value": "#00000030",
         "$type": "color"
       }
     }
@@ -382,7 +382,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000001a",
+        "$value": "#00000028",
         "$type": "color"
       }
     },
@@ -416,7 +416,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000001a",
+        "$value": "#00000038",
         "$type": "color"
       }
     }
@@ -452,7 +452,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#00000038",
+        "$value": "#0000004d",
         "$type": "color"
       }
     }
@@ -488,7 +488,7 @@
         "$type": "dimension"
       },
       "color": {
-        "$value": "#0000000a",
+        "$value": "#00000010",
         "$type": "color"
       }
     }
