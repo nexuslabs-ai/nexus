@@ -9,8 +9,6 @@ import {
 } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../../stories/spacing-modes';
-import { expectHeightFixedAcrossModes } from '../../../stories/test-utils';
 import { Spinner } from '../spinner';
 
 import { Badge } from './badge';
@@ -692,71 +690,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'All spacing-mode rows render at the same Badge height; the `BadgeIsDensityStable` sentinel below asserts it.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
-      {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
-          <Badge>Default</Badge>
-          <Badge variant="success">Success</Badge>
-          <Badge variant="error" leftIcon={<IconX />}>
-            Error
-          </Badge>
-        </div>
-      ))}
-    </div>
-  ),
-};
-
-export const BadgeIsDensityStable: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Mode-invariance sentinel: Badge renders at the same height in every spacing mode.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="compact" data-testid="badge-host-compact">
-        <Badge>Nova</Badge>
-      </div>
-      <div data-style="default" data-testid="badge-host-default">
-        <Badge>Default</Badge>
-      </div>
-      <div data-style="spacious" data-testid="badge-host-spacious">
-        <Badge>Sera</Badge>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightFixedAcrossModes(
-      within(canvasElement),
-      ['badge-host-compact', 'badge-host-default', 'badge-host-spacious'],
-      24,
-      { selector: '[data-slot="badge"]' }
-    );
   },
 };
 

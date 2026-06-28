@@ -2,60 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconArrowRight, IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
-import { expectHeightPinned } from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/story-height-test-utils';
 
 import { Button } from './button';
-
-const BUTTON_SCALE_HEIGHTS = {
-  sm: {
-    tight: 32,
-    relaxed: 36,
-    default: 32,
-    compact: 30,
-    comfortable: 32,
-    spacious: 32,
-  },
-  default: {
-    tight: 42,
-    relaxed: 44,
-    default: 40,
-    compact: 38,
-    comfortable: 40,
-    spacious: 40,
-  },
-  lg: {
-    tight: 48,
-    relaxed: 52,
-    default: 48,
-    compact: 46,
-    comfortable: 48,
-    spacious: 48,
-  },
-} as const;
-
-async function expectButtonScaleHeights(
-  canvasElement: HTMLElement,
-  size: keyof typeof BUTTON_SCALE_HEIGHTS,
-  testIdPrefix: string
-) {
-  await document.fonts.ready;
-  const canvas = within(canvasElement);
-
-  for (const mode of SPACING_MODES) {
-    const actual = Math.round(
-      canvas.getByTestId(`${testIdPrefix}-${mode}`).getBoundingClientRect()
-        .height
-    );
-    expect(actual, `[data-testid="${testIdPrefix}-${mode}"] height`).toBe(
-      BUTTON_SCALE_HEIGHTS[size][mode]
-    );
-  }
-}
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -388,10 +337,7 @@ export const TextButtonsStayContentWidth: Story = {
     },
   },
   render: () => (
-    <div
-      data-style="default"
-      className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background"
-    >
+    <div className="nx:flex nx:items-center nx:gap-2 nx:p-10 nx:bg-background">
       <Button data-testid="button-content-short">Go</Button>
       <Button data-testid="button-content-long">Confirm transfer</Button>
       <Button size="icon" aria-label="Icon action">
@@ -857,111 +803,6 @@ export const AllVariants: Story = {
   ),
 };
 
-export const AllModes: Story = {
-  parameters: {
-    // 7 rows × 3 buttons each duplicates the same accessible names; the
-    // canonical Default/Primary/etc. stories already cover a11y for Button.
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side.',
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Button>Default</Button>
-          <Button size="sm">Sm</Button>
-          <Button size="lg">Lg</Button>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
-export const LargeScaleHeightAcrossModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Scale-utility sentinel for the large Button size. The class is `h-12`, so the rendered height follows the active Nexus spacing mode.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
-      {SPACING_MODES.map((mode) => (
-        <div key={mode} data-style={mode}>
-          <Button size="lg" data-testid={`button-lg-${mode}`}>
-            Lg
-          </Button>
-        </div>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectButtonScaleHeights(canvasElement, 'lg', 'button-lg');
-  },
-};
-
-export const IconScaleHeightsAcrossModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Icon-only Button visuals follow the text Button size classes (`size-8`/`size-10`/`size-12`). Coarse-pointer hit-area overlays preserve the Nexus touch floor for smaller boxes.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
-      {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:items-center nx:gap-2"
-        >
-          <Button
-            size="icon-sm"
-            aria-label={`Small icon ${mode}`}
-            data-testid={`button-icon-sm-${mode}`}
-          >
-            <IconStar />
-          </Button>
-          <Button
-            size="icon"
-            aria-label={`Default icon ${mode}`}
-            data-testid={`button-icon-default-${mode}`}
-          >
-            <IconStar />
-          </Button>
-          <Button
-            size="icon-lg"
-            aria-label={`Large icon ${mode}`}
-            data-testid={`button-icon-lg-${mode}`}
-          >
-            <IconStar />
-          </Button>
-        </div>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectButtonScaleHeights(canvasElement, 'sm', 'button-icon-sm');
-    await expectButtonScaleHeights(
-      canvasElement,
-      'default',
-      'button-icon-default'
-    );
-    await expectButtonScaleHeights(canvasElement, 'lg', 'button-icon-lg');
-  },
-};
-
 export const VariantClassesMatchFigmaTokens: Story = {
   render: () => (
     <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
@@ -1044,59 +885,6 @@ export const BorderedVariantsKeepFixedHeight: Story = {
   },
 };
 
-export const TextScaleHeightsAcrossModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Scale-utility sentinel for the Button sizing model. Text Button sizes use `h-8`/`h-10`/`h-12` and therefore follow the active Nexus spacing mode. Inline padding uses Nexus scale utilities.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
-      {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:items-center nx:gap-2"
-        >
-          <Button data-testid={`button-default-${mode}`}>Default</Button>
-          <Button size="sm" data-testid={`button-sm-${mode}`}>
-            Sm
-          </Button>
-          <Button size="lg" data-testid={`button-lg-${mode}`}>
-            Lg
-          </Button>
-        </div>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const defaultButton = canvas.getByTestId('button-default-default');
-    const smallButton = canvas.getByTestId('button-sm-default');
-    const largeButton = canvas.getByTestId('button-lg-default');
-
-    await expect(defaultButton).toHaveClass('nx:typography-label-default');
-    await expect(defaultButton).toHaveClass('nx:h-10');
-    await expect(defaultButton).toHaveClass('nx:px-3');
-    await expect(defaultButton).toHaveClass('nx:gap-1');
-    await expect(smallButton).toHaveClass('nx:typography-label-default');
-    await expect(smallButton).toHaveClass('nx:h-8');
-    await expect(smallButton).toHaveClass('nx:px-2.5');
-    await expect(smallButton).toHaveClass('nx:gap-1');
-    await expect(largeButton).toHaveClass('nx:typography-label-default');
-    await expect(largeButton).toHaveClass('nx:h-12');
-    await expect(largeButton).toHaveClass('nx:px-3.5');
-
-    await expectButtonScaleHeights(canvasElement, 'default', 'button-default');
-    await expectButtonScaleHeights(canvasElement, 'sm', 'button-sm');
-    await expectButtonScaleHeights(canvasElement, 'lg', 'button-lg');
-  },
-};
-
 export const DefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -1108,11 +896,7 @@ export const DefaultModeHeightPinned: Story = {
     },
   },
   render: () => (
-    <div
-      data-style="default"
-      data-testid="button-default-host"
-      className="nx:p-10 nx:bg-background"
-    >
+    <div data-testid="button-default-host" className="nx:p-10 nx:bg-background">
       <Button>Default</Button>
     </div>
   ),

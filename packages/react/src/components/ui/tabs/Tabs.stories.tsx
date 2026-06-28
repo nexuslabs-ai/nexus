@@ -3,15 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
-import {
-  expectHeightFixedAcrossModes,
-  expectHeightPinned,
-} from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/story-height-test-utils';
 import {
   Card,
   CardContent,
@@ -696,42 +688,6 @@ export const AllVariants: Story = {
   ),
 };
 
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side.',
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Tabs defaultValue="a">
-            <TabsList>
-              <TabsTrigger value="a">Default</TabsTrigger>
-              <TabsTrigger value="b">Other</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Tabs defaultValue="a">
-            <TabsList>
-              <TabsTrigger size="lg" value="a">
-                Lg
-              </TabsTrigger>
-              <TabsTrigger size="lg" value="b">
-                Other
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
 export const TabsTriggerDefaultModeHeightPinned: Story = {
   parameters: {
     a11y: { test: 'off' },
@@ -743,11 +699,7 @@ export const TabsTriggerDefaultModeHeightPinned: Story = {
     },
   },
   render: () => (
-    <div
-      data-style="default"
-      data-testid="tabs-default-host"
-      className="nx:p-10 nx:bg-background"
-    >
+    <div data-testid="tabs-default-host" className="nx:p-10 nx:bg-background">
       <Tabs defaultValue="a">
         <TabsList>
           <TabsTrigger value="a">Default</TabsTrigger>
@@ -757,57 +709,6 @@ export const TabsTriggerDefaultModeHeightPinned: Story = {
   ),
   play: async ({ canvasElement }) => {
     await expectHeightPinned(within(canvasElement), 'tabs-default-host', 34);
-  },
-};
-
-export const TabsSmIsDensityStable: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Density-stability sentinel: the `sm` `TabsTrigger` renders at the same height across spacing modes.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:items-center nx:gap-4 nx:p-10 nx:bg-background">
-      <div data-style="compact" data-testid="tabs-sm-host-compact">
-        <Tabs defaultValue="a">
-          <TabsList>
-            <TabsTrigger size="sm" value="a">
-              Tab
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      <div data-style="default" data-testid="tabs-sm-host-default">
-        <Tabs defaultValue="a">
-          <TabsList>
-            <TabsTrigger size="sm" value="a">
-              Tab
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      <div data-style="spacious" data-testid="tabs-sm-host-spacious">
-        <Tabs defaultValue="a">
-          <TabsList>
-            <TabsTrigger size="sm" value="a">
-              Tab
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    await expectHeightFixedAcrossModes(
-      within(canvasElement),
-      ['tabs-sm-host-compact', 'tabs-sm-host-default', 'tabs-sm-host-spacious'],
-      26,
-      { selector: '[data-slot="tabs-trigger"]' }
-    );
   },
 };
 

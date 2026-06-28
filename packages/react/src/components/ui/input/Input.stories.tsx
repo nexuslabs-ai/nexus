@@ -1,13 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import {
-  AllModesGrid,
-  AllModesRow,
-  SPACING_MODES,
-} from '../../../stories/spacing-modes';
-import { expectHeightPerMode } from '../../../stories/test-utils';
-
 import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
@@ -52,33 +45,6 @@ const meta: Meta<typeof Input> = {
 
 export default meta;
 type Story = StoryObj<typeof Input>;
-
-const INPUT_SCALE_HEIGHTS = {
-  sm: {
-    tight: 32,
-    relaxed: 36,
-    default: 32,
-    compact: 30,
-    comfortable: 32,
-    spacious: 32,
-  },
-  default: {
-    tight: 42,
-    relaxed: 44,
-    default: 40,
-    compact: 38,
-    comfortable: 40,
-    spacious: 40,
-  },
-  lg: {
-    tight: 48,
-    relaxed: 52,
-    default: 48,
-    compact: 46,
-    comfortable: 48,
-    spacious: 48,
-  },
-} as const;
 
 // ============================================
 // BASIC STORIES
@@ -552,93 +518,6 @@ export const AllVariants: Story = {
   ),
   parameters: {
     layout: 'padded',
-  },
-};
-
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Each row scopes `data-style` locally so the 7 spacing modes render side-by-side regardless of the Style toolbar. Input follows the approved fixed-height utility scale (`h-8` / `h-10` / `h-12`) without copying Button min-widths. Sm uses body-small text; default/lg use body-default text.',
-      },
-    },
-  },
-  render: () => (
-    <AllModesGrid>
-      {SPACING_MODES.map((mode) => (
-        <AllModesRow key={mode} mode={mode}>
-          <Input
-            size="sm"
-            placeholder="Sm"
-            aria-label={`${mode} small input`}
-          />
-          <Input
-            size="default"
-            placeholder="Default"
-            aria-label={`${mode} default input`}
-          />
-          <Input
-            size="lg"
-            placeholder="Lg"
-            aria-label={`${mode} large input`}
-          />
-        </AllModesRow>
-      ))}
-    </AllModesGrid>
-  ),
-};
-
-export const InputScaleHeightsFollowModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          'Scale-utility sentinel for the Input sizing model. Text Input sizes use `h-8` / `h-10` / `h-12` and therefore follow the active Nexus spacing mode while keeping Input width layout-controlled.',
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background">
-      {SPACING_MODES.map((mode) => (
-        <div key={mode} data-style={mode} className="nx:flex nx:gap-4">
-          <Input
-            size="sm"
-            aria-label={`${mode} small input`}
-            data-testid={`input-sm-${mode}`}
-          />
-          <Input
-            aria-label={`${mode} default input`}
-            data-testid={`input-default-${mode}`}
-          />
-          <Input
-            size="lg"
-            aria-label={`${mode} large input`}
-            data-testid={`input-lg-${mode}`}
-          />
-        </div>
-      ))}
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // The implicit-default input still exposes its size for styling hooks.
-    await expect(
-      canvas.getByLabelText('default default input')
-    ).toHaveAttribute('data-size', 'default');
-
-    // Heights vary per mode (fixed h-* over mode-scaled spacing tokens); the
-    // shared helper measures every mode against INPUT_SCALE_HEIGHTS.
-    await expectHeightPerMode(canvas, 'input-sm', INPUT_SCALE_HEIGHTS.sm);
-    await expectHeightPerMode(
-      canvas,
-      'input-default',
-      INPUT_SCALE_HEIGHTS.default
-    );
-    await expectHeightPerMode(canvas, 'input-lg', INPUT_SCALE_HEIGHTS.lg);
   },
 };
 

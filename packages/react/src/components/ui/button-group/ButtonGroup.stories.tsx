@@ -8,7 +8,7 @@ import {
 } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../../stories/test-utils';
+import { expectHeightPinned } from '../../../stories/story-height-test-utils';
 import { Button } from '../button';
 import {
   DropdownMenu,
@@ -179,10 +179,7 @@ export const SizeAlignment: Story = {
     },
   },
   render: () => (
-    <div
-      data-style="default"
-      className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10"
-    >
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10">
       {Object.keys(BUTTON_GROUP_SIZE_HEIGHTS).map((size) => (
         <ButtonGroup
           key={size}

@@ -3,7 +3,6 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { SPACING_MODES } from '../../../stories/spacing-modes';
 import { Button } from '../button';
 
 import {
@@ -328,41 +327,6 @@ export const AllVariants: Story = {
   parameters: {
     layout: 'padded',
   },
-};
-
-export const AllModes: Story = {
-  parameters: {
-    a11y: { test: 'off' },
-    docs: {
-      description: {
-        story:
-          "Each row sets `data-style` on the trigger wrapper to demonstrate the available spacing modes. Note that `TooltipContent` portals to `document.body` and therefore picks up the document-level `data-style`, not the wrapper — opening a tooltip from any row renders content at whatever mode the Style toolbar selected, not the row's mode. The triggers themselves (Buttons) do respond to the wrapper.",
-      },
-    },
-  },
-  render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-4 nx:p-10 nx:bg-background nx:min-w-fit">
-      {SPACING_MODES.map((mode) => (
-        <div
-          key={mode}
-          data-style={mode}
-          className="nx:flex nx:gap-2 nx:items-center"
-        >
-          <span className="nx:w-[64px] nx:typography-label-default nx:font-mono nx:text-muted-foreground">
-            {mode}
-          </span>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline">Hover</Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Tooltip in {mode}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      ))}
-    </div>
-  ),
 };
 
 export const TooltipContentUsesNumericSpacing: Story = {
