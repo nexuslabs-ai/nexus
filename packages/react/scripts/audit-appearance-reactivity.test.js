@@ -5,6 +5,7 @@ import {
   classifyClassName,
   isAllowed,
   parseArgs,
+  shouldScanFile,
   utilityForClassName,
   validateAllowlist,
 } from './audit-appearance-reactivity.mjs';
@@ -46,6 +47,14 @@ describe('appearance reactivity audit classifier', () => {
     expect(classifyClassName('nx:text-[1.25rem]')).toMatchObject({
       ruleId: 'arbitrary-text-size',
     });
+    expect(classifyClassName('nx:text-[clamp(1rem,2vw,2rem)]')).toMatchObject({
+      ruleId: 'arbitrary-text-size',
+    });
+    expect(
+      classifyClassName('nx:text-[length:clamp(1rem,2vw,2rem)]')
+    ).toMatchObject({
+      ruleId: 'arbitrary-text-size',
+    });
     expect(classifyClassName('nx:text-[CanvasText]')).toBeNull();
     expect(classifyClassName('nx:bg-[Canvas]')).toBeNull();
   });
@@ -57,6 +66,9 @@ describe('appearance reactivity audit classifier', () => {
     expect(classifyClassName('nx:gap-[7px]')).toMatchObject({
       ruleId: 'arbitrary-spacing',
     });
+    expect(classifyClassName('nx:p-[calc(1rem+2px)]')).toMatchObject({
+      ruleId: 'arbitrary-spacing',
+    });
     expect(classifyClassName('nx:rounded-md')).toBeNull();
     expect(classifyClassName('nx:rounded-[2px]')).toMatchObject({
       ruleId: 'arbitrary-radius',
@@ -65,6 +77,12 @@ describe('appearance reactivity audit classifier', () => {
     expect(classifyClassName('nx:shadow-lg')).toBeNull();
     expect(classifyClassName('nx:shadow-[0_1px_2px_black]')).toMatchObject({
       ruleId: 'arbitrary-shadow',
+    });
+  });
+
+  it('flags CSS function arbitrary border widths', () => {
+    expect(classifyClassName('nx:border-[calc(1px+0.5px)]')).toMatchObject({
+      ruleId: 'arbitrary-border-width',
     });
   });
 
@@ -100,6 +118,21 @@ describe('appearance reactivity audit source scanning', () => {
       expect.objectContaining({
         line: 2,
         className: 'nx:text-[13px]',
+        ruleId: 'arbitrary-text-size',
+      }),
+    ]);
+  });
+
+  it('scans arbitrary CSS function classes without truncating the class name', () => {
+    const violations = auditSource(
+      'packages/react/src/components/ui/example/example.tsx',
+      '<div className="nx:text-[clamp(1rem,2vw,2rem)]" />',
+      []
+    );
+
+    expect(violations).toEqual([
+      expect.objectContaining({
+        className: 'nx:text-[clamp(1rem,2vw,2rem)]',
         ruleId: 'arbitrary-text-size',
       }),
     ]);
@@ -147,14 +180,30 @@ describe('appearance reactivity audit source scanning', () => {
         },
         {
           file: 'packages/react/src/components/ui/button/button.tsx',
+          ruleId: 'raw-border-width',
+          reason: 'rule-only wildcard',
+        },
+        {
+          file: 'packages/react/src/components/ui/button/button.tsx',
           className: 'nx:border',
         },
       ])
     ).toEqual([
       'allowlist[0] must include a concrete file path.',
-      'allowlist[1] must include an exact className or ruleId.',
-      'allowlist[2] must include a reason.',
+      'allowlist[1] must include an exact className.',
+      'allowlist[2] must include an exact className.',
+      'allowlist[3] must include a reason.',
     ]);
+  });
+
+  it('skips story and test files', () => {
+    expect(shouldScanFile('/repo/button.tsx')).toBe(true);
+    expect(shouldScanFile('/repo/button.stories.ts')).toBe(false);
+    expect(shouldScanFile('/repo/button.stories.tsx')).toBe(false);
+    expect(shouldScanFile('/repo/button.stories.js')).toBe(false);
+    expect(shouldScanFile('/repo/button.stories.jsx')).toBe(false);
+    expect(shouldScanFile('/repo/button.test.ts')).toBe(false);
+    expect(shouldScanFile('/repo/button.test.mjs')).toBe(false);
   });
 
   it('parses --json', () => {

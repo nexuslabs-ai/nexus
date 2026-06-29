@@ -58,6 +58,6 @@ export const APPEARANCE_REACTIVITY_ALLOWLIST = [
     file: 'packages/react/src/components/ui/chart/chart.tsx',
     className: 'nx:border-[1.5px]',
     reason:
-      'Dashed chart tooltip mark uses a fixed stroke matching chart glyphs.',
+      'Chart tooltip mark uses a fixed stroke matching chart glyphs.',
   },
 ];

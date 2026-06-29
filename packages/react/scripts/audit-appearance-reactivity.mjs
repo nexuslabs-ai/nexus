@@ -8,10 +8,10 @@ import {
 } from './appearance-reactivity.config.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(scriptDir, '../..', '..');
-const CLASS_RE = /nx:[^\s"'`)}]+/g;
+const CLASS_RE = /nx:[^\s"'`}]+/g;
 const DIMENSION_RE =
   /(?:^|[^\w-])-?(?:\d+|\d*\.\d+)(?:px|rem|em|%|lh|vw|vh|svw|svh|lvw|lvh|dvw|dvh|ch|ex|cap|ic)\b/i;
+const CSS_DIMENSION_FUNCTION_RE = /^(?:calc|clamp|min|max)\(/i;
 
 const RULES = {
   rawBorderWidth: 'raw-border-width',
@@ -26,6 +26,26 @@ function toPosix(file) {
   return file.split(path.sep).join('/');
 }
 
+function findRepoRoot(startDir) {
+  let current = startDir;
+
+  while (true) {
+    if (existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
+      return current;
+    }
+
+    const parent = path.dirname(current);
+    if (parent === current) {
+      throw new Error(
+        `Could not find repo root from ${toPosix(path.relative(process.cwd(), startDir))}.`
+      );
+    }
+    current = parent;
+  }
+}
+
+const repoRoot = findRepoRoot(scriptDir);
+
 function rel(file) {
   return toPosix(path.relative(repoRoot, file));
 }
@@ -38,13 +58,33 @@ function utilityForClassName(className) {
   const withoutPrefix = className.startsWith('nx:')
     ? className.slice(3)
     : className;
-  const parts = withoutPrefix.split(':');
+  let bracketDepth = 0;
+  let lastVariantSeparator = -1;
 
-  return parts[parts.length - 1];
+  for (let index = 0; index < withoutPrefix.length; index += 1) {
+    const char = withoutPrefix[index];
+
+    if (char === '[') {
+      bracketDepth += 1;
+    } else if (char === ']') {
+      bracketDepth = Math.max(0, bracketDepth - 1);
+    } else if (char === ':' && bracketDepth === 0) {
+      lastVariantSeparator = index;
+    }
+  }
+
+  return withoutPrefix.slice(lastVariantSeparator + 1);
 }
 
 function isDimensionLiteral(value) {
-  return DIMENSION_RE.test(value);
+  const normalized = value.trim().replace(/_/g, ' ');
+  const withoutTypeHint = normalized.replace(/^length:/i, '');
+
+  return (
+    normalized !== withoutTypeHint ||
+    DIMENSION_RE.test(withoutTypeHint) ||
+    CSS_DIMENSION_FUNCTION_RE.test(withoutTypeHint)
+  );
 }
 
 function bracketValue(utility, prefix) {
@@ -132,9 +172,9 @@ function validateAllowlist(allowlist) {
     if (!entry.file || entry.file.includes('*')) {
       failures.push(`allowlist[${index}] must include a concrete file path.`);
     }
-    if (!entry.className && !entry.ruleId) {
+    if (!entry.className || entry.className.includes('*')) {
       failures.push(
-        `allowlist[${index}] must include an exact className or ruleId.`
+        `allowlist[${index}] must include an exact className.`
       );
     }
     if (!entry.reason) {
@@ -150,6 +190,7 @@ function isAllowed(violation, allowlist = APPEARANCE_REACTIVITY_ALLOWLIST) {
 
   return normalized.some((entry) => {
     if (entry.file !== violation.file) return false;
+    if (!entry.className) return false;
     if (entry.className && entry.className !== violation.className)
       return false;
     if (entry.ruleId && entry.ruleId !== violation.ruleId) return false;
@@ -188,9 +229,7 @@ function auditSource(
 
 function shouldScanFile(file) {
   if (!/\.[cm]?[jt]sx?$/.test(file)) return false;
-  if (file.endsWith('.stories.tsx')) return false;
-  if (file.endsWith('.test.tsx') || file.endsWith('.test.ts')) return false;
-  if (file.endsWith('.test.js') || file.endsWith('.test.mjs')) return false;
+  if (/\.(?:stories|test)\.[cm]?[jt]sx?$/.test(file)) return false;
 
   return true;
 }
@@ -304,6 +343,7 @@ export {
   classifyClassName,
   isAllowed,
   parseArgs,
+  shouldScanFile,
   utilityForClassName,
   validateAllowlist,
 };

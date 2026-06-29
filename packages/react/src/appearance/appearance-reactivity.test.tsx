@@ -17,10 +17,18 @@ function expectNoRawBorderWidth(element: Element) {
       ? className.slice(3).split(':')
       : [className];
     const utility = parts[parts.length - 1];
+    const arbitraryBorderWidth = utility?.match(
+      /^border(?:-[xytrbl])?-\[(.+)\]$/
+    );
 
     return (
       /^border(?:-[xytrbl])?$/.test(utility ?? '') ||
-      /^border(?:-[xytrbl])?-(?:[1-9]\d*(?:\.\d+)?)$/.test(utility ?? '')
+      /^border(?:-[xytrbl])?-(?:[1-9]\d*(?:\.\d+)?)$/.test(utility ?? '') ||
+      (arbitraryBorderWidth
+        ? /(?:\d|\bcalc\(|\bclamp\(|\bmin\(|\bmax\()/i.test(
+            arbitraryBorderWidth[1]
+          )
+        : false)
     );
   });
 
