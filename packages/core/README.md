@@ -41,13 +41,17 @@ const state = {
 };
 const snapshot = createNexusAppearanceSnapshotFromState(state);
 const firstPaint = resolveFirstPaint(snapshot, false);
+const themeStyle =
+  document.querySelector<HTMLStyleElement>('style[data-theme]') ??
+  document.head.appendChild(document.createElement('style'));
+themeStyle.dataset.theme = '';
 
 document.documentElement.classList.toggle(
   'dark',
   firstPaint.className === 'dark'
 );
 document.documentElement.style.colorScheme = firstPaint.colorScheme;
-document.querySelector('style[data-theme]')!.textContent = themeToCss(
+themeStyle.textContent = themeToCss(
   deriveTheme(createNexusThemeContract(snapshot.state))
 );
 ```
