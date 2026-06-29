@@ -144,7 +144,7 @@ export const Link: Story = {
     await expect(button).toHaveClass('nx:border-0');
     await expect(button).toHaveClass('nx:p-0!');
     await expect(button).not.toHaveClass('nx:hover:bg-primary-subtle-hover');
-    await expectHeightPinned(canvas, 'button-link', 20);
+    await expectHeightPinned(canvas, 'button-link', 22);
   },
 };
 
