@@ -69,3 +69,75 @@
   border-left-style: var(--tw-border-style, solid);
   border-left-width: var(--nx-borderwidth-thick);
 }
+
+/* Border Width Alias Utilities */
+
+@utility border-width-default {
+  border-style: var(--tw-border-style, solid);
+  border-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-x-default {
+  border-inline-style: var(--tw-border-style, solid);
+  border-inline-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-y-default {
+  border-block-style: var(--tw-border-style, solid);
+  border-block-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-t-default {
+  border-top-style: var(--tw-border-style, solid);
+  border-top-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-r-default {
+  border-right-style: var(--tw-border-style, solid);
+  border-right-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-b-default {
+  border-bottom-style: var(--tw-border-style, solid);
+  border-bottom-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-l-default {
+  border-left-style: var(--tw-border-style, solid);
+  border-left-width: var(--nx-borderwidth-default);
+}
+
+@utility border-width-thick {
+  border-style: var(--tw-border-style, solid);
+  border-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-x-thick {
+  border-inline-style: var(--tw-border-style, solid);
+  border-inline-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-y-thick {
+  border-block-style: var(--tw-border-style, solid);
+  border-block-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-t-thick {
+  border-top-style: var(--tw-border-style, solid);
+  border-top-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-r-thick {
+  border-right-style: var(--tw-border-style, solid);
+  border-right-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-b-thick {
+  border-bottom-style: var(--tw-border-style, solid);
+  border-bottom-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-width-l-thick {
+  border-left-style: var(--tw-border-style, solid);
+  border-left-width: var(--nx-borderwidth-thick);
+}

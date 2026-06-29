@@ -21,6 +21,7 @@ import {
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
+  generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
@@ -304,6 +305,8 @@ function generateModularGlobalsCSS(
   const shadowTokens = collectShadowTokens(TOKENS_DIR, primitiveMap);
   const zIndexTokens = collectZIndexTokens(SEMANTIC_DIR);
   const breakpointTokens = collectBreakpointsTokens(SEMANTIC_DIR);
+  const borderColorAliases =
+    generateBorderColorAliasUtilitiesCSS(semanticTokens);
 
   // Generate using shared function. Spacing is split: numeric default tokens
   // seed @theme for Tailwind utility codegen; role tokens drive the inline
@@ -333,6 +336,7 @@ function generateModularGlobalsCSS(
       './motion-snappy.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
+      ...(borderColorAliases.css ? ['./border-color-aliases.css'] : []),
       './motion-utilities.css',
       './spacing-utilities.css',
     ],
@@ -365,6 +369,14 @@ function generateModularGlobalsCSS(
   // the same local graph.
   const spacingUtilities = generateSpacingRoleUtilitiesCSS(defaultSpacingRole);
   writeModularFile(distDir, 'spacing-utilities.css', spacingUtilities.css);
+
+  if (borderColorAliases.css) {
+    writeModularFile(
+      distDir,
+      'border-color-aliases.css',
+      borderColorAliases.css
+    );
+  }
 
   return (
     semanticTokens.length +

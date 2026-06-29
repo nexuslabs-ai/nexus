@@ -711,13 +711,15 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 // BORDER WIDTH UTILITIES
 // ============================================
 
+const BORDER_WIDTH_UTILITIES_PER_TOKEN = 14;
+
 /**
  * Generate border width utility CSS from token array.
  * Creates @utility rules with border-{side?}-{name} patterns for all
  * borderwidth tokens, so runtime stroke modes can affect one-sided borders.
  *
  * @param {object[]} tokens - Array of borderwidth tokens with cssName property (e.g., "nx-borderwidth-default")
- * @returns {{ css: string, count: number }} Generated CSS and token count
+ * @returns {{ css: string, count: number }} Generated CSS and utility count
  */
 export function generateBorderWidthUtilitiesCSS(tokens) {
   if (!tokens || tokens.length === 0) {
@@ -767,7 +769,104 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
     css += `}\n\n`;
   }
 
-  return { css, count: tokens.length };
+  css += `/* Border Width Alias Utilities */\n\n`;
+
+  for (const token of tokens) {
+    const name = token.cssName.replace('nx-borderwidth-', '');
+    const value = `var(--${token.cssName})`;
+
+    css += `@utility border-width-${name} {\n`;
+    css += `  border-style: var(--tw-border-style, solid);\n`;
+    css += `  border-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-x-${name} {\n`;
+    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
+    css += `  border-inline-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-y-${name} {\n`;
+    css += `  border-block-style: var(--tw-border-style, solid);\n`;
+    css += `  border-block-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-t-${name} {\n`;
+    css += `  border-top-style: var(--tw-border-style, solid);\n`;
+    css += `  border-top-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-r-${name} {\n`;
+    css += `  border-right-style: var(--tw-border-style, solid);\n`;
+    css += `  border-right-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-b-${name} {\n`;
+    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
+    css += `  border-bottom-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-l-${name} {\n`;
+    css += `  border-left-style: var(--tw-border-style, solid);\n`;
+    css += `  border-left-width: ${value};\n`;
+    css += `}\n\n`;
+  }
+
+  return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
+}
+
+const BORDER_COLOR_ALIAS_NAMES = new Set([
+  'default',
+  'default-alpha',
+  'active',
+  'disabled',
+  'warning',
+  'warning-active',
+  'success',
+  'success-active',
+  'error',
+  'error-active',
+  'information',
+  'information-active',
+  'primary',
+  'primary-active',
+]);
+
+function getBorderColorAliasName(cssName) {
+  const prefix = 'color-border-';
+  if (!cssName.startsWith(prefix)) {
+    return null;
+  }
+
+  const name = cssName.slice(prefix.length);
+  return BORDER_COLOR_ALIAS_NAMES.has(name) ? name : null;
+}
+
+/**
+ * Generate border color alias utility CSS from semantic color tokens.
+ * Creates @utility rules with border-color-{name} patterns for every
+ * semantic color token in the border namespace.
+ *
+ * @param {object[]} tokens - Array of semantic color tokens with cssName property (e.g., "color-border-default")
+ * @returns {{ css: string, count: number }} Generated CSS and utility count
+ */
+export function generateBorderColorAliasUtilitiesCSS(tokens) {
+  const borderColorTokens = (tokens ?? [])
+    .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
+    .filter(({ name }) => name !== null);
+
+  if (borderColorTokens.length === 0) {
+    return { css: '', count: 0 };
+  }
+
+  let css = `/* Border Color Alias Utilities */\n\n`;
+
+  for (const { token, name } of borderColorTokens) {
+    css += `@utility border-color-${name} {\n`;
+    css += `  border-color: var(--${token.cssName});\n`;
+    css += `}\n\n`;
+  }
+
+  return { css, count: borderColorTokens.length };
 }
 
 // ============================================

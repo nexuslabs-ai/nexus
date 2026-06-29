@@ -126,6 +126,7 @@ describe('generateModular', () => {
     const files = fs.readdirSync(distDir);
     expect(files).toContain('spacing-utilities.css');
     expect(files).toContain('motion-utilities.css');
+    expect(files).toContain('border-color-aliases.css');
 
     const spacingUtilities = fs.readFileSync(
       path.join(distDir, 'spacing-utilities.css'),
@@ -143,12 +144,23 @@ describe('generateModular', () => {
       /transition-duration:\s*var\(--nx-motion-duration-fast\);/
     );
 
+    const borderColorAliases = fs.readFileSync(
+      path.join(distDir, 'border-color-aliases.css'),
+      'utf8'
+    );
+    expect(borderColorAliases).toMatch(/@utility border-color-default \{/);
+    expect(borderColorAliases).toMatch(
+      /border-color:\s*var\(--color-border-default\);/
+    );
+
     // globals.css does NOT inline sibling utilities — it @imports them.
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
     expect(globals).not.toMatch(/@utility p-container \{/);
     expect(globals).not.toMatch(/@utility duration-fast \{/);
+    expect(globals).not.toMatch(/@utility border-color-default \{/);
     expect(globals).toMatch(/@import\s+['"]\.\/spacing-utilities\.css['"]/);
     expect(globals).toMatch(/@import\s+['"]\.\/motion-utilities\.css['"]/);
+    expect(globals).toMatch(/@import\s+['"]\.\/border-color-aliases\.css['"]/);
   });
 
   it('@utility declarations bind the right prefixed CSS vars', () => {

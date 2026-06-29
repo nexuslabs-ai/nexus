@@ -16,6 +16,7 @@
 @import './motion-snappy.css';
 @import './typography-utilities.css';
 @import './borderwidth-utilities.css';
+@import './border-color-aliases.css';
 @import './motion-utilities.css';
 @import './spacing-utilities.css';
 
