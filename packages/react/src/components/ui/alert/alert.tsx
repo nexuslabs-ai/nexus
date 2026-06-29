@@ -20,8 +20,8 @@ const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:p-4', {
         'nx:border-border-warning nx:bg-warning-subtle nx:text-warning-subtle-foreground',
     },
     presentation: {
-      card: 'nx:rounded-md nx:border',
-      banner: 'nx:rounded-none nx:border-b',
+      card: 'nx:rounded-md nx:border-default',
+      banner: 'nx:rounded-none nx:border-b-default',
     },
     layout: {
       stack:

@@ -135,7 +135,7 @@ export const ScrollableContent: Story = {
             {SCROLLABLE_ITEMS.map((item) => (
               <li
                 key={item.title}
-                className="nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:p-4"
+                className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:p-4"
               >
                 <p className="nx:typography-label-default nx:text-foreground">
                   {item.title}
@@ -147,7 +147,7 @@ export const ScrollableContent: Story = {
             ))}
           </ul>
         </DrawerBody>
-        <DrawerFooter className="nx:border-t nx:border-border-default">
+        <DrawerFooter className="nx:border-t-default nx:border-border-default">
           <Button>Save changes</Button>
           <DrawerClose asChild>
             <Button variant="outline">Close</Button>

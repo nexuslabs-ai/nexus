@@ -42,7 +42,7 @@ type Story = StoryObj<typeof Command>;
 // Presentational chrome for the inline (non-dialog) palette stories — a fixed
 // width with a bordered, elevated surface so the palette reads as a card.
 const paletteClass =
-  'nx:w-[480px] nx:rounded-lg nx:border nx:border-border-default nx:shadow-md';
+  'nx:w-[480px] nx:rounded-lg nx:border-default nx:border-border-default nx:shadow-md';
 
 const projectCommands = [
   {

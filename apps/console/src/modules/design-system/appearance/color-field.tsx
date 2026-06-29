@@ -45,7 +45,7 @@ export function NexusAppearanceColorField({
     <div className="nx:flex nx:items-center nx:gap-2">
       <div className="nx:relative nx:size-7 nx:shrink-0">
         <div
-          className="nx:size-full nx:rounded-full nx:border nx:border-border-default"
+          className="nx:size-full nx:rounded-full nx:border-default nx:border-border-default"
           style={{
             backgroundColor: normalizedValue ?? 'transparent',
           }}

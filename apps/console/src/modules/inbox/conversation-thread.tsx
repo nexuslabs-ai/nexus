@@ -113,7 +113,7 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
 
   return (
     <div className="nx:flex nx:min-h-0 nx:flex-1 nx:flex-col">
-      <header className="nx:border-border-default nx:flex nx:items-start nx:justify-between nx:gap-4 nx:border-b nx:px-6 nx:py-4">
+      <header className="nx:border-border-default nx:flex nx:items-start nx:justify-between nx:gap-4 nx:border-b-default nx:px-6 nx:py-4">
         <div className="nx:flex nx:min-w-0 nx:items-start nx:gap-2">
           {/* Below lg the list is hidden once a thread is open, so the thread
               needs its own way back to it. */}
@@ -155,7 +155,7 @@ function ThreadContent({ conversation }: { conversation: ConversationDetail }) {
         </div>
       </ScrollArea>
 
-      <div className="nx:border-border-default nx:border-t nx:p-4">
+      <div className="nx:border-border-default nx:border-t-default nx:p-4">
         <Textarea
           value={body}
           onChange={(event) => setBody(event.target.value)}
@@ -255,7 +255,7 @@ function MessageBubble({ message }: { message: Message }) {
 function ThreadSkeleton() {
   return (
     <div className="nx:flex nx:min-h-0 nx:flex-1 nx:flex-col">
-      <div className="nx:border-border-default nx:space-y-2 nx:border-b nx:px-6 nx:py-4">
+      <div className="nx:border-border-default nx:space-y-2 nx:border-b-default nx:px-6 nx:py-4">
         <Skeleton className="nx:h-6 nx:w-64 nx:max-w-full" />
         <Skeleton className="nx:h-4 nx:w-48" />
       </div>

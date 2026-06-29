@@ -11,8 +11,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="nx:bg-container nx:rounded-xl nx:border nx:border-border-default nx:overflow-hidden">
-      <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-background-hover-alpha">
+    <section className="nx:bg-container nx:rounded-xl nx:border-default nx:border-border-default nx:overflow-hidden">
+      <div className="nx:px-5 nx:py-4 nx:border-b-default nx:border-border-default nx:bg-background-hover-alpha">
         <h2 className="nx:typography-heading-xsmall nx:text-foreground">
           {title}
         </h2>
@@ -165,7 +165,7 @@ export function ComponentShowcase() {
             />
             <ColorSwatch name="Nav Border" className="nx:bg-nav-border" />
           </div>
-          <div className="nx:mt-4 nx:bg-nav-background nx:border nx:border-nav-border nx:rounded-md nx:p-4">
+          <div className="nx:mt-4 nx:bg-nav-background nx:border-default nx:border-nav-border nx:rounded-md nx:p-4">
             <p className="nx:text-nav-foreground nx:typography-label-default">
               Nav item label
             </p>
@@ -230,7 +230,7 @@ export function ComponentShowcase() {
               <span className="nx:typography-label-caps nx:text-muted-foreground nx:uppercase">
                 Container — p-container, gap-container
               </span>
-              <div className="nx:bg-container nx:border nx:border-border-default nx:rounded-lg nx:flex nx:flex-col nx:p-container nx:gap-container">
+              <div className="nx:bg-container nx:border-default nx:border-border-default nx:rounded-lg nx:flex nx:flex-col nx:p-container nx:gap-container">
                 <h4 className="nx:text-foreground nx:typography-label-default">
                   Card header
                 </h4>
@@ -242,7 +242,7 @@ export function ComponentShowcase() {
                   <button className="nx:bg-primary-background nx:text-primary-foreground nx:rounded-md nx:px-3 nx:py-1.5 nx:typography-label-default">
                     Confirm
                   </button>
-                  <button className="nx:border nx:border-border-default nx:bg-background nx:rounded-md nx:px-3 nx:py-1.5 nx:typography-label-default">
+                  <button className="nx:border-default nx:border-border-default nx:bg-background nx:rounded-md nx:px-3 nx:py-1.5 nx:typography-label-default">
                     Cancel
                   </button>
                 </div>
@@ -289,7 +289,7 @@ export function ComponentShowcase() {
               <button className="nx:bg-secondary-background nx:text-secondary-foreground nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:hover:opacity-90 nx:transition-opacity">
                 Secondary
               </button>
-              <button className="nx:border nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:transition-colors">
+              <button className="nx:border-default nx:border-border-default nx:bg-background nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:transition-colors">
                 Outline
               </button>
               <button className="nx:hover:bg-background-hover nx:rounded-md nx:px-4 nx:py-2 nx:typography-label-default nx:transition-colors">
@@ -308,13 +308,13 @@ export function ComponentShowcase() {
           description="Surface styles and containers"
         >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
-            <div className="nx:border nx:border-border-default nx:bg-container nx:rounded-lg nx:p-4">
+            <div className="nx:border-default nx:border-border-default nx:bg-container nx:rounded-lg nx:p-4">
               <h3 className="nx:typography-label-default">Container</h3>
               <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Default container background
               </p>
             </div>
-            <div className="nx:border nx:border-border-default nx:bg-popover nx:rounded-lg nx:p-4">
+            <div className="nx:border-default nx:border-border-default nx:bg-popover nx:rounded-lg nx:p-4">
               <h3 className="nx:typography-label-default">Popover</h3>
               <p className="nx:text-muted-foreground nx:mt-1 nx:typography-body-default">
                 Popover background color
@@ -347,10 +347,10 @@ export function ComponentShowcase() {
                 Width
               </span>
               <div className="nx:flex nx:flex-wrap nx:gap-3 nx:mt-2">
-                <div className="nx:border nx:border-border-default nx:border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-default nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   default
                 </div>
-                <div className="nx:border nx:border-border-default nx:border-thick nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border-default nx:border-border-default nx:border-thick nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   thick
                 </div>
               </div>
@@ -386,25 +386,25 @@ export function ComponentShowcase() {
           description="Feedback and alert styles"
         >
           <div className="nx:grid nx:gap-4 nx:md:grid-cols-2">
-            <div className="nx:bg-success-subtle nx:border nx:border-border-success nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-success-subtle nx:border-default nx:border-border-success nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-success-background" />
               <span className="nx:text-success-subtle-foreground nx:typography-label-default">
                 Success message
               </span>
             </div>
-            <div className="nx:bg-error-subtle nx:border nx:border-border-error nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-error-subtle nx:border-default nx:border-border-error nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-error-background" />
               <span className="nx:text-error-subtle-foreground nx:typography-label-default">
                 Error message
               </span>
             </div>
-            <div className="nx:bg-warning-subtle nx:border nx:border-border-warning nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-warning-subtle nx:border-default nx:border-border-warning nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-warning-background" />
               <span className="nx:text-warning-subtle-foreground nx:typography-label-default">
                 Warning message
               </span>
             </div>
-            <div className="nx:bg-information-subtle nx:border nx:border-border-information nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
+            <div className="nx:bg-information-subtle nx:border-default nx:border-border-information nx:rounded-lg nx:p-4 nx:flex nx:items-center nx:gap-3">
               <div className="nx:w-2 nx:h-2 nx:rounded-full nx:bg-information-background" />
               <span className="nx:text-information-subtle-foreground nx:typography-label-default">
                 Info message
@@ -431,7 +431,7 @@ function ColorSwatch({
   return (
     <div
       className={`nx:flex nx:h-20 nx:items-end nx:rounded-lg nx:p-3 ${className} ${
-        border ? 'nx:border nx:border-border-default' : ''
+        border ? 'nx:border-default nx:border-border-default' : ''
       }`}
     >
       <span

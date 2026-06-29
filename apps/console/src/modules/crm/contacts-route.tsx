@@ -105,7 +105,7 @@ export function ContactsSkeleton() {
   return (
     <div className="nx:space-y-4">
       <Skeleton className="nx:h-9 nx:max-w-xs" />
-      <div className="nx:border-border-default nx:space-y-3 nx:rounded-md nx:border nx:p-4">
+      <div className="nx:border-border-default nx:space-y-3 nx:rounded-md nx:border-default nx:p-4">
         {Array.from({ length: 8 }, (_, i) => (
           <Skeleton key={i} className="nx:h-8 nx:w-full" />
         ))}

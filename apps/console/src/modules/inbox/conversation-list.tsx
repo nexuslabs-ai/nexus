@@ -17,7 +17,7 @@ export function ConversationList({
 }: ConversationListProps) {
   return (
     <div className="nx:flex nx:min-h-0 nx:flex-1 nx:flex-col">
-      <div className="nx:border-border-default nx:text-muted-foreground nx:border-b nx:px-4 nx:py-3 nx:typography-label-default">
+      <div className="nx:border-border-default nx:text-muted-foreground nx:border-b-default nx:px-4 nx:py-3 nx:typography-label-default">
         {conversations.length} conversation
         {conversations.length === 1 ? '' : 's'}
       </div>
@@ -52,7 +52,7 @@ function ConversationRow({
       search={{ c: conversation.id }}
       resetScroll={false}
       data-active={active || undefined}
-      className="nx:border-border-default nx:hover:bg-background-hover nx:data-[active]:bg-muted nx:flex nx:gap-3 nx:border-b nx:px-4 nx:py-3"
+      className="nx:border-border-default nx:hover:bg-background-hover nx:data-[active]:bg-muted nx:flex nx:gap-3 nx:border-b-default nx:px-4 nx:py-3"
     >
       <div className="nx:flex nx:w-2 nx:shrink-0 nx:justify-center nx:pt-1.5">
         {conversation.unread && (

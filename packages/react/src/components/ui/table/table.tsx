@@ -136,7 +136,7 @@ function Table({
           data-sticky-header={stickyHeader || undefined}
           data-striped={striped || undefined}
           className={cn(
-            'nx:w-full nx:caption-bottom nx:typography-body-default nx:[&[data-striped]_tbody_tr:nth-child(even):not(:hover):not([data-state=selected])]:bg-muted nx:[&[data-striped]_tfoot]:border-t nx:[&[data-striped]_tfoot]:border-border-default-alpha',
+            'nx:w-full nx:caption-bottom nx:typography-body-default nx:[&[data-striped]_tbody_tr:nth-child(even):not(:hover):not([data-state=selected])]:bg-muted nx:[&[data-striped]_tfoot]:border-t-default nx:[&[data-striped]_tfoot]:border-border-default-alpha',
             className
           )}
           {...props}
@@ -198,9 +198,9 @@ const tableFooterVariants = cva(
   {
     variants: {
       variant: {
-        default: 'nx:border-t nx:border-border-default-alpha',
+        default: 'nx:border-t-default nx:border-border-default-alpha',
         borderless: '',
-        grid: 'nx:border-t nx:border-border-default-alpha',
+        grid: 'nx:border-t-default nx:border-border-default-alpha',
       } satisfies Record<TableVariant, string>,
     },
     defaultVariants: { variant: 'default' },
@@ -236,9 +236,9 @@ const tableRowVariants = cva(
   {
     variants: {
       variant: {
-        default: 'nx:border-b nx:border-border-default-alpha',
+        default: 'nx:border-b-default nx:border-border-default-alpha',
         borderless: '',
-        grid: 'nx:border-b nx:border-border-default-alpha',
+        grid: 'nx:border-b-default nx:border-border-default-alpha',
       } satisfies Record<TableVariant, string>,
     },
     defaultVariants: { variant: 'default' },
@@ -276,7 +276,7 @@ const tableHeadVariants = cva(
       variant: {
         default: '',
         borderless: '',
-        grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
+        grid: 'nx:border-r-default nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
       } satisfies Record<TableVariant, string>,
       density: {
         comfortable: 'nx:py-3',
@@ -326,7 +326,7 @@ const tableCellVariants = cva(
       variant: {
         default: '',
         borderless: '',
-        grid: 'nx:border-r nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
+        grid: 'nx:border-r-default nx:border-border-default-alpha nx:[&:last-child]:border-r-0',
       } satisfies Record<TableVariant, string>,
       density: {
         comfortable: 'nx:py-3',

@@ -150,7 +150,7 @@ function TabsList({ className, children, ref, ...props }: TabsListProps) {
         data-variant="default"
         className={cn(
           'nx:pointer-events-none nx:absolute nx:top-0 nx:left-0 nx:z-0 nx:opacity-0',
-          'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
+          'nx:data-[variant=default]:rounded-sm nx:data-[variant=default]:border-default nx:data-[variant=default]:border-border-default nx:data-[variant=default]:bg-background',
           'nx:data-[variant=underline]:bg-primary-background',
           ready &&
             'nx:transition-[transform,width,height] nx:duration-fast nx:ease-move nx:motion-reduce:transition-none'
@@ -184,7 +184,7 @@ const tabsTriggerVariants = cva(
        */
       variant: {
         default: [
-          'nx:rounded-sm nx:border nx:border-transparent',
+          'nx:rounded-sm nx:border-default nx:border-transparent',
           'nx:data-[state=inactive]:hover:bg-control-background-hover',
           'nx:data-[state=active]:text-foreground',
         ],

@@ -119,7 +119,7 @@ function ToggleGroupItem({
         'nx:min-w-0 nx:shrink-0',
         // When joined (spacing=0): drop inner rounding/borders so items share
         // edges; round only the group's ends.
-        'nx:data-[spacing=0]:rounded-none nx:data-[spacing=0]:first:rounded-l-md nx:data-[spacing=0]:last:rounded-r-md nx:data-[spacing=0]:data-[variant=outline]:border-l-0 nx:data-[spacing=0]:data-[variant=outline]:first:border-l',
+        'nx:data-[spacing=0]:rounded-none nx:data-[spacing=0]:first:rounded-l-md nx:data-[spacing=0]:last:rounded-r-md nx:data-[spacing=0]:data-[variant=outline]:border-l-0 nx:data-[spacing=0]:data-[variant=outline]:first:border-l-default',
         className
       )}
       {...props}

@@ -43,7 +43,7 @@ function InputGroup({ className, ...props }: InputGroupProps) {
       data-slot="input-group"
       role="group"
       className={cn(
-        'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:transition-colors nx:outline-none',
+        'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:transition-colors nx:outline-none',
         // Size: an inline group matches standalone Input's height for the
         // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
         // non-stacked layouts (no block addon) so the fixed-height rule and the

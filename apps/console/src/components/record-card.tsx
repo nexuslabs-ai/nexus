@@ -20,7 +20,7 @@ interface RecordCardProps {
  */
 export function RecordCard({ title, badge, children }: RecordCardProps) {
   return (
-    <li className="nx:border-border-default nx:bg-container nx:rounded-lg nx:border nx:p-4">
+    <li className="nx:border-border-default nx:bg-container nx:rounded-lg nx:border-default nx:p-4">
       <div className="nx:flex nx:items-start nx:justify-between nx:gap-3">
         <div className="nx:min-w-0 nx:flex-1">{title}</div>
         {badge ? <div className="nx:shrink-0">{badge}</div> : null}

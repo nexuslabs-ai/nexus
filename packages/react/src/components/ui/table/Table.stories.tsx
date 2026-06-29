@@ -591,7 +591,7 @@ export const Borderless: Story = {
     const row = canvasElement.querySelector('[data-slot="table-row"]');
 
     await expect(table).toHaveAttribute('data-variant', 'borderless');
-    await expect(row).not.toHaveClass('nx:border-b');
+    await expect(row).not.toHaveClass('nx:border-b-default');
   },
 };
 
@@ -624,10 +624,10 @@ export const Grid: Story = {
 
     await expect(table).toHaveAttribute('data-variant', 'grid');
     await expect(row).toHaveClass(
-      'nx:border-b',
+      'nx:border-b-default',
       'nx:border-border-default-alpha'
     );
-    await expect(cell).toHaveClass('nx:border-r');
+    await expect(cell).toHaveClass('nx:border-r-default');
   },
 };
 
@@ -1129,7 +1129,7 @@ export const StackedCard: Story = {
           {invoices.slice(0, 3).map((row) => (
             <li
               key={row.invoice}
-              className="nx:space-y-1 nx:rounded-md nx:border nx:border-border-default-alpha nx:p-3"
+              className="nx:space-y-1 nx:rounded-md nx:border-default nx:border-border-default-alpha nx:p-3"
             >
               <div className="nx:flex nx:justify-between">
                 <span className="nx:text-muted-foreground">Invoice</span>

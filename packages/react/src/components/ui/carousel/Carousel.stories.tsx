@@ -28,7 +28,7 @@ type Story = StoryObj<typeof Carousel>;
 // Five numbered slides reused across stories.
 const slideItems = [1, 2, 3, 4, 5].map((n) => (
   <CarouselItem key={n} aria-label={`Slide ${n} of 5`}>
-    <div className="nx:flex nx:aspect-square nx:items-center nx:justify-center nx:rounded-md nx:border nx:border-border-default">
+    <div className="nx:flex nx:aspect-square nx:items-center nx:justify-center nx:rounded-md nx:border-default nx:border-border-default">
       <span className="nx:text-[2.25rem] nx:font-semibold">{n}</span>
     </div>
   </CarouselItem>

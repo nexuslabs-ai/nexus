@@ -32,7 +32,7 @@ function Textarea({ className, ...props }: TextareaProps) {
     <textarea
       data-slot="textarea"
       className={cn(
-        'nx:flex nx:min-h-16 nx:w-full nx:rounded-md nx:border nx:border-border-default',
+        'nx:flex nx:min-h-16 nx:w-full nx:rounded-md nx:border-default nx:border-border-default',
         'nx:bg-background nx:text-foreground nx:transition-colors nx:enabled:hover:bg-background-hover',
         'nx:placeholder:text-muted-foreground',
         'nx:px-3 nx:py-2 nx:typography-body-default',

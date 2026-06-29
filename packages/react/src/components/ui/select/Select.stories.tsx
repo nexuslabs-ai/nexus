@@ -104,7 +104,7 @@ export const CapabilityLadder: Story = {
   },
   render: () => (
     <div className="nx:grid nx:max-w-3xl nx:gap-4 nx:md:grid-cols-2">
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
           NativeSelect
         </h3>
@@ -117,7 +117,7 @@ export const CapabilityLadder: Story = {
           <NativeSelectOption value="team">Team</NativeSelectOption>
         </NativeSelect>
       </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
           Select
         </h3>
@@ -140,7 +140,7 @@ export const CapabilityLadder: Story = {
           </SelectContent>
         </Select>
       </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
           Future Combobox
         </h3>
@@ -148,7 +148,7 @@ export const CapabilityLadder: Story = {
           Roadmap boundary for searchable or async single selection.
         </p>
       </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
           Future MultiSelect
         </h3>
@@ -190,7 +190,7 @@ export const ReadOnlyBoundary: Story = {
         </span>
         <div
           data-testid="select-display-only-value"
-          className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:px-3 nx:py-2 nx:typography-body-default nx:text-foreground"
+          className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:px-3 nx:py-2 nx:typography-body-default nx:text-foreground"
         >
           Team
         </div>
@@ -241,7 +241,7 @@ export const RichItemFutureBoundary: Story = {
           <SelectItem value="viewer">Viewer</SelectItem>
         </SelectContent>
       </Select>
-      <div className="nx:grid nx:gap-2 nx:rounded-md nx:border nx:border-dashed nx:border-border-default nx:p-4">
+      <div className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
           Future rich item slots
         </h3>

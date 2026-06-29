@@ -69,8 +69,8 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
       data-slot="accordion-item"
       className={cn(
         'nx:border-border-default nx:px-4 nx:transition-colors nx:hover:bg-background-hover nx:data-disabled:border-border-disabled nx:data-disabled:text-disabled-foreground nx:data-disabled:hover:bg-transparent nx:data-[state=open]:pb-4',
-        'nx:group-data-[variant=stacked]/accordion:border-b nx:group-data-[variant=stacked]/accordion:last:border-b-0',
-        'nx:group-data-[variant=floating]/accordion:rounded-md nx:group-data-[variant=floating]/accordion:border',
+        'nx:group-data-[variant=stacked]/accordion:border-b-default nx:group-data-[variant=stacked]/accordion:last:border-b-0',
+        'nx:group-data-[variant=floating]/accordion:rounded-md nx:group-data-[variant=floating]/accordion:border-default',
         className
       )}
       {...props}

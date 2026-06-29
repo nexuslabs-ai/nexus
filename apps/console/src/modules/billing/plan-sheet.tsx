@@ -84,7 +84,7 @@ export function PlanSheet({
         </SheetHeader>
 
         <div className="nx:min-h-0 nx:flex-1 nx:space-y-5 nx:overflow-y-auto nx:px-4">
-          <div className="nx:border-border-default nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border nx:p-3">
+          <div className="nx:border-border-default nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border-default nx:p-3">
             <div className="nx:space-y-0.5">
               <Label htmlFor="billing-cycle">Annual billing</Label>
               <p className="nx:text-muted-foreground nx:typography-body-default">
@@ -111,7 +111,7 @@ export function PlanSheet({
                 <Label
                   key={plan.id}
                   htmlFor={`tier-${plan.id}`}
-                  className={`nx:flex nx:cursor-pointer nx:gap-3 nx:rounded-lg nx:border nx:p-4 ${selected ? 'nx:border-border-primary nx:bg-primary-subtle' : 'nx:border-border-default'}`}
+                  className={`nx:flex nx:cursor-pointer nx:gap-3 nx:rounded-lg nx:border-default nx:p-4 ${selected ? 'nx:border-border-primary nx:bg-primary-subtle' : 'nx:border-border-default'}`}
                 >
                   <RadioGroupItem
                     value={plan.id}

@@ -31,7 +31,7 @@ export function NexusAppearanceConfigPreview({
 
   return (
     <pre
-      className="nx:overflow-x-auto nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:font-mono nx:text-muted-foreground"
+      className="nx:overflow-x-auto nx:rounded-lg nx:border-default nx:border-border-default nx:bg-muted nx:p-3 nx:font-mono nx:text-muted-foreground"
       style={{ lineHeight: '1.7' }}
     >
       <code>

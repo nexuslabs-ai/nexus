@@ -8,7 +8,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
  */
 const popoverSurfaceClassName = [
   'nx:rounded-md',
-  'nx:border',
+  'nx:border-default',
   'nx:border-border-default',
   'nx:bg-popover-alpha',
   'nx:backdrop-blur-lg',
@@ -19,7 +19,7 @@ const popoverSurfaceClassName = [
 
 const tooltipSurfaceClassName = [
   'nx:rounded-md',
-  'nx:border',
+  'nx:border-default',
   'nx:border-border-default',
   'nx:bg-popover',
   'nx:text-popover-foreground',
@@ -28,7 +28,7 @@ const tooltipSurfaceClassName = [
 
 const navigationMenuInlinePopoverSurfaceClassName = [
   'nx:group-data-[viewport=false]/navigation-menu:rounded-md',
-  'nx:group-data-[viewport=false]/navigation-menu:border',
+  'nx:group-data-[viewport=false]/navigation-menu:border-default',
   'nx:group-data-[viewport=false]/navigation-menu:border-border-default',
   'nx:group-data-[viewport=false]/navigation-menu:bg-popover-alpha',
   'nx:group-data-[viewport=false]/navigation-menu:backdrop-blur-lg',
@@ -41,7 +41,7 @@ const overlayContentVariants = cva(
   [
     'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
     'nx:-translate-x-1/2 nx:-translate-y-1/2',
-    'nx:gap-4 nx:border nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
+    'nx:gap-4 nx:border-default nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
     'nx:data-[state=open]:duration-slow nx:data-[state=open]:ease-enter',
     'nx:data-[state=closed]:duration-default nx:data-[state=closed]:ease-exit',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',

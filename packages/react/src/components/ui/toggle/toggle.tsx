@@ -11,7 +11,7 @@ const toggleVariants = cva(
     variants: {
       variant: {
         default: 'nx:bg-transparent',
-        outline: 'nx:border nx:border-border-default nx:bg-transparent',
+        outline: 'nx:border-default nx:border-border-default nx:bg-transparent',
       },
       size: {
         default: 'nx:px-4 nx:py-2 nx:gap-2 nx:typography-label-default',

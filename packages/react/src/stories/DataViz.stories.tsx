@@ -74,7 +74,7 @@ function Swatch({ index }: { index: ChartCategoricalIndex }) {
   return (
     <div className="nx:flex nx:flex-col nx:items-center nx:gap-2">
       <div
-        className={`nx:rounded-md nx:border nx:border-border-default nx:size-24 ${CHART_CLASSES[index].bg}`}
+        className={`nx:rounded-md nx:border-default nx:border-border-default nx:size-24 ${CHART_CLASSES[index].bg}`}
       />
       <div className="nx:flex nx:flex-col nx:items-center">
         <span className="nx:text-foreground nx:typography-label-default nx:font-mono">
@@ -185,7 +185,7 @@ export const BarChartExample: Story = {
       <h2 className="nx:text-foreground nx:typography-heading-medium">
         Grouped Bar Chart
       </h2>
-      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border nx:border-border-default nx:w-full">
+      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border-default nx:border-border-default nx:w-full">
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={BAR_DATA}>
             <CartesianGrid
@@ -242,7 +242,7 @@ export const PieChartExample: Story = {
       <h2 className="nx:text-foreground nx:typography-heading-medium">
         Pie Chart
       </h2>
-      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border nx:border-border-default nx:w-full">
+      <div className="nx:bg-container nx:rounded-lg nx:p-6 nx:border-default nx:border-border-default nx:w-full">
         <ResponsiveContainer width="100%" height={400}>
           <PieChart>
             <Pie

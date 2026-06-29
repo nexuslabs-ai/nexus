@@ -712,8 +712,9 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 // ============================================
 
 /**
- * Generate border width utility CSS from token array
- * Creates @utility rules with border-{name} pattern for all borderwidth tokens
+ * Generate border width utility CSS from token array.
+ * Creates @utility rules with border-{side?}-{name} patterns for all
+ * borderwidth tokens, so runtime stroke modes can affect one-sided borders.
  *
  * @param {object[]} tokens - Array of borderwidth tokens with cssName property (e.g., "nx-borderwidth-default")
  * @returns {{ css: string, count: number }} Generated CSS and token count
@@ -728,10 +729,41 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
   for (const token of tokens) {
     // Extract the name part (e.g., "default" from "nx-borderwidth-default")
     const name = token.cssName.replace('nx-borderwidth-', '');
+    const value = `var(--${token.cssName})`;
 
     css += `@utility border-${name} {\n`;
     css += `  border-style: var(--tw-border-style, solid);\n`;
-    css += `  border-width: var(--${token.cssName});\n`;
+    css += `  border-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-x-${name} {\n`;
+    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
+    css += `  border-inline-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-y-${name} {\n`;
+    css += `  border-block-style: var(--tw-border-style, solid);\n`;
+    css += `  border-block-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-t-${name} {\n`;
+    css += `  border-top-style: var(--tw-border-style, solid);\n`;
+    css += `  border-top-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-r-${name} {\n`;
+    css += `  border-right-style: var(--tw-border-style, solid);\n`;
+    css += `  border-right-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-b-${name} {\n`;
+    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
+    css += `  border-bottom-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-l-${name} {\n`;
+    css += `  border-left-style: var(--tw-border-style, solid);\n`;
+    css += `  border-left-width: ${value};\n`;
     css += `}\n\n`;
   }
 

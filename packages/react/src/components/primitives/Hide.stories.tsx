@@ -15,7 +15,7 @@ export default meta;
 type Story = StoryObj<typeof Hide>;
 
 const box =
-  'nx:rounded-md nx:border nx:border-border-default nx:p-3 nx:text-foreground';
+  'nx:rounded-md nx:border-default nx:border-border-default nx:p-3 nx:text-foreground';
 const label = 'nx:text-muted-foreground nx:mb-1 nx:block';
 
 // ============================================
@@ -53,7 +53,7 @@ export const AllAxes: Story = {
         </Hide>
       </div>
       <div
-        className="nx:@container nx:rounded-md nx:border nx:border-border-default nx:p-2"
+        className="nx:@container nx:rounded-md nx:border-default nx:border-border-default nx:p-2"
         style={{ width: 600 }}
       >
         <span className={label}>
@@ -64,7 +64,7 @@ export const AllAxes: Story = {
         </Hide>
       </div>
       <div
-        className="nx:@container nx:rounded-md nx:border nx:border-border-default nx:p-2"
+        className="nx:@container nx:rounded-md nx:border-default nx:border-border-default nx:p-2"
         style={{ width: 240 }}
       >
         <span className={label}>
@@ -165,19 +165,19 @@ export const FlexParent: Story = {
       <div className="nx:flex nx:gap-4">
         <div
           data-testid="item-a"
-          className="nx:rounded-md nx:border nx:border-border-default"
+          className="nx:rounded-md nx:border-default nx:border-border-default"
           style={{ width: 48, height: 48 }}
         />
         <Hide containerBelow="md" data-testid="wrap">
           <div
             data-testid="item-b"
-            className="nx:rounded-md nx:border nx:border-border-primary"
+            className="nx:rounded-md nx:border-default nx:border-border-primary"
             style={{ width: 48, height: 48 }}
           />
         </Hide>
         <div
           data-testid="item-c"
-          className="nx:rounded-md nx:border nx:border-border-default"
+          className="nx:rounded-md nx:border-default nx:border-border-default"
           style={{ width: 48, height: 48 }}
         />
       </div>

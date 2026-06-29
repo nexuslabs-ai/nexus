@@ -211,7 +211,7 @@ function FieldVsFormErgonomicsExample() {
 
   return (
     <div className="nx:grid nx:max-w-3xl nx:gap-6 nx:lg:grid-cols-2">
-      <section className="nx:grid nx:gap-3 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-3 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
           Field
         </h3>
@@ -231,7 +231,7 @@ function FieldVsFormErgonomicsExample() {
           </FieldDescription>
         </Field>
       </section>
-      <section className="nx:grid nx:gap-3 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-3 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">Form</h3>
         <p className="nx:typography-body-small nx:text-muted-foreground">
           React Hook Form-specific. FormField and FormControl wire ids,
@@ -269,7 +269,7 @@ function FieldVsFormErgonomicsExample() {
 function RequiredOptionalHouseRuleExample() {
   return (
     <div className="nx:grid nx:max-w-3xl nx:gap-6 nx:lg:grid-cols-2">
-      <section className="nx:grid nx:gap-4 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-4 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <div className="nx:grid nx:gap-1">
           <h3 className="nx:typography-label-default nx:text-foreground">
             Most fields required
@@ -294,7 +294,7 @@ function RequiredOptionalHouseRuleExample() {
           <Input id="required-house-po" />
         </Field>
       </section>
-      <section className="nx:grid nx:gap-4 nx:rounded-md nx:border nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-4 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <div className="nx:grid nx:gap-1">
           <h3 className="nx:typography-label-default nx:text-foreground">
             Most fields optional
