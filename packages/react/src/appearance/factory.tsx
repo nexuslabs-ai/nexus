@@ -10,19 +10,19 @@ import {
 
 export interface CreateNexusAppearanceOptions {
   storageKey?: string | false;
-  cookieKey?: string | false;
+  cookieWriteKey?: string | false;
   cookieOptions?: NexusAppearanceCookieOptions;
   defaultState?: NexusAppearanceState;
 }
 
 type ConfiguredProviderProps = Omit<
   NexusAppearanceProviderProps,
-  'storageKey' | 'cookieKey' | 'cookieOptions' | 'defaultState'
+  'storageKey' | 'cookieWriteKey' | 'cookieOptions' | 'defaultState'
 >;
 
 export function createNexusAppearance({
   storageKey,
-  cookieKey,
+  cookieWriteKey,
   cookieOptions,
   defaultState,
 }: CreateNexusAppearanceOptions = {}) {
@@ -34,7 +34,7 @@ export function createNexusAppearance({
       <NexusAppearanceProvider
         {...props}
         storageKey={storageKey}
-        cookieKey={cookieKey}
+        cookieWriteKey={cookieWriteKey}
         cookieOptions={cookieOptions}
         defaultState={defaultState}
       >

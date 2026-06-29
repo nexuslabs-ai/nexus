@@ -80,7 +80,7 @@ In Next, read `DEFAULT_COOKIE_KEY` on the server and pass
 `createNexusAppearanceSnapshotFromCookie`. In Vite, inject
 `createNexusAppearanceBootstrapScript` through `transformIndexHtml`.
 
-`cookieKey` persists client changes for the next server request; it is not a
+`cookieWriteKey` persists client changes for the next server request; it is not a
 client-side read source. When `storageKey` is enabled, localStorage wins after
 hydration. Set `storageKey={false}` when the client should hydrate from the
 server snapshot/default state without localStorage persistence.

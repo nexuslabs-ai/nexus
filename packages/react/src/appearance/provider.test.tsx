@@ -292,7 +292,7 @@ describe('NexusAppearanceProvider', () => {
     const { result } = renderHook(() => useNexusAppearance(), {
       wrapper: wrapperFor({
         storageKey: false,
-        cookieKey: 'test-appearance-cookie',
+        cookieWriteKey: 'test-appearance-cookie',
       }),
     });
 
@@ -317,7 +317,7 @@ describe('NexusAppearanceProvider', () => {
     const { result } = renderHook(() => useNexusAppearance(), {
       wrapper: wrapperFor({
         storageKey: false,
-        cookieKey: 'test-appearance-cookie',
+        cookieWriteKey: 'test-appearance-cookie',
         cookieOptions: {
           maxAge: 120,
           path: '/',
@@ -364,7 +364,7 @@ describe('NexusAppearanceProvider', () => {
       <NexusAppearanceProvider
         defaultState={{ ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'slate' }}
         storageKey={key}
-        cookieKey="precedence-appearance-cookie"
+        cookieWriteKey="precedence-appearance-cookie"
       >
         <Probe />
       </NexusAppearanceProvider>
@@ -443,7 +443,7 @@ describe('NexusAppearanceProvider', () => {
         state: DEFAULT_NEXUS_APPEARANCE,
         onStateChange,
         storageKey: 'controlled-appearance',
-        cookieKey: 'controlled-appearance-cookie',
+        cookieWriteKey: 'controlled-appearance-cookie',
       }),
     });
 

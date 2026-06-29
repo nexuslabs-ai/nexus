@@ -286,14 +286,14 @@ jobs:
             pnpm turbo typecheck
           fi
 
-      - name: Dist consumer type probes
-        run: pnpm typecheck:dist
-
       - name: Core runtime export contract
         run: pnpm --filter @nexus/core audit:runtime-exports
 
       - name: Core dist-type contract
         run: pnpm --filter @nexus/core typecheck:dist
+
+      - name: Tailwind and CSS export contract
+        run: node scripts/typecheck-tailwind-dist.mjs
 
       - name: React package boundary contract
         run: pnpm --filter @nexus/react audit:package-boundary

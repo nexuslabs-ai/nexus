@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { DEFAULT_COOKIE_KEY, type NexusAppearanceState } from '@nexus/core';
+import type { NexusAppearanceState } from '@nexus/core';
 import {
   NexusAppearanceProvider,
   useNexusAppearance,
@@ -80,11 +80,7 @@ export function AppearanceFixtureClient({
   children,
 }: AppearanceFixtureClientProps) {
   return (
-    <NexusAppearanceProvider
-      defaultState={defaultState}
-      storageKey={false}
-      cookieKey={DEFAULT_COOKIE_KEY}
-    >
+    <NexusAppearanceProvider defaultState={defaultState} storageKey={false}>
       <div data-nexus-appearance-provider-fixture="">
         <AppearanceFixtureControls />
         {children}

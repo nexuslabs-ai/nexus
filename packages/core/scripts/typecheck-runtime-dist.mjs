@@ -34,32 +34,34 @@ if (!packageJson.files?.includes('dist/runtime')) {
   throw new Error('@nexus/core package files must include dist/runtime.');
 }
 
-function collectExportFiles(value, out = []) {
+function collectExportEntries(value, keyPath = 'exports', out = []) {
   if (typeof value === 'string') {
-    out.push(value);
+    out.push({ keyPath, file: value });
     return out;
   }
 
   if (value && typeof value === 'object') {
-    for (const nested of Object.values(value)) {
-      collectExportFiles(nested, out);
+    for (const [key, nested] of Object.entries(value)) {
+      collectExportEntries(nested, `${keyPath}.${key}`, out);
     }
   }
 
   return out;
 }
 
-for (const exportFile of collectExportFiles(packageJson.exports)) {
+for (const { keyPath, file: exportFile } of collectExportEntries(
+  packageJson.exports
+)) {
   if (!exportFile.startsWith('./dist/runtime/')) {
     throw new Error(
-      `@nexus/core export ${exportFile} must stay inside dist/runtime.`
+      `@nexus/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
     );
   }
 
   const resolved = path.join(packageRoot, exportFile);
   if (!existsSync(resolved)) {
     throw new Error(
-      `@nexus/core export ${exportFile} points to missing ${path.relative(
+      `@nexus/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
         repoRoot,
         resolved
       )}.`

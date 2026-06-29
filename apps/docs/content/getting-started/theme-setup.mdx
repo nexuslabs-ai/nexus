@@ -79,7 +79,7 @@ export default async function RootLayout({
       <body>
         <NexusAppearanceProvider
           storageKey="app-appearance"
-          cookieKey={DEFAULT_COOKIE_KEY}
+          cookieWriteKey={DEFAULT_COOKIE_KEY}
           defaultState={snapshot.state}
         >
           {children}
@@ -90,7 +90,7 @@ export default async function RootLayout({
 }
 ```
 
-The cookie seeds SSR and first paint. `cookieKey` writes the active client state
+The cookie seeds SSR and first paint. `cookieWriteKey` writes the active client state
 back to a cookie for the next server request; the provider does not read the
 cookie again during client hydration. When `storageKey` is enabled,
 `localStorage` becomes the client-side source of truth after hydration. Use
