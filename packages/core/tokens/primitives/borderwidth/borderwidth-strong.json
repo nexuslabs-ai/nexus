@@ -1,7 +1,7 @@
 {
   "default": {
     "$value": {
-      "value": 1.5,
+      "value": 2,
       "unit": "px"
     },
     "$type": "dimension"

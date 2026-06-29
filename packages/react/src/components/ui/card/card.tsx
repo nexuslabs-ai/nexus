@@ -39,7 +39,7 @@ function Card({ className, ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        'nx:overflow-hidden nx:rounded-xl nx:border-width-default nx:border-color-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
+        'nx:overflow-hidden nx:rounded-xl nx:border-default nx:border-border-default nx:bg-container nx:text-container-foreground nx:shadow-sm',
         className
       )}
       {...props}

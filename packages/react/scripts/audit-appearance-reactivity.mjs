@@ -20,6 +20,7 @@ const RULES = {
   arbitraryRadius: 'arbitrary-radius',
   arbitraryShadow: 'arbitrary-shadow',
   arbitraryBorderWidth: 'arbitrary-border-width',
+  legacyBorderAlias: 'legacy-border-alias',
 };
 
 function toPosix(file) {
@@ -100,6 +101,14 @@ function classifyClassName(className) {
       ruleId: RULES.rawBorderWidth,
       message:
         'Use Nexus runtime stroke utilities such as nx:border-default or nx:border-b-default instead of raw border width.',
+    };
+  }
+
+  if (/^border-(?:width|color)-/.test(utility)) {
+    return {
+      ruleId: RULES.legacyBorderAlias,
+      message:
+        'Use canonical runtime border utilities such as nx:border-default and nx:border-border-default instead of legacy border-width/color aliases.',
     };
   }
 

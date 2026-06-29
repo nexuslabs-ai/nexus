@@ -71,7 +71,7 @@ describe('mode-distinctness core', () => {
   it('keeps distinct pairs out of violations and surfaces leaf counts', () => {
     const findings = comparePairs('borderwidth', {
       normal: { default: px(1), thick: px(2) },
-      strong: { default: px(1.5), thick: px(3) },
+      strong: { default: px(2), thick: px(3) },
     });
     expect(findings[0].differingLeaves).toBe(2);
     expect(findViolations(findings, [])).toHaveLength(0);

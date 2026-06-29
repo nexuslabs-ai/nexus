@@ -37,6 +37,20 @@ describe('appearance reactivity audit classifier', () => {
     expect(classifyClassName('nx:border-collapse')).toBeNull();
   });
 
+  it('flags legacy border alias utilities inside component source', () => {
+    expect(classifyClassName('nx:border-width-default')).toMatchObject({
+      ruleId: 'legacy-border-alias',
+    });
+    expect(classifyClassName('nx:border-color-default')).toMatchObject({
+      ruleId: 'legacy-border-alias',
+    });
+    expect(
+      classifyClassName('nx:aria-invalid:border-color-error')
+    ).toMatchObject({
+      ruleId: 'legacy-border-alias',
+    });
+  });
+
   it('flags dimension-like arbitrary literals without flagging system colors', () => {
     expect(classifyClassName('nx:border-[1.5px]')).toMatchObject({
       ruleId: 'arbitrary-border-width',
