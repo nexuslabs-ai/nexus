@@ -56,7 +56,7 @@ describe('NexusAppearanceScript', () => {
   it('creates a provider closed over the same config', async () => {
     const appearance = createNexusAppearance({
       storageKey: 'factory-appearance',
-      cookieKey: 'factory-appearance-cookie',
+      cookieWriteKey: 'factory-appearance-cookie',
       defaultState: { ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'slate' },
     });
 

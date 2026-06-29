@@ -73,7 +73,7 @@ export interface NexusAppearanceProviderProps {
    * cookie (no `storageKey`, or a fresh device with no localStorage) will hydrate
    * from `defaultState` and paint with whatever the server did not override.
    */
-  cookieKey?: string | false;
+  cookieWriteKey?: string | false;
   cookieOptions?: NexusAppearanceCookieOptions;
 }
 
@@ -128,11 +128,11 @@ function writeStoredSnapshot(
 }
 
 function writeStateCookie(
-  cookieKey: string | false,
+  cookieWriteKey: string | false,
   state: NexusAppearanceState,
   options: NexusAppearanceCookieOptions = {}
 ): void {
-  if (!canUseDOM() || cookieKey === false) return;
+  if (!canUseDOM() || cookieWriteKey === false) return;
 
   try {
     const maxAge = options.maxAge ?? NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS;
@@ -149,7 +149,7 @@ function writeStateCookie(
       secure ? 'Secure' : '',
     ].filter(Boolean);
 
-    document.cookie = `${cookieKey}=${serializeNexusAppearanceStateCookie(
+    document.cookie = `${cookieWriteKey}=${serializeNexusAppearanceStateCookie(
       state
     )}; ${attrs.join('; ')}`;
   } catch {
@@ -217,7 +217,7 @@ export function NexusAppearanceProvider({
   defaultState,
   onStateChange,
   storageKey = DEFAULT_STORAGE_KEY,
-  cookieKey = false,
+  cookieWriteKey = false,
   cookieOptions,
 }: NexusAppearanceProviderProps) {
   const isControlled = state !== undefined;
@@ -282,12 +282,12 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (mounted && !isControlled) {
       writeStoredSnapshot(storageKey, activeSnapshot);
-      writeStateCookie(cookieKey, activeState, cookieOptions);
+      writeStateCookie(cookieWriteKey, activeState, cookieOptions);
     }
   }, [
     activeSnapshot,
     activeState,
-    cookieKey,
+    cookieWriteKey,
     cookieOptions,
     isControlled,
     mounted,

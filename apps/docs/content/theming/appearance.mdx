@@ -1,0 +1,86 @@
+# Appearance
+
+Appearance is the runtime state that drives Nexus theming. The package derives
+colors, typography prefs, density, corners, elevation, stroke, and motion prefs
+from a single `NexusAppearanceState`.
+
+## The model
+
+| Field         | Type                                                    | Meaning                                                                                |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `mode`        | `'light' \| 'dark' \| 'system'`                         | Color scheme; `system` follows the OS.                                                 |
+| `brandColor`  | `string`                                                | Brand color seed, default `#339cff`.                                                   |
+| `surfaceTone` | `'stone' \| 'neutral' \| 'zinc' \| 'slate' \| 'gray'`   | Neutral surface family.                                                                |
+| `contrast`    | `number`                                                | Structural separation for surfaces, borders, dividers, nav, controls, and cards.       |
+| `density`     | `'compact' \| 'default' \| 'comfortable' \| 'spacious'` | Spacing rhythm.                                                                        |
+| `corners`     | `'square' \| 'subtle' \| 'smooth' \| 'round'`           | Radius scale.                                                                          |
+| `elevation`   | `'quiet' \| 'standard' \| 'strong'`                     | Shadow scale.                                                                          |
+| `stroke`      | `'fine' \| 'normal' \| 'strong'`                        | Border-width scale.                                                                    |
+| `prefs`       | `NexusAppearancePrefs`                                  | UI/code font family, UI/code size, reduce motion, pointer cursors, and font smoothing. |
+
+`contrast` is a structure control, not a text hierarchy knob. Text may track a
+moving surface enough to stay APCA-readable, but the hierarchy itself stays
+fixed.
+
+## Brand and surface tone
+
+Start from the shipped default and override the fields you own:
+
+```ts
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus/core';
+
+export const defaultAppearance = {
+  ...DEFAULT_NEXUS_APPEARANCE,
+  brandColor: '#2563eb',
+  surfaceTone: 'slate',
+};
+```
+
+`brandColor` drives the primary palette. `surfaceTone` picks the neutral family:
+`stone`, `neutral`, `zinc`, `slate`, or `gray`.
+
+## Reading and updating
+
+Use `useNexusAppearance` to build product-specific controls.
+
+```tsx
+import { useNexusAppearance } from '@nexus/react/appearance';
+
+function ModeButton() {
+  const { state, setState } = useNexusAppearance();
+
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        setState((current) => ({
+          ...current,
+          mode: current.mode === 'dark' ? 'light' : 'dark',
+        }))
+      }
+    >
+      {state.mode}
+    </button>
+  );
+}
+```
+
+Nexus ships the provider and hook. Product-specific Appearance panels and quick
+controls belong in the consuming app, so they can match that product's settings
+IA.
+
+## First paint and persistence
+
+The first-paint script writes the derived theme CSS, preference CSS, `.dark`,
+`data-density`, `data-radius`, `data-shadow`, `data-borderwidth`, and native
+`color-scheme` before the first frame.
+
+In Next, read `DEFAULT_COOKIE_KEY` on the server and pass
+`cookieStore.get(DEFAULT_COOKIE_KEY)?.value` into
+`createNexusAppearanceSnapshotFromCookie`. In Vite, inject
+`createNexusAppearanceBootstrapScript` through `transformIndexHtml`.
+
+`cookieWriteKey` persists client changes for the next server request; it is not a
+client-side read source. When `storageKey` is enabled, localStorage wins after
+hydration. Set `storageKey={false}` when the client should hydrate from the
+server snapshot/default state without localStorage persistence.

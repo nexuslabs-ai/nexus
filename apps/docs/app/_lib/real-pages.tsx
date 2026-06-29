@@ -25,6 +25,16 @@ export const REAL_PAGES: Record<string, ComponentType> = {
 };
 
 /**
+ * App Router pages that are intentionally outside the `[section]/[sub]`
+ * registry because they need request-time server APIs.
+ */
+export const SERVER_ROUTE_PAGES = {
+  '/appearance-ssr': {
+    source: 'apps/docs/app/appearance-ssr/page.tsx',
+  },
+} as const;
+
+/**
  * MDX content pages, keyed by `${section}/${sub}`. Lazy thunks so each page
  * code-splits; the dynamic route awaits the import at build time (SSG). Add a
  * page by dropping content/{section}/{sub}.mdx and an entry here.
@@ -36,4 +46,7 @@ export const MDX_PAGES: Record<
 > = {
   'getting-started/install': () =>
     import('../../content/getting-started/install.mdx'),
+  'getting-started/theme-setup': () =>
+    import('../../content/getting-started/theme-setup.mdx'),
+  'theming/appearance': () => import('../../content/theming/appearance.mdx'),
 };

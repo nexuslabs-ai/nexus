@@ -401,6 +401,12 @@ export const SECTIONS = {
     href: '/theming',
     subs: [
       {
+        slug: 'appearance',
+        label: 'Appearance',
+        lede: '[ Appearance model · mode · brand · tone · contrast · density ]',
+        blocks: [],
+      },
+      {
         slug: 'multi-brand',
         label: 'Multi-brand',
         lede: '[ Five bases × light / dark · the brand thesis ]',

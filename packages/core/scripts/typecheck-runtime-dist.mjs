@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,6 +11,7 @@ const probeDir = path.join(packageRoot, '.runtime-dist-typecheck');
 const probePath = path.join(probeDir, 'probe.ts');
 const tsconfigPath = path.join(probeDir, 'tsconfig.json');
 const tscBin = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
+const packageJsonPath = path.join(packageRoot, 'package.json');
 
 const requiredDistFiles = [
   path.join(packageRoot, 'dist', 'runtime', 'index.d.ts'),
@@ -27,30 +28,81 @@ for (const distFile of requiredDistFiles) {
   }
 }
 
+const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
+
+if (!packageJson.files?.includes('dist/runtime')) {
+  throw new Error('@nexus/core package files must include dist/runtime.');
+}
+
+function collectExportEntries(value, keyPath = 'exports', out = []) {
+  if (typeof value === 'string') {
+    out.push({ keyPath, file: value });
+    return out;
+  }
+
+  if (value && typeof value === 'object') {
+    for (const [key, nested] of Object.entries(value)) {
+      collectExportEntries(nested, `${keyPath}.${key}`, out);
+    }
+  }
+
+  return out;
+}
+
+for (const { keyPath, file: exportFile } of collectExportEntries(
+  packageJson.exports
+)) {
+  if (!exportFile.startsWith('./dist/runtime/')) {
+    throw new Error(
+      `@nexus/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
+    );
+  }
+
+  const resolved = path.join(packageRoot, exportFile);
+  if (!existsSync(resolved)) {
+    throw new Error(
+      `@nexus/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
+        repoRoot,
+        resolved
+      )}.`
+    );
+  }
+}
+
 await rm(probeDir, { recursive: true, force: true });
 await mkdir(probeDir, { recursive: true });
 
 await writeFile(
   probePath,
   `import {
+  createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromCookie,
   createNexusAppearanceSnapshotFromState,
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
+  DEFAULT_STORAGE_KEY,
   deriveTheme,
+  resolveFirstPaint,
+  sanitizeNexusAppearance,
   themeToCss,
   type NexusAppearanceState,
 } from '@nexus/core';
 
-const state: NexusAppearanceState = {
+const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,
   mode: 'system',
+  brandColor: '#2563eb',
   surfaceTone: 'slate',
-};
+});
 
 const snapshot = createNexusAppearanceSnapshotFromState(state);
 const serverSnapshot = createNexusAppearanceSnapshotFromCookie('', state);
 const css: string = themeToCss(deriveTheme(createNexusThemeContract(state)));
+const bootstrap: string = createNexusAppearanceBootstrapScript({
+  storageKey: DEFAULT_STORAGE_KEY,
+  defaultSnapshot: snapshot,
+});
+const firstPaint = resolveFirstPaint(snapshot, true);
 
 // @ts-expect-error proves the public state is not any.
 state.notARealNexusAppearanceField;
@@ -58,6 +110,8 @@ state.notARealNexusAppearanceField;
 void snapshot;
 void serverSnapshot;
 void css;
+void bootstrap;
+void firstPaint.colorScheme;
 `
 );
 
