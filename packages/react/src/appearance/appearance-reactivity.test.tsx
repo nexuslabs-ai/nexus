@@ -75,9 +75,9 @@ describe('Appearance reactivity component contracts', () => {
 
     const input = screen.getByLabelText('Email');
 
-    expect(input).toHaveClass('nx:border-default');
-    expect(input).toHaveClass('nx:border-border-default');
-    expect(input).toHaveClass('nx:aria-invalid:border-border-error');
+    expect(input).toHaveClass('nx:border-width-default');
+    expect(input).toHaveClass('nx:border-color-default');
+    expect(input).toHaveClass('nx:aria-invalid:border-color-error');
     expectNoRawBorderWidth(input);
   });
 
@@ -87,8 +87,8 @@ describe('Appearance reactivity component contracts', () => {
 
     expect(card).toHaveClass('nx:bg-container');
     expect(card).toHaveClass('nx:text-container-foreground');
-    expect(card).toHaveClass('nx:border-default');
-    expect(card).toHaveClass('nx:border-border-default');
+    expect(card).toHaveClass('nx:border-width-default');
+    expect(card).toHaveClass('nx:border-color-default');
     expect(card).toHaveClass('nx:shadow-sm');
     expectNoRawBorderWidth(card as Element);
   });

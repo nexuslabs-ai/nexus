@@ -37,18 +37,10 @@ describe('appearance reactivity audit classifier', () => {
     expect(classifyClassName('nx:border-collapse')).toBeNull();
   });
 
-  it('flags legacy border alias utilities inside component source', () => {
-    expect(classifyClassName('nx:border-width-default')).toMatchObject({
-      ruleId: 'legacy-border-alias',
-    });
-    expect(classifyClassName('nx:border-color-default')).toMatchObject({
-      ruleId: 'legacy-border-alias',
-    });
-    expect(
-      classifyClassName('nx:aria-invalid:border-color-error')
-    ).toMatchObject({
-      ruleId: 'legacy-border-alias',
-    });
+  it('allows runtime border aliases that preserve Appearance reactivity', () => {
+    expect(classifyClassName('nx:border-width-default')).toBeNull();
+    expect(classifyClassName('nx:border-color-default')).toBeNull();
+    expect(classifyClassName('nx:aria-invalid:border-color-error')).toBeNull();
   });
 
   it('flags dimension-like arbitrary literals without flagging system colors', () => {

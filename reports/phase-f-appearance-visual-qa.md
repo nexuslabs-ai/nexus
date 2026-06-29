@@ -17,9 +17,9 @@ across light/dark, surface tones, contrast, typography, density, corners,
 elevation, and stroke.
 
 Outcome: no visual blocker remains in the captured surfaces. The pass found and
-fixed two runtime-consumption gaps:
+fixed one visual runtime-consumption gap, and verified the clearer border alias
+classes remain runtime-safe:
 
-- Card/Input/Accordion still used legacy border aliases in a few places.
 - `strong` stroke used `1.5px` for default borders, but Chromium computes
   `1.5px` borders as `1px`, making the public Stroke control look inert on
   common borders.
@@ -82,7 +82,7 @@ fixed two runtime-consumption gaps:
 
 | #   | Severity | Surface                | State                        | Evidence                                                                                                                                                                                              | Decision                                                                                                                                              |
 | --- | -------- | ---------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F1  | Fixed    | Card/Input/Accordion   | Runtime stroke/color aliases | Components used stale `border-width-*` / `border-color-*` aliases in places, so they bypassed the canonical runtime utility vocabulary.                                                               | Replaced with `border-default`, `border-border-*`, and side-aware runtime border utilities; added an audit classifier/test for legacy border aliases. |
+| F1  | Verified | Card/Input/Accordion   | Runtime stroke/color aliases | The clearer `border-width-*` / `border-color-*` aliases still resolve to runtime Stroke/Border variables and merge safely with border colors and width overrides.                                     | Kept the clearer aliases and kept the appearance reactivity audit focused on raw widths, numeric widths, and arbitrary literals that bypass controls. |
 | F2  | Fixed    | Stroke control         | `strong` on common borders   | Chromium computes `1.5px` border widths as `1px`; live Card/Input/CRM default borders therefore looked unchanged under `strong`.                                                                      | Changed `borderwidth-strong.default` to `2px`, regenerated modular/docs/Tailwind CSS, and updated distinctness expectations.                          |
 | F3  | Fixed    | Package consumer build | Docs build                   | `@nexus/react` ESM exported `CommandDialog`, but generated top-level declarations re-exported component directories. Next/docs package resolution did not expose `CommandDialog` from `@nexus/react`. | Rewrote generated declaration component exports to explicit `/index` barrel paths and extended the dist consumer probe to import `CommandDialog`.     |
 | F4  | Watch    | Density control        | table-heavy CRM scene        | Density variables move, and compact visibly reduces CRM row height. Comfortable/spacious are subtle in the CRM table because table rows still lean on numeric/fixed spacing.                          | Not a blocker for Phase F. Track as a future product-density calibration if stronger table density is desired.                                        |

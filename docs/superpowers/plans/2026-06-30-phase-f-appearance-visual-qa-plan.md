@@ -68,10 +68,10 @@ Use the shipped model from `packages/core/src/lib/appearance-model.ts`:
 
 Concrete QA-backed fixes found during execution:
 
-- Card/Input/Accordion still used legacy `border-width-*` / `border-color-*`
-  aliases in places. These now use canonical runtime utilities such as
-  `border-default` and `border-border-default`, and the appearance reactivity
-  audit now flags legacy border aliases in component source.
+- Card/Input/Accordion were checked for border Appearance reactivity. The
+  clearer `border-width-*` / `border-color-*` aliases are runtime-safe and stay
+  valid; the appearance reactivity audit remains focused on raw border widths
+  and arbitrary literals that bypass the Stroke control.
 - `strong` stroke used `1.5px` for `--nx-borderwidth-default`; Chromium computes
   `1.5px` borders as `1px`, so normal component borders looked unchanged.
   `borderwidth-strong.default` is now `2px`, with generated CSS and screenshots
