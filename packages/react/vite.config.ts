@@ -24,6 +24,19 @@ const APPEARANCE_DECLARATION_ENTRIES = [
 function rewriteAppearanceDeclaration(filePath: string, content: string) {
   const normalizedPath = filePath.split(path.sep).join('/');
 
+  if (normalizedPath.endsWith('/dist/index.d.ts')) {
+    return {
+      filePath,
+      content: content.replace(
+        /from '\.\/components\/([^']+)'/g,
+        (match, entry: string) =>
+          entry.endsWith('/index')
+            ? match
+            : `from './components/${entry}/index'`
+      ),
+    };
+  }
+
   for (const entry of APPEARANCE_DECLARATION_ENTRIES) {
     if (normalizedPath.endsWith(entry.source)) {
       return {

@@ -33,7 +33,7 @@ for (const distFile of requiredDistFiles) {
 
 await writeFile(
   probePath,
-  `import { Button } from '@nexus/react';
+  `import { Button, CommandDialog } from '@nexus/react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   createNexusAppearance,
@@ -133,9 +133,11 @@ const configuredProviderHtml = renderToStaticMarkup(<ConfiguredProviderProbe />)
 
 const defaultProviderMarkup: string = defaultProviderHtml;
 const configuredProviderMarkup: string = configuredProviderHtml;
+const commandDialogNode = <CommandDialog open={false} />;
 
 void defaultProviderMarkup;
 void configuredProviderMarkup;
+void commandDialogNode;
 void serverScript;
 void configuredScript;
 void cookieOnly;

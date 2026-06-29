@@ -108,7 +108,26 @@ describe('token-mode rename preserves migration values', () => {
 
       const [dir, file] = LOCATION[family](friendly);
       const data = readJson(path.join(dir, file));
-      expect(leafValues(data)).toEqual(ORACLE[`${family}.${codename}`]);
+      const actual = leafValues(data);
+      const expected = ORACLE[`${family}.${codename}`];
+
+      expect(Object.keys(actual).sort()).toEqual(Object.keys(expected).sort());
+
+      if (family === 'borderwidth' && friendly === 'strong') {
+        // #566 intentionally calibrates the public strong default stroke
+        // after the codename migration. Chromium computes 1.5px borders as 1px,
+        // so the previous value did not make common component borders visibly
+        // stronger. The thick token still preserves the original nova value.
+        expect(actual.default.value).toBe(2);
+        expect(actual.default.unit).toBe('px');
+        expect(actual).toEqual({
+          ...expected,
+          default: { value: 2, unit: 'px' },
+        });
+        return;
+      }
+
+      expect(actual).toEqual(expected);
     }
   );
 

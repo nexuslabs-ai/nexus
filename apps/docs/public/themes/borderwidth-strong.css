@@ -1,6 +1,6 @@
 /* borderwidth: strong */
 
 :root {
-  --nx-borderwidth-default: 1.5px;
+  --nx-borderwidth-default: 2px;
   --nx-borderwidth-thick: 3px;
 }
