@@ -261,6 +261,9 @@ describe('NexusAppearanceProvider', () => {
     expect(
       document.querySelector('style[data-nexus-appearance-prefs]')?.textContent
     ).toContain('font-size: 16px');
+    expect(
+      document.querySelector('style[data-nexus-appearance-prefs]')?.textContent
+    ).toContain('--nx-typography-size-sm: 16px');
   });
 
   it('writes uncontrolled state as a versioned snapshot', async () => {

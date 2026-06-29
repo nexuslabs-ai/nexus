@@ -302,7 +302,11 @@ describe('appearancePrefsToCss', () => {
     expect(css).toContain('--nx-typography-family-font-sans: Inter;');
     expect(css).toContain('--nx-typography-family-font-mono: JetBrains Mono;');
     expect(css).toContain('font-size: 32px;');
-    expect(css).toContain('code, pre, .nx\\:font-mono { font-size: 12px; }');
+    expect(css).toContain('--nx-typography-size-sm: 32px;');
+    expect(css).toContain('--nx-typography-line-height-sm: 45.7143px;');
+    expect(css).toContain(
+      'code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
+    );
     expect(css).toContain('-webkit-font-smoothing: antialiased');
   });
 
