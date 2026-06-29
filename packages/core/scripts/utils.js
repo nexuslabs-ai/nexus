@@ -711,13 +711,15 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
 // BORDER WIDTH UTILITIES
 // ============================================
 
+const BORDER_WIDTH_UTILITIES_PER_TOKEN = 14;
+
 /**
  * Generate border width utility CSS from token array.
  * Creates @utility rules with border-{side?}-{name} patterns for all
  * borderwidth tokens, so runtime stroke modes can affect one-sided borders.
  *
  * @param {object[]} tokens - Array of borderwidth tokens with cssName property (e.g., "nx-borderwidth-default")
- * @returns {{ css: string, count: number }} Generated CSS and token count
+ * @returns {{ css: string, count: number }} Generated CSS and utility count
  */
 export function generateBorderWidthUtilitiesCSS(tokens) {
   if (!tokens || tokens.length === 0) {
@@ -809,7 +811,34 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
     css += `}\n\n`;
   }
 
-  return { css, count: tokens.length };
+  return { css, count: tokens.length * BORDER_WIDTH_UTILITIES_PER_TOKEN };
+}
+
+const BORDER_COLOR_ALIAS_NAMES = new Set([
+  'default',
+  'default-alpha',
+  'active',
+  'disabled',
+  'warning',
+  'warning-active',
+  'success',
+  'success-active',
+  'error',
+  'error-active',
+  'information',
+  'information-active',
+  'primary',
+  'primary-active',
+]);
+
+function getBorderColorAliasName(cssName) {
+  const prefix = 'color-border-';
+  if (!cssName.startsWith(prefix)) {
+    return null;
+  }
+
+  const name = cssName.slice(prefix.length);
+  return BORDER_COLOR_ALIAS_NAMES.has(name) ? name : null;
 }
 
 /**
@@ -818,12 +847,12 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
  * semantic color token in the border namespace.
  *
  * @param {object[]} tokens - Array of semantic color tokens with cssName property (e.g., "color-border-default")
- * @returns {{ css: string, count: number }} Generated CSS and token count
+ * @returns {{ css: string, count: number }} Generated CSS and utility count
  */
 export function generateBorderColorAliasUtilitiesCSS(tokens) {
-  const borderColorTokens = (tokens ?? []).filter((token) =>
-    token.cssName.startsWith('color-border-')
-  );
+  const borderColorTokens = (tokens ?? [])
+    .map((token) => ({ token, name: getBorderColorAliasName(token.cssName) }))
+    .filter(({ name }) => name !== null);
 
   if (borderColorTokens.length === 0) {
     return { css: '', count: 0 };
@@ -831,8 +860,7 @@ export function generateBorderColorAliasUtilitiesCSS(tokens) {
 
   let css = `/* Border Color Alias Utilities */\n\n`;
 
-  for (const token of borderColorTokens) {
-    const name = token.cssName.replace('color-border-', '');
+  for (const { token, name } of borderColorTokens) {
     css += `@utility border-color-${name} {\n`;
     css += `  border-color: var(--${token.cssName});\n`;
     css += `}\n\n`;

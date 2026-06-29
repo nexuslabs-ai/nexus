@@ -8,7 +8,11 @@ import { fileURLToPath } from 'url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { generateTailwindPackage } from '../generate-tailwind-package.js';
-import { DEFAULT_CONFIG } from '../utils.js';
+import {
+  DEFAULT_CONFIG,
+  generateBorderColorAliasUtilitiesCSS,
+  generateBorderWidthUtilitiesCSS,
+} from '../utils.js';
 
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
@@ -142,6 +146,31 @@ afterAll(() => {
     const dir = tmpDirs.pop();
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+describe('border alias utility generators', () => {
+  it('reports the actual number of emitted border width utilities', () => {
+    const result = generateBorderWidthUtilitiesCSS([
+      { cssName: 'nx-borderwidth-default' },
+      { cssName: 'nx-borderwidth-thick' },
+    ]);
+
+    expect(result.count).toBe(28);
+    expect(result.css.match(/^@utility /gm)).toHaveLength(result.count);
+  });
+
+  it('emits color aliases only for approved semantic border names', () => {
+    const result = generateBorderColorAliasUtilitiesCSS([
+      { cssName: 'color-border-default' },
+      { cssName: 'color-border-radius-sm' },
+      { cssName: 'color-nav-border' },
+    ]);
+
+    expect(result.count).toBe(1);
+    expect(result.css).toMatch(/@utility border-color-default \{/);
+    expect(result.css).not.toMatch(/border-color-radius-sm/);
+    expect(result.css).not.toMatch(/border-color-nav-border/);
+  });
 });
 
 describe('generateTailwindPackage', () => {
@@ -849,6 +878,28 @@ describe('generateTailwindPackage', () => {
   });
 
   it('border-color-aliases.css declares aliases for border semantic colors', () => {
+    const aliases = [
+      ...borderColorAliasesCSS.matchAll(
+        /^@utility border-color-([a-z0-9-]+) \{/gm
+      ),
+    ].map((match) => match[1]);
+    expect(aliases).toEqual([
+      'default',
+      'default-alpha',
+      'active',
+      'disabled',
+      'warning',
+      'warning-active',
+      'success',
+      'success-active',
+      'error',
+      'error-active',
+      'information',
+      'information-active',
+      'primary',
+      'primary-active',
+    ]);
+
     const defaultBlock = extractBlock(
       borderColorAliasesCSS,
       '@utility border-color-default'

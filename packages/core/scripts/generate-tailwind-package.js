@@ -427,6 +427,7 @@ function collectLightSemanticTokens(semanticFiles, primitiveMap) {
 function generateNexusCSS(
   semanticFiles,
   primitiveMap,
+  lightSemanticTokens,
   usedModes,
   spacingModes,
   spacingDefault,
@@ -449,10 +450,6 @@ function generateNexusCSS(
   // Light + dark semantic color accumulators. Dimension tokens (e.g.
   // focus.offset) are collected separately into `dimensionTokens` so they emit
   // at :root, not @theme (see generateRootDimensionsCSS / #506).
-  const lightSemanticTokens = collectLightSemanticTokens(
-    semanticFiles,
-    primitiveMap
-  );
   const darkSemanticTokens = [];
   const dimensionTokens = [];
 
@@ -616,6 +613,10 @@ export async function generateTailwindPackage(
     primitiveTokens,
     darkPrimitiveTokens
   );
+  const lightSemanticTokens = collectLightSemanticTokens(
+    semanticFiles,
+    primitiveMap
+  );
 
   const variablesCSS = generateVariablesCSS(
     primitiveTokens,
@@ -639,9 +640,8 @@ export async function generateTailwindPackage(
     log.success(`Generated ${borderWidth.count} border width utilities`);
   }
 
-  const borderColorAliases = generateBorderColorAliasUtilitiesCSS(
-    collectLightSemanticTokens(semanticFiles, primitiveMap)
-  );
+  const borderColorAliases =
+    generateBorderColorAliasUtilitiesCSS(lightSemanticTokens);
   if (borderColorAliases.css) {
     writeDistFile('border-color-aliases.css', borderColorAliases.css);
     log.success(
@@ -684,6 +684,7 @@ export async function generateTailwindPackage(
   const nexusCSS = generateNexusCSS(
     semanticFiles,
     primitiveMap,
+    lightSemanticTokens,
     usedModes,
     spacingModes,
     spacingDefault,
