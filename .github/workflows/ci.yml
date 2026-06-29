@@ -286,6 +286,15 @@ jobs:
             pnpm turbo typecheck
           fi
 
+      - name: Core runtime export contract
+        run: pnpm --filter @nexus/core audit:runtime-exports
+
+      - name: Core dist-type contract
+        run: pnpm --filter @nexus/core typecheck:dist
+
+      - name: React package boundary contract
+        run: pnpm --filter @nexus/react audit:package-boundary
+
       - name: Appearance dist-type contract
         run: pnpm --filter @nexus/react typecheck:dist-appearance
 

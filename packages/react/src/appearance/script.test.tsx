@@ -4,8 +4,9 @@ import { DEFAULT_NEXUS_APPEARANCE } from '@nexus/core';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { createNexusAppearance } from './factory';
 import { useNexusAppearance } from './provider';
-import { createNexusAppearance, NexusAppearanceScript } from './script';
+import { NexusAppearanceScript } from './script';
 
 describe('NexusAppearanceScript', () => {
   beforeEach(() => {
@@ -26,9 +27,22 @@ describe('NexusAppearanceScript', () => {
     expect(html).toContain('data-nexus-appearance-script');
   });
 
+  it('renders a locked no-storage bootstrap script', () => {
+    const html = renderToStaticMarkup(
+      <NexusAppearanceScript
+        storageKey={false}
+        defaultState={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' }}
+      />
+    );
+
+    expect(html).toContain('var k=false');
+    expect(html).toContain('data-nexus-appearance-script');
+  });
+
   it('creates a provider and script closed over the same config', async () => {
     const appearance = createNexusAppearance({
       storageKey: 'factory-appearance',
+      cookieKey: 'factory-appearance-cookie',
       defaultState: { ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'slate' },
     });
 

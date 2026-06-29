@@ -26,6 +26,11 @@ export interface NexusAppearanceSnapshot {
   prefsCss: string;
 }
 
+export interface NexusAppearanceStateCookie {
+  version: typeof SNAPSHOT_VERSION;
+  state: NexusAppearanceState;
+}
+
 export interface NexusFirstPaintResolution {
   className: '' | 'dark';
   dataAttrs: Record<NexusAppearanceDataAttr, string>;
@@ -36,11 +41,12 @@ export interface NexusFirstPaintResolution {
 }
 
 export interface NexusAppearanceBootstrapScriptOptions {
-  storageKey?: string;
+  storageKey?: string | false;
   defaultSnapshot?: NexusAppearanceSnapshot;
 }
 
 export const DEFAULT_STORAGE_KEY = 'nexus-appearance';
+export const DEFAULT_COOKIE_KEY = 'nexus-appearance-state';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
@@ -73,6 +79,56 @@ export function createNexusAppearanceSnapshotFromState(
     state,
     deriveThemeCss(state),
     derivePrefsCss(state)
+  );
+}
+
+export function createNexusAppearanceStateCookie(
+  state: NexusAppearanceState
+): NexusAppearanceStateCookie {
+  return {
+    version: SNAPSHOT_VERSION,
+    state: sanitizeNexusAppearance(state),
+  };
+}
+
+export function serializeNexusAppearanceStateCookie(
+  state: NexusAppearanceState
+): string {
+  return encodeURIComponent(
+    JSON.stringify(createNexusAppearanceStateCookie(state))
+  );
+}
+
+export function parseNexusAppearanceStateCookie(
+  raw: unknown
+): NexusAppearanceState | null {
+  if (typeof raw !== 'string' || raw.length === 0) return null;
+
+  try {
+    const decoded = decodeURIComponent(raw);
+    const parsed = JSON.parse(decoded);
+
+    if (
+      !isRecord(parsed) ||
+      parsed.version !== SNAPSHOT_VERSION ||
+      !isRecord(parsed.state)
+    ) {
+      return null;
+    }
+
+    return sanitizeNexusAppearance(parsed.state);
+  } catch {
+    return null;
+  }
+}
+
+export function createNexusAppearanceSnapshotFromCookie(
+  raw: unknown,
+  fallbackState: NexusAppearanceState = DEFAULT_NEXUS_APPEARANCE
+): NexusAppearanceSnapshot {
+  return createNexusAppearanceSnapshotFromState(
+    parseNexusAppearanceStateCookie(raw) ??
+      sanitizeNexusAppearance(fallbackState)
   );
 }
 
@@ -143,5 +199,5 @@ export function createNexusAppearanceBootstrapScript(
     ? sanitizeNexusAppearanceSnapshot(options.defaultSnapshot)
     : createDefaultNexusAppearanceSnapshot();
 
-  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var s=f;try{var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var dark=m==="dark"||sys===true;var root=document.documentElement;root.classList.toggle("dark",dark);root.setAttribute("data-density",typeof st.density==="string"?st.density:f.state.density);root.setAttribute("data-radius",typeof st.corners==="string"?st.corners:f.state.corners);root.setAttribute("data-shadow",typeof st.elevation==="string"?st.elevation:f.state.elevation);root.setAttribute("data-borderwidth",typeof st.stroke==="string"?st.stroke:f.state.stroke);root.style.colorScheme=dark?"dark":"light";var meta=document.querySelector('meta[name="color-scheme"]');if(!meta){meta=document.createElement("meta");meta.setAttribute("name","color-scheme");document.head.appendChild(meta);}meta.setAttribute("content",m==="system"?"light dark":m);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nexus-appearance-theme",s.themeCss);upsert("data-nexus-appearance-prefs",s.prefsCss);}catch(e){}})();`;
+  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var s=f;try{if(k!==false){var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var dark=m==="dark"||sys===true;var root=document.documentElement;root.classList.toggle("dark",dark);root.setAttribute("data-density",typeof st.density==="string"?st.density:f.state.density);root.setAttribute("data-radius",typeof st.corners==="string"?st.corners:f.state.corners);root.setAttribute("data-shadow",typeof st.elevation==="string"?st.elevation:f.state.elevation);root.setAttribute("data-borderwidth",typeof st.stroke==="string"?st.stroke:f.state.stroke);root.style.colorScheme=dark?"dark":"light";var meta=document.querySelector('meta[name="color-scheme"]');if(!meta){meta=document.createElement("meta");meta.setAttribute("name","color-scheme");document.head.appendChild(meta);}meta.setAttribute("content",m==="system"?"light dark":m);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nexus-appearance-theme",s.themeCss);upsert("data-nexus-appearance-prefs",s.prefsCss);}catch(e){}})();`;
 }

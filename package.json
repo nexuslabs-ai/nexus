@@ -26,7 +26,7 @@
     "audit:contrast": "pnpm --filter @nexus/core audit:contrast",
     "audit:mode-codenames": "pnpm --filter @nexus/core audit:mode-codenames",
     "audit:mode-distinctness": "pnpm --filter @nexus/core audit:mode-distinctness",
-    "audit:storybook-coverage": "pnpm --filter @nexus/react audit:storybook-coverage",
+    "audit:storybook-coverage": "pnpm --filter @nexus/react audit:storybook-coverage -- --all",
     "validate:spacing-modes": "pnpm --filter @nexus/core validate:spacing-modes",
     "console": "cd apps/console && pnpm dev",
     "docs:serve": "npx @arabold/docs-mcp-server@latest server --store-path ./docs-mcp/data --protocol http --host 127.0.0.1 --port 6282",

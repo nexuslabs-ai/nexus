@@ -12,29 +12,27 @@ import {
   type NexusSurfaceTone,
   STROKE_OPTIONS,
 } from '@nexus/core';
-
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+  Slider,
+  Switch,
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@nexus/react';
+import { useNexusAppearance } from '@nexus/react/appearance';
 
 import { NexusAppearanceColorField } from './color-field';
 import { NexusAppearanceConfigPreview } from './config-preview';
-import { useNexusAppearance } from './provider';
 import { NexusAppearanceSettingRow } from './setting-row';
 
 const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];

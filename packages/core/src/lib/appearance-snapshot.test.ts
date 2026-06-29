@@ -8,9 +8,12 @@ import {
 import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshot,
+  createNexusAppearanceSnapshotFromCookie,
   NEXUS_APPEARANCE_DATA_ATTRS,
+  parseNexusAppearanceStateCookie,
   resolveFirstPaint,
   sanitizeNexusAppearanceSnapshot,
+  serializeNexusAppearanceStateCookie,
   SNAPSHOT_VERSION,
 } from './appearance-snapshot';
 import { deriveTheme, themeToCss } from './derive-theme';
@@ -122,6 +125,61 @@ describe('NexusAppearanceSnapshot', () => {
     });
 
     expect(snapshot.state).toEqual(DEFAULT_NEXUS_APPEARANCE);
+  });
+
+  it('serializes only versioned state into the server cookie payload', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'dark' as const,
+      surfaceTone: 'slate' as const,
+      brandColor: '#2563eb',
+    };
+    const raw = serializeNexusAppearanceStateCookie(state);
+    const decoded = JSON.parse(decodeURIComponent(raw));
+
+    expect(decoded).toEqual({
+      version: SNAPSHOT_VERSION,
+      state,
+    });
+    expect(decoded.themeCss).toBeUndefined();
+    expect(decoded.prefsCss).toBeUndefined();
+  });
+
+  it('parses a versioned state cookie and derives a fresh server snapshot', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'dark' as const,
+      surfaceTone: 'gray' as const,
+      contrast: 85,
+    };
+    const raw = serializeNexusAppearanceStateCookie(state);
+
+    expect(parseNexusAppearanceStateCookie(raw)).toEqual(state);
+
+    const snapshot = createNexusAppearanceSnapshotFromCookie(raw);
+    expect(snapshot.state).toEqual(state);
+    expect(snapshot.themeCss).toBe(themeCss(state));
+    expect(snapshot.prefsCss).toBe(prefsCss(state));
+  });
+
+  it('falls back when the state cookie is unreadable or stale', () => {
+    expect(parseNexusAppearanceStateCookie('%')).toBeNull();
+    expect(
+      parseNexusAppearanceStateCookie(
+        encodeURIComponent(
+          JSON.stringify({
+            version: SNAPSHOT_VERSION - 1,
+            state: { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
+          })
+        )
+      )
+    ).toBeNull();
+
+    const snapshot = createNexusAppearanceSnapshotFromCookie('%', {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      surfaceTone: 'zinc',
+    });
+    expect(snapshot.state.surfaceTone).toBe('zinc');
   });
 });
 
@@ -237,6 +295,31 @@ describe('createNexusAppearanceBootstrapScript', () => {
     expect(
       document.querySelectorAll('style[data-nexus-appearance-theme]')
     ).toHaveLength(1);
+  });
+
+  it('can be locked to the embedded snapshot with storageKey false', () => {
+    const dark = createNexusAppearanceSnapshot(
+      { ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' },
+      ':root { --test-theme: dark; }',
+      ':root { --test-prefs: dark; }'
+    );
+    window.localStorage.setItem('nexus-appearance', JSON.stringify(dark));
+
+    new Function(
+      createNexusAppearanceBootstrapScript({
+        storageKey: false,
+        defaultSnapshot: createNexusAppearanceSnapshot(
+          DEFAULT_NEXUS_APPEARANCE,
+          ':root { --test-theme: light; }',
+          ':root { --test-prefs: light; }'
+        ),
+      })
+    )();
+
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    expect(
+      document.querySelector('style[data-nexus-appearance-theme]')?.textContent
+    ).toBe(':root { --test-theme: light; }');
   });
 
   it('uses matchMedia for system mode', () => {

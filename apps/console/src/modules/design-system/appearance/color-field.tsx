@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Input } from '@/components/ui/input';
+import { Input } from '@nexus/react';
 
 interface NexusAppearanceColorFieldProps {
   value: string;

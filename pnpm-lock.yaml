@@ -295,6 +295,9 @@ importers:
 
   packages/react:
     dependencies:
+      '@nexus/core':
+        specifier: workspace:*
+        version: link:../core
       '@nexus/tailwind':
         specifier: workspace:*
         version: link:../tailwind
@@ -407,9 +410,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: ^7.58.9
         version: 7.58.9(@types/node@25.9.1)
-      '@nexus/core':
-        specifier: workspace:*
-        version: link:../core
       '@storybook/addon-a11y':
         specifier: ^10.1.10
         version: 10.4.2(storybook@10.4.2(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))

@@ -1,6 +1,5 @@
 import type { NexusAppearanceState } from '@nexus/core';
-
-import type { NexusResolvedAppearanceMode } from './provider';
+import type { NexusResolvedAppearanceMode } from '@nexus/react/appearance';
 
 function toLines(
   state: NexusAppearanceState,

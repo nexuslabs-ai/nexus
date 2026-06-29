@@ -16,6 +16,7 @@ const tscBin = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
 const requiredDistFiles = [
   path.join(packageRoot, 'dist', 'index.d.ts'),
   path.join(packageRoot, 'dist', 'appearance.d.ts'),
+  path.join(packageRoot, 'dist', 'appearance-server.d.ts'),
   path.join(packageRoot, '..', 'core', 'dist', 'runtime', 'index.d.ts'),
 ];
 
@@ -34,15 +35,25 @@ await writeFile(
   probePath,
   `import { Button } from '@nexus/react';
 import type { NexusAppearanceState } from '@nexus/core';
-import { NexusAppearanceProvider, NexusThemeQuickControl } from '@nexus/react/appearance';
-import { useNexusAppearance } from '@nexus/react/appearance';
+import {
+  createNexusAppearance,
+  NexusAppearanceProvider,
+  NexusAppearanceScript as ClientNexusAppearanceScript,
+  useNexusAppearance,
+} from '@nexus/react/appearance';
+import { NexusAppearanceScript as ServerNexusAppearanceScript } from '@nexus/react/appearance/server';
 
 const element = (
-  <NexusAppearanceProvider storageKey={false}>
+  <NexusAppearanceProvider storageKey={false} cookieKey="appearance-state">
     <Button>Confirm</Button>
-    <NexusThemeQuickControl />
   </NexusAppearanceProvider>
 );
+const clientScript = <ClientNexusAppearanceScript storageKey={false} nonce="nonce" />;
+const serverScript = <ServerNexusAppearanceScript storageKey={false} nonce="nonce" />;
+const configured = createNexusAppearance({
+  storageKey: false,
+  cookieKey: "appearance-state",
+});
 
 const { setState } = useNexusAppearance();
 
@@ -57,6 +68,9 @@ setState((state) => {
 });
 
 void element;
+void clientScript;
+void serverScript;
+void configured;
 `
 );
 

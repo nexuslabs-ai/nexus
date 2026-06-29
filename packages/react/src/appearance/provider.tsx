@@ -21,6 +21,7 @@ import {
   resolveFirstPaint,
   sanitizeNexusAppearance,
   sanitizeNexusAppearanceSnapshot,
+  serializeNexusAppearanceStateCookie,
 } from '@nexus/core';
 
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
@@ -43,6 +44,7 @@ export interface NexusAppearanceProviderProps {
   defaultState?: NexusAppearanceState;
   onStateChange?: (state: NexusAppearanceState) => void;
   storageKey?: string | false;
+  cookieKey?: string | false;
 }
 
 const NexusAppearanceContext =
@@ -92,6 +94,21 @@ function writeStoredSnapshot(
     window.localStorage.setItem(storageKey, JSON.stringify(snapshot));
   } catch {
     // Storage can fail in privacy modes or quota-constrained embeds.
+  }
+}
+
+function writeStateCookie(
+  cookieKey: string | false,
+  state: NexusAppearanceState
+): void {
+  if (!canUseDOM() || cookieKey === false) return;
+
+  try {
+    document.cookie = `${cookieKey}=${serializeNexusAppearanceStateCookie(
+      state
+    )}; Path=/; SameSite=Lax; Max-Age=31536000`;
+  } catch {
+    // Cookie writes can fail in locked-down embeds.
   }
 }
 
@@ -155,6 +172,7 @@ export function NexusAppearanceProvider({
   defaultState,
   onStateChange,
   storageKey = DEFAULT_STORAGE_KEY,
+  cookieKey = false,
 }: NexusAppearanceProviderProps) {
   const isControlled = state !== undefined;
   const initialState = useMemo(
@@ -218,8 +236,16 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (mounted && !isControlled) {
       writeStoredSnapshot(storageKey, activeSnapshot);
+      writeStateCookie(cookieKey, activeState);
     }
-  }, [activeSnapshot, isControlled, mounted, storageKey]);
+  }, [
+    activeSnapshot,
+    activeState,
+    cookieKey,
+    isControlled,
+    mounted,
+    storageKey,
+  ]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;

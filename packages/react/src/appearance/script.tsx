@@ -6,26 +6,11 @@ import {
   sanitizeNexusAppearance,
 } from '@nexus/core';
 
-import {
-  NexusAppearanceProvider,
-  type NexusAppearanceProviderProps,
-} from './provider';
-
 export interface NexusAppearanceScriptProps {
-  storageKey?: string;
+  storageKey?: string | false;
   defaultState?: NexusAppearanceState;
   nonce?: string;
 }
-
-export interface CreateNexusAppearanceOptions {
-  storageKey?: string;
-  defaultState?: NexusAppearanceState;
-}
-
-type ConfiguredProviderProps = Omit<
-  NexusAppearanceProviderProps,
-  'storageKey' | 'defaultState'
->;
 
 function defaultSnapshotFor(defaultState: NexusAppearanceState | undefined) {
   return defaultState
@@ -52,41 +37,4 @@ export function NexusAppearanceScript({
       }}
     />
   );
-}
-
-export function createNexusAppearance({
-  storageKey,
-  defaultState,
-}: CreateNexusAppearanceOptions = {}) {
-  function ConfiguredNexusAppearanceProvider({
-    children,
-    ...props
-  }: ConfiguredProviderProps) {
-    return (
-      <NexusAppearanceProvider
-        {...props}
-        storageKey={storageKey}
-        defaultState={defaultState}
-      >
-        {children}
-      </NexusAppearanceProvider>
-    );
-  }
-
-  function ConfiguredNexusAppearanceScript({
-    nonce,
-  }: Pick<NexusAppearanceScriptProps, 'nonce'>) {
-    return (
-      <NexusAppearanceScript
-        nonce={nonce}
-        storageKey={storageKey}
-        defaultState={defaultState}
-      />
-    );
-  }
-
-  return {
-    NexusAppearanceProvider: ConfiguredNexusAppearanceProvider,
-    NexusAppearanceScript: ConfiguredNexusAppearanceScript,
-  };
 }

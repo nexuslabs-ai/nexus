@@ -1,6 +1,6 @@
-import { NexusAppearanceSettings } from '@nexus/react/appearance';
-
 import { PageHeader } from '../../components/page-header';
+
+import { NexusAppearanceSettings } from './appearance';
 
 /**
  * Design System → Appearance: the package-owned theme control, wired to the

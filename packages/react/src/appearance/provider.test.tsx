@@ -9,6 +9,7 @@ import {
   deriveTheme,
   NEXUS_APPEARANCE_DATA_ATTRS,
   type NexusAppearanceState,
+  parseNexusAppearanceStateCookie,
   sanitizeNexusAppearance,
   SNAPSHOT_VERSION,
   themeToCss,
@@ -30,6 +31,13 @@ function resetAppearanceDom(): void {
     )
     .forEach((style) => style.remove());
   window.localStorage.clear();
+  document.cookie
+    .split(';')
+    .map((cookie) => cookie.split('=')[0]?.trim())
+    .filter(Boolean)
+    .forEach((name) => {
+      document.cookie = `${name}=; Path=/; Max-Age=0`;
+    });
 }
 
 function snapshotFor(state: NexusAppearanceState) {
@@ -273,6 +281,30 @@ describe('NexusAppearanceProvider', () => {
     });
   });
 
+  it('can write uncontrolled state as a versioned SSR cookie', async () => {
+    const { result } = renderHook(() => useNexusAppearance(), {
+      wrapper: wrapperFor({
+        storageKey: false,
+        cookieKey: 'test-appearance-cookie',
+      }),
+    });
+
+    act(() => {
+      result.current.setState((state) => ({ ...state, surfaceTone: 'slate' }));
+    });
+
+    await waitFor(() => {
+      const rawCookie = document.cookie
+        .split('; ')
+        .find((cookie) => cookie.startsWith('test-appearance-cookie='))
+        ?.split('=')[1];
+
+      expect(parseNexusAppearanceStateCookie(rawCookie)).toMatchObject({
+        surfaceTone: 'slate',
+      });
+    });
+  });
+
   it('recovers stale snapshot versions through the provider and refreshes storage', async () => {
     const key = 'stale-appearance';
     window.localStorage.setItem(
@@ -329,6 +361,7 @@ describe('NexusAppearanceProvider', () => {
         state: DEFAULT_NEXUS_APPEARANCE,
         onStateChange,
         storageKey: 'controlled-appearance',
+        cookieKey: 'controlled-appearance-cookie',
       }),
     });
 
@@ -340,6 +373,7 @@ describe('NexusAppearanceProvider', () => {
       expect.objectContaining({ surfaceTone: 'gray' })
     );
     expect(window.localStorage.getItem('controlled-appearance')).toBeNull();
+    expect(document.cookie).not.toContain('controlled-appearance-cookie=');
   });
 
   it('reuses bootstrap-created style tags instead of stacking duplicates', async () => {

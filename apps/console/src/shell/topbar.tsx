@@ -1,7 +1,8 @@
 import { Kbd, KbdGroup, SidebarTrigger } from '@nexus/react';
-import { NexusThemeQuickControl } from '@nexus/react/appearance';
 import { IconSearch } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
+
+import { NexusThemeQuickControl } from '../modules/design-system/appearance';
 
 import { NotificationsMenu } from './notifications-menu';
 

@@ -27,6 +27,18 @@ export default defineConfig({
           };
         }
 
+        if (normalizedPath.endsWith('/dist/appearance/server.d.ts')) {
+          return {
+            filePath: path.resolve(__dirname, 'dist/appearance-server.d.ts'),
+            content: content
+              .replace(/from '\.\/([^']+)'/g, "from './appearance/$1'")
+              .replace(
+                '//# sourceMappingURL=server.d.ts.map',
+                '//# sourceMappingURL=appearance-server.d.ts.map'
+              ),
+          };
+        }
+
         if (normalizedPath.endsWith('/dist/appearance/index.d.ts.map')) {
           const appearanceMapPath = path.resolve(
             __dirname,
@@ -49,6 +61,29 @@ export default defineConfig({
             };
           }
         }
+
+        if (normalizedPath.endsWith('/dist/appearance/server.d.ts.map')) {
+          const appearanceServerMapPath = path.resolve(
+            __dirname,
+            'dist/appearance-server.d.ts.map'
+          );
+
+          try {
+            const sourceMap = JSON.parse(content) as { file?: string };
+
+            sourceMap.file = 'appearance-server.d.ts';
+
+            return {
+              filePath: appearanceServerMapPath,
+              content: JSON.stringify(sourceMap),
+            };
+          } catch {
+            return {
+              filePath: appearanceServerMapPath,
+              content,
+            };
+          }
+        }
       },
     }),
   ],
@@ -62,6 +97,10 @@ export default defineConfig({
       entry: {
         index: path.resolve(__dirname, 'src/index.ts'),
         appearance: path.resolve(__dirname, 'src/appearance/index.ts'),
+        'appearance-server': path.resolve(
+          __dirname,
+          'src/appearance/server.ts'
+        ),
       },
       name: 'NexusReact',
       formats: ['es', 'cjs'],

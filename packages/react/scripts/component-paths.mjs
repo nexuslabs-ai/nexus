@@ -2,18 +2,14 @@
  * component-paths.mjs — canonical layout of the source directories that hold
  * first-party Nexus components.
  *
- * Imported by audit-storybook-coverage.mjs to resolve component files by
- * kebab name and honor the optional `sourceDir` field in
+ * Imported by audit-storybook-coverage.mjs to resolve package component files
+ * by kebab name and honor the optional `sourceDir` field in
  * storybook-coverage.config.json.
  * One source of truth — keeps the two scripts from drifting silently.
  */
 
 export const COMPONENT_SUBDIRS = ['ui', 'primitives'];
-export const APPEARANCE_SOURCE_DIR = 'appearance';
-export const COMPONENT_SOURCE_DIRS = [
-  ...COMPONENT_SUBDIRS,
-  APPEARANCE_SOURCE_DIR,
-];
+export const COMPONENT_SOURCE_DIRS = [...COMPONENT_SUBDIRS];
 
 /*
  * Subdirs using the per-component folder layout: each component lives in
@@ -37,10 +33,12 @@ export function toKebab(name) {
  * Nested: `{subdir}/{kebab}`. Flat: `{subdir}`.
  */
 export function componentDirSegment(subdir, name) {
-  if (subdir === APPEARANCE_SOURCE_DIR) return '';
   return NESTED_SUBDIRS.has(subdir) ? `${subdir}/${toKebab(name)}` : subdir;
 }
 
 export function sourceRootSegment(sourceDir) {
-  return sourceDir === APPEARANCE_SOURCE_DIR ? 'appearance' : 'components';
+  if (!COMPONENT_SUBDIRS.includes(sourceDir)) {
+    throw new Error(`Unknown package component sourceDir: ${sourceDir}`);
+  }
+  return 'components';
 }
