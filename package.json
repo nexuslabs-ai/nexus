@@ -26,6 +26,7 @@
     "audit:contrast": "pnpm --filter @nexus/core audit:contrast",
     "audit:mode-codenames": "pnpm --filter @nexus/core audit:mode-codenames",
     "audit:mode-distinctness": "pnpm --filter @nexus/core audit:mode-distinctness",
+    "audit:appearance-reactivity": "pnpm --filter @nexus/react audit:appearance-reactivity",
     "audit:storybook-coverage": "pnpm --filter @nexus/react audit:storybook-coverage -- --all",
     "validate:spacing-modes": "pnpm --filter @nexus/core validate:spacing-modes",
     "console": "cd apps/console && pnpm dev",
