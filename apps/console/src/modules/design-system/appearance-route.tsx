@@ -3,8 +3,8 @@ import { PageHeader } from '../../components/page-header';
 import { NexusAppearanceSettings } from './appearance';
 
 /**
- * Design System → Appearance: the package-owned theme control, wired to the
- * root NexusAppearanceProvider so changes here re-theme the entire console.
+ * Design System → Appearance: console-owned controls wired to the root
+ * NexusAppearanceProvider so changes here re-theme the entire console.
  */
 export function AppearanceRoute() {
   return (

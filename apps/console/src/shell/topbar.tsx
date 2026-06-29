@@ -13,7 +13,7 @@ interface TopbarProps {
 
 /**
  * App-shell top bar: sidebar toggle, the ⌘K search button that opens the
- * command palette, the notifications bell, and the package-owned appearance
+ * command palette, the notifications bell, and the console-owned appearance
  * quick-control wired to the shared root appearance provider.
  */
 export function Topbar({ onSearchClick }: TopbarProps) {

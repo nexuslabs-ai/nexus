@@ -20,6 +20,11 @@ const distAppearanceServerPath = path.join(
   'dist',
   'appearance-server.mjs'
 );
+const distAppearanceServerCjsPath = path.join(
+  packageRoot,
+  'dist',
+  'appearance-server.js'
+);
 
 const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 const failures = [];
@@ -44,7 +49,9 @@ function readBundleWithLocalImports(entryPath) {
     const content = readFileSync(file, 'utf8');
     source += `\n/* ${rel(file)} */\n${content}`;
 
-    for (const match of content.matchAll(/from ["'](\.\/[^"']+)["']/g)) {
+    for (const match of content.matchAll(
+      /(?:from\s+|require\()["'](\.\/[^"']+)["']/g
+    )) {
       stack.push(path.resolve(path.dirname(file), match[1]));
     }
   }
@@ -101,23 +108,28 @@ if (existsSync(distAppearancePath)) {
   );
 }
 
-if (existsSync(distAppearanceServerPath)) {
+for (const serverEntryPath of [
+  distAppearanceServerPath,
+  distAppearanceServerCjsPath,
+]) {
+  if (!existsSync(serverEntryPath)) continue;
+
   const distAppearanceServer = readBundleWithLocalImports(
-    distAppearanceServerPath
+    serverEntryPath
   );
   assert(
     distAppearanceServer.includes('@nexus/core'),
-    `${rel(distAppearanceServerPath)} should consume the external @nexus/core runtime.`
+    `${rel(serverEntryPath)} should consume the external @nexus/core runtime.`
   );
   assert(
     !/createContext|useState|useEffect|useRef|useMemo|useCallback|useContext/.test(
       distAppearanceServer
     ),
-    `${rel(distAppearanceServerPath)} must stay server-safe and hook-free.`
+    `${rel(serverEntryPath)} must stay server-safe and hook-free.`
   );
   assert(
     !/NexusAppearanceProvider|useNexusAppearance/.test(distAppearanceServer),
-    `${rel(distAppearanceServerPath)} must not import the client provider.`
+    `${rel(serverEntryPath)} must not import the client provider.`
   );
 }
 
