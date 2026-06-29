@@ -325,7 +325,7 @@ export function discoverSemantics(semanticDir) {
   // Pattern for themed files: {type}-{mode}-{light|dark}.json
   const themedPattern = /^(.+)-(.+)-(light|dark)\.json$/;
   // Pattern for spacing-mode files: spacing-{mode}.json. Their values are
-  // direct px (no `{N}` refs) and emit per-mode `[data-style="X"]` blocks via
+  // direct px (no `{N}` refs) and emit per-mode `[data-density="X"]` blocks via
   // `collectSpacingTokens` — they intentionally bypass the generic
   // standalone-dimension scan, which would otherwise emit each file's keys
   // into `@theme` once per mode and last-write-wins.
@@ -837,7 +837,7 @@ const SPACING_ROLE_ROOTS = new Set(['container', 'layout']);
  * (path starts with `spacing`) feed `@theme` for Tailwind's `nx:p-*` /
  * `nx:m-*` / `nx:gap-*` / `nx:h-*` / `nx:w-*` utility codegen. Role tokens
  * (`container.*`, `layout.*`) feed only the per-mode
- * `[data-style="X"]` overrides and the `spacing-utilities` `@utility`
+ * `[data-density="X"]` overrides and the `spacing-utilities` `@utility`
  * declarations. Role tokens never enter `@theme`, both because Tailwind v4's
  * `--container-*` namespace would otherwise auto-codegen `nx:w-p` and
  * friends from `--nx-container-p`, and because role tokens don't map onto
@@ -866,11 +866,11 @@ export function splitSpacingTokens(tokens) {
 }
 
 /**
- * Emit per-mode `[data-style="X"]` CSS blocks for spacing.
+ * Emit per-mode `[data-density="X"]` CSS blocks for spacing.
  *
- * The selected default mode is published under `:root, [data-style="<mode>"]`
- * so any document with no `data-style` attribute still resolves to it. The
- * remaining six modes emit in alphabetical order for cross-platform
+ * The selected default mode is published under `:root, [data-density="<mode>"]`
+ * so any document with no `data-density` attribute still resolves to it. The
+ * remaining five modes emit in alphabetical order for cross-platform
  * determinism (filesystem order isn't portable; sorting locks it).
  *
  * Each block emits ALL spacing tokens for that mode (numeric + role) — even
@@ -888,7 +888,7 @@ export function splitSpacingTokens(tokens) {
  * @param {Record<string, {cssName: string, value: string}[]>} modesByName
  * @param {object} [opts]
  * @param {string} [opts.defaultMode=CANONICAL_SPACING_DEFAULT_MODE]
- * @param {string} [opts.attrName='data-style']
+ * @param {string} [opts.attrName='data-density']
  * @param {string} [opts.commentLabel='SPACING']
  * @param {string} [opts.duplicateValuePrefix='spacing-']
  * @returns {string} CSS string with all per-mode blocks
@@ -896,7 +896,7 @@ export function splitSpacingTokens(tokens) {
 export function generateSpacingModesCSS(modesByName, opts = {}) {
   const {
     defaultMode = CANONICAL_SPACING_DEFAULT_MODE,
-    attrName = 'data-style',
+    attrName = 'data-density',
     commentLabel = 'SPACING',
     duplicateValuePrefix = 'spacing-',
   } = opts;
@@ -1094,7 +1094,7 @@ function deriveRoleUtility(tokenPath) {
  * `@utility` declaration referencing the already-prefixed CSS variable.
  *
  * Data-driven by design: adding a new role key to the canonical spacing mode (and
- * the other six mode files, per the schema contract) automatically grows the
+ * the other five mode files, per the schema contract) automatically grows the
  * utility set. The Phase 2 drift test asserts utilities ↔ role tokens stay
  * 1:1.
  *
@@ -1115,7 +1115,7 @@ export function generateSpacingRoleUtilitiesCSS(canonicalRoleTokens) {
     for (const prop of properties) {
       // @utility lives in Tailwind's source-pass, so it WILL pick up the
       // `prefix(nx)` rewrite — but the var name we're referencing is in our
-      // own per-mode `[data-style="X"]` block, which is already prefixed.
+      // own per-mode `[data-density="X"]` block, which is already prefixed.
       // Emit the prefixed form directly so both sides match.
       css += `  ${prop}: var(--nx-${token.cssName});\n`;
     }

@@ -25,7 +25,7 @@ function applyMode(mode: ThemeMode, value: string) {
   const safeValue = sanitizeMode(mode, value);
 
   if (mode === 'spacing') {
-    document.documentElement.setAttribute('data-style', safeValue);
+    document.documentElement.setAttribute('data-density', safeValue);
     return;
   }
 

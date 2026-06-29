@@ -69,7 +69,7 @@ describe('docs theme modes', () => {
   it('keeps THEME_MODE_VALUES in sync with the shipped core token modes', () => {
     // The docs picker re-encodes the token-mode names; the @nexus/core audit
     // can see the shadow/radius/borderwidth hrefs but NOT spacing (applied via
-    // data-style, no /themes file). Bind every rename family to the actual
+    // data-density, no /themes file). Bind every rename family to the actual
     // token files so a drifted or typo'd mode is caught. Green today, and after
     // the #546 cutover renames both sides together.
     const coreTokens = join(docsRoot, '..', '..', 'packages', 'core', 'tokens');
@@ -130,7 +130,7 @@ describe('docs theme modes', () => {
   it('executes the bootstrap script with sanitized persisted theme values', () => {
     localStorage.clear();
     document.head.replaceChildren();
-    document.documentElement.removeAttribute('data-style');
+    document.documentElement.removeAttribute('data-density');
     document.documentElement.classList.remove('dark');
 
     localStorage.setItem(
@@ -155,7 +155,7 @@ describe('docs theme modes', () => {
         .querySelector<HTMLLinkElement>('link:not([data-theme])')
         ?.getAttribute('href')
     ).toBe('/themes/focus-default.css');
-    expect(document.documentElement.getAttribute('data-style')).toBe(
+    expect(document.documentElement.getAttribute('data-density')).toBe(
       DEFAULT_THEME_STATE.spacing
     );
     expect(document.documentElement.classList.contains('dark')).toBe(false);

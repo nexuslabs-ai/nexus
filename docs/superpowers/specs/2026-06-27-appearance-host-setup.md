@@ -80,7 +80,7 @@ const script = createNexusAppearanceBootstrapScript({
 The script writes:
 
 - `.dark` on `<html>` when the resolved mode is dark
-- `data-style`, `data-radius`, `data-shadow`, and `data-borderwidth`
+- `data-density`, `data-radius`, `data-shadow`, and `data-borderwidth`
 - `color-scheme` on `<html>` plus the `color-scheme` meta content
 - `style[data-nexus-appearance-theme]`
 - `style[data-nexus-appearance-prefs]`

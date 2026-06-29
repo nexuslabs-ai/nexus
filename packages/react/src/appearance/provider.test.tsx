@@ -7,6 +7,8 @@ import {
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
   deriveTheme,
+  NEXUS_APPEARANCE_DATA_ATTRS,
+  NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
   type NexusAppearanceState,
   sanitizeNexusAppearance,
   SNAPSHOT_VERSION,
@@ -17,12 +19,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { NexusAppearanceProvider, useNexusAppearance } from './provider';
 
+const RETIRED_STYLE_ATTR = NEXUS_RETIRED_APPEARANCE_DATA_ATTRS[0];
+
 function resetAppearanceDom(): void {
   document.documentElement.classList.remove('dark');
-  document.documentElement.removeAttribute('data-style');
-  document.documentElement.removeAttribute('data-radius');
-  document.documentElement.removeAttribute('data-shadow');
-  document.documentElement.removeAttribute('data-borderwidth');
+  for (const attr of [
+    ...NEXUS_APPEARANCE_DATA_ATTRS,
+    ...NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
+  ]) {
+    document.documentElement.removeAttribute(attr);
+  }
   document.documentElement.style.colorScheme = '';
   document
     .querySelectorAll(
@@ -45,7 +51,8 @@ function captureAppearanceDom() {
 
   return {
     dark: root.classList.contains('dark'),
-    style: root.getAttribute('data-style'),
+    density: root.getAttribute('data-density'),
+    retiredStyle: root.getAttribute(RETIRED_STYLE_ATTR),
     radius: root.getAttribute('data-radius'),
     shadow: root.getAttribute('data-shadow'),
     borderwidth: root.getAttribute('data-borderwidth'),
@@ -85,7 +92,8 @@ describe('NexusAppearanceProvider', () => {
 
     const root = document.documentElement;
 
-    expect(root).toHaveAttribute('data-style', 'default');
+    expect(root).toHaveAttribute('data-density', 'default');
+    expect(root).not.toHaveAttribute(RETIRED_STYLE_ATTR);
     expect(root).toHaveAttribute('data-radius', 'square');
     expect(root).toHaveAttribute('data-shadow', 'quiet');
     expect(root).toHaveAttribute('data-borderwidth', 'normal');
@@ -156,6 +164,22 @@ describe('NexusAppearanceProvider', () => {
 
     expect(captureAppearanceDom()).toEqual(beforeHydration);
     expect(result.current.resolvedMode).toBe('dark');
+  });
+
+  it('removes the retired spacing attribute when the provider applies density', async () => {
+    document.documentElement.setAttribute(RETIRED_STYLE_ATTR, 'compact');
+
+    renderHook(() => useNexusAppearance(), {
+      wrapper: wrapperFor({ storageKey: false }),
+    });
+
+    await waitFor(() => {
+      expect(document.documentElement).toHaveAttribute(
+        'data-density',
+        'default'
+      );
+    });
+    expect(document.documentElement).not.toHaveAttribute(RETIRED_STYLE_ATTR);
   });
 
   it('repairs readable snapshots against the sanitized state after hydration', async () => {

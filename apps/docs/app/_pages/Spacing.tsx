@@ -7,7 +7,7 @@ import { Breadcrumb } from '../_components/Breadcrumb';
  *
  * The bars reference the runtime `--nx-spacing-N` var inline, so they rescale
  * the moment the Size control in the theme picker swaps the active density via
- * the `data-style` attribute on `<html>`. Role-token rows are static spec.
+ * the `data-density` attribute on `<html>`. Role-token rows are static spec.
  *
  * Source: packages/core/tokens/ (spacing modes).
  */
@@ -70,7 +70,7 @@ export function Spacing() {
       <p className="nx:typography-body-default nx:text-muted-foreground nx:mt-2 nx:mb-8 nx:max-w-[64ch]">
         A 4px-based scale, exposed as named steps only — there is no base{' '}
         <code>--spacing</code> token. All six density modes ship in every build
-        and swap at runtime through the <code>data-style</code> attribute on{' '}
+        and swap at runtime through the <code>data-density</code> attribute on{' '}
         <code>&lt;html&gt;</code> — the &ldquo;Size&rdquo; control in the theme
         picker (bottom-right) — cascading to every <code>nx:p-*</code> and{' '}
         <code>nx:gap-*</code> utility at once. The bars below read the live var,

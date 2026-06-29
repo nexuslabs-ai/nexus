@@ -227,7 +227,7 @@ export const SECTIONS = {
       {
         slug: 'spacing',
         label: 'Spacing',
-        lede: '[ Canonical step set · 7 density modes · role tokens ]',
+        lede: '[ Canonical step set · 6 density modes · role tokens ]',
         blocks: [
           {
             type: 'placeholder',
@@ -238,7 +238,7 @@ export const SECTIONS = {
           {
             type: 'placeholder',
             variant: 'tall',
-            label: '[ Side-by-side — 7 modes via data-style switcher ]',
+            label: '[ Side-by-side — 6 modes via data-density switcher ]',
           },
           { type: 'h2', text: '[ Role tokens ]' },
           {
@@ -421,18 +421,18 @@ export const SECTIONS = {
       {
         slug: 'density-modes',
         label: 'Density modes',
-        lede: '[ Spacing density via data-style ]',
+        lede: '[ Spacing density via data-density ]',
         blocks: [
           {
             type: 'placeholder',
             variant: 'tall',
             label:
-              '[ Live demo — 7-mode grid · same component, different density ]',
+              '[ Live demo — 6-mode grid · same component, different density ]',
           },
           {
             type: 'placeholder',
             variant: 'code',
-            label: '[ Code — data-style attribute pattern ]',
+            label: '[ Code — data-density attribute pattern ]',
           },
         ],
       },

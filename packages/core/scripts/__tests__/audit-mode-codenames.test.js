@@ -10,13 +10,13 @@ const borderwidthCodename = Object.keys(MODE_RENAME.borderwidth)[0];
 
 describe('audit-mode-codenames scanText', () => {
   it('flags a retired codename in a data-attribute value', () => {
-    const hits = scanText('app.tsx', `<div data-style="${spacingCodename}">`);
+    const hits = scanText('app.tsx', `<div data-density="${spacingCodename}">`);
     expect(hits).toMatchObject([
       {
         file: 'app.tsx',
         line: 1,
         kind: 'data attribute',
-        text: `data-style="${spacingCodename}"`,
+        text: `data-density="${spacingCodename}"`,
       },
     ]);
   });
@@ -54,10 +54,10 @@ describe('audit-mode-codenames scanText', () => {
   it('flags multiple load-bearing codenames on the same line', () => {
     const hits = scanText(
       'x.css',
-      `[data-style="${spacingCodename}"] [data-borderwidth="${borderwidthCodename}"] {}`
+      `[data-density="${spacingCodename}"] [data-borderwidth="${borderwidthCodename}"] {}`
     );
     expect(hits.map((hit) => hit.text)).toEqual([
-      `[data-style="${spacingCodename}"]`,
+      `[data-density="${spacingCodename}"]`,
       `[data-borderwidth="${borderwidthCodename}"]`,
     ]);
   });

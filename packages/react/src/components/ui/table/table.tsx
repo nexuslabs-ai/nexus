@@ -132,7 +132,7 @@ function Table({
         <table
           data-slot="table"
           data-variant={variant}
-          data-density={density}
+          data-table-density={density}
           data-sticky-header={stickyHeader || undefined}
           data-striped={striped || undefined}
           className={cn(

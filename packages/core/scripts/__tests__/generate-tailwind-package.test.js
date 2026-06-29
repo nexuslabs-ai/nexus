@@ -56,12 +56,12 @@ function extractBlock(css, openSelector) {
   return match[1];
 }
 
-// Per-mode spacing blocks open with `[data-style='X']` (single-quoted by
+// Per-mode spacing blocks open with `[data-density='X']` (single-quoted by
 // prettier). The configured default selector is multi-line because it includes
 // `:root`. Match by attribute-selector only so the leading `:root,\n` does
 // not need separate handling for prettier output variance.
 function extractDataStyleBlock(css, mode) {
-  return extractDataAttrBlock(css, 'data-style', mode);
+  return extractDataAttrBlock(css, 'data-density', mode);
 }
 
 function extractDataAttrBlock(css, attrName, mode) {
@@ -410,7 +410,7 @@ describe('generateTailwindPackage', () => {
   it('removes the --nx-size-* primitive layer entirely', () => {
     // The whole point of the migration is that --nx-size-* primitives don't
     // exist anymore — spacing values flow directly from semantic per-mode
-    // files into [data-style="X"] blocks. Any residual --nx-size- would
+    // files into [data-density="X"] blocks. Any residual --nx-size- would
     // indicate the deletion was incomplete or the build regressed.
     expect(variablesCSS).not.toMatch(/--nx-size-/);
     expect(nexusCSS).not.toMatch(/--nx-size-/);
@@ -552,10 +552,10 @@ describe('generateTailwindPackage', () => {
     expect(themeBlock).not.toMatch(/--layout-section-gap:/);
   });
 
-  it('emits exactly 6 [data-style="X"] selectors (one per mode)', () => {
-    // The configured default selector is `:root, [data-style='<mode>']`, so it contributes one
-    // [data-style=...] match; the other 5 modes each contribute one. Total: 6.
-    const matches = nexusCSS.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+  it('emits exactly 6 [data-density="X"] selectors (one per mode)', () => {
+    // The configured default selector is `:root, [data-density='<mode>']`, so it contributes one
+    // [data-density=...] match; the other 5 modes each contribute one. Total: 6.
+    const matches = nexusCSS.match(/\[data-density=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(6);
 
     const modes = new Set(matches.map((m) => m.match(/['"]([a-z]+)['"]/)[1]));
@@ -563,11 +563,11 @@ describe('generateTailwindPackage', () => {
   });
 
   it('emits configured spacing default under :root selector', () => {
-    // Without the :root half, a document with no data-style attribute would
+    // Without the :root half, a document with no data-density attribute would
     // miss the role-token defaults (which only live in per-mode blocks, not
     // @theme). The :root selector keeps the configured default live in both
-    // no-attribute and explicit data-style configurations.
-    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-style=['"]default['"]\] \{/);
+    // no-attribute and explicit data-density configurations.
+    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-density=['"]default['"]\] \{/);
   });
 
   it('emits runtime mode selectors for radius, shadow, and border width', () => {
@@ -663,7 +663,7 @@ describe('generateTailwindPackage', () => {
   });
 
   it.each(SPACING_MODES)(
-    '[data-style="%s"] block values match spacing-%s.json source',
+    '[data-density="%s"] block values match spacing-%s.json source',
     (mode) => {
       const block = extractDataStyleBlock(nexusCSS, mode);
       const source = readSpacingModeJson(mode);
@@ -734,9 +734,9 @@ describe('generateTailwindPackage', () => {
     }
   });
 
-  it('every [data-style="X"] block declares the same set of CSS variable names', () => {
+  it('every [data-density="X"] block declares the same set of CSS variable names', () => {
     // Cross-mode parity: a mode missing a key silently breaks only that mode
-    // when data-style switches to it. Schema validation (#125) will codify
+    // when data-density switches to it. Schema validation (#125) will codify
     // this at the JSON layer; this is the emit-side guarantee.
     const blocks = SPACING_MODES.map((mode) => {
       const block = extractDataStyleBlock(nexusCSS, mode);
@@ -856,9 +856,9 @@ describe('generateTailwindPackage', () => {
   it('emits 6 per-mode spacing blocks in deterministic alphabetical order (non-default modes)', () => {
     // Filesystem order isn't portable; the emitter sorts non-default modes
     // alphabetically.
-    const ordered = [...nexusCSS.matchAll(/\[data-style=['"]([a-z-]+)['"]\]/g)]
+    const ordered = [...nexusCSS.matchAll(/\[data-density=['"]([a-z-]+)['"]\]/g)]
       .map((m) => m[1])
-      // De-dup in case `:root, [data-style="<default>"]` produces two captures.
+      // De-dup in case `:root, [data-density="<default>"]` produces two captures.
       .filter((m, i, arr) => arr.indexOf(m) === i);
     expect(ordered[0]).toBe('default');
     // Other five in alphabetical order:
@@ -919,7 +919,7 @@ describe('generateTailwindPackage', () => {
     );
   });
 
-  it('config.spacingDefault shifts which mode lands under :root, [data-style="X"]', async () => {
+  it('config.spacingDefault shifts which mode lands under :root, [data-density="X"]', async () => {
     // Build with a non-default spacing mode. All 6 mode blocks still emit;
     // only the `:root` half of the dual selector moves from Default to Relaxed.
     const dir = makeTmpDir();
@@ -929,13 +929,13 @@ describe('generateTailwindPackage', () => {
     );
     const css = read(dir, 'nexus.css');
 
-    // :root must combine with [data-style="relaxed"], not default.
-    expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]relaxed['"]\] \{/);
+    // :root must combine with [data-density="relaxed"], not default.
+    expect(css).toMatch(/:root,\s*\n\s*\[data-density=['"]relaxed['"]\] \{/);
     // Default becomes a plain attribute selector (no :root combinator).
-    expect(css).not.toMatch(/:root,\s*\n\s*\[data-style=['"]default['"]\] \{/);
+    expect(css).not.toMatch(/:root,\s*\n\s*\[data-density=['"]default['"]\] \{/);
     // Both blocks still present — the bundle still ships all 6 modes; only
     // the cascade default moves.
-    const matches = css.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    const matches = css.match(/\[data-density=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(6);
   });
 });

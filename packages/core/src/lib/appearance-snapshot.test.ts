@@ -8,11 +8,15 @@ import {
 import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshot,
+  NEXUS_APPEARANCE_DATA_ATTRS,
+  NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
   resolveFirstPaint,
   sanitizeNexusAppearanceSnapshot,
   SNAPSHOT_VERSION,
 } from './appearance-snapshot';
 import { deriveTheme, themeToCss } from './derive-theme';
+
+const RETIRED_STYLE_ATTR = NEXUS_RETIRED_APPEARANCE_DATA_ATTRS[0];
 
 function themeCss(state = DEFAULT_NEXUS_APPEARANCE): string {
   return themeToCss(deriveTheme(createNexusThemeContract(state)));
@@ -138,7 +142,7 @@ describe('resolveFirstPaint', () => {
     expect(result.colorScheme).toBe('dark');
     expect(result.metaColorScheme).toBe('dark');
     expect(result.dataAttrs).toEqual({
-      'data-style': 'default',
+      'data-density': 'default',
       'data-radius': 'square',
       'data-shadow': 'quiet',
       'data-borderwidth': 'normal',
@@ -171,10 +175,12 @@ describe('createNexusAppearanceBootstrapScript', () => {
     window.localStorage.clear();
     window.matchMedia = originalMatchMedia;
     document.documentElement.classList.remove('dark');
-    document.documentElement.removeAttribute('data-style');
-    document.documentElement.removeAttribute('data-radius');
-    document.documentElement.removeAttribute('data-shadow');
-    document.documentElement.removeAttribute('data-borderwidth');
+    for (const attr of [
+      ...NEXUS_APPEARANCE_DATA_ATTRS,
+      ...NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
+    ]) {
+      document.documentElement.removeAttribute(attr);
+    }
     document.documentElement.style.colorScheme = '';
     document
       .querySelectorAll(
@@ -230,11 +236,24 @@ describe('createNexusAppearanceBootstrapScript', () => {
       })
     )();
 
-    expect(document.documentElement.getAttribute('data-style')).toBe('default');
+    expect(document.documentElement.getAttribute('data-density')).toBe(
+      'default'
+    );
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(
       document.querySelectorAll('style[data-nexus-appearance-theme]')
     ).toHaveLength(1);
+  });
+
+  it('removes the retired spacing attribute without treating it as an alias', () => {
+    document.documentElement.setAttribute(RETIRED_STYLE_ATTR, 'compact');
+
+    new Function(createNexusAppearanceBootstrapScript())();
+
+    expect(document.documentElement.getAttribute('data-density')).toBe(
+      'default'
+    );
+    expect(document.documentElement.getAttribute(RETIRED_STYLE_ATTR)).toBeNull();
   });
 
   it('uses matchMedia for system mode', () => {
@@ -305,12 +324,8 @@ describe('createNexusAppearanceBootstrapScript', () => {
         document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
           ?.content
       ).toBe(expected.metaColorScheme);
-      for (const attr of [
-        'data-style',
-        'data-radius',
-        'data-shadow',
-        'data-borderwidth',
-      ] as const) {
+      expect(root.getAttribute(RETIRED_STYLE_ATTR)).toBeNull();
+      for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
         expect(root.getAttribute(attr)).toBe(expected.dataAttrs[attr]);
       }
     }

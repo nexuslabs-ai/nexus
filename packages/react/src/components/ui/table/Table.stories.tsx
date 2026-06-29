@@ -35,7 +35,7 @@ type Story = StoryObj<typeof Table>;
 
 const rawTextSizeSentinelClass = ['nx', 'text-xs'].join(':');
 const densityCellSelector = (density: string) =>
-  `[data-${'density'}="${density}"] [data-slot="table-cell"]`;
+  `[data-slot="table"][data-table-density="${density}"] [data-slot="table-cell"]`;
 
 // Representative fixture: a list of invoices with status, payment method, and
 // amount — the shape a real billing table renders.
@@ -635,7 +635,7 @@ export const Grid: Story = {
 // tightens to ~36px for dense data.
 export const Density: Story = {
   render: () => (
-    <div className="nx:flex nx:flex-col nx:gap-6">
+    <div data-density="compact" className="nx:flex nx:flex-col nx:gap-6">
       {(['comfortable', 'compact'] as const).map((density) => (
         <Table key={density} density={density}>
           <TableHeader>
@@ -657,6 +657,12 @@ export const Density: Story = {
     </div>
   ),
   play: async ({ canvasElement }) => {
+    const comfyTable = canvasElement.querySelector(
+      '[data-slot="table"][data-table-density="comfortable"]'
+    );
+    const compactTable = canvasElement.querySelector(
+      '[data-slot="table"][data-table-density="compact"]'
+    );
     const comfyCell = canvasElement.querySelector(
       densityCellSelector('comfortable')
     );
@@ -664,6 +670,10 @@ export const Density: Story = {
       densityCellSelector('compact')
     );
 
+    await expect(comfyTable).toBeInTheDocument();
+    await expect(comfyTable).not.toHaveAttribute('data-density');
+    await expect(compactTable).toBeInTheDocument();
+    await expect(compactTable).not.toHaveAttribute('data-density');
     await expect(comfyCell).toBeInTheDocument();
     await expect(comfyCell).toHaveClass('nx:py-3');
     await expect(compactCell).toBeInTheDocument();

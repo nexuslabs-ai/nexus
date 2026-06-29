@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 const CODE = RETIRED_CODENAMES.join('|');
-const DATA_ATTR_FAMILY = 'style|radius|shadow|borderwidth';
+const DATA_ATTR_FAMILY = 'density|radius|shadow|borderwidth';
 const THEME_FAMILY = 'spacing|shadow|radius|borderwidth|typography';
 
 const PATTERNS = [

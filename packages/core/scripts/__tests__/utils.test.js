@@ -422,7 +422,7 @@ describe('utils', () => {
       expect(DEFAULT_CONFIG.radius).toBe('square');
       expect(DEFAULT_CONFIG.borderwidth).toBe('normal');
       // Mira is the runtime spacing default. The
-      // key controls which mode lands under `:root, [data-style="X"]`; other
+      // key controls which mode lands under `:root, [data-density="X"]`; other
       // modes still ship in the bundle.
       expect(DEFAULT_CONFIG.spacingDefault).toBe('default');
     });
@@ -806,9 +806,9 @@ describe('utils', () => {
       ],
     };
 
-    it('emits Default block under :root and [data-style="default"] selectors', () => {
+    it('emits Default block under :root and [data-density="default"] selectors', () => {
       const css = generateSpacingModesCSS(modes);
-      expect(css).toMatch(/:root,\s*\n\s*\[data-style=['"]default['"]\] \{/);
+      expect(css).toMatch(/:root,\s*\n\s*\[data-density=['"]default['"]\] \{/);
     });
 
     it('emits non-default modes alphabetically (comfortable before tight)', () => {
@@ -816,8 +816,8 @@ describe('utils', () => {
       // generateSpacingModesCSS returns a raw string with double-quoted
       // attribute selectors; prettier rewrites to single quotes only after
       // formatDistCssFiles runs. Match the raw form here.
-      const comfortableIdx = css.indexOf('[data-style="comfortable"]');
-      const tightIdx = css.indexOf('[data-style="tight"]');
+      const comfortableIdx = css.indexOf('[data-density="comfortable"]');
+      const tightIdx = css.indexOf('[data-density="tight"]');
       expect(comfortableIdx).toBeGreaterThan(-1);
       expect(tightIdx).toBeGreaterThan(-1);
       expect(comfortableIdx).toBeLessThan(tightIdx);

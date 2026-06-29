@@ -119,5 +119,5 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 
 ## Notes
 
-- **Spacing:** role-named utilities are the norm — mirror the archetype. `nx:py-control-{sm,md,lg}` is the **height mechanism** for a control (it resolves per `data-style` density mode; numeric `nx:py-2` does not). `button.tsx` also uses `nx:px-control-*` / `nx:gap-control-*`; numeric `nx:px-*` / `nx:gap-*` stay only for non-control spacing (icon gaps, internal layout). Never reach for numeric `py` on a control. (Role-utilities rolled out in #124, now closed.)
+- **Spacing:** role-named utilities are the norm — mirror the archetype. `nx:py-control-{sm,md,lg}` is the **height mechanism** for a control (it resolves per `data-density` density mode; numeric `nx:py-2` does not). `button.tsx` also uses `nx:px-control-*` / `nx:gap-control-*`; numeric `nx:px-*` / `nx:gap-*` stay only for non-control spacing (icon gaps, internal layout). Never reach for numeric `py` on a control. (Role-utilities rolled out in #124, now closed.)
 - **Don't over-plan.** The recipe above _is_ the plan — no planning doc, no approval gate. Orient, transform, verify, report.

@@ -390,10 +390,10 @@ function generateVariablesCSS(primitiveTokens, divergentDark, usedModes) {
 /**
  * Generate nexus.css using shared generateThemeCSS function.
  *
- * `spacingDefault` controls which mode lands under `:root, [data-style="X"]`
- * (i.e. which mode applies when no `data-style` attribute is set). All six
+ * `spacingDefault` controls which mode lands under `:root, [data-density="X"]`
+ * (i.e. which mode applies when no `data-density` attribute is set). All six
  * modes still ship in the bundle either way — the other five emit as plain
- * `[data-style="X"]` blocks. The @theme numeric subset always comes from the
+ * `[data-density="X"]` blocks. The @theme numeric subset always comes from the
  * canonical default baseline because @theme drives Tailwind's utility codegen
  * (build-time); the cascade flip happens at runtime via the per-mode blocks.
  */
@@ -461,7 +461,7 @@ function generateNexusCSS(
 
   // Per-mode spacing — default numerics seed @theme for Tailwind's spacing-utility
   // codegen (nx:p-*, nx:m-*, nx:gap-*, nx:h-*, nx:w-*). The per-mode override
-  // blocks live outside @theme in `:root, [data-style="X"]` form (see below);
+  // blocks live outside @theme in `:root, [data-density="X"]` form (see below);
   // role tokens are not registered in @theme — they're consumed by the
   // separately-emitted spacing-utilities.css.
   const { numeric: defaultSpacingNumeric } = splitSpacingTokens(
@@ -524,10 +524,10 @@ function generateNexusCSS(
   // Fixed dimension primitives at :root (e.g. --focus-offset) — see #506.
   css += generateRootDimensionsCSS(dimensionTokens);
 
-  // Per-mode spacing override blocks (`:root, [data-style="<default>"]` for
-  // the consumer-chosen default + plain `[data-style="X"]` for the others).
+  // Per-mode spacing override blocks (`:root, [data-density="<default>"]` for
+  // the consumer-chosen default + plain `[data-density="X"]` for the others).
   // Lives outside @theme so the cascade can pick the active mode at runtime
-  // via the `data-style` attribute on any ancestor.
+  // via the `data-density` attribute on any ancestor.
   css += generateSpacingModesCSS(spacingModes, { defaultMode: spacingDefault });
   css += generateSpacingModesCSS(runtimeModes.radiusModes, {
     defaultMode: usedModes.radius || DEFAULT_CONFIG.radius,
@@ -643,7 +643,7 @@ export async function generateTailwindPackage(
     log.success(`Generated ${motionUtilities.count} motion duration utilities`);
   }
 
-  // `spacingDefault` controls which mode lands under `:root, [data-style="X"]`.
+  // `spacingDefault` controls which mode lands under `:root, [data-density="X"]`.
   // Falls back to the canonical baseline so older config objects without the
   // key (or hand-rolled test fixtures) still produce a valid build.
   const spacingDefault =

@@ -61,7 +61,7 @@ export const DOCS_THEME_BOOTSTRAP_SCRIPT = `(function () {
         link.href = STYLESHEET_HREFS[key][prefs[key]];
         document.head.appendChild(link);
       });
-      document.documentElement.setAttribute('data-style', prefs.spacing);
+      document.documentElement.setAttribute('data-density', prefs.spacing);
       var darkPref = ls.getItem(${DARK_MODE_STORAGE_KEY});
       if (darkPref !== 'dark' && darkPref !== 'light') {
         darkPref = null;
