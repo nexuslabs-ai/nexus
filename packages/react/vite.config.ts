@@ -28,8 +28,11 @@ function rewriteAppearanceDeclaration(filePath: string, content: string) {
     return {
       filePath,
       content: content.replace(
-        /from '\.\/components\/((?:primitives|ui)\/[^']+)'/g,
-        "from './components/$1/index'"
+        /from '\.\/components\/([^']+)'/g,
+        (match, entry: string) =>
+          entry.endsWith('/index')
+            ? match
+            : `from './components/${entry}/index'`
       ),
     };
   }
