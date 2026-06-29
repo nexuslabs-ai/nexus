@@ -5,6 +5,12 @@ import { describe, expect, it } from 'vitest';
 
 import { cn, NEXUS_CLASS_GROUPS, ROLE_CLASS_GROUPS } from './utils';
 
+function utilityNames(css: string) {
+  return [...css.matchAll(/@utility ([a-z-]+) \{/g)].flatMap((match) =>
+    match[1] ? [match[1]] : []
+  );
+}
+
 describe('cn — gap class group', () => {
   it('collapses two role gap utilities with last-one-wins semantics', () => {
     expect(cn('nx:gap-container', 'nx:gap-layout-section')).toBe(
@@ -25,11 +31,7 @@ describe('cn — role-utility class group parity', () => {
       resolve(here, '../../../tailwind/spacing-utilities.css'),
       'utf8'
     );
-    const emitted = new Set(
-      [...spacingUtilitiesCss.matchAll(/@utility ([a-z-]+) \{/g)].map(
-        (m) => m[1]
-      )
-    );
+    const emitted = new Set(utilityNames(spacingUtilitiesCss));
     const configured = new Set(Object.values(ROLE_CLASS_GROUPS).flat());
 
     expect([...configured].sort()).toEqual([...emitted].sort());
@@ -46,6 +48,15 @@ describe('cn — border width token utilities', () => {
     );
     expect(cn('nx:border-default', 'nx:border-transparent')).toBe(
       'nx:border-default nx:border-transparent'
+    );
+  });
+
+  it('keeps new stroke width aliases alongside new border color aliases', () => {
+    expect(cn('nx:border-width-default', 'nx:border-color-default')).toBe(
+      'nx:border-width-default nx:border-color-default'
+    );
+    expect(cn('nx:border-color-default', 'nx:border-width-default')).toBe(
+      'nx:border-color-default nx:border-width-default'
     );
   });
 
@@ -67,6 +78,19 @@ describe('cn — border width token utilities', () => {
     ).toBe('nx:border-x-default nx:border-border-default');
   });
 
+  it('collapses new stroke width aliases with old stroke width names', () => {
+    expect(cn('nx:border-width-default', 'nx:border-0')).toBe('nx:border-0');
+    expect(cn('nx:border-0', 'nx:border-width-default')).toBe(
+      'nx:border-width-default'
+    );
+    expect(cn('nx:border-default', 'nx:border-width-thick')).toBe(
+      'nx:border-width-thick'
+    );
+    expect(cn('nx:border-width-b-default', 'nx:border-b-thick')).toBe(
+      'nx:border-b-thick'
+    );
+  });
+
   it('collapses Nexus stroke utilities against native border-width overrides', () => {
     expect(cn('nx:border-default', 'nx:border-0')).toBe('nx:border-0');
     expect(cn('nx:border-0', 'nx:border-default')).toBe('nx:border-default');
@@ -83,6 +107,23 @@ describe('cn — border width token utilities', () => {
   });
 });
 
+describe('cn — border color token utilities', () => {
+  it('collapses new border color aliases with old border-border names', () => {
+    expect(cn('nx:border-color-default', 'nx:border-transparent')).toBe(
+      'nx:border-transparent'
+    );
+    expect(cn('nx:border-transparent', 'nx:border-color-default')).toBe(
+      'nx:border-color-default'
+    );
+    expect(cn('nx:border-border-default', 'nx:border-color-error')).toBe(
+      'nx:border-color-error'
+    );
+    expect(cn('nx:border-color-active', 'nx:border-border-active')).toBe(
+      'nx:border-border-active'
+    );
+  });
+});
+
 describe('cn — custom utility class group parity', () => {
   it('classGroups cover exactly the border width utilities emitted by @nexus/core', () => {
     const here = dirname(fileURLToPath(import.meta.url));
@@ -90,11 +131,7 @@ describe('cn — custom utility class group parity', () => {
       resolve(here, '../../../tailwind/borderwidth-utilities.css'),
       'utf8'
     );
-    const emitted = new Set(
-      [...borderWidthUtilitiesCss.matchAll(/@utility ([a-z-]+) \{/g)].map(
-        (m) => m[1]
-      )
-    );
+    const emitted = new Set(utilityNames(borderWidthUtilitiesCss));
     const configured = new Set(
       Object.entries(NEXUS_CLASS_GROUPS)
         .filter(
@@ -104,5 +141,28 @@ describe('cn — custom utility class group parity', () => {
     );
 
     expect([...configured].sort()).toEqual([...emitted].sort());
+  });
+
+  it('classGroups cover every generated border color alias and old equivalent', () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const borderColorAliasesCss = readFileSync(
+      resolve(here, '../../../tailwind/border-color-aliases.css'),
+      'utf8'
+    );
+    const emittedAliases = utilityNames(borderColorAliasesCss);
+    const configured = NEXUS_CLASS_GROUPS['border-color'];
+    const configuredAliases = configured.filter((name) =>
+      name.startsWith('border-color-')
+    );
+    const configuredOldNames = configured.filter((name) =>
+      name.startsWith('border-border-')
+    );
+
+    expect(configuredAliases.sort()).toEqual([...emittedAliases].sort());
+    expect(configuredOldNames.sort()).toEqual(
+      emittedAliases
+        .map((name) => name.replace('border-color-', 'border-border-'))
+        .sort()
+    );
   });
 });

@@ -21,6 +21,7 @@ import {
   filterDivergentDark,
   formatDistCssFiles,
   formatTokenValue,
+  generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
@@ -333,6 +334,7 @@ function generateModularGlobalsCSS(
       './motion-snappy.css',
       './typography-utilities.css',
       './borderwidth-utilities.css',
+      './border-color-aliases.css',
       './motion-utilities.css',
       './spacing-utilities.css',
     ],
@@ -365,6 +367,10 @@ function generateModularGlobalsCSS(
   // the same local graph.
   const spacingUtilities = generateSpacingRoleUtilitiesCSS(defaultSpacingRole);
   writeModularFile(distDir, 'spacing-utilities.css', spacingUtilities.css);
+
+  const borderColorAliases =
+    generateBorderColorAliasUtilitiesCSS(semanticTokens);
+  writeModularFile(distDir, 'border-color-aliases.css', borderColorAliases.css);
 
   return (
     semanticTokens.length +

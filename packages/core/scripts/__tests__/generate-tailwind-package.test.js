@@ -152,6 +152,7 @@ describe('generateTailwindPackage', () => {
   let motionUtilitiesCSS;
   let spacingUtilitiesCSS;
   let borderWidthUtilitiesCSS;
+  let borderColorAliasesCSS;
   let warnings;
 
   beforeAll(async () => {
@@ -172,6 +173,7 @@ describe('generateTailwindPackage', () => {
     motionUtilitiesCSS = read(distDir, 'motion-utilities.css');
     spacingUtilitiesCSS = read(distDir, 'spacing-utilities.css');
     borderWidthUtilitiesCSS = read(distDir, 'borderwidth-utilities.css');
+    borderColorAliasesCSS = read(distDir, 'border-color-aliases.css');
   });
 
   it('emits a :root block in variables.css', () => {
@@ -765,6 +767,7 @@ describe('generateTailwindPackage', () => {
       'motion-utilities.css',
       'spacing-utilities.css',
       'borderwidth-utilities.css',
+      'border-color-aliases.css',
     ]) {
       const importMatch = nexusCSS.match(
         new RegExp(`@import\\s+['"](\\./${fileName})['"]`)
@@ -813,12 +816,73 @@ describe('generateTailwindPackage', () => {
     );
   });
 
+  it('borderwidth-utilities.css declares self-describing stroke width aliases', () => {
+    const defaultBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-width-default'
+    );
+    expect(defaultBlock).toMatch(
+      /border-width:\s*var\(--nx-borderwidth-default\);/
+    );
+
+    const bottomBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-width-b-default'
+    );
+    expect(bottomBlock).toMatch(
+      /border-bottom-style:\s*var\(--tw-border-style, solid\);/
+    );
+    expect(bottomBlock).toMatch(
+      /border-bottom-width:\s*var\(--nx-borderwidth-default\);/
+    );
+
+    const inlineBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-width-x-thick'
+    );
+    expect(inlineBlock).toMatch(
+      /border-inline-style:\s*var\(--tw-border-style, solid\);/
+    );
+    expect(inlineBlock).toMatch(
+      /border-inline-width:\s*var\(--nx-borderwidth-thick\);/
+    );
+  });
+
+  it('border-color-aliases.css declares aliases for border semantic colors', () => {
+    const defaultBlock = extractBlock(
+      borderColorAliasesCSS,
+      '@utility border-color-default'
+    );
+    expect(defaultBlock).toMatch(
+      /border-color:\s*var\(--color-border-default\);/
+    );
+
+    const errorBlock = extractBlock(
+      borderColorAliasesCSS,
+      '@utility border-color-error'
+    );
+    expect(errorBlock).toMatch(/border-color:\s*var\(--color-border-error\);/);
+
+    const informationActiveBlock = extractBlock(
+      borderColorAliasesCSS,
+      '@utility border-color-information-active'
+    );
+    expect(informationActiveBlock).toMatch(
+      /border-color:\s*var\(--color-border-information-active\);/
+    );
+  });
+
   it('compiles runtime stroke utilities for all-side and one-side borders', async () => {
     const css = compactCss(
       await compileGeneratedTailwind(distDir, [
         'nx:border-default',
+        'nx:border-width-default',
         'nx:border-b-default',
+        'nx:border-width-b-default',
         'nx:border-x-thick',
+        'nx:border-width-x-thick',
+        'nx:border-color-default',
+        'nx:border-color-error',
       ])
     );
 
@@ -829,6 +893,8 @@ describe('generateTailwindPackage', () => {
     expect(css).toMatch(
       /border-inline-width:\s*var\(--nx-borderwidth-thick\);/
     );
+    expect(css).toMatch(/border-color:\s*var\(--color-border-default\);/);
+    expect(css).toMatch(/border-color:\s*var\(--color-border-error\);/);
   });
 
   it('spacing-utilities.css declares all 4 role utilities with correct property bindings', () => {

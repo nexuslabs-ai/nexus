@@ -767,7 +767,78 @@ export function generateBorderWidthUtilitiesCSS(tokens) {
     css += `}\n\n`;
   }
 
+  css += `/* Border Width Alias Utilities */\n\n`;
+
+  for (const token of tokens) {
+    const name = token.cssName.replace('nx-borderwidth-', '');
+    const value = `var(--${token.cssName})`;
+
+    css += `@utility border-width-${name} {\n`;
+    css += `  border-style: var(--tw-border-style, solid);\n`;
+    css += `  border-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-x-${name} {\n`;
+    css += `  border-inline-style: var(--tw-border-style, solid);\n`;
+    css += `  border-inline-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-y-${name} {\n`;
+    css += `  border-block-style: var(--tw-border-style, solid);\n`;
+    css += `  border-block-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-t-${name} {\n`;
+    css += `  border-top-style: var(--tw-border-style, solid);\n`;
+    css += `  border-top-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-r-${name} {\n`;
+    css += `  border-right-style: var(--tw-border-style, solid);\n`;
+    css += `  border-right-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-b-${name} {\n`;
+    css += `  border-bottom-style: var(--tw-border-style, solid);\n`;
+    css += `  border-bottom-width: ${value};\n`;
+    css += `}\n\n`;
+
+    css += `@utility border-width-l-${name} {\n`;
+    css += `  border-left-style: var(--tw-border-style, solid);\n`;
+    css += `  border-left-width: ${value};\n`;
+    css += `}\n\n`;
+  }
+
   return { css, count: tokens.length };
+}
+
+/**
+ * Generate border color alias utility CSS from semantic color tokens.
+ * Creates @utility rules with border-color-{name} patterns for every
+ * semantic color token in the border namespace.
+ *
+ * @param {object[]} tokens - Array of semantic color tokens with cssName property (e.g., "color-border-default")
+ * @returns {{ css: string, count: number }} Generated CSS and token count
+ */
+export function generateBorderColorAliasUtilitiesCSS(tokens) {
+  const borderColorTokens = (tokens ?? []).filter((token) =>
+    token.cssName.startsWith('color-border-')
+  );
+
+  if (borderColorTokens.length === 0) {
+    return { css: '', count: 0 };
+  }
+
+  let css = `/* Border Color Alias Utilities */\n\n`;
+
+  for (const token of borderColorTokens) {
+    const name = token.cssName.replace('color-border-', '');
+    css += `@utility border-color-${name} {\n`;
+    css += `  border-color: var(--${token.cssName});\n`;
+    css += `}\n\n`;
+  }
+
+  return { css, count: borderColorTokens.length };
 }
 
 // ============================================
