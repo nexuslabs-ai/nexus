@@ -116,10 +116,10 @@ export const WithBodyContent: Story = {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogBody className="nx:grid nx:gap-2">
-          <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
+          <div className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
             Future invoices will use the fallback payment method.
           </div>
-          <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
+          <div className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:p-3 nx:typography-body-default">
             Active subscriptions continue until the next billing cycle.
           </div>
         </AlertDialogBody>

@@ -5,7 +5,67 @@
   border-width: var(--nx-borderwidth-default);
 }
 
+@utility border-x-default {
+  border-inline-style: var(--tw-border-style, solid);
+  border-inline-width: var(--nx-borderwidth-default);
+}
+
+@utility border-y-default {
+  border-block-style: var(--tw-border-style, solid);
+  border-block-width: var(--nx-borderwidth-default);
+}
+
+@utility border-t-default {
+  border-top-style: var(--tw-border-style, solid);
+  border-top-width: var(--nx-borderwidth-default);
+}
+
+@utility border-r-default {
+  border-right-style: var(--tw-border-style, solid);
+  border-right-width: var(--nx-borderwidth-default);
+}
+
+@utility border-b-default {
+  border-bottom-style: var(--tw-border-style, solid);
+  border-bottom-width: var(--nx-borderwidth-default);
+}
+
+@utility border-l-default {
+  border-left-style: var(--tw-border-style, solid);
+  border-left-width: var(--nx-borderwidth-default);
+}
+
 @utility border-thick {
   border-style: var(--tw-border-style, solid);
   border-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-x-thick {
+  border-inline-style: var(--tw-border-style, solid);
+  border-inline-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-y-thick {
+  border-block-style: var(--tw-border-style, solid);
+  border-block-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-t-thick {
+  border-top-style: var(--tw-border-style, solid);
+  border-top-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-r-thick {
+  border-right-style: var(--tw-border-style, solid);
+  border-right-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-b-thick {
+  border-bottom-style: var(--tw-border-style, solid);
+  border-bottom-width: var(--nx-borderwidth-thick);
+}
+
+@utility border-l-thick {
+  border-left-style: var(--tw-border-style, solid);
+  border-left-width: var(--nx-borderwidth-thick);
 }

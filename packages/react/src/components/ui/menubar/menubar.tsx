@@ -38,7 +38,7 @@ function Menubar({ className, ...props }: MenubarProps) {
     <MenubarPrimitive.Root
       data-slot="menubar"
       className={cn(
-        'nx:flex nx:items-center nx:gap-1 nx:rounded-md nx:border nx:border-border-default nx:bg-background nx:p-1 nx:shadow-xs',
+        'nx:flex nx:items-center nx:gap-1 nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:p-1 nx:shadow-xs',
         className
       )}
       {...props}

@@ -123,7 +123,7 @@ export const ReadOnlyBoundary: Story = {
         </span>
         <div
           data-testid="native-select-display-only-value"
-          className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:px-3 nx:py-2 nx:typography-body-default nx:text-foreground"
+          className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:px-3 nx:py-2 nx:typography-body-default nx:text-foreground"
         >
           Pro
         </div>

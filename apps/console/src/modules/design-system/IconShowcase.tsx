@@ -12,8 +12,8 @@ export function IconShowcase() {
   const meta = iconLibraryMeta[library];
 
   return (
-    <section className="nx:bg-container nx:rounded-xl nx:border nx:border-border-default nx:overflow-hidden">
-      <div className="nx:px-5 nx:py-4 nx:border-b nx:border-border-default nx:bg-background-hover-alpha">
+    <section className="nx:bg-container nx:rounded-xl nx:border-default nx:border-border-default nx:overflow-hidden">
+      <div className="nx:px-5 nx:py-4 nx:border-b-default nx:border-border-default nx:bg-background-hover-alpha">
         <div className="nx:flex nx:items-center nx:justify-between">
           <div>
             <h2 className="nx:typography-heading-xsmall nx:text-foreground">

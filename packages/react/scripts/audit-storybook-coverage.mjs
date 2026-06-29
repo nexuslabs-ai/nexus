@@ -22,7 +22,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  APPEARANCE_SOURCE_DIR,
   COMPONENT_SUBDIRS,
   componentDirSegment,
   NESTED_SUBDIRS,
@@ -32,7 +31,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const SRC_ROOT = path.join(__dirname, '..', 'src');
 const COMPONENTS_ROOT = path.join(SRC_ROOT, 'components');
-const APPEARANCE_ROOT = path.join(SRC_ROOT, 'appearance');
 const CONFIG_PATH = path.join(__dirname, 'storybook-coverage.config.json');
 const EXCLUDE_PATH_FRAGMENTS = ['node_modules', 'dist'];
 const STORY_SUFFIX = '.stories.tsx';
@@ -48,7 +46,6 @@ const FLAG_PATTERN = /^--([a-zA-Z][a-zA-Z0-9-]*)(?:=(.+))?$/;
 const DOCS_HINT = 'see .claude/rules/testing-react.md';
 const DEFAULT_SEARCH_ROOTS = [
   { root: COMPONENTS_ROOT, sourceDirs: COMPONENT_SUBDIRS },
-  { root: APPEARANCE_ROOT, sourceDirs: [APPEARANCE_SOURCE_DIR] },
 ];
 
 class ConfigError extends Error {}
@@ -615,10 +612,8 @@ export function findStoriesFile(componentFile) {
 }
 
 /**
- * List every audited component file for `--all` mode. Component/primitives
- * folders are discovered structurally. Appearance is intentionally config-led:
- * private composition files live flat beside public entries, so only explicit
- * storybook-coverage.config.json rows join the sweep.
+ * List every audited package component file for `--all` mode.
+ * Component/primitives folders are discovered structurally.
  */
 export function listAllComponents(root = COMPONENTS_ROOT) {
   const out = [];
@@ -629,21 +624,8 @@ export function listAllComponents(root = COMPONENTS_ROOT) {
 
   for (const { root: searchRoot, sourceDirs } of searchRoots) {
     for (const sourceDir of sourceDirs) {
-      const dir =
-        sourceDir === APPEARANCE_SOURCE_DIR
-          ? searchRoot
-          : path.join(searchRoot, sourceDir);
+      const dir = path.join(searchRoot, sourceDir);
       if (!fs.existsSync(dir)) continue;
-      if (sourceDir === APPEARANCE_SOURCE_DIR) {
-        const config = readConfig();
-        for (const entry of config.components ?? []) {
-          if (entry.sourceDir !== APPEARANCE_SOURCE_DIR) continue;
-          const kebab = pascalToKebab(entry.name);
-          const full = path.join(dir, `${kebab}.tsx`);
-          if (fs.existsSync(full) && !isExcludedPath(full)) out.push(full);
-        }
-        continue;
-      }
       if (NESTED_SUBDIRS.has(sourceDir)) {
         // Per-component folder: each child dir holds `{kebab}/{kebab}.tsx`.
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {

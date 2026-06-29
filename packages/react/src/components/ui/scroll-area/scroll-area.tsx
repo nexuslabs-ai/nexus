@@ -34,7 +34,7 @@ interface ScrollAreaProps extends React.ComponentProps<
  *
  * @example
  * ```tsx
- * <ScrollArea className="nx:h-72 nx:w-64 nx:rounded-md nx:border nx:border-border-default">
+ * <ScrollArea className="nx:h-72 nx:w-64 nx:rounded-md nx:border-default nx:border-border-default">
  *   <div className="nx:p-4">{longContent}</div>
  * </ScrollArea>
  * ```
@@ -42,7 +42,7 @@ interface ScrollAreaProps extends React.ComponentProps<
  * @example
  * ```tsx
  * // Horizontal scrolling — add a horizontal ScrollBar after the content.
- * <ScrollArea className="nx:w-96 nx:rounded-md nx:border nx:border-border-default nx:whitespace-nowrap">
+ * <ScrollArea className="nx:w-96 nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
  *   <div className="nx:flex nx:w-max nx:gap-4 nx:p-4">{tags}</div>
  *   <ScrollBar orientation="horizontal" />
  * </ScrollArea>
@@ -71,7 +71,7 @@ function ScrollArea({ className, children, ...props }: ScrollAreaProps) {
       <ScrollBar />
       <ScrollAreaPrimitive.Corner
         data-slot="scroll-area-corner"
-        className="nx:forced-colors:border nx:forced-colors:border-[ButtonBorder] nx:forced-colors:bg-[Canvas]"
+        className="nx:forced-colors:border-default nx:forced-colors:border-[ButtonBorder] nx:forced-colors:bg-[Canvas]"
       />
     </ScrollAreaPrimitive.Root>
   );
@@ -94,9 +94,9 @@ const scrollBarVariants = cva(
     variants: {
       orientation: {
         vertical:
-          'nx:h-full nx:w-2.5 nx:border-l nx:border-l-transparent nx:forced-colors:border-l-[ButtonBorder]',
+          'nx:h-full nx:w-2.5 nx:border-l-default nx:border-l-transparent nx:forced-colors:border-l-[ButtonBorder]',
         horizontal:
-          'nx:h-2.5 nx:flex-col nx:border-t nx:border-t-transparent nx:forced-colors:border-t-[ButtonBorder]',
+          'nx:h-2.5 nx:flex-col nx:border-t-default nx:border-t-transparent nx:forced-colors:border-t-[ButtonBorder]',
       },
     },
     defaultVariants: {

@@ -4,8 +4,9 @@ import { DEFAULT_NEXUS_APPEARANCE } from '@nexus/core';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { createNexusAppearance } from './factory';
 import { useNexusAppearance } from './provider';
-import { createNexusAppearance, NexusAppearanceScript } from './script';
+import { createNexusAppearanceScript, NexusAppearanceScript } from './script';
 
 describe('NexusAppearanceScript', () => {
   beforeEach(() => {
@@ -26,16 +27,38 @@ describe('NexusAppearanceScript', () => {
     expect(html).toContain('data-nexus-appearance-script');
   });
 
-  it('creates a provider and script closed over the same config', async () => {
-    const appearance = createNexusAppearance({
+  it('renders a locked no-storage bootstrap script', () => {
+    const html = renderToStaticMarkup(
+      <NexusAppearanceScript
+        storageKey={false}
+        defaultState={{ ...DEFAULT_NEXUS_APPEARANCE, mode: 'dark' }}
+      />
+    );
+
+    expect(html).toContain('var k=false');
+    expect(html).toContain('data-nexus-appearance-script');
+  });
+
+  it('creates a configured server-safe script', () => {
+    const ConfiguredNexusAppearanceScript = createNexusAppearanceScript({
       storageKey: 'factory-appearance',
       defaultState: { ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'slate' },
     });
 
     const html = renderToStaticMarkup(
-      <appearance.NexusAppearanceScript nonce="nonce-2" />
+      <ConfiguredNexusAppearanceScript nonce="nonce-2" />
     );
     expect(html).toContain('factory-appearance');
+    expect(html).toContain('nonce="nonce-2"');
+    expect(html).toContain('slate');
+  });
+
+  it('creates a provider closed over the same config', async () => {
+    const appearance = createNexusAppearance({
+      storageKey: 'factory-appearance',
+      cookieKey: 'factory-appearance-cookie',
+      defaultState: { ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'slate' },
+    });
 
     const { result } = renderHook(() => useNexusAppearance(), {
       wrapper: ({ children }) => (

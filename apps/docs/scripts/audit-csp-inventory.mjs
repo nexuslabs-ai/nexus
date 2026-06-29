@@ -7,6 +7,12 @@ const docsRoot = path.resolve(
   '..'
 );
 const appOutputDir = path.join(docsRoot, '.next', 'server', 'app');
+const appearanceFixtureSource = path.join(
+  docsRoot,
+  'app',
+  'appearance-ssr',
+  'page.tsx'
+);
 const inlineScriptPattern =
   /<script\b(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi;
 
@@ -23,6 +29,9 @@ if (!existsSync(appOutputDir)) {
 }
 
 const htmlFiles = walk(appOutputDir).filter((file) => file.endsWith('.html'));
+const serverFiles = walk(appOutputDir).filter((file) =>
+  /\.(?:js|mjs)$/.test(file)
+);
 
 if (htmlFiles.length === 0) {
   console.error('No prerendered app HTML files found under .next/server/app.');
@@ -30,9 +39,12 @@ if (htmlFiles.length === 0) {
 }
 
 let bootstrapScripts = 0;
+let appearanceScripts = 0;
 let inlineScripts = 0;
 let inlineStyleAttributes = 0;
 let serializedBootstrapReferences = 0;
+let serializedAppearanceReferences = 0;
+let fixtureOrderChecks = 0;
 
 for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
@@ -43,9 +55,34 @@ for (const file of htmlFiles) {
   bootstrapScripts += scripts.filter(([, attrs]) =>
     attrs.includes('data-nexus-theme-bootstrap')
   ).length;
+  appearanceScripts += scripts.filter(([, attrs]) =>
+    attrs.includes('data-nexus-appearance-script')
+  ).length;
   serializedBootstrapReferences += scripts.filter(([, , body]) =>
     body.includes('nexus-docs-tokens')
   ).length;
+  serializedAppearanceReferences += scripts.filter(([, attrs, body]) =>
+    `${attrs}\n${body}`.includes('data-nexus-appearance-script')
+  ).length;
+
+  const scriptIndex = html.indexOf('data-nexus-appearance-script');
+  const markerIndex = html.indexOf('data-nexus-appearance-fixture-marker');
+  if (scriptIndex !== -1 && markerIndex !== -1) {
+    fixtureOrderChecks++;
+    if (scriptIndex > markerIndex) {
+      console.error(
+        `${file}: expected data-nexus-appearance-script before fixture marker.`
+      );
+      process.exit(1);
+    }
+  }
+}
+
+for (const file of serverFiles) {
+  const source = readFileSync(file, 'utf8');
+  if (source.includes('data-nexus-appearance-script')) {
+    serializedAppearanceReferences++;
+  }
 }
 
 console.log(
@@ -54,8 +91,11 @@ console.log(
       htmlFiles: htmlFiles.length,
       inlineScripts,
       bootstrapScripts,
-      nextInlineScripts: inlineScripts - bootstrapScripts,
+      appearanceScripts,
+      nextInlineScripts: inlineScripts - bootstrapScripts - appearanceScripts,
       serializedBootstrapReferences,
+      serializedAppearanceReferences,
+      fixtureOrderChecks,
       inlineStyleAttributes,
     },
     null,
@@ -64,6 +104,28 @@ console.log(
 );
 
 if (bootstrapScripts === 0) {
-  console.error('Expected the docs theme bootstrap script in prerendered HTML.');
+  console.error(
+    'Expected the docs theme bootstrap script in prerendered HTML.'
+  );
   process.exit(1);
+}
+
+if (serializedAppearanceReferences === 0) {
+  console.error(
+    'Expected the package appearance bootstrap script in the built fixture.'
+  );
+  process.exit(1);
+}
+
+if (fixtureOrderChecks === 0 && existsSync(appearanceFixtureSource)) {
+  const source = readFileSync(appearanceFixtureSource, 'utf8');
+  const scriptIndex = source.indexOf('<NexusAppearanceScript');
+  const markerIndex = source.indexOf('data-nexus-appearance-fixture-marker');
+
+  if (scriptIndex === -1 || markerIndex === -1 || scriptIndex > markerIndex) {
+    console.error(
+      'Expected apps/docs/app/appearance-ssr/page.tsx to render NexusAppearanceScript before the fixture marker.'
+    );
+    process.exit(1);
+  }
 }

@@ -51,7 +51,7 @@ function RuntimeUtilityCard({
 }) {
   return (
     <article
-      className={`nx:flex nx:min-h-36 nx:flex-col nx:justify-between nx:gap-4 nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4 ${className}`}
+      className={`nx:flex nx:min-h-36 nx:flex-col nx:justify-between nx:gap-4 nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-4 ${className}`}
       data-testid={`shadow-${tier}`}
     >
       <div className="nx:flex nx:flex-col nx:gap-1">

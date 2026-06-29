@@ -63,7 +63,7 @@ export function InboxRoute() {
       {isDesktop ? (
         <ResizablePanelGroup
           orientation="horizontal"
-          className="nx:border-border-default nx:min-h-0 nx:flex-1 nx:overflow-hidden nx:rounded-lg nx:border"
+          className="nx:border-border-default nx:min-h-0 nx:flex-1 nx:overflow-hidden nx:rounded-lg nx:border-default"
         >
           <ResizablePanel
             defaultSize="28%"
@@ -80,7 +80,7 @@ export function InboxRoute() {
         </ResizablePanelGroup>
       ) : (
         // Below lg only one pane shows at a time, toggled by `c`.
-        <div className="nx:border-border-default nx:flex nx:min-h-0 nx:flex-1 nx:overflow-hidden nx:rounded-lg nx:border">
+        <div className="nx:border-border-default nx:flex nx:min-h-0 nx:flex-1 nx:overflow-hidden nx:rounded-lg nx:border-default">
           <aside
             className={`nx:min-h-0 nx:w-full nx:min-w-0 nx:flex-col ${c ? 'nx:hidden' : 'nx:flex'}`}
           >

@@ -347,7 +347,7 @@ function Sidebar({
           (variant === 'floating' || variant === 'inset') && 'nx:p-2',
           variant === 'floating' || variant === 'inset'
             ? 'nx:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
-            : 'nx:group-data-[collapsible=icon]:w-(--sidebar-width-icon) nx:group-data-[side=left]:border-r nx:group-data-[side=right]:border-l nx:border-nav-border',
+            : 'nx:group-data-[collapsible=icon]:w-(--sidebar-width-icon) nx:group-data-[side=left]:border-r-default nx:group-data-[side=right]:border-l-default nx:border-nav-border',
           className
         )}
         style={style}
@@ -355,7 +355,7 @@ function Sidebar({
       >
         <div
           data-slot="sidebar-inner"
-          className="nx:flex nx:h-full nx:w-full nx:flex-col nx:bg-nav-background nx:group-data-[variant=floating]:rounded-lg nx:group-data-[variant=floating]:border nx:group-data-[variant=floating]:border-nav-border nx:group-data-[variant=floating]:shadow-sm"
+          className="nx:flex nx:h-full nx:w-full nx:flex-col nx:bg-nav-background nx:group-data-[variant=floating]:rounded-lg nx:group-data-[variant=floating]:border-default nx:group-data-[variant=floating]:border-nav-border nx:group-data-[variant=floating]:shadow-sm"
         >
           {children}
         </div>
@@ -794,7 +794,7 @@ const sidebarMenuButtonVariants = cva(
       variant: {
         default: 'nx:hover:bg-nav-item-hover',
         outline:
-          'nx:border nx:border-nav-border nx:bg-background nx:hover:bg-nav-item-hover',
+          'nx:border-default nx:border-nav-border nx:bg-background nx:hover:bg-nav-item-hover',
       },
       size: {
         default:
@@ -1048,7 +1048,7 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
     <ul
       data-slot="sidebar-menu-sub"
       className={cn(
-        'nx:ml-3.5 nx:flex nx:min-w-0 nx:translate-x-px nx:flex-col nx:gap-px nx:border-l nx:border-nav-border nx:pl-2.5 nx:py-0.5',
+        'nx:ml-3.5 nx:flex nx:min-w-0 nx:translate-x-px nx:flex-col nx:gap-px nx:border-l-default nx:border-nav-border nx:pl-2.5 nx:py-0.5',
         'nx:group-data-[collapsible=icon]:hidden',
         className
       )}

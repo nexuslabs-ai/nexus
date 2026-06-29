@@ -341,34 +341,18 @@ describe('file discovery', () => {
     expect(stories.endsWith('Button.stories.tsx')).toBe(true);
   });
 
-  it('resolves appearance components from src/appearance', () => {
-    const file = findComponentFile('appearance-settings');
-    expect(file.endsWith('/src/appearance/appearance-settings.tsx')).toBe(true);
-
-    const result = auditComponent(file);
-    expect(result.findings).toEqual([]);
-  });
-
   it('throws ConfigError for missing components', () => {
     expect(() => findComponentFile('nonexistent-component')).toThrow(
       /not found/
     );
   });
 
-  it('lists every component file under ui/primitives and configured appearance entries', () => {
+  it('lists every component file under ui/primitives only', () => {
     const files = listAllComponents();
     expect(files.length).toBeGreaterThan(10);
     expect(files.every((f) => f.endsWith('.tsx'))).toBe(true);
     expect(files.every((f) => !f.endsWith('.stories.tsx'))).toBe(true);
-    expect(
-      files.some((f) => f.endsWith('/src/appearance/appearance-settings.tsx'))
-    ).toBe(true);
-    expect(
-      files.some((f) => f.endsWith('/src/appearance/theme-quick-control.tsx'))
-    ).toBe(true);
-    expect(
-      files.some((f) => f.endsWith('/src/appearance/color-field.tsx'))
-    ).toBe(false);
+    expect(files.some((f) => f.includes('/src/appearance/'))).toBe(false);
   });
 });
 

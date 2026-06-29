@@ -58,7 +58,8 @@ function EmptyState({
       data-bordered={bordered || undefined}
       className={cn(
         'nx:flex nx:min-w-0 nx:flex-1 nx:flex-col nx:items-center nx:justify-center nx:gap-6 nx:rounded-lg nx:p-6 nx:text-center nx:text-balance',
-        bordered && 'nx:border nx:border-dashed nx:border-border-default',
+        bordered &&
+          'nx:border-default nx:border-dashed nx:border-border-default',
         className
       )}
       {...props}

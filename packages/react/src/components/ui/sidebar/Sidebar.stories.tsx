@@ -147,7 +147,7 @@ function DemoSidebar(props: React.ComponentProps<typeof Sidebar>) {
 function DemoInset({ children }: { children?: React.ReactNode }) {
   return (
     <SidebarInset>
-      <header className="nx:flex nx:h-16 nx:items-center nx:gap-2 nx:border-b nx:border-border-default nx:px-4">
+      <header className="nx:flex nx:h-16 nx:items-center nx:gap-2 nx:border-b-default nx:border-border-default nx:px-4">
         <SidebarTrigger />
         <span className="nx:typography-label-default">Dashboard</span>
       </header>
@@ -639,7 +639,7 @@ export const StylingContracts: Story = {
  */
 export const AllVariants: Story = {
   render: () => (
-    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border nx:border-border-default">
+    <div className="nx:h-96 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default">
       <SidebarProvider style={{ minHeight: 'unset', height: '100%' }}>
         <Sidebar collapsible="none">
           <SidebarHeader>

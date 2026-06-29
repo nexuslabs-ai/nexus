@@ -36,7 +36,7 @@ export const Vertical: Story = {
 
 export const InContext: Story = {
   render: () => (
-    <div className="nx:max-w-xs nx:rounded-lg nx:border nx:border-border-default nx:bg-container nx:p-4">
+    <div className="nx:max-w-xs nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container nx:p-4">
       <div className="nx:flex nx:flex-col nx:gap-1">
         <span className="nx:typography-label-default nx:text-container-foreground">
           Radix Primitives

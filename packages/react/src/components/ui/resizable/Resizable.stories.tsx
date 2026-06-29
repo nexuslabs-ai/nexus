@@ -19,7 +19,7 @@ export default meta;
 type Story = StoryObj<typeof ResizablePanelGroup>;
 
 const groupClass =
-  'nx:max-w-md nx:overflow-hidden nx:rounded-lg nx:border nx:border-border-default';
+  'nx:max-w-md nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default';
 
 // react-resizable-panels sets the group to height:100% inline (beating any
 // height class) and spreads consumer style after it — so a fixed demo height

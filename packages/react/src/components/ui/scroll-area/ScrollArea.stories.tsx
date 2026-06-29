@@ -60,7 +60,7 @@ const jobRuns = Array.from({ length: 28 }, (_, i) => ({
 // content and surfaces the auto-rendered vertical ScrollBar on hover.
 export const Default: Story = {
   render: () => (
-    <ScrollArea className="nx:h-48 nx:w-72 nx:rounded-md nx:border nx:border-border-default">
+    <ScrollArea className="nx:h-48 nx:w-72 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:flex nx:flex-col nx:gap-3 nx:p-4 nx:typography-label-default nx:text-foreground">
         <h4 className="nx:font-medium nx:leading-none">Release notes</h4>
         {releaseNotes.map((note, i) => (
@@ -76,7 +76,7 @@ export const Default: Story = {
 // A scrollable list of discrete rows.
 export const VerticalList: Story = {
   render: () => (
-    <ScrollArea className="nx:h-72 nx:w-56 nx:rounded-md nx:border nx:border-border-default">
+    <ScrollArea className="nx:h-72 nx:w-56 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:p-4">
         <h4 className="nx:mb-3 nx:typography-label-default nx:leading-none nx:text-foreground">
           Builds
@@ -85,7 +85,7 @@ export const VerticalList: Story = {
           {versions.map((version) => (
             <li
               key={version}
-              className="nx:border-b nx:border-border-default nx:py-2 nx:typography-label-default nx:text-foreground nx:last:border-b-0"
+              className="nx:border-b-default nx:border-border-default nx:py-2 nx:typography-label-default nx:text-foreground nx:last:border-b-0"
             >
               {version}
             </li>
@@ -100,7 +100,7 @@ export const VerticalList: Story = {
 // the content. The content lays out in a `nx:w-max` flex row so it overflows.
 export const HorizontalRow: Story = {
   render: () => (
-    <ScrollArea className="nx:w-96 nx:rounded-md nx:border nx:border-border-default nx:whitespace-nowrap">
+    <ScrollArea className="nx:w-96 nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
       <div className="nx:flex nx:w-max nx:gap-4 nx:p-4">
         {artworks.map((artwork) => (
           <figure key={artwork.title} className="nx:shrink-0">
@@ -125,7 +125,7 @@ export const HorizontalRow: Story = {
 // where they meet.
 export const Both: Story = {
   render: () => (
-    <ScrollArea className="nx:h-72 nx:w-96 nx:rounded-md nx:border nx:border-border-default">
+    <ScrollArea className="nx:h-72 nx:w-96 nx:rounded-md nx:border-default nx:border-border-default">
       <div className="nx:w-max nx:p-4">
         {Array.from({ length: 20 }, (_, row) => (
           <div key={row} className="nx:flex nx:gap-2 nx:py-1">
@@ -158,10 +158,10 @@ export const VisibleAffordance: Story = {
   render: () => (
     <ScrollArea
       type="always"
-      className="nx:h-64 nx:w-80 nx:rounded-md nx:border nx:border-border-default"
+      className="nx:h-64 nx:w-80 nx:rounded-md nx:border-default nx:border-border-default"
     >
       <div className="nx:w-max nx:p-4">
-        <div className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:pb-2 nx:typography-label-small nx:text-muted-foreground">
+        <div className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b-default nx:border-border-default nx:pb-2 nx:typography-label-small nx:text-muted-foreground">
           <span>Run</span>
           <span>Branch</span>
           <span>Owner</span>
@@ -172,7 +172,7 @@ export const VisibleAffordance: Story = {
           {jobRuns.map((run) => (
             <div
               key={run.id}
-              className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b nx:border-border-default nx:py-2 nx:typography-label-default nx:text-foreground nx:last:border-b-0"
+              className="nx:grid nx:grid-cols-[112px_160px_96px_96px_96px] nx:gap-x-4 nx:border-b-default nx:border-border-default nx:py-2 nx:typography-label-default nx:text-foreground nx:last:border-b-0"
             >
               <span className="nx:font-mono nx:typography-label-small">
                 {run.id}
@@ -244,12 +244,12 @@ export const InCard: Story = {
         <CardTitle>Builds</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="nx:h-48 nx:rounded-md nx:border nx:border-border-default">
+        <ScrollArea className="nx:h-48 nx:rounded-md nx:border-default nx:border-border-default">
           <ul className="nx:flex nx:flex-col nx:p-3">
             {versions.map((version) => (
               <li
                 key={version}
-                className="nx:border-b nx:border-border-default nx:py-2 nx:typography-label-default nx:text-container-foreground nx:last:border-b-0"
+                className="nx:border-b-default nx:border-border-default nx:py-2 nx:typography-label-default nx:text-container-foreground nx:last:border-b-0"
               >
                 {version}
               </li>
@@ -271,7 +271,7 @@ export const WithDataAttributes: Story = {
   render: () => (
     <ScrollArea
       type="always"
-      className="nx:h-32 nx:w-48 nx:rounded-md nx:border nx:border-border-default"
+      className="nx:h-32 nx:w-48 nx:rounded-md nx:border-default nx:border-border-default"
     >
       <div className="nx:flex nx:flex-col nx:gap-2 nx:p-4 nx:typography-label-default nx:text-foreground">
         {Array.from({ length: 12 }, (_, i) => (
@@ -305,12 +305,12 @@ export const AllVariants: Story = {
     <div className="nx:flex nx:flex-wrap nx:items-start nx:gap-6 nx:typography-label-default nx:text-foreground">
       <div className="nx:flex nx:flex-col nx:gap-2">
         <span className="nx:text-muted-foreground">Vertical</span>
-        <ScrollArea className="nx:h-40 nx:w-48 nx:rounded-md nx:border nx:border-border-default">
+        <ScrollArea className="nx:h-40 nx:w-48 nx:rounded-md nx:border-default nx:border-border-default">
           <ul className="nx:flex nx:flex-col nx:p-3">
             {versions.slice(0, 20).map((version) => (
               <li
                 key={version}
-                className="nx:border-b nx:border-border-default nx:py-1.5 nx:last:border-b-0"
+                className="nx:border-b-default nx:border-border-default nx:py-1.5 nx:last:border-b-0"
               >
                 {version}
               </li>
@@ -321,7 +321,7 @@ export const AllVariants: Story = {
 
       <div className="nx:flex nx:flex-col nx:gap-2">
         <span className="nx:text-muted-foreground">Horizontal</span>
-        <ScrollArea className="nx:w-64 nx:rounded-md nx:border nx:border-border-default nx:whitespace-nowrap">
+        <ScrollArea className="nx:w-64 nx:rounded-md nx:border-default nx:border-border-default nx:whitespace-nowrap">
           <div className="nx:flex nx:w-max nx:gap-3 nx:p-3">
             {artworks.map((artwork) => (
               <div
@@ -338,7 +338,7 @@ export const AllVariants: Story = {
 
       <div className="nx:flex nx:flex-col nx:gap-2">
         <span className="nx:text-muted-foreground">Both</span>
-        <ScrollArea className="nx:h-40 nx:w-64 nx:rounded-md nx:border nx:border-border-default">
+        <ScrollArea className="nx:h-40 nx:w-64 nx:rounded-md nx:border-default nx:border-border-default">
           <div className="nx:w-max nx:p-3">
             {Array.from({ length: 12 }, (_, row) => (
               <div key={row} className="nx:flex nx:gap-2 nx:py-1">

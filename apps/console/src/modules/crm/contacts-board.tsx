@@ -150,7 +150,7 @@ function BoardCard({ contact }: { contact: Contact }) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`nx:bg-container nx:border-border-default nx:cursor-grab nx:space-y-2 nx:rounded-md nx:border nx:p-3 nx:active:cursor-grabbing ${
+      className={`nx:bg-container nx:border-border-default nx:cursor-grab nx:space-y-2 nx:rounded-md nx:border-default nx:p-3 nx:active:cursor-grabbing ${
         isDragging ? 'nx:opacity-50' : ''
       }`}
     >

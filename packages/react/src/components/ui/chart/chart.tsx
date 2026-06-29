@@ -215,7 +215,7 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        'nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:grid nx:min-w-32 nx:items-start nx:gap-1.5 nx:rounded-md nx:border nx:px-3 nx:py-1.5 nx:typography-body-small nx:shadow-lg',
+        'nx:border-border-default nx:bg-popover nx:text-popover-foreground nx:grid nx:min-w-32 nx:items-start nx:gap-1.5 nx:rounded-md nx:border-default nx:px-3 nx:py-1.5 nx:typography-body-small nx:shadow-lg',
         className
       )}
     >

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -289,6 +291,12 @@ describe('createNexusThemeContract', () => {
 
 describe('appearancePrefsToCss', () => {
   const prefs = DEFAULT_NEXUS_APPEARANCE.prefs;
+  const typographyVarPattern =
+    /--nx-typography-(?:size|line-height)-[a-z0-9]+:\s*[^;]+;/g;
+
+  function typographyDeclarations(css: string) {
+    return (css.match(typographyVarPattern) ?? []).sort();
+  }
 
   it('emits font variables, clamped root size, code size, and smoothing', () => {
     const css = appearancePrefsToCss({
@@ -302,8 +310,23 @@ describe('appearancePrefsToCss', () => {
     expect(css).toContain('--nx-typography-family-font-sans: Inter;');
     expect(css).toContain('--nx-typography-family-font-mono: JetBrains Mono;');
     expect(css).toContain('font-size: 32px;');
-    expect(css).toContain('code, pre, .nx\\:font-mono { font-size: 12px; }');
+    expect(css).toContain('--nx-typography-size-sm: 32px;');
+    expect(css).toContain('--nx-typography-line-height-sm: 45.7143px;');
+    expect(css).toContain(
+      'code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: 12px; }'
+    );
     expect(css).toContain('-webkit-font-smoothing: antialiased');
+  });
+
+  it('keeps default runtime typography variables in parity with generated tokens', () => {
+    const generatedCss = readFileSync(
+      resolve(process.cwd(), 'packages/tailwind/variables.css'),
+      'utf8'
+    );
+
+    expect(typographyDeclarations(appearancePrefsToCss(prefs))).toEqual(
+      typographyDeclarations(generatedCss)
+    );
   });
 
   it('emits the reduced-motion block only when reduceMotion is on', () => {

@@ -55,7 +55,7 @@ function Checkbox({ className, ...props }: CheckboxProps) {
       data-slot="checkbox"
       className={cn(
         'nx:group nx:peer nx:inline-flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center',
-        'nx:rounded-sm nx:border nx:border-border-default nx:bg-background',
+        'nx:rounded-sm nx:border-default nx:border-border-default nx:bg-background',
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',

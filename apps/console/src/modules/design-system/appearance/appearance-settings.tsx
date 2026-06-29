@@ -1,3 +1,5 @@
+import { type KeyboardEvent, useState } from 'react';
+
 import {
   BASE_TONE_OPTIONS,
   CORNER_OPTIONS,
@@ -12,29 +14,27 @@ import {
   type NexusSurfaceTone,
   STROKE_OPTIONS,
 } from '@nexus/core';
-
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+  Slider,
+  Switch,
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@nexus/react';
+import { useNexusAppearance } from '@nexus/react/appearance';
 
 import { NexusAppearanceColorField } from './color-field';
 import { NexusAppearanceConfigPreview } from './config-preview';
-import { useNexusAppearance } from './provider';
 import { NexusAppearanceSettingRow } from './setting-row';
 
 const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];
@@ -43,6 +43,8 @@ const REDUCE_MOTION_OPTIONS: NexusAppearancePrefs['reduceMotion'][] = [
   'on',
   'off',
 ];
+const FONT_SIZE_MIN = 8;
+const FONT_SIZE_MAX = 32;
 
 function isAppearanceMode(value: string): value is NexusAppearanceMode {
   return APPEARANCE_MODES.includes(value as NexusAppearanceMode);
@@ -83,6 +85,69 @@ function AxisSelect<TValue extends string>({
         ))}
       </SelectContent>
     </Select>
+  );
+}
+
+function parseFontSize(value: string) {
+  if (value.trim() === '') return null;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.min(FONT_SIZE_MAX, Math.max(FONT_SIZE_MIN, Math.round(parsed)));
+}
+
+function FontSizeInput({
+  value,
+  onCommit,
+  ariaLabel,
+}: {
+  value: number;
+  onCommit: (value: number) => void;
+  ariaLabel: string;
+}) {
+  const [draft, setDraft] = useState(String(value));
+  const [lastValue, setLastValue] = useState(value);
+  if (value !== lastValue) {
+    setLastValue(value);
+    setDraft(String(value));
+  }
+
+  const commitDraft = () => {
+    const parsed = parseFontSize(draft);
+    if (parsed === null) {
+      setDraft(String(value));
+      return;
+    }
+
+    setDraft(String(parsed));
+    onCommit(parsed);
+  };
+
+  const resetDraft = () => setDraft(String(value));
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.currentTarget.blur();
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      resetDraft();
+      event.currentTarget.blur();
+    }
+  };
+
+  return (
+    <Input
+      type="number"
+      min={FONT_SIZE_MIN}
+      max={FONT_SIZE_MAX}
+      value={draft}
+      onChange={(event) => setDraft(event.target.value)}
+      onBlur={commitDraft}
+      onKeyDown={handleKeyDown}
+      aria-label={ariaLabel}
+      className="nx:w-20"
+    />
   );
 }
 
@@ -222,29 +287,17 @@ export function NexusAppearanceSettings() {
             />
           </NexusAppearanceSettingRow>
           <NexusAppearanceSettingRow label="UI font size">
-            <Input
-              type="number"
-              min={8}
-              max={32}
+            <FontSizeInput
               value={state.prefs.uiFontSize}
-              onChange={(event) =>
-                setFontSize('uiFontSize', event.target.valueAsNumber)
-              }
-              aria-label="UI font size"
-              className="nx:w-20"
+              ariaLabel="UI font size"
+              onCommit={(value) => setFontSize('uiFontSize', value)}
             />
           </NexusAppearanceSettingRow>
           <NexusAppearanceSettingRow label="Code font size">
-            <Input
-              type="number"
-              min={8}
-              max={32}
+            <FontSizeInput
               value={state.prefs.codeFontSize}
-              onChange={(event) =>
-                setFontSize('codeFontSize', event.target.valueAsNumber)
-              }
-              aria-label="Code font size"
-              className="nx:w-20"
+              ariaLabel="Code font size"
+              onCommit={(value) => setFontSize('codeFontSize', value)}
             />
           </NexusAppearanceSettingRow>
         </CardContent>

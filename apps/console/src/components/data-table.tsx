@@ -101,7 +101,7 @@ export function DataTable<TData>({
         </InputGroup>
       )}
 
-      <div className="nx:border-border-default nx:overflow-hidden nx:rounded-md nx:border">
+      <div className="nx:border-border-default nx:overflow-hidden nx:rounded-md nx:border-default">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

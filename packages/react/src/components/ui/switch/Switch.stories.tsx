@@ -173,7 +173,7 @@ export const WithLabelAndDescription: Story = {
 
 export const LabelOnLeft: Story = {
   render: (_args) => (
-    <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border nx:border-border-default nx:p-4">
+    <div className="nx:flex nx:items-center nx:justify-between nx:gap-4 nx:rounded-lg nx:border-default nx:border-border-default nx:p-4">
       <div className="nx:space-y-0.5">
         <label
           htmlFor="marketing"

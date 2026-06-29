@@ -29,7 +29,7 @@ const buttonGroupVariants = cva(
 );
 
 const buttonGroupTextVariants = cva(
-  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border nx:border-border-default nx:bg-control-background nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
   {
     variants: {
       size: {

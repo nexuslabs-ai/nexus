@@ -612,7 +612,7 @@ export const WithPresets: Story = {
             fixedWeeks
           />
         </CardContent>
-        <CardFooter className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-t nx:border-border-default nx:p-4 nx:[&>*:last-child]:col-span-2">
+        <CardFooter className="nx:grid nx:grid-cols-2 nx:gap-2 nx:border-t-default nx:border-border-default nx:p-4 nx:[&>*:last-child]:col-span-2">
           {PRESETS.map((preset) => (
             <Button
               key={preset.label}
@@ -649,7 +649,7 @@ export const WithTime: Story = {
             defaultMonth={REFERENCE_MONTH}
           />
         </CardContent>
-        <CardFooter className="nx:border-t nx:border-border-default nx:p-4">
+        <CardFooter className="nx:border-t-default nx:border-border-default nx:p-4">
           <FieldGroup className="nx:gap-4">
             <Field>
               <FieldLabel htmlFor="time-from">Start Time</FieldLabel>

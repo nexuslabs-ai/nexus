@@ -151,6 +151,7 @@ describe('generateTailwindPackage', () => {
   let typographyCSS;
   let motionUtilitiesCSS;
   let spacingUtilitiesCSS;
+  let borderWidthUtilitiesCSS;
   let warnings;
 
   beforeAll(async () => {
@@ -170,6 +171,7 @@ describe('generateTailwindPackage', () => {
     typographyCSS = read(distDir, 'typography-utilities.css');
     motionUtilitiesCSS = read(distDir, 'motion-utilities.css');
     spacingUtilitiesCSS = read(distDir, 'spacing-utilities.css');
+    borderWidthUtilitiesCSS = read(distDir, 'borderwidth-utilities.css');
   });
 
   it('emits a :root block in variables.css', () => {
@@ -759,7 +761,11 @@ describe('generateTailwindPackage', () => {
   });
 
   it('nexus.css imports generated utility files and each import resolves', () => {
-    for (const fileName of ['motion-utilities.css', 'spacing-utilities.css']) {
+    for (const fileName of [
+      'motion-utilities.css',
+      'spacing-utilities.css',
+      'borderwidth-utilities.css',
+    ]) {
       const importMatch = nexusCSS.match(
         new RegExp(`@import\\s+['"](\\./${fileName})['"]`)
       );
@@ -773,6 +779,56 @@ describe('generateTailwindPackage', () => {
         `imported file ${importMatch[1]} must exist`
       ).toBe(true);
     }
+  });
+
+  it('borderwidth-utilities.css declares all-side and one-side stroke utilities', () => {
+    const defaultBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-default'
+    );
+    expect(defaultBlock).toMatch(
+      /border-width:\s*var\(--nx-borderwidth-default\);/
+    );
+
+    const bottomBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-b-default'
+    );
+    expect(bottomBlock).toMatch(
+      /border-bottom-style:\s*var\(--tw-border-style, solid\);/
+    );
+    expect(bottomBlock).toMatch(
+      /border-bottom-width:\s*var\(--nx-borderwidth-default\);/
+    );
+
+    const inlineBlock = extractBlock(
+      borderWidthUtilitiesCSS,
+      '@utility border-x-thick'
+    );
+    expect(inlineBlock).toMatch(
+      /border-inline-style:\s*var\(--tw-border-style, solid\);/
+    );
+    expect(inlineBlock).toMatch(
+      /border-inline-width:\s*var\(--nx-borderwidth-thick\);/
+    );
+  });
+
+  it('compiles runtime stroke utilities for all-side and one-side borders', async () => {
+    const css = compactCss(
+      await compileGeneratedTailwind(distDir, [
+        'nx:border-default',
+        'nx:border-b-default',
+        'nx:border-x-thick',
+      ])
+    );
+
+    expect(css).toMatch(/border-width:\s*var\(--nx-borderwidth-default\);/);
+    expect(css).toMatch(
+      /border-bottom-width:\s*var\(--nx-borderwidth-default\);/
+    );
+    expect(css).toMatch(
+      /border-inline-width:\s*var\(--nx-borderwidth-thick\);/
+    );
   });
 
   it('spacing-utilities.css declares all 4 role utilities with correct property bindings', () => {

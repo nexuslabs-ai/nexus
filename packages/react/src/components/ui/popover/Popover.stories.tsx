@@ -120,7 +120,7 @@ export const WithAnchor: Story = {
   render: (_args) => (
     <Popover>
       <PopoverAnchor asChild>
-        <div className="nx:rounded-md nx:border nx:border-border-default nx:bg-muted nx:p-container nx:typography-label-default nx:text-muted-foreground">
+        <div className="nx:rounded-md nx:border-default nx:border-border-default nx:bg-muted nx:p-container nx:typography-label-default nx:text-muted-foreground">
           The popover positions against this anchor box.
         </div>
       </PopoverAnchor>

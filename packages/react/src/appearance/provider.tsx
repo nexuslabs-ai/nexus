@@ -1,3 +1,5 @@
+'use client';
+
 import {
   createContext,
   type Dispatch,
@@ -21,13 +23,26 @@ import {
   resolveFirstPaint,
   sanitizeNexusAppearance,
   sanitizeNexusAppearanceSnapshot,
+  serializeNexusAppearanceStateCookie,
 } from '@nexus/core';
 
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';
 const PREFS_STYLE_SELECTOR = 'style[data-nexus-appearance-prefs]';
+const DEFAULT_COOKIE_PATH = '/';
+const DEFAULT_COOKIE_SAME_SITE = 'Lax';
+export const NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export type NexusResolvedAppearanceMode = 'light' | 'dark';
+export type NexusAppearanceCookieSameSite = 'Lax' | 'Strict' | 'None';
+
+export interface NexusAppearanceCookieOptions {
+  maxAge?: number;
+  path?: string;
+  sameSite?: NexusAppearanceCookieSameSite;
+  secure?: boolean | 'auto';
+  domain?: string;
+}
 
 export interface NexusAppearanceContextValue {
   state: NexusAppearanceState;
@@ -42,7 +57,24 @@ export interface NexusAppearanceProviderProps {
   state?: NexusAppearanceState;
   defaultState?: NexusAppearanceState;
   onStateChange?: (state: NexusAppearanceState) => void;
+  /**
+   * Client snapshot storage. When enabled, the local snapshot is read after
+   * mount and is the client-side source of truth — it takes precedence over the
+   * SSR-seeded cookie and `defaultState`. Disable with `false` to make the
+   * provider cookie/SSR-driven only.
+   */
   storageKey?: string | false;
+  /**
+   * Optional state cookie for SSR and first-paint seeding. The cookie is written
+   * from the active client state for the next request; during client hydration it
+   * is NOT read — `localStorage` (when `storageKey` is enabled) wins. This keeps
+   * the SSR paint stable: the server renders from the cookie, the client then
+   * adopts the local snapshot without a flash. Consumers who seed only the
+   * cookie (no `storageKey`, or a fresh device with no localStorage) will hydrate
+   * from `defaultState` and paint with whatever the server did not override.
+   */
+  cookieKey?: string | false;
+  cookieOptions?: NexusAppearanceCookieOptions;
 }
 
 const NexusAppearanceContext =
@@ -92,6 +124,36 @@ function writeStoredSnapshot(
     window.localStorage.setItem(storageKey, JSON.stringify(snapshot));
   } catch {
     // Storage can fail in privacy modes or quota-constrained embeds.
+  }
+}
+
+function writeStateCookie(
+  cookieKey: string | false,
+  state: NexusAppearanceState,
+  options: NexusAppearanceCookieOptions = {}
+): void {
+  if (!canUseDOM() || cookieKey === false) return;
+
+  try {
+    const maxAge = options.maxAge ?? NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS;
+    const path = options.path ?? DEFAULT_COOKIE_PATH;
+    const sameSite = options.sameSite ?? DEFAULT_COOKIE_SAME_SITE;
+    const secure =
+      options.secure === true ||
+      (options.secure !== false && window.location.protocol === 'https:');
+    const attrs = [
+      `Path=${path.replace(/[;\r\n]/g, '')}`,
+      `SameSite=${sameSite}`,
+      `Max-Age=${maxAge}`,
+      options.domain ? `Domain=${options.domain.replace(/[;\r\n]/g, '')}` : '',
+      secure ? 'Secure' : '',
+    ].filter(Boolean);
+
+    document.cookie = `${cookieKey}=${serializeNexusAppearanceStateCookie(
+      state
+    )}; ${attrs.join('; ')}`;
+  } catch {
+    // Cookie writes can fail in locked-down embeds.
   }
 }
 
@@ -155,6 +217,8 @@ export function NexusAppearanceProvider({
   defaultState,
   onStateChange,
   storageKey = DEFAULT_STORAGE_KEY,
+  cookieKey = false,
+  cookieOptions,
 }: NexusAppearanceProviderProps) {
   const isControlled = state !== undefined;
   const initialState = useMemo(
@@ -218,8 +282,17 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (mounted && !isControlled) {
       writeStoredSnapshot(storageKey, activeSnapshot);
+      writeStateCookie(cookieKey, activeState, cookieOptions);
     }
-  }, [activeSnapshot, isControlled, mounted, storageKey]);
+  }, [
+    activeSnapshot,
+    activeState,
+    cookieKey,
+    cookieOptions,
+    isControlled,
+    mounted,
+    storageKey,
+  ]);
 
   useEffect(() => {
     if (!canUseDOM() || !mounted) return;

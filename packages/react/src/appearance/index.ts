@@ -1,17 +1,18 @@
-// Public Phase-B surface only. The field components (color-field, setting-row,
-// config-preview) are internal composition details and are intentionally not
-// re-exported.
-export { NexusAppearanceSettings } from './appearance-settings';
+'use client';
+
+// Client runtime Appearance surface. Product-specific editors live in consumer
+// apps; server-safe script helpers are exported from ./appearance/server.
+export type { CreateNexusAppearanceOptions } from './factory';
+export { createNexusAppearance } from './factory';
 export type {
   NexusAppearanceContextValue,
+  NexusAppearanceCookieOptions,
+  NexusAppearanceCookieSameSite,
   NexusAppearanceProviderProps,
   NexusResolvedAppearanceMode,
 } from './provider';
-export { NexusAppearanceProvider, useNexusAppearance } from './provider';
-export type {
-  CreateNexusAppearanceOptions,
-  NexusAppearanceScriptProps,
-} from './script';
-export { createNexusAppearance, NexusAppearanceScript } from './script';
-export type { NexusThemeQuickControlProps } from './theme-quick-control';
-export { NexusThemeQuickControl } from './theme-quick-control';
+export {
+  NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS,
+  NexusAppearanceProvider,
+  useNexusAppearance,
+} from './provider';

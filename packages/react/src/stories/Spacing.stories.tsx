@@ -184,7 +184,7 @@ export const ActiveMode: Story = {
         <h3 className="nx:text-foreground nx:typography-heading-xsmall nx:font-mono">
           nx:p-container / nx:gap-container
         </h3>
-        <div className="nx:p-container nx:bg-container nx:border nx:border-border-default nx:rounded-md nx:flex nx:flex-col nx:gap-container nx:max-w-md">
+        <div className="nx:p-container nx:bg-container nx:border-default nx:border-border-default nx:rounded-md nx:flex nx:flex-col nx:gap-container nx:max-w-md">
           <div className="nx:bg-muted nx:rounded-sm nx:h-8" />
           <div className="nx:bg-muted nx:rounded-sm nx:h-8" />
         </div>

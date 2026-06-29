@@ -92,37 +92,37 @@ const badgeVariants = cva(
         variant: 'default',
         fill: 'outline',
         className:
-          'nx:border nx:border-border-primary nx:bg-primary-subtle nx:text-primary-subtle-foreground',
+          'nx:border-default nx:border-border-primary nx:bg-primary-subtle nx:text-primary-subtle-foreground',
       },
       {
         variant: 'secondary',
         fill: 'outline',
         className:
-          'nx:border nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
+          'nx:border-default nx:border-border-default nx:bg-secondary-subtle nx:text-secondary-subtle-foreground',
       },
       {
         variant: 'error',
         fill: 'outline',
         className:
-          'nx:border nx:border-border-error nx:bg-error-subtle nx:text-error-subtle-foreground',
+          'nx:border-default nx:border-border-error nx:bg-error-subtle nx:text-error-subtle-foreground',
       },
       {
         variant: 'warning',
         fill: 'outline',
         className:
-          'nx:border nx:border-border-warning nx:bg-warning-subtle nx:text-warning-subtle-foreground',
+          'nx:border-default nx:border-border-warning nx:bg-warning-subtle nx:text-warning-subtle-foreground',
       },
       {
         variant: 'success',
         fill: 'outline',
         className:
-          'nx:border nx:border-border-success nx:bg-success-subtle nx:text-success-subtle-foreground',
+          'nx:border-default nx:border-border-success nx:bg-success-subtle nx:text-success-subtle-foreground',
       },
       {
         variant: 'information',
         fill: 'outline',
         className:
-          'nx:border nx:border-border-information nx:bg-information-subtle nx:text-information-subtle-foreground',
+          'nx:border-default nx:border-border-information nx:bg-information-subtle nx:text-information-subtle-foreground',
       },
     ],
     defaultVariants: {

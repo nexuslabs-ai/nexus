@@ -40,7 +40,7 @@ function PaletteRow({ name }: { name: string }) {
           className="nx:flex nx:flex-col nx:items-center nx:gap-1"
         >
           <div
-            className="nx:rounded-sm nx:border nx:border-border-default"
+            className="nx:rounded-sm nx:border-default nx:border-border-default"
             style={{
               backgroundColor: `var(--nx-color-${name}-${shade})`,
               width: 64,
@@ -60,7 +60,7 @@ function NeutralChip({ name }: { name: string }) {
   return (
     <div className="nx:flex nx:flex-col nx:items-center nx:gap-1">
       <div
-        className="nx:rounded-sm nx:border nx:border-border-default"
+        className="nx:rounded-sm nx:border-default nx:border-border-default"
         style={{
           backgroundColor: `var(--nx-color-${name})`,
           width: 64,

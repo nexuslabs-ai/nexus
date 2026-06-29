@@ -172,7 +172,7 @@ export const MediaCard: Story = {
   render: (_args) => (
     <Card className="nx:w-[350px]">
       <div aria-hidden="true" className="nx:aspect-video nx:bg-muted nx:p-6">
-        <div className="nx:size-full nx:rounded-lg nx:border nx:border-border-default nx:bg-container" />
+        <div className="nx:size-full nx:rounded-lg nx:border-default nx:border-border-default nx:bg-container" />
       </div>
       <CardHeader>
         <CardTitle>Campaign Snapshot</CardTitle>
@@ -252,7 +252,7 @@ export const BorderedFooter: Story = {
           </span>
         </div>
       </CardContent>
-      <CardFooter className="nx:border-t nx:border-border-default nx:bg-muted nx:pt-6">
+      <CardFooter className="nx:border-t-default nx:border-border-default nx:bg-muted nx:pt-6">
         <Button variant="outline">Compare</Button>
         <Button>Upgrade</Button>
       </CardFooter>

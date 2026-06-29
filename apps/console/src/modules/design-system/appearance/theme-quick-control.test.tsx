@@ -1,8 +1,13 @@
+import {
+  NexusAppearanceProvider,
+  useNexusAppearance,
+} from '@nexus/react/appearance';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { NexusAppearanceProvider, useNexusAppearance } from './provider';
 import { NexusThemeQuickControl } from './theme-quick-control';
+
+import '@testing-library/jest-dom/vitest';
 
 function Probe() {
   const { state } = useNexusAppearance();
@@ -28,6 +33,6 @@ describe('NexusThemeQuickControl', () => {
 
     fireEvent.click(screen.getByRole('radio', { name: 'Dark' }));
 
-    expect(screen.getByLabelText('mode')).toHaveTextContent('dark');
+    expect(screen.getByLabelText('mode').textContent).toBe('dark');
   });
 });

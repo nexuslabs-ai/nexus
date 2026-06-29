@@ -318,7 +318,7 @@ function Sample({
       </p>
       <div
         className={cn(
-          'nx:border-border-default nx:bg-background nx:rounded-lg nx:border nx:p-4',
+          'nx:border-border-default nx:bg-background nx:rounded-lg nx:border-default nx:p-4',
           className
         )}
       >

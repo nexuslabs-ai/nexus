@@ -145,7 +145,7 @@ function CommandInput({ className, ...props }: CommandInputProps) {
   return (
     <div
       data-slot="command-input-wrapper"
-      className="nx:flex nx:items-center nx:border-b nx:border-border-default nx:px-3 nx:focus-within:border-border-active"
+      className="nx:flex nx:items-center nx:border-b-default nx:border-border-default nx:px-3 nx:focus-within:border-border-active"
     >
       <IconSearch className="nx:mr-2 nx:size-4 nx:shrink-0 nx:opacity-50" />
       <CommandPrimitive.Input

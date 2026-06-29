@@ -123,6 +123,36 @@ export const DEFAULT_NEXUS_APPEARANCE: NexusAppearanceState = {
 
 const FONT_PX_MIN = 8;
 const FONT_PX_MAX = 32;
+const TYPOGRAPHY_SIZE_PX = {
+  xs: 12,
+  sm: 14,
+  base: 16,
+  lg: 18,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 30,
+  '4xl': 36,
+  '5xl': 48,
+  '6xl': 60,
+  '7xl': 72,
+  '8xl': 96,
+  '9xl': 128,
+} as const;
+const TYPOGRAPHY_LINE_HEIGHT_PX = {
+  xs: 16,
+  sm: 20,
+  base: 24,
+  lg: 28,
+  xl: 28,
+  '2xl': 32,
+  '3xl': 36,
+  '4xl': 48,
+  '5xl': 48,
+  '6xl': 60,
+  '7xl': 72,
+  '8xl': 96,
+  '9xl': 128,
+} as const;
 
 const APPEARANCE_MODES = new Set<NexusAppearanceMode>([
   'light',
@@ -177,6 +207,24 @@ const clampFontSize = (value: unknown, fallback: number): number =>
   typeof value === 'number' && Number.isFinite(value) && value > 0
     ? Math.min(FONT_PX_MAX, Math.max(FONT_PX_MIN, value))
     : fallback;
+
+function formatPx(value: number): string {
+  return `${Number(value.toFixed(4))}px`;
+}
+
+function typographyScaleVariables(uiPx: number): string {
+  const scale = uiPx / DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize;
+  const sizeVars = Object.entries(TYPOGRAPHY_SIZE_PX).map(
+    ([name, value]) =>
+      `  --nx-typography-size-${name}: ${formatPx(value * scale)};`
+  );
+  const lineHeightVars = Object.entries(TYPOGRAPHY_LINE_HEIGHT_PX).map(
+    ([name, value]) =>
+      `  --nx-typography-line-height-${name}: ${formatPx(value * scale)};`
+  );
+
+  return [...sizeVars, ...lineHeightVars].join('\n');
+}
 
 // Retired public-mode codename -> friendly, applied to persisted state on read
 // (see normalizeAppearanceModeIds). Internal; correctness is covered behaviorally
@@ -290,8 +338,9 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
   --nx-typography-family-font-sans: ${prefs.uiFont};
   --nx-typography-family-font-mono: ${prefs.codeFont};
   font-size: ${uiPx}px;
+${typographyScaleVariables(uiPx)}
 }`,
-    `code, pre, .nx\\:font-mono { font-size: ${codePx}px; }`,
+    `code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
     `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; }`,
   ];
   if (prefs.pointerCursors) {
