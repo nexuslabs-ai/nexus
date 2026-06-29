@@ -9,14 +9,11 @@ import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshot,
   NEXUS_APPEARANCE_DATA_ATTRS,
-  NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
   resolveFirstPaint,
   sanitizeNexusAppearanceSnapshot,
   SNAPSHOT_VERSION,
 } from './appearance-snapshot';
 import { deriveTheme, themeToCss } from './derive-theme';
-
-const RETIRED_STYLE_ATTR = NEXUS_RETIRED_APPEARANCE_DATA_ATTRS[0];
 
 function themeCss(state = DEFAULT_NEXUS_APPEARANCE): string {
   return themeToCss(deriveTheme(createNexusThemeContract(state)));
@@ -175,10 +172,7 @@ describe('createNexusAppearanceBootstrapScript', () => {
     window.localStorage.clear();
     window.matchMedia = originalMatchMedia;
     document.documentElement.classList.remove('dark');
-    for (const attr of [
-      ...NEXUS_APPEARANCE_DATA_ATTRS,
-      ...NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
-    ]) {
+    for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
       document.documentElement.removeAttribute(attr);
     }
     document.documentElement.style.colorScheme = '';
@@ -243,17 +237,6 @@ describe('createNexusAppearanceBootstrapScript', () => {
     expect(
       document.querySelectorAll('style[data-nexus-appearance-theme]')
     ).toHaveLength(1);
-  });
-
-  it('removes the retired spacing attribute without treating it as an alias', () => {
-    document.documentElement.setAttribute(RETIRED_STYLE_ATTR, 'compact');
-
-    new Function(createNexusAppearanceBootstrapScript())();
-
-    expect(document.documentElement.getAttribute('data-density')).toBe(
-      'default'
-    );
-    expect(document.documentElement.getAttribute(RETIRED_STYLE_ATTR)).toBeNull();
   });
 
   it('uses matchMedia for system mode', () => {
@@ -324,7 +307,6 @@ describe('createNexusAppearanceBootstrapScript', () => {
         document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
           ?.content
       ).toBe(expected.metaColorScheme);
-      expect(root.getAttribute(RETIRED_STYLE_ATTR)).toBeNull();
       for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
         expect(root.getAttribute(attr)).toBe(expected.dataAttrs[attr]);
       }

@@ -16,7 +16,6 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   NEXUS_APPEARANCE_DATA_ATTRS,
-  NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
   type NexusAppearanceSnapshot,
   type NexusAppearanceState,
   resolveFirstPaint,
@@ -136,10 +135,7 @@ function removeAppearanceArtifacts(): void {
   const root = document.documentElement;
   root.classList.remove('dark');
   root.style.removeProperty('color-scheme');
-  for (const attr of [
-    ...NEXUS_APPEARANCE_DATA_ATTRS,
-    ...NEXUS_RETIRED_APPEARANCE_DATA_ATTRS,
-  ]) {
+  for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
     root.removeAttribute(attr);
   }
 }
@@ -230,9 +226,6 @@ export function NexusAppearanceProvider({
 
     const root = document.documentElement;
 
-    for (const attr of NEXUS_RETIRED_APPEARANCE_DATA_ATTRS) {
-      root.removeAttribute(attr);
-    }
     for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
       root.setAttribute(attr, firstPaint.dataAttrs[attr]);
     }
