@@ -34,6 +34,7 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "typecheck:dist-appearance": "node scripts/typecheck-appearance-dist.mjs",
+    "audit:appearance-reactivity": "node scripts/audit-appearance-reactivity.mjs",
     "audit:package-boundary": "node scripts/audit-package-boundary.mjs",
     "audit:storybook-coverage": "node scripts/audit-storybook-coverage.mjs",
     "storybook": "storybook dev -p 6006",

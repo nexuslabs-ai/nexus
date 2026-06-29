@@ -61,7 +61,7 @@ function SwatchRow({ label, value, onSelect }: SwatchRowProps) {
             >
               <span
                 className={cn(
-                  'nx:size-5 nx:rounded-full nx:border-2 nx:transition-colors',
+                  'nx:size-5 nx:rounded-full nx:border-thick nx:transition-colors',
                   active ? 'nx:border-foreground' : 'nx:border-border-default'
                 )}
                 style={{ backgroundColor: option.color }}

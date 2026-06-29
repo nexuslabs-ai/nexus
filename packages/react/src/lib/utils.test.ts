@@ -41,8 +41,14 @@ describe('cn — border width token utilities', () => {
     expect(cn('nx:border-default', 'nx:border-border-default')).toBe(
       'nx:border-default nx:border-border-default'
     );
+    expect(cn('nx:border-default', 'nx:border-border-primary')).toBe(
+      'nx:border-default nx:border-border-primary'
+    );
     expect(cn('nx:border-b-default', 'nx:border-border-default')).toBe(
       'nx:border-b-default nx:border-border-default'
+    );
+    expect(cn('nx:border-t-default', 'nx:border-border-default')).toBe(
+      'nx:border-t-default nx:border-border-default'
     );
     expect(cn('nx:border-default', 'nx:border-transparent')).toBe(
       'nx:border-default nx:border-transparent'
