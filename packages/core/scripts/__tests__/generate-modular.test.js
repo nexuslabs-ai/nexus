@@ -190,7 +190,9 @@ describe('generateModular', () => {
     }
     const globals = fs.readFileSync(path.join(dir, 'globals.css'), 'utf8');
 
-    expect(globals).toMatch(/:root,\s*\n\s*\[data-density=['"]relaxed['"]\] \{/);
+    expect(globals).toMatch(
+      /:root,\s*\n\s*\[data-density=['"]relaxed['"]\] \{/
+    );
     expect(globals).not.toMatch(
       /:root,\s*\n\s*\[data-density=['"]default['"]\] \{/
     );

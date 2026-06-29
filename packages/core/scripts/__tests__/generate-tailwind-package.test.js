@@ -567,7 +567,9 @@ describe('generateTailwindPackage', () => {
     // miss the role-token defaults (which only live in per-mode blocks, not
     // @theme). The :root selector keeps the configured default live in both
     // no-attribute and explicit data-density configurations.
-    expect(nexusCSS).toMatch(/:root,\s*\n\s*\[data-density=['"]default['"]\] \{/);
+    expect(nexusCSS).toMatch(
+      /:root,\s*\n\s*\[data-density=['"]default['"]\] \{/
+    );
   });
 
   it('emits runtime mode selectors for radius, shadow, and border width', () => {
@@ -856,7 +858,9 @@ describe('generateTailwindPackage', () => {
   it('emits 6 per-mode spacing blocks in deterministic alphabetical order (non-default modes)', () => {
     // Filesystem order isn't portable; the emitter sorts non-default modes
     // alphabetically.
-    const ordered = [...nexusCSS.matchAll(/\[data-density=['"]([a-z-]+)['"]\]/g)]
+    const ordered = [
+      ...nexusCSS.matchAll(/\[data-density=['"]([a-z-]+)['"]\]/g),
+    ]
       .map((m) => m[1])
       // De-dup in case `:root, [data-density="<default>"]` produces two captures.
       .filter((m, i, arr) => arr.indexOf(m) === i);
@@ -932,7 +936,9 @@ describe('generateTailwindPackage', () => {
     // :root must combine with [data-density="relaxed"], not default.
     expect(css).toMatch(/:root,\s*\n\s*\[data-density=['"]relaxed['"]\] \{/);
     // Default becomes a plain attribute selector (no :root combinator).
-    expect(css).not.toMatch(/:root,\s*\n\s*\[data-density=['"]default['"]\] \{/);
+    expect(css).not.toMatch(
+      /:root,\s*\n\s*\[data-density=['"]default['"]\] \{/
+    );
     // Both blocks still present — the bundle still ships all 6 modes; only
     // the cascade default moves.
     const matches = css.match(/\[data-density=['"][a-z]+['"]\]/g) ?? [];
