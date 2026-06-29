@@ -38,18 +38,23 @@ import type { NexusAppearanceState } from '@nexus/core';
 import {
   createNexusAppearance,
   NexusAppearanceProvider,
-  NexusAppearanceScript as ClientNexusAppearanceScript,
   useNexusAppearance,
 } from '@nexus/react/appearance';
-import { NexusAppearanceScript as ServerNexusAppearanceScript } from '@nexus/react/appearance/server';
+import {
+  createNexusAppearanceScript,
+  NexusAppearanceScript as ServerNexusAppearanceScript,
+} from '@nexus/react/appearance/server';
 
 const element = (
   <NexusAppearanceProvider storageKey={false} cookieKey="appearance-state">
     <Button>Confirm</Button>
   </NexusAppearanceProvider>
 );
-const clientScript = <ClientNexusAppearanceScript storageKey={false} nonce="nonce" />;
 const serverScript = <ServerNexusAppearanceScript storageKey={false} nonce="nonce" />;
+const ConfiguredNexusAppearanceScript = createNexusAppearanceScript({
+  storageKey: false,
+});
+const configuredScript = <ConfiguredNexusAppearanceScript nonce="nonce" />;
 const configured = createNexusAppearance({
   storageKey: false,
   cookieKey: "appearance-state",
@@ -68,8 +73,8 @@ setState((state) => {
 });
 
 void element;
-void clientScript;
 void serverScript;
+void configuredScript;
 void configured;
 `
 );

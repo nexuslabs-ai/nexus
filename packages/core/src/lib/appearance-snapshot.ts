@@ -8,6 +8,7 @@ import {
 import { deriveTheme, themeToCss } from './derive-theme';
 
 export const SNAPSHOT_VERSION = 3;
+const SNAPSHOT_CACHE_LIMIT = 50;
 
 export const NEXUS_APPEARANCE_DATA_ATTRS = [
   'data-density',
@@ -51,6 +52,12 @@ export const DEFAULT_COOKIE_KEY = 'nexus-appearance-state';
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
+const cachedSnapshots = new Map<string, NexusAppearanceSnapshot>();
+
+function cacheKeyForState(state: NexusAppearanceState): string {
+  return JSON.stringify(state);
+}
+
 function deriveThemeCss(state: NexusAppearanceState): string {
   return themeToCss(deriveTheme(createNexusThemeContract(state)));
 }
@@ -75,11 +82,26 @@ export function createNexusAppearanceSnapshot(
 export function createNexusAppearanceSnapshotFromState(
   state: NexusAppearanceState
 ): NexusAppearanceSnapshot {
-  return createNexusAppearanceSnapshot(
-    state,
-    deriveThemeCss(state),
-    derivePrefsCss(state)
+  const sanitizedState = sanitizeNexusAppearance(state);
+  const cacheKey = cacheKeyForState(sanitizedState);
+  const cachedSnapshot = cachedSnapshots.get(cacheKey);
+
+  if (cachedSnapshot) return cachedSnapshot;
+
+  const snapshot = createNexusAppearanceSnapshot(
+    sanitizedState,
+    deriveThemeCss(sanitizedState),
+    derivePrefsCss(sanitizedState)
   );
+
+  cachedSnapshots.set(cacheKey, snapshot);
+
+  if (cachedSnapshots.size > SNAPSHOT_CACHE_LIMIT) {
+    const oldestKey = cachedSnapshots.keys().next().value;
+    if (oldestKey) cachedSnapshots.delete(oldestKey);
+  }
+
+  return snapshot;
 }
 
 export function createNexusAppearanceStateCookie(

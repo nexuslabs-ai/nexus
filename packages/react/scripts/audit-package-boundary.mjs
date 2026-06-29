@@ -37,6 +37,10 @@ function assert(condition, message) {
   if (!condition) failures.push(message);
 }
 
+function hasUseClientDirective(source) {
+  return /^['"]use client['"];/.test(source);
+}
+
 function readBundleWithLocalImports(entryPath) {
   const seen = new Set();
   const stack = [entryPath];
@@ -80,12 +84,20 @@ const sourceIndex = readFileSync(sourceIndexPath, 'utf8');
 const sourceAppearance = readFileSync(sourceAppearancePath, 'utf8');
 
 assert(
+  hasUseClientDirective(sourceAppearance),
+  `${rel(sourceAppearancePath)} must mark the appearance runtime as a client entry.`
+);
+assert(
   !sourceIndex.includes('@nexus/core'),
   `${rel(sourceIndexPath)} must not import @nexus/core from the main entry.`
 );
 assert(
   !/NexusAppearanceSettings|NexusThemeQuickControl/.test(sourceAppearance),
   `${rel(sourceAppearancePath)} must export runtime APIs only, not console editor UI.`
+);
+assert(
+  !/NexusAppearanceScript/.test(sourceAppearance),
+  `${rel(sourceAppearancePath)} must not export the server-only appearance script. Use @nexus/react/appearance/server.`
 );
 
 if (existsSync(distIndexPath)) {
@@ -99,12 +111,20 @@ if (existsSync(distIndexPath)) {
 if (existsSync(distAppearancePath)) {
   const distAppearance = readFileSync(distAppearancePath, 'utf8');
   assert(
+    hasUseClientDirective(distAppearance),
+    `${rel(distAppearancePath)} must preserve the client directive.`
+  );
+  assert(
     distAppearance.includes('@nexus/core'),
     `${rel(distAppearancePath)} should consume the external @nexus/core runtime.`
   );
   assert(
     !/NexusAppearanceSettings|NexusThemeQuickControl/.test(distAppearance),
     `${rel(distAppearancePath)} must not ship console editor UI.`
+  );
+  assert(
+    !/NexusAppearanceScript/.test(distAppearance),
+    `${rel(distAppearancePath)} must not export the server-only appearance script.`
   );
 }
 
@@ -114,9 +134,7 @@ for (const serverEntryPath of [
 ]) {
   if (!existsSync(serverEntryPath)) continue;
 
-  const distAppearanceServer = readBundleWithLocalImports(
-    serverEntryPath
-  );
+  const distAppearanceServer = readBundleWithLocalImports(serverEntryPath);
   assert(
     distAppearanceServer.includes('@nexus/core'),
     `${rel(serverEntryPath)} should consume the external @nexus/core runtime.`

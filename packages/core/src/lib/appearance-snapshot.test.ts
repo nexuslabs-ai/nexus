@@ -9,6 +9,7 @@ import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshot,
   createNexusAppearanceSnapshotFromCookie,
+  createNexusAppearanceSnapshotFromState,
   NEXUS_APPEARANCE_DATA_ATTRS,
   parseNexusAppearanceStateCookie,
   resolveFirstPaint,
@@ -160,6 +161,18 @@ describe('NexusAppearanceSnapshot', () => {
     expect(snapshot.state).toEqual(state);
     expect(snapshot.themeCss).toBe(themeCss(state));
     expect(snapshot.prefsCss).toBe(prefsCss(state));
+  });
+
+  it('reuses derived snapshots for identical sanitized state', () => {
+    const state = {
+      ...DEFAULT_NEXUS_APPEARANCE,
+      mode: 'dark' as const,
+      surfaceTone: 'slate' as const,
+    };
+
+    expect(createNexusAppearanceSnapshotFromState(state)).toBe(
+      createNexusAppearanceSnapshotFromState({ ...state })
+    );
   });
 
   it('falls back when the state cookie is unreadable or stale', () => {

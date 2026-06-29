@@ -17,7 +17,11 @@ import {
 import { act, render, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { NexusAppearanceProvider, useNexusAppearance } from './provider';
+import {
+  NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS,
+  NexusAppearanceProvider,
+  useNexusAppearance,
+} from './provider';
 
 function resetAppearanceDom(): void {
   document.documentElement.classList.remove('dark');
@@ -301,6 +305,81 @@ describe('NexusAppearanceProvider', () => {
 
       expect(parseNexusAppearanceStateCookie(rawCookie)).toMatchObject({
         surfaceTone: 'slate',
+      });
+    });
+  });
+
+  it('writes SSR cookies with named defaults and consumer-overridden attributes', async () => {
+    const cookieSetter = vi.spyOn(document, 'cookie', 'set');
+    const { result } = renderHook(() => useNexusAppearance(), {
+      wrapper: wrapperFor({
+        storageKey: false,
+        cookieKey: 'test-appearance-cookie',
+        cookieOptions: {
+          maxAge: 120,
+          path: '/',
+          sameSite: 'Strict',
+          secure: true,
+        },
+      }),
+    });
+
+    act(() => {
+      result.current.setState((state) => ({ ...state, surfaceTone: 'slate' }));
+    });
+
+    await waitFor(() => {
+      expect(cookieSetter).toHaveBeenCalledWith(
+        expect.stringContaining(
+          '; Path=/; SameSite=Strict; Max-Age=120; Secure'
+        )
+      );
+    });
+    expect(NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS).toBe(60 * 60 * 24 * 365);
+
+    cookieSetter.mockRestore();
+  });
+
+  it('treats the cookie/default state as the SSR seed and localStorage as the client override', async () => {
+    const key = 'precedence-appearance';
+    window.localStorage.setItem(
+      key,
+      JSON.stringify(
+        snapshotFor({ ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'gray' })
+      )
+    );
+
+    const seen: string[] = [];
+
+    function Probe() {
+      const { mounted, state } = useNexusAppearance();
+      seen.push(`${mounted}:${state.surfaceTone}`);
+      return null;
+    }
+
+    render(
+      <NexusAppearanceProvider
+        defaultState={{ ...DEFAULT_NEXUS_APPEARANCE, surfaceTone: 'slate' }}
+        storageKey={key}
+        cookieKey="precedence-appearance-cookie"
+      >
+        <Probe />
+      </NexusAppearanceProvider>
+    );
+
+    expect(seen[0]).toBe('false:slate');
+
+    await waitFor(() => {
+      expect(seen[seen.length - 1]).toBe('true:gray');
+    });
+    await waitFor(() => {
+      const rawCookie = document.cookie
+        .split('; ')
+        .find((cookie) => cookie.startsWith('precedence-appearance-cookie='))
+        ?.split('=')[1];
+
+      expect(parseNexusAppearanceStateCookie(rawCookie)).toMatchObject({
+        surfaceTone: 'gray',
       });
     });
   });

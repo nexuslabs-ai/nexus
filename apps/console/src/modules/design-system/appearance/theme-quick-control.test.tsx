@@ -7,6 +7,8 @@ import { describe, expect, it } from 'vitest';
 
 import { NexusThemeQuickControl } from './theme-quick-control';
 
+import '@testing-library/jest-dom/vitest';
+
 function Probe() {
   const { state } = useNexusAppearance();
 
@@ -24,10 +26,10 @@ describe('NexusThemeQuickControl', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Theme' }));
 
-    expect(screen.getByRole('group', { name: 'Theme mode' })).toBeTruthy();
-    expect(screen.getByRole('radio', { name: 'Light' })).toBeTruthy();
-    expect(screen.getByRole('radio', { name: 'Dark' })).toBeTruthy();
-    expect(screen.getByRole('radio', { name: 'System' })).toBeTruthy();
+    expect(screen.getByRole('group', { name: 'Theme mode' })).toBeVisible();
+    expect(screen.getByRole('radio', { name: 'Light' })).toBeVisible();
+    expect(screen.getByRole('radio', { name: 'Dark' })).toBeVisible();
+    expect(screen.getByRole('radio', { name: 'System' })).toBeVisible();
 
     fireEvent.click(screen.getByRole('radio', { name: 'Dark' }));
 

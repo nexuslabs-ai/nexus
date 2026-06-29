@@ -1,3 +1,5 @@
+'use client';
+
 import {
   createContext,
   type Dispatch,
@@ -27,8 +29,20 @@ import {
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';
 const PREFS_STYLE_SELECTOR = 'style[data-nexus-appearance-prefs]';
+const DEFAULT_COOKIE_PATH = '/';
+const DEFAULT_COOKIE_SAME_SITE = 'Lax';
+export const NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export type NexusResolvedAppearanceMode = 'light' | 'dark';
+export type NexusAppearanceCookieSameSite = 'Lax' | 'Strict' | 'None';
+
+export interface NexusAppearanceCookieOptions {
+  maxAge?: number;
+  path?: string;
+  sameSite?: NexusAppearanceCookieSameSite;
+  secure?: boolean | 'auto';
+  domain?: string;
+}
 
 export interface NexusAppearanceContextValue {
   state: NexusAppearanceState;
@@ -45,6 +59,7 @@ export interface NexusAppearanceProviderProps {
   onStateChange?: (state: NexusAppearanceState) => void;
   storageKey?: string | false;
   cookieKey?: string | false;
+  cookieOptions?: NexusAppearanceCookieOptions;
 }
 
 const NexusAppearanceContext =
@@ -99,14 +114,29 @@ function writeStoredSnapshot(
 
 function writeStateCookie(
   cookieKey: string | false,
-  state: NexusAppearanceState
+  state: NexusAppearanceState,
+  options: NexusAppearanceCookieOptions = {}
 ): void {
   if (!canUseDOM() || cookieKey === false) return;
 
   try {
+    const maxAge = options.maxAge ?? NEXUS_APPEARANCE_COOKIE_MAX_AGE_SECONDS;
+    const path = options.path ?? DEFAULT_COOKIE_PATH;
+    const sameSite = options.sameSite ?? DEFAULT_COOKIE_SAME_SITE;
+    const secure =
+      options.secure === true ||
+      (options.secure !== false && window.location.protocol === 'https:');
+    const attrs = [
+      `Path=${path.replace(/[;\r\n]/g, '')}`,
+      `SameSite=${sameSite}`,
+      `Max-Age=${maxAge}`,
+      options.domain ? `Domain=${options.domain.replace(/[;\r\n]/g, '')}` : '',
+      secure ? 'Secure' : '',
+    ].filter(Boolean);
+
     document.cookie = `${cookieKey}=${serializeNexusAppearanceStateCookie(
       state
-    )}; Path=/; SameSite=Lax; Max-Age=31536000`;
+    )}; ${attrs.join('; ')}`;
   } catch {
     // Cookie writes can fail in locked-down embeds.
   }
@@ -173,6 +203,7 @@ export function NexusAppearanceProvider({
   onStateChange,
   storageKey = DEFAULT_STORAGE_KEY,
   cookieKey = false,
+  cookieOptions,
 }: NexusAppearanceProviderProps) {
   const isControlled = state !== undefined;
   const initialState = useMemo(
@@ -236,12 +267,13 @@ export function NexusAppearanceProvider({
   useEffect(() => {
     if (mounted && !isControlled) {
       writeStoredSnapshot(storageKey, activeSnapshot);
-      writeStateCookie(cookieKey, activeState);
+      writeStateCookie(cookieKey, activeState, cookieOptions);
     }
   }, [
     activeSnapshot,
     activeState,
     cookieKey,
+    cookieOptions,
     isControlled,
     mounted,
     storageKey,

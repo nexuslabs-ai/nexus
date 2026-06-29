@@ -12,6 +12,11 @@ export interface NexusAppearanceScriptProps {
   nonce?: string;
 }
 
+export interface CreateNexusAppearanceScriptOptions {
+  storageKey?: string | false;
+  defaultState?: NexusAppearanceState;
+}
+
 function defaultSnapshotFor(defaultState: NexusAppearanceState | undefined) {
   return defaultState
     ? createNexusAppearanceSnapshotFromState(
@@ -37,4 +42,23 @@ export function NexusAppearanceScript({
       }}
     />
   );
+}
+
+export function createNexusAppearanceScript({
+  storageKey,
+  defaultState,
+}: CreateNexusAppearanceScriptOptions = {}) {
+  function ConfiguredNexusAppearanceScript({
+    nonce,
+  }: Pick<NexusAppearanceScriptProps, 'nonce'>) {
+    return (
+      <NexusAppearanceScript
+        nonce={nonce}
+        storageKey={storageKey}
+        defaultState={defaultState}
+      />
+    );
+  }
+
+  return ConfiguredNexusAppearanceScript;
 }

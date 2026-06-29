@@ -4,6 +4,61 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
+const APPEARANCE_DECLARATION_ENTRIES = [
+  {
+    source: '/dist/appearance/index.d.ts',
+    sourceMap: '/dist/appearance/index.d.ts.map',
+    output: 'appearance.d.ts',
+    outputMap: 'appearance.d.ts.map',
+    mapSource: 'index.d.ts.map',
+  },
+  {
+    source: '/dist/appearance/server.d.ts',
+    sourceMap: '/dist/appearance/server.d.ts.map',
+    output: 'appearance-server.d.ts',
+    outputMap: 'appearance-server.d.ts.map',
+    mapSource: 'server.d.ts.map',
+  },
+] as const;
+
+function rewriteAppearanceDeclaration(filePath: string, content: string) {
+  const normalizedPath = filePath.split(path.sep).join('/');
+
+  for (const entry of APPEARANCE_DECLARATION_ENTRIES) {
+    if (normalizedPath.endsWith(entry.source)) {
+      return {
+        filePath: path.resolve(__dirname, 'dist', entry.output),
+        content: content
+          .replace(/from '\.\/([^']+)'/g, "from './appearance/$1'")
+          .replace(
+            `//# sourceMappingURL=${entry.mapSource}`,
+            `//# sourceMappingURL=${entry.outputMap}`
+          ),
+      };
+    }
+
+    if (normalizedPath.endsWith(entry.sourceMap)) {
+      const outputMapPath = path.resolve(__dirname, 'dist', entry.outputMap);
+
+      try {
+        const sourceMap = JSON.parse(content) as { file?: string };
+
+        sourceMap.file = entry.output;
+
+        return {
+          filePath: outputMapPath,
+          content: JSON.stringify(sourceMap),
+        };
+      } catch {
+        return {
+          filePath: outputMapPath,
+          content,
+        };
+      }
+    }
+  }
+}
+
 export default defineConfig({
   plugins: [
     react(),
@@ -13,77 +68,7 @@ export default defineConfig({
       exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
       outDir: 'dist',
       beforeWriteFile(filePath, content) {
-        const normalizedPath = filePath.split(path.sep).join('/');
-
-        if (normalizedPath.endsWith('/dist/appearance/index.d.ts')) {
-          return {
-            filePath: path.resolve(__dirname, 'dist/appearance.d.ts'),
-            content: content
-              .replace(/from '\.\/([^']+)'/g, "from './appearance/$1'")
-              .replace(
-                '//# sourceMappingURL=index.d.ts.map',
-                '//# sourceMappingURL=appearance.d.ts.map'
-              ),
-          };
-        }
-
-        if (normalizedPath.endsWith('/dist/appearance/server.d.ts')) {
-          return {
-            filePath: path.resolve(__dirname, 'dist/appearance-server.d.ts'),
-            content: content
-              .replace(/from '\.\/([^']+)'/g, "from './appearance/$1'")
-              .replace(
-                '//# sourceMappingURL=server.d.ts.map',
-                '//# sourceMappingURL=appearance-server.d.ts.map'
-              ),
-          };
-        }
-
-        if (normalizedPath.endsWith('/dist/appearance/index.d.ts.map')) {
-          const appearanceMapPath = path.resolve(
-            __dirname,
-            'dist/appearance.d.ts.map'
-          );
-
-          try {
-            const sourceMap = JSON.parse(content) as { file?: string };
-
-            sourceMap.file = 'appearance.d.ts';
-
-            return {
-              filePath: appearanceMapPath,
-              content: JSON.stringify(sourceMap),
-            };
-          } catch {
-            return {
-              filePath: appearanceMapPath,
-              content,
-            };
-          }
-        }
-
-        if (normalizedPath.endsWith('/dist/appearance/server.d.ts.map')) {
-          const appearanceServerMapPath = path.resolve(
-            __dirname,
-            'dist/appearance-server.d.ts.map'
-          );
-
-          try {
-            const sourceMap = JSON.parse(content) as { file?: string };
-
-            sourceMap.file = 'appearance-server.d.ts';
-
-            return {
-              filePath: appearanceServerMapPath,
-              content: JSON.stringify(sourceMap),
-            };
-          } catch {
-            return {
-              filePath: appearanceServerMapPath,
-              content,
-            };
-          }
-        }
+        return rewriteAppearanceDeclaration(filePath, content);
       },
     }),
   ],
@@ -123,6 +108,11 @@ export default defineConfig({
         'vaul',
       ],
       output: {
+        banner: (chunk) =>
+          chunk.fileName === 'appearance.mjs' ||
+          chunk.fileName === 'appearance.js'
+            ? "'use client';"
+            : '',
         globals: {
           '@nexus/core': 'NexusCore',
           react: 'React',

@@ -1,28 +1,29 @@
+'use client';
+
 import type { NexusAppearanceState } from '@nexus/core';
 
 import {
+  type NexusAppearanceCookieOptions,
   NexusAppearanceProvider,
   type NexusAppearanceProviderProps,
 } from './provider';
-import {
-  NexusAppearanceScript,
-  type NexusAppearanceScriptProps,
-} from './script';
 
 export interface CreateNexusAppearanceOptions {
   storageKey?: string | false;
   cookieKey?: string | false;
+  cookieOptions?: NexusAppearanceCookieOptions;
   defaultState?: NexusAppearanceState;
 }
 
 type ConfiguredProviderProps = Omit<
   NexusAppearanceProviderProps,
-  'storageKey' | 'cookieKey' | 'defaultState'
+  'storageKey' | 'cookieKey' | 'cookieOptions' | 'defaultState'
 >;
 
 export function createNexusAppearance({
   storageKey,
   cookieKey,
+  cookieOptions,
   defaultState,
 }: CreateNexusAppearanceOptions = {}) {
   function ConfiguredNexusAppearanceProvider({
@@ -34,6 +35,7 @@ export function createNexusAppearance({
         {...props}
         storageKey={storageKey}
         cookieKey={cookieKey}
+        cookieOptions={cookieOptions}
         defaultState={defaultState}
       >
         {children}
@@ -41,20 +43,7 @@ export function createNexusAppearance({
     );
   }
 
-  function ConfiguredNexusAppearanceScript({
-    nonce,
-  }: Pick<NexusAppearanceScriptProps, 'nonce'>) {
-    return (
-      <NexusAppearanceScript
-        nonce={nonce}
-        storageKey={storageKey}
-        defaultState={defaultState}
-      />
-    );
-  }
-
   return {
     NexusAppearanceProvider: ConfiguredNexusAppearanceProvider,
-    NexusAppearanceScript: ConfiguredNexusAppearanceScript,
   };
 }
