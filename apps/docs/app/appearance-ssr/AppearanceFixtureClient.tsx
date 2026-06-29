@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import * as React from 'react';
 
 import { DEFAULT_COOKIE_KEY, type NexusAppearanceState } from '@nexus/core';
 import {
@@ -10,7 +10,7 @@ import {
 
 interface AppearanceFixtureClientProps {
   defaultState: NexusAppearanceState;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 function AppearanceFixtureControls() {

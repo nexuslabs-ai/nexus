@@ -20,6 +20,38 @@ pnpm add @nexus/core
 
 See the Nexus docs, Theming -> Appearance, for setup recipes.
 
+## Non-React Shell Example
+
+Use the engine directly when a host shell owns DOM or native styling.
+
+```ts
+import {
+  createNexusAppearanceSnapshotFromState,
+  createNexusThemeContract,
+  DEFAULT_NEXUS_APPEARANCE,
+  deriveTheme,
+  resolveFirstPaint,
+  themeToCss,
+} from '@nexus/core';
+
+const state = {
+  ...DEFAULT_NEXUS_APPEARANCE,
+  brandColor: '#2563eb',
+  surfaceTone: 'slate',
+};
+const snapshot = createNexusAppearanceSnapshotFromState(state);
+const firstPaint = resolveFirstPaint(snapshot, false);
+
+document.documentElement.classList.toggle(
+  'dark',
+  firstPaint.className === 'dark'
+);
+document.documentElement.style.colorScheme = firstPaint.colorScheme;
+document.querySelector('style[data-theme]')!.textContent = themeToCss(
+  deriveTheme(createNexusThemeContract(snapshot.state))
+);
+```
+
 ## Token Architecture
 
 ### DTCG Format (W3C Standard)

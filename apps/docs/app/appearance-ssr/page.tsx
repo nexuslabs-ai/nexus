@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
@@ -16,7 +18,7 @@ export default async function AppearanceSsrFixturePage() {
   );
 
   return (
-    <>
+    <React.Fragment>
       <NexusAppearanceScript storageKey={false} defaultState={snapshot.state} />
       <section
         data-nexus-appearance-fixture=""
@@ -46,6 +48,6 @@ export default async function AppearanceSsrFixturePage() {
           </div>
         </AppearanceFixtureClient>
       </section>
-    </>
+    </React.Fragment>
   );
 }

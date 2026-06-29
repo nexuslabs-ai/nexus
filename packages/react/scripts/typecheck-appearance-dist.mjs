@@ -38,6 +38,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   type NexusAppearanceState,
 } from '@nexus/core';
+import { renderToStaticMarkup } from 'react-dom/server';
 import {
   createNexusAppearance,
   NexusAppearanceProvider,
@@ -60,7 +61,7 @@ const ConfiguredNexusAppearanceScript = createNexusAppearanceScript({
 const { NexusAppearanceProvider: ConfiguredNexusAppearanceProvider } =
   createNexusAppearance({
     storageKey: 'app-appearance',
-    cookieKey: "appearance-state",
+    cookieKey: 'appearance-state',
     defaultState,
   });
 
@@ -86,16 +87,22 @@ function ThemeControls() {
   );
 }
 
-const element = (
-  <NexusAppearanceProvider storageKey={false} cookieKey="appearance-state">
-    <ThemeControls />
-  </NexusAppearanceProvider>
-);
-const configuredElement = (
-  <ConfiguredNexusAppearanceProvider>
-    <ThemeControls />
-  </ConfiguredNexusAppearanceProvider>
-);
+function DefaultProviderProbe() {
+  return (
+    <NexusAppearanceProvider storageKey={false} cookieKey="appearance-state">
+      <ThemeControls />
+    </NexusAppearanceProvider>
+  );
+}
+
+function ConfiguredProviderProbe() {
+  return (
+    <ConfiguredNexusAppearanceProvider>
+      <ThemeControls />
+    </ConfiguredNexusAppearanceProvider>
+  );
+}
+
 const serverScript = (
   <ServerNexusAppearanceScript
     storageKey="app-appearance"
@@ -106,11 +113,13 @@ const serverScript = (
 const configuredScript = <ConfiguredNexusAppearanceScript nonce="nonce" />;
 const cookieOnly = createNexusAppearance({
   storageKey: false,
-  cookieKey: "appearance-state",
+  cookieKey: 'appearance-state',
 });
+const defaultProviderHtml = renderToStaticMarkup(<DefaultProviderProbe />);
+const configuredProviderHtml = renderToStaticMarkup(<ConfiguredProviderProbe />);
 
-void element;
-void configuredElement;
+void defaultProviderHtml;
+void configuredProviderHtml;
 void serverScript;
 void configuredScript;
 void cookieOnly;

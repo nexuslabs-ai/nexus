@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,6 +11,7 @@ const probeDir = path.join(packageRoot, '.runtime-dist-typecheck');
 const probePath = path.join(probeDir, 'probe.ts');
 const tsconfigPath = path.join(probeDir, 'tsconfig.json');
 const tscBin = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
+const packageJsonPath = path.join(packageRoot, 'package.json');
 
 const requiredDistFiles = [
   path.join(packageRoot, 'dist', 'runtime', 'index.d.ts'),
@@ -23,6 +24,45 @@ for (const distFile of requiredDistFiles) {
   if (!existsSync(distFile)) {
     throw new Error(
       `Missing ${path.relative(repoRoot, distFile)}. Run @nexus/core build before this dist typecheck.`
+    );
+  }
+}
+
+const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
+
+if (!packageJson.files?.includes('dist/runtime')) {
+  throw new Error('@nexus/core package files must include dist/runtime.');
+}
+
+function collectExportFiles(value, out = []) {
+  if (typeof value === 'string') {
+    out.push(value);
+    return out;
+  }
+
+  if (value && typeof value === 'object') {
+    for (const nested of Object.values(value)) {
+      collectExportFiles(nested, out);
+    }
+  }
+
+  return out;
+}
+
+for (const exportFile of collectExportFiles(packageJson.exports)) {
+  if (!exportFile.startsWith('./dist/runtime/')) {
+    throw new Error(
+      `@nexus/core export ${exportFile} must stay inside dist/runtime.`
+    );
+  }
+
+  const resolved = path.join(packageRoot, exportFile);
+  if (!existsSync(resolved)) {
+    throw new Error(
+      `@nexus/core export ${exportFile} points to missing ${path.relative(
+        repoRoot,
+        resolved
+      )}.`
     );
   }
 }

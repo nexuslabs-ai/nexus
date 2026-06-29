@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { describe, expect, it, vi } from 'vitest';
@@ -11,7 +10,6 @@ vi.mock('next/headers', () => ({
 
 describe('AppearanceSsrFixturePage', () => {
   it('emits the first-paint script before client fixture content', async () => {
-    vi.stubGlobal('React', React);
     const { default: AppearanceSsrFixturePage } = await import('./page');
     const element = await AppearanceSsrFixturePage();
     const html = renderToStaticMarkup(element);

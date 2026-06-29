@@ -38,7 +38,9 @@ Surface tones are `stone`, `neutral`, `zinc`, `slate`, and `gray`.
 ## Next.js App Router
 
 Read the cookie on the server, convert its raw string value into a snapshot, put
-the inline script in `<head>`, and render the provider in `<body>`.
+the inline script in `<head>`, and render the provider in `<body>`. The second
+argument to `createNexusAppearanceSnapshotFromCookie` is the SSR fallback when
+the cookie is missing or invalid.
 
 ```tsx
 // app/layout.tsx
@@ -88,9 +90,12 @@ export default async function RootLayout({
 }
 ```
 
-The cookie seeds SSR and first paint. When `storageKey` is enabled,
+The cookie seeds SSR and first paint. `cookieKey` writes the active client state
+back to a cookie for the next server request; the provider does not read the
+cookie again during client hydration. When `storageKey` is enabled,
 `localStorage` becomes the client-side source of truth after hydration. Use
-`storageKey={false}` for a cookie/default-state-only setup.
+`storageKey={false}` when you want the client to hydrate from the server
+snapshot/default state without localStorage persistence.
 
 Under a strict CSP, pass a nonce to `<NexusAppearanceScript nonce={nonce} />`.
 
