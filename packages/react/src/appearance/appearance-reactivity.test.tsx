@@ -20,13 +20,14 @@ function expectNoRawBorderWidth(element: Element) {
     const arbitraryBorderWidth = utility?.match(
       /^border(?:-[xytrbl])?-\[(.+)\]$/
     );
+    const arbitraryBorderWidthValue = arbitraryBorderWidth?.[1];
 
     return (
       /^border(?:-[xytrbl])?$/.test(utility ?? '') ||
       /^border(?:-[xytrbl])?-(?:[1-9]\d*(?:\.\d+)?)$/.test(utility ?? '') ||
-      (arbitraryBorderWidth
+      (arbitraryBorderWidthValue !== undefined
         ? /(?:\d|\bcalc\(|\bclamp\(|\bmin\(|\bmax\()/i.test(
-            arbitraryBorderWidth[1]
+            arbitraryBorderWidthValue
           )
         : false)
     );
