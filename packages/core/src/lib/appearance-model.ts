@@ -212,7 +212,7 @@ function formatPx(value: number): string {
   return `${Number(value.toFixed(4))}px`;
 }
 
-export function typographyScaleVariables(uiPx: number): string {
+function typographyScaleVariables(uiPx: number): string {
   const scale = uiPx / DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize;
   const sizeVars = Object.entries(TYPOGRAPHY_SIZE_PX).map(
     ([name, value]) =>

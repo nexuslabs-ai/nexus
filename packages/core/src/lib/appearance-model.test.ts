@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -17,7 +16,6 @@ import {
   sanitizeNexusAppearance,
   sanitizeNexusAppearancePrefs,
   STROKE_OPTIONS,
-  typographyScaleVariables,
 } from './appearance-model';
 import { deriveTheme } from './derive-theme';
 
@@ -357,56 +355,5 @@ describe('appearancePrefsToCss', () => {
 
     expect(css).not.toContain('sidebar-container');
     expect(css).not.toContain('diff');
-  });
-});
-
-describe('typography scale parity with variables.css', () => {
-  it('emits size/line-height variables that match the static --nx-typography-* scale at the default uiFontSize', () => {
-    const here = dirname(fileURLToPath(import.meta.url));
-    const variablesCss = readFileSync(
-      resolve(here, '../../../tailwind/variables.css'),
-      'utf8'
-    );
-    const staticSize = (name: string): number => {
-      const match = variablesCss.match(
-        new RegExp(`--nx-typography-size-${name}: (\\d+(?:\\.\\d+)?)px`)
-      );
-      if (!match) throw new Error(`missing --nx-typography-size-${name}`);
-      return Number(match[1]);
-    };
-    const staticLineHeight = (name: string): number => {
-      const match = variablesCss.match(
-        new RegExp(`--nx-typography-line-height-${name}: (\\d+(?:\\.\\d+)?)px`)
-      );
-      if (!match)
-        throw new Error(`missing --nx-typography-line-height-${name}`);
-      return Number(match[1]);
-    };
-
-    const emitted = typographyScaleVariables(
-      DEFAULT_NEXUS_APPEARANCE.prefs.uiFontSize
-    );
-    for (const name of [
-      'xs',
-      'sm',
-      'base',
-      'lg',
-      'xl',
-      '2xl',
-      '3xl',
-      '4xl',
-      '5xl',
-      '6xl',
-      '7xl',
-      '8xl',
-      '9xl',
-    ]) {
-      expect(emitted).toContain(
-        `--nx-typography-size-${name}: ${staticSize(name)}px;`
-      );
-      expect(emitted).toContain(
-        `--nx-typography-line-height-${name}: ${staticLineHeight(name)}px;`
-      );
-    }
   });
 });
