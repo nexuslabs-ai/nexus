@@ -1,8 +1,8 @@
 /**
- * Auth API client. Thin typed wrappers over the mock endpoints served by MSW
- * (`src/mocks/handlers.ts`) — there is no real backend. Screens call these
- * through TanStack Query mutations; the resolved user is written into the
- * session store (`app/session.ts`), which is the single source of session truth.
+ * Demo auth API client. Thin typed wrappers over the mock endpoints served by
+ * MSW (`src/mocks/handlers.ts`) — there is no real backend. Screens call these
+ * through TanStack Query mutations; the mock-verified user is written into the
+ * demo session store (`app/session.ts`).
  */
 
 export type User = {
@@ -37,7 +37,7 @@ export const login = (creds: Credentials) =>
 export const signup = (input: SignupInput) =>
   post<{ email: string }>('/api/auth/signup', input);
 
-/** OTP check succeeds → the authenticated user is returned. */
+/** OTP check succeeds -> the mock-verified demo user is returned. */
 export const verifyOtp = (input: VerifyInput) =>
   post<{ user: User }>('/api/auth/verify-otp', input);
 

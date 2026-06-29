@@ -8,6 +8,7 @@ import { DOCS_THEME_BOOTSTRAP_CSP_HASH } from './theme-csp';
 const SCRIPT_SRC = [
   "'self'",
   DOCS_THEME_BOOTSTRAP_CSP_HASH,
+  "'report-sample'",
   process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : null,
 ]
   .filter(Boolean)
@@ -28,10 +29,41 @@ const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
   "font-src 'self'",
   `connect-src ${CONNECT_SRC}`,
   "object-src 'none'",
-  "base-uri 'self'",
+  "base-uri 'none'",
   "form-action 'self'",
   "frame-ancestors 'none'",
 ].join('; ');
+
+const PERMISSIONS_POLICY = [
+  'camera=()',
+  'geolocation=()',
+  'microphone=()',
+  'payment=()',
+  'usb=()',
+].join(', ');
+
+const SECURITY_HEADERS = [
+  {
+    key: 'Content-Security-Policy-Report-Only',
+    value: CONTENT_SECURITY_POLICY_REPORT_ONLY,
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'strict-origin-when-cross-origin',
+  },
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+  {
+    key: 'X-Frame-Options',
+    value: 'SAMEORIGIN',
+  },
+  {
+    key: 'Permissions-Policy',
+    value: PERMISSIONS_POLICY,
+  },
+];
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@nexus/react'],
@@ -46,12 +78,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/:path*',
-        headers: [
-          {
-            key: 'Content-Security-Policy-Report-Only',
-            value: CONTENT_SECURITY_POLICY_REPORT_ONLY,
-          },
-        ],
+        headers: SECURITY_HEADERS,
       },
     ];
   },
