@@ -124,13 +124,13 @@ const membersStore: MemberDetail[] = MEMBERS.map((m) => ({ ...m }));
 const notificationsStore: Notification[] = NOTIFICATIONS.map((n) => ({ ...n }));
 
 /**
- * MSW request handlers — there is no real backend. Auth is a two-step flow: a
- * credentials check (login/signup) hands the email to the OTP step, which is
- * what actually authenticates and returns the user. CRM handlers follow.
+ * MSW request handlers — there is no real backend. Demo auth is a two-step
+ * flow: a credentials check (login/signup) hands the email to the OTP step,
+ * which mock-verifies and returns the demo user. CRM handlers follow.
  */
 export const handlers: RequestHandler[] = [
   // Credentials check — no real validation (any email + an 8+ char password
-  // passes); the OTP step below is the only actual auth gate. Proceeds to OTP.
+  // passes); the OTP step below is the only demo gate. Proceeds to OTP.
   http.post('/api/auth/login', async ({ request }) => {
     const { email, password } = (await request.json()) as LoginBody;
     if (!email || !password || password.length < 8) {
@@ -153,7 +153,7 @@ export const handlers: RequestHandler[] = [
     return HttpResponse.json({ email });
   }),
 
-  // OTP step: the fixed demo code authenticates and returns the user.
+  // OTP step: the fixed demo code mock-verifies and returns the user.
   http.post('/api/auth/verify-otp', async ({ request }) => {
     const { email, code } = (await request.json()) as VerifyBody;
     if (!email || code !== OTP_CODE) {

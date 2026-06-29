@@ -149,8 +149,8 @@ function SidebarProvider({
       }
 
       _setOpen(openState);
-      // Persist uncontrolled open state to a cookie for server-side restore.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      // Persist non-sensitive uncontrolled open state for server-side restore.
+      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax`;
     },
     [setOpenProp, open]
   );
