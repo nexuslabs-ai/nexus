@@ -146,7 +146,7 @@ Read the token sources in `packages/core/tokens/` before changing tokens or gene
 - Do not edit `dist/` or `packages/tailwind/` directly; regenerate outputs.
 - On disk, color tokens are hex; emitted runtime CSS is OKLCH.
 - APCA contrast failures must be fixed by changing semantic mappings or palette/grid values, not by lowering thresholds.
-- Spacing mode swaps happen at runtime through `data-style`.
+- Spacing mode swaps happen at runtime through `data-density`.
 
 ## Claude Commands, Skills, Agents, And Settings
 

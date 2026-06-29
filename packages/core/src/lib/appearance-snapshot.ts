@@ -9,6 +9,16 @@ import { deriveTheme, themeToCss } from './derive-theme';
 
 export const SNAPSHOT_VERSION = 3;
 
+export const NEXUS_APPEARANCE_DATA_ATTRS = [
+  'data-density',
+  'data-radius',
+  'data-shadow',
+  'data-borderwidth',
+] as const;
+
+export type NexusAppearanceDataAttr =
+  (typeof NEXUS_APPEARANCE_DATA_ATTRS)[number];
+
 export interface NexusAppearanceSnapshot {
   version: typeof SNAPSHOT_VERSION;
   state: NexusAppearanceState;
@@ -18,12 +28,7 @@ export interface NexusAppearanceSnapshot {
 
 export interface NexusFirstPaintResolution {
   className: '' | 'dark';
-  dataAttrs: {
-    'data-style': string;
-    'data-radius': string;
-    'data-shadow': string;
-    'data-borderwidth': string;
-  };
+  dataAttrs: Record<NexusAppearanceDataAttr, string>;
   colorScheme: 'light' | 'dark';
   metaColorScheme: 'light' | 'dark' | 'light dark';
   themeCss: string;
@@ -111,7 +116,7 @@ export function resolveFirstPaint(
   return {
     className: dark ? 'dark' : '',
     dataAttrs: {
-      'data-style': state.density,
+      'data-density': state.density,
       'data-radius': state.corners,
       'data-shadow': state.elevation,
       'data-borderwidth': state.stroke,
@@ -138,5 +143,5 @@ export function createNexusAppearanceBootstrapScript(
     ? sanitizeNexusAppearanceSnapshot(options.defaultSnapshot)
     : createDefaultNexusAppearanceSnapshot();
 
-  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var s=f;try{var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var dark=m==="dark"||sys===true;var root=document.documentElement;root.classList.toggle("dark",dark);root.setAttribute("data-style",typeof st.density==="string"?st.density:f.state.density);root.setAttribute("data-radius",typeof st.corners==="string"?st.corners:f.state.corners);root.setAttribute("data-shadow",typeof st.elevation==="string"?st.elevation:f.state.elevation);root.setAttribute("data-borderwidth",typeof st.stroke==="string"?st.stroke:f.state.stroke);root.style.colorScheme=dark?"dark":"light";var meta=document.querySelector('meta[name="color-scheme"]');if(!meta){meta=document.createElement("meta");meta.setAttribute("name","color-scheme");document.head.appendChild(meta);}meta.setAttribute("content",m==="system"?"light dark":m);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nexus-appearance-theme",s.themeCss);upsert("data-nexus-appearance-prefs",s.prefsCss);}catch(e){}})();`;
+  return `(function(){try{var k=${escapeInlineScriptJson(storageKey)};var f=${escapeInlineScriptJson(defaultSnapshot)};var s=f;try{var r=window.localStorage&&window.localStorage.getItem(k);if(r){var p=JSON.parse(r);if(p&&p.version===f.version&&p.state&&typeof p.themeCss==="string"&&typeof p.prefsCss==="string"){s=p;}}}catch(e){}var st=s.state||f.state;var m=st.mode==="dark"||st.mode==="light"||st.mode==="system"?st.mode:f.state.mode;var sys=false;try{sys=m==="system"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}var dark=m==="dark"||sys===true;var root=document.documentElement;root.classList.toggle("dark",dark);root.setAttribute("data-density",typeof st.density==="string"?st.density:f.state.density);root.setAttribute("data-radius",typeof st.corners==="string"?st.corners:f.state.corners);root.setAttribute("data-shadow",typeof st.elevation==="string"?st.elevation:f.state.elevation);root.setAttribute("data-borderwidth",typeof st.stroke==="string"?st.stroke:f.state.stroke);root.style.colorScheme=dark?"dark":"light";var meta=document.querySelector('meta[name="color-scheme"]');if(!meta){meta=document.createElement("meta");meta.setAttribute("name","color-scheme");document.head.appendChild(meta);}meta.setAttribute("content",m==="system"?"light dark":m);function upsert(attr,css){var list=document.querySelectorAll("style["+attr+"]");var el=list[0]||document.createElement("style");for(var i=1;i<list.length;i++){list[i].remove();}el.setAttribute(attr,"");el.textContent=css||"";if(!el.parentNode){document.head.appendChild(el);}}upsert("data-nexus-appearance-theme",s.themeCss);upsert("data-nexus-appearance-prefs",s.prefsCss);}catch(e){}})();`;
 }

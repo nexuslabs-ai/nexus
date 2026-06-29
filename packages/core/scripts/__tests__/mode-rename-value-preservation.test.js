@@ -116,7 +116,7 @@ describe('token-mode rename preserves migration values', () => {
     const css = fs.readFileSync(TAILWIND_CSS, 'utf8');
 
     for (const [attr, value] of [
-      ['data-style', 'default'],
+      ['data-density', 'default'],
       ['data-radius', 'square'],
       ['data-radius', 'extra-round'],
       ['data-shadow', 'quiet'],
@@ -130,7 +130,7 @@ describe('token-mode rename preserves migration values', () => {
 
     for (const codename of RETIRED_CODENAMES) {
       const pattern = new RegExp(
-        `\\[data-(?:style|radius|shadow|borderwidth)=(['"])${codename}\\1\\]`
+        `\\[data-(?:density|radius|shadow|borderwidth)=(['"])${codename}\\1\\]`
       );
       expect(pattern.test(css), `retired selector for "${codename}"`).toBe(
         false

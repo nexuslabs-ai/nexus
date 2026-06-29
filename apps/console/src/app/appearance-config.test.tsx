@@ -12,7 +12,7 @@ import {
 beforeEach(() => {
   window.localStorage.clear();
   document.documentElement.classList.remove('dark');
-  document.documentElement.removeAttribute('data-style');
+  document.documentElement.removeAttribute('data-density');
   document.documentElement.removeAttribute('data-radius');
   document.documentElement.removeAttribute('data-shadow');
   document.documentElement.removeAttribute('data-borderwidth');
@@ -31,7 +31,7 @@ describe('CONSOLE_APPEARANCE', () => {
     const root = document.documentElement;
 
     expect(result.current.state).toMatchObject(CONSOLE_APPEARANCE_DEFAULT);
-    expect(root.dataset.style).toBe(CONSOLE_APPEARANCE_DEFAULT.density);
+    expect(root.dataset.density).toBe(CONSOLE_APPEARANCE_DEFAULT.density);
     expect(root.dataset.radius).toBe(CONSOLE_APPEARANCE_DEFAULT.corners);
     expect(root.dataset.shadow).toBe(CONSOLE_APPEARANCE_DEFAULT.elevation);
     expect(root.dataset.borderwidth).toBe(CONSOLE_APPEARANCE_DEFAULT.stroke);

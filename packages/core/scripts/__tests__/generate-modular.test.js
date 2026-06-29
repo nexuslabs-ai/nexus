@@ -95,9 +95,9 @@ describe('generateModular', () => {
   // Spacing migration (#119) — per-mode blocks + sibling spacing-utilities.css
   // -----------------------------------------------------------------------
 
-  it('emits all 6 per-mode [data-style="X"] blocks in globals.css', () => {
+  it('emits all 6 per-mode [data-density="X"] blocks in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
-    const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    const matches = globals.match(/\[data-density=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(6);
 
     const modes = new Set(matches.map((m) => m.match(/['"]([a-z]+)['"]/)[1]));
@@ -166,17 +166,17 @@ describe('generateModular', () => {
 
   it('per-mode override blocks use --nx- prefix (Tailwind only rewrites @theme)', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
-    // Both numeric AND role tokens inside [data-style="X"] blocks must be
+    // Both numeric AND role tokens inside [data-density="X"] blocks must be
     // already-prefixed since they live outside @theme.
     expect(globals).toMatch(
-      /\[data-style=['"]default['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
+      /\[data-density=['"]default['"]\] \{[\s\S]*?--nx-spacing-4:\s*16px;/
     );
     expect(globals).toMatch(
-      /\[data-style=['"]default['"]\] \{[\s\S]*?--nx-container-p:\s*24px;/
+      /\[data-density=['"]default['"]\] \{[\s\S]*?--nx-container-p:\s*24px;/
     );
   });
 
-  it('spacingDefault option shifts which mode lands under :root, [data-style="X"]', async () => {
+  it('spacingDefault option shifts which mode lands under :root, [data-density="X"]', async () => {
     // Same contract as the bundled-tailwind build: pass a non-default mode
     // and confirm the :root combinator moves to it. All 6 mode blocks still
     // emit; only the `:root` half of the dual selector changes.
@@ -190,11 +190,13 @@ describe('generateModular', () => {
     }
     const globals = fs.readFileSync(path.join(dir, 'globals.css'), 'utf8');
 
-    expect(globals).toMatch(/:root,\s*\n\s*\[data-style=['"]relaxed['"]\] \{/);
-    expect(globals).not.toMatch(
-      /:root,\s*\n\s*\[data-style=['"]default['"]\] \{/
+    expect(globals).toMatch(
+      /:root,\s*\n\s*\[data-density=['"]relaxed['"]\] \{/
     );
-    const matches = globals.match(/\[data-style=['"][a-z]+['"]\]/g) ?? [];
+    expect(globals).not.toMatch(
+      /:root,\s*\n\s*\[data-density=['"]default['"]\] \{/
+    );
+    const matches = globals.match(/\[data-density=['"][a-z]+['"]\]/g) ?? [];
     expect(matches).toHaveLength(6);
   });
 });

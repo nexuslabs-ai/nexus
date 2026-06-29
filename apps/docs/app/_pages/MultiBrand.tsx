@@ -24,8 +24,8 @@ const DIMENSIONS: { dim: string; options: string; swap: string }[] = [
   },
   {
     dim: 'Spacing (density)',
-    options: '7 modes — compact · default · comfortable · …',
-    swap: 'data-style attr',
+    options: '6 modes — compact · default · comfortable · …',
+    swap: 'data-density attr',
   },
   { dim: 'Shadow', options: '5 modes', swap: '<link> swap' },
   {
@@ -117,7 +117,7 @@ export function MultiBrand() {
           — each mode is a small CSS file that redefines the{' '}
           <code className="nx:typography-code-inline">--nx-*</code> variables.
           Spacing density swaps via a{' '}
-          <code className="nx:typography-code-inline">data-style</code>{' '}
+          <code className="nx:typography-code-inline">data-density</code>{' '}
           attribute on{' '}
           <code className="nx:typography-code-inline">&lt;html&gt;</code> (so
           one attribute rescales every{' '}
@@ -171,7 +171,7 @@ export function MultiBrand() {
 }
 
 /* density on a subtree */
-<section data-style="compact"> … compact … </section>`}
+<section data-density="compact"> … compact … </section>`}
         </pre>
       </section>
 

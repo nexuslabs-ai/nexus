@@ -1033,10 +1033,10 @@
   --focus-offset: 2px;
 }
 
-/* ===== PER-MODE SPACING (mode swap via [data-style="X"] on any ancestor) ===== */
+/* ===== PER-MODE SPACING (mode swap via [data-density="X"] on any ancestor) ===== */
 
 :root,
-[data-style='default'] {
+[data-density='default'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1077,7 +1077,7 @@
   --nx-layout-stack-gap: 8px;
 }
 
-[data-style='comfortable'] {
+[data-density='comfortable'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1118,7 +1118,7 @@
   --nx-layout-stack-gap: 10px;
 }
 
-[data-style='compact'] {
+[data-density='compact'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1159,7 +1159,7 @@
   --nx-layout-stack-gap: 6px;
 }
 
-[data-style='relaxed'] {
+[data-density='relaxed'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1200,7 +1200,7 @@
   --nx-layout-stack-gap: 10px;
 }
 
-[data-style='spacious'] {
+[data-density='spacious'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;
@@ -1241,7 +1241,7 @@
   --nx-layout-stack-gap: 16px;
 }
 
-[data-style='tight'] {
+[data-density='tight'] {
   --nx-spacing-0: 0px;
   --nx-spacing-1: 4px;
   --nx-spacing-2: 8px;

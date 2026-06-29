@@ -15,6 +15,7 @@ import {
   createNexusAppearanceSnapshotFromState,
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
+  NEXUS_APPEARANCE_DATA_ATTRS,
   type NexusAppearanceSnapshot,
   type NexusAppearanceState,
   resolveFirstPaint,
@@ -25,12 +26,6 @@ import {
 const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 const THEME_STYLE_SELECTOR = 'style[data-nexus-appearance-theme]';
 const PREFS_STYLE_SELECTOR = 'style[data-nexus-appearance-prefs]';
-const APPEARANCE_DATA_ATTRS = [
-  'data-style',
-  'data-radius',
-  'data-shadow',
-  'data-borderwidth',
-] as const;
 
 export type NexusResolvedAppearanceMode = 'light' | 'dark';
 
@@ -140,12 +135,7 @@ function removeAppearanceArtifacts(): void {
   const root = document.documentElement;
   root.classList.remove('dark');
   root.style.removeProperty('color-scheme');
-  for (const attr of [
-    'data-style',
-    'data-radius',
-    'data-shadow',
-    'data-borderwidth',
-  ]) {
+  for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
     root.removeAttribute(attr);
   }
 }
@@ -236,7 +226,7 @@ export function NexusAppearanceProvider({
 
     const root = document.documentElement;
 
-    for (const attr of APPEARANCE_DATA_ATTRS) {
+    for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
       root.setAttribute(attr, firstPaint.dataAttrs[attr]);
     }
   }, [firstPaint, mounted]);

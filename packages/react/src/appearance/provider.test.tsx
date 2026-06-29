@@ -7,6 +7,7 @@ import {
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
   deriveTheme,
+  NEXUS_APPEARANCE_DATA_ATTRS,
   type NexusAppearanceState,
   sanitizeNexusAppearance,
   SNAPSHOT_VERSION,
@@ -19,10 +20,9 @@ import { NexusAppearanceProvider, useNexusAppearance } from './provider';
 
 function resetAppearanceDom(): void {
   document.documentElement.classList.remove('dark');
-  document.documentElement.removeAttribute('data-style');
-  document.documentElement.removeAttribute('data-radius');
-  document.documentElement.removeAttribute('data-shadow');
-  document.documentElement.removeAttribute('data-borderwidth');
+  for (const attr of NEXUS_APPEARANCE_DATA_ATTRS) {
+    document.documentElement.removeAttribute(attr);
+  }
   document.documentElement.style.colorScheme = '';
   document
     .querySelectorAll(
@@ -45,7 +45,7 @@ function captureAppearanceDom() {
 
   return {
     dark: root.classList.contains('dark'),
-    style: root.getAttribute('data-style'),
+    density: root.getAttribute('data-density'),
     radius: root.getAttribute('data-radius'),
     shadow: root.getAttribute('data-shadow'),
     borderwidth: root.getAttribute('data-borderwidth'),
@@ -85,7 +85,7 @@ describe('NexusAppearanceProvider', () => {
 
     const root = document.documentElement;
 
-    expect(root).toHaveAttribute('data-style', 'default');
+    expect(root).toHaveAttribute('data-density', 'default');
     expect(root).toHaveAttribute('data-radius', 'square');
     expect(root).toHaveAttribute('data-shadow', 'quiet');
     expect(root).toHaveAttribute('data-borderwidth', 'normal');
