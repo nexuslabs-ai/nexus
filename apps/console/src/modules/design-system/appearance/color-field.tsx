@@ -9,6 +9,14 @@ interface NexusAppearanceColorFieldProps {
 }
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const HEX_BODY_RE = /^[0-9a-fA-F]{6}$/;
+
+function normalizeHex(value: string) {
+  const trimmed = value.trim();
+  if (HEX_RE.test(trimmed)) return trimmed.toLowerCase();
+  if (HEX_BODY_RE.test(trimmed)) return `#${trimmed.toLowerCase()}`;
+  return null;
+}
 
 export function NexusAppearanceColorField({
   value,
@@ -22,12 +30,16 @@ export function NexusAppearanceColorField({
     setLastValue(value);
     setDraft(value);
   }
-  const committedHex = HEX_RE.test(value) ? value : '#000000';
+  const normalizedValue = normalizeHex(value);
+  const committedHex = normalizedValue ?? '#000000';
 
   const commit = (next: string) => {
     setDraft(next);
-    if (HEX_RE.test(next)) onChange(next);
+    const normalized = normalizeHex(next);
+    if (normalized) onChange(normalized);
   };
+
+  const resetDraft = () => setDraft(value);
 
   return (
     <div className="nx:flex nx:items-center nx:gap-2">
@@ -35,7 +47,7 @@ export function NexusAppearanceColorField({
         <div
           className="nx:size-full nx:rounded-full nx:border nx:border-border-default"
           style={{
-            backgroundColor: HEX_RE.test(value) ? value : 'transparent',
+            backgroundColor: normalizedValue ?? 'transparent',
           }}
         />
         <input
@@ -49,8 +61,9 @@ export function NexusAppearanceColorField({
       <Input
         value={draft}
         onChange={(event) => commit(event.target.value)}
+        onBlur={resetDraft}
         aria-label={`${label} hex value`}
-        aria-invalid={!HEX_RE.test(draft)}
+        aria-invalid={normalizeHex(draft) === null}
         spellCheck={false}
         className="nx:w-28 nx:font-mono nx:uppercase"
       />
