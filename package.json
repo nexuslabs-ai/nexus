@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run --project=unit",
+    "typecheck:dist": "pnpm --filter @nexus/core typecheck:dist-core && pnpm --filter @nexus/react typecheck:dist-appearance && node scripts/typecheck-tailwind-dist.mjs",
     "test:storybook": "vitest run --project=storybook",
     "test:storybook:watch": "vitest --project=storybook",
     "test:storybook:ui": "vitest --project=storybook --ui",

@@ -286,6 +286,9 @@ jobs:
             pnpm turbo typecheck
           fi
 
+      - name: Dist consumer type probes
+        run: pnpm typecheck:dist
+
       - name: Core runtime export contract
         run: pnpm --filter @nexus/core audit:runtime-exports
 

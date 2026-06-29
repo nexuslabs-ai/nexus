@@ -7,6 +7,8 @@ React entrypoint.
 
 ## Add the packages
 
+For components and the Tailwind theme:
+
 ```bash
 pnpm add @nexus/react @nexus/tailwind react-hook-form sonner
 ```
@@ -14,6 +16,19 @@ pnpm add @nexus/react @nexus/tailwind react-hook-form sonner
 `@nexus/react` provides the components; `@nexus/tailwind` provides the
 `nx:`-prefixed utility theme they're built on. `react-hook-form` and `sonner`
 back the exported Form and Toaster components. Tokens come along transitively.
+
+### Add Appearance theming
+
+To use the runtime Appearance system (`@nexus/react/appearance`), also add the
+framework-agnostic engine:
+
+```bash
+pnpm add @nexus/core
+```
+
+`@nexus/core` owns the appearance model, theme derivation, and the first-paint
+bootstrap. It is required when you use `@nexus/react/appearance`. See **Theme
+setup** for the full wiring.
 
 ## Wire the styles
 

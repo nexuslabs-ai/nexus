@@ -33,24 +33,34 @@ await mkdir(probeDir, { recursive: true });
 await writeFile(
   probePath,
   `import {
+  createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromCookie,
   createNexusAppearanceSnapshotFromState,
   createNexusThemeContract,
   DEFAULT_NEXUS_APPEARANCE,
+  DEFAULT_STORAGE_KEY,
   deriveTheme,
+  resolveFirstPaint,
+  sanitizeNexusAppearance,
   themeToCss,
   type NexusAppearanceState,
 } from '@nexus/core';
 
-const state: NexusAppearanceState = {
+const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,
   mode: 'system',
+  brandColor: '#2563eb',
   surfaceTone: 'slate',
-};
+});
 
 const snapshot = createNexusAppearanceSnapshotFromState(state);
 const serverSnapshot = createNexusAppearanceSnapshotFromCookie('', state);
 const css: string = themeToCss(deriveTheme(createNexusThemeContract(state)));
+const bootstrap: string = createNexusAppearanceBootstrapScript({
+  storageKey: DEFAULT_STORAGE_KEY,
+  defaultSnapshot: snapshot,
+});
+const firstPaint = resolveFirstPaint(snapshot, true);
 
 // @ts-expect-error proves the public state is not any.
 state.notARealNexusAppearanceField;
@@ -58,6 +68,8 @@ state.notARealNexusAppearanceField;
 void snapshot;
 void serverSnapshot;
 void css;
+void bootstrap;
+void firstPaint.colorScheme;
 `
 );
 

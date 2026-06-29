@@ -16,6 +16,49 @@ type Release = { date: string; changes: Change[] };
 
 const RELEASES: Release[] = [
   {
+    date: '2026-06-29',
+    changes: [
+      {
+        type: 'Changed',
+        text: '@nexus/core — publish-ready framework-agnostic Appearance engine',
+      },
+      {
+        type: 'Added',
+        text: 'Appearance — consumer setup docs and dist-consumer package probes',
+      },
+    ],
+  },
+  {
+    date: '2026-06-27',
+    changes: [
+      {
+        type: 'Added',
+        text: 'Appearance — full-token derivation and contrast as a structure control',
+        pr: 535,
+      },
+      {
+        type: 'Added',
+        text: 'Appearance — package engine and React provider/script runtime',
+        pr: 536,
+      },
+      {
+        type: 'Added',
+        text: 'Appearance — first-paint, no-flash bootstrap',
+        pr: 537,
+      },
+      {
+        type: 'Changed',
+        text: 'Console — dogfood the package Appearance model',
+        pr: 545,
+      },
+      {
+        type: 'Fixed',
+        text: '@nexus/react/appearance — consumer dist types now resolve correctly',
+        pr: 548,
+      },
+    ],
+  },
+  {
     date: '2026-06-01',
     changes: [
       { type: 'Added', text: 'Sonner — toast notifications', pr: 274 },

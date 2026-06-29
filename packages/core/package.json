@@ -1,9 +1,20 @@
 {
   "name": "@nexus/core",
   "version": "0.0.1",
-  "private": true,
   "type": "module",
-  "description": "Internal design tokens, theme definitions, and runtime color utilities (not published)",
+  "description": "Framework-agnostic Nexus design-token engine: appearance model, runtime theme derivation, and first-paint snapshots.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexuslabs-ai/nexus.git",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/runtime"
+  ],
   "exports": {
     ".": {
       "import": {
@@ -20,6 +31,7 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "typecheck:dist": "node scripts/typecheck-runtime-dist.mjs",
+    "typecheck:dist-core": "node scripts/typecheck-runtime-dist.mjs",
     "build:tokens:modular": "node scripts/generate-modular.js --spacingDefault=default",
     "build:tailwind": "node scripts/generate-tailwind-package.js --base=stone --brand=black --borderwidth=normal --radius=square --shadow=quiet --motion=snappy --spacingDefault=default",
     "audit:runtime-exports": "node scripts/audit-runtime-exports.mjs",
@@ -35,7 +47,6 @@
     "apca-w3": "^0.1.9",
     "culori": "^4.0.2"
   },
-  "license": "MIT",
   "devDependencies": {
     "@bjornlu/colorblind": "^1.0.3",
     "@types/apca-w3": "^0.1.3",

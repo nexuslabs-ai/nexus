@@ -36,4 +36,7 @@ export const MDX_PAGES: Record<
 > = {
   'getting-started/install': () =>
     import('../../content/getting-started/install.mdx'),
+  'getting-started/theme-setup': () =>
+    import('../../content/getting-started/theme-setup.mdx'),
+  'theming/appearance': () => import('../../content/theming/appearance.mdx'),
 };

@@ -1,6 +1,24 @@
-# @nexus/core - Design Tokens
+# @nexus/core
 
-Internal package containing design tokens in W3C DTCG format and custom CSS generation.
+The framework-agnostic engine behind Nexus Appearance: appearance model, runtime theme derivation, and first-paint snapshots. Use it directly for non-React targets like Electron, React Native, or native shells, or via `@nexus/react/appearance` in React apps. It also contains the design tokens in DTCG format and CSS generation documented below.
+
+## Install
+
+```bash
+pnpm add @nexus/core
+```
+
+## Primary Exports
+
+- `DEFAULT_NEXUS_APPEARANCE`, `sanitizeNexusAppearance`, `NexusAppearanceState`: the appearance model.
+- `createNexusThemeContract`, `deriveTheme`, `themeToCss`: derive a full token set from appearance state and render it to CSS.
+- `createNexusAppearanceSnapshotFromState`, `createNexusAppearanceBootstrapScript`, `resolveFirstPaint`, `DEFAULT_STORAGE_KEY`: first-paint, no-flash bootstrap.
+
+## Advanced / Engine Exports
+
+`adjustContrast`, `PALETTE_KEYS`, `TIER_THRESHOLDS`, `isColor`: low-level palette and contrast utilities. Stability is not guaranteed pre-1.0.
+
+See the Nexus docs, Theming -> Appearance, for setup recipes.
 
 ## Token Architecture
 
