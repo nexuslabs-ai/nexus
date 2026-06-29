@@ -59,13 +59,19 @@ export interface NexusAppearanceProviderProps {
   onStateChange?: (state: NexusAppearanceState) => void;
   /**
    * Client snapshot storage. When enabled, the local snapshot is read after
-   * mount and takes precedence over any cookie-seeded SSR/default state.
+   * mount and is the client-side source of truth — it takes precedence over the
+   * SSR-seeded cookie and `defaultState`. Disable with `false` to make the
+   * provider cookie/SSR-driven only.
    */
   storageKey?: string | false;
   /**
    * Optional state cookie for SSR and first-paint seeding. The cookie is written
-   * from the active client state for the next request; it does not override
-   * localStorage during client hydration when `storageKey` is enabled.
+   * from the active client state for the next request; during client hydration it
+   * is NOT read — `localStorage` (when `storageKey` is enabled) wins. This keeps
+   * the SSR paint stable: the server renders from the cookie, the client then
+   * adopts the local snapshot without a flash. Consumers who seed only the
+   * cookie (no `storageKey`, or a fresh device with no localStorage) will hydrate
+   * from `defaultState` and paint with whatever the server did not override.
    */
   cookieKey?: string | false;
   cookieOptions?: NexusAppearanceCookieOptions;

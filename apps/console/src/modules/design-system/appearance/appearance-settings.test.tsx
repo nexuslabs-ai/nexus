@@ -83,6 +83,12 @@ describe('NexusAppearanceSettings', () => {
     expect(uiSize.value).toBe('32');
     expect(screen.getByLabelText('font sizes').textContent).toBe('32/12');
 
+    fireEvent.change(uiSize, { target: { value: '100' } });
+    fireEvent.blur(uiSize);
+
+    expect(uiSize.value).toBe('32');
+    expect(screen.getByLabelText('font sizes').textContent).toBe('32/12');
+
     fireEvent.change(codeSize, { target: { value: '2' } });
     fireEvent.blur(codeSize);
 

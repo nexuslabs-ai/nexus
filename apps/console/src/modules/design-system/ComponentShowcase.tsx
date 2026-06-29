@@ -347,7 +347,7 @@ export function ComponentShowcase() {
                 Width
               </span>
               <div className="nx:flex nx:flex-wrap nx:gap-3 nx:mt-2">
-                <div className="nx:border-default nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
+                <div className="nx:border nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
                   default
                 </div>
                 <div className="nx:border-thick nx:border-border-default nx:rounded nx:px-4 nx:py-2 nx:typography-label-default">
