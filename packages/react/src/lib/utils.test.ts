@@ -66,6 +66,21 @@ describe('cn — border width token utilities', () => {
       cn('nx:border-l-thick', 'nx:border-x-default', 'nx:border-border-default')
     ).toBe('nx:border-x-default nx:border-border-default');
   });
+
+  it('collapses Nexus stroke utilities against native border-width overrides', () => {
+    expect(cn('nx:border-default', 'nx:border-0')).toBe('nx:border-0');
+    expect(cn('nx:border-0', 'nx:border-default')).toBe('nx:border-default');
+    expect(cn('nx:border-b-default', 'nx:border-b-0')).toBe('nx:border-b-0');
+    expect(cn('nx:border-b-0', 'nx:border-b-default')).toBe(
+      'nx:border-b-default'
+    );
+    expect(cn('nx:border-x-default', 'nx:border-l-0')).toBe(
+      'nx:border-x-default nx:border-l-0'
+    );
+    expect(cn('nx:border-l-0', 'nx:border-x-default')).toBe(
+      'nx:border-x-default'
+    );
+  });
 });
 
 describe('cn — custom utility class group parity', () => {
@@ -82,7 +97,9 @@ describe('cn — custom utility class group parity', () => {
     );
     const configured = new Set(
       Object.entries(NEXUS_CLASS_GROUPS)
-        .filter(([group]) => group.startsWith('nexus-border-w'))
+        .filter(
+          ([group]) => group === 'border-w' || group.startsWith('border-w-')
+        )
         .flatMap(([, values]) => values)
     );
 

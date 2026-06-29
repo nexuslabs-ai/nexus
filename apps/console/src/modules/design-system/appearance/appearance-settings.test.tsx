@@ -66,4 +66,27 @@ describe('NexusAppearanceSettings', () => {
 
     expect(codeSize.value).toBe('12');
   });
+
+  it('clamps out-of-range font-size drafts before committing them', () => {
+    render(
+      <NexusAppearanceProvider storageKey={false}>
+        <NexusAppearanceSettings />
+        <FontSizeProbe />
+      </NexusAppearanceProvider>
+    );
+
+    const { uiSize, codeSize } = getFontSizeInputs();
+
+    fireEvent.change(uiSize, { target: { value: '99' } });
+    fireEvent.blur(uiSize);
+
+    expect(uiSize.value).toBe('32');
+    expect(screen.getByLabelText('font sizes').textContent).toBe('32/12');
+
+    fireEvent.change(codeSize, { target: { value: '2' } });
+    fireEvent.blur(codeSize);
+
+    expect(codeSize.value).toBe('8');
+    expect(screen.getByLabelText('font sizes').textContent).toBe('32/8');
+  });
 });

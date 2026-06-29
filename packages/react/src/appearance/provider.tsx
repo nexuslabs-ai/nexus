@@ -57,7 +57,16 @@ export interface NexusAppearanceProviderProps {
   state?: NexusAppearanceState;
   defaultState?: NexusAppearanceState;
   onStateChange?: (state: NexusAppearanceState) => void;
+  /**
+   * Client snapshot storage. When enabled, the local snapshot is read after
+   * mount and takes precedence over any cookie-seeded SSR/default state.
+   */
   storageKey?: string | false;
+  /**
+   * Optional state cookie for SSR and first-paint seeding. The cookie is written
+   * from the active client state for the next request; it does not override
+   * localStorage during client hydration when `storageKey` is enabled.
+   */
   cookieKey?: string | false;
   cookieOptions?: NexusAppearanceCookieOptions;
 }

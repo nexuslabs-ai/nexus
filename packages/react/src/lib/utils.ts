@@ -15,13 +15,13 @@ export const ROLE_CLASS_GROUPS = {
 };
 
 const BORDER_WIDTH_CLASS_GROUPS = {
-  'nexus-border-w': ['border-default', 'border-thick'],
-  'nexus-border-w-x': ['border-x-default', 'border-x-thick'],
-  'nexus-border-w-y': ['border-y-default', 'border-y-thick'],
-  'nexus-border-w-t': ['border-t-default', 'border-t-thick'],
-  'nexus-border-w-r': ['border-r-default', 'border-r-thick'],
-  'nexus-border-w-b': ['border-b-default', 'border-b-thick'],
-  'nexus-border-w-l': ['border-l-default', 'border-l-thick'],
+  'border-w': ['border-default', 'border-thick'],
+  'border-w-x': ['border-x-default', 'border-x-thick'],
+  'border-w-y': ['border-y-default', 'border-y-thick'],
+  'border-w-t': ['border-t-default', 'border-t-thick'],
+  'border-w-r': ['border-r-default', 'border-r-thick'],
+  'border-w-b': ['border-b-default', 'border-b-thick'],
+  'border-w-l': ['border-l-default', 'border-l-thick'],
 };
 
 export const NEXUS_CLASS_GROUPS = {
@@ -31,25 +31,11 @@ export const NEXUS_CLASS_GROUPS = {
 
 type NexusClassGroupId = keyof typeof NEXUS_CLASS_GROUPS;
 
-const BORDER_WIDTH_CONFLICTING_CLASS_GROUPS = {
-  'nexus-border-w': [
-    'nexus-border-w-x',
-    'nexus-border-w-y',
-    'nexus-border-w-t',
-    'nexus-border-w-r',
-    'nexus-border-w-b',
-    'nexus-border-w-l',
-  ],
-  'nexus-border-w-x': ['nexus-border-w-r', 'nexus-border-w-l'],
-  'nexus-border-w-y': ['nexus-border-w-t', 'nexus-border-w-b'],
-} satisfies Partial<Record<NexusClassGroupId, readonly NexusClassGroupId[]>>;
-
 /** Tailwind-merge configured with `nx:` prefix and Nexus custom utility groups. */
 const twMerge = extendTailwindMerge<NexusClassGroupId>({
   prefix: 'nx',
   extend: {
     classGroups: NEXUS_CLASS_GROUPS,
-    conflictingClassGroups: BORDER_WIDTH_CONFLICTING_CLASS_GROUPS,
   },
 });
 
