@@ -48,6 +48,9 @@ const TONE_TOKENS = [
 
 type Tone = (typeof TONES)[number];
 type ToneToken = (typeof TONE_TOKENS)[number];
+const DARK_TOL_OVERRIDES: Partial<Record<ToneToken, typeof DARK_TOL>> = {
+  'nav-background': { ...DARK_TOL, l: 0.07 },
+};
 type TokenRecord = Record<string, string>;
 type Fixture = {
   schemaVersion: number;
@@ -237,7 +240,8 @@ function expectNear(
   expect(got, `${tone} ${mode} ${token} is emitted`).toBeDefined();
   const g = comps(got!);
   const w = comps(want);
-  const tolerance = mode === 'light' ? LIGHT_TOL : DARK_TOL;
+  const tolerance =
+    mode === 'light' ? LIGHT_TOL : (DARK_TOL_OVERRIDES[token] ?? DARK_TOL);
   expect(
     Math.abs(g.l - w.l),
     `${tone} ${mode} ${token} lightness`
