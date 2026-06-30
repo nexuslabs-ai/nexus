@@ -94,7 +94,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
  */
 const sheetContentVariants = cva(
   cn(
-    'nx:fixed nx:z-modal nx:flex nx:flex-col',
+    'nx:fixed nx:z-modal nx:flex nx:flex-col nx:overflow-y-auto',
     'nx:bg-container nx:shadow-lg',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
     'nx:data-[state=open]:duration-slower nx:data-[state=open]:ease-enter',
@@ -106,19 +106,19 @@ const sheetContentVariants = cva(
     variants: {
       side: {
         top: cn(
-          'nx:inset-x-0 nx:top-0 nx:h-auto nx:border-b-default nx:border-border-default',
+          'nx:inset-x-0 nx:top-0 nx:h-auto nx:max-h-svh nx:border-b-default nx:border-border-default',
           'nx:data-[state=open]:slide-in-from-top nx:data-[state=closed]:slide-out-to-top'
         ),
         bottom: cn(
-          'nx:inset-x-0 nx:bottom-0 nx:h-auto nx:border-t-default nx:border-border-default',
+          'nx:inset-x-0 nx:bottom-0 nx:h-auto nx:max-h-svh nx:border-t-default nx:border-border-default',
           'nx:data-[state=open]:slide-in-from-bottom nx:data-[state=closed]:slide-out-to-bottom'
         ),
         left: cn(
-          'nx:inset-y-0 nx:left-0 nx:h-full nx:w-3/4 nx:border-r-default nx:border-border-default nx:sm:max-w-sm',
+          'nx:left-0 nx:top-0 nx:h-svh nx:w-3/4 nx:border-r-default nx:border-border-default nx:sm:max-w-sm',
           'nx:data-[state=open]:slide-in-from-left nx:data-[state=closed]:slide-out-to-left'
         ),
         right: cn(
-          'nx:inset-y-0 nx:right-0 nx:h-full nx:w-3/4 nx:border-l-default nx:border-border-default nx:sm:max-w-sm',
+          'nx:right-0 nx:top-0 nx:h-svh nx:w-3/4 nx:border-l-default nx:border-border-default nx:sm:max-w-sm',
           'nx:data-[state=open]:slide-in-from-right nx:data-[state=closed]:slide-out-to-right'
         ),
       },

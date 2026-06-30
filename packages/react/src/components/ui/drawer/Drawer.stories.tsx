@@ -399,6 +399,17 @@ export const DirectionBehavior: Story = {
         'data-vaul-drawer-direction',
         direction
       );
+      await expect(drawer).toHaveClass('nx:overflow-y-auto');
+
+      if (direction === 'top' || direction === 'bottom') {
+        await expect(drawer).toHaveClass(
+          `nx:data-[vaul-drawer-direction=${direction}]:max-h-[80svh]`
+        );
+      } else {
+        await expect(drawer).toHaveClass(
+          `nx:data-[vaul-drawer-direction=${direction}]:h-svh`
+        );
+      }
 
       await userEvent.click(
         within(drawer).getByRole('button', {

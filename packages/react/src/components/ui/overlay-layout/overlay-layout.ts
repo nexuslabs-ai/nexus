@@ -40,6 +40,7 @@ const navigationMenuInlinePopoverSurfaceClassName = [
 const overlayContentVariants = cva(
   [
     'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
+    'nx:max-h-[calc(100svh-2rem)] nx:overflow-y-auto',
     'nx:-translate-x-1/2 nx:-translate-y-1/2',
     'nx:gap-4 nx:border-default nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
     'nx:data-[state=open]:duration-slow nx:data-[state=open]:ease-enter',
