@@ -48,9 +48,6 @@ const TONE_TOKENS = [
 
 type Tone = (typeof TONES)[number];
 type ToneToken = (typeof TONE_TOKENS)[number];
-const DARK_TOL_OVERRIDES: Partial<Record<ToneToken, typeof DARK_TOL>> = {
-  'nav-background': { ...DARK_TOL, l: 0.07 },
-};
 type TokenRecord = Record<string, string>;
 type Fixture = {
   schemaVersion: number;
@@ -210,7 +207,9 @@ function expectedTone(tone: Tone, mode: Mode, token: ToneToken): string {
   if (mode === 'light') return LIGHT_FIXTURE.tones[tone][token];
   const ref = baseLeaves(tone, mode)[token];
   if (!ref) throw new Error(`Missing curated ${tone}.${mode}.${token}`);
-  return primitiveOklch(ref);
+  if (ref.startsWith('{')) return primitiveOklch(ref);
+  if (ref.startsWith('#')) return formatOklchWithAlpha(parseToOklch(ref));
+  return ref;
 }
 
 function comps(value: string): { l: number; c: number; h: number; a: number } {
@@ -240,8 +239,7 @@ function expectNear(
   expect(got, `${tone} ${mode} ${token} is emitted`).toBeDefined();
   const g = comps(got!);
   const w = comps(want);
-  const tolerance =
-    mode === 'light' ? LIGHT_TOL : (DARK_TOL_OVERRIDES[token] ?? DARK_TOL);
+  const tolerance = mode === 'light' ? LIGHT_TOL : DARK_TOL;
   expect(
     Math.abs(g.l - w.l),
     `${tone} ${mode} ${token} lightness`
