@@ -12,6 +12,7 @@ import {
   FieldGroup,
   FieldLabel,
   FieldLegend,
+  FieldRequiredIndicator,
   FieldSeparator,
   FieldSet,
   FieldTitle,
@@ -179,6 +180,53 @@ export const WithSeparator: Story = {
       </Field>
     </FieldGroup>
   ),
+};
+
+export const RequiredAndOptionalIndicators: Story = {
+  render: () => (
+    <FieldGroup className="nx:w-80">
+      <Field>
+        <FieldLabel htmlFor="field-required-email">
+          Work email <FieldRequiredIndicator />
+        </FieldLabel>
+        <Input id="field-required-email" type="email" required />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="field-optional-po">
+          Purchase order{' '}
+          <FieldRequiredIndicator fallback="Optional">
+            Required
+          </FieldRequiredIndicator>
+        </FieldLabel>
+        <Input id="field-optional-po" />
+      </Field>
+    </FieldGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const requiredInput = canvas.getByRole('textbox', { name: 'Work email' });
+    const optionalInput = canvas.getByRole('textbox', {
+      name: 'Purchase order Optional',
+    });
+    const indicators = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(
+        '[data-slot="field-required-indicator"]'
+      )
+    );
+    const [requiredIndicator, optionalIndicator] = indicators;
+
+    await expect(requiredInput).toHaveAttribute('required');
+    await expect(optionalInput).not.toHaveAttribute('required');
+    await expect(indicators).toHaveLength(2);
+
+    await expect(requiredIndicator).toHaveTextContent('*');
+    await expect(requiredIndicator).toHaveAttribute('aria-hidden', 'true');
+    await expect(requiredIndicator).not.toHaveAttribute('data-optional');
+
+    await expect(optionalIndicator).toHaveTextContent('Optional');
+    await expect(optionalIndicator).toHaveAttribute('data-optional', 'true');
+    await expect(optionalIndicator).not.toHaveAttribute('aria-hidden');
+  },
 };
 
 // The checkbox-card pattern: a FieldLabel wrapping a Field becomes a selectable card.

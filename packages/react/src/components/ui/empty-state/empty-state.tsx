@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
@@ -144,17 +145,38 @@ function EmptyStateMedia({
  *
  * Props for the EmptyStateTitle component.
  */
-interface EmptyStateTitleProps extends React.ComponentProps<'div'> {}
+interface EmptyStateTitleProps extends React.ComponentProps<'div'> {
+  /**
+   * Render the title styles on a child element. Use this when the empty-state
+   * title should participate in the page outline as a real heading.
+   *
+   * @default false
+   * @example
+   * ```tsx
+   * <EmptyStateTitle asChild>
+   *   <h2>No contacts yet</h2>
+   * </EmptyStateTitle>
+   * ```
+   */
+  asChild?: boolean;
+}
 
 /**
  * EmptyStateTitle
  *
- * The headline of the empty state — what is missing. Renders a `div`, not a
- * heading element — set the heading level in your app if the region needs one.
+ * The headline of the empty state — what is missing. Renders as a `div` by
+ * default; use `asChild` to apply empty-state title styling to a semantic
+ * heading when the page outline needs one.
  */
-function EmptyStateTitle({ className, ...props }: EmptyStateTitleProps) {
+function EmptyStateTitle({
+  asChild = false,
+  className,
+  ...props
+}: EmptyStateTitleProps) {
+  const Comp = asChild ? Slot : 'div';
+
   return (
-    <div
+    <Comp
       data-slot="empty-state-title"
       className={cn('nx:typography-heading-xsmall', className)}
       {...props}
