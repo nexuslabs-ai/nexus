@@ -184,7 +184,7 @@ export const ScrollableContent: Story = {
       <DialogTrigger asChild>
         <Button variant="outline">Terms & Conditions</Button>
       </DialogTrigger>
-      <DialogContent className="nx:max-h-[300px] nx:overflow-y-auto">
+      <DialogContent className="nx:max-h-[300px]">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
           <DialogDescription>
@@ -241,6 +241,14 @@ export const ViewportBoundContent: Story = {
       </DialogContent>
     </Dialog>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Manual check: on a narrow/mobile viewport, long DialogBody content should scroll while the close button remains pinned in the content frame.',
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -254,8 +262,13 @@ export const ViewportBoundContent: Story = {
 
     await expect(dialog).toHaveClass(
       'nx:max-h-[calc(100svh-2rem)]',
-      'nx:overflow-y-auto'
+      'nx:overflow-hidden'
     );
+
+    const body = document.querySelector('[data-slot="dialog-body"]');
+    const closeButton = within(dialog).getByRole('button', { name: 'Close' });
+    await expect(body).toHaveClass('nx:min-h-0', 'nx:overflow-y-auto');
+    expect(body).not.toContainElement(closeButton);
 
     await userEvent.click(
       within(dialog).getByRole('button', {
@@ -606,7 +619,7 @@ export const WithDataAttributes: Story = {
       'nx:py-6',
       'nx:gap-4',
       'nx:max-h-[calc(100svh-2rem)]',
-      'nx:overflow-y-auto'
+      'nx:overflow-hidden'
     );
     await expect(content).not.toHaveClass('nx:p-6');
     await expect(
@@ -623,7 +636,7 @@ export const WithDataAttributes: Story = {
     ).toHaveAttribute('data-orientation', 'horizontal');
     await expect(
       document.querySelector('[data-slot="dialog-body"]')
-    ).toHaveClass('nx:px-6');
+    ).toHaveClass('nx:px-6', 'nx:min-h-0', 'nx:overflow-y-auto');
 
     // Close the dialog
     await userEvent.keyboard('{Escape}');

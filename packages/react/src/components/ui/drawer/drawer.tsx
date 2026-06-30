@@ -98,7 +98,7 @@ function DrawerContent({
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(
-          'nx:group/drawer-content nx:fixed nx:z-modal nx:flex nx:h-auto nx:flex-col nx:overflow-y-auto nx:bg-container nx:shadow-lg',
+          'nx:group/drawer-content nx:fixed nx:z-modal nx:flex nx:h-auto nx:flex-col nx:overflow-hidden nx:bg-container nx:shadow-lg',
           'nx:motion-reduce:transition-none',
           'nx:data-[vaul-drawer-direction=top]:inset-x-0 nx:data-[vaul-drawer-direction=top]:top-0 nx:data-[vaul-drawer-direction=top]:mb-24 nx:data-[vaul-drawer-direction=top]:max-h-[80svh] nx:data-[vaul-drawer-direction=top]:rounded-b-lg nx:data-[vaul-drawer-direction=top]:border-b-default nx:data-[vaul-drawer-direction=top]:border-border-default',
           'nx:data-[vaul-drawer-direction=bottom]:inset-x-0 nx:data-[vaul-drawer-direction=bottom]:bottom-0 nx:data-[vaul-drawer-direction=bottom]:mt-24 nx:data-[vaul-drawer-direction=bottom]:max-h-[80svh] nx:data-[vaul-drawer-direction=bottom]:rounded-t-lg nx:data-[vaul-drawer-direction=bottom]:border-t-default nx:data-[vaul-drawer-direction=bottom]:border-border-default',
@@ -128,7 +128,7 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-header"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1.5 nx:p-6 nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center nx:group-data-[vaul-drawer-direction=top]/drawer-content:text-center nx:md:text-left',
+        'nx:flex nx:shrink-0 nx:flex-col nx:gap-1.5 nx:p-6 nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center nx:group-data-[vaul-drawer-direction=top]/drawer-content:text-center nx:md:text-left',
         className
       )}
       {...props}
@@ -146,7 +146,7 @@ function DrawerBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="drawer-body"
-      className={cn('nx:px-6', className)}
+      className={cn('nx:min-h-0 nx:overflow-y-auto nx:px-6', className)}
       {...props}
     />
   );
@@ -162,7 +162,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-footer"
       className={cn(
-        'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-6',
+        'nx:mt-auto nx:flex nx:shrink-0 nx:flex-col nx:gap-2 nx:p-6',
         className
       )}
       {...props}

@@ -176,7 +176,7 @@ export const ScrollableContent: Story = {
       <SheetTrigger asChild>
         <Button variant="outline">Terms & Conditions</Button>
       </SheetTrigger>
-      <SheetContent className="nx:overflow-y-auto">
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Terms of Service</SheetTitle>
           <SheetDescription>
@@ -241,6 +241,14 @@ export const ViewportUnitContract: Story = {
       ))}
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Manual check: on a narrow/mobile viewport, long SheetBody content should scroll while the frame and close button stay fixed to the selected edge.',
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -251,7 +259,14 @@ export const ViewportUnitContract: Story = {
 
       const sheet = await within(document.body).findByRole('dialog');
       await expect(sheet).toHaveAttribute('data-side', side);
-      await expect(sheet).toHaveClass('nx:overflow-y-auto');
+      await expect(sheet).toHaveClass('nx:overflow-hidden');
+
+      const body = sheet.querySelector('[data-slot="sheet-body"]');
+      const closeButton = within(sheet).getByRole('button', {
+        name: `Close ${side} viewport sheet`,
+      });
+      await expect(body).toHaveClass('nx:min-h-0', 'nx:overflow-y-auto');
+      expect(body).not.toContainElement(closeButton);
 
       if (side === 'left' || side === 'right') {
         await expect(sheet).toHaveClass('nx:h-svh');
@@ -425,7 +440,11 @@ export const WithDataAttributes: Story = {
     ).toHaveAttribute('data-side', 'right');
     await expect(
       document.querySelector('[data-slot="sheet-content"]')
-    ).toHaveClass('nx:h-svh', 'nx:overflow-y-auto');
+    ).toHaveClass('nx:h-svh', 'nx:overflow-hidden');
+
+    await expect(
+      document.querySelector('[data-slot="sheet-body"]')
+    ).toHaveClass('nx:min-h-0', 'nx:overflow-y-auto');
 
     await expect(
       document.querySelector('[data-slot="sheet-close-button"]')

@@ -6,6 +6,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { buttonVariants } from '@/components/ui/button';
 import {
   defaultOverlayLayout,
+  overlayBodyClassName,
   overlayContentVariants,
   overlayFooterVariants,
   overlayHeaderVariants,
@@ -224,7 +225,7 @@ function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
   return (
     <div
       data-slot="alert-dialog-body"
-      className={cn('nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
       {...props}
     />
   );

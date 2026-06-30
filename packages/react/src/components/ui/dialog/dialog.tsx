@@ -5,6 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
   containsComposedSlot,
   defaultOverlayLayout,
+  overlayBodyClassName,
   overlayCloseButtonClassName,
   overlayContentVariants,
   overlayHeaderVariants,
@@ -255,7 +256,7 @@ function DialogBody({ className, ...props }: DialogBodyProps) {
   return (
     <div
       data-slot="dialog-body"
-      className={cn('nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
       {...props}
     />
   );
