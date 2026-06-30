@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { useNexusAppearance } from '../appearance/provider';
+import { useNexusAppearance } from '../components/ui/appearance/provider';
 
 export function useRuntimeTokenValues(
   tokenNames: readonly string[]

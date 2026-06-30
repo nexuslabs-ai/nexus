@@ -67,3 +67,10 @@ export * from '@/components/ui/tooltip';
 // Primitives
 export * from '@/components/primitives/hide';
 export * from '@/components/primitives/show';
+
+// Appearance (editor UI — provider is published separately via ./appearance subentry)
+export * from '@/components/ui/appearance/appearance-settings';
+export * from '@/components/ui/appearance/color-field';
+export * from '@/components/ui/appearance/config-preview';
+export * from '@/components/ui/appearance/setting-row';
+export * from '@/components/ui/appearance/theme-quick-control';

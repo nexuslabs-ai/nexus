@@ -94,10 +94,13 @@ export default defineConfig({
     lib: {
       entry: {
         index: path.resolve(__dirname, 'src/index.ts'),
-        appearance: path.resolve(__dirname, 'src/appearance/index.ts'),
+        appearance: path.resolve(
+          __dirname,
+          'src/components/ui/appearance/provider/index.ts'
+        ),
         'appearance-server': path.resolve(
           __dirname,
-          'src/appearance/server.ts'
+          'src/components/ui/appearance/provider/server.ts'
         ),
       },
       name: 'NexusReact',

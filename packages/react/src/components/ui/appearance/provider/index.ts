@@ -1,7 +1,6 @@
 'use client';
 
-// Client runtime Appearance surface. Product-specific editors live in consumer
-// apps; server-safe script helpers are exported from ./appearance/server.
+// Client runtime Appearance surface. Server-safe script helpers are exported from ./server.
 export type { CreateNexusAppearanceOptions } from './factory';
 export { createNexusAppearance } from './factory';
 export type {

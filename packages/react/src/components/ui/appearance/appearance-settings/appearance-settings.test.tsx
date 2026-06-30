@@ -1,9 +1,7 @@
-import {
-  NexusAppearanceProvider,
-  useNexusAppearance,
-} from '@nexus/react/appearance';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+
+import { NexusAppearanceProvider, useNexusAppearance } from '../provider';
 
 import { NexusAppearanceSettings } from './appearance-settings';
 

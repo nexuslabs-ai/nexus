@@ -5,20 +5,20 @@ import {
   type NexusAppearanceMode,
   type NexusSurfaceTone,
 } from '@nexus/core';
+import { IconPalette } from '@tabler/icons-react';
+
+import { Button } from '@/components/ui/button';
 import {
-  Button,
-  cn,
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Separator,
-  ToggleGroup,
-  ToggleGroupItem,
-} from '@nexus/react';
-import { useNexusAppearance } from '@nexus/react/appearance';
-import { IconPalette } from '@tabler/icons-react';
+} from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { cn } from '@/lib/utils';
 
-import { NexusAppearanceColorField } from './color-field';
+import { NexusAppearanceColorField } from '../color-field';
+import { useNexusAppearance } from '../provider';
 
 interface SwatchRowProps {
   label: string;

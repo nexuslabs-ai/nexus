@@ -14,28 +14,30 @@ import {
   type NexusSurfaceTone,
   STROKE_OPTIONS,
 } from '@nexus/core';
+
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Input,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Slider,
-  Switch,
-  ToggleGroup,
-  ToggleGroupItem,
-} from '@nexus/react';
-import { useNexusAppearance } from '@nexus/react/appearance';
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-import { NexusAppearanceColorField } from './color-field';
-import { NexusAppearanceConfigPreview } from './config-preview';
-import { NexusAppearanceSettingRow } from './setting-row';
+import { NexusAppearanceColorField } from '../color-field';
+import { NexusAppearanceConfigPreview } from '../config-preview';
+import { useNexusAppearance } from '../provider';
+import { NexusAppearanceSettingRow } from '../setting-row';
 
 const APPEARANCE_MODES: NexusAppearanceMode[] = ['light', 'dark', 'system'];
 const REDUCE_MOTION_OPTIONS: NexusAppearancePrefs['reduceMotion'][] = [
