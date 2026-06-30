@@ -185,7 +185,10 @@ function FieldLabel({
  *
  * Props for the FieldRequiredIndicator component.
  */
-interface FieldRequiredIndicatorProps extends React.ComponentProps<'span'> {
+type FieldRequiredIndicatorProps = Omit<
+  React.ComponentProps<'span'>,
+  'aria-hidden'
+> & {
   /**
    * Optional-field content to render instead of the required marker. This
    * remains readable by assistive tech and takes precedence over `children`.
@@ -206,7 +209,7 @@ interface FieldRequiredIndicatorProps extends React.ComponentProps<'span'> {
    * ```
    */
   fallback?: React.ReactNode;
-}
+};
 
 /**
  * FieldRequiredIndicator
@@ -218,21 +221,20 @@ function FieldRequiredIndicator({
   className,
   children,
   fallback,
-  'aria-hidden': _ariaHidden,
   ...props
 }: FieldRequiredIndicatorProps) {
   const isOptional = fallback !== undefined;
 
   return (
     <span
+      {...props}
       aria-hidden={isOptional ? undefined : true}
       data-slot="field-required-indicator"
       data-optional={isOptional ? 'true' : undefined}
       className={cn(
-        'nx:text-error-subtle-foreground nx:data-[optional=true]:text-muted-foreground',
+        'nx:text-error-subtle-foreground nx:data-[optional=true]:typography-body-default nx:data-[optional=true]:text-muted-foreground',
         className
       )}
-      {...props}
     >
       {isOptional ? fallback : (children ?? '*')}
     </span>

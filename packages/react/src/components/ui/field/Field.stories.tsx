@@ -194,7 +194,7 @@ export const RequiredAndOptionalIndicators: Story = {
       <Field>
         <FieldLabel htmlFor="field-optional-po">
           Purchase order{' '}
-          <FieldRequiredIndicator fallback="Optional" aria-hidden>
+          <FieldRequiredIndicator fallback="Optional">
             Required
           </FieldRequiredIndicator>
         </FieldLabel>
@@ -226,6 +226,9 @@ export const RequiredAndOptionalIndicators: Story = {
     await expect(optionalIndicator).toHaveTextContent('Optional');
     await expect(optionalIndicator).toHaveAttribute('data-optional', 'true');
     await expect(optionalIndicator).not.toHaveAttribute('aria-hidden');
+    await expect(optionalIndicator).toHaveClass(
+      'nx:data-[optional=true]:typography-body-default'
+    );
   },
 };
 
