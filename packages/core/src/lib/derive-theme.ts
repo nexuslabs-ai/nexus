@@ -141,7 +141,7 @@ const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
   'popover-active': 3.2,
   'control-background': 3.2,
   'control-background-hover': 4.8,
-  'nav-background': 0,
+  'nav-background': 0.6,
   'nav-item-hover': 1.6,
   'nav-item-active': 1.6,
   'nav-border': 3.2,
