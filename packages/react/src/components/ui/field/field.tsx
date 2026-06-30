@@ -218,14 +218,14 @@ function FieldRequiredIndicator({
   className,
   children,
   fallback,
-  'aria-hidden': ariaHidden,
+  'aria-hidden': _ariaHidden,
   ...props
 }: FieldRequiredIndicatorProps) {
   const isOptional = fallback !== undefined;
 
   return (
     <span
-      aria-hidden={isOptional ? ariaHidden : true}
+      aria-hidden={isOptional ? undefined : true}
       data-slot="field-required-indicator"
       data-optional={isOptional ? 'true' : undefined}
       className={cn(

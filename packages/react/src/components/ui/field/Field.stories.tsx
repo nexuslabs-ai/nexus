@@ -194,7 +194,7 @@ export const RequiredAndOptionalIndicators: Story = {
       <Field>
         <FieldLabel htmlFor="field-optional-po">
           Purchase order{' '}
-          <FieldRequiredIndicator fallback="Optional">
+          <FieldRequiredIndicator fallback="Optional" aria-hidden>
             Required
           </FieldRequiredIndicator>
         </FieldLabel>
