@@ -78,6 +78,36 @@ export const WithDescription: Story = {
   ),
 };
 
+export const TitleAsHeading: Story = {
+  render: (_args) => (
+    <section aria-labelledby="card-section-heading">
+      <Card className="nx:w-[350px]">
+        <CardHeader>
+          <CardTitle asChild>
+            <h2 id="card-section-heading">Campaign overview</h2>
+          </CardTitle>
+          <CardDescription>
+            Use a section-level heading when the card sits directly below a page
+            heading.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Campaign metrics belong to this section of the page outline.</p>
+        </CardContent>
+      </Card>
+    </section>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const heading = canvas.getByRole('heading', {
+      level: 2,
+      name: 'Campaign overview',
+    });
+
+    await expect(heading).toHaveAttribute('data-slot', 'card-title');
+  },
+};
+
 export const WithAction: Story = {
   render: (_args) => (
     <Card className="nx:w-[350px]">
@@ -398,8 +428,11 @@ export const WithDataAttributes: Story = {
     await expect(footer).toBeInTheDocument();
 
     // Verify title text
-    const titleElement = canvas.getByText('Data Attributes Test');
-    await expect(titleElement).toBeInTheDocument();
+    const titleElement = canvas.getByRole('heading', {
+      level: 3,
+      name: 'Data Attributes Test',
+    });
+    await expect(titleElement).toHaveAttribute('data-slot', 'card-title');
   },
 };
 
