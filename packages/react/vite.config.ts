@@ -28,11 +28,11 @@ function rewriteAppearanceDeclaration(filePath: string, content: string) {
     return {
       filePath,
       content: content.replace(
-        /from '\.\/components\/([^']+)'/g,
+        /from '\.\/components\/ui\/([^']+)'/g,
         (match, entry: string) =>
           entry.endsWith('/index')
             ? match
-            : `from './components/${entry}/index'`
+            : `from './components/ui/${entry}/index'`
       ),
     };
   }
