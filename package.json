@@ -40,6 +40,9 @@
     "docs:pull": "docker pull ghcr.io/nexuslabs-ai-bot/nexus-docs-mcp:latest",
     "docs:restore": "docker rm -f -v nexus-docs-restore >/dev/null 2>&1; docker create --name nexus-docs-restore ghcr.io/nexuslabs-ai-bot/nexus-docs-mcp:latest >/dev/null && docker cp nexus-docs-restore:/data/documents.db ./docs-mcp/data/documents.db && docker rm -v nexus-docs-restore >/dev/null && rm -f ./docs-mcp/data/documents.db-wal ./docs-mcp/data/documents.db-shm && echo 'Restored docs-mcp database from image into docs-mcp/data (stop docs:serve first)'",
     "size-limit": "size-limit",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm --filter @nexus_ds/core build && changeset publish",
     "prepare": "husky"
   },
   "size-limit": [
@@ -75,6 +78,7 @@
     }
   ],
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@eslint/js": "^9.39.2",
     "@nexus_ds/eslint-plugin": "workspace:*",
     "@size-limit/preset-small-lib": "^12.0.0",
