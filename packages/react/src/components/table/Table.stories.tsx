@@ -3,11 +3,18 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent } from 'storybook/test';
 
-import { IconChevronDown, IconChevronUp } from '@/lib/icons';
+import {
+  IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronUp,
+  IconSearch,
+} from '@/lib/icons';
 
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Hide } from '../hide';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../input-group';
 import { Show } from '../show';
 
 import {
@@ -471,9 +478,9 @@ export const SemanticScope: Story = {
   },
 };
 
-// A sorted column reads as active: TableHead emphasizes its text (muted →
+// A sorted column reads as active: TableHead emphasizes its text (muted to
 // foreground) when it carries aria-sort="ascending"/"descending", but not for a
-// merely-sortable "none". The interactive sort control is a recipe (SortableHeader).
+// merely-sortable "none". The interactive sort control is a recipe.
 export const AriaSortIndicator: Story = {
   render: () => (
     <Table>
@@ -505,8 +512,6 @@ export const AriaSortIndicator: Story = {
     await expect(none).toBeInTheDocument();
     await expect(desc).toBeInTheDocument();
 
-    // Smoke check that the emphasis utility ships on the head (it's on the cva
-    // base, so every <th> carries it — the aria-sort attr selects which renders).
     await expect(asc).toHaveClass(
       'nx:[&[aria-sort=ascending]]:text-foreground'
     );
@@ -1250,6 +1255,194 @@ export const LiveRegionAnnouncements: Story = {
   },
 };
 
-// The full sort/filter/paginate DataTable recipe — TanStack Table wired over
-// these primitives — lives at apps/console/src/components/data-table.tsx (the
-// logic engine stays a consumer dependency, out of the published bundle).
+// Canonical product-table recipe: filter + sortable header + row selection +
+// pagination + empty state, assembled over the Table primitives. State is plain
+// useState (TanStack Table in production; see the console adapter note below);
+// no @tanstack/react-table dependency enters the package.
+interface RecipeRow {
+  invoice: string;
+  status: string;
+  amount: number;
+}
+
+const recipeRows: RecipeRow[] = [
+  { invoice: 'INV-001', status: 'Paid', amount: 250 },
+  { invoice: 'INV-002', status: 'Pending', amount: 150 },
+  { invoice: 'INV-003', status: 'Unpaid', amount: 350 },
+  { invoice: 'INV-004', status: 'Paid', amount: 450 },
+  { invoice: 'INV-005', status: 'Pending', amount: 550 },
+  { invoice: 'INV-006', status: 'Paid', amount: 200 },
+  { invoice: 'INV-007', status: 'Unpaid', amount: 300 },
+];
+
+const RECIPE_PAGE_SIZE = 3;
+const formatRecipeAmount = (amount: number) => `$${amount.toFixed(2)}`;
+
+function DataTableRecipeDemo() {
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('asc');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(0);
+
+  const ariaSort = sort === 'asc' ? 'ascending' : 'descending';
+  const SortIcon = sort === 'asc' ? IconChevronUp : IconChevronDown;
+  const filtered = recipeRows
+    .filter((row) => row.invoice.toLowerCase().includes(query.toLowerCase()))
+    .sort((a, b) =>
+      sort === 'asc' ? a.amount - b.amount : b.amount - a.amount
+    );
+  const pageCount = Math.max(1, Math.ceil(filtered.length / RECIPE_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageRows = filtered.slice(
+    safePage * RECIPE_PAGE_SIZE,
+    safePage * RECIPE_PAGE_SIZE + RECIPE_PAGE_SIZE
+  );
+
+  function changeQuery(value: string) {
+    setQuery(value);
+    setPage(0);
+  }
+
+  function toggleRow(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  return (
+    <div className="nx:space-y-4">
+      <InputGroup className="nx:max-w-xs">
+        <InputGroupAddon>
+          <IconSearch />
+        </InputGroupAddon>
+        <InputGroupInput
+          placeholder="Filter by invoice..."
+          value={query}
+          onChange={(e) => changeQuery(e.target.value)}
+          aria-label="Filter by invoice"
+        />
+      </InputGroup>
+
+      <div className="nx:overflow-hidden nx:rounded-md nx:border-default nx:border-border-default">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <span className="nx:sr-only">Select</span>
+              </TableHead>
+              <TableHead>Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead aria-sort={ariaSort} className="nx:text-right">
+                <button
+                  type="button"
+                  onClick={() => setSort((s) => (s === 'asc' ? 'desc' : 'asc'))}
+                  className="nx:ml-auto nx:inline-flex nx:items-center nx:gap-1 nx:typography-label-default nx:text-inherit nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+                >
+                  Amount
+                  <SortIcon className="nx:size-4" aria-hidden />
+                </button>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pageRows.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="nx:py-8 nx:text-center nx:text-muted-foreground"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            ) : (
+              pageRows.map((row) => (
+                <TableRow
+                  key={row.invoice}
+                  data-state={
+                    selected.has(row.invoice) ? 'selected' : undefined
+                  }
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selected.has(row.invoice)}
+                      onCheckedChange={() => toggleRow(row.invoice)}
+                      aria-label={`Select ${row.invoice}`}
+                    />
+                  </TableCell>
+                  <TableRowHeader>{row.invoice}</TableRowHeader>
+                  <TableCell>{row.status}</TableCell>
+                  <TableCell className="nx:text-right nx:tabular-nums">
+                    {formatRecipeAmount(row.amount)}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
+        <p className="nx:text-muted-foreground nx:typography-body-default">
+          {selected.size > 0
+            ? `${selected.size} of ${filtered.length} row(s) selected.`
+            : `${filtered.length} row(s)`}
+        </p>
+        <div className="nx:flex nx:items-center nx:gap-3">
+          <span className="nx:text-muted-foreground nx:typography-label-default">
+            Page {safePage + 1} of {pageCount}
+          </span>
+          <Button
+            variant="outline"
+            size="icon-sm"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={safePage === 0}
+            aria-label="Previous page"
+          >
+            <IconChevronLeft />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon-sm"
+            onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+            disabled={safePage >= pageCount - 1}
+            aria-label="Next page"
+          >
+            <IconChevronRight />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const DataTableRecipe: Story = {
+  render: () => <DataTableRecipeDemo />,
+  play: async ({ canvasElement }) => {
+    const filter = canvasElement.querySelector(
+      '[aria-label="Filter by invoice"]'
+    ) as HTMLInputElement;
+    await userEvent.type(filter, 'INV-002');
+    await expect(canvasElement).toHaveTextContent('1 row(s)');
+    await userEvent.clear(filter);
+    await expect(canvasElement).toHaveTextContent('7 row(s)');
+
+    const amountHeader = canvasElement.querySelector('[aria-sort]');
+    await expect(amountHeader).toHaveAttribute('aria-sort', 'ascending');
+    await userEvent.click(canvasElement.querySelector('th button') as Element);
+    await expect(amountHeader).toHaveAttribute('aria-sort', 'descending');
+
+    await userEvent.click(
+      canvasElement.querySelector('tbody [role="checkbox"]') as Element
+    );
+    await expect(canvasElement).toHaveTextContent('1 of 7 row(s) selected.');
+  },
+};
+
+// DataTableRecipe (above) shows the assembled shell: filter, sortable header,
+// selection, pagination, empty state, over these primitives with plain state.
+// The production version wires TanStack Table over the same markup and lives at
+// apps/console/src/components/data-table.tsx (the engine stays a consumer
+// dependency, out of the published bundle).

@@ -8,14 +8,13 @@ interface FilterInputProps {
 }
 
 /**
- * The search box that filters the mobile card lists — mirrors the filter box
- * built into {@link DataTable} so the table (≥lg) and card (<lg) views share one
- * look. Controlled: the parent owns the query string.
+ * The shared search box for the console's table and card-list views. Controlled:
+ * the parent owns the query string.
  */
 export function FilterInput({
   value,
   onChange,
-  placeholder = 'Filter…',
+  placeholder,
 }: FilterInputProps) {
   return (
     <InputGroup className="nx:max-w-xs">
@@ -23,10 +22,10 @@ export function FilterInput({
         <IconSearch />
       </InputGroupAddon>
       <InputGroupInput
-        placeholder={placeholder}
+        placeholder={placeholder ?? 'Filter…'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        aria-label={placeholder}
+        aria-label={placeholder ?? 'Filter'}
       />
     </InputGroup>
   );

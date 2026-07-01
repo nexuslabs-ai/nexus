@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { Button } from '@nexus_ds/react';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
@@ -5,28 +7,30 @@ interface DataPagerProps {
   /** 0-based page index. */
   page: number;
   pageCount: number;
-  /** Total filtered row count, summarised on the left. */
+  /** Total filtered row count, shown on the left when `summary` is omitted. */
   total: number;
+  /** Overrides the left summary text, such as a selection count. */
+  summary?: ReactNode;
   onPrev: () => void;
   onNext: () => void;
 }
 
 /**
- * The prev/next pager for the mobile card lists — mirrors the pager built into
- * {@link DataTable} (row count, "Page X of Y", bounded chevrons) so the table
- * (≥lg) and card (<lg) views read consistently.
+ * The shared prev/next pager for the console's table and card-list views: row
+ * count or a caller summary, "Page X of Y", and bounded chevrons.
  */
 export function DataPager({
   page,
   pageCount,
   total,
+  summary,
   onPrev,
   onNext,
 }: DataPagerProps) {
   return (
     <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
       <p className="nx:text-muted-foreground nx:typography-body-default">
-        {total} row(s)
+        {summary ?? `${total} row(s)`}
       </p>
       <div className="nx:flex nx:items-center nx:gap-3">
         <span className="nx:text-muted-foreground nx:typography-label-default">
