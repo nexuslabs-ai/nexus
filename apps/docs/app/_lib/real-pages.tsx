@@ -41,7 +41,7 @@ export const SERVER_ROUTE_PAGES = {
  */
 export const MDX_PAGES: Record<
   string,
-  // eslint-disable-next-line @nexus/no-render-prop-types -- `default: ComponentType` is the shape of a lazily-imported MDX module, not a component-as-prop.
+  // eslint-disable-next-line @nexus_ds/no-render-prop-types -- `default: ComponentType` is the shape of a lazily-imported MDX module, not a component-as-prop.
   () => Promise<{ default: ComponentType }>
 > = {
   'getting-started/install': () =>

@@ -1,11 +1,11 @@
-# @nexus/core
+# @nexus_ds/core
 
-The framework-agnostic engine behind Nexus Appearance: appearance model, runtime theme derivation, and first-paint snapshots. Use it directly for non-React targets like Electron, React Native, or native shells, or via `@nexus/react/appearance` in React apps. It also contains the design tokens in DTCG format and CSS generation documented below.
+The framework-agnostic engine behind Nexus Appearance: appearance model, runtime theme derivation, and first-paint snapshots. Use it directly for non-React targets like Electron, React Native, or native shells, or via `@nexus_ds/react/appearance` in React apps. It also contains the design tokens in DTCG format and CSS generation documented below.
 
 ## Install
 
 ```bash
-pnpm add @nexus/core
+pnpm add @nexus_ds/core
 ```
 
 ## Primary Exports
@@ -32,7 +32,7 @@ import {
   deriveTheme,
   resolveFirstPaint,
   themeToCss,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 
 const state = {
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -126,7 +126,7 @@ This resolves to CSS:
 ### Generate CSS
 
 ```bash
-pnpm build:tailwind       # Generate @nexus/tailwind package CSS
+pnpm build:tailwind       # Generate @nexus_ds/tailwind package CSS
 pnpm build:tokens:modular # Generate modular CSS (console + docs apps)
 ```
 

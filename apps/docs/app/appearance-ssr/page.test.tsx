@@ -6,7 +6,7 @@ import {
   type NexusAppearanceSnapshot,
   type NexusAppearanceState,
   serializeNexusAppearanceStateCookie,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SERVER_ROUTE_PAGES } from '../_lib/real-pages';

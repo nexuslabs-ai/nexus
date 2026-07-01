@@ -13,7 +13,7 @@ import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { useMutation } from '@tanstack/react-query';
 import { getRouteApi, Link, useNavigate } from '@tanstack/react-router';
 

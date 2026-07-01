@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconFilter } from '@tabler/icons-react';
 
 import type {

@@ -9,7 +9,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Avatar, AvatarFallback } from '@nexus/react';
+import { Avatar, AvatarFallback } from '@nexus_ds/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {

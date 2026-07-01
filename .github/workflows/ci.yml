@@ -45,9 +45,9 @@ jobs:
         with:
           filters: |
             # `react` intentionally excludes `apps/**` — no app currently
-            # consumes @nexus/react at runtime, so apps/ changes can't break
+            # consumes @nexus_ds/react at runtime, so apps/ changes can't break
             # the react test/build/bundle-size jobs. Revisit if an app starts
-            # importing from @nexus/react.
+            # importing from @nexus_ds/react.
             react:
               - 'packages/react/**'
               - 'packages/tailwind/**'
@@ -74,7 +74,7 @@ jobs:
       # actually negate (under the default `some`, the `apps/**` inclusion
       # wins and the negation is silently a no-op). Combined with `packages`
       # via the job-level output expression below. Drop `!apps/docs/**` when
-      # @nexus/docs becomes a real package.
+      # @nexus_ds/docs becomes a real package.
       - name: Detect non-docs app changes
         uses: dorny/paths-filter@v4
         id: filter-apps
@@ -287,10 +287,10 @@ jobs:
           fi
 
       - name: Core runtime export contract
-        run: pnpm --filter @nexus/core audit:runtime-exports
+        run: pnpm --filter @nexus_ds/core audit:runtime-exports
 
       - name: Core dist-type contract
-        run: pnpm --filter @nexus/core typecheck:dist
+        run: pnpm --filter @nexus_ds/core typecheck:dist
 
       - name: Tailwind and CSS export contract
         run: node scripts/typecheck-tailwind-dist.mjs
@@ -365,7 +365,7 @@ jobs:
       # and the live union across spacing-*.json. Same fail-fast tier as
       # the validator above — stdlib-only, sub-second.
       - name: Check canonical step set freshness
-        run: pnpm --filter @nexus/eslint-plugin refresh:canonical-set --check
+        run: pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set --check
 
       - name: Regenerate token outputs (tailwind + modular)
         id: regen
@@ -393,15 +393,15 @@ jobs:
 
       - name: APCA contrast audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus/core audit:contrast
+        run: pnpm --filter @nexus_ds/core audit:contrast
 
       - name: Color-blind audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus/core audit:colorblind
+        run: pnpm --filter @nexus_ds/core audit:colorblind
 
       - name: Tailwind class-ref audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
-        run: pnpm --filter @nexus/core audit:class-refs
+        run: pnpm --filter @nexus_ds/core audit:class-refs
 
       - name: Token-mode codename audit
         if: ${{ !cancelled() && steps.regen.conclusion == 'success' }}
@@ -432,11 +432,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # The AdjustContrast story imports @nexus/core, which is consumed via
+      # The AdjustContrast story imports @nexus_ds/core, which is consumed via
       # its built dist/runtime entry (package.json exports). Build it so
       # Storybook/Vite can resolve the package during the story tests.
-      - name: Build @nexus/core
-        run: pnpm --filter @nexus/core build
+      - name: Build @nexus_ds/core
+        run: pnpm --filter @nexus_ds/core build
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -477,11 +477,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # The AdjustContrast story imports @nexus/core, which is consumed via
+      # The AdjustContrast story imports @nexus_ds/core, which is consumed via
       # its built dist/runtime entry (package.json exports). Build it so the
       # Storybook production build can resolve the package.
-      - name: Build @nexus/core
-        run: pnpm --filter @nexus/core build
+      - name: Build @nexus_ds/core
+        run: pnpm --filter @nexus_ds/core build
 
       - name: Build Storybook
         run: pnpm build-storybook

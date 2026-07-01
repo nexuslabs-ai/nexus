@@ -12,7 +12,7 @@ import {
   EmptyStateMedia,
   EmptyStateTitle,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconLayoutDashboard } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';

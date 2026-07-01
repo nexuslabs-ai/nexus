@@ -81,7 +81,7 @@ const toasterThemeVars = {
  *
  * @example
  * ```tsx
- * import { Toaster, toast } from '@nexus/react';
+ * import { Toaster, toast } from '@nexus_ds/react';
  *
  * function App() {
  *   return (

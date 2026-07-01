@@ -14,7 +14,7 @@ import {
   SheetTitle,
   Switch,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconCheck } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 

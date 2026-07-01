@@ -1,4 +1,4 @@
-import type { NexusAppearanceMode } from '@nexus/core';
+import type { NexusAppearanceMode } from '@nexus_ds/core';
 
 type NexusResolvedAppearanceMode = 'light' | 'dark';
 

@@ -12,7 +12,7 @@ import {
   TableRow,
   ToggleGroup,
   ToggleGroupItem,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';

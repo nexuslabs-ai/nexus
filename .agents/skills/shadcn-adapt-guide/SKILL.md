@@ -81,7 +81,7 @@ Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + s
 
 Run these and fix everything before reporting — no deferral (`no-follow-up-deferral.md`):
 
-- `pnpm --filter @nexus/react typecheck`
+- `pnpm --filter @nexus_ds/react typecheck`
 - `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/{name}/{name}.tsx`.
 - Story tests per `testing-react.md` (`pnpm test:storybook`); a11y violations fail the run.
 

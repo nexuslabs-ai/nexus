@@ -5,7 +5,7 @@ import * as Nexus from './app/_components/nexus';
 /**
  * Required by @next/mdx in the App Router. Maps Markdown-rendered HTML to
  * Nexus-styled elements (typography utilities, semantic tokens) and exposes
- * the @nexus/react components so MDX authors can drop a live <Button> etc.
+ * the @nexus_ds/react components so MDX authors can drop a live <Button> etc.
  * into prose with no import.
  *
  * The pre/code pairing matters: a fenced ``` block renders as <pre><code>;
@@ -72,7 +72,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    // live @nexus/react components, usable in MDX without an import
+    // live @nexus_ds/react components, usable in MDX without an import
     ...Nexus,
     // caller-provided overrides win
     ...components,

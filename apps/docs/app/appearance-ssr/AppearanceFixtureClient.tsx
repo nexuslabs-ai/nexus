@@ -2,11 +2,11 @@
 
 import * as React from 'react';
 
-import type { NexusAppearanceState } from '@nexus/core';
+import type { NexusAppearanceState } from '@nexus_ds/core';
 import {
   NexusAppearanceProvider,
   useNexusAppearance,
-} from '@nexus/react/appearance';
+} from '@nexus_ds/react/appearance';
 
 interface AppearanceFixtureClientProps {
   defaultState: NexusAppearanceState;

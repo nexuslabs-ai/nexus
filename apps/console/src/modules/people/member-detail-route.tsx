@@ -16,7 +16,7 @@ import {
   CardTitle,
   Separator,
   Skeleton,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconPencil } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';

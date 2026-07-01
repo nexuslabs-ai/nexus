@@ -108,8 +108,8 @@ describe('canonical-spacing-steps — real-file smoke test', () => {
         overrideConfig: {
           files: ['**/*.json'],
           languageOptions: { parser: jsoncParser },
-          plugins: { '@nexus': plugin },
-          rules: { '@nexus/canonical-spacing-steps': 'error' },
+          plugins: { '@nexus_ds': plugin },
+          rules: { '@nexus_ds/canonical-spacing-steps': 'error' },
         },
       });
       const filePath = resolve(semanticDir, fileName);
@@ -127,8 +127,8 @@ describe('canonical-spacing-steps — bad-fixture smoke test', () => {
       overrideConfig: {
         files: ['**/*.json'],
         languageOptions: { parser: jsoncParser },
-        plugins: { '@nexus': plugin },
-        rules: { '@nexus/canonical-spacing-steps': 'error' },
+        plugins: { '@nexus_ds': plugin },
+        rules: { '@nexus_ds/canonical-spacing-steps': 'error' },
       },
     });
     const filePath = resolve(fixturesDir, 'bad-canonical-spacing.json');

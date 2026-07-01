@@ -1,4 +1,4 @@
-import { createNexusAppearance } from '@nexus/react/appearance';
+import { createNexusAppearance } from '@nexus_ds/react/appearance';
 
 import {
   CONSOLE_APPEARANCE_DEFAULT,

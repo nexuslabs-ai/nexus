@@ -66,7 +66,7 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@nexus/react'],
+  transpilePackages: ['@nexus_ds/react'],
   // let .md/.mdx resolve as modules (for content imported by the dynamic route)
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // Pin the monorepo root (../.. from this file) so Turbopack doesn't walk past

@@ -1,34 +1,52 @@
 # Install
 
-Nexus ships as a small set of workspace packages: the React components, the
-Tailwind theme they're styled with, and the design tokens underneath. Add the
-packages you consume directly, plus the form and toast peers required by the
-React entrypoint.
+Nexus has two delivery models. The **runtime engine** and **lint rules** publish
+to npm; the **components** and **Tailwind theme** are copy/own — you vendor their
+source into your app and own it from there.
 
-## Add the packages
+| Package                        | How you get it                                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `@nexus_ds/core`               | `npm install` — framework-agnostic appearance / theme engine                                         |
+| `@nexus_ds/eslint-plugin`      | `npm install -D` — lint guardrails for the conventions                                               |
+| `@nexus_ds/react` (components) | copy/own — vendored via the export tool ([#541](https://github.com/nexuslabs-ai/nexus/issues/541))   |
+| `@nexus_ds/tailwind` (theme)   | copy/own — regenerated with your own token choices                                                   |
 
-For components and the Tailwind theme:
+> **Copy/own is still landing.** The standalone export tool that copies the
+> components and token CSS into a consumer app is tracked in
+> [#541](https://github.com/nexuslabs-ai/nexus/issues/541). Until it ships, the
+> components are consumed inside this monorepo via the workspace. The published
+> `@nexus_ds/core` and `@nexus_ds/eslint-plugin` packages install from npm today.
+
+## Install the published packages
+
+The runtime engine — required whenever you use the Appearance system
+(`@nexus_ds/react/appearance`):
 
 ```bash
-pnpm add @nexus/react @nexus/tailwind react-hook-form sonner
+npm install @nexus_ds/core
 ```
 
-`@nexus/react` provides the components; `@nexus/tailwind` provides the
-`nx:`-prefixed utility theme they're built on. `react-hook-form` and `sonner`
-back the exported Form and Toaster components. Tokens come along transitively.
-
-### Add Appearance theming
-
-To use the runtime Appearance system (`@nexus/react/appearance`), also add the
-framework-agnostic engine:
+`@nexus_ds/core` owns the appearance model, theme derivation, and the first-paint
+bootstrap. Add the lint rules as a dev dependency:
 
 ```bash
-pnpm add @nexus/core
+npm install -D @nexus_ds/eslint-plugin
 ```
 
-`@nexus/core` owns the appearance model, theme derivation, and the first-paint
-bootstrap. It is required when you use `@nexus/react/appearance`. See **Theme
-setup** for the full wiring.
+## Vendor the components and theme
+
+`@nexus_ds/react` (the components) and `@nexus_ds/tailwind` (the `nx:`-prefixed
+utility theme) are copy/own — you take their source into your app rather than
+installing them from npm. The export tool ([#541](https://github.com/nexuslabs-ai/nexus/issues/541))
+automates this. The copied React entrypoint needs `react-hook-form` and `sonner`
+as peers, which back the Form and Toaster components:
+
+```bash
+npm install react-hook-form sonner
+```
+
+The sections below show how the vendored packages are wired and consumed under
+their `@nexus_ds/*` module names.
 
 ## Wire the styles
 
@@ -36,8 +54,8 @@ Import the theme and the prebuilt component styles once, at your app's CSS
 entry point:
 
 ```css
-@import '@nexus/tailwind';
-@import '@nexus/react/styles.css';
+@import '@nexus_ds/tailwind';
+@import '@nexus_ds/react/styles.css';
 ```
 
 The second import matters: Tailwind doesn't scan `node_modules`, so the
@@ -52,14 +70,14 @@ initial page canvas before JavaScript loads:
 <meta name="color-scheme" content="light dark" />
 ```
 
-`@nexus/tailwind` also emits the matching CSS policy: `:root` advertises
+`@nexus_ds/tailwind` also emits the matching CSS policy: `:root` advertises
 light/dark support, `.dark` pins native UI to dark, and light mode stays pinned
 when `.dark` is absent.
 
 ## Render a component
 
 Every utility is prefixed with `nx:` and every color is a semantic token, so
-components theme themselves. The buttons below are live `@nexus/react`
+components theme themselves. The buttons below are live `@nexus_ds/react`
 components rendered straight from this Markdown page:
 
 <div className="nx:flex nx:flex-wrap nx:gap-3 nx:my-6">

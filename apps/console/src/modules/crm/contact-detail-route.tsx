@@ -20,7 +20,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import {
   IconFlag,
   IconMail,

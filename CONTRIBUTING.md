@@ -22,14 +22,14 @@ That's the whole first-time setup. It also wires the Husky pre-commit hook, whic
 
 Pick the surface you're working on — each is one `make` command that turbo orchestrates (parallel servers, prefixed logs, one Ctrl-C stops all):
 
-| Command        | Brings up                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface.              |
-| `make console` | the console app **+ a live `@nexus/react` watcher** (component edits show up in the app) |
-| `make docs`    | the docs site **+ live `@nexus/react`**                                                  |
-| `make dev-all` | everything: console + docs + storybook + all package watchers                            |
+| Command        | Brings up                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface.                 |
+| `make console` | the console app **+ a live `@nexus_ds/react` watcher** (component edits show up in the app) |
+| `make docs`    | the docs site **+ live `@nexus_ds/react`**                                                  |
+| `make dev-all` | everything: console + docs + storybook + all package watchers                               |
 
-> **First start on a clean checkout:** `console` / `docs` read `@nexus/react`'s `dist`, which the watcher emits a moment after launch — a brief error on the very first start is expected, or run `make build` once beforehand.
+> **First start on a clean checkout:** `console` / `docs` read `@nexus_ds/react`'s `dist`, which the watcher emits a moment after launch — a brief error on the very first start is expected, or run `make build` once beforehand.
 
 Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nexus-docs-mcp)).
 
@@ -52,13 +52,13 @@ The pre-commit hook already formats and `nx:`-lints staged files, so you rarely 
 
 `make help` prints these with descriptions. The full set:
 
-| Group        | Targets                                                      |
-| ------------ | ------------------------------------------------------------ |
-| **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`        |
-| **Dev**      | `dev` · `console` · `docs` · `dev-all`                       |
-| **Build**    | `build` · `tokens` (regenerate token CSS from `@nexus/core`) |
-| **Quality**  | `lint` · `typecheck` · `audit` · `verify`                    |
-| **Docs MCP** | `up` · `down` · `serve` · `publish`                          |
+| Group        | Targets                                                         |
+| ------------ | --------------------------------------------------------------- |
+| **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`           |
+| **Dev**      | `dev` · `console` · `docs` · `dev-all`                          |
+| **Build**    | `build` · `tokens` (regenerate token CSS from `@nexus_ds/core`) |
+| **Quality**  | `lint` · `typecheck` · `audit` · `verify`                       |
+| **Docs MCP** | `up` · `down` · `serve` · `publish`                             |
 
 Anything not wrapped is still a plain pnpm script (`pnpm test`, `pnpm test:storybook:ui`, the per-package `audit:*`).
 
@@ -75,7 +75,7 @@ A single `*.stories.tsx` file does four jobs at once:
 
 You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — `vitest.config.ts` explicitly excludes `packages/react/src/components/**/*.test.{ts,tsx}` from the `unit` project.
 
-Hooks and utilities use `*.test.ts` files with `@nexus/test-utils`. Scripts under `packages/core/scripts/__tests__/` use `.test.js` and import from `vitest` directly. Both run under Vitest's `unit` project (jsdom).
+Hooks and utilities use `*.test.ts` files with `@nexus_ds/test-utils`. Scripts under `packages/core/scripts/__tests__/` use `.test.js` and import from `vitest` directly. Both run under Vitest's `unit` project (jsdom).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -211,10 +211,10 @@ export const Destructive: Story = {
 
 ### Hooks and utilities: `*.test.ts`
 
-Plain Vitest with `@nexus/test-utils` (re-exports `act`, `renderHook`, `waitFor` plus the standard Vitest globals — **not** `render` / `screen` / `userEvent` / `axe`, which only make sense for component tests, and those live in stories):
+Plain Vitest with `@nexus_ds/test-utils` (re-exports `act`, `renderHook`, `waitFor` plus the standard Vitest globals — **not** `render` / `screen` / `userEvent` / `axe`, which only make sense for component tests, and those live in stories):
 
 ```tsx
-import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
+import { act, describe, expect, it, renderHook } from '@nexus_ds/test-utils';
 
 import { useCounter } from './use-counter';
 
@@ -302,6 +302,58 @@ The index DB ships **inside** the image, never in git — the live index is the 
 | `make publish` | `docs:login` + `docs:publish` (export → build → push) | maintainer — ship an update        |
 
 The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claude/rules/docs-mcp.md).
+
+---
+
+## Releasing
+
+Releases are driven by [changesets](https://github.com/changesets/changesets) and the [`Release`](.github/workflows/release.yml) workflow. Only the two runtime packages publish to npm; everything else is either internal or copy/own.
+
+| Package                   | Published? | Why                                                                     |
+| ------------------------- | ---------- | ----------------------------------------------------------------------- |
+| `@nexus_ds/core`          | **npm**    | Framework-agnostic runtime engine; copied component code imports it     |
+| `@nexus_ds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
+| `@nexus_ds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
+| `@nexus_ds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
+| `@nexus_ds/test-utils`    | private    | Internal test tooling                                                   |
+| `@nexus_ds/console/docs`  | private    | Apps                                                                    |
+
+Everything lives under the `@nexus_ds` scope — the published packages on npm and the ESLint plugin's **rule namespace** (rules are referenced as `@nexus_ds/*`, e.g. `@nexus_ds/no-render-prop-types`). The rule namespace is a flat-config key the plugin registers, independent of the npm package name; it is kept in lockstep with the scope so the repo reads consistently.
+
+### Publishing setup (trusted publishing — no token)
+
+The packages authenticate to npm with **trusted publishing** (OIDC): GitHub Actions mints a short-lived credential at publish time, so there is **no `NPM_TOKEN` secret** in the repo. This is already configured:
+
+1. Both packages were bootstrapped with an initial manual `npm publish` — trusted publishing can't be configured until a package exists on npm.
+2. Each package has a **trusted publisher** registered on npmjs.com (_Settings → Trusted Publisher → GitHub Actions_) pointing at `nexuslabs-ai/nexus` and the `release.yml` workflow.
+3. A repo secret **`RELEASE_TOKEN`** — a fine-grained PAT from `nexuslabs-ai-bot` with **contents: read/write** and **pull requests: read/write** on this repo — authenticates the "Version Packages" PR. The default `GITHUB_TOKEN` can't be used here: PRs it opens don't fire `pull_request`, so the required `CI Status` check would never run on the version PR and it couldn't merge. Rotate the PAT before it expires.
+
+The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a trusted-publishing-capable version (≥ 11.5.1) on Node ≥ 22.14.0, and uses `RELEASE_TOKEN` for the release PR and tags. There is **no npm token** — publish auth is OIDC. Provenance attestations are emitted automatically.
+
+### Day-to-day: adding a changeset
+
+Any PR that changes `@nexus_ds/core` or `@nexus_ds/eslint-plugin` includes a changeset describing the bump:
+
+```bash
+pnpm changeset        # pick packages + semver bump, write a summary
+```
+
+Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: `major` for a breaking change to core's runtime surface or the plugin's rule API, `minor` for additive, `patch` for fixes.
+
+### Cutting a release
+
+The `Release` workflow runs on every push to `main`:
+
+1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s.
+2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nexus_ds/core` and `@nexus_ds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
+
+`@nexus_ds/core` and `@nexus_ds/eslint-plugin` were bootstrapped at `0.0.1` by the initial manual publish. The staged initial changeset cuts the first **trusted-publishing** release: merging the Version Packages PR the workflow opens publishes both at `0.1.0`. Verify any release with a fresh external install:
+
+```bash
+npm install @nexus_ds/core @nexus_ds/eslint-plugin
+```
+
+To version locally without publishing (e.g. to preview the bump): `pnpm version-packages`.
 
 ---
 

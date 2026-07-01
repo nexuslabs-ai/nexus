@@ -1,6 +1,6 @@
 # Extract Non-Trivial Inline Handlers
 
-> **Enforced by** `@nexus/no-multi-statement-jsx-handler` — inline JSX handlers with 3+ statements, or a nested callback-object argument, fail `pnpm lint`. One- and two-statement handlers stay inline.
+> **Enforced by** `@nexus_ds/no-multi-statement-jsx-handler` — inline JSX handlers with 3+ statements, or a nested callback-object argument, fail `pnpm lint`. One- and two-statement handlers stay inline.
 
 Inline event handlers in JSX (`onClick`, `onSubmit`, `onChange`, …) are fine when the body is a one- or two-line call — a single mutation kick-off, a state setter, a router push. Past that, extract a named function above the `return` and pass it by reference.
 

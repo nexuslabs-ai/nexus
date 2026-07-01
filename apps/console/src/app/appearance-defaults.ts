@@ -2,7 +2,7 @@ import {
   DEFAULT_NEXUS_APPEARANCE,
   DEFAULT_STORAGE_KEY,
   type NexusAppearanceState,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 
 export const CONSOLE_STORAGE_KEY = DEFAULT_STORAGE_KEY;
 

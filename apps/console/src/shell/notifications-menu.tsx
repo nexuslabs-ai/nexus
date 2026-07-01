@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
   Separator,
   Skeleton,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import {
   IconAt,
   IconBell,

@@ -1,5 +1,5 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus/react';
-import { NexusAppearanceSettings } from '@nexus/react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus_ds/react';
+import { NexusAppearanceSettings } from '@nexus_ds/react';
 
 import { AccountTab } from './AccountTab';
 import { NotificationsTab } from './NotificationsTab';
@@ -7,7 +7,7 @@ import { ProfileTab } from './ProfileTab';
 
 /**
  * The composed Settings scene — a realistic product screen assembled from
- * @nexus/react primitives plus console-owned Appearance controls. Its
+ * @nexus_ds/react primitives plus console-owned Appearance controls. Its
  * Appearance tab drives the live theme; the others are realistic settings
  * forms. Layers background → container (Card) → popover / overlay (Select /
  * AlertDialog) to exercise the surface contract.

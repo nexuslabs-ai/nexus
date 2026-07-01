@@ -1,6 +1,6 @@
 'use client';
 
-import type { NexusAppearanceState } from '@nexus/core';
+import type { NexusAppearanceState } from '@nexus_ds/core';
 
 import {
   type NexusAppearanceCookieOptions,

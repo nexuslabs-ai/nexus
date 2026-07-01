@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconCreditCard } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 

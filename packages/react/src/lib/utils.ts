@@ -3,7 +3,7 @@ import { extendTailwindMerge } from 'tailwind-merge';
 
 /**
  * Tailwind-merge class groups for Nexus custom utilities. Hand-mirrors the
- * `@utility` sets emitted by `@nexus/core` (see `packages/tailwind`) so a new
+ * `@utility` sets emitted by `@nexus_ds/core` (see `packages/tailwind`) so a new
  * custom utility cannot silently drop out of `cn()`'s last-wins collapse.
  */
 const ROLE_CLASS_GROUPS = {

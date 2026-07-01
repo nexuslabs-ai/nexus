@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import {
   IconChevronDown,
   IconChevronUp,

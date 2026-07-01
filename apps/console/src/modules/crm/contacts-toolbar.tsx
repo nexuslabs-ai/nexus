@@ -25,7 +25,7 @@ import {
   toast,
   ToggleGroup,
   ToggleGroupItem,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import {
   IconBookmark,
   IconFilter,

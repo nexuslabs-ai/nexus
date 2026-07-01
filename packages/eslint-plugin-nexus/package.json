@@ -1,9 +1,19 @@
 {
-  "name": "@nexus/eslint-plugin",
+  "name": "@nexus_ds/eslint-plugin",
   "version": "0.0.1",
-  "private": true,
   "type": "module",
   "description": "Custom ESLint rules for the Nexus design system",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexuslabs-ai/nexus.git",
+    "directory": "packages/eslint-plugin-nexus"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",

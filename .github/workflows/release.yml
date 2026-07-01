@@ -1,0 +1,91 @@
+name: Release
+
+# Publishes @nexus_ds/core and @nexus_ds/eslint-plugin to npm via changesets,
+# authenticated by npm trusted publishing (OIDC) — there is no npm token in the
+# repo. Standalone from ci.yml: this is a post-merge push:main workflow, not a
+# PR check, so it is not part of the `CI Status` branch-protection aggregator.
+#
+# Flow: on push to main, changesets/action either opens/updates a "Version
+# Packages" PR (when unreleased changesets exist) or — once that PR merges and
+# the changesets are consumed — runs `pnpm release` to build and publish.
+# Only the two non-private packages publish; changesets skips private ones.
+#
+# Auth: each published package has a trusted publisher registered on npmjs.com
+# pointing at this repo + this workflow file (release.yml). At publish time npm
+# exchanges the GitHub OIDC token (id-token: write) for a short-lived
+# credential — no secret to store or rotate. This requires npm >= 11.5.1
+# (installed below, since the npm bundled with Node is older) and Node >=
+# 22.14.0; provenance attestations are emitted automatically. registry-url is
+# intentionally omitted from setup-node: with no token configured, npm falls
+# back to the OIDC exchange against the default registry. See
+# CONTRIBUTING.md § Releasing.
+#
+# Release auth: changesets pushes the "Version Packages" branch and the release
+# tags with plain `git push` (authenticated by the credential actions/checkout
+# persists) and opens the version PR through the API. Both use RELEASE_TOKEN — a
+# fine-grained PAT from nexuslabs-ai-bot — supplied to the checkout step and to
+# changesets/action's GITHUB_TOKEN env, not the default GITHUB_TOKEN, because:
+#   - the default token is read-only here (contents: read), so its persisted
+#     checkout credential can't push the branch or tags (403); and
+#   - branches/PRs created with the default token don't fire `pull_request`, so
+#     the required `CI Status` check would never run on the version PR and it
+#     couldn't merge without an admin override.
+# The default GITHUB_TOKEN then only needs id-token: write for the OIDC exchange.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read # git push + PR are authenticated by RELEASE_TOKEN (see above)
+  id-token: write # OIDC token for npm trusted publishing (+ provenance)
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN }} # persisted so changesets' git push (branch + tags) is authenticated
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0' # trusted publishing requires Node >= 22.14.0
+          cache: 'pnpm'
+
+      # `changeset publish` runs `pnpm publish` (pnpm is the detected package
+      # manager), which packs each package then shells out to the system npm to
+      # upload it — so the OIDC trusted-publishing exchange runs in npm, which
+      # must be >= 11.5.1 (newer than the npm bundled with Node 22). Pinned (not
+      # @latest) so the publish path stays reproducible.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@11.5.1
+
+      - name: Install dependencies
+        # --ignore-scripts: RELEASE_TOKEN is persisted in .git/config for this
+        # job, so keep untrusted third-party dependency lifecycle scripts from
+        # reading it. The build doesn't need them — esbuild resolves its
+        # platform binary from the installed optional package at runtime.
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Create Release Pull Request or Publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+        env:
+          # RELEASE_TOKEN (bot PAT), not the default GITHUB_TOKEN — see the
+          # "Release auth" note at the top of this file. Using GITHUB_TOKEN here
+          # would leave the version PR unable to clear branch protection.
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

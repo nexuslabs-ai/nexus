@@ -1,6 +1,7 @@
 {
-  "name": "@nexus/test-utils",
+  "name": "@nexus_ds/test-utils",
   "version": "0.0.1",
+  "private": true,
   "description": "Test utilities for Nexus Design System components",
   "type": "module",
   "main": "./dist/index.cjs",

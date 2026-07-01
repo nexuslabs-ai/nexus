@@ -5,7 +5,7 @@ import {
   EmptyStateHeader,
   EmptyStateMedia,
   EmptyStateTitle,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react';
 
 interface ErrorStateProps {

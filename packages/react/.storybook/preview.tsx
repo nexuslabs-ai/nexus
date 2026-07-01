@@ -10,7 +10,7 @@ import {
   type NexusAppearanceState,
   sanitizeNexusAppearance,
   STROKE_OPTIONS,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 import type { Decorator, Preview } from '@storybook/react-vite';
 import { useGlobals } from 'storybook/preview-api';
 
@@ -18,8 +18,8 @@ import { NexusAppearanceProvider } from '../src/components/appearance/provider';
 
 // Storybook needs the full token set to render. The shipped component CSS
 // (src/index.css) is utilities-only by design — tokens come from the consumer's
-// @nexus/tailwind — so Storybook loads them via preview.css (a CSS @import, so
-// the production build can resolve @nexus/tailwind's .css package entry).
+// @nexus_ds/tailwind — so Storybook loads them via preview.css (a CSS @import, so
+// the production build can resolve @nexus_ds/tailwind's .css package entry).
 import './preview.css';
 
 type AppearanceGlobalKey =
@@ -245,7 +245,7 @@ const preview: Preview = {
       },
     },
     // A11y violations will fail tests automatically.
-    // Color-contrast is APCA-gated via `pnpm --filter @nexus/core audit:contrast`
+    // Color-contrast is APCA-gated via `pnpm --filter @nexus_ds/core audit:contrast`
     // (see `packages/core/scripts/audit-contrast.js`), not WCAG 2 — disable
     // axe-core's WCAG-based contrast rules so the two gates don't conflict.
     a11y: {

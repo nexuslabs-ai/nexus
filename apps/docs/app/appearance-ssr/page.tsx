@@ -3,8 +3,8 @@ import * as React from 'react';
 import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
-} from '@nexus/core';
-import { NexusAppearanceScript } from '@nexus/react/appearance/server';
+} from '@nexus_ds/core';
+import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
 import { cookies } from 'next/headers';
 
 import { AppearanceFixtureClient } from './AppearanceFixtureClient';

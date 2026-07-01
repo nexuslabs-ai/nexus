@@ -15,7 +15,7 @@ import {
   Skeleton,
   Textarea,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconArrowLeft, IconChevronDown, IconSend } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';

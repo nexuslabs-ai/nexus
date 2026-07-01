@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { SidebarInset, SidebarProvider } from '@nexus/react';
+import { SidebarInset, SidebarProvider } from '@nexus_ds/react';
 import { Outlet } from '@tanstack/react-router';
 
 import { AppSidebar } from '../shell/app-sidebar';

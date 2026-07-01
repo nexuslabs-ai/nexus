@@ -1,6 +1,6 @@
 # Testing Rules - React Package
 
-> This file contains testing patterns for `@nexus/react` package.
+> This file contains testing patterns for `@nexus_ds/react` package.
 > For core testing philosophy, see: [testing.md](testing.md)
 
 ## Core Principle
@@ -13,11 +13,11 @@
 
 ## Testing Split
 
-| What       | Where           | Imports From        |
-| ---------- | --------------- | ------------------- |
-| Components | `*.stories.tsx` | `storybook/test`    |
-| Hooks      | `*.test.ts`     | `@nexus/test-utils` |
-| Utilities  | `*.test.ts`     | `@nexus/test-utils` |
+| What       | Where           | Imports From           |
+| ---------- | --------------- | ---------------------- |
+| Components | `*.stories.tsx` | `storybook/test`       |
+| Hooks      | `*.test.ts`     | `@nexus_ds/test-utils` |
+| Utilities  | `*.test.ts`     | `@nexus_ds/test-utils` |
 
 ## File Structure
 
@@ -191,11 +191,11 @@ play: async ({ canvasElement }) => {
 };
 ```
 
-## Hook Tests (Using @nexus/test-utils)
+## Hook Tests (Using @nexus_ds/test-utils)
 
 ```tsx
 // use-counter.test.ts
-import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
+import { act, describe, expect, it, renderHook } from '@nexus_ds/test-utils';
 
 import { useCounter } from './use-counter';
 
@@ -216,7 +216,7 @@ describe('useCounter', () => {
 
 ```tsx
 // format-currency.test.ts
-import { describe, expect, it } from '@nexus/test-utils';
+import { describe, expect, it } from '@nexus_ds/test-utils';
 
 import { formatCurrency } from './format-currency';
 
@@ -248,14 +248,14 @@ import {
   renderHook,
   vi,
   waitFor,
-} from '@nexus/test-utils';
+} from '@nexus_ds/test-utils';
 ```
 
 ## Accessibility Testing
 
 A11y is automatic. Every story is checked against axe-core rules via `addon-a11y` and violations fail the test — keyboard nav, ARIA semantics, focus management, role/landmark structure. No separate a11y assertions needed.
 
-**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Contrast is verified at the token layer by `pnpm --filter @nexus/core audit:contrast`.
+**Color contrast is APCA-gated, not axe-gated.** Axe-core's `color-contrast` rules are disabled in `preview.tsx` because they enforce WCAG 2.x ratios that don't match Nexus's APCA tier model. Contrast is verified at the token layer by `pnpm --filter @nexus_ds/core audit:contrast`.
 
 ## Running Tests
 
@@ -282,10 +282,10 @@ pnpm test:storybook:ui
 | ----------------------------------------------- | -------------------------------------- |
 | Create `component.test.tsx`                     | Add play functions to stories          |
 | Import from `@testing-library/react` in stories | Use `storybook/test`                   |
-| Import `render` from `@nexus/test-utils`        | Use stories for components             |
+| Import `render` from `@nexus_ds/test-utils`     | Use stories for components             |
 | Add manual `axe()` assertions                   | Let addon-a11y handle it               |
 | Skip keyboard interaction tests                 | Every interactive component needs them |
-| Use `@nexus/test-utils` for components          | Use `storybook/test` in stories        |
+| Use `@nexus_ds/test-utils` for components       | Use `storybook/test` in stories        |
 | Import from `@storybook/test`                   | Use `storybook/test` (Storybook 10)    |
 
 ## Do Not

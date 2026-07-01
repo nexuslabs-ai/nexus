@@ -1,15 +1,15 @@
-/* @nexus/react component styles.
+/* @nexus_ds/react component styles.
  *
  * Ships UTILITIES ONLY — design tokens are NOT emitted here. We @reference the
  * Nexus theme so Tailwind can generate utilities against it (and resolve the
  * composite @utility / @custom-variant definitions) without outputting any
  * `--color-*` / `--nx-color-*` variables. Consumers supply the tokens by
- * importing `@nexus/tailwind`; that way importing this file can never re-define
+ * importing `@nexus_ds/tailwind`; that way importing this file can never re-define
  * (and thus override / stale-out) a consumer's tokens.
  */
 @import 'tailwindcss' prefix(nx);
 @custom-variant reduce-transparency (@media (prefers-reduced-transparency: reduce));
-@reference '@nexus/tailwind';
+@reference '@nexus_ds/tailwind';
 @import 'tw-animate-css';
 @import './components/progress/progress.css';
 

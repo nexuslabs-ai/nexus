@@ -1,4 +1,4 @@
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@nexus/react';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@nexus_ds/react';
 import { IconSearch } from '@tabler/icons-react';
 
 interface FilterInputProps {

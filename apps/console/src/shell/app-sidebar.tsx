@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import {
   IconComponents,
   IconLayoutGrid,

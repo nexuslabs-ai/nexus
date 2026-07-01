@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import {
   nexusComponentConfig,
   nexusSpacingTokenConfig,
-} from '@nexus/eslint-plugin/config';
+} from '@nexus_ds/eslint-plugin/config';
 import prettierConfig from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';

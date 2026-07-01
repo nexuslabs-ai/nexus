@@ -20,7 +20,7 @@ const RELEASES: Release[] = [
     changes: [
       {
         type: 'Changed',
-        text: '@nexus/core — publish-ready framework-agnostic Appearance engine',
+        text: '@nexus_ds/core — publish-ready framework-agnostic Appearance engine',
       },
       {
         type: 'Added',
@@ -53,7 +53,7 @@ const RELEASES: Release[] = [
       },
       {
         type: 'Fixed',
-        text: '@nexus/react/appearance — consumer dist types now resolve correctly',
+        text: '@nexus_ds/react/appearance — consumer dist types now resolve correctly',
         pr: 548,
       },
     ],

@@ -9,11 +9,11 @@ CSS imports, a provider, and a first-paint script.
 At your app's CSS entry point:
 
 ```css
-@import '@nexus/tailwind';
-@import '@nexus/react/styles.css';
+@import '@nexus_ds/tailwind';
+@import '@nexus_ds/react/styles.css';
 ```
 
-`@nexus/tailwind` provides the token utilities. `@nexus/react/styles.css`
+`@nexus_ds/tailwind` provides the token utilities. `@nexus_ds/react/styles.css`
 contains the utilities used inside compiled Nexus components, because Tailwind
 does not scan `node_modules`.
 
@@ -24,7 +24,7 @@ are state fields, not factory arguments.
 
 ```ts
 // app/appearance-state.ts or src/appearance-state.ts
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus/core';
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -49,9 +49,9 @@ import { cookies } from 'next/headers';
 import {
   createNexusAppearanceSnapshotFromCookie,
   DEFAULT_COOKIE_KEY,
-} from '@nexus/core';
-import { NexusAppearanceProvider } from '@nexus/react/appearance';
-import { NexusAppearanceScript } from '@nexus/react/appearance/server';
+} from '@nexus_ds/core';
+import { NexusAppearanceProvider } from '@nexus_ds/react/appearance';
+import { NexusAppearanceScript } from '@nexus_ds/react/appearance/server';
 import { defaultAppearance } from './appearance-state';
 import './globals.css';
 
@@ -111,7 +111,7 @@ import react from '@vitejs/plugin-react';
 import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromState,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 import { defaultAppearance } from './src/appearance-state';
 
 const STORAGE_KEY = 'app-appearance';
@@ -138,7 +138,7 @@ export default defineConfig({
 ```tsx
 // src/main.tsx
 import { createRoot } from 'react-dom/client';
-import { createNexusAppearance } from '@nexus/react/appearance';
+import { createNexusAppearance } from '@nexus_ds/react/appearance';
 import { defaultAppearance } from './appearance-state';
 import './index.css';
 

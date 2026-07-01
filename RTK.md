@@ -120,7 +120,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 Required component story purposes are defined in `.claude/rules/testing-react.md`. New components generally need default, variant, size, disabled, click interaction, keyboard interaction, data-attribute, composition, edge-case, and showcase stories unless that rule documents an archetype-specific exception.
 
-Hooks and utilities use `*.test.ts` with `@nexus/test-utils`. Do not use Storybook imports in hook/utility tests.
+Hooks and utilities use `*.test.ts` with `@nexus_ds/test-utils`. Do not use Storybook imports in hook/utility tests.
 
 Before finishing component work, run the narrowest meaningful checks first, then broaden as risk increases:
 
@@ -151,7 +151,7 @@ The repo still carries useful Claude-specific workflow assets:
 
 Codex does not automatically execute Claude commands or invoke Claude subagents. When a user mentions a Claude command such as `/implement`, translate the intent into normal Codex work and read the corresponding `.claude/commands/*.md` or `.claude/skills/*/SKILL.md` only for process guidance.
 
-Formatting and linting run on commit via the Husky + lint-staged pre-commit hook (`eslint --fix` + `prettier --write` on staged files); the `nx:` Tailwind-class conventions are enforced by the `@nexus/nx-class-conventions` ESLint rule. For immediate feedback, run `pnpm lint` and `pnpm format` explicitly.
+Formatting and linting run on commit via the Husky + lint-staged pre-commit hook (`eslint --fix` + `prettier --write` on staged files); the `nx:` Tailwind-class conventions are enforced by the `@nexus_ds/nx-class-conventions` ESLint rule. For immediate feedback, run `pnpm lint` and `pnpm format` explicitly.
 
 ## GitHub And PRs
 

@@ -77,7 +77,7 @@ function main() {
   if (check) {
     if (!existing) {
       process.stderr.write(
-        `Error: ${OUTPUT_PATH} is missing. Run \`pnpm --filter @nexus/eslint-plugin refresh:canonical-set\` and commit the result.\n`
+        `Error: ${OUTPUT_PATH} is missing. Run \`pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set\` and commit the result.\n`
       );
       process.exit(1);
     }
@@ -100,7 +100,7 @@ function main() {
         (extra.length
           ? `  no longer in any mode file: ${extra.join(', ')}\n`
           : '') +
-        `Refresh via \`pnpm --filter @nexus/eslint-plugin refresh:canonical-set\` and commit the result.\n`
+        `Refresh via \`pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set\` and commit the result.\n`
     );
     process.exit(1);
   }
@@ -127,7 +127,7 @@ function main() {
 }
 
 function defaultComment() {
-  return 'Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `pnpm --filter @nexus/eslint-plugin refresh:canonical-set`. The shipped union may exceed the originally-intended scale; reconciliation tracked separately.';
+  return 'Union of every px value shipped across packages/core/tokens/semantic/spacing-{vega,lyra,maia,mira,nova,luma,sera}.json. Regenerate via `pnpm --filter @nexus_ds/eslint-plugin refresh:canonical-set`. The shipped union may exceed the originally-intended scale; reconciliation tracked separately.';
 }
 
 main();

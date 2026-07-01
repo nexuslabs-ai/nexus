@@ -146,7 +146,7 @@ export function pathToCssVar(tokenPath, prefix = null) {
 
 /**
  * Convert token path to CSS variable name with optional nx- prefix
- * Used for generating prefixed CSS variables for @nexus/tailwind package
+ * Used for generating prefixed CSS variables for @nexus_ds/tailwind package
  * @param {string[]} tokenPath - Token path array
  * @param {string|null} categoryPrefix - Optional category prefix (e.g., 'color', 'radius')
  * @param {boolean} useNxPrefix - Whether to add nx- prefix
