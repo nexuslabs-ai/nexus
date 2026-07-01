@@ -1,7 +1,9 @@
+import * as React from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { Slider } from './slider';
+import { Slider, SliderComfortable } from './slider';
 
 const meta: Meta<typeof Slider> = {
   title: 'Components/Slider',
@@ -40,8 +42,72 @@ export const Range: Story = {
 // Larger step increments snap the thumb.
 export const Steps: Story = {
   render: () => (
-    <Slider defaultValue={[40]} max={100} step={10} aria-label="Brightness" />
+    <Slider
+      defaultValue={[40]}
+      max={100}
+      step={10}
+      showSteps
+      aria-label="Brightness"
+    />
   ),
+};
+
+// The current value can sit beside the track.
+export const ValueDisplay: Story = {
+  render: function ValueDisplayStory() {
+    const [value, setValue] = React.useState([40]);
+
+    return (
+      <Slider
+        value={value}
+        onValueChange={setValue}
+        max={100}
+        step={1}
+        showValue
+        valuePosition="right"
+        label="Volume"
+      />
+    );
+  },
+};
+
+// Formatters keep the control numeric while displaying domain units.
+export const Format: Story = {
+  render: function FormatStory() {
+    const [value, setValue] = React.useState([75]);
+
+    return (
+      <Slider
+        value={value}
+        onValueChange={setValue}
+        max={100}
+        step={5}
+        showValue
+        valuePosition="bottom"
+        label="Opacity"
+        formatValue={(nextValue) => `${nextValue}%`}
+      />
+    );
+  },
+};
+
+// Tooltip values appear above the thumb on hover or keyboard focus.
+export const TooltipValue: Story = {
+  render: function TooltipValueStory() {
+    const [value, setValue] = React.useState([60]);
+
+    return (
+      <Slider
+        value={value}
+        onValueChange={setValue}
+        max={100}
+        step={1}
+        showValue
+        valuePosition="tooltip"
+        aria-label="Volume"
+      />
+    );
+  },
 };
 
 // Vertical orientation.
@@ -86,7 +152,14 @@ export const KeyboardInteraction: Story = {
 // A disabled slider does not respond to interaction.
 export const Disabled: Story = {
   render: () => (
-    <Slider disabled defaultValue={[50]} max={100} aria-label="Volume" />
+    <Slider
+      disabled
+      defaultValue={[50]}
+      max={100}
+      showValue
+      valuePosition="right"
+      aria-label="Volume"
+    />
   ),
   play: async ({ canvasElement }) => {
     const slider = canvasElement.querySelector('[data-slot="slider"]');
@@ -153,17 +226,201 @@ export const Invalid: Story = {
   },
 };
 
+type ComfortableStory = StoryObj<typeof SliderComfortable>;
+
+const comfortableDecorators = [
+  (Story: React.ComponentType) => (
+    <div className="nx:w-72">
+      <Story />
+    </div>
+  ),
+];
+
+// Pip mode creates a discrete settings-row selector.
+export const Comfortable: ComfortableStory = {
+  decorators: comfortableDecorators,
+  render: function ComfortableStory() {
+    const [value, setValue] = React.useState(2);
+
+    return (
+      <SliderComfortable
+        value={value}
+        onValueChange={setValue}
+        min={0}
+        max={4}
+        step={1}
+        label="Roundness"
+      />
+    );
+  },
+};
+
+// Scrubber mode keeps the larger row but drops discrete pips.
+export const ComfortableScrubber: ComfortableStory = {
+  decorators: comfortableDecorators,
+  render: function ComfortableScrubberStory() {
+    const [value, setValue] = React.useState(50);
+
+    return (
+      <SliderComfortable
+        variant="scrubber"
+        value={value}
+        onValueChange={setValue}
+        min={0}
+        max={100}
+        step={1}
+        label="Volume"
+        formatValue={(nextValue) => `${nextValue}%`}
+      />
+    );
+  },
+};
+
+// Comfortable sliders also accept display formatters.
+export const ComfortableFormat: ComfortableStory = {
+  decorators: comfortableDecorators,
+  render: function ComfortableFormatStory() {
+    const [value, setValue] = React.useState(2);
+    const qualityLabels = ['Low', 'Medium', 'High'];
+
+    return (
+      <SliderComfortable
+        value={value}
+        onValueChange={setValue}
+        min={1}
+        max={3}
+        step={1}
+        label="Quality"
+        formatValue={(nextValue) => qualityLabels[nextValue - 1] ?? 'Medium'}
+      />
+    );
+  },
+};
+
+// Disabled comfortable sliders keep their row mounted but inert.
+export const ComfortableDisabled: ComfortableStory = {
+  decorators: comfortableDecorators,
+  render: () => (
+    <SliderComfortable
+      disabled
+      defaultValue={2}
+      min={0}
+      max={4}
+      step={1}
+      label="Roundness"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable"]')
+    ).toHaveAttribute('data-disabled');
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable-track"]')
+    ).toHaveClass('nx:bg-disabled');
+  },
+};
+
+// Arrow keys operate the comfortable slider through Radix semantics.
+export const ComfortableKeyboardInteraction: ComfortableStory = {
+  args: { onValueChange: fn() },
+  decorators: comfortableDecorators,
+  render: (args) => (
+    <SliderComfortable
+      defaultValue={2}
+      min={0}
+      max={4}
+      step={1}
+      label="Roundness"
+      onValueChange={args.onValueChange}
+    />
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const thumb = canvas.getByRole('slider');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '2');
+    await userEvent.tab();
+    await expect(thumb).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '3');
+    await expect(args.onValueChange).toHaveBeenCalledWith(3);
+  },
+};
+
+// Comfortable data slots identify the row, track, range, thumb, label, and value.
+export const ComfortableWithDataAttributes: ComfortableStory = {
+  decorators: comfortableDecorators,
+  render: () => (
+    <SliderComfortable
+      defaultValue={2}
+      min={0}
+      max={4}
+      step={1}
+      label="Roundness"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable"]')
+    ).toHaveAttribute('data-variant', 'pips');
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable-track"]')
+    ).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable-range"]')
+    ).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable-thumb"]')
+    ).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable-label"]')
+    ).toBeInTheDocument();
+    await expect(
+      canvasElement.querySelector('[data-slot="slider-comfortable-value"]')
+    ).toBeInTheDocument();
+  },
+};
+
 // ============================================
 // ALL VARIANTS GRID
 // ============================================
 
-// Single, range, and disabled sliders. Reused by the per-base variant generator.
+// Compact and comfortable slider examples. Reused by the per-base variant generator.
 export const AllVariants: Story = {
   render: () => (
-    <div className="nx:flex nx:w-64 nx:flex-col nx:gap-8">
+    <div className="nx:flex nx:w-72 nx:flex-col nx:gap-8">
       <Slider defaultValue={[50]} max={100} step={1} aria-label="Single" />
-      <Slider defaultValue={[25, 75]} max={100} step={1} aria-label="Range" />
+      <Slider
+        defaultValue={[25, 75]}
+        max={100}
+        step={1}
+        showValue
+        valuePosition="right"
+        aria-label="Range"
+      />
+      <Slider
+        defaultValue={[40]}
+        max={100}
+        step={10}
+        showSteps
+        aria-label="Steps"
+      />
       <Slider disabled defaultValue={[40]} max={100} aria-label="Disabled" />
+      <SliderComfortable
+        defaultValue={2}
+        min={0}
+        max={4}
+        step={1}
+        label="Roundness"
+      />
+      <SliderComfortable
+        variant="scrubber"
+        defaultValue={50}
+        min={0}
+        max={100}
+        step={1}
+        label="Volume"
+        formatValue={(nextValue) => `${nextValue}%`}
+      />
     </div>
   ),
 };
