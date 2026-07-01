@@ -293,10 +293,11 @@ describe('scanInternalDeps', () => {
       " * import { Tooltip } from '@/components/tooltip';",
       ' */',
       "const docs = 'https://example.com/guide'; // see @/components/should-not-leak",
+      "const cdn = 'https://x.io'; export { Button } from '@/components/button';",
       "import { useToast } from '@/hooks/use-toast';",
     ].join('\n');
     expect(scanInternalDeps(source)).toEqual({
-      components: [],
+      components: ['button'],
       lib: ['utils'],
       hooks: ['use-toast'],
     });
