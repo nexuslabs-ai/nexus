@@ -1,6 +1,6 @@
 {
   "name": "@nexus_ds/eslint-plugin",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "description": "Custom ESLint rules for the Nexus design system",
   "engines": {
