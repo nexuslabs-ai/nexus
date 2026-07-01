@@ -19,7 +19,6 @@ packages:
   '@acme/*':
     access: $all
     publish: $all
-    unpublish: $all
 
   # Published upstream Nexus deps — proxied from real npm.
   '@nexus_ds/*':

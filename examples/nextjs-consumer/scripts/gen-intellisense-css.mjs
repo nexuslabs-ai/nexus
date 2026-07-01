@@ -33,13 +33,17 @@ const twDir = path.join(appDir, 'node_modules', '@acme', 'tailwind');
 let css = fs.readFileSync(path.join(twDir, 'nexus.css'), 'utf8');
 
 // 1) app default prefix + nx as a no-op variant (instead of a global prefix flip)
-css = css.replace(
-  /@import ['"]tailwindcss['"] prefix\(nx\);/,
-  "@import 'tailwindcss';\n@custom-variant nx (&);"
-);
+const PREFIX_IMPORT = /@import ['"]tailwindcss['"] prefix\(nx\);/;
+if (!PREFIX_IMPORT.test(css)) {
+  throw new Error(
+    "gen-intellisense-css: couldn't find `@import 'tailwindcss' prefix(nx);` in nexus.css. " +
+      'The format drifted — the prefix flip would leak into IntelliSense; update this script.'
+  );
+}
+css = css.replace(PREFIX_IMPORT, "@import 'tailwindcss';\n@custom-variant nx (&);");
 
 // 2) drop the base-namespace resets so the app's own default utilities survive
-css = css.replace(/\n\s*--(?:color|spacing|text|radius|shadow|breakpoint)-\*: initial;/g, '');
+css = css.replace(/\n\s*--[a-z-]+-\*: initial;/g, '');
 
 // 3) inline the relative @imports (variables + @utility sets aren't package-exported)
 css = css.replace(/@import ['"]\.\/([\w-]+\.css)['"];/g, (_m, file) => {

@@ -66,13 +66,26 @@ async function startVerdaccio() {
     return null;
   }
   console.log(`▶ starting Verdaccio at ${REGISTRY}`);
+  // `detached` makes the child a process-group leader so stopVerdaccio can signal
+  // the group — npx spawns verdaccio as a grandchild that would otherwise orphan.
   const proc = spawn(
     'npx',
     ['--yes', 'verdaccio@6', '--config', path.join(EXAMPLES_DIR, 'verdaccio.yaml'), '--listen', String(PORT)],
-    { cwd: EXAMPLES_DIR, stdio: 'inherit', env: process.env }
+    { cwd: EXAMPLES_DIR, stdio: 'inherit', env: process.env, detached: true }
   );
   await waitForRegistry();
   return proc;
+}
+
+function stopVerdaccio(proc) {
+  if (!proc?.pid) {
+    return;
+  }
+  try {
+    process.kill(-proc.pid, 'SIGTERM');
+  } catch {
+    proc.kill();
+  }
 }
 
 /** Export the design system into .generated/ (fresh each run). */
@@ -121,9 +134,7 @@ async function main() {
     }
     console.log(`\n✅ setup complete. Next:\n   cd ${path.relative(process.cwd(), APP_DIR)} && npm run dev\n`);
   } finally {
-    if (verdaccio) {
-      verdaccio.kill();
-    }
+    stopVerdaccio(verdaccio);
   }
 }
 

@@ -826,7 +826,7 @@ function isPathWithin(parent, child) {
 }
 
 /** True if a `.git` entry exists anywhere within `dir` (skips node_modules). */
-function containsGitDir(dir) {
+export function containsGitDir(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === 'node_modules') {
       continue;
@@ -841,28 +841,42 @@ function containsGitDir(dir) {
   return false;
 }
 
-/** True if `dir` is git-ignored — throwaway output safe to write/rmSync. */
-function isGitIgnored(dir) {
-  return spawnSync('git', ['check-ignore', '-q', dir], { cwd: REPO_ROOT }).status === 0;
+/** True if `dir` matches a gitignore pattern in `repoRoot`. */
+export function isGitIgnored(repoRoot, dir) {
+  return spawnSync('git', ['check-ignore', '-q', dir], { cwd: repoRoot }).status === 0;
+}
+
+/** True if git tracks any file under `dir`. */
+export function hasTrackedFiles(repoRoot, dir) {
+  const res = spawnSync('git', ['ls-files', '--', dir], { cwd: repoRoot, encoding: 'utf8' });
+  return res.stdout.trim().length > 0;
 }
 
 /** Resolve + prepare the output directory (refuse a non-empty target unless --force). */
-function prepareOutDir(out, force) {
-  const outDir = path.resolve(process.cwd(), out);
+export function prepareOutDir(out, force, { repoRoot = REPO_ROOT, cwd = process.cwd() } = {}) {
+  const outDir = path.resolve(cwd, out);
   // `--force` does an rmSync, so never allow a target that *contains* this repo
   // or the cwd — `--out=..` would wipe the repo's parent.
-  if (isPathWithin(outDir, REPO_ROOT) || isPathWithin(outDir, process.cwd())) {
+  if (isPathWithin(outDir, repoRoot) || isPathWithin(outDir, cwd)) {
     throw new Error(
       `Refusing to export into "${outDir}": it contains this repo / the current directory.`
     );
   }
-  // A target *inside* the repo is allowed only when git-ignored (throwaway output
-  // like examples/.generated/) — never tracked source such as packages/ or apps/.
-  if (isPathWithin(REPO_ROOT, outDir) && !isGitIgnored(outDir)) {
-    throw new Error(
-      `Refusing to export into "${outDir}": it is tracked content inside this repo. ` +
-        `Use a git-ignored path (e.g. examples/.generated/...) or a dir outside the repo.`
-    );
+  if (isPathWithin(repoRoot, outDir)) {
+    // check-ignore reports a dir as un-ignored once it holds a tracked file, so
+    // test tracked content first or this branch is unreachable.
+    if (hasTrackedFiles(repoRoot, outDir)) {
+      throw new Error(
+        `Refusing to export into "${outDir}": it holds git-tracked files. ` +
+          `Use a git-ignored throwaway path (e.g. examples/.generated/...) or a dir outside the repo.`
+      );
+    }
+    if (!isGitIgnored(repoRoot, outDir)) {
+      throw new Error(
+        `Refusing to export into "${outDir}": it is inside this repo but not git-ignored. ` +
+          `Use a git-ignored path (e.g. examples/.generated/...) or a dir outside the repo.`
+      );
+    }
   }
   if (fs.existsSync(outDir) && fs.readdirSync(outDir).length > 0) {
     if (!force) {
