@@ -20,33 +20,11 @@ const withSliderWidth: Decorator = (Story, context) => {
   );
 };
 
-const fluidSliderVariables: React.CSSProperties &
-  Record<`--${string}`, string> = {
-  '--slider-showcase-bg': '#0e0e0e',
-  '--slider-showcase-muted': '#8c8c8c',
-  '--slider-track': '#242424',
-  '--slider-range': '#3a3a3a',
-  '--slider-border': 'rgba(255,255,255,.09)',
-  '--slider-pip': '#5c5c5c',
-  '--slider-thumb': '#ffffff',
-  '--slider-thumb-border': 'rgba(0,0,0,.04)',
-  '--slider-tooltip-bg': '#f2f2f0',
-  '--slider-tooltip-fg': '#171717',
-  '--slider-comfortable-track': '#1a1a1a',
-  '--slider-comfortable-range': '#2c2c2c',
-  '--slider-comfortable-border': 'rgba(255,255,255,.09)',
-  '--slider-comfortable-pip': '#5c5c5c',
-  '--slider-comfortable-caret': '#cfcfcf',
-  '--slider-comfortable-label': '#d4d4d4',
-  '--slider-comfortable-muted': '#8c8c8c',
-};
-
 function FluidSliderShowcase({ children }: { children: React.ReactNode }) {
   return (
     <div
       data-slider-showcase
-      style={fluidSliderVariables}
-      className="nx:w-[35rem] nx:max-w-[calc(100vw-3rem)] nx:bg-(--slider-showcase-bg) nx:px-6 nx:py-8 nx:text-foreground"
+      className="nx:w-[35rem] nx:max-w-[calc(100vw-3rem)] nx:bg-background nx:px-6 nx:py-8 nx:text-foreground"
     >
       <div className="nx:flex nx:w-full nx:flex-col nx:gap-5">{children}</div>
     </div>
@@ -441,11 +419,11 @@ export const AllVariants: Story = {
   render: () => (
     <FluidSliderShowcase>
       <div className="nx:grid nx:grid-cols-[3rem_minmax(0,1fr)] nx:items-center nx:gap-x-5 nx:gap-y-8">
-        <span className="nx:tabular-nums nx:typography-label-default nx:text-(--slider-showcase-muted)">
+        <span className="nx:tabular-nums nx:typography-label-default nx:text-muted-foreground">
           50
         </span>
         <Slider defaultValue={[50]} max={100} step={1} aria-label="Single" />
-        <span className="nx:tabular-nums nx:typography-label-default nx:text-(--slider-showcase-muted)">
+        <span className="nx:tabular-nums nx:typography-label-default nx:text-muted-foreground">
           50
         </span>
         <Slider
