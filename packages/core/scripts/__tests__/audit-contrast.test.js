@@ -43,6 +43,15 @@ describe('resolveToSrgbInts', () => {
       255, 255, 255,
     ]);
     expect(resolveToSrgbInts('oklch(0 0 0)', new Map())).toEqual([0, 0, 0]);
+    expect(resolveToSrgbInts('oklch(0.1624 0.04 264.7)', new Map())).toEqual([
+      6, 13, 31,
+    ]);
+  });
+
+  it('requires a backdrop for alpha OKLCH semantic literals', () => {
+    expect(() => resolveToSrgbInts('oklch(1 0 0 / 0.5)', new Map())).toThrow(
+      'needs a backdrop to composite against'
+    );
   });
 });
 

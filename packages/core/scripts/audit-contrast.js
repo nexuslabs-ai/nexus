@@ -262,7 +262,19 @@ export function resolveToSrgbInts(value, primitiveMap, bgInts) {
     }
     const toInt = (channel) =>
       Math.round(Math.max(0, Math.min(1, channel ?? 0)) * 255);
-    return [toInt(rgb.r), toInt(rgb.g), toInt(rgb.b)];
+    const alpha = rgb.alpha ?? 1;
+    const ints = [toInt(rgb.r), toInt(rgb.g), toInt(rgb.b)];
+    if (alpha < 1) {
+      if (!bgInts) {
+        throw new Error(
+          `audit-contrast: alpha colour "${value}" needs a backdrop to composite against`
+        );
+      }
+      return ints.map((channel, index) =>
+        Math.round(channel * alpha + bgInts[index] * (1 - alpha))
+      );
+    }
+    return ints;
   } else {
     throw new Error(`audit-contrast: unrecognized color value "${value}"`);
   }
