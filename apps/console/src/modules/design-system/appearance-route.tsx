@@ -1,6 +1,6 @@
-import { PageHeader } from '../../components/page-header';
+import { NexusAppearanceSettings } from '@nexus/react';
 
-import { NexusAppearanceSettings } from './appearance';
+import { PageHeader } from '../../components/page-header';
 
 /**
  * Design System → Appearance: console-owned controls wired to the root

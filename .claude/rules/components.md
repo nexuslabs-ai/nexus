@@ -15,11 +15,11 @@
 
 ## File Structure
 
-Each component under `packages/react/src/components/ui/` lives in its own
+Each component under `packages/react/src/components/` lives in its own
 kebab-case folder holding the component, its stories, and a barrel:
 
 ```
-ui/{name}/
+{name}/
 ├── {name}.tsx          # Component (kebab-case)
 ├── {Name}.stories.tsx  # Stories + Tests (PascalCase, play functions)
 └── index.ts            # Barrel: export * from './{name}'
@@ -27,18 +27,14 @@ ui/{name}/
 
 The folder is kebab-case (`dropdown-menu/`); the stories file stays PascalCase
 (`DropdownMenu.stories.tsx`). The per-folder `index.ts` is what keeps every
-import site stable — `@/components/ui/{name}` resolves to the folder barrel, so
+import site stable — `@/components/{name}` resolves to the folder barrel, so
 `src/index.ts` and cross-component imports never reference the nested file.
 
 **No separate `*.test.tsx` files.** Tests are play functions in stories.
 
-> `primitives/` stays flat (`{name}.tsx` directly under the subdir) because
-> Show/Hide share `responsive-visibility.ts` at the subdir root. The tooling
-> (`scripts/component-paths.mjs`) tracks which subdirs are nested.
-
 ## Component Template
 
-Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. Export the component, its props type, and its `cva` variants function, re-export them from the folder's `index.ts` (`export * from './{name}'`), then add the barrel `export * from '@/components/ui/{name}'` to `src/index.ts`. See `button/button.tsx` and `badge/badge.tsx` for the canonical implementations.
+Structure: `cva()` for enum variants; a named `ComponentProps` interface extending `React.ComponentProps<'element'>` + `VariantProps<typeof componentVariants>`; `asChild` via Radix `Slot`; `data-slot` / `data-variant` / `data-size` attributes; `cn()` to merge `className`. Export the component, its props type, and its `cva` variants function, re-export them from the folder's `index.ts` (`export * from './{name}'`), then add the barrel `export * from '@/components/{name}'` to `src/index.ts`. See `button/button.tsx` and `badge/badge.tsx` for the canonical implementations.
 
 ## Data Attributes
 
@@ -146,7 +142,7 @@ For invalid fields, wire both an always-on error border and an error-coloured fo
 nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error
 ```
 
-Live consumer: `packages/react/src/components/ui/input.tsx`.
+Live consumer: `packages/react/src/components/input/input.tsx`.
 
 ### Why outline, not box-shadow
 

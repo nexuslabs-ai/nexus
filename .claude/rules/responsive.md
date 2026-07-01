@@ -76,7 +76,7 @@ Most components use `@container` for internal responsive behaviour — though no
 
 A Dialog at 480px viewport is full-bleed (no rounded corners) because _the viewport is narrow_, not because the Dialog's own container is narrow. Migrating to `@container` would flip the rounded-corner threshold to the Dialog's intrinsic width, producing rounded corners on what's still effectively a full-bleed sheet — wrong UX.
 
-Live examples: `packages/react/src/components/ui/overlay-layout/overlay-layout.ts` uses `nx:sm:` for Dialog-family content corner rounding, header text alignment, and footer flex-direction/gap, and bounds Dialog / AlertDialog content with `svh` while the body slot owns overflow. Sheet and Drawer use `svh` for visible-viewport height bounds: side panels use `h-svh`, top/bottom Sheet panels cap at `max-h-svh`, and top/bottom Drawer panels keep their intentional `max-h-[80svh]` peek. Each is a positioning concern relative to the viewport, not a container-width concern. Keep them.
+Live examples: `packages/react/src/components/overlay-layout/overlay-layout.ts` uses `nx:sm:` for Dialog-family content corner rounding, header text alignment, and footer flex-direction/gap, and bounds Dialog / AlertDialog content with `svh` while the body slot owns overflow. Sheet and Drawer use `svh` for visible-viewport height bounds: side panels use `h-svh`, top/bottom Sheet panels cap at `max-h-svh`, and top/bottom Drawer panels keep their intentional `max-h-[80svh]` peek. Each is a positioning concern relative to the viewport, not a container-width concern. Keep them.
 
 For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you normally would.
 
@@ -87,6 +87,6 @@ For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you norma
 ## See also
 
 - [components.md](components.md) — component-authoring rules; `@container` internal use is the responsive corollary of the Sizing Convention
-- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) + `packages/react/src/components/primitives/` — the shipped `<Show>` / `<Hide>` source, stories, and spike-conclusion header
+- [#103](https://github.com/nexuslabs-ai/nexus/issues/103) + `packages/react/src/components/{show,hide}/` (sharing `packages/react/src/lib/responsive-visibility.ts`) — the shipped `<Show>` / `<Hide>` source, stories, and spike-conclusion header
 - `packages/core/tokens/semantic/breakpoints.json` — the `--breakpoint-*` token values
-- `packages/react/src/components/ui/dialog.tsx` — the live viewport-driven exception
+- `packages/react/src/components/dialog/dialog.tsx` — the live viewport-driven exception

@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { tokenValue, useRuntimeTokenValues } from './runtime-token-values';
-import { COMPOSITE_UTILITIES } from './typography-utilities';
+import {
+  tokenValue,
+  useRuntimeTokenValues,
+} from './support/runtime-token-values';
+import { COMPOSITE_UTILITIES } from './support/typography-utilities';
 
 const SIZE_KEYS = [
   'xs',

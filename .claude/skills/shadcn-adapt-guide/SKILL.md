@@ -69,21 +69,20 @@ Rewrite the source into the Nexus component, mirroring the archetype and applyin
 
 ### Step 4 — Stories
 
-Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + size, Disabled, interaction (click/keyboard) with play-fns, WithDataAttributes (play), and a render-based AllVariants. a11y runs automatically. If the component needs a non-standard showcase name or interaction equivalence, add metadata to `packages/react/scripts/storybook-coverage.config.json`.
+Author `{Name}.stories.tsx` per `testing-react.md`: Default, one per variant + size, Disabled, interaction (click/keyboard) with play-fns, WithDataAttributes (play), and a render-based AllVariants. a11y runs automatically. For a non-standard showcase name or interaction equivalence, follow the archetype equivalence policy in `testing-react.md`.
 
 ### Step 5 — Wire
 
 - Add the dep to `packages/react/package.json` (alphabetical) → `pnpm install`.
 - Add any new icon to `packages/react/src/lib/icons.ts` (Tabler re-export).
-- `export * from '@/components/ui/{name}'` in `packages/react/src/index.ts`.
-- If it needs showcase or interaction audit metadata, add an entry to `packages/react/scripts/storybook-coverage.config.json`.
+- `export * from '@/components/{name}'` in `packages/react/src/index.ts`.
 
 ### Step 6 — Verify (real gates; fix until green)
 
 Run these and fix everything before reporting — no deferral (`no-follow-up-deferral.md`):
 
 - `pnpm --filter @nexus/react typecheck`
-- `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/ui/{name}.tsx`.
+- `pnpm lint` — the canonical gate (`eslint . --max-warnings 0`), and it passes on a current tree (`.claude/worktrees/` is config-ignored, so `eslint .` doesn't recurse it). For a faster loop while iterating, scope to your files: `npx eslint packages/react/src/components/{name}/{name}.tsx`.
 - Story tests per `testing-react.md` (`pnpm test:storybook`); a11y violations fail the run.
 
 ## Reflex Check
@@ -112,7 +111,7 @@ Read at the start; re-fire whenever a trigger lights up. The trigger is the thin
 - [ ] `nx:` prefix before all modifiers; semantic token paths only; no `dark:` on semantic tokens
 - [ ] `data-slot` (+ `data-variant`/`data-size`); padding-based sizing (documented exceptions only)
 - [ ] Named interface + JSDoc on custom props; focus ring = `outline-focus-default` + tokenised offset
-- [ ] Stories with play-fns + AllVariants; a11y clean; story coverage metadata updated where needed
+- [ ] Stories with play-fns + AllVariants; a11y clean
 - [ ] Dep added + installed; icons added; exported from `src/index.ts`
 - [ ] `typecheck` + `eslint packages` + story tests all green
 - [ ] One component, one commit, `Closes #N`

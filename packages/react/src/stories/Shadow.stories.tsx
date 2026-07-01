@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { tokenValue, useRuntimeTokenValues } from './runtime-token-values';
+import {
+  tokenValue,
+  useRuntimeTokenValues,
+} from './support/runtime-token-values';
 
 const RUNTIME_SHADOW_TIERS = [
   { name: '2xs', className: 'nx:shadow-2xs', layers: 1 },

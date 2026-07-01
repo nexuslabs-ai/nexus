@@ -519,7 +519,7 @@ export const SECTIONS = {
       {
         slug: 'audits',
         label: 'Token audits',
-        lede: '[ figma-parity · APCA contrast · spacing-modes · storybook-coverage ]',
+        lede: '[ figma-parity · APCA contrast · spacing-modes ]',
         blocks: [
           {
             type: 'placeholder',

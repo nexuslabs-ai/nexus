@@ -64,7 +64,6 @@ audit: ## Token / a11y / browser audits
 	pnpm validate:spacing-modes
 	pnpm audit:browser-support
 	pnpm audit:contrast
-	pnpm audit:storybook-coverage
 
 verify: ## Full pre-push gate: lint + format + typecheck + test + audits
 	pnpm lint

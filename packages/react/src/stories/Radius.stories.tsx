@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { tokenValue, useRuntimeTokenValues } from './runtime-token-values';
+import {
+  tokenValue,
+  useRuntimeTokenValues,
+} from './support/runtime-token-values';
 
 const RADIUS_KEYS = [
   'base',

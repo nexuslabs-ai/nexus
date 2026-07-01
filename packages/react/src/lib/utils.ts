@@ -3,13 +3,10 @@ import { extendTailwindMerge } from 'tailwind-merge';
 
 /**
  * Tailwind-merge class groups for Nexus custom utilities. Hand-mirrors the
- * `@utility` sets emitted by `@nexus/core` (see `packages/tailwind`). The
- * parity tests in `utils.test.ts` pin these groups to the generated files so
- * a new custom utility cannot silently drop out of `cn()`'s last-wins collapse.
- *
- * Not re-exported from the package's public entry — internal coupling only.
+ * `@utility` sets emitted by `@nexus/core` (see `packages/tailwind`) so a new
+ * custom utility cannot silently drop out of `cn()`'s last-wins collapse.
  */
-export const ROLE_CLASS_GROUPS = {
+const ROLE_CLASS_GROUPS = {
   gap: ['gap-container', 'gap-layout-section', 'gap-layout-stack'],
   p: ['p-container'],
 };
@@ -92,7 +89,7 @@ const BORDER_COLOR_CLASS_GROUPS = {
   ],
 };
 
-export const NEXUS_CLASS_GROUPS = {
+const NEXUS_CLASS_GROUPS = {
   ...ROLE_CLASS_GROUPS,
   ...BORDER_WIDTH_CLASS_GROUPS,
   ...BORDER_COLOR_CLASS_GROUPS,

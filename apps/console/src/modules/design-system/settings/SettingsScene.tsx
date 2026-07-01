@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@nexus/react';
-
-import { NexusAppearanceSettings } from '../appearance';
+import { NexusAppearanceSettings } from '@nexus/react';
 
 import { AccountTab } from './AccountTab';
 import { NotificationsTab } from './NotificationsTab';
