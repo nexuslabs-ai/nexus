@@ -322,7 +322,7 @@ export const LoadingSkeleton: Story = {
   ),
 };
 
-export const MobileDrawer: Story = {
+export const NarrowDrawer: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
   },

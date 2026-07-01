@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = '16rem';
-const SIDEBAR_WIDTH_MOBILE = '18rem';
+const SIDEBAR_WIDTH_NARROW = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
@@ -50,9 +50,9 @@ interface SidebarContextProps {
   state: 'expanded' | 'collapsed';
   open: boolean;
   setOpen: (value: boolean | ((value: boolean) => boolean)) => void;
-  openMobile: boolean;
-  setOpenMobile: (open: boolean) => void;
-  isMobile: boolean;
+  openNarrow: boolean;
+  setOpenNarrow: (open: boolean) => void;
+  isNarrow: boolean;
   toggleSidebar: () => void;
 }
 
@@ -61,7 +61,7 @@ const SidebarContext = React.createContext<SidebarContextProps | null>(null);
 /**
  * useSidebar
  *
- * Reads the sidebar context (open state, mobile state, and the toggle helper).
+ * Reads the sidebar context (open state, narrow-tier state, and the toggle helper).
  * Must be called within a `SidebarProvider`; throws otherwise.
  *
  * @example
@@ -134,8 +134,8 @@ function SidebarProvider({
   children,
   ...props
 }: SidebarProviderProps) {
-  const isMobile = useIsNarrow();
-  const [openMobile, setOpenMobile] = React.useState(false);
+  const isNarrow = useIsNarrow();
+  const [openNarrow, setOpenNarrow] = React.useState(false);
 
   // Internal open state; openProp/setOpenProp take over when controlled.
   const [_open, _setOpen] = React.useState(defaultOpen);
@@ -156,10 +156,10 @@ function SidebarProvider({
   );
 
   const toggleSidebar = React.useCallback(() => {
-    return isMobile
-      ? setOpenMobile((value) => !value)
+    return isNarrow
+      ? setOpenNarrow((value) => !value)
       : setOpen((value) => !value);
-  }, [isMobile, setOpen, setOpenMobile]);
+  }, [isNarrow, setOpen, setOpenNarrow]);
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -184,12 +184,12 @@ function SidebarProvider({
       state,
       open,
       setOpen,
-      isMobile,
-      openMobile,
-      setOpenMobile,
+      isNarrow,
+      openNarrow,
+      setOpenNarrow,
       toggleSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [state, open, setOpen, isNarrow, openNarrow, setOpenNarrow, toggleSidebar]
   );
 
   return (
@@ -264,7 +264,7 @@ function Sidebar({
   children,
   ...props
 }: SidebarProps) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const { isNarrow, state, openNarrow, setOpenNarrow } = useSidebar();
 
   if (collapsible === 'none') {
     return (
@@ -282,12 +282,12 @@ function Sidebar({
     );
   }
 
-  if (isMobile) {
+  if (isNarrow) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
+      <Sheet open={openNarrow} onOpenChange={setOpenNarrow}>
         <SheetContent
           data-slot="sidebar"
-          data-mobile="true"
+          data-narrow="true"
           side={side}
           showCloseButton={false}
           className={cn(
@@ -296,7 +296,7 @@ function Sidebar({
           )}
           style={
             {
-              '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
+              '--sidebar-width': SIDEBAR_WIDTH_NARROW,
               ...style,
             } as React.CSSProperties
           }
@@ -304,7 +304,9 @@ function Sidebar({
         >
           <SheetHeader className="nx:sr-only">
             <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            <SheetDescription>
+              Displays the narrow-tier sidebar.
+            </SheetDescription>
           </SheetHeader>
           <div className="nx:flex nx:h-full nx:w-full nx:flex-col">
             {children}
@@ -859,7 +861,7 @@ function SidebarMenuButton({
   ...props
 }: SidebarMenuButtonProps) {
   const Comp = asChild ? Slot : 'button';
-  const { isMobile, state } = useSidebar();
+  const { isNarrow, state } = useSidebar();
 
   const button = (
     <Comp
@@ -885,7 +887,7 @@ function SidebarMenuButton({
       <TooltipContent
         side="right"
         align="center"
-        hidden={state !== 'collapsed' || isMobile}
+        hidden={state !== 'collapsed' || isNarrow}
         {...tooltipProps}
       />
     </Tooltip>
