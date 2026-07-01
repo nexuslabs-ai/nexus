@@ -52,6 +52,9 @@ describe('resolveToSrgbInts', () => {
     expect(() => resolveToSrgbInts('oklch(1 0 0 / 0.5)', new Map())).toThrow(
       'needs a backdrop to composite against'
     );
+    expect(
+      resolveToSrgbInts('oklch(1 0 0 / 0.5)', new Map(), [0, 0, 0])
+    ).toEqual([128, 128, 128]);
   });
 });
 
