@@ -287,7 +287,7 @@ export default function IncrementalPage() {
         <div className="flex flex-wrap items-center gap-4">
           <button
             type="button"
-            className="nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover nx:typography-label-default inline-flex h-10 items-center rounded-md px-3.5 transition"
+            className="nx:bg-primary-background nx:text-primary-foreground nx:hover:bg-primary-background-hover nx:typography-label-default nx:inline-flex nx:h-10 nx:items-center nx:rounded-md nx:px-3.5 nx:transition"
           >
             authored nx: button
           </button>
