@@ -18,7 +18,6 @@
 
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
-import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -39,40 +38,40 @@ function run(cmd, args, cwd) {
   }
 }
 
-function portOpen(port) {
-  return new Promise((resolve) => {
-    const socket = net.connect(port, '127.0.0.1');
-    socket.once('connect', () => {
-      socket.end();
-      resolve(true);
-    });
-    socket.once('error', () => resolve(false));
-  });
+async function registryUp() {
+  try {
+    // Any HTTP response (even 4xx) means Verdaccio is listening. fetch() resolves
+    // localhost across IPv4/IPv6, so it doesn't matter which family it bound to.
+    const res = await fetch(REGISTRY, { method: 'GET' });
+    return res.status < 500;
+  } catch {
+    return false;
+  }
 }
 
-async function waitForPort(port, timeoutMs = 30000) {
+async function waitForRegistry(timeoutMs = 60000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
-    if (await portOpen(port)) {
+    if (await registryUp()) {
       return;
     }
     await new Promise((r) => setTimeout(r, 500));
   }
-  throw new Error(`Verdaccio did not come up on :${port} within ${timeoutMs}ms`);
+  throw new Error(`Verdaccio did not respond at ${REGISTRY} within ${timeoutMs}ms`);
 }
 
 async function startVerdaccio() {
-  if (await portOpen(PORT)) {
-    console.log(`ℹ Verdaccio already running on :${PORT} — reusing it.`);
+  if (await registryUp()) {
+    console.log(`ℹ Verdaccio already running at ${REGISTRY} — reusing it.`);
     return null;
   }
-  console.log(`▶ starting Verdaccio on :${PORT}`);
+  console.log(`▶ starting Verdaccio at ${REGISTRY}`);
   const proc = spawn(
     'npx',
     ['--yes', 'verdaccio@6', '--config', path.join(EXAMPLES_DIR, 'verdaccio.yaml'), '--listen', String(PORT)],
     { cwd: EXAMPLES_DIR, stdio: 'inherit', env: process.env }
   );
-  await waitForPort(PORT);
+  await waitForRegistry();
   return proc;
 }
 
