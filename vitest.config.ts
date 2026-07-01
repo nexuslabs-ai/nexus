@@ -14,14 +14,14 @@ export default defineConfig({
         find: '@nexus/react/appearance/server',
         replacement: path.resolve(
           __dirname,
-          './packages/react/src/appearance/server.ts'
+          './packages/react/src/components/appearance/provider/server.ts'
         ),
       },
       {
         find: '@nexus/react/appearance',
         replacement: path.resolve(
           __dirname,
-          './packages/react/src/appearance/index.ts'
+          './packages/react/src/components/appearance/provider/index.ts'
         ),
       },
       {

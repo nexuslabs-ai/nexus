@@ -60,8 +60,7 @@ ruleTester.run('nx-class-conventions', rule, {
     // demo surfaces, but are not part of this hard gate.
     {
       code: "const c = 'nx:font-medium nx:leading-none nx:tracking-wide';",
-      filename:
-        '/repo/packages/react/src/components/ui/table/Table.stories.tsx',
+      filename: '/repo/packages/react/src/components/table/Table.stories.tsx',
     },
     {
       code: "const c = 'nx:font-semibold nx:tracking-wider';",
@@ -72,11 +71,11 @@ ruleTester.run('nx-class-conventions', rule, {
     // token that preserves that relationship.
     {
       code: "const c = 'nx:flex nx:size-full nx:items-center nx:justify-center nx:rounded-[inherit] nx:bg-muted nx:text-foreground nx:font-medium nx:leading-none';",
-      filename: '/repo/packages/react/src/components/ui/avatar/avatar.tsx',
+      filename: '/repo/packages/react/src/components/avatar/avatar.tsx',
     },
     {
       code: "const c = 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums';",
-      filename: '/repo/packages/react/src/components/ui/chart/chart.tsx',
+      filename: '/repo/packages/react/src/components/chart/chart.tsx',
     },
   ],
   invalid: [
@@ -178,7 +177,7 @@ ruleTester.run('nx-class-conventions', rule, {
     },
     {
       code: "const c = 'nx:flex nx:size-full nx:items-center nx:justify-center nx:rounded-[inherit] nx:bg-muted nx:text-foreground nx:font-medium nx:leading-none nx:tracking-wide';",
-      filename: '/repo/packages/react/src/components/ui/avatar/avatar.tsx',
+      filename: '/repo/packages/react/src/components/avatar/avatar.tsx',
       errors: [
         { messageId: 'rawFontWeight' },
         { messageId: 'rawLineHeight' },
@@ -187,7 +186,7 @@ ruleTester.run('nx-class-conventions', rule, {
     },
     {
       code: "const c = 'nx:text-foreground nx:font-mono nx:font-medium nx:tabular-nums nx:tracking-wide';",
-      filename: '/repo/packages/react/src/components/ui/chart/chart.tsx',
+      filename: '/repo/packages/react/src/components/chart/chart.tsx',
       errors: [
         { messageId: 'rawFontWeight' },
         { messageId: 'rawLetterSpacing' },

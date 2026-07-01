@@ -1,6 +1,6 @@
 # Component Review Notes
 
-Issues found reviewing `packages/react/src/components/ui/`. One section per component.
+Issues found reviewing `packages/react/src/components/`. One section per component.
 Numeric spacing notes call out unresolved raw spacing/rhythm decisions; `eslint-disable`
 comments remain deviations to reconsider and should justify themselves.
 

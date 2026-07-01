@@ -32,7 +32,7 @@ function rewriteAppearanceDeclaration(filePath: string, content: string) {
         (match, entry: string) =>
           entry.endsWith('/index')
             ? match
-            : `from './components/ui/${entry}/index'`
+            : `from './components/${entry}/index'`
       ),
     };
   }
@@ -96,11 +96,11 @@ export default defineConfig({
         index: path.resolve(__dirname, 'src/index.ts'),
         appearance: path.resolve(
           __dirname,
-          'src/components/ui/appearance/provider/index.ts'
+          'src/components/appearance/provider/index.ts'
         ),
         'appearance-server': path.resolve(
           __dirname,
-          'src/components/ui/appearance/provider/server.ts'
+          'src/components/appearance/provider/server.ts'
         ),
       },
       name: 'NexusReact',

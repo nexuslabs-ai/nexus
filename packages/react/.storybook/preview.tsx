@@ -14,7 +14,7 @@ import {
 import type { Decorator, Preview } from '@storybook/react-vite';
 import { useGlobals } from 'storybook/preview-api';
 
-import { NexusAppearanceProvider } from '../src/components/ui/appearance/provider';
+import { NexusAppearanceProvider } from '../src/components/appearance/provider';
 
 // Storybook needs the full token set to render. The shipped component CSS
 // (src/index.css) is utilities-only by design — tokens come from the consumer's

@@ -210,7 +210,7 @@ export default tseslint.config(
 
   // UI components: allow empty interface extends per .claude/rules/components.md
   {
-    files: ['packages/react/src/components/ui/**/*.{ts,tsx}'],
+    files: ['packages/react/src/components/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-empty-object-type': [
         'error',

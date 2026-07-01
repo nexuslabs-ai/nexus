@@ -48,13 +48,6 @@ pnpm test:unit
 pnpm test:storybook
 pnpm audit:browser-support
 pnpm audit:contrast
-pnpm audit:storybook-coverage
-```
-
-For a single React component story coverage check:
-
-```bash
-pnpm --filter @nexus/react audit:storybook-coverage --component <kebab-name>
 ```
 
 For token output changes:
@@ -88,7 +81,7 @@ Important rule summaries:
 
 ## Component Work
 
-Use `packages/react/src/components/ui/` patterns as the reference.
+Use `packages/react/src/components/` patterns as the reference.
 
 - Every component needs `{name}.tsx` and `{Name}.stories.tsx`.
 - Do not add component `*.test.tsx` files; component behavior is tested in Storybook `play` functions.
@@ -132,7 +125,6 @@ Hooks and utilities use `*.test.ts` with `@nexus/test-utils`. Do not use Storybo
 Before finishing component work, run the narrowest meaningful checks first, then broaden as risk increases:
 
 ```bash
-pnpm --filter @nexus/react audit:storybook-coverage --component <kebab-name>
 pnpm test:storybook
 pnpm typecheck
 pnpm lint
