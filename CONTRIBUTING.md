@@ -249,7 +249,7 @@ A new (or updated) component ships these stories (fuller table in `.claude/rules
 | Edge cases                           | Yes            | Empty / long / special-char children, with icon |
 | `AllVariants`                        | No             | Visual grid for review                          |
 
-A11y is automatic — every story is axe-checked, no separate a11y story needed. For a **new** component, the definition-of-done gate is `pnpm --filter @nexus/react audit:storybook-coverage --component <name>` exiting 0 (also run by `make audit`).
+A11y is automatic — every story is axe-checked, no separate a11y story needed.
 
 ### Running tests
 

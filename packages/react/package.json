@@ -36,16 +36,11 @@
     "build": "vite build",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
-    "typecheck:dist-appearance": "node scripts/typecheck-appearance-dist.mjs",
-    "audit:appearance-reactivity": "node scripts/audit-appearance-reactivity.mjs",
-    "audit:package-boundary": "node scripts/audit-package-boundary.mjs",
-    "audit:storybook-coverage": "node scripts/audit-storybook-coverage.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.4.0",
-    "@microsoft/api-extractor": "^7.58.9",
     "@storybook/addon-a11y": "^10.1.10",
     "@storybook/addon-docs": "^10.1.10",
     "@storybook/react-vite": "^10.1.10",
