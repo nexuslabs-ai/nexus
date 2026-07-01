@@ -7,7 +7,7 @@ name: Release
 #
 # Flow: on push to main, changesets/action either opens/updates a "Version
 # Packages" PR (when unreleased changesets exist) or — once that PR merges and
-# the changesets are consumed — runs `pnpm release` to build core and publish.
+# the changesets are consumed — runs `pnpm release` to build and publish.
 # Only the two non-private packages publish; changesets skips private ones.
 #
 # Auth: each published package has a trusted publisher registered on npmjs.com
@@ -19,6 +19,14 @@ name: Release
 # intentionally omitted from setup-node: with no token configured, npm falls
 # back to the OIDC exchange against the default registry. See
 # CONTRIBUTING.md § Releasing.
+#
+# Release PR token: the "Version Packages" PR is opened with RELEASE_TOKEN (a
+# fine-grained PAT from nexuslabs-ai-bot), not the default GITHUB_TOKEN. PRs
+# opened by GITHUB_TOKEN don't fire `pull_request`, so the required `CI Status`
+# check would never run on the version PR and it couldn't merge without an admin
+# override. A PAT's pushes and PRs trigger CI normally. That token also carries
+# the contents/pull-requests writes, so the default GITHUB_TOKEN only needs read
+# for checkout plus id-token for the OIDC exchange.
 
 on:
   push:
@@ -29,8 +37,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write # create the Version Packages PR / push tags
-  pull-requests: write # open and update the Version Packages PR
+  contents: read # checkout; release commits, tags, and the PR use RELEASE_TOKEN
   id-token: write # OIDC token for npm trusted publishing (+ provenance)
 
 jobs:
@@ -52,10 +59,11 @@ jobs:
           node-version: '22.14.0' # trusted publishing requires Node >= 22.14.0
           cache: 'pnpm'
 
-      # pnpm publish shells out to the system npm; trusted publishing needs
-      # npm >= 11.5.1, newer than the npm bundled with Node 22.
+      # `changeset publish` shells out to the system npm; trusted publishing
+      # needs npm >= 11.5.1, newer than the npm bundled with Node 22. Pinned
+      # (not @latest) so the publish path stays reproducible.
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11.5.1
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -66,4 +74,7 @@ jobs:
           version: pnpm version-packages
           publish: pnpm release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # RELEASE_TOKEN (bot PAT), not the default GITHUB_TOKEN — see the
+          # "Release PR token" note at the top of this file. Using GITHUB_TOKEN
+          # here would leave the version PR unable to clear branch protection.
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

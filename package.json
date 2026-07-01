@@ -42,7 +42,7 @@
     "size-limit": "size-limit",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm --filter @nexus_ds/core build && changeset publish",
+    "release": "pnpm turbo build && changeset publish",
     "prepare": "husky"
   },
   "size-limit": [

@@ -326,8 +326,9 @@ The packages authenticate to npm with **trusted publishing** (OIDC): GitHub Acti
 
 1. Both packages were bootstrapped with an initial manual `npm publish` — trusted publishing can't be configured until a package exists on npm.
 2. Each package has a **trusted publisher** registered on npmjs.com (_Settings → Trusted Publisher → GitHub Actions_) pointing at `nexuslabs-ai/nexus` and the `release.yml` workflow.
+3. A repo secret **`RELEASE_TOKEN`** — a fine-grained PAT from `nexuslabs-ai-bot` with **contents: read/write** and **pull requests: read/write** on this repo — authenticates the "Version Packages" PR. The default `GITHUB_TOKEN` can't be used here: PRs it opens don't fire `pull_request`, so the required `CI Status` check would never run on the version PR and it couldn't merge. Rotate the PAT before it expires.
 
-The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a trusted-publishing-capable version (≥ 11.5.1) on Node ≥ 22.14.0, and reads `GITHUB_TOKEN` for the release PR — no other secrets are needed. Provenance attestations are emitted automatically.
+The workflow grants `id-token: write` for the OIDC exchange, upgrades npm to a trusted-publishing-capable version (≥ 11.5.1) on Node ≥ 22.14.0, and uses `RELEASE_TOKEN` for the release PR and tags. There is **no npm token** — publish auth is OIDC. Provenance attestations are emitted automatically.
 
 ### Day-to-day: adding a changeset
 
@@ -344,7 +345,7 @@ Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: 
 The `Release` workflow runs on every push to `main`:
 
 1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s.
-2. **Publish** — when you merge that PR (changesets consumed), the next run builds core and runs `changeset publish`, pushing `@nexus_ds/core` and `@nexus_ds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
+2. **Publish** — when you merge that PR (changesets consumed), the next run builds the packages and runs `changeset publish`, pushing `@nexus_ds/core` and `@nexus_ds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
 
 `@nexus_ds/core` and `@nexus_ds/eslint-plugin` were bootstrapped at `0.0.1` by the initial manual publish. The staged initial changeset cuts the first **trusted-publishing** release: merging the Version Packages PR the workflow opens publishes both at `0.1.0`. Verify any release with a fresh external install:
 
