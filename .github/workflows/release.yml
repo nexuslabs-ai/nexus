@@ -73,7 +73,11 @@ jobs:
         run: npm install -g npm@11.5.1
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        # --ignore-scripts: RELEASE_TOKEN is persisted in .git/config for this
+        # job, so keep untrusted third-party dependency lifecycle scripts from
+        # reading it. The build doesn't need them — esbuild resolves its
+        # platform binary from the installed optional package at runtime.
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
