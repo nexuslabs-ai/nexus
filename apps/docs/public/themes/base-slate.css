@@ -105,11 +105,11 @@ html.dark {
   --nx-color-control-background: var(--nx-color-slate-800);
   --nx-color-control-background-hover: var(--nx-color-slate-700);
   --nx-color-control-thumb: var(--nx-color-white-base);
-  --nx-color-nav-background: oklch(0.1624 0.04 264.7);
+  --nx-color-nav-background: var(--nx-color-slate-900);
   --nx-color-nav-foreground: var(--nx-color-slate-50);
   --nx-color-nav-muted-foreground: var(--nx-color-slate-300);
-  --nx-color-nav-item-hover: var(--nx-color-slate-900);
-  --nx-color-nav-item-active: var(--nx-color-slate-900);
+  --nx-color-nav-item-hover: var(--nx-color-slate-800);
+  --nx-color-nav-item-active: var(--nx-color-slate-800);
   --nx-color-nav-border: var(--nx-color-slate-800);
   --nx-color-overlay: var(--nx-color-slate-a800);
   --nx-color-border-default: var(--nx-color-white-a300);

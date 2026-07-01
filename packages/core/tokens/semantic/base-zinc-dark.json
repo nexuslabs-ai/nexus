@@ -94,7 +94,7 @@
     "$type": "color"
   },
   "nav-background": {
-    "$value": "oklch(0.1731 0.005 262.8)",
+    "$value": "{zinc.900}",
     "$type": "color"
   },
   "nav-foreground": {
@@ -106,11 +106,11 @@
     "$type": "color"
   },
   "nav-item-hover": {
-    "$value": "{zinc.900}",
+    "$value": "{zinc.800}",
     "$type": "color"
   },
   "nav-item-active": {
-    "$value": "{zinc.900}",
+    "$value": "{zinc.800}",
     "$type": "color"
   },
   "nav-border": {

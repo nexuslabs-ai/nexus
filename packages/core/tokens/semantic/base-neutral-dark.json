@@ -94,7 +94,7 @@
     "$type": "color"
   },
   "nav-background": {
-    "$value": "oklch(0.1784 0 0)",
+    "$value": "{neutral.900}",
     "$type": "color"
   },
   "nav-foreground": {
@@ -106,11 +106,11 @@
     "$type": "color"
   },
   "nav-item-hover": {
-    "$value": "{neutral.900}",
+    "$value": "{neutral.800}",
     "$type": "color"
   },
   "nav-item-active": {
-    "$value": "{neutral.900}",
+    "$value": "{neutral.800}",
     "$type": "color"
   },
   "nav-border": {
