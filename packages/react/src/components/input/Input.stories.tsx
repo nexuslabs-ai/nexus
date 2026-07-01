@@ -149,10 +149,7 @@ export const BorderlessStates: Story = {
 
     await expect(empty).toHaveAttribute('data-variant', 'borderless');
     await expect(empty).toHaveClass('nx:border-transparent');
-    await expect(empty).toHaveClass('nx:bg-control-background');
-    await expect(empty).toHaveClass(
-      'nx:enabled:hover:bg-control-background-hover'
-    );
+    await expect(empty).toHaveClass('nx:bg-background-hover-alpha');
 
     await expect(readOnly).toHaveAttribute('readonly');
     await expect(readOnly).not.toBeDisabled();
@@ -174,7 +171,7 @@ export const BorderlessSurfaceComparison: Story = {
     docs: {
       description: {
         story:
-          'Borderless inputs use the control tonal fill so the field remains perceivable on both page background and container surfaces.',
+          'Borderless inputs use the background-hover-alpha surface so the same semantic token adapts across light and dark page and container surfaces.',
       },
     },
   },
@@ -187,7 +184,7 @@ export const BorderlessSurfaceComparison: Story = {
         <Input
           variant="borderless"
           aria-label="Borderless input on background"
-          defaultValue="control-background fill"
+          defaultValue="alpha surface fill"
         />
       </div>
       <div className="nx:grid nx:gap-2 nx:rounded-md nx:bg-container nx:p-4">
@@ -197,7 +194,7 @@ export const BorderlessSurfaceComparison: Story = {
         <Input
           variant="borderless"
           aria-label="Borderless input on container"
-          defaultValue="control-background fill"
+          defaultValue="alpha surface fill"
         />
       </div>
     </div>
@@ -211,8 +208,8 @@ export const BorderlessSurfaceComparison: Story = {
       name: 'Borderless input on container',
     });
 
-    await expect(background).toHaveClass('nx:bg-control-background');
-    await expect(container).toHaveClass('nx:bg-control-background');
+    await expect(background).toHaveClass('nx:bg-background-hover-alpha');
+    await expect(container).toHaveClass('nx:bg-background-hover-alpha');
   },
 };
 

@@ -479,7 +479,9 @@ function deriveAlpha(
     '--nx-color-overlay': toneInk(dark ? 0.8471 : 0.7529),
     '--nx-color-popover-backdrop': toneInk(0.9098),
     '--nx-color-border-default-alpha': toneInk(profile.borderAlpha),
-    '--nx-color-background-hover-alpha': toneInk(profile.hoverAlpha),
+    '--nx-color-background-hover-alpha': dark
+      ? contrastInk(profile.hoverAlpha)
+      : toneInk(profile.hoverAlpha),
     '--nx-color-popover-alpha': dark
       ? toneInk(0.7529)
       : 'oklch(1 0 0 / 0.7529)',

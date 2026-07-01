@@ -12,7 +12,7 @@
     "$type": "color"
   },
   "background-hover-alpha": {
-    "$value": "{slate.a100}",
+    "$value": "{white.a100}",
     "$type": "color"
   },
   "background-active": {
