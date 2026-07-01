@@ -305,6 +305,54 @@ The rule that mandates querying it lives in [`.claude/rules/docs-mcp.md`](.claud
 
 ---
 
+## Releasing
+
+Releases are driven by [changesets](https://github.com/changesets/changesets) and the [`Release`](.github/workflows/release.yml) workflow. Only the two runtime packages publish to npm; everything else is either internal or copy/own.
+
+| Package                   | Published? | Why                                                                     |
+| ------------------------- | ---------- | ----------------------------------------------------------------------- |
+| `@nexus_ds/core`          | **npm**    | Framework-agnostic runtime engine; copied component code imports it     |
+| `@nexus_ds/eslint-plugin` | **npm**    | Lint guardrails consumers install and use                               |
+| `@nexus_ds/tailwind`      | copy/own   | Generated token CSS — consumers regenerate with their own token choices |
+| `@nexus_ds/react`         | copy/own   | Components are copied and owned; delivered by the export tool (#541)    |
+| `@nexus_ds/test-utils`    | private    | Internal test tooling                                                   |
+| `@nexus_ds/console/docs`  | private    | Apps                                                                    |
+
+The published packages live under the `@nexus_ds` **npm scope**. The ESLint plugin's **rule namespace** stays `@nexus/*` (e.g. `@nexus/no-render-prop-types`) — it is a flat-config key decoupled from the package name, so consumers keep their existing `eslint-disable` comments.
+
+### One-time maintainer setup
+
+1. Claim the `@nexus_ds` scope on npmjs.com (the org/user that will own the packages).
+2. Create an npm **automation** access token (bypasses 2FA on publish) with publish rights to the scope.
+3. Add it as the repo secret `NPM_TOKEN` (`Settings → Secrets and variables → Actions`). The workflow already grants `id-token: write` for npm provenance and reads `GITHUB_TOKEN` for the release PR — no other secrets are needed.
+
+### Day-to-day: adding a changeset
+
+Any PR that changes `@nexus_ds/core` or `@nexus_ds/eslint-plugin` includes a changeset describing the bump:
+
+```bash
+pnpm changeset        # pick packages + semver bump, write a summary
+```
+
+Commit the generated `.changeset/*.md` file with your PR. Semver is a contract: `major` for a breaking change to core's runtime surface or the plugin's rule API, `minor` for additive, `patch` for fixes.
+
+### Cutting a release
+
+The `Release` workflow runs on every push to `main`:
+
+1. **Collect** — with unreleased changesets present, it opens/updates a **"Version Packages"** PR that bumps versions and writes `CHANGELOG.md`s.
+2. **Publish** — when you merge that PR (changesets consumed), the next run builds core and runs `changeset publish`, pushing `@nexus_ds/core` and `@nexus_ds/eslint-plugin` to npm with provenance. Private packages are skipped automatically.
+
+The **first** release is already staged: an initial changeset ships both packages at `0.1.0`. Once the scope and `NPM_TOKEN` are in place, merge the Version Packages PR the workflow opens to publish. Verify with a fresh external install:
+
+```bash
+npm install @nexus_ds/core @nexus_ds/eslint-plugin
+```
+
+To version locally without publishing (e.g. to preview the bump): `pnpm version-packages`.
+
+---
+
 ## Authoritative specs
 
 This handbook is the on-ramp. The canonical conventions live in [`.claude/rules/`](.claude/rules/) — there is no root `CLAUDE.md`. When this doc and a rule file disagree, the rule file wins.

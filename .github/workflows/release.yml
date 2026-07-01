@@ -1,0 +1,64 @@
+name: Release
+
+# Publishes @nexus_ds/core and @nexus_ds/eslint-plugin to npm via changesets.
+# Standalone from ci.yml: this is a post-merge push:main workflow, not a PR
+# check, so it is not part of the `CI Status` branch-protection aggregator.
+#
+# Flow: on push to main, changesets/action either opens/updates a "Version
+# Packages" PR (when unreleased changesets exist) or — once that PR merges and
+# the changesets are consumed — runs `pnpm release` to build core and publish.
+# Only the two non-private packages publish; changesets skips private ones.
+#
+# Prerequisites (see CONTRIBUTING.md § Releasing):
+#   - the `@nexus_ds` npm scope is claimed
+#   - repo secret NPM_TOKEN holds an npm automation token (2FA-exempt) with
+#     publish rights to the scope. Missing/unset only matters at publish time
+#     (the Version PR step needs no token), so a first run still opens the PR.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create the Version Packages PR / push tags
+  pull-requests: write # open and update the Version Packages PR
+  id-token: write # mint the OIDC token for npm provenance
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create Release Pull Request or Publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # changesets/action writes ~/.npmrc with
+          # //registry.npmjs.org/:_authToken=${NPM_TOKEN} from this value.
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Emit npm provenance attestations (needs id-token: write above).
+          NPM_CONFIG_PROVENANCE: true
