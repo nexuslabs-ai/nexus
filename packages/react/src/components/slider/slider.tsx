@@ -372,7 +372,7 @@ function SliderComfortable({
       step={step}
       disabled={disabled}
       className={cn(
-        'nx:group/slider-comfortable nx:relative nx:flex nx:h-6 nx:w-full nx:cursor-pointer nx:select-none nx:items-center nx:touch-pan-y nx:data-disabled:cursor-default',
+        'nx:group/slider-comfortable nx:relative nx:flex nx:h-8 nx:w-full nx:cursor-pointer nx:select-none nx:items-center nx:touch-pan-y nx:data-disabled:cursor-default',
         disabled && 'nx:pointer-events-none',
         className
       )}
@@ -381,7 +381,7 @@ function SliderComfortable({
       <SliderPrimitive.Track
         data-slot="slider-comfortable-track"
         className={cn(
-          'nx:relative nx:h-6 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default nx:bg-control-background nx:text-foreground nx:transition-colors nx:duration-fast nx:motion-reduce:transition-none',
+          'nx:relative nx:h-8 nx:w-full nx:overflow-hidden nx:rounded-lg nx:border-default nx:border-border-default nx:bg-control-background nx:text-foreground nx:transition-colors nx:duration-fast nx:motion-reduce:transition-none',
           disabled &&
             'nx:border-border-disabled nx:bg-disabled nx:text-disabled-foreground'
         )}
