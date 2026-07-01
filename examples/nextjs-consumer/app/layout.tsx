@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { Providers } from './providers';
+import { AppShell } from './shell';
 
 export const metadata: Metadata = {
   title: 'nextjs-consumer',
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <NexusAppearanceScript storageKey={APPEARANCE_STORAGE_KEY} />
       </head>
       <body>
-        <Providers storageKey={APPEARANCE_STORAGE_KEY}>{children}</Providers>
+        <Providers storageKey={APPEARANCE_STORAGE_KEY}>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );
