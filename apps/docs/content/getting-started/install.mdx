@@ -10,24 +10,24 @@ React entrypoint.
 For components and the Tailwind theme:
 
 ```bash
-pnpm add @nexus/react @nexus/tailwind react-hook-form sonner
+pnpm add @nexus_ds/react @nexus_ds/tailwind react-hook-form sonner
 ```
 
-`@nexus/react` provides the components; `@nexus/tailwind` provides the
+`@nexus_ds/react` provides the components; `@nexus_ds/tailwind` provides the
 `nx:`-prefixed utility theme they're built on. `react-hook-form` and `sonner`
 back the exported Form and Toaster components. Tokens come along transitively.
 
 ### Add Appearance theming
 
-To use the runtime Appearance system (`@nexus/react/appearance`), also add the
+To use the runtime Appearance system (`@nexus_ds/react/appearance`), also add the
 framework-agnostic engine:
 
 ```bash
-pnpm add @nexus/core
+pnpm add @nexus_ds/core
 ```
 
-`@nexus/core` owns the appearance model, theme derivation, and the first-paint
-bootstrap. It is required when you use `@nexus/react/appearance`. See **Theme
+`@nexus_ds/core` owns the appearance model, theme derivation, and the first-paint
+bootstrap. It is required when you use `@nexus_ds/react/appearance`. See **Theme
 setup** for the full wiring.
 
 ## Wire the styles
@@ -36,8 +36,8 @@ Import the theme and the prebuilt component styles once, at your app's CSS
 entry point:
 
 ```css
-@import '@nexus/tailwind';
-@import '@nexus/react/styles.css';
+@import '@nexus_ds/tailwind';
+@import '@nexus_ds/react/styles.css';
 ```
 
 The second import matters: Tailwind doesn't scan `node_modules`, so the
@@ -52,14 +52,14 @@ initial page canvas before JavaScript loads:
 <meta name="color-scheme" content="light dark" />
 ```
 
-`@nexus/tailwind` also emits the matching CSS policy: `:root` advertises
+`@nexus_ds/tailwind` also emits the matching CSS policy: `:root` advertises
 light/dark support, `.dark` pins native UI to dark, and light mode stays pinned
 when `.dark` is absent.
 
 ## Render a component
 
 Every utility is prefixed with `nx:` and every color is a semantic token, so
-components theme themselves. The buttons below are live `@nexus/react`
+components theme themselves. The buttons below are live `@nexus_ds/react`
 components rendered straight from this Markdown page:
 
 <div className="nx:flex nx:flex-wrap nx:gap-3 nx:my-6">

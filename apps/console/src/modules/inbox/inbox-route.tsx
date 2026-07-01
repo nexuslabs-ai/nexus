@@ -8,7 +8,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
   Skeleton,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconInbox } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';

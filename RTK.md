@@ -120,7 +120,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 Required component story purposes are defined in `.claude/rules/testing-react.md`. New components generally need default, variant, size, disabled, click interaction, keyboard interaction, data-attribute, composition, edge-case, and showcase stories unless that rule documents an archetype-specific exception.
 
-Hooks and utilities use `*.test.ts` with `@nexus/test-utils`. Do not use Storybook imports in hook/utility tests.
+Hooks and utilities use `*.test.ts` with `@nexus_ds/test-utils`. Do not use Storybook imports in hook/utility tests.
 
 Before finishing component work, run the narrowest meaningful checks first, then broaden as risk increases:
 

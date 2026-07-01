@@ -1,4 +1,4 @@
-# @nexus/eslint-plugin
+# @nexus_ds/eslint-plugin
 
 Custom ESLint rules for the Nexus design system. They split into two groups: **token-layer** rules that backfill what the deleted `--nx-size-*` primitive layer used to enforce, and **component-authoring** rules that machine-enforce conventions documented in `.claude/rules/` (so they fail `pnpm lint` and the pre-commit hook for every contributor, not just code review).
 
@@ -28,7 +28,7 @@ The token-layer rules are self-contained: the canonical step set is `src/canonic
 
 ## Shareable config
 
-`@nexus/eslint-plugin/config` exports small flat-config helpers for consumers
+`@nexus_ds/eslint-plugin/config` exports small flat-config helpers for consumers
 that want the Nexus rules without copying this monorepo's full lint setup:
 
 - `nexusComponentConfig({ files })` wires the component-authoring rules.

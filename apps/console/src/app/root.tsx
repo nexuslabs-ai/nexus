@@ -1,4 +1,4 @@
-import { Toaster } from '@nexus/react';
+import { Toaster } from '@nexus_ds/react';
 import { Outlet } from '@tanstack/react-router';
 
 /**

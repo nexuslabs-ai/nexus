@@ -1,7 +1,7 @@
 // packages/test-utils/src/index.ts
 
 /**
- * @nexus/test-utils
+ * @nexus_ds/test-utils
  *
  * Testing utilities for hooks and utility functions.
  *

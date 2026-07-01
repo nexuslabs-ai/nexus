@@ -10,24 +10,24 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run --project=unit",
-    "typecheck:dist": "pnpm --filter @nexus/core typecheck:dist-core && node scripts/typecheck-tailwind-dist.mjs",
+    "typecheck:dist": "pnpm --filter @nexus_ds/core typecheck:dist-core && node scripts/typecheck-tailwind-dist.mjs",
     "test:storybook": "vitest run --project=storybook",
     "test:storybook:watch": "vitest --project=storybook",
     "test:storybook:ui": "vitest --project=storybook --ui",
-    "storybook": "pnpm --filter @nexus/react storybook",
-    "build-storybook": "pnpm --filter @nexus/react build-storybook",
+    "storybook": "pnpm --filter @nexus_ds/react storybook",
+    "build-storybook": "pnpm --filter @nexus_ds/react build-storybook",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\" \".claude/**/*.md\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,yml}\" \".claude/**/*.md\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck",
-    "tokens:modular": "pnpm --filter @nexus/core build:tokens:modular && node scripts/sync-docs-themes.js",
+    "tokens:modular": "pnpm --filter @nexus_ds/core build:tokens:modular && node scripts/sync-docs-themes.js",
     "tokens:tailwind": "cd packages/core && pnpm build:tailwind && cp dist/tailwind/* ../../packages/tailwind/",
     "audit:browser-support": "node scripts/audit-browser-support.js",
     "audit:agent-drift": "node scripts/audit-agent-drift.js",
-    "audit:contrast": "pnpm --filter @nexus/core audit:contrast",
-    "audit:mode-codenames": "pnpm --filter @nexus/core audit:mode-codenames",
-    "audit:mode-distinctness": "pnpm --filter @nexus/core audit:mode-distinctness",
-    "validate:spacing-modes": "pnpm --filter @nexus/core validate:spacing-modes",
+    "audit:contrast": "pnpm --filter @nexus_ds/core audit:contrast",
+    "audit:mode-codenames": "pnpm --filter @nexus_ds/core audit:mode-codenames",
+    "audit:mode-distinctness": "pnpm --filter @nexus_ds/core audit:mode-distinctness",
+    "validate:spacing-modes": "pnpm --filter @nexus_ds/core validate:spacing-modes",
     "console": "cd apps/console && pnpm dev",
     "docs:serve": "npx @arabold/docs-mcp-server@latest server --store-path ./docs-mcp/data --protocol http --host 127.0.0.1 --port 6282",
     "docs:export": "cp ./docs-mcp/data/documents.db ./docs-mcp/documents.db && echo 'Exported docs-mcp database to docs-mcp/documents.db'",
@@ -44,10 +44,10 @@
   },
   "size-limit": [
     {
-      "name": "@nexus/react (ESM)",
+      "name": "@nexus_ds/react (ESM)",
       "path": "packages/react/dist/index.mjs",
       "ignore": [
-        "@nexus/core",
+        "@nexus_ds/core",
         "embla-carousel-react",
         "react-day-picker",
         "react-hook-form",
@@ -59,15 +59,15 @@
       "limit": "95 kB"
     },
     {
-      "name": "@nexus/react (CSS)",
+      "name": "@nexus_ds/react (CSS)",
       "path": "packages/react/dist/react.css",
       "limit": "30 kB"
     },
     {
-      "name": "@nexus/react/appearance (ESM)",
+      "name": "@nexus_ds/react/appearance (ESM)",
       "path": "packages/react/dist/appearance.mjs",
       "ignore": [
-        "@nexus/core",
+        "@nexus_ds/core",
         "react",
         "react-dom"
       ],
@@ -76,7 +76,7 @@
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@nexus/eslint-plugin": "workspace:*",
+    "@nexus_ds/eslint-plugin": "workspace:*",
     "@size-limit/preset-small-lib": "^12.0.0",
     "@storybook/addon-vitest": "^10.1.11",
     "@vitest/browser": "4.0.18",

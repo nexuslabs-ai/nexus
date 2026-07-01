@@ -1,6 +1,6 @@
 /* Atlas console — package-owned Nexus tokens, utilities, and component CSS. */
-@import '@nexus/tailwind';
-@import '@nexus/react/styles.css';
+@import '@nexus_ds/tailwind';
+@import '@nexus_ds/react/styles.css';
 
 /* Component overlay animations (Dialog / Select / AlertDialog / Tooltip). */
 @import 'tw-animate-css';

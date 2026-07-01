@@ -10,7 +10,7 @@ out
 pnpm-lock.yaml
 package-lock.json
 
-# Auto-generated CSS — produced by @nexus/core token pipeline; do not reformat
+# Auto-generated CSS — produced by @nexus_ds/core token pipeline; do not reformat
 packages/tailwind/*.css
 apps/console/public/themes/*.css
 apps/console/src/styles/*.css

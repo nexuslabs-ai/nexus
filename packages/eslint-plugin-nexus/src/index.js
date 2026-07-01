@@ -5,7 +5,7 @@ import nxClassConventions from './rules/nx-class-conventions.js';
 
 const plugin = {
   meta: {
-    name: '@nexus/eslint-plugin',
+    name: '@nexus_ds/eslint-plugin',
     version: '0.0.1',
   },
   rules: {

@@ -31,14 +31,14 @@ clean: ## Stop docs-mcp, remove build outputs + node_modules
 
 # ── Dev servers (turbo-orchestrated) ──────────────────────────────────────────
 
-dev: ## Storybook — the primary component-dev surface (builds @nexus/core first)
-	pnpm turbo storybook --filter=@nexus/react
+dev: ## Storybook — the primary component-dev surface (builds @nexus_ds/core first)
+	pnpm turbo storybook --filter=@nexus_ds/react
 
-console: ## Console app + live @nexus/react (turbo: app + react watcher)
-	pnpm turbo dev --filter=@nexus/console...
+console: ## Console app + live @nexus_ds/react (turbo: app + react watcher)
+	pnpm turbo dev --filter=@nexus_ds/console...
 
-docs: ## Docs site + live @nexus/react (turbo: docs + react watcher)
-	pnpm turbo dev --filter=@nexus/docs...
+docs: ## Docs site + live @nexus_ds/react (turbo: docs + react watcher)
+	pnpm turbo dev --filter=@nexus_ds/docs...
 
 dev-all: ## Everything: console + docs + storybook + package watchers (turbo)
 	pnpm turbo dev storybook

@@ -8,7 +8,7 @@ import {
   EmptyStateMedia,
   EmptyStateTitle,
   Skeleton,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { IconBriefcase, IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 

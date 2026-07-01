@@ -19,7 +19,7 @@ import {
   Input,
   Textarea,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { z } from 'zod';
 
 const profileSchema = z.object({

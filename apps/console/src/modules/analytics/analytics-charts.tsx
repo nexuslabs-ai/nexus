@@ -5,7 +5,7 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import {
   Area,
   AreaChart,

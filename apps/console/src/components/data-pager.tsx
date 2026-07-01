@@ -1,4 +1,4 @@
-import { Button } from '@nexus/react';
+import { Button } from '@nexus_ds/react';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 interface DataPagerProps {

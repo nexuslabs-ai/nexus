@@ -2,7 +2,7 @@ import {
   createNexusAppearanceBootstrapScript,
   createNexusAppearanceSnapshotFromState,
   type NexusAppearanceState,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 
 export interface InjectAppearanceBootstrapOptions {
   storageKey: string;

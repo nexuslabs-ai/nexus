@@ -4,7 +4,7 @@ import {
   createNexusAppearanceSnapshotFromState,
   type NexusAppearanceState,
   sanitizeNexusAppearance,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 
 export interface NexusAppearanceScriptProps {
   storageKey?: string | false;

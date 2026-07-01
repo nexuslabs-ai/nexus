@@ -3,7 +3,7 @@ import { Button } from '../_components/nexus';
 
 /**
  * Theming → Multi-brand. The theming-model explainer (this is where
- * `/theming` lands). Server component; the live preview renders @nexus/react
+ * `/theming` lands). Server component; the live preview renders @nexus_ds/react
  * Buttons as a client island that re-themes via the picker. Documents the
  * dimensions, the two runtime swap mechanisms, consumer overrides, and the
  * humans/agents framing.
@@ -165,7 +165,7 @@ export function MultiBrand() {
           surface.
         </p>
         <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
-          {`/* loaded after @nexus/tailwind */
+          {`/* loaded after @nexus_ds/tailwind */
 :root {
   --nx-color-primary-background: oklch(0.55 0.2 145); /* your brand */
 }

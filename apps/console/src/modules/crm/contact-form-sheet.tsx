@@ -26,7 +26,7 @@ import {
   SheetHeader,
   SheetTitle,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 

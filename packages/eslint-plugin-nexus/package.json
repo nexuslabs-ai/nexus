@@ -1,5 +1,5 @@
 {
-  "name": "@nexus/eslint-plugin",
+  "name": "@nexus_ds/eslint-plugin",
   "version": "0.0.1",
   "private": true,
   "type": "module",

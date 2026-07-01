@@ -6,7 +6,7 @@ import { Breadcrumb } from '../_components/Breadcrumb';
  * the letter-spacing / text-wrap rules.
  *
  * The tier classes are stored as full literal strings so Tailwind's scanner
- * emits them; the composites also ship wholesale via @nexus/tailwind.
+ * emits them; the composites also ship wholesale via @nexus_ds/tailwind.
  *
  * Source: packages/core/tokens/ (typography).
  */
@@ -177,7 +177,7 @@ export function Typography() {
           in running prose.
         </p>
         <pre className="nx:typography-code-block nx:rounded-lg nx:border nx:border-border-default nx:bg-muted nx:p-4 nx:overflow-x-auto">
-          {`import { Button } from '@nexus/react';
+          {`import { Button } from '@nexus_ds/react';
 
 <Button variant="secondary">Ship it</Button>`}
         </pre>

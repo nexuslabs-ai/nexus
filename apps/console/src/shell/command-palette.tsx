@@ -7,8 +7,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@nexus/react';
-import { useNexusAppearance } from '@nexus/react/appearance';
+} from '@nexus_ds/react';
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import {
   IconAddressBook,
   IconBriefcase,

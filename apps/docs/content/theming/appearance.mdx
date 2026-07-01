@@ -27,7 +27,7 @@ fixed.
 Start from the shipped default and override the fields you own:
 
 ```ts
-import { DEFAULT_NEXUS_APPEARANCE } from '@nexus/core';
+import { DEFAULT_NEXUS_APPEARANCE } from '@nexus_ds/core';
 
 export const defaultAppearance = {
   ...DEFAULT_NEXUS_APPEARANCE,
@@ -44,7 +44,7 @@ export const defaultAppearance = {
 Use `useNexusAppearance` to build product-specific controls.
 
 ```tsx
-import { useNexusAppearance } from '@nexus/react/appearance';
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 
 function ModeButton() {
   const { state, setState } = useNexusAppearance();

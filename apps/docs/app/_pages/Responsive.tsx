@@ -144,7 +144,7 @@ export function Responsive() {
         </h2>
         <p className="nx:typography-body-default nx:text-muted-foreground nx:mb-4 nx:max-w-[64ch]">
           The declarative <code>&lt;Show&gt;</code> / <code>&lt;Hide&gt;</code>{' '}
-          primitives from <code>@nexus/react</code> express responsive
+          primitives from <code>@nexus_ds/react</code> express responsive
           visibility. Provide exactly one axis: <code>above</code> /{' '}
           <code>below</code> for the viewport, or <code>containerAbove</code> /{' '}
           <code>containerBelow</code> for the nearest <code>@container</code>.

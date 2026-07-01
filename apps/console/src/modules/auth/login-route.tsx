@@ -18,7 +18,7 @@ import {
   FormLabel,
   FormMessage,
   Input,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';

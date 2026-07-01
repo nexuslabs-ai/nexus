@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 
 // The docs app loads the modular per-mode CSS at runtime via <link> tags
 // (ThemeBootstrap) for live theme swapping, and gets primitives from
-// @nexus/tailwind. Console now gets runtime appearance from @nexus/core +
-// @nexus/react/appearance, so this sync is docs-only.
+// @nexus_ds/tailwind. Console now gets runtime appearance from @nexus_ds/core +
+// @nexus_ds/react/appearance, so this sync is docs-only.
 //
 // public/themes is a committed copy of the generated dist/modular output;
 // without this sync it silently drifts from the tokens (which is exactly
@@ -29,7 +29,7 @@ if (!fs.existsSync(SENTINEL)) {
 
 if (!fs.existsSync(SOURCE_DIR)) {
   throw new Error(
-    `sync-docs-themes: source ${SOURCE_DIR} missing — run pnpm --filter @nexus/core build:tokens:modular first.`
+    `sync-docs-themes: source ${SOURCE_DIR} missing — run pnpm --filter @nexus_ds/core build:tokens:modular first.`
   );
 }
 

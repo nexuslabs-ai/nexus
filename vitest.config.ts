@@ -7,25 +7,25 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: '@nexus/core',
+        find: '@nexus_ds/core',
         replacement: path.resolve(__dirname, './packages/core/src/index.ts'),
       },
       {
-        find: '@nexus/react/appearance/server',
+        find: '@nexus_ds/react/appearance/server',
         replacement: path.resolve(
           __dirname,
           './packages/react/src/components/appearance/provider/server.ts'
         ),
       },
       {
-        find: '@nexus/react/appearance',
+        find: '@nexus_ds/react/appearance',
         replacement: path.resolve(
           __dirname,
           './packages/react/src/components/appearance/provider/index.ts'
         ),
       },
       {
-        find: /^@nexus\/react$/,
+        find: /^@nexus_ds\/react$/,
         replacement: path.resolve(__dirname, './packages/react/src/index.ts'),
       },
       {

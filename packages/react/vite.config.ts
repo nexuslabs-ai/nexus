@@ -58,7 +58,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        '@nexus/core',
+        '@nexus_ds/core',
         'react',
         'react-dom',
         'react/jsx-runtime',
@@ -77,7 +77,7 @@ export default defineConfig({
             ? "'use client';"
             : '',
         globals: {
-          '@nexus/core': 'NexusCore',
+          '@nexus_ds/core': 'NexusCore',
           react: 'React',
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'jsxRuntime',

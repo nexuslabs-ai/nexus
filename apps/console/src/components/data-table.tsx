@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -150,7 +150,7 @@ export function DataTable<TData>({
         </Table>
       </div>
 
-      {/* App-local pager — the polished @nexus/react Pagination is tracked in #281. */}
+      {/* App-local pager — the polished @nexus_ds/react Pagination is tracked in #281. */}
       <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
         <p className="nx:text-muted-foreground nx:typography-body-default">
           {enableSelection

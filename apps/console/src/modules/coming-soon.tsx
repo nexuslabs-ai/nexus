@@ -4,7 +4,7 @@ import {
   EmptyStateHeader,
   EmptyStateMedia,
   EmptyStateTitle,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 import { useParams } from '@tanstack/react-router';
 
 import { MODULE_ITEMS } from '../shell/modules';

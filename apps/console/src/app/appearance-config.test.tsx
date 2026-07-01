@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { useNexusAppearance } from '@nexus/react/appearance';
+import { useNexusAppearance } from '@nexus_ds/react/appearance';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 

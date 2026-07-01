@@ -1,13 +1,13 @@
 {
-  "name": "@nexus/react",
+  "name": "@nexus_ds/react",
   "version": "0.0.1",
   "publishConfig": {
     "access": "public"
   },
   "description": "React components built with Radix UI and Tailwind CSS",
   "//": [
-    "@nexus/core is a runtime dependency of @nexus/react/appearance; Vite marks it external so the runtime theme engine is consumed from @nexus/core, not bundled into @nexus/react.",
-    "Tracked for restructure: https://github.com/nexuslabs-ai/nexus/issues/66 (move to @nexus/tailwind dependsOn @nexus/core#build:tailwind in turbo)."
+    "@nexus_ds/core is a runtime dependency of @nexus_ds/react/appearance; Vite marks it external so the runtime theme engine is consumed from @nexus_ds/core, not bundled into @nexus_ds/react.",
+    "Tracked for restructure: https://github.com/nexuslabs-ai/nexus/issues/66 (move to @nexus_ds/tailwind dependsOn @nexus_ds/core#build:tailwind in turbo)."
   ],
   "type": "module",
   "main": "./dist/index.js",
@@ -65,8 +65,8 @@
     "zod": "^4.4.3"
   },
   "dependencies": {
-    "@nexus/core": "workspace:*",
-    "@nexus/tailwind": "workspace:*",
+    "@nexus_ds/core": "workspace:*",
+    "@nexus_ds/tailwind": "workspace:*",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",

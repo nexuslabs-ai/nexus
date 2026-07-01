@@ -16,7 +16,7 @@ importers:
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.4
-      '@nexus/eslint-plugin':
+      '@nexus_ds/eslint-plugin':
         specifier: workspace:*
         version: link:packages/eslint-plugin-nexus
       '@size-limit/preset-small-lib':
@@ -112,13 +112,13 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.77.0(react@19.2.7))
-      '@nexus/core':
+      '@nexus_ds/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@nexus/react':
+      '@nexus_ds/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@nexus/tailwind':
+      '@nexus_ds/tailwind':
         specifier: workspace:*
         version: link:../../packages/tailwind
       '@phosphor-icons/react':
@@ -203,13 +203,13 @@ importers:
       '@next/mdx':
         specifier: ^15.1.6
         version: 15.5.19(@mdx-js/loader@3.1.1)(@mdx-js/react@3.1.1(@types/react@19.2.16)(react@19.2.7))
-      '@nexus/core':
+      '@nexus_ds/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@nexus/react':
+      '@nexus_ds/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@nexus/tailwind':
+      '@nexus_ds/tailwind':
         specifier: workspace:*
         version: link:../../packages/tailwind
       next:
@@ -295,10 +295,10 @@ importers:
 
   packages/react:
     dependencies:
-      '@nexus/core':
+      '@nexus_ds/core':
         specifier: workspace:*
         version: link:../core
-      '@nexus/tailwind':
+      '@nexus_ds/tailwind':
         specifier: workspace:*
         version: link:../tailwind
       '@radix-ui/react-accordion':

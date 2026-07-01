@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
   toast,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 
 const PLANS = [
   { value: 'free', label: 'Free' },

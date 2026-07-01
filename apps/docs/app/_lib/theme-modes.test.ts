@@ -67,7 +67,7 @@ describe('docs theme modes', () => {
   });
 
   it('keeps THEME_MODE_VALUES in sync with the shipped core token modes', () => {
-    // The docs picker re-encodes the token-mode names; the @nexus/core audit
+    // The docs picker re-encodes the token-mode names; the @nexus_ds/core audit
     // can see the shadow/radius/borderwidth hrefs but NOT spacing (applied via
     // data-density, no /themes file). Bind every rename family to the actual
     // token files so a drifted or typo'd mode is caught. Green today, and after

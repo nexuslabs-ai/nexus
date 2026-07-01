@@ -70,5 +70,5 @@ assertExports('ESM', esm);
 assertExports('CJS', cjs);
 
 console.log(
-  `@nexus/core runtime export allowlist clean (${EXPECTED_RUNTIME_EXPORTS.length} exports).`
+  `@nexus_ds/core runtime export allowlist clean (${EXPECTED_RUNTIME_EXPORTS.length} exports).`
 );

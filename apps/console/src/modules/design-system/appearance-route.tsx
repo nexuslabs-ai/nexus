@@ -1,4 +1,4 @@
-import { NexusAppearanceSettings } from '@nexus/react';
+import { NexusAppearanceSettings } from '@nexus_ds/react';
 
 import { PageHeader } from '../../components/page-header';
 

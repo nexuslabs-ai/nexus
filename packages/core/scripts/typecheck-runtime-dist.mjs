@@ -23,7 +23,7 @@ const requiredDistFiles = [
 for (const distFile of requiredDistFiles) {
   if (!existsSync(distFile)) {
     throw new Error(
-      `Missing ${path.relative(repoRoot, distFile)}. Run @nexus/core build before this dist typecheck.`
+      `Missing ${path.relative(repoRoot, distFile)}. Run @nexus_ds/core build before this dist typecheck.`
     );
   }
 }
@@ -31,7 +31,7 @@ for (const distFile of requiredDistFiles) {
 const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
 
 if (!packageJson.files?.includes('dist/runtime')) {
-  throw new Error('@nexus/core package files must include dist/runtime.');
+  throw new Error('@nexus_ds/core package files must include dist/runtime.');
 }
 
 function collectExportEntries(value, keyPath = 'exports', out = []) {
@@ -54,14 +54,14 @@ for (const { keyPath, file: exportFile } of collectExportEntries(
 )) {
   if (!exportFile.startsWith('./dist/runtime/')) {
     throw new Error(
-      `@nexus/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
+      `@nexus_ds/core ${keyPath} -> ${exportFile} must stay inside dist/runtime.`
     );
   }
 
   const resolved = path.join(packageRoot, exportFile);
   if (!existsSync(resolved)) {
     throw new Error(
-      `@nexus/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
+      `@nexus_ds/core ${keyPath} -> ${exportFile} points to missing ${path.relative(
         repoRoot,
         resolved
       )}.`
@@ -86,7 +86,7 @@ await writeFile(
   sanitizeNexusAppearance,
   themeToCss,
   type NexusAppearanceState,
-} from '@nexus/core';
+} from '@nexus_ds/core';
 
 const state: NexusAppearanceState = sanitizeNexusAppearance({
   ...DEFAULT_NEXUS_APPEARANCE,

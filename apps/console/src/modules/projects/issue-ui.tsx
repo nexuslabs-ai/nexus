@@ -1,4 +1,4 @@
-import { Badge, type BadgeProps } from '@nexus/react';
+import { Badge, type BadgeProps } from '@nexus_ds/react';
 
 import {
   ISSUE_PRIORITIES,

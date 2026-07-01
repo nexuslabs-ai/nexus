@@ -1,11 +1,11 @@
 /* Storybook-only stylesheet: render against exactly what consumers get. The
  * shipped src/index.css is utilities-only by design (tokens come from the
- * consumer's @nexus/tailwind), so Storybook layers the two the same way a
- * consumer does — tokens from @nexus/tailwind, then the shipped utilities,
+ * consumer's @nexus_ds/tailwind), so Storybook layers the two the same way a
+ * consumer does — tokens from @nexus_ds/tailwind, then the shipped utilities,
  * tw-animate-css, and component keyframes from src/index.css. Imported via CSS
  * @import (not a JS import) so the Rollup production build can resolve
- * @nexus/tailwind, whose package entry is a .css. */
-@import '@nexus/tailwind';
+ * @nexus_ds/tailwind, whose package entry is a .css. */
+@import '@nexus_ds/tailwind';
 @import '../src/index.css';
 
 @source inline('nx:text-xs');

@@ -22,14 +22,14 @@ That's the whole first-time setup. It also wires the Husky pre-commit hook, whic
 
 Pick the surface you're working on — each is one `make` command that turbo orchestrates (parallel servers, prefixed logs, one Ctrl-C stops all):
 
-| Command        | Brings up                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface.              |
-| `make console` | the console app **+ a live `@nexus/react` watcher** (component edits show up in the app) |
-| `make docs`    | the docs site **+ live `@nexus/react`**                                                  |
-| `make dev-all` | everything: console + docs + storybook + all package watchers                            |
+| Command        | Brings up                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| `make dev`     | **Storybook** — the component catalog + interaction tests. The 90% surface.                 |
+| `make console` | the console app **+ a live `@nexus_ds/react` watcher** (component edits show up in the app) |
+| `make docs`    | the docs site **+ live `@nexus_ds/react`**                                                  |
+| `make dev-all` | everything: console + docs + storybook + all package watchers                               |
 
-> **First start on a clean checkout:** `console` / `docs` read `@nexus/react`'s `dist`, which the watcher emits a moment after launch — a brief error on the very first start is expected, or run `make build` once beforehand.
+> **First start on a clean checkout:** `console` / `docs` read `@nexus_ds/react`'s `dist`, which the watcher emits a moment after launch — a brief error on the very first start is expected, or run `make build` once beforehand.
 
 Leave **`make up`** running in another terminal so the docs-MCP is available to Claude Code (see [AI Documentation MCP](#ai-documentation-mcp-nexus-docs-mcp)).
 
@@ -52,13 +52,13 @@ The pre-commit hook already formats and `nx:`-lints staged files, so you rarely 
 
 `make help` prints these with descriptions. The full set:
 
-| Group        | Targets                                                      |
-| ------------ | ------------------------------------------------------------ |
-| **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`        |
-| **Dev**      | `dev` · `console` · `docs` · `dev-all`                       |
-| **Build**    | `build` · `tokens` (regenerate token CSS from `@nexus/core`) |
-| **Quality**  | `lint` · `typecheck` · `audit` · `verify`                    |
-| **Docs MCP** | `up` · `down` · `serve` · `publish`                          |
+| Group        | Targets                                                         |
+| ------------ | --------------------------------------------------------------- |
+| **Setup**    | `setup` · `fresh` (clean + install + build) · `clean`           |
+| **Dev**      | `dev` · `console` · `docs` · `dev-all`                          |
+| **Build**    | `build` · `tokens` (regenerate token CSS from `@nexus_ds/core`) |
+| **Quality**  | `lint` · `typecheck` · `audit` · `verify`                       |
+| **Docs MCP** | `up` · `down` · `serve` · `publish`                             |
 
 Anything not wrapped is still a plain pnpm script (`pnpm test`, `pnpm test:storybook:ui`, the per-package `audit:*`).
 
@@ -75,7 +75,7 @@ A single `*.stories.tsx` file does four jobs at once:
 
 You don't write a separate `*.test.tsx` for a component. That's not a stylistic preference — `vitest.config.ts` explicitly excludes `packages/react/src/components/**/*.test.{ts,tsx}` from the `unit` project.
 
-Hooks and utilities use `*.test.ts` files with `@nexus/test-utils`. Scripts under `packages/core/scripts/__tests__/` use `.test.js` and import from `vitest` directly. Both run under Vitest's `unit` project (jsdom).
+Hooks and utilities use `*.test.ts` files with `@nexus_ds/test-utils`. Scripts under `packages/core/scripts/__tests__/` use `.test.js` and import from `vitest` directly. Both run under Vitest's `unit` project (jsdom).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -211,10 +211,10 @@ export const Destructive: Story = {
 
 ### Hooks and utilities: `*.test.ts`
 
-Plain Vitest with `@nexus/test-utils` (re-exports `act`, `renderHook`, `waitFor` plus the standard Vitest globals — **not** `render` / `screen` / `userEvent` / `axe`, which only make sense for component tests, and those live in stories):
+Plain Vitest with `@nexus_ds/test-utils` (re-exports `act`, `renderHook`, `waitFor` plus the standard Vitest globals — **not** `render` / `screen` / `userEvent` / `axe`, which only make sense for component tests, and those live in stories):
 
 ```tsx
-import { act, describe, expect, it, renderHook } from '@nexus/test-utils';
+import { act, describe, expect, it, renderHook } from '@nexus_ds/test-utils';
 
 import { useCounter } from './use-counter';
 

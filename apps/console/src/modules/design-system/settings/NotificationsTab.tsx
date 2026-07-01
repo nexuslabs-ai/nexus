@@ -11,7 +11,7 @@ import {
   RadioGroup,
   RadioGroupItem,
   Switch,
-} from '@nexus/react';
+} from '@nexus_ds/react';
 
 const ACTIVITY = [
   { id: 'comments', label: 'Comments' },
