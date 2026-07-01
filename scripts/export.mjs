@@ -13,6 +13,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // Package names that are PUBLISHED upstream deps — never rebranded into the fork.
 export const KEEP_PACKAGES = ['@nexus_ds/core', '@nexus_ds/eslint-plugin'];
@@ -571,3 +572,250 @@ export default tseslint.config(
   prettierConfig
 );
 `;
+
+// ============================================================================
+// CLI ORCHESTRATION
+// ============================================================================
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// Files rebranded on copy; anything else is copied byte-for-byte.
+const TEXT_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.css',
+  '.json',
+  '.md',
+]);
+
+// eslint toolchain the produced root config imports; versions read from source root.
+const TOOLCHAIN_PACKAGES = [
+  '@eslint/js',
+  'eslint',
+  'eslint-config-prettier',
+  'eslint-plugin-jsx-a11y',
+  'eslint-plugin-react',
+  'eslint-plugin-react-hooks',
+  'eslint-plugin-simple-import-sort',
+  'globals',
+  'typescript-eslint',
+  'typescript',
+];
+
+function readJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function writeJson(filePath, value) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function writeFile(filePath, content) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, content);
+}
+
+/** Drop the `@storybook/addon-vitest` line — the produced Storybook is showcase-only. */
+function trimStorybookVitestAddon(text) {
+  return text.replace(/^\s*'@storybook\/addon-vitest',?\s*\n/m, '');
+}
+
+/**
+ * Recursively copy a tree, rebranding text files. `skip(srcPath)` excludes a
+ * path; `transform(srcPath, text)` post-processes rebranded text.
+ */
+function copyTree(srcDir, destDir, { scope, skip, transform }) {
+  fs.mkdirSync(destDir, { recursive: true });
+  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
+    const srcPath = path.join(srcDir, entry.name);
+    if (skip?.(srcPath)) {
+      continue;
+    }
+    const destPath = path.join(destDir, entry.name);
+    if (entry.isDirectory()) {
+      copyTree(srcPath, destPath, { scope, skip, transform });
+      continue;
+    }
+    if (!TEXT_EXTENSIONS.has(path.extname(entry.name))) {
+      fs.copyFileSync(srcPath, destPath);
+      continue;
+    }
+    let text = rebrandContent(fs.readFileSync(srcPath, 'utf8'), scope);
+    if (transform) {
+      text = transform(srcPath, text);
+    }
+    fs.writeFileSync(destPath, text);
+  }
+}
+
+/** Collect the minimal registry manifest entries from the source component tree. */
+function collectComponentEntries(componentsDir) {
+  const entries = [];
+  for (const dirent of fs.readdirSync(componentsDir, { withFileTypes: true })) {
+    if (!dirent.isDirectory()) {
+      continue;
+    }
+    const dir = path.join(componentsDir, dirent.name);
+    const files = [];
+    const sources = [];
+    const walk = (current) => {
+      for (const child of fs.readdirSync(current, { withFileTypes: true })) {
+        const childPath = path.join(current, child.name);
+        if (child.isDirectory()) {
+          walk(childPath);
+          continue;
+        }
+        if (child.name.endsWith('.stories.tsx')) {
+          continue;
+        }
+        files.push(path.relative(componentsDir, childPath));
+        if (child.name.endsWith('.tsx') || child.name.endsWith('.ts')) {
+          sources.push(fs.readFileSync(childPath, 'utf8'));
+        }
+      }
+    };
+    walk(dir);
+    entries.push({
+      name: dirent.name,
+      files: files.sort(),
+      deps: scanInternalDeps(sources.join('\n')),
+    });
+  }
+  return entries;
+}
+
+/** Fork packages/react into the produced repo, rebranded + showcase-only Storybook. */
+function forkReactPackage(destReactDir, scope, coreVersion, version) {
+  const srcReactDir = path.join(REPO_ROOT, 'packages', 'react');
+
+  copyTree(path.join(srcReactDir, 'src'), path.join(destReactDir, 'src'), { scope });
+  copyTree(path.join(srcReactDir, '.storybook'), path.join(destReactDir, '.storybook'), {
+    scope,
+    skip: (srcPath) => srcPath.endsWith('vitest.setup.ts'),
+    transform: (srcPath, text) =>
+      srcPath.endsWith('main.ts') ? trimStorybookVitestAddon(text) : text,
+  });
+  for (const file of ['vite.config.ts', 'tsconfig.json', 'components.json']) {
+    const src = path.join(srcReactDir, file);
+    writeFile(path.join(destReactDir, file), rebrandContent(fs.readFileSync(src, 'utf8'), scope));
+  }
+
+  const reactPkg = transformReactPackageJson(readJson(path.join(srcReactDir, 'package.json')), {
+    scope,
+    coreVersion,
+    version,
+  });
+  writeJson(path.join(destReactDir, 'package.json'), reactPkg);
+}
+
+/** Generate the rebranded tailwind package (CSS via the core generator + manifest). */
+async function writeTailwindPackage(destTailwindDir, tokenConfig, scope, version) {
+  const { generateTailwindPackage } = await import(
+    pathToFileURL(path.join(REPO_ROOT, 'packages', 'core', 'scripts', 'generate-tailwind-package.js')).href
+  );
+  fs.mkdirSync(destTailwindDir, { recursive: true });
+  await generateTailwindPackage(tokenConfig, { distDir: destTailwindDir });
+
+  const srcTailwindPkg = readJson(path.join(REPO_ROOT, 'packages', 'tailwind', 'package.json'));
+  writeJson(
+    path.join(destTailwindDir, 'package.json'),
+    transformTailwindPackageJson(srcTailwindPkg, { scope, version })
+  );
+}
+
+/** Write the produced monorepo root scaffold. */
+function writeRootScaffold(outDir, config, manifest) {
+  const { name, scope, policy, tokenConfig } = config;
+  const rootPkg = readJson(path.join(REPO_ROOT, 'package.json'));
+  const eslintPluginVersion = readJson(
+    path.join(REPO_ROOT, 'packages', 'eslint-plugin-nexus', 'package.json')
+  ).version;
+
+  const toolchain = {};
+  for (const dep of TOOLCHAIN_PACKAGES) {
+    const spec = rootPkg.devDependencies?.[dep];
+    if (!spec) {
+      throw new Error(`Toolchain dep "${dep}" not found in root devDependencies.`);
+    }
+    toolchain[dep] = spec;
+  }
+
+  writeJson(
+    path.join(outDir, 'package.json'),
+    renderRootPackageJson({
+      name,
+      scope,
+      eslintPluginVersion,
+      toolchain,
+      overrides: rootPkg.pnpm?.overrides ?? {},
+    })
+  );
+  writeFile(path.join(outDir, 'pnpm-workspace.yaml'), WORKSPACE_YAML);
+  writeFile(path.join(outDir, '.npmrc'), NPMRC_CONTENT);
+  writeFile(path.join(outDir, 'eslint.config.js'), ROOT_ESLINT_CONFIG);
+  writeFile(path.join(outDir, 'README.md'), renderReadme({ name, scope, tokenConfig }));
+  writeJson(path.join(outDir, 'registry.json'), manifest);
+  writeFile(
+    path.join(outDir, 'examples', 'app-appearance.tsx'),
+    renderAppAppearanceExample(scope, policy)
+  );
+}
+
+/** Resolve + prepare the output directory (refuse a non-empty target unless --force). */
+function prepareOutDir(out, force) {
+  const outDir = path.resolve(process.cwd(), out);
+  if (fs.existsSync(outDir) && fs.readdirSync(outDir).length > 0) {
+    if (!force) {
+      throw new Error(`Output dir "${outDir}" is not empty. Pass --force to overwrite.`);
+    }
+    if (fs.existsSync(path.join(outDir, '.git'))) {
+      throw new Error(`Refusing to overwrite "${outDir}": it looks like a git repo.`);
+    }
+    fs.rmSync(outDir, { recursive: true, force: true });
+  }
+  fs.mkdirSync(outDir, { recursive: true });
+  return outDir;
+}
+
+async function main(argv) {
+  const validChoices = discoverTokenChoices(path.join(REPO_ROOT, 'packages', 'core', 'tokens'));
+  const config = parseExportArgs(argv, { validChoices });
+  const coreVersion = readJson(path.join(REPO_ROOT, 'packages', 'core', 'package.json')).version;
+
+  const outDir = prepareOutDir(config.out, config.force);
+  console.log(`\n📦 Exporting "${config.name}" (${config.scope}) → ${outDir}`);
+  console.log(
+    `   tokens: ${TOKEN_CONFIG_KEYS.map((k) => `${k}=${config.tokenConfig[k]}`).join(' ')}`
+  );
+
+  forkReactPackage(path.join(outDir, 'packages', 'react'), config.scope, coreVersion, config.version);
+  console.log(`   ✓ forked ${config.scope}/react (Storybook showcase, rebranded)`);
+
+  await writeTailwindPackage(
+    path.join(outDir, 'packages', 'tailwind'),
+    config.tokenConfig,
+    config.scope,
+    config.version
+  );
+  console.log(`   ✓ generated ${config.scope}/tailwind`);
+
+  const entries = collectComponentEntries(
+    path.join(REPO_ROOT, 'packages', 'react', 'src', 'components')
+  );
+  writeRootScaffold(outDir, config, buildManifest(entries, { version: config.version }));
+  console.log(`   ✓ wrote root scaffold + registry (${entries.length} components)`);
+
+  console.log(`\n✨ Done. Next:\n   cd ${outDir} && pnpm install && pnpm build\n`);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main(process.argv.slice(2)).catch((error) => {
+    console.error(`✗ ${error.message}`);
+    process.exit(1);
+  });
+}
