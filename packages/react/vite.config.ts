@@ -29,9 +29,7 @@ export default defineConfig({
       include: ['src'],
       exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
       outDir: 'dist',
-      beforeWriteFile(filePath, content) {
-        return rewriteRootDeclaration(filePath, content);
-      },
+      beforeWriteFile: rewriteRootDeclaration,
     }),
   ],
   resolve: {
