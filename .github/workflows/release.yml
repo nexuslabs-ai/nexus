@@ -1,19 +1,24 @@
 name: Release
 
-# Publishes @nexus_ds/core and @nexus_ds/eslint-plugin to npm via changesets.
-# Standalone from ci.yml: this is a post-merge push:main workflow, not a PR
-# check, so it is not part of the `CI Status` branch-protection aggregator.
+# Publishes @nexus_ds/core and @nexus_ds/eslint-plugin to npm via changesets,
+# authenticated by npm trusted publishing (OIDC) — there is no npm token in the
+# repo. Standalone from ci.yml: this is a post-merge push:main workflow, not a
+# PR check, so it is not part of the `CI Status` branch-protection aggregator.
 #
 # Flow: on push to main, changesets/action either opens/updates a "Version
 # Packages" PR (when unreleased changesets exist) or — once that PR merges and
 # the changesets are consumed — runs `pnpm release` to build core and publish.
 # Only the two non-private packages publish; changesets skips private ones.
 #
-# Prerequisites (see CONTRIBUTING.md § Releasing):
-#   - the `@nexus_ds` npm scope is claimed
-#   - repo secret NPM_TOKEN holds an npm automation token (2FA-exempt) with
-#     publish rights to the scope. Missing/unset only matters at publish time
-#     (the Version PR step needs no token), so a first run still opens the PR.
+# Auth: each published package has a trusted publisher registered on npmjs.com
+# pointing at this repo + this workflow file (release.yml). At publish time npm
+# exchanges the GitHub OIDC token (id-token: write) for a short-lived
+# credential — no secret to store or rotate. This requires npm >= 11.5.1
+# (installed below, since the npm bundled with Node is older) and Node >=
+# 22.14.0; provenance attestations are emitted automatically. registry-url is
+# intentionally omitted from setup-node: with no token configured, npm falls
+# back to the OIDC exchange against the default registry. See
+# CONTRIBUTING.md § Releasing.
 
 on:
   push:
@@ -26,7 +31,7 @@ concurrency:
 permissions:
   contents: write # create the Version Packages PR / push tags
   pull-requests: write # open and update the Version Packages PR
-  id-token: write # mint the OIDC token for npm provenance
+  id-token: write # OIDC token for npm trusted publishing (+ provenance)
 
 jobs:
   release:
@@ -44,8 +49,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22.14.0' # trusted publishing requires Node >= 22.14.0
           cache: 'pnpm'
+
+      # pnpm publish shells out to the system npm; trusted publishing needs
+      # npm >= 11.5.1, newer than the npm bundled with Node 22.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -57,8 +67,3 @@ jobs:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # changesets/action writes ~/.npmrc with
-          # //registry.npmjs.org/:_authToken=${NPM_TOKEN} from this value.
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # Emit npm provenance attestations (needs id-token: write above).
-          NPM_CONFIG_PROVENANCE: true
