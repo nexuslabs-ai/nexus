@@ -285,6 +285,22 @@ describe('scanInternalDeps', () => {
       hooks: [],
     });
   });
+
+  it('strips block comments and does not treat :// URLs as line comments', () => {
+    const source = [
+      "import { cn } from '@/lib/utils';",
+      '/*',
+      " * import { Tooltip } from '@/components/tooltip';",
+      ' */',
+      "const docs = 'https://example.com/guide'; // see @/components/should-not-leak",
+      "import { useToast } from '@/hooks/use-toast';",
+    ].join('\n');
+    expect(scanInternalDeps(source)).toEqual({
+      components: [],
+      lib: ['utils'],
+      hooks: ['use-toast'],
+    });
+  });
 });
 
 describe('buildManifest', () => {

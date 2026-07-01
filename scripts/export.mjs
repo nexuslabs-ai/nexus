@@ -843,11 +843,17 @@ function containsGitDir(dir) {
 /** Resolve + prepare the output directory (refuse a non-empty target unless --force). */
 function prepareOutDir(out, force) {
   const outDir = path.resolve(process.cwd(), out);
-  // Never let --force `rmSync` a directory that is (or contains) this repo or
-  // the cwd — `--out=..` would otherwise wipe the repo's parent.
-  if (isPathWithin(outDir, REPO_ROOT) || isPathWithin(outDir, process.cwd())) {
+  // Never let --force `rmSync` a directory entangled with this repo or the cwd:
+  // `--out=..` would wipe the repo's parent, and `--out=packages` would wipe
+  // tracked source *inside* the repo — the single root `.git` can't guard a
+  // subdir, so refuse both directions relative to REPO_ROOT.
+  if (
+    isPathWithin(outDir, REPO_ROOT) ||
+    isPathWithin(REPO_ROOT, outDir) ||
+    isPathWithin(outDir, process.cwd())
+  ) {
     throw new Error(
-      `Refusing to export into "${outDir}": it is or contains this repo / the current directory.`
+      `Refusing to export into "${outDir}": it overlaps this repo / the current directory.`
     );
   }
   if (fs.existsSync(outDir) && fs.readdirSync(outDir).length > 0) {
