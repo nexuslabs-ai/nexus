@@ -1,9 +1,7 @@
 {
   "name": "@nexus_ds/react",
   "version": "0.0.1",
-  "publishConfig": {
-    "access": "public"
-  },
+  "private": true,
   "description": "React components built with Radix UI and Tailwind CSS",
   "//": [
     "@nexus_ds/core is a runtime dependency of @nexus_ds/react/appearance; Vite marks it external so the runtime theme engine is consumed from @nexus_ds/core, not bundled into @nexus_ds/react.",

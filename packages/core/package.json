@@ -4,6 +4,9 @@
   "type": "module",
   "description": "Framework-agnostic Nexus design-token engine: appearance model, runtime theme derivation, and first-paint snapshots.",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nexuslabs-ai/nexus.git",
