@@ -126,7 +126,7 @@ Minor: controls are `size="icon"` (36px), under ~44px (recurring touch-target ba
 
 Typography (raw, lower priority — dense data-viz): `text-xs` (root + tooltip), `font-medium` (tooltip labels) → composites. Value's `font-mono tabular-nums` is intentional, leave it.
 
-ESLint exception: file-level `eslint-disable @nexus/no-render-prop-types` — recharts mandates render-prop shapes (`ChartConfig.icon`, Tooltip formatters). Composition rule permits a third-party opt-out; confirm the scope stays minimal.
+ESLint exception: file-level `eslint-disable @nexus_ds/no-render-prop-types` — recharts mandates render-prop shapes (`ChartConfig.icon`, Tooltip formatters). Composition rule permits a third-party opt-out; confirm the scope stays minimal.
 
 ## checkbox
 

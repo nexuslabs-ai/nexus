@@ -1,4 +1,4 @@
-/* eslint-disable @nexus/no-render-prop-types -- this file adapts the recharts
+/* eslint-disable @nexus_ds/no-render-prop-types -- this file adapts the recharts
    API, whose ChartConfig `icon` (ComponentType) and Tooltip `labelFormatter` /
    `formatter` (return ReactNode) shapes are third-party-mandated and out of
    scope per composition-over-render-props.md. */

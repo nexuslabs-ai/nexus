@@ -139,7 +139,7 @@ type DatePickerProps = React.ComponentProps<typeof DayPicker> & {
    * A render callback (not a `children` slot) because react-day-picker owns
    * the per-day render loop, so per-day content cannot be passed as children.
    */
-  // eslint-disable-next-line @nexus/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
+  // eslint-disable-next-line @nexus_ds/no-render-prop-types -- react-day-picker owns the per-day render loop; per-day content can't be a children slot
   renderDayContent?: (props: DatePickerDayContentProps) => React.ReactNode;
 };
 

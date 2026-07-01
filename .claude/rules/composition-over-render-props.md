@@ -1,6 +1,6 @@
 # Composition Over Render Props
 
-> **Enforced by** `@nexus/no-render-prop-types` — props typed as render callbacks (`(...) => ReactNode`) or component references (`ComponentType` / `FC`) fail `pnpm lint`. Genuinely third-party-mandated shapes opt out with a scoped `eslint-disable` + reason.
+> **Enforced by** `@nexus_ds/no-render-prop-types` — props typed as render callbacks (`(...) => ReactNode`) or component references (`ComponentType` / `FC`) fail `pnpm lint`. Genuinely third-party-mandated shapes opt out with a scoped `eslint-disable` + reason.
 
 When a component's internal shape varies by mode, never accept a render-callback or component reference as a prop to inject the varying part. Either compose with `children` (or other `ReactNode` slots), or split into one component per mode.
 

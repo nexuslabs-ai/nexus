@@ -151,7 +151,7 @@ The repo still carries useful Claude-specific workflow assets:
 
 Codex does not automatically execute Claude commands or invoke Claude subagents. When a user mentions a Claude command such as `/implement`, translate the intent into normal Codex work and read the corresponding `.claude/commands/*.md` or `.claude/skills/*/SKILL.md` only for process guidance.
 
-Formatting and linting run on commit via the Husky + lint-staged pre-commit hook (`eslint --fix` + `prettier --write` on staged files); the `nx:` Tailwind-class conventions are enforced by the `@nexus/nx-class-conventions` ESLint rule. For immediate feedback, run `pnpm lint` and `pnpm format` explicitly.
+Formatting and linting run on commit via the Husky + lint-staged pre-commit hook (`eslint --fix` + `prettier --write` on staged files); the `nx:` Tailwind-class conventions are enforced by the `@nexus_ds/nx-class-conventions` ESLint rule. For immediate feedback, run `pnpm lint` and `pnpm format` explicitly.
 
 ## GitHub And PRs
 
