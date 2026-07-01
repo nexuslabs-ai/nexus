@@ -29,7 +29,7 @@ const buttonGroupVariants = cva(
 );
 
 const buttonGroupTextVariants = cva(
-  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
+  'nx:flex nx:items-center nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-control-background nx:shadow-xs nx:transition-colors nx:duration-fast nx:motion-reduce:transition-none nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4',
   {
     variants: {
       size: {
@@ -147,7 +147,12 @@ function ButtonGroupText({
     <Comp
       data-slot="button-group-text"
       data-size={resolvedSize}
-      className={cn(buttonGroupTextVariants({ size: resolvedSize }), className)}
+      className={cn(
+        buttonGroupTextVariants({ size: resolvedSize }),
+        asChild &&
+          'nx:cursor-pointer nx:hover:bg-control-background-hover nx:active:bg-background-active',
+        className
+      )}
       {...props}
     />
   );
