@@ -20,6 +20,7 @@ import {
   Toaster,
 } from '@acme/react';
 import {
+  IconBrandTailwind,
   IconComponents,
   IconForms,
   IconLayoutDashboard,
@@ -36,6 +37,7 @@ const NAV = [
   { href: '/data', label: 'Data table', icon: IconTable },
   { href: '/forms', label: 'Forms', icon: IconForms },
   { href: '/appearance', label: 'Appearance', icon: IconPalette },
+  { href: '/raw-tailwind', label: 'Raw Tailwind', icon: IconBrandTailwind },
 ] as const;
 
 const TITLES: Record<string, string> = {
@@ -44,6 +46,7 @@ const TITLES: Record<string, string> = {
   '/data': 'Data table',
   '/forms': 'Forms',
   '/appearance': 'Appearance',
+  '/raw-tailwind': 'Raw Tailwind (no design system)',
 };
 
 export function AppShell({ children }: { children: ReactNode }) {
