@@ -26,6 +26,11 @@ const meta: Meta<typeof Textarea> = {
     onBlur: fn(),
   },
   argTypes: {
+    variant: {
+      control: 'select',
+      options: ['default', 'borderless'],
+      description: 'The visual treatment of the textarea',
+    },
     disabled: {
       control: 'boolean',
       description: 'Whether the textarea is disabled',
@@ -169,6 +174,73 @@ export const Invalid: Story = {
   },
 };
 
+export const BorderlessStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-[400px] nx:flex-col nx:gap-3">
+      <Textarea
+        data-testid="textarea-borderless-empty"
+        variant="borderless"
+        placeholder="Placeholder text"
+      />
+      <Textarea
+        data-testid="textarea-borderless-filled"
+        variant="borderless"
+        defaultValue="Filled value spanning a couple of lines."
+        aria-label="Filled borderless textarea"
+      />
+      <Textarea
+        data-testid="textarea-borderless-readonly"
+        variant="borderless"
+        defaultValue="Read-only notes"
+        aria-label="Read-only borderless textarea"
+        readOnly
+      />
+      <Textarea
+        data-testid="textarea-borderless-invalid"
+        variant="borderless"
+        defaultValue="Too short"
+        aria-invalid
+        aria-label="Invalid borderless textarea"
+      />
+      <Textarea
+        data-testid="textarea-borderless-disabled"
+        variant="borderless"
+        placeholder="Disabled"
+        disabled
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const empty = canvas.getByTestId('textarea-borderless-empty');
+    const readOnly = canvas.getByTestId('textarea-borderless-readonly');
+    const invalid = canvas.getByTestId('textarea-borderless-invalid');
+    const disabled = canvas.getByTestId('textarea-borderless-disabled');
+
+    await expect(empty).toHaveAttribute('data-variant', 'borderless');
+    await expect(empty).toHaveClass('nx:border-transparent');
+    await expect(empty).toHaveClass('nx:bg-control-background');
+    await expect(empty).toHaveClass(
+      'nx:enabled:hover:bg-control-background-hover'
+    );
+
+    await expect(readOnly).toHaveAttribute('readonly');
+    await expect(readOnly).not.toBeDisabled();
+
+    await expect(invalid).toHaveAttribute('aria-invalid', 'true');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+
+    await expect(disabled).toBeDisabled();
+    await expect(disabled).toHaveClass('nx:disabled:bg-disabled');
+    await expect(disabled).not.toHaveClass(
+      'nx:disabled:border-border-disabled'
+    );
+  },
+};
+
 export const WithLabel: Story = {
   render: (args) => (
     <div className="nx:flex nx:flex-col nx:gap-2">
@@ -308,6 +380,7 @@ export const WithDataAttributes: Story = {
     const textarea = canvas.getByRole('textbox');
 
     await expect(textarea).toHaveAttribute('data-slot', 'textarea');
+    await expect(textarea).toHaveAttribute('data-variant', 'default');
     await expect(textarea).toHaveClass('nx:enabled:hover:bg-background-hover');
   },
 };
@@ -319,6 +392,26 @@ export const WithDataAttributes: Story = {
 export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8 nx:w-[400px]">
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Variants
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-3">
+          <div className="nx:flex nx:items-start nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20 nx:pt-2">
+              default
+            </span>
+            <Textarea placeholder="Default textarea" />
+          </div>
+          <div className="nx:flex nx:items-start nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20 nx:pt-2">
+              borderless
+            </span>
+            <Textarea variant="borderless" placeholder="Borderless textarea" />
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           States

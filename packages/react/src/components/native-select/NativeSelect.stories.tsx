@@ -93,6 +93,67 @@ export const Disabled: Story = {
   },
 };
 
+export const BorderlessStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:gap-3">
+      <NativeSelect
+        data-testid="native-select-borderless-default"
+        variant="borderless"
+        aria-label="Borderless plan"
+        defaultValue="pro"
+      >
+        <NativeSelectOption value="free">Free</NativeSelectOption>
+        <NativeSelectOption value="pro">Pro</NativeSelectOption>
+      </NativeSelect>
+      <NativeSelect
+        data-testid="native-select-borderless-invalid"
+        variant="borderless"
+        aria-label="Invalid borderless plan"
+        aria-invalid
+        defaultValue="free"
+      >
+        <NativeSelectOption value="free">Free</NativeSelectOption>
+        <NativeSelectOption value="pro">Pro</NativeSelectOption>
+      </NativeSelect>
+      <NativeSelect
+        data-testid="native-select-borderless-disabled"
+        variant="borderless"
+        aria-label="Disabled borderless plan"
+        defaultValue="free"
+        disabled
+      >
+        <NativeSelectOption value="free">Free</NativeSelectOption>
+        <NativeSelectOption value="pro">Pro</NativeSelectOption>
+      </NativeSelect>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const base = canvas.getByTestId('native-select-borderless-default');
+    const invalid = canvas.getByTestId('native-select-borderless-invalid');
+    const disabled = canvas.getByTestId('native-select-borderless-disabled');
+
+    await expect(base).toHaveAttribute('data-variant', 'borderless');
+    await expect(base).toHaveClass('nx:border-transparent');
+    await expect(base).toHaveClass('nx:bg-control-background');
+    await expect(base).toHaveClass(
+      'nx:enabled:hover:bg-control-background-hover'
+    );
+
+    await expect(invalid).toHaveAttribute('aria-invalid', 'true');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+
+    await expect(disabled).toBeDisabled();
+    await expect(disabled).toHaveClass('nx:disabled:bg-disabled');
+    await expect(disabled).not.toHaveClass(
+      'nx:disabled:border-border-disabled'
+    );
+  },
+};
+
 export const ReadOnlyBoundary: Story = {
   parameters: {
     docs: {
@@ -203,6 +264,7 @@ export const WithDataAttributes: Story = {
     const select = canvasElement.querySelector('[data-slot="native-select"]');
     await expect(select).toBeInTheDocument();
     await expect(select).toHaveAttribute('data-size', 'default');
+    await expect(select).toHaveAttribute('data-variant', 'default');
     await expect(
       canvasElement.querySelector('[data-slot="native-select-wrapper"]')
     ).toBeInTheDocument();
@@ -222,6 +284,14 @@ export const AllVariants: Story = {
   render: () => (
     <div className="nx:flex nx:flex-col nx:gap-3">
       <NativeSelect size="default" aria-label="Default" defaultValue="pro">
+        <NativeSelectOption value="free">Free</NativeSelectOption>
+        <NativeSelectOption value="pro">Pro</NativeSelectOption>
+      </NativeSelect>
+      <NativeSelect
+        variant="borderless"
+        aria-label="Borderless"
+        defaultValue="pro"
+      >
         <NativeSelectOption value="free">Free</NativeSelectOption>
         <NativeSelectOption value="pro">Pro</NativeSelectOption>
       </NativeSelect>

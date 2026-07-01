@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 import { popoverSurfaceClassName } from '@/components/overlay-layout/overlay-layout';
 import { IconCheck, IconChevronDown, IconChevronUp } from '@/lib/icons';
@@ -40,19 +41,48 @@ const SelectGroup = SelectPrimitive.Group;
  */
 const SelectValue = SelectPrimitive.Value;
 
+const selectTriggerVariants = cva(
+  [
+    'nx:group/select-trigger nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-2',
+    'nx:rounded-md nx:border-default nx:transition-colors',
+    'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
+    'nx:whitespace-nowrap',
+    'nx:data-[placeholder]:text-muted-foreground',
+    'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
+    'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
+    'nx:[&>span]:line-clamp-1',
+  ],
+  {
+    variants: {
+      variant: {
+        default:
+          'nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-border-disabled',
+        borderless:
+          'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
 /**
  * SelectTriggerProps
  *
  * Props for the SelectTrigger component.
  */
-interface SelectTriggerProps extends React.ComponentProps<
-  typeof SelectPrimitive.Trigger
-> {}
+interface SelectTriggerProps
+  extends
+    React.ComponentProps<typeof SelectPrimitive.Trigger>,
+    VariantProps<typeof selectTriggerVariants> {}
 
 /**
  * SelectTrigger
  *
- * Button that opens the select dropdown.
+ * Button that opens the select dropdown. Use `variant="borderless"` to remove
+ * the visible border while keeping a tonal control fill for resting affordance.
  *
  * @example
  * ```tsx
@@ -61,21 +91,17 @@ interface SelectTriggerProps extends React.ComponentProps<
  * </SelectTrigger>
  * ```
  */
-function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
+function SelectTrigger({
+  className,
+  children,
+  variant,
+  ...props
+}: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      className={cn(
-        'nx:group/select-trigger nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-2',
-        'nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:transition-colors nx:enabled:hover:bg-background-hover',
-        'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
-        'nx:whitespace-nowrap',
-        'nx:data-[placeholder]:text-muted-foreground',
-        'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
-        'nx:disabled:cursor-not-allowed nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
-        'nx:[&>span]:line-clamp-1',
-        className
-      )}
+      data-variant={variant ?? 'default'}
+      className={cn(selectTriggerVariants({ variant, className }))}
       {...props}
     >
       {children}
@@ -321,5 +347,6 @@ export {
   type SelectSeparatorProps,
   SelectTrigger,
   type SelectTriggerProps,
+  selectTriggerVariants,
   SelectValue,
 };

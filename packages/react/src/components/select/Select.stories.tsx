@@ -76,6 +76,34 @@ export const Disabled: Story = {
   ),
 };
 
+export const InvalidTrigger: Story = {
+  render: () => (
+    <Select defaultValue="apple">
+      <SelectTrigger
+        className="nx:w-[180px]"
+        aria-label="Invalid select"
+        aria-invalid
+      >
+        <SelectValue placeholder="Select a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="apple">Apple</SelectItem>
+        <SelectItem value="banana">Banana</SelectItem>
+      </SelectContent>
+    </Select>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Invalid select' });
+
+    await expect(trigger).toHaveAttribute('aria-invalid', 'true');
+    await expect(trigger).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(trigger).toHaveClass(
+      'nx:aria-invalid:focus-visible:outline-focus-error'
+    );
+  },
+};
+
 export const WithDisabledItems: Story = {
   render: (_args) => (
     <Select>
@@ -91,6 +119,86 @@ export const WithDisabledItems: Story = {
       </SelectContent>
     </Select>
   ),
+};
+
+export const BorderlessStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-[220px] nx:flex-col nx:gap-3">
+      <Select>
+        <SelectTrigger
+          data-testid="select-borderless-empty"
+          variant="borderless"
+          aria-label="Empty borderless select"
+        >
+          <SelectValue placeholder="Select option" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select defaultValue="apple">
+        <SelectTrigger
+          variant="borderless"
+          aria-label="Filled borderless select"
+        >
+          <SelectValue placeholder="Select option" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select defaultValue="apple">
+        <SelectTrigger
+          data-testid="select-borderless-invalid"
+          variant="borderless"
+          aria-label="Invalid borderless select"
+          aria-invalid
+        >
+          <SelectValue placeholder="Select option" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select disabled defaultValue="apple">
+        <SelectTrigger
+          data-testid="select-borderless-disabled"
+          variant="borderless"
+          aria-label="Disabled borderless select"
+        >
+          <SelectValue placeholder="Select option" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="apple">Apple</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const empty = canvas.getByTestId('select-borderless-empty');
+    const invalid = canvas.getByTestId('select-borderless-invalid');
+    const disabled = canvas.getByTestId('select-borderless-disabled');
+
+    await expect(empty).toHaveAttribute('data-variant', 'borderless');
+    await expect(empty).toHaveClass('nx:border-transparent');
+    await expect(empty).toHaveClass('nx:bg-control-background');
+    await expect(empty).toHaveClass(
+      'nx:enabled:hover:bg-control-background-hover'
+    );
+
+    await expect(invalid).toHaveAttribute('aria-invalid', 'true');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-border-error');
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+
+    await expect(disabled).toBeDisabled();
+    await expect(disabled).toHaveClass('nx:disabled:bg-disabled');
+    await expect(disabled).not.toHaveClass(
+      'nx:disabled:border-border-disabled'
+    );
+  },
 };
 
 export const CapabilityLadder: Story = {
@@ -571,6 +679,7 @@ export const WithDataAttributes: Story = {
     // Check trigger data-slot
     const trigger = canvas.getByRole('combobox');
     await expect(trigger).toHaveAttribute('data-slot', 'select-trigger');
+    await expect(trigger).toHaveAttribute('data-variant', 'default');
     await expect(trigger).toHaveClass('nx:enabled:hover:bg-background-hover');
 
     // Open the select
@@ -604,6 +713,47 @@ export const WithDataAttributes: Story = {
 export const AllVariants: Story = {
   render: (_args) => (
     <div className="nx:flex nx:flex-col nx:gap-8">
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Variants
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-4">
+          <div className="nx:flex nx:items-center nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
+              Default
+            </span>
+            <Select>
+              <SelectTrigger
+                className="nx:w-[180px]"
+                aria-label="Default variant select"
+              >
+                <SelectValue placeholder="Select option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="option1">Option 1</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="nx:flex nx:items-center nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-24">
+              Borderless
+            </span>
+            <Select>
+              <SelectTrigger
+                variant="borderless"
+                className="nx:w-[180px]"
+                aria-label="Borderless variant select"
+              >
+                <SelectValue placeholder="Select option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="option1">Option 1</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
           Basic States

@@ -7,12 +7,59 @@ import { Input } from '@/components/input';
 import { Textarea } from '@/components/textarea';
 import { cn } from '@/lib/utils';
 
+const inputGroupVariants = cva(
+  [
+    'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-default nx:transition-colors nx:outline-none',
+    // Size: an inline group matches standalone Input's height for the
+    // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
+    // non-stacked layouts (no block addon) so the fixed-height rule and the
+    // auto-height stacked case are mutually exclusive — they never both
+    // match.
+    'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=sm]]:h-8',
+    'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=default]]:h-10',
+    'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=lg]]:h-12',
+    // The control fills the fixed-height frame without adding height (the
+    // compound :has() selector outranks Input's own h-* by specificity).
+    // Released in the stacked case, where the control keeps its own height.
+    'nx:not-has-[>[data-align^=block]]:[&>input]:h-full',
+    // Alignment: addons push the control's padding to make room.
+    'nx:has-[>[data-align=inline-start]]:[&>input]:pl-2',
+    'nx:has-[>[data-align=inline-end]]:[&>input]:pr-2',
+    'nx:has-[>[data-align=block-start]]:flex-col nx:has-[>[data-align=block-start]]:[&>input]:pb-3',
+    'nx:has-[>[data-align=block-end]]:flex-col nx:has-[>[data-align=block-end]]:[&>input]:pt-3',
+    'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:bg-disabled',
+    // Focus: the group shows the ring when the inner control is focused
+    // (the control suppresses its own outline).
+    'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-2 nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default nx:has-[[data-slot=input-group-control]:focus-visible]:outline-offset-(--focus-offset)',
+    // Error: an invalid control reddens the border; an invalid focused
+    // control switches the ring to the error colour (matches Input).
+    'nx:has-[[data-slot][aria-invalid=true]]:border-border-error',
+    'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error',
+  ],
+  {
+    variants: {
+      variant: {
+        default:
+          'nx:border-border-default nx:bg-background nx:not-data-[disabled=true]:hover:bg-background-hover nx:data-[disabled=true]:border-border-disabled',
+        borderless:
+          'nx:border-transparent nx:bg-control-background nx:not-data-[disabled=true]:hover:bg-control-background-hover',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
 /**
  * InputGroupProps
  *
  * Props for the InputGroup component.
  */
-interface InputGroupProps extends React.ComponentProps<'div'> {}
+interface InputGroupProps
+  extends
+    React.ComponentProps<'div'>,
+    VariantProps<typeof inputGroupVariants> {}
 
 /**
  * InputGroup
@@ -26,6 +73,8 @@ interface InputGroupProps extends React.ComponentProps<'div'> {}
  *
  * The visible frame matches a standalone `Input`: an inline group takes the
  * control's `size` height. Stacked (block-aligned) groups stay auto-height.
+ * Use `variant="borderless"` to remove the visible border while keeping a
+ * tonal control fill for resting affordance.
  *
  * @example
  * ```tsx
@@ -37,42 +86,13 @@ interface InputGroupProps extends React.ComponentProps<'div'> {}
  * </InputGroup>
  * ```
  */
-function InputGroup({ className, ...props }: InputGroupProps) {
+function InputGroup({ className, variant, ...props }: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
+      data-variant={variant ?? 'default'}
       role="group"
-      className={cn(
-        'nx:group/input-group nx:relative nx:flex nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:transition-colors nx:outline-none',
-        // Size: an inline group matches standalone Input's height for the
-        // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
-        // non-stacked layouts (no block addon) so the fixed-height rule and the
-        // auto-height stacked case are mutually exclusive — they never both
-        // match.
-        'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=sm]]:h-8',
-        'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=default]]:h-10',
-        'nx:not-has-[>[data-align^=block]]:has-[[data-slot=input-group-control][data-size=lg]]:h-12',
-        // The control fills the fixed-height frame without adding height (the
-        // compound :has() selector outranks Input's own h-* by specificity).
-        // Released in the stacked case, where the control keeps its own height.
-        'nx:not-has-[>[data-align^=block]]:[&>input]:h-full',
-        // Alignment: addons push the control's padding to make room.
-        'nx:has-[>[data-align=inline-start]]:[&>input]:pl-2',
-        'nx:has-[>[data-align=inline-end]]:[&>input]:pr-2',
-        'nx:has-[>[data-align=block-start]]:flex-col nx:has-[>[data-align=block-start]]:[&>input]:pb-3',
-        'nx:has-[>[data-align=block-end]]:flex-col nx:has-[>[data-align=block-end]]:[&>input]:pt-3',
-        // Hover / disabled: Input's semantic state tokens (no opacity dimming).
-        'nx:not-data-[disabled=true]:hover:bg-background-hover',
-        'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:border-border-disabled nx:data-[disabled=true]:bg-disabled',
-        // Focus: the group shows the ring when the inner control is focused
-        // (the control suppresses its own outline).
-        'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-2 nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default nx:has-[[data-slot=input-group-control]:focus-visible]:outline-offset-(--focus-offset)',
-        // Error: an invalid control reddens the border; an invalid focused
-        // control switches the ring to the error colour (matches Input).
-        'nx:has-[[data-slot][aria-invalid=true]]:border-border-error',
-        'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error',
-        className
-      )}
+      className={cn(inputGroupVariants({ variant, className }))}
       {...props}
     />
   );
@@ -211,7 +231,10 @@ function InputGroupText({ className, ...props }: InputGroupTextProps) {
  *
  * Props for the InputGroupInput component.
  */
-interface InputGroupInputProps extends React.ComponentProps<typeof Input> {}
+interface InputGroupInputProps extends Omit<
+  React.ComponentProps<typeof Input>,
+  'variant'
+> {}
 
 /**
  * InputGroupInput
@@ -225,7 +248,7 @@ function InputGroupInput({ className, ...props }: InputGroupInputProps) {
     <Input
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:rounded-none nx:border-0 nx:bg-transparent nx:focus-visible:outline-none',
+        'nx:flex-1 nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:focus-visible:outline-none',
         className
       )}
       {...props}
@@ -238,8 +261,9 @@ function InputGroupInput({ className, ...props }: InputGroupInputProps) {
  *
  * Props for the InputGroupTextarea component.
  */
-interface InputGroupTextareaProps extends React.ComponentProps<
-  typeof Textarea
+interface InputGroupTextareaProps extends Omit<
+  React.ComponentProps<typeof Textarea>,
+  'variant'
 > {}
 
 /**
@@ -253,7 +277,7 @@ function InputGroupTextarea({ className, ...props }: InputGroupTextareaProps) {
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:bg-transparent nx:py-3 nx:shadow-none nx:focus-visible:outline-none',
+        'nx:flex-1 nx:resize-none nx:rounded-none nx:border-0 nx:bg-transparent nx:enabled:hover:bg-transparent nx:py-3 nx:shadow-none nx:focus-visible:outline-none',
         className
       )}
       {...props}
@@ -276,4 +300,5 @@ export {
   InputGroupTextarea,
   type InputGroupTextareaProps,
   type InputGroupTextProps,
+  inputGroupVariants,
 };

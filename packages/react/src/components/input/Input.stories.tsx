@@ -27,6 +27,11 @@ const meta: Meta<typeof Input> = {
       options: ['default', 'sm', 'lg'],
       description: 'The size of the input',
     },
+    variant: {
+      control: 'select',
+      options: ['default', 'borderless'],
+      description: 'The visual treatment of the input',
+    },
     type: {
       control: 'select',
       options: ['text', 'email', 'password', 'number', 'search', 'tel', 'url'],
@@ -96,6 +101,118 @@ export const Invalid: Story = {
     const input = canvas.getByRole('textbox');
 
     await expect(input).toHaveAttribute('aria-invalid', 'true');
+  },
+};
+
+export const BorderlessStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-[400px] nx:flex-col nx:gap-3">
+      <Input
+        data-testid="input-borderless-empty"
+        variant="borderless"
+        placeholder="Placeholder text"
+      />
+      <Input
+        data-testid="input-borderless-filled"
+        variant="borderless"
+        defaultValue="Filled value"
+        aria-label="Filled borderless input"
+      />
+      <Input
+        data-testid="input-borderless-readonly"
+        variant="borderless"
+        defaultValue="acct_1024"
+        aria-label="Read-only borderless input"
+        readOnly
+      />
+      <Input
+        data-testid="input-borderless-invalid"
+        variant="borderless"
+        defaultValue="invalid@"
+        aria-invalid
+        aria-label="Invalid borderless input"
+      />
+      <Input
+        data-testid="input-borderless-disabled"
+        variant="borderless"
+        placeholder="Disabled"
+        disabled
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const empty = canvas.getByTestId('input-borderless-empty');
+    const readOnly = canvas.getByTestId('input-borderless-readonly');
+    const invalid = canvas.getByTestId('input-borderless-invalid');
+    const disabled = canvas.getByTestId('input-borderless-disabled');
+
+    await expect(empty).toHaveAttribute('data-variant', 'borderless');
+    await expect(empty).toHaveClass('nx:border-transparent');
+    await expect(empty).toHaveClass('nx:bg-control-background');
+    await expect(empty).toHaveClass(
+      'nx:enabled:hover:bg-control-background-hover'
+    );
+
+    await expect(readOnly).toHaveAttribute('readonly');
+    await expect(readOnly).not.toBeDisabled();
+
+    await expect(invalid).toHaveAttribute('aria-invalid', 'true');
+    await expect(invalid).toHaveClass('nx:aria-invalid:border-color-error');
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+
+    await expect(disabled).toBeDisabled();
+    await expect(disabled).toHaveClass('nx:disabled:bg-disabled');
+    await expect(disabled).not.toHaveClass('nx:disabled:border-color-disabled');
+  },
+};
+
+export const BorderlessSurfaceComparison: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Borderless inputs use the control tonal fill so the field remains perceivable on both page background and container surfaces.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:grid nx:w-[400px] nx:gap-4">
+      <div className="nx:grid nx:gap-2 nx:rounded-md nx:bg-background nx:p-4">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Background
+        </span>
+        <Input
+          variant="borderless"
+          aria-label="Borderless input on background"
+          defaultValue="control-background fill"
+        />
+      </div>
+      <div className="nx:grid nx:gap-2 nx:rounded-md nx:bg-container nx:p-4">
+        <span className="nx:typography-label-default nx:text-foreground">
+          Container
+        </span>
+        <Input
+          variant="borderless"
+          aria-label="Borderless input on container"
+          defaultValue="control-background fill"
+        />
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const background = canvas.getByRole('textbox', {
+      name: 'Borderless input on background',
+    });
+    const container = canvas.getByRole('textbox', {
+      name: 'Borderless input on container',
+    });
+
+    await expect(background).toHaveClass('nx:bg-control-background');
+    await expect(container).toHaveClass('nx:bg-control-background');
   },
 };
 
@@ -415,6 +532,7 @@ export const WithDataAttributes: Story = {
 
     await expect(input).toHaveAttribute('data-slot', 'input');
     await expect(input).toHaveAttribute('data-size', 'lg');
+    await expect(input).toHaveAttribute('data-variant', 'default');
   },
 };
 
@@ -447,6 +565,26 @@ export const AllVariants: Story = {
               lg
             </span>
             <Input size="lg" placeholder="Large input" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="nx:text-foreground nx:mb-4 nx:typography-label-default">
+          Variants
+        </h3>
+        <div className="nx:flex nx:flex-col nx:gap-3">
+          <div className="nx:flex nx:items-center nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">
+              default
+            </span>
+            <Input placeholder="Default input" />
+          </div>
+          <div className="nx:flex nx:items-center nx:gap-4">
+            <span className="nx:typography-label-small nx:text-muted-foreground nx:w-20">
+              borderless
+            </span>
+            <Input variant="borderless" placeholder="Borderless input" />
           </div>
         </div>
       </div>
