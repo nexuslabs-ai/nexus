@@ -10,7 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../stories/story-height-test-utils';
+import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { Button } from '../button';
 
 import {
