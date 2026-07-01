@@ -1,0 +1,20 @@
+{
+  // This app has TWO Tailwind entry points (see app/layout.tsx):
+  //   app/globals.css — the app's own (unprefixed) Tailwind
+  //   app/nexus.css   — the @acme design system's nx: theme (a SEPARATE
+  //                     compilation, so the nx: prefix can't clobber the app's
+  //                     own utilities at build time).
+  //
+  // Tailwind IntelliSense builds completions from a CSS entry it's told about;
+  // by default it only finds globals.css, so `nx:` classes get no autocomplete
+  // or hover. Mapping BOTH entries to the app source restores completions for
+  // `bg-slate-*` AND `nx:bg-primary-background`.
+  //
+  // Requires the Tailwind CSS IntelliSense extension v0.14.3+ (v4 CSS-config
+  // support). If your version associates only one entry per file, `nx:` (the
+  // part that was missing) is the one to keep — list app/nexus.css first.
+  "tailwindCSS.experimental.configFile": {
+    "app/nexus.css": "app/**",
+    "app/globals.css": "app/**"
+  }
+}
