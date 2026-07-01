@@ -166,6 +166,81 @@ export const WithBodyContent: Story = {
   },
 };
 
+export const ViewportBoundContent: Story = {
+  render: (_args) => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Show viewport alert</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Viewport bounded alert dialog</AlertDialogTitle>
+          <AlertDialogDescription>
+            Consequential confirmations share the Dialog-family viewport
+            boundary.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogBody className="nx:space-y-3 nx:typography-body-default nx:text-foreground">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <p key={i}>
+              Representative alert dialog detail that makes the body tall enough
+              to exercise its stable viewport max-height contract.
+            </p>
+          ))}
+        </AlertDialogBody>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel viewport alert</AlertDialogCancel>
+          <AlertDialogAction variant="destructive">Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Manual check: on a narrow/mobile viewport, long AlertDialogBody content should scroll inside the Dialog-family viewport boundary.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Show viewport alert' })
+    );
+
+    const dialog = await within(document.body).findByRole('alertdialog', {
+      name: 'Viewport bounded alert dialog',
+    });
+    await expect(dialog).toHaveClass(
+      'nx:max-h-[calc(100svh-2rem)]',
+      'nx:overflow-hidden'
+    );
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-body"]')
+    ).toHaveClass(
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-body"]')
+    ).toHaveAttribute('tabindex', '0');
+
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: 'Cancel viewport alert' })
+    );
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="alert-dialog-content"]')
+      ).toBeNull();
+    });
+  },
+};
+
 export const Centered: Story = {
   render: (_args) => (
     <AlertDialog>

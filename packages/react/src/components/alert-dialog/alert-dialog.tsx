@@ -6,6 +6,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { buttonVariants } from '@/components/button';
 import {
   defaultOverlayLayout,
+  overlayBodyClassName,
   overlayContentVariants,
   overlayFooterVariants,
   overlayHeaderVariants,
@@ -224,7 +225,10 @@ function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
   return (
     <div
       data-slot="alert-dialog-body"
-      className={cn('nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
       {...props}
     />
   );

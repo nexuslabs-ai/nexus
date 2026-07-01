@@ -184,7 +184,7 @@ export const ScrollableContent: Story = {
       <DialogTrigger asChild>
         <Button variant="outline">Terms & Conditions</Button>
       </DialogTrigger>
-      <DialogContent className="nx:max-h-[300px] nx:overflow-y-auto">
+      <DialogContent className="nx:max-h-[300px]">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
           <DialogDescription>
@@ -210,6 +210,82 @@ export const ScrollableContent: Story = {
       </DialogContent>
     </Dialog>
   ),
+};
+
+export const ViewportBoundContent: Story = {
+  render: (_args) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Open viewport-bound dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Viewport bounded dialog</DialogTitle>
+          <DialogDescription>
+            Long modal content stays within the stable visible viewport.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody className="nx:space-y-4 nx:typography-label-default nx:text-foreground">
+          {Array.from({ length: 16 }).map((_, i) => (
+            <p key={i}>
+              A representative row of dialog content that makes the modal tall
+              enough to exercise its viewport max-height contract.
+            </p>
+          ))}
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Close viewport-bound dialog</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Manual check: on a narrow/mobile viewport, long DialogBody content should scroll while the close button remains pinned in the content frame.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open viewport-bound dialog' })
+    );
+
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Viewport bounded dialog',
+    });
+
+    await expect(dialog).toHaveClass(
+      'nx:max-h-[calc(100svh-2rem)]',
+      'nx:overflow-hidden'
+    );
+
+    const body = document.querySelector('[data-slot="dialog-body"]');
+    const closeButton = within(dialog).getByRole('button', { name: 'Close' });
+    await expect(body).toHaveAttribute('tabindex', '0');
+    await expect(body).toHaveClass(
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    expect(body).not.toContainElement(closeButton);
+
+    await userEvent.click(
+      within(dialog).getByRole('button', {
+        name: 'Close viewport-bound dialog',
+      })
+    );
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
+  },
 };
 
 export const PropDrivenContent: Story = {
@@ -546,7 +622,12 @@ export const WithDataAttributes: Story = {
     const content = document.querySelector('[data-slot="dialog-content"]');
     await expect(content).toHaveAttribute('data-variant', 'default');
     await expect(content).toHaveAttribute('data-orientation', 'horizontal');
-    await expect(content).toHaveClass('nx:py-6', 'nx:gap-4');
+    await expect(content).toHaveClass(
+      'nx:py-6',
+      'nx:gap-4',
+      'nx:max-h-[calc(100svh-2rem)]',
+      'nx:overflow-hidden'
+    );
     await expect(content).not.toHaveClass('nx:p-6');
     await expect(
       document.querySelector('[data-slot="dialog-header"]')
@@ -562,7 +643,17 @@ export const WithDataAttributes: Story = {
     ).toHaveAttribute('data-orientation', 'horizontal');
     await expect(
       document.querySelector('[data-slot="dialog-body"]')
-    ).toHaveClass('nx:px-6');
+    ).toHaveClass(
+      'nx:px-6',
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    await expect(
+      document.querySelector('[data-slot="dialog-body"]')
+    ).toHaveAttribute('tabindex', '0');
 
     // Close the dialog
     await userEvent.keyboard('{Escape}');

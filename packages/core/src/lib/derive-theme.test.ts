@@ -132,6 +132,16 @@ describe('deriveSurfaces', () => {
     );
   });
 
+  it('separates nav from the page background in dark mode', () => {
+    const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
+    const backgroundL = lOf(s['--nx-color-background']);
+    const navL = lOf(s['--nx-color-nav-background']);
+    const containerL = lOf(s['--nx-color-container']);
+
+    expect(navL - backgroundL).toBeCloseTo(0.03, 3);
+    expect(navL).toBeLessThan(containerL);
+  });
+
   it('recedes hover darker than background in light mode', () => {
     const s = deriveSurfaces('#ffffff', surfaceTone, 'light', 0.05);
     expect(lOf(s['--nx-color-background-hover'])).toBeLessThan(

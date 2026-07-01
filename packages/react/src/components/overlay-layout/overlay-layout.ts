@@ -39,7 +39,8 @@ const navigationMenuInlinePopoverSurfaceClassName = [
 
 const overlayContentVariants = cva(
   [
-    'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:grid nx:w-full nx:max-w-lg',
+    'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:flex nx:w-full nx:max-w-lg nx:flex-col',
+    'nx:max-h-[calc(100svh-2rem)] nx:overflow-hidden',
     'nx:-translate-x-1/2 nx:-translate-y-1/2',
     'nx:gap-4 nx:border-default nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
     'nx:data-[state=open]:duration-slow nx:data-[state=open]:ease-enter',
@@ -63,19 +64,31 @@ const overlayScrimVariants = cva(
   ].join(' ')
 );
 
-const overlayHeaderVariants = cva('nx:flex nx:flex-col nx:gap-1 nx:px-6', {
-  variants: {
-    variant: {
-      default: 'nx:text-center nx:sm:text-left',
-      center: 'nx:items-center nx:text-center',
+const overlayHeaderVariants = cva(
+  'nx:flex nx:shrink-0 nx:flex-col nx:gap-1 nx:px-6',
+  {
+    variants: {
+      variant: {
+        default: 'nx:text-center nx:sm:text-left',
+        center: 'nx:items-center nx:text-center',
+      },
     },
-  },
-  defaultVariants: {
-    variant: 'default',
-  },
-});
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
 
-const overlayFooterVariants = cva('nx:flex nx:gap-2 nx:px-6', {
+const overlayBodyClassName = [
+  'nx:min-h-0',
+  'nx:overflow-y-auto',
+  'nx:px-6',
+  'nx:focus-visible:outline-2',
+  'nx:focus-visible:outline-focus-default',
+  'nx:focus-visible:[outline-offset:-2px]',
+].join(' ');
+
+const overlayFooterVariants = cva('nx:flex nx:shrink-0 nx:gap-2 nx:px-6', {
   variants: {
     orientation: {
       horizontal:
@@ -144,6 +157,7 @@ export {
   containsComposedSlot,
   defaultOverlayLayout,
   navigationMenuInlinePopoverSurfaceClassName,
+  overlayBodyClassName,
   type OverlayButtonOrientation,
   overlayCloseButtonClassName,
   overlayContentVariants,

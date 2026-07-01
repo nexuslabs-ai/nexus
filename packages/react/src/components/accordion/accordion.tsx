@@ -68,7 +68,7 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
     <AccordionPrimitive.Item
       data-slot="accordion-item"
       className={cn(
-        'nx:border-color-default nx:px-4 nx:transition-colors nx:hover:bg-background-hover nx:data-disabled:border-color-disabled nx:data-disabled:text-disabled-foreground nx:data-disabled:hover:bg-transparent nx:data-[state=open]:pb-4',
+        'nx:border-color-default nx:px-4 nx:transition-colors nx:duration-fast nx:hover:bg-background-hover nx:data-disabled:border-color-disabled nx:data-disabled:text-disabled-foreground nx:data-disabled:hover:bg-transparent nx:data-[state=open]:pb-4',
         'nx:group-data-[variant=stacked]/accordion:border-b-default nx:group-data-[variant=stacked]/accordion:last:border-b-0',
         'nx:group-data-[variant=floating]/accordion:rounded-md nx:group-data-[variant=floating]/accordion:border-width-default',
         className
@@ -98,7 +98,7 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          'nx:flex nx:w-full nx:flex-1 nx:items-start nx:gap-4 nx:py-4 nx:typography-label-default nx:text-foreground nx:transition-all nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:disabled:[&>svg]:text-disabled-foreground nx:[&[data-state=open]>svg]:rotate-180',
+          'nx:flex nx:w-full nx:flex-1 nx:items-start nx:gap-4 nx:py-4 nx:typography-label-default nx:text-foreground nx:transition-colors nx:duration-fast nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground nx:disabled:[&>svg]:text-disabled-foreground nx:[&[data-state=open]>svg]:rotate-180',
           className
         )}
         {...props}
@@ -110,7 +110,7 @@ function AccordionTrigger({
           {children}
         </span>
         <IconChevronDown
-          className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:transition-transform nx:duration-default"
+          className="nx:size-4 nx:shrink-0 nx:text-muted-foreground nx:transition-transform nx:duration-default nx:motion-reduce:transition-none"
           aria-hidden="true"
         />
       </AccordionPrimitive.Trigger>
@@ -136,7 +136,7 @@ function AccordionContent({
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="nx:overflow-hidden nx:typography-body-default nx:text-muted-foreground nx:transition-all nx:data-[state=closed]:animate-accordion-up nx:data-[state=open]:animate-accordion-down nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none"
+      className="nx:overflow-hidden nx:typography-body-default nx:text-muted-foreground nx:duration-default nx:data-[state=closed]:animate-accordion-up nx:data-[state=open]:animate-accordion-down nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none"
       {...props}
     >
       <div className={className}>{children}</div>

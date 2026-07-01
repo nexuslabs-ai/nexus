@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { blendAlphaOver, formatLine } from '../audit-contrast.js';
+import {
+  blendAlphaOver,
+  formatLine,
+  resolveToSrgbInts,
+} from '../audit-contrast.js';
 
 // The over-operator behind alpha-foreground contrast scoring (#249): an
 // 8-digit hex is composited onto its resolved backdrop before APCA reads it.
@@ -30,6 +34,27 @@ describe('blendAlphaOver', () => {
 
   it('blends each channel independently (red over blue at 50%)', () => {
     expect(blendAlphaOver('#ff000080', [0, 0, 255])).toEqual([128, 0, 127]);
+  });
+});
+
+describe('resolveToSrgbInts', () => {
+  it('accepts direct OKLCH semantic literals', () => {
+    expect(resolveToSrgbInts('oklch(1 0 0)', new Map())).toEqual([
+      255, 255, 255,
+    ]);
+    expect(resolveToSrgbInts('oklch(0 0 0)', new Map())).toEqual([0, 0, 0]);
+    expect(resolveToSrgbInts('oklch(0.1624 0.04 264.7)', new Map())).toEqual([
+      6, 13, 31,
+    ]);
+  });
+
+  it('requires a backdrop for alpha OKLCH semantic literals', () => {
+    expect(() => resolveToSrgbInts('oklch(1 0 0 / 0.5)', new Map())).toThrow(
+      'needs a backdrop to composite against'
+    );
+    expect(
+      resolveToSrgbInts('oklch(1 0 0 / 0.5)', new Map(), [0, 0, 0])
+    ).toEqual([128, 128, 128]);
   });
 });
 

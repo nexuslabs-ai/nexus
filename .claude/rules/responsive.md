@@ -41,7 +41,7 @@ Sidebar's `nx:after:-inset-2` pattern.
 | `@container` query                    | Component renders differently based on its parent's width | Card that's full-width in a hero, narrow in a sidebar |
 | `nx:lg:` viewport prefix              | Page-shell decisions — nav collapse, side panel hide      | Hide secondary sidebar below `lg`                     |
 | `clamp()` (CSS primitive)             | Continuous adaptation of size — type, padding             | `font-size: clamp(1rem, 0.9rem + 0.5vw, 1.5rem)`      |
-| `svh` / `lvh` / `dvh` (CSS primitive) | Mobile browser-chrome accommodation                       | Modal that must not clip: `min-height: 100svh`        |
+| `svh` / `lvh` / `dvh` (CSS primitive) | Mobile browser-chrome accommodation                       | Modal that must not clip: `max-height: 100svh`        |
 
 ### `container-type` cost policy
 
@@ -67,15 +67,16 @@ Prefer the primitive over raw class toggling (`nx:hidden nx:lg:block`), which is
 
 - **Don't use `nx:sm:` inside component internals.** Use `@container` queries instead. A viewport prefix inside a component leaks page-shell concerns into the component's internal layout — the component then renders inconsistently when dropped into a sidebar vs a hero. The exception is full-viewport overlays; see Viewport-driven exceptions below.
 - **Don't use raw `vh` units.** They reflect the largest possible viewport on mobile and overshoot when browser chrome is visible. Per [web.dev's viewport-units guide](https://web.dev/blog/viewport-units) and MDN: use `svh` (small viewport — chrome-shown size) for content that must not clip on initial load — modals, sticky elements; use `lvh` (large viewport — chrome-hidden size) for immersive full-bleed heroes; use `dvh` (dynamic) for layouts that should grow and shrink as chrome shows/hides.
+- **Don't use `dvh` for overlay internals.** Dialog-family overlays (Dialog and AlertDialog), Sheet, and Drawer bounds use `svh` so their measured height does not jitter as mobile browser chrome collapses or expands. Reach for `dvh` only when the whole surface is intentionally supposed to resize during that chrome transition.
 - **Don't write responsive component code that assumes a viewport width.** Components don't know their consumer's page shell. Render decisions should follow the component's parent width (`@container`) or be passed in as props — never inferred from the viewport.
 
 ## Viewport-driven exceptions
 
-Most components use `@container` for internal responsive behaviour — though no shipped Nexus component reaches for it yet (Dialog is the only live datapoint, and it's the viewport-driven exception below). The `@container` default is forward-looking: it sets the bar for the next wave of internal-responsive components, not a pattern to retrofit existing ones against. **Full-viewport overlay components are exceptions** — Dialog, future Sheet, future FullScreenOverlay — because their responsive trigger is positioning relative to the viewport, not their own container width.
+Most components use `@container` for internal responsive behaviour — though no shipped Nexus component reaches for it yet (Dialog is the original live datapoint, and it's one of the viewport-driven exceptions below). The `@container` default is forward-looking: it sets the bar for the next wave of internal-responsive components, not a pattern to retrofit existing ones against. **Full-viewport overlay components are exceptions** — Dialog, AlertDialog, Sheet, Drawer, and future FullScreenOverlay — because their responsive trigger is positioning relative to the viewport, not their own container width.
 
 A Dialog at 480px viewport is full-bleed (no rounded corners) because _the viewport is narrow_, not because the Dialog's own container is narrow. Migrating to `@container` would flip the rounded-corner threshold to the Dialog's intrinsic width, producing rounded corners on what's still effectively a full-bleed sheet — wrong UX.
 
-Live example: `packages/react/src/components/dialog/dialog.tsx` uses `nx:sm:` at three sites — content corner rounding, header text alignment, and footer flex-direction/gap (grep `nx:sm:` in that file; only these three). Each is a positioning concern relative to the viewport, not a container-width concern. Keep them.
+Live examples: `packages/react/src/components/overlay-layout/overlay-layout.ts` uses `nx:sm:` for Dialog-family content corner rounding, header text alignment, and footer flex-direction/gap, and bounds Dialog / AlertDialog content with `svh` while the body slot owns overflow. Sheet and Drawer use `svh` for visible-viewport height bounds: side panels use `h-svh`, top/bottom Sheet panels cap at `max-h-svh`, and top/bottom Drawer panels keep their intentional `max-h-[80svh]` peek. Each is a positioning concern relative to the viewport, not a container-width concern. Keep them.
 
 For exceptions, use viewport breakpoints (`nx:sm:`, `nx:md:`, etc.) as you normally would.
 

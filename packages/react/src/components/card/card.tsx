@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { Slot } from '@radix-ui/react-slot';
+
 import { cn } from '@/lib/utils';
 
 /**
@@ -90,21 +92,44 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
  *
  * Props for the CardTitle component.
  */
-interface CardTitleProps extends React.ComponentProps<'h3'> {}
+interface CardTitleProps extends React.ComponentProps<'h3'> {
+  /**
+   * Render the title styles on a child element. Use this when the card title
+   * needs a different heading level in the page outline.
+   *
+   * @default false
+   * @example
+   * ```tsx
+   * <CardTitle asChild>
+   *   <h2>Section Title</h2>
+   * </CardTitle>
+   * ```
+   */
+  asChild?: boolean;
+}
 
 /**
  * CardTitle
  *
- * The primary heading of a card.
+ * The primary heading of a card. Renders as an `h3` by default; use `asChild`
+ * to apply card title styling to another heading level when the page outline
+ * needs one.
  *
  * @example
  * ```tsx
  * <CardTitle>Card Title</CardTitle>
  * ```
  */
-function CardTitle({ className, children, ...props }: CardTitleProps) {
+function CardTitle({
+  asChild = false,
+  className,
+  children,
+  ...props
+}: CardTitleProps) {
+  const Comp = asChild ? Slot : 'h3';
+
   return (
-    <h3
+    <Comp
       data-slot="card-title"
       className={cn(
         'nx:col-start-1 nx:min-w-0 nx:typography-heading-xsmall',
@@ -113,7 +138,7 @@ function CardTitle({ className, children, ...props }: CardTitleProps) {
       {...props}
     >
       {children}
-    </h3>
+    </Comp>
   );
 }
 

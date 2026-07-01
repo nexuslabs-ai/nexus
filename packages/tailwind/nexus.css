@@ -947,7 +947,7 @@
   --nx-color-control-background: var(--nx-color-stone-800);
   --nx-color-control-background-hover: var(--nx-color-stone-700);
   --nx-color-control-thumb: var(--nx-color-white-base);
-  --nx-color-nav-background: var(--nx-color-stone-950);
+  --nx-color-nav-background: oklch(0.1485 0.006 70);
   --nx-color-nav-foreground: var(--nx-color-stone-50);
   --nx-color-nav-muted-foreground: var(--nx-color-stone-300);
   --nx-color-nav-item-hover: var(--nx-color-stone-900);

@@ -59,6 +59,36 @@ export const WithoutAction: Story = {
   ),
 };
 
+export const TitleAsHeading: Story = {
+  render: () => (
+    <section aria-labelledby="empty-state-section-heading">
+      <EmptyState>
+        <EmptyStateHeader>
+          <EmptyStateMedia variant="icon">
+            <IconUsers aria-hidden />
+          </EmptyStateMedia>
+          <EmptyStateTitle asChild>
+            <h2 id="empty-state-section-heading">No contacts yet</h2>
+          </EmptyStateTitle>
+          <EmptyStateDescription>
+            The empty-state title can be the section heading without adding a
+            duplicate hidden heading.
+          </EmptyStateDescription>
+        </EmptyStateHeader>
+      </EmptyState>
+    </section>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const heading = canvas.getByRole('heading', {
+      level: 2,
+      name: 'No contacts yet',
+    });
+
+    await expect(heading).toHaveAttribute('data-slot', 'empty-state-title');
+  },
+};
+
 // Every structural part carries a data-slot hook; the media advertises its
 // variant.
 export const WithDataAttributes: Story = {

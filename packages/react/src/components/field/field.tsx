@@ -181,6 +181,67 @@ function FieldLabel({
 }
 
 /**
+ * FieldRequiredIndicatorProps
+ *
+ * Props for the FieldRequiredIndicator component.
+ */
+type FieldRequiredIndicatorProps = Omit<
+  React.ComponentProps<'span'>,
+  'aria-hidden'
+> & {
+  /**
+   * Optional-field content to render instead of the required marker. This
+   * remains readable by assistive tech and takes precedence over `children`.
+   * Required semantics still belong on the control via `required` or
+   * `aria-required`.
+   *
+   * @example
+   * ```tsx
+   * <FieldLabel htmlFor="email">
+   *   Email <FieldRequiredIndicator />
+   * </FieldLabel>
+   * <Input id="email" required />
+   * ```
+   *
+   * @example
+   * ```tsx
+   * <FieldRequiredIndicator fallback="Optional">Required</FieldRequiredIndicator>
+   * ```
+   */
+  fallback?: React.ReactNode;
+};
+
+/**
+ * FieldRequiredIndicator
+ *
+ * A label affordance for required or optional fields. Renders `*` by default
+ * with `aria-hidden`, or renders `fallback` as readable optional text.
+ */
+function FieldRequiredIndicator({
+  className,
+  children,
+  fallback,
+  ...props
+}: FieldRequiredIndicatorProps) {
+  const isOptional = fallback !== undefined;
+
+  return (
+    <span
+      {...props}
+      aria-hidden={isOptional ? undefined : true}
+      data-slot="field-required-indicator"
+      data-optional={isOptional ? 'true' : undefined}
+      className={cn(
+        'nx:text-error-subtle-foreground nx:data-[optional=true]:typography-body-default nx:data-[optional=true]:text-muted-foreground',
+        className
+      )}
+    >
+      {isOptional ? fallback : (children ?? '*')}
+    </span>
+  );
+}
+
+/**
  * FieldTitle
  *
  * A non-`<label>` title for a field group or card (use when the title isn't
@@ -333,6 +394,8 @@ export {
   FieldLegend,
   type FieldLegendProps,
   type FieldProps,
+  FieldRequiredIndicator,
+  type FieldRequiredIndicatorProps,
   FieldSeparator,
   FieldSet,
   FieldTitle,

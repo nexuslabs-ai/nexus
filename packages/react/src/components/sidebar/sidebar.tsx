@@ -329,7 +329,7 @@ function Sidebar({
       <div
         data-slot="sidebar-gap"
         className={cn(
-          'nx:relative nx:w-(--sidebar-width) nx:bg-transparent nx:transition-[width] nx:duration-default nx:ease-linear',
+          'nx:relative nx:w-(--sidebar-width) nx:bg-transparent nx:transition-[width] nx:duration-default nx:ease-linear nx:motion-reduce:transition-none',
           'nx:group-data-[collapsible=offcanvas]:w-0',
           'nx:group-data-[side=right]:rotate-180',
           variant === 'floating' || variant === 'inset'
@@ -340,7 +340,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-default nx:ease-linear nx:lg:flex',
+          'nx:fixed nx:inset-y-0 nx:z-sticky nx:hidden nx:h-svh nx:w-(--sidebar-width) nx:transition-[left,right,width] nx:duration-default nx:ease-linear nx:motion-reduce:transition-none nx:lg:flex',
           side === 'left'
             ? 'nx:left-0 nx:group-data-[collapsible=offcanvas]:-left-(--sidebar-width)'
             : 'nx:right-0 nx:group-data-[collapsible=offcanvas]:-right-(--sidebar-width)',
@@ -426,7 +426,7 @@ function SidebarRail({ className, ...props }: SidebarRailProps) {
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:-translate-x-1/2 nx:transition-all nx:ease-linear nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:lg:flex',
+        'nx:absolute nx:inset-y-0 nx:z-sticky nx:hidden nx:w-4 nx:-translate-x-1/2 nx:transition-[left,right,translate,background-color] nx:duration-fast nx:ease-linear nx:motion-reduce:transition-none nx:group-data-[side=left]:-right-4 nx:group-data-[side=right]:left-0 nx:after:absolute nx:after:inset-y-0 nx:after:left-1/2 nx:after:w-0.5 nx:hover:after:bg-nav-border nx:lg:flex',
         'nx:in-data-[side=left]:cursor-w-resize nx:in-data-[side=right]:cursor-e-resize',
         'nx:[[data-side=left][data-state=collapsed]_&]:cursor-e-resize nx:[[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
         'nx:group-data-[collapsible=offcanvas]:translate-x-0 nx:group-data-[collapsible=offcanvas]:after:left-full nx:hover:group-data-[collapsible=offcanvas]:bg-nav-background',
@@ -656,7 +656,7 @@ function SidebarGroupLabel({
     <Comp
       data-slot="sidebar-group-label"
       className={cn(
-        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-default nx:ease-linear nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:flex nx:h-8 nx:shrink-0 nx:items-center nx:rounded-md nx:px-2 nx:typography-label-small nx:text-nav-muted-foreground nx:transition-[margin,opacity] nx:duration-default nx:ease-linear nx:motion-reduce:transition-none nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         'nx:group-data-[collapsible=icon]:-mt-8 nx:group-data-[collapsible=icon]:opacity-0',
         className
       )}
@@ -695,7 +695,7 @@ function SidebarGroupAction({
     <Comp
       data-slot="sidebar-group-action"
       className={cn(
-        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:transition-transform nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         // Enlarges the hit area on touch viewports.
         'nx:after:absolute nx:after:-inset-2 nx:lg:after:hidden',
         'nx:group-data-[collapsible=icon]:hidden',
@@ -781,7 +781,7 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
 
 const sidebarMenuButtonVariants = cva(
   cn(
-    'nx:peer/menu-button nx:flex nx:w-full nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:p-2 nx:text-left nx:text-nav-muted-foreground nx:transition-[width,height,padding]',
+    'nx:peer/menu-button nx:flex nx:w-full nx:items-center nx:gap-2 nx:overflow-hidden nx:rounded-md nx:p-2 nx:text-left nx:text-nav-muted-foreground nx:transition-[width,height,padding] nx:duration-fast nx:motion-reduce:transition-none',
     'nx:group-has-data-[slot=sidebar-menu-action]/menu-item:pr-8 nx:group-data-[collapsible=icon]:size-8',
     'nx:group-data-[collapsible=icon]:justify-center nx:group-data-[collapsible=icon]:[&>span]:sr-only nx:group-data-[collapsible=icon]:[&>svg:not(:first-child)]:hidden',
     'nx:hover:bg-nav-item-hover nx:active:bg-nav-item-active',
@@ -929,7 +929,7 @@ function SidebarMenuAction({
     <Comp
       data-slot="sidebar-menu-action"
       className={cn(
-        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:transition-transform nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
+        'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
         // Enlarges the hit area on touch viewports.
         'nx:after:absolute nx:after:-inset-2 nx:lg:after:hidden',
         'nx:peer-data-[size=sm]/menu-button:top-1',

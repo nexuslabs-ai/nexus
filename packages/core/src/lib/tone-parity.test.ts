@@ -207,7 +207,9 @@ function expectedTone(tone: Tone, mode: Mode, token: ToneToken): string {
   if (mode === 'light') return LIGHT_FIXTURE.tones[tone][token];
   const ref = baseLeaves(tone, mode)[token];
   if (!ref) throw new Error(`Missing curated ${tone}.${mode}.${token}`);
-  return primitiveOklch(ref);
+  if (ref.startsWith('{')) return primitiveOklch(ref);
+  if (ref.startsWith('#')) return formatOklchWithAlpha(parseToOklch(ref));
+  return ref;
 }
 
 function comps(value: string): { l: number; c: number; h: number; a: number } {

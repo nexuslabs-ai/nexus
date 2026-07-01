@@ -6,7 +6,12 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { z } from 'zod';
 
 import { Button } from '../button';
-import { Field, FieldDescription, FieldLabel } from '../field';
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+  FieldRequiredIndicator,
+} from '../field';
 import { Input } from '../input';
 
 import {
@@ -280,16 +285,15 @@ function RequiredOptionalHouseRuleExample() {
         </div>
         <Field>
           <FieldLabel htmlFor="required-house-company">Company</FieldLabel>
-          <Input id="required-house-company" />
+          <Input id="required-house-company" required />
         </Field>
         <Field>
           <FieldLabel htmlFor="required-house-email">Work email</FieldLabel>
-          <Input id="required-house-email" type="email" />
+          <Input id="required-house-email" type="email" required />
         </Field>
         <Field>
           <FieldLabel htmlFor="required-house-po">
-            Purchase order{' '}
-            <span className="nx:text-muted-foreground">(optional)</span>
+            Purchase order <FieldRequiredIndicator fallback="Optional" />
           </FieldLabel>
           <Input id="required-house-po" />
         </Field>
@@ -315,8 +319,7 @@ function RequiredOptionalHouseRuleExample() {
         </Field>
         <Field>
           <FieldLabel htmlFor="optional-house-email">
-            Work email{' '}
-            <span className="nx:text-muted-foreground">(required)</span>
+            Work email <FieldRequiredIndicator />
           </FieldLabel>
           <Input id="optional-house-email" type="email" required />
         </Field>
@@ -390,10 +393,23 @@ export const RequiredOptionalHouseRule: Story = {
   },
   render: () => <RequiredOptionalHouseRuleExample />,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const indicators = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(
+        '[data-slot="field-required-indicator"]'
+      )
+    );
+    const optionalIndicator = indicators.find(
+      (indicator) => indicator.dataset.optional === 'true'
+    );
+    const requiredIndicator = indicators.find(
+      (indicator) => indicator.dataset.optional !== 'true'
+    );
 
-    await expect(canvas.getByText('(optional)')).toBeInTheDocument();
-    await expect(canvas.getByText('(required)')).toBeInTheDocument();
+    await expect(indicators).toHaveLength(2);
+    await expect(optionalIndicator).toHaveTextContent('Optional');
+    await expect(optionalIndicator).not.toHaveAttribute('aria-hidden');
+    await expect(requiredIndicator).toHaveTextContent('*');
+    await expect(requiredIndicator).toHaveAttribute('aria-hidden', 'true');
   },
 };
 

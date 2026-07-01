@@ -5,6 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
   containsComposedSlot,
   defaultOverlayLayout,
+  overlayBodyClassName,
   overlayCloseButtonClassName,
   overlayContentVariants,
   overlayHeaderVariants,
@@ -38,7 +39,9 @@ const DialogLayoutContext =
  *       <DialogTitle>Dialog Title</DialogTitle>
  *       <DialogDescription>Dialog description here.</DialogDescription>
  *     </DialogHeader>
- *     <p>Dialog content goes here.</p>
+ *     <DialogBody>
+ *       <p>Dialog content goes here.</p>
+ *     </DialogBody>
  *     <DialogFooter>
  *       <Button>Save</Button>
  *     </DialogFooter>
@@ -140,7 +143,9 @@ interface DialogContentProps extends Omit<
  *   <DialogHeader>
  *     <DialogTitle>Title</DialogTitle>
  *   </DialogHeader>
- *   <p>Content here</p>
+ *   <DialogBody>
+ *     <p>Content here</p>
+ *   </DialogBody>
  * </DialogContent>
  * ```
  */
@@ -255,7 +260,10 @@ function DialogBody({ className, ...props }: DialogBodyProps) {
   return (
     <div
       data-slot="dialog-body"
-      className={cn('nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
       {...props}
     />
   );
@@ -289,7 +297,7 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
       data-slot="dialog-footer"
       data-orientation={layout.buttonOrientation}
       className={cn(
-        'nx:flex nx:flex-col-reverse nx:px-6 nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
+        'nx:flex nx:shrink-0 nx:flex-col-reverse nx:px-6 nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
         className
       )}
       {...props}
