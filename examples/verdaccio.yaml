@@ -1,0 +1,37 @@
+# Local npm registry for the external-consumer integration test.
+#
+# It proxies the real npm registry for everything (so @nexus_ds/core, react,
+# @radix-ui/*, next, etc. resolve normally) and additionally hosts the exported
+# @acme/* design-system packages that scripts/setup.mjs publishes into it.
+#
+# This stands in for "the consumer publishes the exported design system to their
+# own registry" without touching public npm.
+
+storage: ./.verdaccio/storage
+
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+    maxage: 60m
+
+packages:
+  # The exported design system — published here, no upstream proxy.
+  '@acme/*':
+    access: $all
+    publish: $all
+    unpublish: $all
+
+  # Published upstream Nexus deps — proxied from real npm.
+  '@nexus_ds/*':
+    access: $all
+    proxy: npmjs
+
+  '@*/*':
+    access: $all
+    proxy: npmjs
+
+  '**':
+    access: $all
+    proxy: npmjs
+
+log: { type: stdout, format: pretty, level: warn }
