@@ -22,8 +22,8 @@ const withSliderWidth: Decorator = (Story, context) => {
 
 function FluidSliderShowcase({ children }: { children: React.ReactNode }) {
   return (
-    <div className="nx:w-[42rem] nx:max-w-[calc(100vw-3rem)] nx:rounded-md nx:bg-background nx:px-11 nx:py-12 nx:text-foreground">
-      <div className="nx:flex nx:w-full nx:flex-col nx:gap-6">{children}</div>
+    <div className="nx:w-[35rem] nx:max-w-[calc(100vw-3rem)] nx:bg-background nx:px-6 nx:py-8 nx:text-foreground">
+      <div className="nx:flex nx:w-full nx:flex-col nx:gap-5">{children}</div>
     </div>
   );
 }
@@ -415,7 +415,7 @@ export const AllVariants: Story = {
   },
   render: () => (
     <FluidSliderShowcase>
-      <div className="nx:grid nx:grid-cols-[3rem_minmax(0,1fr)] nx:items-center nx:gap-x-6 nx:gap-y-5">
+      <div className="nx:grid nx:grid-cols-[3rem_minmax(0,1fr)] nx:items-center nx:gap-x-5 nx:gap-y-8">
         <span className="nx:tabular-nums nx:typography-label-default nx:text-muted-foreground">
           50
         </span>
@@ -433,7 +433,7 @@ export const AllVariants: Story = {
           aria-label="Stepped volume"
         />
       </div>
-      <div className="nx:pt-5">
+      <div className="nx:pt-4">
         <SliderComfortable
           defaultValue={2}
           min={0}
