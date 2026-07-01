@@ -1,20 +1,19 @@
 {
-  // This app has TWO Tailwind entry points (see app/layout.tsx):
-  //   app/globals.css — the app's own (unprefixed) Tailwind
-  //   app/nexus.css   — the @acme design system's nx: theme (a SEPARATE
-  //                     compilation, so the nx: prefix can't clobber the app's
-  //                     own utilities at build time).
+  // The design system's nx: theme runs as a SEPARATE Tailwind compilation
+  // (app/nexus.css) so its prefix can't clobber the app's own Tailwind at build
+  // time. Point Tailwind IntelliSense at that entry so `nx:` classes get
+  // complete autocomplete + hover (colors, typography, shadow, radius — all with
+  // the design system's values).
   //
-  // Tailwind IntelliSense builds completions from a CSS entry it's told about;
-  // by default it only finds globals.css, so `nx:` classes get no autocomplete
-  // or hover. Mapping BOTH entries to the app source restores completions for
-  // `bg-slate-*` AND `nx:bg-primary-background`.
+  // Trade-off (Tailwind's one-prefix-per-design-system limit + the extension not
+  // merging two entries per file — tailwindcss-intellisense#665): while this is
+  // active, your app's OWN unprefixed utilities (bg-slate-*, flex, …) won't
+  // autocomplete. They're standard Tailwind; the `nx:` vocabulary is the part
+  // worth completion help.
   //
-  // Requires the Tailwind CSS IntelliSense extension v0.14.3+ (v4 CSS-config
-  // support). If your version associates only one entry per file, `nx:` (the
-  // part that was missing) is the one to keep — list app/nexus.css first.
+  // Requires Tailwind CSS IntelliSense v0.14.3+ (v4 CSS-config support). Open
+  // this folder (examples/nextjs-consumer) as the workspace root for it to apply.
   "tailwindCSS.experimental.configFile": {
-    "app/nexus.css": "app/**",
-    "app/globals.css": "app/**"
+    "app/nexus.css": "app/**"
   }
 }
