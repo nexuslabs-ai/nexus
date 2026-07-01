@@ -94,7 +94,7 @@
     "$type": "color"
   },
   "nav-background": {
-    "$value": "{neutral.950}",
+    "$value": "oklch(0.1784 0 0)",
     "$type": "color"
   },
   "nav-foreground": {

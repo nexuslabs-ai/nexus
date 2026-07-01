@@ -1,4 +1,5 @@
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
+import { converter, parse } from 'culori';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +15,7 @@ const PRIMITIVES_FILE = path.join(TOKENS_DIR, 'primitives', 'color.json');
 const FOCUS_PRIMITIVES_DIR = path.join(TOKENS_DIR, 'primitives', 'focus');
 
 const THEMES = ['light', 'dark'];
+const toRgb = converter('rgb');
 
 // APCA tiers: body 75 (fluent reading), ui 60 (button/badge labels),
 // incidental 45 (muted text, dividers, disabled state).
@@ -232,7 +234,7 @@ export function blendAlphaOver(hex8, bgInts) {
   return [mix(0), mix(1), mix(2)];
 }
 
-function resolveToSrgbInts(value, primitiveMap, bgInts) {
+export function resolveToSrgbInts(value, primitiveMap, bgInts) {
   if (typeof value !== 'string') {
     throw new Error(
       `audit-contrast: expected string color value, got ${typeof value}`
@@ -253,6 +255,26 @@ function resolveToSrgbInts(value, primitiveMap, bgInts) {
     palette = primitive.path[primitive.path.length - 2];
   } else if (value.startsWith('#')) {
     hex = value;
+  } else if (value.startsWith('oklch(')) {
+    const rgb = toRgb(parse(value));
+    if (!rgb) {
+      throw new Error(`audit-contrast: cannot parse OKLCH value "${value}"`);
+    }
+    const toInt = (channel) =>
+      Math.round(Math.max(0, Math.min(1, channel ?? 0)) * 255);
+    const alpha = rgb.alpha ?? 1;
+    const ints = [toInt(rgb.r), toInt(rgb.g), toInt(rgb.b)];
+    if (alpha < 1) {
+      if (!bgInts) {
+        throw new Error(
+          `audit-contrast: alpha colour "${value}" needs a backdrop to composite against`
+        );
+      }
+      return ints.map((channel, index) =>
+        Math.round(channel * alpha + bgInts[index] * (1 - alpha))
+      );
+    }
+    return ints;
   } else {
     throw new Error(`audit-contrast: unrecognized color value "${value}"`);
   }

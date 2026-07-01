@@ -94,7 +94,7 @@
     "$type": "color"
   },
   "nav-background": {
-    "$value": "{stone.950}",
+    "$value": "oklch(0.1485 0.006 70)",
     "$type": "color"
   },
   "nav-foreground": {

@@ -105,7 +105,7 @@ html.dark {
   --nx-color-control-background: var(--nx-color-gray-800);
   --nx-color-control-background-hover: var(--nx-color-gray-700);
   --nx-color-control-thumb: var(--nx-color-white-base);
-  --nx-color-nav-background: var(--nx-color-gray-950);
+  --nx-color-nav-background: oklch(0.1632 0.027 261.7);
   --nx-color-nav-foreground: var(--nx-color-gray-50);
   --nx-color-nav-muted-foreground: var(--nx-color-gray-300);
   --nx-color-nav-item-hover: var(--nx-color-gray-900);

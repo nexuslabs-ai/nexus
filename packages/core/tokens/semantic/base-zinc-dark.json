@@ -94,7 +94,7 @@
     "$type": "color"
   },
   "nav-background": {
-    "$value": "{zinc.950}",
+    "$value": "oklch(0.1731 0.005 262.8)",
     "$type": "color"
   },
   "nav-foreground": {
