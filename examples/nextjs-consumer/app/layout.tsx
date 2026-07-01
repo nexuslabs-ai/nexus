@@ -2,7 +2,10 @@
 // precompiled (nx:-prefixed) utilities. Imported via JS so the bundler resolves
 // @acme/react's package `exports` map (postcss @import would not).
 import './globals.css';
-import '@acme/react/styles.css';
+// Design system, as two independent Tailwind compilations so the nx: prefix
+// never collides with the app's own Tailwind above:
+import './nexus.css'; // nx: theme — lets the app author nx: utilities itself
+import '@acme/react/styles.css'; // precompiled component styles
 
 import { NexusAppearanceScript } from '@acme/react/appearance/server';
 import type { Metadata } from 'next';

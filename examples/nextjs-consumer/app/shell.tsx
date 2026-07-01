@@ -23,6 +23,7 @@ import {
   IconBrandTailwind,
   IconComponents,
   IconForms,
+  IconLayersIntersect,
   IconLayoutDashboard,
   IconPalette,
   IconTable,
@@ -37,6 +38,7 @@ const NAV = [
   { href: '/data', label: 'Data table', icon: IconTable },
   { href: '/forms', label: 'Forms', icon: IconForms },
   { href: '/appearance', label: 'Appearance', icon: IconPalette },
+  { href: '/incremental', label: 'Incremental', icon: IconLayersIntersect },
   { href: '/raw-tailwind', label: 'Raw Tailwind', icon: IconBrandTailwind },
 ] as const;
 
@@ -46,6 +48,7 @@ const TITLES: Record<string, string> = {
   '/data': 'Data table',
   '/forms': 'Forms',
   '/appearance': 'Appearance',
+  '/incremental': 'Incremental (nx: + your Tailwind)',
   '/raw-tailwind': 'Raw Tailwind (no design system)',
 };
 

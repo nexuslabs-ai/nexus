@@ -3,8 +3,7 @@
  * here collides with the design system. */
 @import 'tailwindcss';
 
-/* The app's own design tokens live in the default (unprefixed) namespace and are
- * NOT clobbered by @acme's `--nx-*` tokens — this proves the two coexist. */
+/* The app's own design tokens live in the default (unprefixed) namespace. */
 @theme {
   --color-brand: oklch(0.55 0.2 280);
 }
