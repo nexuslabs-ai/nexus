@@ -47,6 +47,7 @@
       "name": "@nexus/react (ESM)",
       "path": "packages/react/dist/index.mjs",
       "ignore": [
+        "@nexus/core",
         "embla-carousel-react",
         "react-day-picker",
         "react-hook-form",
@@ -55,7 +56,7 @@
         "sonner",
         "vaul"
       ],
-      "limit": "110 kB"
+      "limit": "95 kB"
     },
     {
       "name": "@nexus/react (CSS)",
