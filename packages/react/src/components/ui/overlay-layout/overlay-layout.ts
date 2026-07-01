@@ -83,6 +83,9 @@ const overlayBodyClassName = [
   'nx:min-h-0',
   'nx:overflow-y-auto',
   'nx:px-6',
+  'nx:focus-visible:outline-2',
+  'nx:focus-visible:outline-focus-default',
+  'nx:focus-visible:[outline-offset:-2px]',
 ].join(' ');
 
 const overlayFooterVariants = cva('nx:flex nx:shrink-0 nx:gap-2 nx:px-6', {

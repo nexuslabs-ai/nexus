@@ -267,7 +267,14 @@ export const ViewportBoundContent: Story = {
 
     const body = document.querySelector('[data-slot="dialog-body"]');
     const closeButton = within(dialog).getByRole('button', { name: 'Close' });
-    await expect(body).toHaveClass('nx:min-h-0', 'nx:overflow-y-auto');
+    await expect(body).toHaveAttribute('tabindex', '0');
+    await expect(body).toHaveClass(
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
     expect(body).not.toContainElement(closeButton);
 
     await userEvent.click(
@@ -636,7 +643,17 @@ export const WithDataAttributes: Story = {
     ).toHaveAttribute('data-orientation', 'horizontal');
     await expect(
       document.querySelector('[data-slot="dialog-body"]')
-    ).toHaveClass('nx:px-6', 'nx:min-h-0', 'nx:overflow-y-auto');
+    ).toHaveClass(
+      'nx:px-6',
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    await expect(
+      document.querySelector('[data-slot="dialog-body"]')
+    ).toHaveAttribute('tabindex', '0');
 
     // Close the dialog
     await userEvent.keyboard('{Escape}');

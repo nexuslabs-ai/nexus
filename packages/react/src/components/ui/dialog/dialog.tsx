@@ -39,7 +39,9 @@ const DialogLayoutContext =
  *       <DialogTitle>Dialog Title</DialogTitle>
  *       <DialogDescription>Dialog description here.</DialogDescription>
  *     </DialogHeader>
- *     <p>Dialog content goes here.</p>
+ *     <DialogBody>
+ *       <p>Dialog content goes here.</p>
+ *     </DialogBody>
  *     <DialogFooter>
  *       <Button>Save</Button>
  *     </DialogFooter>
@@ -258,6 +260,9 @@ function DialogBody({ className, ...props }: DialogBodyProps) {
       data-slot="dialog-body"
       className={cn(overlayBodyClassName, className)}
       {...props}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
     />
   );
 }
@@ -290,7 +295,7 @@ function DialogFooter({ className, ...props }: DialogFooterProps) {
       data-slot="dialog-footer"
       data-orientation={layout.buttonOrientation}
       className={cn(
-        'nx:flex nx:flex-col-reverse nx:px-6 nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
+        'nx:flex nx:shrink-0 nx:flex-col-reverse nx:px-6 nx:sm:flex-row nx:sm:justify-end nx:sm:gap-2',
         className
       )}
       {...props}

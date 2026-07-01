@@ -227,6 +227,9 @@ function AlertDialogBody({ className, ...props }: AlertDialogBodyProps) {
       data-slot="alert-dialog-body"
       className={cn(overlayBodyClassName, className)}
       {...props}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
     />
   );
 }

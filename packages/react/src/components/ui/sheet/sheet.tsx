@@ -3,7 +3,10 @@ import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { overlayCloseButtonClassName } from '@/components/ui/overlay-layout/overlay-layout';
+import {
+  overlayBodyClassName,
+  overlayCloseButtonClassName,
+} from '@/components/ui/overlay-layout/overlay-layout';
 import { IconX } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -249,8 +252,11 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
   return (
     <div
       data-slot="sheet-body"
-      className={cn('nx:min-h-0 nx:overflow-y-auto nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
       {...props}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
     />
   );
 }

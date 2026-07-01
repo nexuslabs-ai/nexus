@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { Drawer as DrawerPrimitive } from 'vaul';
 
+import { overlayBodyClassName } from '@/components/ui/overlay-layout/overlay-layout';
 import { cn } from '@/lib/utils';
 
 /**
@@ -146,8 +147,11 @@ function DrawerBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="drawer-body"
-      className={cn('nx:min-h-0 nx:overflow-y-auto nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
       {...props}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
     />
   );
 }

@@ -128,8 +128,7 @@ export const ScrollableContent: Story = {
         </DrawerHeader>
         <DrawerBody
           data-testid="drawer-scroll-area"
-          tabIndex={0}
-          className="nx:max-h-[45svh] nx:overflow-y-auto nx:pb-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+          className="nx:max-h-[45svh] nx:pb-2"
         >
           <ul className="nx:flex nx:flex-col nx:gap-3">
             {SCROLLABLE_ITEMS.map((item) => (
@@ -172,6 +171,12 @@ export const ScrollableContent: Story = {
     const drawer = await within(document.body).findByRole('dialog');
     const scrollArea = within(drawer).getByTestId('drawer-scroll-area');
 
+    await expect(scrollArea).toHaveAttribute('tabindex', '0');
+    await expect(scrollArea).toHaveClass(
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
     await waitFor(() => {
       expect(scrollArea.scrollHeight).toBeGreaterThan(scrollArea.clientHeight);
     });
@@ -367,7 +372,16 @@ export const WithDataAttributes: Story = {
     ).toHaveClass('nx:overflow-hidden');
     await expect(
       document.querySelector('[data-slot="drawer-body"]')
-    ).toHaveClass('nx:min-h-0', 'nx:overflow-y-auto');
+    ).toHaveClass(
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    await expect(
+      document.querySelector('[data-slot="drawer-body"]')
+    ).toHaveAttribute('tabindex', '0');
 
     await userEvent.keyboard('{Escape}');
   },
@@ -424,7 +438,16 @@ export const DirectionBehavior: Story = {
 
       await expect(
         drawer.querySelector('[data-slot="drawer-body"]')
-      ).toHaveClass('nx:min-h-0', 'nx:overflow-y-auto');
+      ).toHaveClass(
+        'nx:min-h-0',
+        'nx:overflow-y-auto',
+        'nx:focus-visible:outline-2',
+        'nx:focus-visible:outline-focus-default',
+        'nx:focus-visible:[outline-offset:-2px]'
+      );
+      await expect(
+        drawer.querySelector('[data-slot="drawer-body"]')
+      ).toHaveAttribute('tabindex', '0');
 
       if (direction === 'top' || direction === 'bottom') {
         await expect(drawer).toHaveClass(

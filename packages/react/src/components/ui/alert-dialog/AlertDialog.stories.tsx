@@ -219,7 +219,16 @@ export const ViewportBoundContent: Story = {
     );
     await expect(
       document.querySelector('[data-slot="alert-dialog-body"]')
-    ).toHaveClass('nx:min-h-0', 'nx:overflow-y-auto');
+    ).toHaveClass(
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-body"]')
+    ).toHaveAttribute('tabindex', '0');
 
     await userEvent.click(
       within(dialog).getByRole('button', { name: 'Cancel viewport alert' })
