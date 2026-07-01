@@ -5,8 +5,6 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Slider, SliderComfortable } from './slider';
 
-const darkGlobals = { mode: 'dark' } as const;
-
 const withSliderWidth: Decorator = (Story, context) => {
   const sliderWidth =
     typeof context.parameters.sliderWidth === 'string'
@@ -258,7 +256,6 @@ const comfortableDecorators = [
 
 // Pip mode creates a discrete settings-row selector.
 export const Comfortable: ComfortableStory = {
-  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: function ComfortableStory() {
     const [value, setValue] = React.useState(2);
@@ -278,7 +275,6 @@ export const Comfortable: ComfortableStory = {
 
 // Scrubber mode keeps the larger row but drops discrete pips.
 export const ComfortableScrubber: ComfortableStory = {
-  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: function ComfortableScrubberStory() {
     const [value, setValue] = React.useState(50);
@@ -300,7 +296,6 @@ export const ComfortableScrubber: ComfortableStory = {
 
 // Comfortable sliders also accept display formatters.
 export const ComfortableFormat: ComfortableStory = {
-  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: function ComfortableFormatStory() {
     const [value, setValue] = React.useState(2);
@@ -322,7 +317,6 @@ export const ComfortableFormat: ComfortableStory = {
 
 // Disabled comfortable sliders keep their row mounted but inert.
 export const ComfortableDisabled: ComfortableStory = {
-  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: () => (
     <SliderComfortable
@@ -347,7 +341,6 @@ export const ComfortableDisabled: ComfortableStory = {
 // Arrow keys operate the comfortable slider through Radix semantics.
 export const ComfortableKeyboardInteraction: ComfortableStory = {
   args: { onValueChange: fn() },
-  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: (args) => (
     <SliderComfortable
@@ -373,7 +366,6 @@ export const ComfortableKeyboardInteraction: ComfortableStory = {
 
 // Comfortable data slots identify the row, track, range, thumb, label, and value.
 export const ComfortableWithDataAttributes: ComfortableStory = {
-  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: () => (
     <SliderComfortable
@@ -412,7 +404,6 @@ export const ComfortableWithDataAttributes: ComfortableStory = {
 
 // Compact and comfortable slider examples. Reused by the per-base variant generator.
 export const AllVariants: Story = {
-  globals: darkGlobals,
   parameters: {
     sliderWidth: 'nx:w-auto',
   },
@@ -456,4 +447,9 @@ export const AllVariants: Story = {
       />
     </FluidSliderShowcase>
   ),
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.ownerDocument.documentElement).not.toHaveClass(
+      'dark'
+    );
+  },
 };
