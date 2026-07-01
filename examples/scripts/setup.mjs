@@ -83,7 +83,7 @@ function exportDesignSystem() {
 
 /** Install + build the exported react package, then publish both to Verdaccio. */
 function publishDesignSystem() {
-  run('pnpm', ['install', '--config.confirmModulesPurge=false'], GENERATED_DIR);
+  run('pnpm', ['install'], GENERATED_DIR);
   run('pnpm', ['--filter', `${SCOPE}/react`, 'build'], GENERATED_DIR);
 
   // Anonymous publish is allowed by verdaccio.yaml ($all); npm still needs a
@@ -100,9 +100,10 @@ function publishDesignSystem() {
   }
 }
 
-/** Install the consumer app against Verdaccio (@acme/* only; rest from real npm). */
+/** Install the consumer app. Its .npmrc scopes @acme/* to Verdaccio; every other
+ *  dependency resolves from the default (real) npm registry. */
 function installConsumerApp() {
-  run('npm', ['install', '--registry', REGISTRY], APP_DIR);
+  run('npm', ['install'], APP_DIR);
 }
 
 async function main() {
