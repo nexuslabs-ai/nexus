@@ -1,20 +1,37 @@
 import * as React from 'react';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Decorator, Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Slider, SliderComfortable } from './slider';
 
+const darkGlobals = { mode: 'dark' } as const;
+
+const withSliderWidth: Decorator = (Story, context) => {
+  const sliderWidth =
+    typeof context.parameters.sliderWidth === 'string'
+      ? context.parameters.sliderWidth
+      : 'nx:w-64';
+
+  return (
+    <div className={sliderWidth}>
+      <Story />
+    </div>
+  );
+};
+
+function FluidSliderShowcase({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="nx:w-[42rem] nx:max-w-[calc(100vw-3rem)] nx:rounded-md nx:bg-background nx:px-11 nx:py-12 nx:text-foreground">
+      <div className="nx:flex nx:w-full nx:flex-col nx:gap-6">{children}</div>
+    </div>
+  );
+}
+
 const meta: Meta<typeof Slider> = {
   title: 'Components/Slider',
   component: Slider,
-  decorators: [
-    (Story) => (
-      <div className="nx:w-64">
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [withSliderWidth],
 };
 
 export default meta;
@@ -229,15 +246,16 @@ export const Invalid: Story = {
 type ComfortableStory = StoryObj<typeof SliderComfortable>;
 
 const comfortableDecorators = [
-  (Story: React.ComponentType) => (
-    <div className="nx:w-72">
+  ((Story) => (
+    <div className="nx:w-[36rem] nx:max-w-[calc(100vw-3rem)]">
       <Story />
     </div>
-  ),
+  )) satisfies Decorator,
 ];
 
 // Pip mode creates a discrete settings-row selector.
 export const Comfortable: ComfortableStory = {
+  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: function ComfortableStory() {
     const [value, setValue] = React.useState(2);
@@ -257,6 +275,7 @@ export const Comfortable: ComfortableStory = {
 
 // Scrubber mode keeps the larger row but drops discrete pips.
 export const ComfortableScrubber: ComfortableStory = {
+  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: function ComfortableScrubberStory() {
     const [value, setValue] = React.useState(50);
@@ -278,6 +297,7 @@ export const ComfortableScrubber: ComfortableStory = {
 
 // Comfortable sliders also accept display formatters.
 export const ComfortableFormat: ComfortableStory = {
+  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: function ComfortableFormatStory() {
     const [value, setValue] = React.useState(2);
@@ -299,6 +319,7 @@ export const ComfortableFormat: ComfortableStory = {
 
 // Disabled comfortable sliders keep their row mounted but inert.
 export const ComfortableDisabled: ComfortableStory = {
+  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: () => (
     <SliderComfortable
@@ -323,6 +344,7 @@ export const ComfortableDisabled: ComfortableStory = {
 // Arrow keys operate the comfortable slider through Radix semantics.
 export const ComfortableKeyboardInteraction: ComfortableStory = {
   args: { onValueChange: fn() },
+  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: (args) => (
     <SliderComfortable
@@ -348,6 +370,7 @@ export const ComfortableKeyboardInteraction: ComfortableStory = {
 
 // Comfortable data slots identify the row, track, range, thumb, label, and value.
 export const ComfortableWithDataAttributes: ComfortableStory = {
+  globals: darkGlobals,
   decorators: comfortableDecorators,
   render: () => (
     <SliderComfortable
@@ -386,32 +409,39 @@ export const ComfortableWithDataAttributes: ComfortableStory = {
 
 // Compact and comfortable slider examples. Reused by the per-base variant generator.
 export const AllVariants: Story = {
+  globals: darkGlobals,
+  parameters: {
+    sliderWidth: 'nx:w-auto',
+  },
   render: () => (
-    <div className="nx:flex nx:w-72 nx:flex-col nx:gap-8">
-      <Slider defaultValue={[50]} max={100} step={1} aria-label="Single" />
-      <Slider
-        defaultValue={[25, 75]}
-        max={100}
-        step={1}
-        showValue
-        valuePosition="right"
-        aria-label="Range"
-      />
-      <Slider
-        defaultValue={[40]}
-        max={100}
-        step={10}
-        showSteps
-        aria-label="Steps"
-      />
-      <Slider disabled defaultValue={[40]} max={100} aria-label="Disabled" />
-      <SliderComfortable
-        defaultValue={2}
-        min={0}
-        max={4}
-        step={1}
-        label="Roundness"
-      />
+    <FluidSliderShowcase>
+      <div className="nx:grid nx:grid-cols-[3rem_minmax(0,1fr)] nx:items-center nx:gap-x-6 nx:gap-y-5">
+        <span className="nx:tabular-nums nx:typography-label-default nx:text-muted-foreground">
+          50
+        </span>
+        <Slider defaultValue={[50]} max={100} step={1} aria-label="Single" />
+        <span className="nx:tabular-nums nx:typography-label-default nx:text-muted-foreground">
+          50
+        </span>
+        <Slider
+          defaultValue={[70]}
+          max={100}
+          step={10}
+          showSteps
+          showValue
+          valuePosition="tooltip"
+          aria-label="Stepped volume"
+        />
+      </div>
+      <div className="nx:pt-5">
+        <SliderComfortable
+          defaultValue={2}
+          min={0}
+          max={4}
+          step={1}
+          label="Roundness"
+        />
+      </div>
       <SliderComfortable
         variant="scrubber"
         defaultValue={50}
@@ -421,6 +451,6 @@ export const AllVariants: Story = {
         label="Volume"
         formatValue={(nextValue) => `${nextValue}%`}
       />
-    </div>
+    </FluidSliderShowcase>
   ),
 };

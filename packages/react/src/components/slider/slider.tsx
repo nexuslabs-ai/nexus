@@ -228,14 +228,14 @@ function Slider({
       step={step}
       orientation={orientation}
       className={cn(
-        'nx:group/slider nx:relative nx:flex nx:w-full nx:select-none nx:items-center nx:data-[orientation=horizontal]:touch-pan-y nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:min-h-44 nx:data-[orientation=vertical]:w-auto nx:data-[orientation=vertical]:touch-pan-x nx:data-[orientation=vertical]:flex-col',
+        'nx:group/slider nx:relative nx:flex nx:w-full nx:cursor-pointer nx:select-none nx:items-center nx:data-disabled:cursor-default nx:data-[orientation=horizontal]:touch-pan-y nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:min-h-44 nx:data-[orientation=vertical]:w-auto nx:data-[orientation=vertical]:touch-pan-x nx:data-[orientation=vertical]:flex-col',
         className
       )}
       {...props}
     >
       <SliderPrimitive.Track
         data-slot="slider-track"
-        className="nx:relative nx:grow nx:overflow-hidden nx:rounded-full nx:bg-control-background nx:data-disabled:bg-disabled nx:data-[orientation=horizontal]:h-1.5 nx:data-[orientation=horizontal]:w-full nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:w-1.5"
+        className="nx:relative nx:grow nx:overflow-hidden nx:rounded-full nx:bg-control-background nx:data-disabled:bg-disabled nx:data-[orientation=horizontal]:h-2 nx:data-[orientation=horizontal]:w-full nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:w-2"
       >
         {stepValues.map((stepValue) => (
           <span
@@ -252,7 +252,7 @@ function Slider({
         ))}
         <SliderPrimitive.Range
           data-slot="slider-range"
-          className="nx:absolute nx:z-20 nx:bg-primary-background nx:data-disabled:bg-primary-disabled nx:data-[orientation=horizontal]:h-full nx:data-[orientation=vertical]:w-full"
+          className="nx:pointer-events-none nx:absolute nx:z-20 nx:bg-control-background-hover nx:data-disabled:bg-disabled nx:data-[orientation=horizontal]:h-full nx:data-[orientation=vertical]:w-full"
         />
       </SliderPrimitive.Track>
       {Array.from({ length: values.length }, (_, index) => (
@@ -271,12 +271,12 @@ function Slider({
           aria-labelledby={ariaLabelledby}
           aria-invalid={ariaInvalid}
           aria-valuetext={formatValue(values[index] ?? values[0] ?? min)}
-          className="nx:relative nx:z-30 nx:block nx:size-4 nx:shrink-0 nx:rounded-full nx:border-default nx:border-border-primary nx:bg-background nx:transition-colors nx:after:absolute nx:after:-inset-3 nx:after:content-[''] nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:data-disabled:border-border-disabled nx:data-disabled:bg-disabled nx:aria-invalid:focus-visible:outline-focus-error"
+          className="nx:relative nx:z-30 nx:block nx:size-5 nx:shrink-0 nx:cursor-grab nx:rounded-full nx:border-default nx:border-border-default nx:bg-control-thumb nx:shadow-sm nx:transition-[background-color,border-color,transform] nx:duration-fast nx:after:absolute nx:after:-inset-3 nx:after:cursor-grab nx:after:content-[''] nx:active:cursor-grabbing nx:active:after:cursor-grabbing nx:motion-reduce:transition-none nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:data-disabled:cursor-not-allowed nx:data-disabled:border-border-disabled nx:data-disabled:bg-disabled nx:data-disabled:after:cursor-not-allowed nx:aria-invalid:focus-visible:outline-focus-error"
         >
           {showValue && valuePosition === 'tooltip' ? (
             <span
               data-slot="slider-tooltip"
-              className="nx:pointer-events-none nx:absolute nx:bottom-full nx:left-1/2 nx:mb-2 nx:-translate-x-1/2 nx:rounded-md nx:bg-popover nx:px-2 nx:py-1 nx:tabular-nums nx:typography-label-small nx:text-popover-foreground nx:opacity-0 nx:shadow-sm nx:transition-opacity nx:duration-fast nx:motion-reduce:transition-none nx:group-hover/slider:opacity-100 nx:group-focus-within/slider:opacity-100"
+              className="nx:pointer-events-none nx:absolute nx:bottom-full nx:left-1/2 nx:mb-3 nx:-translate-x-1/2 nx:rounded-lg nx:bg-foreground nx:px-2.5 nx:py-1 nx:tabular-nums nx:typography-label-small nx:text-background nx:opacity-0 nx:shadow-sm nx:transition-opacity nx:duration-fast nx:before:absolute nx:before:left-1/2 nx:before:top-full nx:before:size-2 nx:before:-translate-x-1/2 nx:before:-translate-y-1/2 nx:before:rotate-45 nx:before:bg-foreground nx:before:content-[''] nx:motion-reduce:transition-none nx:group-hover/slider:opacity-100 nx:group-focus-within/slider:opacity-100"
             >
               {formatValue(values[index] ?? values[0] ?? min)}
             </span>
@@ -372,7 +372,7 @@ function SliderComfortable({
       step={step}
       disabled={disabled}
       className={cn(
-        'nx:group/slider-comfortable nx:relative nx:flex nx:h-8 nx:w-full nx:select-none nx:items-center nx:touch-pan-y',
+        'nx:group/slider-comfortable nx:relative nx:flex nx:h-16 nx:w-full nx:cursor-pointer nx:select-none nx:items-center nx:touch-pan-y nx:data-disabled:cursor-default',
         disabled && 'nx:pointer-events-none',
         className
       )}
@@ -381,8 +381,8 @@ function SliderComfortable({
       <SliderPrimitive.Track
         data-slot="slider-comfortable-track"
         className={cn(
-          'nx:relative nx:h-8 nx:w-full nx:overflow-hidden nx:rounded-md nx:border-default nx:border-border-default nx:bg-container nx:text-muted-foreground nx:transition-colors nx:duration-fast nx:motion-reduce:transition-none',
-          'nx:group-hover/slider-comfortable:text-foreground nx:group-focus-within/slider-comfortable:text-foreground',
+          'nx:relative nx:h-16 nx:w-full nx:overflow-hidden nx:rounded-md nx:border-default nx:border-border-default nx:bg-background nx:text-foreground nx:transition-colors nx:duration-fast nx:motion-reduce:transition-none',
+          'nx:text-foreground',
           disabled &&
             'nx:border-border-disabled nx:bg-disabled nx:text-disabled-foreground'
         )}
@@ -390,8 +390,8 @@ function SliderComfortable({
         <SliderPrimitive.Range
           data-slot="slider-comfortable-range"
           className={cn(
-            'nx:absolute nx:inset-y-0 nx:left-0 nx:z-10 nx:bg-primary-subtle',
-            disabled && 'nx:bg-primary-disabled'
+            'nx:pointer-events-none nx:absolute nx:inset-y-0 nx:left-0 nx:z-10 nx:bg-control-background',
+            disabled && 'nx:bg-disabled'
           )}
         />
         {pipValues.map((pipValue) => (
@@ -400,13 +400,13 @@ function SliderComfortable({
             data-slot="slider-comfortable-pip"
             key={pipValue}
             className={cn(
-              'nx:pointer-events-none nx:absolute nx:top-1/2 nx:z-20 nx:size-1.5 nx:-translate-x-1/2 nx:-translate-y-1/2 nx:rounded-full nx:bg-current nx:opacity-40',
-              pipValue === currentValue && 'nx:opacity-100'
+              'nx:pointer-events-none nx:absolute nx:top-1/2 nx:z-20 nx:size-2 nx:-translate-x-1/2 nx:-translate-y-1/2 nx:rounded-full nx:bg-muted-foreground nx:opacity-50',
+              pipValue === currentValue && 'nx:bg-foreground nx:opacity-90'
             )}
             style={{ left: `${getValuePercent(pipValue, min, max)}%` }}
           />
         ))}
-        <span className="nx:pointer-events-none nx:absolute nx:inset-0 nx:z-30 nx:flex nx:items-center nx:gap-3 nx:px-3 nx:typography-label-small">
+        <span className="nx:pointer-events-none nx:absolute nx:inset-0 nx:z-30 nx:flex nx:items-center nx:gap-4 nx:px-5 nx:typography-label-default">
           {label ? (
             <span data-slot="slider-comfortable-label" className="nx:truncate">
               {label}
@@ -425,8 +425,17 @@ function SliderComfortable({
         aria-label={ariaLabel ?? label}
         aria-labelledby={ariaLabelledby}
         aria-valuetext={formatValue(currentValue)}
-        className="nx:relative nx:z-40 nx:block nx:h-4 nx:w-0.5 nx:shrink-0 nx:rounded-full nx:bg-foreground nx:transition-[height,background-color] nx:duration-fast nx:after:absolute nx:after:-inset-4 nx:after:content-[''] nx:motion-reduce:transition-none nx:group-hover/slider-comfortable:h-5 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:data-disabled:bg-disabled-foreground"
-      />
+        className="nx:relative nx:z-40 nx:block nx:h-8 nx:w-1 nx:shrink-0 nx:cursor-grab nx:rounded-full nx:bg-foreground nx:transition-[height,background-color] nx:duration-fast nx:after:absolute nx:after:-inset-5 nx:after:cursor-grab nx:after:content-[''] nx:active:cursor-grabbing nx:active:after:cursor-grabbing nx:motion-reduce:transition-none nx:group-hover/slider-comfortable:h-9 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:data-disabled:cursor-not-allowed nx:data-disabled:bg-disabled-foreground nx:data-disabled:after:cursor-not-allowed"
+      >
+        {!disabled ? (
+          <span
+            data-slot="slider-comfortable-tooltip"
+            className="nx:pointer-events-none nx:absolute nx:bottom-full nx:left-1/2 nx:mb-3 nx:-translate-x-1/2 nx:rounded-lg nx:bg-foreground nx:px-3 nx:py-1.5 nx:tabular-nums nx:typography-label-default nx:text-background nx:opacity-0 nx:shadow-sm nx:transition-opacity nx:duration-fast nx:before:absolute nx:before:left-1/2 nx:before:top-full nx:before:size-2 nx:before:-translate-x-1/2 nx:before:-translate-y-1/2 nx:before:rotate-45 nx:before:bg-foreground nx:before:content-[''] nx:motion-reduce:transition-none nx:group-hover/slider-comfortable:opacity-100 nx:group-focus-within/slider-comfortable:opacity-100"
+          >
+            {formatValue(currentValue)}
+          </span>
+        ) : null}
+      </SliderPrimitive.Thumb>
     </SliderPrimitive.Root>
   );
 }
