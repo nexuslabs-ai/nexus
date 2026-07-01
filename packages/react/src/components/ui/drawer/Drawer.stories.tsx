@@ -128,8 +128,7 @@ export const ScrollableContent: Story = {
         </DrawerHeader>
         <DrawerBody
           data-testid="drawer-scroll-area"
-          tabIndex={0}
-          className="nx:max-h-[45svh] nx:overflow-y-auto nx:pb-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)"
+          className="nx:max-h-[45svh] nx:pb-2"
         >
           <ul className="nx:flex nx:flex-col nx:gap-3">
             {SCROLLABLE_ITEMS.map((item) => (
@@ -156,6 +155,14 @@ export const ScrollableContent: Story = {
       </DrawerContent>
     </Drawer>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Manual check: on a touch device, scroll DrawerBody, then drag from the handle or frame; Vaul should still dismiss because DrawerContent is not the scroll container.',
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -164,6 +171,12 @@ export const ScrollableContent: Story = {
     const drawer = await within(document.body).findByRole('dialog');
     const scrollArea = within(drawer).getByTestId('drawer-scroll-area');
 
+    await expect(scrollArea).toHaveAttribute('tabindex', '0');
+    await expect(scrollArea).toHaveClass(
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
     await waitFor(() => {
       expect(scrollArea.scrollHeight).toBeGreaterThan(scrollArea.clientHeight);
     });
@@ -354,6 +367,22 @@ export const WithDataAttributes: Story = {
       }
     });
 
+    await expect(
+      document.querySelector('[data-slot="drawer-content"]')
+    ).toHaveClass('nx:overflow-hidden');
+    await expect(
+      document.querySelector('[data-slot="drawer-body"]')
+    ).toHaveClass(
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    await expect(
+      document.querySelector('[data-slot="drawer-body"]')
+    ).toHaveAttribute('tabindex', '0');
+
     await userEvent.keyboard('{Escape}');
   },
 };
@@ -376,6 +405,12 @@ export const DirectionBehavior: Story = {
                 The content exposes the active Vaul direction.
               </DrawerDescription>
             </DrawerHeader>
+            <DrawerBody>
+              <p className="nx:typography-body-default nx:text-foreground">
+                The drawer frame stays non-scrolling while this body owns any
+                vertical overflow.
+              </p>
+            </DrawerBody>
             <DrawerFooter>
               <DrawerClose asChild>
                 <Button>Close {direction} drawer</Button>
@@ -399,6 +434,30 @@ export const DirectionBehavior: Story = {
         'data-vaul-drawer-direction',
         direction
       );
+      await expect(drawer).toHaveClass('nx:overflow-hidden');
+
+      await expect(
+        drawer.querySelector('[data-slot="drawer-body"]')
+      ).toHaveClass(
+        'nx:min-h-0',
+        'nx:overflow-y-auto',
+        'nx:focus-visible:outline-2',
+        'nx:focus-visible:outline-focus-default',
+        'nx:focus-visible:[outline-offset:-2px]'
+      );
+      await expect(
+        drawer.querySelector('[data-slot="drawer-body"]')
+      ).toHaveAttribute('tabindex', '0');
+
+      if (direction === 'top' || direction === 'bottom') {
+        await expect(drawer).toHaveClass(
+          `nx:data-[vaul-drawer-direction=${direction}]:max-h-[80svh]`
+        );
+      } else {
+        await expect(drawer).toHaveClass(
+          `nx:data-[vaul-drawer-direction=${direction}]:h-svh`
+        );
+      }
 
       await userEvent.click(
         within(drawer).getByRole('button', {

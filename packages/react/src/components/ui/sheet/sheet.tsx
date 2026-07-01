@@ -3,7 +3,10 @@ import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { overlayCloseButtonClassName } from '@/components/ui/overlay-layout/overlay-layout';
+import {
+  overlayBodyClassName,
+  overlayCloseButtonClassName,
+} from '@/components/ui/overlay-layout/overlay-layout';
 import { IconX } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -94,7 +97,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
  */
 const sheetContentVariants = cva(
   cn(
-    'nx:fixed nx:z-modal nx:flex nx:flex-col',
+    'nx:fixed nx:z-modal nx:flex nx:flex-col nx:overflow-hidden',
     'nx:bg-container nx:shadow-lg',
     'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
     'nx:data-[state=open]:duration-slower nx:data-[state=open]:ease-enter',
@@ -106,19 +109,19 @@ const sheetContentVariants = cva(
     variants: {
       side: {
         top: cn(
-          'nx:inset-x-0 nx:top-0 nx:h-auto nx:border-b-default nx:border-border-default',
+          'nx:inset-x-0 nx:top-0 nx:h-auto nx:max-h-svh nx:border-b-default nx:border-border-default',
           'nx:data-[state=open]:slide-in-from-top nx:data-[state=closed]:slide-out-to-top'
         ),
         bottom: cn(
-          'nx:inset-x-0 nx:bottom-0 nx:h-auto nx:border-t-default nx:border-border-default',
+          'nx:inset-x-0 nx:bottom-0 nx:h-auto nx:max-h-svh nx:border-t-default nx:border-border-default',
           'nx:data-[state=open]:slide-in-from-bottom nx:data-[state=closed]:slide-out-to-bottom'
         ),
         left: cn(
-          'nx:inset-y-0 nx:left-0 nx:h-full nx:w-3/4 nx:border-r-default nx:border-border-default nx:sm:max-w-sm',
+          'nx:left-0 nx:top-0 nx:h-svh nx:w-3/4 nx:border-r-default nx:border-border-default nx:sm:max-w-sm',
           'nx:data-[state=open]:slide-in-from-left nx:data-[state=closed]:slide-out-to-left'
         ),
         right: cn(
-          'nx:inset-y-0 nx:right-0 nx:h-full nx:w-3/4 nx:border-l-default nx:border-border-default nx:sm:max-w-sm',
+          'nx:right-0 nx:top-0 nx:h-svh nx:w-3/4 nx:border-l-default nx:border-border-default nx:sm:max-w-sm',
           'nx:data-[state=open]:slide-in-from-right nx:data-[state=closed]:slide-out-to-right'
         ),
       },
@@ -215,7 +218,10 @@ function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn('nx:flex nx:flex-col nx:gap-1 nx:p-6', className)}
+      className={cn(
+        'nx:flex nx:shrink-0 nx:flex-col nx:gap-1 nx:p-6',
+        className
+      )}
       {...props}
     />
   );
@@ -246,7 +252,10 @@ function SheetBody({ className, ...props }: SheetBodyProps) {
   return (
     <div
       data-slot="sheet-body"
-      className={cn('nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
       {...props}
     />
   );
@@ -277,7 +286,7 @@ function SheetFooter({ className, ...props }: SheetFooterProps) {
     <div
       data-slot="sheet-footer"
       className={cn(
-        'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-6',
+        'nx:mt-auto nx:flex nx:shrink-0 nx:flex-col nx:gap-2 nx:p-6',
         className
       )}
       {...props}

@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { Drawer as DrawerPrimitive } from 'vaul';
 
+import { overlayBodyClassName } from '@/components/ui/overlay-layout/overlay-layout';
 import { cn } from '@/lib/utils';
 
 /**
@@ -98,12 +99,12 @@ function DrawerContent({
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(
-          'nx:group/drawer-content nx:fixed nx:z-modal nx:flex nx:h-auto nx:flex-col nx:bg-container nx:shadow-lg',
+          'nx:group/drawer-content nx:fixed nx:z-modal nx:flex nx:h-auto nx:flex-col nx:overflow-hidden nx:bg-container nx:shadow-lg',
           'nx:motion-reduce:transition-none',
           'nx:data-[vaul-drawer-direction=top]:inset-x-0 nx:data-[vaul-drawer-direction=top]:top-0 nx:data-[vaul-drawer-direction=top]:mb-24 nx:data-[vaul-drawer-direction=top]:max-h-[80svh] nx:data-[vaul-drawer-direction=top]:rounded-b-lg nx:data-[vaul-drawer-direction=top]:border-b-default nx:data-[vaul-drawer-direction=top]:border-border-default',
           'nx:data-[vaul-drawer-direction=bottom]:inset-x-0 nx:data-[vaul-drawer-direction=bottom]:bottom-0 nx:data-[vaul-drawer-direction=bottom]:mt-24 nx:data-[vaul-drawer-direction=bottom]:max-h-[80svh] nx:data-[vaul-drawer-direction=bottom]:rounded-t-lg nx:data-[vaul-drawer-direction=bottom]:border-t-default nx:data-[vaul-drawer-direction=bottom]:border-border-default',
-          'nx:data-[vaul-drawer-direction=right]:inset-y-0 nx:data-[vaul-drawer-direction=right]:right-0 nx:data-[vaul-drawer-direction=right]:w-3/4 nx:data-[vaul-drawer-direction=right]:border-l-default nx:data-[vaul-drawer-direction=right]:border-border-default nx:data-[vaul-drawer-direction=right]:sm:max-w-sm',
-          'nx:data-[vaul-drawer-direction=left]:inset-y-0 nx:data-[vaul-drawer-direction=left]:left-0 nx:data-[vaul-drawer-direction=left]:w-3/4 nx:data-[vaul-drawer-direction=left]:border-r-default nx:data-[vaul-drawer-direction=left]:border-border-default nx:data-[vaul-drawer-direction=left]:sm:max-w-sm',
+          'nx:data-[vaul-drawer-direction=right]:right-0 nx:data-[vaul-drawer-direction=right]:top-0 nx:data-[vaul-drawer-direction=right]:h-svh nx:data-[vaul-drawer-direction=right]:w-3/4 nx:data-[vaul-drawer-direction=right]:border-l-default nx:data-[vaul-drawer-direction=right]:border-border-default nx:data-[vaul-drawer-direction=right]:sm:max-w-sm',
+          'nx:data-[vaul-drawer-direction=left]:left-0 nx:data-[vaul-drawer-direction=left]:top-0 nx:data-[vaul-drawer-direction=left]:h-svh nx:data-[vaul-drawer-direction=left]:w-3/4 nx:data-[vaul-drawer-direction=left]:border-r-default nx:data-[vaul-drawer-direction=left]:border-border-default nx:data-[vaul-drawer-direction=left]:sm:max-w-sm',
           className
         )}
         {...props}
@@ -128,7 +129,7 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-header"
       className={cn(
-        'nx:flex nx:flex-col nx:gap-1.5 nx:p-6 nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center nx:group-data-[vaul-drawer-direction=top]/drawer-content:text-center nx:md:text-left',
+        'nx:flex nx:shrink-0 nx:flex-col nx:gap-1.5 nx:p-6 nx:group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center nx:group-data-[vaul-drawer-direction=top]/drawer-content:text-center nx:md:text-left',
         className
       )}
       {...props}
@@ -146,7 +147,10 @@ function DrawerBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="drawer-body"
-      className={cn('nx:px-6', className)}
+      className={cn(overlayBodyClassName, className)}
+      // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
       {...props}
     />
   );
@@ -162,7 +166,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="drawer-footer"
       className={cn(
-        'nx:mt-auto nx:flex nx:flex-col nx:gap-2 nx:p-6',
+        'nx:mt-auto nx:flex nx:shrink-0 nx:flex-col nx:gap-2 nx:p-6',
         className
       )}
       {...props}

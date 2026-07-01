@@ -176,7 +176,7 @@ export const ScrollableContent: Story = {
       <SheetTrigger asChild>
         <Button variant="outline">Terms & Conditions</Button>
       </SheetTrigger>
-      <SheetContent className="nx:overflow-y-auto">
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Terms of Service</SheetTitle>
           <SheetDescription>
@@ -202,6 +202,95 @@ export const ScrollableContent: Story = {
       </SheetContent>
     </Sheet>
   ),
+};
+
+export const ViewportUnitContract: Story = {
+  render: (_args) => (
+    <div className="nx:flex nx:flex-wrap nx:gap-4">
+      {SIDES.map((side) => (
+        <Sheet key={side}>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="nx:capitalize">
+              Open {side} viewport sheet
+            </Button>
+          </SheetTrigger>
+          <SheetContent side={side}>
+            <SheetHeader>
+              <SheetTitle className="nx:capitalize">
+                {side} viewport sheet
+              </SheetTitle>
+              <SheetDescription>
+                The sheet uses stable visible viewport units for this edge.
+              </SheetDescription>
+            </SheetHeader>
+            <SheetBody className="nx:space-y-3 nx:typography-body-default nx:text-foreground">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <p key={i}>
+                  Representative sheet content for checking the viewport sizing
+                  contract without relying on a device-specific visual test.
+                </p>
+              ))}
+            </SheetBody>
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button>Close {side} viewport sheet</Button>
+              </SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ))}
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Manual check: on a narrow/mobile viewport, long SheetBody content should scroll while the frame and close button stay fixed to the selected edge.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    for (const side of SIDES) {
+      await userEvent.click(
+        canvas.getByRole('button', { name: `Open ${side} viewport sheet` })
+      );
+
+      const sheet = await within(document.body).findByRole('dialog');
+      await expect(sheet).toHaveAttribute('data-side', side);
+      await expect(sheet).toHaveClass('nx:overflow-hidden');
+
+      const body = sheet.querySelector('[data-slot="sheet-body"]');
+      const closeButton = within(sheet).getByRole('button', {
+        name: 'Close',
+      });
+      await expect(body).toHaveAttribute('tabindex', '0');
+      await expect(body).toHaveClass(
+        'nx:min-h-0',
+        'nx:overflow-y-auto',
+        'nx:focus-visible:outline-2',
+        'nx:focus-visible:outline-focus-default',
+        'nx:focus-visible:[outline-offset:-2px]'
+      );
+      expect(body).not.toContainElement(closeButton);
+
+      if (side === 'left' || side === 'right') {
+        await expect(sheet).toHaveClass('nx:h-svh');
+      } else {
+        await expect(sheet).toHaveClass('nx:max-h-svh');
+      }
+
+      await userEvent.click(
+        within(sheet).getByRole('button', {
+          name: `Close ${side} viewport sheet`,
+        })
+      );
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeNull();
+      });
+    }
+  },
 };
 
 // ============================================
@@ -356,6 +445,22 @@ export const WithDataAttributes: Story = {
     await expect(
       document.querySelector('[data-slot="sheet-content"]')
     ).toHaveAttribute('data-side', 'right');
+    await expect(
+      document.querySelector('[data-slot="sheet-content"]')
+    ).toHaveClass('nx:h-svh', 'nx:overflow-hidden');
+
+    await expect(
+      document.querySelector('[data-slot="sheet-body"]')
+    ).toHaveClass(
+      'nx:min-h-0',
+      'nx:overflow-y-auto',
+      'nx:focus-visible:outline-2',
+      'nx:focus-visible:outline-focus-default',
+      'nx:focus-visible:[outline-offset:-2px]'
+    );
+    await expect(
+      document.querySelector('[data-slot="sheet-body"]')
+    ).toHaveAttribute('tabindex', '0');
 
     await expect(
       document.querySelector('[data-slot="sheet-close-button"]')
