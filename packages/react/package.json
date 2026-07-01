@@ -20,12 +20,12 @@
       "require": "./dist/index.js"
     },
     "./appearance": {
-      "types": "./dist/appearance.d.ts",
+      "types": "./dist/components/appearance/provider/index.d.ts",
       "import": "./dist/appearance.mjs",
       "require": "./dist/appearance.js"
     },
     "./appearance/server": {
-      "types": "./dist/appearance-server.d.ts",
+      "types": "./dist/components/appearance/provider/server.d.ts",
       "import": "./dist/appearance-server.mjs",
       "require": "./dist/appearance-server.js"
     },

@@ -4,77 +4,21 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-const APPEARANCE_PROVIDER_DIST_DIR = 'components/appearance/provider';
-
-const APPEARANCE_DECLARATION_ENTRIES = [
-  {
-    source: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/index.d.ts`,
-    sourceMap: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/index.d.ts.map`,
-    output: 'appearance.d.ts',
-    outputMap: 'appearance.d.ts.map',
-    mapSource: 'index.d.ts.map',
-  },
-  {
-    source: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/server.d.ts`,
-    sourceMap: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/server.d.ts.map`,
-    output: 'appearance-server.d.ts',
-    outputMap: 'appearance-server.d.ts.map',
-    mapSource: 'server.d.ts.map',
-  },
-] as const;
-
-function rewriteAppearanceDeclaration(filePath: string, content: string) {
+// Flat component dirs export a barrel `index.d.ts`; node16/nodenext consumers
+// need the explicit `/index` suffix on those relative imports in `dist/index.d.ts`.
+function rewriteRootDeclaration(filePath: string, content: string) {
   const normalizedPath = filePath.split(path.sep).join('/');
 
-  if (normalizedPath.endsWith('/dist/index.d.ts')) {
-    return {
-      filePath,
-      content: content.replace(
-        /from '\.\/components\/([^']+)'/g,
-        (match, entry: string) =>
-          entry.endsWith('/index')
-            ? match
-            : `from './components/${entry}/index'`
-      ),
-    };
-  }
+  if (!normalizedPath.endsWith('/dist/index.d.ts')) return;
 
-  for (const entry of APPEARANCE_DECLARATION_ENTRIES) {
-    if (normalizedPath.endsWith(entry.source)) {
-      return {
-        filePath: path.resolve(__dirname, 'dist', entry.output),
-        content: content
-          .replace(
-            /from '\.\/([^']+)'/g,
-            `from './${APPEARANCE_PROVIDER_DIST_DIR}/$1'`
-          )
-          .replace(
-            `//# sourceMappingURL=${entry.mapSource}`,
-            `//# sourceMappingURL=${entry.outputMap}`
-          ),
-      };
-    }
-
-    if (normalizedPath.endsWith(entry.sourceMap)) {
-      const outputMapPath = path.resolve(__dirname, 'dist', entry.outputMap);
-
-      try {
-        const sourceMap = JSON.parse(content) as { file?: string };
-
-        sourceMap.file = entry.output;
-
-        return {
-          filePath: outputMapPath,
-          content: JSON.stringify(sourceMap),
-        };
-      } catch {
-        return {
-          filePath: outputMapPath,
-          content,
-        };
-      }
-    }
-  }
+  return {
+    filePath,
+    content: content.replace(
+      /from '\.\/components\/([^']+)'/g,
+      (match, entry: string) =>
+        entry.endsWith('/index') ? match : `from './components/${entry}/index'`
+    ),
+  };
 }
 
 export default defineConfig({
@@ -86,7 +30,7 @@ export default defineConfig({
       exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx'],
       outDir: 'dist',
       beforeWriteFile(filePath, content) {
-        return rewriteAppearanceDeclaration(filePath, content);
+        return rewriteRootDeclaration(filePath, content);
       },
     }),
   ],
