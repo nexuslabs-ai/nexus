@@ -143,7 +143,9 @@ interface DialogContentProps extends Omit<
  *   <DialogHeader>
  *     <DialogTitle>Title</DialogTitle>
  *   </DialogHeader>
- *   <p>Content here</p>
+ *   <DialogBody>
+ *     <p>Content here</p>
+ *   </DialogBody>
  * </DialogContent>
  * ```
  */
@@ -259,10 +261,10 @@ function DialogBody({ className, ...props }: DialogBodyProps) {
     <div
       data-slot="dialog-body"
       className={cn(overlayBodyClassName, className)}
-      {...props}
       // Overlay bodies own the scroll region, so pure-text overflow must be keyboard reachable.
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
+      {...props}
     />
   );
 }
