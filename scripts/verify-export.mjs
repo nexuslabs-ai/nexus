@@ -3,11 +3,12 @@
  *
  * Builds + packs the published upstream deps (`@nexus_ds/core`,
  * `@nexus_ds/eslint-plugin`) into tarballs, runs `pnpm export` into a temp
- * monorepo, redirects the two upstream deps to those tarballs via root
- * `pnpm.overrides` (leaving the real version ranges intact so `publish
- * --dry-run` validates the shipped manifest), then proves the produced repo
- * passes: install → build → lint → typecheck → publish --dry-run (both members)
- * → build-storybook → ESM smoke import → CSS token emission.
+ * monorepo, asserts the shipped upstream ranges actually resolve on npm (the
+ * tarball overrides below mask this), redirects the two upstream deps to those
+ * tarballs via root `pnpm.overrides` (leaving the real version ranges intact so
+ * `publish --dry-run` validates the shipped manifest), then proves the produced
+ * repo passes: install → build → lint → typecheck → publish --dry-run (both
+ * members) → build-storybook → ESM smoke import → CSS token emission.
  *
  * Per-step pass/fail + duration is reported; the temp dir is retained on failure.
  */
@@ -17,6 +18,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import { KEEP_PACKAGES } from './export.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SCOPE = '@acme';
@@ -56,8 +59,21 @@ function exec(cmd, args, cwd) {
   return res.stdout ?? '';
 }
 
-/** Recursively find text files whose contents match `re`, relative to `root`. */
-function findMatches(root, re) {
+/** Rule ids published by @nexus_ds/eslint-plugin (each `rules/*.js` = one rule). */
+function discoverEslintRuleRefs() {
+  const rulesDir = path.join(REPO_ROOT, 'packages', 'eslint-plugin-nexus', 'src', 'rules');
+  return fs
+    .readdirSync(rulesDir)
+    .filter((file) => file.endsWith('.js'))
+    .map((file) => `@nexus_ds/${file.replace(/\.js$/, '')}`);
+}
+
+/**
+ * Find files under `root` referencing a `@nexus_ds/*` name not in `allowed`.
+ * Catches any un-forked upstream sibling (react/tailwind, or a future package),
+ * while permitting the kept published deps and the eslint-plugin rule ids.
+ */
+function findStrayNexusRefs(root, allowed) {
   const hits = [];
   const walk = (dir) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -67,15 +83,47 @@ function findMatches(root, re) {
           continue;
         }
         walk(full);
-      } else if (TEXT_EXTENSIONS.has(path.extname(entry.name))) {
-        if (re.test(fs.readFileSync(full, 'utf8'))) {
-          hits.push(path.relative(root, full));
-        }
+        continue;
+      }
+      if (!TEXT_EXTENSIONS.has(path.extname(entry.name))) {
+        continue;
+      }
+      const refs = fs.readFileSync(full, 'utf8').match(/@nexus_ds\/[a-zA-Z0-9._-]+/g) ?? [];
+      const bad = [...new Set(refs)].filter((ref) => !allowed.has(ref));
+      if (bad.length > 0) {
+        hits.push(`${path.relative(root, full)} (${bad.join(', ')})`);
       }
     }
   };
   walk(root);
   return hits;
+}
+
+/**
+ * Assert the produced upstream ranges resolve to a published npm version. The
+ * tarball overrides below satisfy install/publish locally, so a workspace
+ * version ahead of npm would fail a real install while this harness stayed green.
+ */
+function assertUpstreamRangesPublished(producedDir) {
+  const reactPkg = readJson(path.join(producedDir, 'packages', 'react', 'package.json'));
+  const rootPkg = readJson(path.join(producedDir, 'package.json'));
+  const ranges = {
+    '@nexus_ds/core': reactPkg.dependencies?.['@nexus_ds/core'],
+    '@nexus_ds/eslint-plugin': rootPkg.devDependencies?.['@nexus_ds/eslint-plugin'],
+  };
+  for (const [name, range] of Object.entries(ranges)) {
+    if (!range) {
+      throw new Error(`Produced manifest is missing the ${name} dependency range.`);
+    }
+    const matched = exec('npm', ['view', `${name}@${range}`, 'version'], REPO_ROOT).trim();
+    if (!matched) {
+      throw new Error(
+        `Shipped range "${name}@${range}" resolves to no published version on npm; ` +
+          `a real install would fail even though tarball overrides keep this harness green. ` +
+          `Publish ${name} at a version satisfying ${range}.`
+      );
+    }
+  }
 }
 
 function packTarball(packageDir, destDir) {
@@ -196,15 +244,17 @@ async function main() {
       )
     );
 
-    await step('rebrand audit (no stray upstream react/tailwind refs)', () => {
-      const stray = findMatches(
-        path.join(producedDir, 'packages'),
-        /@nexus_ds\/(react|tailwind)/
-      );
+    await step('rebrand audit (no un-forked @nexus_ds/* refs)', () => {
+      const allowed = new Set([...KEEP_PACKAGES, ...discoverEslintRuleRefs()]);
+      const stray = findStrayNexusRefs(path.join(producedDir, 'packages'), allowed);
       if (stray.length > 0) {
-        throw new Error(`Stray @nexus_ds/react|tailwind refs in: ${stray.join(', ')}`);
+        throw new Error(`Un-forked @nexus_ds/* refs leaked in: ${stray.join(', ')}`);
       }
     });
+
+    await step('upstream ranges resolve on npm', () =>
+      assertUpstreamRangesPublished(producedDir)
+    );
 
     await step('inject tarball overrides', () => injectOverrides(producedDir, tarballs));
     await step('pnpm install', () => exec('pnpm', ['install'], producedDir));

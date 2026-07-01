@@ -18,6 +18,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 // Package names that are PUBLISHED upstream deps — never rebranded into the fork.
 export const KEEP_PACKAGES = ['@nexus_ds/core', '@nexus_ds/eslint-plugin'];
 
+// Workspace packages forked into the produced repo — rebranded to the target scope.
+export const REBRAND_PACKAGES = ['@nexus_ds/react', '@nexus_ds/tailwind'];
+
 // Token-shaping config axes fed to the `@nexus_ds/core` tailwind generator.
 export const TOKEN_CONFIG_KEYS = [
   'base',
@@ -80,8 +83,9 @@ export function deriveScope(name, explicitScope) {
 /**
  * Enumerate valid token-config values from the committed token files, the same
  * way the generator discovers them: base/brand from
- * `tokens/semantic/{base,brands}-{value}-{light|dark}.json`, and
- * radius/borderwidth/shadow/motion from `tokens/primitives/{category}/`.
+ * `tokens/semantic/{base,brands}-{value}-{light|dark}.json`,
+ * radius/borderwidth/shadow/motion from `tokens/primitives/{category}/`, and
+ * spacingDefault from `tokens/semantic/spacing-{mode}.json`.
  */
 export function discoverTokenChoices(tokensDir) {
   const semanticDir = path.join(tokensDir, 'semantic');
@@ -113,6 +117,19 @@ export function discoverTokenChoices(tokensDir) {
     return [...seen].sort();
   };
 
+  // Spacing modes ship as `semantic/spacing-{mode}.json` (no light/dark split),
+  // matching the generator's own `^spacing-([a-z]+)\.json$` discovery.
+  const spacingModes = () => {
+    const seen = new Set();
+    for (const file of fs.readdirSync(semanticDir)) {
+      const match = file.match(/^spacing-([a-z]+)\.json$/);
+      if (match) {
+        seen.add(match[1]);
+      }
+    }
+    return [...seen].sort();
+  };
+
   return {
     base: semanticModes('base'),
     brand: semanticModes('brands'),
@@ -120,8 +137,7 @@ export function discoverTokenChoices(tokensDir) {
     borderwidth: primitiveModes('borderwidth'),
     shadow: primitiveModes('shadow'),
     motion: primitiveModes('motion'),
-    // spacingDefault is validated by the generator itself; accept any value.
-    spacingDefault: [],
+    spacingDefault: spacingModes(),
   };
 }
 
@@ -203,11 +219,40 @@ export function parseExportArgs(argv, { validChoices } = {}) {
  * directives, and the `nx:` / `--nx-*` prefixes are left untouched.
  */
 export function rebrandContent(text, scope) {
-  return text
-    .split('@nexus_ds/react')
-    .join(`${scope}/react`)
-    .split('@nexus_ds/tailwind')
-    .join(`${scope}/tailwind`);
+  return REBRAND_PACKAGES.reduce(
+    (out, pkg) => out.split(pkg).join(pkg.replace('@nexus_ds', scope)),
+    text
+  );
+}
+
+const DEP_FIELDS = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+  'optionalDependencies',
+];
+
+/**
+ * Guard a produced manifest against un-forked `@nexus_ds/*` deps. After the
+ * transform the only `@nexus_ds/*` names that may survive are the published
+ * KEEP_PACKAGES; a new workspace dep (e.g. a future `@nexus_ds/icons`) would
+ * otherwise ship as an unresolved `workspace:*` range — fail loudly instead.
+ */
+function assertNoUnhandledNexusDeps(pkg) {
+  const unhandled = [];
+  for (const field of DEP_FIELDS) {
+    for (const name of Object.keys(pkg[field] ?? {})) {
+      if (name.startsWith('@nexus_ds/') && !KEEP_PACKAGES.includes(name)) {
+        unhandled.push(`${field}.${name}`);
+      }
+    }
+  }
+  if (unhandled.length > 0) {
+    throw new Error(
+      `Unhandled @nexus_ds/* dependency in the forked manifest: ${unhandled.join(', ')}. ` +
+        `Fork it (add to REBRAND_PACKAGES) or keep it published (add to KEEP_PACKAGES).`
+    );
+  }
 }
 
 /**
@@ -232,6 +277,8 @@ export function transformReactPackageJson(pkg, { scope, coreVersion, version }) 
     delete next.dependencies['@nexus_ds/tailwind'];
     next.dependencies[`${scope}/tailwind`] = spec;
   }
+
+  assertNoUnhandledNexusDeps(next);
   return next;
 }
 
@@ -246,20 +293,25 @@ export function transformTailwindPackageJson(pkg, { scope, version }) {
   next.version = version;
   delete next.private;
   next.publishConfig = { access: 'public' };
+
+  assertNoUnhandledNexusDeps(next);
   return next;
 }
 
 /**
  * Scan a component source file for its intra-package (`@/`) dependencies,
- * bucketed by root. Line comments are stripped so a commented import can't leak
- * in. Used to build the minimal registry manifest (seed of the future CLI).
+ * bucketed by root. Block and line comments are stripped (URLs preserved) so a
+ * commented import can't leak in. Used to build the minimal registry manifest
+ * (seed of the future CLI).
  */
 export function scanInternalDeps(text) {
-  const withoutLineComments = text.replace(/\/\/.*$/gm, '');
+  const withoutComments = text
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(?<!:)\/\/.*$/gm, '');
   const deps = { components: new Set(), lib: new Set(), hooks: new Set() };
   const importRe = /@\/(components|lib|hooks)\/([\w-]+)/g;
   let match;
-  while ((match = importRe.exec(withoutLineComments)) !== null) {
+  while ((match = importRe.exec(withoutComments)) !== null) {
     deps[match[1]].add(match[2]);
   }
   return {
@@ -766,15 +818,44 @@ function writeRootScaffold(outDir, config, manifest) {
   );
 }
 
+/** True if `child` is `parent` itself or nested inside it. */
+function isPathWithin(parent, child) {
+  const rel = path.relative(parent, child);
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+}
+
+/** True if a `.git` entry exists anywhere within `dir` (skips node_modules). */
+function containsGitDir(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'node_modules') {
+      continue;
+    }
+    if (entry.name === '.git') {
+      return true;
+    }
+    if (entry.isDirectory() && containsGitDir(path.join(dir, entry.name))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /** Resolve + prepare the output directory (refuse a non-empty target unless --force). */
 function prepareOutDir(out, force) {
   const outDir = path.resolve(process.cwd(), out);
+  // Never let --force `rmSync` a directory that is (or contains) this repo or
+  // the cwd — `--out=..` would otherwise wipe the repo's parent.
+  if (isPathWithin(outDir, REPO_ROOT) || isPathWithin(outDir, process.cwd())) {
+    throw new Error(
+      `Refusing to export into "${outDir}": it is or contains this repo / the current directory.`
+    );
+  }
   if (fs.existsSync(outDir) && fs.readdirSync(outDir).length > 0) {
     if (!force) {
       throw new Error(`Output dir "${outDir}" is not empty. Pass --force to overwrite.`);
     }
-    if (fs.existsSync(path.join(outDir, '.git'))) {
-      throw new Error(`Refusing to overwrite "${outDir}": it looks like a git repo.`);
+    if (containsGitDir(outDir)) {
+      throw new Error(`Refusing to overwrite "${outDir}": it contains a git repository.`);
     }
     fs.rmSync(outDir, { recursive: true, force: true });
   }

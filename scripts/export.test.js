@@ -10,6 +10,8 @@ import {
   parseExportArgs,
   rebrandContent,
   renderAppAppearanceExample,
+  renderReadme,
+  renderRootPackageJson,
   scanInternalDeps,
   transformReactPackageJson,
   transformTailwindPackageJson,
@@ -30,7 +32,14 @@ const VALID_CHOICES = {
   borderwidth: ['fine', 'normal', 'strong'],
   shadow: ['flat', 'quiet', 'soft', 'standard', 'strong'],
   motion: ['snappy'],
-  spacingDefault: [],
+  spacingDefault: [
+    'comfortable',
+    'compact',
+    'default',
+    'relaxed',
+    'spacious',
+    'tight',
+  ],
 };
 
 const DEFAULTS = {
@@ -80,6 +89,15 @@ describe('validateTokenConfig', () => {
     expect(() =>
       validateTokenConfig({ ...DEFAULTS, radius: 'octagon' }, VALID_CHOICES)
     ).toThrow(/Invalid --radius="octagon"\. Valid values: .*square/);
+  });
+
+  it('rejects an unknown spacingDefault against discovered modes', () => {
+    expect(() =>
+      validateTokenConfig(
+        { ...DEFAULTS, spacingDefault: 'roomy' },
+        VALID_CHOICES
+      )
+    ).toThrow(/Invalid --spacingDefault="roomy"\. Valid values: .*default/);
   });
 });
 
@@ -213,6 +231,23 @@ describe('transformReactPackageJson', () => {
     expect(source.name).toBe('@nexus_ds/react');
     expect(source.private).toBe(true);
   });
+
+  it('throws on an un-forked @nexus_ds/* dep in the produced manifest', () => {
+    const withStray = {
+      ...source,
+      dependencies: {
+        ...source.dependencies,
+        '@nexus_ds/icons': 'workspace:*',
+      },
+    };
+    expect(() =>
+      transformReactPackageJson(withStray, {
+        scope: '@examlly',
+        coreVersion: '0.1.0',
+        version: '0.1.0',
+      })
+    ).toThrow(/Unhandled @nexus_ds\/\* dependency.*@nexus_ds\/icons/);
+  });
 });
 
 describe('transformTailwindPackageJson', () => {
@@ -318,10 +353,52 @@ describe('discoverTokenChoices', () => {
     for (const f of ['radius-square.json', 'radius-round.json']) {
       fs.writeFileSync(path.join(radiusDir, f), '{}');
     }
+    for (const f of ['spacing-default.json', 'spacing-compact.json']) {
+      fs.writeFileSync(path.join(semantic, f), '{}');
+    }
 
     const choices = discoverTokenChoices(root);
     expect(choices.base).toEqual(['slate', 'stone']);
     expect(choices.brand).toEqual(['blue']);
     expect(choices.radius).toEqual(['round', 'square']);
+    expect(choices.spacingDefault).toEqual(['compact', 'default']);
+  });
+});
+
+describe('renderRootPackageJson', () => {
+  it('wires scripts, toolchain, eslint-plugin range, and overrides', () => {
+    const pkg = renderRootPackageJson({
+      name: 'acme-ds',
+      scope: '@acme',
+      eslintPluginVersion: '0.2.0',
+      toolchain: { eslint: '^9.0.0', typescript: '^5.5.0' },
+      overrides: { 'some-dep': '1.2.3' },
+    });
+    expect(pkg.name).toBe('acme-ds');
+    expect(pkg.private).toBe(true);
+    expect(pkg.devDependencies['@nexus_ds/eslint-plugin']).toBe('^0.2.0');
+    expect(pkg.devDependencies.eslint).toBe('^9.0.0');
+    expect(pkg.scripts.storybook).toBe('pnpm --filter @acme/react storybook');
+    expect(pkg.scripts['build-storybook']).toBe(
+      'pnpm --filter @acme/react build-storybook'
+    );
+    expect(pkg.pnpm.overrides).toEqual({ 'some-dep': '1.2.3' });
+  });
+});
+
+describe('renderReadme', () => {
+  it('documents both packages, the token table, and tailwind-before-react publish order', () => {
+    const readme = renderReadme({
+      name: 'acme-ds',
+      scope: '@acme',
+      tokenConfig: { ...DEFAULTS, base: 'slate' },
+    });
+    expect(readme).toContain('# acme-ds');
+    expect(readme).toContain('`@acme/react`');
+    expect(readme).toContain('`@acme/tailwind`');
+    expect(readme).toContain('| `base` | `slate` |');
+    expect(readme.indexOf('@acme/tailwind publish')).toBeLessThan(
+      readme.indexOf('@acme/react publish')
+    );
   });
 });
