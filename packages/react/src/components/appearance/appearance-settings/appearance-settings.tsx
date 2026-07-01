@@ -107,6 +107,7 @@ function FontSizeInput({
   ariaLabel: string;
 }) {
   const [draft, setDraft] = useState(String(value));
+  // Re-sync the draft when the committed value changes, during render (no effect).
   const [lastValue, setLastValue] = useState(value);
   if (value !== lastValue) {
     setLastValue(value);

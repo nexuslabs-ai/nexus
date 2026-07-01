@@ -4,17 +4,19 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
+const APPEARANCE_PROVIDER_DIST_DIR = 'components/appearance/provider';
+
 const APPEARANCE_DECLARATION_ENTRIES = [
   {
-    source: '/dist/appearance/index.d.ts',
-    sourceMap: '/dist/appearance/index.d.ts.map',
+    source: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/index.d.ts`,
+    sourceMap: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/index.d.ts.map`,
     output: 'appearance.d.ts',
     outputMap: 'appearance.d.ts.map',
     mapSource: 'index.d.ts.map',
   },
   {
-    source: '/dist/appearance/server.d.ts',
-    sourceMap: '/dist/appearance/server.d.ts.map',
+    source: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/server.d.ts`,
+    sourceMap: `/dist/${APPEARANCE_PROVIDER_DIST_DIR}/server.d.ts.map`,
     output: 'appearance-server.d.ts',
     outputMap: 'appearance-server.d.ts.map',
     mapSource: 'server.d.ts.map',
@@ -28,7 +30,7 @@ function rewriteAppearanceDeclaration(filePath: string, content: string) {
     return {
       filePath,
       content: content.replace(
-        /from '\.\/components\/ui\/([^']+)'/g,
+        /from '\.\/components\/([^']+)'/g,
         (match, entry: string) =>
           entry.endsWith('/index')
             ? match
@@ -42,7 +44,10 @@ function rewriteAppearanceDeclaration(filePath: string, content: string) {
       return {
         filePath: path.resolve(__dirname, 'dist', entry.output),
         content: content
-          .replace(/from '\.\/([^']+)'/g, "from './appearance/$1'")
+          .replace(
+            /from '\.\/([^']+)'/g,
+            `from './${APPEARANCE_PROVIDER_DIST_DIR}/$1'`
+          )
           .replace(
             `//# sourceMappingURL=${entry.mapSource}`,
             `//# sourceMappingURL=${entry.outputMap}`

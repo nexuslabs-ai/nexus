@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Input } from '@/components/input';
 
-interface NexusAppearanceColorFieldProps {
+export interface NexusAppearanceColorFieldProps {
   value: string;
   onChange: (hex: string) => void;
   label: string;
