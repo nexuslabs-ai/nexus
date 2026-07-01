@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconArrowRight, IconRocket, IconStar } from '@tabler/icons-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../../stories/story-height-test-utils';
+import { expectHeightPinned } from '../../stories/story-height-test-utils';
 
 import { Button } from './button';
 

@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../../stories/story-height-test-utils';
+import { expectHeightPinned } from '../../stories/story-height-test-utils';
 import {
   Card,
   CardContent,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, within } from 'storybook/test';
 
-import { expectHeightPinned } from '../../../stories/story-height-test-utils';
+import { expectHeightPinned } from '../../stories/story-height-test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
 
