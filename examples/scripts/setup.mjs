@@ -113,6 +113,9 @@ async function main() {
     publishDesignSystem();
     if (fs.existsSync(path.join(APP_DIR, 'package.json'))) {
       installConsumerApp();
+      // Regenerate the editor's combined IntelliSense design system from the
+      // freshly installed @acme/tailwind (see app/.vscode/settings.json).
+      run('node', ['scripts/gen-intellisense-css.mjs'], APP_DIR);
     } else {
       console.log(`\n⚠ ${path.relative(REPO_ROOT, APP_DIR)} not found yet — skipping app install.`);
     }
