@@ -11,6 +11,7 @@
  * `import.meta.url` guard so importing this module runs nothing.
  */
 
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -840,20 +841,27 @@ function containsGitDir(dir) {
   return false;
 }
 
+/** True if `dir` is git-ignored — throwaway output safe to write/rmSync. */
+function isGitIgnored(dir) {
+  return spawnSync('git', ['check-ignore', '-q', dir], { cwd: REPO_ROOT }).status === 0;
+}
+
 /** Resolve + prepare the output directory (refuse a non-empty target unless --force). */
 function prepareOutDir(out, force) {
   const outDir = path.resolve(process.cwd(), out);
-  // Never let --force `rmSync` a directory entangled with this repo or the cwd:
-  // `--out=..` would wipe the repo's parent, and `--out=packages` would wipe
-  // tracked source *inside* the repo — the single root `.git` can't guard a
-  // subdir, so refuse both directions relative to REPO_ROOT.
-  if (
-    isPathWithin(outDir, REPO_ROOT) ||
-    isPathWithin(REPO_ROOT, outDir) ||
-    isPathWithin(outDir, process.cwd())
-  ) {
+  // `--force` does an rmSync, so never allow a target that *contains* this repo
+  // or the cwd — `--out=..` would wipe the repo's parent.
+  if (isPathWithin(outDir, REPO_ROOT) || isPathWithin(outDir, process.cwd())) {
     throw new Error(
-      `Refusing to export into "${outDir}": it overlaps this repo / the current directory.`
+      `Refusing to export into "${outDir}": it contains this repo / the current directory.`
+    );
+  }
+  // A target *inside* the repo is allowed only when git-ignored (throwaway output
+  // like examples/.generated/) — never tracked source such as packages/ or apps/.
+  if (isPathWithin(REPO_ROOT, outDir) && !isGitIgnored(outDir)) {
+    throw new Error(
+      `Refusing to export into "${outDir}": it is tracked content inside this repo. ` +
+        `Use a git-ignored path (e.g. examples/.generated/...) or a dir outside the repo.`
     );
   }
   if (fs.existsSync(outDir) && fs.readdirSync(outDir).length > 0) {
