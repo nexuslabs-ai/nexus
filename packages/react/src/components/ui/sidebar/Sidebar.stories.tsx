@@ -463,6 +463,9 @@ export const StylingContracts: Story = {
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupAction aria-label="Add platform">
+              <IconPlus />
+            </SidebarGroupAction>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -470,6 +473,9 @@ export const StylingContracts: Story = {
                     <IconHome />
                     <span>Active</span>
                   </SidebarMenuButton>
+                  <SidebarMenuAction aria-label="More actions">
+                    <IconDots />
+                  </SidebarMenuAction>
                   <SidebarMenuBadge>4</SidebarMenuBadge>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
@@ -508,11 +514,39 @@ export const StylingContracts: Story = {
     </SidebarProvider>
   ),
   play: async ({ canvasElement }) => {
+    const gap = getRequiredElement(canvasElement, '[data-slot="sidebar-gap"]');
+    await expect(gap).toHaveClass('nx:duration-default');
+    await expect(gap).toHaveClass('nx:ease-linear');
+    await expect(gap).toHaveClass('nx:motion-reduce:transition-none');
+
+    const container = getRequiredElement(
+      canvasElement,
+      '[data-slot="sidebar-container"]'
+    );
+    await expect(container).toHaveClass('nx:duration-default');
+    await expect(container).toHaveClass('nx:ease-linear');
+    await expect(container).toHaveClass('nx:motion-reduce:transition-none');
+
+    const rail = getRequiredElement(
+      canvasElement,
+      '[data-slot="sidebar-rail"]'
+    );
+    await expect(rail).toHaveClass(
+      'nx:transition-[left,right,translate,background-color]'
+    );
+    await expect(rail).toHaveClass('nx:duration-fast');
+    await expect(rail).toHaveClass('nx:ease-linear');
+    await expect(rail).toHaveClass('nx:motion-reduce:transition-none');
+    await expect(rail).not.toHaveClass('nx:transition-all');
+
     const groupLabel = getRequiredElement(
       canvasElement,
       '[data-slot="sidebar-group-label"]'
     );
     await expect(groupLabel).toHaveClass('nx:typography-label-small');
+    await expect(groupLabel).toHaveClass('nx:duration-default');
+    await expect(groupLabel).toHaveClass('nx:ease-linear');
+    await expect(groupLabel).toHaveClass('nx:motion-reduce:transition-none');
     await expect(groupLabel).not.toHaveClass('nx:font-medium');
 
     const groupContent = getRequiredElement(
@@ -535,6 +569,8 @@ export const StylingContracts: Story = {
     );
 
     await expect(defaultButton).toHaveClass('nx:typography-body-default');
+    await expect(defaultButton).toHaveClass('nx:duration-fast');
+    await expect(defaultButton).toHaveClass('nx:motion-reduce:transition-none');
     await expect(defaultButton).toHaveClass(
       'nx:data-[active=true]:text-nav-foreground'
     );
@@ -595,6 +631,18 @@ export const StylingContracts: Story = {
     );
     await expect(badge).toHaveClass('nx:typography-label-small');
     await expect(badge).not.toHaveClass('nx:font-medium');
+
+    const groupAction = getRequiredElement(
+      canvasElement,
+      '[data-slot="sidebar-group-action"]'
+    );
+    await expect(groupAction).not.toHaveClass('nx:transition-transform');
+
+    const menuAction = getRequiredElement(
+      canvasElement,
+      '[data-slot="sidebar-menu-action"]'
+    );
+    await expect(menuAction).not.toHaveClass('nx:transition-transform');
 
     const defaultSubButton = getRequiredElement(
       canvasElement,

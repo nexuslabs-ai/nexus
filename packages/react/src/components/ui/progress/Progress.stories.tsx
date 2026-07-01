@@ -82,6 +82,9 @@ export const Indeterminate: Story = {
     await expect(getComputedStyle(indicator as Element).animationName).toBe(
       'progress-indeterminate'
     );
+    await expect(getComputedStyle(indicator as Element).animationDuration).toBe(
+      '1.5s'
+    );
     await expect(indicator).toHaveClass(
       'nx:motion-reduce:data-[state=indeterminate]:animate-none'
     );
@@ -106,6 +109,8 @@ export const WithDataAttributes: Story = {
     // value is forwarded to the Radix root, so it reports a determinate value
     await expect(progress).toHaveAttribute('aria-valuenow', '40');
     await expect(indicator).toHaveAttribute('data-state', 'loading');
+    await expect(indicator).toHaveClass('nx:duration-fast');
+    await expect(indicator).toHaveClass('nx:motion-reduce:transition-none');
   },
 };
 

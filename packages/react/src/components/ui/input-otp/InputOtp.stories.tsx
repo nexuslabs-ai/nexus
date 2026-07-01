@@ -116,6 +116,19 @@ export const ClickInteraction: Story = {
 
     await userEvent.click(input!);
     await expect(input).toHaveFocus();
+
+    const slot = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="input-otp-slot"]'
+    );
+    const caret = canvasElement.querySelector<HTMLElement>(
+      '[class~="nx:animate-caret-blink"]'
+    );
+
+    await expect(slot).toHaveClass('nx:duration-fast');
+    await expect(slot).toHaveClass('nx:motion-reduce:transition-none');
+    await expect(caret).toHaveClass('nx:animate-caret-blink');
+    await expect(caret).toHaveClass('nx:motion-reduce:animate-none');
+    await expect(caret).not.toHaveClass('nx:duration-1000');
   },
 };
 

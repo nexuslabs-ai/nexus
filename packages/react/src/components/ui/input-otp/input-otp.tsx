@@ -120,7 +120,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
         'nx:relative nx:flex nx:size-10 nx:items-center nx:justify-center',
         'nx:border-y-default nx:border-r-default nx:border-border-default',
         'nx:group-has-[:disabled]/input-otp:border-border-disabled nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
-        'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-all',
+        'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-all nx:duration-fast nx:motion-reduce:transition-none',
         'nx:first:rounded-l-md nx:first:border-l-default nx:last:rounded-r-md',
         'nx:data-[active=true]:z-10 nx:data-[active=true]:outline-2 nx:data-[active=true]:outline-focus-default nx:data-[active=true]:outline-offset-(--focus-offset)',
         className
@@ -130,7 +130,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       {char}
       {hasFakeCaret && (
         <div className="nx:pointer-events-none nx:absolute nx:inset-0 nx:flex nx:items-center nx:justify-center">
-          <div className="nx:h-4 nx:w-px nx:animate-caret-blink nx:bg-foreground nx:duration-1000 nx:motion-reduce:animate-none" />
+          <div className="nx:h-4 nx:w-px nx:animate-caret-blink nx:bg-foreground nx:motion-reduce:animate-none" />
         </div>
       )}
     </div>
