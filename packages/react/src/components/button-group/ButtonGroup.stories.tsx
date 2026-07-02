@@ -309,6 +309,16 @@ export const AsChild: Story = {
     const link = within(canvasElement).getByRole('link', { name: 'Docs' });
     await expect(link.tagName).toBe('A');
     await expect(link).toHaveAttribute('data-slot', 'button-group-text');
+    await expect(link).toHaveClass('nx:focus-visible:outline-2');
+    await expect(link).toHaveClass('nx:focus-visible:outline-focus-default');
+    await expect(link).toHaveClass(
+      'nx:focus-visible:outline-offset-(--focus-offset)'
+    );
+    await expect(link).toHaveClass('nx:transition-colors');
+    await expect(link).toHaveClass('nx:duration-fast');
+    await expect(link).toHaveClass('nx:motion-reduce:transition-none');
+    await expect(link).toHaveClass('nx:hover:bg-control-background-hover');
+    await expect(link).toHaveClass('nx:active:bg-background-active');
   },
 };
 
@@ -371,6 +381,77 @@ export const SplitButton: Story = {
     );
     await expect(trigger).toBeInTheDocument();
     await expect(trigger).toHaveAttribute('data-slot', 'button');
+  },
+};
+
+export const TierAPolishEvidence: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'ButtonGroup Tier-A polish contract: focus-visible addon links, tokenized color motion with reduced-motion fallback, inherited loading/disabled button states, and vertical density evidence.',
+      },
+    },
+  },
+  render: () => (
+    <div className="nx:flex nx:flex-col nx:items-start nx:gap-4 nx:bg-background nx:p-10">
+      <ButtonGroup aria-label="document actions">
+        <ButtonGroupText asChild>
+          <a href="https://example.com/docs">Docs</a>
+        </ButtonGroupText>
+        <Button variant="outline">Open</Button>
+        <Button variant="outline" loading>
+          Saving
+        </Button>
+        <Button variant="outline" disabled>
+          Disabled
+        </Button>
+      </ButtonGroup>
+
+      <ButtonGroup orientation="vertical" size="sm" aria-label="format density">
+        <Button variant="outline">Bold</Button>
+        <Button variant="outline">Italic</Button>
+        <Button variant="outline">Underline</Button>
+      </ButtonGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const horizontalGroup = canvas.getByRole('group', {
+      name: 'document actions',
+    });
+    const verticalGroup = canvas.getByRole('group', {
+      name: 'format density',
+    });
+    const link = canvas.getByRole('link', { name: 'Docs' });
+    const loadingButton = canvas.getByRole('button', { name: 'Saving' });
+    const disabledButton = canvas.getByRole('button', { name: 'Disabled' });
+
+    await expect(horizontalGroup).toHaveAttribute(
+      'data-orientation',
+      'horizontal'
+    );
+    await expect(horizontalGroup).toHaveAttribute('data-size', 'default');
+    await expect(verticalGroup).toHaveAttribute('data-orientation', 'vertical');
+    await expect(verticalGroup).toHaveAttribute('data-size', 'sm');
+    for (const button of within(verticalGroup).getAllByRole('button')) {
+      await expect(button).toHaveAttribute('data-size', 'sm');
+    }
+
+    await expect(link).toHaveClass('nx:transition-colors');
+    await expect(link).toHaveClass('nx:duration-fast');
+    await expect(link).toHaveClass('nx:motion-reduce:transition-none');
+    await expect(link).toHaveClass('nx:focus-visible:outline-2');
+    await expect(link).toHaveClass('nx:hover:bg-control-background-hover');
+    await expect(link).toHaveClass('nx:active:bg-background-active');
+
+    await expect(loadingButton).toHaveAttribute('data-loading', 'true');
+    await expect(loadingButton).toHaveAttribute('aria-busy', 'true');
+    await expect(loadingButton).toHaveAttribute('aria-disabled', 'true');
+    await expect(loadingButton).toHaveClass('nx:transition-colors');
+
+    await expect(disabledButton).toBeDisabled();
+    await expect(disabledButton).toHaveAttribute('aria-disabled', 'true');
   },
 };
 
