@@ -318,6 +318,22 @@ describe('appearancePrefsToCss', () => {
     expect(css).toContain('-webkit-font-smoothing: antialiased');
   });
 
+  it('pairs -moz-osx-font-smoothing with the -webkit property', () => {
+    const on = appearancePrefsToCss({
+      ...prefs,
+      fontSmoothing: true,
+    });
+    expect(on).toContain('-webkit-font-smoothing: antialiased');
+    expect(on).toContain('-moz-osx-font-smoothing: grayscale');
+
+    const off = appearancePrefsToCss({
+      ...prefs,
+      fontSmoothing: false,
+    });
+    expect(off).toContain('-webkit-font-smoothing: auto');
+    expect(off).toContain('-moz-osx-font-smoothing: auto');
+  });
+
   it('keeps default runtime typography variables in parity with generated tokens', () => {
     const generatedCss = readFileSync(
       resolve(process.cwd(), 'packages/tailwind/variables.css'),
