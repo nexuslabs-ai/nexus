@@ -128,6 +128,15 @@ export const WithDataAttributes: Story = {
   },
 };
 
+export const ThumbTouchTarget: Story = {
+  render: () => <Slider defaultValue={[50]} aria-label="Volume" />,
+  play: async ({ canvasElement }) => {
+    const thumb = canvasElement.querySelector('[role="slider"]');
+
+    await expect(thumb).toHaveClass('nx:pointer-coarse:after:-inset-2');
+  },
+};
+
 // aria-invalid surfaces the error focus ring on the thumb. It is forwarded to
 // every role="slider" element, so a two-thumb range reddens both.
 export const Invalid: Story = {
