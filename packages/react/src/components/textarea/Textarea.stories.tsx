@@ -219,7 +219,10 @@ export const BorderlessStates: Story = {
 
     await expect(empty).toHaveAttribute('data-variant', 'borderless');
     await expect(empty).toHaveClass('nx:border-transparent');
-    await expect(empty).toHaveClass('nx:bg-background-hover-alpha');
+    await expect(empty).toHaveClass('nx:bg-control-background');
+    await expect(empty).toHaveClass(
+      'nx:enabled:hover:bg-control-background-hover'
+    );
 
     await expect(readOnly).toHaveAttribute('readonly');
     await expect(readOnly).not.toBeDisabled();

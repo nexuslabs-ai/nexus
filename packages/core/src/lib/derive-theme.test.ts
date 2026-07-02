@@ -606,7 +606,7 @@ describe('alpha and translucent colors', () => {
       'oklch(0.13 0.0400 264.7 / 0.0627)'
     );
     expect(dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(1 0 0 / 0.0627)'
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
     );
     expect(light['--nx-color-popover-alpha']).toBe('oklch(1 0 0 / 0.7529)');
     expect(dark['--nx-color-popover-alpha']).toBe(
@@ -683,19 +683,19 @@ describe('alpha and translucent colors', () => {
       'oklch(0.13 0.0400 264.7 / 0.035)'
     );
     expect(at(0).dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(1 0 0 / 0.04)'
+      'oklch(0.13 0.0400 264.7 / 0.04)'
     );
     expect(at(60).light['--nx-color-background-hover-alpha']).toBe(
       'oklch(0.13 0.0400 264.7 / 0.0627)'
     );
     expect(at(60).dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(1 0 0 / 0.0627)'
+      'oklch(0.13 0.0400 264.7 / 0.0627)'
     );
     expect(at(100).light['--nx-color-background-hover-alpha']).toBe(
       'oklch(0.13 0.0400 264.7 / 0.085)'
     );
     expect(at(100).dark['--nx-color-background-hover-alpha']).toBe(
-      'oklch(1 0 0 / 0.09)'
+      'oklch(0.13 0.0400 264.7 / 0.09)'
     );
     expect(at(0).dark['--nx-color-overlay']).toBe(
       at(100).dark['--nx-color-overlay']

@@ -85,7 +85,7 @@ html.dark {
   --nx-color-background: var(--nx-color-slate-950);
   --nx-color-foreground: var(--nx-color-white-a900);
   --nx-color-background-hover: var(--nx-color-slate-900);
-  --nx-color-background-hover-alpha: var(--nx-color-white-a100);
+  --nx-color-background-hover-alpha: var(--nx-color-slate-a100);
   --nx-color-background-active: var(--nx-color-slate-900);
   --nx-color-muted: var(--nx-color-slate-900);
   --nx-color-muted-foreground: var(--nx-color-white-a600);

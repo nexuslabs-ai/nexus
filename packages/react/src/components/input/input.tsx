@@ -24,7 +24,8 @@ const inputVariants = cva(
       variant: {
         default:
           'nx:border-color-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-color-disabled',
-        borderless: 'nx:border-transparent nx:bg-background-hover-alpha',
+        borderless:
+          'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
       },
     },
     defaultVariants: {
