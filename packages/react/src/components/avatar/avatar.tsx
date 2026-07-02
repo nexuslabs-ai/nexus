@@ -5,29 +5,32 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
-const avatarVariants = cva('nx:relative nx:flex nx:shrink-0', {
-  variants: {
-    size: {
-      '2xs': 'nx:size-5 nx:text-[0.625rem]',
-      xs: 'nx:size-6 nx:text-[0.6875rem]',
-      sm: 'nx:size-8 nx:text-[0.75rem]',
-      md: 'nx:size-10 nx:text-[1rem]',
-      lg: 'nx:size-12 nx:text-[1.125rem]',
-      xl: 'nx:size-14 nx:text-[1.25rem]',
-      '2xl': 'nx:size-16 nx:text-[1.5rem]',
-      '3xl': 'nx:size-20 nx:text-[1.875rem]',
-      '4xl': 'nx:size-24 nx:text-[2.25rem]',
+const avatarVariants = cva(
+  'nx:relative nx:flex nx:shrink-0 nx:after:pointer-events-none nx:after:absolute nx:after:inset-0 nx:after:rounded-[inherit] nx:after:outline nx:after:outline-1 nx:after:-outline-offset-1 nx:after:outline-black/10 nx:dark:after:outline-white/10',
+  {
+    variants: {
+      size: {
+        '2xs': 'nx:size-5 nx:text-[0.625rem]',
+        xs: 'nx:size-6 nx:text-[0.6875rem]',
+        sm: 'nx:size-8 nx:text-[0.75rem]',
+        md: 'nx:size-10 nx:text-[1rem]',
+        lg: 'nx:size-12 nx:text-[1.125rem]',
+        xl: 'nx:size-14 nx:text-[1.25rem]',
+        '2xl': 'nx:size-16 nx:text-[1.5rem]',
+        '3xl': 'nx:size-20 nx:text-[1.875rem]',
+        '4xl': 'nx:size-24 nx:text-[2.25rem]',
+      },
+      shape: {
+        circle: 'nx:rounded-full',
+        rounded: 'nx:rounded-lg',
+      },
     },
-    shape: {
-      circle: 'nx:rounded-full',
-      rounded: 'nx:rounded-lg',
+    defaultVariants: {
+      size: 'md',
+      shape: 'circle',
     },
-  },
-  defaultVariants: {
-    size: 'md',
-    shape: 'circle',
-  },
-});
+  }
+);
 
 type AvatarGroupContextValue = Pick<
   VariantProps<typeof avatarVariants>,

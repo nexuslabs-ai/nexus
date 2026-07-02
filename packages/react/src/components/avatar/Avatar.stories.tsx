@@ -144,6 +144,53 @@ export const DefaultDataAttributes: Story = {
   },
 };
 
+export const ImageHairline: Story = {
+  render: () => (
+    <Avatar>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
+    </Avatar>
+  ),
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-slot="avatar"]');
+    const image = await waitFor(() => {
+      const img = canvasElement.querySelector('[data-slot="avatar-image"]');
+      if (!img) throw new Error('avatar image has not mounted yet');
+      return img;
+    });
+
+    await expect(root).toHaveClass('nx:after:outline-black/10');
+    await expect(root).toHaveClass('nx:dark:after:outline-white/10');
+    await expect(root).toHaveClass('nx:after:-outline-offset-1');
+    await expect(image).not.toHaveClass('nx:after:outline-black/10');
+  },
+};
+
+export const ImageHairlineLightDark: Story = {
+  render: () => (
+    <div className="nx:grid nx:grid-cols-2 nx:gap-4">
+      <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
+        <Avatar>
+          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+        <Avatar shape="rounded">
+          <AvatarFallback>JD</AvatarFallback>
+        </Avatar>
+      </div>
+      <div className="dark nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
+        <Avatar>
+          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+        <Avatar shape="rounded">
+          <AvatarFallback>JD</AvatarFallback>
+        </Avatar>
+      </div>
+    </div>
+  ),
+};
+
 export const WithFallback: Story = {
   render: (_args) => (
     <Avatar role="img" aria-label="Ada Lovelace">

@@ -115,6 +115,28 @@ export const Media: Story = {
   ),
 };
 
+export const MediaImageHairline: Story = {
+  render: () => (
+    <Item>
+      <ItemMedia variant="image">
+        <img
+          src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="
+          alt=""
+        />
+      </ItemMedia>
+    </Item>
+  ),
+  play: async ({ canvasElement }) => {
+    const media = canvasElement.querySelector('[data-slot="item-media"]');
+    const image = canvasElement.querySelector('img');
+
+    await expect(media).toHaveClass('nx:after:outline-black/10');
+    await expect(media).toHaveClass('nx:dark:after:outline-white/10');
+    await expect(media).toHaveClass('nx:after:-outline-offset-1');
+    await expect(image).not.toHaveClass('nx:after:outline-black/10');
+  },
+};
+
 // A grouped list divided by separators.
 export const Grouped: Story = {
   render: () => (
