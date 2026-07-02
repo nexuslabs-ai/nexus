@@ -111,6 +111,20 @@ export const Horizontal: Story = {
   ),
 };
 
+export const TouchTarget: Story = {
+  render: () => (
+    <RadioGroup defaultValue="a">
+      <RadioGroupItem value="a" aria-label="A" />
+    </RadioGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const item = canvasElement.querySelector('[data-slot="radio-group-item"]');
+
+    await expect(item).toHaveClass('nx:relative');
+    await expect(item).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
+  },
+};
+
 // ============================================
 // INTERACTION TESTS
 // ============================================
