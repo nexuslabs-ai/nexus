@@ -235,7 +235,7 @@ function Slider({
     >
       <SliderPrimitive.Track
         data-slot="slider-track"
-        className="nx:relative nx:grow nx:overflow-hidden nx:rounded-full nx:border-default nx:border-border-default nx:bg-control-background nx:data-disabled:border-border-disabled nx:data-disabled:bg-disabled nx:data-[orientation=horizontal]:h-3 nx:data-[orientation=horizontal]:w-full nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:w-3"
+        className="nx:relative nx:grow nx:overflow-hidden nx:rounded-full nx:border-default nx:border-border-default nx:bg-control-background nx:data-disabled:border-border-disabled nx:data-disabled:bg-disabled nx:data-[orientation=horizontal]:h-4 nx:data-[orientation=horizontal]:w-full nx:data-[orientation=vertical]:h-full nx:data-[orientation=vertical]:w-4"
       >
         {stepValues.map((stepValue) => (
           <span
