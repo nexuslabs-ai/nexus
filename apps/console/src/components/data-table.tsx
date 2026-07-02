@@ -1,10 +1,6 @@
 import { useState } from 'react';
 
 import {
-  Button,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -12,11 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from '@nexus_ds/react';
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconSearch,
-} from '@tabler/icons-react';
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -28,6 +19,9 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
+
+import { DataPager } from './data-pager';
+import { FilterInput } from './filter-input';
 
 /**
  * Generic, app-level data table — the canonical recipe of headless
@@ -88,17 +82,11 @@ export function DataTable<TData>({
   return (
     <div className="nx:space-y-4">
       {filterControl && (
-        <InputGroup className="nx:max-w-xs">
-          <InputGroupAddon>
-            <IconSearch />
-          </InputGroupAddon>
-          <InputGroupInput
-            placeholder={filterPlaceholder ?? 'Filter…'}
-            value={(filterControl.getFilterValue() as string) ?? ''}
-            onChange={(e) => filterControl.setFilterValue(e.target.value)}
-            aria-label={filterPlaceholder ?? 'Filter'}
-          />
-        </InputGroup>
+        <FilterInput
+          value={(filterControl.getFilterValue() as string) ?? ''}
+          onChange={(value) => filterControl.setFilterValue(value)}
+          placeholder={filterPlaceholder}
+        />
       )}
 
       <div className="nx:border-border-default nx:overflow-hidden nx:rounded-md nx:border-default">
@@ -150,37 +138,18 @@ export function DataTable<TData>({
         </Table>
       </div>
 
-      {/* App-local pager — the polished @nexus_ds/react Pagination is tracked in #281. */}
-      <div className="nx:flex nx:items-center nx:justify-between nx:gap-4">
-        <p className="nx:text-muted-foreground nx:typography-body-default">
-          {enableSelection
+      <DataPager
+        page={pageIndex}
+        pageCount={Math.max(table.getPageCount(), 1)}
+        total={totalCount}
+        summary={
+          enableSelection
             ? `${selectedCount} of ${totalCount} row(s) selected.`
-            : `${totalCount} row(s)`}
-        </p>
-        <div className="nx:flex nx:items-center nx:gap-3">
-          <span className="nx:text-muted-foreground nx:typography-label-default">
-            Page {pageIndex + 1} of {Math.max(table.getPageCount(), 1)}
-          </span>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            aria-label="Previous page"
-          >
-            <IconChevronLeft />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            aria-label="Next page"
-          >
-            <IconChevronRight />
-          </Button>
-        </div>
-      </div>
+            : undefined
+        }
+        onPrev={() => table.previousPage()}
+        onNext={() => table.nextPage()}
+      />
     </div>
   );
 }
