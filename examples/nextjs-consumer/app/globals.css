@@ -1,0 +1,9 @@
+/* The consumer app's OWN Tailwind v4 — standard, unprefixed, untouched by @acme.
+ * @acme's utilities are `nx:`-prefixed and its tokens are `--nx-*`, so nothing
+ * here collides with the design system. */
+@import 'tailwindcss';
+
+/* The app's own design tokens live in the default (unprefixed) namespace. */
+@theme {
+  --color-brand: oklch(0.55 0.2 280);
+}

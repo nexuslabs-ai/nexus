@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,6 +9,7 @@ import {
   deriveScope,
   discoverTokenChoices,
   parseExportArgs,
+  prepareOutDir,
   rebrandContent,
   renderAppAppearanceExample,
   renderReadme,
@@ -417,5 +419,98 @@ describe('renderReadme', () => {
     expect(readme.indexOf('@acme/tailwind publish')).toBeLessThan(
       readme.indexOf('@acme/react publish')
     );
+  });
+});
+
+describe('prepareOutDir', () => {
+  // A real temp git repo: the guard is git behavior (check-ignore / ls-files).
+  function initRepo() {
+    const repoRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'nexus-export-repo-')
+    );
+    tempDirs.push(repoRoot);
+    execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+    fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.generated/\n');
+    return repoRoot;
+  }
+
+  function tmpOutside() {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-export-out-'));
+    tempDirs.push(dir);
+    return dir;
+  }
+
+  it('allows a git-ignored, untracked dir inside the repo and creates it', () => {
+    const repoRoot = initRepo();
+    const out = path.join(repoRoot, '.generated', 'acme');
+    expect(prepareOutDir(out, false, { repoRoot, cwd: repoRoot })).toBe(out);
+    expect(fs.existsSync(out)).toBe(true);
+  });
+
+  it('refuses a tracked path inside the repo', () => {
+    const repoRoot = initRepo();
+    fs.mkdirSync(path.join(repoRoot, 'packages'));
+    fs.writeFileSync(path.join(repoRoot, 'packages', 'x.txt'), 'x');
+    execFileSync('git', ['add', 'packages/x.txt'], { cwd: repoRoot });
+    expect(() =>
+      prepareOutDir(path.join(repoRoot, 'packages'), true, {
+        repoRoot,
+        cwd: repoRoot,
+      })
+    ).toThrow(/holds git-tracked files/);
+  });
+
+  it('refuses an ignored dir that still holds a force-added tracked file', () => {
+    const repoRoot = initRepo();
+    const out = path.join(repoRoot, '.generated', 'acme');
+    fs.mkdirSync(out, { recursive: true });
+    fs.writeFileSync(path.join(out, 'keep.txt'), 'x');
+    execFileSync('git', ['add', '-f', '.generated/acme/keep.txt'], {
+      cwd: repoRoot,
+    });
+    expect(() => prepareOutDir(out, true, { repoRoot, cwd: repoRoot })).toThrow(
+      /holds git-tracked files/
+    );
+  });
+
+  it('refuses an untracked but non-ignored dir inside the repo', () => {
+    const repoRoot = initRepo();
+    expect(() =>
+      prepareOutDir(path.join(repoRoot, 'packages', 'oops'), true, {
+        repoRoot,
+        cwd: repoRoot,
+      })
+    ).toThrow(/inside this repo but not git-ignored/);
+  });
+
+  it('refuses a path that contains the repo', () => {
+    const repoRoot = initRepo();
+    expect(() =>
+      prepareOutDir(path.resolve(repoRoot, '..'), true, {
+        repoRoot,
+        cwd: repoRoot,
+      })
+    ).toThrow(/contains this repo/);
+  });
+
+  it('refuses to overwrite a non-empty dir that contains a nested .git', () => {
+    const repoRoot = initRepo();
+    const out = path.join(tmpOutside(), 'target');
+    fs.mkdirSync(path.join(out, '.git'), { recursive: true });
+    expect(() => prepareOutDir(out, true, { repoRoot, cwd: repoRoot })).toThrow(
+      /contains a git repository/
+    );
+  });
+
+  it('requires --force to overwrite a non-empty target', () => {
+    const repoRoot = initRepo();
+    const out = path.join(tmpOutside(), 'target');
+    fs.mkdirSync(out, { recursive: true });
+    fs.writeFileSync(path.join(out, 'stale.txt'), 'x');
+    expect(() =>
+      prepareOutDir(out, false, { repoRoot, cwd: repoRoot })
+    ).toThrow(/Pass --force to overwrite/);
+    expect(prepareOutDir(out, true, { repoRoot, cwd: repoRoot })).toBe(out);
+    expect(fs.readdirSync(out)).toHaveLength(0);
   });
 });

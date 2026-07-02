@@ -1,0 +1,153 @@
+/**
+ * examples/scripts/setup.mjs — end-to-end external-consumer integration test.
+ *
+ * Simulates the full "consumer gets our exported design system" flow with a
+ * local registry, so nothing touches public npm:
+ *
+ *   1. start Verdaccio (local npm registry, proxies npmjs)
+ *   2. `pnpm export` the design system into .generated/ (@acme scope)
+ *   3. install + build the exported @acme/react, then publish @acme/tailwind
+ *      then @acme/react to Verdaccio (publish order matters)
+ *   4. `npm install` the nextjs-consumer app against Verdaccio (@acme/* only;
+ *      everything else from real npm)
+ *
+ * After this, `cd examples/nextjs-consumer && npm run dev` runs fully offline —
+ * all deps are in node_modules. Re-run this script after changing the design
+ * system to republish + reinstall.
+ */
+
+import { spawn, spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const EXAMPLES_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const REPO_ROOT = path.resolve(EXAMPLES_DIR, '..');
+const GENERATED_DIR = path.join(EXAMPLES_DIR, '.generated', 'acme-design-system');
+const APP_DIR = path.join(EXAMPLES_DIR, 'nextjs-consumer');
+const REGISTRY = 'http://localhost:4873';
+const PORT = 4873;
+const SCOPE = '@acme';
+const NAME = 'acme-design-system';
+
+let verdaccioProc = null;
+
+function run(cmd, args, cwd) {
+  console.log(`\n$ ${cmd} ${args.join(' ')}  (${path.relative(REPO_ROOT, cwd) || '.'})`);
+  const res = spawnSync(cmd, args, { cwd, stdio: 'inherit', env: process.env });
+  if (res.status !== 0) {
+    throw new Error(`${cmd} ${args.join(' ')} exited ${res.status}`);
+  }
+}
+
+async function registryUp() {
+  try {
+    // Any HTTP response (even 4xx) means Verdaccio is listening. fetch() resolves
+    // localhost across IPv4/IPv6, so it doesn't matter which family it bound to.
+    const res = await fetch(REGISTRY, { method: 'GET' });
+    return res.status < 500;
+  } catch {
+    return false;
+  }
+}
+
+async function waitForRegistry(timeoutMs = 60000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (await registryUp()) {
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(`Verdaccio did not respond at ${REGISTRY} within ${timeoutMs}ms`);
+}
+
+async function startVerdaccio() {
+  if (await registryUp()) {
+    console.log(`ℹ Verdaccio already running at ${REGISTRY} — reusing it.`);
+    return;
+  }
+  console.log(`▶ starting Verdaccio at ${REGISTRY}`);
+  // `detached` makes the child a process-group leader so stopVerdaccio can signal
+  // the group — npx spawns verdaccio as a grandchild that would otherwise orphan.
+  verdaccioProc = spawn(
+    'npx',
+    ['--yes', 'verdaccio@6', '--config', path.join(EXAMPLES_DIR, 'verdaccio.yaml'), '--listen', String(PORT)],
+    { cwd: EXAMPLES_DIR, stdio: 'inherit', env: process.env, detached: true }
+  );
+  await waitForRegistry();
+}
+
+function stopVerdaccio() {
+  const proc = verdaccioProc;
+  verdaccioProc = null;
+  if (!proc?.pid) {
+    return;
+  }
+  try {
+    process.kill(-proc.pid, 'SIGTERM');
+  } catch {
+    proc.kill();
+  }
+}
+
+/** Export the design system into .generated/ (fresh each run). */
+function exportDesignSystem() {
+  run('node', ['scripts/export.mjs', `--name=${NAME}`, `--scope=${SCOPE}`, `--out=${GENERATED_DIR}`, '--force'], REPO_ROOT);
+}
+
+/** Install + build the exported react package, then publish both to Verdaccio. */
+function publishDesignSystem() {
+  run('pnpm', ['install'], GENERATED_DIR);
+  run('pnpm', ['--filter', `${SCOPE}/react`, 'build'], GENERATED_DIR);
+
+  // Anonymous publish is allowed by verdaccio.yaml ($all); npm still needs a
+  // token present, so seed a throwaway one scoped to the local registry.
+  const npmrc = path.join(GENERATED_DIR, '.npmrc');
+  const authLine = `//localhost:${PORT}/:_authToken=local-verdaccio-token\n`;
+  if (!fs.readFileSync(npmrc, 'utf8').includes(authLine)) {
+    fs.appendFileSync(npmrc, authLine);
+  }
+
+  // Order matters: react depends on @acme/tailwind, so tailwind publishes first.
+  for (const pkg of [`${SCOPE}/tailwind`, `${SCOPE}/react`]) {
+    run('pnpm', ['--filter', pkg, 'publish', '--registry', REGISTRY, '--no-git-checks'], GENERATED_DIR);
+  }
+}
+
+/** Install the consumer app. Its .npmrc scopes @acme/* to Verdaccio; every other
+ *  dependency resolves from the default (real) npm registry. */
+function installConsumerApp() {
+  run('npm', ['install'], APP_DIR);
+}
+
+async function main() {
+  // Ctrl-C won't reach the detached registry, and the default SIGINT skips `finally`.
+  for (const signal of ['SIGINT', 'SIGTERM']) {
+    process.once(signal, () => {
+      stopVerdaccio();
+      process.exit(130);
+    });
+  }
+  try {
+    await startVerdaccio();
+    exportDesignSystem();
+    publishDesignSystem();
+    if (fs.existsSync(path.join(APP_DIR, 'package.json'))) {
+      installConsumerApp();
+      // Regenerate the editor's combined IntelliSense design system from the
+      // freshly installed @acme/tailwind (see app/.vscode/settings.json).
+      run('node', ['scripts/gen-intellisense-css.mjs'], APP_DIR);
+    } else {
+      console.log(`\n⚠ ${path.relative(REPO_ROOT, APP_DIR)} not found yet — skipping app install.`);
+    }
+    console.log(`\n✅ setup complete. Next:\n   cd ${path.relative(process.cwd(), APP_DIR)} && npm run dev\n`);
+  } finally {
+    stopVerdaccio();
+  }
+}
+
+main().catch((error) => {
+  console.error(`\n✗ ${error.message}`);
+  process.exit(1);
+});

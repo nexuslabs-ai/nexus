@@ -1,0 +1,12 @@
+/* Incremental adoption — the design system's nx: theme, in a SEPARATE Tailwind
+ * entry from the app's own globals.css.
+ *
+ * Why separate: Tailwind v4's prefix is global *per compilation*, so two
+ * `@import 'tailwindcss'` with different prefixes can't share one stylesheet
+ * (importing @acme/tailwind INTO globals.css makes the whole build nx-prefixed
+ * and kills the app's own `bg-slate-*`/`flex`). As its own CSS entry it's a
+ * second, independent compilation — the app authors `nx:` utilities in its own
+ * markup and gets the `--nx-*` tokens here, while globals.css keeps generating
+ * the app's unprefixed utilities. The nx: / --nx-* namespacing keeps the two
+ * outputs from colliding. */
+@import '@acme/tailwind';

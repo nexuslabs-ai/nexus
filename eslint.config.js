@@ -28,6 +28,9 @@ export default tseslint.config(
       '**/storybook-static/**',
       '**/build/**',
       '**/out/**',
+      // Standalone consumer examples — self-contained repos with their own
+      // toolchains, outside this workspace. Not linted by the monorepo config.
+      'examples/**',
       // Untracked git worktree copies (full-repo clones) under .claude — never lint them.
       '**/.claude/worktrees/**',
     ],
