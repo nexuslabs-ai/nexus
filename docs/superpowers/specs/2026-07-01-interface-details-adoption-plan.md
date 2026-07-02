@@ -16,24 +16,24 @@ list is already handled, deliberately declined, or already owned by #159/#181.
 
 ## Master matrix
 
-| #   | Principle                | Status          | Verdict                                                                                                           |
-| --- | ------------------------ | --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 8   | Font smoothing           | ✅ already done | correct placement (appearance model → `<html>`); add `-moz-` twin only                                            |
-| 9   | Tabular numbers          | 🟢 small gaps   | chart axis + Progress %; table correctly opt-in                                                                   |
-| 10  | text-wrap balance/pretty | 🟢 one fix      | `balance` → 4 heading utilities; `pretty` already systemic                                                        |
-| 1   | Concentric radius        | 🟡 backlog      | 2px lever in rounded brands only; moot under `square` default                                                     |
-| 2   | Optical alignment        | ✅ N/A          | no asymmetric glyphs; symmetric chevrons need no offset                                                           |
-| 3   | Shadows over borders     | 🔴 / 🔬         | declined; resolved → KEEP border — already an accessible theme-adaptive hairline, shadow supplements not replaces |
-| 11  | Image outlines           | 🟢 systemic gap | 0 adoption; fix via Root `::after`, pure black/white @10%                                                         |
-| 16  | Hit area (~44px)         | 🟢 mixed        | 3 top-tier gaps + a gating inconsistency; many already correct                                                    |
-| 4   | Interruptible anims      | ✅/🟡           | loading/height keyframes correct; overlay open/close → #159                                                       |
-| 5   | Split & stagger enter    | 🟡 backlog      | all menus/command/toasts → #181                                                                                   |
-| 6   | Subtle exit              | ✅              | sheet/drawer full-slide is the legit full-exit case                                                               |
-| 7   | Contextual icon anim     | 🟡 backlog      | checkbox/radio/select/dropdown indicators → #181                                                                  |
-| 12  | Scale on press           | 🟢 adopt        | Button, default-on (user decision)                                                                                |
-| 13  | Skip anim on load        | 🟡 backlog      | mechanism N/A (no Framer); avatar mount fade → #181                                                               |
-| 14  | Never `transition: all`  | 🟢 one fix      | `input-otp.tsx:123` (repo already asserts against it)                                                             |
-| 15  | `will-change` discipline | ✅              | clean repo-wide                                                                                                   |
+| #   | Principle                | Status             | Verdict                                                                                                           |
+| --- | ------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| 8   | Font smoothing           | ✅ already done    | correct placement (appearance model → `<html>`); add `-moz-` twin only                                            |
+| 9   | Tabular numbers          | 🟢 small gaps      | chart axis + Progress %; table correctly opt-in                                                                   |
+| 10  | text-wrap balance/pretty | 🟢 one fix         | `balance` → 4 heading utilities; `pretty` already systemic                                                        |
+| 1   | Concentric radius        | 🟡 backlog         | 2px lever in rounded brands only; moot under `square` default                                                     |
+| 2   | Optical alignment        | ✅ N/A             | no asymmetric glyphs; symmetric chevrons need no offset                                                           |
+| 3   | Shadows over borders     | 🔴 / 🔬            | declined; resolved → KEEP border — already an accessible theme-adaptive hairline, shadow supplements not replaces |
+| 11  | Image outlines           | 🟢 systemic gap    | 0 adoption; fix via Root `::after`, pure black/white @10%                                                         |
+| 16  | Hit area (~44px)         | 🟢 mixed           | 3 top-tier gaps + a gating inconsistency; many already correct                                                    |
+| 4   | Interruptible anims      | 🟢 adopt (partial) | overlay open/close → Workstream E; loading/height keyframes stay correct                                          |
+| 5   | Split & stagger enter    | 🟢 adopt           | all menus/command/toasts → Workstream E                                                                           |
+| 6   | Subtle exit              | ✅                 | sheet/drawer full-slide is the legit full-exit case                                                               |
+| 7   | Contextual icon anim     | 🟢 adopt           | checkbox/radio/select/dropdown indicators → Workstream E                                                          |
+| 12  | Scale on press           | 🟢 adopt           | Button, default-on (user decision)                                                                                |
+| 13  | Skip anim on load        | 🟢 adopt           | avatar mount-fade guard → Workstream E                                                                            |
+| 14  | Never `transition: all`  | 🟢 one fix         | `input-otp.tsx:123` (repo already asserts against it)                                                             |
+| 15  | `will-change` discipline | ✅                 | clean repo-wide                                                                                                   |
 
 ## Actionable roadmap (prioritized)
 
@@ -106,12 +106,43 @@ nx:after:-outline-offset-1 nx:after:outline-<color>`, scoped to the
   `data-[has-start-icon]`/`[has-end-icon]` hook — trades against the documented
   symmetric sizing contract, so likely defer.
 
-## Backlog filings (route, don't hand-roll) — Workstream E
+### Workstream E — Motion adoption (#4, #5, #7, #13) — largest lift; sequence last, split per principle
 
-- **#4** overlay open/close animate-in/out → **#159** (decide interruptible transitions)
-- **#5** stagger menus/command/toasts → **#181**
-- **#7** icon cross-fade for checkbox/radio/select/dropdown indicators → **#181**
-- **#13** avatar mount-fade first-render guard → **#181** (optional)
+Uses the **existing** motion foundation (`nx:duration-*` / `nx:ease-enter/exit/move`,
+already consumed) — no parallel scale — and every effect is `nx:motion-reduce:`-guarded.
+More involved and higher-risk than A–D: this is the coordination #159 exists for, so do it
+last and split each principle into its own PR.
+
+- **#4 Interruptible overlay open/close:** convert the
+  `data-[state=open]:animate-in / data-[state=closed]:animate-out` keyframe set to
+  interruptible CSS transitions on `data-[state]`, so rapid open/close retargets instead of
+  replaying. ~12 surfaces, mostly via the `overlay-layout.ts` choke point: DropdownMenu,
+  ContextMenu, Menubar, Popover, Select, HoverCard, Tooltip, Sheet, Drawer, NavigationMenu.
+  **Caveat:** Radix `Presence` unmounts on close after the exit animation ends — it supports
+  transitions, but each surface must be verified so the exit still completes before unmount
+  (`forceMount` where needed). Loading/height keyframes (spinner, skeleton, accordion,
+  collapsible, progress, caret) stay keyframes — correct as-is.
+- **#7 Contextual icon cross-fade:** replace hard-swapped indicators with an opacity + scale
+  (+ optional blur) cross-fade: checkbox `IconCheck`/`IconMinus` (`checkbox.tsx:90,95`), radio
+  Indicator (`radio-group.tsx:80-84`), Select/DropdownMenu `ItemIndicator`
+  (`select.tsx:266-268`, `dropdown-menu.tsx:313-315,363-365`). No-Framer technique: keep both
+  glyphs in the DOM (one absolute), cross-fade via CSS transition on the existing `ease`
+  token. **Caveat:** Radix `ItemIndicator` mounts/unmounts on selection, so a true cross-fade
+  needs the both-in-DOM pattern or `data-state` styling.
+- **#5 Split & stagger enter:** stagger menu / listbox / command / toast items on open via a
+  per-item `animation-delay: calc(var(--stagger,0) * <duration-token>)` (or `:nth-child`
+  delay). Targets: dropdown/context/menubar items, select listbox, command items, toast stack.
+  **Caveat:** most involved — Radix animates the container, so per-item stagger needs a
+  per-item index/delay and careful reduced-motion handling.
+- **#13 Skip animation on load:** scope Avatar's `animate-in` (`avatar.tsx:166,200`) so the
+  fade fires on the image-loaded `data-state` transition, not on every mount/first paint.
+  Narrow; portal overlays are already correctly gated by `data-[state=open]`.
+
+Evidence: per-component stories for each state change + a `motion-reduce` story proving the
+effect is suppressed; verify overlay exit-before-unmount across the browser floor.
+
+## Backlog filings (route, don't hand-roll)
+
 - **#1** concentric radius popover-family 2px lever (rounded brands) → **#181** (low-pri)
 
 ## Declined (with reason)
@@ -163,8 +194,10 @@ nx:after:-outline-offset-1 nx:after:outline-<color>`, scoped to the
 
 ## Suggested sequencing
 
-A (typography base, 1 small PR) → C (hit-area, real a11y) → B (image outlines) →
-D (Button scale) → E (file backlog issues). A/B/C/D are independent PRs.
+A (typography base) → C (hit-area, real a11y) → B (image outlines) → D (Button scale)
+→ **E (motion: overlay interruptible, icon cross-fade, stagger, skip-on-load) — largest
+lift, do last and split per principle**. A–D are independent PRs; only #1 remains filed
+to #181.
 
 ## Next
 
