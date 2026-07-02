@@ -300,21 +300,36 @@ export function transformTailwindPackageJson(pkg, { scope, version }) {
 }
 
 /**
- * Scan a component source file for its intra-package (`@/`) dependencies,
- * bucketed by root. Block and line comments are stripped (URLs preserved) so a
- * commented import can't leak in. Used to build the minimal registry manifest
- * (seed of the future CLI).
+ * Scan component source for its intra-package deps (`@/` alias or relative),
+ * bucketed by root. Comments are stripped (URLs preserved) so a commented import
+ * can't leak in. Seeds the registry manifest.
  */
 export function scanInternalDeps(text) {
   const withoutComments = text
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(?<!:)\/\/.*$/gm, '');
   const deps = { components: new Set(), lib: new Set(), hooks: new Set() };
-  const importRe = /@\/(components|lib|hooks)\/([\w-]+)/g;
+
+  // lib/hooks carry their bucket in the path; any other cross-dir relative
+  // import (`../button`) is a sibling component keyed by its directory name.
+  const isModuleName = (name) => /^[\w-]+$/.test(name ?? '');
+  const specRe = /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
   let match;
-  while ((match = importRe.exec(withoutComments)) !== null) {
-    deps[match[1]].add(match[2]);
+  while ((match = specRe.exec(withoutComments)) !== null) {
+    const spec = match[1];
+    if (!spec.startsWith('@/') && !spec.startsWith('../')) {
+      continue;
+    }
+    const [head, next] = spec.replace(/^(?:@\/|(?:\.\.\/)+)/, '').split('/');
+    if ((head === 'lib' || head === 'hooks') && isModuleName(next)) {
+      deps[head].add(next);
+    } else if (head === 'components' && isModuleName(next)) {
+      deps.components.add(next);
+    } else if (isModuleName(head)) {
+      deps.components.add(head);
+    }
   }
+
   return {
     components: [...deps.components].sort(),
     lib: [...deps.lib].sort(),

@@ -304,6 +304,23 @@ describe('scanInternalDeps', () => {
       hooks: ['use-toast'],
     });
   });
+
+  it('buckets relative imports (the shape after the @/->relative migration)', () => {
+    const source = [
+      "import { cn } from '../../lib/utils';",
+      "import { IconCheck } from '../../lib/icons';",
+      "import { useIsNarrow } from '../../hooks/use-narrow';",
+      "import { Button } from '../button';",
+      "export { ButtonGroup } from '../button-group/button-group';",
+      "import { part } from './internal-sibling';",
+      "// import { Dead } from '../tooltip';",
+    ].join('\n');
+    expect(scanInternalDeps(source)).toEqual({
+      components: ['button', 'button-group'],
+      lib: ['icons', 'utils'],
+      hooks: ['use-narrow'],
+    });
+  });
 });
 
 describe('buildManifest', () => {
