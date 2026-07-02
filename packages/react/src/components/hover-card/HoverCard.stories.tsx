@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
@@ -54,13 +58,11 @@ export const OpenCloseInteraction: Story = {
         document.querySelector('[data-slot="hover-card-content"]')
       ).toBeInTheDocument();
     });
+    const content = document.querySelector('[data-slot="hover-card-content"]');
+    await expectInterruptibleOverlayMotion(content);
 
     await userEvent.unhover(trigger);
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="hover-card-content"]')
-      ).toBeNull();
-    });
+    await expectExitBeforeUnmount(content);
   },
 };
 

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -220,6 +222,9 @@ export const OpenCloseInteraction: Story = {
     // The flyout links render in-tree (no portal)
     const link = await canvas.findByRole('link', { name: 'Analytics' });
     await expect(link).toBeInTheDocument();
+    await expectInterruptibleOverlayMotion(
+      canvasElement.querySelector('[data-slot="navigation-menu-viewport"]')
+    );
 
     // Close with Escape
     await userEvent.keyboard('{Escape}');

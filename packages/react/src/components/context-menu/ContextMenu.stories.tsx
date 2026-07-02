@@ -4,6 +4,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 
 import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
+
+import {
   ContextMenu,
   ContextMenuCheckboxItem,
   ContextMenuContent,
@@ -241,6 +246,7 @@ export const OpenCloseInteraction: Story = {
     const menu = await within(document.body).findByRole('menu');
     await expect(menu).toBeInTheDocument();
     await expect(menu).toHaveAttribute('data-slot', 'context-menu-content');
+    await expectInterruptibleOverlayMotion(menu);
 
     // Items should be visible
     const item1 = within(menu).getByRole('menuitem', { name: 'Item 1' });
@@ -250,9 +256,7 @@ export const OpenCloseInteraction: Story = {
     await userEvent.keyboard('{Escape}');
 
     // Wait for menu to be removed from DOM
-    await waitFor(() => {
-      expect(document.querySelector('[role="menu"]')).toBeNull();
-    });
+    await expectExitBeforeUnmount(document.querySelector('[role="menu"]'));
   },
 };
 

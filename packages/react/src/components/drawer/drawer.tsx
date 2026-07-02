@@ -3,7 +3,10 @@ import * as React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 
 import { cn } from '../../lib/utils';
-import { overlayBodyClassName } from '../overlay-layout/overlay-layout';
+import {
+  overlayBodyClassName,
+  overlayScrimTransitionClassName,
+} from '../overlay-layout/overlay-layout';
 
 /**
  * Drawer
@@ -69,11 +72,7 @@ function DrawerOverlay({
       data-slot="drawer-overlay"
       className={cn(
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
-        'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-        'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-        'nx:data-[state=open]:duration-slower nx:data-[state=open]:ease-enter',
-        'nx:data-[state=closed]:duration-slow nx:data-[state=closed]:ease-exit',
-        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
+        overlayScrimTransitionClassName,
         className
       )}
       {...props}

@@ -1,14 +1,12 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  expect,
-  userEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-  within,
-} from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
 import { Label } from '../label';
@@ -206,17 +204,10 @@ export const InterruptibleOpenClose: Story = {
     const panel = content.closest('[data-slot="popover-content"]');
 
     await waitFor(() => expect(content).toBeVisible());
-    await expect(panel).not.toHaveClass('nx:data-[state=open]:animate-in');
-    await expect(panel).toHaveClass('nx:motion-reduce:transition-none');
-    await expect(panel).toHaveClass(
-      'nx:data-[state=closed]:animate-overlay-presence-exit'
-    );
+    await expectInterruptibleOverlayMotion(panel);
 
     await userEvent.keyboard('{Escape}');
-    await expect(
-      document.body.querySelector('[data-slot="popover-content"]')
-    ).toBeInTheDocument();
-    await waitForElementToBeRemoved(
+    await expectExitBeforeUnmount(
       document.body.querySelector('[data-slot="popover-content"]')
     );
   },

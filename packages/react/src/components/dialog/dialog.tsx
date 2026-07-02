@@ -167,14 +167,14 @@ function DialogContent({
   return (
     <DialogPortal>
       <DialogOverlay />
-      <DialogLayoutContext.Provider value={defaultOverlayLayout}>
-        <DialogPrimitive.Content
-          data-slot="dialog-content"
-          data-variant={defaultOverlayLayout.variant}
-          data-orientation={defaultOverlayLayout.buttonOrientation}
-          className={cn(overlayContentVariants(), className)}
-          {...props}
-        >
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        data-variant={defaultOverlayLayout.variant}
+        data-orientation={defaultOverlayLayout.buttonOrientation}
+        className={cn(overlayContentVariants(), className)}
+        {...props}
+      >
+        <DialogLayoutContext.Provider value={defaultOverlayLayout}>
           {showGeneratedHeader && (
             <DialogHeader>
               {title != null && <DialogTitle>{title}</DialogTitle>}
@@ -194,8 +194,8 @@ function DialogContent({
               <span className="nx:sr-only">Close</span>
             </DialogPrimitive.Close>
           )}
-        </DialogPrimitive.Content>
-      </DialogLayoutContext.Provider>
+        </DialogLayoutContext.Provider>
+      </DialogPrimitive.Content>
     </DialogPortal>
   );
 }

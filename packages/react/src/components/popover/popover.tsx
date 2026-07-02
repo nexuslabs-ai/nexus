@@ -3,7 +3,10 @@ import * as React from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 
 import { cn } from '../../lib/utils';
-import { popoverSurfaceClassName } from '../overlay-layout/overlay-layout';
+import {
+  overlayFloatingTransitionClassName,
+  popoverSurfaceClassName,
+} from '../overlay-layout/overlay-layout';
 
 /**
  * Popover
@@ -74,9 +77,7 @@ function PopoverContent({
         className={cn(
           'nx:z-popover nx:w-72 nx:p-container nx:outline-none',
           popoverSurfaceClassName,
-          'nx:transition-[opacity,scale] nx:duration-fast nx:ease-move nx:motion-reduce:transition-none',
-          'nx:data-[state=closed]:scale-95 nx:data-[state=closed]:opacity-0',
-          'nx:data-[state=closed]:animate-overlay-presence-exit nx:motion-reduce:data-[state=closed]:animate-none',
+          overlayFloatingTransitionClassName,
           className
         )}
         {...props}
