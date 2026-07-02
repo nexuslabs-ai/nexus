@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 
 import {
+  IconAlertCircle,
   IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
@@ -16,6 +17,7 @@ import { Checkbox } from '../checkbox';
 import { Hide } from '../hide';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '../input-group';
 import { Show } from '../show';
+import { Skeleton } from '../skeleton';
 
 import {
   Table,
@@ -1277,6 +1279,20 @@ const recipeRows: RecipeRow[] = [
 
 const RECIPE_PAGE_SIZE = 3;
 const formatRecipeAmount = (amount: number) => `$${amount.toFixed(2)}`;
+type RecipeSortKey = 'invoice' | 'status' | 'amount';
+type RecipeSortDirection = 'ascending' | 'descending';
+
+function compareRecipeRows(
+  a: RecipeRow,
+  b: RecipeRow,
+  key: RecipeSortKey,
+  direction: RecipeSortDirection
+) {
+  const result =
+    key === 'amount' ? a.amount - b.amount : a[key].localeCompare(b[key]);
+
+  return direction === 'ascending' ? result : -result;
+}
 
 function DataTableRecipeDemo() {
   const [query, setQuery] = useState('');
@@ -1441,8 +1457,407 @@ export const DataTableRecipe: Story = {
   },
 };
 
-// DataTableRecipe (above) shows the assembled shell: filter, sortable header,
-// selection, pagination, empty state, over these primitives with plain state.
-// The production version wires TanStack Table over the same markup and lives at
-// apps/console/src/components/data-table.tsx (the engine stays a consumer
-// dependency, out of the published bundle).
+interface SortableRecipeHeadProps {
+  label: string;
+  sortKey: RecipeSortKey;
+  activeKey: RecipeSortKey;
+  direction: RecipeSortDirection;
+  align?: 'left' | 'right';
+  onSort: (key: RecipeSortKey) => void;
+}
+
+function SortableRecipeHead({
+  label,
+  sortKey,
+  activeKey,
+  direction,
+  align = 'left',
+  onSort,
+}: SortableRecipeHeadProps) {
+  const isActive = activeKey === sortKey;
+  const ariaSort = isActive ? direction : 'none';
+  const SortIcon =
+    isActive && direction === 'descending' ? IconChevronDown : IconChevronUp;
+
+  return (
+    <TableHead
+      aria-sort={ariaSort}
+      className={align === 'right' ? 'nx:text-right' : undefined}
+    >
+      <button
+        type="button"
+        onClick={() => onSort(sortKey)}
+        className={[
+          'nx:inline-flex nx:items-center nx:gap-1 nx:typography-label-default nx:text-inherit',
+          'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
+          align === 'right' ? 'nx:ml-auto' : '',
+        ].join(' ')}
+      >
+        {label}
+        <SortIcon
+          className={isActive ? 'nx:size-4' : 'nx:size-4 nx:opacity-40'}
+          aria-hidden
+        />
+      </button>
+    </TableHead>
+  );
+}
+
+function DataTableSortableHeaderRecipeDemo() {
+  const [sortKey, setSortKey] = useState<RecipeSortKey>('invoice');
+  const [direction, setDirection] = useState<RecipeSortDirection>('ascending');
+
+  function sortBy(nextKey: RecipeSortKey) {
+    if (nextKey !== sortKey) {
+      setSortKey(nextKey);
+      setDirection('ascending');
+      return;
+    }
+
+    setDirection((current) =>
+      current === 'ascending' ? 'descending' : 'ascending'
+    );
+  }
+
+  const rows = [...recipeRows].sort((a, b) =>
+    compareRecipeRows(a, b, sortKey, direction)
+  );
+
+  return (
+    <div className="nx:overflow-hidden nx:rounded-md nx:border-default nx:border-border-default">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <SortableRecipeHead
+              label="Invoice"
+              sortKey="invoice"
+              activeKey={sortKey}
+              direction={direction}
+              onSort={sortBy}
+            />
+            <SortableRecipeHead
+              label="Status"
+              sortKey="status"
+              activeKey={sortKey}
+              direction={direction}
+              onSort={sortBy}
+            />
+            <SortableRecipeHead
+              label="Amount"
+              sortKey="amount"
+              activeKey={sortKey}
+              direction={direction}
+              align="right"
+              onSort={sortBy}
+            />
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.slice(0, 4).map((row) => (
+            <TableRow key={row.invoice}>
+              <TableRowHeader>{row.invoice}</TableRowHeader>
+              <TableCell>{row.status}</TableCell>
+              <TableCell className="nx:text-right nx:tabular-nums">
+                {formatRecipeAmount(row.amount)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+export const DataTableSortableHeaderRecipe: Story = {
+  render: () => <DataTableSortableHeaderRecipeDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const invoiceButton = canvas.getByRole('button', { name: /Invoice/ });
+    const amountButton = canvas.getByRole('button', { name: /Amount/ });
+    const amountHead = amountButton.closest('th');
+    const invoiceHead = invoiceButton.closest('th');
+
+    await expect(invoiceHead).toHaveAttribute('aria-sort', 'ascending');
+
+    amountButton.focus();
+    await expect(amountButton).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(amountHead).toHaveAttribute('aria-sort', 'ascending');
+    await expect(
+      canvasElement.querySelector('tbody [data-slot="table-row"]')
+    ).toHaveTextContent('INV-002');
+
+    await userEvent.click(amountButton);
+    await expect(amountHead).toHaveAttribute('aria-sort', 'descending');
+    await expect(
+      canvasElement.querySelector('tbody [data-slot="table-row"]')
+    ).toHaveTextContent('INV-005');
+  },
+};
+
+function DataTableSelectionRecipeDemo() {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const allSelected = selected.size === recipeRows.length;
+  const someSelected = selected.size > 0 && !allSelected;
+
+  function toggleAll(checked: boolean | 'indeterminate') {
+    setSelected(
+      checked === true
+        ? new Set(recipeRows.map((row) => row.invoice))
+        : new Set()
+    );
+  }
+
+  function toggleRow(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  return (
+    <div className="nx:space-y-3">
+      {selected.size > 0 && (
+        <div
+          role="status"
+          className="nx:flex nx:flex-wrap nx:items-center nx:justify-between nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:bg-background-hover nx:px-3 nx:py-2"
+        >
+          <span className="nx:typography-label-default">
+            {selected.size} selected
+          </span>
+          <div className="nx:flex nx:flex-wrap nx:items-center nx:gap-2">
+            <Button size="sm" variant="secondary">
+              Export
+            </Button>
+            <Button size="sm" variant="destructive">
+              Archive
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelected(new Set())}
+              aria-label="Clear selection"
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="nx:overflow-hidden nx:rounded-md nx:border-default nx:border-border-default">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <Checkbox
+                  checked={
+                    allSelected ? true : someSelected ? 'indeterminate' : false
+                  }
+                  onCheckedChange={toggleAll}
+                  aria-label="Select all invoices"
+                />
+              </TableHead>
+              <TableHead>Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="nx:text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {recipeRows.map((row) => (
+              <TableRow
+                key={row.invoice}
+                data-state={selected.has(row.invoice) ? 'selected' : undefined}
+              >
+                <TableCell>
+                  <Checkbox
+                    checked={selected.has(row.invoice)}
+                    onCheckedChange={() => toggleRow(row.invoice)}
+                    aria-label={`Select ${row.invoice}`}
+                  />
+                </TableCell>
+                <TableRowHeader>{row.invoice}</TableRowHeader>
+                <TableCell>{row.status}</TableCell>
+                <TableCell className="nx:text-right nx:tabular-nums">
+                  {formatRecipeAmount(row.amount)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
+
+export const DataTableSelectionRecipe: Story = {
+  render: () => <DataTableSelectionRecipeDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const selectAll = canvas.getByLabelText('Select all invoices');
+    const firstRow = canvas.getByLabelText('Select INV-001');
+
+    await userEvent.click(firstRow);
+    await expect(selectAll).toHaveAttribute('data-state', 'indeterminate');
+    await expect(canvas.getByRole('status')).toHaveTextContent('1 selected');
+
+    await userEvent.click(selectAll);
+    await expect(selectAll).toHaveAttribute('data-state', 'checked');
+    await expect(canvas.getByRole('status')).toHaveTextContent('7 selected');
+    await expect(
+      canvasElement.querySelectorAll(
+        'tbody [data-slot="table-row"][data-state="selected"]'
+      )
+    ).toHaveLength(recipeRows.length);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Clear selection' })
+    );
+    await expect(selectAll).toHaveAttribute('data-state', 'unchecked');
+  },
+};
+
+interface DataTableStateFrameProps {
+  title: string;
+  children: ReactNode;
+}
+
+function DataTableStateFrame({ title, children }: DataTableStateFrameProps) {
+  return (
+    <section aria-label={title} className="nx:space-y-2">
+      <h3 className="nx:typography-label-default nx:text-muted-foreground">
+        {title}
+      </h3>
+      <div className="nx:overflow-hidden nx:rounded-md nx:border-default nx:border-border-default">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="nx:text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          {children}
+        </Table>
+      </div>
+    </section>
+  );
+}
+
+function DataTableLoadingRows() {
+  return (
+    <TableBody aria-busy="true" aria-live="polite">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <TableRow key={index}>
+          <TableCell>
+            <Skeleton className="nx:h-4 nx:w-20" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="nx:h-4 nx:w-16" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="nx:ml-auto nx:h-4 nx:w-20" />
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  );
+}
+
+function DataTableErrorRows() {
+  const [retried, setRetried] = useState(false);
+
+  return (
+    <TableBody>
+      <TableRow>
+        <TableCell
+          colSpan={3}
+          className="nx:py-8 nx:text-center nx:text-muted-foreground"
+        >
+          <div className="nx:flex nx:flex-col nx:items-center nx:gap-3">
+            <IconAlertCircle aria-hidden className="nx:size-5" />
+            <span>
+              {retried ? 'Retry queued.' : 'Could not load invoices.'}
+            </span>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setRetried(true)}
+              aria-label="Retry loading invoices"
+            >
+              Retry
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    </TableBody>
+  );
+}
+
+function DataTableEmptyRows({ children }: { children: ReactNode }) {
+  return (
+    <TableBody>
+      <TableRow>
+        <TableCell
+          colSpan={3}
+          className="nx:py-8 nx:text-center nx:text-muted-foreground"
+        >
+          {children}
+        </TableCell>
+      </TableRow>
+    </TableBody>
+  );
+}
+
+function DataTableStatesRecipeDemo() {
+  return (
+    <div className="nx:grid nx:gap-4">
+      <DataTableStateFrame title="Loading rows">
+        <DataTableLoadingRows />
+      </DataTableStateFrame>
+      <DataTableStateFrame title="Error row">
+        <DataTableErrorRows />
+      </DataTableStateFrame>
+      <DataTableStateFrame title="No data yet">
+        <DataTableEmptyRows>No invoices yet.</DataTableEmptyRows>
+      </DataTableStateFrame>
+      <DataTableStateFrame title="No filtered results">
+        <DataTableEmptyRows>
+          No invoices match &quot;INV-999&quot;.
+        </DataTableEmptyRows>
+      </DataTableStateFrame>
+    </div>
+  );
+}
+
+export const DataTableStatesRecipe: Story = {
+  render: () => <DataTableStatesRecipeDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const loadingSection = canvas.getByLabelText('Loading rows');
+
+    await expect(
+      loadingSection.querySelector('[aria-busy="true"]')
+    ).toBeInTheDocument();
+    await expect(
+      loadingSection.querySelectorAll('[data-slot="skeleton"]')
+    ).toHaveLength(9);
+
+    await expect(canvas.getByText('Could not load invoices.')).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Retry loading invoices' })
+    );
+    await expect(canvas.getByText('Retry queued.')).toBeVisible();
+    await expect(canvas.getByText('No invoices yet.')).toBeVisible();
+    await expect(
+      canvas.getByText('No invoices match "INV-999".')
+    ).toBeVisible();
+  },
+};
+
+// These recipe stories show the assembled shell, focused sortable headers,
+// selection, pagination, and state rows over the Table primitives with plain
+// React state. The production version wires TanStack Table over the same markup
+// in apps/console/src/components/data-table.tsx; the engine stays a consumer
+// dependency, out of the published bundle.
