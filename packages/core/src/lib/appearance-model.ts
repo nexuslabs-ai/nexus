@@ -341,7 +341,7 @@ export function appearancePrefsToCss(prefs: NexusAppearancePrefs): string {
 ${typographyScaleVariables(uiPx)}
 }`,
     `code, pre, .nx\\:font-mono, .nx\\:typography-code-block, .nx\\:typography-code-inline { font-size: ${codePx}px; }`,
-    `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; }`,
+    `html { -webkit-font-smoothing: ${prefs.fontSmoothing ? 'antialiased' : 'auto'}; -moz-osx-font-smoothing: ${prefs.fontSmoothing ? 'grayscale' : 'auto'}; }`,
   ];
   if (prefs.pointerCursors) {
     blocks.push(
