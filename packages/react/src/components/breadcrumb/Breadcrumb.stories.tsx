@@ -387,9 +387,7 @@ export const EllipsisTouchTarget: Story = {
     );
 
     await expect(menuTrigger).toHaveClass('nx:relative');
-    await expect(menuTrigger).toHaveClass(
-      'nx:pointer-coarse:after:-inset-3'
-    );
+    await expect(menuTrigger).toHaveClass('nx:pointer-coarse:after:-inset-3');
     await expect(ellipsis).toHaveClass('nx:relative');
     await expect(ellipsis).toHaveClass('nx:pointer-coarse:after:-inset-3');
   },
