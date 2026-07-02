@@ -3,9 +3,9 @@ import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { popoverSurfaceClassName } from '@/components/overlay-layout/overlay-layout';
-import { IconCheck, IconChevronDown, IconChevronUp } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconCheck, IconChevronDown, IconChevronUp } from '../../lib/icons';
+import { cn } from '../../lib/utils';
+import { popoverSurfaceClassName } from '../overlay-layout/overlay-layout';
 
 /**
  * Select

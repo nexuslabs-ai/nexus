@@ -300,21 +300,46 @@ export function transformTailwindPackageJson(pkg, { scope, version }) {
 }
 
 /**
- * Scan a component source file for its intra-package (`@/`) dependencies,
- * bucketed by root. Block and line comments are stripped (URLs preserved) so a
- * commented import can't leak in. Used to build the minimal registry manifest
- * (seed of the future CLI).
+ * Scan one component source file for its intra-package deps (`@/` alias or
+ * relative), resolving each specifier against the file's own directory so a
+ * nested-internal import (`../color-field` inside `appearance/…`) resolves to its
+ * true path and can't leak as a phantom sibling component. `fileDir` is the file's
+ * directory relative to `src/` (POSIX, e.g. `components/appearance/setting-row`).
+ * Comments are stripped (URLs preserved) so a commented import can't leak in.
+ * Seeds the registry manifest.
  */
-export function scanInternalDeps(text) {
+export function scanInternalDeps(text, fileDir) {
   const withoutComments = text
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(?<!:)\/\/.*$/gm, '');
   const deps = { components: new Set(), lib: new Set(), hooks: new Set() };
-  const importRe = /@\/(components|lib|hooks)\/([\w-]+)/g;
+  const isModuleName = (name) => /^[\w-]+$/.test(name ?? '');
+  const owner = fileDir.split('/')[1]; // components/<owner>/…
+
+  const specRe = /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
   let match;
-  while ((match = importRe.exec(withoutComments)) !== null) {
-    deps[match[1]].add(match[2]);
+  while ((match = specRe.exec(withoutComments)) !== null) {
+    const spec = match[1];
+    let target;
+    if (spec.startsWith('@/')) {
+      target = spec.slice(2);
+    } else if (spec.startsWith('./') || spec.startsWith('../')) {
+      target = path.posix.join(fileDir, spec);
+    } else {
+      continue;
+    }
+    // `target` is now src-relative; classify by its first two segments. An import
+    // that resolves back into the owning component is internal, not a dep.
+    const [root, name] = target.split('/');
+    if (root === 'lib' && isModuleName(name)) {
+      deps.lib.add(name);
+    } else if (root === 'hooks' && isModuleName(name)) {
+      deps.hooks.add(name);
+    } else if (root === 'components' && isModuleName(name) && name !== owner) {
+      deps.components.add(name);
+    }
   }
+
   return {
     components: [...deps.components].sort(),
     lib: [...deps.lib].sort(),
@@ -708,14 +733,18 @@ function copyTree(srcDir, destDir, { scope, skip, transform }) {
 
 /** Collect the minimal registry manifest entries from the source component tree. */
 function collectComponentEntries(componentsDir) {
+  const srcDir = path.dirname(componentsDir);
+  const componentNames = new Set(
+    fs
+      .readdirSync(componentsDir, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name)
+  );
+
   const entries = [];
-  for (const dirent of fs.readdirSync(componentsDir, { withFileTypes: true })) {
-    if (!dirent.isDirectory()) {
-      continue;
-    }
-    const dir = path.join(componentsDir, dirent.name);
+  for (const name of componentNames) {
     const files = [];
-    const sources = [];
+    const fileDeps = [];
     const walk = (current) => {
       for (const child of fs.readdirSync(current, { withFileTypes: true })) {
         const childPath = path.join(current, child.name);
@@ -728,16 +757,32 @@ function collectComponentEntries(componentsDir) {
         }
         files.push(path.relative(componentsDir, childPath));
         if (child.name.endsWith('.tsx') || child.name.endsWith('.ts')) {
-          sources.push(fs.readFileSync(childPath, 'utf8'));
+          const fileDir = path.relative(srcDir, current).split(path.sep).join('/');
+          fileDeps.push(scanInternalDeps(fs.readFileSync(childPath, 'utf8'), fileDir));
         }
       }
     };
-    walk(dir);
+    walk(path.join(componentsDir, name));
     entries.push({
-      name: dirent.name,
+      name,
       files: files.sort(),
-      deps: scanInternalDeps(sources.join('\n')),
+      deps: {
+        components: [...new Set(fileDeps.flatMap((d) => d.components))].sort(),
+        lib: [...new Set(fileDeps.flatMap((d) => d.lib))].sort(),
+        hooks: [...new Set(fileDeps.flatMap((d) => d.hooks))].sort(),
+      },
     });
+  }
+
+  // Fail loud if a scan produced a component dep that isn't a real component dir.
+  for (const entry of entries) {
+    const unknown = entry.deps.components.filter((dep) => !componentNames.has(dep));
+    if (unknown.length > 0) {
+      throw new Error(
+        `Component "${entry.name}" references unknown component dep(s): ${unknown.join(', ')}. ` +
+          `scanInternalDeps mis-resolved a non-component import — check its bucket handling.`
+      );
+    }
   }
   return entries;
 }

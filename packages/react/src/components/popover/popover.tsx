@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 
-import { popoverSurfaceClassName } from '@/components/overlay-layout/overlay-layout';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
+import { popoverSurfaceClassName } from '../overlay-layout/overlay-layout';
 
 /**
  * Popover

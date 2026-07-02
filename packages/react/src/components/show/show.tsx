@@ -3,8 +3,8 @@ import * as React from 'react';
 import {
   type ResponsiveVisibilityProps,
   visibilityClassName,
-} from '@/lib/responsive-visibility';
-import { cn } from '@/lib/utils';
+} from '../../lib/responsive-visibility';
+import { cn } from '../../lib/utils';
 
 /**
  * Renders its children only when a responsive condition is met, via a CSS

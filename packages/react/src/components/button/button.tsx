@@ -3,9 +3,9 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { ButtonGroupSizeContext } from '@/components/button-group/button-group-context';
-import { Spinner } from '@/components/spinner';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
+import { ButtonGroupSizeContext } from '../button-group/button-group-context';
+import { Spinner } from '../spinner';
 
 const buttonVariants = cva(
   'nx:inline-flex nx:box-border nx:cursor-pointer nx:items-center nx:justify-center nx:rounded-base nx:border-default nx:border-transparent nx:whitespace-nowrap nx:transition-colors nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:cursor-default nx:disabled:opacity-100 nx:aria-disabled:pointer-events-none nx:aria-disabled:cursor-default nx:aria-disabled:opacity-100 nx:[&_svg]:pointer-events-none nx:[&_svg]:size-3.5 nx:[&_svg]:shrink-0',

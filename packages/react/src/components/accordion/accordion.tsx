@@ -3,8 +3,8 @@ import * as React from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { IconChevronDown } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconChevronDown } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 
 const accordionVariants = cva(
   'nx:group/accordion nx:flex nx:w-full nx:flex-col',

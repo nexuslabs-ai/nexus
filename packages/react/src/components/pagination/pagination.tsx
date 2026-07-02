@@ -2,9 +2,9 @@ import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
 
-import { type ButtonProps, buttonVariants } from '@/components/button';
-import { IconChevronLeft, IconChevronRight, IconDots } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconChevronLeft, IconChevronRight, IconDots } from '../../lib/icons';
+import { cn } from '../../lib/utils';
+import { type ButtonProps, buttonVariants } from '../button';
 
 /**
  * PaginationProps

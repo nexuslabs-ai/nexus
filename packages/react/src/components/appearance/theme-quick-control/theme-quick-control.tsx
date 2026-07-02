@@ -7,12 +7,11 @@ import {
 } from '@nexus_ds/core';
 import { IconPalette } from '@tabler/icons-react';
 
-import { Button } from '@/components/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/popover';
-import { Separator } from '@/components/separator';
-import { ToggleGroup, ToggleGroupItem } from '@/components/toggle-group';
-import { cn } from '@/lib/utils';
-
+import { cn } from '../../../lib/utils';
+import { Button } from '../../button';
+import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
+import { Separator } from '../../separator';
+import { ToggleGroup, ToggleGroupItem } from '../../toggle-group';
 import { NexusAppearanceColorField } from '../color-field';
 import { useNexusAppearance } from '../provider';
 

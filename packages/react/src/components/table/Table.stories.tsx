@@ -10,8 +10,7 @@ import {
   IconChevronRight,
   IconChevronUp,
   IconSearch,
-} from '@/lib/icons';
-
+} from '../../lib/icons';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Hide } from '../hide';

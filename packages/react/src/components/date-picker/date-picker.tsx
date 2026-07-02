@@ -9,9 +9,8 @@ import {
   IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
-} from '@/lib/icons';
-import { cn } from '@/lib/utils';
-
+} from '../../lib/icons';
+import { cn } from '../../lib/utils';
 import { Button, buttonVariants } from '../button';
 
 type DatePickerCellSize = 'default' | 'large' | 'xlarge';
