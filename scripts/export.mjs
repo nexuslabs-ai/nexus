@@ -299,6 +299,8 @@ export function transformTailwindPackageJson(pkg, { scope, version }) {
   return next;
 }
 
+const BUCKET_ROOTS = new Set(['components', 'lib', 'hooks']);
+
 /**
  * Scan component source for its intra-package deps (`@/` alias or relative),
  * bucketed by root. Comments are stripped (URLs preserved) so a commented import
@@ -325,7 +327,7 @@ export function scanInternalDeps(text) {
       deps[head].add(next);
     } else if (head === 'components' && isModuleName(next)) {
       deps.components.add(next);
-    } else if (isModuleName(head)) {
+    } else if (isModuleName(head) && !BUCKET_ROOTS.has(head)) {
       deps.components.add(head);
     }
   }
@@ -724,17 +726,20 @@ function copyTree(srcDir, destDir, { scope, skip, transform }) {
 /** Collect the minimal registry manifest entries from the source component tree. */
 function collectComponentEntries(componentsDir) {
   const entries = [];
+  const componentDirs = new Set();
   for (const dirent of fs.readdirSync(componentsDir, { withFileTypes: true })) {
     if (!dirent.isDirectory()) {
       continue;
     }
     const dir = path.join(componentsDir, dirent.name);
+    componentDirs.add(dirent.name);
     const files = [];
     const sources = [];
     const walk = (current) => {
       for (const child of fs.readdirSync(current, { withFileTypes: true })) {
         const childPath = path.join(current, child.name);
         if (child.isDirectory()) {
+          componentDirs.add(child.name);
           walk(childPath);
           continue;
         }
@@ -753,6 +758,17 @@ function collectComponentEntries(componentsDir) {
       files: files.sort(),
       deps: scanInternalDeps(sources.join('\n')),
     });
+  }
+
+  // Fail loud if the catch-all minted a phantom component dep with no real dir.
+  for (const entry of entries) {
+    const unknown = entry.deps.components.filter((name) => !componentDirs.has(name));
+    if (unknown.length > 0) {
+      throw new Error(
+        `Component "${entry.name}" references unknown component dep(s): ${unknown.join(', ')}. ` +
+          `scanInternalDeps mis-bucketed a non-component import root — extend its bucket handling.`
+      );
+    }
   }
   return entries;
 }

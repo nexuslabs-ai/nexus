@@ -321,6 +321,20 @@ describe('scanInternalDeps', () => {
       hooks: ['use-narrow'],
     });
   });
+
+  it('ignores bare bucket-root imports without minting a phantom component', () => {
+    const source = [
+      "import '../../lib';",
+      "import { x } from '@/lib';",
+      "export * from '@/hooks';",
+      "import { Button } from '@/components';",
+    ].join('\n');
+    expect(scanInternalDeps(source)).toEqual({
+      components: [],
+      lib: [],
+      hooks: [],
+    });
+  });
 });
 
 describe('buildManifest', () => {
