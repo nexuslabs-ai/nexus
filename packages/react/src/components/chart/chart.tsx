@@ -6,7 +6,7 @@ import * as React from 'react';
 
 import * as RechartsPrimitive from 'recharts';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 /**
  * Per-series chart configuration. Each key matches a series `dataKey`; the

@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import * as HoverCardPrimitive from '@radix-ui/react-hover-card';
 
-import { popoverSurfaceClassName } from '@/components/overlay-layout/overlay-layout';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
+import { popoverSurfaceClassName } from '../overlay-layout/overlay-layout';
 
 /**
  * HoverCardProps

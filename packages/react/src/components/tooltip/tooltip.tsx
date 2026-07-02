@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
-import { tooltipSurfaceClassName } from '@/components/overlay-layout/overlay-layout';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
+import { tooltipSurfaceClassName } from '../overlay-layout/overlay-layout';
 
 /**
  * TooltipProvider

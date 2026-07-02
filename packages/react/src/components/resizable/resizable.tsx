@@ -1,7 +1,7 @@
 import * as ResizablePrimitive from 'react-resizable-panels';
 
-import { IconGripVertical } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconGripVertical } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 
 /**
  * ResizablePanelGroup

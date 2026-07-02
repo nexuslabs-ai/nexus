@@ -21,19 +21,18 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/card';
-import { Input } from '@/components/input';
+} from '../../card';
+import { Input } from '../../input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/select';
-import { Slider } from '@/components/slider';
-import { Switch } from '@/components/switch';
-import { ToggleGroup, ToggleGroupItem } from '@/components/toggle-group';
-
+} from '../../select';
+import { Slider } from '../../slider';
+import { Switch } from '../../switch';
+import { ToggleGroup, ToggleGroupItem } from '../../toggle-group';
 import { NexusAppearanceColorField } from '../color-field';
 import { NexusAppearanceConfigPreview } from '../config-preview';
 import { useNexusAppearance } from '../provider';

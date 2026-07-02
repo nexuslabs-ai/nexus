@@ -3,8 +3,8 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { IconX } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconX } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 
 const alertVariants = cva('nx:group/alert nx:grid nx:w-full nx:p-4', {
   variants: {

@@ -32,11 +32,6 @@ export default defineConfig({
       beforeWriteFile: rewriteRootDeclaration,
     }),
   ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
   build: {
     lib: {
       entry: {

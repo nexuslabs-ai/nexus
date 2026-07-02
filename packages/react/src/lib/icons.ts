@@ -8,7 +8,7 @@
  *
  * @example
  * ```tsx
- * import { IconLoader2 } from '@/lib/icons';
+ * import { IconLoader2 } from './icons';
  * ```
  */
 

@@ -8,7 +8,7 @@ import {
   IconCircleCheck,
   IconInfoCircle,
   IconLoader2,
-} from '@/lib/icons';
+} from '../../lib/icons';
 
 /**
  * Track the active theme by observing the `.dark` class on the document root

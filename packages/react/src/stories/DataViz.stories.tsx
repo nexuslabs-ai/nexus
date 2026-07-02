@@ -15,7 +15,7 @@ import {
 import {
   CHART_CATEGORICAL_SERIES,
   type ChartCategoricalIndex,
-} from '@/lib/chart';
+} from '../lib/chart';
 
 const CHART_NAMES: Record<ChartCategoricalIndex, string> = {
   '1': 'teal',

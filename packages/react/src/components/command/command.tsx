@@ -2,14 +2,14 @@ import * as React from 'react';
 
 import { Command as CommandPrimitive } from 'cmdk';
 
+import { IconSearch } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from '@/components/dialog';
-import { IconSearch } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+} from '../dialog';
 
 /**
  * CommandProps

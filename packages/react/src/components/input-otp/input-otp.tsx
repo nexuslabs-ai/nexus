@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import { OTPInput, OTPInputContext } from 'input-otp';
 
-import { IconPointFilled } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconPointFilled } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 
 /**
  * InputOTPProps

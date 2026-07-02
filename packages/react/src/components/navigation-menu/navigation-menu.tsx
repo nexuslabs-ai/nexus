@@ -3,12 +3,12 @@ import * as React from 'react';
 import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu';
 import { cva } from 'class-variance-authority';
 
+import { IconChevronDown } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 import {
   navigationMenuInlinePopoverSurfaceClassName,
   popoverSurfaceClassName,
-} from '@/components/overlay-layout/overlay-layout';
-import { IconChevronDown } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+} from '../overlay-layout/overlay-layout';
 
 /**
  * NavigationMenuProps

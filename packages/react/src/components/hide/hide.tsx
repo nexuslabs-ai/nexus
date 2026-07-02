@@ -3,8 +3,8 @@ import * as React from 'react';
 import {
   type ResponsiveVisibilityProps,
   visibilityClassName,
-} from '@/lib/responsive-visibility';
-import { cn } from '@/lib/utils';
+} from '../../lib/responsive-visibility';
+import { cn } from '../../lib/utils';
 
 /**
  * The inverse of `<Show>`: renders its children only when a responsive condition

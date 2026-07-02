@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 
-import { IconCircleFilled } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconCircleFilled } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 
 /**
  * RadioGroupProps

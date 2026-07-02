@@ -3,12 +3,12 @@ import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { IconX } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 import {
   overlayBodyClassName,
   overlayCloseButtonClassName,
-} from '@/components/overlay-layout/overlay-layout';
-import { IconX } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+} from '../overlay-layout/overlay-layout';
 
 /**
  * Sheet

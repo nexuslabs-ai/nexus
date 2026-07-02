@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
+import { IconX } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 import {
   containsComposedSlot,
   defaultOverlayLayout,
@@ -11,9 +13,7 @@ import {
   overlayHeaderVariants,
   type OverlayLayoutContextValue,
   overlayScrimVariants,
-} from '@/components/overlay-layout/overlay-layout';
-import { IconX } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+} from '../overlay-layout/overlay-layout';
 
 type DialogLayoutContextValue = Pick<
   OverlayLayoutContextValue,

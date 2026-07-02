@@ -3,9 +3,9 @@ import * as React from 'react';
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { popoverSurfaceClassName } from '@/components/overlay-layout/overlay-layout';
-import { IconCheck, IconChevronRight, IconCircleFilled } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
+import { cn } from '../../lib/utils';
+import { popoverSurfaceClassName } from '../overlay-layout/overlay-layout';
 
 /**
  * ContextMenu

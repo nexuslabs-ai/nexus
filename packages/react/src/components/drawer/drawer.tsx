@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import { Drawer as DrawerPrimitive } from 'vaul';
 
-import { overlayBodyClassName } from '@/components/overlay-layout/overlay-layout';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
+import { overlayBodyClassName } from '../overlay-layout/overlay-layout';
 
 /**
  * Drawer

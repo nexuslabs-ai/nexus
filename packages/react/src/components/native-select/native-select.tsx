@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { IconChevronDown } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconChevronDown } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 
 const nativeSelectVariants = cva(
   [

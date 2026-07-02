@@ -5,14 +5,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconClock } from '@tabler/icons-react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '@/components/button';
-import { Card, CardContent, CardFooter } from '@/components/card';
-import { Field, FieldGroup, FieldLabel } from '@/components/field';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/input-group';
+import { Button } from '../button';
+import { Card, CardContent, CardFooter } from '../card';
+import { Field, FieldGroup, FieldLabel } from '../field';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../input-group';
 
 import { DatePicker } from './date-picker';
 

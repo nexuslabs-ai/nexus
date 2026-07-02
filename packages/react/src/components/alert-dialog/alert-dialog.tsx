@@ -3,7 +3,8 @@ import * as React from 'react';
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import type { VariantProps } from 'class-variance-authority';
 
-import { buttonVariants } from '@/components/button';
+import { cn } from '../../lib/utils';
+import { buttonVariants } from '../button';
 import {
   defaultOverlayLayout,
   overlayBodyClassName,
@@ -14,8 +15,7 @@ import {
   overlayScrimVariants,
   type OverlayVariant,
   resolveOverlayButtonOrientation,
-} from '@/components/overlay-layout/overlay-layout';
-import { cn } from '@/lib/utils';
+} from '../overlay-layout/overlay-layout';
 
 type AlertDialogVariant = OverlayVariant;
 type AlertDialogLayoutContextValue = OverlayLayoutContextValue;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { IconLoader2 } from '@/lib/icons';
-import { cn } from '@/lib/utils';
+import { IconLoader2 } from '../../lib/icons';
+import { cn } from '../../lib/utils';
 
 /**
  * SpinnerProps
