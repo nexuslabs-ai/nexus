@@ -3,7 +3,10 @@ import * as React from 'react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
 import { cn } from '../../lib/utils';
-import { tooltipSurfaceClassName } from '../overlay-layout/overlay-layout';
+import {
+  overlayFloatingTransitionClassName,
+  tooltipSurfaceClassName,
+} from '../overlay-layout/overlay-layout';
 
 /**
  * TooltipProvider
@@ -79,14 +82,7 @@ function TooltipContent({
           tooltipSurfaceClassName,
           'nx:px-3 nx:py-1.5',
           'nx:typography-body-small',
-          'nx:animate-in nx:fade-in-0 nx:zoom-in-95 nx:duration-fast nx:ease-enter',
-          'nx:data-[state=closed]:animate-out nx:data-[state=closed]:fade-out-0 nx:data-[state=closed]:zoom-out-95',
-          'nx:data-[state=closed]:duration-fast nx:data-[state=closed]:ease-exit',
-          'nx:data-[side=bottom]:slide-in-from-top-2',
-          'nx:data-[side=left]:slide-in-from-right-2',
-          'nx:data-[side=right]:slide-in-from-left-2',
-          'nx:data-[side=top]:slide-in-from-bottom-2',
-          'nx:motion-reduce:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
+          overlayFloatingTransitionClassName,
           className
         )}
         {...props}

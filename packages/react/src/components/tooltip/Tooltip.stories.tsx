@@ -3,6 +3,10 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 
 import {
@@ -158,15 +162,16 @@ export const HoverInteraction: Story = {
       const tooltip = document.querySelector('[data-slot="tooltip-content"]');
       expect(tooltip).toBeInTheDocument();
     });
+    const tooltip = document.querySelector('[data-slot="tooltip-content"]');
+    await expectInterruptibleOverlayMotion(tooltip, {
+      oldOpenAnimationClass: 'nx:animate-in',
+    });
 
     // Move away from trigger
     await userEvent.unhover(trigger);
 
     // Tooltip should disappear
-    await waitFor(() => {
-      const tooltip = document.querySelector('[data-slot="tooltip-content"]');
-      expect(tooltip).toBeNull();
-    });
+    await expectExitBeforeUnmount(tooltip);
   },
 };
 

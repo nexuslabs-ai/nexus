@@ -132,6 +132,7 @@ interface AlertDialogContentProps extends React.ComponentProps<
  */
 function AlertDialogContent({
   className,
+  children,
   variant = 'default',
   ...props
 }: AlertDialogContentProps) {
@@ -140,19 +141,23 @@ function AlertDialogContent({
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
-      <AlertDialogLayoutContext.Provider value={{ variant, buttonOrientation }}>
-        <AlertDialogPrimitive.Content
-          data-slot="alert-dialog-content"
-          data-variant={variant}
-          data-orientation={buttonOrientation}
-          className={cn(
-            overlayContentVariants(),
-            variant === 'center' && 'nx:max-w-xs',
-            className
-          )}
-          {...props}
-        />
-      </AlertDialogLayoutContext.Provider>
+      <AlertDialogPrimitive.Content
+        data-slot="alert-dialog-content"
+        data-variant={variant}
+        data-orientation={buttonOrientation}
+        className={cn(
+          overlayContentVariants(),
+          variant === 'center' && 'nx:max-w-xs',
+          className
+        )}
+        {...props}
+      >
+        <AlertDialogLayoutContext.Provider
+          value={{ variant, buttonOrientation }}
+        >
+          {children}
+        </AlertDialogLayoutContext.Provider>
+      </AlertDialogPrimitive.Content>
     </AlertDialogPortal>
   );
 }

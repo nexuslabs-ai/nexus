@@ -3,6 +3,10 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
 import { Label } from '../label';
@@ -173,6 +177,39 @@ export const OpenCloseInteraction: Story = {
         document.querySelector('[data-slot="popover-content"]')
       ).toBeNull();
     });
+  },
+};
+
+export const InterruptibleOpenClose: Story = {
+  render: (_args) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline">Open interruptible popover</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <p className="nx:typography-body-default">Interruptible content</p>
+      </PopoverContent>
+    </Popover>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', {
+      name: 'Open interruptible popover',
+    });
+
+    await userEvent.click(trigger);
+    const content = await within(document.body).findByText(
+      'Interruptible content'
+    );
+    const panel = content.closest('[data-slot="popover-content"]');
+
+    await waitFor(() => expect(content).toBeVisible());
+    await expectInterruptibleOverlayMotion(panel);
+
+    await userEvent.keyboard('{Escape}');
+    await expectExitBeforeUnmount(
+      document.body.querySelector('[data-slot="popover-content"]')
+    );
   },
 };
 

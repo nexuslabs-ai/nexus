@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 
 import {
@@ -326,6 +330,10 @@ export const OpenConfirm: Story = {
     const dialog = await within(document.body).findByRole('alertdialog');
     await expect(dialog).toBeInTheDocument();
     await expect(dialog).toHaveAttribute('data-slot', 'alert-dialog-content');
+    await expectInterruptibleOverlayMotion(dialog);
+    await expect(
+      document.querySelector('[data-slot="alert-dialog-overlay"]')
+    ).toHaveClass('nx:transition-opacity');
 
     // Confirming via the action closes the dialog.
     const continueButton = within(dialog).getByRole('button', {
@@ -333,11 +341,9 @@ export const OpenConfirm: Story = {
     });
     await userEvent.click(continueButton);
 
-    await waitFor(() => {
-      expect(
-        document.querySelector('[data-slot="alert-dialog-content"]')
-      ).toBeNull();
-    });
+    await expectExitBeforeUnmount(
+      document.querySelector('[data-slot="alert-dialog-content"]')
+    );
   },
 };
 

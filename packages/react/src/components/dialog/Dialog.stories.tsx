@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 import {
   DropdownMenu,
@@ -743,20 +747,16 @@ export const ReducedMotionFallbacks: Story = {
         name: 'Close',
       });
 
-      await expect(overlay).toHaveClass(
-        'nx:motion-reduce:data-[state=open]:animate-none',
-        'nx:motion-reduce:data-[state=closed]:animate-none'
-      );
-      await expect(dialog).toHaveClass(
-        'nx:motion-reduce:duration-0',
-        'nx:motion-reduce:data-[state=open]:animate-none',
-        'nx:motion-reduce:data-[state=closed]:animate-none'
-      );
+      await expectInterruptibleOverlayMotion(overlay);
+      await expect(overlay).toHaveClass('nx:transition-opacity');
+      await expectInterruptibleOverlayMotion(dialog);
+      await expect(dialog).toHaveClass('nx:transition-[opacity,scale]');
       await expect(closeButton).toHaveClass('nx:motion-reduce:transition-none');
 
       await userEvent.click(
         within(dialog).getByRole('button', { name: 'Done' })
       );
+      await expectExitBeforeUnmount(document.querySelector('[role="dialog"]'));
     } finally {
       if (document.querySelector('[role="dialog"]')) {
         await userEvent.keyboard('{Escape}');
