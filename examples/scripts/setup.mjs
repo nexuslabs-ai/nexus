@@ -30,6 +30,8 @@ const PORT = 4873;
 const SCOPE = '@acme';
 const NAME = 'acme-design-system';
 
+let verdaccioProc = null;
+
 function run(cmd, args, cwd) {
   console.log(`\n$ ${cmd} ${args.join(' ')}  (${path.relative(REPO_ROOT, cwd) || '.'})`);
   const res = spawnSync(cmd, args, { cwd, stdio: 'inherit', env: process.env });
@@ -63,21 +65,22 @@ async function waitForRegistry(timeoutMs = 60000) {
 async function startVerdaccio() {
   if (await registryUp()) {
     console.log(`ℹ Verdaccio already running at ${REGISTRY} — reusing it.`);
-    return null;
+    return;
   }
   console.log(`▶ starting Verdaccio at ${REGISTRY}`);
   // `detached` makes the child a process-group leader so stopVerdaccio can signal
   // the group — npx spawns verdaccio as a grandchild that would otherwise orphan.
-  const proc = spawn(
+  verdaccioProc = spawn(
     'npx',
     ['--yes', 'verdaccio@6', '--config', path.join(EXAMPLES_DIR, 'verdaccio.yaml'), '--listen', String(PORT)],
     { cwd: EXAMPLES_DIR, stdio: 'inherit', env: process.env, detached: true }
   );
   await waitForRegistry();
-  return proc;
 }
 
-function stopVerdaccio(proc) {
+function stopVerdaccio() {
+  const proc = verdaccioProc;
+  verdaccioProc = null;
   if (!proc?.pid) {
     return;
   }
@@ -119,9 +122,15 @@ function installConsumerApp() {
 }
 
 async function main() {
-  let verdaccio = null;
+  // Ctrl-C won't reach the detached registry, and the default SIGINT skips `finally`.
+  for (const signal of ['SIGINT', 'SIGTERM']) {
+    process.once(signal, () => {
+      stopVerdaccio();
+      process.exit(130);
+    });
+  }
   try {
-    verdaccio = await startVerdaccio();
+    await startVerdaccio();
     exportDesignSystem();
     publishDesignSystem();
     if (fs.existsSync(path.join(APP_DIR, 'package.json'))) {
@@ -134,7 +143,7 @@ async function main() {
     }
     console.log(`\n✅ setup complete. Next:\n   cd ${path.relative(process.cwd(), APP_DIR)} && npm run dev\n`);
   } finally {
-    stopVerdaccio(verdaccio);
+    stopVerdaccio();
   }
 }
 
