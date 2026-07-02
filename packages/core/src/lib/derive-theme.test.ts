@@ -132,14 +132,19 @@ describe('deriveSurfaces', () => {
     );
   });
 
-  it('separates nav from the page background in dark mode', () => {
-    const s = deriveSurfaces('#181818', surfaceTone, 'dark', 0.05);
-    const backgroundL = lOf(s['--nx-color-background']);
-    const navL = lOf(s['--nx-color-nav-background']);
-    const containerL = lOf(s['--nx-color-container']);
+  it('uses the fixed palette ramp for dark nav surfaces', () => {
+    const soft = deriveSurfaces('#181818', surfaceTone, 'dark', 0.02);
+    const strong = deriveSurfaces('#181818', surfaceTone, 'dark', 0.08);
 
-    expect(navL - backgroundL).toBeCloseTo(0.03, 3);
-    expect(navL).toBeLessThan(containerL);
+    for (const s of [soft, strong]) {
+      expect(s['--nx-color-nav-background']).toBe('oklch(0.207 0 0)');
+      expect(s['--nx-color-nav-item-hover']).toBe('oklch(0.297 0 0)');
+      expect(s['--nx-color-nav-item-active']).toBe('oklch(0.297 0 0)');
+      expect(s['--nx-color-nav-border']).toBe('oklch(0.297 0 0)');
+      expect(lOf(s['--nx-color-nav-background'])).toBeLessThan(
+        lOf(s['--nx-color-container'])
+      );
+    }
   });
 
   it('recedes hover darker than background in light mode', () => {
@@ -350,14 +355,31 @@ describe('deriveTheme', () => {
       const soft = at(0);
       const strong = at(100);
 
-      for (const token of [
-        '--nx-color-nav-border',
-        '--nx-color-nav-item-active',
+      const contrastSteppedTokens = [
         '--nx-color-control-background',
         '--nx-color-muted',
         '--nx-color-container-hover',
-      ]) {
+      ];
+      const modeSteppedTokens =
+        mode === 'light'
+          ? [
+              '--nx-color-nav-border',
+              '--nx-color-nav-item-active',
+              ...contrastSteppedTokens,
+            ]
+          : contrastSteppedTokens;
+
+      for (const token of modeSteppedTokens) {
         expect(strong[token], `${mode} ${token}`).not.toBe(soft[token]);
+      }
+
+      if (mode === 'dark') {
+        for (const token of [
+          '--nx-color-nav-border',
+          '--nx-color-nav-item-active',
+        ]) {
+          expect(strong[token], `${mode} ${token}`).toBe(soft[token]);
+        }
       }
     }
   );

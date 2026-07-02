@@ -149,6 +149,48 @@ const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
   'border-active': 9.68,
 };
 
+type DarkNavSurfaceToken =
+  | 'nav-background'
+  | 'nav-item-hover'
+  | 'nav-item-active'
+  | 'nav-border';
+
+const DARK_NAV_SURFACES: Record<
+  NexusSurfaceTone,
+  Record<DarkNavSurfaceToken, string>
+> = {
+  slate: {
+    'nav-background': 'oklch(0.207 0.0398 265.755)',
+    'nav-item-hover': 'oklch(0.297 0.0368 260.031)',
+    'nav-item-active': 'oklch(0.297 0.0368 260.031)',
+    'nav-border': 'oklch(0.297 0.0368 260.031)',
+  },
+  gray: {
+    'nav-background': 'oklch(0.207 0.0318 264.665)',
+    'nav-item-hover': 'oklch(0.297 0.0296 256.848)',
+    'nav-item-active': 'oklch(0.297 0.0296 256.848)',
+    'nav-border': 'oklch(0.297 0.0296 256.848)',
+  },
+  zinc: {
+    'nav-background': 'oklch(0.207 0.0061 271.116)',
+    'nav-item-hover': 'oklch(0.297 0.0057 271.205)',
+    'nav-item-active': 'oklch(0.297 0.0057 271.205)',
+    'nav-border': 'oklch(0.297 0.0057 271.205)',
+  },
+  neutral: {
+    'nav-background': 'oklch(0.207 0 0)',
+    'nav-item-hover': 'oklch(0.297 0 0)',
+    'nav-item-active': 'oklch(0.297 0 0)',
+    'nav-border': 'oklch(0.297 0 0)',
+  },
+  stone: {
+    'nav-background': 'oklch(0.207 0 0)',
+    'nav-item-hover': 'oklch(0.297 0 0)',
+    'nav-item-active': 'oklch(0.297 0 0)',
+    'nav-border': 'oklch(0.297 0 0)',
+  },
+};
+
 /** Opaque surface tiers derived from the background seed + contrast Δ. */
 export function deriveSurfaces(
   backgroundHex: string,
@@ -164,6 +206,12 @@ export function deriveSurfaces(
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
   for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
+    if (dark && token in DARK_NAV_SURFACES[surfaceTone]) {
+      out[`--nx-color-${token}`] =
+        DARK_NAV_SURFACES[surfaceTone][token as DarkNavSurfaceToken];
+      continue;
+    }
+
     const step = dark
       ? (DARK_SURFACE_STEPS[token] ?? rawStep)
       : FLAT_IN_LIGHT.has(token)

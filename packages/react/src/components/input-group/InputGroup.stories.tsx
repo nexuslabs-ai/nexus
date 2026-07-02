@@ -157,6 +157,7 @@ export const WithDataAttributes: Story = {
     const group = canvasElement.querySelector('[data-slot="input-group"]');
     await expect(group).toBeInTheDocument();
     await expect(group).toHaveAttribute('role', 'group');
+    await expect(group).toHaveAttribute('data-variant', 'default');
     await expect(
       canvasElement.querySelector('[data-slot="input-group-addon"]')
     ).toBeInTheDocument();
@@ -234,6 +235,87 @@ export const Disabled: Story = {
     await expect(
       canvas.getByRole('button', { name: 'Subscribe' })
     ).toBeDisabled();
+  },
+};
+
+export const BorderlessStates: Story = {
+  render: () => (
+    <div className="nx:flex nx:w-80 nx:flex-col nx:gap-3">
+      <InputGroup data-testid="ig-borderless-empty" variant="borderless">
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput aria-label="Borderless search" placeholder="Search…" />
+      </InputGroup>
+      <InputGroup data-testid="ig-borderless-filled" variant="borderless">
+        <InputGroupInput
+          aria-label="Filled borderless URL"
+          defaultValue="nexus.dev"
+        />
+      </InputGroup>
+      <InputGroup data-testid="ig-borderless-readonly" variant="borderless">
+        <InputGroupInput
+          aria-label="Read-only borderless URL"
+          defaultValue="nexus.dev"
+          readOnly
+        />
+      </InputGroup>
+      <InputGroup data-testid="ig-borderless-invalid" variant="borderless">
+        <InputGroupInput
+          aria-label="Invalid borderless email"
+          defaultValue="jane@"
+          aria-invalid
+        />
+      </InputGroup>
+      <InputGroup
+        data-testid="ig-borderless-disabled"
+        variant="borderless"
+        data-disabled="true"
+      >
+        <InputGroupInput
+          aria-label="Disabled borderless email"
+          defaultValue="jane@example.com"
+          disabled
+        />
+      </InputGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const empty = canvas.getByTestId('ig-borderless-empty');
+    const readOnly = canvas.getByRole('textbox', {
+      name: 'Read-only borderless URL',
+    });
+    const invalid = canvas.getByTestId('ig-borderless-invalid');
+    const disabled = canvas.getByTestId('ig-borderless-disabled');
+
+    await expect(empty).toHaveAttribute('data-variant', 'borderless');
+    await expect(empty).toHaveClass('nx:border-transparent');
+    await expect(empty).toHaveClass('nx:bg-control-background');
+    await expect(empty).toHaveClass(
+      'nx:not-data-[disabled=true]:hover:bg-control-background-hover'
+    );
+
+    await expect(readOnly).toHaveAttribute('readonly');
+    await expect(readOnly).not.toBeDisabled();
+
+    await expect(
+      canvas.getByRole('textbox', { name: 'Invalid borderless email' })
+    ).toHaveAttribute('aria-invalid', 'true');
+    await expect(invalid).toHaveClass(
+      'nx:has-[[data-slot][aria-invalid=true]]:border-border-error'
+    );
+    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
+      'rgba(0, 0, 0, 0)'
+    );
+
+    await expect(
+      canvas.getByRole('textbox', { name: 'Disabled borderless email' })
+    ).toBeDisabled();
+    await expect(disabled).toHaveClass('nx:data-[disabled=true]:bg-disabled');
+    await expect(disabled).not.toHaveClass(
+      'nx:data-[disabled=true]:border-border-disabled'
+    );
   },
 };
 
@@ -383,6 +465,36 @@ export const StateMatrix: Story = {
     await expect(
       canvas.getByRole('status', { name: 'Checking username' })
     ).toBeInTheDocument();
+  },
+};
+
+export const BorderlessHoverSurface: Story = {
+  render: () => (
+    <InputGroup
+      data-testid="ig-borderless-hover"
+      variant="borderless"
+      className="nx:w-80"
+    >
+      <InputGroupAddon>
+        <IconSearch aria-hidden />
+      </InputGroupAddon>
+      <InputGroupInput
+        data-testid="ig-borderless-hover-input"
+        aria-label="Search"
+        placeholder="Search…"
+      />
+    </InputGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByTestId('ig-borderless-hover');
+    const input = canvas.getByTestId('ig-borderless-hover-input');
+
+    await expect(group).toHaveClass('nx:bg-control-background');
+    await expect(group).toHaveClass(
+      'nx:not-data-[disabled=true]:hover:bg-control-background-hover'
+    );
+    await expect(input).toHaveClass('nx:enabled:hover:bg-transparent');
   },
 };
 
@@ -553,6 +665,15 @@ export const AllVariants: Story = {
         <InputGroupAddon align="block-end">
           <InputGroupText>0 / 200</InputGroupText>
         </InputGroupAddon>
+      </InputGroup>
+      <InputGroup variant="borderless">
+        <InputGroupAddon>
+          <IconSearch aria-hidden />
+        </InputGroupAddon>
+        <InputGroupInput
+          aria-label="Borderless search"
+          placeholder="Borderless search…"
+        />
       </InputGroup>
     </div>
   ),

@@ -6,13 +6,13 @@ import { cn } from '@/lib/utils';
 
 const inputVariants = cva(
   [
-    'nx:flex nx:w-full nx:rounded-md nx:border-width-default nx:border-color-default',
-    'nx:bg-background nx:text-foreground nx:transition-colors nx:enabled:hover:bg-background-hover',
+    'nx:flex nx:w-full nx:rounded-md nx:border-width-default',
+    'nx:text-foreground nx:transition-colors',
     'nx:file:border-0 nx:file:bg-transparent nx:file:typography-label-default nx:file:text-foreground nx:disabled:file:text-disabled-foreground',
     'nx:placeholder:text-muted-foreground',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:aria-invalid:border-color-error nx:aria-invalid:focus-visible:outline-focus-error',
-    'nx:disabled:cursor-not-allowed nx:disabled:border-color-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
+    'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground',
   ],
   {
     variants: {
@@ -21,9 +21,16 @@ const inputVariants = cva(
         sm: 'nx:h-8 nx:px-2.5 nx:py-0 nx:typography-body-small',
         lg: 'nx:h-12 nx:px-3.5 nx:py-0 nx:typography-body-default',
       },
+      variant: {
+        default:
+          'nx:border-color-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-color-disabled',
+        borderless:
+          'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
+      },
     },
     defaultVariants: {
       size: 'default',
+      variant: 'default',
     },
   }
 );
@@ -42,7 +49,9 @@ interface InputProps
  * Input
  *
  * A text input field for collecting user data.
- * Supports different sizes and all native input attributes.
+ * Supports different sizes and all native input attributes. Use
+ * `variant="borderless"` to remove the visible border while keeping a tonal
+ * control fill for resting affordance.
  *
  * @example
  * ```tsx
@@ -61,13 +70,14 @@ interface InputProps
  * <Input type="email" placeholder="Enter email" />
  * ```
  */
-function Input({ className, type, size, ...props }: InputProps) {
+function Input({ className, type, size, variant, ...props }: InputProps) {
   return (
     <input
       type={type}
       data-slot="input"
       data-size={size ?? 'default'}
-      className={cn(inputVariants({ size, className }))}
+      data-variant={variant ?? 'default'}
+      className={cn(inputVariants({ size, variant, className }))}
       {...props}
     />
   );

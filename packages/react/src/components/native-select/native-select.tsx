@@ -7,11 +7,11 @@ import { cn } from '@/lib/utils';
 
 const nativeSelectVariants = cva(
   [
-    'nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border-default nx:border-border-default',
-    'nx:bg-background nx:text-foreground nx:transition-colors nx:enabled:hover:bg-background-hover nx:outline-none',
+    'nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border-default',
+    'nx:text-foreground nx:transition-colors nx:outline-none',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
-    'nx:disabled:cursor-not-allowed',
+    'nx:disabled:cursor-not-allowed nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
   ],
   {
     variants: {
@@ -19,9 +19,16 @@ const nativeSelectVariants = cva(
         default: 'nx:px-3 nx:py-2 nx:pr-9 nx:typography-body-default',
         sm: 'nx:px-2.5 nx:py-1.5 nx:pr-9 nx:typography-body-small',
       },
+      variant: {
+        default:
+          'nx:border-border-default nx:bg-background nx:enabled:hover:bg-background-hover nx:disabled:border-border-disabled',
+        borderless:
+          'nx:border-transparent nx:bg-control-background nx:enabled:hover:bg-control-background-hover',
+      },
     },
     defaultVariants: {
       size: 'default',
+      variant: 'default',
     },
   }
 );
@@ -42,7 +49,8 @@ interface NativeSelectProps
  * A styled wrapper over the native `<select>` — on mobile it opens the OS
  * picker (iOS wheel / Android sheet), the preferred dense-form UX there. The
  * open list is OS-rendered. For rich options (icons, descriptions, grouping)
- * on desktop, use `Select`.
+ * on desktop, use `Select`. Use `variant="borderless"` to remove the visible
+ * border while keeping a tonal control fill for resting affordance.
  *
  * @example
  * ```tsx
@@ -55,6 +63,7 @@ interface NativeSelectProps
 function NativeSelect({
   className,
   size = 'default',
+  variant,
   ...props
 }: NativeSelectProps) {
   return (
@@ -65,11 +74,8 @@ function NativeSelect({
       <select
         data-slot="native-select"
         data-size={size}
-        className={cn(
-          nativeSelectVariants({ size }),
-          'nx:disabled:border-border-disabled nx:disabled:bg-disabled nx:disabled:text-disabled-foreground',
-          className
-        )}
+        data-variant={variant ?? 'default'}
+        className={cn(nativeSelectVariants({ size, variant, className }))}
         {...props}
       />
       <IconChevronDown
