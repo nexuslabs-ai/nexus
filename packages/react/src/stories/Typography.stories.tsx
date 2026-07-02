@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect } from 'storybook/test';
 
 import {
   tokenValue,
@@ -342,4 +343,27 @@ export const CompositeUtilities: Story = {
       ))}
     </div>
   ),
+};
+
+export const HeadingsBalance: Story = {
+  render: () => (
+    <h2
+      data-testid="balanced-heading"
+      className="nx:typography-heading-large"
+      style={{ inlineSize: '18rem' }}
+    >
+      A deliberately long heading that wraps onto multiple lines
+    </h2>
+  ),
+  play: async ({ canvasElement }) => {
+    const heading = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="balanced-heading"]'
+    );
+    const style = getComputedStyle(heading!);
+    const wrap =
+      style.getPropertyValue('text-wrap-style') ||
+      style.getPropertyValue('text-wrap');
+
+    await expect(wrap).toContain('balance');
+  },
 };

@@ -72,7 +72,7 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "nx:flex nx:aspect-video nx:justify-center nx:typography-body-small nx:[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground nx:[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-curve.recharts-tooltip-cursor]:stroke-border-default nx:[&_.recharts-dot[stroke='#fff']]:stroke-transparent nx:[&_.recharts-layer]:outline-hidden nx:[&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-radial-bar-background-sector]:fill-muted nx:[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted nx:[&_.recharts-reference-line_[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-sector]:outline-hidden nx:[&_.recharts-sector[stroke='#fff']]:stroke-transparent nx:[&_.recharts-surface]:outline-hidden",
+          "nx:flex nx:aspect-video nx:justify-center nx:typography-body-small nx:[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground nx:[&_.recharts-cartesian-axis-tick_text]:tabular-nums nx:[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-curve.recharts-tooltip-cursor]:stroke-border-default nx:[&_.recharts-dot[stroke='#fff']]:stroke-transparent nx:[&_.recharts-layer]:outline-hidden nx:[&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-radial-bar-background-sector]:fill-muted nx:[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted nx:[&_.recharts-reference-line_[stroke='#ccc']]:stroke-border-default nx:[&_.recharts-sector]:outline-hidden nx:[&_.recharts-sector[stroke='#fff']]:stroke-transparent nx:[&_.recharts-surface]:outline-hidden",
           className
         )}
         style={chartStyle}
