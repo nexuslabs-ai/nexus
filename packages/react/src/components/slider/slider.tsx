@@ -29,7 +29,7 @@ const sliderRangeVariants =
   'nx:absolute nx:bg-control-background nx:bg-clip-content nx:p-0.5 nx:transition-colors nx:duration-fast nx:data-disabled:bg-disabled nx:data-[orientation=horizontal]:top-0 nx:data-[orientation=horizontal]:h-full nx:data-[orientation=vertical]:left-0 nx:data-[orientation=vertical]:w-full nx:motion-reduce:transition-none';
 
 const sliderThumbVariants = cva(
-  "nx:relative nx:block nx:size-5 nx:shrink-0 nx:bg-transparent nx:before:absolute nx:before:top-1/2 nx:before:left-1/2 nx:before:-translate-x-1/2 nx:before:-translate-y-1/2 nx:before:rounded-sm nx:before:bg-foreground nx:before:content-[''] nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-3 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:aria-invalid:focus-visible:outline-focus-error nx:data-disabled:before:bg-disabled-foreground",
+  "nx:relative nx:block nx:size-5 nx:shrink-0 nx:bg-transparent nx:before:absolute nx:before:top-1/2 nx:before:left-1/2 nx:before:-translate-x-1/2 nx:before:-translate-y-1/2 nx:before:rounded-sm nx:before:bg-foreground nx:before:content-[''] nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:aria-invalid:focus-visible:outline-focus-error nx:data-disabled:before:bg-disabled-foreground",
   {
     variants: {
       orientation: {

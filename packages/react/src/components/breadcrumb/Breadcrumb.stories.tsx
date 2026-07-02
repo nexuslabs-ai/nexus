@@ -345,6 +345,56 @@ export const WithEllipsis: Story = {
   },
 };
 
+export const EllipsisTouchTarget: Story = {
+  render: () => (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <BreadcrumbMenuTrigger aria-label="Show alternate paths for Home" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem asChild>
+                <a href="/accounts">Accounts</a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <BreadcrumbEllipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem asChild>
+                <a href="/projects">Projects</a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  ),
+  play: async ({ canvasElement }) => {
+    const menuTrigger = canvasElement.querySelector(
+      '[data-slot="breadcrumb-menu-trigger"]'
+    );
+    const ellipsis = canvasElement.querySelector(
+      '[data-slot="breadcrumb-ellipsis"]'
+    );
+
+    await expect(menuTrigger).toHaveClass('nx:relative');
+    await expect(menuTrigger).toHaveClass(
+      'nx:pointer-coarse:after:-inset-3'
+    );
+    await expect(ellipsis).toHaveClass('nx:relative');
+    await expect(ellipsis).toHaveClass('nx:pointer-coarse:after:-inset-3');
+  },
+};
+
 // Figma supports optional item icons and trailing dropdown affordances. The
 // chevron is a real menu trigger next to the link, not an interactive control
 // nested inside the anchor.
