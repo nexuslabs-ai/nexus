@@ -1641,6 +1641,18 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     css += `}\n\n`;
   }
 
+  css += `@keyframes overlay-presence-exit {\n`;
+  css += `  from,\n`;
+  css += `  to {\n`;
+  css += `    opacity: 1;\n`;
+  css += `  }\n`;
+  css += `}\n\n`;
+  css += `@utility animate-overlay-presence-exit {\n`;
+  css += `  animation-name: overlay-presence-exit;\n`;
+  css += `  animation-duration: var(--tw-duration, var(--nx-motion-duration-fast));\n`;
+  css += `  animation-timing-function: linear;\n`;
+  css += `}\n\n`;
+
   return { css, count: durationTokens.length };
 }
 
