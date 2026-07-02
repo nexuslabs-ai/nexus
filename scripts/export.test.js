@@ -281,7 +281,7 @@ describe('scanInternalDeps', () => {
       "import { cn } from '@/lib/utils';",
       "// import { useIsNarrow } from '@/hooks/use-narrow';",
     ].join('\n');
-    expect(scanInternalDeps(source)).toEqual({
+    expect(scanInternalDeps(source, 'components/sidebar')).toEqual({
       components: ['overlay-layout'],
       lib: ['icons', 'utils'],
       hooks: [],
@@ -298,7 +298,7 @@ describe('scanInternalDeps', () => {
       "const cdn = 'https://x.io'; export { Button } from '@/components/button';",
       "import { useToast } from '@/hooks/use-toast';",
     ].join('\n');
-    expect(scanInternalDeps(source)).toEqual({
+    expect(scanInternalDeps(source, 'components/sidebar')).toEqual({
       components: ['button'],
       lib: ['utils'],
       hooks: ['use-toast'],
@@ -315,10 +315,28 @@ describe('scanInternalDeps', () => {
       "import { part } from './internal-sibling';",
       "// import { Dead } from '../tooltip';",
     ].join('\n');
-    expect(scanInternalDeps(source)).toEqual({
+    expect(scanInternalDeps(source, 'components/sidebar')).toEqual({
       components: ['button', 'button-group'],
       lib: ['icons', 'utils'],
       hooks: ['use-narrow'],
+    });
+  });
+
+  it('resolves against the file dir so intra-component (nested) imports do not leak', () => {
+    // A file nested inside `appearance/` (a component with internal subdirs).
+    const source = [
+      "import { ColorField } from '../color-field';",
+      "import { ConfigPreview } from '../config-preview';",
+      "import { part } from './appearance-settings';",
+      "import { Button } from '../../button';",
+      "import { cn } from '../../../lib/utils';",
+    ].join('\n');
+    expect(
+      scanInternalDeps(source, 'components/appearance/appearance-settings')
+    ).toEqual({
+      components: ['button'],
+      lib: ['utils'],
+      hooks: [],
     });
   });
 
@@ -329,7 +347,7 @@ describe('scanInternalDeps', () => {
       "export * from '@/hooks';",
       "import { Button } from '@/components';",
     ].join('\n');
-    expect(scanInternalDeps(source)).toEqual({
+    expect(scanInternalDeps(source, 'components/sidebar')).toEqual({
       components: [],
       lib: [],
       hooks: [],

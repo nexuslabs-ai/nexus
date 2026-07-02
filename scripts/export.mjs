@@ -299,36 +299,44 @@ export function transformTailwindPackageJson(pkg, { scope, version }) {
   return next;
 }
 
-const BUCKET_ROOTS = new Set(['components', 'lib', 'hooks']);
-
 /**
- * Scan component source for its intra-package deps (`@/` alias or relative),
- * bucketed by root. Comments are stripped (URLs preserved) so a commented import
- * can't leak in. Seeds the registry manifest.
+ * Scan one component source file for its intra-package deps (`@/` alias or
+ * relative), resolving each specifier against the file's own directory so a
+ * nested-internal import (`../color-field` inside `appearance/…`) resolves to its
+ * true path and can't leak as a phantom sibling component. `fileDir` is the file's
+ * directory relative to `src/` (POSIX, e.g. `components/appearance/setting-row`).
+ * Comments are stripped (URLs preserved) so a commented import can't leak in.
+ * Seeds the registry manifest.
  */
-export function scanInternalDeps(text) {
+export function scanInternalDeps(text, fileDir) {
   const withoutComments = text
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(?<!:)\/\/.*$/gm, '');
   const deps = { components: new Set(), lib: new Set(), hooks: new Set() };
-
-  // lib/hooks carry their bucket in the path; any other cross-dir relative
-  // import (`../button`) is a sibling component keyed by its directory name.
   const isModuleName = (name) => /^[\w-]+$/.test(name ?? '');
+  const owner = fileDir.split('/')[1]; // components/<owner>/…
+
   const specRe = /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
   let match;
   while ((match = specRe.exec(withoutComments)) !== null) {
     const spec = match[1];
-    if (!spec.startsWith('@/') && !spec.startsWith('../')) {
+    let target;
+    if (spec.startsWith('@/')) {
+      target = spec.slice(2);
+    } else if (spec.startsWith('./') || spec.startsWith('../')) {
+      target = path.posix.join(fileDir, spec);
+    } else {
       continue;
     }
-    const [head, next] = spec.replace(/^(?:@\/|(?:\.\.\/)+)/, '').split('/');
-    if ((head === 'lib' || head === 'hooks') && isModuleName(next)) {
-      deps[head].add(next);
-    } else if (head === 'components' && isModuleName(next)) {
-      deps.components.add(next);
-    } else if (isModuleName(head) && !BUCKET_ROOTS.has(head)) {
-      deps.components.add(head);
+    // `target` is now src-relative; classify by its first two segments. An import
+    // that resolves back into the owning component is internal, not a dep.
+    const [root, name] = target.split('/');
+    if (root === 'lib' && isModuleName(name)) {
+      deps.lib.add(name);
+    } else if (root === 'hooks' && isModuleName(name)) {
+      deps.hooks.add(name);
+    } else if (root === 'components' && isModuleName(name) && name !== owner) {
+      deps.components.add(name);
     }
   }
 
@@ -725,21 +733,22 @@ function copyTree(srcDir, destDir, { scope, skip, transform }) {
 
 /** Collect the minimal registry manifest entries from the source component tree. */
 function collectComponentEntries(componentsDir) {
+  const srcDir = path.dirname(componentsDir);
+  const componentNames = new Set(
+    fs
+      .readdirSync(componentsDir, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name)
+  );
+
   const entries = [];
-  const componentDirs = new Set();
-  for (const dirent of fs.readdirSync(componentsDir, { withFileTypes: true })) {
-    if (!dirent.isDirectory()) {
-      continue;
-    }
-    const dir = path.join(componentsDir, dirent.name);
-    componentDirs.add(dirent.name);
+  for (const name of componentNames) {
     const files = [];
-    const sources = [];
+    const fileDeps = [];
     const walk = (current) => {
       for (const child of fs.readdirSync(current, { withFileTypes: true })) {
         const childPath = path.join(current, child.name);
         if (child.isDirectory()) {
-          componentDirs.add(child.name);
           walk(childPath);
           continue;
         }
@@ -748,25 +757,30 @@ function collectComponentEntries(componentsDir) {
         }
         files.push(path.relative(componentsDir, childPath));
         if (child.name.endsWith('.tsx') || child.name.endsWith('.ts')) {
-          sources.push(fs.readFileSync(childPath, 'utf8'));
+          const fileDir = path.relative(srcDir, current).split(path.sep).join('/');
+          fileDeps.push(scanInternalDeps(fs.readFileSync(childPath, 'utf8'), fileDir));
         }
       }
     };
-    walk(dir);
+    walk(path.join(componentsDir, name));
     entries.push({
-      name: dirent.name,
+      name,
       files: files.sort(),
-      deps: scanInternalDeps(sources.join('\n')),
+      deps: {
+        components: [...new Set(fileDeps.flatMap((d) => d.components))].sort(),
+        lib: [...new Set(fileDeps.flatMap((d) => d.lib))].sort(),
+        hooks: [...new Set(fileDeps.flatMap((d) => d.hooks))].sort(),
+      },
     });
   }
 
-  // Fail loud if the catch-all minted a phantom component dep with no real dir.
+  // Fail loud if a scan produced a component dep that isn't a real component dir.
   for (const entry of entries) {
-    const unknown = entry.deps.components.filter((name) => !componentDirs.has(name));
+    const unknown = entry.deps.components.filter((dep) => !componentNames.has(dep));
     if (unknown.length > 0) {
       throw new Error(
         `Component "${entry.name}" references unknown component dep(s): ${unknown.join(', ')}. ` +
-          `scanInternalDeps mis-bucketed a non-component import root — extend its bucket handling.`
+          `scanInternalDeps mis-resolved a non-component import — check its bucket handling.`
       );
     }
   }
