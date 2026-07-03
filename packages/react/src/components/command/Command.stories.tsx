@@ -12,6 +12,7 @@ import {
 import { useCommandState } from 'cmdk';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
 import { Button } from '../button';
 import { Spinner } from '../spinner';
 
@@ -278,6 +279,32 @@ export const RichItems: Story = {
       </CommandList>
     </Command>
   ),
+};
+
+export const StaggeredItems: Story = {
+  render: () => (
+    <Command label="Motion command menu" className={paletteClass}>
+      <CommandInput placeholder="Search commands..." />
+      <CommandList>
+        <CommandGroup heading="Actions">
+          <CommandItem>Open project</CommandItem>
+          <CommandItem>Search documentation</CommandItem>
+          <CommandItem>Project settings</CommandItem>
+          <CommandItem>Invite teammate</CommandItem>
+          <CommandItem>Open billing</CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const listbox = canvas.getByRole('listbox');
+    const items = Array.from(
+      listbox.querySelectorAll('[data-slot="command-item"]')
+    );
+
+    await expectStaggeredItemMotion(listbox, items);
+  },
 };
 
 export const AdvancedFiltering: Story = {

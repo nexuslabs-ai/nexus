@@ -3,6 +3,8 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
+
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -208,6 +210,40 @@ export const WithInsetItems: Story = {
       </ContextMenuContent>
     </ContextMenu>
   ),
+};
+
+export const StaggeredItems: Story = {
+  render: (_args) => (
+    <ContextMenu>
+      <ContextMenuTrigger className={triggerClass}>
+        Right click for staggered items
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem>Back</ContextMenuItem>
+        <ContextMenuItem>Forward</ContextMenuItem>
+        <ContextMenuItem>Reload</ContextMenuItem>
+        <ContextMenuItem>Save Page</ContextMenuItem>
+        <ContextMenuItem>Inspect</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByText('Right click for staggered items');
+
+    await fireEvent.contextMenu(trigger, { clientX: 20, clientY: 20 });
+
+    const menu = await within(document.body).findByRole('menu');
+    const items = Array.from(
+      menu.querySelectorAll('[data-slot="context-menu-item"]')
+    );
+    await expectStaggeredItemMotion(menu, items);
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="menu"]')).toBeNull();
+    });
+  },
 };
 
 // ============================================
