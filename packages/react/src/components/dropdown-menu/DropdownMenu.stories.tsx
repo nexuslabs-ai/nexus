@@ -146,6 +146,96 @@ export const WithRadioItems: Story = {
   },
 };
 
+export const IndicatorCrossFade: Story = {
+  render: function IndicatorCrossFadeStory() {
+    const [showStatusBar, setShowStatusBar] = React.useState(true);
+    const [showActivityBar, setShowActivityBar] = React.useState(false);
+    const [position, setPosition] = React.useState('bottom');
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">Indicator Motion</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="nx:w-56">
+          <DropdownMenuCheckboxItem
+            checked={showStatusBar}
+            onCheckedChange={setShowStatusBar}
+          >
+            Status Bar
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={showActivityBar}
+            onCheckedChange={setShowActivityBar}
+          >
+            Activity Bar
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+            <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Indicator Motion' });
+
+    try {
+      await userEvent.click(trigger);
+
+      const menu = await within(document.body).findByRole('menu');
+      const checkedItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Status Bar',
+      });
+      const uncheckedItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Activity Bar',
+      });
+      const selectedRadio = within(menu).getByRole('menuitemradio', {
+        name: 'Bottom',
+      });
+      const unselectedRadio = within(menu).getByRole('menuitemradio', {
+        name: 'Top',
+      });
+
+      const checkedIcon = checkedItem.querySelector(
+        '[data-slot="dropdown-menu-checkbox-indicator-icon"]'
+      );
+      const uncheckedIcon = uncheckedItem.querySelector(
+        '[data-slot="dropdown-menu-checkbox-indicator-icon"]'
+      );
+      const selectedDot = selectedRadio.querySelector(
+        '[data-slot="dropdown-menu-radio-indicator-icon"]'
+      );
+      const unselectedDot = unselectedRadio.querySelector(
+        '[data-slot="dropdown-menu-radio-indicator-icon"]'
+      );
+
+      await expect(checkedIcon).toBeInTheDocument();
+      await expect(uncheckedIcon).toBeInTheDocument();
+      await expect(selectedDot).toBeInTheDocument();
+      await expect(unselectedDot).toBeInTheDocument();
+      await expect(checkedIcon).toHaveClass(
+        'nx:transition-[opacity,transform]'
+      );
+      await expect(checkedIcon).toHaveClass(
+        'nx:group-data-[state=checked]:opacity-100'
+      );
+      await expect(checkedIcon).toHaveClass('nx:motion-reduce:transition-none');
+      await expect(selectedDot).toHaveClass(
+        'nx:group-data-[state=checked]:opacity-100'
+      );
+    } finally {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(document.querySelector('[role="menu"]')).toBeNull();
+      });
+    }
+  },
+};
+
 export const WithSubMenu: Story = {
   render: (_args) => (
     <DropdownMenu>
