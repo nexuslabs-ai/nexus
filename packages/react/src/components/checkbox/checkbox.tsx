@@ -82,18 +82,19 @@ function Checkbox({ className, ...props }: CheckboxProps) {
       {...props}
     >
       <CheckboxPrimitive.Indicator
+        forceMount
         data-slot="checkbox-indicator"
-        className="nx:flex nx:items-center nx:justify-center nx:text-current"
+        className="nx:relative nx:flex nx:size-full nx:items-center nx:justify-center nx:text-current"
       >
         <IconCheck
           data-slot="checkbox-check"
           aria-hidden="true"
-          className="nx:hidden nx:size-3.5 nx:group-data-[state=checked]:block"
+          className="nx:absolute nx:size-3.5 nx:scale-50 nx:opacity-0 nx:transition-[opacity,transform] nx:duration-fast nx:ease-enter nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100 nx:motion-reduce:transition-none"
         />
         <IconMinus
           data-slot="checkbox-minus"
           aria-hidden="true"
-          className="nx:hidden nx:size-3.5 nx:group-data-[state=indeterminate]:block"
+          className="nx:absolute nx:size-3.5 nx:scale-50 nx:opacity-0 nx:transition-[opacity,transform] nx:duration-fast nx:ease-enter nx:group-data-[state=indeterminate]:scale-100 nx:group-data-[state=indeterminate]:opacity-100 nx:motion-reduce:transition-none"
         />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
