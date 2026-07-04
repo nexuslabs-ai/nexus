@@ -696,6 +696,10 @@ export function generateTypographyUtilitiesCSS(tokensDir, primitiveMap) {
       css += `  letter-spacing: ${resolveTypographyProperty(value.letterSpacing, primitiveMap)};\n`;
     }
 
+    if (token.path[0] === 'heading') {
+      css += `  text-wrap: balance;\n`;
+    }
+
     if (token.path[0] === 'body') {
       // orphan/widow protection for multi-line copy
       css += `  text-wrap: pretty;\n`;

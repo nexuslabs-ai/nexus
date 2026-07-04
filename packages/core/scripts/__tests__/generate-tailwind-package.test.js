@@ -398,6 +398,14 @@ describe('generateTailwindPackage', () => {
     expect(typographyCSS).not.toMatch(/line-height: auto/);
   });
 
+  it('emits balanced wrapping on heading typography utilities', () => {
+    const block = extractBlock(
+      typographyCSS,
+      '@utility typography-heading-large'
+    );
+    expect(block).toMatch(/text-wrap: balance;/);
+  });
+
   it('emits typography-shortcut from the shortcut composite token', () => {
     const block = extractBlock(typographyCSS, '@utility typography-shortcut');
     expect(block).toMatch(
