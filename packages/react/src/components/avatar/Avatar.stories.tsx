@@ -647,6 +647,8 @@ export const FallbackDataAttributes: Story = {
     const avatar = canvas.getByRole('img', { name: 'Ada Byron' });
 
     await expect(fallback).toBeInTheDocument();
+    await expect(fallback).not.toHaveClass('nx:animate-in');
+    await expect(fallback).not.toHaveClass('nx:fade-in-0');
     await expect(avatar).toHaveAttribute('data-slot', 'avatar');
   },
 };
