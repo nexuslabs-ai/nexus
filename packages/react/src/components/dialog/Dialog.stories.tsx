@@ -41,6 +41,30 @@ const meta: Meta<typeof Dialog> = {
 export default meta;
 type Story = StoryObj<typeof Dialog>;
 
+// #593 — the close-button touch hit area is gated by pointer modality (coarse),
+// not by viewport, so it survives on large touchscreens.
+export const CloseHitAreaModalityGated: Story = {
+  render: () => (
+    <Dialog defaultOpen>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hit area</DialogTitle>
+          <DialogDescription>
+            The close hit area is gated by coarse pointer, not viewport.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async () => {
+    const close = document.body.querySelector(
+      '[data-slot="dialog-close-button"]'
+    );
+    await expect(close).not.toHaveClass('nx:lg:after:hidden');
+    await expect(close).toHaveClass('nx:pointer-coarse:after:-inset-2.5');
+  },
+};
+
 // ============================================
 // BASIC STORIES
 // ============================================
@@ -695,9 +719,8 @@ export const CloseButtonFocus: Story = {
     await expect(closeButton).toHaveClass(
       'nx:right-6',
       'nx:top-6',
-      'nx:after:absolute',
-      'nx:after:-inset-2.5',
-      'nx:lg:after:hidden'
+      'nx:pointer-coarse:after:absolute',
+      'nx:pointer-coarse:after:-inset-2.5'
     );
 
     await userEvent.keyboard('{Escape}');
