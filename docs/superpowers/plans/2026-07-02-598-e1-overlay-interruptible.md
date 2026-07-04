@@ -9,9 +9,14 @@ teardown. Radix Presence is animation-gated (`animationName` /
 `animationend`), while this work removes the keyframes that currently provide
 both the enter 0% frame and the exit unmount delay. The spike must first add a
 small Nexus transition-presence helper that uses `forceMount`, owns the visual
-motion state, waits for `transitionend`, and gates closed content from pointer
-and focus access. Only after Popover proves that helper should the recipe fan
-out to other surfaces.
+motion state, waits for `transitionend`, and gates exiting content from pointer
+and focus access. Teardown means **full unmount** of the Radix
+portal/content/overlay subtree after the exit transition completes; a mounted
+but visually hidden/deactivated subtree is not an acceptable closed state
+because modal Radix side effects such as scroll lock, outside hiding, and focus
+scope are Presence-gated. The precursor PR must prove the helper on both
+Popover (non-modal positioning surface) and Dialog (modal side-effect surface)
+before any recipe fans out to other overlays.
 
 **Tech Stack:** React, Tailwind v4 (`nx:` prefix, data-attribute variants,
 individual transform-property transitions), Radix primitives with `forceMount`,
@@ -30,14 +35,25 @@ these surfaces), Storybook 10 (`storybook/test`).
 - **Radix `Presence` is not the transition teardown mechanism** - every
   converted Presence-backed surface needs `forceMount` plus Nexus-owned
   transitionend teardown.
+- **Teardown means full unmount** - after the visible exit transition ends, the
+  helper must unmount the Radix portal/content/overlay subtree. Do not keep a
+  closed modal subtree mounted as `aria-hidden`, pointer-blocked, or otherwise
+  "deactivated"; that leaves modal side effects alive.
+- **Split precursor from fan-out** - the first implementation PR is the shared
+  helper plus Popover and Dialog spikes only. Remaining overlay surfaces move in
+  follow-up PRs after the modal and non-modal contracts are proven.
 - **No `@starting-style` for this work** - it is below the Nexus browser floor.
 - Tailwind v4 scale/translate utilities emit individual transform properties.
   Use `nx:transition-[opacity,scale]` for fade+scale surfaces and
   `nx:transition-[opacity,translate]` (or `opacity,scale,translate` where both
   are used) for directional slide surfaces. Do **not** use
   `transition-[opacity,transform]` for `scale-95`.
-- Closed/closing content must be gated: no pointer interaction, no focusable
-  descendants reachable by Tab, and hidden from assistive tech while closed.
+- Exiting content must be gated: no pointer interaction and no focusable
+  descendants reachable by Tab while the exit is in progress. Do not create a
+  visible semantic node that is also `aria-hidden`. If a visual-only exit shell
+  is used, the semantic Radix subtree must already be unmounted and the shell
+  must be non-focusable, `aria-hidden`, and pointer-events-none. Do not rely on
+  `inert` unless the PR names a Safari 15.4-safe fallback.
 - `nx:` prefix before every modifier; semantic tokens only. **Pre-production.** **PR:** `feat(motion): …`, base `main`, body references `#598` (this is sub-PR 1 of 4).
 
 ---
@@ -54,7 +70,10 @@ these surfaces), Storybook 10 (`storybook/test`).
 - `packages/react/src/components/hover-card/hover-card.tsx:95`
 - `packages/react/src/components/tooltip/tooltip.tsx:82,83`
 - `packages/react/src/components/sheet/sheet.tsx:80,102` — scrim opacity + panel slide from edge
-- `packages/react/src/components/drawer/drawer.tsx:72` — Vaul owns runtime transitions; verify and leave out of scope unless evidence says Nexus owns the close transition
+- `packages/react/src/components/drawer/drawer.tsx:72` — Nexus owns this scrim
+  recipe; Vaul owns the drawer primitive/panel lifecycle. Verify the Nexus
+  scrim keyframes separately and leave Vaul panel lifecycle out of scope unless
+  evidence proves Nexus-owned close timing controls interruptibility.
 - `packages/react/src/components/navigation-menu/navigation-menu.tsx:186,195,235,303`
 
 ---
@@ -73,12 +92,11 @@ Required assertions:
 - the panel has no `animate-in` / `animate-out` keyframe utilities;
 - computed `transition-property` includes `opacity` and `scale`;
 - closing leaves the panel mounted long enough to observe the visible exit
-  state (`opacity < 1` or equivalent closed-state class + computed opacity);
+  state (`opacity < 1` or equivalent exiting-state class + computed opacity);
 - a close interrupted by a re-open cancels stale teardown and leaves the panel
   present/open;
-- final `transitionend` removes or fully deactivates the panel according to the
-  helper contract;
-- the closed/closing state blocks pointer interaction and keyboard focus.
+- final `transitionend` fully unmounts the Radix portal/content subtree;
+- the exiting state blocks pointer interaction and keyboard focus.
 
 ```tsx
 export const InterruptibleOpenClose: Story = {
@@ -116,13 +134,17 @@ export const InterruptibleOpenClose: Story = {
     await expect(panel).toHaveStyle({ pointerEvents: 'none' });
 
     await userEvent.click(trigger);
+    const reopenedContent = await within(document.body).findByText('Content');
+    const reopenedPanel = reopenedContent.closest(
+      '[data-slot="popover-content"]'
+    )!;
     await waitFor(() =>
-      expect(panel).toHaveAttribute('data-motion-state', 'open')
+      expect(reopenedPanel).toHaveAttribute('data-motion-state', 'open')
     );
-    await expect(panel).toBeVisible();
+    await expect(reopenedPanel).toBeVisible();
 
     await userEvent.keyboard('{Escape}');
-    panel.dispatchEvent(
+    reopenedPanel.dispatchEvent(
       new TransitionEvent('transitionend', {
         bubbles: true,
         propertyName: 'opacity',
@@ -158,11 +180,13 @@ Implementation requirements:
   animation frame. This replaces the keyframe 0% frame without using
   `@starting-style`.
 - On close, set the motion state to closed, wait for `transitionend` from the
-  animated property (`opacity` for fade+scale), then tear down. Ignore stale
-  transitionend events after an interrupted reopen.
-- Closed/closing content gets `aria-hidden`, no pointer interaction, and focus
-  gating. If the implementation uses `inert`, first verify Safari 15.4 support
-  or provide a fallback because `inert` may sit outside the Nexus floor.
+  animated property (`opacity` for fade+scale), then fully unmount the Radix
+  portal/content subtree. Ignore stale transitionend events after an interrupted
+  reopen.
+- Exiting content gets no pointer interaction and focus gating. Do not add
+  `aria-hidden` to a still-visible semantic content node. If the implementation
+  uses `inert`, first verify Safari 15.4 support or provide a fallback because
+  `inert` may sit outside the Nexus floor.
 
 Popover class recipe:
 
@@ -209,16 +233,87 @@ git commit -m "feat(motion): interruptible transitions for Popover open/close (#
 
 ---
 
-### Task 2: Apply the verified recipe to the remaining surfaces
+### Task 2: Add the Dialog modal spike gate before fan-out
+
+**Files:** `overlay-layout.ts`, `dialog.tsx`, `Dialog.stories.tsx`, and the
+shared transition-presence helper from Task 1.
+
+Popover proves the non-modal positioning case only. It does not exercise
+Dialog's modal Radix path, including scroll lock, outside `aria-hidden`
+management, or focus return. Do not fan out to any other surface until Dialog
+proves the helper releases those modal side effects by fully unmounting after
+exit.
+
+Required assertions:
+
+- opening Dialog renders content and overlay visibly;
+- closing leaves content/overlay mounted long enough to observe the visible exit
+  state;
+- no still-visible Dialog content node is marked `aria-hidden`;
+- a close interrupted by a re-open cancels stale teardown; re-query the content
+  node after the re-open before asserting or dispatching `transitionend`;
+- final `transitionend` fully unmounts the current Dialog content and overlay;
+- after final unmount, body scroll lock is released, outside `aria-hidden`
+  mutations are cleaned up, and focus returns to the trigger.
+
+- [ ] **Step 1:** Write the failing Dialog story/play-fn for the assertions
+      above. Run `pnpm test:storybook dialog` -> FAIL.
+- [ ] **Step 2:** Apply the helper to Dialog/AlertDialog layout content and
+      scrim. Use `nx:transition-[opacity,scale]` for content and
+      `nx:transition-opacity` for scrim. Preserve existing open/close
+      duration/ease tokens. Run `pnpm test:storybook dialog` -> PASS.
+- [ ] **Step 3:** Commit the modal proof separately:
+
+```bash
+git add packages/react/src/components/dialog packages/react/src/components/overlay-layout
+git commit -m "feat(motion): prove modal overlay transition teardown (#598)"
+```
+
+---
+
+### Task 3: Validate and open the precursor sub-PR
+
+- [ ] `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:storybook` — all green.
+- [ ] Open PR:
+
+```bash
+git push -u origin aishvarya/motion-overlay-interruptible
+gh pr create --base main \
+  --title "feat(motion): prove interruptible overlay transition teardown (E1 of #598)" \
+  --body "$(cat <<'EOF'
+## Summary
+Introduce the Nexus transition-presence helper and prove interruptible open/close on Popover and Dialog before fan-out. The helper uses `forceMount` only during visible exit, then fully unmounts the Radix portal/content/overlay subtree so modal side effects release naturally. Loading/height keyframes untouched.
+
+## GitHub Issue
+Part of #598 (Workstream E, principle #4). Sub-PR 1 of 4.
+
+## Test Plan
+- [ ] lint / format:check / typecheck / test:storybook green
+- [ ] Popover spike proves forceMount + Nexus transitionend teardown + exiting-state gating
+- [ ] Dialog spike proves full unmount releases scroll lock, outside aria-hidden cleanup, and focus return
+- [ ] Popover/Dialog play-fns: no `animate-in` / `animate-out` class, `motion-reduce:transition-none` present, computed transition-property matches opacity/scale, exit visibly paints, interruption cancels stale teardown
+
+## Modern Web Guidance / polish.md
+- Existing `nx:duration-*` / `nx:ease-*` tokens (no parallel scale); reduced-motion guarded; opacity plus individual scale/translate properties only. Radix Presence is animation-gated, so CSS-transition teardown is owned by the Nexus helper. Visible semantic nodes are not marked aria-hidden; inert is avoided unless a Safari 15.4 fallback is named.
+EOF
+)"
+```
+
+---
+
+### Task 4: Apply the verified recipe to remaining surfaces in follow-up PRs
 
 **Files:** each surface in File Structure above (except Popover).
 
-Do not fan out until Task 1 proves the helper with tests. For each surface,
-move from Radix/animation-state classes to the shared transition-presence
-contract, then adapt only the visual recipe.
+Do not fan out until Tasks 1-3 land the precursor PR with non-modal and modal
+tests. For each follow-up surface, move from Radix/animation-state classes to
+the shared transition-presence contract, then adapt only the visual recipe.
 
-- **Popover-family fade+scale surfaces** (`overlay-layout.ts:48`,
-  dropdown-menu, context-menu, menubar, select, hover-card): use
+- **Dialog/AlertDialog content** (`overlay-layout.ts:48`): use the
+  modal-proven helper, `nx:transition-[opacity,scale]`, preserved open/close
+  duration/ease tokens, and full unmount after exit.
+- **Popover-family fade+scale surfaces** (dropdown-menu, context-menu, menubar,
+  select, hover-card): use
   `nx:transition-[opacity,scale]`, closed opacity/scale, preserved open/close
   duration/ease tokens, and closed pointer/focus gating.
 - **Dialog/AlertDialog scrim** (`overlay-layout.ts:59`): opacity only. Use
@@ -231,9 +326,11 @@ contract, then adapt only the visual recipe.
   translate. Tailwind v4 translate utilities emit the individual `translate`
   property, so the panel transition property must include `translate`, not only
   `transform`.
-- **Drawer** (`drawer.tsx:72`): Vaul owns the drawer runtime transition model.
-  Keep Drawer out of this PR unless the spike proves a Nexus-owned keyframe is
-  actually controlling its interruptibility; if excluded, say so in the PR body.
+- **Drawer** (`drawer.tsx:72`): Nexus owns the scrim recipe at this line; Vaul
+  owns the drawer primitive/panel lifecycle. Verify the Nexus scrim keyframes
+  independently. Keep Vaul panel lifecycle out of this PR unless evidence proves
+  Nexus-owned close timing controls interruptibility; if excluded, say so in the
+  PR body.
 - **NavigationMenu** (`navigation-menu.tsx:186,195,235,303`): convert viewport
   and inline flyout recipes separately. Preserve any directional motion by
   translating it to `translate` states rather than dropping it.
@@ -245,9 +342,9 @@ contract, then adapt only the visual recipe.
       interruption cancels stale teardown. Run `pnpm test:storybook <surface>`
       -> FAIL.
 - [ ] **Step 2:** Apply the helper and the surface-specific recipe. Re-run ->
-      PASS. Manually confirm pointer/focus gating in the closed/closing state.
-- [ ] **Step 3:** Commit per surface or in small logical groups (e.g. helper +
-      Popover, popover-family, panels, navigation-menu):
+      PASS. Manually confirm pointer/focus gating in the exiting state.
+- [ ] **Step 3:** Commit per surface or in small logical groups (e.g.
+      popover-family, panels, navigation-menu):
 
 ```bash
 git add packages/react/src/components/<surface>
@@ -256,39 +353,10 @@ git commit -m "feat(motion): interruptible transitions for <surface> open/close 
 
 ---
 
-### Task 3: Validate and open the sub-PR
-
-- [ ] `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:storybook` — all green.
-- [ ] Open PR:
-
-```bash
-git push -u origin aishvarya/motion-overlay-interruptible
-gh pr create --base main \
-  --title "feat(motion): interruptible overlay open/close transitions (E1 of #598)" \
-  --body "$(cat <<'EOF'
-## Summary
-Convert overlay open/close from tw-animate-css keyframes to interruptible `data-[state]` transitions across the popover family, tooltip, sheet, drawer, and navigation-menu. Rapid open/close now retargets instead of replaying. Loading/height keyframes untouched.
-
-## GitHub Issue
-Part of #598 (Workstream E, principle #4). Sub-PR 1 of 4.
-
-## Test Plan
-- [ ] lint / format:check / typecheck / test:storybook green
-- [ ] Popover spike proves forceMount + Nexus transitionend teardown + closed-state gating
-- [ ] Per-surface play-fn: no `animate-in` / `animate-out` class, `motion-reduce:transition-none` present, computed transition-property matches opacity/scale/translate, exit visibly paints, interruption cancels stale teardown
-
-## Modern Web Guidance / polish.md
-- Existing `nx:duration-*` / `nx:ease-*` tokens (no parallel scale); reduced-motion guarded; opacity plus individual scale/translate properties only. Radix Presence is animation-gated, so CSS-transition teardown is owned by the Nexus helper.
-EOF
-)"
-```
-
----
-
 ## Self-Review
 
-**Spec coverage (#4):** all `data-[state=open]:animate-in/out` surfaces enumerated; helper + recipe proven on Popover (Task 1) then applied per-surface (Task 2). Loading/height keyframes explicitly excluded. Drawer/Vaul flagged for exclusion unless verification proves Nexus owns its transition.
+**Spec coverage (#4):** all `data-[state=open]:animate-in/out` surfaces enumerated; helper + recipe proven on Popover (Task 1) and Dialog (Task 2) before the precursor PR opens (Task 3) and before any follow-up fan-out (Task 4). Loading/height keyframes explicitly excluded. Drawer split is sharpened: Nexus owns the scrim recipe, while Vaul panel lifecycle remains out of scope unless evidence proves Nexus-owned close timing controls interruptibility.
 
-**Placeholder scan:** the Popover recipe is concrete (exact REMOVE/ADD class lists), while remaining surfaces are grouped by motion shape: fade+scale, opacity-only scrim, or directional translate. The "spike then apply" structure is deliberate because Radix Presence cannot be trusted for transition teardown.
+**Placeholder scan:** the Popover recipe is concrete (exact REMOVE/ADD class lists), Dialog has a required modal side-effect spike, and remaining surfaces are grouped by motion shape: fade+scale, opacity-only scrim, or directional translate. The "precursor then fan-out" structure is deliberate because Radix Presence cannot be trusted for transition teardown.
 
 **Type/name consistency:** `data-slot="popover-content"`, `data-motion-state`, computed `transition-property`, and `motion-reduce:transition-none` are aligned between the implementation recipe and the assertions. `scale-95` maps to `scale`, not `transform`, under Tailwind v4.
