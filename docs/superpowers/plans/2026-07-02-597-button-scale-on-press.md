@@ -14,7 +14,7 @@
 - **Layer on top of** the existing `active:bg-*` press cue — do not replace it.
 - **Reduced motion:** `nx:motion-reduce:active:scale-100` (no global reset exists).
 - **No `transition: all`** — the base transition lists exact properties.
-- **Motion tokens:** `scale` is a transform; document the desired duration/easing-token relationship for #159 (do not invent a new scale). `nx:` prefix before every modifier; semantic tokens only.
+- **Motion tokens:** the transition uses the existing token-backed default duration/easing; `scale-[0.96]` is the Button-local press distance. Do not invent a new motion scale. `nx:` prefix before every modifier; semantic tokens only.
 - **Tests are stories.** **Pre-production:** change in place. **PR:** `feat(polish): …`, base `main`, body `Closes #597`, Summary + Test Plan + polish.md evidence (incl. reduced-motion).
 
 ---
@@ -54,6 +54,7 @@ export const PressScale: Story = {
     await expect(primary).toHaveClass('nx:motion-reduce:active:scale-100');
     // Link opts out.
     await expect(link).toHaveClass('nx:active:scale-100');
+    await expect(link).not.toHaveClass('nx:active:scale-[0.96]');
   },
 };
 ```
@@ -89,7 +90,7 @@ Then, in the `link` variant (line 29), append `nx:active:scale-100` so link text
         link: 'nx:border-0 nx:text-primary-subtle-foreground nx:underline-offset-4 nx:hover:underline nx:active:scale-100 nx:disabled:text-disabled-foreground nx:aria-disabled:text-disabled-foreground',
 ```
 
-(CVA appends the variant class after the base, so `active:scale-100` wins over the base `active:scale-[0.96]` for `link`.)
+(CVA appends the variant class after the base, so `active:scale-100` wins over the base `active:scale-[0.96]` for `link`; `cn()`/tailwind-merge collapses the conflicting scale utility before the CSS cascade needs to arbitrate it.)
 
 - [ ] **Step 4: Run to verify it passes**
 
@@ -124,10 +125,10 @@ Closes #597
 
 ## Test Plan
 - [ ] lint / format:check / typecheck / test:storybook green
-- [ ] Story asserts `active:scale-[0.96]` + `motion-reduce:active:scale-100` on default, `active:scale-100` on link
+- [ ] Story asserts `active:scale-[0.96]` + `motion-reduce:active:scale-100` on default, and `active:scale-100` without `active:scale-[0.96]` on link
 
 ## Modern Web Guidance
-- `scale` is a GPU-composited transform (web.dev high-perf animations); floor-safe. Reduced-motion honored per MDN `prefers-reduced-motion`. Duration/easing to align with motion tokens (#159); no parallel scale introduced.
+- `scale` is a GPU-composited transform (web.dev high-perf animations); floor-safe. Reduced-motion honored per MDN `prefers-reduced-motion`. Uses the existing token-backed default duration/easing; no parallel motion scale introduced.
 
 ## Note
 - Benchmarks (Linear/Stripe/Geist) don't scale buttons on press — this was an explicit product decision to adopt it. Sanity-check the feel in review.
