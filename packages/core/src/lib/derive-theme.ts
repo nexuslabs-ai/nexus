@@ -531,6 +531,7 @@ function deriveAlpha(
     '--nx-color-popover-alpha': dark
       ? toneInk(0.7529)
       : 'oklch(1 0 0 / 0.7529)',
+    '--nx-color-border-hairline': contrastInk(0.0941),
     '--nx-color-border-default': contrastInk(profile.borderAlpha),
     '--nx-color-border-disabled': contrastInk(profile.borderAlpha),
   };

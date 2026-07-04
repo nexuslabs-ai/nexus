@@ -35,7 +35,7 @@ function hOf(oklchStr: string | undefined): number {
 const toRgb = converter('rgb');
 const oklabDelta = differenceEuclidean('oklab');
 const COLORBLIND_DELTA_E = 0.02;
-const RUNTIME_SEMANTIC_COLOR_COUNT = 105;
+const RUNTIME_SEMANTIC_COLOR_COUNT = 106;
 const VISION_TYPES = [
   'normal',
   'deuteranopia',
@@ -638,6 +638,10 @@ describe('alpha and translucent colors', () => {
       'oklch(0.1448 0 0 / 0.0941)'
     );
     expect(dark['--nx-color-border-default']).toBe('oklch(1 0 0 / 0.1882)');
+    expect(light['--nx-color-border-hairline']).toBe(
+      'oklch(0.1448 0 0 / 0.0941)'
+    );
+    expect(dark['--nx-color-border-hairline']).toBe('oklch(1 0 0 / 0.0941)');
     expect(light['--nx-color-border-disabled']).toBe(
       'oklch(0.1448 0 0 / 0.0941)'
     );
@@ -682,6 +686,12 @@ describe('alpha and translucent colors', () => {
     );
     expect(at(100).dark['--nx-color-border-default-alpha']).toBe(
       'oklch(0.13 0.0400 264.7 / 0.2337)'
+    );
+    expect(at(100).light['--nx-color-border-hairline']).toBe(
+      'oklch(0.1448 0 0 / 0.0941)'
+    );
+    expect(at(100).dark['--nx-color-border-hairline']).toBe(
+      'oklch(1 0 0 / 0.0941)'
     );
     // contrast 30 exercises the sub-anchor lerp branch + toFixed rounding —
     // every assertion above is an endpoint (0/100) or the c===60 early return.

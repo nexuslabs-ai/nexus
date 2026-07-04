@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconUser } from '@tabler/icons-react';
 import { expect, waitFor, within } from 'storybook/test';
 
+import { expectInsetOutlinePseudoElement } from '../../stories/support/pseudo-element-style';
+
 import {
   Avatar,
   AvatarFallback,
@@ -66,6 +68,16 @@ const WIDE_AVATAR_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
     <rect x="88" y="16" width="68" height="58" rx="12" fill="#7c3aed"/>
   </svg>
 `)}`;
+
+function expectAvatarHairline(
+  element: Element | null,
+  missingMessage = 'avatar root not found'
+) {
+  expectInsetOutlinePseudoElement(element, {
+    token: '--nx-color-border-hairline',
+    missingMessage,
+  });
+}
 
 function avatarLabel(size: (typeof AVATAR_SIZES)[number]) {
   if (size === '2xs') return '2X';
@@ -141,6 +153,60 @@ export const DefaultDataAttributes: Story = {
     // (16px/36px have no composite, so the whole scale stays arbitrary, matching
     // the pre-existing 2xs/xs). md → text-[1rem], migrated from the raw named text-size utility.
     await expect(avatar).toHaveClass('nx:text-[1rem]');
+  },
+};
+
+export const ImageHairline: Story = {
+  render: () => (
+    <Avatar>
+      <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
+    </Avatar>
+  ),
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-slot="avatar"]');
+    const image = await waitFor(() => {
+      const img = canvasElement.querySelector('[data-slot="avatar-image"]');
+      if (!img) throw new Error('avatar image has not mounted yet');
+      return img;
+    });
+
+    expectAvatarHairline(root);
+    await expect(image).not.toHaveClass('nx:after:outline-border-hairline');
+  },
+};
+
+export const ImageHairlineLightDark: Story = {
+  render: () => (
+    <div className="nx:grid nx:grid-cols-2 nx:gap-4">
+      <div className="nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
+        <Avatar>
+          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+        <Avatar shape="rounded">
+          <AvatarFallback>JD</AvatarFallback>
+        </Avatar>
+      </div>
+      <div className="dark nx:flex nx:items-center nx:gap-3 nx:rounded-md nx:bg-background nx:p-4">
+        <Avatar>
+          <AvatarImage src={AVATAR_URL} alt="Ada Lovelace" />
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+        <Avatar shape="rounded">
+          <AvatarFallback>JD</AvatarFallback>
+        </Avatar>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const avatars = canvasElement.querySelectorAll('[data-slot="avatar"]');
+
+    await expect(avatars).toHaveLength(4);
+    expectAvatarHairline(avatars.item(0));
+    expectAvatarHairline(avatars.item(1));
+    expectAvatarHairline(avatars.item(2));
+    expectAvatarHairline(avatars.item(3));
   },
 };
 

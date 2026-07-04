@@ -32,6 +32,7 @@ html {
   --nx-color-nav-border: var(--nx-color-gray-200);
   --nx-color-overlay: var(--nx-color-gray-a700);
   --nx-color-border-default: var(--nx-color-black-a200);
+  --nx-color-border-hairline: var(--nx-color-black-a200);
   --nx-color-border-default-alpha: var(--nx-color-gray-a200);
   --nx-color-border-active: var(--nx-color-gray-400);
   --nx-color-border-disabled: var(--nx-color-black-a200);
@@ -113,6 +114,7 @@ html.dark {
   --nx-color-nav-border: var(--nx-color-gray-800);
   --nx-color-overlay: var(--nx-color-gray-a800);
   --nx-color-border-default: var(--nx-color-white-a300);
+  --nx-color-border-hairline: var(--nx-color-white-a200);
   --nx-color-border-default-alpha: var(--nx-color-gray-a300);
   --nx-color-border-active: var(--nx-color-gray-400);
   --nx-color-border-disabled: var(--nx-color-white-a300);

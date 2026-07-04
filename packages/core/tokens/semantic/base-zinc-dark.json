@@ -126,6 +126,10 @@
       "$value": "{white.a300}",
       "$type": "color"
     },
+    "hairline": {
+      "$value": "{white.a200}",
+      "$type": "color"
+    },
     "default-alpha": {
       "$value": "{zinc.a300}",
       "$type": "color"
