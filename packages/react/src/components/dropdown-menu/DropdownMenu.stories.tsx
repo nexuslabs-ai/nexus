@@ -150,6 +150,9 @@ export const IndicatorCrossFade: Story = {
   render: function IndicatorCrossFadeStory() {
     const [showStatusBar, setShowStatusBar] = React.useState(true);
     const [showActivityBar, setShowActivityBar] = React.useState(false);
+    const [showBookmarksBar, setShowBookmarksBar] = React.useState<
+      boolean | 'indeterminate'
+    >('indeterminate');
     const [position, setPosition] = React.useState('bottom');
 
     return (
@@ -169,6 +172,12 @@ export const IndicatorCrossFade: Story = {
             onCheckedChange={setShowActivityBar}
           >
             Activity Bar
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={showBookmarksBar}
+            onCheckedChange={setShowBookmarksBar}
+          >
+            Bookmarks Bar
           </DropdownMenuCheckboxItem>
           <DropdownMenuSeparator />
           <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
@@ -193,6 +202,9 @@ export const IndicatorCrossFade: Story = {
       const uncheckedItem = within(menu).getByRole('menuitemcheckbox', {
         name: 'Activity Bar',
       });
+      const indeterminateItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Bookmarks Bar',
+      });
       const selectedRadio = within(menu).getByRole('menuitemradio', {
         name: 'Bottom',
       });
@@ -206,6 +218,9 @@ export const IndicatorCrossFade: Story = {
       const uncheckedIcon = uncheckedItem.querySelector(
         '[data-slot="dropdown-menu-checkbox-indicator-icon"]'
       );
+      const indeterminateIcon = indeterminateItem.querySelector(
+        '[data-slot="dropdown-menu-checkbox-indicator-icon"]'
+      );
       const selectedDot = selectedRadio.querySelector(
         '[data-slot="dropdown-menu-radio-indicator-icon"]'
       );
@@ -215,13 +230,19 @@ export const IndicatorCrossFade: Story = {
 
       await expect(checkedIcon).toBeInTheDocument();
       await expect(uncheckedIcon).toBeInTheDocument();
+      await expect(indeterminateIcon).toBeInTheDocument();
       await expect(selectedDot).toBeInTheDocument();
       await expect(unselectedDot).toBeInTheDocument();
-      await expect(checkedIcon).toHaveClass(
-        'nx:transition-[opacity,transform]'
+      await expect(indeterminateItem).toHaveAttribute(
+        'data-state',
+        'indeterminate'
       );
+      await expect(checkedIcon).toHaveClass('nx:transition-[opacity,scale]');
       await expect(checkedIcon).toHaveClass(
         'nx:group-data-[state=checked]:opacity-100'
+      );
+      await expect(indeterminateIcon).toHaveClass(
+        'nx:group-data-[state=indeterminate]:opacity-100'
       );
       await expect(checkedIcon).toHaveClass('nx:motion-reduce:transition-none');
       await expect(selectedDot).toHaveClass(

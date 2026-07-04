@@ -118,7 +118,7 @@ export const IndicatorCrossFade: Story = {
     const check = checkbox.querySelector('[data-slot="checkbox-check"]');
 
     await expect(check).not.toHaveClass('nx:hidden');
-    await expect(check).toHaveClass('nx:transition-[opacity,transform]');
+    await expect(check).toHaveClass('nx:transition-[opacity,scale]');
     await expect(check).toHaveClass(
       'nx:group-data-[state=checked]:opacity-100'
     );

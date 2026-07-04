@@ -4,6 +4,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 import { popoverSurfaceClassName } from '../overlay-layout/overlay-layout';
 
@@ -317,7 +318,12 @@ function DropdownMenuCheckboxItem({
           <IconCheck
             data-slot="dropdown-menu-checkbox-indicator-icon"
             aria-hidden="true"
-            className="nx:size-4 nx:scale-50 nx:opacity-0 nx:transition-[opacity,transform] nx:duration-fast nx:ease-enter nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100 nx:motion-reduce:transition-none"
+            className={cn(
+              'nx:size-4',
+              selectionIndicatorMotionClassName,
+              'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100',
+              'nx:group-data-[state=indeterminate]:scale-100 nx:group-data-[state=indeterminate]:opacity-100'
+            )}
           />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
@@ -374,7 +380,11 @@ function DropdownMenuRadioItem({
           <IconCircleFilled
             data-slot="dropdown-menu-radio-indicator-icon"
             aria-hidden="true"
-            className="nx:size-2 nx:scale-50 nx:opacity-0 nx:transition-[opacity,transform] nx:duration-fast nx:ease-enter nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100 nx:motion-reduce:transition-none"
+            className={cn(
+              'nx:size-2',
+              selectionIndicatorMotionClassName,
+              'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+            )}
           />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>

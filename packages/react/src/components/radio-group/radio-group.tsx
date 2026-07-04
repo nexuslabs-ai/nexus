@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 
 import { IconCircleFilled } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
@@ -86,7 +87,11 @@ function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
         <IconCircleFilled
           data-slot="radio-group-dot"
           aria-hidden="true"
-          className="nx:size-2.5 nx:scale-50 nx:text-current nx:opacity-0 nx:transition-[opacity,transform] nx:duration-fast nx:ease-enter nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100 nx:motion-reduce:transition-none"
+          className={cn(
+            'nx:size-2.5 nx:text-current',
+            selectionIndicatorMotionClassName,
+            'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+          )}
         />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
