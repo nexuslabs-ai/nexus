@@ -32,4 +32,4 @@ async function expectStaggeredItemMotion(container: Element, items: Element[]) {
   );
 }
 
-export { expectStaggeredItemMotion };
+export { animationDelayMs, expectStaggeredItemMotion };
