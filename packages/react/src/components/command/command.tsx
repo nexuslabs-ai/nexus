@@ -10,10 +10,6 @@ import {
   DialogDescription,
   DialogTitle,
 } from '../dialog';
-import {
-  staggeredItemClassName,
-  staggeredItemContainerClassName,
-} from '../motion/motion';
 
 /**
  * CommandProps
@@ -186,7 +182,6 @@ function CommandList({ className, ...props }: CommandListProps) {
       data-slot="command-list"
       className={cn(
         'nx:max-h-[300px] nx:overflow-y-auto nx:overflow-x-hidden nx:scroll-py-2',
-        staggeredItemContainerClassName,
         className
       )}
       {...props}
@@ -290,7 +285,6 @@ function CommandGroup({ className, ...props }: CommandGroupProps) {
         'nx:p-2',
         'nx:**:[[cmdk-group-heading]]:px-2 nx:**:[[cmdk-group-heading]]:py-1.5',
         'nx:**:[[cmdk-group-heading]]:typography-label-small nx:**:[[cmdk-group-heading]]:text-muted-foreground',
-        staggeredItemContainerClassName,
         className
       )}
       {...props}
@@ -358,7 +352,6 @@ function CommandItem({ className, ...props }: CommandItemProps) {
         'nx:data-[selected=true]:bg-popover-hover nx:data-[selected=true]:text-popover-foreground',
         'nx:data-[disabled=true]:pointer-events-none nx:data-[disabled=true]:text-disabled-foreground',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
-        staggeredItemClassName,
         className
       )}
       {...props}

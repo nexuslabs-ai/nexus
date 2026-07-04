@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Goal:** Workstream E principle #5 (part of issue #598) — when a menu / listbox / command palette / toast stack opens, stagger its items in (each slightly delayed) instead of the whole container appearing at once.
+**Goal:** Workstream E principle #5 (part of issue #598) — when a menu / listbox opens, stagger its items in (each slightly delayed) instead of the whole container appearing at once.
 
-**Architecture:** This is **spike-driven** and the most exploratory of the E sub-PRs — items currently have no entrance animation, so this adds one. Approach: a co-located keyframe (fade + small `translateY`) applied per item, with a per-item `animation-delay` driven by `:nth-child` (CSS-only, bounded to the first ~8 items; further items animate with the max delay). Use the existing `nx:duration-*` / `nx:ease-*` tokens; `nx:motion-reduce:animate-none` disables the whole thing. Prove the mechanism on DropdownMenu first, evaluate the feel, then apply to the other item lists. **If the spike shows stagger adds noise rather than polish on any surface, leave that surface out and note it** — do not force it.
+**Architecture:** This is **spike-driven** and the most exploratory of the E sub-PRs — items currently have no entrance animation, so this adds one. Approach: a co-located keyframe (fade + small `translateY`) applied per item, with a per-item `animation-delay` driven by `:nth-child` (CSS-only, bounded to the first ~8 items; further items animate with the max delay). Use the existing `nx:duration-*` / `nx:ease-*` tokens; `nx:motion-reduce:animate-none` disables the whole thing. Prove the mechanism on DropdownMenu first, evaluate the feel, then apply to the other stable item lists. **If the spike shows stagger adds noise rather than polish on any surface, leave that surface out and note it** — do not force it. Command is intentionally excluded because cmdk remounts filtered items while typing, replaying the entrance motion during search. Toast is intentionally excluded because Sonner owns the stack/item DOM and does not expose stable Nexus slots for this contract.
 
 **Tech Stack:** React, Tailwind v4 (`nx:` prefix, arbitrary `[&>*:nth-child(n)]` + `[animation-delay:*]`), co-located component CSS `@keyframes` (per the repo's custom-keyframe pattern), Storybook 10 (`storybook/test`).
 
@@ -20,7 +20,8 @@
 
 - New/updated co-located CSS for the stagger keyframe (e.g. reuse an existing `--animate-*` if one fits; otherwise add one under the menu components' CSS).
 - `packages/react/src/components/dropdown-menu/dropdown-menu.tsx` — **spike surface** (item list).
-- `packages/react/src/components/context-menu/context-menu.tsx`, `menubar/menubar.tsx`, `select/select.tsx` (listbox), `command/command.tsx:350` (items), `sonner/sonner.tsx` (toast stack — library-owned, note).
+- `packages/react/src/components/context-menu/context-menu.tsx`, `menubar/menubar.tsx`, `select/select.tsx` (listbox).
+- Command and Sonner remain out of scope: Command would replay on filtered cmdk item remounts; Sonner's toast stack is library-owned.
 - Stories for each.
 
 ---
@@ -73,10 +74,11 @@ git commit -m "feat(motion): staggered item entrance for DropdownMenu (#598)"
 
 ### Task 2: Apply the validated stagger to the other item lists
 
-**Files:** context-menu, menubar, select (listbox), command; sonner (note).
+**Files:** context-menu, menubar, select (listbox); command and sonner notes.
 
-- [ ] For **each** of context-menu, menubar, select, command: add the same per-item stagger (adjusting the `data-slot` selector) + a story asserting the stagger class + `motion-reduce:animate-none`. Run `pnpm test:storybook <surface>` → FAIL → implement → PASS.
-- [ ] **Toast (sonner):** the stack markup is owned by the `sonner` library and themed only via CSS vars — per-item stagger isn't directly reachable. Either target the toast nodes from the `Toaster` wrapper (`nx:[&_[data-sonner-toast]]:…`) if the selector is stable, or **document that toast stagger is out of scope** (library-owned) and leave it.
+- [ ] For **each** of context-menu, menubar, select: add the same per-item stagger (adjusting the `data-slot` selector) + a story asserting the stagger class + `motion-reduce:animate-none`. Run `pnpm test:storybook <surface>` → FAIL → implement → PASS.
+- [ ] **Command:** leave out of this stagger contract. cmdk filters by unmounting/remounting items while the user types, so item-enter motion replays during search and reads as noise rather than polish.
+- [ ] **Toast (sonner):** the stack markup is owned by the `sonner` library and themed only via CSS vars, so per-item stagger is not a stable Nexus-owned contract. Document that toast stagger is out of scope and leave it.
 - [ ] Commit per surface (or a small group):
 
 ```bash
@@ -94,10 +96,10 @@ git commit -m "feat(motion): staggered item entrance for <surface> (#598)"
 ```bash
 git push -u origin aishvarya/motion-stagger
 gh pr create --base main \
-  --title "feat(motion): staggered item entrance for menus/command (E3 of #598)" \
+  --title "feat(motion): staggered item entrance for menus (E3 of #598)" \
   --body "$(cat <<'EOF'
 ## Summary
-Menu / listbox / command items stagger in on open (fade + small translate, ~30ms step, capped). Toast stagger noted as library-owned. Reduced-motion disables it.
+Menu / listbox items stagger in on open (fade + small translate, ~30ms step, capped). Command is left out because cmdk remounts filtered items while typing; toast stagger is left out because Sonner owns the item DOM. Reduced-motion disables the shipped stagger.
 
 ## GitHub Issue
 Part of #598 (Workstream E, principle #5). Sub-PR 3 of 4.
@@ -116,7 +118,7 @@ EOF
 
 ## Self-Review
 
-**Spec coverage (#5):** menu/listbox/command staggered (Task 1 spike + Task 2 apply); toast explicitly scoped out as library-owned. No gaps.
+**Spec coverage (#5):** menu/listbox staggered (Task 1 spike + Task 2 apply); Command explicitly scoped out because filtering replays item entry; toast explicitly scoped out as library-owned. No gaps.
 
 **Placeholder scan:** the mechanism is concrete (keyframe + exact nth-child delay classes); "spike then apply" and "tune the step" are legitimate for a genuinely new animation, not TBD placeholders.
 
