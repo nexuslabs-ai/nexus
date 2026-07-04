@@ -1,7 +1,13 @@
 # Interface Details — Full Adoption Plan
 
+> **Historical — superseded.** Preserved as the design/rationale record for the
+> interface-details adoption. The work has since shipped: workstreams A–E are
+> complete — issues #593–#598 closed; PRs #599, #600, #601, #602, and #609
+> (Workstream E, overlay-interruptible motion) merged. Read this as the decision
+> archive, not a live task list.
+
 **Date:** 2026-07-01
-**Status:** Design — pending user review
+**Status:** Shipped 2026-07-04 (was: Design — pending user review)
 **Source:** `make-interfaces-feel-better` skill (Jakub Krehel / interfaces.dev) — 16 principles.
 **Method:** three parallel read-only audits (Typography, Surfaces, Motion/Performance)
 across all 58 components + base CSS. Findings verified to `file:line`.
