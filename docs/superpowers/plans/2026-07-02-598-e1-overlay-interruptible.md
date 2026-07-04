@@ -132,6 +132,8 @@ export const InterruptibleOpenClose: Story = {
     });
 
     await expect(panel).toHaveStyle({ pointerEvents: 'none' });
+    await userEvent.tab();
+    await expect(panel).not.toContainElement(document.activeElement);
 
     await userEvent.click(trigger);
     const reopenedContent = await within(document.body).findByText('Content');
@@ -247,6 +249,12 @@ exit.
 Required assertions:
 
 - opening Dialog renders content and overlay visibly;
+- Dialog content and scrim have no `animate-in` / `animate-out` keyframe
+  utilities;
+- Dialog content and scrim include `nx:motion-reduce:transition-none`;
+- computed `transition-property` includes `opacity` and `scale` for content;
+- computed `transition-property` includes `opacity` for the scrim, and the scrim
+  recipe does not add scale;
 - closing leaves content/overlay mounted long enough to observe the visible exit
   state;
 - no still-visible Dialog content node is marked `aria-hidden`;
@@ -255,6 +263,9 @@ Required assertions:
 - final `transitionend` fully unmounts the current Dialog content and overlay;
 - after final unmount, body scroll lock is released, outside `aria-hidden`
   mutations are cleaned up, and focus returns to the trigger.
+- focus gating is evidenced either by an automated Tab assertion while exiting
+  or, if the portal/focus trap makes that unstable in Storybook, by an explicit
+  manual focus-gating checklist item in the PR body.
 
 - [ ] **Step 1:** Write the failing Dialog story/play-fn for the assertions
       above. Run `pnpm test:storybook dialog` -> FAIL.
@@ -292,6 +303,7 @@ Part of #598 (Workstream E, principle #4). Sub-PR 1 of 4.
 - [ ] Popover spike proves forceMount + Nexus transitionend teardown + exiting-state gating
 - [ ] Dialog spike proves full unmount releases scroll lock, outside aria-hidden cleanup, and focus return
 - [ ] Popover/Dialog play-fns: no `animate-in` / `animate-out` class, `motion-reduce:transition-none` present, computed transition-property matches opacity/scale, exit visibly paints, interruption cancels stale teardown
+- [ ] Exiting-state focus gating covered by automated Tab assertions or called out as a manual focus-gating checklist where Storybook focus-trap behavior is unstable
 
 ## Modern Web Guidance / polish.md
 - Existing `nx:duration-*` / `nx:ease-*` tokens (no parallel scale); reduced-motion guarded; opacity plus individual scale/translate properties only. Radix Presence is animation-gated, so CSS-transition teardown is owned by the Nexus helper. Visible semantic nodes are not marked aria-hidden; inert is avoided unless a Safari 15.4 fallback is named.
@@ -303,22 +315,17 @@ EOF
 
 ### Task 4: Apply the verified recipe to remaining surfaces in follow-up PRs
 
-**Files:** each surface in File Structure above (except Popover).
+**Files:** each surface in File Structure above (except Popover and
+Dialog/AlertDialog).
 
 Do not fan out until Tasks 1-3 land the precursor PR with non-modal and modal
 tests. For each follow-up surface, move from Radix/animation-state classes to
 the shared transition-presence contract, then adapt only the visual recipe.
 
-- **Dialog/AlertDialog content** (`overlay-layout.ts:48`): use the
-  modal-proven helper, `nx:transition-[opacity,scale]`, preserved open/close
-  duration/ease tokens, and full unmount after exit.
 - **Popover-family fade+scale surfaces** (dropdown-menu, context-menu, menubar,
   select, hover-card): use
   `nx:transition-[opacity,scale]`, closed opacity/scale, preserved open/close
   duration/ease tokens, and closed pointer/focus gating.
-- **Dialog/AlertDialog scrim** (`overlay-layout.ts:59`): opacity only. Use
-  `nx:transition-opacity` plus closed opacity. Do **not** add `scale-95` to a
-  full-bleed scrim.
 - **Tooltip** (`tooltip.tsx:82,83`): convert the unconditional enter keyframes
   and closed keyframes to the same helper-backed fade+scale recipe. Verify
   tooltip delay/escape behavior still works.
