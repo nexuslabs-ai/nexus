@@ -110,6 +110,22 @@ export const Indeterminate: Story = {
   },
 };
 
+export const IndicatorCrossFade: Story = {
+  render: () => <Checkbox defaultChecked aria-label="Accept" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const checkbox = canvas.getByRole('checkbox', { name: 'Accept' });
+    const check = checkbox.querySelector('[data-slot="checkbox-check"]');
+
+    await expect(check).not.toHaveClass('nx:hidden');
+    await expect(check).toHaveClass('nx:transition-[opacity,scale]');
+    await expect(check).toHaveClass(
+      'nx:group-data-[state=checked]:opacity-100'
+    );
+    await expect(check).toHaveClass('nx:motion-reduce:transition-none');
+  },
+};
+
 export const Disabled: Story = {
   args: {
     'aria-label': 'Disabled checkbox',

@@ -62,6 +62,53 @@ export const WithDefaultValue: Story = {
   ),
 };
 
+export const IndicatorCrossFade: Story = {
+  render: () => (
+    <Select defaultValue="apple">
+      <SelectTrigger className="nx:w-[180px]" aria-label="Select a fruit">
+        <SelectValue placeholder="Select a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="apple">Apple</SelectItem>
+        <SelectItem value="banana">Banana</SelectItem>
+      </SelectContent>
+    </Select>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Select a fruit' });
+
+    try {
+      await userEvent.click(trigger);
+
+      const listbox = await within(document.body).findByRole('listbox');
+      const apple = within(listbox).getByRole('option', { name: 'Apple' });
+      const banana = within(listbox).getByRole('option', { name: 'Banana' });
+      const selectedCheck = apple.querySelector(
+        '[data-slot="select-item-indicator-icon"]'
+      );
+      const unselectedCheck = banana.querySelector(
+        '[data-slot="select-item-indicator-icon"]'
+      );
+
+      await expect(selectedCheck).toBeInTheDocument();
+      await expect(unselectedCheck).toBeInTheDocument();
+      await expect(selectedCheck).toHaveClass('nx:transition-[opacity,scale]');
+      await expect(selectedCheck).toHaveClass(
+        'nx:group-data-[state=checked]:opacity-100'
+      );
+      await expect(selectedCheck).toHaveClass(
+        'nx:motion-reduce:transition-none'
+      );
+    } finally {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(document.querySelector('[role="listbox"]')).toBeNull();
+      });
+    }
+  },
+};
+
 export const Disabled: Story = {
   render: (_args) => (
     <Select disabled>

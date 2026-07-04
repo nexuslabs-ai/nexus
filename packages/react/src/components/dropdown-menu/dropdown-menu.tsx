@@ -4,6 +4,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 import { popoverSurfaceClassName } from '../overlay-layout/overlay-layout';
 
@@ -299,7 +300,7 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
-        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
+        'nx:group nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
@@ -309,9 +310,21 @@ function DropdownMenuCheckboxItem({
       checked={checked}
       {...props}
     >
-      <span className="nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
-        <DropdownMenuPrimitive.ItemIndicator>
-          <IconCheck className="nx:size-4" />
+      <span className="nx:pointer-events-none nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
+        <DropdownMenuPrimitive.ItemIndicator
+          forceMount
+          data-slot="dropdown-menu-checkbox-indicator"
+        >
+          <IconCheck
+            data-slot="dropdown-menu-checkbox-indicator-icon"
+            aria-hidden="true"
+            className={cn(
+              'nx:size-4',
+              selectionIndicatorMotionClassName,
+              'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100',
+              'nx:group-data-[state=indeterminate]:scale-100 nx:group-data-[state=indeterminate]:opacity-100'
+            )}
+          />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}
@@ -350,7 +363,7 @@ function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
-        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
+        'nx:group nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
@@ -359,9 +372,20 @@ function DropdownMenuRadioItem({
       )}
       {...props}
     >
-      <span className="nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
-        <DropdownMenuPrimitive.ItemIndicator>
-          <IconCircleFilled className="nx:size-2" />
+      <span className="nx:pointer-events-none nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
+        <DropdownMenuPrimitive.ItemIndicator
+          forceMount
+          data-slot="dropdown-menu-radio-indicator"
+        >
+          <IconCircleFilled
+            data-slot="dropdown-menu-radio-indicator-icon"
+            aria-hidden="true"
+            className={cn(
+              'nx:size-2',
+              selectionIndicatorMotionClassName,
+              'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+            )}
+          />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}
