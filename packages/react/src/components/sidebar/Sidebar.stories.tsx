@@ -55,6 +55,34 @@ const meta: Meta<typeof Sidebar> = {
 
 export default meta;
 type Story = StoryObj<typeof Sidebar>;
+
+// #593 — the menu-action touch hit area is gated by pointer modality (coarse),
+// not by viewport, so it survives on large touchscreens.
+export const MenuActionHitAreaModalityGated: Story = {
+  render: () => (
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton>Item</SidebarMenuButton>
+              <SidebarMenuAction aria-label="More">
+                <IconDots />
+              </SidebarMenuAction>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarContent>
+      </Sidebar>
+    </SidebarProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const action = canvasElement.querySelector(
+      '[data-slot="sidebar-menu-action"]'
+    );
+    await expect(action).not.toHaveClass('nx:lg:after:hidden');
+    await expect(action).toHaveClass('nx:pointer-coarse:after:-inset-2');
+  },
+};
 type SidebarControlsArgs = Pick<
   React.ComponentProps<typeof Sidebar>,
   'collapsible' | 'side' | 'variant'
