@@ -1618,11 +1618,20 @@ export function collectMotionTokens(tokensDir, mode) {
 }
 
 /**
- * Generate `@utility` declarations for motion duration tokens.
+ * Generate motion `@utility` declarations.
  *
- * Tailwind v4 codegens named easing utilities from --ease-* theme vars, but
- * not named duration utilities from --duration-* vars. Emit duration-* as
- * explicit utilities so classes such as nx:duration-fast are real.
+ * Emits two kinds of motion utility together, since components consume them as
+ * one file:
+ *
+ * 1. Data-driven duration utilities. Tailwind v4 codegens named easing
+ *    utilities from --ease-* theme vars, but not named duration utilities from
+ *    --duration-* vars, so emit duration-* explicitly (e.g. nx:duration-fast).
+ * 2. A static, non-token `overlay-presence-exit` keyframe + its
+ *    `animate-overlay-presence-exit` utility — the Radix Presence bridge (see
+ *    the block comment below). It animates an inert custom property so it fires
+ *    `animationend` without overriding the transitioned opacity/scale exit.
+ *
+ * `count` reports the data-driven duration utilities only.
  *
  * @param {{group?: string, key?: string, cssName: string, varRef: string}[]} motionTokens
  * @returns {{css: string, count: number}}
@@ -1644,6 +1653,26 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     css += `  transition-duration: ${token.varRef};\n`;
     css += `}\n\n`;
   }
+
+  // Static "presence bridge" (not token-derived): a non-visual animation whose only
+  // job is to fire `animationend` so Radix Presence — which waits on `animationName`,
+  // not `transitionend` — keeps a closing overlay mounted while its opacity/scale/
+  // translate TRANSITIONS run the visible exit. It must NOT animate a transitioned
+  // property (opacity/scale/translate) or it would override that transition, so it
+  // animates an inert, unread custom property instead.
+  css += `@keyframes overlay-presence-exit {\n`;
+  css += `  from {\n`;
+  css += `    --overlay-presence-phase: 0;\n`;
+  css += `  }\n`;
+  css += `  to {\n`;
+  css += `    --overlay-presence-phase: 1;\n`;
+  css += `  }\n`;
+  css += `}\n\n`;
+  css += `@utility animate-overlay-presence-exit {\n`;
+  css += `  animation-name: overlay-presence-exit;\n`;
+  css += `  animation-duration: var(--tw-duration, var(--nx-motion-duration-fast));\n`;
+  css += `  animation-timing-function: linear;\n`;
+  css += `}\n\n`;
 
   return { css, count: durationTokens.length };
 }

@@ -8,6 +8,8 @@ import { cn } from '../../lib/utils';
 import {
   overlayBodyClassName,
   overlayCloseButtonClassName,
+  overlayPanelTransitionClassName,
+  overlayScrimTransitionClassName,
 } from '../overlay-layout/overlay-layout';
 
 /**
@@ -77,11 +79,7 @@ function SheetOverlay({ className, ...props }: SheetOverlayProps) {
       data-slot="sheet-overlay"
       className={cn(
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
-        'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-        'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-        'nx:data-[state=open]:duration-slower nx:data-[state=open]:ease-enter',
-        'nx:data-[state=closed]:duration-slow nx:data-[state=closed]:ease-exit',
-        'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
+        overlayScrimTransitionClassName,
         className
       )}
       {...props}
@@ -99,30 +97,26 @@ const sheetContentVariants = cva(
   cn(
     'nx:fixed nx:z-modal nx:flex nx:flex-col nx:overflow-hidden',
     'nx:bg-container nx:shadow-lg',
-    'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-    'nx:data-[state=open]:duration-slower nx:data-[state=open]:ease-enter',
-    'nx:data-[state=closed]:duration-slow nx:data-[state=closed]:ease-exit',
-    'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
-    'nx:motion-reduce:data-[state=open]:duration-0 nx:motion-reduce:data-[state=closed]:duration-0'
+    overlayPanelTransitionClassName
   ),
   {
     variants: {
       side: {
         top: cn(
           'nx:inset-x-0 nx:top-0 nx:h-auto nx:max-h-svh nx:border-b-default nx:border-border-default',
-          'nx:data-[state=open]:slide-in-from-top nx:data-[state=closed]:slide-out-to-top'
+          'nx:data-[state=closed]:-translate-y-full'
         ),
         bottom: cn(
           'nx:inset-x-0 nx:bottom-0 nx:h-auto nx:max-h-svh nx:border-t-default nx:border-border-default',
-          'nx:data-[state=open]:slide-in-from-bottom nx:data-[state=closed]:slide-out-to-bottom'
+          'nx:data-[state=closed]:translate-y-full'
         ),
         left: cn(
           'nx:left-0 nx:top-0 nx:h-svh nx:w-3/4 nx:border-r-default nx:border-border-default nx:sm:max-w-sm',
-          'nx:data-[state=open]:slide-in-from-left nx:data-[state=closed]:slide-out-to-left'
+          'nx:data-[state=closed]:-translate-x-full'
         ),
         right: cn(
           'nx:right-0 nx:top-0 nx:h-svh nx:w-3/4 nx:border-l-default nx:border-border-default nx:sm:max-w-sm',
-          'nx:data-[state=open]:slide-in-from-right nx:data-[state=closed]:slide-out-to-right'
+          'nx:data-[state=closed]:translate-x-full'
         ),
       },
     },

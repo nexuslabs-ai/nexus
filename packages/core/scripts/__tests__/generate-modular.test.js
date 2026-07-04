@@ -143,6 +143,10 @@ describe('generateModular', () => {
     expect(motionUtilities).toMatch(
       /transition-duration:\s*var\(--nx-motion-duration-fast\);/
     );
+    expect(motionUtilities).toMatch(/@keyframes overlay-presence-exit \{/);
+    expect(motionUtilities).toMatch(
+      /@utility animate-overlay-presence-exit \{/
+    );
 
     const borderColorAliases = fs.readFileSync(
       path.join(distDir, 'border-color-aliases.css'),

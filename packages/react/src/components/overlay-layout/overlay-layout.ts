@@ -37,18 +37,71 @@ const navigationMenuInlinePopoverSurfaceClassName = [
   'nx:group-data-[viewport=false]/navigation-menu:reduce-transparency:bg-popover',
 ].join(' ');
 
+const navigationMenuInlinePopoverTransitionClassName = [
+  'nx:group-data-[viewport=false]/navigation-menu:transition-[opacity,scale]',
+  'nx:group-data-[viewport=false]/navigation-menu:duration-fast',
+  'nx:group-data-[viewport=false]/navigation-menu:ease-move',
+  'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:transition-none',
+  'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:scale-95',
+  'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:opacity-0',
+  'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-overlay-presence-exit',
+  'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-none',
+].join(' ');
+
+// `animate-overlay-presence-exit` is a non-visual "presence bridge": the installed
+// Radix Presence only waits on `animationName`, not `transitionend`, so this inert
+// animation keeps a closing overlay mounted while the opacity/scale/translate
+// TRANSITIONS above run the visible exit. It animates an unread custom property (see
+// generateMotionUtilitiesCSS in @nexus/core), never a transitioned property, so it
+// cannot override those transitions. Reduced motion drops both. Retire this bridge if
+// Radix Presence gains a transition-aware unmount path.
+const overlayPresenceExitClassName =
+  'nx:data-[state=closed]:animate-overlay-presence-exit nx:motion-reduce:data-[state=closed]:animate-none';
+
+const overlayFloatingTransitionClassName = [
+  'nx:transition-[opacity,scale]',
+  'nx:duration-fast',
+  'nx:ease-move',
+  'nx:motion-reduce:transition-none',
+  'nx:data-[state=closed]:scale-95',
+  'nx:data-[state=closed]:opacity-0',
+  overlayPresenceExitClassName,
+].join(' ');
+
+const overlayContentTransitionClassName = [
+  'nx:transition-[opacity,scale]',
+  'nx:duration-default',
+  'nx:ease-move',
+  'nx:motion-reduce:transition-none',
+  'nx:data-[state=closed]:scale-95',
+  'nx:data-[state=closed]:opacity-0',
+  overlayPresenceExitClassName,
+].join(' ');
+
+const overlayScrimTransitionClassName = [
+  'nx:transition-opacity',
+  'nx:duration-default',
+  'nx:ease-move',
+  'nx:motion-reduce:transition-none',
+  'nx:data-[state=closed]:opacity-0',
+  overlayPresenceExitClassName,
+].join(' ');
+
+const overlayPanelTransitionClassName = [
+  'nx:transition-[translate]',
+  'nx:duration-slow',
+  'nx:ease-move',
+  'nx:motion-reduce:transition-none',
+  overlayPresenceExitClassName,
+].join(' ');
+
 const overlayContentVariants = cva(
   [
     'nx:fixed nx:left-1/2 nx:top-1/2 nx:z-modal nx:flex nx:w-full nx:max-w-lg nx:flex-col',
     'nx:max-h-[calc(100svh-2rem)] nx:overflow-hidden',
     'nx:-translate-x-1/2 nx:-translate-y-1/2',
     'nx:gap-4 nx:border-default nx:border-border-default nx:bg-container nx:py-6 nx:shadow-lg',
-    'nx:data-[state=open]:duration-slow nx:data-[state=open]:ease-enter',
-    'nx:data-[state=closed]:duration-default nx:data-[state=closed]:ease-exit',
-    'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-    'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-    'nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:zoom-in-95',
-    'nx:motion-reduce:duration-0 nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
+    overlayContentTransitionClassName,
     'nx:sm:rounded-lg',
   ].join(' ')
 );
@@ -56,11 +109,7 @@ const overlayContentVariants = cva(
 const overlayScrimVariants = cva(
   [
     'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
-    'nx:data-[state=open]:animate-in nx:data-[state=closed]:animate-out',
-    'nx:data-[state=closed]:fade-out-0 nx:data-[state=open]:fade-in-0',
-    'nx:data-[state=open]:duration-slow nx:data-[state=open]:ease-enter',
-    'nx:data-[state=closed]:duration-default nx:data-[state=closed]:ease-exit',
-    'nx:motion-reduce:data-[state=open]:animate-none nx:motion-reduce:data-[state=closed]:animate-none',
+    overlayScrimTransitionClassName,
   ].join(' ')
 );
 
@@ -157,13 +206,17 @@ export {
   containsComposedSlot,
   defaultOverlayLayout,
   navigationMenuInlinePopoverSurfaceClassName,
+  navigationMenuInlinePopoverTransitionClassName,
   overlayBodyClassName,
   type OverlayButtonOrientation,
   overlayCloseButtonClassName,
   overlayContentVariants,
+  overlayFloatingTransitionClassName,
   overlayFooterVariants,
   overlayHeaderVariants,
   type OverlayLayoutContextValue,
+  overlayPanelTransitionClassName,
+  overlayScrimTransitionClassName,
   overlayScrimVariants,
   type OverlayVariant,
   popoverSurfaceClassName,

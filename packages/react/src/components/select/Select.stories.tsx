@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
+import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { NativeSelect, NativeSelectOption } from '../native-select';
 
@@ -613,6 +614,8 @@ export const OpenCloseInteraction: Story = {
     // Wait for listbox to appear
     const listbox = await within(document.body).findByRole('listbox');
     await expect(listbox).toBeInTheDocument();
+    const content = document.querySelector('[data-slot="select-content"]');
+    await expectInterruptibleOverlayMotion(content);
 
     // Options should be visible
     const appleOption = within(listbox).getByRole('option', { name: 'Apple' });
@@ -621,7 +624,8 @@ export const OpenCloseInteraction: Story = {
     // Close by clicking outside or pressing escape
     await userEvent.keyboard('{Escape}');
 
-    // Wait for listbox to be removed
+    // Radix Select renders closed content into a detached DocumentFragment, not
+    // through Presence, so the visible listbox unmounts immediately on close.
     await waitFor(() => {
       expect(document.querySelector('[role="listbox"]')).toBeNull();
     });

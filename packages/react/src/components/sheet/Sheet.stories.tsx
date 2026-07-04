@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 import { Input } from '../input';
 
@@ -330,6 +334,13 @@ export const OpenCloseInteraction: Story = {
     const sheet = await within(document.body).findByRole('dialog');
     await expect(sheet).toBeInTheDocument();
     await expect(sheet).toHaveAttribute('data-slot', 'sheet-content');
+    await expectInterruptibleOverlayMotion(sheet, {
+      reducedMotionClass: 'nx:motion-reduce:transition-none',
+    });
+    await expect(sheet).toHaveClass('nx:transition-[translate]');
+    await expect(sheet).toHaveClass('nx:data-[state=closed]:translate-x-full');
+    const overlay = document.querySelector('[data-slot="sheet-overlay"]');
+    await expectInterruptibleOverlayMotion(overlay);
 
     // Title should be visible.
     await expect(
@@ -341,9 +352,7 @@ export const OpenCloseInteraction: Story = {
       within(sheet).getByRole('button', { name: 'Dismiss' })
     );
 
-    await waitFor(() => {
-      expect(document.querySelector('[role="dialog"]')).toBeNull();
-    });
+    await expectExitBeforeUnmount(document.querySelector('[role="dialog"]'));
   },
 };
 

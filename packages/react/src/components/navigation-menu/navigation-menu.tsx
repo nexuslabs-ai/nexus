@@ -7,6 +7,8 @@ import { IconChevronDown } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 import {
   navigationMenuInlinePopoverSurfaceClassName,
+  navigationMenuInlinePopoverTransitionClassName,
+  overlayFloatingTransitionClassName,
   popoverSurfaceClassName,
 } from '../overlay-layout/overlay-layout';
 
@@ -192,12 +194,7 @@ function NavigationMenuContent({
         'nx:group-data-[viewport=false]/navigation-menu:mt-1.5',
         'nx:group-data-[viewport=false]/navigation-menu:overflow-hidden',
         navigationMenuInlinePopoverSurfaceClassName,
-        'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-out nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:zoom-out-95',
-        'nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-in nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:zoom-in-95',
-        'nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:duration-default nx:group-data-[viewport=false]/navigation-menu:data-[state=open]:ease-enter',
-        'nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:duration-fast nx:group-data-[viewport=false]/navigation-menu:data-[state=closed]:ease-exit',
-        'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:duration-0',
-        'nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-none nx:motion-reduce:group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-none',
+        navigationMenuInlinePopoverTransitionClassName,
         className
       )}
       {...props}
@@ -232,10 +229,7 @@ function NavigationMenuViewport({
         className={cn(
           'nx:origin-top-center nx:relative nx:mt-1.5 nx:h-(--radix-navigation-menu-viewport-height) nx:w-full nx:overflow-hidden',
           popoverSurfaceClassName,
-          'nx:data-[state=closed]:animate-out nx:data-[state=closed]:zoom-out-95 nx:data-[state=open]:animate-in nx:data-[state=open]:zoom-in-90',
-          'nx:data-[state=open]:duration-default nx:data-[state=open]:ease-enter',
-          'nx:data-[state=closed]:duration-fast nx:data-[state=closed]:ease-exit',
-          'nx:motion-reduce:data-[state=closed]:animate-none nx:motion-reduce:data-[state=open]:animate-none',
+          overlayFloatingTransitionClassName,
           'nx:@md/navmenu:w-(--radix-navigation-menu-viewport-width)',
           className
         )}
@@ -300,10 +294,8 @@ function NavigationMenuIndicator({
       data-slot="navigation-menu-indicator"
       className={cn(
         'nx:top-full nx:z-1 nx:flex nx:h-1.5 nx:items-end nx:justify-center nx:overflow-hidden',
-        'nx:data-[state=hidden]:animate-out nx:data-[state=hidden]:fade-out nx:data-[state=visible]:animate-in nx:data-[state=visible]:fade-in',
-        'nx:data-[state=visible]:duration-default nx:data-[state=visible]:ease-enter',
-        'nx:data-[state=hidden]:duration-fast nx:data-[state=hidden]:ease-exit',
-        'nx:motion-reduce:data-[state=hidden]:animate-none nx:motion-reduce:data-[state=visible]:animate-none',
+        'nx:transition-opacity nx:duration-fast nx:ease-move nx:motion-reduce:transition-none',
+        'nx:data-[state=hidden]:opacity-0 nx:data-[state=hidden]:animate-overlay-presence-exit nx:motion-reduce:data-[state=hidden]:animate-none',
         className
       )}
       {...props}

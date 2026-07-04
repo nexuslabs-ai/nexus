@@ -4,6 +4,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 
 import {
   Menubar,
@@ -233,6 +237,7 @@ export const OpenCloseInteraction: Story = {
     const menu = await within(document.body).findByRole('menu');
     await expect(menu).toBeInTheDocument();
     await expect(menu).toHaveAttribute('data-slot', 'menubar-content');
+    await expectInterruptibleOverlayMotion(menu);
 
     // Items should be visible
     const item = within(menu).getByRole('menuitem', { name: 'New Tab' });
@@ -242,9 +247,7 @@ export const OpenCloseInteraction: Story = {
     await userEvent.keyboard('{Escape}');
 
     // Wait for menu to be removed from DOM
-    await waitFor(() => {
-      expect(document.querySelector('[role="menu"]')).toBeNull();
-    });
+    await expectExitBeforeUnmount(document.querySelector('[role="menu"]'));
   },
 };
 

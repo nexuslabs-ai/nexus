@@ -520,6 +520,32 @@ describe('generateTailwindPackage', () => {
     expect(defaultBlock).toMatch(
       /transition-duration:\s*var\(--nx-motion-duration-default\);/
     );
+
+    expect(motionUtilitiesCSS).toMatch(/@keyframes overlay-presence-exit \{/);
+    const presenceExitBlock = extractBlock(
+      motionUtilitiesCSS,
+      '@utility animate-overlay-presence-exit'
+    );
+    expect(presenceExitBlock).toMatch(
+      /animation-name:\s*overlay-presence-exit;/
+    );
+    expect(presenceExitBlock).toMatch(
+      /animation-duration:\s*var\(--tw-duration,\s*var\(--nx-motion-duration-fast\)\);/
+    );
+
+    // Regression guard (#609): the presence bridge exists only to fire
+    // `animationend` for Radix Presence; it must animate an inert custom
+    // property, never a transitioned one. Animating opacity/scale/translate
+    // would override the exit transition and the visible fade would never
+    // render — the bug that shipped green because no test read the keyframe body.
+    const presenceExitKeyframe = extractBlock(
+      motionUtilitiesCSS,
+      '@keyframes overlay-presence-exit'
+    );
+    expect(presenceExitKeyframe).toMatch(/--overlay-presence-phase:/);
+    expect(presenceExitKeyframe).not.toMatch(
+      /opacity|scale|translate|transform/
+    );
   });
 
   it('compiles named motion utilities through Tailwind', async () => {
@@ -529,6 +555,7 @@ describe('generateTailwindPackage', () => {
       'nx:duration-150',
       'nx:duration-(--nx-motion-duration-fast)',
       'nx:ease-enter',
+      'nx:animate-overlay-presence-exit',
     ]);
 
     expect(compiledCSS).toMatch(
@@ -545,6 +572,9 @@ describe('generateTailwindPackage', () => {
     );
     expect(compiledCSS).toMatch(
       /\.nx\\:ease-enter\s*\{[\s\S]*?transition-timing-function:\s*var\(--nx-ease-enter\);/
+    );
+    expect(compiledCSS).toMatch(
+      /\.nx\\:animate-overlay-presence-exit\s*\{[\s\S]*?animation-name:\s*overlay-presence-exit;/
     );
   });
 

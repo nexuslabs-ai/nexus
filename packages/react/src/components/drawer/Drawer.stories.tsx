@@ -2,6 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { IconX } from '../../lib/icons';
+import {
+  expectExitBeforeUnmount,
+  expectInterruptibleOverlayMotion,
+} from '../../stories/support/overlay-motion-test-utils';
 import { Button } from '../button';
 
 import {
@@ -271,6 +275,8 @@ export const OpenCloseInteraction: Story = {
     // Content portals to document.body with role="dialog".
     const drawer = await within(document.body).findByRole('dialog');
     await expect(drawer).toHaveAttribute('data-slot', 'drawer-content');
+    const overlay = document.querySelector('[data-slot="drawer-overlay"]');
+    await expectInterruptibleOverlayMotion(overlay);
     await expect(
       within(drawer).getByText('Interaction Test')
     ).toBeInTheDocument();
@@ -279,6 +285,7 @@ export const OpenCloseInteraction: Story = {
       within(drawer).getByRole('button', { name: 'Dismiss' })
     );
 
+    await expectExitBeforeUnmount(overlay);
     await waitForDrawerToClose();
   },
 };
