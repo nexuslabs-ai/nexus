@@ -27,6 +27,31 @@ type Story = StoryObj<typeof Item>;
 const THUMB =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23999'/%3E%3C/svg%3E";
 
+function resolveCssColor(element: Element, color: string) {
+  const probe = element.ownerDocument.createElement('span');
+  probe.style.color = color;
+  element.ownerDocument.body.append(probe);
+  const resolved = getComputedStyle(probe).color;
+  probe.remove();
+  return resolved;
+}
+
+function expectMediaHairline(element: Element | null) {
+  if (!element) throw new Error('item media not found');
+
+  const rootStyles = getComputedStyle(element.ownerDocument.documentElement);
+  const expectedColor = resolveCssColor(
+    element,
+    rootStyles.getPropertyValue('--nx-color-black-a200').trim()
+  );
+  const afterStyles = getComputedStyle(element, '::after');
+
+  expect(afterStyles.outlineStyle).toBe('solid');
+  expect(afterStyles.outlineWidth).toBe('1px');
+  expect(afterStyles.outlineOffset).toBe('-1px');
+  expect(afterStyles.outlineColor).toBe(expectedColor);
+}
+
 // A standard row: icon media, title + description, and a trailing action.
 export const Default: Story = {
   render: () => (
@@ -130,10 +155,10 @@ export const MediaImageHairline: Story = {
     const media = canvasElement.querySelector('[data-slot="item-media"]');
     const image = canvasElement.querySelector('img');
 
-    await expect(media).toHaveClass('nx:after:outline-black/10');
-    await expect(media).toHaveClass('nx:dark:after:outline-white/10');
-    await expect(media).toHaveClass('nx:after:-outline-offset-1');
-    await expect(image).not.toHaveClass('nx:after:outline-black/10');
+    expectMediaHairline(media);
+    await expect(image).not.toHaveClass(
+      'nx:after:outline-[var(--nx-color-black-a200)]'
+    );
   },
 };
 
