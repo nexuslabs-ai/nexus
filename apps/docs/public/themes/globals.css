@@ -247,6 +247,10 @@
     --nx-color-border-default,
     var(--nx-color-black-a200)
   );
+  --color-border-hairline: var(
+    --nx-color-border-hairline,
+    var(--nx-color-black-a200)
+  );
   --color-border-default-alpha: var(
     --nx-color-border-default-alpha,
     var(--nx-color-slate-a200)
@@ -616,6 +620,10 @@
   --color-overlay: var(--nx-color-overlay, var(--nx-color-slate-a700));
   --color-border-default: var(
     --nx-color-border-default,
+    var(--nx-color-black-a200)
+  );
+  --color-border-hairline: var(
+    --nx-color-border-hairline,
     var(--nx-color-black-a200)
   );
   --color-border-default-alpha: var(

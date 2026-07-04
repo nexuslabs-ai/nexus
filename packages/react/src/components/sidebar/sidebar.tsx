@@ -696,8 +696,8 @@ function SidebarGroupAction({
       data-slot="sidebar-group-action"
       className={cn(
         'nx:absolute nx:top-3.5 nx:right-3 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
-        // Enlarges the hit area on touch viewports.
-        'nx:after:absolute nx:after:-inset-2 nx:lg:after:hidden',
+        // Enlarges the hit area on coarse (touch) pointers.
+        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2',
         'nx:group-data-[collapsible=icon]:hidden',
         className
       )}
@@ -930,8 +930,8 @@ function SidebarMenuAction({
       data-slot="sidebar-menu-action"
       className={cn(
         'nx:absolute nx:top-1.5 nx:right-1 nx:flex nx:aspect-square nx:w-5 nx:items-center nx:justify-center nx:rounded-md nx:p-0 nx:text-nav-foreground nx:hover:bg-nav-item-hover nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:[&>svg]:size-4 nx:[&>svg]:shrink-0',
-        // Enlarges the hit area on touch viewports.
-        'nx:after:absolute nx:after:-inset-2 nx:lg:after:hidden',
+        // Enlarges the hit area on coarse (touch) pointers.
+        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-2',
         'nx:peer-data-[size=sm]/menu-button:top-1',
         'nx:peer-data-[size=default]/menu-button:top-1.5',
         'nx:peer-data-[size=lg]/menu-button:top-2.5',

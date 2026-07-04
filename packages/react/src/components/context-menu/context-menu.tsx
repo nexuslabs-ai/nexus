@@ -6,6 +6,10 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 import {
+  staggeredItemClassName,
+  staggeredItemContainerClassName,
+} from '../motion/motion';
+import {
   overlayFloatingTransitionClassName,
   popoverSurfaceClassName,
 } from '../overlay-layout/overlay-layout';
@@ -99,6 +103,7 @@ function ContextMenuSubTrigger({
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-[state=open]:bg-popover-hover nx:data-[state=open]:text-popover-foreground',
         'nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+        staggeredItemClassName,
         inset && 'nx:pl-8',
         className
       )}
@@ -136,6 +141,7 @@ function ContextMenuSubContent({
         popoverSurfaceClassName,
         'nx:p-1',
         overlayFloatingTransitionClassName,
+        staggeredItemContainerClassName,
         className
       )}
       {...props}
@@ -176,6 +182,7 @@ function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
           popoverSurfaceClassName,
           'nx:p-1',
           overlayFloatingTransitionClassName,
+          staggeredItemContainerClassName,
           className
         )}
         {...props}
@@ -185,7 +192,7 @@ function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
 }
 
 const contextMenuItemVariants = cva(
-  'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:typography-body-default nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0',
+  `nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:typography-body-default nx:outline-none nx:transition-colors nx:focus:bg-popover-hover nx:focus:text-popover-foreground nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground nx:[&_svg]:pointer-events-none nx:[&_svg]:size-4 nx:[&_svg]:shrink-0 ${staggeredItemClassName}`,
   {
     variants: {
       variant: {
@@ -284,6 +291,7 @@ function ContextMenuCheckboxItem({
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
+        staggeredItemClassName,
         className
       )}
       checked={checked}
@@ -335,6 +343,7 @@ function ContextMenuRadioItem({
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
+        staggeredItemClassName,
         className
       )}
       {...props}

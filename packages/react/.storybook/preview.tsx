@@ -225,7 +225,7 @@ const AppearanceDecorator: Decorator = (Story, context) => {
       onStateChange={handleStateChange}
     >
       <div
-        className={`nx:flex nx:items-center nx:justify-center nx:bg-background nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-svh'}`}
+        className={`nx:flex nx:items-center nx:justify-center nx:text-foreground ${isDocs ? 'nx:py-12' : 'nx:min-h-svh'}`}
       >
         <Story />
       </div>
@@ -263,11 +263,11 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-    // Disable Storybook's built-in background selector
-    // Theme switching is handled by the decorator which applies
-    // nx:bg-background class that uses CSS variables
+    // Disable Storybook's built-in background selector. The imported consumer
+    // CSS still owns the iframe body background for theme parity; the per-story
+    // wrapper stays transparent so components do not get an extra surface.
     backgrounds: { disable: true },
-    // Use fullscreen layout so our theme wrapper fills the entire canvas
+    // Use fullscreen layout so our theme wrapper owns alignment and min-height
     layout: 'fullscreen',
     viewport: {
       options: {

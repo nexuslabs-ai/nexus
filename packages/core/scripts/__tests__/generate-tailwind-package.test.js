@@ -243,7 +243,7 @@ describe('generateTailwindPackage', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme inline');
     const colorLines = themeColorLines(themeBlock);
 
-    expect(colorLines).toHaveLength(105);
+    expect(colorLines).toHaveLength(106);
 
     for (const [, name, value] of colorLines) {
       expect(compactCss(value), `--color-${name}`).toMatch(
@@ -396,6 +396,14 @@ describe('generateTailwindPackage', () => {
     );
     expect(block).toMatch(/line-height: normal;/);
     expect(typographyCSS).not.toMatch(/line-height: auto/);
+  });
+
+  it('emits balanced wrapping on heading typography utilities', () => {
+    const block = extractBlock(
+      typographyCSS,
+      '@utility typography-heading-large'
+    );
+    expect(block).toMatch(/text-wrap: balance;/);
   });
 
   it('emits typography-shortcut from the shortcut composite token', () => {

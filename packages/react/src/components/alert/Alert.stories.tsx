@@ -789,6 +789,21 @@ export const InlineActionsWithClose: Story = {
   ),
 };
 
+export const CloseTouchTarget: Story = {
+  render: () => (
+    <Alert>
+      <AlertTitle>Heads up</AlertTitle>
+      <AlertClose aria-label="Dismiss" />
+    </Alert>
+  ),
+  play: async ({ canvasElement }) => {
+    const close = canvasElement.querySelector('[data-slot="alert-close"]');
+
+    await expect(close).toHaveClass('nx:relative');
+    await expect(close).toHaveClass('nx:pointer-coarse:after:-inset-1.5');
+  },
+};
+
 export const DisabledClose: Story = {
   args: {
     layout: 'inline',

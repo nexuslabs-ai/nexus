@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
 import { IconCheck, IconMinus } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
@@ -54,7 +55,8 @@ function Checkbox({ className, ...props }: CheckboxProps) {
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        'nx:group nx:peer nx:inline-flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center',
+        'nx:group nx:peer nx:relative nx:inline-flex nx:size-4 nx:shrink-0 nx:items-center nx:justify-center',
+        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-3.5',
         'nx:rounded-sm nx:border-default nx:border-border-default nx:bg-background',
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
@@ -81,18 +83,27 @@ function Checkbox({ className, ...props }: CheckboxProps) {
       {...props}
     >
       <CheckboxPrimitive.Indicator
+        forceMount
         data-slot="checkbox-indicator"
-        className="nx:flex nx:items-center nx:justify-center nx:text-current"
+        className="nx:relative nx:flex nx:size-full nx:items-center nx:justify-center nx:text-current"
       >
         <IconCheck
           data-slot="checkbox-check"
           aria-hidden="true"
-          className="nx:hidden nx:size-3.5 nx:group-data-[state=checked]:block"
+          className={cn(
+            'nx:absolute nx:size-3.5',
+            selectionIndicatorMotionClassName,
+            'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+          )}
         />
         <IconMinus
           data-slot="checkbox-minus"
           aria-hidden="true"
-          className="nx:hidden nx:size-3.5 nx:group-data-[state=indeterminate]:block"
+          className={cn(
+            'nx:absolute nx:size-3.5',
+            selectionIndicatorMotionClassName,
+            'nx:group-data-[state=indeterminate]:scale-100 nx:group-data-[state=indeterminate]:opacity-100'
+          )}
         />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>

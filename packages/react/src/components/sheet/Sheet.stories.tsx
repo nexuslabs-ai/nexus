@@ -476,9 +476,8 @@ export const WithDataAttributes: Story = {
     ).toHaveClass(
       'nx:right-6',
       'nx:top-6',
-      'nx:after:absolute',
-      'nx:after:-inset-2.5',
-      'nx:lg:after:hidden'
+      'nx:pointer-coarse:after:absolute',
+      'nx:pointer-coarse:after:-inset-2.5'
     );
 
     await userEvent.keyboard('{Escape}');

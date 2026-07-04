@@ -36,6 +36,16 @@ export const Checked: Story = {
   },
 };
 
+export const TouchTarget: Story = {
+  render: () => <Switch aria-label="Wifi" />,
+  play: async ({ canvasElement }) => {
+    const sw = canvasElement.querySelector('[data-slot="switch"]');
+
+    await expect(sw).toHaveClass('nx:relative');
+    await expect(sw).toHaveClass('nx:pointer-coarse:after:-inset-3');
+  },
+};
+
 export const Disabled: Story = {
   args: {
     'aria-label': 'Toggle switch',

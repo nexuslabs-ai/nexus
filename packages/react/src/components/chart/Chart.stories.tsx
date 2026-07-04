@@ -202,6 +202,43 @@ export const WithDataAttributes: Story = {
   },
 };
 
+export const AxisTicksTabular: Story = {
+  render: () => (
+    <div className="nx:w-[600px] nx:max-w-full">
+      <ChartContainer config={config}>
+        <LineChart
+          accessibilityLayer
+          data={data}
+          margin={{ left: 12, right: 12 }}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={shortMonth}
+          />
+          <Line
+            dataKey="desktop"
+            type="natural"
+            stroke="var(--color-desktop)"
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ChartContainer>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const chart = canvasElement.querySelector('[data-slot="chart"]');
+
+    await expect(chart).toHaveClass(
+      'nx:[&_.recharts-cartesian-axis-tick_text]:tabular-nums'
+    );
+  },
+};
+
 export const DynamicStyleGuard: Story = {
   render: () => (
     <div className="nx:w-[600px] nx:max-w-full">

@@ -480,6 +480,25 @@ export const FocusManagement: Story = {
   },
 };
 
+export const PressScale: Story = {
+  render: () => (
+    <div>
+      <Button>Default</Button>
+      <Button variant="link">Link</Button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const [primary, link] = canvasElement.querySelectorAll(
+      '[data-slot="button"]'
+    );
+
+    await expect(primary).toHaveClass('nx:active:scale-[0.96]');
+    await expect(primary).toHaveClass('nx:motion-reduce:active:scale-100');
+    await expect(link).toHaveClass('nx:active:scale-100');
+    await expect(link).not.toHaveClass('nx:active:scale-[0.96]');
+  },
+};
+
 // ============================================
 // PROPS & ATTRIBUTES TESTS
 // ============================================

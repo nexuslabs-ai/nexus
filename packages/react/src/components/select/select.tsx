@@ -4,7 +4,12 @@ import * as SelectPrimitive from '@radix-ui/react-select';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronDown, IconChevronUp } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
+import {
+  staggeredItemClassName,
+  staggeredItemContainerClassName,
+} from '../motion/motion';
 import {
   overlayFloatingTransitionClassName,
   popoverSurfaceClassName,
@@ -200,6 +205,7 @@ function SelectContent({
           // `data-[state=closed]` exit + presence bridge inside this shared class are inert
           // here — only the open-state transition applies.
           overlayFloatingTransitionClassName,
+          staggeredItemContainerClassName,
           position === 'popper' &&
             'nx:data-[side=bottom]:translate-y-1 nx:data-[side=left]:-translate-x-1 nx:data-[side=right]:translate-x-1 nx:data-[side=top]:-translate-y-1',
           className
@@ -279,18 +285,27 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        'nx:relative nx:flex nx:w-full nx:cursor-default nx:select-none nx:items-center',
+        'nx:group nx:relative nx:flex nx:w-full nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
         'nx:data-disabled:pointer-events-none nx:data-disabled:text-disabled-foreground',
+        staggeredItemClassName,
         className
       )}
       {...props}
     >
-      <span className="nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
-        <SelectPrimitive.ItemIndicator>
-          <IconCheck className="nx:size-4" />
-        </SelectPrimitive.ItemIndicator>
+      <span className="nx:pointer-events-none nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
+        {/* SelectPrimitive.ItemIndicator does not support forceMount and unmounts
+            when unchecked, so this icon mirrors item state for the cross-fade. */}
+        <IconCheck
+          data-slot="select-item-indicator-icon"
+          aria-hidden="true"
+          className={cn(
+            'nx:size-4',
+            selectionIndicatorMotionClassName,
+            'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+          )}
+        />
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>

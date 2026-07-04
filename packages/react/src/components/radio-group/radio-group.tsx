@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 
 import { IconCircleFilled } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
@@ -66,7 +67,8 @@ function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       className={cn(
-        'nx:size-4 nx:shrink-0 nx:cursor-pointer nx:rounded-full nx:border-default nx:border-border-default nx:bg-background',
+        'nx:group nx:relative nx:size-4 nx:shrink-0 nx:cursor-pointer nx:rounded-full nx:border-default nx:border-border-default nx:bg-background',
+        'nx:pointer-coarse:after:absolute nx:pointer-coarse:after:-inset-3.5',
         'nx:transition-colors',
         'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
         'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
@@ -78,10 +80,19 @@ function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
       {...props}
     >
       <RadioGroupPrimitive.Indicator
+        forceMount
         data-slot="radio-group-indicator"
         className="nx:flex nx:items-center nx:justify-center"
       >
-        <IconCircleFilled className="nx:size-2.5 nx:text-current" />
+        <IconCircleFilled
+          data-slot="radio-group-dot"
+          aria-hidden="true"
+          className={cn(
+            'nx:size-2.5 nx:text-current',
+            selectionIndicatorMotionClassName,
+            'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+          )}
+        />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );

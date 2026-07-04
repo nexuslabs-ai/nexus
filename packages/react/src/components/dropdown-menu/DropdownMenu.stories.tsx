@@ -4,6 +4,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
+  animationDelayMs,
+  expectStaggeredItemMotion,
+} from '../../stories/support/motion-test-utils';
+import {
   expectExitBeforeUnmount,
   expectInterruptibleOverlayMotion,
 } from '../../stories/support/overlay-motion-test-utils';
@@ -150,6 +154,117 @@ export const WithRadioItems: Story = {
   },
 };
 
+export const IndicatorCrossFade: Story = {
+  render: function IndicatorCrossFadeStory() {
+    const [showStatusBar, setShowStatusBar] = React.useState(true);
+    const [showActivityBar, setShowActivityBar] = React.useState(false);
+    const [showBookmarksBar, setShowBookmarksBar] = React.useState<
+      boolean | 'indeterminate'
+    >('indeterminate');
+    const [position, setPosition] = React.useState('bottom');
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">Indicator Motion</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="nx:w-56">
+          <DropdownMenuCheckboxItem
+            checked={showStatusBar}
+            onCheckedChange={setShowStatusBar}
+          >
+            Status Bar
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={showActivityBar}
+            onCheckedChange={setShowActivityBar}
+          >
+            Activity Bar
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={showBookmarksBar}
+            onCheckedChange={setShowBookmarksBar}
+          >
+            Bookmarks Bar
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+            <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Indicator Motion' });
+
+    try {
+      await userEvent.click(trigger);
+
+      const menu = await within(document.body).findByRole('menu');
+      const checkedItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Status Bar',
+      });
+      const uncheckedItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Activity Bar',
+      });
+      const indeterminateItem = within(menu).getByRole('menuitemcheckbox', {
+        name: 'Bookmarks Bar',
+      });
+      const selectedRadio = within(menu).getByRole('menuitemradio', {
+        name: 'Bottom',
+      });
+      const unselectedRadio = within(menu).getByRole('menuitemradio', {
+        name: 'Top',
+      });
+
+      const checkedIcon = checkedItem.querySelector(
+        '[data-slot="dropdown-menu-checkbox-indicator-icon"]'
+      );
+      const uncheckedIcon = uncheckedItem.querySelector(
+        '[data-slot="dropdown-menu-checkbox-indicator-icon"]'
+      );
+      const indeterminateIcon = indeterminateItem.querySelector(
+        '[data-slot="dropdown-menu-checkbox-indicator-icon"]'
+      );
+      const selectedDot = selectedRadio.querySelector(
+        '[data-slot="dropdown-menu-radio-indicator-icon"]'
+      );
+      const unselectedDot = unselectedRadio.querySelector(
+        '[data-slot="dropdown-menu-radio-indicator-icon"]'
+      );
+
+      await expect(checkedIcon).toBeInTheDocument();
+      await expect(uncheckedIcon).toBeInTheDocument();
+      await expect(indeterminateIcon).toBeInTheDocument();
+      await expect(selectedDot).toBeInTheDocument();
+      await expect(unselectedDot).toBeInTheDocument();
+      await expect(indeterminateItem).toHaveAttribute(
+        'data-state',
+        'indeterminate'
+      );
+      await expect(checkedIcon).toHaveClass('nx:transition-[opacity,scale]');
+      await expect(checkedIcon).toHaveClass(
+        'nx:group-data-[state=checked]:opacity-100'
+      );
+      await expect(indeterminateIcon).toHaveClass(
+        'nx:group-data-[state=indeterminate]:opacity-100'
+      );
+      await expect(checkedIcon).toHaveClass('nx:motion-reduce:transition-none');
+      await expect(selectedDot).toHaveClass(
+        'nx:group-data-[state=checked]:opacity-100'
+      );
+    } finally {
+      await userEvent.keyboard('{Escape}');
+      await waitFor(() => {
+        expect(document.querySelector('[role="menu"]')).toBeNull();
+      });
+    }
+  },
+};
+
 export const WithSubMenu: Story = {
   render: (_args) => (
     <DropdownMenu>
@@ -276,6 +391,121 @@ export const WithInsetItems: Story = {
       </DropdownMenuContent>
     </DropdownMenu>
   ),
+};
+
+export const StaggeredItems: Story = {
+  render: (_args) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Open staggered menu</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>New File</DropdownMenuItem>
+        <DropdownMenuItem>Open File</DropdownMenuItem>
+        <DropdownMenuItem>Save</DropdownMenuItem>
+        <DropdownMenuItem>Share</DropdownMenuItem>
+        <DropdownMenuItem>Archive</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', {
+      name: 'Open staggered menu',
+    });
+
+    await userEvent.click(trigger);
+
+    const menu = await within(document.body).findByRole('menu');
+    const items = Array.from(
+      menu.querySelectorAll('[data-slot="dropdown-menu-item"]')
+    );
+    await expectStaggeredItemMotion(menu, items);
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="menu"]')).toBeNull();
+    });
+  },
+};
+
+export const StaggeredGroupedItems: Story = {
+  render: (_args) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Open grouped staggered menu</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Files</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>New File</DropdownMenuItem>
+          <DropdownMenuItem>Open File</DropdownMenuItem>
+          <DropdownMenuItem>Save File</DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Edit</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>Undo</DropdownMenuItem>
+          <DropdownMenuItem>Redo</DropdownMenuItem>
+          <DropdownMenuItem>Copy</DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', {
+      name: 'Open grouped staggered menu',
+    });
+
+    await userEvent.click(trigger);
+
+    const menu = await within(document.body).findByRole('menu');
+    const groups = Array.from(menu.querySelectorAll('[role="group"]'));
+    expect(groups).toHaveLength(2);
+
+    const [fileGroup, editGroup] = groups;
+
+    if (!fileGroup || !editGroup) {
+      throw new Error('Expected two grouped stagger sections.');
+    }
+
+    const fileItems = Array.from(
+      fileGroup.querySelectorAll('[data-slot="dropdown-menu-item"]')
+    );
+    const editItems = Array.from(
+      editGroup.querySelectorAll('[data-slot="dropdown-menu-item"]')
+    );
+
+    await expectStaggeredItemMotion(menu, fileItems);
+    await expectStaggeredItemMotion(menu, editItems);
+
+    const firstFileItem = fileItems[0];
+    const secondFileItem = fileItems[1];
+    const firstEditItem = editItems[0];
+    const secondEditItem = editItems[1];
+
+    if (
+      !firstFileItem ||
+      !secondFileItem ||
+      !firstEditItem ||
+      !secondEditItem
+    ) {
+      throw new Error('Expected at least two items in each staggered group.');
+    }
+
+    expect(animationDelayMs(firstEditItem)).toBe(
+      animationDelayMs(firstFileItem)
+    );
+    expect(animationDelayMs(secondEditItem)).toBe(
+      animationDelayMs(secondFileItem)
+    );
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="menu"]')).toBeNull();
+    });
+  },
 };
 
 // ============================================

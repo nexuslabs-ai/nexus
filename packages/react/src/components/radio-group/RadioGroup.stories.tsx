@@ -111,6 +111,20 @@ export const Horizontal: Story = {
   ),
 };
 
+export const TouchTarget: Story = {
+  render: () => (
+    <RadioGroup defaultValue="a">
+      <RadioGroupItem value="a" aria-label="A" />
+    </RadioGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const item = canvasElement.querySelector('[data-slot="radio-group-item"]');
+
+    await expect(item).toHaveClass('nx:relative');
+    await expect(item).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
+  },
+};
+
 // ============================================
 // INTERACTION TESTS
 // ============================================
@@ -271,6 +285,31 @@ export const WithDataAttributes: Story = {
     // The filled dot renders only inside the checked item
     const indicator = one.querySelector('[data-slot="radio-group-indicator"]');
     await expect(indicator).toBeInTheDocument();
+  },
+};
+
+export const IndicatorCrossFade: Story = {
+  render: (args) => (
+    <RadioGroup {...args} defaultValue="one" aria-label="Pick one">
+      <RadioGroupItem value="one" aria-label="Option one" />
+      <RadioGroupItem value="two" aria-label="Option two" />
+    </RadioGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const one = canvas.getByRole('radio', { name: 'Option one' });
+    const two = canvas.getByRole('radio', { name: 'Option two' });
+
+    const selectedDot = one.querySelector('[data-slot="radio-group-dot"]');
+    const unselectedDot = two.querySelector('[data-slot="radio-group-dot"]');
+
+    await expect(selectedDot).toBeInTheDocument();
+    await expect(unselectedDot).toBeInTheDocument();
+    await expect(selectedDot).toHaveClass('nx:transition-[opacity,scale]');
+    await expect(selectedDot).toHaveClass(
+      'nx:group-data-[state=checked]:opacity-100'
+    );
+    await expect(selectedDot).toHaveClass('nx:motion-reduce:transition-none');
   },
 };
 
