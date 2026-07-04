@@ -132,6 +132,16 @@ export const Disabled: Story = {
   },
 };
 
+export const TouchTarget: Story = {
+  render: () => <Checkbox aria-label="Accept" />,
+  play: async ({ canvasElement }) => {
+    const box = canvasElement.querySelector('[data-slot="checkbox"]');
+
+    await expect(box).toHaveClass('nx:relative');
+    await expect(box).toHaveClass('nx:pointer-coarse:after:-inset-3.5');
+  },
+};
+
 export const WithLabel: Story = {
   render: function WithLabelStory(args) {
     const termsId = React.useId();

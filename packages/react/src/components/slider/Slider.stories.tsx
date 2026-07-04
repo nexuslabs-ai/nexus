@@ -261,7 +261,7 @@ export const Vertical: Story = {
       Number.parseFloat(getComputedStyle(range).borderTopLeftRadius)
     ).toBe(0);
     await expect(thumb).toHaveAttribute('data-orientation', 'vertical');
-    await expect(thumb).toHaveClass('nx:pointer-coarse:after:-inset-3');
+    await expect(thumb).toHaveClass('nx:pointer-coarse:after:-inset-2');
     await expect(getComputedStyle(thumb).height).toBe('20px');
     await expect(getComputedStyle(thumb).width).toBe('20px');
     await expect(thumbHandleStyle.height).toBe('2px');
@@ -362,7 +362,7 @@ export const SizeMeasurements: Story = {
     await expect(getComputedStyle(comfortableThumb).height).toBe('20px');
     await expect(getComputedStyle(comfortableThumb).width).toBe('20px');
     await expect(comfortableThumb).toHaveClass(
-      'nx:pointer-coarse:after:-inset-3'
+      'nx:pointer-coarse:after:-inset-2'
     );
     await expect(comfortableThumbHandleStyle.height).toBe('20px');
     await expect(comfortableThumbHandleStyle.width).toBe('2px');
@@ -618,6 +618,15 @@ export const WithDataAttributes: Story = {
     await expect(marker).toBeInTheDocument();
     await expect(marker).toHaveAttribute('data-size', 'comfortable');
     await expect(thumb).toHaveAttribute('data-size', 'comfortable');
+  },
+};
+
+export const ThumbTouchTarget: Story = {
+  render: () => <Slider defaultValue={[50]} aria-label="Volume" />,
+  play: async ({ canvasElement }) => {
+    const thumb = canvasElement.querySelector('[role="slider"]');
+
+    await expect(thumb).toHaveClass('nx:pointer-coarse:after:-inset-2');
   },
 };
 
