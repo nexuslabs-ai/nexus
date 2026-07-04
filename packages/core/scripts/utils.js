@@ -1618,11 +1618,20 @@ export function collectMotionTokens(tokensDir, mode) {
 }
 
 /**
- * Generate `@utility` declarations for motion duration tokens.
+ * Generate motion `@utility` declarations.
  *
- * Tailwind v4 codegens named easing utilities from --ease-* theme vars, but
- * not named duration utilities from --duration-* vars. Emit duration-* as
- * explicit utilities so classes such as nx:duration-fast are real.
+ * Emits two kinds of motion utility together, since components consume them as
+ * one file:
+ *
+ * 1. Data-driven duration utilities. Tailwind v4 codegens named easing
+ *    utilities from --ease-* theme vars, but not named duration utilities from
+ *    --duration-* vars, so emit duration-* explicitly (e.g. nx:duration-fast).
+ * 2. A static, non-token `overlay-presence-exit` keyframe + its
+ *    `animate-overlay-presence-exit` utility — the Radix Presence bridge (see
+ *    the block comment below). It animates an inert custom property so it fires
+ *    `animationend` without overriding the transitioned opacity/scale exit.
+ *
+ * `count` reports the data-driven duration utilities only.
  *
  * @param {{group?: string, key?: string, cssName: string, varRef: string}[]} motionTokens
  * @returns {{css: string, count: number}}

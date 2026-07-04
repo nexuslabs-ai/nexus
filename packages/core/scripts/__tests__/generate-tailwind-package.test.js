@@ -532,6 +532,20 @@ describe('generateTailwindPackage', () => {
     expect(presenceExitBlock).toMatch(
       /animation-duration:\s*var\(--tw-duration,\s*var\(--nx-motion-duration-fast\)\);/
     );
+
+    // Regression guard (#609): the presence bridge exists only to fire
+    // `animationend` for Radix Presence; it must animate an inert custom
+    // property, never a transitioned one. Animating opacity/scale/translate
+    // would override the exit transition and the visible fade would never
+    // render — the bug that shipped green because no test read the keyframe body.
+    const presenceExitKeyframe = extractBlock(
+      motionUtilitiesCSS,
+      '@keyframes overlay-presence-exit'
+    );
+    expect(presenceExitKeyframe).toMatch(/--overlay-presence-phase:/);
+    expect(presenceExitKeyframe).not.toMatch(
+      /opacity|scale|translate|transform/
+    );
   });
 
   it('compiles named motion utilities through Tailwind', async () => {
