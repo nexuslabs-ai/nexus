@@ -126,6 +126,10 @@
       "$value": "{black.a200}",
       "$type": "color"
     },
+    "hairline": {
+      "$value": "{black.a200}",
+      "$type": "color"
+    },
     "default-alpha": {
       "$value": "{neutral.a200}",
       "$type": "color"

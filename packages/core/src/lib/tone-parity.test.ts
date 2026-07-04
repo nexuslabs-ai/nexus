@@ -86,6 +86,7 @@ const CONTRAST_INK_TOKENS = new Set([
   'nav-foreground',
   'nav-muted-foreground',
   'border-default',
+  'border-hairline',
   'border-disabled',
 ]);
 const FIXED_WHITE_TOKENS = new Set(['control-thumb']);

@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconUser } from '@tabler/icons-react';
 import { expect, waitFor, within } from 'storybook/test';
 
+import { expectInsetOutlinePseudoElement } from '../../stories/support/pseudo-element-style';
+
 import {
   Avatar,
   AvatarFallback,
@@ -67,32 +69,14 @@ const WIDE_AVATAR_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
   </svg>
 `)}`;
 
-function resolveCssColor(element: Element, color: string) {
-  const probe = element.ownerDocument.createElement('span');
-  probe.style.color = color;
-  element.ownerDocument.body.append(probe);
-  const resolved = getComputedStyle(probe).color;
-  probe.remove();
-  return resolved;
-}
-
 function expectAvatarHairline(
   element: Element | null,
-  token: '--nx-color-black-a200' | '--nx-color-white-a200'
+  missingMessage = 'avatar root not found'
 ) {
-  if (!element) throw new Error('avatar root not found');
-
-  const rootStyles = getComputedStyle(element.ownerDocument.documentElement);
-  const expectedColor = resolveCssColor(
-    element,
-    rootStyles.getPropertyValue(token).trim()
-  );
-  const afterStyles = getComputedStyle(element, '::after');
-
-  expect(afterStyles.outlineStyle).toBe('solid');
-  expect(afterStyles.outlineWidth).toBe('1px');
-  expect(afterStyles.outlineOffset).toBe('-1px');
-  expect(afterStyles.outlineColor).toBe(expectedColor);
+  expectInsetOutlinePseudoElement(element, {
+    token: '--nx-color-border-hairline',
+    missingMessage,
+  });
 }
 
 function avatarLabel(size: (typeof AVATAR_SIZES)[number]) {
@@ -187,10 +171,8 @@ export const ImageHairline: Story = {
       return img;
     });
 
-    expectAvatarHairline(root, '--nx-color-black-a200');
-    await expect(image).not.toHaveClass(
-      'nx:after:outline-[var(--nx-color-black-a200)]'
-    );
+    expectAvatarHairline(root);
+    await expect(image).not.toHaveClass('nx:after:outline-border-hairline');
   },
 };
 
@@ -221,10 +203,10 @@ export const ImageHairlineLightDark: Story = {
     const avatars = canvasElement.querySelectorAll('[data-slot="avatar"]');
 
     await expect(avatars).toHaveLength(4);
-    expectAvatarHairline(avatars.item(0), '--nx-color-black-a200');
-    expectAvatarHairline(avatars.item(1), '--nx-color-black-a200');
-    expectAvatarHairline(avatars.item(2), '--nx-color-white-a200');
-    expectAvatarHairline(avatars.item(3), '--nx-color-white-a200');
+    expectAvatarHairline(avatars.item(0));
+    expectAvatarHairline(avatars.item(1));
+    expectAvatarHairline(avatars.item(2));
+    expectAvatarHairline(avatars.item(3));
   },
 };
 

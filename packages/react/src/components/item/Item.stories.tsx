@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { IconFile } from '@tabler/icons-react';
 import { expect, within } from 'storybook/test';
 
+import { expectInsetOutlinePseudoElement } from '../../stories/support/pseudo-element-style';
 import { Button } from '../button';
 
 import {
@@ -27,29 +28,11 @@ type Story = StoryObj<typeof Item>;
 const THUMB =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23999'/%3E%3C/svg%3E";
 
-function resolveCssColor(element: Element, color: string) {
-  const probe = element.ownerDocument.createElement('span');
-  probe.style.color = color;
-  element.ownerDocument.body.append(probe);
-  const resolved = getComputedStyle(probe).color;
-  probe.remove();
-  return resolved;
-}
-
 function expectMediaHairline(element: Element | null) {
-  if (!element) throw new Error('item media not found');
-
-  const rootStyles = getComputedStyle(element.ownerDocument.documentElement);
-  const expectedColor = resolveCssColor(
-    element,
-    rootStyles.getPropertyValue('--nx-color-black-a200').trim()
-  );
-  const afterStyles = getComputedStyle(element, '::after');
-
-  expect(afterStyles.outlineStyle).toBe('solid');
-  expect(afterStyles.outlineWidth).toBe('1px');
-  expect(afterStyles.outlineOffset).toBe('-1px');
-  expect(afterStyles.outlineColor).toBe(expectedColor);
+  expectInsetOutlinePseudoElement(element, {
+    token: '--nx-color-border-hairline',
+    missingMessage: 'item media not found',
+  });
 }
 
 // A standard row: icon media, title + description, and a trailing action.
@@ -156,9 +139,7 @@ export const MediaImageHairline: Story = {
     const image = canvasElement.querySelector('img');
 
     expectMediaHairline(media);
-    await expect(image).not.toHaveClass(
-      'nx:after:outline-[var(--nx-color-black-a200)]'
-    );
+    await expect(image).not.toHaveClass('nx:after:outline-border-hairline');
   },
 };
 

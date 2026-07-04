@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const avatarVariants = cva(
-  'nx:relative nx:flex nx:shrink-0 nx:after:pointer-events-none nx:after:absolute nx:after:inset-0 nx:after:rounded-[inherit] nx:after:outline nx:after:outline-1 nx:after:-outline-offset-1 nx:after:outline-[var(--nx-color-black-a200)] nx:dark:after:outline-[var(--nx-color-white-a200)]',
+  'nx:relative nx:flex nx:shrink-0 nx:after:pointer-events-none nx:after:absolute nx:after:inset-0 nx:after:rounded-[inherit] nx:after:outline nx:after:outline-1 nx:after:-outline-offset-1 nx:after:outline-border-hairline',
   {
     variants: {
       size: {

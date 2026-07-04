@@ -242,6 +242,10 @@
     --nx-color-border-default,
     var(--nx-color-black-a200)
   );
+  --color-border-hairline: var(
+    --nx-color-border-hairline,
+    var(--nx-color-black-a200)
+  );
   --color-border-default-alpha: var(
     --nx-color-border-default-alpha,
     var(--nx-color-stone-a200)
@@ -633,6 +637,10 @@
     --nx-color-border-default,
     var(--nx-color-black-a200)
   );
+  --color-border-hairline: var(
+    --nx-color-border-hairline,
+    var(--nx-color-black-a200)
+  );
   --color-border-default-alpha: var(
     --nx-color-border-default-alpha,
     var(--nx-color-stone-a200)
@@ -955,6 +963,7 @@
   --nx-color-nav-border: var(--nx-color-stone-800);
   --nx-color-overlay: var(--nx-color-stone-a800);
   --nx-color-border-default: var(--nx-color-white-a300);
+  --nx-color-border-hairline: var(--nx-color-white-a200);
   --nx-color-border-default-alpha: var(--nx-color-stone-a300);
   --nx-color-border-active: var(--nx-color-stone-400);
   --nx-color-border-disabled: var(--nx-color-white-a300);
