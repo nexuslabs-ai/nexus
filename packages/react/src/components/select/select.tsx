@@ -196,6 +196,9 @@ function SelectContent({
         className={cn(
           'nx:relative nx:z-popover nx:max-h-96 nx:min-w-32 nx:overflow-hidden',
           popoverSurfaceClassName,
+          // Radix Select renders closed content into a detached DocumentFragment, so the
+          // `data-[state=closed]` exit + presence bridge inside this shared class are inert
+          // here — only the open-state transition applies.
           overlayFloatingTransitionClassName,
           position === 'popper' &&
             'nx:data-[side=bottom]:translate-y-1 nx:data-[side=left]:-translate-x-1 nx:data-[side=right]:translate-x-1 nx:data-[side=top]:-translate-y-1',

@@ -1641,10 +1641,18 @@ export function generateMotionUtilitiesCSS(motionTokens) {
     css += `}\n\n`;
   }
 
+  // Static "presence bridge" (not token-derived): a non-visual animation whose only
+  // job is to fire `animationend` so Radix Presence — which waits on `animationName`,
+  // not `transitionend` — keeps a closing overlay mounted while its opacity/scale/
+  // translate TRANSITIONS run the visible exit. It must NOT animate a transitioned
+  // property (opacity/scale/translate) or it would override that transition, so it
+  // animates an inert, unread custom property instead.
   css += `@keyframes overlay-presence-exit {\n`;
-  css += `  from,\n`;
+  css += `  from {\n`;
+  css += `    --overlay-presence-phase: 0;\n`;
+  css += `  }\n`;
   css += `  to {\n`;
-  css += `    opacity: 1;\n`;
+  css += `    --overlay-presence-phase: 1;\n`;
   css += `  }\n`;
   css += `}\n\n`;
   css += `@utility animate-overlay-presence-exit {\n`;

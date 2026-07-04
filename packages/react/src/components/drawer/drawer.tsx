@@ -72,6 +72,8 @@ function DrawerOverlay({
       data-slot="drawer-overlay"
       className={cn(
         'nx:fixed nx:inset-0 nx:z-modal nx:bg-overlay',
+        // Drawer is vaul-driven and owns its own unmount, so the Radix presence bridge in
+        // this shared class is inert here; the opacity transition still fades the scrim.
         overlayScrimTransitionClassName,
         className
       )}

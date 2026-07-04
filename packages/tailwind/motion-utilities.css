@@ -36,9 +36,11 @@
 }
 
 @keyframes overlay-presence-exit {
-  from,
+  from {
+    --overlay-presence-phase: 0;
+  }
   to {
-    opacity: 1;
+    --overlay-presence-phase: 1;
   }
 }
 
