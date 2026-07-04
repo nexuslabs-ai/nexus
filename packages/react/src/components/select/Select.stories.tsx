@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
 import { NativeSelect, NativeSelectOption } from '../native-select';
 
@@ -539,6 +540,42 @@ export const Scrollable: Story = {
       </SelectContent>
     </Select>
   ),
+};
+
+export const StaggeredItems: Story = {
+  render: (_args) => (
+    <Select>
+      <SelectTrigger className="nx:w-[180px]" aria-label="Select motion item">
+        <SelectValue placeholder="Select an item" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="alpha">Alpha</SelectItem>
+        <SelectItem value="bravo">Bravo</SelectItem>
+        <SelectItem value="charlie">Charlie</SelectItem>
+        <SelectItem value="delta">Delta</SelectItem>
+        <SelectItem value="echo">Echo</SelectItem>
+      </SelectContent>
+    </Select>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', {
+      name: 'Select motion item',
+    });
+
+    await userEvent.click(trigger);
+
+    const listbox = await within(document.body).findByRole('listbox');
+    const items = Array.from(
+      listbox.querySelectorAll('[data-slot="select-item"]')
+    );
+    await expectStaggeredItemMotion(listbox, items);
+
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(document.querySelector('[role="listbox"]')).toBeNull();
+    });
+  },
 };
 
 // ============================================
