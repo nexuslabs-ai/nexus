@@ -132,6 +132,27 @@ export const ClickInteraction: Story = {
   },
 };
 
+export const TransitionScoped: Story = {
+  render: () => (
+    <InputOTP maxLength={4} aria-label="One-time password">
+      <InputOTPGroup>
+        <InputOTPSlot index={0} />
+        <InputOTPSlot index={1} />
+        <InputOTPSlot index={2} />
+        <InputOTPSlot index={3} />
+      </InputOTPGroup>
+    </InputOTP>
+  ),
+  play: async ({ canvasElement }) => {
+    const slot = canvasElement.querySelector('[data-slot="input-otp-slot"]');
+
+    await expect(slot).not.toHaveClass('nx:transition-all');
+    await expect(slot).toHaveClass(
+      'nx:transition-[color,background-color,border-color]'
+    );
+  },
+};
+
 export const KeyboardInteraction: Story = {
   play: async ({ canvasElement, args }) => {
     const input = canvasElement.querySelector<HTMLInputElement>(
