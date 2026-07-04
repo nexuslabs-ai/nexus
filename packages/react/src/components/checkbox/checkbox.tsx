@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 
 import { IconCheck, IconMinus } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
@@ -88,12 +89,20 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         <IconCheck
           data-slot="checkbox-check"
           aria-hidden="true"
-          className="nx:absolute nx:size-3.5 nx:scale-50 nx:opacity-0 nx:transition-[opacity,transform] nx:duration-fast nx:ease-enter nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100 nx:motion-reduce:transition-none"
+          className={cn(
+            'nx:absolute nx:size-3.5',
+            selectionIndicatorMotionClassName,
+            'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+          )}
         />
         <IconMinus
           data-slot="checkbox-minus"
           aria-hidden="true"
-          className="nx:absolute nx:size-3.5 nx:scale-50 nx:opacity-0 nx:transition-[opacity,transform] nx:duration-fast nx:ease-enter nx:group-data-[state=indeterminate]:scale-100 nx:group-data-[state=indeterminate]:opacity-100 nx:motion-reduce:transition-none"
+          className={cn(
+            'nx:absolute nx:size-3.5',
+            selectionIndicatorMotionClassName,
+            'nx:group-data-[state=indeterminate]:scale-100 nx:group-data-[state=indeterminate]:opacity-100'
+          )}
         />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>

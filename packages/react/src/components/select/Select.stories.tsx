@@ -93,9 +93,7 @@ export const IndicatorCrossFade: Story = {
 
       await expect(selectedCheck).toBeInTheDocument();
       await expect(unselectedCheck).toBeInTheDocument();
-      await expect(selectedCheck).toHaveClass(
-        'nx:transition-[opacity,transform]'
-      );
+      await expect(selectedCheck).toHaveClass('nx:transition-[opacity,scale]');
       await expect(selectedCheck).toHaveClass(
         'nx:group-data-[state=checked]:opacity-100'
       );
