@@ -370,7 +370,12 @@ export const StaggeredGroupedItems: Story = {
     const firstEditItem = editItems[0];
     const secondEditItem = editItems[1];
 
-    if (!firstFileItem || !secondFileItem || !firstEditItem || !secondEditItem) {
+    if (
+      !firstFileItem ||
+      !secondFileItem ||
+      !firstEditItem ||
+      !secondEditItem
+    ) {
       throw new Error('Expected at least two items in each staggered group.');
     }
 
