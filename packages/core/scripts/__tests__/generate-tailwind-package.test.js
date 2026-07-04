@@ -110,10 +110,6 @@ function cssDeclarations(block) {
   );
 }
 
-function themeColorLines(themeBlock) {
-  return [...themeBlock.matchAll(/--color-([a-z0-9-]+):\s*([^;]+);/g)];
-}
-
 function compactCss(value) {
   return value.replace(/\s+/g, ' ').trim();
 }
@@ -226,12 +222,12 @@ describe('generateTailwindPackage', () => {
   // vars referenced only via arbitrary utilities, #506). The count guard also
   // catches duplicate emission via the dimension scan (the --breakpoint-* trap).
   it('promotes focus colours to --color-* and emits --focus-offset once at :root; no focus box-shadow', () => {
-    const themeBlock = compactCss(extractBlock(nexusCSS, '@theme inline'));
+    const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(
-      /--color-focus-default: var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);/
+      /--color-focus-default: var\(--nx-focus-color-default\);/
     );
     expect(themeBlock).toMatch(
-      /--color-focus-error: var\(\s*--nx-color-focus-error,\s*var\(--nx-focus-color-error\)\s*\);/
+      /--color-focus-error: var\(--nx-focus-color-error\);/
     );
     expect(nexusCSS.match(/--focus-offset:/g)).toHaveLength(1);
     expect(themeBlock).not.toMatch(/--focus-offset/);
@@ -239,29 +235,7 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 
-  it('bridges every semantic color utility to its runtime override with a static fallback', () => {
-    const themeBlock = extractBlock(nexusCSS, '@theme inline');
-    const colorLines = themeColorLines(themeBlock);
-
-    expect(colorLines).toHaveLength(106);
-
-    for (const [, name, value] of colorLines) {
-      expect(compactCss(value), `--color-${name}`).toMatch(
-        new RegExp(`^var\\(\\s*--nx-color-${name},\\s*.+\\)$`)
-      );
-    }
-  });
-
-  it('aliases semantic colors at :root for non-utility CSS consumers', () => {
-    expect(nexusCSS).toMatch(
-      /:root\s*\{[\s\S]*--color-background:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);[\s\S]*\}/
-    );
-    expect(nexusCSS).toMatch(
-      /:root\s*\{[\s\S]*--color-focus-default:\s*var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);[\s\S]*\}/
-    );
-  });
-
-  it('compiles semantic color utilities through the bridged theme variables', async () => {
+  it('compiles semantic color utilities through prefixed theme variables', async () => {
     const css = compactCss(
       await compileGeneratedTailwind(distDir, [
         'nx:bg-background',
@@ -269,12 +243,8 @@ describe('generateTailwindPackage', () => {
       ])
     );
 
-    expect(css).toMatch(
-      /background-color:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);/
-    );
-    expect(css).toMatch(
-      /outline-color:\s*var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);/
-    );
+    expect(css).toMatch(/background-color:\s*var\(--nx-color-background\);/);
+    expect(css).toMatch(/outline-color:\s*var\(--nx-color-focus-default\);/);
   });
 
   // Every var(--nx-shadow-*) or var(--nx-focus-*) ref in nexus.css must have a
@@ -323,12 +293,12 @@ describe('generateTailwindPackage', () => {
   });
 
   it('emits chart.categorical tokens in @theme (light) and .dark (dark override)', () => {
-    const themeBlock = compactCss(extractBlock(nexusCSS, '@theme inline'));
+    const themeBlock = extractBlock(nexusCSS, '@theme');
     expect(themeBlock).toMatch(
-      /--color-chart-categorical-1: var\(\s*--nx-color-chart-categorical-1,\s*var\(--nx-color-teal-600\)\s*\);/
+      /--color-chart-categorical-1: var\(--nx-color-teal-600\);/
     );
     expect(themeBlock).toMatch(
-      /--color-chart-categorical-5: var\(\s*--nx-color-chart-categorical-5,\s*var\(--nx-color-indigo-600\)\s*\);/
+      /--color-chart-categorical-5: var\(--nx-color-indigo-600\);/
     );
 
     const darkBlock = extractBlock(nexusCSS, '.dark');

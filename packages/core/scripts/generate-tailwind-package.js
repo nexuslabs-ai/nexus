@@ -500,9 +500,8 @@ function generateNexusCSS(
 /* Auto-generated - DO NOT EDIT */
 /* Uses nx: prefix for all utility classes */
 /*
- * Uses @theme for static scales and @theme inline for semantic colours so
- * generated utilities can fall back statically while accepting runtime
- * --nx-color-* overrides from NexusAppearanceProvider.
+ * Uses @theme (not inline) so utilities reference CSS variables
+ * that can be overridden by .dark selector for theme switching.
  */
 
 `;

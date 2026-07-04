@@ -2,9 +2,8 @@
 /* Auto-generated - DO NOT EDIT */
 /* Uses nx: prefix for all utility classes */
 /*
- * Uses @theme for static scales and @theme inline for semantic colours so
- * generated utilities can fall back statically while accepting runtime
- * --nx-color-* overrides from NexusAppearanceProvider.
+ * Uses @theme (not inline) so utilities reference CSS variables
+ * that can be overridden by .dark selector for theme switching.
  */
 
 @import 'tailwindcss' prefix(nx);
@@ -25,6 +24,114 @@
   --radius-*: initial;
   --shadow-*: initial;
   --breakpoint-*: initial;
+
+  /* Semantic tokens */
+  --color-background: var(--nx-color-white-base);
+  --color-foreground: var(--nx-color-black-a900);
+  --color-background-hover: var(--nx-color-stone-50);
+  --color-background-hover-alpha: var(--nx-color-stone-a100);
+  --color-background-active: var(--nx-color-stone-100);
+  --color-muted: var(--nx-color-stone-50);
+  --color-muted-foreground: var(--nx-color-black-a600);
+  --color-muted-foreground-subtle: var(--nx-color-black-a500);
+  --color-disabled: var(--nx-color-stone-50);
+  --color-disabled-foreground: var(--nx-color-stone-400);
+  --color-container: var(--nx-color-white-base);
+  --color-container-foreground: var(--nx-color-stone-950);
+  --color-container-hover: var(--nx-color-stone-50);
+  --color-container-active: var(--nx-color-stone-100);
+  --color-popover: var(--nx-color-white-base);
+  --color-popover-foreground: var(--nx-color-stone-950);
+  --color-popover-hover: var(--nx-color-stone-50);
+  --color-popover-active: var(--nx-color-stone-50);
+  --color-popover-alpha: var(--nx-color-white-a700);
+  --color-popover-backdrop: var(--nx-color-stone-a900);
+  --color-control-background: var(--nx-color-stone-100);
+  --color-control-background-hover: var(--nx-color-stone-200);
+  --color-control-thumb: var(--nx-color-white-base);
+  --color-nav-background: var(--nx-color-stone-100);
+  --color-nav-foreground: var(--nx-color-stone-900);
+  --color-nav-muted-foreground: var(--nx-color-stone-600);
+  --color-nav-item-hover: var(--nx-color-stone-200);
+  --color-nav-item-active: var(--nx-color-stone-200);
+  --color-nav-border: var(--nx-color-stone-200);
+  --color-overlay: var(--nx-color-stone-a700);
+  --color-border-default: var(--nx-color-black-a200);
+  --color-border-hairline: var(--nx-color-black-a200);
+  --color-border-default-alpha: var(--nx-color-stone-a200);
+  --color-border-active: var(--nx-color-stone-400);
+  --color-border-disabled: var(--nx-color-black-a200);
+  --color-border-warning: var(--nx-color-orange-200);
+  --color-border-warning-active: var(--nx-color-orange-400);
+  --color-border-success: var(--nx-color-green-200);
+  --color-border-success-active: var(--nx-color-green-400);
+  --color-border-error: var(--nx-color-red-200);
+  --color-border-error-active: var(--nx-color-red-400);
+  --color-border-information: var(--nx-color-blue-200);
+  --color-border-information-active: var(--nx-color-blue-400);
+  --color-error-background: var(--nx-color-red-600);
+  --color-error-foreground: var(--nx-color-white-base);
+  --color-error-background-hover: var(--nx-color-red-700);
+  --color-error-background-active: var(--nx-color-red-800);
+  --color-error-disabled: var(--nx-color-red-300);
+  --color-error-subtle: var(--nx-color-red-50);
+  --color-error-subtle-foreground: var(--nx-color-red-600);
+  --color-error-subtle-hover: var(--nx-color-red-100);
+  --color-error-subtle-active: var(--nx-color-red-200);
+  --color-success-background: var(--nx-color-green-600);
+  --color-success-foreground: var(--nx-color-white-base);
+  --color-success-background-hover: var(--nx-color-green-700);
+  --color-success-background-active: var(--nx-color-green-800);
+  --color-success-disabled: var(--nx-color-green-300);
+  --color-success-subtle: var(--nx-color-green-50);
+  --color-success-subtle-foreground: var(--nx-color-green-700);
+  --color-success-subtle-hover: var(--nx-color-green-100);
+  --color-success-subtle-active: var(--nx-color-green-200);
+  --color-information-background: var(--nx-color-blue-600);
+  --color-information-foreground: var(--nx-color-white-base);
+  --color-information-background-hover: var(--nx-color-blue-700);
+  --color-information-background-active: var(--nx-color-blue-800);
+  --color-information-disabled: var(--nx-color-blue-300);
+  --color-information-subtle: var(--nx-color-blue-50);
+  --color-information-subtle-foreground: var(--nx-color-blue-600);
+  --color-information-subtle-hover: var(--nx-color-blue-100);
+  --color-information-subtle-active: var(--nx-color-blue-200);
+  --color-warning-background: var(--nx-color-orange-600);
+  --color-warning-foreground: var(--nx-color-white-base);
+  --color-warning-background-hover: var(--nx-color-orange-700);
+  --color-warning-background-active: var(--nx-color-orange-800);
+  --color-warning-disabled: var(--nx-color-orange-300);
+  --color-warning-subtle: var(--nx-color-orange-50);
+  --color-warning-subtle-foreground: var(--nx-color-orange-600);
+  --color-warning-subtle-hover: var(--nx-color-orange-100);
+  --color-warning-subtle-active: var(--nx-color-orange-200);
+  --color-primary-background: var(--nx-color-black-base);
+  --color-primary-background-active: var(--nx-color-neutral-950);
+  --color-primary-foreground: var(--nx-color-white-base);
+  --color-primary-background-hover: var(--nx-color-neutral-900);
+  --color-primary-disabled: var(--nx-color-neutral-300);
+  --color-primary-subtle: var(--nx-color-neutral-50);
+  --color-primary-subtle-foreground: var(--nx-color-black-base);
+  --color-primary-subtle-hover: var(--nx-color-neutral-100);
+  --color-primary-subtle-active: var(--nx-color-neutral-200);
+  --color-secondary-background: var(--nx-color-neutral-100);
+  --color-secondary-foreground: var(--nx-color-neutral-900);
+  --color-secondary-background-hover: var(--nx-color-neutral-200);
+  --color-secondary-background-active: var(--nx-color-neutral-300);
+  --color-secondary-disabled: var(--nx-color-neutral-50);
+  --color-secondary-subtle: var(--nx-color-neutral-100);
+  --color-secondary-subtle-foreground: var(--nx-color-neutral-600);
+  --color-secondary-subtle-hover: var(--nx-color-neutral-200);
+  --color-secondary-subtle-active: var(--nx-color-neutral-300);
+  --color-border-primary: var(--nx-color-neutral-200);
+  --color-border-primary-active: var(--nx-color-neutral-400);
+  --color-chart-categorical-1: var(--nx-color-teal-600);
+  --color-chart-categorical-2: var(--nx-color-lime-700);
+  --color-chart-categorical-3: var(--nx-color-orange-600);
+  --color-chart-categorical-4: var(--nx-color-rose-600);
+  --color-chart-categorical-5: var(--nx-color-indigo-600);
+  --color-focus-default: var(--nx-focus-color-default);
+  --color-focus-error: var(--nx-focus-color-error);
 
   /* Spacing tokens */
   --spacing-0: 0px;
@@ -138,796 +245,6 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 96rem;
-}
-
-@theme inline {
-  /* Semantic tokens */
-  --color-background: var(--nx-color-background, var(--nx-color-white-base));
-  --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
-  --color-background-hover: var(
-    --nx-color-background-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-background-hover-alpha: var(
-    --nx-color-background-hover-alpha,
-    var(--nx-color-stone-a100)
-  );
-  --color-background-active: var(
-    --nx-color-background-active,
-    var(--nx-color-stone-100)
-  );
-  --color-muted: var(--nx-color-muted, var(--nx-color-stone-50));
-  --color-muted-foreground: var(
-    --nx-color-muted-foreground,
-    var(--nx-color-black-a600)
-  );
-  --color-muted-foreground-subtle: var(
-    --nx-color-muted-foreground-subtle,
-    var(--nx-color-black-a500)
-  );
-  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-50));
-  --color-disabled-foreground: var(
-    --nx-color-disabled-foreground,
-    var(--nx-color-stone-400)
-  );
-  --color-container: var(--nx-color-container, var(--nx-color-white-base));
-  --color-container-foreground: var(
-    --nx-color-container-foreground,
-    var(--nx-color-stone-950)
-  );
-  --color-container-hover: var(
-    --nx-color-container-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-container-active: var(
-    --nx-color-container-active,
-    var(--nx-color-stone-100)
-  );
-  --color-popover: var(--nx-color-popover, var(--nx-color-white-base));
-  --color-popover-foreground: var(
-    --nx-color-popover-foreground,
-    var(--nx-color-stone-950)
-  );
-  --color-popover-hover: var(
-    --nx-color-popover-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-popover-active: var(
-    --nx-color-popover-active,
-    var(--nx-color-stone-50)
-  );
-  --color-popover-alpha: var(
-    --nx-color-popover-alpha,
-    var(--nx-color-white-a700)
-  );
-  --color-popover-backdrop: var(
-    --nx-color-popover-backdrop,
-    var(--nx-color-stone-a900)
-  );
-  --color-control-background: var(
-    --nx-color-control-background,
-    var(--nx-color-stone-100)
-  );
-  --color-control-background-hover: var(
-    --nx-color-control-background-hover,
-    var(--nx-color-stone-200)
-  );
-  --color-control-thumb: var(
-    --nx-color-control-thumb,
-    var(--nx-color-white-base)
-  );
-  --color-nav-background: var(
-    --nx-color-nav-background,
-    var(--nx-color-stone-100)
-  );
-  --color-nav-foreground: var(
-    --nx-color-nav-foreground,
-    var(--nx-color-stone-900)
-  );
-  --color-nav-muted-foreground: var(
-    --nx-color-nav-muted-foreground,
-    var(--nx-color-stone-600)
-  );
-  --color-nav-item-hover: var(
-    --nx-color-nav-item-hover,
-    var(--nx-color-stone-200)
-  );
-  --color-nav-item-active: var(
-    --nx-color-nav-item-active,
-    var(--nx-color-stone-200)
-  );
-  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-stone-200));
-  --color-overlay: var(--nx-color-overlay, var(--nx-color-stone-a700));
-  --color-border-default: var(
-    --nx-color-border-default,
-    var(--nx-color-black-a200)
-  );
-  --color-border-hairline: var(
-    --nx-color-border-hairline,
-    var(--nx-color-black-a200)
-  );
-  --color-border-default-alpha: var(
-    --nx-color-border-default-alpha,
-    var(--nx-color-stone-a200)
-  );
-  --color-border-active: var(
-    --nx-color-border-active,
-    var(--nx-color-stone-400)
-  );
-  --color-border-disabled: var(
-    --nx-color-border-disabled,
-    var(--nx-color-black-a200)
-  );
-  --color-border-warning: var(
-    --nx-color-border-warning,
-    var(--nx-color-orange-200)
-  );
-  --color-border-warning-active: var(
-    --nx-color-border-warning-active,
-    var(--nx-color-orange-400)
-  );
-  --color-border-success: var(
-    --nx-color-border-success,
-    var(--nx-color-green-200)
-  );
-  --color-border-success-active: var(
-    --nx-color-border-success-active,
-    var(--nx-color-green-400)
-  );
-  --color-border-error: var(--nx-color-border-error, var(--nx-color-red-200));
-  --color-border-error-active: var(
-    --nx-color-border-error-active,
-    var(--nx-color-red-400)
-  );
-  --color-border-information: var(
-    --nx-color-border-information,
-    var(--nx-color-blue-200)
-  );
-  --color-border-information-active: var(
-    --nx-color-border-information-active,
-    var(--nx-color-blue-400)
-  );
-  --color-error-background: var(
-    --nx-color-error-background,
-    var(--nx-color-red-600)
-  );
-  --color-error-foreground: var(
-    --nx-color-error-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-error-background-hover: var(
-    --nx-color-error-background-hover,
-    var(--nx-color-red-700)
-  );
-  --color-error-background-active: var(
-    --nx-color-error-background-active,
-    var(--nx-color-red-800)
-  );
-  --color-error-disabled: var(
-    --nx-color-error-disabled,
-    var(--nx-color-red-300)
-  );
-  --color-error-subtle: var(--nx-color-error-subtle, var(--nx-color-red-50));
-  --color-error-subtle-foreground: var(
-    --nx-color-error-subtle-foreground,
-    var(--nx-color-red-600)
-  );
-  --color-error-subtle-hover: var(
-    --nx-color-error-subtle-hover,
-    var(--nx-color-red-100)
-  );
-  --color-error-subtle-active: var(
-    --nx-color-error-subtle-active,
-    var(--nx-color-red-200)
-  );
-  --color-success-background: var(
-    --nx-color-success-background,
-    var(--nx-color-green-600)
-  );
-  --color-success-foreground: var(
-    --nx-color-success-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-success-background-hover: var(
-    --nx-color-success-background-hover,
-    var(--nx-color-green-700)
-  );
-  --color-success-background-active: var(
-    --nx-color-success-background-active,
-    var(--nx-color-green-800)
-  );
-  --color-success-disabled: var(
-    --nx-color-success-disabled,
-    var(--nx-color-green-300)
-  );
-  --color-success-subtle: var(
-    --nx-color-success-subtle,
-    var(--nx-color-green-50)
-  );
-  --color-success-subtle-foreground: var(
-    --nx-color-success-subtle-foreground,
-    var(--nx-color-green-700)
-  );
-  --color-success-subtle-hover: var(
-    --nx-color-success-subtle-hover,
-    var(--nx-color-green-100)
-  );
-  --color-success-subtle-active: var(
-    --nx-color-success-subtle-active,
-    var(--nx-color-green-200)
-  );
-  --color-information-background: var(
-    --nx-color-information-background,
-    var(--nx-color-blue-600)
-  );
-  --color-information-foreground: var(
-    --nx-color-information-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-information-background-hover: var(
-    --nx-color-information-background-hover,
-    var(--nx-color-blue-700)
-  );
-  --color-information-background-active: var(
-    --nx-color-information-background-active,
-    var(--nx-color-blue-800)
-  );
-  --color-information-disabled: var(
-    --nx-color-information-disabled,
-    var(--nx-color-blue-300)
-  );
-  --color-information-subtle: var(
-    --nx-color-information-subtle,
-    var(--nx-color-blue-50)
-  );
-  --color-information-subtle-foreground: var(
-    --nx-color-information-subtle-foreground,
-    var(--nx-color-blue-600)
-  );
-  --color-information-subtle-hover: var(
-    --nx-color-information-subtle-hover,
-    var(--nx-color-blue-100)
-  );
-  --color-information-subtle-active: var(
-    --nx-color-information-subtle-active,
-    var(--nx-color-blue-200)
-  );
-  --color-warning-background: var(
-    --nx-color-warning-background,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-foreground: var(
-    --nx-color-warning-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-warning-background-hover: var(
-    --nx-color-warning-background-hover,
-    var(--nx-color-orange-700)
-  );
-  --color-warning-background-active: var(
-    --nx-color-warning-background-active,
-    var(--nx-color-orange-800)
-  );
-  --color-warning-disabled: var(
-    --nx-color-warning-disabled,
-    var(--nx-color-orange-300)
-  );
-  --color-warning-subtle: var(
-    --nx-color-warning-subtle,
-    var(--nx-color-orange-50)
-  );
-  --color-warning-subtle-foreground: var(
-    --nx-color-warning-subtle-foreground,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-subtle-hover: var(
-    --nx-color-warning-subtle-hover,
-    var(--nx-color-orange-100)
-  );
-  --color-warning-subtle-active: var(
-    --nx-color-warning-subtle-active,
-    var(--nx-color-orange-200)
-  );
-  --color-primary-background: var(
-    --nx-color-primary-background,
-    var(--nx-color-black-base)
-  );
-  --color-primary-background-active: var(
-    --nx-color-primary-background-active,
-    var(--nx-color-neutral-950)
-  );
-  --color-primary-foreground: var(
-    --nx-color-primary-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-primary-background-hover: var(
-    --nx-color-primary-background-hover,
-    var(--nx-color-neutral-900)
-  );
-  --color-primary-disabled: var(
-    --nx-color-primary-disabled,
-    var(--nx-color-neutral-300)
-  );
-  --color-primary-subtle: var(
-    --nx-color-primary-subtle,
-    var(--nx-color-neutral-50)
-  );
-  --color-primary-subtle-foreground: var(
-    --nx-color-primary-subtle-foreground,
-    var(--nx-color-black-base)
-  );
-  --color-primary-subtle-hover: var(
-    --nx-color-primary-subtle-hover,
-    var(--nx-color-neutral-100)
-  );
-  --color-primary-subtle-active: var(
-    --nx-color-primary-subtle-active,
-    var(--nx-color-neutral-200)
-  );
-  --color-secondary-background: var(
-    --nx-color-secondary-background,
-    var(--nx-color-neutral-100)
-  );
-  --color-secondary-foreground: var(
-    --nx-color-secondary-foreground,
-    var(--nx-color-neutral-900)
-  );
-  --color-secondary-background-hover: var(
-    --nx-color-secondary-background-hover,
-    var(--nx-color-neutral-200)
-  );
-  --color-secondary-background-active: var(
-    --nx-color-secondary-background-active,
-    var(--nx-color-neutral-300)
-  );
-  --color-secondary-disabled: var(
-    --nx-color-secondary-disabled,
-    var(--nx-color-neutral-50)
-  );
-  --color-secondary-subtle: var(
-    --nx-color-secondary-subtle,
-    var(--nx-color-neutral-100)
-  );
-  --color-secondary-subtle-foreground: var(
-    --nx-color-secondary-subtle-foreground,
-    var(--nx-color-neutral-600)
-  );
-  --color-secondary-subtle-hover: var(
-    --nx-color-secondary-subtle-hover,
-    var(--nx-color-neutral-200)
-  );
-  --color-secondary-subtle-active: var(
-    --nx-color-secondary-subtle-active,
-    var(--nx-color-neutral-300)
-  );
-  --color-border-primary: var(
-    --nx-color-border-primary,
-    var(--nx-color-neutral-200)
-  );
-  --color-border-primary-active: var(
-    --nx-color-border-primary-active,
-    var(--nx-color-neutral-400)
-  );
-  --color-chart-categorical-1: var(
-    --nx-color-chart-categorical-1,
-    var(--nx-color-teal-600)
-  );
-  --color-chart-categorical-2: var(
-    --nx-color-chart-categorical-2,
-    var(--nx-color-lime-700)
-  );
-  --color-chart-categorical-3: var(
-    --nx-color-chart-categorical-3,
-    var(--nx-color-orange-600)
-  );
-  --color-chart-categorical-4: var(
-    --nx-color-chart-categorical-4,
-    var(--nx-color-rose-600)
-  );
-  --color-chart-categorical-5: var(
-    --nx-color-chart-categorical-5,
-    var(--nx-color-indigo-600)
-  );
-  --color-focus-default: var(
-    --nx-color-focus-default,
-    var(--nx-focus-color-default)
-  );
-  --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
-}
-
-/* ===== RUNTIME COLOR ALIASES ===== */
-:root {
-  --color-background: var(--nx-color-background, var(--nx-color-white-base));
-  --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
-  --color-background-hover: var(
-    --nx-color-background-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-background-hover-alpha: var(
-    --nx-color-background-hover-alpha,
-    var(--nx-color-stone-a100)
-  );
-  --color-background-active: var(
-    --nx-color-background-active,
-    var(--nx-color-stone-100)
-  );
-  --color-muted: var(--nx-color-muted, var(--nx-color-stone-50));
-  --color-muted-foreground: var(
-    --nx-color-muted-foreground,
-    var(--nx-color-black-a600)
-  );
-  --color-muted-foreground-subtle: var(
-    --nx-color-muted-foreground-subtle,
-    var(--nx-color-black-a500)
-  );
-  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-50));
-  --color-disabled-foreground: var(
-    --nx-color-disabled-foreground,
-    var(--nx-color-stone-400)
-  );
-  --color-container: var(--nx-color-container, var(--nx-color-white-base));
-  --color-container-foreground: var(
-    --nx-color-container-foreground,
-    var(--nx-color-stone-950)
-  );
-  --color-container-hover: var(
-    --nx-color-container-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-container-active: var(
-    --nx-color-container-active,
-    var(--nx-color-stone-100)
-  );
-  --color-popover: var(--nx-color-popover, var(--nx-color-white-base));
-  --color-popover-foreground: var(
-    --nx-color-popover-foreground,
-    var(--nx-color-stone-950)
-  );
-  --color-popover-hover: var(
-    --nx-color-popover-hover,
-    var(--nx-color-stone-50)
-  );
-  --color-popover-active: var(
-    --nx-color-popover-active,
-    var(--nx-color-stone-50)
-  );
-  --color-popover-alpha: var(
-    --nx-color-popover-alpha,
-    var(--nx-color-white-a700)
-  );
-  --color-popover-backdrop: var(
-    --nx-color-popover-backdrop,
-    var(--nx-color-stone-a900)
-  );
-  --color-control-background: var(
-    --nx-color-control-background,
-    var(--nx-color-stone-100)
-  );
-  --color-control-background-hover: var(
-    --nx-color-control-background-hover,
-    var(--nx-color-stone-200)
-  );
-  --color-control-thumb: var(
-    --nx-color-control-thumb,
-    var(--nx-color-white-base)
-  );
-  --color-nav-background: var(
-    --nx-color-nav-background,
-    var(--nx-color-stone-100)
-  );
-  --color-nav-foreground: var(
-    --nx-color-nav-foreground,
-    var(--nx-color-stone-900)
-  );
-  --color-nav-muted-foreground: var(
-    --nx-color-nav-muted-foreground,
-    var(--nx-color-stone-600)
-  );
-  --color-nav-item-hover: var(
-    --nx-color-nav-item-hover,
-    var(--nx-color-stone-200)
-  );
-  --color-nav-item-active: var(
-    --nx-color-nav-item-active,
-    var(--nx-color-stone-200)
-  );
-  --color-nav-border: var(--nx-color-nav-border, var(--nx-color-stone-200));
-  --color-overlay: var(--nx-color-overlay, var(--nx-color-stone-a700));
-  --color-border-default: var(
-    --nx-color-border-default,
-    var(--nx-color-black-a200)
-  );
-  --color-border-hairline: var(
-    --nx-color-border-hairline,
-    var(--nx-color-black-a200)
-  );
-  --color-border-default-alpha: var(
-    --nx-color-border-default-alpha,
-    var(--nx-color-stone-a200)
-  );
-  --color-border-active: var(
-    --nx-color-border-active,
-    var(--nx-color-stone-400)
-  );
-  --color-border-disabled: var(
-    --nx-color-border-disabled,
-    var(--nx-color-black-a200)
-  );
-  --color-border-warning: var(
-    --nx-color-border-warning,
-    var(--nx-color-orange-200)
-  );
-  --color-border-warning-active: var(
-    --nx-color-border-warning-active,
-    var(--nx-color-orange-400)
-  );
-  --color-border-success: var(
-    --nx-color-border-success,
-    var(--nx-color-green-200)
-  );
-  --color-border-success-active: var(
-    --nx-color-border-success-active,
-    var(--nx-color-green-400)
-  );
-  --color-border-error: var(--nx-color-border-error, var(--nx-color-red-200));
-  --color-border-error-active: var(
-    --nx-color-border-error-active,
-    var(--nx-color-red-400)
-  );
-  --color-border-information: var(
-    --nx-color-border-information,
-    var(--nx-color-blue-200)
-  );
-  --color-border-information-active: var(
-    --nx-color-border-information-active,
-    var(--nx-color-blue-400)
-  );
-  --color-error-background: var(
-    --nx-color-error-background,
-    var(--nx-color-red-600)
-  );
-  --color-error-foreground: var(
-    --nx-color-error-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-error-background-hover: var(
-    --nx-color-error-background-hover,
-    var(--nx-color-red-700)
-  );
-  --color-error-background-active: var(
-    --nx-color-error-background-active,
-    var(--nx-color-red-800)
-  );
-  --color-error-disabled: var(
-    --nx-color-error-disabled,
-    var(--nx-color-red-300)
-  );
-  --color-error-subtle: var(--nx-color-error-subtle, var(--nx-color-red-50));
-  --color-error-subtle-foreground: var(
-    --nx-color-error-subtle-foreground,
-    var(--nx-color-red-600)
-  );
-  --color-error-subtle-hover: var(
-    --nx-color-error-subtle-hover,
-    var(--nx-color-red-100)
-  );
-  --color-error-subtle-active: var(
-    --nx-color-error-subtle-active,
-    var(--nx-color-red-200)
-  );
-  --color-success-background: var(
-    --nx-color-success-background,
-    var(--nx-color-green-600)
-  );
-  --color-success-foreground: var(
-    --nx-color-success-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-success-background-hover: var(
-    --nx-color-success-background-hover,
-    var(--nx-color-green-700)
-  );
-  --color-success-background-active: var(
-    --nx-color-success-background-active,
-    var(--nx-color-green-800)
-  );
-  --color-success-disabled: var(
-    --nx-color-success-disabled,
-    var(--nx-color-green-300)
-  );
-  --color-success-subtle: var(
-    --nx-color-success-subtle,
-    var(--nx-color-green-50)
-  );
-  --color-success-subtle-foreground: var(
-    --nx-color-success-subtle-foreground,
-    var(--nx-color-green-700)
-  );
-  --color-success-subtle-hover: var(
-    --nx-color-success-subtle-hover,
-    var(--nx-color-green-100)
-  );
-  --color-success-subtle-active: var(
-    --nx-color-success-subtle-active,
-    var(--nx-color-green-200)
-  );
-  --color-information-background: var(
-    --nx-color-information-background,
-    var(--nx-color-blue-600)
-  );
-  --color-information-foreground: var(
-    --nx-color-information-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-information-background-hover: var(
-    --nx-color-information-background-hover,
-    var(--nx-color-blue-700)
-  );
-  --color-information-background-active: var(
-    --nx-color-information-background-active,
-    var(--nx-color-blue-800)
-  );
-  --color-information-disabled: var(
-    --nx-color-information-disabled,
-    var(--nx-color-blue-300)
-  );
-  --color-information-subtle: var(
-    --nx-color-information-subtle,
-    var(--nx-color-blue-50)
-  );
-  --color-information-subtle-foreground: var(
-    --nx-color-information-subtle-foreground,
-    var(--nx-color-blue-600)
-  );
-  --color-information-subtle-hover: var(
-    --nx-color-information-subtle-hover,
-    var(--nx-color-blue-100)
-  );
-  --color-information-subtle-active: var(
-    --nx-color-information-subtle-active,
-    var(--nx-color-blue-200)
-  );
-  --color-warning-background: var(
-    --nx-color-warning-background,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-foreground: var(
-    --nx-color-warning-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-warning-background-hover: var(
-    --nx-color-warning-background-hover,
-    var(--nx-color-orange-700)
-  );
-  --color-warning-background-active: var(
-    --nx-color-warning-background-active,
-    var(--nx-color-orange-800)
-  );
-  --color-warning-disabled: var(
-    --nx-color-warning-disabled,
-    var(--nx-color-orange-300)
-  );
-  --color-warning-subtle: var(
-    --nx-color-warning-subtle,
-    var(--nx-color-orange-50)
-  );
-  --color-warning-subtle-foreground: var(
-    --nx-color-warning-subtle-foreground,
-    var(--nx-color-orange-600)
-  );
-  --color-warning-subtle-hover: var(
-    --nx-color-warning-subtle-hover,
-    var(--nx-color-orange-100)
-  );
-  --color-warning-subtle-active: var(
-    --nx-color-warning-subtle-active,
-    var(--nx-color-orange-200)
-  );
-  --color-primary-background: var(
-    --nx-color-primary-background,
-    var(--nx-color-black-base)
-  );
-  --color-primary-background-active: var(
-    --nx-color-primary-background-active,
-    var(--nx-color-neutral-950)
-  );
-  --color-primary-foreground: var(
-    --nx-color-primary-foreground,
-    var(--nx-color-white-base)
-  );
-  --color-primary-background-hover: var(
-    --nx-color-primary-background-hover,
-    var(--nx-color-neutral-900)
-  );
-  --color-primary-disabled: var(
-    --nx-color-primary-disabled,
-    var(--nx-color-neutral-300)
-  );
-  --color-primary-subtle: var(
-    --nx-color-primary-subtle,
-    var(--nx-color-neutral-50)
-  );
-  --color-primary-subtle-foreground: var(
-    --nx-color-primary-subtle-foreground,
-    var(--nx-color-black-base)
-  );
-  --color-primary-subtle-hover: var(
-    --nx-color-primary-subtle-hover,
-    var(--nx-color-neutral-100)
-  );
-  --color-primary-subtle-active: var(
-    --nx-color-primary-subtle-active,
-    var(--nx-color-neutral-200)
-  );
-  --color-secondary-background: var(
-    --nx-color-secondary-background,
-    var(--nx-color-neutral-100)
-  );
-  --color-secondary-foreground: var(
-    --nx-color-secondary-foreground,
-    var(--nx-color-neutral-900)
-  );
-  --color-secondary-background-hover: var(
-    --nx-color-secondary-background-hover,
-    var(--nx-color-neutral-200)
-  );
-  --color-secondary-background-active: var(
-    --nx-color-secondary-background-active,
-    var(--nx-color-neutral-300)
-  );
-  --color-secondary-disabled: var(
-    --nx-color-secondary-disabled,
-    var(--nx-color-neutral-50)
-  );
-  --color-secondary-subtle: var(
-    --nx-color-secondary-subtle,
-    var(--nx-color-neutral-100)
-  );
-  --color-secondary-subtle-foreground: var(
-    --nx-color-secondary-subtle-foreground,
-    var(--nx-color-neutral-600)
-  );
-  --color-secondary-subtle-hover: var(
-    --nx-color-secondary-subtle-hover,
-    var(--nx-color-neutral-200)
-  );
-  --color-secondary-subtle-active: var(
-    --nx-color-secondary-subtle-active,
-    var(--nx-color-neutral-300)
-  );
-  --color-border-primary: var(
-    --nx-color-border-primary,
-    var(--nx-color-neutral-200)
-  );
-  --color-border-primary-active: var(
-    --nx-color-border-primary-active,
-    var(--nx-color-neutral-400)
-  );
-  --color-chart-categorical-1: var(
-    --nx-color-chart-categorical-1,
-    var(--nx-color-teal-600)
-  );
-  --color-chart-categorical-2: var(
-    --nx-color-chart-categorical-2,
-    var(--nx-color-lime-700)
-  );
-  --color-chart-categorical-3: var(
-    --nx-color-chart-categorical-3,
-    var(--nx-color-orange-600)
-  );
-  --color-chart-categorical-4: var(
-    --nx-color-chart-categorical-4,
-    var(--nx-color-rose-600)
-  );
-  --color-chart-categorical-5: var(
-    --nx-color-chart-categorical-5,
-    var(--nx-color-indigo-600)
-  );
-  --color-focus-default: var(
-    --nx-color-focus-default,
-    var(--nx-focus-color-default)
-  );
-  --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
 }
 
 /* ===== DARK MODE ===== */
