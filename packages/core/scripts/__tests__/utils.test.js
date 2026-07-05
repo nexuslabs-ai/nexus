@@ -232,7 +232,7 @@ describe('utils', () => {
   });
 
   describe('generateFocusRingCSS', () => {
-    it('emits hard field and button focus rules with a forced-colors outline fallback', () => {
+    it('emits hard field and 2px-gap button focus rules with a forced-colors outline fallback', () => {
       const css = generateFocusRingCSS();
 
       expect(css).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
@@ -259,7 +259,10 @@ describe('utils', () => {
       );
       expect(css).toMatch(/--tw-outline-style:\s*none\s*!important;/);
       expect(css).toMatch(/outline-style:\s*none\s*!important;/);
-      expect(css).toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+      expect(css).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
+      expect(css).toMatch(/0 0 0 2px var\(--color-background\),/);
+      expect(css).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
+      expect(css).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
       expect(css).not.toMatch(/color-mix\(/);
       expect(css).toMatch(/@media \(forced-colors: active\)/);
       expect(css).toMatch(/outline-color:\s*Highlight\s*!important;/);

@@ -102,10 +102,16 @@ describe('generateModular', () => {
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(globals).toMatch(
+      /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+    );
+    expect(globals).toMatch(
       /--color-border-default:\s*var\(--color-focus-default\);/
     );
     expect(globals).toMatch(/outline-style:\s*none\s*!important;/);
-    expect(globals).toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+    expect(globals).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
+    expect(globals).toMatch(/0 0 0 2px var\(--color-background\),/);
+    expect(globals).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
+    expect(globals).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
     expect(globals).toMatch(/@media \(forced-colors: active\)/);
     expect(globals).toMatch(/outline-color:\s*Highlight\s*!important;/);
     expect(globals).toMatch(/outline-style:\s*solid\s*!important;/);

@@ -2144,7 +2144,7 @@ ${buttonSelectors} {
   outline-style: none !important;
   box-shadow:
     0 0 0 2px var(--color-background),
-    0 0 0 8px var(--color-focus-default);
+    0 0 0 4px var(--color-focus-default);
 }
 
 ${buttonErrorSelectors} {
@@ -2153,7 +2153,7 @@ ${buttonErrorSelectors} {
   outline-style: none !important;
   box-shadow:
     0 0 0 2px var(--color-background),
-    0 0 0 8px var(--color-focus-error);
+    0 0 0 4px var(--color-focus-error);
 }
 
 @media (forced-colors: active) {

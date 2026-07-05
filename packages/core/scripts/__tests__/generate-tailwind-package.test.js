@@ -252,7 +252,10 @@ describe('generateTailwindPackage', () => {
       /--color-border-default:\s*var\(--color-focus-default\);/
     );
     expect(nexusCSS).toMatch(/outline-style:\s*none\s*!important;/);
-    expect(nexusCSS).toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+    expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
+    expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-background\),/);
+    expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
+    expect(nexusCSS).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
     expect(nexusCSS).toMatch(/@media \(forced-colors: active\)/);
     expect(nexusCSS).toMatch(/outline-style:\s*solid\s*!important;/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
