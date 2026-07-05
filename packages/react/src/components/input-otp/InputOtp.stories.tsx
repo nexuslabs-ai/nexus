@@ -94,13 +94,12 @@ export const Disabled: Story = {
     await expect(input).toBeDisabled();
 
     // A disabled OTP field dims its slots via the group's has-[:disabled] hook,
-    // using a semantic border token at full opacity (not a fade).
+    // using a semantic boundary token at full opacity (not a fade).
     const slot = canvasElement.querySelector<HTMLElement>(
       '[data-slot="input-otp-slot"]'
     )!;
-    await expect(slot).toHaveClass(
-      'nx:group-has-[:disabled]/input-otp:border-border-disabled'
-    );
+    await expect(getComputedStyle(slot).borderTopWidth).toBe('0px');
+    await expect(getComputedStyle(slot).boxShadow).not.toBe('none');
     await expect(getComputedStyle(slot).opacity).toBe('1');
   },
 };
@@ -126,6 +125,9 @@ export const ClickInteraction: Story = {
 
     await expect(slot).toHaveClass('nx:duration-fast');
     await expect(slot).toHaveClass('nx:motion-reduce:transition-none');
+    await expect(slot).toHaveClass(
+      'nx:transition-[color,background-color,box-shadow]'
+    );
     await expect(caret).toHaveClass('nx:animate-caret-blink');
     await expect(caret).toHaveClass('nx:motion-reduce:animate-none');
     await expect(caret).not.toHaveClass('nx:duration-1000');
@@ -148,7 +150,7 @@ export const TransitionScoped: Story = {
 
     await expect(slot).not.toHaveClass('nx:transition-all');
     await expect(slot).toHaveClass(
-      'nx:transition-[color,background-color,border-color]'
+      'nx:transition-[color,background-color,box-shadow]'
     );
   },
 };

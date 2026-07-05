@@ -245,6 +245,16 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
+    expect(nexusCSS).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
+    expect(nexusCSS).toMatch(
+      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
+    );
+    expect(nexusCSS).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
+    expect(nexusCSS).toMatch(
+      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
+    );
+    expect(nexusCSS).toMatch(/\[data-slot='input-otp-slot'\]/);
+    expect(nexusCSS).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
     expect(nexusCSS).toMatch(
       /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
     );
@@ -270,6 +280,7 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
     expect(nexusCSS).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
     expect(nexusCSS).toMatch(/@media \(forced-colors: active\)/);
+    expect(nexusCSS).toMatch(/border-color:\s*CanvasText\s*!important;/);
     expect(nexusCSS).toMatch(/outline-style:\s*solid\s*!important;/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });

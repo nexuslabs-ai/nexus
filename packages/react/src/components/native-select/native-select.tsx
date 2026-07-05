@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 
 const nativeSelectVariants = cva(
   [
-    'nx:box-border nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border-default',
+    'nx:box-border nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border-0',
     'nx:text-foreground nx:transition-colors nx:outline-none',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
@@ -49,8 +49,8 @@ interface NativeSelectProps
  * A styled wrapper over the native `<select>` — on mobile it opens the OS
  * picker (iOS wheel / Android sheet), the preferred dense-form UX there. The
  * open list is OS-rendered. For rich options (icons, descriptions, grouping)
- * on desktop, use `Select`. Use `variant="borderless"` to remove the visible
- * border while keeping a tonal control fill for resting affordance.
+ * on desktop, use `Select`. Use `variant="borderless"` to remove the resting
+ * field stroke while keeping a tonal control fill for resting affordance.
  *
  * @example
  * ```tsx

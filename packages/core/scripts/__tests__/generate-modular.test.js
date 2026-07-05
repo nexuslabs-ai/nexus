@@ -101,6 +101,16 @@ describe('generateModular', () => {
     expect(globals).toMatch(
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
+    expect(globals).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
+    expect(globals).toMatch(
+      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
+    );
+    expect(globals).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
+    expect(globals).toMatch(
+      /box-shadow:\s*inset 0 0 0 1px var\(--color-border-error\);/
+    );
+    expect(globals).toMatch(/\[data-slot='input-otp-slot'\]/);
+    expect(globals).toMatch(/inset -1px 0 0 var\(--color-border-default\)/);
     expect(globals).toMatch(
       /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
     );
@@ -126,6 +136,7 @@ describe('generateModular', () => {
     expect(globals).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
     expect(globals).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
     expect(globals).toMatch(/@media \(forced-colors: active\)/);
+    expect(globals).toMatch(/border-color:\s*CanvasText\s*!important;/);
     expect(globals).toMatch(/outline-color:\s*Highlight\s*!important;/);
     expect(globals).toMatch(/outline-style:\s*solid\s*!important;/);
   });

@@ -52,7 +52,7 @@ const SelectValue = SelectPrimitive.Value;
 const selectTriggerVariants = cva(
   [
     'nx:group/select-trigger nx:flex nx:box-border nx:w-full nx:items-center nx:justify-between nx:gap-2',
-    'nx:rounded-md nx:border-default nx:transition-colors',
+    'nx:rounded-md nx:border-0 nx:transition-colors',
     'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
     'nx:whitespace-nowrap',
     'nx:data-[placeholder]:text-muted-foreground',
@@ -90,7 +90,7 @@ interface SelectTriggerProps
  * SelectTrigger
  *
  * Button that opens the select dropdown. Use `variant="borderless"` to remove
- * the visible border while keeping a tonal control fill for resting affordance.
+ * the resting field stroke while keeping a tonal control fill for resting affordance.
  *
  * @example
  * ```tsx

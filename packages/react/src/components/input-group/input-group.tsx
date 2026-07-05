@@ -9,7 +9,7 @@ import { Textarea } from '../textarea';
 
 const inputGroupVariants = cva(
   [
-    'nx:group/input-group nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-default nx:transition-colors nx:outline-none',
+    'nx:group/input-group nx:relative nx:flex nx:box-border nx:w-full nx:min-w-0 nx:items-center nx:rounded-md nx:border-0 nx:transition-colors nx:outline-none',
     // Size: an inline group matches standalone Input's height for the
     // control's data-size. `not-has-[>[data-align^=block]]` scopes this to
     // non-stacked layouts (no block addon) so the fixed-height rule and the
@@ -65,7 +65,7 @@ interface InputGroupProps
  * InputGroup
  *
  * Wraps an input (or textarea) with leading/trailing addons — icons, text,
- * buttons, or kbd hints — inside one bordered field that shares a focus ring.
+ * buttons, or kbd hints — inside one framed field that shares a focus ring.
  * Place an `InputGroupInput` / `InputGroupTextarea` as the control and one or
  * more `InputGroupAddon`s (positioned with `align`) around it; the whole group
  * lights up when the control is focused, and reflects the control's invalid
@@ -73,7 +73,7 @@ interface InputGroupProps
  *
  * The visible frame matches a standalone `Input`: an inline group takes the
  * control's `size` height. Stacked (block-aligned) groups stay auto-height.
- * Use `variant="borderless"` to remove the visible border while keeping a
+ * Use `variant="borderless"` to remove the resting field stroke while keeping a
  * tonal control fill for resting affordance.
  *
  * @example

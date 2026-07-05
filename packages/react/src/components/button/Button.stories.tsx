@@ -473,6 +473,7 @@ export const FocusManagement: Story = {
       getComputedStyle(root).getPropertyValue('--focus-offset').trim()
     ).toBe('2px');
     await expect(getComputedStyle(button).outlineOffset).toBe('2px');
+    await expect(getComputedStyle(button).boxShadow).toContain('4px');
 
     // Shift+Tab should blur
     await userEvent.tab({ shift: true });

@@ -2054,6 +2054,37 @@ const ERROR_FOCUS_RING_SELECTORS = [
   "[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
 ];
 
+const FIELD_BOUNDARY_SELECTORS = [
+  "[data-slot='input'][data-variant='default']",
+  "[data-slot='sidebar-input'][data-variant='default']",
+  "[data-slot='textarea'][data-variant='default']",
+  "[data-slot='native-select'][data-variant='default']",
+  "[data-slot='select-trigger'][data-variant='default']",
+  "[data-slot='input-group'][data-variant='default']",
+];
+
+const FIELD_ERROR_BOUNDARY_SELECTORS = [
+  "[data-slot='input'][aria-invalid='true']",
+  "[data-slot='sidebar-input'][aria-invalid='true']",
+  "[data-slot='textarea'][aria-invalid='true']",
+  "[data-slot='native-select'][aria-invalid='true']",
+  "[data-slot='select-trigger'][aria-invalid='true']",
+  "[data-slot='input-group']:has([data-slot][aria-invalid='true'])",
+];
+
+const FIELD_DISABLED_BOUNDARY_SELECTORS = [
+  "[data-slot='input'][data-variant='default']:disabled",
+  "[data-slot='sidebar-input'][data-variant='default']:disabled",
+  "[data-slot='textarea'][data-variant='default']:disabled",
+  "[data-slot='native-select'][data-variant='default']:disabled",
+  "[data-slot='select-trigger'][data-variant='default']:disabled",
+  "[data-slot='input-group'][data-variant='default'][data-disabled='true']",
+];
+
+const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
+const OTP_SLOT_GROUP_DISABLED_SELECTOR =
+  "[class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled) [data-slot='input-otp-slot']";
+
 const FIELD_FOCUS_RING_SELECTORS = [
   "[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
   "[data-slot='sidebar-input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
@@ -2098,6 +2129,11 @@ const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
 export function generateFocusRingCSS() {
   const defaultSelectors = DEFAULT_FOCUS_RING_SELECTORS.join(',\n');
   const errorSelectors = ERROR_FOCUS_RING_SELECTORS.join(',\n');
+  const fieldBoundarySelectors = FIELD_BOUNDARY_SELECTORS.join(',\n');
+  const fieldErrorBoundarySelectors =
+    FIELD_ERROR_BOUNDARY_SELECTORS.join(',\n');
+  const fieldDisabledBoundarySelectors =
+    FIELD_DISABLED_BOUNDARY_SELECTORS.join(',\n');
   const fieldSelectors = FIELD_FOCUS_RING_SELECTORS.join(',\n');
   const fieldErrorSelectors = FIELD_ERROR_FOCUS_RING_SELECTORS.join(',\n');
   const inputGroupControlSuppressionSelectors =
@@ -2115,6 +2151,58 @@ export function generateFocusRingCSS() {
 
   return `
 /* ===== FOCUS RING ===== */
+${fieldBoundarySelectors} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-default);
+}
+
+${fieldErrorBoundarySelectors} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-error);
+}
+
+${fieldDisabledBoundarySelectors} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow: inset 0 0 0 1px var(--color-border-disabled);
+}
+
+${OTP_SLOT_BOUNDARY_SELECTOR} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 1px 0 var(--color-border-default),
+    inset -1px 0 0 var(--color-border-default),
+    inset 0 -1px 0 var(--color-border-default);
+}
+
+${OTP_SLOT_BOUNDARY_SELECTOR}:first-child {
+  box-shadow:
+    inset 0 1px 0 var(--color-border-default),
+    inset 1px 0 0 var(--color-border-default),
+    inset -1px 0 0 var(--color-border-default),
+    inset 0 -1px 0 var(--color-border-default);
+}
+
+${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
+  border-color: transparent !important;
+  border-width: 0;
+  box-shadow:
+    inset 0 1px 0 var(--color-border-disabled),
+    inset -1px 0 0 var(--color-border-disabled),
+    inset 0 -1px 0 var(--color-border-disabled);
+}
+
+${OTP_SLOT_GROUP_DISABLED_SELECTOR}:first-child {
+  box-shadow:
+    inset 0 1px 0 var(--color-border-disabled),
+    inset 1px 0 0 var(--color-border-disabled),
+    inset -1px 0 0 var(--color-border-disabled),
+    inset 0 -1px 0 var(--color-border-disabled);
+}
+
 ${defaultSelectors} {
   --tw-outline-style: none !important;
   outline-color: transparent !important;
@@ -2177,6 +2265,21 @@ ${buttonErrorSelectors} {
 }
 
 @media (forced-colors: active) {
+  ${fieldBoundarySelectors},
+  ${fieldErrorBoundarySelectors},
+  ${OTP_SLOT_BOUNDARY_SELECTOR} {
+    border-color: CanvasText !important;
+    border-width: 1px;
+    box-shadow: none !important;
+  }
+
+  ${fieldDisabledBoundarySelectors},
+  ${OTP_SLOT_GROUP_DISABLED_SELECTOR} {
+    border-color: GrayText !important;
+    border-width: 1px;
+    box-shadow: none !important;
+  }
+
   ${allSelectors} {
     --tw-outline-style: solid !important;
     outline-color: Highlight !important;

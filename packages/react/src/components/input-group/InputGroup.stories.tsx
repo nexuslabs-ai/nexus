@@ -367,9 +367,8 @@ export const BorderlessStates: Story = {
     await expect(invalid).toHaveClass(
       'nx:has-[[data-slot][aria-invalid=true]]:border-border-error'
     );
-    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
-      'rgba(0, 0, 0, 0)'
-    );
+    await expect(window.getComputedStyle(invalid).borderTopWidth).toBe('0px');
+    await expect(window.getComputedStyle(invalid).boxShadow).not.toBe('none');
 
     await expect(
       canvas.getByRole('textbox', { name: 'Disabled borderless email' })
@@ -668,11 +667,11 @@ export const Invalid: Story = {
       canvas.getByRole('textbox', { name: 'Invalid email' })
     ).toHaveAttribute('aria-invalid', 'true');
 
-    // Error border fires: the invalid group's border colour differs from valid.
+    // Error boundary fires: the invalid group's visual stroke differs from valid.
     const valid = canvas.getByTestId('ig-valid');
     const invalid = canvas.getByTestId('ig-invalid');
-    await expect(window.getComputedStyle(invalid).borderTopColor).not.toBe(
-      window.getComputedStyle(valid).borderTopColor
+    await expect(window.getComputedStyle(invalid).boxShadow).not.toBe(
+      window.getComputedStyle(valid).boxShadow
     );
   },
 };
