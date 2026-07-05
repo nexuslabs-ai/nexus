@@ -19,6 +19,7 @@ import {
   deriveText,
   deriveTheme,
   type NexusSurfaceTone,
+  STATUS_RAMP,
   type ThemeDerivationInput,
   themeToCss,
 } from './derive-theme';
@@ -318,10 +319,8 @@ describe('deriveTheme', () => {
   it('keeps runtime error focus aligned with the shipped red primitives', () => {
     const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
 
-    expect(d.light['--nx-color-focus-error']).toBe(
-      'oklch(0.577 0.2523 27.926)'
-    );
-    expect(d.dark['--nx-color-focus-error']).toBe('oklch(0.808 0.1333 28.058)');
+    expect(d.light['--nx-color-focus-error']).toBe(STATUS_RAMP.error['600']);
+    expect(d.dark['--nx-color-focus-error']).toBe(STATUS_RAMP.error['300']);
   });
 
   it.each(['light', 'dark'] as const)(

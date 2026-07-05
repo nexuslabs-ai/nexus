@@ -67,11 +67,6 @@ const PAPER_L = 0.987;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FLAT_IN_LIGHT = new Set(['container', 'popover']);
 const FOCUS_APCA_FLOOR = 45;
-const FOCUS_ERROR_SEEDS = {
-  // Mirrors generated focus.color.error primitives: red.600 in light, red.300 in dark.
-  light: 'oklch(0.577 0.2523 27.926)',
-  dark: 'oklch(0.808 0.1333 28.058)',
-} as const;
 
 function anchoredContrastLerp(
   contrast: number,
@@ -543,7 +538,7 @@ function deriveFocus(
   surfaces: TokenMap,
   primary: TokenMap
 ): TokenMap {
-  const errorSeed = FOCUS_ERROR_SEEDS[mode];
+  const errorSeed = STATUS_RAMP.error[mode === 'dark' ? '300' : '600'];
   const background =
     surfaces['--nx-color-background'] ??
     (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
