@@ -219,7 +219,7 @@ describe('generateTailwindPackage', () => {
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
     expect(rootBlock).not.toMatch(/--nx-focus-color-default:/);
     expect(rootBlock).toMatch(
-      /--nx-focus-color-error:\s*var\(--nx-color-red-800\);/
+      /--nx-focus-color-error:\s*var\(--nx-color-red-600\);/
     );
     // Focus is an outline ring; default focus follows primary accent, and the old
     // geometry primitives were dropped.

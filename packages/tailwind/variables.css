@@ -331,7 +331,7 @@
   --nx-color-black-a950: oklch(0.1448 0 0 / 0.9569);
 
   /* focus (default) */
-  --nx-focus-color-error: var(--nx-color-red-800);
+  --nx-focus-color-error: var(--nx-color-red-600);
 
   /* motion (snappy) */
   --nx-motion-duration-0: 0ms;

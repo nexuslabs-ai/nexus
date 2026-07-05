@@ -173,7 +173,7 @@ Error focus fg lives in
 ```json
 {
   "color": {
-    "error": { "$value": "{red.800}", "$type": "color" }
+    "error": { "$value": "{red.600}", "$type": "color" }
   }
 }
 ```

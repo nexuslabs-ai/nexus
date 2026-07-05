@@ -98,7 +98,7 @@ describe('generateModular', () => {
     );
 
     expect(focus).toMatch(
-      /--nx-focus-color-error:\s*var\(--nx-color-red-800\);/
+      /--nx-focus-color-error:\s*var\(--nx-color-red-600\);/
     );
     expect(focus).toMatch(
       /\.dark \{[\s\S]*--nx-focus-color-error:\s*var\(--nx-color-red-300\);/
