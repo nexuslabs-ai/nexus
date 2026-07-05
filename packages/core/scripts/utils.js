@@ -2134,6 +2134,7 @@ ${fieldSelectors} {
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: transparent !important;
+  border-width: 0;
   box-shadow:
     inset 0 0 0 1px var(--color-focus-default),
     0 0 0 1px var(--color-focus-default);
@@ -2144,6 +2145,7 @@ ${fieldErrorSelectors} {
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: transparent !important;
+  border-width: 0;
   box-shadow:
     inset 0 0 0 1px var(--color-focus-error),
     0 0 0 1px var(--color-focus-error);

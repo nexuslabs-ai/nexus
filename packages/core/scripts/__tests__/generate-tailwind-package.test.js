@@ -246,14 +246,14 @@ describe('generateTailwindPackage', () => {
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(nexusCSS).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
+      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
     );
     expect(nexusCSS).toMatch(
       /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(nexusCSS).toMatch(/border-color:\s*transparent\s*!important;/);
     expect(nexusCSS).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
+      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?border-width:\s*0;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
     );
     expect(nexusCSS).toMatch(
       /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
@@ -264,6 +264,7 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-default\);/);
     expect(nexusCSS).toMatch(/inset 0 0 0 1px var\(--color-focus-error\),/);
     expect(nexusCSS).toMatch(/0 0 0 1px var\(--color-focus-error\);/);
+    expect(nexusCSS).toMatch(/border-width:\s*0;/);
     expect(nexusCSS).not.toMatch(/border-width:\s*2px;/);
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-background\),/);
     expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);

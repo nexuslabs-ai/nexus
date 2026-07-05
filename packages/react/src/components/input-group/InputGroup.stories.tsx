@@ -184,6 +184,7 @@ export const FocusBorderOwnership: Story = {
       const groupStyles = getComputedStyle(group);
       const controlStyles = getComputedStyle(control);
 
+      await expect(groupStyles.borderTopWidth).toBe('0px');
       await expect(groupStyles.borderTopColor).toBe('rgba(0, 0, 0, 0)');
       await expect(groupStyles.boxShadow).not.toBe('none');
       await expect(groupStyles.boxShadow).toContain('inset');
