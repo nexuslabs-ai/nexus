@@ -2042,73 +2042,128 @@ export function generateRootDimensionsCSS(dimensionTokens = []) {
   return css;
 }
 
-const DEFAULT_FOCUS_HALO_SELECTORS = [
+const DEFAULT_FOCUS_RING_SELECTORS = [
   "[class~='nx:focus-visible:outline-focus-default']:focus-visible",
   "[class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
   "[data-focused='true'] [class~='nx:group-data-[focused=true]/day:outline-focus-default']",
   "[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
 ];
 
-const ERROR_FOCUS_HALO_SELECTORS = [
+const ERROR_FOCUS_RING_SELECTORS = [
   "[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
   "[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
 ];
 
+const FIELD_FOCUS_RING_SELECTORS = [
+  "[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
+  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
+];
+
+const FIELD_ERROR_FOCUS_RING_SELECTORS = [
+  "[data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
+];
+
+const BUTTON_FOCUS_RING_SELECTORS = [
+  "[data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+];
+
+const BUTTON_ERROR_FOCUS_RING_SELECTORS = [
+  "[data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+];
+
 /**
- * Turn the canonical focus outline utilities into the shipped soft-halo
+ * Turn the canonical focus outline utilities into the shipped hard focus
  * treatment while preserving a real outline in forced-colors mode.
  *
  * The component classes intentionally stay outline-based: Tailwind owns the
- * outline width/offset, this layer owns the normal-mode halo paint.
+ * outline width/offset, this layer owns the normal-mode ring paint.
  *
- * @returns {string} CSS focus halo rules
+ * @returns {string} CSS focus ring rules
  */
-export function generateFocusHaloCSS() {
-  const defaultSelectors = DEFAULT_FOCUS_HALO_SELECTORS.join(',\n');
-  const errorSelectors = ERROR_FOCUS_HALO_SELECTORS.join(',\n');
+export function generateFocusRingCSS() {
+  const defaultSelectors = DEFAULT_FOCUS_RING_SELECTORS.join(',\n');
+  const errorSelectors = ERROR_FOCUS_RING_SELECTORS.join(',\n');
+  const fieldSelectors = FIELD_FOCUS_RING_SELECTORS.join(',\n');
+  const fieldErrorSelectors = FIELD_ERROR_FOCUS_RING_SELECTORS.join(',\n');
+  const buttonSelectors = BUTTON_FOCUS_RING_SELECTORS.join(',\n');
+  const buttonErrorSelectors = BUTTON_ERROR_FOCUS_RING_SELECTORS.join(',\n');
   const allSelectors = [
-    ...DEFAULT_FOCUS_HALO_SELECTORS,
-    ...ERROR_FOCUS_HALO_SELECTORS,
+    ...DEFAULT_FOCUS_RING_SELECTORS,
+    ...ERROR_FOCUS_RING_SELECTORS,
+    ...FIELD_FOCUS_RING_SELECTORS,
+    ...FIELD_ERROR_FOCUS_RING_SELECTORS,
+    ...BUTTON_FOCUS_RING_SELECTORS,
+    ...BUTTON_ERROR_FOCUS_RING_SELECTORS,
   ].join(',\n');
 
   return `
-/* ===== FOCUS HALO ===== */
+/* ===== FOCUS RING ===== */
 ${defaultSelectors} {
-  outline-color: transparent;
-  box-shadow:
-    0 0 0 1px var(--color-focus-default),
-    0 0 0 4px var(--color-primary-subtle),
-    0 0 12px -2px var(--color-focus-default);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-default);
 }
 
 ${errorSelectors} {
-  outline-color: transparent;
-  box-shadow:
-    0 0 0 1px var(--color-focus-error),
-    0 0 0 4px var(--color-error-subtle),
-    0 0 12px -2px var(--color-focus-error);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-error);
 }
 
-@supports (color: color-mix(in oklch, black, white)) {
-  ${defaultSelectors} {
-    box-shadow:
-      0 0 0 1px color-mix(in oklch, var(--color-focus-default) 82%, transparent),
-      0 0 0 4px color-mix(in oklch, var(--color-focus-default) 18%, transparent),
-      0 0 14px 0 color-mix(in oklch, var(--color-focus-default) 28%, transparent);
-  }
+${fieldSelectors} {
+  --color-border-default: var(--color-focus-default);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: var(--color-focus-default) !important;
+  box-shadow: 0 0 0 1px var(--color-focus-default);
+}
 
-  ${errorSelectors} {
-    box-shadow:
-      0 0 0 1px color-mix(in oklch, var(--color-focus-error) 82%, transparent),
-      0 0 0 4px color-mix(in oklch, var(--color-focus-error) 18%, transparent),
-      0 0 14px 0 color-mix(in oklch, var(--color-focus-error) 28%, transparent);
-  }
+${fieldErrorSelectors} {
+  --color-border-error: var(--color-focus-error);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: var(--color-focus-error) !important;
+  box-shadow: 0 0 0 1px var(--color-focus-error);
+}
+
+${buttonSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 8px var(--color-focus-default);
+}
+
+${buttonErrorSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 8px var(--color-focus-error);
 }
 
 @media (forced-colors: active) {
   ${allSelectors} {
-    outline-color: Highlight;
-    box-shadow: none;
+    --tw-outline-style: solid !important;
+    outline-color: Highlight !important;
+    outline-offset: var(--focus-offset) !important;
+    outline-style: solid !important;
+    outline-width: 2px !important;
+    box-shadow: none !important;
   }
 }
 `;

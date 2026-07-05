@@ -900,7 +900,7 @@
   --focus-offset: 2px;
 }
 
-/* ===== FOCUS HALO ===== */
+/* ===== FOCUS RING ===== */
 [class~='nx:focus-visible:outline-focus-default']:focus-visible,
 [class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
 [data-focused='true']
@@ -908,48 +908,69 @@
 [class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
   [data-slot='input-group-control']:focus-visible
 ) {
-  outline-color: transparent;
-  box-shadow:
-    0 0 0 1px var(--color-focus-default),
-    0 0 0 4px var(--color-primary-subtle),
-    0 0 12px -2px var(--color-focus-default);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-default);
 }
 
 [class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
 [class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
   [data-slot='input-group-control'][aria-invalid='true']:focus-visible
 ) {
-  outline-color: transparent;
-  box-shadow:
-    0 0 0 1px var(--color-focus-error),
-    0 0 0 4px var(--color-error-subtle),
-    0 0 12px -2px var(--color-focus-error);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow: 0 0 0 2px var(--color-focus-error);
 }
 
-@supports (color: color-mix(in oklch, black, white)) {
-  [class~='nx:focus-visible:outline-focus-default']:focus-visible,
-  [class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
-  [data-focused='true']
-    [class~='nx:group-data-[focused=true]/day:outline-focus-default'],
-  [class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
     [data-slot='input-group-control']:focus-visible
   ) {
-    box-shadow:
-      0 0 0 1px color-mix(in oklch, var(--color-focus-default) 82%, transparent),
-      0 0 0 4px color-mix(in oklch, var(--color-focus-default) 18%, transparent),
-      0 0 14px 0
-        color-mix(in oklch, var(--color-focus-default) 28%, transparent);
-  }
+  --color-border-default: var(--color-focus-default);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: var(--color-focus-default) !important;
+  box-shadow: 0 0 0 1px var(--color-focus-default);
+}
 
-  [class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
-  [class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+[data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
     [data-slot='input-group-control'][aria-invalid='true']:focus-visible
   ) {
-    box-shadow:
-      0 0 0 1px color-mix(in oklch, var(--color-focus-error) 82%, transparent),
-      0 0 0 4px color-mix(in oklch, var(--color-focus-error) 18%, transparent),
-      0 0 14px 0 color-mix(in oklch, var(--color-focus-error) 28%, transparent);
-  }
+  --color-border-error: var(--color-focus-error);
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  border-color: var(--color-focus-error) !important;
+  box-shadow: 0 0 0 1px var(--color-focus-error);
+}
+
+[data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 8px var(--color-focus-default);
+}
+
+[data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 8px var(--color-focus-error);
 }
 
 @media (forced-colors: active) {
@@ -963,9 +984,30 @@
   [class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
   [class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
     [data-slot='input-group-control'][aria-invalid='true']:focus-visible
-  ) {
-    outline-color: Highlight;
-    box-shadow: none;
+  ),
+  [data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+  [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+      [data-slot='input-group-control']:focus-visible
+    ),
+  [data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+      [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+    ),
+  [data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+    --tw-outline-style: solid !important;
+    outline-color: Highlight !important;
+    outline-offset: var(--focus-offset) !important;
+    outline-style: solid !important;
+    outline-width: 2px !important;
+    box-shadow: none !important;
   }
 }
 

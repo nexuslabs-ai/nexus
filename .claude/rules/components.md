@@ -129,7 +129,7 @@ No shipped component needs this yet — it's the rule for the first one that doe
 
 ## Focus States
 
-Use the design-system focus token with the canonical outline utilities and the tokenised offset (`--focus-offset`, currently `2px`). The generated theme turns those utilities into the shared soft halo in normal rendering and keeps the real outline as the forced-colors fallback:
+Use the design-system focus token with the canonical outline utilities and the tokenised offset (`--focus-offset`, currently `2px`). The generated theme turns those utilities into a hard focus treatment in normal rendering and keeps the real outline as the forced-colors fallback:
 
 ```
 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)
@@ -137,7 +137,7 @@ nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visib
 
 Not every component takes this ring — see [§ Surface exception map](#surface-exception-map) for which component types use the ring, a background-tint `:focus`, or no focus treatment at all.
 
-For invalid fields, wire both an always-on error border and an error-coloured focus halo:
+For invalid fields, wire both an always-on error border and an error-coloured focus treatment:
 
 ```
 nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error
@@ -145,13 +145,13 @@ nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-
 
 Live consumer: `packages/react/src/components/input/input.tsx`.
 
-### Why outline utilities plus halo CSS
+### Why outline utilities plus focus CSS
 
-The component API stays outline-based even though normal rendering is a soft halo:
+The component API stays outline-based even though normal rendering uses box-shadow paint:
 
 - **One component contract.** Components keep using `outline-focus-default` / `outline-focus-error`, so the design-system CSS can change the look globally without per-component rewrites.
 - **Windows High Contrast Mode survives.** `forced-colors: active` strips box-shadows, so the generated CSS restores the outline in the user's system focus colour.
-- **Soft primary-accent focus.** Normal rendering uses the active `focus-default` / `focus-error` colour for a 1px edge plus a soft outer halo.
+- **Notion-style focus.** Inputs, textareas, selects, and input groups get a focused border plus a 1px outside edge. Buttons get a thicker outer primary ring with a 2px surface gap. Other keyboard-focusable controls get a hard 2px primary ring.
 
 ### Uniform primary focus across variants
 

@@ -91,16 +91,24 @@ describe('generateModular', () => {
     expect(globals).not.toMatch(/light-dark\(/);
   });
 
-  it('emits the shared focus halo treatment in globals.css', () => {
+  it('emits the shared focus ring treatment in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
 
-    expect(globals).toMatch(/\/\* ===== FOCUS HALO ===== \*\//);
+    expect(globals).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
     expect(globals).toMatch(
       /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
-    expect(globals).toMatch(/box-shadow:[\s\S]*var\(--color-focus-default\)/);
+    expect(globals).toMatch(
+      /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+    );
+    expect(globals).toMatch(
+      /--color-border-default:\s*var\(--color-focus-default\);/
+    );
+    expect(globals).toMatch(/outline-style:\s*none\s*!important;/);
+    expect(globals).toMatch(/0 0 0 8px var\(--color-focus-default\);/);
     expect(globals).toMatch(/@media \(forced-colors: active\)/);
-    expect(globals).toMatch(/outline-color:\s*Highlight;/);
+    expect(globals).toMatch(/outline-color:\s*Highlight\s*!important;/);
+    expect(globals).toMatch(/outline-style:\s*solid\s*!important;/);
   });
 
   // -----------------------------------------------------------------------

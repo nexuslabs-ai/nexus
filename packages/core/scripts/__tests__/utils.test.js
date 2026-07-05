@@ -13,7 +13,7 @@ import {
   extractRefPath,
   extractTokens,
   formatTokenValue,
-  generateFocusHaloCSS,
+  generateFocusRingCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   isReference,
@@ -231,13 +231,19 @@ describe('utils', () => {
     });
   });
 
-  describe('generateFocusHaloCSS', () => {
-    it('emits soft halo rules with a forced-colors outline fallback', () => {
-      const css = generateFocusHaloCSS();
+  describe('generateFocusRingCSS', () => {
+    it('emits hard field and button focus rules with a forced-colors outline fallback', () => {
+      const css = generateFocusRingCSS();
 
-      expect(css).toMatch(/\/\* ===== FOCUS HALO ===== \*\//);
+      expect(css).toMatch(/\/\* ===== FOCUS RING ===== \*\//);
       expect(css).toMatch(
         /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+      );
+      expect(css).toMatch(
+        /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+      );
+      expect(css).toMatch(
+        /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
       );
       expect(css).toMatch(
         /\[class~='nx:data-\[active=true\]:outline-focus-default'\]\[data-active='true'\]/
@@ -245,13 +251,21 @@ describe('utils', () => {
       expect(css).toMatch(
         /\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible/
       );
-      expect(css).toMatch(/box-shadow:[\s\S]*var\(--color-focus-default\)/);
       expect(css).toMatch(
-        /@supports \(color: color-mix\(in oklch, black, white\)\)/
+        /border-color:\s*var\(--color-focus-default\)\s*!important;/
       );
+      expect(css).toMatch(
+        /--color-border-default:\s*var\(--color-focus-default\);/
+      );
+      expect(css).toMatch(/--tw-outline-style:\s*none\s*!important;/);
+      expect(css).toMatch(/outline-style:\s*none\s*!important;/);
+      expect(css).toMatch(/0 0 0 8px var\(--color-focus-default\);/);
+      expect(css).not.toMatch(/color-mix\(/);
       expect(css).toMatch(/@media \(forced-colors: active\)/);
-      expect(css).toMatch(/outline-color:\s*Highlight;/);
-      expect(css).toMatch(/box-shadow:\s*none;/);
+      expect(css).toMatch(/outline-color:\s*Highlight\s*!important;/);
+      expect(css).toMatch(/outline-style:\s*solid\s*!important;/);
+      expect(css).toMatch(/outline-width:\s*2px\s*!important;/);
+      expect(css).toMatch(/box-shadow:\s*none\s*!important;/);
     });
   });
 

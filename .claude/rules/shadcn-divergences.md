@@ -264,10 +264,10 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 
 | shadcn                   | Nexus                                              | Notes                                                          |
 | ------------------------ | -------------------------------------------------- | -------------------------------------------------------------- |
-| `ring-ring`              | `nx:outline-focus-default`                         | Focus halo colour hook (current primary accent)                |
+| `ring-ring`              | `nx:outline-focus-default`                         | Focus ring colour hook (current primary accent)                |
 | `ring-offset-background` | `nx:focus-visible:outline-offset-(--focus-offset)` | Forced-colors outline offset (tokenised `--focus-offset`, 2px) |
 | `focus-visible:ring-2`   | `nx:focus-visible:outline-2`                       | Forced-colors outline width                                    |
-| —                        | `nx:focus-visible:outline-focus-error`             | Error halo colour hook (invalid inputs)                        |
+| —                        | `nx:focus-visible:outline-focus-error`             | Error focus colour hook (invalid inputs)                       |
 
 **Example transformation:**
 
@@ -275,7 +275,7 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 // shadcn
 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
-// Nexus (uniform primary-accent focus halo)
+// Nexus (uniform primary-accent focus treatment)
 'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)';
 ```
 
