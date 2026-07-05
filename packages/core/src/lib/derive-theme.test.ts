@@ -315,6 +315,15 @@ describe('deriveTheme', () => {
     }
   });
 
+  it('keeps runtime error focus aligned with the shipped red primitives', () => {
+    const d = deriveTheme(createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE));
+
+    expect(d.light['--nx-color-focus-error']).toBe(
+      'oklch(0.577 0.2523 27.926)'
+    );
+    expect(d.dark['--nx-color-focus-error']).toBe('oklch(0.808 0.1333 28.058)');
+  });
+
   it.each(['light', 'dark'] as const)(
     'uses primary accent for shipped default focus and keeps focus colors APCA-safe in %s mode',
     (mode) => {

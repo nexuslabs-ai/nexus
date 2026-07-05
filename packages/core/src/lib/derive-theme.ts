@@ -68,8 +68,9 @@ const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FLAT_IN_LIGHT = new Set(['container', 'popover']);
 const FOCUS_APCA_FLOOR = 45;
 const FOCUS_ERROR_SEEDS = {
-  light: '#7f1d1d',
-  dark: '#fca5a5',
+  // Mirrors generated focus.color.error primitives: red.600 in light, red.300 in dark.
+  light: 'oklch(0.577 0.2523 27.926)',
+  dark: 'oklch(0.808 0.1333 28.058)',
 } as const;
 
 function anchoredContrastLerp(
