@@ -9,7 +9,7 @@
       "$type": "color"
     },
     "offset": {
-      "$value": { "value": 1, "unit": "px" },
+      "$value": { "value": 2, "unit": "px" },
       "$type": "dimension"
     }
   }

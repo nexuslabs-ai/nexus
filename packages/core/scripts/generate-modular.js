@@ -23,6 +23,7 @@ import {
   formatTokenValue,
   generateBorderColorAliasUtilitiesCSS,
   generateBorderWidthUtilitiesCSS,
+  generateFocusHaloCSS,
   generateMotionUtilitiesCSS,
   generateNativeBrowserUIThemeCSS,
   generateRootDimensionsCSS,
@@ -354,6 +355,7 @@ function generateModularGlobalsCSS(
 
   // Fixed dimension primitives at :root (e.g. --focus-offset) — see #506.
   css += generateRootDimensionsCSS(dimensionTokens);
+  css += generateFocusHaloCSS();
 
   // Per-mode spacing override blocks. `spacingDefault` picks which mode lands
   // under `:root, [data-density="X"]`; the other five emit as bare

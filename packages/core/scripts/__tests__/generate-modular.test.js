@@ -91,6 +91,18 @@ describe('generateModular', () => {
     expect(globals).not.toMatch(/light-dark\(/);
   });
 
+  it('emits the shared focus halo treatment in globals.css', () => {
+    const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
+
+    expect(globals).toMatch(/\/\* ===== FOCUS HALO ===== \*\//);
+    expect(globals).toMatch(
+      /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+    );
+    expect(globals).toMatch(/box-shadow:[\s\S]*var\(--color-focus-default\)/);
+    expect(globals).toMatch(/@media \(forced-colors: active\)/);
+    expect(globals).toMatch(/outline-color:\s*Highlight;/);
+  });
+
   // -----------------------------------------------------------------------
   // Spacing migration (#119) — per-mode blocks + sibling spacing-utilities.css
   // -----------------------------------------------------------------------

@@ -13,6 +13,7 @@ import {
   extractRefPath,
   extractTokens,
   formatTokenValue,
+  generateFocusHaloCSS,
   generateSpacingModesCSS,
   generateSpacingRoleUtilitiesCSS,
   isReference,
@@ -227,6 +228,30 @@ describe('utils', () => {
       expect(resolveValue('#ff0000', primitiveMap, 'color')).toBe(
         'oklch(0.628 0.2577 29.234)'
       );
+    });
+  });
+
+  describe('generateFocusHaloCSS', () => {
+    it('emits soft halo rules with a forced-colors outline fallback', () => {
+      const css = generateFocusHaloCSS();
+
+      expect(css).toMatch(/\/\* ===== FOCUS HALO ===== \*\//);
+      expect(css).toMatch(
+        /\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+      );
+      expect(css).toMatch(
+        /\[class~='nx:data-\[active=true\]:outline-focus-default'\]\[data-active='true'\]/
+      );
+      expect(css).toMatch(
+        /\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible/
+      );
+      expect(css).toMatch(/box-shadow:[\s\S]*var\(--color-focus-default\)/);
+      expect(css).toMatch(
+        /@supports \(color: color-mix\(in oklch, black, white\)\)/
+      );
+      expect(css).toMatch(/@media \(forced-colors: active\)/);
+      expect(css).toMatch(/outline-color:\s*Highlight;/);
+      expect(css).toMatch(/box-shadow:\s*none;/);
     });
   });
 

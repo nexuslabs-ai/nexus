@@ -1040,7 +1040,76 @@
 
 /* ===== RUNTIME DIMENSION TOKENS ===== */
 :root {
-  --focus-offset: 1px;
+  --focus-offset: 2px;
+}
+
+/* ===== FOCUS HALO ===== */
+[class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+[data-focused='true']
+  [class~='nx:group-data-[focused=true]/day:outline-focus-default'],
+[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+  [data-slot='input-group-control']:focus-visible
+) {
+  outline-color: transparent;
+  box-shadow:
+    0 0 0 1px var(--color-focus-default),
+    0 0 0 4px var(--color-primary-subtle),
+    0 0 12px -2px var(--color-focus-default);
+}
+
+[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+  [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+) {
+  outline-color: transparent;
+  box-shadow:
+    0 0 0 1px var(--color-focus-error),
+    0 0 0 4px var(--color-error-subtle),
+    0 0 12px -2px var(--color-focus-error);
+}
+
+@supports (color: color-mix(in oklch, black, white)) {
+  [class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+  [data-focused='true']
+    [class~='nx:group-data-[focused=true]/day:outline-focus-default'],
+  [class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+    [data-slot='input-group-control']:focus-visible
+  ) {
+    box-shadow:
+      0 0 0 1px color-mix(in oklch, var(--color-focus-default) 82%, transparent),
+      0 0 0 4px color-mix(in oklch, var(--color-focus-default) 18%, transparent),
+      0 0 14px 0
+        color-mix(in oklch, var(--color-focus-default) 28%, transparent);
+  }
+
+  [class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+    [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+  ) {
+    box-shadow:
+      0 0 0 1px color-mix(in oklch, var(--color-focus-error) 82%, transparent),
+      0 0 0 4px color-mix(in oklch, var(--color-focus-error) 18%, transparent),
+      0 0 14px 0 color-mix(in oklch, var(--color-focus-error) 28%, transparent);
+  }
+}
+
+@media (forced-colors: active) {
+  [class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
+  [data-focused='true']
+    [class~='nx:group-data-[focused=true]/day:outline-focus-default'],
+  [class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+    [data-slot='input-group-control']:focus-visible
+  ),
+  [class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
+  [class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+    [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+  ) {
+    outline-color: Highlight;
+    box-shadow: none;
+  }
 }
 
 /* ===== PER-MODE SPACING (mode swap via [data-density="X"] on any ancestor) ===== */

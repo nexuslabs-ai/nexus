@@ -2042,6 +2042,78 @@ export function generateRootDimensionsCSS(dimensionTokens = []) {
   return css;
 }
 
+const DEFAULT_FOCUS_HALO_SELECTORS = [
+  "[class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
+  "[data-focused='true'] [class~='nx:group-data-[focused=true]/day:outline-focus-default']",
+  "[class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
+];
+
+const ERROR_FOCUS_HALO_SELECTORS = [
+  "[class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
+];
+
+/**
+ * Turn the canonical focus outline utilities into the shipped soft-halo
+ * treatment while preserving a real outline in forced-colors mode.
+ *
+ * The component classes intentionally stay outline-based: Tailwind owns the
+ * outline width/offset, this layer owns the normal-mode halo paint.
+ *
+ * @returns {string} CSS focus halo rules
+ */
+export function generateFocusHaloCSS() {
+  const defaultSelectors = DEFAULT_FOCUS_HALO_SELECTORS.join(',\n');
+  const errorSelectors = ERROR_FOCUS_HALO_SELECTORS.join(',\n');
+  const allSelectors = [
+    ...DEFAULT_FOCUS_HALO_SELECTORS,
+    ...ERROR_FOCUS_HALO_SELECTORS,
+  ].join(',\n');
+
+  return `
+/* ===== FOCUS HALO ===== */
+${defaultSelectors} {
+  outline-color: transparent;
+  box-shadow:
+    0 0 0 1px var(--color-focus-default),
+    0 0 0 4px var(--color-primary-subtle),
+    0 0 12px -2px var(--color-focus-default);
+}
+
+${errorSelectors} {
+  outline-color: transparent;
+  box-shadow:
+    0 0 0 1px var(--color-focus-error),
+    0 0 0 4px var(--color-error-subtle),
+    0 0 12px -2px var(--color-focus-error);
+}
+
+@supports (color: color-mix(in oklch, black, white)) {
+  ${defaultSelectors} {
+    box-shadow:
+      0 0 0 1px color-mix(in oklch, var(--color-focus-default) 82%, transparent),
+      0 0 0 4px color-mix(in oklch, var(--color-focus-default) 18%, transparent),
+      0 0 14px 0 color-mix(in oklch, var(--color-focus-default) 28%, transparent);
+  }
+
+  ${errorSelectors} {
+    box-shadow:
+      0 0 0 1px color-mix(in oklch, var(--color-focus-error) 82%, transparent),
+      0 0 0 4px color-mix(in oklch, var(--color-focus-error) 18%, transparent),
+      0 0 14px 0 color-mix(in oklch, var(--color-focus-error) 28%, transparent);
+  }
+}
+
+@media (forced-colors: active) {
+  ${allSelectors} {
+    outline-color: Highlight;
+    box-shadow: none;
+  }
+}
+`;
+}
+
 export function generateNativeBrowserUIThemeCSS() {
   return `
 /* ===== NATIVE BROWSER UI THEME ===== */
