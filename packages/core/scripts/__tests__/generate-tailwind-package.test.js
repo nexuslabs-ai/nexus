@@ -50,10 +50,6 @@ function read(distDir, fileName) {
   return fs.readFileSync(path.join(distDir, fileName), 'utf8');
 }
 
-function readWorkspaceFile(...segments) {
-  return fs.readFileSync(path.join(WORKSPACE_ROOT, ...segments), 'utf8');
-}
-
 function extractBlock(css, openSelector) {
   const escaped = openSelector.replace(/\./g, '\\.');
   const open = openSelector === '@theme' ? '@theme(?: inline)?' : escaped;
@@ -293,116 +289,53 @@ describe('generateTailwindPackage', () => {
   });
 
   it('keeps field focus selectors aligned with React data-slot contracts', () => {
-    const contracts = [
-      {
-        file: ['packages', 'react', 'src', 'components', 'input', 'input.tsx'],
-        snippets: [
-          'data-slot="input"',
-          'data-variant={variant ??',
-          'nx:focus-visible:outline-focus-default',
-          'nx:aria-invalid:focus-visible:outline-focus-error',
-        ],
-      },
-      {
-        file: [
-          'packages',
-          'react',
-          'src',
-          'components',
-          'textarea',
-          'textarea.tsx',
-        ],
-        snippets: [
-          'data-slot="textarea"',
-          'data-variant={variant ??',
-          'nx:focus-visible:outline-focus-default',
-          'nx:aria-invalid:focus-visible:outline-focus-error',
-        ],
-      },
-      {
-        file: [
-          'packages',
-          'react',
-          'src',
-          'components',
-          'native-select',
-          'native-select.tsx',
-        ],
-        snippets: [
-          'data-slot="native-select"',
-          'data-variant={variant ??',
-          'nx:focus-visible:outline-focus-default',
-          'nx:aria-invalid:focus-visible:outline-focus-error',
-        ],
-      },
-      {
-        file: [
-          'packages',
-          'react',
-          'src',
-          'components',
-          'select',
-          'select.tsx',
-        ],
-        snippets: [
-          'data-slot="select-trigger"',
-          'data-variant={variant ??',
-          'nx:focus-visible:outline-focus-default',
-          'nx:aria-invalid:focus-visible:outline-focus-error',
-        ],
-      },
-      {
-        file: [
-          'packages',
-          'react',
-          'src',
-          'components',
-          'input-group',
-          'input-group.tsx',
-        ],
-        snippets: [
-          'data-slot="input-group"',
-          'data-slot="input-group-control"',
-          'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default',
-          'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error',
-          'nx:focus-visible:outline-none',
-        ],
-      },
-      {
-        file: [
-          'packages',
-          'react',
-          'src',
-          'components',
-          'input-otp',
-          'input-otp.tsx',
-        ],
-        snippets: [
-          'data-slot="input-otp-slot"',
-          'data-active={isActive}',
-          'nx:data-[active=true]:outline-focus-default',
-        ],
-      },
-      {
-        file: [
-          'packages',
-          'react',
-          'src',
-          'components',
-          'sidebar',
-          'sidebar.tsx',
-        ],
-        snippets: ['data-slot="sidebar-input"'],
-      },
-    ];
+    // Derive the contract from the emitted FOCUS RING block (the single source):
+    // a data-slot or class rename on either the generator or a component side
+    // fails here, and a newly targeted field is covered with no hand list.
+    const start = nexusCSS.indexOf('/* ===== FOCUS RING ===== */');
+    expect(start, 'FOCUS RING block is emitted').toBeGreaterThanOrEqual(0);
+    const end = nexusCSS.indexOf('/* ===== ', start + 10);
+    const focusRingBlock = nexusCSS.slice(start, end === -1 ? undefined : end);
 
-    for (const { file, snippets } of contracts) {
-      const source = readWorkspaceFile(...file);
-      for (const snippet of snippets) {
-        expect(source, `${file.join('/')} missing ${snippet}`).toContain(
-          snippet
-        );
-      }
+    const targetedSlots = new Set();
+    for (const m of focusRingBlock.matchAll(
+      /data-slot=(?:'([a-z-]+)'|([a-z-]+))/g
+    )) {
+      targetedSlots.add(m[1] ?? m[2]);
+    }
+    const targetedClasses = new Set();
+    for (const m of focusRingBlock.matchAll(/\[class~='([^']+)'\]/g)) {
+      targetedClasses.add(m[1]);
+    }
+    expect(targetedSlots.size).toBeGreaterThan(0);
+    expect(targetedClasses.size).toBeGreaterThan(0);
+
+    const readComponentSources = (dir) =>
+      fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) return readComponentSources(full);
+        if (entry.name.endsWith('.tsx') && !entry.name.endsWith('.stories.tsx'))
+          return [fs.readFileSync(full, 'utf8')];
+        return [];
+      });
+    const componentSource = readComponentSources(
+      path.join(WORKSPACE_ROOT, 'packages', 'react', 'src', 'components')
+    ).join('\n');
+
+    for (const slot of targetedSlots) {
+      // Matches `data-slot="x"` (JSX attr) and `'data-slot': 'x'` (spread form).
+      expect(
+        new RegExp(`data-slot["']?\\s*[:=]\\s*["']${slot}["']`).test(
+          componentSource
+        ),
+        `no component emits the data-slot "${slot}" targeted by the focus CSS`
+      ).toBe(true);
+    }
+    for (const className of targetedClasses) {
+      expect(
+        componentSource.includes(className),
+        `no component emits the class "${className}" targeted by the focus CSS`
+      ).toBe(true);
     }
   });
 
