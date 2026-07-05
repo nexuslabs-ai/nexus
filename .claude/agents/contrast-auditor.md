@@ -183,9 +183,10 @@ Error focus fg lives in
 }
 ```
 
-Read `data.color.default.$value` for `color.default` pair failures and
-`data.color.error.$value` for `color.error` failures. **Display the actual
-current hex** in the table so the user has the anchor for retuning.
+Read `data.color.error.$value` for `color.error` failures. Default focus
+failures route through `primary.subtle-foreground`, not this primitive file.
+**Display the actual current hex** in the table so the user has the anchor for
+retuning.
 
 Output the **target L value** the new hex must land at (one grid row from
 current in the contrast-increasing direction, with the relevant `bg` L for

@@ -546,9 +546,16 @@ function deriveFocus(
   const background =
     surfaces['--nx-color-background'] ??
     (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
+  const primaryFocus = primary['--nx-color-primary-subtle-foreground'];
+
+  if (primaryFocus === undefined) {
+    throw new Error(
+      'deriveFocus: missing --nx-color-primary-subtle-foreground'
+    );
+  }
+
   return {
-    '--nx-color-focus-default':
-      primary['--nx-color-primary-subtle-foreground']!,
+    '--nx-color-focus-default': primaryFocus,
     '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
   };
 }
