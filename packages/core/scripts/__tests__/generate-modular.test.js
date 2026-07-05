@@ -102,25 +102,25 @@ describe('generateModular', () => {
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(globals).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*var\(--color-focus-default\)\s*!important;[\s\S]*?border-width:\s*2px;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
+      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-default\),[\s\S]*?0 0 0 1px var\(--color-focus-default\);[\s\S]*?\}/
     );
     expect(globals).toMatch(
       /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
+    expect(globals).toMatch(/border-color:\s*transparent\s*!important;/);
     expect(globals).toMatch(
-      /--color-border-default:\s*var\(--color-focus-default\);/
-    );
-    expect(globals).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*var\(--color-focus-error\)\s*!important;[\s\S]*?border-width:\s*2px;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
+      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*transparent\s*!important;[\s\S]*?box-shadow:\s*[\s\S]*?inset 0 0 0 1px var\(--color-focus-error\),[\s\S]*?0 0 0 1px var\(--color-focus-error\);[\s\S]*?\}/
     );
     expect(globals).toMatch(
       /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
     );
     expect(globals).toMatch(/outline-style:\s*none\s*!important;/);
     expect(globals).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
-    expect(globals).toMatch(/box-shadow:\s*none;/);
-    expect(globals).not.toMatch(/0 0 0 1px var\(--color-focus-default\);/);
-    expect(globals).not.toMatch(/0 0 0 1px var\(--color-focus-error\);/);
+    expect(globals).toMatch(/inset 0 0 0 1px var\(--color-focus-default\),/);
+    expect(globals).toMatch(/0 0 0 1px var\(--color-focus-default\);/);
+    expect(globals).toMatch(/inset 0 0 0 1px var\(--color-focus-error\),/);
+    expect(globals).toMatch(/0 0 0 1px var\(--color-focus-error\);/);
+    expect(globals).not.toMatch(/border-width:\s*2px;/);
     expect(globals).toMatch(/0 0 0 2px var\(--color-background\),/);
     expect(globals).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
     expect(globals).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);

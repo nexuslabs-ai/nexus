@@ -933,13 +933,13 @@
 [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
     [data-slot='input-group-control']:focus-visible
   ) {
-  --color-border-default: var(--color-focus-default);
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
-  border-color: var(--color-focus-default) !important;
-  border-width: 2px;
-  box-shadow: none;
+  border-color: transparent !important;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-default),
+    0 0 0 1px var(--color-focus-default);
 }
 
 [data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
@@ -950,13 +950,13 @@
 [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
     [data-slot='input-group-control'][aria-invalid='true']:focus-visible
   ) {
-  --color-border-error: var(--color-focus-error);
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
-  border-color: var(--color-focus-error) !important;
-  border-width: 2px;
-  box-shadow: none;
+  border-color: transparent !important;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-error),
+    0 0 0 1px var(--color-focus-error);
 }
 
 [data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible,

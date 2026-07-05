@@ -2130,23 +2130,23 @@ ${errorSelectors} {
 }
 
 ${fieldSelectors} {
-  --color-border-default: var(--color-focus-default);
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
-  border-color: var(--color-focus-default) !important;
-  border-width: 2px;
-  box-shadow: none;
+  border-color: transparent !important;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-default),
+    0 0 0 1px var(--color-focus-default);
 }
 
 ${fieldErrorSelectors} {
-  --color-border-error: var(--color-focus-error);
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
-  border-color: var(--color-focus-error) !important;
-  border-width: 2px;
-  box-shadow: none;
+  border-color: transparent !important;
+  box-shadow:
+    inset 0 0 0 1px var(--color-focus-error),
+    0 0 0 1px var(--color-focus-error);
 }
 
 ${inputGroupControlSuppressionSelectors} {
