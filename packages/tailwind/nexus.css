@@ -1081,6 +1081,7 @@
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-default) !important;
+  border-width: 2px;
   box-shadow: none;
 }
 
@@ -1097,6 +1098,15 @@
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-error) !important;
+  border-width: 2px;
+  box-shadow: none;
+}
+
+[data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+[data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
   box-shadow: none;
 }
 
@@ -1154,6 +1164,14 @@
     outline-offset: var(--focus-offset) !important;
     outline-style: solid !important;
     outline-width: 2px !important;
+    box-shadow: none !important;
+  }
+
+  [data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
+  [data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {
+    --tw-outline-style: none !important;
+    outline-color: transparent !important;
+    outline-style: none !important;
     box-shadow: none !important;
   }
 }

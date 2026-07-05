@@ -102,13 +102,19 @@ describe('generateModular', () => {
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(globals).toMatch(
-      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*var\(--color-focus-default\)\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
+      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*var\(--color-focus-default\)\s*!important;[\s\S]*?border-width:\s*2px;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
     );
     expect(globals).toMatch(
       /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(globals).toMatch(
       /--color-border-default:\s*var\(--color-focus-default\);/
+    );
+    expect(globals).toMatch(
+      /\[data-slot='sidebar-input'\]\[class~='nx:aria-invalid:focus-visible:outline-focus-error'\]\[aria-invalid='true'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*var\(--color-focus-error\)\s*!important;[\s\S]*?border-width:\s*2px;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
+    );
+    expect(globals).toMatch(
+      /\[data-slot='input-group-control'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?outline-style:\s*none\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
     );
     expect(globals).toMatch(/outline-style:\s*none\s*!important;/);
     expect(globals).toMatch(/0 0 0 2px var\(--color-focus-default\);/);

@@ -117,7 +117,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       data-slot="input-otp-slot"
       data-active={isActive}
       className={cn(
-        'nx:relative nx:flex nx:size-10 nx:items-center nx:justify-center',
+        'nx:relative nx:flex nx:box-border nx:size-10 nx:items-center nx:justify-center',
         'nx:border-y-default nx:border-r-default nx:border-border-default',
         'nx:group-has-[:disabled]/input-otp:border-border-disabled nx:group-has-[:disabled]/input-otp:bg-disabled nx:group-has-[:disabled]/input-otp:text-disabled-foreground',
         'nx:bg-background nx:text-foreground nx:typography-body-small nx:transition-[color,background-color,border-color] nx:duration-fast nx:motion-reduce:transition-none',

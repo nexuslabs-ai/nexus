@@ -2073,6 +2073,11 @@ const FIELD_ERROR_FOCUS_RING_SELECTORS = [
   "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
 ];
 
+const INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS = [
+  "[data-slot='input-group-control'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='input-group-control'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+];
+
 const BUTTON_FOCUS_RING_SELECTORS = [
   "[data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
 ];
@@ -2095,6 +2100,8 @@ export function generateFocusRingCSS() {
   const errorSelectors = ERROR_FOCUS_RING_SELECTORS.join(',\n');
   const fieldSelectors = FIELD_FOCUS_RING_SELECTORS.join(',\n');
   const fieldErrorSelectors = FIELD_ERROR_FOCUS_RING_SELECTORS.join(',\n');
+  const inputGroupControlSuppressionSelectors =
+    INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS.join(',\n');
   const buttonSelectors = BUTTON_FOCUS_RING_SELECTORS.join(',\n');
   const buttonErrorSelectors = BUTTON_ERROR_FOCUS_RING_SELECTORS.join(',\n');
   const allSelectors = [
@@ -2128,6 +2135,7 @@ ${fieldSelectors} {
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-default) !important;
+  border-width: 2px;
   box-shadow: none;
 }
 
@@ -2137,6 +2145,14 @@ ${fieldErrorSelectors} {
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-error) !important;
+  border-width: 2px;
+  box-shadow: none;
+}
+
+${inputGroupControlSuppressionSelectors} {
+  --tw-outline-style: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
   box-shadow: none;
 }
 
@@ -2165,6 +2181,13 @@ ${buttonErrorSelectors} {
     outline-offset: var(--focus-offset) !important;
     outline-style: solid !important;
     outline-width: 2px !important;
+    box-shadow: none !important;
+  }
+
+  ${inputGroupControlSuppressionSelectors} {
+    --tw-outline-style: none !important;
+    outline-color: transparent !important;
+    outline-style: none !important;
     box-shadow: none !important;
   }
 }

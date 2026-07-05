@@ -51,7 +51,7 @@ const SelectValue = SelectPrimitive.Value;
 
 const selectTriggerVariants = cva(
   [
-    'nx:group/select-trigger nx:flex nx:w-full nx:items-center nx:justify-between nx:gap-2',
+    'nx:group/select-trigger nx:flex nx:box-border nx:w-full nx:items-center nx:justify-between nx:gap-2',
     'nx:rounded-md nx:border-default nx:transition-colors',
     'nx:h-10 nx:px-3 nx:py-0 nx:typography-body-default',
     'nx:whitespace-nowrap',

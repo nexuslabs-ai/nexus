@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 
 const nativeSelectVariants = cva(
   [
-    'nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border-default',
+    'nx:box-border nx:w-full nx:min-w-0 nx:appearance-none nx:rounded-md nx:border-default',
     'nx:text-foreground nx:transition-colors nx:outline-none',
     'nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)',
     'nx:aria-invalid:border-border-error nx:aria-invalid:focus-visible:outline-focus-error',
