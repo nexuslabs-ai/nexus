@@ -246,6 +246,9 @@ describe('generateTailwindPackage', () => {
       /\[data-slot='input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(nexusCSS).toMatch(
+      /\[data-slot='sidebar-input'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible[\s\S]*?\{[\s\S]*?border-color:\s*var\(--color-focus-default\)\s*!important;[\s\S]*?box-shadow:\s*none;[\s\S]*?\}/
+    );
+    expect(nexusCSS).toMatch(
       /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
     );
     expect(nexusCSS).toMatch(

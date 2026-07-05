@@ -2056,6 +2056,7 @@ const ERROR_FOCUS_RING_SELECTORS = [
 
 const FIELD_FOCUS_RING_SELECTORS = [
   "[data-slot='input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
+  "[data-slot='sidebar-input'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
   "[data-slot='textarea'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
   "[data-slot='native-select'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
   "[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
@@ -2065,6 +2066,7 @@ const FIELD_FOCUS_RING_SELECTORS = [
 
 const FIELD_ERROR_FOCUS_RING_SELECTORS = [
   "[data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
+  "[data-slot='sidebar-input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
   "[data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
   "[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
   "[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
