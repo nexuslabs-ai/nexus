@@ -253,6 +253,9 @@ describe('generateTailwindPackage', () => {
     );
     expect(nexusCSS).toMatch(/outline-style:\s*none\s*!important;/);
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
+    expect(nexusCSS).toMatch(/box-shadow:\s*none;/);
+    expect(nexusCSS).not.toMatch(/0 0 0 1px var\(--color-focus-default\);/);
+    expect(nexusCSS).not.toMatch(/0 0 0 1px var\(--color-focus-error\);/);
     expect(nexusCSS).toMatch(/0 0 0 2px var\(--color-background\),/);
     expect(nexusCSS).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
     expect(nexusCSS).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);

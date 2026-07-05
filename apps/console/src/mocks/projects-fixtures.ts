@@ -126,7 +126,7 @@ export const ISSUES: (Issue & { description: string })[] = [
     createdAt: '2026-05-25',
     updatedAt: '2026-06-01',
     description:
-      'The focus ring should follow the active primary accent token, use hard field/button/control treatments, and keep a high-contrast outline fallback for forced-colors users.',
+      'The focus ring should follow the active primary accent token, use border-only field focus plus hard button/control treatments, and keep a high-contrast outline fallback for forced-colors users.',
   },
   {
     id: 'i-11',

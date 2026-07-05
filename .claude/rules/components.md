@@ -151,7 +151,7 @@ The component API stays outline-based even though normal rendering uses box-shad
 
 - **One component contract.** Components keep using `outline-focus-default` / `outline-focus-error`, so the design-system CSS can change the look globally without per-component rewrites.
 - **Windows High Contrast Mode survives.** `forced-colors: active` strips box-shadows, so the generated CSS restores the outline in the user's system focus colour.
-- **Notion-style focus.** Inputs, textareas, selects, and input groups get a focused border plus a 1px outside edge. Buttons get a 2px surface gap plus a 2px outer primary ring. Other keyboard-focusable controls get a hard 2px primary ring.
+- **Notion-style focus.** Inputs, textareas, selects, and input groups use the focused border as the focus edge, with no extra outside edge. Buttons get a 2px surface gap plus a 2px outer primary ring. Other keyboard-focusable controls get a hard 2px primary ring.
 
 ### Uniform primary focus across variants
 

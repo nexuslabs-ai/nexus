@@ -2126,7 +2126,7 @@ ${fieldSelectors} {
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-default) !important;
-  box-shadow: 0 0 0 1px var(--color-focus-default);
+  box-shadow: none;
 }
 
 ${fieldErrorSelectors} {
@@ -2135,7 +2135,7 @@ ${fieldErrorSelectors} {
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-error) !important;
-  box-shadow: 0 0 0 1px var(--color-focus-error);
+  box-shadow: none;
 }
 
 ${buttonSelectors} {

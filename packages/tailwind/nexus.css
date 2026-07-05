@@ -1080,7 +1080,7 @@
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-default) !important;
-  box-shadow: 0 0 0 1px var(--color-focus-default);
+  box-shadow: none;
 }
 
 [data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
@@ -1095,7 +1095,7 @@
   outline-color: transparent !important;
   outline-style: none !important;
   border-color: var(--color-focus-error) !important;
-  box-shadow: 0 0 0 1px var(--color-focus-error);
+  box-shadow: none;
 }
 
 [data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible {

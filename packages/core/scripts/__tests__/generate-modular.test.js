@@ -109,6 +109,9 @@ describe('generateModular', () => {
     );
     expect(globals).toMatch(/outline-style:\s*none\s*!important;/);
     expect(globals).toMatch(/0 0 0 2px var\(--color-focus-default\);/);
+    expect(globals).toMatch(/box-shadow:\s*none;/);
+    expect(globals).not.toMatch(/0 0 0 1px var\(--color-focus-default\);/);
+    expect(globals).not.toMatch(/0 0 0 1px var\(--color-focus-error\);/);
     expect(globals).toMatch(/0 0 0 2px var\(--color-background\),/);
     expect(globals).toMatch(/0 0 0 4px var\(--color-focus-default\);/);
     expect(globals).not.toMatch(/0 0 0 8px var\(--color-focus-default\);/);
