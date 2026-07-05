@@ -316,7 +316,7 @@ describe('deriveTheme', () => {
   });
 
   it.each(['light', 'dark'] as const)(
-    'ties default focus to primary accent and keeps error focus APCA-safe in %s mode',
+    'uses primary accent for shipped default focus and keeps focus colors APCA-safe in %s mode',
     (mode) => {
       const map = deriveTheme(
         createNexusThemeContract(DEFAULT_NEXUS_APPEARANCE)
@@ -334,6 +334,10 @@ describe('deriveTheme', () => {
       );
 
       for (const surface of surfaces) {
+        expect(
+          apcaLc(map['--nx-color-focus-default']!, map[surface]!),
+          `${mode}: --nx-color-focus-default on ${surface}`
+        ).toBeGreaterThanOrEqual(TIER_THRESHOLDS.incidental);
         expect(
           apcaLc(map['--nx-color-focus-error']!, map[surface]!),
           `${mode}: --nx-color-focus-error on ${surface}`

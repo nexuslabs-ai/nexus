@@ -555,7 +555,7 @@ function deriveFocus(
   }
 
   return {
-    '--nx-color-focus-default': primaryFocus,
+    '--nx-color-focus-default': apcaSafeAgainst(primaryFocus, background, mode),
     '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
   };
 }

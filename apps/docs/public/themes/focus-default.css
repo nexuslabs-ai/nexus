@@ -1,9 +1,9 @@
 /* focus: default */
 
 html {
-  --nx-focus-color-error: oklch(0.3958 0.1331 25.723);
+  --nx-focus-color-error: var(--nx-color-red-800);
 }
 
 html.dark {
-  --nx-focus-color-error: oklch(0.8077 0.1035 19.571);
+  --nx-focus-color-error: var(--nx-color-red-300);
 }

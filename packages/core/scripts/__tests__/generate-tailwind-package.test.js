@@ -15,6 +15,7 @@ import {
 } from '../utils.js';
 
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
+const WORKSPACE_ROOT = path.resolve(TEST_DIR, '..', '..', '..', '..');
 const SEMANTIC_DIR = path.resolve(TEST_DIR, '..', '..', 'tokens', 'semantic');
 const require = createRequire(import.meta.url);
 const TAILWIND_ENTRY = require.resolve('tailwindcss/index.css');
@@ -47,6 +48,10 @@ function makeTmpDir() {
 
 function read(distDir, fileName) {
   return fs.readFileSync(path.join(distDir, fileName), 'utf8');
+}
+
+function readWorkspaceFile(...segments) {
+  return fs.readFileSync(path.join(WORKSPACE_ROOT, ...segments), 'utf8');
 }
 
 function extractBlock(css, openSelector) {
@@ -213,7 +218,9 @@ describe('generateTailwindPackage', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
     expect(rootBlock).not.toMatch(/--nx-focus-color-default:/);
-    expect(rootBlock).toMatch(/--nx-focus-color-error:/);
+    expect(rootBlock).toMatch(
+      /--nx-focus-color-error:\s*var\(--nx-color-red-800\);/
+    );
     // Focus is an outline ring; default focus follows primary accent, and the old
     // geometry primitives were dropped.
     expect(rootBlock).not.toMatch(/--nx-focus-geometry-/);
@@ -285,6 +292,120 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 
+  it('keeps field focus selectors aligned with React data-slot contracts', () => {
+    const contracts = [
+      {
+        file: ['packages', 'react', 'src', 'components', 'input', 'input.tsx'],
+        snippets: [
+          'data-slot="input"',
+          'data-variant={variant ??',
+          'nx:focus-visible:outline-focus-default',
+          'nx:aria-invalid:focus-visible:outline-focus-error',
+        ],
+      },
+      {
+        file: [
+          'packages',
+          'react',
+          'src',
+          'components',
+          'textarea',
+          'textarea.tsx',
+        ],
+        snippets: [
+          'data-slot="textarea"',
+          'data-variant={variant ??',
+          'nx:focus-visible:outline-focus-default',
+          'nx:aria-invalid:focus-visible:outline-focus-error',
+        ],
+      },
+      {
+        file: [
+          'packages',
+          'react',
+          'src',
+          'components',
+          'native-select',
+          'native-select.tsx',
+        ],
+        snippets: [
+          'data-slot="native-select"',
+          'data-variant={variant ??',
+          'nx:focus-visible:outline-focus-default',
+          'nx:aria-invalid:focus-visible:outline-focus-error',
+        ],
+      },
+      {
+        file: [
+          'packages',
+          'react',
+          'src',
+          'components',
+          'select',
+          'select.tsx',
+        ],
+        snippets: [
+          'data-slot="select-trigger"',
+          'data-variant={variant ??',
+          'nx:focus-visible:outline-focus-default',
+          'nx:aria-invalid:focus-visible:outline-focus-error',
+        ],
+      },
+      {
+        file: [
+          'packages',
+          'react',
+          'src',
+          'components',
+          'input-group',
+          'input-group.tsx',
+        ],
+        snippets: [
+          'data-slot="input-group"',
+          'data-slot="input-group-control"',
+          'nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default',
+          'nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error',
+          'nx:focus-visible:outline-none',
+        ],
+      },
+      {
+        file: [
+          'packages',
+          'react',
+          'src',
+          'components',
+          'input-otp',
+          'input-otp.tsx',
+        ],
+        snippets: [
+          'data-slot="input-otp-slot"',
+          'data-active={isActive}',
+          'nx:data-[active=true]:outline-focus-default',
+        ],
+      },
+      {
+        file: [
+          'packages',
+          'react',
+          'src',
+          'components',
+          'sidebar',
+          'sidebar.tsx',
+        ],
+        snippets: ['data-slot="sidebar-input"'],
+      },
+    ];
+
+    for (const { file, snippets } of contracts) {
+      const source = readWorkspaceFile(...file);
+      for (const snippet of snippets) {
+        expect(source, `${file.join('/')} missing ${snippet}`).toContain(
+          snippet
+        );
+      }
+    }
+  });
+
   it('bridges every semantic color utility to its runtime override with a static fallback', () => {
     const themeBlock = extractBlock(nexusCSS, '@theme inline');
     const colorLines = themeColorLines(themeBlock);
@@ -323,13 +444,13 @@ describe('generateTailwindPackage', () => {
     );
   });
 
-  // Every var(--nx-shadow-*) or var(--nx-focus-*) ref in nexus.css must have a
-  // matching decl in :root of variables.css; missing decls render the utility
-  // flat. Error focus still points at --nx-focus-* primitives directly.
-  it('every var(--nx-(shadow|focus)-*) ref in nexus.css has a matching decl in :root', () => {
-    const rootBlock = extractBlock(variablesCSS, ':root');
+  // Every generated focus/shadow primitive ref and every --color-* fallback ref
+  // in nexus.css must have a matching emitted declaration. Runtime override vars
+  // like --nx-color-focus-default are intentionally optional and excluded.
+  it('every generated focus/shadow and color fallback ref in nexus.css has a matching declaration', () => {
+    const declarationCSS = `${variablesCSS}\n${nexusCSS}`;
 
-    const refPattern = /var\(--(nx-(?:shadow|focus)-[a-z0-9-]+)\)/g;
+    const refPattern = /var\(--((?:nx-(?:shadow|focus)-|color-)[a-z0-9-]+)\b/g;
     const refs = new Set();
     let match;
     while ((match = refPattern.exec(nexusCSS)) !== null) {
@@ -340,7 +461,7 @@ describe('generateTailwindPackage', () => {
 
     const missing = [];
     for (const varName of refs) {
-      if (!new RegExp(`--${varName}:`).test(rootBlock)) {
+      if (!declarationCSS.includes(`--${varName}:`)) {
         missing.push(varName);
       }
     }
@@ -357,7 +478,9 @@ describe('generateTailwindPackage', () => {
     const darkBlock = extractBlock(variablesCSS, '.dark');
 
     expect(darkBlock).not.toMatch(/--nx-focus-color-default:/);
-    expect(darkBlock).toMatch(/--nx-focus-color-error:/);
+    expect(darkBlock).toMatch(
+      /--nx-focus-color-error:\s*var\(--nx-color-red-300\);/
+    );
     expect(darkBlock).toMatch(/--nx-shadow-2xs-layer-1-color:/);
     expect(darkBlock).toMatch(/--nx-shadow-sm-layer-1-color:/);
 

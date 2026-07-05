@@ -1,7 +1,7 @@
 {
   "color": {
     "error": {
-      "$value": "#fca5a5",
+      "$value": "{red.300}",
       "$type": "color"
     }
   }

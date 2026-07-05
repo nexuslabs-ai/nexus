@@ -91,6 +91,20 @@ describe('generateModular', () => {
     expect(globals).not.toMatch(/light-dark\(/);
   });
 
+  it('emits focus error primitives through Nexus red scale tokens', () => {
+    const focus = fs.readFileSync(
+      path.join(distDir, 'focus-default.css'),
+      'utf8'
+    );
+
+    expect(focus).toMatch(
+      /--nx-focus-color-error:\s*var\(--nx-color-red-800\);/
+    );
+    expect(focus).toMatch(
+      /\.dark \{[\s\S]*--nx-focus-color-error:\s*var\(--nx-color-red-300\);/
+    );
+  });
+
   it('emits the shared focus ring treatment in globals.css', () => {
     const globals = fs.readFileSync(path.join(distDir, 'globals.css'), 'utf8');
 

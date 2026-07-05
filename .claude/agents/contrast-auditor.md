@@ -170,7 +170,7 @@ Shade-step doesn't apply. Propose either:
 Call this case out explicitly in the **Proposed reroute** column. Do not paper
 over with a fake shade-step.
 
-#### Case C — error focus primitive (literal hex)
+#### Case C — error focus primitive (red primitive reference)
 
 Error focus fg lives in
 `packages/core/tokens/primitives/focus/focus-default-{theme}.json` with shape:
@@ -178,21 +178,19 @@ Error focus fg lives in
 ```json
 {
   "color": {
-    "error": { "$value": "#7f1d1d", "$type": "color" }
+    "error": { "$value": "{red.800}", "$type": "color" }
   }
 }
 ```
 
 Read `data.color.error.$value` for `color.error` failures. Default focus
 failures route through `primary.subtle-foreground`, not this primitive file.
-**Display the actual current hex** in the table so the user has the anchor for
-retuning.
+**Display the actual current red primitive reference** in the table so the user
+has the anchor for retuning.
 
-Output the **target L value** the new hex must land at (one grid row from
-current in the contrast-increasing direction, with the relevant `bg` L for
-context). Point at the file. **Do not propose a specific hex** — picking a hex
-at a target L is colour-theory better left to the designer or the
-`figma-use` workflow.
+Output the **target red shade step** in the contrast-increasing direction, with
+the relevant `bg` L for context. Point at the file. **Do not propose a specific
+hex** — retune by changing the red primitive reference.
 
 #### Case D — chart-categorical pair
 
