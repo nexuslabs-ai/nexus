@@ -1040,7 +1040,7 @@
 
 /* ===== RUNTIME DIMENSION TOKENS ===== */
 :root {
-  --focus-offset: 2px;
+  --focus-offset: 1px;
 }
 
 /* ===== PER-MODE SPACING (mode swap via [data-density="X"] on any ancestor) ===== */

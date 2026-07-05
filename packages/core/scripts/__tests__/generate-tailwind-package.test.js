@@ -223,7 +223,7 @@ describe('generateTailwindPackage', () => {
   // outline-focus-* utilities. Default focus falls through to primary accent; error
   // focus keeps its primitive-backed token. The ring is outline-only — no focus
   // box-shadow tokens of any kind (the geometry-composed --shadow-focus-* are gone).
-  // The 2px C40 offset is also tokenised so components share one tune-point.
+  // The tight outline offset is also tokenised so components share one tune-point.
   // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
   // vars referenced only via arbitrary utilities, #506). The count guard also
   // catches duplicate emission via the dimension scan (the --breakpoint-* trap).
@@ -237,7 +237,7 @@ describe('generateTailwindPackage', () => {
     );
     expect(nexusCSS.match(/--focus-offset:/g)).toHaveLength(1);
     expect(themeBlock).not.toMatch(/--focus-offset/);
-    expect(nexusCSS).toMatch(/:root\s*\{[^}]*--focus-offset: 2px;[^}]*\}/);
+    expect(nexusCSS).toMatch(/:root\s*\{[^}]*--focus-offset: 1px;[^}]*\}/);
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 

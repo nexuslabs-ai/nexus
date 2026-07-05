@@ -129,7 +129,7 @@ No shipped component needs this yet — it's the rule for the first one that doe
 
 ## Focus States
 
-Use the design-system focus token with a real `outline` and the tokenised offset (`--focus-offset`, currently `2px`), not Tailwind `ring-*` utilities and not box-shadow:
+Use the design-system focus token with a real `outline` and the tokenised offset (`--focus-offset`, currently `1px`), not Tailwind `ring-*` utilities and not box-shadow:
 
 ```
 nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset)
@@ -149,7 +149,7 @@ Live consumer: `packages/react/src/components/input/input.tsx`.
 
 The ring is a real `outline` (not `box-shadow`) for two reasons:
 
-- **WCAG 2.4.7 + technique C40 compliance.** A 2px offset puts the ring on the surface _next to_ the control, so even on a same-coloured fill (primary button on a near-blue canvas) the ring stays legible against the background — without the system needing to detect the surrounding fill.
+- **WCAG 2.4.7 compliance.** A positive offset puts the ring on the surface _next to_ the control, so even on a same-coloured fill (primary button on a near-blue canvas) the ring stays legible against the background — without the system needing to detect the surrounding fill.
 - **Windows High Contrast Mode survives.** `forced-colors: active` strips backgrounds and box-shadows but preserves outlines. A box-shadow ring disappears entirely under WHCM; an outline ring renders in the user's system focus colour.
 
 ### Uniform primary focus across variants

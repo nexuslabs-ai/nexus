@@ -190,7 +190,7 @@ const CHART_SURFACES = ['background', 'container'];
 // `muted` and `disabled` are intentionally excluded — they are non-focusable
 // fills (de-emphasised text backgrounds and disabled-state backdrops).
 // Nav surfaces are included because focusable controls inside nav chrome use
-// the universal focus ring (no `nav-ring`) — so the 2px-offset ring paints
+// the universal focus ring (no `nav-ring`) — so the offset ring paints
 // onto nav-background, nav-item-{hover,active}, or nav-border, all of which
 // must clear the gate.
 const FOCUS_SURFACES = [

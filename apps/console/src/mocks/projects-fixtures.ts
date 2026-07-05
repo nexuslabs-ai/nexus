@@ -126,7 +126,7 @@ export const ISSUES: (Issue & { description: string })[] = [
     createdAt: '2026-05-25',
     updatedAt: '2026-06-01',
     description:
-      'The focus outline should follow the active primary accent token while keeping a 2px offset so it reads separately from the control fill.',
+      'The focus outline should follow the active primary accent token while keeping a tight 1px offset so it reads separately from the control fill without floating away from it.',
   },
   {
     id: 'i-11',
