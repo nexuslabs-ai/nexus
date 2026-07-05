@@ -515,7 +515,7 @@
   );
   --color-focus-default: var(
     --nx-color-focus-default,
-    var(--nx-focus-color-default)
+    var(--color-primary-subtle-foreground)
   );
   --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
 }
@@ -890,7 +890,7 @@
   );
   --color-focus-default: var(
     --nx-color-focus-default,
-    var(--nx-focus-color-default)
+    var(--color-primary-subtle-foreground)
   );
   --color-focus-error: var(--nx-color-focus-error, var(--nx-focus-color-error));
 }

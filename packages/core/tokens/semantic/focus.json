@@ -1,7 +1,7 @@
 {
   "focus": {
     "default": {
-      "$value": "{focus.color.default}",
+      "$value": "{primary.subtle-foreground}",
       "$type": "color"
     },
     "error": {

@@ -67,9 +67,9 @@ const PAPER_L = 0.987;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
 const FLAT_IN_LIGHT = new Set(['container', 'popover']);
 const FOCUS_APCA_FLOOR = 45;
-const FOCUS_SEEDS = {
-  light: { default: '#1e3a8a', error: '#7f1d1d' },
-  dark: { default: '#9dc1ee', error: '#fca5a5' },
+const FOCUS_ERROR_SEEDS = {
+  light: '#7f1d1d',
+  dark: '#fca5a5',
 } as const;
 
 function anchoredContrastLerp(
@@ -537,18 +537,19 @@ function deriveAlpha(
   };
 }
 
-function deriveFocus(mode: Mode, surfaces: TokenMap): TokenMap {
-  const seeds = FOCUS_SEEDS[mode];
+function deriveFocus(
+  mode: Mode,
+  surfaces: TokenMap,
+  primary: TokenMap
+): TokenMap {
+  const errorSeed = FOCUS_ERROR_SEEDS[mode];
   const background =
     surfaces['--nx-color-background'] ??
     (mode === 'dark' ? 'oklch(0 0 0)' : 'oklch(1 0 0)');
   return {
-    '--nx-color-focus-default': apcaSafeAgainst(
-      seeds.default,
-      background,
-      mode
-    ),
-    '--nx-color-focus-error': apcaSafeAgainst(seeds.error, background, mode),
+    '--nx-color-focus-default':
+      primary['--nx-color-primary-subtle-foreground']!,
+    '--nx-color-focus-error': apcaSafeAgainst(errorSeed, background, mode),
   };
 }
 
@@ -600,7 +601,7 @@ function deriveMode(
   const status = deriveStatus(mode);
   const chart = deriveChart(mode);
   const alpha = deriveAlpha(surfaceTone, mode, profile);
-  const focus = deriveFocus(mode, surfaces);
+  const focus = deriveFocus(mode, surfaces, primary);
   return {
     ...surfaces,
     ...text,

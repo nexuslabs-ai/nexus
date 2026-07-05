@@ -264,7 +264,7 @@ shadcn 2024+ ships a `sidebar-*` namespace; Nexus uses `nav-*` for the equivalen
 
 | shadcn                   | Nexus                                              | Notes                                                           |
 | ------------------------ | -------------------------------------------------- | --------------------------------------------------------------- |
-| `ring-ring`              | `nx:outline-focus-default`                         | Focus ring colour (brand blue)                                  |
+| `ring-ring`              | `nx:outline-focus-default`                         | Focus ring colour (current primary accent)                      |
 | `ring-offset-background` | `nx:focus-visible:outline-offset-(--focus-offset)` | Real outline offset (tokenised `--focus-offset`, currently 2px) |
 | `focus-visible:ring-2`   | `nx:focus-visible:outline-2`                       | Outline width                                                   |
 | —                        | `nx:focus-visible:outline-focus-error`             | Error ring (invalid inputs)                                     |

@@ -186,8 +186,7 @@ const CHART_SURFACES = ['background', 'container'];
 
 // Focus indicators target WCAG 2.2 SC 1.4.11 (3:1 non-text contrast),
 // which APCA encodes as the incidental tier (Lc 45). Pair against every
-// base palette surface focusable controls actually render on per theme;
-// the focus color is theme-aware and loaded from primitives/focus/.
+// base palette surface focusable controls actually render on per theme.
 // `muted` and `disabled` are intentionally excluded — they are non-focusable
 // fills (de-emphasised text backgrounds and disabled-state backdrops).
 // Nav surfaces are included because focusable controls inside nav chrome use
@@ -203,10 +202,18 @@ const FOCUS_SURFACES = [
   'nav-item-active',
   'nav-border',
 ];
-const FOCUS_COLORS = ['color.default', 'color.error'];
-const FOCUS_PAIRS = FOCUS_COLORS.flatMap((fg) =>
-  FOCUS_SURFACES.map((bg) => ({ fg, bg, minLc: 45, tier: 'incidental' }))
-);
+const FOCUS_PRIMARY_PAIRS = FOCUS_SURFACES.map((bg) => ({
+  fg: 'primary.subtle-foreground',
+  bg,
+  minLc: 45,
+  tier: 'incidental',
+}));
+const FOCUS_ERROR_PAIRS = FOCUS_SURFACES.map((bg) => ({
+  fg: 'color.error',
+  bg,
+  minLc: 45,
+  tier: 'incidental',
+}));
 
 const REF_RE = /^\{([^}]+)\}$/;
 
@@ -432,6 +439,24 @@ function main() {
           primitiveMap
         )
       );
+
+      for (const palette of BASE_PALETTES) {
+        const bgFilePath = path.join(
+          SEMANTIC_DIR,
+          `base-${palette}-${theme}.json`
+        );
+        if (!fs.existsSync(bgFilePath)) continue;
+
+        sections.push(
+          auditPairs(
+            fileData,
+            readTokenFile(bgFilePath),
+            `${path.basename(bgFilePath)} ↔ ${path.basename(filePath)} focus`,
+            FOCUS_PRIMARY_PAIRS,
+            primitiveMap
+          )
+        );
+      }
     }
   }
 
@@ -439,7 +464,7 @@ function main() {
     ...auditCrossFileLoop({
       themes: THEMES,
       palettes: BASE_PALETTES,
-      pairs: FOCUS_PAIRS,
+      pairs: FOCUS_ERROR_PAIRS,
       fgFile: (theme) =>
         path.join(FOCUS_PRIMITIVES_DIR, `focus-default-${theme}.json`),
       fgLabel: (theme) => `focus-default-${theme}.json`,

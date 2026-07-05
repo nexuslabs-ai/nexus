@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   collectBreakpointsTokens,
+  collectSemanticColorTokensVarRef,
   collectSpacingTokens,
   collectZIndexTokens,
   DEFAULT_CONFIG,
@@ -642,6 +643,45 @@ describe('utils', () => {
         fs.writeFileSync(path.join(dir, 'focus.json'), JSON.stringify({}));
         const result = discoverSemantics(dir);
         expect(result.perModeFiles).toEqual({});
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe('collectSemanticColorTokensVarRef', () => {
+    it('preserves primitive references and maps semantic references to color aliases', () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-sem-test-'));
+      try {
+        fs.writeFileSync(
+          path.join(dir, 'focus.json'),
+          JSON.stringify({
+            focus: {
+              default: {
+                $value: '{primary.subtle-foreground}',
+                $type: 'color',
+              },
+              error: { $value: '{focus.color.error}', $type: 'color' },
+            },
+          })
+        );
+
+        const primitiveMap = new Map([
+          ['focus.color.error', { cssName: 'nx-focus-color-error' }],
+        ]);
+
+        expect(
+          collectSemanticColorTokensVarRef(dir, 'focus.json', primitiveMap)
+        ).toEqual([
+          {
+            cssName: 'color-focus-default',
+            value: 'var(--color-primary-subtle-foreground)',
+          },
+          {
+            cssName: 'color-focus-error',
+            value: 'var(--nx-focus-color-error)',
+          },
+        ]);
       } finally {
         fs.rmSync(dir, { recursive: true, force: true });
       }

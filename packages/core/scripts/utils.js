@@ -500,7 +500,7 @@ export const log = {
 /**
  * Format a shadow property value as a var() reference or literal.
  * References are resolved through the primitive map so the var name matches
- * the actual primitive cssName (e.g. `{color.default}` → `var(--nx-focus-color-default)`
+ * the actual primitive cssName (e.g. `{color.error}` → `var(--nx-focus-color-error)`
  * when the focus primitive provides it). This means shadow property references
  * can point to any primitive category, not just `--nx-shadow-*`.
  */
@@ -1756,6 +1756,8 @@ export function collectSemanticColorTokensVarRef(
           const primitiveInfo = primitiveMap.get(refPath);
           if (primitiveInfo) {
             resolvedValue = `var(--${primitiveInfo.cssName})`;
+          } else {
+            resolvedValue = `var(--color-${refPath.replace(/\./g, '-')})`;
           }
         } else {
           resolvedValue = formatTokenValue(resolvedValue, 'color', currentPath);

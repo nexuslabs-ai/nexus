@@ -209,18 +209,20 @@ describe('generateTailwindPackage', () => {
     expect(variablesCSS).toMatch(/^:root \{/m);
   });
 
-  it('emits focus colour primitives but no geometry in :root (light values)', () => {
+  it('emits focus error primitive but no default focus primitive or geometry in :root', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
     expect(rootBlock).toMatch(/--nx-shadow-2xs-layer-1-x: 0px;/);
-    expect(rootBlock).toMatch(/--nx-focus-color-default:/);
+    expect(rootBlock).not.toMatch(/--nx-focus-color-default:/);
     expect(rootBlock).toMatch(/--nx-focus-color-error:/);
-    // Focus is an outline ring; the geometry primitives were dropped.
+    // Focus is an outline ring; default focus follows primary accent, and the old
+    // geometry primitives were dropped.
     expect(rootBlock).not.toMatch(/--nx-focus-geometry-/);
   });
 
   // Focus colours are promoted to the --color-* namespace so Tailwind emits
-  // outline-focus-* utilities. The ring is outline-only — no focus box-shadow
-  // tokens of any kind (the geometry-composed --shadow-focus-* are gone).
+  // outline-focus-* utilities. Default focus falls through to primary accent; error
+  // focus keeps its primitive-backed token. The ring is outline-only — no focus
+  // box-shadow tokens of any kind (the geometry-composed --shadow-focus-* are gone).
   // The 2px C40 offset is also tokenised so components share one tune-point.
   // --focus-offset emits once at :root (not @theme: Tailwind tree-shakes @theme
   // vars referenced only via arbitrary utilities, #506). The count guard also
@@ -228,7 +230,7 @@ describe('generateTailwindPackage', () => {
   it('promotes focus colours to --color-* and emits --focus-offset once at :root; no focus box-shadow', () => {
     const themeBlock = compactCss(extractBlock(nexusCSS, '@theme inline'));
     expect(themeBlock).toMatch(
-      /--color-focus-default: var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);/
+      /--color-focus-default: var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);/
     );
     expect(themeBlock).toMatch(
       /--color-focus-error: var\(\s*--nx-color-focus-error,\s*var\(--nx-focus-color-error\)\s*\);/
@@ -257,7 +259,7 @@ describe('generateTailwindPackage', () => {
       /:root\s*\{[\s\S]*--color-background:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);[\s\S]*\}/
     );
     expect(nexusCSS).toMatch(
-      /:root\s*\{[\s\S]*--color-focus-default:\s*var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);[\s\S]*\}/
+      /:root\s*\{[\s\S]*--color-focus-default:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);[\s\S]*\}/
     );
   });
 
@@ -273,14 +275,13 @@ describe('generateTailwindPackage', () => {
       /background-color:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);/
     );
     expect(css).toMatch(
-      /outline-color:\s*var\(\s*--nx-color-focus-default,\s*var\(--nx-focus-color-default\)\s*\);/
+      /outline-color:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);/
     );
   });
 
   // Every var(--nx-shadow-*) or var(--nx-focus-*) ref in nexus.css must have a
   // matching decl in :root of variables.css; missing decls render the utility
-  // flat. Focus refs are covered because shadow composites built from
-  // styles/shadows.json now point at --nx-focus-* primitives directly.
+  // flat. Error focus still points at --nx-focus-* primitives directly.
   it('every var(--nx-(shadow|focus)-*) ref in nexus.css has a matching decl in :root', () => {
     const rootBlock = extractBlock(variablesCSS, ':root');
 
@@ -304,14 +305,14 @@ describe('generateTailwindPackage', () => {
   });
 
   // The .dark block must contain only dark tokens whose value diverges from
-  // their `:root` counterpart by cssName. Focus colors live in their own
-  // primitive category (primitives/focus/) and supply the focus divergence.
+  // their `:root` counterpart by cssName. Error focus lives in the focus
+  // primitive category and supplies the focus divergence.
   // Default elevation shadows now also carry dark-only color tuning; geometry
   // stays shared, so only the diverging shadow colour leaves should appear.
   it('.dark block contains only tokens that diverge from :root by value', () => {
     const darkBlock = extractBlock(variablesCSS, '.dark');
 
-    expect(darkBlock).toMatch(/--nx-focus-color-default:/);
+    expect(darkBlock).not.toMatch(/--nx-focus-color-default:/);
     expect(darkBlock).toMatch(/--nx-focus-color-error:/);
     expect(darkBlock).toMatch(/--nx-shadow-2xs-layer-1-color:/);
     expect(darkBlock).toMatch(/--nx-shadow-sm-layer-1-color:/);
