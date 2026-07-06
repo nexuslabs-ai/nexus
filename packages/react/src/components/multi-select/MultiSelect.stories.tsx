@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '../field';
 
@@ -40,6 +40,12 @@ const groupedOptions: MultiSelectOptionInput[] = [
     ],
   },
 ];
+
+async function waitForPopoverSettle() {
+  await new Promise<void>((resolve) => {
+    window.setTimeout(resolve, 350);
+  });
+}
 
 const meta: Meta<typeof MultiSelect> = {
   title: 'Components/MultiSelect',
@@ -293,6 +299,13 @@ export const ClickInteraction: Story = {
     const input = canvas.getByRole('combobox', { name: 'Click frameworks' });
 
     await userEvent.click(input);
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await waitForPopoverSettle();
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      document.body.querySelector('[data-slot="multi-select-content"]')
+    ).toHaveAttribute('data-state', 'open');
+
     const listbox = await within(document.body).findByRole('listbox');
     await userEvent.click(
       within(listbox).getByRole('option', { name: 'Next.js' })
@@ -303,6 +316,7 @@ export const ClickInteraction: Story = {
 
     await expect(canvas.getByText('Next.js')).toBeVisible();
     await expect(canvas.getByText('Astro')).toBeVisible();
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
   },
 };
 

@@ -234,6 +234,7 @@ function Combobox({
   const inputId = id ?? `${generatedId}-input`;
   const popupId = `${generatedId}-popup`;
   const listboxId = `${generatedId}-listbox`;
+  const rootRef = React.useRef<HTMLDivElement>(null);
   const groups = React.useMemo(
     () => normalizeSelectionGroups(options),
     [options]
@@ -393,6 +394,18 @@ function Combobox({
     [onBlur]
   );
 
+  const handleContentInteractOutside = React.useCallback<
+    NonNullable<
+      React.ComponentProps<typeof PopoverPrimitive.Content>['onInteractOutside']
+    >
+  >((event) => {
+    const target = event.target;
+
+    if (target instanceof Node && rootRef.current?.contains(target)) {
+      event.preventDefault();
+    }
+  }, []);
+
   React.useEffect(() => {
     if (!open) resetInputValue();
   }, [open, resetInputValue, value]);
@@ -412,6 +425,7 @@ function Combobox({
         data-size={size}
         className={cn('nx:w-full', className)}
         {...props}
+        ref={rootRef}
       >
         <PopoverPrimitive.Anchor asChild>
           <InputGroup
@@ -494,6 +508,7 @@ function Combobox({
           sideOffset={4}
           className={comboboxContentClassName}
           onCloseAutoFocus={(event) => event.preventDefault()}
+          onInteractOutside={handleContentInteractOutside}
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           {loading ? (

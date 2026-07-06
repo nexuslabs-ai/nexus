@@ -390,6 +390,7 @@ function MultiSelect({
   const inputId = id ?? `${generatedId}-input`;
   const popupId = `${generatedId}-popup`;
   const listboxId = `${generatedId}-listbox`;
+  const rootRef = React.useRef<HTMLDivElement>(null);
   const groups = React.useMemo(
     () => normalizeSelectionGroups(options),
     [options]
@@ -568,6 +569,18 @@ function MultiSelect({
     [onBlur]
   );
 
+  const handleContentInteractOutside = React.useCallback<
+    NonNullable<
+      React.ComponentProps<typeof PopoverPrimitive.Content>['onInteractOutside']
+    >
+  >((event) => {
+    const target = event.target;
+
+    if (target instanceof Node && rootRef.current?.contains(target)) {
+      event.preventDefault();
+    }
+  }, []);
+
   React.useEffect(() => {
     if (!activeId) return;
     document.getElementById(activeId)?.scrollIntoView({ block: 'nearest' });
@@ -583,6 +596,7 @@ function MultiSelect({
         data-size={size}
         className={cn('nx:w-full', className)}
         {...props}
+        ref={rootRef}
       >
         <PopoverPrimitive.Anchor asChild>
           <div
@@ -707,6 +721,7 @@ function MultiSelect({
           sideOffset={4}
           className={multiSelectContentClassName}
           onCloseAutoFocus={(event) => event.preventDefault()}
+          onInteractOutside={handleContentInteractOutside}
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           {loading ? (
