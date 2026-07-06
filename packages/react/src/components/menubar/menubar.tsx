@@ -4,6 +4,7 @@ import * as MenubarPrimitive from '@radix-ui/react-menubar';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { IconCheck, IconChevronRight, IconCircleFilled } from '../../lib/icons';
+import { selectionIndicatorMotionClassName } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 import {
   staggeredItemClassName,
@@ -342,7 +343,7 @@ function MenubarCheckboxItem({
     <MenubarPrimitive.CheckboxItem
       data-slot="menubar-checkbox-item"
       className={cn(
-        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
+        'nx:group nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
@@ -353,9 +354,21 @@ function MenubarCheckboxItem({
       checked={checked}
       {...props}
     >
-      <span className="nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
-        <MenubarPrimitive.ItemIndicator>
-          <IconCheck className="nx:size-4" />
+      <span className="nx:pointer-events-none nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
+        <MenubarPrimitive.ItemIndicator
+          forceMount
+          data-slot="menubar-checkbox-indicator"
+        >
+          <IconCheck
+            data-slot="menubar-checkbox-indicator-icon"
+            aria-hidden="true"
+            className={cn(
+              'nx:size-4',
+              selectionIndicatorMotionClassName,
+              'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100',
+              'nx:group-data-[state=indeterminate]:scale-100 nx:group-data-[state=indeterminate]:opacity-100'
+            )}
+          />
         </MenubarPrimitive.ItemIndicator>
       </span>
       {children}
@@ -394,7 +407,7 @@ function MenubarRadioItem({
     <MenubarPrimitive.RadioItem
       data-slot="menubar-radio-item"
       className={cn(
-        'nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
+        'nx:group nx:relative nx:flex nx:cursor-default nx:select-none nx:items-center',
         'nx:rounded-sm nx:py-1.5 nx:pl-8 nx:pr-2 nx:typography-body-default nx:outline-none',
         'nx:transition-colors',
         'nx:focus:bg-popover-hover nx:focus:text-popover-foreground',
@@ -404,9 +417,20 @@ function MenubarRadioItem({
       )}
       {...props}
     >
-      <span className="nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
-        <MenubarPrimitive.ItemIndicator>
-          <IconCircleFilled className="nx:size-2" />
+      <span className="nx:pointer-events-none nx:absolute nx:left-2 nx:flex nx:size-3.5 nx:items-center nx:justify-center">
+        <MenubarPrimitive.ItemIndicator
+          forceMount
+          data-slot="menubar-radio-indicator"
+        >
+          <IconCircleFilled
+            data-slot="menubar-radio-indicator-icon"
+            aria-hidden="true"
+            className={cn(
+              'nx:size-2',
+              selectionIndicatorMotionClassName,
+              'nx:group-data-[state=checked]:scale-100 nx:group-data-[state=checked]:opacity-100'
+            )}
+          />
         </MenubarPrimitive.ItemIndicator>
       </span>
       {children}
