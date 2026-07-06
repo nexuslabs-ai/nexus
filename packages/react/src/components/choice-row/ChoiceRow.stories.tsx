@@ -260,6 +260,15 @@ export const WithDataAttributes: Story = {
     await expect(row).not.toHaveAttribute('tabindex');
     await expect(row).toHaveClass('nx:min-h-8');
     await expect(row).toHaveClass('nx:pointer-coarse:min-h-11');
+    await expect(row).toHaveClass(
+      'nx:has-[>[data-slot=choice-row-content]]:items-start'
+    );
+    await expect(row).toHaveClass(
+      'nx:has-[>[data-slot=choice-row-content]]:[&>[role=checkbox]]:mt-px'
+    );
+    await expect(row).toHaveClass(
+      'nx:has-[>[data-slot=choice-row-content]]:[&>[role=radio]]:mt-px'
+    );
     await expect(content).toHaveAttribute('data-slot', 'choice-row-content');
     await expect(title).toHaveAttribute('data-slot', 'choice-row-title');
     await expect(description).toHaveAttribute(
