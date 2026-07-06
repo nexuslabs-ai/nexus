@@ -29,8 +29,10 @@ interface RadioGroupItemProps extends React.ComponentProps<
  *
  * A set of mutually exclusive options where exactly one can be selected. Render
  * one `RadioGroupItem` per option; Radix handles roving focus and arrow-key
- * navigation between them. Control the selection with `value` / `onValueChange`,
- * or set an initial selection with `defaultValue`.
+ * navigation between them. Wrap each item in `ChoiceRow` for compact row-owned
+ * choices, or pair it with `Label` for simple inline labels. Control the
+ * selection with `value` / `onValueChange`, or set an initial selection with
+ * `defaultValue`.
  *
  * @example
  * ```tsx
