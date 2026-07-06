@@ -4,6 +4,8 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectStaggeredItemMotion } from '../../stories/support/motion-test-utils';
 import { expectInterruptibleOverlayMotion } from '../../stories/support/overlay-motion-test-utils';
 import { expectHeightPinned } from '../../stories/support/story-height-test-utils';
+import { Combobox } from '../combobox';
+import { MultiSelect } from '../multi-select';
 import { NativeSelect, NativeSelectOption } from '../native-select';
 
 import {
@@ -254,7 +256,7 @@ export const CapabilityLadder: Story = {
     docs: {
       description: {
         story:
-          'Capability ladder: use NativeSelect for native form submission and OS pickers with simple text options; use Select for a styled trigger/listbox with groups, separators, and disabled items. Future Combobox and MultiSelect remain roadmap-only boundaries and are not implemented here.',
+          'Capability ladder: use NativeSelect for native form submission and OS pickers with simple text options; use Select for a styled trigger/listbox; use Combobox for searchable single selection; use MultiSelect for searchable multiple selection with chips.',
       },
     },
   },
@@ -296,21 +298,39 @@ export const CapabilityLadder: Story = {
           </SelectContent>
         </Select>
       </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
-          Future Combobox
+          Combobox
         </h3>
         <p className="nx:typography-body-small nx:text-muted-foreground">
-          Roadmap boundary for searchable or async single selection.
+          Searchable single selection with an editable input.
         </p>
+        <Combobox
+          aria-label="Searchable framework"
+          defaultValue="next"
+          options={[
+            { value: 'next', label: 'Next.js' },
+            { value: 'sveltekit', label: 'SvelteKit' },
+            { value: 'remix', label: 'Remix' },
+          ]}
+        />
       </section>
-      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-dashed nx:border-border-default nx:p-4">
+      <section className="nx:grid nx:gap-2 nx:rounded-md nx:border-default nx:border-border-default nx:p-4">
         <h3 className="nx:typography-label-default nx:text-foreground">
-          Future MultiSelect
+          MultiSelect
         </h3>
         <p className="nx:typography-body-small nx:text-muted-foreground">
-          Roadmap boundary for multiple selected values and chip summaries.
+          Searchable multiple selection with removable chips.
         </p>
+        <MultiSelect
+          aria-label="Searchable frameworks"
+          defaultValue={['next', 'remix']}
+          options={[
+            { value: 'next', label: 'Next.js' },
+            { value: 'sveltekit', label: 'SvelteKit' },
+            { value: 'remix', label: 'Remix' },
+          ]}
+        />
       </section>
     </div>
   ),
