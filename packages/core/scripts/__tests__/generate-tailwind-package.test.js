@@ -288,10 +288,14 @@ describe('generateTailwindPackage', () => {
     expect(nexusCSS).not.toMatch(/--shadow-focus-/);
   });
 
-  it('keeps field focus selectors aligned with React data-slot contracts', () => {
-    // Derive the contract from the emitted FOCUS RING block (the single source):
-    // a data-slot or class rename on either the generator or a component side
-    // fails here, and a newly targeted field is covered with no hand list.
+  it('emits no orphaned focus selectors — every targeted slot and class lives on a component', () => {
+    // Derive the contract from the emitted FOCUS RING block (single source):
+    // every data-slot and focus class the generated CSS targets must exist in a
+    // component, so a generator-side rename or a dropped field fails here and new
+    // fields are covered with no hand list. Per-component class co-location is not
+    // checked here: composed controls (SidebarInput, InputGroup's control) inherit
+    // their focus classes from Input at runtime, so a source grep would false-fail
+    // — runtime co-location is a component-story concern.
     const start = nexusCSS.indexOf('/* ===== FOCUS RING ===== */');
     expect(start, 'FOCUS RING block is emitted').toBeGreaterThanOrEqual(0);
     const end = nexusCSS.indexOf('/* ===== ', start + 10);
