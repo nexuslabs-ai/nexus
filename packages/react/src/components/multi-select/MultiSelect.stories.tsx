@@ -360,11 +360,18 @@ export const WithDataAttributes: Story = {
     await expect(root).toHaveAttribute('data-size', 'default');
     await expect(root).not.toHaveAttribute('data-empty');
 
-    const control = canvasElement.querySelector(
+    const control = canvasElement.querySelector<HTMLElement>(
       '[data-slot="multi-select-control"]'
     );
+    if (!control) throw new Error('MultiSelect control was not rendered');
+
     await expect(control).toHaveAttribute('data-size', 'default');
     await expect(control).toHaveAttribute('data-variant', 'default');
-    await expect(control).toHaveClass('nx:border-default');
+    await expect(control).toHaveClass('nx:border-0');
+    await expect(control).toHaveClass('nx:border-border-default');
+
+    const controlStyle = window.getComputedStyle(control);
+    await expect(controlStyle.borderTopWidth).toBe('0px');
+    await expect(controlStyle.boxShadow).toContain('inset');
   },
 };

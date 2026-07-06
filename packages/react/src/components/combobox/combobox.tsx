@@ -419,7 +419,6 @@ function Combobox({
             data-disabled={disabled ? 'true' : undefined}
             data-size={size}
             variant={variant}
-            className="nx:border-default"
           >
             <InputGroupAddon>
               <IconSearch aria-hidden="true" />

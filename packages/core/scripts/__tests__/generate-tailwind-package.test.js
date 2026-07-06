@@ -250,6 +250,12 @@ describe('generateTailwindPackage', () => {
     );
     expect(nexusCSS).toMatch(/\[data-slot='input'\]\[data-variant='default'\]/);
     expect(nexusCSS).toMatch(
+      /\[data-slot='combobox-control'\]\[data-variant='default'\]/
+    );
+    expect(nexusCSS).toMatch(
+      /\[data-slot='multi-select-control'\]\[data-variant='default'\]/
+    );
+    expect(nexusCSS).toMatch(
       /box-shadow:\s*inset 0 0 0 1px var\(--color-border-default\);/
     );
     expect(nexusCSS).toMatch(/\[data-slot='input'\]\[aria-invalid='true'\]/);
@@ -263,6 +269,12 @@ describe('generateTailwindPackage', () => {
     );
     expect(nexusCSS).toMatch(
       /\[data-slot='button'\]\[class~='nx:focus-visible:outline-focus-default'\]:focus-visible/
+    );
+    expect(nexusCSS).toMatch(
+      /\[data-slot='combobox-control'\]\[class~='nx:has-\[\[data-slot=input-group-control\]:focus-visible\]:outline-focus-default'\]:has\([\s\S]*?\[data-slot='input-group-control'\]:focus-visible[\s\S]*?\)/
+    );
+    expect(nexusCSS).toMatch(
+      /\[data-slot='multi-select-control'\]\[class~='nx:focus-within:outline-focus-default'\]:focus-within/
     );
     expect(nexusCSS).toMatch(/border-color:\s*transparent\s*!important;/);
     expect(nexusCSS).toMatch(

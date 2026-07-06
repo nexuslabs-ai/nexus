@@ -1049,7 +1049,9 @@
 [data-slot='textarea'][data-variant='default'],
 [data-slot='native-select'][data-variant='default'],
 [data-slot='select-trigger'][data-variant='default'],
-[data-slot='input-group'][data-variant='default'] {
+[data-slot='input-group'][data-variant='default'],
+[data-slot='combobox-control'][data-variant='default'],
+[data-slot='multi-select-control'][data-variant='default'] {
   border-color: transparent !important;
   border-width: 0;
   box-shadow: inset 0 0 0 1px var(--color-border-default);
@@ -1060,7 +1062,9 @@
 [data-slot='textarea'][aria-invalid='true'],
 [data-slot='native-select'][aria-invalid='true'],
 [data-slot='select-trigger'][aria-invalid='true'],
-[data-slot='input-group']:has([data-slot][aria-invalid='true']) {
+[data-slot='input-group']:has([data-slot][aria-invalid='true']),
+[data-slot='combobox-control']:has([data-slot][aria-invalid='true']),
+[data-slot='multi-select-control'][data-invalid='true'] {
   border-color: transparent !important;
   border-width: 0;
   box-shadow: inset 0 0 0 1px var(--color-border-error);
@@ -1071,7 +1075,9 @@
 [data-slot='textarea'][data-variant='default']:disabled,
 [data-slot='native-select'][data-variant='default']:disabled,
 [data-slot='select-trigger'][data-variant='default']:disabled,
-[data-slot='input-group'][data-variant='default'][data-disabled='true'] {
+[data-slot='input-group'][data-variant='default'][data-disabled='true'],
+[data-slot='combobox-control'][data-variant='default'][data-disabled='true'],
+[data-slot='multi-select-control'][data-variant='default'][data-disabled='true'] {
   border-color: transparent !important;
   border-width: 0;
   box-shadow: inset 0 0 0 1px var(--color-border-disabled);
@@ -1144,7 +1150,11 @@
 [data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true'],
 [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
     [data-slot='input-group-control']:focus-visible
-  ) {
+  ),
+[data-slot='combobox-control'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+    [data-slot='input-group-control']:focus-visible
+  ),
+[data-slot='multi-select-control'][class~='nx:focus-within:outline-focus-default']:focus-within {
   --tw-outline-style: none !important;
   outline-color: transparent !important;
   outline-style: none !important;
@@ -1162,6 +1172,12 @@
 [data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
 [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
     [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+  ),
+[data-slot='combobox-control'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+    [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+  ),
+[data-slot='multi-select-control'][class~='nx:has-[[aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+    [aria-invalid='true']:focus-visible
   ) {
   --tw-outline-style: none !important;
   outline-color: transparent !important;
@@ -1206,12 +1222,16 @@
   [data-slot='native-select'][data-variant='default'],
   [data-slot='select-trigger'][data-variant='default'],
   [data-slot='input-group'][data-variant='default'],
+  [data-slot='combobox-control'][data-variant='default'],
+  [data-slot='multi-select-control'][data-variant='default'],
   [data-slot='input'][aria-invalid='true'],
   [data-slot='sidebar-input'][aria-invalid='true'],
   [data-slot='textarea'][aria-invalid='true'],
   [data-slot='native-select'][aria-invalid='true'],
   [data-slot='select-trigger'][aria-invalid='true'],
   [data-slot='input-group']:has([data-slot][aria-invalid='true']),
+  [data-slot='combobox-control']:has([data-slot][aria-invalid='true']),
+  [data-slot='multi-select-control'][data-invalid='true'],
   [data-slot='input-otp-slot'] {
     border-color: CanvasText !important;
     border-width: 1px;
@@ -1224,6 +1244,8 @@
   [data-slot='native-select'][data-variant='default']:disabled,
   [data-slot='select-trigger'][data-variant='default']:disabled,
   [data-slot='input-group'][data-variant='default'][data-disabled='true'],
+  [data-slot='combobox-control'][data-variant='default'][data-disabled='true'],
+  [data-slot='multi-select-control'][data-variant='default'][data-disabled='true'],
   [class~='nx:group/input-otp']:has([data-slot='input-otp']:disabled)
     [data-slot='input-otp-slot'] {
     border-color: GrayText !important;
@@ -1251,6 +1273,10 @@
   [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
       [data-slot='input-group-control']:focus-visible
     ),
+  [data-slot='combobox-control'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has(
+      [data-slot='input-group-control']:focus-visible
+    ),
+  [data-slot='multi-select-control'][class~='nx:focus-within:outline-focus-default']:focus-within,
   [data-slot='input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
   [data-slot='sidebar-input'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
   [data-slot='textarea'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
@@ -1258,6 +1284,12 @@
   [data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible,
   [data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
       [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+    ),
+  [data-slot='combobox-control'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+      [data-slot='input-group-control'][aria-invalid='true']:focus-visible
+    ),
+  [data-slot='multi-select-control'][class~='nx:has-[[aria-invalid=true]:focus-visible]:outline-focus-error']:has(
+      [aria-invalid='true']:focus-visible
     ),
   [data-slot='button'][class~='nx:focus-visible:outline-focus-default']:focus-visible,
   [data-slot='button'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible {

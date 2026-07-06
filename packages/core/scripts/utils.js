@@ -2061,6 +2061,8 @@ const FIELD_BOUNDARY_SELECTORS = [
   "[data-slot='native-select'][data-variant='default']",
   "[data-slot='select-trigger'][data-variant='default']",
   "[data-slot='input-group'][data-variant='default']",
+  "[data-slot='combobox-control'][data-variant='default']",
+  "[data-slot='multi-select-control'][data-variant='default']",
 ];
 
 const FIELD_ERROR_BOUNDARY_SELECTORS = [
@@ -2070,6 +2072,8 @@ const FIELD_ERROR_BOUNDARY_SELECTORS = [
   "[data-slot='native-select'][aria-invalid='true']",
   "[data-slot='select-trigger'][aria-invalid='true']",
   "[data-slot='input-group']:has([data-slot][aria-invalid='true'])",
+  "[data-slot='combobox-control']:has([data-slot][aria-invalid='true'])",
+  "[data-slot='multi-select-control'][data-invalid='true']",
 ];
 
 const FIELD_DISABLED_BOUNDARY_SELECTORS = [
@@ -2079,6 +2083,8 @@ const FIELD_DISABLED_BOUNDARY_SELECTORS = [
   "[data-slot='native-select'][data-variant='default']:disabled",
   "[data-slot='select-trigger'][data-variant='default']:disabled",
   "[data-slot='input-group'][data-variant='default'][data-disabled='true']",
+  "[data-slot='combobox-control'][data-variant='default'][data-disabled='true']",
+  "[data-slot='multi-select-control'][data-variant='default'][data-disabled='true']",
 ];
 
 const OTP_SLOT_BOUNDARY_SELECTOR = "[data-slot='input-otp-slot']";
@@ -2093,6 +2099,8 @@ const FIELD_FOCUS_RING_SELECTORS = [
   "[data-slot='select-trigger'][class~='nx:focus-visible:outline-focus-default']:focus-visible",
   "[data-slot='input-otp-slot'][class~='nx:data-[active=true]:outline-focus-default'][data-active='true']",
   "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
+  "[data-slot='combobox-control'][class~='nx:has-[[data-slot=input-group-control]:focus-visible]:outline-focus-default']:has([data-slot='input-group-control']:focus-visible)",
+  "[data-slot='multi-select-control'][class~='nx:focus-within:outline-focus-default']:focus-within",
 ];
 
 const FIELD_ERROR_FOCUS_RING_SELECTORS = [
@@ -2102,6 +2110,8 @@ const FIELD_ERROR_FOCUS_RING_SELECTORS = [
   "[data-slot='native-select'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
   "[data-slot='select-trigger'][class~='nx:aria-invalid:focus-visible:outline-focus-error'][aria-invalid='true']:focus-visible",
   "[data-slot='input-group'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
+  "[data-slot='combobox-control'][class~='nx:has-[[data-slot=input-group-control][aria-invalid=true]:focus-visible]:outline-focus-error']:has([data-slot='input-group-control'][aria-invalid='true']:focus-visible)",
+  "[data-slot='multi-select-control'][class~='nx:has-[[aria-invalid=true]:focus-visible]:outline-focus-error']:has([aria-invalid='true']:focus-visible)",
 ];
 
 const INPUT_GROUP_CONTROL_FOCUS_SUPPRESSION_SELECTORS = [

@@ -34,7 +34,7 @@ const multiSelectControlVariants = cva(
     'nx:flex-wrap',
     'nx:items-center',
     'nx:rounded-md',
-    'nx:border-default',
+    'nx:border-0',
     'nx:transition-colors',
     'nx:outline-none',
     'nx:focus-within:outline-2',
