@@ -1,18 +1,18 @@
 import * as React from 'react';
 
+import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+
+import { Checkbox } from '../checkbox';
+import { FieldLegend, FieldSet } from '../field';
+import { RadioGroup, RadioGroupItem } from '../radio-group';
+
 import {
-  Checkbox,
   ChoiceRow,
   ChoiceRowContent,
   ChoiceRowDescription,
   ChoiceRowTitle,
-  FieldLegend,
-  FieldSet,
-  RadioGroup,
-  RadioGroupItem,
-} from '@nexus_ds/react';
-import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+} from './choice-row';
 
 const meta: Meta<typeof ChoiceRow> = {
   title: 'Components/ChoiceRow',
