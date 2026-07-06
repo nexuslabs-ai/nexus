@@ -287,6 +287,18 @@ export const NarrowWidth: Story = {
       />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', { name: 'Narrow frameworks' });
+
+    await userEvent.click(canvas.getByText('Next.js'));
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await waitForPopoverSettle();
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      document.body.querySelector('[data-slot="multi-select-content"]')
+    ).toHaveAttribute('data-state', 'open');
+  },
 };
 
 export const ClickInteraction: Story = {

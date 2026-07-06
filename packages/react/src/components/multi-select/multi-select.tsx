@@ -391,6 +391,7 @@ function MultiSelect({
   const popupId = `${generatedId}-popup`;
   const listboxId = `${generatedId}-listbox`;
   const rootRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const groups = React.useMemo(
     () => normalizeSelectionGroups(options),
     [options]
@@ -569,6 +570,22 @@ function MultiSelect({
     [onBlur]
   );
 
+  const handleControlPointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.button !== 0 || interactionDisabled) return;
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest('button,input')) return;
+
+      event.preventDefault();
+      inputRef.current?.focus();
+      setOpenState(true);
+      updateActiveValue();
+    },
+    [interactionDisabled, setOpenState, updateActiveValue]
+  );
+
   const handleContentInteractOutside = React.useCallback<
     NonNullable<
       React.ComponentProps<typeof PopoverPrimitive.Content>['onInteractOutside']
@@ -606,6 +623,7 @@ function MultiSelect({
             data-size={size}
             data-variant={variant ?? 'default'}
             className={cn(multiSelectControlVariants({ size, variant }))}
+            onPointerDown={handleControlPointerDown}
           >
             <IconSearch
               data-slot="multi-select-search-icon"
@@ -643,6 +661,7 @@ function MultiSelect({
               </span>
             ) : null}
             <input
+              ref={inputRef}
               id={inputId}
               data-slot="multi-select-input"
               role="combobox"
