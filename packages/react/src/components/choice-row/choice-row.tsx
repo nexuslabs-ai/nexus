@@ -44,7 +44,6 @@ function ChoiceRow({ className, disabled = false, ...props }: ChoiceRowProps) {
       data-disabled={disabled ? 'true' : undefined}
       className={cn(
         'nx:group/choice-row nx:box-border nx:flex nx:min-h-8 nx:w-full nx:cursor-pointer nx:items-center nx:justify-start nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:transition-colors nx:pointer-coarse:min-h-11',
-        'nx:has-[>[data-slot=choice-row-content]]:items-start nx:has-[>[data-slot=choice-row-content]]:[&>[role=checkbox]]:mt-px nx:has-[>[data-slot=choice-row-content]]:[&>[role=radio]]:mt-px',
         'nx:not-data-[disabled=true]:hover:bg-background-hover nx:not-data-[disabled=true]:active:bg-background-active',
         'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:text-disabled-foreground',
         className
