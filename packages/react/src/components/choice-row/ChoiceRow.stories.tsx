@@ -19,6 +19,12 @@ const meta: Meta<typeof ChoiceRow> = {
   component: ChoiceRow,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'Use ChoiceRow for compact checkbox or radio choices where the whole row should be the click/tap target and the real Checkbox or RadioGroupItem remains the semantic control. Use Checkbox/RadioGroup with Label for simple inline controls. Use a roomier field or card composition for choices that need a title with helper text.',
+      },
+    },
   },
 };
 
