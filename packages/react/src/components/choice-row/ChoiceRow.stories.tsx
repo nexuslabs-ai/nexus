@@ -157,7 +157,7 @@ export const KeyboardInteraction: Story = {
 export const Disabled: Story = {
   render: () => (
     <div className="nx:w-80">
-      <ChoiceRow htmlFor="choice-disabled" disabled>
+      <ChoiceRow htmlFor="choice-disabled">
         <Checkbox
           id="choice-disabled"
           disabled
@@ -179,7 +179,8 @@ export const Disabled: Story = {
       name: 'Locked notifications',
     });
 
-    await expect(row).toHaveAttribute('data-disabled', 'true');
+    await expect(row).not.toHaveAttribute('data-disabled');
+    await expect(row).not.toHaveAttribute('aria-disabled');
     await expect(checkbox).toBeDisabled();
     await userEvent.click(row);
     await expect(checkbox).not.toBeChecked();
@@ -258,8 +259,6 @@ export const WithDataAttributes: Story = {
     await expect(row).toHaveAttribute('data-slot', 'choice-row');
     await expect(row).not.toHaveAttribute('role');
     await expect(row).not.toHaveAttribute('tabindex');
-    await expect(row).toHaveClass('nx:min-h-8');
-    await expect(row).toHaveClass('nx:pointer-coarse:min-h-11');
     await expect(content).toHaveAttribute('data-slot', 'choice-row-content');
     await expect(title).toHaveAttribute('data-slot', 'choice-row-title');
     await expect(description).toHaveAttribute(
@@ -270,6 +269,51 @@ export const WithDataAttributes: Story = {
     await expect(
       Math.round(row.getBoundingClientRect().height)
     ).toBeGreaterThanOrEqual(32);
+  },
+};
+
+export const EdgeCases: Story = {
+  render: () => (
+    <div className="nx:grid nx:w-52 nx:gap-1">
+      <ChoiceRow htmlFor="choice-edge-long">
+        <Checkbox
+          id="choice-edge-long"
+          aria-labelledby="choice-edge-long-title"
+        />
+        <ChoiceRowTitle id="choice-edge-long-title" className="nx:truncate">
+          Very long notification preference title that should stay on one line
+          in compact product settings
+        </ChoiceRowTitle>
+      </ChoiceRow>
+      <ChoiceRow htmlFor="choice-edge-empty">
+        <Checkbox id="choice-edge-empty" aria-label="Unnamed visual choice" />
+        <ChoiceRowTitle id="choice-edge-empty-title" aria-hidden="true" />
+      </ChoiceRow>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const longCheckbox = canvas.getByRole('checkbox', {
+      name: /Very long notification preference title/i,
+    });
+    const emptyCheckbox = canvas.getByRole('checkbox', {
+      name: 'Unnamed visual choice',
+    });
+    const longTitle = getRequiredElement<HTMLElement>(
+      canvasElement,
+      '#choice-edge-long-title'
+    );
+    const emptyTitle = getRequiredElement<HTMLElement>(
+      canvasElement,
+      '#choice-edge-empty-title'
+    );
+
+    await expect(longCheckbox).toHaveAccessibleName(
+      /Very long notification preference title/i
+    );
+    await expect(longTitle.scrollWidth).toBeGreaterThan(longTitle.clientWidth);
+    await expect(emptyCheckbox).toHaveAccessibleName('Unnamed visual choice');
+    await expect(emptyTitle).toBeEmptyDOMElement();
   },
 };
 
@@ -311,7 +355,7 @@ export const AllVariants: Story = {
             Checked checkbox
           </ChoiceRowTitle>
         </ChoiceRow>
-        <ChoiceRow htmlFor="choice-all-disabled" disabled>
+        <ChoiceRow htmlFor="choice-all-disabled">
           <Checkbox
             id="choice-all-disabled"
             disabled

@@ -8,18 +8,7 @@ import { Label } from '../label';
  *
  * Props for the ChoiceRow component.
  */
-interface ChoiceRowProps extends Omit<
-  React.ComponentProps<typeof Label>,
-  'disabled'
-> {
-  /**
-   * Visual disabled metadata for the row shell. Consumers must still disable the
-   * nested Checkbox or RadioGroupItem to disable behavior.
-   *
-   * @default false
-   */
-  disabled?: boolean;
-}
+interface ChoiceRowProps extends React.ComponentProps<typeof Label> {}
 
 /**
  * ChoiceRow
@@ -37,15 +26,14 @@ interface ChoiceRowProps extends Omit<
  * </ChoiceRow>
  * ```
  */
-function ChoiceRow({ className, disabled = false, ...props }: ChoiceRowProps) {
+function ChoiceRow({ className, ...props }: ChoiceRowProps) {
   return (
     <Label
       data-slot="choice-row"
-      data-disabled={disabled ? 'true' : undefined}
       className={cn(
-        'nx:group/choice-row nx:box-border nx:flex nx:min-h-8 nx:w-full nx:cursor-pointer nx:items-center nx:justify-start nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:transition-colors nx:pointer-coarse:min-h-11',
-        'nx:not-data-[disabled=true]:hover:bg-background-hover nx:not-data-[disabled=true]:active:bg-background-active',
-        'nx:data-[disabled=true]:cursor-not-allowed nx:data-[disabled=true]:text-disabled-foreground',
+        'nx:group/choice-row nx:box-border nx:flex nx:min-h-8 nx:min-w-0 nx:w-full nx:cursor-pointer nx:items-center nx:justify-start nx:gap-2 nx:rounded-sm nx:px-2 nx:py-1.5 nx:transition-colors nx:pointer-coarse:min-h-11',
+        'nx:not-has-[:disabled]:hover:bg-background-hover nx:not-has-[:disabled]:active:bg-background-active',
+        'nx:has-[:disabled]:cursor-not-allowed nx:has-[:disabled]:text-disabled-foreground',
         className
       )}
       {...props}
@@ -85,7 +73,7 @@ function ChoiceRowTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="choice-row-title"
       className={cn(
-        'nx:min-w-0 nx:flex-1 nx:typography-label-default nx:text-foreground nx:group-data-[disabled=true]/choice-row:text-disabled-foreground',
+        'nx:min-w-0 nx:flex-1 nx:typography-label-default nx:text-foreground nx:group-has-[:disabled]/choice-row:text-disabled-foreground',
         className
       )}
       {...props}
@@ -107,7 +95,7 @@ function ChoiceRowDescription({
     <p
       data-slot="choice-row-description"
       className={cn(
-        'nx:typography-body-default nx:text-muted-foreground nx:group-data-[disabled=true]/choice-row:text-disabled-foreground',
+        'nx:typography-body-default nx:text-muted-foreground nx:group-has-[:disabled]/choice-row:text-disabled-foreground',
         className
       )}
       {...props}
