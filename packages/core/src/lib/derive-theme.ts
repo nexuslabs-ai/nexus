@@ -63,9 +63,8 @@ const SURFACE_TONE: Record<
   stone: { h: 70, lightC: 0.008, darkC: 0.006 },
 };
 
-const PAPER_L = 0.987;
+const PAGE_L_LIGHT = 0.97;
 const LIGHT_CHROMA_DEPTH_MULTIPLIER = 1.4;
-const FLAT_IN_LIGHT = new Set(['container', 'popover']);
 const FOCUS_APCA_FLOOR = 45;
 
 function anchoredContrastLerp(
@@ -145,6 +144,27 @@ const DARK_SURFACE_STEPS: Partial<Record<string, number>> = {
   'border-active': 9.68,
 };
 
+const LIGHT_M2_SURFACE_STEPS: Partial<Record<string, number>> = {
+  background: 0,
+  'background-hover': -0.43,
+  'background-active': -0.84,
+  muted: -0.43,
+  container: 0.54,
+  'container-hover': 0.27,
+  'container-active': -0.43,
+  popover: 0.54,
+  'popover-hover': 0.27,
+  'popover-active': -0.43,
+  'control-background': -0.84,
+  'control-background-hover': -1.77,
+  'nav-background': -0.84,
+  'nav-item-hover': -1.77,
+  'nav-item-active': -1.77,
+  'nav-border': -1.77,
+  disabled: -0.43,
+  'border-active': -5.5,
+};
+
 type DarkNavSurfaceToken =
   | 'nav-background'
   | 'nav-item-hover'
@@ -197,8 +217,7 @@ export function deriveSurfaces(
   const bg = seedOklch(backgroundHex);
   const tone = SURFACE_TONE[surfaceTone];
   const dark = mode === 'dark';
-  const dir = dark ? 1 : -1;
-  const anchorL = dark ? (bg.l ?? 0) : tone.lightC > 0 ? PAPER_L : (bg.l ?? 1);
+  const anchorL = dark ? (bg.l ?? 0) : PAGE_L_LIGHT;
   const baseC = dark ? tone.darkC : tone.lightC;
   const out: TokenMap = {};
   for (const [token, rawStep] of Object.entries(SURFACE_STEPS)) {
@@ -210,13 +229,13 @@ export function deriveSurfaces(
 
     const step = dark
       ? (DARK_SURFACE_STEPS[token] ?? rawStep)
-      : FLAT_IN_LIGHT.has(token)
-        ? 0
-        : rawStep;
-    const l = clamp01(anchorL + dir * step * delta);
+      : (LIGHT_M2_SURFACE_STEPS[token] ?? -rawStep);
+    const l = clamp01(anchorL + step * delta);
     const c = dark
       ? baseC
-      : baseC * (1 + (1 - l) * LIGHT_CHROMA_DEPTH_MULTIPLIER);
+      : l >= 1
+        ? 0
+        : baseC * (1 + (1 - l) * LIGHT_CHROMA_DEPTH_MULTIPLIER);
     const color: Oklch = {
       mode: 'oklch',
       l,

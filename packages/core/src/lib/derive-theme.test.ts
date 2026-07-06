@@ -155,6 +155,13 @@ describe('deriveSurfaces', () => {
     );
   });
 
+  it('elevates container lighter than the tinted page in light mode', () => {
+    const s = deriveSurfaces('#ffffff', 'stone', 'light', 0.056);
+    const lift =
+      lOf(s['--nx-color-container']) - lOf(s['--nx-color-background']);
+    expect(lift).toBeGreaterThan(0.015);
+  });
+
   it('widens the ladder as contrast (delta) grows', () => {
     const lo = deriveSurfaces('#181818', surfaceTone, 'dark', 0.02);
     const hi = deriveSurfaces('#181818', surfaceTone, 'dark', 0.08);
@@ -527,7 +534,7 @@ describe('status families', () => {
 });
 
 describe('surfaceTone surfaces', () => {
-  it('keeps light base flat while tone tints light paper and stepped surfaces', () => {
+  it('lifts light containers above the tinted page while recessed surfaces step down', () => {
     const slate = deriveTheme({
       surfaceTone: 'slate',
       ...SURFACE_TONE_SEEDS,
@@ -537,15 +544,20 @@ describe('surfaceTone surfaces', () => {
       ...SURFACE_TONE_SEEDS,
     }).light;
 
-    expect(slate['--nx-color-container']).toBe(slate['--nx-color-background']);
+    expect(lOf(slate['--nx-color-container'])).toBeGreaterThan(
+      lOf(slate['--nx-color-background'])
+    );
+    expect(slate['--nx-color-popover']).toBe(slate['--nx-color-container']);
     expect(slate['--nx-color-background']).not.toBe(
       neutral['--nx-color-background']
     );
-    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.987, 3);
-    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(1, 3);
-    expect(slate['--nx-color-muted']).not.toBe(slate['--nx-color-background']);
-    expect(slate['--nx-color-container-hover']).not.toBe(
-      slate['--nx-color-container']
+    expect(lOf(slate['--nx-color-background'])).toBeCloseTo(0.97, 3);
+    expect(lOf(neutral['--nx-color-background'])).toBeCloseTo(0.97, 3);
+    expect(lOf(slate['--nx-color-muted'])).toBeLessThan(
+      lOf(slate['--nx-color-background'])
+    );
+    expect(lOf(slate['--nx-color-container-hover'])).toBeLessThan(
+      lOf(slate['--nx-color-container'])
     );
     expect(slate['--nx-color-muted']).not.toBe(neutral['--nx-color-muted']);
   });
@@ -911,18 +923,11 @@ describe('legibility invariant: every text tier clears its APCA floor', () => {
         );
       }
       for (let index = 1; index <= 5; index += 1) {
-        checks.push(
-          [
-            `--nx-color-chart-categorical-${index}`,
-            '--nx-color-background',
-            'ui',
-          ],
-          [
-            `--nx-color-chart-categorical-${index}`,
-            '--nx-color-container',
-            'ui',
-          ]
-        );
+        checks.push([
+          `--nx-color-chart-categorical-${index}`,
+          '--nx-color-container',
+          'ui',
+        ]);
       }
 
       for (const [fg, bg, tier] of checks) {

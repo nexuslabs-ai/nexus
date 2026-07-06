@@ -358,7 +358,7 @@ describe('generateTailwindPackage', () => {
 
   it('aliases semantic colors at :root for non-utility CSS consumers', () => {
     expect(nexusCSS).toMatch(
-      /:root\s*\{[\s\S]*--color-background:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);[\s\S]*\}/
+      /:root\s*\{[\s\S]*--color-background:\s*var\(--nx-color-background,\s*var\(--nx-color-stone-75\)\);[\s\S]*\}/
     );
     expect(nexusCSS).toMatch(
       /:root\s*\{[\s\S]*--color-focus-default:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);[\s\S]*\}/
@@ -374,7 +374,7 @@ describe('generateTailwindPackage', () => {
     );
 
     expect(css).toMatch(
-      /background-color:\s*var\(--nx-color-background,\s*var\(--nx-color-white-base\)\);/
+      /background-color:\s*var\(--nx-color-background,\s*var\(--nx-color-stone-75\)\);/
     );
     expect(css).toMatch(
       /outline-color:\s*var\(\s*--nx-color-focus-default,\s*var\(--color-primary-subtle-foreground\)\s*\);/

@@ -142,11 +142,11 @@
 
 @theme inline {
   /* Semantic tokens */
-  --color-background: var(--nx-color-background, var(--nx-color-white-base));
+  --color-background: var(--nx-color-background, var(--nx-color-stone-75));
   --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
   --color-background-hover: var(
     --nx-color-background-hover,
-    var(--nx-color-stone-50)
+    var(--nx-color-stone-100)
   );
   --color-background-hover-alpha: var(
     --nx-color-background-hover-alpha,
@@ -154,9 +154,9 @@
   );
   --color-background-active: var(
     --nx-color-background-active,
-    var(--nx-color-stone-100)
+    var(--nx-color-stone-150)
   );
-  --color-muted: var(--nx-color-muted, var(--nx-color-stone-50));
+  --color-muted: var(--nx-color-muted, var(--nx-color-stone-100));
   --color-muted-foreground: var(
     --nx-color-muted-foreground,
     var(--nx-color-black-a600)
@@ -165,7 +165,7 @@
     --nx-color-muted-foreground-subtle,
     var(--nx-color-black-a500)
   );
-  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-50));
+  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-100));
   --color-disabled-foreground: var(
     --nx-color-disabled-foreground,
     var(--nx-color-stone-400)
@@ -194,7 +194,7 @@
   );
   --color-popover-active: var(
     --nx-color-popover-active,
-    var(--nx-color-stone-50)
+    var(--nx-color-stone-100)
   );
   --color-popover-alpha: var(
     --nx-color-popover-alpha,
@@ -206,7 +206,7 @@
   );
   --color-control-background: var(
     --nx-color-control-background,
-    var(--nx-color-stone-100)
+    var(--nx-color-stone-150)
   );
   --color-control-background-hover: var(
     --nx-color-control-background-hover,
@@ -218,7 +218,7 @@
   );
   --color-nav-background: var(
     --nx-color-nav-background,
-    var(--nx-color-stone-100)
+    var(--nx-color-stone-150)
   );
   --color-nav-foreground: var(
     --nx-color-nav-foreground,
@@ -537,11 +537,11 @@
 
 /* ===== RUNTIME COLOR ALIASES ===== */
 :root {
-  --color-background: var(--nx-color-background, var(--nx-color-white-base));
+  --color-background: var(--nx-color-background, var(--nx-color-stone-75));
   --color-foreground: var(--nx-color-foreground, var(--nx-color-black-a900));
   --color-background-hover: var(
     --nx-color-background-hover,
-    var(--nx-color-stone-50)
+    var(--nx-color-stone-100)
   );
   --color-background-hover-alpha: var(
     --nx-color-background-hover-alpha,
@@ -549,9 +549,9 @@
   );
   --color-background-active: var(
     --nx-color-background-active,
-    var(--nx-color-stone-100)
+    var(--nx-color-stone-150)
   );
-  --color-muted: var(--nx-color-muted, var(--nx-color-stone-50));
+  --color-muted: var(--nx-color-muted, var(--nx-color-stone-100));
   --color-muted-foreground: var(
     --nx-color-muted-foreground,
     var(--nx-color-black-a600)
@@ -560,7 +560,7 @@
     --nx-color-muted-foreground-subtle,
     var(--nx-color-black-a500)
   );
-  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-50));
+  --color-disabled: var(--nx-color-disabled, var(--nx-color-stone-100));
   --color-disabled-foreground: var(
     --nx-color-disabled-foreground,
     var(--nx-color-stone-400)
@@ -589,7 +589,7 @@
   );
   --color-popover-active: var(
     --nx-color-popover-active,
-    var(--nx-color-stone-50)
+    var(--nx-color-stone-100)
   );
   --color-popover-alpha: var(
     --nx-color-popover-alpha,
@@ -601,7 +601,7 @@
   );
   --color-control-background: var(
     --nx-color-control-background,
-    var(--nx-color-stone-100)
+    var(--nx-color-stone-150)
   );
   --color-control-background-hover: var(
     --nx-color-control-background-hover,
@@ -613,7 +613,7 @@
   );
   --color-nav-background: var(
     --nx-color-nav-background,
-    var(--nx-color-stone-100)
+    var(--nx-color-stone-150)
   );
   --color-nav-foreground: var(
     --nx-color-nav-foreground,

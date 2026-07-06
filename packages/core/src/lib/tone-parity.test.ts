@@ -51,7 +51,7 @@ type ToneToken = (typeof TONE_TOKENS)[number];
 type TokenRecord = Record<string, string>;
 type Fixture = {
   schemaVersion: number;
-  paperL: number;
+  pageL: number;
   lightDepthMultiplier: number;
   toneContrast: number;
   tones: Record<Tone, Record<ToneToken, string>>;

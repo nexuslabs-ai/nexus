@@ -1,6 +1,6 @@
 {
   "background": {
-    "$value": "{white.base}",
+    "$value": "{gray.75}",
     "$type": "color"
   },
   "foreground": {
@@ -8,7 +8,7 @@
     "$type": "color"
   },
   "background-hover": {
-    "$value": "{gray.50}",
+    "$value": "{gray.100}",
     "$type": "color"
   },
   "background-hover-alpha": {
@@ -16,11 +16,11 @@
     "$type": "color"
   },
   "background-active": {
-    "$value": "{gray.100}",
+    "$value": "{gray.150}",
     "$type": "color"
   },
   "muted": {
-    "$value": "{gray.50}",
+    "$value": "{gray.100}",
     "$type": "color"
   },
   "muted-foreground": {
@@ -34,7 +34,7 @@
     "$description": "Tertiary text tier below muted-foreground — helper text, captions, divider labels."
   },
   "disabled": {
-    "$value": "{gray.50}",
+    "$value": "{gray.100}",
     "$type": "color"
   },
   "disabled-foreground": {
@@ -70,7 +70,7 @@
     "$type": "color"
   },
   "popover-active": {
-    "$value": "{gray.50}",
+    "$value": "{gray.100}",
     "$type": "color"
   },
   "popover-alpha": {
@@ -82,7 +82,7 @@
     "$type": "color"
   },
   "control-background": {
-    "$value": "{gray.100}",
+    "$value": "{gray.150}",
     "$type": "color"
   },
   "control-background-hover": {
@@ -94,7 +94,7 @@
     "$type": "color"
   },
   "nav-background": {
-    "$value": "{gray.100}",
+    "$value": "{gray.150}",
     "$type": "color"
   },
   "nav-foreground": {
