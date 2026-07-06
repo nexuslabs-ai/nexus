@@ -1008,8 +1008,16 @@
       "$value": "#fbfaf8",
       "$type": "color"
     },
+    "75": {
+      "$value": "#f6f5f2",
+      "$type": "color"
+    },
     "100": {
       "$value": "#eeedeb",
+      "$type": "color"
+    },
+    "150": {
+      "$value": "#e7e5e2",
       "$type": "color"
     },
     "200": {
