@@ -51,6 +51,16 @@ const meta: Meta<typeof MultiSelect> = {
     onValueChange: fn(),
     onOpenChange: fn(),
   },
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['sm', 'default', 'lg'],
+    },
+    variant: {
+      control: 'select',
+      options: ['default', 'borderless'],
+    },
+  },
   decorators: [
     (Story) => (
       <div className="nx:w-[420px]">
@@ -95,6 +105,56 @@ export const WithDefaultValues: Story = {
     'aria-label': 'Selected frameworks',
     defaultValue: ['next', 'astro'],
     options: frameworkOptions,
+  },
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="nx:grid nx:gap-3">
+      <MultiSelect
+        aria-label="Small frameworks"
+        size="sm"
+        defaultValue={['next']}
+        options={frameworkOptions}
+        placeholder="Small"
+      />
+      <MultiSelect
+        aria-label="Default frameworks"
+        size="default"
+        defaultValue={['next']}
+        options={frameworkOptions}
+        placeholder="Default"
+      />
+      <MultiSelect
+        aria-label="Large frameworks"
+        size="lg"
+        defaultValue={['next']}
+        options={frameworkOptions}
+        placeholder="Large"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByRole('combobox', { name: 'Small frameworks' })
+    ).toBeVisible();
+    await expect(
+      canvas
+        .getByRole('combobox', { name: 'Small frameworks' })
+        .closest('[data-slot="multi-select"]')
+    ).toHaveAttribute('data-size', 'sm');
+    await expect(
+      canvas
+        .getByRole('combobox', { name: 'Default frameworks' })
+        .closest('[data-slot="multi-select"]')
+    ).toHaveAttribute('data-size', 'default');
+    await expect(
+      canvas
+        .getByRole('combobox', { name: 'Large frameworks' })
+        .closest('[data-slot="multi-select"]')
+    ).toHaveAttribute('data-size', 'lg');
   },
 };
 
@@ -297,6 +357,14 @@ export const WithDataAttributes: Story = {
       .closest('[data-slot="multi-select"]');
 
     await expect(root).toHaveAttribute('data-slot', 'multi-select');
+    await expect(root).toHaveAttribute('data-size', 'default');
     await expect(root).not.toHaveAttribute('data-empty');
+
+    const control = canvasElement.querySelector(
+      '[data-slot="multi-select-control"]'
+    );
+    await expect(control).toHaveAttribute('data-size', 'default');
+    await expect(control).toHaveAttribute('data-variant', 'default');
+    await expect(control).toHaveClass('nx:border-default');
   },
 };

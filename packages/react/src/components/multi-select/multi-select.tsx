@@ -29,16 +29,12 @@ const multiSelectControlVariants = cva(
   [
     'nx:group/multi-select-control',
     'nx:flex',
-    'nx:min-h-10',
     'nx:w-full',
     'nx:min-w-0',
     'nx:flex-wrap',
     'nx:items-center',
-    'nx:gap-1.5',
     'nx:rounded-md',
-    'nx:border-0',
-    'nx:px-2',
-    'nx:py-1.5',
+    'nx:border-default',
     'nx:transition-colors',
     'nx:outline-none',
     'nx:focus-within:outline-2',
@@ -52,6 +48,11 @@ const multiSelectControlVariants = cva(
   ],
   {
     variants: {
+      size: {
+        sm: 'nx:min-h-8 nx:gap-1 nx:px-1.5 nx:py-1',
+        default: 'nx:min-h-10 nx:gap-1.5 nx:px-2 nx:py-1.5',
+        lg: 'nx:min-h-12 nx:gap-1.5 nx:px-2.5 nx:py-2',
+      },
       variant: {
         default:
           'nx:border-border-default nx:bg-background nx:not-data-[disabled=true]:hover:bg-background-hover nx:data-[disabled=true]:border-border-disabled',
@@ -60,7 +61,117 @@ const multiSelectControlVariants = cva(
       },
     },
     defaultVariants: {
+      size: 'default',
       variant: 'default',
+    },
+  }
+);
+
+const multiSelectInputVariants = cva(
+  [
+    'nx:flex-1',
+    'nx:bg-transparent',
+    'nx:text-foreground',
+    'nx:outline-none',
+    'nx:placeholder:text-muted-foreground',
+    'nx:disabled:cursor-not-allowed',
+    'nx:disabled:text-disabled-foreground',
+    'nx:disabled:placeholder:text-disabled-foreground',
+  ],
+  {
+    variants: {
+      size: {
+        sm: 'nx:min-w-20 nx:py-0.5 nx:typography-body-small',
+        default: 'nx:min-w-28 nx:py-1 nx:typography-body-default',
+        lg: 'nx:min-w-32 nx:py-1.5 nx:typography-body-default',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  }
+);
+
+const multiSelectChipVariants = cva(
+  [
+    'nx:inline-flex',
+    'nx:min-w-0',
+    'nx:items-center',
+    'nx:rounded-sm',
+    'nx:bg-secondary-subtle',
+    'nx:text-secondary-subtle-foreground',
+  ],
+  {
+    variants: {
+      size: {
+        sm: 'nx:max-w-36 nx:gap-1 nx:px-1.5 nx:py-0.5 nx:typography-label-small',
+        default:
+          'nx:max-w-40 nx:gap-1 nx:px-2 nx:py-1 nx:typography-label-default',
+        lg: 'nx:max-w-48 nx:gap-1.5 nx:px-2.5 nx:py-1 nx:typography-label-default',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  }
+);
+
+const multiSelectChipRemoveVariants = cva(
+  [
+    'nx:-mr-1',
+    'nx:inline-flex',
+    'nx:items-center',
+    'nx:justify-center',
+    'nx:rounded-sm',
+    'nx:text-muted-foreground',
+    'nx:hover:bg-background-hover',
+    'nx:hover:text-foreground',
+    'nx:focus-visible:outline-2',
+    'nx:focus-visible:outline-focus-default',
+    'nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:disabled:pointer-events-none',
+    'nx:disabled:text-disabled-foreground',
+  ],
+  {
+    variants: {
+      size: {
+        sm: 'nx:size-4 nx:[&>svg]:size-3',
+        default: 'nx:size-5 nx:[&>svg]:size-3.5',
+        lg: 'nx:size-5 nx:[&>svg]:size-3.5',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  }
+);
+
+const multiSelectInlineButtonVariants = cva(
+  [
+    'nx:inline-flex',
+    'nx:shrink-0',
+    'nx:items-center',
+    'nx:justify-center',
+    'nx:rounded-sm',
+    'nx:text-muted-foreground',
+    'nx:hover:bg-background-hover',
+    'nx:hover:text-foreground',
+    'nx:focus-visible:outline-2',
+    'nx:focus-visible:outline-focus-default',
+    'nx:focus-visible:outline-offset-(--focus-offset)',
+    'nx:disabled:pointer-events-none',
+    'nx:disabled:text-disabled-foreground',
+  ],
+  {
+    variants: {
+      size: {
+        sm: 'nx:size-6 nx:[&>svg]:size-4',
+        default: 'nx:size-6 nx:[&>svg]:size-4',
+        lg: 'nx:size-8 nx:[&>svg]:size-4',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
     },
   }
 );
@@ -264,6 +375,7 @@ function MultiSelect({
   required,
   maxVisibleValues = 3,
   autoHighlight = true,
+  size = 'default',
   variant,
   onKeyDown,
   onFocus,
@@ -468,6 +580,7 @@ function MultiSelect({
         data-disabled={disabled ? 'true' : undefined}
         data-readonly={readOnly ? 'true' : undefined}
         data-empty={value.length === 0 ? 'true' : undefined}
+        data-size={size}
         className={cn('nx:w-full', className)}
         {...props}
       >
@@ -476,8 +589,9 @@ function MultiSelect({
             data-slot="multi-select-control"
             data-disabled={disabled ? 'true' : undefined}
             data-invalid={ariaInvalid ? 'true' : undefined}
+            data-size={size}
             data-variant={variant ?? 'default'}
-            className={cn(multiSelectControlVariants({ variant }))}
+            className={cn(multiSelectControlVariants({ size, variant }))}
           >
             <IconSearch
               data-slot="multi-select-search-icon"
@@ -488,7 +602,7 @@ function MultiSelect({
               <span
                 key={option.value}
                 data-slot="multi-select-chip"
-                className="nx:inline-flex nx:min-w-0 nx:max-w-40 nx:items-center nx:gap-1 nx:rounded-sm nx:bg-secondary-subtle nx:px-2 nx:py-1 nx:typography-label-default nx:text-secondary-subtle-foreground"
+                className={cn(multiSelectChipVariants({ size }))}
               >
                 <span className="nx:truncate">{option.label}</span>
                 <button
@@ -496,13 +610,13 @@ function MultiSelect({
                   data-slot="multi-select-chip-remove"
                   aria-label={`Remove ${option.label}`}
                   disabled={interactionDisabled}
-                  className="nx:-mr-1 nx:inline-flex nx:size-5 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground"
+                  className={cn(multiSelectChipRemoveVariants({ size }))}
                   onClick={(event) => {
                     event.stopPropagation();
                     removeOption(option.value);
                   }}
                 >
-                  <IconX aria-hidden="true" className="nx:size-3.5" />
+                  <IconX aria-hidden="true" />
                 </button>
               </span>
             ))}
@@ -534,7 +648,7 @@ function MultiSelect({
               required={required && value.length === 0}
               placeholder={value.length === 0 ? placeholder : undefined}
               value={inputValue}
-              className="nx:min-w-28 nx:flex-1 nx:bg-transparent nx:py-1 nx:typography-body-default nx:text-foreground nx:outline-none nx:placeholder:text-muted-foreground nx:disabled:cursor-not-allowed nx:disabled:text-disabled-foreground nx:disabled:placeholder:text-disabled-foreground"
+              className={cn(multiSelectInputVariants({ size }))}
               onBlur={handleInputBlur}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
@@ -546,13 +660,13 @@ function MultiSelect({
                 data-slot="multi-select-clear"
                 aria-label="Clear selections"
                 disabled={interactionDisabled}
-                className="nx:inline-flex nx:size-6 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground"
+                className={cn(multiSelectInlineButtonVariants({ size }))}
                 onClick={(event) => {
                   event.stopPropagation();
                   clearValues();
                 }}
               >
-                <IconX aria-hidden="true" className="nx:size-4" />
+                <IconX aria-hidden="true" />
               </button>
             ) : (
               <button
@@ -561,13 +675,13 @@ function MultiSelect({
                 aria-label={open ? 'Close options' : 'Open options'}
                 aria-expanded={open}
                 disabled={interactionDisabled}
-                className="nx:inline-flex nx:size-6 nx:shrink-0 nx:items-center nx:justify-center nx:rounded-sm nx:text-muted-foreground nx:hover:bg-background-hover nx:hover:text-foreground nx:focus-visible:outline-2 nx:focus-visible:outline-focus-default nx:focus-visible:outline-offset-(--focus-offset) nx:disabled:pointer-events-none nx:disabled:text-disabled-foreground"
+                className={cn(multiSelectInlineButtonVariants({ size }))}
                 onClick={(event) => {
                   event.stopPropagation();
                   setOpen(!open);
                 }}
               >
-                <IconChevronDown aria-hidden="true" className="nx:size-4" />
+                <IconChevronDown aria-hidden="true" />
               </button>
             )}
           </div>

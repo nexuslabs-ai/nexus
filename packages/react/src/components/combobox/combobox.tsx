@@ -150,6 +150,12 @@ interface ComboboxProps extends Omit<
    * @default 'default'
    */
   variant?: 'default' | 'borderless';
+  /**
+   * Field size. `default` is Nexus's medium control size.
+   *
+   * @default 'default'
+   */
+  size?: 'sm' | 'default' | 'lg';
 }
 
 function useControllableState<T>({
@@ -214,6 +220,7 @@ function Combobox({
   required,
   autoHighlight = true,
   variant,
+  size = 'default',
   onKeyDown,
   onFocus,
   onBlur,
@@ -402,6 +409,7 @@ function Combobox({
         data-disabled={disabled ? 'true' : undefined}
         data-readonly={readOnly ? 'true' : undefined}
         data-empty={hasValue ? undefined : 'true'}
+        data-size={size}
         className={cn('nx:w-full', className)}
         {...props}
       >
@@ -409,7 +417,9 @@ function Combobox({
           <InputGroup
             data-slot="combobox-control"
             data-disabled={disabled ? 'true' : undefined}
+            data-size={size}
             variant={variant}
+            className="nx:border-default"
           >
             <InputGroupAddon>
               <IconSearch aria-hidden="true" />
@@ -432,6 +442,7 @@ function Combobox({
               disabled={disabled}
               readOnly={readOnly}
               required={required}
+              size={size}
               placeholder={placeholder}
               value={inputValue}
               onBlur={handleInputBlur}

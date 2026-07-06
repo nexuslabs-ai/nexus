@@ -51,6 +51,16 @@ const meta: Meta<typeof Combobox> = {
     onValueChange: fn(),
     onOpenChange: fn(),
   },
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['sm', 'default', 'lg'],
+    },
+    variant: {
+      control: 'select',
+      options: ['default', 'borderless'],
+    },
+  },
   decorators: [
     (Story) => (
       <div className="nx:w-[360px]">
@@ -95,6 +105,44 @@ export const WithDefaultValue: Story = {
     'aria-label': 'Framework with default',
     defaultValue: 'next',
     options: frameworkOptions,
+  },
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="nx:grid nx:gap-3">
+      <Combobox
+        aria-label="Small framework"
+        size="sm"
+        options={frameworkOptions}
+        placeholder="Small"
+      />
+      <Combobox
+        aria-label="Default framework"
+        size="default"
+        options={frameworkOptions}
+        placeholder="Default"
+      />
+      <Combobox
+        aria-label="Large framework"
+        size="lg"
+        options={frameworkOptions}
+        placeholder="Large"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByRole('combobox', { name: 'Small framework' })
+    ).toHaveAttribute('data-size', 'sm');
+    await expect(
+      canvas.getByRole('combobox', { name: 'Default framework' })
+    ).toHaveAttribute('data-size', 'default');
+    await expect(
+      canvas.getByRole('combobox', { name: 'Large framework' })
+    ).toHaveAttribute('data-size', 'lg');
   },
 };
 
@@ -296,6 +344,14 @@ export const WithDataAttributes: Story = {
       .closest('[data-slot="combobox"]');
 
     await expect(root).toHaveAttribute('data-slot', 'combobox');
+    await expect(root).toHaveAttribute('data-size', 'default');
     await expect(root).not.toHaveAttribute('data-empty');
+
+    const control = canvasElement.querySelector(
+      '[data-slot="combobox-control"]'
+    );
+    await expect(control).toHaveAttribute('data-size', 'default');
+    await expect(control).toHaveAttribute('data-variant', 'default');
+    await expect(control).toHaveClass('nx:border-default');
   },
 };
